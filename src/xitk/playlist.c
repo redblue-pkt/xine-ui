@@ -108,11 +108,11 @@ static void _playlist_update_browser_list(int start) {
 
   if(gGui->is_display_mrl)
     xitk_browser_update_list(playlist->playlist, 
-			     (const char **)playlist->playlist_mrls, 
+			     (const char **)playlist->playlist_mrls, NULL, 
 			     playlist->playlist_len, start);
   else
     xitk_browser_update_list(playlist->playlist, 
-			     (const char **)playlist->playlist_idents, 
+			     (const char **)playlist->playlist_idents, NULL,
 			     playlist->playlist_len, start);
 
   if((sel >= 0) && ((start == -1) || (old_start == start)))

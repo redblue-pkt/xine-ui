@@ -670,7 +670,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   menu_private_data_t        *private_data;
   int                         bentries, bsep, btitle, rentries;
   menu_node_t                *maxnode, *me;
-  int                         maxlen, wwidth, wheight, swidth, sheight;
+  int                         maxlen, wwidth, wheight, swidth, sheight, shortcutlen = 0, shortcutpos = 0;
   xitk_font_t                *fs;
   static xitk_window_t       *xwin;
   menu_window_t              *menu_window;
@@ -699,8 +699,10 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   xitk_font_set_font(fs, private_data->widget->wl->gc);
   maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
 
-  if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch))
-    maxlen += xitk_font_get_string_length(fs, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut) + 15;
+  if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch)) {
+    shortcutlen = xitk_font_get_string_length(fs, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut);
+    maxlen += shortcutlen + 15;
+  }
 
   xitk_font_unload_font(fs);
 
@@ -709,6 +711,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   if(_menu_branch_have_check(branch) || _menu_branch_have_branch(branch))
     wwidth += 20;
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
+
+  shortcutpos = (wwidth - shortcutlen) - 15;
   
   XLOCK(private_data->imlibdata->x.disp);
   swidth = DisplayWidth(private_data->imlibdata->x.disp, 
@@ -818,27 +822,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
       me->button = btn;
       
-      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut) {
-	int  swidth, max;
-	char buf[2048];
-	
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_12);
-	xitk_font_set_font(fs, private_data->widget->wl->gc);
-
-	max = xitk_font_get_string_length(fs, maxnode->menu_entry->menu) + 15;
-	
-	sprintf(buf, "%s ", me->menu_entry->menu);
-	swidth = xitk_font_get_string_length(fs, buf);
-
-	while(swidth <= max) {
-	  sprintf(buf, "%s%c", buf, ' ');
-	  swidth = xitk_font_get_string_length(fs, buf);
-	}
-
-	sprintf(buf, "%s%s", buf, me->menu_entry->shortcut); 
-	xitk_labelbutton_change_label(btn, buf);
-	xitk_font_unload_font(fs);
-      }
+      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut)
+	xitk_labelbutton_change_shortcut_label(btn, me->menu_entry->shortcut, shortcutpos);
       
       wimage = xitk_get_widget_foreground_skin(btn);
       if(wimage) {

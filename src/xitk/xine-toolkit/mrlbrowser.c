@@ -374,7 +374,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
-			     (const char* const*)private_data->mc->mrls_disp, 
+			     (const char* const*)private_data->mc->mrls_disp, NULL,
 			     private_data->mc->mrls_to_disp, 0);
   }
 }
@@ -837,7 +837,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
-			     (const char* const*)private_data->mc->mrls_disp, 
+			     (const char* const*)private_data->mc->mrls_disp, NULL,
 			     private_data->mc->mrls_to_disp, 0);
     
   }
@@ -911,7 +911,7 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   private_data->filter_selected = select;
   mrlbrowser_create_enlighted_entries(private_data);
   xitk_browser_update_list(private_data->mrlb_list, 
-  			  (const char* const*) private_data->mc->mrls_disp, 
+			   (const char* const*) private_data->mc->mrls_disp, NULL,
   			   private_data->mc->mrls_to_disp, 0);
 }
 
@@ -1317,7 +1317,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   mywidget->tips_string        = NULL;
 
   xitk_browser_update_list(private_data->mrlb_list, 
-			   (const char* const*)private_data->mc->mrls_disp, 
+			   (const char* const*)private_data->mc->mrls_disp, NULL,
 			   private_data->mrls_num, 0);
 
   XLOCK (mb->imlibdata->x.disp);

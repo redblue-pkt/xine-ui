@@ -277,7 +277,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
     printf("-----------------------------------\n\n");
   }
   
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
+  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, NULL, viewlog->real_num_entries, 0);
   
   viewlog_clear_tab();
   viewlog_paint_widgets();
@@ -432,7 +432,7 @@ void viewlog_panel(void) {
   xitk_enable_and_show_widget(viewlog->browser_widget);
 
   xitk_browser_set_alignment(viewlog->browser_widget, ALIGN_LEFT);
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
+  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, NULL, viewlog->real_num_entries, 0);
   
   viewlog_paint_widgets();
   

@@ -782,7 +782,7 @@ void control_panel(void) {
 			    xitk_browser_create(control->widget_list, gGui->skin_config, &br)));
 
   xitk_browser_update_list(control->skinlist, 
-			   control->skins, control->skins_num, 0);
+			   control->skins, NULL, control->skins_num, 0);
 
 
   lb.skin_element_name = "CtlDismiss";

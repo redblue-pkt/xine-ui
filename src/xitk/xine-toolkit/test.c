@@ -845,7 +845,7 @@ static void create_browser(void) {
   xitk_enable_and_show_widget(test->browser);
   
   xitk_browser_update_list(test->browser, 
-			   (const char *const *)test->entries, test->num_entries, 0);
+			   (const char *const *)test->entries, NULL, test->num_entries, 0);
 
 }
 

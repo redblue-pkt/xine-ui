@@ -1265,7 +1265,7 @@ char *xitk_get_system_encoding(void) {
 #endif
   /*
    * guess locale codeset according to shell variables
-   * when nl_langinfo(CODESET) isn't available or workig
+   * when nl_langinfo(CODESET) isn't available or working
    */
   if (!codeset || strstr(codeset, "ANSI") != 0) {
     if(!(lang = getenv("LC_ALL")))

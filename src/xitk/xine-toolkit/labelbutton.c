@@ -43,6 +43,7 @@ static void notify_destroy(xitk_widget_t *w) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     XITK_FREE(private_data->label);
+    XITK_FREE(private_data->shortcut_label);
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data->normcolor);
     XITK_FREE(private_data->focuscolor);
@@ -97,9 +98,8 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 static void create_labelofbutton(xitk_widget_t *lb, 
 				 Window win, GC gc, Pixmap pix, 
 				 int xsize, int ysize, 
-				 char *label, int state) {
-  lbutton_private_data_t  *private_data = 
-    (lbutton_private_data_t *) lb->private_data;
+				 char *label, char *shortcut_label, int shortcut_pos, int state) {
+  lbutton_private_data_t  *private_data = (lbutton_private_data_t *) lb->private_data;
   xitk_font_t             *fs = NULL;
   int                      lbear, rbear, width, asc, des;
   int                      xoff = 0, yoff = 0, DefaultColor = -1;
@@ -187,15 +187,27 @@ static void create_labelofbutton(xitk_widget_t *lb,
   /*  Put text in the right place */
   if(private_data->align == ALIGN_CENTER) {
     xitk_font_draw_string(fs, pix, gc, 
-    ((xsize-(width+xoff))>>1) + private_data->label_offset, origin, label, strlen(label));
+			  ((xsize-(width+xoff))>>1) + private_data->label_offset, 
+			  origin, label, strlen(label));
   }
   else if(private_data->align == ALIGN_LEFT) {
     xitk_font_draw_string(fs, pix, gc, 
-    (((state != CLICK) ? 1 : 5)) + private_data->label_offset, origin, label, strlen(label));
+			  (((state != CLICK) ? 1 : 5)) + private_data->label_offset, 
+			  origin, label, strlen(label));
+    
+    /* shortcut is only permited if alignement is set to left */
+    if(strlen(shortcut_label) && shortcut_pos >= 0) {
+      xitk_font_draw_string(fs, pix, gc, 
+			    (((state != CLICK) ? 1 : 5)) + shortcut_pos, 
+			    origin, shortcut_label, strlen(shortcut_label));
+      
+    }
+    
   }
   else if(private_data->align == ALIGN_RIGHT) {
     xitk_font_draw_string(fs, pix, gc, 
-    (xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset, origin, label, strlen(label));
+			  (xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset, 
+			  origin, label, strlen(label));
   }
 
   xitk_font_unload_font(fs);
@@ -298,7 +310,7 @@ static void paint_labelbutton (xitk_widget_t *w) {
       if(private_data->label_visible) {
 	create_labelofbutton(w, w->wl->win, w->wl->gc, btn->pixmap,
 			     button_width, skin->height, 
-			     private_data->label, state);
+			     private_data->label, private_data->shortcut_label, private_data->shortcut_pos, state);
       }
       
       XLOCK(private_data->imlibdata->x.disp);
@@ -385,6 +397,49 @@ char *xitk_labelbutton_get_label(xitk_widget_t *w) {
   if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     return private_data->label;
+  }
+
+  return NULL;
+}
+
+/*
+ * Changing button caption
+ */
+int xitk_labelbutton_change_shortcut_label(xitk_widget_t *w, char *newlabel, int pos) {
+  lbutton_private_data_t *private_data;
+
+  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) && 
+	    (((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_MENU) || ((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_BROWSER)))) {
+    private_data = (lbutton_private_data_t *) w->private_data;
+
+    if((private_data->shortcut_label = (char *) realloc(private_data->shortcut_label, strlen(newlabel) + 1)) != NULL)
+      strcpy(private_data->shortcut_label, newlabel);
+
+    if(strlen(private_data->shortcut_label)) {
+      if(pos >= 0)
+	private_data->shortcut_pos = pos;
+      else
+	private_data->shortcut_pos = -1;
+    }
+    
+    paint_labelbutton(w);
+    
+    return 1;
+  }
+
+  return 0;
+}
+
+/*
+ * Return the current button label
+ */
+char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *w) {
+  lbutton_private_data_t *private_data;
+
+  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) &&
+	    (((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_MENU) || ((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_BROWSER)))) {
+    private_data = (lbutton_private_data_t *) w->private_data;
+    return private_data->shortcut_label;
   }
 
   return NULL;
@@ -667,6 +722,8 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
   private_data->state_callback    = b->state_callback;
   private_data->userdata          = b->userdata;
   private_data->label             = strdup((b->label)?b->label:"");
+  private_data->shortcut_label    = strdup("");
+  private_data->shortcut_pos      = -1;
   private_data->label_visible     = label_visible;
   private_data->label_static      = label_static;
 

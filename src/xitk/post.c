@@ -1055,7 +1055,7 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
       int    i = 0;
 
       pplugin->help_text = hbuf;
-      xitk_browser_update_list(pplugin->help_browser, (const char **)pplugin->help_text, 
+      xitk_browser_update_list(pplugin->help_browser, (const char **)pplugin->help_text, NULL,
 			       lines, 0);
       
       if(ohbuf) {

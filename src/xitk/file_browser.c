@@ -602,7 +602,7 @@ static void sort_files(filebrowser_t *fb) {
     fb->files[i] = NULL;
   }
   
-  xitk_browser_update_list(fb->files_browser, (const char *const *)fb->files, fb->files_num, 0);
+  xitk_browser_update_list(fb->files_browser, (const char *const *)fb->files, NULL, fb->files_num, 0);
 }
 
 static void sort_directories(filebrowser_t *fb) {
@@ -637,7 +637,7 @@ static void sort_directories(filebrowser_t *fb) {
   }
 
   xitk_browser_update_list(fb->directories_browser, 
-			   (const char *const *)fb->directories, fb->directories_num, 0);
+			   (const char *const *)fb->directories, NULL, fb->directories_num, 0);
 }
 
 static void fb_getdir(filebrowser_t *fb) {

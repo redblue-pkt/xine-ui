@@ -1182,7 +1182,7 @@ void download_skin(char *url) {
 							 WINDOW_WIDTH - (20 + 10) , 20, 12, fontname)));
     
     xitk_browser_update_list(skdloader->browser, 
-    			     (const char *const *)skdloader->entries, skdloader->num, 0);
+    			     (const char *const *)skdloader->entries, NULL, skdloader->num, 0);
     
     xitk_enable_and_show_widget(skdloader->browser);
     

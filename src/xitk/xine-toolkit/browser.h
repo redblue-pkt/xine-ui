@@ -45,6 +45,7 @@ typedef struct {
   int                     jumped;
 
   char                  **content;
+  char                  **shortcuts_content;
   int                     max_length;
   int                     list_length;
   int                     current_start;

@@ -154,7 +154,7 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
     
     xitk_browser_release_all_buttons(private_data->browser_widget);
     xitk_browser_update_list(private_data->browser_widget, 
-			     (const char* const*)private_data->entries, 
+			     (const char* const*)private_data->entries, NULL,
 			     private_data->num_entries, 0);
     
     xitk_checkbox_set_state(private_data->button_widget, 0);
@@ -486,7 +486,7 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
     private_data->selected    = -1;
     
     xitk_browser_update_list(private_data->browser_widget, 
-			     (const char* const*)private_data->entries, 
+			     (const char* const*)private_data->entries, NULL,
 			     private_data->num_entries, 0);
   }
 }
@@ -614,7 +614,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
   xitk_browser_update_list(private_data->browser_widget, 
-			   (const char* const*)private_data->entries, 
+			   (const char* const*)private_data->entries, NULL,
 			   private_data->num_entries, 0);
   
   private_data->widget_key = 

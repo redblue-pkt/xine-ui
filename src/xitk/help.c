@@ -85,7 +85,7 @@ static _help_t    *help = NULL;
 
 static void help_change_section(xitk_widget_t *wx, void *data, int section) {
   if(section < help->num_sections)
-    xitk_browser_update_list(help->browser, help->sections[section]->content, 
+    xitk_browser_update_list(help->browser, help->sections[section]->content, NULL,
 			     help->sections[section]->line_num, 0);
 }
 

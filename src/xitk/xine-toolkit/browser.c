@@ -317,8 +317,14 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
+    char         *max_shortcut = NULL;
+    int           item_width;
+    char         *label_font;
+    xitk_font_t  *fs = NULL;
     
     private_data = (browser_private_data_t *) w->private_data;
+    item_width   = xitk_get_widget_width(private_data->item_tree[WBSTART]);
+    label_font   = xitk_labelbutton_get_fontname(private_data->item_tree[WBSTART]);
     
     xitk_browser_release_all_buttons(w);
 
@@ -343,30 +349,54 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 
     private_data->labels_offset = 0;
 
-    for(i = 0; i < private_data->max_length; i++) {
-      xitk_labelbutton_set_label_offset(private_data->item_tree[i + WBSTART], 0);
+    if(label_font) {
+      fs = xitk_font_load_font(private_data->imlibdata->x.disp, label_font);
+      xitk_font_set_font(fs, private_data->parent_wlist->gc);
     }
+
+    if(private_data->shortcuts_content) {
+      int maxlen = 0;
+      
+      for(i = 0; i < private_data->max_length; i++) {
+	char *nshortcut;
+	
+	if((private_data->shortcuts_content[private_data->current_start + i]) && 
+	   (nshortcut = private_data->shortcuts_content[private_data->current_start + i])) {
+	  int nlen = strlen(nshortcut);
+	  
+	  if(nlen > maxlen) {
+	    maxlen = nlen;
+	    max_shortcut = nshortcut;
+	  }
+	}
+      }
+    }
+    
+    for(i = 0; i < private_data->max_length; i++)
+      xitk_labelbutton_set_label_offset(private_data->item_tree[i + WBSTART], 0);
     
     for(i = 0; i < private_data->max_length; i++) {
       if (((private_data->current_start + i) < private_data->list_length) 
 	  && (private_data->content[private_data->current_start + i] != NULL)) {
-	int item_width = xitk_get_widget_width(private_data->item_tree[WBSTART]);
-	char *label_font = xitk_labelbutton_get_fontname(private_data->item_tree[WBSTART]);
 	
-	xitk_labelbutton_change_label(private_data->item_tree[i + WBSTART], 
+	xitk_labelbutton_change_label(private_data->item_tree[i + WBSTART],
 				      private_data->content[private_data->current_start + i]);
+
+	if(private_data->shortcuts_content) {
+	  if(private_data->shortcuts_content[private_data->current_start + i])
+	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART],
+						   private_data->shortcuts_content[private_data->current_start + i], 
+						   item_width - (xitk_font_get_string_length(fs, private_data->shortcuts_content[private_data->current_start + i]) + 10));
+	  else
+	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
+	}
 	
-	if(label_font) {
-	  xitk_font_t *fs = NULL;
-	  int          label_width;
-	  
-	  fs = xitk_font_load_font(private_data->imlibdata->x.disp, label_font);
-	  xitk_font_set_font(fs, private_data->parent_wlist->gc);
+	if(fs) {
+	  int  label_width;
 	  
 	  label_width = (private_data->content[private_data->current_start + i] && 
 			 strlen(private_data->content[private_data->current_start + i])) ? 
 	    xitk_font_get_string_length(fs, private_data->content[private_data->current_start + i]) : 0;
-	  xitk_font_unload_font(fs);
 	  
 	  if(label_width > (item_width - 2)) {
 	    int diff_width = (label_width - (item_width - 2));
@@ -377,13 +407,18 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 	      private_data->labels_offset = diff_width;
 	    
 	  }
-	  XITK_FREE(label_font);
 	}
       }
       else {
 	xitk_labelbutton_change_label(private_data->item_tree[i+WBSTART], "");
+	xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
       }
     }
+
+    XITK_FREE(label_font);
+
+    if(fs)
+      xitk_font_unload_font(fs);
 
     if(private_data->need_h_slider) {
       int align = xitk_labelbutton_get_alignment(private_data->item_tree[WBSTART]);
@@ -436,7 +471,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 /**
  * Update the list, and rebuild button list
  */
-void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, int len, int start) {
+void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
@@ -444,6 +479,7 @@ void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, int len
     
     private_data = (browser_private_data_t *) w->private_data;
     private_data->content = (char **)list;
+    private_data->shortcuts_content = (char **)shortcut;
     private_data->list_length = len;
     xitk_browser_rebuild_browser(w, start);
   }
@@ -493,11 +529,15 @@ static void browser_hslidmove(xitk_widget_t *w, void *data, int pos) {
 	  
 	  xitk_labelbutton_change_label(private_data->item_tree[i + WBSTART], 
 					private_data->content[private_data->current_start + i]);
+	  if(private_data->shortcuts_content)
+	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], 
+						   private_data->shortcuts_content[private_data->current_start + i], -1);
 	  
 	}
-	else
+	else {
 	  xitk_labelbutton_change_label(private_data->item_tree[i+WBSTART], "");
-	
+	  xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
+	}
       }
     }
     else
@@ -931,6 +971,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   private_data->skin_element_name    = (skin_element_name == NULL) ? NULL : strdup(br->browser.skin_element_name);
   private_data->jumped               = -1;
   private_data->content              = (char **)br->browser.entries;
+  private_data->shortcuts_content    = NULL;
   private_data->list_length          = br->browser.num_entries;
   private_data->max_length           = br->browser.max_displayed_entries;
 

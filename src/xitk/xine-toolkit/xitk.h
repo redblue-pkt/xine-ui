@@ -1189,11 +1189,13 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
  * Change label of button 'widget'.
  */
 int xitk_labelbutton_change_label(xitk_widget_t *, char *);
+int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, char *, int);
 
 /**
  * Return label of button 'widget'.
  */
 char *xitk_labelbutton_get_label(xitk_widget_t *);
+char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *);
 
 /**
  * Get state of button 'widget'.
@@ -1362,7 +1364,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
 /**
  * Update the list, and rebuild button list
  */
-void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, int len, int start);
+void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start);
 
 /**
  * slide up.

@@ -740,7 +740,7 @@ static void load_files(xitk_widget_t *w, void *data) {
     private_data->dir_contents_num = 0;
   
   xitk_browser_update_list(private_data->fb_list, 
-			   (const char* const*)private_data->fc->dir_disp_contents, 
+			   (const char* const*)private_data->fc->dir_disp_contents, NULL,
 			   private_data->dir_contents_num, 0);
   
   update_current_dir(private_data);
@@ -1269,7 +1269,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   load_files(NULL, (void *)private_data);
   
   xitk_browser_update_list(private_data->fb_list, 
-			   (const char* const*)private_data->fc->dir_disp_contents,
+			   (const char* const*)private_data->fc->dir_disp_contents, NULL,
 			   private_data->dir_contents_num, 0);
 
   XLOCK(fb->imlibdata->x.disp);
@@ -1562,7 +1562,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   load_files(NULL, (void *)private_data);
   
   xitk_browser_update_list(private_data->fb_list, 
-			   (const char* const*)private_data->fc->dir_disp_contents,
+			   (const char* const*)private_data->fc->dir_disp_contents, NULL,
 			   private_data->dir_contents_num, 0);
 
   XLOCK(fb->imlibdata->x.disp);

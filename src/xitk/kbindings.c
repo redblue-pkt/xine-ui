@@ -72,6 +72,7 @@ typedef struct {
 
   int                   num_entries;
   char                **entries;
+  char                **shortcuts;
 
   int                   grabbing;
   int                   action_wanted; /* See KBEDIT_ defines */
@@ -1109,39 +1110,52 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
+static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t  *kbe) {
+  static char shortcut[32];
+
+  if(kbe) {
+    memset(&shortcut, 0, sizeof(shortcut));
+    
+#define EMACS_SHORTCUTS
+#ifdef EMACS_SHORTCUTS
+    if(kbe->modifier & KEYMOD_CONTROL)
+      sprintf(shortcut, "%s%s", shortcut, "C-");
+    if(kbe->modifier & KEYMOD_META)
+      sprintf(shortcut, "%s%s", shortcut, "M-");
+    if(kbe->modifier & KEYMOD_MOD3)
+      sprintf(shortcut, "%s%s", shortcut, "M3-");
+    if(kbe->modifier & KEYMOD_MOD4)
+      sprintf(shortcut, "%s%s", shortcut, "M4-");
+    if(kbe->modifier & KEYMOD_MOD5)
+      sprintf(shortcut, "%s%s", shortcut, "M5-");
+#else
+    if(kbe->modifier & KEYMOD_CONTROL)
+      sprintf(shortcut, "%s%s", shortcut, "Ctrl+");
+    if(kbe->modifier & KEYMOD_META)
+      sprintf(shortcut, "%s%s", shortcut, "Alt+");
+    if(kbe->modifier & KEYMOD_MOD3)
+      sprintf(shortcut, "%s%s", shortcut, "M3+");
+    if(kbe->modifier & KEYMOD_MOD4)
+      sprintf(shortcut, "%s%s", shortcut, "M4+");
+    if(kbe->modifier & KEYMOD_MOD5)
+      sprintf(shortcut, "%s%s", shortcut, "M5+");
+#endif
+    
+    sprintf(shortcut, "%s%s", shortcut, kbe->key);
+    
+    return shortcut;
+  }
+  return NULL;
+}
+
 char *kbindings_get_shortcut(kbinding_t *kbt, char *action) {
   kbinding_entry_t  *k;
-  static char buf[32];
+  static char shortcut[32];
   
   if(kbt && action && (k = kbindings_lookup_action(kbt, action))) {
     if(strcmp(k->key, "VOID")) {
-      sprintf(buf, "%c", '[');
-#define EMACS_SHORTCUTS
-#ifdef EMACS_SHORTCUTS
-      if(k->modifier & KEYMOD_CONTROL)
-	sprintf(buf, "%s%s", buf, "C-");
-      if(k->modifier & KEYMOD_META)
-	sprintf(buf, "%s%s", buf, "M-");
-      if(k->modifier & KEYMOD_MOD3)
-	sprintf(buf, "%s%s", buf, "M3-");
-      if(k->modifier & KEYMOD_MOD4)
-	sprintf(buf, "%s%s", buf, "M4-");
-      if(k->modifier & KEYMOD_MOD5)
-	sprintf(buf, "%s%s", buf, "M5-");
-#else
-      if(k->modifier & KEYMOD_CONTROL)
-	sprintf(buf, "%s%s", buf, "Ctrl+");
-      if(k->modifier & KEYMOD_META)
-	sprintf(buf, "%s%s", buf, "Alt+");
-      if(k->modifier & KEYMOD_MOD3)
-	sprintf(buf, "%s%s", buf, "M3+");
-      if(k->modifier & KEYMOD_MOD4)
-	sprintf(buf, "%s%s", buf, "M4+");
-      if(k->modifier & KEYMOD_MOD5)
-	sprintf(buf, "%s%s", buf, "M5+");
-#endif
-      sprintf(buf, "%s%s%c", buf, k->key, ']');
-      return buf;
+      sprintf(shortcut, "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k), ']');
+      return shortcut;
     }
   }
   return NULL;
@@ -1331,77 +1345,45 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 
 static void kbedit_create_browser_entries(void) {
   xitk_font_t  *fs;
-  int           i, wlen;
+  int           i;
   
   if(kbedit->num_entries) {
-    for(i = 0; i < kbedit->num_entries; i++)
+    for(i = 0; i < kbedit->num_entries; i++) {
       free((char *)kbedit->entries[i]);
+      free((char *)kbedit->shortcuts[i]);
+    }
     free((char **)kbedit->entries);
-
+    free((char **)kbedit->shortcuts);
   }
 
-  kbedit->entries = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
+  kbedit->entries   = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
+  kbedit->shortcuts = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
   kbedit->num_entries = (kbedit->kbt->num_entries - 1);
   
-  wlen = WINDOW_WIDTH - 30 - 2 - 16;
-
-  fs   = xitk_font_load_font(gGui->display, br_fontname);
+  fs = xitk_font_load_font(gGui->display, br_fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   
   for(i = 0; i < kbedit->num_entries; i++) {
-    char buf[2048], buf2[2048];
-    char shortcut[256];
-
+    char  buf[2048];
+    char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i]);
+    char  shortcut[32];
+        
     memset(&buf, 0, sizeof(buf));
-    memset(&buf2, 0, sizeof(buf2));
     memset(&shortcut, 0, sizeof(shortcut));
+    sprintf(shortcut, "%c%s%c", '[', (sc ? sc : "VOID"), ']');
     
     if(kbedit->kbt->entry[i]->is_alias)
       sprintf(buf, "@{%s}", kbedit->kbt->entry[i]->comment);
     else
       sprintf(buf, "%s", kbedit->kbt->entry[i]->comment);
     
-    sprintf(shortcut, "%2s", "[ ");
-    
-    if(kbedit->kbt->entry[i]->modifier != KEYMOD_NOMOD) {
-      
-      if(kbedit->kbt->entry[i]->modifier & KEYMOD_CONTROL)
-	sprintf(shortcut, "%s%c", shortcut, 'C');
-      if(kbedit->kbt->entry[i]->modifier & KEYMOD_META)
-	sprintf(shortcut, "%s%c", shortcut, 'M');
-      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD3)
-	sprintf(shortcut, "%s%2s", shortcut, "M3");
-      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD4)
-	sprintf(shortcut, "%s%2s", shortcut, "M4");
-      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD5)
-	sprintf(shortcut, "%s%2s", shortcut, "M5");
-
-      sprintf(shortcut, "%s%c", shortcut, '-');
-    }
-
-    sprintf(shortcut, "%s%s ]", shortcut, kbedit->kbt->entry[i]->key);
-
-    { /* Right align shortcut */
-      int           slen, spaces;
-      
-      sprintf(buf2, "%s %s", buf, shortcut);
-      spaces = strlen(buf) + 1;
-      
-      slen = xitk_font_get_string_length(fs, buf2);
-      while((slen + 8) < wlen) {
-	
-	buf2[spaces++] = ' ';
-	memcpy(buf2 + spaces, shortcut, strlen(shortcut));
-	buf2[strlen(buf2)] = '\0';
-
-	slen = xitk_font_get_string_length(fs, buf2);
-      }
-
-    }
-
-    kbedit->entries[i] = strdup(buf2);
+    kbedit->entries[i]   = strdup(buf);
+    kbedit->shortcuts[i] = strdup(shortcut);
   }
-  kbedit->entries[i] = NULL;
+
+  kbedit->entries[i]   = NULL;
+  kbedit->shortcuts[i] = NULL;
+
   xitk_font_unload_font(fs);
 }
 
@@ -1520,10 +1502,13 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
     {
       int i;
       
-      for(i = 0; i < kbedit->num_entries; i++)
+      for(i = 0; i < kbedit->num_entries; i++) {
 	free((char *)kbedit->entries[i]);
+	free((char *)kbedit->shortcuts[i]);
+      }
       
       free((char **)kbedit->entries);
+      free((char **)kbedit->shortcuts);
     }
     
     kbindings_free_kbinding(&kbedit->kbt);
@@ -1606,7 +1591,8 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       kbedit_create_browser_entries();
       
       xitk_browser_update_list(kbedit->browser, 
-			       (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			       (const char* const*) kbedit->entries, 
+			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
     }
     else {
       xine_error(_("You can only delete alias entries."));
@@ -1626,7 +1612,8 @@ static void kbedit_reset(xitk_widget_t *w, void *data) {
   kbindings_reset_kbinding(&kbedit->kbt);
   kbedit_create_browser_entries();
   xitk_browser_update_list(kbedit->browser, 
-			   (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->entries, 
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
 }
 
 /*
@@ -1674,7 +1661,8 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     
     kbedit_create_browser_entries();
     xitk_browser_update_list(kbedit->browser, 
-			     (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			     (const char* const*) kbedit->entries, 
+			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
     break;
     
   case KBEDIT_EDITING:
@@ -1684,7 +1672,8 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     
     kbedit_create_browser_entries();
     xitk_browser_update_list(kbedit->browser, 
-			     (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			     (const char* const*) kbedit->entries, 
+			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
     break;
   }
 
@@ -1703,7 +1692,8 @@ static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
   kbedit->action_wanted = KBEDIT_NOOP;
   
   xitk_browser_update_list(kbedit->browser, 
-			   (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->entries, 
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
   SAFE_FREE(kbe->comment);
   SAFE_FREE(kbe->action);
   SAFE_FREE(kbe->key);
@@ -1807,32 +1797,14 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   kbedit->grabbing = 0;
   
   if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
-    char shortcut[256];
+    char shortcut[32];
     
     xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
     kbedit_display_kbinding(action, kbe);
     
     memset(&shortcut, 0, sizeof(shortcut));
-    sprintf(shortcut, "%2s", "[ ");
+    sprintf(shortcut, "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
     
-    if(kbe->modifier != KEYMOD_NOMOD) {
-      
-      if(kbe->modifier & KEYMOD_CONTROL)
-	sprintf(shortcut, "%s%c", shortcut, 'C');
-      if(kbe->modifier & KEYMOD_META)
-	sprintf(shortcut, "%s%c", shortcut, 'M');
-      if(kbe->modifier & KEYMOD_MOD3)
-	sprintf(shortcut, "%s%2s", shortcut, "M3");
-      if(kbe->modifier & KEYMOD_MOD4)
-	sprintf(shortcut, "%s%2s", shortcut, "M4");
-      if(kbe->modifier & KEYMOD_MOD5)
-	sprintf(shortcut, "%s%2s", shortcut, "M5");
-
-      sprintf(shortcut, "%s%c", shortcut, '-');
-    }
-    
-    sprintf(shortcut, "%s%s ]", shortcut, kbe->key);
-
     /* Ask if uses want/wont store new shorcut */
     xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Accept?"),
 					kbedit_accept_yes, 
@@ -1840,7 +1812,6 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 					(void *) kbe, 400, ALIGN_CENTER,
 					_("Store %s as\n'%s' key binding ?."),
 					shortcut, kbedit->ksel->comment);
-
   }
   else {
     /* error, redundant */
@@ -1849,7 +1820,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 		 kbedit->kbt->entry[redundant]->comment);
     }
   }
-
+  
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
@@ -2022,7 +1993,8 @@ void kbedit_window(void) {
 
   xitk_browser_set_alignment(kbedit->browser, ALIGN_LEFT);
   xitk_browser_update_list(kbedit->browser, 
-			   (const char* const*) kbedit->entries, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->entries, 
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
 
   y = (WINDOW_HEIGHT - 160);
 
