@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-04 21:43+0200\n"
-"PO-Revision-Date: 2002-05-31 22:05+0200\n"
+"POT-Creation-Date: 2002-06-07 14:44+0200\n"
+"PO-Revision-Date: 2002-06-07 11:46+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -63,15 +63,15 @@ msgstr "Kon"
 msgid "Choose a Skin"
 msgstr "Wybór Skóry"
 
-#: src/xitk/control.c:713 src/xitk/mrl_browser.c:219 src/xitk/playlist.c:874
+#: src/xitk/control.c:712 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:873
 msgid "Dismiss"
 msgstr "Koniec"
 
-#: src/xitk/control.c:719
+#: src/xitk/control.c:718
 msgid "Close control window"
 msgstr "Zamykanie panela kontrolnego"
 
-#: src/xitk/errors.c:64 src/xitk/kbindings.c:1842
+#: src/xitk/errors.c:64 src/xitk/kbindings.c:1918
 msgid "Done"
 msgstr "Zrobione"
 
@@ -151,107 +151,121 @@ msgstr "Nie mogê zainicjowaæ Imlib\n"
 msgid "Xine File Browser"
 msgstr "Przegl±darka plików xine"
 
-#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:212
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:210
 msgid "Select"
 msgstr "Wybór"
 
 #: src/xitk/kbindings.c:349
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
-msgstr "Skróty klawiaturowe '%s' i '%s' s± identyczne.\n"
+msgstr "Mapowania klawiszy '%s' i '%s' s± identyczne.\n"
 
 #: src/xitk/kbindings.c:709
 msgid "OOCH: key binding table is NULL.\n"
-msgstr "Ojej: tablica skrótów klawiaturowych jest PUSTA.\n"
+msgstr "Ojej: tablica mapowania klawiszy jest PUSTA.\n"
 
-#: src/xitk/kbindings.c:1270
+#: src/xitk/kbindings.c:1294
 msgid "Nothing selected"
 msgstr "Nic nie wybrano"
 
-#: src/xitk/kbindings.c:1271
+#: src/xitk/kbindings.c:1295
 msgid "None"
-msgstr "Nic"
+msgstr "Brak"
 
-#: src/xitk/kbindings.c:1432
+#: src/xitk/kbindings.c:1456
 msgid "You can only delete alias entries."
 msgstr "Mo¿na usuwaæ tylko aliasy wpisów"
 
-#: src/xitk/kbindings.c:1496
+#: src/xitk/kbindings.c:1580
 msgid "Press Keyboard Keys..."
-msgstr "Naciskaj przyciski klawiatury..."
+msgstr "Naci¶nij kawisz..."
 
-#: src/xitk/kbindings.c:1514
+#: src/xitk/kbindings.c:1597
 msgid "Event receiver window"
 msgstr "Okno odbiornika wydarzeñ"
 
-#: src/xitk/kbindings.c:1611
+#. Ask if uses want/wont store new shorcut
+#: src/xitk/kbindings.c:1682
+msgid "Accept?"
+msgstr "Zaakceptowaæ?"
+
+#: src/xitk/kbindings.c:1686
+#, c-format
+msgid ""
+"Store %s as\n"
+"'%s' key binding ?."
+msgstr ""
+"Zapis %s jako\n"
+"mapowanie klawisza '%s'?."
+
+#: src/xitk/kbindings.c:1693
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
-"Ten skrót klawiaturowy jest redundantny z akcj±\n"
+"To mapowanie klawisza jest redundantne z akcj±\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:1695
+#: src/xitk/kbindings.c:1772
 msgid "key binding editor"
-msgstr "Edytor skrótów klawiaturowych"
+msgstr "Edytor mapowania klawiszy"
 
-#: src/xitk/kbindings.c:1721
+#: src/xitk/kbindings.c:1797
 msgid "Binding action"
 msgstr "Akcja skrótu"
 
-#: src/xitk/kbindings.c:1727
+#: src/xitk/kbindings.c:1803
 msgid "Key"
 msgstr "Klawisz"
 
-#: src/xitk/kbindings.c:1732
+#: src/xitk/kbindings.c:1808
 msgid "Modifiers"
 msgstr "Modyfikator"
 
-#: src/xitk/kbindings.c:1773
+#: src/xitk/kbindings.c:1849
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1787
+#: src/xitk/kbindings.c:1863
 msgid "Edit"
 msgstr "Edycja"
 
-#: src/xitk/kbindings.c:1801
+#: src/xitk/kbindings.c:1877
 msgid "Delete"
 msgstr "Usuwanie"
 
-#: src/xitk/kbindings.c:1815 src/xitk/playlist.c:864
+#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:863
 msgid "Save"
 msgstr "Zapis"
 
-#: src/xitk/kbindings.c:1829
+#: src/xitk/kbindings.c:1905
 msgid "Reset"
 msgstr "Reset"
 
-#: src/xitk/kbindings.c:1906
+#: src/xitk/kbindings.c:1982
 msgid "ctrl"
 msgstr "ctrl"
 
-#: src/xitk/kbindings.c:1927
+#: src/xitk/kbindings.c:2003
 msgid "meta"
 msgstr "meta"
 
-#: src/xitk/kbindings.c:1949
+#: src/xitk/kbindings.c:2025
 msgid "mod3"
 msgstr "mod3"
 
-#: src/xitk/kbindings.c:1971
+#: src/xitk/kbindings.c:2047
 msgid "mod4"
 msgstr "mod4"
 
-#: src/xitk/kbindings.c:1992
+#: src/xitk/kbindings.c:2068
 msgid "mod5"
 msgstr "mod5"
 
-#: src/xitk/kbindings.c:2001
+#: src/xitk/kbindings.c:2077
 msgid "Grab"
-msgstr "Pobór"
+msgstr "Przechwytuj"
 
 #: src/xitk/main.c:251
 #, c-format
@@ -370,7 +384,7 @@ msgstr "      --install                Instalowanie prywatnej mapy kolorów.\n"
 #: src/xitk/main.c:311
 msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr ""
-"      --keymap [option]        Wy¶wietlanie skrótów klawiaturowych. Opcje:\n"
+"      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
 
 #: src/xitk/main.c:312
 msgid ""
@@ -475,183 +489,193 @@ msgstr ""
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: podany sterownik d¼wiêku '%s' zawiód³\n"
 
-#: src/xitk/main.c:590
+#: src/xitk/main.c:574
+#, c-format
+msgid "No audio plugin found to decode '%s'."
+msgstr ""
+
+#: src/xitk/main.c:578
+#, c-format
+msgid "No video plugin found to decode '%s'."
+msgstr ""
+
+#: src/xitk/main.c:606
 #, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Wymaga biblioteki xine 0.9.9, znaleziono %d.%d.%d.\n"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:687
 msgid "video driver id required for -V option\n"
 msgstr "id serownika wideo wymagane dla opcji -V\n"
 
-#: src/xitk/main.c:681
+#: src/xitk/main.c:697
 msgid "audio driver id required for -A option\n"
 msgstr "ID serownika d¼wiêku wymagane dla opcji -A\n"
 
-#: src/xitk/main.c:792
+#: src/xitk/main.c:808
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "B³êdna geometria '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:816
+#: src/xitk/main.c:832
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "B³êdny argument %d => exit\n"
 
-#: src/xitk/mrl_browser.c:201
+#: src/xitk/mrl_browser.c:199
 msgid "Xine MRL Browser"
 msgstr "Przegl±darka MRL xine"
 
-#: src/xitk/mrl_browser.c:228
+#: src/xitk/mrl_browser.c:226
 msgid "Source:"
 msgstr "¬ród³o:"
 
-#: src/xitk/panel.c:526
+#: src/xitk/panel.c:543
 msgid "Volume control"
 msgstr "Kontrola g³o¶no¶ci"
 
-#: src/xitk/panel.c:528
+#: src/xitk/panel.c:545
 msgid "Mute toggle"
 msgstr "Wyciszenie"
 
-#: src/xitk/panel.c:697
+#: src/xitk/panel.c:714
 msgid "Play previous entry from playlist"
 msgstr "Odtwarzanie poprzedniego wpisu z listy"
 
-#: src/xitk/panel.c:704
+#: src/xitk/panel.c:721
 msgid "Stop playback"
 msgstr "Zatrzymanie"
 
-#: src/xitk/panel.c:711
+#: src/xitk/panel.c:728
 msgid "Play selected entry"
 msgstr "Odtwarzanie"
 
-#: src/xitk/panel.c:719
+#: src/xitk/panel.c:736
 msgid "Pause/Resume playback"
 msgstr "Pauza"
 
-#: src/xitk/panel.c:726
+#: src/xitk/panel.c:743
 msgid "Play next entry from playlist"
 msgstr "Odtwarzanie nastepnego wpisu z listy"
 
-#: src/xitk/panel.c:733
+#: src/xitk/panel.c:750
 msgid "Eject current medium"
 msgstr "Wyrzut no¶nika"
 
-#: src/xitk/panel.c:740
+#: src/xitk/panel.c:757
 msgid "Quit"
 msgstr "Koniec"
 
-#: src/xitk/panel.c:747
+#: src/xitk/panel.c:764
 msgid "Setup window"
 msgstr "Okno ustawieñ"
 
-#: src/xitk/panel.c:754
+#: src/xitk/panel.c:771
 msgid "Hide GUI"
 msgstr "Ukrycie GUI"
 
-#: src/xitk/panel.c:761
+#: src/xitk/panel.c:778
 msgid "Fullscreen/Window mode"
 msgstr "Tryb pe³noekranowy/okienkowy"
 
-#: src/xitk/panel.c:768
+#: src/xitk/panel.c:785
 msgid "Next audio channel"
 msgstr "Nastêpny kana³ d¼wiêku"
 
-#: src/xitk/panel.c:775
+#: src/xitk/panel.c:792
 msgid "Previous audio channel"
 msgstr "Poprzedni kana³ d¼wiêku"
 
-#: src/xitk/panel.c:782
+#: src/xitk/panel.c:799
 msgid "Next SPU channel"
 msgstr "Nastêpny kana³ napisów"
 
-#: src/xitk/panel.c:789
+#: src/xitk/panel.c:806
 msgid "Previous SPU channel"
 msgstr "Poprzedni kana³ napisów"
 
-#: src/xitk/panel.c:835
+#: src/xitk/panel.c:852
 msgid "Stream playback position slider"
 msgstr "Suwak pozycji odtwarzania strumienia"
 
-#: src/xitk/panel.c:865
+#: src/xitk/panel.c:882
 msgid "Take a snapshot"
 msgstr "Zrzut obrazu"
 
-#: src/xitk/panel.c:872
+#: src/xitk/panel.c:889
 msgid "Slow motion"
 msgstr "Zwolnienie"
 
-#: src/xitk/panel.c:879
+#: src/xitk/panel.c:896
 msgid "Fast motion"
 msgstr "Przyspieszenie"
 
-#: src/xitk/panel.c:886
+#: src/xitk/panel.c:903
 msgid "Playlist"
 msgstr "Lista odtwarzania"
 
-#: src/xitk/panel.c:893
+#: src/xitk/panel.c:910
 msgid "Control"
 msgstr "Kontrola wy¶wietlania"
 
-#: src/xitk/panel.c:900
+#: src/xitk/panel.c:917
 msgid "MRL Browser"
 msgstr "Przegl±darka MRL"
 
-#: src/xitk/playlist.c:354 src/xitk/playlist.c:411
+#: src/xitk/playlist.c:353 src/xitk/playlist.c:410
 #, c-format
 msgid "Can't read %s: %s\n"
 msgstr "Nie mogê odczytaæ %s: %s\n"
 
-#: src/xitk/playlist.c:810
+#: src/xitk/playlist.c:809
 msgid "Move up selected MRL"
 msgstr "Przesuñ do góry wybrany MRL"
 
-#: src/xitk/playlist.c:818
+#: src/xitk/playlist.c:817
 msgid "Move down selected MRL"
 msgstr "Przesuñ w dól wybrany MRL"
 
-#: src/xitk/playlist.c:825
+#: src/xitk/playlist.c:824
 msgid "Start playback of selected MRL"
 msgstr "Rozpocznij odtwarzanie wybranego MRL"
 
-#: src/xitk/playlist.c:832
+#: src/xitk/playlist.c:831
 msgid "Delete selected MRL from playlist"
 msgstr "Skasuj wybrany MRL z listy odtwarzania"
 
-#: src/xitk/playlist.c:839
+#: src/xitk/playlist.c:838
 msgid "Delete all entries in playlist"
 msgstr "Skasuj wszystkie wpisy z listy odtwarzania"
 
-#: src/xitk/playlist.c:843
+#: src/xitk/playlist.c:842
 msgid "Add"
 msgstr "Dodanie"
 
-#: src/xitk/playlist.c:849
+#: src/xitk/playlist.c:848
 msgid "Add one or more entries in playlist"
 msgstr "Dodanie jednego lub wiecej wpisów do listy"
 
-#: src/xitk/playlist.c:854
+#: src/xitk/playlist.c:853
 msgid "Load"
 msgstr "£aduj"
 
-#: src/xitk/playlist.c:860
+#: src/xitk/playlist.c:859
 msgid "Load saved playlist"
 msgstr "£adowanie zapisanej listy"
 
-#: src/xitk/playlist.c:870
+#: src/xitk/playlist.c:869
 msgid "Save playlist"
 msgstr "Zapis listy"
 
-#: src/xitk/playlist.c:880
+#: src/xitk/playlist.c:879
 msgid "Close playlist window"
 msgstr "Zamykanie okna listy odtwarzania"
 
-#: src/xitk/playlist.c:897
+#: src/xitk/playlist.c:895
 msgid "Scan for:"
 msgstr "Skanuj:"
 
-#: src/xitk/playlist.c:909
+#: src/xitk/playlist.c:907
 msgid "Direct MRL entry"
 msgstr "Bezpo¶redni wpis MRL"
 
@@ -673,12 +697,11 @@ msgstr "Ustawienia xine"
 
 #: src/xitk/setup.c:1143
 msgid "Logs"
-msgstr ""
+msgstr "Logi"
 
 #: src/xitk/setup.c:1154
-#, fuzzy
 msgid "Key Bindings"
-msgstr "Edytor skrótów klawiaturowych"
+msgstr "Mapowanie klawiszy"
 
 #: src/xitk/setup.c:1165 src/xitk/viewlog.c:488
 msgid "Close"
