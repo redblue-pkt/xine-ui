@@ -74,7 +74,7 @@ extern char *strchr (), *strrchr ();
 #define _rl_strnicmp strncasecmp
 #else
 extern int _rl_stricmp PARAMS((char *, char *));
-extern int _rl_strnicmp PARAMS((char *, char *));
+extern int _rl_strnicmp PARAMS((char *, char *, int));
 #endif
 
 #if defined (HAVE_STRPBRK)
