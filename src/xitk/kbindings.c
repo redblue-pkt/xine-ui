@@ -2271,7 +2271,7 @@ int main(int argc, char **argv) {
     
     for(i = 0; k[i]->action != NULL; i++) {
       
-      if(k[i]->is_alias && (!strcasecmp(k[i]->key, "VOID")))
+      if(k[i]->is_alias || (!strcasecmp(k[i]->key, "VOID")))
 	continue;
       
       printf(".IP \"");
