@@ -1077,9 +1077,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 					  mb->imlibdata->x.visual,
 					  CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 					  &attr);
-  
-  XSetStandardProperties(mb->imlibdata->x.disp, private_data->window, title, title,
-			 None, NULL, 0, &hint);
+
+  XmbSetWMProperties(mb->imlibdata->x.disp, private_data->window, title, title,
+                     NULL, 0, &hint, NULL, NULL);
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   XUNLOCK(mb->imlibdata->x.disp);

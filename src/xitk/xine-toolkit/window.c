@@ -248,7 +248,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
 			       | CWOverrideRedirect | CWWinGravity ,
 			       &attr);
   
-  XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
+  XmbSetWMProperties(im->x.disp, xwin->window, title, title, NULL, 0, &hint, NULL, NULL);
 
   XSelectInput(im->x.disp, xwin->window, INPUT_MOTION | KeymapStateMask);
   

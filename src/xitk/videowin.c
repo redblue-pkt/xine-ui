@@ -168,7 +168,7 @@ static Bool have_xtestextention(void) {
 }
 
 static void _set_window_title(void) {
-  XSetStandardProperties(gGui->display, gGui->video_window, gVw->window_title, gVw->window_title, None, NULL, 0, 0);
+  XmbSetWMProperties(gGui->display, gGui->video_window, gVw->window_title, gVw->window_title, NULL, 0, NULL, NULL, NULL);
   XSync(gGui->display, False);
 }
 

@@ -1098,8 +1098,8 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
 		   fb->imlibdata->x.visual,
 		   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
   
-  XSetStandardProperties(fb->imlibdata->x.disp, private_data->window, title, title,
-			 None, NULL, 0, &hint);
+  XmbSetWMProperties(fb->imlibdata->x.disp, private_data->window, title, title,
+                     NULL, 0, &hint, NULL, NULL);
 
   XSelectInput(fb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   
@@ -1391,8 +1391,8 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
 		   fb->imlibdata->x.visual,
 		   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
   
-  XSetStandardProperties(fb->imlibdata->x.disp, private_data->window, title, title,
-			 None, NULL, 0, &hint);
+  XmbSetWMProperties(fb->imlibdata->x.disp, private_data->window, title, title,
+                     &hint, NULL, NULL);
 
   XSelectInput(fb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   

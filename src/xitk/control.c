@@ -581,8 +581,8 @@ void control_panel(void) {
 				   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				   &attr);
   
-  XSetStandardProperties(gGui->display, control->window, title, title,
- 			 None, NULL, 0, &hint);
+  XmbSetWMProperties(gGui->display, control->window, title, title, NULL, 0, 
+                     &hint, NULL, NULL);
   
   XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay(gGui->display);

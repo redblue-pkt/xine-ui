@@ -1076,8 +1076,8 @@ void playlist_editor(void) {
 				    CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				    &attr);
   
-  XSetStandardProperties(gGui->display, playlist->window, title, title,
-			 None, NULL, 0, &hint);
+  XmbSetWMProperties(gGui->display, playlist->window, title, title, NULL, 0,
+                     &hint, NULL, NULL);
   
   XSelectInput(gGui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay (gGui->display);
