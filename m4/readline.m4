@@ -617,27 +617,43 @@ AC_DEFUN([BASH_CHECK_LIB_TERMCAP],
      _bash_needmsg=
    fi
    AC_CACHE_VAL(bash_cv_termcap_lib,
-                [AC_CHECK_LIB(termcap, tgetent, bash_cv_termcap_lib=libtermcap,
-                              [AC_CHECK_LIB(curses, tgetent, bash_cv_termcap_lib=libcurses,
-	                                    [AC_CHECK_LIB(ncurses, tgetent, bash_cv_termcap_lib=libncurses,
-	                                                  [ bash_cv_termcap_lib=unset
-                                                            no_termcap=yes])
-                                            ])
-                              ])
-                ])
+     [ if test x"$prefer_curses" = "xyes"; then
+         bash_cv_termcap_lib=libcurses
+       else
+         AC_CHECK_LIB(termcap, tgetent, bash_cv_termcap_lib=libtermcap,
+           [AC_CHECK_LIB(ncurses, tgetent, bash_cv_termcap_lib=libncurses,
+             [AC_CHECK_LIB(curses, tgetent, bash_cv_termcap_lib=libcurses,
+	                   [ bash_cv_termcap_lib=unset
+                             no_termcap=yes
+                           ])
+                        ])
+                     ])
+       fi
+     ])
 
-   if test "X$_bash_needmsg" = "Xyes"; then
+   if test x"$_bash_needmsg" = "xyes"; then
      AC_MSG_CHECKING([which library has the termcap functions])
    fi
 
-   if test x"$no_termcap" = "x"; then
+   if test x"$no_termcap" != "xyes"; then
      AC_MSG_RESULT([using $bash_cv_termcap_lib])
    else
      AC_MSG_RESULT([none])
    fi
 
+   if test x"$no_termcap" != "xyes" -o [ x"$no_termcap" = "xyes" -a -z "$prefer_curses" ]; then
+     t_lib=`echo $bash_cv_termcap_lib | sed -e 's/^lib//g'`
+     t_funcs="tputs tgoto tgetnum tgetstr tgetent tgetflag"
+     for t_func in $t_funcs; do
+       AC_CHECK_LIB($t_lib, $t_func, [no_termcap=no], [no_termcap=yes])
+       if test x"$no_termcap" = "xyes"; then
+         break
+       fi
+     done
+   fi
+
    if test x"$no_termcap" = "xyes" && test -z "$prefer_curses"; then
-     :
+     : 
    elif test x"$bash_cv_termcap_lib" = "xlibtermcap" && test -z "$prefer_curses"; then
      TERMCAP_LIB=-ltermcap
      TERMCAP_DEP=
@@ -649,7 +665,7 @@ AC_DEFUN([BASH_CHECK_LIB_TERMCAP],
      TERMCAP_DEP=
    fi
 
-   if test x"$no_termcap" = "x"; then
+   if test x"$no_termcap" != "xyes"; then
      ifelse([$1], , :, [$1])
    else
      ifelse([$2], , :, [$2])
