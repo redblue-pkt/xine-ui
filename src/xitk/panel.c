@@ -469,7 +469,10 @@ void panel_add_autoplay_buttons(void) {
 	      xitk_labelbutton_create (gGui->skin_config, &lb)));
     xitk_set_widget_tips(panel->autoplay_plugins[i], 
 			 xine_get_input_plugin_description(gGui->xine, autoplay_plugins[i]));
-    
+
+    if(!panel->tips.enable)
+      xitk_disable_widget_tips(panel->autoplay_plugins[i]);
+
     (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 
     x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
@@ -513,6 +516,11 @@ void panel_add_mixer_control(void) {
     xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
   if(gGui->mixer.caps & AO_CAP_MUTE_VOL)
     xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
+
+  if(!panel->tips.enable) {
+    xitk_disable_widget_tips(panel->mixer.slider);
+    xitk_disable_widget_tips(panel->mixer.mute);
+  }
 
 }
 
