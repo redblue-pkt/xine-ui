@@ -691,7 +691,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       }
 
       if(s->browser_entries > -1)
-	printf("  browser entries = %d\n", s->browset_entries);
+	printf("  browser entries = %d\n", s->browser_entries);
       
       printf("  animation   = %d\n", s->animation);
       printf("  step        = %d\n", s->animation_step);
