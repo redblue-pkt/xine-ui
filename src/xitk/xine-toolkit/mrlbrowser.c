@@ -594,6 +594,7 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
       for(i = 0; private_data->filters[i] != NULL; i++)
 	free(private_data->filters[i]);
 
+      free(private_data->filters);
     }
     
     XITK_FREE(private_data->skin_element_name);
