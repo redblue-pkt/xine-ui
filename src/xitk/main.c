@@ -579,10 +579,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
+    printf("xitk/main.c: playback finished\n");
     if(event->stream == gGui->stream) {
+      printf("xitk/main.c: playing next stream...\n");
       gui_playlist_start_next();
     }
     else if(event->stream == gGui->visual_anim.stream) {
+      printf("xitk/main.c: restarting visual stream...\n");
       visual_anim_play_next();
     }
     break;
