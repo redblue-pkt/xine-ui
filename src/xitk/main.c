@@ -1732,8 +1732,6 @@ int main(int argc, char *argv[]) {
   gGui->event_queue = xine_event_new_queue(gGui->stream);
   xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
 
-  xine_tvmode_init(gGui->xine);
-  
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);

@@ -338,23 +338,14 @@ static void video_window_adapt_size (void) {
 #ifdef HAVE_XINERAMA
   case 4:
 #endif
-    if(gGui->xine)
-      xine_tvmode_switch (gGui->xine, 
-			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
     break;
   case 2:
 #ifdef HAVE_XINERAMA
   case 8:
 #endif
-    if(gGui->xine)
-      if (xine_tvmode_switch (gGui->xine,
-			      1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
-	gVw->fullscreen_req = 0;
+    gVw->fullscreen_req = 0;
     break;
   default:
-    if(gGui->xine)
-      xine_tvmode_switch (gGui->xine, 
-			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
     gVw->fullscreen_req = 0;
   }
 
@@ -489,11 +480,6 @@ static void video_window_adapt_size (void) {
   gVw->visible_height = gVw->fullscreen_height;
   gVw->visible_aspect = gGui->pixel_aspect;
 
-  if(gGui->xine) {
-    xine_tvmode_size (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_aspect, NULL);
-    xine_tvmode_size (gGui->xine, &hint.width, &hint.height, NULL, NULL);
-  }
-  
 #ifdef HAVE_XINERAMA
   /* ask for xinerama fullscreen mode */
   if (gVw->xinerama && gVw->fullscreen_req==4) {
@@ -1572,8 +1558,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  * Necessary cleanup
  */
 void video_window_exit (void) {
-
-  xine_tvmode_exit (gGui->xine);
 
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
