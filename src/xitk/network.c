@@ -576,7 +576,7 @@ static int __sock_write(int socket, int cr, char *msg, ...) {
   return _sock_write(socket, buf, strlen(buf));
 }
 
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 91)
 #define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, ##args)
 #define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, ##args)
 #else
@@ -633,7 +633,7 @@ static int get_bool_value(const char *val) {
 
 #ifdef NETWORK_CLIENT
 
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 91)
 #define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, ##args)
 #define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, ##args)
 #else
