@@ -1,17 +1,23 @@
 xine-ui (0.9.20) unstable; urgency=low
 
-  * many skins updates (don't forget to update you local copies)
-  * add menu events in main menu,
-  * fix segfault with wrong DISPLAY envvar,
-  * fb: fix xine's driver initialization,
-  * try to handle versionless asx playlists,
-  * fix lirc exiting freeze bug,
-  * add --verbose[=level] option arg,
-  * various memleaks/bug fixes,
-  * update file browser filters,
-  * fix quit while playing crash bug, faster quit,
-  * support XINE_PARAM_AUDIO_AMP_LEVEL (shortcut/session),
   * hpux compilation fix.
+  * aa:
+  *   support XINE_ENGINE_PARAM_VERBOSITY
+  * fb:
+  *   fix xine's driver initialization.
+  * xitk:
+  *   support fb output,
+  *   many skins updates (don't forget to update you local copies),
+  *   add menu events in main menu,
+  *   fix segfault with wrong DISPLAY envvar,
+  *   try to handle versionless asx playlists,
+  *   fix lirc exiting freeze bug,
+  *   add --verbose[=level] option arg,
+  *   various memleaks/bug fixes,
+  *   update file browser filters,
+  *   fix quit while playing crash bug, faster quit,
+  *   support XINE_ENGINE_PARAM_VERBOSITY,
+  *   support XINE_PARAM_AUDIO_AMP_LEVEL (shortcut/session).
 
 xine-ui (0.9.19) unstable; urgency=low
 
