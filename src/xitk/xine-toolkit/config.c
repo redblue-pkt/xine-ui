@@ -253,7 +253,7 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.warn_foreground = -1;
   xtcf->colors.warn_background = -1;
   xtcf->timers.label_anim      = 50000;
-  xtcf->timers.dbl_click       = 200;
+  xtcf->timers.dbl_click       = 400;
 }
 
 /*
