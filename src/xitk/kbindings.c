@@ -341,7 +341,7 @@ static kbinding_entry_t default_binding_table[] = {
   { "visibility toggle of output window",
     "ToggleWindowVisibility", ACTID_TOGGLE_WINOUT_VISIBLITY , "h",        KEYMOD_NOMOD   , 0 },
   { "visibility toggle of UI windows",
-    "ToggleVisiblity",        ACTID_TOGGLE_VISIBLITY        , "g",        KEYMOD_NOMOD   , 0 },
+    "ToggleVisibility",       ACTID_TOGGLE_VISIBLITY        , "g",        KEYMOD_NOMOD   , 0 },
   { "visibility toggle of control window",
     "ControlShow",            ACTID_CONTROLSHOW             , "c",        KEYMOD_META    , 0 },
   { "visibility toggle of mrl browser window",
