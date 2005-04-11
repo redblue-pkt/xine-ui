@@ -382,38 +382,6 @@ void control_exit(xitk_widget_t *w, void *data) {
 }
 
 /*
- * Reset video settings.
- */
-void control_reset(xitk_widget_t *w, void *data) {
-
-  if(hue_ena) {
-    set_current_param(XINE_PARAM_VO_HUE,
-		      (xitk_slider_get_min(control->hue) +
-		       xitk_slider_get_max(control->hue)) / 2);
-    config_update_num("gui.vo_hue", get_current_param(XINE_PARAM_VO_HUE));
-  }
-  if(sat_ena) {
-    set_current_param(XINE_PARAM_VO_SATURATION,
-		      (xitk_slider_get_min(control->sat) +
-		       xitk_slider_get_max(control->sat)) / 2);
-    config_update_num("gui.vo_saturation", get_current_param(XINE_PARAM_VO_SATURATION));
-  }
-  if(bright_ena) {
-    set_current_param(XINE_PARAM_VO_BRIGHTNESS,
-		      (xitk_slider_get_min(control->bright) +
-		       xitk_slider_get_max(control->bright)) / 2);
-    config_update_num("gui.vo_brightness", get_current_param(XINE_PARAM_VO_BRIGHTNESS));
-  }
-  if(contr_ena) {
-    set_current_param(XINE_PARAM_VO_CONTRAST,
-		      (xitk_slider_get_min(control->contr) +
-		       xitk_slider_get_max(control->contr)) / 2);
-    config_update_num("gui.vo_contrast", get_current_param(XINE_PARAM_VO_CONTRAST));
-  }
-  update_sliders_video_settings();
-}
-
-/*
  * return 1 if control panel is ON
  */
 int control_is_running(void) {
@@ -839,16 +807,6 @@ void control_panel(void) {
   xitk_browser_update_list(control->skinlist, 
 			   control->skins, NULL, control->skins_num, 0);
 
-
-  lb.skin_element_name = "CtlReset";
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Reset");
-  lb.callback          = control_reset;
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(control->widget_list)), 
-		    (w = xitk_labelbutton_create (control->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(w, _("Reset video controls to center values"));
 
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;

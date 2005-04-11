@@ -30,7 +30,6 @@ void control_deinit(void);
 void control_panel(void);
 void control_change_skins(int);
 void control_exit(xitk_widget_t *, void *);
-void control_reset(xitk_widget_t *, void *);
 int control_is_visible(void);
 int control_is_running(void);
 void control_toggle_visibility(xitk_widget_t *, void *);

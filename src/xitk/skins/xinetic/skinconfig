@@ -697,22 +697,6 @@ skin.CtlSkItemBtn {
 	}
 }
 
-skin.CtlReset {
-	coords {
-	  x = 15
-	  y = 182
-	}
-# Same pixmap as for skin.CtlDismiss below
-# We should rename CtlDismiss.png to something more general
-	pixmap = CtlDismiss.png
-	label {
-	  color = #9fa4ad
-	  color_focus = #081e2f
-	  color_click = #081e2f
-	  font = *-helvetica-*-i-*-*-12-*-*-*-*-*-*-*
-	}
-}
-
 skin.CtlDismiss {
 	coords {
 	  x = 333
