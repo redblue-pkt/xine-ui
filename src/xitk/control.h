@@ -26,6 +26,7 @@
 
 void control_config_register(void);
 
+void control_reset(void);
 void control_deinit(void);
 void control_panel(void);
 void control_change_skins(int);

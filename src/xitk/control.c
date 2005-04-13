@@ -262,6 +262,42 @@ static void probe_active_controls(void) {
   contr_ena  = test_vo_property(XINE_PARAM_VO_CONTRAST);
 }
 
+/*
+ * Reset video settings.
+ */
+void control_reset(void) {
+  
+  if(hue_ena) {
+    set_current_param(XINE_PARAM_VO_HUE,
+		      (xitk_slider_get_min(control->hue) +
+		       xitk_slider_get_max(control->hue)) / 2);
+    config_update_num("gui.vo_hue", get_current_param(XINE_PARAM_VO_HUE));
+  }
+
+  if(sat_ena) {
+    set_current_param(XINE_PARAM_VO_SATURATION,
+		      (xitk_slider_get_min(control->sat) +
+		       xitk_slider_get_max(control->sat)) / 2);
+    config_update_num("gui.vo_saturation", get_current_param(XINE_PARAM_VO_SATURATION));
+  }
+
+  if(bright_ena) {
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS,
+		      (xitk_slider_get_min(control->bright) +
+		       xitk_slider_get_max(control->bright)) / 2);
+    config_update_num("gui.vo_brightness", get_current_param(XINE_PARAM_VO_BRIGHTNESS));
+  }
+
+  if(contr_ena) {
+    set_current_param(XINE_PARAM_VO_CONTRAST,
+		      (xitk_slider_get_min(control->contr) +
+		       xitk_slider_get_max(control->contr)) / 2);
+    config_update_num("gui.vo_contrast", get_current_param(XINE_PARAM_VO_CONTRAST));
+  }
+
+  update_sliders_video_settings();
+}
+
 void control_config_register(void) {
   
   probe_active_controls();
@@ -430,7 +466,17 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
 static void control_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
+  case ButtonPress: {
+    XButtonEvent *bevent = (XButtonEvent *) event;
     
+    if(bevent->button == Button3) {
+      int wx, wy;
+      
+      xitk_get_window_position(gGui->display, control->window, &wx, &wy, NULL, NULL);
+      control_menu(control->widget_list, bevent->x + wx, bevent->y + wy);
+    }
+  }
+
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       control_exit(NULL, NULL);

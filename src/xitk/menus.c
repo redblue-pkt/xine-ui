@@ -86,6 +86,9 @@ static char *menu_get_shortcut(char *action) {
   return (shortcut ? strdup(shortcut) : NULL);
 }
 
+static void menu_control_reset(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  control_reset();
+}
 static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   open_mrlbrowser_from_playlist(w, data);
 }
@@ -1214,5 +1217,30 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     xitk_menu_add_entry(w, &menu_entry);
   }
 
+  xitk_menu_show_menu(w);
+}
+
+void control_menu(xitk_widget_list_t *wl, int x, int y) {
+  xitk_menu_widget_t   menu;
+  xitk_widget_t       *w = NULL;
+  char                 buffer[2048];
+  xitk_menu_entry_t    menu_entries[] = {
+    { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
+    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
+    { _("Reset video settings"),   
+                       NULL,          NULL,          menu_control_reset,           NULL                    },
+    { NULL,            NULL,          NULL,          NULL,                         NULL                    }
+  };
+  
+  XITK_WIDGET_INIT(&menu, gGui->imlib_data);
+  
+  snprintf(buffer, sizeof(buffer), "%s", _("Video Control"));
+  menu_entries[0].menu   = buffer;
+  menu.menu_tree         = &menu_entries[0];
+  menu.parent_wlist      = wl;
+  menu.skin_element_name = NULL;
+
+  w = xitk_noskin_menu_create(wl, &menu, x, y);
+  
   xitk_menu_show_menu(w);
 }
