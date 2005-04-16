@@ -430,11 +430,16 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       return;
     }
     
-    mmk.mrl   = _mrl;
-    mmk.ident = NULL;
-    mmk.sub   = NULL;
-    mmk.start = 0;
-    mmk.end   = -1;
+    mmk.mrl           = _mrl;
+    mmk.ident         = NULL;
+    mmk.sub           = NULL;
+    mmk.start         = 0;
+    mmk.end           = -1;
+    mmk.av_offset     = 0;
+    mmk.spu_offset    = 0;
+    mmk.got_alternate = 0;
+    mmk.alternates    = NULL;
+    mmk.cur_alt       = NULL;
     gui_set_current_mmk(&mmk);
   }
 }
