@@ -134,7 +134,7 @@ static void *scheduler_thread(void *data) {
   pthread_exit(NULL);
 }
 
-void start_scheduler() {
+void start_scheduler(void) {
 
   struct timeval tv;
   struct timezone tz;
@@ -158,7 +158,7 @@ void start_scheduler() {
   }
 }
 
-void stop_scheduler() {
+void stop_scheduler(void) {
 
   job_t *job;
   void *ret = NULL;
@@ -247,12 +247,12 @@ void cancel_job(int job_id) {
   pthread_cond_signal(&ox_scheduler->jobs_reorganize);
 }
 
-void lock_job_mutex() {
+void lock_job_mutex(void) {
   if (!ox_scheduler) return;
   pthread_mutex_lock(&ox_scheduler->job_execution_mutex);
 }
 
-void unlock_job_mutex() {
+void unlock_job_mutex(void) {
   if (!ox_scheduler) return;
   pthread_mutex_unlock(&ox_scheduler->job_execution_mutex);
 }

@@ -27,8 +27,8 @@
  * multi purpose scheduler
  */
 
-void start_scheduler();
-void stop_scheduler();
+void start_scheduler(void);
+void stop_scheduler(void);
 
 /*
  * will execute cb(data) after <delay> ms.
@@ -43,8 +43,8 @@ int schedule_job(int delay, void (*cb)(void *data), void *data);
 
 void cancel_job(int job_id);
 
-void lock_job_mutex();
-void unlock_job_mutex();
+void lock_job_mutex(void);
+void unlock_job_mutex(void);
 
 /*
  * heap management
@@ -97,7 +97,7 @@ int ho_verify(void *ho);
  * prints info about all allocated data chunks to stdout
  */
 
-void heapstat();
+void heapstat(void);
 
 
 #if 0
