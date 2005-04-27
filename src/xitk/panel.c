@@ -905,6 +905,32 @@ static void panel_handle_event(XEvent *event, void *data) {
     XUnlockDisplay(gGui->display);
     break;
 
+  case MapNotify:
+    /* When panel becomes visible by any means,               */
+    /* all other hidden GUI windows shall also become visible */
+    if(!playlist_is_visible())
+      playlist_toggle_visibility(NULL, NULL);
+    if(!control_is_visible())
+      control_toggle_visibility(NULL, NULL);
+    if(!mrl_browser_is_visible())
+      mrl_browser_toggle_visibility(NULL, NULL);
+    if(!setup_is_visible())
+      setup_toggle_visibility(NULL, NULL);
+    if(!viewlog_is_visible())
+      viewlog_toggle_visibility(NULL, NULL);
+    if(!kbedit_is_visible())
+      kbedit_toggle_visibility(NULL, NULL);
+    if(!event_sender_is_visible())
+      event_sender_toggle_visibility(NULL, NULL);
+    if(!stream_infos_is_visible())
+      stream_infos_toggle_visibility(NULL, NULL);
+    if(!tvset_is_visible())
+      tvset_toggle_visibility(NULL, NULL);
+    if(!pplugin_is_visible())
+      pplugin_toggle_visibility(NULL, NULL);
+    if(!help_is_visible())
+      help_toggle_visibility(NULL, NULL);
+    break;
   }
   
 }
