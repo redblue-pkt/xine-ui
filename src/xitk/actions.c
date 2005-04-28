@@ -108,7 +108,9 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
     }
     else {
       *visible = 0;
+      XUnlockDisplay(gGui->display);
       xitk_hide_widgets(widget_list);
+      XLockDisplay(gGui->display);
       XUnmapWindow(gGui->display, window);
     }
     XUnlockDisplay(gGui->display);

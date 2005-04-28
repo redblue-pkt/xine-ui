@@ -594,7 +594,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	panel->visible = 0;
 	XUnmapWindow (gGui->display, gGui->panel_window);
 	XSync(gGui->display, False);
+	XUnlockDisplay(gGui->display);
 	xitk_hide_widgets(panel->widget_list);
+	XLockDisplay(gGui->display);
       }
     }
     else {

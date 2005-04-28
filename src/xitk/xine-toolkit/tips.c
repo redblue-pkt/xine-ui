@@ -311,9 +311,7 @@ void xitk_tips_deinit(void) {
  */
 void xitk_tips_hide_tips(void) {
 
-  if(pthread_mutex_trylock(&tips.mutex))
-    return;
-
+  pthread_mutex_lock(&tips.mutex);
   if(tips.running) {
     tips.new_widget = NULL;
     if(tips.prewait) {
