@@ -525,6 +525,10 @@ static void setup_handle_event(XEvent *event, void *data) {
       case XK_Escape:
 	setup_exit(NULL, NULL);
 	break;
+
+      default:
+	gui_handle_event(event, data);
+	break;
       }
     }
     break;

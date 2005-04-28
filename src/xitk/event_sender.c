@@ -285,6 +285,16 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 	event_sender_num(NULL, (void *)10);
 	break;
 
+      case XK_Escape: {
+	  static void event_sender_exit(xitk_widget_t *, void *);
+
+	  event_sender_exit(NULL, NULL);
+	}
+	break;
+
+      default:
+	gui_handle_event(event, data);
+	break;
       }
     }
     break;

@@ -955,6 +955,9 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
       xitk_mrlbrowser_exit(NULL, (void *)private_data->fbWidget);
       break;
       
+    default:
+      gui_handle_event(event, data);
+      break;
     }
   }
   break;
