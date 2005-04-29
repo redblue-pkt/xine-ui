@@ -1198,9 +1198,8 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	MUTUNLOCK();
 	return;
       }
+      FXUNLOCK(fx);
     }
-
-    FXUNLOCK(fx);
 
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
