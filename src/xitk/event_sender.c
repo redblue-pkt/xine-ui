@@ -212,6 +212,8 @@ static void event_sender_angle(xitk_widget_t *w, void *data) {
   event_sender_send(events[event]);
 }
 
+static void event_sender_exit(xitk_widget_t *, void *);
+
 static void event_sender_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
@@ -285,11 +287,8 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 	event_sender_num(NULL, (void *)10);
 	break;
 
-      case XK_Escape: {
-	  static void event_sender_exit(xitk_widget_t *, void *);
-
-	  event_sender_exit(NULL, NULL);
-	}
+      case XK_Escape:
+	event_sender_exit(NULL, NULL);
 	break;
 
       default:
