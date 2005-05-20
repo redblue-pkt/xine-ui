@@ -161,6 +161,8 @@ static void tabs_arrange(xitk_widget_t *w) {
       else
 	xitk_start_widget(private_data->left);
     }
+
+    private_data->old_offset = private_data->offset;
   } 
 }
 
@@ -177,8 +179,6 @@ static void paint(xitk_widget_t *w) {
 
     if((w->visible == 1)) {
       tabs_arrange(w);
-      if(private_data->old_offset == -2)
-	private_data->old_offset = private_data->offset;
     }
   }
 }
