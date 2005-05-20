@@ -1320,7 +1320,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 
 				 0,
 				 _("Synchronized X protocol (debug)"), 
-				 CONFIG_NO_HELP,
+				 _("Do X transactions in synchronous mode. "
+				   "Very slow, use only for debugging!"), 
 				 CONFIG_LEVEL_ADV,
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA)) {
@@ -1361,8 +1362,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->ssaver_timeout =
     xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
-			      _("Screensaver wakeup"),
-			      _("Time between two screensaver fake events, 0 to disable."),
+			      _("Screensaver reset interval (s)"),
+			      _("Time, in seconds, between two faked events to keep a screensaver quiet, 0 to disable."),
 			      CONFIG_LEVEL_ADV,
 			      ssaver_timeout_cb,
 			      CONFIG_NO_DATA);
