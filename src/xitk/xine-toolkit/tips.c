@@ -110,6 +110,9 @@ static void *_tips_loop_thread(void *data) {
       struct timeval       tv;
       struct timespec      ts;
 
+      int                  disp_w = xitk_get_display_width();
+      int                  disp_h = xitk_get_display_height();
+
       int                  margin = 10;
 
       tips.visible = 1;
@@ -123,7 +126,7 @@ static void *_tips_loop_thread(void *data) {
       fs = xitk_font_load_font(tips.display, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips.widget->wl->gc);
 
-      string_length = MIN((xitk_font_get_string_length(fs, tips.widget->tips_string)), (xitk_get_display_width()/3));
+      string_length = MIN((xitk_font_get_string_length(fs, tips.widget->tips_string)), (disp_w/3));
 
       xitk_font_unload_font(fs);
       
@@ -142,11 +145,11 @@ static void *_tips_loop_thread(void *data) {
       h = image->height + margin;
       x -= ((w >> 1) - (tips.widget->width >> 1));
       y += (tips.widget->height + 1);
-      if(x > DisplayWidth(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - w)
-	x = DisplayWidth(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - w;
+      if(x > disp_w - w)
+	x = disp_w - w;
       else if(x < 0)
 	x = 0;
-      if(y > DisplayHeight(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - h)
+      if(y > disp_h - h)
 	y -= (tips.widget->height + h + 2);
       /* No further alternative to y-position the tips (just either below or above widget) */
       xwin = xitk_window_create_simple_window(tips.widget->imlibdata, x, y, w, h);
