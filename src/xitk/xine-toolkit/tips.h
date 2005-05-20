@@ -24,7 +24,7 @@
 #ifndef HAVE_XITK_TIPS_H
 #define HAVE_XITK_TIPS_H
 
-#define TIPS_TIMEOUT 500
+#define TIPS_TIMEOUT 5000
 
 void xitk_tips_init(Display *display);
 void xitk_tips_deinit(void);
