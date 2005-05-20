@@ -147,6 +147,8 @@ typedef struct {
   
   struct timeval              keypress;
 
+  KeyCode                     ignore_keys[3];
+
   pthread_t                  *tips_thread;
   unsigned long               tips_timeout;
 
@@ -1269,6 +1271,19 @@ void xitk_xevent_notify(XEvent *event) {
      
   if(!(fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx)))
     return;
+
+  if(event->type == KeyPress || event->type == KeyRelease) {
+
+    /* Filter keys that dont't need to be handled by xine  */
+    /* and could be used by our screen saver reset "ping". */
+    /* So they will not kill tips and menus.               */
+
+    int i;
+
+    for(i = 0; i < sizeof(gXitk->ignore_keys)/sizeof(gXitk->ignore_keys[0]); ++i)
+      if(event->xkey.keycode == gXitk->ignore_keys[i])
+	return;
+  }
   
   FXLOCK(fx);
   
@@ -1790,6 +1805,9 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   xitk_x_error           = 0;
   gXitk->x_error_handler = NULL;
   gXitk->modalw          = None;
+  gXitk->ignore_keys[0]  = XKeysymToKeycode(display, XK_Scroll_Lock);
+  gXitk->ignore_keys[1]  = XKeysymToKeycode(display, XK_Num_Lock);
+  gXitk->ignore_keys[2]  = XKeysymToKeycode(display, XK_Caps_Lock);
   gXitk->tips_timeout    = TIPS_TIMEOUT;
   XGetInputFocus(display, &(gXitk->parent.window), &(gXitk->parent.focus));
 
