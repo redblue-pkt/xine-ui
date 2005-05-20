@@ -1,0 +1,22 @@
+xine-ui's windows in general are designed to have no decoration (border and
+title) attached by the window manager, and some are intended to be placed at
+a position given by xine-ui instead of being placed automatically.
+
+For that to work, window managers must accept the MWM (motif window manager)
+decoration hint as well as program supplied window positions, either globally
+or at least for the xine-ui windows.
+
+Some window managers may need appropriate entries in their configuration file
+as noted below:
+
+
+fvwm2:
+
+  Put following lines into your .fvwm2rc configuration file:
+
+    Style "xine" MwmDecor,UsePPosition
+    Style "Xitk" MwmDecor,UsePPosition
+
+  ("xine" and "Xitk" are the class names of the several xine-ui windows).
+  These commands are only necessary if they are not covered or inverted by other
+  'Style "*" ...' commands. However, it's no mistake to include them anyway.
