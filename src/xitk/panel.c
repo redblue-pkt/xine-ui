@@ -1485,14 +1485,14 @@ void panel_init (void) {
   panel->tips.enable = xine_config_register_bool(gGui->xine, "gui.tips_visible", 
 						 1,
 						 _("gui tips visibility"), 
-						 CONFIG_NO_HELP,
+						 _("If disabled, no tooltips are shown."), 
 						 CONFIG_LEVEL_ADV,
 						 panel_enable_tips_cb,
 						 CONFIG_NO_DATA);
   panel->tips.timeout = (unsigned long) xine_config_register_num(gGui->xine, "gui.tips_timeout", 
-								 500,
-								 _("tips timeout (ms)"), 
-								 CONFIG_NO_HELP,
+								 5000,
+								 _("Tips timeout (ms)"), 
+								 _("Persistence time of tooltips, in milliseconds."), 
 								 CONFIG_LEVEL_ADV,
 								 panel_timeout_tips_cb, 
 								 CONFIG_NO_DATA);
