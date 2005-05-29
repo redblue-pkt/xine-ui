@@ -3114,7 +3114,8 @@ void mmkeditor_set_mmk(mediamark_t **mmk) {
 }
 
 static void mmkeditor_apply(xitk_widget_t *w, void *data) {
-  const char *ident, *mrl, *sub;
+  const char *sub;
+  char       *ident, *mrl;
   int         start, end, av_offset, spu_offset;
 
   if(mmkeditor->mmk) {
