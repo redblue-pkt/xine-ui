@@ -2552,7 +2552,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
   if(mrl && (!sub) && gGui->subtitle_autoload) {
 
     if(mrl_look_like_file((char *) mrl)) {
-      char        *know_subs = "sub,srt,asc,smi,ssa";
+      char        *know_subs = "sub,srt,asc,smi,ssa,txt";
       char        *vsubs;
       char        *_mrl, *ending, *ext;
       struct stat  pstat;

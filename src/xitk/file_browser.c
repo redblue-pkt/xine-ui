@@ -82,7 +82,7 @@ typedef struct {
 static filebrowser_filter_t __fb_filters[] = {
   { NULL, "*"                                                                      },
  /* subtitles */
-  { NULL, ".sub .srt .asc .smi .ssa "                                              },
+  { NULL, ".sub .srt .asc .smi .ssa .txt"                                          },
   /* playlists */
   { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "                         },
   { "*.4xm", ".4xm "                                                               },
