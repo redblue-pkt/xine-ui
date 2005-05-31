@@ -1,5 +1,5 @@
 # For updating this file, look at the result of:
-#  $ head -3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] | grep -v src/xitk/session_ctrl.c >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
+#  $ head -n 3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] | grep -v src/xitk/session_ctrl.c >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
 src/xitk/actions.c
 src/xitk/config_wrapper.c

@@ -1,5 +1,5 @@
 # For updating this file, look at the result of:
-#  $ head -3 src/xitk/xine-toolkit/po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/xine-toolkit/*.[chy] >> /tmp/POTFILES.in && cp /tmp/POTFILES.in src/xitk/xine-toolkit/po/
+#  $ head -n 3 src/xitk/xine-toolkit/po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/xine-toolkit/*.[chy] >> /tmp/POTFILES.in && cp /tmp/POTFILES.in src/xitk/xine-toolkit/po/
 
 src/xitk/xine-toolkit/mrlbrowser.c
 src/xitk/xine-toolkit/test.c

@@ -187,8 +187,8 @@ getmessage(){
 	  fi
 	fi
     done
-    short=`head -1 <$tmpfile`
-    description="`tail +2 <$tmpfile`"
+    short=`head -n 1 <$tmpfile`
+    description="`tail -n +2 <$tmpfile`"
     rm $tmpfile
     if test -z "$short"; then
       echo "internal error: no message for $id" >&2
@@ -480,7 +480,7 @@ xine_executable=""
 if search -x xine "$PATH"; then
   xine_executable1=`echo "$found"|sort|uniq`
   if [ `echo "$xine_executable1" | wc -l` -gt 1 ]; then
-    xine_executable=`echo "$xine_executable1" | head -1`
+    xine_executable=`echo "$xine_executable1" | head -n 1`
     msg several-xine-in-path 1
   else
     xine_executable="$xine_executable1"
@@ -499,7 +499,7 @@ if search -x xine-config "$PATH"; then
   xine_config=`echo "$found"|sort|uniq`
   if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
     xine_configs="$xine_config"
-    xine_config=`echo "$xine_configs" | head -1`
+    xine_config=`echo "$xine_configs" | head -n 1`
     msg several-xine-config 1
   else
     msg xine-config-in-path 0
@@ -509,7 +509,7 @@ else
     xine_config="$found";
     if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
       xine_configs="$xine_config"
-      xine_config=`echo "$xine_configs" | head -1`
+      xine_config=`echo "$xine_configs" | head -n 1`
       msg several-xine-config 1
     else
       msg xine-config-somewhere 0
@@ -679,7 +679,7 @@ if test -r "$DVDROM"; then # only test DMA if we have a drive...
 
     search -x hdparm "$PATH" || search -x bin/hdparm || search -x sbin/hdparm;
     if test -n "$found"; then
-      hdparm=`echo "$found"|head -1`
+      hdparm=`echo "$found"|head -n 1`
     fi
 
     case "$DVDROM" in
@@ -722,8 +722,8 @@ vars DISPLAY xvinfo XVIDEO YUV YUY2 planes
 # Xv extension
 search -x xvinfo "$PATH" || search -x bin/xvinfo;
 if test -n "$found"; then
-  xvinfo=`echo "$found"|head -1`
-  XVIDEO=`$xvinfo|head -1`
+  xvinfo=`echo "$found"|head -n 1`
+  XVIDEO=`$xvinfo|head -n 1`
   msg have-xv 0
   YUV=false
   YUY2=false
@@ -964,7 +964,7 @@ echo " Please use this subject line, or something even more descriptive:"
 echo "Subject: $subject"
 
 if search -x mail "$PATH" || search -x mailx "$PATH"; then
-  mailer=`echo "$found"|head -1`
+  mailer=`echo "$found"|head -n 1`
   echo "Alternatively, I could try to send the bug report for you, using"
   echo $mailer -s \""$subject"\"
   echo 'Please make sure to add the additional description before saying "yes"!' 

@@ -623,7 +623,7 @@ fi
 dnl
 dnl
 dnl
-BUILD_CC="`$CC -v 2>&1 | tail -1`"
+BUILD_CC="`$CC -v 2>&1 | tail -n 1`"
 BUILD_OS="`uname -s -r -m`"
 BUILD_DATE="`date \"+%a %d %b %Y %T\"`"
 AC_SUBST(BUILD_CC)
