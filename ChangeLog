@@ -6,8 +6,10 @@
   * fixed parsing post plugin parameters of type double for some locales
   * autoload subtitles with .txt extension too
   * be more POSIX-compliant (head, tail) (build fix) [bug #1172729]
-  
+  * Russian translations (thanks to Pavel Maryanov)
+
 xine-ui (0.99.3) unstable; urgency=low
+
   * enlarge stream info window (required for Russian translation),
   * possibility to specify more than one playlist in command line,
   * unlock mutex before destroying (thanks to Matthias Drochner),
@@ -34,7 +36,6 @@ xine-ui (0.99.3) unstable; urgency=low
   * support alpha channel in splash screen image,
   * some translations updates, BIG THANKS to the translators,
   * Merry xmas xiners.
-
 
 xine-ui (0.99.2) unstable; urgency=low
 
@@ -104,25 +105,25 @@ xine-ui (0.9.23) unstable; urgency=low
   * new "stop after this stream" feature,
   * grab streams recusively (with enqueuing and file browser),
   * fix reference mrl handling,
-  * add 'loop' and two new playlist options 'first' and 'last', in 
+  * add 'loop' and two new playlist options 'first' and 'last', in
     session control,
   * fix shortcut grabber,
-  * sound volume control can be sets with sound card mixer or 
+  * sound volume control can be sets with sound card mixer or
     software amplification,
   * add help in chain reaction window,
   * double clicking in output window is a fullscreen toggle now,
   * subtitle autoload feature added,
-  * new TVout feature, using libnvtvsimple for nVIDIA cards, and 
+  * new TVout feature, using libnvtvsimple for nVIDIA cards, and
     atitvout for ATI,
   * store spu offset in toxine's playlist,
   * fix skin downloder,
   * fix support of huge playlists,
   * contextual menu popup in playlist window,
   * fix control's window sliders,
-  * ton of fbxine improvments (post plugin, deinterlacing, spu, 
+  * ton of fbxine improvments (post plugin, deinterlacing, spu,
     stream infos...),
   * bunch of other fix.
-	
+
 xine-ui (0.9.22) unstable; urgency=low
 
   * control xine and fbxine via stdin, patch from Dirk Meyer <dmeyer@tzi.de>,
@@ -139,7 +140,7 @@ xine-ui (0.9.22) unstable; urgency=low
   * don't show up mouse cursor on keyboard action,
   * network control can manage loop modes,
   * fix crash when pressing 'm' or 'n' with empty playlist
-	
+
 xine-ui (0.9.21) unstable; urgency=low
 
   * fix playlist handling bug.
@@ -169,7 +170,7 @@ xine-ui (0.9.21) unstable; urgency=low
   * fix deadlock with panel hide/show cycle,
   * playback slider don't handle keyboard events (fix seek weirdness),
   * .po updates.
-	
+
 xine-ui (0.9.20) unstable; urgency=low
 
   * hpux compilation fix.
@@ -178,7 +179,7 @@ xine-ui (0.9.20) unstable; urgency=low
   * fb:
   *   fix xine's driver initialization.
   * xitk:
-  *   add get position/length in network control, 
+  *   add get position/length in network control,
   *     (patch from Henrik (Mauritz) Johnson <henrik@spinbox.se>),
   *   support fb output,
   *   many skins updates (don't forget to update your local copies),
@@ -197,7 +198,7 @@ xine-ui (0.9.20) unstable; urgency=low
 
 xine-ui (0.9.19) unstable; urgency=low
 
-  * deinterlace and aspect ratio from command line 
+  * deinterlace and aspect ratio from command line
     (patch from Dan Dennedy <dan@dennedy.org>),
   * FreeBSD compilation fixes (patch from mike@flyn.org	<mike@flyn.org>),
   * main panel don't show 00:00:00 time when stream length is unknown (streaming),
@@ -247,7 +248,7 @@ xine-ui (0.9.18) unstable; urgency=low
   * apply button added in setup window (changes cancelation possible),
   * some playlist bugs fixed,
   * few other bug fixed, as usual.
-	
+
 xine-ui (0.9.17) unstable; urgency=low
 
   * keep in mind origin path for filebrowser (per session),
@@ -266,7 +267,7 @@ xine-ui (0.9.17) unstable; urgency=low
   * user level experience configuration support,
   * setup enumerate audio/video plugins.
   * add support of post plugins.
-	
+
 xine-ui (0.9.16) unstable; urgency=low
 
   * some bug fixes: config dialog segfault, several race conditions
@@ -276,7 +277,7 @@ xine-ui (0.9.16) unstable; urgency=low
   * remove embedded libcurl (use conditionally external one),
   * take care of origin when using sfv playlist.
   * add a xinerama fullscreen, ie a fullscreen on several screens
-	
+
 xine-ui (0.9.15) unstable; urgency=low
 
   * download asx playlist. In fact it can download anything, since we
@@ -325,7 +326,7 @@ xine-ui (0.9.14) unstable; urgency=low
   * -- Switch to new xine library API --
 
 xine-ui (0.9.13) unstable; urgency=low
-  
+
   * includes the most popular themes: xinetic(default), cloudy, CelomaChrome
   * improved TV mode selection (untested)
   * localization updates (including correct numeric plural forms)
@@ -334,7 +335,7 @@ xine-ui (0.9.13) unstable; urgency=low
   * setup dialog features brand-new xitk scrollbars
   * prev/next buttons optionally switch chapters (instead of MRLs) on supported media
   * invalid buttons (eg. "play" without an MRL) are disabled
-  
+
   And, of course, lots of other small bugfixes and improvements...
 
  -- Siggi Langauf <siggi@debian.org>  Sat,  3 Aug 2002 22:58:00 +0200
@@ -356,5 +357,3 @@ xine-ui (0.9.11) unstable; urgency=low
   * probably more things that I don't recall
 
  -- Siggi Langauf <siggi@users.sf.net>  Sun, 21 Jun 2002
-
-
