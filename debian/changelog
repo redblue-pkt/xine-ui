@@ -1,15 +1,16 @@
 xine-ui (0.99.3-2) unstable; urgency=low
 
   * fixed icon in menu entry (closes: #228633)
+  * add debian/watch file for uscan.
 
- --
+ -- Xxx Xxx <xxx@xxx.xx>  Fri, 03 Jun 2005 00:00:00 +0000
 
 xine-ui (0.99.3-1) unstable; urgency=high
 
   * new upstream release(s)
   * now build-depending on unspecific version of libcurl (closes: #262780)
   * rebuilt against libcurl3-dev (closes: 279452)
-  
+
  -- Siggi Langauf <siggi@flake.langauf.de>  Mon, 27 Dec 2004 13:56:42 +0100
 
 xine-ui (0.99.1-1) unstable; urgency=low
@@ -23,7 +24,7 @@ xine-ui (0.99.1-1) unstable; urgency=low
     - xine-check handles "unknown" plugins better (closes: #243661)
     - doesn't segfault on -pfq any more (closes: 187321)
     - fixes segfault on >16 autorun options (closes: #212509)
-  
+
  -- Siggi Langauf <siggi@debian.org>  Thu, 15 Apr 2004 21:26:28 +0200
 
 xine-ui (0.9.23-2) unstable; urgency=low
@@ -47,7 +48,7 @@ xine-ui (0.9.22-1) unstable; urgency=high
     * allows configuration of post-processing plugin chains ("chain reaction")
       With the "expand" plugin, you can place subtitles outside the video.
       (closes: #200085)
-  
+
  -- Siggi Langauf <siggi@debian.org>  Fri,  1 Aug 2003 16:29:45 +0200
 
 xine-ui (0.9.21-2) unstable; urgency=high
@@ -93,7 +94,7 @@ xine-ui (0.9.18-1) unstable; urgency=low
   * new upstream release
     - restores correct video mode on exit (closes: #177740)
     - brings meaningful error message when hotkeys collide (closes: #177877)
-  
+
  -- Siggi Langauf <siggi@debian.org>  Wed, 29 Jan 2003 21:51:14 +0100
 
 xine-ui (0.9.17-2) unstable; urgency=low
@@ -182,11 +183,11 @@ xine-ui (0.9.10-1) unstable; urgency=medium
   * new upstream release
     - contains xine-check fixes (closes: #141962)
     - doesn't segfault on SIGINT any more (closes: #147994)
-  
+
   * added build-dependancy on liblircclient-dev (closes: #137715)
   * recompiled agains libxine0-0.9.10 (with versioned shlibs) (closes: #147273)
   * removed references to the (never released, long obsolete) "xine" package
-  
+
  -- Siggi Langauf <siggi@debian.org>  Sun, 26 May 2002 00:37:52 +0200
 
 xine-ui (0.9.9-1) unstable; urgency=medium
@@ -201,9 +202,9 @@ xine-ui (0.9.9-1) unstable; urgency=medium
 xine-ui (0.9.8-3) testing unstable; urgency=high
 
   * added Conflicts: with future xine-lib (closes: #129942, #128440)
-  * added man page for xine-check (and xine-bugreport) 
+  * added man page for xine-check (and xine-bugreport)
   * "softer" architecture check, so it at least compiles on unknown arch...
-  
+
  -- Siggi Langauf <siggi@debian.org>  Sat, 19 Jan 2002 16:57:27 +0100
 
 xine-ui (0.9.8-2) unstable; urgency=high
@@ -217,7 +218,7 @@ xine-ui (0.9.8-1) unstable; urgency=medium
   * new upstream release with countless improvements (see upstream ChangeLog)
     * includes xine-check script to detect most common problems.
     * no more "apostrophe abuse" (closes: #125667)
-  
+
  -- Siggi Langauf <siggi@debian.org>  Mon, 14 Jan 2002 01:07:29 +0100
 
 xine-ui (0.9.7-1) unstable; urgency=low
@@ -254,7 +255,7 @@ xine-ui (0.9.3-1) unstable; urgency=medium
  -- Siggi Langauf <siggi@debian.org>  Sat,  3 Nov 2001 11:23:56 +0100
 
 xine-ui (0.9.2-3) unstable; urgency=high
-  
+
   * allow for architectures that won't compile aaxine
   * forcing mandir to /usr/share/man again (closes: #116050)
   * 0.9.2-2 was rejected because of checksum problems...
@@ -277,7 +278,6 @@ xine-ui (0.9.2-1) unstable; urgency=medium
 
  -- Siggi Langauf <siggi@debian.org>  Mon, 15 Oct 2001 21:01:22 +0200
 
-
 xine-ui (0.9.1-1.1) unstable; urgency=low
 
   * NMU.
@@ -287,7 +287,7 @@ xine-ui (0.9.1-1.1) unstable; urgency=low
   * Added ia64 support.  Closes: #115039.
 
  -- Jeff Licquia <jlicquia@progeny.com>  Tue,  9 Oct 2001 10:25:26 -0600
-    
+
 xine-ui (0.9.1-1) unstable; urgency=low
 
   * added README and fixed doc dir (closes: #112283)
@@ -311,8 +311,8 @@ xine-ui (0.5.3-1) unstable; urgency=low
 
 xine-ui (0.5.2-1) unstable; urgency=low
 
-  * new upstream release, featuring slow/fast playback  
-  * added compiler flags for m68k 
+  * new upstream release, featuring slow/fast playback
+  * added compiler flags for m68k
 
  -- Siggi Langauf <siggi@debian.org>  Sun,  2 Sep 2001 22:15:09 +0200
 
@@ -323,11 +323,8 @@ xine-ui (0.5.1-1) unstable; urgency=low
 
  -- Siggi Langauf <siggi@debian.org>  Mon, 27 Aug 2001 09:49:01 +0200
 
-
 xine-ui (0.5.0-1) unstable; urgency=low
 
   * Initial Release of the new 0.5 architecture with separate libxine
 
  -- Siggi Langauf <siggi@debian.org>  Sun, 12 Aug 2001 23:59:02 +0200
-
-

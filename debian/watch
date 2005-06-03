@@ -1,0 +1,4 @@
+version=3
+http://xinehq.de/index.php/releases \
+	(?:.*/)?xine/xine-ui-([\d\.]*).tar.gz \
+	debian uupdate
