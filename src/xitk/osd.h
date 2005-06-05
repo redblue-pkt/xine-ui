@@ -40,6 +40,11 @@ typedef struct {
 #define OSD_BAR_STEPPER  4
 
 void osd_init(void);
+void osd_hide_sinfo(void);
+void osd_hide_bar(void);
+void osd_hide_status(void);
+void osd_hide_info(void);
+void osd_hide(void);
 void osd_deinit(void);
 void osd_update(void);
 void osd_display_spu_lang(void);

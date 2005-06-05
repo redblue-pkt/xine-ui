@@ -186,28 +186,50 @@ void osd_init(void) {
     (xine_osd_get_capabilities(gGui->osd.status.osd[0]) & XINE_OSD_CAP_UNSCALED );
 }
 
-void osd_deinit(void) {
+void osd_hide_sinfo(void) {
 
   if(gGui->osd.sinfo.visible) {
     gGui->osd.sinfo.visible = 0;
     xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
   }
+}
+
+void osd_hide_bar(void) {
 
   if(gGui->osd.bar.visible) {
     gGui->osd.bar.visible = 0;
     xine_osd_hide(gGui->osd.bar.osd[0], 0);
     xine_osd_hide(gGui->osd.bar.osd[1], 0);
   } 
+}
+
+void osd_hide_status(void) {
 
   if(gGui->osd.status.visible) {
     gGui->osd.status.visible = 0;
     xine_osd_hide(gGui->osd.status.osd[0], 0);
   } 
+}
+
+void osd_hide_info(void) {
 
   if(gGui->osd.info.visible) {
     gGui->osd.info.visible = 0;
     xine_osd_hide(gGui->osd.info.osd[0], 0);
   } 
+}
+
+void osd_hide(void) {
+
+  osd_hide_sinfo();
+  osd_hide_bar();
+  osd_hide_status();
+  osd_hide_info();
+}
+
+void osd_deinit(void) {
+
+  osd_hide();
 
   xine_osd_free(gGui->osd.sinfo.osd[0]);
   xine_osd_free(gGui->osd.bar.osd[0]);
