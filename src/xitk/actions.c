@@ -572,7 +572,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   oxine_exit();
 
-  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
+  if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
     gGui->ignore_next = 1;
 
     if(gGui->visual_anim.running) {
@@ -580,7 +580,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
       xine_stop(gGui->visual_anim.stream);
 
-      while(xine_get_status(gGui->visual_anim.stream) != XINE_STATUS_STOP)
+      while(xine_get_status(gGui->visual_anim.stream) == XINE_STATUS_PLAY)
       	xine_usec_sleep(50000);
       
       audio_source = xine_get_audio_source(gGui->stream);
