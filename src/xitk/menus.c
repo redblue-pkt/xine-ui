@@ -53,6 +53,8 @@ extern _panel_t                *panel;
 #define AUDIO_MUTE              20
 #define AUDIO_INCRE_VOL         21
 #define AUDIO_DECRE_VOL         22
+#define AUDIO_PPROCESS          23
+#define AUDIO_PPROCESS_ENABLE   24
 
 #define VIDEO_FULLSCR           30
 #define VIDEO_2X                31
@@ -312,6 +314,14 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
       xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
       osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
     }
+    break;
+
+  case AUDIO_PPROCESS:
+    gui_execute_action_id(ACTID_APP);
+    break;
+
+  case AUDIO_PPROCESS_ENABLE:
+    gui_execute_action_id(ACTID_APP_ENABLE);
     break;
 
   default:
@@ -655,7 +665,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_video_ctrl, (void *) VIDEO_PPROCESS                                               },
     { _("Video/Postprocess/Enable Postprocessing"),
       (sh[shc++] = menu_get_shortcut("VPProcessEnable")),
-      gGui->post_enable ? "<checked>" : "<check>",
+      gGui->post_video_enable ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_PPROCESS_ENABLE                                        },
     { _("Audio"),
       NULL,
@@ -685,6 +695,22 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL,
       "<branch>",
       NULL, NULL                                                                             },
+    { _("Audio/SEP"),
+      NULL,
+      "<separator>",
+      NULL, NULL                                                                             },
+    { _("Audio/Postprocess"),
+      NULL,
+      "<branch>",
+      NULL, NULL                                                                             },
+    { _("Audio/Postprocess/Chain Reaction..."),
+      NULL /* (sh[shc++] = menu_get_shortcut("APProcessShow")) */,
+      NULL,
+      menu_audio_ctrl, (void *) AUDIO_PPROCESS                                               },
+    { _("Audio/Postprocess/Enable Postprocessing"),
+      NULL /* (sh[shc++] = menu_get_shortcut("APProcessEnable")) */,
+      gGui->post_audio_enable ? "<checked>" : "<check>",
+      menu_audio_ctrl, (void *) AUDIO_PPROCESS_ENABLE                                        },
     { _("Subtitle"),
       NULL,
       "<branch>",

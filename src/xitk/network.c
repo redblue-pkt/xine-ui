@@ -2374,6 +2374,10 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
 	gui_vpp_show(NULL, NULL);
 	flushing++;
       }
+      else if(is_arg_contain(client_info, 1, "apost")) {
+	gui_app_show(NULL, NULL);
+	flushing++;
+      }
       else if(is_arg_contain(client_info, 1, "help")) {
 	gui_help_show(NULL, NULL);
 	flushing++;

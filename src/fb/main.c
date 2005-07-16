@@ -44,10 +44,14 @@ struct fbxine fbxine =
 	tty_fd:        -1,
 	video_port_id: "fb",
 
-        post_elements: NULL,
-        post_elements_num: 0,
-        post_enable: 1,
+        post_video_elements: NULL,
+        post_video_elements_num: 0,
+        post_video_enable: 1,
           
+        post_audio_elements: NULL,
+        post_audio_elements_num: 0,
+        post_audio_enable: 1,
+
         deinterlace_plugin: NULL,
         deinterlace_elements: NULL,
         deinterlace_elements_num: 0,
@@ -72,6 +76,7 @@ static void load_config(void)
 			XINE_CONFIG_FILE);
 	}
 	xine_config_load(fbxine.xine, fbxine.configfile);
+        xine_engine_set_param(fbxine.xine, XINE_ENGINE_PARAM_VERBOSITY, fbxine.verbosity);
 }
 
 static int check_version(void)
@@ -245,14 +250,14 @@ static int fbxine_init(int argc, char **argv)
 {
 	if(!check_version())
 		return 0;
-	if(!init_xine())
-		return 0;
 	switch(parse_options(argc, argv))
 	{
 		case 0:
 		case -1:
 			return 0;
 	}
+	if(!init_xine())
+		return 0;
 
 	if (stdctl)
 	        fbxine_init_stdctl();
@@ -275,13 +280,15 @@ static int fbxine_init(int argc, char **argv)
 	  char             **plugin = pplugins;
 	  
 	  while(*plugin) {
-	    pplugin_parse_and_store_post((const char *) *plugin);
+	    vpplugin_parse_and_store_post((const char *) *plugin);
+	    applugin_parse_and_store_post((const char *) *plugin);
 	    printf("1\n");
 	    
 	    plugin++;
 	  }
     
-	  pplugin_rewire_posts();
+	  vpplugin_rewire_posts();
+	  applugin_rewire_posts();
 	}
 
 	post_deinterlace_init(NULL);

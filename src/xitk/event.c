@@ -168,7 +168,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
     
     if(!has_video && !gGui->visual_anim.running) {
       if(gGui->visual_anim.enabled == 1) {
-	if(gGui->visual_anim.post_output) {
+	if(gGui->visual_anim.post_output_element.post) {
 	  if(post_rewire_audio_post_to_stream(gGui->stream))
 	    gGui->visual_anim.running = 1;
 	}
@@ -718,6 +718,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_mVOLUME:
     gui_decrease_audio_volume();
+    break;
+
+  case ACTID_APP:
+    gui_app_show(NULL, NULL);
+    break;
+
+  case ACTID_APP_ENABLE:
+    gui_app_enable();
     break;
 
   case ACTID_pAMP:

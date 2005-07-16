@@ -22,8 +22,10 @@
 #ifndef POST_HH
 #define POST_HH
 
-void pplugin_rewire_posts(void);
-void pplugin_parse_and_store_post(const char *post);
+void vpplugin_rewire_posts(void);
+void applugin_rewire_posts(void);
+void vpplugin_parse_and_store_post(const char *post);
+void applugin_parse_and_store_post(const char *post);
 void post_deinterlace(void);
 void post_deinterlace_init(const char *deinterlace_post);
 

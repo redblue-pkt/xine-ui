@@ -65,7 +65,8 @@ void reparent_all_windows(void) {
     { event_sender_is_visible,  event_sender_reparent },
     { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
-    { pplugin_is_visible,       pplugin_reparent },
+    { vpplugin_is_visible,      vpplugin_reparent },
+    { applugin_is_visible,      applugin_reparent },
     { help_is_visible,          help_reparent },
     { NULL,                     NULL}
   };
@@ -236,7 +237,7 @@ static int _gui_xine_play(xine_stream_t *stream,
       gGui->visual_anim.running = 0;
 
   } else if (!has_video && (gGui->visual_anim.enabled == 1) && 
-	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
+	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output_element.post) {
 
     if(post_rewire_audio_post_to_stream(stream))
       gGui->visual_anim.running = 1;
@@ -604,7 +605,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
   event_sender_end();
   stream_infos_end();
   tvset_end();
-  pplugin_end();
+  vpplugin_end();
+  applugin_end();
   help_end();
   download_skin_end();
   
@@ -651,8 +653,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
    */
   gGui->running = 0;
 
-  if(gGui->visual_anim.post_output)
-    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
+  if(gGui->visual_anim.post_output_element.post)
+    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output_element.post);
 
   xine_dispose(gGui->stream);
   /* xine_dispose(gGui->visual_anim.stream); */
@@ -920,7 +922,8 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int event_sender = event_sender_is_visible();
   int stream_infos = stream_infos_is_visible();
   int tvset        = tvset_is_visible();
-  int pplugin      = pplugin_is_visible();
+  int vpplugin     = vpplugin_is_visible();
+  int applugin     = applugin_is_visible();
   int help         = help_is_visible();
 
   if((!(video_window_is_visible())) || gGui->use_root_window)
@@ -947,8 +950,10 @@ static void set_fullscreen_mode(int fullscreen_mode) {
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
       tvset_toggle_visibility(NULL, NULL);
-    if(pplugin)
-      pplugin_toggle_visibility(NULL, NULL);
+    if(vpplugin)
+      vpplugin_toggle_visibility(NULL, NULL);
+    if(applugin)
+      applugin_toggle_visibility(NULL, NULL);
     if(help)
       help_toggle_visibility(NULL, NULL);
   }
@@ -980,8 +985,10 @@ static void set_fullscreen_mode(int fullscreen_mode) {
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
       tvset_toggle_visibility(NULL, NULL);
-    if(pplugin)
-      pplugin_toggle_visibility(NULL, NULL);
+    if(vpplugin)
+      vpplugin_toggle_visibility(NULL, NULL);
+    if(applugin)
+      applugin_toggle_visibility(NULL, NULL);
     if(help)
       help_toggle_visibility(NULL, NULL);
   }
@@ -1705,28 +1712,28 @@ void gui_tvset_show(xitk_widget_t *w, void *data) {
 
 void gui_vpp_show(xitk_widget_t *w, void *data) {
   
-  if (pplugin_is_running() && !pplugin_is_visible())
-    pplugin_toggle_visibility(NULL, NULL);
-  else if(!pplugin_is_running())
-    pplugin_panel();
+  if (vpplugin_is_running() && !vpplugin_is_visible())
+    vpplugin_toggle_visibility(NULL, NULL);
+  else if(!vpplugin_is_running())
+    vpplugin_panel();
   else {
     if(gGui->use_root_window)
-      pplugin_toggle_visibility(NULL, NULL);
+      vpplugin_toggle_visibility(NULL, NULL);
     else
-      pplugin_end();
+      vpplugin_end();
   }
 }
 
 void gui_vpp_enable(void) {
 
-  if(pplugin_is_post_selected()) {
-    gGui->post_enable = !gGui->post_enable;
-    osd_display_info(_("Post plugins: %s."), (gGui->post_enable) ? _("enabled") : _("disabled"));
-    pplugin_update_enable_button();
-    if(pplugin_is_visible())
-      pplugin_rewire_from_posts_window();
+  if(vpplugin_is_post_selected()) {
+    gGui->post_video_enable = !gGui->post_video_enable;
+    osd_display_info(_("Video post plugins: %s."), (gGui->post_video_enable) ? _("enabled") : _("disabled"));
+    vpplugin_update_enable_button();
+    if(vpplugin_is_visible())
+      vpplugin_rewire_from_posts_window();
     else
-      pplugin_rewire_posts();
+      vpplugin_rewire_posts();
   }
 }
 
@@ -1846,6 +1853,33 @@ void gui_decrease_audio_volume(void) {
     change_audio_vol((gGui->mixer.volume_level - 1));
   else if(gGui->mixer.method == SOFTWARE_MIXER)
     gui_decrease_amp_level();
+}
+
+void gui_app_show(xitk_widget_t *w, void *data) {
+  
+  if (applugin_is_running() && !applugin_is_visible())
+    applugin_toggle_visibility(NULL, NULL);
+  else if(!applugin_is_running())
+    applugin_panel();
+  else {
+    if(gGui->use_root_window)
+      applugin_toggle_visibility(NULL, NULL);
+    else
+      applugin_end();
+  }
+}
+
+void gui_app_enable(void) {
+
+  if(applugin_is_post_selected()) {
+    gGui->post_audio_enable = !gGui->post_audio_enable;
+    osd_display_info(_("Audio post plugins: %s."), (gGui->post_audio_enable) ? _("enabled") : _("disabled"));
+    applugin_update_enable_button();
+    if(applugin_is_visible())
+      applugin_rewire_from_posts_window();
+    else
+      applugin_rewire_posts();
+  }
 }
 
 void gui_change_zoom(int zoom_dx, int zoom_dy) {

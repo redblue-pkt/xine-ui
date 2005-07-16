@@ -1380,9 +1380,12 @@ int main(int argc, char *argv[]) {
   gGui->verbosity              = 0;
   gGui->broadcast_port         = 0;
   gGui->display_logo           = 1;
-  gGui->post_elements          = NULL;
-  gGui->post_elements_num      = 0;
-  gGui->post_enable            = 1;
+  gGui->post_video_elements    = NULL;
+  gGui->post_video_elements_num = 0;
+  gGui->post_video_enable      = 1;
+  gGui->post_audio_elements    = NULL;
+  gGui->post_audio_elements_num = 0;
+  gGui->post_audio_enable      = 1;
   gGui->splash                 = 1;
 #ifdef HAVE_LIRC
   gGui->lirc_enable            = 1;
@@ -1722,7 +1725,8 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_DISABLE_POST:
-      gGui->post_enable = 0;
+      gGui->post_video_enable = 0;
+      gGui->post_audio_enable = 0;
       break;
 
     case OPTION_NO_SPLASH:
@@ -2141,11 +2145,13 @@ int main(int argc, char *argv[]) {
     char             **plugin = pplugins;
     
     while(*plugin) {
-      pplugin_parse_and_store_post((const char *) *plugin);
+      vpplugin_parse_and_store_post((const char *) *plugin);
+      applugin_parse_and_store_post((const char *) *plugin);
       plugin++;
     }
     
-    pplugin_rewire_posts();
+    vpplugin_rewire_posts();
+    applugin_rewire_posts();
   }
   
   gui_run(session_argv);

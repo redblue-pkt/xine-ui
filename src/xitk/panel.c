@@ -156,6 +156,7 @@ static void panel_exit(xitk_widget_t *w, void *data) {
     XUnmapWindow(gGui->display, gGui->panel_window);
     XUnlockDisplay(gGui->display);
 
+    panel->title_label = 0;
     xitk_destroy_widgets(panel->widget_list);
 
     XLockDisplay(gGui->display);
@@ -573,8 +574,11 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if(((!panel->visible || !visible) && !tvset_is_visible()) || (visible && tvset_is_visible()))
     tvset_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !pplugin_is_visible()) || (visible && pplugin_is_visible()))
-    pplugin_toggle_visibility(NULL, NULL);
+  if(((!panel->visible || !visible) && !vpplugin_is_visible()) || (visible && vpplugin_is_visible()))
+    vpplugin_toggle_visibility(NULL, NULL);
+
+  if(((!panel->visible || !visible) && !applugin_is_visible()) || (visible && applugin_is_visible()))
+    applugin_toggle_visibility(NULL, NULL);
 
   if(((!panel->visible || !visible) && !help_is_visible()) || (visible && help_is_visible()))
     help_toggle_visibility(NULL, NULL);
@@ -928,8 +932,10 @@ static void panel_handle_event(XEvent *event, void *data) {
       stream_infos_toggle_visibility(NULL, NULL);
     if(!tvset_is_visible())
       tvset_toggle_visibility(NULL, NULL);
-    if(!pplugin_is_visible())
-      pplugin_toggle_visibility(NULL, NULL);
+    if(!vpplugin_is_visible())
+      vpplugin_toggle_visibility(NULL, NULL);
+    if(!applugin_is_visible())
+      applugin_toggle_visibility(NULL, NULL);
     if(!help_is_visible())
       help_toggle_visibility(NULL, NULL);
     break;

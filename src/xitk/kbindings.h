@@ -143,6 +143,8 @@ typedef enum {
   ACTID_HELP_SHOW,
   ACTID_PLAYLIST_STOP,
   ACTID_OSD_MENU,
+  ACTID_APP,
+  ACTID_APP_ENABLE,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 

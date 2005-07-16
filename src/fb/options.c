@@ -35,6 +35,7 @@
 #include "options.h"
 
 #define OPTION_STDCTL           5000
+#define OPTION_VERBOSE          1005
 #define OPTION_POST             1008
 
 int stdctl;
@@ -78,6 +79,7 @@ static void print_usage(void)
 	printf("Usage: fbxine [options] <MRL> ...\n"
 	       "\n"
 	       "  -v, --version                  Display version.\n"
+               "      --verbose [=level]         Set verbosity level. Default is 1.\n"
 	       "  -V, --video-driver <drv>       Select video driver:\n");
 	
 	driver_id = xine_list_video_output_plugins(fbxine.xine);
@@ -139,8 +141,9 @@ int parse_options(int argc, char **argv)
 			{ "version",       no_argument,       0, 'v' },
 			{ "no-lirc",       no_argument,       0, 'L' },
 			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
-			{"post",           required_argument, 0, OPTION_POST },
-			{"deinterlace",    no_argument,       0, 'D' },
+			{ "post",          required_argument, 0, OPTION_POST },
+			{ "deinterlace",   no_argument,       0, 'D' },
+			{ "verbose",       optional_argument, 0, OPTION_VERBOSE },
 			{ 0,               no_argument,       0,  0  }
 		};
 	const char *short_options = "?hda:qA:V:R::vD";
@@ -208,6 +211,13 @@ int parse_options(int argc, char **argv)
 				pplugins_num++;
 				pplugins[pplugins_num] = NULL;
 				break;
+
+                        case OPTION_VERBOSE:
+                                if(!optarg)
+                                    fbxine.verbosity = 1;
+                                else
+                                    fbxine.verbosity = strtol(optarg, &optarg, 10);
+                                break;
 
 			case 'h':
 			case '?':

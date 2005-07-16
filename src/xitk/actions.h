@@ -88,6 +88,8 @@ void change_audio_vol(int value);
 void layer_above_video(Window w);
 void gui_increase_audio_volume(void);
 void gui_decrease_audio_volume(void);
+void gui_app_show(xitk_widget_t *w, void *data);
+void gui_app_enable(void);
 void change_amp_vol(int value);
 void gui_increase_amp_level(void);
 void gui_decrease_amp_level(void);

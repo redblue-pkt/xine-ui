@@ -158,9 +158,12 @@ typedef struct {
 
   tvout_t                  *tvout;
 
-  post_element_t          **post_elements;
-  int                       post_elements_num;
-  int                       post_enable;
+  post_element_t          **post_video_elements;
+  int                       post_video_elements_num;
+  int                       post_video_enable;
+  post_element_t          **post_audio_elements;
+  int                       post_audio_elements_num;
+  int                       post_audio_enable;
 
   char                     *deinterlace_plugin;
   post_element_t          **deinterlace_elements;
@@ -210,9 +213,8 @@ typedef struct {
     int                     num_mrls;
     
     int                     post_plugin_num;
-    xine_post_t            *post_output;
+    post_element_t          post_output_element;    
     int                     post_changed;
-    
   } visual_anim;
   
   struct {

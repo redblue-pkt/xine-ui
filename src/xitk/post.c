@@ -129,17 +129,29 @@ typedef struct {
   xitk_widget_t              *help_browser;
 } _pplugin_t;
 
-static _pplugin_t    *pplugin = NULL;
-static char         **post_audio_plugins;
+typedef struct {
+  _pplugin_t                 *pplugin;
+} _pp_wrapper_t;
+
+static _pp_wrapper_t vpp_wrapper = { NULL };
+static _pp_wrapper_t app_wrapper = { NULL };
+static char        **post_audio_plugins;
 
 /* Some functions prototype */
-static void _pplugin_unwire(void);
-static post_element_t **pplugin_parse_and_load(const char *, int *);
-static void _pplugin_rewire(void);
-void _pplugin_rewire_from_post_elements(post_element_t **, int);
+static void _vpplugin_unwire();
+static void _applugin_unwire();
+static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper);
+static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *, int *);
+static void _vpplugin_rewire();
+static void _applugin_rewire();
+static void _pplugin_rewire(_pp_wrapper_t *pp_wrapper);
+static void _pplugin_rewire_from_post_elements(_pp_wrapper_t *pp_wrapper, post_element_t **, int);
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *);
-static void _pplugin_save_chain(void);
-static void _pplugin_close_help(xitk_widget_t *, void *);
+static post_element_t **_pplugin_join_visualization_and_post_elements(int *);
+static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper);
+static void _vpplugin_close_help(xitk_widget_t *, void *);
+static void _applugin_close_help(xitk_widget_t *, void *);
+static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *, void *);
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   post_element_t **posts = NULL;
@@ -148,7 +160,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->deinterlace_plugin = cfg->str_value;
   
   if(gGui->deinterlace_enable)
-    _pplugin_unwire();
+    _vpplugin_unwire();
   
   for(i = 0; i < gGui->deinterlace_elements_num; i++) {
     xine_post_dispose(gGui->xine, gGui->deinterlace_elements[i]->post);
@@ -159,13 +171,13 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   SAFE_FREE(gGui->deinterlace_elements);
   gGui->deinterlace_elements_num = 0;
   
-  if((posts = pplugin_parse_and_load(gGui->deinterlace_plugin, &num))) {
+  if((posts = pplugin_parse_and_load(&vpp_wrapper, gGui->deinterlace_plugin, &num))) {
     gGui->deinterlace_elements     = posts;
     gGui->deinterlace_elements_num = num;
   }
 
   if(gGui->deinterlace_enable)
-    _pplugin_rewire();
+    _vpplugin_rewire();
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -179,7 +191,8 @@ const char **post_get_audio_plugins_names(void) {
 
 void post_init(void) {
 
-  gGui->visual_anim.post_output = NULL;
+  memset(&gGui->visual_anim.post_output_element, 0, sizeof (gGui->visual_anim.post_output_element));
+  
   gGui->visual_anim.post_plugin_num = -1;
   gGui->visual_anim.post_changed = 0;
 
@@ -210,7 +223,7 @@ void post_init(void) {
 				    post_audio_plugin_cb,
 				    CONFIG_NO_DATA);
 	
-	gGui->visual_anim.post_output = 
+	gGui->visual_anim.post_output_element.post = 
 	  xine_post_init(gGui->xine,
 			 post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 			 &gGui->ao_port, &gGui->vo_port);
@@ -222,21 +235,18 @@ void post_init(void) {
 
 void post_rewire_visual_anim(void) {
 
-  if(gGui->visual_anim.post_output) {
-    xine_post_out_t *audio_source;
+  if(gGui->visual_anim.post_output_element.post) {
+    (void) post_rewire_audio_port_to_stream(gGui->stream);
     
-    audio_source = xine_get_audio_source(gGui->stream);
-    (void) xine_post_wire_audio_port(audio_source, gGui->ao_port);
-    
-    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
+    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output_element.post);
   }
   
-  gGui->visual_anim.post_output = 
+  gGui->visual_anim.post_output_element.post = 
     xine_post_init(gGui->xine,
 		   post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 		   &gGui->ao_port, &gGui->vo_port);
 
-  if(gGui->visual_anim.post_output && 
+  if(gGui->visual_anim.post_output_element.post && 
      (gGui->visual_anim.enabled == 1) && (gGui->visual_anim.running == 1)) {
 
     (void) post_rewire_audio_post_to_stream(gGui->stream);
@@ -244,23 +254,39 @@ void post_rewire_visual_anim(void) {
   }
 }
 
+static int ignore_visual_anim = 1;
+
 int post_rewire_audio_port_to_stream(xine_stream_t *stream) {
+
+  _applugin_unwire();
+  ignore_visual_anim = 1;
+  _applugin_rewire();
+/*  
   xine_post_out_t * audio_source;
   
   audio_source = xine_get_audio_source(stream);
   return xine_post_wire_audio_port(audio_source, gGui->ao_port);
+*/
+  return 1;
 }
 
 int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
+
+  _applugin_unwire();
+  ignore_visual_anim = 0;
+  _applugin_rewire();
+/*
   xine_post_out_t * audio_source;
 
   audio_source = xine_get_audio_source(stream);
   return xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]);
+*/
+  return 1;
 }
 
 /* ================================================================ */
 
-static void _pplugin_unwire(void) {
+static void _vpplugin_unwire(void) {
   xine_post_out_t  *vo_source;
   
   vo_source = xine_get_video_source(gGui->stream);
@@ -268,17 +294,32 @@ static void _pplugin_unwire(void) {
   (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
 }
 
-static void _pplugin_rewire(void) {
+static void _applugin_unwire(void) {
+  xine_post_out_t  *ao_source;
+  
+  ao_source = xine_get_audio_source(gGui->stream);
 
+  (void) xine_post_wire_audio_port(ao_source, gGui->ao_port);
+}
+
+static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper) {
+  if (pp_wrapper == &vpp_wrapper)
+    _vpplugin_unwire();
+  else
+    _applugin_unwire();
+}
+
+static void _vpplugin_rewire(void) {
   static post_element_t **post_elements;
   int post_elements_num;
-
-  _pplugin_save_chain();
+  _pp_wrapper_t *pp_wrapper = &vpp_wrapper;
+  
+  _pplugin_save_chain(pp_wrapper);
 
   post_elements = _pplugin_join_deinterlace_and_post_elements(&post_elements_num);
 
   if( post_elements ) {
-    _pplugin_rewire_from_post_elements(post_elements, post_elements_num);
+    _pplugin_rewire_from_post_elements(pp_wrapper, post_elements, post_elements_num);
 
     free(post_elements);
   }
@@ -336,28 +377,51 @@ static void _pplugin_rewire(void) {
 #endif
 }
 
-static int _pplugin_get_object_offset(post_object_t *pobj) {
+static void _applugin_rewire(void) {
+  static post_element_t **post_elements;
+  int post_elements_num;
+  _pp_wrapper_t *pp_wrapper = &app_wrapper;
+
+  _pplugin_save_chain(pp_wrapper);
+
+  post_elements = _pplugin_join_visualization_and_post_elements(&post_elements_num);
+  
+  if( post_elements ) {
+    _pplugin_rewire_from_post_elements(pp_wrapper, post_elements, post_elements_num);
+
+    free(post_elements);
+  }
+}
+
+static void _pplugin_rewire(_pp_wrapper_t *pp_wrapper) {
+  if (pp_wrapper == &vpp_wrapper)
+    _vpplugin_rewire();
+  else
+    _applugin_rewire();
+}
+
+static int _pplugin_get_object_offset(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   int i;
   
-  for(i = 0; i < pplugin->object_num; i++) {
-    if(pplugin->post_objects[i] == pobj)
+  for(i = 0; i < pp_wrapper->pplugin->object_num; i++) {
+    if(pp_wrapper->pplugin->post_objects[i] == pobj)
       return i;
   }
   
   return 0;
 }
 
-static int _pplugin_is_first_filter(post_object_t *pobj) {
-  if(pplugin)
-    return (pobj == *pplugin->post_objects);
+static int _pplugin_is_first_filter(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
+  if(pp_wrapper->pplugin)
+    return (pobj == *pp_wrapper->pplugin->post_objects);
   
   return 0;
 }
 
-static int _pplugin_is_last_filter(post_object_t *pobj) {
+static int _pplugin_is_last_filter(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   
-  if(pplugin) {
-    post_object_t **po = pplugin->post_objects;
+  if(pp_wrapper->pplugin) {
+    post_object_t **po = pp_wrapper->pplugin->post_objects;
     
     while(*po && (*po != pobj))
       po++;
@@ -382,7 +446,7 @@ static void _pplugin_hide_obj(post_object_t *pobj) {
   }
 }
 
-static void _pplugin_show_obj(post_object_t *pobj) {
+static void _pplugin_show_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
 
   if(pobj) {
 
@@ -419,82 +483,82 @@ static void _pplugin_show_obj(post_object_t *pobj) {
     if(pobj->help)
       ENABLE_ME(pobj->help);
     
-    if((!_pplugin_is_first_filter(pobj)) && (xitk_combo_get_current_selected(pobj->plugins)))
+    if((!_pplugin_is_first_filter(pp_wrapper, pobj)) && (xitk_combo_get_current_selected(pobj->plugins)))
       ENABLE_ME(pobj->up);
     
-    if((!_pplugin_is_last_filter(pobj) && (xitk_combo_get_current_selected(pobj->plugins))) && 
-       (_pplugin_is_last_filter(pobj) 
-	|| (!_pplugin_is_last_filter(pobj) 
-	    && pplugin->post_objects[_pplugin_get_object_offset(pobj) + 1] 
-	    && xitk_combo_get_current_selected(pplugin->post_objects[_pplugin_get_object_offset(pobj) + 1]->plugins))))
+    if((!_pplugin_is_last_filter(pp_wrapper, pobj) && (xitk_combo_get_current_selected(pobj->plugins))) && 
+       (_pplugin_is_last_filter(pp_wrapper, pobj) 
+	|| (!_pplugin_is_last_filter(pp_wrapper, pobj) 
+	    && pp_wrapper->pplugin->post_objects[_pplugin_get_object_offset(pp_wrapper, pobj) + 1] 
+	    && xitk_combo_get_current_selected(pp_wrapper->pplugin->post_objects[_pplugin_get_object_offset(pp_wrapper, pobj) + 1]->plugins))))
       ENABLE_ME(pobj->down);
 
   }
 }
 
-static void _pplugin_paint_widgets(void) {
-  if(pplugin) {
+static void _pplugin_paint_widgets(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin) {
     int   i, x, y;
     int   last;
     int   slidmax, slidpos;
     
-    last = pplugin->object_num <= (pplugin->first_displayed + MAX_DISPLAY_FILTERS)
-      ? pplugin->object_num : (pplugin->first_displayed + MAX_DISPLAY_FILTERS);
+    last = pp_wrapper->pplugin->object_num <= (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS)
+      ? pp_wrapper->pplugin->object_num : (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
     
-    for(i = 0; i < pplugin->object_num; i++)
-      _pplugin_hide_obj(pplugin->post_objects[i]);
+    for(i = 0; i < pp_wrapper->pplugin->object_num; i++)
+      _pplugin_hide_obj(pp_wrapper->pplugin->post_objects[i]);
     
     x = 15;
     y = -45;
     
-    for(i = pplugin->first_displayed; i < last; i++) {
+    for(i = pp_wrapper->pplugin->first_displayed; i < last; i++) {
       y += 20 + 5 + 20 + 5 + 23 + 10;
-      pplugin->post_objects[i]->x = x;
-      pplugin->post_objects[i]->y = y;
-      _pplugin_show_obj(pplugin->post_objects[i]);
+      pp_wrapper->pplugin->post_objects[i]->x = x;
+      pp_wrapper->pplugin->post_objects[i]->y = y;
+      _pplugin_show_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
     }
     
-    if(pplugin->object_num > MAX_DISPLAY_FILTERS) {
-      slidmax = pplugin->object_num - MAX_DISPLAY_FILTERS;
-      slidpos = slidmax - pplugin->first_displayed;
-      xitk_enable_and_show_widget(pplugin->slider);
+    if(pp_wrapper->pplugin->object_num > MAX_DISPLAY_FILTERS) {
+      slidmax = pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS;
+      slidpos = slidmax - pp_wrapper->pplugin->first_displayed;
+      xitk_enable_and_show_widget(pp_wrapper->pplugin->slider);
     }
     else {
       slidmax = 1;
       slidpos = slidmax;
       
-      if(!pplugin->first_displayed)
-	xitk_disable_and_hide_widget(pplugin->slider);
+      if(!pp_wrapper->pplugin->first_displayed)
+	xitk_disable_and_hide_widget(pp_wrapper->pplugin->slider);
     }
     
-    xitk_slider_set_max(pplugin->slider, slidmax);
-    xitk_slider_set_pos(pplugin->slider, slidpos);
+    xitk_slider_set_max(pp_wrapper->pplugin->slider, slidmax);
+    xitk_slider_set_pos(pp_wrapper->pplugin->slider, slidpos);
   }
 }
 
-static void _pplugin_send_expose(void) {
-  if(pplugin) {
+static void _pplugin_send_expose(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin) {
     XLockDisplay(gGui->display);
-    XClearWindow(gGui->display, (XITK_WIDGET_LIST_WINDOW(pplugin->widget_list)));
+    XClearWindow(gGui->display, (XITK_WIDGET_LIST_WINDOW(pp_wrapper->pplugin->widget_list)));
     XUnlockDisplay(gGui->display);
   }
 }
 
-static void _pplugin_destroy_widget(xitk_widget_t *w) {
+static void _pplugin_destroy_widget(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w) {
   xitk_widget_t *cw;
 
-  cw = (xitk_widget_t *) xitk_list_first_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)));
+  cw = (xitk_widget_t *) xitk_list_first_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)));
   while(cw) {
     
     if(cw == w) {
       xitk_hide_widget(cw);
       xitk_destroy_widget(cw);
       cw = NULL;
-      xitk_list_delete_current((XITK_WIDGET_LIST_LIST(pplugin->widget_list)));
+      xitk_list_delete_current((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)));
       return;
     }
     
-    cw = (xitk_widget_t *) xitk_list_next_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)));
+    cw = (xitk_widget_t *) xitk_list_next_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)));
   }
 }
 
@@ -589,7 +653,7 @@ static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {
 			  (*(int *)(pobj->param_data + pobj->param->offset)));  
 }
 
-static void _pplugin_add_parameter_widget(post_object_t *pobj) {
+static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   
   if(pobj) {
     xitk_label_widget_t   lb;
@@ -602,19 +666,19 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	     ? pobj->param->description : _("No description available"));
 
     fs = xitk_font_load_font(gGui->display, boldfontname);
-    xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(pplugin->widget_list)));
+    xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
     width = xitk_font_get_string_length(fs, buffer);
     xitk_font_unload_font(fs);
     
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-    lb.window              = xitk_window_get_window(pplugin->xwin);
-    lb.gc                  = (XITK_WIDGET_LIST_GC(pplugin->widget_list));
+    lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
+    lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
     lb.label               = buffer;
     lb.callback            = NULL;
     lb.userdata            = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-     (pobj->comment = xitk_noskin_label_create(pplugin->widget_list, &lb,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+     (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
 					       pobj->x, (pobj->y + 25), 
 					       width + 10, 20, boldfontname)));
 
@@ -631,13 +695,13 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
-	  cmb.parent_wlist      = pplugin->widget_list;
+	  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	  cmb.entries           = pobj->param->enum_values;
-	  cmb.parent_wkey       = &pplugin->widget_key;
+	  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	  cmb.callback          = _pplugin_set_param_int;
 	  cmb.userdata          = pobj;
-	  xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-	   (pobj->value = xitk_noskin_combo_create(pplugin->widget_list, 
+	  xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+	   (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
 						   &cmb, 
 						   pobj->x + w, pobj->y + 25, 
 						   180, NULL, NULL)));
@@ -651,11 +715,11 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	  ib.skin_element_name = NULL;
 	  ib.value             = *(int *)(pobj->param_data + pobj->param->offset);
 	  ib.step              = 1;
-	  ib.parent_wlist      = pplugin->widget_list;
+	  ib.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	  ib.callback          = _pplugin_set_param_int;
 	  ib.userdata          = pobj;
-	  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-	   (pobj->value = xitk_noskin_intbox_create(pplugin->widget_list, &ib, 
+	  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+	   (pobj->value = xitk_noskin_intbox_create(pp_wrapper->pplugin->widget_list, &ib, 
 						    pobj->x + w, pobj->y + 25, 
 						    50, 20, NULL, NULL, NULL)));
 	}
@@ -670,11 +734,11 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	ib.skin_element_name = NULL;
 	ib.value             = *(double *)(pobj->param_data + pobj->param->offset);
 	ib.step              = .5;
-	ib.parent_wlist      = pplugin->widget_list;
+	ib.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	ib.callback          = _pplugin_set_param_double;
 	ib.userdata          = pobj;
-	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-	 (pobj->value = xitk_noskin_doublebox_create(pplugin->widget_list, &ib, 
+	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+	 (pobj->value = xitk_noskin_doublebox_create(pp_wrapper->pplugin->widget_list, &ib, 
 						     pobj->x + w, pobj->y + 25, 
 						     100, 20, NULL, NULL, NULL)));
       }
@@ -691,8 +755,8 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	inp.max_length        = 256;
 	inp.callback          = _pplugin_set_param_char;
 	inp.userdata          = pobj;
-	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-	 (pobj->value = xitk_noskin_inputtext_create(pplugin->widget_list, &inp, 
+	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+	 (pobj->value = xitk_noskin_inputtext_create(pp_wrapper->pplugin->widget_list, &inp, 
 						     pobj->x + w, pobj->y + 25, 
 						     180, 20,
 						     "Black", "Black", fontname)));
@@ -706,13 +770,13 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = (is_layer_above());
-	cmb.parent_wlist      = pplugin->widget_list;
+	cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	cmb.entries           = (char **)(pobj->param_data + pobj->param->offset);
-	cmb.parent_wkey       = &pplugin->widget_key;
+	cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	cmb.callback          = _pplugin_set_param_stringlist;
 	cmb.userdata          = pobj;
-	xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-	 (pobj->value = xitk_noskin_combo_create(pplugin->widget_list, 
+	xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+	 (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
 						 &cmb, 
 						 pobj->x + w, pobj->y + 25, 
 						 180, NULL, NULL)));
@@ -729,8 +793,8 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	cb.skin_element_name = NULL;
 	cb.callback          = _pplugin_set_param_bool;
 	cb.userdata          = pobj;
-	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-	  (pobj->value = xitk_noskin_checkbox_create(pplugin->widget_list, &cb,
+	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+	  (pobj->value = xitk_noskin_checkbox_create(pp_wrapper->pplugin->widget_list, &cb,
 						     pobj->x + w, pobj->y + 25, 15, 15)));
 	xitk_checkbox_set_state(pobj->value, 
 				(*(int *)(pobj->param_data + pobj->param->offset)));  
@@ -740,52 +804,61 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
   }
 }
 
-static void _pplugin_change_parameter(xitk_widget_t *w, void *data, int select) {
+static void _pplugin_change_parameter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int select) {
   post_object_t *pobj = (post_object_t *) data;
 
   if(pobj) {
 
     if(pobj->value)
-      _pplugin_destroy_widget(pobj->value);
+      _pplugin_destroy_widget(pp_wrapper, pobj->value);
     
     if(pobj->comment)
-      _pplugin_destroy_widget(pobj->comment);
+      _pplugin_destroy_widget(pp_wrapper, pobj->comment);
 
     if(pobj->descr) {
       pobj->param    = pobj->descr->parameter;
       pobj->param    += select;
       pobj->readonly = pobj->param->readonly;
-      _pplugin_add_parameter_widget(pobj);
+      _pplugin_add_parameter_widget(pp_wrapper, pobj);
     }
 
-    _pplugin_paint_widgets();
+    _pplugin_paint_widgets(pp_wrapper);
   }
 }
 
-static void _pplugin_get_plugins(void) {
-  const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_VIDEO_FILTER);
+static void _vpplugin_change_parameter(xitk_widget_t *w, void *data, int select) {
+  return _pplugin_change_parameter(&vpp_wrapper, w, data, select);
+}
+
+static void _applugin_change_parameter(xitk_widget_t *w, void *data, int select) {
+  return _pplugin_change_parameter(&app_wrapper, w, data, select);
+}
+
+static void _pplugin_get_plugins(_pp_wrapper_t *pp_wrapper) {
+  int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
+  const char *const *pol = xine_list_post_plugins_typed(gGui->xine, plugin_type);
   
   if(pol) {
     int  i = 0;
 
-    pplugin->plugin_names    = (char **) xine_xmalloc(sizeof(char *) * 2);
-    pplugin->plugin_names[i] = strdup(_("No Filter"));
+    pp_wrapper->pplugin->plugin_names    = (char **) xine_xmalloc(sizeof(char *) * 2);
+    pp_wrapper->pplugin->plugin_names[i] = strdup(_("No Filter"));
     while(pol[i]) {
-      pplugin->plugin_names = (char **) realloc(pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
+      pp_wrapper->pplugin->plugin_names = (char **) realloc(pp_wrapper->pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
       
-      pplugin->plugin_names[i + 1] = strdup(pol[i]);
+      pp_wrapper->pplugin->plugin_names[i + 1] = strdup(pol[i]);
       i++;
     }
-    pplugin->plugin_names[i + 1] = NULL;
+    pp_wrapper->pplugin->plugin_names[i + 1] = NULL;
   }
 }
 
-static void _pplugin_destroy_only_obj(post_object_t *pobj) {
+static void _pplugin_destroy_only_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   if(pobj) {
 
     if(pobj->properties) {
       
-      _pplugin_destroy_widget(pobj->properties);
+      _pplugin_destroy_widget(pp_wrapper, pobj->properties);
       pobj->properties = NULL;
       
       free(pobj->param_data);
@@ -805,28 +878,28 @@ static void _pplugin_destroy_only_obj(post_object_t *pobj) {
     }
     
     if(pobj->comment) {
-      _pplugin_destroy_widget(pobj->comment);
+      _pplugin_destroy_widget(pp_wrapper, pobj->comment);
       pobj->comment = NULL;
     }
     
     if(pobj->value) {
-      _pplugin_destroy_widget(pobj->value);
+      _pplugin_destroy_widget(pp_wrapper, pobj->value);
       pobj->value = NULL;
     }
 
     if(pobj->api && pobj->help) {
-      if(pplugin->help_running)
-	_pplugin_close_help(NULL,NULL);
-      _pplugin_destroy_widget(pobj->help);
+      if(pp_wrapper->pplugin->help_running)
+	_pplugin_close_help(pp_wrapper, NULL,NULL);
+      _pplugin_destroy_widget(pp_wrapper, pobj->help);
       pobj->help = NULL;
     }
     
   }
 }
 
-static void _pplugin_destroy_obj(post_object_t *pobj) {
+static void _pplugin_destroy_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   if(pobj) {
-    _pplugin_destroy_only_obj(pobj);
+    _pplugin_destroy_only_obj(pp_wrapper, pobj);
     
     if(pobj->post) {
       xine_post_dispose(gGui->xine, pobj->post);
@@ -835,56 +908,56 @@ static void _pplugin_destroy_obj(post_object_t *pobj) {
   }
 }
 
-static void _pplugin_destroy_base_obj(post_object_t *pobj) {
+static void _pplugin_destroy_base_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   int i = 0;
 
-  while(pplugin->post_objects && (pplugin->post_objects[i] != pobj)) 
+  while(pp_wrapper->pplugin->post_objects && (pp_wrapper->pplugin->post_objects[i] != pobj)) 
     i++;
   
-  if(pplugin->post_objects[i]) {
-    _pplugin_destroy_widget(pplugin->post_objects[i]->plugins);
-    _pplugin_destroy_widget(pplugin->post_objects[i]->frame);
-    _pplugin_destroy_widget(pplugin->post_objects[i]->up);
-    _pplugin_destroy_widget(pplugin->post_objects[i]->down);
+  if(pp_wrapper->pplugin->post_objects[i]) {
+    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->plugins);
+    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->frame);
+    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->up);
+    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->down);
     
-    free(pplugin->post_objects[i]);
-    pplugin->post_objects[i] = NULL;
+    free(pp_wrapper->pplugin->post_objects[i]);
+    pp_wrapper->pplugin->post_objects[i] = NULL;
     
-    pplugin->object_num--;
+    pp_wrapper->pplugin->object_num--;
     
-    pplugin->x = 5;
-    pplugin->y -= 20 + 5 + 20 + 5 + 23 + 10;
+    pp_wrapper->pplugin->x = 5;
+    pp_wrapper->pplugin->y -= 20 + 5 + 20 + 5 + 23 + 10;
   }
 }
 
-static void _pplugin_kill_filters_from(post_object_t *pobj) {
-  int             num = pplugin->object_num;
+static void _pplugin_kill_filters_from(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
+  int             num = pp_wrapper->pplugin->object_num;
   int             i = 0;
   
-  while(pplugin->post_objects && (pplugin->post_objects[i] != pobj)) 
+  while(pp_wrapper->pplugin->post_objects && (pp_wrapper->pplugin->post_objects[i] != pobj)) 
     i++;
   
-  _pplugin_destroy_obj(pplugin->post_objects[i]);
+  _pplugin_destroy_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
   
   i++;
   
-  if(pplugin->post_objects[i]) {
+  if(pp_wrapper->pplugin->post_objects[i]) {
 
-    while(pplugin->post_objects[i]) {
+    while(pp_wrapper->pplugin->post_objects[i]) {
 
-      _pplugin_destroy_obj(pplugin->post_objects[i]);
+      _pplugin_destroy_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
       
-      _pplugin_destroy_base_obj(pplugin->post_objects[i]);
+      _pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
 
       i++;
     }
   }
 
-  _pplugin_send_expose();
+  _pplugin_send_expose(pp_wrapper);
 
-  if(num != pplugin->object_num) {
-    pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
-    pplugin->post_objects[pplugin->object_num + 1] = NULL;
+  if(num != pp_wrapper->pplugin->object_num) {
+    pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
+    pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
   }
 }
 
@@ -925,23 +998,31 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
   return 0;
 }
 
-static void _pplugin_close_help(xitk_widget_t *w, void *data) {
+static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
 
-  pplugin->help_running = 0;
+  pp_wrapper->pplugin->help_running = 0;
   
-  xitk_unregister_event_handler(&pplugin->help_widget_key);
+  xitk_unregister_event_handler(&pp_wrapper->pplugin->help_widget_key);
   
-  xitk_destroy_widgets(pplugin->help_widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, pplugin->helpwin);
+  xitk_destroy_widgets(pp_wrapper->pplugin->help_widget_list);
+  xitk_window_destroy_window(gGui->imlib_data, pp_wrapper->pplugin->helpwin);
   
-  pplugin->helpwin = NULL;
-  xitk_list_free((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)));
+  pp_wrapper->pplugin->helpwin = NULL;
+  xitk_list_free((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)));
     
   XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pplugin->help_widget_list)));
+  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
   XUnlockDisplay(gGui->display);
     
-  free(pplugin->help_widget_list);
+  free(pp_wrapper->pplugin->help_widget_list);
+}
+
+static void _vpplugin_close_help(xitk_widget_t *w, void *data) {
+  _pplugin_close_help(&vpp_wrapper, w, data);
+}
+
+static void _applugin_close_help(xitk_widget_t *w, void *data) {
+  _pplugin_close_help(&app_wrapper, w, data);
 }
 
 static int __line_wrap(char *s, int pos, int line_size)
@@ -959,7 +1040,7 @@ static int __line_wrap(char *s, int pos, int line_size)
   return word_size + pos > line_size;
 }
 
-static void _pplugin_show_help(xitk_widget_t *w, void *data) {
+static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
   GC                          gc;
   xitk_pixmap_t              *bg = NULL;
@@ -968,37 +1049,37 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
   xitk_browser_widget_t       br;
 
   if(!pobj->api) {
-    if(pplugin->help_running)
-      _pplugin_close_help(NULL,NULL);
+    if(pp_wrapper->pplugin->help_running)
+      _pplugin_close_help(pp_wrapper, NULL,NULL);
     return;
   }
   
   /* create help window if needed */
 
-  if( !pplugin->help_running ) {
+  if( !pp_wrapper->pplugin->help_running ) {
     x = y = 100;
-    pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
-  						 _("Plugin Help"), x, y,
-  						 HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
+    pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+                                                                    _("Plugin Help"), x, y,
+                                                                    HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
 
-    set_window_states_start((xitk_window_get_window(pplugin->helpwin)));
+    set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
 
     XLockDisplay (gGui->display);
     gc = XCreateGC(gGui->display, 
-  		 (xitk_window_get_window(pplugin->helpwin)), None, None);
+  		 (xitk_window_get_window(pp_wrapper->pplugin->helpwin)), None, None);
     XUnlockDisplay (gGui->display);
     
-    pplugin->help_widget_list = xitk_widget_list_new();
-    xitk_widget_list_set(pplugin->help_widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
-    xitk_widget_list_set(pplugin->help_widget_list, 
-  		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pplugin->helpwin)));
-    xitk_widget_list_set(pplugin->help_widget_list, WIDGET_LIST_GC, gc);
+    pp_wrapper->pplugin->help_widget_list = xitk_widget_list_new();
+    xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+    xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, 
+                         WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
+    xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, WIDGET_LIST_GC, gc);
     
-    xitk_window_get_window_size(pplugin->helpwin, &width, &height);
+    xitk_window_get_window_size(pp_wrapper->pplugin->helpwin, &width, &height);
     bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
   
     XLockDisplay (gGui->display);
-    XCopyArea(gGui->display, (xitk_window_get_background(pplugin->helpwin)), bg->pixmap,
+    XCopyArea(gGui->display, (xitk_window_get_background(pp_wrapper->pplugin->helpwin)), bg->pixmap,
   	    bg->gc, 0, 0, width, height, 0, 0);
     XUnlockDisplay (gGui->display);
   
@@ -1006,12 +1087,12 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Ok");
     lb.align             = ALIGN_CENTER;
-    lb.callback          = _pplugin_close_help;
+    lb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_close_help : _applugin_close_help;
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)), 
-     (w = xitk_noskin_labelbutton_create(pplugin->help_widget_list, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)), 
+     (w = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->help_widget_list, 
   				       &lb, 150, 270, 100, 23,
   				       "Black", "Black", "White", btnfontname)));
     xitk_enable_and_show_widget(w);
@@ -1027,12 +1108,12 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     br.browser.entries               = NULL;
     br.callback                      = NULL;
     br.dbl_click_callback            = NULL;
-    br.parent_wlist                  = pplugin->help_widget_list;
+    br.parent_wlist                  = pp_wrapper->pplugin->help_widget_list;
     br.userdata                      = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)), 
-     (pplugin->help_browser = 
-      xitk_noskin_browser_create(pplugin->help_widget_list, &br,
-  			       (XITK_WIDGET_LIST_GC(pplugin->help_widget_list)), 15, 25, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)), 
+     (pp_wrapper->pplugin->help_browser = 
+      xitk_noskin_browser_create(pp_wrapper->pplugin->help_widget_list, &br,
+  			       (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)), 15, 25, 
   			       HELP_WINDOW_WIDTH - (30 + 16), 20,
   			       16, br_fontname)));
   }
@@ -1067,12 +1148,12 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     } while( *p );
     
     if(lines) {
-      char **ohbuf = pplugin->help_text;
+      char **ohbuf = pp_wrapper->pplugin->help_text;
       int    i = 0;
 
-      pplugin->help_text = hbuf;
-      xitk_browser_update_list(pplugin->help_browser, (const char **)pplugin->help_text, NULL,
-			       lines, 0);
+      pp_wrapper->pplugin->help_text = hbuf;
+      xitk_browser_update_list(pp_wrapper->pplugin->help_browser, (const char **)pp_wrapper->pplugin->help_text,
+                               NULL, lines, 0);
       
       if(ohbuf) {
 	while(ohbuf[i++])
@@ -1082,32 +1163,40 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     }
   }
 
-  if( !pplugin->help_running ) {
+  if( !pp_wrapper->pplugin->help_running ) {
 
-    xitk_enable_and_show_widget(pplugin->help_browser);
-    xitk_browser_set_alignment(pplugin->help_browser, ALIGN_LEFT);
+    xitk_enable_and_show_widget(pp_wrapper->pplugin->help_browser);
+    xitk_browser_set_alignment(pp_wrapper->pplugin->help_browser, ALIGN_LEFT);
   
   
-    xitk_window_change_background(gGui->imlib_data, pplugin->helpwin, bg->pixmap, width, height);
+    xitk_window_change_background(gGui->imlib_data, pp_wrapper->pplugin->helpwin, bg->pixmap, width, height);
     xitk_image_destroy_xitk_pixmap(bg);
   
-    pplugin->help_widget_key = xitk_register_event_handler("pplugin_help", 
-  						    (xitk_window_get_window(pplugin->helpwin)),
-  						    NULL,
-  						    NULL,
-  						    NULL,
-  						    pplugin->help_widget_list,
-  						    NULL);
+    pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
+                                                                       (xitk_window_get_window(pp_wrapper->pplugin->helpwin)),
+                                                                       NULL,
+                                                                       NULL,
+                                                                       NULL,
+                                                                       pp_wrapper->pplugin->help_widget_list,
+                                                                       NULL);
   
-    pplugin->help_running = 1;
+    pp_wrapper->pplugin->help_running = 1;
   }
 
-  raise_window(xitk_window_get_window(pplugin->helpwin), 1, pplugin->help_running);
+  raise_window(xitk_window_get_window(pp_wrapper->pplugin->helpwin), 1, pp_wrapper->pplugin->help_running);
   
-  try_to_set_input_focus(xitk_window_get_window(pplugin->helpwin));
+  try_to_set_input_focus(xitk_window_get_window(pp_wrapper->pplugin->helpwin));
 }
 
-static void _pplugin_retrieve_parameters(post_object_t *pobj) {
+static void _vpplugin_show_help(xitk_widget_t *w, void *data) {
+  _pplugin_show_help(&vpp_wrapper, w, data);
+}
+
+static void _applugin_show_help(xitk_widget_t *w, void *data) {
+  _pplugin_show_help(&app_wrapper, w, data);
+}
+
+static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   xitk_combo_widget_t         cmb;
   xitk_labelbutton_widget_t   lb;
   
@@ -1116,13 +1205,13 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
     cmb.skin_element_name = NULL;
     cmb.layer_above       = (is_layer_above());
-    cmb.parent_wlist      = pplugin->widget_list;
+    cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
     cmb.entries           = pobj->properties_names;
-    cmb.parent_wkey       = &pplugin->widget_key;
-    cmb.callback          = _pplugin_change_parameter;
+    cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
+    cmb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_change_parameter : _applugin_change_parameter;
     cmb.userdata          = pobj;
-    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-     (pobj->properties = xitk_noskin_combo_create(pplugin->widget_list, 
+    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+     (pobj->properties = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
 						  &cmb, 
 						  pobj->x + 180, pobj->y, 
 						  150, NULL, NULL)));
@@ -1136,12 +1225,12 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
       lb.button_type       = CLICK_BUTTON;
       lb.label             = _("Help");
       lb.align             = ALIGN_CENTER;
-      lb.callback          = _pplugin_show_help; 
+      lb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_show_help : _applugin_show_help; 
       lb.state_callback    = NULL;
       lb.userdata          = pobj;
       lb.skin_element_name = NULL;
-      xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-			       (pobj->help = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+      xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+			       (pobj->help = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
 									    &lb, pobj->x + 390, pobj->y, 50, 20,
 									    "Black", "Black", "White", btnfontname)));
       xitk_show_widget(pobj->help);
@@ -1152,14 +1241,14 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     xitk_label_widget_t   lb;
     
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-    lb.window              = xitk_window_get_window(pplugin->xwin);
-    lb.gc                  = (XITK_WIDGET_LIST_GC(pplugin->widget_list));
+    lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
+    lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
     lb.label               = _("There is no parameter available for this plugin.");
     lb.callback            = NULL;
     lb.userdata            = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-     (pobj->comment = xitk_noskin_label_create(pplugin->widget_list, &lb,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+     (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
 					       pobj->x, (pobj->y + 25), 
 					       FRAME_WIDTH - 50, 20, boldfontname)));
     
@@ -1167,62 +1256,70 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
   }
 }
 
-static void _pplugin_select_filter(xitk_widget_t *w, void *data, int select) {
+static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int select) {
   post_object_t *pobj = (post_object_t *) data;
   
-  _pplugin_unwire();
+  _pplugin_unwire(pp_wrapper);
 
   if(!select) {
-    _pplugin_kill_filters_from(pobj);
+    _pplugin_kill_filters_from(pp_wrapper, pobj);
     
-    if(_pplugin_is_first_filter(pobj)) {
-      if(xitk_is_widget_enabled(pplugin->new_filter))
-	xitk_disable_widget(pplugin->new_filter);
+    if(_pplugin_is_first_filter(pp_wrapper, pobj)) {
+      if(xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
+	xitk_disable_widget(pp_wrapper->pplugin->new_filter);
     }
     else {
-      _pplugin_destroy_base_obj(pobj);
+      _pplugin_destroy_base_obj(pp_wrapper, pobj);
       
-      pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
-      pplugin->post_objects[pplugin->object_num + 1] = NULL;
+      pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
+      pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
       
-      if(!xitk_is_widget_enabled(pplugin->new_filter))
-	xitk_enable_widget(pplugin->new_filter);
+      if(!xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
+	xitk_enable_widget(pp_wrapper->pplugin->new_filter);
      
     }
 
-    if(pplugin->object_num <= MAX_DISPLAY_FILTERS)
-      pplugin->first_displayed = 0;
-    else if((pplugin->object_num - pplugin->first_displayed) < MAX_DISPLAY_FILTERS)
-      pplugin->first_displayed = pplugin->object_num - MAX_DISPLAY_FILTERS;
+    if(pp_wrapper->pplugin->object_num <= MAX_DISPLAY_FILTERS)
+      pp_wrapper->pplugin->first_displayed = 0;
+    else if((pp_wrapper->pplugin->object_num - pp_wrapper->pplugin->first_displayed) < MAX_DISPLAY_FILTERS)
+      pp_wrapper->pplugin->first_displayed = pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS;
 
   }
   else {
-    _pplugin_destroy_obj(pobj);
+    _pplugin_destroy_obj(pp_wrapper, pobj);
 
     pobj->post = xine_post_init(gGui->xine, 
 				xitk_combo_get_current_entry_selected(w),
 				0, &gGui->ao_port, &gGui->vo_port);
     
-    _pplugin_retrieve_parameters(pobj);
+    _pplugin_retrieve_parameters(pp_wrapper, pobj);
 
-    if(!xitk_is_widget_enabled(pplugin->new_filter))
-      xitk_enable_widget(pplugin->new_filter);
+    if(!xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
+      xitk_enable_widget(pp_wrapper->pplugin->new_filter);
 
   }
   
-  if(pplugin->help_running)
-    _pplugin_show_help(NULL, pobj);
+  if(pp_wrapper->pplugin->help_running)
+    _pplugin_show_help(pp_wrapper, NULL, pobj);
 
-  _pplugin_rewire();
-  _pplugin_paint_widgets();
+  _pplugin_rewire(pp_wrapper);
+  _pplugin_paint_widgets(pp_wrapper);
 }
 
-static void _pplugin_move_up(xitk_widget_t *w, void *data) {
+static void _vpplugin_select_filter(xitk_widget_t *w, void *data, int select) {
+  _pplugin_select_filter(&vpp_wrapper, w, data, select);
+}
+
+static void _applugin_select_filter(xitk_widget_t *w, void *data, int select) {
+  _pplugin_select_filter(&app_wrapper, w, data, select);
+}
+
+static void _pplugin_move_up(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
   post_object_t *pobj_tmp;
-  post_object_t **ppobj = pplugin->post_objects;
+  post_object_t **ppobj = pp_wrapper->pplugin->post_objects;
 
-  _pplugin_unwire();
+  _pplugin_unwire(pp_wrapper);
 
   while(*ppobj != pobj)
     ppobj++;
@@ -1231,16 +1328,24 @@ static void _pplugin_move_up(xitk_widget_t *w, void *data) {
   *ppobj   = pobj;
   *++ppobj = pobj_tmp;
   
-  _pplugin_rewire();
-  _pplugin_paint_widgets();
+  _pplugin_rewire(pp_wrapper);
+  _pplugin_paint_widgets(pp_wrapper);
 }
 
-static void _pplugin_move_down(xitk_widget_t *w, void *data) {
+static void _vpplugin_move_up(xitk_widget_t *w, void *data) {
+  _pplugin_move_up(&vpp_wrapper, w, data);
+}
+
+static void _applugin_move_up(xitk_widget_t *w, void *data) {
+  _pplugin_move_up(&app_wrapper, w, data);
+}
+
+static void _pplugin_move_down(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
   post_object_t *pobj_tmp;
-  post_object_t **ppobj = pplugin->post_objects;
+  post_object_t **ppobj = pp_wrapper->pplugin->post_objects;
 
-  _pplugin_unwire();
+  _pplugin_unwire(pp_wrapper);
 
   while(*ppobj != pobj)
     ppobj++;
@@ -1249,37 +1354,45 @@ static void _pplugin_move_down(xitk_widget_t *w, void *data) {
   *ppobj   = pobj_tmp;
   *++ppobj = pobj;
   
-  _pplugin_rewire();
-  _pplugin_paint_widgets();
+  _pplugin_rewire(pp_wrapper);
+  _pplugin_paint_widgets(pp_wrapper);
 }
 
-static void _pplugin_create_filter_object(void) {
+static void _vpplugin_move_down(xitk_widget_t *w, void *data) {
+  _pplugin_move_down(&vpp_wrapper, w, data);
+}
+
+static void _applugin_move_down(xitk_widget_t *w, void *data) {
+  _pplugin_move_down(&app_wrapper, w, data);
+}
+
+static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   xitk_combo_widget_t   cmb;
   post_object_t        *pobj;
   xitk_image_widget_t   im;
   xitk_image_t         *image;
   xitk_button_widget_t  b;
   
-  pplugin->x = 15;
-  pplugin->y += 20 + 5 + 20 + 5 + 23 + 10;
+  pp_wrapper->pplugin->x = 15;
+  pp_wrapper->pplugin->y += 20 + 5 + 20 + 5 + 23 + 10;
   
-  xitk_disable_widget(pplugin->new_filter);
+  xitk_disable_widget(pp_wrapper->pplugin->new_filter);
 
-  pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
-  pplugin->post_objects[pplugin->object_num + 1] = NULL;
+  pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
+  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
   
-  pobj = pplugin->post_objects[pplugin->object_num] = (post_object_t *) xine_xmalloc(sizeof(post_object_t));
-  pplugin->post_objects[pplugin->object_num]->x     = pplugin->x;
-  pplugin->post_objects[pplugin->object_num]->y     = pplugin->y;
-  pplugin->object_num++;
+  pobj = pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = (post_object_t *) xine_xmalloc(sizeof(post_object_t));
+  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->x = pp_wrapper->pplugin->x;
+  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->y = pp_wrapper->pplugin->y;
+  pp_wrapper->pplugin->object_num++;
 
   image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH, FRAME_HEIGHT);
 
   XLockDisplay(gGui->display);
-  XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(pplugin->widget_list)),
+  XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
 		 xitk_get_pixel_color_gray(gGui->imlib_data));
   XFillRectangle(gGui->display, image->image->pixmap,
-		 (XITK_WIDGET_LIST_GC(pplugin->widget_list)),
+		 (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
 		 0, 0, image->width, image->height);
   XUnlockDisplay(gGui->display);
 
@@ -1305,20 +1418,20 @@ static void _pplugin_create_filter_object(void) {
 
   XITK_WIDGET_INIT(&im, gGui->imlib_data);
   im.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-   (pobj->frame = xitk_noskin_image_create(pplugin->widget_list, &im, image, 10, pobj->y - 5)));
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+   (pobj->frame = xitk_noskin_image_create(pp_wrapper->pplugin->widget_list, &im, image, 10, pobj->y - 5)));
   DISABLE_ME(pobj->frame);
   
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = pplugin->widget_list;
-  cmb.entries           = pplugin->plugin_names;
-  cmb.parent_wkey       = &pplugin->widget_key;
-  cmb.callback          = _pplugin_select_filter;
+  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
+  cmb.entries           = pp_wrapper->pplugin->plugin_names;
+  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
+  cmb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_select_filter : _applugin_select_filter;
   cmb.userdata          = pobj;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-   (pobj->plugins = xitk_noskin_combo_create(pplugin->widget_list, 
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+   (pobj->plugins = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
 					     &cmb, pobj->x + 20, pobj->y, 150, NULL, NULL)));
   DISABLE_ME(pobj->plugins);
   
@@ -1329,10 +1442,10 @@ static void _pplugin_create_filter_object(void) {
 
     XITK_WIDGET_INIT(&b, gGui->imlib_data);
     b.skin_element_name = NULL;
-    b.callback          = _pplugin_move_up;
+    b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_up : _applugin_move_up;
     b.userdata          = pobj;
-    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-     (pobj->up = xitk_noskin_button_create(pplugin->widget_list, &b, 
+    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+     (pobj->up = xitk_noskin_button_create(pp_wrapper->pplugin->widget_list, &b, 
 					   pobj->x, pobj->y, 17, 17)));
     DISABLE_ME(pobj->up);
 
@@ -1340,10 +1453,10 @@ static void _pplugin_create_filter_object(void) {
       draw_arrow_up(gGui->imlib_data, bimage);
     
     b.skin_element_name = NULL;
-    b.callback          = _pplugin_move_down;
+    b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_down : _applugin_move_down;
     b.userdata          = pobj;
-    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pplugin->widget_list), 
-     (pobj->down = xitk_noskin_button_create(pplugin->widget_list, &b, 
+    xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
+     (pobj->down = xitk_noskin_button_create(pp_wrapper->pplugin->widget_list, &b, 
 					     pobj->x, pobj->y + (FRAME_HEIGHT - 26), 17, 17)));
     DISABLE_ME(pobj->down);
 
@@ -1353,50 +1466,66 @@ static void _pplugin_create_filter_object(void) {
   }
 }
 
-static void _pplugin_add_filter(xitk_widget_t *w, void *data) {
-  _pplugin_create_filter_object();
+static void _pplugin_add_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
+  _pplugin_create_filter_object(pp_wrapper);
 
-  if(pplugin->object_num > MAX_DISPLAY_FILTERS)
-    pplugin->first_displayed = (pplugin->object_num - MAX_DISPLAY_FILTERS);
+  if(pp_wrapper->pplugin->object_num > MAX_DISPLAY_FILTERS)
+    pp_wrapper->pplugin->first_displayed = (pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS);
 
-  _pplugin_paint_widgets();
+  _pplugin_paint_widgets(pp_wrapper);
 }
 
-static void _pplugin_rebuild_filters(void) {
-  post_element_t  **pelem = gGui->post_elements;
+static void _vpplugin_add_filter(xitk_widget_t *w, void *data) {
+  _pplugin_add_filter(&vpp_wrapper, w, data);
+}
 
+static void _applugin_add_filter(xitk_widget_t *w, void *data) {
+  _pplugin_add_filter(&app_wrapper, w, data);
+}
+
+static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
+  post_element_t  **pelem = (pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements : gGui->post_audio_elements;
+  int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
+  int num_filters = 0;
+  
   while(pelem && *pelem) {
     int i = 0;
-    
-    _pplugin_create_filter_object();
-    pplugin->post_objects[pplugin->object_num - 1]->post = (*pelem)->post;
-    
-    while(pplugin->plugin_names[i] && strcasecmp(pplugin->plugin_names[i], (*pelem)->name))
-      i++;
-    
-    if(pplugin->plugin_names[i]) {
-      xitk_combo_set_select(pplugin->post_objects[pplugin->object_num - 1]->plugins, i);
+
+    if ((*pelem)->post->type == plugin_type) {
+      num_filters++;
       
-      _pplugin_retrieve_parameters(pplugin->post_objects[pplugin->object_num - 1]);
+      _pplugin_create_filter_object(pp_wrapper);
+      pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num - 1]->post = (*pelem)->post;
+      
+      while(pp_wrapper->pplugin->plugin_names[i] && strcasecmp(pp_wrapper->pplugin->plugin_names[i], (*pelem)->name))
+        i++;
+      
+      if(pp_wrapper->pplugin->plugin_names[i]) {
+        xitk_combo_set_select(pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num - 1]->plugins, i);
+        
+        _pplugin_retrieve_parameters(pp_wrapper, pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num - 1]);
+      }
     }
     
     pelem++;
   }
   
-  xitk_enable_widget(pplugin->new_filter);
+  xitk_enable_widget(pp_wrapper->pplugin->new_filter);
 
-  _pplugin_paint_widgets();
+  _pplugin_paint_widgets(pp_wrapper);
+
+  return num_filters;
 }
 
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num) {
   post_element_t **post_elements;
-  int i, j;
+  int i = 0, j = 0;
 
   *post_elements_num = 0;
-  if( gGui->post_enable )
-    *post_elements_num += gGui->post_elements_num;
+  if( gGui->post_video_enable )
+    (*post_elements_num) += gGui->post_video_elements_num;
   if( gGui->deinterlace_enable )
-    *post_elements_num += gGui->deinterlace_elements_num;
+    (*post_elements_num) += gGui->deinterlace_elements_num;
 
   if( *post_elements_num == 0 )
     return NULL;
@@ -1405,166 +1534,212 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
     xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
 
   for( i = 0; gGui->deinterlace_enable && i < gGui->deinterlace_elements_num; i++ ) {
-    post_elements[i] = gGui->deinterlace_elements[i];
+    post_elements[i+j] = gGui->deinterlace_elements[i];
   }
 
-  for( j = 0; gGui->post_enable && j < gGui->post_elements_num; j++ ) {
-    post_elements[i+j] = gGui->post_elements[j];
+  for( j = 0; gGui->post_video_enable && j < gGui->post_video_elements_num; j++ ) {
+    post_elements[i+j] = gGui->post_video_elements[j];
   }
   
   return post_elements;
 }
 
 
-static void _pplugin_save_chain(void) {
+static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_elements_num) {
+  post_element_t **post_elements;
+  int i = 0, j = 0;
+
+  *post_elements_num = 0;
+  if( gGui->post_audio_enable )
+    (*post_elements_num) += gGui->post_audio_elements_num;
+  if( !ignore_visual_anim )
+    (*post_elements_num)++;
+
+  if( *post_elements_num == 0 )
+    return NULL;
+
+  post_elements = (post_element_t **) 
+    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
   
-  if(pplugin) {
+  for( j = 0; gGui->post_audio_enable && j < gGui->post_audio_elements_num; j++ ) {
+    post_elements[i+j] = gGui->post_audio_elements[j];
+  }
+
+  for( i = 0; !ignore_visual_anim && i < 1; i++ ) {
+    post_elements[i+j] = &gGui->visual_anim.post_output_element;
+  }
+
+  return post_elements;
+}
+
+
+static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
+  
+  if(pp_wrapper->pplugin) {
+    post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements : &gGui->post_audio_elements;
+    int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements_num : &gGui->post_audio_elements_num;
     int i = 0;
-    int post_num = pplugin->object_num;
+    int post_num = pp_wrapper->pplugin->object_num;
     
-    if(!xitk_combo_get_current_selected(pplugin->post_objects[post_num - 1]->plugins))
+    if(!xitk_combo_get_current_selected(pp_wrapper->pplugin->post_objects[post_num - 1]->plugins))
       post_num--;
     
     if(post_num) {
-      if(!gGui->post_elements) {
-	gGui->post_elements = (post_element_t **) 
+      if(!*_post_elements) {
+	*_post_elements = (post_element_t **) 
 	  xine_xmalloc(sizeof(post_element_t *) * (post_num + 1));
       }
       else {
 	int j;
 	
-	for(j = 0; j < gGui->post_elements_num; j++) {
-	  free(gGui->post_elements[j]->name);
-	  free(gGui->post_elements[j]);
+	for(j = 0; j < *_post_elements_num; j++) {
+	  free((*_post_elements)[j]->name);
+	  free((*_post_elements)[j]);
 	}
 	
-	gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, sizeof(post_element_t *) * (post_num + 1));
+	*_post_elements = (post_element_t **) realloc(*_post_elements, sizeof(post_element_t *) * (post_num + 1));
 	
       }
 	
       for(i = 0; i < post_num; i++) {
-	gGui->post_elements[i] = (post_element_t *) xine_xmalloc(sizeof(post_element_t));
-	gGui->post_elements[i]->post = pplugin->post_objects[i]->post;
-	gGui->post_elements[i]->name = 
-	  strdup(xitk_combo_get_current_entry_selected(pplugin->post_objects[i]->plugins));
+	(*_post_elements)[i] = (post_element_t *) xine_xmalloc(sizeof(post_element_t));
+	(*_post_elements)[i]->post = pp_wrapper->pplugin->post_objects[i]->post;
+	(*_post_elements)[i]->name = 
+	  strdup(xitk_combo_get_current_entry_selected(pp_wrapper->pplugin->post_objects[i]->plugins));
       }
 
-      gGui->post_elements[post_num] = NULL;
-      gGui->post_elements_num       = post_num;
+      (*_post_elements)[post_num] = NULL;
+      *_post_elements_num         = post_num;
     }
     else {
-      if(gGui->post_elements_num) {
+      if(*_post_elements_num) {
 	int j;
 	
-	for(j = 0; j < gGui->post_elements_num; j++) {
-	  free(gGui->post_elements[j]->name);
-	  free(gGui->post_elements[j]);
+	for(j = 0; j < *_post_elements_num; j++) {
+	  free((*_post_elements)[j]->name);
+	  free((*_post_elements)[j]);
 	}
 	
-	free(gGui->post_elements[j]);
-	free(gGui->post_elements);
+	free((*_post_elements)[j]);
+	free(*_post_elements);
 
-	gGui->post_elements_num = 0;
-	gGui->post_elements     = NULL;
+	*_post_elements_num = 0;
+	*_post_elements     = NULL;
       }
     }
   }
 }
 
-static void _pplugin_nextprev(xitk_widget_t *w, void *data, int pos) {
-  int rpos = (xitk_slider_get_max(pplugin->slider)) - pos;
+static void _pplugin_nextprev(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int pos) {
+  int rpos = (xitk_slider_get_max(pp_wrapper->pplugin->slider)) - pos;
 
-  if(rpos != pplugin->first_displayed) {
-    pplugin->first_displayed = rpos;
-    _pplugin_paint_widgets();
+  if(rpos != pp_wrapper->pplugin->first_displayed) {
+    pp_wrapper->pplugin->first_displayed = rpos;
+    _pplugin_paint_widgets(pp_wrapper);
   }
 }
 
-static void pplugin_exit(xitk_widget_t *w, void *data) {
+static void _vpplugin_nextprev(xitk_widget_t *w, void *data, int pos) {
+  _pplugin_nextprev(&vpp_wrapper, w, data, pos);
+}
+
+static void _applugin_nextprev(xitk_widget_t *w, void *data, int pos) {
+  _pplugin_nextprev(&app_wrapper, w, data, pos);
+}
+
+static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   
-  if(pplugin) {
+  if(pp_wrapper->pplugin) {
     window_info_t wi;
     int           i;
     
-    if( pplugin->help_running )
-     _pplugin_close_help(NULL,NULL);
+    if( pp_wrapper->pplugin->help_running )
+     _pplugin_close_help(pp_wrapper, NULL,NULL);
 
-    if(pplugin->help_text) {
+    if(pp_wrapper->pplugin->help_text) {
       i = 0;
-      while(pplugin->help_text[i++])
-	free(pplugin->help_text[i]);
-      free(pplugin->help_text);
+      while(pp_wrapper->pplugin->help_text[i++])
+	free(pp_wrapper->pplugin->help_text[i]);
+      free(pp_wrapper->pplugin->help_text);
     }
     
-    _pplugin_save_chain();
+    _pplugin_save_chain(pp_wrapper);
 
-    pplugin->running = 0;
-    pplugin->visible = 0;
+    pp_wrapper->pplugin->running = 0;
+    pp_wrapper->pplugin->visible = 0;
     
-    if((xitk_get_window_info(pplugin->widget_key, &wi))) {
-      config_update_num ("gui.pplugin_x", wi.x);
-      config_update_num ("gui.pplugin_y", wi.y);
+    if((xitk_get_window_info(pp_wrapper->pplugin->widget_key, &wi))) {
+      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
+      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
-    i = pplugin->object_num - 1;
+    i = pp_wrapper->pplugin->object_num - 1;
     if(i > 0) {
 
       while(i > 0) {
-	_pplugin_destroy_only_obj(pplugin->post_objects[i]);
-	_pplugin_destroy_base_obj(pplugin->post_objects[i]);
-	free(pplugin->post_objects[i]);
+	_pplugin_destroy_only_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
+	_pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
+	free(pp_wrapper->pplugin->post_objects[i]);
 	i--;
       }
       
-      _pplugin_destroy_only_obj(pplugin->post_objects[0]);
-      _pplugin_destroy_base_obj(pplugin->post_objects[0]);
-      free(pplugin->post_objects);
+      _pplugin_destroy_only_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[0]);
+      _pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[0]);
+      free(pp_wrapper->pplugin->post_objects);
     }
     
-    for(i = 0; pplugin->plugin_names[i]; i++)
-      free(pplugin->plugin_names[i]);
+    for(i = 0; pp_wrapper->pplugin->plugin_names[i]; i++)
+      free(pp_wrapper->pplugin->plugin_names[i]);
     
-    free(pplugin->plugin_names);
+    free(pp_wrapper->pplugin->plugin_names);
     
-    xitk_unregister_event_handler(&pplugin->widget_key);
+    xitk_unregister_event_handler(&pp_wrapper->pplugin->widget_key);
 
-    xitk_destroy_widgets(pplugin->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, pplugin->xwin);
+    xitk_destroy_widgets(pp_wrapper->pplugin->widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, pp_wrapper->pplugin->xwin);
 
-    pplugin->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(pplugin->widget_list)));
+    pp_wrapper->pplugin->xwin = NULL;
+    xitk_list_free((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pplugin->widget_list)));
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(pplugin->widget_list);
+    free(pp_wrapper->pplugin->widget_list);
    
-    free(pplugin);
-    pplugin = NULL;
+    free(pp_wrapper->pplugin);
+    pp_wrapper->pplugin = NULL;
 
     try_to_set_input_focus(gGui->video_window);
   }
 }
 
-static void _pplugin_handle_event(XEvent *event, void *data) {
+static void vpplugin_exit(xitk_widget_t *w, void *data) {
+  pplugin_exit(&vpp_wrapper, w, data);
+}
 
+static void applugin_exit(xitk_widget_t *w, void *data) {
+  pplugin_exit(&app_wrapper, w, data);
+}
+
+static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void *data) {
+  
   switch(event->type) {
 
   case ButtonPress:
     if(event->xbutton.button == Button4) {
-      xitk_slider_make_step(pplugin->slider);
-      xitk_slider_callback_exec(pplugin->slider);
+      xitk_slider_make_step(pp_wrapper->pplugin->slider);
+      xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
     }
     else if(event->xbutton.button == Button5) {
-      xitk_slider_make_backstep(pplugin->slider);
-      xitk_slider_callback_exec(pplugin->slider);
+      xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
+      xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
     }
     break;
 
   case KeyPress:
-    if(xitk_is_widget_enabled(pplugin->slider)) {
+    if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
       KeySym         mkey;
       int            modifier;
       
@@ -1575,41 +1750,41 @@ static void _pplugin_handle_event(XEvent *event, void *data) {
 	
       case XK_Up:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-	  xitk_slider_make_step(pplugin->slider);
-	  xitk_slider_callback_exec(pplugin->slider);
+	  xitk_slider_make_step(pp_wrapper->pplugin->slider);
+	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
 	}
 	break;
 	
       case XK_Down:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) { 
-	  xitk_slider_make_backstep(pplugin->slider);
-	  xitk_slider_callback_exec(pplugin->slider);
+	  xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
+	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
 	}
 	break;
 	
 	
       case XK_Next:
 	{
-	  int pos, max = xitk_slider_get_max(pplugin->slider);
+	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
 	  
-	  pos = max - (pplugin->first_displayed + MAX_DISPLAY_FILTERS);
-	  xitk_slider_set_pos(pplugin->slider, (pos >= 0) ? pos : 0);
-	  xitk_slider_callback_exec(pplugin->slider);
+	  pos = max - (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
+	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos >= 0) ? pos : 0);
+	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
 	}
 	break;
 	
       case XK_Prior:
 	{
-	  int pos, max = xitk_slider_get_max(pplugin->slider);
+	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
 	  
-	  pos = max - (pplugin->first_displayed - MAX_DISPLAY_FILTERS);
-	  xitk_slider_set_pos(pplugin->slider, (pos <= max) ? pos : max);
-	  xitk_slider_callback_exec(pplugin->slider);
+	  pos = max - (pp_wrapper->pplugin->first_displayed - MAX_DISPLAY_FILTERS);
+	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos <= max) ? pos : max);
+	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
 	}
 	break;
 	
       case XK_Escape:
-	pplugin_exit(NULL, NULL);
+	pplugin_exit(pp_wrapper, NULL, NULL);
 	break;
 
       }
@@ -1619,48 +1794,74 @@ static void _pplugin_handle_event(XEvent *event, void *data) {
   }
 }
 
-static void _pplugin_enability(xitk_widget_t *w, void *data, int state) {
-  gGui->post_enable = state;
-  _pplugin_unwire();
-  _pplugin_rewire();
+static void _vpplugin_handle_event(XEvent *event, void *data) {
+  _pplugin_handle_event(&vpp_wrapper, event, data);
 }
 
-int pplugin_is_post_selected(void) {
+static void _applugin_handle_event(XEvent *event, void *data) {
+  _pplugin_handle_event(&app_wrapper, event, data);
+}
+
+static void _pplugin_enability(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int state) {
+  if (pp_wrapper == &vpp_wrapper)
+    gGui->post_video_enable = state;
+  else
+    gGui->post_audio_enable = state;
   
-  if(pplugin) {
-    int post_num = pplugin->object_num;
+  _pplugin_unwire(pp_wrapper);
+  _pplugin_rewire(pp_wrapper);
+}
+
+static void _vpplugin_enability(xitk_widget_t *w, void *data, int state) {
+  _pplugin_enability(&vpp_wrapper, w, data, state);
+}
+
+static void _applugin_enability(xitk_widget_t *w, void *data, int state) {
+  _pplugin_enability(&app_wrapper, w, data, state);
+}
+
+static int pplugin_is_post_selected(_pp_wrapper_t *pp_wrapper) {
+  
+  if(pp_wrapper->pplugin) {
+    int post_num = pp_wrapper->pplugin->object_num;
     
-    if(!xitk_combo_get_current_selected(pplugin->post_objects[post_num - 1]->plugins))
+    if(!xitk_combo_get_current_selected(pp_wrapper->pplugin->post_objects[post_num - 1]->plugins))
       post_num--;
 
     return (post_num > 0);
   }
   
-  return gGui->post_elements_num;
+  return (pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements_num : gGui->post_audio_elements_num;
 }
 
-void pplugin_rewire_from_posts_window(void) {
-  if(pplugin) {
-    _pplugin_unwire();
-    _pplugin_rewire();
+static void pplugin_rewire_from_posts_window(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin) {
+    _pplugin_unwire(pp_wrapper);
+    _pplugin_rewire(pp_wrapper);
   }
 }
 
-void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
   
   if(post_elements_num) {
     xine_post_out_t   *vo_source;
     int                i = 0;
     
     for(i = (post_elements_num - 1); i >= 0; i--) {
+      /* use the first output from plugin */
       const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
       const xine_post_out_t *vo_out = xine_post_output(post_elements[i]->post, (char *) *outs);
       if(i == (post_elements_num - 1)) {
 	xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
       }
       else {
-	const xine_post_in_t *vo_in = xine_post_input(post_elements[i + 1]->post, "video");
+	const xine_post_in_t *vo_in;
 	int                   err;
+	
+	/* look for standard input names */
+	vo_in = xine_post_input(post_elements[i + 1]->post, "video");
+	if( !vo_in )
+	  vo_in = xine_post_input(post_elements[i + 1]->post, "video in");
 	
 	err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
       }
@@ -1671,10 +1872,47 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
   }
 }
 
-void pplugin_rewire_posts(void) {
+static void _applugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
   
-  _pplugin_unwire();
-  _pplugin_rewire();
+  if(post_elements_num) {
+    xine_post_out_t   *ao_source;
+    int                i = 0;
+    
+    for(i = (post_elements_num - 1); i >= 0; i--) {
+      /* use the first output from plugin */
+      const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
+      const xine_post_out_t *ao_out = xine_post_output(post_elements[i]->post, (char *) *outs);
+      if(i == (post_elements_num - 1)) {
+	xine_post_wire_audio_port((xine_post_out_t *) ao_out, gGui->ao_port);
+      }
+      else {
+	const xine_post_in_t *ao_in;
+	int                   err;
+	
+	/* look for standard input names */
+	ao_in = xine_post_input(post_elements[i + 1]->post, "audio");
+	if( !ao_in )
+	  ao_in = xine_post_input(post_elements[i + 1]->post, "audio in");
+	
+	err = xine_post_wire((xine_post_out_t *) ao_out, (xine_post_in_t *) ao_in);	
+      }
+    }
+    
+    ao_source = xine_get_audio_source(gGui->stream);
+    xine_post_wire_audio_port(ao_source, post_elements[0]->post->audio_input[0]);
+  }
+}
+
+static void _pplugin_rewire_from_post_elements(_pp_wrapper_t *pp_wrapper, post_element_t **post_elements, int post_elements_num) {
+  if (pp_wrapper == &vpp_wrapper)
+    _vpplugin_rewire_from_post_elements(post_elements, post_elements_num);
+  else
+    _applugin_rewire_from_post_elements(post_elements, post_elements_num);
+}
+
+static void pplugin_rewire_posts(_pp_wrapper_t *pp_wrapper) {
+  _pplugin_unwire(pp_wrapper);
+  _pplugin_rewire(pp_wrapper);
 
 #if 0
   if(gGui->post_enable && !gGui->deinterlace_enable)
@@ -1682,53 +1920,53 @@ void pplugin_rewire_posts(void) {
 #endif
 }
 
-void pplugin_end(void) {
-  pplugin_exit(NULL, NULL);
+static void pplugin_end(_pp_wrapper_t *pp_wrapper) {
+  pplugin_exit(pp_wrapper, NULL, NULL);
 }
 
-int pplugin_is_visible(void) {
+static int pplugin_is_visible(_pp_wrapper_t *pp_wrapper) {
   
-  if(pplugin) {
+  if(pp_wrapper->pplugin) {
     if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin));
+      return xitk_is_window_visible(gGui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
     else
-      return pplugin->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin));
+      return pp_wrapper->pplugin->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
   }
   
   return 0;
 }
 
-int pplugin_is_running(void) {
+static int pplugin_is_running(_pp_wrapper_t *pp_wrapper) {
   
-  if(pplugin)
-    return pplugin->running;
+  if(pp_wrapper->pplugin)
+    return pp_wrapper->pplugin->running;
   
   return 0;
 }
 
-void pplugin_raise_window(void) {
-  if(pplugin != NULL)
-    raise_window(xitk_window_get_window(pplugin->xwin), pplugin->visible, pplugin->running);
+static void pplugin_raise_window(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin != NULL)
+    raise_window(xitk_window_get_window(pp_wrapper->pplugin->xwin), pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
 
-void pplugin_toggle_visibility(xitk_widget_t *w, void *data) {
-  if(pplugin != NULL)
-    toggle_window(xitk_window_get_window(pplugin->xwin), pplugin->widget_list,
-		  &pplugin->visible, pplugin->running);
+static void pplugin_toggle_visibility(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
+  if(pp_wrapper->pplugin != NULL)
+    toggle_window(xitk_window_get_window(pp_wrapper->pplugin->xwin), pp_wrapper->pplugin->widget_list,
+		  &pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
-void pplugin_update_enable_button(void) {
-  if(pplugin)
-    xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
+static void pplugin_update_enable_button(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin)
+    xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gGui->post_video_enable : gGui->post_audio_enable);
 }
 
-void pplugin_reparent(void) {
-  if(pplugin)
-    reparent_window((xitk_window_get_window(pplugin->xwin)));
+static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
+  if(pp_wrapper->pplugin)
+    reparent_window((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
 }
 
-void pplugin_panel(void) {
+static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
@@ -1738,18 +1976,18 @@ void pplugin_panel(void) {
   xitk_slider_widget_t        sl;
   xitk_widget_t              *w;
 
-  pplugin = (_pplugin_t *) xine_xmalloc(sizeof(_pplugin_t));
-  pplugin->first_displayed = 0;
-  pplugin->help_text       = NULL;
+  pp_wrapper->pplugin = (_pplugin_t *) xine_xmalloc(sizeof(_pplugin_t));
+  pp_wrapper->pplugin->first_displayed = 0;
+  pp_wrapper->pplugin->help_text       = NULL;
   
-  x = xine_config_register_num (gGui->xine, "gui.pplugin_x", 
+  x = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", 
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, "gui.pplugin_y",
+  y = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y",
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
@@ -1757,32 +1995,32 @@ void pplugin_panel(void) {
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   
-  pplugin->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
-						   _("Chain Reaction"), x, y,
-						   WINDOW_WIDTH, WINDOW_HEIGHT);
+  pp_wrapper->pplugin->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+						   (pp_wrapper == &vpp_wrapper) ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
+                                                   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(pplugin->xwin)));
+  set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
 
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
-		 (xitk_window_get_window(pplugin->xwin)), None, None);
+		 (xitk_window_get_window(pp_wrapper->pplugin->xwin)), None, None);
   XUnlockDisplay (gGui->display);
   
-  pplugin->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(pplugin->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
-  xitk_widget_list_set(pplugin->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pplugin->xwin)));
-  xitk_widget_list_set(pplugin->widget_list, WIDGET_LIST_GC, gc);
+  pp_wrapper->pplugin->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(pp_wrapper->pplugin->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(pp_wrapper->pplugin->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pp_wrapper->pplugin->xwin)));
+  xitk_widget_list_set(pp_wrapper->pplugin->widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
 
-  xitk_window_get_window_size(pplugin->xwin, &width, &height);
+  xitk_window_get_window_size(pp_wrapper->pplugin->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
 
   XLockDisplay (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(pplugin->xwin)), bg->pixmap,
+  XCopyArea(gGui->display, (xitk_window_get_background(pp_wrapper->pplugin->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   XUnlockDisplay (gGui->display);
   
@@ -1794,10 +2032,10 @@ void pplugin_panel(void) {
   sl.skin_element_name        = NULL;
   sl.callback                 = NULL;
   sl.userdata                 = NULL;
-  sl.motion_callback          = _pplugin_nextprev;
+  sl.motion_callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_nextprev : _applugin_nextprev;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)),
-   (pplugin->slider = xitk_noskin_slider_create(pplugin->widget_list, &sl,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
+   (pp_wrapper->pplugin->slider = xitk_noskin_slider_create(pp_wrapper->pplugin->widget_list, &sl,
 						(WINDOW_WIDTH - (16 + 10)), 33, 
 						16, (WINDOW_HEIGHT - 88), XITK_VSLIDER)));
 
@@ -1807,15 +2045,15 @@ void pplugin_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("New Filter");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = _pplugin_add_filter; 
+  lb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_add_filter : _applugin_add_filter; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-   (pplugin->new_filter = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+   (pp_wrapper->pplugin->new_filter = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
 							 &lb, x, y, 100, 23,
 							 "Black", "Black", "White", btnfontname)));
-  xitk_show_widget(pplugin->new_filter);
+  xitk_show_widget(pp_wrapper->pplugin->new_filter);
 
   x += 115;
 
@@ -1823,16 +2061,16 @@ void pplugin_panel(void) {
   lb.label             = _("Enable");
   lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
-  lb.state_callback    = _pplugin_enability;
+  lb.state_callback    = (pp_wrapper == &vpp_wrapper) ? _vpplugin_enability : _applugin_enability;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-   (pplugin->enable = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+   (pp_wrapper->pplugin->enable = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
 						     &lb, x, y, 100, 23,
 						     "Black", "Black", "White", btnfontname)));
 
-  xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
-  xitk_enable_and_show_widget(pplugin->enable);
+  xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gGui->post_video_enable : gGui->post_audio_enable);
+  xitk_enable_and_show_widget(pp_wrapper->pplugin->enable);
 
   /* IMPLEMENT ME
   x += 115;
@@ -1844,8 +2082,8 @@ void pplugin_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+   (w = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
 							 &lb, x, y, 100, 23,
 							 "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(w);
@@ -1856,49 +2094,50 @@ void pplugin_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Ok");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = pplugin_exit; 
+  lb.callback          = (pp_wrapper == &vpp_wrapper) ? vpplugin_exit : applugin_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
+   (w = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
 				       &lb, x, y, 100, 23,
 				       "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(w);
 
-  _pplugin_get_plugins();
+  _pplugin_get_plugins(pp_wrapper);
   
-  pplugin->x = 0;
-  pplugin->y = -45;
+  pp_wrapper->pplugin->x = 0;
+  pp_wrapper->pplugin->y = -45;
   
-  if(!gGui->post_elements)
-    _pplugin_add_filter(NULL, NULL);
+  if((pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements : gGui->post_audio_elements)
+    _pplugin_rebuild_filters(pp_wrapper);
   else
-    _pplugin_rebuild_filters();
+    _pplugin_add_filter(pp_wrapper, NULL, NULL);
   
-  xitk_window_change_background(gGui->imlib_data, pplugin->xwin, bg->pixmap, width, height);
+  xitk_window_change_background(gGui->imlib_data, pp_wrapper->pplugin->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
   
-  pplugin->widget_key = xitk_register_event_handler("pplugin", 
-						    (xitk_window_get_window(pplugin->xwin)),
-						    _pplugin_handle_event,
+  pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin" : "applugin", 
+						    (xitk_window_get_window(pp_wrapper->pplugin->xwin)),
+						    (pp_wrapper == &vpp_wrapper) ? _vpplugin_handle_event : _applugin_handle_event,
 						    NULL,
 						    NULL,
-						    pplugin->widget_list,
+						    pp_wrapper->pplugin->widget_list,
 						    NULL);
   
-  pplugin->visible = 1;
-  pplugin->running = 1;
+  pp_wrapper->pplugin->visible = 1;
+  pp_wrapper->pplugin->running = 1;
 
-  _pplugin_paint_widgets();
+  _pplugin_paint_widgets(pp_wrapper);
 
-  pplugin_raise_window();
+  pplugin_raise_window(pp_wrapper);
   
-  try_to_set_input_focus(xitk_window_get_window(pplugin->xwin));
+  try_to_set_input_focus(xitk_window_get_window(pp_wrapper->pplugin->xwin));
 }
 
 /* pchain: "<post1>:option1=value1,option2=value2..;<post2>:...." */
-static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num) {
+static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *pchain, int *post_elements_num) {
+  int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
   post_element_t **post_elements = NULL;
   char            *post_chain;
 
@@ -1927,7 +2166,14 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
 	  args = p;
 	
 	post = xine_post_init(gGui->xine, plugin, 0, &gGui->ao_port, &gGui->vo_port);
-	
+
+        if (post && pp_wrapper) {
+          if (post->type != plugin_type) {
+            xine_post_dispose(gGui->xine, post);
+            post = NULL;
+          }
+        }              
+        
 	if(post) {
 	  post_object_t  pobj;
 	 
@@ -2054,26 +2300,28 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
   return post_elements;
 }
 
-void pplugin_parse_and_store_post(const char *post_chain) {
+static void pplugin_parse_and_store_post(_pp_wrapper_t *pp_wrapper, const char *post_chain) {
+  post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements : &gGui->post_audio_elements;
+  int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements_num : &gGui->post_audio_elements_num;
   post_element_t **posts = NULL;
   int              num;
 
-  if((posts = pplugin_parse_and_load(post_chain, &num))) {
-    if(gGui->post_elements_num) {
+  if((posts = pplugin_parse_and_load(pp_wrapper, post_chain, &num))) {
+    if(*_post_elements_num) {
       int i;
-      int ptot = gGui->post_elements_num + num;
+      int ptot = *_post_elements_num + num;
       
-      gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, sizeof(post_element_t *) * (ptot + 1));
-      for(i = gGui->post_elements_num; i <  ptot; i++)
-	gGui->post_elements[i] = posts[i - gGui->post_elements_num];
+      *_post_elements = (post_element_t **) realloc(*_post_elements, sizeof(post_element_t *) * (ptot + 1));
+      for(i = *_post_elements_num; i <  ptot; i++)
+	(*_post_elements)[i] = posts[i - *_post_elements_num];
 
-      gGui->post_elements[i] = NULL;
-      gGui->post_elements_num += num;
+      (*_post_elements)[i]   = NULL;
+      (*_post_elements_num) += num;
 
     }
     else {
-      gGui->post_elements     = posts;
-      gGui->post_elements_num = num;
+      *_post_elements     = posts;
+      *_post_elements_num = num;
     }
   }
   
@@ -2099,7 +2347,7 @@ void post_deinterlace_init(const char *deinterlace_post) {
 					  CONFIG_LEVEL_ADV,
 					  post_deinterlace_plugin_cb,
 					  CONFIG_NO_DATA);
-  if((posts = pplugin_parse_and_load((deinterlace_post && strlen(deinterlace_post)) ? 
+  if((posts = pplugin_parse_and_load(0, (deinterlace_post && strlen(deinterlace_post)) ? 
 				     deinterlace_post : gGui->deinterlace_plugin, &num))) {
     gGui->deinterlace_elements     = posts;
     gGui->deinterlace_elements_num = num;
@@ -2115,8 +2363,8 @@ void post_deinterlace(void) {
                    gGui->deinterlace_enable);
   }
   else {
-    _pplugin_unwire();
-    _pplugin_rewire();
+    _pplugin_unwire(&vpp_wrapper);
+    _pplugin_rewire(&vpp_wrapper);
   }
 
 #if 0
@@ -2137,4 +2385,124 @@ void post_deinterlace(void) {
     }
   }
 #endif
+}
+
+void vpplugin_end(void)
+{
+  pplugin_end(&vpp_wrapper);
+}
+
+int vpplugin_is_visible(void)
+{
+  return pplugin_is_visible(&vpp_wrapper);
+}
+
+int vpplugin_is_running(void)
+{
+  return pplugin_is_running(&vpp_wrapper);
+}
+
+void vpplugin_toggle_visibility(xitk_widget_t *w, void *data)
+{
+  pplugin_toggle_visibility(&vpp_wrapper, w, data);
+}
+
+void vpplugin_raise_window(void)
+{
+  pplugin_raise_window(&vpp_wrapper);
+}
+
+void vpplugin_update_enable_button(void)
+{
+  pplugin_update_enable_button(&vpp_wrapper);
+}
+
+void vpplugin_panel(void)
+{
+  pplugin_panel(&vpp_wrapper);
+}
+
+void vpplugin_parse_and_store_post(const char *post)
+{
+  pplugin_parse_and_store_post(&vpp_wrapper, post);
+}
+
+void vpplugin_rewire_from_posts_window(void)
+{
+  pplugin_rewire_from_posts_window(&vpp_wrapper);
+}
+
+void vpplugin_rewire_posts(void)
+{
+  pplugin_rewire_posts(&vpp_wrapper);
+}
+
+int vpplugin_is_post_selected(void)
+{
+  return pplugin_is_post_selected(&vpp_wrapper);
+}
+
+void vpplugin_reparent(void)
+{
+  pplugin_reparent(&vpp_wrapper);
+}
+
+void applugin_end(void)
+{
+  pplugin_end(&app_wrapper);
+}
+
+int applugin_is_visible(void)
+{
+  return pplugin_is_visible(&app_wrapper);
+}
+
+int applugin_is_running(void)
+{
+  return pplugin_is_running(&app_wrapper);
+}
+
+void applugin_toggle_visibility(xitk_widget_t *w, void *data)
+{
+  pplugin_toggle_visibility(&app_wrapper, w, data);
+}
+
+void applugin_raise_window(void)
+{
+  pplugin_raise_window(&app_wrapper);
+}
+
+void applugin_update_enable_button(void)
+{
+  pplugin_update_enable_button(&app_wrapper);
+}
+
+void applugin_panel(void)
+{
+  pplugin_panel(&app_wrapper);
+}
+
+void applugin_parse_and_store_post(const char *post)
+{
+  pplugin_parse_and_store_post(&app_wrapper, post);
+}
+
+void applugin_rewire_from_posts_window(void)
+{
+  pplugin_rewire_from_posts_window(&app_wrapper);
+}
+
+void applugin_rewire_posts(void)
+{
+  pplugin_rewire_posts(&app_wrapper);
+}
+
+int applugin_is_post_selected(void)
+{
+  return pplugin_is_post_selected(&app_wrapper);
+}
+
+void applugin_reparent(void)
+{
+  pplugin_reparent(&app_wrapper);
 }

@@ -89,7 +89,7 @@ static void _pplugin_update_parameter(post_object_t *pobj) {
 
 
 /* -post <name>:option1=value1,option2=value2... */
-static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num) {
+static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pchain, int *post_elements_num) {
   post_element_t **post_elements = NULL;
   char            *post_chain;
 
@@ -118,7 +118,14 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
 	  args = p;
 	
 	post = xine_post_init(fbxine.xine, plugin, 0, &fbxine.audio_port, &fbxine.video_port);
-	
+
+        if (post && plugin_type) {
+          if (post->type != plugin_type) {
+            xine_post_dispose(fbxine.xine, post);
+            post = NULL;
+          }
+        }
+          
 	if(post) {
 	  post_object_t  pobj;
 	 
@@ -250,34 +257,46 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
 }
 
 
-void pplugin_parse_and_store_post(const char *post_chain) {
+static void pplugin_parse_and_store_post(int plugin_type, const char *post_chain) {
+  post_element_t ***_post_elements = (plugin_type == XINE_POST_TYPE_VIDEO_FILTER) ? &fbxine.post_video_elements : &fbxine.post_audio_elements;
+  int *_post_elements_num = (plugin_type == XINE_POST_TYPE_VIDEO_FILTER) ? &fbxine.post_video_elements_num : &fbxine.post_audio_elements_num;
   post_element_t **posts = NULL;
   int              num;
 
-  if((posts = pplugin_parse_and_load(post_chain, &num))) {
-    if(fbxine.post_elements_num) {
+  if((posts = pplugin_parse_and_load(plugin_type, post_chain, &num))) {
+    if(*_post_elements_num) {
       int i;
-      int ptot = fbxine.post_elements_num + num;
+      int ptot = *_post_elements_num + num;
       
-      fbxine.post_elements = (post_element_t **) realloc(fbxine.post_elements, 
+      *_post_elements = (post_element_t **) realloc(*_post_elements, 
 							sizeof(post_element_t *) * (ptot + 1));
-      for(i = fbxine.post_elements_num; i <  ptot; i++)
-	fbxine.post_elements[i] = posts[i - fbxine.post_elements_num];
+      for(i = *_post_elements_num; i <  ptot; i++)
+	(*_post_elements)[i] = posts[i - *_post_elements_num];
 
-      fbxine.post_elements[i] = NULL;
-      fbxine.post_elements_num += num;
+      (*_post_elements)[i] = NULL;
+      (*_post_elements_num) += num;
 
     }
     else {
-      fbxine.post_elements     = posts;
-      fbxine.post_elements_num = num;;
+      *_post_elements     = posts;
+      *_post_elements_num = num;
     }
   }
   
 }
 
 
-static void _pplugin_unwire(void) {
+void vpplugin_parse_and_store_post(const char *post_chain) {
+  pplugin_parse_and_store_post(XINE_POST_TYPE_VIDEO_FILTER, post_chain);
+}
+
+
+void applugin_parse_and_store_post(const char *post_chain) {
+  pplugin_parse_and_store_post(XINE_POST_TYPE_AUDIO_FILTER, post_chain);
+}
+
+
+static void _vpplugin_unwire(void) {
   xine_post_out_t  *vo_source;
   
   vo_source = xine_get_video_source(fbxine.stream);
@@ -286,7 +305,16 @@ static void _pplugin_unwire(void) {
 }
 
 
-static void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+static void _applugin_unwire(void) {
+  xine_post_out_t  *ao_source;
+  
+  ao_source = xine_get_audio_source(fbxine.stream);
+
+  (void) xine_post_wire_audio_port(ao_source, fbxine.audio_port);
+}
+
+
+static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
   
   if(post_elements_num) {
     xine_post_out_t   *vo_source;
@@ -300,8 +328,13 @@ static void _pplugin_rewire_from_post_elements(post_element_t **post_elements, i
 	xine_post_wire_video_port((xine_post_out_t *) vo_out, fbxine.video_port);
       }
       else {
-	const xine_post_in_t *vo_in = xine_post_input(post_elements[i + 1]->post, "video");
+	const xine_post_in_t *vo_in;
 	int                   err;
+	
+	/* look for standard input names */
+	vo_in = xine_post_input(post_elements[i + 1]->post, "video");
+	if( !vo_in )
+	  vo_in = xine_post_input(post_elements[i + 1]->post, "video in");
 	
 	err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
       }
@@ -313,13 +346,45 @@ static void _pplugin_rewire_from_post_elements(post_element_t **post_elements, i
 }
 
 
+static void _applugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+
+  if(post_elements_num) {
+    xine_post_out_t   *ao_source;
+    int                i = 0;
+    
+    for(i = (post_elements_num - 1); i >= 0; i--) {
+      
+      const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
+      const xine_post_out_t *ao_out = xine_post_output(post_elements[i]->post, (char *) *outs);
+      if(i == (post_elements_num - 1)) {
+	xine_post_wire_audio_port((xine_post_out_t *) ao_out, fbxine.audio_port);
+      }
+      else {
+	const xine_post_in_t *ao_in;
+	int                   err;
+	
+	/* look for standard input names */
+	ao_in = xine_post_input(post_elements[i + 1]->post, "audio");
+	if( !ao_in )
+	  ao_in = xine_post_input(post_elements[i + 1]->post, "audio in");
+	
+	err = xine_post_wire((xine_post_out_t *) ao_out, (xine_post_in_t *) ao_in);	
+      }
+    }
+    
+    ao_source = xine_get_audio_source(fbxine.stream);
+    xine_post_wire_audio_port(ao_source, post_elements[0]->post->audio_input[0]);
+  }
+}
+
+
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num) {
   post_element_t **post_elements;
-  int i, j;
+  int i = 0, j = 0;
 
   *post_elements_num = 0;
-  if( fbxine.post_enable )
-    *post_elements_num += fbxine.post_elements_num;
+  if( fbxine.post_video_enable )
+    *post_elements_num += fbxine.post_video_elements_num;
   if( fbxine.deinterlace_enable )
     *post_elements_num += fbxine.deinterlace_elements_num;
 
@@ -330,17 +395,45 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
     xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
 
   for( i = 0; fbxine.deinterlace_enable && i < fbxine.deinterlace_elements_num; i++ ) {
-    post_elements[i] = fbxine.deinterlace_elements[i];
+    post_elements[i+j] = fbxine.deinterlace_elements[i];
   }
 
-  for( j = 0; fbxine.post_enable && j < fbxine.post_elements_num; j++ ) {
-    post_elements[i+j] = fbxine.post_elements[j];
+  for( j = 0; fbxine.post_video_enable && j < fbxine.post_video_elements_num; j++ ) {
+    post_elements[i+j] = fbxine.post_video_elements[j];
   }
   
   return post_elements;
 }
 
-static void _pplugin_rewire(void) {
+static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_elements_num) {
+  post_element_t **post_elements;
+  int i = 0, j = 0;
+
+  *post_elements_num = 0;
+  if( fbxine.post_audio_enable )
+    *post_elements_num += fbxine.post_audio_elements_num;
+/*
+  if( fbxine.visual_anim_enable )
+    *post_elements_num++;
+*/
+  if( *post_elements_num == 0 )
+    return NULL;
+
+  post_elements = (post_element_t **) 
+    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+
+  for( j = 0; fbxine.post_audio_enable && j < fbxine.post_audio_elements_num; j++ ) {
+    post_elements[i+j] = fbxine.post_audio_elements[j];
+  }
+/*
+  for( i = 0; fbxine.visual_anim_enable && i < 1; i++ ) {
+    post_elements[i+j] = fbxine.visual_anim_element;
+  }
+*/
+  return post_elements;
+}
+
+static void _vpplugin_rewire(void) {
 
   static post_element_t **post_elements;
   int post_elements_num;
@@ -348,7 +441,21 @@ static void _pplugin_rewire(void) {
   post_elements = _pplugin_join_deinterlace_and_post_elements(&post_elements_num);
 
   if( post_elements ) {
-    _pplugin_rewire_from_post_elements(post_elements, post_elements_num);
+    _vpplugin_rewire_from_post_elements(post_elements, post_elements_num);
+
+    free(post_elements);
+  }
+}
+
+static void _applugin_rewire(void) {
+
+  static post_element_t **post_elements;
+  int post_elements_num;
+
+  post_elements = _pplugin_join_visualization_and_post_elements(&post_elements_num);
+
+  if( post_elements ) {
+    _applugin_rewire_from_post_elements(post_elements, post_elements_num);
 
     free(post_elements);
   }
@@ -395,7 +502,7 @@ void post_deinterlace_init(const char *deinterlace_post) {
 
   fbxine.deinterlace_plugin = DEFAULT_DEINTERLACER;
   
-  if((posts = pplugin_parse_and_load((deinterlace_post && strlen(deinterlace_post)) ? 
+  if((posts = pplugin_parse_and_load(0, (deinterlace_post && strlen(deinterlace_post)) ? 
 				     deinterlace_post : fbxine.deinterlace_plugin, &num))) {
     fbxine.deinterlace_elements     = posts;
     fbxine.deinterlace_elements_num = num;
@@ -411,15 +518,21 @@ void post_deinterlace(void) {
                    fbxine.deinterlace_enable);
   }
   else {
-    _pplugin_unwire();
-    _pplugin_rewire();
+    _vpplugin_unwire();
+    _vpplugin_rewire();
   }
 }
 
-void pplugin_rewire_posts(void) {
+void vpplugin_rewire_posts(void) {
   
-  _pplugin_unwire();
-  _pplugin_rewire();
+  _vpplugin_unwire();
+  _vpplugin_rewire();
+}
+
+void applugin_rewire_posts(void) {
+  
+  _applugin_unwire();
+  _applugin_rewire();
 }
 
 /* end of post.c */

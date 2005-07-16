@@ -236,6 +236,7 @@ void osd_deinit(void) {
   xine_osd_free(gGui->osd.bar.osd[1]);
   xine_osd_free(gGui->osd.status.osd[0]);
   xine_osd_free(gGui->osd.info.osd[0]);
+  gGui->osd.info.osd[0] = NULL;
 }
 
 void osd_update(void) {
@@ -580,11 +581,14 @@ void osd_display_info(char *info, ...) {
 	return;
     }
 
-    xine_osd_clear(gGui->osd.info.osd[0]);
+    if (gGui->osd.info.osd[0]) {
+      xine_osd_clear(gGui->osd.info.osd[0]);
 
-    xine_osd_draw_text(gGui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
-    xine_osd_set_position(gGui->osd.info.osd[0], 20, 10 + 30);
-    _xine_osd_show(gGui->osd.info.osd[0], 0);
+      xine_osd_draw_text(gGui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
+      xine_osd_set_position(gGui->osd.info.osd[0], 20, 10 + 30);
+      _xine_osd_show(gGui->osd.info.osd[0], 0);
+    }
+
     gGui->osd.info.visible = gGui->osd.timeout;
     SAFE_FREE(buf);
   }
