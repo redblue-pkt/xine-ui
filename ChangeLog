@@ -8,6 +8,7 @@
   * autoload subtitles with .txt extension too
   * be more POSIX-compliant (head, tail) (build fix) [bug #1172729]
   * Russian translations (thanks to Pavel Maryanov)
+  * forced not loading old playlist with -P option
 
 xine-ui (0.99.3) unstable; urgency=low
 

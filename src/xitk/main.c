@@ -1633,6 +1633,9 @@ int main(int argc, char *argv[]) {
 	mediamark_load_mediamarks(optarg);
       else
 	mediamark_concat_mediamarks(optarg);
+
+      /* don't load original playlist when loading this one */
+      no_old_playlist = 1;
       break;
 
     case 'l':
