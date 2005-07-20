@@ -1,3 +1,4 @@
+  * fixed menu shortcut strings allocation/freeing [bug #1223022]
   * audio post plugin support
   * use UTF-8 for Japanese locale if nl_langinfo doesn't work [bug #1096974]
   * expand tabs in post-plugin help
