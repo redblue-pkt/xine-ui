@@ -3122,11 +3122,11 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
     
     mrl = atoa(xitk_inputtext_get_text(mmkeditor->mrl));
     if(mrl && (!strlen(mrl)))
-      xine_strdupa((char *) mrl, (*mmkeditor->mmk)->mrl);
+      xine_strdupa(mrl, (*mmkeditor->mmk)->mrl);
     
     ident = atoa(xitk_inputtext_get_text(mmkeditor->ident));
     if(ident && (!strlen(ident)))
-      xine_strdupa((char *) ident, mrl);
+      xine_strdupa(ident, mrl);
 
     sub = xitk_inputtext_get_text(mmkeditor->sub);
     if(sub && (!strlen(sub)))
