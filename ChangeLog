@@ -1,5 +1,8 @@
 xine-ui (0.99.4) unstable; urgency=low
 
+  * Fixed deadlock, segfaults and mem-leaks, several other fixes and enhancements,
+    can't remember details (thanks also to Marcelo Jimenez and Jakub Labath)
+  * Menu to reset video controls
   * fixed menu shortcut strings allocation/freeing [bug #1223022]
   * audio post plugin support
   * use UTF-8 for Japanese locale if nl_langinfo doesn't work [bug #1096974]
