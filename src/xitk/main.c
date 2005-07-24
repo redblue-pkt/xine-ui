@@ -1042,8 +1042,8 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
-	if(gGui->playlist.mmk != NULL && 
-	   gGui->playlist.mmk[gGui->playlist.cur] != NULL ) {
+	if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+	   gGui->playlist.mmk[gGui->playlist.cur]) {
 	  
 	  if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
 	    free(gGui->playlist.mmk[gGui->playlist.cur]->ident);

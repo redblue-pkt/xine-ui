@@ -1154,7 +1154,8 @@ static void *_gui_set_current_position(void *data) {
   
   gGui->ignore_next = 1;
   
-  if(gGui->playlist.num && 
+  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[gGui->playlist.cur] &&
      (!strcmp(gGui->playlist.mmk[gGui->playlist.cur]->mrl, gGui->mmk.mrl)))
     update_mmk = 1;
   
@@ -1281,6 +1282,8 @@ void gui_seek_relative (int off_sec) {
 static void *_gui_dndcallback(void *data) {
   int   more_than_one = -2;
   char *mrl           = (char *) data;
+
+  pthread_detach(pthread_self());
 
   if(mrl) {
     char  buffer[strlen(mrl) + 10];

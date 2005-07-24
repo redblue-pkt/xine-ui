@@ -385,7 +385,8 @@ static void *slider_loop(void *dummy) {
 
 	  pthread_mutex_lock(&gGui->xe_mutex);
 
-	  if(gGui->playlist.num && gGui->mmk.end != -1) {
+	  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+	     gGui->playlist.mmk[gGui->playlist.cur] && gGui->mmk.end != -1) {
 	    if(secs >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
 	      gGui->ignore_next = 0;
 	      gui_playlist_start_next();
@@ -428,7 +429,8 @@ static void *slider_loop(void *dummy) {
 	char *ident = stream_infos_get_ident_from_stream(gGui->stream);
 	
 	if(ident) {
-	  if(gGui->playlist.num) {
+	  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+	     gGui->playlist.mmk[gGui->playlist.cur]) {
 	    if(strcmp(gGui->mmk.ident, ident)) {
 	      if(gGui->mmk.ident)
 		free(gGui->mmk.ident);
@@ -442,8 +444,8 @@ static void *slider_loop(void *dummy) {
 	      playlist_mrlident_toggle();
 	      panel_update_mrl_display();
 	    }
-	    free(ident);
 	  }
+	  free(ident);
 	}
 	else
 	  video_window_set_mrl((char *)gGui->mmk.mrl);
@@ -808,9 +810,9 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   int wx, wy;
 
   xitk_get_window_position(gGui->display, gGui->panel_window, &wx, &wy, NULL, NULL);
-  xitk_get_widget_pos(panel->audiochan_label, &x, &y);
+  xitk_get_widget_pos(panel->spuid_label, &x, &y);
   x += wx;
-  y += (wy + xitk_get_widget_height(panel->audiochan_label));
+  y += (wy + xitk_get_widget_height(panel->spuid_label));
   spu_lang_menu(panel->widget_list, x, y);
 }
 /*

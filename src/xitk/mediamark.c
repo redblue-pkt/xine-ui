@@ -2636,7 +2636,7 @@ int mediamark_all_played(void) {
 int mediamark_get_shuffle_next(void) {
   int  next = 0;
   
-  if(gGui->playlist.num >= 3) {
+  if(gGui->playlist.num >= 3 && gGui->playlist.cur >= 0) {
     int    remain = gGui->playlist.num;
     int    entries[remain];
     float  num = (float) gGui->playlist.num;
@@ -2695,7 +2695,8 @@ void mediamark_replace_entry(mediamark_t **mmk,
 
 mediamark_t *mediamark_get_current_mmk(void) {
 
-  if(gGui->playlist.mmk && gGui->playlist.num)
+  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[gGui->playlist.cur])
     return gGui->playlist.mmk[gGui->playlist.cur];
 
   return (mediamark_t *) NULL;
@@ -2703,7 +2704,8 @@ mediamark_t *mediamark_get_current_mmk(void) {
 
 mediamark_t *mediamark_get_mmk_by_index(int index) {
 
-  if(gGui->playlist.mmk && index < gGui->playlist.num)
+  if(index < gGui->playlist.num && index >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[index])
     return gGui->playlist.mmk[index];
 
   return (mediamark_t *) NULL;
@@ -2711,7 +2713,9 @@ mediamark_t *mediamark_get_mmk_by_index(int index) {
 
 const char *mediamark_get_current_mrl(void) {
 
-  if(gGui->playlist.mmk && gGui->playlist.num && (gGui->playlist.cur < gGui->playlist.num))
+  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[gGui->playlist.cur] &&
+     gGui->playlist.cur < gGui->playlist.num)
     return gGui->playlist.mmk[gGui->playlist.cur]->mrl;
 
   return NULL;
@@ -2719,7 +2723,8 @@ const char *mediamark_get_current_mrl(void) {
 
 const char *mediamark_get_current_ident(void) {
 
-  if(gGui->playlist.mmk && gGui->playlist.num)
+  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[gGui->playlist.cur])
     return gGui->playlist.mmk[gGui->playlist.cur]->ident;
 
   return NULL;
@@ -2727,7 +2732,8 @@ const char *mediamark_get_current_ident(void) {
 
 const char *mediamark_get_current_sub(void) {
 
-  if(gGui->playlist.mmk && gGui->playlist.num)
+  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[gGui->playlist.cur])
     return gGui->playlist.mmk[gGui->playlist.cur]->sub;
 
   return NULL;
@@ -2735,10 +2741,10 @@ const char *mediamark_get_current_sub(void) {
 
 void mediamark_free_entry(int offset) {
 
-  if(gGui->playlist.num && (offset < gGui->playlist.num)) {
+  if(offset < gGui->playlist.num && offset >= 0 && gGui->playlist.mmk &&
+     gGui->playlist.mmk[offset])
     if(mediamark_free_mmk(&gGui->playlist.mmk[offset]))
       gGui->playlist.num--;
-  }
 }
 
 int mediamark_concat_mediamarks(const char *_filename) {
