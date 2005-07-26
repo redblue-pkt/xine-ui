@@ -1,3 +1,5 @@
+xine-ui (0.99.5) unstable; urgency=low
+
 xine-ui (0.99.4) unstable; urgency=low
 
   * Fixed deadlock, segfaults and mem-leaks, several other fixes and enhancements,
