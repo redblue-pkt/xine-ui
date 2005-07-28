@@ -35,6 +35,7 @@ void osd_init(void);
 void osd_deinit(void);
 void osd_display_spu_lang(void);
 void osd_display_audio_lang(void);
+void osd_display_zoom(void);
 void osd_update_status(void);
 void osd_stream_position(void);
 void osd_display_info(char *info, ...);

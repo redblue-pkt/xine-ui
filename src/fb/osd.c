@@ -556,7 +556,7 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
   }
 }
 
-void osd_stream_position() {
+void osd_stream_position(void) {
   int pos;
   if(get_pos_length(fbxine.stream, &pos, NULL, NULL)) {
       osd_draw_bar("Position in Stream", 0, 65535, pos, OSD_BAR_POS2);
@@ -619,4 +619,13 @@ void osd_display_audio_lang(void) {
 
   sprintf(buffer, "Audio Channel: %s", lang);
   osd_display_info(buffer);
+}
+
+void osd_display_zoom(void) {
+
+  /* show some average of x/y zoom (in case aspect ratio was changed) */
+  osd_draw_bar("Zoom Setting", 0, 200,
+	       (xine_get_param(fbxine.stream, XINE_PARAM_VO_ZOOM_X) +
+		xine_get_param(fbxine.stream, XINE_PARAM_VO_ZOOM_Y)) / 2,
+	       OSD_BAR_POS2);
 }

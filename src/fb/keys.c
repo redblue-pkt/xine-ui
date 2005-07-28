@@ -76,6 +76,10 @@ static int default_key_action(int key)
 		case 'M': return ACTID_EVENT_MENU1;
 		case 'S': return ACTID_EVENT_SELECT;
 		case 'i': return ACTID_TOGGLE_INTERLEAVE;
+
+		case 'z':    return ACTID_ZOOM_IN;
+		case 'Z':    return ACTID_ZOOM_OUT;
+		case '\032': return ACTID_ZOOM_RESET; /* This is ^Z */
 	}
 	
 	return 0;

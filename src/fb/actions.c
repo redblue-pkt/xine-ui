@@ -207,6 +207,13 @@ static const struct
 	{ "Select event.",
 		  "EventSelect", ACTID_EVENT_SELECT },
 		
+	{ "Zoom in.",
+		  "ZoomIn", ACTID_ZOOM_IN },
+	{ "Zoom out.",
+		  "ZoomOut", ACTID_ZOOM_OUT },
+	{ "Reset zooming.",
+		  "ZoomReset", ACTID_ZOOM_RESET },
+
 	{ "Loop mode toggle.",
 		  "ToggleLoopMode", ACTID_LOOPMODE },
 		
@@ -408,6 +415,26 @@ static void change_spu(void *data)
 	osd_display_spu_lang();
 }
 
+
+static void change_zoom(int zoom_dx, int zoom_dy)
+{
+	xine_set_param(fbxine.stream, XINE_PARAM_VO_ZOOM_X,
+		       xine_get_param(fbxine.stream, XINE_PARAM_VO_ZOOM_X) + zoom_dx);
+	xine_set_param(fbxine.stream, XINE_PARAM_VO_ZOOM_Y,
+		       xine_get_param(fbxine.stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
+
+	osd_display_zoom();
+}
+
+static void reset_zoom(void)
+{
+	xine_set_param(fbxine.stream, XINE_PARAM_VO_ZOOM_X, 100);
+	xine_set_param(fbxine.stream, XINE_PARAM_VO_ZOOM_Y, 100);
+
+	osd_display_zoom();
+}
+
+
 void do_action(int action)
 {
 	if(action & ACTID_IS_INPUT_EVENT)
@@ -507,6 +534,17 @@ void do_action(int action)
 		case ACTID_QUIT:
 			fbxine_exit();
 			break;
+
+		case ACTID_ZOOM_IN:
+			change_zoom(5, 5);
+			break;
+		case ACTID_ZOOM_OUT:
+			change_zoom(-5, -5);
+			break;
+		case ACTID_ZOOM_RESET:
+			reset_zoom();
+			break;
+
 	        case ACTID_TOGGLE_INTERLEAVE:
 		        fbxine.deinterlace_enable = !fbxine.deinterlace_enable;
 			osd_display_info("Deinterlace: %s", (fbxine.deinterlace_enable) ? 
