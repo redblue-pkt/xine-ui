@@ -46,7 +46,7 @@
 
 #include <locale.h>
 
-#ifdef __linux__
+#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
 #endif
 
@@ -322,8 +322,7 @@ static void xitk_signal_handler(int sig) {
       fprintf(stderr, "xiTK received SIGSEGV signal, RIP.\n");
 #ifndef DEBUG
       abort();
-#else
-#ifdef __linux__
+#elif defined(HAVE_EXECINFO_H)
       void    *backtrace_array[255];
       char   **backtrace_strings;
       int      entries, i;
@@ -340,7 +339,6 @@ static void xitk_signal_handler(int sig) {
 	  printf("--\n");
 	}
       }
-#endif
 #endif
     }
     break;
