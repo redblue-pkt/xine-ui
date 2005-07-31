@@ -1,5 +1,6 @@
 xine-ui (0.99.5) unstable; urgency=low
   * backtrace in debug mode in FreeBSD too
+  * fixed build with different prefix from xine-lib
 
 xine-ui (0.99.4) unstable; urgency=low
 
