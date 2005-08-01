@@ -1875,7 +1875,7 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   sprintf(buffer, "%s%s", buffer, " ]-");
 
   if(verbosity)
-    printf(buffer);
+    printf("%s", buffer);
 
   gXitk->wm_type = xitk_check_wm(display);
   
