@@ -138,12 +138,12 @@ static _pp_wrapper_t app_wrapper = { NULL };
 static char        **post_audio_plugins;
 
 /* Some functions prototype */
-static void _vpplugin_unwire();
-static void _applugin_unwire();
+static void _vpplugin_unwire(void);
+static void _applugin_unwire(void);
 static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper);
 static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *, int *);
-static void _vpplugin_rewire();
-static void _applugin_rewire();
+static void _vpplugin_rewire(void);
+static void _applugin_rewire(void);
 static void _pplugin_rewire(_pp_wrapper_t *pp_wrapper);
 static void _pplugin_rewire_from_post_elements(_pp_wrapper_t *pp_wrapper, post_element_t **, int);
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *);
