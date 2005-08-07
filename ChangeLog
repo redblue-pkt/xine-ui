@@ -1,4 +1,7 @@
 xine-ui (0.99.5) unstable; urgency=low
+
+  * OSD improvements in xitk
+  * Added zoom function to fbxine (thanks to Mike Lewis <lachlanlewis@gmail.com>)
   * backtrace in debug mode in FreeBSD too
   * fixed build with different prefix from xine-lib
 
