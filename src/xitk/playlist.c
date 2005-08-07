@@ -174,6 +174,8 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 static void _playlist_xine_play(void) {
   gui_set_current_mmk(mediamark_get_current_mmk());
 
+  osd_hide();
+
   if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
                              gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
                              !mediamark_have_alternates(&(gGui->mmk)))) {

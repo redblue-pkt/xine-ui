@@ -417,6 +417,8 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       }
     }
     
+    osd_hide();
+
     if(!xine_open(gGui->stream, (const char *) _mrl)) {
       gui_handle_xine_error(gGui->stream, _mrl);
       enable_playback_controls(0);

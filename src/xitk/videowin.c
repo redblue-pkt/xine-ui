@@ -1227,8 +1227,7 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
 
   video_window_adapt_size();
   try_to_set_input_focus(gGui->video_window);
-  if(osd_is_visible())
-    osd_update_osd();
+  osd_update_osd();
 
 }
 
@@ -1903,20 +1902,22 @@ static int video_window_translate_point(int gui_x, int gui_y,
 /*
  * Set/Get magnification.
  */
-void video_window_set_mag(float mag) {
+int video_window_set_mag(float mag) {
   
   if((!(gVw->fullscreen_mode & WINDOWED_MODE))
 #ifdef HAVE_XF86VIDMODE
      && !(gVw->XF86_modelines_count > 1)
 #endif
      )
-    return;
+    return 0;
   
   gVw->mag        = mag;
   gVw->win_width  = (int) ((float) gVw->video_width) * gVw->mag;
   gVw->win_height = (int) ((float) gVw->video_height) * gVw->mag;
   
   video_window_adapt_size ();
+
+  return 1;
 }
 
 float video_window_get_mag (void) {
@@ -2125,7 +2126,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
         gVw->ywin = cev->y;
       }
 
-      if(osd_is_visible() && ((h != gVw->output_height) || (w != gVw->output_width)))
+      if((h != gVw->output_height) || (w != gVw->output_width))
 	osd_update_osd();
 
       oxine_adapt();

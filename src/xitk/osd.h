@@ -57,7 +57,6 @@ void osd_display_info(char *info, ...);
 /* see OSD_BAR_* */
 void osd_draw_bar(char *title, int min, int max, int val, int type);
 
-int osd_is_visible(void);
 void osd_update_osd(void);
 
 #endif

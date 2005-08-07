@@ -422,18 +422,18 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_ZOOM_1_1:
   case ACTID_WINDOW100:
-    video_window_set_mag (1.0);
-    osd_display_info(_("Zoom: 1:1"));
+    if(video_window_set_mag (1.0))
+      osd_display_info(_("Zoom: 1:1"));
     break;
 
   case ACTID_WINDOW200:
-    video_window_set_mag (2.0);
-    osd_display_info(_("Zoom: 200%%"));
+    if(video_window_set_mag (2.0))
+      osd_display_info(_("Zoom: 200%%"));
     break;
 
   case ACTID_WINDOW50:
-    video_window_set_mag (0.5);
-    osd_display_info(_("Zoom: 50%%"));
+    if(video_window_set_mag (0.5))
+      osd_display_info(_("Zoom: 50%%"));
     break;
 
   case ACTID_SPU_NEXT:
@@ -1032,6 +1032,7 @@ void gui_playlist_start_next(void) {
   if (gGui->ignore_next)
     return;
 
+  osd_hide();
   panel_reset_slider ();
   
   if(gGui->playlist.control & PLAYLIST_CONTROL_STOP) {

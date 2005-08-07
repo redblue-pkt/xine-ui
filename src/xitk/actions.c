@@ -725,7 +725,11 @@ void gui_play (xitk_widget_t *w, void *data) {
     }
   }
   else {
+    int oldspeed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    if(oldspeed != XINE_SPEED_NORMAL)
+      osd_update_status();
   }
   
   panel_check_pause();
@@ -748,6 +752,9 @@ void gui_stop (xitk_widget_t *w, void *data) {
       gGui->visual_anim.running = 0;
   }
 
+  osd_hide_sinfo();
+  osd_hide_bar();
+  osd_hide_info();
   osd_update_status();
   panel_reset_slider ();
   panel_check_pause();
@@ -774,6 +781,9 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   }
   
   panel_check_pause();
+  /* Give xine engine some time before updating OSD, otherwise the */
+  /* time disp may be empty when switching to XINE_SPEED_PAUSE.    */
+  xine_usec_sleep(10000);
   osd_update_status();
 }
 
@@ -1106,6 +1116,9 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   else if(((int)data) == GUI_RESET) {
     xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
+  /* Give xine engine some time before updating OSD, otherwise the        */
+  /* time disp may be empty when switching to speeds < XINE_SPEED_NORMAL. */
+  xine_usec_sleep(10000);
   osd_update_status();
 }
 
@@ -1187,6 +1200,7 @@ static void *_gui_set_current_position(void *data) {
   } while(pos != -1);
   
   gGui->ignore_next = 0;
+  osd_hide_status();
   panel_check_pause();
 
   pthread_mutex_unlock(&gGui->xe_mutex);
@@ -1423,6 +1437,8 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 
   if(((int)data) == GUI_NEXT) {
 
+    osd_hide();
+
     if(by_chapter) {
 
       for(i = 0; i < value; i++)
@@ -1476,6 +1492,8 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
   }
   else if(((int)data) == GUI_PREV) {
+
+    osd_hide();
     
     if(by_chapter) {
 
