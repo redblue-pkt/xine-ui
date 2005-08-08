@@ -957,7 +957,7 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_PLAYLIST_STOP:
     if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
       if(gGui->playlist.control & PLAYLIST_CONTROL_STOP)
-	gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+	gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       else
 	gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
       osd_display_info(_("Playlist: %s"), 
@@ -1036,7 +1036,7 @@ void gui_playlist_start_next(void) {
   panel_reset_slider ();
   
   if(gGui->playlist.control & PLAYLIST_CONTROL_STOP) {
-    gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+    gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
     gui_display_logo();
     return;
   }

@@ -741,7 +741,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
   xine_stop (gGui->stream);
   gGui->ignore_next = 0;
 
-  gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+  gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
 
   gGui->stream_length.pos = gGui->stream_length.time = gGui->stream_length.length = 0;
   
@@ -2016,7 +2016,7 @@ static void fileselector_callback(filebrowser_t *fb) {
     if(file)  {
       gGui->playlist.control |= PLAYLIST_CONTROL_IGNORE;
       gui_dndcallback(file);
-      gGui->playlist.control &= !PLAYLIST_CONTROL_IGNORE;
+      gGui->playlist.control &= ~PLAYLIST_CONTROL_IGNORE;
       free(file);
     }
 
@@ -2063,7 +2063,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
 	snprintf(fullfilename, sizeof(fullfilename), "%s%s", pathname, files[i++]);
 	gui_dndcallback(fullfilename);
       }
-      gGui->playlist.control &= !PLAYLIST_CONTROL_IGNORE;
+      gGui->playlist.control &= ~PLAYLIST_CONTROL_IGNORE;
       
       free(path);
 

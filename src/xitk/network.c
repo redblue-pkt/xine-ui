@@ -1946,7 +1946,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "continue")) {
 	if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-	  gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+	  gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       }
 
     }

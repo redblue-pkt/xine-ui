@@ -425,7 +425,7 @@ static void *ctrlsocket_func(void *data) {
 
     case CMD_PLAYLIST_CONTINUE:
       if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-	gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+	gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       send_ack(shdr);
       break;
 
