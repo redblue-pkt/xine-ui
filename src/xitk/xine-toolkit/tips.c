@@ -106,14 +106,15 @@ static void *_tips_loop_thread(void *data) {
       xitk_font_t         *fs;
       XWindowAttributes    wattr;
       Status               status;
-      unsigned int         cwarnfore, cwarnback;
+      unsigned int         cfore, cback;
       struct timeval       tv;
       struct timespec      ts;
 
       int                  disp_w = xitk_get_display_width();
       int                  disp_h = xitk_get_display_height();
 
-      int                  margin = 10;
+      int                  x_margin = 12, y_margin = 6;
+      int                  bottom_gap = 16; /* To avoid mouse cursor overlaying tips on bottom of widget */
 
       tips.visible = 1;
 
@@ -130,27 +131,28 @@ static void *_tips_loop_thread(void *data) {
 
       xitk_font_unload_font(fs);
       
-      cwarnfore = xitk_get_pixel_color_warning_foreground(tips.widget->imlibdata);
-      cwarnback = xitk_get_pixel_color_warning_background(tips.widget->imlibdata);
+      cfore = xitk_get_pixel_color_black(tips.widget->imlibdata);
+      cback = xitk_get_pixel_color_lightgray(tips.widget->imlibdata);
       
       image = xitk_image_create_image_with_colors_from_string(tips.widget->imlibdata, DEFAULT_FONT_10,
 							      string_length + 1, ALIGN_LEFT, 
-							      tips.widget->tips_string, cwarnfore, cwarnback);
+							      tips.widget->tips_string, cfore, cback);
       
       /* Create the tips window, horizontally centered from parent widget */
       /* If necessary, adjust position to display it fully on screen      */
-      /* 1 px dist to widget prevents odd behavior of mouse pointer when  */
-      /* pointer is moved slowly from widget to tips, at least under FVWM */
-      w = image->width + margin;
-      h = image->height + margin;
+      w = image->width + x_margin;
+      h = image->height + y_margin;
       x -= ((w >> 1) - (tips.widget->width >> 1));
-      y += (tips.widget->height + 1);
+      y += (tips.widget->height + bottom_gap);
       if(x > disp_w - w)
 	x = disp_w - w;
       else if(x < 0)
 	x = 0;
       if(y > disp_h - h)
-	y -= (tips.widget->height + h + 2);
+	/* 1 px dist to widget prevents odd behavior of mouse pointer when  */
+	/* pointer is moved slowly from widget to tips, at least under FVWM */
+	/*                                           v                      */
+	y -= (tips.widget->height + h + bottom_gap + 1);
       /* No further alternative to y-position the tips (just either below or above widget) */
       xwin = xitk_window_create_simple_window(tips.widget->imlibdata, x, y, w, h);
       
@@ -180,12 +182,12 @@ static void *_tips_loop_thread(void *data) {
 	XUNLOCK(tips.display);
 	
 	XLOCK(tips.display);
-	XSetForeground(tips.display, gc, cwarnfore);
+	XSetForeground(tips.display, gc, cfore);
 	XDrawRectangle(tips.display, bg->pixmap, gc, 0, 0, width - 1, height - 1);
 	XUNLOCK(tips.display);
 	
 	XLOCK(tips.display);
-	XSetForeground(tips.display, gc, cwarnback);
+	XSetForeground(tips.display, gc, cback);
 	XFillRectangle(tips.display, bg->pixmap, gc, 1, 1, width - 2, height - 2);
 	XCopyArea(tips.display, image->image->pixmap, bg->pixmap,
 		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, ((height - image->height)>>1) + 1);
