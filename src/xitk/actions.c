@@ -894,8 +894,11 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 
     /* We need to reparent all visible windows because of redirect tweaking */
     if(!visible) { /* Show the panel in taskbar */
+      int x = 0, y = 0;
+
+      xitk_get_window_position(gGui->display, gGui->panel_window, &x, &y, NULL, NULL);
       XLockDisplay(gGui->display);
-      XReparentWindow(gGui->display, gGui->panel_window, gGui->imlib_data->x.root, 0, 0);
+      XReparentWindow(gGui->display, gGui->panel_window, gGui->imlib_data->x.root, x, y);
       XUnlockDisplay(gGui->display);
     }
     reparent_all_windows();
