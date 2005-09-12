@@ -192,7 +192,9 @@ static void *second_display_loop (void *dummy) {
     
     do {
         XLockDisplay(gGui->video_display);
-        got_event = XCheckMaskEvent(gGui->video_display, INPUT_MOTION, &xevent);
+        got_event = XPending(gGui->video_display);
+        if( got_event )
+          XNextEvent(gGui->video_display, &xevent);
         XUnlockDisplay(gGui->video_display);
         
         if( got_event && gGui->stream ) {

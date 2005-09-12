@@ -1886,11 +1886,6 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   xitk_tips_init(display);
 }
 
-/* Return True is event type isn't completion */
-static Bool is_event(Display *display, XEvent *event, XPointer arg) {
-  return True;
-}
-
 /*
  * Start widget event handling.
  * It will block till widget_stop() call
@@ -2009,7 +2004,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
     select(xconnection + 1, &r, 0, 0, &tv);
     
     XLOCK(gXitk->display);
-    got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
+    got_event = (XPending(gXitk->display) != 0);
+    if( got_event )
+      XNextEvent(gXitk->display, &myevent);
     XUNLOCK(gXitk->display);
       
     while(got_event == True) {
@@ -2017,7 +2014,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
       xitk_xevent_notify(&myevent);
 
       XLOCK(gXitk->display);
-      got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
+      got_event = (XPending(gXitk->display) != 0);
+      if( got_event )
+        XNextEvent(gXitk->display, &myevent);
       XUNLOCK(gXitk->display);
     }
 
