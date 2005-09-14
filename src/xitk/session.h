@@ -52,6 +52,8 @@ typedef enum {
   CMD_AMP,
   CMD_LOOP,
   CMD_GET_SPEED_STATUS,
+  CMD_GET_TIME_STATUS_IN_SECS,
+  CMD_GET_TIME_STATUS_IN_POS,
   CMD_GET_VERSION,
   CMD_PING
 } ctrl_commands_t;

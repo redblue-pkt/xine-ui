@@ -511,6 +511,23 @@ static void *ctrlsocket_func(void *data) {
       }
       break;
     
+
+    case CMD_GET_TIME_STATUS_IN_SECS:
+      {
+	uint32_t status = gGui->stream_length.time / 1000;
+	send_packet(shdr->fd, CMD_GET_TIME_STATUS_IN_SECS, &status, sizeof(status));
+	send_ack(shdr);
+      }
+      break;
+
+    case CMD_GET_TIME_STATUS_IN_POS:
+      {
+	uint32_t status = gGui->stream_length.pos;
+	send_packet(shdr->fd, CMD_GET_TIME_STATUS_IN_POS, &status, sizeof(status));
+	send_ack(shdr);
+      }
+      break;
+
     case CMD_GET_VERSION:
       send_packet(shdr->fd, CMD_GET_VERSION, VERSION,  strlen(VERSION));
       send_ack(shdr);
@@ -591,10 +608,16 @@ int init_session(void) {
   return retval;
 }
 
+static int sanestrcasecmp(char *s1, char *s2) {
+  if(s1 && s2)
+    return strcasecmp(s1, s2);
+  return 1;
+} 
+
 int session_handle_subopt(char *suboptarg, int *session) {
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
-  int          volume, amp, loop, speed_status;
+  int          volume, amp, loop, speed_status, time_status;
   int          fullscreen, s, c;
   uint32_t     state;
   char        *optstr;
@@ -609,7 +632,8 @@ int session_handle_subopt(char *suboptarg, int *session) {
     "play",  "slow2",  "slow4",   "pause",      "fast2",
     "fast4", "stop",   "quit",    "fullscreen", "eject",
     "audio", "spu",    "session", "mrl",        "playlist", 
-    "pl",    "volume", "amp",     "loop",       "get_speed", 
+    "pl",    "volume", "amp",     "loop",       "get_speed",
+    "get_time",
     NULL
   };
   
@@ -619,7 +643,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   volume = amp   = -1;
   state          = 0;
   loop           = -1;
-  speed_status   = 0;
+  speed_status   = time_status = 0;
 
   while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
     switch(c) {
@@ -640,17 +664,17 @@ int session_handle_subopt(char *suboptarg, int *session) {
 
       /* audio */
     case 10:
-      if(!strcasecmp(optstr, "next"))
+      if(!sanestrcasecmp(optstr, "next"))
 	audio_next++;
-      else if(!strcasecmp(optstr, "prev"))
+      else if(!sanestrcasecmp(optstr, "prev"))
 	audio_prev++;
       break;
 
       /* spu */
     case 11:
-      if(!strcasecmp(optstr, "next"))
+      if(!sanestrcasecmp(optstr, "next"))
 	spu_next++;
-      else if(!strcasecmp(optstr, "prev"))
+      else if(!sanestrcasecmp(optstr, "prev"))
 	spu_prev++;
       break;
       
@@ -671,21 +695,21 @@ int session_handle_subopt(char *suboptarg, int *session) {
       /* playlist */
     case 14:
     case 15:
-      if(!strcasecmp(optstr, "first"))
+      if(!sanestrcasecmp(optstr, "first"))
 	playlist_first = 1;
-      else if(!strcasecmp(optstr, "last"))
+      else if(!sanestrcasecmp(optstr, "last"))
 	playlist_last = 1;
-      else if(!strcasecmp(optstr, "clear"))
+      else if(!sanestrcasecmp(optstr, "clear"))
 	playlist_clear = 1;
-      else if(!strcasecmp(optstr, "next"))
+      else if(!sanestrcasecmp(optstr, "next"))
 	playlist_next++;
-      else if(!strcasecmp(optstr, "prev"))
+      else if(!sanestrcasecmp(optstr, "prev"))
 	playlist_prev++;
       else if(!strncasecmp(optstr, "load:", 5))
 	playlist_load = strdup(optstr + 5);
-      else if(!strcasecmp(optstr, "stop"))
+      else if(!sanestrcasecmp(optstr, "stop"))
 	playlist_stop_cont = -1;
-      else if(!strcasecmp(optstr, "cont"))
+      else if(!sanestrcasecmp(optstr, "cont"))
 	playlist_stop_cont = 1;
       break;
 
@@ -701,21 +725,27 @@ int session_handle_subopt(char *suboptarg, int *session) {
       
       /* loop */
     case 18:
-      if(!strcasecmp(optstr, "none"))
+      if(!sanestrcasecmp(optstr, "none"))
 	loop = PLAYLIST_LOOP_NO_LOOP;
-      else if(!strcasecmp(optstr, "loop"))
+      else if(!sanestrcasecmp(optstr, "loop"))
 	loop = PLAYLIST_LOOP_LOOP;
-      else if(!strcasecmp(optstr, "repeat"))
+      else if(!sanestrcasecmp(optstr, "repeat"))
 	loop = PLAYLIST_LOOP_REPEAT;
-      else if(!strcasecmp(optstr, "shuffle"))
+      else if(!sanestrcasecmp(optstr, "shuffle"))
 	loop = PLAYLIST_LOOP_SHUFFLE;
-      else if(!strcasecmp(optstr, "shuffle+"))
+      else if(!sanestrcasecmp(optstr, "shuffle+"))
 	loop = PLAYLIST_LOOP_SHUF_PLUS;
       break;
 
       /* speed status */
     case 19:
       speed_status = 1;
+      break;
+      
+    case 20:
+      time_status = 1;
+      if(!sanestrcasecmp(optstr, "p") || !sanestrcasecmp(optstr, "pos"))
+	time_status = 2;
       break;
 
     }
@@ -812,6 +842,20 @@ int session_handle_subopt(char *suboptarg, int *session) {
 
     if(speed_status)
       retval = get_uint32(*session, CMD_GET_SPEED_STATUS);
+
+    if(time_status) {
+      switch(time_status) {
+      case 1:
+	retval = get_uint32(*session, CMD_GET_TIME_STATUS_IN_SECS);
+	break;
+
+      case 2:
+	retval = get_uint32(*session, CMD_GET_TIME_STATUS_IN_POS);
+	break;
+      }
+
+      fprintf(stdout, "%d\n", retval);
+    }
 
   }
   else
