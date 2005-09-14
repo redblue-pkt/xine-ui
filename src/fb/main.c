@@ -250,14 +250,14 @@ static int fbxine_init(int argc, char **argv)
 {
 	if(!check_version())
 		return 0;
+	if(!init_xine())
+		return 0;
 	switch(parse_options(argc, argv))
 	{
 		case 0:
 		case -1:
 			return 0;
 	}
-	if(!init_xine())
-		return 0;
 
 	if (stdctl)
 	        fbxine_init_stdctl();

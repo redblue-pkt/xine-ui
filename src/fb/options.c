@@ -139,14 +139,20 @@ int parse_options(int argc, char **argv)
 			{ "audio-driver",  required_argument, 0, 'A' },
 			{ "video-driver",  required_argument, 0, 'V' },
 			{ "version",       no_argument,       0, 'v' },
+#ifdef HAVE_LIRC
 			{ "no-lirc",       no_argument,       0, 'L' },
+#endif
 			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
 			{ "post",          required_argument, 0, OPTION_POST },
 			{ "deinterlace",   no_argument,       0, 'D' },
 			{ "verbose",       optional_argument, 0, OPTION_VERBOSE },
 			{ 0,               no_argument,       0,  0  }
 		};
-	const char *short_options = "?hda:qA:V:R::vD";
+	const char *short_options = "?hda:qA:V:"
+#ifdef HAVE_LIRC
+		"L"
+#endif
+		"vD";
 	int c = '?', option_index = 0;
   
 	opterr = 0;

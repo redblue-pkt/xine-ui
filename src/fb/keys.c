@@ -97,7 +97,8 @@ static void *fbxine_keyboard_loop(void *dummy)
 
 static void exit_keyboard(void)
 {
-	pthread_cancel(fbxine.keyboard_thread);
+	if (fbxine.keyboard_thread)
+		pthread_cancel(fbxine.keyboard_thread);
 
 	endwin();
 
