@@ -260,6 +260,8 @@ Les options sont:
     - 7: fast2
     - 8: fast4
 .br
+\fBget_time[=p|pos]\fP retourne la position courante en secondes, ou en position dans le flux (0..65535).
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> peut être:

@@ -264,6 +264,8 @@ Options are:
     - 7: fast2
     - 8: fast4
 .br
+\fBget_time[=p|pos]\fP get current position status in seconds, or in position in stream (0..65535).
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> can be:
