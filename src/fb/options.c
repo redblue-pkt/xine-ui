@@ -97,12 +97,6 @@ static void print_usage(void)
 	
 	printf("\n"
 	       "  -a, --audio-channel <number>   Select audio channel.\n"
-	       "  -R, --recognize-by [option]    Try to recognize stream type. Option are:\n"
-	       "                                 'default': by content, then by extension,\n"
-	       "                                 'revert': by extension, then by content,\n"
-	       "                                 'content': only by content,\n"
-	       "                                 'extension': only by extension.\n"
-	       "                                 -if no option is given, 'revert' is selected\n");
 #ifdef HAVE_LIRC
 	printf("  -L, --no-lirc                  Turn off LIRC support.\n");
 #endif
