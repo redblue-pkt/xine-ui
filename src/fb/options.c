@@ -96,7 +96,7 @@ static void print_usage(void)
 		       *driver_id++);
 	
 	printf("\n"
-	       "  -a, --audio-channel <number>   Select audio channel.\n"
+	       "  -a, --audio-channel <number>   Select audio channel.\n");
 #ifdef HAVE_LIRC
 	printf("  -L, --no-lirc                  Turn off LIRC support.\n");
 #endif
