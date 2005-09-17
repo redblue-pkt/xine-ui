@@ -413,11 +413,25 @@ void gui_execute_action_id(action_id_t action) {
   switch(action) {
     
   case ACTID_WINDOWREDUCE:
-    video_window_set_mag (0.8 * video_window_get_mag());
+    {
+      float mag = video_window_get_mag();
+
+      /* Limit size to a practical minimum.                         */
+      /* Too small window is hard to view or to hit with the mouse. */
+      if(mag > (1/10.0f))
+	video_window_set_mag(mag * (1/1.2f));
+    }
     break;
 
   case ACTID_WINDOWENLARGE:
-    video_window_set_mag (1.2 * (video_window_get_mag() + 0.002));
+    {
+      float mag = video_window_get_mag();
+
+      /* Limit size to a practical maximum.                                    */
+      /* Too large window can grab system resources up to a virtual dead lock. */
+      if(mag < 10.0f)
+	video_window_set_mag(mag * 1.2f);
+    }
     break;
 
   case ACTID_ZOOM_1_1:
@@ -1661,7 +1675,7 @@ static void on_start(void *data) {
 
   splash_destroy();
 
-  if((!startup->start && !gGui->playlist.num) || (!startup->start && gGui->playlist.num)) {
+  if(!startup->start) {
     
     gui_display_logo();
     
