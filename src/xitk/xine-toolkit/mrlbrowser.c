@@ -63,7 +63,7 @@ static xitk_mrlbrowser_filter_t __mrl_filters[] = {
   { NULL                  , NULL           }
 };
 
-void gui_handle_event(XEvent *event, void *data);
+extern void gui_handle_event(XEvent *event, void *data);
 
 /*
  *
