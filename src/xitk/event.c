@@ -414,23 +414,34 @@ void gui_execute_action_id(action_id_t action) {
     
   case ACTID_WINDOWREDUCE:
     {
-      float mag = video_window_get_mag();
+      int	output_width, output_height;
 
       /* Limit size to a practical minimum.                         */
       /* Too small window is hard to view or to hit with the mouse. */
-      if(mag > (1/10.0f))
-	video_window_set_mag(mag * (1/1.2f));
+
+      video_window_get_output_size(&output_width, &output_height);
+      if(output_width > 50 && output_height > 50)
+	video_window_set_mag(video_window_get_mag() * (1/1.2f));
     }
     break;
 
   case ACTID_WINDOWENLARGE:
     {
-      float mag = video_window_get_mag();
+      int	output_width, output_height, window_width, window_height;
 
-      /* Limit size to a practical maximum.                                    */
-      /* Too large window can grab system resources up to a virtual dead lock. */
-      if(mag < 10.0f)
-	video_window_set_mag(mag * 1.2f);
+      /* Limit size to a practical maximum.                                        */
+      /* Too large window can grab system resources up to a virtual dead lock.     */
+      /* Compare output size to window size as a WM (like fvwm) can be configured  */
+      /* to impose limits on window size which may not be reflected back to output */
+      /* size (no further ConfigureNotify after size limit is exceeded),           */
+      /* so we'll not end up in endless magnification.                             */
+
+      video_window_get_output_size(&output_width, &output_height);
+      xitk_get_window_position(gGui->video_display, gGui->video_window,
+			       NULL, NULL, &window_width, &window_height);
+      if(output_width < 5000 && output_height < 5000 &&
+	 output_width <= window_width && output_height <= window_height)
+	video_window_set_mag(video_window_get_mag() * 1.2f);
     }
     break;
 
