@@ -1450,8 +1450,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->desktopHeight      = DisplayHeight(gGui->video_display, gGui->video_screen);
 
 #ifdef HAVE_XTESTEXTENSION
-  gVw->fake_keys[0] = XKeysymToKeycode(gGui->video_display, XK_Scroll_Lock);
-  gVw->fake_keys[1] = XKeysymToKeycode(gGui->video_display, XK_Num_Lock);
+  gVw->fake_keys[0] = XKeysymToKeycode(gGui->video_display, XK_Shift_L);
+  gVw->fake_keys[1] = XKeysymToKeycode(gGui->video_display, XK_Control_L);
   gVw->fake_key_cur = 0;
 #endif
   
@@ -2152,8 +2152,6 @@ void video_window_reset_ssaver(void) {
 	gVw->fake_key_cur = 0;
 
       XLockDisplay(gGui->video_display);
-      XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], True, CurrentTime);
-      XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], False, CurrentTime);
       XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], True, CurrentTime);
       XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], False, CurrentTime);
       XSync(gGui->video_display, False);
