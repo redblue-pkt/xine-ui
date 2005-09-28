@@ -236,11 +236,12 @@ int xitk_system(int dont_run_as_root, char *command) {
 void xitk_usec_sleep(unsigned long usec) {
 #ifdef HAVE_NANOSLEEP
   /* nanosleep is prefered on solaris, because it's mt-safe */
-  struct timespec ts;
+  struct timespec ts, remaining;
   
   ts.tv_sec =   usec / 1000000;
   ts.tv_nsec = (usec % 1000000) * 1000;
-  nanosleep(&ts, NULL);
+  while (nanosleep (&ts, &remaining) == -1 && errno == EINTR)
+    ts = remaining;
 #else
   usleep(usec);
 #endif
