@@ -3,5 +3,6 @@ Makefile.in
 SlackBuild
 build_rpms.sh
 relchk.sh
+xine-bugreport
 xine-check
 xine-ui.spec

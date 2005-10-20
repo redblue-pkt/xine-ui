@@ -2,6 +2,7 @@ Makefile
 Makefile.in
 acinclude.m4
 aclocal.m4
+compile
 configure
 config.guess
 config.log
