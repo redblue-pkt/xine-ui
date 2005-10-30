@@ -516,7 +516,12 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   }
 
   if(!xine_open(gGui->stream, (const char *) mrl)) {
-    
+
+#ifdef XINE_PARAM_GAPLESS_SWITCH
+    if( xine_check_version(1,1,1) )
+      xine_set_param(gGui->stream, XINE_PARAM_GAPLESS_SWITCH, 0);
+#endif
+
     if(!strcmp(mrl, gGui->mmk.mrl))
       gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
     

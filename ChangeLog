@@ -5,6 +5,7 @@ xine-ui (0.99.5) unstable; urgency=low
   * backtrace in debug mode in FreeBSD too
   * fixed build with different prefix from xine-lib
   * followed freedesktop standards (desktop file and icons)
+  * support gapless playback while switching streams (requires xine-lib >= 1.1.1)
 
 xine-ui (0.99.4) unstable; urgency=low
 

@@ -1018,7 +1018,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     if(event->stream == gGui->stream) {
-
+#ifdef XINE_PARAM_GAPLESS_SWITCH
+      if( xine_check_version(1,1,1) )
+        xine_set_param(gGui->stream, XINE_PARAM_GAPLESS_SWITCH, 1);
+#endif
       gui_playlist_start_next();
     }
     else if(event->stream == gGui->visual_anim.stream) {
@@ -2081,6 +2084,10 @@ int main(int argc, char *argv[]) {
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
+#ifdef XINE_PARAM_EARLY_FINISHED_EVENT
+  if( xine_check_version(1,1,1) )
+      xine_set_param(gGui->stream, XINE_PARAM_EARLY_FINISHED_EVENT, 1);
+#endif
 
   /* Store audio mixer level */
   if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
