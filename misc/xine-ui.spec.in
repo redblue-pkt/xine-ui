@@ -231,6 +231,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pixmaps/*
 %{_datadir}/xine/visuals/*
 %{_datadir}/xine/oxine/*
+%{_datadir}/icons/hicolor/*/apps/xine.png
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
 %lang(es) %{_mandir}/es/man1/*
@@ -239,6 +240,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun Oct 30 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- added icons directory to file list
 * Mon Feb 07 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - added oxine directory to the files
 * Fri Apr 09 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
