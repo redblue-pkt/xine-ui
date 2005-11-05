@@ -16,7 +16,7 @@ Summary:     A Free Audio/Video Player.
 Summary(cs): Voln audio a video pehr�a�Summary(de): Ein freies Audio- und Video-Abspielprogramm
 Version:     %{version}
 Release:     %{release}
-Copyright:   GPL
+License:     GPL
 Group:       Applications/Multimedia
 Source:      http://xinehq.de/files/%{name}-%{version}.tar.gz
 URL:         http://xinehq.de
@@ -240,6 +240,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sat Nov 05 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- changed Copyright to License
 * Sun Oct 30 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - added icons directory to file list
 * Mon Feb 07 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
