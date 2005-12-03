@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-02 22:47+0100\n"
+"POT-Creation-Date: 2005-12-03 23:23+0100\n"
 "PO-Revision-Date: 2004-10-18 20:18+0200\n"
 "Last-Translator: Bartlomiej Muryn <forever@dione.ids.pl>\n"
 "Language-Team:  <pl@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1166
 msgid "Select current entry"
 msgstr "Wybór aktualnego wpisu"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1174
 msgid "Play selected entry"
 msgstr "Odtwarzanie wybranego wpisu"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1185
 msgid "Close MRL browser window"
 msgstr "Zamkniêcie okna przegl±darki MRL"
 

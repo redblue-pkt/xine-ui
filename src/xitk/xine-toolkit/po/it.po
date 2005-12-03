@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-02 22:47+0100\n"
+"POT-Creation-Date: 2005-12-03 23:23+0100\n"
 "PO-Revision-Date: 2003-12-26 12:42+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.0.2\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1166
 msgid "Select current entry"
 msgstr "Seleziona l'elemento corrente"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1174
 msgid "Play selected entry"
 msgstr "Riproduci l'elemento selezionato"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1185
 msgid "Close MRL browser window"
 msgstr "Chiudi la finestra di navigazione MRL"
 

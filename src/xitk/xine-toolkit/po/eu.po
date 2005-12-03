@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk-eu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-02 22:47+0100\n"
+"POT-Creation-Date: 2005-12-03 23:23+0100\n"
 "PO-Revision-Date: 2005-02-08 18:51+0100\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1166
 msgid "Select current entry"
 msgstr "Hautatu aukeratutako sarrera"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1174
 msgid "Play selected entry"
 msgstr "Erreproduzitu aukeratutako sarrera"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1185
 msgid "Close MRL browser window"
 msgstr "Itxi MRL kudeatzaile leihoa"
 

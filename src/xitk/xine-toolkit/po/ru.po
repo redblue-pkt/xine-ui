@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk 0.99.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-02 22:47+0100\n"
+"POT-Creation-Date: 2005-12-03 23:23+0100\n"
 "PO-Revision-Date: 2004-07-26 11:56+0300\n"
 "Last-Translator: Pavel Maryanov <acid_jack@ukr.net>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,15 +16,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.3\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1166
 msgid "Select current entry"
 msgstr "Выбрать текущий пункт"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1174
 msgid "Play selected entry"
 msgstr "Воспроизвести выбранный пункт"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1185
 msgid "Close MRL browser window"
 msgstr "Закрыть окно MRL-браузера"
 
