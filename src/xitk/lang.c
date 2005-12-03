@@ -180,8 +180,8 @@
      mr_IN
      ms_MY
      mt_MT
-     nb_NO
-     nb_NO.ISO-8859-1
+ *   nb_NO
+ *   nb_NO.ISO-8859-1
      nl_BE
      nl_BE@euro
      nl_NL
