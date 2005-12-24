@@ -201,6 +201,7 @@ static void *second_display_loop (void *dummy) {
           video_window_handle_event(&xevent, NULL);
         }
     } while (got_event);
+
   }
   
   pthread_exit(NULL);
@@ -379,12 +380,15 @@ static void video_window_adapt_size (void) {
       attr.background_pixel  = gGui->black.pixel;
       
       border_width = 0;
-      
-      gGui->video_window = XCreateWindow(gGui->video_display, rootwindow,
-					 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
-					 border_width, 
-					 CopyFromParent, CopyFromParent, CopyFromParent, 
-					 CWBackPixel | CWOverrideRedirect, &attr);
+
+      if(gGui->wid)
+	gGui->video_window = gGui->wid;
+      else
+	gGui->video_window = XCreateWindow(gGui->video_display, rootwindow,
+					   0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
+					   border_width, 
+					   CopyFromParent, CopyFromParent, CopyFromParent, 
+					   CWBackPixel | CWOverrideRedirect, &attr);
       
       if(gGui->video_display == gGui->display)
         xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
@@ -395,7 +399,12 @@ static void video_window_adapt_size (void) {
         XLockDisplay (gGui->video_display);
       }
 
-      XSelectInput(gGui->video_display, gGui->video_window, ExposureMask);
+      if(!(gGui->no_mouse))
+	XSelectInput(gGui->video_display, gGui->video_window, ExposureMask);
+      else
+	XSelectInput(gGui->video_display,
+                     gGui->video_window,
+                     ExposureMask & (~(ButtonPressMask | ButtonReleaseMask)));
       
       _set_window_title();
       
@@ -425,7 +434,7 @@ static void video_window_adapt_size (void) {
 
       XUnlockDisplay (gGui->video_display);
 
-      if(gGui->video_display == gGui->display)
+      if((gGui->video_display == gGui->display))
         gVw->widget_key = xitk_register_event_handler("video_window", 
 						    gGui->video_window, 
 						    video_window_handle_event,
@@ -668,13 +677,15 @@ static void video_window_adapt_size (void) {
     attr.colormap	   = gVw->colormap;
 
     border_width           = 0;
-
-    gGui->video_window =
-      XCreateWindow (gGui->video_display, DefaultRootWindow(gGui->video_display),
-		     hint.x, hint.y, gVw->visible_width, gVw->visible_height,
-		     border_width, gVw->depth, InputOutput,
-		     gVw->visual,
-		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
+    if(gGui->wid)
+      gGui->video_window = gGui->wid;
+    else
+      gGui->video_window =
+	XCreateWindow (gGui->video_display, DefaultRootWindow(gGui->video_display),
+		       hint.x, hint.y, gVw->visible_width, gVw->visible_height,
+		       border_width, gVw->depth, InputOutput,
+		       gVw->visual,
+		       CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
@@ -766,13 +777,16 @@ static void video_window_adapt_size (void) {
 
     border_width           = 0;
 
-    gGui->video_window = 
-      XCreateWindow (gGui->video_display, DefaultRootWindow(gGui->video_display), 
-		     hint.x, hint.y, gVw->visible_width, gVw->visible_height, 
-		     border_width, gVw->depth, InputOutput,
-		     gVw->visual,
-		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
-
+    if(gGui->wid)
+      gGui->video_window = gGui->wid;
+    else
+      gGui->video_window = 
+	XCreateWindow (gGui->video_display, DefaultRootWindow(gGui->video_display), 
+		       hint.x, hint.y, gVw->visible_width, gVw->visible_height, 
+		       border_width, gVw->depth, InputOutput,
+		       gVw->visual,
+		       CWBackPixel | CWBorderPixel | CWColormap, &attr);
+  
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
     
@@ -915,12 +929,15 @@ static void video_window_adapt_size (void) {
     else
       border_width = 4;
 
-    gGui->video_window =
-      XCreateWindow(gGui->video_display, DefaultRootWindow(gGui->video_display),
-		    hint.x, hint.y, hint.width, hint.height, border_width, 
-		    gVw->depth, InputOutput, gVw->visual,
-		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
-    
+    if(gGui->wid)
+      gGui->video_window = gGui->wid;
+    else
+      gGui->video_window =
+	XCreateWindow(gGui->video_display, DefaultRootWindow(gGui->video_display),
+		      hint.x, hint.y, hint.width, hint.height, border_width, 
+		      gVw->depth, InputOutput, gVw->visual,
+		      CWBackPixel | CWBorderPixel | CWColormap, &attr);
+
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
 
@@ -956,8 +973,13 @@ static void video_window_adapt_size (void) {
     }
   }
   
-  XSelectInput(gGui->video_display, gGui->video_window, INPUT_MOTION | KeymapStateMask);
-
+  if(!(gGui->no_mouse))
+    XSelectInput(gGui->video_display, gGui->video_window, INPUT_MOTION | KeymapStateMask);
+  else
+    XSelectInput(gGui->video_display,
+		 gGui->video_window,
+		 (INPUT_MOTION | KeymapStateMask) & (~(ButtonPressMask | ButtonReleaseMask)));
+  
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input = True;
@@ -1048,12 +1070,12 @@ static void video_window_adapt_size (void) {
 
   if(gGui->video_display == gGui->display)
     gVw->widget_key = xitk_register_event_handler("video_window", 
-						gGui->video_window, 
-						video_window_handle_event,
-						NULL,
-						gui_dndcallback,
-						NULL, NULL);
-
+						  gGui->video_window, 
+						  video_window_handle_event,
+						  NULL,
+						  gui_dndcallback,
+						  NULL, NULL);
+  
   /* take care about window decoration/pos */
   {
     Window tmp_win;
@@ -1996,7 +2018,6 @@ void video_window_change_skins(int synthetic) {
  *
  */
 static void video_window_handle_event (XEvent *event, void *data) {
-
   switch(event->type) {
 
   case DestroyNotify:
@@ -2136,6 +2157,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     break;
     
   }
+
 
 }
 

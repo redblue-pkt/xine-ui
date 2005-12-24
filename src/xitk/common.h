@@ -358,6 +358,9 @@ typedef struct {
   FILE                      *report;
 
   int                        no_gui;
+  
+  int                        no_mouse;
+  int                        wid;
 
   void                     (*nongui_error_msg)(char *text);
 

@@ -103,6 +103,7 @@ typedef struct {
 #define OPTION_LIST_PLUGINS     1012
 #define OPTION_BUG_REPORT       1013
 #define OPTION_NETWORK_PORT     1014
+#define OPTION_NO_MOUSE         1015
 
 
 /* options args */
@@ -116,7 +117,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZD::r:c:ET:I";
+ "u:a:V:A:p::s:RW:G:BN:P:l::S:ZD::r:c:ET:I";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -141,6 +142,7 @@ static struct option long_options[] = {
   {"network"        , no_argument      , 0, 'n'                      },
   {"network-port"   , required_argument, 0,  OPTION_NETWORK_PORT     },
   {"root"           , no_argument      , 0, 'R'                      },
+  {"wid"            , required_argument, 0, 'W'                      },
   {"geometry"       , required_argument, 0, 'G'                      },
   {"borderless"     , no_argument      , 0, 'B'                      },
   {"animation"      , required_argument, 0, 'N'                      },
@@ -159,6 +161,7 @@ static struct option long_options[] = {
   {"broadcast-port" , required_argument, 0, OPTION_BROADCAST_PORT    },
 #endif
   {"no-logo"        , no_argument      , 0, OPTION_NO_LOGO           },
+  {"no-mouse"       , no_argument      , 0, OPTION_NO_MOUSE          },
   {"no-reload"      , no_argument      , 0, 'E'                      },
   {"post"           , required_argument, 0, OPTION_POST              },
   {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
@@ -627,6 +630,7 @@ static void show_usage (void) {
 #endif
   printf(_("  -g, --hide-gui               hide GUI (panel, etc.)\n"));
   printf(_("  -I, --no-gui                 disable GUI\n"));
+  printf(_("      --no-mouse               disable mouse event\n"));
   printf(_("  -H, --hide-video             hide video window\n"));
 #ifdef HAVE_LIRC
   printf(_("  -L, --no-lirc                Turn off LIRC support.\n"));
@@ -643,6 +647,7 @@ static void show_usage (void) {
   printf(_("  -n, --network                Enable network remote control server.\n"));
   printf(_("      --network-port           Specify network server port number.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
+  printf(_("  -W, --wid                    Use a window id.\n"));
   printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
   printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"
@@ -1311,6 +1316,7 @@ int main(int argc, char *argv[]) {
   int                     c = '?', aos    = 0;
   int                     option_index    = 0;
   int                     audio_channel   = -1;
+  int                     window_id       = 0;
   int                     spu_channel     = -1;
   char                   *audio_driver_id = NULL;
   char                   *video_driver_id = NULL;
@@ -1397,6 +1403,8 @@ int main(int argc, char *argv[]) {
   gGui->report                 = stdout;
   gGui->ssaver_enabled         = 1;
   gGui->no_gui                 = 0;
+  gGui->no_mouse               = 0;
+  gGui->wid                    = 0;
   gGui->nongui_error_msg       = NULL;
   
   window_attribute.x     = window_attribute.y      = -8192;
@@ -1422,6 +1430,7 @@ int main(int argc, char *argv[]) {
   while((c = getopt_long(_argc, _argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
+
 
 #ifdef HAVE_LIRC
     case 'L': /* Disable LIRC support */
@@ -1662,7 +1671,6 @@ int main(int argc, char *argv[]) {
 	gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
       break;
 
-
     case OPTION_SK_SERVER:
       gGui->skin_server_url = strdup(optarg);
       break;
@@ -1692,6 +1700,10 @@ int main(int argc, char *argv[]) {
       gGui->display_logo = 0;
       break;
 
+    case OPTION_NO_MOUSE:
+      gGui->no_mouse = 1;
+      break;
+      
     case 'S':
       if(is_remote_running(((session >= 0) ? session : 0)))
 	retval = session_handle_subopt(optarg, &session);
@@ -1817,10 +1829,20 @@ int main(int argc, char *argv[]) {
     case 'I':
       gGui->no_gui = 1;
       break;
-
+    case 'W': /* Select wid */
+      if(optarg != NULL) {
+        sscanf(optarg, "%i", &window_id);
+     	gGui->wid = window_id;
+      } 
+      else {
+	fprintf(stderr, _("window id is required for -wid option\n"));
+	exit(1);
+      }
+      break;
+      
     default:
       show_usage();
-      fprintf (stderr, _("invalid argument %d => exit\n"), c);
+      fprintf(stderr, _("invalid argument %d => exit\n"), c);
       exit(1);
     }
   }
@@ -2163,7 +2185,7 @@ int main(int argc, char *argv[]) {
     vpplugin_rewire_posts();
     applugin_rewire_posts();
   }
-  
+
   gui_run(session_argv);
 
   if(pplugins)
