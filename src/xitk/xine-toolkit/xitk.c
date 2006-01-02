@@ -1344,8 +1344,7 @@ void xitk_xevent_notify(XEvent *event) {
 	    
 	    xitk_send_key_event(w, event);
 	    
-	    if((mykey == XK_Return) || 
-	       (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
+	    if((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
 	      widget_event_t  event;
 	      
 	      event.type = WIDGET_EVENT_PAINT;
@@ -1358,7 +1357,7 @@ void xitk_xevent_notify(XEvent *event) {
 	    return;
 	  }
 	  
-	  /* set focus to next widget */
+	  /* close menu */
 	  if(mykey == XK_Escape) {
 	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
 	      xitk_widget_t *m = xitk_menu_get_menu(w);
@@ -1368,6 +1367,7 @@ void xitk_xevent_notify(XEvent *event) {
 	      return;
 	    }
 	  }
+	  /* set focus to next widget */
 	  else if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
 	    if(fx->widget_list) {
 	      handled = 1;
@@ -1376,9 +1376,11 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  /* simulate click event on space/return/enter key event */
 	  else if((mykey == XK_space) || (mykey == XK_Return) || 
-		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
+		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
 	    if(w && (((w->type & WIDGET_CLICKABLE) && (w->type & WIDGET_KEYABLE))
 		     && w->visible && w->enable)) {
+
+	    __menu_sim_click:
 
 	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
@@ -1405,7 +1407,7 @@ void xitk_xevent_notify(XEvent *event) {
 	      }
 	    }
 	  }
-	  /* move sliders */
+	  /* move sliders, handle menu items */
 	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
 		   || (mykey == XK_Up) || (mykey == XK_Down)
 		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
@@ -1432,18 +1434,32 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	    else if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) 
 			  && (w->type & WIDGET_KEYABLE))) {
+	      handled = 1;
 	      if((mykey == XK_Left) || (mykey == XK_Down) || (mykey == XK_Next)) {
-		handled = 1;
 		xitk_slider_make_backstep(w);
-		xitk_slider_callback_exec(w);
 	      }
 	      else {
-		handled = 1;
 		xitk_slider_make_step(w);
-		xitk_slider_callback_exec(w);
+	      }
+	      xitk_slider_callback_exec(w);
+	    }
+	    else if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
+	      handled = 1;
+	      if(mykey == XK_Left) {
+		/* close menu branch */
+		xitk_menu_destroy_branch(w);
+	      }
+	      else if(mykey == XK_Right) {
+		/* simulate click event: trigger action of menu item (e.g. open submenu) */
+		goto __menu_sim_click; // (goto is bad but simple ...)
+	      }
+	      else {
+		/* next/previous menu item */
+		if(fx->widget_list)
+		  xitk_set_focus_to_next_widget(fx->widget_list,
+						((mykey == XK_Up) || (mykey == XK_Prior)));
 	      }
 	    }
-
 	  }
 	  else if((mykey == XK_0) || (mykey == XK_1) || (mykey == XK_2) || (mykey == XK_3) || 
 		  (mykey == XK_4) || (mykey == XK_5) || (mykey == XK_6) || (mykey == XK_7) || 
@@ -1492,8 +1508,7 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	    
 	    if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && 
-	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) 
-		|| (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter))) {
+	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter))) {
 	      widget_event_t  event;
 	      
 	      event.type = WIDGET_EVENT_PAINT;
@@ -1577,16 +1592,20 @@ void xitk_xevent_notify(XEvent *event) {
 	}
 	  break;
 	  
-	case LeaveNotify:
+	case EnterNotify:
 	  if(fx->widget_list)
-	    xitk_motion_notify_widget_list (fx->widget_list,
-					    event->xmotion.x,
-					    event->xmotion.y, event->xmotion.state);
+	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
+	      xitk_motion_notify_widget_list (fx->widget_list,
+					      event->xcrossing.x,
+					      event->xcrossing.y, event->xcrossing.state);
 	  break;
 	  
-	case FocusOut:
+	case LeaveNotify:
 	  if(fx->widget_list)
-	    xitk_motion_notify_widget_list (fx->widget_list, -1, -1, 0);
+	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
+	      xitk_motion_notify_widget_list (fx->widget_list,
+					      -1,
+					      -1, event->xcrossing.state);
 	  break;
 	  
 	case ButtonPress: {
