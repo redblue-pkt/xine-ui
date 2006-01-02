@@ -75,7 +75,6 @@
 #define INPUT_MOTION                (ExposureMask | ButtonPressMask | ButtonReleaseMask | \
                                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |   \
                                      StructureNotifyMask | PropertyChangeMask |           \
-                                     FocusChangeMask |			                  \
                                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
 #define WINDOW_INFO_ZERO(w)         do {                  \
@@ -2382,6 +2381,7 @@ void xitk_menu_show_menu(xitk_widget_t *w);
 void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me);
 xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
+void xitk_menu_destroy_branch(xitk_widget_t *w);
 void xitk_menu_destroy(xitk_widget_t *w);
 int xitk_menu_show_sub_branchs(xitk_widget_t *w);
 
