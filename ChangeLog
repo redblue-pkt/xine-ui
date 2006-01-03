@@ -1,5 +1,7 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Improved positioning of menu windows and menu navigation by keyboard
+  * Panel window keeps position when toggling gui visibility instead of reset to 0,0
   * OSD improvements in xitk
   * Added zoom function to fbxine (thanks to Mike Lewis <lachlanlewis@gmail.com>)
   * backtrace in debug mode in FreeBSD too
