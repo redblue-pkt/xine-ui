@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2004 the xine project
+ * Copyright (C) 2004-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -29,7 +29,7 @@
 
 #include "_xitk.h"
 
-#define MAX_CURSORS  (xitk_cursor_num_glyphs + 1)
+#define MAX_CURSORS  xitk_cursor_num_glyphs
 
 #define X_CURSOR     0
 #define XITK_CURSOR  1
