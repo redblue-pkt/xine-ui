@@ -25,4 +25,12 @@
 
 #include "utils.h"
 
+#ifndef HAVE_GETLINE
+ssize_t getline(char *lineptr, size_t *n, FILE *f);
+#endif
+
+#ifndef HAVE_GETSUBOPT
+int getsubopt(char **optionp, char * const *keylistp, char **valuep);
+#endif
+
 #endif

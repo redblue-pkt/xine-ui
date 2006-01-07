@@ -9,6 +9,7 @@ xine-ui (0.99.5) unstable; urgency=low
   * followed freedesktop standards (desktop file and icons)
   * support gapless playback while switching streams (requires xine-lib >= 1.1.1)
   * Norwegian Bokmaal translation (thanks to Alexander Nicolaysen Sørnes)
+  * added replacement functions for the GNU extension (fixes FreeBSD and CygWin)
 
 xine-ui (0.99.4) unstable; urgency=low
 

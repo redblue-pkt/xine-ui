@@ -4,6 +4,7 @@ dnl
 
 AC_INIT
 AC_CONFIG_SRCDIR([src/xitk/main.c])
+AC_CONFIG_LIBOBJ_DIR([src/common])
 
 dnl
 dnl Require autoconf version 2.13
@@ -972,6 +973,13 @@ AC_SUBST(DEBUG_CFLAGS)
 
 dnl gcc __attribute__ ((aligned ()))
 AC_C_ATTRIBUTE_ALIGNED
+
+
+dnl
+dnl system function checks (defined _GNU_SOURCE)
+dnl
+AC_DEFINE([_GNU_SOURCE], [], [enable GNU libc extension])
+AC_REPLACE_FUNCS(getline getsubopt strndup)
 
 
 dnl

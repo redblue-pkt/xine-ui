@@ -17,6 +17,8 @@ liboxine_la_SOURCES = \
 	oxine.c \
 	playlist.c \
 	utils.c
+liboxine_la_LIBADD = @XINE_LIBS@
+liboxine_la_DEPENDENCIES = ../../common/libcommon.la
 
 noinst_HEADERS = \
 	list.h \
