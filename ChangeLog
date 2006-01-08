@@ -10,7 +10,7 @@ xine-ui (0.99.5) unstable; urgency=low
   * support gapless playback while switching streams (requires xine-lib >= 1.1.1)
   * Norwegian Bokmaal translation (thanks to Alexander Nicolaysen Sørnes)
   * added replacement functions for the GNU extension (fixes FreeBSD and CygWin)
-    [bugs #1395139, #1393589]
+    [bugs #1395139, #1393589], other portability fixes
   * fixed X_CreateGlyphCursor crash [bugs #1092498, #1235983]
 
 xine-ui (0.99.4) unstable; urgency=low

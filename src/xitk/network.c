@@ -1,6 +1,6 @@
 #warning IMPLEMENT POST SUPPORT
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -56,6 +56,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/signal.h>

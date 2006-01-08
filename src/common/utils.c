@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -34,7 +34,6 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/utsname.h>
-#include <alloca.h>
 
 #ifdef HAVE_X11
 #include <X11/Xlib.h>
