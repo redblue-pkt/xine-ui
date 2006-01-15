@@ -378,15 +378,15 @@ ARCH=`uname -m||arch`
 DISTRO=unknown
 vars UNAME OS ARCH DISTRO
 
-if test -f /etc/debian_version; then
-  DISTRO=Debian
-  DEBIAN_VERSION="`cat /etc/debian_version`"
-  vars DEBIAN_VERSION
-fi
 if test -f /etc/redhat-release; then
   DISTRO=RedHat
   REDHAT_RELEASE="`cat /etc/redhat-release`"
   vars REDHAT_RELEASE
+fi
+if test -f /etc/debian_version; then
+  DISTRO=Debian
+  DEBIAN_VERSION="`cat /etc/debian_version`"
+  vars DEBIAN_VERSION
 fi
 if test -f /etc/VERSION; then
   LINUX_VERSION="`cat /etc/VERSION`"
