@@ -513,7 +513,7 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
 #define CMP          2
 #define LEN          3
 #define ISDIGIT(c)   ((unsigned) (c) - '0' <= 9)
-static int strverscmp(const char *s1, const char *s2) {
+static int my_strverscmp(const char *s1, const char *s2) {
   const unsigned char *p1 = (const unsigned char *) s1;
   const unsigned char *p2 = (const unsigned char *) s2;
   unsigned char c1, c2;
@@ -570,13 +570,13 @@ static int strverscmp(const char *s1, const char *s2) {
 }
 
 /*
- * Wrapper to strverscmp() for qsort() calls, which sort mrl_t type array.
+ * Wrapper to my_strverscmp() for qsort() calls, which sort mrl_t type array.
  */
 static int _sortfiles_default(const fileinfo_t *s1, const fileinfo_t *s2) {
-  return(strverscmp(s1->name, s2->name));
+  return(my_strverscmp(s1->name, s2->name));
 }
 static int _sortfiles_reverse(const fileinfo_t *s1, const fileinfo_t *s2) {
-  return(strverscmp(s2->name, s1->name));
+  return(my_strverscmp(s2->name, s1->name));
 }
 
 static void sort_files(filebrowser_t *fb) {
