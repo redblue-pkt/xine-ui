@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-03 23:23+0100\n"
+"POT-Creation-Date: 2006-01-30 22:36+0100\n"
 "PO-Revision-Date: 2004-12-17 00:53+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -109,10 +109,10 @@ msgstr "Non"
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
+#: src/xitk/xine-toolkit/xitk.h:2249 src/xitk/xine-toolkit/xitk.h:2258
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
+#: src/xitk/xine-toolkit/xitk.h:2252 src/xitk/xine-toolkit/xitk.h:2261
 msgid "Information"
 msgstr "Information"

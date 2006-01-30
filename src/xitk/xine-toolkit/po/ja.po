@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.1-cvs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-03 23:23+0100\n"
+"POT-Creation-Date: 2006-01-30 22:36+0100\n"
 "PO-Revision-Date: 2004-12-14 06:38+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -110,10 +110,10 @@ msgstr "いいえ"
 msgid "Cancel"
 msgstr "取り消し"
 
-#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
+#: src/xitk/xine-toolkit/xitk.h:2249 src/xitk/xine-toolkit/xitk.h:2258
 msgid "Error"
 msgstr "エラー"
 
-#: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
+#: src/xitk/xine-toolkit/xitk.h:2252 src/xitk/xine-toolkit/xitk.h:2261
 msgid "Information"
 msgstr "情報"
