@@ -159,7 +159,7 @@ int fbxine_init_keyboard(void)
 	fbxine.ti_cur.c_cc[VTIME] = 0;
 	fbxine.ti_cur.c_iflag    &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
 							INLCR  | IGNCR  | ICRNL  | IXON);
-	fbxine.ti_cur.c_lflag    &= ~(ECHO | ECHONL | ICANON);
+	fbxine.ti_cur.c_lflag    &= ~(ECHO | ECHONL | ISIG | ICANON);
 	
 	if (tcsetattr(fbxine.tty_fd, TCSAFLUSH, &fbxine.ti_cur) == -1) 
 	{
