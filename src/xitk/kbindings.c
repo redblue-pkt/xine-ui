@@ -511,6 +511,10 @@ static kbinding_entry_t default_binding_table[] = {
     "VDRVolumeMinus",         ACTID_EVENT_VDR_VOLMINUS      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "VDR Audio Mute",
     "VDRMute",                ACTID_EVENT_VDR_MUTE          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+  { "VDR Audio menu",
+    "VDRAudio",               ACTID_EVENT_VDR_AUDIO         , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+  { "VDR Command info",
+    "VDRInfo",                ACTID_EVENT_VDR_INFO          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
 #endif
   { 0,
     0,                        0,                              0,          0              , 0 , 0}

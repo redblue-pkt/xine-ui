@@ -282,6 +282,10 @@ static const struct
 	  "VDRVolumeMinus",         ACTID_EVENT_VDR_VOLMINUS },
 	{ "VDR Audio Mute",
 	  "VDRMute",                ACTID_EVENT_VDR_MUTE },
+	{ "VDR Audio menu",
+	  "VDRAudio",               ACTID_EVENT_VDR_AUDIO },
+	{ "VDR Command info",
+	  "VDRInfo",                ACTID_EVENT_VDR_INFO },
 #endif
 	{ 0,
 		  0, 0 }
