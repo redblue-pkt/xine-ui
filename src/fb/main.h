@@ -29,6 +29,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
+#include <termios.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -53,12 +54,14 @@ struct fbxine
 	xine_t                   *xine;
 	xine_stream_t            *stream;
 	xine_video_port_t        *video_port;
-        xine_audio_port_t        *audio_port;
+	xine_audio_port_t        *audio_port;
 	xine_event_queue_t       *event_queue;
 
-	int tty_fd;
+	int                      tty_fd;
+	struct termios           ti_save;
+	struct termios           ti_cur;
 
-	int lirc_enable;
+	int                      lirc_enable;
 
 	char                     *configfile;
 	

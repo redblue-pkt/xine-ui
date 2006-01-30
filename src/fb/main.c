@@ -202,6 +202,8 @@ static int init_stream(void)
 
 	fbxine.stream = xine_stream_new(fbxine.xine, fbxine.audio_port,
 					fbxine.video_port);
+	xine_set_param(fbxine.stream, XINE_PARAM_VERBOSITY, fbxine.verbosity);
+
 	fbxine.event_queue = xine_event_new_queue(fbxine.stream);  
   
 	xine_event_create_listener_thread(fbxine.event_queue, 

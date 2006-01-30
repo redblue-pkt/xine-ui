@@ -33,24 +33,41 @@
 #include <linux/kd.h>
 #endif
 
-#ifdef HAVE_CURSES_H
-#include <curses.h>
-#endif
-
 #include "keys.h"
+
+#define K_PPAGE ('\033' | ('\133'<<8) | ('\065'<<16) | ('\176'<<24))
+#define K_NPAGE ('\033' | ('\133'<<8) | ('\066'<<16) | ('\176'<<24))
+#define K_UP    ('\033' | ('\133'<<8) | ('\101'<<16))
+#define K_DOWN  ('\033' | ('\133'<<8) | ('\102'<<16))
+#define K_RIGHT ('\033' | ('\133'<<8) | ('\103'<<16))
+#define K_LEFT  ('\033' | ('\133'<<8) | ('\104'<<16))
+#define K_ENTER ('\015')
+#define K_CTRLZ ('\032')
+
+static int do_getc(void)
+{
+	unsigned char c[4];
+	int           n, i, k;
+	
+	n = read(fbxine.tty_fd, c, 4 );
+	for (k = 0, i = 0; i < n; i++)
+		k |= c[i] << (i << 3);
+
+	return k;
+}
 
 static int default_key_action(int key)
 {
 	switch(key)
 	{
-		case KEY_PPAGE: return ACTID_SEEK_REL_p600;
-		case KEY_NPAGE: return ACTID_SEEK_REL_m600;
-		case KEY_UP:    return ACTID_SEEK_REL_p60;
-		case KEY_DOWN:  return ACTID_SEEK_REL_m60;
-		case KEY_RIGHT: return ACTID_SEEK_REL_p10;
-		case KEY_LEFT:  return ACTID_SEEK_REL_m10;
+		case K_PPAGE: return ACTID_SEEK_REL_p600;
+		case K_NPAGE: return ACTID_SEEK_REL_m600;
+		case K_UP:    return ACTID_SEEK_REL_p60;
+		case K_DOWN:  return ACTID_SEEK_REL_m60;
+		case K_RIGHT: return ACTID_SEEK_REL_p10;
+		case K_LEFT:  return ACTID_SEEK_REL_m10;
 
-		case KEY_ENTER: return ACTID_PLAY;
+		case K_ENTER: return ACTID_PLAY;
 
 		case 'q': 
 		case 'Q': return ACTID_QUIT;
@@ -77,9 +94,9 @@ static int default_key_action(int key)
 		case 'S': return ACTID_EVENT_SELECT;
 		case 'i': return ACTID_TOGGLE_INTERLEAVE;
 
-		case 'z':    return ACTID_ZOOM_IN;
-		case 'Z':    return ACTID_ZOOM_OUT;
-		case '\032': return ACTID_ZOOM_RESET; /* This is ^Z */
+		case 'z':     return ACTID_ZOOM_IN;
+		case 'Z':     return ACTID_ZOOM_OUT;
+		case K_CTRLZ: return ACTID_ZOOM_RESET; /* This is ^Z */
 	}
 	
 	return 0;
@@ -89,8 +106,10 @@ static void *fbxine_keyboard_loop(void *dummy)
 {
 	pthread_detach(pthread_self());
 
-	for(;;)
-		do_action(default_key_action(getch()));
+	for(;;) {
+		pthread_testcancel();
+		do_action(default_key_action(do_getc()));
+	}
 	
 	return 0;
 }
@@ -100,7 +119,7 @@ static void exit_keyboard(void)
 	if (fbxine.keyboard_thread)
 		pthread_cancel(fbxine.keyboard_thread);
 
-	endwin();
+	tcsetattr(fbxine.tty_fd, TCSANOW, &fbxine.ti_save);
 
 #ifdef HAVE_LINUX_KD_H
 	if(ioctl(fbxine.tty_fd, KDSETMODE, KD_TEXT) == -1)
@@ -116,17 +135,10 @@ int fbxine_init_keyboard(void)
 	
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_keyboard);
 	fbxine_register_abort(&exit_callback,(fbxine_callback_t)exit_keyboard);
-	
-	initscr();
-	keypad(stdscr, TRUE);
-	cbreak();
-	noecho();
-	intrflush(stdscr, FALSE);
-	meta(stdscr, TRUE);
 
 	fbxine.tty_fd = open("/dev/tty", O_RDWR);
 	if(fbxine.tty_fd == -1)
-        {
+	{
 		perror("Failed to open /dev/tty");
 		return 0;
 	}
@@ -135,9 +147,27 @@ int fbxine_init_keyboard(void)
 	if(ioctl(fbxine.tty_fd, KDSETMODE, KD_GRAPHICS) == -1)
 	{
 		perror("Failed to set /dev/tty to graphics mode");
+		close(fbxine.tty_fd);
 		return 0;
-        }
+	}
 #endif
+
+	tcgetattr(fbxine.tty_fd, &fbxine.ti_save);
+
+	fbxine.ti_cur = fbxine.ti_save;
+	fbxine.ti_cur.c_cc[VMIN]  = 1;
+	fbxine.ti_cur.c_cc[VTIME] = 0;
+	fbxine.ti_cur.c_iflag    &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
+							INLCR  | IGNCR  | ICRNL  | IXON);
+	fbxine.ti_cur.c_lflag    &= ~(ECHO | ECHONL | ICANON);
+	
+	if (tcsetattr(fbxine.tty_fd, TCSAFLUSH, &fbxine.ti_cur) == -1) 
+	{
+		perror("Failed to change terminal attributes");
+		close(fbxine.tty_fd);
+		return 0;
+	}
+
 	pthread_create(&fbxine.keyboard_thread, 0, fbxine_keyboard_loop, 0);
 	return 1;
 }

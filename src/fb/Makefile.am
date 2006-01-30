@@ -2,14 +2,10 @@ AM_CFLAGS = @BUILD_LIB_STATIC@ @XINE_CFLAGS@ -DFONTDIR=\"$(XINE_SKINDIR)/../font
 
 DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @XINE_CFLAGS@
 
-if HAVE_NCURSES
-fb_programs = fbxine
-endif
-
-bin_PROGRAMS = ${fb_programs} 
+bin_PROGRAMS = fbxine 
 
 fbxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
-fbxine_LDADD = @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) -lm $(top_builddir)/src/common/libcommon.la $(NCURSES_LIB)
+fbxine_LDADD = @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) -lm $(top_builddir)/src/common/libcommon.la
 
 fbxine_SOURCES = main.c lirc.c actions.c keys.c options.c callback.c stdctl.c post.c osd.c config_wrapper.c
 noinst_HEADERS = main.h lirc.h actions.h keys.h options.h callback.h stdctl.h post.h osd.h config_wrapper.h
