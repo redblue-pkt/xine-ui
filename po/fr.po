@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-30 22:36+0100\n"
-"PO-Revision-Date: 2004-12-17 21:39+0100\n"
+"POT-Creation-Date: 2006-02-02 23:59+0100\n"
+"PO-Revision-Date: 2006-02-03 00:02+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -93,9 +93,9 @@ msgid "There is no mrl."
 msgstr "Il n'y a aucune mrl."
 
 #: src/xitk/actions.c:1760
-#, fuzzy, c-format
+#, c-format
 msgid "Video post plugins: %s."
-msgstr "Post plugins: %s."
+msgstr "Post plugins vidéo: %s."
 
 #: src/xitk/actions.c:1851
 msgid "Amplification Level"
@@ -106,9 +106,9 @@ msgid "Audio Volume"
 msgstr "Volume Audio"
 
 #: src/xitk/actions.c:1905
-#, fuzzy, c-format
+#, c-format
 msgid "Audio post plugins: %s."
-msgstr "Post plugins: %s."
+msgstr "Post plugins audio: %s."
 
 #: src/xitk/actions.c:1955
 #, c-format
@@ -508,7 +508,7 @@ msgstr "Protocole X synchronisé (debug)"
 #: src/xitk/event.c:1366
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
-msgstr ""
+msgstr "Efectue les transactions X en mode synchrone. Très lent, à n'utiliser que pour debogger!"
 
 #: src/xitk/event.c:1375
 #, c-format
@@ -541,14 +541,15 @@ msgstr "Où les captures seront sauvées"
 
 #: src/xitk/event.c:1408
 msgid "Screensaver reset interval (s)"
-msgstr ""
+msgstr "Interval de remise à zéro de l'économiseur d'écran (s)"
 
 #: src/xitk/event.c:1409
-#, fuzzy
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "Temps entre deux évènements trompeur d'economiseur, 0 pour dévalider."
+msgstr ""
+"Temps, en secondes, entre deux évènements trompeur d'economiseur d'écran "
+"afin de le garder silencieux, 0 pour dévalider."
 
 #: src/xitk/event.c:1416
 msgid "Chapter hopping"
@@ -1231,9 +1232,9 @@ msgid "  -I, --no-gui                 disable GUI\n"
 msgstr "  -I, --no-gui                 dévalide l'interface utilisateur\n"
 
 #: src/xitk/main.c:633
-#, fuzzy, c-format
+#, c-format
 msgid "      --no-mouse               disable mouse event\n"
-msgstr "  -I, --no-gui                 dévalide l'interface utilisateur\n"
+msgstr "      --no-mouse               invalide les évènement de la souris\n"
 
 #: src/xitk/main.c:634
 #, c-format
@@ -1311,11 +1312,9 @@ msgstr ""
 "vidéo.\n"
 
 #: src/xitk/main.c:650
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr ""
-"  -R, --root                   Utilise la fenêtre root pour l'affichage "
-"vidéo.\n"
+msgstr "  -W, --wid                   Utilise l'id de fenêtre.\n"
 
 #: src/xitk/main.c:651
 #, c-format
@@ -1816,9 +1815,9 @@ msgstr ""
 "REPORT.TXT.\n"
 
 #: src/xitk/main.c:1838
-#, fuzzy, c-format
+#, c-format
 msgid "window id is required for -wid option\n"
-msgstr "Nom du pilote video requis pour l'option -V\n"
+msgstr "l'id de la fenêtre est requis avec l'option --wid\n"
 
 #: src/xitk/main.c:1845
 #, c-format
@@ -2189,24 +2188,20 @@ msgid "Audio/Visualization"
 msgstr "Audio/Visualisation"
 
 #: src/xitk/menus.c:696
-#, fuzzy
 msgid "Audio/SEP"
-msgstr "Audio"
+msgstr "Audio/SEP"
 
 #: src/xitk/menus.c:700
-#, fuzzy
 msgid "Audio/Postprocess"
-msgstr "Vidéo/Post-traitement"
+msgstr "Audio/Post-traitement"
 
 #: src/xitk/menus.c:704
-#, fuzzy
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "Vidéo/Post-traitement/Réaction en Chaine..."
+msgstr "Audio/Post-traitement/Réaction en Chaine..."
 
 #: src/xitk/menus.c:708
-#, fuzzy
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "Vidéo/Post-traitement/En fonction"
+msgstr "Audio/Post-traitement/En fonction"
 
 #: src/xitk/menus.c:716 src/xitk/menus.c:929
 msgid "Subtitle/Channel"
@@ -2321,12 +2316,11 @@ msgstr "Déplacer vers le Bas"
 
 #: src/xitk/menus.c:1262
 msgid "Reset video settings"
-msgstr ""
+msgstr "Remise à zéro des paramètres vidéo"
 
 #: src/xitk/menus.c:1269
-#, fuzzy
 msgid "Video Control"
-msgstr "Contrôle"
+msgstr "Contrôle Vidéo"
 
 #: src/xitk/mrl_browser.c:208
 msgid "All extensions"
@@ -2504,17 +2498,15 @@ msgstr "bulle d'aide visible"
 
 #: src/xitk/panel.c:1496
 msgid "If disabled, no tooltips are shown."
-msgstr ""
+msgstr "Si désactivé, pas de bulles d'aides."
 
 #: src/xitk/panel.c:1502
-#, fuzzy
 msgid "Tips timeout (ms)"
-msgstr "timeout des bulles d'aides (ms)"
+msgstr "Timeout des bulles d'aides (ms)"
 
 #: src/xitk/panel.c:1503
-#, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "Temps de persistance de l'OSD, en secondes."
+msgstr "Temps de persistance des bulles d'aide, en millisecondes."
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
@@ -2632,14 +2624,12 @@ msgid "There is no parameter available for this plugin."
 msgstr "Il n'y a aucun paramètre disponible pour ce plugin."
 
 #: src/xitk/post.c:1999
-#, fuzzy
 msgid "Video Chain Reaction"
-msgstr "Réaction en Chaine"
+msgstr "Réaction en Chaine Vidéo"
 
 #: src/xitk/post.c:1999
-#, fuzzy
 msgid "Audio Chain Reaction"
-msgstr "Réaction en Chaine"
+msgstr "Réaction en Chaine Audio"
 
 #: src/xitk/post.c:2046
 msgid "New Filter"
