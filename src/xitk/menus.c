@@ -439,6 +439,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
   xitk_menu_widget_t   menu;
   char                 buffer[2048];
   xitk_widget_t       *w;
+  float                xmag, ymag;
 #ifdef HAVE_XINERAMA
   int                  fullscr_mode = (FULLSCR_MODE | FULLSCR_XI_MODE);
 #else
@@ -639,15 +640,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_aspect, (void *) XINE_VO_ASPECT_DVB                                               },
     { _("Video/200%"),
       menu_get_shortcut("Window200"),
-      (video_window_get_mag() == 2.0) ? "<checked>" : "<check>",
+      (video_window_get_mag(&xmag, &ymag),
+        (xmag == 2.0f && ymag == 2.0f)) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_2X                                                     },
     { _("Video/100%"),
       menu_get_shortcut("Window100"),
-      (video_window_get_mag() == 1.0) ? "<checked>" : "<check>",
+      (video_window_get_mag(&xmag, &ymag),
+        (xmag == 1.0f && ymag == 1.0f)) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_1X                                                     },
     { _("Video/50%"),
       menu_get_shortcut("Window50"),
-      (video_window_get_mag() ==  .5) ? "<checked>" : "<check>",
+      (video_window_get_mag(&xmag, &ymag),
+        (xmag == 0.5f && ymag == 0.5f)) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO__5X                                                    },
     { _("Video/SEP"),
       NULL,

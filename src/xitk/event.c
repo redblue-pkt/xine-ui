@@ -420,8 +420,12 @@ void gui_execute_action_id(action_id_t action) {
       /* Too small window is hard to view or to hit with the mouse. */
 
       video_window_get_output_size(&output_width, &output_height);
-      if(output_width > 50 && output_height > 50)
-	video_window_set_mag(video_window_get_mag() * (1/1.2f));
+      if(output_width > 50 && output_height > 50) {
+	float	xmag, ymag;
+
+	video_window_get_mag(&xmag, &ymag);
+	video_window_set_mag(xmag * (1/1.2f), ymag * (1/1.2f));
+      }
     }
     break;
 
@@ -440,24 +444,28 @@ void gui_execute_action_id(action_id_t action) {
       xitk_get_window_position(gGui->video_display, gGui->video_window,
 			       NULL, NULL, &window_width, &window_height);
       if(output_width < 5000 && output_height < 5000 &&
-	 output_width <= window_width && output_height <= window_height)
-	video_window_set_mag(video_window_get_mag() * 1.2f);
+	 output_width <= window_width && output_height <= window_height) {
+	float	xmag, ymag;
+
+	video_window_get_mag(&xmag, &ymag);
+	video_window_set_mag(xmag * 1.2f, ymag * 1.2f);
+      }
     }
     break;
 
   case ACTID_ZOOM_1_1:
   case ACTID_WINDOW100:
-    if(video_window_set_mag (1.0))
+    if(video_window_set_mag (1.0f, 1.0f))
       osd_display_info(_("Zoom: 1:1"));
     break;
 
   case ACTID_WINDOW200:
-    if(video_window_set_mag (2.0))
+    if(video_window_set_mag (2.0f, 2.0f))
       osd_display_info(_("Zoom: 200%%"));
     break;
 
   case ACTID_WINDOW50:
-    if(video_window_set_mag (0.5))
+    if(video_window_set_mag (0.5f, 0.5f))
       osd_display_info(_("Zoom: 50%%"));
     break;
 

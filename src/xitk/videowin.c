@@ -85,7 +85,6 @@ typedef struct {
   int                    win_height;
   int                    output_width;    /* output video window width/height      */
   int                    output_height;
-  float                  mag;
 
   int                    stream_resize_window; /* Boolean, 1 if new stream resize output window */
   int                    zoom_small_stream; /* Boolean, 1 to double size small streams */
@@ -1089,11 +1088,11 @@ static void video_window_adapt_size (void) {
   oxine_adapt();
 }
 
-static float get_default_mag(int video_width, int video_height) {
+static void get_default_mag(int video_width, int video_height, float *xmag, float *ymag) {
   if(gVw->zoom_small_stream && video_width < 300 && video_height < 300 )
-    return 2.0;
+    *xmag = *ymag = 2.0f;
   else
-    return 1.0;
+    *xmag = *ymag = 1.0f;
 }
 
 /*
@@ -1119,15 +1118,17 @@ void video_window_dest_size_cb (void *data,
     if(gVw->video_width != video_width || gVw->video_height != video_height) {
       
       if((video_width > 0) && (video_height > 0)) {
-        double mag = get_default_mag( video_width, video_height );
+	float xmag, ymag;
+
+        get_default_mag(video_width, video_height, &xmag, &ymag);
 
         /* FIXME: this is supposed to give the same results as if a 
-         * video_window_set_mag(mag) was called. Since video_window_adapt_size()
+         * video_window_set_mag(xmag, ymag) was called. Since video_window_adapt_size()
          * check several other details (like border, xinerama, etc) this
          * may produce wrong values in some cases. (?)
-         */  
-        *dest_width  = (int) ((float) video_width * mag);
-        *dest_height = (int) ((float) video_height * mag);
+         */
+        *dest_width  = (int) ((float) video_width * xmag + 0.5f);
+        *dest_height = (int) ((float) video_height * ymag + 0.5f);
         *dest_pixel_aspect = gGui->pixel_aspect;
         return;
       }
@@ -1195,8 +1196,12 @@ void video_window_frame_output_cb (void *data,
       gVw->video_width  = video_width;
       gVw->video_height = video_height;
       
-      if(video_width > 0 && video_height > 0)
-	video_window_set_mag(get_default_mag( video_width, video_height ));
+      if(video_width > 0 && video_height > 0) {
+	float xmag, ymag;
+
+	get_default_mag(video_width, video_height, &xmag, &ymag);
+	video_window_set_mag(xmag, ymag);
+      }
     }
   }
 
@@ -1783,7 +1788,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   
 #endif
 
-  video_window_set_mag(1.0);
+  video_window_set_mag(1.0f, 1.0f);
 
   /*
    * for plugins that aren't really bind to the window, it's necessary that the
@@ -1926,7 +1931,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
 /*
  * Set/Get magnification.
  */
-int video_window_set_mag(float mag) {
+int video_window_set_mag(float xmag, float ymag) {
   
   if((!(gVw->fullscreen_mode & WINDOWED_MODE))
 #ifdef HAVE_XF86VIDMODE
@@ -1935,21 +1940,19 @@ int video_window_set_mag(float mag) {
      )
     return 0;
   
-  gVw->mag        = mag;
-  gVw->win_width  = (int) ((float) gVw->video_width) * gVw->mag;
-  gVw->win_height = (int) ((float) gVw->video_height) * gVw->mag;
+  gVw->win_width  = (int) ((float) gVw->video_width * xmag + 0.5f);
+  gVw->win_height = (int) ((float) gVw->video_height * ymag + 0.5f);
   
   video_window_adapt_size ();
 
   return 1;
 }
 
-float video_window_get_mag (void) {
+void video_window_get_mag (float *xmag, float *ymag) {
   
   /* compute current mag */
-  gVw->mag = (((float) gVw->output_width / (float) gVw->video_width ) + 
-	      ((float) gVw->output_height / (float) gVw->video_height )) * .5;
-  return gVw->mag;
+  *xmag = (float) gVw->output_width / (float) gVw->video_width; 
+  *ymag = (float) gVw->output_height / (float) gVw->video_height; 
 }
 
 /*

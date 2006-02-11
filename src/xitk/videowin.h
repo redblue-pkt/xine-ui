@@ -77,8 +77,8 @@ void video_window_set_cursor_timer(int timer);
 void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
 
-int video_window_set_mag (float mag);
-float video_window_get_mag (void);
+int video_window_set_mag (float xmag, float ymag);
+void video_window_get_mag (float *xmag, float *ymag);
 
 void video_window_update_logo(void);
 void video_window_change_skins(int);
