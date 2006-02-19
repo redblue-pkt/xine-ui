@@ -1334,8 +1334,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
 	  XUNLOCK(gXitk->display);
 
-	  if(fx->widget_list && (fx->widget_list->widget_under_mouse || fx->widget_list->widget_focused))
-	    xitk_tips_hide_tips();
+	  xitk_tips_hide_tips();
 	  
 	  if(fx->widget_list && fx->widget_list->widget_focused) {
 	    w = fx->widget_list->widget_focused;

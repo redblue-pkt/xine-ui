@@ -104,8 +104,6 @@ static void *_tips_loop_thread(void *data) {
       xitk_register_key_t  key;
       xitk_image_t        *image;
       xitk_font_t         *fs;
-      XWindowAttributes    wattr;
-      Status               status;
       unsigned int         cfore, cback;
       struct timeval       tv;
       struct timespec      ts;
@@ -205,15 +203,8 @@ static void *_tips_loop_thread(void *data) {
       }
       
       XLOCK(tips.display);
-      status = XGetWindowAttributes(tips.display, tips.widget->wl->win, &wattr);
       XMapRaised(tips.display, (xitk_window_get_window(xwin)));
       XUNLOCK(tips.display);
-      
-      if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable)) {
-	XLOCK(tips.display);
-	XSetInputFocus(tips.display, tips.widget->wl->win, RevertToParent, CurrentTime);
-	XUNLOCK(tips.display);
-      }
       
       key = xitk_register_event_handler("xitk tips", 
 					(xitk_window_get_window(xwin)),
