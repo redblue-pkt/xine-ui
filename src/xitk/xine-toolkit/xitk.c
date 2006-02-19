@@ -1533,14 +1533,15 @@ void xitk_xevent_notify(XEvent *event) {
 
 	case Expose:
 	  if (fx->widget_list) {
-	    XEvent xev;
-
-	    xitk_paint_widget_list (fx->widget_list);
+	    XEvent xev = *event;
 
 	    XLOCK(gXitk->display);
 	    while(XCheckTypedWindowEvent(gXitk->display, fx->window, 
 					 Expose, &xev) == True);
 	    XUNLOCK(gXitk->display);
+
+	    if(xev.xexpose.count == 0)
+	      xitk_paint_widget_list(fx->widget_list);
 	  }
 	  break;
 	  
