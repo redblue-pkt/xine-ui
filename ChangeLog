@@ -1,5 +1,6 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixed security issues related to playlist files (thanks to Chris Ries)
   * Improved positioning of menu windows and menu navigation by keyboard
   * Panel window keeps position when toggling gui visibility instead of reset to 0,0
   * OSD improvements in xitk
