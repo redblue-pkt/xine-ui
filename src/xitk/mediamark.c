@@ -547,7 +547,8 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  }
 		}
 		else {
-		  char  buffer[_PATH_MAX + _NAME_MAX + 1];
+		  char  buffer1[_PATH_MAX + _NAME_MAX + 1];
+		  char  buffer2[_PATH_MAX + _NAME_MAX + 1];
 		  char *entry;
 		  
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
@@ -555,16 +556,15 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  entry = ln;
 
 		  if(origin) {
-		    memset(&buffer, 0, sizeof(buffer));
-		    snprintf(buffer, sizeof(buffer), "%s", origin);
+		    snprintf(buffer1, sizeof(buffer1), "%s", origin);
 		    
-		    if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
-		      buffer[strlen(buffer) - 1] = '\0';
+		    if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
+		      buffer1[strlen(buffer1) - 1] = '\0';
 		    
-		    sprintf(buffer, "%s%s", buffer, ln);
+		    snprintf(buffer2, sizeof(buffer2), "%s%s", buffer1, ln);
 		    
-		    if(_file_exist(buffer))
-		      entry = buffer;
+		    if(_file_exist(buffer2))
+		      entry = buffer2;
 		  }
 		    
 		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0, 0);
@@ -644,7 +644,8 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		if(valid_sfv) {
 		  
 		  if(strncmp(ln, ";", 1)) {
-		    char            buffer[_PATH_MAX + _NAME_MAX + 1];
+		    char            buffer1[_PATH_MAX + _NAME_MAX + 1];
+		    char            buffer2[_PATH_MAX + _NAME_MAX + 1];
 		    char           *entry;
 		    long long int   crc = 0;
 		    char           *p;
@@ -675,16 +676,15 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 			entry = ln;
 			
 			if(origin) {
-			  memset(&buffer, 0, sizeof(buffer));
-			  snprintf(buffer, sizeof(buffer), "%s", origin);
+			  snprintf(buffer1, sizeof(buffer1), "%s", origin);
 			  
-			  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
-			    buffer[strlen(buffer) - 1] = '\0';
+			  if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
+			    buffer1[strlen(buffer1) - 1] = '\0';
 			  
-			  sprintf(buffer, "%s%s", buffer, ln);
+			  snprintf(buffer2, sizeof(buffer2), "%s%s", buffer1, ln);
 			  
-			  if(_file_exist(buffer))
-			    entry = buffer;
+			  if(_file_exist(buffer2))
+			    entry = buffer2;
 			}
 			
 			mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
@@ -693,15 +693,15 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		    }
 		  }
 		}
-		else if(strlen(ln) > 1){
+		else if(strlen(ln) > 1) {
 		  long int   size;
 		  int        h, m, s;
 		  int        Y, M, D;
-		  char       fn[_PATH_MAX + _NAME_MAX + 1];
+		  char       fn[2];
 		  char       mon[4];
 		  
-		  if(((sscanf(ln, ";%ld %d:%d.%d %d-%d-%d %s", &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) ||
-		     ((sscanf(ln, ";%ld %3s %d %d:%d:%d %d %s", &size, &mon[0], &D, &h, &m, &s, &Y, &fn[0])) == 8))
+		  if(((sscanf(ln, ";%ld %d:%d.%d %d-%d-%d %1s", &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) ||
+		     ((sscanf(ln, ";%ld %3s %d %d:%d:%d %d %1s", &size, &mon[0], &D, &h, &m, &s, &Y, &fn[0])) == 8))
 		    valid_sfv = 1;
 
 		}		
@@ -753,7 +753,8 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	    if(ln) {
 	      
 	      if((strncmp(ln, ";", 1)) && (strncmp(ln, "#", 1))) {
-		char  buffer[_PATH_MAX + _NAME_MAX + 1];
+		char  buffer1[_PATH_MAX + _NAME_MAX + 1];
+		char  buffer2[_PATH_MAX + _NAME_MAX + 1];
 		char *entry;
 		
 		path = strrchr(filename, '/');
@@ -768,16 +769,15 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		entry = ln;
 
 		if(origin) {
-		  memset(&buffer, 0, sizeof(buffer));
-		  snprintf(buffer, sizeof(buffer), "%s", origin);
+		  snprintf(buffer1, sizeof(buffer1), "%s", origin);
 		  
-		  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
-		    buffer[strlen(buffer) - 1] = '\0';
+		  if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
+		    buffer1[strlen(buffer1) - 1] = '\0';
 		  
-		  sprintf(buffer, "%s%s", buffer, ln);
+		  snprintf(buffer2, sizeof(buffer2), "%s%s", buffer1, ln);
 		  
-		  if(_file_exist(buffer))
-		    entry = buffer;
+		  if(_file_exist(buffer2))
+		    entry = buffer2;
 		}
 		
 		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1, 0, 0);
