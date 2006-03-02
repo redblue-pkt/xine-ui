@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a free video player.
  * 
@@ -83,6 +83,8 @@ typedef struct {
   int                    video_duration_valid; /* is use_duration trustable? */
   int                    win_width;       /* size of non-fullscreen window         */
   int                    win_height;
+  int                    old_win_width;
+  int                    old_win_height;
   int                    output_width;    /* output video window width/height      */
   int                    output_height;
 
@@ -147,11 +149,16 @@ typedef struct {
   int                    second_display_running;
   
   int                    logo_synthetic;
+
+  pthread_mutex_t        mutex;
+
 } gVw_t;
 
 static gVw_t            *gVw;
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (void);
+static int  video_window_check_mag (void);
+static void video_window_calc_mag_win_size (float xmag, float ymag);
 
 static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
   gVw->stream_resize_window = cfg->num_value;
@@ -318,7 +325,9 @@ void video_window_select_visual (void) {
       XLockDisplay (gGui->display);
       gui_init_imlib (gGui->visual);
       XUnlockDisplay (gGui->display);
+      pthread_mutex_lock(&gVw->mutex);
       video_window_adapt_size ();
+      pthread_mutex_unlock(&gVw->mutex);
     }
   }
 }
@@ -844,6 +853,9 @@ static void video_window_adapt_size (void) {
       hint.x           = gVw->old_xwin;
       hint.y           = gVw->old_ywin;
     }
+
+    gVw->old_win_width  = hint.width;
+    gVw->old_win_height = hint.height;
     
     gVw->output_width  = hint.width;
     gVw->output_height = hint.height;
@@ -1103,6 +1115,8 @@ void video_window_dest_size_cb (void *data,
 				double video_pixel_aspect,
 				int *dest_width, int *dest_height,
 				double *dest_pixel_aspect)  {
+
+  pthread_mutex_lock(&gVw->mutex);
   
   gVw->frame_width = video_width;
   gVw->frame_height = video_height;
@@ -1130,6 +1144,7 @@ void video_window_dest_size_cb (void *data,
         *dest_width  = (int) ((float) video_width * xmag + 0.5f);
         *dest_height = (int) ((float) video_height * ymag + 0.5f);
         *dest_pixel_aspect = gGui->pixel_aspect;
+        pthread_mutex_unlock(&gVw->mutex);
         return;
       }
     }
@@ -1144,6 +1159,8 @@ void video_window_dest_size_cb (void *data,
     *dest_height = gVw->output_height;
     *dest_pixel_aspect = gGui->pixel_aspect;
   }
+
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
@@ -1156,6 +1173,8 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
+
+  pthread_mutex_lock(&gVw->mutex);
 
   gVw->frame_width = video_width;
   gVw->frame_height = video_height;
@@ -1183,26 +1202,23 @@ void video_window_frame_output_cb (void *data,
   }
 #endif
 
-  if(gVw->video_width != video_width || gVw->video_height != video_height )
-    oxine_adapt();
+  if(gVw->video_width != video_width || gVw->video_height != video_height) {
 
-  if(!gVw->stream_resize_window) {
     gVw->video_width  = video_width;
     gVw->video_height = video_height;
-  }
-  else {
-    if(gVw->video_width != video_width || gVw->video_height != video_height ) {
-      
-      gVw->video_width  = video_width;
-      gVw->video_height = video_height;
-      
-      if(video_width > 0 && video_height > 0) {
-	float xmag, ymag;
 
-	get_default_mag(video_width, video_height, &xmag, &ymag);
-	video_window_set_mag(xmag, ymag);
-      }
+    if(gVw->stream_resize_window && video_width > 0 && video_height > 0) {
+      float xmag, ymag;
+
+      /* Prepare window size */
+      get_default_mag(video_width, video_height, &xmag, &ymag);
+      video_window_calc_mag_win_size(xmag, ymag);
+      /* If actually ready to adapt window size, do it now */
+      if(video_window_check_mag())
+	video_window_adapt_size();
     }
+
+    oxine_adapt();
   }
 
   *dest_x = 0;
@@ -1222,12 +1238,15 @@ void video_window_frame_output_cb (void *data,
   *win_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
   *win_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
 
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
  *
  */
 void video_window_set_fullscreen_mode (int req_fullscreen) {
+
+  pthread_mutex_lock(&gVw->mutex);
   
   if(!(gVw->fullscreen_mode & req_fullscreen)) {
 
@@ -1255,9 +1274,11 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
   }
 
   video_window_adapt_size();
+
   try_to_set_input_focus(gGui->video_window);
   osd_update_osd();
 
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
@@ -1275,7 +1296,9 @@ int video_window_get_fullscreen_mode (void) {
 void video_window_set_xinerama_fullscreen_mode(int req_fullscreen) {
   gVw->fullscreen_req = req_fullscreen;
 
+  pthread_mutex_lock(&gVw->mutex);
   video_window_adapt_size ();
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
@@ -1362,6 +1385,14 @@ void video_window_set_visibility(int show_window) {
   xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)show_window);
   
   gVw->show = show_window;
+ 
+  /* Switching to visible: If new window size requested meanwhile, adapt window */
+  if((gVw->show) && (gVw->fullscreen_mode & WINDOWED_MODE) &&
+     (gVw->win_width != gVw->old_win_width || gVw->win_height != gVw->old_win_height)) {
+    pthread_mutex_lock(&gVw->mutex);
+    video_window_adapt_size();
+    pthread_mutex_unlock(&gVw->mutex);
+  }
 
   XLockDisplay(gGui->video_display);
   
@@ -1388,7 +1419,6 @@ void video_window_set_visibility(int show_window) {
      && !(gVw->fullscreen_mode & FULLSCR_XI_MODE)
      && wm_not_ewmh_only())
       xitk_set_ewmh_fullscreen(gGui->video_window);
-    
   }
   else
     XUnmapWindow (gGui->video_display, gGui->video_window);
@@ -1442,6 +1472,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 
   gVw = (gVw_t *) xine_xmalloc(sizeof(gVw_t));
   
+  pthread_mutex_init(&gVw->mutex, NULL);
+
   if(gGui->video_display == gGui->display) {
     gVw->wl                 = xitk_widget_list_new();
     xitk_widget_list_set(gVw->wl, WIDGET_LIST_LIST, (xitk_list_new()));
@@ -1706,6 +1738,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
     gVw->video_width  = 768;
     gVw->video_height = 480;
   }
+  gVw->old_win_width  = gVw->win_width  = gVw->video_width;
+  gVw->old_win_height = gVw->win_height = gVw->video_height;
 
 #ifdef HAVE_XF86VIDMODE
   if(xine_config_register_bool(gGui->xine, "gui.use_xvidext", 
@@ -1788,7 +1822,10 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   
 #endif
 
-  video_window_set_mag(1.0f, 1.0f);
+  /*
+   * Create initial video window with the geometry constructed above.
+   */
+  video_window_adapt_size();
 
   /*
    * for plugins that aren't really bind to the window, it's necessary that the
@@ -1862,6 +1899,7 @@ void video_window_exit (void) {
   else
     pthread_join(gVw->second_display_thread, NULL);
 
+  pthread_mutex_destroy(&gVw->mutex);
 }
 
 
@@ -1883,7 +1921,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
   rect.h = 0;
 
   if (xine_port_send_gui_data(gGui->vo_port, 
-			    XINE_GUI_SEND_TRANSLATE_GUI_TO_VIDEO, (void*)&rect) != -1) {
+			      XINE_GUI_SEND_TRANSLATE_GUI_TO_VIDEO, (void*)&rect) != -1) {
     /* driver implements gui->video coordinate space translation, use it */
     *video_x = rect.x;
     *video_y = rect.y;
@@ -1891,6 +1929,8 @@ static int video_window_translate_point(int gui_x, int gui_y,
   }
 
   /* Driver cannot convert gui->video space, fall back to old code... */
+
+  pthread_mutex_lock(&gVw->mutex);
 
   XLockDisplay(gGui->video_display);
   if(XGetGeometry(gGui->video_display, gGui->video_window, &rootwin, 
@@ -1925,25 +1965,50 @@ static int video_window_translate_point(int gui_x, int gui_y,
     /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,*video_x,*video_y);  */
   }
 
+  pthread_mutex_unlock(&gVw->mutex);
+
   return 1;
 }
 
 /*
  * Set/Get magnification.
  */
-int video_window_set_mag(float xmag, float ymag) {
-  
+static int video_window_check_mag(void)
+{
   if((!(gVw->fullscreen_mode & WINDOWED_MODE))
+/*
+ * Currently, no support for magnification in fullscreen mode.
+ * Commented out in order to not mess up current mag for windowed mode.
+ *
 #ifdef HAVE_XF86VIDMODE
      && !(gVw->XF86_modelines_count > 1)
 #endif
-     )
+ */
+    )
     return 0;
   
+  /* Allow mag only if video win is visible, so don't do something we can't see. */
+  return (xitk_is_window_visible(gGui->video_display, gGui->video_window));
+}
+
+static void video_window_calc_mag_win_size(float xmag, float ymag)
+{
   gVw->win_width  = (int) ((float) gVw->video_width * xmag + 0.5f);
   gVw->win_height = (int) ((float) gVw->video_height * ymag + 0.5f);
+}
+
+int video_window_set_mag(float xmag, float ymag) {
   
+  pthread_mutex_lock(&gVw->mutex);
+
+  if (!video_window_check_mag()) {
+    pthread_mutex_unlock(&gVw->mutex);
+    return 0;
+  }
+  video_window_calc_mag_win_size(xmag, ymag);
   video_window_adapt_size ();
+
+  pthread_mutex_unlock(&gVw->mutex);
 
   return 1;
 }
@@ -1951,8 +2016,10 @@ int video_window_set_mag(float xmag, float ymag) {
 void video_window_get_mag (float *xmag, float *ymag) {
   
   /* compute current mag */
+  pthread_mutex_lock(&gVw->mutex);
   *xmag = (float) gVw->output_width / (float) gVw->video_width; 
   *ymag = (float) gVw->output_height / (float) gVw->video_height; 
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
@@ -2136,6 +2203,8 @@ static void video_window_handle_event (XEvent *event, void *data) {
       Window           tmp_win;
       int              h, w;
 
+      pthread_mutex_lock(&gVw->mutex);
+
       h = gVw->output_height;
       w = gVw->output_width;
       gVw->output_width  = cev->width;
@@ -2152,10 +2221,18 @@ static void video_window_handle_event (XEvent *event, void *data) {
         gVw->ywin = cev->y;
       }
 
+      /* Keep geometry memory of windowed mode in sync. */
+      if(gVw->fullscreen_mode & WINDOWED_MODE) {
+	gVw->old_win_width  = gVw->win_width  = gVw->output_width;
+	gVw->old_win_height = gVw->win_height = gVw->output_height;
+      }
+
       if((h != gVw->output_height) || (w != gVw->output_width))
 	osd_update_osd();
 
       oxine_adapt();
+
+      pthread_mutex_unlock(&gVw->mutex);
     }
     break;
     
