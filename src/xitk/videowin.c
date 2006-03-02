@@ -1294,9 +1294,9 @@ int video_window_get_fullscreen_mode (void) {
  * ie: try to expend display on further screens
  */
 void video_window_set_xinerama_fullscreen_mode(int req_fullscreen) {
-  gVw->fullscreen_req = req_fullscreen;
 
   pthread_mutex_lock(&gVw->mutex);
+  gVw->fullscreen_req = req_fullscreen;
   video_window_adapt_size ();
   pthread_mutex_unlock(&gVw->mutex);
 }
@@ -1384,15 +1384,14 @@ void video_window_set_visibility(int show_window) {
 
   xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)show_window);
   
+  pthread_mutex_lock(&gVw->mutex);
+
   gVw->show = show_window;
  
   /* Switching to visible: If new window size requested meanwhile, adapt window */
   if((gVw->show) && (gVw->fullscreen_mode & WINDOWED_MODE) &&
-     (gVw->win_width != gVw->old_win_width || gVw->win_height != gVw->old_win_height)) {
-    pthread_mutex_lock(&gVw->mutex);
+     (gVw->win_width != gVw->old_win_width || gVw->win_height != gVw->old_win_height))
     video_window_adapt_size();
-    pthread_mutex_unlock(&gVw->mutex);
-  }
 
   XLockDisplay(gGui->video_display);
   
@@ -1429,6 +1428,7 @@ void video_window_set_visibility(int show_window) {
   if(gVw->hide_on_start == -1)
     gVw->hide_on_start = 0;
 
+  pthread_mutex_unlock(&gVw->mutex);
 }
 
 /*
