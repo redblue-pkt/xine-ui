@@ -458,7 +458,7 @@ void init_skins_support(void) {
   sk = (skin_num < skins_avail_num) ? skins_avail[skin_num] : NULL;
   
   if(!sk) {
-    xine_error(_("Ooch, skin '%s' not found, use fallback '%s'.\n"), skins_avail[skin_num], 
+    xine_error(_("Ooch, skin '%s' not found, use fallback '%s'.\n"), skins_avail[skin_num]->skin,
 	       (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
     config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
     sk = get_skin_location(DEFAULT_SKIN);
