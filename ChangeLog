@@ -15,6 +15,7 @@ xine-ui (0.99.5) unstable; urgency=low
   * added replacement functions for the GNU extension (fixes FreeBSD and CygWin)
     [bugs #1395139, #1393589], other portability fixes
   * fixed X_CreateGlyphCursor crash [bugs #1092498, #1235983]
+  * fixed support for Xservers with shared images but without shared pixmaps (Xgl)
 
 xine-ui (0.99.4) unstable; urgency=low
 

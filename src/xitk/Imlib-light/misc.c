@@ -144,8 +144,7 @@ Imlib_init(Display * disp)
 	      id->x.last_xim = NULL;
 	      id->x.last_sxim = NULL;
 	      id->max_shm = 0x7fffffff;
-	      if ((XShmPixmapFormat(id->x.disp) == ZPixmap) &&
-		  (pm == True))
+	      if (pm == True && XShmPixmapFormat(id->x.disp) == ZPixmap)
 		id->x.shmp = 1;
 	    }
 	}
@@ -679,8 +678,10 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   id->x.root = DefaultRootWindow(disp);		/* the root window id */
   id->x.visual = DefaultVisual(disp, id->x.screen);	/* the visual type */
   id->x.depth = DefaultDepth(disp, id->x.screen);	/* the depth of the screen in bpp */
+
   id->x.shm = 0;
   id->x.shmp = 0;
+  id->max_shm = 0;
 #ifdef HAVE_SHM
   if (XShmQueryExtension(id->x.disp))
     {
