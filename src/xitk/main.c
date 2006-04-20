@@ -1219,7 +1219,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       }
       
       if(strlen(buffer))
-	report(buffer);
+	report("%s", buffer);
       
     }
     break;
