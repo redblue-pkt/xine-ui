@@ -26,11 +26,11 @@
 
 #include <stdarg.h>
 
-void xine_error(char *message, ...);
+void xine_error(char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
-void xine_error_with_more(char *message, ...);
+void xine_error_with_more(char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
-void xine_info(char *message, ...);
+void xine_info(char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
 void gui_handle_xine_error(xine_stream_t *stream, char *mrl);
 

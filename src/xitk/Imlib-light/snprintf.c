@@ -52,7 +52,7 @@ my_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 }
 
 #ifdef HAVE_STDARGS
-int
+int __attribute__ ((format (printf, 3, 4)))
 my_snprintf(char *str, size_t count, const char *fmt,...)
 #else
 int

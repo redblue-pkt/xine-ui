@@ -2459,7 +2459,7 @@ static void layer_above_video(Window w) {
 }
 static void raise_window(Window window, int visible, int running) {
 }
-static void xine_error(char *message, ...) {
+static void __attribute__ ((format (printf, 1, 2))) xine_error(char *message, ...) {
 }
 static void gui_execute_action_id(action_id_t actid) {
 }

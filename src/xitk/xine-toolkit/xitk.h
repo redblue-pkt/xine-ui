@@ -2218,27 +2218,31 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 int xitk_is_window_size(Display *display, Window window, int width, int height);
 
 xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
-							 int window_width, int align, char *message, ...);
+							 int window_width, int align, char *message, ...)
+							 __attribute__ ((format (printf, 5, 6)));
 
 /*
  *
  */
 xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
 							xitk_state_callback_t cb, void *userdata, 
-							int window_width, int align, char *message, ...);
+							int window_width, int align, char *message, ...)
+							__attribute__ ((format (printf, 8, 9)));
 
 /**
  *
  */
 xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 						xitk_state_callback_t cb, void *userdata, 
-						int window_width, int align, char *message, ...);
+						int window_width, int align, char *message, ...)
+						__attribute__ ((format (printf, 7, 8)));
 
 /**
  *
  */
 xitk_window_t *xitk_window_dialog_ok(ImlibData *im, char *title,
-				     xitk_state_callback_t cb, void *userdata, int align, char *message, ...);
+				     xitk_state_callback_t cb, void *userdata, int align, char *message, ...)
+				     __attribute__ ((format (printf, 6, 7)));
 
 
 #ifdef	__GNUC__
@@ -2271,7 +2275,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 							   xitk_state_callback_t cb2, 
 							   xitk_state_callback_t cb3, 
 							   void *userdata, 
-							   int window_width, int align, char *message, ...);
+							   int window_width, int align, char *message, ...)
+							   __attribute__ ((format (printf, 12, 13)));
 /**
  *
  */
@@ -2280,7 +2285,8 @@ xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *ti
 							 xitk_state_callback_t ncb, 
 							 xitk_state_callback_t ccb, 
 							 void *userdata, 
-							 int window_width, int align, char *message, ...);
+							 int window_width, int align, char *message, ...)
+							 __attribute__ ((format (printf, 9, 10)));
 
 /**
  *
@@ -2289,7 +2295,8 @@ xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
 					      xitk_state_callback_t ycb, 
 					      xitk_state_callback_t ncb, 
 					      xitk_state_callback_t ccb, 
-					      void *userdata, int align, char *message, ...);
+					      void *userdata, int align, char *message, ...)
+					      __attribute__ ((format (printf, 8, 9)));
 
 #ifdef __GNUC__
 #define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, message, args...) \
@@ -2326,7 +2333,8 @@ xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 						   xitk_state_callback_t ycb, 
 						   xitk_state_callback_t ncb, 
 						   void *userdata, 
-						   int window_width, int align, char *message, ...);
+						   int window_width, int align, char *message, ...)
+						   __attribute__ ((format (printf, 8, 9)));
 
 /**
  *
@@ -2334,7 +2342,8 @@ xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, char *title,
 					xitk_state_callback_t ycb, 
 					xitk_state_callback_t ncb, 
-					void *userdata, int align, char *message, ...);
+					void *userdata, int align, char *message, ...)
+					__attribute__ ((format (printf, 7, 8)));
 #ifdef __GNUC__
 #define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) \
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args)

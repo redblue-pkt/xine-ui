@@ -433,7 +433,7 @@ extern gGui_t *gGui;
 
 #endif
 
-static void sock_err(const char *error_msg, ...) {
+static void __attribute__ ((format (printf, 1, 2))) sock_err(const char *error_msg, ...) {
   va_list args;
   
   va_start(args, error_msg);
@@ -540,7 +540,7 @@ static int _sock_write(int socket, char *buf, int len) {
   return wlen;
 }
 
-static int __sock_write(int socket, int cr, char *msg, ...) {
+static int __attribute__ ((format (printf, 3, 4))) __sock_write(int socket, int cr, char *msg, ...) {
   char     buf[_BUFSIZ];
   va_list  args;
   
@@ -629,7 +629,7 @@ static int sock_client(const char *host, const char *service, const char *transp
 #define write_to_console_unlocked_nocr(session, ...) __sock_write(session->console, 0, __VA_ARGS__)
 #endif
 
-static int write_to_console(session_t *session, const char *msg, ...) {
+static int __attribute__ ((format (printf, 2, 3))) write_to_console(session_t *session, const char *msg, ...) {
   char     buf[_BUFSIZ];
   va_list  args;
   int      err;
@@ -646,7 +646,7 @@ static int write_to_console(session_t *session, const char *msg, ...) {
 }
 
 #if 0
-static int write_to_console_nocr(session_t *session, const char *msg, ...) {
+static int __attribute__ ((format (printf, 2, 3)) write_to_console_nocr(session_t *session, const char *msg, ...) {
   char     buf[_BUFSIZ];
   va_list  args;
   int      err;

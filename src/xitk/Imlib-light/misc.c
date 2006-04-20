@@ -18,7 +18,8 @@ extern const char *__XOS2RedirRoot(const char *);
 #ifndef HAVE_SNPRINTF
 #define snprintf my_snprintf
 #ifdef HAVE_STDARGS
-int                 my_snprintf(char *str, size_t count, const char *fmt,...);
+int                 my_snprintf(char *str, size_t count, const char *fmt,...)
+		    __attribute__ ((format (printf, 3, 4)));
 
 #else
 int                 my_snprintf(va_alist);

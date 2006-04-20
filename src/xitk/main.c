@@ -1072,7 +1072,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gGui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
       char                    buffer[8192];
-      void                    (*report)(char *message, ...) = xine_error_with_more;
+      void                    (*report)(char *message, ...)
+				__attribute__ ((format (printf, 1, 2)));
+      
+      report = xine_error_with_more;
 
       memset(&buffer, 0, sizeof(buffer));
       
