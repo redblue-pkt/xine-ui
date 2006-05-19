@@ -546,9 +546,9 @@ static int scale_image( struct prvt_image_s *image )
   int ov_width = image->v_width;
 
   /* new line widths NB scale factor is factored by 32768 for rounding */
-  int ny_width = (oy_width * image->scale_factor) / 32768;
-  int nu_width = (ou_width * image->scale_factor) / 32768;
-  int nv_width = (ov_width * image->scale_factor) / 32768;
+  int ny_width = (oy_width * image->scale_factor + 0x4000) / 32768;
+  int nu_width = (ou_width * image->scale_factor + 0x4000) / 32768;
+  int nv_width = (ov_width * image->scale_factor + 0x4000) / 32768;
 
   /* allocate new buffer space space for post-scaled line buffers */
   n_y = (uint8_t*)png_malloc( image->struct_ptr, ny_width * image->height );
@@ -594,8 +594,8 @@ static int scale_image( struct prvt_image_s *image )
   image->u_width = nu_width;
   image->v_width = nv_width;
 
-#ifdef DEBUG
-  printf("  Post scaled\n    Width %d %d %d\n    Height %d %d %d\n",
+#ifdef DEBUG 
+  fprintf(stderr, "  Post scaled\n    Width %d %d %d\n    Height %d %d %d\n",
     image->width, image->u_width, image->v_width,
     image->height, image->u_height, image->v_height );
 #endif
@@ -877,6 +877,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   int err = 0;
   struct prvt_image_s *image;
   int width, height, ratio_code, format;
+  double aspect, destaspect, scale;
   
 #ifdef DEBUG
   static int	   prof_scale_image = -1;
@@ -941,65 +942,62 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   }
 
 #ifdef DEBUG
-  printf("  width:  %d\n", image->width );
-  printf("  height: %d\n", image->height );
-  printf("  ratio:  " );
+  fprintf (stderr, "  width:  %d\n", image->width );
+  fprintf (stderr, "  height: %d\n", image->height );
 #endif
 
-  switch ( image->ratio_code ) {
+  aspect = image->width / (double) image->height;
+  switch (image->ratio_code) {
     case XINE_VO_ASPECT_SQUARE:
-#ifdef DEBUG
-      printf( "XINE_ASPECT_RATIO_SQUARE\n" ); 
-#endif
-      image->scale_line = scale_line_1_1;
-      image->scale_factor = ( 32768 * 1 ) / 1;
+      destaspect = 0;
+      scale = 1;
       break;
-
     case XINE_VO_ASPECT_4_3:
-#ifdef DEBUG
-      printf( "XINE_ASPECT_RATIO_4_3\n" ); 
-#endif
-      image->scale_line = scale_line_15_16;
-      image->scale_factor = ( 32768 * 16 ) / 15;
+      destaspect = 4 / 3.0;
       break;
-
     case XINE_VO_ASPECT_ANAMORPHIC: 
-#ifdef DEBUG
-      printf( "XINE_ASPECT_RATIO_ANAMORPHIC\n" ); 
-#endif
-      image->scale_line = scale_line_45_64;
-      image->scale_factor = ( 32768 * 64 ) / 45;
+      destaspect = 16 / 9.0;
       break;
-
     case XINE_VO_ASPECT_DVB:      
-#ifdef DEBUG
-      printf( "XINE_ASPECT_RATIO_211_1\n" ); 
-#endif
-      image->scale_line = scale_line_45_64;
-      image->scale_factor = ( 32768 * 64 ) / 45;
+      destaspect = 2.11;
       break;
-
     case XINE_VO_ASPECT_DONT_TOUCH: 
-#ifdef DEBUG
-      printf( "XINE_ASPECT_RATIO_DONT_TOUCH\n" ); 
-#endif
-      image->scale_line = scale_line_1_1;
-      image->scale_factor = ( 32768 * 1 ) / 1;
-      break;
-    default:                
-      /* the mpeg standard has a few that we don't know about */
+    default: 
+      destaspect = 0;
+      scale = 1;
 #ifdef DEBUG
       printf( "Warning: unknown aspect ratio. will assume 1:1\n" ); 
 #endif
+  }
+
+  if (destaspect > 0)
+    scale = destaspect / aspect;
+  /* image->scale_factor = 0x8000 * scale + .5; */
+
+#ifdef DEBUG
+  fprintf(stderr, "  input aspect: %g  output aspect: %g  pixel aspect: %g ",
+	 aspect, destaspect, scale);
+#endif
+      
+  if (scale > 0.99 && scale < 1.01) {
+      image->scale_factor = 0x8000;
       image->scale_line = scale_line_1_1;
-      image->scale_factor = ( 32768 * 1 ) / 1;
-      break;
+  } else if (scale > 1.06 && scale < 1.075) {
+      image->scale_line = scale_line_15_16;
+      image->scale_factor = 0x8000 * 16 / 15;
+  } else if (scale > 1.41 && scale < 1.43) {
+      image->scale_line = scale_line_45_64;
+      image->scale_factor = 0x8000 * 64 / 45;
+  } else {
+      fprintf (stderr, "*** Scale image not implemented for destination aspect %g:1, pixel aspect %g:1\n*** Using pixel aspect 1:1\n", destaspect, scale);
+      image->scale_factor = 0x8000;
+      image->scale_line = scale_line_1_1;
   }
 
 #ifdef DEBUG
   printf("  format: " );
 #endif
- 
+
   switch ( image->format ) {
     case XINE_IMGFMT_YV12:
 #ifdef DEBUG
