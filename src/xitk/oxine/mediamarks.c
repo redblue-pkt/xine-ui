@@ -718,7 +718,7 @@ void mediamarks_cb (void *data) {
   snprintf(mmpath,sizeof(mmpath),"%s/.xine/oxine/mediamarks", xine_get_homedir());
   if (!read_mediamarks(items, mmpath)) {
     lprintf("trying to load system wide mediamarks\n");
-    snprintf(mmpath,1024,"%s/mediamarks", XINE_OXINEDIR);
+    snprintf(mmpath,sizeof(mmpath),"%s/mediamarks", XINE_OXINEDIR);
     if (read_mediamarks(items, mmpath)) {
       bpush(session->backpath, items);
       oxine->reentry_data = session;

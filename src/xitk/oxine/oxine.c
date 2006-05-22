@@ -534,7 +534,7 @@ static void main_menu_init(oxine_t *oxine)
   snprintf(mmpath,sizeof(mmpath),"%s/.xine/oxine/mainmenu", xine_get_homedir());
   if (!read_main_menu(oxine, oxine->main_menu_items, mmpath)) {
     lprintf("trying to load system wide mainmenu\n");
-    snprintf(mmpath,1024,"%s/mainmenu", XINE_OXINEDIR);
+    snprintf(mmpath, sizeof(mmpath),"%s/mainmenu", XINE_OXINEDIR);
     if (read_main_menu(oxine, oxine->main_menu_items, mmpath)) {
       /**/
     } else {
