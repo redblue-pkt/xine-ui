@@ -380,7 +380,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      sprintf(buffer+strlen(buffer), _("%sVideo Codec: %s (%s)\n"), NULL,
+      sprintf(buffer+strlen(buffer), _("%sVideo Codec: %s (%s)\n"), "",
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
 	      (get_fourcc_string(vfcc)));
     }
@@ -391,7 +391,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      sprintf(buffer+strlen(buffer),  _("%sAudio Codec: %s (%s)\n"), NULL,
+      sprintf(buffer+strlen(buffer),  _("%sAudio Codec: %s (%s)\n"), "",
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
 	      (get_fourcc_string(afcc)));
     }
@@ -405,7 +405,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     if(!gGui->play_anyway) {
       xitk_window_t *xw;
 
-      sprintf(buffer+strlen(buffer), _("%s\nStart playback anyway ?\n"), NULL);
+      sprintf(buffer+strlen(buffer), _("%s\nStart playback anyway ?\n"), "");
       
       play_data.stream             = stream;
       play_data.start_pos          = start_pos;
