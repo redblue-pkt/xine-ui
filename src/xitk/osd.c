@@ -372,40 +372,38 @@ void osd_stream_infos(void) {
       y += h;
     }
     
-    memset(&buffer, 0, sizeof(buffer));
-
-    snprintf(buffer, sizeof(buffer), "%s", _("Audio: "));
+    strcpy(buffer, _("Audio: "));
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
-      sprintf(buffer, "%s%s", buffer, "off");
+      strcat(buffer, "off");
       break;
     case -1:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%s%s", buffer, "auto");
+	strcat(buffer, "auto");
       break;
     default:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%s%3d", buffer, audiochannel);
+	sprintf(buffer+strlen(buffer), "%3d", audiochannel);
       break;
     }
 
-    sprintf(buffer, "%s%s", buffer, ", Spu: ");
+    strcat(buffer, ", Spu: ");
     len = strlen(buffer);
     switch (spuchannel) {
     case -2:
-      sprintf(buffer, "%s%s", buffer, "off");
+      strcat(buffer, "off");
       break;
     case -1:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-	sprintf(buffer, "%s%s", buffer, "auto");
+	strcat(buffer, "auto");
       break;
     default:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-        sprintf(buffer, "%s%3d", buffer, spuchannel);
+        sprintf(buffer+strlen(buffer), "%3d", spuchannel);
       break;
     }
-    sprintf(buffer, "%s.", buffer);
+    strcat(buffer, ".");
     xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)
@@ -424,12 +422,12 @@ void osd_stream_infos(void) {
       int totaldays;
       
       totaldays  = totaltime / (3600 * 24);
-      sprintf(buffer, "%s(%.0f%%) %s ", buffer, ((float)playedtime / (float)totaltime) * 100, _("of"));
+      sprintf(buffer+strlen(buffer), "(%.0f%%) %s ", ((float)playedtime / (float)totaltime) * 100, _("of"));
       
       if(totaldays > 0)
-	sprintf(buffer, "%s%d::%02d", buffer, totaldays, totaltime / 3600);
+	sprintf(buffer+strlen(buffer), "%d::%02d", totaldays, totaltime / 3600);
       else
-	sprintf(buffer, "%s%d:%02d:%02d", buffer, totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
+	sprintf(buffer+strlen(buffer), "%d:%02d:%02d", totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
     }
     
     xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);

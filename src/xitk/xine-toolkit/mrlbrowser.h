@@ -59,7 +59,7 @@
   if((s)->origin) {                                                           \
     if((d)->origin) {                                                         \
       (d)->origin = (char *) realloc((d)->origin, strlen((s)->origin) + 1);   \
-      sprintf((d)->origin, "%s", (s)->origin);                                \
+      strcpy((d)->origin, (s)->origin);                                	      \
     }                                                                         \
     else                                                                      \
       (d)->origin = strdup((s)->origin);                                      \
@@ -70,7 +70,7 @@
   if((s)->mrl) {                                                              \
     if((d)->mrl) {                                                            \
       (d)->mrl = (char *) realloc((d)->mrl, strlen((s)->mrl) + 1);            \
-      sprintf((d)->mrl, "%s", (s)->mrl);                                      \
+      strcpy((d)->mrl, (s)->mrl);                                      	      \
     }                                                                         \
     else                                                                      \
       (d)->mrl = strdup((s)->mrl);                                            \
@@ -81,7 +81,7 @@
   if((s)->link) {                                                             \
     if((d)->link) {                                                           \
       (d)->link = (char *) realloc((d)->link, strlen((s)->link) + 1);         \
-      sprintf((d)->link, "%s", (s)->link);                                    \
+      strcpy((d)->link, (s)->link);                                    	      \
     }                                                                         \
     else                                                                      \
       (d)->link = strdup((s)->link);                                          \

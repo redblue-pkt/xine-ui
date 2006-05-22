@@ -260,16 +260,16 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
       len += strlen(aalbum) + 3;
     
     ident = (char *) xine_xmalloc(len + 1);
-    sprintf(ident, "%s", atitle);
+    strcpy(ident, atitle);
     
     if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {
       strcat(ident, " (");
       if(aartist && strlen(aartist))
-	sprintf(ident, "%s%s", ident, aartist);
+	strcat(ident, aartist);
       if((aartist && strlen(aartist)) && (aalbum && strlen(aalbum)))
 	strcat(ident, " - ");
       if(aalbum && strlen(aalbum))
-	sprintf(ident, "%s%s", ident, aalbum);
+	strcat(ident, aalbum);
       strcat(ident, ")");
     }
   }

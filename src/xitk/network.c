@@ -551,7 +551,7 @@ static int __attribute__ ((format (printf, 3, 4))) __sock_write(int socket, int 
   /* Each line sent is '\n' terminated */
   if(cr) {
     if((buf[strlen(buf)] == '\0') && (buf[strlen(buf) - 1] != '\n'))
-      sprintf(buf, "%s%c", buf, '\n');
+      strcat(buf, "\n");
   }
   
   return _sock_write(socket, buf, strlen(buf));
@@ -747,15 +747,15 @@ static void client_help(session_t *session, session_commands_t *command, const c
   while(session_commands[i]->command != NULL) {
     if(session_commands[i]->enable) {
       if((curpos + maxlen) >= 80) {
-	sprintf(buf, "%s\n       ", buf);
+	strcat(buf, "\n       ");
 	curpos = 7;
       }
       
-      sprintf(buf, "%s%s", buf, session_commands[i]->command);
+      strcat(buf, session_commands[i]->command);
       curpos += strlen(session_commands[i]->command);
       
       for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
-	sprintf(buf, "%s ", buf);
+	strcat(buf, " ");
 	curpos++;
       }
     }
@@ -1109,13 +1109,13 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
   int i;
   char buf[_BUFSIZ];
   
-  memset(&buf, 0, sizeof(buf));
+  buf[0] = 0;
 
   for(i = 0; i < num_commands; i++) {
-    if(strlen(buf))
-      sprintf(buf, "%s %s", buf, commands[i]);
+    if(buf[0])
+      sprintf(buf+strlen(buf), " %s", commands[i]);
     else
-      snprintf(buf, sizeof(buf), "%s", commands[i]);
+      strcpy(buf, commands[i]);
   }
 
   client_handle_command(session, buf);
@@ -1663,8 +1663,7 @@ static void set_command_line(client_info_t *client_info, char *line) {
 
     client_info->command.line = (char *) realloc(client_info->command.line, strlen(line) + 1);
     
-    memset(client_info->command.line, 0, sizeof(client_info->command.line));
-    sprintf(client_info->command.line, "%s", line);
+    strcpy(client_info->command.line, line);
 
   }
 }
@@ -1705,16 +1704,15 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
   int i = 0;
   char buf[_BUFSIZ];
 
-  memset(&buf, 0, sizeof(buf));
-  snprintf(buf, sizeof(buf), "%s", COMMANDS_PREFIX);
+  strcpy(buf, COMMANDS_PREFIX);
   
   while(commands[i].command != NULL) {
     if(commands[i].public) {
-      sprintf(buf, "%s\t%s", buf, commands[i].command);
+      sprintf(buf+strlen(buf), "\t%s", commands[i].command);
     }
     i++;
   }
-  sprintf(buf, "%s.\n", buf);
+  strcat(buf, ".\n");
   sock_write(client_info->socket, buf);
 }
 
@@ -1745,22 +1743,22 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     while(commands[i].command != NULL) {
       if(commands[i].public) {
 	if((curpos + maxlen) >= 80) {
-	  sprintf(buf, "%s\n       ", buf);
+	  strcat(buf, "\n       ");
 	  curpos = 7;
 	}
 	
-	sprintf(buf, "%s%s", buf, commands[i].command);
+	strcat(buf, commands[i].command);
 	curpos += strlen(commands[i].command);
 	
 	for(j = 0; j < (maxlen - strlen(commands[i].command)); j++) {
-	  sprintf(buf, "%s ", buf);
+	  strcat(buf, " ");
 	  curpos++;
 	}
       }
       i++;
     }
     
-    sprintf(buf, "%s\n", buf);
+    strcat(buf, "\n");
     sock_write(client_info->socket, buf);
   }
   else {
@@ -2088,22 +2086,22 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	char buf[64];
 	int  status;
 
-	snprintf(buf, sizeof(buf), "%s", "Current status: ");
+	strcpy(buf, "Current status: ");
 	status = xine_get_status(gGui->stream);
 	
 	if(status <= XINE_STATUS_QUIT)
-	  sprintf(buf, "%s%s", buf, status_struct[status].name);
+	  strcat(buf, status_struct[status].name);
 	else
-	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
+	  strcat(buf, "*UNKNOWN*");
 	
-	sprintf(buf, "%s%c", buf, '\n');
+	strcat(buf, "\n");
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
 	int  speed = -1, i;
 	
-	snprintf(buf, sizeof(buf), "%s", "Current speed: ");
+	strcpy(buf, "Current speed: ");
 	speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
 
 	for(i = 0; speeds_struct[i].name != NULL; i++) {
@@ -2112,11 +2110,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 	
 	if(i < ((sizeof(speeds_struct) / sizeof(speeds_struct[0])) - 1))
-	  sprintf(buf, "%s%s", buf, speeds_struct[i].name);
+	  strcat(buf, speeds_struct[i].name);
 	else
-	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
+	  strcat(buf, "*UNKNOWN*");
 	
-	sprintf(buf, "%s%c", buf, '\n');
+	strcat(buf, "\n");
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "position")) {
@@ -2150,26 +2148,26 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 
 	switch(gGui->playlist.loop) {
 	case PLAYLIST_LOOP_NO_LOOP:
-	  sprintf(buf, "%s%s", buf, "'No Loop'");
+	  strcat(buf, "'No Loop'");
 	  break;
 	case PLAYLIST_LOOP_LOOP:
-	  sprintf(buf, "%s%s", buf, "'Loop'");
+	  strcat(buf, "'Loop'");
 	  break;
 	case PLAYLIST_LOOP_REPEAT:
-	  sprintf(buf, "%s%s", buf, "'Repeat'");
+	  strcat(buf, "'Repeat'");
 	  break;
 	case PLAYLIST_LOOP_SHUFFLE:
-	  sprintf(buf, "%s%s", buf, "'Shuffle'");
+	  strcat(buf, "'Shuffle'");
 	  break;
 	case PLAYLIST_LOOP_SHUF_PLUS:	
-	  sprintf(buf, "%s%s", buf, "'Shuffle forever'");
+	  strcat(buf, "'Shuffle forever'");
 	  break;
 	default:
-	  sprintf(buf, "%s%s", buf, "'!!Unknown!!'");
+	  strcat(buf, "'!!Unknown!!'");
 	  break;
 	}
 
-	sprintf(buf, "%s.\n", buf);
+	strcat(buf, ".\n");
 	sock_write(client_info->socket, buf);
       }
     }
@@ -2638,11 +2636,11 @@ static void parse_destock_remain(client_info_t *client_info) {
 	p++;
       
       if(p)
-	snprintf(remaining, sizeof(remaining), "%s", (_atoa(p)));
+	strcpy(remaining, (_atoa(p)));
       
       client_info->command.line = (char *) realloc(client_info->command.line, sizeof(char *) * (strlen(c) + 1));
       
-      sprintf(client_info->command.line, "%s", c);
+      strcpy(client_info->command.line, c);
       
       if(p) {
 	/* remove last ';' */
@@ -2657,7 +2655,7 @@ static void parse_destock_remain(client_info_t *client_info) {
 	if(strlen(remaining)) {
 	  client_info->command.remain = (char *) realloc(client_info->command.remain, 
 							 sizeof(char *) * (strlen(remaining) + 1));
-	  sprintf(client_info->command.remain, "%s", remaining);
+	  strcpy(client_info->command.remain, remaining);
 	}
 	else {
 	  SAFE_FREE(client_info->command.remain);
@@ -2673,7 +2671,7 @@ static void parse_destock_remain(client_info_t *client_info) {
       client_info->command.line = (char *) realloc(client_info->command.line, 
 						   sizeof(char *) * (strlen(client_info->command.remain) + 1));
       
-      sprintf(client_info->command.line, "%s", client_info->command.remain);
+      strcpy(client_info->command.line, client_info->command.remain);
       
       SAFE_FREE(client_info->command.remain);
     }
@@ -2768,7 +2766,7 @@ static void parse_command(client_info_t *client_info) {
 	  if((*(pcmd - 1) != '\\') && (get_quote == 0)) {
 
 	  __end_args:
-	    sprintf(client_info->command.args[nargs], "%s", _atoa(buf));
+	    strcpy(client_info->command.args[nargs], _atoa(buf));
 	    nargs++;
 	    memset(&buf, 0, sizeof(buf));
 	    pb = buf;
@@ -2794,8 +2792,7 @@ static void parse_command(client_info_t *client_info) {
   else {
     client_info->command.command = (char *) realloc(client_info->command.command, strlen(client_info->command.line) + 1);
     
-    memset(client_info->command.command, 0, sizeof(client_info->command.command));
-    sprintf(client_info->command.command, "%s", client_info->command.line);
+    strcpy(client_info->command.command, client_info->command.line);
   }
 
 #if 0

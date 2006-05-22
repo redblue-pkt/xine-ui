@@ -338,7 +338,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(lbl) + 1);
     
     old_old_src = strdup(private_data->last_mrl_source);
-    sprintf(private_data->last_mrl_source, "%s", lbl);
+    strcpy(private_data->last_mrl_source, lbl);
 
     {
       int num_mrls;
@@ -347,7 +347,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 					       NULL, &num_mrls);
       if(!mtmp) {
 	private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
-	sprintf(private_data->last_mrl_source, "%s", old_old_src);
+	strcpy(private_data->last_mrl_source, old_old_src);
 	return;
       }
       

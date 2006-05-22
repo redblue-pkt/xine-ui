@@ -115,7 +115,7 @@ static void xitk_config_fonts(xitk_config_t *xtcf) {
       xtcf->fonts.fallback = strdup(c);
     else if(!strncasecmp(p, "system", 6)) {
       xtcf->fonts.system = (char *) realloc(xtcf->fonts.system, (strlen(c) + 1));
-      sprintf(xtcf->fonts.system, "%s", c);
+      strcpy(xtcf->fonts.system, c);
     }
     else if(!strncasecmp(p, "xmb", 3)) {
       xtcf->fonts.xmb = ((strtol(c, &c, 10)) >= 1) ? 1 : 0;
@@ -488,7 +488,7 @@ xitk_config_t *xitk_config_init(void) {
     sprintf(rcfile, "%s/.xine/%s", xitk_get_homedir(), user_rc);
     if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
       rcfile = (char *) realloc(rcfile, (strlen(SYSTEM_RC) + 1));
-      sprintf(rcfile, "%s", SYSTEM_RC);
+      strcpy(rcfile, SYSTEM_RC);
       if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
         XITK_FREE(rcfile);
         rcfile = NULL;

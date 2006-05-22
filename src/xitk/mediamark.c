@@ -1122,10 +1122,10 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		  
 		if(atitle && strlen(atitle)) {
 		  real_title = (char *) xine_xmalloc(len);
-		  sprintf(real_title, "%s", atitle);
+		  strcpy(real_title, atitle);
 		    
 		  if(aauthor && strlen(aauthor))
-		    sprintf(real_title, "%s (%s)", real_title, aauthor);
+		    sprintf(real_title+strlen(real_title), " (%s)", aauthor);
 		}
 		  
 		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));

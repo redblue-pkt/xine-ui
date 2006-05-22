@@ -52,7 +52,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     if((strlen(private_data->label)) > private_data->length)
       sprintf(_label, "%s *** %s", private_data->label, private_data->label);
     else
-      sprintf(_label, "%s", private_data->label);
+      strcpy(_label, private_data->label);
     
   }
   else

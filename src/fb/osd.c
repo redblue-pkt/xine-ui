@@ -305,7 +305,7 @@ void osd_update_status(void) {
     switch(status) {
     case XINE_STATUS_IDLE:
     case XINE_STATUS_STOP:
-      sprintf(buffer, "%s", (_osd_get_status_sym(status)));
+      strcpy(buffer, (_osd_get_status_sym(status)));
       break;
       
     case XINE_STATUS_PLAY:
@@ -320,7 +320,7 @@ void osd_update_status(void) {
 		  secs / (60*60), (secs / 60) % 60, secs % 60);
 	}
 	else
-	  sprintf(buffer, "%s", (_osd_get_speed_sym(speed)));
+	  strcpy(buffer, (_osd_get_speed_sym(speed)));
       }
       break;
       
@@ -392,34 +392,34 @@ void osd_stream_infos(void) {
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
-      sprintf(buffer, "%soff", buffer);
+      strcat(buffer, "off");
       break;
     case -1:
       if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%sauto", buffer);
+	strcat(buffer, "auto");
       break;
     default:
       if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%s%3d", buffer, audiochannel);
+	sprintf(buffer+strlen(buffer), "%3d", audiochannel);
       break;
     }
 
-    sprintf(buffer, "%s, Spu: ", buffer);
+    strcat(buffer, ", Spu: ");
     len = strlen(buffer);
     switch (spuchannel) {
     case -2:
-      sprintf(buffer, "%soff", buffer);
+      strcat(buffer, "off");
       break;
     case -1:
       if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
-	sprintf(buffer, "%sauto", buffer);
+	strcat(buffer, "auto");
       break;
     default:
       if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
-        sprintf(buffer, "%s%3d", buffer, spuchannel);
+        sprintf(buffer+strlen(buffer), "%3d", spuchannel);
       break;
     }
-    sprintf(buffer, "%s.", buffer);
+    strcat(buffer, ".");
     xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
     if(w > osdw)

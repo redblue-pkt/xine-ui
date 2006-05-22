@@ -605,7 +605,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	  else {
 	    len += 2;
 	    kmsg = (char *) realloc(kmsg, strlen(kmsg) + len + 1);
-	    sprintf(kmsg, "%s%s%s%c%s%c%s", kmsg, ", ", action1, ' ', dna, ' ', action2);
+	    sprintf(kmsg+strlen(kmsg), "%s%s%c%s%c%s", ", ", action1, ' ', dna, ' ', action2);
 	  }
 	}
       }
@@ -617,7 +617,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
     char          *footer = _(".\n\nWhat do you want to do ?\n");
     
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
-    sprintf(kmsg, "%s%s", kmsg, footer);
+    strcat(kmsg, footer);
 
     dump_error(gGui->verbosity, kmsg);
 
@@ -1018,15 +1018,14 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
     for(k = kbt->entry, i = 0; k[i]->action != NULL; i++) {
       if(!k[i]->is_alias) {
 	sprintf(buf, "# %s\n", k[i]->comment);
-	sprintf(buf, "%sbegin\n", buf);
-	sprintf(buf, "%s\tremote = xxxxx\n", buf);
-	sprintf(buf, "%s\tbutton = xxxxx\n", buf);
-	sprintf(buf, "%s\tprog   = xine\n", buf);
-	sprintf(buf, "%s\trepeat = 0\n", buf);
-	sprintf(buf, "%s\tconfig = %s\n", buf, k[i]->action);
-	sprintf(buf, "%send\n\n", buf);
+	strcat(buf, "begin\n");
+	strcat(buf, "\tremote = xxxxx\n");
+	strcat(buf, "\tbutton = xxxxx\n");
+	strcat(buf, "\tprog   = xine\n");
+	strcat(buf, "\trepeat = 0\n");
+	sprintf(buf+strlen(buf), "\tconfig = %s\n", k[i]->action);
+	strcat(buf, "end\n\n");
 	fputs(buf, stream);
-	memset(&buf, 0, sizeof(buf));
       }
     }
     fprintf(stream, "##\n# End of xine key bindings.\n##\n");
@@ -1041,31 +1040,30 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
       snprintf(buf, sizeof(buf), "# %s\n", k[i]->comment);
 
       if(k[i]->is_alias) {
-	sprintf(buf, "%sAlias {\n", buf);
-	sprintf(buf, "%s\tentry = %s\n", buf, k[i]->action);
+	strcat(buf, "Alias {\n");
+	sprintf(buf+strlen(buf), "\tentry = %s\n", k[i]->action);
       }
       else
-	sprintf(buf, "%s%s {\n", buf, k[i]->action);
+	sprintf(buf+strlen(buf), "%s {\n", k[i]->action);
 
-      sprintf(buf, "%s\tkey = %s\n", buf, k[i]->key);
-      sprintf(buf, "%s%s", buf, "\tmodifier = ");
+      sprintf(buf+strlen(buf), "\tkey = %s\n", k[i]->key);
+      strcat(buf, "\tmodifier = ");
       if(k[i]->modifier == KEYMOD_NOMOD)
-	sprintf(buf, "%s%s, ", buf, "none");
+	strcat(buf, "none, ");
       if(k[i]->modifier & KEYMOD_CONTROL)
-	sprintf(buf, "%s%s, ", buf, "control");
+	strcat(buf, "control, ");
       if(k[i]->modifier & KEYMOD_META)
-	sprintf(buf, "%s%s, ", buf, "meta");
+	strcat(buf, "meta, ");
       if(k[i]->modifier & KEYMOD_MOD3)
-	sprintf(buf, "%s%s, ", buf, "mod3");
+	strcat(buf, "mod3, ");
       if(k[i]->modifier & KEYMOD_MOD4)
-	sprintf(buf, "%s%s, ", buf, "mod4");
+	strcat(buf, "mod4, ");
       if(k[i]->modifier & KEYMOD_MOD5)
-	sprintf(buf, "%s%s, ", buf, "mod5");
+	strcat(buf, "mod5, ");
       buf[strlen(buf) - 2] = '\n';
       buf[strlen(buf) - 1] = '\0';
-      sprintf(buf, "%s%s", buf, "}\n\n");
+      strcat(buf, "}\n\n");
       fprintf(stream, "%s", buf);
-      memset(&buf, 0, sizeof(buf));
     }
     fprintf(stream, "##\n# End of xine key bindings.\n##\n");
     break;
@@ -1274,34 +1272,34 @@ static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
   static char shortcut[32];
 
   if(kbe) {
-    memset(&shortcut, 0, sizeof(shortcut));
+    shortcut[0] = 0;
     
     if(gGui->shortcut_style == 0) {
       if(kbe->modifier & KEYMOD_CONTROL)
-	sprintf(shortcut, "%s%s+", shortcut, _("Ctrl"));
+	sprintf(shortcut+strlen(shortcut), "%s+", _("Ctrl"));
       if(kbe->modifier & KEYMOD_META)
-	sprintf(shortcut, "%s%s+", shortcut, _("Alt"));
+	sprintf(shortcut+strlen(shortcut), "%s+", _("Alt"));
       if(kbe->modifier & KEYMOD_MOD3)
-	sprintf(shortcut, "%s%s+", shortcut, "M3");
+	strcat(shortcut, "M3+");
       if(kbe->modifier & KEYMOD_MOD4)
-	sprintf(shortcut, "%s%s+", shortcut, "M4");
+	strcat(shortcut, "M4+");
       if(kbe->modifier & KEYMOD_MOD5)
-	sprintf(shortcut, "%s%s+", shortcut, "M5");
+	strcat(shortcut, "M5+");
     }
     else {
       if(kbe->modifier & KEYMOD_CONTROL)
-	sprintf(shortcut, "%s%s-", shortcut, "C");
+	strcat(shortcut, "C-");
       if(kbe->modifier & KEYMOD_META)
-	sprintf(shortcut, "%s%s-", shortcut, "M");
+	strcat(shortcut, "M-");
       if(kbe->modifier & KEYMOD_MOD3)
-	sprintf(shortcut, "%s%s-", shortcut, "M3");
+	strcat(shortcut, "M3-");
       if(kbe->modifier & KEYMOD_MOD4)
-	sprintf(shortcut, "%s%s-", shortcut, "M4");
+	strcat(shortcut, "M4-");
       if(kbe->modifier & KEYMOD_MOD5)
-	sprintf(shortcut, "%s%s-", shortcut, "M5");
+	strcat(shortcut, "M5-");
     }
     
-    sprintf(shortcut, "%s%s", shortcut, kbe->key);
+    strcat(shortcut, kbe->key);
     
     return shortcut;
   }
@@ -1852,7 +1850,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     
   case KBEDIT_EDITING:
     kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe->key) + 1));
-    sprintf(kbedit->ksel->key, "%s", kbe->key);
+    strcpy(kbedit->ksel->key, kbe->key);
     kbedit->ksel->modifier = kbe->modifier;
     
     kbedit_create_browser_entries();
@@ -2493,26 +2491,26 @@ int main(int argc, char **argv) {
 	memset(&buf, 0, sizeof(buf));
 	
 	if(k[i]->modifier & KEYMOD_CONTROL)
-	  sprintf(buf, "%s", "\\fBC\\fP");
+	  strcpy(buf, "\\fBC\\fP");
 	if(k[i]->modifier & KEYMOD_META) {
-	  if(strlen(buf))
-	    sprintf(buf, "%s%s", buf, "\\-");
-	  sprintf(buf, "%s%s", buf, "\\fBM\\fP");
+	  if(buf[0])
+	    strcat(buf, "\\-");
+	  strcat(buf, "\\fBM\\fP");
 	}
 	if(k[i]->modifier & KEYMOD_MOD3) {
-	  if(strlen(buf))
-	    sprintf(buf, "%s%s", buf, "\\-");
-	  sprintf(buf, "%s%s", buf, "\\fBM3\\fP");
+	  if(buf[0])
+	    strcat(buf, "\\-");
+	  strcat(buf, "\\fBM3\\fP");
 	}
 	if(k[i]->modifier & KEYMOD_MOD4) {
-	  if(strlen(buf))
-	    sprintf(buf, "%s%s", buf, "\\-");
-	  sprintf(buf, "%s%s", buf, "\\fBM4\\fP");
+	  if(buf[0])
+	    strcat(buf, "\\-");
+	  strcat(buf, "\\fBM4\\fP");
 	}
 	if(k[i]->modifier & KEYMOD_MOD5) {
-	  if(strlen(buf))
-	    sprintf(buf, "%s%s", buf, "\\-");
-	  sprintf(buf, "%s%s", buf, "\\fBM5\\fP");
+	  if(buf[0])
+	    strcat(buf, "\\-");
+	  strcat(buf, "\\fBM5\\fP");
 	}
 	printf("%s\\-", buf);
       }

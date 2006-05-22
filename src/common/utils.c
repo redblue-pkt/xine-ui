@@ -190,11 +190,11 @@ int mkdir_safe(char *path) {
   memset(&buf, 0, sizeof(buf));
   memset(&buf2, 0, sizeof(buf2));
   
-  sprintf(buf, "%s", path);
+  strcpy(buf, path);
   pp = buf;
   while((p = xine_strsep(&pp, "/")) != NULL) {
     if(p && strlen(p)) {
-      sprintf(buf2, "%s/%s", buf2, p);
+      sprintf(buf2+strlen(buf2), "/%s", p);
       if(!_mkdir_safe(buf2))
 	return 0;
     }

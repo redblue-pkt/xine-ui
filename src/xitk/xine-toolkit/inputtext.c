@@ -1014,7 +1014,7 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
 	    
 	    private_data->text = (char *) realloc(private_data->text, strlen(oldtext) + 3);
 
-	    sprintf(private_data->text, "%s", oldtext);
+	    strcpy(private_data->text, oldtext);
 	    sprintf(&private_data->text[pos], "%c%s", buf[0], &oldtext[pos]);
 	    private_data->text[strlen(private_data->text)] = '\0';
 	    free(oldtext);
@@ -1027,7 +1027,8 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
 	else {
 	  private_data->text = (char *) xitk_xmalloc(2);
 	  
-	  sprintf(private_data->text, "%c%c", buf[0], 0);
+	  private_data->text[0] = buf[0];
+	  private_data->text[1] = 0;
 	  
 	  private_data->cursor_pos++;
 	  paint_inputtext(w);
