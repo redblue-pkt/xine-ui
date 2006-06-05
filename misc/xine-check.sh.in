@@ -434,7 +434,7 @@ case "$OS" in
 
       # MTRR support
       case "$ARCH" in
-        i?86|k6|k7|athlon)
+        i?86|k6|k7|athlon|x86_64)
 	  msg arch-i386-mtrr
 	  if test -f /proc/mtrr; then
 	    if [ `wc -l </proc/mtrr` -lt 2 ]; then
