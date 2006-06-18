@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2005-11-20 22:57+0000\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
@@ -341,10 +341,6 @@ msgstr ""
 "\n"
 "Uhåndterbar feil\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Åpner Mozilla-nettleseren. Dette kan ta litt tid . . ."
@@ -731,7 +727,6 @@ msgstr "Vinkel +"
 msgid "Angle -"
 msgstr "Vinkel -"
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "Meny 1"
@@ -951,7 +946,6 @@ msgstr "Trykk på tastene . . ."
 msgid "Event receiver window"
 msgstr "Hendelsesmottakervindu"
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr "Godta?"
@@ -1826,7 +1820,6 @@ msgstr "Spillelistefilen «%s» er ugyldig.\n"
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Klarte ikke lagre spillelisten «%s»: %s.\n"
 
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr "Mediamerke-redigerer"
@@ -2200,7 +2193,6 @@ msgstr "xine %s"
 msgid "Open/Subtitle..."
 msgstr "Åpne/Teksting . . ."
 
-#. Save Playlist
 #: src/xitk/menus.c:819
 msgid "Playlist/Save..."
 msgstr "Spilleliste/Lagre . . ."
@@ -2756,8 +2748,6 @@ msgstr "«prvt_image_alloc» feilet\n"
 msgid "Framegrabber failed\n"
 msgstr "Bildegriperen feilet\n"
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr "Støttes ikke får denne videovisningsdriveren\n"
@@ -2794,7 +2784,6 @@ msgstr "Skrev til fil: "
 msgid "xine Splash"
 msgstr "xine-oppstartsbilde"
 
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr "Strøminformasjon"

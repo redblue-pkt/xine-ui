@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -350,10 +350,6 @@ msgstr ""
 "\n"
 "!! Нерозп╕знана помилка !!\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr ""
@@ -738,7 +734,6 @@ msgstr ""
 msgid "Angle -"
 msgstr ""
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr ""
@@ -965,7 +960,6 @@ msgstr ""
 msgid "Event receiver window"
 msgstr ""
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr ""
@@ -1756,7 +1750,6 @@ msgstr ""
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr ""
 
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr ""
@@ -2166,7 +2159,6 @@ msgid "Open/Subtitle..."
 msgstr ""
 
 # src/xitk/panel.c:832
-#. Save Playlist
 #: src/xitk/menus.c:819
 #, fuzzy
 msgid "Playlist/Save..."
@@ -2789,8 +2781,6 @@ msgstr ""
 msgid "Framegrabber failed\n"
 msgstr ""
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr ""
@@ -2834,7 +2824,6 @@ msgstr "Файл '%s' записан.\n"
 msgid "xine Splash"
 msgstr "Налаштування xine"
 
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr ""

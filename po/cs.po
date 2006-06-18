@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.24\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2004-12-12 00:58+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -343,10 +343,6 @@ msgstr ""
 "\n"
 "!! Neznámá chyba !!\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Otevírá se webový prohlí¾eè mozilla, mù¾e to chvíli trvat..."
@@ -736,7 +732,6 @@ msgstr "Úhel +"
 msgid "Angle -"
 msgstr "Úhel -"
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "Volba 1"
@@ -963,7 +958,6 @@ msgstr "Tisknìte klávesy..."
 msgid "Event receiver window"
 msgstr "Okno pro pøíjem událostí"
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr "Pøijmout?"
@@ -1844,7 +1838,6 @@ msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Nelze ulo¾it playlist (%s): %s.\n"
 
 # window title
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr "Editor zálo¾ek"
@@ -2218,7 +2211,6 @@ msgstr "xine %s"
 msgid "Open/Subtitle..."
 msgstr "Otevøít/Titulky..."
 
-#. Save Playlist
 #: src/xitk/menus.c:819
 msgid "Playlist/Save..."
 msgstr "Playlist/Ulo¾it..."
@@ -2783,8 +2775,6 @@ msgstr "prvt_image_alloc selhalo\n"
 msgid "Framegrabber failed\n"
 msgstr "Framegrabber selhal\n"
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr "Není podporováno tímto výstupním ovladaèem videa\n"
@@ -2822,7 +2812,6 @@ msgid "xine Splash"
 msgstr "Úvodní obrázek xine"
 
 # window title
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr "Informace o datech"

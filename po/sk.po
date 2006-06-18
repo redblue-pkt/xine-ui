@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2004-05-07 23:16+0000\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -335,10 +335,6 @@ msgstr ""
 "\n"
 "!! Neo¹etrená chyba !!\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr ""
@@ -714,7 +710,6 @@ msgstr "Uhol +"
 msgid "Angle -"
 msgstr "Uhol -"
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "Menú 1"
@@ -933,7 +928,6 @@ msgstr "Stlaète klávesy ..."
 msgid "Event receiver window"
 msgstr "Okno príjemcu udalostí"
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr "Akceptova»?"
@@ -1801,7 +1795,6 @@ msgstr "Súbor playlistu (%s) je neplatný.\n"
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Nie je mo¾né ulo¾i» playlist (%s): %s.\n"
 
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr "Mediamark Editor"
@@ -2179,7 +2172,6 @@ msgstr "xine %s"
 msgid "Open/Subtitle..."
 msgstr "Otvori»/Titulky..."
 
-#. Save Playlist
 #: src/xitk/menus.c:819
 msgid "Playlist/Save..."
 msgstr "Playlist/Ulo¾i»..."
@@ -2741,8 +2733,6 @@ msgstr "prvt_image_alloc zlyhal\n"
 msgid "Framegrabber failed\n"
 msgstr "Framegrabber zlyhal\n"
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr "Nepodporovaný pre tento video out ovládaè\n"
@@ -2782,7 +2772,6 @@ msgstr "Súbor '%s' ulo¾ený.\n"
 msgid "xine Splash"
 msgstr "xine %s"
 
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr "Informácie o prúde"

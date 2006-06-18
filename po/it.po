@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2006-06-07 21:19+0200\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
@@ -346,10 +346,6 @@ msgstr ""
 "\n"
 "!! Errore non gestito !!\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Apertura del browser mozilla, può richiedere del tempo..."
@@ -747,7 +743,6 @@ msgstr "Angolo +"
 msgid "Angle -"
 msgstr "Angolo -"
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "Menu 1"
@@ -965,7 +960,6 @@ msgstr "Premi un tasto..."
 msgid "Event receiver window"
 msgstr "Finestra di ricezione eventi"
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr "Accetti?"
@@ -1867,7 +1861,6 @@ msgstr "Il file playlist (%s) non è valido.\n"
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Impossibile salvare playlist (%s): %s.\n"
 
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr "Editor dei marcatori di Media"
@@ -2237,7 +2230,6 @@ msgstr "xine %s"
 msgid "Open/Subtitle..."
 msgstr "Apri/Sottotitolo..."
 
-#. Save Playlist
 #: src/xitk/menus.c:819
 msgid "Playlist/Save..."
 msgstr "Playlist/Salva..."
@@ -2793,8 +2785,6 @@ msgstr "prvt_image_alloc non riuscito\n"
 msgid "Framegrabber failed\n"
 msgstr "Framegrabber non riuscito\n"
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr "Non supportato per questo driver di output video\n"
@@ -2831,7 +2821,6 @@ msgstr "File scritto: "
 msgid "xine Splash"
 msgstr "Splash di xine"
 
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr "Informazioni stream"

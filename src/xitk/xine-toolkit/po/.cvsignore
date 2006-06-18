@@ -2,3 +2,6 @@ Makefile
 Makefile.in
 *.gmo
 POTFILES
+Makefile
+Makefile.in
+POTFILES

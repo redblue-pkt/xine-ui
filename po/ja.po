@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.1-cvs\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-07 21:25+0100\n"
+"Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
+"POT-Creation-Date: 2006-06-18 23:42+0200\n"
 "PO-Revision-Date: 2005-01-07 06:56+0900\n"
 "Last-Translator: Satoru SATOH <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -340,10 +340,6 @@ msgstr ""
 "\n"
 "!! 未処理のエラー !!\n"
 
-#.
-#. * fixme: how to properly open the system browser?
-#. * should we just make it configurable?
-#.
 #: src/xitk/errors.c:317
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "mozilla ブラウザを開いています. しばらく御待ち下さい..."
@@ -722,7 +718,6 @@ msgstr "角度 +"
 msgid "Angle -"
 msgstr "角度 -"
 
-#. Initialize menu labels
 #: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "メニュー 1"
@@ -942,7 +937,6 @@ msgstr "キーボードのキーを押してください..."
 msgid "Event receiver window"
 msgstr "イベント受信ウィンドウ"
 
-#. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1979
 msgid "Accept?"
 msgstr "受理しますか?"
@@ -1816,7 +1810,6 @@ msgstr "再生リストファイル (%s) は無効なものです\n"
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "再生リスト (%s) を保存できません: %s\n"
 
-#. Create window
 #: src/xitk/mediamark.c:3245
 msgid "Mediamark Editor"
 msgstr "メディアマークエディタ"
@@ -2190,7 +2183,6 @@ msgstr "xine %s"
 msgid "Open/Subtitle..."
 msgstr "開く/字幕..."
 
-#. Save Playlist
 #: src/xitk/menus.c:819
 msgid "Playlist/Save..."
 msgstr "再生リスト/保存..."
@@ -2750,8 +2742,6 @@ msgstr "prvt_image_alloc 失敗\n"
 msgid "Framegrabber failed\n"
 msgstr "Framegrabber 失敗\n"
 
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:939
 msgid "Not supported for this video out driver\n"
 msgstr "この動画出力ドライバはサポートされていません\n"
@@ -2788,7 +2778,6 @@ msgstr "書き込みファイル: "
 msgid "xine Splash"
 msgstr "xine スプラッシュ"
 
-#. Create window
 #: src/xitk/stream_infos.c:492
 msgid "Stream Information"
 msgstr "ストリーム情報"

@@ -100,16 +100,8 @@ dnl
 dnl NLS Support
 dnl
 dnl AM_WITH_NLS(use-libtool,,)
-dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
-ALL_LINGUAS="fr es pt_BR de sk pl uk cs it ja eu ru nb"
-AM_GNU_GETTEXT(use-libtool, need-ngettext)
+AM_GNU_GETTEXT(external)
 AC_PROG_GMSGFMT_PLURAL
-AC_CONFIG_LINKS($nls_cv_header_libgt, $nls_cv_header_intl)
-AM_CONDITIONAL(INCLUDED_INTL, test x$USE_INCLUDED_LIBINTL = "xyes")
-if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
-   INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
-fi
-dnl AC_SUBST(INTLDIR)
 
 
 dnl
@@ -813,7 +805,7 @@ case "$host_or_hostalias" in
         case "$host_or_hostalias" in
 	*-*-cygwin) 
           enable_w32dll="no" 
-	  LDFLAGS="-no-undefined @INTLLIBS@ $LDFLAGS"
+	  LDFLAGS="-no-undefined $LDFLAGS"
 	  ;;
 	esac
     else
@@ -1104,7 +1096,6 @@ dnl
 AC_CONFIG_FILES([
 Makefile
 m4/Makefile
-intl/Makefile
 src/Makefile
 src/common/Makefile
 src/xitk/Makefile

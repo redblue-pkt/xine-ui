@@ -72,7 +72,7 @@ xine_LDADD = @XINE_LIBS@ \
 xine_remote_SOURCES = xine-remote.c
 xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la \
 			   xine-remote.c
-xine_remote_LDADD = $(INTLLIBS) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
+xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
 	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
 session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
