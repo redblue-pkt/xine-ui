@@ -1,35 +1,8 @@
 # For updating this file, look at the result of:
-#  $ head -n 3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] | grep -v src/xitk/session_ctrl.c >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
+#  head -n 3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] --exclude '*/session_ctrl.c' | sed -e 's:^\./::' >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
-src/xitk/actions.c
-src/xitk/config_wrapper.c
-src/xitk/control.c
-src/xitk/download.c
-src/xitk/errors.c
-src/xitk/event.c
-src/xitk/event_sender.c
-src/xitk/file_browser.c
-src/xitk/help.c
-src/xitk/i18n.h
-src/xitk/kbindings.c
-src/xitk/lang.c
-src/xitk/lirc.c
-src/xitk/main.c
-src/xitk/mediamark.c
-src/xitk/menus.c
-src/xitk/mrl_browser.c
-src/xitk/osd.c
-src/xitk/panel.c
-src/xitk/playlist.c
-src/xitk/post.c
-src/xitk/session.c
-src/xitk/setup.c
-src/xitk/skins.c
-src/xitk/snapshot.c
-src/xitk/splash.c
-src/xitk/stdctl.c
-src/xitk/stream_infos.c
-src/xitk/tvout.c
-src/xitk/tvset.c
-src/xitk/videowin.c
-src/xitk/viewlog.c
+src/xitk/xine-toolkit/mrlbrowser.c
+src/xitk/xine-toolkit/test.c
+src/xitk/xine-toolkit/window.c
+src/xitk/xine-toolkit/xitk.h
+src/xitk/xine-toolkit/xitkintl.h
