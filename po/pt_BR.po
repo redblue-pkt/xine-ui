@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-18 23:42+0200\n"
+"POT-Creation-Date: 2006-06-19 00:24+0200\n"
 "PO-Revision-Date: 2004-05-07 23:16+0000\n"
 "Last-Translator: Lucas Clemente Vella <lvella@triang.com.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
@@ -255,6 +255,7 @@ msgid "Download progress: %d%%."
 msgstr "Progresso do download: %d%%."
 
 #: src/xitk/errors.c:68 src/xitk/errors.c:352 src/xitk/kbindings.c:2248
+#: src/xitk/kbindings_man.c:2248
 msgid "Done"
 msgstr "Feito"
 
@@ -792,7 +793,8 @@ msgstr "Fechar"
 msgid "Apply"
 msgstr "Aplicar"
 
-#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:626 src/xitk/skins.c:1208
+#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:626
+#: src/xitk/kbindings_man.c:626 src/xitk/skins.c:1208
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -858,7 +860,7 @@ msgid "Rename"
 msgstr "Renomear"
 
 #: src/xitk/file_browser.c:1547 src/xitk/kbindings.c:2204
-#: src/xitk/menus.c:1213
+#: src/xitk/kbindings_man.c:2204 src/xitk/menus.c:1213
 msgid "Delete"
 msgstr "Apagar"
 
@@ -879,11 +881,11 @@ msgstr "Ajuda"
 msgid "No Help Section Available"
 msgstr "Nenhuma descrição disponível"
 
-#: src/xitk/kbindings.c:587
+#: src/xitk/kbindings.c:587 src/xitk/kbindings_man.c:587
 msgid "and"
 msgstr ""
 
-#: src/xitk/kbindings.c:600
+#: src/xitk/kbindings.c:600 src/xitk/kbindings_man.c:600
 #, fuzzy
 msgid ""
 "The following key bindings pairs are identical:\n"
@@ -892,63 +894,64 @@ msgstr ""
 "Esta associação de teclas é redundante com a ação:\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:617
+#: src/xitk/kbindings.c:617 src/xitk/kbindings_man.c:617
 msgid ""
 ".\n"
 "\n"
 "What do you want to do ?\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:625
+#: src/xitk/kbindings.c:625 src/xitk/kbindings_man.c:625
 msgid "Keybindings error!"
 msgstr "Erro de assossiação de teclas"
 
 #: src/xitk/kbindings.c:626 src/xitk/kbindings.c:2234
+#: src/xitk/kbindings_man.c:626 src/xitk/kbindings_man.c:2234
 msgid "Reset"
 msgstr "Reiniciar"
 
-#: src/xitk/kbindings.c:626
+#: src/xitk/kbindings.c:626 src/xitk/kbindings_man.c:626
 msgid "Editor"
 msgstr ""
 
-#: src/xitk/kbindings.c:1009
+#: src/xitk/kbindings.c:1009 src/xitk/kbindings_man.c:1009
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: A tabela de associação de teclas é nula.\n"
 
-#: src/xitk/kbindings.c:1279
+#: src/xitk/kbindings.c:1279 src/xitk/kbindings_man.c:1279
 #, fuzzy
 msgid "Ctrl"
 msgstr "Ctr"
 
-#: src/xitk/kbindings.c:1281
+#: src/xitk/kbindings.c:1281 src/xitk/kbindings_man.c:1281
 msgid "Alt"
 msgstr ""
 
-#: src/xitk/kbindings.c:1605
+#: src/xitk/kbindings.c:1605 src/xitk/kbindings_man.c:1605
 msgid "Nothing selected"
 msgstr "Nada Selecionado"
 
-#: src/xitk/kbindings.c:1606
+#: src/xitk/kbindings.c:1606 src/xitk/kbindings_man.c:1606
 msgid "None"
 msgstr "Nenhum"
 
-#: src/xitk/kbindings.c:1779
+#: src/xitk/kbindings.c:1779 src/xitk/kbindings_man.c:1779
 msgid "You can only delete alias entries."
 msgstr "Você só pode apagar entradas de nome alternativo."
 
-#: src/xitk/kbindings.c:1915
+#: src/xitk/kbindings.c:1915 src/xitk/kbindings_man.c:1915
 msgid "Press Keyboard Keys..."
 msgstr "Pessione Teclas do Teclado..."
 
-#: src/xitk/kbindings.c:1928
+#: src/xitk/kbindings.c:1928 src/xitk/kbindings_man.c:1928
 msgid "Event receiver window"
 msgstr "Janela recebedora de eventos"
 
-#: src/xitk/kbindings.c:1979
+#: src/xitk/kbindings.c:1979 src/xitk/kbindings_man.c:1979
 msgid "Accept?"
 msgstr "Aceita?"
 
-#: src/xitk/kbindings.c:1983
+#: src/xitk/kbindings.c:1983 src/xitk/kbindings_man.c:1983
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -957,7 +960,7 @@ msgstr ""
 "Guarda %s como\n"
 "associação de tecla '%s'?"
 
-#: src/xitk/kbindings.c:1989
+#: src/xitk/kbindings.c:1989 src/xitk/kbindings_man.c:1989
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -966,55 +969,57 @@ msgstr ""
 "Esta associação de teclas é redundante com a ação:\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:2086
+#: src/xitk/kbindings.c:2086 src/xitk/kbindings_man.c:2086
 msgid "key binding editor"
 msgstr "editor de associação de teclas"
 
-#: src/xitk/kbindings.c:2117
+#: src/xitk/kbindings.c:2117 src/xitk/kbindings_man.c:2117
 msgid "Binding action"
 msgstr "Ação da associação"
 
-#: src/xitk/kbindings.c:2123
+#: src/xitk/kbindings.c:2123 src/xitk/kbindings_man.c:2123
 msgid "Key"
 msgstr "Tecla"
 
-#: src/xitk/kbindings.c:2128
+#: src/xitk/kbindings.c:2128 src/xitk/kbindings_man.c:2128
 msgid "Modifiers"
 msgstr "Modificadores"
 
-#: src/xitk/kbindings.c:2174
+#: src/xitk/kbindings.c:2174 src/xitk/kbindings_man.c:2174
 msgid "Alias"
 msgstr "Nome alternativo"
 
-#: src/xitk/kbindings.c:2189 src/xitk/menus.c:1211
+#: src/xitk/kbindings.c:2189 src/xitk/kbindings_man.c:2189
+#: src/xitk/menus.c:1211
 msgid "Edit"
 msgstr "Editar"
 
-#: src/xitk/kbindings.c:2219 src/xitk/playlist.c:422 src/xitk/playlist.c:1222
+#: src/xitk/kbindings.c:2219 src/xitk/kbindings_man.c:2219
+#: src/xitk/playlist.c:422 src/xitk/playlist.c:1222
 msgid "Save"
 msgstr "Salvar"
 
-#: src/xitk/kbindings.c:2314
+#: src/xitk/kbindings.c:2314 src/xitk/kbindings_man.c:2314
 msgid "ctrl"
 msgstr ""
 
-#: src/xitk/kbindings.c:2338
+#: src/xitk/kbindings.c:2338 src/xitk/kbindings_man.c:2338
 msgid "meta"
 msgstr ""
 
-#: src/xitk/kbindings.c:2362
+#: src/xitk/kbindings.c:2362 src/xitk/kbindings_man.c:2362
 msgid "mod3"
 msgstr ""
 
-#: src/xitk/kbindings.c:2386
+#: src/xitk/kbindings.c:2386 src/xitk/kbindings_man.c:2386
 msgid "mod4"
 msgstr ""
 
-#: src/xitk/kbindings.c:2410
+#: src/xitk/kbindings.c:2410 src/xitk/kbindings_man.c:2410
 msgid "mod5"
 msgstr ""
 
-#: src/xitk/kbindings.c:2421
+#: src/xitk/kbindings.c:2421 src/xitk/kbindings_man.c:2421
 msgid "Grab"
 msgstr "Trazer"
 

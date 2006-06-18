@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-18 23:42+0200\n"
+"POT-Creation-Date: 2006-06-19 00:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -250,6 +250,7 @@ msgid "Download progress: %d%%."
 msgstr ""
 
 #: src/xitk/errors.c:68 src/xitk/errors.c:352 src/xitk/kbindings.c:2248
+#: src/xitk/kbindings_man.c:2248
 msgid "Done"
 msgstr ""
 
@@ -742,7 +743,8 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:626 src/xitk/skins.c:1208
+#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:626
+#: src/xitk/kbindings_man.c:626 src/xitk/skins.c:1208
 msgid "Cancel"
 msgstr ""
 
@@ -808,7 +810,7 @@ msgid "Rename"
 msgstr ""
 
 #: src/xitk/file_browser.c:1547 src/xitk/kbindings.c:2204
-#: src/xitk/menus.c:1213
+#: src/xitk/kbindings_man.c:2204 src/xitk/menus.c:1213
 msgid "Delete"
 msgstr ""
 
@@ -828,134 +830,137 @@ msgstr ""
 msgid "No Help Section Available"
 msgstr ""
 
-#: src/xitk/kbindings.c:587
+#: src/xitk/kbindings.c:587 src/xitk/kbindings_man.c:587
 msgid "and"
 msgstr ""
 
-#: src/xitk/kbindings.c:600
+#: src/xitk/kbindings.c:600 src/xitk/kbindings_man.c:600
 msgid ""
 "The following key bindings pairs are identical:\n"
 "\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:617
+#: src/xitk/kbindings.c:617 src/xitk/kbindings_man.c:617
 msgid ""
 ".\n"
 "\n"
 "What do you want to do ?\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:625
+#: src/xitk/kbindings.c:625 src/xitk/kbindings_man.c:625
 msgid "Keybindings error!"
 msgstr ""
 
 #: src/xitk/kbindings.c:626 src/xitk/kbindings.c:2234
+#: src/xitk/kbindings_man.c:626 src/xitk/kbindings_man.c:2234
 msgid "Reset"
 msgstr ""
 
-#: src/xitk/kbindings.c:626
+#: src/xitk/kbindings.c:626 src/xitk/kbindings_man.c:626
 msgid "Editor"
 msgstr ""
 
-#: src/xitk/kbindings.c:1009
+#: src/xitk/kbindings.c:1009 src/xitk/kbindings_man.c:1009
 msgid "OOCH: key binding table is NULL.\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:1279
+#: src/xitk/kbindings.c:1279 src/xitk/kbindings_man.c:1279
 msgid "Ctrl"
 msgstr ""
 
-#: src/xitk/kbindings.c:1281
+#: src/xitk/kbindings.c:1281 src/xitk/kbindings_man.c:1281
 msgid "Alt"
 msgstr ""
 
-#: src/xitk/kbindings.c:1605
+#: src/xitk/kbindings.c:1605 src/xitk/kbindings_man.c:1605
 msgid "Nothing selected"
 msgstr ""
 
-#: src/xitk/kbindings.c:1606
+#: src/xitk/kbindings.c:1606 src/xitk/kbindings_man.c:1606
 msgid "None"
 msgstr ""
 
-#: src/xitk/kbindings.c:1779
+#: src/xitk/kbindings.c:1779 src/xitk/kbindings_man.c:1779
 msgid "You can only delete alias entries."
 msgstr ""
 
-#: src/xitk/kbindings.c:1915
+#: src/xitk/kbindings.c:1915 src/xitk/kbindings_man.c:1915
 msgid "Press Keyboard Keys..."
 msgstr ""
 
-#: src/xitk/kbindings.c:1928
+#: src/xitk/kbindings.c:1928 src/xitk/kbindings_man.c:1928
 msgid "Event receiver window"
 msgstr ""
 
-#: src/xitk/kbindings.c:1979
+#: src/xitk/kbindings.c:1979 src/xitk/kbindings_man.c:1979
 msgid "Accept?"
 msgstr ""
 
-#: src/xitk/kbindings.c:1983
+#: src/xitk/kbindings.c:1983 src/xitk/kbindings_man.c:1983
 #, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?."
 msgstr ""
 
-#: src/xitk/kbindings.c:1989
+#: src/xitk/kbindings.c:1989 src/xitk/kbindings_man.c:1989
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:2086
+#: src/xitk/kbindings.c:2086 src/xitk/kbindings_man.c:2086
 msgid "key binding editor"
 msgstr ""
 
-#: src/xitk/kbindings.c:2117
+#: src/xitk/kbindings.c:2117 src/xitk/kbindings_man.c:2117
 msgid "Binding action"
 msgstr ""
 
-#: src/xitk/kbindings.c:2123
+#: src/xitk/kbindings.c:2123 src/xitk/kbindings_man.c:2123
 msgid "Key"
 msgstr ""
 
-#: src/xitk/kbindings.c:2128
+#: src/xitk/kbindings.c:2128 src/xitk/kbindings_man.c:2128
 msgid "Modifiers"
 msgstr ""
 
-#: src/xitk/kbindings.c:2174
+#: src/xitk/kbindings.c:2174 src/xitk/kbindings_man.c:2174
 msgid "Alias"
 msgstr ""
 
-#: src/xitk/kbindings.c:2189 src/xitk/menus.c:1211
+#: src/xitk/kbindings.c:2189 src/xitk/kbindings_man.c:2189
+#: src/xitk/menus.c:1211
 msgid "Edit"
 msgstr ""
 
-#: src/xitk/kbindings.c:2219 src/xitk/playlist.c:422 src/xitk/playlist.c:1222
+#: src/xitk/kbindings.c:2219 src/xitk/kbindings_man.c:2219
+#: src/xitk/playlist.c:422 src/xitk/playlist.c:1222
 msgid "Save"
 msgstr ""
 
-#: src/xitk/kbindings.c:2314
+#: src/xitk/kbindings.c:2314 src/xitk/kbindings_man.c:2314
 msgid "ctrl"
 msgstr ""
 
-#: src/xitk/kbindings.c:2338
+#: src/xitk/kbindings.c:2338 src/xitk/kbindings_man.c:2338
 msgid "meta"
 msgstr ""
 
-#: src/xitk/kbindings.c:2362
+#: src/xitk/kbindings.c:2362 src/xitk/kbindings_man.c:2362
 msgid "mod3"
 msgstr ""
 
-#: src/xitk/kbindings.c:2386
+#: src/xitk/kbindings.c:2386 src/xitk/kbindings_man.c:2386
 msgid "mod4"
 msgstr ""
 
-#: src/xitk/kbindings.c:2410
+#: src/xitk/kbindings.c:2410 src/xitk/kbindings_man.c:2410
 msgid "mod5"
 msgstr ""
 
-#: src/xitk/kbindings.c:2421
+#: src/xitk/kbindings.c:2421 src/xitk/kbindings_man.c:2421
 msgid "Grab"
 msgstr ""
 

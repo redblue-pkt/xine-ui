@@ -57,38 +57,11 @@ $(POFILES) $(GMOFILES) \
 $(DISTFILES.extra1) $(DISTFILES.extra2) $(DISTFILES.extra3)
 
 POTFILES = \
-     ../../../../src/xitk/actions.c \
-     ../../../../src/xitk/config_wrapper.c \
-     ../../../../src/xitk/control.c \
-     ../../../../src/xitk/download.c \
-     ../../../../src/xitk/errors.c \
-     ../../../../src/xitk/event.c \
-     ../../../../src/xitk/event_sender.c \
-     ../../../../src/xitk/file_browser.c \
-     ../../../../src/xitk/help.c \
-     ../../../../src/xitk/i18n.h \
-     ../../../../src/xitk/kbindings.c \
-     ../../../../src/xitk/lang.c \
-     ../../../../src/xitk/lirc.c \
-     ../../../../src/xitk/main.c \
-     ../../../../src/xitk/mediamark.c \
-     ../../../../src/xitk/menus.c \
-     ../../../../src/xitk/mrl_browser.c \
-     ../../../../src/xitk/osd.c \
-     ../../../../src/xitk/panel.c \
-     ../../../../src/xitk/playlist.c \
-     ../../../../src/xitk/post.c \
-     ../../../../src/xitk/session.c \
-     ../../../../src/xitk/setup.c \
-     ../../../../src/xitk/skins.c \
-     ../../../../src/xitk/snapshot.c \
-     ../../../../src/xitk/splash.c \
-     ../../../../src/xitk/stdctl.c \
-     ../../../../src/xitk/stream_infos.c \
-     ../../../../src/xitk/tvout.c \
-     ../../../../src/xitk/tvset.c \
-     ../../../../src/xitk/videowin.c \
-     ../../../../src/xitk/viewlog.c
+     ../../../../src/xitk/xine-toolkit/mrlbrowser.c \
+     ../../../../src/xitk/xine-toolkit/test.c \
+     ../../../../src/xitk/xine-toolkit/window.c \
+     ../../../../src/xitk/xine-toolkit/xitk.h \
+     ../../../../src/xitk/xine-toolkit/xitkintl.h
 
 CATALOGS =  cs.gmo de.gmo es.gmo eu.gmo fr.gmo it.gmo ja.gmo nb.gmo pl.gmo pt_BR.gmo ru.gmo sk.gmo uk.gmo
 
@@ -99,7 +72,7 @@ CATALOGS =  cs.gmo de.gmo es.gmo eu.gmo fr.gmo it.gmo ja.gmo nb.gmo pl.gmo pt_BR
 DOMAIN = xitk
 
 # These two variables depend on the location of this directory.
-subdir = src/xitk/xine-tookit/po
+subdir = src/xitk/xine-toolkit/po
 top_builddir = ../../../..
 
 # These options get passed to xgettext.
