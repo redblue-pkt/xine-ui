@@ -1087,8 +1087,17 @@ AC_SUBST(DEPCOMP)
 dnl
 dnl Newest automake workaround
 dnl
-AC_SUBST(mkdir_p)
 
+AC_SUBST(mkdir_p)
+if test -n "$ac_aux_dir"; then
+  case "$ac_aux_dir" in
+    /*) MKINSTALLDIRS="$ac_aux_dir/install-sh -d" ;;
+    *) MKINSTALLDIRS="\$(top_builddir)/$ac_aux_dir/install-sh -d" ;;
+  esac
+else
+  MKINSTALLDIRS="\$(top_srcdir)/install-sh -d"
+fi
+AC_SUBST(MKINSTALLDIRS)
 
 dnl
 dnl Output configuration files
