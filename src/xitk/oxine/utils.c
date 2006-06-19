@@ -297,9 +297,9 @@ struct postfix_tag_s {
 static prefix_tag_t* heap_head=NULL;
 
 
-void static AddToLinkedList      ( prefix_tag_t* );
-void static RemoveFromLinkedList ( prefix_tag_t* );
-void static RenderDesc           ( prefix_tag_t*, char* );
+static void AddToLinkedList      ( prefix_tag_t* );
+static void RemoveFromLinkedList ( prefix_tag_t* );
+static void RenderDesc           ( prefix_tag_t*, char* );
 
 
 void *_gen_malloc(size_t wSize, const char* tag, char* lpFile, int nLine) {
@@ -435,7 +435,7 @@ void heapstat(void) {
 }
 
 
-void static AddToLinkedList(prefix_tag_t* lpAdd) {
+static void AddToLinkedList(prefix_tag_t* lpAdd) {
     /*--- Add before current head of list ---*/
     if (heap_head) {
         lpAdd->prev = heap_head->prev;
@@ -454,7 +454,7 @@ void static AddToLinkedList(prefix_tag_t* lpAdd) {
     heap_head = lpAdd;
 }
 
-void static RemoveFromLinkedList(prefix_tag_t* lpRemove) {
+static void RemoveFromLinkedList(prefix_tag_t* lpRemove) {
 
     /*--- Remove from doubly linked list ---*/
     (lpRemove->prev)->next = lpRemove->next;
@@ -467,7 +467,7 @@ void static RemoveFromLinkedList(prefix_tag_t* lpRemove) {
         }
 }
 
-int static ho_is_ok(void* content)
+static int ho_is_ok(void* content)
 {
     return ((content) && (!((long)content&(ALIGNMENT-1))));
 }
@@ -490,9 +490,9 @@ int ho_verify(void *content) {
 }
 
 
-void static RenderDesc(prefix_tag_t* prefix, char* lpBuffer) {
+static void RenderDesc(prefix_tag_t* prefix, char* lpBuffer) {
   if (prefix->content==&prefix[1]) {
-    sprintf( lpBuffer, "%i words @ 0x%08lx:", prefix->size, (unsigned long)prefix->content );
+    sprintf( lpBuffer, "%zi words @ 0x%08lx:", prefix->size, (unsigned long)prefix->content );
     if (prefix->filename) {
       sprintf( lpBuffer+strlen(lpBuffer), "%s:%ld ",
 	  prefix->filename, prefix->line );

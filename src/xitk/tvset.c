@@ -306,7 +306,7 @@ void tvset_panel(void) {
   xitk_combo_widget_t         cmb;
   xitk_inputtext_widget_t     inp;
   xitk_pixmap_t              *bg;
-  int                         i;
+  size_t                      i;
   int                         x, y, w, width, height;
   xitk_widget_t              *widget;
 

@@ -299,7 +299,7 @@ static void viewlog_create_tabs(void) {
   const char   *const *log_sections = xine_get_log_names(gGui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(gGui->xine);
   char                *tab_sections[log_section_count + 1];
-  int                  i;
+  unsigned int         i;
 
   /* 
    * create log sections

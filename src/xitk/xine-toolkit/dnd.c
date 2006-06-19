@@ -228,8 +228,8 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
  */
 static void _dnd_get_type_list (xitk_dnd_t *xdnd, Window window, Atom **typelist) {
   Atom            type, *a;
-  int             format, i;
-  unsigned long   count, remaining;
+  int             format;
+  unsigned long   count, remaining, i;
   unsigned char  *data = NULL;
   
   *typelist = 0;

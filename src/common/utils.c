@@ -580,11 +580,11 @@ void dump_xfree_info(Display *display, int screen, int complete) {
     printf("   Number of extensions:   %d\n", n);
     if (extlist) {
       int   i, opcode, event, error;
-      int   j, maxlen = 0;
+      size_t   j, maxlen = 0;
       
-      for(j = 0; j < n; j++) {
-	if(maxlen < strlen(extlist[j]))
-	  maxlen = strlen(extlist[j]);
+      for(i = 0; i < n; i++) {
+	if(maxlen < strlen(extlist[i]))
+	  maxlen = strlen(extlist[i]);
       }
       maxlen += 2;
       
@@ -685,8 +685,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 
 #ifdef HAVE_XV
       if(have_xv) {
-	int                   n, k, adaptor; 
-	unsigned int          nencode, nadaptors;
+	unsigned int          nencode, adaptor, nadaptors, k;
 	int                   nattr, numImages;
 	XvAdaptorInfo        *ainfo;
 	XvAttribute          *attributes;
@@ -744,10 +743,11 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	    attributes = XvQueryPortAttributes(display, ainfo[adaptor].base_id, &nattr);
 	    
 	    if(attributes && nattr) {
+	      int j;
 	      printf("     Number of attributes: %i\n", nattr);
 	      
-	      for(k = 0; k < nattr; k++)
-		printf("       - %s\n", attributes[k].name);
+	      for(j = 0; j < nattr; j++)
+		printf("       - %s\n", attributes[j].name);
 
 	      XFree(attributes);
 	    } else {
@@ -757,6 +757,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	    XvQueryEncodings(display, ainfo[adaptor].base_id, &nencode, &encodings);
 	    
 	    if(encodings && nencode) {
+	      unsigned int n;
 	      int ImageEncodings = 0;
 	      
 	      for(n = 0; n < nencode; n++) {
@@ -779,10 +780,12 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	      
 	      if(ImageEncodings && (ainfo[adaptor].type & XvImageMask)) {
 		char imageName[5] = {0, 0, 0, 0, 0};
+		unsigned int j;
+		int n;
 		
-		for(n = 0; n < nencode; n++) {
-		  if(!strcmp(encodings[n].name, "XV_IMAGE")) {
-		    printf("     Maximum XvImage size: %li x %li\n", encodings[n].width, encodings[n].height);
+		for(j = 0; j < nencode; j++) {
+		  if(!strcmp(encodings[j].name, "XV_IMAGE")) {
+		    printf("     Maximum XvImage size: %li x %li\n", encodings[j].width, encodings[j].height);
 		    break;
 		  }
 		}

@@ -876,6 +876,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			mmkf.end        = -1;
 			mmkf.av_offset  = 0;
 			mmkf.spu_offset = 0;
+			mmkf.mrl        = NULL;
 
 			mmkf_members[0] = 0;  /* ident */
 			mmkf_members[1] = -1; /* mrl */
@@ -3199,7 +3200,7 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
   else
     open_path = gGui->curdir;
   
-  (void *) create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
+  create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
 }
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {

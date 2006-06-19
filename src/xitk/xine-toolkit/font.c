@@ -1058,12 +1058,6 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   XRectangle  logic;
 #endif
   
-#ifdef DEBUG
-  if (nbytes > strlen(c) + 1) {
-    XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
-  }
-#endif
-
   if (nbytes <= 0) {
 #ifdef DEBUG
     if (nbytes < 0)
@@ -1077,13 +1071,19 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     return;
   }
     
+#ifdef DEBUG
+  if ((size_t)nbytes > strlen(c) + 1) {
+    XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
+  }
+#endif
+
 #ifdef WITH_XFT
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->font);
   ABORT_IF_NULL(c);
 
   /* recode right part of string */
-  if (nbytes > strlen(c))
+  if ((size_t)nbytes > strlen(c))
     nbytes = strlen(c);
 
   foo_text = strdup(c);

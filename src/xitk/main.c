@@ -2012,7 +2012,7 @@ int main(int argc, char *argv[]) {
     if(xine_config_lookup_entry(gGui->xine, "media.files.origin_path", &cfg_entry))
       snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cfg_entry.str_value);
     else
-      (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
+      getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
 
   }
 

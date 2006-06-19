@@ -305,7 +305,7 @@ static int fbxine_init(int argc, char **argv)
 
 static void install_abort(void)
 {
-	static int trapped[] = {
+	static const int trapped[] = {
 		SIGINT, SIGQUIT, SIGILL,
 		SIGFPE, SIGKILL, SIGBUS,
 		SIGSEGV, SIGSYS, SIGPIPE,
@@ -314,7 +314,7 @@ static void install_abort(void)
 		SIGSTKFLT,
 #endif
 	};
-	int i;
+	size_t i;
 	
 	for(i = 0; i < sizeof(trapped)/sizeof(int); i++)
 		signal(trapped[i], (void(*)(int))fbxine_do_abort);

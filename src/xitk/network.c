@@ -599,7 +599,7 @@ static int sock_client(const char *host, const char *service, const char *transp
   
   sock = sock_create(service, transport, &sin);
 
-  if ((sin.sin_addr.s_addr = inet_addr(host)) == -1) {
+  if ((sin.sin_addr.s_addr = inet_addr(host)) == INADDR_NONE) {
     ihost = gethostbyname(host);
     
     if(!ihost) {
@@ -718,8 +718,8 @@ static void session_create_commands(session_t *session) {
 static void client_noop(session_t *session, session_commands_t *command, const char *cmd) {
 }
 static void client_help(session_t *session, session_commands_t *command, const char *cmd) {
-  int i = 0, j;
-  int maxlen = 0;
+  int i = 0;
+  size_t maxlen = 0, j;
   int curpos = 0;
   char buf[_BUFSIZ];
   
@@ -1720,8 +1720,8 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
   char buf[_BUFSIZ];
 
   if(!client_info->command.num_args) {
-    int i = 0, j;
-    int maxlen = 0;
+    int i = 0;
+    size_t maxlen = 0, j;
     int curpos = 0;
     
     while(commands[i].command != NULL) {
@@ -2099,7 +2099,8 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
-	int  speed = -1, i;
+	int  speed = -1;
+	size_t i;
 	
 	strcpy(buf, "Current speed: ");
 	speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
@@ -2434,11 +2435,11 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
 	while(events_struct[i].name && strncmp(arg, events_struct[i].name, strlen(arg))) i++;
       }
 
-      if((i >= 0) && (i < ((sizeof(events_struct) / sizeof(events_struct[0])) - 1))) {
+      if((i >= 0) && ((size_t)i < ((sizeof(events_struct) / sizeof(events_struct[0])) - 1))) {
 	xine_event.type = events_struct[i].type;
       }
       else {
-	int   value;
+	size_t value;
 	int   input_numbers[] = {
 	  XINE_EVENT_INPUT_NUMBER_0, XINE_EVENT_INPUT_NUMBER_1, XINE_EVENT_INPUT_NUMBER_2,
 	  XINE_EVENT_INPUT_NUMBER_3, XINE_EVENT_INPUT_NUMBER_4, XINE_EVENT_INPUT_NUMBER_5,
@@ -2447,10 +2448,10 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
 	};
 	  
 
-	if(((sscanf(arg, "%d", &value)) == 1) ||
-	   ((sscanf(arg, "+%d", &value)) == 1)) {
+	if(((sscanf(arg, "%zu", &value)) == 1) ||
+	   ((sscanf(arg, "+%zu", &value)) == 1)) {
 	  
-	  if((value >= 0) && (value < (sizeof(input_numbers) / sizeof(input_numbers[0]))))
+	  if(value < (sizeof(input_numbers) / sizeof(input_numbers[0])))
 	    xine_event.type = input_numbers[value];
 	}
       }
@@ -2979,7 +2980,7 @@ static void *server_thread(void *data) {
 
   while(gGui->running) {
     client_info_t       *client_info;
-    int                  lsin;
+    socklen_t            lsin;
     pthread_t            thread_client;
     
     msock = sock_serv(service, "tcp", 5);

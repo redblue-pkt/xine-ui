@@ -33,7 +33,8 @@ PaletteLUTGet(ImlibData *id)
     {
       if (format_ret == 8)
 	{
-	  int j, i, pnum;
+	  int i, pnum;
+	  unsigned long j;
 	  
 	  pnum = (int)(retval[0]);
 	  j = 1;
@@ -108,9 +109,9 @@ void
 _PaletteAlloc(ImlibData * id, int num, int *cols)
 {
   XColor              xcl;
-  int                 colnum, i, j;
+  int                 colnum, i;
   int                 r, g, b;
-  int                 used[256], num_used, is_used;
+  unsigned int        used[256], num_used, is_used, j;
 
   if (id->palette)
     free(id->palette);

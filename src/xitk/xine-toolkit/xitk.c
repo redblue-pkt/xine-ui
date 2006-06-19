@@ -493,7 +493,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	unsigned char   *prop_return2 = NULL;
 	Window           win_id;
 	
-	win_id = *(long *)prop_return;
+	win_id = *(unsigned long *)prop_return;
 	
 	xitk_install_x_error_handler();
 	
@@ -507,7 +507,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	if((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
 	  
 	  if((format_return == 32) && (nitems_return == 1) 
-	     && (bytes_after_return == 0) && (win_id == *(long *)prop_return2)) {
+	     && (bytes_after_return == 0) && (win_id == *(unsigned long *)prop_return2)) {
 	    type |= WM_TYPE_GNOME_COMP;
 	  }
 	}
@@ -548,7 +548,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	unsigned char   *prop_return2 = NULL;
 	Window           win_id;
 	
-	win_id = *(long *)prop_return;
+	win_id = *(unsigned long *)prop_return;
 	
 	xitk_install_x_error_handler();
 	
@@ -563,7 +563,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	if((status == Success) && (type_return != None) && (type_return == XA_WINDOW) &&
 	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
 	  
-	  if(win_id == *(long *)prop_return) {
+	  if(win_id == *(unsigned long *)prop_return) {
 	    if (wm_name) free(wm_name);
 	    wm_name = get_wm_name(display, win_id, "_NET_WM_NAME");
 	    type |= WM_TYPE_EWMH_COMP;
@@ -1279,7 +1279,7 @@ void xitk_xevent_notify(XEvent *event) {
     /* and could be used by our screen saver reset "ping". */
     /* So they will not kill tips and menus.               */
 
-    int i;
+    size_t i;
 
     for(i = 0; i < sizeof(gXitk->ignore_keys)/sizeof(gXitk->ignore_keys[0]); ++i)
       if(event->xkey.keycode == gXitk->ignore_keys[i])

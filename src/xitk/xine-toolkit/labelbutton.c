@@ -134,7 +134,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
   }
 
   if((private_data->skin_element_name != NULL) ||
-     ((private_data->skin_element_name == NULL) && ((fg = xitk_get_black_color()) == -1))) {
+     ((private_data->skin_element_name == NULL) && ((fg = xitk_get_black_color()) == (unsigned int)-1))) {
     
     /*  Some colors configurations */
     switch(state) {

@@ -263,7 +263,8 @@ static void *ctrlsocket_func(void *data) {
   struct timeval        tv;
   struct sockaddr_un    saddr;
   serv_header_packet_t *shdr;
-  int                   len, fd;
+  int                   fd;
+  socklen_t             len;
 
   while(!going)
     xine_usec_sleep(10000);

@@ -296,7 +296,7 @@ static int _menu_is_title_in_branch(menu_node_t *branch) {
 static menu_node_t *_menu_get_wider_menuitem_node(menu_node_t *branch) {
   menu_node_t  *me = branch;
   menu_node_t  *max = NULL;
-  int           len = 0;
+  size_t        len = 0;
   
   while(me) {
     if((!_menu_is_separator(me->menu_entry)) && 
@@ -325,7 +325,7 @@ static int _menu_branch_have_shortcut(menu_node_t *branch) {
 static menu_node_t *_menu_get_wider_shortcut_node(menu_node_t *branch) {
   menu_node_t  *me = branch;
   menu_node_t  *max = NULL;
-  int           len = 0;
+  size_t        len = 0;
   
   while(me) {
     if((!_menu_is_separator(me->menu_entry)) && 

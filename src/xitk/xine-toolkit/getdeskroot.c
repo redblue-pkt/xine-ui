@@ -167,7 +167,7 @@ static Window __GetKDEDesktop(Display *display, int screen,
    * barking up the wrong tree. */
   if (go_deeper && (XQueryTree(display, window, 
 			       &rootReturn, &parentReturn, &children, &nChildren))) {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < nChildren; ++i) {
       /* children[i] is now at depth 3 */
@@ -205,7 +205,7 @@ static Window __GetNautilusDesktop(Display *display, int screen, Window window, 
     return ((Window) 0);
   }
   else if (XQueryTree(display, window, &rootReturn, &parentReturn, &children, &nChildren)) {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < nChildren; ++i) {
       XWindowAttributes attributes;
@@ -263,7 +263,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
   if ((background == None)
       && (XQueryTree(display, root, &rootReturn, &parentReturn, &children, &nChildren))) {
     Atom  _NET_WM_WINDOW_TYPE, __SWM_VROOT;
-    int   i;
+    unsigned int   i;
       
     _NET_WM_WINDOW_TYPE = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
     __SWM_VROOT = XInternAtom(display, "__SWM_VROOT", False);
@@ -355,7 +355,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
       /* Now look at each immediate child window of root to see if it is
        * the current desktop */
       else if (XQueryTree(display, root, &rootReturn, &parentReturn, &children, &nChildren)) {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < nChildren; ++i) {
 	  if ((XGetWindowProperty(display, children[i],

@@ -440,7 +440,7 @@ static int file_is_m3u(const char *mrl) {
 static void parse_m3u(const char *mrl, list_t *items) {
   FILE *file;
   char **line;
-  int *n;
+  size_t *n;
   int a;
 
   file = fopen(mrl, "r");
