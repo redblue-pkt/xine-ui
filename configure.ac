@@ -971,7 +971,7 @@ dnl
 dnl system function checks (defined _GNU_SOURCE)
 dnl
 AC_DEFINE([_GNU_SOURCE], [], [enable GNU libc extension])
-AC_REPLACE_FUNCS(getline getsubopt strndup)
+AC_REPLACE_FUNCS(getline getsubopt strndup strsep)
 
 
 dnl

@@ -1,8 +1,5 @@
 /*
- * written for xine project, 2006
- *
- * public domain replacement function of getline
- *
+ * taken from xine-lib
  */
 
 #include <stdlib.h>

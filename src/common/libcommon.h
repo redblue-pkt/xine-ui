@@ -33,4 +33,12 @@ ssize_t getline(char *lineptr, size_t *n, FILE *f);
 int getsubopt(char **optionp, char * const *keylistp, char **valuep);
 #endif
 
+#ifndef HAVE_STRNDUP
+char *strndup(const char *s, size_t n);
+#endif
+
+#ifndef HAVE_STRSEP
+char *strsep(char **stringp, const char *delim);
+#endif
+
 #endif
