@@ -1918,12 +1918,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
       else if((first = is_arg_contain(client_info, 1, "first")) || is_arg_contain(client_info, 1, "last")) {
 
 	if(gGui->playlist.num) {
-	  int entry = gGui->playlist.cur;
-	  
-	  if(entry)
-	    entry = 0;
-	  else
-	    entry = gGui->playlist.num - 1;
+	  int entry = (first) ? 0 : gGui->playlist.num - 1;
 	  
 	  if(entry != gGui->playlist.cur) {
 	    
