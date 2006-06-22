@@ -273,7 +273,10 @@ void osd_display_info(char *info, ...) {
 
     xine_osd_draw_text(fbxine.osd.info, 0, 0, buf, XINE_OSD_TEXT1);
     xine_osd_set_position(fbxine.osd.info, 20, 10 + 30);
-    xine_osd_show(fbxine.osd.info, 0);
+    if (xine_osd_get_capabilities(fbxine.osd.info) & XINE_OSD_CAP_UNSCALED)
+      xine_osd_show_unscaled(fbxine.osd.info, 0);
+    else
+      xine_osd_show(fbxine.osd.info, 0); 
     fbxine.osd.info_visible = fbxine.osd.timeout;
     SAFE_FREE(buf);
   }
@@ -331,7 +334,10 @@ void osd_update_status(void) {
     
     xine_osd_draw_text(fbxine.osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
     xine_osd_set_position(fbxine.osd.status, 20, 10);
-    xine_osd_show(fbxine.osd.status, 0);
+    if (xine_osd_get_capabilities(fbxine.osd.status) & XINE_OSD_CAP_UNSCALED)
+      xine_osd_show_unscaled(fbxine.osd.status, 0);
+    else
+      xine_osd_show(fbxine.osd.status, 0);
     fbxine.osd.status_visible = fbxine.osd.timeout;
   }
 }
@@ -339,6 +345,7 @@ void osd_update_status(void) {
 void osd_stream_infos(void) {
 
   if(fbxine.osd.enabled) {
+    uint32_t    width;
     uint32_t    vwidth, vheight, asrate;
     const char *vcodec, *acodec;
     char        buffer[256], *p;
@@ -439,11 +446,18 @@ void osd_stream_infos(void) {
 
       osd_stream_position();
     }
-    
-    x = (vwidth - osdw) - 40;
-    xine_osd_set_position(fbxine.osd.sinfo, (x >= 0) ? x : 0, 15);
 
-    xine_osd_show(fbxine.osd.sinfo, 0);
+    if (xine_osd_get_capabilities(fbxine.osd.sinfo) & XINE_OSD_CAP_UNSCALED)
+      width = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_WIDTH);
+    else
+      width = vwidth;
+    
+    x = (width - osdw) - 40;
+    xine_osd_set_position(fbxine.osd.sinfo, (x >= 0) ? x : 0, 15);
+    if (xine_osd_get_capabilities(fbxine.osd.sinfo) & XINE_OSD_CAP_UNSCALED)
+      xine_osd_show_unscaled(fbxine.osd.sinfo, 0);
+    else
+      xine_osd_show(fbxine.osd.sinfo, 0);
     fbxine.osd.sinfo_visible = fbxine.osd.timeout;
   }
 }
@@ -451,7 +465,7 @@ void osd_stream_infos(void) {
 void osd_draw_bar(char *title, int min, int max, int val, int type) {
 
   if(fbxine.osd.enabled) {
-    uint32_t vwidth, vheight;
+    uint32_t width, height;
     int      bar_color[40];
     int      i, x;
     float    _val = (int) val;
@@ -541,16 +555,29 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
       xine_osd_draw_text(fbxine.osd.bar[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
     }
     
-    vwidth  = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-    vheight = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    if (xine_osd_get_capabilities(fbxine.osd.bar[0]) & XINE_OSD_CAP_UNSCALED) {
+      width  = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_WIDTH);
+      height = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_HEIGHT);
+    }
+    else {
+      width  = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+      height = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    }
     
-    x = (vwidth - BAR_WIDTH) >> 1;
-    xine_osd_set_position(fbxine.osd.bar[0], (x >= 0) ? x : 0, (vheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(fbxine.osd.bar[1], (x >= 0) ? x : 0, (vheight - (BAR_HEIGHT * 2)) - 40);
+    x = (width - BAR_WIDTH) >> 1;
+    xine_osd_set_position(fbxine.osd.bar[0], (x >= 0) ? x : 0, (height - BAR_HEIGHT) - 40);
+    xine_osd_set_position(fbxine.osd.bar[1], (x >= 0) ? x : 0, (height - (BAR_HEIGHT * 2)) - 40);
     
-    xine_osd_show(fbxine.osd.bar[0], 0);
-    if(title)
-      xine_osd_show(fbxine.osd.bar[1], 0);
+    if (xine_osd_get_capabilities(fbxine.osd.bar[0]) & XINE_OSD_CAP_UNSCALED) {
+      xine_osd_show_unscaled(fbxine.osd.bar[0], 0);
+      if (title)
+        xine_osd_show_unscaled(fbxine.osd.bar[1], 0);
+    }
+    else {
+      xine_osd_show(fbxine.osd.bar[0], 0);
+      if (title)
+        xine_osd_show(fbxine.osd.bar[1], 0);
+    }
     
     fbxine.osd.bar_visible = fbxine.osd.timeout;
   }
