@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -38,11 +38,11 @@ static char                     *fontname     = "-*-helvetica-medium-r-*-*-10-*-
 static char                     *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
 static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH             500
-#define WINDOW_HEIGHT            500
+#define WINDOW_WIDTH             660
+#define WINDOW_HEIGHT            548
 
-#define FRAME_WIDTH              350
-#define FRAME_HEIGHT             40
+#define FRAME_WIDTH              538
+#define FRAME_HEIGHT             46
 
 #define MAX_DISPLAY_WIDGETS      8
 
@@ -53,7 +53,7 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     xitk_widget_t       *frame = NULL;                                                          \
     xitk_image_t        *image;                                                                 \
     xitk_image_widget_t  im;                                                                    \
-    int                  lbearing, rbearing, width, ascent, descent;                            \
+    int                  ascent, descent;                                                       \
     xitk_font_t         *fs;                                                                    \
                                                                                                 \
     image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
@@ -61,7 +61,7 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     fs = xitk_font_load_font(gGui->display, boldfontname);                                      \
     xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(setup->widget_list)));                          \
     xitk_font_text_extent(fs, title, strlen(title),                                             \
-                          &lbearing, &rbearing, &width, &ascent, &descent);                     \
+                          NULL, NULL, NULL, &ascent, &descent);                                 \
     xitk_font_unload_font(fs);                                                                  \
                                                                                                 \
     XLockDisplay(gGui->display);                                                                \
@@ -714,7 +714,7 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			   (input = 
 			    xitk_noskin_inputtext_create(setup->widget_list, &inp,
-							 x, y - 5, 150, 20,
+							 x, y - 5, 260, 20,
 							 "Black", "Black", fontname)));
 
   ADD_LABEL(input, NULL, NULL);
@@ -792,7 +792,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
 			   (combo = 
 			    xitk_noskin_combo_create(setup->widget_list, &cmb,
-						     x, y - 4, 150, &lw, &bw)));
+						     x, y - 4, 260, &lw, &bw)));
   xitk_combo_set_select(combo, entry->num_value );
 
   ADD_LABEL(combo, NULL, NULL);
@@ -1075,14 +1075,14 @@ void setup_panel(void) {
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
   x = xine_config_register_num (gGui->xine, "gui.setup_x", 
-				100, 
+				80, 
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.setup_y", 
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
