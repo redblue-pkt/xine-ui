@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -317,41 +317,54 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 static char * xitk_font_core_string_to_xft( char * old_name) {
   static char new_name[255];
 
-  if( strncmp(old_name, "-*", 2) == 0 || strncmp(old_name, "*-", 2) == 0
-      || strncmp(old_name, "-", 1) == 0 || strncmp(old_name, "*", 1) == 0) {
-    char  font[50];
-    char  style[15];
-    char  *psize = "*", size[5], ptsize[5], pxsize[5];
+  if(old_name[0] == '-' || old_name[0] == '*') {
+    char  family[50], weight[15], slant[8], pxsize[5], ptsize[5];
     
     if( old_name[0] == '-' )
       old_name++;
     
-    sscanf( old_name, "%*[^-]-%[^-]", font );
-    sscanf( old_name, "%*[^-]-%*[^-]-%[^-]", style );
-    sscanf( old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%[^-]", pxsize);
-    sscanf( old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%[^-]", ptsize);
+    /* Extract description elements */
+    family[0] = weight[0] = slant[0] = pxsize[0] = ptsize[0] = '\0';
+    sscanf(old_name, "%*[^-]-%49[^-]", family);
+    sscanf(old_name, "%*[^-]-%*[^-]-%14[^-]", weight);
+    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%7[^-]", slant);
+    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%4[^-]", pxsize);
+    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%4[^-]", ptsize);
+
+    /* Transform the elements */
+    if(!strcmp(weight, "*"))
+      weight[0] = '\0';
+    if(!strcmp(pxsize, "*"))
+      pxsize[0] = '\0';
+    if(!strcmp(ptsize, "*"))
+      ptsize[0] = '\0';
+    strcpy(slant,
+	   (!strcmp(slant, "i")) ? "italic" :
+	   (!strcmp(slant, "o")) ? "oblique" :
+	   (!strcmp(slant, "r")) ? "roman" :
+				   "");
 
     /* Xft doesn't have lucida, which is a small font;
      * thus we make whatever is chosen 2 sizes smaller */
-    if(strlen(pxsize) && strcmp(pxsize, "*"))
-      psize = pxsize;
-    else if(strlen(ptsize) && strcmp(ptsize, "*"))
-      psize = ptsize;
-
-    if( strcmp( font, "lucida" ) == 0 ) {
-      int  sz = strtol(psize, &psize, 10);
-
-      sz -= 2;
-      snprintf(size , sizeof(size), "%i", sz);
+    if(!strcasecmp(family, "lucida")) {
+      if(pxsize[0]) {
+	int sz = strtol(pxsize, NULL, 10) - 2;
+	snprintf(pxsize, sizeof(pxsize), "%i", sz);
+      }
+      if(ptsize[0]) {
+	int sz = strtol(ptsize, NULL, 10) - 2;
+	snprintf(ptsize, sizeof(ptsize), "%i", sz);
+      }
     }
-    else
-      snprintf(size, sizeof(size), "%s", psize);
     
-    if( strcmp( style , "bold" ) != 0 )
-      snprintf( new_name, sizeof(new_name), "%s-%s", font, size );
-    else
-      snprintf( new_name, sizeof(new_name), "%s-%s:%s", font, size, style );
- 
+    /* Build Xft font description string from the elements */
+    snprintf(new_name, sizeof(new_name), "%s%s%s%s%s%s%s%s%s",
+	     family,
+	     ((weight[0]) ? ":weight="    : ""), weight,
+	     ((slant[0])  ? ":slant="     : ""), slant,
+	     ((pxsize[0]) ? ":pixelsize=" : ""), pxsize,
+	     ((ptsize[0]) ? ":size="      : ""), ptsize);
+
     return new_name;
   }
 
@@ -999,13 +1012,11 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nby
  *
  */
 int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
-  int lbearing, rbearing, width, ascent, descent, height;
+  int ascent, descent;
   
-  xitk_font_text_extent(xtfs, c, nbytes, &lbearing, &rbearing, &width, &ascent, &descent);
+  xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, NULL, &ascent, &descent);
  
-  height = ascent + descent;
- 
-  return height;
+  return (ascent + descent);
 }
 
 /*
@@ -1195,7 +1206,7 @@ void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
  *
  */
 int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
-  int lbearing, rbearing, width, ascent, descent;
+  int ascent;
   
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->display);
@@ -1209,7 +1220,7 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
 #endif
     ABORT_IF_NULL(xtfs->font);
   
-  xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
+  xitk_font_text_extent(xtfs, c, strlen(c), NULL, NULL, NULL, &ascent, NULL);
 
   return ascent;
 }
@@ -1218,7 +1229,7 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
  *
  */
 int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
-  int lbearing, rbearing, width, ascent, descent;
+  int descent;
  
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->display);
@@ -1232,7 +1243,7 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
 #endif
     ABORT_IF_NULL(xtfs->font);
   
-  xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
+  xitk_font_text_extent(xtfs, c, strlen(c), NULL, NULL, NULL, NULL, &descent);
 
   return descent;
 }
