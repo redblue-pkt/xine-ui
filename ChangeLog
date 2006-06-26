@@ -1,5 +1,6 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixes and improvements for appearance and behaviour
   * Video window: User magnification ignored and auto-resizing on new stream
     maintained in background if not in visible windowed mode.
   * Fixed security issues related to playlist files (thanks to Chris Ries)
