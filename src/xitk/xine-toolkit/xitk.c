@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1418,6 +1418,7 @@ void xitk_xevent_notify(XEvent *event) {
 	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
 	      if(b) {
+		handled = 1;
 		if(mykey == XK_Up)
 		  xitk_browser_step_down(b, NULL);
 		else if(mykey == XK_Down)
@@ -1430,7 +1431,6 @@ void xitk_xevent_notify(XEvent *event) {
 		  xitk_browser_page_down(b, NULL);
 		else if(mykey == XK_Next)
 		  xitk_browser_page_up(b, NULL);
-
 	      }
 	    }
 	    else if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) 
@@ -1465,6 +1465,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  else if((mykey == XK_0) || (mykey == XK_1) || (mykey == XK_2) || (mykey == XK_3) || 
 		  (mykey == XK_4) || (mykey == XK_5) || (mykey == XK_6) || (mykey == XK_7) || 
 		  (mykey == XK_8) || (mykey == XK_9) || 
+		  (mykey == XK_underscore) ||
 		  (mykey == XK_a) || (mykey == XK_A) || (mykey == XK_b) || (mykey == XK_B) ||
 		  (mykey == XK_c) || (mykey == XK_C) || (mykey == XK_d) || (mykey == XK_D) ||
 		  (mykey == XK_e) || (mykey == XK_E) || (mykey == XK_f) || (mykey == XK_F) ||
