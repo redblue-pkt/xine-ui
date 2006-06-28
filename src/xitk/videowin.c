@@ -333,6 +333,18 @@ void video_window_select_visual (void) {
 }
 
 /*
+ * Lock the video window against WM-initiated transparency changes.
+ * At the time of writing (2006-06-29), only xfwm4 SVN understands this.
+ * Ref. http://bugzilla.xfce.org/show_bug.cgi?id=1958
+ */
+static void video_window_lock_opacity (void) {
+  XChangeProperty(gGui->video_display, gGui->video_window,
+                  XInternAtom (gGui->video_display, "_NET_WM_WINDOW_OPACITY_LOCKED", False),
+		  XA_CARDINAL, 32, PropModeReplace,
+		  (unsigned char *)gGui, 1);
+}
+
+/*
  * will modify/create video output window based on
  *
  * - fullscreen flags
@@ -431,7 +443,9 @@ static void video_window_adapt_size (void) {
       hint.width  = gVw->fullscreen_width;
       hint.height = gVw->fullscreen_height;
       XSetNormalHints(gGui->video_display, gGui->video_window, &hint);
-      
+
+      video_window_lock_opacity();
+
       XClearWindow(gGui->video_display, gGui->video_window);
       
       XMapWindow(gGui->video_display, gGui->video_window);
@@ -716,6 +730,8 @@ static void video_window_adapt_size (void) {
 
     XSetWMHints(gGui->video_display, gGui->video_window, gVw->wm_hint);
 
+    video_window_lock_opacity();
+
     gVw->output_width    = hint.width;
     gVw->output_height   = hint.height;
 
@@ -821,6 +837,8 @@ static void video_window_adapt_size (void) {
     XSetWMNormalHints (gGui->video_display, gGui->video_window, &hint);
         
     XSetWMHints(gGui->video_display, gGui->video_window, gVw->wm_hint);
+
+    video_window_lock_opacity();
 
     gVw->output_width    = hint.width;
     gVw->output_height   = hint.height;
@@ -973,6 +991,8 @@ static void video_window_adapt_size (void) {
     XSetWMNormalHints (gGui->video_display, gGui->video_window, &hint);
 
     XSetWMHints(gGui->video_display, gGui->video_window, gVw->wm_hint);
+
+    video_window_lock_opacity();
 
     if(gVw->borderless) {
       prop = XInternAtom(gGui->video_display, "_MOTIF_WM_HINTS", False);

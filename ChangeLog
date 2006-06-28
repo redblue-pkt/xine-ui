@@ -18,6 +18,8 @@ xine-ui (0.99.5) unstable; urgency=low
   * fixed X_CreateGlyphCursor crash [bugs #1092498, #1235983]
   * fixed support for Xservers with shared images but without shared pixmaps (Xgl)
   * fixed aspect ratio in snapshot function
+  * lock against WM/daemon-initiated opacity changes (given suitably-patched
+    compositor managers and opacity-setting daemons)
 
 xine-ui (0.99.4) unstable; urgency=low
 
