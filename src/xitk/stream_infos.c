@@ -133,10 +133,8 @@ char *get_fourcc_string(uint32_t f) {
   if(f <= 0xFFFF)
     snprintf(fcc, sizeof(fcc), "0x%x", f);
   
-  if((fcc[0] == 'm') && (fcc[1] == 's')) {
-    if((fcc[2] = 0x0) && (fcc[3] == 0x55)) {
-      *(uint32_t *) fcc = 0x33706d2e; /* Force to '.mp3' */
-    }
+  if(memcmp(fcc, "ms\0\x55", 4) == 0) {
+    strncpy(fcc, "3pm.", 4); /* Force to '.mp3' */
   }
   
   return &fcc[0];
