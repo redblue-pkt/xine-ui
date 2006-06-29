@@ -2316,7 +2316,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
                                                          char *checkbox_label, int checkbox_state,
                                                          xitk_state_callback_t cb3,
 							 void *userdata, 
-							 int window_width, int align, char *message, ...);
+							 int window_width, int align, char *message, ...)
+  __attribute__((__format__(__printf__, 13, 14)));
 
 #ifdef __GNUC__
 #define xitk_window_dialog_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, userdata, window_width, align, message, args...) \
