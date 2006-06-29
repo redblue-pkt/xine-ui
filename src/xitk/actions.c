@@ -398,7 +398,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     
 
     if(v_unhandled && a_unhandled) {
-      xine_error(buffer);
+      xine_error("%s", buffer);
       return 0;
     }
 
@@ -416,7 +416,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       xw = xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Start Playback ?"), 
 					       start_anyway_yesno, start_anyway_yesno, 
 					       NULL, 400, ALIGN_CENTER,
-					       buffer);
+					       "%s", buffer);
       XLockDisplay(gGui->display);
       if(!gGui->use_root_window && gGui->video_display == gGui->display)
 	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);

@@ -626,7 +626,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 						     _("Reset"), _("Editor"), _("Cancel"),
 						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
 						     (void *) kbt, 450, ALIGN_CENTER,
-						     kmsg);
+						     "%s", kmsg);
     free(kmsg);
     XLockDisplay(gGui->display);
     if(!gGui->use_root_window && gGui->video_display == gGui->display)

@@ -1012,7 +1012,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
     xitk_window_dialog_yesno(gGui->imlib_data, _("Confirm deletion ?"),
 			     fb_delete_file_cb, 
 			     fb_delete_file_cb, 
-			     (void *)fb, ALIGN_DEFAULT, buf);
+			     (void *)fb, ALIGN_DEFAULT, "%s", buf);
   }
 }
 

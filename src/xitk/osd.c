@@ -719,7 +719,7 @@ void osd_display_spu_lang(void) {
   }
   
   snprintf(buffer, sizeof(buffer), "%s%s", _("Subtitles: "), get_language_from_iso639_1(lang));
-  osd_display_info(buffer);
+  osd_display_info("%s", buffer);
 }
 
 void osd_display_audio_lang(void) {
@@ -748,7 +748,7 @@ void osd_display_audio_lang(void) {
   }
 
   snprintf(buffer, sizeof(buffer), "%s%s", _("Audio Channel: "), get_language_from_iso639_1(lang));
-  osd_display_info(buffer);
+  osd_display_info("%s", buffer);
 }
 
 void osd_update_osd(void) {

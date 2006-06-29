@@ -845,10 +845,10 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  *  to snapshot current frame.
  */
 static void panel_snapshot_error(void *data, char *message) {
-  xine_error(message);
+  xine_error("%s", message);
 }
 static void panel_snapshot_info(void *data, char *message) {
-  xine_info(message);
+  xine_info("%s", message);
 }
 void panel_snapshot(xitk_widget_t *w, void *data) {
   create_snapshot(gGui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, NULL);

@@ -639,7 +639,7 @@ static int __attribute__ ((format (printf, 2, 3))) write_to_console(session_t *s
   va_end(args);
   
   pthread_mutex_lock(&session->console_mutex);
-  err = write_to_console_unlocked(session, buf);
+  err = write_to_console_unlocked(session, "%s", buf);
   pthread_mutex_unlock(&session->console_mutex);
 
   return err;
@@ -999,7 +999,7 @@ static void *select_thread(void *data) {
 		  write_to_console_unlocked_nocr(session, "\b \b");
 		  pos--;
 		}
-		write_to_console_unlocked(session, obuffer);
+		write_to_console_unlocked(session, "%s", obuffer);
 
 		rl_crlf();
 		rl_forced_update_display();
@@ -1083,7 +1083,7 @@ static void client_handle_command(session_t *session, const char *command) {
 	  
 	  *pp = '\0';
 	  
-	  if((sock_write(session->socket, buf)) == -1) {
+	  if((sock_write(session->socket, "%s", buf)) == -1) {
 	    session->running = 0;
 	  }
 	}
@@ -1095,7 +1095,7 @@ static void client_handle_command(session_t *session, const char *command) {
   
   /* Perhaps a ';' separated commands, so send anyway to server */
   if(found == 0) {
-    sock_write(session->socket, (char *)command);
+    sock_write(session->socket, "%s", (char *)command);
   }
   
   if((!strncasecmp(cmd, "exit", strlen(cmd))) || (!strncasecmp(cmd, "halt", strlen(cmd)))) {
@@ -1713,7 +1713,7 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
     i++;
   }
   strcat(buf, ".\n");
-  sock_write(client_info->socket, buf);
+  sock_write(client_info->socket, "%s", buf);
 }
 
 static void do_help(commands_t *cmd, client_info_t *client_info) {
@@ -1759,7 +1759,7 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     }
     
     strcat(buf, "\n");
-    sock_write(client_info->socket, buf);
+    sock_write(client_info->socket, "%s", buf);
   }
   else {
     int i;
@@ -2090,7 +2090,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	  strcat(buf, "*UNKNOWN*");
 	
 	strcat(buf, "\n");
-	sock_write(client_info->socket, buf);
+	sock_write(client_info->socket, "%s", buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
@@ -2111,7 +2111,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	  strcat(buf, "*UNKNOWN*");
 	
 	strcat(buf, "\n");
-	sock_write(client_info->socket, buf);
+	sock_write(client_info->socket, "%s", buf);
       }
       else if(is_arg_contain(client_info, 1, "position")) {
 	char buf[64];
@@ -2123,7 +2123,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_time,
 			    &length_time);
 	snprintf(buf, sizeof(buf), "%s: %d\n", "Current position", pos_time);
-	sock_write(client_info->socket, buf);
+	sock_write(client_info->socket, "%s", buf);
       }
       else if(is_arg_contain(client_info, 1, "length")) {
 	char buf[64];
@@ -2135,7 +2135,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_time,
 			    &length_time);
 	snprintf(buf, sizeof(buf), "%s: %d\n", "Current length", length_time);
-	sock_write(client_info->socket, buf);
+	sock_write(client_info->socket, "%s", buf);
       }
       else if(is_arg_contain(client_info, 1, "loop")) {
 	char buf[64];
@@ -2164,7 +2164,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 
 	strcat(buf, ".\n");
-	sock_write(client_info->socket, buf);
+	sock_write(client_info->socket, "%s", buf);
       }
     }
     else if(nargs >= 2) {
@@ -2547,7 +2547,7 @@ static void do_halt(commands_t *cmd, client_info_t *client_info) {
 static void network_messenger(void *data, char *message) {
   int socket = (int) data;
   
-  sock_write(socket, message);
+  sock_write(socket, "%s", message);
 }
 
 static void do_snap(commands_t *cmd, client_info_t *client_info) {
@@ -2572,7 +2572,7 @@ static void say_hello(client_info_t *client_info) {
   else {
     snprintf(buf, sizeof(buf), "%s %s %s\n", PACKAGE, VERSION, "remote server. Nice to meet you.");
   }
-  sock_write(client_info->socket, buf);
+  sock_write(client_info->socket,"%s",  buf);
   
 }
 

@@ -1260,7 +1260,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
       gGui->mrl_overrided = 3;
       panel_set_title(buffer);
-      osd_display_info(buffer);
+      osd_display_info("%s", buffer);
     }
     break;
 

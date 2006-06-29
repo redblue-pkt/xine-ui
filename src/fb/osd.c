@@ -620,7 +620,7 @@ void osd_display_spu_lang(void) {
   }
   
   sprintf(buffer, "Subtitles: %s", lang);
-  osd_display_info(buffer);
+  osd_display_info("%s", buffer);
 }
 
 void osd_display_audio_lang(void) {
@@ -649,7 +649,7 @@ void osd_display_audio_lang(void) {
   }
 
   sprintf(buffer, "Audio Channel: %s", lang);
-  osd_display_info(buffer);
+  osd_display_info("%s", buffer);
 }
 
 void osd_display_zoom(void) {
