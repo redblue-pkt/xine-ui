@@ -447,9 +447,11 @@ void osd_stream_infos(void) {
       osd_stream_position();
     }
 
+#ifdef XINE_PARAM_VO_WINDOW_WIDTH
     if (xine_osd_get_capabilities(fbxine.osd.sinfo) & XINE_OSD_CAP_UNSCALED)
       width = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_WIDTH);
     else
+#endif
       width = vwidth;
     
     x = (width - osdw) - 40;
@@ -554,12 +556,14 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
       xine_osd_get_text_size(fbxine.osd.bar[1], title, &tw, &th);
       xine_osd_draw_text(fbxine.osd.bar[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
     }
-    
+
+#ifdef XINE_PARAM_VO_WINDOW_WIDTH
     if (xine_osd_get_capabilities(fbxine.osd.bar[0]) & XINE_OSD_CAP_UNSCALED) {
       width  = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_WIDTH);
       height = xine_get_param(fbxine.stream, XINE_PARAM_VO_WINDOW_HEIGHT);
-    }
-    else {
+    } else
+#endif
+    {
       width  = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
       height = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
     }
