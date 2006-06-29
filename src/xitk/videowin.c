@@ -1898,19 +1898,22 @@ void video_window_exit (void) {
 
   gVw->second_display_running = 0;
   if(gGui->use_root_window || gGui->video_display != gGui->display) {
-    XExposeEvent event;
+    union {
+      XExposeEvent expose;
+      XEvent event;
+    } event;
     
     XLockDisplay(gGui->video_display);
     XClearWindow(gGui->video_display, gGui->video_window);
-    event.type       = Expose;
-    event.send_event = True;
-    event.display    = gGui->video_display;
-    event.window     = gGui->video_window;
-    event.x          = 0;
-    event.y          = 0;
-    event.width      = gVw->video_width;
-    event.height     = gVw->video_height;
-    XSendEvent(gGui->video_display, gGui->video_window, False, Expose, (XEvent *) &event);
+    event.expose.type       = Expose;
+    event.expose.send_event = True;
+    event.expose.display    = gGui->video_display;
+    event.expose.window     = gGui->video_window;
+    event.expose.x          = 0;
+    event.expose.y          = 0;
+    event.expose.width      = gVw->video_width;
+    event.expose.height     = gVw->video_height;
+    XSendEvent(gGui->video_display, gGui->video_window, False, Expose, &event.event);
     XUnlockDisplay(gGui->video_display);
   }
     

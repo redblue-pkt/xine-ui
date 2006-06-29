@@ -631,7 +631,6 @@ if test "$GCC" = yes; then
     dnl
     AC_TRY_CFLAGS("-mpreferred-stack-boundary=2", 
 	m_psb="-mpreferred-stack-boundary=2", m_psb="")
-    AC_TRY_CFLAGS("-fno-strict-aliasing", f_nsa="-fno-strict-aliasing", f_nsa="")
     AC_TRY_CFLAGS("-fschedule-insns2", f_si="-fschedule-insns2", f_si="")
     AC_TRY_CFLAGS("-mwide-multiply", m_wm="-mwide-multiply", m_wm="")
     dnl
@@ -660,6 +659,8 @@ fi
 
 dnl Flags not supported by all *cc* variants
 AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
+AC_TRY_CFLAGS("-fno-strict-aliasing", NO_STRICT_ALIASING="-fno-strict-aliasing")
+AC_SUBST(NO_STRICT_ALIASING)
 
 dnl Common cflags for all platforms
 COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
@@ -677,7 +678,7 @@ fi
 
 case "$host_or_hostalias" in
   i386-*-freebsd*)
-    CFLAGS="-pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions -D_REENTRANT $CFLAGS"
+    CFLAGS="-pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si -ffast-math -funroll-loops -finline-functions -D_REENTRANT $CFLAGS"
     DEBUG_CFLAGS="$X_CFLAGS -D_REENTRANT -DDEBUG $DEBUG_CFLAGS"
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
     AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
@@ -721,7 +722,7 @@ case "$host_or_hostalias" in
         AC_TRY_CFLAGS("$sarchopt=athlon", k7cpu="athlon", k7cpu="i686")
 
 	dnl add x86 specific gcc CFLAGS
-	CFLAGS="-O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+	CFLAGS="-O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si -ffast-math -funroll-loops -finline-functions $CFLAGS"
 
 	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
 
@@ -833,7 +834,7 @@ case "$host_or_hostalias" in
 
   ppc-*-linux-* | powerpc-*) 
     AC_DEFINE(__ppc__,1,[Define this if you're running PowerPC architecture])
-    CFLAGS="-O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+    CFLAGS="-O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si -ffast-math -funroll-loops -finline-functions $CFLAGS"
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
@@ -920,7 +921,7 @@ case "$host_or_hostalias" in
     ;;
 
   x86_64-*)
-    CFLAGS="-O3 -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+    CFLAGS="-O3 -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si -ffast-math -funroll-loops -finline-functions $CFLAGS"
     DEBUG_CFLAGS="-O0 -g $DEBUG_CFLAGS"
     ;;
 
@@ -1085,6 +1086,10 @@ if test "x$wformat" != "x"; then
 fi
 AC_TRY_CFLAGS("-Wmissing-format-attribute", wformat="$wformat -Wmissing-format-attribute")
 CFLAGS="$CFLAGS $wformat"
+
+AC_TRY_CFLAGS("-Wstrict-aliasing", wsa="-Wstrict-aliasing")
+AC_TRY_CFLAGS("-Wstrict-aliasing=2", wsa="-Wstrict-aliasing=2")
+CFLAGS="$CFLAGS $wsa"
 
 dnl
 dnl It seems automake 1.5 don't take care about this script

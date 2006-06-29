@@ -77,18 +77,21 @@ static int connect_to_session(int session) {
   int fd;
   
   if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
-    struct sockaddr_un   saddr;
+    union {
+      struct sockaddr_un un;
+      struct sockaddr sa;
+    } saddr;
     uid_t                stored_uid, euid;
     
-    saddr.sun_family = AF_UNIX;
+    saddr.un.sun_family = AF_UNIX;
     stored_uid       = getuid();
     euid             = geteuid();
     setuid(euid);
 
-    snprintf(saddr.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
+    snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
     setreuid(stored_uid, euid);
 
-    if((connect(fd,(struct sockaddr *) &saddr, sizeof(saddr))) != -1)
+    if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1)
       return fd;
 
   }
@@ -261,10 +264,13 @@ int is_remote_running(int session) {
 static void *ctrlsocket_func(void *data) {
   fd_set                set;
   struct timeval        tv;
-  struct sockaddr_un    saddr;
   serv_header_packet_t *shdr;
   int                   fd;
   socklen_t             len;
+  union {
+    struct sockaddr_un un;
+    struct sockaddr sa;
+  } saddr;
 
   while(!going)
     xine_usec_sleep(10000);
@@ -277,10 +283,10 @@ static void *ctrlsocket_func(void *data) {
     tv.tv_sec  = 0;
     tv.tv_usec = 100000;
 
-    len = sizeof(saddr);
+    len = sizeof(saddr.un);
     
     if(((select(ctrl_fd + 1, &set, NULL, NULL, &tv)) <= 0) || 
-       ((fd = accept(ctrl_fd, (struct sockaddr *) &saddr, &len)) == -1))
+       ((fd = accept(ctrl_fd, &saddr.sa, &len)) == -1))
       continue;
     
     shdr = (serv_header_packet_t *) xine_xmalloc((sizeof(serv_header_packet_t)));
@@ -562,38 +568,41 @@ void deinit_session(void) {
 }
 
 int init_session(void) {
-  struct sockaddr_un   saddr;
+  union {
+    struct sockaddr_un un;
+    struct sockaddr sa;
+  } saddr;
   int                  retval = 0;
   int                  i;
   
   if((ctrl_fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
     for(i = 0;; i++)	{
-      saddr.sun_family = AF_UNIX;
+      saddr.un.sun_family = AF_UNIX;
       
-      snprintf(saddr.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", i);
+      snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", i);
       if(!is_remote_running(i)) {
-	if((unlink(saddr.sun_path) == -1) && errno != ENOENT) {
+	if((unlink(saddr.un.sun_path) == -1) && errno != ENOENT) {
 	  fprintf(stderr, "setup_ctrlsocket(): Failed to unlink %s (Error: %s)", 
-		  saddr.sun_path, strerror(errno));
+		  saddr.un.sun_path, strerror(errno));
 	}
       }
       else
 	continue;
       
-      if((bind(ctrl_fd, (struct sockaddr *) &saddr, sizeof (saddr))) != -1) {
+      if((bind(ctrl_fd, &saddr.sa, sizeof (saddr.un))) != -1) {
 
 	session_id = i;
 	listen(ctrl_fd, 100);
 	going = 1;
 	
 	pthread_create(&thread_server, NULL, ctrlsocket_func, NULL);
-	socket_name = strdup(saddr.sun_path);
+	socket_name = strdup(saddr.un.sun_path);
 	retval = 1;
 	break;
       }
       else {
 	fprintf(stderr, "setup_ctrlsocket(): Failed to assign %s to a socket (Error: %s)",
-		saddr.sun_path, strerror(errno));
+		saddr.un.sun_path, strerror(errno));
 	break;
       }
     }
@@ -629,7 +638,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   char        *sopts         = suboptarg;
   int          optsess       = -1;
   char        *playlist_load = NULL;
-  const char  *tokens[]      = {
+  static const char const *tokens[]      = {
     /* Don't change order */
     "play",  "slow2",  "slow4",   "pause",      "fast2",
     "fast4", "stop",   "quit",    "fullscreen", "eject",
@@ -647,7 +656,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   loop           = -1;
   speed_status   = time_status = 0;
 
-  while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
+  while((c = getsubopt(&sopts, tokens, &optstr)) != -1) {
     switch(c) {
 
       /* play -> eject */

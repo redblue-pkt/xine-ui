@@ -226,7 +226,10 @@ struct client_info_s {
   int                   finished;
 
   int                   socket;
-  struct sockaddr_in    sin;
+  union {
+    struct sockaddr_in  in;
+    struct sockaddr     sa;
+  } fsin;
   char                **actions;
 
   struct {
@@ -593,23 +596,26 @@ static char *_atoa(char *str) {
 
 #ifdef NETWORK_CLIENT
 static int sock_client(const char *host, const char *service, const char *transport) {
-  struct sockaddr_in   sin;
+  union {
+    struct sockaddr_in in;
+    struct sockaddr sa;
+  } fsin;
   struct hostent      *ihost;
   int                  sock;
   
-  sock = sock_create(service, transport, &sin);
+  sock = sock_create(service, transport, &fsin.in);
 
-  if ((sin.sin_addr.s_addr = inet_addr(host)) == INADDR_NONE) {
+  if ((fsin.in.sin_addr.s_addr = inet_addr(host)) == INADDR_NONE) {
     ihost = gethostbyname(host);
     
     if(!ihost) {
       sock_err("Unknown host: %s\n", host);
       return -1;
     }
-    memcpy(&sin.sin_addr, ihost->h_addr, ihost->h_length);
+    memcpy(&fsin.in.sin_addr, ihost->h_addr, ihost->h_length);
   }
   
-  if(connect(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+  if(connect(sock, &fsin.sa, sizeof(fsin.in)) < 0) {
     int err = errno;
 
     close(sock);
@@ -1327,15 +1333,18 @@ int main(int argc, char **argv) {
 #else
 
 static int sock_serv(const char *service, const char *transport, int queue_length) {
-  struct sockaddr_in  sin;
+  union {
+    struct sockaddr_in in;
+    struct sockaddr sa;
+  } fsin;
   int                 sock;
   int                 on = 1;
 
-  sock = sock_create(service, transport, &sin);
+  sock = sock_create(service, transport, &fsin.in);
   
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
   
-  if(bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
+  if(bind(sock, &fsin.sa, sizeof(fsin.in)) < 0)
     sock_err("Unable to link socket %s: %s\n", service, strerror(errno));
   
   if(strcmp(transport, "udp") && listen(sock, queue_length) < 0)
@@ -2981,9 +2990,9 @@ static void *server_thread(void *data) {
     msock = sock_serv(service, "tcp", 5);
     
     client_info = (client_info_t *) xine_xmalloc(sizeof(client_info_t));
-    lsin = sizeof(client_info->sin);
+    lsin = sizeof(client_info->fsin.in);
     
-    client_info->socket = accept(msock, (struct sockaddr *)&(client_info->sin), &lsin);
+    client_info->socket = accept(msock, &(client_info->fsin.sa), &lsin);
     client_info->authentified = is_client_authorized(client_info);
     
     if(client_info->socket < 0) {
