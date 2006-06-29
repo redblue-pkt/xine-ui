@@ -13,6 +13,7 @@ endif
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 
+kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
 kbindings_man_LDADD = @XINE_LIBS@ 
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	     $(top_builddir)/src/xitk/oxine/liboxine.la \
@@ -20,6 +21,7 @@ kbindings_man_LDADD = @XINE_LIBS@
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm
+kbindings_man_SOURCES = kbindings_man.c
 
 xine_SOURCES = \
 	actions.c \
@@ -69,13 +71,15 @@ xine_LDADD = @XINE_LIBS@ \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm $(DBG_LIBS)
 
-xine_remote_SOURCES = xine-remote.c
-xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la \
-			   xine-remote.c
+xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
+xine_remote_SOURCES = network.c
+xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
 xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
 	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
+session_ctrl_CFLAGS = $(AM_CFLAGS) -DCTRL_TEST
 session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
+session_ctrl_SOURCES = session.c
 
 noinst_HEADERS = \
 	actions.h \
@@ -116,26 +120,6 @@ noinst_HEADERS = \
 $(top_builddir)/src/common/libcommon.la:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
 
-xine-remote.c:	$(srcdir)/network.c
-	@rm -f xine-remote.c;$(LN_S) $(srcdir)/network.c ./xine-remote.c
-
-xine-remote.o: xine-remote.c
-	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
-
-session_ctrl.c: $(srcdir)/session.c
-	@rm -f ./session_ctrl.c; $(LN_S) $(srcdir)/session.c ./session_ctrl.c
-
-session_ctrl.o: session_ctrl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS) -DCTRL_TEST -c `test -f $< || echo '$(srcdir)/'`$<
-
-kbindings_man.c: $(srcdir)/kbindings.c
-	@rm -f kbindings_man.c; $(LN_S) $(srcdir)/kbindings.c ./kbindings_man.c
-
-kbindings_man.o: kbindings_man.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS) -DKBINDINGS_MAN -c `test -f $< || echo '$(srcdir)/'`$<
-
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
 
@@ -146,7 +130,7 @@ install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#* session_ctrl
+	-rm -f *~ \#* .*~ .\#*
 
 maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"
