@@ -1083,6 +1083,7 @@ AC_TRY_CFLAGS("-Wformat=2", wformat="-Wformat=2")
 if test "x$wformat" != "x"; then
    AC_TRY_CFLAGS("-Wno-format-zero-length", wformat="$wformat -Wno-format-zero-length")
 fi
+AC_TRY_CFLAGS("-Wmissing-format-attribute", wformat="$wformat -Wmissing-format-attribute")
 CFLAGS="$CFLAGS $wformat"
 
 dnl
