@@ -648,17 +648,6 @@ AC_SUBST(NO_STRICT_ALIASING)
 dnl Common cflags for all platforms
 COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
 
-host_or_hostalias="$host"
-if test "$host_or_hostalias" = ""; then
-    dnl user has called ./configure with a host parameter unknown to
-    dnl config.sub
-    dnl
-    dnl Try the following switch with user's original host-alias
-    dnl input instead.
-    dnl
-    host_or_hostalias="$host_alias"
-fi
-
 CFLAGS="-DNDEBUG $COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 DEBUG_CFLAGS="$COMMON_CFLAGS $DEBUG_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
 AC_SUBST(CFLAGS)
