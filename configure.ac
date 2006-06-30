@@ -275,11 +275,15 @@ fi
 dnl
 dnl Checks for Xinerama extension
 dnl
-AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
-             X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
-             AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
-             ac_have_xinerama="yes",,
-             $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+AC_ARG_ENABLE([xinerama],
+              AS_HELP_STRING([--disable-xinerama], [Don't build support for xinerama (default: check)]))
+if test "x$enable_xinerama" != "xno"; then
+  AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
+               X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
+               AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
+               ac_have_xinerama="yes",,
+               $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+fi
 AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
 
 
