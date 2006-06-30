@@ -276,7 +276,7 @@ dnl
 dnl Checks for Xinerama extension
 dnl
 AC_ARG_ENABLE([xinerama],
-              AS_HELP_STRING([--disable-xinerama], [Don't build support for xinerama (default: check)]))
+   AS_HELP_STRING([--disable-xinerama], [Don't build support for xinerama (default: check)]))
 if test "x$enable_xinerama" != "xno"; then
   AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
                X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
@@ -324,11 +324,10 @@ fi
 dnl
 dnl ncurses
 dnl
-AC_ARG_WITH(ncurses,
-   [  --without-ncurses       Turn off ncurses support.],
-   [], with_ncurses=yes)
+AC_ARG_WITH([ncurses],
+   AS_HELP_STRING([--without-ncurses], [Turn off ncurses support.]))
 
-if test x"$with_ncurses" = xyes; then
+if test "x$with_ncurses" != "xno"; then
   AC_CHECK_HEADERS(curses.h)
   AC_CHECK_LIB(ncurses, cbreak,
                AC_DEFINE(HAVE_NCURSES,,[Define this if you have ncurses installed])
@@ -342,9 +341,8 @@ AM_CONDITIONAL(HAVE_NCURSES, test x$ac_have_ncurses = "xyes")
 dnl
 dnl Libcurl
 dnl
-AC_ARG_WITH(curl,
-   [  --without-curl          Turn off curl support.],
-   [], with_curl=yes)
+AC_ARG_WITH([curl],
+   AS_HELP_STRING([--without-curl], [Turn off CURL support.]))
 
 if test x"$with_curl" = xyes; then
   AM_PATH_CURL(7.10.2, [
@@ -367,9 +365,8 @@ AC_SUBST(NET_LIBS)
 dnl
 dnl check for ascii-art library
 dnl
-AC_ARG_WITH(aalib,
-   [  --without-aalib         Turn off AALIB support.],
-   [], with_aalib=yes)
+AC_ARG_WITH([aalib],
+   AS_HELP_STRING([--without-aalib], [Turn off AALIB support.]))
 
 if test x"$with_aalib" = xyes; then
   AM_PATH_AALIB(1.2.0,,)
@@ -382,10 +379,9 @@ dnl
 dnl checks for Color AsCii Art library
 dnl 
 AC_ARG_WITH(libcaca,
-   [  --without-libcaca       Turn off CACA support.],
-   [], with_libcaca=yes)
+   AS_HELP_STRING([--without-libcaca], [Turn off CACA support.]))
 
-if test x"$with_libcaca" = xyes; then
+if test "x$with_libcaca" != "xno"; then
   AM_PATH_CACA(0.3,, AC_MSG_RESULT([*** All CACA-dependent parts will be disabled ***]))
 else
   no_caca=yes
@@ -393,8 +389,9 @@ fi
 AM_CONDITIONAL(HAVE_CACA, test x$no_caca != "xyes")
 
 dnl option for font sets and multibyte string support
-AC_ARG_ENABLE(mbs, [  --disable-mbs           Disable multibyte string support], echo $enable_mbs, enable_mbs="yes")
-if test "x$enable_mbs" = "xyes"; then
+AC_ARG_ENABLE([mbs],
+   AS_HELP_STRING([--disable-mbs], [Disable multibyte string support]))
+if test "x$enable_mbs" != "xno"; then
   AC_DEFINE(WITH_XMB,,[Define this if you want support multibyte strings in gui])
 fi
 
