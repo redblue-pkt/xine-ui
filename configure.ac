@@ -481,10 +481,10 @@ AM_CONDITIONAL(HAVE_DIRECTFB, test x$have_directfb = "xyes" )
 dnl
 dnl check for libpng
 dnl
-AC_ARG_WITH(png-prefix,
-    [  --with-png-prefix=PFX   Prefix where PNG library is installed (optional)], png_prefix="$withval", png_prefix="")
+AC_ARG_WITH([png-prefix],
+   AS_HELP_STRING([--with-png-prefix=PATH], [Prefix where PNG librayr is installed (optional)]))
 
-if test x"$png_prefix" != "x"; then
+if test x"$with_png_prefix" != "x"; then
     PNG_LIB="-L$png_prefix/lib"
     PNG_CFLAGS="-I$png_prefix/include"
     old_CPPFLAGS="$CPPFLAGS"
@@ -683,23 +683,6 @@ case "$host_or_hostalias" in
     DEBUG_CFLAGS="$X_CFLAGS -D_REENTRANT -DDEBUG $DEBUG_CFLAGS"
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
     AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
-
-    AC_CHECK_HEADER(/usr/local/include/iconv.h,
-			CFLAGS="-I/usr/local/include $CFLAGS"
-			LDFLAGS="-L/usr/local/lib $LDFLAGS"
-	                GICONV_BSD_LIBS="-liconv"
-		        no_BSDiconv="no", 
-                        [ no_BSDiconv="yes"
-	                  echo
-                          echo "****************************************************************"
-		          echo "* You need to install a recent version of the port 'libiconv'  *"
-			  echo "* (in /usr/ports/converters/libiconv).                         *"
-			  echo "* The library in this port is needed to successfully compile   *"
-			  echo "* libsputext plugin.                                           *"
-                          echo "****************************************************************"
-	                  echo 
-                        ],)
-    ;;
 
   i?86-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-* | pentium*)
     if test "$GCC" = yes -o "${CC##*/}x" = "iccx" ; then
