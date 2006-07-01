@@ -20,6 +20,9 @@ xine-ui (0.99.5) unstable; urgency=low
   * fixed aspect ratio in snapshot function
   * lock against WM/daemon-initiated opacity changes (given suitably-patched
     compositor managers and opacity-setting daemons)
+  * make the configure script rely more on pkg-config, to simplify and speed up the
+    checks. Add requirement of pkg-config presence.
+  * bump version requirement for xine-lib to 1.1.0 and for libpng to 1.2.8.
 
 xine-ui (0.99.4) unstable; urgency=low
 
