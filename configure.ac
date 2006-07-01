@@ -303,14 +303,16 @@ dnl
 AC_ARG_WITH([curl],
    AS_HELP_STRING([--without-curl], [Turn off CURL support.]))
 
-if test x"$with_curl" = xyes; then
-  AM_PATH_CURL(7.10.2, [
-     AC_DEFINE(HAVE_CURL,,[Define this if you have libcurl installed])], [
-     AC_MSG_RESULT(*** All of curl dependent parts will be disabled ***)])
-else
-  no_curl=yes
+if test x"$with_curl" != xno; then
+   PKG_CHECK_MODULES([CURL], [libcurl >= 7.10.2], have_curl="yes", have_curl="no")
+   
+   if test "x$have_curl" = "xyes"; then
+      AC_DEFINE([HAVE_CURL], [1], [Define this if you have libcurl installed])
+   else
+      AC_MSG_RESULT([*** All of curl dependent parts will be disabled ***])
+   fi
 fi
-AM_CONDITIONAL(HAVE_CURL, test x$no_curl != "xyes")
+AM_CONDITIONAL(HAVE_CURL, test x$have_curl = "xyes")
 
 
 dnl
