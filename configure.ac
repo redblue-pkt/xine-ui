@@ -72,14 +72,9 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_LN_S
+PKG_PROG_PKG_CONFIG
 
-dnl
-dnl Libtool
-dnl
-dnl
 dnl NLS Support
-dnl
-dnl AM_WITH_NLS(use-libtool,,)
 AM_GNU_GETTEXT(external)
 AC_PROG_GMSGFMT_PLURAL
 
@@ -378,23 +373,6 @@ if test "x$enable_mbs" != "xno"; then
 fi
 
 dnl
-dnl Find pkg-config
-dnl
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-if test x"$PKG_CONFIG" != "xno" ; then
-
-  if test x$pkg_exec_prefix != x ; then
-    if test x${PKG_CONFIG+set} != xset ; then
-      PKG_CONFIG=$pkg_exec_prefix/bin/pkg-config
-    fi
-  fi
-
-else
-  echo "*** pkg-config not found. See http://pkgconfig.sourceforge.net"
-  echo "*** All of DIRECTFB dependent parts will be disabled"
-fi
-
-dnl
 dnl Check for Xft
 dnl
 AC_MSG_CHECKING([whether to have Xft support])
@@ -437,24 +415,16 @@ dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE N
 dnl  DFB:
 dnl  Temporary disabled, port to new API needed
 dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-if test x"$PKG_CONFIG" != "xno" ; then
   if test "x" != "x"; then
 
     DIRECTFB_REQUIRED_VERSION=0.9.10
+    PKG_CHECK_MODULES([DIRECTFB], [directfb >= $DIRECTFB_REQUIRED_VERSION],
+       [have_directfb=yes], [have_directfb=no])
 
-    AC_MSG_CHECKING(for DirectFB)
-    if $PKG_CONFIG --atleast-version $DIRECTFB_REQUIRED_VERSION directfb ; then
-        AC_MSG_RESULT(found)
-        DIRECTFB_CFLAGS=`$PKG_CONFIG --cflags directfb`
-        DIRECTFB_LIBS=`$PKG_CONFIG --libs directfb`
-        have_directfb="yes"
-    else
-        AC_MSG_RESULT([*** All of DIRECTFB dependent parts will be disabled ***])
+    if test "x$have_directfb" != "xyes"; then
+       AC_MSG_RESULT([*** All of DirectFB dependent parts will be disabled ***])
     fi
-
   fi
-
-fi
 
 AC_SUBST(DIRECTFB_CFLAGS)
 AC_SUBST(DIRECTFB_LIBS)
