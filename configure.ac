@@ -80,8 +80,6 @@ AC_TYPE_SIZE_T
 dnl AC_CHECK_TYPES([ptrdiff_t])
 dnl AC_C_BIGENDIAN
 
-AC_SUBST(DEBUG_CFLAGS)
-
 dnl
 dnl Check for xine-lib
 dnl
@@ -503,13 +501,17 @@ AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
 AC_TRY_CFLAGS("-fno-strict-aliasing", NO_STRICT_ALIASING="-fno-strict-aliasing")
 AC_SUBST(NO_STRICT_ALIASING)
 
-dnl Common cflags for all platforms
-COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
-
-CFLAGS="-DNDEBUG $COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
-DEBUG_CFLAGS="$COMMON_CFLAGS $DEBUG_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
+CFLAGS="$wall -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 AC_SUBST(CFLAGS)
-AC_SUBST(DEBUG_CFLAGS)
+
+AC_ARG_ENABLE([debug],
+   AS_HELP_STRING([--enable-debug], [Enable debugging code]))
+
+if test "x$enable_debug" = "xyes"; then
+   CFLAGS="$CFLAGS -DDEBUG"
+else
+   CFLAGS="$CFLAGS -DNDEBUG"
+fi
 
 dnl gcc __attribute__ ((aligned ()))
 AC_C_ATTRIBUTE_ALIGNED

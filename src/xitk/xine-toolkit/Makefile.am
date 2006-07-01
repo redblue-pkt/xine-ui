@@ -78,20 +78,3 @@ test_LDADD = libxitk.a
 
 $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a:
 	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.a
-
-debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
-
-test-debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)" test
-
-install-debug: debug
-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#* test
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in

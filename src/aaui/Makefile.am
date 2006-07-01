@@ -1,5 +1,4 @@
 AM_CFLAGS = @XINE_CFLAGS@
-DEBUG_CFLAGS = @DEBUG_CFLAGS@ @XINE_CFLAGS@
 
 if HAVE_AA
 aa_programs = aaxine
@@ -25,17 +24,3 @@ cacaxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
 
 $(top_builddir)/src/common/libcommon.a:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.a
-
-debug:
-	@$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
-
-install-debug: debug
-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in

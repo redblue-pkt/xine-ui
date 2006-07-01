@@ -4,7 +4,7 @@ endif
 
 noinst_LIBRARIES = libcommon.a $(commonx)
 
-AM_CFLAGS = @XINE_CFLAGS@ @X_CFLAGS@
+AM_CFLAGS = @XINE_CFLAGS@
 
 EXTRA_DIST = getopt.c getopt1.c getopt.h xscreensaver-remote.c xscreensaver-remote.h 
 
@@ -15,22 +15,7 @@ GETOPT_HDR = getopt.h
 endif
 
 libcommon_a_SOURCES = $(GETOPT_SRC) utils.c
+libcommonx_a_CFLAGS = $(X_CFLAGS)
 libcommonx_a_SOURCES = x11utils.c
 
 noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
-
-debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
-
-install-debug: debug
-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
-
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in

@@ -30,14 +30,3 @@ docs_DATA = \
 	README.cs.5.xine-ui \
 	README.cs.10.Remote_control \
 	README.cs.15.MRLs
-
-debug:
-install-debug: install
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in

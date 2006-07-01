@@ -15,17 +15,3 @@ EXTRA_DIST = glibc2.m4 intdiv0.m4 intmax.m4 inttypes.m4 inttypes_h.m4 inttypes-p
 	readline.m4 \
 	xft.m4 \
 	_xine.m4
-
-
-debug:
-
-install-debug: debug
-
-mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
-
-
-maintainer-clean-generic:
-	-@echo "This command is intended for maintainers to use;"
-	-@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in
