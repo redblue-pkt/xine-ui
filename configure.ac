@@ -692,10 +692,9 @@ misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
-misc/relchk.sh
 misc/desktops/Makefile
 misc/visuals/Makefile
 po/Makefile.in
 ])
-AC_CONFIG_COMMANDS([default],[[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh ./misc/relchk.sh]],[[]])
+AC_CONFIG_COMMANDS([default],[[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh]],[[]])
 AC_OUTPUT
