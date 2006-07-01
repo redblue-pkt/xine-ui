@@ -189,10 +189,12 @@ AM_CONDITIONAL(HAVE_XV, test x$ac_have_xv = "xyes")
 dnl
 dnl Shm
 dnl
-AC_ARG_ENABLE(shm, [  --disable-shm           Disable shared memory support in build.], disable_shm_default="yes", enable_shm="yes")
-AC_ARG_ENABLE(shm, [  --disable-shm-default   Disable shared memory support by default.], disable_shm_default="yes",)
+AC_ARG_ENABLE([shm],
+   AS_HELP_STRING([--disable-shm], [Disable shared memory support in build.]))
+AC_ARG_ENABLE([shm-default],
+   AS_HELP_STRING([--disable-shm-default], [Disable shared memory support by default.]))
 
-if test "x$disable_shm_default" = "xyes"; then
+if test "x$enable_shm_default" = "xno"; then
   AC_DEFINE(DISABLE_SHM_DEFAULT,,[Disable shared memory by default])
 fi
 
@@ -482,7 +484,7 @@ dnl
 dnl check for libpng
 dnl
 AC_ARG_WITH([png-prefix],
-   AS_HELP_STRING([--with-png-prefix=PATH], [Prefix where PNG librayr is installed (optional)]))
+   AS_HELP_STRING([--with-png-prefix=PATH], [Prefix where PNG library is installed (optional)]))
 
 if test x"$with_png_prefix" != "x"; then
     PNG_LIB="-L$png_prefix/lib"
@@ -577,8 +579,9 @@ AC_CHECK_LIRC
 dnl
 dnl user selectable support for special VDR interaction keys
 dnl
-AC_ARG_ENABLE(vdr-keys, [  --enable-vdr-keys       Support special keys for VDR interaction.], vdr_keys=$enableval, vdr_keys=no)
-if test x"$vdr_keys" = xyes ; then
+AC_ARG_ENABLE([vdr-keys],
+   AS_HELP_STRING([--enable-vdr-keys], [Support special keys for VDR interaction.]))
+if test x"$enable_vdr_keys" = xyes ; then
   AC_DEFINE(ENABLE_VDR_KEYS,, [Define this if you want support for VDR keys.])
 fi
 
