@@ -12,7 +12,6 @@ src/xitk/file_browser.c
 src/xitk/help.c
 src/xitk/i18n.h
 src/xitk/kbindings.c
-src/xitk/kbindings_man.c
 src/xitk/lang.c
 src/xitk/lirc.c
 src/xitk/main.c
