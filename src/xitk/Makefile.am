@@ -22,7 +22,7 @@ kbindings_man_LDADD = @XINE_LIBS@
 	     $(X_PRE_LIBS) $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm
-kbindings_man_SOURCES = kbindings_man.c
+kbindings_man_SOURCES = kbindings.c
 
 xine_SOURCES = \
 	actions.c \
