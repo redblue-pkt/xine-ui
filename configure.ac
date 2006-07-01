@@ -34,18 +34,7 @@ AC_SUBST(SPEC_VERSION)
 AC_CANONICAL_TARGET([])
 
 ##
-AM_INIT_AUTOMAKE("xine-ui", $XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE)
-
-dnl
-dnl Made possible to build for another arch.
-dnl
-if test x$XINE_BUILD != "x"; then
-  AC_MSG_RESULT(*** build forced to $XINE_BUILD ***)
-  build=$XINE_BUILD
-  host=$XINE_BUILD
-else
-  check_athlon=yes
-fi
+AM_INIT_AUTOMAKE("xine-ui", [$SPEC_VERSION])
 
 AM_CONFIG_HEADER(config.h)
 
