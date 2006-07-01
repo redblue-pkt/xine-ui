@@ -39,13 +39,13 @@ AC_DEFUN([AM_PATH_AALIB],
 [dnl 
 dnl
 AC_ARG_WITH(aalib-prefix,
-    [  --with-aalib-prefix=PFX Prefix where AALIB is installed (optional)],
+    AS_HELP_STRING([--with-aalib-prefix=PATH], [Prefix where AALIB is installed (optional)]),
             aalib_config_prefix="$withval", aalib_config_prefix="")
 AC_ARG_WITH(aalib-exec-prefix,
-    [  --with-aalib-exec-prefix=PFX                                                                            Exec prefix where AALIB is installed (optional)],
+    AS_HELP_STRING([--with-aalib-exec-prefix=PATH], [Exec prefix where AALIB is installed (optional)]),
             aalib_config_exec_prefix="$withval", aalib_config_exec_prefix="")
 AC_ARG_ENABLE(aalibtest, 
-    [  --disable-aalibtest     Do not try to compile and run a test AALIB program],, enable_aalibtest=yes)
+    AS_HELP_STRING([--disable-aalibtest], [Do not try to compile and run a test AALIB program]))
 
   if test x$aalib_config_exec_prefix != x ; then
      aalib_config_args="$aalib_config_args --exec-prefix=$aalib_config_exec_prefix"
@@ -62,7 +62,7 @@ AC_ARG_ENABLE(aalibtest,
 
   min_aalib_version=ifelse([$1], ,1.2,$1)
 
-  if test x"$enable_aalibtest" != "xyes"; then
+  if test x"$enable_aalibtest" = "xno"; then
     AC_MSG_CHECKING(for AALIB version >= $min_aalib_version)
   else
     if test ! -x "$AALIB_CONFIG"; then

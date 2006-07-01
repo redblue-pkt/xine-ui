@@ -14,13 +14,13 @@ AC_DEFUN([AM_PATH_CACA],
 [dnl 
 dnl
 AC_ARG_WITH(caca-prefix,
-    [  --with-caca-prefix=PFX  Prefix where CACA is installed (optional)],
+   AS_HELP_STRING([--with-caca-prefix=PATH], [Prefix where CACA is installed (optional)]),
             caca_config_prefix="$withval", caca_config_prefix="")
 AC_ARG_WITH(caca-exec-prefix,
-    [  --with-caca-exec-prefix=PFX                                                                             Exec prefix where CACA is installed (optional)],
+   AS_HELP_STRING([--with-caca-exec-prefix=PATH], [Exec prefix where CACA is installed (optional)]),
             caca_config_exec_prefix="$withval", caca_config_exec_prefix="")
 AC_ARG_ENABLE(cacatest, 
-    [  --disable-cacatest      Do not try to compile and run a test CACA program],, enable_cacatest=yes)
+    AS_HELP_STRING([--disable-cacatest], [Do not try to compile and run a test CACA program]))
 
   if test x$caca_config_exec_prefix != x ; then
      caca_config_args="$caca_config_args --exec-prefix=$caca_config_exec_prefix"
@@ -37,7 +37,7 @@ AC_ARG_ENABLE(cacatest,
 
   min_caca_version=ifelse([$1], ,0.3,$1)
 
-  if test x"$enable_cacatest" != "xyes"; then
+  if test x"$enable_cacatest" = "xno"; then
     AC_MSG_CHECKING([for CACA version >= $min_caca_version])
   else
     if test ! -x "$CACA_CONFIG"; then

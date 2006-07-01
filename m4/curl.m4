@@ -31,13 +31,13 @@ AC_DEFUN([AM_PATH_CURL],
 dnl Get the cflags and libraries from the curl-config script
 dnl
 AC_ARG_WITH(curl-prefix,
-    [  --with-curl-prefix=PFX  Prefix where curl is installed (optional)],
+   AS_HELP_STRING([--with-curl-prefix=PATH], [Prefix where curl is installed (optional)]),
             curl_config_prefix="$withval", curl_config_prefix="")
 AC_ARG_WITH(curl-exec-prefix,
-    [  --with-curl-exec-prefix=PFX                                                                             Exec prefix where curl is installed (optional)],
+   AS_HELP_STRING([--with-curl-exec-prefix=PATH], [Exec prefix where curl is installed (optional)]),
             curl_config_exec_prefix="$withval", curl_config_exec_prefix="")
-AC_ARG_ENABLE(curltest, 
-    [  --disable-curltest      Do not try to compile and run a test curl program],, enable_curltest=yes)
+AC_ARG_ENABLE(curltest,
+   AS_HELP_STRING([--disable-curltest], [Do not try to compile and run a test curl program]))
 
   if test x$curl_config_exec_prefix != x ; then
      curl_config_args="$curl_config_args --exec-prefix=$curl_config_exec_prefix"
@@ -53,7 +53,7 @@ AC_ARG_ENABLE(curltest,
   fi
 
   min_curl_version=ifelse([$1], ,0.5.0,$1)
-  if test "x$enable_curltest" != "xyes" ; then
+  if test "x$enable_curltest" = "xno" ; then
     AC_MSG_CHECKING([for CURL-LIB version >= $min_curl_version])
   else
     AC_PATH_PROG(CURL_CONFIG, curl-config, no)
