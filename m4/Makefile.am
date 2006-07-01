@@ -14,7 +14,8 @@ EXTRA_DIST = glibc2.m4 intdiv0.m4 intmax.m4 inttypes.m4 inttypes_h.m4 inttypes-p
 	lcmessage.m4 \
 	progtest.m4 \
 	readline.m4 \
-	xft.m4
+	xft.m4 \
+	_xine.m4
 
 
 debug:
