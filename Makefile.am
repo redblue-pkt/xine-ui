@@ -4,7 +4,7 @@
 
 AUTOMAKE_OPTIONS = 1.3
 
-ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
+ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = doc m4 po misc src  
 
