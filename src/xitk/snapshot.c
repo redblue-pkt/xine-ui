@@ -66,11 +66,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_PNG_H
 #include <png.h>
-#elif HAVE_LIBPNG_PNG_H
-#include <libpng/png.h>
-#endif
 
 #include "common.h"
 

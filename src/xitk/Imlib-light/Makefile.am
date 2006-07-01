@@ -1,5 +1,4 @@
-AM_CFLAGS = @X_CFLAGS@
-DEBUG_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@
+DEBUG_CFLAGS = @DEBUG_CFLAGS@
 
 if HAVE_X11
 imlib_lib = libImlib-light.a
@@ -7,6 +6,7 @@ endif
 
 noinst_LIBRARIES = $(imlib_lib)
 
+libImlib_light_a_CFLAGS = $(LIBPNG_CFLAGS)
 libImlib_light_a_SOURCES = \
 	cache.c \
 	colors.c \
