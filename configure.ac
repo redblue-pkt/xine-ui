@@ -5,16 +5,7 @@ dnl
 AC_INIT
 AC_CONFIG_SRCDIR([src/xitk/main.c])
 AC_CONFIG_LIBOBJ_DIR([src/common])
-
-dnl
-dnl Require autoconf version 2.13
-dnl
 AC_PREREQ(2.53)
-
-dnl
-dnl Require libtool minimum version 1.4.0
-dnl
-dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 installed ***))
 
 dnl
 dnl Don't forget to update the misc/xine_splash.{xcf,png}
@@ -91,19 +82,10 @@ dnl AC_C_BIGENDIAN
 
 AC_SUBST(DEBUG_CFLAGS)
 
-
 dnl
 dnl Check for xine-lib
 dnl
-AM_PATH_XINE(1.0.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
-dnl the following is an interim solution for the rc series
-dnl checking just the version is not enough, because this is always 1.0.0
-SAVE_CFLAGS="$CFLAGS"
-CFLAGS="$XINE_CFLAGS $CFLAGS"
-AC_CHECK_DECL(XINE_PARAM_AUDIO_AMP_MUTE,,
-  AC_MSG_ERROR(*** Your version of xine-lib is too old ***),[#include "xine.h"])
-CFLAGS="$SAVE_CFLAGS"
-
+PKG_CHECK_MODULES([XINE], [libxine >= 1.1.0])
 
 dnl
 dnl threads: xine-config tell us what should be used, but
