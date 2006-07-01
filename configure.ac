@@ -12,7 +12,7 @@ dnl Don't forget to update the misc/xine_splash.{xcf,png}
 dnl
 XINE_MAJOR=0
 XINE_MINOR=99
-XINE_SUB=4
+XINE_SUB=5
 if test -f .cvsversion; then
   XINE_PRE="cvs"
 else
