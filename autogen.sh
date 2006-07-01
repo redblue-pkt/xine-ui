@@ -30,7 +30,6 @@ PROG=xine-ui
 WANT_AUTOMAKE_1_6=1 export WANT_AUTOMAKE_1_6
 AUTOMAKE_MIN=1.6.0
 AUTOCONF_MIN=2.53
-LIBTOOL_MIN=1.4.0
 
 # Check how echo works in this /bin/sh
 case `echo -n` in
@@ -100,55 +99,6 @@ run_autoconf () {
 
   echo $_echo_n " + Running autoconf: $_echo_c";
     autoconf;
-  echo "done."
-}
-
-#--------------------
-# LIBTOOL
-#-------------------
-try_libtool_executable() {
-  libtool=$1
-  set -- `type $libtool 2>/dev/null`
-  RETVAL=$?
-  NUM_RESULT=$#
-  RESULT_FILE=$3
-  if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    LT="`$libtool --version | awk '{ print $4 }' | sed -e 's/[a-zA-Z\ \.\(\)\-\;]//g'`"
-    LIBTOOL_MIN="`echo $LIBTOOL_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    if test $LT -lt 100 ; then
-      LT=`expr $LT \* 10`
-    fi
-    if [ `expr $LT` -ge $LIBTOOL_MIN ]; then
-      libtool_ok=yes
-    fi
-  fi
-}
-
-detect_libtool() {
-  # try glibtool first, then libtool
-  try_libtool_executable 'glibtool'
-  if [ "x$libtool_ok" != "xyes" ]; then
-    try_libtool_executable 'libtool'
-    if [ "x$libtool_ok" != "xyes" ]; then
-      echo
-      echo "**Error**: You must have \`libtool' >= $LIBTOOL_MIN installed to" 
-      echo "           compile $PROG. Download the appropriate package"
-      echo "           for your distribution or source from ftp.gnu.org."
-      exit 1
-    fi
-  fi
-}
-
-run_libtoolize() {
-  if test x"$libtool_ok" != x"yes"; then
-    echo
-    echo "**Warning**: Version of libtool is less than $LIBTOOL_MIN."
-    echo "             Some warning message might occur from libtool"
-    echo
-  fi
-
-  echo $_echo_n " + Running libtoolize: $_echo_c";
-    "${libtool}ize" --force --copy >/dev/null 2>&1;
   echo "done."
 }
 
@@ -259,7 +209,6 @@ run_configure () {
 #---------------
 detect_configure_ac
 detect_autoconf
-detect_libtool
 detect_automake
 detect_aclocal
 
@@ -281,19 +230,14 @@ case "$1" in
     run_aclocal
     run_autoconf
     ;;
-  libtoolize)
-    run_libtoolize
-    ;;
   noconfig)
     run_aclocal
-    run_libtoolize
     run_autoheader
     run_automake
     run_autoconf
     ;;
   *)
     run_aclocal
-    run_libtoolize
     run_autoheader
     run_automake
     run_autoconf
