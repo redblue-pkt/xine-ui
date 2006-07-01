@@ -4,12 +4,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/src/xitk
 AM_CFLAGS = @XINE_CFLAGS@
 
 if HAVE_X11
-oxine_lib = liboxine.la
+oxine_lib = liboxine.a
 endif
 
-noinst_LTLIBRARIES = $(oxine_lib)
+noinst_LIBRARIES = $(oxine_lib)
 
-liboxine_la_SOURCES = \
+liboxine_a_SOURCES = \
 	list.c \
 	mediamarks.c \
 	odk.c \
@@ -17,8 +17,6 @@ liboxine_la_SOURCES = \
 	oxine.c \
 	playlist.c \
 	utils.c
-liboxine_la_LIBADD = @XINE_LIBS@
-liboxine_la_DEPENDENCIES = ../../common/libcommon.la
 
 noinst_HEADERS = \
 	list.h \

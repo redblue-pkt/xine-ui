@@ -1,13 +1,13 @@
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@
-DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @X_CFLAGS@
+AM_CFLAGS = @X_CFLAGS@
+DEBUG_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@
 
 if HAVE_X11
-imlib_lib = libImlib-light.la
+imlib_lib = libImlib-light.a
 endif
 
-noinst_LTLIBRARIES = $(imlib_lib)
+noinst_LIBRARIES = $(imlib_lib)
 
-libImlib_light_la_SOURCES = \
+libImlib_light_a_SOURCES = \
 	cache.c \
 	colors.c \
 	load.c \

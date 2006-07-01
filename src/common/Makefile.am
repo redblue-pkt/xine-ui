@@ -1,6 +1,10 @@
-noinst_LTLIBRARIES = libcommon.la
+if HAVE_X11
+commonx = libcommonx.a
+endif
 
-AM_CFLAGS = @XINE_CFLAGS@ @X_CFLAGS@ @BUILD_LIB_STATIC@
+noinst_LIBRARIES = libcommon.a $(commonx)
+
+AM_CFLAGS = @XINE_CFLAGS@ @X_CFLAGS@
 
 EXTRA_DIST = getopt.c getopt1.c getopt.h xscreensaver-remote.c xscreensaver-remote.h 
 
@@ -10,14 +14,8 @@ GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-if HAVE_X11
-##xscreensaver_remote = xscreensaver-remote.c
-X11_COMMON_LIBS = $(X_LIBS) $(X_PRE_LIBS) @XV_LIB@ -lX11 $(X_EXTRA_LIBS) -lXext
-endif
-
-
-libcommon_la_SOURCES = $(GETOPT_SRC) utils.c
-libcommon_la_LIBADD = $(X11_COMMON_LIBS) $(GICONV_BSD_LIBS) @LTLIBOBJS@
+libcommon_a_SOURCES = $(GETOPT_SRC) utils.c
+libcommonx_a_SOURCES = x11utils.c
 
 noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
 

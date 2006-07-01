@@ -70,32 +70,12 @@ AC_MINIX dnl readline
 AC_HEADER_STDC([])
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-dnl obsolete AC_PROG_RANLIB
+AC_PROG_RANLIB
 AC_PROG_LN_S
 
 dnl
 dnl Libtool
 dnl
-AC_LIBTOOL_DLOPEN
-AM_DISABLE_STATIC
-AM_PROG_LIBTOOL
-AC_SUBST(LIBTOOL_DEPS)
-if ${CONFIG_SHELL} ./libtool --features | grep "enable static" >/dev/null; then
-  STATIC="-static"
-else
-  STATIC=
-fi
-AC_SUBST(STATIC)
-
-
-dnl
-dnl Build all libs as static
-dnl
-BUILD_LIB_STATIC="-static"
-BUILD_LIB_STATIC=""
-AC_SUBST(BUILD_LIB_STATIC)
-
-
 dnl
 dnl NLS Support
 dnl

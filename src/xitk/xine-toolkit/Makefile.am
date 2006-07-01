@@ -7,17 +7,17 @@ docsdir = $(datadir)/doc/xitk
 
 docs_DATA = README
 
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@ @XFT_CFLAGS@
+AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@ @XFT_CFLAGS@
 
 if HAVE_X11
-xitk_lib = libxitk.la
+xitk_lib = libxitk.a
 endif
 
 EXTRA_PROGRAMS = test
-noinst_LTLIBRARIES = $(xitk_lib)
+noinst_LIBRARIES = $(xitk_lib)
 
-libxitk_la_CFLAGS = $(AM_CFLAGS) $(NO_STRICT_ALIASING)
-libxitk_la_SOURCES = \
+libxitk_a_CFLAGS = $(AM_CFLAGS) $(NO_STRICT_ALIASING)
+libxitk_a_SOURCES = \
 	browser.c \
 	button.c \
 	checkbox.c \
@@ -43,10 +43,6 @@ libxitk_la_SOURCES = \
 	widget.c \
 	window.c \
 	xitk.c
-
-libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
-	-lXext $(X_EXTRA_LIBS)  $(THREAD_LIBS) $(LTLIBINTL) $(XFT_LIBS) \
-	$(top_builddir)/src/xitk/Imlib-light/libImlib-light.la
 
 noinst_HEADERS = \
 	_config.h \
@@ -77,15 +73,11 @@ noinst_HEADERS = \
 	xitkintl.h
 
 test_SOURCES = test.c
-test_DEPENDENCIES = libxitk.la
-test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
+test_DEPENDENCIES = libxitk.a
+test_LDADD = libxitk.a
 
-$(top_builddir)/src/xitk/Imlib-light/libImlib-light.la:
-	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.la
-
-
-$(top_builddir)/src/xitk/xine-toolkit/libxitk.la:
-	@cd $(top_builddir)/src/xitk/xine-toolkit && $(MAKE) libxitk.la
+$(top_builddir)/src/xitk/Imlib-light/libImlib-light.a:
+	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.a
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

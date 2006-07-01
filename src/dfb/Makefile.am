@@ -3,8 +3,8 @@ fontandpointers = cetus.ttf pointer1.png pointer2.png
 
 EXTRA_DIST = $(fontandpointers)
 
-AM_CFLAGS = $(DIRECTFB_CFLAGS) @BUILD_LIB_STATIC@ @XINE_CFLAGS@ -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
-DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @XINE_CFLAGS@
+AM_CFLAGS = $(DIRECTFB_CFLAGS) @XINE_CFLAGS@ -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
+DEBUG_CFLAGS = @DEBUG_CFLAGS@ @XINE_CFLAGS@
 
 if HAVE_DIRECTFB
 dfb_programs = dfbxine
@@ -17,8 +17,8 @@ fontdir = $(datadir)/xine/fonts/
 font_DATA = $(fontandpointers)
 endif
 
-dfbxine_DEPENDENCIES = $(topbuilddir)/src/common/libcommon.la
-dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm $(topbuilddir)/src/common/libcommon.la
+dfbxine_DEPENDENCIES = $(topbuilddir)/src/common/libcommon.a
+dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm $(topbuilddir)/src/common/libcommon.a
 dfbxine_SOURCES = options.c \
 	dfb.c \
 	main.c
@@ -27,8 +27,8 @@ dfbxine_SOURCES = options.c \
 
 noinst_HEADERS = dfb.h
 
-$(top_builddir)/src/common/libcommon.la:
-	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
+$(top_builddir)/src/common/libcommon.a:
+	@cd $(top_builddir)/src/common && $(MAKE) libcommon.a
 
 debug:
 	@$(MAKE) CFLAGS="-DFONTDIR=\\\"$(XINE_SKINDIR)/../fonts/\\\" $(DEBUG_CFLAGS)"

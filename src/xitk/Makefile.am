@@ -1,6 +1,6 @@
-SUBDIRS = Imlib-light xine-toolkit skins oxine
+SUBDIRS = Imlib-light xine-toolkit skins oxine .
 
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
+AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
 if HAVE_READLINE
 remote = xine-remote
@@ -8,6 +8,7 @@ endif
 
 if HAVE_X11
 xine_ui = xine $(remote)
+
 endif
 
 bin_PROGRAMS = $(xine_ui)
@@ -15,10 +16,10 @@ EXTRA_PROGRAMS = session_ctrl kbindings_man
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
 kbindings_man_LDADD = @XINE_LIBS@ 
-	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-	     $(top_builddir)/src/xitk/oxine/liboxine.la \
-	     $(top_builddir)/src/common/libcommon.la \
-	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
+	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
+	     $(top_builddir)/src/xitk/oxine/liboxine.a \
+	     $(top_builddir)/src/common/libcommon.a \
+	     $(X_PRE_LIBS) $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm
 kbindings_man_SOURCES = kbindings_man.c
@@ -58,27 +59,24 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
-xine_DEPENDENCIES = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-                    $(top_builddir)/src/xitk/oxine/liboxine.la \
-                    $(top_builddir)/src/common/libcommon.la
-
-# double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
-xine_LDADD = @XINE_LIBS@ \
-	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-	     $(top_builddir)/src/xitk/oxine/liboxine.la \
-	     $(top_builddir)/src/common/libcommon.la \
-	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
+xine_LDADD = $(XINE_LIBS) \
+	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
+             $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
+	     $(top_builddir)/src/xitk/oxine/liboxine.a \
+	     $(top_builddir)/src/common/libcommon.a \
+             $(top_builddir)/src/common/libcommonx.a \
+	     $(X_PRE_LIBS) $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
-	     -lX11 -lm $(DBG_LIBS)
+	     -lX11 -lm $(DBG_LIBS) $(XV_LIB)
 
 xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
 xine_remote_SOURCES = network.c
-xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
+xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
 xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
-	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
+	$(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
 
 session_ctrl_CFLAGS = $(AM_CFLAGS) -DCTRL_TEST
-session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
+session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
 session_ctrl_SOURCES = session.c
 
 noinst_HEADERS = \
@@ -116,9 +114,6 @@ noinst_HEADERS = \
 	tvset.h \
 	videowin.h \
 	viewlog.h
-
-$(top_builddir)/src/common/libcommon.la:
-	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
