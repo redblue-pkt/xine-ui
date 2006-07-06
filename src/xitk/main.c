@@ -23,7 +23,7 @@
  *
  */
 /* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
-#ifndef __sun
+#if !defined(__sun) && ! defined(__FreeBSD__)
 #define _XOPEN_SOURCE 500
 #endif
 /* required for strncasecmp() */
@@ -38,6 +38,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
+#include <strings.h>
 #include <math.h>
 #include <fcntl.h>
 #include <errno.h>

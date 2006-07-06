@@ -30,6 +30,8 @@
 #include "config.h"
 #endif
 
+#include <strings.h>
+
 #include "main.h"
 #include "actions.h"
 #include "osd.h"
