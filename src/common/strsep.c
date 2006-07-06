@@ -2,6 +2,10 @@
  * taken from xine-lib
  */
 
+#include <config.h>
+
+#ifndef HAVE_STRSEP
+
 #include <string.h>
 
 char *strsep(char **stringp, const char *delim) {
@@ -37,3 +41,5 @@ char *strsep(char **stringp, const char *delim) {
 
   return begin;
 }
+
+#endif

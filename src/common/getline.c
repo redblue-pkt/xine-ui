@@ -5,13 +5,16 @@
  *
  */
 
+#include <config.h>
+
+#ifndef HAVE_GETLINE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
 #define BLOCK_SIZE 128
-
 
 ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *stream) {
   void *tmp;
@@ -46,3 +49,5 @@ ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *stream) {
 ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
   return getdelims(lineptr, n, "\n\r", stream);
 }
+
+#endif

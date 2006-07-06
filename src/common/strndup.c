@@ -2,6 +2,10 @@
  * taken from xine-lib
  */
 
+#include <config.h>
+
+#ifndef HAVE_STRNDUP
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,3 +17,7 @@ char *strndup(const char *s, size_t n) {
   ret[n] = '\0';
   return ret;
 }
+
+#endif
+
+
