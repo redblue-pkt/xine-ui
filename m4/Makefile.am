@@ -11,6 +11,7 @@ EXTRA_DIST = glibc2.m4 intdiv0.m4 intmax.m4 inttypes.m4 inttypes_h.m4 inttypes-p
 	iconv.m4 \
 	isc-posix.m4 \
 	lcmessage.m4 \
+	pkg.m4 \
 	progtest.m4 \
 	readline.m4 \
 	xft.m4 \
