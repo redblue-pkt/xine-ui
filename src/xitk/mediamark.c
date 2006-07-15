@@ -1102,18 +1102,20 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 	      }
 		
 	      if(href && strlen(href)) {
-		char *atitle     = NULL;
-		char *aauthor    = NULL;
+		/* Use the _orig pointers to store the string before
+		   using atoa() that changes the pointer */
+		char *atitle     = NULL, *atitle_orig  = NULL;
+		char *aauthor    = NULL, *aauthor_orig = NULL;
 		char *real_title = NULL;
 		int   len        = 0;
 		  
 		if(title && strlen(title)) {
-		  atitle = strdup(title);
+		  atitle_orig = atitle = strdup(title);
 		  atitle = atoa(atitle);
 		  len = strlen(atitle);
 		    
 		  if(author && strlen(author)) {
-		    aauthor = strdup(author);
+		    aauthor_orig = aauthor = strdup(author);
 		    aauthor = atoa(aauthor);
 		    len += strlen(aauthor) + 3;
 		  }
@@ -1135,8 +1137,8 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		playlist->entries = ++entries_asx;
 
 		SAFE_FREE(real_title);
-		SAFE_FREE(atitle);
-		SAFE_FREE(aauthor);
+		SAFE_FREE(atitle_orig);
+		SAFE_FREE(aauthor_orig);
 	      }
 		
 	      href = title = author = NULL;
