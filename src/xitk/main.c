@@ -458,7 +458,7 @@ static void print_formatted(char *title, const char *const *plugins) {
   const char  *plugin;
   char         buffer[81];
   int          len;
-  char        *blanks = "     ";
+  static const char blanks[] = "     ";
 
   printf("%s", title);
   
@@ -470,7 +470,7 @@ static void print_formatted(char *title, const char *const *plugins) {
     len = strlen(buffer);
     
     if((len + (strlen(plugin) + 3)) < 80) {
-      snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%s%s", (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
+      snprintf(buffer+len, sizeof(buffer)-len, "%s%s", (len == sizeof(blanks)-1) ? "" : ", ", plugin);
     }
     else {
       printf("%s,\n", buffer);
