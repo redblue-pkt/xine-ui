@@ -376,34 +376,34 @@ void osd_stream_infos(void) {
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
-      strcat(buffer, "off");
+      strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	strcat(buffer, "auto");
+	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	sprintf(buffer+strlen(buffer), "%3d", audiochannel);
+	snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", audiochannel);
       break;
     }
 
-    strcat(buffer, ", Spu: ");
+    strlcat(buffer, ", Spu: ", sizeof(buffer));
     len = strlen(buffer);
     switch (spuchannel) {
     case -2:
-      strcat(buffer, "off");
+      strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-	strcat(buffer, "auto");
+	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-        sprintf(buffer+strlen(buffer), "%3d", spuchannel);
+        snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", spuchannel);
       break;
     }
-    strcat(buffer, ".");
+    strlcat(buffer, ".", sizeof(buffer));
     xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)

@@ -527,8 +527,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	  path = strrchr(filename, '/');
 	  if(path && (path > filename)) {
 	    origin = (char *) xine_xmalloc((path - filename) + 2);
-	    strncat(origin, filename, (path - filename));
-	    strcat(origin, "/");
+	    snprintf(origin, (path-filename)+1, "%s/", filename);
 	  }
 	  
 	  while((ln = playlist->lines[linen++]) != NULL) {
@@ -633,8 +632,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	    path = strrchr(filename, '/');
 	    if(path && (path > filename)) {
 	      origin = (char *) xine_xmalloc((path - filename) + 2);
-	      strncat(origin, filename, (path - filename));
-	      strcat(origin, "/");
+	      snprintf(origin, (path - filename)+1, "%s/", filename);
 	    }
 	    
 	    while((ln = playlist->lines[linen++]) != NULL) {
@@ -760,8 +758,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		path = strrchr(filename, '/');
 		if(path && (path > filename)) {
 		  origin = (char *) xine_xmalloc((path - filename) + 2);
-		  strncat(origin, filename, (path - filename));
-		  strcat(origin, "/");
+		  snprintf(origin, (path - filename)+1, "%s/", filename);
 		}
 
 		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
@@ -1775,13 +1772,13 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	  p = buffer;
 
 	  if(smil->base && (!strstr(prop->value, "://"))) {
-	    strcat(p, smil->base);
+	    strlcat(p, smil->base, sizeof(buffer));
 	    
 	    if(buffer[strlen(buffer) - 1] != '/')
-	      strcat(p, "/");
+	      strlcat(p, "/", sizeof(buffer));
 	  }
 	  
-	  strcat(p, prop->value);
+	  strlcat(p, prop->value, sizeof(buffer));
 	  
 	  (*snode)->mmk->mrl = strdup(buffer);
 	}
@@ -2389,8 +2386,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
       path = strrchr(filename, '/');
       if(path && (path > filename)) {
 	origin = (char *) xine_xmalloc((path - filename) + 2);
-	strncat(origin, filename, (path - filename));
-	strcat(origin, "/");
+	snprintf(origin, (path - filename)+1, "%s/", filename);
       }
 	  
       fvo_entry = xml_tree->child;
@@ -2423,13 +2419,14 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 		else if(!strcasecmp(ssentry->name, "FILE")) {
 
 		  if(origin) {
-		    url = (char *) xine_xmalloc(strlen(origin) + strlen(ssentry->data) + 2);
-		    strcat(url, origin);
+		    const size_t urlsize = strlen(origin) + strlen(ssentry->data) + 2;
+		    url = (char *) xine_xmalloc(urlsize);
+		    strlcat(url, origin, urlsize);
 		    
 		    if((url[strlen(url) - 1] == '/') && (*ssentry->data == '/'))
 		      url[strlen(url) - 1] = '\0';
 		    
-		    strcat(url, ssentry->data);
+		    strlcat(url, ssentry->data, urlsize);
 		    
 		  }
 		  else

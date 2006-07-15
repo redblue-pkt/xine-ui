@@ -210,9 +210,7 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 
     while((e = xine_strsep(&mrl_exts, " ")) != NULL) {
       
-      memset(&patterns, 0, sizeof(patterns));
-      strcat(patterns, "*.");
-      strcat(patterns, e);
+      snprintf(patterns, sizeof(patterns), "*.%s", e);
 
       num_endings++;
       

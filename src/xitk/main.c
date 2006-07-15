@@ -1184,10 +1184,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       case XINE_MSG_ENCRYPTED_SOURCE:
 	snprintf(buffer, sizeof(buffer), "%s", _("The source seems encrypted, and can't be read."));
 	if(!strncasecmp(gGui->mmk.mrl, "dvd:/", 5)) {
-	  strcat(buffer, _("\nYour DVD is probably crypted. "
+	  strlcat(buffer, _("\nYour DVD is probably crypted. "
 			   "According to your country laws, you can or can't "
 			   "install/use libdvdcss to be able to read this disc, "
-			   "which you bought."));
+			   "which you bought."), buffer);
 	}
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
@@ -1216,12 +1216,12 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       }
       
       if(gGui->verbosity >= XINE_VERBOSITY_DEBUG) {
-	strcat(buffer, "\n\n[");
+	strlcat(buffer, "\n\n[", sizeof(buffer));
 	
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "'%s' '%s'", (char *) data + data->explanation, (char *) data + data->parameters);
 	
-	strcat(buffer, "]");
+	strlcat(buffer, "]", sizeof(buffer));
       }
       
       if(strlen(buffer))

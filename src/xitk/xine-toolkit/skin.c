@@ -31,6 +31,7 @@
 #include <pthread.h>
 #include <errno.h>
 
+#include "utils.h"
 #include "_xitk.h"
 
 #undef DEBUG_SKIN
@@ -148,37 +149,37 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 		snprintf(ppath, sizeof(ppath), "%s", skonfig->path);
 		if((z = strrchr(ppath, '/')) != NULL) {
 		  *z = '\0';
-		  strcat(buf2, ppath);
+		  strlcat(buf2, ppath, sizeof(buf2));
 		}
 	      }
 	    }
 	    else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
 	      if(skonfig->version >= 0)
-		sprintf(buf2+strlen(buf2), "%d", skonfig->version);
+		snprintf(buf2+strlen(buf2), sizeof(buf2)-strlen(buf2), "%d", skonfig->version);
 	    }
 	    else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
 	      if(skonfig->author)
-		strcat(buf2, skonfig->author);
+		strlcat(buf2, skonfig->author, sizeof(buf2));
 	    }
 	    else if(!strncmp("SKIN_PATH", var, strlen(var))) {
 	      if(skonfig->path)
-		strcat(buf2, skonfig->path);
+		strlcat(buf2, skonfig->path, sizeof(buf2));
 	    }
 	    else if(!strncmp("SKIN_NAME", var, strlen(var))) {
 	      if(skonfig->name)
-		strcat(buf2, skonfig->name);
+		strlcat(buf2, skonfig->name, sizeof(buf2));
 	    }
 	    else if(!strncmp("SKIN_DATE", var, strlen(var))) {
 	      if(skonfig->date)
-		strcat(buf2, skonfig->date);
+		strlcat(buf2, skonfig->date, sizeof(buf2));
 	    }
 	    else if(!strncmp("SKIN_URL", var, strlen(var))) {
 	      if(skonfig->url)
-		strcat(buf2, skonfig->url);
+		strlcat(buf2, skonfig->url, sizeof(buf2));
 	    }
 	    else if(!strncmp("HOME", var, strlen(var))) {
 	      if(skonfig->url)
-		strcat(buf2, xitk_get_homedir());
+		strlcat(buf2, xitk_get_homedir(), sizeof(buf2));
 	    }
 	    /* else ignore */
 	  }

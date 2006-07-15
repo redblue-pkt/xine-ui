@@ -617,7 +617,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
     char          *footer = _(".\n\nWhat do you want to do ?\n");
     
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
-    strcat(kmsg, footer);
+    strlcat(kmsg, footer, strlen(kmsg) + strlen(footer) + 1);
 
     dump_error(gGui->verbosity, kmsg);
 
@@ -1017,14 +1017,14 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
     
     for(k = kbt->entry, i = 0; k[i]->action != NULL; i++) {
       if(!k[i]->is_alias) {
-	sprintf(buf, "# %s\n", k[i]->comment);
-	strcat(buf, "begin\n");
-	strcat(buf, "\tremote = xxxxx\n");
-	strcat(buf, "\tbutton = xxxxx\n");
-	strcat(buf, "\tprog   = xine\n");
-	strcat(buf, "\trepeat = 0\n");
-	sprintf(buf+strlen(buf), "\tconfig = %s\n", k[i]->action);
-	strcat(buf, "end\n\n");
+	snprintf(buf, sizeof(buf), "# %s\n", k[i]->comment);
+	strlcat(buf, "begin\n", sizeof(buf));
+	strlcat(buf, "\tremote = xxxxx\n", sizeof(buf));
+	strlcat(buf, "\tbutton = xxxxx\n", sizeof(buf));
+	strlcat(buf, "\tprog   = xine\n", sizeof(buf));
+	strlcat(buf, "\trepeat = 0\n", sizeof(buf));
+	snprintf(buf+strlen(buf), sizeof(buf)-strlen(buf), "\tconfig = %s\n", k[i]->action);
+	strlcat(buf, "end\n\n", sizeof(buf));
 	fputs(buf, stream);
       }
     }
@@ -1040,30 +1040,30 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
       snprintf(buf, sizeof(buf), "# %s\n", k[i]->comment);
 
       if(k[i]->is_alias) {
-	strcat(buf, "Alias {\n");
+	strlcat(buf, "Alias {\n", sizeof(buf));
 	sprintf(buf+strlen(buf), "\tentry = %s\n", k[i]->action);
       }
       else
 	sprintf(buf+strlen(buf), "%s {\n", k[i]->action);
 
       sprintf(buf+strlen(buf), "\tkey = %s\n", k[i]->key);
-      strcat(buf, "\tmodifier = ");
+      strlcat(buf, "\tmodifier = ", sizeof(buf));
       if(k[i]->modifier == KEYMOD_NOMOD)
-	strcat(buf, "none, ");
+	strlcat(buf, "none, ", sizeof(buf));
       if(k[i]->modifier & KEYMOD_CONTROL)
-	strcat(buf, "control, ");
+	strlcat(buf, "control, ", sizeof(buf));
       if(k[i]->modifier & KEYMOD_META)
-	strcat(buf, "meta, ");
+	strlcat(buf, "meta, ", sizeof(buf));
       if(k[i]->modifier & KEYMOD_MOD3)
-	strcat(buf, "mod3, ");
+	strlcat(buf, "mod3, ", sizeof(buf));
       if(k[i]->modifier & KEYMOD_MOD4)
-	strcat(buf, "mod4, ");
+	strlcat(buf, "mod4, ", sizeof(buf));
       if(k[i]->modifier & KEYMOD_MOD5)
-	strcat(buf, "mod5, ");
+	strlcat(buf, "mod5, ", sizeof(buf));
       buf[strlen(buf) - 2] = '\n';
       buf[strlen(buf) - 1] = '\0';
-      strcat(buf, "}\n\n");
-      fprintf(stream, "%s", buf);
+      strlcat(buf, "}\n\n", sizeof(buf));
+      fputs(buf, stream);
     }
     fprintf(stream, "##\n# End of xine key bindings.\n##\n");
     break;
@@ -1276,30 +1276,30 @@ static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
     
     if(gGui->shortcut_style == 0) {
       if(kbe->modifier & KEYMOD_CONTROL)
-	sprintf(shortcut+strlen(shortcut), "%s+", _("Ctrl"));
+	snprintf(shortcut+strlen(shortcut), sizeof(shortcut)-strlen(shortcut), "%s+", _("Ctrl"));
       if(kbe->modifier & KEYMOD_META)
-	sprintf(shortcut+strlen(shortcut), "%s+", _("Alt"));
+	snprintf(shortcut+strlen(shortcut), sizeof(shortcut)-strlen(shortcut), "%s+", _("Alt"));
       if(kbe->modifier & KEYMOD_MOD3)
-	strcat(shortcut, "M3+");
+	strlcat(shortcut, "M3+", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_MOD4)
-	strcat(shortcut, "M4+");
+	strlcat(shortcut, "M4+", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_MOD5)
-	strcat(shortcut, "M5+");
+	strlcat(shortcut, "M5+", sizeof(shortcut));
     }
     else {
       if(kbe->modifier & KEYMOD_CONTROL)
-	strcat(shortcut, "C-");
+	strlcat(shortcut, "C-", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_META)
-	strcat(shortcut, "M-");
+	strlcat(shortcut, "M-", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_MOD3)
-	strcat(shortcut, "M3-");
+	strlcat(shortcut, "M3-", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_MOD4)
-	strcat(shortcut, "M4-");
+	strlcat(shortcut, "M4-", sizeof(shortcut));
       if(kbe->modifier & KEYMOD_MOD5)
-	strcat(shortcut, "M5-");
+	strlcat(shortcut, "M5-", sizeof(shortcut));
     }
     
-    strcat(shortcut, kbe->key);
+    strlcat(shortcut, kbe->key, sizeof(shortcut));
     
     return shortcut;
   }
@@ -2494,41 +2494,41 @@ int main(int argc, char **argv) {
 	  strcpy(buf, "\\fBC\\fP");
 	if(k[i]->modifier & KEYMOD_META) {
 	  if(buf[0])
-	    strcat(buf, "\\-");
-	  strcat(buf, "\\fBM\\fP");
+	    strlcat(buf, "\\-", sizeof(buf));
+	  strlcat(buf, "\\fBM\\fP", sizeof(buf));
 	}
 	if(k[i]->modifier & KEYMOD_MOD3) {
 	  if(buf[0])
-	    strcat(buf, "\\-");
-	  strcat(buf, "\\fBM3\\fP");
+	    strlcat(buf, "\\-", sizeof(buf));
+	  strlcat(buf, "\\fBM3\\fP", sizeof(buf));
 	}
 	if(k[i]->modifier & KEYMOD_MOD4) {
 	  if(buf[0])
-	    strcat(buf, "\\-");
-	  strcat(buf, "\\fBM4\\fP");
+	    strlcat(buf, "\\-", sizeof(buf));
+	  strlcat(buf, "\\fBM4\\fP", sizeof(buf));
 	}
 	if(k[i]->modifier & KEYMOD_MOD5) {
 	  if(buf[0])
-	    strcat(buf, "\\-");
-	  strcat(buf, "\\fBM5\\fP");
+	    strlcat(buf, "\\-", sizeof(buf));
+	  strlcat(buf, "\\fBM5\\fP", sizeof(buf));
 	}
 	printf("%s\\-", buf);
       }
       
-      printf("\\fB");
+      puts("\\fB");
       if(strlen(k[i]->key) > 1)
-	printf("\\<");
+	puts("\\<");
       
       if(!strncmp(k[i]->key, "KP_", 3))
 	printf("Keypad %s", (k[i]->key + 3));
       else
-	printf("%s", k[i]->key);
+	puts(k[i]->key);
       
       if(strlen(k[i]->key) > 1)
-	printf("\\>");
-      printf("\\fP");
+	puts("\\>");
+      puts("\\fP");
       
-      printf("\"\n");
+      puts("\"\n");
       
       printf("%c%s\n", (toupper(k[i]->comment[0])), (k[i]->comment + 1));
     }

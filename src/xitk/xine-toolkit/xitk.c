@@ -56,6 +56,7 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
+#include "utils.h"
 #include "_xitk.h"
 
 extern char **environ;
@@ -1873,7 +1874,7 @@ void xitk_init(Display *display, XColor black, int verbosity) {
 	    gXitk->use_xshm = 0;
 	  else {
 	    XShmDetach(display, &shminfo);
-	    strcat(buffer, "[XShm]");
+	    strlcat(buffer, "[XShm]", sizeof(buffer));
 	  }
 	  
 	  XDestroyImage(xim);
@@ -1889,15 +1890,15 @@ void xitk_init(Display *display, XColor black, int verbosity) {
 #endif
 
 #ifdef WITH_XFT
-  strcat(buffer, "[XFT]");
+  strlcat(buffer, "[XFT]", sizeof(buffer));
 #elif defined(WITH_XMB)
-  strcat(buffer, "[XMB]");
+  strlcat(buffer, "[XMB]", sizeof(buffer));
 #endif
   
-  strcat(buffer, " ]-");
+  strlcat(buffer, " ]-", sizeof(buffer));
 
   if(verbosity)
-    printf("%s", buffer);
+    puts(buffer);
 
   gXitk->wm_type = xitk_check_wm(display);
   

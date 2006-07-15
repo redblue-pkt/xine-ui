@@ -261,14 +261,14 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
     strcpy(ident, atitle);
     
     if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {
-      strcat(ident, " (");
+      strlcat(ident, " (", len);
       if(aartist && strlen(aartist))
-	strcat(ident, aartist);
+	strlcat(ident, aartist, len);
       if((aartist && strlen(aartist)) && (aalbum && strlen(aalbum)))
-	strcat(ident, " - ");
+	strlcat(ident, " - ", len);
       if(aalbum && strlen(aalbum))
-	strcat(ident, aalbum);
-      strcat(ident, ")");
+	strlcat(ident, aalbum, len);
+      strlcat(ident, ")", len);
     }
   }
 

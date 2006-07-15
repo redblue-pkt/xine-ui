@@ -95,4 +95,8 @@ void dump_xfree_info(Display *display, int screen, int complete);
 void dump_error(int verbosity, char *msg);
 void dump_info(int verbosity, char *msg);
 
+#ifndef HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t size);
+#endif
+
 #endif

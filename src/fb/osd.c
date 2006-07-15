@@ -34,7 +34,7 @@
 #include "main.h"
 #include "osd.h"
 #include "actions.h"
-
+#include "utils.h"
 
 #define OVL_PALETTE_SIZE 256
 
@@ -393,40 +393,38 @@ void osd_stream_infos(void) {
       y += h;
     }
     
-    memset(&buffer, 0, sizeof(buffer));
-
-    sprintf(buffer, "Audio: ");
+    strncpy(buffer, "Audio: ", sizeof(buffer)-1);
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
-      strcat(buffer, "off");
+      strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
       if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	strcat(buffer, "auto");
+	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
       if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
-	sprintf(buffer+strlen(buffer), "%3d", audiochannel);
+	snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", audiochannel);
       break;
     }
 
-    strcat(buffer, ", Spu: ");
+    strlcat(buffer, ", Spu: ", sizeof(buffer));
     len = strlen(buffer);
     switch (spuchannel) {
     case -2:
-      strcat(buffer, "off");
+      strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
       if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
-	strcat(buffer, "auto");
+	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
       if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
         sprintf(buffer+strlen(buffer), "%3d", spuchannel);
       break;
     }
-    strcat(buffer, ".");
+    strlcat(buffer, ".", sizeof(buffer));
     xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
     if(w > osdw)

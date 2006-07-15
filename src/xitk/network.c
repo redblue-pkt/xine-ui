@@ -553,7 +553,7 @@ static int __attribute__ ((format (printf, 3, 4))) __sock_write(int socket, int 
   /* Each line sent is '\n' terminated */
   if(cr) {
     if((buf[strlen(buf)] == '\0') && (buf[strlen(buf) - 1] != '\n'))
-      strcat(buf, "\n");
+      strlcat(buf, "\n", sizeof(buf));
   }
   
   return _sock_write(socket, buf, strlen(buf));
@@ -752,15 +752,15 @@ static void client_help(session_t *session, session_commands_t *command, const c
   while(session_commands[i]->command != NULL) {
     if(session_commands[i]->enable) {
       if((curpos + maxlen) >= 80) {
-	strcat(buf, "\n       ");
+	strlcat(buf, "\n       ", sizeof(buf));
 	curpos = 7;
       }
       
-      strcat(buf, session_commands[i]->command);
+      strlcat(buf, session_commands[i]->command, sizeof(buf));
       curpos += strlen(session_commands[i]->command);
       
       for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
-	strcat(buf, " ");
+	strlcat(buf, " ", sizeof(buf));
 	curpos++;
       }
     }
@@ -1716,11 +1716,11 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
   
   while(commands[i].command != NULL) {
     if(commands[i].public) {
-      sprintf(buf+strlen(buf), "\t%s", commands[i].command);
+      snprintf(buf+strlen(buf), sizeof(buf)-strlen(buf), "\t%s", commands[i].command);
     }
     i++;
   }
-  strcat(buf, ".\n");
+  strlcat(buf, ".\n", sizeof(buf));
   sock_write(client_info->socket, "%s", buf);
 }
 
@@ -1751,22 +1751,22 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     while(commands[i].command != NULL) {
       if(commands[i].public) {
 	if((curpos + maxlen) >= 80) {
-	  strcat(buf, "\n       ");
+	  strlcat(buf, "\n       ", sizeof(buf));
 	  curpos = 7;
 	}
 	
-	strcat(buf, commands[i].command);
+	strlcat(buf, commands[i].command, sizeof(buf));
 	curpos += strlen(commands[i].command);
 	
 	for(j = 0; j < (maxlen - strlen(commands[i].command)); j++) {
-	  strcat(buf, " ");
+	  strlcat(buf, " ", sizeof(buf));
 	  curpos++;
 	}
       }
       i++;
     }
     
-    strcat(buf, "\n");
+    strlcat(buf, "\n", sizeof(buf));
     sock_write(client_info->socket, "%s", buf);
   }
   else {
@@ -2093,12 +2093,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	status = xine_get_status(gGui->stream);
 	
 	if(status <= XINE_STATUS_QUIT)
-	  strcat(buf, status_struct[status].name);
+	  strlcat(buf, status_struct[status].name, sizeof(buf));
 	else
-	  strcat(buf, "*UNKNOWN*");
+	  strlcat(buf, "*UNKNOWN*", sizeof(buf));
 	
-	strcat(buf, "\n");
-	sock_write(client_info->socket, "%s", buf);
+	sock_write(client_info->socket, "%s\n", buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
@@ -2114,12 +2113,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 	
 	if(i < ((sizeof(speeds_struct) / sizeof(speeds_struct[0])) - 1))
-	  strcat(buf, speeds_struct[i].name);
+	  strlcat(buf, speeds_struct[i].name, sizeof(buf));
 	else
-	  strcat(buf, "*UNKNOWN*");
+	  strlcat(buf, "*UNKNOWN*", sizeof(buf));
 	
-	strcat(buf, "\n");
-	sock_write(client_info->socket, "%s", buf);
+	sock_write(client_info->socket, "%s\n", buf);
       }
       else if(is_arg_contain(client_info, 1, "position")) {
 	char buf[64];
@@ -2152,27 +2150,26 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 
 	switch(gGui->playlist.loop) {
 	case PLAYLIST_LOOP_NO_LOOP:
-	  strcat(buf, "'No Loop'");
+	  strlcat(buf, "'No Loop'", sizeof(buf));
 	  break;
 	case PLAYLIST_LOOP_LOOP:
-	  strcat(buf, "'Loop'");
+	  strlcat(buf, "'Loop'", sizeof(buf));
 	  break;
 	case PLAYLIST_LOOP_REPEAT:
-	  strcat(buf, "'Repeat'");
+	  strlcat(buf, "'Repeat'", sizeof(buf));
 	  break;
 	case PLAYLIST_LOOP_SHUFFLE:
-	  strcat(buf, "'Shuffle'");
+	  strlcat(buf, "'Shuffle'", sizeof(buf));
 	  break;
 	case PLAYLIST_LOOP_SHUF_PLUS:	
-	  strcat(buf, "'Shuffle forever'");
+	  strlcat(buf, "'Shuffle forever'", sizeof(buf));
 	  break;
 	default:
-	  strcat(buf, "'!!Unknown!!'");
+	  strlcat(buf, "'!!Unknown!!'", sizeof(buf));
 	  break;
 	}
 
-	strcat(buf, ".\n");
-	sock_write(client_info->socket, "%s", buf);
+	sock_write(client_info->socket, "%s.\n", buf);
       }
     }
     else if(nargs >= 2) {
