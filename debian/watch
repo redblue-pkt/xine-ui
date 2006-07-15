@@ -1,4 +1,4 @@
+# format version number, currently 3; this line is compulsory!
 version=3
-http://xinehq.de/index.php/releases \
-	(?:.*/)?xine/xine-ui-([\d\.]*).tar.gz \
-	debian uupdate
+
+http://sf.net/xine/xine-ui-(.*)\.tar\.gz

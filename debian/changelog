@@ -1,17 +1,120 @@
-xine-ui (0.99.3-2) unstable; urgency=low
+xine-ui (0.99.4-3) unstable; urgency=low
+
+  * should build now on kfreebsd-amd64 (Closes: #361493)
+
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 17 Jun 2006 17:41:46 +0200
+
+xine-ui (0.99.4-2) unstable; urgency=high
+
+  * Urgency high because of security and RC bugs
+  * Add last missing hunk from CVS-2006-2230. (Closes: #372172)
+  * rebuild against a newer xine-lib. (Closes: #347572, #369174, #257495)
+  * use libcurl3-gnutls-dev (Closes: #265539)
+  * add --enable-vdr-keys to configure script for vdr support.
+    Thanks to Peter Weber <peter_weber69@gmx.at>
+  * more cleanups in 'clean' rule of debian/rules
+  * Does no longer crash in skin browser on amd64 (Closes: #369276)
+  * Conformance with menu policy (Closes: #320615)
+  * Link to xine.desktop in usr/share/applications (Closes: #278628)
+  * Update desktop file (Closes: #301443)
+  * late ack'ing NMUs. Thanks contributors!
+    (Closes: #346817, #228633, #300335, #306725, #313876, #314409,
+             #321552, #325144, #320872, #324469, #288702, #244495,
+             #327895, #328129)
+
+ -- Reinhard Tartler <siretart@tauware.de>  Thu, 15 Jun 2006 13:28:01 +0200
+
+xine-ui (0.99.4-1) unstable; urgency=high
+
+  [ Siggi Langauf ]
 
   * fixed icon in menu entry (closes: #228633)
-  * add debian/watch file for uscan.
 
- -- Xxx Xxx <xxx@xxx.xx>  Fri, 03 Jun 2005 00:00:00 +0000
+  [ Reinhard Tartler ]
+
+  * new upstream release, featuring:
+    - Fixed deadlock, segfaults and mem-leaks, several other fixes and
+      enhancements,
+      can't remember details (thanks also to Marcelo Jimenez and Jakub Labath)
+    - Menu to reset video controls
+    - fixed menu shortcut strings allocation/freeing [bug #1223022]
+    - audio post plugin support
+    - use UTF-8 for Japanese locale if nl_langinfo doesn't work [bug #1096974]
+    - expand tabs in post-plugin help
+    - merge some osd menus from oxine
+    - aspect ratio fixed for multihead setups (especially TwinView)
+      [bugs #1089328, #1001702 and #989157]
+    - fixed parsing post plugin parameters of type double for some locales
+    - autoload subtitles with .txt extension too
+    - be more POSIX-compliant (head, tail) (build fix) [bug #1172729]
+    - Russian translations (thanks to Pavel Maryanov)
+    - forced not loading old playlist with -P option
+
+  * add debian/watch file for uscan.
+  * added myself to Uploaders
+  * high urgency upload because of security fix
+  * bumped standards version to 3.7.2, no changes needed
+
+  * SECURITY: Fix two format string bugs which could be possibly
+    remote-exploitable (Ubuntu: #41781, CVE-2006-1905). Imported from security
+    upload to ubuntu by Sebastian Dröge <slomo@ubuntu.com> (Closes: #363370)
+
+ -- Reinhard Tartler <siretart@tauware.de>  Mon,  5 Jun 2006 18:08:45 +0200
+
+xine-ui (0.99.3-1.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Replace build-dependency on xlibs-dev with an explicit build-dependency
+    on each required package. (Closes: #346817)
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sat, 21 Jan 2006 02:34:09 +0100
+
+xine-ui (0.99.3-1.2) unstable; urgency=low
+
+  * Non-maintainer upload with permission from Siggi.
+  * Fix the crashes which occur on right-clicking the GUI.
+    (Closes: #328129)
+  * Updated config.{sub guess} to prevent FTBFS on GNU/gFreeBSD.
+    This involves a build-dependency upon the autotools-dev package.
+    (Closes: #327895)
+  * Updated the menu file to point to the correct icon.
+    (Closes: #244495)
+  * Updated standards version to 3.6.2, which involved several
+    minor changes:
+        - Updated standards versoin.
+        - Updated Debhelper compatability version.
+        - Removed the usage of dh_testversion.
+        - Tweaked copyright file.
+        - Quote arguments in menu file.
+  * Outstanding areas remain:
+        - Manpages in the wrong section, and not all binaries having them.
+
+ -- Steve Kemp <skx@debian.org>  Fri, 4 Nov 2005 14:34:10 +0000
+
+xine-ui (0.99.3-1.1) unstable; urgency=low
+
+  * 0-day NMU (BSP).
+  * gcc-4.0 fixes by Andreas Jochen (closes: bug#288702).
+  * Build-depends on libaa1-dev instead of aalib1-dev (closes: bug#321552,
+    #325144, #320872, #324469).
+  * Build-depends on 'libreadline5-dev | libreadline-dev' instead of
+    libreadline-dev.
+  * Build-depends on libcaca-dev (closes: bug#314409).
+  * Fixed German translation (closes: bug#313876).
+  * Fixed 2 typos in xineremote.1 (closes: bug#306725).
+  * Fixed 4 typos in xine.1 (closes: bug#300335).
+  * Fixed the menu file (closes: bug#228633).
+  * Build-depends on libgpmg1-dev only on Linux systems.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 12 Sep 2005 01:04:42 +0200
 
 xine-ui (0.99.3-1) unstable; urgency=high
 
   * new upstream release(s)
   * now build-depending on unspecific version of libcurl (closes: #262780)
   * rebuilt against libcurl3-dev (closes: 279452)
-
- -- Siggi Langauf <siggi@flake.langauf.de>  Mon, 27 Dec 2004 13:56:42 +0100
+  
+ -- Siggi Langauf <siggi@debian.org>  Mon, 27 Dec 2004 13:56:42 +0100
 
 xine-ui (0.99.1-1) unstable; urgency=low
 
@@ -24,7 +127,7 @@ xine-ui (0.99.1-1) unstable; urgency=low
     - xine-check handles "unknown" plugins better (closes: #243661)
     - doesn't segfault on -pfq any more (closes: 187321)
     - fixes segfault on >16 autorun options (closes: #212509)
-
+  
  -- Siggi Langauf <siggi@debian.org>  Thu, 15 Apr 2004 21:26:28 +0200
 
 xine-ui (0.9.23-2) unstable; urgency=low
@@ -48,7 +151,7 @@ xine-ui (0.9.22-1) unstable; urgency=high
     * allows configuration of post-processing plugin chains ("chain reaction")
       With the "expand" plugin, you can place subtitles outside the video.
       (closes: #200085)
-
+  
  -- Siggi Langauf <siggi@debian.org>  Fri,  1 Aug 2003 16:29:45 +0200
 
 xine-ui (0.9.21-2) unstable; urgency=high
@@ -94,7 +197,7 @@ xine-ui (0.9.18-1) unstable; urgency=low
   * new upstream release
     - restores correct video mode on exit (closes: #177740)
     - brings meaningful error message when hotkeys collide (closes: #177877)
-
+  
  -- Siggi Langauf <siggi@debian.org>  Wed, 29 Jan 2003 21:51:14 +0100
 
 xine-ui (0.9.17-2) unstable; urgency=low
@@ -183,11 +286,11 @@ xine-ui (0.9.10-1) unstable; urgency=medium
   * new upstream release
     - contains xine-check fixes (closes: #141962)
     - doesn't segfault on SIGINT any more (closes: #147994)
-
+  
   * added build-dependancy on liblircclient-dev (closes: #137715)
   * recompiled agains libxine0-0.9.10 (with versioned shlibs) (closes: #147273)
   * removed references to the (never released, long obsolete) "xine" package
-
+  
  -- Siggi Langauf <siggi@debian.org>  Sun, 26 May 2002 00:37:52 +0200
 
 xine-ui (0.9.9-1) unstable; urgency=medium
@@ -202,9 +305,9 @@ xine-ui (0.9.9-1) unstable; urgency=medium
 xine-ui (0.9.8-3) testing unstable; urgency=high
 
   * added Conflicts: with future xine-lib (closes: #129942, #128440)
-  * added man page for xine-check (and xine-bugreport)
+  * added man page for xine-check (and xine-bugreport) 
   * "softer" architecture check, so it at least compiles on unknown arch...
-
+  
  -- Siggi Langauf <siggi@debian.org>  Sat, 19 Jan 2002 16:57:27 +0100
 
 xine-ui (0.9.8-2) unstable; urgency=high
@@ -218,7 +321,7 @@ xine-ui (0.9.8-1) unstable; urgency=medium
   * new upstream release with countless improvements (see upstream ChangeLog)
     * includes xine-check script to detect most common problems.
     * no more "apostrophe abuse" (closes: #125667)
-
+  
  -- Siggi Langauf <siggi@debian.org>  Mon, 14 Jan 2002 01:07:29 +0100
 
 xine-ui (0.9.7-1) unstable; urgency=low
@@ -255,7 +358,7 @@ xine-ui (0.9.3-1) unstable; urgency=medium
  -- Siggi Langauf <siggi@debian.org>  Sat,  3 Nov 2001 11:23:56 +0100
 
 xine-ui (0.9.2-3) unstable; urgency=high
-
+  
   * allow for architectures that won't compile aaxine
   * forcing mandir to /usr/share/man again (closes: #116050)
   * 0.9.2-2 was rejected because of checksum problems...
@@ -278,6 +381,7 @@ xine-ui (0.9.2-1) unstable; urgency=medium
 
  -- Siggi Langauf <siggi@debian.org>  Mon, 15 Oct 2001 21:01:22 +0200
 
+
 xine-ui (0.9.1-1.1) unstable; urgency=low
 
   * NMU.
@@ -287,7 +391,7 @@ xine-ui (0.9.1-1.1) unstable; urgency=low
   * Added ia64 support.  Closes: #115039.
 
  -- Jeff Licquia <jlicquia@progeny.com>  Tue,  9 Oct 2001 10:25:26 -0600
-
+    
 xine-ui (0.9.1-1) unstable; urgency=low
 
   * added README and fixed doc dir (closes: #112283)
@@ -311,8 +415,8 @@ xine-ui (0.5.3-1) unstable; urgency=low
 
 xine-ui (0.5.2-1) unstable; urgency=low
 
-  * new upstream release, featuring slow/fast playback
-  * added compiler flags for m68k
+  * new upstream release, featuring slow/fast playback  
+  * added compiler flags for m68k 
 
  -- Siggi Langauf <siggi@debian.org>  Sun,  2 Sep 2001 22:15:09 +0200
 
@@ -323,8 +427,11 @@ xine-ui (0.5.1-1) unstable; urgency=low
 
  -- Siggi Langauf <siggi@debian.org>  Mon, 27 Aug 2001 09:49:01 +0200
 
+
 xine-ui (0.5.0-1) unstable; urgency=low
 
   * Initial Release of the new 0.5 architecture with separate libxine
 
  -- Siggi Langauf <siggi@debian.org>  Sun, 12 Aug 2001 23:59:02 +0200
+
+
