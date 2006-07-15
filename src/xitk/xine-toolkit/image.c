@@ -1330,13 +1330,12 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
       do {
 	nchar++;
 	snprintf(buf, nchar, "%s", title);
-      } while(xitk_font_get_string_length(fs, buf) < (w - 12));
+      } while(xitk_font_get_string_length(fs, buf) < (w - 12) && nchar < sizeof (buf) - 1);
       /* Cut title, add three dots a the end */
-      nchar -= 4;
-      snprintf(buf, nchar, "%s...", title);
+      snprintf(buf, sizeof (buf), "%*s...", nchar - 1, title);
     }
     else
-      strncpy(buf, title, sizeof(buf));
+      snprintf(buf, sizeof(buf), "%s", title);
 
     fwidth = xitk_font_get_string_length(fs, buf);
   }
