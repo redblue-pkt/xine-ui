@@ -480,10 +480,7 @@ static void print_formatted(char *title, const char *const *plugins) {
     plugin = *plugins++;
   }
   
-  if(strlen(buffer))
-    puts(buffer);
-  
-  puts(".\n\n");
+  printf("%s.\n\n", buffer);
 }
 static void list_plugins(char *type) {
   typedef struct {
