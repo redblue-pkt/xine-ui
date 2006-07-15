@@ -372,7 +372,7 @@ void osd_stream_infos(void) {
       y += h;
     }
     
-    strcpy(buffer, _("Audio: "));
+    strncpy(buffer, _("Audio: "), sizeof(buffer));
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
