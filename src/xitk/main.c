@@ -473,8 +473,7 @@ static void print_formatted(char *title, const char *const *plugins) {
       snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%s%s", (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
     }
     else {
-      printf("%s", buffer);
-      printf(",\n");
+      printf("%s,\n", buffer);
       snprintf(buffer, sizeof(buffer), "%s%s", blanks, plugin);
     }
     
@@ -484,7 +483,7 @@ static void print_formatted(char *title, const char *const *plugins) {
   if(strlen(buffer))
     puts(buffer);
   
-  printf(".\n\n");
+  puts(".\n\n");
 }
 static void list_plugins(char *type) {
   typedef struct {
