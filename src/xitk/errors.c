@@ -110,7 +110,7 @@ void xine_error(char *message, ...) {
       return;
   }
   
-  if(gGui->stdctl_enable) {
+  if(gGui->stdctl_enable || !gGui->display) {
     printf("%s\n", buf);
   }
   else {
