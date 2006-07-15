@@ -3,6 +3,7 @@
 ##
 
 ACLOCAL_AMFLAGS = -I m4
+AUTOMAKE_OPTIONS = dist-bzip2
 
 SUBDIRS = doc m4 po misc src  
 
