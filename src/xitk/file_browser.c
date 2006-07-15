@@ -1003,7 +1003,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
 
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s'"), fb->current_dir);
     if(strlen(fb->current_dir) > 1)
-      strlcat(buf, "/", buf);
+      strlcat(buf, "/", sizeof(buf));
     snprintf(buf+strlen(buf), sizeof(buf)-strlen(buf), "%s' ?.", fb->norm_files[sel].name);
     
     fb_deactivate(fb);

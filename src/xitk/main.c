@@ -1183,7 +1183,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	  strlcat(buffer, _("\nYour DVD is probably crypted. "
 			   "According to your country laws, you can or can't "
 			   "install/use libdvdcss to be able to read this disc, "
-			   "which you bought."), buffer);
+			   "which you bought."), sizeof(buffer));
 	}
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
