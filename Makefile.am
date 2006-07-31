@@ -11,8 +11,7 @@ DEBFILES = debian/README.Debian debian/changelog debian/control \
 	debian/copyright debian/links debian/menu \
 	debian/rules debian/shlibdeps.sh debian/xine-ui.mime 
 
-EXTRA_DIST = config.rpath autogen.sh\
-	$(DEBFILES)
+EXTRA_DIST = config.rpath autogen.sh
 
 slackbuild:
 	@(cd misc && $(MAKE) SlackBuild) && \
