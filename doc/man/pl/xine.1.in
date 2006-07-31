@@ -290,9 +290,9 @@ ustawia dynamiczny zakres kompresji d¼wiêku
 przypisuje now± warto¶æ do jakiegokolwiek wpisu konfiguracji
 .SH KLAWISZE KONTROLNE
 Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
-'\fBM\-\fP' to modyfikator (klawisz `\fBAlt\fP' na klawiaturze PC), '\fBC\-\fP'
+`\fBM\-\fP' to modyfikator (klawisz `\fBAlt\fP' na klawiaturze PC), `\fBC\-\fP'
 to klawisz Control `\fBCTRL\fP', inne klawisze specjalne s± zamkniête znakami
-'\fB<\fP' i '\fB>\fP', np:
+`\fB<\fP' i `\fB>\fP', np:
 klawisz `\fBHOME\fP' jest wy¶wietlany jako \fB<home>\fP.
 Domy¶lne mapowania klawiszy to:
 .IP "\fB0\fP .. \fB9\fP"
@@ -558,7 +558,8 @@ mo¿e zostanie zaimplementowanych wiêcej takich jak np. podawanie okre¶lonego
 albo absolutnego MRL, kana³u napisów lub kana³u d¼wiêku.
 
 .SH PLIKI
-.TP \w'~/.xine/passwdXX'u
+.TP
+\w'~/.xine/passwdXX'u
 ~/.xine/config
 G³ówny plik konfiguracyjny xine
 .TP

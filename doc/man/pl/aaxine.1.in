@@ -94,7 +94,8 @@ typów no¶ników. Te wymienione powy¿ej s± dostêpne wraz z libxine.
 Po separatorze
 .B #
 mo¿esz dodaæ kilka parametrów strumienia:
-.TP novideo
+.TP
+.B novideo
 Obraz bêdzie ignorowany
 .TP
 .B noaudio
