@@ -371,9 +371,9 @@ The syntax is:
 .br
 Unlike stream config option, you can change anything \fIbefore\fP playing the stream.
 .SH CONTROL KEYS
-Many features can be controlled by pressing control keys. '\fBM\-\fP' is 
-the Meta key (`\fBAlt\fP' key on PC keyboard), '\fBC\-\fP' is the Control `\fBCTRL\fP' 
-key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the `\fBHOME\fP' key is displayed \fB<home>\fP.
+Many features can be controlled by pressing control keys. `\fBM\-\fP' is 
+the Meta key (`\fBAlt\fP' key on PC keyboard), `\fBC\-\fP' is the Control `\fBCTRL\fP' 
+key, other special keys are delimited by `\fB<\fP' and `\fB>\fP' characters, e.g. the `\fBHOME\fP' key is displayed as \fB<home>\fP.
 The default key bindings are:
 .IP "\fB\<Return\>\fP"
 Start playback
