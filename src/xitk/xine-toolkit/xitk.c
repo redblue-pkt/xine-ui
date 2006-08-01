@@ -1715,6 +1715,7 @@ void xitk_xevent_notify(XEvent *event) {
 	case ConfigureNotify: {
 	  XWindowAttributes wattr;
 	  Status            err;
+	  int               xerr;
 
 	  if(fx->widget_list && fx->widget_list->l) {
 	    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content(fx->widget_list->l);
@@ -1728,7 +1729,9 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 
 	  XLOCK(gXitk->display);
+	  xerr = xitk_install_x_error_handler();
 	  err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	  if (xerr) xitk_uninstall_x_error_handler();
 	  XUNLOCK(gXitk->display);
 
 	  if(err != BadDrawable && err != BadWindow) {
