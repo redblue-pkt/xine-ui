@@ -77,6 +77,8 @@ MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Tit
 .BI mms:// <host>...
 .TP 
 .BI http:// <host>...
+.TP 
+.BI cdda:// <Titelnummer>
 .PP 
 Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
 .br

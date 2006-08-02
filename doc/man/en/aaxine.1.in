@@ -85,6 +85,8 @@ to read from. valid MRLs may be plain file names or one of the following:
 .BI mms:// <host>...
 .br
 .BI http:// <host>...
+.br
+.BI cdda:// <tracknumber>
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams. Additional input plugins will provide additional MRL types.

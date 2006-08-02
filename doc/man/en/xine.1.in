@@ -147,7 +147,7 @@ If no option is given, `\fBdefault\fP' is selected.
 Enable network remote control server.
 To use network remote control server, a password file is required. 
 If xine cannot find it, the server is stopped. 
-The syntax of the password file follows the (familliar) scheme
+The syntax of the password file follows the (familiar) scheme
 <\fIidentification\fP>:<\fIpassword\fP>. Since cryptography is subject to
 legal issues in some countries, the password is not encrypted and also
 transmitted unencrypted, so take care with remote connections.
@@ -191,7 +191,7 @@ The server itself offers command help/syntax:
 .BI help\  [command]
 .br
 Without \fIcommand\fP specified, all available commands will be displayed. 
-If a command is specified, short text about the command functionnality will
+If a command is specified, short text about the command functionality will
 be given.
 .br
 .BI syntax\  <command>
@@ -223,7 +223,7 @@ Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possib
 .br
 \fBshuffle\fP: select randomly an entry in playlist from those not yet played.
 .br
-\fBshuffle\+\fP: same as shuffle, but indefinetely replay the playlist.
+\fBshuffle\+\fP: same as shuffle, but indefinitely replay the playlist.
 .TP
 .BI \-\-skin\-server\-url\  <url>
 Define the skin server url.
@@ -494,7 +494,7 @@ Fullscreen toggle
 .IP "\fBF\fP"
 Xinerama fullscreen toggle
 .IP "\fBb\fP"
-Video window borders appearence toggle
+Video window borders appearance toggle
 .IP "\fB\<Escape\>\fP"
 Jump to media Menu
 .IP "\fB\<F1\>\fP"
