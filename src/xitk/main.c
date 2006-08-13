@@ -1024,9 +1024,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       if( xine_check_version(1,1,1) )
         xine_set_param(gGui->stream, XINE_PARAM_GAPLESS_SWITCH, 1);
 #endif
-      if( strcmp( xine_get_meta_info(gGui->stream, XINE_META_INFO_SYSTEMLAYER),
-                  "imagedmx" ) != 0 )
-        gui_playlist_start_next();
+      gui_playlist_start_next();
     }
     else if(event->stream == gGui->visual_anim.stream) {
       /* printf("xitk/main.c: restarting visual stream...\n"); */
