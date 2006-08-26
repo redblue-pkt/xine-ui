@@ -740,8 +740,7 @@ void *xitk_xmalloc(size_t size) {
     size++;
   
   if((ptrmalloc = calloc(1, size)) == NULL) {
-    XITK_WARNING("calloc() failed: %s.\n", strerror(errno));
-    return NULL;
+    XITK_DIE("%s(): calloc() failed: %s\n", __FUNCTION__, strerror(errno));
   }
 
   return ptrmalloc;
