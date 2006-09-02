@@ -736,9 +736,10 @@ void xitk_set_layer_above(Window window) {
   
 
   if(gXitk->wm_type & WM_TYPE_EWMH_COMP) {
+    XEvent xev;
+
+    memset(&xev, 0, sizeof xev);
     if(gXitk->wm_type & WM_TYPE_KWIN) {
-      XEvent xev;
-      
       XLockDisplay(gXitk->display);
       xev.xclient.type         = ClientMessage;
       xev.xclient.display      = gXitk->display;
@@ -755,8 +756,6 @@ void xitk_set_layer_above(Window window) {
       XUnlockDisplay(gXitk->display);
     }
     else {
-      XEvent xev;
-      
       XLockDisplay(gXitk->display);
       
       xev.xclient.type         = ClientMessage;
@@ -824,6 +823,7 @@ void xitk_set_window_layer(Window window, int layer) {
     return;
   }
 
+  memset(&xev, 0, sizeof xev);
   xev.type                 = ClientMessage;
   xev.xclient.type         = ClientMessage;
   xev.xclient.window       = window;
@@ -846,6 +846,7 @@ static void _set_ewmh_state(Window window, Atom atom, int enable) {
   if((window == None) || (atom == None))
     return;
 
+  memset(&xev, 0, sizeof(xev));
   xev.xclient.type         = ClientMessage;
   xev.xclient.message_type = XA_NET_WM_STATE;
   xev.xclient.display      = gXitk->display;
@@ -912,22 +913,8 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
     }
     
     if(atom) {
-      XEvent xev;
-
-      xev.xclient.type         = ClientMessage;
-      xev.xclient.display      = gXitk->display;
-      xev.xclient.window       = window;
-      xev.xclient.message_type = XA_WIN_LAYER;
-      xev.xclient.format       = 32;
-      xev.xclient.data.l[0]    = *atom;
-      xev.xclient.data.l[1]    = 0l;
-      xev.xclient.data.l[2]    = 0l;
-      xev.xclient.data.l[3]    = 0l;
-      xev.xclient.data.l[4]    = 0l;
-  
       XLOCK(gXitk->display);
-      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), False, SubstructureNotifyMask, &xev);
-
+      XChangeProperty(gXitk->display, window, XA_WM_WINDOW_TYPE, XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
       XRaiseWindow(gXitk->display, window);
       XUNLOCK(gXitk->display);
     }
@@ -1987,7 +1974,8 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
    
     if(fx->window != None && fx->widget_list) {
       XEvent xexp;
-      
+
+      memset(&xexp, 0, sizeof xexp);
       xexp.xany.type          = Expose;
       xexp.xexpose.type       = Expose;
       xexp.xexpose.send_event = True;

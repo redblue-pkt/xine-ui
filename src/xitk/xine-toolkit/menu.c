@@ -789,7 +789,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   xwin = xitk_window_create_simple_window(private_data->imlibdata, 
 					  x, y, wwidth + 2, wheight + 2);
-  xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_DOCK);
+  xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
 
   if(bsep || btitle) {
     int width, height;
