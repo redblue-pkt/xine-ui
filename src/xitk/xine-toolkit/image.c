@@ -590,9 +590,9 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
   int            w;
   int            h;
   XPoint         points[4];
-  int            i, offset = 0;
-  short          x1, x2, x3;
-  short          y1, y2, y3;
+  int            i;
+  int            x1, x2, x3;
+  int            y1, y2, y3;
   
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
@@ -600,20 +600,20 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
   w = p->width / 3;
   h = p->height;
   
+  x1 = (w - 5);
+  y1 = (h / 2); 
+
+  x2 = (w - 10);
+  y2 = ((h / 2) + 5);
+
+  x3 = (w - 10);
+  y3 = ((h / 2) - 5);
+  
   XLOCK(im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   XUNLOCK(im->x.disp);
-  
-  for(i = 0; i < 3; i++) {
 
-    x1 = (w - 10) + offset;
-    y1 = (h / 4);
-    
-    x2 = (w - 10) + offset;
-    y2 = ((h / 4) * 3);
-    
-    x3 = (w - 4) + offset;
-    y3 = (h / 2); 
+  for(i = 0; i < 3; i++) {
     
     if(i == 2) {
       x1++; x2++; x3++;
@@ -628,13 +628,15 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
     points[2].y = y3;
     points[3].x = x1;
     points[3].y = y1;
-    
-    offset += w;
 
     XLOCK(im->x.disp);
     XFillPolygon(im->x.disp, p->image->pixmap, p->image->gc, 
-		 &points[0], 4, Complex, CoordModeOrigin);
+		 &points[0], 4, Convex, CoordModeOrigin);
     XUNLOCK(im->x.disp);
+
+    x1 += w;
+    x2 += w;
+    x3 += w;
   }
 
 }
@@ -645,10 +647,11 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
 static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
   int            w;
   int            h;
-  XPoint         points[4];
-  int            i, offset = 0;
-  short          x1, x2, x3;
-  short          y1, y2, y3;
+  XSegment      *segments;
+  int            nsegments;
+  int            i, s;
+  int            x1, x2, dx;
+  int            y1, y2, dy;
 
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
@@ -656,79 +659,118 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
   w = p->width / 3;
   h = p->height;
 
+  /*
+   * XFillPolygon doesn't yield equally shaped arbitrary sized small triangles
+   * because of its filling algorithm (see also fill-rule in XCreateGC(3X11)
+   * as for which pixels are drawn on the boundary).
+   * So we handcraft them using XDrawSegments applying Bresenham's algorithm.
+   */
+
+  /* Coords of the enclosing rectangle for the triangle:   */
+  /* Pay attention to integer precision loss and calculate */
+  /* carefully to obtain symmetrical and centered shapes.  */
+  x1 = ((w - 1) / 2) - (w / 4);
+  x2 = ((w - 1) / 2) + (w / 4);
+  y1 = ((h - 1) / 2) - (h / 4);
+  y2 = ((h - 1) / 2) + (h / 4);
+
+  dx = (x2 - x1 + 1);
+  dy = (y2 - y1 + 1);
+
+  if(direction == DIRECTION_UP || direction == DIRECTION_DOWN) {
+    int y, iy, dd;
+
+    nsegments = dy;
+    segments = (XSegment *) xitk_xmalloc(sizeof(XSegment) * nsegments);
+
+    if(direction == DIRECTION_DOWN) {
+      y = y1; iy = 1;
+    }
+    else {
+      y = y2; iy = -1;
+    }
+    dx = (dx + 1) / 2;
+    dd = 0;
+    for(s = 0; s < nsegments; s++) {
+      segments[s].y1 = y; segments[s].x1 = x1;
+      segments[s].y2 = y; segments[s].x2 = x2;
+      y += iy;
+      if(dy >= dx) {
+	if((dd += dx) >= dy) {
+	  x1++; x2--;
+	  dd -= dy;
+	}
+      }
+      else {
+	do {
+	  x1++; x2--;
+	} while((dd += dy) < dx);
+	dd -= dx;
+      }
+    }
+  }
+  else if(direction == DIRECTION_LEFT || direction == DIRECTION_RIGHT) {
+    int x, ix, dd;
+
+    nsegments = dx;
+    segments = (XSegment *) xitk_xmalloc(sizeof(XSegment) * nsegments);
+
+    if(direction == DIRECTION_RIGHT) {
+      x = x1; ix = 1;
+    }
+    else {
+      x = x2; ix = -1;
+    }
+    dy = (dy + 1) / 2;
+    dd = 0;
+    for(s = 0; s < nsegments; s++) {
+      segments[s].x1 = x; segments[s].y1 = y1;
+      segments[s].x2 = x; segments[s].y2 = y2;
+      x += ix;
+      if(dx >= dy) {
+	if((dd += dy) >= dx) {
+	  y1++; y2--;
+	  dd -= dx;
+	}
+      }
+      else {
+	do {
+	  y1++; y2--;
+	} while((dd += dx) < dy);
+	dd -= dy;
+      }
+    }
+  }
+  else {
+    XITK_WARNING("direction '%d' is unhandled.\n", direction);
+    return;
+  }
+
   XLOCK(im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   XUNLOCK(im->x.disp);
 
   for(i = 0; i < 3; i++) {
     
-    if(direction == DIRECTION_UP) {
-      x1 = (w / 2) + offset;
-      y1 = (h / 4);
-      
-      x2 = ((w / 4) * 3) + offset;
-      y2 = ((h / 4) * 3);
-      
-      x3 = (w / 4) + offset;
-      y3 = ((h / 4) * 3); 
-    }
-    else if(direction == DIRECTION_DOWN) {
-      x1 = (w / 2) + offset;
-      y1 = ((h / 4) * 3);
-
-      x2 = (w / 4) + offset;
-      y2 = (h / 4);
-      
-      x3 = ((w / 4) * 3) + offset;
-      y3 = (h / 4); 
-    }
-    else if(direction == DIRECTION_LEFT) {
-      x1 = ((w / 4) * 3) + offset;
-      y1 = (h / 4);
-
-      x2 = ((w / 4) * 3) + offset;
-      y2 = ((h / 4) * 3);
-      
-      x3 = (w / 4) + offset;
-      y3 = (h / 2); 
-    }
-    else if(direction == DIRECTION_RIGHT) {
-      x1 = (w / 4) + offset;
-      y1 = (h / 4);
-
-      x2 = ((w / 4) * 3) + offset;
-      y2 = (h / 2);
-      
-      x3 = (w / 4) + offset;
-      y3 = ((h / 4) * 3); 
-    }
-    else {
-      XITK_WARNING("direction '%d' is unhandled.\n", direction);
-      return;
-    }
-    
     if(i == 2) {
-      x1++; x2++; x3++;
-      y1++; y2++; y3++;
+      for(s = 0; s < nsegments; s++) {
+	segments[s].x1++; segments[s].y1++;
+	segments[s].x2++; segments[s].y2++;
+      }
     }
     
-    points[0].x = x1;
-    points[0].y = y1;
-    points[1].x = x2;
-    points[1].y = y2;
-    points[2].x = x3;
-    points[2].y = y3;
-    points[3].x = x1;
-    points[3].y = y1;
-    
-    offset += w;
-
     XLOCK(im->x.disp);
-    XFillPolygon(im->x.disp, p->image->pixmap, p->image->gc, 
-		 &points[0], 4, Complex, CoordModeOrigin);
+    XDrawSegments(im->x.disp, p->image->pixmap, p->image->gc, 
+		  &segments[0], nsegments);
     XUNLOCK(im->x.disp);
+
+    for(s = 0; s < nsegments; s++) {
+      segments[s].x1 += w;
+      segments[s].x2 += w;
+    }
   }
 
+  free(segments);
 }
 
 /*
@@ -763,7 +805,7 @@ static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p,
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
   
   XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + excstart), y);
-  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width - 1), y);
   XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
   XUNLOCK(im->x.disp);
 
@@ -774,7 +816,7 @@ static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p,
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
   
   XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + 1), (y + height), (x + width), (y + height));
   XUNLOCK(im->x.disp);
 }
 
@@ -794,7 +836,7 @@ static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p,
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_darkgray(im));
 
   XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + excstart), y);
-  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width - 1), y);
   XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
   XUNLOCK(im->x.disp);
 
@@ -805,7 +847,7 @@ static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p,
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
   
   XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + 1), (y + height), (x + width), (y + height));
   XUNLOCK(im->x.disp);
 }
 
@@ -825,7 +867,7 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p,
   else if(relief == DRAW_INNER)
     XSetForeground(im->x.disp, p->gc, dcolor);
 
-  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + width - 1), y);
   XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
   XUNLOCK(im->x.disp);
 
@@ -836,7 +878,7 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p,
     XSetForeground(im->x.disp, p->gc, lcolor);
   
   XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + 1), (y + height), (x + width), (y + height));
   XUNLOCK(im->x.disp);
 }
 
@@ -1310,34 +1352,53 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
   xitk_font_t   *fs = NULL;
   int            sty[2];
   int            yoff = 0, xstart = 0, xstop = 0, fheight = 0, fwidth = 0;
+  int            titlelen = 0;
+  char          *titlebuf = NULL;
   char           buf[BUFSIZ];
 
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
   
   if(title) {
+    int	ascent, descent;
+
+    int maxfwidth = (w - 12);
+
+    titlelen = strlen(title);
+    titlebuf = title;
 
     fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
     xitk_font_set_font(fs, p->gc);
-    fheight = xitk_font_get_string_height(fs, title);
-    fwidth = xitk_font_get_string_length(fs, title);
+    xitk_font_text_extent(fs, title, titlelen, NULL, NULL, &fwidth, &ascent, &descent);
+    fheight = ascent + descent;
 
-    if(fwidth >= (w - 12)) {
-      int nchar = 1;
-      
-      memset(&buf, 0, sizeof(buf));
-      /* Limit the title to width of frame */
+    /* Limit title to frame width */
+    if(fwidth > maxfwidth) {
+      char  dots[]  = "...";
+      int   dotslen = strlen(dots);
+      int   dotsfwidth;
+
+      /* Cut title, append dots */
+      xitk_font_text_extent(fs, dots, dotslen, NULL, NULL, &dotsfwidth, NULL, NULL);
       do {
-	nchar++;
-	snprintf(buf, nchar, "%s", title);
-      } while(xitk_font_get_string_length(fs, buf) < (w - 12) && nchar < sizeof (buf) - 1);
-      /* Cut title, add three dots a the end */
-      snprintf(buf, sizeof (buf), "%*s...", nchar - 1, title);
+	titlelen--;
+	xitk_font_text_extent(fs, title, titlelen, NULL, NULL, &fwidth, NULL, NULL);
+      } while((fwidth + dotsfwidth) > maxfwidth);
+      { /* Cut possible incomplete multibyte character at the end */
+	int fwidth1;
+	while((titlelen > 0) &&
+	      (xitk_font_text_extent(fs, title, (titlelen - 1), NULL, NULL, &fwidth1, NULL, NULL),
+	       fwidth1 == fwidth))
+	  titlelen--;
+      }
+      if(titlelen > (sizeof(buf) - dotslen - 1)) /* Should never happen, */
+	titlelen = (sizeof(buf) - dotslen - 1);  /* just to be sure ...  */
+      strncpy(buf, title, titlelen), buf[titlelen] = '\0';
+      strcat(buf, dots);
+      fwidth += dotsfwidth;
+      titlelen += dotslen;
+      titlebuf = buf;
     }
-    else
-      snprintf(buf, sizeof(buf), "%s", title);
-
-    fwidth = xitk_font_get_string_length(fs, buf);
   }
 
   sty[0] = (style == DRAW_INNER) ? DRAW_INNER : DRAW_OUTTER;
@@ -1347,23 +1408,24 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
   if(title) {
     yoff = (fheight>>1);
     xstart = 3;
-    xstop = fwidth + 12;
+    xstop = fwidth + 9;
   }
+
   _draw_rectangular_box_light(im, p, x, (y - yoff), 
 			      xstart, xstop,
-			      w, (h - yoff), sty[0]);
+			      w, (h - fheight + yoff), sty[0]);
   
   if(title)
-    xstart--;
+    xstart--, xstop--;
   
   _draw_rectangular_box_light(im, p, (x + 1), ((y - yoff) + 1), 
 			      xstart, xstop,
-			      (w - 2), ((h - yoff) - 2), sty[1]);
+			      (w - 2), ((h - fheight + yoff) - 2), sty[1]);
   
   if(title) {
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
-    xitk_font_draw_string(fs, p->pixmap, p->gc, (x + 6), y, buf, strlen(buf));
+    xitk_font_draw_string(fs, p->pixmap, p->gc, (x + 6), y, titlebuf, titlelen);
     XUNLOCK(im->x.disp);
     
     xitk_font_unload_font(fs);
