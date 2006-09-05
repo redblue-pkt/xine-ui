@@ -1266,6 +1266,7 @@ static void *_gui_seek_relative(void *data) {
     osd_stream_position(pos);
   
   gGui->ignore_next = 0;
+  osd_hide_status();
   panel_check_pause();
 
   pthread_exit(NULL);
