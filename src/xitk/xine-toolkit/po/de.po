@@ -1,5 +1,5 @@
 # xine-toolkit - deutsche ‹bersetzung.
-# Copyright (C) 2002 the xine project (http://xine.sf.net).
+# Copyright (C) 2002,2006 the xine project (http://xine.sf.net).
 # Siggi Langauf <siggi at users dot sf dot net>, 2002.
 #
 msgid ""
@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.23\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2006-06-19 00:26+0200\n"
-"PO-Revision-Date: 2003-01-02 09:01+0100\n"
+"PO-Revision-Date: 2006-09-14 08:54+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:1166
-#, fuzzy
 msgid "Select current entry"
 msgstr "W‰hle momentanen Eintrag"
 
@@ -24,7 +23,6 @@ msgid "Play selected entry"
 msgstr "Spiele momentanen Eintrag"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:1185
-#, fuzzy
 msgid "Close MRL browser window"
 msgstr "MRL-Browser-Fenster schlieﬂen"
 
@@ -79,9 +77,9 @@ msgstr ""
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:962
-#, fuzzy, c-format
+#, c-format
 msgid "init_test() failed\n"
-msgstr "XInitThreads() fehlgeschlagen.\n"
+msgstr "init_test() fehlgeschlagen.\n"
 
 #: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
@@ -104,7 +102,6 @@ msgid "Yes"
 msgstr "Ja"
 
 #: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
-#, fuzzy
 msgid "No"
 msgstr "Nein"
 
@@ -117,50 +114,38 @@ msgid "Error"
 msgstr "Fehler"
 
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
-#, fuzzy
 msgid "Information"
 msgstr "Information"
 
-#, fuzzy
 #~ msgid "Stream information"
-#~ msgstr "Information"
+#~ msgstr "Datenstrominformation"
 
-#, fuzzy
 #~ msgid "No Information available."
-#~ msgstr "Information"
+#~ msgstr "Keine Information verf¸gbar"
 
-#, fuzzy
 #~ msgid "Stream/Information..."
-#~ msgstr "Information"
+#~ msgstr "Datenstrom/Information..."
 
-#, fuzzy
 #~ msgid "Stream/Information (OSD)"
-#~ msgstr "Information"
+#~ msgstr "Datenstrom/Information (OSD)"
 
-#, fuzzy
 #~ msgid "Close playlist window"
-#~ msgstr "MRL-Browser-Fenster schlieﬂen"
+#~ msgstr "Playlist-Fenster schlieﬂen"
 
-#, fuzzy
 #~ msgid "Error: "
-#~ msgstr "Fehler"
+#~ msgstr "Fehler: "
 
-#, fuzzy
 #~ msgid "xine_get_current_frame() failed\n"
-#~ msgstr "init_test() fehlgeschlagen\n"
+#~ msgstr "xine_get_current_frame() fehlgeschlagen\n"
 
-#, fuzzy
 #~ msgid "png_create_write_struct() failed\n"
-#~ msgstr "init_test() fehlgeschlagen\n"
+#~ msgstr "png_create_write_struct() fehlgeschlagen\n"
 
-#, fuzzy
 #~ msgid "png_create_info_struct() failed\n"
-#~ msgstr "init_test() fehlgeschlagen\n"
+#~ msgstr "png_create_info_struct() fehlgeschlagen\n"
 
-#, fuzzy
 #~ msgid "Channel: "
-#~ msgstr "Abbrechen"
+#~ msgstr "Kanal: "
 
-#, fuzzy
 #~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "init_test() fehlgeschlagen\n"
+#~ msgstr "XAllocWMHints() fehlgeschlagen\n"
