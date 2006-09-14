@@ -64,6 +64,7 @@
 
 #ifdef CACA
 #  include <caca.h>
+#  include <cucul.h>
 #endif
 
 /* Sound mixer capabilities */
@@ -87,6 +88,10 @@ typedef struct {
   char                *configfile;
 #ifdef AA
   aa_context          *context;
+#endif
+#ifdef CACA
+  cucul_canvas_t      *canvas;
+  caca_display_t      *display;
 #endif
   char                *mrl[1024];
   int                  num_mrls;
@@ -583,14 +588,12 @@ static int aaxine_get_key_event(void) {
 #endif
 
 #ifdef CACA
-  unsigned int key;
+  caca_event_t ev;
 
-  key = CACA_EVENT_NONE;
-  while (((key = caca_get_event(CACA_EVENT_KEY_PRESS)) == CACA_EVENT_NONE) && aaxine.running)
-    usleep(50000);
+  while ( !caca_get_event(aaxine.display, CACA_EVENT_KEY_PRESS, &ev, 50000) && aaxine.running ) ;
 
   if (!aaxine.running) return 0;
-  return key & ~CACA_EVENT_ANY;
+  return ev.data.key.ch;
 #endif
 }
 
@@ -804,6 +807,8 @@ int main(int argc, char *argv[]) {
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_CACA,
 					  NULL);
+  aaxine.canvas = cucul_create_canvas(0, 0);
+  aaxine.display = caca_create_display(aaxine.canvas);
 #endif
 
   if (!aaxine.vo_port) {
@@ -1107,6 +1112,11 @@ int main(int argc, char *argv[]) {
     aa_uninitkbd(aaxine.context);
     aa_close(aaxine.context);
   }
+#endif
+
+#ifdef CACA
+  caca_free_display(aaxine.display);
+  cucul_free_canvas(aaxine.canvas);
 #endif
   
   if(xlib_handle)
