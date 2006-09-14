@@ -24,6 +24,7 @@ xine-ui (0.99.5) unstable; urgency=low
     checks. Add requirement of pkg-config presence.
   * bump version requirement for xine-lib to 1.1.0 and for libpng to 1.2.8.
   * fixed using window type property [bug #1534222]
+  * Support libcaca 0.99.
 
 xine-ui (0.99.4) unstable; urgency=low
 
