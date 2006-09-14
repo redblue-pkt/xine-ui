@@ -323,15 +323,17 @@ AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 dnl 
 dnl checks for Color AsCii Art library
 dnl 
-AC_ARG_WITH(libcaca,
-   AS_HELP_STRING([--without-libcaca], [Turn off CACA support.]))
+AC_ARG_WITH([caca],
+  AS_HELP_STRING([--without-caca], [Do not build CACA support]))
 
-if test "x$with_libcaca" != "xno"; then
-  AM_PATH_CACA(0.3,, AC_MSG_RESULT([*** All CACA-dependent parts will be disabled ***]))
-else
-  no_caca=yes
+if test "x$with_caca" != "xno"; then
+   PKG_CHECK_MODULES([CACA], [caca cucul], [have_caca="yes"], [have_caca="no"])
+   if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
+      AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
+   fi
 fi
-AM_CONDITIONAL(HAVE_CACA, test x$no_caca != "xyes")
+
+AM_CONDITIONAL([HAVE_CACA], [test "x$have_caca" = "xyes"])
 
 dnl option for font sets and multibyte string support
 AC_ARG_ENABLE([mbs],
