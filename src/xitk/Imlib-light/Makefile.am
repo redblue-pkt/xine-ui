@@ -4,7 +4,7 @@ endif
 
 noinst_LIBRARIES = $(imlib_lib)
 
-libImlib_light_a_CFLAGS = $(LIBPNG_CFLAGS)
+libImlib_light_a_CFLAGS = $(X_CFLAGS) $(LIBPNG_CFLAGS)
 libImlib_light_a_SOURCES = \
 	cache.c \
 	colors.c \

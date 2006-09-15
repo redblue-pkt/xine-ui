@@ -403,7 +403,8 @@ AM_CONDITIONAL(HAVE_DIRECTFB, test x$have_directfb = "xyes" )
 dnl
 dnl check for libpng
 dnl
-PKG_CHECK_MODULES([LIBPNG], [libpng >= 1.2.8])
+PKG_CHECK_MODULES([LIBPNG], [libpng >= 1.2.8],,
+  [PKG_CHECK_MODULES([LIBPNG], [libpng12 >= 1.2.8])])
 
 dnl
 dnl
