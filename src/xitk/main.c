@@ -1071,8 +1071,9 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       char                    buffer[8192];
       void                    (*report)(char *message, ...)
 #if __GNUC__ >= 3
-				__attribute__ ((format (printf, 1, 2)));
+				__attribute__ ((format (printf, 1, 2)))
 #endif
+      ;
       
       report = xine_error_with_more;
 
