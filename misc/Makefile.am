@@ -25,4 +25,4 @@ xine-check: xine-check.sh.in xine-check.en
 	chmod a+x xine-check
 
 xine-bugreport: xine-check
-	test ! -f xine-bugreport && $(LN_S) xine-check xine-bugreport
+	test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
