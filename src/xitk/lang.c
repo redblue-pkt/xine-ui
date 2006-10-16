@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -78,7 +78,7 @@
      de_LU
      de_LU@euro
   *  deutsch
-  *  dutch
+     dutch
      eesti
      el_GR
      en_AU
@@ -134,7 +134,7 @@
   *  fr_FR@euro
      fr_LU
      fr_LU@euro
-  *  français
+     français
   *  french
      ga_IE
      ga_IE@euro
@@ -243,14 +243,12 @@ static langs_t _langs[] = {
   /* French section */
   { "fr_FR",            FRENCH,             "fr",    "ISO-8859-1" },
   { "fr_FR@euro",       FRENCH,             "fr",    "ISO-8859-1" },
-  { "français",         FRENCH,             "fr",    "ISO-8859-1" },
   { "french",           FRENCH,             "fr",    "ISO-8859-1" },
 
   /* German section */
   { "de_DE",            GERMAN,             "de",    "ISO-8859-1" },
   { "de_DE@euro",       GERMAN,             "de",    "ISO-8859-1" },
   { "deutsch",          GERMAN,             "de",    "ISO-8859-1" },
-  { "dutch",            GERMAN,             "de",    "ISO-8859-1" },
   { "german",           GERMAN,             "de",    "ISO-8859-1" },
 
   /* Portuguese section */
@@ -335,7 +333,7 @@ static iso639_1_t iso639_1[] = {
   { "fo", "Faroese"		     },
   { "fj", "Fijian"		     },
   { "fi", "Finnish"		     },
-  { "fr", "Français"		     },
+  { "fr", "French"		     },
   { "fy", "Frisian"		     },
   { "ff", "Fulah"		     },
   { "gd", "Gaelic"		     },
@@ -361,6 +359,7 @@ static iso639_1_t iso639_1[] = {
   { "ie", "Interlingue"		     },
   { "iu", "Inuktitut"		     },
   { "ik", "Inupiaq"		     },
+  { "iw", "Hebrew"		     },
   { "ga", "Irish"		     },
   { "it", "Italian"		     },
   { "ja", "Japanese"		     },
