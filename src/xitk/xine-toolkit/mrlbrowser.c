@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1091,12 +1091,13 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
    */
   XLOCK(mb->imlibdata->x.disp);
   if(mb->layer_above) {
-    XA_WIN_LAYER = XInternAtom(mb->imlibdata->x.disp, "_WIN_LAYER", False);
+    if((XA_WIN_LAYER = XInternAtom(mb->imlibdata->x.disp, "_WIN_LAYER", False)) != None) {
     
-    data[0] = 10;
-    XChangeProperty(mb->imlibdata->x.disp, private_data->window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
+      data[0] = 10;
+      XChangeProperty(mb->imlibdata->x.disp, private_data->window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		      1);
+    }
   }
   
   /*
