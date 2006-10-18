@@ -617,6 +617,7 @@ static uint32_t xitk_check_wm(Display *display) {
   case WM_TYPE_METACITY: /* Untested */
   case WM_TYPE_AFTERSTEP:
   case WM_TYPE_BLACKBOX:
+  case WM_TYPE_DTWM:
     XA_WIN_LAYER = XInternAtom(display, "_WIN_LAYER", False);
     break;
   }
@@ -739,8 +740,8 @@ void xitk_set_layer_above(Window window) {
     XEvent xev;
 
     memset(&xev, 0, sizeof xev);
+    XLockDisplay(gXitk->display);
     if(gXitk->wm_type & WM_TYPE_KWIN) {
-      XLockDisplay(gXitk->display);
       xev.xclient.type         = ClientMessage;
       xev.xclient.display      = gXitk->display;
       xev.xclient.window       = window;
@@ -753,11 +754,8 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.data.l[4]    = 0l;
       
       XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), True, SubstructureRedirectMask, &xev);
-      XUnlockDisplay(gXitk->display);
     }
     else {
-      XLockDisplay(gXitk->display);
-      
       xev.xclient.type         = ClientMessage;
       xev.xclient.serial       = 0;
       xev.xclient.send_event   = True;
@@ -772,8 +770,8 @@ void xitk_set_layer_above(Window window) {
       XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), 
 		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
       
-      XUnlockDisplay(gXitk->display);
     }
+    XUnlockDisplay(gXitk->display);
     
     return;
   }
@@ -781,7 +779,6 @@ void xitk_set_layer_above(Window window) {
   switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_MOTIF:
   case WM_TYPE_LARSWM:
-    return;
     break;
     
   case WM_TYPE_KWIN:
@@ -800,7 +797,7 @@ void xitk_set_layer_above(Window window) {
   case WM_TYPE_METACITY: /* Untested */
   case WM_TYPE_AFTERSTEP:
   case WM_TYPE_BLACKBOX:
-  default:
+  case WM_TYPE_DTWM:
     {
       long propvalue[1];
       
@@ -815,6 +812,7 @@ void xitk_set_layer_above(Window window) {
     break;
   }
 }
+
 void xitk_set_window_layer(Window window, int layer) {
   XEvent xev;
 
