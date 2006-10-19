@@ -638,7 +638,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   char        *sopts         = suboptarg;
   int          optsess       = -1;
   char        *playlist_load = NULL;
-  static const char const *tokens[]      = {
+  static char *const tokens[]= {
     /* Don't change order */
     "play",  "slow2",  "slow4",   "pause",      "fast2",
     "fast4", "stop",   "quit",    "fullscreen", "eject",
