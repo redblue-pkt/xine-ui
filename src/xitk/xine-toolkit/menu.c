@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -384,10 +384,31 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
   menu_window_t *mw;
   
   mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
+  if(!mw || (mw == menu_window))
+    /* Nothing to be done, save useless following efforts */
+    return;
   while(mw && (mw != menu_window)) {
     xitk_list_delete_current(private_data->menu_windows);
     _menu_destroy_menu_window(&mw);
     mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
+  }
+  /* Set focus to parent menu */
+  if(xitk_is_window_visible(menu_window->display, (xitk_window_get_window(menu_window->xwin)))) {
+    int    retry = 0;
+    Window focused_win;
+
+    do {
+      int placeholder;
+
+      XLOCK(menu_window->display);
+      XSetInputFocus(menu_window->display, (xitk_window_get_window(menu_window->xwin)),
+		     RevertToParent, CurrentTime);
+      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
+      XSync(menu_window->display, False);
+      xitk_usec_sleep(10000);
+      XGetInputFocus(menu_window->display, &focused_win, &placeholder);
+      XUNLOCK(menu_window->display);
+    } while(focused_win != xitk_window_get_window(menu_window->xwin) && retry++ < 20);
   }
 }
 
@@ -511,13 +532,8 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
 	private_data->curbranch = _menu_get_branch_from_node(me);
       }
     }
-
   }
-#ifdef DEBUG_MENU
-  else if(_menu_is_separator(me->menu_entry))
-    printf("SEPARATOR\n");
-#endif
-  else if(_menu_is_check(me->menu_entry)) {
+  else if(!_menu_is_title(me->menu_entry) && !_menu_is_separator(me->menu_entry)) {
     _menu_hide_menu(private_data);
 
     if(me->menu_entry->cb)
@@ -525,16 +541,10 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
     
     xitk_menu_destroy(widget);
   }
-  else {
-    if(!_menu_is_title(me->menu_entry)) {
-      _menu_hide_menu(private_data);
-
-      if(me->menu_entry->cb)
-	me->menu_entry->cb(widget, me->menu_entry, me->menu_entry->user_data);
-      
-      xitk_menu_destroy(widget);
-    }
-  }
+#ifdef DEBUG_MENU
+  if(_menu_is_separator(me->menu_entry))
+    printf("SEPARATOR\n");
+#endif
 }
 
 static void _menu_handle_xevents(XEvent *event, void *data) {
@@ -913,15 +923,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   xitk_set_layer_above((xitk_window_get_window(xwin)));
   
-  /* Set transient-for-hint to the immediate predecessor,            */
-  /* so it gets focus back by the WM when this menu window is closed */
   XLOCK(private_data->imlibdata->x.disp);
-  if(branch == private_data->mtree->first)
-    XSetTransientForHint(private_data->imlibdata->x.disp, 
-			 (xitk_window_get_window(xwin)), private_data->parent_wlist->win);
-  else
-    XSetTransientForHint(private_data->imlibdata->x.disp, 
-			 (xitk_window_get_window(xwin)), (xitk_window_get_window(branch->prev->menu_window->xwin)));
+  XSetTransientForHint(private_data->imlibdata->x.disp, 
+		       (xitk_window_get_window(xwin)), private_data->parent_wlist->win);
   XUNLOCK(private_data->imlibdata->x.disp);
 
   menu_window->key = xitk_register_event_handler("xitk menu",
