@@ -398,17 +398,21 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
     Window focused_win;
 
     do {
-      int placeholder;
+      int revert;
 
       XLOCK(menu_window->display);
       XSetInputFocus(menu_window->display, (xitk_window_get_window(menu_window->xwin)),
 		     RevertToParent, CurrentTime);
-      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
       XSync(menu_window->display, False);
-      xitk_usec_sleep(10000);
-      XGetInputFocus(menu_window->display, &focused_win, &placeholder);
       XUNLOCK(menu_window->display);
-    } while(focused_win != xitk_window_get_window(menu_window->xwin) && retry++ < 20);
+
+      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
+      xitk_usec_sleep(5000);
+      XLOCK(menu_window->display);
+      XGetInputFocus(menu_window->display, &focused_win, &revert);
+      XUNLOCK(menu_window->display);
+
+    } while((focused_win != xitk_window_get_window(menu_window->xwin)) && (retry++ < 30));
   }
 }
 
