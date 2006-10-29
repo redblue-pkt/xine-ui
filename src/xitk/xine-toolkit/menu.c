@@ -799,7 +799,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   xwin = xitk_window_create_simple_window(private_data->imlibdata, 
 					  x, y, wwidth + 2, wheight + 2);
-  xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
 
   if(bsep || btitle) {
     int width, height;
@@ -943,6 +942,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   
   while(!xitk_is_window_visible(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin))))
     xitk_usec_sleep(5000);
+
+  xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
   
   XLOCK(private_data->imlibdata->x.disp);
   XSetInputFocus(private_data->imlibdata->x.disp, 
