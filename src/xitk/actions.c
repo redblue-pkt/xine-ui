@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -176,9 +176,24 @@ void try_to_set_input_focus(Window window) {
   wait_for_window_visible(gGui->display, window);
   
   if(xitk_is_window_visible(gGui->display, window)) {
-    XLockDisplay (gGui->display);
-    XSetInputFocus(gGui->display, window, RevertToParent, CurrentTime);
-    XUnlockDisplay (gGui->display);
+    int    retry = 0;
+    Window focused_win;
+
+    do {
+      int revert;
+
+      XLockDisplay (gGui->display);
+      XSetInputFocus(gGui->display, window, RevertToParent, CurrentTime);
+      XSync(gGui->display, False);
+      XUnlockDisplay (gGui->display);
+
+      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
+      xine_usec_sleep(5000);
+      XLockDisplay (gGui->display);
+      XGetInputFocus(gGui->display, &focused_win, &revert);
+      XUnlockDisplay (gGui->display);
+
+    } while((focused_win != window) && (retry++ < 30));
   }
 }
 
@@ -1814,13 +1829,7 @@ void gui_help_show(xitk_widget_t *w, void *data) {
  */
 int is_layer_above(void) {
   
-  if(gGui->always_layer_above || gGui->layer_above) {
-    if(!gGui->layer_above)
-      config_update_num("gui.layer_above", 1);
-    return 1;
-  }
-  
-  return 0;
+  return (gGui->always_layer_above || gGui->layer_above) ? 1 : 0;
 }
 /*
  * set window layer property to something above GNOME (and KDE?) panel
