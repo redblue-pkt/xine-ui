@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1386,7 +1386,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->layer_above = 
     xine_config_register_bool (gGui->xine, "gui.layer_above", 0,
 			       _("Windows stacking"),
-			       _("Use wm layer property to place window on top."), 
+			       _("Use WM layer property to place windows on top\n"
+				 "except for the video window in non-fullscreen mode."), 
 			       CONFIG_LEVEL_ADV,
 			       layer_above_cb,
 			       CONFIG_NO_DATA);
@@ -1394,13 +1395,11 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->always_layer_above = 
     xine_config_register_bool (gGui->xine, "gui.always_layer_above", 0,
 			       _("Windows stacking (more)"),
-			       _("Use WM layer property to place windows on top."), 
+			       _("Use WM layer property to place windows on top\n"
+				 "for all windows (surpasses the 'layer_above' setting)."), 
 			       CONFIG_LEVEL_ADV,
 			       always_layer_above_cb,
 			       CONFIG_NO_DATA);
-
-  if(gGui->always_layer_above && (!gGui->layer_above))
-    config_update_num("gui.layer_above", 1);
 
   gGui->snapshot_location = 
     (char *)xine_config_register_string (gGui->xine, "gui.snapshotdir", 
