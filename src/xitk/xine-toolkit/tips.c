@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -54,15 +54,6 @@ typedef struct {
 } _tips_t;
 
 static _tips_t tips;
-
-static void _tips_handle_event(XEvent *event, void *data) {
-  switch(event->type) {
-  case ButtonRelease:
-  case ButtonPress:
-    xitk_tips_hide_tips();
-    break;
-  }
-}
 
 static void *_tips_loop_thread(void *data) {
 
@@ -205,14 +196,6 @@ static void *_tips_loop_thread(void *data) {
       XLOCK(tips.display);
       XMapRaised(tips.display, (xitk_window_get_window(xwin)));
       XUNLOCK(tips.display);
-      
-      key = xitk_register_event_handler("xitk tips", 
-					(xitk_window_get_window(xwin)),
-					_tips_handle_event,
-					NULL,
-					NULL,
-					tips.widget->wl,
-					NULL);
 
       gettimeofday(&tv, NULL);
       /* We round to ms instead of us (tips_timeout is ms anyway) to get out most of an int */
@@ -290,8 +273,12 @@ void xitk_tips_deinit(void) {
     pthread_cond_signal(&tips.timer_cond);
   else
     pthread_cond_signal(&tips.new_cond);
-
   pthread_mutex_unlock(&tips.mutex);
+
+  /* Wait until tips are hidden to avoid a race condition causing a segfault when */
+  /* the parent widget is already destroyed before it's referenced during hiding. */
+  while(tips.visible)
+    xitk_usec_sleep(5000);
 
   pthread_join(tips.thread, NULL);
 
@@ -318,6 +305,11 @@ void xitk_tips_hide_tips(void) {
       pthread_cond_signal(&tips.timer_cond);
   }
   pthread_mutex_unlock(&tips.mutex);
+
+  /* Wait until tips are hidden to avoid a race condition causing a segfault when */
+  /* the parent widget is already destroyed before it's referenced during hiding. */
+  while(tips.visible)
+    xitk_usec_sleep(5000);
 }
 
 /*
