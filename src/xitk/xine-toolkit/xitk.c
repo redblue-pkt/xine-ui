@@ -1248,6 +1248,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   MUTUNLOCK();
   return 0;
 }
+
 /*
  * Here events are handled. All widget are locally
  * handled, then if a event handler callback was passed
@@ -1582,6 +1583,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  break;
 	  
 	case EnterNotify:
+	case LeaveNotify:
 	  if(fx->widget_list)
 	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
 	      xitk_motion_notify_widget_list (fx->widget_list,
@@ -1589,30 +1591,20 @@ void xitk_xevent_notify(XEvent *event) {
 					      event->xcrossing.y, event->xcrossing.state);
 	  break;
 	  
-	case LeaveNotify:
-	  if(fx->widget_list)
-	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
-	      xitk_motion_notify_widget_list (fx->widget_list,
-					      -1,
-					      -1, event->xcrossing.state);
-	  break;
-	  
 	case ButtonPress: {
 	  XWindowAttributes   wattr;
 	  Status              status;
-	  Window              focused_window;
-	  int                 revert;
+
+	  xitk_tips_hide_tips();
 	  
 	  XLOCK(gXitk->display);
 	  status = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
-	  XGetInputFocus(gXitk->display, &focused_window, &revert);
-	  
 	  /* 
-	   * Give focus(and raise) to a window after a click, and 
-	   * only if window isn't the current focused one.
+	   * Give focus (and raise) to window after click
+	   * if it's viewable (e.g. not iconified).
 	   */
 	  if((status != BadDrawable) && (status != BadWindow) 
-	     && (wattr.map_state == IsViewable)/* && (focused_window != fx->window)*/) {
+	     && (wattr.map_state == IsViewable)) {
 	    XRaiseWindow(gXitk->display, fx->window);
 	    XSetInputFocus(gXitk->display, fx->window, RevertToParent, CurrentTime);
 	  }
@@ -1678,6 +1670,8 @@ void xitk_xevent_notify(XEvent *event) {
 	break;
 	  
 	case ButtonRelease:
+
+	  xitk_tips_hide_tips();
 	  
 	  if(fx->move.enabled) {
 
@@ -1742,13 +1736,6 @@ void xitk_xevent_notify(XEvent *event) {
 	  fx->xevent_callback(event, fx->user_data);
 	}
       }
-    }
-    else {
-      
-      /* Don't forward event to all of windows */
-      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
-	fx->xevent_callback(event, fx->user_data);
-      
     }
     
     if(fx->destroy) {
