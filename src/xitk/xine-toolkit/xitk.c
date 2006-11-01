@@ -1617,6 +1617,9 @@ void xitk_xevent_notify(XEvent *event) {
 	      (!fx->widget_list)))  {
 
 	    xitk_set_current_menu(NULL);
+
+	    FXUNLOCK(fx);
+	    return;
 	  }
 	  
 	  if(fx->widget_list) {
