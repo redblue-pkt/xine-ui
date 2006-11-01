@@ -927,8 +927,14 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   xitk_set_layer_above((xitk_window_get_window(xwin)));
   
   XLOCK(private_data->imlibdata->x.disp);
-  XSetTransientForHint(private_data->imlibdata->x.disp, 
-		       (xitk_window_get_window(xwin)), private_data->parent_wlist->win);
+  /* Set transient-for-hint to the immediate predecessor,     */
+  /* so window stacking of submenus is kept upon raise/lower. */
+  if(branch == private_data->mtree->first)
+    XSetTransientForHint(private_data->imlibdata->x.disp,
+			 (xitk_window_get_window(xwin)), private_data->parent_wlist->win);
+  else
+    XSetTransientForHint(private_data->imlibdata->x.disp,
+			 (xitk_window_get_window(xwin)), (xitk_window_get_window(branch->prev->menu_window->xwin)));
   XUNLOCK(private_data->imlibdata->x.disp);
 
   menu_window->key = xitk_register_event_handler("xitk menu",
@@ -947,7 +953,17 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   while(!xitk_is_window_visible(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin))))
     xitk_usec_sleep(5000);
 
-  xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
+  if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
+    /* WINDOW_TYPE_MENU seems to be the natural choice. */
+    xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
+  else
+    /* However, KWin has unacceptable behaviour for WINDOW_TYPE_MENU in  */
+    /* our transient-for scheme: The transient-for window must be mapped */
+    /* and the transient-for window or another transient window (incl.   */
+    /* the menu itself) must have focus, otherwise it unmaps the menu.   */
+    /* This causes menus not to be shown under many several conditions.  */
+    /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
+    xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_DOCK);
   
   XLOCK(private_data->imlibdata->x.disp);
   XSetInputFocus(private_data->imlibdata->x.disp, 
