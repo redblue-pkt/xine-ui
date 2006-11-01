@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1044,7 +1044,6 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
     { NULL , NULL, "<title>",      NULL, NULL },
-    { "SEP", NULL, "<separator>",  NULL, NULL },
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
@@ -1120,7 +1119,6 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
     { NULL , NULL, "<title>",      NULL, NULL },
-    { "SEP", NULL, "<separator>",  NULL, NULL },
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
@@ -1195,7 +1193,6 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   char                 buffer[2048];
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Scan"),       menu_get_shortcut("ScanPlaylistInfo"),
                                       NULL,          menu_scan_infos,              NULL                    },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
@@ -1203,7 +1200,6 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   };
   xitk_menu_entry_t    menu_entries_sel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL                    },
@@ -1262,7 +1258,6 @@ void control_menu(xitk_widget_list_t *wl, int x, int y) {
   char                 buffer[2048];
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Reset video settings"),   
                        NULL,          NULL,          menu_control_reset,           NULL                    },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
