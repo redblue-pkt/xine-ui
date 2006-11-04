@@ -113,7 +113,12 @@ AC_SUBST(DYNAMIC_LD_LIBS)
 dnl
 dnl Checks for X11
 dnl
-AC_PATH_XTRA
+if test "x$with_x" != "xno"; then
+   PKG_CHECK_MODULES([X11], [x11], , [AC_PATH_XTRA])
+else
+   no_x="yes"
+fi
+
 if test x"$no_x" != x"yes"; then
     AC_DEFINE(HAVE_X11,,[Define this if you have X11R6 installed])
 fi
