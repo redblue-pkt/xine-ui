@@ -124,10 +124,17 @@ if test x"$no_x" != x"yes"; then
 fi
 AM_CONDITIONAL(HAVE_X11, [test x"$no_x" != "xyes"])
 
-AC_CHECK_LIB(Xv, XvQueryExtension, 
+PKG_CHECK_MODULES([XV], [xv], [
+  XV_LIB=$XV_LIBS
+  ac_have_xv="yes"
+  AC_DEFINE(HAVE_XV, 1, [Define this if you have libXv installed])
+], [  
+  AC_CHECK_LIB(Xv, XvQueryExtension, 
             [ XV_LIB="-lXv"
 	      AC_DEFINE(HAVE_XV, 1, [Define this if you have libXv installed])
             ],, [$X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS])
+])
+
 AC_SUBST(XV_LIB)
 AM_CONDITIONAL(HAVE_XV, test x$ac_have_xv = "xyes")
 
@@ -226,11 +233,17 @@ dnl
 AC_ARG_ENABLE([xinerama],
    AS_HELP_STRING([--disable-xinerama], [Don't build support for xinerama (default: check)]))
 if test "x$enable_xinerama" != "xno"; then
-  AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
-               X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
-               AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
+  PKG_CHECK_MODULES([XINERAMA], [xinerama], [ac_have_xinerama="yes"], [
+    AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
+               XINERAMA_LIBS="-lXinerama"
                ac_have_xinerama="yes",,
                $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+  ])
+  
+  if test "x$ac_have_xinerama" = "xyes"; then
+     X_PRE_LIBS="$X_PRE_LIBS $XINERAMA_LIBS"
+     AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
+  fi
 fi
 AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
 
@@ -238,21 +251,34 @@ AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
 dnl
 dnl Checks for XF86VidMode extension
 dnl
-AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension, 
-             X_PRE_LIBS="$X_PRE_LIBS -lXxf86vm"
-             AC_DEFINE(HAVE_XF86VIDMODE,,[Define this if you have libXxf86vm installed])
+PKG_CHECK_MODULES([XXF86VM], [xxf86vm], [ac_have_xf86vidmode="yes"], [
+  AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension, 
+             XXF86VM_LIBS="-lXxf86vm"
              ac_have_xf86vidmode="yes",,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+])
+
+if test "x$ac_have_xf86vidmode" = "xyes"; then
+   X_PRE_LIBS="$X_PRE_LIBS ${XXF86VM_LIBS}"
+   AC_DEFINE(HAVE_XF86VIDMODE,,[Define this if you have libXxf86vm installed])
+fi
+
 AM_CONDITIONAL(HAVE_XF86VIDMODE, test x$ac_have_xf86vidmode = "xyes")
 
 
 dnl
 dnl XTest Extension
 dnl
-AC_CHECK_LIB(Xtst, XTestFakeKeyEvent, 
+PKG_CHECK_MODULES([XTEST], [xtst], [ac_have_xtest="yes"], [
+  AC_CHECK_LIB(Xtst, XTestFakeKeyEvent, 
              XTEST_LIBS="-lXtst"
-             AC_DEFINE(HAVE_XTESTEXTENSION,,[Define this if you have libXtst installed])
 	     ac_have_xtest="yes",, $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+])
+
+if test "x$ac_have_xtest" = "xyes"; then
+   AC_DEFINE(HAVE_XTESTEXTENSION,,[Define this if you have libXtst installed])
+fi
+
 AC_SUBST(XTEST_LIBS)
 AM_CONDITIONAL(HAVE_XTESTEXTENSION, test x$ac_have_xtest = "xyes")
  
