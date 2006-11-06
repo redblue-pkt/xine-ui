@@ -776,6 +776,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
     y -= 1; /* Top item of submenu in line with parent item */
   }
+  else {
+    x++; y++; /* Upper left corner 1 pix distance to mouse pointer */
+  }
 
   /* Check if menu fits on screen and adjust position if necessary in a way */
   /* that it doesn't obscure the parent menu or get under the mouse pointer */
@@ -797,7 +800,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
     else {
       /* Align bottom edge of top level menu to requested (i.e. pointer) pos */
-      y -= (wheight + 2);
+      y -= (wheight + 2) + 1;
     }
   }
 
