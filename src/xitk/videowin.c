@@ -27,6 +27,7 @@
 #endif
 
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
 #include <X11/Xlib.h>
@@ -2285,6 +2286,12 @@ void video_window_reset_ssaver(void) {
     else 
 #endif
       {
+	if (access("/usr/bin/gnome-screensaver-command", X_OK) == 0) {
+	  if(fork() == 0) {
+	    execlp("gnome-screensaver-command", "--poke", NULL);
+	    exit(0);
+	  }
+	}
 	XLockDisplay(gGui->video_display);
 	XResetScreenSaver(gGui->video_display);
 	XUnlockDisplay(gGui->video_display);
