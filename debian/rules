@@ -51,8 +51,10 @@ endif
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./configure --prefix=/usr --mandir=\$${prefix}/share/man \
-	            --enable-vdr-keys \
+	./autogen.sh \
+		--prefix=/usr --mandir=\$${prefix}/share/man \
+		--with-aalib \
+		--enable-vdr-keys \
 	            $(HOST_OPTION) || \
 	(echo "=== config.log: ==="; cat config.log; false)
 	touch configure-stamp
@@ -74,8 +76,12 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	-$(MAKE) distclean
-	# strange dangling symlinks
-	rm -f doc/man/*/xine-bugreport.1
+	# strange dangling symlinks  
+	-find . -name Makefile.in -print | xargs rm
+	rm -f doc/man/*/xine-bugreport.1 misc/xine-bugreport
+	rm -f po/*.gmo src/xitk/xine-toolkit/po/*.gmo
+	rm -f compile config.guess configure depcomp install-sh missing 
+	rm -f misc/xine-check po/stamp-po src/xitk/xine-toolkit/po/stamp-po
 	dh_clean
 
 install: build
@@ -87,9 +93,9 @@ install: build
 	mkdir -p debian/xine-ui/usr/share/doc/xine-ui
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
 	# these must not be compressed, or xine's online help will fail:
-	cd debian/xine-ui/usr/share/doc/xine-ui; \
+	-cd debian/xine-ui/usr/share/doc/xine-ui; \
 	mkdir -p ../../xine/doc; \
-	mv README.config_?? README_?? FAQ_?? ../../xine/doc; \
+	mv README.config_?? README_?? ../../xine/doc; \
 	ln -s ../../xine/doc/* .
 
 binary-indep: build install

@@ -1,8 +1,19 @@
-xine-ui (0.99.4-3) unstable; urgency=low
+xine-ui (0.99.4+cvs20060813-1) unstable; urgency=low
 
+  * new upstream snapshot:
+    + improved manpage xine(1) (Closes: #289052)
+    + added basque translation (Closes: #351850)
+    + fix for "playlist first" and "playlist last"
+       --network commands (Closes: #309322)
+    + fix X_CreateGlyphCursor crash (Closes: #309320)
+    + visual improvments (Closes: #287874)
+    + MRL format for DVD correct now in docu (Closes: #286944)
   * should build now on kfreebsd-amd64 (Closes: #361493)
+  * add mime entry for video/x-ms-wmv (Closes: #228171)
+  * running autogen on the buildds
+  * some cleanups to debian/rules
 
- -- Reinhard Tartler <siretart@tauware.de>  Sat, 17 Jun 2006 17:41:46 +0200
+ -- Reinhard Tartler <siretart@tauware.de>  Sun, 13 Aug 2006 18:26:10 +0200
 
 xine-ui (0.99.4-2) unstable; urgency=high
 
