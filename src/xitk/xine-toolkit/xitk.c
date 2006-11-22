@@ -1183,7 +1183,6 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	*key = 0; 
 	
 	__fx_destroy(fx, 1);
-	fx = NULL;
 	MUTUNLOCK();
 	return;
       }
@@ -1255,7 +1254,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
  * at register time, it will be called.
  */
 void xitk_xevent_notify(XEvent *event) {
-  __gfx_t  *fx;
+  __gfx_t  *fx, *fxd;
      
   if(!(fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx)))
     return;
@@ -1508,10 +1507,8 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	  }
 	  
-	  if(fx->destroy) {
+	  if(fx->destroy)
 	    __fx_destroy(fx, 0);
-	    fx = NULL;
-	  }
 	  else
 	    FXUNLOCK(fx);
 
@@ -1697,7 +1694,6 @@ void xitk_xevent_notify(XEvent *event) {
 	case ConfigureNotify: {
 	  XWindowAttributes wattr;
 	  Status            err;
-	  int               xerr;
 
 	  if(fx->widget_list && fx->widget_list->l) {
 	    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content(fx->widget_list->l);
@@ -1710,21 +1706,21 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	  }
 
-	  XLOCK(gXitk->display);
-	  xerr = xitk_install_x_error_handler();
-	  err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
-	  if (xerr) xitk_uninstall_x_error_handler();
-	  XUNLOCK(gXitk->display);
-
-	  if(err != BadDrawable && err != BadWindow) {
-	    fx->width = wattr.width;
-	    fx->height = wattr.height;
-	  }
 	  /* Inform application about window movement. */
-	  if(fx->newpos_callback)
+	  if(fx->newpos_callback) {
+
+	    XLOCK(gXitk->display);
+	    err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	    XUNLOCK(gXitk->display);
+
+	    if(err != BadDrawable && err != BadWindow) {
+	      fx->width = wattr.width;
+	      fx->height = wattr.height;
+	    }
 	    fx->newpos_callback(event->xconfigure.x,
 				event->xconfigure.y,
 				fx->width, fx->height);
+	  }
 	}
 	break;
 
@@ -1741,16 +1737,16 @@ void xitk_xevent_notify(XEvent *event) {
       }
     }
     
-    if(fx->destroy) {
-      __fx_destroy(fx, 0);
-      fx = NULL;
-    }
+    fxd = fx;
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+
+    if(fxd->destroy)
+      __fx_destroy(fxd, 0);
     else
-      FXUNLOCK(fx);
+      FXUNLOCK(fxd);
     
 #warning FIXME
     if(gXitk->modalw != None) {
-      fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
       /* Flush remain fxs */
       while(fx && (fx->window != gXitk->modalw)) {
@@ -1759,19 +1755,18 @@ void xitk_xevent_notify(XEvent *event) {
 	if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	  fx->xevent_callback(event, fx->user_data);
 	
-	if(fx->destroy) {
-	  __fx_destroy(fx, 0);
-	  fx = NULL;
-	}
-	else
-	  FXUNLOCK(fx);
-	
+	fxd = fx;
 	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+
+	if(fxd->destroy)
+	  __fx_destroy(fxd, 0);
+	else
+	  FXUNLOCK(fxd);
       }
       return;
     }
 
-    if((fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx)))
+    if(fx)
       FXLOCK(fx);
   }
 }
