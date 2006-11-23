@@ -1579,8 +1579,10 @@ void xitk_xevent_notify(XEvent *event) {
 	}
 	  break;
 	  
-	case EnterNotify:
 	case LeaveNotify:
+	  event->xcrossing.x = event->xcrossing.y = -1; /* Same as moving outside any widget */
+	  /* fall through */
+	case EnterNotify:
 	  if(fx->widget_list)
 	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
 	      xitk_motion_notify_widget_list (fx->widget_list,

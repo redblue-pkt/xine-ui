@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -848,8 +848,8 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
     return 0;
   }
 
-  if(((x >= widget->x) && (x <= (widget->x + widget->width))) && 
-     ((y >= widget->y) && (y <= (widget->y + widget->height)))) {
+  if(((x >= widget->x) && (x < (widget->x + widget->width))) && 
+     ((y >= widget->y) && (y < (widget->y + widget->height)))) {
     widget_event_t        event;
     widget_event_result_t result;
 
@@ -938,8 +938,8 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
 	event.focus = FOCUS_MOUSE_OUT;
 	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
 
-      event.type = WIDGET_EVENT_PAINT;
-      (void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
+	event.type = WIDGET_EVENT_PAINT;
+	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
       }
     }
     
@@ -951,17 +951,19 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       dump_widget_type(mywidget);
 #endif
       
+      /* Only give focus and paint when tips are accepted, otherwise associated window is invisible. */
+      /* This call may occur from MotionNotify directly after iconifying window.                     */
       if(xitk_tips_show_widget_tips(mywidget)) {
       
-	/* Only give focus and paint when tips are accepted, otherwise associated window is invisible. */
-	/* This call may occur from MotionNotify directly after iconifying window.                     */
 	if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
 	     (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
 	      ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
 	       (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
 	   (mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
 	  event.type  = WIDGET_EVENT_FOCUS;
-	  event.focus = FOCUS_MOUSE_IN;
+	  /* If widget still marked pressed or focus received, it shall receive the focus again. */
+	  event.focus = (mywidget == wl->widget_pressed || mywidget == wl->widget_focused) ?
+			FOCUS_RECEIVED : FOCUS_MOUSE_IN;
 	  (void) mywidget->event(mywidget, &event, NULL);
 
 	  event.type  = WIDGET_EVENT_PAINT;
@@ -1005,6 +1007,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   mywidget = xitk_get_widget_at (wl, x, y);
 
   if(mywidget != wl->widget_focused && !bUp) {
+
     if (wl->widget_focused) {
       
       /* Kill (hide) tips */
@@ -1043,7 +1046,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
     }
-    
     
     wl->widget_focused = mywidget;
     
@@ -1100,6 +1102,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     }
   }
   else {
+
     if(wl->widget_pressed) {
       if((wl->widget_pressed->type & WIDGET_CLICKABLE) &&
 	 (wl->widget_pressed->enable == WIDGET_ENABLE) && wl->widget_pressed->running) {
@@ -1332,9 +1335,6 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     }
     
     if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
-
-      if(wl->widget_focused->type & WIDGET_CLICKABLE)
-	wl->widget_under_mouse = wl->widget_focused;
 
       if((wl->widget_focused->type & WIDGET_CLICKABLE) &&
 	 (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
@@ -2082,8 +2082,8 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
   }
   else {
     
-    if(((win_x >= w->x) && (win_x <= (w->x + w->width))) && 
-       ((win_y >= w->y) && (win_y <= (w->y + w->height)))) {
+    if(((win_x >= w->x) && (win_x < (w->x + w->width))) && 
+       ((win_y >= w->y) && (win_y < (w->y + w->height)))) {
       retval = 1;
     }
     
