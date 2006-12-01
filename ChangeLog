@@ -1,5 +1,6 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixed segfault and memleak in log viewer
   * Fixes and improvements for appearance and behaviour
   * Video window: User magnification ignored and auto-resizing on new stream
     maintained in background if not in visible windowed mode.
