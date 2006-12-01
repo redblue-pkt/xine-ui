@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -76,6 +76,7 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
 
   if(viewlog) {
     window_info_t wi;
+    int           i;
     
     viewlog->running = 0;
     viewlog->visible = 0;
@@ -100,6 +101,10 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     
     free(viewlog->widget_list);
     
+    for(i = 0; i < viewlog->log_entries; i++)
+      free((char *)viewlog->log[i]);
+    free(viewlog->log);
+
     free(viewlog);
     viewlog = NULL;
 
@@ -187,21 +192,21 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   const char *p;
   
   /* Freeing entries */
-  for(i = 0; i <= viewlog->log_entries; i++) {
+  for(i = 0; i < viewlog->log_entries; i++)
     free((char *)viewlog->log[i]);
-  }
   
   /* Compute log entries */
-  viewlog->log_entries = viewlog->real_num_entries = k = 0;
+  viewlog->real_num_entries = j = k = 0;
   
   if(log) {
     
     /* Look for entries number */
     while(log[k] != NULL) k++;
 
-    for(i = 0, j = 0; i < k; i++) {
+    for(i = 0; i < k; i++) {
+      int buflen;
 
-      memset(&buf, 0, sizeof(buf));
+      buf[0] = '\0'; buflen = 0;
       
       p = &log[i][0];
       
@@ -220,16 +225,16 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    break;
 	    
 	  case '\n':
-	    if(strlen(buf)) {
+	    if(buflen > 0) {
 	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	      viewlog->log[j++] = strdup(buf);
 	      viewlog->real_num_entries++;
 	    }
-	    memset(&buf, 0, sizeof(buf));
+	    buf[0] = '\0'; buflen = 0;
 	    break;
 	    
 	  default:
-	    sprintf(buf+strlen(buf), "%c", *p);
+	    buf[buflen++] = *p; buf[buflen] = '\0';
 	    break;
 	  }
 	  
@@ -237,7 +242,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	}
 
 	/* Remaining chars */
-	if(strlen(buf)) {
+	if(buflen > 0) {
 	  viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	  viewlog->log[j++] = strdup(buf);
 	}
@@ -250,11 +255,11 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
       }
     }
     
-    /* I like null terminated arrays ;-) */
-    viewlog->log[j]      = NULL;
-    viewlog->log_entries = j;
-    
   }
+
+  /* I like null terminated arrays ;-) */
+  viewlog->log[j]      = NULL;
+  viewlog->log_entries = j;
   
 #if DEBUG_VIEWLOG
   if((viewlog->log_entries == 0) || (log == NULL))
