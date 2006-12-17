@@ -308,6 +308,17 @@ ask() {
   read answer
 }
 
+resolve_symlinks() {
+  if readlink -f / >/dev/null 2>/dev/null; then
+    while read n; do
+      readlink -f "$n"
+    done
+  else
+    while read n; do
+      echo "$n"
+    done
+  fi
+}
 
 # command line
 while [ "$#" -gt 0 ]; do
@@ -463,7 +474,7 @@ esac
 
 xine_executables=""
 if search -x bin/xine; then
-  xine_executables="$found"
+  xine_executables=`echo "$found"|resolve_symlinks|sort|uniq`
   if [ `echo "$xine_executables" | wc -l` -gt 1 ]; then
     msg several-xine 1
   else
@@ -478,7 +489,7 @@ fi
 
 xine_executable=""
 if search -x xine "$PATH"; then
-  xine_executable1=`echo "$found"|sort|uniq`
+  xine_executable1=`echo "$found"|resolve_symlinks|sort|uniq`
   if [ `echo "$xine_executable1" | wc -l` -gt 1 ]; then
     xine_executable=`echo "$xine_executable1" | head -n 1`
     msg several-xine-in-path 1
@@ -565,7 +576,7 @@ if test -n "$plugindir"; then
       decoder=
       video_out=
       audio_out=
-      cd $plugindir
+      cd "$plugindir"
       for i in *.so; do
 	case "$i" in
 	  xineplug_inp_*)
@@ -587,6 +598,9 @@ if test -n "$plugindir"; then
 	  xineplug_ao_out_*)
 	    type=audio_out;
 	    pfx=xineplug_ao_out_;
+	    ;;
+	  \*.so)
+	    continue
 	    ;;
 	  *)
 	    type=unknown;
