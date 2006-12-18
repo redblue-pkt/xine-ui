@@ -1580,7 +1580,10 @@ void xitk_xevent_notify(XEvent *event) {
 	  break;
 	  
 	case LeaveNotify:
-	  event->xcrossing.x = event->xcrossing.y = -1; /* Same as moving outside any widget */
+	  if(!(fx->widget_list && fx->widget_list->widget_pressed &&
+	       (fx->widget_list->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
+	    event->xcrossing.x = event->xcrossing.y = -1; /* Simulate moving out of any widget */
+	    /* but leave the actual coords for an active slider, otherwise the slider may jump */
 	  /* fall through */
 	case EnterNotify:
 	  if(fx->widget_list)
