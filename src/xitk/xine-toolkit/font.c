@@ -284,8 +284,7 @@ static const lang_locale_t *_get_first_lang_locale(char *lcal) {
   return NULL;
 }
 
-#ifdef WITH_XMB
-# ifndef WITH_XFT
+#if defined(WITH_XMB) && !defined(WITH_XFT)
 /*
  * Guess if error occured, release missing charsets list.
  * There is a problem with rendering when "ISO10646-1" charset is missing.
@@ -311,8 +310,9 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 
   return 0;
 }
-# endif
+#endif
 
+#ifdef WITH_XFT
 /* convert a -*-* .. style font description into something Xft can digest */
 static char * xitk_font_core_string_to_xft( char * old_name) {
   static char new_name[255];
@@ -370,8 +370,9 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
 
   return old_name;
 }
+#endif
 
-# ifndef WITH_XFT
+#if defined(WITH_XMB) && !defined(WITH_XFT)
 /*
  * XCreateFontSet requires font name starting with '-'
  */
@@ -390,7 +391,6 @@ static char *xitk_font_right_name(char *name) {
 
   return strdup(right_name);
 }
-# endif
 #endif
 
 /*
