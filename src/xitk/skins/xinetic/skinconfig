@@ -1,5 +1,6 @@
 #Xine skin data file
 # revision 0.8
+# last modified: 31.12.2006
 #  Licence : GNU GENERAL PUBLIC LICENSE Version 2, June 1991: http://www.gnu.org/copyleft/gpl.html
 
 skin.name    = Xinetic
@@ -349,7 +350,7 @@ skin.PlItemBtn {
 	  color = #a4abb0
 	  color_focus = #a4abb0
 	  color_click = #081e2f
-	  font = *-helvetica-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-o-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -502,7 +503,7 @@ skin.PlInputText {
 	  color = #9fa4ad
 	  color_focus = #9fa4ad
 	  color_click = #081e2f
-	  font = *-helvetica-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-o-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -693,7 +694,7 @@ skin.CtlSkItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-helvetica-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-o-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -734,7 +735,7 @@ skin.MrlItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-helvetica-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-o-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
