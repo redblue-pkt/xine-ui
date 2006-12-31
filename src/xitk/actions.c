@@ -48,6 +48,8 @@ filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
+static int             last_playback_speed = XINE_SPEED_NORMAL;
+
 void reparent_all_windows(void) {
   int                    i;
   typedef struct {
@@ -793,10 +795,14 @@ void gui_stop (xitk_widget_t *w, void *data) {
 }
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
-  if(xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+  int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+
+  if(speed != XINE_SPEED_PAUSE) {
+    last_playback_speed = speed;
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+  }
   else {
-    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, last_playback_speed);
     video_window_reset_ssaver();
   }
   
@@ -1121,24 +1127,29 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
 }
 
 void gui_change_speed_playback(xitk_widget_t *w, void *data) {
+  int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
 
   if(((int)data) == GUI_NEXT) {
-    if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-      xine_set_param (gGui->stream, XINE_PARAM_SPEED, 
-		      (xine_get_param(gGui->stream, XINE_PARAM_SPEED)) / 2);
+    if(speed > XINE_SPEED_PAUSE)
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed /= 2));
   }
   else if(((int)data) == GUI_PREV) {
-    if (xine_get_param (gGui->stream, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
-      if (xine_get_param (gGui->stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-	xine_set_param (gGui->stream, XINE_PARAM_SPEED, 
-			(xine_get_param(gGui->stream, XINE_PARAM_SPEED)) * 2);
-      else
-	xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+    if(speed < XINE_SPEED_FAST_4) {
+      if(speed > XINE_SPEED_PAUSE)
+	xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed *= 2));
+      else {
+	xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed = XINE_SPEED_SLOW_4));
+	video_window_reset_ssaver();
+      }
     }
   }
   else if(((int)data) == GUI_RESET) {
-    xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed = XINE_SPEED_NORMAL));
   }
+  if(speed != XINE_SPEED_PAUSE)
+    last_playback_speed = speed;
+
+  panel_check_pause();
   /* Give xine engine some time before updating OSD, otherwise the        */
   /* time disp may be empty when switching to speeds < XINE_SPEED_NORMAL. */
   xine_usec_sleep(10000);
