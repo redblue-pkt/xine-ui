@@ -90,7 +90,7 @@ static void *_tips_loop_thread(void *data) {
     tips.new_widget = NULL;
     
     if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string && strlen(tips.widget->tips_string)) {
-      int                  x, y, w, h, string_length;
+      int                  x, y, w, h;
       xitk_window_t       *xwin;
       xitk_register_key_t  key;
       xitk_image_t        *image;
@@ -116,22 +116,21 @@ static void *_tips_loop_thread(void *data) {
       fs = xitk_font_load_font(tips.display, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips.widget->wl->gc);
 
-      string_length = MIN((xitk_font_get_string_length(fs, tips.widget->tips_string)), (disp_w/3));
-
       xitk_font_unload_font(fs);
       
       cfore = xitk_get_pixel_color_black(tips.widget->imlibdata);
       cback = xitk_get_pixel_color_lightgray(tips.widget->imlibdata);
       
+      /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
       image = xitk_image_create_image_with_colors_from_string(tips.widget->imlibdata, DEFAULT_FONT_10,
-							      string_length + 1, ALIGN_LEFT, 
+							      (disp_w/3), ALIGN_LEFT, 
 							      tips.widget->tips_string, cfore, cback);
       
       /* Create the tips window, horizontally centered from parent widget */
       /* If necessary, adjust position to display it fully on screen      */
       w = image->width + x_margin;
       h = image->height + y_margin;
-      x -= ((w >> 1) - (tips.widget->width >> 1));
+      x -= ((w - tips.widget->width) >> 1);
       y += (tips.widget->height + bottom_gap);
       if(x > disp_w - w)
 	x = disp_w - w;
@@ -179,7 +178,7 @@ static void *_tips_loop_thread(void *data) {
 	XSetForeground(tips.display, gc, cback);
 	XFillRectangle(tips.display, bg->pixmap, gc, 1, 1, width - 2, height - 2);
 	XCopyArea(tips.display, image->image->pixmap, bg->pixmap,
-		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, ((height - image->height)>>1) + 1);
+		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, (height - image->height)>>1);
 	XUNLOCK(tips.display);
 	
 	xitk_window_change_background(tips.widget->imlibdata, xwin, bg->pixmap, width, height);

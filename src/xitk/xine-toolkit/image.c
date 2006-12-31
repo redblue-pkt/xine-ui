@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2006 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -395,13 +395,15 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   xitk_image_t   *image;
   xitk_font_t    *fs;
   GC              gc;
-  int             length, height, descent, linel, linew, wlinew, lastws;
+  int             length, height, lbearing, rbearing, ascent, descent, linel, linew, wlinew, lastws;
   int             maxw = 0;
   const char     *p;
   char           *bp;
   char           *lines[256];
   int             numlines = 0;
   char            buf[BUFSIZ]; /* Could be allocated dynamically for bigger texts */
+
+  int             add_line_spc = 2;
 
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(fontname);
@@ -414,13 +416,17 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   
   fs = xitk_font_load_font(im->x.disp, fontname);
   xitk_font_set_font(fs, gc);
-  length = xitk_font_get_string_length(fs, str);
-  height = xitk_font_get_string_height(fs, str);
-  descent = xitk_font_get_descent(fs, str);
+  xitk_font_string_extent(fs, str, NULL, NULL, NULL, &ascent, &descent);
+  height = ascent + descent;
 
   p      = str;
   bp     = buf;
   wlinew = linew = lastws = linel = 0;
+
+  /*
+   * Create string image using exactly the ink width
+   * without left and right spacing measures
+   */
 
   while((*p!='\0') && (bp + linel) < (buf + BUFSIZ - TABULATION_SIZE - 2)) {
     
@@ -474,9 +480,10 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       break;
     }
 
-    bp[linel] = '\0'; /* terminate the string for reading with xitk_font_get_string_length or strlen */
+    bp[linel] = '\0'; /* terminate the string for reading with xitk_font_string_extent or strlen */
 
-    if((linew = xitk_font_get_string_length(fs, bp)) >= width) {
+    xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL); 
+    if((linew = rbearing - lbearing) > width) {
       
       if(lastws == 0) { /* if we haven't found a whitespace */
         bp[linel]         = bp[linel-1]; /* Move that last character down */
@@ -506,7 +513,8 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       if(wlinew > maxw)
         maxw = wlinew;
       
-      linew = xitk_font_get_string_length(fs, bp);
+      xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL); 
+      linew = rbearing - lbearing;
     }
     
     p++;
@@ -519,36 +527,34 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       maxw = linew;
   }
   
-  maxw += 10; /* add some space */
-  
-  if(align == ALIGN_LEFT) /* if it is left-aligned, we can resize the image */
+  /* If default resp. left aligned, we may shrink the image */
+  if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
     width = MIN(maxw, width);
   
-  image = xitk_image_create_image(im, width, (height + 3) * numlines);
+  image = xitk_image_create_image(im, width, (height + add_line_spc) * numlines - add_line_spc);
   draw_flat_with_color(im, image->image, image->width, image->height, background);
   
   { /* Draw string in image */
-    int i, j, x = 0;
+    int i, y, x = 0;
     
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, gc, foreground);
     XUNLOCK(im->x.disp);
     
-    j = height;
-    for(i = 0; i < numlines; i++, j += (height + 3)) {
-      length = xitk_font_get_string_length(fs, lines[i]);
+    for(y = ascent, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
+      xitk_font_string_extent(fs, lines[i], &lbearing, &rbearing, NULL, NULL, NULL); 
+      length = rbearing - lbearing;
 
       if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
         x = 0;
       else if(align == ALIGN_CENTER)
-        x = (maxw - length) >> 1;
+        x = (width - length) >> 1;
       else if(align == ALIGN_RIGHT)
-        x = (maxw - length);
+        x = (width - length);
       
-      XLOCK(im->x.disp);
       xitk_font_draw_string(fs, image->image->pixmap, gc, 
-                            x, (j - descent), lines[i], strlen(lines[i]));
-      XUNLOCK(im->x.disp);
+			    (x - lbearing), y, lines[i], strlen(lines[i]));
+			    /*   ^^^^^^^^ Adjust to start of ink */
     }
   }
 

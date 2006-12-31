@@ -1066,7 +1066,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   char       *foo_text, *encoded_text;
 #endif
 #if defined(WITH_XMB) && !defined(WITH_XFT)
-  XRectangle  logic;
+  XRectangle  ink, logic;
 #endif
   
   if (nbytes <= 0) {
@@ -1108,11 +1108,11 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   XUNLOCK(xtfs->display);
   free(encoded_text);
 
-  if (width) *width       = xft_extents.width;
-  if (ascent) *ascent     = xtfs->font->ascent - 1;
+  if (width) *width       = xft_extents.xOff;
+  if (ascent) *ascent     = xtfs->font->ascent;
   if (descent) *descent   = xtfs->font->descent;
-  if (lbearing) *lbearing = 0;
-  if (rbearing) *rbearing = 0;
+  if (lbearing) *lbearing = -xft_extents.x;
+  if (rbearing) *rbearing = -xft_extents.x + xft_extents.width;
 #else
 #ifdef WITH_XMB
   if(xitk_get_xmb_enability()) {
@@ -1121,42 +1121,49 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     ABORT_IF_NULL(c);
     
     XLOCK(xtfs->display);
-    XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
+    XmbTextExtents(xtfs->fontset, c, nbytes, &ink, &logic);
     XUNLOCK(xtfs->display);
     if (!logic.width || !logic.height) {
       /* XmbTextExtents() has problems, try char-per-char counting */
       mbstate_t state;
       size_t    i = 0, n;
-      int       height = 0, width = 0;
+      int       height = 0, width = 0, y = 0, lb = 0, rb;
       
       memset(&state, '\0', sizeof(mbstate_t));
       
       XLOCK(xtfs->display);
       while (i < nbytes) {
-	n = mbrtowc(NULL, c, nbytes - i, &state);
+	n = mbrtowc(NULL, c + i, nbytes - i, &state);
 	if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
-	XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
+	XmbTextExtents(xtfs->fontset, c + i, n, &ink, &logic);
 	if (logic.height > height) height = logic.height;
+	if (logic.y < y) y = logic.y; /* y is negative! */
+	if (i == 0) lb = ink.x; /* left bearing of string */
 	width += logic.width;
 	i += n;
       }
+      rb = width - logic.width + ink.x + ink.width; /* right bearing of string */
       XUNLOCK(xtfs->display);
       
       if (!height || !width) {
 	/* char-per-char counting fails too */
 	XITK_WARNING("extents of the font \"%s\" are %dx%d!\n", xtfs->name, width, height);
-	if (!height) height = 12;
+	if (!height) height = 12, y = -10;
+	if (!width) lb = rb = 0;
       } 
       
       logic.height = height;
       logic.width = width;
+      logic.y = y;
+      ink.x = lb;
+      ink.width = rb - lb;
     }
     
     if (width) *width     = logic.width;
     if (ascent) *ascent   = -logic.y;
     if (descent) *descent = logic.height + logic.y;
-    if (lbearing) *lbearing = 0;
-    if (rbearing) *rbearing = 0;
+    if (lbearing) *lbearing = ink.x;
+    if (rbearing) *rbearing = ink.x + ink.width;
   }
   else
 #endif
