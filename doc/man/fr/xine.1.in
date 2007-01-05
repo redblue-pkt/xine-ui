@@ -306,7 +306,7 @@ Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier
 .BI \-\-no\-splash
 N'affiche las l'écran splash.
 .TP
-.B \-\-stdctrl
+.B \-\-stdctl
 Met en fonction le contrôle de xine via le STDIN.
 .TP
 .BI \-T,\ \-\-tvout\ <controleur>

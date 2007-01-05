@@ -193,7 +193,7 @@ Verdeckt nach dem Start nur das Video\-Fenster.
 Deaktiviert die LIRC Unterstützung.
 Diese Option steht nur zur Verfügung, wenn xine mit LIRC-Unterstützung übersetzt wurde.
 .TP
-.B \-\-stdctrl
+.B \-\-stdctl
 Aktiviert die Steuerung von xine über die Standardeingabe.
 .TP 
 .BI \-\-visual\  <Visual\-Klasse\-oder\-id>

@@ -310,7 +310,7 @@ Don't enable post plugin(s). This way, you can specify one more plugin to use, u
 .BI \-\-no\-splash
 Don't display the splash screen.
 .TP
-.B \-\-stdctrl
+.B \-\-stdctl
 Turn on controlling xine over STDIN.
 .TP
 .BI \-T,\ \-\-tvout <backend>
