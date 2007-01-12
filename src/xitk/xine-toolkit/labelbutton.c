@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -461,7 +461,7 @@ char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *w) {
 }
 
 /*
- * Handle motion on button
+ * Handle focus on button
  */
 static int notify_focus_labelbutton (xitk_widget_t *w, int focus) {
   lbutton_private_data_t *private_data;
@@ -536,10 +536,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     break;
   case WIDGET_EVENT_FOCUS:
     notify_focus_labelbutton(w, event->focus);
-    if((w->type & WIDGET_GROUP_MENU) && 
-       (event->type == WIDGET_EVENT_FOCUS) && (event->focus == FOCUS_MOUSE_IN)) {
-      menu_auto_pop(w);
-    }
     break;
   case WIDGET_EVENT_INSIDE:
     result->value = notify_inside(w, event->x, event->y);

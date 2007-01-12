@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -968,6 +968,9 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
 
 	  event.type  = WIDGET_EVENT_PAINT;
 	  (void) mywidget->event(mywidget, &event, NULL);
+
+	  if(mywidget->type & WIDGET_GROUP_MENU)
+	    menu_auto_pop(mywidget);
 	}
       }
     }
