@@ -281,11 +281,11 @@ static langs_t _langs[] = {
   
 /* ISO 639-1 */
 typedef struct {
-  unsigned char   *two_letters;
-  unsigned char   *language;
+  const char   *two_letters;
+  const char   *language;
 } iso639_1_t;
 
-static iso639_1_t iso639_1[] = {
+static const iso639_1_t iso639_1[] = {
   { "ab", "Abkhazian"                },
   { "aa", "Afar"                     },
   { "af", "Afrikaans"                },
