@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2002-01-05 "Le projet xine"
+.TH XINE 1 2002-01-05 "Le projet xine"
 .SH NOM
 xine \- Lecteur audio/vidéo libre.
 .SH SYNOPSIS
