@@ -850,7 +850,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
     xr_color.alpha = (short)-1;
     xft_draw       = XftDrawCreate(xtfs->display, pix, visual, colormap);
     XftColorAllocValue(xtfs->display, visual, colormap, &xr_color, &xcolor);
-    XftDrawStringUtf8(xft_draw, &xcolor, xtfs->font, x, y, encoded_text, strlen(encoded_text));
+    XftDrawStringUtf8(xft_draw, &xcolor, xtfs->font, x, y, (FcChar8*)encoded_text, strlen(encoded_text));
     XftColorFree(xtfs->display, visual, colormap, &xcolor);
     XftDrawDestroy(xft_draw);
 
@@ -1104,7 +1104,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   free(foo_text);
   
   XLOCK(xtfs->display);
-  XftTextExtentsUtf8(xtfs->display, xtfs->font, encoded_text, nbytes, &xft_extents);
+  XftTextExtentsUtf8(xtfs->display, xtfs->font, (FcChar8*)encoded_text, nbytes, &xft_extents);
   XUNLOCK(xtfs->display);
   free(encoded_text);
 
