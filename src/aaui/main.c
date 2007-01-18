@@ -631,6 +631,10 @@ int main(int argc, char *argv[]) {
   aaxine.post_running = 0;
   aaxine.post_plugin_name = NULL;
 
+#ifdef CACA
+  aaxine.display = NULL;
+#endif
+
 #ifdef AA
   /* 
    * AALib help and option-parsing
@@ -1115,8 +1119,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef CACA
-  caca_free_display(aaxine.display);
-  cucul_free_canvas(aaxine.canvas);
+  if(aaxine.display) {
+    caca_free_display(aaxine.display); 
+    cucul_free_canvas(aaxine.canvas);
+  }
 #endif
   
   if(xlib_handle)
