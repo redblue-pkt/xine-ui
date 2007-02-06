@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -688,7 +688,7 @@ static void inputtext_erase_with_backspace(xitk_widget_t *w) {
   int                       offset;
   
   if(private_data->text && (strlen(private_data->text) >= 1)) {
-    if(private_data->cursor_pos >= 0) {
+    if(private_data->cursor_pos > 0) {
       
       oldtext = strdup(private_data->text);
       newtext = (char *) xitk_xmalloc(strlen(oldtext));
@@ -700,20 +700,15 @@ static void inputtext_erase_with_backspace(xitk_widget_t *w) {
       pp = newtext;
       
       while(offset < private_data->cursor_pos) {
-	*pp = *p;
-	p++;
-	pp++;
+	*pp++ = *p++;
 	offset++;
       }
       p++;
       
       while(*p != '\0') {
-	*pp = *p;
-	offset++;
-	p++;
-	pp++;
+	*pp++ = *p++;
       } 
-      *pp = 0;
+      *pp = '\0';
       
       XITK_FREE(private_data->text);
       private_data->text = strdup(newtext);
