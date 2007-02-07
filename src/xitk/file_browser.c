@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -444,62 +444,74 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
 }
 
 static void fb_update_origin(filebrowser_t *fb) {
-  char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   
-  if(strcasecmp(fb->current_dir, "/")) {
-    if(strlen(fb->filename))
-      snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->filename);
-    else
-      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
-  }
-  else {
-    if(strlen(fb->filename))
-      snprintf(buf, sizeof(buf), "%s%s", fb->current_dir, fb->filename);
-    else
-      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
-  }
+  if(strcmp(fb->current_dir, "/"))
+    snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->filename);
+  else
+    snprintf(buf, sizeof(buf), "/%s", fb->filename);
   
   xitk_inputtext_change_text(fb->origin, buf); 
 }
 
 static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
-  if(filepathname) {
+  if(filepathname && *filepathname) {
+    char *dirname = NULL;
     char *filename = NULL;
-    char *_filepathname;
-    char *tilde;
+    char  _filepathname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+    char *p;
     
-    if((tilde = strchr(filepathname, '~')) && (*(tilde - 1) != '\\')) {
+    if((*filepathname == '~') && (*(filepathname + 1) == '/' || *(filepathname + 1) == '\0')) {
       const char *homedir = xine_get_homedir();
-      int         len = strlen(homedir) + (tilde - filepathname);
       
-      tilde++;
-      
-      if(*tilde == '/')
-	len += strlen(tilde);
-      
-      _filepathname = (char *) alloca(len + 1);
-      sprintf(_filepathname, "%s%s", homedir, (tilde) ? tilde : "");
-    }
-    else 
-      xine_strdupa(_filepathname, filepathname);
-
-    if(!is_a_dir((char *)_filepathname))
-      filename = strrchr(_filepathname, '/');
-    
-    if(filename && (strlen(filename) > 1)) {
-      *filename++ = '\0';
-      snprintf(fb->filename, sizeof(fb->filename), "%s", filename);
-      
-      if(is_a_dir(_filepathname))
-	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", _filepathname);
-
+      snprintf(_filepathname, sizeof(_filepathname), "%s%s", homedir, (filepathname + 1));
     }
     else {
-      if(is_a_dir((char *)_filepathname)) {
-	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", _filepathname);
-	memset(&fb->filename, 0, sizeof(fb->filename));
+      if((*filepathname == '\\') && (*(filepathname + 1) == '~'))
+	filepathname++;
+      if((*filepathname == '/'))
+	snprintf(_filepathname, sizeof(_filepathname), "%s", filepathname);
+      else
+	snprintf(_filepathname, sizeof(_filepathname), "%s/%s", fb->current_dir, filepathname);
+    }
+
+    p = _filepathname + strlen(_filepathname) - 1;
+    while((p > _filepathname) && (*p == '/'))	/* Remove trailing '/' from path name */
+      *p-- = '\0';
+
+    if(is_a_dir(_filepathname)) {		/* Whole name is a dir name */
+      dirname = _filepathname;
+    }
+    else {
+      filename = strrchr(_filepathname, '/');
+    
+      if(!filename) {				/* Whole name treated as file name */
+	filename = _filepathname;
+      }
+      else {					/* Split into dir and file part */
+	*filename++ = '\0';
+
+	if(*_filepathname == '\0')
+	  dirname = "/";			/* Dir part was "/", restore it */
+	else
+	  dirname = _filepathname;
+
+	p = dirname + strlen(dirname) - 1;
+	while((p > dirname) && (*p == '/'))	/* Remove trailing '/' from dir name */
+	  *p-- = '\0';
+
+	if(!is_a_dir(dirname))			/* Invalid path, don't change anything */
+	  return;
       }
     }
+
+    if(dirname)
+      snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", dirname);
+
+    if(filename)
+      snprintf(fb->filename, sizeof(fb->filename), "%s", filename);
+    else
+      *fb->filename = '\0';
   }
 }
 
@@ -648,7 +660,7 @@ static void sort_directories(filebrowser_t *fb) {
 }
 
 static void fb_getdir(filebrowser_t *fb) {
-  char                  fullfilename[XINE_PATH_MAX + XINE_NAME_MAX + 1];
+  char                  fullfilename[XINE_PATH_MAX + XINE_NAME_MAX + 2];
   struct dirent        *pdirent;
   int                   num_dir_files   = 0;
   int                   num_norm_files  = 0;
@@ -677,12 +689,13 @@ static void fb_getdir(filebrowser_t *fb) {
     xine_error(_("Unable to open directory '%s': %s."), 
 	       (p) ? p + 1 : fb->current_dir, strerror(errno));
     
-    /* One step back */
-    if(p)
+    /* One step back if dir has a subdir component */
+    if(p && *(p + 1)) {
       *p = '\0';
 
-    fb_update_origin(fb);
-    fb_getdir(fb);
+      fb_update_origin(fb);
+      fb_getdir(fb);
+    }
     return;
   }
 
@@ -777,7 +790,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
   if(w == fb->directories_browser) {
-    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     /* Want to re-read current dir */
     if(!strcasecmp(fb->dir_files[selected].name, ".")) {
@@ -832,17 +845,8 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
 
 static void fb_change_origin(xitk_widget_t *w, void *data, char *currenttext) {
   filebrowser_t *fb = (filebrowser_t *)data;
-  char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  char          *p;
 
-  memset(&buf, 0, sizeof(buf));
-  snprintf(buf, sizeof(buf), "%s", currenttext);
-
-  p = &buf[strlen(buf) - 1];
-  while((strlen(buf) > 1) && (*p == '/'))
-    *p-- = '\0';
-
-  fb_extract_path_and_file(fb, buf);
+  fb_extract_path_and_file(fb, currenttext);
   fb_update_origin(fb);
   fb_getdir(fb);
 }
@@ -976,7 +980,7 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
   switch(button) {
   case XITK_WINDOW_ANSWER_YES:
     {
-      char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+      char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
       int sel = xitk_browser_get_current_selected(fb->files_browser);
 
       snprintf(buf, sizeof(buf), "%s%s%s",
@@ -999,7 +1003,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
   int            sel;
   
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
-    char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s'"), fb->current_dir);
     if(strlen(fb->current_dir) > 1)
@@ -1016,7 +1020,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
 
 static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   int sel = xitk_browser_get_current_selected(fb->files_browser);
   
   snprintf(buf, sizeof(buf), "%s%s%s",
@@ -1034,7 +1038,7 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
   int            sel;
   
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
-    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     snprintf(buf, sizeof(buf), "%s%s%s",
 	     fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ),
@@ -1055,7 +1059,7 @@ static void fb_create_directory_cb(xitk_widget_t *w, void *data, char *newdir) {
 }
 static void fb_create_directory(xitk_widget_t *w, void *data) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   
   snprintf(buf, sizeof(buf), "%s%s",
 	   fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ));
