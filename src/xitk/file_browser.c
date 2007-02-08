@@ -683,15 +683,19 @@ static void fb_getdir(filebrowser_t *fb) {
     }
   }
   
+  /* Following code relies on the fact that fb->current_dir has no trailing '/' */
   if((pdir = opendir(fb->current_dir)) == NULL) {
     char *p = strrchr(fb->current_dir, '/');
     
     xine_error(_("Unable to open directory '%s': %s."), 
-	       (p) ? p + 1 : fb->current_dir, strerror(errno));
+	       (p && *(p + 1)) ? p + 1 : fb->current_dir, strerror(errno));
     
     /* One step back if dir has a subdir component */
     if(p && *(p + 1)) {
-      *p = '\0';
+      if(p == fb->current_dir) /* we are in the root dir */
+	*(p + 1) = '\0';
+      else
+	*p = '\0';
 
       fb_update_origin(fb);
       fb_getdir(fb);
