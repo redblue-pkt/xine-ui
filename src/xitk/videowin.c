@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a free video player.
  * 
@@ -339,8 +339,14 @@ void video_window_select_visual (void) {
  * Ref. http://bugzilla.xfce.org/show_bug.cgi?id=1958
  */
 static void video_window_lock_opacity (void) {
+  Atom opacity_lock = XInternAtom(gGui->video_display, "_NET_WM_WINDOW_OPACITY_LOCKED", False);
+
+  /* This shouldn't happen, but was reported in bug #1573056 */
+  if(opacity_lock == None)
+    return;
+
   XChangeProperty(gGui->video_display, gGui->video_window,
-                  XInternAtom (gGui->video_display, "_NET_WM_WINDOW_OPACITY_LOCKED", False),
+		  opacity_lock,
 		  XA_CARDINAL, 32, PropModeReplace,
 		  (unsigned char *)gGui, 1);
 }
