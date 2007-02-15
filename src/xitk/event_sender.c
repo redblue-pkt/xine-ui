@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -50,7 +50,6 @@ typedef struct {
 
   int                   x;
   int                   y;
-  int                   move_forced;
 
   xitk_widget_list_t   *widget_list;
 
@@ -89,44 +88,28 @@ static char *menu_items_default[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 static char *menu_items_dvd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
+  int old_sticky_value = gGui->eventer_sticky;
   
-  if(!eventer)
-    gGui->eventer_sticky = cfg->num_value;
-  else {
-    int old_sticky_value = gGui->eventer_sticky;
-    gGui->eventer_sticky = cfg->num_value;
-    
+  gGui->eventer_sticky = cfg->num_value;
+  if(eventer) {
     if((!old_sticky_value) && gGui->eventer_sticky) {
-      int  px, py, pw, ph;
-      xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
+      int  px, py, pw;
+      xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, NULL);
       eventer->x = px + pw;
       eventer->y = py;
-      eventer->move_forced++;
       xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
     }
   }
-
 }
 
 static void event_sender_store_new_position(int x, int y, int w, int h) {
 
-  if(gGui->eventer_sticky) {
-    if(eventer->move_forced == 0) {
-      if(panel_is_visible()) {
-	eventer->move_forced++;
-	xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
-      }
-    }
-    else
-      eventer->move_forced--;
-  }
-  else {
+  if(eventer && !gGui->eventer_sticky) {
     eventer->x = x;
     eventer->y = y;
     config_update_num ("gui.eventer_x", x);
     config_update_num ("gui.eventer_y", y);
   }
-  
 }
 
 void event_sender_show_tips(int enabled, unsigned long timeout) {
@@ -218,6 +201,20 @@ static void event_sender_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
+  case ButtonRelease:
+    /*
+     * If we tried to move sticky window, move it back to stored position.
+     */
+    if(eventer && gGui->eventer_sticky) {
+      if(panel_is_visible()) {
+	int  x, y;
+	xitk_window_get_window_position(gGui->imlib_data, eventer->xwin, &x, &y, NULL, NULL);
+	if((x != eventer->x) || (y != eventer->y))
+	  xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
+      }
+    }
+    break;
+
   case KeyPress:
     {
       XKeyEvent      mykeyevent;
@@ -234,7 +231,7 @@ static void event_sender_handle_event(XEvent *event, void *data) {
       switch(key) {
       case XK_Up:
 	event_sender_up(NULL, NULL);
-	  break;
+	break;
       case XK_Down:
 	event_sender_down(NULL, NULL);
 	break;
@@ -243,7 +240,7 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 	break;
       case XK_Right:
 	event_sender_right(NULL, NULL);
-	  break;
+	break;
 
       case XK_Return:
       case XK_KP_Enter:
@@ -427,8 +424,8 @@ void event_sender_panel(void) {
 					 CONFIG_NO_DATA);
   
   if(gGui->eventer_sticky && panel_is_visible()) {
-    int  px, py, pw, ph;
-    xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
+    int  px, py, pw;
+    xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, NULL);
     eventer->x = px + pw;
     eventer->y = py;
   }
@@ -714,7 +711,6 @@ void event_sender_panel(void) {
 
   eventer->visible = 1;
   eventer->running = 1;
-  eventer->move_forced = 0;
   event_sender_raise_window();
 
   try_to_set_input_focus(xitk_window_get_window(eventer->xwin));
