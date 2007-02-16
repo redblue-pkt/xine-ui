@@ -1,5 +1,9 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixed crash upon missing opacity lock atom for video window [bug #1573056]
+  * Fixed infinite X event loop with sticky event sender window (stressed CPU and X)
+  * Fixed infinite loop in file browser with unreadable directory [bug #1628791]
+  * Added support for gnome screen saver
   * Fixed segfault and memleak in log viewer
   * Fixes and improvements for appearance and behaviour
   * Video window: User magnification ignored and auto-resizing on new stream
