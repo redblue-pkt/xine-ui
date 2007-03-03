@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eo\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-07-16 01:09+0200\n"
+"POT-Creation-Date: 2007-03-03 13:48+0100\n"
 "PO-Revision-Date: 2007-02-10 23:28+0200\n"
 "Last-Translator: Antonio Codazzi <f_sophia@libero.it>\n"
 "Language-Team: Esperanto\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: src/xitk/actions.c:369
+#: src/xitk/actions.c:386
 #, c-format
 msgid ""
 "The stream '%s' isn't supported by xine:\n"
@@ -31,7 +31,7 @@ msgstr ""
 "La datumstrio '%s' ne estas subtenita de xine:\n"
 "\n"
 
-#: src/xitk/actions.c:373
+#: src/xitk/actions.c:390
 #, c-format
 msgid ""
 "The stream '%s' use an unsupported codec:\n"
@@ -40,12 +40,12 @@ msgstr ""
 "La datumstrio '%s' uzas nesubtenitan kodaĵon:\n"
 "\n"
 
-#: src/xitk/actions.c:383
+#: src/xitk/actions.c:400
 #, c-format
 msgid "%sVideo Codec: %s (%s)\n"
 msgstr "%sVideokodaĵo: %s (%s)\n"
 
-#: src/xitk/actions.c:384 src/xitk/actions.c:395 src/xitk/stream_infos.c:161
+#: src/xitk/actions.c:401 src/xitk/actions.c:412 src/xitk/stream_infos.c:161
 #: src/xitk/stream_infos.c:376 src/xitk/stream_infos.c:377
 #: src/xitk/stream_infos.c:378 src/xitk/stream_infos.c:379
 #: src/xitk/stream_infos.c:380 src/xitk/stream_infos.c:382
@@ -54,12 +54,12 @@ msgstr "%sVideokodaĵo: %s (%s)\n"
 msgid "Unavailable"
 msgstr "Nedisponebla"
 
-#: src/xitk/actions.c:394
+#: src/xitk/actions.c:411
 #, c-format
 msgid "%sAudio Codec: %s (%s)\n"
 msgstr "%sAŭdokodaĵo: %s (%s)\n"
 
-#: src/xitk/actions.c:408
+#: src/xitk/actions.c:425
 #, c-format
 msgid ""
 "%s\n"
@@ -68,84 +68,84 @@ msgstr ""
 "%s\n"
 "Ĉu mi devas startigi legon ĉiukaze?\n"
 
-#: src/xitk/actions.c:416
+#: src/xitk/actions.c:433
 msgid "Start Playback ?"
 msgstr "Ĉu mi devas startigi legon?"
 
-#: src/xitk/actions.c:715
+#: src/xitk/actions.c:732
 msgid "No MRL (input stream) specified"
 msgstr "Neniu MRL (eniga datumstrio) estis specifita"
 
-#: src/xitk/actions.c:1041
+#: src/xitk/actions.c:1062
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Proporcio: %s"
 
-#: src/xitk/actions.c:1056
+#: src/xitk/actions.c:1077
 #, c-format
 msgid "Deinterlace: %s"
 msgstr "Malplektado: %s"
 
-#: src/xitk/actions.c:1056 src/xitk/actions.c:1760 src/xitk/actions.c:1905
+#: src/xitk/actions.c:1077 src/xitk/actions.c:1787 src/xitk/actions.c:1926
 msgid "enabled"
 msgstr "ebligita"
 
-#: src/xitk/actions.c:1056 src/xitk/actions.c:1760 src/xitk/actions.c:1905
+#: src/xitk/actions.c:1077 src/xitk/actions.c:1787 src/xitk/actions.c:1926
 msgid "disabled"
 msgstr "malebligita"
 
-#: src/xitk/actions.c:1282 src/xitk/actions.c:1299 src/xitk/actions.c:1430
+#: src/xitk/actions.c:1309 src/xitk/actions.c:1326 src/xitk/actions.c:1457
 #: src/xitk/lirc.c:165 src/xitk/stdctl.c:112
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): estas neeble krei novan fadenon (%s)\n"
 
-#: src/xitk/actions.c:1652
+#: src/xitk/actions.c:1679
 msgid "There is no mrl."
 msgstr "Neniu MRL estas."
 
-#: src/xitk/actions.c:1760
+#: src/xitk/actions.c:1787
 #, c-format
 msgid "Video post plugins: %s."
 msgstr "Kromaĵo por videa postprocezado: %s."
 
-#: src/xitk/actions.c:1851
+#: src/xitk/actions.c:1872
 msgid "Amplification Level"
 msgstr "Nivelo de amplifo"
 
-#: src/xitk/actions.c:1869 src/xitk/menus.c:301 src/xitk/menus.c:315
+#: src/xitk/actions.c:1890 src/xitk/menus.c:301 src/xitk/menus.c:315
 msgid "Audio Volume"
 msgstr "Laŭteco"
 
-#: src/xitk/actions.c:1905
+#: src/xitk/actions.c:1926
 #, c-format
 msgid "Audio post plugins: %s."
 msgstr "Kromaĵo por aŭda postprocezado: %s."
 
-#: src/xitk/actions.c:1955
+#: src/xitk/actions.c:1976
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV Moduso: %d"
 
-#: src/xitk/actions.c:1976
+#: src/xitk/actions.c:1997
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(ekranbloko, 0x%x ...) malsukcesis.\n"
 
-#: src/xitk/actions.c:2108 src/xitk/actions.c:2172 src/xitk/event_sender.c:495
+#: src/xitk/actions.c:2129 src/xitk/actions.c:2193 src/xitk/event_sender.c:492
 #: src/xitk/mediamark.c:3181
 msgid "Select"
 msgstr "Elektu"
 
-#: src/xitk/actions.c:2111
+#: src/xitk/actions.c:2132
 msgid "Select all"
 msgstr "Elektu ĉion"
 
-#: src/xitk/actions.c:2116
+#: src/xitk/actions.c:2137
 msgid "Stream(s) loading"
 msgstr "Ŝargo de datumstrio(j)"
 
-#: src/xitk/actions.c:2195 src/xitk/mediamark.c:3202
+#: src/xitk/actions.c:2216 src/xitk/mediamark.c:3202
 msgid "Pick a subtitle file"
 msgstr "Prenu dosieron de surskribaĵoj"
 
@@ -156,8 +156,8 @@ msgid ""
 "after reading and understanding its help text."
 msgstr ""
 "Vi provis ŝanĝi agordadon per cfg dosiero: MRL.\n"
-"Tio ne estas permesita krome se vi ebligas agordoj pri 'misc.implicit_config'"
-"post kiam vi legis kaj komprenis ĝian helpan tekston."
+"Tio ne estas permesita krome se vi ebligas agordoj pri 'misc."
+"implicit_config'post kiam vi legis kaj komprenis ĝian helpan tekston."
 
 #: src/xitk/config_wrapper.c:173
 #, c-format
@@ -165,8 +165,7 @@ msgid ""
 "For security reason, you're not allowed to change the configuration entry "
 "named '%s'."
 msgstr ""
-"Pro kialo de sekureco, vi ne rajtas ŝanĝi la agordan eron nomiĝita "
-"'%s'."
+"Pro kialo de sekureco, vi ne rajtas ŝanĝi la agordan eron nomiĝita '%s'."
 
 #: src/xitk/control.c:310
 msgid "hue value"
@@ -289,7 +288,8 @@ msgstr ""
 "- eraro de xine-motoro -\n"
 "\n"
 "Ne estas eniga kromaĵo disponebla por mastrumi '%s'.\n"
-"Eble la MRL-sintako estas malĝusta aŭ la fonto de dosiero/datumstio ne ekzistas."
+"Eble la MRL-sintako estas malĝusta aŭ la fonto de dosiero/datumstio ne "
+"ekzistas."
 
 #: src/xitk/errors.c:274
 #, c-format
@@ -324,7 +324,8 @@ msgid ""
 msgstr ""
 "- eraro de xine-motoro -\n"
 "\n"
-"Miskvalita MRL. La MRL '%s' ŝajnas difekta/nevalida.\n\n"
+"Miskvalita MRL. La MRL '%s' ŝajnas difekta/nevalida.\n"
+"\n"
 
 #: src/xitk/errors.c:294
 #, c-format
@@ -456,12 +457,13 @@ msgstr "Halto"
 msgid "Continue"
 msgstr "Daŭro"
 
-#: src/xitk/event.c:1242 src/xitk/videowin.c:272
+#: src/xitk/event.c:1242 src/xitk/videowin.c:273
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
-msgstr "gui_ĉefo: elektita vido %#lx ne ekzistas, do mi provas defaŭltan vidon\n"
+msgstr ""
+"gui_ĉefo: elektita vido %#lx ne ekzistas, do mi provas defaŭltan vidon\n"
 
-#: src/xitk/event.c:1261 src/xitk/videowin.c:291
+#: src/xitk/event.c:1261 src/xitk/videowin.c:292
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_ĉefo: estas neeble trovi verkoloran vidon.\n"
@@ -491,10 +493,10 @@ msgid ""
 "like ':0.1' or ':1' makes possible to display video and control on different "
 "screens (very useful for TV presentations)."
 msgstr ""
-"Uzu ĉi tion por agordi ekranblokon en kiu xine montros filmojn. Se ĝi "
-"estas malplena, estos uzata la ĉefa ekranbloko. Agordante ĉi opcion per "
-"valoro kiel ':0.1' aŭ ':1', eblas vidi filmon kaj regilon en malsamaj  "
-"ekranoj (tre utila por TV prezentadoj)."
+"Uzu ĉi tion por agordi ekranblokon en kiu xine montros filmojn. Se ĝi estas "
+"malplena, estos uzata la ĉefa ekranbloko. Agordante ĉi opcion per valoro "
+"kiel ':0.1' aŭ ':1', eblas vidi filmon kaj regilon en malsamaj  ekranoj (tre "
+"utila por TV prezentadoj)."
 
 #: src/xitk/event.c:1363
 #, c-format
@@ -511,8 +513,8 @@ msgstr "Sinkronigita X protokolo (senĉimigo)"
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
-"Ĝi plenumas transakciojn de X en sinkronigita moduso. Ĝi estas tre malrapida, "
-"do uzu ĝin nur por senĉimigo!"
+"Ĝi plenumas transakciojn de X en sinkronigita moduso. Ĝi estas tre "
+"malrapida, do uzu ĝin nur por senĉimigo!"
 
 #: src/xitk/event.c:1383
 #, c-format
@@ -524,62 +526,68 @@ msgid "Windows stacking"
 msgstr "Stako de fenestroj"
 
 #: src/xitk/event.c:1389
-msgid "Use wm layer property to place window on top."
+#, fuzzy
+msgid ""
+"Use WM layer property to place windows on top\n"
+"except for the video window in non-fullscreen mode."
 msgstr ""
-"Ĝi uzas ecojn de tavolo de fenestradministrilo por lokigi la "
-"fenestro sur la pinto."
+"Ĝi uzas ecojn de tavolo de fenestradministrilo por lokigi la fenestroj sur "
+"la pinto."
 
-#: src/xitk/event.c:1396
+#: src/xitk/event.c:1397
 msgid "Windows stacking (more)"
 msgstr "Stako de fenestroj (pli)"
 
-#: src/xitk/event.c:1397
-msgid "Use WM layer property to place windows on top."
+#: src/xitk/event.c:1398
+#, fuzzy
+msgid ""
+"Use WM layer property to place windows on top\n"
+"for all windows (surpasses the 'layer_above' setting)."
 msgstr ""
-"Ĝi uzas ecojn de tavolo de fenestradministrilo por lokigi la "
-"fenestroj sur la pinto."
+"Ĝi uzas ecojn de tavolo de fenestradministrilo por lokigi la fenestroj sur "
+"la pinto."
 
-#: src/xitk/event.c:1408
+#: src/xitk/event.c:1407
 msgid "Snapshot location"
 msgstr "Lokado de ekfotoj"
 
-#: src/xitk/event.c:1409
+#: src/xitk/event.c:1408
 msgid "Where snapshots will be saved."
 msgstr "Kie ekfotoj estos konservitaj"
 
-#: src/xitk/event.c:1416
+#: src/xitk/event.c:1415
 msgid "Screensaver reset interval (s)"
 msgstr "Intervalo de reagordo de ekrankurteno (sek.)"
 
-#: src/xitk/event.c:1417
+#: src/xitk/event.c:1416
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
 msgstr ""
-"Tempo, en sekundoj, inter du falsaj eventoj por teni ekrankurtenon trankvila, "
-"0 por malebligi."
+"Tempo, en sekundoj, inter du falsaj eventoj por teni ekrankurtenon "
+"trankvila, 0 por malebligi."
 
-#: src/xitk/event.c:1424
+#: src/xitk/event.c:1423
 msgid "Chapter hopping"
 msgstr "Transsaltu ĉapitron"
 
-#: src/xitk/event.c:1425
+#: src/xitk/event.c:1424
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
 msgstr "Ĝi legas la antaŭan|sekvan ĉapitron anstataŭ MRL (dvdnav)"
 
-#: src/xitk/event.c:1432
+#: src/xitk/event.c:1431
 msgid "Visibility behavior of output window"
 msgstr "Agmaniero de videbleco de eliga fenestro"
 
-#: src/xitk/event.c:1433
+#: src/xitk/event.c:1432
 msgid "Hide video output window if there is no video in the stream"
 msgstr "Kaŝu la fenestron de videoeligo se ne estas filmo en datumstio"
 
-#: src/xitk/event.c:1440
+#: src/xitk/event.c:1439
 msgid "Visiblility behavior of panel"
 msgstr "Agmaniero de videbleco de panelo"
 
-#: src/xitk/event.c:1441
+#: src/xitk/event.c:1440
 msgid ""
 "Automatically show/hide panel window, according to "
 "auto_video_output_visibility"
@@ -587,94 +595,95 @@ msgstr ""
 "Ĝi aŭtomate montras/kaŝas fenestron de panelo, konforme al "
 "auto_video_output_visibility"
 
-#: src/xitk/event.c:1449
+#: src/xitk/event.c:1448
 msgid "Event sender behavior"
 msgstr "Agmaniero de sinkronigilo de eventoj"
 
-#: src/xitk/event.c:1450
+#: src/xitk/event.c:1449
 msgid "Event sender window stick to main panel"
 msgstr "Fenestro de sinkronigilo de eventoj algluita al ĉefa panelo"
 
-#: src/xitk/event.c:1459
+#: src/xitk/event.c:1458
 msgid "Visual animation style"
 msgstr "Stilo de videa animacio"
 
-#: src/xitk/event.c:1460
+#: src/xitk/event.c:1459
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
-"Ĝi montras kelkajn videajn animaciojn se la nuna datumstrio estas nur aŭda (eg: mp3)."
+"Ĝi montras kelkajn videajn animaciojn se la nuna datumstrio estas nur aŭda "
+"(eg: mp3)."
 
-#: src/xitk/event.c:1469
+#: src/xitk/event.c:1468
 msgid "Stream information"
 msgstr "Pri datumstrio"
 
-#: src/xitk/event.c:1470
+#: src/xitk/event.c:1469
 msgid "Update stream information (in stream info window) each half seconds."
 msgstr ""
-"Ĝi ĝisdatigas informojn pri datumstrio (en fenestro de informoj pri datumstrio) "
-"je ĉiu duonsekundo"
+"Ĝi ĝisdatigas informojn pri datumstrio (en fenestro de informoj pri "
+"datumstrio) je ĉiu duonsekundo"
 
-#: src/xitk/event.c:1480
+#: src/xitk/event.c:1479
 msgid "Skin Server Url"
 msgstr "URL de Servilo por Etosoj"
 
-#: src/xitk/event.c:1481
+#: src/xitk/event.c:1480
 msgid "From where we can get skins."
 msgstr "El kie ni povas akiri etosojn"
 
-#: src/xitk/event.c:1492
+#: src/xitk/event.c:1491
 msgid "Enable OSD support"
 msgstr "Ebligu subtenon por OSD"
 
-#: src/xitk/event.c:1493
+#: src/xitk/event.c:1492
 msgid ""
 "Enabling OSD permit to display some status/informations in output window."
-msgstr ""
-"Ebligante OSD, ĝi permitas montri staton/informojn en eliga fenestro."
+msgstr "Ebligante OSD, ĝi permitas montri staton/informojn en eliga fenestro."
 
-#: src/xitk/event.c:1502
+#: src/xitk/event.c:1501
 msgid "Use unscaled OSD"
 msgstr "Uzu neskalitan OSD"
 
-#: src/xitk/event.c:1503
+#: src/xitk/event.c:1502
 msgid "Use unscaled (full screen resolution) OSD if possible"
 msgstr "Ĝi uzas neskalitan OSD (tutekrana difino) se ĝi estas ebla"
 
-#: src/xitk/event.c:1511
+#: src/xitk/event.c:1510
 msgid "Dismiss OSD time (s)"
 msgstr "Rezignu tempo(j)n de OSD"
 
-#: src/xitk/event.c:1512
+#: src/xitk/event.c:1511
 msgid "Persistence time of OSD visual, in seconds."
 msgstr "Pludaŭra tempo de OSD-vido, en sekundoj."
 
-#: src/xitk/event.c:1520
+#: src/xitk/event.c:1519
 msgid "Change xine's behavior for unexperienced user"
 msgstr "Ŝanĝu agmanieron de xine por malspertaj uzantoj"
 
-#: src/xitk/event.c:1521
+#: src/xitk/event.c:1520
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
-"En ĉi moduso, xine alprenas kelkajn decidojn por simpligi la vivon de la uzanto"
+"En ĉi moduso, xine alprenas kelkajn decidojn por simpligi la vivon de la "
+"uzanto"
 
-#: src/xitk/event.c:1529
+#: src/xitk/event.c:1528
 msgid "Ask user for playback with unsupported codec"
 msgstr "Demandu al uzanto pri lego per nesubtenita kodaĵo"
 
-#: src/xitk/event.c:1530
+#: src/xitk/event.c:1529
 msgid ""
 "If xine don't support audio or video codec of current stream the user will "
 "be asked if the stream should be played or not"
 msgstr ""
-"Se xine ne subtenas aŭdan aŭ videan kodaĵon de nuna datumstrio, la uzanto estos "
-"pridemandita pri legi aŭ ne legi la datumstrion"
+"Se xine ne subtenas aŭdan aŭ videan kodaĵon de nuna datumstrio, la uzanto "
+"estos pridemandita pri legi aŭ ne legi la datumstrion"
 
-#: src/xitk/event.c:1539
+#: src/xitk/event.c:1538
 msgid "Configuration experience level"
 msgstr "Agordo de spertnivelo"
 
-#: src/xitk/event.c:1540
+#: src/xitk/event.c:1539
 msgid ""
 "Level of user's experience, this will show more or less configuration "
 "options."
@@ -682,127 +691,127 @@ msgstr ""
 "Nivelo de sperteco de la uzanto, ĝi montros pli aŭ malpli da opcioj laŭ "
 "agordo."
 
-#: src/xitk/event.c:1548
+#: src/xitk/event.c:1547
 msgid "Amplification level"
 msgstr "Nivelo de amplifo"
 
-#: src/xitk/event.c:1557
+#: src/xitk/event.c:1556
 msgid "Display splash screen"
 msgstr "Montru startbildon"
 
-#: src/xitk/event.c:1558
+#: src/xitk/event.c:1557
 msgid "If enabled, xine will display its splash screen"
 msgstr "Se ĝi estas ebligita, xine montros sian startbildon"
 
-#: src/xitk/event.c:1566
+#: src/xitk/event.c:1565
 msgid "Audio mixer control method"
 msgstr "Mastruma metodo por aŭda miksilo"
 
-#: src/xitk/event.c:1567
+#: src/xitk/event.c:1566
 msgid "Which method used to control audio volume."
 msgstr "Metodo uzata por mastrumi laŭtecon."
 
-#: src/xitk/event.c:1575
+#: src/xitk/event.c:1574
 msgid "Menu shortcut style"
 msgstr "Stilo de menuo-kurtvojo"
 
-#: src/xitk/event.c:1576
+#: src/xitk/event.c:1575
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Prezento de kurtvojo en menuo, 'Strkl,Alt' aŭ 'S,M'."
 
-#: src/xitk/event.c:1666
+#: src/xitk/event.c:1665
 #, c-format
 msgid "Unable to initialize Imlib\n"
 msgstr "Estas neeble pravalorizi Imlib\n"
 
-#: src/xitk/event_sender.c:442
+#: src/xitk/event_sender.c:439
 msgid "xine Event Sender"
 msgstr "Sinkronigilo de eventoj por xine"
 
-#: src/xitk/event_sender.c:459
+#: src/xitk/event_sender.c:456
 msgid "Up"
 msgstr "Supre"
 
-#: src/xitk/event_sender.c:477
+#: src/xitk/event_sender.c:474
 msgid "Left"
 msgstr "Maldekstre"
 
-#: src/xitk/event_sender.c:513
+#: src/xitk/event_sender.c:510
 msgid "Right"
 msgstr "Dekstre"
 
-#: src/xitk/event_sender.c:531
+#: src/xitk/event_sender.c:528
 msgid "Down"
 msgstr "Sube"
 
-#: src/xitk/event_sender.c:611
+#: src/xitk/event_sender.c:608
 msgid "Angle +"
 msgstr "Angulo +"
 
-#: src/xitk/event_sender.c:627
+#: src/xitk/event_sender.c:624
 msgid "Angle -"
 msgstr "Angulo -"
 
-#: src/xitk/event_sender.c:642 src/xitk/menus.c:989
+#: src/xitk/event_sender.c:639 src/xitk/menus.c:989
 msgid "Menu 1"
 msgstr "Menuo 1"
 
-#: src/xitk/event_sender.c:643 src/xitk/menus.c:989
+#: src/xitk/event_sender.c:640 src/xitk/menus.c:989
 msgid "Menu 2"
 msgstr "Menuo 2"
 
-#: src/xitk/event_sender.c:644 src/xitk/menus.c:989
+#: src/xitk/event_sender.c:641 src/xitk/menus.c:989
 msgid "Menu 3"
 msgstr "Menuo 3"
 
-#: src/xitk/event_sender.c:645 src/xitk/menus.c:989
+#: src/xitk/event_sender.c:642 src/xitk/menus.c:989
 msgid "Menu 4"
 msgstr "Menuo 4"
 
-#: src/xitk/event_sender.c:646 src/xitk/menus.c:990
+#: src/xitk/event_sender.c:643 src/xitk/menus.c:990
 msgid "Menu 5"
 msgstr "Menuo 5"
 
-#: src/xitk/event_sender.c:647 src/xitk/menus.c:990
+#: src/xitk/event_sender.c:644 src/xitk/menus.c:990
 msgid "Menu 6"
 msgstr "Menuo 6"
 
-#: src/xitk/event_sender.c:648 src/xitk/menus.c:990
+#: src/xitk/event_sender.c:645 src/xitk/menus.c:990
 msgid "Menu 7"
 msgstr "Menuo 7"
 
-#: src/xitk/event_sender.c:650 src/xitk/menus.c:993
+#: src/xitk/event_sender.c:647 src/xitk/menus.c:993
 msgid "Menu toggle"
 msgstr "Mastrumu menuon"
 
-#: src/xitk/event_sender.c:651 src/xitk/menus.c:993
+#: src/xitk/event_sender.c:648 src/xitk/menus.c:993
 msgid "Title"
 msgstr "Titolo"
 
-#: src/xitk/event_sender.c:652 src/xitk/menus.c:993
+#: src/xitk/event_sender.c:649 src/xitk/menus.c:993
 msgid "Root"
 msgstr "Radiko"
 
-#: src/xitk/event_sender.c:653 src/xitk/menus.c:993
+#: src/xitk/event_sender.c:650 src/xitk/menus.c:993
 msgid "Subpicture"
 msgstr "Subbildo"
 
-#: src/xitk/event_sender.c:654 src/xitk/menus.c:672 src/xitk/menus.c:994
-#: src/xitk/menus.c:1051 src/xitk/stream_infos.c:899
+#: src/xitk/event_sender.c:651 src/xitk/menus.c:672 src/xitk/menus.c:994
+#: src/xitk/menus.c:1050 src/xitk/stream_infos.c:899
 msgid "Audio"
 msgstr "Aŭdo"
 
-#: src/xitk/event_sender.c:655 src/xitk/menus.c:994
+#: src/xitk/event_sender.c:652 src/xitk/menus.c:994
 msgid "Angle"
 msgstr "Angulo"
 
-#: src/xitk/event_sender.c:656 src/xitk/menus.c:994
+#: src/xitk/event_sender.c:653 src/xitk/menus.c:994
 msgid "Part"
 msgstr "Parto"
 
-#: src/xitk/event_sender.c:693 src/xitk/file_browser.c:1611
+#: src/xitk/event_sender.c:690 src/xitk/file_browser.c:1619
 #: src/xitk/help.c:442 src/xitk/mediamark.c:3465 src/xitk/setup.c:1185
-#: src/xitk/stream_infos.c:1061 src/xitk/tvset.c:525 src/xitk/viewlog.c:460
+#: src/xitk/stream_infos.c:1061 src/xitk/tvset.c:525 src/xitk/viewlog.c:465
 msgid "Close"
 msgstr "Fermu"
 
@@ -814,73 +823,73 @@ msgstr "Apliku"
 msgid "Cancel"
 msgstr "Rezignu"
 
-#: src/xitk/file_browser.c:677
+#: src/xitk/file_browser.c:690
 #, c-format
 msgid "Unable to open directory '%s': %s."
 msgstr "Estas neeble malfermi dosierujon '%s': %s."
 
-#: src/xitk/file_browser.c:987
+#: src/xitk/file_browser.c:995
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "Estas neeble forigi dosieron '%s': %s."
 
-#: src/xitk/file_browser.c:1004
+#: src/xitk/file_browser.c:1012
 #, c-format
 msgid "Do you really want to delete the file: '%s'"
 msgstr "Ĉu vi volas ja forigi la dosieron: '%s'"
 
-#: src/xitk/file_browser.c:1010
+#: src/xitk/file_browser.c:1018
 msgid "Confirm deletion ?"
 msgstr "Ĉu vi konfirmas forigon?"
 
-#: src/xitk/file_browser.c:1027
+#: src/xitk/file_browser.c:1035
 #, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
 msgstr "Estas neeble renomi dosieron '%s' per '%s': %s."
 
-#: src/xitk/file_browser.c:1044
+#: src/xitk/file_browser.c:1052
 msgid "Rename file"
 msgstr "Renomu dosieron"
 
-#: src/xitk/file_browser.c:1052
+#: src/xitk/file_browser.c:1060
 #, c-format
 msgid "Unable to create the directory '%s': %s."
 msgstr "Estas neeble krei dosierujon '%s': %s."
 
-#: src/xitk/file_browser.c:1064
+#: src/xitk/file_browser.c:1072
 msgid "Create a new directory"
 msgstr "Kreu novan dosierujon"
 
-#: src/xitk/file_browser.c:1208
+#: src/xitk/file_browser.c:1216
 msgid "File Browser"
 msgstr "Foliumilo"
 
-#: src/xitk/file_browser.c:1234
+#: src/xitk/file_browser.c:1242
 msgid "All files"
 msgstr "Ĉiuj dosieroj"
 
-#: src/xitk/file_browser.c:1235
+#: src/xitk/file_browser.c:1243
 msgid "All known subtitles"
 msgstr "Ĉiuj konataj surkribaĵoj"
 
-#: src/xitk/file_browser.c:1236
+#: src/xitk/file_browser.c:1244
 msgid "All known playlists"
 msgstr "Ĉiuj konataj legolistoj"
 
-#: src/xitk/file_browser.c:1510
+#: src/xitk/file_browser.c:1518
 msgid "Show hidden file"
 msgstr "Montru kaŝitajn dosierojn"
 
-#: src/xitk/file_browser.c:1523
+#: src/xitk/file_browser.c:1531
 msgid "Rename"
 msgstr "Renomu"
 
-#: src/xitk/file_browser.c:1539 src/xitk/kbindings.c:2202
-#: src/xitk/menus.c:1213
+#: src/xitk/file_browser.c:1547 src/xitk/kbindings.c:2202
+#: src/xitk/menus.c:1209
 msgid "Delete"
 msgstr "Forigu"
 
-#: src/xitk/file_browser.c:1555
+#: src/xitk/file_browser.c:1563
 msgid "Create a directory"
 msgstr "Kreu dosierujon"
 
@@ -1004,7 +1013,7 @@ msgstr "Modifiloj"
 msgid "Alias"
 msgstr "Kromnomo"
 
-#: src/xitk/kbindings.c:2187 src/xitk/menus.c:1211
+#: src/xitk/kbindings.c:2187 src/xitk/menus.c:1207
 msgid "Edit"
 msgstr "Redaktu"
 
@@ -1036,7 +1045,7 @@ msgstr "mod5"
 msgid "Grab"
 msgstr "Prenu"
 
-#: src/xitk/lang.c:499
+#: src/xitk/lang.c:498
 msgid "Unknown"
 msgstr "Nekonata"
 
@@ -1056,10 +1065,10 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Tiu ĉi estas xine (X11 GUI) - iu libera videolegilo v%s"
 
 #: src/xitk/main.c:435
-#, c-format
+#, fuzzy, c-format
 msgid ""
 ".\n"
-"(c) 2000-2004 The xine Team.\n"
+"(c) 2000-2006 The xine Team.\n"
 msgstr ""
 ".\n"
 "(c) 2000-2004 la Skipo de xine.\n"
@@ -1133,7 +1142,8 @@ msgstr "  -v, --version                Montru version.\n"
 #: src/xitk/main.c:588
 #, c-format
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
-msgstr "      --verbose [=nivelo]       Agordu paroleman nivelon. Defaŭlte 1.\n"
+msgstr ""
+"      --verbose [=nivelo]       Agordu paroleman nivelon. Defaŭlte 1.\n"
 
 #: src/xitk/main.c:589
 #, c-format
@@ -1163,7 +1173,8 @@ msgstr ""
 #: src/xitk/main.c:611
 #, c-format
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
-msgstr "  -u, --spu-channel <#>        Elektu SPU (surskribaĵan) kanalon '#'.\n"
+msgstr ""
+"  -u, --spu-channel <#>        Elektu SPU (surskribaĵan) kanalon '#'.\n"
 
 #: src/xitk/main.c:612
 #, c-format
@@ -1201,7 +1212,8 @@ msgstr "                    'F': tutekrane en 'xinerama' moduso.\n"
 #: src/xitk/main.c:623
 #, c-format
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
-msgstr "  -s, --auto-scan <kromaĵo>     mem-skanita legolisto far de <kromaĵo>\n"
+msgstr ""
+"  -s, --auto-scan <kromaĵo>     mem-skanita legolisto far de <kromaĵo>\n"
 
 #: src/xitk/main.c:624
 #, c-format
@@ -1271,29 +1283,33 @@ msgid ""
 "selected.\n"
 msgstr ""
 "      --keymap [=opcio]       Montru klavarmapon. Opcioj estas:\n"
-"                                 'default': montru defaŭltan tabelon de klavarmapo\n"
+"                                 'default': montru defaŭltan tabelon de "
+"klavarmapo\n"
 "                                 'lirc': montru skizon de .lircrc agordo.\n"
-"                                 'remapped': tabelo de klavarmapo re-mapita far de "
-"uzanto.\n"
+"                                 'remapped': tabelo de klavarmapo re-mapita "
+"far de uzanto.\n"
 "                                 'file:<dosiernomo>': uzu <dosiernomo>n kiel "
 "klavarmapo.\n"
-"                                 -en la okazo de neniu opcio, 'default' estas "
-"elektita.\n"
+"                                 -en la okazo de neniu opcio, 'default' "
+"estas elektita.\n"
 
 #: src/xitk/main.c:644
 #, c-format
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr "  -n, --network                Ebligu retan servilon por fora regado.\n"
+msgstr ""
+"  -n, --network                Ebligu retan servilon por fora regado.\n"
 
 #: src/xitk/main.c:645
 #, c-format
 msgid "      --network-port           Specify network server port number.\n"
-msgstr "      --network-port           Specifu numeron de pordo de reta servilo.\n"
+msgstr ""
+"      --network-port           Specifu numeron de pordo de reta servilo.\n"
 
 #: src/xitk/main.c:646
 #, c-format
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr "  -R, --root                   Uzu fenestron de ĉefuzanto kiel fenestro de "
+msgstr ""
+"  -R, --root                   Uzu fenestron de ĉefuzanto kiel fenestro de "
 "filmo.\n"
 
 #: src/xitk/main.c:647
@@ -1304,8 +1320,9 @@ msgstr "  -W, --wid                    Uzu ID de fenestro.\n"
 #: src/xitk/main.c:648
 #, c-format
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr "  -G, --geometry <WxH[+X+Y]>   Agordu geometrion de eliga fenestro (X"
-"-stilo).\n"
+msgstr ""
+"  -G, --geometry <WxH[+X+Y]>   Agordu geometrion de eliga fenestro (X-"
+"stilo).\n"
 
 #: src/xitk/main.c:649
 #, c-format
@@ -1344,10 +1361,10 @@ msgstr ""
 "(defaŭlte: loop). Modusoj estas:\n"
 "                                 'loop': interaciu tutan legoliston.\n"
 "                                 'repeat': ripetu nunan eron de legolisto.\n"
-"                                 'shuffle': elektu aleatore iun el ne ankoraŭ legitaj "
-"eroj de legolisto\n"
-"                                 'shuffle+': egale al 'shuffle', tamen "
-"ĝi plurfoje legas la legolisto nedifinite.\n"
+"                                 'shuffle': elektu aleatore iun el ne "
+"ankoraŭ legitaj eroj de legolisto\n"
+"                                 'shuffle+': egale al 'shuffle', tamen ĝi "
+"plurfoje legas la legolisto nedifinite.\n"
 
 #: src/xitk/main.c:658
 #, c-format
@@ -1359,7 +1376,8 @@ msgstr "      --skin-server-url <url>  Agordu url de servilo por etosoj.\n"
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
-"      --enqueue <mrl> ...      Atendovicigu MRL de plenumanta sesio (sesio 0)\n"
+"      --enqueue <mrl> ...      Atendovicigu MRL de plenumanta sesio (sesio "
+"0)\n"
 
 #: src/xitk/main.c:660
 #, c-format
@@ -1403,10 +1421,10 @@ msgstr ""
 "                    spu=c       elektu spu kanalon (<c>: 'next' aŭ 'prev'),\n"
 "                    volume=v    agordu laŭtecon,\n"
 "                    amp=v       agordu nivelon de amplifo,\n"
-"                    loop=m      agordu interacian moduson (<m>: 'none' 'loop' "
-"'repeat' 'shuffle' aŭ 'shuffle+'),\n"
-"                    get_speed   ĝi havigas valoron de rapideco (vidu manlibron por "
-"revenvaloroj).\n"
+"                    loop=m      agordu interacian moduson (<m>: 'none' "
+"'loop' 'repeat' 'shuffle' aŭ 'shuffle+'),\n"
+"                    get_speed   ĝi havigas valoron de rapideco (vidu "
+"manlibron por revenvaloroj).\n"
 "                    (playlist|pl)=p\n"
 "                                 <p> povas esti:\n"
 "                                   'clear'  vakigu legoliston,\n"
@@ -1414,9 +1432,12 @@ msgstr ""
 "                                   'prev'   legu antaŭan eron de legolisto,\n"
 "                                   'next'   legu sekvan eron de legolisto,\n"
 "                                   'last'   legu lastan eron de legolisto,\n"
-"                                   'load:s' ŝargu dosieron de legolisto <s>,\n"
-"                                   'stop'   fermu legon al la fino de nuna lego.\n"
-"                                   'cont'   daŭru legi al la fino de nuna lego.\n"
+"                                   'load:s' ŝargu dosieron de legolisto "
+"<s>,\n"
+"                                   'stop'   fermu legon al la fino de nuna "
+"lego.\n"
+"                                   'cont'   daŭru legi al la fino de nuna "
+"lego.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
 "                    fast4, stop, quit, fullscreen, eject.\n"
 
@@ -1451,7 +1472,8 @@ msgid ""
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 msgstr ""
-"  -r, --aspect-ratio <mode>    Agordu proporciojn de videa eligo. Modusoj estas:\n"
+"  -r, --aspect-ratio <mode>    Agordu proporciojn de videa eligo. Modusoj "
+"estas:\n"
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 
@@ -1462,7 +1484,8 @@ msgid ""
 "                               Slave is started with 'xine slave://address:"
 "port'\n"
 msgstr ""
-"      --broadcast-port <port>  Agordu pordon de xine-elsendilo (ĉefa flanko)\n"
+"      --broadcast-port <port>  Agordu pordon de xine-elsendilo (ĉefa "
+"flanko)\n"
 "                               Servantilo estas lanĉita per 'xine slave://"
 "adreso:pordo'\n"
 
@@ -1474,7 +1497,8 @@ msgstr "      --no-logo                Ne montru logogramon.\n"
 #: src/xitk/main.c:693
 #, c-format
 msgid "  -E, --no-reload              Don't reload old playlist.\n"
-msgstr "  -E, --no-reload              Ne ŝargu denove malnovajn legolistojn.\n"
+msgstr ""
+"  -E, --no-reload              Ne ŝargu denove malnovajn legolistojn.\n"
 
 #: src/xitk/main.c:694
 #, c-format
@@ -1485,16 +1509,16 @@ msgid ""
 "                               This option can be used more than one time.\n"
 msgstr ""
 "      --post <kromaĵo>[:parametro=valoro][,...][;...]\n"
-"                               Ŝargu unu aŭ pluraj postprocezada(j)n "
-"kromaĵo(j)n.\n"
+"                               Ŝargu unu aŭ pluraj postprocezada(j)n kromaĵo"
+"(j)n.\n"
 "                               Parametroj estas apartitaj per komo.\n"
 "                               Ĉi opcio estas uzebla plurfoje.\n"
 
 #: src/xitk/main.c:698
 #, c-format
 msgid "      --disable-post           Don't enable post plugin(s).\n"
-msgstr "      --disable-post           Ne ebligu postprocezada(j)n "
-"kromaĵo(j)n.\n"
+msgstr ""
+"      --disable-post           Ne ebligu postprocezada(j)n kromaĵo(j)n.\n"
 
 #: src/xitk/main.c:699
 #, c-format
@@ -1513,7 +1537,8 @@ msgstr ""
 #: src/xitk/main.c:701
 #, c-format
 msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
-msgstr "  -T, --tvout <backend>        Ŝanĝu al tvout subteno. Interfaco povas "
+msgstr ""
+"  -T, --tvout <backend>        Ŝanĝu al tvout subteno. Interfaco povas "
 "esti:\n"
 
 #: src/xitk/main.c:711
@@ -1524,7 +1549,8 @@ msgid ""
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
 msgstr ""
-"      --list-plugins [=speco]   Montru la liston de ĉiuj disponeblaj kromaĵoj,\n"
+"      --list-plugins [=speco]   Montru la liston de ĉiuj disponeblaj "
+"kromaĵoj,\n"
 "                               Akcesora <speco> povas esti:\n"
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
@@ -1541,7 +1567,8 @@ msgid ""
 msgstr ""
 "      --bug-report [=mrl]      Ebligu moduson de sencimigo:\n"
 "                                 Ĝi ebligas babilemecon, kunigas ĉiujn\n"
-"                                 eligaj mesaĝojn kaj skribas ilin en la dosiero\n"
+"                                 eligaj mesaĝojn kaj skribas ilin en la "
+"dosiero\n"
 "                                 BUG-REPORT.TXT.\n"
 "                                 Se <mrl> estas donita, xine legos la MRL\n"
 "                                 poste ĝi eliros (same al -pq).\n"
@@ -1623,19 +1650,19 @@ msgstr "ĉefo: ekzameno de aŭdozorgilo malsukcesis => neniu aŭda eligo\n"
 msgid "main: audio driver <%s> failed\n"
 msgstr "ĉefo: aŭdozorgilo <%s> malsukcesis\n"
 
-#: src/xitk/main.c:1117
+#: src/xitk/main.c:1118
 msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
 msgstr ""
-"*tamburado*, xine-biblioteko altiras vian atenton por liveri al vi gravan mesaĝon "
-" ;-):"
+"*tamburado*, xine-biblioteko altiras vian atenton por liveri al vi gravan "
+"mesaĝon  ;-):"
 
-#: src/xitk/main.c:1122
+#: src/xitk/main.c:1123
 msgid "No Information available."
 msgstr "Neniu informo disponebla."
 
-#: src/xitk/main.c:1128
+#: src/xitk/main.c:1129
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
@@ -1643,11 +1670,11 @@ msgstr ""
 "La gastiga komputilo, kiu vi provis ekkontakti, estas nekonata.\n"
 "Kontrolu validecon de specifita nomo de gastigilo."
 
-#: src/xitk/main.c:1136
+#: src/xitk/main.c:1137
 msgid "The device name you specified seems invalid."
 msgstr "La aparatonomo, kiu vi specifis, ŝajnas nevalida"
 
-#: src/xitk/main.c:1143
+#: src/xitk/main.c:1144
 msgid ""
 "The network looks unreachable.\n"
 "Check your network setup and/or the server name."
@@ -1655,7 +1682,7 @@ msgstr ""
 "La reto ŝajnas .\n"
 "Kontrolu viajn agordojn de reto kaj/aŭ nomon de servilo."
 
-#: src/xitk/main.c:1151
+#: src/xitk/main.c:1152
 msgid ""
 "The connection was refused.\n"
 "Check the host name."
@@ -1663,141 +1690,143 @@ msgstr ""
 "TLa konekto estis refuzata.\n"
 "Kontrolu la nomon de servilo."
 
-#: src/xitk/main.c:1158
+#: src/xitk/main.c:1159
 msgid "The specified file or mrl is not found. Please check it twice."
 msgstr "La specifita dosiero aŭ MRL ne estas trovita. Bonvolu kontroli denove."
 
-#: src/xitk/main.c:1165
+#: src/xitk/main.c:1166
 msgid ""
 "The source can't be read.\n"
 "Maybe you don't have enough rights for this, or source doesn't contain data "
 "(e.g: not disc in drive)."
 msgstr ""
 "Estas neeble legi fonton.\n"
-"Eble vi ne rajtas aŭ la fonto ne entenas datumojn "
-"(ekz.: neniu disko en drajvo)."
+"Eble vi ne rajtas aŭ la fonto ne entenas datumojn (ekz.: neniu disko en "
+"drajvo)."
 
-#: src/xitk/main.c:1174
+#: src/xitk/main.c:1175
 msgid "A problem occur while loading a library or a decoder"
 msgstr "Okazis problemo dum ŝargo de iu biblioteka dosiero aŭ iu malkodilo"
 
-#: src/xitk/main.c:1181
+#: src/xitk/main.c:1182
 msgid "The source seems encrypted, and can't be read."
 msgstr "La fonto ŝajnas ĉifrita kaj do estas neeble legi ĝin."
 
-#: src/xitk/main.c:1183
+#: src/xitk/main.c:1184
 msgid ""
 "\n"
 "Your DVD is probably crypted. According to your country laws, you can or "
 "can't install/use libdvdcss to be able to read this disc, which you bought."
 msgstr ""
 "\n"
-"Eble la DVD estas ĉifrita. Konforme al leĝoj de via lando, vi rajtas "
-"aŭ nerajtas instali/uzi libdvdcss por ebligi la legon de ĉi disko, kiun vi aĉetis."
+"Eble la DVD estas ĉifrita. Konforme al leĝoj de via lando, vi rajtas aŭ "
+"nerajtas instali/uzi libdvdcss por ebligi la legon de ĉi disko, kiun vi "
+"aĉetis."
 
-#: src/xitk/main.c:1198
+#: src/xitk/main.c:1199
 msgid "No Informations available."
 msgstr "Neniu informo disponebla."
 
-#: src/xitk/main.c:1203
+#: src/xitk/main.c:1204
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "use it."
 msgstr ""
-"La aŭdaparato estas nedisponebla. Bonvolu kontroli ke alia programo nune ne uzus "
-"ĝin."
+"La aŭdaparato estas nedisponebla. Bonvolu kontroli ke alia programo nune ne "
+"uzus ĝin."
 
-#: src/xitk/main.c:1208
+#: src/xitk/main.c:1209
 msgid "*sight*, unkown error."
 msgstr "*vido*, nekonata eraro."
 
-#: src/xitk/main.c:1359
+#: src/xitk/main.c:1360
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Estas necesa xine-biblioteko de versio 1.0.0, trovita %d.%d.%d.\n"
 
-#: src/xitk/main.c:1455
+#: src/xitk/main.c:1456
 #, c-format
 msgid "video driver id required for -V option\n"
 msgstr "ID de videozorgilo estas necesa por -V opcio\n"
 
-#: src/xitk/main.c:1464
+#: src/xitk/main.c:1465
 #, c-format
 msgid "audio driver id required for -A option\n"
 msgstr "ID de aŭdozorgilo estas necesa por -A opcio\n"
 
-#: src/xitk/main.c:1552
+#: src/xitk/main.c:1553
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "Malbona moduso de proporcio '%s', vidu xine --help\n"
 
-#: src/xitk/main.c:1616
+#: src/xitk/main.c:1617
 #, c-format
 msgid "Bad port number: %d\n"
 msgstr "Malbona numero de pordo: %d\n"
 
-#: src/xitk/main.c:1628
+#: src/xitk/main.c:1629
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Malbona geometrio '%s', vidu xine --help\n"
 
-#: src/xitk/main.c:1668
+#: src/xitk/main.c:1669
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Malbona interacia moduso '%s', vidu xine --help\n"
 
-#: src/xitk/main.c:1795
+#: src/xitk/main.c:1796
 #, c-format
 msgid "*** NOTE ***\n"
 msgstr "*** NOTU ***\n"
 
-#: src/xitk/main.c:1796
+#: src/xitk/main.c:1797
 #, c-format
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
-" Sencimiga moduso: Ĉiuj eligaj mesaĝoj estos aldonitaj en dosiero BUG-REPORT.TXT.\n"
+" Sencimiga moduso: Ĉiuj eligaj mesaĝoj estos aldonitaj en dosiero BUG-REPORT."
+"TXT.\n"
 
-#: src/xitk/main.c:1840
+#: src/xitk/main.c:1841
 #, c-format
 msgid "window id is required for -wid option\n"
 msgstr "Estas necesa ID de fenestro por -wid opcio\n"
 
-#: src/xitk/main.c:1847
+#: src/xitk/main.c:1848
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "nevalida argumento %d => eliro\n"
 
-#: src/xitk/main.c:1867
+#: src/xitk/main.c:1868
 #, c-format
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr "Vi devas specifi unu MRL por atendovicigi, almenaŭ!\n"
 
-#: src/xitk/main.c:1949
+#: src/xitk/main.c:1950
 msgid "Automatically reload old playlist"
 msgstr "Aŭtomate reŝargu malnovan legoliston"
 
-#: src/xitk/main.c:1950
+#: src/xitk/main.c:1951
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
-"Se ĝi estas ebligita kaj se vi ne specifas iun MRL en komandlinio, xine ŝargos "
-"aŭtomate la antaŭan legoliston."
+"Se ĝi estas ebligita kaj se vi ne specifas iun MRL en komandlinio, xine "
+"ŝargos aŭtomate la antaŭan legoliston."
 
-#: src/xitk/main.c:1965
+#: src/xitk/main.c:1966
 msgid "Subtitle autoloading"
 msgstr "Memŝargado de surskribaĵoj"
 
-#: src/xitk/main.c:1966
+#: src/xitk/main.c:1967
 msgid "Automatically load subtitles if they exist."
 msgstr "Ĝi aŭtomate ŝargas surkribaĵojn se ili ejzistas. "
 
-#: src/xitk/main.c:1974
+#: src/xitk/main.c:1975
 msgid "Enable deinterlacing by default"
 msgstr "Ebligu defaŭlte malplektadon"
 
-#: src/xitk/main.c:1975
+#: src/xitk/main.c:1976
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1805,7 +1834,7 @@ msgstr ""
 "Kromaĵo por malplektado estos ebligita dum starto. Progresivaj datumstrioj "
 "estas aŭtomate rekonitaj sen negativa influo sur performanco."
 
-#: src/xitk/main.c:2131
+#: src/xitk/main.c:2132
 msgid "Logo mrl"
 msgstr "Logoo MRL"
 
@@ -1843,7 +1872,7 @@ msgstr "MRL"
 msgid "Mediamark Mrl"
 msgstr "MRL de de plurmedia marko"
 
-#: src/xitk/mediamark.c:3317 src/xitk/menus.c:716 src/xitk/menus.c:1127
+#: src/xitk/mediamark.c:3317 src/xitk/menus.c:716 src/xitk/menus.c:1125
 msgid "Subtitle"
 msgstr "Surskribaĵoj"
 
@@ -1971,7 +2000,7 @@ msgstr "Legado/Pliigu Rapidon"
 msgid "Playback/Decrease Speed"
 msgstr "Legado/Malpliigu Rapidon"
 
-#: src/xitk/menus.c:525 src/xitk/menus.c:1225 src/xitk/panel.c:1474
+#: src/xitk/menus.c:525 src/xitk/menus.c:1221 src/xitk/panel.c:1474
 msgid "Playlist"
 msgstr "Legolisto"
 
@@ -2220,44 +2249,44 @@ msgstr "Surskribaĵoj/Kanalo/Aŭtomata"
 msgid "Add Mediamark"
 msgstr "Aldonu Plurmedian markon"
 
-#: src/xitk/menus.c:1069 src/xitk/menus.c:1145
+#: src/xitk/menus.c:1068 src/xitk/menus.c:1143
 msgid "Off"
 msgstr "Elkluda pos."
 
-#: src/xitk/menus.c:1076 src/xitk/menus.c:1151
+#: src/xitk/menus.c:1075 src/xitk/menus.c:1149
 msgid "Auto"
 msgstr "Aŭtomate"
 
-#: src/xitk/menus.c:1199 src/xitk/menus.c:1209
+#: src/xitk/menus.c:1196 src/xitk/menus.c:1205
 msgid "Scan"
 msgstr "Skanado"
 
-#: src/xitk/menus.c:1201 src/xitk/menus.c:1210 src/xitk/mrl_browser.c:287
+#: src/xitk/menus.c:1198 src/xitk/menus.c:1206 src/xitk/mrl_browser.c:287
 #: src/xitk/playlist.c:1202
 msgid "Add"
 msgstr "Aldonu"
 
-#: src/xitk/menus.c:1207
+#: src/xitk/menus.c:1203
 msgid "Play"
 msgstr "Legu/Ludu"
 
-#: src/xitk/menus.c:1214 src/xitk/menus.c:1251
+#: src/xitk/menus.c:1210 src/xitk/menus.c:1247
 msgid "Delete All"
 msgstr "Forigu ĉion"
 
-#: src/xitk/menus.c:1216
+#: src/xitk/menus.c:1212
 msgid "Move Up"
 msgstr "Movu Supren"
 
-#: src/xitk/menus.c:1217
+#: src/xitk/menus.c:1213
 msgid "Move Down"
 msgstr "Movu Suben"
 
-#: src/xitk/menus.c:1266
+#: src/xitk/menus.c:1261
 msgid "Reset video settings"
 msgstr "Reŝargu agordordojn de video"
 
-#: src/xitk/menus.c:1273
+#: src/xitk/menus.c:1268
 msgid "Video Control"
 msgstr "Videoregiloj"
 
@@ -2584,8 +2613,8 @@ msgid ""
 "Plugin (with optional parameters) to use when deinterlace is used (plugin "
 "separator is ';')."
 msgstr ""
-"Uzenda kromaĵo (kun akcesoraj parametroj) kiam malplektado estas uzata ("
-"disigilo de kromaĵo estas ';')."
+"Uzenda kromaĵo (kun akcesoraj parametroj) kiam malplektado estas uzata "
+"(disigilo de kromaĵo estas ';')."
 
 #: src/xitk/session.c:873
 #, c-format
@@ -2610,8 +2639,7 @@ msgstr "Neniu disponebla helpo"
 #: src/xitk/setup.c:896
 msgid ""
 "There is no configuration option available in this user experience level."
-msgstr ""
-"Neniu agordopcio estas disponebla en ĉi spertnivelo de uzanto."
+msgstr "Neniu agordopcio estas disponebla en ĉi spertnivelo de uzanto."
 
 #: src/xitk/setup.c:1094
 msgid "xine setup"
@@ -2681,8 +2709,8 @@ msgstr "Ŝargo de %s/%s malsukcesis. Elirante\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso "
-"'%s'.\n"
+"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso '%"
+"s'.\n"
 
 #: src/xitk/skins.c:663
 #, c-format
@@ -2965,21 +2993,21 @@ msgstr "Filmergrando"
 msgid "MPEG2"
 msgstr "MPEG2"
 
-#: src/xitk/videowin.c:317
+#: src/xitk/videowin.c:318
 #, c-format
 msgid "videowin: output driver cannot select a working visual\n"
 msgstr "videowin: eliga zorgilo ne eblas elekti plenumantan vidon\n"
 
-#: src/xitk/videowin.c:324
+#: src/xitk/videowin.c:325
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr "videowin: eliga zorgilo anstataŭas elektan vidon per vido id 0x%lx\n"
 
-#: src/xitk/videowin.c:546
+#: src/xitk/videowin.c:553
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Etendilo: ŝanĝo de reĝimlinio malsukcesis.\n"
 
-#: src/xitk/videowin.c:1569
+#: src/xitk/videowin.c:1576
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
@@ -2987,73 +3015,73 @@ msgstr ""
 "Uzendaj ekranoj por akiri tutekranege vidon en xinerama moduso. (ekzemple 0 "
 "2 3)"
 
-#: src/xitk/videowin.c:1570
+#: src/xitk/videowin.c:1577
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
 "Ekzemple, se vi volas vastigi ekranblokon sur ekrano 0, 2 kaj 3, enigu 0 2 3"
 
-#: src/xitk/videowin.c:1626
+#: src/xitk/videowin.c:1633
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "x koordinato por xinerama tutekranspeco (-8192 = memrekono)"
 
-#: src/xitk/videowin.c:1637
+#: src/xitk/videowin.c:1644
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "y koordinato por xinerama tutekranspeco (-8192 = memrekono)"
 
-#: src/xitk/videowin.c:1648
+#: src/xitk/videowin.c:1655
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "larĝo por xinerama tutekranspeco (-8192 = memrekono)"
 
-#: src/xitk/videowin.c:1659
+#: src/xitk/videowin.c:1666
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "alto por xinerama tutekranspeco (-8192 = memrekono)"
 
-#: src/xitk/videowin.c:1695
+#: src/xitk/videowin.c:1702
 msgid "xine Video Window"
 msgstr "Videofenestro de xine"
 
-#: src/xitk/videowin.c:1699
+#: src/xitk/videowin.c:1706
 msgid "xine Video Fullscreen Window"
 msgstr "Tutekrane Videofenestro de xine"
 
-#: src/xitk/videowin.c:1703
+#: src/xitk/videowin.c:1710
 msgid "xine Video Borderless Window"
 msgstr "Senranda Videofenestro de xine"
 
-#: src/xitk/videowin.c:1716
+#: src/xitk/videowin.c:1723
 #, c-format
 msgid "XAllocWMHints() failed\n"
 msgstr "XAllocWMHints() malsukcesis\n"
 
-#: src/xitk/videowin.c:1731
+#: src/xitk/videowin.c:1738
 msgid "New stream sizes resize output window"
 msgstr "Novaj grandoj de datumstrioj readaptas eligan fenestron"
 
-#: src/xitk/videowin.c:1741
+#: src/xitk/videowin.c:1748
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr "Duobla grando por etaj datumstrioj (tio necesas stream_resize_window)"
 
-#: src/xitk/videowin.c:1767
+#: src/xitk/videowin.c:1774
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "uzu XVidModeExtension kiam oni ŝangas al tutekrano"
 
-#: src/xitk/videowin.c:1788
+#: src/xitk/videowin.c:1795
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr "XF86VidMode Etendilo (%d.%d) estis rekonita, provu uzi ĝin.\n"
 
-#: src/xitk/videowin.c:1793
+#: src/xitk/videowin.c:1800
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr "XF86VidMode Etendilo: %d reĝimlinioj estis trovitaj.\n"
 
-#: src/xitk/videowin.c:1802
+#: src/xitk/videowin.c:1809
 #, c-format
 msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 msgstr "XF86VidModeModeLine %dx%d estas nevalida: ago rezignita.\n"
 
-#: src/xitk/videowin.c:1833
+#: src/xitk/videowin.c:1840
 #, c-format
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
@@ -3061,24 +3089,29 @@ msgstr ""
 "XF86VidMode Etendilo: estas neeble havi liston de disponeblaj reĝimlinioj. "
 "Ago malsukcesinta\n"
 
-#: src/xitk/videowin.c:1836
+#: src/xitk/videowin.c:1843
 #, c-format
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr "XF86VidMode Etendilo: preparado malsukcesis; ne uzu ĝin.\n"
 
-#: src/xitk/viewlog.c:261
+#: src/xitk/viewlog.c:266
 msgid "log info"
 msgstr "Pri protokoloj"
 
-#: src/xitk/viewlog.c:263
+#: src/xitk/viewlog.c:268
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Neniu ero de protokoloestas por protokola sesiono '%s'.\n"
 
-#: src/xitk/viewlog.c:395
+#: src/xitk/viewlog.c:400
 msgid "xine log viewer"
 msgstr "Vidigilo de protokolo de xine"
 
-#: src/xitk/viewlog.c:445
+#: src/xitk/viewlog.c:450
 msgid "Refresh"
 msgstr "Ĝisdatigu"
+
+#~ msgid "Use wm layer property to place window on top."
+#~ msgstr ""
+#~ "Ĝi uzas ecojn de tavolo de fenestradministrilo por lokigi la fenestro sur "
+#~ "la pinto."
