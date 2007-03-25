@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1109,8 +1109,13 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   free(encoded_text);
 
   if (width) *width       = xft_extents.xOff;
-  if (ascent) *ascent     = xtfs->font->ascent;
-  if (descent) *descent   = xtfs->font->descent;
+  /* Since Xft fonts have more top and bottom space rows than Xmb/Xcore fonts, */
+  /* we tweak ascent and descent to appear the same like Xmb/Xcore, so we get  */
+  /* unified vertical text positions. We must however be aware to eventually   */
+  /* reserve space for these rows when drawing the text.                       */
+  /* Following trick works for our font sizes 10...14.                         */
+  if (ascent) *ascent     = xtfs->font->ascent - (xtfs->font->ascent - 9) / 2;
+  if (descent) *descent   = xtfs->font->descent - (xtfs->font->descent - 0) / 2;
   if (lbearing) *lbearing = -xft_extents.x;
   if (rbearing) *rbearing = -xft_extents.x + xft_extents.width;
 #else
