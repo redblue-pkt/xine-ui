@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -54,7 +54,6 @@ static int progress_callback(void *userdata,
   int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
   
   osd_draw_bar(_("Download in progress"), 0, 100, percent, OSD_BAR_POS);
-  memset(&buffer, 0, sizeof(buffer));
   snprintf(buffer, sizeof(buffer), _("Download progress: %d%%."), percent);
   gGui->mrl_overrided = 3;
   panel_set_title(buffer);
@@ -87,7 +86,6 @@ static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 int network_download(const char *url, download_t *download) {
 #ifdef HAVE_CURL
   CURL        *curl;
-  CURLcode     res;
 
   pthread_mutex_lock(&gGui->download_mutex);
 
@@ -99,7 +97,6 @@ int network_download(const char *url, download_t *download) {
     
     memset(&error_buffer, 0, sizeof(error_buffer));
     
-    memset(&user_agent, 0, sizeof(user_agent));
     snprintf(user_agent, sizeof(user_agent), "User-Agent: xine/%s", VERSION);
     
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 
@@ -127,12 +124,16 @@ int network_download(const char *url, download_t *download) {
     
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer);
     
-    if((res = curl_easy_perform(curl)) != 0) {
+    if(curl_easy_perform(curl)) {
       download->error = strdup((strlen(error_buffer)) ? error_buffer : "Unknown error");
       download->status = 1;
     }
     
     curl_easy_cleanup(curl);
+  }
+  else {
+    download->error = strdup("Cannot initialize");
+    download->status = 1;
   }
   
   curl_global_cleanup();
