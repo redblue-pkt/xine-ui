@@ -2291,19 +2291,46 @@ void video_window_reset_ssaver(void) {
     }
     else 
 #endif
+    {
+      /* Reset the gnome screensaver. Look up the command in PATH only once to save time, */
+      /* assuming its location and permission will not change during run time of xine-ui. */
       {
-	if (access("/usr/bin/gnome-screensaver-command", X_OK) == 0) {
-	  if(fork() == 0) {
-	    execlp("gnome-screensaver-command", "--poke", NULL);
-	    exit(0);
-	  }
-	}
-	XLockDisplay(gGui->video_display);
-	XResetScreenSaver(gGui->video_display);
-	XUnlockDisplay(gGui->video_display);
-      }
-  }
+	static char *gssaver_args[] = { "gnome-screensaver-command", "--poke", NULL };
+	static char *gssaver_path   = NULL;
 
+	if(!gssaver_path) {
+	  char *path = getenv("PATH");
+
+	  if(!path)
+	    path = "/usr/local/bin:/usr/bin";
+	  do {
+	    char *p, pbuf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+	    int   plen;
+
+	    for(p = path; *path && *path != ':'; path++)
+	      ;
+	    if(p == path)
+	      plen = 1, p = ".";
+	    else
+	      plen = path - p;
+	    plen = snprintf(pbuf, sizeof(pbuf), "%.*s/%s", plen, p, gssaver_args[0]);
+	    if (plen <= -1 || plen >= sizeof(pbuf))
+	      gssaver_path = "";
+	    else
+	      gssaver_path = (access(pbuf, X_OK)) ? "" : strdup(pbuf);
+	  } while(!gssaver_path[0] && *path++);
+	}
+	if(gssaver_path[0] && (fork() == 0)) {
+	  execv(gssaver_path, gssaver_args);
+	  exit(0);
+	}
+      }
+
+      XLockDisplay(gGui->video_display);
+      XResetScreenSaver(gGui->video_display);
+      XUnlockDisplay(gGui->video_display);
+    }
+  }
 }
 
 void video_window_get_frame_size(int *w, int *h) {
