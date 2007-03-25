@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1518,14 +1518,13 @@ void xitk_xevent_notify(XEvent *event) {
 
 	case Expose:
 	  if (fx->widget_list) {
-	    XEvent xev = *event;
 
 	    XLOCK(gXitk->display);
 	    while(XCheckTypedWindowEvent(gXitk->display, fx->window, 
-					 Expose, &xev) == True);
+					 Expose, event) == True);
 	    XUNLOCK(gXitk->display);
 
-	    if(xev.xexpose.count == 0)
+	    if(event->xexpose.count == 0)
 	      xitk_paint_widget_list(fx->widget_list);
 	  }
 	  break;
