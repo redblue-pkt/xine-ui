@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -543,6 +543,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 
   itemw = xitk_get_widget_width(private_data->label_widget);
   itemw += xitk_get_widget_width(private_data->button_widget);
+  itemw -= 2; /* space for border */
 
   private_data->imlibdata                = c->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
@@ -750,7 +751,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     
     fs = xitk_font_load_font(c->imlibdata->x.disp, DEFAULT_FONT_10);
     xitk_font_set_font(fs, c->parent_wlist->gc);
-    height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
+    height = xitk_font_get_string_height(fs, " ") + 4;
     xitk_font_unload_font(fs);
 
 
@@ -763,7 +764,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(c->parent_wlist, &lbl,
-						       x, y, (width - height), (height + 4), DEFAULT_FONT_10)));
+						       x, y, (width - height), height, DEFAULT_FONT_10)));
     private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
     cb.skin_element_name = NULL;
@@ -774,7 +775,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
 			     (private_data->button_widget = 
 			      xitk_noskin_checkbox_create(c->parent_wlist, &cb,
 							  x + (width - height), y,
-							  (height + 4), (height + 4))));
+							  height, height)));
     private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
     if(lw)
@@ -784,8 +785,8 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     
     mywidget->x = x;
     mywidget->y = y;
-    mywidget->width = (width - height) + (height + 4);
-    mywidget->height = (height + 4);
+    mywidget->width = width;
+    mywidget->height = height;
     
     {
       xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->label_widget);
