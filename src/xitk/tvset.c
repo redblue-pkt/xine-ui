@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -40,13 +40,13 @@
 
 #include "frequencies.h"
 	
-#define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       310
+#define WINDOW_WIDTH    500
+#define WINDOW_HEIGHT   346
 
 extern gGui_t          *gGui;
 
 static char            *tvsetfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char            *lfontname         = "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*";
+static char            *lfontname         = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
 static char            *btnfontname       = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 typedef struct {
@@ -220,6 +220,8 @@ static void tvset_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       tvset_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
     break;
   }  
 }
@@ -313,14 +315,14 @@ void tvset_panel(void) {
   tvset = (_tvset_t *) xine_xmalloc(sizeof(_tvset_t));
   
   x = xine_config_register_num (gGui->xine, "gui.tvset_x", 
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.tvset_y",
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
@@ -329,7 +331,7 @@ void tvset_panel(void) {
   
   /* Create window */
   tvset->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
-						 _("TV/Analog Video parameters"), x, y,
+						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start((xitk_window_get_window(tvset->xwin)));
@@ -356,19 +358,19 @@ void tvset_panel(void) {
 	    bg->gc, 0, 0, width, height, 0, 0);
   XUnlockDisplay (gGui->display);
   
-  x = 5;
-  y = 35;
+  x = 15;
+  y = 34 - 6;
   
   draw_outter_frame(gGui->imlib_data, bg, _("General"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, (2 * 20) + 15 + 5);
+		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
   /* First Line */
-  x = 15;
+  x = 20;
   y += 15;
-  w = 130;
+  w = 139;
   draw_inner_frame(gGui->imlib_data, bg, _("Input: "), lfontname, 
-		    x - 5, y - 2, w + 10, 20 + 15);
+		   x, y, w, (20 + 22));
   XITK_WIDGET_INIT(&ib, gGui->imlib_data);
   ib.skin_element_name = NULL;
   ib.value             = 4;
@@ -379,7 +381,7 @@ void tvset_panel(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset->widget_list)), 
 			   (tvset->input = 
 			    xitk_noskin_intbox_create(tvset->widget_list, &ib,
-						     x, y, w, 20, NULL, NULL, NULL)));
+						      x + 10, y + 15, w - 20 + 1, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(tvset->input);
 
   for(i = 0; chanlists[i].name; i++) ;
@@ -389,10 +391,10 @@ void tvset_panel(void) {
     tvset->system_entries[i] = strdup(chanlists[i].name);
   tvset->system_entries[i] = NULL;
 
-  x += w + 15;
-  w = 150;
-  draw_inner_frame(gGui->imlib_data, bg, _("Broadcast system: "), lfontname, 
-		    x - 5, y - 2, w + 10, 20 + 15);
+  x += w + 5;
+  w = 155;
+  draw_inner_frame(gGui->imlib_data, bg, _("Broadcast System: "), lfontname, 
+		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
@@ -405,16 +407,17 @@ void tvset_panel(void) {
   xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
 		   (tvset->system = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
-					     x, y, w, NULL, NULL)));
+					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
+  xitk_set_widget_pos(tvset->system, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->system)) / 2);
   xitk_enable_and_show_widget(tvset->system);
 
   xitk_combo_set_select(tvset->system, 0);
   update_chann_entries(0);
 
-  x += w + 15;
-  w = 150;
+  x += w + 5;
+  w = 155;
   draw_inner_frame(gGui->imlib_data, bg, _("Channel: "), lfontname, 
-		    x - 5, y - 2, w + 10, 20 + 15);
+		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
@@ -427,20 +430,21 @@ void tvset_panel(void) {
   xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
 		   (tvset->chann = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
-					     x, y, w, NULL, NULL)));
+					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
+  xitk_set_widget_pos(tvset->chann, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->chann)) / 2);
   xitk_enable_and_show_widget(tvset->chann);
 
-  x = 5;
-  y += 45;
-  draw_outter_frame(gGui->imlib_data, bg, _("Standard"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, (2 * 20) + 15 + 5);
-
-
   x = 15;
+  y += ((20 + 22) + 5 + 2) + 3;
+  draw_outter_frame(gGui->imlib_data, bg, _("Standard"), btnfontname, 
+		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
+
+
+  x = 20;
   y += 15;
-  w = 130;
+  w = 139;
   draw_inner_frame(gGui->imlib_data, bg, _("Frame Rate: "), lfontname, 
-		    x - 5, y - 2, w + 10, 20 + 15);
+		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
   inp.skin_element_name = NULL;
@@ -451,7 +455,7 @@ void tvset_panel(void) {
   xitk_list_append_content (XITK_WIDGET_LIST_LIST(tvset->widget_list),
 	   (tvset->framerate = 
 	    xitk_noskin_inputtext_create(tvset->widget_list, &inp,
-					 x, y, w, 20,
+					 x + 10, y + 15, w - 20 + 1, 20,
 					 "Black", "Black", tvsetfontname)));
   xitk_enable_and_show_widget(tvset->framerate);
 
@@ -462,10 +466,10 @@ void tvset_panel(void) {
     tvset->vidstd_entries[i] = strdup(std_list[i].name);
   tvset->vidstd_entries[i] = NULL;
 
-  x += w + 15;
-  w = 150;
+  x += w + 5;
+  w = 155;
   draw_inner_frame(gGui->imlib_data, bg, _("Analog Standard: "), lfontname, 
-		    x - 5, y - 2, w + 10, 20 + 15);
+		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
@@ -478,28 +482,29 @@ void tvset_panel(void) {
   xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
 		   (tvset->vidstd = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
-					     x, y, w, NULL, NULL)));
+					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
+  xitk_set_widget_pos(tvset->vidstd, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->vidstd)) / 2);
   xitk_enable_and_show_widget(tvset->vidstd);
 
-  x = 5;
-  y += 45;
+  x = 15;
+  y += ((20 + 22) + 5 + 2) + 3;
   draw_outter_frame(gGui->imlib_data, bg, _("Frame Size"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, (2 * 20) + 15 + 5);
+		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
+
+
+  x = 20;
+  y += 15;
+  w = 139;
 
   x = 15;
-  y += 15;
-  w = 130;
-
-
-  x = 5;
-  y += 45;
+  y += ((20 + 22) + 5 + 2) + 3;
   draw_outter_frame(gGui->imlib_data, bg, _("MPEG2"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, (2 * 20) + 15 + 5);
+		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
-  x = 15;
+  x = 20;
   y += 15;
-  w = 130;
+  w = 139;
 
   /*  */
   y = WINDOW_HEIGHT - (23 + 15);
@@ -519,7 +524,7 @@ void tvset_panel(void) {
 					   "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(tvset->update);
  
-  x = WINDOW_WIDTH - 115;
+  x = WINDOW_WIDTH - (100 + 15);
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");

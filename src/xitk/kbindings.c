@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -83,10 +83,9 @@ typedef struct {
 static _kbedit_t    *kbedit = NULL;
 static char         *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 static char         *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
-#define FONT_HEIGHT_MODEL "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
 
-#define WINDOW_WIDTH        520
-#define WINDOW_HEIGHT       440
+#define WINDOW_WIDTH        530
+#define WINDOW_HEIGHT       456
 #define MAX_DISP_ENTRIES    11
 
 /*
@@ -1536,8 +1535,6 @@ static void kbedit_create_browser_entries(void) {
     char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i]);
     char  shortcut[32];
         
-    memset(&buf, 0, sizeof(buf));
-    memset(&shortcut, 0, sizeof(shortcut));
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', (sc ? sc : "VOID"), ']');
     
     if(kbedit->kbt->entry[i]->is_alias)
@@ -1918,12 +1915,12 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   {
     int x, y, w, h;
 
-    
     xitk_get_window_position(gGui->display, 
 			     (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
         
     xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
-					    _("Event receiver window"), x, y, w, h);
+					    _("Event Receiver Window:  Press keyboard keys to bind..."),
+					    x, y, w, h);
 
     set_window_states_start((xitk_window_get_window(xwin)));
   }
@@ -1936,10 +1933,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   try_to_set_input_focus(xitk_window_get_window(xwin));
 
   do {
-    XMaskEvent(gGui->display, ButtonReleaseMask | KeyReleaseMask, &xev);
-    XMapRaised(gGui->display, (xitk_window_get_window(xwin)));
+    /* Although only release events are evaluated, we must also grab the corresponding press */
+    /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
+    XMaskEvent(gGui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
   } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
-	   xev.xmap.event != xitk_window_get_window(xwin));
+	   xev.xany.window != xitk_window_get_window(xwin));
   
   (void) xitk_get_key_modifier(&xev, &mod);
   kbindings_convert_modifier(mod, &modifier);
@@ -1970,21 +1968,20 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
     kbedit_display_kbinding(action, kbe);
     
-    memset(&shortcut, 0, sizeof(shortcut));
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
     
-    /* Ask if uses want/wont store new shorcut */
+    /* Ask if user wants to store new shortcut */
     xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Accept?"),
 					kbedit_accept_yes, 
 					kbedit_accept_no, 
 					(void *) kbe, 400, ALIGN_CENTER,
-					_("Store %s as\n'%s' key binding ?."),
+					_("Store %s as\n'%s' key binding ?"),
 					shortcut, kbedit->ksel->comment);
   }
   else {
     /* error, redundant */
     if(redundant >= 0) {
-      xine_error(_("This key bindings is redundant with action:\n\"%s\".\n"),
+      xine_error(_("This key binding is redundant with action:\n\"%s\".\n"),
 		 kbedit->kbt->entry[redundant]->comment);
     }
   }
@@ -2004,6 +2001,8 @@ static void kbedit_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       kbedit_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
     break;
 
   case KeyRelease: {
@@ -2049,7 +2048,7 @@ void kbedit_reparent(void) {
  *
  */
 void kbedit_window(void) {
-  int                        x, y;
+  int                        x, y, y1;
   GC                         gc;
   xitk_pixmap_t             *bg;
   xitk_labelbutton_widget_t  lb;
@@ -2057,19 +2056,19 @@ void kbedit_window(void) {
   xitk_browser_widget_t      br;
   xitk_checkbox_widget_t     cb;
   int                        btnw = 80;
-  int                        lbear, rbear, wid, asc, des;
+  int                        fontheight;
   xitk_font_t               *fs;
   xitk_widget_t             *w;
   
   x = xine_config_register_num(gGui->xine, "gui.kbedit_x", 
-			       100, 
+			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_DEB,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   y = xine_config_register_num(gGui->xine, "gui.kbedit_y",
-			       100,
+			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_DEB,
@@ -2081,7 +2080,7 @@ void kbedit_window(void) {
   kbedit->kbt           = _kbindings_duplicate_kbindings(gGui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;
   kbedit->xwin          = xitk_window_create_dialog_window(gGui->imlib_data,
-							   _("key binding editor"), 
+							   _("Key Binding Editor"),
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   set_window_states_start((xitk_window_get_window(kbedit->xwin)));
 
@@ -2105,18 +2104,19 @@ void kbedit_window(void) {
   XUnlockDisplay (gGui->display);
   
   x = 15;
-  y = 35;
+  y = 34;
   
   draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
-			     (WINDOW_WIDTH - 30), (20 * (MAX_DISP_ENTRIES + 1)) - 2);
+			     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
 
-  y = y + (20 * (MAX_DISP_ENTRIES + 1)) + 45;
+  y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
+  y1 = y; /* remember for later */
   draw_outter_frame(gGui->imlib_data, bg, 
-		    _("Binding action"), fontname, 
+		    _("Binding Action"), fontname,
 		    x, y, 
 		    (WINDOW_WIDTH - 30), 45);
 
-  y += 50;
+  y += 45 + 3;
   draw_outter_frame(gGui->imlib_data, bg, 
 		    _("Key"), fontname, 
 		    x, y, 
@@ -2135,7 +2135,7 @@ void kbedit_window(void) {
 
   kbedit_create_browser_entries();
 
-  y = 35;
+  y = 34;
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   
@@ -2154,8 +2154,8 @@ void kbedit_window(void) {
 			   (kbedit->browser = 
 			    xitk_noskin_browser_create(kbedit->widget_list, &br,
 						       (XITK_WIDGET_LIST_GC(kbedit->widget_list)),
-						       x + 1, y + 1, 
-						       WINDOW_WIDTH - 30 - 2 - 16, 20,
+						       x + 5, y + 5,
+						       WINDOW_WIDTH - (30 + 10 + 16), 20,
 						       16, br_fontname)));
   xitk_enable_and_show_widget(kbedit->browser);
 
@@ -2164,7 +2164,7 @@ void kbedit_window(void) {
 			   (const char* const*) kbedit->entries, 
 			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
 
-  y = (WINDOW_HEIGHT - 160);
+  y = y1 - 30 + 4;
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   
@@ -2181,7 +2181,7 @@ void kbedit_window(void) {
 						   "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(kbedit->alias);
   
-  x += btnw + 2;
+  x += btnw + 4;
 
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Edit");
@@ -2196,7 +2196,7 @@ void kbedit_window(void) {
 						   "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(kbedit->edit);
   
-  x += btnw + 2;
+  x += btnw + 4;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
@@ -2211,7 +2211,7 @@ void kbedit_window(void) {
 						   "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(kbedit->delete);
 
-  x += btnw + 2;
+  x += btnw + 4;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Save");
@@ -2226,7 +2226,7 @@ void kbedit_window(void) {
 						   "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(kbedit->save);
 
-  x += btnw + 2;
+  x += btnw + 4;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Reset");
@@ -2240,7 +2240,7 @@ void kbedit_window(void) {
 				       "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(w);
 
-  x += btnw + 2;
+  x += btnw + 4;
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Done");
@@ -2256,29 +2256,30 @@ void kbedit_window(void) {
   xitk_enable_and_show_widget(kbedit->done);
 
   x = 15;
-  y += 30;
   
   XITK_WIDGET_INIT(&l, gGui->imlib_data);
 
   fs = xitk_font_load_font(gGui->display, fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-  xitk_font_string_extent(fs, FONT_HEIGHT_MODEL, &lbear, &rbear, &wid, &asc, &des);
+  fontheight = xitk_font_get_string_height(fs, " ");
   xitk_font_unload_font(fs);
   
-  y += (asc+des) + 2;
+  y = y1 + (45 / 2);                /* Checkbox                     */
+  y1 = y - ((fontheight - 10) / 2); /* Text, v-centered to ckeckbox */
 
   l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
   l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
-  l.label             = FONT_HEIGHT_MODEL;
+  l.label             = "Binding Action";
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-		   (kbedit->comment = 
-		    xitk_noskin_label_create(kbedit->widget_list, &l, x + 1 + 10, y, 
-					     WINDOW_WIDTH - 50 - 2, (asc+des), fontname)));
+			   (kbedit->comment =
+			    xitk_noskin_label_create(kbedit->widget_list, &l, x + 10, y1,
+						     WINDOW_WIDTH - 50 - 2, fontheight, fontname)));
   xitk_enable_and_show_widget(kbedit->comment);
 
-  y += 50;
+  y += 45 + 3;
+  y1 += 45 + 3;
 
   l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
   l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
@@ -2286,8 +2287,9 @@ void kbedit_window(void) {
   l.label             = "THE Key";
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-		   (kbedit->key = xitk_noskin_label_create(kbedit->widget_list, &l, x + 10, y, 
-							   100, (asc+des), fontname)));
+			   (kbedit->key =
+			    xitk_noskin_label_create(kbedit->widget_list, &l, x + 10, y1,
+						     100, fontheight, fontname)));
   xitk_enable_and_show_widget(kbedit->key);
   
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
@@ -2312,8 +2314,8 @@ void kbedit_window(void) {
   l.label             = _("ctrl");
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y - (((asc+des) - 10)>>1), 
-				 40, (asc+des), fontname)));
+   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
+				 40, fontheight, fontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2336,8 +2338,8 @@ void kbedit_window(void) {
   l.label             = _("meta");
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y - (((asc+des) - 10)>>1), 
-				 40, (asc+des), fontname)));
+   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
+				 40, fontheight, fontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2360,8 +2362,8 @@ void kbedit_window(void) {
   l.label             = _("mod3");
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y - (((asc+des) - 10)>>1), 
-				 40, (asc+des), fontname)));
+   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
+				 40, fontheight, fontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2384,8 +2386,8 @@ void kbedit_window(void) {
   l.label             = _("mod4");
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y - (((asc+des) - 10)>>1), 
-				 40, (asc+des), fontname)));
+   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
+				 40, fontheight, fontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2408,12 +2410,12 @@ void kbedit_window(void) {
   l.label             = _("mod5");
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
-   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y - (((asc+des) - 10)>>1), 
-				 40, (asc+des), fontname)));
+   (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
+				 40, fontheight, fontname)));
   xitk_enable_and_show_widget(w);
 
   x = 15;
-  y += 30;
+  y = WINDOW_HEIGHT - (23 + 15);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Grab");
@@ -2470,7 +2472,7 @@ int main(int argc, char **argv) {
   int   i;
 
   gGui              = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
-  gGui->keymap_file = (char *) xine_xmalloc(XITK_PATH_MAX + XITK_NAME_MAX);
+  gGui->keymap_file = (char *) xine_xmalloc(XITK_PATH_MAX + XITK_NAME_MAX + 2);
   sprintf(gGui->keymap_file, "%s/%s/%s", xine_get_homedir(), ".xine", "keymap");
   
   if((gGui->kbindings = kbindings_init_kbinding())) {

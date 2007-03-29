@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -50,8 +50,14 @@ typedef struct {
   } skin;
 } slx_entry_t;
 
-#define WINDOW_WIDTH  400
-#define WINDOW_HEIGHT 380
+#define WINDOW_WIDTH      630
+#define WINDOW_HEIGHT     446
+
+#define PREVIEW_WIDTH     (WINDOW_WIDTH - 30)
+#define PREVIEW_HEIGHT    220
+#define PREVIEW_RATIO     ((float)PREVIEW_WIDTH / (float)PREVIEW_HEIGHT)
+
+#define MAX_DISP_ENTRIES  5
 
 #define NORMAL_CURS   0
 #define WAIT_CURS     1
@@ -62,8 +68,6 @@ typedef struct {
   xitk_widget_t        *browser;
   
   xitk_image_t         *preview_image;
-  int                   preview_width;
-  int                   preview_height;
 
   xitk_widget_list_t   *widget_list;
   char                **entries;
@@ -99,11 +103,10 @@ static void get_available_skins_from(char *path) {
     return;
 
   if((pdir = opendir(path)) != NULL) {
-    char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-    char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+    char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     while((pdirent = readdir(pdir)) != NULL) {
-      memset(&fullfilename, 0, sizeof(fullfilename));
       snprintf(fullfilename, sizeof(fullfilename), "%s/%s", path, pdirent->d_name);
       
       if((is_a_dir(fullfilename))
@@ -114,7 +117,6 @@ static void get_available_skins_from(char *path) {
 	/*
 	 * Check if a skinconfig file exist
 	 */
-	memset(&skcfgname, 0, sizeof(skcfgname));
 	snprintf(skcfgname, sizeof(skcfgname), "%s/%s", fullfilename, "skinconfig");
 	if(is_a_file(skcfgname)) {
 	  
@@ -145,14 +147,13 @@ static void get_available_skins_from(char *path) {
 }
 
 /*
- * Grab all available skins from $HOME/.xineskins/ and XINE_SKINDIR locations.
+ * Grab all available skins from $HOME/.xine/skins and XINE_SKINDIR locations.
  */
 static void looking_for_available_skins(void) {
-  char    buf[XITK_NAME_MAX];
+  char    buf[XITK_PATH_MAX + 1];
 
   skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
-  memset(&buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf), "%s%s", xine_get_homedir(), "/.xine/skins");
   
   get_available_skins_from(buf);
@@ -169,7 +170,6 @@ static char *skin_get_skindir(void) {
   xine_cfg_entry_t     entry;
   char                *skin;
   
-  memset(&tmp, 0, sizeof(tmp));
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
   if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry))
     skin = (char *) skins_avail[entry.num_value]->skin;
@@ -186,10 +186,9 @@ static char *skin_get_skindir(void) {
  */
 static char *skin_get_configfile(void) {
   static char          tmp[2048];
-  xine_cfg_entry_t  entry;
+  xine_cfg_entry_t     entry;
   char                *skin;
   
-  memset(&tmp, 0, sizeof(tmp));
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
   if (xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)) 
     skin = (char *) skins_avail[entry.num_value]->skin;
@@ -251,7 +250,7 @@ static skins_locations_t *get_skin_location(char *skin) {
  * skin file. There is fallback if that fail.
  */
 static int change_skin(skins_locations_t *sk) {
-  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char                *old_skin;
   skins_locations_t   *sks = sk;
   int                  twice = 0, twice_load = 0;
@@ -269,7 +268,6 @@ static int change_skin(skins_locations_t *sk) {
   nskin_config = xitk_skin_init_config(gGui->imlib_data);
 
  __reload_skin:
-  memset(&buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf), "%s/%s", sks->pathname, sks->skin);
 
   if(!xitk_skin_load_config(nskin_config, buf, "skinconfig")) {
@@ -388,7 +386,7 @@ void select_new_skin(int selected) {
 const char *skin_get_current_skin_dir(void) {
   xine_cfg_entry_t     entry;
   int                  skin_num = 0;
-  static char          skin_dir[XINE_PATH_MAX + XINE_NAME_MAX];
+  static char          skin_dir[XINE_PATH_MAX + XINE_NAME_MAX + 2];
   
   if((skins_avail == NULL) || (skins_avail_num == 0)) {
     fprintf(stderr, _("No available skin found. Say goodbye.\n"));
@@ -441,7 +439,7 @@ void preinit_skins_support(void) {
 
 void init_skins_support(void) {
   skins_locations_t   *sk;
-  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   int                  twice = 0, twice_load = 0;
   int                  skin_num;
   char                *skin_anim;
@@ -469,7 +467,6 @@ void init_skins_support(void) {
   } 
   
  __reload_skin:
-  memset(&buf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
   snprintf(buf, sizeof(buf), "%s/%s", sk->pathname, sk->skin);
   
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
@@ -678,7 +675,8 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
   if(skdloader) {
     xitk_unregister_event_handler(&skdloader->widget_key);
     
-    xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
+    if(skdloader->preview_image)
+      xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
     
     xitk_destroy_widgets(skdloader->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
@@ -722,8 +720,7 @@ static void download_update_blank_preview(void) {
 		 (xitk_get_pixel_color_from_rgb(gGui->imlib_data, 52, 52, 52)));
   XFillRectangle(gGui->display, 
 		 (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)),
-		 (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 10, 30, 
-		  skdloader->preview_image->image->width, skdloader->preview_image->image->height);
+		 (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 15, 34, PREVIEW_WIDTH, PREVIEW_HEIGHT);
   XUnlockDisplay(gGui->display);
 
 }
@@ -731,10 +728,8 @@ static void download_update_blank_preview(void) {
 static void redraw_preview(void) {
   int  x, y;
   
-  download_update_blank_preview();
-  
-  y = 30 + ((skdloader->preview_image->image->height - skdloader->preview_height) >> 1);
-  x = 10 + ((skdloader->preview_image->image->width - skdloader->preview_width) >> 1);
+  x = 15 + ((PREVIEW_WIDTH - skdloader->preview_image->image->width) >> 1);
+  y = 34 + ((PREVIEW_HEIGHT - skdloader->preview_image->image->height) >> 1);
   
   if(skdloader->preview_image->mask && skdloader->preview_image->mask->pixmap) {
     XLockDisplay (gGui->display);
@@ -746,18 +741,18 @@ static void redraw_preview(void) {
   XLockDisplay (gGui->display);
   XCopyArea (gGui->display, skdloader->preview_image->image->pixmap, 
 	     (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 0, 0,
-	     skdloader->preview_width, skdloader->preview_height, x, y);
+	     skdloader->preview_image->image->width, skdloader->preview_image->image->height, x, y);
+  XSetClipMask(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)), None);
   XSync(gGui->display, False);
   XUnlockDisplay (gGui->display);
 }
 
 static void download_update_preview(void) {
 
-  if(skdloader->preview_image->image && skdloader->preview_image->image->pixmap)
-    redraw_preview();
-  else
-    download_update_blank_preview();
+  download_update_blank_preview();
 
+  if(skdloader->preview_image && skdloader->preview_image->image && skdloader->preview_image->image->pixmap)
+    redraw_preview();
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
@@ -776,14 +771,15 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
   if((network_download(skdloader->slxs[selected]->skin.preview, &download))) {
     char          *skpname;
     FILE          *fd;
-    char           tmpfile[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char           tmpfile[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     skpname = strrchr(skdloader->slxs[selected]->skin.preview, '/');
 
-    if(*skpname == '/')
+    if(skpname)
       skpname++;
+    else
+      skpname = skdloader->slxs[selected]->skin.preview;
     
-    memset(&tmpfile, 0, sizeof(tmpfile));
     snprintf(tmpfile, sizeof(tmpfile), "%s%d%s", "/tmp/", (unsigned int)time(NULL), skpname);
     
     if((fd = fopen(tmpfile, "w+b")) != NULL) {
@@ -799,36 +795,38 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 
       if(img) {
 	xitk_image_t *ximg, *oimg = skdloader->preview_image;
-	int           owidth, oheight;
+	int           preview_width, preview_height;
 	float         ratio;
 	
-	owidth = skdloader->preview_image->width;
-	oheight = skdloader->preview_image->height;
-	skdloader->preview_width = img->rgb_width;
-	skdloader->preview_height = img->rgb_height;
+	preview_width = img->rgb_width;
+	preview_height = img->rgb_height;
 	
-	ratio = ((float)skdloader->preview_width / (float)skdloader->preview_height);
+	ratio = ((float)preview_width / (float)preview_height);
 
-	if(skdloader->preview_width >= skdloader->preview_height) {
-	  skdloader->preview_width = owidth;
-	  skdloader->preview_height = abs((float)skdloader->preview_width / ratio);
+	if(ratio > PREVIEW_RATIO) {
+	  if(preview_width > PREVIEW_WIDTH) {
+	    preview_width = PREVIEW_WIDTH;
+	    preview_height = (float)preview_width / ratio;
+	  }
 	}
 	else {
-	  skdloader->preview_height = oheight;
-	  skdloader->preview_width = abs((float)skdloader->preview_height / ratio);
+	  if(preview_height > PREVIEW_HEIGHT) {
+	    preview_height = PREVIEW_HEIGHT;
+	    preview_width = (float)preview_height * ratio;
+	  }
 	}
 	
 	/* Rescale preview */
 	XLockDisplay(gGui->display);
-	Imlib_render(gGui->imlib_data, img, skdloader->preview_width, skdloader->preview_height);
+	Imlib_render(gGui->imlib_data, img, preview_width, preview_height);
 	XUnlockDisplay(gGui->display);
 	
 	ximg = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-	ximg->width  = owidth;
-	ximg->height = oheight;
+	ximg->width  = preview_width;
+	ximg->height = preview_height;
 	
-	ximg->image = xitk_image_create_xitk_pixmap(gGui->imlib_data, owidth, oheight);
-	ximg->mask = xitk_image_create_xitk_mask_pixmap(gGui->imlib_data, owidth, oheight);
+	ximg->image = xitk_image_create_xitk_pixmap(gGui->imlib_data, preview_width, preview_height);
+	ximg->mask = xitk_image_create_xitk_mask_pixmap(gGui->imlib_data, preview_width, preview_height);
 	
 	XLockDisplay(gGui->display);
 	ximg->image->pixmap = Imlib_copy_image(gGui->imlib_data, img);
@@ -838,7 +836,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 	
 	skdloader->preview_image = ximg;
 	
-	xitk_image_free_image(gGui->imlib_data, &oimg);
+	if(oimg)
+	  xitk_image_free_image(gGui->imlib_data, &oimg);
 
 	download_update_preview();
       }
@@ -847,7 +846,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
     }
   }
   else {
-    xine_error(_("Unable to download '%s': %s\n"), 
+    xine_error(_("Unable to download '%s': %s"), 
 	       skdloader->slxs[selected]->skin.preview, download.error);
     download_update_blank_preview();
   }
@@ -878,13 +877,16 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
     char *filename;
 
     filename = strrchr(skdloader->slxs[selected]->skin.href, '/');
-    if(strlen(filename) >= 2) {
-      struct stat  st;
-      char         skindir[XITK_PATH_MAX];
-      
+
+    if(filename)
       filename++;
+    else
+      filename = skdloader->slxs[selected]->skin.href;
+
+    if(filename[0]) {
+      struct stat  st;
+      char         skindir[XITK_PATH_MAX + 1];
       
-      memset(&skindir, 0, sizeof(skindir));
       snprintf(skindir, sizeof(skindir), "%s%s", xine_get_homedir(), "/.xine/skins");
       
       /*
@@ -897,36 +899,30 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	xine_error(_("Unable to create '%s' directory: %s."), skindir, strerror(errno));
       }
       else {
-	char   tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+	char   tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 	FILE  *fd;
 	
-	memset(&tmpskin, 0, sizeof(tmpskin));
 	snprintf(tmpskin, sizeof(tmpskin), "%s%d%s", "/tmp/", (unsigned int)time(NULL), filename);
 	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char      buffer[2048];
-	  char      fskin_path[XITK_PATH_MAX];
+	  char      fskin_path[XITK_PATH_MAX + 1];
 	  int       i, skin_found = -1;
 
 	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
 
-	  memset(&buffer, 0, sizeof(buffer));
-	  
 	  snprintf(buffer, sizeof(buffer), "%s %s %s %s %s", "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 
-	  memset(&buffer, 0, sizeof(buffer));
 	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
 
-	  memset(&fskin_path, 0, sizeof(fskin_path));
 	  snprintf(fskin_path, sizeof(fskin_path), "%s/%s/%s", skindir, buffer, "doinst.sh");
 	  if(is_a_file(fskin_path)) {
 	    char doinst[2048];
 
-	    memset(&doinst, 0, sizeof(doinst));
 	    snprintf(doinst, sizeof(doinst), "%s %s/%s %s", "cd", skindir, buffer, "&& ./doinst.sh");
 	    xine_system(0, doinst);
 	  }
@@ -978,7 +974,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
     }
   }
   else
-    xine_error(_("Unable to download '%s': %s\n"), 
+    xine_error(_("Unable to download '%s': %s"), 
 	       skdloader->slxs[selected]->skin.href, download.error);
 
   download_set_cursor_state(NORMAL_CURS);
@@ -996,53 +992,15 @@ static void download_skin_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case Expose:
-    redraw_preview();
+    if(event->xexpose.count == 0)
+      download_update_preview();
     break;
-    
-  case KeyPress: {
-    KeySym         mkey;
-    int            modifier;
-    
-    xitk_get_key_modifier(event, &modifier);
-    mkey = xitk_get_key_pressed(event);
-    
-    switch(mkey) {
-      
-    case XK_Down:
-    case XK_Next:
-      {
-	xitk_widget_t *w;
-	
-	w = xitk_get_focused_widget(skdloader->widget_list);
-	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	  if(mkey == XK_Down)
-	    xitk_browser_step_up(skdloader->browser, NULL);
-	  else
-	    xitk_browser_page_up(skdloader->browser, NULL);
-	}
-      }
-      break;
-      
-    case XK_Up:
-    case XK_Prior:
-      {
-	xitk_widget_t *w;
-	
-	w = xitk_get_focused_widget(skdloader->widget_list);
-	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	  if(mkey == XK_Up)
-	    xitk_browser_step_down(skdloader->browser, NULL);
-	  else
-	    xitk_browser_page_down(skdloader->browser, NULL);
-	}
-      }
-      break;
-      
-    case XK_Escape:
+
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
       download_skin_exit(NULL, NULL);
-      break;
-    }
-  }
+    else
+      gui_handle_event(event, data);
     break;
 
   }
@@ -1060,6 +1018,15 @@ void download_skin(char *url) {
   int                   x, y, w, h, width, height;
   xitk_widget_t        *widget;
 
+  if(skdloader)
+  {
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, xitk_window_get_window(skdloader->xwin));
+    XSetInputFocus(gGui->display, xitk_window_get_window(skdloader->xwin), RevertToParent, CurrentTime);
+    XUnlockDisplay(gGui->display);
+    return;
+  }
+
   w = 300;
   h = 50;
   XLockDisplay(gGui->display);
@@ -1067,9 +1034,9 @@ void download_skin(char *url) {
   y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (h >> 1);
   XUnlockDisplay(gGui->display);
   
-  xwin = xitk_window_dialog_button_free_with_width(gGui->imlib_data, _("Be Patient..."), 
+  xwin = xitk_window_dialog_button_free_with_width(gGui->imlib_data, _("Be patient..."),
   						   w, ALIGN_CENTER, 
-  						   _("Retrieve skin list from %s"), url);
+						   _("Retrieving skin list from %s"), url);
   
   while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(xwin)))
     xine_usec_sleep(5000);
@@ -1083,7 +1050,7 @@ void download_skin(char *url) {
   layer_above_video(xitk_window_get_window(xwin));
   
   if((slxs = skins_get_slx_entries(url)) != NULL) {
-    char                      *fontname    = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+    char                      *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
     char                      *btnfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
     int                        i;
     xitk_browser_widget_t      br;
@@ -1149,20 +1116,21 @@ void download_skin(char *url) {
       
       skdloader->entries[i] = strdup(slxs[i]->name);
       i++;
-      skdloader->entries[i] = NULL;
     }
+    skdloader->entries[i] = NULL;
     
     skdloader->num = i;
 
-    skdloader->preview_image = xitk_image_create_image(gGui->imlib_data, WINDOW_WIDTH - 20, 180);
+    skdloader->preview_image = NULL;
     
-    y = WINDOW_HEIGHT - (5 * 20) - (23 + 15 + 15 + 12);
+    x = 15;
+    y = 34 + PREVIEW_HEIGHT + 14;
 
     br.arrow_up.skin_element_name    = NULL;
     br.slider.skin_element_name      = NULL;
     br.arrow_dn.skin_element_name    = NULL;
     br.browser.skin_element_name     = NULL;
-    br.browser.max_displayed_entries = 5;
+    br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
     br.browser.num_entries           = skdloader->num;
     br.browser.entries               = (const char *const *)skdloader->entries;
     br.callback                      = download_skin_preview;
@@ -1173,15 +1141,16 @@ void download_skin(char *url) {
 			     (skdloader->browser = 
 			      xitk_noskin_browser_create(skdloader->widget_list, &br,
 							 (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 
-							 10, y, 
-							 WINDOW_WIDTH - (20 + 10) , 20, 12, fontname)));
+							 x + 5, y + 5,
+							 WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname)));
     
     xitk_browser_update_list(skdloader->browser, 
     			     (const char *const *)skdloader->entries, NULL, skdloader->num, 0);
     
     xitk_enable_and_show_widget(skdloader->browser);
     
-    draw_rectangular_inner_box(gGui->imlib_data, bg, 8, y - 2, (WINDOW_WIDTH - 20) + 5, (5 * 20) + 10 + 5);
+    draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+			       (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
     
     xitk_window_change_background(gGui->imlib_data, skdloader->xwin, bg->pixmap, width, height);
     xitk_image_destroy_xitk_pixmap(bg);
@@ -1202,7 +1171,7 @@ void download_skin(char *url) {
 						      "Black", "Black", "White", btnfontname)));
     xitk_enable_and_show_widget(widget);
 
-    x = WINDOW_WIDTH - 115;
+    x = WINDOW_WIDTH - (100 + 15);
     
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Cancel");

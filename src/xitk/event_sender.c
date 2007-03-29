@@ -38,8 +38,8 @@
 
 #include "common.h"
 
-#define WINDOW_WIDTH        250
-#define WINDOW_HEIGHT       222
+#define WINDOW_WIDTH    250
+#define WINDOW_HEIGHT   221
 
 extern gGui_t          *gGui;
 
@@ -409,14 +409,14 @@ void event_sender_panel(void) {
   eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
   
   eventer->x = xine_config_register_num (gGui->xine, "gui.eventer_x", 
-					 100,
+					 80,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,
 					 CONFIG_LEVEL_DEB,
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   eventer->y = xine_config_register_num (gGui->xine, "gui.eventer_y",
-					 100,
+					 80,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,
 					 CONFIG_LEVEL_DEB,
@@ -449,8 +449,8 @@ void event_sender_panel(void) {
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  x = 70 + 15 + 5;
-  y = /* 23 +  23 + 11*/ 5 + 23 + 11;
+  x = 80 + 5 + 5;
+  y = 5 + 23 * 3 + 5 - 40;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Up");
@@ -539,13 +539,12 @@ void event_sender_panel(void) {
 					   eventerfontname)));
   xitk_enable_and_show_widget(eventer->navigator.down);
 
-  x = 23 * 2 + 5 + 8;
+  x = 23 * 2 + 5 + (80 - 23 * 3) / 2 + 1; /* (+1 to round up) */
   y = 5 + 23 * 3 + 5 + 40 + 5;
 
   for(i = 9; i >= 0; i--) {
     char number[2];
     
-    memset(&number, 0, sizeof(number));
     snprintf(number, sizeof(number), "%d", i);
 
     lb.button_type       = CLICK_BUTTON;
@@ -582,7 +581,6 @@ void event_sender_panel(void) {
     
     i = 10;
     
-    memset(&number, 0, sizeof(number));
     snprintf(number, sizeof(number), "+ %d", i);
     
     lb.button_type       = CLICK_BUTTON;
@@ -653,7 +651,7 @@ void event_sender_panel(void) {
   menu_items_dvd[6]     = _("Part");
 
   x = 5;
-  y = 5/* 23 */;
+  y = 5;
 
   for(i = 0; i < 7; i++) {
     lb.button_type       = CLICK_BUTTON;

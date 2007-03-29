@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -44,8 +44,8 @@ extern gGui_t              *gGui;
 static char                *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
 static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH        580
-#define WINDOW_HEIGHT       480
+#define WINDOW_WIDTH        630
+#define WINDOW_HEIGHT       473
 #define MAX_DISP_ENTRIES    17
         
 typedef struct {
@@ -68,6 +68,8 @@ typedef struct {
 } _viewlog_t;
 
 static _viewlog_t    *viewlog = NULL;
+
+static int            th; /* Tabs height */
 
 /*
  * Leaving setup panel, release memory.
@@ -169,14 +171,14 @@ static void viewlog_paint_widgets(void) {
 static void viewlog_clear_tab(void) {
   xitk_image_t *im;
   
-  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
-			       (WINDOW_HEIGHT - (51 + 57) + 1) - 5);
+  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 30),
+			       (MAX_DISP_ENTRIES * 20 + 16 + 10));
   
   draw_outter(gGui->imlib_data, im->image, im->width, im->height);
   
   XLockDisplay(gGui->display);
   XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(viewlog->xwin)),
-	    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 20, 51);
+	    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + th));
   XUnlockDisplay(gGui->display);
   
   xitk_image_free_image(gGui->imlib_data, &im);
@@ -324,7 +326,10 @@ static void viewlog_create_tabs(void) {
   tab.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(viewlog->widget_list)),
     (viewlog->tabs = 
-     xitk_noskin_tabs_create(viewlog->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
+     xitk_noskin_tabs_create(viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname)));
+
+  th = xitk_get_widget_height(viewlog->tabs) - 1;
+
   xitk_enable_and_show_widget(viewlog->tabs);
 
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -334,8 +339,8 @@ static void viewlog_create_tabs(void) {
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   XUnlockDisplay(gGui->display);
   
-  draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)) - 5);
+  draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
+			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_change_background(gGui->imlib_data, viewlog->xwin, bg->pixmap, 
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -357,6 +362,8 @@ static void viewlog_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       viewlog_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
     break;
     
   }
@@ -381,14 +388,14 @@ void viewlog_panel(void) {
   viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
 
   x = xine_config_register_num (gGui->xine, "gui.viewlog_x", 
-				100, 
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.viewlog_y", 
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
@@ -397,7 +404,7 @@ void viewlog_panel(void) {
 
   /* Create window */
   viewlog->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
-						   _("xine log viewer"), 
+						   _("xine Log Viewer"),
 						   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start((xitk_window_get_window(viewlog->xwin)));
@@ -431,9 +438,10 @@ void viewlog_panel(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
    (viewlog->browser_widget = 
     xitk_noskin_browser_create(viewlog->widget_list, &br,
-			       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 25, 58, 
-			       WINDOW_WIDTH - (50 + 16), 20,
+			       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + th) + 5,
+			       WINDOW_WIDTH - (30 + 10 + 16), 20,
 			       16, br_fontname)));
+
   xitk_enable_and_show_widget(viewlog->browser_widget);
 
   xitk_browser_set_alignment(viewlog->browser_widget, ALIGN_LEFT);
@@ -443,8 +451,8 @@ void viewlog_panel(void) {
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  x = ((WINDOW_WIDTH / 2) - 100) / 2;
-  y = WINDOW_HEIGHT - 40;
+  y = WINDOW_HEIGHT - (23 + 15);
+  x = 15;
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Refresh");
@@ -459,7 +467,7 @@ void viewlog_panel(void) {
 				       "Black", "Black", "White", tabsfontname)));
   xitk_enable_and_show_widget(w);
 
-  x += (WINDOW_WIDTH / 2);
+  x = WINDOW_WIDTH - (100 + 15);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");

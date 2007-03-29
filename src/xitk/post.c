@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2005 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -41,18 +41,18 @@ extern gGui_t    *gGui;
 
 #define DEFAULT_DEINTERLACER "tvtime:method=LinearBlend,cheap_mode=1,pulldown=0,use_progressive_frame_flag=1"
 
-#define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       500
+#define WINDOW_WIDTH        530
+#define WINDOW_HEIGHT       503
 
-#define FRAME_WIDTH         (WINDOW_WIDTH - 40)
+#define FRAME_WIDTH         (WINDOW_WIDTH - 50)
 #define FRAME_HEIGHT        80
 
 #define HELP_WINDOW_WIDTH   400
-#define HELP_WINDOW_HEIGHT  300
+#define HELP_WINDOW_HEIGHT  402
 
 #define MAX_DISPLAY_FILTERS 5
 
-#define MAX_DISP_ENTRIES    11
+#define MAX_DISP_ENTRIES    15
 #define BROWSER_LINE_WIDTH  55
 
 #define DISABLE_ME(widget)                                                                      \
@@ -451,37 +451,35 @@ static void _pplugin_show_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
   if(pobj) {
 
     if(pobj->frame)
-      xitk_set_widget_pos(pobj->frame, 10, pobj->y - 5);
+      xitk_set_widget_pos(pobj->frame, pobj->x, pobj->y);
     
     if(pobj->plugins)
-      xitk_set_widget_pos(pobj->plugins, pobj->x + 30, pobj->y + 2);
+      xitk_set_widget_pos(pobj->plugins, pobj->x + 26 + 6, pobj->y + 5 + (20 - xitk_get_widget_height(pobj->plugins)) / 2);
     
     if(pobj->properties)
-      xitk_set_widget_pos(pobj->properties, pobj->x + 200, pobj->y + 2);
+      xitk_set_widget_pos(pobj->properties, pobj->x + 26 + 196, pobj->y + 5 + (20 - xitk_get_widget_height(pobj->properties)) / 2);
     
     if(pobj->help)
-      xitk_set_widget_pos(pobj->help, pobj->x + 390, pobj->y);
+      xitk_set_widget_pos(pobj->help, pobj->x + 26 + 386, pobj->y + 5);
 
     if(pobj->comment)
-      xitk_set_widget_pos(pobj->comment, pobj->x + 30, (pobj->y + 27));
+      xitk_set_widget_pos(pobj->comment, pobj->x + 26 + 6, pobj->y + 28 + 4);
     
     if(pobj->value)
-      xitk_set_widget_pos(pobj->value, pobj->x + 30, pobj->y + 50);
+      xitk_set_widget_pos(pobj->value, pobj->x + 26 + 6, pobj->y + (FRAME_HEIGHT - 5 + 1) - (20 + xitk_get_widget_height(pobj->value)) / 2);
 
     if(pobj->up)
-      xitk_set_widget_pos(pobj->up, pobj->x, pobj->y);
+      xitk_set_widget_pos(pobj->up, pobj->x + 5, pobj->y + 5);
 
     if(pobj->down)
-      xitk_set_widget_pos(pobj->down, pobj->x, pobj->y + (FRAME_HEIGHT - 26));
+      xitk_set_widget_pos(pobj->down, pobj->x + 5, pobj->y + (FRAME_HEIGHT - 16 - 5));
     
     ENABLE_ME(pobj->frame);
     ENABLE_ME(pobj->plugins);
     ENABLE_ME(pobj->properties);
     ENABLE_ME(pobj->value);
     ENABLE_ME(pobj->comment);
-
-    if(pobj->help)
-      ENABLE_ME(pobj->help);
+    ENABLE_ME(pobj->help);
     
     if((!_pplugin_is_first_filter(pp_wrapper, pobj)) && (xitk_combo_get_current_selected(pobj->plugins)))
       ENABLE_ME(pobj->up);
@@ -509,10 +507,10 @@ static void _pplugin_paint_widgets(_pp_wrapper_t *pp_wrapper) {
       _pplugin_hide_obj(pp_wrapper->pplugin->post_objects[i]);
     
     x = 15;
-    y = -45;
+    y = 34 - (FRAME_HEIGHT + 4);
     
     for(i = pp_wrapper->pplugin->first_displayed; i < last; i++) {
-      y += 20 + 5 + 20 + 5 + 23 + 10;
+      y += FRAME_HEIGHT + 4;
       pp_wrapper->pplugin->post_objects[i]->x = x;
       pp_wrapper->pplugin->post_objects[i]->y = y;
       _pplugin_show_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
@@ -657,19 +655,11 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
   
   if(pobj) {
     xitk_label_widget_t   lb;
-    int                   w, width;
     char                  buffer[2048];
-    xitk_font_t          *fs;
 
-    memset(&buffer, 0, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description) 
 	     ? pobj->param->description : _("No description available"));
 
-    fs = xitk_font_load_font(gGui->display, boldfontname);
-    xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
-    width = xitk_font_get_string_length(fs, buffer);
-    xitk_font_unload_font(fs);
-    
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
     lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
     lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
@@ -679,16 +669,11 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
     lb.userdata            = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
      (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
-					       pobj->x, (pobj->y + 25), 
-					       width + 10, 20, boldfontname)));
-
-    w = xitk_get_widget_width(pobj->comment);
-    w += 5;
+					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, boldfontname)));
 
     switch(pobj->param->type) {
     case POST_PARAM_TYPE_INT:
       {
-	
 	if(pobj->param->enum_values) {
 	  xitk_combo_widget_t         cmb;
 
@@ -701,10 +686,8 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  cmb.callback          = _pplugin_set_param_int;
 	  cmb.userdata          = pobj;
 	  xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
-	   (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
-						   &cmb, 
-						   pobj->x + w, pobj->y + 25, 
-						   180, NULL, NULL)));
+	   (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, &cmb,
+						   0, 0, 365, NULL, NULL)));
 
 	  xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
 	}
@@ -719,9 +702,8 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  ib.callback          = _pplugin_set_param_int;
 	  ib.userdata          = pobj;
 	  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
-	   (pobj->value = xitk_noskin_intbox_create(pp_wrapper->pplugin->widget_list, &ib, 
-						    pobj->x + w, pobj->y + 25, 
-						    50, 20, NULL, NULL, NULL)));
+	   (pobj->value = xitk_noskin_intbox_create(pp_wrapper->pplugin->widget_list, &ib,
+						    0, 0, 50, 20, NULL, NULL, NULL)));
 	}
       }
       break;
@@ -738,9 +720,8 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	ib.callback          = _pplugin_set_param_double;
 	ib.userdata          = pobj;
 	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
-	 (pobj->value = xitk_noskin_doublebox_create(pp_wrapper->pplugin->widget_list, &ib, 
-						     pobj->x + w, pobj->y + 25, 
-						     100, 20, NULL, NULL, NULL)));
+	 (pobj->value = xitk_noskin_doublebox_create(pp_wrapper->pplugin->widget_list, &ib,
+						     0, 0, 100, 20, NULL, NULL, NULL)));
       }
       break;
       
@@ -756,9 +737,8 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	inp.callback          = _pplugin_set_param_char;
 	inp.userdata          = pobj;
 	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
-	 (pobj->value = xitk_noskin_inputtext_create(pp_wrapper->pplugin->widget_list, &inp, 
-						     pobj->x + w, pobj->y + 25, 
-						     180, 20,
+	 (pobj->value = xitk_noskin_inputtext_create(pp_wrapper->pplugin->widget_list, &inp,
+						     0, 0, 365, 20,
 						     "Black", "Black", fontname)));
       }
       break;
@@ -776,10 +756,8 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	cmb.callback          = _pplugin_set_param_stringlist;
 	cmb.userdata          = pobj;
 	xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
-	 (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
-						 &cmb, 
-						 pobj->x + w, pobj->y + 25, 
-						 180, NULL, NULL)));
+	 (pobj->value = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, &cmb,
+						 0, 0, 365, NULL, NULL)));
 	
 	xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
       }
@@ -795,7 +773,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	cb.userdata          = pobj;
 	xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
 	  (pobj->value = xitk_noskin_checkbox_create(pp_wrapper->pplugin->widget_list, &cb,
-						     pobj->x + w, pobj->y + 25, 15, 15)));
+						     0, 0, 12, 12)));
 	xitk_checkbox_set_state(pobj->value, 
 				(*(int *)(pobj->param_data + pobj->param->offset)));  
       }
@@ -925,8 +903,8 @@ static void _pplugin_destroy_base_obj(_pp_wrapper_t *pp_wrapper, post_object_t *
     
     pp_wrapper->pplugin->object_num--;
     
-    pp_wrapper->pplugin->x = 5;
-    pp_wrapper->pplugin->y -= 20 + 5 + 20 + 5 + 23 + 10;
+    pp_wrapper->pplugin->x = 15;
+    pp_wrapper->pplugin->y -= FRAME_HEIGHT + 4;
   }
 }
 
@@ -1025,6 +1003,24 @@ static void _applugin_close_help(xitk_widget_t *w, void *data) {
   _pplugin_close_help(&app_wrapper, w, data);
 }
 
+static void _pplugin_help_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void *data) {
+
+  if(event->type == KeyPress) {
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      _pplugin_close_help(pp_wrapper, NULL, NULL);
+    else
+      gui_handle_event(event, data);
+  }
+}
+
+static void _vpplugin_help_handle_event(XEvent *event, void *data) {
+  _pplugin_help_handle_event(&vpp_wrapper, event, data);
+}
+
+static void _applugin_help_handle_event(XEvent *event, void *data) {
+  _pplugin_help_handle_event(&app_wrapper, event, data);
+}
+
 static int __line_wrap(char *s, int pos, int line_size)
 {
   int word_size = 0;
@@ -1050,14 +1046,14 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
   if(!pobj->api) {
     if(pp_wrapper->pplugin->help_running)
-      _pplugin_close_help(pp_wrapper, NULL,NULL);
+      _pplugin_close_help(pp_wrapper, NULL, NULL);
     return;
   }
   
   /* create help window if needed */
 
   if( !pp_wrapper->pplugin->help_running ) {
-    x = y = 100;
+    x = y = 80;
     pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
                                                                     _("Plugin Help"), x, y,
                                                                     HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
@@ -1085,7 +1081,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
     lb.button_type       = CLICK_BUTTON;
-    lb.label             = _("Ok");
+    lb.label             = _("Close");
     lb.align             = ALIGN_CENTER;
     lb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_close_help : _applugin_close_help;
     lb.state_callback    = NULL;
@@ -1093,7 +1089,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     lb.skin_element_name = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)), 
      (w = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->help_widget_list, 
-  				       &lb, 150, 270, 100, 23,
+				       &lb, HELP_WINDOW_WIDTH - (100 + 15), HELP_WINDOW_HEIGHT - (23 + 15), 100, 23,
   				       "Black", "Black", "White", btnfontname)));
     xitk_enable_and_show_widget(w);
   
@@ -1113,7 +1109,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)), 
      (pp_wrapper->pplugin->help_browser = 
       xitk_noskin_browser_create(pp_wrapper->pplugin->help_widget_list, &br,
-  			       (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)), 15, 25, 
+			       (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)), 15, 34,
   			       HELP_WINDOW_WIDTH - (30 + 16), 20,
   			       16, br_fontname)));
   }
@@ -1174,7 +1170,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   
     pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
                                                                        (xitk_window_get_window(pp_wrapper->pplugin->helpwin)),
-                                                                       NULL,
+								       (pp_wrapper == &vpp_wrapper) ? _vpplugin_help_handle_event : _applugin_help_handle_event,
                                                                        NULL,
                                                                        NULL,
                                                                        pp_wrapper->pplugin->help_widget_list,
@@ -1213,8 +1209,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
      (pobj->properties = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
 						  &cmb, 
-						  pobj->x + 180, pobj->y, 
-						  150, NULL, NULL)));
+						  0, 0, 175, NULL, NULL)));
     
     xitk_combo_set_select(pobj->properties, 0);
     xitk_combo_callback_exec(pobj->properties);
@@ -1231,10 +1226,8 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
       lb.skin_element_name = NULL;
       xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
 			       (pobj->help = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
-									    &lb, pobj->x + 390, pobj->y, 50, 20,
+									    &lb, 0, 0, 63, 20,
 									    "Black", "Black", "White", btnfontname)));
-      xitk_show_widget(pobj->help);
-      xitk_enable_widget(pobj->help);
     }
   }
   else {
@@ -1249,8 +1242,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     lb.userdata            = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
      (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
-					       pobj->x, (pobj->y + 25), 
-					       FRAME_WIDTH - 50, 20, boldfontname)));
+					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, boldfontname)));
     
     pobj->properties = NULL;
   }
@@ -1271,8 +1263,8 @@ static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, 
     else {
       _pplugin_destroy_base_obj(pp_wrapper, pobj);
       
-      pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
-      pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
+      pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 1));
+      pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = NULL;
       
       if(!xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
 	xitk_enable_widget(pp_wrapper->pplugin->new_filter);
@@ -1316,7 +1308,6 @@ static void _applugin_select_filter(xitk_widget_t *w, void *data, int select) {
 
 static void _pplugin_move_up(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
-  post_object_t *pobj_tmp;
   post_object_t **ppobj = pp_wrapper->pplugin->post_objects;
 
   _pplugin_unwire(pp_wrapper);
@@ -1324,9 +1315,8 @@ static void _pplugin_move_up(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *
   while(*ppobj != pobj)
     ppobj++;
   
-  pobj_tmp = *--ppobj;
-  *ppobj   = pobj;
-  *++ppobj = pobj_tmp;
+  *ppobj       = *(ppobj - 1);
+  *(ppobj - 1) = pobj;
   
   _pplugin_rewire(pp_wrapper);
   _pplugin_paint_widgets(pp_wrapper);
@@ -1342,7 +1332,6 @@ static void _applugin_move_up(xitk_widget_t *w, void *data) {
 
 static void _pplugin_move_down(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
-  post_object_t *pobj_tmp;
   post_object_t **ppobj = pp_wrapper->pplugin->post_objects;
 
   _pplugin_unwire(pp_wrapper);
@@ -1350,9 +1339,8 @@ static void _pplugin_move_down(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   while(*ppobj != pobj)
     ppobj++;
   
-  pobj_tmp = *(ppobj + 1);
-  *ppobj   = pobj_tmp;
-  *++ppobj = pobj;
+  *ppobj       = *(ppobj + 1);
+  *(ppobj + 1) = pobj;
   
   _pplugin_rewire(pp_wrapper);
   _pplugin_paint_widgets(pp_wrapper);
@@ -1374,7 +1362,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   xitk_button_widget_t  b;
   
   pp_wrapper->pplugin->x = 15;
-  pp_wrapper->pplugin->y += 20 + 5 + 20 + 5 + 23 + 10;
+  pp_wrapper->pplugin->y += FRAME_HEIGHT + 4;
   
   xitk_disable_widget(pp_wrapper->pplugin->new_filter);
 
@@ -1386,7 +1374,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->y = pp_wrapper->pplugin->y;
   pp_wrapper->pplugin->object_num++;
 
-  image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH, FRAME_HEIGHT);
+  image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
   XLockDisplay(gGui->display);
   XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
@@ -1397,29 +1385,29 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   XUnlockDisplay(gGui->display);
 
   /* Some decorations */
-  draw_outter_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_outter_frame(gGui->imlib_data, image->image, NULL, NULL,
 		    0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-  draw_outter_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_rectangular_outter_box_light(gGui->imlib_data, image->image,
+		    27, 28, FRAME_WIDTH - 27 - 5, 1);
+  draw_rectangular_outter_box_light(gGui->imlib_data, image->image,
 		    26, 5, 1, FRAME_HEIGHT - 10);
-  draw_outter_frame(gGui->imlib_data, image->image, NULL, boldfontname,
-		    27, 28, FRAME_WIDTH - 40, 1);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_inner_frame(gGui->imlib_data, image->image, NULL, NULL,
 		    5, 5, 16, 16);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
 		    5, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
 		    10, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
 		    15, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
 		    20, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
+  draw_inner_frame(gGui->imlib_data, image->image, NULL, NULL,
 		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
   XITK_WIDGET_INIT(&im, gGui->imlib_data);
   im.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
-   (pobj->frame = xitk_noskin_image_create(pp_wrapper->pplugin->widget_list, &im, image, 10, pobj->y - 5)));
+   (pobj->frame = xitk_noskin_image_create(pp_wrapper->pplugin->widget_list, &im, image, pobj->x - 5, pobj->y - 5)));
   DISABLE_ME(pobj->frame);
   
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
@@ -1432,7 +1420,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   cmb.userdata          = pobj;
   xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
    (pobj->plugins = xitk_noskin_combo_create(pp_wrapper->pplugin->widget_list, 
-					     &cmb, pobj->x + 20, pobj->y, 150, NULL, NULL)));
+					     &cmb, 0, 0, 175, NULL, NULL)));
   DISABLE_ME(pobj->plugins);
   
   xitk_combo_set_select(pobj->plugins, 0);
@@ -1446,7 +1434,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
     b.userdata          = pobj;
     xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
      (pobj->up = xitk_noskin_button_create(pp_wrapper->pplugin->widget_list, &b, 
-					   pobj->x, pobj->y, 17, 17)));
+					   0, 0, 17, 17)));
     DISABLE_ME(pobj->up);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->up)) != NULL)
@@ -1457,7 +1445,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
     b.userdata          = pobj;
     xitk_list_append_content(XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list), 
      (pobj->down = xitk_noskin_button_create(pp_wrapper->pplugin->widget_list, &b, 
-					     pobj->x, pobj->y + (FRAME_HEIGHT - 26), 17, 17)));
+					     0, 0, 17, 17)));
     DISABLE_ME(pobj->down);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->down)) != NULL)
@@ -1739,7 +1727,7 @@ static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void
     break;
 
   case KeyPress:
-    if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
+    {
       KeySym         mkey;
       int            modifier;
       
@@ -1749,48 +1737,52 @@ static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void
       switch(mkey) {
 	
       case XK_Up:
-	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
+	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
 	  xitk_slider_make_step(pp_wrapper->pplugin->slider);
 	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+	  return;
 	}
 	break;
 	
       case XK_Down:
-	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) { 
+	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
+	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
 	  xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
 	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+	  return;
 	}
 	break;
 	
-	
       case XK_Next:
-	{
+	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
 	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
 	  
 	  pos = max - (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
 	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos >= 0) ? pos : 0);
 	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+	  return;
 	}
 	break;
 	
       case XK_Prior:
-	{
+	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
 	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
 	  
 	  pos = max - (pp_wrapper->pplugin->first_displayed - MAX_DISPLAY_FILTERS);
 	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos <= max) ? pos : max);
 	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+	  return;
 	}
 	break;
 	
       case XK_Escape:
 	pplugin_exit(pp_wrapper, NULL, NULL);
-	break;
-
+	return;
       }
+      gui_handle_event(event, data);
     }
     break;
-
   }
 }
 
@@ -1981,14 +1973,14 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->help_text       = NULL;
   
   x = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", 
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y",
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
@@ -2036,8 +2028,9 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   sl.motion_userdata          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
    (pp_wrapper->pplugin->slider = xitk_noskin_slider_create(pp_wrapper->pplugin->widget_list, &sl,
-						(WINDOW_WIDTH - (16 + 10)), 33, 
-						16, (WINDOW_HEIGHT - 88), XITK_VSLIDER)));
+							    (WINDOW_WIDTH - (16 + 15)), 34,
+							    16, (MAX_DISPLAY_FILTERS * (FRAME_HEIGHT + 4) - 4),
+							    XITK_VSLIDER)));
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
@@ -2051,11 +2044,11 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
    (pp_wrapper->pplugin->new_filter = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
-							 &lb, x, y, 100, 23,
-							 "Black", "Black", "White", btnfontname)));
+								     &lb, x, y, 100, 23,
+								     "Black", "Black", "White", btnfontname)));
   xitk_show_widget(pp_wrapper->pplugin->new_filter);
 
-  x += 115;
+  x += (100 + 15);
 
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Enable");
@@ -2066,14 +2059,14 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
    (pp_wrapper->pplugin->enable = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
-						     &lb, x, y, 100, 23,
-						     "Black", "Black", "White", btnfontname)));
+								 &lb, x, y, 100, 23,
+								 "Black", "Black", "White", btnfontname)));
 
   xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gGui->post_video_enable : gGui->post_audio_enable);
   xitk_enable_and_show_widget(pp_wrapper->pplugin->enable);
 
   /* IMPLEMENT ME
-  x += 115;
+  x += (100 + 15);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Save");
@@ -2084,15 +2077,15 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
    (w = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
-							 &lb, x, y, 100, 23,
-							 "Black", "Black", "White", btnfontname)));
+				       &lb, x, y, 100, 23,
+				       "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(w);
   */
 
-  x = WINDOW_WIDTH - 115;
+  x = WINDOW_WIDTH - (100 + 15);
   
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Ok");
+  lb.label             = _("OK");
   lb.align             = ALIGN_CENTER;
   lb.callback          = (pp_wrapper == &vpp_wrapper) ? vpplugin_exit : applugin_exit; 
   lb.state_callback    = NULL;
@@ -2106,8 +2099,8 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 
   _pplugin_get_plugins(pp_wrapper);
   
-  pp_wrapper->pplugin->x = 0;
-  pp_wrapper->pplugin->y = -45;
+  pp_wrapper->pplugin->x = 15;
+  pp_wrapper->pplugin->y = 34 - (FRAME_HEIGHT + 4);
   
   if((pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements : gGui->post_audio_elements)
     _pplugin_rebuild_filters(pp_wrapper);

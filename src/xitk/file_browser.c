@@ -43,7 +43,8 @@
 #include "common.h"
 
 #define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       391
+#define WINDOW_HEIGHT       390
+#define MAX_DISP_ENTRIES    10
 
 #define MAXFILES            65535
 
@@ -81,40 +82,40 @@ typedef struct {
 
 static filebrowser_filter_t __fb_filters[] = {
   { NULL, "*"                                                                      },
- /* subtitles */
-  { NULL, ".sub .srt .asc .smi .ssa .txt"                                          },
+  /* subtitles */
+  { NULL, ".sub .srt .asc .smi .ssa .txt "                                         },
   /* playlists */
   { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "                         },
   { "*.4xm", ".4xm "                                                               },
   { "*.ac3", ".ac3 "                                                               },
-  { "*.aif, *.aiff,", ".aif .aiff "                                                },
+  { "*.aif, *.aiff", ".aif .aiff "                                                 },
   {"*.asf, *.wmv, *.wma, *.wvx, *.wax", ".asf .wmv .wma .wvx .wax "                },
   { "*.aud", ".aud "                                                               },
   { "*.avi", ".avi "                                                               },
-  { "*.cin,", ".cin "                                                              },
-  { "*.cpk, *.cak, *.film,", ".cpk .cak .film "                                    },
+  { "*.cin", ".cin "                                                               },
+  { "*.cpk, *.cak, *.film", ".cpk .cak .film "                                     },
   { "*.dv, *.dif", ".dv .dif "                                                     },
-  { "*.fli, *.flc,", ".fli .flc "                                                  },
+  { "*.fli, *.flc", ".fli .flc "                                                   },
   { "*.mp3, *.mp2, *.mpa, *.mpega", ".mp3 .mp2 .mpa .mpega "                       },
   { "*.mjpg", ".mjpg "                                                             },
-  { "*.mov, *.qt, *.mp4,", ".mov .qt .mp4 "                                        },
+  { "*.mov, *.qt, *.mp4", ".mov .qt .mp4 "                                         },
   { "*.mpg, *.mpeg", ".mpg .mpeg "                                                 },
   { "*.mpv", ".mpv "                                                               },
   { "*.mve, *.mv8", ".mve .mv8 "                                                   },
   { "*.nsf", ".nsf "                                                               },
   { "*.nsv", ".nsv "                                                               },
-  { "*.ogg, *.ogm, *.spx,", ".ogg .ogm .spx "                                      },
+  { "*.ogg, *.ogm, *.spx", ".ogg .ogm .spx "                                       },
   { "*.pes", ".pes "                                                               },
-  { "*.png, *.mng,", ".png .mng "                                                  },
+  { "*.png, *.mng", ".png .mng "                                                   },
   { "*.pva", ".pva "                                                               },
   { "*.ra", ".ra "                                                                 },
   { "*.rm, *.ram", ".rm .ram "                                                     },
   { "*.roq", ".roq "                                                               },
-  { "*.str, *.iki, *.ik2, *.dps, *.dat, *.xa1, *.xa2, *.xas, *.xap, *.xa,",
+  { "*.str, *.iki, *.ik2, *.dps, *.dat, *.xa1, *.xa2, *.xas, *.xap, *.xa",
     ".str .iki .ik2 .dps .dat .xa1 .xa2 .xas .xap .xa "                            },
   { "*.snd, *.au", ".snd .au "                                                     },
-  { "*.ts, *.m2t, *.trp,", ".ts .m2t .trp "                                        },
-  { "*.vqa,", ".vqa "                                                              },
+  { "*.ts, *.m2t, *.trp", ".ts .m2t .trp "                                         },
+  { "*.vqa", ".vqa "                                                               },
   { "*.vob", ".vob "                                                               },
   { "*.voc", ".voc "                                                               },
   { "*.vox", ".vox "                                                               },
@@ -289,6 +290,8 @@ static void fne_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       fne_cancel_cb(NULL, data);
+    else
+      gui_handle_event(event, data);
     break;
   }
 }
@@ -298,7 +301,7 @@ static void fb_create_input_window(char *title, char *text,
   GC                          gc;
   int                         x, y, w;
   int                         width = WINDOW_WIDTH;
-  int                         height = 100;
+  int                         height = 102;
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
   
@@ -333,7 +336,7 @@ static void fb_create_input_window(char *title, char *text,
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
 
   x = 15;
-  y = 23;
+  y = 30;
   w = width - 30;
   
   inp.skin_element_name = NULL;
@@ -347,8 +350,8 @@ static void fb_create_input_window(char *title, char *text,
 					  x, y, w, 20, "Black", "Black", fontname)));
   xitk_enable_and_show_widget(fne->input);
 
-  y = height - 23 - 15;
-  x = width - (100 * 2) - (15 * 2);
+  y = height - (23 + 15);
+  x = 15;
   w = 100;
 
   lb.button_type       = CLICK_BUTTON;
@@ -365,7 +368,7 @@ static void fb_create_input_window(char *title, char *text,
 					   "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(fne->button_apply);
 
-  x += 100 + 15;
+  x = width - (w + 15);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Cancel");
@@ -705,7 +708,6 @@ static void fb_getdir(filebrowser_t *fb) {
 
   while((pdirent = readdir(pdir)) != NULL) {
     
-    memset(&fullfilename, 0, sizeof(fullfilename));
     snprintf(fullfilename, sizeof(fullfilename), "%s/%s", fb->current_dir, pdirent->d_name);
     
     if(is_a_dir(fullfilename)) {
@@ -803,7 +805,6 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
     else if(!strcasecmp(fb->dir_files[selected].name, "..")) {
       char *p;
       
-      memset(&buf, '\0', sizeof(buf));
       snprintf(buf, sizeof(buf), "%s", fb->current_dir);
       if(strlen(buf) > 1) { /* not '/' directory */
 	
@@ -824,11 +825,9 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
       
       /* not '/' directory */
       if(strcasecmp(fb->current_dir, "/")) {
-	memset(&buf, 0, sizeof(buf));
 	snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->dir_files[selected].name);
       }
       else {
-	memset(&buf, 0, sizeof(buf));
 	snprintf(buf, sizeof(buf), "/%s", fb->dir_files[selected].name);
       }
       
@@ -988,7 +987,7 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
 
       snprintf(buf, sizeof(buf), "%s%s%s",
-	       fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ),
+	       fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
 	       fb->norm_files[sel].name);
       
       if((unlink(buf)) == -1)
@@ -1009,10 +1008,9 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
     char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
-    snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s'"), fb->current_dir);
-    if(strlen(fb->current_dir) > 1)
-      strlcat(buf, "/", sizeof(buf));
-    snprintf(buf+strlen(buf), sizeof(buf)-strlen(buf), "%s' ?.", fb->norm_files[sel].name);
+    snprintf(buf, sizeof(buf), _("Do you really want to delete the file '%s%s%s' ?"),
+	     fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
+	     fb->norm_files[sel].name);
     
     fb_deactivate(fb);
     xitk_window_dialog_yesno(gGui->imlib_data, _("Confirm deletion ?"),
@@ -1028,7 +1026,7 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
   int sel = xitk_browser_get_current_selected(fb->files_browser);
   
   snprintf(buf, sizeof(buf), "%s%s%s",
-	   fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ),
+	   fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
 	   fb->norm_files[sel].name);
       
   if((rename(buf, newname)) == -1)
@@ -1045,7 +1043,7 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     snprintf(buf, sizeof(buf), "%s%s%s",
-	     fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ),
+	     fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
 	     fb->norm_files[sel].name);
       
     fb_deactivate(fb);
@@ -1066,7 +1064,7 @@ static void fb_create_directory(xitk_widget_t *w, void *data) {
   char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   
   snprintf(buf, sizeof(buf), "%s%s",
-	   fb->current_dir, ( strlen(fb->current_dir) ? "/" : "" ));
+	   fb->current_dir, ((fb->current_dir[0]) ? "/" : ""));
       
   fb_deactivate(fb);
   fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);
@@ -1106,6 +1104,8 @@ static void fb_handle_events(XEvent *event, void *data) {
       
       if(sel >= 0)
 	fb_select(fb->files_browser, (void *) fb, sel);
+      else
+	gui_handle_event(event, data);
     }
     break;
   }
@@ -1296,14 +1296,14 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   fb_update_origin(fb);
 
-  y += 46;
-  w = (WINDOW_WIDTH >> 1) - 15 - 12 - 10;
+  y += 45;
+  w = (WINDOW_WIDTH - 30 - 10) / 2;
 
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
-  br.browser.max_displayed_entries = 10;
+  br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
   br.browser.num_entries           = fb->directories_num;
   br.browser.entries               = (const char *const *)fb->directories;
   br.callback                      = fb_select;
@@ -1314,31 +1314,30 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	   (fb->directories_browser = 
 	    xitk_noskin_browser_create(fb->widget_list, &br,
 				       (XITK_WIDGET_LIST_GC(fb->widget_list)),
-				       x, y, w, 20, 12, fontname)));
+				       x + 2, y + 2, w - 4 - 12, 20, 12, fontname)));
   xitk_enable_and_show_widget(fb->directories_browser);
   
-  draw_rectangular_inner_box(gGui->imlib_data, bg, x - 1, y - 1,
-			     xitk_get_widget_width(fb->directories_browser) + 2,
-			     xitk_get_widget_height(fb->directories_browser) + 2);
+  draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+			     w - 1, xitk_get_widget_height(fb->directories_browser) + 4 - 1);
   
-  y -= 16;
+  y -= 15;
   
   b.skin_element_name = NULL;
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
 	   (fb->directories_sort =
-	    xitk_noskin_button_create(fb->widget_list, &b, x - 1, y, w + 12 + 2, 15)));
+	    xitk_noskin_button_create(fb->widget_list, &b, x, y, w, 15)));
   xitk_enable_and_show_widget(fb->directories_sort);
 
-  x = WINDOW_WIDTH - (w + 15 + 12);
-  y += 16;
+  x = WINDOW_WIDTH - (w + 15);
+  y += 15;
 
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
-  br.browser.max_displayed_entries = 10;
+  br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
   br.browser.num_entries           = fb->files_num;
   br.browser.entries               = (const char *const *)fb->files;
   br.callback                      = fb_select;
@@ -1349,21 +1348,20 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	   (fb->files_browser = 
 	    xitk_noskin_browser_create(fb->widget_list, &br,
 				       (XITK_WIDGET_LIST_GC(fb->widget_list)),
-				       x, y, w, 20, 12, fontname)));
+				       x + 2, y + 2, w - 4 - 12, 20, 12, fontname)));
   xitk_enable_and_show_widget(fb->files_browser);
 
-  draw_rectangular_inner_box(gGui->imlib_data, bg, x - 1, y - 1,
-			     xitk_get_widget_width(fb->files_browser) + 2,
-			     xitk_get_widget_height(fb->files_browser) + 2);
+  draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+			     w - 1, xitk_get_widget_height(fb->files_browser) + 4 - 1);
 
-  y -= 16;
+  y -= 15;
 
   b.skin_element_name = NULL;
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
 	   (fb->files_sort =
-	    xitk_noskin_button_create(fb->widget_list, &b, x - 1, y, w + 12 + 2, 15)));
+	    xitk_noskin_button_create(fb->widget_list, &b, x, y, w, 15)));
   xitk_enable_and_show_widget(fb->files_sort);
 
 
@@ -1455,7 +1453,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	XSetForeground(gGui->display, image->image->gc, 
 		       xitk_get_pixel_color_lightgray(gGui->imlib_data));
 	XFillPolygon(gGui->display, image->image->pixmap, image->image->gc, 
-		     &points[0], 4, Complex, CoordModeOrigin);
+		     &points[0], 4, Convex, CoordModeOrigin);
 	XUnlockDisplay(gGui->display);
 	
 	XLockDisplay(gGui->display);
@@ -1484,9 +1482,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 			    fsimage, fsimage->width, fsimage->height);
   }
 
-  x--;
-  y += xitk_get_widget_height(fb->files_browser) + 16 + 5;
-  w = xitk_get_widget_width(fb->files_browser);
+  y += xitk_get_widget_height(fb->files_browser) + 15 + 4 + 5;
 
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
@@ -1523,8 +1519,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	    xitk_noskin_label_create(fb->widget_list, &lbl, x + 15, y, w - 15, 20, fontname)));
   xitk_enable_and_show_widget(widget);
   
-
-  y += 30;
+  y = WINDOW_HEIGHT - (23 + 15) - (23 + 8);
   w = (WINDOW_WIDTH - (4 * 15)) / 3;
 
   lb.button_type       = CLICK_BUTTON;
@@ -1541,7 +1536,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 					   "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(fb->rename);
 
-  x += w + 15;
+  x = (WINDOW_WIDTH - w) / 2;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
@@ -1557,7 +1552,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 					   "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(fb->delete);
   
-  x += w + 15;
+  x = WINDOW_WIDTH - (w + 15);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Create a directory");
@@ -1575,9 +1570,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   fb->cb_buttons[0] = fb->cb_buttons[1] = NULL;
 
+  y = WINDOW_HEIGHT - (23 + 15);
+
   if(fb->cbb[0].label) {
     x = 15;
-    y += 30;
     
     lb.button_type       = CLICK_BUTTON;
     lb.label             = fb->cbb[0].label;
@@ -1594,7 +1590,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     xitk_enable_and_show_widget(fb->cb_buttons[0]);
 
     if(fb->cbb[1].label) {
-      x += w + 15;
+      x = (WINDOW_WIDTH - w) / 2;
       
       lb.button_type       = CLICK_BUTTON;
       lb.label             = fb->cbb[1].label;
@@ -1612,8 +1608,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     }
   }
 
-  x = WINDOW_WIDTH - w - 15;
-  y = WINDOW_HEIGHT - 23 - 15;
+  x = WINDOW_WIDTH - (w + 15);
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");

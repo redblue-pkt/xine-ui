@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -41,8 +41,8 @@
 #include <X11/keysym.h>
 #include "common.h"
 
-#define WINDOW_WIDTH            505
-#define WINDOW_HEIGHT           250
+#define WINDOW_WIDTH            525
+#define WINDOW_HEIGHT           270
 
 static char                    *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 static char                    *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
@@ -107,7 +107,7 @@ static char *_download_file(const char *filename, int *size) {
     memcpy(buf, download->buf, *size);
   }
   else
-    xine_error("Unable to download '%s':\n%s.", filename, download->error);
+    xine_error("Unable to download '%s': %s", filename, download->error);
 
   SAFE_FREE(download->buf);
   SAFE_FREE(download->error);
@@ -546,8 +546,8 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  }
 		}
 		else {
-		  char  buffer1[_PATH_MAX + _NAME_MAX + 1];
-		  char  buffer2[_PATH_MAX + _NAME_MAX + 1];
+		  char  buffer1[_PATH_MAX + _NAME_MAX + 2];
+		  char  buffer2[_PATH_MAX + _NAME_MAX + 2];
 		  char *entry;
 		  
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
@@ -642,8 +642,8 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		if(valid_sfv) {
 		  
 		  if(strncmp(ln, ";", 1)) {
-		    char            buffer1[_PATH_MAX + _NAME_MAX + 1];
-		    char            buffer2[_PATH_MAX + _NAME_MAX + 1];
+		    char            buffer1[_PATH_MAX + _NAME_MAX + 2];
+		    char            buffer2[_PATH_MAX + _NAME_MAX + 2];
 		    char           *entry;
 		    long long int   crc = 0;
 		    char           *p;
@@ -751,8 +751,8 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	    if(ln) {
 	      
 	      if((strncmp(ln, ";", 1)) && (strncmp(ln, "#", 1))) {
-		char  buffer1[_PATH_MAX + _NAME_MAX + 1];
-		char  buffer2[_PATH_MAX + _NAME_MAX + 1];
+		char  buffer1[_PATH_MAX + _NAME_MAX + 2];
+		char  buffer2[_PATH_MAX + _NAME_MAX + 2];
 		char *entry;
 		
 		path = strrchr(filename, '/');
@@ -2537,7 +2537,7 @@ int mediamark_get_entry_from_id(const char *ident) {
 
 void mediamark_insert_entry(int index, const char *mrl, const char *ident, 
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
-  char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
   gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
   
@@ -2561,7 +2561,6 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
       if(!strncasecmp(_mrl, "file:", 5))
 	_mrl += 5;
       
-      memset(&autosub, 0, sizeof(autosub));
       snprintf(autosub, sizeof(autosub), "%s", _mrl);
       
       if((ending = strrchr(autosub, '.')))
@@ -2959,7 +2958,7 @@ void mediamark_collect_from_directory(char *filepathname) {
   if((dir = opendir(filepathname))) {
     
     while((dentry = readdir(dir))) {
-      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX] = "";
+      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX + 2] = "";
       
       snprintf(fullpathname, sizeof(fullpathname) - 1, "%s/%s", filepathname, dentry->d_name);
       
@@ -2977,7 +2976,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	}
 	else {
 	  char *p, *extension;
-	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX] = "";
+	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX + 2] = "";
 	  
 	  p = strncat(loname, fullpathname, strlen(fullpathname));
 	  while(*p && (*p != '\0')) {
@@ -3055,6 +3054,8 @@ static void mmkeditor_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       mmkeditor_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
   }
 }
 
@@ -3227,14 +3228,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor->user_data = data;
 
   x = xine_config_register_num(gGui->xine, "gui.mmk_editor_x", 
-			       100,
+			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_DEB,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   y = xine_config_register_num(gGui->xine, "gui.mmk_editor_y",
-			       100,
+			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_DEB,
@@ -3271,14 +3272,12 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	    bg->gc, 0, 0, width, height, 0, 0);
   XUnlockDisplay (gGui->display);
 
-  x = 5;
-  y = 35;
-  draw_outter_frame(gGui->imlib_data, bg, _("Identifier"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
-
   x = 15;
-  y += 5;
+  y = 34 - 6;
   w = WINDOW_WIDTH - 30;
+  draw_outter_frame(gGui->imlib_data, bg, _("Identifier"), btnfontname, 
+		    x, y, w, 45);
+
   inp.skin_element_name = NULL;
   inp.text              = NULL;
   inp.max_length        = 2048;
@@ -3287,18 +3286,15 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	   (mmkeditor->ident = 
 	    xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
-					 x, y, w, 20,
+					 x + 10, y + 16, w - 20, 20,
 					 "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->ident, _("Mediamark Identifier"));
   xitk_enable_and_show_widget(mmkeditor->ident);
 
-  x = 5;
-  y += 40;
+  y += 45 + 3;
   draw_outter_frame(gGui->imlib_data, bg, _("Mrl"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x = 15;
-  y += 5;
   inp.skin_element_name = NULL;
   inp.text              = NULL;
   inp.max_length        = 2048;
@@ -3307,18 +3303,15 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->mrl = 
 	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
-					  x, y, w, 20,
+					  x + 10, y + 16, w - 20, 20,
 					  "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->mrl, _("Mediamark Mrl"));
   xitk_enable_and_show_widget(mmkeditor->mrl);
 
-  x = 5;
-  y += 40;
+  y += 45 + 3;
   draw_outter_frame(gGui->imlib_data, bg, _("Subtitle"), btnfontname, 
-		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x = 15;
-  y += 5;
   inp.skin_element_name = NULL;
   inp.text              = NULL;
   inp.max_length        = 2048;
@@ -3327,12 +3320,11 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->sub = 
 	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
-					  x, y, w - 115, 20,
+					  x + 10, y + 16, w - 20 - 100 - 10, 20,
 					  "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->sub, _("Subtitle File"));
   xitk_enable_and_show_widget(mmkeditor->sub);
 
-  x = WINDOW_WIDTH - 115;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Sub File");
   lb.align             = ALIGN_CENTER;
@@ -3341,20 +3333,17 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)), 
-	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
-					       &lb, x, y - 2, 100, 23,
+	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, &lb,
+					       x + 10 + w - 20 - 100, y + 16, 100, 20,
 					       "Black", "Black", "White", btnfontname)));
   xitk_set_widget_tips_default(b, _("Select a subtitle file to use together with the mrl."));
   xitk_enable_and_show_widget(b);
 
-  x = 5;
-  y += 40;
-  w = 60;
+  y += 45 + 3;
+  w = 120;
   draw_outter_frame(gGui->imlib_data, bg, _("Start at"), btnfontname, 
-		    x, y, w + 60, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x = 35;
-  y += 5;
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
@@ -3364,17 +3353,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->start = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
-				       x, y, w, 20, NULL, NULL, NULL)));
+				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->start, _("Mediamark start time (secs)."));
   xitk_enable_and_show_widget(mmkeditor->start);
 
-  x += w + 20 + 15;
-  y -= 5;
+  x += w + 5;
   draw_outter_frame(gGui->imlib_data, bg, _("End at"), btnfontname, 
-		    x, y, w + 60, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x += 30;
-  y += 5;
   ib.skin_element_name = NULL;
   ib.value             = -1;
   ib.step              = 1;
@@ -3384,17 +3370,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->end = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
-				       x, y, w, 20, NULL, NULL, NULL)));
+				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
   xitk_enable_and_show_widget(mmkeditor->end);
 
-  x += w + 20 + 15;
-  y -= 5;
+  x += w + 5;
   draw_outter_frame(gGui->imlib_data, bg, _("A/V offset"), btnfontname, 
-		    x, y, w + 60, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x += 30;
-  y += 5;
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
@@ -3404,17 +3387,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->av_offset = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
-				       x, y, w, 20, NULL, NULL, NULL)));
+				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->av_offset, _("Offset of Audio and Video."));
   xitk_enable_and_show_widget(mmkeditor->av_offset);
 
-  x += w + 20 + 15;
-  y -= 5;
+  x += w + 5;
   draw_outter_frame(gGui->imlib_data, bg, _("SPU offset"), btnfontname, 
-		    x, y, w + 60, 20 + 15 + 10);
+		    x, y, w, 45);
 
-  x += 30;
-  y += 5;
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
@@ -3424,14 +3404,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->spu_offset = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
-				       x, y, w, 20, NULL, NULL, NULL)));
+				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->spu_offset, _("Subpicture offset."));
   xitk_enable_and_show_widget(mmkeditor->spu_offset);
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Ok");
+  lb.label             = _("OK");
   lb.align             = ALIGN_CENTER;
   lb.callback          = mmkeditor_ok; 
   lb.state_callback    = NULL;
@@ -3444,7 +3424,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_set_widget_tips_default(b, _("Apply the changes and close the window."));
   xitk_enable_and_show_widget(b);
 
-  x = (WINDOW_WIDTH >>1) - 50;
+  x = (WINDOW_WIDTH - 100) / 2;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Apply");
   lb.align             = ALIGN_CENTER;
@@ -3459,8 +3439,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_set_widget_tips_default(b, _("Apply the changes to the playlist."));
   xitk_enable_and_show_widget(b);
 
-  x = WINDOW_WIDTH - 115;
-  
+  x = WINDOW_WIDTH - (100 + 15);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;

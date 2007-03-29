@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -47,8 +47,8 @@ extern gGui_t                   *gGui;
 static char                     *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
 static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH             580
-#define WINDOW_HEIGHT            480
+#define WINDOW_WIDTH             570
+#define WINDOW_HEIGHT            473
 
 #define MAX_SECTIONS             50
 
@@ -82,6 +82,8 @@ typedef struct {
 } _help_t;
 
 static _help_t    *help = NULL;
+
+static int         th; /* Tabs height */
 
 static void help_change_section(xitk_widget_t *wx, void *data, int section) {
   if(section < help->num_sections)
@@ -158,8 +160,8 @@ static void help_sections(void) {
     struct dirent       *dir_entry;
     const langs_t       *lang = get_lang();
     char                 locale_file[XITK_NAME_MAX];
-    char                 locale_readme[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-    char                 default_readme[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char                 locale_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+    char                 default_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     char                 ending[XITK_NAME_MAX];
     char                 section_name[1024];
 
@@ -281,6 +283,8 @@ static void help_handle_event(XEvent *event, void *data) {
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
       help_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
     break;
   }
 }
@@ -337,14 +341,14 @@ void help_panel(void) {
   help = (_help_t *) xine_xmalloc(sizeof(_help_t));
 
   x = xine_config_register_num (gGui->xine, "gui.help_x", 
-				100, 
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.help_y", 
-				100,
+				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
@@ -392,7 +396,9 @@ void help_panel(void) {
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(help->widget_list)),
     (help->tabs = 
      xitk_noskin_tabs_create(help->widget_list, 
-			     &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
+			     &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname)));
+
+  th = xitk_get_widget_height(help->tabs) - 1;
   
   xitk_enable_and_show_widget(help->tabs);
 
@@ -403,8 +409,8 @@ void help_panel(void) {
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   XUnlockDisplay(gGui->display);
   
-  draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)) - 5);
+  draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
+			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_change_background(gGui->imlib_data, help->xwin, bg->pixmap, 
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -426,8 +432,8 @@ void help_panel(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(help->widget_list)), 
    (help->browser = 
     xitk_noskin_browser_create(help->widget_list, &br,
-			       (XITK_WIDGET_LIST_GC(help->widget_list)), 25, 58, 
-			       WINDOW_WIDTH - (50 + 16), 20,
+			       (XITK_WIDGET_LIST_GC(help->widget_list)), 15 + 5, (24 + th) + 5,
+			       WINDOW_WIDTH - (30 + 10 + 16), 20,
 			       16, br_fontname)));
 
   xitk_enable_and_show_widget(help->browser);
@@ -447,7 +453,7 @@ void help_panel(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(help->widget_list)), 
    (w = xitk_noskin_labelbutton_create(help->widget_list, &lb, 
-				       (WINDOW_WIDTH - (100 + 20)), WINDOW_HEIGHT - 40, 100, 23,
+				       WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23,
 				       "Black", "Black", "White", tabsfontname)));
   xitk_enable_and_show_widget(w);
   
