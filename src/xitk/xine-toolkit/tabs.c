@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -362,12 +362,12 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     fs = xitk_font_load_font(t->imlibdata->x.disp, fontname);
 
     xitk_font_set_font(fs, t->parent_wlist->gc);
-    fheight = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
+    fheight = xitk_font_get_string_height(fs, " ");
 
     XITK_WIDGET_INIT(&lb, t->imlibdata);
     XITK_WIDGET_INIT(&b, t->imlibdata);
 
-    private_data->bheight = fheight * 2;
+    private_data->bheight = fheight + 18;
 
     for(i = 0; i < t->num_entries; i++) {
 
@@ -450,7 +450,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
   mywidget->have_focus            = FOCUS_LOST; 
   mywidget->imlibdata             = private_data->imlibdata;
-  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
+  mywidget->x = mywidget->y       = 0;
+  mywidget->width                 = private_data->width;
+  mywidget->height                = private_data->bheight;
   mywidget->type                  = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_TABS;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
