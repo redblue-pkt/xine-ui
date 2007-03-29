@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -82,13 +82,13 @@ unsigned int xitk_get_pixel_color_gray(ImlibData *im) {
   int user_color = xitk_get_background_color();
   if(user_color >= 0)
     return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(im, 192, 192, 192);
+  return xitk_get_pixel_color_from_rgb(im, 190, 190, 190);
 }
 unsigned int xitk_get_pixel_color_darkgray(ImlibData *im) {
   int user_color = xitk_get_select_color();
   if(user_color >= 0)
     return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(im, 160, 160, 160);
+  return xitk_get_pixel_color_from_rgb(im, 128, 128, 128);
 }
 unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im) {
   int user_color = xitk_get_warning_foreground();
@@ -1147,18 +1147,12 @@ static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int reli
   
   if(relief != DRAW_FLATTER) {
     
-    if(relief == DRAW_OUTTER)
-      _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1, 
-					xitk_get_pixel_color_white(im),	
-					((light) 
-					 ? xitk_get_pixel_color_darkgray(im)
-					 : xitk_get_pixel_color_black(im)),
-					relief);
-    else if(relief == DRAW_INNER)
-      _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1, 
-					xitk_get_pixel_color_white(im),
-					xitk_get_pixel_color_black(im),	
-					relief);
+    _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1,
+				      xitk_get_pixel_color_white(im),
+				      ((light)
+				       ? xitk_get_pixel_color_darkgray(im)
+				       : xitk_get_pixel_color_black(im)),
+				      relief);
   }
 
 }
@@ -1351,13 +1345,14 @@ void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigne
 }
 
 /*
- *
+ * Draw a frame outline with embedded title.
  */
 static void _draw_frame(ImlibData *im, xitk_pixmap_t *p, 
 			char *title, char *fontname, int style, int x, int y, int w, int h) {
   xitk_font_t   *fs = NULL;
   int            sty[2];
-  int            yoff = 0, xstart = 0, xstop = 0, fheight = 0, fwidth = 0;
+  int            yoff = 0, xstart = 0, xstop = 0, fheight = 0;
+  int            ascent = 0, descent = 0, lbearing = 0, rbearing = 0;
   int            titlelen = 0;
   char          *titlebuf = NULL;
   char           buf[BUFSIZ];
@@ -1366,42 +1361,41 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
   ABORT_IF_NULL(p);
   
   if(title) {
-    int	ascent, descent;
-
-    int maxfwidth = (w - 12);
+    int maxinkwidth = (w - 12);
 
     titlelen = strlen(title);
     titlebuf = title;
 
     fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
     xitk_font_set_font(fs, p->gc);
-    xitk_font_text_extent(fs, title, titlelen, NULL, NULL, &fwidth, &ascent, &descent);
+    xitk_font_text_extent(fs, title, titlelen, &lbearing, &rbearing, NULL, &ascent, &descent);
     fheight = ascent + descent;
 
     /* Limit title to frame width */
-    if(fwidth > maxfwidth) {
+    if((rbearing - lbearing) > maxinkwidth) {
       char  dots[]  = "...";
       int   dotslen = strlen(dots);
-      int   dotsfwidth;
+      int   dotsrbearing;
+      int   titlewidth;
 
       /* Cut title, append dots */
-      xitk_font_text_extent(fs, dots, dotslen, NULL, NULL, &dotsfwidth, NULL, NULL);
+      xitk_font_text_extent(fs, dots, dotslen, NULL, &dotsrbearing, NULL, NULL, NULL);
       do {
 	titlelen--;
-	xitk_font_text_extent(fs, title, titlelen, NULL, NULL, &fwidth, NULL, NULL);
-      } while((fwidth + dotsfwidth) > maxfwidth);
+	xitk_font_text_extent(fs, title, titlelen, NULL, NULL, &titlewidth, NULL, NULL);
+	rbearing = titlewidth + dotsrbearing;
+      } while((rbearing - lbearing) > maxinkwidth);
       { /* Cut possible incomplete multibyte character at the end */
-	int fwidth1;
+	int titlewidth1;
 	while((titlelen > 0) &&
-	      (xitk_font_text_extent(fs, title, (titlelen - 1), NULL, NULL, &fwidth1, NULL, NULL),
-	       fwidth1 == fwidth))
+	      (xitk_font_text_extent(fs, title, (titlelen - 1), NULL, NULL, &titlewidth1, NULL, NULL),
+	       titlewidth1 == titlewidth))
 	  titlelen--;
       }
       if(titlelen > (sizeof(buf) - dotslen - 1)) /* Should never happen, */
 	titlelen = (sizeof(buf) - dotslen - 1);  /* just to be sure ...  */
       strncpy(buf, title, titlelen), buf[titlelen] = '\0';
       strcat(buf, dots);
-      fwidth += dotsfwidth;
       titlelen += dotslen;
       titlebuf = buf;
     }
@@ -1412,26 +1406,26 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
 
   /* Dont draw frame box under frame title */
   if(title) {
-    yoff = (fheight>>1);
-    xstart = 3;
-    xstop = fwidth + 9;
+    yoff = (ascent >> 1) + 1; /* Roughly v-center outline to ascent part of glyphs */
+    xstart = 4 - 1;
+    xstop = (rbearing - lbearing) + 8;
   }
 
-  _draw_rectangular_box_light(im, p, x, (y - yoff), 
+  _draw_rectangular_box_light(im, p, x, (y + yoff), 
 			      xstart, xstop,
-			      w, (h - fheight + yoff), sty[0]);
+			      w, (h - yoff), sty[0]);
   
   if(title)
     xstart--, xstop--;
   
-  _draw_rectangular_box_light(im, p, (x + 1), ((y - yoff) + 1), 
+  _draw_rectangular_box_light(im, p, (x + 1), ((y + yoff) + 1), 
 			      xstart, xstop,
-			      (w - 2), ((h - fheight + yoff) - 2), sty[1]);
+			      (w - 2), ((h - yoff) - 2), sty[1]);
   
   if(title) {
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
-    xitk_font_draw_string(fs, p->pixmap, p->gc, (x + 6), y, titlebuf, titlelen);
+    xitk_font_draw_string(fs, p->pixmap, p->gc, (x - lbearing + 6), (y + ascent), titlebuf, titlelen);
     XUNLOCK(im->x.disp);
     
     xitk_font_unload_font(fs);
