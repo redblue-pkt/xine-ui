@@ -1,5 +1,14 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Harmonized appearance of non-skinned windows with more space
+  * Shortcut keys unused in a particular window work transparent now,
+    i.e. as configured by their key bindings
+  * Added missing ESC key shortcut for exit in some windows
+  * Typing corrections
+  * Fixed side effects from key presses in event receiver window of key bindings editor
+  * Fixed image clip/redraw problems in skin download preview
+  * Fixed segfault upon trying to open skin download window when it's already open
+  * Fixed timing dependent window redrawing failures
   * Fixed crash upon missing opacity lock atom for video window [bug #1573056]
   * Fixed infinite X event loop with sticky event sender window (stressed CPU and X)
   * Fixed infinite loop in file browser with unreadable directory [bug #1628791]
