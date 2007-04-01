@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.23\n"
+"Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2007-03-03 13:48+0100\n"
-"PO-Revision-Date: 2006-01-31 08:34+0100\n"
+"PO-Revision-Date: 2007-04-01 14:31+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -517,22 +517,24 @@ msgid "Windows stacking"
 msgstr "Fensterüberlagerung"
 
 #: src/xitk/event.c:1389
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
-msgstr "Benutze Fenstermanagerebenen um Fenster oben zu plazieren"
+msgstr ""
+"Benutze Ebeneneigenschaft des Fenstermanagers um Fenster oben zu plazieren\n"
+"Ausnahme: das Videofenster im Vollbildmodus."
 
 #: src/xitk/event.c:1397
 msgid "Windows stacking (more)"
 msgstr "Fensterüberlagerung (mehr)"
 
 #: src/xitk/event.c:1398
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
-msgstr "Benutze Fenstermanagerebenen um Fenster oben zu plazieren"
+msgstr ""
+"Benutze Ebeneneigenschaft des Fenstermanagers um Fenster oben zu plazieren\n"
+"für alle Fenster (überschreibt die 'layer_above'-Einstellung)."
 
 #: src/xitk/event.c:1407
 msgid "Snapshot location"
@@ -1053,13 +1055,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
 #: src/xitk/main.c:435
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2006 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 Das xine Team.\n"
+"(c) 2000-2006 Das xine Team.\n"
 
 #: src/xitk/main.c:447
 #, c-format
