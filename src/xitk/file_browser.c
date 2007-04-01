@@ -987,7 +987,7 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
 
       snprintf(buf, sizeof(buf), "%s%s%s",
-	       fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
+	       fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	       fb->norm_files[sel].name);
       
       if((unlink(buf)) == -1)
@@ -1009,7 +1009,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
     char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file '%s%s%s' ?"),
-	     fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
+	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	     fb->norm_files[sel].name);
     
     fb_deactivate(fb);
@@ -1026,7 +1026,7 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
   int sel = xitk_browser_get_current_selected(fb->files_browser);
   
   snprintf(buf, sizeof(buf), "%s%s%s",
-	   fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
+	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	   fb->norm_files[sel].name);
       
   if((rename(buf, newname)) == -1)
@@ -1043,7 +1043,7 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     snprintf(buf, sizeof(buf), "%s%s%s",
-	     fb->current_dir, ((fb->current_dir[0]) ? "/" : ""),
+	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	     fb->norm_files[sel].name);
       
     fb_deactivate(fb);
@@ -1064,7 +1064,7 @@ static void fb_create_directory(xitk_widget_t *w, void *data) {
   char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   
   snprintf(buf, sizeof(buf), "%s%s",
-	   fb->current_dir, ((fb->current_dir[0]) ? "/" : ""));
+	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""));
       
   fb_deactivate(fb);
   fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);
@@ -1097,8 +1097,10 @@ static void fb_handle_events(XEvent *event, void *data) {
   switch(event->type) {
 
   case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
-      _fb_exit(NULL, data);
+    if(xitk_get_key_pressed(event) == XK_Escape) {
+      if(xitk_is_widget_enabled(fb->close)) /* Exit only if close button would exit */
+	_fb_exit(NULL, data);
+    }
     else {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
       
