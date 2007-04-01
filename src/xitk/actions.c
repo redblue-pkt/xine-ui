@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -380,14 +380,12 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
      || (a_unhandled = (has_audio && (!audio_handled)))) {
     char      buffer[4096];
     
-    memset(&buffer, 0, sizeof(buffer));
-
     if(v_unhandled && a_unhandled) {
       snprintf(buffer, sizeof(buffer), _("The stream '%s' isn't supported by xine:\n\n"),
 	       (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     }
     else {
-      snprintf(buffer, sizeof(buffer), _("The stream '%s' use an unsupported codec:\n\n"),
+      snprintf(buffer, sizeof(buffer), _("The stream '%s' uses an unsupported codec:\n\n"),
 	       (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     }
     
@@ -482,12 +480,11 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       char *filename;
       
       filename = strrchr(url, '/');
-      if(strlen(filename) >= 2) {
-	char  fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+      if(filename && filename[1]) { /* we have a filename */
+	char  fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 	FILE *fd;
 	
 	filename++;
-	memset(&fullfilename, 0, sizeof(fullfilename));
 	snprintf(fullfilename, sizeof(fullfilename), "%s/%s", xine_get_homedir(), filename);
 	
 	if((fd = fopen(fullfilename, "w+b")) != NULL) {
@@ -835,8 +832,7 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	char *cur_mrl = (char *)mediamark_get_current_mrl();
 	
 	len = (mrl - cur_mrl) + 3;
-	tok = (char *) alloca(len + 1);
-	memset(tok, 0, len + 1);
+	tok = (char *) alloca(len);
   	snprintf(tok, len, "%s", cur_mrl);
       }
 
@@ -1673,10 +1669,9 @@ void gui_set_current_mmk(mediamark_t *mmk) {
   else {
     char buffer[1024];
     
-    memset(&buffer, 0, sizeof(buffer));
     snprintf(buffer, sizeof(buffer), "xine-ui version %s", VERSION);
     
-    gGui->mmk.mrl           = strdup(_("There is no mrl."));
+    gGui->mmk.mrl           = strdup(_("There is no MRL."));
     gGui->mmk.ident         = strdup(buffer);
     gGui->mmk.sub           = NULL;
     gGui->mmk.start         = 0;
@@ -2030,93 +2025,131 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
     load_sub = NULL;
 }
 
+
+/* Callback function for file select button or double-click in file browser.
+   Append selected file to the current playlist */
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
   char *cur_dir = filebrowser_get_current_dir(fb);
   
+  /* Upate configuration with the selected directory path */
   if(cur_dir && strlen(cur_dir)) {
     snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cur_dir);
     config_update_string("media.files.origin_path", gGui->curdir);
   }
   
+  /* Get the file path/name */
   if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
     int first  = gGui->playlist.num;
+    char *ident;
 
-    if(file)  {
-      gGui->playlist.control |= PLAYLIST_CONTROL_IGNORE;
-      gui_dndcallback(file);
-      gGui->playlist.control &= ~PLAYLIST_CONTROL_IGNORE;
-      free(file);
+    /* Get the name only to use as an identifier in the playlist display */
+    ident = filebrowser_get_current_filename(fb);
+
+    /* If the file has an extension which could be a playlist, attempt to append
+       it to the current list as a list; otherwise, append it as an ordinary file. */
+    if(mrl_look_like_playlist(file)) {
+      if(!mediamark_concat_mediamarks(file))
+        mediamark_append_entry(file, ident, NULL, 0, -1, 0, 0);
     }
+    else
+      mediamark_append_entry(file, ident, NULL, 0, -1, 0, 0);
 
-    if((first != gGui->playlist.num) && gGui->smart_mode) {
-      if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
-	gGui->ignore_next = 1;
-	xine_stop(gGui->stream);
-	gGui->ignore_next = 0;
-      }
-      
+    playlist_update_playlist();
+    free(file);
+    free(ident);
+
+    /* Enable controls on display */
+    if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+      enable_playback_controls(1);
+
+    /* If an MRL is not being played, select the first file appended. If in "smart mode" start
+       playing the entry.  If a an MRL is currently being played, let it continue normally */
+    if((first != gGui->playlist.num) && (xine_get_status(gGui->stream) == XINE_STATUS_STOP)) {
       gGui->playlist.cur = first;
-      gui_set_current_mmk(mediamark_get_current_mmk());
-      gui_play(NULL, NULL);
+      if(gGui->smart_mode) {
+        gui_set_current_mmk(mediamark_get_current_mmk());
+        gui_play(NULL, NULL);
+      }
     }
-  }
+  } /* If valid file name */
 
   load_stream = NULL;
 }
 
+
+/* Callback function for "Select All" button in file browser. Append all files in the
+   currently selected directory to the current playlist. */
 static void fileselector_all_callback(filebrowser_t *fb) {
   char **files;
   char  *path = filebrowser_get_current_dir(fb);
   
+  /* Update the configuration with the current path */
   if(path && strlen(path)) {
     snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", path);
     config_update_string("media.files.origin_path", gGui->curdir);
   }
   
+  /* Get all of the file names in the current directory as an array of pointers to strings */
   if((files = filebrowser_get_all_files(fb)) != NULL) {
     int i = 0;
 
     if(path && strlen(path)) {
-      char pathname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-      char fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-      int  first = gGui->playlist.num;
+      char pathname[XITK_PATH_MAX + 1 + 1]; /* +1 for trailing '/' */
+      char fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+      int  first = gGui->playlist.num; /* current count of entries in playlist */
 
+      /* If the path is anything other than "/", append a slash to it so that it can
+         be concatenated with the file name */
       if(strcasecmp(path, "/"))
-	snprintf(pathname, sizeof(pathname), "%s/", path);
+        snprintf(pathname, sizeof(pathname), "%s/", path);
       else
-	snprintf(pathname, sizeof(pathname), "%s", path);
+        snprintf(pathname, sizeof(pathname), "%s", path);
       
-      gGui->playlist.control |= PLAYLIST_CONTROL_IGNORE;
+      /* For each file, concatenate the path with the name and append it to the playlist */
       while(files[i]) {
-	snprintf(fullfilename, sizeof(fullfilename), "%s%s", pathname, files[i++]);
-	gui_dndcallback(fullfilename);
-      }
-      gGui->playlist.control &= ~PLAYLIST_CONTROL_IGNORE;
+        snprintf(fullfilename, sizeof(fullfilename), "%s%s", pathname, files[i]);
+
+        /* If the file has an extension which could be a playlist, attempt to append
+           it to the current list as a list; otherwise, append it as an ordinary file. */
+        if(mrl_look_like_playlist(fullfilename)) {
+          if(!mediamark_concat_mediamarks(fullfilename))
+            mediamark_append_entry(fullfilename, files[i], NULL, 0, -1, 0, 0);
+        }
+        else
+          mediamark_append_entry(fullfilename, files[i], NULL, 0, -1, 0, 0);
+
+        i++;
+      } /* End while */
       
+      playlist_update_playlist();
       free(path);
 
-      if((first != gGui->playlist.num) && gGui->smart_mode) {
-	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
-	  gGui->ignore_next = 1;
-	  xine_stop(gGui->stream);
-	  gGui->ignore_next = 0;
-	}
-	gGui->playlist.cur = first;
-	gui_set_current_mmk(mediamark_get_current_mmk());
-	gui_play(NULL, NULL);
+      /* Enable playback controls on display */
+      if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+        enable_playback_controls(1);
+
+      /* If an MRL is not being played, select the first file appended. If in "smart mode" start
+         playing the entry.  If an MRL is currently being played, let it continue normally */
+      if((first != gGui->playlist.num) && (xine_get_status(gGui->stream) == XINE_STATUS_STOP)) {
+        gGui->playlist.cur = first;
+        if(gGui->smart_mode) {
+          gui_set_current_mmk(mediamark_get_current_mmk());
+          gui_play(NULL, NULL);
+        }
       }
-    }
+    } /* If valid path */
 
     i = 0;
     while(files[i])
       free(files[i++]);
     
     free(files);
-  }
+  } /* If valid file list */
 
   load_stream = NULL;
 }
+
 
 void gui_file_selector(void) {
   filebrowser_callback_button_t  cbb[3];
@@ -2134,7 +2167,7 @@ void gui_file_selector(void) {
     cbb[1].need_a_file = 0;
     cbb[2].callback = fileselector_cancel_callback;
     cbb[2].need_a_file = 0;
-    load_stream = create_filebrowser(_("Stream(s) loading"), gGui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
+    load_stream = create_filebrowser(_("Stream(s) Loading"), gGui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
   }
 }
 
@@ -2225,7 +2258,6 @@ void gui_select_sub(void) {
 void visual_anim_init(void) {
   char buffer[4096];
 
-  memset(&buffer, 0, sizeof(buffer));
   snprintf(buffer, sizeof(buffer), "%s/%s", XINE_VISDIR, "default.avi");
   
   gGui->visual_anim.mrls = (char **) xine_xmalloc(sizeof(char *) * 3);
