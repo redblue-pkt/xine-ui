@@ -1,5 +1,8 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixed segfaults when appending files to playlist, current play not interrupted
+    when appending files to playlist, only file name displayed in playlist dialog
+    to better fit into the dialog box. Thanks to Michael Hughes for this patch
   * Harmonized appearance of non-skinned windows with more space
   * Shortcut keys unused in a particular window work transparent now,
     i.e. as configured by their key bindings
