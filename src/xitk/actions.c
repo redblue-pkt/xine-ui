@@ -1401,6 +1401,13 @@ static void *_gui_dndcallback(void *data) {
       more_than_one = gGui->playlist.cur;
     }
     else {
+      char *ident;
+
+      /* If possible, use only base name as identifier to better fit into the display */
+      if((ident = strrchr(buffer, '/')) && ident[1])
+	ident++;
+      else
+	ident = buffer;
       
       if(mrl_look_like_playlist(buffer)) {
 	int cur = gGui->playlist.cur;
@@ -1409,10 +1416,10 @@ static void *_gui_dndcallback(void *data) {
 	if(mediamark_concat_mediamarks(buffer))
 	  gGui->playlist.cur = cur;
 	else
-	  mediamark_append_entry(buffer, buffer, NULL, 0, -1, 0, 0);
+	  mediamark_append_entry(buffer, ident, NULL, 0, -1, 0, 0);
       }
       else
-	mediamark_append_entry(buffer, buffer, NULL, 0, -1, 0, 0);
+	mediamark_append_entry(buffer, ident, NULL, 0, -1, 0, 0);
 
     }
     
