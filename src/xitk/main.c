@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -346,22 +346,18 @@ static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
 
 static void xrm_parse(void) {
   Display      *display;
-  char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char         *environment;
   char         *classname = "xine";
-  char         *str_type[20];
+  char         *str_type;
   XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
   XrmValue      value;
   
   XrmInitialize();
 
   rmdb = home_rmdb = server_rmdb = application_rmdb = NULL;
-  memset(&user_dbname, 0, sizeof(user_dbname));
-  memset(&environement_buf, 0, sizeof(environement_buf));
-  memset(&wide_dbname, 0, sizeof(wide_dbname));
-  memset(str_type, 0, sizeof(str_type));
 
   snprintf(wide_dbname, sizeof(wide_dbname), "%s%s", "/usr/lib/X11/app-defaults/", classname);
   
@@ -385,27 +381,27 @@ static void xrm_parse(void) {
     
     environment = environement_buf;
     snprintf(environement_buf, sizeof(environement_buf), "%s%s", (xine_get_homedir()), "/.Xdefaults-");
-    len = strlen(environment);
-    (void) gethostname(environment + len, (XITK_PATH_MAX + XITK_NAME_MAX) - len);
+    len = strlen(environement_buf);
+    (void) gethostname(environement_buf + len, sizeof(environement_buf) - len);
   }
   
   home_rmdb = XrmGetFileDatabase(environment);
   (void) XrmMergeDatabases(home_rmdb, &rmdb);
 
-  if(XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", &str_type, &value) == True) {
     if(!parse_geometry(&window_attribute, (char *)value.addr))
       printf(_("Bad geometry '%s'\n"), (char *)value.addr);
   } 
-  if(XrmGetResource(rmdb, "xine.border", "xine.Border", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.border", "xine.Border", &str_type, &value) == True) {
     window_attribute.borderless = !get_bool_value((char *) value.addr);
   }
-  if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", &str_type, &value) == True) {
     if(!parse_visual(&gGui->prefered_visual_id, 
 		     &gGui->prefered_visual_class, (char *)value.addr)) {
       printf(_("Bad visual '%s'\n"), (char *)value.addr);
     }
   }
-  if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", &str_type, &value) == True) {
     gGui->install_colormap = !get_bool_value((char *) value.addr);
   }
   
@@ -536,7 +532,7 @@ static void list_plugins(char *type) {
       i++;
     }
 
-    printf(_("No available plugins found of %s type!.\n"), type);
+    printf(_("No available plugins found of %s type!\n"), type);
   __found: ;
   }
   else {
@@ -1120,7 +1116,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s %s", (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s", _("No Information available."));
+	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s", _("No information available."));
 	  
 	break;
 
@@ -1156,7 +1152,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
 	/* (file name or mrl) */
       case XINE_MSG_FILE_NOT_FOUND:
-	snprintf(buffer, sizeof(buffer), "%s", _("The specified file or mrl is not found. Please check it twice."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The specified file or MRL could not be found. Please check it twice."));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
@@ -1172,7 +1168,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	
 	/* (library/decoder) */
       case XINE_MSG_LIBRARY_LOAD_ERROR:
-	snprintf(buffer, sizeof(buffer), "%s", _("A problem occur while loading a library or a decoder"));
+	snprintf(buffer, sizeof(buffer), "%s", _("A problem occurred while loading a library or a decoder"));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), ": %s", (char *) data + data->parameters);
 	break;
@@ -1196,13 +1192,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	if(data->explanation)
 	  snprintf(buffer, sizeof(buffer), "%s %s", (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  snprintf(buffer, sizeof(buffer), "%s", _("No Informations available."));
+	  snprintf(buffer, sizeof(buffer), "%s", _("No information available."));
 	break;
 
       case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
 	gui_stop(NULL, NULL);
 	snprintf(buffer, sizeof(buffer), "%s", _("The audio device is unavailable. "
-						 "Please verify if another program already use it."));
+						 "Please verify if another program already uses it."));
 	break;
 
       default:
@@ -1231,20 +1227,35 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   case XINE_EVENT_FRAME_FORMAT_CHANGE:
     break;
 
-    /* report current audio level (l/r) */
+    /* report current audio vol level (l/r/mute) */
   case XINE_EVENT_AUDIO_LEVEL:
     if(event->stream == gGui->stream) {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
-      
-      gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
-      gGui->mixer.mute = aevent->mute;
 
-      if(gGui->mixer.method == SOUND_CARD_MIXER)
+      gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
+      if(gGui->mixer.method == SOUND_CARD_MIXER) {
+	gGui->mixer.mute = aevent->mute;
 	xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
-      
-      xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+	xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+      }
     }
     break;
+
+#ifdef XINE_EVENT_AUDIO_AMP_LEVEL	/* Precaution for backward compatibility, will be removed some time */
+    /* report current audio amp level (l/r/mute) */
+  case XINE_EVENT_AUDIO_AMP_LEVEL:
+    if(event->stream == gGui->stream) {
+      xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
+
+      gGui->mixer.amp_level = (aevent->left + aevent->right) / 2;
+      if(gGui->mixer.method == SOFTWARE_MIXER) {
+	gGui->mixer.mute = aevent->mute;
+	xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.amp_level);
+	xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+      }
+    }
+    break;
+#endif
 
     /* last event sent when stream is disposed */
   case XINE_EVENT_QUIT:
@@ -1256,7 +1267,6 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
       
-      memset(&buffer, 0, sizeof(buffer));
       snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
       gGui->mrl_overrided = 3;
       panel_set_title(buffer);
@@ -1587,7 +1597,7 @@ int main(int argc, char *argv[]) {
 	  char  *keymap_file = p + 5;
 	  
 	  if((gGui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
-	    char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+	    char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
 	    memset(&buffer, 0, sizeof(buffer));
 	    xitk_subst_special_chars(keymap_file, &buffer[0]);
@@ -1726,7 +1736,7 @@ int main(int argc, char *argv[]) {
     case 'c':
       {
 	char *cfg = xine_chomp(optarg);
-	char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+	char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 	
 	memset(&buffer, 0, sizeof(buffer));
 	xitk_subst_special_chars(cfg, &buffer[0]);
@@ -1865,7 +1875,7 @@ int main(int argc, char *argv[]) {
 	}
       }
       else
-	printf(_("You should specify one MRL to enqueue, at least!.\n"));
+	printf(_("You should specify at least one MRL to enqueue!\n"));
 
     }
 
@@ -1955,7 +1965,7 @@ int main(int argc, char *argv[]) {
 			      CONFIG_NO_DATA);
 
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
-    char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_load_mediamarks(buffer);
@@ -2013,7 +2023,6 @@ int main(int argc, char *argv[]) {
       snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cfg_entry.str_value);
     else
       getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
-
   }
 
   /*
@@ -2129,7 +2138,7 @@ int main(int argc, char *argv[]) {
   gGui->logo_mode = 0;
   gGui->logo_has_changed = 0;
   gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.logo_mrl", XINE_LOGO_MRL,
-						_("Logo mrl"),
+						_("Logo MRL"),
 						CONFIG_NO_HELP, 
 						CONFIG_LEVEL_EXP,
 						main_change_logo_cb, 
