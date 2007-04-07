@@ -1868,40 +1868,44 @@ void layer_above_video(Window w) {
 }
 
 void change_amp_vol(int value) {
+  if(value < 0)
+    value = 0;
+  if(value > 200)
+    value = 200;
   gGui->mixer.amp_level = value;
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp_level);
-  xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.amp_level);
+  if(gGui->mixer.method == SOFTWARE_MIXER)
+    xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.amp_level);
   osd_draw_bar(_("Amplification Level"), 0, 200, gGui->mixer.amp_level, OSD_BAR_STEPPER);
 }
 void gui_increase_amp_level(void) {
-  if(gGui->mixer.amp_level < 200)
-    change_amp_vol((gGui->mixer.amp_level + 1));
+  change_amp_vol((gGui->mixer.amp_level + 1));
 }
 void gui_decrease_amp_level(void) {
-  if(gGui->mixer.amp_level > 0)
-    change_amp_vol((gGui->mixer.amp_level - 1));
+  change_amp_vol((gGui->mixer.amp_level - 1));
 }
 void gui_reset_amp_level(void) {
   change_amp_vol(100);
 }
 
 void change_audio_vol(int value) {
+  if(value < 0)
+    value = 0;
+  if(value > 100)
+    value = 100;
   gGui->mixer.volume_level = value;
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
   xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
   osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
 }
 void gui_increase_audio_volume(void) {
-  if((gGui->mixer.method == SOUND_CARD_MIXER) && 
-     (gGui->mixer.caps & MIXER_CAP_VOL) && (gGui->mixer.volume_level < 100))
+  if((gGui->mixer.method == SOUND_CARD_MIXER) && (gGui->mixer.caps & MIXER_CAP_VOL))
     change_audio_vol((gGui->mixer.volume_level + 1));
   else if(gGui->mixer.method == SOFTWARE_MIXER)
     gui_increase_amp_level();
-  
 }
 void gui_decrease_audio_volume(void) {
-  if((gGui->mixer.method == SOUND_CARD_MIXER) &&
-     (gGui->mixer.caps & MIXER_CAP_VOL) && (gGui->mixer.volume_level > 0))
+  if((gGui->mixer.method == SOUND_CARD_MIXER) && (gGui->mixer.caps & MIXER_CAP_VOL))
     change_audio_vol((gGui->mixer.volume_level - 1));
   else if(gGui->mixer.method == SOFTWARE_MIXER)
     gui_decrease_amp_level();
