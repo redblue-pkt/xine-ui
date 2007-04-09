@@ -40,7 +40,12 @@
 #define GUI_NEXT     1
 #define GUI_PREV     2
 #define GUI_RESET    3
-
+ 
+parameter_t gParameter =
+{
+	{ 0, 0    },
+	{ 0, NULL }
+};
 
 static const struct
 {
@@ -67,6 +72,8 @@ static const struct
 		  "ToggleAspectRatio", ACTID_TOGGLE_ASPECT_RATIO },
 	{ "Display stream information using OSD.",
 		  "OSDStreamInfos", ACTID_OSD_SINFOS },
+	{ "Display information using OSD.",
+		  "OSDWriteText", ACTID_OSD_WTEXT },
 	
 	{ "Interlaced mode toggle.",
 		  "ToggleInterleave", ACTID_TOGGLE_INTERLEAVE },
@@ -532,7 +539,15 @@ void do_action(int action)
 	        case ACTID_OSD_SINFOS:
 		        osd_stream_infos();
 		        break;
-		  
+
+		case ACTID_OSD_WTEXT:
+			if (gParameter.alphanum.set) {
+				osd_display_info("%s", gParameter.alphanum.arg);
+			} else {
+				osd_display_info("No text to display!");
+			}
+			break;
+
 		case ACTID_PAUSE:
 			action_pause();
 			break;

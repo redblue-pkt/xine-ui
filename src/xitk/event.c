@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -906,7 +906,15 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_OSD_SINFOS:
     osd_stream_infos();
     break;
-  
+
+  case ACTID_OSD_WTEXT:
+    if(gGui->alphanum.set) {
+      osd_display_info("%s", gGui->alphanum.arg);
+    } else {
+      osd_display_info(_("No text to display!"));
+    }
+    break;
+
   case ACTID_OSD_MENU:
     oxine_menu();
     break;

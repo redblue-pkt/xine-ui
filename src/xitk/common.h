@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -343,7 +343,12 @@ typedef struct {
     int                      set;
     int                      arg;
   } numeric;
-  
+
+  struct {
+    int                      set;
+    char                    *arg;
+  } alphanum;
+
   int                        eventer_sticky;
   int                        stream_info_auto_update;
 

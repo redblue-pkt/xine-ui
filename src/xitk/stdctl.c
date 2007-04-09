@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -35,6 +35,8 @@
 
 #include "common.h"
 
+#undef DEBUG_STDCTL
+
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
 
@@ -52,45 +54,96 @@ static void *xine_stdctl_loop(void *dummy) {
   fd_set            set;
   struct timeval    tv;
   int               secs, last_secs;
+  char             *params;
 
   last_secs = -1;
+  params = NULL;
 
   while(gGui->running) {
 
     FD_ZERO(&set);
     FD_SET(stdctl.fd, &set);
-    
+
     tv.tv_sec  = 0;
     tv.tv_usec = 500000;
 
     select(stdctl.fd + 1, &set, NULL, NULL, &tv);
-    
+
     if(FD_ISSET(stdctl.fd, &set)) {
+
       len = read(stdctl.fd, &c, 255);
+
       if(len > 0) {
+
 	c[len - 1] = '\0';
 	
-#if 0
+#ifdef DEBUG_STDCTL
 	fprintf(stdout, "Command Received = '%s'\n", c);
 #endif
-	
+
+	/* Handle optional parameter */
+
+	/* alphanum: separated from the command by a '$'        */
+	/* syntax:   "command$parameter"                        */
+	/* example:  "OSDWriteText$Some Information to Display" */
+
+	gGui->alphanum.set = 0;
+	params = strchr(c, '$');
+
+	if(params != NULL) {
+
+	  /* parameters available */
+
+	  *params = '\0';
+	  params++;
+
+	  gGui->alphanum.set = 1;
+	  gGui->alphanum.arg = params;
+
+#ifdef DEBUG_STDCTL
+	  fprintf(stdout, "Command: '%s'\nParameters: '%s'\n", c, params);
+#endif
+	}
+
+	/* numeric: separated from the command by a '#' */
+	/* syntax:  "command#parameter"                 */
+	/* example: "SetPosition%#99"                   */
+
+	gGui->numeric.set = 0;
+	params = strchr(c, '#');
+
+	if(params != NULL) {
+
+	  /* parameters available */
+
+	  *params = '\0';
+	  params++;
+
+	  gGui->numeric.set = 1;
+	  gGui->numeric.arg = atoi(params);
+
+#ifdef DEBUG_STDCTL
+	  fprintf(stdout, "Command: '%s'\nParameters: '%d'\n", c, gGui->numeric.arg);
+#endif
+	}
+
 	k = kbindings_lookup_action(gGui->kbindings, c);
-	
+
 	if(k)
 	  gui_execute_action_id((kbindings_get_action_id(k)));
       }
-      
+
       if(panel_is_visible())
 	xitk_paint_widget_list (panel->widget_list);
-      
+
       if(len == -1) 
 	break;
-      
     }
 
     if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
+
       secs /= 1000;
-      
+
       if (secs != last_secs) {
 	fprintf(stdout, "time: %d\n", secs);
 	fflush(stdout);

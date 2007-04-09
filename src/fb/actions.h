@@ -22,6 +22,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -122,6 +123,7 @@ typedef enum {
   ACTID_ADDMEDIAMARK,
   ACTID_SKINDOWNLOAD,
   ACTID_OSD_SINFOS,
+  ACTID_OSD_WTEXT,
   ACTID_FILESELECTOR,
   ACTID_SUBSELECT,
 
@@ -199,6 +201,20 @@ typedef enum {
    * End of numeric mapping.
    */
 } action_id_t;
+ 
+typedef struct {
+
+  struct {
+    int set;
+    int arg;
+  } numeric;
+
+  struct {
+    int   set;
+    char *arg;
+  } alphanum;
+
+} parameter_t;
 
 int default_command_action(char *action_str);
 void do_action(int action);
