@@ -71,6 +71,8 @@ dnl Check for xine-lib
 dnl
 PKG_CHECK_MODULES([XINE], [libxine >= 1.1.0])
 
+CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
+
 dnl
 dnl threads: xine-config tell us what should be used, but
 dnl          xitk need to be linked to thread lib, so the follow AC_SUBST() 
