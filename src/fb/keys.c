@@ -23,6 +23,7 @@
 #include "config.h"
 #endif
 
+#include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
 
@@ -69,6 +70,7 @@ static int default_key_action(int key)
 
 		case K_ENTER: return ACTID_PLAY;
 
+		case '\033': /* ESC */
 		case 'q': 
 		case 'Q': return ACTID_QUIT;
 
@@ -122,10 +124,10 @@ static void exit_keyboard(void)
 	tcsetattr(fbxine.tty_fd, TCSANOW, &fbxine.ti_save);
 
 #ifdef HAVE_LINUX_KD_H
-	if(ioctl(fbxine.tty_fd, KDSETMODE, KD_TEXT) == -1)
+	if (ioctl(fbxine.tty_fd, KDSETMODE, KD_TEXT) == -1)
 		perror("Failed to set /dev/tty to text mode");
 #endif
-	
+
 	close(fbxine.tty_fd);
 }
 
@@ -136,20 +138,19 @@ int fbxine_init_keyboard(void)
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_keyboard);
 	fbxine_register_abort(&exit_callback,(fbxine_callback_t)exit_keyboard);
 
-	fbxine.tty_fd = open("/dev/tty", O_RDWR);
-	if(fbxine.tty_fd == -1)
+	if (isatty(STDIN_FILENO))
+		fbxine.tty_fd = dup(STDIN_FILENO);
+	else
+		fbxine.tty_fd = open("/dev/tty", O_RDWR);
+	if (fbxine.tty_fd == -1)
 	{
 		perror("Failed to open /dev/tty");
 		return 0;
 	}
 
 #ifdef HAVE_LINUX_KD_H
-	if(ioctl(fbxine.tty_fd, KDSETMODE, KD_GRAPHICS) == -1)
-	{
+	if (ioctl(fbxine.tty_fd, KDSETMODE, KD_GRAPHICS) == -1)
 		perror("Failed to set /dev/tty to graphics mode");
-		close(fbxine.tty_fd);
-		return 0;
-	}
 #endif
 
 	tcgetattr(fbxine.tty_fd, &fbxine.ti_save);
