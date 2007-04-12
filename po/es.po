@@ -1,4 +1,4 @@
-# translation of xine-ui-0.99.4.po to Spanish
+# translation of xine-ui.po to Spanish
 # translation of xine-ui-es.po to
 # Spanish .po file for xine-ui.
 # Copyright (C) 2001,2003, 2007 Free Software Foundation, Inc.
@@ -8,10 +8,10 @@
 # Carlos E. Robinson M. <carloser@users.sourceforge.net>, 2006, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui-0.99.4\n"
+"Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2007-02-28 14:01+0100\n"
+"PO-Revision-Date: 2007-04-13 00:30+0200\n"
 "Last-Translator: Carlos E. Robinson <carloser@users.sourceforge.net>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
@@ -99,9 +99,8 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): no se puede crear un hilo nuevo (%s)\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
-msgstr "No hay mrl."
+msgstr "No hay MRL."
 
 #: src/xitk/actions.c:1789
 #, c-format
@@ -141,9 +140,8 @@ msgid "Select all"
 msgstr "Seleccionar todo"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
-msgstr "Cargando flujo(s)"
+msgstr "Cargando Flujo(s) "
 
 #: src/xitk/actions.c:2260 src/xitk/mediamark.c:3203
 msgid "Pick a subtitle file"
@@ -235,7 +233,7 @@ msgstr "Control del valor de BRILLO"
 
 #: src/xitk/control.c:787
 msgid "Brt"
-msgstr "Brl"
+msgstr "Brll"
 
 #: src/xitk/control.c:807
 msgid "Control CONTRAST value"
@@ -433,9 +431,8 @@ msgid "Playlist: shuffle forever."
 msgstr "Lista de reproducción: siempre aleatorio."
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Nombre de la pantalla de vídeo"
+msgstr "¡No hay texto que mostrar!"
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -533,26 +530,26 @@ msgid "Windows stacking"
 msgstr "Apilación de ventanas"
 
 #: src/xitk/event.c:1397
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
 msgstr ""
-"Usa la propiedad de capas del gestor de ventanas para poner las ventanas "
-"encima."
+"Usa la propiedad de capas del gestor de ventanas\n"
+"para poner las ventanas encima excepto \n"
+"para la ventana de vídeo en modo no de pantalla completa."
 
 #: src/xitk/event.c:1405
 msgid "Windows stacking (more)"
 msgstr "Apilación de ventanas (más)"
 
 #: src/xitk/event.c:1406
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
 msgstr ""
-"Usa la propiedad de capas del gestor de ventanas para poner las ventanas "
-"encima."
+"Usa la propiedad de capas del gestor de ventanas\n"
+"para poner las ventanas encima\n"
+"para todas las ventanas (manda sobre el ajuste 'layer_above')."
 
 #: src/xitk/event.c:1415
 msgid "Snapshot location"
@@ -846,9 +843,9 @@ msgstr "No se puede borrar el archivo '%s': %s."
 
 # CER El signo de cierre de interrogación está en el código fuente.
 #: src/xitk/file_browser.c:1011
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "¿Realmente quiere borrar el fichero: '%s'?"
+msgstr "¿Realmente quiere borrar el fichero '%s%s%s' ?"
 
 #: src/xitk/file_browser.c:1016
 msgid "Confirm deletion ?"
@@ -982,22 +979,23 @@ msgstr "Presione teclas del teclado..."
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
 msgstr ""
+"Ventana Receptora de Eventos:  Pulse las teclas a convertir en atajo..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "¿Acepta?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
 msgstr ""
 "¿Guardar %s como\n"
-"atajo de teclado '%s'?."
+"atajo de teclado '%s' ?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
@@ -1006,14 +1004,12 @@ msgstr ""
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
-msgstr "Editor de atajos de teclado"
+msgstr "Editor de Atajos de Teclado"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
-msgstr "Acción del atajo"
+msgstr "Acción del Atajo"
 
 #: src/xitk/kbindings.c:2127
 msgid "Key"
@@ -1079,13 +1075,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Esto es xine (IGU X11) - un reproductor de vídeo libre v%s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 El Equipo de xine.\n"
+"(c) 2000-2007 El Equipo de xine.\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1140,7 +1136,7 @@ msgstr ""
 " Complementos de xine disponibles:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
 msgstr "¡No se encuentran complementos de tipo %s disponibles!\n"
 
@@ -1258,9 +1254,9 @@ msgid "  -I, --no-gui                 disable GUI\n"
 msgstr "  -I, --no-gui                 desactivar interfaz gráfica\n"
 
 #: src/xitk/main.c:626
-#, fuzzy, c-format
+#, c-format
 msgid "      --no-mouse               disable mouse event\n"
-msgstr "  -I, --no-gui                 desactivar interfaz gráfica\n"
+msgstr "      --no-mouse               desactivar evento del ratón\n"
 
 #: src/xitk/main.c:627
 #, c-format
@@ -1334,10 +1330,9 @@ msgstr ""
 "  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
 
 #: src/xitk/main.c:643
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr ""
-"  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
+msgstr "  -W, --wid                    Use un identificador de ventana.\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1698,7 +1693,6 @@ msgstr ""
 "importante que tiene para usted ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "No hay información disponible."
 
@@ -1731,10 +1725,9 @@ msgstr ""
 "Compruebe el nombre de la máquina."
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr ""
-"El archivo o mrl especificado no se encontró. Por favor vuelva a comprobarlo."
+"El archivo o MRL especificado no se encontró. Por favor vuelva a comprobarlo."
 
 #: src/xitk/main.c:1162
 msgid ""
@@ -1747,7 +1740,6 @@ msgstr ""
 "datos (por ejemplo, que no haya disco en la unidad)."
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
 msgstr "Ocurrió un problema al cargar una biblioteca o un decodificador"
 
@@ -1767,7 +1759,6 @@ msgstr ""
 "compró."
 
 #: src/xitk/main.c:1200
-#, fuzzy
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
@@ -1830,9 +1821,9 @@ msgstr ""
 "archivo BUG-REPORT.TXT.\n"
 
 #: src/xitk/main.c:1851
-#, fuzzy, c-format
+#, c-format
 msgid "window id is required for -wid option\n"
-msgstr "Se requiere el id. del manejador de vídeo para la opción -V\n"
+msgstr "se requiere el id. de ventana para la opción -wid\n"
 
 #: src/xitk/main.c:1858
 #, c-format
@@ -1840,7 +1831,7 @@ msgid "invalid argument %d => exit\n"
 msgstr "argumento %d inválido => salir\n"
 
 #: src/xitk/main.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "Debería especificar un MRL para encolarlo, ¡por lo menos!\n"
 
@@ -1877,9 +1868,8 @@ msgstr ""
 "progresivos son detectados automáticamente sin detrimento del desempeño."
 
 #: src/xitk/main.c:2141
-#, fuzzy
 msgid "Logo MRL"
-msgstr "mrl del logo"
+msgstr "MRL del logo"
 
 #: src/xitk/mediamark.c:482
 msgid "!!Invalid entry!!"
@@ -2510,7 +2500,7 @@ msgstr "visibilidad de los consejos del IGU"
 #: src/xitk/panel.c:1496
 msgid "If disabled, no tooltips are shown."
 msgstr ""
-"si se desactiva, no se ven los consejos o ayudas en la interfaz gráfica."
+"Si se desactiva, no se ven los consejos o ayudas en la interfaz gráfica."
 
 #: src/xitk/panel.c:1502
 msgid "Tips timeout (ms)"
@@ -2689,9 +2679,8 @@ msgstr ""
 "de usuario."
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
-msgstr "configuración de xine"
+msgstr "Configuración de xine"
 
 #: src/xitk/setup.c:1114
 msgid "(*)  you need to restart xine for this setting to take effect"
@@ -2765,9 +2754,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "No se puede recuperar la lista de pieles de %s: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "No se puede descargar '%s': %s\n"
+msgstr "No se puede descargar '%s': %s "
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2785,14 +2774,13 @@ msgid "Unable to create '%s'."
 msgstr "No se puede crear '%s'."
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "Sea paciente..."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
-msgstr "Recuperar la lista de pieles de %s"
+msgstr "Recuperando lista de pieles desde %s"
 
 #: src/xitk/skins.c:1087
 msgid "Choose a skin to download..."
@@ -3007,18 +2995,16 @@ msgid "Command to turn on TV out"
 msgstr "Comando para habilitar la salida al TV"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "Parámetros de vídeo para TV/analógico"
+msgstr "Parámetros de Vídeo para TV analógica"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "Entrada: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
-msgstr "Sistema de difusión: "
+msgstr "Sistema de Difusión: "
 
 #: src/xitk/tvset.c:419
 msgid "Channel: "
@@ -3160,24 +3146,9 @@ msgid "There is no log entry for logging section '%s'.\n"
 msgstr "No hay una entrada de registro para la sección '%s'.\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
-msgstr "visor del registro de xine"
+msgstr "Visor del Registro de xine"
 
 #: src/xitk/viewlog.c:458
 msgid "Refresh"
 msgstr "Refrescar"
-
-#~ msgid "Use wm layer property to place window on top."
-#~ msgstr ""
-#~ "Usa la propiedad de las capas del gestor de ventanas para poner la "
-#~ "ventana encima."
-
-#~ msgid "Event receiver window"
-#~ msgstr "Ventana receptora de eventos"
-
-#~ msgid "No Informations available."
-#~ msgstr "No hay informaciones disponibles."
-
-#~ msgid "Ok"
-#~ msgstr "Ok"
