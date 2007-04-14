@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-19 00:26+0200\n"
+"POT-Creation-Date: 2007-04-13 02:11+0200\n"
 "PO-Revision-Date: 2006-06-19 00:29+0200\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
@@ -19,15 +19,15 @@ msgstr ""
 "X-Generator: KBabel 1.11.2\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1166
+#: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
 msgstr "Seleziona l'elemento corrente"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1174
+#: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
 msgstr "Riproduci l'elemento selezionato"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1185
+#: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
 msgstr "Chiudi la finestra di navigazione MRL"
 
@@ -94,23 +94,23 @@ msgstr "La mia finestra"
 msgid "Quit"
 msgstr "Esci"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1102
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
 msgid "Question?"
 msgstr "Domande?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "Yes"
 msgstr "Sì"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1573
 msgid "Cancel"
 msgstr "Annulla"
 

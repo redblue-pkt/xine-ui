@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk 0.99.2\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-19 00:26+0200\n"
+"POT-Creation-Date: 2007-04-13 02:11+0200\n"
 "PO-Revision-Date: 2004-07-26 11:56+0300\n"
 "Last-Translator: Pavel Maryanov <acid_jack@ukr.net>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -16,17 +16,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.3\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1166
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
 msgstr "Выбрать текущий пункт"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1174
+#: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
 msgstr "Воспроизвести выбранный пункт"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1185
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
 msgstr "Закрыть окно MRL-браузера"
 
@@ -81,9 +79,9 @@ msgstr ""
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:962
-#, fuzzy, c-format
+#, c-format
 msgid "init_test() failed\n"
-msgstr "Сбой XInitThreads().\n"
+msgstr "Сбой init_test().\n"
 
 #: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
@@ -93,24 +91,23 @@ msgstr "Мое гребаное окно"
 msgid "Quit"
 msgstr "Выход"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1102
 msgid "OK"
 msgstr "ОК"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
 msgid "Question?"
 msgstr "Вопрос?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "Yes"
 msgstr "Да"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
-#, fuzzy
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "No"
 msgstr "Нет"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1573
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -119,50 +116,5 @@ msgid "Error"
 msgstr "Ошибка"
 
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
-#, fuzzy
 msgid "Information"
 msgstr "Информация"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Информация"
-
-#, fuzzy
-#~ msgid "No Information available."
-#~ msgstr "Информация"
-
-#, fuzzy
-#~ msgid "Stream/Information..."
-#~ msgstr "Информация"
-
-#, fuzzy
-#~ msgid "Stream/Information (OSD)"
-#~ msgstr "Информация"
-
-#, fuzzy
-#~ msgid "Close playlist window"
-#~ msgstr "Закрыть окно MRL-браузера"
-
-#, fuzzy
-#~ msgid "Error: "
-#~ msgstr "Ошибка"
-
-#, fuzzy
-#~ msgid "xine_get_current_frame() failed\n"
-#~ msgstr "сбой init_test()\n"
-
-#, fuzzy
-#~ msgid "png_create_write_struct() failed\n"
-#~ msgstr "сбой init_test()\n"
-
-#, fuzzy
-#~ msgid "png_create_info_struct() failed\n"
-#~ msgstr "сбой init_test()\n"
-
-#, fuzzy
-#~ msgid "Channel: "
-#~ msgstr "Отмена"
-
-#, fuzzy
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "сбой init_test()\n"

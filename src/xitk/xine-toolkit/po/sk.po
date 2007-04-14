@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-19 00:26+0200\n"
+"POT-Creation-Date: 2007-04-13 02:11+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -14,17 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1166
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
 msgstr "Vybra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1174
+#: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
 msgstr "Prehra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1185
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
 msgstr "Zatvori» okno MRL prehliadaèa"
 
@@ -49,9 +47,9 @@ msgid "New integer value is: %d. Confirm ?"
 msgstr "Nová celoèíselná hodnota je %d. Potvrdi» ?"
 
 #: src/xitk/xine-toolkit/test.c:430
-#, fuzzy, c-format
+#, c-format
 msgid "New double value is: %e. Confirm ?"
-msgstr "Nová celoèíselná hodnota je %d. Potvrdi» ?"
+msgstr "Nová celoèíselná hodnota je %e. Potvrdi» ?"
 
 #: src/xitk/xine-toolkit/test.c:532
 msgid "My Frame"
@@ -79,9 +77,9 @@ msgstr ""
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:962
-#, fuzzy, c-format
+#, c-format
 msgid "init_test() failed\n"
-msgstr "XInitThreads() zlyhali.\n"
+msgstr "init_test() zlyhali.\n"
 
 #: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
@@ -91,24 +89,23 @@ msgstr "Moje okno"
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1102
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "Yes"
 msgstr "Áno"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
-#, fuzzy
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1573
 msgid "Cancel"
 msgstr "Zru¹i»"
 
@@ -119,27 +116,3 @@ msgstr ""
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
 msgid "Information"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Close playlist window"
-#~ msgstr "Zatvori» okno MRL prehliadaèa"
-
-#, fuzzy
-#~ msgid "xine_get_current_frame() failed\n"
-#~ msgstr "init_test() zlyhal\n"
-
-#, fuzzy
-#~ msgid "png_create_write_struct() failed\n"
-#~ msgstr "init_test() zlyhal\n"
-
-#, fuzzy
-#~ msgid "png_create_info_struct() failed\n"
-#~ msgstr "init_test() zlyhal\n"
-
-#, fuzzy
-#~ msgid "Channel: "
-#~ msgstr "Zru¹i»"
-
-#, fuzzy
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "init_test() zlyhal\n"

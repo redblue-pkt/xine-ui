@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.23\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-19 00:26+0200\n"
+"POT-Creation-Date: 2007-04-13 02:11+0200\n"
 "PO-Revision-Date: 2006-09-14 08:54+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1166
+#: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
 msgstr "Wähle momentanen Eintrag"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1174
+#: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
 msgstr "Spiele momentanen Eintrag"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1185
+#: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
 msgstr "MRL-Browser-Fenster schließen"
 
@@ -89,23 +89,23 @@ msgstr "Mein Sch***-Fenster"
 msgid "Quit"
 msgstr "Beenden"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1102
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
 msgid "Question?"
 msgstr "Frage?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "Yes"
 msgstr "Ja"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "No"
 msgstr "Nein"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1573
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -116,36 +116,3 @@ msgstr "Fehler"
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
 msgid "Information"
 msgstr "Information"
-
-#~ msgid "Stream information"
-#~ msgstr "Datenstrominformation"
-
-#~ msgid "No Information available."
-#~ msgstr "Keine Information verfügbar"
-
-#~ msgid "Stream/Information..."
-#~ msgstr "Datenstrom/Information..."
-
-#~ msgid "Stream/Information (OSD)"
-#~ msgstr "Datenstrom/Information (OSD)"
-
-#~ msgid "Close playlist window"
-#~ msgstr "Playlist-Fenster schließen"
-
-#~ msgid "Error: "
-#~ msgstr "Fehler: "
-
-#~ msgid "xine_get_current_frame() failed\n"
-#~ msgstr "xine_get_current_frame() fehlgeschlagen\n"
-
-#~ msgid "png_create_write_struct() failed\n"
-#~ msgstr "png_create_write_struct() fehlgeschlagen\n"
-
-#~ msgid "png_create_info_struct() failed\n"
-#~ msgstr "png_create_info_struct() fehlgeschlagen\n"
-
-#~ msgid "Channel: "
-#~ msgstr "Kanal: "
-
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "XAllocWMHints() fehlgeschlagen\n"

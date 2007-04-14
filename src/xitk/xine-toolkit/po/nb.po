@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2006-06-19 00:26+0200\n"
+"POT-Creation-Date: 2007-04-13 02:11+0200\n"
 "PO-Revision-Date: 2005-12-04 13:11+0000\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
@@ -18,17 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10.1\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1166
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
 msgstr "Velg gjeldende oppføring"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1174
+#: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
 msgstr "Spill av valgte oppføring"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1185
-#, fuzzy
+#: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
 msgstr "Lukk MRL-blavinduet"
 
@@ -83,9 +81,9 @@ msgstr ""
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:962
-#, fuzzy, c-format
+#, c-format
 msgid "init_test() failed\n"
-msgstr "«XInitThreads()» feilet.\n"
+msgstr "«init_test()» feilet.\n"
 
 #: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
@@ -95,24 +93,23 @@ msgstr "MItt jævla horevindu"
 msgid "Quit"
 msgstr "Avslutt"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1102
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
 msgid "Question?"
 msgstr "Spørsmål?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "Yes"
 msgstr "Ja"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
-#, fuzzy
+#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
 msgid "No"
 msgstr "Nei"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1573
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -121,50 +118,5 @@ msgid "Error"
 msgstr "Feil"
 
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
-#, fuzzy
 msgid "Information"
 msgstr "Informasjon"
-
-#, fuzzy
-#~ msgid "Stream information"
-#~ msgstr "Informasjon"
-
-#, fuzzy
-#~ msgid "No Information available."
-#~ msgstr "Informasjon"
-
-#, fuzzy
-#~ msgid "Stream/Information..."
-#~ msgstr "Informasjon"
-
-#, fuzzy
-#~ msgid "Stream/Information (OSD)"
-#~ msgstr "Informasjon"
-
-#, fuzzy
-#~ msgid "Close playlist window"
-#~ msgstr "Lukk MRL-blavinduet"
-
-#, fuzzy
-#~ msgid "Error: "
-#~ msgstr "Feil"
-
-#, fuzzy
-#~ msgid "xine_get_current_frame() failed\n"
-#~ msgstr "«init_test()» feilet\n"
-
-#, fuzzy
-#~ msgid "png_create_write_struct() failed\n"
-#~ msgstr "«init_test()» feilet\n"
-
-#, fuzzy
-#~ msgid "png_create_info_struct() failed\n"
-#~ msgstr "«init_test()» feilet\n"
-
-#, fuzzy
-#~ msgid "Channel: "
-#~ msgstr "Avbryt"
-
-#, fuzzy
-#~ msgid "XAllocWMHints() failed\n"
-#~ msgstr "«init_test()» feilet\n"
