@@ -48,6 +48,17 @@ detect_configure_ac() {
   }
 }
 
+parse_version_no() {
+  # version no. is extended/truncated to three parts; only digits are handled
+  perl -e 'my $v = <>;
+	   chomp $v;
+	   my @v = split (" ", $v);
+	   $v = $v[$#v];
+	   $v =~ s/[^0-9.].*$//;
+	   @v = split (/\./, $v);
+	   push @v, 0 while $#v < 2;
+	   print $v[0] * 10000 + $v[1] * 100 + $v[2], "\n"'
+}
 
 #--------------------
 # AUTOCONF
@@ -58,12 +69,8 @@ detect_autoconf() {
   NUM_RESULT=$#
   RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    AC="`autoconf --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    AUTOCONF_MIN="`echo $AUTOCONF_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    if test $AC -lt 100 ; then
-      AC=`expr $AC \* 10`
-    fi
-    if [ `expr $AC` -ge $AUTOCONF_MIN ]; then
+    AC="`autoconf --version | parse_version_no`"
+    if [ `expr $AC` -ge "`echo $AUTOCONF_MIN | parse_version_no`" ]; then
       autoconf_ok=yes
     fi
   else
@@ -114,12 +121,8 @@ detect_automake() {
   NUM_RESULT=$#
   RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    AM="`automake --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    AUTOMAKE_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    if test $AM -lt 100 ; then
-      AM=`expr $AM \* 10`
-    fi
-    if [ `expr $AM` -ge $AUTOMAKE_MIN ]; then
+    AM="`automake --version | parse_version_no`"
+    if [ `expr $AM` -ge "`echo $AUTOMAKE_MIN | parse_version_no`" ]; then
       automake_ok=yes
     fi
   else
@@ -156,12 +159,8 @@ detect_aclocal() {
   NUM_RESULT=$#
   RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    AC="`aclocal --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    ACLOCAL_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    if test $AC -lt 100 ; then
-      AC=`expr $AC \* 10`
-    fi
-    if [ `expr $AC` -ge $ACLOCAL_MIN ]; then
+    AC="`aclocal --version | parse_version_no`"
+    if [ `expr $AC` -ge "`echo $AUTOMAKE_MIN | parse_version_no`" ]; then
       aclocal_ok=yes
     fi
   else
