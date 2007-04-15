@@ -73,8 +73,13 @@ noinst_HEADERS = \
 	xitkintl.h
 
 test_SOURCES = test.c
-test_DEPENDENCIES = libxitk.a
-test_LDADD = libxitk.a
+test_DEPENDENCIES = libxitk.a \
+             $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a
+
+test_LDADD = libxitk.a \
+             $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
+	     $(X_PRE_LIBS) $(X_LIBS) $(XFT_LIBS) -lX11 \
+	     $(THREAD_LIBS) $(LIBPNG_LIBS) $(INTLLIBS)
 
 $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a:
 	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.a

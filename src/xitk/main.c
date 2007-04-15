@@ -579,7 +579,7 @@ static void show_usage (void) {
   printf("\n");
   printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
   printf("\n");
-  printf("OPTIONS are:\n");
+  printf(_("OPTIONS are:\n"));
   printf(_("  -v, --version                Display version.\n"));
   printf(_("      --verbose [=level]       Set verbosity level. Default is 1.\n"));
   printf(_("  -c, --config <file>          Use config file instead of default one.\n"));
@@ -1352,7 +1352,7 @@ int main(int argc, char *argv[]) {
   int                     session_argv_num = 0;
   int                     retval           = 0;
   
-#ifdef HAVE_SETLOCALE
+#ifdef ENABLE_NLS
   if((xitk_set_locale()) != NULL) {
     setlocale(LC_ALL, "");
     setlocale(LC_NUMERIC, "C");
@@ -1806,9 +1806,11 @@ int main(int argc, char *argv[]) {
 	  printf(_("*** NOTE ***\n"));
 	  printf(_(" Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"));
 
-#ifdef HAVE_SETLOCALE
-	if((xitk_set_locale()) != NULL)
-	  setlocale(LC_ALL, "C");
+#ifdef ENABLE_NLS
+	if((xitk_set_locale()) != NULL) {
+	  setlocale(LC_ALL, "");
+          setlocale(LC_NUMERIC, "C");
+        }
 #endif
 
 	  if (dup2((fileno(f)), STDOUT_FILENO) < 0)

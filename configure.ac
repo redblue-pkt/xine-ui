@@ -580,14 +580,16 @@ AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 dnl
 dnl desktop dir location, xine-config told us about this.
 dnl
-escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
-XINE_SCRIPTDIR="`echo $xine_script_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
-AC_SUBST(XINE_SCRIPTDIR)
-AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR", [Location of the scripts])
+makeexpand () {
+  local i
+  local j
+  i="$1"
+  while test "$i" != "$j"; do j="$i"; eval i="$j"; done
+  echo "$i"
+}
 
-XINE_LOCALE="`echo $xine_locale_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
-AC_SUBST(XINE_LOCALE)
-AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XINE_LOCALE",[Location of Xine catalog files])
+XITK_LOCALEPATH="`makeexpand ${datadir}/locale`"
+AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALEPATH", [Location of Xine catalog files])
 
 
 dnl
@@ -603,7 +605,7 @@ fi
 if test "x$XINE_DOCPATH" = "x"; then
    XINE_DOCPATH="${datadir}/doc/xine-ui"
 fi
-eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
+XINE_DOCDIR="`makeexpand $XINE_DOCPATH`"
 AC_SUBST(XINE_DOCDIR)
 AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR",[Location of documentation files])
 
@@ -611,31 +613,28 @@ dnl
 dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="${datadir}/xine/skins"
-eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
+XINE_SKINPATH="`makeexpand ${datadir}/xine/skins`"
 AC_SUBST(XINE_SKINDIR)
-AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of xine skin directory])
+AC_SUBST(XINE_SKINPATH)
+AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINPATH",[Location of xine skin directory])
 
 XINE_LOGO_MRL="file:$XINE_SKINDIR/xine-ui_logo.mpv"
-AC_SUBST(XINE_LOGO_MRL)
-AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
+AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "`makeexpand $XINE_LOGO_MRL`",[official logo mrl])
 
 XINE_SPLASH="$XINE_SKINDIR/xine_splash.png"
-AC_SUBST(XINE_SPLASH)
-AC_DEFINE_UNQUOTED(XINE_SPLASH, "$XINE_SPLASH",[splash image])
+AC_DEFINE_UNQUOTED(XINE_SPLASH, "`makeexpand $XINE_SPLASH`",[splash image])
 
 XINE_VISDIR="${datadir}/xine/visuals"
-eval XINE_VISDIR=`eval echo "$XINE_VISDIR"`
 AC_SUBST(XINE_VISDIR)
-AC_DEFINE_UNQUOTED(XINE_VISDIR, "$XINE_VISDIR",[Location of xine visual animation streams])
+AC_DEFINE_UNQUOTED(XINE_VISDIR, "`makeexpand $XINE_VISDIR`",[Location of xine visual animation streams])
 
 XINE_OXINEDIR="${datadir}/xine/oxine"
-eval XINE_OXINEDIR=`eval echo "$XINE_OXINEDIR"`
 AC_SUBST(XINE_OXINEDIR)
-AC_DEFINE_UNQUOTED(XINE_OXINEDIR, "$XINE_OXINEDIR",[Location of osd menu (oxine) config files])
+AC_DEFINE_UNQUOTED(XINE_OXINEDIR, "`makeexpand $XINE_OXINEDIR`",[Location of osd menu (oxine) config files])
 
-DATA_DIR=`eval echo "$datadir"`
+DATA_DIR=`makeexpand "$datadir"`
 AC_SUBST(DATA_DIR)
-SYSCONF_DIR=`eval echo "$sysconfdir"`
+SYSCONF_DIR=`makeexpand "$sysconfdir"`
 AC_SUBST(SYSCONF_DIR)
 
 dnl

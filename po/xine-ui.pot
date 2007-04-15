@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
+"POT-Creation-Date: 2007-04-15 17:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1051,6 +1051,11 @@ msgstr ""
 #: src/xitk/main.c:580
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
+msgstr ""
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
 msgstr ""
 
 #: src/xitk/main.c:583

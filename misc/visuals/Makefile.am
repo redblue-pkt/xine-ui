@@ -1,5 +1,5 @@
 EXTRA_DIST = $(visuals_DATA)
 
-visualsdir = $(datadir)/xine/visuals
+visualsdir = $(XINE_VISDIR)
 
 visuals_DATA = default.avi

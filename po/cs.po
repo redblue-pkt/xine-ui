@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2007-04-15 15:24+0200\n"
+"POT-Creation-Date: 2007-04-15 17:49+0200\n"
+"PO-Revision-Date: 2007-04-15 17:52+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -509,7 +509,8 @@ msgstr "Synchronizovaný protokol X (debug)"
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
-"Provádet transakce X v synchronním re¾imu. Velmi pomalé, pou¾ívat pouze pro debugování!"
+"Provádet transakce X v synchronním re¾imu. Velmi pomalé, pou¾ívat pouze pro "
+"debugování!"
 
 #: src/xitk/event.c:1391
 #, c-format
@@ -557,7 +558,9 @@ msgstr "Interval nulování spoøièe obrazovky (s)"
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "Èas v sekundách mezi dvìma pøedstíranými událostmi pro ¹etøiè obrazovky, 0 zaká¾e"
+msgstr ""
+"Èas v sekundách mezi dvìma pøedstíranými událostmi pro ¹etøiè obrazovky, 0 "
+"zaká¾e"
 
 #: src/xitk/event.c:1431
 msgid "Chapter hopping"
@@ -967,8 +970,7 @@ msgstr "Tisknìte klávesy..."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
-"Okno k zachytávání událostí:  Tisknìte klávesy k pøiøazení..."
+msgstr "Okno k zachytávání událostí:  Tisknìte klávesy k pøiøazení..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
@@ -1133,6 +1135,11 @@ msgstr "Nebyly nalezeny ¾ádné moduly typu %s, které by byly k dispozici!\n"
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Pou¾ití: xine [VOLBY]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "VOLBY jsou:\n"
 
 #: src/xitk/main.c:583
 #, c-format

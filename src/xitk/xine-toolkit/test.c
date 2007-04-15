@@ -963,13 +963,12 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-#ifdef HAVE_SETLOCALE
+#ifdef ENABLE_NLS
   xitk_set_locale();
-  setlocale (LC_ALL, "");
-  printf("locale\n");
+  printf("locale: %s\n", setlocale (LC_ALL, ""));
 #endif
   
-  bindtextdomain("xitk", XITK_LOCALE);
+  printf("bindtextdomain: %s\n", bindtextdomain("xitk", XITK_LOCALE));
   textdomain("xitk");
 
   /* Create window */

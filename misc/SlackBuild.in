@@ -21,7 +21,7 @@ do_doinst() {
    cd install
   cat > doinst.sh <<EOF
 
-SKINDIR=@DATA_DIR@/xine/skins
+SKINDIR=@XINE_SKINPATH@
 DESKDIR=@DATA_DIR@/xine/desktop
 DATADIR=@DATA_DIR@
 SYSCONFDIR=@SYSCONF_DIR@

@@ -44,7 +44,7 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 
-#ifdef HAVE_SETLOCALE
+#ifdef ENABLE_NLS
 #include <locale.h>
 #endif
 
@@ -2176,7 +2176,7 @@ void xitk_subst_special_chars(char *src, char *dest) {
 char *xitk_set_locale(void) {
   char *cur_locale = NULL;
   
-#ifdef HAVE_SETLOCALE
+#ifdef ENABLE_NLS
   if(setlocale (LC_ALL,"") == NULL) {
     XITK_WARNING("locale not supported by C library\n");
     return NULL;
