@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2007-04-01 14:31+0200\n"
+"POT-Creation-Date: 2007-04-15 17:49+0200\n"
+"PO-Revision-Date: 2007-04-11 09:05+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
@@ -93,9 +93,8 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): Kann keinen neuen Thread erzeugen (%s)\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
-msgstr "Das ist keine MRL."
+msgstr "Keine MRL vorhanden."
 
 #: src/xitk/actions.c:1789
 #, c-format
@@ -135,9 +134,8 @@ msgid "Select all"
 msgstr "Alles auswählen"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
-msgstr "Ströme laden"
+msgstr "Datenströme werden geladen"
 
 #: src/xitk/actions.c:2260 src/xitk/mediamark.c:3203
 msgid "Pick a subtitle file"
@@ -426,9 +424,8 @@ msgid "Playlist: shuffle forever."
 msgstr "Playliste: Immer mischen."
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Name des Video-Bildschirms"
+msgstr "Kein Text zum anzeigen!"
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -832,9 +829,9 @@ msgid "Unable to delete file '%s': %s."
 msgstr "Kann Datei '%s' nicht löschen: %s."
 
 #: src/xitk/file_browser.c:1011
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Datei '%s' wirklich löschen?"
+msgstr "Datei '%s%s%s' wirklich löschen?"
 
 #: src/xitk/file_browser.c:1016
 msgid "Confirm deletion ?"
@@ -967,23 +964,23 @@ msgstr "Drücke Taste auf Tastatur..."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
+msgstr "Ereignisempfangsfenster: Drücke Taste auf Tastatur zum zuweisen..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "Akzeptieren?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
 msgstr ""
-"Sichere %s als\n"
-"'%s' Tastenbelegung ?"
+"%s als\n"
+"'%s' Tastenbelegung sichern?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
@@ -992,12 +989,10 @@ msgstr ""
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
 msgstr "Tastenbelegungseditor"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
 msgstr "Aktion zuordnen"
 
@@ -1065,13 +1060,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2006 Das xine Team.\n"
+"(c) 2000-2007 Das xine Team.\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1125,7 +1120,7 @@ msgstr ""
 " Verfügbare xine-Plugins:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
 msgstr "Keine verfügbaren Plugins für Typ %s gefunden!.\n"
 
@@ -1133,6 +1128,11 @@ msgstr "Keine verfügbaren Plugins für Typ %s gefunden!.\n"
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Benutzung: xine [OPTIONEN]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "Optionen sind:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1662,7 +1662,6 @@ msgid ""
 msgstr "Flaschenpost fon der xine Library ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "Keine Informationen verfügbar."
 
@@ -1695,7 +1694,6 @@ msgstr ""
 "Überprüfen Sie den Rechnernamen."
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr ""
 "Die angegebene Datei oder MRL wurde nicht gefunden. Überprüfen Sie diese "
@@ -1712,9 +1710,9 @@ msgstr ""
 "(z.B. Laufwerk leer)."
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
-msgstr "Es trat ein Problem beim Laden der Bibliothek oder des Dekoders aus"
+msgstr ""
+"Es trat ein Problem beim Laden einer Bibliothek oder eines Dekoders auf"
 
 #: src/xitk/main.c:1178
 msgid "The source seems encrypted, and can't be read."
@@ -1733,7 +1731,6 @@ msgstr ""
 "diese von ihnen gekaufte DVD zu lesen."
 
 #: src/xitk/main.c:1200
-#, fuzzy
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
@@ -1804,7 +1801,7 @@ msgid "invalid argument %d => exit\n"
 msgstr "Ungültiger Parameter %d => exit\n"
 
 #: src/xitk/main.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "Sie sollten wenigstens eine MRL zum Anhängen angeben!.\n"
 
@@ -1841,7 +1838,6 @@ msgstr ""
 "werden automatisch ohne Leistungseinbußen erkannt ."
 
 #: src/xitk/main.c:2141
-#, fuzzy
 msgid "Logo MRL"
 msgstr "Logo MRL"
 
@@ -2653,7 +2649,6 @@ msgstr ""
 "Konfigurationsoption vorhanden."
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
 msgstr "xine Konfiguration"
 
@@ -2726,9 +2721,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "Kann Skinliste von %s nicht bekommen: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "Kann '%s' nicht herunterladen: %s\n"
+msgstr "Kann '%s' nicht herunterladen: %s"
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2746,12 +2741,11 @@ msgid "Unable to create '%s'."
 msgstr "Kann '%s' nicht erzeichen."
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "Habe Geduld..."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
 msgstr "Beziehe Skinliste von %s"
 
@@ -2968,18 +2962,16 @@ msgid "Command to turn on TV out"
 msgstr "Befehl zum aktivieren des TV-Ausgangs"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "TV/Analog Videoparameter"
+msgstr "Analog-TV Videoparameter"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "Eingabeplugin: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
-msgstr "Broadcast-System: "
+msgstr "Verbreitungssystem: "
 
 #: src/xitk/tvset.c:419
 msgid "Channel: "
@@ -3120,9 +3112,8 @@ msgstr ""
 "Es ist kein Log Eintrag für die zu protokolierende Sektion '%s' vorhanden.\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
-msgstr "xine Log Betrachter"
+msgstr "xine Log-Betrachter"
 
 #: src/xitk/viewlog.c:458
 msgid "Refresh"
