@@ -4,7 +4,7 @@ endif
 
 noinst_LIBRARIES = libcommon.a $(commonx)
 
-AM_CFLAGS = @XINE_CFLAGS@
+AM_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS)
 
 EXTRA_DIST = getopt.c getopt1.c getopt.h xscreensaver-remote.c xscreensaver-remote.h 
 
@@ -16,7 +16,6 @@ endif
 
 libcommon_a_SOURCES = $(GETOPT_SRC) utils.c getline.c strndup.c strsep.c strlcat.c
 
-libcommonx_a_CFLAGS = $(X_CFLAGS)
 libcommonx_a_SOURCES = x11utils.c
 
 noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h

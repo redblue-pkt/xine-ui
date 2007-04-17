@@ -1,7 +1,7 @@
 SUBDIRS = data
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/xitk
-AM_CFLAGS = @XINE_CFLAGS@
+AM_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS)
 
 if HAVE_X11
 oxine_lib = liboxine.a

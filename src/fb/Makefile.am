@@ -1,4 +1,4 @@
-AM_CFLAGS = @XINE_CFLAGS@ -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
+AM_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS) -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
 
 bin_PROGRAMS = fbxine 
 
