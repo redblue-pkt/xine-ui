@@ -1850,7 +1850,7 @@ int main(int argc, char *argv[]) {
      	gGui->wid = window_id;
       } 
       else {
-	fprintf(stderr, _("window id is required for -wid option\n"));
+	fprintf(stderr, _("window id required for -W option\n"));
 	exit(1);
       }
       break;
