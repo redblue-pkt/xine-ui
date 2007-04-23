@@ -1,15 +1,15 @@
 # translation of xitk-eu.po to Librezale.org
 # translation of xitk.po to Librezale.org
 # This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER.
 # Piarres Beobide  <pi@beobide.net>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xitk-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2005-02-08 18:51+0100\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
 "MIME-Version: 1.0\n"
@@ -84,31 +84,31 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "init_test()-ek huts egin du.\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "Nire Leiho Madarikatua"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Itxi"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "Ados"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Galdera?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Bai"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Ez"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Utzi"
 

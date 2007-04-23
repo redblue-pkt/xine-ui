@@ -1,6 +1,6 @@
 # translation of it.po to Italian
 # This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER.
 #
 # Giovanni Venturi <jumpyj@libero.it>, 2003.
 # Giovanni Venturi <jumpyj@tiscali.it>, 2003.
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2006-06-19 00:29+0200\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -86,31 +86,31 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "init_test() fallito.\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "La mia finestra"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Esci"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Domande?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Sì"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Annulla"
 

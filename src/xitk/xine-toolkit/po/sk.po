@@ -1,13 +1,13 @@
 # xine-toolkit - slovak translation.
-# Copyright (C) 2002 the xine project (http://xine.sf.net).
+# Copyright (C) 2002,2007 the xine project (http://xine.sf.net).
 # Daniel Beòa <Daniel.Bena@dm-drogeriemarkt.sk>, 2002.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2002-01-25 10:11+0100\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -81,38 +81,38 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "init_test() zlyhali.\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "Moje okno"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Áno"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Zru¹i»"
 
 #: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
 msgid "Error"
-msgstr ""
+msgstr "Chyba"
 
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
 msgid "Information"
-msgstr ""
+msgstr "Informácie"

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2004-12-17 00:53+0100\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -81,31 +81,31 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Abandon"
 

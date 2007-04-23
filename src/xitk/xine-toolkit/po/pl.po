@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2006-01-26 20:00+0200\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Bart³omiej Muryn <bmuryn@gmail.com>\n"
 "Language-Team:  <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -77,31 +77,31 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "init_test() zawiod³o.\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "Moje Pieprzone Okno"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Koniec"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Pytanie?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Tak"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Anuluj"
 

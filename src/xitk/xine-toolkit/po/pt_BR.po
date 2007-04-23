@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-13 02:11+0200\n"
-"PO-Revision-Date: 2002-01-22 18:44GMT-3\n"
+"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Marcelo Roberto Jimenez <mroberto@cetuc.puc-rio.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,15 +15,15 @@ msgstr ""
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:1167
 msgid "Select current entry"
-msgstr ""
+msgstr "Ejeta a mídia atual"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:1175
 msgid "Play selected entry"
-msgstr ""
+msgstr "Toca a entrada selecionada"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:1186
 msgid "Close MRL browser window"
-msgstr ""
+msgstr "Fechar janela de selecionador de MRL"
 
 #: src/xitk/xine-toolkit/test.c:118
 #, c-format
@@ -80,38 +80,38 @@ msgstr ""
 msgid "init_test() failed\n"
 msgstr "erro em init_test().\n"
 
-#: src/xitk/xine-toolkit/test.c:977
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "My Fucking Window"
 
-#: src/xitk/xine-toolkit/test.c:1010
+#: src/xitk/xine-toolkit/test.c:1009
 msgid "Quit"
 msgstr "Sair"
 
-#: src/xitk/xine-toolkit/window.c:1102
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1180 src/xitk/xine-toolkit/window.c:1421
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Pergunta?"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Sim"
 
-#: src/xitk/xine-toolkit/window.c:1351 src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Não"
 
-#: src/xitk/xine-toolkit/window.c:1573
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Cancela"
 
 #: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
 msgid "Information"
-msgstr ""
+msgstr "Informação"
