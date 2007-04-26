@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-15 17:49+0200\n"
-"PO-Revision-Date: 2007-04-15 17:52+0200\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1786,26 +1786,26 @@ msgstr ""
 " Re¾im zprávy o chybì: V¹echny výstupní zprávy budou pøidány do souboru BUG-"
 "REPORT.TXT.\n"
 
-#: src/xitk/main.c:1851
+#: src/xitk/main.c:1853
 #, c-format
-msgid "window id is required for -wid option\n"
-msgstr "u volby -wid je vy¾adováno id okna\n"
+msgid "window id required for -W option\n"
+msgstr "u volby -W je vy¾adováno id okna\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "neplatný argument %d ==> konec\n"
 
-#: src/xitk/main.c:1878
+#: src/xitk/main.c:1880
 #, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "K zaøazení do fronty byste mìli uvést nejménì jedno MRL!\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "Automaticky znovu naèítat starý playlist"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1813,19 +1813,19 @@ msgstr ""
 "Je-li povoleno a jestli¾e nespecifikujete na pøíkazové øádce ¾ádné MRL, xine "
 "bude automaticky naèítat poslední playlist."
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "Automatické naèítání titulkù"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "Automaticky naèíst titulky, pokud existují"
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "Standardnì povolit korekci prokládání"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1833,7 +1833,7 @@ msgstr ""
 "Modul na korekci prokládání bude pøi startu povolen. Progresivní sekvence "
 "jsou automaticky rozpoznány bez ztráty výkonu."
 
-#: src/xitk/main.c:2141
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr "MRL loga"
 

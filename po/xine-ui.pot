@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-15 17:49+0200\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1564,50 +1564,50 @@ msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 
-#: src/xitk/main.c:1851
+#: src/xitk/main.c:1853
 #, c-format
-msgid "window id is required for -wid option\n"
+msgid "window id required for -W option\n"
 msgstr ""
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
 
-#: src/xitk/main.c:1878
+#: src/xitk/main.c:1880
 #, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr ""
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr ""
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr ""
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr ""
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr ""
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
 
-#: src/xitk/main.c:2141
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr ""
 

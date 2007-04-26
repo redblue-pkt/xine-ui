@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.1-cvs\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2005-01-07 06:56+0900\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Satoru SATOH <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
@@ -95,7 +95,6 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): 新しいスレッド(%s)を作成できません\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
 msgstr "mrl がありません"
 
@@ -137,7 +136,6 @@ msgid "Select all"
 msgstr "すべて選択"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
 msgstr "ストリーム読み込み中"
 
@@ -427,9 +425,8 @@ msgid "Playlist: shuffle forever."
 msgstr "再生リスト: ずっとシャッフル"
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "画面の名前"
+msgstr ""
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -814,9 +811,9 @@ msgid "Unable to delete file '%s': %s."
 msgstr "ファイル '%s' の削除に失敗しました: %s"
 
 #: src/xitk/file_browser.c:1011
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "本当にこのファイルを削除しますか: '%s"
+msgstr "本当にこのファイルを削除しますか: '%s%s%s'"
 
 #: src/xitk/file_browser.c:1016
 msgid "Confirm deletion ?"
@@ -949,14 +946,14 @@ msgstr "キーボードのキーを押してください..."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
+msgstr "イベント受信ウィンドウ:  キーボードのキーを押してください..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "受理しますか?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
@@ -965,7 +962,7 @@ msgstr ""
 "キーバインド '%s' として保存しますか?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
@@ -974,12 +971,10 @@ msgstr ""
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
 msgstr "キーバインドエディタ"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
 msgstr "バインドアクション"
 
@@ -1047,13 +1042,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "xine (X11 gui) - 無償の動画プレイヤー v%s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 xine チーム\n"
+"(c) 2000-2007 xine チーム\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1107,7 +1102,7 @@ msgstr ""
 "利用可能な xine のプラグイン:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
 msgstr "タイプ %s について利用可能なプラグインがありません!\n"
 
@@ -1115,6 +1110,11 @@ msgstr "タイプ %s について利用可能なプラグインがありませ�
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "使い方: xine [オプション]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "オプション:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1291,7 +1291,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "  -W, --wid                    Use a window id.\n"
 msgstr ""
-"  -R, --root                   ルートウィンドウを動画ウィンドウとして使う\n"
+"  -W, --wid                    ルートウィンドウを動画ウィンドウとして使う\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1632,7 +1632,6 @@ msgstr ""
 "きたいと思っています ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "利用可能な情報がありません"
 
@@ -1665,7 +1664,6 @@ msgstr ""
 "ホスト名を調べて下さい"
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr "指定のファイル/MRL がみつかりません. 再度調べ直して下さい"
 
@@ -1680,7 +1678,6 @@ msgstr ""
 "イブに未挿入)"
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
 msgstr "ライブラリまたはデコーダを読み込み中に障害が発生"
 
@@ -1699,7 +1696,6 @@ msgstr ""
 "ストール、使って、あなたの買ったディスクを読み込むことができます"
 
 #: src/xitk/main.c:1200
-#, fuzzy
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
@@ -1760,27 +1756,27 @@ msgstr ""
 " バグ報告モード: すべての出力メッセージは BUG-REPORT.TXT ファイルに追加されま"
 "す\n"
 
-#: src/xitk/main.c:1851
+#: src/xitk/main.c:1853
 #, fuzzy, c-format
-msgid "window id is required for -wid option\n"
-msgstr "-V オプションには動画ドライバー ID が必要です\n"
+msgid "window id required for -W option\n"
+msgstr "-W オプションには動画ドライバー ID が必要です\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "無効な引数 %d => 終了\n"
 
-#: src/xitk/main.c:1878
-#, fuzzy, c-format
+#: src/xitk/main.c:1880
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr ""
 "少なくともキューに入れるために 1 つの MRL を指定しなければなりません!\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "古い再生リストを自動的に再読み込み"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1788,19 +1784,19 @@ msgstr ""
 "もしこれが有効かつコマンド行で MRL を未指定なら xine は自動的に前の再生リスト"
 "を読み込みます"
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "字幕を自動的に読み込んでいます"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "もし字幕があれば自動的に読み込む"
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "デフォルトでインターレースを解除"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1808,8 +1804,7 @@ msgstr ""
 "インターレース解除プラグインは起動時に有効となります. プログレッシブストリー"
 "ムはパフォーマンスの低下なしに自動的に検出されます"
 
-#: src/xitk/main.c:2141
-#, fuzzy
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr "ロゴ MRL"
 
@@ -2132,24 +2127,20 @@ msgid "Audio/Visualization"
 msgstr "音声/可視化"
 
 #: src/xitk/menus.c:700
-#, fuzzy
 msgid "Audio/SEP"
-msgstr "音声"
+msgstr "音声/SEP"
 
 #: src/xitk/menus.c:704
-#, fuzzy
 msgid "Audio/Postprocess"
-msgstr "動画/後処理"
+msgstr "音声/後処理"
 
 #: src/xitk/menus.c:708
-#, fuzzy
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "動画/後処理/連鎖処理..."
+msgstr "音声/後処理/連鎖処理..."
 
 #: src/xitk/menus.c:712
-#, fuzzy
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "動画/後処理/後処理を有効に"
+msgstr "音声/後処理/後処理を有効に"
 
 #: src/xitk/menus.c:720 src/xitk/menus.c:933
 msgid "Subtitle/Channel"
@@ -2449,14 +2440,13 @@ msgid "If disabled, no tooltips are shown."
 msgstr ""
 
 #: src/xitk/panel.c:1502
-#, fuzzy
 msgid "Tips timeout (ms)"
 msgstr "チップスタイムアウト (ミリ秒)"
 
 #: src/xitk/panel.c:1503
 #, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "OSD の表示時間 (秒)"
+msgstr "OSD の表示時間 (ミリ秒)"
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
@@ -2626,7 +2616,6 @@ msgid ""
 msgstr "このユーザーレベルで利用可能な設定オプションはありません"
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
 msgstr "xine 設定"
 
@@ -2700,9 +2689,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "%s からスキン一覧の取得が出来ません: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "'%s' のダウンロードができません: %s\n"
+msgstr "'%s' のダウンロードができません: %s"
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2720,12 +2709,11 @@ msgid "Unable to create '%s'."
 msgstr "'%s' を作成できません"
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "待って下さい..."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
 msgstr "%s からスキン一覧を取得"
 
@@ -2942,16 +2930,14 @@ msgid "Command to turn on TV out"
 msgstr "TV 出力を有効にするコマンド"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "TV/アナログ動画パラメータ"
+msgstr "TV アナログ動画パラメータ"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "入力: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
 msgstr "放送システム: "
 
@@ -3087,7 +3073,6 @@ msgid "There is no log entry for logging section '%s'.\n"
 msgstr "ログセクション '%s' のログエントリがありません\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
 msgstr "xine ログビュアー"
 

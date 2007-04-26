@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -119,7 +119,7 @@ msgstr ""
 #: src/xitk/actions.c:2003
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr ""
+msgstr "XSendEvent(display, 0x%x ...) виявлено зб╕й.\n"
 
 # src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:196
 #: src/xitk/actions.c:2173 src/xitk/actions.c:2237 src/xitk/event_sender.c:492
@@ -204,7 +204,7 @@ msgstr "Закрити в╕кно управл╕ння"
 #: src/xitk/control.c:609
 #, fuzzy
 msgid "control: couldn't find image for background\n"
-msgstr "%s(): не можу знайти зображення тла\n"
+msgstr "control: не можу знайти зображення тла\n"
 
 #: src/xitk/control.c:738
 msgid "Control HUE value"
@@ -438,11 +438,9 @@ msgstr "Список композиц╕й"
 msgid "Playlist: shuffle forever."
 msgstr ""
 
-# src/xitk/event.c:913
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Ця програма вимога╓ граф╕чний режим X Windows.\n"
+msgstr ""
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -860,7 +858,7 @@ msgstr ""
 #: src/xitk/file_browser.c:1218
 #, fuzzy
 msgid "File Browser"
-msgstr "Нав╕гатор файл╕в Xine "
+msgstr "Нав╕гатор файл╕в xine "
 
 #: src/xitk/file_browser.c:1244
 msgid "All files"
@@ -1070,11 +1068,10 @@ msgstr ""
 
 # src/xitk/main.c:138
 #: src/xitk/main.c:443
-#, fuzzy, c-format
+#, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
-msgstr "З╕брано з б╕бл╕отекою xine %d.%d.%d [%s]-[%s]-[%s].\n"
+msgstr "З╕брано з б╕бл╕отекою xine %d.%d.%d (%s)\n"
 
-# src/xitk/main.c:141
 #: src/xitk/main.c:449
 #, c-format
 msgid "Found xine library version: %d.%d.%d (%s).\n"
@@ -1130,6 +1127,11 @@ msgstr "Не знайдено стил╕ Г╤К.\n"
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Використання: xine [опц╕╖]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "опц╕╖:\n"
 
 # src/xitk/main.c:159
 #: src/xitk/main.c:583
@@ -1197,7 +1199,7 @@ msgstr ""
 #: src/xitk/main.c:617
 #, fuzzy, c-format
 msgid "                    'F': in xinerama fullscreen mode.\n"
-msgstr "                    'f':  повноекранний режим.\n"
+msgstr "                    'F':  повноекранний режим.\n"
 
 # src/xitk/main.c:188
 #: src/xitk/main.c:619
@@ -1292,19 +1294,15 @@ msgstr ""
 
 # src/xitk/main.c:184
 #: src/xitk/main.c:642
-#, fuzzy, c-format
+#, c-format
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr ""
-"  -R, -root                  Вжити в╕кно root як в╕кно в╕део. (режим fb, "
-"aalib)\n"
+msgstr "  -R, --root                   Вжити в╕кно root як в╕кно в╕део.\n"
 
 # src/xitk/main.c:184
 #: src/xitk/main.c:643
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr ""
-"  -R, -root                  Вжити в╕кно root як в╕кно в╕део. (режим fb, "
-"aalib)\n"
+msgstr "  -W, --wid                    Вжити ID в╕кно.\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1551,7 +1549,7 @@ msgstr ""
 #: src/xitk/main.c:922 src/xitk/main.c:970
 #, fuzzy, c-format
 msgid "main: not using any audio driver (as requested).\n"
-msgstr "main: вибраний ауд╕о драйвер '%s' зазнав збою\n"
+msgstr "main: вибраний ауд╕о драйвер '  ' зазнав збою\n"
 
 # src/xitk/main.c:284
 #: src/xitk/main.c:943
@@ -1695,51 +1693,50 @@ msgid ""
 msgstr ""
 
 # src/xitk/main.c:531
-#: src/xitk/main.c:1851
-#, fuzzy, c-format
-msgid "window id is required for -wid option\n"
-msgstr "ID в╕део драйвера потр╕бен для -V опц╕╖\n"
+#: src/xitk/main.c:1853
+#, c-format
+msgid "window id required for -W option\n"
+msgstr "ID в╕кно потр╕бен для -W опц╕╖\n"
 
-# src/xitk/main.c:641
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "неправильний параметр %d => вих╕д\n"
 
-#: src/xitk/main.c:1878
+#: src/xitk/main.c:1880
 #, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr ""
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr ""
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr ""
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr ""
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr ""
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
 
-#: src/xitk/main.c:2141
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr ""
 
@@ -2257,7 +2254,7 @@ msgstr ""
 #: src/xitk/mrl_browser.c:276
 #, fuzzy
 msgid "xine MRL Browser"
-msgstr "Xine MRL нав╕гатор"
+msgstr "xine MRL нав╕гатор"
 
 # src/xitk/mrl_browser.c:212
 #: src/xitk/mrl_browser.c:303
@@ -2643,9 +2640,7 @@ msgid ""
 "There is no configuration option available in this user experience level."
 msgstr ""
 
-# src/xitk/setup.c:1109
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
 msgstr "Налаштування xine"
 
@@ -2675,9 +2670,9 @@ msgstr ""
 
 # src/xitk/skins.c:271 src/xitk/skins.c:310
 #: src/xitk/skins.c:362
-#, fuzzy, c-format
+#, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Опс, стиль '%s' не знайдено, вжива╓мо типовий '%s'.\n"
+msgstr "Опс, стиль не знайдено, вжива╓мо типовий '%s'.\n"
 
 # src/xitk/skins.c:298
 #: src/xitk/skins.c:392 src/xitk/skins.c:419
@@ -2765,7 +2760,7 @@ msgstr ""
 
 #: src/xitk/snapshot.c:898
 msgid "xine_get_current_frame() failed\n"
-msgstr ""
+msgstr "xine_get_current_frame() виявлено зб╕й\n"
 
 #: src/xitk/snapshot.c:907
 msgid "Wrong image size: "
@@ -2793,15 +2788,15 @@ msgstr ""
 #: src/xitk/snapshot.c:1041
 #, fuzzy
 msgid "File open failed"
-msgstr "Помилка в╕дкриття файлу (%s)\n"
+msgstr "Помилка в╕дкриття файлу"
 
 #: src/xitk/snapshot.c:1061
 msgid "png_create_write_struct() failed\n"
-msgstr ""
+msgstr "png_create_write_struct() виявлено зб╕й\n"
 
 #: src/xitk/snapshot.c:1075
 msgid "png_create_info_struct() failed\n"
-msgstr ""
+msgstr "png_create_info_struct() виявлено зб╕й\n"
 
 #: src/xitk/snapshot.c:1095
 msgid "PNG Parsing failed\n"
@@ -2812,15 +2807,12 @@ msgid "Error: yuy2_fudge failed\n"
 msgstr ""
 
 #: src/xitk/snapshot.c:1141
-#, fuzzy
 msgid "rgb_alloc() failed\n"
-msgstr "init_test() виявлено зб╕й\n"
+msgstr "rgb_alloc() виявлено зб╕й\n"
 
-# src/xitk/snapshot.c:1091
 #: src/xitk/snapshot.c:1222
-#, fuzzy
 msgid "File written: "
-msgstr "Файл '%s' записан.\n"
+msgstr "Файл записан: "
 
 # src/xitk/setup.c:1109
 #: src/xitk/splash.c:65
@@ -3074,9 +3066,9 @@ msgid "xine Video Borderless Window"
 msgstr "Повноекранний/В╕конний режим"
 
 #: src/xitk/videowin.c:1723
-#, fuzzy, c-format
+#, c-format
 msgid "XAllocWMHints() failed\n"
-msgstr "init_test() виявлено зб╕й\n"
+msgstr "XAllocWMHints() виявлено зб╕й\n"
 
 #: src/xitk/videowin.c:1738
 msgid "New stream sizes resize output window"

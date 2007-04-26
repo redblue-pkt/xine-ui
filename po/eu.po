@@ -1,15 +1,15 @@
 # translation of xine-ui-eu.po to Librezale.org
 # translation of xine-ui-orig.po to Librezale.org
 # This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER.
 # Piarres Beobide  <pi@beobide.net>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2005-02-15 23:19+0100\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +27,7 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
@@ -96,7 +96,6 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): ezin da hari berria sortu (%s)\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
 msgstr "Ez dago mrl-rik."
 
@@ -138,7 +137,6 @@ msgid "Select all"
 msgstr "Hautatu dena"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
 msgstr "Korrontea(k) kargatzen"
 
@@ -431,9 +429,8 @@ msgid "Playlist: shuffle forever."
 msgstr "Erreprodukzio-zerrenda: ausaz etengabe."
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Bideo pantaila izena"
+msgstr ""
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -558,11 +555,12 @@ msgid "Screensaver reset interval (s)"
 msgstr ""
 
 #: src/xitk/event.c:1424
-#, fuzzy
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "Bi pantaila-babesleren sasigertaeren arteko denbora, 0 desgaitzeko."
+msgstr ""
+"Bi pantaila-babesleren sasigertaeren arteko denbora, segundotan, 0 "
+"desgaitzeko."
 
 #: src/xitk/event.c:1431
 msgid "Chapter hopping"
@@ -832,9 +830,9 @@ msgid "Unable to delete file '%s': %s."
 msgstr "Ezin da '%s' fitxategia ezabatu: %s."
 
 #: src/xitk/file_browser.c:1011
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s'"
+msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s%s%s'"
 
 #: src/xitk/file_browser.c:1016
 msgid "Confirm deletion ?"
@@ -967,23 +965,23 @@ msgstr "Sakatu teklatuko teklak..."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
+msgstr "Gertaera-hartzailearen leihoa:  Sakatu teklatuko teklak..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "Onartu?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
 msgstr ""
 "%s gorde \n"
-"'%s' laster-tekla gisa?."
+"'%s' laster-tekla gisa?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
@@ -992,12 +990,10 @@ msgstr ""
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
-msgstr "laster-teklen editorea"
+msgstr "Laster-teklen editorea"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
 msgstr "Lotura-ekintza"
 
@@ -1065,13 +1061,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Hau xine da (X11 gui), doako bideo-erreproduzigailua v%s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 Xine Taldea.\n"
+"(c) 2000-2007 xine Taldea.\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1125,14 +1121,19 @@ msgstr ""
 " xine plugin eskuragarriak:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
-msgstr "Ez da %s motako plugin erabilgarririk!.\n"
+msgstr "Ez da %s motako plugin erabilgarririk!\n"
 
 #: src/xitk/main.c:580
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Erabilera: xine [AUKERAK]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "AUKERAK:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1320,7 +1321,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid "  -W, --wid                    Use a window id.\n"
 msgstr ""
-"  -R, --root                   Erabili erroko leihoa bideoaren leiho gisa.\n"
+"  -W, --wid                    Erabili erroko leihoa bideoaren leiho gisa.\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1654,7 +1655,6 @@ msgstr ""
 "helarazteko ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "Ez dago informaziorik erabilgarri."
 
@@ -1687,7 +1687,6 @@ msgstr ""
 "Egiaztatu ostalari-izena."
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr "Adierazitako fitxategia edo mrl-a ez da aurkitu. Egiaztatu bi aldiz."
 
@@ -1702,7 +1701,6 @@ msgstr ""
 "edukitzea (adib.: diskorik ez egotea unitatean)."
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
 msgstr "Arazoa gertatu da liburutegia edo deskodetzailea kargatzean"
 
@@ -1721,7 +1719,6 @@ msgstr ""
 "duzu libdvdcss instalatu erosi duzun diska hau irakurri ahal izateko."
 
 #: src/xitk/main.c:1200
-#, fuzzy
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
@@ -1781,26 +1778,26 @@ msgstr ""
 " Arazo Erreporte modua: Irteera mezu guztiak BUG-REPORT.TXT fitxategian "
 "gordeko dira.\n"
 
-#: src/xitk/main.c:1851
-#, fuzzy, c-format
-msgid "window id is required for -wid option\n"
-msgstr "bideo-kontrolatzailearen id-a behar da -V aukerarako\n"
+#: src/xitk/main.c:1853
+#, c-format
+msgid "window id required for -W option\n"
+msgstr "bideoaren leihoa id-a behar da -W aukerarako\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "%d argumentu baliogabea => irten\n"
 
-#: src/xitk/main.c:1878
-#, fuzzy, c-format
+#: src/xitk/main.c:1880
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "MRL bat adierazi beharko zenuke ilaran gehitzeko, gutxienez!\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "Berritu automatikoki erreprodukzio-zerrenda zaharra"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1808,19 +1805,19 @@ msgstr ""
 "Gaituta badago eta komando-lerroan MRLrik adierazten ez baduzu, xine-k "
 "automatikoki kargatuko du aurreko erreprodukzio-zerrenda."
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "Azpitituluen fitxategia"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "Kargatu automatikoki erreprodukzio zerrenda zaharra balego."
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "Gaitu elkar-ezloturikoa lehetsi bezala"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1828,10 +1825,9 @@ msgstr ""
 "Elkar-ezloturiko plugin-a gaiturik egongo da abiaraztean. Korronte "
 "progrsiboak automatikoki atzemanak izango dira errendimendua jeitsi gabe."
 
-#: src/xitk/main.c:2141
-#, fuzzy
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
-msgstr "mrl logotipoa"
+msgstr "MRL logotipoa"
 
 #: src/xitk/mediamark.c:482
 msgid "!!Invalid entry!!"
@@ -2152,24 +2148,20 @@ msgid "Audio/Visualization"
 msgstr "Audioa bistaratzeko plugin-a"
 
 #: src/xitk/menus.c:700
-#, fuzzy
 msgid "Audio/SEP"
-msgstr "Audioa"
+msgstr "Audioa/SEP"
 
 #: src/xitk/menus.c:704
-#, fuzzy
 msgid "Audio/Postprocess"
-msgstr "Bideo/Postprozesua"
+msgstr "Audioa/Postprozesua"
 
 #: src/xitk/menus.c:708
-#, fuzzy
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "Bideo/Postprozesua/Kanal erreakzioa..."
+msgstr "Audioa/Postprozesua/Kanal erreakzioa..."
 
 #: src/xitk/menus.c:712
-#, fuzzy
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "Bideo/Postprozesua/Gaitu Postprozesatzea"
+msgstr "Audioa/Postprozesua/Gaitu Postprozesatzea"
 
 #: src/xitk/menus.c:720 src/xitk/menus.c:933
 msgid "Subtitle/Channel"
@@ -2469,14 +2461,13 @@ msgid "If disabled, no tooltips are shown."
 msgstr ""
 
 #: src/xitk/panel.c:1502
-#, fuzzy
 msgid "Tips timeout (ms)"
-msgstr "iradokizunen denbora-muga (ms)"
+msgstr "Iradokizunen denbora-muga (ms)"
 
 #: src/xitk/panel.c:1503
 #, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "OSD bisualaren iraunkortasun-denbora, segundotan."
+msgstr "OSD bisualaren iraunkortasun-denbora, millisegundotan."
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
@@ -2647,7 +2638,6 @@ msgstr ""
 "maila honetan."
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
 msgstr "xine-ren konfigurazioa"
 
@@ -2720,9 +2710,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "Ezin izan da azalen zerrenda berreskuratu %s(e)tik: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "Ezin izan da '%s' deskargatu: %s\n"
+msgstr "Ezin izan da '%s' deskargatu: %s"
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2740,12 +2730,11 @@ msgid "Unable to create '%s'."
 msgstr "Ezin da '%s' sortu."
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "Izan pazientzia..."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
 msgstr "Berreskuratu azalen zerrenda %s(e)tik"
 
@@ -2960,16 +2949,14 @@ msgid "Command to turn on TV out"
 msgstr "Telebista irteera gaitzeko komandoa"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "Telebista/Bideo Analogiko parametroak"
+msgstr "Telebista Bideo Analogiko parametroak"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "Sarrera: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
 msgstr "Difusio sistema: "
 
@@ -3117,7 +3104,6 @@ msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Ez dago erregistro-sarrerarik '%s' erregistro-atalerako.\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
 msgstr "xine erregistro-ikustailea"
 

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2005-11-20 22:57+0000\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,16 +21,16 @@ msgid ""
 "The stream '%s' isn't supported by xine:\n"
 "\n"
 msgstr ""
-"Strømmen «%s» støttes ikke av xine.\n"
+"Strømmen «%s» støttes ikke av xine:\n"
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
 msgstr ""
-"Strømmen «%s» bruker en kodek som ikke støttes.\n"
+"Strømmen «%s» bruker en kodek som ikke støttes:\n"
 "\n"
 
 #: src/xitk/actions.c:398
@@ -94,7 +94,6 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): klarte ikke lage ny tråd (%s)\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
 msgstr "Det er ingen MRL."
 
@@ -136,7 +135,6 @@ msgid "Select all"
 msgstr "Velg alle"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
 msgstr "Laster strøm(mer)"
 
@@ -428,9 +426,8 @@ msgid "Playlist: shuffle forever."
 msgstr "Spilleliste: tilfeldig for evig."
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Navn på visningsenhet"
+msgstr ""
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -553,11 +550,12 @@ msgid "Screensaver reset interval (s)"
 msgstr ""
 
 #: src/xitk/event.c:1424
-#, fuzzy
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "Tid mellom to falske hendelser for skjermspareren, 0 for å slå av."
+msgstr ""
+"Tid, i sekunder, mellom to falske hendelser for skjermspareren, 0 for å slå "
+"av."
 
 #: src/xitk/event.c:1431
 msgid "Chapter hopping"
@@ -823,9 +821,9 @@ msgid "Unable to delete file '%s': %s."
 msgstr "Klarte ikke slette filen «%s»: %s."
 
 #: src/xitk/file_browser.c:1011
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Virkelig slette filen «%s»?"
+msgstr "Virkelig slette filen «%s%s%s»?"
 
 #: src/xitk/file_browser.c:1016
 msgid "Confirm deletion ?"
@@ -958,14 +956,14 @@ msgstr "Trykk på tastene . . ."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
+msgstr "Hendelsesmottakervindu:  Trykk på tastene..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "Godta?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
@@ -974,19 +972,17 @@ msgstr ""
 "«%s»-tastebinding?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
 msgstr "Denne tastebindingen er overføldig med handlingen «%s».\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
-msgstr "tastebindingsredigerer"
+msgstr "Tastebindingsredigerer"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
 msgstr "Bindingshandling"
 
@@ -1054,13 +1050,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dette er xine (X11-grensesnitt) - en fri videospiller, versjon %s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"Kopirett 2000-2004 tilhører xine-laget.\n"
+"Kopirett 2000-2007 tilhører xine-laget.\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1114,7 +1110,7 @@ msgstr ""
 " Tilgjengelige xine-tilleggsmoduler:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
 msgstr "Fant ingen tilgjengelige tilleggsmoduler av typen «%s».\n"
 
@@ -1122,6 +1118,11 @@ msgstr "Fant ingen tilgjengelige tilleggsmoduler av typen «%s».\n"
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Bruk: «xine [VALG] . . . [MRL]»\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "VALG er:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1299,9 +1300,9 @@ msgid "  -R, --root                   Use root window as video window.\n"
 msgstr "  -R, --root                   Bruk rotvindu som videovindu.\n"
 
 #: src/xitk/main.c:643
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr "  -R, --root                   Bruk rotvindu som videovindu.\n"
+msgstr "  -W, --wid                    Bruk videovindu-id.\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1645,7 +1646,6 @@ msgstr ""
 "deg ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "Ingen tilgjengelig informasjon."
 
@@ -1678,7 +1678,6 @@ msgstr ""
 "Kontroller vertsnavnet."
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr "Klarte ikke finne oppgitte fil eller MRL. Kontroller det 17 ganger."
 
@@ -1693,7 +1692,6 @@ msgstr ""
 "inneholder data (ingenting i stasjonen, for eksempel)."
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
 msgstr ""
 "Det oppstod et problem under lastingen av et bibliotek eller en dekoder"
@@ -1712,7 +1710,6 @@ msgstr ""
 "DVD'en er antakelig kryptert. Du kan installere «libdvdcssx for å lese den."
 
 #: src/xitk/main.c:1200
-#, fuzzy
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
@@ -1771,26 +1768,26 @@ msgstr ""
 " Feilrapporteringsmodus. Alle utdatameldinger lagres i filen «BUG-REPORT."
 "TXT».\n"
 
-#: src/xitk/main.c:1851
-#, fuzzy, c-format
-msgid "window id is required for -wid option\n"
-msgstr "«-V» krever en videodriver-id\n"
+#: src/xitk/main.c:1853
+#, c-format
+msgid "window id required for -W option\n"
+msgstr "«-W» krever en vindu-id\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Valget «%d» er ugyldig. Synd for deg, nå avsluttes programmet\n"
 
-#: src/xitk/main.c:1878
-#, fuzzy, c-format
+#: src/xitk/main.c:1880
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "Du må oppgi mer enn null MRL'er å legge til i køen.\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "Last den gamle spillelisten automatisk"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1798,19 +1795,19 @@ msgstr ""
 "Hvis dette er aktivert og du ikke oppgir en MRL på kommandolinjen vil xine "
 "automatisk åpne den forrige spillelisten."
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "Last teksting automatisk"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "Last teksting automatisk hvis det finnes."
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "Aktiver avfletting som standard"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1818,8 +1815,7 @@ msgstr ""
 "Avflettingstilleggene aktiveres ved oppstart. Progressive strømmer oppdages "
 "automatisk uten redusert ytelse."
 
-#: src/xitk/main.c:2141
-#, fuzzy
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr "MRL til logo"
 
@@ -2142,9 +2138,8 @@ msgid "Audio/Visualization"
 msgstr "Lyd/Visualisering"
 
 #: src/xitk/menus.c:700
-#, fuzzy
 msgid "Audio/SEP"
-msgstr "Lyd"
+msgstr "Lyd/SEP"
 
 #: src/xitk/menus.c:704
 #, fuzzy
@@ -2459,14 +2454,12 @@ msgid "If disabled, no tooltips are shown."
 msgstr ""
 
 #: src/xitk/panel.c:1502
-#, fuzzy
 msgid "Tips timeout (ms)"
 msgstr "Varighet for tips (ms)"
 
 #: src/xitk/panel.c:1503
-#, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "Hvor lenge tekst på skjermen vises, i sekunder."
+msgstr "Hvor lenge tips vises, i millisekunder."
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
@@ -2636,7 +2629,6 @@ msgid ""
 msgstr "Det er ingen oppsettsvalg tilgjengelige for dette erfaringsnivået."
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
 msgstr "Oppsett av xine"
 
@@ -2706,9 +2698,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "Klarte ikke hente hudlisten fra «%s»: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "Klarte ikke laste ned «%s»: %s\n"
+msgstr "Klarte ikke laste ned «%s»: %s"
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2726,12 +2718,11 @@ msgid "Unable to create '%s'."
 msgstr "Klarte ikke opprette «%s»."
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "Vær tålmodig . . ."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
 msgstr "Hent hudliste fra »%s»"
 
@@ -2948,16 +2939,14 @@ msgid "Command to turn on TV out"
 msgstr "Kommando for å slå på TV-ut"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "Parametere for TV/analog video"
+msgstr "Parametere for TV Analog video"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "Inndata: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
 msgstr "Kringkastingssystem: "
 
@@ -3100,7 +3089,6 @@ msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Det er ingen loggoppføringer for loggseksjonen «%s».\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
 msgstr "Loggviser for xine"
 

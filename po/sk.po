@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2004-05-07 23:16+0000\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:388
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
@@ -93,7 +93,6 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): nemô¾em vytvori» nový thread (%s)\n"
 
 #: src/xitk/actions.c:1681
-#, fuzzy
 msgid "There is no MRL."
 msgstr "Nie je ¾iadne MRL"
 
@@ -135,7 +134,6 @@ msgid "Select all"
 msgstr "Vybra» v¹etko"
 
 #: src/xitk/actions.c:2181
-#, fuzzy
 msgid "Stream(s) Loading"
 msgstr "Prúd(y) nahra» "
 
@@ -344,7 +342,7 @@ msgstr ""
 #: src/xitk/errors.c:330
 #, fuzzy
 msgid "Warning"
-msgstr "Varovanie: %s\n"
+msgstr "Varovanie"
 
 #: src/xitk/errors.c:331
 msgid ""
@@ -382,23 +380,22 @@ msgid "Zoom: 50%%"
 msgstr "Zväè¹enie: 200%%"
 
 #: src/xitk/event.c:692 src/xitk/event.c:706
-#, fuzzy, c-format
+#, c-format
 msgid "A/V offset: %s"
-msgstr "A/V offset: %d"
+msgstr "A/V offset: %s"
 
 #: src/xitk/event.c:717
 msgid "A/V Offset: reset."
-msgstr "A/V Offset: reset"
+msgstr "A/V Offset: reset."
 
 #: src/xitk/event.c:726 src/xitk/event.c:736
-#, fuzzy, c-format
+#, c-format
 msgid "SPU Offset: %s"
-msgstr "SPU Offset: %d"
+msgstr "SPU Offset: %s"
 
 #: src/xitk/event.c:742
-#, fuzzy
 msgid "SPU Offset: reset."
-msgstr "A/V Offset: reset"
+msgstr "SPU Offset: reset."
 
 #: src/xitk/event.c:881 src/xitk/menus.c:204
 msgid "Playlist: no loop."
@@ -421,9 +418,8 @@ msgid "Playlist: shuffle forever."
 msgstr "Playlist: náhodné poradie s opakovaním."
 
 #: src/xitk/event.c:914
-#, fuzzy
 msgid "No text to display!"
-msgstr "Nemô¾em otvori» display.\n"
+msgstr ""
 
 #: src/xitk/event.c:945 src/xitk/event.c:952
 msgid "Saturation"
@@ -540,11 +536,11 @@ msgid "Screensaver reset interval (s)"
 msgstr ""
 
 #: src/xitk/event.c:1424
-#, fuzzy
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "Èas medzi dvoma screensaver fake udalos»ami, 0 na zakázanie"
+msgstr ""
+"Èas, v sekundách, medzi dvoma screensaver fake udalos»ami, 0 na zakázanie"
 
 #: src/xitk/event.c:1431
 msgid "Chapter hopping"
@@ -834,7 +830,7 @@ msgstr "Vytvori» nový adresár"
 
 #: src/xitk/file_browser.c:1218
 msgid "File Browser"
-msgstr "Xine súborový prehliadaè"
+msgstr "xine súborový prehliadaè"
 
 #: src/xitk/file_browser.c:1244
 msgid "All files"
@@ -888,7 +884,7 @@ msgid ""
 "\n"
 msgstr ""
 "Toto priradenie je redundantné s akciou:\n"
-"\"%s\".\n"
+"\n"
 
 #: src/xitk/kbindings.c:622
 msgid ""
@@ -914,9 +910,8 @@ msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ajajáj: tabuµka klávesových skratiek je PRÁZDNA.\n"
 
 #: src/xitk/kbindings.c:1282
-#, fuzzy
 msgid "Ctrl"
-msgstr "Kontrast"
+msgstr ""
 
 #: src/xitk/kbindings.c:1284
 msgid "Alt"
@@ -940,23 +935,23 @@ msgstr "Stlaète klávesy ..."
 
 #: src/xitk/kbindings.c:1928
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr ""
+msgstr "Okno príjemcu udalostí:  Stlaète klávesy..."
 
 #: src/xitk/kbindings.c:1980
 msgid "Accept?"
 msgstr "Akceptova»?"
 
 #: src/xitk/kbindings.c:1984
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?"
 msgstr ""
 "Ulo¾i» %s ako\n"
-"'%s' priradenie kláves ?."
+"'%s' priradenie kláves ?"
 
 #: src/xitk/kbindings.c:1990
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
@@ -965,12 +960,10 @@ msgstr ""
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:2089
-#, fuzzy
 msgid "Key Binding Editor"
-msgstr "editor priradenia kláves"
+msgstr "Editor priradenia kláves"
 
 #: src/xitk/kbindings.c:2121
-#, fuzzy
 msgid "Binding Action"
 msgstr "Priradenie akcie"
 
@@ -1038,13 +1031,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Toto je xine (X11 gui) - slobodný video prehrávaè v%s"
 
 #: src/xitk/main.c:431
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 The xine Team.\n"
+"(c) 2000-2007 The xine Team.\n"
 
 #: src/xitk/main.c:443
 #, c-format
@@ -1098,14 +1091,19 @@ msgstr ""
 " Dostupné xine pluginy:\n"
 
 #: src/xitk/main.c:535
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!\n"
-msgstr "®iadny dostupný plugin typu %s sa nena¹iel!.\n"
+msgstr "®iadny dostupný plugin typu %s sa nena¹iel!\n"
 
 #: src/xitk/main.c:580
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Pou¾itie : xine [VO¥BY]...[MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "VO¥BY sú:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1281,10 +1279,9 @@ msgstr ""
 "  -R, --root                   Pou¾i» pracovnú plochu pre zobrazenie videa\n"
 
 #: src/xitk/main.c:643
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr ""
-"  -R, --root                   Pou¾i» pracovnú plochu pre zobrazenie videa\n"
+msgstr "  -W, --wid                    Pou¾i» id okna\n"
 
 #: src/xitk/main.c:644
 #, c-format
@@ -1620,7 +1617,6 @@ msgstr ""
 "správu ;-):"
 
 #: src/xitk/main.c:1119 src/xitk/main.c:1195
-#, fuzzy
 msgid "No information available."
 msgstr "®iadne informácie nie su k dispozícii."
 
@@ -1653,7 +1649,6 @@ msgstr ""
 "Skontrolujte meno poèítaèa."
 
 #: src/xitk/main.c:1155
-#, fuzzy
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr "Zadaný súbor/mrl sa nena¹iel. Skontrolujte ho dvakrát"
 
@@ -1668,7 +1663,6 @@ msgstr ""
 "je v mechnike)."
 
 #: src/xitk/main.c:1171
-#, fuzzy
 msgid "A problem occurred while loading a library or a decoder"
 msgstr "Problém sa vyskytol pri naèítavaní kni¾nice alebo dekódera"
 
@@ -1745,26 +1739,26 @@ msgstr ""
 " Bug Report mód: V¹etky výstupné správy budú pridané do súboru BUG-REPORT."
 "TXT.\n"
 
-#: src/xitk/main.c:1851
-#, fuzzy, c-format
-msgid "window id is required for -wid option\n"
-msgstr "id video ovládaèa je nutný pre -V voµbu\n"
+#: src/xitk/main.c:1853
+#, c-format
+msgid "window id required for -W option\n"
+msgstr "id okna je nutný pre -W voµbu\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d je neplatný => koniec\n"
 
-#: src/xitk/main.c:1878
-#, fuzzy, c-format
+#: src/xitk/main.c:1880
+#, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
-msgstr "Máte zada» aspoò jedno MRL na prid. do playlistu!.\n"
+msgstr "Máte zada» aspoò jedno MRL na prid. do playlistu!\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "Automaticaky natiahnu» starý playlist"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1772,19 +1766,19 @@ msgstr ""
 "Ak je to povolené a ak ne¹pecifikujete nejaké MRL v príkaz. riadku, xine "
 "automaticky natiahne predchádzajúci playlist."
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "Automatické naèítanie titulkov"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "Automaticky natiahnu» titulky, ak exitujú."
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "Povoli» odprekladanie ako default"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1792,8 +1786,7 @@ msgstr ""
 "Odprekladanie (plugin) bude povolený pri ¹tarte. Progressive prúdy sú "
 "automaticky detekované bez straty výkonu."
 
-#: src/xitk/main.c:2141
-#, fuzzy
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr "MRL loga"
 
@@ -2120,24 +2113,20 @@ msgid "Audio/Visualization"
 msgstr "Audio/Vizualizácia"
 
 #: src/xitk/menus.c:700
-#, fuzzy
 msgid "Audio/SEP"
-msgstr "Audio"
+msgstr "Audio/SEP"
 
 #: src/xitk/menus.c:704
-#, fuzzy
 msgid "Audio/Postprocess"
-msgstr "Video/Postprocess"
+msgstr "Audio/Postprocess"
 
 #: src/xitk/menus.c:708
-#, fuzzy
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "Video/Postprocess/Zre»azenie..."
+msgstr "Audio/Postprocess/Zre»azenie..."
 
 #: src/xitk/menus.c:712
-#, fuzzy
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "Video/Postprocess/Povoli» Postprocessing"
+msgstr "Audio/Postprocess/Povoli» Postprocessing"
 
 #: src/xitk/menus.c:720 src/xitk/menus.c:933
 msgid "Subtitle/Channel"
@@ -2293,14 +2282,12 @@ msgid "Position in Stream"
 msgstr "Pozícia v prúde"
 
 #: src/xitk/osd.c:721
-#, fuzzy
 msgid "Subtitles: "
-msgstr "Titulky: %s"
+msgstr "Titulky: "
 
 #: src/xitk/osd.c:750
-#, fuzzy
 msgid "Audio Channel: "
-msgstr "Audio kanál: %s"
+msgstr "Audio kanál: "
 
 #: src/xitk/panel.c:47
 msgid "Play previous chapter or mrl"
@@ -2319,14 +2306,13 @@ msgid "Play next entry from playlist"
 msgstr "Ïal¹ia polo¾ka z playlistu"
 
 #: src/xitk/panel.c:350 src/xitk/panel.c:352 src/xitk/panel.c:355
-#, fuzzy
 msgid "Total time: "
-msgstr "Celkový èas: --:--:--"
+msgstr "Celkový èas: "
 
 #: src/xitk/panel.c:833
-#, fuzzy, c-format
+#, c-format
 msgid "Amp: %s"
-msgstr "Audio: %s"
+msgstr "Amp: %s"
 
 #: src/xitk/panel.c:833 src/xitk/panel.c:838
 msgid "Muted"
@@ -2442,14 +2428,13 @@ msgid "If disabled, no tooltips are shown."
 msgstr ""
 
 #: src/xitk/panel.c:1502
-#, fuzzy
 msgid "Tips timeout (ms)"
-msgstr "tipy timeout (ms)"
+msgstr "Tipy timeout (ms)"
 
 #: src/xitk/panel.c:1503
 #, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "Dosvitový èas zobrazenia OSD, v sekundách."
+msgstr "Dosvitový èas zobrazenia tipy, v millisekundách."
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
@@ -2618,9 +2603,8 @@ msgid ""
 msgstr "Nie je ¾iadna voµba dostupná v tejto úrovni konfiguraèných mo¾ností."
 
 #: src/xitk/setup.c:1071
-#, fuzzy
 msgid "xine Setup"
-msgstr "nastavenie Xine"
+msgstr "Nastavenie xine"
 
 #: src/xitk/setup.c:1114
 msgid "(*)  you need to restart xine for this setting to take effect"
@@ -2688,9 +2672,9 @@ msgid "Unable to retrieve skin list from %s: %s"
 msgstr "Nie je mo¾né stiahnu» zoznam skinov z %s: %s"
 
 #: src/xitk/skins.c:849 src/xitk/skins.c:977
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s"
-msgstr "Nemô¾em stiahnu» '%s': %s\n"
+msgstr "Nemô¾em stiahnu» '%s': %s"
 
 #: src/xitk/skins.c:899
 #, c-format
@@ -2708,12 +2692,11 @@ msgid "Unable to create '%s'."
 msgstr "Nemô¾em vytvori» '%s'."
 
 #: src/xitk/skins.c:1037
-#, fuzzy
 msgid "Be patient..."
 msgstr "Trpezlivos» prosím..."
 
 #: src/xitk/skins.c:1039
-#, fuzzy, c-format
+#, c-format
 msgid "Retrieving skin list from %s"
 msgstr "Získa» zoznam skinov z %s"
 
@@ -2737,7 +2720,7 @@ msgstr ""
 #: src/xitk/snapshot.c:907
 #, fuzzy
 msgid ". Snapshot aborted."
-msgstr "Zlé rozmery obrázku %dx%d. Ulo¾enie obsahu obr. zru¹ené.\n"
+msgstr "Zlé rozmery obrázku      . Ulo¾enie obsahu obr. zru¹ené.\n"
 
 #: src/xitk/snapshot.c:919
 msgid "prvt_image_alloc failed\n"
@@ -2752,9 +2735,8 @@ msgid "Not supported for this video out driver\n"
 msgstr "Nepodporovaný pre tento video out ovládaè\n"
 
 #: src/xitk/snapshot.c:1041
-#, fuzzy
 msgid "File open failed"
-msgstr "Otvorenie súboru zlyhalo (%s)\n"
+msgstr "Otvorenie súboru zlyhalo"
 
 #: src/xitk/snapshot.c:1061
 msgid "png_create_write_struct() failed\n"
@@ -2779,12 +2761,12 @@ msgstr "rgb_alloc() zlyhal\n"
 #: src/xitk/snapshot.c:1222
 #, fuzzy
 msgid "File written: "
-msgstr "Súbor '%s' ulo¾ený.\n"
+msgstr "Súbor ulo¾ený: "
 
 #: src/xitk/splash.c:65
 #, fuzzy
 msgid "xine Splash"
-msgstr "xine %s"
+msgstr "xine Splash"
 
 #: src/xitk/stream_infos.c:489
 msgid "Stream Information"
@@ -2934,16 +2916,14 @@ msgid "Command to turn on TV out"
 msgstr "Príkaz na zapnutie TV výstupu"
 
 #: src/xitk/tvset.c:334
-#, fuzzy
 msgid "TV Analog Video Parameters"
-msgstr "TV/Analog Video parametre"
+msgstr "TV Analog Video parametre"
 
 #: src/xitk/tvset.c:372
 msgid "Input: "
 msgstr "Vstup: "
 
 #: src/xitk/tvset.c:396
-#, fuzzy
 msgid "Broadcast System: "
 msgstr "Broadcast system: "
 
@@ -3079,9 +3059,8 @@ msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Nie je ¾iaden záznam v logu pre sekciu '%s'.\n"
 
 #: src/xitk/viewlog.c:407
-#, fuzzy
 msgid "xine Log Viewer"
-msgstr "Xine prehliadaè logov"
+msgstr "xine prehliadaè logov"
 
 #: src/xitk/viewlog.c:458
 msgid "Refresh"

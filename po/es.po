@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-11 16:02+0200\n"
-"PO-Revision-Date: 2007-04-13 00:30+0200\n"
+"POT-Creation-Date: 2007-04-24 01:02+0200\n"
+"PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Carlos E. Robinson <carloser@users.sourceforge.net>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgid ""
 "The stream '%s' isn't supported by xine:\n"
 "\n"
 msgstr ""
-"\t\tXine no soporta el flujo '%s':\n"
+"\t\txine no soporta el flujo '%s':\n"
 "\n"
 
 #: src/xitk/actions.c:388
@@ -1143,7 +1143,12 @@ msgstr "¡No se encuentran complementos de tipo %s disponibles!\n"
 #: src/xitk/main.c:580
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
-msgstr "Uso: xine [OPTIONS]... [MRL]\n"
+msgstr "Uso: xine [OPCIONES]... [MRL]\n"
+
+#: src/xitk/main.c:582
+#, c-format
+msgid "OPTIONS are:\n"
+msgstr "Las OPCIONES son:\n"
 
 #: src/xitk/main.c:583
 #, c-format
@@ -1820,26 +1825,26 @@ msgstr ""
 "Modo de reporte de errores: Todos los mensajes de salida serán agregados al "
 "archivo BUG-REPORT.TXT.\n"
 
-#: src/xitk/main.c:1851
+#: src/xitk/main.c:1853
 #, c-format
-msgid "window id is required for -wid option\n"
-msgstr "se requiere el id. de ventana para la opción -wid\n"
+msgid "window id required for -W option\n"
+msgstr "se requiere el id. de ventana para la opción -W\n"
 
-#: src/xitk/main.c:1858
+#: src/xitk/main.c:1860
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "argumento %d inválido => salir\n"
 
-#: src/xitk/main.c:1878
+#: src/xitk/main.c:1880
 #, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
 msgstr "Debería especificar un MRL para encolarlo, ¡por lo menos!\n"
 
-#: src/xitk/main.c:1960
+#: src/xitk/main.c:1962
 msgid "Automatically reload old playlist"
 msgstr "Recargar automáticamente la antigua lista de reproducción"
 
-#: src/xitk/main.c:1961
+#: src/xitk/main.c:1963
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1847,19 +1852,19 @@ msgstr ""
 "Si esta función está habilitada y usted no especifica ningún MRL en la línea "
 "de comandos, xine cargará automáticamente la anterior lista de reproducción."
 
-#: src/xitk/main.c:1976
+#: src/xitk/main.c:1978
 msgid "Subtitle autoloading"
 msgstr "Carga automática de subtítulos"
 
-#: src/xitk/main.c:1977
+#: src/xitk/main.c:1979
 msgid "Automatically load subtitles if they exist."
 msgstr "Carga automáticamente los subtítulos, si existen."
 
-#: src/xitk/main.c:1985
+#: src/xitk/main.c:1987
 msgid "Enable deinterlacing by default"
 msgstr "Habilita el desentrelazado por defecto"
 
-#: src/xitk/main.c:1986
+#: src/xitk/main.c:1988
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
@@ -1867,7 +1872,7 @@ msgstr ""
 "El complemento de desentrelazado será habilitado en el arranque. Los flujos "
 "progresivos son detectados automáticamente sin detrimento del desempeño."
 
-#: src/xitk/main.c:2141
+#: src/xitk/main.c:2143
 msgid "Logo MRL"
 msgstr "MRL del logo"
 
@@ -2508,7 +2513,7 @@ msgstr "Duración del consejo (ms)"
 
 #: src/xitk/panel.c:1503
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "Tiempo de persistencia de la visualización de VEP, en segundos."
+msgstr "Tiempo de persistencia del consejo, en millisegundos."
 
 #: src/xitk/panel.c:1517
 msgid "gui panel visibility"
