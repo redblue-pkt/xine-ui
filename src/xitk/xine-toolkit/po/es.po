@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: xine-toolkit\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2007-04-23 23:01+0200\n"
-"PO-Revision-Date: 2007-04-23 23:05+0200\n"
+"PO-Revision-Date: 2007-04-26 23:05+0200\n"
 "Last-Translator: Carlos E. Robinson <carloser@users.sourceforge.net>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -83,7 +83,7 @@ msgstr ""
 #: src/xitk/xine-toolkit/test.c:962
 #, c-format
 msgid "init_test() failed\n"
-msgstr "Falló init_test() failed\n"
+msgstr "Falló init_test()\n"
 
 #: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
