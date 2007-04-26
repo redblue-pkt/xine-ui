@@ -1,5 +1,12 @@
 xine-ui (0.99.5) unstable; urgency=low
 
+  * Fixes and enhancements ...
+  * Updated language translations. Thanks to all translators
+  * Handle audio amp level event. Thanks to Reinhard Nissl
+  * Stdctl extensions: New command "OSDWriteText" added to display arbitrary
+    text on OSD, any stdctl command can now be coded to take a numeric or
+    string parameter; closes feature request #1635452. Thanks to Richard van Paasen
+  * Further VDR keys added. Thanks to Reinhard Nissl
   * Fixed segfaults when appending files to playlist, current play not interrupted
     when appending files to playlist, only file name displayed in playlist dialog
     to better fit into the dialog box. Thanks to Michael Hughes for this patch
