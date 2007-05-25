@@ -872,8 +872,12 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_LOOPMODE:
-    gGui->playlist.loop++;
-    if(gGui->playlist.loop == PLAYLIST_LOOP_MODES_NUM)
+    if (!gGui->numeric.set)
+      gGui->playlist.loop++;
+    else
+      gGui->playlist.loop = gGui->numeric.arg;
+    if(gGui->playlist.loop >= PLAYLIST_LOOP_MODES_NUM ||
+       gGui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
       gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
     
     switch(gGui->playlist.loop) {
@@ -1010,11 +1014,12 @@ void gui_execute_action_id(action_id_t action) {
     break;
   }
 
-  /* Some sort of function was done given. Clear numeric argument. */
+  /* Some sort of function was done. Clear arguments. */
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
-
-}	    
+  gGui->alphanum.set = 0;
+  gGui->alphanum.arg = "";
+}
 
 /*
  * top-level event handler
@@ -1587,6 +1592,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
+  gGui->alphanum.set = 0;
+  gGui->alphanum.arg = "";
   
   XLockDisplay (gGui->display);
 
