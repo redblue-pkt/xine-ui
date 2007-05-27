@@ -35,7 +35,7 @@
 
 #include "common.h"
 
-#undef DEBUG_STDCTL
+#define DEBUG_STDCTL 0
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -48,8 +48,8 @@ typedef struct {
 static _stdctl_t stdctl;
 
 static void *xine_stdctl_loop(void *dummy) {
-  char              c[255];
-  int               len;
+  char              buf[256], *c, *c1;
+  int               len, selrt;
   kbinding_entry_t *k;
   fd_set            set;
   struct timeval    tv;
@@ -67,77 +67,86 @@ static void *xine_stdctl_loop(void *dummy) {
     tv.tv_sec  = 0;
     tv.tv_usec = 500000;
 
-    select(stdctl.fd + 1, &set, NULL, NULL, &tv);
+    selrt = select(stdctl.fd + 1, &set, NULL, NULL, &tv);
 
-    if(FD_ISSET(stdctl.fd, &set)) {
+    if(selrt > 0 && FD_ISSET(stdctl.fd, &set)) {
 
-      len = read(stdctl.fd, &c, 255);
+      len = read(stdctl.fd, &buf, sizeof(buf) - 1);
 
       if(len > 0) {
 
-	c[len - 1] = '\0';
-	
-#ifdef DEBUG_STDCTL
-	fprintf(stdout, "Command Received = '%s'\n", c);
+	buf[len] = '\0';
+
+	c = buf;
+	while((c1 = strchr(c, '\n'))) {
+	  *c1 = '\0';
+
+#if DEBUG_STDCTL
+	  fprintf(stderr, "Command Received = '%s'\n", c);
 #endif
 
-	/* Handle optional parameter */
+	  /* Handle optional parameter */
 
-	/* alphanum: separated from the command by a '$'        */
-	/* syntax:   "command$parameter"                        */
-	/* example:  "OSDWriteText$Some Information to Display" */
+	  /* alphanum: separated from the command by a '$'        */
+	  /* syntax:   "command$parameter"                        */
+	  /* example:  "OSDWriteText$Some Information to Display" */
 
-	gGui->alphanum.set = 0;
-	params = strchr(c, '$');
+	  gGui->alphanum.set = 0;
+	  params = strchr(c, '$');
 
-	if(params != NULL) {
+	  if(params != NULL) {
 
-	  /* parameters available */
+	    /* parameters available */
 
-	  *params = '\0';
-	  params++;
+	    *params = '\0';
+	    params++;
 
-	  gGui->alphanum.set = 1;
-	  gGui->alphanum.arg = params;
+	    gGui->alphanum.set = 1;
+	    gGui->alphanum.arg = params;
 
-#ifdef DEBUG_STDCTL
-	  fprintf(stdout, "Command: '%s'\nParameters: '%s'\n", c, params);
+#if DEBUG_STDCTL
+	    fprintf(stderr, "Command: '%s'\nParameters: '%s'\n", c, params);
 #endif
+	  }
+
+	  /* numeric: separated from the command by a '#' */
+	  /* syntax:  "command#parameter"                 */
+	  /* example: "SetPosition%#99"                   */
+
+	  gGui->numeric.set = 0;
+	  params = strchr(c, '#');
+
+	  if(params != NULL) {
+
+	    /* parameters available */
+
+	    *params = '\0';
+	    params++;
+
+	    gGui->numeric.set = 1;
+	    gGui->numeric.arg = atoi(params);
+
+#if DEBUG_STDCTL
+	    fprintf(stderr, "Command: '%s'\nParameters: '%d'\n", c, gGui->numeric.arg);
+#endif
+	  }
+
+	  k = kbindings_lookup_action(gGui->kbindings, c);
+
+	  if(k)
+	    gui_execute_action_id((kbindings_get_action_id(k)));
+
+	  c = c1 + 1;
 	}
-
-	/* numeric: separated from the command by a '#' */
-	/* syntax:  "command#parameter"                 */
-	/* example: "SetPosition%#99"                   */
-
-	gGui->numeric.set = 0;
-	params = strchr(c, '#');
-
-	if(params != NULL) {
-
-	  /* parameters available */
-
-	  *params = '\0';
-	  params++;
-
-	  gGui->numeric.set = 1;
-	  gGui->numeric.arg = atoi(params);
-
-#ifdef DEBUG_STDCTL
-	  fprintf(stdout, "Command: '%s'\nParameters: '%d'\n", c, gGui->numeric.arg);
-#endif
-	}
-
-	k = kbindings_lookup_action(gGui->kbindings, c);
-
-	if(k)
-	  gui_execute_action_id((kbindings_get_action_id(k)));
       }
 
       if(panel_is_visible())
 	xitk_paint_widget_list (panel->widget_list);
 
-      if(len == -1) 
+      if(len <= 0) {
+	gui_execute_action_id(ACTID_QUIT);
 	break;
+      }
     }
 
     if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
@@ -153,6 +162,7 @@ static void *xine_stdctl_loop(void *dummy) {
 
   }
   
+  fprintf(stdout, "Exiting\n");
   pthread_exit(NULL);
 }
 
@@ -169,4 +179,13 @@ void stdctl_start(void) {
 
 void stdctl_stop(void) {
   pthread_join(stdctl.thread, NULL);
+}
+
+void stdctl_event(const xine_event_t *event)
+{
+  switch(event->type) {
+  case XINE_EVENT_UI_PLAYBACK_FINISHED:
+    fprintf(stdout, "PlaybackFinished\n");
+    break;
+  }
 }
