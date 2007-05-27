@@ -32,5 +32,6 @@
 
 void stdctl_start(void);
 void stdctl_stop(void);
+void stdctl_event(const xine_event_t *event);
 
 #endif
