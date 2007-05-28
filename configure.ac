@@ -527,10 +527,10 @@ CFLAGS="$wall -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 AC_SUBST(CFLAGS)
 
 AC_ARG_ENABLE([debug],
-   AS_HELP_STRING([--enable-debug], [Enable debugging code]))
+   AS_HELP_STRING([--enable-debug], [Compile with debug information]))
 
 if test "x$enable_debug" = "xyes"; then
-   CFLAGS="$CFLAGS -DDEBUG"
+   CFLAGS="$CFLAGS -DDEBUG -g"
 else
    CFLAGS="$CFLAGS -DNDEBUG"
 fi
@@ -588,19 +588,18 @@ makeexpand () {
   echo "$i"
 }
 
-XITK_LOCALEPATH="`makeexpand ${datadir}/locale`"
-AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALEPATH", [Location of Xine catalog files])
-
-
-dnl
-dnl NLS, part II
-dnl
 if test "x$prefix" = xNONE; then
    prefix="${ac_default_prefix}"
 fi
 if test "x$exec_prefix" = xNONE; then
    exec_prefix='${prefix}'
 fi
+
+dnl
+dnl NLS, part II
+dnl
+XITK_LOCALEPATH="`makeexpand ${datadir}/locale`"
+AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALEPATH", [Location of Xine catalog files])
 
 if test "x$XINE_DOCPATH" = "x"; then
    XINE_DOCPATH="${datadir}/doc/xine-ui"
