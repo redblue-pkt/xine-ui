@@ -347,8 +347,8 @@ void dump_host_info(void) {
     printf("uname() failed: %s\n", strerror(errno));
   }
   else {
-    printf("   Plateform informations:\n");
-    printf("   ----------------------\n");
+    printf("   Platform information:\n");
+    printf("   --------------------\n");
     printf("        system name     : %s\n", uts.sysname);
     printf("        node name       : %s\n", uts.nodename);
     printf("        release         : %s\n", uts.release);
@@ -370,8 +370,8 @@ void dump_cpu_infos(void) {
   
   if((stream = fopen("/proc/cpuinfo", "r"))) {
     
-    printf("   CPU Informations:\n");
-    printf("   ----------------\n");
+    printf("   CPU information:\n");
+    printf("   ---------------\n");
     
     memset(&buffer, 0, sizeof(buffer));
     while(fread(&buffer, 1, 2047, stream)) {
@@ -393,7 +393,7 @@ void dump_cpu_infos(void) {
     printf("   Unable to open '/proc/cpuinfo': '%s'.\n", strerror(errno));
   
 #else
-  printf("   CPU informations unavailable.\n"); 
+  printf("   CPU information unavailable.\n"); 
 #endif
 }
 
