@@ -567,6 +567,9 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 
   gui_xine_get_pos_length(gGui->stream, NULL, NULL, NULL);
   
+  if (gGui->stdctl_enable)
+    stdctl_playing(mrl);
+
   return 1;
 }
 
