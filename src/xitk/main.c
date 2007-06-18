@@ -1011,6 +1011,9 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     return;
   }
   
+  if(gGui->stdctl_enable)
+    stdctl_event(event);
+
   switch(event->type) { 
     
   /* frontend can e.g. move on to next playlist entry */
@@ -1352,6 +1355,10 @@ int main(int argc, char *argv[]) {
   int                     session_argv_num = 0;
   int                     retval           = 0;
   
+  /* Set stdout always line buffered to get every     */
+  /* message line immediately, needed esp. for stdctl */
+  setlinebuf(stdout);
+
 #ifdef ENABLE_NLS
   if((xitk_set_locale()) != NULL) {
     setlocale(LC_ALL, "");
@@ -1419,6 +1426,7 @@ int main(int argc, char *argv[]) {
   gGui->no_mouse               = 0;
   gGui->wid                    = 0;
   gGui->nongui_error_msg       = NULL;
+  gGui->stdout                 = stdout;
   
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1443,7 +1451,6 @@ int main(int argc, char *argv[]) {
   while((c = getopt_long(_argc, _argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
-
 
 #ifdef HAVE_LIRC
     case 'L': /* Disable LIRC support */
@@ -1560,7 +1567,7 @@ int main(int argc, char *argv[]) {
 	else if(!strcasecmp(p, "dvb"))
 	  aspect_ratio = XINE_VO_ASPECT_DVB;
 	else {
-	  printf(_("Bad aspect ratio mode '%s', see xine --help\n"), optarg);
+	  fprintf(stderr, _("Bad aspect ratio mode '%s', see xine --help\n"), optarg);
 	  exit(1);
 	}
       }
@@ -1624,7 +1631,7 @@ int main(int argc, char *argv[]) {
 	if((port >= 1) && (port <= 65535))
 	  gGui->network_port = port;
 	else
-	  printf(_("Bad port number: %d\n"), port);
+	  fprintf(stderr, _("Bad port number: %d\n"), port);
 
       }
       break;
@@ -1636,7 +1643,7 @@ int main(int argc, char *argv[]) {
     case 'G': /* Set geometry */
       if(optarg != NULL) {
 	if(!parse_geometry(&window_attribute, optarg)) {
-	  printf(_("Bad geometry '%s', see xine --help\n"), optarg);
+	  fprintf(stderr, _("Bad geometry '%s', see xine --help\n"), optarg);
 	  exit(1);
 	}
       }
@@ -1676,7 +1683,7 @@ int main(int argc, char *argv[]) {
 	else if(!strcasecmp(p, "shuffle"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
 	else {
-	  printf(_("Bad loop mode '%s', see xine --help\n"), optarg);
+	  fprintf(stderr, _("Bad loop mode '%s', see xine --help\n"), optarg);
 	  exit(1);
 	}
       }
@@ -1877,7 +1884,7 @@ int main(int argc, char *argv[]) {
 	}
       }
       else
-	printf(_("You should specify at least one MRL to enqueue!\n"));
+	fprintf(stderr, _("You should specify at least one MRL to enqueue!\n"));
 
     }
 
@@ -1899,14 +1906,23 @@ int main(int argc, char *argv[]) {
   show_banner();
   
 #ifndef DEBUG
+  /* Make non-verbose stdout really quiet but keep a copy for special use, e.g. stdctl feedback */
   if(!gGui->verbosity) {
-    int error_fd;
+    int   guiout_fd, stdout_fd;
+    FILE *guiout_fp;
     
-    if ((error_fd = open("/dev/null", O_WRONLY)) < 0)
-      printf("cannot open /dev/null");
+    if((guiout_fd = dup(STDOUT_FILENO)) < 0)
+      fprintf(stderr, "cannot dup STDOUT_FILENO: %s.\n", strerror(errno));
+    else if((guiout_fp = fdopen(guiout_fd, "w")) == NULL)
+      fprintf(stderr, "cannot fdopen guiout_fd: %s.\n", strerror(errno));
+    else if((stdout_fd = open("/dev/null", O_WRONLY)) < 0)
+      fprintf(stderr, "cannot open /dev/null: %s.\n", strerror(errno));
+    else if(dup2(stdout_fd, STDOUT_FILENO) < 0)
+      fprintf(stderr, "cannot dup2 stdout_fd: %s.\n", strerror(errno));
     else {
-      if (dup2(error_fd, STDOUT_FILENO) < 0)
-	printf("cannot dup2 stdout");
+      gGui->stdout = guiout_fp;
+      setlinebuf(gGui->stdout);
+      close(stdout_fd); /* stdout_fd was intermediate, not needed any longer */
     }
   }
 #endif
@@ -2219,6 +2235,8 @@ int main(int argc, char *argv[]) {
 
   if(gGui->report != stdout)
     fclose(gGui->report);
+  if(gGui->stdout != stdout)
+    fclose(gGui->stdout);
 
   free_command_line_args(&_argv, _argc);
 
