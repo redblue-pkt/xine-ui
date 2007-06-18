@@ -1054,8 +1054,11 @@ void gui_handle_event (XEvent *event, void *data) {
   }
   break;
 
-  case ButtonRelease:
   case KeyPress:
+    if(gGui->stdctl_enable)
+      stdctl_keypress(event->xkey);
+    /* no break */
+  case ButtonRelease:
     kbindings_handle_kbinding(gGui->kbindings, event);
     break;
     
