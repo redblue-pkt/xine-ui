@@ -43,6 +43,7 @@ extern _panel_t        *panel;
 typedef struct {
   int                   fd;
   pthread_t             thread;
+  FILE                 *fbk;
 } _stdctl_t;
 
 static _stdctl_t stdctl;
@@ -154,15 +155,13 @@ static void *xine_stdctl_loop(void *dummy) {
       secs /= 1000;
 
       if (secs != last_secs) {
-	fprintf(stdout, "time: %d\n", secs);
-	fflush(stdout);
+	fprintf(stdctl.fbk, "time: %d\n", secs);
 	last_secs = secs;
       }
     }
 
   }
   
-  fprintf(stdout, "Exiting\n");
   pthread_exit(NULL);
 }
 
@@ -170,14 +169,24 @@ void stdctl_start(void) {
   int err;
 
   stdctl.fd = STDIN_FILENO;
+  stdctl.fbk = gGui->stdout;
   
   if((err = pthread_create(&(stdctl.thread), NULL, xine_stdctl_loop, NULL)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+    fprintf(stderr, _("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     gGui->stdctl_enable = 0;
   }
 }
 
 void stdctl_stop(void) {
+  /*
+   * We print the exit feedback here, not on exit of the stdctl thread.
+   * Otherwise, if ACTID_QUIT (bringing us to this point) was triggered
+   * by stdctl itself, we run into a race with the main thread which
+   * could close the feedback channel beforehand: pthread_join doesn't
+   * wait but returns immediately with EDEADLK as stdctl tries to join
+   * itself and termination continues asynchronously.
+   */
+  fprintf(stdctl.fbk, "Exiting\n");
   pthread_join(stdctl.thread, NULL);
 }
 
@@ -185,7 +194,23 @@ void stdctl_event(const xine_event_t *event)
 {
   switch(event->type) {
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    fprintf(stdout, "PlaybackFinished\n");
+    fprintf(stdctl.fbk, "PlaybackFinished\n");
     break;
   }
+}
+
+void stdctl_keypress(XKeyEvent event)
+{
+    KeySym  sym;
+    char   *str;
+
+    if((sym = XKeycodeToKeysym(event.display, event.keycode, 0)))
+      if((str = XKeysymToString(sym)))
+	fprintf(stdctl.fbk, "KeyPress$%s\n", str);
+}
+
+void stdctl_playing(const char *mrl)
+{
+    fprintf(stdctl.fbk, "PlaybackStart$%s\n", mrl);
+    fprintf(stdctl.fbk, "PlaylistPos#%i\n", gGui->playlist.cur);
 }
