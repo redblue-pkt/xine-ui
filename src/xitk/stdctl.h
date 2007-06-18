@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -33,5 +33,7 @@
 void stdctl_start(void);
 void stdctl_stop(void);
 void stdctl_event(const xine_event_t *event);
+void stdctl_keypress(XKeyEvent event);
+void stdctl_playing(const char *mrl);
 
 #endif
