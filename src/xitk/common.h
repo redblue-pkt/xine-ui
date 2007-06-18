@@ -369,6 +369,8 @@ typedef struct {
 
   void                     (*nongui_error_msg)(char *text);
 
+  FILE                      *stdout; /* Channel to original stdout at startup */
+                                     /* before an evtl. later redirection     */
 } gGui_t;
 
 
