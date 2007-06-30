@@ -171,10 +171,10 @@ typedef struct {
   int                       deinterlace_enable;
 
   struct {
-    int                     hue;
-    int                     brightness;
-    int                     saturation;
-    int                     contrast;
+    int                     hue, default_hue;
+    int                     brightness, default_brightness;
+    int                     saturation, default_saturation;
+    int                     contrast, default_contrast;
   } video_settings;
 
   xine_audio_port_t        *ao_port;

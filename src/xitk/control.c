@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -39,7 +39,11 @@
 
 #include "common.h"
 
-#define TEST_VO_VALUE(val)  (val < 65535/3 || val > 65535*2/3) ? (65535 - val) : 0
+#define CONTROL_MIN     0
+#define CONTROL_MAX     65535
+#define CONTROL_STEP    565	/* approx. 1 pixel slider step */
+
+#define TEST_VO_VALUE(val)  (val < CONTROL_MAX/3 || val > CONTROL_MAX*2/3) ? (CONTROL_MAX - val) : 0
 
 extern gGui_t          *gGui;
 
@@ -69,16 +73,20 @@ static int hue_ena, sat_ena, bright_ena, contr_ena;
 
 
 static void hue_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.hue = cfg->num_value;
+  gGui->video_settings.hue =
+    (cfg->num_value < 0) ? gGui->video_settings.default_hue : cfg->num_value;
 }
 static void brightness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.brightness = cfg->num_value;
+  gGui->video_settings.brightness =
+    (cfg->num_value < 0) ? gGui->video_settings.default_brightness : cfg->num_value;
 }
 static void saturation_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.saturation = cfg->num_value;
+  gGui->video_settings.saturation =
+    (cfg->num_value < 0) ? gGui->video_settings.default_saturation : cfg->num_value;
 }
 static void contrast_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.contrast = cfg->num_value;
+  gGui->video_settings.contrast =
+    (cfg->num_value < 0) ? gGui->video_settings.default_contrast : cfg->num_value;
 }
 
 /*
@@ -268,31 +276,23 @@ static void probe_active_controls(void) {
 void control_reset(void) {
   
   if(hue_ena) {
-    set_current_param(XINE_PARAM_VO_HUE,
-		      (xitk_slider_get_min(control->hue) +
-		       xitk_slider_get_max(control->hue)) / 2);
-    config_update_num("gui.vo_hue", get_current_param(XINE_PARAM_VO_HUE));
+    set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.default_hue);
+    config_update_num("gui.vo_hue", -1);
   }
 
   if(sat_ena) {
-    set_current_param(XINE_PARAM_VO_SATURATION,
-		      (xitk_slider_get_min(control->sat) +
-		       xitk_slider_get_max(control->sat)) / 2);
-    config_update_num("gui.vo_saturation", get_current_param(XINE_PARAM_VO_SATURATION));
+    set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.default_saturation);
+    config_update_num("gui.vo_saturation", -1);
   }
 
   if(bright_ena) {
-    set_current_param(XINE_PARAM_VO_BRIGHTNESS,
-		      (xitk_slider_get_min(control->bright) +
-		       xitk_slider_get_max(control->bright)) / 2);
-    config_update_num("gui.vo_brightness", get_current_param(XINE_PARAM_VO_BRIGHTNESS));
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.default_brightness);
+    config_update_num("gui.vo_brightness", -1);
   }
 
   if(contr_ena) {
-    set_current_param(XINE_PARAM_VO_CONTRAST,
-		      (xitk_slider_get_min(control->contr) +
-		       xitk_slider_get_max(control->contr)) / 2);
-    config_update_num("gui.vo_contrast", get_current_param(XINE_PARAM_VO_CONTRAST));
+    set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.default_contrast);
+    config_update_num("gui.vo_contrast", -1);
   }
 
   update_sliders_video_settings();
@@ -306,64 +306,76 @@ void control_config_register(void) {
     gGui->video_settings.hue = 
      xine_config_register_range(gGui->xine, "gui.vo_hue",
 				-1,
-				0, 65535,
-				_("hue value"),
-				_("Hue value."), 
+				CONTROL_MIN, CONTROL_MAX,
+				CONFIG_NO_DESC, /* _("hue value"), */
+				CONFIG_NO_HELP, /* _("Hue value."), */
 				CONFIG_LEVEL_DEB,
 				hue_changes_cb, 
 				CONFIG_NO_DATA);
-    if( gGui->video_settings.hue < 0 )
+    gGui->video_settings.default_hue = get_current_param(XINE_PARAM_VO_HUE);
+    if(gGui->video_settings.hue < 0)
+      gGui->video_settings.hue = gGui->video_settings.default_hue;
+    else {
+      set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
       gGui->video_settings.hue = get_current_param(XINE_PARAM_VO_HUE);
-    else 
-      set_current_param(XINE_PARAM_VO_HUE,gGui->video_settings.hue);
+    }
   }
   
   if(bright_ena) {
     gGui->video_settings.brightness = 
      xine_config_register_range(gGui->xine, "gui.vo_brightness",
 				-1,
-				0, 65535,
-				_("brightness value"),
-				_("Brightness value."), 
+				CONTROL_MIN, CONTROL_MAX,
+				CONFIG_NO_DESC, /* _("brightness value"), */
+				CONFIG_NO_HELP, /* _("Brightness value."), */
 				CONFIG_LEVEL_DEB,
 				brightness_changes_cb, 
 				CONFIG_NO_DATA);
-    if( gGui->video_settings.brightness < 0 )
+    gGui->video_settings.default_brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
+    if(gGui->video_settings.brightness < 0)
+      gGui->video_settings.brightness = gGui->video_settings.default_brightness;
+    else {
+      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
       gGui->video_settings.brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
-    else 
-      set_current_param(XINE_PARAM_VO_BRIGHTNESS,gGui->video_settings.brightness);
+    }
   }
 
   if(sat_ena) {
    gGui->video_settings.saturation = 
      xine_config_register_range(gGui->xine, "gui.vo_saturation",
 				-1,
-				0, 65535,
-				_("saturation value"),
-				_("Saturation value."), 
+				CONTROL_MIN, CONTROL_MAX,
+				CONFIG_NO_DESC, /* _("saturation value"), */
+				CONFIG_NO_HELP, /* _("Saturation value."), */
 				CONFIG_LEVEL_DEB,
 				saturation_changes_cb, 
 				CONFIG_NO_DATA);
-    if( gGui->video_settings.saturation < 0 )
+    gGui->video_settings.default_saturation = get_current_param(XINE_PARAM_VO_SATURATION);
+    if(gGui->video_settings.saturation < 0)
+      gGui->video_settings.saturation = gGui->video_settings.default_saturation;
+    else {
+      set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
       gGui->video_settings.saturation = get_current_param(XINE_PARAM_VO_SATURATION);
-    else 
-      set_current_param(XINE_PARAM_VO_SATURATION,gGui->video_settings.saturation);
+    }
   }
 
   if(contr_ena) {
     gGui->video_settings.contrast = 
      xine_config_register_range(gGui->xine, "gui.vo_contrast",
 				-1,
-				0, 65535,
-				_("contrast value"),
-				_("Contrast value."), 
+				CONTROL_MIN, CONTROL_MAX,
+				CONFIG_NO_DESC, /* _("contrast value"), */
+				CONFIG_NO_HELP, /* _("Contrast value."), */
 				CONFIG_LEVEL_DEB,
 				contrast_changes_cb, 
 				CONFIG_NO_DATA);
-    if( gGui->video_settings.contrast < 0 )
+    gGui->video_settings.default_contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
+    if(gGui->video_settings.contrast < 0)
+      gGui->video_settings.contrast = gGui->video_settings.default_contrast;
+    else {
+      set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       gGui->video_settings.contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
-    else 
-      set_current_param(XINE_PARAM_VO_CONTRAST,gGui->video_settings.contrast);
+    }
   }
 }
 
@@ -716,7 +728,7 @@ void control_panel(void) {
   xitk_widget_list_set(control->widget_list, WIDGET_LIST_GC, gc);
   
   { /* All of sliders are disabled by default*/
-    int min = 0, max = 65535, step = 565, cur;
+    int cur;
 
     lbl.window = XITK_WIDGET_LIST_WINDOW(control->widget_list);
     lbl.gc     = XITK_WIDGET_LIST_GC(control->widget_list);
@@ -725,9 +737,9 @@ void control_panel(void) {
     cur = get_current_param(XINE_PARAM_VO_HUE);
     
     sl.skin_element_name = "SliderCtlHue";
-    sl.min               = min;
-    sl.max               = max;
-    sl.step              = step;
+    sl.min               = CONTROL_MIN;
+    sl.max               = CONTROL_MAX;
+    sl.step              = CONTROL_STEP;
     sl.callback          = set_hue;
     sl.userdata          = NULL;
     sl.motion_callback   = set_hue;
@@ -748,9 +760,9 @@ void control_panel(void) {
     cur = get_current_param(XINE_PARAM_VO_SATURATION);
 
     sl.skin_element_name = "SliderCtlSat";
-    sl.min               = min;
-    sl.max               = max;
-    sl.step              = step;
+    sl.min               = CONTROL_MIN;
+    sl.max               = CONTROL_MAX;
+    sl.step              = CONTROL_STEP;
     sl.callback          = set_saturation;
     sl.userdata          = NULL;
     sl.motion_callback   = set_saturation;
@@ -771,9 +783,9 @@ void control_panel(void) {
     cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
 
     sl.skin_element_name = "SliderCtlBright";
-    sl.min               = min;
-    sl.max               = max;
-    sl.step              = step;
+    sl.min               = CONTROL_MIN;
+    sl.max               = CONTROL_MAX;
+    sl.step              = CONTROL_STEP;
     sl.callback          = set_brightness;
     sl.userdata          = NULL;
     sl.motion_callback   = set_brightness;
@@ -794,9 +806,9 @@ void control_panel(void) {
     cur = get_current_param(XINE_PARAM_VO_CONTRAST);
 
     sl.skin_element_name = "SliderCtlCont";
-    sl.min               = min;
-    sl.max               = max;
-    sl.step              = step;
+    sl.min               = CONTROL_MIN;
+    sl.max               = CONTROL_MAX;
+    sl.step              = CONTROL_STEP;
     sl.callback          = set_contrast;
     sl.userdata          = NULL;
     sl.motion_callback   = set_contrast;
