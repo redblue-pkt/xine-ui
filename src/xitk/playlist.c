@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -172,22 +172,13 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 }
 
 static void _playlist_xine_play(void) {
-  gui_set_current_mmk(mediamark_get_current_mmk());
 
-  osd_hide();
+  if(!gui_playlist_play(gGui->playlist.cur)) {
 
-  if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-                             gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
-                             !mediamark_have_alternates(&(gGui->mmk)))) {
-    
-    if(!mediamark_have_alternates(&(gGui->mmk)) ||
-        !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
-  
-      if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	gui_exit(NULL, NULL);
-      
-      gui_display_logo();
-    }
+    if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+      gui_exit(NULL, NULL);
+
+    gui_display_logo();
   }
 }
 /*

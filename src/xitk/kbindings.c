@@ -192,6 +192,8 @@ static kbinding_entry_t default_binding_table[] = {
     "NextMrl",                ACTID_MRL_NEXT                , "Next",     KEYMOD_NOMOD   , 0 , 0},
   { "select and play previous MRL in the playlist",
     "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 , 0},
+  { "select and play MRL in the playlist",
+    "SelectMrl",              ACTID_MRL_SELECT              , "Select",   KEYMOD_NOMOD   , 0 , 0},
   { "loop mode toggle",
     "ToggleLoopMode",         ACTID_LOOPMODE	            , "l",	  KEYMOD_NOMOD   , 0 , 0},
   { "stop playback after played stream",
