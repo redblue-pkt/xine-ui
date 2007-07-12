@@ -856,6 +856,13 @@ void gui_execute_action_id(action_id_t action) {
     gui_kbedit_show(NULL, NULL);
     break;
 
+  case ACTID_KBENABLE:
+    if(gGui->numeric.set)
+      gGui->kbindings_enabled = gGui->numeric.arg;
+    else
+      gGui->kbindings_enabled = 1;
+    break;
+
   case ACTID_DPMSSTANDBY:
     xine_system(0, "xset dpms force standby");
     break;

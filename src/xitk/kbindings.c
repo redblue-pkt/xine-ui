@@ -375,6 +375,8 @@ static kbinding_entry_t default_binding_table[] = {
     "OSDMenu",                ACTID_OSD_MENU                , "O",        KEYMOD_NOMOD   , 0 , 0},
   { "enter key binding editor",
     "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 , 1},
+  { "enable key bindings (not useful to bind a key to it!)",
+    "KeyBindingsEnable",      ACTID_KBENABLE	            , "VOID",	  KEYMOD_NOMOD   , 0 , 0},
   { "open file selector",
     "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 , 1},
   { "select a subtitle file",
@@ -1150,6 +1152,8 @@ kbinding_t *kbindings_init_kbinding(void) {
   /* Just to check is there redundant entries, and inform user */
   _kbindings_check_redundancy(kbt);
 
+  gGui->kbindings_enabled = 1;
+
   return kbt;
 }
 
@@ -1457,7 +1461,7 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
   char              buf[256];
   kbinding_entry_t *k;
 
-  if((kbt == NULL) || (event == NULL))
+  if(!gGui->kbindings_enabled || (kbt == NULL) || (event == NULL))
     return;
 
   if (xevent2id(event, &modifier, buf, sizeof(buf)))

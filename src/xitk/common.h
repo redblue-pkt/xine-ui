@@ -338,6 +338,7 @@ typedef struct {
   char                      *keymap_file;
   kbinding_t                *kbindings;
   int                        shortcut_style;
+  int                        kbindings_enabled;
 
   struct {
     int                      set;
