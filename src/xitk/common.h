@@ -279,6 +279,8 @@ typedef struct {
 
   /* Current mediamark */
   mediamark_t               mmk;
+
+  pthread_mutex_t           mmk_mutex;
   
   /* playlist */
   struct {

@@ -1091,22 +1091,24 @@ void gui_handle_event (XEvent *event, void *data) {
  * Start playback of an entry in playlist
  */
 int gui_playlist_play(int idx) {
+  int ret = 1;
 
   osd_hide();
   panel_reset_slider ();
 
-  gGui->playlist.cur = idx;
-  if(gGui->playlist.cur >= gGui->playlist.num)
+  if(idx >= gGui->playlist.num)
     return 0;
-  gui_set_current_mmk(mediamark_get_current_mmk());
+  gui_set_current_mmk_by_index(idx);
 
+  pthread_mutex_lock(&gGui->mmk_mutex);
   if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
 			     gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
 			     !mediamark_have_alternates(&(gGui->mmk))) &&
      (!mediamark_have_alternates(&(gGui->mmk)) ||
       !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)))
-    return 0;
-  return 1;
+    ret = 0;
+  pthread_mutex_unlock(&gGui->mmk_mutex);
+  return ret;
 }
 
 /*

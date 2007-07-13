@@ -1654,7 +1654,7 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
 }
 
-void gui_set_current_mmk(mediamark_t *mmk) {
+static void set_mmk(mediamark_t *mmk) {
   
   if(gGui->mmk.mrl)
     free(gGui->mmk.mrl);
@@ -1692,6 +1692,9 @@ void gui_set_current_mmk(mediamark_t *mmk) {
     gGui->mmk.alternates    = NULL;
     gGui->mmk.cur_alt       = NULL;
   }
+}
+
+static void mmk_set_update(void) {
 
   video_window_set_mrl(gGui->mmk.ident);
   event_sender_update_menu_buttons();
@@ -1699,6 +1702,25 @@ void gui_set_current_mmk(mediamark_t *mmk) {
   playlist_update_focused_entry();
   
   gGui->playlist.ref_append = gGui->playlist.cur;
+}
+
+void gui_set_current_mmk(mediamark_t *mmk) {
+
+  pthread_mutex_lock(&gGui->mmk_mutex);
+  set_mmk(mmk);
+  pthread_mutex_unlock(&gGui->mmk_mutex);
+
+  mmk_set_update();
+}
+
+void gui_set_current_mmk_by_index(int idx) {
+
+  pthread_mutex_lock(&gGui->mmk_mutex);
+  set_mmk(mediamark_get_mmk_by_index(idx));
+  gGui->playlist.cur = idx;
+  pthread_mutex_unlock(&gGui->mmk_mutex);
+
+  mmk_set_update();
 }
 
 void gui_control_show(xitk_widget_t *w, void *data) {

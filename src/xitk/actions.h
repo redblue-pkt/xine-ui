@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -72,6 +72,7 @@ void gui_nextprev(xitk_widget_t *w, void *data);
 void gui_playlist_show(xitk_widget_t *w, void *data);
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data);
 void gui_set_current_mmk(mediamark_t *mmk);
+void gui_set_current_mmk_by_index(int idx);
 void gui_control_show(xitk_widget_t *w, void *data);
 void gui_mrl_browser_show(xitk_widget_t *w, void *data);
 void gui_setup_show(xitk_widget_t *w, void *data);

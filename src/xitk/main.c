@@ -1437,6 +1437,8 @@ int main(int argc, char *argv[]) {
   _rc_file_check_args(_argc, _argv);
 #endif
 
+  pthread_mutex_init(&gGui->mmk_mutex, NULL);
+
   visual_anim_init();
 
   /*
@@ -2230,6 +2232,7 @@ int main(int argc, char *argv[]) {
     free(session_argv);
   }
 
+  pthread_mutex_destroy(&gGui->mmk_mutex);
   pthread_mutex_destroy(&gGui->xe_mutex);
   pthread_mutex_destroy(&gGui->download_mutex);
 
