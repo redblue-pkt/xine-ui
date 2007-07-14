@@ -1131,6 +1131,7 @@ void gui_playlist_start_next() {
   if(is_playback_widgets_enabled() && (!gGui->playlist.num)) {
     gui_set_current_mmk(NULL);
     enable_playback_controls(0);
+    gui_display_logo();
     return;
   }
   
