@@ -236,6 +236,7 @@ typedef struct {
 
   const char               *logo_mrl;
   int                       logo_mode;
+  pthread_mutex_t           logo_mutex;
   int                       logo_has_changed;
   int                       display_logo;
 

@@ -48,10 +48,6 @@ filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
-static pthread_mutex_t logo_mutex = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP;
-/* Note: We need error check lock for the logo_mutex as it may be locked */
-/* twice by the same thread; fast lock would cause a dead lock!          */
-
 static int             last_playback_speed = XINE_SPEED_NORMAL;
 
 void reparent_all_windows(void) {
@@ -208,7 +204,7 @@ void try_to_set_input_focus(Window window) {
  */
 void gui_display_logo(void) {
 
-  pthread_mutex_lock(&logo_mutex);
+  pthread_mutex_lock(&gGui->logo_mutex);
   
   gGui->logo_mode = 2;
   
@@ -234,7 +230,7 @@ void gui_display_logo(void) {
   if(stream_infos_is_visible())
     stream_infos_update_infos();
   
-  pthread_mutex_unlock(&logo_mutex);
+  pthread_mutex_unlock(&gGui->logo_mutex);
 }
 
 static int _gui_xine_play(xine_stream_t *stream, 
@@ -273,10 +269,10 @@ static int _gui_xine_play(xine_stream_t *stream,
   else {
     char *ident;
 
-    pthread_mutex_lock(&logo_mutex);
+    pthread_mutex_lock(&gGui->logo_mutex);
     if(gGui->logo_mode != 2)
       gGui->logo_mode = 0;
-    pthread_mutex_unlock(&logo_mutex);
+    pthread_mutex_unlock(&gGui->logo_mutex);
     
     if(gGui->logo_mode == 0) {
      

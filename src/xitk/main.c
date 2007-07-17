@@ -1354,6 +1354,7 @@ int main(int argc, char *argv[]) {
   char                  **session_argv     = NULL;
   int                     session_argv_num = 0;
   int                     retval           = 0;
+  pthread_mutexattr_t     mutexattr;
   
   /* Set stdout always line buffered to get every     */
   /* message line immediately, needed esp. for stdctl */
@@ -2022,6 +2023,10 @@ int main(int argc, char *argv[]) {
 
   pthread_mutex_init(&gGui->download_mutex, NULL);
 
+  pthread_mutexattr_init(&mutexattr);
+  pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&gGui->logo_mutex, &mutexattr);
+
   /* Automatically start playback if new_mode is enabled and playlist is filled */
   if((gGui->smart_mode && 
       (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
@@ -2235,6 +2240,7 @@ int main(int argc, char *argv[]) {
   pthread_mutex_destroy(&gGui->mmk_mutex);
   pthread_mutex_destroy(&gGui->xe_mutex);
   pthread_mutex_destroy(&gGui->download_mutex);
+  pthread_mutex_destroy(&gGui->logo_mutex);
 
   if(gGui->report != stdout)
     fclose(gGui->report);
