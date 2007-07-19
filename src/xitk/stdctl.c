@@ -127,6 +127,12 @@ static void *xine_stdctl_loop(void *dummy) {
 	    gGui->numeric.set = 1;
 	    gGui->numeric.arg = atoi(params);
 
+	    if(gGui->numeric.arg < 0)
+	    {
+	      gGui->numeric.arg = 0;
+	      fprintf(stderr, "WARNING: stdctl: Negative num argument not supported, set to 0\n");
+	    }
+
 #if DEBUG_STDCTL
 	    fprintf(stderr, "Command: '%s'\nParameters: '%d'\n", c, gGui->numeric.arg);
 #endif

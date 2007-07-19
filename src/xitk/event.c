@@ -362,6 +362,12 @@ void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
   
   if(action & ACTID_IS_INPUT_EVENT) {
+
+    /* Note: In the following overflow checks, we must test against INT_MAX */
+    /* carefully. Otherwise, the comparison term may overflow itself and    */
+    /* detecting the overflow condition will fail (never true or true by    */
+    /* chance, depending on expression and rearranging by the compiler).    */
+
     if((action >= ACTID_EVENT_NUMBER_0) && (action <= ACTID_EVENT_NUMBER_9)) {
 
       if(!gGui->numeric.set) {
@@ -369,7 +375,8 @@ void gui_execute_action_id(action_id_t action) {
 	gGui->numeric.arg = 0;
       }
       
-      if(((gGui->numeric.arg * 10) + (action - ACTID_EVENT_NUMBER_0)) <= INT_MAX) {
+      if(gGui->numeric.arg <= ((INT_MAX - (action - ACTID_EVENT_NUMBER_0)) / 10)) {
+	/* ((gGui->numeric.arg * 10) + (action - ACTID_EVENT_NUMBER_0)) <= INT_MAX */
 	gGui->numeric.arg *= 10;
 	gGui->numeric.arg += (action - ACTID_EVENT_NUMBER_0);
       }
@@ -384,7 +391,8 @@ void gui_execute_action_id(action_id_t action) {
 	gGui->numeric.arg = 0;
       }
       
-      if((gGui->numeric.arg + 10) <= INT_MAX)
+      if(gGui->numeric.arg <= (INT_MAX - 10))
+	/* (gGui->numeric.arg + 10) <= INT_MAX */
 	gGui->numeric.arg += 10;
       else
 	fprintf(stderr, "WARNING: Input number canceled, avoid overflow\n");
@@ -639,7 +647,7 @@ void gui_execute_action_id(action_id_t action) {
       gGui->numeric.arg = -gGui->numeric.arg;
       gui_seek_relative (gGui->numeric.arg);
     }
-  break;
+    break;
 
   case ACTID_SEEK_REL_p:
     if(gGui->numeric.set)
