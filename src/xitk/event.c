@@ -540,7 +540,10 @@ void gui_execute_action_id(action_id_t action) {
 #endif
 
   case ACTID_TOGGLE_ASPECT_RATIO:
-    gui_toggle_aspect(-1);
+    if(!gGui->numeric.set)
+      gui_toggle_aspect(-1);
+    else
+      gui_toggle_aspect(gGui->numeric.arg);
     break;
 
   case ACTID_STREAM_INFOS:
