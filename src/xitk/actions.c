@@ -768,7 +768,8 @@ void gui_stop (xitk_widget_t *w, void *data) {
   xine_stop (gGui->stream);
   gGui->ignore_next = 0;
 
-  gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+  if(!(gGui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST))
+    gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
 
   gGui->stream_length.pos = gGui->stream_length.time = gGui->stream_length.length = 0;
   

@@ -111,8 +111,9 @@
 #define PLAYLIST_LOOP_SHUF_PLUS 4 /* random selection in playlist, never ending */
 #define PLAYLIST_LOOP_MODES_NUM 5
 
-#define PLAYLIST_CONTROL_STOP   0x00000001 /* Don't start next entry in playlist */
-#define PLAYLIST_CONTROL_IGNORE 0x00000002 /* Ignore some playlist adding action */
+#define PLAYLIST_CONTROL_STOP         0x00000001 /* Don't start next entry in playlist */
+#define PLAYLIST_CONTROL_STOP_PERSIST 0x00000002 /* Don't automatically reset PLAYLIST_CONTROL_STOP */
+#define PLAYLIST_CONTROL_IGNORE       0x00000003 /* Ignore some playlist adding action */
 
 #define SAFE_FREE(x)            do {           \
                                   if((x)) {    \

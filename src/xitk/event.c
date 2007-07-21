@@ -1025,14 +1025,23 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_PLAYLIST_STOP:
-    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
-      if(gGui->playlist.control & PLAYLIST_CONTROL_STOP)
+    if(!gGui->numeric.set) {
+      gGui->playlist.control ^= PLAYLIST_CONTROL_STOP;
+      gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP_PERSIST;
+    }
+    else {
+      if(!gGui->numeric.arg)
 	gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       else
 	gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
-      osd_display_info(_("Playlist: %s"), 
-		       (gGui->playlist.control & PLAYLIST_CONTROL_STOP) ? _("Stop") : _("Continue"));
+      gGui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
     }
+    osd_display_info(_("Playlist: %s"), 
+		     (gGui->playlist.control & PLAYLIST_CONTROL_STOP) ?
+		     (gGui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST) ?
+		     _("Stop (persistent)") :
+		     _("Stop") :
+		     _("Continue"));
     break;
     
   default:
@@ -1134,7 +1143,8 @@ void gui_playlist_start_next() {
   panel_reset_slider ();
 
   if(gGui->playlist.control & PLAYLIST_CONTROL_STOP) {
-    gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+    if(!(gGui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST))
+      gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
     gui_display_logo();
     return;
   }
