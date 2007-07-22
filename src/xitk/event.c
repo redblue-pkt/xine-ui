@@ -323,7 +323,10 @@ static void gui_signal_handler (int sig, void *data) {
       }
       alarm(5);
       
-      xine_stop(gGui->stream);
+      /* We should call xine_stop() here, but since the */
+      /* xine functions are not signal-safe, we cant.   */
+
+      /*xine_stop(gGui->stream);*/
     }
     break;
   }
