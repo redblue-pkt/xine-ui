@@ -414,6 +414,12 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
   XUNLOCK(im->x.disp);
   
+  /* Creating an image from an empty string would cause an abort with failed */
+  /* condition "width > 0". So we substitute some spaces (one single space   */
+  /* may not be enough!). Should only happen in case of error.               */
+  if(!*str)
+    str = "   ";
+
   fs = xitk_font_load_font(im->x.disp, fontname);
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, str, NULL, NULL, NULL, &ascent, &descent);
