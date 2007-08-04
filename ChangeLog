@@ -1,6 +1,30 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * Fixes for stdctl race conditions, contributed by Stas Sergeev
+  * Resetting the video controls restores the driver default settings
+    instead of fixed center values
+  * New commands/keybindings from Stas Sergeev:
+    "SelectMrl" with a numeric parameter allows to select an MRL directly
+    by its position number in the playlist.
+    "KeyBindingsEnable" with optional numeric parameter allows to enable/disable
+    the keybindings (disabled by param equal to 0, else enabled), so stdctl can
+    get exclusive control over the keys with disabled bindings; this command is
+    not bound to a key by default for an obvious reason (don't dare to bind) ;-)
+  * Enhanced commands/keybindings with contributions from Stas Sergeev:
+    "PlaylistStop" accepts a numeric parameter to set the stop state absolutely
+    (continue if param equals 0, else stop) and persistent, i.e. not reset to
+    "continue" after playing current stream, as opposed to the usual toggling
+    without parameter; usual toggling is now also possible when no stream is
+    currently played, allowing to change the selection at any time.
+    "ToggleLoopMode" and "ToggleAspectRatio" accept a numeric parameter as index
+    to make a direct selection from the list of their possible states
+  * Stdctl enhancements and fixes from Stas Sergeev:
+    Feedback messages and echoing of key presses to standard output added,
+    clean exit upon closing standard input connection or quitting xine-ui,
+    multiple commands in one command string handled
+  * Fixed wrong locale path (introduced in previous release)
+
 xine-ui (0.99.5) unstable; urgency=low
 
   * Fixes and enhancements ...
