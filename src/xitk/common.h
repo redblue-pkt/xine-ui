@@ -243,7 +243,7 @@ typedef struct {
 
   /* stuff like ACTID_x */
 #define MAX_ACTIONS_ON_START 32
-  action_id_t               actions_on_start[MAX_ACTIONS_ON_START];
+  action_id_t               actions_on_start[MAX_ACTIONS_ON_START+1];
   char                     *autoscan_plugin;
 
   /* basic X11 stuff */

@@ -2206,8 +2206,7 @@ int main(int argc, char *argv[]) {
   /*
    * hand control over to gui
    */
-  if(aos < MAX_ACTIONS_ON_START)
-    gGui->actions_on_start[aos] = ACTID_NOKEY;
+  gGui->actions_on_start[aos] = ACTID_NOKEY;
   
   /* Initialize posts, if required */
   if(pplugins_num) {
