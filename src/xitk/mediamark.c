@@ -2991,7 +2991,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	      ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
 	      ".film .dv .dif .fli .flc .mjpg .mov .qt .m2p .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
 	      ".mpv .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .mng .pva .ra .rm "
-	      ".ram .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
+	      ".ram .rmvb .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
 	      ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
 	    
 	    snprintf(ext, sizeof(ext), "%s ", extension);

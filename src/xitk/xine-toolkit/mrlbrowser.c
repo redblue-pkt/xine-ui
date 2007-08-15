@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2007 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -60,6 +60,7 @@ static xitk_mrlbrowser_filter_t __mrl_filters[] = {
   { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"   }, /* QT */
   { "*.roq"               , "roq"          }, /* roq */
   { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"   }, /* ts */
+  { "*.rmvb"              , "rmvb"         }, /* rmvb */
   { NULL                  , NULL           }
 };
 

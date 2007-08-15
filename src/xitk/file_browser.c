@@ -86,6 +86,7 @@ static filebrowser_filter_t __fb_filters[] = {
   { NULL, ".sub .srt .asc .smi .ssa .txt "                                         },
   /* playlists */
   { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "                         },
+  /* media files */
   { "*.4xm", ".4xm "                                                               },
   { "*.ac3", ".ac3 "                                                               },
   { "*.aif, *.aiff", ".aif .aiff "                                                 },
@@ -109,7 +110,7 @@ static filebrowser_filter_t __fb_filters[] = {
   { "*.png, *.mng", ".png .mng "                                                   },
   { "*.pva", ".pva "                                                               },
   { "*.ra", ".ra "                                                                 },
-  { "*.rm, *.ram", ".rm .ram "                                                     },
+  { "*.rm, *.ram, *.rmvb ", ".rm .ram .rmvb "                                      },
   { "*.roq", ".roq "                                                               },
   { "*.str, *.iki, *.ik2, *.dps, *.dat, *.xa1, *.xa2, *.xas, *.xap, *.xa",
     ".str .iki .ik2 .dps .dat .xa1 .xa2 .xas .xap .xa "                            },
