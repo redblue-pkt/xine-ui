@@ -100,6 +100,7 @@ static filebrowser_filter_t __fb_filters[] = {
   { "*.mp3, *.mp2, *.mpa, *.mpega", ".mp3 .mp2 .mpa .mpega "                       },
   { "*.mjpg", ".mjpg "                                                             },
   { "*.mov, *.qt, *.mp4", ".mov .qt .mp4 "                                         },
+  { "*.m2p", ".m2p "                                                               },
   { "*.mpg, *.mpeg", ".mpg .mpeg "                                                 },
   { "*.mpv", ".mpv "                                                               },
   { "*.mve, *.mv8", ".mve .mv8 "                                                   },
