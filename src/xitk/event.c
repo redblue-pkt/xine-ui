@@ -1331,7 +1331,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * init playlist
    */
   for (i = 0; i < nfiles; i++) {
-    char *file = atoa(filenames[i]);
+    char *file = filenames[i];
 
     /* grab recursively all files from dir */
     if(is_a_dir(file)) {
