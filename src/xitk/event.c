@@ -603,8 +603,11 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SET_CURPOS:
-    /* Number is a percentage */
-    gGui->numeric.arg %= 100; /* range [0..100] */
+    /* Number is a percentage, range [0..100] */
+    if(gGui->numeric.arg < 0)
+      gGui->numeric.arg = 0;
+    if(gGui->numeric.arg > 100)
+      gGui->numeric.arg = 100;
     gui_set_current_position((65534 * gGui->numeric.arg) / 100);
     break;
 
