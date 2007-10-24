@@ -240,6 +240,8 @@ static kbinding_entry_t default_binding_table[] = {
     "SetPosition80%",         ACTID_SET_CURPOS_80           , "8",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 90% of current stream",
     "SetPosition90%",         ACTID_SET_CURPOS_90           , "9",        KEYMOD_CONTROL , 0 , 0},
+  { "set position to 100% of current stream",
+    "SetPosition100%",        ACTID_SET_CURPOS_100          , "End",      KEYMOD_CONTROL , 0 , 0},
   { "increment playback speed",
     "SpeedFaster",            ACTID_SPEED_FAST              , "Up",       KEYMOD_NOMOD   , 0 , 0},
   { "decrement playback speed",
