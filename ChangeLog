@@ -1,6 +1,8 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * New command/keybinding from Richard van Paasen:
+    "SetPosition100%" jumps to end of stream.
   * Recognize .rmvb files, closes debian bug #437864.
   * Recognize .m2p files, closes debian bug #419002.
   * Fixes for stdctl race conditions, contributed by Stas Sergeev
