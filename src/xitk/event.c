@@ -608,7 +608,7 @@ void gui_execute_action_id(action_id_t action) {
       gGui->numeric.arg = 0;
     if(gGui->numeric.arg > 100)
       gGui->numeric.arg = 100;
-    gui_set_current_position((65534 * gGui->numeric.arg) / 100);
+    gui_set_current_position((65535 * gGui->numeric.arg) / 100);
     break;
 
   case ACTID_SET_CURPOS_0:
@@ -652,7 +652,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SET_CURPOS_100:
-    gui_set_current_position (65534);
+    gui_set_current_position (65535);
     break;
 
   case ACTID_SEEK_REL_m:
