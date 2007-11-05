@@ -195,6 +195,9 @@ typedef enum {
 #ifdef XINE_EVENT_VDR_CHANNELPREVIOUS /* #ifdef is precaution for backward compatibility at the moment */
   ACTID_EVENT_VDR_CHANNELPREVIOUS  = XINE_EVENT_VDR_CHANNELPREVIOUS  | ACTID_IS_INPUT_EVENT,
 #endif
+#ifdef XINE_EVENT_VDR_SUBTITLES /* #ifdef is precaution for backward compatibility at the moment */
+  ACTID_EVENT_VDR_SUBTITLES        = XINE_EVENT_VDR_SUBTITLES        | ACTID_IS_INPUT_EVENT,
+#endif
 #endif
 
   /*

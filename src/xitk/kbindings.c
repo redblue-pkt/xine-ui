@@ -526,6 +526,10 @@ static kbinding_entry_t default_binding_table[] = {
   { "VDR Previous channel",
     "VDRChannelPrevious",     ACTID_EVENT_VDR_CHANNELPREVIOUS, "VOID",     KEYMOD_NOMOD   , 0 , 0},
 #endif
+#ifdef XINE_EVENT_VDR_SUBTITLES /* #ifdef is precaution for backward compatibility at the moment */
+  { "VDR Subtiles menu",
+    "VDRSubtitles",           ACTID_EVENT_VDR_SUBTITLES      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+#endif
 #endif
   { 0,
     0,                        0                              , 0,          0              , 0 , 0}

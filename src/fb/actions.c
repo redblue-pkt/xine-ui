@@ -299,6 +299,10 @@ static const struct
 	{ "VDR Previous channel",
 	  "VDRChannelPrevious",     ACTID_EVENT_VDR_CHANNELPREVIOUS },
 #endif
+#ifdef XINE_EVENT_VDR_SUBTITLES /* #ifdef is precaution for backward compatibility at the moment */
+	{ "VDR Subtitles menu",
+	  "VDRSubtitles",           ACTID_EVENT_VDR_SUBTITLES },
+#endif
 #endif
 	{ 0,
 	  0,                        0 }
