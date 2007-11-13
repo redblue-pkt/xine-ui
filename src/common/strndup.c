@@ -32,12 +32,11 @@
 
 #include <config.h>
 
-#include <assert.h>
+#ifndef HAVE_STRNDUP
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if !HAVE_STRNDUP
 char *
 strndup(const char *str, size_t n)
 {
