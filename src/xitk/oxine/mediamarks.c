@@ -232,7 +232,6 @@ static void free_subtree(list_t *list, int i) {
 static playitem_t *playitem_load (xml_node_t *node) {
 
   playitem_t *play_item;
-  char *type;
   struct stat filestat;
 
   play_item = ho_new(playitem_t);
@@ -246,7 +245,7 @@ static playitem_t *playitem_load (xml_node_t *node) {
 #endif
     } else if (!strcasecmp (node->name, "ref")) {
       play_item->mrl = ho_strdup(xml_parser_get_property (node, "href"));
-      type = xml_parser_get_property(node, "type");
+      const char *type = xml_parser_get_property(node, "type");
       if(type) {
 	if(!strcasecmp(type, "multiple")) {
 	  play_item->type = TYPE_MULTIPLE;
