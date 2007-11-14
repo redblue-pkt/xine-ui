@@ -77,7 +77,7 @@ typedef struct {
   char                    *modifier;
 } lang_locale_t;
 
-static lang_locale_t lang_locales[] = {
+static const lang_locale_t lang_locales[] = {
   { "af_ZA",    "iso88591",   NULL       },
   { "ar_AE",    "iso88596",   NULL       },
   { "ar_BH",    "iso88596",   NULL       },
