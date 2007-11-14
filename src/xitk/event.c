@@ -76,7 +76,7 @@ static const unsigned char icon_datas[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-static char *exp_levels[] = {
+static const char *exp_levels[] = {
   "Beginner",
   "Advanced",
   "Expert",
@@ -89,20 +89,20 @@ static char *exp_levels[] = {
   NULL
 };
 
-static char *visual_anim_style[] = {
+static const char *visual_anim_style[] = {
   "None",
   "Post Plugin",
   "Stream Animation",
   NULL
 };
 
-static char *mixer_control_method[] = {
+static const char *mixer_control_method[] = {
   "Sound card",
   "Software",
   NULL
 };
 
-static char *shortcut_style[] = {
+static const char *shortcut_style[] = {
   "Windows style",
   "Emacs style",
   NULL
@@ -1505,7 +1505,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->visual_anim.enabled = 
     xine_config_register_enum(gGui->xine, "gui.visual_anim", 
 			      1, /* Post plugin */
-			      visual_anim_style,
+			      (char**)visual_anim_style,
 			      _("Visual animation style"),
 			      _("Display some video animations when "
 				"current stream is audio only (eg: mp3)."), 
@@ -1585,7 +1585,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->experience_level =
     (xine_config_register_enum(gGui->xine, "gui.experience_level", 
-			       0, exp_levels,
+			       0, (char**)exp_levels,
 			       _("Configuration experience level"),
 			       _("Level of user's experience, this will show more or less "
 				 "configuration options."), 
@@ -1612,7 +1612,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->mixer.method = 
     xine_config_register_enum(gGui->xine, "gui.audio_mixer_method", 
-			      SOUND_CARD_MIXER, mixer_control_method,
+			      SOUND_CARD_MIXER, (char**)mixer_control_method,
 			      _("Audio mixer control method"),
 			      _("Which method used to control audio volume."), 
 			      CONFIG_LEVEL_ADV,
@@ -1621,7 +1621,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->shortcut_style = 
     xine_config_register_enum(gGui->xine, "gui.shortcut_style", 
-			      0, shortcut_style,
+			      0, (char**)shortcut_style,
 			      _("Menu shortcut style"),
 			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."), 
 			      CONFIG_LEVEL_ADV,
