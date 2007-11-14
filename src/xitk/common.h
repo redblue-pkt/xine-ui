@@ -210,12 +210,12 @@ typedef struct {
     int                     current;
     int                     enabled; /* 0, 1:vpost, 2:vanim */
     
-    char                  **mrls;
     int                     num_mrls;
+    char                  **mrls;
     
     int                     post_plugin_num;
-    post_element_t          post_output_element;    
     int                     post_changed;
+    post_element_t          post_output_element;    
   } visual_anim;
   
   struct {
@@ -235,8 +235,8 @@ typedef struct {
   char                     *configfile;
   int                       experience_level;
 
-  const char               *logo_mrl;
   int                       logo_mode;
+  const char               *logo_mrl;
   pthread_mutex_t           logo_mutex;
   int                       logo_has_changed;
   int                       display_logo;
@@ -256,8 +256,8 @@ typedef struct {
   Colormap                  colormap;
   double                    pixel_aspect;
 
-  int		            prefered_visual_class;
   VisualID	            prefered_visual_id;
+  int		            prefered_visual_class;
   int		            install_colormap;
 
   xitk_skin_config_t       *skin_config;
@@ -329,8 +329,6 @@ typedef struct {
   
   int                       use_root_window;
 
-  const char               *snapshot_location;
-  
   int                       ssaver_enabled;
   int                       ssaver_timeout;
 
@@ -339,6 +337,8 @@ typedef struct {
   int                       auto_vo_visibility;
   int                       auto_panel_visibility;
 
+  const char               *snapshot_location;
+  
   char                      *keymap_file;
   kbinding_t                *kbindings;
   int                        shortcut_style;

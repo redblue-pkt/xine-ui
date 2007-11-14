@@ -42,10 +42,12 @@ typedef struct {
   int                       end;    /* -1 == <till the end> else (secs) */
   int                       av_offset;
   int                       spu_offset;
+
+  int                       played; /* used with shuffle loop mode */
+
   int                       got_alternate;
   alternate_t              *cur_alt;
   alternate_t              *alternates;
-  int                       played; /* used with shuffle loop mode */
 } mediamark_t;
 
 

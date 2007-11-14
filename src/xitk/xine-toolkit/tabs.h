@@ -36,11 +36,11 @@ typedef struct {
 
   int                     x, y, width;
 
+  int                     num_entries;
+  char                  **entries;
+
   xitk_widget_t          *tabs[MAX_TABS];
   btnlist_t              *bt[MAX_TABS];
-
-  char                  **entries;
-  int                     num_entries;
 
   xitk_widget_list_t     *parent_wlist;
 

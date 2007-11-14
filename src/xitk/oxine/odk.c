@@ -46,7 +46,6 @@ struct  odk_s {
   xine_stream_t *stream;
   
   xine_osd_t *osd;
-  int unscaled_osd;
   double vscale, hscale;
 
   int (*event_handler)(void *data, oxine_event_t *ev);
@@ -55,7 +54,9 @@ struct  odk_s {
   uint32_t color[NUM_COLORS];
   uint8_t trans[NUM_COLORS];
 
+  int unscaled_osd;
   int palette_fill;
+
   char *menu_bg;
 
   int is_freetype;

@@ -62,15 +62,15 @@ struct otk_widget_s {
 
   int            widget_type;
   
-  otk_t          *otk;
-  odk_t          *odk;
-
   int             x, y, w, h;
   int             focus;
   int             selectable;
   int             needupdate;
   int             needcalc; /* used by layout container */
   int             major; /* if parent otk_window_t should draw/destroy this widget set this to 0 */
+
+  otk_t          *otk;
+  odk_t          *odk;
 
   otk_widget_t   *win;
 
@@ -154,8 +154,8 @@ struct otk_list_s {
   int              num_entries;
   int              last_selected;
 
-  char            *font;
   int              font_size;
+  char            *font;
 
   otk_list_cb_t    cb;
   void            *cb_data;
@@ -186,16 +186,17 @@ struct otk_s {
 
   g_list_t     *windows;
 
-  int           showing;
-
   otk_widget_t *focus_ptr;
+
+  int           showing;
 
   int           textcolor_win;
   int           textcolor_but;
   int           col_sl1, col_sl2, col_sl1f, col_sl2f;
 
-  char         *button_font;
   int           button_font_size;
+  char         *button_font;
+
   char         *label_font;
   int           label_color;
   int           label_font_size;
