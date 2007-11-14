@@ -175,7 +175,7 @@ typedef struct {
 /* 
  * Default key mapping table.
  */
-static kbinding_entry_t default_binding_table[] = {
+static const kbinding_entry_t default_binding_table[] = {
   { "start playback",
     "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   , 0 , 0},
   { "playback pause toggle",
