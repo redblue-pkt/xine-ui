@@ -37,9 +37,6 @@
 #define NORMAL                  1
 #define FOCUS                   2
 
-unsigned int mods_used = (ShiftMask | ControlMask | Mod1Mask |
-			  Mod2Mask| Mod3Mask| Mod4Mask| Mod5Mask);
-
 /*
  *
  */
