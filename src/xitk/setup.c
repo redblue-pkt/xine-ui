@@ -34,9 +34,7 @@
 
 extern gGui_t                   *gGui;
 
-static char                     *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char                     *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
-static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+#define boldfontname "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
 
 #define WINDOW_WIDTH             630
 #define WINDOW_HEIGHT            530

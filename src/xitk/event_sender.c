@@ -43,7 +43,7 @@
 
 extern gGui_t          *gGui;
 
-static char            *eventerfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+#define eventerfontname "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 
 typedef struct {
   xitk_window_t        *xwin;

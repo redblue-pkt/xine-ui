@@ -45,9 +45,7 @@
 
 extern gGui_t          *gGui;
 
-static char            *sinfosfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char            *lfontname          = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
-static char            *btnfontname        = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+#define sinfosfontname "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
 
 typedef struct {
   xitk_window_t        *xwin;

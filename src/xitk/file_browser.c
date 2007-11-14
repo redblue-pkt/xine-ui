@@ -72,9 +72,6 @@
 
 extern gGui_t          *gGui;
 
-static char            *fontname           = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char            *btnfontname        = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-
 typedef struct {
   char                      *name;
   char                      *ending;

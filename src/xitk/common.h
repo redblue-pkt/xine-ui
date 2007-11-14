@@ -152,6 +152,13 @@
 /* Our default location for skin downloads */
 #define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
 
+#define fontname       "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
+#define lfontname      "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
+#define tabsfontname   "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
+#define br_fontname    "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*"
+#define btnfontname    "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
+
+
 typedef struct {
   xine_video_port_t        *vo_port;
   xine_video_port_t        *vo_none;

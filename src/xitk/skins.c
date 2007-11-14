@@ -1050,8 +1050,6 @@ void download_skin(char *url) {
   layer_above_video(xitk_window_get_window(xwin));
   
   if((slxs = skins_get_slx_entries(url)) != NULL) {
-    char                      *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
-    char                      *btnfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
     int                        i;
     xitk_browser_widget_t      br;
     xitk_labelbutton_widget_t  lb;

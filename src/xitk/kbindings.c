@@ -81,8 +81,6 @@ typedef struct {
 } _kbedit_t;
 
 static _kbedit_t    *kbedit = NULL;
-static char         *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-static char         *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
 
 #define WINDOW_WIDTH        530
 #define WINDOW_HEIGHT       456

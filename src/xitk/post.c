@@ -67,10 +67,7 @@ extern gGui_t    *gGui;
         xitk_enable_and_show_widget(widget);                                                    \
     } while(0)
  
-static char                  *br_fontname      = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
-static char                  *btnfontname      = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-static char                  *fontname         = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char                  *boldfontname     = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+#define boldfontname "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 
 typedef struct {
   xine_post_t                 *post;

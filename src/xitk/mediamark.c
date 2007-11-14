@@ -44,9 +44,6 @@
 #define WINDOW_WIDTH            525
 #define WINDOW_HEIGHT           270
 
-static char                    *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-static char                    *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-
 typedef struct {
   apply_callback_t              callback;
   void                         *user_data;
