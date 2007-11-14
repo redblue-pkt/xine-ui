@@ -234,7 +234,7 @@
 */
 
 /* Global definition */
-static langs_t _langs[] = {
+static const langs_t _langs[] = {
   /* English section */
   { "C",                ENGLISH,            "en",    NULL         }, /* WARNING: This should be the first entry */
   { "POSIX",            ENGLISH,            "en",    NULL         },

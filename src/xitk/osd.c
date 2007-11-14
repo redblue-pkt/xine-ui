@@ -51,7 +51,7 @@ typedef struct {         /* CLUT == Color LookUp Table */
   uint8_t foo   : 8;
 } __attribute__ ((packed)) clut_t;
 
-static clut_t textpalettes_color[] = {
+static const clut_t textpalettes_color[] = {
   /* white, no border, translucid */
     CLUT_Y_CR_CB_INIT(0x00, 0x00, 0x00), //0
     CLUT_Y_CR_CB_INIT(0x60, 0x80, 0x80), //1
@@ -78,14 +78,14 @@ static clut_t textpalettes_color[] = {
     CLUT_Y_CR_CB_INIT(0xff, 0x90, 0x00), //10
 };
 
-static uint8_t textpalettes_trans[] = {
+static const uint8_t textpalettes_trans[] = {
   /* white, no border, translucid */
   0, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15,
   /* yellow, black border, transparent */
   0, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15,
 };
 
-static struct xine_status_s {
+static const struct xine_status_s {
   char    *symbol;
   int      status;
 } xine_status[] = {
@@ -96,7 +96,7 @@ static struct xine_status_s {
   { NULL, 0                 }
 };
 
-static struct xine_speeds_s {
+static const struct xine_speeds_s {
   char    *symbol;
   int      speed;
 } xine_speeds[] = {
