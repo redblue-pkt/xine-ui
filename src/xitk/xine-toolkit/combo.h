@@ -43,7 +43,7 @@ typedef struct {
   xitk_widget_t          *button_widget;
   xitk_widget_t          *browser_widget;
 
-  char                  **entries;
+  const char     * const *entries;
   int                     num_entries;
   int                     selected;
 

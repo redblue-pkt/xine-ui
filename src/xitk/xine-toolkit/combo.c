@@ -474,7 +474,7 @@ int xitk_combo_get_current_selected(xitk_widget_t *w) {
 /*
  * 
  */
-char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
+const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
@@ -490,7 +490,7 @@ char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
 /*
  *
  */
-void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
+void xitk_combo_update_list(xitk_widget_t *w, const char const* const* list, int len) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
@@ -532,7 +532,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 					 int visible, int enable) {
   Atom                        XA_WIN_LAYER;
   long                        data[1];
-  char                      **entries = c->entries;
+  const char                **entries = c->entries;
   unsigned int                itemw, itemh = 20;
   unsigned int                slidw = 12;
   xitk_browser_widget_t       browser;

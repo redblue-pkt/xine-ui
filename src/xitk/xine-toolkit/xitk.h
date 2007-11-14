@@ -627,7 +627,7 @@ typedef struct {
   ImlibData                        *imlibdata;
   char                             *skin_element_name;
   xitk_widget_list_t               *parent_wlist;
-  char                           **entries;
+  const char                      **entries;
   int                              layer_above;
   xitk_state_callback_t            callback;
   void                            *userdata;
@@ -1885,7 +1885,7 @@ int xitk_combo_get_current_selected(xitk_widget_t *w);
 /**
  *
  */
-char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
+const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
 
 /**
  *
@@ -1895,7 +1895,7 @@ void xitk_combo_set_select(xitk_widget_t *w, int select);
 /**
  *
  */
-void xitk_combo_update_list(xitk_widget_t *w, char **list, int len);
+void xitk_combo_update_list(xitk_widget_t *w, const char const* const* list, int len);
 
 /**
  *
