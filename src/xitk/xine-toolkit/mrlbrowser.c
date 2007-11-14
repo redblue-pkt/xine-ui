@@ -112,7 +112,7 @@ static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data,
   private_data->mrl_filters[i]->name   = NULL;
   private_data->mrl_filters[i]->ending = NULL;
   
-  private_data->filters = (char **) xitk_xmalloc(sizeof(char *) * (private_data->filters_num + 1));
+  private_data->filters = (const char **) xitk_xmalloc(sizeof(char *) * (private_data->filters_num + 1));
   
   for(i = 0; private_data->mrl_filters[i]->name != NULL; i++)
     private_data->filters[i] = private_data->mrl_filters[i]->name;

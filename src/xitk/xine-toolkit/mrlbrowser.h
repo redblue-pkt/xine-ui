@@ -148,7 +148,7 @@ typedef struct {
   xitk_widget_t             *autodir_plugins[64];
 
   xitk_widget_t             *combo_filter;
-  char                     **filters;
+  const char               **filters;
   int                        filters_num;
   xitk_mrlbrowser_filter_t **mrl_filters;
   int                        filter_selected;
