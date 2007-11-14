@@ -436,14 +436,15 @@ static menuitem_t *menuitem_load(xml_node_t *node) {
   item->title = NULL;
   item->data = NULL;
 
-  node = node->child;
-  while( node ) {
+  if ( (node = node->child) == NULL )
+    return item;
 
+  do {
     if (!strcasecmp (node->name, "title")) {
       item->title = ho_strdup (node->data);
     } else if (!strcasecmp (node->name, "action")) {
-
       const char *type = xml_parser_get_property(node, "type");
+
       if(type) {
         if(!strcasecmp(type, "autoplay")) {
           item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
@@ -461,8 +462,7 @@ static menuitem_t *menuitem_load(xml_node_t *node) {
         }
       }
     }
-    node=node->next;
-  }
+  } while ( (node = node->next) != NULL );
 
   return item;
 }
