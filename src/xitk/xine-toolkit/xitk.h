@@ -1292,7 +1292,7 @@ xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
 /**
  * Change label of widget 'widget'.
  */
-int xitk_label_change_label(xitk_widget_t *l, char *newlabel);
+int xitk_label_change_label(xitk_widget_t *l, const char *newlabel);
 
 /**
  * Get label.

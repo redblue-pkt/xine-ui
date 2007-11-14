@@ -289,7 +289,7 @@ static void *xitk_label_animation_loop(void *data) {
 /*
  *
  */
-static void label_setup_label(xitk_widget_t *w, char *label_) {
+static void label_setup_label(xitk_widget_t *w, const char *label_) {
   label_private_data_t *private_data = (label_private_data_t *) w->private_data;
   int label_len;
   
@@ -399,7 +399,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 /*
  *
  */
-int xitk_label_change_label(xitk_widget_t *w, char *newlabel) {
+int xitk_label_change_label(xitk_widget_t *w, const char *newlabel) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
