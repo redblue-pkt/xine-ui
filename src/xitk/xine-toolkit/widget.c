@@ -37,7 +37,7 @@
 
 #include "_xitk.h"
 
-static xitk_color_names_t xitk_color_names[] = {
+static const xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
   { 248,  248,  255,  "GhostWhite" },
   { 245,  245,  245,  "WhiteSmoke" },
@@ -1621,7 +1621,6 @@ xitk_color_names_t *gui_get_color_names(void) {
  */
 xitk_color_names_t *xitk_get_color_name(char *color) {
   xitk_color_names_t *cn = NULL;
-  xitk_color_names_t *pcn = NULL;
 
   if(color == NULL) {
     XITK_WARNING("color was NULL.\n");
@@ -1661,6 +1660,7 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
     return cn;
   } 
   else {
+    const xitk_color_names_t *pcn = NULL;
     for(pcn = xitk_color_names; pcn->colorname != NULL; pcn++) {
       if(!strncasecmp(pcn->colorname, color, strlen(pcn->colorname))) {
 
