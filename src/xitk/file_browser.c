@@ -77,12 +77,10 @@ typedef struct {
   char                      *ending;
 } filebrowser_filter_t;
 
-static filebrowser_filter_t __fb_filters[] = {
-  { NULL, "*"                                                                      },
-  /* subtitles */
-  { NULL, ".sub .srt .asc .smi .ssa .txt "                                         },
-  /* playlists */
-  { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "                         },
+static const filebrowser_filter_t __fb_filters[] = {
+  { N_("All files"), "*"                                                           },
+  { N_("All known subtitles"), ".sub .srt .asc .smi .ssa .txt "                    },
+  { N_("All known playlists"), ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "    },
   /* media files */
   { "*.4xm", ".4xm "                                                               },
   { "*.ac3", ".ac3 "                                                               },
@@ -157,7 +155,7 @@ struct filebrowser_s {
 
   xitk_widget_t                  *filters;
   int                             filter_selected;
-  char                          **file_filters;
+  const char                    **file_filters;
 
   xitk_widget_t                  *show_hidden;
   int                             show_hidden_files;
@@ -955,8 +953,6 @@ static void fb_exit(xitk_widget_t *w, void *data) {
       free(fb->directories);
     }
 
-    for(i = 0; fb->file_filters[i]; i++)
-      free(fb->file_filters[i]);
     free(fb->file_filters);
     
     SAFE_FREE(fb->cbb[0].label);
@@ -1240,14 +1236,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->files = (char **) xine_xmalloc(sizeof(char *) * 2);
   fb->directories = (char **) xine_xmalloc(sizeof(char *) * 2);
   
-  __fb_filters[0].name = _("All files");
-  __fb_filters[1].name = _("All known subtitles");
-  __fb_filters[2].name = _("All known playlists");
-
-  fb->file_filters = (char **) xine_xmalloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
+  fb->file_filters = (const char **) xine_xmalloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
   
   for(i = 0; __fb_filters[i].ending; i++)
-    fb->file_filters[i] = strdup(__fb_filters[i].name);
+    fb->file_filters[i] = _(__fb_filters[i].name);
 
   fb->file_filters[i] = NULL;
   fb->filter_selected = 0;
