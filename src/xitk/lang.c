@@ -502,10 +502,10 @@ const char *get_language_from_iso639_1(char *two_letters) {
  * Return a langs_t pointer on static struct langs[];
  */
 const langs_t *get_lang(void) {
-  langs_t *l;
   char    *lcmsg = setlocale(LC_MESSAGES, NULL);
   
   if(lcmsg) {
+    const langs_t *l;
     for(l = _langs; l->lang != NULL; l++) {
       if(!strncasecmp(l->lang, lcmsg, strlen(lcmsg))) {
 	return l;
