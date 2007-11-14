@@ -448,21 +448,16 @@ static menuitem_t *menuitem_load(xml_node_t *node) {
         if(!strcasecmp(type, "autoplay")) {
           item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
           item->func = autoplay_cb;
-        }
-        if(!strcasecmp(type, "mrl")) {
+        } else if(!strcasecmp(type, "mrl")) {
           item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
           item->func = mrl_cb;
-        }
-        if(!strcasecmp(type, "mediamarks")) {
+        } else if(!strcasecmp(type, "mediamarks")) {
           item->func = mediamarks_cb;
-        }
-        if(!strcasecmp(type, "playlist")) {
+        } else if(!strcasecmp(type, "playlist")) {
           item->func = playlist_cb;
-        }
-        if(!strcasecmp(type, "shutdown")) {
+        } else if(!strcasecmp(type, "shutdown")) {
           item->func = shutdown_cb;
-        }
-        if(!strcasecmp(type, "shell")) {
+        } else if(!strcasecmp(type, "shell")) {
         }
       }
     }
