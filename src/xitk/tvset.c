@@ -63,9 +63,9 @@ typedef struct {
   xitk_widget_t        *close;
   xitk_widget_t        *update;
 
-  char                **system_entries;
-  char                **chann_entries;
-  char                **vidstd_entries;
+  const char          **system_entries;
+  const char          **chann_entries;
+  const char          **vidstd_entries;
 
   int                   running;
   int                   visible;
@@ -114,7 +114,7 @@ typedef uint64_t v4l2_std_id;
 #define V4L2_STD_ATSC_16_VSB    ((v4l2_std_id)0x02000000)
 
 
-static struct _std_list std_list[] = {
+static const struct _std_list std_list[] = {
   { "PAL-B",       V4L2_STD_PAL_B       },
   { "PAL-B1",      V4L2_STD_PAL_B1      },
   { "PAL-G",       V4L2_STD_PAL_G       },
@@ -167,7 +167,6 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
 
   if(tvset) {
     window_info_t wi;
-    int           i;
 
     tvset->running = 0;
     tvset->visible = 0;
@@ -190,18 +189,10 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset->widget_list)));
     XUnlockDisplay(gGui->display);
 
-    for(i = 0; tvset->system_entries[i]; i++)
-      free(tvset->system_entries[i]);
     free(tvset->system_entries);
     
-    if(tvset->chann_entries) {
-      for(i = 0; tvset->chann_entries[i]; i++)
-	free(tvset->chann_entries[i]);
-      free(tvset->chann_entries);
-    }
+    free(tvset->chann_entries);
     
-    for(i = 0; tvset->vidstd_entries[i]; i++)
-      free(tvset->vidstd_entries[i]);
     free(tvset->vidstd_entries);
 
     free(tvset->widget_list);
@@ -264,19 +255,15 @@ void tvset_end(void) {
 
 static int update_chann_entries(int system_entry) {
   int               i;
-  struct CHANLIST  *list = chanlists[system_entry].list;
+  const struct CHANLIST *list = chanlists[system_entry].list;
   int               len  = chanlists[system_entry].count;
   
-  if( tvset->chann_entries ) {
-    for(i = 0; tvset->chann_entries[i]; i++)
-      free(tvset->chann_entries[i]);
-    free(tvset->chann_entries);
-  }
+  free(tvset->chann_entries);
 
-  tvset->chann_entries = (char **) xine_xmalloc(sizeof(char *) * (len+1) );
+  tvset->chann_entries = (const char **) xine_xmalloc(sizeof(const char *) * (len+1) );
   
   for(i = 0; i < len; i++)
-    tvset->chann_entries[i] = strdup(list[i].name);
+    tvset->chann_entries[i] = list[i].name;
 
   tvset->chann_entries[i] = NULL;
   return len;
@@ -385,10 +372,10 @@ void tvset_panel(void) {
   xitk_enable_and_show_widget(tvset->input);
 
   for(i = 0; chanlists[i].name; i++) ;
-  tvset->system_entries = (char **) xine_xmalloc(sizeof(char *) * (i+1));
+  tvset->system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (i+1));
   
   for(i = 0; chanlists[i].name; i++)
-    tvset->system_entries[i] = strdup(chanlists[i].name);
+    tvset->system_entries[i] = chanlists[i].name;
   tvset->system_entries[i] = NULL;
 
   x += w + 5;
@@ -459,11 +446,11 @@ void tvset_panel(void) {
 					 "Black", "Black", tvsetfontname)));
   xitk_enable_and_show_widget(tvset->framerate);
 
-  tvset->vidstd_entries = (char **) xine_xmalloc(sizeof(char *) * 
+  tvset->vidstd_entries = (const char **) xine_xmalloc(sizeof(const char *) * 
                           (sizeof(std_list)/sizeof(std_list[0])+1));
   
   for(i = 0; i < (sizeof(std_list)/sizeof(std_list[0])); i++)
-    tvset->vidstd_entries[i] = strdup(std_list[i].name);
+    tvset->vidstd_entries[i] = std_list[i].name;
   tvset->vidstd_entries[i] = NULL;
 
   x += w + 5;
