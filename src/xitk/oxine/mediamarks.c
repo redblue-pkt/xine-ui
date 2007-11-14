@@ -61,7 +61,7 @@ extern gGui_t          *gGui;
 #define MM_ACTION_PLAY (1)
 #define MM_ACTION_ADD (2)
 
-const char *mm_action_strings[] = { "Play", "Add to PL" };
+static const char *mm_action_strings[] = { "Play", "Add to PL" };
 
 typedef struct playitem_s playitem_t;
 
