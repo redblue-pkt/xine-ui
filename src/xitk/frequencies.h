@@ -122,15 +122,11 @@ struct CHANLISTS {
     int               count;
 };
 
-#define CHAN_COUNT(x) (sizeof(x)/sizeof(struct CHANLIST))
-
 /* --------------------------------------------------------------------- */
 
 extern const struct CHANLISTS   chanlists[];
 
-extern int                chantab;
 extern const struct CHANLIST *chanlist;
-extern int                chancount;
 
 /* vim: ts=4 sw=4 noet
  */

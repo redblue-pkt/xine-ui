@@ -25,6 +25,8 @@
 
 #include "frequencies.h"
 
+#define CHAN_COUNT(x) (sizeof(x)/sizeof(struct CHANLIST))
+
 /* --------------------------------------------------------------------- */
 
 /* US broadcast */
@@ -1296,9 +1298,7 @@ const struct CHANLISTS chanlists[] = {
     { NULL, NULL, 0 } /* EOF */
 };
 
-int                chantab   = 5;
 const struct CHANLIST   *chanlist  = europe_west;
-int                chancount = CHAN_COUNT(europe_west);
 
 /* vim: ts=4 sw=4 noet
  */
