@@ -118,7 +118,7 @@ struct CHANLIST {
 
 struct CHANLISTS {
     const char       *name;
-    struct CHANLIST  *list;
+    const struct CHANLIST *list;
     int               count;
 };
 
@@ -126,10 +126,10 @@ struct CHANLISTS {
 
 /* --------------------------------------------------------------------- */
 
-extern struct CHANLISTS   chanlists[];
+extern const struct CHANLISTS   chanlists[];
 
 extern int                chantab;
-extern struct CHANLIST   *chanlist;
+extern const struct CHANLIST *chanlist;
 extern int                chancount;
 
 /* vim: ts=4 sw=4 noet
