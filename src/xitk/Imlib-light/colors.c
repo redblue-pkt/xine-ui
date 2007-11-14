@@ -106,7 +106,7 @@ PaletteLUTSet(ImlibData *id)
 }
 
 void
-_PaletteAlloc(ImlibData * id, int num, int *cols)
+_PaletteAlloc(ImlibData * id, int num, const int *cols)
 {
   XColor              xcl;
   int                 colnum, i;
@@ -236,7 +236,7 @@ Imlib_load_colors(ImlibData * id, char *file)
   return 1;
 }
 
-static int default_pal[] = {
+static const int default_pal[] = {
   0x00, 0x00, 0x00,
   0xff, 0xff, 0xff,
   0xc0, 0xc0, 0xc0,
@@ -475,7 +475,7 @@ int
 Imlib_load_default_colors(ImlibData * id)
 {
   int                 i;
-  int                *pal = default_pal;
+  const int          *pal = default_pal;
   int                 r,g,b;
   int                 rr, gg, bb;
 #ifdef DEBUG

@@ -90,7 +90,7 @@ int                 ispng(FILE *f);
 
 void                calc_map_tables(ImlibData * id, ImlibImage * im);
 
-void                _PaletteAlloc(ImlibData * id, int num, int *cols);
+void                _PaletteAlloc(ImlibData * id, int num, const int *cols);
 
 FILE               *open_helper(const char *, const char *, const char *);
 int                 close_helper(FILE *);
