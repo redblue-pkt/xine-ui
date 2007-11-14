@@ -427,8 +427,7 @@ static char *read_entire_file (const char *mrl, int *file_size) {
 static menuitem_t *menuitem_load(xml_node_t *node) {
   
   menuitem_t *item = ho_new(menuitem_t);
-  char *type;
-  
+
   item->x = atoi(xml_parser_get_property(node, "x"));
   item->y = atoi(xml_parser_get_property(node, "y"));
   item->w = atoi(xml_parser_get_property(node, "width"));
@@ -444,7 +443,7 @@ static menuitem_t *menuitem_load(xml_node_t *node) {
       item->title = ho_strdup (node->data);
     } else if (!strcasecmp (node->name, "action")) {
 
-      type = xml_parser_get_property(node, "type");
+      const char *type = xml_parser_get_property(node, "type");
       if(type) {
         if(!strcasecmp(type, "autoplay")) {
           item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
