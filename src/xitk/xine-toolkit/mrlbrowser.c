@@ -46,7 +46,7 @@
 
 #undef DEBUG_MRLB
 
-static xitk_mrlbrowser_filter_t __mrl_filters[] = {
+static const xitk_mrlbrowser_filter_t __mrl_filters[] = {
   { "All"                 , "*"            },
   { "*.vob"               , "vob"          }, /* mpeg block */
   { "*.mpv"               , "mpv"          }, /* elementary */
