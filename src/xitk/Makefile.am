@@ -72,7 +72,7 @@ xine_LDADD = $(XINE_LIBS) \
 xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
 xine_remote_SOURCES = network.c
 xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
-xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
+xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) \
 	$(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
 
 session_ctrl_CFLAGS = $(AM_CFLAGS) -DCTRL_TEST
