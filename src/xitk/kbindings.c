@@ -2128,18 +2128,18 @@ void kbedit_window(void) {
   y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
   y1 = y; /* remember for later */
   draw_outter_frame(gGui->imlib_data, bg, 
-		    _("Binding Action"), fontname,
+		    _("Binding Action"), hboldfontname,
 		    x, y, 
 		    (WINDOW_WIDTH - 30), 45);
 
   y += 45 + 3;
   draw_outter_frame(gGui->imlib_data, bg, 
-		    _("Key"), fontname, 
+		    _("Key"), hboldfontname,
 		    x, y, 
 		    120, 45);
 
   draw_outter_frame(gGui->imlib_data, bg, 
-		    _("Modifiers"), fontname, 
+		    _("Modifiers"), hboldfontname,
 		    x + 130, y, 
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
@@ -2194,7 +2194,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 		   (kbedit->alias = 
 		    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-						   "Black", "Black", "White", fontname)));
+						   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->alias);
   
   x += btnw + 4;
@@ -2209,7 +2209,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 		   (kbedit->edit = 
 		    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-						   "Black", "Black", "White", fontname)));
+						   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->edit);
   
   x += btnw + 4;
@@ -2224,7 +2224,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 		   (kbedit->delete = 
 		    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-						   "Black", "Black", "White", fontname)));
+						   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->delete);
 
   x += btnw + 4;
@@ -2239,7 +2239,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 		   (kbedit->save = 
 		    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-						   "Black", "Black", "White", fontname)));
+						   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->save);
 
   x += btnw + 4;
@@ -2253,7 +2253,7 @@ void kbedit_window(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-				       "Black", "Black", "White", fontname)));
+				       "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x += btnw + 4;
@@ -2268,14 +2268,14 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 		   (kbedit->done = 
 		    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, btnw, 23,
-						   "Black", "Black", "White", fontname)));
+						   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->done);
 
   x = 15;
   
   XITK_WIDGET_INIT(&l, gGui->imlib_data);
 
-  fs = xitk_font_load_font(gGui->display, fontname);
+  fs = xitk_font_load_font(gGui->display, hboldfontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   fontheight = xitk_font_get_string_height(fs, " ");
   xitk_font_unload_font(fs);
@@ -2291,7 +2291,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 			   (kbedit->comment =
 			    xitk_noskin_label_create(kbedit->widget_list, &l, x + 10, y1,
-						     WINDOW_WIDTH - 50 - 2, fontheight, fontname)));
+						     WINDOW_WIDTH - 50 - 2, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(kbedit->comment);
 
   y += 45 + 3;
@@ -2305,7 +2305,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 			   (kbedit->key =
 			    xitk_noskin_label_create(kbedit->widget_list, &l, x + 10, y1,
-						     100, fontheight, fontname)));
+						     100, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(kbedit->key);
   
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
@@ -2331,7 +2331,7 @@ void kbedit_window(void) {
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
-				 40, fontheight, fontname)));
+				 40, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2355,7 +2355,7 @@ void kbedit_window(void) {
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
-				 40, fontheight, fontname)));
+				 40, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2379,7 +2379,7 @@ void kbedit_window(void) {
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
-				 40, fontheight, fontname)));
+				 40, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2403,7 +2403,7 @@ void kbedit_window(void) {
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
-				 40, fontheight, fontname)));
+				 40, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x += 55;
@@ -2427,7 +2427,7 @@ void kbedit_window(void) {
   l.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
    (w = xitk_noskin_label_create(kbedit->widget_list, &l, x, y1,
-				 40, fontheight, fontname)));
+				 40, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(w);
 
   x = 15;
@@ -2443,7 +2443,7 @@ void kbedit_window(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(kbedit->widget_list)), 
 	   (kbedit->grab = 
 	    xitk_noskin_labelbutton_create(kbedit->widget_list, &lb, x, y, WINDOW_WIDTH - 30, 23,
-					   "Black", "Black", "White", fontname)));
+					   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(kbedit->grab);
 
   kbedit_unset();

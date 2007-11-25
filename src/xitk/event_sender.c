@@ -43,8 +43,6 @@
 
 extern gGui_t          *gGui;
 
-#define eventerfontname "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-
 typedef struct {
   xitk_window_t        *xwin;
 
@@ -464,7 +462,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
-					   eventerfontname)));
+					   hboldfontname)));
   xitk_enable_and_show_widget(eventer->navigator.up);
 
   x -= 70;
@@ -482,7 +480,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
-					   eventerfontname)));
+					   hboldfontname)));
   xitk_enable_and_show_widget(eventer->navigator.left);
 
   x += 75;
@@ -500,7 +498,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 60, 30,
 					   "Black", "Black", "White", 
-					   eventerfontname)));
+					   hboldfontname)));
   xitk_enable_and_show_widget(eventer->navigator.select);
 
   x += 65;
@@ -518,7 +516,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
-					   eventerfontname)));
+					   hboldfontname)));
   xitk_enable_and_show_widget(eventer->navigator.right);
 
   x -= 70;
@@ -536,7 +534,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
-					   eventerfontname)));
+					   hboldfontname)));
   xitk_enable_and_show_widget(eventer->navigator.down);
 
   x = 23 * 2 + 5 + (80 - 23 * 3) / 2 + 1; /* (+1 to round up) */
@@ -562,7 +560,7 @@ void event_sender_panel(void) {
 	     (eventer->numbers.number[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 23, 23,
-					     "Black", "Black", "White", eventerfontname)));
+					     "Black", "Black", "White", hboldfontname)));
     xitk_enable_and_show_widget(eventer->numbers.number[i]);
   
     if(!((i - 1) % 3)) {
@@ -595,7 +593,7 @@ void event_sender_panel(void) {
 	     (eventer->numbers.number[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 46, 23,
-					     "Black", "Black", "White", eventerfontname)));
+					     "Black", "Black", "White", hboldfontname)));
     xitk_enable_and_show_widget(eventer->numbers.number[i]);
   }
 
@@ -613,7 +611,7 @@ void event_sender_panel(void) {
 	   (eventer->angles.next = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
-					   "Black", "Black", "White", eventerfontname)));
+					   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(eventer->angles.next);
 
   y += 23;
@@ -629,7 +627,7 @@ void event_sender_panel(void) {
 	   (eventer->angles.prev = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
-					   "Black", "Black", "White", eventerfontname)));
+					   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(eventer->angles.prev);
 
 
@@ -665,7 +663,7 @@ void event_sender_panel(void) {
 	     (eventer->menus.menu[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 80, 23,
-					     "Black", "Black", "White", eventerfontname)));
+					     "Black", "Black", "White", hboldfontname)));
     xitk_enable_and_show_widget(eventer->menus.menu[i]);
 
     if(i == 2) {
@@ -694,7 +692,7 @@ void event_sender_panel(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
    (w = xitk_noskin_labelbutton_create(eventer->widget_list, 
 				       &lb, x, y, 70, 23,
-				       "Black", "Black", "White", eventerfontname)));
+				       "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(w);
   event_sender_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 

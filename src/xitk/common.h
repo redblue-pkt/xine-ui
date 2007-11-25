@@ -153,6 +153,8 @@
 #define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
 
 #define fontname       "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
+#define boldfontname   "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
+#define hboldfontname  "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 #define lfontname      "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
 #define tabsfontname   "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 #define br_fontname    "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*"

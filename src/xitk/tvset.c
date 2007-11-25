@@ -45,8 +45,6 @@
 
 extern gGui_t          *gGui;
 
-#define tvsetfontname "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
-
 typedef struct {
   xitk_window_t        *xwin;
 
@@ -441,7 +439,7 @@ void tvset_panel(void) {
 	   (tvset->framerate = 
 	    xitk_noskin_inputtext_create(tvset->widget_list, &inp,
 					 x + 10, y + 15, w - 20 + 1, 20,
-					 "Black", "Black", tvsetfontname)));
+					 "Black", "Black", fontname)));
   xitk_enable_and_show_widget(tvset->framerate);
 
   tvset->vidstd_entries = (const char **) xine_xmalloc(sizeof(const char *) * 

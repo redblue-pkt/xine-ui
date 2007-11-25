@@ -34,8 +34,6 @@
 
 extern gGui_t                   *gGui;
 
-#define boldfontname "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
-
 #define WINDOW_WIDTH             630
 #define WINDOW_HEIGHT            530
 

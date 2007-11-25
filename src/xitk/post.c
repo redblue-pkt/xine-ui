@@ -67,8 +67,6 @@ extern gGui_t    *gGui;
         xitk_enable_and_show_widget(widget);                                                    \
     } while(0)
  
-#define boldfontname "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-
 typedef struct {
   xine_post_t                 *post;
   xine_post_api_t             *api;
@@ -666,7 +664,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
     lb.userdata            = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
      (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
-					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, boldfontname)));
+					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, hboldfontname)));
 
     switch(pobj->param->type) {
     case POST_PARAM_TYPE_INT:
@@ -1239,7 +1237,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     lb.userdata            = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
      (pobj->comment = xitk_noskin_label_create(pp_wrapper->pplugin->widget_list, &lb,
-					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, boldfontname)));
+					       0, 0, FRAME_WIDTH - (26 + 6 + 6), 20, hboldfontname)));
     
     pobj->properties = NULL;
   }
