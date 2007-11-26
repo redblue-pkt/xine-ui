@@ -490,7 +490,7 @@ const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
 /*
  *
  */
-void xitk_combo_update_list(xitk_widget_t *w, const char const* const* list, int len) {
+void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int len) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
