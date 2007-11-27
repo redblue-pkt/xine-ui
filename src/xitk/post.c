@@ -676,7 +676,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
 	  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
-	  cmb.entries           = pobj->param->enum_values;
+	  cmb.entries           = (const char **)pobj->param->enum_values;
 	  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	  cmb.callback          = _pplugin_set_param_int;
 	  cmb.userdata          = pobj;
@@ -746,7 +746,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = (is_layer_above());
 	cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
-	cmb.entries           = (char **)(pobj->param_data + pobj->param->offset);
+	cmb.entries           = (const char **)(pobj->param_data + pobj->param->offset);
 	cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	cmb.callback          = _pplugin_set_param_stringlist;
 	cmb.userdata          = pobj;
@@ -1197,7 +1197,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     cmb.skin_element_name = NULL;
     cmb.layer_above       = (is_layer_above());
     cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
-    cmb.entries           = pobj->properties_names;
+    cmb.entries           = (const char **)pobj->properties_names;
     cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
     cmb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_change_parameter : _applugin_change_parameter;
     cmb.userdata          = pobj;
@@ -1409,7 +1409,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
-  cmb.entries           = pp_wrapper->pplugin->plugin_names;
+  cmb.entries           = (const char **)pp_wrapper->pplugin->plugin_names;
   cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
   cmb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_select_filter : _applugin_select_filter;
   cmb.userdata          = pobj;

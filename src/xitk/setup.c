@@ -757,7 +757,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = setup->widget_list;
-  cmb.entries           = entry->enum_values;
+  cmb.entries           = (const char **)entry->enum_values;
   cmb.parent_wkey       = &setup->kreg;
   cmb.callback          = numtype_update;
   cmb.userdata          = (void *)wt;
