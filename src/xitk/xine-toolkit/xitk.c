@@ -475,6 +475,8 @@ static uint32_t xitk_check_wm(Display *display) {
     type |= WM_TYPE_DTWM;
   }
 
+  xitk_install_x_error_handler();
+
   if((atom = XInternAtom(display, "_WIN_SUPPORTING_WM_CHECK", True)) != None) {
     unsigned char   *prop_return = NULL;
     unsigned long    nitems_return;
@@ -496,14 +498,10 @@ static uint32_t xitk_check_wm(Display *display) {
 	
 	win_id = *(unsigned long *)prop_return;
 	
-	xitk_install_x_error_handler();
-	
 	status = XGetWindowProperty(display, win_id, atom, 0,
 				    1, False, XA_CARDINAL,
 				    &type_return, &format_return, &nitems_return,
 				    &bytes_after_return, &prop_return2);
-	
-	xitk_uninstall_x_error_handler();
 	
 	if((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
 	  
@@ -551,15 +549,10 @@ static uint32_t xitk_check_wm(Display *display) {
 	
 	win_id = *(unsigned long *)prop_return;
 	
-	xitk_install_x_error_handler();
-	
 	status = XGetWindowProperty(display, win_id, atom, 0,
 				    1, False, XA_WINDOW,
 				    &type_return, &format_return, &nitems_return,
 				    &bytes_after_return, &prop_return2);
-	
-	xitk_uninstall_x_error_handler();
-	
 	
 	if((status == Success) && (type_return != None) && (type_return == XA_WINDOW) &&
 	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
@@ -577,6 +570,8 @@ static uint32_t xitk_check_wm(Display *display) {
 	XFree(prop_return);
     }
   }
+
+  xitk_uninstall_x_error_handler();
 
   if(type & WM_TYPE_EWMH_COMP) {
     XA_WIN_LAYER               = XInternAtom(display, "_NET_WM_STATE", False);
