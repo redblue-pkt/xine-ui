@@ -76,8 +76,8 @@
 typedef struct {
   xine_t                  *xine;
   int                      ignore_status;
-  const xine_vo_driver_t  *vo_driver;
-  const xine_ao_driver_t  *ao_driver;
+  const xine_video_port_t *vo_driver;
+  const xine_audio_port_t *ao_driver;
   char                    *mrl[1024];
   int                      num_mrls;
   int                      current_mrl;
