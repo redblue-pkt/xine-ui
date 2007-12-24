@@ -2127,14 +2127,13 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *pchain, int *post_elements_num) {
   int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
   post_element_t **post_elements = NULL;
-  char            *post_chain;
 
   *post_elements_num = 0;
   
   if(pchain && strlen(pchain)) {
     char *p;
     
-    xine_strdupa(post_chain, pchain);
+    char *post_chain = strdup(pchain);
     
     while((p = xine_strsep(&post_chain, ";"))) {
       
@@ -2283,6 +2282,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 	free(plugin);
       }
     }
+    free(post_chain);
   }
 
   return post_elements;

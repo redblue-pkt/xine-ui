@@ -91,14 +91,13 @@ static void _pplugin_update_parameter(post_object_t *pobj) {
 /* -post <name>:option1=value1,option2=value2... */
 static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pchain, int *post_elements_num) {
   post_element_t **post_elements = NULL;
-  char            *post_chain;
 
   *post_elements_num = 0;
   
   if(pchain && strlen(pchain)) {
     char *p;
     
-    xine_strdupa(post_chain, pchain);
+    char *post_chain = strdup(pchain);
     
     while((p = xine_strsep(&post_chain, ";"))) {
       
@@ -251,6 +250,7 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
 	free(plugin);
       }
     }
+    free(post_chain);
   }
 
   return post_elements;

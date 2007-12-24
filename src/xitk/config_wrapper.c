@@ -153,7 +153,7 @@ void config_mrl(char *mrl) {
     return;
   }
 
-  xine_strdupa(_mrl, mrl);
+  _mrl = strdup(mrl);
   config = strchr(_mrl, '/');
   
   if(config && strlen(config))
@@ -172,7 +172,7 @@ void config_mrl(char *mrl) {
 	if(entry.exp_level >= XINE_CONFIG_SECURITY) {
 	  xine_info(_("For security reason, you're not allowed to change "
 		      "the configuration entry named '%s'."), entry.key);
-	  return;
+	  break;
 	}
 
 	switch(entry.type) {
@@ -203,4 +203,5 @@ void config_mrl(char *mrl) {
     }
   }
 
+  free(_mrl);
 }

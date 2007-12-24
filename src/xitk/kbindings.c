@@ -1568,7 +1568,7 @@ static void kbedit_create_browser_entries(void) {
   xitk_font_unload_font(fs);
 }
 
-static void kbedit_display_kbinding(char *action, kbinding_entry_t *kbe) {
+static void kbedit_display_kbinding(const char *action, kbinding_entry_t *kbe) {
 
   if(action && kbe) {
 
@@ -1901,7 +1901,6 @@ static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
  */
 static void kbedit_grab(xitk_widget_t *w, void *data) {
   char              *olbl;
-  char              *action;
   XEvent             xev;
   int                mod, modifier;
   xitk_window_t     *xwin;
@@ -1912,7 +1911,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   if(kbedit->grabbing)
     return;
 
-  xine_strdupa(olbl, (xitk_labelbutton_get_label(kbedit->grab)));
+  olbl = strdup(xitk_labelbutton_get_label(kbedit->grab));
  
   kbedit->grabbing = 1;
   
@@ -1981,8 +1980,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
     char shortcut[32];
     
-    xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
-    kbedit_display_kbinding(action, kbe);
+    kbedit_display_kbinding(xitk_label_get_label(kbedit->comment), kbe);
     
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
     
@@ -2002,6 +2000,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     }
   }
   
+  free(olbl);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);

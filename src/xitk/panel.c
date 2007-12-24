@@ -1085,7 +1085,7 @@ void panel_init (void) {
   XSizeHints                hint;
   XWMHints                 *wm_hint;
   XSetWindowAttributes      attr;
-  char                     *title;
+  char                     *title = _("xine Panel");
   Atom                      prop;
   MWMHints                  mwmhints;
   XClassHint               *xclasshint;
@@ -1095,8 +1095,6 @@ void panel_init (void) {
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
   
-  xine_strdupa(title, _("xine Panel"));
-
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);

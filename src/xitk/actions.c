@@ -493,13 +493,13 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 	snprintf(fullfilename, sizeof(fullfilename), "%s/%s", xine_get_homedir(), filename);
 	
 	if((fd = fopen(fullfilename, "w+b")) != NULL) {
-	  char  *newmrl, *ident, *sub = NULL;
+	  char  *sub = NULL;
 	  int    start, end;
 	  
-	  xine_strdupa(newmrl, fullfilename);
-	  xine_strdupa(ident, gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	  char *newmrl = strdup(fullfilename);
+	  char *ident = strdup(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	  if(gGui->playlist.mmk[gGui->playlist.cur]->sub)
-	    xine_strdupa(sub, gGui->playlist.mmk[gGui->playlist.cur]->sub);
+	    sub = strdup(gGui->playlist.mmk[gGui->playlist.cur]->sub);
 	  start = gGui->playlist.mmk[gGui->playlist.cur]->start;
 	  end = gGui->playlist.mmk[gGui->playlist.cur]->end;
 	  
@@ -511,6 +511,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 				  newmrl, ident, sub, start, end, 0, 0);
 	  gui_set_current_mmk(mediamark_get_current_mmk());
 	  mrl = gGui->mmk.mrl;
+
+	  free(newmrl);
+	  free(ident);
+	  free(sub);
 	}
       }
     }
@@ -2276,7 +2280,7 @@ void gui_select_sub(void) {
 	if(mrl_look_like_file(path)) {
 	  char *p;
 	  
-	  xine_strdupa(open_path, path);
+	  open_path = strdup(path);
 	  
 	  if(!strncasecmp(path, "file:", 5))
 	    path += 5;
@@ -2286,9 +2290,10 @@ void gui_select_sub(void) {
 	    *p = '\0';
 	}
 	else
-	  open_path = gGui->curdir;
+	  open_path = strdup(gGui->curdir);
 	
 	load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+	free(open_path);
       }
     }
   }

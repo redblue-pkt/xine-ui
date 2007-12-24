@@ -224,16 +224,25 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
    * Note: atoa() modify the string, so we work on a copy.
    */
   if(title && strlen(title)) {
-    xine_strdupa(atitle, title);
-    atitle = atoa(atitle);
+    atitle = atoa(title);
+    if ( atitle && ! *atitle )
+      atitle = strdup(title);
+    else
+      atitle = strdup(atitle);
   }
   if(artist && strlen(artist)) {
-    xine_strdupa(aartist, artist);
-    aartist = atoa(aartist);
+    aartist = atoa(artist);
+    if ( aartist && ! *aartist )
+      aartist = strdup(artist);
+    else
+      aartist = strdup(aartist);
   }
   if(album && strlen(album)) {
-    xine_strdupa(aalbum, album);
-    aalbum = atoa(aalbum);
+    aalbum = atoa(album);
+    if ( aalbum && ! *aalbum )
+      aalbum = strdup(album);
+    else
+      aalbum = strdup(aalbum);
   }
   if(title)
     free(title);
@@ -264,6 +273,9 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
       strlcat(ident, ")", len);
     }
   }
+  free(atitle);
+  free(aartist);
+  free(aalbum);
 
   return ident;
 }

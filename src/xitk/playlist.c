@@ -1017,7 +1017,7 @@ void playlist_editor(void) {
   XSizeHints                 hint;
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
-  char                      *title;
+  char                      *title = _("xine Playlist Editor");
   Atom                       prop;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
@@ -1026,8 +1026,6 @@ void playlist_editor(void) {
   xitk_label_widget_t        lbl;
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
-
-  xine_strdupa(title, _("xine Playlist Editor"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);

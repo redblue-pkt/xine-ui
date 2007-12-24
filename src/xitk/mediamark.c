@@ -2567,7 +2567,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
 	*ending++ = '.';
       }
       
-      xine_strdupa(vsubs, know_subs);
+      vsubs = strdup(know_subs);
       
       while((ext = xine_strsep(&vsubs, ",")) && !sub) {
 	sprintf(ending, "%s", ext);
@@ -2576,6 +2576,8 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
 	if(((stat(autosub, &pstat)) > -1) && (S_ISREG(pstat.st_mode)) && strcmp(autosub, _mrl))
 	  sub = autosub;
       }
+      free(vsubs);
+
     }
 
   }
@@ -2865,7 +2867,7 @@ void mediamark_save_mediamarks(const char *filename) {
   if(!gGui->playlist.num)
     return;
 
-  xine_strdupa(fullfn, filename);
+  fullfn = strdup(filename);
   
   pn = fullfn;
 
@@ -2915,6 +2917,8 @@ void mediamark_save_mediamarks(const char *filename) {
       fprintf(stderr, _("Unable to save playlist (%s): %s.\n"), filename, strerror(errno));
 
   }
+
+  free(fullfn);
 }
 
 int mrl_look_like_playlist(char *mrl) {
@@ -3126,11 +3130,15 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
     
     mrl = atoa(xitk_inputtext_get_text(mmkeditor->mrl));
     if(mrl && (!strlen(mrl)))
-      xine_strdupa(mrl, (*mmkeditor->mmk)->mrl);
+      mrl = strdup((*mmkeditor->mmk)->mrl);
+    else
+      mrl = strdup(mrl);
     
     ident = atoa(xitk_inputtext_get_text(mmkeditor->ident));
     if(ident && (!strlen(ident)))
-      xine_strdupa(ident, mrl);
+      ident = strdup(mrl);
+    else
+      ident = strdup(ident);
 
     sub = xitk_inputtext_get_text(mmkeditor->sub);
     if(sub && (!strlen(sub)))
@@ -3148,10 +3156,11 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
     spu_offset = xitk_intbox_get_value(mmkeditor->spu_offset);
     
     mediamark_replace_entry(mmkeditor->mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
-
     if(mmkeditor->callback)
       mmkeditor->callback(mmkeditor->user_data);
-    
+
+    free(mrl);
+    free(ident);
   }  
 }
 
@@ -3185,7 +3194,7 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
   if(mrl_look_like_file(path)) {
     char *p;
     
-    xine_strdupa(open_path, path);
+    open_path = strdup(path);
     
     if(!strncasecmp(path, "file:", 5))
       path += 5;
@@ -3195,9 +3204,11 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
       *p = '\0';
   }
   else
-    open_path = gGui->curdir;
+    open_path = strdup(gGui->curdir);
   
   create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
+
+  free(open_path);
 }
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {

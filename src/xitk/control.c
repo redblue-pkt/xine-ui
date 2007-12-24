@@ -592,7 +592,7 @@ void control_panel(void) {
   XSizeHints                 hint;
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
-  char                      *title;
+  char                      *title = _("xine Control Window");
   Atom                       prop;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
@@ -602,8 +602,6 @@ void control_panel(void) {
   xitk_slider_widget_t       sl;
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
-
-  xine_strdupa(title, _("xine Control Window"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
@@ -666,7 +664,7 @@ void control_panel(void) {
 				   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				   &attr);
   
-  XmbSetWMProperties(gGui->display, control->window, title, title, NULL, 0, 
+  XmbSetWMProperties(gGui->display, control->window, _(title), _(title), NULL, 0, 
                      &hint, NULL, NULL);
   
   XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
