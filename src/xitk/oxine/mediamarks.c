@@ -244,8 +244,8 @@ static playitem_t *playitem_load (xml_node_t *node) {
       printf ("mediamarks: title = %s\n", play_item->title);
 #endif
     } else if (!strcasecmp (node->name, "ref")) {
-      play_item->mrl = ho_strdup(xml_parser_get_property (node, "href"));
       const char *type = xml_parser_get_property(node, "type");
+      play_item->mrl = ho_strdup(xml_parser_get_property (node, "href"));
       if(type) {
 	if(!strcasecmp(type, "multiple")) {
 	  play_item->type = TYPE_MULTIPLE;
