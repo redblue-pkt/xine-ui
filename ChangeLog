@@ -1,6 +1,10 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * New commands/keybindings from Richard van Paasen:
+    "PVRSetInput" changes input on ivtv cards (input_pvr);
+    "PVRSetMark", "PVRSetName", "PVRSave" enable saving
+    of live streams from ivtv cards (input_pvr).
   * New command/keybinding from Richard van Paasen:
     "SetPosition100%" jumps to end of stream.
   * Recognize .rmvb files, closes debian bug #437864.

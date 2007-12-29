@@ -42,6 +42,9 @@
 #include <time.h>
 #include <stdlib.h>
 
+/* input_pvr functionality needs this */
+#define XINE_ENABLE_EXPERIMENTAL_FEATURES
+
 #include "common.h"
 #include "oxine/oxine.h"
 
@@ -1053,11 +1056,132 @@ void gui_execute_action_id(action_id_t action) {
 		     _("Stop") :
 		     _("Continue"));
     break;
-    
+
+  case ACTID_PVR_SETINPUT:
+
+    /* Parameter (integer, required): input
+    */
+    if(gGui->numeric.set) {
+      xine_event_t         xine_event;
+      xine_set_v4l2_data_t ev_data;
+
+      /* set input */
+      ev_data.input = gGui->numeric.arg;
+
+      /* do not change tuning */
+      ev_data.channel = -1;
+      ev_data.frequency = -1;
+
+      /* do not set session id */
+      ev_data.session_id = -1;
+
+      /* send event */
+      xine_event.type = XINE_EVENT_SET_V4L2;
+      xine_event.data_length = sizeof(xine_set_v4l2_data_t);
+      xine_event.data = &ev_data;
+      xine_event.stream = gGui->stream;
+      xine_event_send(gGui->stream, &xine_event);
+    }
+    break;
+
+  case ACTID_PVR_SETMARK:
+
+    /* Parameter (integer, required): session_id
+
+       Mark the start of a section in the pvr stream for later saving
+       The 'id' can be used to set different marks in the stream. If
+       an existing mark is provided, then the mark for that section
+       is moved to the current position.
+    */
+    if(gGui->numeric.set) {
+      xine_event_t         xine_event;
+      xine_set_v4l2_data_t ev_data;
+
+      /* do not change input */
+      ev_data.input = -1;
+
+      /* do not change tuning */
+      ev_data.channel = -1;
+      ev_data.frequency = -1;
+
+      /* set session id */
+      ev_data.session_id = gGui->numeric.arg;
+
+      /* send event */
+      xine_event.type = XINE_EVENT_SET_V4L2;
+      xine_event.data_length = sizeof(xine_set_v4l2_data_t);
+      xine_event.data = &ev_data;
+      xine_event.stream = gGui->stream;
+      xine_event_send(gGui->stream, &xine_event);
+    }
+    break;
+
+  case ACTID_PVR_SETNAME:
+
+    /* Parameter (string, required): name
+
+       Set the name of the current section in the pvr stream. The name
+       is used when the section is saved permanently.
+    */
+    if(gGui->alphanum.set) {
+      xine_event_t         xine_event;
+      xine_pvr_save_data_t ev_data;
+
+      /* only set name */
+      ev_data.mode = -1;
+      ev_data.id = -1;
+
+      /* name of the show, max 255 is hardcoded in xine.h */
+      strncpy(ev_data.name, gGui->alphanum.arg, 255);
+      ev_data.name[254] = '\0';
+
+      /* send event */
+      xine_event.type = XINE_EVENT_PVR_SAVE;
+      xine_event.data = &ev_data;
+      xine_event.data_length = sizeof(xine_pvr_save_data_t);
+      xine_event.stream = gGui->stream;
+      xine_event_send(gGui->stream, &xine_event);
+    }
+    break;
+
+  case ACTID_PVR_SAVE:
+
+    /* Parameter (integer, required): mode
+
+       Save the pvr stream with mode:
+         mode = 0 : save from now on
+         mode = 1 : save from last mark
+         mode = 2 : save entire stream
+    */
+    if(gGui->numeric.set) {
+      xine_event_t         xine_event;
+      xine_pvr_save_data_t ev_data;
+      int                  mode = gGui->numeric.arg;
+
+      /* set mode [0..2] */
+      if(mode < 0)
+	mode = 0;
+      if(mode > 2)
+	mode = 2;
+      ev_data.mode = mode;
+
+      /* do not set id and name */
+      ev_data.id = 0;
+      ev_data.name[0] = '\0';
+
+      /* send event */
+      xine_event.type = XINE_EVENT_PVR_SAVE;
+      xine_event.data = &ev_data;
+      xine_event.data_length = sizeof(xine_pvr_save_data_t);
+      xine_event.stream = gGui->stream;
+      xine_event_send(gGui->stream, &xine_event);
+    }
+    break;
+
   default:
     break;
   }
-
+    
   /* Some sort of function was done. Clear arguments. */
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;

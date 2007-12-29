@@ -149,6 +149,10 @@ typedef enum {
   ACTID_OSD_MENU,
   ACTID_APP,
   ACTID_APP_ENABLE,
+  ACTID_PVR_SETINPUT,
+  ACTID_PVR_SETMARK,
+  ACTID_PVR_SETNAME,
+  ACTID_PVR_SAVE,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
