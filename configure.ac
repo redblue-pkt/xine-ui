@@ -298,23 +298,6 @@ if test x"$have_readline" != "xyes"; then
 fi
 
 dnl
-dnl ncurses
-dnl
-AC_ARG_WITH([ncurses],
-   AS_HELP_STRING([--without-ncurses], [Turn off ncurses support.]))
-
-if test "x$with_ncurses" != "xno"; then
-  AC_CHECK_HEADERS(curses.h)
-  AC_CHECK_LIB(ncurses, cbreak,
-               AC_DEFINE(HAVE_NCURSES,,[Define this if you have ncurses installed])
-               ac_have_ncurses="yes"
-               NCURSES_LIB="-lncurses")
-  AC_SUBST(NCURSES_LIB)
-fi
-
-AM_CONDITIONAL(HAVE_NCURSES, test x$ac_have_ncurses = "xyes")
-
-dnl
 dnl Libcurl
 dnl
 AC_ARG_WITH([curl],
