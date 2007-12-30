@@ -3,6 +3,9 @@ SUBDIRS = desktops visuals
 skindir = $(XINE_SKINDIR)
 skin_DATA = xine-ui_logo.mpv xine_splash.png
 
+mimedir = $(datadir)/mime/packages
+mime_DATA = xine-ui.xml
+
 EXTRA_DIST = \
 	$(bin_SCRIPTS) \
 	SlackBuild.in \
@@ -26,3 +29,6 @@ xine-check: xine-check.sh.in xine-check.en
 
 xine-bugreport: xine-check
 	test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
+
+install-data-local:
+	test "x$(DESTDIR)" = "x" && update-mime-database $(mimedir)/..
