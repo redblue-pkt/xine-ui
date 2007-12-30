@@ -1,7 +1,7 @@
 SUBDIRS = desktops visuals
 
-datadir = @XINE_SKINDIR@
-data_DATA = xine-ui_logo.mpv xine_splash.png
+skindir = @XINE_SKINDIR@
+skin_DATA = xine-ui_logo.mpv xine_splash.png
 
 EXTRA_DIST = \
 	$(bin_SCRIPTS) \
