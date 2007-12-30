@@ -1,6 +1,6 @@
 SUBDIRS = desktops visuals
 
-skindir = @XINE_SKINDIR@
+skindir = $(XINE_SKINDIR)
 skin_DATA = xine-ui_logo.mpv xine_splash.png
 
 EXTRA_DIST = \
