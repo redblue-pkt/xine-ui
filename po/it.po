@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2007-12-31 01:30+0100\n"
-"PO-Revision-Date: 2007-04-25 00:55+0200\n"
+"PO-Revision-Date: 2007-12-31 01:35+0100\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gmail.com>\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -422,7 +422,7 @@ msgstr "Playlist: %s"
 
 #: src/xitk/event.c:1055
 msgid "Stop (persistent)"
-msgstr ""
+msgstr "Ferma (persistente)"
 
 #: src/xitk/event.c:1056
 msgid "Stop"
