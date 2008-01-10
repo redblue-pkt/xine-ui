@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1071,6 +1071,33 @@ void gui_execute_action_id(action_id_t action) {
       /* do not change tuning */
       ev_data.channel = -1;
       ev_data.frequency = -1;
+
+      /* do not set session id */
+      ev_data.session_id = -1;
+
+      /* send event */
+      xine_event.type = XINE_EVENT_SET_V4L2;
+      xine_event.data_length = sizeof(xine_set_v4l2_data_t);
+      xine_event.data = &ev_data;
+      xine_event.stream = gGui->stream;
+      xine_event_send(gGui->stream, &xine_event);
+    }
+    break;
+
+  case ACTID_PVR_SETFREQUENCY:
+
+    /* Parameter (integer, required): frequency
+    */
+    if(gGui->numeric.set) {
+      xine_event_t         xine_event;
+      xine_set_v4l2_data_t ev_data;
+
+      /* do not change input */
+      ev_data.input = -1;
+
+      /* change tuning */
+      ev_data.channel = -1;
+      ev_data.frequency = gGui->numeric.arg;
 
       /* do not set session id */
       ev_data.session_id = -1;

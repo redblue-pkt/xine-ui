@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -150,6 +150,7 @@ typedef enum {
   ACTID_APP,
   ACTID_APP_ENABLE,
   ACTID_PVR_SETINPUT,
+  ACTID_PVR_SETFREQUENCY,
   ACTID_PVR_SETMARK,
   ACTID_PVR_SETNAME,
   ACTID_PVR_SAVE,

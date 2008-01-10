@@ -1,6 +1,8 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * New command/keybinding from Richard van Paasen:
+    "PVRSetFrequency" changes frequency on ivtv cards (input_pvr).
   * Install a shared-mime-info entry for .tox files, contributed by
     Peter Fox in bug #10.
   * New commands/keybindings from Richard van Paasen:
