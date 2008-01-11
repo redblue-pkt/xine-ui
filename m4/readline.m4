@@ -14,9 +14,8 @@ AC_DEFUN([AC_CHECK_READLINE],[
       with_arg="$withval/include:-L$withval/lib $withval/include/readline:-L$withval/lib"
     fi)
 
-  AC_MSG_CHECKING(for readline.h)
-
   if test "x$without_readline" != "xyes"; then
+    AC_MSG_CHECKING(for readline.h)
     for i in $with_arg \
 	     /usr/include: \
 	     /usr/local/include:-L/usr/local/lib \
@@ -30,6 +29,8 @@ AC_DEFUN([AC_CHECK_READLINE],[
       incl=`echo "$i" | sed 's/:.*//'`
       lib=`echo "$i" | sed 's/.*://'`
 
+      have_readline=no
+
       if test -f $incl/readline/readline.h ; then
         AC_MSG_RESULT($incl/readline/readline.h)
         READLINE_LIBS="$lib -lreadline"
@@ -38,22 +39,52 @@ AC_DEFUN([AC_CHECK_READLINE],[
 	else
 	  READLINE_INCLUDES="-I$incl/readline"
 	fi
-        AC_DEFINE(HAVE_READLINE, 1, [define if You want readline])
         have_readline=yes
         break
       elif test -f $incl/readline.h -a "x$incl" != "x/usr/include"; then
         AC_MSG_RESULT($incl/readline.h)
         READLINE_LIBS="$lib -lreadline"
         READLINE_INCLUDES="-I$incl"
-        AC_DEFINE(HAVE_READLINE, 1, [define if You want readline])
         have_readline=yes
         break
       fi
+
     done
+
+    if test "$have_readline" = yes; then
+      dnl Check to see if ncurses is needed.
+      dnl Debian's libreadline is linked against ncurses,
+      dnl but others' may not be.
+      READLINE_LIBS_TEMP="$LIBS"
+      READLINE_LDFLAGS_TEMP="$LDFLAGS"
+      LIBS=''
+      AC_MSG_NOTICE([checking whether libreadline is linked against libncurses])
+      AC_CHECK_LIB([readline], [cbreak])
+      if test "$LIBS" = ''; then
+	LIBS=''
+	LDFLAGS="$READLINE_LDFLAGS_TEMP"
+        AC_CHECK_LIB([ncurses], [cbreak])
+        if test "$LIBS" = ''; then
+	  AC_MSG_NOTICE([libreadline is not linked against libncurses, and I can't find it - disabling])
+	  have_readline=no
+	else
+	  READLINE_LIBS="$READLINE_LIBS $LIBS"
+	  AC_MSG_NOTICE([libreadline is not linked against libncurses; adding $LIBS])
+	fi
+      else
+	AC_MSG_NOTICE([libreadline is linked against libncurses])
+      fi
+      LIBS="$READLINE_LIBS_TEMP"
+      LDFLAGS="$READLINE_LDFLAGS_TEMP"
+    else
+      AC_MSG_RESULT(not found)
+    fi
+
+    if test "$have_readline" = yes; then
+      AC_DEFINE(HAVE_READLINE, 1, [define if You want readline])
+    fi
+
   fi
 
-  if test "x$have_readline" != "xyes"; then
-    AC_MSG_RESULT(not found)
-  fi
 ])
 
