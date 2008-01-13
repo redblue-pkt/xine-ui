@@ -109,9 +109,6 @@ static const struct xine_speeds_s {
   { NULL , 0                 }
 };
 
-static uint32_t color[OVL_PALETTE_SIZE];
-static uint8_t trans[OVL_PALETTE_SIZE];
-
 #define BAR_WIDTH 336
 #define BAR_HEIGHT 25
 
@@ -164,12 +161,9 @@ void osd_init(void) {
   xine_osd_set_text_palette(gGui->osd.sinfo.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  memcpy(color, textpalettes_color, sizeof(textpalettes_color));
-  memcpy(trans, textpalettes_trans, sizeof(textpalettes_trans));
-
   gGui->osd.bar.osd[0] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   
-  xine_osd_set_palette(gGui->osd.bar.osd[0], color, trans);
+  xine_osd_set_palette(gGui->osd.bar.osd[0], textpalettes_color, textpalettes_trans);
 
   gGui->osd.bar.osd[1] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   xine_osd_set_font(gGui->osd.bar.osd[1], "sans", fonth);
