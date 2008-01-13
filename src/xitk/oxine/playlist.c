@@ -47,7 +47,7 @@ extern gGui_t                  *gGui;
 #define PL_ACTION_PLAY 1
 #define PL_ACTION_REMOVE 2
 
-const char *pl_action_strings[] = { "Play", "Remove" };
+const char *const pl_action_strings[] = { "Play", "Remove" };
 
 typedef struct {
   oxine_t *oxine;
