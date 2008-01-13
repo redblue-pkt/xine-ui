@@ -383,14 +383,16 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   
   if((v_unhandled = (has_video && (!video_handled))) 
      || (a_unhandled = (has_audio && (!audio_handled)))) {
-    char      buffer[4096];
+    char *buffer = NULL;
+    char *v_info = NULL;
+    char *a_info = NULL;
     
     if(v_unhandled && a_unhandled) {
-      snprintf(buffer, sizeof(buffer), _("The stream '%s' isn't supported by xine:\n\n"),
+      asprintf(&buffer, _("The stream '%s' isn't supported by xine:\n\n"),
 	       (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     }
     else {
-      snprintf(buffer, sizeof(buffer), _("The stream '%s' uses an unsupported codec:\n\n"),
+      asprintf(&buffer, _("The stream '%s' uses an unsupported codec:\n\n"),
 	       (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     }
     
@@ -400,7 +402,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      sprintf(buffer+strlen(buffer), _("%sVideo Codec: %s (%s)\n"), "",
+      asprintf(&v_info, _("Video Codec: %s (%s)\n"),
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
 	      (get_fourcc_string(vfcc)));
     }
@@ -411,22 +413,21 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      sprintf(buffer+strlen(buffer),  _("%sAudio Codec: %s (%s)\n"), "",
+      asprintf(&a_info,  _("Audio Codec: %s (%s)\n"),
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
 	      (get_fourcc_string(afcc)));
     }
     
 
     if(v_unhandled && a_unhandled) {
-      xine_error("%s", buffer);
+      xine_error("%s%s%s", buffer, v_info, a_info);
+      free(buffer); free(v_info); free(a_info);
       return 0;
     }
 
     if(!gGui->play_anyway) {
       xitk_window_t *xw;
 
-      sprintf(buffer+strlen(buffer), _("%s\nStart playback anyway ?\n"), "");
-      
       play_data.stream             = stream;
       play_data.start_pos          = start_pos;
       play_data.start_time_in_secs = start_time_in_secs;
@@ -436,7 +437,11 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       xw = xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Start Playback ?"), 
 					       start_anyway_yesno, start_anyway_yesno, 
 					       NULL, 400, ALIGN_CENTER,
-					       "%s", buffer);
+					       "%s%s%s%s", buffer,
+					       v_info, a_info,
+					       _("\nStart playback anyway ?\n"));
+      free(buffer); free(v_info); free(a_info);
+
       XLockDisplay(gGui->display);
       if(!gGui->use_root_window && gGui->video_display == gGui->display)
 	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
@@ -451,6 +456,8 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       return 1;
     }
+
+    free(buffer); free(v_info); free(a_info);
   }
 
   return _gui_xine_play(stream, start_pos, start_time_in_secs, update_mmk);
