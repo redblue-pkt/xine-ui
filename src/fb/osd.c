@@ -85,19 +85,18 @@ static uint8_t textpalettes_trans[] = {
   0, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15,
 };
 
-static struct xine_status_s {
-  char    *symbol;
+static const struct xine_status_s {
+  char     symbol[4];
   int      status;
 } xine_status[] = {
-  { "Ø",  XINE_STATUS_IDLE  },
+  { "Ã˜",  XINE_STATUS_IDLE  },
   { "}",  XINE_STATUS_STOP  },
   { ">" , XINE_STATUS_PLAY  },
-  { "{" , XINE_STATUS_QUIT  },
-  { NULL, 0                 }
+  { "{" , XINE_STATUS_QUIT  }
 };
 
-static struct xine_speeds_s {
-  char    *symbol;
+static const struct xine_speeds_s {
+  char     symbol[4];
   int      speed;
 } xine_speeds[] = {
   { "<"  , XINE_SPEED_PAUSE  },
@@ -105,12 +104,8 @@ static struct xine_speeds_s {
   { "@>" , XINE_SPEED_SLOW_2 },
   { ">"  , XINE_SPEED_NORMAL },
   { ">$" , XINE_SPEED_FAST_2 },
-  { ">$$", XINE_SPEED_FAST_4 },
-  { NULL , 0                 }
+  { ">$$", XINE_SPEED_FAST_4 }
 };
-
-static uint32_t color[OVL_PALETTE_SIZE];
-static uint8_t trans[OVL_PALETTE_SIZE];
 
 #define BAR_WIDTH 336
 #define BAR_HEIGHT 25
@@ -154,7 +149,7 @@ static void *osd_loop(void *dummy)
 static char *_osd_get_speed_sym(int speed) {
   int i;
 
-  for(i = 0; xine_speeds[i].symbol != NULL; i++) {
+  for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
     if(speed == xine_speeds[i].speed)
       return xine_speeds[i].symbol;
   }
@@ -165,7 +160,7 @@ static char *_osd_get_speed_sym(int speed) {
 static char *_osd_get_status_sym(int status) {
   int i;
 
-  for(i = 0; xine_status[i].symbol != NULL; i++) {
+  for(i = 0; i < sizeof(xine_status)/sizeof(xine_status[0]); i++) {
     if(status == xine_status[i].status)
       return xine_status[i].symbol;
   }
@@ -181,11 +176,8 @@ void osd_init(void) {
   xine_osd_set_text_palette(fbxine.osd.sinfo, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  memcpy(color, textpalettes_color, sizeof(textpalettes_color));
-  memcpy(trans, textpalettes_trans, sizeof(textpalettes_trans));
-
   fbxine.osd.bar[0] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_palette(fbxine.osd.bar[0], color, trans);
+  xine_osd_set_palette(fbxine.osd.bar[0], textpalettes_color, textpalettes_trans);
 
   fbxine.osd.bar[1] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   xine_osd_set_font(fbxine.osd.bar[1], "sans", fonth);
