@@ -200,7 +200,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   int                 w, h;
   unsigned char      *data;
   ImlibImage         *im;
-  char                fil[4096];
+  char               *fil;
   char               *iden;
   char               *e;
   FILE               *p;
@@ -231,7 +231,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   }
   if (!p)
 	return NULL;
-  strncpy(fil, file, sizeof(fil));
+  fil = strdup(file);
   iden = _SplitID(fil);
   e = _GetExtension(fil);
 
@@ -255,6 +255,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   if (!data)
     {
       fprintf(stderr, "IMLIB ERROR: Cannot load image: %s\nAll fallbacks failed.\n", fil);
+      free(fil);
       return NULL;
     }
     
@@ -263,6 +264,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
       fprintf(stderr, "IMLIB ERROR: zero image\n" );
       if(data)
         free(data);
+      free(fil);
       return NULL;
     }
     
@@ -272,6 +274,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
       fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for image structure\n");
       if (data)
 	free(data);
+      free(fil);
       return NULL;
     }
   im->alpha_data = NULL;
@@ -315,5 +318,6 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   if ((id->cache.on_image) && (im))
     add_image(id, im, fil);
   calc_map_tables(id, im);
+  free(fil);
   return im;
 }
