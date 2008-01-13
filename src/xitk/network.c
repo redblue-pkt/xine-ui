@@ -669,18 +669,13 @@ static int __attribute__ ((format (printf, 2, 3)) write_to_console_nocr(session_
 #endif
 
 static void session_update_prompt(session_t *session) {
-  char buf[514];
-
   if(session == NULL)
     return;
 
-  if(session->socket >= 0) {
-    snprintf(buf, sizeof(buf), "%s:%s", session->host, session->port);
-  }
+  if(session->socket >= 0)
+    snprintf(session->prompt, sizeof(session->prompt), "[%s:%s]"PROGNAME" >", session->host, session->port, PROGNAME);
   else
-    snprintf(buf, sizeof(buf), "%s", "******:****");
-
-  snprintf(session->prompt, sizeof(session->prompt), "[%s]%s >", buf, PROGNAME);
+    strncpy(session->prompt, "[******:****]"PROGNAME" >", sizeof(session->prompt));
 }
 
 static void session_create_commands(session_t *session) {
@@ -726,13 +721,11 @@ static void client_help(session_t *session, session_commands_t *command, const c
   int i = 0;
   size_t maxlen = 0, j;
   int curpos = 0;
-  char buf[_BUFSIZ];
+  char buf[_BUFSIZ] = "Available commands are:\n       ";
   
   if((session == NULL) || (command == NULL))
     return;
   
-  memset(&buf, 0, sizeof(buf));
-
   while(session_commands[i]->command != NULL) {
     
     if(session_commands[i]->enable) {
@@ -746,7 +739,6 @@ static void client_help(session_t *session, session_commands_t *command, const c
   maxlen++; 
   i = 0;  
   
-  snprintf(buf, sizeof(buf), "%s", "Available commands are:\n       ");
   curpos += 7;
   
   while(session_commands[i]->command != NULL) {
@@ -810,7 +802,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
   }
   
   if(cmd) {
-    snprintf(buf, sizeof(buf), "%s", cmd);
+    strncpy(buf, cmd, sizeof(buf)-1);
     pbuf = buf;
     if((p = strchr(pbuf, ' ')) != NULL) {
       host = _atoa(p);
@@ -828,10 +820,10 @@ static void client_open(session_t *session, session_commands_t *command, const c
     
     if(host != NULL) {
       
-      snprintf(session->host, sizeof(session->host), "%s", host);
+      strncpy(session->host, host, sizeof(session->host)-1);
       
       if(port != NULL) 
-	snprintf(session->port, sizeof(session->port), "%s", port);
+	strncpy(session->port, port, sizeof(session->port)-1);
       
       session_create_commands(session);
       session->socket = sock_client(session->host, session->port, "tcp");
@@ -1040,8 +1032,7 @@ static void client_handle_command(session_t *session, const char *command) {
     return;
   
   /* Get only first arg of command */
-  memset(&cmd, 0, sizeof(cmd));
-  snprintf(cmd, sizeof(cmd), "%s", command);
+  strncpy(cmd, command, sizeof(cmd)-1);
   if((p = strchr(cmd, ' ')) != NULL)
     *p = '\0';
   
@@ -1205,8 +1196,8 @@ int main(int argc, char **argv) {
 
   session.socket = -1;
   pthread_mutex_init(&session.console_mutex, NULL);
-  snprintf(session.host, sizeof(session.host), "%s", DEFAULT_SERVER);
-  snprintf(session.port, sizeof(session.port), "%s", DEFAULT_XINECTL_PORT);
+  strcpy(session.host, DEFAULT_SERVER);
+  strcpy(session.prot, DEFAULT_XINECTL_PORT);
 
   opterr = 0;
   while((c = getopt_long(argc, argv, short_options, long_options, &option_index)) != EOF) {
@@ -1214,13 +1205,13 @@ int main(int argc, char **argv) {
       
     case 'H': /* Set host */
       if(optarg != NULL)
-	snprintf(session.host, sizeof(session.host), "%s", optarg);
+	strncpy(session.host, optarg, sizeof(session.host)-1);
       break;
       
     case 'P': /* Set port */
       if(optarg != NULL) {
 	port_set = 1;
-	snprintf(session.port, sizeof(session.port), "%s", optarg);
+	strncpy(session.port, optarg, sizeof(session.port)-1);
       }
       break;
 
@@ -1439,7 +1430,7 @@ static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
   char buf[_BUFSIZ];
   char *n, *p;
   
-  snprintf(buf, sizeof(buf), "%s", entry);
+  strncpy(buf, entry, sizeof(buf)-1);
   n = buf;
   if((p = strrchr(buf, ':')) != NULL) {
     if(strlen(p) > 1) {
@@ -1453,8 +1444,8 @@ static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
   }
   
   if((n != NULL) && (p != NULL)) {
-    snprintf(name, MAX_NAME_LEN, "%s", n);
-    snprintf(passwd, MAX_PASSWD_LEN, "%s", p);
+    strncpy(name, n, MAX_NAME_LEN-1);
+    strncpy(passwd, p, MAX_PASSWD_LEN-1);
     return 1;
   }
 
@@ -1725,7 +1716,7 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
 }
 
 static void do_help(commands_t *cmd, client_info_t *client_info) {
-  char buf[_BUFSIZ];
+  char buf[_BUFSIZ] = "Available commands are:\n       ";
 
   if(!client_info->command.num_args) {
     int i = 0;
@@ -1745,7 +1736,6 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     maxlen++; 
     i = 0;  
 
-    snprintf(buf, sizeof(buf), "%s", "Available commands are:\n       ");
     curpos += 7;
     
     while(commands[i].command != NULL) {
@@ -1806,7 +1796,7 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
       char *name;
       char *passwd;
       
-      snprintf(buf, sizeof(buf), "%s", get_arg(client_info, 1));
+      strncpy(buf, get_arg(client_info, 1), sizeof(buf)-1);
       name = buf;
       if((passwd = strrchr(buf, ':')) != NULL) {
 	if(strlen(passwd) > 1) {
@@ -1822,8 +1812,8 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
 	memset(&client_info->name, 0, sizeof(client_info->name));
 	memset(&client_info->passwd, 0, sizeof(client_info->passwd));
 
-	snprintf(client_info->name, sizeof(client_info->name), "%s", name);
-	snprintf(client_info->passwd, sizeof(client_info->passwd), "%s", passwd);
+	strncpy(client_info->name, name, sizeof(client_info->name)-1);
+	strncpy(client_info->passwd, passwd, sizeof(client_info->passwd)-1);
 
 	check_client_auth(client_info);
       }
@@ -2144,9 +2134,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	sock_write(client_info->socket, "%s", buf);
       }
       else if(is_arg_contain(client_info, 1, "loop")) {
-	char buf[64];
-
-	snprintf(buf, sizeof(buf), "%s", "Current loop mode is: ");
+	char buf[64] = "Current loop mode is: ";
 
 	switch(gGui->playlist.loop) {
 	case PLAYLIST_LOOP_NO_LOOP:
@@ -2725,8 +2713,8 @@ static void parse_command(client_info_t *client_info) {
 						    strlen(client_info->command.line) - strlen(cmd) + 1);
 
     memset(client_info->command.command, 0, sizeof(client_info->command.command));
-    snprintf(client_info->command.command, 
-	     (strlen(client_info->command.line) - strlen(cmd))+1, "%s", client_info->command.line);
+    strncpy(client_info->command.command, client_info->command.line,
+	    (strlen(client_info->command.line) - strlen(cmd)));
 
     cmd = _atoa(cmd);
     

@@ -732,8 +732,7 @@ static void inputtext_kill_line(xitk_widget_t *w) {
     if(private_data->cursor_pos >= 0) {
       char *newtext = NULL;
       
-      newtext = (char *) xitk_xmalloc(private_data->cursor_pos + 1);
-      snprintf(newtext, private_data->cursor_pos + 1, "%s", private_data->text);
+      newtext = strndup(private_data->text, private_data->cursor_pos);
       
       XITK_FREE(private_data->text);
       private_data->text = newtext;

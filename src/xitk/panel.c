@@ -328,7 +328,7 @@ void panel_update_runtime_display(void) {
     }
     else
       if(remain < 0)
-	snprintf(timestr, sizeof(timestr), "%s", "  :  :  ");
+	strcpy(timestr, "  :  :  ");
       else {
 	if(rdays > 0)
 	  snprintf(timestr, sizeof(timestr), "% 4d::%02d", rdays, remain / (60*60));
@@ -338,7 +338,7 @@ void panel_update_runtime_display(void) {
     
   }
   else
-    snprintf(timestr, sizeof(timestr), "%s", "--:--:--");
+    strcpy(timestr, "--:--:--");
   
   if(length > 0) {
     int days;

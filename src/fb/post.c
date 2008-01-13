@@ -209,7 +209,7 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
 			if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
 			  int maxlen = pobj.param->size / sizeof(char);
 			  
-			  snprintf((char *)(pobj.param_data + pobj.param->offset), maxlen, "%s", p);
+			  strncpy((char *)(pobj.param_data + pobj.param->offset), maxlen-1, p);
 			  _pplugin_update_parameter(&pobj);
 			}
 			else

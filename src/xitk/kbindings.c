@@ -1566,7 +1566,7 @@ static void kbedit_create_browser_entries(void) {
     if(kbedit->kbt->entry[i]->is_alias)
       snprintf(buf, sizeof(buf), "@{%s}", kbedit->kbt->entry[i]->comment);
     else
-      snprintf(buf, sizeof(buf), "%s", kbedit->kbt->entry[i]->comment);
+      strncpy(buf, kbedit->kbt->entry[i]->comment, sizeof(buf)-1);
     
     kbedit->entries[i]   = strdup(buf);
     kbedit->shortcuts[i] = strdup(shortcut);

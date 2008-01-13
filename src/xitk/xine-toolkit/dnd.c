@@ -105,10 +105,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
     
     /* Okay, got something, handle */
     {
-      char  buf[nread + 2];
-      
-      memset(&buf, '\0', sizeof(buf));
-      snprintf(buf, sizeof(buf), "%s", s);
+      char *buf = strndup(s, nread);
       
       if(strlen(buf)) {
 	char *p, *pbuf;
@@ -137,6 +134,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	  }
 	}
       }
+      free(buf);
     }
     
     XFree(s);

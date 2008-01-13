@@ -470,7 +470,7 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
       if((*filepathname == '\\') && (*(filepathname + 1) == '~'))
 	filepathname++;
       if((*filepathname == '/'))
-	snprintf(_filepathname, sizeof(_filepathname), "%s", filepathname);
+	strncpy(_filepathname, filepathname, sizeof(_filepathname)-1);
       else
 	snprintf(_filepathname, sizeof(_filepathname), "%s/%s", fb->current_dir, filepathname);
     }
@@ -506,10 +506,10 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
     }
 
     if(dirname)
-      snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", dirname);
+      strncpy(fb->current_dir, dirname, sizeof(fb->current_dir)-1);
 
     if(filename)
-      snprintf(fb->filename, sizeof(fb->filename), "%s", filename);
+      strncpy(fb->filename, filename, sizeof(fb->filename)-1);
     else
       *fb->filename = '\0';
   }
@@ -766,7 +766,7 @@ static void fb_select(xitk_widget_t *w, void *data, int selected) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   if(w == fb->files_browser) {
-    snprintf(fb->filename, sizeof(fb->filename), "%s", fb->norm_files[selected].name);
+    strncpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename)-1);
     fb_update_origin(fb);
   }
 }
@@ -802,7 +802,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
     else if(!strcasecmp(fb->dir_files[selected].name, "..")) {
       char *p;
       
-      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
+      strncpy(buf, fb->current_dir, sizeof(buf)-1);
       if(strlen(buf) > 1) { /* not '/' directory */
 	
 	p = &buf[strlen(buf)-1];
@@ -815,7 +815,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
 	if((strlen(buf) > 1) && *p == '/') 
 	  *p = '\0';
 	
-	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", buf);
+	strncpy(fb->current_dir, buf, sizeof(fb->current_dir)-1);
       }
     }
     else {
@@ -829,7 +829,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
       }
       
       if(is_a_dir(buf))
-	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", buf);
+	strncpy(fb->current_dir, buf, sizeof(fb->current_dir)-1);
 
     }
     
@@ -837,7 +837,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
     fb_getdir(fb);
   }
   else if(w == fb->files_browser) {
-    snprintf(fb->filename, sizeof(fb->filename), "%s", fb->norm_files[selected].name);
+    strncpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename)-1);
     fb_callback_button_cb(fb->cb_buttons[0], (void *)data);
   }
 
@@ -1226,7 +1226,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->hidden_cb                  = hidden_cb;
   fb->show_hidden_files          = hidden_cb(0, 0);
 
-  snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", xine_get_homedir());
+  strncpy(fb->current_dir, xine_get_homedir(), sizeof(fb->current_dir)-1);
   memset(&fb->filename, 0, sizeof(fb->filename));
   fb_extract_path_and_file(fb, filepathname);
 

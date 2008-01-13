@@ -690,7 +690,7 @@ static char *snap_build_filename(const char *mrl) {
     
     p++;
     
-    snprintf(basename, sizeof(basename), "%s", p);
+    strncpy(basename, p, sizeof(basename)-1);
     
     if((ext = strrchr(basename, '.')) != NULL)
       *ext = '\0';

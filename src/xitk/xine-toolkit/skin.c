@@ -120,7 +120,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 
     if(strchr(cmd, '$')) {
 
-      snprintf(buf, sizeof(buf), "%s", cmd);
+      strncpy(buf, cmd, sizeof(buf)-1);
 
       buf2[0] = 0;
       

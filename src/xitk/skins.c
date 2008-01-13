@@ -917,7 +917,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 
-	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
+	  strncpy(buffer, filename, ((strlen(filename) + 1) - 7));
 
 	  snprintf(fskin_path, sizeof(fskin_path), "%s/%s/%s", skindir, buffer, "doinst.sh");
 	  if(is_a_file(fskin_path)) {

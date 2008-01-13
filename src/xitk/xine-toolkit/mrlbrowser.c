@@ -152,9 +152,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 static void update_current_origin(mrlbrowser_private_data_t *private_data) {
 
   if(private_data->mc->mrls[0] && private_data->mc->mrls[0]->origin)
-    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", private_data->mc->mrls[0]->origin);
+    strncpy(private_data->current_origin, private_data->mc->mrls[0]->origin, sizeof(private_data->current_origin)-1);
   else
-    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", "");
+    private_data->current_origin[0] = '\0';
   
   xitk_label_change_label (private_data->widget_origin, 
 			   private_data->current_origin);
@@ -776,8 +776,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
   xine_mrl_t *ms = private_data->mc->filtered_mrls[j];
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
-  memset(&buf, '\0', sizeof(buf));
-  snprintf(buf, sizeof(buf), "%s", ms->mrl);
+  strncpy(buf, ms->mrl, sizeof(buf)-1);
   
   if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
     char *filename = ms->mrl;
@@ -792,16 +791,14 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     /* Check if we want to re-read current dir or go in parent dir */
     if((filename[strlen(filename) - 1] == '.') &&
        (filename[strlen(filename) - 2] != '.')) {
-      
-      memset(&buf, '\0', sizeof(buf));
-      snprintf(buf, sizeof(buf), "%s", ms->origin);
+
+      strncpy(buf, ms->origin, sizeof(buf)-1);
     }
     else if((filename[strlen(filename) - 1] == '.') &&
 	    (filename[strlen(filename) - 2] == '.')) {
       char *p;
       
-      memset(&buf, '\0', sizeof(buf));
-      snprintf(buf, sizeof(buf), "%s", ms->origin);
+      strncpy(buf, ms->origin, sizeof(buf)-1);
       if(strlen(buf) > 1) { /* not '/' directory */
 	  
 	p = &buf[strlen(buf)-1];
@@ -1209,7 +1206,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
   if(mb->origin.cur_origin)
-    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", mb->origin.cur_origin);
+    strncpy(private_data->current_origin, mb->origin.cur_origin, sizeof(private_data->current_origin)-1);
 
   if(mb->ip_name.label.label_str) {
 

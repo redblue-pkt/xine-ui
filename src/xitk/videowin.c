@@ -1541,7 +1541,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->fake_key_cur = 0;
 #endif
   
-  snprintf(gVw->window_title, sizeof(gVw->window_title), "%s", "xine");
+  strcpy(gVw->window_title, "xine");
   
   gettimeofday(&gVw->click_time, 0);
 

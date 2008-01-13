@@ -497,10 +497,8 @@ static void RenderDesc(prefix_tag_t* prefix, char* lpBuffer) {
       sprintf( lpBuffer+strlen(lpBuffer), "%s:%ld ",
 	  prefix->filename, prefix->line );
     }
-    if (prefix->tag) {
-      sprintf( lpBuffer+strlen(lpBuffer), "%s",
-	  prefix->tag );
-    }
+    if (prefix->tag)
+      strcat(lpBuffer, prefix->tag);
   }
   else {
     strcpy( lpBuffer, "(bad pointer given)" );
