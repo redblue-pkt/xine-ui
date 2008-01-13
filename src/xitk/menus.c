@@ -1040,15 +1040,13 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
 void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
-  char                 buffer[2048];
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
     { NULL , NULL, "<title>",      NULL, NULL },
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
-  snprintf(buffer, sizeof(buffer), "%s", _("Audio"));
-  menu_entries[0].menu = buffer;
+  menu_entries[0].menu = _("Audio");
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
 
@@ -1115,15 +1113,13 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 
 void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
-  char                 buffer[2048];
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
     { NULL , NULL, "<title>",      NULL, NULL },
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
-  snprintf(buffer, sizeof(buffer), "%s", _("Subtitle"));
-  menu_entries[0].menu = buffer;
+  menu_entries[0].menu = _("Subtitle");
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
 
@@ -1190,7 +1186,6 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
-  char                 buffer[2048];
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { _("Scan"),       menu_get_shortcut("ScanPlaylistInfo"),
@@ -1218,13 +1213,12 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
   
-  snprintf(buffer, sizeof(buffer), "%s", _("Playlist"));
   if(selected) {
-    menu_entries_sel[0].menu = buffer;
+    menu_entries_sel[0].menu = _("Playlist");
     menu.menu_tree           = &menu_entries_sel[0];
   }
   else {
-    menu_entries_nosel[0].menu = buffer;
+    menu_entries_nosel[0].menu = _("Playlist");
     menu.menu_tree             = &menu_entries_nosel[0];
   }
   
@@ -1255,7 +1249,6 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
 void control_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
-  char                 buffer[2048];
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { _("Reset video settings"),   
@@ -1265,8 +1258,7 @@ void control_menu(xitk_widget_list_t *wl, int x, int y) {
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
   
-  snprintf(buffer, sizeof(buffer), "%s", _("Video Control"));
-  menu_entries[0].menu   = buffer;
+  menu_entries[0].menu   = _("Video Control");
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
