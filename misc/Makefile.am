@@ -30,5 +30,5 @@ xine-check: xine-check.sh.in xine-check.en
 xine-bugreport: xine-check
 	test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
 
-install-data-local:
+install-data-hook:
 	test "x$(DESTDIR)" != "x" || update-mime-database $(mimedir)/..
