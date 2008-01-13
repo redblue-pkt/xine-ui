@@ -383,11 +383,11 @@ void select_new_skin(int selected) {
 /*
  * Return path of current skin
  */
-const char *skin_get_current_skin_dir(void) {
+char *skin_get_current_skin_dir(void) {
   xine_cfg_entry_t     entry;
   int                  skin_num = 0;
-  static char          skin_dir[XINE_PATH_MAX + XINE_NAME_MAX + 2];
-  
+  char                *skin_dir;
+
   if((skins_avail == NULL) || (skins_avail_num == 0)) {
     fprintf(stderr, _("No available skin found. Say goodbye.\n"));
     exit(-1);
@@ -397,9 +397,9 @@ const char *skin_get_current_skin_dir(void) {
   (void) xine_config_lookup_entry(gGui->xine, "gui.skin", &entry);
   skin_num = entry.num_value;
   
-  snprintf(skin_dir, sizeof(skin_dir), "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
+  asprintf(&skin_dir, "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
 
-  return (const char *) &skin_dir;
+  return skin_dir;
 }
 
 /*

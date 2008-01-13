@@ -36,7 +36,7 @@ void preinit_skins_support(void);
 void init_skins_support(void);
 void select_new_skin(int selected);
 void download_skin(char *url);
-const char *skin_get_current_skin_dir(void);
+char *skin_get_current_skin_dir(void);
 void download_skin_end(void);
 
 #endif
