@@ -35,7 +35,7 @@
 
 #include "_xitk.h"
 
-typedef struct {
+static struct {
   Display             *display;
   pthread_t            thread;
 
@@ -51,9 +51,7 @@ typedef struct {
 
   int                  prewait;
   pthread_cond_t       prewait_cond;
-} _tips_t;
-
-static _tips_t tips;
+} tips;
 
 static void *_tips_loop_thread(void *data) {
 
