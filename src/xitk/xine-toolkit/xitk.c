@@ -2238,9 +2238,9 @@ const char *xitk_get_homedir(void) {
  * yes/no, on/off. Case isn't checked.
  */
 int xitk_get_bool_value(const char *val) {
-  static struct {
-    const char *str;
-    int value;
+  static const struct {
+    char str[7];
+    uint8_t value;
   } bools[] = {
     { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
     { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 },
