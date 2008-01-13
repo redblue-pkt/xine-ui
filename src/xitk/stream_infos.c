@@ -136,14 +136,6 @@ char *get_fourcc_string(uint32_t f) {
   return &fcc[0];
 }
 
-static char *get_num_string(uint32_t num) {
-  static char buffer[1024];
-
-  snprintf(buffer, sizeof(buffer), "%d", num);
-
-  return &buffer[0];
-}
-
 static void get_meta_info(xitk_widget_t *w, int meta) {
   char *minfo;
   xitk_recode_t *xr;
@@ -161,10 +153,13 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
 }
 
 static void get_stream_info(xitk_widget_t *w, int info) {
-  uint32_t   iinfo;
+  char *tmp;
+
+  asprintf(&tmp, "%d", xine_get_stream_info(gGui->stream, info));
   
-  iinfo = xine_get_stream_info(gGui->stream, info);
-  set_label(w, (get_num_string(iinfo)));
+  set_label(w, tmp);
+
+  free(tmp);
 }
       
 static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
