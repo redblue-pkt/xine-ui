@@ -2295,7 +2295,7 @@ void video_window_reset_ssaver(void) {
       /* Reset the gnome screensaver. Look up the command in PATH only once to save time, */
       /* assuming its location and permission will not change during run time of xine-ui. */
       {
-	static char *gssaver_args[] = { "gnome-screensaver-command", "--poke", NULL };
+	static char *const gssaver_args[] = { "gnome-screensaver-command", "--poke", NULL };
 	static char *gssaver_path   = NULL;
 
 	if(!gssaver_path) {
