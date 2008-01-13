@@ -835,22 +835,22 @@ static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
 
   if(error_msg_cb) {
-    char uerror[4096]; 
+    char *uerror;
 
-    memset(&uerror, 0, sizeof(uerror));
-    snprintf(uerror, sizeof(uerror), "%s%s\n", _("Error: "), error_msg);
+    asprintf(&uerror, "%s%s\n", _("Error: "), error_msg);
     error_msg_cb(msg_cb_data, uerror);
+    free(uerror);
   }
 }
 
 static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 {
   if(error_msg_cb) {
-    char uerror[4096];
-    
-    memset(&uerror, 0, sizeof(uerror));
-    snprintf(uerror, sizeof(uerror), "%s%s\n", _("Error: "), warning_msg);
+    char *uerror;
+
+    asprintf(&uerror, "%s%s\n", _("Error: "), warning_msg);
     error_msg_cb(msg_cb_data, uerror);
+    free(uerror);
   }
 }
 
@@ -899,11 +899,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   if((!width) || (!height)) {
     if(error_msg_cb) {
-      char umessage[4096];
+      char *umessage;
       
-      memset(&umessage, 0, sizeof(umessage));
-      snprintf(umessage, sizeof(umessage), "%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
+      asprintf(&umessage, "%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
       error_msg_cb(msg_cb_data, umessage);
+      free(umessage);
     }
     return;
   }
@@ -1033,11 +1033,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   if ( (image->fp = fopen(image->file_name, "wb")) == NULL ) {
     
     if(error_msg_cb) {
-      char umessage[4096];
+      char *umessage;
       
-      memset(&umessage, 0, sizeof(umessage));
-      snprintf(umessage, sizeof(umessage), "%s (%s)\n", _("File open failed"), image->file_name);
+      asprintf(&umessage, "%s (%s)\n", _("File open failed"), image->file_name);
       error_msg_cb(msg_cb_data, umessage);
+      free(umessage);
     }
     prvt_image_free( &image );
     return;
@@ -1215,10 +1215,10 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   /**/
   if(info_msg_cb) {
-    char umessage[4096];
-    memset(&umessage, 0, sizeof(umessage));
-    snprintf(umessage, sizeof(umessage), "%s%s\n", _("File written: "), image->file_name);
+    char *umessage;
+    asprintf(&umessage, "%s%s\n", _("File written: "), image->file_name);
     info_msg_cb(msg_cb_data, umessage);
+    free(umessage);
   }
 
 #ifdef DEBUG
