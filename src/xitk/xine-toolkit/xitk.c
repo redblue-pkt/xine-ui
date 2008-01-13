@@ -2197,15 +2197,19 @@ long int xitk_get_last_keypressed_time(void) {
 
 /*
  * Return home directory.
+ *
+ * This will cause a small memory leak, as the memory will not be ever
+ * freed. It's actually to be considered a false positive, as the only
+ * moment when we stop needing this for sure is when we exit.
  */
 const char *xitk_get_homedir(void) {
 #ifdef HAVE_GETPWUID_R
   struct passwd  pwd;
 #endif
   struct passwd *pw = NULL;
-  static char    homedir[BUFSIZ] = {0,};
+  static const char *homedir = NULL;
 
-  if(homedir[0])
+  if(homedir)
     return homedir;
 
 #ifdef HAVE_GETPWUID_R
@@ -2214,20 +2218,15 @@ const char *xitk_get_homedir(void) {
   if((pw = getpwuid(getuid())) == NULL) {
 #endif
     char *tmp = getenv("HOME");
-    if(tmp) {
-      strncpy(homedir, tmp, sizeof(homedir));
-      homedir[sizeof(homedir) - 1] = '\0';
-    }
+    if(tmp)
+      homedir = strdup(tmp);
   } else {
-    char *s = strdup(pw->pw_dir);
-    strncpy(homedir, s, sizeof(homedir));
-    homedir[sizeof(homedir) - 1] = '\0';
-    free(s);
+    homedir = strdup(pw->pw_dir);
   }
 
-  if(!homedir[0]) {
+  if(!homedir) {
     XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
-    strcpy(homedir, "/tmp");
+    homedir = "/tmp";
   }
 
   return homedir;
