@@ -83,8 +83,7 @@ Imlib_init(Display * disp)
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
-  char               *homedir;
-  char                s[4096], *s1, *s2;
+  char               *s, *s1, *s2;
   FILE               *f;
   int                 override = 0;
   int                 dither = 0;
@@ -189,8 +188,7 @@ Imlib_init(Display * disp)
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
-  homedir = getenv("HOME");
-  snprintf(s, sizeof(s), "%s/.imrc", homedir);
+  asprintf(&s, "%s/.imrc", getenv("HOME"));
 
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
@@ -200,6 +198,8 @@ Imlib_init(Display * disp)
 #else
   f = fopen(s, "rt");
 #endif
+
+  free(s);
 
   if (!f)
     {
@@ -639,8 +639,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
-  char               *homedir;
-  char                s[4096], *s1, *s2;
+  char               *s, *s1, *s2;
   FILE               *f;
   int                 override = 0;
   int                 dither = 0;
@@ -742,8 +741,8 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
-  homedir = getenv("HOME");
-  snprintf(s, sizeof(s), "%s/.imrc", homedir);
+  asprintf(&s, "%s/.imrc", getenv("HOME"));
+
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
 
@@ -752,6 +751,8 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 #else
   f = fopen(s, "rt");
 #endif
+
+  free(s);
 
   if (!f)
     {
