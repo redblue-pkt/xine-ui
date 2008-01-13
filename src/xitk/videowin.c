@@ -2318,7 +2318,7 @@ void video_window_reset_ssaver(void) {
 	      free(pbuf);
 	      gssaver_path = "";
 	    } else
-	      pbuf;
+	      gssaver_path = pbuf;
 	  } while(!gssaver_path[0] && *path++);
 	}
 	if(gssaver_path[0] && (fork() == 0)) {
