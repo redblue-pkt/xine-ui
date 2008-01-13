@@ -86,18 +86,17 @@ static const uint8_t textpalettes_trans[] = {
 };
 
 static const struct xine_status_s {
-  char    *symbol;
+  char     symbol[4];
   int      status;
 } xine_status[] = {
   { "Ø",  XINE_STATUS_IDLE  },
   { "}",  XINE_STATUS_STOP  },
   { ">" , XINE_STATUS_PLAY  },
-  { "{" , XINE_STATUS_QUIT  },
-  { NULL, 0                 }
+  { "{" , XINE_STATUS_QUIT  }
 };
 
 static const struct xine_speeds_s {
-  char    *symbol;
+  char     symbol[4];
   int      speed;
 } xine_speeds[] = {
   { "<"  , XINE_SPEED_PAUSE  },
@@ -105,8 +104,7 @@ static const struct xine_speeds_s {
   { "@>" , XINE_SPEED_SLOW_2 },
   { ">"  , XINE_SPEED_NORMAL },
   { ">$" , XINE_SPEED_FAST_2 },
-  { ">$$", XINE_SPEED_FAST_4 },
-  { NULL , 0                 }
+  { ">$$", XINE_SPEED_FAST_4 }
 };
 
 #define BAR_WIDTH 336
@@ -135,7 +133,7 @@ static void _osd_get_output_size(int *w, int *h) {
 static char *_osd_get_speed_sym(int speed) {
   int i;
 
-  for(i = 0; xine_speeds[i].symbol != NULL; i++) {
+  for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
     if(speed == xine_speeds[i].speed)
       return xine_speeds[i].symbol;
   }
@@ -145,7 +143,7 @@ static char *_osd_get_speed_sym(int speed) {
 static char *_osd_get_status_sym(int status) {
   int i;
 
-  for(i = 0; xine_status[i].symbol != NULL; i++) {
+  for(i = 0; i < sizeof(xine_status)/sizeof(xine_status[0]); i++) {
     if(status == xine_status[i].status)
       return xine_status[i].symbol;
   }
