@@ -143,14 +143,15 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 	     */
 	    if(!strncmp("SKIN_PARENT_PATH", var, strlen(var))) {
 	      if(skonfig->path) {
-		char ppath[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+		char *ppath;
 		char *z;
 		
-		snprintf(ppath, sizeof(ppath), "%s", skonfig->path);
+		ppath = strdup(skonfig->path);
 		if((z = strrchr(ppath, '/')) != NULL) {
 		  *z = '\0';
 		  strlcat(buf2, ppath, sizeof(buf2));
 		}
+		free(ppath);
 	      }
 	    }
 	    else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
