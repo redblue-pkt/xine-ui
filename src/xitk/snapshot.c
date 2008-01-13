@@ -679,7 +679,7 @@ static void rgb_free( struct prvt_image_s *image )
  */
 
 static char *snap_build_filename(const char *mrl) {
-  static char   buffer[XITK_NAME_MAX + XITK_PATH_MAX + 1];
+  char         *buffer;
   char          basename[XITK_NAME_MAX + 1] = "xine_snapshot";
   char         *p = strrchr(mrl, '/');
   struct stat   sstat;
@@ -698,12 +698,13 @@ static char *snap_build_filename(const char *mrl) {
   }
 
   for(i = 1;; i++) {
-    snprintf(buffer, sizeof(buffer), "%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
+    asprintf(&buffer, "%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
     if(((stat(buffer, &sstat)) == -1) && (errno == ENOENT))
       break;
+    free(buffer);
   }
   
-  return &buffer[0];
+  return buffer;
 }
 
 static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
@@ -728,10 +729,8 @@ static void prvt_image_free( struct prvt_image_s **image )
 {
   struct prvt_image_s *image_p = *image;
 
-  /*
-   * Do not free image_p->file_name
-   *   It looks after itself
-   */
+  free(image_p->file_name);
+
   if (image_p->img)
     free(image_p->img);
    
