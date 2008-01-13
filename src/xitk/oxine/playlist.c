@@ -60,7 +60,7 @@ typedef struct {
 static void playlist_reentry_cb (void *data);
 
 static char * get_basename(char *path) {
-  static char buf[1024];
+  char *buf;
   int i=strlen(path);
 
   for (i--; i>=0; i--)
@@ -68,9 +68,9 @@ static char * get_basename(char *path) {
       break;
 
   if (i<=0)
-    strncpy(buf, path, 1023);
+    buf = strdup(path);
   else
-    strncpy(buf, &path[i+1], 1023);
+    buf = strdup(&path[i+1]);
 
 #ifdef LOG
   printf("basename(%s)=%s\n", path, buf);
@@ -84,6 +84,7 @@ static void changelist (otk_widget_t *list) {
   char tmp[512];
   int i;
   char *pretty_name;
+  char *pretty_name_free = NULL;
 
   otk_remove_listentries(list);
 
@@ -108,12 +109,13 @@ static void changelist (otk_widget_t *list) {
         strcmp(gGui->playlist.mmk[i]->ident,gGui->playlist.mmk[i]->mrl) )
       pretty_name = gGui->playlist.mmk[i]->ident;
     else if( !strchr(gGui->playlist.mmk[i]->mrl, ':') )
-      pretty_name = get_basename(gGui->playlist.mmk[i]->mrl);
+      pretty_name_free = pretty_name = get_basename(gGui->playlist.mmk[i]->mrl);
     else
       pretty_name = gGui->playlist.mmk[i]->ident;
     
     snprintf(tmp, 511, "%s %s",  ( i == gGui->playlist.cur ) ? "->" : "  ", pretty_name);
     otk_add_listentry(list, tmp, NULL, -1);
+    free(pretty_name_free);
   }
   otk_list_set_pos(list,0);
   otk_set_focus(list);
