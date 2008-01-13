@@ -2310,14 +2310,14 @@ void gui_select_sub(void) {
  *
  */
 void visual_anim_init(void) {
-  char buffer[4096];
+  char *buffer;
 
-  snprintf(buffer, sizeof(buffer), "%s/%s", XINE_VISDIR, "default.avi");
+  asprintf(&buffer, "%s/%s", XINE_VISDIR, "default.avi");
   
   gGui->visual_anim.mrls = (char **) xine_xmalloc(sizeof(char *) * 3);
   gGui->visual_anim.num_mrls = 0;
   
-  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = strdup(buffer);
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = buffer;
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]     = NULL;
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls + 1] = NULL;
 }
