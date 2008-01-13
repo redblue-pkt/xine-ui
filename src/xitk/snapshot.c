@@ -731,8 +731,7 @@ static void prvt_image_free( struct prvt_image_s **image )
 
   free(image_p->file_name);
 
-  if (image_p->img)
-    free(image_p->img);
+  free(image_p->img);
    
   rgb_free ( image_p );
 
