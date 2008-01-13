@@ -39,12 +39,11 @@ static xitk_window_t     *xwin = NULL;
 void splash_create(void) {
   xitk_image_t *xim;
   char         *splash_image = XINE_SPLASH;
-  char          skin_splash_image[XINE_PATH_MAX + XINE_NAME_MAX];
+  char         *skin_splash_image;
   char         *skin_path = skin_get_current_skin_dir();
   
   if(skin_path && is_a_dir((char *) skin_path)) {
-    memset(&skin_splash_image, 0, sizeof(skin_splash_image));
-    snprintf(skin_splash_image, sizeof(skin_splash_image), "%s/%s", skin_path, "xine_splash.png");
+    asprintf(&skin_splash_image, "%s/%s", skin_path, "xine_splash.png");
 
     if(is_a_file(skin_splash_image))
       splash_image = skin_splash_image;
@@ -81,6 +80,8 @@ void splash_create(void) {
 
     xitk_image_free_image(gGui->imlib_data, &xim);
   }
+
+  free(skin_splash_image);
 }
 
 void splash_destroy(void) {
