@@ -31,4 +31,4 @@ xine-bugreport: xine-check
 	test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
 
 install-data-local:
-	test "x$(DESTDIR)" = "x" && update-mime-database $(mimedir)/..
+	test "x$(DESTDIR)" != "x" || update-mime-database $(mimedir)/..
