@@ -89,7 +89,7 @@ static const struct xine_status_s {
   char     symbol[4];
   int      status;
 } xine_status[] = {
-  { "Ø",  XINE_STATUS_IDLE  },
+  { "\xD8",  XINE_STATUS_IDLE  }, /* Ã˜ */
   { "}",  XINE_STATUS_STOP  },
   { ">" , XINE_STATUS_PLAY  },
   { "{" , XINE_STATUS_QUIT  }
