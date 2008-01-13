@@ -94,8 +94,8 @@
 #endif
 
 /* options args */
-static const char *short_options = "?hH:P:ncv";
-static struct option long_options[] = {
+static const char short_options[] = "?hH:P:ncv";
+static const struct option long_options[] = {
   { "help"           , no_argument      , 0, 'h' },
   { "host"           , required_argument, 0, 'H' },
   { "port"           , required_argument, 0, 'P' },
