@@ -59,6 +59,9 @@ typedef struct {
 
 static void playlist_reentry_cb (void *data);
 
+/**
+ * @TODO see if it can be replaced by basename(), and at least use strrchr.
+ */
 static char * get_basename(char *path) {
   char *buf;
   int i=strlen(path);
