@@ -2304,7 +2304,7 @@ void video_window_reset_ssaver(void) {
 	  if(!path)
 	    path = "/usr/local/bin:/usr/bin";
 	  do {
-	    char *p, pbuf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+	    char *p, *pbuf;
 	    int   plen;
 
 	    for(p = path; *path && *path != ':'; path++)
@@ -2313,11 +2313,12 @@ void video_window_reset_ssaver(void) {
 	      plen = 1, p = ".";
 	    else
 	      plen = path - p;
-	    plen = snprintf(pbuf, sizeof(pbuf), "%.*s/%s", plen, p, gssaver_args[0]);
-	    if (plen <= -1 || plen >= sizeof(pbuf))
+	    asprintf(&pbuf, "%.*s/%s", plen, p, gssaver_args[0]);
+	    if ( access(pbuf, X_OK) ) {
+	      free(pbuf);
 	      gssaver_path = "";
-	    else
-	      gssaver_path = (access(pbuf, X_OK)) ? "" : strdup(pbuf);
+	    } else
+	      pbuf;
 	  } while(!gssaver_path[0] && *path++);
 	}
 	if(gssaver_path[0] && (fork() == 0)) {
