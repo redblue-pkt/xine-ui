@@ -198,9 +198,9 @@ int ispng(FILE *f) {
 
 ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   int                 w, h;
-  unsigned char      *data;
+  unsigned char      *data = NULL;
   ImlibImage         *im;
-  char               *fil;
+  char               *fil = NULL;
   char               *iden;
   char               *e;
   FILE               *p;
@@ -255,27 +255,20 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   if (!data)
     {
       fprintf(stderr, "IMLIB ERROR: Cannot load image: %s\nAll fallbacks failed.\n", fil);
-      free(fil);
-      return NULL;
+      goto error;
     }
     
   if (!w || !h)
     {
       fprintf(stderr, "IMLIB ERROR: zero image\n" );
-      if(data)
-        free(data);
-      free(fil);
-      return NULL;
+      goto error;
     }
     
   im = (ImlibImage *) malloc(sizeof(ImlibImage));
   if (!im)
     {
       fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for image structure\n");
-      if (data)
-	free(data);
-      free(fil);
-      return NULL;
+      goto error;
     }
   im->alpha_data = NULL;
   if (trans)
@@ -320,4 +313,8 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   calc_map_tables(id, im);
   free(fil);
   return im;
+ error:
+  free(fil);
+  free(data);
+  return NULL;
 }
