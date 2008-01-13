@@ -370,12 +370,12 @@ static void _playlist_cancel_callback(filebrowser_t *fb) {
 }
 void playlist_load_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
-  char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char                          *buffer;
 
   if(load_fb)
     filebrowser_raise_window(load_fb);
   else {
-    snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+    asprintf(&buffer, "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
     
     cbb[0].label = _("Load");
     cbb[0].callback = _playlist_load_callback;
@@ -384,6 +384,7 @@ void playlist_load_playlist(xitk_widget_t *w, void *data) {
     
     playlist_deactivate();
     load_fb = create_filebrowser(_("Load a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+    free(buffer);
   }
 }
 
@@ -402,13 +403,13 @@ static void _playlist_save_callback(filebrowser_t *fb) {
 }
 void playlist_save_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
-  char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char                          *buffer;
 
   if(gGui->playlist.num) {
     if(save_fb)
       filebrowser_raise_window(save_fb);
     else {
-      snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+      asprintf(&buffer, "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
       
       cbb[0].label = _("Save");
       cbb[0].callback = _playlist_save_callback;
@@ -417,6 +418,7 @@ void playlist_save_playlist(xitk_widget_t *w, void *data) {
       
       playlist_deactivate();
       save_fb = create_filebrowser(_("Save a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+      free(buffer);
     }
   }
 }
