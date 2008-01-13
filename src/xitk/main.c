@@ -108,7 +108,7 @@ typedef struct {
 
 
 /* options args */
-static const char *short_options = "?hHgfvn"
+static const char short_options[] = "?hHgfvn"
 #ifdef HAVE_XINERAMA
  "F"
 #endif
@@ -120,7 +120,7 @@ static const char *short_options = "?hHgfvn"
 #endif
  "u:a:V:A:p::s:RW:G:BN:P:l::S:ZD::r:c:ET:I";
 
-static struct option long_options[] = {
+static const struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
   {"no-lirc"        , no_argument      , 0, 'L'                      },
