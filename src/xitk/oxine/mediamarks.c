@@ -332,7 +332,7 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
       type = TYPE_RDIR;
       snprintf(title, 255, "[%s]", entp->d_name);	  
       }else if (S_ISREG(filestat.st_mode)) {
-      strncpy(title, entp->d_name, 255);
+      strlcpy(title, entp->d_name, sizeof(title));
       type = TYPE_RREG;
       }
       if(file_is_m3u(mrl)) {
