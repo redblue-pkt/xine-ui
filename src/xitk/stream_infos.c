@@ -130,7 +130,7 @@ char *get_fourcc_string(uint32_t f) {
     snprintf(fcc, sizeof(fcc), "0x%x", f);
   
   if(memcmp(fcc, "ms\0\x55", 4) == 0) {
-    strncpy(fcc, "3pm.", 4); /* Force to '.mp3' */
+    strcpy(fcc, "3pm."); /* Force to '.mp3' */
   }
   
   return &fcc[0];
