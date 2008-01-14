@@ -327,11 +327,9 @@ static int change_skin(skins_locations_t *sk) {
   gGui->skin_config = nskin_config;
 
   { /* Now, change skins for each window */
-    typedef struct {
+    static const struct {
       void (*change_skins)(int);
-    } visible_state_t;
-    int   i;
-    visible_state_t visible_state[] = {
+    } visible_state[] = {
       { video_window_change_skins },
       { panel_change_skins        },
       { control_change_skins      },
@@ -339,11 +337,10 @@ static int change_skin(skins_locations_t *sk) {
       { mrl_browser_change_skins  },
       { NULL                      }
     };
+    int   i;
     
     for(i = 0; visible_state[i].change_skins != NULL; i++) {
-      if(visible_state[i].change_skins) {
-	visible_state[i].change_skins(1);
-      }
+      visible_state[i].change_skins(1);
     }
   }
 
