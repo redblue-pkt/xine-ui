@@ -103,11 +103,11 @@ static void get_available_skins_from(char *path) {
     return;
 
   if((pdir = opendir(path)) != NULL) {
-    char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    
     while((pdirent = readdir(pdir)) != NULL) {
-      snprintf(fullfilename, sizeof(fullfilename), "%s/%s", path, pdirent->d_name);
+      char          *fullfilename = NULL;
+      char          *skcfgname = NULL;
+    
+      asprintf(&fullfilename, "%s/%s", path, pdirent->d_name);
       
       if((is_a_dir(fullfilename))
 	 && (!(strlen(pdirent->d_name) == 1 && pdirent->d_name[0] == '.' )
@@ -117,7 +117,7 @@ static void get_available_skins_from(char *path) {
 	/*
 	 * Check if a skinconfig file exist
 	 */
-	snprintf(skcfgname, sizeof(skcfgname), "%s/%s", fullfilename, "skinconfig");
+	asprintf(&skcfgname, "%s/%s", fullfilename, "skinconfig");
 	if(is_a_file(skcfgname)) {
 	  
 	  skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
@@ -140,7 +140,11 @@ static void get_available_skins_from(char *path) {
 		  fullfilename, pdirent->d_name);
 	}
       }
+
+      free(skcfgname);
+      free(fullfilename);
     }
+
     closedir(pdir);
     skins_avail[skins_avail_num] = NULL;
   }
