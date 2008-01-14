@@ -1178,10 +1178,13 @@ void panel_init (void) {
   XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay(gGui->display);
   
-  if(!video_window_is_visible())
+  if(!video_window_is_visible()) {
+    xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
     xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
-  else
+  } else {
     xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
+    xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
+  }
   
   if(is_layer_above())
     xitk_set_layer_above(gGui->panel_window);
