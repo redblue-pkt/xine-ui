@@ -105,8 +105,8 @@ typedef uint64_t v4l2_std_id;
 #define V4L2_STD_ATSC_16_VSB    ((v4l2_std_id)0x02000000)
 
 static const struct {
-    const char     *name;
-    uint64_t        std;
+  char     name[24];
+  uint64_t std;
 } std_list[] = {
   { "PAL-B",       V4L2_STD_PAL_B       },
   { "PAL-B1",      V4L2_STD_PAL_B1      },
