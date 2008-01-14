@@ -116,88 +116,85 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   
   ABORT_IF_NULL(skonfig);
 
-  if(cmd) {
+  if( ! ( cmd && strchr(cmd, '$') ) ) return NULL;
 
-    if(strchr(cmd, '$')) {
-      buf2 = calloc(BUFSIZ, sizeof(char));
+  buf2 = calloc(BUFSIZ, sizeof(char));
 
-      strlcpy(buf, cmd, sizeof(buf));
+  strlcpy(buf, cmd, sizeof(buf));
 
-      buf2[0] = 0;
+  buf2[0] = 0;
       
-      p = buf;
+  p = buf;
 
-      while(*p != '\0') {
-	switch(*p) {
+  while(*p != '\0') {
+    switch(*p) {
 
-	  /*
-	   * Prefix of variable names.
-	   */
-	case '$':
-	  memset(&var, 0, sizeof(var));
-	  if(sscanf(p, "$\(%[A-Z-_])", &var[0])) {
+      /*
+       * Prefix of variable names.
+       */
+    case '$':
+      memset(&var, 0, sizeof(var));
+      if(sscanf(p, "$\(%[A-Z-_])", &var[0])) {
 
-	    p += (strlen(var) + 2);
+	p += (strlen(var) + 2);
 
-	    /*
-	     * Now check variable validity
-	     */
-	    if(!strncmp("SKIN_PARENT_PATH", var, strlen(var))) {
-	      if(skonfig->path) {
-		char *ppath;
-		char *z;
+	/*
+	 * Now check variable validity
+	 */
+	if(!strncmp("SKIN_PARENT_PATH", var, strlen(var))) {
+	  if(skonfig->path) {
+	    char *ppath;
+	    char *z;
 		
-		ppath = strdup(skonfig->path);
-		if((z = strrchr(ppath, '/')) != NULL) {
-		  *z = '\0';
-		  strlcat(buf2, ppath, sizeof(buf2));
-		}
-		free(ppath);
-	      }
+	    ppath = strdup(skonfig->path);
+	    if((z = strrchr(ppath, '/')) != NULL) {
+	      *z = '\0';
+	      strlcat(buf2, ppath, sizeof(buf2));
 	    }
-	    else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
-	      if(skonfig->version >= 0)
-		snprintf(buf2+strlen(buf2), sizeof(buf2)-strlen(buf2), "%d", skonfig->version);
-	    }
-	    else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
-	      if(skonfig->author)
-		strlcat(buf2, skonfig->author, sizeof(buf2));
-	    }
-	    else if(!strncmp("SKIN_PATH", var, strlen(var))) {
-	      if(skonfig->path)
-		strlcat(buf2, skonfig->path, sizeof(buf2));
-	    }
-	    else if(!strncmp("SKIN_NAME", var, strlen(var))) {
-	      if(skonfig->name)
-		strlcat(buf2, skonfig->name, sizeof(buf2));
-	    }
-	    else if(!strncmp("SKIN_DATE", var, strlen(var))) {
-	      if(skonfig->date)
-		strlcat(buf2, skonfig->date, sizeof(buf2));
-	    }
-	    else if(!strncmp("SKIN_URL", var, strlen(var))) {
-	      if(skonfig->url)
-		strlcat(buf2, skonfig->url, sizeof(buf2));
-	    }
-	    else if(!strncmp("HOME", var, strlen(var))) {
-	      if(skonfig->url)
-		strlcat(buf2, xitk_get_homedir(), sizeof(buf2));
-	    }
-	    /* else ignore */
+	    free(ppath);
 	  }
-	  break;
-	  
-	default:
-	  {
-	    const size_t buf2_len = strlen(buf2);
-	    buf2[buf2_len + 1] = 0;
-	    buf2[buf2_len] = *p;
-	  }
-	  break;
 	}
-	p++;
+	else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
+	  if(skonfig->version >= 0)
+	    snprintf(buf2+strlen(buf2), sizeof(buf2)-strlen(buf2), "%d", skonfig->version);
+	}
+	else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
+	  if(skonfig->author)
+	    strlcat(buf2, skonfig->author, sizeof(buf2));
+	}
+	else if(!strncmp("SKIN_PATH", var, strlen(var))) {
+	  if(skonfig->path)
+	    strlcat(buf2, skonfig->path, sizeof(buf2));
+	}
+	else if(!strncmp("SKIN_NAME", var, strlen(var))) {
+	  if(skonfig->name)
+	    strlcat(buf2, skonfig->name, sizeof(buf2));
+	}
+	else if(!strncmp("SKIN_DATE", var, strlen(var))) {
+	  if(skonfig->date)
+	    strlcat(buf2, skonfig->date, sizeof(buf2));
+	}
+	else if(!strncmp("SKIN_URL", var, strlen(var))) {
+	  if(skonfig->url)
+	    strlcat(buf2, skonfig->url, sizeof(buf2));
+	}
+	else if(!strncmp("HOME", var, strlen(var))) {
+	  if(skonfig->url)
+	    strlcat(buf2, xitk_get_homedir(), sizeof(buf2));
+	}
+	/* else ignore */
       }
+      break;
+	  
+    default:
+      {
+	const size_t buf2_len = strlen(buf2);
+	buf2[buf2_len + 1] = 0;
+	buf2[buf2_len] = *p;
+      }
+      break;
     }
+    p++;
   }
 
   return buf2;
