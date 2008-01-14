@@ -154,13 +154,15 @@ static void get_available_skins_from(char *path) {
  * Grab all available skins from $HOME/.xine/skins and XINE_SKINDIR locations.
  */
 static void looking_for_available_skins(void) {
-  char    buf[XITK_PATH_MAX + 1];
+  char    *buf;
 
   skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
-  snprintf(buf, sizeof(buf), "%s%s", xine_get_homedir(), "/.xine/skins");
+  asprintf(&buf, "%s%s", xine_get_homedir(), "/.xine/skins");
   
   get_available_skins_from(buf);
+  free(buf);
+
   get_available_skins_from(XINE_SKINDIR);
   
 }
