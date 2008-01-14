@@ -377,19 +377,24 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
  * XCreateFontSet requires font name starting with '-'
  */
 static char *xitk_font_right_name(char *name) {
-  char right_name[XITK_FONT_LENGTH_NAME];
+  char *right_name;
 
   ABORT_IF_NULL(name);
 
-  if(name[0] == '-') 
-    return strdup(name);
+  right_name = strdup(name);
 
-  right_name[0] = (name[0] == '*') ? '-' : '*';
+  switch(right_name[0]) {
+  case '-':
+    break;
+  case '*':
+    right_name[0] = '-';
+    break;
+  default:
+    right_name[0] = '*';
+    break;
+  }
 
-  right_name[XITK_FONT_LENGTH_NAME - 1] = 0;
-  strncpy(right_name + 1, name, XITK_FONT_LENGTH_NAME - 2);
-
-  return strdup(right_name);
+  return right_name;
 }
 #endif
 
