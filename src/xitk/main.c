@@ -479,27 +479,26 @@ static void print_formatted(char *title, const char *const *plugins) {
   printf("%s.\n\n", buffer);
 }
 static void list_plugins(char *type) {
-  typedef struct {
-    const char *const *(*func)(xine_t *);
-    char                *name;
-    char                *type;
-  } _list_plugin_t;
   const char   *const  *plugins;
   xine_t               *xine;
   char                 *cfgdir     = CONFIGDIR;
   char                 *cfgfile    = CONFIGFILE;
   char                 *configfile = NULL;
   int                   i;
-  _list_plugin_t        list_functions[] = {
-    { xine_list_audio_output_plugins,  _("   -Audio output:\n"),    "audio_out"     },
-    { xine_list_video_output_plugins,  _("   -Video output:\n"),    "video_out"     },
-    { xine_list_demuxer_plugins,       _("   -Demuxer:\n"),         "demux"         },
-    { xine_list_input_plugins,         _("   -Input:\n"),           "input"         },
-    { xine_list_spu_plugins,           _("   -Subpicture:\n"),      "sub"           },
-    { xine_list_post_plugins,          _("   -Post processing:\n"), "post"          },
-    { xine_list_audio_decoder_plugins, _("   -Audio decoder:\n"),   "audio_decoder" },
-    { xine_list_video_decoder_plugins, _("   -Video decoder:\n"),   "video_decoder" },
-    { NULL,                            NULL,                        NULL            }
+  static const struct {
+    const char *const *(*func)(xine_t *);
+    char                name[24];
+    char                type[16];
+  } list_functions[] = {
+    { xine_list_audio_output_plugins,  N_("   -Audio output:\n"),    "audio_out"     },
+    { xine_list_video_output_plugins,  N_("   -Video output:\n"),    "video_out"     },
+    { xine_list_demuxer_plugins,       N_("   -Demuxer:\n"),         "demux"         },
+    { xine_list_input_plugins,         N_("   -Input:\n"),           "input"         },
+    { xine_list_spu_plugins,           N_("   -Subpicture:\n"),      "sub"           },
+    { xine_list_post_plugins,          N_("   -Post processing:\n"), "post"          },
+    { xine_list_audio_decoder_plugins, N_("   -Audio decoder:\n"),   "audio_decoder" },
+    { xine_list_video_decoder_plugins, N_("   -Video decoder:\n"),   "video_decoder" },
+    { NULL,                            "",                           ""              }
   };
     
   configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
@@ -519,12 +518,12 @@ static void list_plugins(char *type) {
   if(type && strlen(type)) {
     i = 0;
     
-    while(list_functions[i].name) {
+    while(list_functions[i].func) {
       
       if(!strncasecmp(type, list_functions[i].type, strlen(type))) {
 	if((plugins = list_functions[i].func(xine))) {
 	  printf(_("\n Available xine's plugins:\n"));
-	  print_formatted(list_functions[i].name, plugins);
+	  print_formatted(gettext(list_functions[i].name), plugins);
 	  goto __found;
 	}
       }
@@ -540,10 +539,10 @@ static void list_plugins(char *type) {
     
     i = 0;
     
-    while(list_functions[i].name) {
+    while(list_functions[i].func) {
 
       if((plugins = list_functions[i].func(xine)))
-	print_formatted(list_functions[i].name, plugins);
+	print_formatted(gettext(list_functions[i].name), plugins);
       
       i++;
     }
