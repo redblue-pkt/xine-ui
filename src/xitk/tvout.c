@@ -52,15 +52,15 @@ static tvout_t *nvtv_backend(Display *);
 #endif
 static tvout_t *ati_backend(Display *);
 
-static struct {
-  char            *name;
-  backend_init_t   init;
+static const struct {
+  char            name[8];
+  backend_init_t  init;
 } backends[] = {
 #ifdef HAVE_NVTVSIMPLE
   { "nvtv", nvtv_backend },
 #endif
   { "ati",  ati_backend  },
-  { NULL,   NULL         }
+  { "",     NULL         }
 };
 
 
@@ -290,7 +290,7 @@ tvout_t *tvout_init(Display *display, char *backend) {
     printf("Looking for %s tvout backend\n", backend);
 #endif
     
-    for(i = 0; backends[i].name; i++) {
+    for(i = 0; backends[i].init; i++) {
       if(!strcasecmp(backends[i].name, backend)) {
 	tvout_t *tvout = backends[i].init(display);
 	
@@ -346,7 +346,7 @@ char **tvout_get_backend_names(void) {
   static char *bckends[(sizeof(backends) / sizeof(backends[0]))];
   int i = 0;
   
-  while(backends[i].name) {
+  while(backends[i].init) {
     bckends[i] = backends[i].name;
     i++;
   }
