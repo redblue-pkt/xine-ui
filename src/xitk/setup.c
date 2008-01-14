@@ -962,9 +962,7 @@ static void setup_sections (void) {
       }
 
       if (!found) {
-        setup->sections[setup->num_sections] = xine_xmalloc (len + 1);
-	strncpy (setup->sections[setup->num_sections], entry.key, len);
-	setup->sections[setup->num_sections][len] = 0;
+        setup->sections[setup->num_sections] = strndup(entry.key, len);
 	setup->num_sections++;
       }
     }      
