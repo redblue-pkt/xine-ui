@@ -108,8 +108,8 @@ static void set_label(xitk_widget_t *w, char *label) {
   xitk_label_change_label(w, label);
 }
 
-static char *get_yesno_string(uint32_t val) {
-  static char *yesno[] =  { "No", "Yes" };
+static const char *get_yesno_string(uint32_t val) {
+  static const char yesno[][4] =  { "No", "Yes" };
 
   return ((val > 0) ? yesno[1] : yesno[0]);
 }
