@@ -51,7 +51,8 @@ struct list_s {
   node_t    *first, *last, *cur;
 
 #ifdef DEBUG
-  char tag[256];
+#define TAG_SIZE 256
+  char tag[TAG_SIZE];
 #endif
 };
 
@@ -63,12 +64,12 @@ struct list_s {
 #ifdef DEBUG
 list_t *_list_new_tagged(char *file, int line) {
 
-  char tag[256];
+  char tag[TAG_SIZE];
   list_t *list;
 
-  snprintf(tag, 255, "list @ %s:%i", file, line);
+  snprintf(tag, TAG_SIZE, "list @ %s:%i", file, line);
   list = ho_new_tagged(list_t, tag);
-  strlcpy(list->tag, tag, sizeof(tag));
+  strcpy(list->tag, tag);
 
   list->first=NULL;
   list->last =NULL;
@@ -195,9 +196,9 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
   node_t *node;
   
 #ifdef DEBUG
-  char tag[256];
+  char tag[TAG_SIZE];
 
-  snprintf(tag, 255, "pri node in %s", l->tag);
+  snprintf(tag, TAG_SIZE, "pri node in %s", l->tag);
   node = ho_new_tagged(node_t, tag);
 #else
   node = ho_new(node_t);
@@ -248,9 +249,9 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
 #ifdef DEBUG
 void _list_append_content(list_t *l, void *content, char *file, int line) {
   node_t *node;
-  char tag[256];
+  char tag[TAG_SIZE];
 
-  snprintf(tag, 255, "app node @ %s:%i", file, line);
+  snprintf(tag, TAG_SIZE, "app node @ %s:%i", file, line);
   node = ho_new_tagged(node_t, tag);
 
 #else
@@ -278,9 +279,9 @@ void list_insert_content (list_t *l, void *content) {
   node_t *nodecur, *nodenew, *nodeprev;
   
 #ifdef DEBUG
-  char tag[256];
+  char tag[TAG_SIZE];
 
-  snprintf(tag, 255, "ins node in %s", l->tag);
+  snprintf(tag, TAG_SIZE, "ins node in %s", l->tag);
   nodenew = ho_new_tagged(node_t, tag);
 #else
   nodenew = ho_new(node_t);
