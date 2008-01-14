@@ -675,7 +675,7 @@ static void session_update_prompt(session_t *session) {
   if(session->socket >= 0)
     snprintf(session->prompt, sizeof(session->prompt), "[%s:%s]"PROGNAME" >", session->host, session->port, PROGNAME);
   else
-    strncpy(session->prompt, "[******:****]"PROGNAME" >", sizeof(session->prompt));
+    strlcpy(session->prompt, "[******:****]"PROGNAME" >", sizeof(session->prompt));
 }
 
 static void session_create_commands(session_t *session) {
@@ -802,7 +802,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
   }
   
   if(cmd) {
-    strncpy(buf, cmd, sizeof(buf)-1);
+    strlcpy(buf, cmd, sizeof(buf));
     pbuf = buf;
     if((p = strchr(pbuf, ' ')) != NULL) {
       host = _atoa(p);
@@ -820,10 +820,10 @@ static void client_open(session_t *session, session_commands_t *command, const c
     
     if(host != NULL) {
       
-      strncpy(session->host, host, sizeof(session->host)-1);
+      strlcpy(session->host, host, sizeof(session->host));
       
       if(port != NULL) 
-	strncpy(session->port, port, sizeof(session->port)-1);
+	strlcpy(session->port, port, sizeof(session->port));
       
       session_create_commands(session);
       session->socket = sock_client(session->host, session->port, "tcp");
@@ -1032,7 +1032,7 @@ static void client_handle_command(session_t *session, const char *command) {
     return;
   
   /* Get only first arg of command */
-  strncpy(cmd, command, sizeof(cmd)-1);
+  strlcpy(cmd, command, sizeof(cmd));
   if((p = strchr(cmd, ' ')) != NULL)
     *p = '\0';
   
@@ -1205,13 +1205,13 @@ int main(int argc, char **argv) {
       
     case 'H': /* Set host */
       if(optarg != NULL)
-	strncpy(session.host, optarg, sizeof(session.host)-1);
+	strlcpy(session.host, optarg, sizeof(session.host));
       break;
       
     case 'P': /* Set port */
       if(optarg != NULL) {
 	port_set = 1;
-	strncpy(session.port, optarg, sizeof(session.port)-1);
+	strlcpy(session.port, optarg, sizeof(session.port));
       }
       break;
 
@@ -1430,7 +1430,7 @@ static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
   char buf[_BUFSIZ];
   char *n, *p;
   
-  strncpy(buf, entry, sizeof(buf)-1);
+  strlcpy(buf, entry, sizeof(buf));
   n = buf;
   if((p = strrchr(buf, ':')) != NULL) {
     if(strlen(p) > 1) {
@@ -1444,8 +1444,8 @@ static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
   }
   
   if((n != NULL) && (p != NULL)) {
-    strncpy(name, n, MAX_NAME_LEN-1);
-    strncpy(passwd, p, MAX_PASSWD_LEN-1);
+    strlcpy(name, n, MAX_NAME_LEN);
+    strlcpy(passwd, p, MAX_PASSWD_LEN);
     return 1;
   }
 
@@ -1796,7 +1796,7 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
       char *name;
       char *passwd;
       
-      strncpy(buf, get_arg(client_info, 1), sizeof(buf)-1);
+      strlcpy(buf, get_arg(client_info, 1), sizeof(buf));
       name = buf;
       if((passwd = strrchr(buf, ':')) != NULL) {
 	if(strlen(passwd) > 1) {
@@ -1812,8 +1812,8 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
 	memset(&client_info->name, 0, sizeof(client_info->name));
 	memset(&client_info->passwd, 0, sizeof(client_info->passwd));
 
-	strncpy(client_info->name, name, sizeof(client_info->name)-1);
-	strncpy(client_info->passwd, passwd, sizeof(client_info->passwd)-1);
+	strlcpy(client_info->name, name, sizeof(client_info->name));
+	strlcpy(client_info->passwd, passwd, sizeof(client_info->passwd));
 
 	check_client_auth(client_info);
       }
@@ -2713,7 +2713,7 @@ static void parse_command(client_info_t *client_info) {
 						    strlen(client_info->command.line) - strlen(cmd) + 1);
 
     memset(client_info->command.command, 0, sizeof(client_info->command.command));
-    strncpy(client_info->command.command, client_info->command.line,
+    strlcpy(client_info->command.command, client_info->command.line,
 	    (strlen(client_info->command.line) - strlen(cmd)));
 
     cmd = _atoa(cmd);
@@ -3041,13 +3041,11 @@ const char *get_homedir(void) {
 #endif
     char *tmp = getenv("HOME");
     if(tmp) {
-      strncpy(homedir, tmp, sizeof(homedir));
-      homedir[sizeof(homedir) - 1] = '\0';
+      strlcpy(homedir, tmp, sizeof(homedir));
     }
   } else {
     char *s = strdup(pw->pw_dir);
-    strncpy(homedir, s, sizeof(homedir));
-    homedir[sizeof(homedir) - 1] = '\0';
+    strlcpy(homedir, s, sizeof(homedir));
     free(s);
   }
 

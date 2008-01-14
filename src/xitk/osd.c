@@ -332,7 +332,7 @@ void osd_stream_infos(void) {
 
     y = x = 0;
 
-    strncpy(buffer, (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident, sizeof(buffer)-1);
+    strlcpy(buffer, (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident, sizeof(buffer));
     xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {
@@ -364,7 +364,7 @@ void osd_stream_infos(void) {
       y += h;
     }
     
-    strncpy(buffer, _("Audio: "), sizeof(buffer));
+    strlcpy(buffer, _("Audio: "), sizeof(buffer));
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
@@ -633,7 +633,7 @@ void osd_update_status(void) {
     switch(status) {
     case XINE_STATUS_IDLE:
     case XINE_STATUS_STOP:
-      strncpy(buffer, _osd_get_status_sym(status), sizeof(buffer)-1);
+      strlcpy(buffer, _osd_get_status_sym(status), sizeof(buffer));
       break;
       
     case XINE_STATUS_PLAY:
@@ -648,7 +648,7 @@ void osd_update_status(void) {
 		   secs / (60*60), (secs / 60) % 60, secs % 60);
 	}
 	else
-	  strncpy(buffer, _osd_get_speed_sym(speed), sizeof(buffer)-1);
+	  strlcpy(buffer, _osd_get_speed_sym(speed), sizeof(buffer));
 	
       }
       break;

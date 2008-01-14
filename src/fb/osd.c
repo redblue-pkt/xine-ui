@@ -385,7 +385,7 @@ void osd_stream_infos(void) {
       y += h;
     }
     
-    strncpy(buffer, "Audio: ", sizeof(buffer)-1);
+    strlcpy(buffer, "Audio: ", sizeof(buffer));
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:

@@ -68,7 +68,7 @@ list_t *_list_new_tagged(char *file, int line) {
 
   snprintf(tag, 255, "list @ %s:%i", file, line);
   list = ho_new_tagged(list_t, tag);
-  strncpy(list->tag, tag, 255);
+  strlcpy(list->tag, tag, sizeof(tag));
 
   list->first=NULL;
   list->last =NULL;

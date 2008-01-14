@@ -616,7 +616,7 @@ static void _pplugin_set_param_char(xitk_widget_t *w, void *data, char *text) {
   if(pobj->param->type == POST_PARAM_TYPE_CHAR) {
     int maxlen = pobj->param->size / sizeof(char);
     
-    strncpy((char *)(pobj->param_data + pobj->param->offset), text, maxlen);
+    strlcpy((char *)(pobj->param_data + pobj->param->offset), text, maxlen);
     _pplugin_update_parameter(pobj);
     xitk_inputtext_change_text(pobj->value, (char *)(pobj->param_data + pobj->param->offset));
   }
@@ -2241,7 +2241,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 			if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
 			  int maxlen = pobj.param->size / sizeof(char);
 			  
-			  strncpy((char *)(pobj.param_data + pobj.param->offset), p, maxlen);
+			  strlcpy((char *)(pobj.param_data + pobj.param->offset), p, maxlen);
 			  _pplugin_update_parameter(&pobj);
 			}
 			else

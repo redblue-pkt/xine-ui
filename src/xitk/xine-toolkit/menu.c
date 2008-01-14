@@ -28,6 +28,8 @@
 
 #include "_xitk.h"
 
+#include "utils.h"
+
 #undef DEBUG_MENU
 #undef DUMP_MENU
 
@@ -615,7 +617,7 @@ void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
       menu_node_t         *branch = NULL;
       int                  in_trunk = 1;
 
-      strncpy(buffer, me->menu, sizeof(buffer)-1);
+      strlcpy(buffer, me->menu, sizeof(buffer));
       
       o = c = new_entry = buffer;
 

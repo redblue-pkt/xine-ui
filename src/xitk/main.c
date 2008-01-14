@@ -1125,60 +1125,60 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
         /* (host name) */
       case XINE_MSG_UNKNOWN_HOST:
-	strncpy(buffer, _("The host you're trying to connect is unknown.\n"
-			  "Check the validity of the specified hostname."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The host you're trying to connect is unknown.\n"
+			  "Check the validity of the specified hostname."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 	
 	/* (device name) */
       case XINE_MSG_UNKNOWN_DEVICE:
-	strncpy(buffer, _("The device name you specified seems invalid."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The device name you specified seems invalid."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 
 	/* none */
       case XINE_MSG_NETWORK_UNREACHABLE:
-	strncpy(buffer, _("The network looks unreachable.\nCheck your network "
-			  "setup and/or the server name."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The network looks unreachable.\nCheck your network "
+			  "setup and/or the server name."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 
 	/* (host name) */
       case XINE_MSG_CONNECTION_REFUSED:
-	strncpy(buffer, _("The connection was refused.\nCheck the host name."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The connection was refused.\nCheck the host name."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 
 	/* (file name or mrl) */
       case XINE_MSG_FILE_NOT_FOUND:
-	strncpy(buffer, _("The specified file or MRL could not be found. Please check it twice."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The specified file or MRL could not be found. Please check it twice."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 
 	/* (device/file/mrl) */
       case XINE_MSG_READ_ERROR:
-	strncpy(buffer, _("The source can't be read.\nMaybe you don't have enough "
+	strlcpy(buffer, _("The source can't be read.\nMaybe you don't have enough "
 			  "rights for this, or source doesn't contain data "
-			  "(e.g: not disc in drive)."), sizeof(buffer)-1);
+			  "(e.g: not disc in drive)."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
 	
 	/* (library/decoder) */
       case XINE_MSG_LIBRARY_LOAD_ERROR:
-	strncpy(buffer, _("A problem occurred while loading a library or a decoder"), sizeof(buffer)-1);
+	strlcpy(buffer, _("A problem occurred while loading a library or a decoder"), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), ": %s", (char *) data + data->parameters);
 	break;
 
 	/* none */
       case XINE_MSG_ENCRYPTED_SOURCE:
-	strncpy(buffer, _("The source seems encrypted, and can't be read."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The source seems encrypted, and can't be read."), sizeof(buffer));
 	if(!strncasecmp(gGui->mmk.mrl, "dvd:/", 5)) {
 	  strlcat(buffer, _("\nYour DVD is probably crypted. "
 			   "According to your country laws, you can or can't "
@@ -1195,17 +1195,17 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	if(data->explanation)
 	  snprintf(buffer, sizeof(buffer), "%s %s", (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  strncpy(buffer, _("No information available."), sizeof(buffer)-1);
+	  strlcpy(buffer, _("No information available."), sizeof(buffer));
 	break;
 
       case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
 	gui_stop(NULL, NULL);
-	strncpy(buffer, _("The audio device is unavailable. "
-			  "Please verify if another program already uses it."), sizeof(buffer)-1);
+	strlcpy(buffer, _("The audio device is unavailable. "
+			  "Please verify if another program already uses it."), sizeof(buffer));
 	break;
 
       default:
-	strncpy(buffer, _("*sight*, unkown error."), sizeof(buffer)-1);
+	strlcpy(buffer, _("*sight*, unkown error."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s %s)", (char *) data + data->explanation, (char *) data + data->parameters);
 	break;
@@ -2045,7 +2045,7 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_entry;
     
     if(xine_config_lookup_entry(gGui->xine, "media.files.origin_path", &cfg_entry))
-      strncpy(gGui->curdir, cfg_entry.str_value, sizeof(gGui->curdir)-1);
+      strlcpy(gGui->curdir, cfg_entry.str_value, sizeof(gGui->curdir));
     else
       getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
   }

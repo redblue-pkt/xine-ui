@@ -853,7 +853,7 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	
 	len = (mrl - cur_mrl) + 3;
 	tok = (char *) alloca(len);
-	strncpy(tok, cur_mrl, len-1);
+	strlcpy(tok, cur_mrl, len);
       }
 
       if(tok != NULL) {
@@ -1388,7 +1388,7 @@ static void *_gui_dndcallback(void *data) {
 	  
 	  /* file don't exist, add it anyway */
 	  if((stat(buffer2, &pstat)) == -1)
-	    strncpy(buffer, mrl, sizeof(buffer)-1);
+	    strlcpy(buffer, mrl, sizeof(buffer));
 	  else {
 	    if(is_a_dir(buffer2)) {
 	      
@@ -1411,7 +1411,7 @@ static void *_gui_dndcallback(void *data) {
       }
     }
     else
-      strncpy(buffer, mrl, sizeof(buffer)-1);
+      strlcpy(buffer, mrl, sizeof(buffer));
     
     if(is_a_dir(buffer)) {
       if(buffer[strlen(buffer) - 1] == '/')
@@ -2069,7 +2069,7 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
 
   if(fb == load_stream) {
     if(cur_dir && strlen(cur_dir)) {
-      strncpy(gGui->curdir, cur_dir, sizeof(gGui->curdir)-1);
+      strlcpy(gGui->curdir, cur_dir, sizeof(gGui->curdir));
       config_update_string("media.files.origin_path", gGui->curdir);
     }
     load_stream = NULL;
@@ -2087,7 +2087,7 @@ static void fileselector_callback(filebrowser_t *fb) {
   
   /* Upate configuration with the selected directory path */
   if(cur_dir && strlen(cur_dir)) {
-    strncpy(gGui->curdir, cur_dir, sizeof(gGui->curdir)-1);
+    strlcpy(gGui->curdir, cur_dir, sizeof(gGui->curdir));
     config_update_string("media.files.origin_path", gGui->curdir);
   }
   
@@ -2139,7 +2139,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   
   /* Update the configuration with the current path */
   if(path && strlen(path)) {
-    strncpy(gGui->curdir, path, sizeof(gGui->curdir)-1);
+    strlcpy(gGui->curdir, path, sizeof(gGui->curdir));
     config_update_string("media.files.origin_path", gGui->curdir);
   }
   
@@ -2157,7 +2157,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       if(strcasecmp(path, "/"))
         snprintf(pathname, sizeof(pathname), "%s/", path);
       else
-	strncpy(pathname, path, sizeof(pathname)-1);
+	strlcpy(pathname, path, sizeof(pathname));
       
       /* For each file, concatenate the path with the name and append it to the playlist */
       while(files[i]) {

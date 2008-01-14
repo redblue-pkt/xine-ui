@@ -552,7 +552,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  entry = ln;
 
 		  if(origin) {
-		    strncpy(buffer1, origin, sizeof(buffer1)-1);
+		    strlcpy(buffer1, origin, sizeof(buffer1));
 		    
 		    if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
 		      buffer1[strlen(buffer1) - 1] = '\0';
@@ -671,7 +671,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 			entry = ln;
 			
 			if(origin) {
-			  strncpy(buffer1, origin, sizeof(buffer1)-1);
+			  strlcpy(buffer1, origin, sizeof(buffer1));
 			  
 			  if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
 			    buffer1[strlen(buffer1) - 1] = '\0';
@@ -763,7 +763,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		entry = ln;
 
 		if(origin) {
-		  strncpy(buffer1, origin, sizeof(buffer1)-1);
+		  strlcpy(buffer1, origin, sizeof(buffer1));
 		  
 		  if((buffer1[strlen(buffer1) - 1] == '/') && (*ln == '/'))
 		    buffer1[strlen(buffer1) - 1] = '\0';
@@ -2558,7 +2558,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
       if(!strncasecmp(_mrl, "file:", 5))
 	_mrl += 5;
       
-      strncpy(autosub, _mrl, sizeof(autosub)-1);
+      strlcpy(autosub, _mrl, sizeof(autosub));
       
       if((ending = strrchr(autosub, '.')))
 	ending++;
@@ -3172,7 +3172,7 @@ static void mmkeditor_ok(xitk_widget_t *w, void *data) {
 static void mmk_fileselector_callback(filebrowser_t *fb) {
   char *file;
 
-  strncpy(gGui->curdir, filebrowser_get_current_dir(fb), sizeof(gGui->curdir)-1);
+  strlcpy(gGui->curdir, filebrowser_get_current_dir(fb), sizeof(gGui->curdir));
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file)

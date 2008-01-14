@@ -31,6 +31,8 @@
 
 #include "_xitk.h"
 
+#include "utils.h"
+
 int xitk_x_error = 0;
 
 /*
@@ -1400,7 +1402,7 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
       }
       if(titlelen > (sizeof(buf) - dotslen - 1)) /* Should never happen, */
 	titlelen = (sizeof(buf) - dotslen - 1);  /* just to be sure ...  */
-      strncpy(buf, title, titlelen), buf[titlelen] = '\0';
+      strlcpy(buf, title, titlelen);
       strcat(buf, dots);
       titlelen += dotslen;
       titlebuf = buf;

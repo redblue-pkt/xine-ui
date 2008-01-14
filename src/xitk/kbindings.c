@@ -1451,7 +1451,7 @@ static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
         keySym = XKeysymToString(mkey);
         XUnlockDisplay (event->xany.display);
         if (keySym != NULL) {
-          strncpy(buf, keySym, size);
+          strlcpy(buf, keySym, size);
           return 0;
         }
       case 0: /* Key without assigned KeySymbol */
@@ -1566,7 +1566,7 @@ static void kbedit_create_browser_entries(void) {
     if(kbedit->kbt->entry[i]->is_alias)
       snprintf(buf, sizeof(buf), "@{%s}", kbedit->kbt->entry[i]->comment);
     else
-      strncpy(buf, kbedit->kbt->entry[i]->comment, sizeof(buf)-1);
+      strlcpy(buf, kbedit->kbt->entry[i]->comment, sizeof(buf));
     
     kbedit->entries[i]   = strdup(buf);
     kbedit->shortcuts[i] = strdup(shortcut);
