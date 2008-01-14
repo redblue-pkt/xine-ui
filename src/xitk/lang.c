@@ -280,12 +280,10 @@ static const langs_t _langs[] = {
 };
   
 /* ISO 639-1 */
-typedef struct {
-  const char   *two_letters;
-  const char   *language;
-} iso639_1_t;
-
-static const iso639_1_t iso639_1[] = {
+static const struct {
+  char   two_letters[4];
+  char   language[28];
+} iso639_1[] = {
   { "ab", "Abkhazian"                },
   { "aa", "Afar"                     },
   { "af", "Afrikaans"                },
@@ -471,7 +469,7 @@ static const iso639_1_t iso639_1[] = {
   { "yo", "Yoruba"		     },
   { "za", "Zhuang"		     },
   { "zu", "Zulu"		     },
-  { NULL, NULL			     }
+  { "",   ""			     }
 };
 
 /*
@@ -488,7 +486,7 @@ const char *get_language_from_iso639_1(char *two_letters) {
     if(tl && (strlen(tl) == 2)) {
       int   i;
       
-      for(i = 0; iso639_1[i].two_letters; i++) {
+      for(i = 0; *(iso639_1[i].two_letters); i++) {
 	if(!strcmp(iso639_1[i].two_letters, tl))
 	  return iso639_1[i].language;
       }
