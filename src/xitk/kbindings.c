@@ -591,7 +591,7 @@ static void _kbindings_subst_percent(char *src, char *dest) {
     *d = '\0';
   }
   else
-    strncpy(dest, src, strlen(src));
+    strcpy(dest, src);
 }
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
   int            i, j, found = 0;
