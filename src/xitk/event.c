@@ -1159,8 +1159,7 @@ void gui_execute_action_id(action_id_t action) {
       ev_data.id = -1;
 
       /* name of the show, max 255 is hardcoded in xine.h */
-      strncpy(ev_data.name, gGui->alphanum.arg, 255);
-      ev_data.name[254] = '\0';
+      strlcpy(ev_data.name, gGui->alphanum.arg, sizeof(ev_data.name));
 
       /* send event */
       xine_event.type = XINE_EVENT_PVR_SAVE;
