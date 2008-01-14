@@ -72,11 +72,6 @@ typedef struct {
 static _tvset_t    *tvset = NULL;
 
 
-struct _std_list {
-    const char     *name;
-    uint64_t        std;
-};
-
 typedef uint64_t v4l2_std_id;
 
 /* one bit for each */
@@ -109,8 +104,10 @@ typedef uint64_t v4l2_std_id;
 #define V4L2_STD_ATSC_8_VSB     ((v4l2_std_id)0x01000000)
 #define V4L2_STD_ATSC_16_VSB    ((v4l2_std_id)0x02000000)
 
-
-static const struct _std_list std_list[] = {
+static const struct {
+    const char     *name;
+    uint64_t        std;
+} std_list[] = {
   { "PAL-B",       V4L2_STD_PAL_B       },
   { "PAL-B1",      V4L2_STD_PAL_B1      },
   { "PAL-G",       V4L2_STD_PAL_G       },
