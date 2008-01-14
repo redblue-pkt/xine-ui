@@ -355,16 +355,18 @@ void stream_infos_end(void) {
 }
 
 static void stream_info_update_undefined(void) {
-  set_label(sinfos.meta_infos.title, _("Unavailable"));
-  set_label(sinfos.meta_infos.comment, _("Unavailable"));
-  set_label(sinfos.meta_infos.artist, _("Unavailable"));
-  set_label(sinfos.meta_infos.genre, _("Unavailable"));
-  set_label(sinfos.meta_infos.album, _("Unavailable"));
+  const char *const unavail = _("Unavailable");
+
+  set_label(sinfos.meta_infos.title, unavail);
+  set_label(sinfos.meta_infos.comment, unavail);
+  set_label(sinfos.meta_infos.artist, unavail);
+  set_label(sinfos.meta_infos.genre, unavail);
+  set_label(sinfos.meta_infos.album, unavail);
   set_label(sinfos.meta_infos.year, "19__");
-  set_label(sinfos.meta_infos.videocodec, _("Unavailable"));
-  set_label(sinfos.meta_infos.audiocodec, _("Unavailable"));
-  set_label(sinfos.meta_infos.systemlayer, _("Unavailable"));
-  set_label(sinfos.meta_infos.input_plugin, _("Unavailable"));
+  set_label(sinfos.meta_infos.videocodec, unavail);
+  set_label(sinfos.meta_infos.audiocodec, unavail);
+  set_label(sinfos.meta_infos.systemlayer, unavail);
+  set_label(sinfos.meta_infos.input_plugin, unavail);
   /* */
   set_label(sinfos.infos.bitrate, "---");
   set_label(sinfos.infos.seekable, "---");
