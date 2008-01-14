@@ -236,8 +236,8 @@
 /* Global definition */
 static const langs_t _langs[] = {
   /* English section */
-  { "C",                ENGLISH,            "en",    NULL         }, /* WARNING: This should be the first entry */
-  { "POSIX",            ENGLISH,            "en",    NULL         },
+  { "C",                ENGLISH,            "en",    ""           }, /* WARNING: This should be the first entry */
+  { "POSIX",            ENGLISH,            "en",    ""           },
   { "en_GB",            ENGLISH,            "en",    "ISO-8859-1" },
 
   /* French section */
@@ -276,7 +276,7 @@ static const langs_t _langs[] = {
   { "nb_NO.ISO-8859-1", NORWEGIAN_BOKMAL,   "nb",    "ISO-8859-1" },
 
   /* The ultimate solution */
-  { NULL,               ENGLISH,            "en",    "ISO-8859-1" }
+  { "",                 ENGLISH,            "en",    "ISO-8859-1" }
 };
   
 /* ISO 639-1 */
