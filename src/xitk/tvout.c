@@ -75,13 +75,14 @@ typedef struct {
   double                pa;
 } nvtv_private_t;
 
-static char *tv_systems[] = { "PAL", "NTSC", NULL };
 
 /* ===== NVTV ===== */
 static int nvtv_tvout_init(Display *display, void **data) {
   int             ret;
   
   if((ret = nvtv_simple_init())) {
+    static char *const tv_systems[] = { "PAL", "NTSC", NULL };
+
     nvtv_private_t *private = (nvtv_private_t *) xine_xmalloc(sizeof(nvtv_private_t));
 
     *data = private;
