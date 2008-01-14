@@ -673,7 +673,7 @@ static void session_update_prompt(session_t *session) {
     return;
 
   if(session->socket >= 0)
-    snprintf(session->prompt, sizeof(session->prompt), "[%s:%s]"PROGNAME" >", session->host, session->port, PROGNAME);
+    snprintf(session->prompt, sizeof(session->prompt), "[%s:%s]"PROGNAME" >", session->host, session->port);
   else
     strlcpy(session->prompt, "[******:****]"PROGNAME" >", sizeof(session->prompt));
 }
@@ -1197,7 +1197,7 @@ int main(int argc, char **argv) {
   session.socket = -1;
   pthread_mutex_init(&session.console_mutex, NULL);
   strcpy(session.host, DEFAULT_SERVER);
-  strcpy(session.prot, DEFAULT_XINECTL_PORT);
+  strcpy(session.port, DEFAULT_XINECTL_PORT);
 
   opterr = 0;
   while((c = getopt_long(argc, argv, short_options, long_options, &option_index)) != EOF) {
