@@ -52,11 +52,10 @@ static int             last_playback_speed = XINE_SPEED_NORMAL;
 
 void reparent_all_windows(void) {
   int                    i;
-  typedef struct {
+  static const struct {
     int                 (*visible)(void);
     void                (*reparent)(void);
-  } reparent_t;
-  reparent_t _reparent[] = {
+  } _reparent[] = {
     { panel_is_visible,         panel_reparent },
     { mrl_browser_is_visible,   mrl_browser_reparent },
     { playlist_is_visible,      playlist_reparent },
