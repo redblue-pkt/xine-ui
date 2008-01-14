@@ -102,7 +102,7 @@ static void stream_infos_update(xitk_widget_t *w, void *data) {
   stream_infos_update_infos();
 }
 
-static void set_label(xitk_widget_t *w, char *label) {
+static void set_label(xitk_widget_t *w, const char *label) {
   xitk_label_change_label(w, label);
 }
 
