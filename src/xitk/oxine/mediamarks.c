@@ -314,8 +314,8 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
     while ((entp = readdir(dirp))) {
 
       struct stat filestat;
-      char mrl[1024];
-      char title[256];
+      char *mrl;
+      char *title;
       int type = 0;
       
       if((!strcmp(entp->d_name, "."))||(!strcmp(entp->d_name, "..")))
@@ -325,22 +325,24 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
       if(entp->d_name[0] == '.')
         continue;
 #endif
-      
-      snprintf(mrl, 1023, "%s/%s", dir, entp->d_name);
+
+      asprintf(&mrl, "%s/%s", dir, entp->d_name);
       stat(mrl, &filestat);
-      if(S_ISDIR(filestat.st_mode)) {
-      type = TYPE_RDIR;
-      snprintf(title, 255, "[%s]", entp->d_name);	  
-      }else if (S_ISREG(filestat.st_mode)) {
-      strlcpy(title, entp->d_name, sizeof(title));
-      type = TYPE_RREG;
-      }
+
       if(file_is_m3u(mrl)) {
-      type = TYPE_M3U;
-      snprintf(title, 255, "[%s]", entp->d_name);
+        asprintf(&title, "[%s]", entp->d_name);
+	type = TYPE_M3U;
+      } else if(S_ISDIR(filestat.st_mode)) {
+        asprintf(&title, "[%s]", entp->d_name);	  
+	type = TYPE_RDIR;
+      } else if (S_ISREG(filestat.st_mode)) {
+	title = strdup(entp->d_name);
+	type = TYPE_RREG;
       }
 
-      item = playitem_new(type, title, mrl, list_new());
+      item = playitem_new(type, NULL, NULL, list_new());
+      item->mrl = mrl;
+      item->title = title;
 #if 0
       printf("mrl   : %s\n", item->mrl);
       printf("title : %s\n", item->title);
