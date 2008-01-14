@@ -111,14 +111,15 @@ static void skin_free_cache(xitk_skin_config_t *skonfig) {
 #warning FIXME
 static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   char *p;
-  char *ret = NULL;
-  char  buf[BUFSIZ], buf2[BUFSIZ], var[BUFSIZ];
+  char *buf2 = NULL;
+  char  buf[BUFSIZ], var[BUFSIZ];
   
   ABORT_IF_NULL(skonfig);
 
   if(cmd) {
 
     if(strchr(cmd, '$')) {
+      buf2 = calloc(BUFSIZ, sizeof(char));
 
       strlcpy(buf, cmd, sizeof(buf));
 
@@ -187,18 +188,19 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 	  break;
 	  
 	default:
-	  buf2[strlen(buf2) + 1] = 0;
-	  buf2[strlen(buf2)] = *p;
+	  {
+	    const size_t buf2_len = strlen(buf2);
+	    buf2[buf2_len + 1] = 0;
+	    buf2[buf2_len] = *p;
+	  }
 	  break;
 	}
 	p++;
       }
-
-      ret = strdup(buf2);
     }
   }
 
-  return ret;
+  return buf2;
 }
 
 /*
