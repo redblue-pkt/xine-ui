@@ -1012,8 +1012,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
   /* Mediamark */
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
     xitk_menu_entry_t   menu_entry;
-    char                buffer[2048];
-    char               *location = _("Playback");
 
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Playback/SEP");
@@ -1021,9 +1019,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_add_entry(w, &menu_entry);
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-    memset(&buffer, 0, sizeof(buffer));
-    
-    snprintf(buffer, sizeof(buffer), "%s/%s", location, _("Add Mediamark"));
+
+    asprintf(&menu_entry.menu, "%s/%s", _("Playback"), _("Add Mediamark"));
     menu_entry.menu      = buffer;
     menu_entry.shortcut  = menu_get_shortcut("AddMediamark");
     menu_entry.cb        = menu_playback_ctrl;
@@ -1031,6 +1028,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_add_entry(w, &menu_entry);
     
     free(menu_entry.shortcut);
+    free(menu_entry.menu);
   }
 
   xitk_menu_show_menu(w);
