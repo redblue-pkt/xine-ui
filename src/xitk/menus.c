@@ -981,31 +981,31 @@ void video_window_menu(xitk_widget_list_t *wl) {
   }
   
   { /* Menus access */
+    static const char menu_entries[14][16] = {
+      /* Default menu */
+      N_("Menu 1"), N_("Menu 2"), N_("Menu 3"), N_("Menu 4"),
+      N_("Menu 5"), N_("Menu 6"), N_("Menu 7"),
+
+      /* DVD menu */
+      N_("Menu toggle"), N_("Title"), N_("Root"), N_("Subpicture"), 
+      N_("Audio"), N_("Angle"), N_("Part"),
+    };
+
     xitk_menu_entry_t   menu_entry;
-    char                buffer[2048];
-    char               *location = _("Menus");
-    char               *default_menu[8] = {
-      _("Menu 1"), _("Menu 2"), _("Menu 3"), _("Menu 4"),
-      _("Menu 5"), _("Menu 6"), _("Menu 7"), NULL
-    };
-    char               *dvd_menu[8] = {
-      _("Menu toggle"), _("Title"), _("Root"), _("Subpicture"), 
-      _("Audio"), _("Angle"), _("Part"), NULL
-    };
-    char              **menu = default_menu;
-    int                 i;
+    int                 i, j;
+    const char *const menus_str = _("Menus");
     
     if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
-      menu = dvd_menu;
+      j = 7; /* Start from the DVD menu */
     
     for(i = 0; i < 7; i++) {
-      snprintf(buffer, sizeof(buffer), "%s/%s", location, menu[i]);
-      
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-      menu_entry.menu      = buffer;
+
+      asprintf(&menu_entry.menu, "%s/%s", menus_str, gettext(menu_entries[i]));
       menu_entry.cb        = menu_menus_selection;
       menu_entry.user_data = (void *)i;
       xitk_menu_add_entry(w, &menu_entry);
+      free(menu_entry.menu);
     }
   }
 
