@@ -79,7 +79,7 @@ static const unsigned char icon_datas[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-static const char *exp_levels[] = {
+static const char *const exp_levels[] = {
   "Beginner",
   "Advanced",
   "Expert",
@@ -92,20 +92,20 @@ static const char *exp_levels[] = {
   NULL
 };
 
-static const char *visual_anim_style[] = {
+static const char *const visual_anim_style[] = {
   "None",
   "Post Plugin",
   "Stream Animation",
   NULL
 };
 
-static const char *mixer_control_method[] = {
+static const char *const mixer_control_method[] = {
   "Sound card",
   "Software",
   NULL
 };
 
-static const char *shortcut_style[] = {
+static const char *const shortcut_style[] = {
   "Windows style",
   "Emacs style",
   NULL
