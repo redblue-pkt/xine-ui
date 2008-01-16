@@ -1294,8 +1294,7 @@ const struct CHANLISTS chanlists[] = {
     { "southafrica",      pal_bcast_za,      CHAN_COUNT(pal_bcast_za)      },
     { "argentina",        argentina,         CHAN_COUNT(argentina)         },
     { "canada-cable",     ntsc_cable_ca,     CHAN_COUNT(ntsc_cable_ca)     },
-    { "australia-optus",        pal_australia_optus,     CHAN_COUNT(pal_australia_optus)     },
-    { NULL, NULL, 0 } /* EOF */
+    { "australia-optus",  pal_australia_optus,     CHAN_COUNT(pal_australia_optus)     }
 };
 
 /* vim: ts=4 sw=4 noet
