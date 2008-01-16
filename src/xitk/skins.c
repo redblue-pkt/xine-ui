@@ -664,10 +664,8 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
  
  __failure:
   
-  if(download.buf)
-    free(download.buf);
-  if(download.error)
-    free(download.error);
+  free(download.buf);
+  free(download.error);
   
   return slxs;
 }
@@ -855,10 +853,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 
   download_set_cursor_state(NORMAL_CURS);
 
-  if(download.buf)
-    free(download.buf);
-  if(download.error)
-    free(download.error);
+  free(download.buf);
+  free(download.error);
 }
 
 static void download_skin_select(xitk_widget_t *w, void *data) {
@@ -981,10 +977,8 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
   download_set_cursor_state(NORMAL_CURS);
   
-  if(download.buf)
-    free(download.buf);
-  if(download.error)
-    free(download.error);
+  free(download.buf);
+  free(download.error);
   
   download_skin_exit(w, NULL);
 }

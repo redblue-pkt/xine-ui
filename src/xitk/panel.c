@@ -432,10 +432,8 @@ static void *slider_loop(void *dummy) {
 	  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
 	     gGui->playlist.mmk[gGui->playlist.cur]) {
 	    if(strcmp(gGui->mmk.ident, ident)) {
-	      if(gGui->mmk.ident)
-		free(gGui->mmk.ident);
-	      if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-		free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	      free(gGui->mmk.ident);
+	      free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	      
 	      gGui->mmk.ident = strdup(ident);
 	      gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);

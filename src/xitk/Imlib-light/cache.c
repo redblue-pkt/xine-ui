@@ -349,8 +349,7 @@ clean_caches(ImlibData * id)
 		  id->cache.image = ptr->next;
 		if (ptr->next)
 		  ptr->next->prev = ptr->prev;
-		if (ptr->file)
-		  free(ptr->file);
+		free(ptr->file);
 		last = ptr;
 		ptr = ptr->prev;
 		free(last);
@@ -401,8 +400,7 @@ clean_caches(ImlibData * id)
 		  id->cache.image = ptr->next;
 		if (ptr->next)
 		  ptr->next->prev = ptr->prev;
-		if (ptr->file)
-		  free(ptr->file);
+		free(ptr->file);
 		last = ptr;
 		ptr = ptr->prev;
 		free(last);
@@ -525,8 +523,7 @@ clean_caches(ImlibData * id)
 	      id->cache.pixmap = ptr->next;
 	    if (ptr->next)
 	      ptr->next->prev = ptr->prev;
-	    if (ptr->file)
-	      free(ptr->file);
+	    free(ptr->file);
 	    last = ptr;
 	    ptr = ptr->prev;
 	    free(last);
@@ -544,13 +541,9 @@ nullify_image(ImlibData * id, ImlibImage * im)
 {
   if (!im)
     return;
-  if (im->rgb_data)
-    free(im->rgb_data);
-  if (im->alpha_data)
-    free(im->alpha_data);
-  if (im->pixmap)
-    free_pixmappmap(id, im->pixmap);
-  if (im->filename)
-    free(im->filename);
+  free(im->rgb_data);
+  free(im->alpha_data);
+  free_pixmappmap(id, im->pixmap);
+  free(im->filename);
   free(im);
 }

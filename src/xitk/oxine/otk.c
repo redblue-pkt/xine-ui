@@ -790,7 +790,7 @@ static void button_destroy(otk_widget_t *this) {
   if (!is_correct_widget(this, OTK_WIDGET_BUTTON)) return;
 
   if(button->type == OTK_BUTTON_PIXMAP) 
-    if(button->pixmap) free(button->pixmap);
+    free(button->pixmap);
 
   remove_widget_from_win(this);
   if (this->otk->focus_ptr == this)

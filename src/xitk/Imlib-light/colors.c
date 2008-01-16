@@ -66,8 +66,7 @@ PaletteLUTGet(ImlibData *id)
 		  return 0;
 		}
 	    }
-	  if (id->fast_rgb)
-	    free(id->fast_rgb);
+	  free(id->fast_rgb);
 	  id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);	  
 	  for (i = 0; (i < (32 * 32 * 32)) && (j < num_ret); i++)
 	    id->fast_rgb[i] = retval[j++];
@@ -113,11 +112,9 @@ _PaletteAlloc(ImlibData * id, int num, const int *cols)
   int                 r, g, b;
   unsigned int        used[256], num_used, is_used, j;
 
-  if (id->palette)
-    free(id->palette);
+  free(id->palette);
   id->palette = malloc(sizeof(ImlibColor) * num);
-  if (id->palette_orig)
-    free(id->palette_orig);
+  free(id->palette_orig);
   id->palette_orig = malloc(sizeof(ImlibColor) * num);
   num_used = 0;
   colnum = 0;
@@ -213,8 +210,7 @@ Imlib_load_colors(ImlibData * id, char *file)
   _PaletteAlloc(id, (i / 3), pal);
   if (!PaletteLUTGet(id))
     {
-      if (id->fast_rgb)
-	free(id->fast_rgb);
+      free(id->fast_rgb);
       id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);
       
       for (r = 0; r < 32; r++)
@@ -493,8 +489,7 @@ Imlib_load_default_colors(ImlibData * id)
   _PaletteAlloc(id, (i / 3), pal);
   if (!PaletteLUTGet(id))
     {
-      if (id->fast_rgb)
-	free(id->fast_rgb);
+      free(id->fast_rgb);
       id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);
       
       for (r = 0; r < 32; r++)

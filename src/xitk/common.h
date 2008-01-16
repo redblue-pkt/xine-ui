@@ -116,10 +116,8 @@
 #define PLAYLIST_CONTROL_IGNORE       0x00000004 /* Ignore some playlist adding action */
 
 #define SAFE_FREE(x)            do {           \
-                                  if((x)) {    \
                                     free((x)); \
                                     x = NULL;  \
-                                  }            \
                                 } while(0)
 
 #define ABORT_IF_NULL(p)                                                                      \

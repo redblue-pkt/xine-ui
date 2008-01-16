@@ -560,15 +560,13 @@ static void _scan_for_playlist_infos(xine_stream_t *stream, int n) {
     
     if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
       
-      if(gGui->playlist.mmk[n]->ident)
-	free(gGui->playlist.mmk[n]->ident);
+      free(gGui->playlist.mmk[n]->ident);
       
       gGui->playlist.mmk[n]->ident = strdup(ident);
       
       if(n == gGui->playlist.cur) {
 	
-	if(gGui->mmk.ident)
-	  free(gGui->mmk.ident);
+	free(gGui->mmk.ident);
 	
 	gGui->mmk.ident = strdup(ident);
 	
@@ -778,8 +776,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    
 	    mediamark_append_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
 	    
-	    if(ident)
-	      free(ident);
+	    free(ident);
 	  }
 
 	  xine_dispose(stream);

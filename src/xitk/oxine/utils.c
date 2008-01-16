@@ -337,8 +337,8 @@ void *_gen_free(void* content) {
     size_t        wSize=(char*)(prefix->postfix+1)-(char*)prefix;
     
     RemoveFromLinkedList( prefix );
+    free(prefix->tag);
     memset( prefix, 0, wSize );
-    if (prefix->tag) free(prefix->tag);
     free(prefix);
   }
 

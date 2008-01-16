@@ -232,8 +232,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
       }    
     }
     
-    if(filter_ends)
-      free(filter_ends);
+    free(filter_ends);
     
   }
   else { /* no filtering */

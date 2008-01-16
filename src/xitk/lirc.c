@@ -125,8 +125,7 @@ static void *xine_lirc_loop(void *dummy) {
       if(panel_is_visible())
 	xitk_paint_widget_list (panel->widget_list);
       
-      if(code)
-	free(code);
+      free(code);
       
       if(ret == -1) 
 	break;

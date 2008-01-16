@@ -78,8 +78,7 @@
                                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
 #define WINDOW_INFO_ZERO(w)         do {                  \
-                                      if((w)->name)       \
-	                                free((w)->name);  \
+	                              free((w)->name);    \
                                       (w)->window = None; \
                                       (w)->name   = NULL; \
                                       (w)->x      = 0;    \

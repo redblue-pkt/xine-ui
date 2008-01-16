@@ -35,12 +35,9 @@
  */
 #define MRL_ZERO(m) {                                                         \
   if((m)) {                                                                   \
-    if((m)->origin)                                                           \
-      free((m)->origin);                                                      \
-    if((m)->mrl)                                                              \
-      free((m)->mrl);                                                         \
-    if((m)->link)                                                             \
-      free((m)->link);                                                        \
+    free((m)->origin);                                                        \
+    free((m)->mrl);                                                           \
+    free((m)->link);                                                          \
     (m)->origin = NULL;                                                       \
     (m)->mrl    = NULL;                                                       \
     (m)->link   = NULL;                                                       \

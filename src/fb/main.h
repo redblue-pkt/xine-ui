@@ -137,8 +137,6 @@ extern struct fbxine fbxine;
 void fbxine_exit(void);
 
 #define SAFE_FREE(x)            do {           \
-                                  if((x)) {    \
                                     free((x)); \
                                     x = NULL;  \
-                                  }            \
                                 } while(0)

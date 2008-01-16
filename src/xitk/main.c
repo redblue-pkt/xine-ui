@@ -1043,13 +1043,11 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       
       if(strcmp(gGui->mmk.ident, uevent->str)) {
 	
-	if(gGui->mmk.ident)
-	  free(gGui->mmk.ident);
+	free(gGui->mmk.ident);
 	if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
 	   gGui->playlist.mmk[gGui->playlist.cur]) {
 	  
-	  if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-	    free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	  
 	  gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
 	}
@@ -2223,8 +2221,7 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
-  if(pplugins)
-    free(pplugins);
+  free(pplugins);
   
   if(session_argv_num) {
     int i = 0;

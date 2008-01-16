@@ -666,11 +666,11 @@ static void rgb_free( struct prvt_image_s *image )
   if (image->rgb == 0) return;
 
   for ( i=0; i<image->height; ++i ) {
-    if (image->rgb[i]) png_free ( image->struct_ptr, image->rgb[i]);
+    png_free ( image->struct_ptr, image->rgb[i]);
     image->rgb[i] = NULL;
   }
 
-  if (image->rgb) png_free(  image->struct_ptr, image->rgb );
+  png_free(  image->struct_ptr, image->rgb );
   image->rgb = 0;
 }
 
@@ -735,12 +735,12 @@ static void prvt_image_free( struct prvt_image_s **image )
    
   rgb_free ( image_p );
 
-  if (image_p->scale_image_y) png_free( image_p->struct_ptr, image_p->scale_image_y );
-  if (image_p->scale_image_u) png_free( image_p->struct_ptr, image_p->scale_image_u );
-  if (image_p->scale_image_v) png_free( image_p->struct_ptr, image_p->scale_image_v );
-  if (image_p->yuy2_fudge_y)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_y );
-  if (image_p->yuy2_fudge_u)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_u );
-  if (image_p->yuy2_fudge_v)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_v );
+  png_free( image_p->struct_ptr, image_p->scale_image_y );
+  png_free( image_p->struct_ptr, image_p->scale_image_u );
+  png_free( image_p->struct_ptr, image_p->scale_image_v );
+  png_free( image_p->struct_ptr, image_p->yuy2_fudge_y );
+  png_free( image_p->struct_ptr, image_p->yuy2_fudge_u );
+  png_free( image_p->struct_ptr, image_p->yuy2_fudge_v );
 
   if (image_p->info_ptr)   png_destroy_info_struct (  image_p->struct_ptr, &image_p->info_ptr );
   if (image_p->struct_ptr) png_destroy_write_struct( &image_p->struct_ptr, (png_infopp)NULL );

@@ -279,10 +279,8 @@ static int _gui_xine_play(xine_stream_t *stream,
 	stream_infos_update_infos();
       
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
-	if(gGui->mmk.ident)
-	  free(gGui->mmk.ident);
-	if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	free(gGui->mmk.ident);
+	free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	
 	gGui->mmk.ident = strdup(ident);
 	gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
@@ -525,10 +523,8 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       }
     }
 
-    if(download.buf)
-      free(download.buf);
-    if(download.error)
-      free(download.error);
+    free(download.buf);
+    free(download.error);
 
   }
 
@@ -1672,12 +1668,9 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
 static void set_mmk(mediamark_t *mmk) {
   
-  if(gGui->mmk.mrl)
-    free(gGui->mmk.mrl);
-  if(gGui->mmk.ident)
-    free(gGui->mmk.ident);
-  if(gGui->mmk.sub)
-    free(gGui->mmk.sub);
+  free(gGui->mmk.mrl);
+  free(gGui->mmk.ident);
+  free(gGui->mmk.sub);
   if(mediamark_have_alternates(&(gGui->mmk)))
     mediamark_free_alternates(&(gGui->mmk));
   

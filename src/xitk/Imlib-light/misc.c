@@ -376,8 +376,7 @@ Imlib_init(Display * disp)
       fclose(f);
     }
   setlocale(LC_NUMERIC, old_locale);
-  if (old_locale)
-    free(old_locale);
+  free(old_locale);
   
   /* list all visuals for the default screen */
   xvi.screen = id->x.screen;
@@ -570,8 +569,7 @@ Imlib_init(Display * disp)
     if ((htonl(1) == 1) && (byt == LSBFirst))
       id->fastrend = 0;
   }
-  if (palfile)
-    free(palfile);
+  free(palfile);
 
 #ifdef HAVE_SHM
   if (id->x.shm)
@@ -929,8 +927,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
       fclose(f);
     }
   setlocale(LC_NUMERIC, old_locale);
-  if (old_locale)
-    free(old_locale);
+  free(old_locale);
   
   if (p)
     {
@@ -1168,8 +1165,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
     if ((htonl(1) == 1) && (byt == LSBFirst))
       id->fastrend = 0;
   }
-  if (palfile)
-    free(palfile);
+  free(palfile);
 #ifdef HAVE_SHM
   if (id->x.shm)
     {

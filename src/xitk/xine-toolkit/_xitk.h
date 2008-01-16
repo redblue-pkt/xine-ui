@@ -134,10 +134,8 @@ typedef struct {
 
 #define XITK_FREE(X) \
   do {               \
-    if((X)) {        \
       free((X));     \
       (X) = NULL;    \
-    }                \
   } while(0)
 
 #define XITK_CHECK_CONSTITENCY(X)                                                \
@@ -249,8 +247,7 @@ void xitk_strdupa(char *dest, char *src);
 } while(0)
 
 #define WINDOW_INFO_ZERO(w) do {                                              \
-      if((w)->name)                                                           \
-	free((w)->name);                                                      \
+      free((w)->name);                                                      \
       (w)->window = None;                                                     \
       (w)->name   = NULL;                                                     \
       (w)->x      = 0;                                                        \

@@ -448,12 +448,9 @@ static void _menu_destroy_ntree(menu_node_t **mn) {
     _menu_destroy_ntree(&((*mn)->next));
 
   if((*mn)->menu_entry) {
-    if((*mn)->menu_entry->menu)
-      free((*mn)->menu_entry->menu);
-    if((*mn)->menu_entry->shortcut)
-      free((*mn)->menu_entry->shortcut);
-    if((*mn)->menu_entry->type)
-      free((*mn)->menu_entry->type);
+    free((*mn)->menu_entry->menu);
+    free((*mn)->menu_entry->shortcut);
+    free((*mn)->menu_entry->type);
     free((*mn)->menu_entry);
   }
 

@@ -558,7 +558,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
 	  
 	  if(win_id == *(unsigned long *)prop_return) {
-	    if (wm_name) free(wm_name);
+	    free(wm_name);
 	    wm_name = get_wm_name(display, win_id, "_NET_WM_NAME");
 	    type |= WM_TYPE_EWMH_COMP;
 	  }

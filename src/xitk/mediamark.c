@@ -1255,8 +1255,7 @@ static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entr
 	mediamark_store_mmk(&(*mmk)[*entries], href, (atitle && strlen(atitle)) ? atitle : NULL, NULL, start, -1, 0, 0);
 	playlist->entries = ++(*entries);
 	
-	if(atitle)
-	  free(atitle);
+	free(atitle);
       }
       
       href = title = NULL;
@@ -1406,8 +1405,7 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
 	      mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
 	      playlist->entries = ++entries_noa;
 	      
-	      if(real_title)
-		free(real_title);
+	      free(real_title);
 	      
 	    }
 	  }

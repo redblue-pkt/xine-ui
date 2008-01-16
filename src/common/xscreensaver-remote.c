@@ -225,7 +225,7 @@ send_xscreensaver_command (Display *dpy, Atom command, long arg,
               if (type != XA_INTEGER || nitems < 3)
                 {
                 STATUS_LOSE:
-                  if (data) free (data);
+                  free (data);
                   fprintf (stdout, "\n");
                   fflush (stdout);
                   fprintf (stderr, "bad status format on root window.\n");
@@ -282,11 +282,11 @@ send_xscreensaver_command (Display *dpy, Atom command, long arg,
                   fputs ("\n", stdout);
               }
 
-	      if (data) free (data);
+	      free (data);
 	    }
 	  else
 	    {
-	      if (data) free (data);
+	      free (data);
 	      fprintf (stdout, "\n");
 	      fflush (stdout);
 	      fprintf (stderr, "no saver status on root window.\n");

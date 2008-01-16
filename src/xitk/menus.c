@@ -801,8 +801,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
   cur_entry = &menu_entries[0];
   while(cur_entry->menu) {
-    if(cur_entry->shortcut)
-      free(cur_entry->shortcut);
+    free(cur_entry->shortcut);
     cur_entry++;
   }
 
@@ -1031,8 +1030,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     menu_entry.user_data = (void *) PLAYB_ADDMMK;
     xitk_menu_add_entry(w, &menu_entry);
     
-    if(menu_entry.shortcut)
-      free(menu_entry.shortcut);
+    free(menu_entry.shortcut);
   }
 
   xitk_menu_show_menu(w);
@@ -1229,8 +1227,7 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
 
   cur_entry = &menu_entries_sel[0];
   while(cur_entry->menu) {
-    if(cur_entry->shortcut)
-      free(cur_entry->shortcut);
+    free(cur_entry->shortcut);
     cur_entry++;
   }
   

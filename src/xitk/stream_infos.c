@@ -145,8 +145,7 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
     minfo = xitk_recode(xr, minfo);
   set_label(w, (minfo) ? (char *) minfo : _("Unavailable"));
   
-  if(minfo)
-    free(minfo);
+  free(minfo);
   xitk_recode_done(xr);
 }
 
@@ -237,12 +236,9 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
     else
       aalbum = strdup(aalbum);
   }
-  if(title)
-    free(title);
-  if(artist)
-    free(artist);
-  if(album)
-    free(album);
+  free(title);
+  free(artist);
+  free(album);
 
   if(atitle) {
     int len = strlen(atitle);
