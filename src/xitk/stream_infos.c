@@ -277,6 +277,8 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
 
     window_info_t wi;
     
+  if ( ! sinfos.running ) return;
+
     sinfos.running = 0;
     sinfos.visible = 0;
     
