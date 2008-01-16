@@ -1298,7 +1298,5 @@ const struct CHANLISTS chanlists[] = {
     { NULL, NULL, 0 } /* EOF */
 };
 
-const struct CHANLIST   *chanlist  = europe_west;
-
 /* vim: ts=4 sw=4 noet
  */
