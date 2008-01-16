@@ -344,12 +344,14 @@ void tvset_panel(void) {
 						      x + 10, y + 15, w - 20 + 1, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(tvset.input);
 
-  for(i = 0; chanlists[i].name; i++) ;
-  tvset.system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (i+1));
+  {
+    const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
+    tvset.system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (chanlists_count+1));
   
-  for(i = 0; chanlists[i].name; i++)
-    tvset.system_entries[i] = chanlists[i].name;
-  tvset.system_entries[i] = NULL;
+    for(i = 0; i < chanlists_count; i++)
+      tvset.system_entries[i] = chanlists[i].name;
+    tvset.system_entries[i] = NULL;
+  }
 
   x += w + 5;
   w = 155;
