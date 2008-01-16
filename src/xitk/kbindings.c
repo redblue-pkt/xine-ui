@@ -2476,21 +2476,21 @@ void kbedit_window(void) {
 
 #ifdef KBINDINGS_MAN
 
-static gGui_t  *gGui;
+gGui_t  *gGui;
 
-static void layer_above_video(Window w) {
+void layer_above_video(Window w) {
 }
-static void raise_window(Window window, int visible, int running) {
+void raise_window(Window window, int visible, int running) {
 }
-static void __attribute__ ((format (printf, 1, 2))) xine_error(char *message, ...) {
+void __attribute__ ((format (printf, 1, 2))) xine_error(char *message, ...) {
 }
-static void gui_execute_action_id(action_id_t actid) {
+void gui_execute_action_id(action_id_t actid) {
 }
-static void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
+void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
 }
-static void config_update_num(char *key, int value) {
+void config_update_num(char *key, int value) {
 }
-static void try_to_set_input_focus(Window window) {
+void try_to_set_input_focus(Window window) {
 }
 
 int main(int argc, char **argv) {
