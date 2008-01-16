@@ -881,7 +881,6 @@ int session_handle_subopt(char *suboptarg, int *session) {
 
 int main(int argc, char **argv) {
   int session = 0;
-  int fd;
   
   if(argc > 1)
     session = atoi(argv[1]);
