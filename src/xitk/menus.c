@@ -56,6 +56,7 @@ extern _panel_t                *panel;
 #define AUDIO_PPROCESS          23
 #define AUDIO_PPROCESS_ENABLE   24
 
+#define VIDEO_MIN               30
 #define VIDEO_FULLSCR           30
 #define VIDEO_2X                31
 #define VIDEO_1X                32
@@ -65,6 +66,7 @@ extern _panel_t                *panel;
 #define VIDEO_PPROCESS_ENABLE   36
 #define VIDEO_TOGGLE            37
 
+#define SETS_MIN                40
 #define SETS_SETUP              40
 #define SETS_KEYMAP             41
 #define SETS_VIDEO              42
@@ -331,80 +333,44 @@ static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_toggle_aspect(aspect);
 }
 static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = (int) data;
+  int ctrl = ((int) data) - VIDEO_MIN;
 
-  switch(ctrl) {
+  static const int actions[] = {
+    ACTID_TOGGLE_FULLSCREEN,
+    ACTID_WINDOW200,
+    ACTID_WINDOW100,
+    ACTID_WINDOW50,
+    ACTID_TOGGLE_INTERLEAVE,
+    ACTID_VPP,
+    ACTID_VPP_ENABLE,
+    ACTID_TOGGLE_WINOUT_VISIBLITY
+  };
 
-  case VIDEO_FULLSCR:
-    gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
-    break;
-    
-  case VIDEO_2X:
-    gui_execute_action_id(ACTID_WINDOW200);
-    break;
-    
-  case VIDEO_1X:
-    gui_execute_action_id(ACTID_WINDOW100);
-    break;
-    
-  case VIDEO__5X:
-    gui_execute_action_id(ACTID_WINDOW50);
-    break;
-    
-  case VIDEO_INTERLEAVE:
-    gui_execute_action_id(ACTID_TOGGLE_INTERLEAVE);
-    break;
-
-  case VIDEO_PPROCESS:
-    gui_execute_action_id(ACTID_VPP);
-    break;
-
-  case VIDEO_PPROCESS_ENABLE:
-    gui_execute_action_id(ACTID_VPP_ENABLE);
-    break;
-
-  case VIDEO_TOGGLE:
-    gui_execute_action_id(ACTID_TOGGLE_WINOUT_VISIBLITY);
-    break;
-    
-  default:
-    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
-    break;
+  if ( ctrl >= sizeof(actions)/sizeof(actions[0]) ) {
+    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl+VIDEO_MIN);
+    return;
   }
+
+  gui_execute_action_id(actions[ctrl]);
 }
 static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int sets = (int) data;
+  int sets = ((int) data) - SETS_MIN;
 
-  switch(sets) {
+  static const int actions[] = {
+    ACTID_SETUP,
+    ACTID_KBEDIT,
+    ACTID_CONTROLSHOW,
+    ACTID_TVANALOG,
+    ACTID_VIEWLOG,
+    ACTID_SKINDOWNLOAD
+  };
 
-  case SETS_SETUP:
-    gui_execute_action_id(ACTID_SETUP);
-    break;
-    
-  case SETS_KEYMAP:
-    gui_execute_action_id(ACTID_KBEDIT);
-    break;
-    
-  case SETS_VIDEO:
-    gui_execute_action_id(ACTID_CONTROLSHOW);
-    break;
-
-  case SETS_TVANALOG:
-    gui_execute_action_id(ACTID_TVANALOG);
-    break;
-
-  case SETS_LOGS:
-    gui_execute_action_id(ACTID_VIEWLOG);
-    break;
-
-  case SETS_SKINDL:
-    gui_execute_action_id(ACTID_SKINDOWNLOAD);
-    break;
-    
-  default:
-    printf("%s(): unknown setting %d\n", __XINE_FUNCTION__, sets);
-    break;
+  if ( sets >= sizeof(actions)/sizeof(actions[0]) ) {
+    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, sets+SETS_MIN);
+    return;
   }
+
+  gui_execute_action_id(actions[sets]);
 }
 static void menu_help(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_HELP_SHOW);
