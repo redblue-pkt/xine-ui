@@ -66,11 +66,6 @@ typedef struct {
   void                 *data;
 } serv_header_packet_t;
 
-static int           ctrl_fd, session_id = -1;
-static int           going;
-static pthread_t     thread_server;
-static char         *socket_name;
-
 static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length);
 
 static int connect_to_session(int session) {
@@ -138,6 +133,58 @@ static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t da
 
   _send_packet(fd, data, &hdr);
 }
+
+void send_string(int session, ctrl_commands_t command, char *string) {
+  int fd;
+  
+  if((fd = connect_to_session(session)) == -1)
+    return;
+  send_packet(fd, command, string, string ? strlen(string) + 1 : 0);
+  read_ack(fd);
+  close(fd);
+}
+
+char *get_string(int session, ctrl_commands_t command) {
+  ctrl_header_packet_t  hdr;
+  char                 *data = NULL;
+  int                   fd;
+  
+  if((fd = connect_to_session(session)) == -1)
+    return data;
+  
+  send_packet(fd, command, NULL, 0);
+  data = (char *)read_packet(fd, &hdr);
+  read_ack(fd);
+  close(fd);
+
+  return data;
+}
+
+static int remote_cmd(int session, ctrl_commands_t command) {
+  int fd;
+  
+  if((fd = connect_to_session(session)) == -1)
+    return 0;
+
+  send_packet(fd, command, NULL, 0);
+  read_ack(fd);
+  close(fd);
+  
+  return 1;
+}
+
+int is_remote_running(int session) {
+  return remote_cmd(session, CMD_PING);
+}
+
+
+#ifndef CTRL_TEST
+
+static int session_id = -1;
+static int           ctrl_fd;
+static int           going;
+static pthread_t     thread_server;
+static char         *socket_name;
 
 static void ssend_packet(int fd, void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
@@ -216,51 +263,6 @@ uint8_t get_boolean(int session, ctrl_commands_t command) {
   return ret;
 }
 
-void send_string(int session, ctrl_commands_t command, char *string) {
-  int fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return;
-  send_packet(fd, command, string, string ? strlen(string) + 1 : 0);
-  read_ack(fd);
-  close(fd);
-}
-
-char *get_string(int session, ctrl_commands_t command) {
-  ctrl_header_packet_t  hdr;
-  char                 *data = NULL;
-  int                   fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return data;
-  
-  send_packet(fd, command, NULL, 0);
-  data = (char *)read_packet(fd, &hdr);
-  read_ack(fd);
-  close(fd);
-
-  return data;
-}
-
-static int remote_cmd(int session, ctrl_commands_t command) {
-  int fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return 0;
-
-  send_packet(fd, command, NULL, 0);
-  read_ack(fd);
-  close(fd);
-  
-  return 1;
-}
-
-int is_remote_running(int session) {
-  return remote_cmd(session, CMD_PING);
-}
-
-
-#ifndef CTRL_TEST
 static void *ctrlsocket_func(void *data) {
   fd_set                set;
   struct timeval        tv;
