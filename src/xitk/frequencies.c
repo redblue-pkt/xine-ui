@@ -1277,7 +1277,7 @@ static const struct CHANLIST argentina[] = {
 
 /* --------------------------------------------------------------------- */
 
-const struct CHANLISTS chanlists[] = {
+const struct CHANLISTS chanlists[17] = {
     { "us-bcast",         ntsc_bcast,        CHAN_COUNT(ntsc_bcast)        },
     { "us-cable",         ntsc_cable,        CHAN_COUNT(ntsc_cable)        },
     { "us-cable-hrc",     ntsc_hrc,          CHAN_COUNT(ntsc_hrc)          },

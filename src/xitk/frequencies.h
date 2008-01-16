@@ -124,7 +124,7 @@ struct CHANLISTS {
 
 /* --------------------------------------------------------------------- */
 
-extern const struct CHANLISTS   chanlists[];
+extern const struct CHANLISTS chanlists[17];
 
 /* vim: ts=4 sw=4 noet
  */
