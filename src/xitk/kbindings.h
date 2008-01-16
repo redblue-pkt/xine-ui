@@ -23,8 +23,6 @@
 #ifndef KBINDINGS_H
 #define KBINDINGS_H
 
-#include <X11/Xlib.h>
-
 #include "xitk.h"
 
 /* Opaque structure */
