@@ -891,7 +891,7 @@ int main(int argc, char **argv) {
     printf("GET_VERSION: '%s'\n", get_string(session, CMD_GET_VERSION));
   }
   else
-    printf("Session %d isn't running\n");
+    printf("Session %d isn't running\n", session);
 
   return 1;
 }
