@@ -143,45 +143,25 @@ static void menu_subtitle_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void
 static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int ctrl = (int) data;
 
-  switch(ctrl) {
+  static const int actions[] = {
+    ACTID_PLAY,
+    ACTID_STOP,
+    ACTID_PAUSE,
+    ACTID_MRL_NEXT,
+    ACTID_MRL_PRIOR,
+    ACTID_SPEED_FAST,
+    ACTID_SPEED_SLOW,
+    ACTID_ADDMEDIAMARK
+  };
 
-  case PLAYB_PLAY:
-    gui_execute_action_id(ACTID_PLAY);
-    break;
-    
-  case PLAYB_STOP:
-    gui_execute_action_id(ACTID_STOP);
-    break;
-    
-  case PLAYB_PAUSE:
-    gui_execute_action_id(ACTID_PAUSE);
-    break;
-
-  case PLAYB_NEXT:
-    gui_execute_action_id(ACTID_MRL_NEXT);
-    break;
-
-  case PLAYB_PREV:
-    gui_execute_action_id(ACTID_MRL_PRIOR);
-    break;
-
-  case PLAYB_SPEEDM:
-    gui_execute_action_id(ACTID_SPEED_FAST);
-    break;
-
-  case PLAYB_SPEEDL:
-    gui_execute_action_id(ACTID_SPEED_SLOW);
-    break;
-
-  case PLAYB_ADDMMK:
-    gui_execute_action_id(ACTID_ADDMEDIAMARK);
-    break;
-
-  default:
+  if ( ctrl >= sizeof(actions)/sizeof(actions[0]) ) {
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
-    break;
+    return;
   }
+
+  gui_execute_action_id(actions[ctrl]);
 }
+
 static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int ctrl = (int) data;
 
