@@ -40,13 +40,11 @@
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
 
-typedef struct {
+static struct {
   int                   fd;
   pthread_t             thread;
   FILE                 *fbk;
-} _stdctl_t;
-
-static _stdctl_t stdctl;
+} stdctl;
 
 static void *xine_stdctl_loop(void *dummy) {
   char              buf[256], *c, *c1;

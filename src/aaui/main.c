@@ -1128,8 +1128,7 @@ int main(int argc, char *argv[]) {
   if(xlib_handle)
     dlclose(xlib_handle);
 
-  if(aaxine.configfile)
-    free(aaxine.configfile);
+  free(aaxine.configfile);
 
   return 0;
 }

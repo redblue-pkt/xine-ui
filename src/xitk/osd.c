@@ -44,14 +44,12 @@ extern gGui_t     *gGui;
 #define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ (_cb), (_cr), (_y) }
 #endif
 
-typedef struct {         /* CLUT == Color LookUp Table */
+static const struct {         /* CLUT == Color LookUp Table */
   uint8_t cb    : 8;
   uint8_t cr    : 8;
   uint8_t y     : 8;
   uint8_t foo   : 8;
-} __attribute__ ((packed)) clut_t;
-
-static const clut_t textpalettes_color[] = {
+} __attribute__ ((packed)) textpalettes_color[] = {
   /* white, no border, translucid */
     CLUT_Y_CR_CB_INIT(0x00, 0x00, 0x00), //0
     CLUT_Y_CR_CB_INIT(0x60, 0x80, 0x80), //1
@@ -85,7 +83,7 @@ static const uint8_t textpalettes_trans[] = {
   0, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15,
 };
 
-static const struct xine_status_s {
+static const struct {
   char     symbol[4];
   int      status;
 } xine_status[] = {
@@ -95,7 +93,7 @@ static const struct xine_status_s {
   { "{" , XINE_STATUS_QUIT  }
 };
 
-static const struct xine_speeds_s {
+static const struct {
   char     symbol[4];
   int      speed;
 } xine_speeds[] = {

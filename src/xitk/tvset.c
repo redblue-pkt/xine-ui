@@ -45,7 +45,7 @@
 
 extern gGui_t          *gGui;
 
-typedef struct {
+static struct {
   xitk_window_t        *xwin;
 
   xitk_widget_list_t   *widget_list;
@@ -67,10 +67,7 @@ typedef struct {
   int                   visible;
   xitk_register_key_t   widget_key;
 
-} _tvset_t;
-
-static _tvset_t    *tvset = NULL;
-
+} tvset;
 
 typedef uint64_t v4l2_std_id;
 
@@ -140,11 +137,11 @@ static void tvset_update(xitk_widget_t *w, void *data) {
   
   ev_data = (xine_set_v4l2_data_t *)xine_xmalloc(sizeof(xine_set_v4l2_data_t));
   
-  ev_data->input     = xitk_intbox_get_value(tvset->input);
-  ev_data->frequency = (chanlists[xitk_combo_get_current_selected(tvset->system)].
-			list[xitk_combo_get_current_selected(tvset->chann)].freq * 16) / 1000;
+  ev_data->input     = xitk_intbox_get_value(tvset.input);
+  ev_data->frequency = (chanlists[xitk_combo_get_current_selected(tvset.system)].
+			list[xitk_combo_get_current_selected(tvset.chann)].freq * 16) / 1000;
   
-  ev_data->standard_id = std_list[xitk_combo_get_current_selected(tvset->vidstd)].std;
+  ev_data->standard_id = std_list[xitk_combo_get_current_selected(tvset.vidstd)].std;
   
   xine_event.type        = XINE_EVENT_SET_V4L2;
   xine_event.data_length = sizeof(xine_set_v4l2_data_t);
@@ -157,44 +154,40 @@ static void tvset_update(xitk_widget_t *w, void *data) {
 
 
 static void tvset_exit(xitk_widget_t *w, void *data) {
-
-  if(tvset) {
     window_info_t wi;
 
-    tvset->running = 0;
-    tvset->visible = 0;
+  if ( ! tvset.running ) return;
+
+    tvset.running = 0;
+    tvset.visible = 0;
     
-    if((xitk_get_window_info(tvset->widget_key, &wi))) {
+    if((xitk_get_window_info(tvset.widget_key, &wi))) {
       config_update_num ("gui.tvset_x", wi.x);
       config_update_num ("gui.tvset_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
-    xitk_unregister_event_handler(&tvset->widget_key);
+    xitk_unregister_event_handler(&tvset.widget_key);
 
-    xitk_destroy_widgets(tvset->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, tvset->xwin);
+    xitk_destroy_widgets(tvset.widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, tvset.xwin);
 
-    tvset->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(tvset->widget_list)));
+    tvset.xwin = NULL;
+    xitk_list_free((XITK_WIDGET_LIST_LIST(tvset.widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset->widget_list)));
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset.widget_list)));
     XUnlockDisplay(gGui->display);
 
-    free(tvset->system_entries);
+    free(tvset.system_entries);
     
-    free(tvset->chann_entries);
+    free(tvset.chann_entries);
     
-    free(tvset->vidstd_entries);
+    free(tvset.vidstd_entries);
 
-    free(tvset->widget_list);
+    free(tvset.widget_list);
     
-    free(tvset);
-    tvset = NULL;
-
     try_to_set_input_focus(gGui->video_window);
-  }
 }
 
 static void tvset_handle_event(XEvent *event, void *data) {
@@ -212,33 +205,23 @@ static void tvset_handle_event(XEvent *event, void *data) {
 
 int tvset_is_visible(void) {
   
-  if(tvset != NULL) {
     if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset->xwin));
+      return xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset.xwin));
     else
-      return tvset->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset->xwin));
-  }
-  
-  return 0;
+      return tvset.visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset.xwin));
 }
 
 int tvset_is_running(void) {
-  
-  if(tvset != NULL)
-    return tvset->running;
-  
-  return 0;
+  return tvset.running;
 }
 
 void tvset_raise_window(void) {
-  if(tvset != NULL)
-    raise_window(xitk_window_get_window(tvset->xwin), tvset->visible, tvset->running);
+    raise_window(xitk_window_get_window(tvset.xwin), tvset.visible, tvset.running);
 }
 
 void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
-  if(tvset != NULL)
-    toggle_window(xitk_window_get_window(tvset->xwin), tvset->widget_list,
-		  &tvset->visible, tvset->running);
+    toggle_window(xitk_window_get_window(tvset.xwin), tvset.widget_list,
+		  &tvset.visible, tvset.running);
 }
 
 void tvset_end(void) {
@@ -251,14 +234,14 @@ static int update_chann_entries(int system_entry) {
   const struct CHANLIST *list = chanlists[system_entry].list;
   int               len  = chanlists[system_entry].count;
   
-  free(tvset->chann_entries);
+  free(tvset.chann_entries);
 
-  tvset->chann_entries = (const char **) xine_xmalloc(sizeof(const char *) * (len+1) );
+  tvset.chann_entries = (const char **) xine_xmalloc(sizeof(const char *) * (len+1) );
   
   for(i = 0; i < len; i++)
-    tvset->chann_entries[i] = list[i].name;
+    tvset.chann_entries[i] = list[i].name;
 
-  tvset->chann_entries[i] = NULL;
+  tvset.chann_entries[i] = NULL;
   return len;
 }
 
@@ -267,16 +250,15 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
   
   len = update_chann_entries(select);
 
-  if( tvset->chann ) {
-    xitk_combo_update_list(tvset->chann, tvset->chann_entries, len);
-    xitk_combo_set_select(tvset->chann, 0);
+  if( tvset.chann ) {
+    xitk_combo_update_list(tvset.chann, tvset.chann_entries, len);
+    xitk_combo_set_select(tvset.chann, 0);
   }
 }
 
 
 void tvset_reparent(void) {
-  if(tvset)
-    reparent_window((xitk_window_get_window(tvset->xwin)));
+    reparent_window((xitk_window_get_window(tvset.xwin)));
 }
 
 void tvset_panel(void) {
@@ -292,8 +274,6 @@ void tvset_panel(void) {
   int                         x, y, w, width, height;
   xitk_widget_t              *widget;
 
-  tvset = (_tvset_t *) xine_xmalloc(sizeof(_tvset_t));
-  
   x = xine_config_register_num (gGui->xine, "gui.tvset_x", 
 				80,
 				CONFIG_NO_DESC,
@@ -310,31 +290,31 @@ void tvset_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  tvset->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+  tvset.xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
 						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(tvset->xwin)));
+  set_window_states_start((xitk_window_get_window(tvset.xwin)));
 
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
-		 (xitk_window_get_window(tvset->xwin)), None, None);
+		 (xitk_window_get_window(tvset.xwin)), None, None);
   XUnlockDisplay (gGui->display);
 
-  tvset->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(tvset->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
-  xitk_widget_list_set(tvset->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(tvset->xwin)));
-  xitk_widget_list_set(tvset->widget_list, WIDGET_LIST_GC, gc);
+  tvset.widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(tvset.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(tvset.widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(tvset.xwin)));
+  xitk_widget_list_set(tvset.widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
 
-  xitk_window_get_window_size(tvset->xwin, &width, &height);
+  xitk_window_get_window_size(tvset.xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
   XLockDisplay (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(tvset->xwin)), bg->pixmap,
+  XCopyArea(gGui->display, (xitk_window_get_background(tvset.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   XUnlockDisplay (gGui->display);
   
@@ -355,21 +335,21 @@ void tvset_panel(void) {
   ib.skin_element_name = NULL;
   ib.value             = 4;
   ib.step              = 1;
-  ib.parent_wlist      = tvset->widget_list;
+  ib.parent_wlist      = tvset.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset->widget_list)), 
-			   (tvset->input = 
-			    xitk_noskin_intbox_create(tvset->widget_list, &ib,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset.widget_list)), 
+			   (tvset.input = 
+			    xitk_noskin_intbox_create(tvset.widget_list, &ib,
 						      x + 10, y + 15, w - 20 + 1, 20, NULL, NULL, NULL)));
-  xitk_enable_and_show_widget(tvset->input);
+  xitk_enable_and_show_widget(tvset.input);
 
   for(i = 0; chanlists[i].name; i++) ;
-  tvset->system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (i+1));
+  tvset.system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (i+1));
   
   for(i = 0; chanlists[i].name; i++)
-    tvset->system_entries[i] = chanlists[i].name;
-  tvset->system_entries[i] = NULL;
+    tvset.system_entries[i] = chanlists[i].name;
+  tvset.system_entries[i] = NULL;
 
   x += w + 5;
   w = 155;
@@ -379,19 +359,19 @@ void tvset_panel(void) {
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = tvset->widget_list;
-  cmb.entries           = tvset->system_entries;
-  cmb.parent_wkey       = &tvset->widget_key;
+  cmb.parent_wlist      = tvset.widget_list;
+  cmb.entries           = tvset.system_entries;
+  cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = system_combo_select;
   cmb.userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
-		   (tvset->system = 
-		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset.widget_list), 
+		   (tvset.system = 
+		    xitk_noskin_combo_create(tvset.widget_list, &cmb,
 					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
-  xitk_set_widget_pos(tvset->system, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->system)) / 2);
-  xitk_enable_and_show_widget(tvset->system);
+  xitk_set_widget_pos(tvset.system, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.system)) / 2);
+  xitk_enable_and_show_widget(tvset.system);
 
-  xitk_combo_set_select(tvset->system, 0);
+  xitk_combo_set_select(tvset.system, 0);
   update_chann_entries(0);
 
   x += w + 5;
@@ -402,17 +382,17 @@ void tvset_panel(void) {
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = tvset->widget_list;
-  cmb.entries           = tvset->chann_entries;
-  cmb.parent_wkey       = &tvset->widget_key;
+  cmb.parent_wlist      = tvset.widget_list;
+  cmb.entries           = tvset.chann_entries;
+  cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = NULL;
   cmb.userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
-		   (tvset->chann = 
-		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset.widget_list), 
+		   (tvset.chann = 
+		    xitk_noskin_combo_create(tvset.widget_list, &cmb,
 					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
-  xitk_set_widget_pos(tvset->chann, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->chann)) / 2);
-  xitk_enable_and_show_widget(tvset->chann);
+  xitk_set_widget_pos(tvset.chann, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.chann)) / 2);
+  xitk_enable_and_show_widget(tvset.chann);
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
@@ -432,19 +412,19 @@ void tvset_panel(void) {
   inp.max_length        = 20;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(tvset->widget_list),
-	   (tvset->framerate = 
-	    xitk_noskin_inputtext_create(tvset->widget_list, &inp,
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(tvset.widget_list),
+	   (tvset.framerate = 
+	    xitk_noskin_inputtext_create(tvset.widget_list, &inp,
 					 x + 10, y + 15, w - 20 + 1, 20,
 					 "Black", "Black", fontname)));
-  xitk_enable_and_show_widget(tvset->framerate);
+  xitk_enable_and_show_widget(tvset.framerate);
 
-  tvset->vidstd_entries = (const char **) xine_xmalloc(sizeof(const char *) * 
+  tvset.vidstd_entries = (const char **) xine_xmalloc(sizeof(const char *) * 
                           (sizeof(std_list)/sizeof(std_list[0])+1));
   
   for(i = 0; i < (sizeof(std_list)/sizeof(std_list[0])); i++)
-    tvset->vidstd_entries[i] = std_list[i].name;
-  tvset->vidstd_entries[i] = NULL;
+    tvset.vidstd_entries[i] = std_list[i].name;
+  tvset.vidstd_entries[i] = NULL;
 
   x += w + 5;
   w = 155;
@@ -454,17 +434,17 @@ void tvset_panel(void) {
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = tvset->widget_list;
-  cmb.entries           = tvset->vidstd_entries;
-  cmb.parent_wkey       = &tvset->widget_key;
+  cmb.parent_wlist      = tvset.widget_list;
+  cmb.entries           = tvset.vidstd_entries;
+  cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = NULL;
   cmb.userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset->widget_list), 
-		   (tvset->vidstd = 
-		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(tvset.widget_list), 
+		   (tvset.vidstd = 
+		    xitk_noskin_combo_create(tvset.widget_list, &cmb,
 					     x + 10, y + 15, w - 20 + 1, NULL, NULL)));
-  xitk_set_widget_pos(tvset->vidstd, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset->vidstd)) / 2);
-  xitk_enable_and_show_widget(tvset->vidstd);
+  xitk_set_widget_pos(tvset.vidstd, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.vidstd)) / 2);
+  xitk_enable_and_show_widget(tvset.vidstd);
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
@@ -497,12 +477,12 @@ void tvset_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset->widget_list)), 
-	   (tvset->update = 
-	    xitk_noskin_labelbutton_create(tvset->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset.widget_list)), 
+	   (tvset.update = 
+	    xitk_noskin_labelbutton_create(tvset.widget_list, 
 					   &lb, x, y, 100, 23,
 					   "Black", "Black", "White", btnfontname)));
-  xitk_enable_and_show_widget(tvset->update);
+  xitk_enable_and_show_widget(tvset.update);
  
   x = WINDOW_WIDTH - (100 + 15);
   
@@ -513,26 +493,26 @@ void tvset_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset->widget_list)), 
-   (widget = xitk_noskin_labelbutton_create(tvset->widget_list, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset.widget_list)), 
+   (widget = xitk_noskin_labelbutton_create(tvset.widget_list, 
 					    &lb, x, y, 100, 23,
 					    "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(widget);
   
-  xitk_window_change_background(gGui->imlib_data, tvset->xwin, bg->pixmap, width, height);
+  xitk_window_change_background(gGui->imlib_data, tvset.xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
-  tvset->widget_key = xitk_register_event_handler("tvset", 
-						  (xitk_window_get_window(tvset->xwin)),
+  tvset.widget_key = xitk_register_event_handler("tvset", 
+						  (xitk_window_get_window(tvset.xwin)),
 						  tvset_handle_event,
 						  NULL,
 						  NULL,
-						  tvset->widget_list,
+						  tvset.widget_list,
 						  NULL);
   
-  tvset->visible = 1;
-  tvset->running = 1;
+  tvset.visible = 1;
+  tvset.running = 1;
   tvset_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(tvset->xwin));
+  try_to_set_input_focus(xitk_window_get_window(tvset.xwin));
 }

@@ -47,13 +47,11 @@ extern gGui_t          *gGui;
 
 extern _panel_t        *panel;
 
-typedef struct {
+static struct {
   struct lirc_config   *config;
   int                   fd;
   pthread_t             thread;
-} _lirc_t;
-
-static _lirc_t lirc;
+} lirc;
 
 static void lirc_get_playlist(char *from) {
   int    i;
