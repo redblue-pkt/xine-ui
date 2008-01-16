@@ -120,7 +120,7 @@ static void menu_event_sender(xitk_widget_t *w, xitk_menu_entry_t *me, void *dat
 }
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int event     = (int) data;
-  int events[7] = {
+  static const int events[7] = {
     XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
     XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
     XINE_EVENT_INPUT_MENU7
