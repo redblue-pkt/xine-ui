@@ -1176,12 +1176,20 @@ void panel_init (void) {
   XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay(gGui->display);
   
+  /*
+   * The following is more or less a hack to keep the panel window visible
+   * with and without focus in windowed and fullscreen mode.
+   * Different WMs and even different versions behave different.
+   * There is no guarantee that it works with all WMs/versions.
+   */
   if(!video_window_is_visible()) {
-    xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
+    if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
+      xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
     xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
   } else {
     xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
-    xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
+    if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
+      xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_TOOLBAR);
   }
   
   if(is_layer_above())
