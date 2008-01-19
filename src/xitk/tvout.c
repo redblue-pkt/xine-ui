@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -342,8 +342,8 @@ void tvout_deinit(tvout_t *tvout) {
     tvout->deinit(tvout->private);
 }
 
-char **tvout_get_backend_names(void) {
-  static char *bckends[(sizeof(backends) / sizeof(backends[0]))];
+const char **tvout_get_backend_names(void) {
+  static const char *bckends[(sizeof(backends) / sizeof(backends[0]))];
   int i = 0;
   
   while(backends[i].init) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -89,10 +89,10 @@ static const struct xine_status_s {
   char     symbol[4];
   int      status;
 } xine_status[] = {
-  { "\xD8",  XINE_STATUS_IDLE  }, /* Ø */
-  { "}",  XINE_STATUS_STOP  },
-  { ">" , XINE_STATUS_PLAY  },
-  { "{" , XINE_STATUS_QUIT  }
+  { "\xD8", XINE_STATUS_IDLE  }, /* Ø */
+  { "}"   , XINE_STATUS_STOP  },
+  { ">"   , XINE_STATUS_PLAY  },
+  { "{"   , XINE_STATUS_QUIT  }
 };
 
 static const struct xine_speeds_s {
@@ -146,7 +146,7 @@ static void *osd_loop(void *dummy)
 	return NULL;
 }
 
-static char *_osd_get_speed_sym(int speed) {
+static const char *_osd_get_speed_sym(int speed) {
   int i;
 
   for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
@@ -157,7 +157,7 @@ static char *_osd_get_speed_sym(int speed) {
   return NULL;
 }
 
-static char *_osd_get_status_sym(int status) {
+static const char *_osd_get_status_sym(int status) {
   int i;
 
   for(i = 0; i < sizeof(xine_status)/sizeof(xine_status[0]); i++) {
@@ -177,7 +177,7 @@ void osd_init(void) {
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
   fbxine.osd.bar[0] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_palette(fbxine.osd.bar[0], textpalettes_color, textpalettes_trans);
+  xine_osd_set_palette(fbxine.osd.bar[0], (uint32_t *)textpalettes_color, textpalettes_trans);
 
   fbxine.osd.bar[1] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   xine_osd_set_font(fbxine.osd.bar[1], "sans", fonth);

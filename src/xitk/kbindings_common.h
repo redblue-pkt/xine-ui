@@ -74,5 +74,10 @@ typedef struct {
   int               is_gui;
 } user_kbinding_t;
 
+void        _kbindings_free_bindings_no_kbt(kbinding_t *);
+void        _kbindings_free_bindings(kbinding_t *);
+void        _kbindings_init_to_default_no_kbt(kbinding_t *);
+kbinding_t *_kbindings_init_to_default(void);
+
 #endif
 

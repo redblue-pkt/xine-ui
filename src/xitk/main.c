@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -561,7 +561,7 @@ static void show_usage (void) {
   char         *cfgdir     = CONFIGDIR;
   char         *cfgfile    = CONFIGFILE;
   char         *configfile = NULL;
-  char        **backends, *backend;
+  const char  **backends, *backend;
   
   configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
 				     + strlen(cfgdir) 

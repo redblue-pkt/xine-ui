@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -32,6 +32,6 @@ void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *
 int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height);
 int tvout_get_fullscreen_mode(tvout_t *tvout);
 void tvout_deinit(tvout_t *tvout);
-char **tvout_get_backend_names(void);
+const char **tvout_get_backend_names(void);
 
 #endif

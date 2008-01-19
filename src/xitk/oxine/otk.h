@@ -87,11 +87,11 @@ otk_widget_t *otk_slider_new (otk_widget_t *win, int x, int y, int w, int h, otk
 otk_widget_t *otk_slider_grid_new (otk_slider_cb_t cb);
 
 otk_widget_t *otk_selector_new(otk_widget_t *win, int x, int y, 
-                           int w, int h, const char **items, int num,
+                           int w, int h, const char *const *items, int num,
 			   otk_selector_cb_t cb,
 			   void *cb_data);
 
-otk_widget_t *otk_selector_grid_new (const char **items, int num,
+otk_widget_t *otk_selector_grid_new (const char *const *items, int num,
 			      otk_selector_cb_t cb,
 			      void *cb_data);
 
