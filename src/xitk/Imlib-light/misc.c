@@ -763,7 +763,9 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   
   if (f)
     {
-      while (fgets(s, 4096, f))
+      size_t length;
+      s = NULL;
+      while (getline (&s, &length, f) >= 0)
 	{
 	  if (s[0] == '#')
 	    continue;
@@ -924,6 +926,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 		id->ordered_dither = 1;
 	    }
 	}
+      free (s);
       fclose(f);
     }
   setlocale(LC_NUMERIC, old_locale);
