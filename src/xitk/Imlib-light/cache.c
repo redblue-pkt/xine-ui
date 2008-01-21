@@ -142,6 +142,8 @@ free_pixmappmap(ImlibData * id, Pixmap pmap)
 {
   struct pixmap_cache *ptr;
 
+  if (!pmap)
+    return;
   ptr = id->cache.pixmap;
   while (ptr)
     {
