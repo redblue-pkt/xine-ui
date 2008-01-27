@@ -413,6 +413,19 @@ static int _kbinding_get_is_gui_from_default(char *action) {
 void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
   int          i;
 
+  /*
+   * FIXME: This should be a compile time check.
+   */
+  /* Check for space to hold the default table plus a number of user defined aliases. */
+  if(sizeof(default_binding_table)/sizeof(default_binding_table[0])+100 > MAX_ENTRIES) {
+    fprintf(stderr, "%s(%d):\n"
+		    "  Too many entries in default_binding_table[].\n"
+		    "  Increase MAX_ENTRIES to at least %d.\n",
+	    __XINE_FUNCTION__, __LINE__,
+	    sizeof(default_binding_table)/sizeof(default_binding_table[0])+100);
+    abort();
+  }
+
   for(i = 0; default_binding_table[i].action != NULL; i++) {
     kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
     kbt->entry[i]->comment = strdup(default_binding_table[i].comment);
@@ -420,6 +433,8 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
     kbt->entry[i]->action_id = default_binding_table[i].action_id;
     kbt->entry[i]->key = strdup(default_binding_table[i].key);
     kbt->entry[i]->modifier = default_binding_table[i].modifier;
+    kbt->entry[i]->is_alias = default_binding_table[i].is_alias;
+    kbt->entry[i]->is_gui = default_binding_table[i].is_gui;
   }
   kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
   kbt->entry[i]->comment = NULL;
@@ -427,8 +442,10 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
   kbt->entry[i]->action_id = 0;
   kbt->entry[i]->key = NULL;
   kbt->entry[i]->modifier = 0;
+  kbt->entry[i]->is_alias = 0;
+  kbt->entry[i]->is_gui = 0;
 
-  kbt->num_entries = i + 1;
+  kbt->num_entries = i + 1; /* Count includes the terminating null entry! */
 }
 
 kbinding_t *_kbindings_init_to_default(void) {
@@ -563,6 +580,12 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 
   ABORT_IF_NULL(kbt);
   ABORT_IF_NULL(ukb);
+
+  /* This should only happen if the keymap file was edited manually. */
+  if(kbt->num_entries >= MAX_ENTRIES) {
+    fprintf(stderr, _("xine-ui: Too many Alias entries in keymap file, entry ignored.\n"));
+    return;
+  }
 
   k = kbindings_lookup_action(kbt, ukb->alias);
   if(k) {
@@ -788,37 +811,6 @@ static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
 }
 #endif
 
-static void _kbindings_subst_percent(char *src, char *dest) {
-  char *s, *d;
-  
-  if(!src || !dest)
-    return;
-  
-  if(!strlen(src))
-    return;
-
-  if(strchr(src, '%')) {
-    s = src;
-    d = dest;
-    while(*s != '\0') {
-      
-      switch(*s) {
-      case '%':
-	if((*(s) == '%') && (*(s + 1) != '%'))
-	  *d++ = *s;
-      default:
-	*d = *s;
-	break;
-      }
-      s++;
-      d++;
-    }
-    *d = '\0';
-  }
-  else
-    strcpy(dest, src);
-}
-
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
   int            i, j, found = 0;
   char          *kmsg = NULL;
@@ -832,16 +824,14 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
 	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) && 
 	   (strcasecmp(kbt->entry[i]->key, "void"))) {
-	  char action1[1024], action2[1024];
+	  char *action1, *action2;
 	  char *dna = _("and");
 	  int  len;
 	  
 	  found++;
 	  
-	  memset(&action1, 0, sizeof(action1));
-	  memset(&action2, 0, sizeof(action2));
-	  _kbindings_subst_percent(kbt->entry[i]->action, &action1[0]);
-	  _kbindings_subst_percent(kbt->entry[j]->action, &action2[0]);
+	  action1 = kbt->entry[i]->action;
+	  action2 = kbt->entry[j]->action;
 
 	  len = strlen(action1) + 1 + strlen(dna) + 1 + strlen(action2);
 
@@ -877,8 +867,6 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
 						     (void *) kbt, 450, ALIGN_CENTER,
 						     "%s", kmsg);
-    free(kmsg);
-
     XLockDisplay(gGui->display);
     if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
@@ -888,6 +876,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
   }
 #endif
 
+  free(kmsg);
 }
 
 /*
