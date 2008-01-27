@@ -1,6 +1,7 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * Fixed possible corruption and overflow of keybindings table
   * Mark the toolbar window as such; should fix control panel visibility issues
     in full-screen mode with some window managers. [bug SF 1750100]
   * New command/keybinding from Richard van Paasen:
