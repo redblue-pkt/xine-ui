@@ -863,6 +863,11 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   switch(kbedit->action_wanted) {
     
   case KBEDIT_ALIASING:
+    if(kbedit->kbt->num_entries >= MAX_ENTRIES) {
+      xine_error(_("No more space for additional entries!"));
+      return;
+    }
+
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment   = strdup(kbedit->ksel->comment);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action    = strdup(kbedit->ksel->action);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
@@ -907,7 +912,6 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   SAFE_FREE(kbe->key);
   SAFE_FREE(kbe);
   kbedit_unset();
-
 }
 
 static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
