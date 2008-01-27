@@ -48,7 +48,7 @@ struct kbinding_entry_s {
   int               is_gui;
 };
 
-#define MAX_ENTRIES 255
+#define MAX_ENTRIES 301          /* Including terminating null entry */
 struct kbinding_s {
   int               num_entries;
   kbinding_entry_t *entry[MAX_ENTRIES];
