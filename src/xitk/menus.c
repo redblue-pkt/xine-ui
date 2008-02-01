@@ -967,7 +967,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
     asprintf(&menu_entry.menu, "%s/%s", _("Playback"), _("Add Mediamark"));
-    menu_entry.menu      = buffer;
     menu_entry.shortcut  = menu_get_shortcut("AddMediamark");
     menu_entry.cb        = menu_playback_ctrl;
     menu_entry.user_data = (void *) PLAYB_ADDMMK;
