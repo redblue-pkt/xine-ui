@@ -13,7 +13,8 @@
 
 Name:        %{name}
 Summary:     A Free Audio/Video Player.
-Summary(cs): Voln audio a video pehr�a�Summary(de): Ein freies Audio- und Video-Abspielprogramm
+Summary(cs): Voln audio a video pehrďż˝aďż˝
+Summary(de): Ein freies Audio- und Video-Abspielprogramm
 Version:     %{version}
 Release:     %{release}
 License:     GPL
@@ -33,12 +34,13 @@ uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
 
 %description -l cs
-xine je v�e�lov voln�iiteln audio a video pehr�a�pro unixovsk�syst�y, kter pou��libxine k dek�ov��zvuku a videa a k pehr���
-V�e informac�o tom, jak�form�y jsou podporov�y z�k�e v dokumentaci
+xine je vďż˝eďż˝lov volnďż˝iiteln audio a video pehrďż˝aďż˝pro unixovskďż˝systďż˝y,
+kter pouďż˝ďż˝libxine k dekďż˝ovďż˝ďż˝zvuku a videa a k pehrďż˝ďż˝ďż˝
+Vďż˝e informacďż˝o tom, jakďż˝formďż˝y jsou podporovďż˝y zďż˝kďż˝e v dokumentaci
 od libxine.
 
 %description -l de
-xine ist ein freies Audio- und Video-Abspielprogramm fr unixartige Systeme
+xine ist ein freies Audio- und Video-Abspielprogramm für unixartige Systeme
 mit umfassenden Funktionen. Zur Audio- und Videodekodierung und Wiedergabe
 werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
 ber die untersttzten Formate entnehmen Sie in der Dokumentation zu libxine.
@@ -66,172 +68,32 @@ fi
 	    --localstatedir=%{_localstatedir} \
 	    --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
 	    --infodir=%{_infodir}
-make
+
+%{__make} %{?jobs:-j%{jobs}}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=%{?buildroot:%{buildroot}} install
-install -m 644 misc/desktops/xine.wmconfig %{?buildroot:%{buildroot}}%{deskdir}/
-
-%post
-if [ "$1" = "1" ] || [ "$1" = "2" ] ; then # install or update
-  if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
-  if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
-
-  if test ! -d %{_datadir}/icons; then
-    %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
-  fi
-  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm %{_datadir}/icons/xine.xpm
-  if test ! -d %{_datadir}/pixmaps; then
-    %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
-  fi
-  if test -d %{_sysconfdir}/X11/wmconfig; then
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
-  fi
-  if test -d %{_sysconfdir}/X11/applnk; then
-    if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then
-      %{ginstall} -m 755 -o 0 -g 0 -d %{_sysconfdir}/X11/applnk/Multimedia
-    fi
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop
-  fi
-  # End Icons
-  # Gnome
-  if test -d /opt/gnome; then
-    if test ! -d /opt/gnome/share/pixmaps; then
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
-    fi
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
-    if test -d /opt/gnome/share/gnome/apps/Multimedia; then
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
-    else
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/gnome/apps/Multimedia
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
-    fi
-  else
-    if test -d %{_datadir}/gnome/apps; then
-      if test -d %{_datadir}/gnome/apps/Multimedia; then
-        %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
-      else
-        %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/gnome/apps/Multimedia
-        %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
-      fi
-    fi
-  fi
-  # End Gnome
-  # Kde3
-  if test -d /opt/kde3/; then
-    DIR_HI3=/opt/kde3/share/icons/hicolor
-    DIR_LO3=/opt/kde3/share/icons/locolor
-    HIRES3='48x48 32x32 22x22'
-    LORES3='32x32 22x22 16x16'
-    for hires in $HIRES3; do
-      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI3/$hires/apps
-      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
-    done
-    for lores in $LORES3; do
-      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO3/$lores/apps
-      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
-    done
-    if test ! -d /opt/kde3/share/applnk/Multimedia; then
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
-    fi
-    cat %{deskdir}/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > %{deskdir}/xine.desktop.kde
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
-    rm %{deskdir}/xine.desktop.kde
-  fi
-  # End Kde3
-  # Kde2
-  if test -d /opt/kde2/; then
-    DIR_HI=/opt/kde2/share/icons/hicolor
-    DIR_LO=/opt/kde2/share/icons/locolor
-    HIRES='48x48 32x32 22x22'
-    LORES='32x32 22x22 16x16'
-    for hires in $HIRES; do
-      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
-      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI/$hires/apps/xine.png
-    done
-    for lores in $LORES; do
-      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
-      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO/$lores/apps/xine.png
-    done
-    if test ! -d /opt/kde2/share/applnk/Multimedia; then
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
-    fi
-    cat %{deskdir}/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > %{deskdir}/xine.desktop.kde
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
-    rm %{deskdir}/xine.desktop.kde
-  else
-    if test -d %{_datadir}/applnk/Multimedia; then
-      if test ! -d %{_datadir}/applnk/Multimedia; then
-        %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/applnk/Multimedia
-      fi
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
-    fi
-  fi
-  # End Kde2
-  # Kde
-  if test -d /opt/kde; then
-    if test ! -d /opt/kde/share/icons; then
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/icons
-    fi
-    if test ! -d /opt/kde/share/applnk/Multimedia; then
-      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
-    fi
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/kde/share/icons/xine.xpm
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
-  else
-    if test -d %{_datadir}/applnk/Multimedia; then
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
-    fi
-  fi
-  # End Kde
-fi
-
-%preun
-if [ "$1" = "0" ]; then # remove
-  DIR_HI=/opt/kde2/share/icons/hicolor
-  DIR_LO=/opt/kde2/share/icons/locolor
-  DIR_HI3=/opt/kde3/share/icons/hicolor
-  DIR_LO3=/opt/kde3/share/icons/locolor
-  # icon dimensions
-  HIRES='48x48 32x32 22x22'
-  LORES='32x32 22x22 16x16'
-  # files to remove
-  REMOVALS='%{_datadir}/icons/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
-  # remove files in $REMOVALS
-  for remove in $REMOVALS; do
-    rm -f $remove
-  done
-  # KDE2 icons
-  for hires in $HIRES; do
-    rm -f $DIR_HI/$hires/apps/xine.png
-  done
-  for lores in $LORES; do
-    rm -f $DIR_LO/$lores/apps/xine.png
-  done
-  # KDE3 icons
-  for hires in $HIRES; do
-    rm -f $DIR_HI3/$hires/apps/xine.png
-  done
-  for lores in $LORES; do
-    rm -f $DIR_LO3/$lores/apps/xine.png
-  done
-fi
+[ "${RPM_BUILD_ROOT}" != "/" ] && %{__rm} -rf ${RPM_BUILD_ROOT}
+%makeinstall
+%{__mkdir_p} ${RPM_BUILD_ROOT}/%{_datadir}/applications/
+%{__install} -c -m644 ${RPM_BUILD_ROOT}/%{_datadir}/xine/desktop/xine.desktop ${RPM_BUILD_ROOT}/%{_datadir}/applications/
+%{__install} -m 644 misc/desktops/xine.wmconfig %{?buildroot:%{buildroot}}%{deskdir}/
+%{__rm} -rf ${RPM_BUILD_ROOT}/%{deskdir}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+[ "${RPM_BUILD_ROOT}" != "/" ] && %{__rm} -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(-,root,root)
 %doc %{_docdir}/*
 %doc %{_datadir}/doc/xitk/*
-%{_bindir}/*xine*
+%{_bindir}/*
 %{skindir}/*
-%{deskdir}/*
 %{_datadir}/pixmaps/*
 %{_datadir}/xine/visuals/*
 %{_datadir}/xine/oxine/*
 %{_datadir}/icons/hicolor/*/apps/xine.png
+%{_datadir}/applications/xine.desktop
+%{_datadir}/mime/packages/xine-ui.xml
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
 %lang(es) %{_mandir}/es/man1/*
@@ -240,6 +102,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Fri Feb 15 2008 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- rework of the spec-file, also based on the work of Chris Rankin
 * Sat Nov 05 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - changed Copyright to License
 * Sun Oct 30 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
@@ -293,7 +157,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Dec 14 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add portuguese brazilian *.mo files: thanks to Miguel Freitas <miguel@cetuc.puc-rio.br> ;-)
 * Tue Nov 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-- Add spanish *.mo files: thanks to Juan Manuel Garc� Molina <juanmagm@mail.com>
+- Add spanish *.mo files: thanks to Juan Manuel Garcďż˝ Molina <juanmagm@mail.com>
 * Sun Nov 18 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add *.mo files
 * Wed Oct 3 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
@@ -301,7 +165,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Sep 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add icons and desktop stuff from patches by Miguel Freitas <miguel@cetuc.puc-rio.br>
 * Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-- Merge patch from Jos�Carlos Monteiro <jcm@netcabo.pt>:
+- Merge patch from Josďż˝Carlos Monteiro <jcm@netcabo.pt>:
   - Filelist and other minor updates,
   - Fixed some SuSE compatibility issues,
   - Added Portuguese summary.

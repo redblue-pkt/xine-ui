@@ -18,7 +18,8 @@ EXTRA_DIST = \
 	xine-check.en \
 	xine_bash_completion \
 	xine-ui_logo.mpv \
-	xine_splash.png
+	xine_splash.png \
+	xine-ui.xml
 
 bin_SCRIPTS = xine-check xine-bugreport
 

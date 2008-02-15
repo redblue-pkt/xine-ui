@@ -90,6 +90,7 @@ noinst_HEADERS = \
 	i18n.h \
 	help.h \
 	kbindings.h \
+	kbindings_common.h \
 	lang.h \
 	lirc.h \
 	mediamark.h \
