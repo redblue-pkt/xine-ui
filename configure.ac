@@ -424,15 +424,6 @@ PKG_CHECK_MODULES([LIBPNG], [libpng >= 1.2.8],,
   [PKG_CHECK_MODULES([LIBPNG], [libpng12 >= 1.2.8])])
 
 dnl
-dnl
-dnl
-AC_CHECK_LIB(posix4, nanosleep)
-AC_CHECK_FUNCS(strsep nanosleep)
-AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS,,[Define this is you have stdarg.h header file installed]))
-AC_CHECK_HEADERS(string.h strings.h linux/kd.hb execinfo.h)
-
-
-dnl
 dnl Check for LIRC client support
 dnl
 AC_CHECK_LIRC
@@ -526,7 +517,9 @@ dnl
 dnl system function checks (defined _GNU_SOURCE)
 dnl
 AC_DEFINE([_GNU_SOURCE], [], [enable GNU libc extension])
-AC_CHECK_FUNCS([getline getsubopt strndup strsep strlcat strlcpy])
+AC_CHECK_LIB(posix4, nanosleep)
+AC_CHECK_FUNCS([getline getsubopt nanosleep strndup strsep strlcat strlcpy])
+AC_CHECK_HEADERS(string.h strings.h linux/kd.hb execinfo.h)
 
 
 dnl
