@@ -151,17 +151,7 @@ Imlib_clone_image(ImlibData * id, ImlibImage * im)
     }
   else
     im2->alpha_data = NULL;
-  s = malloc(strlen(im->filename) + 320);
-  if (s)
-    {
-      snprintf(s, sizeof(s), "%s_%x_%x", im->filename, (int)time(NULL), (int)rand());
-      im2->filename = malloc(strlen(s) + 1);
-      if (im2->filename)
-	strcpy(im2->filename, s);
-      free(s);
-    }
-  else
-    im2->filename = NULL;
+  asprintf(&im2->filename, "%s_%x_%x", im->filename, (int)time(NULL), (int)rand());
   im2->width = 0;
   im2->height = 0;
   im2->shape_color.r = im->shape_color.r;
