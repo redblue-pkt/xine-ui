@@ -345,7 +345,7 @@ void tvset_panel(void) {
   xitk_enable_and_show_widget(tvset.input);
 
   {
-    const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
+    static const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
     tvset.system_entries = (const char **) calloc((chanlists_count+1), sizeof(const char *));
   
     for(i = 0; i < chanlists_count; i++)

@@ -74,12 +74,12 @@ extern void gui_handle_event(XEvent *event, void *data);
 static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data, 
 				   xitk_mrlbrowser_filter_t **mrl_f) {
   xitk_mrlbrowser_filter_t **mrl_filters = mrl_f;
-  int                        i = 0;
+  size_t                     i = 0;
   
   private_data->filters_num = 0;
 
   if(mrl_f == NULL) {
-    int len = sizeof(__mrl_filters) / sizeof(xitk_mrlbrowser_filter_t);
+    static const size_t len = sizeof(__mrl_filters) / sizeof(xitk_mrlbrowser_filter_t);
 
     private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * len);
