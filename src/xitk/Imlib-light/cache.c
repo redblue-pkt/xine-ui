@@ -225,13 +225,12 @@ add_image(ImlibData * id, ImlibImage * im, char *file)
     return;
   n->prev = NULL;
   n->next = ptr;
-  n->file = malloc(strlen(file) + 1);
+  n->file = strdup(file);
   if (!n->file)
     {
       free(n);
       return;
     }
-  strcpy(n->file, file);
   n->im = im;
   n->refnum = 1;
   n->dirty = 0;

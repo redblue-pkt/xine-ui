@@ -145,8 +145,7 @@ int do_command_line(int argc, char **argv) {
 
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
-	dfbxine.audio_driver_id = xine_xmalloc (strlen (optarg) + 1);
-	strcpy (dfbxine.audio_driver_id, optarg);
+	dfbxine.audio_driver_id = strdup(optarg);
       } else {
 	fprintf (stderr, "audio driver id required for -A option\n");
 	exit (1);
@@ -155,8 +154,7 @@ int do_command_line(int argc, char **argv) {
 
     case 'V': /* Select video driver */
       if(optarg != NULL) {
-	dfbxine.video_driver_id = xine_xmalloc (strlen (optarg) + 1);
-	strcpy (dfbxine.video_driver_id, optarg);
+	dfbxine.video_driver_id = strdup(optarg);
       } else {
 	fprintf (stderr, "video driver id required for -V option\n");
 	exit (1);
