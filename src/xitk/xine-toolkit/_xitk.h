@@ -231,15 +231,6 @@ static inline char *_x_strsep(char **stringp, const char *delim) {
 #define xitk_strsep _x_strsep
 #endif
 
-void xitk_strdupa(char *dest, char *src);
-#define xitk_strdupa(d, s) do {                                     \
-  (d) = NULL;                                                       \
-  if((s) != NULL) {                                                 \
-    (d) = (char *) alloca(strlen((s)) + 1);                         \
-    strcpy((d), (s));                                               \
-  }                                                                 \
-} while(0)
-
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) do {                                                   \
       (d)->tv_sec = (s)->tv_sec;                                              \

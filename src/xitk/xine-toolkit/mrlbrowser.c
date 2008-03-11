@@ -194,12 +194,11 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
   /* filtering is enabled */
   if(private_data->filter_selected) {
     char *filter_ends;
-    char *p, *m;
+    const char *const selected_ending = private_data->mrl_filters[private_data->filter_selected]->ending;
 
     private_data->mc->mrls_to_disp = 0;
 
-    filter_ends = strdup(private_data->mrl_filters[private_data->filter_selected]->ending);
-    xitk_strdupa(p, filter_ends);
+    filter_ends = strdup(selected_ending);
 
     for(i = 0; i < private_data->mrls_num; i++) {
 
@@ -212,7 +211,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	private_data->mc->mrls_to_disp++;
       }
       else {
-	char *ending;
+	char *ending, *m;
 
 	if((ending = strrchr(private_data->mc->mrls[i]->mrl, '.'))) {
 
@@ -227,7 +226,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	    }
 	  }
 	  free(filter_ends);
-	  filter_ends = strdup(p);
+	  filter_ends = strdup(selected_ending);
 	}
       }    
     }

@@ -377,12 +377,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       w->visible                  = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable                   = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
-      {
-	char *label;
-	
-	xitk_strdupa(label, private_data->label);
-	label_setup_label(w, label);
-      }
+      label_setup_label(w, private_data->label);
       
       if(!pthread_mutex_trylock(&private_data->change_mutex)) {
 	paint_label(w);
