@@ -305,9 +305,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   im->bmod.gamma = id->bmod.gamma;
   im->bmod.brightness = id->bmod.brightness;
   im->bmod.contrast = id->bmod.contrast;
-  im->filename = malloc(strlen(file) + 1);
-  if (im->filename)
-    strcpy(im->filename, file);
+  im->filename = strdup(file);
   if ((id->cache.on_image) && (im))
     add_image(id, im, fil);
   calc_map_tables(id, im);
