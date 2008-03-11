@@ -174,24 +174,6 @@ typedef struct {
   } while (0)
 #endif
 
-#ifdef HAVE_STRPBRK
-#define xitk_strpbrk strpbrk
-#else
-static inline char *_x_strpbrk(const char *s, const char *accept) {
-
-  while(*s != '\0') {
-    const char *a = accept;
-    while(*a != '\0')
-      if(*a++ == *s)
-	return(char *) s;
-    ++s;
-  }
-
-  return NULL;
-}
-#define xitk_strpbrk _x_strpbrk
-#endif
-
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) do {                                                   \
       (d)->tv_sec = (s)->tv_sec;                                              \
