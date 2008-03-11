@@ -20,8 +20,6 @@
  * parsing mediamarks
  */
 
-#define _GNU_SOURCE   /* this is needed for getline(..) and strndup(..) */
-
 #include "config.h"
 
 #include <stdio.h>
