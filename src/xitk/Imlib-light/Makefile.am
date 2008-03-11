@@ -11,7 +11,6 @@ libImlib_light_a_SOURCES = \
 	load.c \
 	misc.c \
 	rend.c \
-	snprintf.c \
 	utils.c 
 
 noinst_HEADERS = \
