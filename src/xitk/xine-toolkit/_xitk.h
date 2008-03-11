@@ -192,45 +192,6 @@ static inline char *_x_strpbrk(const char *s, const char *accept) {
 #define xitk_strpbrk _x_strpbrk
 #endif
 
-#ifdef HAVE_STRSEP
-#define xitk_strsep strsep
-#else
-static inline char *_x_strsep(char **stringp, const char *delim) {
-  char *begin, *end;
-  
-  begin = *stringp;
-  if(begin == NULL)
-    return NULL;
-  
-  if(delim[0] == '\0' || delim[1] == '\0') {
-    char ch = delim[0];
-    
-    if(ch == '\0')
-      end = NULL;
-    else {
-      if(*begin == ch)
-	end = begin;
-      else if(*begin == '\0')
-	end = NULL;
-      else
-	end = strchr(begin + 1, ch);
-    }
-  }
-  else
-    end = xitk_strpbrk(begin, delim);
-  
-  if(end) {
-    *end++ = '\0';
-    *stringp = end;
-  }
-  else
-    *stringp = NULL;
-  
-  return begin;
-}
-#define xitk_strsep _x_strsep
-#endif
-
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) do {                                                   \
       (d)->tv_sec = (s)->tv_sec;                                              \

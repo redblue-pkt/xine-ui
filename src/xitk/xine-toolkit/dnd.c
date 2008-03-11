@@ -113,7 +113,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	
 	pbuf = buf;
 	/* Extract all data, '\n' separated */
-	while((p = xitk_strsep(&pbuf, "\n")) != NULL) {
+	while((p = strsep(&pbuf, "\n")) != NULL) {
 	  
 	  plen = strlen(p) - 1;
 	  
