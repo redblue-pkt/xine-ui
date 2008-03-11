@@ -97,8 +97,8 @@ PaletteLUTSet(ImlibData *id)
       prop[j++] = (unsigned char)id->palette[i].b;
       prop[j++] = (unsigned char)id->palette[i].pixel;
     }
-  for (i = 0; i < (32 * 32 * 32); i++)
-    prop[j++] = (unsigned char)id->fast_rgb[i];
+  memcpy(&prop[j], &(id->fast_rgb[i]), (32*32*32));
+  j += (32*32*32);
   XChangeProperty(id->x.disp, id->x.root, to_set, XA_CARDINAL, 8, 
 		  PropModeReplace, (unsigned char *)prop, j);
   free(prop);
