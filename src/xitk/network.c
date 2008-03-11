@@ -679,7 +679,7 @@ static void session_update_prompt(session_t *session) {
 }
 
 static void session_create_commands(session_t *session) {
-  int num_commands = (sizeof(client_commands) / sizeof(client_commands[0]));
+  static const size_t num_commands = (sizeof(client_commands) / sizeof(client_commands[0]));
   int i;
   
   if(session == NULL)
@@ -960,7 +960,7 @@ static void *select_thread(void *data) {
 		if((special = strstr(obuffer, COMMANDS_PREFIX)) != NULL) {
 		  char  *p, *pp;
 		  int    special_length = strlen(special);
-		  int    i = (sizeof(client_commands) / sizeof(client_commands[0])) - 1;
+		  size_t i = (sizeof(client_commands) / sizeof(client_commands[0])) - 1;
 		  
 		  pp = special + 11;
 		  while((p = xine_strsep(&pp, "\t")) != NULL) {
