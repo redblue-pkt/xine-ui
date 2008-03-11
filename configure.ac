@@ -429,7 +429,7 @@ dnl
 AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS(vsnprintf snprintf strsep nanosleep)
 AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS,,[Define this is you have stdarg.h header file installed]))
-AC_CHECK_HEADERS(string.h strings.h alloca.h linux/kd.hb execinfo.h)
+AC_CHECK_HEADERS(string.h strings.h linux/kd.hb execinfo.h)
 
 
 dnl
