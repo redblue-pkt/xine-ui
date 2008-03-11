@@ -1514,7 +1514,7 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
     return NULL;
 
   post_elements = (post_element_t **) 
-    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+    calloc((*post_elements_num), sizeof(post_element_t *));
 
   for( i = 0; gGui->deinterlace_enable && i < gGui->deinterlace_elements_num; i++ ) {
     post_elements[i+j] = gGui->deinterlace_elements[i];
@@ -1542,7 +1542,7 @@ static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_
     return NULL;
 
   post_elements = (post_element_t **) 
-    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+    calloc((*post_elements_num), sizeof(post_element_t *));
   
   for( j = 0; gGui->post_audio_enable && j < gGui->post_audio_elements_num; j++ ) {
     post_elements[i+j] = gGui->post_audio_elements[j];
@@ -1570,7 +1570,7 @@ static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
     if(post_num) {
       if(!*_post_elements) {
 	*_post_elements = (post_element_t **) 
-	  xine_xmalloc(sizeof(post_element_t *) * (post_num + 1));
+	  calloc((post_num + 1), sizeof(post_element_t *));
       }
       else {
 	int j;

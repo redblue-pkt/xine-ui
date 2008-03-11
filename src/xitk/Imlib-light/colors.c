@@ -113,9 +113,9 @@ _PaletteAlloc(ImlibData * id, int num, const int *cols)
   unsigned int        used[256], num_used, is_used, j;
 
   free(id->palette);
-  id->palette = malloc(sizeof(ImlibColor) * num);
+  id->palette = calloc(num, sizeof(ImlibColor));
   free(id->palette_orig);
-  id->palette_orig = malloc(sizeof(ImlibColor) * num);
+  id->palette_orig = calloc(num, sizeof(ImlibColor));
   num_used = 0;
   colnum = 0;
   for (i = 0; i < num; i++)

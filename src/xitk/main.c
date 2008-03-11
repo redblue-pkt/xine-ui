@@ -246,7 +246,7 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   file_info_t   *rcfile;
   char        **_argv = NULL;
   
-  _argv  = (char **) xine_xmalloc(sizeof(char **) * (argc + 1));
+  _argv  = (char **) calloc((argc + 1), sizeof(char *));
   (*_argc) = argc;
 
   _argv[0] = strdup(argv[0]);
@@ -2058,7 +2058,7 @@ int main(int argc, char *argv[]) {
     
     while(vids[i++]);
     
-    video_driver_ids = (char **) xine_xmalloc(sizeof(char *) * (i + 1));
+    video_driver_ids = (char **) calloc((i + 1), sizeof(char *));
     i = 0;
     video_driver_ids[i] = strdup("auto");
     while(vids[i]) {
@@ -2113,7 +2113,7 @@ int main(int argc, char *argv[]) {
     
     while(aids[i++]);
     
-    audio_driver_ids = (char **) xine_xmalloc(sizeof(char *) * (i + 2));
+    audio_driver_ids = (char **) calloc((i + 2), sizeof(char *));
     i = 0;
     audio_driver_ids[i] = strdup("auto");
     audio_driver_ids[i + 1] = strdup("null");

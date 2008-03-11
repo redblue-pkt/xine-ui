@@ -67,7 +67,7 @@ static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
   int         rsize = size * nmemb;
 
   if(download->size == 0)
-    download->buf = (char *) malloc(sizeof(char) * (rsize + 1));
+    download->buf = (char *) calloc((rsize + 1), sizeof(char));
   else
     download->buf = (char *) realloc(download->buf, sizeof(char) * (download->size + rsize + 1));
   

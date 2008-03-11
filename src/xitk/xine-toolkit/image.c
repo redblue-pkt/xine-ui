@@ -695,7 +695,7 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
     int y, iy, dd;
 
     nsegments = dy;
-    segments = (XSegment *) xitk_xmalloc(sizeof(XSegment) * nsegments);
+    segments = (XSegment *) calloc(nsegments, sizeof(XSegment));
 
     if(direction == DIRECTION_DOWN) {
       y = y1; iy = 1;
@@ -727,7 +727,7 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
     int x, ix, dd;
 
     nsegments = dx;
-    segments = (XSegment *) xitk_xmalloc(sizeof(XSegment) * nsegments);
+    segments = (XSegment *) calloc(nsegments, sizeof(XSegment));
 
     if(direction == DIRECTION_RIGHT) {
       x = x1; ix = 1;

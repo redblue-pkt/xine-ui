@@ -254,7 +254,7 @@ static void _dnd_get_type_list (xitk_dnd_t *xdnd, Window window, Atom **typelist
     return;
   }
 
-  *typelist = (Atom *) xitk_xmalloc((count + 1) * sizeof(Atom));
+  *typelist = (Atom *) calloc((count + 1), sizeof(Atom));
   a = (Atom *) data;
 
   for(i = 0; i < count; i++)

@@ -1150,7 +1150,7 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
 
   if(fb && fb->files_num) {
     int i;
-    files = (char **) xine_xmalloc(sizeof(char *) * (fb->files_num + 2));
+    files = (char **) calloc((fb->files_num + 2), sizeof(char *));
     
     for(i = 0; i < fb->files_num; i++)
       files[i] = strdup(fb->norm_files[i].name);

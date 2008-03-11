@@ -6320,7 +6320,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   im->height = h;
 
 /* dithering array */
-  error = (int *)malloc(sizeof(int) * (w + 2) * 2 * 3);
+  error = (int *)calloc((w + 2), sizeof(int) * 2 * 3);
 
   if (!error)
     {
@@ -6335,7 +6335,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   ptr22 = im->rgb_data;
 
 /* setup coord-mapping array (specially for border scaling) */
-  xarray = malloc(sizeof(int) * w);
+  xarray = calloc(w, sizeof(int));
 
   if (!xarray)
     {
@@ -6343,7 +6343,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
       free(error);
       return 0;
     }
-  yarray = malloc(sizeof(unsigned char *) * h);
+  yarray = calloc(h, sizeof(unsigned char *));
 
   if (!yarray)
     {
@@ -6724,7 +6724,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
       if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
 	{
-	  stmp = (unsigned char *)malloc(((w >> 3) + 8) * h);
+	  stmp = (unsigned char *)calloc(((w >> 3) + 8), h);
 	  if (!stmp)
 	    {
 	      fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for shape XImage data\n");

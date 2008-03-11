@@ -696,7 +696,7 @@ static void session_create_commands(session_t *session) {
     free(session_commands);
   }
   
-  session_commands = (session_commands_t **) malloc(sizeof(session_commands_t *) * num_commands);
+  session_commands = (session_commands_t **) calloc(num_commands, sizeof(session_commands_t *));
   for(i = 0; client_commands[i].command != NULL; i++) {
     session_commands[i] = (session_commands_t *) malloc(sizeof(session_commands_t));
     session_commands[i]->command   = strdup(client_commands[i].command);

@@ -423,7 +423,7 @@ void preinit_skins_support(void) {
     exit(-1);
   }
   
-  skin_names = (char **) xine_xmalloc(sizeof(char *) * (skins_avail_num + 1));
+  skin_names = (char **) calloc((skins_avail_num + 1), sizeof(char *));
 
   for(i = 0; i < skins_avail_num; i++)
     skin_names[i] = strdup(skins_avail[i]->skin);

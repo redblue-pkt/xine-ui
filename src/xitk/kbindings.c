@@ -571,8 +571,8 @@ static void kbedit_create_browser_entries(void) {
   fs = xitk_font_load_font(gGui->display, br_fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   
-  kbedit->entries   = (char **) xine_xmalloc(sizeof(char *) * kbedit->kbt->num_entries);
-  kbedit->shortcuts = (char **) xine_xmalloc(sizeof(char *) * kbedit->kbt->num_entries);
+  kbedit->entries   = (char **) calloc(kbedit->kbt->num_entries, sizeof(char *));
+  kbedit->shortcuts = (char **) calloc(kbedit->kbt->num_entries, sizeof(char *));
   kbedit->num_entries = kbedit->kbt->num_entries - 1;
   
   for(i = 0; i < kbedit->num_entries; i++) {

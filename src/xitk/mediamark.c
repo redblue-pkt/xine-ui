@@ -442,7 +442,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 			if(!found_nument) {
 			  if(entries_pls) {
 			    playlist->entries = entries_pls;
-			    mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * (entries_pls + 1));
+			    mmk = (mediamark_t **) calloc((entries_pls + 1), sizeof(mediamark_t *));
 			    found_nument = 1;
 			  }
 			}

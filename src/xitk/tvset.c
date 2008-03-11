@@ -135,7 +135,7 @@ static void tvset_update(xitk_widget_t *w, void *data) {
   xine_event_t          xine_event;
   xine_set_v4l2_data_t *ev_data;
   
-  ev_data = (xine_set_v4l2_data_t *)xine_xmalloc(sizeof(xine_set_v4l2_data_t));
+  ev_data = (xine_set_v4l2_data_t *)malloc(sizeof(xine_set_v4l2_data_t));
   
   ev_data->input     = xitk_intbox_get_value(tvset.input);
   ev_data->frequency = (chanlists[xitk_combo_get_current_selected(tvset.system)].
@@ -236,7 +236,7 @@ static int update_chann_entries(int system_entry) {
   
   free(tvset.chann_entries);
 
-  tvset.chann_entries = (const char **) xine_xmalloc(sizeof(const char *) * (len+1) );
+  tvset.chann_entries = (const char **) calloc((len+1), sizeof(const char *));
   
   for(i = 0; i < len; i++)
     tvset.chann_entries[i] = list[i].name;
@@ -346,7 +346,7 @@ void tvset_panel(void) {
 
   {
     const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
-    tvset.system_entries = (const char **) xine_xmalloc(sizeof(const char *) * (chanlists_count+1));
+    tvset.system_entries = (const char **) calloc((chanlists_count+1), sizeof(const char *));
   
     for(i = 0; i < chanlists_count; i++)
       tvset.system_entries[i] = chanlists[i].name;

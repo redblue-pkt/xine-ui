@@ -84,7 +84,7 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return NULL;
     }
-  lines = (unsigned char **)malloc(*h * sizeof(unsigned char *));
+  lines = (unsigned char **)calloc(*h, sizeof(unsigned char *));
 
   if (lines == NULL)
     {
@@ -95,7 +95,7 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
 
   for (i = 0; i < *h; i++)
     {
-      if ((lines[i] = malloc(*w * (sizeof(unsigned char) * 4))) == NULL)
+      if ((lines[i] = calloc(*w, (sizeof(unsigned char) * 4))) == NULL)
 	{
 	  int                 n;
 

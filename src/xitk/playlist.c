@@ -145,8 +145,8 @@ static void _playlist_create_playlists(void) {
 
   if(gGui->playlist.mmk && gGui->playlist.num) {
 
-    playlist->playlist_mrls = (char **) xine_xmalloc(sizeof(char *) * (gGui->playlist.num + 1));
-    playlist->playlist_idents = (char **) xine_xmalloc(sizeof(char *) * (gGui->playlist.num + 1));
+    playlist->playlist_mrls = (char **) calloc((gGui->playlist.num + 1), sizeof(char *));
+    playlist->playlist_idents = (char **) calloc((gGui->playlist.num + 1), sizeof(char *));
 
     for(i = 0; i < gGui->playlist.num; i++) {
       playlist->playlist_mrls[i] = strdup(gGui->playlist.mmk[i]->mrl);

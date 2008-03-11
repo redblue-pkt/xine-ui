@@ -182,7 +182,7 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   char                      *mrl_exts, *p, *pp;
   
   filters                      = (xitk_mrlbrowser_filter_t **) 
-    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
+    calloc((num_endings + 2), sizeof(xitk_mrlbrowser_filter_t *));
   filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
   filters[num_endings]->name   = strdup("All");
