@@ -837,26 +837,22 @@ void gui_eject(xitk_widget_t *w, void *data) {
       mediamark_t **mmk = NULL;
       char         *tok = NULL;
       char         *mrl;
-      int           len;
+      size_t        tok_len = 0;
       int           new_num = 0;
+
+      const char *const cur_mrl = mediamark_get_current_mrl();
       /*
        * If it's an mrl (____://) remove all of them in playlist
        */
-      mrl = strstr((mediamark_get_current_mrl()), ":/");
-      if(mrl) {
-	char *cur_mrl = (char *)mediamark_get_current_mrl();
-	
-	len = (mrl - cur_mrl) + 3;
-	tok = (char *) alloca(len);
-	strlcpy(tok, cur_mrl, len);
-      }
+      if ( (mrl = strstr((cur_mrl), ":/")) )
+	tok_len = (mrl - cur_mrl) + 2;
 
-      if(tok != NULL) {
+      if(tok_len != 0) {
 	/* 
 	 * Store all of not maching entries
 	 */
 	for(i = 0; i < gGui->playlist.num; i++) {
-	  if(strncasecmp(gGui->playlist.mmk[i]->mrl, tok, strlen(tok))) {
+	  if(strncasecmp(gGui->playlist.mmk[i]->mrl, cur_mrl, tok_len)) {
 	    
 	    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (new_num + 2));
 	    
