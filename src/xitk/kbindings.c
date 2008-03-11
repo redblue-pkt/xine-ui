@@ -29,10 +29,6 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#ifdef HAVE_ALLOCA_H
-#include <alloca.h>
-#endif
-
 #include "common.h"
 #include "kbindings_common.h"
 

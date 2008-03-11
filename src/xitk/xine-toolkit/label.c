@@ -30,10 +30,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#ifdef HAVE_ALLOCA_H   
-#include <alloca.h>
-#endif
-
 #include "_xitk.h"
 
 static void _create_label_pixmap(xitk_widget_t *w) {

@@ -31,10 +31,6 @@
 #include <string.h>
 #include <pthread.h>
 
-#ifdef HAVE_ALLOCA_H
-#include <alloca.h>
-#endif
-
 #include "common.h"
 
 extern gGui_t     *gGui;

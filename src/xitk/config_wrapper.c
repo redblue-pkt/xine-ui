@@ -25,10 +25,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_ALLOCA_H   
-#include <alloca.h>
-#endif
-
 #include "common.h"
 
 extern gGui_t  *gGui;

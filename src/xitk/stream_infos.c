@@ -32,10 +32,6 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
-#ifdef HAVE_ALLOCA_H
-#include <alloca.h>
-#endif
-
 #include "common.h"
 	
 #define WINDOW_WIDTH        570

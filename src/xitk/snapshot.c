@@ -56,10 +56,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef HAVE_ALLOCA_H
-#include <alloca.h>
-#endif
-
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -34,10 +34,6 @@
 #include <unistd.h>
 #include <errno.h>
 
-#ifdef HAVE_ALLOCA_H
-#include <alloca.h>
-#endif
-
 #include <X11/keysym.h>
 #include "common.h"
 
