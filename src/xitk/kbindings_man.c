@@ -49,9 +49,7 @@ int main(int argc, char **argv) {
       printf(".IP \"");
       
       if(k[i]->modifier != KEYMOD_NOMOD) {
-	char buf[256];
-	
-	memset(&buf, 0, sizeof(buf));
+	char buf[256] = { 0, };
 	
 	if(k[i]->modifier & KEYMOD_CONTROL)
 	  strcpy(buf, "\\fBC\\fP");
