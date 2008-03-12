@@ -1977,7 +1977,7 @@ void gui_run(char **session_opts) {
    */
 
 #ifdef HAVE_LIRC
-  if(gGui->lirc_enable)
+  if(__xineui_global_lirc_enable)
     lirc_start();
 #endif
   

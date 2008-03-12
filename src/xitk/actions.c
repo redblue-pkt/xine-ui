@@ -706,7 +706,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   xine_exit(__xineui_global_xine_instance); 
 
 #ifdef HAVE_LIRC
-  if(gGui->lirc_enable)
+  if(__xineui_global_lirc_enable)
     lirc_stop();
 #endif
   

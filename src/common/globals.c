@@ -37,3 +37,9 @@ xine_t *__xineui_global_xine_instance;
  */
 char *__xineui_global_config_file;
 
+#ifdef HAVE_LIRC
+/**
+ * @brief Boolean flag to check if LIRC support is enabled at runtime.
+ */
+int __xineui_global_lirc_enable;
+#endif

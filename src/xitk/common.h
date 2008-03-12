@@ -307,10 +307,6 @@ typedef struct {
   int                       running;
   int                       ignore_next;
 
-#ifdef HAVE_LIRC
-  int                       lirc_enable;
-#endif
-  
   int                       stdctl_enable;
   
 #ifdef HAVE_XF86VIDMODE

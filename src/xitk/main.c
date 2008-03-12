@@ -1415,7 +1415,7 @@ int main(int argc, char *argv[]) {
   gGui->post_audio_enable      = 1;
   gGui->splash                 = 1;
 #ifdef HAVE_LIRC
-  gGui->lirc_enable            = 1;
+  __xineui_global_lirc_enable            = 1;
 #endif
   gGui->deinterlace_enable     = 0;
   gGui->report                 = stdout;
@@ -1454,7 +1454,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef HAVE_LIRC
     case 'L': /* Disable LIRC support */
-      gGui->lirc_enable = 0;
+      __xineui_global_lirc_enable = 0;
       break;
 #endif
 

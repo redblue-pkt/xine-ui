@@ -60,8 +60,6 @@ struct fbxine
 	struct termios           ti_save;
 	struct termios           ti_cur;
 
-	int                      lirc_enable;
-
 	int                      ignore_status;
 	char                     *mrl[1024];
 	int                      num_mrls;

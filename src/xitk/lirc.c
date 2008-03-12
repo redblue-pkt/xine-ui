@@ -140,7 +140,7 @@ void lirc_start(void) {
   int err;
   
   if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
-    gGui->lirc_enable = 0;
+    __xineui_global_lirc_enable = 0;
     return;
   }
   
@@ -150,7 +150,7 @@ void lirc_start(void) {
     fcntl(lirc.fd, F_SETFL, flags|O_NONBLOCK);
   
   if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
-    gGui->lirc_enable = 0;
+    __xineui_global_lirc_enable = 0;
     lirc_deinit();
     return;
   }
@@ -159,7 +159,7 @@ void lirc_start(void) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     lirc_freeconfig(lirc.config);
     lirc_deinit();
-    gGui->lirc_enable = 0;
+    __xineui_global_lirc_enable = 0;
   }
 }
 

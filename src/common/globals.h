@@ -29,4 +29,8 @@
 extern xine_t *__xineui_global_xine_instance;
 extern char   *__xineui_global_config_file;
 
+#ifdef HAVE_LIRC
+extern int __xineui_global_lirc_enable;
+#endif
+
 #endif
