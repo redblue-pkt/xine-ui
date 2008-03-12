@@ -1839,11 +1839,6 @@ typedef struct {
 } xitk_recode_t;
 
 /**
- * get current locale encoding 
- */
-char *xitk_get_system_encoding(void);
-
-/**
  * prepare recoding
  *   - when one of encoding is NULL, is prepared no conversion, strings will
  *     be strdup()ed

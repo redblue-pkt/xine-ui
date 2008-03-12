@@ -1286,7 +1286,7 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
 #endif
 }
 
-char *xitk_get_system_encoding(void) {
+static char *xitk_get_system_encoding(void) {
   char *lang, *codeset = NULL;
   
 #ifdef HAVE_LANGINFO_CODESET
@@ -1332,45 +1332,38 @@ char *xitk_get_system_encoding(void) {
 }
 
 xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
+  xitk_recode_t  *xr = NULL;
 #ifdef HAVE_ICONV
   iconv_t         id;
-  char           *src_enc, *dst_enc;
-  xitk_recode_t  *xr;
+  char           *src_enc = NULL, *dst_enc = NULL;
   
-  if (!src_encoding || !dst_encoding) 
-    return NULL;
-  
-  if (!src_encoding[0])
+  if (src_encoding)
     src_enc = xitk_get_system_encoding();
   else
     src_enc = strdup(src_encoding);
 
   if (!src_enc)
-    return NULL;
+    goto end;
   
-  if (!dst_encoding[0])
+  if (dst_encoding)
     dst_enc = xitk_get_system_encoding();
   else
     dst_enc = strdup(dst_encoding);
 
   if (!dst_enc)
-    goto exception1;
+    goto end;
   
   if ((id = iconv_open(dst_enc, src_enc)) == (iconv_t)-1)
-    goto exception2;
+    goto end;
   
-  free(src_enc);
-  free(dst_enc);
   xr = (xitk_recode_t *) xitk_xmalloc(sizeof(xitk_recode_t));
   xr->id = id;
-  return xr;
   
- exception2:
+ end:
   free(dst_enc);
- exception1:
   free(src_enc);
 #endif
-  return NULL;
+  return xr;
 }
 
 void xitk_recode_done(xitk_recode_t *xr) {

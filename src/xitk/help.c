@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
+#include <assert.h>
 
 #include "common.h"
 
@@ -98,7 +99,8 @@ static void help_add_section(const char *filename, const char *doc_encoding,
     if((stat(filename, &st) == 0) && (st.st_size)) {
       int   fd;
 
-      xr = xitk_recode_init(doc_encoding, "");
+      assert(doc_encoding != NULL);
+      xr = xitk_recode_init(doc_encoding, NULL);
 
       if((fd = open(filename, O_RDONLY)) >= 0) {
 	char  *buf = NULL;
