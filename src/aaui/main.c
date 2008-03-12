@@ -76,7 +76,6 @@
  * global variables
  */
 typedef struct {
-  xine_t              *xine;
   xine_video_port_t   *vo_port;
   xine_audio_port_t   *ao_port;
   xine_stream_t       *stream;
@@ -189,14 +188,14 @@ static void config_update(xine_cfg_entry_t *entry,
     break;
   }
   
-  xine_config_update_entry(aaxine.xine, entry);
+  xine_config_update_entry(__xineui_global_xine_instance, entry);
 }
 
 #if 0 /* No used yet */
 static void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
   
-  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -204,7 +203,7 @@ static void config_update_range(char *key, int min, int max) {
 static void config_update_enum(char *key, int value) {
   xine_cfg_entry_t entry;
   
-  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -213,7 +212,7 @@ static void config_update_enum(char *key, int value) {
 static void config_update_bool(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -223,7 +222,7 @@ static void config_update_bool(char *key, int value) {
 static void config_update_num(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -233,7 +232,7 @@ static void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
   
   memset(&entry, 0, sizeof(entry));
-  if (xine_config_lookup_entry(aaxine.xine, key, &entry) && string)
+  if (xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry) && string)
     config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
     if(string == NULL)
@@ -745,16 +744,16 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  aaxine.xine = (xine_t *)xine_new();
-  xine_config_load (aaxine.xine, aaxine.configfile);
-  xine_engine_set_param(aaxine.xine, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
+  __xineui_global_xine_instance = (xine_t *)xine_new();
+  xine_config_load (__xineui_global_xine_instance, aaxine.configfile);
+  xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
   
   /*
    * xine init
    */
-  xine_init (aaxine.xine);
+  xine_init (__xineui_global_xine_instance);
   
-  if(!aaxine.xine) {
+  if(!__xineui_global_xine_instance) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
   }
@@ -794,7 +793,7 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "aa";
   
-  aaxine.vo_port = xine_open_video_driver(aaxine.xine,
+  aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_AA, 
 					  (void *)aaxine.context);
@@ -807,7 +806,7 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "caca";
   
-  aaxine.vo_port = xine_open_video_driver(aaxine.xine,
+  aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_CACA,
 					  NULL);
@@ -816,7 +815,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   if (!aaxine.vo_port) {
-    aaxine.vo_port = xine_open_video_driver(aaxine.xine, 
+    aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance, 
 					    video_driver_id,
 					    XINE_VISUAL_TYPE_FB, 
 					    NULL);
@@ -829,7 +828,7 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
-  driver_name = (char *)xine_config_register_string (aaxine.xine, 
+  driver_name = (char *)xine_config_register_string (__xineui_global_xine_instance, 
 						     "audio.driver",
 						     "oss",
 						     "audio driver to use",
@@ -843,7 +842,7 @@ int main(int argc, char *argv[]) {
   else
     config_update_string ("audio.driver", audio_driver_id);
   
-  aaxine.ao_port = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
+  aaxine.ao_port = xine_open_audio_driver(__xineui_global_xine_instance, audio_driver_id, NULL);
   
   if(!aaxine.ao_port) {
     printf ("main: audio driver %s failed\n", audio_driver_id);
@@ -854,24 +853,24 @@ int main(int argc, char *argv[]) {
   if(!aaxine.no_post) {
     
     if(aaxine.ao_port) {
-      const char *const *pol = xine_list_post_plugins_typed(aaxine.xine, 
+      const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance, 
 							    XINE_POST_TYPE_AUDIO_VISUALIZATION);
       
       if(pol) {
 	aaxine.post_plugin_name = 
-	  (char *) xine_config_register_string (aaxine.xine, "aaxine.post_plugin", 
+	  (char *) xine_config_register_string (__xineui_global_xine_instance, "aaxine.post_plugin", 
 						pol[0],
 						"Post plugin name",
 						NULL, 0, post_plugin_cb, NULL);
 	
 	if(post_plugin_name) {
-	  if((aaxine.post_plugin = xine_post_init(aaxine.xine, post_plugin_name, 
+	  if((aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, post_plugin_name, 
 						  0, &aaxine.ao_port, &aaxine.vo_port)) != NULL) {
 	    config_update_string("aaxine.post_plugin", post_plugin_name);
 	  }
 	}
 	else
-	  aaxine.post_plugin = xine_post_init(aaxine.xine, aaxine.post_plugin_name, 
+	  aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, aaxine.post_plugin_name, 
 					      0, &aaxine.ao_port, &aaxine.vo_port);
 	
 	if(aaxine.post_plugin == NULL) {
@@ -890,7 +889,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_port, aaxine.vo_port);
+  aaxine.stream = xine_stream_new(__xineui_global_xine_instance, aaxine.ao_port, aaxine.vo_port);
   
   /* Init mixer control */
   aaxine.mixer.enable = 0;
@@ -1092,8 +1091,8 @@ int main(int argc, char *argv[]) {
   
  failure:
   
-  if(aaxine.xine) 
-    xine_config_save(aaxine.xine, aaxine.configfile);
+  if(__xineui_global_xine_instance) 
+    xine_config_save(__xineui_global_xine_instance, aaxine.configfile);
   
   if(aaxine.stream) {
     xine_close(aaxine.stream);
@@ -1102,13 +1101,13 @@ int main(int argc, char *argv[]) {
   }
 
   if(aaxine.vo_port)
-    xine_close_video_driver(aaxine.xine, aaxine.vo_port);
+    xine_close_video_driver(__xineui_global_xine_instance, aaxine.vo_port);
   
   if(aaxine.ao_port)
-    xine_close_audio_driver(aaxine.xine, aaxine.ao_port);
+    xine_close_audio_driver(__xineui_global_xine_instance, aaxine.ao_port);
   
-  if(aaxine.xine)
-    xine_exit(aaxine.xine); 
+  if(__xineui_global_xine_instance)
+    xine_exit(__xineui_global_xine_instance); 
 
 #ifdef AA
   if(aaxine.context) {
