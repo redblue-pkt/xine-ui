@@ -304,7 +304,7 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
  end:
   free(dst_enc);
   free(src_enc);
-  return id;
+  return pid;
 }
 
 void xitk_recode_done(xitk_recode_t *id) {
