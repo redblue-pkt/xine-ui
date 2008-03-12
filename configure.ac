@@ -56,7 +56,13 @@ dnl NLS Support
 AM_GNU_GETTEXT(external)
 AC_PROG_GMSGFMT_PLURAL
 
-AM_ICONV
+AC_ARG_WITH([iconv],
+   AS_HELP_STRING([--without-iconv], [Disable iconv() use for recoding. You can do this if your system is set to use UTF-8.]))
+
+if test "x$with_iconv" != "xno"; then
+  AM_ICONV
+fi
+
 AM_CONDITIONAL([HAVE_ICONV], [test "$am_cv_func_iconv" = yes])
 
 dnl
