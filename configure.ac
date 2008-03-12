@@ -56,6 +56,7 @@ dnl NLS Support
 AM_GNU_GETTEXT(external)
 AC_PROG_GMSGFMT_PLURAL
 
+AM_ICONV
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
