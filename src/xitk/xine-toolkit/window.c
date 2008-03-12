@@ -735,6 +735,11 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
   XITK_FREE(w);
 }
 
+/**
+ *
+ * @TODO Should be split on a different unit, as it's only used with TAR support
+ *       enabled.
+ */
 void xitk_window_dialog_destroy(xitk_window_t *w) {
   xitk_dialog_t *wd = w->parent;
 
@@ -815,6 +820,11 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
   
 }
 
+/**
+ *
+ * @TODO Should be split on a different unit, as it's only used with TAR support
+ *       enabled.
+ */
 xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
 							 int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
