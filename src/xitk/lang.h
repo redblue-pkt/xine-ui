@@ -46,7 +46,6 @@ typedef struct {
 } langs_t;
 
 const langs_t *get_lang(void);
-const langs_t *get_default_lang(void);
 
 const char *get_language_from_iso639_1(char *two_letters);
 

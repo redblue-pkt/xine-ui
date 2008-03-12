@@ -513,7 +513,3 @@ const langs_t *get_lang(void) {
   
   return &_langs[0];
 }
-
-const langs_t *get_default_lang(void) {
-  return &_langs[0];
-}
