@@ -941,9 +941,11 @@ void gui_execute_action_id(action_id_t action) {
     gui_add_mediamark();
     break;
 
+#ifdef HAVE_TAR
   case ACTID_SKINDOWNLOAD:
     download_skin(gGui->skin_server_url);
     break;
+#endif
 
   case ACTID_OSD_SINFOS:
     osd_stream_infos();

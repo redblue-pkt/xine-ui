@@ -21,25 +21,19 @@
  *
  */
 
-#ifndef SKINS_H
-#define SKINS_H
+#ifndef SKINS_INTERNAL_H
+#define SKINS_INTERNAL_H
 
-typedef struct {
-  const char *pathname;
-  const char *skin;
-  int         number;
-} skins_locations_t;
+#define DEFAULT_SKIN        "xinetic"
+#define SKIN_IFACE_VERSION  5
 
-skins_locations_t **get_available_skins(void);
-int get_available_skins_num(void);
-void preinit_skins_support(void);
-void init_skins_support(void);
-void select_new_skin(int selected);
-char *skin_get_current_skin_dir(void);
+#undef SKIN_DEBUG
 
-#ifdef HAVE_TAR
-void download_skin(char *url);
-void download_skin_end(void);
-#endif
+extern skins_locations_t **skins_avail;
+extern int                 skins_avail_num;
+extern char               **skin_names;
+
+int get_skin_offset(const char *skin);
+void skin_change_cb(void *data, xine_cfg_entry_t *cfg);
 
 #endif

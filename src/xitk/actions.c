@@ -641,7 +641,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
   vpplugin_end();
   applugin_end();
   help_end();
+#ifdef HAVE_TAR
   download_skin_end();
+#endif
   
   if(load_stream)
     filebrowser_end(load_stream);

@@ -56,6 +56,10 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
+if HAVE_TAR
+xine_SOURCES += skins_download.c skins_download.h
+endif
+
 xine_LDADD = $(XINE_LIBS) \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
              $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
