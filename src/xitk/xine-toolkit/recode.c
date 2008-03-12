@@ -277,7 +277,7 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
   iconv_t        id, *pid = NULL;
   char           *src_enc = NULL, *dst_enc = NULL;
   
-  if (src_encoding)
+  if (!src_encoding)
     src_enc = xitk_get_system_encoding();
   else
     src_enc = strdup(src_encoding);
@@ -285,7 +285,7 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
   if (!src_enc)
     goto end;
   
-  if (dst_encoding)
+  if (!dst_encoding)
     dst_enc = xitk_get_system_encoding();
   else
     dst_enc = strdup(dst_encoding);
