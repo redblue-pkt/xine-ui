@@ -2,7 +2,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/Xos.h>
-#ifdef HAVE_XSHM_H
+#ifdef HAVE_X11_EXTENSIONS_XSHM_H
 #include <X11/extensions/XShm.h>
 #endif
 #include <X11/extensions/shape.h>
@@ -13,10 +13,10 @@
 #include <ctype.h>
 #include <time.h>
 #include <netinet/in.h>
-#ifdef HAVE_IPC_H
+#ifdef HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
-#ifdef HAVE_SHM_H
+#ifdef HAVE_SYS_SHM_H
 #include <sys/shm.h>
 #endif
 #include <sys/time.h>
@@ -91,7 +91,7 @@ struct _xdata
     int                 shm_event;
     XImage             *last_xim;
     XImage             *last_sxim;
-#ifdef HAVE_XSHM_H
+#ifdef HAVE_X11_EXTENSIONS_XSHM_H
     XShmSegmentInfo     last_shminfo;
     XShmSegmentInfo     last_sshminfo;
 #endif

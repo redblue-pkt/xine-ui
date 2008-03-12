@@ -42,9 +42,9 @@
 
 #ifdef HAVE_X11
 #include <X11/Xlib.h>
-#ifdef HAVE_XSHM_H
+#ifdef HAVE_X11_EXTENSIONS_XSHM_H
 #include <X11/extensions/XShm.h>
-#endif /* !HAVE_XSHM_H */
+#endif
 #ifdef HAVE_XV
 #include <X11/extensions/Xvlib.h>
 #endif /* !HAVE_XV */

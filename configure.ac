@@ -145,30 +145,21 @@ fi
 
 dnl If we are compiling without shared memory support, then don\'t do
 dnl the checks for XShm
-if test "x$enable_shm" = "xyes"; then
+if test "x$enable_shm" != "xno"; then
   dnl Check for the Xext library (needed for XShm extension)
   AC_CHECK_LIB(Xext, XShmAttach, 
       X_LIBS="-lXext $X_LIBS", 
       dnl On AIX, it is in XextSam instead, but we still need -lXext
       AC_CHECK_LIB(XextSam, XShmAttach, 
-          X_LIBS="-lXextSam -lXext $X_LIBS", 
-          no_xshm_ext=yes, $X_LIBS),
+          [X_LIBS="-lXextSam -lXext $X_LIBS"], 
+          no_xshm_ext=yes; have_shm=no, $X_LIBS),
       $X_LIBS)
 
   dnl Test for shared memory headers and semantics, unless we are
   dnl configured to build without shared memory extensions.
+  AC_CHECK_HEADERS([sys/ipc.h sys/shm.h], [have_shm=no])
 
-  dnl Check for shared memory
-  AC_CHECK_HEADER(sys/ipc.h, 
-	AC_DEFINE(HAVE_IPC_H,,[Define if ipc.h installed])
-	, no_sys_ipc=yes)
-  AC_CHECK_HEADER(sys/shm.h,
-	AC_DEFINE(HAVE_SHM_H,,[Define if shm.h installed])
-	, no_sys_shm=yes)
-
-  if test "x$no_sys_ipc" != "xyes" \
-     && test "x$no_sys_shm" != "xyes" \
-     && test "x$no_xshm_ext" != "xyes" ; then
+  if test "x$have_shm" != "xno" ; then
     AC_DEFINE(HAVE_SHM,,[Define if have shm])
   fi
 
@@ -205,15 +196,10 @@ if test "x$enable_shm" = "xyes"; then
   fi
 
   dnl Check for the X shared memory extension header file
-  if test "x$no_xext_lib" = "xyes"; then
-    dnl If we couldn't find XShmAttach earlier, don't use the header
-    no_xshm=yes
-  else
+  if test "x$no_xext_lib" != "xyes"; then
     saved_CPPFLAGS=$CPPFLAGS
     CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-    AC_CHECK_HEADER(X11/extensions/XShm.h, 
-                   [ AC_DEFINE(HAVE_XSHM_H, 1, [Define if includes XShm.h])], no_xshm=yes,
-                   [#include <X11/Xlib.h>])
+    AC_CHECK_HEADERS([X11/extensions/XShm.h], , , [#include <X11/Xlib.h>])
     CPPFLAGS=$saved_CPPFLAGS
   fi
 fi
