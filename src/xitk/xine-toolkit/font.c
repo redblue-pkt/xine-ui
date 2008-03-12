@@ -470,7 +470,7 @@ void xitk_font_cache_init(void) {
   pthread_mutex_init(&cache.mutex, NULL);
   
 #ifdef WITH_XFT
-  cache.xr = xitk_recode_init("", "UTF-8");
+  cache.xr = xitk_recode_init(NULL, "UTF-8");
 #else
   cache.xr = NULL;
 #endif
