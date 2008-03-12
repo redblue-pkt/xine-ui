@@ -121,8 +121,8 @@ static void panel_store_new_position(int x, int y, int w, int h) {
     panel->x = x;
     panel->y = y;
     
-    config_update_num ("gui.panel_x", x); 
-    config_update_num ("gui.panel_y", y);
+    config_update_num (gGui->xine, "gui.panel_x", x); 
+    config_update_num (gGui->xine, "gui.panel_y", y);
     
     if(event_sender_is_running())
       event_sender_move(x+w, y);
@@ -141,8 +141,8 @@ static void panel_exit(xitk_widget_t *w, void *data) {
     panel->visible = 0;
 
     if((xitk_get_window_info(panel->widget_key, &wi))) {
-      config_update_num ("gui.panel_x", wi.x);
-      config_update_num ("gui.panel_y", wi.y);
+      config_update_num (gGui->xine, "gui.panel_x", wi.x);
+      config_update_num (gGui->xine, "gui.panel_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -692,7 +692,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   _panel_toggle_visibility(w, data);
-  config_update_num ("gui.panel_visible", panel->visible);
+  config_update_num (gGui->xine, "gui.panel_visible", panel->visible);
 }
 
 void panel_check_mute(void) {
@@ -1529,7 +1529,7 @@ void panel_init (void) {
   /*  The user don't want panel on startup */
   if(panel->visible && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
     panel->visible = !panel->visible;
-    config_update_num ("gui.panel_visible", panel->visible);
+    config_update_num (gGui->xine, "gui.panel_visible", panel->visible);
   }
   
   if((gGui->use_root_window || gGui->video_display != gGui->display) && (!panel->visible))

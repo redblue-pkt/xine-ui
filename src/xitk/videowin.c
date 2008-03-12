@@ -2064,7 +2064,7 @@ void video_window_update_logo(void) {
 	goto __done;
     }
     
-    config_update_string("gui.logo_mrl", skin_logo);
+    config_update_string(gGui->xine, "gui.logo_mrl", skin_logo);
     goto __play_logo_now;
     
   }
@@ -2075,7 +2075,7 @@ void video_window_update_logo(void) {
      * change, not at the first skin loading.
      **/
     if(gVw.logo_synthetic && (cfg_err_result) && (strcmp(cfg_entry.str_value, XINE_LOGO_MRL))) {
-      config_update_string("gui.logo_mrl", XINE_LOGO_MRL);
+      config_update_string(gGui->xine, "gui.logo_mrl", XINE_LOGO_MRL);
 
     __play_logo_now:
       

@@ -667,8 +667,8 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     playlist->visible = 0;
 
     if((xitk_get_window_info(playlist->widget_key, &wi))) {
-      config_update_num ("gui.playlist_x", wi.x);
-      config_update_num ("gui.playlist_y", wi.y);
+      config_update_num (gGui->xine, "gui.playlist_x", wi.x);
+      config_update_num (gGui->xine, "gui.playlist_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 

@@ -3013,8 +3013,8 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     mmkeditor.visible = 0;
     
     if((xitk_get_window_info(mmkeditor.widget_key, &wi))) {
-      config_update_num ("gui.mmk_editor_x", wi.x);
-      config_update_num ("gui.mmk_editor_y", wi.y);
+      config_update_num (gGui->xine, "gui.mmk_editor_x", wi.x);
+      config_update_num (gGui->xine, "gui.mmk_editor_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 

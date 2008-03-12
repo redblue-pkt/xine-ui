@@ -14,7 +14,8 @@ GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-libcommon_a_SOURCES = $(GETOPT_SRC) utils.c getline.c strndup.c strsep.c strlcpy.c strlcat.c
+libcommon_a_SOURCES = $(GETOPT_SRC) utils.c getline.c strndup.c strsep.c strlcpy.c strlcat.c \
+	config_wrapper.c config_wrapper.h
 
 libcommonx_a_SOURCES = x11utils.c
 

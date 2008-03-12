@@ -145,8 +145,8 @@ void destroy_mrl_browser(void) {
 
   if(mrlb) {
     if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_update_num ("gui.mrl_browser_x", wi.x);
-      config_update_num ("gui.mrl_browser_y", wi.y);
+      config_update_num (gGui->xine, "gui.mrl_browser_x", wi.x);
+      config_update_num (gGui->xine, "gui.mrl_browser_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     xitk_mrlbrowser_destroy(mrlb);
@@ -164,8 +164,8 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
 
   if(mrlb) {
     if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_update_num ("gui.mrl_browser_x", wi.x);
-      config_update_num ("gui.mrl_browser_y", wi.y);
+      config_update_num (gGui->xine, "gui.mrl_browser_x", wi.x);
+      config_update_num (gGui->xine, "gui.mrl_browser_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 

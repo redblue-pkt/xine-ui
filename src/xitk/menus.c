@@ -315,7 +315,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int viz = (int) data;
   
-  config_update_num("gui.post_audio_plugin", viz);
+  config_update_num(gGui->xine, "gui.post_audio_plugin", viz);
 }
 static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int channel = (int) data;

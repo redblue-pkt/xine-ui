@@ -25,9 +25,8 @@
 #include "config.h"
 #endif
 
-#include "common.h"
-
-extern gGui_t  *gGui;
+#include "config_wrapper.h"
+#include "utils.h"
 
 /* 
  * experience level above this level 
@@ -37,7 +36,7 @@ extern gGui_t  *gGui;
 #define XINE_CONFIG_SECURITY   30
 
 
-static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, char *string) {
+static void config_update(xine_t *xine, xine_cfg_entry_t *entry, int type, int min, int max, int value, char *string) {
 
   switch(type) {
 
@@ -67,23 +66,23 @@ static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, i
     break;
   }
   
-  xine_config_update_entry(gGui->xine, entry);
+  xine_config_update_entry(xine, entry);
 }
 
-void config_update_range(char *key, int min, int max) {
+void config_update_range(xine_t *xine, const char *key, int min, int max) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
-    config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
+  if(xine_config_lookup_entry(xine, key, &entry)) 
+    config_update(xine, &entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
     fprintf(stderr, "WOW, range key %s isn't registered\n", key);
 }
 
-void config_update_string(char *key, char *string) {
+void config_update_string(xine_t *xine, const char *key, const char *string) {
   xine_cfg_entry_t entry;
 
-  if((xine_config_lookup_entry(gGui->xine, key, &entry)) && string)
-    config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
+  if((xine_config_lookup_entry(xine, key, &entry)) && string)
+    config_update(xine, &entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
     if(string == NULL)
       fprintf(stderr, "string is NULL\n");
@@ -92,60 +91,47 @@ void config_update_string(char *key, char *string) {
   }
 }
 
-void config_update_enum(char *key, int value) {
+void config_update_enum(xine_t *xine, const char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
-    config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
+  if(xine_config_lookup_entry(xine, key, &entry)) 
+    config_update(xine, &entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, enum key %s isn't registered\n", key);
 }
 
-void config_update_bool(char *key, int value) {
+void config_update_bool(xine_t *xine, const char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
-    config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
+  if(xine_config_lookup_entry(xine, key, &entry)) 
+    config_update(xine, &entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
     fprintf(stderr, "WOW, bool key %s isn't registered\n", key);
 }
 
-void config_update_num(char *key, int value) {
+void config_update_num(xine_t *xine, const char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
-    config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
+  if(xine_config_lookup_entry(xine, key, &entry)) 
+    config_update(xine, &entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, num key %s isn't registered\n", key);
-}
-
-void config_load(void) {
-  xine_config_load(gGui->xine, gGui->configfile);
-}
-
-void config_save(void) {
-  xine_config_save(gGui->xine, gGui->configfile);
-}
-
-void config_reset(void) {
-  xine_config_reset(gGui->xine);
-  xine_config_load(gGui->xine, gGui->configfile);
 }
 
 /*
  * Handle 'cfg:/' mrl style
  */
-void config_mrl(char *mrl) {
+void config_mrl(xine_t *xine, const char *mrl) {
   xine_cfg_entry_t entry;
   char *key;
   char *config;
   char *_mrl;
   
-  if (!xine_config_lookup_entry(gGui->xine, "misc.implicit_config", &entry) ||
+  if (!xine_config_lookup_entry(xine, "misc.implicit_config", &entry) ||
       entry.type != XINE_CONFIG_TYPE_BOOL || !entry.num_value) {
-    xine_info(_("You tried to change the configuration with a cfg: MRL.\n"
-		"This is not allowed unless you enable the 'misc.implicit_config' setting "
-		"after reading and understanding its help text."));
+    fprintf(stderr, "You tried to change the configuration with a cfg: MRL.\n"
+	    "This is not allowed unless you enable the 'misc.implicit_config' setting "
+	    "after reading and understanding its help text.");
     return;
   }
 
@@ -155,7 +141,7 @@ void config_mrl(char *mrl) {
   if(config && strlen(config))
     config++;
 
-  while((key = xine_strsep(&config, ",")) != NULL) {
+  while((key = strsep(&config, ",")) != NULL) {
     char *str_value = strchr(key, ':');
 
     if(str_value && strlen(str_value))
@@ -163,30 +149,30 @@ void config_mrl(char *mrl) {
 
     if(str_value && strlen(str_value)) {
       
-      if(xine_config_lookup_entry(gGui->xine, key, &entry)) {
+      if(xine_config_lookup_entry(xine, key, &entry)) {
 
 	if(entry.exp_level >= XINE_CONFIG_SECURITY) {
-	  xine_info(_("For security reason, you're not allowed to change "
-		      "the configuration entry named '%s'."), entry.key);
+	  fprintf(stderr, "For security reason, you're not allowed to change "
+		  "the configuration entry named '%s'.", entry.key);
 	  break;
 	}
 
 	switch(entry.type) {
 
 	case XINE_CONFIG_TYPE_STRING:
-	  config_update(&entry, entry.type, 0, 0, 0, str_value);
+	  config_update(xine, &entry, entry.type, 0, 0, 0, str_value);
 	  break;
 	  
 	case XINE_CONFIG_TYPE_RANGE:
 	case XINE_CONFIG_TYPE_ENUM:
 	case XINE_CONFIG_TYPE_NUM:
-	  config_update(&entry, ((entry.type == XINE_CONFIG_TYPE_RANGE) ? 
+	  config_update(xine, &entry, ((entry.type == XINE_CONFIG_TYPE_RANGE) ? 
 				 XINE_CONFIG_TYPE_NUM : entry.type), 
 			0, 0, (strtol(str_value, &str_value, 10)), NULL);
 	  break;
 
 	case XINE_CONFIG_TYPE_BOOL:
-	  config_update(&entry, entry.type, 0, 0, (get_bool_value(str_value)), NULL);
+	  config_update(xine, &entry, entry.type, 0, 0, (get_bool_value(str_value)), NULL);
 	  break;
 	
 	case XINE_CONFIG_TYPE_UNKNOWN:

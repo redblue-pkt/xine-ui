@@ -22,7 +22,6 @@ kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 
 xine_SOURCES = \
 	actions.c \
-	config_wrapper.c \
 	control.c \
 	download.c \
 	errors.c \
@@ -89,7 +88,6 @@ session_ctrl_SOURCES = session_common.c session_internal.h session.h ctrl_test.c
 noinst_HEADERS = \
 	actions.h \
 	common.h \
-	config_wrapper.h \
 	control.h \
 	download.h \
 	errors.h \

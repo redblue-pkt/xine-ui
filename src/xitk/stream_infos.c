@@ -276,8 +276,8 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     sinfos.visible = 0;
     
     if((xitk_get_window_info(sinfos.widget_key, &wi))) {
-      config_update_num ("gui.sinfos_x", wi.x);
-      config_update_num ("gui.sinfos_y", wi.y);
+      config_update_num (gGui->xine, "gui.sinfos_x", wi.x);
+      config_update_num (gGui->xine, "gui.sinfos_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     

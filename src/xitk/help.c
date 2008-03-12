@@ -231,8 +231,8 @@ static void help_exit(xitk_widget_t *w, void *data) {
     help->visible = 0;
     
     if((xitk_get_window_info(help->kreg, &wi))) {
-      config_update_num("gui.help_x", wi.x);
-      config_update_num("gui.help_y", wi.y);
+      config_update_num(gGui->xine, "gui.help_x", wi.x);
+      config_update_num(gGui->xine, "gui.help_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     

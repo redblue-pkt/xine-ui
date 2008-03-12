@@ -114,7 +114,7 @@ static int open_and_play(const char *mrl)
 
         if(!strncasecmp(mrl, "cfg:/", 5)) 
 	{
-	        config_mrl(mrl);
+		config_mrl(fbxine.xine, mrl);
 		return 0;
 	}
 

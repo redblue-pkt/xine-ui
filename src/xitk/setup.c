@@ -182,8 +182,8 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     setup.visible = 0;
     
     if((xitk_get_window_info(setup.kreg, &wi))) {
-      config_update_num ("gui.setup_x", wi.x);
-      config_update_num ("gui.setup_y", wi.y);
+      config_update_num (gGui->xine, "gui.setup_x", wi.x);
+      config_update_num (gGui->xine, "gui.setup_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -312,13 +312,13 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 
 	  switch(setup.wg[i]->cfg->type) {
 	  case XINE_CONFIG_TYPE_STRING:
-	    config_update_string((char *)(setup.wg[i]->cfg)->key, strval);
+	    config_update_string(gGui->xine, (char *)(setup.wg[i]->cfg)->key, strval);
 	    break;
 	  case XINE_CONFIG_TYPE_ENUM:
 	  case XINE_CONFIG_TYPE_NUM:
 	  case XINE_CONFIG_TYPE_BOOL:
 	  case XINE_CONFIG_TYPE_RANGE:
-	    config_update_num((char *)(setup.wg[i]->cfg)->key, numval);
+	    config_update_num(gGui->xine, (char *)(setup.wg[i]->cfg)->key, numval);
 	    break;
 	  case XINE_CONFIG_TYPE_UNKNOWN:
 	    break;
@@ -326,7 +326,7 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 	}
       }
     }
-    config_save();
+    xine_config_save(gGui->xine, gGui->configfile);
 
     if(w != setup.ok)
       setup_change_section(setup.tabs, NULL, xitk_tabs_get_current_selected(setup.tabs));

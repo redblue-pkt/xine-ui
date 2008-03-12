@@ -469,7 +469,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 	   __func__, _mrl, (_sub) ? _sub : "NONE", start_pos, start_time, av_offset, spu_offset);
   
   if(!strncasecmp(mrl, "cfg:/", 5)) {
-    config_mrl(mrl);
+    config_mrl(gGui->xine, mrl);
     gui_playlist_start_next();
     return 1;
   }
@@ -670,8 +670,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
    
   osd_deinit();
 
-  config_update_num("gui.amp_level", gGui->mixer.amp_level);
-  config_save();
+  config_update_num(gGui->xine, "gui.amp_level", gGui->mixer.amp_level);
+  xine_config_save(gGui->xine, gGui->configfile);
   
   /* Restore old audio volume */
   if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
@@ -2060,7 +2060,7 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
   if(fb == load_stream) {
     if(cur_dir && strlen(cur_dir)) {
       strlcpy(gGui->curdir, cur_dir, sizeof(gGui->curdir));
-      config_update_string("media.files.origin_path", gGui->curdir);
+      config_update_string(gGui->xine, "media.files.origin_path", gGui->curdir);
     }
     load_stream = NULL;
   }
@@ -2078,7 +2078,7 @@ static void fileselector_callback(filebrowser_t *fb) {
   /* Upate configuration with the selected directory path */
   if(cur_dir && strlen(cur_dir)) {
     strlcpy(gGui->curdir, cur_dir, sizeof(gGui->curdir));
-    config_update_string("media.files.origin_path", gGui->curdir);
+    config_update_string(gGui->xine, "media.files.origin_path", gGui->curdir);
   }
   
   /* Get the file path/name */
@@ -2130,7 +2130,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   /* Update the configuration with the current path */
   if(path && strlen(path)) {
     strlcpy(gGui->curdir, path, sizeof(gGui->curdir));
-    config_update_string("media.files.origin_path", gGui->curdir);
+    config_update_string(gGui->xine, "media.files.origin_path", gGui->curdir);
   }
   
   /* Get all of the file names in the current directory as an array of pointers to strings */

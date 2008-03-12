@@ -105,8 +105,8 @@ static void event_sender_store_new_position(int x, int y, int w, int h) {
   if(eventer && !gGui->eventer_sticky) {
     eventer->x = x;
     eventer->y = y;
-    config_update_num ("gui.eventer_x", x);
-    config_update_num ("gui.eventer_y", y);
+    config_update_num (gGui->xine, "gui.eventer_x", x);
+    config_update_num (gGui->xine, "gui.eventer_y", y);
   }
 }
 
@@ -319,8 +319,8 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     eventer->visible = 0;
     
     if((xitk_get_window_info(eventer->widget_key, &wi))) {
-      config_update_num ("gui.eventer_x", wi.x);
-      config_update_num ("gui.eventer_y", wi.y);
+      config_update_num (gGui->xine, "gui.eventer_x", wi.x);
+      config_update_num (gGui->xine, "gui.eventer_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -382,8 +382,8 @@ void event_sender_move(int x, int y) {
     if(gGui->eventer_sticky) {
       eventer->x = x;
       eventer->y = y;
-      config_update_num ("gui.eventer_x", x);
-      config_update_num ("gui.eventer_y", y);
+      config_update_num (gGui->xine, "gui.eventer_x", x);
+      config_update_num (gGui->xine, "gui.eventer_y", y);
       xitk_window_move_window(gGui->imlib_data, eventer->xwin, x, y);
     }
   }

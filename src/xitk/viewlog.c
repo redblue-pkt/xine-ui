@@ -81,8 +81,8 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     viewlog->visible = 0;
     
     if((xitk_get_window_info(viewlog->kreg, &wi))) {
-      config_update_num ("gui.viewlog_x", wi.x);
-      config_update_num ("gui.viewlog_y", wi.y);
+      config_update_num (gGui->xine, "gui.viewlog_x", wi.x);
+      config_update_num (gGui->xine, "gui.viewlog_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     

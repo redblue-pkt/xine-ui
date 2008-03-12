@@ -117,7 +117,7 @@ int hidden_file_cb(int action, int value) {
   
   if(xine_config_lookup_entry(gGui->xine, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
-      config_update_bool("media.files.show_hidden_files", value);
+      config_update_bool(gGui->xine, "media.files.show_hidden_files", value);
     else
       retval = cfg_entry.num_value;
   }
@@ -295,7 +295,8 @@ static void gui_signal_handler (int sig, void *data) {
   case SIGHUP:
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
-      config_reset();
+      xine_config_reset(gGui->xine);
+      xine_config_load(gGui->xine, gGui->configfile);
     }
     break;
 
@@ -315,8 +316,8 @@ static void gui_signal_handler (int sig, void *data) {
   case SIGTERM:
     if(cur_pid == xine_pid) {
       struct sigaction action;
-      
-      config_save();
+
+      xine_config_save(gGui->xine, gGui->configfile);
       
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
@@ -969,14 +970,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_HUECONTROLp:
     if(gGui->video_settings.hue <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
       osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_HUECONTROLm:
     if(gGui->video_settings.hue >= STEP_SIZE) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
       osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
@@ -984,14 +985,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SATURATIONCONTROLp:
     if(gGui->video_settings.saturation <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
       osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_SATURATIONCONTROLm:
     if(gGui->video_settings.saturation >= STEP_SIZE) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
       osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
@@ -999,14 +1000,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_BRIGHTNESSCONTROLp:
     if(gGui->video_settings.brightness <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
       osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_BRIGHTNESSCONTROLm:
     if(gGui->video_settings.brightness >= STEP_SIZE) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
       osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
@@ -1014,14 +1015,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_CONTRASTCONTROLp:
     if(gGui->video_settings.contrast <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_CONTRASTCONTROLm:
     if(gGui->video_settings.contrast >= STEP_SIZE) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
+      config_update_num(gGui->xine, "gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
@@ -1685,7 +1686,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					 skin_server_url_cb,
 					 CONFIG_NO_DATA);
   
-  config_update_string("gui.skin_server_url", 
+  config_update_string(gGui->xine, "gui.skin_server_url", 
 		       gGui->skin_server_url ? gGui->skin_server_url : server);
   
   gGui->osd.enabled = 
@@ -2008,7 +2009,7 @@ void gui_run(char **session_opts) {
 
     /* Popup setup window if there is no config file */
     if(actions_on_start(gGui->actions_on_start, ACTID_SETUP)) {
-      config_save();
+      xine_config_save(gGui->xine, gGui->configfile);
       gui_execute_action_id(ACTID_SETUP);
     }
     

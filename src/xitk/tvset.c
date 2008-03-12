@@ -158,8 +158,8 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     tvset.visible = 0;
     
     if((xitk_get_window_info(tvset.widget_key, &wi))) {
-      config_update_num ("gui.tvset_x", wi.x);
-      config_update_num ("gui.tvset_y", wi.y);
+      config_update_num (gGui->xine, "gui.tvset_x", wi.x);
+      config_update_num (gGui->xine, "gui.tvset_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     

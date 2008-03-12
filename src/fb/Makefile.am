@@ -5,8 +5,8 @@ bin_PROGRAMS = fbxine
 fbxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
 fbxine_LDADD = @XINE_LIBS@ $(LIRC_LIBS) -lm $(top_builddir)/src/common/libcommon.a
 
-fbxine_SOURCES = main.c actions.c keys.c options.c callback.c stdctl.c post.c osd.c config_wrapper.c
-noinst_HEADERS = main.h actions.h keys.h options.h callback.h stdctl.h post.h osd.h config_wrapper.h
+fbxine_SOURCES = main.c actions.c keys.c options.c callback.c stdctl.c post.c osd.c
+noinst_HEADERS = main.h actions.h keys.h options.h callback.h stdctl.h post.h osd.h
 
 if HAVE_LIRC
 fbxine_SOURCES += lirc.c lirc.h

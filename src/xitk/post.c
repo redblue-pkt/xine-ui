@@ -1649,8 +1649,8 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     pp_wrapper->pplugin->visible = 0;
     
     if((xitk_get_window_info(pp_wrapper->pplugin->widget_key, &wi))) {
-      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
-      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
+      config_update_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
+      config_update_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
