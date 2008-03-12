@@ -1747,7 +1747,7 @@ int main(int argc, char *argv[]) {
 	
 	memset(&buffer, 0, sizeof(buffer));
 	xitk_subst_special_chars(cfg, &buffer[0]);
-	gGui->configfile = strdup(buffer);
+	__xineui_global_config_file = strdup(buffer);
       }
       break;
 
@@ -1930,19 +1930,19 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize config
    */
-  if(gGui->configfile == NULL) {
+  if(__xineui_global_config_file == NULL) {
     struct stat st;
     
-    gGui->configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+    __xineui_global_config_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
 					     + strlen(cfgdir) 
 					     + strlen(cfgfile)
 					     + 3);
-    sprintf (gGui->configfile, "%s/%s", xine_get_homedir(), cfgdir);
-    mkdir (gGui->configfile, 0755);
-    sprintf (gGui->configfile + strlen(gGui->configfile), "/%s", cfgfile);
+    sprintf (__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
+    mkdir (__xineui_global_config_file, 0755);
+    sprintf (__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
     
     /* Popup setup window if there is no config file */
-    if(stat(gGui->configfile, &st) < 0) {
+    if(stat(__xineui_global_config_file, &st) < 0) {
       if(aos < MAX_ACTIONS_ON_START)
 	gGui->actions_on_start[aos++] = ACTID_SETUP;
     }
@@ -1966,7 +1966,7 @@ int main(int argc, char *argv[]) {
   pthread_mutex_init(&gGui->xe_mutex, NULL);
 
   __xineui_global_xine_instance = xine_new();
-  xine_config_load(__xineui_global_xine_instance, gGui->configfile);
+  xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
   xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, gGui->verbosity);
   
   /* 

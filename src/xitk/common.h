@@ -240,8 +240,6 @@ typedef struct {
 
   } osd;
 
-  /* xine lib/gui configuration filename */
-  char                     *configfile;
   int                       experience_level;
 
   int                       logo_mode;

@@ -296,7 +296,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
       xine_config_reset(__xineui_global_xine_instance);
-      xine_config_load(__xineui_global_xine_instance, gGui->configfile);
+      xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
     }
     break;
 
@@ -317,7 +317,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       struct sigaction action;
 
-      xine_config_save(__xineui_global_xine_instance, gGui->configfile);
+      xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
       
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
@@ -2009,7 +2009,7 @@ void gui_run(char **session_opts) {
 
     /* Popup setup window if there is no config file */
     if(actions_on_start(gGui->actions_on_start, ACTID_SETUP)) {
-      xine_config_save(__xineui_global_xine_instance, gGui->configfile);
+      xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
       gui_execute_action_id(ACTID_SETUP);
     }
     

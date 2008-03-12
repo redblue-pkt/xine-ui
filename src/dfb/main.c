@@ -210,7 +210,6 @@ void vm_cb(int w, int h, int bpp, void* cb_data) {
 }
 
 int main(int argc, char *argv[]) {
-  char                 *configfile;
   char                 *driver_name;
   dfb_visual_info_t     visual_info;
   IDirectFBEventBuffer *input_buf;
@@ -251,10 +250,10 @@ int main(int argc, char *argv[]) {
    */
   {
     char *cfgfile = ".xine/config";
-    if (!(configfile = getenv("XINERC"))) {
-      configfile = (char *) xine_xmalloc((strlen((xine_get_homedir())) +
+    if (!(__xineui_global_config_file = getenv("XINERC"))) {
+      __xineui_global_config_file = (char *) xine_xmalloc((strlen((xine_get_homedir())) +
 					  strlen(cfgfile))+2);
-      sprintf(configfile, "%s/%s", (xine_get_homedir()), cfgfile);
+      sprintf(__xineui_global_config_file, "%s/%s", (xine_get_homedir()), cfgfile);
     }
   }
 
@@ -264,7 +263,7 @@ int main(int argc, char *argv[]) {
   }
   
   __xineui_global_xine_instance = (xine_t *) xine_new();
-  xine_config_load (dfb.xine, configfile);
+  xine_config_load (dfb.xine, __xineui_global_config_file);
   
   xine_init (__xineui_global_xine_instance,  dfbxine.ao_driver, dfbxine.vo_driver);
   
@@ -428,7 +427,7 @@ int main(int argc, char *argv[]) {
 failure:
     
   if(__xineui_global_xine_instance) 
-    xine_config_save(__xineui_global_xine_instance, configfile);
+    xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
  
   if(__xineui_global_xine_instance)
    xine_exit(__xineui_global_xine_instance); 

@@ -31,3 +31,9 @@
  * @brief Global xine instance
  */
 xine_t *__xineui_global_xine_instance;
+
+/**
+ * @brief Configuration file name
+ */
+char *__xineui_global_config_file;
+

@@ -66,20 +66,20 @@ struct fbxine fbxine =
 
 static void load_config(void)
 {
-	fbxine.configfile = getenv("XINERC");
-	if(!fbxine.configfile)
+	__xineui_global_config_file = getenv("XINERC");
+	if(!__xineui_global_config_file)
 	{
-		fbxine.configfile = xine_xmalloc(strlen(xine_get_homedir())
+		__xineui_global_config_file = xine_xmalloc(strlen(xine_get_homedir())
 						 + strlen(XINE_CONFIG_DIR) 
 						 + strlen(XINE_CONFIG_FILE)
 						 + 3);
-		sprintf(fbxine.configfile, "%s/%s", xine_get_homedir(),
+		sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(),
 			XINE_CONFIG_DIR);
-		mkdir(fbxine.configfile, 0755);
-		sprintf(fbxine.configfile + strlen(fbxine.configfile), "/%s",
+		mkdir(__xineui_global_config_file, 0755);
+		sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s",
 			XINE_CONFIG_FILE);
 	}
-	xine_config_load(__xineui_global_xine_instance, fbxine.configfile);
+	xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
         xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, fbxine.verbosity);
 }
 

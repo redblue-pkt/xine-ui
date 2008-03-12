@@ -62,8 +62,6 @@ struct fbxine
 
 	int                      lirc_enable;
 
-	char                     *configfile;
-	
 	int                      ignore_status;
 	char                     *mrl[1024];
 	int                      num_mrls;

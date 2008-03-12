@@ -84,7 +84,6 @@ typedef struct {
 
   int                  logo_mode;
   int                  ignore_next;
-  char                *configfile;
 #ifdef AA
   aa_context          *context;
 #endif
@@ -733,19 +732,19 @@ int main(int argc, char *argv[]) {
     char *cfgdir = ".xine";
     char *cfgfile = CONFIGFILE;
     
-    if (!(aaxine.configfile = getenv ("XINERC"))) {
-      aaxine.configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+    if (!(__xineui_global_config_file = getenv ("XINERC"))) {
+      __xineui_global_config_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
 						+ strlen(cfgdir) 
 						+ strlen(cfgfile)
 						+ 3);
-      sprintf(aaxine.configfile, "%s/%s", xine_get_homedir(), cfgdir);
-      mkdir(aaxine.configfile, 0755);
-      sprintf(aaxine.configfile + strlen(aaxine.configfile), "/%s", cfgfile);
+      sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
+      mkdir(__xineui_global_config_file, 0755);
+      sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
     }
   }
 
   __xineui_global_xine_instance = (xine_t *)xine_new();
-  xine_config_load (__xineui_global_xine_instance, aaxine.configfile);
+  xine_config_load (__xineui_global_xine_instance, __xineui_global_config_file);
   xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
   
   /*
@@ -1092,7 +1091,7 @@ int main(int argc, char *argv[]) {
  failure:
   
   if(__xineui_global_xine_instance) 
-    xine_config_save(__xineui_global_xine_instance, aaxine.configfile);
+    xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
   
   if(aaxine.stream) {
     xine_close(aaxine.stream);
@@ -1127,7 +1126,7 @@ int main(int argc, char *argv[]) {
   if(xlib_handle)
     dlclose(xlib_handle);
 
-  free(aaxine.configfile);
+  free(__xineui_global_config_file);
 
   return 0;
 }

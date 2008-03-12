@@ -27,5 +27,6 @@
 #include <xine.h>
 
 extern xine_t *__xineui_global_xine_instance;
+extern char   *__xineui_global_config_file;
 
 #endif
