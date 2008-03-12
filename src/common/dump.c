@@ -37,6 +37,7 @@
 #include <sys/utsname.h>
 
 #include "dump.h"
+#include "globals.h"
 
 void dump_host_info(void) {
   struct utsname uts;
@@ -95,18 +96,18 @@ void dump_cpu_infos(void) {
 #endif
 }
 
-void dump_error(int verbosity, char *msg) {
-  if(verbosity) {
-    fprintf(stderr, "%s", "\n---------------------- (ERROR) ----------------------\n");
-    fputs(msg, stderr); 
-    fprintf(stderr, "%s","\n------------------ (END OF ERROR) -------------------\n\n");
-  }
+void dump_error(const char *msg) {
+  if(!__xineui_global_verbosity) return;
+
+  fprintf(stderr, "%s", "\n---------------------- (ERROR) ----------------------\n");
+  fputs(msg, stderr); 
+  fprintf(stderr, "%s","\n------------------ (END OF ERROR) -------------------\n\n");
 }
 
-void dump_info(int verbosity, char *msg) {
-  if(verbosity) {
-    fprintf(stderr, "%s", "\n---------------------- (INFO) ----------------------\n");
-    fputs(msg, stderr);
-    fprintf(stderr, "%s", "\n------------------- (END OF INFO) ------------------\n\n");
-  }
+void dump_info(const char *msg) {
+  if(!__xineui_global_verbosity) return;
+
+  fprintf(stderr, "%s", "\n---------------------- (INFO) ----------------------\n");
+  fputs(msg, stderr);
+  fprintf(stderr, "%s", "\n------------------- (END OF INFO) ------------------\n\n");
 }
