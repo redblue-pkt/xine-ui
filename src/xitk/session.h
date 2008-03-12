@@ -23,6 +23,8 @@
 #ifndef CTRLSOCK_H
 #define CTRLSOCKS_H
 
+#include <xine/os_types.h>
+
 typedef enum {
   /* Don't change order */
   CMD_PLAY = 1,

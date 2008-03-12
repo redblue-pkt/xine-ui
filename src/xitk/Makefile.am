@@ -43,7 +43,10 @@ xine_SOURCES = \
 	panel.c \
 	playlist.c \
 	post.c \
+	session_common.c \
+	session_internal.h \
 	session.c \
+	session.h \
 	setup.c \
 	skins.c \
 	snapshot.c \
@@ -79,9 +82,9 @@ xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
 xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) \
 	$(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
 
-session_ctrl_CFLAGS = $(AM_CFLAGS) -DCTRL_TEST
+session_ctrl_CFLAGS = $(AM_CFLAGS)
 session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
-session_ctrl_SOURCES = session.c
+session_ctrl_SOURCES = session_common.c session_internal.h session.h ctrl_test.c
 
 noinst_HEADERS = \
 	actions.h \
@@ -107,7 +110,6 @@ noinst_HEADERS = \
 	panel.h \
 	playlist.h \
 	post.h \
-	session.h \
 	setup.h \
 	skins.h \
 	snapshot.h \

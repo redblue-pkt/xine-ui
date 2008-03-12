@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -26,8 +26,6 @@
 #if ! defined (__sun) && ! defined (__OpenBSD__) && ! defined (__FreeBSD__)
 #define _XOPEN_SOURCE 500
 #endif
-/* required for S_ISSOCK */
-#define _BSD_SOURCE 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,140 +43,9 @@
 #include <errno.h>
 
 #include "common.h"
+#include "session_internal.h"
 
 extern gGui_t          *gGui;
-
-#ifndef S_ISSOCK
-#define S_ISSOCK(mode) 0
-#endif
-
-#define CTRL_PROTO_VERSION    0x1
-
-typedef struct {
-  uint16_t         version;     /* client/server version */
-  ctrl_commands_t  command;     /* ctrl_commands_t */
-  uint32_t         data_length; /* data */
-} ctrl_header_packet_t;
-
-typedef struct {
-  ctrl_header_packet_t  hdr;
-  int                   fd;
-  void                 *data;
-} serv_header_packet_t;
-
-static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length);
-
-static int connect_to_session(int session) {
-  int fd;
-  
-  if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
-    union {
-      struct sockaddr_un un;
-      struct sockaddr sa;
-    } saddr;
-    uid_t                stored_uid, euid;
-    
-    saddr.un.sun_family = AF_UNIX;
-    stored_uid       = getuid();
-    euid             = geteuid();
-    setuid(euid);
-
-    snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
-    setreuid(stored_uid, euid);
-
-    if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1)
-      return fd;
-
-  }
-
-  close(fd);
-  return -1;
-}
-
-static void *read_packet(int fd, ctrl_header_packet_t *hdr) {
-  void *data = NULL;
-  
-  if((read(fd, hdr, sizeof(ctrl_header_packet_t))) == sizeof(ctrl_header_packet_t)) {
-    if(hdr->data_length) {
-      data = xine_xmalloc(hdr->data_length);
-      read(fd, data, hdr->data_length);
-    }
-  }
-
-  return data;
-}
-
-static void read_ack(int fd) {
-  ctrl_header_packet_t  hdr;
-  void                 *data;
-  
-  data = read_packet(fd, &hdr);
-  SAFE_FREE(data);
-}
-
-static void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
-
-  write(fd, hdr, sizeof(ctrl_header_packet_t));
-
-  if(hdr->data_length && data)
-    write(fd, data, hdr->data_length);
-}
-
-static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length) {
-  ctrl_header_packet_t  hdr;
-  
-  hdr.version     = CTRL_PROTO_VERSION;
-  hdr.command     = command;
-  hdr.data_length = data_length;
-
-  _send_packet(fd, data, &hdr);
-}
-
-void send_string(int session, ctrl_commands_t command, char *string) {
-  int fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return;
-  send_packet(fd, command, string, string ? strlen(string) + 1 : 0);
-  read_ack(fd);
-  close(fd);
-}
-
-char *get_string(int session, ctrl_commands_t command) {
-  ctrl_header_packet_t  hdr;
-  char                 *data = NULL;
-  int                   fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return data;
-  
-  send_packet(fd, command, NULL, 0);
-  data = (char *)read_packet(fd, &hdr);
-  read_ack(fd);
-  close(fd);
-
-  return data;
-}
-
-static int remote_cmd(int session, ctrl_commands_t command) {
-  int fd;
-  
-  if((fd = connect_to_session(session)) == -1)
-    return 0;
-
-  send_packet(fd, command, NULL, 0);
-  read_ack(fd);
-  close(fd);
-  
-  return 1;
-}
-
-int is_remote_running(int session) {
-  return remote_cmd(session, CMD_PING);
-}
-
-
-#ifndef CTRL_TEST
 
 static int session_id = -1;
 static int           ctrl_fd;
@@ -876,23 +743,3 @@ int session_handle_subopt(char *suboptarg, int *session) {
 
   return retval;
 }
-
-#else /* CTRL_TEST */
-
-int main(int argc, char **argv) {
-  int session = 0;
-  
-  if(argc > 1)
-    session = atoi(argv[1]);
-  
-  if(is_remote_running(session)) {
-    printf("session %d is running\n", session);
-    send_string(session, CMD_PLAYLIST_ADD, "azertyuiopqsdfghjklmwxcvbn");
-    printf("GET_VERSION: '%s'\n", get_string(session, CMD_GET_VERSION));
-  }
-  else
-    printf("Session %d isn't running\n", session);
-
-  return 1;
-}
-#endif
