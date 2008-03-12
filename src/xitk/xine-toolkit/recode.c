@@ -24,9 +24,7 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_ICONV
 #include <iconv.h>
-#endif
 
 #ifdef HAVE_LANGINFO_CODESET
 #include <langinfo.h>
@@ -34,12 +32,15 @@
 
 #include <assert.h>
 
+#define BUILD_RECODE_C
+typedef iconv_t xitk_recode_t;
+
 #include "_xitk.h"
 #include "recode.h"
 
 typedef struct {
   const char               language[9];
-  const char               encoding[9];
+  const char               encoding[11];
 } lang_locale_t;
 
 static const lang_locale_t lang_locales[] = {
@@ -273,8 +274,7 @@ static char *xitk_get_system_encoding(void) {
 }
 
 xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
-  xitk_recode_t  *xr = NULL;
-  iconv_t         id;
+  iconv_t        id, *pid = NULL;
   char           *src_enc = NULL, *dst_enc = NULL;
   
   if (src_encoding)
@@ -292,31 +292,33 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
 
   if (!dst_enc)
     goto end;
-  
+
   if ((id = iconv_open(dst_enc, src_enc)) == (iconv_t)-1)
     goto end;
-  
-  xr = (xitk_recode_t *) xitk_xmalloc(sizeof(xitk_recode_t));
-  xr->id = id;
+
+  pid = malloc(sizeof(iconv_t));
+  assert(id != NULL);
+
+  *pid = id;
   
  end:
   free(dst_enc);
   free(src_enc);
-  return xr;
+  return id;
 }
 
-void xitk_recode_done(xitk_recode_t *xr) {
-  if ( ! xr ) return;
+void xitk_recode_done(xitk_recode_t *id) {
+  if ( ! id ) return;
 
-  iconv_close(xr->id);
+  iconv_close(*id);
 
-  free(xr);
+  free(id);
 }
 
-char *xitk_recode(xitk_recode_t *xr, const char *src) {
+char *xitk_recode(xitk_recode_t *id, const char *src) {
   char *buffer = NULL;
 
-  if ( xr ) {
+  if ( id ) {
     size_t inbytes  = strlen(src);
     size_t outbytes = 2 * inbytes;
     char *buffer    = calloc(outbytes + 1, sizeof(char));
@@ -324,7 +326,7 @@ char *xitk_recode(xitk_recode_t *xr, const char *src) {
     char *outbuf    = buffer;
 
     while (inbytes) {
-      if (iconv(xr->id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
+      if (iconv(*id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
 	free(buffer);
 	buffer = NULL;
 	break;

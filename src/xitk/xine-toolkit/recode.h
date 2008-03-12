@@ -23,11 +23,14 @@
 #ifndef HAVE_XITK_RECODE_H
 #define HAVE_XITK_RECODE_H
 
-#ifdef HAVE_ICONV
+/* Unless building recode.c, make xitk_recode_t an opaque type.
+ */
 
-typedef struct {
-  iconv_t    id;
-} xitk_recode_t;
+#ifndef BUILD_RECODE_C
+typedef void xitk_recode_t;
+#endif
+
+#ifdef HAVE_ICONV
 
 /**
  * prepare recoding
@@ -52,8 +55,6 @@ void xitk_recode_done(xitk_recode_t *xr);
 /* If we're not using iconv(), just define everything as no-op, and
  * xitk_recode as strdup.
  */
-
-typedef void xitk_recode_t;
 
 #define xitk_recode_init(src_encoding, dst_encoding) NULL
 #define xitk_recode(xr, src) strdup(src)
