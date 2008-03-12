@@ -29,10 +29,6 @@
 
 #include <sys/time.h>
 
-#ifdef HAVE_X11
-#include <X11/Xlib.h>
-#endif
-
 /* sys/time.h does not define timersub() on all platforms... */
 #ifndef timersub
 # define timersub(a, b, result)                                               \
@@ -85,15 +81,6 @@ int is_ipv6_last_double_semicolon(const char *str);
 int is_downloadable(char *filename);
 int is_a_dir(char *filename);
 int is_a_file(char *filename);
-
-void dump_host_info(void);
-#ifdef HAVE_X11
-void dump_cpu_infos(void);
-void dump_xfree_info(Display *display, int screen, int complete);
-#endif
-
-void dump_error(int verbosity, char *msg);
-void dump_info(int verbosity, char *msg);
 
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t size);

@@ -74,6 +74,7 @@
 
 #include "libcommon.h"
 #include "globals.h"
+#include "dump.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
