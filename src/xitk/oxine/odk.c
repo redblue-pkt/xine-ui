@@ -31,6 +31,7 @@
 #include "common.h"
 #include "odk.h"
 #include "utils.h"
+#include "globals.h"
 
 extern gGui_t          *gGui;
 

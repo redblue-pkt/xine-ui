@@ -45,10 +45,10 @@
 #include <directfb.h>       
 
 #include <xine.h>
-#include <xine/xineutils.h>
+#include <xine/xineglobals.h>
 
 #include "dfb.h" 
-#include "utils.h"
+#include "globals.h"
 
 dfbxine_t dfbxine;
 

@@ -103,8 +103,4 @@ size_t strlcat(char *dst, const char *src, size_t size);
 size_t strlcpy(char *dst, const char *src, size_t size);
 #endif
 
-#include <xine.h>
-
-extern xine_t *__xineui_global_xine_instance;
-
 #endif

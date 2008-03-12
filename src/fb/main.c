@@ -37,7 +37,7 @@
 #include "options.h"
 #include "osd.h"
 #include "post.h"
-#include "utils.h"
+#include "globals.h"
 #include "config_wrapper.h"
 
 #define XINE_CONFIG_DIR  ".xine"

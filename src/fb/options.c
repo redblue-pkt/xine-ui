@@ -33,7 +33,7 @@
 
 #include "main.h"
 #include "options.h"
-#include "utils.h"
+#include "globals.h"
 
 #define OPTION_STDCTL           5000
 #define OPTION_VERBOSE          1005

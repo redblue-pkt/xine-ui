@@ -73,6 +73,7 @@
 #include "tvout.h"
 
 #include "libcommon.h"
+#include "globals.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"

@@ -40,6 +40,7 @@
 #include "oxine_event.h"
 #include "xine/xmlparser.h"
 #include "utils.h"
+#include "globals.h"
 
 #include "mediamarks.h"
 #include "playlist.h"

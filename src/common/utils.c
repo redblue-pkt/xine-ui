@@ -412,8 +412,3 @@ void dump_info(int verbosity, char *msg) {
     fprintf(stderr, "%s", "\n------------------- (END OF INFO) ------------------\n\n");
   }
 }
-
-/**
- * @brief Global xine instance
- */
-xine_t *__xineui_global_xine_instance;

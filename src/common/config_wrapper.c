@@ -33,6 +33,7 @@
 
 #include "config_wrapper.h"
 #include "utils.h"
+#include "globals.h"
 
 /* 
  * experience level above this level 

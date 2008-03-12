@@ -23,7 +23,7 @@
 #include "post.h"
 #include "main.h"
 
-#include "utils.h"
+#include "globals.h"
 
 typedef struct {
   xine_post_t                 *post;
