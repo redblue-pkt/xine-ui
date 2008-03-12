@@ -17,7 +17,7 @@ font_DATA = $(fontandpointers)
 endif
 
 dfbxine_DEPENDENCIES = $(topbuilddir)/src/common/libcommon.a
-dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm $(topbuilddir)/src/common/libcommon.a
+dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) -lm $(topbuilddir)/src/common/libcommon.a
 dfbxine_SOURCES = options.c \
 	dfb.c \
 	main.c

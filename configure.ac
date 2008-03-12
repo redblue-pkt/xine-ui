@@ -103,17 +103,6 @@ AC_SUBST(THREAD_LIBS)
 AC_SUBST(THREAD_CFLAGS)
 
 dnl
-dnl dynamic linker
-dnl
-AC_CHECK_LIB(c, dlopen,
-	     DYNAMIC_LD_LIBS="",
-	     AC_CHECK_LIB(dl, dlopen,
-             	          DYNAMIC_LD_LIBS="-ldl",
-	                  AC_MSG_ERROR(dynamic linker needed)))
-AC_SUBST(DYNAMIC_LD_LIBS)
-
-
-dnl
 dnl Checks for X11
 dnl
 if test "x$with_x" != "xno"; then
@@ -332,6 +321,7 @@ AC_ARG_WITH([aalib],
 
 if test x"$with_aalib" = xyes; then
   AM_PATH_AALIB(1.2.0,,)
+  AM_DL()
 else
   no_aalib=yes
 fi
@@ -345,6 +335,7 @@ AC_ARG_WITH([caca],
 
 if test "x$with_caca" != "xno"; then
    PKG_CHECK_MODULES([CACA], [caca cucul], [have_caca="yes"], [have_caca="no"])
+   AM_DL()
    if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
       AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
    fi

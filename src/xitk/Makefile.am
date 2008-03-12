@@ -62,7 +62,7 @@ xine_LDADD = $(XINE_LIBS) \
 	     $(top_builddir)/src/xitk/oxine/liboxine.a \
 	     $(top_builddir)/src/common/libcommon.a \
              $(top_builddir)/src/common/libcommonx.a \
-	     $(X_PRE_LIBS) $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) $(XFT_LIBS) \
+	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(INTLLIBS)
 
