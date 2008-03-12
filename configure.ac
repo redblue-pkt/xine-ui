@@ -445,14 +445,14 @@ dnl
 dnl xine-ui use tar, check it
 dnl
 AC_ARG_WITH([tar],
-   AS_HELP_STRING([--without-tar], [Don't user the tar command from xine-ui (disable skin download)]))
+   AS_HELP_STRING([--without-tar], [Don't use the tar command from within xine-ui (disable skin download)]))
 
 if test "x$with_tar" != "xno"; then
    AC_CHECK_PROGS(TAR, [tar bsdtar star])
 fi
 
 if test x"$TAR" = "x"; then
-    AC_MSG_RESULT([*** tar depend part will be disabled (skin download) ***])
+    AC_MSG_RESULT([*** tar-dependent part will be disabled (skin download) ***])
 else
     AC_DEFINE(HAVE_TAR,,[Define this if you have tar installed])
 fi
