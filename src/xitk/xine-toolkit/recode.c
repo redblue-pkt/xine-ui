@@ -32,6 +32,8 @@
 #include <langinfo.h>
 #endif
 
+#include <assert.h>
+
 #include "_xitk.h"
 #include "recode.h"
 
@@ -272,7 +274,6 @@ static char *xitk_get_system_encoding(void) {
 
 xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
   xitk_recode_t  *xr = NULL;
-#ifdef HAVE_ICONV
   iconv_t         id;
   char           *src_enc = NULL, *dst_enc = NULL;
   
@@ -301,31 +302,26 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
  end:
   free(dst_enc);
   free(src_enc);
-#endif
   return xr;
 }
 
 void xitk_recode_done(xitk_recode_t *xr) {
-  if (xr) {
-#ifdef HAVE_ICONV
-    if (xr->id != (iconv_t)-1)
-      iconv_close(xr->id);
-#endif
-    free(xr);
-  }
+  if ( ! xr ) return;
+
+  iconv_close(xr->id);
+
+  free(xr);
 }
 
 char *xitk_recode(xitk_recode_t *xr, const char *src) {
-#ifdef HAVE_ICONV
-  char    *inbuf, *outbuf, *buffer = NULL;
-  size_t   inbytes, outbytes;
+  char *buffer = NULL;
 
-  if (xr && xr->id != (iconv_t)-1) {
-    inbytes  = strlen(src);
-    outbytes = 2 * inbytes;
-    buffer   = xitk_xmalloc(outbytes + 1);
-    inbuf    = (char *)src;
-    outbuf   = buffer;
+  if ( xr ) {
+    size_t inbytes  = strlen(src);
+    size_t outbytes = 2 * inbytes;
+    char *buffer    = calloc(outbytes + 1, sizeof(char));
+    ICONV_CONST char *inbuf     = (ICONV_CONST char *)src;
+    char *outbuf    = buffer;
 
     while (inbytes) {
       if (iconv(xr->id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
@@ -337,7 +333,4 @@ char *xitk_recode(xitk_recode_t *xr, const char *src) {
   }
 
   return buffer ? buffer : strdup(src);
-#else
-  return strdup(src);
-#endif
 }
