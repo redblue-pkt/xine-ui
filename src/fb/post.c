@@ -117,11 +117,11 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
 	if(p && (strlen(p) > 1))
 	  args = p;
 	
-	post = xine_post_init(fbxine.xine, plugin, 0, &fbxine.audio_port, &fbxine.video_port);
+	post = xine_post_init(__xineui_global_xine_instance, plugin, 0, &fbxine.audio_port, &fbxine.video_port);
 
         if (post && plugin_type) {
           if (post->type != plugin_type) {
-            xine_post_dispose(fbxine.xine, post);
+            xine_post_dispose(__xineui_global_xine_instance, post);
             post = NULL;
           }
         }
@@ -477,7 +477,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
     _pplugin_unwire();
   
   for(i = 0; i < fbxine.deinterlace_elements_num; i++) {
-    xine_post_dispose(fbxine.xine, fbxine.deinterlace_elements[i]->post);
+    xine_post_dispose(__xineui_global_xine_instance, fbxine.deinterlace_elements[i]->post);
     free(fbxine.deinterlace_elements[i]->name);
     free(fbxine.deinterlace_elements[i]);
   }

@@ -231,8 +231,8 @@ static void help_exit(xitk_widget_t *w, void *data) {
     help->visible = 0;
     
     if((xitk_get_window_info(help->kreg, &wi))) {
-      config_update_num(gGui->xine, "gui.help_x", wi.x);
-      config_update_num(gGui->xine, "gui.help_y", wi.y);
+      config_update_num("gui.help_x", wi.x);
+      config_update_num("gui.help_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -340,14 +340,14 @@ void help_panel(void) {
 
   help = (_help_t *) xine_xmalloc(sizeof(_help_t));
 
-  x = xine_config_register_num (gGui->xine, "gui.help_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, "gui.help_y", 
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.help_y", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,

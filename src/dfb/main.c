@@ -48,6 +48,7 @@
 #include <xine/xineutils.h>
 
 #include "dfb.h" 
+#include "utils.h"
 
 dfbxine_t dfbxine;
 
@@ -82,13 +83,13 @@ static void config_update(xine_cfg_entry_t *entry,
     break;
   }
   
-  xine_config_update_entry(dfbxine.xine, entry);
+  xine_config_update_entry(__xineui_global_xine_instance, entry);
 }
 
 void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
   
-  if(xine_config_lookup_entry(dfbxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -97,7 +98,7 @@ void config_update_range(char *key, int min, int max) {
 void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
   
-  if((xine_config_lookup_entry(dfbxine.xine, key, &entry)) && string)
+  if((xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) && string)
     config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
     if(string == NULL)
@@ -110,7 +111,7 @@ void config_update_string(char *key, char *string) {
 void config_update_enum(char *key, int value) {
   xine_cfg_entry_t entry;
   
-  if(xine_config_lookup_entry(dfbxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -119,7 +120,7 @@ void config_update_enum(char *key, int value) {
 void config_update_bool(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(dfbxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -128,7 +129,7 @@ void config_update_bool(char *key, int value) {
 void config_update_num(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  if(xine_config_lookup_entry(dfbxine.xine, key, &entry))
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
@@ -146,8 +147,8 @@ static void gui_status_callback (int nStatus) {
     dfbxine.current_mrl++;
    
     if (dfbxine.current_mrl < dfbxine.num_mrls) {
-      if(xine_open(dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl]))
-	xine_play (dfbxine.xine, 0, 0 );
+      if(xine_open(__xineui_global_xine_instance, dfbxine.mrl[dfbxine.current_mrl]))
+	xine_play (__xineui_global_xine_instance, 0, 0 );
     }
     else {
       if (dfbxine.auto_quit == 1) {
@@ -186,7 +187,7 @@ static void gui_branched_callback (void ) {
 static void set_position (int pos) {
 
   dfbxine.ignore_status = 1;
-  xine_play(dfbxine.xine, pos, 0);
+  xine_play(__xineui_global_xine_instance, pos, 0);
   dfbxine.ignore_status = 0;
 }
 
@@ -262,12 +263,12 @@ int main(int argc, char *argv[]) {
     goto failure;
   }
   
-  dfbxine.xine = (xine_t *) xine_new();
+  __xineui_global_xine_instance = (xine_t *) xine_new();
   xine_config_load (dfb.xine, configfile);
   
-  xine_init (dfbxine.xine,  dfbxine.ao_driver, dfbxine.vo_driver);
+  xine_init (__xineui_global_xine_instance,  dfbxine.ao_driver, dfbxine.vo_driver);
   
-  if(!dfbxine.xine) {
+  if(!__xineui_global_xine_instance) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
   }
@@ -280,7 +281,7 @@ int main(int argc, char *argv[]) {
   
   visual_info.dfb = dfbxine.dfb;
   visual_info.layer = dfbxine.video_layer;
-  dfbxine.vo_driver = xine_open_video_driver(dfbxine.xine, 
+  dfbxine.vo_driver = xine_open_video_driver(__xineui_global_xine_instance, 
 					     dfbxine.video_driver_id,
 					     XINE_VISUAL_TYPE_DFB, 
 					     (void *)(&visual_info));
@@ -293,7 +294,7 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
-  driver_name = (char *) xine_config_register_string(dfbxine.xine, 
+  driver_name = (char *) xine_config_register_string(__xineui_global_xine_instance, 
 						     "audio.driver", 
 						     "oss",
 						     "audio driver to use",
@@ -305,9 +306,9 @@ int main(int argc, char *argv[]) {
   if(!dfbxine.audio_driver_id)
     dfbxine.audio_driver_id = driver_name;
   else
-    config_update_string (dfbxine.xine, "audio.driver", dfbxine.audio_driver_id);
+    config_update_string (__xineui_global_xine_instance, "audio.driver", dfbxine.audio_driver_id);
   
-  dfbxine.ao_driver = xine_open_audio_driver(dfbxine.xine, dfbxine.audio_driver_id, NULL);
+  dfbxine.ao_driver = xine_open_audio_driver(__xineui_global_xine_instance, dfbxine.audio_driver_id, NULL);
   
   if (!dfbxine.ao_driver) {
     printf ("main: audio driver %s failed\n", dfbxine.audio_driver_id);
@@ -320,30 +321,30 @@ int main(int argc, char *argv[]) {
   dfbxine.mixer.enable = 0;
   dfbxine.mixer.caps = 0;
 
-  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_MIXER_VOL))
+  if(xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AO_MIXER_VOL))
     dfbxine.mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
-  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_PCM_VOL))
+  if(xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AO_PCM_VOL))
     dfbxine.mixer.caps |= XINE_PARAM_AO_PCM_VOL;
-  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_MUTE))
+  if(xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AO_MUTE))
     dfbxine.mixer.caps |= XINE_PARAM_AO_MUTE;
   
   if(dfbxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     dfbxine.mixer.enable = 1;
-    dfbxine.mixer.volume_level = xine_get_param(dfbxine.xine, XINE_PARAM_AUDIO_VOLUME);
+    dfbxine.mixer.volume_level = xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_VOLUME);
   }
   
   if(dfbxine.mixer.caps & XINE_PARAM_AO_MUTE)
-    dfbxine.mixer.mute = xine_get_param(dfbxine.xine, XINE_PARAM_AUDIO_MUTE);
+    dfbxine.mixer.mute = xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_MUTE);
   
   /* Select audio channel */
-  xine_set_param(dfbxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, dfbxine.audio_channel);
+  xine_set_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, dfbxine.audio_channel);
   
   /*
    * ui loop
    */
 
-  if(xine_open(dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl]))
-    xine_play (dfbxine.xine, 0, 0);
+  if(xine_open(__xineui_global_xine_instance, dfbxine.mrl[dfbxine.current_mrl]))
+    xine_play (__xineui_global_xine_instance, 0, 0);
   
   dfbxine.running = 1;
   
@@ -426,11 +427,11 @@ int main(int argc, char *argv[]) {
   
 failure:
     
-  if(dfbxine.xine) 
-    xine_config_save(dfbxine.xine, configfile);
+  if(__xineui_global_xine_instance) 
+    xine_config_save(__xineui_global_xine_instance, configfile);
  
-  if(dfbxine.xine)
-   xine_exit(dfbxine.xine); 
+  if(__xineui_global_xine_instance)
+   xine_exit(__xineui_global_xine_instance); 
  
   if(dfbxine.video_layer)
    DFBCHECK(dfbxine.video_layer->Release(dfbxine.video_layer));

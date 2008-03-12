@@ -182,8 +182,8 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     setup.visible = 0;
     
     if((xitk_get_window_info(setup.kreg, &wi))) {
-      config_update_num (gGui->xine, "gui.setup_x", wi.x);
-      config_update_num (gGui->xine, "gui.setup_y", wi.y);
+      config_update_num ("gui.setup_x", wi.x);
+      config_update_num ("gui.setup_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -312,13 +312,13 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 
 	  switch(setup.wg[i]->cfg->type) {
 	  case XINE_CONFIG_TYPE_STRING:
-	    config_update_string(gGui->xine, (char *)(setup.wg[i]->cfg)->key, strval);
+	    config_update_string((char *)(setup.wg[i]->cfg)->key, strval);
 	    break;
 	  case XINE_CONFIG_TYPE_ENUM:
 	  case XINE_CONFIG_TYPE_NUM:
 	  case XINE_CONFIG_TYPE_BOOL:
 	  case XINE_CONFIG_TYPE_RANGE:
-	    config_update_num(gGui->xine, (char *)(setup.wg[i]->cfg)->key, numval);
+	    config_update_num((char *)(setup.wg[i]->cfg)->key, numval);
 	    break;
 	  case XINE_CONFIG_TYPE_UNKNOWN:
 	    break;
@@ -326,7 +326,7 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 	}
       }
     }
-    xine_config_save(gGui->xine, gGui->configfile);
+    xine_config_save(__xineui_global_xine_instance, gGui->configfile);
 
     if(w != setup.ok)
       setup_change_section(setup.tabs, NULL, xitk_tabs_get_current_selected(setup.tabs));
@@ -789,7 +789,7 @@ static void setup_section_widgets(int s) {
   section = setup.sections[s];
   len     = strlen (section);
   entry   = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
-  cfg_err_result   = xine_config_get_first_entry(gGui->xine, entry);
+  cfg_err_result   = xine_config_get_first_entry(__xineui_global_xine_instance, entry);
     
   while (cfg_err_result) {
       
@@ -849,7 +849,7 @@ static void setup_section_widgets(int s) {
       free(entry);
       
     entry = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
-    cfg_err_result = xine_config_get_next_entry(gGui->xine, entry);
+    cfg_err_result = xine_config_get_next_entry(__xineui_global_xine_instance, entry);
   }
   free(entry);
 
@@ -930,7 +930,7 @@ static void setup_sections (void) {
   xitk_tabs_widget_t   tab;
 
   setup.num_sections = 0;
-  cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
+  cfg_err_result = xine_config_get_first_entry(__xineui_global_xine_instance, &entry);
   while (cfg_err_result) {
 
     char *point;
@@ -958,7 +958,7 @@ static void setup_sections (void) {
       }
     }      
     
-    cfg_err_result = xine_config_get_next_entry(gGui->xine, &entry);
+    cfg_err_result = xine_config_get_next_entry(__xineui_global_xine_instance, &entry);
   }
 
   XITK_WIDGET_INIT(&tab, gGui->imlib_data);
@@ -1036,14 +1036,14 @@ void setup_panel(void) {
 
   memset(&setup, 0, sizeof(setup));
 
-  x = xine_config_register_num (gGui->xine, "gui.setup_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.setup_x", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, "gui.setup_y", 
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.setup_y", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,

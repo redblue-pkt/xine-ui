@@ -581,7 +581,7 @@ void playlist_scan_for_infos_selected(void) {
     int                 selected = xitk_browser_get_current_selected(playlist->playlist);
     xine_stream_t      *stream;
     
-    stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
+    stream = xine_stream_new(__xineui_global_xine_instance, gGui->ao_none, gGui->vo_none);
     _scan_for_playlist_infos(stream, selected);
     
     xine_dispose(stream);
@@ -596,7 +596,7 @@ void playlist_scan_for_infos(void) {
     int                 i;
     xine_stream_t      *stream;
     
-    stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
+    stream = xine_stream_new(__xineui_global_xine_instance, gGui->ao_none, gGui->vo_none);
     
     for(i = 0; i < gGui->playlist.num; i++)
       _scan_for_playlist_infos(stream, i);
@@ -667,8 +667,8 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     playlist->visible = 0;
 
     if((xitk_get_window_info(playlist->widget_key, &wi))) {
-      config_update_num (gGui->xine, "gui.playlist_x", wi.x);
-      config_update_num (gGui->xine, "gui.playlist_y", wi.y);
+      config_update_num ("gui.playlist_x", wi.x);
+      config_update_num ("gui.playlist_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -734,7 +734,7 @@ int playlist_is_visible(void) {
  * Handle autoplay buttons hitting (from panel and playlist windows)
  */
 void playlist_scan_input(xitk_widget_t *w, void *ip) {
-  const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
   int                i = 0;
   
   if(autoplay_plugins) {
@@ -742,7 +742,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
       
       if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
 	int                num_mrls = 0;
-	char             **autoplay_mrls = xine_get_autoplay_mrls(gGui->xine, autoplay_plugins[i], &num_mrls);
+	char             **autoplay_mrls = xine_get_autoplay_mrls(__xineui_global_xine_instance, autoplay_plugins[i], &num_mrls);
 	xine_stream_t      *stream;
 	
 	if(autoplay_mrls) {
@@ -760,7 +760,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	      xitk_inputtext_change_text(playlist->winput, NULL);
 	  }
 	  
-	  stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
+	  stream = xine_stream_new(__xineui_global_xine_instance, gGui->ao_none, gGui->vo_none);
 	  
 	  for (j = 0; j < num_mrls; j++) {
 	    char *ident = NULL;
@@ -1042,14 +1042,14 @@ void playlist_editor(void) {
     exit(-1);
   }
 
-  hint.x = xine_config_register_num (gGui->xine, "gui.playlist_x",
+  hint.x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
 				     200,
 				     CONFIG_NO_DESC,
 				     CONFIG_NO_HELP,
 				     CONFIG_LEVEL_DEB,
 				     CONFIG_NO_CB,
 				     CONFIG_NO_DATA);
-  hint.y = xine_config_register_num (gGui->xine, "gui.playlist_y", 
+  hint.y = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_y", 
 				     200,
 				     CONFIG_NO_DESC,
 				     CONFIG_NO_HELP,
@@ -1254,7 +1254,7 @@ void playlist_editor(void) {
   {
     int                x, y, dir;
     int                i = 0, max;
-    const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
     
     x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
     y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
@@ -1273,7 +1273,7 @@ void playlist_editor(void) {
 	       (playlist->autoplay_plugins[i] = 
 		xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
       xitk_set_widget_tips(playlist->autoplay_plugins[i], 
-		   (char *) xine_get_input_plugin_description(gGui->xine, (char *)autoplay_plugins[i]));
+		   (char *) xine_get_input_plugin_description(__xineui_global_xine_instance, (char *)autoplay_plugins[i]));
       
       (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
       

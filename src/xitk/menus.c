@@ -217,7 +217,7 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 }
 static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int       num_mrls;
-  char    **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, me->menu, &num_mrls);
+  char    **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, me->menu, &num_mrls);
 
   if(autoplay_mrls) {
     int j;
@@ -315,7 +315,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int viz = (int) data;
   
-  config_update_num(gGui->xine, "gui.post_audio_plugin", viz);
+  config_update_num("gui.post_audio_plugin", viz);
 }
 static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int channel = (int) data;
@@ -771,7 +771,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_entry_t   menu_entry;
     char                buffer[2048];
     char               *location = _("Playlist/Get from");
-    const char *const  *plug_ids = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    const char *const  *plug_ids = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
     const char         *plug_id;
     
     plug_id = *plug_ids++;

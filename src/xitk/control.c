@@ -150,7 +150,7 @@ static void set_hue(xitk_widget_t *w, void *data, int value) {
     update_sliders_video_settings();
   
   if(hue_ena)
-    config_update_num(gGui->xine, "gui.vo_hue", hue);
+    config_update_num("gui.vo_hue", hue);
 }
 
 /*
@@ -165,7 +165,7 @@ static void set_saturation(xitk_widget_t *w, void *data, int value) {
     update_sliders_video_settings();
 
   if(sat_ena)
-    config_update_num(gGui->xine, "gui.vo_saturation", saturation);
+    config_update_num("gui.vo_saturation", saturation);
 }
 
 /*
@@ -180,7 +180,7 @@ static void set_brightness(xitk_widget_t *w, void *data, int value) {
     update_sliders_video_settings();
   
   if(bright_ena)
-    config_update_num(gGui->xine, "gui.vo_brightness", brightness);
+    config_update_num("gui.vo_brightness", brightness);
 }
 
 /*
@@ -195,7 +195,7 @@ static void set_contrast(xitk_widget_t *w, void *data, int value) {
     update_sliders_video_settings();
   
   if(contr_ena)
-    config_update_num(gGui->xine, "gui.vo_contrast", contrast);
+    config_update_num("gui.vo_contrast", contrast);
 }
 
 void control_set_image_prop(int prop, int value) {
@@ -273,22 +273,22 @@ void control_reset(void) {
   
   if(hue_ena) {
     set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.default_hue);
-    config_update_num(gGui->xine, "gui.vo_hue", -1);
+    config_update_num("gui.vo_hue", -1);
   }
 
   if(sat_ena) {
     set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.default_saturation);
-    config_update_num(gGui->xine, "gui.vo_saturation", -1);
+    config_update_num("gui.vo_saturation", -1);
   }
 
   if(bright_ena) {
     set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.default_brightness);
-    config_update_num(gGui->xine, "gui.vo_brightness", -1);
+    config_update_num("gui.vo_brightness", -1);
   }
 
   if(contr_ena) {
     set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.default_contrast);
-    config_update_num(gGui->xine, "gui.vo_contrast", -1);
+    config_update_num("gui.vo_contrast", -1);
   }
 
   update_sliders_video_settings();
@@ -300,7 +300,7 @@ void control_config_register(void) {
   
   if(hue_ena) {
     gGui->video_settings.hue = 
-     xine_config_register_range(gGui->xine, "gui.vo_hue",
+     xine_config_register_range(__xineui_global_xine_instance, "gui.vo_hue",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
 				CONFIG_NO_DESC, /* _("hue value"), */
@@ -319,7 +319,7 @@ void control_config_register(void) {
   
   if(bright_ena) {
     gGui->video_settings.brightness = 
-     xine_config_register_range(gGui->xine, "gui.vo_brightness",
+     xine_config_register_range(__xineui_global_xine_instance, "gui.vo_brightness",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
 				CONFIG_NO_DESC, /* _("brightness value"), */
@@ -338,7 +338,7 @@ void control_config_register(void) {
 
   if(sat_ena) {
    gGui->video_settings.saturation = 
-     xine_config_register_range(gGui->xine, "gui.vo_saturation",
+     xine_config_register_range(__xineui_global_xine_instance, "gui.vo_saturation",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
 				CONFIG_NO_DESC, /* _("saturation value"), */
@@ -357,7 +357,7 @@ void control_config_register(void) {
 
   if(contr_ena) {
     gGui->video_settings.contrast = 
-     xine_config_register_range(gGui->xine, "gui.vo_contrast",
+     xine_config_register_range(__xineui_global_xine_instance, "gui.vo_contrast",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
 				CONFIG_NO_DESC, /* _("contrast value"), */
@@ -388,8 +388,8 @@ void control_exit(xitk_widget_t *w, void *data) {
     control->visible = 0;
 
     if((xitk_get_window_info(control->widget_key, &wi))) {
-      config_update_num(gGui->xine, "gui.control_x", wi.x);
-      config_update_num(gGui->xine, "gui.control_y", wi.y);
+      config_update_num("gui.control_x", wi.x);
+      config_update_num("gui.control_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -618,14 +618,14 @@ void control_panel(void) {
 
   XUnlockDisplay(gGui->display);
 
-  hint.x = xine_config_register_num (gGui->xine, "gui.control_x", 
+  hint.x = xine_config_register_num (__xineui_global_xine_instance, "gui.control_x", 
 				     200,
 				     CONFIG_NO_DESC,
 				     CONFIG_NO_HELP,
 				     CONFIG_LEVEL_DEB,
 				     CONFIG_NO_CB,
 				     CONFIG_NO_DATA);
-  hint.y = xine_config_register_num (gGui->xine, "gui.control_y", 
+  hint.y = xine_config_register_num (__xineui_global_xine_instance, "gui.control_y", 
 				     100,
 				     CONFIG_NO_DESC,
 				     CONFIG_NO_HELP,

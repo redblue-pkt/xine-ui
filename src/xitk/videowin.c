@@ -1564,7 +1564,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
       gVw.xinerama_cnt = screens;
 
       screens_list = 
-	xine_config_register_string (gGui->xine, "gui.xinerama_use_screens",
+	xine_config_register_string (__xineui_global_xine_instance, "gui.xinerama_use_screens",
 				     "0 1",
 				     _("Screens to use in order to do a very fullscreen in xinerama mode. (example 0 2 3)"),
 				     _("Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"),
@@ -1620,7 +1620,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
         gVw.xinerama_fullscreen_height = screeninfo[0].height;
       }
 
-      dummy_a = xine_config_register_num(gGui->xine,
+      dummy_a = xine_config_register_num(__xineui_global_xine_instance,
 					 "gui.xinerama_fullscreen_x",
 					 -8192,
 					 _("x coordinate for xinerama fullscreen (-8192 = autodetect)"),
@@ -1631,7 +1631,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
       if(dummy_a > -8192)
 	gVw.xinerama_fullscreen_x = dummy_a;
 
-      dummy_a = xine_config_register_num(gGui->xine,
+      dummy_a = xine_config_register_num(__xineui_global_xine_instance,
 					 "gui.xinerama_fullscreen_y",
 					 -8192,
 					 _("y coordinate for xinerama fullscreen (-8192 = autodetect)"),
@@ -1642,7 +1642,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
       if(dummy_a > -8192) 
 	gVw.xinerama_fullscreen_y = dummy_a;
 
-      dummy_a = xine_config_register_num(gGui->xine,
+      dummy_a = xine_config_register_num(__xineui_global_xine_instance,
 					 "gui.xinerama_fullscreen_width",
 					 -8192,
 					 _("width for xinerama fullscreen (-8192 = autodetect)"),
@@ -1653,7 +1653,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
       if(dummy_a > -8192) 
 	gVw.xinerama_fullscreen_width = dummy_a;
       
-      dummy_a = xine_config_register_num(gGui->xine,
+      dummy_a = xine_config_register_num(__xineui_global_xine_instance,
 					 "gui.xinerama_fullscreen_height",
 					 -8192,
 					 _("height for xinerama fullscreen (-8192 = autodetect)"),
@@ -1725,7 +1725,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   XUnlockDisplay (gGui->video_display);
       
   gVw.stream_resize_window = 
-    xine_config_register_bool(gGui->xine, 
+    xine_config_register_bool(__xineui_global_xine_instance, 
 			      "gui.stream_resize_window", 
 			      1,
 			      _("New stream sizes resize output window"),
@@ -1735,7 +1735,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			      CONFIG_NO_DATA);
   
   gVw.zoom_small_stream = 
-    xine_config_register_bool(gGui->xine,
+    xine_config_register_bool(__xineui_global_xine_instance,
 			      "gui.zoom_small_stream", 
 			      0,
 			      _("Double size for small streams (require stream_resize_window)"),
@@ -1762,7 +1762,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw.old_win_height = gVw.win_height = gVw.video_height;
 
 #ifdef HAVE_XF86VIDMODE
-  if(xine_config_register_bool(gGui->xine, "gui.use_xvidext", 
+  if(xine_config_register_bool(__xineui_global_xine_instance, "gui.use_xvidext", 
 			       0,
 			       _("use XVidModeExtension when switching to fullscreen"),
 			       CONFIG_NO_HELP,
@@ -2053,7 +2053,7 @@ void video_window_update_logo(void) {
   char                *skin_logo;
   int                  cfg_err_result;
   
-  cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
+  cfg_err_result = xine_config_lookup_entry(__xineui_global_xine_instance, "gui.logo_mrl", &cfg_entry);
   skin_logo = xitk_skin_get_logo(gGui->skin_config);
   
   if(skin_logo) {
@@ -2064,7 +2064,7 @@ void video_window_update_logo(void) {
 	goto __done;
     }
     
-    config_update_string(gGui->xine, "gui.logo_mrl", skin_logo);
+    config_update_string("gui.logo_mrl", skin_logo);
     goto __play_logo_now;
     
   }
@@ -2075,7 +2075,7 @@ void video_window_update_logo(void) {
      * change, not at the first skin loading.
      **/
     if(gVw.logo_synthetic && (cfg_err_result) && (strcmp(cfg_entry.str_value, XINE_LOGO_MRL))) {
-      config_update_string(gGui->xine, "gui.logo_mrl", XINE_LOGO_MRL);
+      config_update_string("gui.logo_mrl", XINE_LOGO_MRL);
 
     __play_logo_now:
       

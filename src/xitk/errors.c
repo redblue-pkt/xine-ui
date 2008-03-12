@@ -306,7 +306,7 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
 
 
 static void _dont_show_too_slow_again(xitk_widget_t *w, void *data, int state) {
-  config_update_num (gGui->xine, "gui.dropped_frames_warning", !state);
+  config_update_num ("gui.dropped_frames_warning", !state);
 }
 
 static void _learn_more_about_too_slow(xitk_widget_t *w, void *data, int state) {
@@ -332,7 +332,7 @@ void too_slow_window(void) {
   
   dump_error(gGui->verbosity, message);
 
-  display_warning = xine_config_register_bool (gGui->xine, "gui.dropped_frames_warning", 
+  display_warning = xine_config_register_bool (__xineui_global_xine_instance, "gui.dropped_frames_warning", 
 		     1,
 		     _("Warn user when too much frames are dropped."),
 		     CONFIG_NO_HELP,

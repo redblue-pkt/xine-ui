@@ -283,7 +283,7 @@ static void autoplay_cb (void *data) {
   char *parameter = (char *) data;
   oxine_t *oxine = oxine_instance;
   int    num_mrls, j;
-  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+  char **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
                          parameter,
                          &num_mrls);
 
@@ -679,7 +679,7 @@ static oxine_t *create_oxine(void) {
     
   oxine->main_menu_cb = main_menu_cb;
 
-  oxine->xine = gGui->xine;
+  oxine->xine = __xineui_global_xine_instance;
   
   oxine->cd_mountpoint = 
   xine_config_register_string (oxine->xine,

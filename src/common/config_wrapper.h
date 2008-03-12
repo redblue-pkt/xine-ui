@@ -24,14 +24,11 @@
 #ifndef CONFIG_WRAPPER_H
 #define CONFIG_WRAPPER_H
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-void config_update_range(xine_t *xine, const char *key, int min, int max);
-void config_update_string(xine_t *xine, const char *key, const char *string);
-void config_update_enum(xine_t *xine, const char *key, int value);
-void config_update_bool(xine_t *xine, const char *key, int value);
-void config_update_num(xine_t *xine, const char *key, int value);
-void config_mrl(xine_t *xine, const char *mrl);
+void config_update_range(const char *key, int min, int max);
+void config_update_string(const char *key, const char *string);
+void config_update_enum(const char *key, int value);
+void config_update_bool(const char *key, int value);
+void config_update_num(const char *key, int value);
+void config_mrl(const char *mrl);
 
 #endif

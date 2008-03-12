@@ -33,6 +33,7 @@
 
 #include "main.h"
 #include "options.h"
+#include "utils.h"
 
 #define OPTION_STDCTL           5000
 #define OPTION_VERBOSE          1005
@@ -82,7 +83,7 @@ static void print_usage(void)
                "      --verbose [=level]         Set verbosity level. Default is 1.\n"
 	       "  -V, --video-driver <drv>       Select video driver:\n");
 	
-	driver_id = xine_list_video_output_plugins(fbxine.xine);
+	driver_id = xine_list_video_output_plugins(__xineui_global_xine_instance);
 	while(*driver_id)
 		printf("                                   '%s'\n",
 		       *driver_id++);
@@ -90,7 +91,7 @@ static void print_usage(void)
 	printf("\n"
 	       "  -A, --audio-driver <drv>       Select audio driver:\n");
 	
-	driver_id = xine_list_audio_output_plugins(fbxine.xine);
+	driver_id = xine_list_audio_output_plugins(__xineui_global_xine_instance);
 	while(*driver_id)
 		printf("                                    '%s'\n",
 		       *driver_id++);

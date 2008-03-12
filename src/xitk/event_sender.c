@@ -105,8 +105,8 @@ static void event_sender_store_new_position(int x, int y, int w, int h) {
   if(eventer && !gGui->eventer_sticky) {
     eventer->x = x;
     eventer->y = y;
-    config_update_num (gGui->xine, "gui.eventer_x", x);
-    config_update_num (gGui->xine, "gui.eventer_y", y);
+    config_update_num ("gui.eventer_x", x);
+    config_update_num ("gui.eventer_y", y);
   }
 }
 
@@ -319,8 +319,8 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     eventer->visible = 0;
     
     if((xitk_get_window_info(eventer->widget_key, &wi))) {
-      config_update_num (gGui->xine, "gui.eventer_x", wi.x);
-      config_update_num (gGui->xine, "gui.eventer_y", wi.y);
+      config_update_num ("gui.eventer_x", wi.x);
+      config_update_num ("gui.eventer_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -382,8 +382,8 @@ void event_sender_move(int x, int y) {
     if(gGui->eventer_sticky) {
       eventer->x = x;
       eventer->y = y;
-      config_update_num (gGui->xine, "gui.eventer_x", x);
-      config_update_num (gGui->xine, "gui.eventer_y", y);
+      config_update_num ("gui.eventer_x", x);
+      config_update_num ("gui.eventer_y", y);
       xitk_window_move_window(gGui->imlib_data, eventer->xwin, x, y);
     }
   }
@@ -406,14 +406,14 @@ void event_sender_panel(void) {
 
   eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
   
-  eventer->x = xine_config_register_num (gGui->xine, "gui.eventer_x", 
+  eventer->x = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_x", 
 					 80,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,
 					 CONFIG_LEVEL_DEB,
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
-  eventer->y = xine_config_register_num (gGui->xine, "gui.eventer_y",
+  eventer->y = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_y",
 					 80,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,

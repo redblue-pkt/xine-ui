@@ -232,7 +232,7 @@ odk_t *odk_init(void) {
   odk->hscale = 0;
   odk->vscale = 0;
 
-  odk->xine = gGui->xine;
+  odk->xine = __xineui_global_xine_instance;
   odk->stream = gGui->stream;
 
   /* test unscaled osd support */

@@ -3013,8 +3013,8 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     mmkeditor.visible = 0;
     
     if((xitk_get_window_info(mmkeditor.widget_key, &wi))) {
-      config_update_num (gGui->xine, "gui.mmk_editor_x", wi.x);
-      config_update_num (gGui->xine, "gui.mmk_editor_y", wi.y);
+      config_update_num ("gui.mmk_editor_x", wi.x);
+      config_update_num ("gui.mmk_editor_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -3217,14 +3217,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor.callback = callback;
   mmkeditor.user_data = data;
 
-  x = xine_config_register_num(gGui->xine, "gui.mmk_editor_x", 
+  x = xine_config_register_num(__xineui_global_xine_instance, "gui.mmk_editor_x", 
 			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_DEB,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
-  y = xine_config_register_num(gGui->xine, "gui.mmk_editor_y",
+  y = xine_config_register_num(__xineui_global_xine_instance, "gui.mmk_editor_y",
 			       80,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,

@@ -155,7 +155,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
     _vpplugin_unwire();
   
   for(i = 0; i < gGui->deinterlace_elements_num; i++) {
-    xine_post_dispose(gGui->xine, gGui->deinterlace_elements[i]->post);
+    xine_post_dispose(__xineui_global_xine_instance, gGui->deinterlace_elements[i]->post);
     free(gGui->deinterlace_elements[i]->name);
     free(gGui->deinterlace_elements[i]);
   }
@@ -189,7 +189,7 @@ void post_init(void) {
   gGui->visual_anim.post_changed = 0;
 
   if(gGui->ao_port) {
-    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, 
+    const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance, 
 							  XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
     if(pol) {
@@ -207,7 +207,7 @@ void post_init(void) {
       if(num_plug) {
 	
 	gGui->visual_anim.post_plugin_num = 
-	  xine_config_register_enum(gGui->xine, "gui.post_audio_plugin", 
+	  xine_config_register_enum(__xineui_global_xine_instance, "gui.post_audio_plugin", 
 				    0, post_audio_plugins,
 				    _("Audio visualization plugin"),
 				    _("Post audio plugin to used when playing streams without video"),
@@ -216,7 +216,7 @@ void post_init(void) {
 				    CONFIG_NO_DATA);
 	
 	gGui->visual_anim.post_output_element.post = 
-	  xine_post_init(gGui->xine,
+	  xine_post_init(__xineui_global_xine_instance,
 			 post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 			 &gGui->ao_port, &gGui->vo_port);
 	
@@ -230,11 +230,11 @@ void post_rewire_visual_anim(void) {
   if(gGui->visual_anim.post_output_element.post) {
     (void) post_rewire_audio_port_to_stream(gGui->stream);
     
-    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output_element.post);
+    xine_post_dispose(__xineui_global_xine_instance, gGui->visual_anim.post_output_element.post);
   }
   
   gGui->visual_anim.post_output_element.post = 
-    xine_post_init(gGui->xine,
+    xine_post_init(__xineui_global_xine_instance,
 		   post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 		   &gGui->ao_port, &gGui->vo_port);
 
@@ -806,7 +806,7 @@ static void _applugin_change_parameter(xitk_widget_t *w, void *data, int select)
 
 static void _pplugin_get_plugins(_pp_wrapper_t *pp_wrapper) {
   int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
-  const char *const *pol = xine_list_post_plugins_typed(gGui->xine, plugin_type);
+  const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance, plugin_type);
   
   if(pol) {
     int  i = 0;
@@ -872,7 +872,7 @@ static void _pplugin_destroy_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj)
     _pplugin_destroy_only_obj(pp_wrapper, pobj);
     
     if(pobj->post) {
-      xine_post_dispose(gGui->xine, pobj->post);
+      xine_post_dispose(__xineui_global_xine_instance, pobj->post);
       pobj->post = NULL;
     }
   }
@@ -1272,7 +1272,7 @@ static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, 
   else {
     _pplugin_destroy_obj(pp_wrapper, pobj);
 
-    pobj->post = xine_post_init(gGui->xine, 
+    pobj->post = xine_post_init(__xineui_global_xine_instance, 
 				xitk_combo_get_current_entry_selected(w),
 				0, &gGui->ao_port, &gGui->vo_port);
     
@@ -1649,8 +1649,8 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     pp_wrapper->pplugin->visible = 0;
     
     if((xitk_get_window_info(pp_wrapper->pplugin->widget_key, &wi))) {
-      config_update_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
-      config_update_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
+      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
+      config_update_num ((pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -1964,14 +1964,14 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->first_displayed = 0;
   pp_wrapper->pplugin->help_text       = NULL;
   
-  x = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_x" : "gui.applugin_x", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y",
+  y = xine_config_register_num (__xineui_global_xine_instance, (pp_wrapper == &vpp_wrapper) ? "gui.vpplugin_y" : "gui.applugin_y",
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
@@ -2149,11 +2149,11 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 	if(p && (strlen(p) > 1))
 	  args = p;
 	
-	post = xine_post_init(gGui->xine, plugin, 0, &gGui->ao_port, &gGui->vo_port);
+	post = xine_post_init(__xineui_global_xine_instance, plugin, 0, &gGui->ao_port, &gGui->vo_port);
 
         if (post && pp_wrapper) {
           if (post->type != plugin_type) {
-            xine_post_dispose(gGui->xine, post);
+            xine_post_dispose(__xineui_global_xine_instance, post);
             post = NULL;
           }
         }              
@@ -2324,7 +2324,7 @@ void post_deinterlace_init(const char *deinterlace_post) {
   deinterlace_default = _pplugin_get_default_deinterlacer();
   
   gGui->deinterlace_plugin = 
-    (char *) xine_config_register_string (gGui->xine, "gui.deinterlace_plugin", 
+    (char *) xine_config_register_string (__xineui_global_xine_instance, "gui.deinterlace_plugin", 
 					  deinterlace_default,
 					  _("Deinterlace plugin."),
 					  _("Plugin (with optional parameters) to use "

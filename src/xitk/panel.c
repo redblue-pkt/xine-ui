@@ -121,8 +121,8 @@ static void panel_store_new_position(int x, int y, int w, int h) {
     panel->x = x;
     panel->y = y;
     
-    config_update_num (gGui->xine, "gui.panel_x", x); 
-    config_update_num (gGui->xine, "gui.panel_y", y);
+    config_update_num ("gui.panel_x", x); 
+    config_update_num ("gui.panel_y", y);
     
     if(event_sender_is_running())
       event_sender_move(x+w, y);
@@ -141,8 +141,8 @@ static void panel_exit(xitk_widget_t *w, void *data) {
     panel->visible = 0;
 
     if((xitk_get_window_info(panel->widget_key, &wi))) {
-      config_update_num (gGui->xine, "gui.panel_x", wi.x);
-      config_update_num (gGui->xine, "gui.panel_y", wi.y);
+      config_update_num ("gui.panel_x", wi.x);
+      config_update_num ("gui.panel_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -692,7 +692,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   _panel_toggle_visibility(w, data);
-  config_update_num (gGui->xine, "gui.panel_visible", panel->visible);
+  config_update_num ("gui.panel_visible", panel->visible);
 }
 
 void panel_check_mute(void) {
@@ -948,7 +948,7 @@ void panel_add_autoplay_buttons(void) {
   int                        x, y, dir;
   int                        i = 0, max;
   xitk_labelbutton_widget_t  lb;
-  const char *const         *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  const char *const         *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
   const char                *autoplay_label;
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
@@ -973,7 +973,7 @@ void panel_add_autoplay_buttons(void) {
 				 xitk_labelbutton_create (panel->widget_list, 
 							  gGui->skin_config, &lb)));
       xitk_set_widget_tips_and_timeout(panel->autoplay_plugins[i],
-				       (char *) xine_get_input_plugin_description(gGui->xine, autoplay_label),
+				       (char *) xine_get_input_plugin_description(__xineui_global_xine_instance, autoplay_label),
 				       panel->tips.timeout);
       
       if(!panel->tips.enable)
@@ -1118,14 +1118,14 @@ void panel_init (void) {
    * open the panel window
    */
 
-  panel->x = hint.x = xine_config_register_num (gGui->xine, "gui.panel_x", 
+  panel->x = hint.x = xine_config_register_num (__xineui_global_xine_instance, "gui.panel_x", 
 						200,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
 						CONFIG_LEVEL_DEB,
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
-  panel->y = hint.y = xine_config_register_num (gGui->xine, "gui.panel_y",
+  panel->y = hint.y = xine_config_register_num (__xineui_global_xine_instance, "gui.panel_y",
 						100,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
@@ -1493,14 +1493,14 @@ void panel_init (void) {
   xitk_set_widget_tips(w, _("Open Location"));
   
 
-  panel->tips.enable = xine_config_register_bool(gGui->xine, "gui.tips_visible", 
+  panel->tips.enable = xine_config_register_bool(__xineui_global_xine_instance, "gui.tips_visible", 
 						 1,
 						 _("gui tips visibility"), 
 						 _("If disabled, no tooltips are shown."), 
 						 CONFIG_LEVEL_ADV,
 						 panel_enable_tips_cb,
 						 CONFIG_NO_DATA);
-  panel->tips.timeout = (unsigned long) xine_config_register_num(gGui->xine, "gui.tips_timeout", 
+  panel->tips.timeout = (unsigned long) xine_config_register_num(__xineui_global_xine_instance, "gui.tips_timeout", 
 								 5000,
 								 _("Tips timeout (ms)"), 
 								 _("Persistence time of tooltips, in milliseconds."), 
@@ -1515,7 +1515,7 @@ void panel_init (void) {
    * show panel 
    */
   {
-    int visible = xine_config_register_bool(gGui->xine, "gui.panel_visible", 
+    int visible = xine_config_register_bool(__xineui_global_xine_instance, "gui.panel_visible", 
 					    1,
 					    _("gui panel visibility"),
 					    CONFIG_NO_HELP,
@@ -1529,7 +1529,7 @@ void panel_init (void) {
   /*  The user don't want panel on startup */
   if(panel->visible && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
     panel->visible = !panel->visible;
-    config_update_num (gGui->xine, "gui.panel_visible", panel->visible);
+    config_update_num ("gui.panel_visible", panel->visible);
   }
   
   if((gGui->use_root_window || gGui->video_display != gGui->display) && (!panel->visible))

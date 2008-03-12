@@ -88,7 +88,7 @@ static int nvtv_tvout_init(Display *display, void **data) {
     *data = private;
     
     private->tv_system = (int) 
-      xine_config_register_enum(gGui->xine, "gui.tvout_nvtv_tv_system", 
+      xine_config_register_enum(__xineui_global_xine_instance, "gui.tvout_nvtv_tv_system", 
 				0,
 				tv_systems,
 				_("nvtv TV output system"),
@@ -97,7 +97,7 @@ static int nvtv_tvout_init(Display *display, void **data) {
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
     private->xrandr = 
-      xine_config_register_bool(gGui->xine, "gui.tvout_nvtv_xrandr", 
+      xine_config_register_bool(__xineui_global_xine_instance, "gui.tvout_nvtv_xrandr", 
 				1,
 				_("Enable XRandr extension"),
 				_("Enable the use of xrandr to autofit the screen "
@@ -200,7 +200,7 @@ static int ati_tvout_init(Display *display, void **data) {
   *data = private;
   
   private->atitvout_cmds[0] = (char *) 
-    xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_off", 
+    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_off", 
 				 "sudo /usr/local/sbin/atitvout c",
 				 _("Command to turn off TV out"),
 				 _("atitvout command line used to turn on TV output."),
@@ -209,7 +209,7 @@ static int ati_tvout_init(Display *display, void **data) {
 				 CONFIG_NO_DATA);
 
   private->atitvout_cmds[1] = (char *) 
-    xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_on", 
+    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_on", 
 				 "sudo /usr/local/sbin/atitvout pal ct",
 				 _("Command to turn on TV out"),
 				 _("atitvout command line used to turn on TV output."),

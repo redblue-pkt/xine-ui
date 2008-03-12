@@ -511,7 +511,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	    skin_names[skins_avail_num] = NULL;
 	    
 	    /* Re-register skin enum config, a new one has been added */
-	    (void) xine_config_register_enum (gGui->xine, "gui.skin", 
+	    (void) xine_config_register_enum (__xineui_global_xine_instance, "gui.skin", 
 					      (get_skin_offset(DEFAULT_SKIN)),
 					      skin_names,
 					      _("gui skin theme"), 

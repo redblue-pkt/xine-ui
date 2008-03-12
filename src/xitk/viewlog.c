@@ -81,8 +81,8 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     viewlog->visible = 0;
     
     if((xitk_get_window_info(viewlog->kreg, &wi))) {
-      config_update_num (gGui->xine, "gui.viewlog_x", wi.x);
-      config_update_num (gGui->xine, "gui.viewlog_y", wi.y);
+      config_update_num ("gui.viewlog_x", wi.x);
+      config_update_num ("gui.viewlog_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -186,7 +186,7 @@ static void viewlog_clear_tab(void) {
  */
 static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   int    i, j, k;
-  const char *const *log = xine_get_log(gGui->xine, section);
+  const char *const *log = xine_get_log(__xineui_global_xine_instance, section);
   char   buf[2048];
   const char *p;
   
@@ -269,7 +269,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 #endif
 
   if(gGui->verbosity) {
-    const char   *const *log_sections = xine_get_log_names(gGui->xine);
+    const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
 
     printf("\nLOG SECTION [%s]\n", log_sections[section]);
     i = 0;
@@ -300,8 +300,8 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
 static void viewlog_create_tabs(void) {
   xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
-  const char   *const *log_sections = xine_get_log_names(gGui->xine);
-  unsigned int         log_section_count = xine_get_log_section_count(gGui->xine);
+  const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
+  unsigned int         log_section_count = xine_get_log_section_count(__xineui_global_xine_instance);
   char                *tab_sections[log_section_count + 1];
   unsigned int         i;
 
@@ -384,14 +384,14 @@ void viewlog_panel(void) {
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
   viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
 
-  x = xine_config_register_num (gGui->xine, "gui.viewlog_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_x", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, "gui.viewlog_y", 
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_y", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,

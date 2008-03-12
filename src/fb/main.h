@@ -51,7 +51,6 @@ typedef struct {
 
 struct fbxine
 {
-	xine_t                   *xine;
 	xine_stream_t            *stream;
 	xine_video_port_t        *video_port;
 	xine_audio_port_t        *audio_port;

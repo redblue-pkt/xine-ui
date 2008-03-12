@@ -158,8 +158,8 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     tvset.visible = 0;
     
     if((xitk_get_window_info(tvset.widget_key, &wi))) {
-      config_update_num (gGui->xine, "gui.tvset_x", wi.x);
-      config_update_num (gGui->xine, "gui.tvset_y", wi.y);
+      config_update_num ("gui.tvset_x", wi.x);
+      config_update_num ("gui.tvset_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
@@ -270,14 +270,14 @@ void tvset_panel(void) {
   int                         x, y, w, width, height;
   xitk_widget_t              *widget;
 
-  x = xine_config_register_num (gGui->xine, "gui.tvset_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_x", 
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  y = xine_config_register_num (gGui->xine, "gui.tvset_y",
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_y",
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,

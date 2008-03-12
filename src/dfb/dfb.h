@@ -74,7 +74,6 @@
 /*** types ***/
 
 typedef struct {
-  xine_t                  *xine;
   int                      ignore_status;
   const xine_video_port_t *vo_driver;
   const xine_audio_port_t *ao_driver;

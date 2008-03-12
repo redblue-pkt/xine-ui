@@ -37,6 +37,7 @@
 #include "options.h"
 #include "osd.h"
 #include "post.h"
+#include "utils.h"
 #include "config_wrapper.h"
 
 #define XINE_CONFIG_DIR  ".xine"
@@ -78,8 +79,8 @@ static void load_config(void)
 		sprintf(fbxine.configfile + strlen(fbxine.configfile), "/%s",
 			XINE_CONFIG_FILE);
 	}
-	xine_config_load(fbxine.xine, fbxine.configfile);
-        xine_engine_set_param(fbxine.xine, XINE_ENGINE_PARAM_VERBOSITY, fbxine.verbosity);
+	xine_config_load(__xineui_global_xine_instance, fbxine.configfile);
+        xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, fbxine.verbosity);
 }
 
 static int check_version(void)
@@ -114,7 +115,7 @@ static int open_and_play(const char *mrl)
 
         if(!strncasecmp(mrl, "cfg:/", 5)) 
 	{
-		config_mrl(fbxine.xine, mrl);
+		config_mrl(mrl);
 		return 0;
 	}
 
@@ -131,7 +132,7 @@ static int open_and_play(const char *mrl)
 
 static void exit_video(void)
 {
-	xine_close_video_driver(fbxine.xine, fbxine.video_port);
+	xine_close_video_driver(__xineui_global_xine_instance, fbxine.video_port);
 }
 
 static int init_video(void)
@@ -142,15 +143,15 @@ static int init_video(void)
 	
 	if (!strcmp(fbxine.video_port_id, "dxr3"))
 	    fbxine.video_port =
-	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+	        xine_open_video_driver(__xineui_global_xine_instance, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_X11, NULL);
 	else if (!strcmp(fbxine.video_port_id, "none"))
 	    fbxine.video_port =
-	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+	        xine_open_video_driver(__xineui_global_xine_instance, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_NONE, NULL);
 	else
 	    fbxine.video_port =
-	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+	        xine_open_video_driver(__xineui_global_xine_instance, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_FB, NULL);
 	if(!fbxine.video_port)
 	{
@@ -164,7 +165,7 @@ static int init_video(void)
 
 static void exit_audio(void)
 {
-	xine_close_audio_driver(fbxine.xine, fbxine.audio_port);
+	xine_close_audio_driver(__xineui_global_xine_instance, fbxine.audio_port);
 }
 
 static int init_audio(void)
@@ -175,12 +176,12 @@ static int init_audio(void)
 
 	if(!fbxine.audio_port_id)
 		fbxine.audio_port_id =
-			xine_config_register_string(fbxine.xine, 
+			xine_config_register_string(__xineui_global_xine_instance, 
 						    "audio.driver", "oss",
 						    "audio driver to use",
 						    0, 20, 0, 0);
 	fbxine.audio_port =
-		xine_open_audio_driver(fbxine.xine, fbxine.audio_port_id, 0);
+		xine_open_audio_driver(__xineui_global_xine_instance, fbxine.audio_port_id, 0);
 	if(!fbxine.audio_port)
 	{
 		fprintf(stderr, "Audio port failed.\n");
@@ -203,7 +204,7 @@ static int init_stream(void)
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_stream);
 
-	fbxine.stream = xine_stream_new(fbxine.xine, fbxine.audio_port,
+	fbxine.stream = xine_stream_new(__xineui_global_xine_instance, fbxine.audio_port,
 					fbxine.video_port);
 	xine_set_param(fbxine.stream, XINE_PARAM_VERBOSITY, fbxine.verbosity);
 
@@ -217,7 +218,7 @@ static int init_stream(void)
 
 static void exit_xine(void)
 {
-	xine_exit(fbxine.xine);
+	xine_exit(__xineui_global_xine_instance);
 }
 
 static int init_xine(void)
@@ -226,14 +227,14 @@ static int init_xine(void)
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_xine);
 	
-	fbxine.xine = xine_new();
-	if(!fbxine.xine)
+	__xineui_global_xine_instance = xine_new();
+	if(!__xineui_global_xine_instance)
 	{
 		fprintf(stderr, "Failed to call xine_new.\n");
 		return 0;
 	}
 	load_config();
-	xine_init(fbxine.xine);
+	xine_init(__xineui_global_xine_instance);
 	return 1;
 }
 

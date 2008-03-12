@@ -115,9 +115,9 @@ int hidden_file_cb(int action, int value) {
   xine_cfg_entry_t  cfg_entry;
   int               retval = 0;
   
-  if(xine_config_lookup_entry(gGui->xine, "media.files.show_hidden_files", &cfg_entry)) {
+  if(xine_config_lookup_entry(__xineui_global_xine_instance, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
-      config_update_bool(gGui->xine, "media.files.show_hidden_files", value);
+      config_update_bool("media.files.show_hidden_files", value);
     else
       retval = cfg_entry.num_value;
   }
@@ -295,8 +295,8 @@ static void gui_signal_handler (int sig, void *data) {
   case SIGHUP:
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
-      xine_config_reset(gGui->xine);
-      xine_config_load(gGui->xine, gGui->configfile);
+      xine_config_reset(__xineui_global_xine_instance);
+      xine_config_load(__xineui_global_xine_instance, gGui->configfile);
     }
     break;
 
@@ -317,7 +317,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       struct sigaction action;
 
-      xine_config_save(gGui->xine, gGui->configfile);
+      xine_config_save(__xineui_global_xine_instance, gGui->configfile);
       
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
@@ -970,14 +970,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_HUECONTROLp:
     if(gGui->video_settings.hue <= (65535 - STEP_SIZE)) {
-      config_update_num(gGui->xine, "gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
+      config_update_num("gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
       osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_HUECONTROLm:
     if(gGui->video_settings.hue >= STEP_SIZE) {
-      config_update_num(gGui->xine, "gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
+      config_update_num("gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
       osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
@@ -985,14 +985,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SATURATIONCONTROLp:
     if(gGui->video_settings.saturation <= (65535 - STEP_SIZE)) {
-      config_update_num(gGui->xine, "gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
       osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_SATURATIONCONTROLm:
     if(gGui->video_settings.saturation >= STEP_SIZE) {
-      config_update_num(gGui->xine, "gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
       osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
@@ -1000,14 +1000,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_BRIGHTNESSCONTROLp:
     if(gGui->video_settings.brightness <= (65535 - STEP_SIZE)) {
-      config_update_num(gGui->xine, "gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
       osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_BRIGHTNESSCONTROLm:
     if(gGui->video_settings.brightness >= STEP_SIZE) {
-      config_update_num(gGui->xine, "gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
       osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
@@ -1015,14 +1015,14 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_CONTRASTCONTROLp:
     if(gGui->video_settings.contrast <= (65535 - STEP_SIZE)) {
-      config_update_num(gGui->xine, "gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_CONTRASTCONTROLm:
     if(gGui->video_settings.contrast >= STEP_SIZE) {
-      config_update_num(gGui->xine, "gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
@@ -1234,7 +1234,7 @@ void gui_handle_event (XEvent *event, void *data) {
   case DestroyNotify:
     if(event->xany.window == gGui->panel_window
        || event->xany.window == gGui->video_window) {
-      xine_exit (gGui->xine);
+      xine_exit (__xineui_global_xine_instance);
       gGui->running = 0;
     }
     break;
@@ -1548,7 +1548,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   }
 
   video_display_name = 
-    (char *)xine_config_register_string (gGui->xine, "gui.video_display", 
+    (char *)xine_config_register_string (__xineui_global_xine_instance, "gui.video_display", 
 					 "",
 					 _("Name of video display"),
 					 _("Use this setting to configure to which "
@@ -1572,7 +1572,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     gGui->video_display = gGui->display;
   }
 
-  if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 
+  if (xine_config_register_bool (__xineui_global_xine_instance, "gui.xsynchronize", 
 				 0,
 				 _("Synchronized X protocol (debug)"), 
 				 _("Do X transactions in synchronous mode. "
@@ -1588,7 +1588,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   }
 
   gGui->layer_above = 
-    xine_config_register_bool (gGui->xine, "gui.layer_above", 0,
+    xine_config_register_bool (__xineui_global_xine_instance, "gui.layer_above", 0,
 			       _("Windows stacking"),
 			       _("Use WM layer property to place windows on top\n"
 				 "except for the video window in non-fullscreen mode."), 
@@ -1597,7 +1597,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_NO_DATA);
 
   gGui->always_layer_above = 
-    xine_config_register_bool (gGui->xine, "gui.always_layer_above", 0,
+    xine_config_register_bool (__xineui_global_xine_instance, "gui.always_layer_above", 0,
 			       _("Windows stacking (more)"),
 			       _("Use WM layer property to place windows on top\n"
 				 "for all windows (surpasses the 'layer_above' setting)."), 
@@ -1606,7 +1606,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_NO_DATA);
 
   gGui->snapshot_location = 
-    (char *)xine_config_register_string (gGui->xine, "gui.snapshotdir", 
+    (char *)xine_config_register_string (__xineui_global_xine_instance, "gui.snapshotdir", 
 					 (char *) (xine_get_homedir()),
 					 _("Snapshot location"),
 					 _("Where snapshots will be saved."),
@@ -1615,7 +1615,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					 CONFIG_NO_DATA);
   
   gGui->ssaver_timeout =
-    xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
+    xine_config_register_num (__xineui_global_xine_instance, "gui.screensaver_timeout", 10,
 			      _("Screensaver reset interval (s)"),
 			      _("Time, in seconds, between two faked events to keep a screensaver quiet, 0 to disable."),
 			      CONFIG_LEVEL_ADV,
@@ -1623,7 +1623,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
   
   gGui->skip_by_chapter = 
-    xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
+    xine_config_register_bool (__xineui_global_xine_instance, "gui.skip_by_chapter", 1,
 			       _("Chapter hopping"),
 			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
 			       CONFIG_LEVEL_ADV,
@@ -1631,7 +1631,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_NO_DATA);
   
   gGui->auto_vo_visibility = 
-    xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
+    xine_config_register_bool (__xineui_global_xine_instance, "gui.auto_video_output_visibility", 0,
 			       _("Visibility behavior of output window"),
 			       _("Hide video output window if there is no video in the stream"), 
 			       CONFIG_LEVEL_ADV,
@@ -1639,7 +1639,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_NO_DATA);
 
   gGui->auto_panel_visibility = 
-    xine_config_register_bool (gGui->xine, "gui.auto_panel_visibility", 0,
+    xine_config_register_bool (__xineui_global_xine_instance, "gui.auto_panel_visibility", 0,
 			       _("Visiblility behavior of panel"),
 			       _("Automatically show/hide panel window, according to auto_video_output_visibility"), 
 			       CONFIG_LEVEL_ADV,
@@ -1647,7 +1647,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_NO_DATA); 
  
   gGui->eventer_sticky = 
-    xine_config_register_bool(gGui->xine, "gui.eventer_sticky", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.eventer_sticky", 
 			      1,
 			      _("Event sender behavior"),
 			      _("Event sender window stick to main panel"), 
@@ -1656,7 +1656,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->visual_anim.enabled = 
-    xine_config_register_enum(gGui->xine, "gui.visual_anim", 
+    xine_config_register_enum(__xineui_global_xine_instance, "gui.visual_anim", 
 			      1, /* Post plugin */
 			      (char**)visual_anim_style,
 			      _("Visual animation style"),
@@ -1667,7 +1667,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->stream_info_auto_update = 
-    xine_config_register_bool(gGui->xine, "gui.sinfo_auto_update", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.sinfo_auto_update", 
 			      0,
 			      _("Stream information"),
 			      _("Update stream information (in stream info window) "
@@ -1678,7 +1678,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
 
   server = 
-    (char *)xine_config_register_string (gGui->xine, "gui.skin_server_url", 
+    (char *)xine_config_register_string (__xineui_global_xine_instance, "gui.skin_server_url", 
 					 SKIN_SERVER_URL,
 					 _("Skin Server Url"),
 					 _("From where we can get skins."),
@@ -1686,11 +1686,11 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					 skin_server_url_cb,
 					 CONFIG_NO_DATA);
   
-  config_update_string(gGui->xine, "gui.skin_server_url", 
+  config_update_string("gui.skin_server_url", 
 		       gGui->skin_server_url ? gGui->skin_server_url : server);
   
   gGui->osd.enabled = 
-    xine_config_register_bool(gGui->xine, "gui.osd_enabled", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.osd_enabled", 
 			      1,
 			      _("Enable OSD support"),
 			      _("Enabling OSD permit to display some status/informations "
@@ -1700,7 +1700,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->osd.use_unscaled = 
-    xine_config_register_bool(gGui->xine, "gui.osd_use_unscaled", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.osd_use_unscaled", 
 			      1,
 			      _("Use unscaled OSD"),
 			      _("Use unscaled (full screen resolution) OSD if possible"), 
@@ -1709,7 +1709,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->osd.timeout = 
-    xine_config_register_num(gGui->xine, "gui.osd_timeout", 
+    xine_config_register_num(__xineui_global_xine_instance, "gui.osd_timeout", 
 			      3,
 			      _("Dismiss OSD time (s)"),
 			      _("Persistence time of OSD visual, in seconds."),
@@ -1718,7 +1718,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->smart_mode = 
-    xine_config_register_bool(gGui->xine, "gui.smart_mode", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.smart_mode", 
 			      1,
 			      _("Change xine's behavior for unexperienced user"), 
 			      _("In this mode, xine take some decisions to simplify user's life."),
@@ -1727,7 +1727,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->play_anyway = 
-    xine_config_register_bool(gGui->xine, "gui.play_anyway", 
+    xine_config_register_bool(__xineui_global_xine_instance, "gui.play_anyway", 
 			      0,
 			      _("Ask user for playback with unsupported codec"),
 			      _("If xine don't support audio or video codec of current stream "
@@ -1737,7 +1737,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->experience_level =
-    (xine_config_register_enum(gGui->xine, "gui.experience_level", 
+    (xine_config_register_enum(__xineui_global_xine_instance, "gui.experience_level", 
 			       0, (char**)exp_levels,
 			       _("Configuration experience level"),
 			       _("Level of user's experience, this will show more or less "
@@ -1746,7 +1746,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       exp_level_cb, 
 			       CONFIG_NO_DATA)) * 10;
 
-  gGui->mixer.amp_level = xine_config_register_range(gGui->xine, "gui.amp_level", 
+  gGui->mixer.amp_level = xine_config_register_range(__xineui_global_xine_instance, "gui.amp_level", 
 						     100, 0, 200,
 						     _("Amplification level"),
 						     NULL,
@@ -1755,7 +1755,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 						     CONFIG_NO_DATA);
 
   gGui->splash = 
-    gGui->splash ? (xine_config_register_bool(gGui->xine, "gui.splash", 
+    gGui->splash ? (xine_config_register_bool(__xineui_global_xine_instance, "gui.splash", 
 					      1,
 					      _("Display splash screen"),
 					      _("If enabled, xine will display its splash screen"), 
@@ -1764,7 +1764,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					      CONFIG_NO_DATA)) : 0;
   
   gGui->mixer.method = 
-    xine_config_register_enum(gGui->xine, "gui.audio_mixer_method", 
+    xine_config_register_enum(__xineui_global_xine_instance, "gui.audio_mixer_method", 
 			      SOUND_CARD_MIXER, (char**)mixer_control_method,
 			      _("Audio mixer control method"),
 			      _("Which method used to control audio volume."), 
@@ -1773,7 +1773,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->shortcut_style = 
-    xine_config_register_enum(gGui->xine, "gui.shortcut_style", 
+    xine_config_register_enum(__xineui_global_xine_instance, "gui.shortcut_style", 
 			      0, (char**)shortcut_style,
 			      _("Menu shortcut style"),
 			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."), 
@@ -1940,7 +1940,7 @@ void gui_run(char **session_opts) {
 
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
-    const char *const *autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    const char *const *autoscan_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
     int         i;
 
     if(autoscan_plugins) {
@@ -1949,7 +1949,7 @@ void gui_run(char **session_opts) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
 	  int    num_mrls, j;
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+	  char **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
 							 gGui->autoscan_plugin,
 							 &num_mrls);
 	  
@@ -2009,7 +2009,7 @@ void gui_run(char **session_opts) {
 
     /* Popup setup window if there is no config file */
     if(actions_on_start(gGui->actions_on_start, ACTID_SETUP)) {
-      xine_config_save(gGui->xine, gGui->configfile);
+      xine_config_save(__xineui_global_xine_instance, gGui->configfile);
       gui_execute_action_id(ACTID_SETUP);
     }
     
