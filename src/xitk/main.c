@@ -439,13 +439,13 @@ static void show_banner(void) {
   
   show_version();
 
-  if(gGui->verbosity)
+  if(__xineui_global_verbosity)
     printf(_("Built with xine library %d.%d.%d (%s)\n"),
 	    XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
   
   xine_get_version (&major, &minor, &sub);
 
-  if(gGui->verbosity)
+  if(__xineui_global_verbosity)
     printf(_("Found xine library version: %d.%d.%d (%s).\n"), 
 	    major, minor, sub, xine_get_version_string());
 }
@@ -823,7 +823,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 
     while (driver_ids[i]) {
       
-      if(gGui->verbosity)
+      if(__xineui_global_verbosity)
 	printf (_("main: probing <%s> video output plugin\n"), driver_ids[i]);
       
       video_port = xine_open_video_driver(__xineui_global_xine_instance, 
@@ -917,7 +917,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
       
       /* don't want to load an audio driver ? */
       if (!strncasecmp(audio_driver_ids[driver_num], "NULL", 4)) {
-	if(gGui->verbosity)
+	if(__xineui_global_verbosity)
 	  printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
@@ -938,11 +938,11 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
     while (driver_ids[i]) {
       
       if(strcmp(driver_ids[i], "none")) {
-	if(gGui->verbosity)
+	if(__xineui_global_verbosity)
 	  printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
       }
       else {
-	if(gGui->verbosity)
+	if(__xineui_global_verbosity)
 	  printf(_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
 	i++;
         continue;
@@ -965,7 +965,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
     /* don't want to load an audio driver ? */
     if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
 
-      if(gGui->verbosity)
+      if(__xineui_global_verbosity)
 	printf(_("main: not using any audio driver (as requested).\n"));
 
       /* calling -A null is useful to developers, but we should not save it at
@@ -1208,7 +1208,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	break;
       }
       
-      if(gGui->verbosity >= XINE_VERBOSITY_DEBUG) {
+      if(__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) {
 	strlcat(buffer, "\n\n[", sizeof(buffer));
 	
 	if(data->explanation)
@@ -1278,7 +1278,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if((event->stream == gGui->stream) && gGui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
-      if(gGui->verbosity)
+      if(__xineui_global_verbosity)
 	printf("XINE_EVENT_MRL_REFERENCE got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
 
@@ -1404,7 +1404,7 @@ int main(int argc, char *argv[]) {
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gGui->playlist.control       = 0;
   gGui->skin_server_url        = NULL;
-  gGui->verbosity              = 0;
+  __xineui_global_verbosity              = 0;
   gGui->broadcast_port         = 0;
   gGui->display_logo           = 1;
   gGui->post_video_elements    = NULL;
@@ -1704,9 +1704,9 @@ int main(int argc, char *argv[]) {
 
     case OPTION_VERBOSE:
       if(optarg != NULL)
-	gGui->verbosity = strtol(optarg, &optarg, 10);
+	__xineui_global_verbosity = strtol(optarg, &optarg, 10);
       else
-	gGui->verbosity = 1;
+	__xineui_global_verbosity = 1;
       break;
 
 #ifdef XINE_PARAM_BROADCASTER_PORT    
@@ -1828,7 +1828,7 @@ int main(int argc, char *argv[]) {
 	  }
 
 	  gGui->report = f;
-	  gGui->verbosity = 0xff;
+	  __xineui_global_verbosity = 0xff;
 	}
 	
 	if(optarg) {
@@ -1907,7 +1907,7 @@ int main(int argc, char *argv[]) {
   
 #ifndef DEBUG
   /* Make non-verbose stdout really quiet but keep a copy for special use, e.g. stdctl feedback */
-  if(!gGui->verbosity) {
+  if(!__xineui_global_verbosity) {
     int   guiout_fd, stdout_fd;
     FILE *guiout_fp;
     
@@ -1967,7 +1967,7 @@ int main(int argc, char *argv[]) {
 
   __xineui_global_xine_instance = xine_new();
   xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
-  xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, gGui->verbosity);
+  xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, __xineui_global_verbosity);
   
   /* 
    * Playlist auto reload 

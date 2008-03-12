@@ -37,6 +37,11 @@ xine_t *__xineui_global_xine_instance;
  */
 char *__xineui_global_config_file;
 
+/**
+ * @brief Verbosity level for the xine fronend
+ */
+int __xineui_global_verbosity;
+
 #ifdef HAVE_LIRC
 /**
  * @brief Boolean flag to check if LIRC support is enabled at runtime.

@@ -858,7 +858,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
     strlcat(kmsg, footer, strlen(kmsg) + strlen(footer) + 1);
 
-    dump_error(gGui->verbosity, kmsg);
+    dump_error(__xineui_global_verbosity, kmsg);
 
     xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
 						     _("Keybindings error!"),

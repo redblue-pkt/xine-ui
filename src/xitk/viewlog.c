@@ -267,7 +267,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 			  xitk_tabs_get_current_tab_selected(viewlog->tabs));
 #endif
 
-  if(gGui->verbosity) {
+  if(__xineui_global_verbosity) {
     const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
 
     printf("\nLOG SECTION [%s]\n", log_sections[section]);

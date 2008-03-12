@@ -215,9 +215,9 @@ int parse_options(int argc, char **argv)
 
                         case OPTION_VERBOSE:
                                 if(!optarg)
-                                    fbxine.verbosity = 1;
+                                    __xineui_global_verbosity = 1;
                                 else
-                                    fbxine.verbosity = strtol(optarg, &optarg, 10);
+                                    __xineui_global_verbosity = strtol(optarg, &optarg, 10);
                                 break;
 
 			case 'h':

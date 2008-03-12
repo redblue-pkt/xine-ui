@@ -201,7 +201,6 @@ typedef struct {
   int                       subtitle_autoload;
   xine_stream_t            *spu_stream;
 
-  int                       verbosity;
   int                       broadcast_port;
 
   pthread_mutex_t           xe_mutex;

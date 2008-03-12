@@ -73,7 +73,6 @@ struct fbxine
 	int                      screen_height;
 
 	int                      debug;
-	int                      verbosity;
 
 	int                      ignore_next;
 

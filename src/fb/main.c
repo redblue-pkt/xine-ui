@@ -80,7 +80,7 @@ static void load_config(void)
 			XINE_CONFIG_FILE);
 	}
 	xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
-        xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, fbxine.verbosity);
+        xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, __xineui_global_verbosity);
 }
 
 static int check_version(void)
@@ -206,7 +206,7 @@ static int init_stream(void)
 
 	fbxine.stream = xine_stream_new(__xineui_global_xine_instance, fbxine.audio_port,
 					fbxine.video_port);
-	xine_set_param(fbxine.stream, XINE_PARAM_VERBOSITY, fbxine.verbosity);
+	xine_set_param(fbxine.stream, XINE_PARAM_VERBOSITY, __xineui_global_verbosity);
 
 	fbxine.event_queue = xine_event_new_queue(fbxine.stream);  
   
