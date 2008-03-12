@@ -34,7 +34,6 @@ xine_SOURCES = \
 	kbindings.c \
 	kbindings_common.c \
 	lang.c \
-	lirc.c \
 	main.c \
 	mediamark.c \
 	menus.c \
@@ -58,6 +57,10 @@ xine_SOURCES = \
 
 if HAVE_TAR
 xine_SOURCES += skins_download.c skins_download.h
+endif
+
+if HAVE_LIRC
+xine_SOURCES += lirc.c lirc.h
 endif
 
 xine_LDADD = $(XINE_LIBS) \
@@ -96,7 +99,6 @@ noinst_HEADERS = \
 	kbindings.h \
 	kbindings_common.h \
 	lang.h \
-	lirc.h \
 	mediamark.h \
 	menus.h \
 	mrl_browser.h \

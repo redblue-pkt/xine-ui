@@ -49,7 +49,9 @@
 #include "help.h"
 #include "i18n.h"
 #include "lang.h"
+#ifdef HAVE_LIRC
 #include "lirc.h"
+#endif
 #include "stdctl.h"
 #include "menus.h"
 #include "mrl_browser.h"

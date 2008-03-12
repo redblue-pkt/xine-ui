@@ -35,8 +35,6 @@
 
 #include "common.h"
 
-#ifdef HAVE_LIRC
-
 #ifdef DEBUG
 #define LIRC_VERBOSE 1
 #else
@@ -171,5 +169,3 @@ void lirc_stop(void) {
   lirc_freeconfig(lirc.config);
   lirc_deinit();
 }
-
-#endif

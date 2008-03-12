@@ -51,6 +51,7 @@ AC_DEFUN([AC_CHECK_LIRC],
 
      AC_SUBST(LIRC_LIBS)
      AC_SUBST(LIRC_INCLUDE)
+     AM_CONDITIONAL([HAVE_LIRC], [test "x$have_lirc" = "xyes"])
 ])
 
 dnl AC_C_ATTRIBUTE_ALIGNED

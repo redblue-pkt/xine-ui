@@ -30,11 +30,7 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIRC
-
 void lirc_start(void);
 void lirc_stop(void);
-
-#endif
 
 #endif

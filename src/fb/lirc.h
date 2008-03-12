@@ -23,8 +23,6 @@
  *
  */
 
-#ifdef HAVE_LIRC
-
 #ifndef LIRC_H
 #define LIRC_H
 
@@ -33,7 +31,5 @@
 #endif
 
 void fbxine_init_lirc(void);
-
-#endif /* LIRC_H */
 
 #endif /* HAVE_LIRC */

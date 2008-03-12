@@ -27,7 +27,10 @@
 
 #include <signal.h>
 
+#ifdef HAVE_LIRC
 #include "lirc.h"
+#endif
+
 #include "main.h"
 #include "keys.h"
 #include "stdctl.h"

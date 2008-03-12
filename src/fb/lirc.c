@@ -27,8 +27,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIRC
-
 #include <pthread.h>
 #include <signal.h>
 
@@ -94,5 +92,3 @@ int fbxine_init_lirc(void)
 	pthread_create(&fbxine.lirc.thread, 0, lirc_loop, 0);
 	return 1;
 }
-
-#endif /* HAVE_LIRC */
