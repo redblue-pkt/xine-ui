@@ -36,6 +36,7 @@ libxitk_a_SOURCES = \
 	list.c \
 	menu.c \
 	mrlbrowser.c \
+	recode.h \
 	skin.c \
 	slider.c \
 	tabs.c \
@@ -43,6 +44,12 @@ libxitk_a_SOURCES = \
 	widget.c \
 	window.c \
 	xitk.c
+
+# recode.h is added unconditionally to the sources because it contains
+# the no-op defines in case iconv is not used.
+if HAVE_ICONV
+libxitk_a_SOURCES += recode.c
+endif
 
 noinst_HEADERS = \
 	_config.h \

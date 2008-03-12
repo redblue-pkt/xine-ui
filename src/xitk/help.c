@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "common.h"
+#include "recode.h"
 
 #if defined(HAVE_ICONV) && defined(HAVE_LANGINFO_CODESET)
 #  include <iconv.h>

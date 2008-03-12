@@ -33,6 +33,7 @@
 #include <pthread.h>
 
 #include "common.h"
+#include "recode.h"
 	
 #define WINDOW_WIDTH        570
 #define WINDOW_HEIGHT       616

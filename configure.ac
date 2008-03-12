@@ -57,6 +57,7 @@ AM_GNU_GETTEXT(external)
 AC_PROG_GMSGFMT_PLURAL
 
 AM_ICONV
+AM_CONDITIONAL([HAVE_ICONV], [test "$am_cv_func_iconv" = yes])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
