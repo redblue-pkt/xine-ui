@@ -693,7 +693,7 @@ static const xitk_color_names_t xitk_color_names[] = {
   { 139,    0,  139,  "DarkMagenta" },
   { 139,    0,    0,  "DarkRed" },
   { 144,  238,  144,  "LightGreen" },
-  {   0,    0,    0,  NULL }
+  { 0,      0,    0,  "" }
 };
 
 #if 0
@@ -1653,7 +1653,7 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
       cn->red = cn->green = cn->blue = 0;
     }
 
-    cn->colorname = strdup(color);
+    strlcpy(cn->colorname, color, sizeof(cn->colorname));
     
     XITK_FREE(p);
 
@@ -1661,15 +1661,12 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
   } 
   else {
     const xitk_color_names_t *pcn = NULL;
-    for(pcn = xitk_color_names; pcn->colorname != NULL; pcn++) {
+    for(pcn = xitk_color_names; pcn->colorname[0] != '\0'; pcn++) {
       if(!strncasecmp(pcn->colorname, color, strlen(pcn->colorname))) {
 
 	cn = (xitk_color_names_t *) xitk_xmalloc(sizeof(xitk_color_names_t));
 
-	cn->red       = pcn->red;
-	cn->green     = pcn->green;
-	cn->blue      = pcn->blue;
-	cn->colorname = strdup(pcn->colorname);
+	*cn = *pcn;
 
 	return cn;
       }
@@ -1689,7 +1686,6 @@ void xitk_free_color_name(xitk_color_names_t *color) {
     return;
   }
 
-  XITK_FREE(color->colorname);
   XITK_FREE(color);
 }
 

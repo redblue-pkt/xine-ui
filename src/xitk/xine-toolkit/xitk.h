@@ -166,7 +166,7 @@ typedef struct {
   int                               red;
   int                               green;
   int                               blue;
-  char                             *colorname;
+  char                              colorname[20];
 } xitk_color_names_t;
 
 typedef struct xitk_node_s {
