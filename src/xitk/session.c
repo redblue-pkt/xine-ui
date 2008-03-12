@@ -98,6 +98,7 @@ uint32_t get_uint32(int session, ctrl_commands_t command) {
   return ret;
 }
 
+#if 0
 void send_boolean(int session, ctrl_commands_t command, uint8_t value) {
   int     fd;
   uint8_t bvalue = (value > 0) ? 1 : 0;
@@ -129,6 +130,7 @@ uint8_t get_boolean(int session, ctrl_commands_t command) {
   
   return ret;
 }
+#endif
 
 static void *ctrlsocket_func(void *data) {
   fd_set                set;
