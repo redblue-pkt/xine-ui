@@ -42,7 +42,6 @@
 #include "common.h"
 #include "oxine/oxine.h"
 
-extern gGui_t          *gGui;
 extern _panel_t        *panel;
 filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 

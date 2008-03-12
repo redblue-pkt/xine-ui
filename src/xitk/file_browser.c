@@ -66,7 +66,6 @@
 #define S_IXUGO        (S_IXUSR | S_IXGRP | S_IXOTH)
 #endif
 
-extern gGui_t          *gGui;
 
 typedef struct {
   char                      *name;

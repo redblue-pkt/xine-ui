@@ -34,7 +34,6 @@
 
 #include "common.h"
 
-extern gGui_t     *gGui;
 
 #define OVL_PALETTE_SIZE 256
 

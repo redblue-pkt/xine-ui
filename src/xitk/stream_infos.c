@@ -40,7 +40,6 @@
 
 #define METAINFO_CHARSET    "UTF-8"
 
-extern gGui_t          *gGui;
 
 struct {
   xitk_window_t        *xwin;

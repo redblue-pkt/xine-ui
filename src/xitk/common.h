@@ -385,6 +385,7 @@ typedef struct {
                                      /* before an evtl. later redirection     */
 } gGui_t;
 
+extern gGui_t *gGui;
 
 void set_window_states_start(Window window);
 #define set_window_states_start(window)                                   \

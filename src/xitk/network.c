@@ -431,7 +431,6 @@ static struct {
   { NULL                 , 0                 }
 };
 
-extern gGui_t *gGui;
 
 #endif
 

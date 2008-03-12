@@ -38,7 +38,6 @@
 #define LOG
 */
 
-extern gGui_t                  *gGui;
 
 /*
  * playlist gui

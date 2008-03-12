@@ -29,7 +29,6 @@
 #include "common.h"
 #include "skins_internal.h"
 
-extern gGui_t             *gGui;
 
 #define NORMAL_CURS   0
 #define WAIT_CURS     1

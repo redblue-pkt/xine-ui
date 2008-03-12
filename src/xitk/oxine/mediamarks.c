@@ -41,7 +41,6 @@
 #include "xine/xmlparser.h"
 #include "utils.h"
 
-extern gGui_t          *gGui;
 
 #define TYPE_NONE (0)
 #define TYPE_DIR  (1)

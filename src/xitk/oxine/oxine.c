@@ -45,7 +45,6 @@
 #include "mediamarks.h"
 #include "playlist.h"
 
-extern gGui_t          *gGui;
 static oxine_t         *oxine_instance = NULL;
 
 

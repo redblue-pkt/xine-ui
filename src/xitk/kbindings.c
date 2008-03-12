@@ -32,7 +32,6 @@
 #include "common.h"
 #include "kbindings_common.h"
 
-extern gGui_t                 *gGui;
 
 #undef TRACE_KBINDINGS
 

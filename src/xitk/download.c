@@ -36,7 +36,6 @@
 
 #include "common.h"
 
-extern gGui_t   *gGui;
 
 #ifdef HAVE_CURL
 

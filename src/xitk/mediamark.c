@@ -63,7 +63,6 @@ static struct {
   xitk_register_key_t           widget_key;
 } mmkeditor;
 
-extern gGui_t                  *gGui;
 
 typedef struct {
   char                         *data;

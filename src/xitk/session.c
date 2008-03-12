@@ -45,7 +45,6 @@
 #include "common.h"
 #include "session_internal.h"
 
-extern gGui_t          *gGui;
 
 static int session_id = -1;
 static int           ctrl_fd;

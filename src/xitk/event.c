@@ -53,7 +53,6 @@
 /*
  * global variables
  */
-extern gGui_t          *gGui;
 extern _panel_t        *panel;
 
 static pid_t            xine_pid;

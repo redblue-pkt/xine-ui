@@ -395,7 +395,6 @@ static const kbinding_entry_t default_binding_table[] = {
     0,                        0                              , 0,          0              , 0 , 0}
 };
 
-extern gGui_t                 *gGui;
 
 static int _kbinding_get_is_gui_from_default(char *action) {
   int i;

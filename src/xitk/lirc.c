@@ -41,7 +41,6 @@
 #define LIRC_VERBOSE 0
 #endif
 
-extern gGui_t          *gGui;
 
 extern _panel_t        *panel;
 

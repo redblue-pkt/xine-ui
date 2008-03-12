@@ -33,7 +33,6 @@
 
 #include "common.h"
 
-extern gGui_t     *gGui;
 
 _panel_t          *panel = NULL;
 

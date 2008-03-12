@@ -51,7 +51,6 @@
 #define EST_MAX_DIFF    0.01      /* maximum diff to detect valid fps */
 #define ABS(x) ((x)>0?(x):-(x))
 
-extern gGui_t           *gGui;
 
 /* Video window private structure */
 static struct {

@@ -39,7 +39,6 @@
 #define WINDOW_WIDTH    500
 #define WINDOW_HEIGHT   346
 
-extern gGui_t          *gGui;
 
 static struct {
   xitk_window_t        *xwin;

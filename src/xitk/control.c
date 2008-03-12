@@ -41,7 +41,6 @@
 
 #define TEST_VO_VALUE(val)  (val < CONTROL_MAX/3 || val > CONTROL_MAX*2/3) ? (CONTROL_MAX - val) : 0
 
-extern gGui_t          *gGui;
 
 typedef struct {
   Window                window;

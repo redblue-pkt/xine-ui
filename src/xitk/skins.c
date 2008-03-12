@@ -37,7 +37,6 @@
 #include "common.h"
 #include "skins_internal.h"
 
-extern gGui_t             *gGui;
 
 skins_locations_t **skins_avail = NULL;
 int                 skins_avail_num = 0;

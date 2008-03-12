@@ -37,7 +37,6 @@
 
 #define DEBUG_STDCTL 0
 
-extern gGui_t          *gGui;
 extern _panel_t        *panel;
 
 static struct {

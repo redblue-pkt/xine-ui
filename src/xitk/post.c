@@ -32,7 +32,6 @@
 
 #include "common.h"
 
-extern gGui_t    *gGui;
 
 #undef TRACE_REWIRE
 

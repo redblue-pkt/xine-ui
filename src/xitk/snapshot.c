@@ -69,7 +69,6 @@
 #define PIXSZ 3
 #define BIT_DEPTH 8
 
-extern gGui_t  *gGui;
 
 /* internal function use to scale yuv data */
 typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest, int width, int step);

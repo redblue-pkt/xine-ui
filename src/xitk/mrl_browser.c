@@ -33,7 +33,6 @@
 
 #include "common.h"
 
-extern gGui_t            *gGui;
 static xitk_widget_t     *mrlb = NULL;
 
 /*

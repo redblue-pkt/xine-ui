@@ -44,7 +44,6 @@
 #  define USE_CONV
 #endif
 
-extern gGui_t                   *gGui;
 
 #define WINDOW_WIDTH             570
 #define WINDOW_HEIGHT            473

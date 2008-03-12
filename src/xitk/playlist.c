@@ -34,7 +34,6 @@
 
 #include "common.h"
 
-extern gGui_t          *gGui;
 
 typedef struct {
   Window                window;

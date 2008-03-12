@@ -41,7 +41,6 @@
 #define WINDOW_WIDTH    250
 #define WINDOW_HEIGHT   221
 
-extern gGui_t          *gGui;
 
 typedef struct {
   xitk_window_t        *xwin;

@@ -33,7 +33,6 @@
 #include "utils.h"
 #include "globals.h"
 
-extern gGui_t          *gGui;
 
 #define V_WIDTH 800
 #define V_HEIGHT 600

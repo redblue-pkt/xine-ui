@@ -33,7 +33,6 @@
 
 #include "common.h"
 
-extern gGui_t            *gGui;
 static xitk_window_t     *xwin = NULL;
 
 void splash_create(void) {

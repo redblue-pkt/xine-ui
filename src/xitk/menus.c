@@ -28,7 +28,6 @@
 
 #include "common.h"
 
-extern gGui_t                  *gGui;
 extern _panel_t                *panel;
 
 #define PLAYB_PLAY              1

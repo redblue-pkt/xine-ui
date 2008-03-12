@@ -35,7 +35,6 @@
 
 #include "common.h"
 
-extern gGui_t          *gGui;
 
 /*
  * Callback used to display the viewlog window.

@@ -32,7 +32,6 @@
 
 #define TVOUT_DEBUG 1
 
-extern gGui_t  *gGui;
 
 struct tvout_s {
   int    (*init)(Display *display, void **private);
