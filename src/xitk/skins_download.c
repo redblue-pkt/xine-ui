@@ -26,6 +26,8 @@
 
 #include <errno.h>
 
+#include <X11/keysym.h>
+
 #include "common.h"
 #include "skins_internal.h"
 
