@@ -1,131 +1,217 @@
+  *************************************
+   XINE: Un reproductor libre de vÃ­deo
+  *************************************
 
-   ----------------------
-            xine
-   ----------------------
+VERSIÃ“N inglesa: 
+       => $Id$
 
-     Reproductor libre de vídeo
-
-
-Alcance de este documento:
---------------------------
-
-Éste es el documento para el usuario final para xine-lib y xine-ui. Encontrará 
-más documentación en el directorio doc/ de ambos paquetes.
-
-Sobre Xine:
------------
-
-Xine es un reproductor de vídeo para sistemas unix con licencia libre gpl. 
-Soporta secuencias de vídeo mpeg-2 y mpeg-1 (sonido + vídeo multiplexado),se-
-cuencias elementales mpeg (sólo sonido/imagen, ej. archivos mp3) y archivos AVI
-(usando los codec dlls de win32).
-
-Xine reproduce secuencias de imágenes y sonidos y los sincroniza ambos en la 
-reproducción. Dependiendo de las propiedades de la secuencia a reproducir, se 
-necesitará más o menos potencia de procesador, en sistemas con un P II de 400 
-MHz se ha observado la totalidad de los fotogramas.
-
-Xine pueden reproducir directamente Vídeo CDs, SVCDs y DVDs. Desgraciadamente 
-el estado legal en la reproducción de DVD bloqueados / encriptados en algunos 
-países es incierta, por lo tanto no podemos incluir ningún código de desencrip-
-tación/desbloqueo con Xine. Para reproducir este tipo de DVDs necesitará progra-
-mas externos o algo como el xine_dvd_plugin que puede manejar autentificación
-/ descodificación (descrambling) del DVD.
-
-A partir de xine 0.5 hemos introducido un nueva arquitectura ofreciendo plu-
-gins flexibles para varias tareas, así que soporta otros tipos de secuencias y 
-más adelante otros dispositivos de salida.
+TraducciÃ³n:                   
+  Alfredo J. Delaiti (2002-05),
+  Carlos E. Robinson (2008-02)
 
 
-Plataformas soportadas / requisitos:
-------------------------------------
 
-- Xine necesita un servidor X11 de 15, 16, 24 o 32 bit de profundidad para la 
-  salida de vídeo,
-- aaxine usa aalib para la salida y puede correr en casi cualquier terminal,
-- Xine puede detectar y puede usar la X de vídeo del MIT y la extensión de me-
-  moria compartida X para un mejor rendimiento
-- sino puede conseguir que la Xv corra en su plataforma deberá usar una profun-
-  didad de color de 16bpp para una buena velocidad. Xv parece funcionar muy 
-bien
-  para 16 y 24bpp.
-- Si usted tiene un adaptador gráfico mga 200 / 400 puede opcionalmente usar el
-  controlador de salida de vídeo sybcfb/teletux. Vea README.syncfb por detalles.
-- Para la reproducción de sonido son soportado OSS, ALSA, ESD y ARTSD.
-- Para construir xine se requiere el reciente gmake, gcc y binutils
-- xine-ui requiere libpng y zlib
+Ãndice general
 
-Xine ha sido hasta ahora exitosamente usado en los siguientes sistemas:
+    1 LA DOCUMENTACIÃ“N
+        1.1 Alcance de este documento
+    2 ACERCA DE XINE
+        2.1 Plataformas soportadas y requisitos
+        2.2 Software usado
+        2.3 Desarrolladores de xine
+        2.4 Uso
+            2.4.1 Atajos de teclado
+                Cambiando atajos:
+                Siguiendo la pista a nombres de teclas en X11: 
+                Mostrando los atajos activos/remapeados:
+            2.4.2 Seleccionando los canales de sonido
+            2.4.3 Seleccionando los subtÃ­tulos
+            2.4.4 LIRC
+                Lista de reproducciÃ³n
+            2.4.5 Ajustando opciones de configuraciÃ³n en la lÃ­nea de Ã³rdenes
+    3 Lo que queda por decir
+        3.1 Libertad, DVDs y cosas...
+    4 Contactando con el proyecto xine
 
-- Linux en un Pentium III 667
-  usando XFree86 4.01 en una nVidia Riva TNT 2
-- Linux en un Pentium II 400
-  usando XFree86 3.3.6, 4.0, 4.01 y 4.02 en una nVidia Riva TNT
-- Versión-FreeBSD 4.1- en un Celeron 400
-  usando XFree86 3.3.6 y 4.0.1 en una Matrox G400
-- Linux en un Pentium 120 (sin MMX)
-  usando XFree86 3.3.5 en una Trident 9660
-- Linux en un AMD K6-266
-  usando XFree86 3.3.5 en una ATI AIW M64-8Mb PCI
-- Linux en un AMD K6-III 450
-  usando XFree86 3.3.6 en una ATI Rage 8MB
-- Linux en un Celeron 633
-  usando XFree86 4.0.1 en una ATI AIW Rage 128-16MB
-- Linux en un Amd K7@550
-  Xfree 4.0.1 usando en una de Ati Rage 128 16 Mb 
-  (Xv funciona en esta configuración con controladores del proyecto GATOS)
-- Linux en un Celeron 667
-  usando XFree86 4.0.2 en una Riva TNT 16Mb 
-  (Xv funciona en esta configuración con controladores de fuente-cerradas
-  versión 0.9.5 de NVidia).
-- Linux en un Amd K6-2@475
-  usando XFree86 4.1.0 en una 3dfx voodoo3 2000 PCI 16Mb 
-  (Xv funciona en esta configuración)
-- Solaris 8 en Intel
-  usando Xsun en una ATI Xpert@Work & Xpert98 (3D RAGE PRO)
-  vea README.solaris por más información
 
-Plataformas no-intel:
 
-- Solaris 8 en SPARC
-  usando Xsun en una Creator-3D framebuffer
-  vea README.solaris por más información
-- IRIX en MIPS
-  el soporte de sonido todavía falta para esta plataforma
+1 LA DOCUMENTACIÃ“N
 
-Uso:
-----
+  1.1 Alcance de este documento
 
-Puede iniciar Xine sin especificar ningún parámetro en la línea de comandos o 
-directamente especificando una o más secuencias de entrada. Xine trata de de-
-tectar si puede usar la extensión Xv y sino pasará a XShm, pero esa detección 
-podría fallar. Entonces especifique el plugin para la salida de vídeo usando la 
-opción "-V". ej.
+Este es el documento para el usuario final de xine-lib y xine-ui. 
+EncontrarÃ¡ mÃ¡s documentaciÃ³n en el directorio doc/ de ambos paquetes. Mire 
+tambiÃ©n el FAQ (preguntas frecuentes) incluido con el paquete xine-ui que 
+pudiera tener las respuestas a sus preguntas.
 
-xine -V XShm
+2 ACERCA DE XINE
 
-obliga a Xine a usar XShm o simplemente X11. 
+xine es un reproductor de vÃ­deo para sistemas tipo unix con licencia libre 
+GPL. Soporta secuencias de vÃ­deo mpeg-2 y mpeg-1 (sonido + vÃ­deo 
+multiplexado), secuencias elementales mpeg (sÃ³lo sonido/imagen, ej. 
+archivos mp3), archivos AVI con varios formatos (algunos de ellos usando 
+los codec en dlls de win32) y secuencias Vorbis OGG. Hay algÃºn soporte para 
+secuencias quictime (pero la mayorÃ­a de los cÃ³decs quicktime de audio y 
+vÃ­deo son altamente propietarios y por tanto no soportados).
 
-Si quiere enviar el sonido sobre una red con ESD, antes de iniciar Xine fije 
-variable el ambiente ESPEAKER.
+xine reproduce secuencias de imÃ¡genes y sonidos y sincroniza la 
+reproducciÃ³n de ambos. Dependiendo de las propiedades de la secuencia a 
+reproducir, se necesitarÃ¡ mÃ¡s o menos potencia de procesador; se ha visto 
+reproduciÃ³n con frecuencia de cuadro completa en sistemas con un P II a 400 
+MHz. 
 
-La secuencia de entrada puede ser un nombre de archivo o algo que llamamos 
-"MediaResourceLocator" MRL que es similar similar a un URL. Primero especifique
-una la fuente de entrada la cual es seguida por "://" y una identificación espe-
-cifica fuente-entrada. Qué fuentes de entrada pueda usar, depende los plugin de 
-entrada que tenga (para simples archivos puede omitir la identificación de la 
-fuente de entrada). Pruebe
+xine puede reproducir directamente VÃ­deo CDs, SVCDs y DVDs. 
+Desgraciadamente el estado legal en la reproducciÃ³n de DVD bloqueados / 
+encriptados en algunos paÃ­ses es incierta, por lo tanto no podemos incluir 
+ningÃºn cÃ³digo de desencriptaciÃ³n/desbloqueo con xine. Para reproducir este 
+tipo de DVDs necesitarÃ¡ programas externos o algo como un xine_dvd_plugin 
+que pueda manejar autentificaciÃ³n / descodificaciÃ³n (descrambling) del DVD.
+
+El projecto xine niega cualquier responsabilidad en tales usos de xine.
+
+A partir de xine 0.5 hemos introducido un nueva arquitectura ofreciendo 
+complementos (plugins) flexibles para varias tareas, asÃ­ varios otros tipos 
+de secuencias y dispositivos de salida pueden ser soportados en un futuro.
+
+2.1 Plataformas soportadas y requisitos
+
+â€¢ xine necesita un servidor X11 para la salida de vÃ­deo
+  (de 8, 15, 16, 24 o 32 bit de profundidad de color)
+
+â€¢ xine puede detectar y usar X vÃ­deo del MIT y la extensiÃ³n de memoria 
+  compartida de X para un mejor rendimiento
+
+â€¢ si no puede conseguir que Xv corra en su plataforma deberÃ­a usar una 
+  profundidad de color de 16bpp para tener mejor velocidad. Xv parece 
+  funcionar muy bien para cualquier profundidad de color.
+
+â€¢ si usted tiene un adaptador grÃ¡fico Matrox G200/G400/G450 puede 
+  opcionalmente usar el controlador de salida de vÃ­deo sybcfb/teletux. Vea 
+  README.syncfb para mÃ¡s detalles.
+
+â€¢ para la reproducciÃ³n de sonido se soportan OSS, ALSA, ESD y ARTSD.
+
+â€¢ aaxine usa aalib para la salida y puede correr en casi cualquier 
+  terminal.
+
+â€¢ para construir xine se requieren GNU make, gcc y binutils bastante 
+  recientes.
+
+xine deberÃ­a correr en cualquier mÃ¡quina reciente compatible i386 (pentium 
+y mÃ¡s) que use GNU/linux o FreeBSD. Dependiendo del tipo de flujo de vÃ­deo 
+que quiera reproducir necesitarÃ¡ mÃ¡s o menos potencia de procesador para 
+una reproducciÃ³n fluÃ­da. Por regla general, los DVDs funcionarÃ¡n bien en un 
+Pentium II a 400 (o equivalente). Hay muchos factores en esta ecuaciÃ³n, asÃ­ 
+que sus resultados pueden variar.
+
+Tarjetas grÃ¡ficas comprobadas con Ã©xito (usando Xv) para PCs incluyen: 
+nVidia Riva TNT (con manejador de cÃ³digo cerrado nvidia), nVidia Riva TNT 
+2, Matrox G400, ATI AIW Rage128-16MB, 3dfx voodoo3 2000 PCI 16Mb.
+
+Las siguientes tarjetas han sido reportadas como que funcionan, pero no 
+estÃ¡ claro si funcionarÃ¡n con Xv o sÃ³lo con XShm (por favor, repÃ³rtelo en 
+la lista de correo xine-user):
+
+Trident 9660, ATI AIW M64-8Mb PCI, ATI RageII 8MB.
+
+xine deberÃ­a ser capaz de mostrar vÃ­deo en cualquier tipo de servidor X que 
+funcione, con cualquier tipo de tarjeta grÃ¡fica, pero con mucho peor 
+rendimiento que con Xv.
+
+Adicionalmente, xine funciona en plataformas i386-solaris, maquinas sparc 
+ccorriendo linux o solaris (se sabe que Creator-3D framebuffer funciona), 
+vea README.solaris por mÃ¡s informaciÃ³n. TambiÃ©n estÃ¡n soportados: algunos 
+sistemas basados en powerpc (con linux) e IRIX en MIPS.
+
+Por Ãºltimo pero no menos importante, xine ha sido reportado que funciona en 
+mÃ¡quinas Alpha, IA-64 y S/390.
+
+2.2 Software usado
+
+xine usa cÃ³digo de los siguientes projectos de software libre externos:
+
+â€¢ liba52 por Aaron Holtzman y Michel Lespinasse
+
+â€¢ libmpeg2 por Aaron Holtzman y Michel Lespinasse
+
+â€¢ libmad por Robert Leslie
+
+â€¢ libffmpeg por Fabrice Bellard
+
+Sin esas magnÃ­ficas obras de software, por supuesto que xine no estarÃ­a 
+donde estÃ¡ ahora.
+
+TambiÃ©n muchas gracias al proyecto de vÃ­deo linux y DVD â€œLiViDâ€, de donde 
+vinieron las ideas originales para el reproductor xine.
+
+==> [http://www.linuxvideo.org/] 
+
+2.3 Desarrolladores de xine
+
+ProgramaciÃ³n principal de xine
+
+   Guenter Bartsch <guenter@users.sourceforge.net>
+
+Varias sugerencias, correcciÃ³n de gazapos y construcciones, complemento 
+alsa, igu (gui )
+
+   Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+
+Muchas correciones de gazapos y bloqueos muertos, detecciÃ³n de ritmo bit, 
+desentrelazador en software, actualizaciones masivas de libwin32
+
+   Miguel Freitas <miguel@cetuc.puc-rio.br>
+
+MÃ³dulo de salida de vÃ­deo teletux/syncfb, varias correcciones de gazapos / 
+revisiones, alsa
+
+   Joachim Koenig <Joachim.Koenig@gmx.net>
+
+Desarrollo liba52/libmpeg2
+
+   Michel Lespinasse <walken@zoy.org>
+
+Paquete Debian, soporte de usuario
+
+   Siegfried Langauf <siggi@users.sourceforge.net>
+
+Y varios contribuidores mÃ¡s, vea el fichero xine-lib/AUTHORS
+
+2.4 Uso
+
+Puede iniciar xine sin especificar ningÃºn parÃ¡metro en la lÃ­nea de Ã³rdenes 
+o directamente especificando una o mÃ¡s secuencias de entrada. xine trata de 
+detectar si puede usar la extensiÃ³n Xv y si no pasarÃ¡ a XShm, pero esa 
+detecciÃ³n podrÃ­a fallar. Puede especificar el complemento para la salida de 
+vÃ­deo usando la opciÃ³n "-V". ej.
+
+xine -V Xshm
+
+
+
+obliga a xine a usar XShm o X11 simple.
+
+Si quiere enviar el sonido por una red con ESD, defina la variable de 
+entorno ESPEAKER antes de iniciar xine.
+
+El flujo de entrada puede ser un nombre de archivo o algo que llamamos 
+"MediaResourceLocator" MRL (localizador de medios) que es similar similar a 
+un URL. Primero especifique una fuente de entrada la cual es seguida por 
+"://" y un identificador especÃ­fico de la fuente de entrada. QuÃ© fuentes de 
+entrada pueda usar, depende los complemento de entrada que tenga (para 
+ficheros simples puede omitir la identificaciÃ³n de la fuente de entrada). 
+
+Pruebe:
 
 $ xine --help
 
-para obtener el listado completo de su forma de uso.
+para tener informaciÃ³n mÃ¡s completa de su forma de uso.
 
-Xine soporta el protocolo xdnd (Versión 3) así si tiene una aplicación de 
-visua-
-lización de archivo que soporta ese protocolo (ej. gmc) puede dejar caer, para
-su reproducción, los archivos de vídeo sobre Xine.
+xine soporta el protocolo xdnd (VersiÃ³n 3) asÃ­ que si tiene una aplicaciÃ³n 
+navegador de ficheros que soporte ese protocolo (ej. gmc) puede dejar caer 
+ficheros de vÃ­deo sobre xine para su reproducciÃ³n.
 
-Reproduciendo la pista 3 de un VCD:
+Reproducir la pista 3 de un VCD:
 
 $ xine vcd://3
 
@@ -133,197 +219,260 @@ Ejemplo para acceso directo a un DVD:
 
 $ xine dvd://VTS_01_1.VOB
 
-Atajos de teclado:
-------------------
+2.4.1 Atajos de teclado
 
-Tecla       Acción
 
-ENTRADA     reproducción
-ESPACIO, P  pausa
-Arriba/Abajo    avance rápido / movimiento lento
 
-0       busca comienzo de la secuencia actual
-1-9     busca el 10-90% de la secuencia actual
-Izq/Der     buscan -+ 15 seg (+CTRL: 60 seg)
-RePág/Previo    salta a la entrada previa de la lista de reproducción
-AvPág/Siguiente salta a la entrada próxima de la lista de reproducción
-
-F       cambia al modo de pantalla completa
-A       cambia la relación de aspecto (AUTO/16:9/4:3/DVB)
-I       cambia al modo interlaceado
-< >     modifica el tamaño de ventana de salida
-+ -         cambia el canal de sonido
-, .     cambia el canal de subtítulo
-n m         ajustan la sincronización de imagen/sonido
-Inicio      restablece la sincronización de imagen/sonido
-Q       salir
-
-viene más.
-
-Pulse el botón derecho del ratón en la ventana vídeo para alternar la vista del
-panel.
-
-Seleccionando los canales de sonido:
-------------------------------------
-
-Proporcione la opción -a para seleccionar la pista de sonido deseada:
-
-xine -a 3 test.mpg
-
-reproduce la tercera pista de sonido disponible (y por supuesto, la imagen).
-
-Seleccionando los subtítulos:
------------------------------
-
-Los subtítulos son incluido en pistas diferentes como el sonido. En general, la
-pista 0 es el subtítulo del idioma predefinido. Use la opción -u para seleccio-
-nar la pista de subtítulo deseada:
-
-xine -u 0 test.vob
-
-muestra los subtítulos de la secuencia 0.
-
-Controlando Xine vía CORBA:
----------------------------
-
-[FIJAME: no hay soporte para corba en xine 0.5]
-
-Xine implementa una interface de servidor CORBA para habilitar telemando y los
-comandos. Para esto, necesita ORBit que ya debe estar instalado si está usando
-GNOME. Por otra parte puede conseguirlo de
-
-  http://orbit-resource.sourceforge.net /
-
-Cualquier versión de ORBit >= 0.4.0 debería trabajar bien.
-
-Para habilitar la interfaz CORBA, necesita proporcionar el argumento 
-"--habilitar-corba" al archivo de comando ./configure y  recompilar Xine.
-
-La definición de la interface del servidor de Xine puede encontrarse en 
-"corba/xine.idl" que se instala por omisión en "/usr/share/idl/xine.idl"
-
-Para comunicarse con xine vía CORBA, necesita conseguir sus IOR (Interoperable 
-Object Reference --> Referencia de Objetos Interoperable).
-En el inicio, Xine lo escribe en el archivo ~/.xine.ior de donde puede leerlo. 
-Si el servicio de nombre de ORBit está corriendo, Xine también se registra allí
-bajo el nombre "Xine". Desgraciadamente, el servidor de nombre ORBit normalmente
-no se activa por defecto. Tiene que ejecutarlo manualmente así:
-
-  orbit-name-server >/tmp/name-service-ior &
-
-Vea la documentación de ORBit por más información.
-
-Se proporcionan dos programas cliente de ejemplo:
-  1. "xine-remote" es un cliente ejemplo escrito en C el que puede ser usado
-     para enviar ordenes play/stop/pause para un caso corriente de xine.
-  2. "example.py" es un pequeño script en Python que demuestra lo fácil que es 
-     controlar Xine desde un archivo de comandos.
-
-Usando LIRC con xine:
----------------------
-
-Xine puede ser controlado remotamente por IR (infrarrojos). Para esto, debe te-
-ner instalado LIRC (http://www.lirc.org), debe conseguir la última actualiza-
-ción del CVS si está ejecutando los últimos kernels de Linux (serie 2.2 o 2.4). 
-
-Debe agregar algunas entradas en su ~/.lircrc, así:
-begin
-    remote = SAMSUNG
-    button = Button_Play
-    prog   = xine
-    repeat = 0
-    config = PLAY
-end
-begin
-    remote = SAMSUNG
-    button = Button_Src
-    prog   = xine
-    repeat = 0
-    config = DVD
-end
-begin
-    remote = SAMSUNG
-    button = Button_1
-    prog   = xine
-    repeat = 0
-    config = 10%
-end
-...
-
-Todas las órdenes válidas son:
-
- - para salir
-      quit
- - para ajustar la posición en la actual secuencia de reproducción:
-      0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90% 
- - para reproducir o parar:
-      play
- - para hacer una pausa:
-      pause
- - para expulsar:
-      eject
- - para la próxima/anterior MRL en la lista de reproducción:
-      next, prev
- - para la selección de la pista de sonido siguiente/previa:
-      audio+, audio -
- - para la selección de los títulos subalternos:
-      spu+, spu -
- - para recibir la lista de reproducción de un DVD/VCD:
-      dvd, vcd,
- - para esconder/mostrar la GUI, la ventana de salida de vídeo:
-      hidegui, hideoutput,
- - para alternar entre ventana de salida de vídeo<->pantalla completa
-      fullscr
-
-En algunos casos no son aplicables todas las órdenes.
-
-Software usado:
----------------
-
-Xine usa software de los siguientes proyectos de software libre:
-
-- liba52 de Aaron Holtzman / Michel Lespinasse
-- libmpeg2 de Aaron Holtzman / Michel Lespinasse
-- libmpg123 del proyecto mpg123 de Michael Hipp
-  (vea http://www.mpg123.de/)
-- libmad de Robert Leslie
-- varios decodificadores del proyecto ffmpeg de Fabrice Bellard
-
-... sin estas grandes pieza de software Xine no podría ser lo que es hoy.
-
-también muchas gracias al Proyecto de Vídeo para Linux y DVD "Lívido"
-(http://www.linuxvideo.org/), de donde vinieron las ideas originales para 
-el reproductor de vídeo Xine.
-
-Diseñadores activos de Xine:
-----------------------------
-
-  desarrollador principal de Xine:
-    Guenter Bartsch
-
-  varias sugerencias, ensamble y arreglo de errores, plugin del alsa, gui,
-    Daniel Caujolle-Bert 
-
-  contribuye con grandes soluciones libmpeg2 y liba52:
-    Michael Lespinasse
-
-  portado a Solaris y corrección de muchos errores
-    Juergen Keil
   
-  ... más otros contribuyentes, vea el archivo AUTHORS (AUTORES)
+  Tecla                    AcciÃ³n                                                         
+  [Intro]                  reproducciÃ³n                                                   
+  [Espacio]                pausa                                                          
+  [Arriba]/[Abajo]         avance rÃ¡pido / lento                                          
+  0-9                      introduzca el dÃ­gito correspondiente                           
+  /                        se desplaza el % relativo al dÃ­gito previamente introducido    
+  [Izq][Der]               se desplaza Â±15 segs (+CTRL: 60 segs)                          
+  f                        conmuta pantalla completa                                      
+  a                        conmuta la razÃ³n de aspecto (AUTO/16:9/4:3/DVB)                
+  i                        conmuta modo entrelazado                                       
+  z / ^Z                   acercar zoom / alejar                                          
+                           con Ctrl hace zoom horizontal y con Meta lo hace vertical      
+  "<", ">"                 modificar el tamaÃ±o de la ventana de salida                    
+  + -                      cambiar el canal de audio                                      
+  , .                      cambiar el canal de subtÃ­tulos                                 
+  n m                      ajustar sincronismo audio / vÃ­deo                              
+  [HOME]                   reiniciar sincronismo a / v                                    
+  [INSERT]                 conmutar la captura de ratÃ³n en la ventana de salida de vÃ­deo  
+  q                        salir                                                          
+  h                        esconder la ventana de vÃ­deo (util para reproducir mp3)        
+  Y mÃ¡s que vendrÃ¡n :-)                                                                   
 
 
-Contactando con el proyecto Xine:
----------------------------------
+Haga clic derecho del ratÃ³n (o pulse 'g') en la ventana vÃ­deo para 
+(des)activar la visualizaciÃ³n del panel.
 
-  el sitio web del proyecto es:
+  Cambiando atajos:
 
-       http://xine.sourceforge.net
+  Puede tambien cambiar uno/muchos/todos los atajos. Para esto, debe tener 
+un mapa de teclado en su directorio $HOME/.xine/. La sintaxis de las teclas 
+es:
 
-  es grandemente apreciado los comentarios y sugerencias o para ofrecer 
-  ayuda por favor contáctese con:
+WindowReduce {
+  key = less
+  modifier = none
+}
 
-       la lista de correo de los usuario de Xine 
+La tecla deberÃ­a encajar con los nombres de teclas X11 (ver abajo). El 
+modificador puede ser:
 
+â€¢ 'none' para no modificador,
 
-Traducción: Alfredo J. Delaiti
+â€¢ 'control' (o 'ctrl') para la tecla de control,
+
+â€¢ 'meta' (o 'alt' en los PC) para la tecla meta,
+
+â€¢ 'mod3' o 'mod4' o 'mod5' sÃ³lo estÃ¡ disponible en algunas plataformas.
+
+Los modificadores pueden mezclarse, separandolos con comas:
+
+WindowReduce {
+   key = less
+   modifier = control, alt
+}
+
+Si no especifica una lÃ­nea modificadora eso equivale a especificar 'none' 
+(ninguno).
+
+Puede tambiÃ©n aÃ±adir alias de teclas, como:
+
+Alias {
+  entry = Pause
+  key = p
+}
+
+Lo que significa que aÃ±ade otra pulsaciÃ³n de tecla a la entrada 'Pause', 
+pulsando 'p', tambiÃ©n puede aÃ±adir una secciÃ³n modificadora (ver arriba). 
+Si no la especifica, el modificador serÃ¡ el mismo que en la secciÃ³n 
+original ('Pause' en este caso).
+
+  Siguiendo la pista a nombres de teclas en X11: 
+
+  Para saber el nombre de una tecla en X11, podrÃ­a usar 'xev', que se 
+suministra con su paquete X11. Arranque 'xev' desde un xterm, dÃ©le el foco 
+a la ventanita, y pulse la tecla que quiera especificar.
+
+Entonces verÃ¡ algo como esto:
+
+KeyRelease event, serial 27, synthetic NO, window 0x3200001,
+         root 0x3c, subw 0x0, time 4144050914, (259,265), root:(272,319),
+         state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
+                                               ^^^^^^^^
+                                   Esto es lo que busca
+
+Sobre el botÃ³n del ratÃ³n, por ejemplo para usar la rueda del ratÃ³n, tiene 
+que seguir la pista a quÃ© botÃ³n se le asignarÃ¡ a una funciÃ³n, usando xev:
+
+ButtonRelease event, serial 27, synthetic NO, window 0x1200001,
+         root 0x3b, subw 0x0, time 2710360666, (107,87), root:(120,117),
+         state 0x1000, button 5, same_screen YES
+                       ^^^^^^^^
+               Este es el botÃ³n
+
+En este caso, tiene que poner "key = XButton_5". Las teclas modificadoras 
+tambiÃ©n se soportan con el manejo de botÃ³n de ratÃ³n.
+
+  Mostrando los atajos activos/remapeados:
+
+PodrÃ­a usar 'xine --keymap' o 'xine --keymap=default' para mostrar los 
+atajos por omisiÃ³n. Puede redirigir el resultado a un fichero, que puede 
+convertirse en el propio ~/.xine/keymap
+
+Para ver el resultado de un remapeado simplemente use 'xine 
+--keymap=remapped'.
+
+2.4.2 Seleccionando los canales de sonido
+
+Proporcione la opciÃ³n -a para seleccionar la pista de sonido deseada:
+
+xine --a 3 test.mpg
+
+reproduce la tercera pista de sonido disponible (y por supuesto, la 
+imagen).
+
+Alternativamente el igu (gui) puede ser usado para seleccionar un canal de 
+audio.
+
+2.4.3 Seleccionando los subtÃ­tulos
+
+Los subtÃ­tulos son incluidos en pistas diferentes como el sonido. En 
+general, la pista 0 es el subtÃ­tulo del idioma por omisiÃ³n. Use la opciÃ³n 
+-u para seleccionar la pista de subtÃ­tulo deseada:
+
+xine --u 0 test.vob
+
+muestra los subtÃ­tulos de la secuencia o flujo 0.
+
+Alternativamente el igu (gui) puede ser usado para seleccionar un canal de 
+subtÃ­tulos.
+
+2.4.4 LIRC
+
+xine puede ser controlado remotamente via infrarojos (IR). Para esto 
+deberÃ­a tener instalado LIRC ([http://www.lirc.org]).
+
+DeberÃ­a aÃ±adir algunas entradas en su ~/.lircrc, tales como 
+
+begin
+        remote = SAMSUNG
+        button = Button_Play
+        prog   = xine
+        repeat = 0
+        config = Play
+end
+
+begin
+        remote = SAMSUNG
+        button = Button_1
+        prog   = xine
+        repeat = 0
+        config = SetPosition10%
+end
+
+xine puede autogenerar un borrador de configuraciÃ³n para lirc, usando 'xine 
+--keymap=lirc', y entonces puede redirigir la salida a un fichero para 
+afinar la configuraciÃ³n.
+
+Cada entrada tendrÃ¡ este aspecto:
+
+# Reduce the output window size.
+
+begin
+       remote = xxxxx
+       button = xxxxx
+       prog   = xine
+       repeat = 0
+       config = WindowReduce
+end
+
+Es todo suyo para especificar el nombre remoto y asignar el botÃ³n.
+
+  Lista de reproducciÃ³n
+
+Para recuperar una lista de reproducciÃ³n de un complemento de entrada dado, 
+puede usar la plabra clave 'PlaylistFrom:', seguida del nombre del 
+complemento (el mismo que en el botÃ³n de la ventana del panel[Nota al pie:
+N. del T.: ObservaciÃ³n: es posible que algunos de estos nombres estÃ©n 
+traducidos. Si esto supone un problema, me (nos) gustarÃ­a saberlo para 
+corregirlo.
+]):
+
+# Retrieve playlist from NAV plugin.
+
+begin
+       remote = xxxxx
+       button = xxxxx
+       prog   = xine
+       repeat = 0
+       config = PlaylistFrom:NAV
+end
+
+2.4.5 Ajustando opciones de configuraciÃ³n en la lÃ­nea de Ã³rdenes
+
+Puede cambiar cualquier opciÃ³n (vea README.config_en) desde la lÃ­nea de 
+Ã³rdenes para anular el valor por omisiÃ³n en $HOME/.xine/config.
+
+Por ejemplo, puede hacer algo como:
+
+xine vcd://1 opt:media.vcd.device=/dev/cdrom2 vcd://1
+
+para cambiar el vcd_device entre la mitad de la repoducciÃ³n de dos mrls.
+
+Estos ajustes opcionales no se grabarÃ¡n en el fichero de configuraciÃ³n, son 
+solo temporales.
+
+3 Lo que queda por decir
+
+3.1 Libertad, DVDs y cosas...
+
+xine es software libre. â€œSoftware libreâ€ tiene que ver con ser â€œcÃ³digo 
+abiertoâ€. Sin embargo, el significado de â€œsoftware libreâ€ va mÃ¡s allÃ¡ de 
+simplemente eso: es sobre la libertade de los usuarios de software 
+(programas). Si tiene tiempo, por favor lea lo que la fundaciÃ³n del 
+software libre dice acerca de las cuestiones de libertad y software
+
+  => [http://www.gnu.org/philosophy/free-sw.html]
+
+Hay una amenaza especial a la libertad cuando hablamos de DVDs: la 
+industria del cine estÃ¡ haciendo enormes esfuerzos para restringir la 
+reproducciÃ³n de DVDs a dispositivos controlados. La mayorÃ­a de los DVDs que 
+se venden actualmente estÃ¡n encriptados de una manera propietaria - y en 
+algunos paises (especialmente E.E.U.U.), es posiblemente ilegal 
+descifrarlos - incluso para reproducciÃ³n privada. Esperanzadoramente, la 
+mayorÃ­a de la gente estarÃ¡ de acuerdo de que es una manera muy questionable 
+de tratar a los clientes. El proyecto xine condena estos esfuerzos de la 
+industria del cine - intentar prevenir pÃ©rdida de beneficios de ventas de 
+esa manera demuestra falta de respeto hacia todos sus clientes honestos. 
+Por otra parte, el proyecto xine estÃ¡ en contra de violar la ley existente. 
+Nadie sabe exactamente si es realmente ilegal en cualquier parte del mundo 
+escribir, poseer y usar software para ver DVDs cifrados. Pero como esto es 
+un tema no claro (que parece potencialmente muy peligroso), xine no 
+contiene nigÃºn cÃ³digo especÃ­fico para descifrar DVDs. Parece, sin embargo, 
+que terceras partes estÃ¡n trabajando en tales complementos. Posiblemente en 
+algunas partes es legal usarlos. De cualquier forma - no podrÃ¡ reproducir 
+DVDs con xine tal cual. Por favor, observe que esto no es un gazapo o una 
+â€œfuncionalidad que falteâ€, sino un problema genuinamente legal. SerÃ­a muy 
+bueno solucionar el problema (p.e., convenciendo a E.E.U.U. y/o la 
+industria del cine que estÃ¡n realmente molestando y siendo innecesariamente 
+injustos con sus clientes y tambiÃ©n usuarios y desarrolladores de software 
+libre), pero incluir cÃ³digo para descifrar DVDs en xine no solucionarÃ¡ este 
+problema.
+
+4 Contactando con el proyecto xine
+
+El sitio web del proyecto xine es
+
+  => [http://xine.sourceforge.net]
+
+Reacciones u ofertas de ayuda serÃ¡n muy apreciadas, por favor contacte:
+
+  => [mailto://xine-user@lists.sourceforge.net||la lista de usuarios de xine]
+
