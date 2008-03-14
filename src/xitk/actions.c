@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -201,6 +201,9 @@ void try_to_set_input_focus(Window window) {
  *
  */
 void gui_display_logo(void) {
+
+  if(!gGui->running) /* We are exiting and have no stream any longer! */
+    return;
 
   pthread_mutex_lock(&gGui->logo_mutex);
   
@@ -836,7 +839,6 @@ void gui_eject(xitk_widget_t *w, void *data) {
 
     if(gGui->playlist.num) {
       mediamark_t **mmk = NULL;
-      char         *tok = NULL;
       char         *mrl;
       size_t        tok_len = 0;
       int           new_num = 0;
