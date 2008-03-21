@@ -2,7 +2,6 @@
 #  head -n 3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] --exclude '*/session_ctrl.c' | sed -e 's:^\./::' >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
 src/xitk/actions.c
-src/xitk/config_wrapper.c
 src/xitk/control.c
 src/xitk/download.c
 src/xitk/errors.c
@@ -12,6 +11,7 @@ src/xitk/file_browser.c
 src/xitk/help.c
 src/xitk/i18n.h
 src/xitk/kbindings.c
+src/xitk/kbindings_common.c
 src/xitk/lang.c
 src/xitk/lirc.c
 src/xitk/main.c
@@ -25,6 +25,7 @@ src/xitk/post.c
 src/xitk/session.c
 src/xitk/setup.c
 src/xitk/skins.c
+src/xitk/skins_download.c
 src/xitk/snapshot.c
 src/xitk/splash.c
 src/xitk/stdctl.c
