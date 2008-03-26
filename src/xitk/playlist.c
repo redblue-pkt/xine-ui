@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -172,8 +172,8 @@ static void _playlist_xine_play(void) {
 
     if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
       gui_exit(NULL, NULL);
-
-    gui_display_logo();
+    else
+      gui_display_logo();
   }
 }
 /*

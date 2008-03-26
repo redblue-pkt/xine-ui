@@ -202,9 +202,6 @@ void try_to_set_input_focus(Window window) {
  */
 void gui_display_logo(void) {
 
-  if(!gGui->running) /* We are exiting and have no stream any longer! */
-    return;
-
   pthread_mutex_lock(&gGui->logo_mutex);
   
   gGui->logo_mode = 2;
@@ -755,8 +752,10 @@ void gui_play (xitk_widget_t *w, void *data) {
       if(!mediamark_have_alternates(&(gGui->mmk)) ||
 	 !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
 	
-	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT)) {
 	  gui_exit(NULL, NULL);
+	  return;
+	}
 	gui_display_logo();
       }
     }

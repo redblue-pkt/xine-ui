@@ -1326,12 +1326,13 @@ void gui_playlist_start_next() {
     
     if(gGui->playlist.cur >= gGui->playlist.num) {
       if(gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) {
-	if(gGui->actions_on_start[0] == ACTID_QUIT)
-	  gui_exit(NULL, NULL);
-
 	gGui->playlist.cur--;
 	mediamark_reset_played_state();
-	gui_display_logo();
+
+	if(gGui->actions_on_start[0] == ACTID_QUIT)
+	  gui_exit(NULL, NULL);
+	else
+	  gui_display_logo();
 	return;
       }
       else if(gGui->playlist.loop == PLAYLIST_LOOP_LOOP) {
@@ -1357,8 +1358,8 @@ void gui_playlist_start_next() {
 	goto __shuffle_restart;
       else if(gGui->actions_on_start[0] == ACTID_QUIT)
       	gui_exit(NULL, NULL);
-      
-      gui_display_logo();
+      else
+	gui_display_logo();
       return;    
     }
     break;
@@ -1370,8 +1371,10 @@ void gui_playlist_start_next() {
   switch(gGui->playlist.loop) {
 
   case PLAYLIST_LOOP_NO_LOOP:
-    if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+    if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT)) {
       gui_exit(NULL, NULL);
+      return;
+    }
     break;
 
   case PLAYLIST_LOOP_LOOP:
