@@ -1,6 +1,6 @@
 #warning IMPLEMENT POST SUPPORT
 /*
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -86,6 +86,10 @@
 #define COMMANDS_PREFIX      "/\377\200COMMANDS"
 
 #ifdef NETWORK_CLIENT
+
+#ifndef INADDR_NONE
+#define INADDR_NONE ((unsigned long) -1)
+#endif
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -610,7 +614,7 @@ static int sock_client(const char *host, const char *service, const char *transp
       sock_err("Unknown host: %s\n", host);
       return -1;
     }
-    memcpy(&fsin.in.sin_addr, ihost->h_addr, ihost->h_length);
+    memcpy(&fsin.in.sin_addr, ihost->h_addr_list[0], ihost->h_length);
   }
   
   if(connect(sock, &fsin.sa, sizeof(fsin.in)) < 0) {
