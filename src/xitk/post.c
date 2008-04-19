@@ -1113,23 +1113,40 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     p = pobj->api->get_help();
     
     do {
-      char c;
-      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
+      char c, *old_p = p, *new_p;
+      int w;
 
-      hbuf[lines]    = malloc(BROWSER_LINE_WIDTH+1);
+      for(w = 0; !__line_wrap(p,w,BROWSER_LINE_WIDTH) && (c = *p++) != 0 && c != '\n'; w++)
+	if (c == '\t') {
+	  w = (w + 1) | 7; /* allow for loop increment */
+	  if (w >= BROWSER_LINE_WIDTH)
+	    w = BROWSER_LINE_WIDTH - 1;
+        }
+
+      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
+      hbuf[lines]    = malloc(w + 2);
       hbuf[lines+1]  = NULL;
 
-      for(i = 0; !__line_wrap(p,i,BROWSER_LINE_WIDTH) && (c = *p++) != 0 && c != '\n'; i++)
-	if (c == '\t') {
+      new_p = p;
+      p = old_p;
+      for(i = 0; i < w; i++)
+        switch (c = *p++) {
+        case '\0':
+        case '\n':
+          hbuf[lines][i] = '\0';
+          i = w;
+          break;
+        case '\t':
 	  do {
 	    hbuf[lines][i] = ' ';
 	  } while (++i & 7 && i < BROWSER_LINE_WIDTH);
 	  --i; /* allow for loop increment */
-        }
-	else
+	  break;
+        default:
 	  hbuf[lines][i] = c;
-
+        }
       hbuf[lines][i] = '\0';
+      p = new_p;
 
       lines++;
     } while( *p );
