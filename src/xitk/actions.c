@@ -1176,10 +1176,6 @@ static void *_gui_set_current_position(void *data) {
     return NULL;
   }
   
-  pthread_mutex_lock(&new_pos_mutex);
-  gGui->new_pos = pos;
-  pthread_mutex_unlock(&new_pos_mutex);
-  
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
     if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
       gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
@@ -1215,6 +1211,10 @@ static void *_gui_set_current_position(void *data) {
      (!strcmp(gGui->playlist.mmk[gGui->playlist.cur]->mrl, gGui->mmk.mrl)))
     update_mmk = 1;
   
+  pthread_mutex_lock(&new_pos_mutex);
+  gGui->new_pos = pos;
+  pthread_mutex_unlock(&new_pos_mutex);
+
   do {
     int opos;
     
@@ -1312,19 +1312,18 @@ void gui_set_current_position (int pos) {
   int        err;
   pthread_t  pth;
 
+  pthread_mutex_lock(&new_pos_mutex);
   if(gGui->new_pos == -1) {
-    
+    pthread_mutex_unlock(&new_pos_mutex);
     if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)pos)) != 0) {
       printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
       abort();
     }
   }
   else {
-    pthread_mutex_lock(&new_pos_mutex);
     gGui->new_pos = pos;
     pthread_mutex_unlock(&new_pos_mutex);
   }
-
 }
 
 void gui_seek_relative (int off_sec) {
