@@ -1,196 +1,688 @@
 .\" -*-Nroff-*-
-.\""
-.TH XINE 1 2001-07-18 "El proyecto Xine"
-.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
-.\" other parms are allowed: see man(7), man(1)
-.\""
-.SH NOMBRE
+.\" 
+.\" NAME (see TH below) should be all caps, SECTION should be 1-8, 
+.\" maybe w/ subsection other parms are allowed: see man(7), man(1)
+.\" 
+.\" CER: Traducción revisada 2008-02-07 - codificación latin1
+.\" 
+.TH "XINE" "1" "2002-04-06" "El proyecto xine" ""
+.SH "NOMBRE"
 xine \- un reproductor libre de vídeo
-.SH SINOPSIS
+.SH "SINOPSIS"
 .B xine
 .I "[opciones] [MRL] ..."
-.SH "DESCRIPCIÒN"
-Esta página del manual documentan brevemente al reproductor de sonido/imágen
-.BR Xine
+.SH "DESCRIPCIÓN"
+Esta página del manual documenta brevemente al reproductor de sonido/imagen
+.BR xine
 .
-.PP
-.B Xine
-reproduce secuencias MPEG (sonido e imágen), secuencias elementales mpeg 
-(ej.: archivos .mp3 ó .mpv), archivos avi (usando codecs win32), (S)VCDs 
-y DVDs.
-.SH OPCIONES
-El programa sigue las sintaxis usuales de líneas de comando GNU, con 
-largas opciones comenzando con dos rayas (`-').
-Debajo están incluidas un conjunto de opciones.
-Para una descripción completa, vea la \fIFAQ_es\fP y el \fIREAME_es\fP en 
-\fI@XINE_DOCDIR@\fP o en la página inicial de Xine.
-.TP
-.B \-h, \-\-help (ayuda)
-Muestra el conjunto de opciones y los controladores de salida disponibles 
-(plugins).
-.TP
-.B \-a, \-\-audio\-channel <num> (canal de audio <número>
-Selecciona le canal de sonido dado. <num> es el número del canal de sonido, 
-por omisión es el "0".
-.br
-Xine 0.5 y superiores prueba la mejor colección de todos los canales válidos 
-de secuenias de sonido (ac3, sonido mpeg, sonido avi, ...) y asignandoles
-"canales virtuales" con números de canales comenzado en 0.
-.TP
-.B \-V, \-\-video\-driver <drv>
-Selección del controlador de vídeo. Mire "xine --help" 
-para una lista de plugins de salida de vídeo disponibles en su sistema.
-Esta selección es almacenada automaticamente en su .xinerc por lo 
-que tendrá que especificar sólo una vez el controlado de vídeo.
-.TP
-.B \-A, \-\-audio\-driver <drv>
-Selección del controlador de sonido. Mire "xine --help" 
-para una lista de plugins de salida de sonido disponibles en su sistema.
-Esta selección es almacenada automaticamente en su .xinerc por lo 
-que tendrá que especificar sólo una vez el controlado de sonido.
-.TP
-.B \-u, \-\-spu\-channel <num>
-Selección de los subtítulos. <num> es la identificación del subtítulo elegido,
-por defecto no se selecciona ningún subtítulo (-1).
-.TP
-.B \-p[f][h][q][d][v]
-Comenzar la reproducción despúes de iniciado Xine. Puede ser seguido
-por "f" para pasar al modo de pantalla completa y/o "h" para esconder
-la GUI (Interfaz Gráfica del Usuario), y/o "q" para salir al finalizar la reproducción. Es también
-posible pedir la lista de reprodución del DVD 'd' o el VCD 'v'.
-.TP
-.B \-R, \-\-recognize\-by <option>
-Cambio de la manera en que Xine tratará de reconocer los tipos de secuencias de vídeo.
-Las opciones válidas son: 
-.br
-"default" ("por omisión") (primero por contenido, despúes por extensión),
-.br
-"revert" ("inverso") (primero por extensión,luego por contenido),
-.br
-"content" ("contenido") (solo por contenido),
-.br
-"extension" ("extensión") (solo por extensión). Si ninguna opción es dada, 
-la opción "revert" es seleccionada.
-.TP
-.B MRL (media resource locator)
-.br
-Los MRLs son similares a las URLs en su navegador de internet. Ellos describen
-los medios de donde leer. MRLs válidos pueden ser nombres de archivos simples
-o uno de los siguientes:
+.PP 
+.B xine
+reproduce secuencias MPEG (sonido e imagen), secuencias elementales mpeg
+(ej.: ficheros .mp3 ó .mpv), secuencias de transporte mpeg, ficheros ogg,
+avi, asf, quicktime, (S)VCDs y DVDs y mucho más.
+.SH "OPCIONES"
+Los programas siguen las sintaxis usuales de línea de órdenes GNU, con
+opciones largas comenzando con dos rayas (`\-\-'). Debajo se incluye un
+resumen de las opciones. Para una descripción completa, vea el
+\fIREADME_es\fP y el \fIFAQ_es\fP en \fI@XINE_DOCDIR@\fP o en la página web
+de xine.
+.TP 
+.BI \-h,\ \-\-help
+(Ayuda) Muestra el conjunto de opciones y los controladores de salida disponibles 
+(complementos).
+.TP 
+.BI \-\-verbose [=nivel]
+Ajusta la cantidad de verborrea.
+.TP 
+.BI \-\-config <fichero>
+Use el fichero \fBconfig\fP en lugar del de por omisión.
+.TP 
+.BI \-a,\ \-\-audio\-channel\  <núm>
+Selecciona el canal de audio dado. <núm> es el número del canal de sonido, 
+por omisión es el \fB0\fP.
+.br 
+xine 0.5 y superiores intenta lo mejor que puede en averiguar todos los
+canales válidos del flujo (ac3, audio mpeg, avi, ...) y mapeándolos a
+"canales virtuales" con números de canales comenzado en \fB0\fP.
+.TP 
+.BI \-V,\ \-\-video\-driver\  <ctrl>
+Selección del controlador de vídeo. Mire \fIxine\ \-\-help\fP 
+para una lista de complementos de salida de vídeo disponibles en su sistema.
+Esta selección es almacenada automáticamente en su \fI~/.xine/config\fP por lo 
+que tendrá que especificar sólo una vez el controlador de vídeo.
+.TP 
+.BI \-A,\ \-\-audio\-driver\  <ctrl>
+Selección del controlador de sonido. Mire \fIxine\ \-\-help\fP 
+para una lista de complementos de salida de sonido disponibles en su sistema.
+Esta selección es almacenada automáticamente en su \fI~/.xine/config\fP por lo 
+que tendrá que especificar sólo una vez el controlador de sonido.
+.TP 
+.BI \-u,\ \-\-spu\-channel\  <núm>
+Selección de subimagen (subtítulos). \fI<núm>\fP es la identificación del canal de subtítulo elegido; por defecto no se selecciona ningún subtítulo (\fB\-1\fP).
+.TP 
+.BI \-p,\ \-\-auto\-play= [f][F][h][w][q][d][v]
+Comenzar la reproducción inmediatamente después de haber iniciado xine.
+Puede estar seguido por:
+.br 
+`\fIf\fP' en modo de pantalla completa,
+.br 
+`\fIF\fP' en modo xinerama a pantalla completa,
+.br 
+`\fIh\fP' esconde IGU (panel principal, etc...),
+.br 
+`\fIw\fP' esconde la pantalla de salida de vídeo,
+.br 
+`\fIq\fP' para salir después de la reproducción,
+.br 
+Es también posible pedir la lista de reproducción al DVD `\fId\fP'' o al VCD `\fIv\fP'. Hay ahora una opción más genérica para eso, \fI\-\-auto\-scan\fP, (ver abajo).
+.TP 
+.TP 
+.BI \-s,\ \-\-auto\-scan\  <complemento>
+Auto\-explorar la lista de reproducción desde el complemento de entrada nombrado.
+Muchos complementos permiten leer una lista de reproducción por defecto con objeto de reproducir  \fBtodo\fP.
+Esto funciona muy bien para DVDs o VCDs, por ejemplo. Poner esta opción tiene el mismo efecto que pulsar el botón adecuado en el panel principal de xine.
 
-.BR file://<ruta 
-o 
-.BR trayectoria>
-.br
-.BR fifo://<ruta 
-o 
-.BR trayectoria>
-.br
-.BR stdin://mpeg1
-o
-.BR "stdin://mpeg2"
-.br
-.BR dvd://VTS_xx_y.VOB
-.br
-.BR "vcd://<número de pista>"
-.br
-.BR "net://???"
-.LP
-Varias MRLs pueden ser especificadas en el orden consecutivo en que 
-las secuencias se van a reproducir.
-.LP
-Si no especifica ningún MRL,tendrá que seleccionar un archivo, arrastrarlo 
-y soltarlo. Archivos arrastrados del Midnight Commander de GNOME (gmc) se 
-sabe que funciona.
+Esta opción es especialmente útil en combinación con auto\-reproducción (auto\-play).
+Podría arrancar \fIxine\~\-\-auto\-play\~\-\-auto\-scan\~dvd\fP con objeto de reproducir un DVD entero sin pulsar ningún botón adicional. 
+Esto también funciona para complementos que no se suministran con xine, ¡basta dar el nombre del botón que el complemento deseado añade al panel de xine!
+.TP 
+.B \-f,\ \-\-fullscreen
+Cambiar xine a modo pantalla completa al arrancar (como si pulsase `\fBf\fP')
+.TP 
+.B \-F,\ \-\-xineramafull
+Cambiar xine a modo xinerama en pantalla completa al arrancar (como si pulsase `\fBF\fP').
+Es decir, trata de expandir la visualización a varias pantallas. Las pantallas se definen en el fichero de configuración.
+.TP 
+.B \-g, \-\-hide\-gui
+Esconde todas las ventanas IGU (excepto la ventana de vídeo) al arrancar. Esto es lo mismo que si pulsase `\fBG\fP' dentro de xine.
+.TP 
+.B \-H, \-\-hide\-video
+Esconde la ventana de salida de vídeo.
+.TP 
+.B \-L, \-\-no\-lirc
+Desconecta el soporte LIRC (infrarrojos). Esta opción está \fIdisponible \~únicamente\fP si xine ha sido compilado con soporte LIRC.
+.TP 
+.BI \-\-visual\  <clase\-visual\-o\-id>
+Intenta usar una visual específica del servidor X11 para las ventanas de xine.
+El parámetro \fI<clase\-visual\-o\-id>\fP es o bien el nombre de una clase visual X11 (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, \fBTrueColor\fP o \fBDirectColor\fP (trad: gris estático, escala de grises, color estático, pseudo color, color verdadero o color directo)) o el valor \fBhexadecimal\fP de una visual X11 específica.
+
+Cuando se usa con el nombre de una clase visual, xine intenta encontrar tal visual con una profundidad de \fB15\fP o \fB16\fP, \fB24\fP, \fB32\fP u \fB8\fP (en ese orden).
+La clase visual por omisión usada por xine en ausencia de una opción \fI\-\-visual\fP es \fBTrueColor\fP.
+
+Si no encuentra una visual usable, xine se retrae a la visual por omisión usada en la ventana raíz del servidor X11.
+.TP 
+.B \-\-install
+Cuando se use una visual X11 con colores cambiables (mapa de color), instala un mapa de color privado para xine. Con un mapa de color privado, xine puede ubicar más colores de modo que la salida de vídeo pueda verse mejor.
+.TP 
+.BI \-\-keymap\  [=opción]
+Muestra el mapa de teclado. Las opciones son:
+.br 
+`\fBdefault\fP' muestra el mapa de teclado por omisión,
+.br 
+`\fBlirc\fP' muestra un borrador de un fichero \fI~/.lircrc\fP de configuración,
+.br 
+`\fBremapped\fP' tabla del usuario de mapa de teclado remapeado,
+.br 
+`\fBfile:<fichero>\fP' usa \fBfichero\fP como tabla de mapa de teclado.
+.br 
+Si no se da una opción, se selecciona `\fBdefault\fP'.
+.TP 
+.B \-n, \-\-network
+Activa control de servidor remoto por red.
+Para usar el control de servidor remoto por red, se requiere un fichero de contraseña.
+Si xine no puede encontrarlo, el servidor se para.
+La sintaxis del fichero de contraseña sigue el esquema (acostumbrado)
+<\fIidentificación\fP>:<\fIcontraseña\fP>. Puesto que la criptografía tiene problemas legales en algunos países, la contraseña no está cifrada y se transmite sin cifrar, así que tenga cuidad con conexiones remotas.
+También están disponibles dos reglas (opcionales) genéricas (una cada vez)
+.nf 
+\fBALL:ALLOW\fP o \fBALL:DENY\fP
+.fi 
+En el primer caso, todos los clientes pueden ejecutar todas las ordenes disponibles, sin restricción.
+En el segundo caso, nadie puede ejecutar ninguna orden, excepto los usuarios identificados (usando la orden 'identify').
+
+Si una entrada de contraseña empieza con un asterisco `\fB*\fP', 
+el usuario es bloqueado. Si una contraseña está vacía, 
+la entrada completa se ignora. Aquí está un ejemplo de un pequeño fichero \fI~/.xine/passwd\fP:
+.nf 
+
+ALL:DENY
+daniel:mypasswd
+foo:*
+
+.fi 
+Esto permite sólo a 'daniel' ejecutar órdenes,
+después de una identificación exitosa.
+
+El puerto por omisión del servidor es \fB6789\fP; éste número es totalmente arbitrario. Puede conectar al servidor usando una simple orden \fItelnet\fP:
+.nf 
+\fBtelnet\~localhost\~6789\fP
+.fi 
+Para cambiar el puerto por omisión, puede editar (como root), su fichero  \fI/etc/services\fP, y añadir una entrada como ésta:
+.nf 
+
+xinectl    7890/tcp        # control de xine
+
+.fi 
+Esto cambiará su puerto por omisión de 6789 a 7890, y creará un servicio "humano" llamado \fIxinectl\fP.
+
+El propio servidor ofrece ayuda de órdenes/sintaxis:
+.br 
+.BI help\  [orden]
+.br 
+Sin especificar \fIorden\fP, se mostrarán todas las órdenes disponibles. 
+Si se especifica una orden, se dará un breve texto acerca de la funcionalidad de la orden.
+.br 
+.BI syntax\  <orden>
+.br 
+Muestra la sintaxis de la \fIorden\fP.
+.TP 
+.B \-R, \-\-root
+Use la ventana raíz como ventana de vídeo.
+.TP 
+.BI \-G,\ \-\-geometry\  <WxH[+X+Y]>
+Puede poner el tamaño y posición de la salida de vídeo usando parámetros de
+geometría como en las X (vea \fBX\fR(7)). Los desplazamientos \fBX\fP e
+\fBY\fP son opcionales.
+.TP 
+.B \-B, \-\-borderless
+Quitar los bordes de la ventana de vídeo, en el modo de ventana.
+.TP 
+.BI \-N,\ \-\-animation\  <mrl>
+Especificar una o más mrl a reproducir con flujos de sólo audio.
+.TP 
+.BI \-P,\ \-\-playlist\  <fichero>
+Use fichero como lista de reproducción. Los formatos conocidos son: asx, toxine, m3u, pls, sfv y fichero de texto puro.
+.TP 
+.BI \-l,\ \-\-loop\  [=mode]
+Poner modo de lista de reproducción en bucle. Si no se especifica el modo se usa modo \fBloop\fP. Los modos posibles son:
+.br 
+\fBloop\fP: bucle completo de toda la lista.
+.br 
+\fBrepeat\fP: repetir el ítem actual de la lista.
+.br 
+\fBshuffle\fP: seleccionar al azar una entrada de la lista entre los no reproducidos todavía.
+.br 
+\fBshuffle\+\fP: igual que "shuffle", pero reproduciendo indefinidamente la lista.
+.TP 
+.BI \-\-skin\-server\-url\  <url>
+Define la url del servidor de pieles.
+.TP 
+.BI \-\-enqueue\  <mrl> ...
+.br 
+Encola uno o más mrls en una sesión en ejecución (sesión 0). 
+.br 
+Si desea especificar otra sesión, use la opción \fB\-S session=\fP\fIx\fP. 
+.TP 
+.BI \-S,\ \-\-session\  <option1,option2,...>
+.br 
+Gestión de sesiones. Todas las opciones pueden usarse más de una vez, excepto \fBsession\fP.
+.br 
+Las opciones son:
+.br 
+\fBsession=\fP\fIn\fP especifica número \<\fIn\fP\> de sesión,
+.br 
+\fBmrl=\fP\fIm\fP     añade mrl \<\fIm\fP\> a la lista de reproducción,
+.br 
+\fBaudio=\fP\fIc\fP   selecciona canal de audio (\<\fIc\fP\>: \fBnext\fP o \fBprev\fP),
+.br 
+\fBspu=\fP\fIc\fP     seleccionar canal spu (subtítulos) (\<\fIc\fP\>: \fBnext\fP o \fBprev\fP),
+.br 
+\fBvolume=\fP\fIv\fP  poner el volumen de audio (\<\fIv\fP\>: 0 a 100),
+.br 
+\fBamp=\fP\fIv\fP     poner amplificación de audio de la instancia (\<\fIv\fP\>: 0 a 200),
+.br 
+\fBloop=\fP\fIm\fP    poner modo bucle (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP o \fBshuffle+\fP),
+.br 
+\fBget_speed\fP       saca el estado de la velocidad actual. Los valores devueltos son:
+    \- 1: error
+    \- 2: stop (parado)
+    \- 3: play (reproducción)
+    \- 4: pause (pausa)
+    \- 5: slow4 (lento 4)
+    \- 6: slow2 (lento 2)
+    \- 7: fast2 (rápido 2)
+    \- 8: fast4 (rápido 4)
+.br 
+\fBget_time[=p|pos]\fP saca la posición actual en segundos, o en posición en el flujo (0..65535).
+.br 
+(\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP    (lista de reproducción)
+.br 
+  \<\fIp\fP\> puede ser:
+.br 
+    \fBclear\fP:     borrar la lista de reproducción,
+    \fBfirst\fP:     reproducir la primera entrada de la lista,
+    \fBprev\fP:     reproducir la entrada anterior de la lista,
+    \fBnext\fP:     reproducir la entrada siguiente de la lista,
+    \fBlast\fP:     	reproducir la última entrada de la lista,
+    \fBload:\fP\fIs\fP:    leer fichero de lista <\fIs\fP>,
+    \fBstop\fP:      detener la reproducción al final de la reproducción actual,
+    \fBcont\fP:      continuar la reproducción al final de la reproducción actual.
+.br 
+Hay también algunas opciones auto explicativas:
+    \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP 
+.B \-Z
+No empezar automáticamente la reproducción, afecta únicamente auto\-start cuando se usa el modo inteligente (smart).
+.TP 
+.BI \-D,\ \-\-deinterlace\  [post[:..][;]]
+Desentrelazar la salida de vídeo. Puede invalidar las opciones de configuración de post tratamientos usado para desentrelazar la imagen de salida. Vea \fI\-\-post\fP para la sintaxis.
+.TP 
+.BI \-r,\ \-\-aspect\-ratio\  <modo>
+Define la razón de aspecto de la salida de vídeo. \<\fImodo\fP\> puede ser:
+\fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP (auto,
+cuadrado, 4:3, anamórfico, dvb).
+.TP 
+.BI \-\-broadcast\-port\  <port>
+Define el puerto del difusor de xine (lado maestro), el exclavo es arrancado
+con 'xine slave://dirección:puerto'
+.TP 
+.BI \-\-no\-logo
+No mostrar el logo.
+.TP 
+.BI \-E,\ \-\-no\-reload
+No recargar la antigua lista de reproducción. La lista se graba cuando se sale de xine, entonces es recargada y reproducida la siguiente vez que lanza xine. Ésta característica puede ser desactivada en la pantalla de configuración.
+.TP 
+.BI \-\-post\  <complemento>[:parámetro=valor][,...][;...]
+Carga uno o más post\-complemento(s). Los parámetros se separan con comas. Esta opción puede usarse más de una vez para encadenar dos o más complementos de postproceso. Puede especificar dos o más complementos, que pueden estar separados por un punto y coma ';'.
+.TP 
+.BI \-\-disable\-post
+No activar post\-complemento(s). De esta forma, puede especificar uno o más complementos a usar, mediante la opción de orden de terminal \-\-post, pero no activa esos efectos.
+.TP 
+.BI \-\-no\-splash
+No muestra la pantalla de bienvenida.
+.TP 
+.B \-\-stdctl
+Activa el control de xine mediante STDIN.
+.TP 
+.BI \-T,\ \-\-tvout <motor>
+Activa el soporte de TVout. \<\fImotor\fP\> puede ser: nvtv, ati.
+.TP 
+.BI \-\-list\-plugins [=tipo]
+Muestra la lista de complementos disponibles. \<\fItipo\fP\> opcional puede ser: 
+audio_out, video_out, demux, input, sub, post, audio_decoder, video_decoder.
+.TP 
+.BI \-\-bug\-report [=mrl]
+Activa el modo de reporte de gazapos. Activa la verbosidad, recoge todos los mensajes de salida y los escribe en un fichero llamado BUG\-REPORT.TXT. Si se pone \<\fImrl\fP\>, xine reproducirá esa mrl y saldrá (igual que \-pq).
+.br 
+.LP 
+Si no especifica ninguna MRL, deberá seleccionar un fichero mediante arrastrar y soltar.
+Se sabe que funciona arrastrar ficheros desde \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP o \fBKonqueror\fP.
+.br 
+.SH "MRL (localizador de recursos multimedia)"
+Las MRLs son similares a las URLs de su navegador. Describen el medio del que se va a leer. La página \fBxine\fP(5) lo describen con algún detalle. xine extiende la sintaxis como sigue:
+.TP 
+.BI <mrl>::<fichero_de_subtítulos>
+Ésta es la manera especifica de xine\-ui de definir el fichero de subtítulos a usar. El nombre de fichero será extraído por el frontal, lo que permite cambiarlo, guardarlo en una lista de reproducción, etc...
+.br 
+.SH "OPCIONES DE FLUJOS"
+.br 
+Después de un delimitador \fB#\fP puede añadir varios parámetros de flujo:
+.TP 
+.B novideo
+el vídeo se ignorará
+.TP 
+.B noaudio
+el audio se ignorará
+.TP 
+.B nospu
+los subtítulos (subpictures) se ignorarán
+.TP 
+.BI demux: <nombre\ demux>
+especifica el complemento demultiplexador a usar
+.TP 
+.BI volume: <nivel>
+ajusta el nivel del volumen de audio
+.TP 
+.BI compression: <nivel>
+ajusta el rango de compresión dinámica de audio
+.TP 
+.BI <entrada\ de\ configuración> : <valor\ de\ configuración>
+asigna un nuevo valor a cualquier entrada de la configuración
+.TP 
+.B cambiar la configuración 'al vuelo':
+.br 
+Puede cambiar una opción de la configuración en cualquier momento, usando el
+estilo especial cfg:/ mrl. La sintaxis es:
+.br 
+	cfg:/<entrada\ de\ configuración> : <valor\ de\ configuración>
+.br 
+Contrariamente a la opción de configuración del flujo, puede cambiar
+cualquier cosa \fIantes\fP de reproducir el flujo.
+.SH "TECLAS DE CONTROL"
+Muchas de las características pueden ser controladas presionando las teclas
+de control. `\fBM\-\fP' es la tecla Meta (tecla `\fBAlt\fP' en el teclado
+del PC), `\fBC\-\fP' es la tecla de Control o `\fBCTRL\fP'; otras teclas
+especiales se delimitan con los caracteres `\fB<\fP' y `\fB>\fP', p.e. la
+tecla `\fBHOME\fP' se muestra como \fB<home>\fP. Las ligazones por defecto
+son:
+.IP "\fB\<Return\>\fP"
+Comienza la reproducción
+.IP "\fB\<barra espaciadora>\fP"
+Pausa/continua la reproducción
+.IP "\fBS\fP"
+Para la reproducción
+.IP "\fBt\fP"
+Toma una foto
+.IP "\fBe\fP"
+Expulsa el medio actual
+.IP "\fB\<AvPág\>\fP"
+Selecciona y reproduce la MRL siguiente de la lista
+.IP "\fB\<RePág\>\fP"
+Selecciona y reproduce el MRL anterior de la lista
+.IP "\fBl\fP"
+Conmuta el modo de bucle
+.IP "\fBC\fP\-\fBs\fP"
+Explora la lista para recoger información de los flujos
+.IP "\fBC\fP\-\fBa\fP"
+Añade una marca de medios desde la reproducción actual
+.IP "\fBC\fP\-\fBe\fP"
+Edita la marca de medios seleccionada
+.IP "\fB\<Izquierda\>\fP"
+Va a la posición \-60 segundos en el flujo actual
+.IP "\fB\<Derecha\>\fP"
+Va a la posición +60 segundos en el flujo actual
+.IP "\fBM\fP\-\fB\<Izquierda\>\fP"
+Va a la posición \-30 segundos en el flujo actual
+.IP "\fBM\fP\-\fB\<Derecha\>\fP"
+Va a la posición +30 segundos en el flujo actual
+.IP "\fBC\fP\-\fB\<Izquierda\>\fP"
+Va a la posición \-15 segundos en el flujo actual
+.IP "\fBC\fP\-\fB\<Derecha\>\fP"
+Va a la posición +15 segundos en el flujo actual
+.IP "\fBM3\fP\-\fB\<Izquierda\>\fP"
+Va a la posición \-7 segundos en el flujo actual
+.IP "\fBM3\fP\-\fB\<Derecha\>\fP"
+Va a la posición +7 segundos en el flujo actual
+.IP "\fBC\fP\-\fB0\fP"
+Va a la posición del inicio del flujo actual
+.IP "\fBC\fP\-\fB1\fP"
+Va a la posición 10% del flujo actual
+.IP "\fBC\fP\-\fB2\fP"
+Va a la posición 20% del flujo actual
+.IP "\fBC\fP\-\fB3\fP"
+Va a la posición 30% del flujo actual
+.IP "\fBC\fP\-\fB4\fP"
+Va a la posición 40% del flujo actual
+.IP "\fBC\fP\-\fB5\fP"
+Va a la posición 50% del flujo actual
+.IP "\fBC\fP\-\fB6\fP"
+Va a la posición 60% del flujo actual
+.IP "\fBC\fP\-\fB7\fP"
+Va a la posición 70% del flujo actual
+.IP "\fBC\fP\-\fB8\fP"
+Va a la posición 80% del flujo actual
+.IP "\fBC\fP\-\fB9\fP"
+Va a la posición 90% del flujo actual
+.IP "\fB\<Arriba\>\fP"
+Aumenta la velocidad de reproducción
+.IP "\fB\<Abajo\>\fP"
+Disminuye la velocidad de reproducción
+.IP "\fBM\fP\-\fB\<Abajo\>\fP"
+Repone la velocidad de reproducción
+.IP "\fBV\fP"
+Aumenta el volumen de audio
+.IP "\fBv\fP"
+Disminuye el volumen de audio
+.IP "\fBC\fP\-\fBV\fP"
+Aumenta el nivel de amplificación
+.IP "\fBC\fP\-\fBv\fP"
+Disminuye el nivel de amplificación
+.IP "\fBC\fP\-\fBA\fP"
+Repone la amplificación a su valor por omisión
+.IP "\fBC\fP\-\fBm\fP"
+Audio mudo/activo
+.IP "\fB\<más\>\fP"
+Selecciona el siguiente canal de audio
+.IP "\fB\<menos\>\fP"
+Selecciona el canal de audio anterior
+.IP "\fB\<punto\>\fP"
+Selecciona el siguiente canal de sub imagen  (subtítulos)
+.IP "\fB\<coma\>\fP"
+Selecciona el canal anterior de sub imagen  (subtítulos)
+.IP "\fBi\fP"
+Conmutador de modo entrelazado
+.IP "\fBa\fP"
+cambia razón de aspecto
+.IP "\fB\<menor\>\fP"
+Reduce el tamaño de la ventana de salida en un factor de 1.2
+.IP "\fB\<mayor\>\fP"
+Agranda el tamaño de la ventana de salida en un factor de 1.2
+.IP "\fBM\fP\-\fB1\fP"
+Pone el tamaño de la ventana de vídeo al 50%
+.IP "\fBM\fP\-\fB2\fP"
+Pone el tamaño de la ventana de vídeo al 100%
+.IP "\fBM\fP\-\fB3\fP"
+Pone el tamaño de la ventana de vídeo al 200%
+.IP "\fBz\fP"
+Zoom adentro
+.IP "\fBZ\fP"
+Zoom afuera
+.IP "\fBC\fP\-\fBz\fP"
+Zoom adentro horizontal
+.IP "\fBC\fP\-\fBZ\fP"
+Zoom afuera horizontal
+.IP "\fBM\fP\-\fBz\fP"
+Zoom adentro verticalmente
+.IP "\fBM\fP\-\fBZ\fP"
+Zoom afuera verticalmente
+.IP "\fBC\fP\-\fBM\fP\-\fBz\fP"
+Reiniciar el  zoom
+.IP "\fBs\fP"
+Reajusta el tamaño de la ventana de salida al tamaño del flujo
+.IP "\fBf\fP"
+Conmutador de ventana completa
+.IP "\fBF\fP"
+Conmutador de ventana completa en xinerama
+.IP "\fBb\fP"
+Conmutador de apariencia de los bordes de la ventana de vídeo
+.IP "\fB\<Escape\>\fP"
+Saltar al menú de medios
+.IP "\fB\<F1\>\fP"
+Saltar al menú de título
+.IP "\fB\<F2\>\fP"
+Saltar al menú raíz
+.IP "\fB\<F3\>\fP"
+Saltar al menú de sub\-imagen
+.IP "\fB\<F4\>\fP"
+Saltar al menú de audio
+.IP "\fB\<F5\>\fP"
+Saltar al menú de ángulo
+.IP "\fB\<F6\>\fP"
+Saltar al menú de parte
+.IP "\fB\<Arriba en teclado numérico\>\fP"
+Navegar por el menú hacia arriba
+.IP "\fB\<Abajo en teclado numérico\>\fP"
+Navegar por el menú hacia abajo
+.IP "\fB\<Izquierda en teclado numérico\>\fP"
+Navegar por el menú hacia la izquierda
+.IP "\fB\<Derecha en teclado numérico\>\fP"
+Navegar por el menú hacia la derecha
+.IP "\fB\<Intro en teclado numérico\>\fP"
+Seleccionar menú
+.IP "\fB\<AvPág en teclado numérico\>\fP"
+Saltar al siguiente capítulo
+.IP "\fB\<RePág en teclado numérico\>\fP"
+Saltar al siguiente capítulo
+.IP "\fB\<Inicio en teclado numérico\>\fP"
+Seleccionar siguiente ángulo
+.IP "\fB\<Fin en teclado numérico\>\fP"
+Seleccionar ángulo anterior
+.IP "\fBM\fP\-\fBh\fP"
+Conmutador de visibilidad de la ventana de ayuda
+.IP "\fBM\fP\-\fBP\fP"
+Conmutador de visibilidad de la ventana de post\-efectos de vídeo
+.IP "\fBC\fP\-\fBM\fP\-\fBP\fP"
+Conmuta uso de post efectos
+.IP "\fBh\fP"
+Conmuta la visibilidad de la ventana de salida
+.IP "\fBg\fP"
+Conmuta la visibilidad de la ventana de interfase de usuario
+.IP "\fBM\fP\-\fBc\fP"
+Conmuta la visibilidad de la ventana de control
+.IP "\fBM\fP\-\fBm\fP"
+Conmuta la visibilidad de la ventana de navegación de mrl
+.IP "\fBM\fP\-\fBp\fP"
+Conmuta la visibilidad de la ventana de edición de lista de reproducción
+.IP "\fBM\fP\-\fBs\fP"
+Conmuta la visibilidad de la ventana de configuración
+.IP "\fBM\fP\-\fBe\fP"
+Conmuta la visibilidad de la ventana del enviador de eventos
+.IP "\fBM\fP\-\fBt\fP"
+Conmuta la visibilidad de la ventana de televisión analógica
+.IP "\fBM\fP\-\fBl\fP"
+Conmuta la visibilidad del visor del registro
+.IP "\fBM\fP\-\fBi\fP"
+Conmuta la visibilidad de la ventana de información del flujo
+.IP "\fBC\fP\-\fBi\fP"
+Muestra información del flujo usando VEP (visualización en pantalla)
+.IP "\fBM\fP\-\fBk\fP"
+Entre en en el editor de vínculos de teclado
+.IP "\fBC\fP\-\fBo\fP"
+Abrir selector de ficheros
+.IP "\fBC\fP\-\fBS\fP"
+Seleccionar un fichero de subtítulos
+.IP "\fBC\fP\-\fBd\fP"
+Descarga una piel desde el servidor de pieles
+.IP "\fBC\fP\-\fBt\fP"
+Conmutador para mostrar MRL/Ident
+.IP "\fB\<Insert\>\fP"
+Conmutador de captura del puntero
+.IP "\fB0\fP"
+Introduce el número 0
+.IP "\fB1\fP"
+Introduce el número 1
+.IP "\fB2\fP"
+Introduce el número 2
+.IP "\fB3\fP"
+Introduce el número 3
+.IP "\fB4\fP"
+Introduce el número 4
+.IP "\fB5\fP"
+Introduce el número 5
+.IP "\fB6\fP"
+Introduce el número 6
+.IP "\fB7\fP"
+Introduce el número 7
+.IP "\fB8\fP"
+Introduce el número 8
+.IP "\fB9\fP"
+Introduce el número 9
+.IP "\fBM3\fP\-\fB\<plus\>\fP"
+Suma 10 al siguiente número introducido
+.IP "\fB\<slash\>\fP"
+Definir la posición en el flujo actual al porcentaje numérico.
+Vea la sección sobre "Entrada numérica" abajo.
+.IP "\fBM\fP\-\fB\<Up\>\fP"
+Definir la posición hacia adelante en el flujo actual por argumento numérico
+.IP "\fBM3\fP\-\fB\<Up\>\fP"
+Definir la posición hacia atrás en el flujo actual por argumento numérico
+.IP "\fBm\fP"
+Cambie la sincronización de audio vídeo (retrasa el vídeo)
+.IP "\fBn\fP"
+Cambie la sincronización de audio vídeo (retrasa el audio)
+.IP "\fB\<Home\>\fP"
+Reinicia el desfase de la sincronización de audio vídeo
+.IP "\fBM\fP"
+Cambia el sincronismo de los subtítulos (retrasa el vídeo)
+.IP "\fBN\fP"
+Cambia el sincronismo de los subtítulos (retrasa los subtítulos)
+.IP "\fBC\fP\-\fBM\fP\-\fBo\fP"
+Conmuta modos de TV (en el DXR3)
+.IP "\fBd\fP"
+Cambia el monitor a modo DPMS standby (espera)
+.IP "\fBC\fP\-\fBl\fP"
+Para la reproducción después de reproducir el flujo
+.IP "\fBq\fP"
+Salir del programa
+.br 
+.SS Complementos de terceras partes
+Las siguientes ligazones son usados por complementos de terceras partes,
+especialmente para navegación de DVD:
+.IP "\fB<Teclado\ numérico:\ arriba>\fP"
+Evento arriba.
+.IP "\fB<Teclado\ numérico:\ abajo>\fP"
+Evento abajo.
+.IP "\fB<Teclado\ numérico:\ izquierda>\fP"
+Evento izquierda.
+.IP "\fB<Teclado\ numérico:\ derecha>\fP"
+Evento derecha.
+.IP "\fB<Teclado\ numérico:\ RePág>\fP"
+Evento RePág.
+.IP "\fB<Teclado\ numérico:\ AvPág>\fP"
+Evento AvPág.
+.IP "\fB<Teclado\ numérico:\ Fin>\fP"
+Evento ángulo anterior.
+.IP "\fB<Teclado\ numérico:\ Inicio>\fP"
+Evento ángulo siguiente.
+.IP "\fB<Teclado\ numérico:\ Intro>\fP"
+Selecciona evento
+
+.SS Ajuste fino de sincronismo
+Algunos flujos tienen marcas de tiempo erróneas, y por tanto el sincronismo falla. Esto puede ser ajustado con estas teclas:
+.IP "n"
+pulsar si el vídeo se queda atrás del audio
+.IP "m"
+pulsar si el vídeo adelanta al audio
+.IP "\fB<inicio>\fP"
+pulsar para reiniciar la compensación audio/vídeo a \fB0\fP, así se dejan intactas las marcas de tiempo del flujo.
+
+.SS Sincronización de subtítulos
+Puede ajustar el sincronismo de los subtítulos mediante estas teclas:
+.IP "M / N"
+
+.SS Entrada numérica
+Puede especificar un argumento numérico a una orden tecleando el número y entonces pulsando la tecla de función. Por ejemplo, introducir "99/", o sea, la tecla del número 9 dos veces seguido de la tecla de la barra; debería posicionarse al 99% del flujo actual. 
+.PP 
+El nuevo complemento VCD/SVCD permite algunas entradas numéricas.
+Introduciendo un número seguido de "Seleccionar evento" (por omisión intro en el teclado numérico), uno puede ir a un "capítulo" específico (pista o entrada) o número de selección.
+Como esto es una característica nueva, quizás con el tiempo más complementos hagan uso de la selección numérica.
+.PP 
+Otras órdenes que pueden ser precedidas de un argumento numérico son 
+MRL siguiente/anterior (\fBMRL_NEXT\fP, \fBMRL_PRIOR\fP), subtítulo siguiente/anterior (\fBSPU_NEXT\fP, \fBSPU_PRIOR\fP), y canal de audio siguiente/anterior (\fBAUDIOCHAN_NEXT\fP, \fBAUDIOCHAN_PRIOR\fP). 
+Con un prefijo numérico, es como si uno hubiera introducido la orden ese número de veces. Aquí, el argumento 0, puesto que no tendría sentido, se interpreta como 1. 
+.PP 
+Vale, el uso de la entrada numérica aquí tiene valor limitado. 
+Con el tiempo quizás más órdenes útiles como especificar un MRL específico o absoluto, canal de audio o subtítulos, sean implementadas.
+.SH "FICHEROS"
+.TP \w'~/.xine/passwdXX'u
+~/.xine/config
+Fichero principal de configuración
+.TP 
+~/.xine/keymap
+Ligazones de teclado para xine\-ui
+.TP 
+~/.xine/passwd
+Fichero de contraseñas de xine\-ui
+.TP 
+~/.xine/xinerc
+Argumentos adicionales de línea de órdenes
+.br 
+Cada línea especifica un argumento adicional de línea de órdenes (un argumento por línea):
+.nf 
+\-\-geometry 720x576+0+0
+\-\-network
+\-s DVD
+\-p
+.fi 
 .SH "VEA TAMBIÉN"
-El programa esta totalmente documentado en la página inicial de Xine:
-.UR http://xine.sourceforge.net/
-.IR "http://xine.sourceforge.net/"
+\fBxine\-remote\fP(1)
+.br 
+\fBxine\fP(5) para detalles de la sintaxis MRL
+.PP 
+Los programas están totalmente documentados en la página principal de xine:
+.UR http://xinehq.de/
+.IR "http://xinehq.de/"
 .UE
-.SH TECLAS DE CONTROL
-Muchas de las características pueden se controladas presionando las teclas de
-control. Las teclas asociadas  son:
-.LP
-.BR ENTRADA :
-Reproducción
-.br
-.BR ESPACIO
-o
-.BR P :
-Pausa.
-.br
-.BR F :
-Alternar al modo de pantalla completa.
-.br
-.BR G :
-Ocultar/mostrar la gui.
-.br
-.BR H :
-Ocultar/mostrar la ventana de salida de vídeo.
-.br
-.BR A :
-Alternar la relación de aspecto (AUTO/16:9/4:3/DVB).
-.br
-.BR B :
-Ocultar/mostrar el navegador MRL.
-.br
-.BR C :
-Mostrar/ocultar la ventana de configuración de vídeo.
-.br
-.BR E :
-Expulsar los medios actuales.
-.br
-.BR 0 :
-Salte para empezar la secuencia actual.
-.br
-.BR 1..9 :
-Salte al 10%..90% de la secuencia actual.
-.br
-.BR PgUp :
-Salte a la anterior secuencia de la lista de reproducción.
-.br
-.BR PgDown :
-Salte a la siguiente secuencia de la lista de reproducción.
-.br
-.BR + :
-Seleccione el siguiente canal de sonido 
-(puede pasar algunos segundos hasta que tenga efecto).
-.br
-.BR - :
-Seleccione el canal de sonido previo.
-.br
-.BR > :
-Agrande la ventana de salida.
-.br
-.BR . :
-Seleccione el siguiente subtítulo.
-.br
-.BR < :
-Reduzca la ventana de salida.
-.br
-.BR , :
-Seleccione el subtítulo anterior.
-.br
-.BR Q :
-Salir.
-.br
-.SH Sintonía fina de sincronización
-Algunas secuencias tienen una mala marca de tiempo, por eso falla la 
-sincronización. Esto puede ser corregido usando las teclas con flechas:
-.br
-.BR Izquierda :
-presione si la imágen sale adelantada al sonido
-.br
-.BR Derecha :
-presione si la imágen se retraza al sonido
-.br
-.BR Inicio :
-presione para reiniciar sonido e imagen a 0, así la marcas de tiempo 
-de la secuencia son inalteradas.
-
-.SH AUTHOR
+.SH "AUTOR"
 Estas páginas del manual fueron escritas por Siggi Langauf <siggi@debian.org>,
-para el proyecto xine. Con muchos agregados de
-Guenter Bartsch <guenter@users.sourceforge.net> y
-Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Traducción: Alfredo Delaiti <alfredodelaiti@netscape.net>
+para el proyecto xine. Muchos agregados de 
+Guenter Bartsch <guenter@users.sourceforge.net>,
+Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>,
+y Philipp Hahn <pmhahn@users.sourceforge.net>.
+
+Traducción:
+.BI
+.br
+\ \·\ Alfredo Delaiti\ <alfredodelaiti@netscape.net> (2001)
+.br 
+\ \·\ Carlos\ E.R.M.\ <carloser@users.sourceforge.net> (2008-02, vers. 2002)

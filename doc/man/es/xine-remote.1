@@ -1,0 +1,74 @@
+.\" -*-Nroff-*-
+.\" 
+.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
+.\" other parms are allowed: see man-pages(7), man(7), man(1)
+.\" 
+.\" CER: Traducción revisada 2008-03-4 - codificación latin1
+.\"
+.TH "XINE-REMOTE" "1x" "2002-04-16" "El proyecto xine" ""
+.SH "NOMBRE"
+xine\-remote \- una pequeña herramienta para conectar el servidor de control remoto de xine.
+.SH "SINOPSIS"
+.B xine\-remote
+.I "[opciones]"
+.SH "DESCRIPCIÓN"
+Esta página de manual documenta brevemente la herramienta 
+.BR xine\-remote.
+.PP 
+.B xine\-remote
+puede reemplazar a una conexión telnet 
+\fIpura\fP a un servidor de control remoto de xine.
+Usa las facilidades \fBreadline\fP (terminación, atajos vi/emacs, historial de órdenes, etc...).
+Por omisión, trata de conectarse a localhost, usando el puerto por defecto (vea \fIxine\fP(1)).
+.SH "OPCIONES"
+El programa sigue la sintaxis usual de línea de órdenes GNU,  con
+opciones  largas  comenzando con dos rayas (`\-\-'). Debajo se incluye un
+resumen  de  las  opciones.
+.TP 
+.BR \-H,\ \-\-host\  <nombre_de_equipo>
+Trata de conectarse a <\fBnombre_de_equipo\fP>.
+.TP 
+.BR \-P,\ \-\-port\  <puerto>
+Trata de conectarse al equipo usando <\fBpuerto\fP>.
+.TP 
+.BR \-c,\ \-\-command\  <orden>
+Envía la <\fBorden\fP> al servidor y sale.
+La orden debiera estar entre comillas simples si contiene espacios o caracteres especiales.
+.TP 
+.BR \-n,\ \-\-noconnect
+No iniciar la conexión al iniciar.
+.TP 
+.BR \-v,\ \-\-version
+Muestra la versión.
+.TP 
+.BR \-h,\ \-\-help
+Muestra un resumen de las opciones.
+.br 
+.SH "ÓRDENES"
+Se dispone de pocas órdenes, las cuales se usan para abrir o cerrar una conexión:
+.TP 
+.B ?
+Muestra las órdenes disponibles (las de xine\-remote + las del servidor cuando se establece la conexión).
+.TP 
+.BR help\  <orden>
+Muestra el propósito de <\fBorden\fP>; si se omite, muestra las ordenes disponibles.
+.TP 
+.BR syntax\  <orden>
+Muestra el uso de <\fBorden\fP>.
+.TP 
+.B version
+Muestra la versión.
+.TP 
+.BR open\  <servidor[:puerto]>
+Abrir conexión al \fBservidor\fP. Un \fBpuerto\fP puede opcionalmente especificarse, usando dos puntos (\fB:\fP) como separador.
+.TP 
+.B close
+Cierra la conexión.
+.TP 
+.B quit
+Sale de xine\-remote.
+.SH "VER TAMBIÉN"
+.BR xine (1).
+.SH "AUTOR"
+Esta página de manual fié escrita por Daniel Caujolle\-Bert <f1rmb@users.sourceforge.net> para el proyecto xine, 
+y traducida por Carlos E.R.M. <carloser@users.sourceforge.net> (2008\-03)

@@ -1,0 +1,74 @@
+.\" CER: Traducción revisada 2008-03-4 - codificación latin1
+.\"
+.TH "XINE-CHECK" "1" "2002-01-16" "El proyecto xine" ""
+.SH "NOMBRE"
+xine\-check \- un comprobador para el reproductor de vídeo xine
+.SH "SINOPSIS"
+.B xine\-check 
+.RI [ \-q ] 
+.RI [ \-v ]
+.RI [ \-B ]
+.RI [ \-b ]
+.br 
+.B xine\-bugreport
+.RI [ \-q ] 
+.RI [ \-v ]
+.RI [ \-B ]
+.br 
+.SH "DESCRIPCIÓN"
+Esta página de manual explica el programa 
+.B xine\-check,
+el cual comprueba la instalación del reproductor de vídeo xine buscando problemas comunes.
+.PP 
+Si experimenta cualquier problema con, o mientras ejecuta, \fBxine\fP, llamar a
+\fBxine\-check\fP puede suministrar valiosas pistas para la averiguación del problema.
+
+\fBxine\-check\fP prueba las configuraciones del sistema operativo, instalación de complementos, ajustes de la unidad de CD/DVD y parámetros de soporte de vídeo.
+
+Si se ejecuta como
+.B xine\-bugreport,
+generará una breve descripción del sistema y le guiará por el proceso de reportar un gazapo (bug). Esto es el sistema preferido por los desarrolladores, siendo más fácil para usted, y suministrando a los desarrolladores un reporte completo del gazapo.
+.SH "OPCIONES"
+El programa sigue la sintaxis usual de línea de órdenes GNU,  con
+opciones  largas  comenzando con dos rayas (`\-\-'). Debajo se incluye un
+resumen  de  las  opciones. Para  una  descripción  completa,  vea  el \fIREADME_es\fP y \fIFAQ_es\fP en \fI@XINE_DOCDIR@\fP o en la página web de xine.
+.B 
+.IP \-h,\ \-\-help
+(Ayuda) Muestra el resumen de las opciones y número de versión.
+.PP 
+El resto de las opciones, llamadas
+.B XINE\-CHECK options:
+cuando se listan con "xine\-check \-\-help", se explican aquí.
+.B 
+.IP \-q,\ \-\-quiet
+Dará un sólo mensaje de una linea, aunque se encuentren problemas.
+Normalmente \fBxine\-check\fP proporciona pistas para cada uno de los problemas encontrados para ayudar a solucionarlos.
+.B 
+.IP \-v,\ \-\-verbose
+Activa la salida extendida describiendo cada prueba en detalle, lo que produce algo como una lista de preguntas frecuentes (FAQ)
+.B 
+.IP \-B,\ \-\-batch
+Desconecta la pausa después de los mensajes largos. Normalmente \fBxine\-check\fP espera confirmación después de encontrar un problema o haber mostrado un mensaje largo.
+.B 
+.IP \-b,\ \-\-bug
+Produce un reporte de gazapo. Esto es lo mismo que si llama directamente a 
+\fBxine\-bugreport\fP.
+.SH "GAZAPOS (BUGS)"
+Ninguno, por supuesto ;\\-)
+.br 
+Vale, seguro que habrá algunos. Quizás lo mejor que pueda hacer es pedir
+soporte (y reportar gazapos) en nuestra lista de correo en
+<xine\-user@lists.sf.net> (es en inglés).
+.SH "VER TAMBIÉN"
+.BR xine (1),\ 
+.BR aaxine (1),\ 
+.BR xine\-lib (3),\ 
+.br 
+.UR http://xinehq.de/
+.BR http://xinehq.de
+.UE
+.SH "AUTOR"
+Esta página de manual fue escrita por Philipp Hahn <pmhahn@users.sf.net> para el proyecto xine, 
+y traducida por Carlos E.R.M. <carloser@users.sourceforge.net> (2008\-03)
+.SH "COPYRIGHT"
+Copyright \(co 2002 Siggi Langauf

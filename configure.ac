@@ -685,6 +685,8 @@ doc/man/fr/Makefile
 doc/man/fr/xine.1
 doc/man/es/Makefile
 doc/man/es/xine.1
+doc/man/es/aaxine.1
+doc/man/es/xine-check.1
 doc/man/pl/Makefile
 doc/man/pl/xine.1
 doc/man/pl/aaxine.1

@@ -1,0 +1,157 @@
+.\" CER: Traducción revisada 2008-03-3 - codificación latin1
+.\"
+.TH "AAXINE" "1" "2001-08-29" "El proyecto xine" ""
+.SH "NOMBRE"
+aaxine \- un reproductor de vídeo en ASCII artístico
+.SH "SINOPSIS"
+.B aaxine 
+.RI [ aalib\-options ] 
+.RI [ \-A <audio\-driver>] 
+.RI [ \-a <audio\-channel>] 
+.RI [ \-R <rec\-by>] 
+.RI [ MRL ...]
+.br 
+.SH "DESCRIPCIÓN"
+Esta página de manual explica el programa 
+.B aaxine. 
+Aaxine, es un frontal basado en aalib para libxine, un reproductor de vídeo/multimedia versátil.
+.PP 
+\fBaaxine\fP es para aquellos que no tienen una tarjeta de vídeo de alta gama, pero también quieren ver DVDs en su venerable vt100 ;\-)
+
+Como xine, \fBaaxine\fP reproduce secuencias de sistema MPEG (audio y  vídeo), secuencias elementales mpeg (p.e., ficheros .mp3 o .mpv), ficheros avi  (usando codecs win32 o ffmpeg), (S)VCDs, DVDs y mucho más. Resumiendo, cualquier cosa que esté soportada por xine\-lib.
+.SH "OPCIONES"
+El programa sigue la sintaxis usual de línea de órdenes GNU,  con
+opciones  largas  comenzando con dos rayas (`\-\-'). Debajo se incluye un
+resumen  de  las  opciones.  Para  una  descripción  completa,  vea  el \fIREADME_es\fP y \fIFAQ_es\fP en \fI@XINE_DOCDIR@\fP o en la página web de xine.
+.TP 
+.B \-h,\ \-\-help
+(Ayuda)  Muestra  el conjunto de opciones y los controladores de
+salida disponibles (complementos).
+.PP 
+Muchas de estas opciones son proporcionadas por aalib. Por favor, ¡mírelas en la documentación de su aalib!
+.PP 
+El resto de las opciones, llamadas
+.B AAXINE options:
+cuando se listan con "\fIaaxine \-\-help\fP", se explican aquí.
+.TP 
+.BI \-A,\ \-\-audio\-driver\  <drv>
+Usar el manejador de audio especificado. Los manejadores disponibles pueden listarse con "aaxine \-\-help"
+.TP 
+.BI \-a,\ \-\-audio\-channel\  <núm>
+Usar el canal de audio especificado. Los canales se numeran secuencialmente desde el 0 para la primera pista de audio. 
+.TP 
+.BI \-R,\ \-\-recognize\-by\  [opción]
+Determina el método usado para reconocer el tipo de flujo o secuencia. Las opciones posibles son:
+.br 
+`\fBdefault\fP': (omisión) por contenido, luego por extensión,
+.br 
+`\fBrevert\fP': (revertir) por extensión, luego por contenido,
+.br 
+`\fBcontent\fP': sólo por contenido,
+.br 
+`\fBextension\fP': sólo por extensión.
+.br 
+Si se da \fB\-R\fP sin ninguna opción adicional, se selecciona `\fBrevert\fP'.
+
+.SH "MRLs"
+Las MRLs son similares a las URLs de su navegador.
+Describen el medio del que se va a leer.
+MRLs válidas pueden ser simples nombres de ficheros o uno de los siguientes:
+.br 
+.BI file: <camino>
+.br 
+.BI fifo: <camino>
+.br 
+.B stdin:/
+.br 
+.BI dvd:/ <título> . <parte>
+.br 
+.BI vcd:/ <pista_número>
+.br 
+.BI tcp:// <equipo> : <puerto>
+.br 
+.BI rtp:// <equipo> : <puerto>
+.br 
+.BI udp:// <equipo> : <puerto>
+.br 
+.BI mms:// <equipo>...
+.br 
+.BI http:// <equipo>...
+.br 
+.BI cdda:// <pista_número>
+.LP 
+Varias MRLs pueden ser especificadas en orden para reproducir un número de flujos consecutivos. Complementos adicionales de entrada pueden proporcionar tipos adicionales de MRL. 
+Los listados arriba son los disponibles con el libxine de fábrica...
+.br 
+Después de un delimitador 
+.B #
+puede añadir varios parámetros de flujo:
+.TP 
+.B novideo
+el vídeo se ignorará
+.TP 
+.B noaudio
+el audio se ignorará
+.TP 
+.B nospu
+las subimágenes se ignorarán
+.TP 
+.BI demux: <nombre_desmultiplexador>
+especifica el desmultiplexador a usar
+.TP 
+.BI volume: <nivel>
+define el volumen de audio
+.TP 
+.BI compression: <nivel>
+especifica el rango de compresión dinámica de audio
+.TP 
+.IB <entrada_configuración> : <valor_configuración>
+asigna un valor nuevo a cualquier entrada de configuración
+.SH "TECLAS DE CONTROL"
+Muchas de las características pueden ser controladas presionando las teclas
+de control. Las ligazones de teclas son:
+.IP "\fB<RETORNO>\fP / \fBR\fP"
+Reproducir
+.IP "\fB<ESPACIO>\fP / \fBP\fP"
+Pausa
+.IP "\fB0\fP"
+Salta al comienzo del flujo actual
+.IP "\fB1\fP .. \fB9\fP"
+Salta al 10%..90% del flujo actual
+.IP "\fB<RePág>\fP"
+Salta al flujo anterior de la lista de reproducción
+.IP "\fB<AvPág>\fP"
+Salta al flujo siguiente de la lista de reproducción
+.IP "\fB+\fP"
+Seleccionar el siguiente canal de audio (puede tardar varios segundos en hacer efecto)
+.IP "\fB\-\fP"
+Seleccionar el canal anterior de audio
+.IP "\fBQ\fP"
+Salir.
+
+.SH "GAZAPOS (BUGS)"
+Ninguno, por supuesto ;\-)
+.br 
+Vale, seguro que habrá algunos. Quizás lo mejor que pueda hacer es pedir
+soporte (y reportar gazapos) en nuestra lista de correo en
+<xine\-user@lists.sf.net> (es en inglés).
+.SH "VER TAMBIÉN"
+.BR xine (1),\ 
+.BR xine\-lib (3)
+.UR http://xinehq.de/
+.br 
+.BR http://xinehq.de/
+.UE
+.br 
+.UR http://aa\-project.sourceforge.net/aalib/
+.BR http://aa\-project.sf.net/aalib
+.UE
+.SH "AUTOR"
+Siggi Langauf para el proyecto xine.
+
+Traducción:
+.BI 
+.br 
+\ \·\ Carlos\ E.R.M.\ <carloser@users.sourceforge.net> (2008\-03, vers. 2001)
+.SH "COPYRIGHT"
+Copyright \(co 2001 El proyecto xine
