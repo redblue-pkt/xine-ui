@@ -52,6 +52,8 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
+#include "../xitk/common.h"
+
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
 #else
@@ -216,7 +218,6 @@ static void config_update_bool(char *key, int value) {
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
-#endif
 
 static void config_update_num(char *key, int value) {
   xine_cfg_entry_t entry;
@@ -240,6 +241,7 @@ static void config_update_string(char *key, char *string) {
       fprintf(stderr, "WOW, key %s isn't registered\n", key);
   }
 }
+#endif
 
 /*
  * Display version.
