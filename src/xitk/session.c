@@ -510,7 +510,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   char        *playlist_load = NULL;
   static char *const tokens[]= {
     /* Don't change order */
-    "play",  "slow2",  "slow4",   "pause",      "fast2",
+    "play",  "slow4",  "slow2",   "pause",      "fast2",
     "fast4", "stop",   "quit",    "fullscreen", "eject",
     "audio", "spu",    "session", "mrl",        "playlist", 
     "pl",    "volume", "amp",     "loop",       "get_speed",
