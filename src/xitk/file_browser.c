@@ -74,7 +74,7 @@ typedef struct {
 
 static const filebrowser_filter_t __fb_filters[] = {
   { N_("All files"), "*"                                                           },
-  { N_("All known subtitles"), ".sub .srt .asc .smi .ssa .txt "                    },
+  { N_("All known subtitles"), ".sub .srt .asc .smi .ssa .ass .txt "               },
   { N_("All known playlists"), ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "    },
   /* media files */
   { "*.4xm", ".4xm "                                                               },
