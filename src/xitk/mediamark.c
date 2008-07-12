@@ -2526,6 +2526,10 @@ int mediamark_get_entry_from_id(const char *ident) {
 void mediamark_insert_entry(int index, const char *mrl, const char *ident, 
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
   char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  char  subpath[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  DIR           *dir;
+  struct dirent *dentry;
+
 
   gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
   
@@ -2542,7 +2546,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
     if(mrl_look_like_file((char *) mrl)) {
       char        *know_subs = "sub,srt,asc,smi,ssa,txt";
       char        *vsubs;
-      char        *_mrl, *ending, *ext;
+      char        *_mrl, *ending, *ext, *path, *d_name;
       struct stat  pstat;
       
       _mrl = (char *) mrl;
@@ -2569,6 +2573,38 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
       }
       free(vsubs);
 
+      /* try matching "<name>.*.<know_subs>" like used by opensubtitles */
+      if( !sub ) {
+        *ending = '\0';
+
+        strlcpy(subpath, autosub, sizeof(subpath));
+        
+        if((d_name = strrchr(subpath, '/'))) {
+          *d_name++ = '\0';
+          path = subpath;
+        } else {
+          d_name = subpath;
+          path = ".";
+        }
+
+        if((dir = opendir(path))) {
+          while((dentry = readdir(dir))) {
+            if( (strncmp(dentry->d_name, d_name, strlen(d_name)) == 0) &&
+                (ending = strrchr(dentry->d_name, '.')) ) {
+
+              if( strstr(know_subs, ending+1) ) {
+                snprintf(autosub,sizeof(autosub),"%s/%s",path,dentry->d_name);
+                autosub[sizeof(autosub)-1]='\0';
+                if(((stat(autosub, &pstat)) > -1) && (S_ISREG(pstat.st_mode)) && strcmp(autosub, _mrl)) {
+                  sub = autosub;
+                  break;
+                }
+              }
+            }
+          }
+          closedir(dir);
+        }
+      }
     }
 
   }
