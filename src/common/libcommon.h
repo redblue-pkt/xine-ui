@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -26,7 +26,7 @@
 #include "utils.h"
 
 #ifndef HAVE_GETLINE
-ssize_t getline(char *lineptr, size_t *n, FILE *f);
+ssize_t getline(char **lineptr, size_t *n, FILE *f);
 #endif
 
 #ifndef HAVE_GETSUBOPT

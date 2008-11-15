@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -155,6 +155,7 @@ static void post_plugin_cb(void *data, xine_cfg_entry_t *entry) {
   aaxine.post_plugin_name = entry->str_value;
 }
 
+#if 0 /* No used yet */
 /*
  * Some config wrapper functions, because it's too much work for updating one entry.
  */
@@ -192,7 +193,6 @@ static void config_update(xine_cfg_entry_t *entry,
   xine_config_update_entry(__xineui_global_xine_instance, entry);
 }
 
-#if 0 /* No used yet */
 static void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
   
@@ -593,7 +593,7 @@ static int aaxine_get_key_event(void) {
   while ( !caca_get_event(aaxine.display, CACA_EVENT_KEY_PRESS, &ev, 50000) && aaxine.running ) ;
 
   if (!aaxine.running) return 0;
-  return ev.data.key.ch;
+  return caca_get_event_key_ch(&ev);
 #endif
 }
 

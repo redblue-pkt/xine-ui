@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -127,7 +127,7 @@ static void _osd_get_output_size(int *w, int *h) {
     video_window_get_frame_size(w, h);
 }
 
-static char *_osd_get_speed_sym(int speed) {
+static const char *_osd_get_speed_sym(int speed) {
   int i;
 
   for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
@@ -137,7 +137,7 @@ static char *_osd_get_speed_sym(int speed) {
 
   return NULL;
 }
-static char *_osd_get_status_sym(int status) {
+static const char *_osd_get_status_sym(int status) {
   int i;
 
   for(i = 0; i < sizeof(xine_status)/sizeof(xine_status[0]); i++) {

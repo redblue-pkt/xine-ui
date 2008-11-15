@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -950,7 +950,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     case XINE_VO_ASPECT_DVB:      
       destaspect = 2.11;
       break;
-    case XINE_VO_ASPECT_DONT_TOUCH: 
+#ifdef XINE_VO_ASPECT_DONT_TOUCH
+    case XINE_VO_ASPECT_DONT_TOUCH:
+#endif 
     default: 
       destaspect = 0;
       scale = 1;

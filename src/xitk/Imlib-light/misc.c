@@ -5,6 +5,8 @@
 #include "Imlib.h"
 #include "Imlib_private.h"
 #include <locale.h>
+#include <stdio.h>
+#include "libcommon.h"
 
 #ifdef HAVE_SHM
 #include <X11/extensions/XShm.h>
@@ -16,11 +18,13 @@ extern const char *__XOS2RedirRoot(const char *);
 
 char                x_error;
 
+#ifdef HAVE_SHM
 static void
 HandleXError(Display * d, XErrorEvent * ev)
 {
   x_error = 1;
 }
+#endif
 
 int
 Imlib_get_render_type(ImlibData * id)

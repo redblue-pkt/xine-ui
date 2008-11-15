@@ -110,7 +110,6 @@ ImlibImage         *
 Imlib_clone_image(ImlibData * id, ImlibImage * im)
 {
   ImlibImage         *im2;
-  char               *s;
 
   if (!im)
     return NULL;

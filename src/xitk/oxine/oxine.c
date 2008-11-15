@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2003 Stefan Holst
+ * Copyright (C) 2002-2008 Stefan Holst
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ struct menuitem_s {
 
 
 static void main_menu_cb(void *data);
+#if 0
 static void media_stop_cb(void *data);
 static void media_info_cb(void *data);
 static void media_pause_cb(void *data, int i);
@@ -99,7 +100,6 @@ static void media_tracks_list_cb(void *data, void *entry) {
   odk_open_and_play(oxine->odk, mrl);
 }
 
-/*
 static void media_tracks_quit(void *data) {
   oxine_t *oxine = (oxine_t*) data;
 
@@ -110,7 +110,6 @@ static void media_tracks_quit(void *data) {
   oxine->pauseplay = NULL;
   otk_clear(oxine->otk); 
 }
-*/
 
 static void media_tracks_cb(void *data) {
   oxine_t *oxine = (oxine_t *) data;
@@ -136,7 +135,6 @@ static void media_tracks_cb(void *data) {
   otk_draw_all(oxine->otk);
 }
 
-#if 0
 static void info_button_time(void *data) {
   oxine_t *oxine = (oxine_t *)data;
   int ret, pos_time, length;
@@ -167,6 +165,7 @@ static void media_info_close_cb(void *data) {
   if (oxine->lines[2]) ho_free(oxine->lines[2]);
 }
 
+#if 0
 static void media_info_cb(void *data) {
   oxine_t *oxine = (oxine_t*) data;
   int pos_time, length, ret;
@@ -263,6 +262,7 @@ static void media_info_cb(void *data) {
 
   schedule_job(5000, media_info_close_cb, oxine);
 }
+#endif
 
 static void shutdown_cb (void *data) {
   gui_execute_action_id(ACTID_QUIT);
@@ -308,6 +308,7 @@ static void autoplay_cb (void *data) {
 }  
 
 
+#if 0
 static void playing_menu_update(void *data) {
   oxine_t *oxine = (oxine_t *) data;
   int pos_time, length;
@@ -319,7 +320,6 @@ static void playing_menu_update(void *data) {
     }
 }
 
-#if 0
 static void playing_menu_cb(void *data) {
    oxine_t *oxine = (oxine_t *) data;
    otk_widget_t *b, *l;

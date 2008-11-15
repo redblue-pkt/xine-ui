@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -53,6 +53,7 @@
 
 #include "xitk/Imlib-light/Imlib.h"
 
+#include "libcommon.h"
 #include "xitk.h"
 
 typedef struct {

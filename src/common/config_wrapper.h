@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -25,7 +25,7 @@
 #define CONFIG_WRAPPER_H
 
 void config_update_range(const char *key, int min, int max);
-void config_update_string(const char *key, const char *string);
+void config_update_string(const char *key, char *string);
 void config_update_enum(const char *key, int value);
 void config_update_bool(const char *key, int value);
 void config_update_num(const char *key, int value);

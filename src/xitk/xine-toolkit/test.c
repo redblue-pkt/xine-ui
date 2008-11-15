@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2003 Daniel Caujolle-Bert <segfault@club-internet.fr>
+** Copyright (C) 2001-2008 Daniel Caujolle-Bert <segfault@club-internet.fr>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -786,7 +786,7 @@ static void create_combo(void) {
 
   cmb.skin_element_name = NULL;
   cmb.parent_wlist      = test->widget_list;
-  cmb.entries           = test->entries;
+  cmb.entries           = (const char **)test->entries;
   cmb.layer_above       = 0;
   cmb.parent_wkey       = &test->kreg;
   cmb.callback          = combo_select;

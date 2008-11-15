@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of __xineui_global_xine_instance, a unix video player.
  * 
@@ -85,7 +85,7 @@ void config_update_range(const char *key, int min, int max) {
     fprintf(stderr, "WOW, range key %s isn't registered\n", key);
 }
 
-void config_update_string(const char *key, const char *string) {
+void config_update_string(const char *key, char *string) {
   xine_cfg_entry_t entry;
 
   if((xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) && string)

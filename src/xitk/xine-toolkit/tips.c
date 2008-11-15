@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2006 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -90,7 +90,6 @@ static void *_tips_loop_thread(void *data) {
     if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string && strlen(tips.widget->tips_string)) {
       int                  x, y, w, h;
       xitk_window_t       *xwin;
-      xitk_register_key_t  key;
       xitk_image_t        *image;
       xitk_font_t         *fs;
       unsigned int         cfore, cback;
@@ -201,7 +200,6 @@ static void *_tips_loop_thread(void *data) {
       
       pthread_cond_timedwait(&tips.timer_cond, &tips.mutex, &ts);
 
-      xitk_unregister_event_handler(&key);
       xitk_window_destroy_window(tips.widget->imlibdata, xwin);
       
       /* We are flushing here, otherwise tips window will stay displayed */

@@ -85,6 +85,7 @@ test_DEPENDENCIES = libxitk.a \
 
 test_LDADD = libxitk.a \
              $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
+	     $(top_builddir)/src/common/libcommon.a \
 	     $(X_PRE_LIBS) $(X_LIBS) $(XFT_LIBS) -lX11 \
 	     $(THREAD_LIBS) $(LIBPNG_LIBS) $(INTLLIBS)
 
