@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -556,7 +556,7 @@ static widget_triplet_t *setup_add_nothing_available(const char *title, int x, i
   xitk_image_t            *image;
   xitk_image_widget_t      im;
   
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
   
   image = xitk_image_create_image_from_string(gGui->imlib_data, tabsfontname,
 					       FRAME_WIDTH, ALIGN_CENTER, (char *)title);
@@ -585,7 +585,7 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
   xitk_widget_t           *slider;
   static widget_triplet_t *wt;
 
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
@@ -624,7 +624,7 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
   xitk_widget_t            *intbox, *wi, *wbu, *wbd;
   static widget_triplet_t  *wt;
   
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&ib, gGui->imlib_data);
 
@@ -662,7 +662,7 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
   xitk_widget_t            *input;
   static widget_triplet_t  *wt;
 
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
 
@@ -704,7 +704,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
   xitk_widget_t            *checkbox;
   static widget_triplet_t  *wt;
   
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
 
@@ -738,7 +738,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
   xitk_widget_t            *combo, *lw, *bw;
   static widget_triplet_t  *wt;
 
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 
@@ -787,7 +787,7 @@ static void setup_section_widgets(int s) {
   
   section = setup.sections[s];
   len     = strlen (section);
-  entry   = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
+  entry   = (xine_cfg_entry_t *)calloc(1, sizeof(xine_cfg_entry_t));
   cfg_err_result   = xine_config_get_first_entry(__xineui_global_xine_instance, entry);
     
   while (cfg_err_result) {
@@ -847,7 +847,7 @@ static void setup_section_widgets(int s) {
     } else
       free(entry);
       
-    entry = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
+    entry = (xine_cfg_entry_t *)calloc(1, sizeof(xine_cfg_entry_t));
     cfg_err_result = xine_config_get_next_entry(__xineui_global_xine_instance, entry);
   }
   free(entry);

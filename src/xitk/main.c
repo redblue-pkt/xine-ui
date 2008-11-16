@@ -251,8 +251,8 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
 
   _argv[0] = strdup(argv[0]);
   
-  rcfile           = (file_info_t *) xine_xmalloc(sizeof(file_info_t));
-  rcfile->filename = (char *) xine_xmalloc((strlen((xine_get_homedir())) + 
+  rcfile           = (file_info_t *) calloc(1, sizeof(file_info_t));
+  rcfile->filename = (char *) malloc((strlen((xine_get_homedir())) + 
 					    strlen(cfgdir) + strlen(xinerc)) + 3);
   sprintf(rcfile->filename, "%s/%s/%s", (xine_get_homedir()), cfgdir, xinerc);
   
@@ -501,7 +501,7 @@ static void list_plugins(char *type) {
     { NULL,                            "",                           ""              }
   };
     
-  configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+  configfile = (char *) malloc(strlen(xine_get_homedir())
 				     + strlen(cfgdir) 
 				     + strlen(cfgfile)
 				     + 3);
@@ -563,7 +563,7 @@ static void show_usage (void) {
   char         *configfile = NULL;
   const char  **backends, *backend;
   
-  configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+  configfile = (char *) malloc(strlen(xine_get_homedir())
 				     + strlen(cfgdir) 
 				     + strlen(cfgfile)
 				     + 3);
@@ -1382,7 +1382,7 @@ int main(int argc, char *argv[]) {
   if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL))
     fprintf (stderr, "sigprocmask() failed.\n");
 
-  gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
+  gGui = (gGui_t *) calloc(1, sizeof(gGui_t));
   
   gGui->stream                 = NULL;
   gGui->debug_level            = 0;
@@ -1836,7 +1836,7 @@ int main(int argc, char *argv[]) {
 
 	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 	  
-	  session_argv[session_argv_num] = (char *) xine_xmalloc(strlen(p) + 5);
+	  session_argv[session_argv_num] = (char *) malloc(strlen(p) + 5);
 	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
 	  session_argv[++session_argv_num]   = NULL;
 
@@ -1933,7 +1933,7 @@ int main(int argc, char *argv[]) {
   if(__xineui_global_config_file == NULL) {
     struct stat st;
     
-    __xineui_global_config_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
+    __xineui_global_config_file = (char *) malloc(strlen(xine_get_homedir())
 					     + strlen(cfgdir) 
 					     + strlen(cfgfile)
 					     + 3);
@@ -1956,7 +1956,7 @@ int main(int argc, char *argv[]) {
     char *cfgdir = CONFIGDIR;
     char *keymap = "keymap";
 
-    gGui->keymap_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
+    gGui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
 					      + strlen(cfgdir) 
 					      + strlen(cfgfile)
 					      + strlen(keymap) + 3);

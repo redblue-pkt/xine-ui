@@ -79,7 +79,7 @@ void *read_packet(int fd, ctrl_header_packet_t *hdr) {
   
   if((read(fd, hdr, sizeof(ctrl_header_packet_t))) == sizeof(ctrl_header_packet_t)) {
     if(hdr->data_length) {
-      data = xine_xmalloc(hdr->data_length);
+      data = malloc(hdr->data_length);
       read(fd, data, hdr->data_length);
     }
   }

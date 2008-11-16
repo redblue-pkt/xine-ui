@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -604,7 +604,7 @@ void control_panel(void) {
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 
-  control = (_control_t *) xine_xmalloc(sizeof(_control_t));
+  control = (_control_t *) calloc(1, sizeof(_control_t));
 
   XLockDisplay(gGui->display);
   

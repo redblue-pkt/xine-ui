@@ -567,7 +567,7 @@ void osd_display_info(char *info, ...) {
     char     *buf;
     int       n, size = 100;
     
-    if((buf = xine_xmalloc(size)) == NULL) 
+    if((buf = malloc(size)) == NULL) 
       return;
     
     while(1) {

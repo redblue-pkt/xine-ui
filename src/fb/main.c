@@ -69,7 +69,7 @@ static void load_config(void)
 	__xineui_global_config_file = getenv("XINERC");
 	if(!__xineui_global_config_file)
 	{
-		__xineui_global_config_file = xine_xmalloc(strlen(xine_get_homedir())
+		__xineui_global_config_file = malloc(strlen(xine_get_homedir())
 						 + strlen(XINE_CONFIG_DIR) 
 						 + strlen(XINE_CONFIG_FILE)
 						 + 3);

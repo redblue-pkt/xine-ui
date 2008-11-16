@@ -159,12 +159,12 @@ static void *ctrlsocket_func(void *data) {
        ((fd = accept(ctrl_fd, &saddr.sa, &len)) == -1))
       continue;
     
-    shdr = (serv_header_packet_t *) xine_xmalloc((sizeof(serv_header_packet_t)));
+    shdr = (serv_header_packet_t *) calloc(1, sizeof(serv_header_packet_t));
 
     (void) read(fd, &(shdr->hdr), sizeof(ctrl_header_packet_t));
     
     if(shdr->hdr.data_length) {
-      shdr->data = xine_xmalloc(shdr->hdr.data_length);
+      shdr->data = malloc(shdr->hdr.data_length);
       read(fd, shdr->data, shdr->hdr.data_length);
     }
 

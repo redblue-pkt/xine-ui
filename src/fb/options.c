@@ -203,7 +203,7 @@ int parse_options(int argc, char **argv)
 
 		        case OPTION_POST:
 			        if(!pplugins_num)
-				     pplugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+				     pplugins = (char **) malloc(sizeof(char *) * 2);
 				else
 				     pplugins = (char **) realloc(pplugins, sizeof(char *) * 
 								  (pplugins_num + 2));

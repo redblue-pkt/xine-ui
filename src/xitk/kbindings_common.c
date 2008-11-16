@@ -636,7 +636,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     /*
      * NULL terminate array.
      */
-    kbt->entry[kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+    kbt->entry[kbt->num_entries] = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
     kbt->entry[kbt->num_entries]->is_gui    = 0;
     kbt->entry[kbt->num_entries]->is_alias  = 0;
     kbt->entry[kbt->num_entries]->comment   = NULL;
@@ -774,7 +774,7 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
   ABORT_IF_NULL(kbt);
   ABORT_IF_NULL(file);
 
-  kbdf = (kbinding_file_t *) xine_xmalloc(sizeof(kbinding_file_t));
+  kbdf = (kbinding_file_t *) calloc(1, sizeof(kbinding_file_t));
   kbdf->bindingfile = strdup(file);
 
   if((kbdf->fd = fopen(kbdf->bindingfile, "r")) != NULL) {
@@ -837,7 +837,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	  if(!kmsg) {
 	    char *header = _("The following key bindings pairs are identical:\n\n");
 	    len += strlen(header);
-	    kmsg = (char *) xine_xmalloc(len + 1);
+	    kmsg = (char *) malloc(len + 1);
 	    sprintf(kmsg, "%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
 	  }
 	  else {

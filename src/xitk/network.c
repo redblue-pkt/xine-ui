@@ -2871,7 +2871,7 @@ static void *client_thread(void *data) {
   memset(&client_info->passwd, 0, sizeof(client_info->passwd));
   
   for(i = 0; i < 256; i++)
-    client_info->command.args[i] = (char *) xine_xmalloc(sizeof(char *) * 2048);
+    client_info->command.args[i] = (char *) malloc(sizeof(char) * 2048);
 
   say_hello(client_info);
   
@@ -2912,13 +2912,13 @@ static void *server_thread(void *data) {
   if(gGui->network_port) {
     int len = (int) log10(gGui->network_port) + 1;
 
-    service = (char *) xine_xmalloc(len + 1);
+    service = (char *) malloc(len + 1);
     sprintf(service, "%u", gGui->network_port);
   } 
   else {
     /*  Search in /etc/services if a xinectl entry exist */
     if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
-      service = (char *) xine_xmalloc(ntohs(serv_ent->s_port));
+      service = (char *) malloc(ntohs(serv_ent->s_port));
       sprintf(service, "%u", ntohs(serv_ent->s_port));
     }
     else
@@ -2976,7 +2976,7 @@ static void *server_thread(void *data) {
     
     msock = sock_serv(service, "tcp", 5);
     
-    client_info = (client_info_t *) xine_xmalloc(sizeof(client_info_t));
+    client_info = (client_info_t *) calloc(1, sizeof(client_info_t));
     lsin = sizeof(client_info->fsin.in);
     
     client_info->socket = accept(msock, &(client_info->fsin.sa), &lsin);

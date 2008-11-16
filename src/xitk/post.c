@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -810,7 +810,7 @@ static void _pplugin_get_plugins(_pp_wrapper_t *pp_wrapper) {
   if(pol) {
     int  i = 0;
 
-    pp_wrapper->pplugin->plugin_names    = (char **) xine_xmalloc(sizeof(char *) * 2);
+    pp_wrapper->pplugin->plugin_names    = (char **) malloc(sizeof(char *) * 2);
     pp_wrapper->pplugin->plugin_names[i] = strdup(_("No Filter"));
     while(pol[i]) {
       pp_wrapper->pplugin->plugin_names = (char **) realloc(pp_wrapper->pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
@@ -1377,7 +1377,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
   pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
   
-  pobj = pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = (post_object_t *) xine_xmalloc(sizeof(post_object_t));
+  pobj = pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = (post_object_t *) calloc(1, sizeof(post_object_t));
   pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->x = pp_wrapper->pplugin->x;
   pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->y = pp_wrapper->pplugin->y;
   pp_wrapper->pplugin->object_num++;
@@ -1598,7 +1598,7 @@ static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
       }
 	
       for(i = 0; i < post_num; i++) {
-	(*_post_elements)[i] = (post_element_t *) xine_xmalloc(sizeof(post_element_t));
+	(*_post_elements)[i] = (post_element_t *) calloc(1, sizeof(post_element_t));
 	(*_post_elements)[i]->post = pp_wrapper->pplugin->post_objects[i]->post;
 	(*_post_elements)[i]->name = 
 	  strdup(xitk_combo_get_current_entry_selected(pp_wrapper->pplugin->post_objects[i]->plugins));
@@ -1976,7 +1976,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   xitk_slider_widget_t        sl;
   xitk_widget_t              *w;
 
-  pp_wrapper->pplugin = (_pplugin_t *) xine_xmalloc(sizeof(_pplugin_t));
+  pp_wrapper->pplugin = (_pplugin_t *) calloc(1, sizeof(_pplugin_t));
   pp_wrapper->pplugin->first_displayed = 0;
   pp_wrapper->pplugin->help_text       = NULL;
   
@@ -2180,7 +2180,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 	  post_elements = (post_element_t **) realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
 	  
 	  post_elements[(*post_elements_num)] = (post_element_t *) 
-	    xine_xmalloc(sizeof(post_element_t));
+	    calloc(1, sizeof(post_element_t));
 	  post_elements[(*post_elements_num)]->post = post;
 	  post_elements[(*post_elements_num)]->name = strdup(plugin);
 	  (*post_elements_num)++;

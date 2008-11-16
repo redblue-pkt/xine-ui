@@ -176,7 +176,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		
 		slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 2));
 		
-		slxs[entries_slx] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
+		slxs[entries_slx] = (slx_entry_t *) calloc(1, sizeof(slx_entry_t));
 		slxs[entries_slx]->name            = strdup(slx.name);
 		slxs[entries_slx]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
 		slxs[entries_slx]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
@@ -503,7 +503,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	    skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
 	    skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
 	    
-	    skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
+	    skins_avail[skins_avail_num] = (skins_locations_t *) calloc(1, sizeof(skins_locations_t));
 	    skins_avail[skins_avail_num]->pathname = strdup(skindir);
 	    skins_avail[skins_avail_num]->skin = strdup(buffer);
 	    skins_avail[skins_avail_num]->number = skins_avail_num;

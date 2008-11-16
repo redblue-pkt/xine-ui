@@ -403,7 +403,7 @@ void event_sender_panel(void) {
   int                        x, y, i;
   xitk_widget_t             *w;
 
-  eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
+  eventer = (_eventer_t *) calloc(1, sizeof(_eventer_t));
   
   eventer->x = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_x", 
 					 80,

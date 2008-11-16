@@ -82,7 +82,7 @@ static int nvtv_tvout_init(Display *display, void **data) {
   if((ret = nvtv_simple_init())) {
     static char *const tv_systems[] = { "PAL", "NTSC", NULL };
 
-    nvtv_private_t *private = (nvtv_private_t *) xine_xmalloc(sizeof(nvtv_private_t));
+    nvtv_private_t *private = (nvtv_private_t *) calloc(1, sizeof(nvtv_private_t));
 
     *data = private;
     
@@ -194,7 +194,7 @@ typedef struct {
 } ati_private_t;
 
 static int ati_tvout_init(Display *display, void **data) {
-  ati_private_t *private = (ati_private_t *) xine_xmalloc(sizeof(ati_private_t));
+  ati_private_t *private = (ati_private_t *) calloc(1, sizeof(ati_private_t));
   
   *data = private;
   

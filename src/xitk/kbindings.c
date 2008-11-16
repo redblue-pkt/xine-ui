@@ -242,10 +242,10 @@ static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
   
   ABORT_IF_NULL(kbt);
   
-  k = (kbinding_t *) xine_xmalloc(sizeof(kbinding_t));
+  k = (kbinding_t *) calloc(1, sizeof(kbinding_t));
 
   for(i = 0; kbt->entry[i]->action != NULL; i++) {
-    k->entry[i]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
+    k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
     k->entry[i]->comment   = strdup(kbt->entry[i]->comment);
     k->entry[i]->action    = strdup(kbt->entry[i]->action);
     k->entry[i]->action_id = kbt->entry[i]->action_id;
@@ -255,7 +255,7 @@ static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
     k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
   }
 
-  k->entry[i]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
   k->entry[i]->comment   = NULL;
   k->entry[i]->action    = NULL;
   k->entry[i]->action_id = 0;
@@ -871,7 +871,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias  = 1;
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_gui    = kbe->is_gui;
 
-    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
     kbedit->kbt->entry[kbedit->kbt->num_entries]->comment   = NULL;
     kbedit->kbt->entry[kbedit->kbt->num_entries]->action    = NULL;
     kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
@@ -943,7 +943,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
  
   kbedit->grabbing = 1;
   
-  kbe = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
+  kbe = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
   kbe->comment   = strdup(kbedit->ksel->comment);
   kbe->action    = strdup(kbedit->ksel->action);
   kbe->action_id = kbedit->ksel->action_id;
@@ -1118,7 +1118,7 @@ void kbedit_window(void) {
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   
-  kbedit = (_kbedit_t *) xine_xmalloc(sizeof(_kbedit_t));
+  kbedit = (_kbedit_t *) calloc(1, sizeof(_kbedit_t));
 
   kbedit->kbt           = _kbindings_duplicate_kbindings(gGui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;

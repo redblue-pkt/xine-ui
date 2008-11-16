@@ -106,7 +106,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	char  *buf = NULL;
 	int    bytes_read;
 
-	if((buf = (char *) xine_xmalloc(st.st_size + 1))) {
+	if((buf = (char *) malloc(st.st_size + 1))) {
 	  if((bytes_read = read(fd, buf, st.st_size)) == st.st_size) {
 	    char  *p, **hbuf = NULL;
 	    int    lines = 0;
@@ -126,7 +126,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	    if(lines) {
 	      help_section_t  *section;
 
-	      section = (help_section_t *) xine_xmalloc(sizeof(help_section_t));
+	      section = (help_section_t *) calloc(1, sizeof(help_section_t));
 
 	      section->name      = strdup((section_name && strlen(section_name)) ? 
 					  section_name : _("Undefined"));
@@ -337,7 +337,7 @@ void help_panel(void) {
   int                        x, y;
   xitk_widget_t             *w;
 
-  help = (_help_t *) xine_xmalloc(sizeof(_help_t));
+  help = (_help_t *) calloc(1, sizeof(_help_t));
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 
 				80,

@@ -13,10 +13,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "libcommon.h"
 
 #define BLOCK_SIZE 128
 
-ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *stream) {
+static ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *stream) {
   void *tmp;
   int c;
   size_t i;

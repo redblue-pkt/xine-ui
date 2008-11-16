@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2003 by Dirk Meyer
+ * Copyright (C) 2008 by Dirk Meyer
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -62,7 +62,7 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
       post_api->get_parameters(pobj->post, pobj->param_data);
       
       if(!pnum)
-	pobj->properties_names = (char **) xine_xmalloc(sizeof(char *) * 2);
+	pobj->properties_names = (char **) malloc(sizeof(char *) * 2);
       else
 	pobj->properties_names = (char **) 
 	  realloc(pobj->properties_names, sizeof(char *) * (pnum + 2));
@@ -130,13 +130,13 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
 	  post_object_t  pobj;
 	 
 	  if(!(*post_elements_num))
-	    post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
+	    post_elements = (post_element_t **) malloc(sizeof(post_element_t *) * 2);
 	  else
 	    post_elements = (post_element_t **) 
 	      realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
 	  
 	  post_elements[(*post_elements_num)] = (post_element_t *) 
-	    xine_xmalloc(sizeof(post_element_t));
+	    malloc(sizeof(post_element_t));
 	  post_elements[(*post_elements_num)]->post = post;
 	  post_elements[(*post_elements_num)]->name = strdup(plugin);
 	  (*post_elements_num)++;
@@ -393,7 +393,7 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
     return NULL;
 
   post_elements = (post_element_t **) 
-    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+    malloc(sizeof(post_element_t *) * (*post_elements_num));
 
   for( i = 0; fbxine.deinterlace_enable && i < fbxine.deinterlace_elements_num; i++ ) {
     post_elements[i+j] = fbxine.deinterlace_elements[i];
@@ -421,7 +421,7 @@ static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_
     return NULL;
 
   post_elements = (post_element_t **) 
-    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+    malloc(sizeof(post_element_t *) * (*post_elements_num));
 
   for( j = 0; fbxine.post_audio_enable && j < fbxine.post_audio_elements_num; j++ ) {
     post_elements[i+j] = fbxine.post_audio_elements[j];

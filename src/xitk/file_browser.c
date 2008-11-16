@@ -302,7 +302,7 @@ static void fb_create_input_window(char *title, char *text,
   y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (height >> 1);
   XUnlockDisplay(gGui->display);
 
-  fne = (filename_editor_t *) xine_xmalloc(sizeof(filename_editor_t));
+  fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
   
   fne->callback = cb;
   fne->fb = fb;
@@ -643,7 +643,7 @@ static void sort_directories(filebrowser_t *fb) {
     
     fb->directories = (char **) realloc(fb->directories, sizeof(char *) * (fb->directories_num + 2));
     for(i = 0; i < fb->directories_num; i++) {
-      fb->directories[i] = (char *) xine_xmalloc(strlen(fb->dir_files[i].name) + 2);
+      fb->directories[i] = (char *) malloc(strlen(fb->dir_files[i].name) + 2);
       sprintf(fb->directories[i], "%s%c", fb->dir_files[i].name, '/');
     }
 
@@ -1172,7 +1172,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_widget_t              *widget;
   int                         i, x, y, w, width, height;
 
-  fb = (filebrowser_t *) xine_xmalloc(sizeof(filebrowser_t));
+  fb = (filebrowser_t *) calloc(1, sizeof(filebrowser_t));
   
   if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
     fb->cbb[0].label = strdup(cbb1->label);
@@ -1225,13 +1225,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   memset(&fb->filename, 0, sizeof(fb->filename));
   fb_extract_path_and_file(fb, filepathname);
 
-  fb->norm_files = (fileinfo_t *) xine_xmalloc(sizeof(fileinfo_t) * MAXFILES);
-  fb->dir_files = (fileinfo_t *) xine_xmalloc(sizeof(fileinfo_t) * MAXFILES);
+  fb->norm_files = (fileinfo_t *) calloc(MAXFILES, sizeof(fileinfo_t));
+  fb->dir_files = (fileinfo_t *) calloc(MAXFILES, sizeof(fileinfo_t));
 
-  fb->files = (char **) xine_xmalloc(sizeof(char *) * 2);
-  fb->directories = (char **) xine_xmalloc(sizeof(char *) * 2);
+  fb->files = (char **) calloc(2, sizeof(char *));
+  fb->directories = (char **) calloc(2, sizeof(char *));
   
-  fb->file_filters = (const char **) xine_xmalloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
+  fb->file_filters = (const char **) malloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
   
   for(i = 0; __fb_filters[i].ending; i++)
     fb->file_filters[i] = _(__fb_filters[i].name);

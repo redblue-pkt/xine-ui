@@ -34,8 +34,8 @@ gGui_t  *gGui;
 int main(int argc, char **argv) {
   int   i;
 
-  gGui              = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
-  gGui->keymap_file = (char *) xine_xmalloc(XITK_PATH_MAX + XITK_NAME_MAX + 2);
+  gGui              = (gGui_t *) calloc(1, sizeof(gGui_t));
+  gGui->keymap_file = (char *) malloc(XITK_PATH_MAX + XITK_NAME_MAX + 2);
   sprintf(gGui->keymap_file, "%s/%s/%s", xine_get_homedir(), ".xine", "keymap");
   
   if((gGui->kbindings = kbindings_init_kbinding())) {

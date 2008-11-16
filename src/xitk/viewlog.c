@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -248,7 +248,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
       }
       else {
 	/* Empty log entry line */
-	viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
 	viewlog->log[j++] = strdup(" ");
       }
     }
@@ -380,8 +380,8 @@ void viewlog_panel(void) {
   int                        x, y;
   xitk_widget_t             *w;
   
-  viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
-  viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
+  viewlog = (_viewlog_t *) calloc(1, sizeof(_viewlog_t));
+  viewlog->log = (const char **) calloc(1, sizeof(char *));
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_x", 
 				80,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -85,7 +85,7 @@ static char *_download_file(const char *filename, int *size) {
     return NULL;
   }
   
-  download = (download_t *) xine_xmalloc(sizeof(download_t));
+  download = (download_t *) calloc(1, sizeof(download_t));
   download->buf    = NULL;
   download->error  = NULL;
   download->size   = 0;
@@ -93,7 +93,7 @@ static char *_download_file(const char *filename, int *size) {
   
   if((network_download(filename, download))) {
     *size = download->size;
-    buf = (char *) xine_xmalloc(*size);
+    buf = (char *) malloc(*size);
     memcpy(buf, download->buf, *size);
   }
   else
@@ -152,8 +152,8 @@ static char *_read_file(const char *filename, int *size) {
     return NULL;
   }
   
-  if((buf = (char *) xine_xmalloc(*size + 1)) == NULL) {
-    fprintf(stderr, "%s(): xine_xmalloc() failed.\n", __XINE_FUNCTION__);
+  if((buf = (char *) malloc(*size + 1)) == NULL) {
+    fprintf(stderr, "%s(): malloc() failed.\n", __XINE_FUNCTION__);
     close(fd);
     return NULL;
   }
@@ -220,7 +220,7 @@ void mediamark_append_alternate_mrl(mediamark_t *mmk, const char *mrl) {
   if(mmk && mrl) {
     alternate_t *alt;
 
-    alt       = (alternate_t *) xine_xmalloc(sizeof(alternate_t));
+    alt       = (alternate_t *) calloc(1, sizeof(alternate_t));
     alt->mrl  = strdup(mrl);
     alt->next = NULL;
     
@@ -245,7 +245,7 @@ void mediamark_duplicate_alternates(mediamark_t *s_mmk, mediamark_t *d_mmk) {
       
       while(alt) {
 	
-	c_alt       = (alternate_t *) xine_xmalloc(sizeof(alternate_t));
+	c_alt       = (alternate_t *) calloc(1, sizeof(alternate_t));
 	c_alt->mrl  = strdup(alt->mrl);
 	c_alt->next = NULL;
 	
@@ -284,7 +284,7 @@ int mediamark_store_mmk(mediamark_t **mmk,
   
   if(mmk && mrl) {
 
-    (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+    (*mmk) = (mediamark_t *) calloc(1, sizeof(mediamark_t));
     (*mmk)->mrl           = strdup(mrl);
     (*mmk)->ident         = strdup((ident != NULL) ? ident : mrl);
     (*mmk)->sub           = (sub != NULL) ? strdup(sub) : NULL;
@@ -307,7 +307,7 @@ mediamark_t *mediamark_clone_mmk(mediamark_t *mmk) {
   mediamark_t *cmmk = NULL;
 
   if(mmk && mmk->mrl) {
-    cmmk = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+    cmmk = (mediamark_t *) calloc(1, sizeof(mediamark_t));
     cmmk->mrl           = strdup(mmk->mrl);
     cmmk->ident         = (mmk->ident) ? strdup(mmk->ident) : NULL;
     cmmk->sub           = (mmk->sub) ? strdup(mmk->sub) : NULL;
@@ -516,7 +516,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	  
 	  path = strrchr(filename, '/');
 	  if(path && (path > filename)) {
-	    origin = (char *) xine_xmalloc((path - filename) + 2);
+	    origin = (char *) malloc((path - filename) + 2);
 	    snprintf(origin, (path-filename)+1, "%s/", filename);
 	  }
 	  
@@ -621,7 +621,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 
 	    path = strrchr(filename, '/');
 	    if(path && (path > filename)) {
-	      origin = (char *) xine_xmalloc((path - filename) + 2);
+	      origin = (char *) malloc((path - filename) + 2);
 	      snprintf(origin, (path - filename)+1, "%s/", filename);
 	    }
 	    
@@ -747,7 +747,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		
 		path = strrchr(filename, '/');
 		if(path && (path > filename)) {
-		  origin = (char *) xine_xmalloc((path - filename) + 2);
+		  origin = (char *) malloc((path - filename) + 2);
 		  snprintf(origin, (path - filename)+1, "%s/", filename);
 		}
 
@@ -1111,7 +1111,7 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		}
 		  
 		if(atitle && strlen(atitle)) {
-		  real_title = (char *) xine_xmalloc(len);
+		  real_title = (char *) malloc(len);
 		  strcpy(real_title, atitle);
 		    
 		  if(aauthor && strlen(aauthor))
@@ -1375,19 +1375,19 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
 		if(artist && (artlen = strlen(artist)) && album && (alblen = strlen(album))) {
 		  int len = titlen + artlen + alblen + 7;
 		  
-		  real_title = (char *) xine_xmalloc(len);
+		  real_title = (char *) malloc(len);
 		  sprintf(real_title, "%s (%s - %s)", title, artist, album);
 		}
 		else if(artist && (artlen = strlen(artist))) {
 		  int len = titlen + artlen + 4;
 		  
-		  real_title = (char *) xine_xmalloc(len);
+		  real_title = (char *) malloc(len);
 		  sprintf(real_title, "%s (%s)", title, artist);
 		}
 		else if(album && (alblen = strlen(album))) {
 		  int len = titlen + alblen + 4;
 		  
-		  real_title = (char *) xine_xmalloc(len);
+		  real_title = (char *) malloc(len);
 		  sprintf(real_title, "%s (%s)", title, album);
 		}
 		else
@@ -1488,7 +1488,7 @@ static void smil_init_smil_property(smil_property_t *sprop) {
 static smil_node_t *smil_new_node(void) {
   smil_node_t *node;
 
-  node       = (smil_node_t *) xine_xmalloc(sizeof(smil_node_t));
+  node       = (smil_node_t *) calloc(1, sizeof(smil_node_t));
   node->mmk  = NULL;
   node->next = NULL;
 
@@ -1499,7 +1499,7 @@ static smil_node_t *smil_new_node(void) {
 static mediamark_t *smil_new_mediamark(void) {
   mediamark_t *mmk;
 
-  mmk             = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+  mmk             = (mediamark_t *) calloc(1, sizeof(mediamark_t));
   mmk->mrl        = NULL;
   mmk->ident      = NULL;
   mmk->sub        = NULL;
@@ -2373,7 +2373,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 
       path = strrchr(filename, '/');
       if(path && (path > filename)) {
-	origin = (char *) xine_xmalloc((path - filename) + 2);
+	origin = (char *) malloc((path - filename) + 2);
 	snprintf(origin, (path - filename)+1, "%s/", filename);
       }
 	  
@@ -2408,7 +2408,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 
 		  if(origin) {
 		    const size_t urlsize = strlen(origin) + strlen(ssentry->data) + 2;
-		    url = (char *) xine_xmalloc(urlsize);
+		    url = (char *) malloc(urlsize);
 		    strlcat(url, origin, urlsize);
 		    
 		    if((url[strlen(url) - 1] == '/') && (*ssentry->data == '/'))
@@ -2792,7 +2792,7 @@ int mediamark_concat_mediamarks(const char *_filename) {
       filename = (_filename + 6);
   }
 
-  playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
+  playlist = (playlist_t *) calloc(1, sizeof(playlist_t));
 
   for(i = 0; guess_functions[i]; i++) {
     if((mmk = guess_functions[i](playlist, filename)))
@@ -2847,7 +2847,7 @@ void mediamark_load_mediamarks(const char *_filename) {
       filename = (_filename + 6);
   }
 
-  playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
+  playlist = (playlist_t *) calloc(1, sizeof(playlist_t));
 
   for(i = 0; guess_functions[i]; i++) {
     if((mmk = guess_functions[i](playlist, filename)))

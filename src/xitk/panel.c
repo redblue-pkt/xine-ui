@@ -1093,7 +1093,7 @@ void panel_init (void) {
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
-  panel = (_panel_t *) xine_xmalloc(sizeof(_panel_t));
+  panel = (_panel_t *) calloc(1, sizeof(_panel_t));
 
   panel->playback_widgets.enabled = -1;
 

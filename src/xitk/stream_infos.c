@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -244,7 +244,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
     if(aalbum && strlen(aalbum))
       len += strlen(aalbum) + 3;
     
-    ident = (char *) xine_xmalloc(len + 1);
+    ident = (char *) malloc(len + 1);
     strcpy(ident, atitle);
     
     if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -416,7 +416,7 @@ void tvset_panel(void) {
 					 "Black", "Black", fontname)));
   xitk_enable_and_show_widget(tvset.framerate);
 
-  tvset.vidstd_entries = (const char **) xine_xmalloc(sizeof(const char *) * 
+  tvset.vidstd_entries = (const char **) malloc(sizeof(const char *) * 
                           (sizeof(std_list)/sizeof(std_list[0])+1));
   
   for(i = 0; i < (sizeof(std_list)/sizeof(std_list[0])); i++)

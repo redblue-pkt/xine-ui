@@ -704,7 +704,7 @@ static char *snap_build_filename(const char *mrl) {
 
 static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
 {
-  *image = (struct prvt_image_s*) xine_xmalloc( sizeof( struct prvt_image_s ) );
+  *image = (struct prvt_image_s*) calloc(1, sizeof( struct prvt_image_s ) );
   
   if (*image == NULL) 
     return 0;

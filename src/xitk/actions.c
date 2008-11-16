@@ -2303,7 +2303,7 @@ void visual_anim_init(void) {
 
   asprintf(&buffer, "%s/%s", XINE_VISDIR, "default.avi");
   
-  gGui->visual_anim.mrls = (char **) xine_xmalloc(sizeof(char *) * 3);
+  gGui->visual_anim.mrls = (char **) malloc(sizeof(char *) * 3);
   gGui->visual_anim.num_mrls = 0;
   
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = buffer;

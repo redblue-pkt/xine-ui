@@ -36,6 +36,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include "libcommon.h"
 
 char *
 strndup(const char *str, size_t n)

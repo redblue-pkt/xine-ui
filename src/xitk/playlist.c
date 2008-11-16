@@ -1027,7 +1027,7 @@ void playlist_editor(void) {
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
 
-  playlist = (_playlist_t *) xine_xmalloc(sizeof(_playlist_t));
+  playlist = (_playlist_t *) calloc(1, sizeof(_playlist_t));
 
   playlist->playlist_len = 0;
 

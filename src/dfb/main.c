@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
   {
     char *cfgfile = ".xine/config";
     if (!(__xineui_global_config_file = getenv("XINERC"))) {
-      __xineui_global_config_file = (char *) xine_xmalloc((strlen((xine_get_homedir())) +
+      __xineui_global_config_file = (char *) malloc((strlen((xine_get_homedir())) +
 					  strlen(cfgfile))+2);
       sprintf(__xineui_global_config_file, "%s/%s", (xine_get_homedir()), cfgfile);
     }

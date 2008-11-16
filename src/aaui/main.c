@@ -287,7 +287,7 @@ static void print_usage (void) {
   char              *configfile;
 
   if(!(configfile = getenv("XINERC"))) {
-    configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+    configfile = (char *) malloc(strlen(xine_get_homedir())
 				       + strlen(cfgdir) 
 				       + strlen(cfgfile)
 				       + 3);
@@ -735,7 +735,7 @@ int main(int argc, char *argv[]) {
     char *cfgfile = CONFIGFILE;
     
     if (!(__xineui_global_config_file = getenv ("XINERC"))) {
-      __xineui_global_config_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
+      __xineui_global_config_file = (char *) malloc(strlen(xine_get_homedir())
 						+ strlen(cfgdir) 
 						+ strlen(cfgfile)
 						+ 3);

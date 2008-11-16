@@ -68,7 +68,7 @@ static void get_available_skins_from(char *path) {
 	if(is_a_file(skcfgname)) {
 	  
 	  skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
-	  skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
+	  skins_avail[skins_avail_num] = (skins_locations_t *) calloc(1, sizeof(skins_locations_t));
 	  
 	  skins_avail[skins_avail_num]->pathname = strdup(path);
 	  skins_avail[skins_avail_num]->skin = strdup(pdirent->d_name);
@@ -103,9 +103,10 @@ static void get_available_skins_from(char *path) {
 static void looking_for_available_skins(void) {
   char    *buf;
 
-  skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
+  skins_avail = (skins_locations_t **) calloc(1, sizeof(skins_locations_t*));
   
   asprintf(&buf, "%s%s", xine_get_homedir(), "/.xine/skins");
+printf("buf='%s'\n", buf);
   
   get_available_skins_from(buf);
   free(buf);
