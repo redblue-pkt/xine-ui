@@ -6706,7 +6706,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  free(tmp);
 	  return 0;
 	}
-      if (xim->bits_per_pixel != bpp)
+      if (xim->bytes_per_line != bpp * w)
 	xim->data = realloc(xim->data, xim->bytes_per_line * xim->height);
       pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
       if (!pmap)

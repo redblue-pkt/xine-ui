@@ -468,7 +468,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char      buffer[2048];
 	  char      fskin_path[XITK_PATH_MAX + 1];
-	  int       i, skin_found = -1;
+	  int       i, skin_found = -1, len;
 
 	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
@@ -478,7 +478,10 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 
-	  strncpy(buffer, filename, ((strlen(filename) + 1) - 7));
+	  len = strlen(filename) - strlen(".tar.gz");
+	  if (len > sizeof(buffer) - 1) len = sizeof(buffer) - 1;
+	  strncpy(buffer, filename, len);
+	  buffer[len] = '\0';
 
 	  snprintf(fskin_path, sizeof(fskin_path), "%s/%s/%s", skindir, buffer, "doinst.sh");
 	  if(is_a_file(fskin_path)) {
