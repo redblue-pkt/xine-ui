@@ -313,7 +313,7 @@ dnl
 AC_ARG_WITH([aalib],
    AS_HELP_STRING([--without-aalib], [Turn off AALIB support.]))
 
-if test x"$with_aalib" = xyes; then
+if test x"$with_aalib" != "xno"; then
   AM_PATH_AALIB(1.2.0,,)
   AM_DL()
 else
@@ -333,6 +333,13 @@ if test "x$with_caca" != "xno"; then
    if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
       AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
    fi
+   AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h> 
+                                        caca_event_t ev;]], 
+                                        [[ev.type = 0;]] 
+                       )],
+                       [],
+                       [AC_DEFINE(CACA_EVENT_OPAQUE, [1], ["Define if struct caca_event is opaque and must not be accessed directly"])]
+   )
 fi
 
 AM_CONDITIONAL([HAVE_CACA], [test "x$have_caca" = "xyes"])

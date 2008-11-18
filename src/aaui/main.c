@@ -593,7 +593,11 @@ static int aaxine_get_key_event(void) {
   while ( !caca_get_event(aaxine.display, CACA_EVENT_KEY_PRESS, &ev, 50000) && aaxine.running ) ;
 
   if (!aaxine.running) return 0;
+#ifdef CACA_EVENT_OPAQUE
   return caca_get_event_key_ch(&ev);
+#else
+  return ev.data.key.ch;
+#endif
 #endif
 }
 
@@ -807,12 +811,12 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "caca";
   
+  aaxine.canvas = cucul_create_canvas(0, 0);
+  aaxine.display = caca_create_display(aaxine.canvas);
   aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_CACA,
-					  NULL);
-  aaxine.canvas = cucul_create_canvas(0, 0);
-  aaxine.display = caca_create_display(aaxine.canvas);
+					  aaxine.display);
 #endif
 
   if (!aaxine.vo_port) {
