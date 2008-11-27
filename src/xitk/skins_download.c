@@ -253,7 +253,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(skdloader.widget_list);
+    XITK_WIDGET_LIST_FREE(skdloader.widget_list);
     
     for(i = 0; i < skdloader.num; i++) {
       SAFE_FREE(skdloader.slxs[i]->name);

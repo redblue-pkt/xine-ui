@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -119,6 +119,7 @@ struct xitk_widget_list_s {
 
   Window                      win;
   GC                          gc;
+  int                         destroy;
 };
 
 /* ****************************************************************** */

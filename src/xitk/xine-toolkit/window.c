@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -754,8 +754,8 @@ void xitk_window_dialog_destroy(xitk_window_t *w) {
       XUNLOCK(wd->imlibdata->x.disp);
       
       xitk_list_free(wd->widget_list->l);
-      
-      XITK_FREE(wd->widget_list);
+     
+     XITK_WIDGET_LIST_FREE(wd->widget_list); 
     }
     XITK_FREE(wd);
   }  
@@ -813,7 +813,7 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
     
     xitk_list_free(wd->widget_list->l);
 
-    free(wd->widget_list);
+    XITK_WIDGET_LIST_FREE(wd->widget_list);
   }
   
   XITK_FREE(wd);

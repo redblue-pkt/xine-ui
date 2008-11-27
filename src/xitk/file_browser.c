@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -256,7 +256,7 @@ static void fne_destroy(filename_editor_t *fne) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fne->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(fne->widget_list);
+    XITK_WIDGET_LIST_FREE(fne->widget_list);
     
     free(fne);
   }
@@ -909,8 +909,8 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
     XUnlockDisplay(gGui->display);
-    
-    free(fb->widget_list);
+   
+    XITK_WIDGET_LIST_FREE(fb->widget_list);
 
     if(fb->norm_files) {
       while(fb->files_num) {

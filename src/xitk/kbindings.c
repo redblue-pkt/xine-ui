@@ -677,7 +677,7 @@ static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
  *
  */
 static void kbedit_exit(xitk_widget_t *w, void *data) {
-  
+
   if(kbedit) {
     window_info_t wi;
     
@@ -702,7 +702,7 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(kbedit->widget_list);
+    XITK_WIDGET_LIST_FREE(kbedit->widget_list);
     
     {
       int i;
@@ -717,7 +717,7 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     }
     
     kbindings_free_kbinding(&kbedit->kbt);
-    
+
     free(kbedit);
     kbedit = NULL;
     gGui->ssaver_enabled = 1;

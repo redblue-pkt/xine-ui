@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -422,6 +422,7 @@ typedef enum {
 #define XITK_WIDGET_LIST_LIST(wl)   (xitk_list_t *) xitk_widget_list_get(wl, WIDGET_LIST_LIST)
 #define XITK_WIDGET_LIST_WINDOW(wl) (Window) xitk_widget_list_get(wl, WIDGET_LIST_WINDOW)
 #define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
+#define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)
 
 #define XITK_WIDGET_INIT(X, I)      do {                              \
                                       (X)->magic = XITK_WIDGET_MAGIC; \
@@ -733,6 +734,11 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
  * Remove widgetkey_t entry in internal table.
  */
 void xitk_unregister_event_handler(xitk_register_key_t *key);
+
+/*
+ * Helper function to free widget list inside callbacks.
+ */
+void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
 
 /*
  * Copy window information matching with key in passed window_info_t struct.

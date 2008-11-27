@@ -174,7 +174,7 @@ static void test_end(xitk_widget_t *w, void *data) {
   xitk_list_free((XITK_WIDGET_LIST_LIST(test->widget_list)));
   XFreeGC(test->display, (XITK_WIDGET_LIST_GC(test->widget_list)));
 
-  free(test->widget_list);
+  XITK_WIDGET_LIST_FREE(test->widget_list);
 
   xitk_stop();
 }

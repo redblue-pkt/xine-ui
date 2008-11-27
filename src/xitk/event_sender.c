@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -335,7 +335,7 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(eventer->widget_list);
+    XITK_WIDGET_LIST_FREE(eventer->widget_list);
     
     free(eventer);
     eventer = NULL;

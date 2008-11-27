@@ -97,7 +97,7 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
     XUnlockDisplay(gGui->display);
     
-    free(viewlog->widget_list);
+    XITK_WIDGET_LIST_FREE(viewlog->widget_list);
     
     for(i = 0; i < viewlog->log_entries; i++)
       free((char *)viewlog->log[i]);

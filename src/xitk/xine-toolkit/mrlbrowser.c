@@ -611,7 +611,7 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
     XUNLOCK(private_data->imlibdata->x.disp);
     
-    XITK_FREE(private_data->widget_list);
+    XITK_WIDGET_LIST_FREE(private_data->widget_list);
     
     {
       int i;

@@ -412,7 +412,7 @@ void control_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(control->widget_list)));
     XUnlockDisplay(gGui->display);
 
-    free(control->widget_list);
+    XITK_WIDGET_LIST_FREE(control->widget_list);
 
     for(i = 0; i < control->skins_num; i++)
       free((char *)control->skins[i]);

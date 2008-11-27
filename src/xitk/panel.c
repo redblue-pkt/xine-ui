@@ -166,7 +166,7 @@ static void panel_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(panel->widget_list)));
     XUnlockDisplay(gGui->display);
 
-    free(panel->widget_list);
+    XITK_WIDGET_LIST_FREE(panel->widget_list);
     
     free(panel);
     panel = NULL;  

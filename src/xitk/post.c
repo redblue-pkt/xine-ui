@@ -983,7 +983,7 @@ static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, voi
   XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
   XUnlockDisplay(gGui->display);
     
-  free(pp_wrapper->pplugin->help_widget_list);
+  XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->help_widget_list);
 }
 
 static void _vpplugin_close_help(xitk_widget_t *w, void *data) {
@@ -1644,7 +1644,7 @@ static void _applugin_nextprev(xitk_widget_t *w, void *data, int pos) {
 }
 
 static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
-  
+
   if(pp_wrapper->pplugin) {
     window_info_t wi;
     int           i;
@@ -1702,7 +1702,7 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(pp_wrapper->pplugin->widget_list);
+    XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->widget_list);
    
     free(pp_wrapper->pplugin);
     pp_wrapper->pplugin = NULL;

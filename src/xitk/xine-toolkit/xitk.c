@@ -1106,6 +1106,9 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
     xitk_unset_dnd_callback(fx->xdnd);
     free(fx->xdnd);
   }
+
+  if (fx->widget_list && fx->widget_list->destroy)
+    free(fx->widget_list);
   
   fx->xevent_callback = NULL;
   fx->newpos_callback = NULL;
@@ -1188,6 +1191,32 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   }
 
   MUTUNLOCK();
+}
+
+void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
+  __gfx_t  *fx;
+
+  MUTLOCK();
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  while (fx) {
+    if (fx->widget_list && fx->widget_list == wl) {
+      if (fx->destroy) {
+      /* there was pending destroy, widget list needed */
+        fx->widget_list->destroy = 1;
+        MUTUNLOCK();
+        return;
+      } else {
+	fx->widget_list = NULL;
+	break;
+      }
+    }
+
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+  }
+
+  MUTUNLOCK();
+
+  free(wl);
 }
 
 /*
@@ -2018,11 +2047,19 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
 
   }
 
+  /* pending destroys of the event handlers */
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  while(fx) {
+    __fx_destroy(fx, 1);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+  }
+  xitk_list_free(gXitk->gfx);
+
   /* destroy font caching */
   xitk_font_cache_done();
   
   xitk_list_free(gXitk->list);
-  xitk_list_free(gXitk->gfx);
+
   xitk_config_deinit(gXitk->config);
   pthread_mutex_destroy(&gXitk->mutex);
   

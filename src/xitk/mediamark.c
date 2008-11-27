@@ -3067,7 +3067,7 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(mmkeditor.widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(mmkeditor.widget_list);
+    XITK_WIDGET_LIST_FREE(mmkeditor.widget_list);
     
     playlist_get_input_focus();
   }

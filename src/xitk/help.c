@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -267,7 +267,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(help->widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(help->widget_list);
+    XITK_WIDGET_LIST_FREE(help->widget_list);
     
     SAFE_FREE(help);
 

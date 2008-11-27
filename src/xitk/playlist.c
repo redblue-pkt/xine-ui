@@ -693,7 +693,7 @@ void playlist_exit(xitk_widget_t *w, void *data) {
 
     _playlist_free_playlists();
     
-    free(playlist->widget_list);
+    XITK_WIDGET_LIST_FREE(playlist->widget_list);
     
     free(playlist);
     playlist = NULL;

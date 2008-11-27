@@ -267,7 +267,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
 
 static void stream_infos_exit(xitk_widget_t *w, void *data) {
 
-    window_info_t wi;
+  window_info_t wi;
     
   if ( ! sinfos.running ) return;
 
@@ -292,7 +292,7 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(sinfos.widget_list);
+    XITK_WIDGET_LIST_FREE(sinfos.widget_list);
     
     try_to_set_input_focus(gGui->video_window);
 }

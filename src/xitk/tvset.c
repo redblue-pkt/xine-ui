@@ -149,7 +149,7 @@ static void tvset_update(xitk_widget_t *w, void *data) {
 
 
 static void tvset_exit(xitk_widget_t *w, void *data) {
-    window_info_t wi;
+  window_info_t wi;
 
   if ( ! tvset.running ) return;
 
@@ -180,7 +180,7 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     
     free(tvset.vidstd_entries);
 
-    free(tvset.widget_list);
+    XITK_WIDGET_LIST_FREE(tvset.widget_list);
     
     try_to_set_input_focus(gGui->video_window);
 }

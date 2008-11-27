@@ -173,7 +173,7 @@ static void add_widget_to_list(xitk_widget_t *w) {
  */
 static void setup_exit(xitk_widget_t *w, void *data) {
 
-    window_info_t wi;
+  window_info_t wi;
     
   if ( ! setup.running ) return;
 
@@ -199,7 +199,7 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)));
     XUnlockDisplay(gGui->display);
     
-    free(setup.widget_list);
+    XITK_WIDGET_LIST_FREE(setup.widget_list);
     
     try_to_set_input_focus(gGui->video_window);
 }
