@@ -2310,6 +2310,12 @@ void visual_anim_init(void) {
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]     = NULL;
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls + 1] = NULL;
 }
+void visual_anim_done(void) {
+  int i;
+
+  for (i = 0; i < gGui->visual_anim.num_mrls; i++) free(gGui->visual_anim.mrls[i]);
+  free(gGui->visual_anim.mrls);
+}
 void visual_anim_add_animation(char *mrl) {
   gGui->visual_anim.mrls = (char **) realloc(gGui->visual_anim.mrls, sizeof(char *) * 
 					     ((gGui->visual_anim.num_mrls + 1) + 2));

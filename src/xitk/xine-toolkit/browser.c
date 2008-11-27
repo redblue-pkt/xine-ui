@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -147,7 +147,7 @@ static void notify_destroy(xitk_widget_t *w) {
 
     private_data = (browser_private_data_t *) w->private_data;
     
-    for(i = WBSTART; i < private_data->max_length + WBSTART; i++)
+    for(i = WBSTART; i < private_data->max_length + WBSTART + EXTRA_BTNS; i++)
       XITK_FREE(private_data->bt[i]);
     
     XITK_FREE(private_data->skin_element_name);

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -103,6 +103,7 @@ void gui_add_mediamark(void);
 void gui_file_selector(void);
 void gui_select_sub(void);
 void visual_anim_init(void);
+void visual_anim_done(void);
 void visual_anim_add_animation(char *mrl);
 void visual_anim_play(void);
 void visual_anim_play_next(void);

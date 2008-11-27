@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -347,7 +347,8 @@ static void label_setup_label(xitk_widget_t *w, const char *label_) {
  *
  */
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  
+  char *label;
+
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
     
@@ -373,7 +374,9 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       w->visible                  = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable                   = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
-      label_setup_label(w, private_data->label);
+      label = strdup(private_data->label);
+      label_setup_label(w, label);
+      free(label);
       
       if(!pthread_mutex_trylock(&private_data->change_mutex)) {
 	paint_label(w);

@@ -753,11 +753,14 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   
 #ifdef HAVE_XINERAMA
   if (XineramaQueryExtension(gGui->video_display, &dummy_event, &dummy_error)) {
+    void *info;
     int count = 1;
-    XineramaQueryScreens(gGui->video_display, &count);
+
+    info = XineramaQueryScreens(gGui->video_display, &count);
     if (count > 1)
       /* multihead -> assuming square pixels */
       gGui->pixel_aspect = 1.0;
+    if (info) XFree(info);
   }
 #endif
 
@@ -2023,6 +2026,7 @@ int main(int argc, char *argv[]) {
   pthread_mutexattr_init(&mutexattr);
   pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
   pthread_mutex_init(&gGui->logo_mutex, &mutexattr);
+  pthread_mutexattr_destroy(&mutexattr);
 
   /* Automatically start playback if new_mode is enabled and playlist is filled */
   if((gGui->smart_mode && 
@@ -2221,6 +2225,7 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
+  visual_anim_done();
   free(pplugins);
   
   if(session_argv_num) {

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -2024,6 +2024,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   xitk_list_free(gXitk->list);
   xitk_list_free(gXitk->gfx);
   xitk_config_deinit(gXitk->config);
+  pthread_mutex_destroy(&gXitk->mutex);
   
   XITK_FREE(gXitk);
 

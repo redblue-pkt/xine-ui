@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2007 the xine project
+ * Copyright (C) 2000-2008 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -333,10 +333,8 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 
   if(lbl) {
     
-    private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(lbl) + 1);
-    
-    old_old_src = strdup(private_data->last_mrl_source);
-    strcpy(private_data->last_mrl_source, lbl);
+    old_old_src = private_data->last_mrl_source;
+    private_data->last_mrl_source = strdup(lbl);
 
     {
       int num_mrls;
@@ -344,13 +342,15 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 					       private_data->last_mrl_source, 
 					       NULL, &num_mrls);
       if(!mtmp) {
-	private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
-	strcpy(private_data->last_mrl_source, old_old_src);
+        free(private_data->last_mrl_source);
+        private_data->last_mrl_source = old_old_src;
 	return;
       }
       
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
+
+    free(old_old_src);
     
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
