@@ -43,6 +43,7 @@ xine-ui (0.99.6) unstable; urgency=low
   * Fixed wrong locale path (introduced in previous release) and related crash
     concerning tooltips, closes debian bug #432798.
   * Various memleak and memory access fixes.
+  * Fixed string encoding conversion, should close xine bug #14.
 
 xine-ui (0.99.5) unstable; urgency=low
 

@@ -321,10 +321,10 @@ char *xitk_recode(xitk_recode_t *id, const char *src) {
   if ( id ) {
     size_t inbytes  = strlen(src);
     size_t outbytes = 2 * inbytes;
-    char *buffer    = calloc(outbytes + 1, sizeof(char));
     ICONV_CONST char *inbuf     = (ICONV_CONST char *)src;
-    char *outbuf    = buffer;
+    char *outbuf    = calloc(outbytes + 1, sizeof(char));
 
+    buffer    = outbuf;
     while (inbytes) {
       if (iconv(*id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
 	free(buffer);
