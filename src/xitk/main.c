@@ -1443,7 +1443,7 @@ int main(int argc, char *argv[]) {
   visual_anim_init();
 
   /*
-   * Parse X Ressource database
+   * Parse X Resource database
    */
   xrm_parse();
 
