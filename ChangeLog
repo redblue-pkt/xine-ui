@@ -45,6 +45,7 @@ xine-ui (0.99.6) unstable; urgency=low
   * Various memleak and memory access fixes, for example:
   *   skin downloader crash
   *   cleaner destroy if the widgets in xine toolkit ("kamikaze patch")
+  *   proper free after strsep()
   * Fixed string encoding conversion, should close xine bug #14.
 
 xine-ui (0.99.5) unstable; urgency=low

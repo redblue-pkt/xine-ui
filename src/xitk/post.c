@@ -2144,11 +2144,12 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
   *post_elements_num = 0;
   
   if(pchain && strlen(pchain)) {
-    char *p;
+    char *p, *post_chain, *ppost_chain;
     
-    char *post_chain = strdup(pchain);
-    
-    while((p = xine_strsep(&post_chain, ";"))) {
+    post_chain = strdup(pchain);
+
+    ppost_chain = post_chain;
+    while((p = xine_strsep(&ppost_chain, ";"))) {
       
       if(p && strlen(p)) {
 	char          *plugin, *args = NULL;

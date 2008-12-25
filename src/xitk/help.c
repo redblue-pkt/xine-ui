@@ -103,7 +103,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
       xr = xitk_recode_init(doc_encoding, NULL);
 
       if((fd = open(filename, O_RDONLY)) >= 0) {
-	char  *buf = NULL;
+	char  *buf = NULL, *pbuf;
 	int    bytes_read;
 
 	if((buf = (char *) malloc(st.st_size + 1))) {
@@ -112,8 +112,9 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	    int    lines = 0;
 	    
 	    buf[st.st_size] = '\0';
-	    
-	    while((p = xine_strsep(&buf, "\n")) != NULL) {
+
+	    pbuf = buf;
+	    while((p = xine_strsep(&pbuf, "\n")) != NULL) {
 	      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
 	      
 	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))

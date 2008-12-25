@@ -592,11 +592,12 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     modifier = k->modifier;
     
     if(ukb->modifier) {
-      char *p;
+      char *p, *ukb_modifier_ptr;
       
       modifier = KEYMOD_NOMOD;
 
-      while((p = xine_strsep(&ukb->modifier, ",")) != NULL) {
+      ukb_modifier_ptr = ukb->modifier;
+      while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
 	
 	_kbindings_set_pos_to_next_char(&p);
 	
@@ -667,10 +668,11 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
       kbt->entry[i]->is_gui = _kbinding_get_is_gui_from_default(ukb->action);
 
       if(ukb->modifier) {
-	char *p;
+	char *p, *ukb_modifier_ptr;
 	int   modifier = KEYMOD_NOMOD;
-	
-	while((p = xine_strsep(&ukb->modifier, ",")) != NULL) {
+
+	ukb_modifier_ptr = ukb->modifier;
+	while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
 
 	  _kbindings_set_pos_to_next_char(&p);
 	  

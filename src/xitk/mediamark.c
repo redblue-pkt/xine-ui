@@ -341,14 +341,15 @@ int mediamark_free_mmk(mediamark_t **mmk) {
 static int playlist_split_data(playlist_t *playlist) {
   
   if(playlist->data) {
-    char *buf, *p;
+    char *buf, *pbuf, *p;
 
     /* strsep modify original string, avoid its corruption */
     buf = strdup(playlist->data);
     playlist->numl = 0;
 
-    while((p = xine_strsep(&buf, "\n")) != NULL) {
-      if(p && (p <= buf) && (strlen(p))) {
+    pbuf = buf;
+    while((p = xine_strsep(&pbuf, "\n")) != NULL) {
+      if(p && (p <= pbuf) && (strlen(p))) {
 
 	playlist->lines = (char **) realloc(playlist->lines, sizeof(char *) * (playlist->numl + 2));
 	
@@ -854,7 +855,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		      { /* OKAY, check found string */
 			mediamark_t   mmkf;
 			int           mmkf_members[7];
-			char         *line;
+			char         *line, *pline;
 			char         *m;
 			
 			mmkf.ident      = NULL;
@@ -875,7 +876,8 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			
 			line = strdup(atoa(buffer));
 			
-			while((m = xine_strsep(&line, ";")) != NULL) {
+			pline = line;
+			while((m = xine_strsep(&pline, ";")) != NULL) {
 			  char *key;
 			  
 			  key = atoa(m);
@@ -2545,7 +2547,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
 
     if(mrl_look_like_file((char *) mrl)) {
       char        *know_subs = "sub,srt,asc,smi,ssa,txt";
-      char        *vsubs;
+      char        *vsubs, *pvsubs;
       char        *_mrl, *ending, *ext, *path, *d_name;
       struct stat  pstat;
       
@@ -2563,8 +2565,9 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
       }
       
       vsubs = strdup(know_subs);
-      
-      while((ext = xine_strsep(&vsubs, ",")) && !sub) {
+
+      pvsubs = vsubs;
+      while((ext = xine_strsep(&pvsubs, ",")) && !sub) {
 	strcpy(ending, ext);
 	*(ending + strlen(ext) + 1) = '\0';
 	

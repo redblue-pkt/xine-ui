@@ -208,11 +208,12 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	private_data->mc->mrls_to_disp++;
       }
       else {
-	char *ending, *m;
+	char *ending, *m, *pfilter_ends;
 
 	if((ending = strrchr(private_data->mc->mrls[i]->mrl, '.'))) {
 
-	  while((m = strsep(&filter_ends, ",")) != NULL) {
+          pfilter_ends = filter_ends;
+	  while((m = strsep(&pfilter_ends, ",")) != NULL) {
 	    
 	    if(!strcasecmp((ending + 1), m)) {
 	      if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
