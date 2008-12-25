@@ -106,7 +106,6 @@ static void looking_for_available_skins(void) {
   skins_avail = (skins_locations_t **) calloc(1, sizeof(skins_locations_t*));
   
   asprintf(&buf, "%s%s", xine_get_homedir(), "/.xine/skins");
-printf("buf='%s'\n", buf);
   
   get_available_skins_from(buf);
   free(buf);

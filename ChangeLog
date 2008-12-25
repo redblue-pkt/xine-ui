@@ -42,7 +42,9 @@ xine-ui (0.99.6) unstable; urgency=low
     multiple commands in one command string handled
   * Fixed wrong locale path (introduced in previous release) and related crash
     concerning tooltips, closes debian bug #432798.
-  * Various memleak and memory access fixes.
+  * Various memleak and memory access fixes, for example:
+  *   skin downloader crash
+  *   cleaner destroy if the widgets in xine toolkit ("kamikaze patch")
   * Fixed string encoding conversion, should close xine bug #14.
 
 xine-ui (0.99.5) unstable; urgency=low
