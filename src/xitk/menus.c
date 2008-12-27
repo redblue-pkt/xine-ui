@@ -359,9 +359,9 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
     ACTID_SETUP,
     ACTID_KBEDIT,
     ACTID_CONTROLSHOW,
-    ACTID_TVANALOG,
     ACTID_VIEWLOG,
-    ACTID_SKINDOWNLOAD
+    ACTID_SKINDOWNLOAD,
+    ACTID_TVANALOG
   };
 
   if ( sets >= sizeof(actions)/sizeof(actions[0]) ) {
