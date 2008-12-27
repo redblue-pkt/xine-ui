@@ -46,6 +46,7 @@ xine-ui (0.99.6) unstable; urgency=low
   *   skin downloader crash
   *   cleaner destroy if the widgets in xine toolkit ("kamikaze patch")
   *   proper free after strsep()
+  *   opening multiple times TV settings window
   * Fixed string encoding conversion, should close xine bug #14.
 
 xine-ui (0.99.5) unstable; urgency=low

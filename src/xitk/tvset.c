@@ -175,10 +175,11 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
 
     free(tvset.system_entries);
-    
     free(tvset.chann_entries);
-    
     free(tvset.vidstd_entries);
+    tvset.system_entries = NULL;
+    tvset.chann_entries = NULL;
+    tvset.vidstd_entries = NULL;
 
     XITK_WIDGET_LIST_FREE(tvset.widget_list);
     
