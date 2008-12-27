@@ -378,7 +378,8 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
   XFreeGC((*mw)->display, (*mw)->wl.gc);
   XUNLOCK((*mw)->display);
 
-  free((*mw));
+  /* deferred free as widget list */
+  XITK_WIDGET_LIST_FREE((xitk_widget_list_t *)(*mw));
   (*mw) = NULL;
 }
 
