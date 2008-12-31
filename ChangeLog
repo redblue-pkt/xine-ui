@@ -42,12 +42,16 @@ xine-ui (0.99.6) unstable; urgency=low
     multiple commands in one command string handled
   * Fixed wrong locale path (introduced in previous release) and related crash
     concerning tooltips, closes debian bug #432798.
+  * ASCII Art updates:
+  *   fixed aalib detection in configure
+  *   build with libcaca >= 0.99, fixes xine bug #50
+  *   update CACA output due to changes in xine-lib
   * Various memleak and memory access fixes, for example:
   *   skin downloader crash
-  *   cleaner destroy if the widgets in xine toolkit ("kamikaze patch")
+  *   cleaner destroy of the widgets in xine toolkit ("kamikaze patch")
   *   proper free after strsep()
   *   opening multiple times TV settings window
-  * Fixed string encoding conversion, should close xine bug #14.
+  * Fixed string encoding conversion, closes xine bug #14.
 
 xine-ui (0.99.5) unstable; urgency=low
 
