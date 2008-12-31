@@ -58,7 +58,7 @@ xine_SOURCES = \
 	viewlog.c
 
 if HAVE_TAR
-xine_SOURCES += skins_download.c skins_download.h
+xine_SOURCES += skins_download.c skins_internal.h
 endif
 
 if HAVE_LIRC
