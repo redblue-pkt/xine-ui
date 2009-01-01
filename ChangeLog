@@ -53,6 +53,8 @@ xine-ui (0.99.6) unstable; urgency=low
   *   opening multiple times TV settings window
   * Fixed string encoding conversion, closes xine bug #14.
   * Fixed loading of playlist containing relative paths, closes xine bug #52.
+  * Fixed possible integer overflow when parsing PNG files in skins, closes
+    xine bug #153.
 
 xine-ui (0.99.5) unstable; urgency=low
 

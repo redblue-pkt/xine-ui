@@ -6,6 +6,10 @@
 #include "Imlib_private.h"
 #include <setjmp.h>
 
+#ifndef INT_MAX
+#define INT_MAX ((int)((unsigned int)(1 << (8 * sizeof(int) - 1)) - 1))
+#endif
+
 /*
  *      Split the ID - damages input
  */
@@ -77,7 +81,9 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
     png_set_expand(png_ptr);
   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
-  data = malloc(*w ** h * 3);
+  if(*w > (INT_MAX / *h) / 3)
+    return NULL;
+  data = malloc(*w * *h * 3);
   if (!data)
     {
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -85,7 +91,7 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
     }
   lines = (unsigned char **)calloc(*h, sizeof(unsigned char *));
 
-  if (lines == NULL)
+  if (lines == NULL || *w > INT_MAX / 4)
     {
       free(data);
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
