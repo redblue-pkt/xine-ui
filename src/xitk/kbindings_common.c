@@ -419,7 +419,7 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
   if(sizeof(default_binding_table)/sizeof(default_binding_table[0])+100 > MAX_ENTRIES) {
     fprintf(stderr, "%s(%d):\n"
 		    "  Too many entries in default_binding_table[].\n"
-		    "  Increase MAX_ENTRIES to at least %d.\n",
+		    "  Increase MAX_ENTRIES to at least %zd.\n",
 	    __XINE_FUNCTION__, __LINE__,
 	    sizeof(default_binding_table)/sizeof(default_binding_table[0])+100);
     abort();
