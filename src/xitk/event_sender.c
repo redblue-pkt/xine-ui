@@ -161,7 +161,7 @@ static void event_sender_select(xitk_widget_t *w, void *data) {
 }
 
 static void event_sender_menu(xitk_widget_t *w, void *data) {
-  int event     = (int) data;
+  int event = (int)(intptr_t) data;
   int events[7] = {
     XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
     XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
@@ -172,7 +172,7 @@ static void event_sender_menu(xitk_widget_t *w, void *data) {
 }
 
 static void event_sender_num(xitk_widget_t *w, void *data) {
-  int event      = (int) data;
+  int event = (int)(intptr_t) data;
   int events[11] = { 
     XINE_EVENT_INPUT_NUMBER_0, XINE_EVENT_INPUT_NUMBER_1, XINE_EVENT_INPUT_NUMBER_2,
     XINE_EVENT_INPUT_NUMBER_3, XINE_EVENT_INPUT_NUMBER_4, XINE_EVENT_INPUT_NUMBER_5,
@@ -184,7 +184,7 @@ static void event_sender_num(xitk_widget_t *w, void *data) {
 }
 
 static void event_sender_angle(xitk_widget_t *w, void *data) {
-  int event      = (int) data;
+  int event = (int)(intptr_t) data;
   int events[11] = { 
     XINE_EVENT_INPUT_ANGLE_NEXT, XINE_EVENT_INPUT_ANGLE_PREVIOUS
   };
@@ -549,7 +549,7 @@ void event_sender_panel(void) {
     lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_num;
     lb.state_callback    = NULL;
-    lb.userdata          = (void *)i;
+    lb.userdata          = (void *)(intptr_t)i;
     lb.skin_element_name = NULL;
 
     if(!i)
@@ -585,7 +585,7 @@ void event_sender_panel(void) {
     lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_num;
     lb.state_callback    = NULL;
-    lb.userdata          = (void *)i;
+    lb.userdata          = (void *)(intptr_t)i;
     lb.skin_element_name = NULL;
     
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
@@ -656,7 +656,7 @@ void event_sender_panel(void) {
     lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_menu; 
     lb.state_callback    = NULL;
-    lb.userdata          = (void *)i;
+    lb.userdata          = (void *)(intptr_t)i;
     lb.skin_element_name = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->menus.menu[i] = 

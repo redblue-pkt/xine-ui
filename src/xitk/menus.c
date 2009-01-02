@@ -120,7 +120,7 @@ static void menu_event_sender(xitk_widget_t *w, xitk_menu_entry_t *me, void *dat
   gui_execute_action_id(ACTID_EVENT_SENDER);
 }
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int event     = (int) data;
+  int event = (int)(intptr_t) data;
   static const int events[7] = {
     XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
     XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
@@ -142,7 +142,7 @@ static void menu_subtitle_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void
   gui_execute_action_id(ACTID_SUBSELECT);
 }
 static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = (int) data;
+  int ctrl = (int)(intptr_t) data;
 
   static const int actions[] = {
     ACTID_PLAY,
@@ -164,7 +164,7 @@ static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 }
 
 static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = (int) data;
+  int ctrl = (int)(intptr_t) data;
 
   switch(ctrl) {
 
@@ -249,7 +249,7 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   }
 }
 static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int info = (int) data;
+  int info = (int)(intptr_t) data;
 
   switch(info) {
   case STREAM_OSDI:
@@ -262,7 +262,7 @@ static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   }
 }
 static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = (int) data;
+  int ctrl = (int)(intptr_t) data;
 
   switch(ctrl) {
   case AUDIO_MUTE:
@@ -312,27 +312,27 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 }
 
 static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int viz = (int) data;
+  int viz = (int)(intptr_t) data;
   
   config_update_num("gui.post_audio_plugin", viz);
 }
 static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int channel = (int) data;
+  int channel = (int)(intptr_t) data;
 
   gui_direct_change_audio_channel(NULL, NULL, channel);
 }
 static void menu_spu_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int channel = (int) data;
+  int channel = (int)(intptr_t) data;
 
   gui_direct_change_spu_channel(NULL, NULL, channel);
 }
 static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int aspect = (int) data;
+  int aspect = (int)(intptr_t) data;
   
   gui_toggle_aspect(aspect);
 }
 static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = ((int) data) - VIDEO_MIN;
+  int ctrl = ((int)(intptr_t) data) - VIDEO_MIN;
 
   static const int actions[] = {
     ACTID_TOGGLE_FULLSCREEN,
@@ -353,7 +353,7 @@ static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
   gui_execute_action_id(actions[ctrl]);
 }
 static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int sets = ((int) data) - SETS_MIN;
+  int sets = ((int)(intptr_t) data) - SETS_MIN;
 
   static const int actions[] = {
     ACTID_SETUP,
@@ -803,7 +803,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	menu_entry.menu      = buffer;
 	menu_entry.type      = IS_CHANNEL_CHECKED(i, gGui->visual_anim.post_plugin_num);
 	menu_entry.cb        = menu_audio_viz;
-	menu_entry.user_data = (void *) i;
+	menu_entry.user_data = (void *)(intptr_t) i;
 	xitk_menu_add_entry(w, &menu_entry);
 	i++;
       }
@@ -852,7 +852,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
-	    menu_entry.user_data = (void *) i;
+	    menu_entry.user_data = (void *)(intptr_t) i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -865,7 +865,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
-      menu_entry.user_data = (void *) i;
+      menu_entry.user_data = (void *)(intptr_t) i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -906,7 +906,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
-	    menu_entry.user_data = (void *) i;
+	    menu_entry.user_data = (void *)(intptr_t) i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -919,7 +919,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
-      menu_entry.user_data = (void *) i;
+      menu_entry.user_data = (void *)(intptr_t) i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -948,7 +948,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
       asprintf(&menu_entry.menu, "%s/%s", menus_str, gettext(menu_entries[i]));
       menu_entry.cb        = menu_menus_selection;
-      menu_entry.user_data = (void *)i;
+      menu_entry.user_data = (void *)(intptr_t)i;
       xitk_menu_add_entry(w, &menu_entry);
       free(menu_entry.menu);
     }
@@ -1030,7 +1030,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
-	    menu_entry.user_data = (void *) i;
+	    menu_entry.user_data = (void *)(intptr_t) i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -1042,7 +1042,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
-      menu_entry.user_data = (void *) i;
+      menu_entry.user_data = (void *)(intptr_t) i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -1102,7 +1102,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
-	    menu_entry.user_data = (void *) i;
+	    menu_entry.user_data = (void *)(intptr_t) i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -1114,7 +1114,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
-      menu_entry.user_data = (void *) i;
+      menu_entry.user_data = (void *)(intptr_t) i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 

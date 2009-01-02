@@ -1403,7 +1403,7 @@ void video_window_set_visibility(int show_window) {
   if(gGui->use_root_window)
     return;
 
-  xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)show_window);
+  xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)(intptr_t)show_window);
   
   pthread_mutex_lock(&gVw.mutex);
 

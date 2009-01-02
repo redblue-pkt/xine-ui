@@ -295,7 +295,7 @@ void playlist_move_current_updown(xitk_widget_t *w, void *data) {
     int          start = xitk_browser_get_current_start(playlist->playlist);
     int          max_vis_len = xitk_browser_get_num_entries(playlist->playlist);
 
-    if(((int)data) == DIRECTION_UP && (j > 0)) {
+    if(((intptr_t)data) == DIRECTION_UP && (j > 0)) {
       mmk = gGui->playlist.mmk[j - 1];
       
       if(j == gGui->playlist.cur)
@@ -305,7 +305,7 @@ void playlist_move_current_updown(xitk_widget_t *w, void *data) {
       gGui->playlist.mmk[j] = mmk;
       j--;
     }
-    else if(((int)data) == DIRECTION_DOWN && (j < (gGui->playlist.num - 1))) {
+    else if(((intptr_t)data) == DIRECTION_DOWN && (j < (gGui->playlist.num - 1))) {
       mmk = gGui->playlist.mmk[j + 1];
       
       if(j == gGui->playlist.cur)

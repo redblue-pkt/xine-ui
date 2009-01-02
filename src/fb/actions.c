@@ -356,7 +356,7 @@ static void action_play(void)
 
 static void *seek_relative_thread(void *data)
 {
-	int sec, off_sec = (int)data;
+	int sec, off_sec = (int)(intptr_t)data;
 	
 	pthread_detach(pthread_self());
 	
@@ -391,7 +391,7 @@ static void action_seek_relative(int off_sec)
 	fbxine.ignore_next = 1;
 
 	err = pthread_create(&seek_thread, 0, seek_relative_thread,
-			     (void *)off_sec);
+			     (void *)(intptr_t)off_sec);
 	if(!err)
 		return;
 
@@ -402,7 +402,7 @@ static void action_seek_relative(int off_sec)
 
 static void change_audio_channel(void *data) 
 {
-        int dir = (int)data;
+        int dir = (int)(intptr_t)data;
 	int channel;
   
 	channel = xine_get_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
@@ -420,7 +420,7 @@ static void change_audio_channel(void *data)
 
 static void change_spu(void *data) 
 {
-        int dir = (int)data;
+        int dir = (int)(intptr_t)data;
 	int channel;
   
 	channel = xine_get_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL);

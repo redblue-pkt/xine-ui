@@ -2541,14 +2541,14 @@ static void do_halt(commands_t *cmd, client_info_t *client_info) {
 }
 
 static void network_messenger(void *data, char *message) {
-  int socket = (int) data;
+  int socket = (int)(intptr_t) data;
   
   sock_write(socket, "%s", message);
 }
 
 static void do_snap(commands_t *cmd, client_info_t *client_info) {
   create_snapshot(gGui->mmk.mrl, 
-		  network_messenger, network_messenger, (void *)client_info->socket);
+		  network_messenger, network_messenger, (void *)(intptr_t)client_info->socket);
 }
 
 /*

@@ -834,11 +834,11 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     xitk_browser_release_all_buttons(private_data->mrlb_list);
 
     if(add_callback && private_data->add_callback)
-      private_data->add_callback(NULL, (void *) j, 
+      private_data->add_callback(NULL, (void *)(intptr_t) j, 
 				 private_data->mc->filtered_mrls[j]);
     
     if(play_callback && private_data->play_callback)
-      private_data->play_callback(NULL, (void *) j,
+      private_data->play_callback(NULL, (void *)(intptr_t) j,
 				  private_data->mc->filtered_mrls[j]);
   }
 }

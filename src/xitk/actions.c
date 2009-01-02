@@ -1102,7 +1102,7 @@ void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value) {
 }
 
 void gui_change_audio_channel(xitk_widget_t *w, void *data) {
-  int dir = (int)data;
+  int dir = (int)(intptr_t)data;
   int channel;
   
   channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
@@ -1122,7 +1122,7 @@ void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
 }
 
 void gui_change_spu_channel(xitk_widget_t *w, void *data) {
-  int dir = (int)data;
+  int dir = (int)(intptr_t)data;
   int channel;
   
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
@@ -1138,11 +1138,11 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
 void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
 
-  if(((int)data) == GUI_NEXT) {
+  if(((intptr_t)data) == GUI_NEXT) {
     if(speed > XINE_SPEED_PAUSE)
       xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed /= 2));
   }
-  else if(((int)data) == GUI_PREV) {
+  else if(((intptr_t)data) == GUI_PREV) {
     if(speed < XINE_SPEED_FAST_4) {
       if(speed > XINE_SPEED_PAUSE)
 	xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed *= 2));
@@ -1152,7 +1152,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
       }
     }
   }
-  else if(((int)data) == GUI_RESET) {
+  else if(((intptr_t)data) == GUI_RESET) {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, (speed = XINE_SPEED_NORMAL));
   }
   if(speed != XINE_SPEED_PAUSE)
@@ -1166,7 +1166,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 }
 
 static void *_gui_set_current_position(void *data) {
-  int  pos = (int) data;
+  int  pos = (int)(intptr_t) data;
   int  update_mmk = 0;
   
   pthread_detach(pthread_self());
@@ -1252,7 +1252,7 @@ static void *_gui_set_current_position(void *data) {
 }
 
 static void *_gui_seek_relative(void *data) {
-  int off_sec = (int)data;
+  int off_sec = (int)(intptr_t)data;
   int sec, pos;
   
   pthread_detach(pthread_self());
@@ -1315,7 +1315,7 @@ void gui_set_current_position (int pos) {
   pthread_mutex_lock(&new_pos_mutex);
   if(gGui->new_pos == -1) {
     pthread_mutex_unlock(&new_pos_mutex);
-    if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)pos)) != 0) {
+    if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)(intptr_t)pos)) != 0) {
       printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
       abort();
     }
@@ -1330,7 +1330,7 @@ void gui_seek_relative (int off_sec) {
   int        err;
   pthread_t  pth;
   
-  if((err = pthread_create(&pth, NULL, _gui_seek_relative, (void *)off_sec)) != 0) {
+  if((err = pthread_create(&pth, NULL, _gui_seek_relative, (void *)(intptr_t)off_sec)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
@@ -1485,7 +1485,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
   if(mmk && mediamark_got_alternate(mmk))
     mediamark_unset_got_alternate(mmk);
 
-  if(((int)data) == GUI_NEXT) {
+  if(((intptr_t)data) == GUI_NEXT) {
 
     osd_hide();
 
@@ -1541,7 +1541,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
       }
     }
   }
-  else if(((int)data) == GUI_PREV) {
+  else if(((intptr_t)data) == GUI_PREV) {
 
     osd_hide();
     
