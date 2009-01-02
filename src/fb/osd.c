@@ -35,6 +35,7 @@
 #include "osd.h"
 #include "actions.h"
 #include "globals.h"
+#include "utils.h"
 
 #define OVL_PALETTE_SIZE 256
 

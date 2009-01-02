@@ -24,6 +24,7 @@
 #include "main.h"
 
 #include "globals.h"
+#include "utils.h"
 
 typedef struct {
   xine_post_t                 *post;
