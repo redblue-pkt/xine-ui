@@ -2904,6 +2904,14 @@ void mediamark_save_mediamarks(const char *filename) {
   if(status && fn) {
     int   i;
     FILE *fd;
+    const char *store_item;
+    char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX];
+
+    if (getcwd(current_dir, sizeof(current_dir)) > 0) {
+      if (current_dir[strlen(current_dir) - 1] != '/')
+        strlcat(current_dir, "/", sizeof(current_dir));
+    } else
+      strcpy(current_dir, "");
 
     if((fd = fopen(filename, "w")) != NULL) {
 
@@ -2912,9 +2920,12 @@ void mediamark_save_mediamarks(const char *filename) {
       for(i = 0; i < gGui->playlist.num; i++) {
 	fprintf(fd, "\nentry {\n");
 	fprintf(fd, "\tidentifier = %s;\n", gGui->playlist.mmk[i]->ident);
-	fprintf(fd, "\tmrl = %s;\n", gGui->playlist.mmk[i]->mrl);
-	if(gGui->playlist.mmk[i]->sub)
-	  fprintf(fd, "\tsubtitle = %s;\n", gGui->playlist.mmk[i]->sub);
+	store_item = concat_basedir(buffer, sizeof(buffer), current_dir, gGui->playlist.mmk[i]->mrl);
+	fprintf(fd, "\tmrl = %s;\n", store_item);
+	if(gGui->playlist.mmk[i]->sub) {
+	  store_item = concat_basedir(buffer, sizeof(buffer), current_dir, gGui->playlist.mmk[i]->sub);
+	  fprintf(fd, "\tsubtitle = %s;\n", store_item);
+	}
 	if(gGui->playlist.mmk[i]->start > 0)
 	  fprintf(fd, "\tstart = %d;\n", gGui->playlist.mmk[i]->start);
 	if(gGui->playlist.mmk[i]->end != -1)
