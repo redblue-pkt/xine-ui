@@ -55,6 +55,7 @@ xine-ui (0.99.6) unstable; urgency=low
   * Fixed loading of playlist containing relative paths, closes xine bug #52.
   * Fixed possible integer overflow when parsing PNG files in skins, closes
     xine bug #153.
+  * Lock display on exit, xine bug #193.
 
 xine-ui (0.99.5) unstable; urgency=low
 

@@ -712,7 +712,16 @@ void gui_exit (xitk_widget_t *w, void *data) {
   
   if(gGui->stdctl_enable) 
     stdctl_stop();
-  
+
+  /* this will prevent a race condition that may lead to a lock:
+   * xitk_stop() makes gui_run() in event.c return from xitk_run()
+   * and do some house cleaning which includes closing displays.
+   * However, we're not done using displays and we must prevent that
+   * from happening until we're finished.
+   */
+  XLockDisplay(gGui->video_display);
+  if( gGui->video_display != gGui->display )
+    XLockDisplay(gGui->display);
   xitk_stop();
   /* 
    * This prevent xine waiting till the end of time for an
@@ -720,7 +729,11 @@ void gui_exit (xitk_widget_t *w, void *data) {
    */
   if( gGui->video_display == gGui->display )
     gui_send_expose_to_window(gGui->video_window);
+ 
   xitk_skin_unload_config(gGui->skin_config);
+  XUnlockDisplay(gGui->video_display);
+  if( gGui->video_display != gGui->display )
+    XUnlockDisplay(gGui->display);
 }
 
 void gui_play (xitk_widget_t *w, void *data) {
