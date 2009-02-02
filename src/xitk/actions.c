@@ -360,6 +360,53 @@ static void start_anyway_yesno(xitk_widget_t *w, void *data, int button) {
 
 }
 
+static void set_mmk(mediamark_t *mmk) {
+  
+  free(gGui->mmk.mrl);
+  free(gGui->mmk.ident);
+  free(gGui->mmk.sub);
+  if(mediamark_have_alternates(&(gGui->mmk)))
+    mediamark_free_alternates(&(gGui->mmk));
+  
+  if(mmk) {
+    gGui->mmk.mrl           = strdup(mmk->mrl);
+    gGui->mmk.ident         = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
+    gGui->mmk.sub           = mmk->sub ? strdup(mmk->sub): NULL;
+    gGui->mmk.start         = mmk->start;
+    gGui->mmk.end           = mmk->end;
+    gGui->mmk.av_offset     = mmk->av_offset;
+    gGui->mmk.spu_offset    = mmk->spu_offset;
+    gGui->mmk.got_alternate = mmk->got_alternate;
+    mediamark_duplicate_alternates(mmk, &(gGui->mmk));
+  }
+  else {
+    char buffer[1024];
+    
+    snprintf(buffer, sizeof(buffer), "xine-ui version %s", VERSION);
+    
+    gGui->mmk.mrl           = strdup(_("There is no MRL."));
+    gGui->mmk.ident         = strdup(buffer);
+    gGui->mmk.sub           = NULL;
+    gGui->mmk.start         = 0;
+    gGui->mmk.end           = -1;
+    gGui->mmk.av_offset     = 0;
+    gGui->mmk.spu_offset    = 0;
+    gGui->mmk.got_alternate = 0;
+    gGui->mmk.alternates    = NULL;
+    gGui->mmk.cur_alt       = NULL;
+  }
+}
+
+static void mmk_set_update(void) {
+
+  video_window_set_mrl(gGui->mmk.ident);
+  event_sender_update_menu_buttons();
+  panel_update_mrl_display();
+  playlist_update_focused_entry();
+  
+  gGui->playlist.ref_append = gGui->playlist.cur;
+}
+
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
   int has_video, has_audio, v_unhandled = 0, a_unhandled = 0;
   uint32_t video_handled, audio_handled;
@@ -1349,11 +1396,9 @@ void gui_seek_relative (int off_sec) {
   }
 }
 
-static void *_gui_dndcallback(void *data) {
+void gui_dndcallback(char *filename) {
   int   more_than_one = -2;
-  char *mrl           = (char *) data;
-
-  pthread_detach(pthread_self());
+  char *mrl           = filename ? strdup(filename) : NULL;
 
   if(mrl) {
     char  buffer[strlen(mrl) + 10];
@@ -1362,6 +1407,8 @@ static void *_gui_dndcallback(void *data) {
 
     memset(&buffer, 0, sizeof(buffer));
     memset(&buffer2, 0, sizeof(buffer2));
+
+    pthread_mutex_lock(&gGui->mmk_mutex);
 
     if((strlen(mrl) > 6) && 
        (!strncmp(mrl, "file:", 5))) {
@@ -1460,7 +1507,8 @@ static void *_gui_dndcallback(void *data) {
 	else
 	  gGui->playlist.cur = gGui->playlist.num - 1;
 
-	gui_set_current_mmk(mediamark_get_current_mmk());
+        set_mmk(mediamark_get_current_mmk());
+        mmk_set_update();
 	if(gGui->smart_mode)
 	  gui_play(NULL, NULL);
 
@@ -1469,23 +1517,11 @@ static void *_gui_dndcallback(void *data) {
     
     if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);
+
+    pthread_mutex_unlock(&gGui->mmk_mutex);
   }
 
   free(mrl);
-
-  pthread_exit(NULL);
-}
-
-void gui_dndcallback(char *mrl) {
-  int         err;
-  pthread_t   pth;
-  char       *_mrl = (mrl ? strdup(mrl) : NULL);
-
-  if((err = pthread_create(&pth, NULL, _gui_dndcallback, (void *)_mrl)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    abort();
-  }
-
 }
 
 void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
@@ -1674,53 +1710,6 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
   }
 
-}
-
-static void set_mmk(mediamark_t *mmk) {
-  
-  free(gGui->mmk.mrl);
-  free(gGui->mmk.ident);
-  free(gGui->mmk.sub);
-  if(mediamark_have_alternates(&(gGui->mmk)))
-    mediamark_free_alternates(&(gGui->mmk));
-  
-  if(mmk) {
-    gGui->mmk.mrl           = strdup(mmk->mrl);
-    gGui->mmk.ident         = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
-    gGui->mmk.sub           = mmk->sub ? strdup(mmk->sub): NULL;
-    gGui->mmk.start         = mmk->start;
-    gGui->mmk.end           = mmk->end;
-    gGui->mmk.av_offset     = mmk->av_offset;
-    gGui->mmk.spu_offset    = mmk->spu_offset;
-    gGui->mmk.got_alternate = mmk->got_alternate;
-    mediamark_duplicate_alternates(mmk, &(gGui->mmk));
-  }
-  else {
-    char buffer[1024];
-    
-    snprintf(buffer, sizeof(buffer), "xine-ui version %s", VERSION);
-    
-    gGui->mmk.mrl           = strdup(_("There is no MRL."));
-    gGui->mmk.ident         = strdup(buffer);
-    gGui->mmk.sub           = NULL;
-    gGui->mmk.start         = 0;
-    gGui->mmk.end           = -1;
-    gGui->mmk.av_offset     = 0;
-    gGui->mmk.spu_offset    = 0;
-    gGui->mmk.got_alternate = 0;
-    gGui->mmk.alternates    = NULL;
-    gGui->mmk.cur_alt       = NULL;
-  }
-}
-
-static void mmk_set_update(void) {
-
-  video_window_set_mrl(gGui->mmk.ident);
-  event_sender_update_menu_buttons();
-  panel_update_mrl_display();
-  playlist_update_focused_entry();
-  
-  gGui->playlist.ref_append = gGui->playlist.cur;
 }
 
 void gui_set_current_mmk(mediamark_t *mmk) {

@@ -57,6 +57,7 @@ xine-ui (0.99.6) unstable; urgency=low
   * Fixed possible integer overflow when parsing PNG files in skins, closes
     xine bug #153.
   * Lock display on exit, xine bug #193.
+  * Drag & drop race condition fixes.
 
 xine-ui (0.99.5) unstable; urgency=low
 
