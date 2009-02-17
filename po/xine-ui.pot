@@ -272,7 +272,7 @@ msgid ""
 "The amount of dropped frame is too high, your system might be slow, not "
 "properly optimized or just too loaded.\n"
 "\n"
-"http://xinehq.de/index.php/faq#SPEEDUP"
+"http://www.xine-project.org/faq#SPEEDUP"
 msgstr ""
 
 #: src/xitk/errors.c:336

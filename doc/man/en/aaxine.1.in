@@ -145,11 +145,11 @@ Well, there are surely a few of those. You can probably best ask for support
 
 .SH SEE ALSO
 .BR xine (1),
-.UR http://xinehq.de/
-.BR http://xinehq.de/,
+.UR http://www.xine-project.org/
+.BR http://www.xine-project.org/,
 .UE
-.UR http://aa-project.sourceforge.net/aalib/
-.BR http://aa-project.sf.net/aalib,
+.UR http://aa\-project.sourceforge.net/aalib/
+.BR http://aa\-project.sf.net/aalib,
 .UE
 .BR xine-lib (3)
 

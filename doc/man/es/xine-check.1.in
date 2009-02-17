@@ -64,8 +64,8 @@ soporte (y reportar gazapos) en nuestra lista de correo en
 .BR aaxine (1),\ 
 .BR xine\-lib (3),\ 
 .br 
-.UR http://xinehq.de/
-.BR http://xinehq.de
+.UR http://www.xine-project.org/
+.BR http://www.xine-project.org/
 .UE
 .SH "AUTOR"
 Esta página de manual fue escrita por Philipp Hahn <pmhahn@users.sf.net> para el proyecto xine, 

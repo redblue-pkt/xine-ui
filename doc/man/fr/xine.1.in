@@ -686,8 +686,8 @@ fichier (un argument par ligne), comme ci\-dessous:
 La documentation pour le plugin VCD est disponible séparement.
 .br
 Le programme est complètement documenté sur la page du projet de xine:
-.UR http://xinehq.de/
-.IR "http://xinehq.de/"
+.UR http://www.xine-project.org/
+.IR "http://www.xine-project.org/"
 .UE
 .SH AUTEURS
 Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, 

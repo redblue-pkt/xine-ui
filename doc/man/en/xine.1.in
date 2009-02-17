@@ -701,8 +701,8 @@ Each line specifies an additional command line argument (one argument per line):
 \fBxine\fP(5) for details of the MRL syntax
 .PP
 The programs are documented fully on the xine home page:
-.UR http://xinehq.de/
-.IR "http://xinehq.de/"
+.UR http://www.xine-project.org/
+.IR "http://www.xine-project.org/"
 .UE
 .SH AUTHOR
 This manual page was written by Siggi Langauf <siggi@debian.org>,

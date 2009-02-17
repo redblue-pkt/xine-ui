@@ -314,7 +314,7 @@ static void _learn_more_about_too_slow(xitk_widget_t *w, void *data, int state) 
    * should we just make it configurable? 
    */
   xine_info(_("Opening mozilla web browser, this might take a while..."));
-  system ("mozilla http://xinehq.de/index.php/faq#SPEEDUP");
+  system ("mozilla http://www.xine-project.org/faq#SPEEDUP");
 }
 
 /*
@@ -327,7 +327,7 @@ void too_slow_window(void) {
   int checked = 0;
     
   title = _("Warning");
-  message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://xinehq.de/index.php/faq#SPEEDUP");
+  message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://www.xine-project.org/faq#SPEEDUP");
   
   dump_error(message);
 

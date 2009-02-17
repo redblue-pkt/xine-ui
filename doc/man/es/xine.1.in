@@ -670,8 +670,8 @@ Cada línea especifica un argumento adicional de línea de órdenes (un argumento p
 \fBxine\fP(5) para detalles de la sintaxis MRL
 .PP 
 Los programas están totalmente documentados en la página principal de xine:
-.UR http://xinehq.de/
-.IR "http://xinehq.de/"
+.UR http://www.xine-project.org/
+.IR "http://www.xine-project.org/"
 .UE
 .SH "AUTOR"
 Estas páginas del manual fueron escritas por Siggi Langauf <siggi@debian.org>,
