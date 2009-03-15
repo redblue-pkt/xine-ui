@@ -505,64 +505,39 @@ vars xine_executable xine_executables
 
 # search for xine-config in PATH
 
-xine_config=""
-if search -x xine-config "$PATH"; then
-  xine_config=`echo "$found"|sort|uniq`
-  if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
-    xine_configs="$xine_config"
-    xine_config=`echo "$xine_configs" | head -n 1`
-    msg several-xine-config 1
-  else
-    msg xine-config-in-path 0
+if pkg-config libxine; then
+  if [ "$xine_executable" = "/usr/bin/xine" ]; then
+    xine_prefix=/usr
+    plugindir=/usr/lib/xine/plugins
+    skindir=/usr/share/xine/skins
+    case "$DISTRO" in
+      Debian)
+        msg assuming-xine-package-deb 1
+        ;;
+      RedHat)
+        msg assuming-xine-package-rpm 1
+        ;;
+      *)
+        msg assuming-xine-package 1
+        ;;
+    esac
   fi
+  xine_config=y
 else
-  if search -f bin/xine-config; then
-    xine_config="$found";
-    if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
-      xine_configs="$xine_config"
-      xine_config=`echo "$xine_configs" | head -n 1`
-      msg several-xine-config 1
-    else
-      msg xine-config-somewhere 0
-    fi
-    if test -x "$xine_config"; then
-      msg xine-config-executable
-    else
-      msg xine-config-not-executable 2
-      xine_config=""
-    fi
-  else
-    if [ "$xine_executable" = "/usr/bin/xine" ]; then
-       xine_prefix=/usr
-       plugindir=/usr/lib/xine/plugins
-       skindir=/usr/share/xine/skins
-       case "$DISTRO" in
-	 Debian)
-	    msg assuming-xine-package-deb 1
-	    ;;
-	 RedHat)
-	    msg assuming-xine-package-rpm 1
-	    ;;
-	 *)
-	    msg assuming-xine-package 1
-	    ;;
-       esac
-    else
-      msg no-xine-config 2
-    fi
-  fi
+  msg no-xine-config 2
+  xine_config=
 fi
 
 vars xine_configs xine_config xine_prefix plugindir skindir
 
 if test -n "$xine_config"; then
-  xine_prefix=`$xine_config --prefix`
-  if [ "$xine_prefix" != `$xine_config --exec-prefix` ]; then
-    custom-exec-prefix 1
+  xine_prefix="`pkg-config --variable=prefix libxine`"
+  if [ "$xine_prefix" != "`pkg-config --variable=exec_prefix libxine`" ]; then
+    msg custom-exec-prefix 1
   else
-    plugindir=`$xine_config --plugindir`
-    datadir=`$xine_config --datadir`
-    skindir="$datadir/skins" #FIXME: guesswork...
+    plugindir="`pkg-config --variable=plugindir libxine`"
+    datadir="`pkg-config --variable=datadir libxine`"
+    skindir="`pkg-config --variable=xinedatadir libxine`/skins"
   fi
 fi
   
@@ -819,7 +794,7 @@ echo
 add "short description: $problem"
 
 if test -n "$xine_config"; then
-  lib_version=`$xine_config --version`
+  lib_version="`pkg-config --modversion libxine`"
 else
   lib_version=unknown
 fi
