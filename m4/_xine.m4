@@ -28,8 +28,13 @@ AC_DEFUN([AC_CHECK_LIRC],
      [  --disable-lirc          Turn off LIRC support.],
      [], enable_lirc=yes)
 
+  found_lirc=no
   if test x"$enable_lirc" = xyes; then
-     have_lirc=yes
+    have_lirc=yes
+    PKG_CHECK_MODULES(LIRC, liblircclient0, [found_lirc=yes], [])
+    if test "$LIRC_CFLAGS" != ''; then
+      LIRC_INCLUDE="$LIRC_CFLAGS"
+    else
      AC_REQUIRE_CPP
      AC_CHECK_LIB(lirc_client,lirc_init,
            [AC_CHECK_HEADER(lirc/lirc_client.h, true, have_lirc=no)], have_lirc=no)
@@ -41,14 +46,17 @@ AC_DEFUN([AC_CHECK_LIRC],
         fi
         for llirc in $lirc_libprefix /lib /usr/lib /usr/local/lib; do
           AC_CHECK_FILE(["$llirc/liblirc_client.a"],
-             [LIRC_LIBS="$llirc/liblirc_client.a"]
-             AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblir_client) installed]),,)
+            [LIRC_LIBS="$llirc/liblirc_client.a"
+             found_lirc=yes],,)
         done
      else
          AC_MSG_RESULT([*** LIRC client support not available, LIRC support will be disabled ***]);
      fi
+    fi
   fi
-
+     if test "$found_lirc" = yes; then
+	AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblirc_client) installed])
+     fi
      AC_SUBST(LIRC_LIBS)
      AC_SUBST(LIRC_INCLUDE)
      AM_CONDITIONAL([HAVE_LIRC], [test "x$have_lirc" = "xyes"])
