@@ -41,9 +41,9 @@ static ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *st
     (*lineptr)[i++] = (unsigned char)c;
     if (index(delims, c)) break;
   }
-  (*lineptr)[i] = '\0';
+  if (i != 0) (*lineptr)[i] = '\0';
 
-  return (c == EOF) ? -1 : (ssize_t)i;
+  return (i == 0) ? -1 : (ssize_t)i;
 }
 
 
