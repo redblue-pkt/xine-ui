@@ -26,7 +26,7 @@
 /* required for getsubopt(); the __sun test avoids compilation problems on 
     solaris. On FreeBSD defining this disable BSD functions to be visible
     and remove INADDR_NONE */
-#if ! defined (__sun__) && ! defined (__OpenBSD__)  && ! defined(__FreeBSD__)
+#if ! defined (__sun__) && ! defined (__OpenBSD__)  && ! defined(__FreeBSD__) && ! defined(__APPLE__)
 #define _XOPEN_SOURCE 500
 #endif
 /* required for strncasecmp() */
