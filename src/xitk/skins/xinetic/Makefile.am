@@ -15,7 +15,6 @@ skins_DATA =                                                                    
 	CtlSave.png	   MainNext.png	      MrlDismiss.png	PlPlay.png	Letters.png       \
 	MainPause.png      MrlSelect.png      Letters2.png      MrlFlit.png                       \
 	MainAutoButton.png MainPlay.png	      Onglet.png	MainNav.png                       \
-	MainAutoButton.png MainPlay.png	      Onglet.png	                                  \
 	BigArrowLeft.png  BigArrowRight.png                                                       \
 	PlSlidHBg.png      SliderHPad.png     SkSlidHBg.png     SlidHPad.png	                  \
 	SkSlidHPad.png     skinconfig
