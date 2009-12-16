@@ -1,6 +1,7 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * Set menu windows' override-redirect flag (xine bug 24)
   * Automatically load opensubtitle-like filenames <name>.*.<subext>
   * New/updated spanish manpage translations from Carlos E. Robinson
   * Fixed possible corruption and overflow of keybindings table

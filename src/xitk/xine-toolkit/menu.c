@@ -37,6 +37,7 @@ static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, i
 
 static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) {
   menu_window_t *menu_window;
+  XSetWindowAttributes menu_attr;
   
   menu_window          = (menu_window_t *) xitk_xmalloc(sizeof(menu_window_t));
   menu_window->display = im->x.disp;
@@ -45,7 +46,10 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   menu_window->wl.l    = xitk_list_new();
   menu_window->wl.win  = xitk_window_get_window(xwin);
 
+  menu_attr.override_redirect = True;
+
   XLOCK(im->x.disp);
+  XChangeWindowAttributes(im->x.disp, menu_window->wl.win, CWOverrideRedirect, &menu_attr);
   menu_window->wl.gc   = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
   XUNLOCK(im->x.disp);
 
