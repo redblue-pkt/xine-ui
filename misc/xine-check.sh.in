@@ -948,7 +948,8 @@ echo "You're strongly encouraged to add a detailed description of your problem."
 echo "Just look for 'additional description', and fill it in..."
 echo
 echo "When you're finished, you can use your favourite mailer to send it to"
-echo "<xine-bugreport@xinehq.de>."
+echo "<xine-bugs@xine-project.org> or, preferably, use your preferred web"
+echo "browser to submit the bug report to http://bugs.xine-project.org/."
 echo " Please use this subject line, or something even more descriptive:"
 echo "Subject: $subject"
 
@@ -958,7 +959,7 @@ if search -x mail "$PATH" || search -x mailx "$PATH"; then
   echo $mailer -s \""$subject"\"
   echo 'Please make sure to add the additional description before saying "yes"!' 
   if yesno "Do you want me to do this now?"; then
-    $mailer -s "$subject" <"$bugreport" xine-bugreport@xinehq.de
+    $mailer -s "$subject" <"$bugreport" xine-bugs@xine-project.org
     echo "okay, done."
     echo "If your machine is set up correctly to send mail to the internet,"
     echo "everything's fine and the message is on the way..."
