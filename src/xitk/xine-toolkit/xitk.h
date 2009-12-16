@@ -812,7 +812,8 @@ int xitk_get_white_color(void);
 int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
-void xitk_subst_special_chars(char *src, char *dest);
+//void xitk_subst_special_chars(char *src, char *dest);
+#define xitk_subst_special_chars(SRC,DST) strcpy((DST),(SRC))
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);

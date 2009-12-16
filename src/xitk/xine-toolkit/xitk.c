@@ -2153,6 +2153,7 @@ void xitk_set_tips_timeout(unsigned long timeout) {
  * copy src to dest and substitute special chars. dest should have 
  * enought space to store chars.
  */
+/*
 void xitk_subst_special_chars(char *src, char *dest) {
   char *s, *d;
   
@@ -2202,7 +2203,7 @@ void xitk_subst_special_chars(char *src, char *dest) {
   }
   *d = '\0';
 }
-
+*/
 /*
  *
  */
