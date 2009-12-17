@@ -288,23 +288,60 @@ static void _dnd_get_three_types (XEvent * xevent, Atom **typelist) {
  */
 void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
 
+  enum {
+    XdndAware,
+    XdndEnter,
+    XdndLeave,
+    XdndDrop,
+    XdndPosition,
+    XdndStatus,
+    XdndSelection,
+    XdndFinished,
+    XdndTypeList,
+    WM_DELETE_WINDOW,
+    XiTkXselWindowProperty,
+    _XA_ATOMS_COUNT
+  };
+
+  const char *const prop_names[_XA_ATOMS_COUNT] = {
+    "XdndAware", /* _XA_XdndAware */
+    "XdndEnter", /* _XA_XdndEnter */
+    "XdndLeave", /* _XA_XdndLeave */
+    "XdndDrop", /* _XA_XdndDrop */
+    "XdndPosition", /* _XA_XdndPosition */
+    "XdndStatus", /* _XA_XdndStatus */
+    "XdndSelection", /* _XA_XdndSelection */
+    "XdndFinished", /* _XA_XdndFinished */
+    "XdndTypeList", /* _XA_XdndTypeList */
+    "WM_DELETE_WINDOW", /* _XA_WM_DELETE_WINDOW */
+    "XiTKXSelWindowProperty" /* _XA_XITK_PROTOCOL_ATOM */
+  };
+
+  const char *const mime_names[MAX_SUPPORTED_TYPE] = {
+    "text/uri-list", /* supported[0] */
+    "text/plain"  /* supported[1] */
+  };
+
+  Atom props[_XA_ATOMS_COUNT];
+
   xdnd->display = display;
 
   XLOCK(xdnd->display);
 
-  xdnd->_XA_XdndAware             = XInternAtom(xdnd->display, "XdndAware", False);
-  xdnd->_XA_XdndEnter             = XInternAtom(xdnd->display, "XdndEnter", False);
-  xdnd->_XA_XdndLeave             = XInternAtom(xdnd->display, "XdndLeave", False);
-  xdnd->_XA_XdndDrop              = XInternAtom(xdnd->display, "XdndDrop", False);
-  xdnd->_XA_XdndPosition          = XInternAtom(xdnd->display, "XdndPosition", False);
-  xdnd->_XA_XdndStatus            = XInternAtom(xdnd->display, "XdndStatus", False);
-  xdnd->_XA_XdndSelection         = XInternAtom(xdnd->display, "XdndSelection", False);
-  xdnd->_XA_XdndFinished          = XInternAtom(xdnd->display, "XdndFinished", False);
-  xdnd->_XA_XdndTypeList          = XInternAtom(xdnd->display, "XdndTypeList", False);
-  xdnd->_XA_WM_DELETE_WINDOW      = XInternAtom(xdnd->display, "WM_DELETE_WINDOW", False);
-  xdnd->_XA_XITK_PROTOCOL_ATOM    = XInternAtom(xdnd->display, "XiTKXSelWindowProperty", False);
-  xdnd->supported[0]              = XInternAtom(xdnd->display, "text/uri-list", False);
-  xdnd->supported[1]              = XInternAtom(xdnd->display, "text/plain", False);
+  XInternAtoms(xdnd->display, prop_names, _XA_ATOMS_COUNT, False, props);
+  XInternAtoms(xdnd->display, mime_names, MAX_SUPPORTED_TYPE, False, xdnd->supported);
+
+  xdnd->_XA_XdndAware             = props[XdndAware];
+  xdnd->_XA_XdndEnter             = props[XdndEnter];
+  xdnd->_XA_XdndLeave             = props[XdndLeave];
+  xdnd->_XA_XdndDrop              = props[XdndDrop]; 
+  xdnd->_XA_XdndPosition          = props[XdndPosition];
+  xdnd->_XA_XdndStatus            = props[XdndStatus];
+  xdnd->_XA_XdndSelection         = props[XdndSelection];
+  xdnd->_XA_XdndFinished          = props[XdndFinished];
+  xdnd->_XA_XdndTypeList          = props[XdndTypeList];
+  xdnd->_XA_WM_DELETE_WINDOW      = props[WM_DELETE_WINDOW];
+  xdnd->_XA_XITK_PROTOCOL_ATOM    = props[XiTkXselWindowProperty];
   
   XUNLOCK(xdnd->display);
 
