@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  *
- * $Id$
- *
  * doubly linked lists with builtin iterator,
  * based upon xine_list functions of the xine project
  */

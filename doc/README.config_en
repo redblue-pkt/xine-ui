@@ -79,9 +79,3 @@ gui.x_mrl_browser           X coords of mrl browser window in root window.
 
 gui.y_mrl_browser           Y coords of mrl browser window in root window.
 ***
-
-
-
---- 
-version of this file:
- $Id$

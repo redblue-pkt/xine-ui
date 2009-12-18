@@ -19,8 +19,6 @@
    Boston, MA 02110, USA
 */
 
-/* $Id$ */
-
 #include <stdlib.h>
 
 #include "frequencies.h"

@@ -19,8 +19,6 @@
    Boston, MA 02110, USA
 */
 
-/* $Id$ */
-
 /*
  * Worldwide channel/frequency list
  *
