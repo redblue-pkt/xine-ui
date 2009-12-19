@@ -1,37 +1,37 @@
 ++++++++++++++++++++++                                  +++++++++++++++++++++++
-                        XINE: Svobodnı video pøehrávaè
+                        XINE: SvobodnÃ½ video pÅ™ehrÃ¡vaÄ
 ++++++++++++++++++++++                                  +++++++++++++++++++++++
 
 
-xine je svobodnı pøehrávaè multimédií licencovanı pod GPL navr¾enı k pøehrávání
-v¹ech typù multimediálních souborù.
-(Je¹tì jsme nemohli dosáhnout tohoto cíle, ale u¾ jsme docela blízko.)
+xine je svobodnÃ½ pÅ™ehrÃ¡vaÄ multimÃ©diÃ­ licencovanÃ½ pod GPL navrÅ¾enÃ½ k pÅ™ehrÃ¡vÃ¡nÃ­
+vÅ¡ech typÅ¯ multimediÃ¡lnÃ­ch souborÅ¯.
+(JeÅ¡tÄ› jsme nemohli dosÃ¡hnout tohoto cÃ­le, ale uÅ¾ jsme docela blÃ­zko.)
 
-Toto je dokumentace pro koncové u¾ivatele xine. Více informací mù¾ete nalézt
-v adresáøích s dokumentací balíèkù xine-lib a xine-ui, obvykle budou
-nainstalovány v /usr/share/doc nebo /usr/share/doc/packeges nebo, pokud jste
+Toto je dokumentace pro koncovÃ© uÅ¾ivatele xine. VÃ­ce informacÃ­ mÅ¯Å¾ete nalÃ©zt
+v adresÃ¡Å™Ã­ch s dokumentacÃ­ balÃ­ÄkÅ¯ xine-lib a xine-ui, obvykle budou
+nainstalovÃ¡ny v /usr/share/doc nebo /usr/share/doc/packeges nebo, pokud jste
 kompilovali xine sami, v /usr/local/share/doc nebo
 /usr/local/share/doc/packages.
 
-Dal¹í informace jako seznam vlastností, software dal¹ích projektù, které
-pou¾íváme, nebo pøání vıvojáøù v pøípadì, ¾e chcete darem podpoøit projekt
-xine, mù¾ete nalézt na webové stránce xine http://www.xine-project.org/.
+DalÅ¡Ã­ informace jako seznam vlastnostÃ­, software dalÅ¡Ã­ch projektÅ¯, kterÃ©
+pouÅ¾Ã­vÃ¡me, nebo pÅ™Ã¡nÃ­ vÃ½vojÃ¡Å™Å¯ v pÅ™Ã­padÄ›, Å¾e chcete darem podpoÅ™it projekt
+xine, mÅ¯Å¾ete nalÃ©zt na webovÃ© strÃ¡nce xine http://www.xine-project.org/.
 
-Jestli¾e se pøi pou¾ívání xine setkáte s jakımikoliv problémy, vìzte, ¾e
-vìt¹inu problémù i jejich øe¹ení najdete ve FAQ, které jsou souèástí xine-lib.
-Aktuální verzi lze v¾dy nalézt na webové stránce
+JestliÅ¾e se pÅ™i pouÅ¾Ã­vÃ¡nÃ­ xine setkÃ¡te s jakÃ½mikoliv problÃ©my, vÄ›zte, Å¾e
+vÄ›tÅ¡inu problÃ©mÅ¯ i jejich Å™eÅ¡enÃ­ najdete ve FAQ, kterÃ© jsou souÄÃ¡stÃ­ xine-lib.
+AktuÃ¡lnÃ­ verzi lze vÅ¾dy nalÃ©zt na webovÃ© strÃ¡nce
 http://www.xine-project.org/faq.
 
-K dispozici je také vıvojáøská dokumentace nazvaná "Hackerskı prùvodce xine"
-(xine hacker's guide). Jestli¾e se chystáte pomoci s roz¹íøením mo¾ností a
-funkcí xine nebo chcete prostì vìdìt, jak pracuje xine uvnitø, podívejte se do
-ní. Vıvojáøská dokumentace je na va¹em systému nainstalována ve formì HTML,
-kromì toho mù¾ete získat aktuální verzi na
+K dispozici je takÃ© vÃ½vojÃ¡Å™skÃ¡ dokumentace nazvanÃ¡ "HackerskÃ½ prÅ¯vodce xine"
+(xine hacker's guide). JestliÅ¾e se chystÃ¡te pomoci s rozÅ¡Ã­Å™enÃ­m moÅ¾nostÃ­ a
+funkcÃ­ xine nebo chcete prostÄ› vÄ›dÄ›t, jak pracuje xine uvnitÅ™, podÃ­vejte se do
+nÃ­. VÃ½vojÃ¡Å™skÃ¡ dokumentace je na vaÅ¡em systÃ©mu nainstalovÃ¡na ve formÄ› HTML,
+kromÄ› toho mÅ¯Å¾ete zÃ­skat aktuÃ¡lnÃ­ verzi na
 http://www.xine-project.org/hackersguide.
 
-Jestli¾e odpovìï na va¹i otázku nebo øe¹ení va¹eho problému nenajdete ve vı¹e
-uvedenıch zdrojích, poraïte se na mailing listu xine-user@lists.sourceforge.net
-v pøípadì problémù s pou¾íváním xine nebo na mailing listu
-xine-devel@lists.sourceforge.net v pøípadì dotazù tıkajících se vıvoje xine.
+JestliÅ¾e odpovÄ›Ä na vaÅ¡i otÃ¡zku nebo Å™eÅ¡enÃ­ vaÅ¡eho problÃ©mu nenajdete ve vÃ½Å¡e
+uvedenÃ½ch zdrojÃ­ch, poraÄte se na mailing listu xine-user@lists.sourceforge.net
+v pÅ™Ã­padÄ› problÃ©mÅ¯ s pouÅ¾Ã­vÃ¡nÃ­m xine nebo na mailing listu
+xine-devel@lists.sourceforge.net v pÅ™Ã­padÄ› dotazÅ¯ tÃ½kajÃ­cÃ­ch se vÃ½voje xine.
 
-Pøejeme pøíjemné pou¾ívání xine.
+PÅ™ejeme pÅ™Ã­jemnÃ© pouÅ¾Ã­vÃ¡nÃ­ xine.

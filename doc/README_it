@@ -10,42 +10,42 @@ un riproduttore video 'free'
 scopo di questo documento:
 --------------------------
 
-questa è la documentazione utente finale per xine-lib e xine-ui. Troverai
+questa Ã¨ la documentazione utente finale per xine-lib e xine-ui. Troverai
 ulteriore documentazione nella cartella doc/ di entrambi i pacchetti.
 
 a proposito di xine:
 --------------------
 
-xine è un riproduttotre video gratuito con licenza GPL per sistemi tipo-unix.
+xine Ã¨ un riproduttotre video gratuito con licenza GPL per sistemi tipo-unix.
 Supportiamo flussi mpeg elementari (solo audio/video, per esempio files mp3) e
 files AVI (usando dll codec win32).
 
 xine riproduce i dati video ed audio del flusso e sincronizza la riproduzione
-d'entrambi. In base alle proprietà del flusso, la riproduzione necessiterà di
-più o meno potenza di calcolo; si è verificata una riproduzione perfetta per
+d'entrambi. In base alle proprietÃ  del flusso, la riproduzione necessiterÃ  di
+piÃ¹ o meno potenza di calcolo; si Ã¨ verificata una riproduzione perfetta per
 l'mpeg-2 su un sistema 400 MHz P II.
 
-xine può riprodurre Video CD, SVCD e DVD direttamente. Sfortunatamente
-lo status legale della riproduzione di DVD crittati/bloccati è incerto in certi
-paesi, sicchè non possiamo includere codice di sblocco/decrittazione DVD in
+xine puÃ² riprodurre Video CD, SVCD e DVD direttamente. Sfortunatamente
+lo status legale della riproduzione di DVD crittati/bloccati Ã¨ incerto in certi
+paesi, sicchÃ¨ non possiamo includere codice di sblocco/decrittazione DVD in
 xine. Per riprodurre tali DVD avrai bisogno di programmi esterni o qualcosa come
 uno xine_dvd_plugin che possa gestire l'autenticazione/derimescolamento del DVD.
 
 In xine 0.5 abbiamo introdotto una nuova architettura che supporta plugin
-flessibili per vari compiti, sicchè in futuro potremo supportare vari altri
+flessibili per vari compiti, sicchÃ¨ in futuro potremo supportare vari altri
 tipi di flussi e dispositivi d'uscita.
 
 
 piattaforme supportate / prerequisiti:
 --------------------------------------
 
-- a xine occorre un server X11 di 15, 16, 24 o 32 bit di profondità per
+- a xine occorre un server X11 di 15, 16, 24 o 32 bit di profonditÃ  per
   l'uscita video.
-- aaxine usa aalib per l'uscita e può funzionare su quasi tutti i terminali.
-- xine può rilevare ed utilizzare le estensioni MIT X video ed X shared memory
+- aaxine usa aalib per l'uscita e puÃ² funzionare su quasi tutti i terminali.
+- xine puÃ² rilevare ed utilizzare le estensioni MIT X video ed X shared memory
   per una miglior resa in riproduzione.
 - se non riesci ad eseguire Xv sulla tua piattaforma, dovresti usare una
-  profondità di colore di 16 bpp per una miglior velocità. Xv sembra funzionare
+  profonditÃ  di colore di 16 bpp per una miglior velocitÃ . Xv sembra funzionare
   bene a 16 e 24 bpp.
 - se hai un adattatore grafico mga 200 / 400 puoi usare opzionalmente il driver
   di uscita video sybcfb/teletux. Vedi README.syncfb per i dettagli.
@@ -54,7 +54,7 @@ piattaforme supportate / prerequisiti:
   gmake, gcc e binutils.
 - xine-ui richiede libpng e zlib
 
-xine è stato finora usato con successo sui seguenti sistemi:
+xine Ã¨ stato finora usato con successo sui seguenti sistemi:
 
 - Linux su un Pentium III 667
   con XFree86 4.01 su una nVidia Riva TNT 2
@@ -88,25 +88,25 @@ non-intel platforms:
   con Xsun su un Creator-3D framebuffer
   vedi README.solaris per ulteriori informazioni
 - IRIX su MIPS
-  il supporto audio support non è ancora disponibile per questa configurazione
+  il supporto audio support non Ã¨ ancora disponibile per questa configurazione
 
 uso:
 ------
 
 Puoi eseguire xine senza alcun parametro su riga comando, o puoi specificare
-uno o più flussi di input direttamente. xine prova a rilevare se può usare
-l'estensione Xv e ricadere su XShm, ma questa rilevazione può fallire.
+uno o piÃ¹ flussi di input direttamente. xine prova a rilevare se puÃ² usare
+l'estensione Xv e ricadere su XShm, ma questa rilevazione puÃ² fallire.
 Specifichi il plugin di output video usando l'opzione "-V", per esempio:
 
 xine -V XShm
 
-forzerà xine ad usare XShm o puro X11. 
+forzerÃ  xine ad usare XShm o puro X11. 
 
 Se vuoi mandare il suono su una rete con ESD, imposta la variabile d'ambiente
 ESPEAKER prima di avviare xine.
 
-Il flusso di input può essere un nome di file o qualcosa che chiamiamo un
-"MediaResourceLocator" MRL, che è simile ad un'URL. Per prima cosa
+Il flusso di input puÃ² essere un nome di file o qualcosa che chiamiamo un
+"MediaResourceLocator" MRL, che Ã¨ simile ad un'URL. Per prima cosa
 occorre specificare una sorgente di input seguita da "://" e da un
 identificatore di una sorgente di input specifica.
 Quali sorgenti di input puoi usare dipende dai plugin di input che hai
@@ -117,7 +117,7 @@ $ xine --help
 
 per ottenere le note di utilizzo complete.
 
-xine supporta il protocollo xdnd (Versione 3), sichhè se hai un'applicazione
+xine supporta il protocollo xdnd (Versione 3), sichhÃ¨ se hai un'applicazione
 di navigazione file che supporti quel protocollo (ad esempio gmc), puoi
 'droppare' files video su xine per la riproduzione.
 
@@ -136,7 +136,7 @@ Tasto             Azione
 
 INVIO             riproduce
 Spazio, P         pausa
-Sù/Giù            avanti veloce / avanti piano
+SÃ¹/GiÃ¹            avanti veloce / avanti piano
 
 0                 va all'inizio del flusso corrente
 1-9               va al 10-90% del flusso corrente
@@ -144,9 +144,9 @@ Sinistra/Destra   va -+ 15 secondi (+CTRL: 60 secondi)
 PgUp/Prior        salta all'elemento precedente della lista di riproduzione
 PgDown/Next       salta all'elemento successivo della lista di riproduzione
 
-F                 cambia da/a modalità a schermo pieno
+F                 cambia da/a modalitÃ  a schermo pieno
 A                 cambia il rapporto dell'aspetto (AUTO/16:9/4:3/DVB)
-I                 cambia da/a modalità interlacciata
+I                 cambia da/a modalitÃ  interlacciata
 < >               modifica l'ampiezza della finestra di output
 + -               cambia il canale audio
 , .               cambia il canale dei sottotitoli
@@ -173,7 +173,7 @@ selezione dei sottotitoli:
 --------------------------
 
 I sottotitoli sono integrati in tracce differenti, come l'audio. In generale,
-la traccia 0 è il linguaggio di default dei sottotitoli. Usa l'opzione -u
+la traccia 0 Ã¨ il linguaggio di default dei sottotitoli. Usa l'opzione -u
 per selezionare la traccia dei sottotitoli desiderata:
 
 xine -u 0 test.vob
@@ -186,8 +186,8 @@ controllare xine attraverso CORBA:
 [ FIXME: non si sa se il supporto corba funzioni fino a xine 0.5 ]
 
 xine implementa un'interfaccia CORBA server per abilitare il controllo remoto e
-lo scripting. Per questo occorre ORBit, che dovrebbe già essere installato,
-se usi GNOME. Altrimenti lo si può ottenere da:
+lo scripting. Per questo occorre ORBit, che dovrebbe giÃ  essere installato,
+se usi GNOME. Altrimenti lo si puÃ² ottenere da:
 
   http://orbit-resource.sourceforge.net/
 
@@ -196,13 +196,13 @@ Qualsiasi versione di ORBit >= 0.4.0 dovrebbe funzionare bene.
 Per abilitare l'interfaccia CORBA, devi fornire l'argomento "--enable-corba"
 allo script ./configure e ricompilare xine.
 
-La definizione dell'interfaccia xine server si può trovare in "corba/xine.idl"
+La definizione dell'interfaccia xine server si puÃ² trovare in "corba/xine.idl"
 che viene installato in "/usr/share/idl/xine.idl" per default.
 
 Per comunicare con xine attraverso CORBA, ti serve il suo IOR (Interoperable
 Object Reference). All'avvio, xine lo scrive nel file ~/.xine.ior
-da dove lo puoi leggere. Se il name service ORBit è in funzione, anche xine
-si registra sotto il nome "Xine". Sfortunatamente, il name server ORBit non è
+da dove lo puoi leggere. Se il name service ORBit Ã¨ in funzione, anche xine
+si registra sotto il nome "Xine". Sfortunatamente, il name server ORBit non Ã¨
 attivato di default. Devi lanciarlo manualmente in questo modo:
 
   orbit-name-server >/tmp/name-service-ior &
@@ -210,20 +210,20 @@ attivato di default. Devi lanciarlo manualmente in questo modo:
 Vedi la documentazione di ORBit per ulteriori informazioni.
 
 Sono forniti due programmi client d'esempio:
-  1. "xine-remote" è un client d'esempio scritto in C che può essere usato per
+  1. "xine-remote" Ã¨ un client d'esempio scritto in C che puÃ² essere usato per
      mandare comandi di riproduzione/stop/pausa ad una istanza attiva di xine
-  2. "example.py" è un piccolo script Python che dimostra come controllare
+  2. "example.py" Ã¨ un piccolo script Python che dimostra come controllare
      semplicemente xine da un linguaggio di scripting
 
 usare LIRC con xine:
 ---------------------
 
-xine può essere controllato da remoto con un ricevitore a infrarossi.
+xine puÃ² essere controllato da remoto con un ricevitore a infrarossi.
 Per questo, dovresti avere installato LIRC (http://www.lirc.org),
-dovresti ottenere l'immagine CVS più recente se usi i kernel Linux più recenti
+dovresti ottenere l'immagine CVS piÃ¹ recente se usi i kernel Linux piÃ¹ recenti
 (delle serie 2.2 o 2.4). 
 
-Dovresti aggiungere alcuni ingressi nel tuo file ~/.lircrc, per esempio così:
+Dovresti aggiungere alcuni ingressi nel tuo file ~/.lircrc, per esempio cosÃ¬:
 begin
         remote = SAMSUNG
         button = Button_Play
@@ -287,7 +287,7 @@ xine usa software dai seguenti progetti software free:
 - varii decoders dal progetto ffmpeg di Fabrice Bellard
 
 ... senza questi grandi pezzi di software naturalmente xine non sarebbe dove
-è adesso.
+Ã¨ adesso.
 
 anche grandi ringraziamenti al Progetto Linux Video e DVD "LiViD"
 (http://www.linuxvideo.org/), da dove sono venute le idee originali per ili
@@ -308,13 +308,13 @@ sviluppatori attivi di xine:
   port verso solaris e tantissime correzioni di bachi
     Juergen Keil
   
-  ... più vari altri contributori, vedi il file AUTHORS
+  ... piÃ¹ vari altri contributori, vedi il file AUTHORS
 
 
 contattare il progetto xine:
 ----------------------------
 
-  il sito web del progetto xine è
+  il sito web del progetto xine Ã¨
 
        http://xine.sourceforge.net
 

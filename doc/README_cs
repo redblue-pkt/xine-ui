@@ -1,5 +1,5 @@
  +++++++++++++++++++++++++                           +++++++++++++++++++++++++
-                          XINE: Volnı pøehrávaè videa
+                          XINE: VolnÃ½ pÅ™ehrÃ¡vaÄ videa
  +++++++++++++++++++++++++                           +++++++++++++++++++++++++
 
 
@@ -7,357 +7,357 @@
  -===-
 
    1   DOKUMENTACE
-   1.1 Úèel tohoto dokumentu
+   1.1 ÃšÄel tohoto dokumentu
 
    2   O XINE
-   2.1 Podporované platformy a po¾adavky
-   2.2 Pou¾itı software
-   2.3 Vıvojáøi xine
-   2.4 Pou¾ití
-   2.4.1 Klávesové zkratky
-   2.4.2 Vıbìr zvukovıch kanálù
-   2.4.3 Vıbìr titulkù
+   2.1 PodporovanÃ© platformy a poÅ¾adavky
+   2.2 PouÅ¾itÃ½ software
+   2.3 VÃ½vojÃ¡Å™i xine
+   2.4 PouÅ¾itÃ­
+   2.4.1 KlÃ¡vesovÃ© zkratky
+   2.4.2 VÃ½bÄ›r zvukovÃ½ch kanÃ¡lÅ¯
+   2.4.3 VÃ½bÄ›r titulkÅ¯
    2.4.4 LIRC
-   2.4.5 Nastavení konfiguraèních voleb xine na pøíkazové øádce
+   2.4.5 NastavenÃ­ konfiguraÄnÃ­ch voleb xine na pÅ™Ã­kazovÃ© Å™Ã¡dce
 
-   3   CO JE©TÌ NEBYLO ØEÈENO
+   3   CO JEÅ TÄš NEBYLO Å˜EÄŒENO
    3.1 Svoboda a DVD...
 
    4   Kontakt na projekt xine
 
-   5   Èeskı pøeklad xine
+   5   ÄŒeskÃ½ pÅ™eklad xine
 
 
 1   DOKUMENTACE
 
-1.1 Úèel tohoto dokumentu
+1.1 ÃšÄel tohoto dokumentu
 
-    Toto je dokumentace xine-lib a xine-ui pro koncové u¾ivatele. Více 
-    informací naleznete v adresáøi doc/ u obou programù.
+    Toto je dokumentace xine-lib a xine-ui pro koncovÃ© uÅ¾ivatele. VÃ­ce 
+    informacÃ­ naleznete v adresÃ¡Å™i doc/ u obou programÅ¯.
 
-    Také se prosím na závìr podívejte na FAQ obsa¾enı v balíèku xine-ui, 
-    kterı ji¾ mù¾e obsahovat odpovìdi na va¹e dotazy.
+    TakÃ© se prosÃ­m na zÃ¡vÄ›r podÃ­vejte na FAQ obsaÅ¾enÃ½ v balÃ­Äku xine-ui, 
+    kterÃ½ jiÅ¾ mÅ¯Å¾e obsahovat odpovÄ›di na vaÅ¡e dotazy.
 
 2   O XINE
 
-    xine je svobodnı videopøehrávaè pod GPL licencí pro unixovské systémy.
-    Podporuje data ve formátu mpeg-2 a mpeg-1 (spoleènì zvuk + video),
-    jednoduchá data mpeg (samotnı zvuk/video, napø. soubory mp3), soubory 
-    AVI s nejrùznìj¹ími formáty videa (nìkteré z nich za pou¾ití win32 
-    knihoven) a data Vorbis a OGG. Je zde i jistá podpora pro sekvence 
-    quicktime (ale vìt¹ina video a zvukovıch kodekù quicktime je 
-    patentována, tudí¾ nepodporována).
+    xine je svobodnÃ½ videopÅ™ehrÃ¡vaÄ pod GPL licencÃ­ pro unixovskÃ© systÃ©my.
+    Podporuje data ve formÃ¡tu mpeg-2 a mpeg-1 (spoleÄnÄ› zvuk + video),
+    jednoduchÃ¡ data mpeg (samotnÃ½ zvuk/video, napÅ™. soubory mp3), soubory 
+    AVI s nejrÅ¯znÄ›jÅ¡Ã­mi formÃ¡ty videa (nÄ›kterÃ© z nich za pouÅ¾itÃ­ win32 
+    knihoven) a data Vorbis a OGG. Je zde i jistÃ¡ podpora pro sekvence 
+    quicktime (ale vÄ›tÅ¡ina video a zvukovÃ½ch kodekÅ¯ quicktime je 
+    patentovÃ¡na, tudÃ­Å¾ nepodporovÃ¡na).
 
-    xine pøehrává obrazová a zvuková data a pøi pøehrávání je synchronizuje.
-    V závislosti na vlastnostech formátu dat potøebuje pøehrávání více èi 
-    ménì vıkonu procesoru, plná kvalita bez ztráty snímkù byla pro mpeg-2 
-    dosa¾ena na systému s procesorem P II 400 MHz.
+    xine pÅ™ehrÃ¡vÃ¡ obrazovÃ¡ a zvukovÃ¡ data a pÅ™i pÅ™ehrÃ¡vÃ¡nÃ­ je synchronizuje.
+    V zÃ¡vislosti na vlastnostech formÃ¡tu dat potÅ™ebuje pÅ™ehrÃ¡vÃ¡nÃ­ vÃ­ce Äi 
+    mÃ©nÄ› vÃ½konu procesoru, plnÃ¡ kvalita bez ztrÃ¡ty snÃ­mkÅ¯ byla pro mpeg-2 
+    dosaÅ¾ena na systÃ©mu s procesorem P II 400 MHz.
     
-    xine mù¾e pøehrávat video pøímo z CD, SVCD nebo DVD. Nane¹tìstí legální 
-    status pøehrávání za¹ifrovanıch/zablokovanıch DVD je v nìkterıch zemích
-    nejasnı, a tak xine neobsahuje ¾ádnı kód na odblokování/de¹ifrování DVD.
-    K pøehrávání takovıch DVD budete potøebovat dal¹í programy nebo nìco 
-    jako xine_dvd_plugin, kterı mù¾e zajistit autentifikaci/dekódování DVD.
+    xine mÅ¯Å¾e pÅ™ehrÃ¡vat video pÅ™Ã­mo z CD, SVCD nebo DVD. NaneÅ¡tÄ›stÃ­ legÃ¡lnÃ­ 
+    status pÅ™ehrÃ¡vÃ¡nÃ­ zaÅ¡ifrovanÃ½ch/zablokovanÃ½ch DVD je v nÄ›kterÃ½ch zemÃ­ch
+    nejasnÃ½, a tak xine neobsahuje Å¾Ã¡dnÃ½ kÃ³d na odblokovÃ¡nÃ­/deÅ¡ifrovÃ¡nÃ­ DVD.
+    K pÅ™ehrÃ¡vÃ¡nÃ­ takovÃ½ch DVD budete potÅ™ebovat dalÅ¡Ã­ programy nebo nÄ›co 
+    jako xine_dvd_plugin, kterÃ½ mÅ¯Å¾e zajistit autentifikaci/dekÃ³dovÃ¡nÃ­ DVD.
     
-    Tım projektu xine odmítá jakoukoliv zodpovìdnost za takovéto u¾ivatele 
+    TÃ½m projektu xine odmÃ­tÃ¡ jakoukoliv zodpovÄ›dnost za takovÃ©to uÅ¾ivatele 
     xine.
     
-    Architektura xine, jaká je od verze 0.5, dovoluje pøizpùsobitelné 
-    moduly, a tak mohou bıt v budoucnu podporovány rùzné dal¹í typy formátù 
-    a vıstupních zaøízení.
+    Architektura xine, jakÃ¡ je od verze 0.5, dovoluje pÅ™izpÅ¯sobitelnÃ© 
+    moduly, a tak mohou bÃ½t v budoucnu podporovÃ¡ny rÅ¯znÃ© dalÅ¡Ã­ typy formÃ¡tÅ¯ 
+    a vÃ½stupnÃ­ch zaÅ™Ã­zenÃ­.
 
-2.1 Podporované platformy a po¾adavky
+2.1 PodporovanÃ© platformy a poÅ¾adavky
 
-    - xine vy¾aduje na vıstup videa server X11
-      (8, 15, 16, 24 nebo 32 bitù barevné hloubky)
+    - xine vyÅ¾aduje na vÃ½stup videa server X11
+      (8, 15, 16, 24 nebo 32 bitÅ¯ barevnÃ© hloubky)
 
-    - xine mù¾e detekovat a pou¾ívat pro lep¹í vıkon pøehrávání roz¹íøení 
+    - xine mÅ¯Å¾e detekovat a pouÅ¾Ã­vat pro lepÅ¡Ã­ vÃ½kon pÅ™ehrÃ¡vÃ¡nÃ­ rozÅ¡Ã­Å™enÃ­ 
       MIT X video nebo X shared memory
 
-    - jestli¾e nemù¾ete pøimìt bì¾et Xv na va¹í platformì, mìli byste kvùli 
-      rychlosti pou¾ívat barevnou hloubku 16 bitù/bod. 
-      Xv, zdá se, pracuje vıbornì se v¹emi barevnımi hloubkami.
+    - jestliÅ¾e nemÅ¯Å¾ete pÅ™imÄ›t bÄ›Å¾et Xv na vaÅ¡Ã­ platformÄ›, mÄ›li byste kvÅ¯li 
+      rychlosti pouÅ¾Ã­vat barevnou hloubku 16 bitÅ¯/bod. 
+      Xv, zdÃ¡ se, pracuje vÃ½bornÄ› se vÅ¡emi barevnÃ½mi hloubkami.
 
-    - jestli¾e máte grafickı adaptér Matrox G200/G400/G450, mù¾ete pøípadnì
-      pou¾ít vıstupní video ovladaè syncfb/teletux. Více detailù viz. 
+    - jestliÅ¾e mÃ¡te grafickÃ½ adaptÃ©r Matrox G200/G400/G450, mÅ¯Å¾ete pÅ™Ã­padnÄ›
+      pouÅ¾Ã­t vÃ½stupnÃ­ video ovladaÄ syncfb/teletux. VÃ­ce detailÅ¯ viz. 
       README.syncfb.
 
-    - je podporováno pøehrávání zvuku pomocí OSS, ALSA, ESD a ARTSD.
-    - aaxine pou¾ívá na vıstup knihovnu aalib a mù¾e bì¾et témìø na v¹ech 
-      terminálech
-    - k bezproblémovému zkompilování xine jsou vy¾adovány novìj¹í verze GNU 
+    - je podporovÃ¡no pÅ™ehrÃ¡vÃ¡nÃ­ zvuku pomocÃ­ OSS, ALSA, ESD a ARTSD.
+    - aaxine pouÅ¾Ã­vÃ¡ na vÃ½stup knihovnu aalib a mÅ¯Å¾e bÄ›Å¾et tÃ©mÄ›Å™ na vÅ¡ech 
+      terminÃ¡lech
+    - k bezproblÃ©movÃ©mu zkompilovÃ¡nÃ­ xine jsou vyÅ¾adovÃ¡ny novÄ›jÅ¡Ã­ verze GNU 
       make, gcc a binutils
 
-    xine by mìl bì¾et na v¹ech novìj¹ích poèítaèích kompatibilních s i386 
-    (pentium a vy¹¹í) pou¾ívajících GNU/Linux nebo FreeBSD. V závislosti na 
-    typu formátu videa, které chcete pøehrávat, budete pro plynulé 
-    pøehrávání potøebovat více èi ménì vıkonu procesoru. DVD se budou dobøe 
-    pøehrávat zpravidla u¾ na systému s Pentiem II 400 MHz (nebo 
-    srovnatelnım). V tomto odhadu je mnoho faktorù, tak¾e va¹e po¾adavky by 
-    se mohly li¹it.
+    xine by mÄ›l bÄ›Å¾et na vÅ¡ech novÄ›jÅ¡Ã­ch poÄÃ­taÄÃ­ch kompatibilnÃ­ch s i386 
+    (pentium a vyÅ¡Å¡Ã­) pouÅ¾Ã­vajÃ­cÃ­ch GNU/Linux nebo FreeBSD. V zÃ¡vislosti na 
+    typu formÃ¡tu videa, kterÃ© chcete pÅ™ehrÃ¡vat, budete pro plynulÃ© 
+    pÅ™ehrÃ¡vÃ¡nÃ­ potÅ™ebovat vÃ­ce Äi mÃ©nÄ› vÃ½konu procesoru. DVD se budou dobÅ™e 
+    pÅ™ehrÃ¡vat zpravidla uÅ¾ na systÃ©mu s Pentiem II 400 MHz (nebo 
+    srovnatelnÃ½m). V tomto odhadu je mnoho faktorÅ¯, takÅ¾e vaÅ¡e poÅ¾adavky by 
+    se mohly liÅ¡it.
 
-    K úspì¹nì testovanım grafickım kartám (pou¾ívajících Xv) pro PC patøí:
-    nVidia Riva TNT (closed-source ovladaèe od nvidie), nVidia Riva TNT 2,
+    K ÃºspÄ›Å¡nÄ› testovanÃ½m grafickÃ½m kartÃ¡m (pouÅ¾Ã­vajÃ­cÃ­ch Xv) pro PC patÅ™Ã­:
+    nVidia Riva TNT (closed-source ovladaÄe od nvidie), nVidia Riva TNT 2,
     Matrox G400, ATI AIW Rage128-16MB, 3dfx voodoo3 2000 PCI 16Mb
 
-    U následujících karet bylo hlá¹eno ¾e fungují, ale není jasné zda 
-    fungují s Xv nebo jen s XShm (prosím oznamujte na mailing list 
+    U nÃ¡sledujÃ­cÃ­ch karet bylo hlÃ¡Å¡eno Å¾e fungujÃ­, ale nenÃ­ jasnÃ© zda 
+    fungujÃ­ s Xv nebo jen s XShm (prosÃ­m oznamujte na mailing list 
     xine-user):
     
      Trident 9660, ATI AIW M64-8Mb PCI, ATI RageII 8MB.
 
-    xine by mìl bıt schopen zobrazit video na v¹ech typech pracujících 
-    X serverù s jakımikoliv grafickımi kartami, ale s mnohem hor¹ím vıkonem 
-    ne¾ s Xv.
+    xine by mÄ›l bÃ½t schopen zobrazit video na vÅ¡ech typech pracujÃ­cÃ­ch 
+    X serverÅ¯ s jakÃ½mikoliv grafickÃ½mi kartami, ale s mnohem horÅ¡Ã­m vÃ½konem 
+    neÅ¾ s Xv.
     
-    Dále xine bì¾í na poèítaèích i386-solaris a sparc s linuxem nebo 
-    solarisem (o framebufferu Creator-3D je známo, ¾e funguje), více 
-    informací viz. README.solaris. Také jsou podporovány: systémy zalo¾ené 
-    na powerpc (s bì¾ícím linuxem) a IRIX na MIPS.
+    DÃ¡le xine bÄ›Å¾Ã­ na poÄÃ­taÄÃ­ch i386-solaris a sparc s linuxem nebo 
+    solarisem (o framebufferu Creator-3D je znÃ¡mo, Å¾e funguje), vÃ­ce 
+    informacÃ­ viz. README.solaris. TakÃ© jsou podporovÃ¡ny: systÃ©my zaloÅ¾enÃ© 
+    na powerpc (s bÄ›Å¾Ã­cÃ­m linuxem) a IRIX na MIPS.
 
-    V neposlední øadì bylo oznámeno, ¾e xine funguje na poèítaèích Alpha, 
+    V neposlednÃ­ Å™adÄ› bylo oznÃ¡meno, Å¾e xine funguje na poÄÃ­taÄÃ­ch Alpha, 
     IA-64 a S/390.
     
-2.2 Pou¾itı software
+2.2 PouÅ¾itÃ½ software
 
-    xine pou¾ívá kód z následujících projektù volného softwaru:
+    xine pouÅ¾Ã­vÃ¡ kÃ³d z nÃ¡sledujÃ­cÃ­ch projektÅ¯ volnÃ©ho softwaru:
 
      - liba52 od Aarona Holtzmana a Michela Lespinasse
      - libmpeg2 od Aarona Holtzmana a Michela Lespinasse 
      - libmad od Roberta Leslieho
      - libffmpeg od Fabrice Bellarda
 
-    Bez tìchto znamenitıch kouskù softwaru by samozøejmì xine nebyl tam, kde 
-    je teï.
+    Bez tÄ›chto znamenitÃ½ch kouskÅ¯ softwaru by samozÅ™ejmÄ› xine nebyl tam, kde 
+    je teÄ.
 
-    Také velkı dík projektu Linux Video a DVD "LiVid", odkud pochází pùvodní 
-    my¹lenky pro videopøehrávaè xine.
+    TakÃ© velkÃ½ dÃ­k projektu Linux Video a DVD "LiVid", odkud pochÃ¡zÃ­ pÅ¯vodnÃ­ 
+    myÅ¡lenky pro videopÅ™ehrÃ¡vaÄ xine.
 
       => http://www.linuxvideo.org/ 
 
-2.3 Vıvojáøi xine
+2.3 VÃ½vojÃ¡Å™i xine
 
-    hlavní programování xine
+    hlavnÃ­ programovÃ¡nÃ­ xine
 
       Guenter Bartsch <guenter@users.sourceforge.net>
 
-    nejrùznìj¹í návrhy, opravy chyb a kompilace, modul alsa, grafické 
-    rozhraní
+    nejrÅ¯znÄ›jÅ¡Ã­ nÃ¡vrhy, opravy chyb a kompilace, modul alsa, grafickÃ© 
+    rozhranÃ­
 
       Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 
-    mnoho oprav chyb a uvíznutí, detekce rychlosti toku dat, softwarová 
-    korekce prokládání, mohutné aktualizace libwin32
+    mnoho oprav chyb a uvÃ­znutÃ­, detekce rychlosti toku dat, softwarovÃ¡ 
+    korekce proklÃ¡dÃ¡nÃ­, mohutnÃ© aktualizace libwin32
 
       Miguel Freitas <miguel@cetuc.puc-rio.br>
 
-    modul pro videovıstup teletux/syncfb, rùzné opravy chyb/revize, alsa
+    modul pro videovÃ½stup teletux/syncfb, rÅ¯znÃ© opravy chyb/revize, alsa
 
       Joachim Koenig <Joachim.Koenig@gmx.net>
 
-    vıvoj liba52/libmpeg2
+    vÃ½voj liba52/libmpeg2
 
       Michel Lespinasse <walken@zoy.org>
 
-    balíèek pro Debian, u¾ivatelská podpora
+    balÃ­Äek pro Debian, uÅ¾ivatelskÃ¡ podpora
 
       Siegfried Langauf <siggi@users.sourceforge.net>
 
-    Plus mnoho dal¹ích pøispìvovatelù, viz. soubor xine-lib/AUTHORS
+    Plus mnoho dalÅ¡Ã­ch pÅ™ispÄ›vovatelÅ¯, viz. soubor xine-lib/AUTHORS
 
-2.4 Pou¾ití
+2.4 PouÅ¾itÃ­
     
-    xine mù¾ete spustit bez jakıchkoliv parametrù na pøíkazové øádce nebo  
-    mù¾ete pøímo specifikovat jeden nebo více vstupních dat. xine zkusí 
-    detekovat, jestli lze pou¾ít roz¹íøení Xv a pøi neúspìchu se vrátí 
-    k XShm. Tato detekce by ale mohla selhat. Mù¾ete tedy specifikovat 
-    vıstupní ovladaè videa pou¾itím volby "-V", napø.
+    xine mÅ¯Å¾ete spustit bez jakÃ½chkoliv parametrÅ¯ na pÅ™Ã­kazovÃ© Å™Ã¡dce nebo  
+    mÅ¯Å¾ete pÅ™Ã­mo specifikovat jeden nebo vÃ­ce vstupnÃ­ch dat. xine zkusÃ­ 
+    detekovat, jestli lze pouÅ¾Ã­t rozÅ¡Ã­Å™enÃ­ Xv a pÅ™i neÃºspÄ›chu se vrÃ¡tÃ­ 
+    k XShm. Tato detekce by ale mohla selhat. MÅ¯Å¾ete tedy specifikovat 
+    vÃ½stupnÃ­ ovladaÄ videa pouÅ¾itÃ­m volby "-V", napÅ™.
 
      xine -V XShm
 
-    pøimìje xine pou¾ít XShm nebo prosté X11.
+    pÅ™imÄ›je xine pouÅ¾Ã­t XShm nebo prostÃ© X11.
 
-    Jestli¾e chcete posílat zvuk pøes sí» pomocí ESD, nastavte promìnnou 
-    prostøedí ESPEAKER pøed spu¹tìním xine.
+    JestliÅ¾e chcete posÃ­lat zvuk pÅ™es sÃ­Å¥ pomocÃ­ ESD, nastavte promÄ›nnou 
+    prostÅ™edÃ­ ESPEAKER pÅ™ed spuÅ¡tÄ›nÃ­m xine.
 
-    Jako vstupní data mù¾ete specifikovat jméno souboru nebo nìco, co 
-    nazıváme "MediaResourceLocator" (MRL), kterı vypadá podobnì jako URL. 
-    Napøed uvedete zdroj vstupu, za kterım následuje "://", a pak 
-    identifikátor specifickı pro zadanı zdroj dat. Jaké zdroje dat mù¾ete 
-    pou¾ít závisí na vstupních modulech, které máte (pro obyèejné soubory 
-    mù¾ete vynechat identifikátor zdroje vstupu "file://").
+    Jako vstupnÃ­ data mÅ¯Å¾ete specifikovat jmÃ©no souboru nebo nÄ›co, co 
+    nazÃ½vÃ¡me "MediaResourceLocator" (MRL), kterÃ½ vypadÃ¡ podobnÄ› jako URL. 
+    NapÅ™ed uvedete zdroj vstupu, za kterÃ½m nÃ¡sleduje "://", a pak 
+    identifikÃ¡tor specifickÃ½ pro zadanÃ½ zdroj dat. JakÃ© zdroje dat mÅ¯Å¾ete 
+    pouÅ¾Ã­t zÃ¡visÃ­ na vstupnÃ­ch modulech, kterÃ© mÃ¡te (pro obyÄejnÃ© soubory 
+    mÅ¯Å¾ete vynechat identifikÃ¡tor zdroje vstupu "file://").
 
     Zkuste:
 
      xine --help
 
-    získáte ucelenìj¹í informace o pou¾ití.
+    zÃ­skÃ¡te ucelenÄ›jÅ¡Ã­ informace o pouÅ¾itÃ­.
 
-    xine podporuje protokol xdnd (verze 3), a proto, jestli máte aplikaci 
-    pro práci se soubory podporující tento protokol (napø. gmc), mù¾ete 
-    soubory s videem, které chcete pøehrávat, pøesunout my¹í na xine.
+    xine podporuje protokol xdnd (verze 3), a proto, jestli mÃ¡te aplikaci 
+    pro prÃ¡ci se soubory podporujÃ­cÃ­ tento protokol (napÅ™. gmc), mÅ¯Å¾ete 
+    soubory s videem, kterÃ© chcete pÅ™ehrÃ¡vat, pÅ™esunout myÅ¡Ã­ na xine.
 
-    Pøehrání tøetí stopy z VCD:
+    PÅ™ehrÃ¡nÃ­ tÅ™etÃ­ stopy z VCD:
 
      xine vcd://3
 
-    Pøíklad pøímého pøístupu na DVD:
+    PÅ™Ã­klad pÅ™Ã­mÃ©ho pÅ™Ã­stupu na DVD:
 
      xine dvd://VTS_01_1.VOB
 
-2.4.1 Klávesové zkratky
+2.4.1 KlÃ¡vesovÃ© zkratky
 
-      Klávesa          Akce
+      KlÃ¡vesa          Akce
 
-      [RETURN]         pøehrát
-      [MEZERNÍK]       pozastavit
-      [Nahoru]/[Dolù]  rychle vpøed / pomalı pohyb
+      [RETURN]         pÅ™ehrÃ¡t
+      [MEZERNÃK]       pozastavit
+      [Nahoru]/[DolÅ¯]  rychle vpÅ™ed / pomalÃ½ pohyb
 
-      0-9              zadání odpovídajícího èísla
-      /                posuv na zadanı poèet procent
-      [Vlevo]/[Vpravo] skoèit o -+ 15 sekund (+CTRL: 60 sekund)
-      [PgUp]/[Prior]   skoèit na pøedcházející polo¾ku playlistu
-      [PgDown]/[Next]  skoèit na dal¹í polo¾ku playlistu
+      0-9              zadÃ¡nÃ­ odpovÃ­dajÃ­cÃ­ho ÄÃ­sla
+      /                posuv na zadanÃ½ poÄet procent
+      [Vlevo]/[Vpravo] skoÄit o -+ 15 sekund (+CTRL: 60 sekund)
+      [PgUp]/[Prior]   skoÄit na pÅ™edchÃ¡zejÃ­cÃ­ poloÅ¾ku playlistu
+      [PgDown]/[Next]  skoÄit na dalÅ¡Ã­ poloÅ¾ku playlistu
 
-      f                pøepnout mezi celoobrazovkovım a okenním re¾imem
-      a                pøepnout pomìr vı¹ka/¹íøka (AUTO/16:9/4:3/DVB)
-      i                pøepnout re¾im prokládání
+      f                pÅ™epnout mezi celoobrazovkovÃ½m a okennÃ­m reÅ¾imem
+      a                pÅ™epnout pomÄ›r vÃ½Å¡ka/Å¡Ã­Å™ka (AUTO/16:9/4:3/DVB)
+      i                pÅ™epnout reÅ¾im proklÃ¡dÃ¡nÃ­
 
-      z / Shift-Z      zvìt¹it / zmen¹it video
-                       pøidejte Ctrl ke zmìnì velikosti horizontálnì nebo 
-                       Meta (Alt) ke zmìnì vertikálnì
+      z / Shift-Z      zvÄ›tÅ¡it / zmenÅ¡it video
+                       pÅ™idejte Ctrl ke zmÄ›nÄ› velikosti horizontÃ¡lnÄ› nebo 
+                       Meta (Alt) ke zmÄ›nÄ› vertikÃ¡lnÄ›
      
-      "<", ">"         upravit velikost vıstupního okna
-      + -              zmìnit zvukovı kanál
-      , .              zmìnit kanál s titulky
-      n m              pøizpùsobit synchronizaci zvuku a videa
+      "<", ">"         upravit velikost vÃ½stupnÃ­ho okna
+      + -              zmÄ›nit zvukovÃ½ kanÃ¡l
+      , .              zmÄ›nit kanÃ¡l s titulky
+      n m              pÅ™izpÅ¯sobit synchronizaci zvuku a videa
       [HOME]           reset synchronizace zvuku a videa
 
-      [INSERT]         zobrazit kurzor my¹i ve vıstupním oknì videa
+      [INSERT]         zobrazit kurzor myÅ¡i ve vÃ½stupnÃ­m oknÄ› videa
 
-      q                ukonèit
+      q                ukonÄit
 
-      h                skrıt okno s videem (u¾iteèné pro pøehrávání mp3)
+      h                skrÃ½t okno s videem (uÅ¾iteÄnÃ© pro pÅ™ehrÃ¡vÃ¡nÃ­ mp3)
 
      
-      Dal¹í pøijdou. :-)
+      DalÅ¡Ã­ pÅ™ijdou. :-)
 
-      Levé tlaèítko my¹i (nebo stisk 'g') v oknì videa zapíná nebo vypíná
-      ovládací panel.
+      LevÃ© tlaÄÃ­tko myÅ¡i (nebo stisk 'g') v oknÄ› videa zapÃ­nÃ¡ nebo vypÃ­nÃ¡
+      ovlÃ¡dacÃ­ panel.
 
-      Zmìna klávesovıch zkratek:
-         V¹echny z tìchto klávesovıch zkratek mù¾ete mìnit. Za tímto úèelem 
-         byste mìli mít mapu klávesnice ve va¹em adresáøi $HOME/.xine. 
-         Syntaxe ka¾dé polo¾ky je:
+      ZmÄ›na klÃ¡vesovÃ½ch zkratek:
+         VÅ¡echny z tÄ›chto klÃ¡vesovÃ½ch zkratek mÅ¯Å¾ete mÄ›nit. Za tÃ­mto ÃºÄelem 
+         byste mÄ›li mÃ­t mapu klÃ¡vesnice ve vaÅ¡em adresÃ¡Å™i $HOME/.xine. 
+         Syntaxe kaÅ¾dÃ© poloÅ¾ky je:
 
          WindowReduce {
             key = less
             modifier = none
          }
 
-         Jméno klávesy by mìlo souhlasit s klávesovımi øetìzci X11 (viz. 
-         ní¾e). Modifikátor by mìl bıt:
-                 - 'none' pro ¾ádnı modifikátor,
-                 - 'control' (nebo 'ctrl') pro klávesu Ctrl,
-                 - 'meta' (nebo 'alt' na PC) pro klávesu Meta (Alt),
-                 - 'mod3', 'mod4' nebo 'mod5' k dispozici jen na nìkterıch 
-                   platformách
+         JmÃ©no klÃ¡vesy by mÄ›lo souhlasit s klÃ¡vesovÃ½mi Å™etÄ›zci X11 (viz. 
+         nÃ­Å¾e). ModifikÃ¡tor by mÄ›l bÃ½t:
+                 - 'none' pro Å¾Ã¡dnÃ½ modifikÃ¡tor,
+                 - 'control' (nebo 'ctrl') pro klÃ¡vesu Ctrl,
+                 - 'meta' (nebo 'alt' na PC) pro klÃ¡vesu Meta (Alt),
+                 - 'mod3', 'mod4' nebo 'mod5' k dispozici jen na nÄ›kterÃ½ch 
+                   platformÃ¡ch
 
-        Modifikátory se mohou kombinovat, oddìlují se èárkami:
+        ModifikÃ¡tory se mohou kombinovat, oddÄ›lujÃ­ se ÄÃ¡rkami:
 
          WindowReduce {
            key = less
            modifier = control, alt
          }
 
-        Jestli¾e nespecifikujete øádku s modifikátorem, je to stejné jako
-        specifikování 'none'.
+        JestliÅ¾e nespecifikujete Å™Ã¡dku s modifikÃ¡torem, je to stejnÃ© jako
+        specifikovÃ¡nÃ­ 'none'.
 
-        Mù¾ete také pøidat zástupce klávesovıch zkratek, jako napø.:
+        MÅ¯Å¾ete takÃ© pÅ™idat zÃ¡stupce klÃ¡vesovÃ½ch zkratek, jako napÅ™.:
 
          Alias {
            entry = Pause
            key = p
          }
 
-        znamená, ¾e pøidáváte dal¹í klávesu do polo¾ky 'Pause' - stisk 'p'.
-        Mù¾ete také pøidat øádku s modifikátorem (viz. nahoøe). Jestli¾e ho 
-        nespecifikujete, modifikátor bude stejnı jako v pùvodní sekci 
-        (v tomto pøípadì 'Pause').
+        znamenÃ¡, Å¾e pÅ™idÃ¡vÃ¡te dalÅ¡Ã­ klÃ¡vesu do poloÅ¾ky 'Pause' - stisk 'p'.
+        MÅ¯Å¾ete takÃ© pÅ™idat Å™Ã¡dku s modifikÃ¡torem (viz. nahoÅ™e). JestliÅ¾e ho 
+        nespecifikujete, modifikÃ¡tor bude stejnÃ½ jako v pÅ¯vodnÃ­ sekci 
+        (v tomto pÅ™Ã­padÄ› 'Pause').
 
-      Zji¹tìní názvù kláves v X11:
-        Ke zji¹tìní názvu klávesy v X11 lze pou¾ít program 'xev', kterı je
-        dodáván s va¹ím programovım balíkem X11. Spus»te 'xev' z xtermu, 
-        pøepnìte se do zobrazeného malého okna a stisknìte klávesu, kterou 
+      ZjiÅ¡tÄ›nÃ­ nÃ¡zvÅ¯ klÃ¡ves v X11:
+        Ke zjiÅ¡tÄ›nÃ­ nÃ¡zvu klÃ¡vesy v X11 lze pouÅ¾Ã­t program 'xev', kterÃ½ je
+        dodÃ¡vÃ¡n s vaÅ¡Ã­m programovÃ½m balÃ­kem X11. SpusÅ¥te 'xev' z xtermu, 
+        pÅ™epnÄ›te se do zobrazenÃ©ho malÃ©ho okna a stisknÄ›te klÃ¡vesu, kterou 
         chcete specifikovat.
 
-        Uvidíte nìco jako:
+        UvidÃ­te nÄ›co jako:
 
          ...
          KeyRelease event, serial 27, synthetic NO, window 0x3200001,
          root 0x3c, subw 0x0, time 4144050914, (259,265), root:(272,319),
          state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
                                                ^^^^^^^^
-                                               Toto je, co hledáte.
+                                               Toto je, co hledÃ¡te.
 
-       U tlaèítek my¹i, pou¾ití napø. koleèka va¹í my¹i, musíte
-       sledovat, které tlaèítko je pøiøazeno dané èinnosti, pou¾ití xev:
+       U tlaÄÃ­tek myÅ¡i, pouÅ¾itÃ­ napÅ™. koleÄka vaÅ¡Ã­ myÅ¡i, musÃ­te
+       sledovat, kterÃ© tlaÄÃ­tko je pÅ™iÅ™azeno danÃ© Äinnosti, pouÅ¾itÃ­ xev:
 
          ButtonRelease event, serial 27, synthetic NO, window 0x1200001,
          root 0x3b, subw 0x0, time 2710360666, (107,87), root:(120,117),
          state 0x1000, button 5, same_screen YES
                        ^^^^^^^^
-                       Toto je to tlaèítko
+                       Toto je to tlaÄÃ­tko
 
-       V tomto pøípadì musíte nastavit "key = XButton_5". Modifikátor kláves 
-       je s tlaèítky my¹i také podporován.
+       V tomto pÅ™Ã­padÄ› musÃ­te nastavit "key = XButton_5". ModifikÃ¡tor klÃ¡ves 
+       je s tlaÄÃ­tky myÅ¡i takÃ© podporovÃ¡n.
        
-      Zobrazení aktuálních/zmìnìnıch klávesovıch zkratek:
-        K zobrazení pøedvolenıch klávesovıch zkratek lze pou¾ít 
-        'xine --keymap' nebo 'xine --keymap=default'. Vısledek mù¾ete 
-        pøesmìrovat do souboru, kterı pak sám mù¾e bıt ~/.xine/keymap.
+      ZobrazenÃ­ aktuÃ¡lnÃ­ch/zmÄ›nÄ›nÃ½ch klÃ¡vesovÃ½ch zkratek:
+        K zobrazenÃ­ pÅ™edvolenÃ½ch klÃ¡vesovÃ½ch zkratek lze pouÅ¾Ã­t 
+        'xine --keymap' nebo 'xine --keymap=default'. VÃ½sledek mÅ¯Å¾ete 
+        pÅ™esmÄ›rovat do souboru, kterÃ½ pak sÃ¡m mÅ¯Å¾e bÃ½t ~/.xine/keymap.
 
-        Abyste zobrazili vısledek pøemapování klávesnice, prostì pou¾ijte
+        Abyste zobrazili vÃ½sledek pÅ™emapovÃ¡nÃ­ klÃ¡vesnice, prostÄ› pouÅ¾ijte
        'xine --keymap=remapped'.
 
-2.4.2 Vıbìr zvukovıch kanálù
+2.4.2 VÃ½bÄ›r zvukovÃ½ch kanÃ¡lÅ¯
 
-      Abyste vybrali po¾adovanı zvukovı kanál, pøidejte volbu -a:
+      Abyste vybrali poÅ¾adovanÃ½ zvukovÃ½ kanÃ¡l, pÅ™idejte volbu -a:
 
        xine -a 3 test.mpg
 
-      Pøehraje tøetí zvukovı kanál, kterı je k dispozici (s videem, 
-      samozøejmì).
+      PÅ™ehraje tÅ™etÃ­ zvukovÃ½ kanÃ¡l, kterÃ½ je k dispozici (s videem, 
+      samozÅ™ejmÄ›).
 
-      Eventuálnì mù¾e bıt k vıbìru zvukového kanálu pou¾ito grafické 
-      u¾ivatelské rozhraní.
+      EventuÃ¡lnÄ› mÅ¯Å¾e bÃ½t k vÃ½bÄ›ru zvukovÃ©ho kanÃ¡lu pouÅ¾ito grafickÃ© 
+      uÅ¾ivatelskÃ© rozhranÃ­.
 
-2.4.3 Vıbìr titulkù
+2.4.3 VÃ½bÄ›r titulkÅ¯
 
-      Titulky jsou vlo¾eny v jinıch stopách ne¾ je zvuk. Pøedvolené jazykové
-      titulky jsou obvykle na stopì 0. K vıbìru po¾adované stopy s titulky 
-      pou¾ijte volbu -u:
+      Titulky jsou vloÅ¾eny v jinÃ½ch stopÃ¡ch neÅ¾ je zvuk. PÅ™edvolenÃ© jazykovÃ©
+      titulky jsou obvykle na stopÄ› 0. K vÃ½bÄ›ru poÅ¾adovanÃ© stopy s titulky 
+      pouÅ¾ijte volbu -u:
 
        xine -u 0 test.vob
 
-      Zobrazí se titulky z kanálu 0.
+      ZobrazÃ­ se titulky z kanÃ¡lu 0.
 
-      Eventuálnì mù¾e bıt k vıbìru kanálu s titulky pou¾ito grafické 
-      u¾ivatelské rozhraní.
+      EventuÃ¡lnÄ› mÅ¯Å¾e bÃ½t k vÃ½bÄ›ru kanÃ¡lu s titulky pouÅ¾ito grafickÃ© 
+      uÅ¾ivatelskÃ© rozhranÃ­.
 
-      Titulky v oddìleném textovém souboru lze také pou¾ít. Volba pro soubor
+      Titulky v oddÄ›lenÃ©m textovÃ©m souboru lze takÃ© pouÅ¾Ã­t. Volba pro soubor
       s titulky se uvede za znakem '#':
 
        xine test.avi#subtitle:test.sub
 
-      Pro správné zobrazení èeskıch znakù zkontrolujte nastavené kódování
-      souboru s titulky, pøednastaveno je windows-1250.
-      Ve verzi xine-lib <= beta12 bylo tøeba zmìnit i font titulkù ze 
-      "sans" na "sanshu". Nyní u¾ pøednastavenı font "sans" obsahuje v¹echny
-      èeské znaky s diakritikou.
+      Pro sprÃ¡vnÃ© zobrazenÃ­ ÄeskÃ½ch znakÅ¯ zkontrolujte nastavenÃ© kÃ³dovÃ¡nÃ­
+      souboru s titulky, pÅ™ednastaveno je windows-1250.
+      Ve verzi xine-lib <= beta12 bylo tÅ™eba zmÄ›nit i font titulkÅ¯ ze 
+      "sans" na "sanshu". NynÃ­ uÅ¾ pÅ™ednastavenÃ½ font "sans" obsahuje vÅ¡echny
+      ÄeskÃ© znaky s diakritikou.
 
-      Úpravy lze provést buï v konfiguraèním dialogu nebo editací
-      konfiguraèního souboru ~/.xine/config2. Ten by mìl obsahovat tyto údaje:
+      Ãšpravy lze provÃ©st buÄ v konfiguraÄnÃ­m dialogu nebo editacÃ­
+      konfiguraÄnÃ­ho souboru ~/.xine/config2. Ten by mÄ›l obsahovat tyto Ãºdaje:
 
       # string, default: sans
         codec.spu_font:sans
@@ -367,11 +367,11 @@
 
 2.4.4 LIRC
 
-      xine mù¾e bıt dálkovì ovládán pomocí IR. Za tímto úèelem byste
-      mìli mít nainstalovanı LIRC (http://www.lirc.org).
+      xine mÅ¯Å¾e bÃ½t dÃ¡lkovÄ› ovlÃ¡dÃ¡n pomocÃ­ IR. Za tÃ­mto ÃºÄelem byste
+      mÄ›li mÃ­t nainstalovanÃ½ LIRC (http://www.lirc.org).
 
-      Do va¹eho souboru ~/.lircrc byste mìli pøidat nìkteré polo¾ky, jako 
-      napø.:
+      Do vaÅ¡eho souboru ~/.lircrc byste mÄ›li pÅ™idat nÄ›kterÃ© poloÅ¾ky, jako 
+      napÅ™.:
       
        begin
                remote = SAMSUNG
@@ -388,11 +388,11 @@
                config = SetPosition10%
        end
 
-      xine sám mù¾e vytvoøit návrh lirc polo¾ek pou¾itím 
-      'xine --keymap=lirc', vıstup mù¾ete pøesmìrovat do souboru a doladit 
-      nastavení.
+      xine sÃ¡m mÅ¯Å¾e vytvoÅ™it nÃ¡vrh lirc poloÅ¾ek pouÅ¾itÃ­m 
+      'xine --keymap=lirc', vÃ½stup mÅ¯Å¾ete pÅ™esmÄ›rovat do souboru a doladit 
+      nastavenÃ­.
 
-      Ka¾dá polo¾ka bude vypadat nìjak takto:
+      KaÅ¾dÃ¡ poloÅ¾ka bude vypadat nÄ›jak takto:
 
        # Reduce the output window size.
        begin
@@ -403,13 +403,13 @@
                config = WindowReduce
        end
 
-      Je na vás specifikovat jméno v remote a pøiøadit tlaèítko.
+      Je na vÃ¡s specifikovat jmÃ©no v remote a pÅ™iÅ™adit tlaÄÃ­tko.
 
       Playlist:
       ---------
-      K získání playlistu z daného vstupního modulu mù¾ete pou¾ít speciální
-      klíèové slovo 'PlaylistFrom:' následované jménem modulu (stejné jako 
-      na tlaèítku na oknì panelu):
+      K zÃ­skÃ¡nÃ­ playlistu z danÃ©ho vstupnÃ­ho modulu mÅ¯Å¾ete pouÅ¾Ã­t speciÃ¡lnÃ­
+      klÃ­ÄovÃ© slovo 'PlaylistFrom:' nÃ¡sledovanÃ© jmÃ©nem modulu (stejnÃ© jako 
+      na tlaÄÃ­tku na oknÄ› panelu):
 
        # Retrieve playlist from NAV plugin.
        begin
@@ -420,67 +420,67 @@
                config = PlaylistFrom:NAV
        end
 
-2.4.5 Nastavení konfiguraèních voleb xine na pøíkazové øádce
+2.4.5 NastavenÃ­ konfiguraÄnÃ­ch voleb xine na pÅ™Ã­kazovÃ© Å™Ã¡dce
 
-      Jakoukoliv volbu mù¾ete nastavit z pøíkazové øádky (viz. 
-      README.config_en) a potlaèit tak nastavené hodnoty 
+      Jakoukoliv volbu mÅ¯Å¾ete nastavit z pÅ™Ã­kazovÃ© Å™Ã¡dky (viz. 
+      README.config_en) a potlaÄit tak nastavenÃ© hodnoty 
       v $HOME/.xine/config.
 
-      Ke zmìnì zaøízení VCD mezi pøehráním dvìma MRL mù¾ete napøíklad 
-      udìlat:
+      Ke zmÄ›nÄ› zaÅ™Ã­zenÃ­ VCD mezi pÅ™ehrÃ¡nÃ­m dvÄ›ma MRL mÅ¯Å¾ete napÅ™Ã­klad 
+      udÄ›lat:
       
          xine vcd://1 opt:media.vcd.device=/dev/cdrom2 vcd://1
 
-      Tato nastavení nebudou ulo¾ena v konfiguraèním souboru, jsou pouze
-      doèasná.
+      Tato nastavenÃ­ nebudou uloÅ¾ena v konfiguraÄnÃ­m souboru, jsou pouze
+      doÄasnÃ¡.
 
-3   CO JE©TÌ NEBYLO ØEÈENO
+3   CO JEÅ TÄš NEBYLO Å˜EÄŒENO
 
 3.1 Svoboda a DVD...
 
-    xine je svobodnı software. "svobodnı software" je cosi pøíbuzné 
-    "open-source". Av¹ak vıznam svobodného softwaru jde dál ne¾ jen otevøené 
-    zdrojové kódy: je to o svobodì u¾ivatelù softwaru. Jestli¾e máte èas, 
-    prosím pøeètìte si, co øíká free software foundation na téma svoboda a 
+    xine je svobodnÃ½ software. "svobodnÃ½ software" je cosi pÅ™Ã­buznÃ© 
+    "open-source". AvÅ¡ak vÃ½znam svobodnÃ©ho softwaru jde dÃ¡l neÅ¾ jen otevÅ™enÃ© 
+    zdrojovÃ© kÃ³dy: je to o svobodÄ› uÅ¾ivatelÅ¯ softwaru. JestliÅ¾e mÃ¡te Äas, 
+    prosÃ­m pÅ™eÄtÄ›te si, co Å™Ã­kÃ¡ free software foundation na tÃ©ma svoboda a 
     software:
 
      => http://www.gnu.org/philosophy/free-sw.html
 
-    Je zde velmi zvlá¹tní sta» o svobodì a DVD: 
-    filmovı prùmysl vytváøí obrovské úsilí na omezení pøehrávání DVD do
-    kontrolovanıch zaøízení. Nejvíce DVD, které se v souèasné dobì 
-    prodávají, jsou za¹ifrována - a v nìkterıch zemích (zvlá¹tì v USA), je 
-    zøejmì nelegální je de¹ifrovat - dokonce i pro soukromé pøehrávání.
+    Je zde velmi zvlÃ¡Å¡tnÃ­ staÅ¥ o svobodÄ› a DVD: 
+    filmovÃ½ prÅ¯mysl vytvÃ¡Å™Ã­ obrovskÃ© ÃºsilÃ­ na omezenÃ­ pÅ™ehrÃ¡vÃ¡nÃ­ DVD do
+    kontrolovanÃ½ch zaÅ™Ã­zenÃ­. NejvÃ­ce DVD, kterÃ© se v souÄasnÃ© dobÄ› 
+    prodÃ¡vajÃ­, jsou zaÅ¡ifrovÃ¡na - a v nÄ›kterÃ½ch zemÃ­ch (zvlÃ¡Å¡tÄ› v USA), je 
+    zÅ™ejmÄ› nelegÃ¡lnÃ­ je deÅ¡ifrovat - dokonce i pro soukromÃ© pÅ™ehrÃ¡vÃ¡nÃ­.
     
-    Snad bude nejvíce lidí souhlasit, ¾e toto je velmi pochybnı zpùsob 
-    zacházení se zákazníky. Tım projektu xine odsuzuje tato úsilí filmového 
-    prùmyslu - zkou¹í pøedejít ztrátì odbytu takovım zpùsobem, ¾e je
-    rozhodnì vidìt mnoho neúcty ke v¹em jejich èestnım zákazníkùm.
-    Na druhou stranu, tım projektu xine je proti poru¹ování existujících
-    zákonù. Nikdo pøesnì neví jestli je nìkde ve svìtì skuteènì nelegální
-    psát, vlastnit a pou¾ívat software na sledování za¹ifrovanıch DVD. Ale
-    proto¾e je toto nejasné téma (a zdá se potenciálnì velmi nebezpeèné), 
-    xine neobsahuje ¾ádnı specifickı kód na de¹ifrování DVD. Zdá se ale, ¾e
-    dal¹í programátoøi pracují na takovıchto roz¹íøeních. Mo¾ná je na 
-    nìkterıch místech jejich pou¾ívání legální. A» tak nebo tak - nebudete 
-    moci pøehrávat za¹ifrovaná DVD se samotnım xine tak, jak je. Prosím 
-    v¹imnìte si, ¾e toto není chyba nebo chybìjící funkce, ale skuteènı 
-    legální problém. Bylo by ohromné vyøe¹it tento problém (napø. 
-    pøesvìdèováním ameriky a/nebo filmového prùmyslu, ¾e jsou skuteènì 
-    nepøíjemní a zbyteènì nepoctiví k zákazníkùm stejnì jako k u¾ivatelùm 
-    a vıvojáøùm volného softwaru), ale zahrnutí kódu na de¹ifrování DVD ve 
-    xine tento problém nevyøe¹í.
+    Snad bude nejvÃ­ce lidÃ­ souhlasit, Å¾e toto je velmi pochybnÃ½ zpÅ¯sob 
+    zachÃ¡zenÃ­ se zÃ¡kaznÃ­ky. TÃ½m projektu xine odsuzuje tato ÃºsilÃ­ filmovÃ©ho 
+    prÅ¯myslu - zkouÅ¡Ã­ pÅ™edejÃ­t ztrÃ¡tÄ› odbytu takovÃ½m zpÅ¯sobem, Å¾e je
+    rozhodnÄ› vidÄ›t mnoho neÃºcty ke vÅ¡em jejich ÄestnÃ½m zÃ¡kaznÃ­kÅ¯m.
+    Na druhou stranu, tÃ½m projektu xine je proti poruÅ¡ovÃ¡nÃ­ existujÃ­cÃ­ch
+    zÃ¡konÅ¯. Nikdo pÅ™esnÄ› nevÃ­ jestli je nÄ›kde ve svÄ›tÄ› skuteÄnÄ› nelegÃ¡lnÃ­
+    psÃ¡t, vlastnit a pouÅ¾Ã­vat software na sledovÃ¡nÃ­ zaÅ¡ifrovanÃ½ch DVD. Ale
+    protoÅ¾e je toto nejasnÃ© tÃ©ma (a zdÃ¡ se potenciÃ¡lnÄ› velmi nebezpeÄnÃ©), 
+    xine neobsahuje Å¾Ã¡dnÃ½ specifickÃ½ kÃ³d na deÅ¡ifrovÃ¡nÃ­ DVD. ZdÃ¡ se ale, Å¾e
+    dalÅ¡Ã­ programÃ¡toÅ™i pracujÃ­ na takovÃ½chto rozÅ¡Ã­Å™enÃ­ch. MoÅ¾nÃ¡ je na 
+    nÄ›kterÃ½ch mÃ­stech jejich pouÅ¾Ã­vÃ¡nÃ­ legÃ¡lnÃ­. AÅ¥ tak nebo tak - nebudete 
+    moci pÅ™ehrÃ¡vat zaÅ¡ifrovanÃ¡ DVD se samotnÃ½m xine tak, jak je. ProsÃ­m 
+    vÅ¡imnÄ›te si, Å¾e toto nenÃ­ chyba nebo chybÄ›jÃ­cÃ­ funkce, ale skuteÄnÃ½ 
+    legÃ¡lnÃ­ problÃ©m. Bylo by ohromnÃ© vyÅ™eÅ¡it tento problÃ©m (napÅ™. 
+    pÅ™esvÄ›dÄovÃ¡nÃ­m ameriky a/nebo filmovÃ©ho prÅ¯myslu, Å¾e jsou skuteÄnÄ› 
+    nepÅ™Ã­jemnÃ­ a zbyteÄnÄ› nepoctivÃ­ k zÃ¡kaznÃ­kÅ¯m stejnÄ› jako k uÅ¾ivatelÅ¯m 
+    a vÃ½vojÃ¡Å™Å¯m volnÃ©ho softwaru), ale zahrnutÃ­ kÃ³du na deÅ¡ifrovÃ¡nÃ­ DVD ve 
+    xine tento problÃ©m nevyÅ™eÅ¡Ã­.
 
 4   Kontakt na projekt xine
 
-    webová stránka projektu xine je
+    webovÃ¡ strÃ¡nka projektu xine je
 
      => http://xine.sourceforge.net
 
-    reakce nebo nabídky pomoci jsou velmi cenìny, prosím kontaktujte:
+    reakce nebo nabÃ­dky pomoci jsou velmi cenÄ›ny, prosÃ­m kontaktujte:
 
-      mailovı diskusní list u¾ivatelù xine <xine-user@lists.sourceforge.net>
+      mailovÃ½ diskusnÃ­ list uÅ¾ivatelÅ¯ xine <xine-user@lists.sourceforge.net>
 
-5   Èeskı pøeklad
+5   ÄŒeskÃ½ pÅ™eklad
 
-Franti¹ek Dvoøák <valtri@atlas.cz>.
+FrantiÅ¡ek DvoÅ™Ã¡k <valtri@atlas.cz>.

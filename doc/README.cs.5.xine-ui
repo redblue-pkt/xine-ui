@@ -1,88 +1,88 @@
-To, co vidÌte jako "xine", se ve skuteËnosti skl·d· ze dvou hlavnÌch Ë·stÌ:
-* xine-lib nebo libxine je takzvan˝ engine zahrnujÌcÌ vπechnu z·kladnÌ
-  funkËnost xine jako zÌsk·v·nÌ mÈdiÌ z r˘zn˝ch podporovan˝ch zdroj˘ vstup˘,
-  dekÛdov·nÌ videa a zvuku, synchronizace p¯ehr·v·nÌ a dodateËnÈ zpracov·nÌ.
-  Tato Ë·st xine je jen pouze akumulace funkËnosti, program·to¯i toto naz˝vajÌ
-  knihovna. KoncovÌ uæivatelÈ nemohou xine-lib pouæÌt p¯Ìmo, jelikoæ zde nenÌ
-  rozhranÌ k interakci se xine-lib.
-* Druh· Ë·st je takzvan˝ "frontend". Obaluje uæivatelskÈ rozhranÌ kolem
-  xine-lib, ËinÌ xine-lib pouæiteln˝m pro vπechny.
+To, co vid√≠te jako "xine", se ve skuteƒçnosti skl√°d√° ze dvou hlavn√≠ch ƒç√°st√≠:
+* xine-lib nebo libxine je takzvan√Ω engine zahrnuj√≠c√≠ v≈°echnu z√°kladn√≠
+  funkƒçnost xine jako z√≠sk√°v√°n√≠ m√©di√≠ z r≈Øzn√Ωch podporovan√Ωch zdroj≈Ø vstup≈Ø,
+  dek√≥dov√°n√≠ videa a zvuku, synchronizace p≈ôehr√°v√°n√≠ a dodateƒçn√© zpracov√°n√≠.
+  Tato ƒç√°st xine je jen pouze akumulace funkƒçnosti, program√°to≈ôi toto naz√Ωvaj√≠
+  knihovna. Koncov√≠ u≈æivatel√© nemohou xine-lib pou≈æ√≠t p≈ô√≠mo, jeliko≈æ zde nen√≠
+  rozhran√≠ k interakci se xine-lib.
+* Druh√° ƒç√°st je takzvan√Ω "frontend". Obaluje u≈æivatelsk√© rozhran√≠ kolem
+  xine-lib, ƒçin√≠ xine-lib pou≈æiteln√Ωm pro v≈°echny.
 
-V˝hodou tohoto oddÏlenÌ je, æe si m˘æete vybrat mezi r˘zn˝mi odliπn˝mi
-"frontendy". Ten, kter˝ pouæÌv·te teÔ, je zn·m˝ jako "xine-ui". NÏkterÈ
-zajÌmavÈ vlastnosti xine-ui jsou v kr·tkosti uvedeny nÌæe:
+V√Ωhodou tohoto oddƒõlen√≠ je, ≈æe si m≈Ø≈æete vybrat mezi r≈Øzn√Ωmi odli≈°n√Ωmi
+"frontendy". Ten, kter√Ω pou≈æ√≠v√°te teƒè, je zn√°m√Ω jako "xine-ui". Nƒõkter√©
+zaj√≠mav√© vlastnosti xine-ui jsou v kr√°tkosti uvedeny n√≠≈æe:
 
 
 Menu
 ----
 
-Vπechny klÌËovÈ funkce xine jsou p¯ÌstupnÈ z hlavnÌho menu xine-ui, kterÈ
-zÌsk·te klepnutÌm prav˝m tlaËÌtkem myπi buÔ na okno s videem nebo na panel.
-VÏtπina poloæek je samovysvÏtlujÌcÌ.
+V≈°echny kl√≠ƒçov√© funkce xine jsou p≈ô√≠stupn√© z hlavn√≠ho menu xine-ui, kter√©
+z√≠sk√°te klepnut√≠m prav√Ωm tlaƒç√≠tkem my≈°i buƒè na okno s videem nebo na panel.
+Vƒõt≈°ina polo≈æek je samovysvƒõtluj√≠c√≠.
 
 
-ProhlÌæeË MRL
+Prohl√≠≈æeƒç MRL
 -------------
 
-Zp˘sob, jak˝m xine popisuje mÈdia k p¯ehr·nÌ, jsou MRL. VÌce o tomto zajÌmavÈm
-pojetÌ si m˘æete p¯eËÌst v sekci MRL. Z d˘vodu schopnostÌ MRL nenÌ bÏæn˝ dialog
-pro v˝bÏr soubor˘ dostateËn˝ pro sdÏlenÌ xine, jak· data p¯ehr·t. ProhlÌæeË
-MRL tudÌæ dovoluje nejen proch·zet vaπimi soubory, nech· v·s takÈ vybrat jin˝
-typ vstupu z mÈdia, kterÈ nabÌzÌ sv˘j vlastnÌ v˝bÏr moæn˝ch dat k p¯ehr·nÌ.
-M˘æete otev¯Ìt prohlÌæeË MRL pomocÌ odpovÌdajÌcÌ ikony vaπeho oblÌbenÈho skinu
-nebo vybr·nÌm Otev¯Ìt->UmÌstÏnÌ z menu.
+Zp≈Øsob, jak√Ωm xine popisuje m√©dia k p≈ôehr√°n√≠, jsou MRL. V√≠ce o tomto zaj√≠mav√©m
+pojet√≠ si m≈Ø≈æete p≈ôeƒç√≠st v sekci MRL. Z d≈Øvodu schopnost√≠ MRL nen√≠ bƒõ≈æn√Ω dialog
+pro v√Ωbƒõr soubor≈Ø dostateƒçn√Ω pro sdƒõlen√≠ xine, jak√° data p≈ôehr√°t. Prohl√≠≈æeƒç
+MRL tud√≠≈æ dovoluje nejen proch√°zet va≈°imi soubory, nech√° v√°s tak√© vybrat jin√Ω
+typ vstupu z m√©dia, kter√© nab√≠z√≠ sv≈Øj vlastn√≠ v√Ωbƒõr mo≈æn√Ωch dat k p≈ôehr√°n√≠.
+M≈Ø≈æete otev≈ô√≠t prohl√≠≈æeƒç MRL pomoc√≠ odpov√≠daj√≠c√≠ ikony va≈°eho obl√≠ben√©ho skinu
+nebo vybr√°n√≠m Otev≈ô√≠t->Um√≠stƒõn√≠ z menu.
 
-BÏæn˝ souborov˝ dialog je rovnÏæ k dispozici, m˘æete ho zÌskat na
-Otev¯Ìt->Soubor v menu.
+Bƒõ≈æn√Ω souborov√Ω dialog je rovnƒõ≈æ k dispozici, m≈Ø≈æete ho z√≠skat na
+Otev≈ô√≠t->Soubor v menu.
 
 
 Playlisty
 ---------
 
-xine-ui takÈ samoz¯ejmÏ pracuje s playlisty. Editor playlistu umÌstÏn˝
-na Playlist->Editor nebo reprezentovan˝ tlaËÌtkem ve vaπem skinu v·m dovoluje
-naËÌst, uloæit a editovat playlisty. Editor z·loæek v·m dovoluje detailnÏ
-editovat aktu·lnÌ poloæku playlistu a p¯idÏlit dalπÌ volby p¯ehr·v·nÌ, nap¯.
-oddÏlen˝ soubor s titulky. Editor z·loæek standardnÏ otev¯ete stiskem Ctrl-e.
+xine-ui tak√© samoz≈ôejmƒõ pracuje s playlisty. Editor playlistu um√≠stƒõn√Ω
+na Playlist->Editor nebo reprezentovan√Ω tlaƒç√≠tkem ve va≈°em skinu v√°m dovoluje
+naƒç√≠st, ulo≈æit a editovat playlisty. Editor z√°lo≈æek v√°m dovoluje detailnƒõ
+editovat aktu√°ln√≠ polo≈æku playlistu a p≈ôidƒõlit dal≈°√≠ volby p≈ôehr√°v√°n√≠, nap≈ô.
+oddƒõlen√Ω soubor s titulky. Editor z√°lo≈æek standardnƒõ otev≈ôete stiskem Ctrl-e.
 
 
-Autoscan tlaËÌtka
+Autoscan tlaƒç√≠tka
 -----------------
 
-Autoscan tlaËÌtka najdete v panelu xine nebo v editoru playlistu. Jsou to
-z·stupci pro vytvo¯enÌ playlistu z urËit˝ch dob¯e zn·m˝ch zdrojov˝ch mÈdiÌ. P¯i
-v˝chozÌm nastavenÌ se zaËne playlist hned p¯ehr·vat. Nap¯. stisk autoscan
-tlaËÌtka popsanÈho "DVD" zaËne, jak n·zev napovÌd·, p¯ehr·vat DVD ve vaπÌ
-mechanice pomocÌ vytvo¯enÈho playlistu.
+Autoscan tlaƒç√≠tka najdete v panelu xine nebo v editoru playlistu. Jsou to
+z√°stupci pro vytvo≈ôen√≠ playlistu z urƒçit√Ωch dob≈ôe zn√°m√Ωch zdrojov√Ωch m√©di√≠. P≈ôi
+v√Ωchoz√≠m nastaven√≠ se zaƒçne playlist hned p≈ôehr√°vat. Nap≈ô. stisk autoscan
+tlaƒç√≠tka popsan√©ho "DVD" zaƒçne, jak n√°zev napov√≠d√°, p≈ôehr√°vat DVD ve va≈°√≠
+mechanice pomoc√≠ vytvo≈ôen√©ho playlistu.
 
 
-P¯ÌdavnÈ efekty
+P≈ô√≠davn√© efekty
 ---------------
 
-xine poskytuje sadu efekt˘ dodateËnÈho zpracov·nÌ, kterÈ m˘æete pouæÌt na vaπe
-video. V menu vyberte Video->DodateËnÈ zpracov·nÌ->Z¯etÏzen· reakce. Otev¯e se
-okno "Z¯etÏzen· reakce", kde m˘æete vytvo¯it sadu p¯Ìdavn˝ch efekt˘, kterÈ se
-pouæijÌ na video. Vyberte si p¯Ìdavn˝ filtr, vyberte a p¯izp˘sobte si volby,
-kterÈ jsou k dispozici, abyste si filtr vylepπili podle pot¯eby. Chcete-li
-p¯idat jeπtÏ dalπÌ efekt do ¯etÏzce, kliknÏte na "Nov˝ filtr".
+xine poskytuje sadu efekt≈Ø dodateƒçn√©ho zpracov√°n√≠, kter√© m≈Ø≈æete pou≈æ√≠t na va≈°e
+video. V menu vyberte Video->Dodateƒçn√© zpracov√°n√≠->Z≈ôetƒõzen√° reakce. Otev≈ôe se
+okno "Z≈ôetƒõzen√° reakce", kde m≈Ø≈æete vytvo≈ôit sadu p≈ô√≠davn√Ωch efekt≈Ø, kter√© se
+pou≈æij√≠ na video. Vyberte si p≈ô√≠davn√Ω filtr, vyberte a p≈ôizp≈Øsobte si volby,
+kter√© jsou k dispozici, abyste si filtr vylep≈°ili podle pot≈ôeby. Chcete-li
+p≈ôidat je≈°tƒõ dal≈°√≠ efekt do ≈ôetƒõzce, kliknƒõte na "Nov√Ω filtr".
 
 
-Navigace v menu mÈdia
+Navigace v menu m√©dia
 ---------------------
 
-NÏkterÈ typy mÈdiÌ jsou interaktivnÌ, nejbÏænÏjπÌ p¯Ìklad jsou dnes DVD, kde si
-m˘æete vybrat vπechny druhy voleb z podrobn˝ch menu. xine poskytuje vÌcero
-zp˘sob˘, jak se pohybovat v takovÈm interaktivnÌm obsahu.
-* 1) M˘æete klikat vaπÌ myπÌ p¯Ìmo na poloæky v oknÏ videa.
-* 2) M˘æete pouæÌt panel na posÌl·nÌ ud·lostÌ, kter˝ lze otev¯Ìt z menu
-     poloækou Volby->Navigace.
-* 3) M˘æete pouæÌt poloæky v menu, abyste se dostali p¯Ìmo na r˘zn· podmenu
-     vaπeho interaktivnÌho mÈdia. Toto bude mÌt efekt pouze tehdy, poskytuje-li
-     danÈ menu zdroj, kter˝ p¯ehr·v·te.
-* 4) M˘æete pouæÌt kl·vesnici. P¯ednastaveno je, æe πipkami na numerickÈ
-     kl·vesnici budete p¯esunovat zv˝raznÏnÌ v menu a Enter vybere zv˝raznÏnÈ
-     tlaËÌtko.
-     P¯es numerickou kl·vesnici jsou k dispozici takÈ dalπÌ zajÌmavÈ funkce:
-     (UvedenÈ kl·vesy jsou z p¯ednastavenÈho mapov·nÌ kl·ves.)
-     S PgUp a PgDown se budete pohybovat zpÏt a vp¯ed mezi kapitolami.
-     Home a End vybere ˙hel, kter˝ p¯ehr·t, je-li k dispozici vÌce ˙hl˘.
+Nƒõkter√© typy m√©di√≠ jsou interaktivn√≠, nejbƒõ≈ænƒõj≈°√≠ p≈ô√≠klad jsou dnes DVD, kde si
+m≈Ø≈æete vybrat v≈°echny druhy voleb z podrobn√Ωch menu. xine poskytuje v√≠cero
+zp≈Øsob≈Ø, jak se pohybovat v takov√©m interaktivn√≠m obsahu.
+* 1) M≈Ø≈æete klikat va≈°√≠ my≈°√≠ p≈ô√≠mo na polo≈æky v oknƒõ videa.
+* 2) M≈Ø≈æete pou≈æ√≠t panel na pos√≠l√°n√≠ ud√°lost√≠, kter√Ω lze otev≈ô√≠t z menu
+     polo≈ækou Volby->Navigace.
+* 3) M≈Ø≈æete pou≈æ√≠t polo≈æky v menu, abyste se dostali p≈ô√≠mo na r≈Øzn√° podmenu
+     va≈°eho interaktivn√≠ho m√©dia. Toto bude m√≠t efekt pouze tehdy, poskytuje-li
+     dan√© menu zdroj, kter√Ω p≈ôehr√°v√°te.
+* 4) M≈Ø≈æete pou≈æ√≠t kl√°vesnici. P≈ôednastaveno je, ≈æe ≈°ipkami na numerick√©
+     kl√°vesnici budete p≈ôesunovat zv√Ωraznƒõn√≠ v menu a Enter vybere zv√Ωraznƒõn√©
+     tlaƒç√≠tko.
+     P≈ôes numerickou kl√°vesnici jsou k dispozici tak√© dal≈°√≠ zaj√≠mav√© funkce:
+     (Uveden√© kl√°vesy jsou z p≈ôednastaven√©ho mapov√°n√≠ kl√°ves.)
+     S PgUp a PgDown se budete pohybovat zpƒõt a vp≈ôed mezi kapitolami.
+     Home a End vybere √∫hel, kter√Ω p≈ôehr√°t, je-li k dispozici v√≠ce √∫hl≈Ø.

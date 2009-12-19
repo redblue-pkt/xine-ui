@@ -1,102 +1,102 @@
-Pro vıbìr multimédií, které chcete pøehrát, pou¾ívá xine systém zvanı MRL
-(Media Resource Locator). Jak ji¾ napovídá název, MRL jsou si velmi podobné
-URL, které znáte z va¹ich webovıch prohlí¾eèù. Ve skuteènosti je zde zobecnìní
-pro obojí: URI (Uniform Resource Identifier) definované v RFC2396.
+Pro vÃ½bÄ›r multimÃ©diÃ­, kterÃ© chcete pÅ™ehrÃ¡t, pouÅ¾Ã­vÃ¡ xine systÃ©m zvanÃ½ MRL
+(Media Resource Locator). Jak jiÅ¾ napovÃ­dÃ¡ nÃ¡zev, MRL jsou si velmi podobnÃ©
+URL, kterÃ© znÃ¡te z vaÅ¡ich webovÃ½ch prohlÃ­Å¾eÄÅ¯. Ve skuteÄnosti je zde zobecnÄ›nÃ­
+pro obojÃ­: URI (Uniform Resource Identifier) definovanÃ© v RFC2396.
 
-MRL xine se dìlí na dvì hlavní èásti: zdroj vstupu a nastavení dat. Nastavení
-dat je volitelné. Jestli¾e se uvede, musí se oddìlit od zdroje vstupu znakem
+MRL xine se dÄ›lÃ­ na dvÄ› hlavnÃ­ ÄÃ¡sti: zdroj vstupu a nastavenÃ­ dat. NastavenÃ­
+dat je volitelnÃ©. JestliÅ¾e se uvede, musÃ­ se oddÄ›lit od zdroje vstupu znakem
 '#'.
 
 
 zdroj vstupu
 ------------
 
-Zdroj vstupu øíká xine, kde získat data k pøehrání. Abychom zaèali nìèím dobøe
-známım, vìt¹ina UNIXovskıch cest a jmen souborù jsou platné. Jsou zde nìkteré
-znaky, které vy¾adují zvlá¹tní zacházení, ale i trochu nesprávné MRL xine zkou¹í
-zpracovávat elegantnì.
+Zdroj vstupu Å™Ã­kÃ¡ xine, kde zÃ­skat data k pÅ™ehrÃ¡nÃ­. Abychom zaÄali nÄ›ÄÃ­m dobÅ™e
+znÃ¡mÃ½m, vÄ›tÅ¡ina UNIXovskÃ½ch cest a jmen souborÅ¯ jsou platnÃ©. Jsou zde nÄ›kterÃ©
+znaky, kterÃ© vyÅ¾adujÃ­ zvlÃ¡Å¡tnÃ­ zachÃ¡zenÃ­, ale i trochu nesprÃ¡vnÃ© MRL xine zkouÅ¡Ã­
+zpracovÃ¡vat elegantnÄ›.
 
-U zdrojù dat jinıch ne¾ jsou jména souborù musíte zaèít tøídou vstupu
-následovanou dvojteèkou ':'. Co má pøijít za dvojteèkou závisí na pou¾itém
-vstupu. Nìkteré dùle¾ité pøíklady by mìly bıt vysvìtleny:
+U zdrojÅ¯ dat jinÃ½ch neÅ¾ jsou jmÃ©na souborÅ¯ musÃ­te zaÄÃ­t tÅ™Ã­dou vstupu
+nÃ¡sledovanou dvojteÄkou ':'. Co mÃ¡ pÅ™ijÃ­t za dvojteÄkou zÃ¡visÃ­ na pouÅ¾itÃ©m
+vstupu. NÄ›kterÃ© dÅ¯leÅ¾itÃ© pÅ™Ã­klady by mÄ›ly bÃ½t vysvÄ›tleny:
 
-     file:/cesta/k/souboru          pøehraje zadanı soubor
-     stdin:/                        získá data ze standardního vstupu
-     fifo:/cesta/k/souboru          získá data z dané fronty (fifo)
+     file:/cesta/k/souboru          pÅ™ehraje zadanÃ½ soubor
+     stdin:/                        zÃ­skÃ¡ data ze standardnÃ­ho vstupu
+     fifo:/cesta/k/souboru          zÃ­skÃ¡ data z danÃ© fronty (fifo)
 
-     cdda:/                         pøehraje zvukové CD
-     cdda:/5                        pøehraje stopu 5 ze zvukového CD
+     cdda:/                         pÅ™ehraje zvukovÃ© CD
+     cdda:/5                        pÅ™ehraje stopu 5 ze zvukovÃ©ho CD
 
-     dvd:/                          pøehraje DVD
-     dvd:/2                         pøehraje DVD od titulu 2
-     dvd:/2.4                       pøehraje DVD od titulu 2, èást 4
+     dvd:/                          pÅ™ehraje DVD
+     dvd:/2                         pÅ™ehraje DVD od titulu 2
+     dvd:/2.4                       pÅ™ehraje DVD od titulu 2, ÄÃ¡st 4
 
-     http://server/umístìní/soubor  pøehraje soubor z webu
-     mms://server/umístìní/soubor   pøehraje soubor pøes protokol MMS
-     pnm://server/umístìní/soubor   pøehraje soubor pøes protokol PNM
-     rtsp://server/umístìní/soubor  pøehraje soubor pøes protokol RTSP
+     http://server/umÃ­stÄ›nÃ­/soubor  pÅ™ehraje soubor z webu
+     mms://server/umÃ­stÄ›nÃ­/soubor   pÅ™ehraje soubor pÅ™es protokol MMS
+     pnm://server/umÃ­stÄ›nÃ­/soubor   pÅ™ehraje soubor pÅ™es protokol PNM
+     rtsp://server/umÃ­stÄ›nÃ­/soubor  pÅ™ehraje soubor pÅ™es protokol RTSP
 
-     tcp://host:port                pøijímá data pøes soket TCP
-     slave://host:port              pøijímá data vysílaná pomocí xine
+     tcp://host:port                pÅ™ijÃ­mÃ¡ data pÅ™es soket TCP
+     slave://host:port              pÅ™ijÃ­mÃ¡ data vysÃ­lanÃ¡ pomocÃ­ xine
 
-     udp://host:port                pøijímá vícesmìrová data pøes UDP
-     udp://host:port?iface=eth0     pøijímá vícesmìrová data pøes UDP z eth0
-     rtp://host:port                pøijímá vícesmìrová data RTP
-     rtp://host:port?iface=eth0     pøijímá vícesmìrová data RTP
+     udp://host:port                pÅ™ijÃ­mÃ¡ vÃ­cesmÄ›rovÃ¡ data pÅ™es UDP
+     udp://host:port?iface=eth0     pÅ™ijÃ­mÃ¡ vÃ­cesmÄ›rovÃ¡ data pÅ™es UDP z eth0
+     rtp://host:port                pÅ™ijÃ­mÃ¡ vÃ­cesmÄ›rovÃ¡ data RTP
+     rtp://host:port?iface=eth0     pÅ™ijÃ­mÃ¡ vÃ­cesmÄ›rovÃ¡ data RTP
 
-     dvb:/                          uká¾e digitální vysílání videa (Digital
+     dvb:/                          ukÃ¡Å¾e digitÃ¡lnÃ­ vysÃ­lÃ¡nÃ­ videa (Digital
                                     Video Broadcast)
-     dvb:/7                         uká¾e DVB stanici 7
+     dvb:/7                         ukÃ¡Å¾e DVB stanici 7
 
-     v4l:/tuner/frekvence           pøijme data ze zaøízení Video4Linux
+     v4l:/tuner/frekvence           pÅ™ijme data ze zaÅ™Ã­zenÃ­ Video4Linux
 
 
-nastavení dat
+nastavenÃ­ dat
 -------------
 
-Èást nastavení dat vám dovoluje pøedat speciální volby pro pøehrávání pøímo
-v MRL. Jednotlivé volby se oddìlují støedníkem ';'.
-Mo¾né volby jsou:
+ÄŒÃ¡st nastavenÃ­ dat vÃ¡m dovoluje pÅ™edat speciÃ¡lnÃ­ volby pro pÅ™ehrÃ¡vÃ¡nÃ­ pÅ™Ã­mo
+v MRL. JednotlivÃ© volby se oddÄ›lujÃ­ stÅ™ednÃ­kem ';'.
+MoÅ¾nÃ© volby jsou:
 
      novideo                        ignorovat v datech video
      noaudio                        ignorovat v datech zvuk
      nospu                          ignorovat v datech titulky
 
      volume:hodnota                 nastavit hlasitost na zadanou hodnotu
-     compression:hodnota            nastavit úroveò komprese na zadanou hodnotu
+     compression:hodnota            nastavit ÃºroveÅˆ komprese na zadanou hodnotu
 
-     subtitle:soubor                zobrazit titulky z oddìleného souboru
+     subtitle:soubor                zobrazit titulky z oddÄ›lenÃ©ho souboru
 
-     save:jméno_souboru             ulo¾it data do urèeného souboru
+     save:jmÃ©no_souboru             uloÅ¾it data do urÄenÃ©ho souboru
 
-     config_entry:hodnota           zmìnit polo¾ku konfigurace na zadanou
+     config_entry:hodnota           zmÄ›nit poloÅ¾ku konfigurace na zadanou
                                     hodnotu
 
-     demux:demuxer_plugin           pou¾ít zadanı demultiplexor "demuxer_plugin"
-     lastdemuxprobe:demuxer_plugin  pou¾ito k debugování
+     demux:demuxer_plugin           pouÅ¾Ã­t zadanÃ½ demultiplexor "demuxer_plugin"
+     lastdemuxprobe:demuxer_plugin  pouÅ¾ito k debugovÃ¡nÃ­
 
 
-pøíklady
+pÅ™Ã­klady
 --------
 
-Následující pøíklady ukazují mo¾nosti MRL:
+NÃ¡sledujÃ­cÃ­ pÅ™Ã­klady ukazujÃ­ moÅ¾nosti MRL:
 
-     vá¹_film.avi#subtitle:va¹e_titulky.srt
+     vÃ¡Å¡_film.avi#subtitle:vaÅ¡e_titulky.srt
 
-                                    pøehraje uvedené avi se zobrazováním
-                                    titulkù z daného souboru
+                                    pÅ™ehraje uvedenÃ© avi se zobrazovÃ¡nÃ­m
+                                    titulkÅ¯ z danÃ©ho souboru
 
-     http://nìjakı.server.org/stream.mpg#save:savedstream.mpg
+     http://nÄ›jakÃ½.server.org/stream.mpg#save:savedstream.mpg
 
-                                    bude stahovat soubor pøes HTTP a bude ho
-                                    ukládat na disk bìhem pøehrávání
+                                    bude stahovat soubor pÅ™es HTTP a bude ho
+                                    uklÃ¡dat na disk bÄ›hem pÅ™ehrÃ¡vÃ¡nÃ­
 
      dvd:/1.1#novideo
 
-                                    pøehraje první èást prvního titulu DVD,
+                                    pÅ™ehraje prvnÃ­ ÄÃ¡st prvnÃ­ho titulu DVD,
                                     ale pouze zvuk
 
      stdin:/#demux:rawdv
 
-                                    pøehraje DV data ze standardního vstupu,
-                                    mù¾e se pou¾ít pro live DV data
+                                    pÅ™ehraje DV data ze standardnÃ­ho vstupu,
+                                    mÅ¯Å¾e se pouÅ¾Ã­t pro live DV data

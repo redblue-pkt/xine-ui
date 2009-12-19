@@ -1,8 +1,8 @@
-xine mù¾e bıt dálkovì ovládáno infraèervenım ovladaèem. Abyste mohli tuto
-vlastnost pou¾ívat, musíte mít nainstalováno LIRC. Podrobnosti najdete na
+xine mÅ¯Å¾e bÃ½t dÃ¡lkovÄ› ovlÃ¡dÃ¡no infraÄervenÃ½m ovladaÄem. Abyste mohli tuto
+vlastnost pouÅ¾Ã­vat, musÃ­te mÃ­t nainstalovÃ¡no LIRC. Podrobnosti najdete na
 http://www.lirc.org/.
 
-Do va¹eho souboru ~/.lircrc pøidejte nìkteré polo¾ky, napø.:
+Do vaÅ¡eho souboru ~/.lircrc pÅ™idejte nÄ›kterÃ© poloÅ¾ky, napÅ™.:
 
        begin
                remote = SAMSUNG
@@ -19,10 +19,10 @@ Do va¹eho souboru ~/.lircrc pøidejte nìkteré polo¾ky, napø.:
                config = SetPosition10%
        end
 
-xine doká¾e samo vytvoøit návrh lirc polo¾ek pou¾itím 'xine --keymap=lirc'.
-Vıstup pøesmìrujte do souboru a dolaïte tam nastavení.
+xine dokÃ¡Å¾e samo vytvoÅ™it nÃ¡vrh lirc poloÅ¾ek pouÅ¾itÃ­m 'xine --keymap=lirc'.
+VÃ½stup pÅ™esmÄ›rujte do souboru a dolaÄte tam nastavenÃ­.
 
-Ka¾dá polo¾ka pak bude vypadat asi takto:
+KaÅ¾dÃ¡ poloÅ¾ka pak bude vypadat asi takto:
 
        # Reduce the output window size.
        begin
@@ -33,12 +33,12 @@ Ka¾dá polo¾ka pak bude vypadat asi takto:
                config = WindowReduce
        end
 
-Je na vás uvést jméno v remote a pøiøadit button.
+Je na vÃ¡s uvÃ©st jmÃ©no v remote a pÅ™iÅ™adit button.
 
 
-K získání automaticky naèteného playlistu z daného vstupního modulu mù¾ete
-pou¾ít speciální klíèové slovo 'PlaylistFrom:' následované jménem modulu
-(stejné jako popisek tlaèítka na panelu xine):
+K zÃ­skÃ¡nÃ­ automaticky naÄtenÃ©ho playlistu z danÃ©ho vstupnÃ­ho modulu mÅ¯Å¾ete
+pouÅ¾Ã­t speciÃ¡lnÃ­ klÃ­ÄovÃ© slovo 'PlaylistFrom:' nÃ¡sledovanÃ© jmÃ©nem modulu
+(stejnÃ© jako popisek tlaÄÃ­tka na panelu xine):
 
        # Retrieve playlist from DVD plugin.
        begin

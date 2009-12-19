@@ -3,7 +3,7 @@
  ++++++++++++++++++++                            ++++++++++++++++++++++++
 
 
- SPIS TRE¦CI
+ SPIS TREÅšCI
  -=========-
    
    1   DOKUMENTACJA
@@ -11,17 +11,17 @@
    
    2   O XINE
    2.1 Wymagania i wspierane platformy
-   2.2 U¿yte oprogramowanie
-   2.3 Programi¶ci xine
-   2.4 U¿ytkowanie
-   2.4.1 Skróty klawiaturowe
-   2.4.2 Wybieranie ¶cie¿ki d¼wiêkowej
-   2.4.3 Wybieranie napisów
+   2.2 UÅ¼yte oprogramowanie
+   2.3 ProgramiÅ›ci xine
+   2.4 UÅ¼ytkowanie
+   2.4.1 SkrÃ³ty klawiaturowe
+   2.4.2 Wybieranie Å›cieÅ¼ki dÅºwiÄ™kowej
+   2.4.3 Wybieranie napisÃ³w
    2.4.4 LIRC
-   2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceñ
+   2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceÅ„
  
-   3   CO NIE ZOSTA£O JESZCZE POWIEDZIANE
-   3.1 Wolno¶æ, DVD i te sprawy...
+   3   CO NIE ZOSTAÅO JESZCZE POWIEDZIANE
+   3.1 WolnoÅ›Ä‡, DVD i te sprawy...
    
    4   Kontakt z projektem xine
 
@@ -35,96 +35,96 @@
 
 1.1 Zakres tego dokumentu
 
-    To jest dokumentacja u¿ytkownika koñcowego xine-lib i xine-ui.
-    Wiêcej informacji znajdziesz w katalogu doc/ obydwu pakietów.
+    To jest dokumentacja uÅ¼ytkownika koÅ„cowego xine-lib i xine-ui.
+    WiÄ™cej informacji znajdziesz w katalogu doc/ obydwu pakietÃ³w.
 
-    Proszê równie¿ rzuciæ okiem na FAQ do³±czany do pakietu xine-ui
-    który mo¿e ju¿ zawieraæ odpowiedzi na Twoje pytania.
+    ProszÄ™ rÃ³wnieÅ¼ rzuciÄ‡ okiem na FAQ doÅ‚Ä…czany do pakietu xine-ui
+    ktÃ³ry moÅ¼e juÅ¼ zawieraÄ‡ odpowiedzi na Twoje pytania.
 
 
 2   O XINE
 
-    xine to wolny, na licncji GPL, odtwarzacz wideo dla systemów
-    unixowych. Obs³uguje strumienie mpeg-2 i mpeg-1 (zawieraj±ce d¼wiêk
-    + obraz), elementarne strumienie mpeg (tylko d¼wiêk/obraz, np.
-    pliki mp3) jak i pliki typu AVI (u¿ywaj±c kodeków dll win32) oraz
+    xine to wolny, na licncji GPL, odtwarzacz wideo dla systemÃ³w
+    unixowych. ObsÅ‚uguje strumienie mpeg-2 i mpeg-1 (zawierajÄ…ce dÅºwiÄ™k
+    + obraz), elementarne strumienie mpeg (tylko dÅºwiÄ™k/obraz, np.
+    pliki mp3) jak i pliki typu AVI (uÅ¼ywajÄ…c kodekÃ³w dll win32) oraz
     strumienie typu Vorbis OGG. Jest pewne wsparcie dla sekwencji
-    quicktime (ale wiêkszo¶æ kodeków audio i wideo jest chronionych
-    przez prawo w³asno¶ci intelektualnej i te nie s± wspierane).
+    quicktime (ale wiÄ™kszoÅ›Ä‡ kodekÃ³w audio i wideo jest chronionych
+    przez prawo wÅ‚asnoÅ›ci intelektualnej i te nie sÄ… wspierane).
 
-    xine odtwarza z sekwencji obraz i d¼wiêk i synchronizuje je.
-    Zale¿nie od w³a¶ciwo¶ci sekwencji odtwarzanie bêdzie wymaga³o
-    wiêcej lub mniej czasu procesora, pe³na czêstotliwo¶æ wy¶wietlania
-    ramek sekwencji mpeg-2 uda³a siê ju¿ przy procesorze
+    xine odtwarza z sekwencji obraz i dÅºwiÄ™k i synchronizuje je.
+    ZaleÅ¼nie od wÅ‚aÅ›ciwoÅ›ci sekwencji odtwarzanie bÄ™dzie wymagaÅ‚o
+    wiÄ™cej lub mniej czasu procesora, peÅ‚na czÄ™stotliwoÅ›Ä‡ wyÅ›wietlania
+    ramek sekwencji mpeg-2 udaÅ‚a siÄ™ juÅ¼ przy procesorze
     Pentium II 400 MHz.
 
-    xine mo¿e odtwarzaæ VideoCD, CD, SVCD i bezpo¶rednio DVD. Niestety
-    status prawny zaszyfrowanych/zablokowanych dysków DVD nie jest
-    jasny w niektórych pañstwach, wiêc nie mo¿emy dodaæ do xine ¿adnego
-    kodu odszyfrowuj±cego DVD. Aby odtwarzaæ takie DVD bêdziesz
-    potrzebowaæ zewnêtrznych programów lub czego¶ na kszta³t wtyczki do
-    xine 'xine_dvd_plugin', który mo¿e obs³u¿yæ uwierzytelnianie/
+    xine moÅ¼e odtwarzaÄ‡ VideoCD, CD, SVCD i bezpoÅ›rednio DVD. Niestety
+    status prawny zaszyfrowanych/zablokowanych dyskÃ³w DVD nie jest
+    jasny w niektÃ³rych paÅ„stwach, wiÄ™c nie moÅ¼emy dodaÄ‡ do xine Å¼adnego
+    kodu odszyfrowujÄ…cego DVD. Aby odtwarzaÄ‡ takie DVD bÄ™dziesz
+    potrzebowaÄ‡ zewnÄ™trznych programÃ³w lub czegoÅ› na ksztaÅ‚t wtyczki do
+    xine 'xine_dvd_plugin', ktÃ³ry moÅ¼e obsÅ‚uÅ¼yÄ‡ uwierzytelnianie/
     odszyfrowanie DVD.
 
-    Grupa autorów projektu xine odmawia jakiejkolwiek odpowiedzialno¶ci
-    za u¿ywanie programu xine w ten sposób.
+    Grupa autorÃ³w projektu xine odmawia jakiejkolwiek odpowiedzialnoÅ›ci
+    za uÅ¼ywanie programu xine w ten sposÃ³b.
     
-    Poczynaj±c od wersji xine 5.0, zaimplementowana zosta³a architektura
-    pozwalaj±ca na elastyczne u¿ywanie wtyczek, dziêki którym mo¿liwe
-    bêdzie w przysz³o¶ci wsparcie wielu innych typów sekwencji i
-    urz±dzeñ wyj¶ciowych.
+    PoczynajÄ…c od wersji xine 5.0, zaimplementowana zostaÅ‚a architektura
+    pozwalajÄ…ca na elastyczne uÅ¼ywanie wtyczek, dziÄ™ki ktÃ³rym moÅ¼liwe
+    bÄ™dzie w przyszÅ‚oÅ›ci wsparcie wielu innych typÃ³w sekwencji i
+    urzÄ…dzeÅ„ wyjÅ›ciowych.
 
 2.1 Wymagania i wspierane platformy
 
-    - xine wymaga serwera X11 dla wyj¶cia obrazu (z 8, 15, 16, 24 lub 32
-      - bitow± g³êbi± kolorów).
-    - xine wykrywa i u¿ywa rozszerzeñ MIT X video i X shared memory dla
-      lepszej wydajno¶ci.
-    - je¶li nie mo¿esz uruchomiæ Xv na twojej platformie, powiniene¶
-      u¿yæ 16bpp g³êbi kolorów dla uzyskania lepszej wydajno¶ci.
-      Xv wydaje siê ca³kiem dobrze pracowaæ z ka¿d± g³êbi± kolorów.
-    - je¿eli masz kartê graficzn± mga 200/400 mo¿esz u¿yæ jako opcji
-      wyj¶cia - wtyczki syncfb/teletux. Szczegó³y zobacz w README.syncfb
+    - xine wymaga serwera X11 dla wyjÅ›cia obrazu (z 8, 15, 16, 24 lub 32
+      - bitowÄ… gÅ‚Ä™biÄ… kolorÃ³w).
+    - xine wykrywa i uÅ¼ywa rozszerzeÅ„ MIT X video i X shared memory dla
+      lepszej wydajnoÅ›ci.
+    - jeÅ›li nie moÅ¼esz uruchomiÄ‡ Xv na twojej platformie, powinieneÅ›
+      uÅ¼yÄ‡ 16bpp gÅ‚Ä™bi kolorÃ³w dla uzyskania lepszej wydajnoÅ›ci.
+      Xv wydaje siÄ™ caÅ‚kiem dobrze pracowaÄ‡ z kaÅ¼dÄ… gÅ‚Ä™biÄ… kolorÃ³w.
+    - jeÅ¼eli masz kartÄ™ graficznÄ… mga 200/400 moÅ¼esz uÅ¼yÄ‡ jako opcji
+      wyjÅ›cia - wtyczki syncfb/teletux. SzczegÃ³Å‚y zobacz w README.syncfb
     - odtwarzanie audio jest wspomagane przez OSS, ALSA, ESD i ARTSD.
-    - aaxine u¿ywa bibliotek aalib i mo¿e pracowaæ na prawie ka¿dym
+    - aaxine uÅ¼ywa bibliotek aalib i moÅ¼e pracowaÄ‡ na prawie kaÅ¼dym
       terminalu.
-    - ¿eby skompilowaæ xine potrzebujesz w miarê nowych wersji gmake, gcc
+    - Å¼eby skompilowaÄ‡ xine potrzebujesz w miarÄ™ nowych wersji gmake, gcc
       i binutils.
 
-    xine powinien pracowaæ na ka¿dym nowszym komputerze kompatybilnym
-    z architektur± i386 (pentium i lepsze) u¿ywaj±c GNU/Linux lub FreeBSD.
-    Zale¿nie od typu odtwarzanej sekwencji wideo, bêdziesz potrzebowaæ
-    wiêcej lub mniej mocy procesora, dla p³ynnago odtwarzania. Odtwarzanie
-    DVD mo¿e dobrze dzia³aæ ju¿ na systemach opartych o Pentium II 400Mhz
-    (lub równowa¿nych). W tym równaniu jest jednak zbyt wiele niewiadomych
-    wiêc ta granica mo¿e siê wahaæ.
+    xine powinien pracowaÄ‡ na kaÅ¼dym nowszym komputerze kompatybilnym
+    z architekturÄ… i386 (pentium i lepsze) uÅ¼ywajÄ…c GNU/Linux lub FreeBSD.
+    ZaleÅ¼nie od typu odtwarzanej sekwencji wideo, bÄ™dziesz potrzebowaÄ‡
+    wiÄ™cej lub mniej mocy procesora, dla pÅ‚ynnago odtwarzania. Odtwarzanie
+    DVD moÅ¼e dobrze dziaÅ‚aÄ‡ juÅ¼ na systemach opartych o Pentium II 400Mhz
+    (lub rÃ³wnowaÅ¼nych). W tym rÃ³wnaniu jest jednak zbyt wiele niewiadomych
+    wiÄ™c ta granica moÅ¼e siÄ™ wahaÄ‡.
 
-    Pomy¶lnie przetestowane karty graficzne (u¿ywaj±ce Xv) dla PC to:
+    PomyÅ›lnie przetestowane karty graficzne (uÅ¼ywajÄ…ce Xv) dla PC to:
     nVidia Riva TNT (oryginalne sterowniki NVidii "closed-source"),
     nVidia Riva TNT 2, Matrox G400, ATI AIW Rage128-16MB,
     3dfx voodoo3 2000 PCI 16Mb
 
-    Nastêpuj±ce karty zosta³y zg³oszone jako dzia³aj±ce, ale nie jest
-    jasne czy u¿ywaj± Xv czy nie (proszê zwróciæ siê na listê
-    dyskusyjn± u¿ytkowników xine):
+    NastÄ™pujÄ…ce karty zostaÅ‚y zgÅ‚oszone jako dziaÅ‚ajÄ…ce, ale nie jest
+    jasne czy uÅ¼ywajÄ… Xv czy nie (proszÄ™ zwrÃ³ciÄ‡ siÄ™ na listÄ™
+    dyskusyjnÄ… uÅ¼ytkownikÃ³w xine):
     Trident 9660, ATI AIW M64-8Mb PCI, ATI RageII 8MB.
 
-    xine powinien daæ sobiê radê z odtwarzaniem obrazu na ka¿dym
-    dzia³aj±cym x-serwerze z ka¿d± kart± graficzn±, ale z du¿o gorsz±
-    wydajno¶ci± ni¿ z rozszerzeniem Xv.
+    xine powinien daÄ‡ sobiÄ™ radÄ™ z odtwarzaniem obrazu na kaÅ¼dym
+    dziaÅ‚ajÄ…cym x-serwerze z kaÅ¼dÄ… kartÄ… graficznÄ…, ale z duÅ¼o gorszÄ…
+    wydajnoÅ›ciÄ… niÅ¼ z rozszerzeniem Xv.
 
     Dodatkowo, xine pracuje na i386-solaris, na maszynach sparc
-    u¿ywaj±cych linuxa lub solarisa (Creator-3D dzia³a), zobacz
-    README.solaris dla dodatkowych informacji. Równie¿ wspierane:
-    niektóre systemy powerpc u¿ywaj±ce linuxa oraz IRIX na procesorach
+    uÅ¼ywajÄ…cych linuxa lub solarisa (Creator-3D dziaÅ‚a), zobacz
+    README.solaris dla dodatkowych informacji. RÃ³wnieÅ¼ wspierane:
+    niektÃ³re systemy powerpc uÅ¼ywajÄ…ce linuxa oraz IRIX na procesorach
     MIPS.
 
-    I ostatnie, lecz nie mniej wa¿ne: zg³oszono równie¿ poprawnie
-    dzia³aj±cy xine na procesorach Alpha, IA-64 i S/390.
+    I ostatnie, lecz nie mniej waÅ¼ne: zgÅ‚oszono rÃ³wnieÅ¼ poprawnie
+    dziaÅ‚ajÄ…cy xine na procesorach Alpha, IA-64 i S/390.
 
-2.2 U¿yte oprogramowanie
+2.2 UÅ¼yte oprogramowanie
 
-    xine u¿ywa oprogramowania z nastêpuj±cych zewnêtrznych projektów
+    xine uÅ¼ywa oprogramowania z nastÄ™pujÄ…cych zewnÄ™trznych projektÃ³w
     wolnego oprogramowania:
 
     - liba52 Aarona Holtzmana i Michaela Lespinasse
@@ -132,173 +132,173 @@
     - libmad Roberta Lesliego
     - libffmpeg Fabrice Bellard'a
 
-    Bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
+    Bez tych Å›wietnych programÃ³w xine nie byÅ‚oby oczywiÅ›cie tym
     czym jest teraz.
 
-    Równie¿ wielkie podziêkowania dla Linux Video and DVD Project
-    "LiViD" sk±d oryginalny pomys³ wolnego i darmowego
+    RÃ³wnieÅ¼ wielkie podziÄ™kowania dla Linux Video and DVD Project
+    "LiViD" skÄ…d oryginalny pomysÅ‚ wolnego i darmowego
     odtwarzacza DVD.
      
     => http://www.linuxvideo.org/
 
-2.3 Programi¶ci xine
+2.3 ProgramiÅ›ci xine
 
-    g³ówny programista xine
+    gÅ‚Ã³wny programista xine
       Guenter Bartsch <guenter@users.sourceforge.net>
 
-    ró¿ne sugestie, poprawki b³êdów i kompilacji, alsa plugin,
-    interfejs u¿ytkownika
+    rÃ³Å¼ne sugestie, poprawki bÅ‚Ä™dÃ³w i kompilacji, alsa plugin,
+    interfejs uÅ¼ytkownika
       Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 
-    wiele poprawek, wykrywanie prêdko¶ci transferu, programowa eliminacja
-    przeplotu, masa uaktualnieñ libwin32
+    wiele poprawek, wykrywanie prÄ™dkoÅ›ci transferu, programowa eliminacja
+    przeplotu, masa uaktualnieÅ„ libwin32
       Miguel Freitas <miguel@cetuc.puc-rio.br>
 
-    modu³ wy¶wietlania obrazu teletux/syncfb, ró¿ne poprawki, sterowniki alsa
+    moduÅ‚ wyÅ›wietlania obrazu teletux/syncfb, rÃ³Å¼ne poprawki, sterowniki alsa
       Joachim Koenig <Joachim.Koenig@gmx.net>
 
     programowanie liba52/libmpeg2
       Michael Lespinasse <walken@zoy.org>
 
-    pakiety dla Debiana, wsparcie dla u¿ytkowników
+    pakiety dla Debiana, wsparcie dla uÅ¼ytkownikÃ³w
       Siegfried Langauf <siggi@users.sourceforge.net>
   
     Oraz wielu innych, zobacz plik xine-lib/AUTHORS
 
-2.4 U¿ytkowanie
+2.4 UÅ¼ytkowanie
 
-    Mo¿esz uruchomiæ xine bez ¿adncyh opcji lub podaj±c jedn± lub
-    wiêcej sekwencji wej¶ciowych bezpo¶rednio. xine testuje mo¿liwo¶æ
-    u¿ycia rozszerzenia Xv i je¶li nie - sam u¿yje XShm, test ten mo¿e
-    jednak zawie¶æ. Mo¿esz okre¶liæ wyj¶cie wideo u¿ywaj±c opcji
+    MoÅ¼esz uruchomiÄ‡ xine bez Å¼adncyh opcji lub podajÄ…c jednÄ… lub
+    wiÄ™cej sekwencji wejÅ›ciowych bezpoÅ›rednio. xine testuje moÅ¼liwoÅ›Ä‡
+    uÅ¼ycia rozszerzenia Xv i jeÅ›li nie - sam uÅ¼yje XShm, test ten moÅ¼e
+    jednak zawieÅ›Ä‡. MoÅ¼esz okreÅ›liÄ‡ wyjÅ›cie wideo uÅ¼ywajÄ…c opcji
     "-V", np:
 
     xine -V XShm
 
-    zmusi xine do u¿ycia XShm albo zwyk³ego X11.
+    zmusi xine do uÅ¼ycia XShm albo zwykÅ‚ego X11.
 
-    Je¶li chcesz wys³aæ d¼wiêk przez sieæ za pomoc± ESD, ustaw zmienn±
-    ¶rodowiskow± ESPEAKER przed uruchomieniem xine.
+    JeÅ›li chcesz wysÅ‚aÄ‡ dÅºwiÄ™k przez sieÄ‡ za pomocÄ… ESD, ustaw zmiennÄ…
+    Å›rodowiskowÄ… ESPEAKER przed uruchomieniem xine.
 
-    Sekwencj± wej¶cia mo¿e byæ nazwa pliku lub co¶ co nazywamy
-    "MediaResourceLocator" MRL, który wygl±da podobnie do URLa.
-    Najpierw podaj ¼ród³o wej¶cia przed "://" nastêpnie specyficzny
-    identyfikator ¼ród³a wej¶cia. Jakich ¼róde³ wej¶cia mo¿esz u¿yæ,
-    zale¿y od tego jakie wtyczki wej¶cia zainstalowa³e¶ (dla zwyk³ych
-    plików mo¿esz pomin±æ identyfikator ¼ród³a wej¶cia).
+    SekwencjÄ… wejÅ›cia moÅ¼e byÄ‡ nazwa pliku lub coÅ› co nazywamy
+    "MediaResourceLocator" MRL, ktÃ³ry wyglÄ…da podobnie do URLa.
+    Najpierw podaj ÅºrÃ³dÅ‚o wejÅ›cia przed "://" nastÄ™pnie specyficzny
+    identyfikator ÅºrÃ³dÅ‚a wejÅ›cia. Jakich ÅºrÃ³deÅ‚ wejÅ›cia moÅ¼esz uÅ¼yÄ‡,
+    zaleÅ¼y od tego jakie wtyczki wejÅ›cia zainstalowaÅ‚eÅ› (dla zwykÅ‚ych
+    plikÃ³w moÅ¼esz pominÄ…Ä‡ identyfikator ÅºrÃ³dÅ‚a wejÅ›cia).
 
-    Spróbuj
+    SprÃ³buj
 
     $ xine --help
 
-    by otrzymaæ pe³n± informacjê o u¿ytkowaniu.
+    by otrzymaÄ‡ peÅ‚nÄ… informacjÄ™ o uÅ¼ytkowaniu.
 
-    xine u¿ywa protoko³u xdnd (wersja 3) wiêc je¶li masz wyszukiwarkê
-    plików z nim wspó³pracuj±c± (np gmc) mo¿esz po prostu "przeci±gn±æ"
-    pliki wideo na xine by je odtworzyæ.
+    xine uÅ¼ywa protokoÅ‚u xdnd (wersja 3) wiÄ™c jeÅ›li masz wyszukiwarkÄ™
+    plikÃ³w z nim wspÃ³Å‚pracujÄ…cÄ… (np gmc) moÅ¼esz po prostu "przeciÄ…gnÄ…Ä‡"
+    pliki wideo na xine by je odtworzyÄ‡.
 
-    Odtwarzanie scie¿ki 3 z VCD:
+    Odtwarzanie scieÅ¼ki 3 z VCD:
 
     $ xine vcd://3
 
-    Przyk³ad bezpo¶redniego dostêpu do DVD:
+    PrzykÅ‚ad bezpoÅ›redniego dostÄ™pu do DVD:
 
     $ xine dvd://VTS_01_1.VOB
 
-2.4.1 Skróty klawiaturowe
+2.4.1 SkrÃ³ty klawiaturowe
 
       Klawisz            Akcja
 
-      [RETURN]           odtwórz
+      [RETURN]           odtwÃ³rz
       [SPACJA]           stop klatka
-      [Góra]/[Dó³]       szybki podgl±d / zwolnienie
+      [GÃ³ra]/[DÃ³Å‚]       szybki podglÄ…d / zwolnienie
 
-      0                  znajd¼ pocz±tek aktualnej sekwencji
-      1-9                przejd¼ do 10-90% aktualnej sekwencji
+      0                  znajdÅº poczÄ…tek aktualnej sekwencji
+      1-9                przejdÅº do 10-90% aktualnej sekwencji
       [Lewo]/[Prawo]     przeskocz -+ 15 sec (+CTRL: 60 sec)
-      [PgUp]/[Wstecz]    przeskocz do poprzedniej pozycji na li¶cie
-      [PgDown]/[Naprzód] przeskocz do nastêpnej pozycji na li¶cie
+      [PgUp]/[Wstecz]    przeskocz do poprzedniej pozycji na liÅ›cie
+      [PgDown]/[NaprzÃ³d] przeskocz do nastÄ™pnej pozycji na liÅ›cie
 
-      f                  Prze³±cz do trybu pe³noekranowego/okna
-      a                  prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
-      i                  w³±cz tryb przeplotu
+      f                  PrzeÅ‚Ä…cz do trybu peÅ‚noekranowego/okna
+      a                  przeÅ‚Ä…cz proporcje ekranu (AUTO/16:9/4:3/DVB)
+      i                  wÅ‚Ä…cz tryb przeplotu
 
-      z / Shift-Z        ZOOM powiêkszanie / pomiejszanie obrazu.
-                         dodaj Ctrl aby powiêkszyæ w pionie lub Meta aby
-                         powiêkszyæ w poziomie
+      z / Shift-Z        ZOOM powiÄ™kszanie / pomiejszanie obrazu.
+                         dodaj Ctrl aby powiÄ™kszyÄ‡ w pionie lub Meta aby
+                         powiÄ™kszyÄ‡ w poziomie
 
-      "<",">"            zmodyfikuj rozmiar okna wyj¶wietlania
-      + -                zmieñ kana³ audio
-      , .                zmieñ kana³ napisów
-      n m                wyreguluj synchronizacjê a/v
-      [HOME]             zresetuj synchronizacjê a/v
+      "<",">"            zmodyfikuj rozmiar okna wyjÅ›wietlania
+      + -                zmieÅ„ kanaÅ‚ audio
+      , .                zmieÅ„ kanaÅ‚ napisÃ³w
+      n m                wyreguluj synchronizacjÄ™ a/v
+      [HOME]             zresetuj synchronizacjÄ™ a/v
 
-      [INSERT]           prze³±cz widzialno¶æ kursora myszki w oknie obrazu
+      [INSERT]           przeÅ‚Ä…cz widzialnoÅ›Ä‡ kursora myszki w oknie obrazu
 
-      q                  zakoñcz
+      q                  zakoÅ„cz
 
-      h                  ukryj okno obrazu (u¿yteczne przy odtwarzaniu mp3)
+      h                  ukryj okno obrazu (uÅ¼yteczne przy odtwarzaniu mp3)
 
-      wiêcej wkrótce ;-)
+      wiÄ™cej wkrÃ³tce ;-)
 
-      Kliknij prawym przyciskiem na okno wyj¶cia wideo (lub naci¶nij "G")
-      aby ukryæ panel.
+      Kliknij prawym przyciskiem na okno wyjÅ›cia wideo (lub naciÅ›nij "G")
+      aby ukryÄ‡ panel.
 
-      Zmienianie skrótów:
-        Mo¿esz równie¿ zmieniæ jeden/kilka/wszystkie skróty. Do tego musisz
-        mieæ plik keymap w swoim katalogu $HOME/.xine/. Sk³adnia wpisów do
-        tego pliku wygl±da tak:
+      Zmienianie skrÃ³tÃ³w:
+        MoÅ¼esz rÃ³wnieÅ¼ zmieniÄ‡ jeden/kilka/wszystkie skrÃ³ty. Do tego musisz
+        mieÄ‡ plik keymap w swoim katalogu $HOME/.xine/. SkÅ‚adnia wpisÃ³w do
+        tego pliku wyglÄ…da tak:
 
          WindowReduce {
             key = less
             modifier = none
          }
 
-        Warto¶æ "key" powinna odpowiadaæ opisowi klawiszy X11 (zobacz poni¿ej).
-        Modyfikator mo¿e byæ:
+        WartoÅ›Ä‡ "key" powinna odpowiadaÄ‡ opisowi klawiszy X11 (zobacz poniÅ¼ej).
+        Modyfikator moÅ¼e byÄ‡:
 	         - 'none' brak modyfikatora,
                  - 'control' (lub 'ctrl') klawisz "Control",
                  - 'meta' (or 'alt' on PC) dla klawisza "meta",
-                 - 'mod3' lub 'mod4' lub 'mod5' dostêpne tylko na niektórych
+                 - 'mod3' lub 'mod4' lub 'mod5' dostÄ™pne tylko na niektÃ³rych
                    platformach.
 
-        Modyfikatory mog± byæ mieszane, oddzielone przecinkiem:
+        Modyfikatory mogÄ… byÄ‡ mieszane, oddzielone przecinkiem:
 	
          WindowReduce {
            key = less
            modifier = control, alt
          }
 
-        Nie wpisanie lini z modyfikatorem, bêdzie równoznaczne z wybraniem
+        Nie wpisanie lini z modyfikatorem, bÄ™dzie rÃ³wnoznaczne z wybraniem
         modyfikatora 'none'.
 
-        Mo¿esz dodaæ równie¿ aliasy dla skrótów, taki:
+        MoÅ¼esz dodaÄ‡ rÃ³wnieÅ¼ aliasy dla skrÃ³tÃ³w, taki:
 	 
 	 Alias {
            entry = Pause
            key = p
          }
 
-        bêdzie oznacza³ dodanie innego skrótu do wpisu 'Pause' przez
-        naci¶niêcie 'p'. Mo¿esz równie¿ dodaæ sekcjê modyfikatora
-        (zobacz poni¿ej). Je¶li nie - modyfikator pozostanie taki
+        bÄ™dzie oznaczaÅ‚ dodanie innego skrÃ³tu do wpisu 'Pause' przez
+        naciÅ›niÄ™cie 'p'. MoÅ¼esz rÃ³wnieÅ¼ dodaÄ‡ sekcjÄ™ modyfikatora
+        (zobacz poniÅ¼ej). JeÅ›li nie - modyfikator pozostanie taki
         jak dla oryginalnego klawisza. ('Pause' w tym przypadku).
 
       Skanowanie nazw klawiszy X11:
-        Aby poznaæ nazwê klawisza X11, mo¿esz u¿yæ polecenia 'xev', który jest
+        Aby poznaÄ‡ nazwÄ™ klawisza X11, moÅ¼esz uÅ¼yÄ‡ polecenia 'xev', ktÃ³ry jest
         dostarczany wraz z pakietami X11. Uruchomienie 'xev' z xterm'a 
-        uaktywnia ma³e okno, wtedy naci¶nij klawisz którego nazwê chcesz poznaæ.
+        uaktywnia maÅ‚e okno, wtedy naciÅ›nij klawisz ktÃ³rego nazwÄ™ chcesz poznaÄ‡.
       
-        Wtedy w oknie xterm'a otrzymasz co¶ takiego:
+        Wtedy w oknie xterm'a otrzymasz coÅ› takiego:
 	
          ...
          KeyRelease event, serial 27, synthetic NO, window 0x3200001,
          root 0x3c, subw 0x0, time 4144050914, (259,265), root:(272,319),
          state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
                                                ^^^^^^^^
-					       To jest w³a¶nie poszukiwana nazwa.
-      Je¶li chodzi o przyciski myszy, aby u¿ywaæ na przyk³ad kó³ko myszy,
-      musisz wy¶ledziæ który przycisk bêdzie asygnowany do funkcji, u¿ywaj±c xev:
+					       To jest wÅ‚aÅ›nie poszukiwana nazwa.
+      JeÅ›li chodzi o przyciski myszy, aby uÅ¼ywaÄ‡ na przykÅ‚ad kÃ³Å‚ko myszy,
+      musisz wyÅ›ledziÄ‡ ktÃ³ry przycisk bÄ™dzie asygnowany do funkcji, uÅ¼ywajÄ…c xev:
 
          ButtonRelease event, serial 27, synthetic NO, window 0x1200001,
          root 0x3b, subw 0x0, time 2710360666, (107,87), root:(120,117),
@@ -306,48 +306,48 @@
                        ^^^^^^^^
                        To jest ten przycisk
 
-      W tym przypadku musisz ustawiæ "key = XButton_5". Przycisk modyfikacyjny
-      jest równie¿ wspierany z przyciskami myszy.
+      W tym przypadku musisz ustawiÄ‡ "key = XButton_5". Przycisk modyfikacyjny
+      jest rÃ³wnieÅ¼ wspierany z przyciskami myszy.
 
-      Wy¶wietlanie obecnych/przemapowanych skrótów.
-        Mo¿esz u¿yæ 'xine --keymap' lub 'xine --keymap=default' aby wy¶wietliæ
-        domy¶lne skróty. Mo¿esz przekierowaæ rezultat do pliku, który mo¿e ju¿
-        zostaæ plikiem ~/.xine/keymap.
+      WyÅ›wietlanie obecnych/przemapowanych skrÃ³tÃ³w.
+        MoÅ¼esz uÅ¼yÄ‡ 'xine --keymap' lub 'xine --keymap=default' aby wyÅ›wietliÄ‡
+        domyÅ›lne skrÃ³ty. MoÅ¼esz przekierowaÄ‡ rezultat do pliku, ktÃ³ry moÅ¼e juÅ¼
+        zostaÄ‡ plikiem ~/.xine/keymap.
 
-        Aby zobaczyæ rezultaty zmiam w mapowaniu klawiszy, wpisz po prostu:
+        Aby zobaczyÄ‡ rezultaty zmiam w mapowaniu klawiszy, wpisz po prostu:
 
         xine --keymap=remapped
 
-2.4.2 Wybieranie ¶cie¿ki d¼wiêkowej
+2.4.2 Wybieranie Å›cieÅ¼ki dÅºwiÄ™kowej
 
-      Podaj opcjê "-a" aby wybraæ wymagan± ¶cie¿kê audio:
+      Podaj opcjÄ™ "-a" aby wybraÄ‡ wymaganÄ… Å›cieÅ¼kÄ™ audio:
 
       xine -a 3 test.mpg
 
-      odtworzy 3-ci± dostêpn± ¶cie¿kê audio (wraz z obrazem, oczywi¶cie).
+      odtworzy 3-ciÄ… dostÄ™pnÄ… Å›cieÅ¼kÄ™ audio (wraz z obrazem, oczywiÅ›cie).
 
-      Alternatywnie mo¿esz u¿yæ interfejsu u¿ytkownika do selekcji
-      ¶cie¿ki audio.
+      Alternatywnie moÅ¼esz uÅ¼yÄ‡ interfejsu uÅ¼ytkownika do selekcji
+      Å›cieÅ¼ki audio.
 
-2.4.3 Wybieranie napisów
+2.4.3 Wybieranie napisÃ³w
 
-      Napisy s± do³±czane w oddzielnych ¶cie¿kach, tak jak d¼wiêk.
-      Zazwyczaj ¶cie¿ka 0 to napisy w domy¶lnym jêzyku. U¿yj
-      opcji "-u" aby wybraæ potrzebn± ¶cie¿kê napisów:
+      Napisy sÄ… doÅ‚Ä…czane w oddzielnych Å›cieÅ¼kach, tak jak dÅºwiÄ™k.
+      Zazwyczaj Å›cieÅ¼ka 0 to napisy w domyÅ›lnym jÄ™zyku. UÅ¼yj
+      opcji "-u" aby wybraÄ‡ potrzebnÄ… Å›cieÅ¼kÄ™ napisÃ³w:
 
       xine -u 0 test.vob
 
-      wy¶wietli napisy ze ¶cie¿ki 0.
+      wyÅ›wietli napisy ze Å›cieÅ¼ki 0.
 
-      Alternatywnie mo¿esz u¿yæ interfejsu u¿ytkownika do selekcji
-      ¶cie¿ki napisów.
+      Alternatywnie moÅ¼esz uÅ¼yÄ‡ interfejsu uÅ¼ytkownika do selekcji
+      Å›cieÅ¼ki napisÃ³w.
 
 2.4.4 LIRC
 
-      xine mo¿e byæ sterowany zdalnie przez podczerwieñ. Do tego potrzebujesz
+      xine moÅ¼e byÄ‡ sterowany zdalnie przez podczerwieÅ„. Do tego potrzebujesz
       zainstalowanego LIRC'a (http://www.lirc.org).
 
-      Musisz dodaæ kilka linii do twojego ~/.lircrc:
+      Musisz dodaÄ‡ kilka linii do twojego ~/.lircrc:
       begin
         remote = SAMSUNG
         button = Button_Play
@@ -363,11 +363,11 @@
         config = DVD
       end
 
-      xine mo¿e samo wygenerowaæ szablon wpisów, je¶li u¿yjesz
-      'xine --keymap=lirc'. Mo¿esz przekierowaæ wyj¶cie komendy do
-      pliku aby dopolerowaæ ustawienia.
+      xine moÅ¼e samo wygenerowaÄ‡ szablon wpisÃ³w, jeÅ›li uÅ¼yjesz
+      'xine --keymap=lirc'. MoÅ¼esz przekierowaÄ‡ wyjÅ›cie komendy do
+      pliku aby dopolerowaÄ‡ ustawienia.
       
-      Ka¿dy wpis bêdzie wygl±da³ tak:
+      KaÅ¼dy wpis bÄ™dzie wyglÄ…daÅ‚ tak:
 
        # Reduce the output window size.
        begin
@@ -378,12 +378,12 @@
                config = WindowReduce
        end
 
-      Do Ciebie nale¿y wybór pilota i przypisanie przycisków.
+      Do Ciebie naleÅ¼y wybÃ³r pilota i przypisanie przyciskÃ³w.
 
       Playlist:
       ---------
-      Aby odnale¼æ listê odtwarzania z danej wtyczki wej¶cia, mo¿esz u¿yæ
-      specjalnego klucza 'PlaylistFrom:', i nastêpuj±cej po nim nazwy
+      Aby odnaleÅºÄ‡ listÄ™ odtwarzania z danej wtyczki wejÅ›cia, moÅ¼esz uÅ¼yÄ‡
+      specjalnego klucza 'PlaylistFrom:', i nastÄ™pujÄ…cej po nim nazwy
       wtyczki (takiej samej jak na przycisku panela):
 
        # Odnajdywanie listy odtwarzania z wtyczki NAV
@@ -395,59 +395,59 @@
                config = PlaylistFrom:NAV
        end
 
-2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceñ
+2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceÅ„
 
-     Mo¿esz ustawiæ ka¿d± opcjê (zobacz README.config_en) z linii
-     poleceñ aby obej¶æ warto¶ci ustawione w $HOME/.xine/config.
+     MoÅ¼esz ustawiÄ‡ kaÅ¼dÄ… opcjÄ™ (zobacz README.config_en) z linii
+     poleceÅ„ aby obejÅ›Ä‡ wartoÅ›ci ustawione w $HOME/.xine/config.
 
-     Na przyk³ad mo¿esz zrobiæ co¶ takiego
+     Na przykÅ‚ad moÅ¼esz zrobiÄ‡ coÅ› takiego
 
       xine vcd://1 opt:media.vcd.device=/dev/cdrom2 vcd://1
 
-     aby zmieniæ vcd_device miêdzy odtworzeniem dwóch mrls.
+     aby zmieniÄ‡ vcd_device miÄ™dzy odtworzeniem dwÃ³ch mrls.
 
-     Te ustawienia opt: nie bêd± zachowane w pliku konfiguracyjnym,
-     gdy¿ s± traktowane jako tymczasowe.
+     Te ustawienia opt: nie bÄ™dÄ… zachowane w pliku konfiguracyjnym,
+     gdyÅ¼ sÄ… traktowane jako tymczasowe.
 
 
-3  CO NIE ZOSTA£O JESZCZE POWIEDZIANE
+3  CO NIE ZOSTAÅO JESZCZE POWIEDZIANE
 
-3.1 Wolno¶æ, DVD i te sprawy...
+3.1 WolnoÅ›Ä‡, DVD i te sprawy...
 
     xine jest wolnym oprogramowaniem. "wolne oprogramowanie"
-    jest w pewnym stopniu zwi±zane z "otwatymi ¼ród³ami". Ale 
-    znaczenie "wolnego oprogramowania" idzie du¿o dalej: jest
-    ono zwi±zane z wolno¶ci± jego u¿ytkowników.
-    Je¶li masz czas, proszê przeczytaj, co "Free Software Foundation"
+    jest w pewnym stopniu zwiÄ…zane z "otwatymi ÅºrÃ³dÅ‚ami". Ale 
+    znaczenie "wolnego oprogramowania" idzie duÅ¼o dalej: jest
+    ono zwiÄ…zane z wolnoÅ›ciÄ… jego uÅ¼ytkownikÃ³w.
+    JeÅ›li masz czas, proszÄ™ przeczytaj, co "Free Software Foundation"
     pisze na ten temat:
     http://www.gnu.org/philosophy/free-sw.pl.html
 
-    Bardzo specyficznym problemem jest wolno¶æ oprogramowania DVD:
-    przemys³ filmowy dope³nia wszelkich mo¿liwych wysi³ków aby ograniczyæ
-    odtwarzanie p³yt DVD do kontrolowanych urz±dzeñ. Wiêkszo¶æ obecnie
-    sprzedawanych p³yt DVD jest zaszyfrowana (zablokowana) i w niektórych
-    krajach (zw³aszcza w USA), nielegalnym jest odszyfrowywanie
-    (odblokowywanie) ich, nawet do celów prywatnego u¿ytku (ogl±dniêcia).
-    Mamy nadziejê ¿e wiêkszo¶æ ludzi zgodzi siê z faktem, ¿e jest to
-    problematyczny sposób traktowania klientów. Grupa Projektu xine potêpia
-    te wysi³ki przemys³u filmowego - próbuj±c t± drog± zapobiegaæ stratom
-    w sprzeda¿y, z pewno¶ci± okazuje brak szacunku do wszystkich swoich
-    uczciwych klientów. Z drugiej jednak strony, Grupa Projektu xine jest
-    przeciwna ³amaniu istniej±cego prawa. Nikt aktualnie nie wie dok³adnie
-    czy gdziekolwiek na ¶wiecie jest legalne  pisanie, posiadanie i u¿ywanie
-    oprogramowania do OGL¡DANIA zaszyfrowanych p³yt DVD. Dopóki ten temat
-    pozostaje niejasny (i wydaje siê potencjalnie bardzo niebezpieczny),
-    xine nie bêdzie zawieraæ ¿adnego specyficznego kodu do odblokowywania DVD.
-    Wydaje siê jednak, ¿e osoby trzecie pracuj± nad takimi rozszerzeniami.
-    Mo¿liwe ¿e s± miejsca gdzie jest to legalne. Którekolwiek z powy¿szych
-    dotyczy Ciebie - nie bêdziesz w stanie odtwarzaæ zaszyfrowanych DVD
-    za pomoc± "czystego" programu xine. Proszê zauwa¿yæ ¿e nie jest to
-    "b³±d" albo braki w funkcjonalno¶ci, ale czysto prawny problem.
-    By³oby wspaniale rozwi±zaæ go (np. przez przekonanie ameryki i/lub
-    przemys³u filmowego, ¿e s± naprawdê nudni i niepotrzebnie nie w porz±dku
-    wobec klientów jak i u¿ytkowników i programistów wolnego
-    oprogramowania), ale dodawanie kodu odszyfrowuj±cego DVD do xine
-    nie rozwi±¿e tego problemu.
+    Bardzo specyficznym problemem jest wolnoÅ›Ä‡ oprogramowania DVD:
+    przemysÅ‚ filmowy dopeÅ‚nia wszelkich moÅ¼liwych wysiÅ‚kÃ³w aby ograniczyÄ‡
+    odtwarzanie pÅ‚yt DVD do kontrolowanych urzÄ…dzeÅ„. WiÄ™kszoÅ›Ä‡ obecnie
+    sprzedawanych pÅ‚yt DVD jest zaszyfrowana (zablokowana) i w niektÃ³rych
+    krajach (zwÅ‚aszcza w USA), nielegalnym jest odszyfrowywanie
+    (odblokowywanie) ich, nawet do celÃ³w prywatnego uÅ¼ytku (oglÄ…dniÄ™cia).
+    Mamy nadziejÄ™ Å¼e wiÄ™kszoÅ›Ä‡ ludzi zgodzi siÄ™ z faktem, Å¼e jest to
+    problematyczny sposÃ³b traktowania klientÃ³w. Grupa Projektu xine potÄ™pia
+    te wysiÅ‚ki przemysÅ‚u filmowego - prÃ³bujÄ…c tÄ… drogÄ… zapobiegaÄ‡ stratom
+    w sprzedaÅ¼y, z pewnoÅ›ciÄ… okazuje brak szacunku do wszystkich swoich
+    uczciwych klientÃ³w. Z drugiej jednak strony, Grupa Projektu xine jest
+    przeciwna Å‚amaniu istniejÄ…cego prawa. Nikt aktualnie nie wie dokÅ‚adnie
+    czy gdziekolwiek na Å›wiecie jest legalne  pisanie, posiadanie i uÅ¼ywanie
+    oprogramowania do OGLÄ„DANIA zaszyfrowanych pÅ‚yt DVD. DopÃ³ki ten temat
+    pozostaje niejasny (i wydaje siÄ™ potencjalnie bardzo niebezpieczny),
+    xine nie bÄ™dzie zawieraÄ‡ Å¼adnego specyficznego kodu do odblokowywania DVD.
+    Wydaje siÄ™ jednak, Å¼e osoby trzecie pracujÄ… nad takimi rozszerzeniami.
+    MoÅ¼liwe Å¼e sÄ… miejsca gdzie jest to legalne. KtÃ³rekolwiek z powyÅ¼szych
+    dotyczy Ciebie - nie bÄ™dziesz w stanie odtwarzaÄ‡ zaszyfrowanych DVD
+    za pomocÄ… "czystego" programu xine. ProszÄ™ zauwaÅ¼yÄ‡ Å¼e nie jest to
+    "bÅ‚Ä…d" albo braki w funkcjonalnoÅ›ci, ale czysto prawny problem.
+    ByÅ‚oby wspaniale rozwiÄ…zaÄ‡ go (np. przez przekonanie ameryki i/lub
+    przemysÅ‚u filmowego, Å¼e sÄ… naprawdÄ™ nudni i niepotrzebnie nie w porzÄ…dku
+    wobec klientÃ³w jak i uÅ¼ytkownikÃ³w i programistÃ³w wolnego
+    oprogramowania), ale dodawanie kodu odszyfrowujÄ…cego DVD do xine
+    nie rozwiÄ…Å¼e tego problemu.
 
 4   Kontakt z projektem xine
 
@@ -455,13 +455,13 @@
 
        http://xine.sourceforge.net
 
-    Informacja zwrotna, lub chêæ pomocy mile widziana, kontakt:
+    Informacja zwrotna, lub chÄ™Ä‡ pomocy mile widziana, kontakt:
 
-       lista dyskusyjna u¿ytkowników xine: xine-user@lists.sourceforge.net
+       lista dyskusyjna uÅ¼ytkownikÃ³w xine: xine-user@lists.sourceforge.net
 
 
     ################################
-    # T³umaczenie: Bar³omiej Muryn #
+    # TÅ‚umaczenie: BarÅ‚omiej Muryn #
     #    mailto: _4ever_@irc.pl    #
     ################################
 
