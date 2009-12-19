@@ -34,9 +34,9 @@ uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
 
 %description -l cs
-xine je vďż˝eďż˝lov volnďż˝iiteln audio a video pehrďż˝aďż˝pro unixovskďż˝systďż˝y,
-kter pouďż˝ďż˝libxine k dekďż˝ovďż˝ďż˝zvuku a videa a k pehrďż˝ďż˝ďż˝
-Vďż˝e informacďż˝o tom, jakďż˝formďż˝y jsou podporovďż˝y zďż˝kďż˝e v dokumentaci
+xine je víceúčelový volně šiřitelný audio a video přehrávač pro unixovské
+systémy, který používá libxine k dekódování zvuku a videa a k přehrávání.
+Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci
 od libxine.
 
 %description -l de
