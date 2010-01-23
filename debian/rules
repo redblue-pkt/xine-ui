@@ -10,17 +10,16 @@
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-INSTALL_TARGET := install
-BUILD_TARGET := all
-DH_STRIP := dh_strip
+CFLAGS = -g
+CONFIGURE_OPTIONS =
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-        INSTALL_TARGET := install-debug
-        BUILD_TARGET := debug
+        CONFIGURE_OPTIONS += --enable-debug
 endif
-ifneq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-        DH_STRIP := true #ie. don't strip!
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -O0
+else
+        CFLAGS += -O2
 endif
-
 
 # the "optimize" flag disables compatibility hacks
 HOST_OPTION := 
@@ -52,6 +51,8 @@ configure-stamp:
 		--prefix=/usr --mandir=\$${prefix}/share/man \
 		--with-aalib \
 		--enable-vdr-keys \
+		$(CONFIGURE_OPTIONS) \
+		CFLAGS="$(CFLAGS)" \
 	            $(HOST_OPTION) || \
 	(echo "=== config.log: ==="; cat config.log; false)
 	touch configure-stamp
@@ -59,7 +60,7 @@ configure-stamp:
 build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
-	$(MAKE) $(BUILD_TARGET)
+	$(MAKE)
 	touch build-stamp
 
 update_config_files:
@@ -86,7 +87,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	$(MAKE) $(INSTALL_TARGET) DESTDIR=$(CURDIR)/debian/xine-ui
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/xine-ui
 	mkdir -p debian/xine-ui/usr/share/doc/xine-ui
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
 	# these must not be compressed, or xine's online help will fail:
@@ -108,7 +109,7 @@ binary-arch: build install
 	dh_installmime
 	dh_installchangelogs -k ChangeLog
 	dh_link
-	$(DH_STRIP)
+	dh_strip
 	dh_compress
 # kick me, I'm a policy violation! (making help dialog work, Q&D)
 	gunzip debian/xine-ui/usr/share/doc/xine-ui/README.??.*.gz
