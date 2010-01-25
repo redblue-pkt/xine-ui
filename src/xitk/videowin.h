@@ -81,7 +81,9 @@ void video_window_get_mag (float *xmag, float *ymag);
 void video_window_update_logo(void);
 void video_window_change_skins(int);
 
-void video_window_reset_ssaver(void);
+long int video_window_get_ssaver_idle(void);
+
+long int video_window_reset_ssaver(void);
 
 void video_window_get_frame_size(int *w, int *h);
 

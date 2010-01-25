@@ -273,7 +273,23 @@ fi
 
 AC_SUBST(XTEST_LIBS)
 AM_CONDITIONAL(HAVE_XTESTEXTENSION, test x$ac_have_xtest = "xyes")
- 
+
+dnl
+dnl XScreenSaver Extension
+dnl
+PKG_CHECK_MODULES([XSSAVER], [xscrnsaver], [ac_have_xscreensaver="yes"], [
+  AC_CHECK_LIB(Xss, XScreenSaverQueryExtension,
+		XSSAVER_LIBS="-lXss"
+		ac_have_xscreensaver="yes",,  $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+])
+
+if test "x$ac_have_xscreensaver" = "xyes"; then
+  AC_DEFINE(HAVE_XSSAVEREXTENSION,,[Define this if you have libXss installed])
+fi
+
+AC_SUBST(XSSAVER_LIBS)
+AM_CONDITIONAL(HAVE_XSSAVEREXTENSION, test x$ac_have_xscreensaver = "xyes")
+
 
 dnl
 dnl readline

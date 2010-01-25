@@ -70,7 +70,7 @@ xine_LDADD = $(XINE_LIBS) $(LIBCOMMON) $(LIBCOMMONX) \
              $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
 	     $(top_builddir)/src/xitk/oxine/liboxine.a \
 	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
-	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
+	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(INTLLIBS) \
 	     $(THREAD_LIBS)
 

@@ -40,6 +40,9 @@
 #ifdef HAVE_XTESTEXTENSION
 #include <X11/extensions/XTest.h>
 #endif
+#ifdef HAVE_XSSAVEREXTENSION
+#include <X11/extensions/scrnsaver.h>
+#endif
 
 #include "common.h"
 #include "oxine/oxine.h"
@@ -2261,9 +2264,33 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
 }
 
-void video_window_reset_ssaver(void) {
+long int video_window_get_ssaver_idle(void) {
 
-  if(gGui->ssaver_enabled && (xitk_get_last_keypressed_time() >= (long int) gGui->ssaver_timeout)) {
+#ifdef HAVE_XSSAVEREXTENSION
+  long int ssaver_idle = 0;
+  int dummy = 0;
+  if(XScreenSaverQueryExtension(gGui->video_display, &dummy, &dummy)) {
+    XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
+    XScreenSaverQueryInfo(gGui->video_display, (DefaultRootWindow(gGui->video_display)), ssaverinfo);
+    ssaver_idle = ssaverinfo->idle;
+    XFree(ssaverinfo);
+    return ssaver_idle/1000;
+  }
+#endif
+
+  return xitk_get_last_keypressed_time();
+}
+
+
+long int video_window_reset_ssaver(void) {
+
+  /* fprintf(stderr, "Idletime %d, timeout %d\n", video_window_get_ssaver_idle(), (long int) gGui->ssaver_timeout); */
+
+  long int idle = 0;
+
+  if(gGui->ssaver_enabled && ((idle = video_window_get_ssaver_idle()) >= (long int) gGui->ssaver_timeout)) {
+    idle = 0;
+    /* fprintf(stderr, "resetting ssaver\n"); */
 
 #ifdef HAVE_XTESTEXTENSION
     if(gVw.have_xtest == True) {
@@ -2322,6 +2349,7 @@ void video_window_reset_ssaver(void) {
       XUnlockDisplay(gGui->video_display);
     }
   }
+  return idle;
 }
 
 void video_window_get_frame_size(int *w, int *h) {

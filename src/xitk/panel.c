@@ -449,8 +449,7 @@ static __attribute__((noreturn)) void *slider_loop(void *dummy) {
 	      screensaver_timer++;
 	    
 	    if(screensaver_timer >= gGui->ssaver_timeout) {
-	      screensaver_timer = 0;
-	      video_window_reset_ssaver();
+	      screensaver_timer = video_window_reset_ssaver();
 	      
 	    }
 	  }  
