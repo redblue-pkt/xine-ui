@@ -198,7 +198,7 @@ int ispng(FILE *f) {
     return 0;
   fread(buf, 1, 8, f);
   rewind(f);
-  return (int)png_check_sig(buf, 8);
+  return (int) !png_sig_cmp(buf, 0, 8);
 }
 
 ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
