@@ -79,7 +79,7 @@ static void _dnd_send_finished (xitk_dnd_t *xdnd, Window window, Window from) {
  * WARNING: X unlocked function 
  */
 static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from, 
-				    Window insert, unsigned long prop, int delete_prop) {
+                    Window insert, Atom prop, int delete_prop) {
   long           nread;
   unsigned long  nitems;
   unsigned long  bytes_after;
@@ -89,22 +89,20 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
   do {
     Atom      actual_type;
     int       actual_fmt;
-    unsigned  char *s = 0;
+    char *buf = 0;
     
     if(XGetWindowProperty(xdnd->display, insert, prop, 
 			  nread / (sizeof(unsigned char *)), 65536, delete_prop, AnyPropertyType, 
-			  &actual_type, &actual_fmt, &nitems, &bytes_after, &s) != Success) {
-      if(s)
-	XFree(s);
+              &actual_type, &actual_fmt, &nitems, &bytes_after, (unsigned char **)&buf) != Success) {
+      /* Note that per XGetWindowProperty man page, buf will always be NULL-terminated */
+      if(buf)
+	XFree(buf);
       return 1;
     }
     
     nread += nitems;
     
     /* Okay, got something, handle */
-    {
-      char *buf = strndup(s, nread);
-      
       if(strlen(buf)) {
 	char *p, *pbuf;
 	int   plen;
@@ -132,10 +130,8 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	  }
 	}
       }
-      free(buf);
-    }
     
-    XFree(s);
+    XFree(buf);
   } while(bytes_after);
   
   if(!nread)
