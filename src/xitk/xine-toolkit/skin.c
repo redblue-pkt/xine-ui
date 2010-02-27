@@ -178,7 +178,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 	}
 	else if(!strncmp("HOME", var, strlen(var))) {
 	  if(skonfig->url)
-	    strlcat(buf2, xitk_get_homedir(), sizeof(buf2));
+	    strlcat(buf2, xine_get_homedir(), sizeof(buf2));
 	}
 	/* else ignore */
       }
