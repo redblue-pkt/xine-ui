@@ -189,7 +189,6 @@ static void do_halt(commands_t *, client_info_t *);
 static void do_snap(commands_t *, client_info_t *);
 
 static void handle_client_command(client_info_t *);
-static const char *get_homedir(void);
 
 #define MAX_NAME_LEN        16
 #define MAX_PASSWD_LEN      16
@@ -2950,10 +2949,10 @@ static void *server_thread(void *data) {
    */
   {
     char        *passwdfile = ".xine/passwd";
-    char         passwdfilename[(strlen((get_homedir())) + strlen(passwdfile)) + 2];
+    char         passwdfilename[(strlen((xine_get_homedir())) + strlen(passwdfile)) + 2];
     struct stat  st;
     
-    snprintf(passwdfilename, sizeof(passwdfilename), "%s/%s", (get_homedir()), passwdfile);
+    snprintf(passwdfilename, sizeof(passwdfilename), "%s/%s", (xine_get_homedir()), passwdfile);
     
     if(stat(passwdfilename, &st) < 0) {
       fprintf(stderr, "ERROR: there is no password file for network access.!\n");
@@ -3023,39 +3022,6 @@ void start_remote_server(void) {
   if(gGui->network)
     pthread_create(&thread, NULL, server_thread, NULL);
   
-}
-
-const char *get_homedir(void) {
-#ifdef HAVE_GETPWUID_R
-  struct passwd pwd;
-#endif
-  struct passwd *pw = NULL;
-  static char homedir[BUFSIZ] = {0,};
-
-  if(homedir[0])
-    return homedir;
-
-#ifdef HAVE_GETPWUID_R
-  if(getpwuid_r(getuid(), &pwd, homedir, sizeof(homedir), &pw) != 0 || pw == NULL) {
-#else
-  if((pw = getpwuid(getuid())) == NULL) {
-#endif
-    char *tmp = getenv("HOME");
-    if(tmp) {
-      strlcpy(homedir, tmp, sizeof(homedir));
-    }
-  } else {
-    char *s = strdup(pw->pw_dir);
-    strlcpy(homedir, s, sizeof(homedir));
-    free(s);
-  }
-
-  if(!homedir[0]) {
-    printf("Unable to get home directory, set it to /tmp.\n");
-    strcpy(homedir, "/tmp");
-  }
-
-  return homedir;
 }
 
 #endif

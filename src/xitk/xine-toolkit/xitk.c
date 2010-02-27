@@ -2186,8 +2186,8 @@ void xitk_subst_special_chars(char *src, char *dest) {
       
     case '~':
       if(*(s + 1) == '/') {
-	strcat(d, xitk_get_homedir());
-	d += (strlen(xitk_get_homedir()) - 1);
+	strcat(d, xine_get_homedir());
+	d += (strlen(xine_get_homedir()) - 1);
       } else
         *d = *s;
       break;
@@ -2230,43 +2230,6 @@ long int xitk_get_last_keypressed_time(void) {
   gettimeofday(&tm, NULL);
   timersub(&tm, &gXitk->keypress, &tm_diff);
   return tm_diff.tv_sec;
-}
-
-/*
- * Return home directory.
- *
- * This will cause a small memory leak, as the memory will not be ever
- * freed. It's actually to be considered a false positive, as the only
- * moment when we stop needing this for sure is when we exit.
- */
-const char *xitk_get_homedir(void) {
-#ifdef HAVE_GETPWUID_R
-  struct passwd  pwd;
-#endif
-  struct passwd *pw = NULL;
-  static const char *homedir = NULL;
-
-  if(homedir)
-    return homedir;
-
-#ifdef HAVE_GETPWUID_R
-  if(getpwuid_r(getuid(), &pwd, homedir, sizeof(homedir), &pw) != 0 || pw == NULL) {
-#else
-  if((pw = getpwuid(getuid())) == NULL) {
-#endif
-    char *tmp = getenv("HOME");
-    if(tmp)
-      homedir = strdup(tmp);
-  } else {
-    homedir = strdup(pw->pw_dir);
-  }
-
-  if(!homedir) {
-    XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
-    homedir = "/tmp";
-  }
-
-  return homedir;
 }
 
 /*

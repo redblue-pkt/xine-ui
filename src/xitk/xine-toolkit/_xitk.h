@@ -223,7 +223,7 @@ void xitk_xevent_notify(XEvent *event);
 int xitk_install_x_error_handler(void);
 int xitk_uninstall_x_error_handler(void);
 
-const char *xitk_get_homedir(void);
+const char *xine_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, char *command);
 int xitk_is_use_xshm(void);

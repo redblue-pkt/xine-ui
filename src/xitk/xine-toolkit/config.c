@@ -478,12 +478,12 @@ xitk_config_t *xitk_config_init(void) {
 
   xtcf = (xitk_config_t *) xitk_xmalloc(sizeof(xitk_config_t));
   
-  rcfile = (char *) xitk_xmalloc(strlen(xitk_get_homedir()) + strlen(user_rc) + 3);
-  sprintf(rcfile, "%s/.%s", xitk_get_homedir(), user_rc);
+  rcfile = (char *) xitk_xmalloc(strlen(xine_get_homedir()) + strlen(user_rc) + 3);
+  sprintf(rcfile, "%s/.%s", xine_get_homedir(), user_rc);
   
   if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
     rcfile = (char *) realloc(rcfile, strlen(rcfile) + 6);
-    sprintf(rcfile, "%s/.xine/%s", xitk_get_homedir(), user_rc);
+    sprintf(rcfile, "%s/.xine/%s", xine_get_homedir(), user_rc);
     if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
       rcfile = (char *) realloc(rcfile, (strlen(SYSTEM_RC) + 1));
       strcpy(rcfile, SYSTEM_RC);
