@@ -104,8 +104,11 @@ static void *xine_lirc_loop(void *dummy) {
 	
 	k = kbindings_lookup_action(gGui->kbindings, c);
 	
-	if(k)
+	if(k) {
+	  XLockDisplay(gGui->display);
 	  gui_execute_action_id((kbindings_get_action_id(k)));
+	  XUnlockDisplay(gGui->display);
+	}
 	else {
 	  char from[256];
 	  
@@ -117,8 +120,11 @@ static void *xine_lirc_loop(void *dummy) {
 	}
       }
       
-      if(panel_is_visible())
+      if(panel_is_visible()) {
+	XLockDisplay(gGui->display);
 	xitk_paint_widget_list (panel->widget_list);
+	XUnlockDisplay(gGui->display);
+      }
       
       free(code);
       
