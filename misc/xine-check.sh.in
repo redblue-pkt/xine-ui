@@ -503,28 +503,12 @@ fi
 
 vars xine_executable xine_executables
 
-# search for xine-config in PATH
+# check for libxine.pc
 
 if pkg-config libxine; then
-  if [ "$xine_executable" = "/usr/bin/xine" ]; then
-    xine_prefix=/usr
-    plugindir=/usr/lib/xine/plugins
-    skindir=/usr/share/xine/skins
-    case "$DISTRO" in
-      Debian)
-        msg assuming-xine-package-deb 1
-        ;;
-      RedHat)
-        msg assuming-xine-package-rpm 1
-        ;;
-      *)
-        msg assuming-xine-package 1
-        ;;
-    esac
-  fi
   xine_config=y
 else
-  msg no-xine-config 2
+  msg no-libxine-pc 2
   xine_config=
 fi
 
@@ -534,11 +518,10 @@ if test -n "$xine_config"; then
   xine_prefix="`pkg-config --variable=prefix libxine`"
   if [ "$xine_prefix" != "`pkg-config --variable=exec_prefix libxine`" ]; then
     msg custom-exec-prefix 1
-  else
-    plugindir="`pkg-config --variable=plugindir libxine`"
-    datadir="`pkg-config --variable=datadir libxine`"
-    skindir="`pkg-config --variable=xinedatadir libxine`/skins"
   fi
+  plugindir="`pkg-config --variable=plugindir libxine`"
+  datadir="`pkg-config --variable=datadir libxine`"
+  skindir="`pkg-config --variable=xinedatadir libxine`/skins"
 fi
   
 ## consistency checks of xine-lib installation

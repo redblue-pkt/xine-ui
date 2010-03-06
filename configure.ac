@@ -83,9 +83,9 @@ PKG_CHECK_MODULES([XINE], [libxine >= 1.1.0])
 CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
 
 dnl
-dnl threads: xine-config tell us what should be used, but
-dnl          xitk need to be linked to thread lib, so the follow AC_SUBST() 
-dnl          are only used in src/xitk/xine-toolkit/Makefile.am
+dnl threads: pkgconfig tell us what should be used, but xitk needs to be
+dnl          linked to thread lib, so the following AC_SUBST() are only used
+dnl          in src/xitk/xine-toolkit/Makefile.am
 dnl
 case "$host" in
   *-*-freebsd*|*-*-openbsd*)
@@ -554,7 +554,7 @@ int main(int argc, char **argv) {
 AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 
 dnl
-dnl desktop dir location, xine-config told us about this.
+dnl desktop dir location, pkgconfig told us about this.
 dnl
 makeexpand () {
   local i
@@ -585,7 +585,7 @@ AC_SUBST(XINE_DOCDIR)
 AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR",[Location of documentation files])
 
 dnl
-dnl skins dir location, xine-config told us about this.
+dnl skins dir location, pkgconfig told us about this.
 dnl
 XINE_SKINDIR="${datadir}/xine/skins"
 XINE_SKINPATH="`makeexpand ${datadir}/xine/skins`"
