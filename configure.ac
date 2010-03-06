@@ -14,7 +14,7 @@ XINE_MAJOR=0
 XINE_MINOR=99
 XINE_SUB=6
 if test -f .cvsversion; then
-  XINE_PRE="cvs"
+  XINE_PRE="hg"
 else
   XINE_PRE=""
 fi
