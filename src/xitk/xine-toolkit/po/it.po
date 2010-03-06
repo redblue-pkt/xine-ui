@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2007-04-23 23:01+0200\n"
+"POT-Creation-Date: 2010-03-06 01:35+0000\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
@@ -19,15 +19,15 @@ msgstr ""
 "X-Generator: KBabel 1.11.2\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1167
+#: src/xitk/xine-toolkit/mrlbrowser.c:1161
 msgid "Select current entry"
 msgstr "Seleziona l'elemento corrente"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1175
+#: src/xitk/xine-toolkit/mrlbrowser.c:1169
 msgid "Play selected entry"
 msgstr "Riproduci l'elemento selezionato"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1186
+#: src/xitk/xine-toolkit/mrlbrowser.c:1180
 msgid "Close MRL browser window"
 msgstr "Chiudi la finestra di navigazione MRL"
 
@@ -94,30 +94,30 @@ msgstr "La mia finestra"
 msgid "Quit"
 msgstr "Esci"
 
-#: src/xitk/xine-toolkit/window.c:1090
+#: src/xitk/xine-toolkit/window.c:1098
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
+#: src/xitk/xine-toolkit/window.c:1176 src/xitk/xine-toolkit/window.c:1417
 msgid "Question?"
 msgstr "Domande?"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
 msgid "Yes"
 msgstr "Sì"
 
-#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1561
+#: src/xitk/xine-toolkit/window.c:1569
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
+#: src/xitk/xine-toolkit/xitk.h:2225 src/xitk/xine-toolkit/xitk.h:2234
 msgid "Error"
 msgstr "Errore"
 
-#: src/xitk/xine-toolkit/xitk.h:2256 src/xitk/xine-toolkit/xitk.h:2265
+#: src/xitk/xine-toolkit/xitk.h:2228 src/xitk/xine-toolkit/xitk.h:2237
 msgid "Information"
 msgstr "Informazioni"
