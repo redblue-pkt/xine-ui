@@ -8,71 +8,13 @@ if your real-life user has sufficient permissions...
 Unless you want to recheck something with root permissions, you should
 abort me now (press Ctrl-C) and run me from your usual account.
 
-several-xine-config several instances of xine-config found in your PATH
-xine-config executables have been found in these places:
-$xine_configs
-This probably means you have several versions of xine-lib installed.
-It's probably best to uninstall all unused xine-libs.
-Further tests will use $xine_config.
-
-xine-config-in-path found $xine_config in your PATH
-xine-config is a script installed by xine-lib. It is used
-to determine various xine file locations on your systems.
-
-xine-config-somewhere found $xine_config, but not in PATH
-xine-config is a script installed by xine-lib. It is used
-to determine various xine file locations on your systems.
-I have found this script altough it is not in your PATH.
-Note that this is somewhat suspicious...
-
-assuming-xine-package-deb No xine-config found. Assuming xine from Debian package
-The xine-config script can be used to determine some file locations
-used by xine-lib, but you don't have such a script on your system.
-However, it looks like you installed xine from the Debian packages.
-So I'll just guess that you are using the standard locations.
-If you want me to be sure about those file locations, you can install
-the 'libxine-dev' package, which contains xine-config. However, this
-package is not really needed to run xine...
-
-assuming-xine-package-rpm No xine-config found. Assuming xine from RPMs
-The xine-config script can be used to determine some file locations
-used by xine-lib, but you don't have such a script on your system.
-However, it looks like you installed xine from the RedHat packages.
-So I'll just guess that you are using the standard locations.
-If you want me to be sure about those file locations, you can install
-the 'xine-lib-devel' package (or 'xine-devel', depend on what packages
-you're using, which contains xine-config. However, this package is
-not really needed to run xine...
-
-assuming-xine-package No xine-config found. Assuming xine from binary packages
-The xine-config script can be used to determine some file locations
-used by xine-lib, but you don't have such a script on your system.
-However, it looks like you installed xine via some package manager.
-So I'll just guess that you are using the standard locations.
-If you want me to be sure about those file locations, you can install
-the xine-lib development package, which is usually called 
-'xine-lib-devel', 'xine-devel', 'libxine-dev' or similar.
-That package contains xine-config, but this is not really needed to
-run xine...
-
-no-xine-config no xine-config on this machine.
+no-libxine-pc no libxine.pc on this machine.
 This means that xine-lib is either not installed 
 or it is installed in a very unusual place.
 So you should probably install xine-lib before running xine-check...
 
-xine-config-executable $xine_config is executable
-Looks like xine-config permissions are set correctly.
-
-xine-config-not-executable $xine_config is NOT executable
-There's something wrong with the permissions of xine-config
-in your installation of xine-lib. This could be fixed by issuing
- chmod a+rx $xine_config
-as root. But there's probably something more seriously wrong,
-so I'll advise you to reinstall xine-lib.
-
 custom-exec-prefix Your xine-lib uses a customized exec-prefix
-I'll assume you knew what you were doing when you configured it,
-I won't do any further xine-lib location checks...
+Presumably, you knew what you were doing when you configured it.
 
 plugindir-exists plugin directory $plugindir exists.
 This directory should hold all kinds of xine plugins.
@@ -84,7 +26,7 @@ Maybe you need to upgrade me (xine-check)so I know about this
 (new) kind of plugin...
 
 no-plugindir no plugin directory ($plugindir)
-The plugin-directory doesn't exist. xine-config claims that there
+The plugin-directory doesn't exist. pkg-config libxine claims that there
 is a plugin directory at $plugindir.
 However, there is no such directory.
 You probably need to reinstall xine-lib.
@@ -99,19 +41,19 @@ You should probably reinstall xine-lib...
 
 unknown-plugindir unable to determine plugin directory
 I could not determine your plugin directory. That would be much easier
-if you had xine-config installed (see message above)...
+if you had libxine.pc installed (see message above)...
 Note that I could not check your xine plugins.
 
 unknown-skindir unable to determine skin directory
 I could not determine your skin directory. That would be much easier
-if you had xine-config installed (see message above)...
+if you had libxine.pc installed (see message above)...
 Note that I could not check your xine-ui skins.
 
 skindir-exists skin directory $skindir exists.
 This directory should hold all xine skins.
 
 no-skindir no skin directory ($skindir)
-The skin-directory doesn't exist. xine-config claims that there
+The skin-directory doesn't exist. pkg-config libxine claims that there
 is a skin directory at $skindir.
 However, there is no such directory.
 You probably need to reinstall xine-ui.

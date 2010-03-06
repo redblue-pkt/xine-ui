@@ -1,6 +1,7 @@
 xine-ui (0.99.6) unstable; urgency=low
   (write here, newest entry on top)
 
+  * Use pkg-config only; xine-config is deprecated.
   * Fix build with libpng 1.4.
   * Fix build on Mac OS X.
   * Fix segfaults caused by our getline() (only used if no system getline()).

@@ -180,7 +180,13 @@ run_aclocal () {
   fi
   
   echo $_echo_n " + Running aclocal: $_echo_c"
-  aclocalinclude=`if [ ! -z "$XINE_CONFIG" ]; then $XINE_CONFIG --acflags; else xine-config --acflags; fi`
+  if [ ! -z "$XINE_CONFIG" ]; then
+    echo
+    echo "**Warning**: Use of XINE_CONFIG is obsolete. Set PKG_CONFIG_PATH instead."
+    echo
+    $XINE_CONFIG --acflags;
+  fi
+  aclocalinclude=`pkg-config --variable=acflags libxine`
 
   aclocal -I m4 $aclocalinclude
   echo "done." 
