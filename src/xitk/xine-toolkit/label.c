@@ -245,7 +245,7 @@ static void paint_label(xitk_widget_t *w) {
 /*
  *
  */
-static void *xitk_label_animation_loop(void *data) {
+static __attribute__((noreturn)) void *xitk_label_animation_loop(void *data) {
   label_private_data_t *private_data = (label_private_data_t *)data;
   xitk_widget_t        *w            = private_data->lWidget;
   unsigned long         t_anim       = private_data->anim_timer;

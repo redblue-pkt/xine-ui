@@ -181,7 +181,7 @@ static void _set_window_title(void) {
 /* 
  * very small X event loop for the second display
  */
-static void *second_display_loop (void *dummy) {
+static __attribute__((noreturn)) void *second_display_loop (void *dummy) {
   
   while(gVw.second_display_running) {
     XEvent   xevent;

@@ -908,7 +908,7 @@ static void signals_handler (int sig) {
   }
 }
 
-static void *select_thread(void *data) {
+static __attribute__((noreturn)) void *select_thread(void *data) {
   session_t       *session = (session_t *) data;
   fd_set           readfds;
   struct timeval   timeout;
@@ -2855,7 +2855,7 @@ static void handle_client_command(client_info_t *client_info) {
 /*
  *
  */
-static void *client_thread(void *data) {
+static __attribute__((noreturn)) void *client_thread(void *data) {
   client_info_t     *client_info = (client_info_t *) data;
   char               buffer[_BUFSIZ];
   int                i;
@@ -2901,7 +2901,7 @@ static void *client_thread(void *data) {
 /*
  *
  */
-static void *server_thread(void *data) {
+static __attribute__((noreturn)) void *server_thread(void *data) {
   char            *service;
   struct servent  *serv_ent;
   int              msock;

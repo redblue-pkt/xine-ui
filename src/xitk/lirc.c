@@ -74,7 +74,7 @@ static void lirc_get_playlist(char *from) {
   }
 }
 
-static void *xine_lirc_loop(void *dummy) {
+static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
   char             *code, *c;
   int               ret;
   kbinding_entry_t *k;

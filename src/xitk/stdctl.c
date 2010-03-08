@@ -43,7 +43,7 @@ static struct {
   FILE                 *fbk;
 } stdctl;
 
-static void *xine_stdctl_loop(void *dummy) {
+static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   char              buf[256], *c, *c1;
   int               len, selrt;
   kbinding_entry_t *k;

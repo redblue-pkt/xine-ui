@@ -50,7 +50,7 @@ typedef struct {
 
 static _stdctl_t stdctl;
 
-static void *xine_stdctl_loop(void *dummy) {
+static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   char              c[255];
   int               len;
   int               k;

@@ -1223,7 +1223,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   osd_update_status();
 }
 
-static void *_gui_set_current_position(void *data) {
+static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
   int  pos = (int)(intptr_t) data;
   int  update_mmk = 0;
   
@@ -1231,7 +1231,6 @@ static void *_gui_set_current_position(void *data) {
 
   if(pthread_mutex_trylock(&gGui->xe_mutex)) {
     pthread_exit(NULL);
-    return NULL;
   }
   
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
@@ -1239,7 +1238,6 @@ static void *_gui_set_current_position(void *data) {
       gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
       pthread_mutex_unlock(&gGui->xe_mutex);
       pthread_exit(NULL);
-      return NULL;
     }
   }
 
@@ -1247,7 +1245,6 @@ static void *_gui_set_current_position(void *data) {
      (gGui->ignore_next == 1)) {
     pthread_mutex_unlock(&gGui->xe_mutex);
     pthread_exit(NULL);
-    return NULL;
   }
     
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
@@ -1306,10 +1303,9 @@ static void *_gui_set_current_position(void *data) {
 
   pthread_mutex_unlock(&gGui->xe_mutex);
   pthread_exit(NULL);
-  return NULL;
 }
 
-static void *_gui_seek_relative(void *data) {
+static __attribute__((noreturn)) void *_gui_seek_relative(void *data) {
   int off_sec = (int)(intptr_t)data;
   int sec, pos;
   
@@ -1321,25 +1317,21 @@ static void *_gui_seek_relative(void *data) {
 
   if(!gui_xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
     pthread_exit(NULL);
-    return NULL;
   }
   
   if(pthread_mutex_trylock(&gGui->xe_mutex)) {
     pthread_exit(NULL);
-    return NULL;
   }
 
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
      (gGui->ignore_next == 1)) {
     pthread_mutex_unlock(&gGui->xe_mutex);
     pthread_exit(NULL);
-    return NULL;
   }
   
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
     pthread_mutex_unlock(&gGui->xe_mutex);
     pthread_exit(NULL);
-    return NULL;
   }
   
   gGui->ignore_next = 1;
@@ -1363,7 +1355,6 @@ static void *_gui_seek_relative(void *data) {
   panel_check_pause();
 
   pthread_exit(NULL);
-  return NULL;
 }
 
 void gui_set_current_position (int pos) {

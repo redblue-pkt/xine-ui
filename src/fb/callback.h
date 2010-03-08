@@ -32,4 +32,4 @@ void fbxine_register_exit(struct fbxine_callback *callback,
 void fbxine_register_abort(struct fbxine_callback *callback,
 			   fbxine_callback_t func);
 void fbxine_do_exit(void);
-void fbxine_do_abort(void);
+void fbxine_do_abort(void) __attribute__((noreturn));

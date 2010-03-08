@@ -51,7 +51,7 @@ static struct {
   pthread_cond_t       prewait_cond;
 } tips;
 
-static void *_tips_loop_thread(void *data) {
+static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
   tips.running = 1;
   pthread_mutex_lock(&tips.mutex);
