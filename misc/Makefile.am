@@ -18,6 +18,7 @@ EXTRA_DIST = \
 	xine-check.en \
 	xine_bash_completion \
 	xine-ui_logo.mpv \
+	xine_splash.xcf \
 	xine_splash.png \
 	xine-ui.xml
 

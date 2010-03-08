@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Distribute xine_splash.xcf (source for xine_splash.png).
   * Tidy up building of common function libraries; ensure all replacement
     function sources are distributed.
   * xine.desktop now says that xine can accept files or URLs.
