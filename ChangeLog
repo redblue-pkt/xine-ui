@@ -1,3 +1,6 @@
+xine-ui (0.99.7) unstable; urgency=low
+  (add entries here, newest at the top)
+
 xine-ui (0.99.6) unstable; urgency=low
 
   * Use pkg-config only; xine-config is deprecated.

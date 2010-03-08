@@ -1,8 +1,8 @@
-xine-ui (0.99.6~hg-0) unstable; urgency=low
+xine-ui (0.99.7~hg-0) unstable; urgency=low
 
   * hg build.
 
- -- Darren Salt <linux@youmustbejoking.demon.co.uk>  Sat, 23 Jan 2010 00:32:14 +0000
+ -- Darren Salt <linux@youmustbejoking.demon.co.uk>  Mon, 08 Mar 2010 00:41:43 +0000
 
 xine-ui (0.99.4+cvs20060813-1) unstable; urgency=low
 
