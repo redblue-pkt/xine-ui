@@ -1,0 +1,9 @@
+LIBCOMMON = $(top_builddir)/src/common/libcommon.a
+LIBCOMMONX = $(top_builddir)/src/common/libcommonx.a
+
+$(LIBCOMMON):
+	$(MAKE) -C $(top_builddir)/src/common libcommon.a
+
+$(LIBCOMMONX):
+	$(MAKE) -C $(top_builddir)/src/common libcommonx.a
+

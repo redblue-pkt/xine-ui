@@ -1,3 +1,4 @@
+include $(top_srcdir)/src/common/Makefile.common
 
 fontandpointers = cetus.ttf pointer1.png pointer2.png
 
@@ -16,15 +17,10 @@ fontdir = $(datadir)/xine/fonts/
 font_DATA = $(fontandpointers)
 endif
 
-dfbxine_DEPENDENCIES = $(topbuilddir)/src/common/libcommon.a
-dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) -lm $(topbuilddir)/src/common/libcommon.a
+dfbxine_DEPENDENCIES = $(LIBCOMMON)
+dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) -lm $(LIBCOMMON)
 dfbxine_SOURCES = options.c \
 	dfb.c \
 	main.c
 
-
-
 noinst_HEADERS = dfb.h
-
-$(top_builddir)/src/common/libcommon.a:
-	@cd $(top_builddir)/src/common && $(MAKE) libcommon.a
