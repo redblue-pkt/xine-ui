@@ -12,6 +12,8 @@
 #include <X11/extensions/XShm.h>
 #endif
 
+#include <xine/xineutils.h>
+
 #ifdef __EMX__
 extern const char *__XOS2RedirRoot(const char *);
 #endif
