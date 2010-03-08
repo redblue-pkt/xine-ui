@@ -1,6 +1,8 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * xine.desktop now says that xine can accept files or URLs.
+
 xine-ui (0.99.6) unstable; urgency=low
 
   * Use pkg-config only; xine-config is deprecated.
