@@ -299,7 +299,7 @@ void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
     _XA_ATOMS_COUNT
   };
 
-  const char *const prop_names[_XA_ATOMS_COUNT] = {
+  static const char *const prop_names[_XA_ATOMS_COUNT] = {
     "XdndAware", /* _XA_XdndAware */
     "XdndEnter", /* _XA_XdndEnter */
     "XdndLeave", /* _XA_XdndLeave */
@@ -313,7 +313,7 @@ void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
     "XiTKXSelWindowProperty" /* _XA_XITK_PROTOCOL_ATOM */
   };
 
-  const char *const mime_names[MAX_SUPPORTED_TYPE] = {
+  static const char *const mime_names[MAX_SUPPORTED_TYPE] = {
     "text/uri-list", /* supported[0] */
     "text/plain"  /* supported[1] */
   };
