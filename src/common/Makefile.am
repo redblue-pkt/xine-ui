@@ -14,10 +14,11 @@ GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-libcommon_a_SOURCES = $(GETOPT_SRC) utils.c getline.c strndup.c strsep.c strlcpy.c strlcat.c \
+libcommon_a_SOURCES = $(GETOPT_SRC) utils.c \
 	config_wrapper.c config_wrapper.h \
 	dump.c           dump.h           \
 	globals.c globals.h
+libcommon_a_LIBADD = @LIBOBJS@
 
 libcommonx_a_SOURCES = x11utils.c
 

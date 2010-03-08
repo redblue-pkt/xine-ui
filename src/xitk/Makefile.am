@@ -1,3 +1,5 @@
+include $(top_srcdir)/src/common/Makefile.common
+
 SUBDIRS = Imlib-light xine-toolkit skins oxine .
 
 AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
@@ -15,9 +17,7 @@ bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
-kbindings_man_LDADD = @XINE_LIBS@ $(THREAD_LIBS) \
-	     $(top_builddir)/src/common/libcommon.a \
-             $(INTLLIBS)
+kbindings_man_LDADD = @XINE_LIBS@ $(THREAD_LIBS) $(LIBCOMMON) $(INTLLIBS)
 kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 
 xine_SOURCES = \
@@ -65,12 +65,10 @@ if HAVE_LIRC
 xine_SOURCES += lirc.c lirc.h
 endif
 
-xine_LDADD = $(XINE_LIBS) \
+xine_LDADD = $(XINE_LIBS) $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
              $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
 	     $(top_builddir)/src/xitk/oxine/liboxine.a \
-	     $(top_builddir)/src/common/libcommon.a \
-             $(top_builddir)/src/common/libcommonx.a \
 	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(INTLLIBS) \
@@ -78,12 +76,12 @@ xine_LDADD = $(XINE_LIBS) \
 
 xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
 xine_remote_SOURCES = network.c
-xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.a
+xine_remote_DEPENDENCIES = $(LIBCOMMON)
 xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) \
-	$(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
+	$(LIBCOMMON)
 
 session_ctrl_CFLAGS = $(AM_CFLAGS)
-session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.a $(DBG_LIBS)
+session_ctrl_LDADD = @XINE_LIBS@ $(LIBCOMMON) $(DBG_LIBS)
 session_ctrl_SOURCES = session_common.c session_internal.h session.h ctrl_test.c
 
 noinst_HEADERS = \

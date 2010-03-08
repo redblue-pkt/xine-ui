@@ -1,3 +1,4 @@
+include $(top_srcdir)/src/common/Makefile.common
 
 SUBDIRS = po
 
@@ -80,12 +81,10 @@ noinst_HEADERS = \
 	xitkintl.h
 
 test_SOURCES = test.c
-test_DEPENDENCIES = libxitk.a \
+test_DEPENDENCIES = libxitk.a $(LIBCOMMON) \
              $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a
 
-test_LDADD = libxitk.a \
-             $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
-	     $(top_builddir)/src/common/libcommon.a \
+test_LDADD = $(test_DEPENDENCIES) \
 	     $(X_PRE_LIBS) $(X_LIBS) $(XFT_LIBS) -lX11 \
 	     $(THREAD_LIBS) $(LIBPNG_LIBS) $(INTLLIBS)
 
