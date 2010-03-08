@@ -197,7 +197,7 @@ do_build() {
   rm -rf $TMPBUILD && \
   mkdir -p $TMPBUILD && \
   cd $TMPBUILD && \
-  tar -xzf $CWD/@TAR_NAME@.tar.gz && \
+  tar -xf $CWD/@TAR_NAME@.tar.bz2 && \
   cd @TAR_NAME@ && \
   DIE=1 && \
   echo "./configure --prefix=$PREFIX $CONFIG_OPT && make && DESTDIR=$PKG make install-strip "  && \
@@ -306,7 +306,7 @@ main() {
   build_pentium
   build_k6
   build_k7
-  cp $CWD/@TAR_NAME@.tar.gz $SLCK
+  cp $CWD/@TAR_NAME@.tar.bz2 $SLCK
 }
 
 
@@ -318,7 +318,7 @@ build_arch() {
       mkdir -p $SLCK
       rm -f config.cache && ./autogen.sh && make dist
       $barch
-      cp -f $CWD/@TAR_NAME@.tar.gz $SLCK
+      cp -f $CWD/@TAR_NAME@.tar.bz2 $SLCK
 }
 
 if [ "`id -u`" -ne 0 ]; then

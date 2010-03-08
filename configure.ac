@@ -1,39 +1,44 @@
 dnl
 dnl Configure.in for xine
 dnl
-
-AC_INIT
-AC_CONFIG_SRCDIR([src/xitk/main.c])
-AC_CONFIG_LIBOBJ_DIR([src/common])
-AC_PREREQ(2.53)
-
 dnl
 dnl Don't forget to update the misc/xine_splash.{xcf,png}
 dnl
-XINE_MAJOR=0
-XINE_MINOR=99
-XINE_SUB=7
-if test -f .cvsversion; then
-  XINE_PRE="hg"
-else
-  XINE_PRE=""
-fi
 
+dnl Change these three m4_define lines to set the version
+dnl Presence of .cvsversion causes an "hg" suffix
+m4_define([xine_MAJOR], [0])
+m4_define([xine_MINOR], [99])
+m4_define([xine_SUB],   [7])
 
-TAR_NAME="xine-ui-"$XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE
-SPEC_VERSION=$XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE
-#TAR_NAME="xine-ui-"$XINE_MAJOR$XINE_PRE
-#SPEC_VERSION=$XINE_MAJOR$XINE_PRE
+m4_define([xine_PRE], [m4_esyscmd_s([test -f .cvsversion && echo hg || :])])
+m4_define([xine_VERSION], [xine_MAJOR.xine_MINOR.m4_expand([xine_SUB])xine_PRE])
+
+XINE_MAJOR=xine_MAJOR
+XINE_MINOR=xine_MINOR
+XINE_SUBxine_SUB
+XINE_PRE=xine_PRE
+
+AC_PREREQ(2.59)
+AC_INIT([xine-ui], [xine_VERSION])
+
+dnl evilness
+
+AC_CONFIG_SRCDIR([src/xitk/main.c])
+AM_CONFIG_HEADER(config.h)
+AC_CONFIG_LIBOBJ_DIR([src/common])
+
+AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
+AM_MAINTAINER_MODE
+
+TAR_NAME=$PACKAGE_NAME-xine_VERSION
+SPEC_VERSION=xine_VERSION
+
 AC_SUBST(XINE_MAJOR)
 AC_SUBST(XINE_MINOR)
 AC_SUBST(XINE_SUB)
 AC_SUBST(TAR_NAME)
 AC_SUBST(SPEC_VERSION)
-
-##
-AM_INIT_AUTOMAKE("xine-ui", [$SPEC_VERSION])
-
-AM_CONFIG_HEADER(config.h)
 
 dnl
 dnl Check for programs.
