@@ -560,7 +560,7 @@ static void extract_mrls(int num_mrls, char **mrls) {
 static void xinit_thread(void) {
    int    (*x_init_threads)(void);
 
-   (void *) dlerror();
+   dlerror();
    if((xlib_handle = dlopen("libX11.so", RTLD_LAZY)) != NULL) {
      
      if((x_init_threads = dlsym(xlib_handle, "XInitThreads")) != NULL)
