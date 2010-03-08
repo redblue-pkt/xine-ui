@@ -637,6 +637,12 @@ fi
 AC_TRY_CFLAGS("-Wmissing-format-attribute", wformat="$wformat -Wmissing-format-attribute")
 CFLAGS="$CFLAGS $wformat"
 
+wbits=''
+AC_TRY_CFLAGS("-Wmissing-noreturn", wbits="$wbits -Wmissing-noreturn")
+AC_TRY_CFLAGS("-Wdisabled-optimization", wbits="$wbits -Wdisabled-optimization")
+AC_TRY_CFLAGS("-Werror-implicit-function-declaration", wbits="$wbits -Werror-implicit-function-declaration")
+CFLAGS="$CFLAGS $wbits"
+
 AC_TRY_CFLAGS("-Wstrict-aliasing", wsa="-Wstrict-aliasing")
 AC_TRY_CFLAGS("-Wstrict-aliasing=2", wsa="-Wstrict-aliasing=2")
 CFLAGS="$CFLAGS $wsa"
