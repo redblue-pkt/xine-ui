@@ -129,7 +129,7 @@ uint8_t get_boolean(int session, ctrl_commands_t command) {
 }
 #endif
 
-static void *ctrlsocket_func(void *data) {
+static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
   fd_set                set;
   struct timeval        tv;
   serv_header_packet_t *shdr;

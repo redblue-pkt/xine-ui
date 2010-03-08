@@ -355,7 +355,7 @@ void panel_update_runtime_display(void) {
 /*
  * Update slider thread.
  */
-static void *slider_loop(void *dummy) {
+static __attribute__((noreturn)) void *slider_loop(void *dummy) {
   int screensaver_timer = 0;
   int status, speed;
   int pos, secs;
@@ -516,7 +516,6 @@ static void *slider_loop(void *dummy) {
   }
 
   pthread_exit(NULL);
-  return NULL;
 }
 
 /*

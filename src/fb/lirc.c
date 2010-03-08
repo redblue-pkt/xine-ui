@@ -36,7 +36,7 @@
 
 int fbxine_init_lirc(void);
 
-static void *lirc_loop(void *dummy)
+static __attribute__((noreturn)) void *lirc_loop(void *dummy)
 {
 	char *code, *c;
 	int k, ret;

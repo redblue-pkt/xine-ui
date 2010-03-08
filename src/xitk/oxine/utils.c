@@ -64,7 +64,7 @@ typedef struct {
 
 } job_t;
 
-static void *scheduler_thread(void *data) {
+static __attribute__((noreturn)) void *scheduler_thread(void *data) {
 
   job_t *job;
   int ret;
@@ -77,7 +77,6 @@ static void *scheduler_thread(void *data) {
  
   if (!ox_scheduler) {
     pthread_exit(NULL);
-    return NULL;
   }
   pthread_mutex_lock(&ox_scheduler->wait_mutex);
 

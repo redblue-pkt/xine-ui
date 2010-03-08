@@ -354,7 +354,7 @@ static void action_play(void)
 	play(fbxine.stream, 0, 0, 0);
 }
 
-static void *seek_relative_thread(void *data)
+static __attribute__((noreturn)) void *seek_relative_thread(void *data)
 {
 	int sec, off_sec = (int)(intptr_t)data;
 	
@@ -375,7 +375,6 @@ static void *seek_relative_thread(void *data)
 	
 	fbxine.ignore_next = 0;
 	pthread_exit(0);
-	return 0;
 }
 
 static void action_seek_relative(int off_sec)

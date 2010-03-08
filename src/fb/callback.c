@@ -66,7 +66,7 @@ void fbxine_do_exit(void)
 	fbxine_do_callbacks(tmp);
 }
 
-void fbxine_do_abort(void)
+void __attribute__((noreturn)) fbxine_do_abort(void)
 {
 	struct fbxine_callback *tmp;
 	

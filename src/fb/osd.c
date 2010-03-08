@@ -110,7 +110,7 @@ static const struct xine_speeds_s {
 #define BAR_HEIGHT 25
 
 
-static void *osd_loop(void *dummy)
+static __attribute__((noreturn)) void *osd_loop(void *dummy)
 {
 	pthread_detach(pthread_self());
 	while(1) {
@@ -142,7 +142,8 @@ static void *osd_loop(void *dummy)
 		}
 	    }
 	}
-	return NULL;
+
+	pthread_exit (NULL);
 }
 
 static const char *_osd_get_speed_sym(int speed) {

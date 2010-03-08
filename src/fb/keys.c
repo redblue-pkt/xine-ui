@@ -104,7 +104,7 @@ static int default_key_action(int key)
 	return 0;
 }
 
-static void *fbxine_keyboard_loop(void *dummy)
+static __attribute__((noreturn)) void *fbxine_keyboard_loop(void *dummy)
 {
 	pthread_detach(pthread_self());
 
@@ -112,8 +112,8 @@ static void *fbxine_keyboard_loop(void *dummy)
 		pthread_testcancel();
 		do_action(default_key_action(do_getc()));
 	}
-	
-	return 0;
+
+	pthread_exit (NULL);
 }
 
 static void exit_keyboard(void)
