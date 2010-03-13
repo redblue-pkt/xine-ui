@@ -473,15 +473,17 @@ static int read_main_menu(oxine_t *oxine, list_t *list, const char *mrl) {
 
   if (!file) return 0;
 
-  xml_parser_init (file, strlen (file), XML_PARSER_CASE_INSENSITIVE);
+  xml_parser_init_R (xml_parser_t *xml, file, strlen (file), XML_PARSER_CASE_INSENSITIVE);
 
-  if (xml_parser_build_tree (&node)<0) {
+  if (xml_parser_build_tree_R (xml, &node)<0) {
     lprintf("xml parsing of %s failed\n", mrl);
+    xml_parser_finalize_R (xml);
     return 0;
   }
 
   if (strcasecmp (node->name, "oxinemm")) {
     lprintf ("error, root node must be OXINEMM\n");
+    xml_parser_finalize_R (xml);
     return 0;
   }
 
@@ -489,6 +491,7 @@ static int read_main_menu(oxine_t *oxine, list_t *list, const char *mrl) {
 
   if (!node || strcasecmp (node->name, "window")) {
     lprintf ("error, node WINDOW expected (%s found)\n", (!node) ? "(null)" : node->name );
+    xml_parser_finalize_R (xml);
     return 0;
   }
 
@@ -511,6 +514,7 @@ static int read_main_menu(oxine_t *oxine, list_t *list, const char *mrl) {
   }
   
   xml_parser_free_tree(node);
+  xml_parser_finalize_R (xml);
   ho_free(file);
 
   return 1;

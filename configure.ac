@@ -84,6 +84,7 @@ dnl
 dnl Check for xine-lib
 dnl
 PKG_CHECK_MODULES([XINE], [libxine >= 1.1.0])
+XINE_LIB_SHIMS
 
 CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
 

@@ -453,4 +453,14 @@ void change_icon(Window window);
     XUnlockDisplay(gGui->display);                                        \
   } while(0)
 
+#ifdef HAVE_XML_PARSER_REENTRANT
+# define xml_parser_init_R(X,D,L,M) X = xml_parser_init_r ((D), (L), (M))
+# define xml_parser_build_tree_R(X,T) xml_parser_build_tree_r ((X), (T))
+# define xml_parser_finalize_R(X) xml_parser_finalize_r ((X))
+#else
+# define xml_parser_init_R(X,D,L,M) xml_parser_init ((D), (L), (M))
+# define xml_parser_build_tree_R(X,T) xml_parser_build_tree ((T))
+# define xml_parser_finalize_R(X) do {} while (0)
+#endif
+
 #endif

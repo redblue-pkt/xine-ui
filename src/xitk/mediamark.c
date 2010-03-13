@@ -2473,8 +2473,8 @@ static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *
 	NULL
       };
 
-      xml_parser_init(xml_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+      xml_parser_init_R(xml_parser_t *xml, xml_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree_R(xml, &xml_tree)) != XML_PARSER_OK)
 	goto __failure;
       
       top_xml_tree = xml_tree;
@@ -2488,6 +2488,7 @@ static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *
       xml_parser_free_tree(top_xml_tree);
     __failure:
       
+      xml_parser_finalize_R(xml);
       free(xml_content);
     }
   }
