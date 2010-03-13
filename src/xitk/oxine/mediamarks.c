@@ -496,20 +496,23 @@ static int read_mediamarks(list_t *list, const char *mrl) {
 
   if (!file) return 0;
 
-  xml_parser_init (file, strlen (file), XML_PARSER_CASE_INSENSITIVE);
+  xml_parser_init_R (xml_parser_t *xml, file, strlen (file), XML_PARSER_CASE_INSENSITIVE);
 
-  if (xml_parser_build_tree (&node)<0) {
+  if (xml_parser_build_tree_R (xml, &node)<0) {
     printf("mediamarks: xml parsing of %s failed\n", mrl);
+    xml_parser_finalize_R (xml);
     return 0;
   }
   
   if (strcasecmp (node->name, "oxinemm")) {
     printf ("mediamarks: error, root node must be OXINEMM\n");
+    xml_parser_finalize_R (xml);
     return 0;
   }
 
   read_subs(node->child, list);
   xml_parser_free_tree(node);
+  xml_parser_finalize_R (xml);
   ho_free(file);
 
   return 1;

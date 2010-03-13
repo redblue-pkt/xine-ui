@@ -90,8 +90,8 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
   if((network_download(url, &download))) {
     int entries_slx = 0;
     
-    xml_parser_init(download.buf, download.size, XML_PARSER_CASE_INSENSITIVE);
-    if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+    xml_parser_init_R(xml_parser_t *xml, download.buf, download.size, XML_PARSER_CASE_INSENSITIVE);
+    if((result = xml_parser_build_tree_R(xml, &xml_tree)) != XML_PARSER_OK)
       goto __failure;
     
     if(!strcasecmp(xml_tree->name, "SLX")) {
@@ -205,6 +205,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
     }
     
     xml_parser_free_tree(xml_tree);
+    xml_parser_finalize_R(xml);
 
     if(entries_slx)
       slxs[entries_slx] = NULL;

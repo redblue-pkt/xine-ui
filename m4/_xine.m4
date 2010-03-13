@@ -172,3 +172,20 @@ _ACEOF
     rm -f conftest.po
   fi
 ])dnl AC_PROG_GMSGFMT_PLURAL
+
+dnl Shims for various functions which are present in newer xine-lib
+AC_DEFUN([XINE_LIB_SHIMS],
+   [AC_MSG_CHECKING([for re-entrant XML parser in xine-lib])
+    tmp_CFLAGS="$CFLAGS"
+    tmp_LIBS="$LIBS"
+    CFLAGS="$CFLAGS $XINE_CFLAGS"
+    LIBS="$LIBS $XINE_LIBS"
+    AC_LINK_IFELSE(
+	[AC_LANG_PROGRAM([[#include <xine/xmlparser.h>]],
+			 [[xml_parser_init_r ((void *)0, 0, XML_PARSER_CASE_INSENSITIVE);]])],
+	[AC_DEFINE([[HAVE_XML_PARSER_REENTRANT]], [[1]], [[Define if xml_parser_init_r etc. are available]])
+	 AC_MSG_RESULT([[yes]])],
+	[AC_MSG_RESULT([[no]])])
+    CFLAGS="$tmp_CFLAGS"
+    LIBS="$tmp_LIBS"
+    ])
