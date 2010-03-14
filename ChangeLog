@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Recognise "authentication needed" messages from xine-lib 1.2.
   * Handle "file is empty" messages from xine-lib.
   * Add support for XINE_EVENT_MRL_REFERENCE_EXT.
   * Use re-entrant XML parser functions (if available).
