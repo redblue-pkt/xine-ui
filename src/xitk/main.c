@@ -996,6 +996,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
  */
 static void event_listener(void *user_data, const xine_event_t *event) {
   struct timeval tv;
+  static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */ 
 
   /*
    * Ignoring finished event logo is displayed (or played), that save us
@@ -1276,7 +1277,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     break;
 
   case XINE_EVENT_MRL_REFERENCE:
-    if((event->stream == gGui->stream) && gGui->playlist.num) {
+    if(!mrl_ext && (event->stream == gGui->stream) && gGui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
       if(__xineui_global_verbosity)
@@ -1296,6 +1297,41 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
       }
 
+    }
+    break;
+
+#ifndef XINE_EVENT_MRL_REFERENCE_EXT
+/* present in 1.1.0 but not 1.0.2 */
+#define XINE_EVENT_MRL_REFERENCE_EXT 13
+typedef struct {
+  int alternative, start_time, duration;
+  const char mrl[1];
+} xine_mrl_reference_data_ext_t;
+#endif
+  case XINE_EVENT_MRL_REFERENCE_EXT:
+    if((event->stream == gGui->stream) && gGui->playlist.num) {
+      xine_mrl_reference_data_ext_t *ref = (xine_mrl_reference_data_ext_t *) event->data;
+      const char *title = ref->mrl + strlen (ref->mrl) + 1;
+
+      mrl_ext = 1; /* use this to ignore MRL_REFERENCE events */
+
+      if(__xineui_global_verbosity)
+	printf("XINE_EVENT_MRL_REFERENCE_EXT got mrl [%s] (alternative=%d)\n",
+               ref->mrl, ref->alternative);
+
+      if(ref->alternative == 0) {
+        gGui->playlist.ref_append++;
+        /* FIXME: duration handled correctly? */
+        mediamark_insert_entry(gGui->playlist.ref_append, ref->mrl, title ? title : ref->mrl, NULL, ref->start_time, ref->duration ? ref->start_time + ref->duration : -1, 0, 0);
+      } else {
+        /* FIXME: title? start? duration? */
+	mediamark_t *mmk = mediamark_get_mmk_by_index(gGui->playlist.ref_append);
+
+	if(mmk) {
+	  mediamark_append_alternate_mrl(mmk, ref->mrl);
+	  mediamark_set_got_alternate(mmk);
+	}
+      }
     }
     break;
 
