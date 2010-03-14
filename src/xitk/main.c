@@ -1203,6 +1203,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 			  "Please verify if another program already uses it."), sizeof(buffer));
 	break;
 
+	/* (file) */
+      case 13 /* UNCOMMENTME: XINE_MSG_FILE_EMPTY */:
+	snprintf(buffer, sizeof(buffer), "%s %s",
+		 data->explanation ? (char *) data + data->explanation : "File is empty",
+		 (char *) data + data->parameters);
+	break;
+
       default:
 	strlcpy(buffer, _("*sight*, unkown error."), sizeof(buffer));
 	if(data->explanation)
