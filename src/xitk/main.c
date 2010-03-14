@@ -1210,6 +1210,16 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 		 (char *) data + data->parameters);
 	break;
 
+#ifdef XINE_MSG_AUTHENTICATION_NEEDED
+	/* mrl */
+	/* FIXME: implement auth dialogue box */
+      case XINE_MSG_AUTHENTICATION_NEEDED:
+	strlcpy(buffer, _("Sorry, not implemented (authentication)"), sizeof(buffer));
+	if (data->num_parameters)
+	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), ": %s", (char *) data + data->parameters);
+	break;
+#endif
+
       default:
 	strlcpy(buffer, _("*sight*, unkown error."), sizeof(buffer));
 	if(data->explanation)
