@@ -62,6 +62,7 @@ AC_DEFUN([AC_CHECK_LIRC],
      if test "$found_lirc" = yes; then
 	AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblirc_client) installed])
      fi
+     AM_CONDITIONAL([HAVE_LIRC], [test "$found_lirc" = yes])
      AC_SUBST(LIRC_LIBS)
      AC_SUBST(LIRC_INCLUDE)
 ])
