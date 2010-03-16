@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Set dialogue windows' maximum sizes.
   * Fix LIRC check so that it doesn't fail if liblircclient0.pc (which is
     Debian-specific) is missing.
   * Recognise "authentication needed" messages from xine-lib 1.2.

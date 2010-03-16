@@ -264,11 +264,13 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   hint.width           = width;
   hint.base_width      = width;
   hint.min_width       = width;
+  hint.max_width       = width;
   hint.height          = height;
   hint.base_height     = height;
   hint.min_height      = height;
+  hint.max_height      = height;
   hint.win_gravity     = NorthWestGravity;
-  hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
+  hint.flags           = PWinGravity | PBaseSize | PMinSize | PMaxSize | USSize | USPosition;
   
   XLOCK(im->x.disp);
   XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
