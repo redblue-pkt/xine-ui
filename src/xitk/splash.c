@@ -40,10 +40,21 @@ void splash_create(void) {
   char         *skin_path = skin_get_current_skin_dir();
   
   if(skin_path && is_a_dir((char *) skin_path)) {
-    asprintf(&skin_splash_image, "%s/%s", skin_path, "xine_splash.png");
+    static const char types[][4] = { "png", "jpg" };
+    int i;
 
-    if(is_a_file(skin_splash_image))
-      splash_image = skin_splash_image;
+    for (i = 0; i < sizeof (types) / sizeof (types[0]); ++i)
+    {
+      asprintf(&skin_splash_image, "%s/xine_splash.%s", skin_path, types[i]);
+
+      if(is_a_file(skin_splash_image))
+      {
+        splash_image = skin_splash_image;
+        break;
+      }
+      free (skin_splash_image);
+      skin_splash_image = NULL;
+    }
   }
 
   free(skin_path);
