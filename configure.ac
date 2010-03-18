@@ -438,6 +438,22 @@ PKG_CHECK_MODULES([LIBPNG], [libpng >= 1.2.8],,
   [PKG_CHECK_MODULES([LIBPNG], [libpng12 >= 1.2.8])])
 
 dnl
+dnl check for libjpeg
+dnl
+AC_ARG_VAR([JPEG_CFLAGS], [C compiler flags for libjpeg])
+AC_ARG_VAR([JPEG_LIBS], [Linker flags for libjpeg])
+JPEG_LIBS="${JPEG_LIBS:--ljpeg}"
+saved_CFLAGS="$CFLAGS"
+saved_LIBS="$LIBS"
+CFLAGS="$CFLAGS $JPEG_CFLAGS"
+LIBS="$LIBS $JPEG_LIBS"
+AC_CHECK_LIB([jpeg], [jpeg_read_header],
+  [AC_CHECK_HEADER([jpeglib.h], [], [AC_MSG_ERROR([JPEG library is required])])
+  ], [$JPEG_LIBS])
+CFLAGS="$saved_CFLAGS"
+LIBS="$saved_LIBS"
+
+dnl
 dnl Check for LIRC client support
 dnl
 AC_CHECK_LIRC
@@ -616,11 +632,38 @@ AC_SUBST(XINE_SKINDIR)
 AC_SUBST(XINE_SKINPATH)
 AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINPATH",[Location of xine skin directory])
 
-XINE_LOGO_MRL="file:$XINE_SKINDIR/xine-ui_logo.mpv"
-AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "`makeexpand $XINE_LOGO_MRL`",[official logo mrl])
+dnl
+dnl Use whichever splash & logo happen to be present.
+dnl JPEG is preferred, then PNG then, for the logo, MPV.
+dnl
+SOURCE_SPLASH="${SOURCE_SPLASH:-`cat misc/splash`}"
+AC_SUBST([SOURCE_SPLASH])
 
-XINE_SPLASH="$XINE_SKINDIR/xine_splash.png"
-AC_DEFINE_UNQUOTED(XINE_SPLASH, "`makeexpand $XINE_SPLASH`",[splash image])
+AC_DEFUN([XINE_LOCATE_MEDIA],
+ [AC_MSG_CHECKING([for a $5 image])
+  $1=''
+  for i in $2; do
+    ac_cv_xine_media_file="misc/splash-${SOURCE_SPLASH}/$4.$i"
+    if test -f "$ac_cv_xine_media_file"; then
+      $1="$XINE_SKINDIR/$4.$i"
+      break
+    fi
+  done
+  if test "$[]$1" = ''; then
+    $1="$XINE_SKINDIR/$4.$3"
+    ac_cv_xine_media_file="misc/splash-default/$4.$3"
+    if ! test -f "$ac_cv_xine_media_file"; then
+      AC_MSG_RESULT([no])
+      AC_MSG_ERROR([Missing $5 image - need $4.* (any of $2)])
+    fi
+  fi
+  AC_MSG_RESULT([$ac_cv_xine_media_file])
+  AC_SUBST([$1], [$ac_cv_xine_media_file])
+  AC_DEFINE_UNQUOTED([$1], "`makeexpand $[]$1`", [$6])
+])
+
+XINE_LOCATE_MEDIA([XINE_LOGO_MRL], [jpg png mpv], [mpv], [xine-ui_logo], [logo], [official logo MRL])
+XINE_LOCATE_MEDIA([XINE_SPLASH], [jpg png], [png], [xine_splash], [splash], [splash image filename])
 
 XINE_VISDIR="${datadir}/xine/visuals"
 AC_SUBST(XINE_VISDIR)

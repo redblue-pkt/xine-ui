@@ -1,0 +1,16 @@
+Splash & logo files reside in "misc/splash-$NAME". Certain files in that
+directory are distributed automatically, and two of these are installed
+(chosen at configure time). First match is preferred.
+
+	xine-ui_logo.jpg
+	xine-ui_logo.mpv
+	xine-ui_logo.png
+
+	xine_splash.jpg
+	xine_splash.png
+
+If extra source files need to be distributed, name them in
+"misc/splash-$NAME/manifest". Names are whitespace-separated; one per line
+is preferred.
+
+$NAME is read from misc/splash.

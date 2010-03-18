@@ -191,14 +191,71 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
   return data;
 }
 
+unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
+  struct jpeg_error_mgr jpeg_error;
+  struct jpeg_decompress_struct jpeg_ptr;
+  JSAMPARRAY buffer;
+  int rowstride;
+  unsigned char *out, *outptr;
+
+  rewind (f);
+       
+  jpeg_ptr.err = jpeg_std_error (&jpeg_error);
+  jpeg_create_decompress (&jpeg_ptr);
+  jpeg_stdio_src (&jpeg_ptr, f);
+
+  jpeg_read_header (&jpeg_ptr, TRUE);
+  jpeg_start_decompress (&jpeg_ptr);
+
+  rowstride = jpeg_ptr.output_width * jpeg_ptr.output_components;
+  buffer = (*jpeg_ptr.mem->alloc_sarray) ((j_common_ptr) &jpeg_ptr, JPOOL_IMAGE, rowstride, 1);
+  outptr = out = malloc (rowstride * jpeg_ptr.output_height);
+
+  if (!buffer || !out)
+  {
+    free (out);
+    jpeg_destroy_decompress (&jpeg_ptr);
+    return NULL;
+  }
+
+  while (jpeg_ptr.output_scanline < jpeg_ptr.output_height)
+  {
+    jpeg_read_scanlines (&jpeg_ptr, buffer, 1);
+    memcpy (outptr, buffer[0], rowstride);
+    outptr += rowstride;
+  }
+
+  *w = jpeg_ptr.output_width;
+  *h = jpeg_ptr.output_height;
+
+  jpeg_finish_decompress (&jpeg_ptr);
+  jpeg_destroy_decompress (&jpeg_ptr);
+
+  return out;
+}
+
 int ispng(FILE *f) {
   unsigned char       buf[8];
   
-  if (!f)
+  if (!f || fread (buf, 1, sizeof (buf), f) < sizeof (buf))
+  {
+    rewind (f);
     return 0;
-  fread(buf, 1, 8, f);
-  rewind(f);
+  }
+  rewind (f);
   return (int) !png_sig_cmp(buf, 0, 8);
+}
+
+int isjpeg(FILE *f) {
+  unsigned char       buf[4];
+
+  if (!f || fread (buf, 1, sizeof (buf), f) < sizeof (buf))
+  {
+    rewind (f);
+    return 0;
+  }
+  rewind (f);
+  return buf[0] == 0xFF && buf[1] == 0xD8 && buf[2] == 0xFF && buf[3] == 0xE0;
 }
 
 ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
@@ -209,7 +266,11 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   char               *iden;
   char               *e;
   FILE               *p;
-  int                 fmt;
+  enum {
+    FORMAT_UNKNOWN,
+    FORMAT_PNG,
+    FORMAT_JPEG,
+  }                   fmt = FORMAT_UNKNOWN;
   int                 trans;
 
   fmt = 0;
@@ -241,14 +302,19 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   e = _GetExtension(fil);
 
   if (ispng(p))
-    fmt = 1;
+    fmt = FORMAT_PNG;
+  else if (isjpeg(p))
+    fmt = FORMAT_JPEG;
 
   trans = 0;
   if (!data) {
       switch (fmt)
 	{
-	case 1:
+	case FORMAT_PNG:
 	    data = _LoadPNG(id, p, &w, &h, &trans);
+	  break;
+	case FORMAT_JPEG:
+	    data = _LoadJPEG(id, p, &w, &h);
 	  break;
 	}
     }

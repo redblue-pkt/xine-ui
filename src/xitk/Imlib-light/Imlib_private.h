@@ -35,6 +35,7 @@
 #include <X11/cursorfont.h>
 
 #include <png.h>
+#include <jpeglib.h>
 
 #define BYTE_ORD_24_RGB 0
 #define BYTE_ORD_24_RBG 1

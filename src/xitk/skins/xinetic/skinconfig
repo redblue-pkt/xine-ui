@@ -8,7 +8,7 @@ skin.version = 5
 skin.date    = 25.05.2002
 skin.author  = Jérôme Villette <garogoril@wanadoo.fr>
 skin.url     = none
-#skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpv
+#skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.png
 
 ## Main GUI ##
 skin.BackGround {

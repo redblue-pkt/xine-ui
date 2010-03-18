@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Support use of JPEG images for splash etc.
   * Make use of XScreenSaver.
   * Set dialogue windows' maximum sizes.
   * Fix LIRC check so that it doesn't fail if liblircclient0.pc (which is
