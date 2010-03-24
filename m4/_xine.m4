@@ -46,7 +46,8 @@ AC_DEFUN([AC_CHECK_LIRC],
         fi
         for llirc in $lirc_libprefix /lib /usr/lib /usr/local/lib; do
           AC_CHECK_FILE(["$llirc/liblirc_client.so"],
-             [LIRC_LIBS="$llirc/liblirc_client.so"]
+             [LIRC_LIBS="$llirc/liblirc_client.so"
+              found_lirc=yes]
              AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblirc_client) installed]),
              AC_CHECK_FILE(["$llirc/liblirc_client.a"],
                 [LIRC_LIBS="$llirc/liblirc_client.a"
