@@ -26,11 +26,9 @@ EXTRA_DIST = \
 	xine-check.sh.in \
 	xine-check.en \
 	xine_bash_completion \
+	xine-ui.xml \
 	splash \
-	$(skin_DATA) \
-	$(wildcard splash-@SOURCE_SPLASH@/manifest)
-	$(addprefix splash-@SOURCE_SPLASH@/,$(MANIFEST)) \
-	xine-ui.xml
+	$(skin_DATA) $(wildcard splash-@SOURCE_SPLASH@/manifest) $(addprefix splash-@SOURCE_SPLASH@/,$(MANIFEST))
 
 bin_SCRIPTS = xine-check xine-bugreport
 
