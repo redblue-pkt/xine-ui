@@ -2292,7 +2292,7 @@ void gui_select_sub(void) {
 void visual_anim_init(void) {
   char *buffer;
 
-  asprintf(&buffer, "%s/%s", XINE_VISDIR, "default.avi");
+  asprintf(&buffer, "%s/%s", XINE_VISDIR, "default.mpv");
   
   gGui->visual_anim.mrls = (char **) malloc(sizeof(char *) * 3);
   gGui->visual_anim.num_mrls = 0;
