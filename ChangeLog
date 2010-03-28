@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Rename default.avi to default.mpv since it's actually an MPEG.
   * Replace the splash .mpv with a PNG (from xine-lib).
   * Support use of JPEG images for splash etc.
   * Make use of XScreenSaver.
