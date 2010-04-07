@@ -88,6 +88,11 @@ XINE_LIB_SHIMS
 
 CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
 
+dnl Check for xine-list-* (MIME types)
+XINE_LIST="`pkg-config --variable=xine_list libxine 2>/dev/null || xine-config --xine-list 2>/dev/null`"
+AM_CONDITIONAL([XINE_LIST], [test "$XINE_LIST" != ''])
+AC_SUBST(XINE_LIST)
+
 dnl
 dnl threads: pkgconfig tell us what should be used, but xitk needs to be
 dnl          linked to thread lib, so the following AC_SUBST() are only used

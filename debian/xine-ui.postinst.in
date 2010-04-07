@@ -1,0 +1,22 @@
+#! /bin/sh
+
+set -e
+
+case "$1" in
+  triggered|configure)
+    if test -x @XINE_LIST@; then
+      {
+	sed -e '/^MimeType=/ d' </var/lib/xine/xine.desktop
+	echo -n 'MimeType='
+	@XINE_LIST@
+	echo '@XINE_MIME_EXTRA@'
+      } >/var/lib/xine/xine.desktop.new
+      echo "Updated the MIME types in xine's menu file."
+      mv /var/lib/xine/xine.desktop.new /var/lib/xine/xine.desktop
+    else
+      echo "Not updating the MIME types in xine's menu file."
+    fi
+    ;;
+esac
+
+#DEBHELPER#

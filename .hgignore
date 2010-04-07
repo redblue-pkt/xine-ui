@@ -30,6 +30,7 @@
 ^misc/SlackBuild$
 ^misc/build_rpms.sh$
 ^misc/xine-(bugreport|check|ui.spec)$
+^misc/desktops/xine\.desktop$
 ^missing$
 ^mkinstalldirs$
 ^(|src/xitk/xine-toolkit/)po/(POTFILES|stamp-po)$

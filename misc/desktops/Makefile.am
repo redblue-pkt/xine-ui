@@ -1,8 +1,12 @@
-EXTRA_DIST = $(pixmap_DATA) $(desktop_DATA) xine.wmconfig \
+EXTRA_DIST = $(pixmap_DATA) xine.wmconfig \
+	xine.desktop.in \
 	$(icon16_DATA) \
 	$(icon22_DATA) \
 	$(icon32_DATA) \
 	$(icon48_DATA) 
+
+BUILT_SOURCES = xine.desktop
+CLEANFILES = $(BUILT_SOURCES)
 
 pixmapdir = $(datadir)/pixmaps
 icon16dir = $(datadir)/icons/hicolor/16x16/apps
@@ -17,5 +21,19 @@ icon48_DATA = icons/48/xine.png
 
 pixmap_DATA = xine.xpm
 
-desktopdir = $(datadir)/xine/desktop
+desktopdir = $(datadir)/applications
 desktop_DATA = xine.desktop
+
+if XINE_LIST
+xine.desktop: xine.desktop.in @XINE_LIST@
+	exec > $@; cat $<; \
+	@XINE_LIST@; \
+	awk '{ printf "%s;", $$1 }' < $(srcdir)/mime.extra
+else
+XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
+MIME = $(if $(shell test -f $(XINE_MIME) && echo y),$(XINE_MIME),$(srcdir)/mime.default)
+xine.desktop: xine.desktop.in $(MIME)
+	exec > $@; \
+	cat $<; \
+	cat $(MIME) $(srcdir)/mime.extra | awk '{ printf "%s;", $$1 }'
+endif
