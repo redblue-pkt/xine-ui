@@ -1,0 +1,8 @@
+#! /bin/sh
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+  rm -f /var/lib/xine/xine.desktop /var/lib/xine/xine.desktop.new
+fi
+
+#DEBHELPER#

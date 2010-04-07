@@ -80,6 +80,7 @@ clean:
 	rm -f po/*.gmo src/xitk/xine-toolkit/po/*.gmo
 	rm -f compile config.guess configure depcomp install-sh missing 
 	rm -f misc/xine-check po/stamp-po src/xitk/xine-toolkit/po/stamp-po
+	rm -f debian/xine-ui.postinst
 	dh_clean
 
 install: build
@@ -90,17 +91,22 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/xine-ui
 	mkdir -p debian/xine-ui/usr/share/doc/xine-ui
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
+	mkdir -p debian/xine-ui/var/lib
+	mv debian/xine-ui/usr/share/applications debian/xine-ui/var/lib/xine
 	# these must not be compressed, or xine's online help will fail:
 	-cd debian/xine-ui/usr/share/doc/xine-ui; \
 	mkdir -p ../../xine/doc; \
 	mv README.config_?? README_?? ../../xine/doc; \
 	ln -s ../../xine/doc/* .
 
+debian/xine-ui.postinst: debian/xine-ui.postinst.in debian/rules
+	sed -e "s^@XINE_LIST@^`pkg-config --variable=xine_list libxine`^g; s^@XINE_MIME_EXTRA@^`awk '{ printf "%s;", $$1 }' < misc/desktops/mime.extra`^g" <$< >$@
+
 binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: build install debian/xine-ui.postinst
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf	
