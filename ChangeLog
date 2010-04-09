@@ -1,6 +1,9 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * "ToggleFullscreen" command takes an optional numeric parameter,
+    controlling whether full-screen mode is switched on or off.
+  * New command "Close".
   * Rename default.avi to default.mpv since it's actually an MPEG.
   * Replace the splash .mpv with a PNG (from xine-lib).
   * Support use of JPEG images for splash etc.
