@@ -867,6 +867,46 @@ void gui_stop (xitk_widget_t *w, void *data) {
   gui_display_logo();
 }
 
+void gui_close (xitk_widget_t *w, void *data) {
+
+  gGui->ignore_next = 1;
+  xine_stop (gGui->stream);
+  gGui->ignore_next = 0;
+
+  if(!(gGui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST))
+    gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+
+  gGui->stream_length.pos = gGui->stream_length.time = gGui->stream_length.length = 0;
+
+  mediamark_reset_played_state();
+  if(gGui->visual_anim.running) {
+    xine_stop(gGui->visual_anim.stream);
+    if(gGui->visual_anim.enabled == 2)
+      gGui->visual_anim.running = 0;
+  }
+
+  osd_hide_sinfo();
+  osd_hide_bar();
+  osd_hide_info();
+  osd_update_status();
+  panel_reset_slider ();
+  panel_check_pause();
+  panel_update_runtime_display();
+
+  if(is_playback_widgets_enabled()) {
+    if(!gGui->playlist.num) {
+      gui_set_current_mmk(NULL);
+      enable_playback_controls(0);
+    }
+    else if(gGui->playlist.num && (strcmp((mediamark_get_current_mrl()), gGui->mmk.mrl))) {
+      gui_set_current_mmk(mediamark_get_current_mmk());
+    }
+  }
+  gGui->ignore_next = 1;
+  xine_close (gGui->stream);
+  gGui->ignore_next = 0;
+}
+
 void gui_pause (xitk_widget_t *w, void *data, int state) {
   int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
 

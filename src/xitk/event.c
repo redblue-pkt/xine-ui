@@ -570,6 +570,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_stop(NULL, NULL);
     break;
 
+  case ACTID_CLOSE:
+    gui_close(NULL, NULL);
+    break;
+
   case ACTID_EVENT_SENDER:
     gui_event_sender_show(NULL, NULL);
     break;

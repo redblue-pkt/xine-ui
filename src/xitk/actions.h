@@ -46,6 +46,7 @@ int gui_xine_open_and_play(char *mrl, char *sub, int start_pos,
 void gui_exit (xitk_widget_t *w, void *data);
 void gui_play (xitk_widget_t *w, void *data);
 void gui_stop (xitk_widget_t *w, void *data);
+void gui_close (xitk_widget_t *w, void *data);
 void gui_pause (xitk_widget_t *w, void *data, int state) ;
 void gui_eject(xitk_widget_t *w, void *data);
 void gui_toggle_visibility(xitk_widget_t *w, void *data);
