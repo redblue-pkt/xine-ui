@@ -32,7 +32,7 @@ xine.desktop: xine.desktop.in @XINE_LIST@
 else
 XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
 MIME = $(if $(shell test -f $(XINE_MIME) && echo y),$(XINE_MIME),$(srcdir)/mime.default)
-xine.desktop: xine.desktop.in $(MIME)
+xine.desktop: xine.desktop.in $(MIME) $(srcdir)/mime.extra
 	exec > $@; \
 	cat $<; \
 	cat $(MIME) $(srcdir)/mime.extra | awk '{ printf "%s;", $$1 }'
