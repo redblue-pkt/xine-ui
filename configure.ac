@@ -100,11 +100,15 @@ dnl          linked to thread lib, so the following AC_SUBST() are only used
 dnl          in src/xitk/xine-toolkit/Makefile.am
 dnl
 case "$host" in
-  *-*-freebsd*|*-*-openbsd*)
+  *-*-freebsd*)
     THREAD_LIBS="-L/usr/local/lib -pthread"
     THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
     CFLAGS="-L/usr/local/lib $THREAD_CFLAGS $CFLAGS"
     CPPFLAGS="-I/usr/local/include -L/usr/local/lib $CPPFLAGS"
+    ;;
+
+  *-*-openbsd*)
+    THREAD_LIBS="-pthread"
     ;;
 
   *-*-hpux11*)
