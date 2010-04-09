@@ -170,7 +170,7 @@ void stdctl_start(void) {
   int err;
 
   stdctl.fd = STDIN_FILENO;
-  stdctl.fbk = gGui->stdout;
+  stdctl.fbk = gGui->orig_stdout;
   
   if((err = pthread_create(&(stdctl.thread), NULL, xine_stdctl_loop, NULL)) != 0) {
     fprintf(stderr, _("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));

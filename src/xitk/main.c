@@ -1478,7 +1478,7 @@ int main(int argc, char *argv[]) {
   gGui->no_mouse               = 0;
   gGui->wid                    = 0;
   gGui->nongui_error_msg       = NULL;
-  gGui->stdout                 = stdout;
+  gGui->orig_stdout            = stdout;
   
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1974,8 +1974,8 @@ int main(int argc, char *argv[]) {
     else if(dup2(stdout_fd, STDOUT_FILENO) < 0)
       fprintf(stderr, "cannot dup2 stdout_fd: %s.\n", strerror(errno));
     else {
-      gGui->stdout = guiout_fp;
-      setlinebuf(gGui->stdout);
+      gGui->orig_stdout = guiout_fp;
+      setlinebuf(gGui->orig_stdout);
       close(stdout_fd); /* stdout_fd was intermediate, not needed any longer */
     }
   }
@@ -2295,8 +2295,8 @@ int main(int argc, char *argv[]) {
 
   if(gGui->report != stdout)
     fclose(gGui->report);
-  if(gGui->stdout != stdout)
-    fclose(gGui->stdout);
+  if(gGui->orig_stdout != stdout)
+    fclose(gGui->orig_stdout);
 
   free_command_line_args(&_argv, _argc);
 
