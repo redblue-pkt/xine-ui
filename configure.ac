@@ -101,10 +101,9 @@ dnl          in src/xitk/xine-toolkit/Makefile.am
 dnl
 case "$host" in
   *-*-freebsd*)
-    THREAD_LIBS="-L/usr/local/lib -pthread"
-    THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
-    CFLAGS="-L/usr/local/lib $THREAD_CFLAGS $CFLAGS"
-    CPPFLAGS="-I/usr/local/include -L/usr/local/lib $CPPFLAGS"
+    THREAD_LIBS="-pthread"
+    THREAD_CFLAGS="-D_THREAD_SAFE"
+    CFLAGS="$THREAD_CFLAGS $CFLAGS"
     ;;
 
   *-*-openbsd*)
