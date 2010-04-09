@@ -534,7 +534,12 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_TOGGLE_FULLSCREEN:
-    gui_set_fullscreen_mode(NULL, NULL);
+    if (gGui->numeric.set) {
+      int fullscreen = video_window_get_fullscreen_mode() & FULLSCR_MODE;
+      if ((gGui->numeric.arg && !fullscreen) || (!gGui->numeric.arg && fullscreen))
+        gui_set_fullscreen_mode(NULL, NULL);
+    } else
+      gui_set_fullscreen_mode(NULL, NULL);
     break;
 
 #ifdef HAVE_XINERAMA
