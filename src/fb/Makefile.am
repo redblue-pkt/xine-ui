@@ -2,7 +2,11 @@ include $(top_srcdir)/src/common/Makefile.common
 
 AM_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS) -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
 
-bin_PROGRAMS = fbxine 
+if HAVE_FB
+fb_programs = fbxine
+endif
+
+bin_PROGRAMS = ${fb_programs}
 
 fbxine_DEPENDENCIES = $(LIBCOMMON)
 fbxine_LDADD = @XINE_LIBS@ $(LIRC_LIBS) -lm $(THREAD_LIBS) $(LIBCOMMON)

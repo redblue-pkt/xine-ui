@@ -413,6 +413,9 @@ XftDrawStringUtf8(0, 0, 0, 0, 0, 0, 0); return 0;
 fi
 AM_CONDITIONAL(WITH_XFT, test x"$XFT" = "xtrue")
 
+AC_ARG_WITH([fb], AS_HELP_STRING([--without-fb], [Turn off framebuffer support]))
+AM_CONDITIONAL([HAVE_FB], [test "x$with_fb" != xno])
+
 dnl
 dnl Check for DirectFB
 dnl
