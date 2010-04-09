@@ -32,6 +32,8 @@ static const kbinding_entry_t default_binding_table[] = {
     "Pause",                  ACTID_PAUSE                   , "space",    KEYMOD_NOMOD   , 0 , 0},
   { "stop playback",
     "Stop",                   ACTID_STOP                    , "S",        KEYMOD_NOMOD   , 0 , 0},
+  { "close stream",
+    "Close",                  ACTID_CLOSE                   , "C",        KEYMOD_NOMOD   , 0 , 0},
   { "take a snapshot",
     "Snapshot",               ACTID_SNAPSHOT                , "t",        KEYMOD_NOMOD   , 0 , 0},
   { "eject the current medium",
