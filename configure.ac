@@ -651,6 +651,7 @@ dnl
 SOURCE_SPLASH="${SOURCE_SPLASH:-`cat misc/splash`}"
 AC_SUBST([SOURCE_SPLASH])
 
+dnl XINE_LOCATE_MEDIA(variable, extns, pref. extn, leafname, purpose, comment)
 AC_DEFUN([XINE_LOCATE_MEDIA],
  [AC_MSG_CHECKING([for a $5 image])
   $1=''
@@ -670,8 +671,8 @@ AC_DEFUN([XINE_LOCATE_MEDIA],
     fi
   fi
   AC_MSG_RESULT([$ac_cv_xine_media_file])
-  AC_SUBST([$1], [$ac_cv_xine_media_file])
   AC_DEFINE_UNQUOTED([$1], "`makeexpand $[]$1`", [$6])
+  AC_SUBST([$1], [$ac_cv_xine_media_file])
 ])
 
 XINE_LOCATE_MEDIA([XINE_LOGO_MRL], [jpg png mpv], [mpv], [xine-ui_logo], [logo], [official logo MRL])
