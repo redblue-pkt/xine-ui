@@ -1,5 +1,7 @@
 EXTRA_DIST = $(pixmap_DATA) xine.wmconfig \
 	xine.desktop.in \
+	mime.default \
+	mime.extra \
 	$(icon16_DATA) \
 	$(icon22_DATA) \
 	$(icon32_DATA) \
