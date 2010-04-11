@@ -73,10 +73,7 @@ fi
 
 %install
 [ "${RPM_BUILD_ROOT}" != "/" ] && %{__rm} -rf ${RPM_BUILD_ROOT}
-%makeinstall
-%{__mkdir_p} ${RPM_BUILD_ROOT}/%{_datadir}/applications/
-%{__install} -c -m644 ${RPM_BUILD_ROOT}/%{_datadir}/xine/desktop/xine.desktop ${RPM_BUILD_ROOT}/%{_datadir}/applications/
-%{__install} -m 644 misc/desktops/xine.wmconfig %{?buildroot:%{buildroot}}%{deskdir}/
+make DESTDIR=${RPM_BUILD_ROOT} install
 %{__rm} -rf ${RPM_BUILD_ROOT}/%{deskdir}
 
 %clean
