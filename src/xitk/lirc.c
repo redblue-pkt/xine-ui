@@ -105,9 +105,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
 	k = kbindings_lookup_action(gGui->kbindings, c);
 	
 	if(k) {
-	  XLockDisplay(gGui->display);
 	  gui_execute_action_id((kbindings_get_action_id(k)));
-	  XUnlockDisplay(gGui->display);
 	}
 	else {
 	  char from[256];
