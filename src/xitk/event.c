@@ -39,6 +39,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
@@ -107,6 +108,11 @@ static const char *const shortcut_style[] = {
   "Emacs style",
   NULL
 };
+
+static volatile int reject_events = 1;
+
+pthread_mutex_t event_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 int hidden_file_cb(int action, int value) {
   xine_cfg_entry_t  cfg_entry;
@@ -364,6 +370,16 @@ static char *pts2str(int64_t pts) {
  */
 void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
+
+  if(reject_events)
+    return;
+
+  pthread_mutex_lock(&event_mutex);
+
+  if (reject_events) {
+    pthread_mutex_unlock(&event_mutex);
+    return;
+  }
   
   if(action & ACTID_IS_INPUT_EVENT) {
 
@@ -408,8 +424,10 @@ void gui_execute_action_id(action_id_t action) {
     }
 
     /* check if osd menu like this event */
-    if( oxine_action_event(action & ~ACTID_IS_INPUT_EVENT) )
+    if( oxine_action_event(action & ~ACTID_IS_INPUT_EVENT) ) {
+      pthread_mutex_unlock(&event_mutex);
       return;
+    }
     
     /* events for advanced input plugins. */
     xine_event.type        = action & ~ACTID_IS_INPUT_EVENT;
@@ -419,6 +437,7 @@ void gui_execute_action_id(action_id_t action) {
     gettimeofday(&xine_event.tv, NULL);
     
     xine_event_send(gGui->stream, &xine_event);
+    pthread_mutex_unlock(&event_mutex);
     return;
   }
 
@@ -1222,6 +1241,7 @@ void gui_execute_action_id(action_id_t action) {
   gGui->numeric.arg = 0;
   gGui->alphanum.set = 0;
   gGui->alphanum.arg = "";
+  pthread_mutex_unlock(&event_mutex);
 }
 
 /*
@@ -1485,6 +1505,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 }
 
 void gui_deinit(void) {
+  reject_events = 1;
   xitk_unregister_event_handler(&gGui->widget_key);
 }
 
@@ -1846,6 +1867,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gui_set_current_mmk(mediamark_get_current_mmk());
 
   panel_init();
+  reject_events = 0;
 }
 
 void gui_init_imlib (Visual *vis) {
