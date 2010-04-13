@@ -47,8 +47,6 @@
 #include "common.h"
 #include "oxine/oxine.h"
 
-#define STEP_SIZE 256
-
 /*
  * global variables
  */
@@ -994,63 +992,60 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_HUECONTROLp:
-    if(gGui->video_settings.hue <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
-      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
-    }
+    control_inc_image_prop(XINE_PARAM_VO_HUE);
     break;
   case ACTID_HUECONTROLm:
-    if(gGui->video_settings.hue >= STEP_SIZE) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
-      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
-    }
+    control_dec_image_prop(XINE_PARAM_VO_HUE);
     break;
 
   case ACTID_SATURATIONCONTROLp:
-    if(gGui->video_settings.saturation <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
-      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
-    }
+    control_inc_image_prop(XINE_PARAM_VO_SATURATION);
     break;
   case ACTID_SATURATIONCONTROLm:
-    if(gGui->video_settings.saturation >= STEP_SIZE) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
-      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
-    }
+    control_dec_image_prop(XINE_PARAM_VO_SATURATION);
     break;
 
   case ACTID_BRIGHTNESSCONTROLp:
-    if(gGui->video_settings.brightness <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
-      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
-    }
+    control_inc_image_prop(XINE_PARAM_VO_BRIGHTNESS);
     break;
   case ACTID_BRIGHTNESSCONTROLm:
-    if(gGui->video_settings.brightness >= STEP_SIZE) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
-      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
-    }
+    control_dec_image_prop(XINE_PARAM_VO_BRIGHTNESS);
     break;
 
   case ACTID_CONTRASTCONTROLp:
-    if(gGui->video_settings.contrast <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
-      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
-    }
+    control_inc_image_prop(XINE_PARAM_VO_CONTRAST);
     break;
   case ACTID_CONTRASTCONTROLm:
-    if(gGui->video_settings.contrast >= STEP_SIZE) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
-      control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
-      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
-    }
+    control_dec_image_prop(XINE_PARAM_VO_CONTRAST);
+    break;
+
+  case ACTID_GAMMACONTROLp:
+    control_inc_image_prop(XINE_PARAM_VO_GAMMA);
+    break;
+  case ACTID_GAMMACONTROLm:
+    control_dec_image_prop(XINE_PARAM_VO_GAMMA);
+    break;
+
+  case ACTID_SHARPNESSCONTROLp:
+#ifdef XINE_PARAM_VO_SHARPNESS
+    control_inc_image_prop(XINE_PARAM_VO_SHARPNESS);
+#endif
+    break;
+  case ACTID_SHARPNESSCONTROLm:
+#ifdef XINE_PARAM_VO_SHARPNESS
+    control_dec_image_prop(XINE_PARAM_VO_SHARPNESS);
+#endif
+    break;
+
+  case ACTID_NOISEREDUCTIONCONTROLp:
+#ifdef XINE_PARAM_VO_NOISE_REDUCTION
+    control_inc_image_prop(XINE_PARAM_VO_NOISE_REDUCTION);
+#endif
+    break;
+  case ACTID_NOISEREDUCTIONCONTROLm:
+#ifdef XINE_PARAM_VO_NOISE_REDUCTION
+    control_dec_image_prop(XINE_PARAM_VO_NOISE_REDUCTION);
+#endif
     break;
 
   case ACTID_VPP:

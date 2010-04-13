@@ -613,9 +613,81 @@ skin.CtlContLbl {
 	}
 }
 
+skin.SliderCtlGamma {
+	coords {
+	  x = 210
+	  y = 36
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlGammaLbl {
+	coords {
+	  x = 210
+	  y = 175
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters2.png
+	}
+}
+
+skin.SliderCtlSharp {
+	coords {
+	  x = 254
+	  y = 36
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlSharpLbl {
+	coords {
+	  x = 254
+	  y = 175
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters2.png
+	}
+}
+
+skin.SliderCtlNoise {
+	coords {
+	  x = 298
+	  y = 36
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlNoiseLbl {
+	coords {
+	  x = 298
+	  y = 175
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters2.png
+	}
+}
+
 skin.CtlSkLbl {
 	coords {
-	  x = 218
+	  x = 350
 	  y = 18
 	}
 	label {
@@ -627,7 +699,7 @@ skin.CtlSkLbl {
 
 skin.CtlSkUp {
 	coords {
-	  x = 372
+	  x = 504
 	  y = 17
 	}
 	pixmap = BigArrowUp.png
@@ -635,7 +707,7 @@ skin.CtlSkUp {
 
 skin.SliderCtlSk {
 	coords {
-	  x = 372
+	  x = 504
 	  y = 38
 	}
 	pixmap = SliderVBg.png
@@ -647,7 +719,7 @@ skin.SliderCtlSk {
 
 skin.CtlSkDn {
 	coords {
-	  x = 372
+	  x = 504
 	  y = 164
 	}
 	pixmap = BigArrowDown.png
@@ -655,7 +727,7 @@ skin.CtlSkDn {
 
 skin.CtlSkLeft {
         coords {
-          x = 200
+          x = 332
           y = 163
         }
         pixmap = BigArrowLeft.png
@@ -663,7 +735,7 @@ skin.CtlSkLeft {
 
 skin.SliderHCtlSk {
         coords {
-          x = 221
+          x = 353
           y = 163
         }
         pixmap = SkSlidHBg.png
@@ -675,7 +747,7 @@ skin.SliderHCtlSk {
 
 skin.CtlSkRight {
         coords {
-          x = 341
+          x = 473
           y = 163
         }
         pixmap = BigArrowRight.png
@@ -683,7 +755,7 @@ skin.CtlSkRight {
 
 skin.CtlSkItemBtn {
 	coords {
-	  x = 200
+	  x = 332
 	  y = 37
 	}
 	pixmap = SkItemBtn.png
@@ -700,7 +772,7 @@ skin.CtlSkItemBtn {
 
 skin.CtlDismiss {
 	coords {
-	  x = 333
+	  x = 465
 	  y = 182
 	}
 	pixmap = CtlDismiss.png
