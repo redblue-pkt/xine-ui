@@ -35,7 +35,8 @@ void control_toggle_visibility(xitk_widget_t *, void *);
 void control_raise_window(void);
 void control_show_tips(int enabled, unsigned long timeout);
 void control_update_tips_timeout(unsigned long timeout);
-void control_set_image_prop(int prop, int value);
+void control_inc_image_prop(int prop);
+void control_dec_image_prop(int prop);
 void control_reparent(void);
 
 #endif

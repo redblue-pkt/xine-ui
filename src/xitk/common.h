@@ -185,6 +185,9 @@ typedef struct {
     int                     brightness, default_brightness;
     int                     saturation, default_saturation;
     int                     contrast, default_contrast;
+    int                     gamma, default_gamma;
+    int                     sharpness, default_sharpness;
+    int                     noise_reduction, default_noise_reduction;
   } video_settings;
 
   xine_audio_port_t        *ao_port;
