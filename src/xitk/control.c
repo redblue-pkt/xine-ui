@@ -155,9 +155,11 @@ static void update_sliders_video_settings(void) {
     if(xitk_is_widget_enabled(control->contr)) {
       xitk_slider_set_pos(control->contr, get_current_param(XINE_PARAM_VO_CONTRAST));
     }
+#ifdef XINE_PARAM_VO_GAMMA
     if(xitk_is_widget_enabled(control->gamma)) {
       xitk_slider_set_pos(control->gamma, get_current_param(XINE_PARAM_VO_GAMMA));
     }
+#endif
 #ifdef XINE_PARAM_VO_SHARPNESS
     if(xitk_is_widget_enabled(control->sharp)) {
       xitk_slider_set_pos(control->sharp, get_current_param(XINE_PARAM_VO_SHARPNESS));
