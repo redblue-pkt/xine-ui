@@ -86,18 +86,24 @@ static void contrast_changes_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->video_settings.contrast =
     (cfg->num_value < 0) ? gGui->video_settings.default_contrast : cfg->num_value;
 }
+#ifdef XINE_PARAM_VO_GAMMA
 static void gamma_changes_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->video_settings.gamma =
     (cfg->num_value < 0) ? gGui->video_settings.default_gamma : cfg->num_value;
 }
+#endif
+#ifdef XINE_PARAM_VO_SHARPNESS
 static void sharpness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->video_settings.sharpness =
     (cfg->num_value < 0) ? gGui->video_settings.default_sharpness : cfg->num_value;
 }
+#endif
+#ifdef XINE_PARAM_VO_NOISE_REDUCTION
 static void noise_reduction_changes_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->video_settings.noise_reduction =
     (cfg->num_value < 0) ? gGui->video_settings.default_noise_reduction : cfg->num_value;
 }
+#endif
 
 /*
  *
@@ -229,6 +235,7 @@ static void set_contrast(xitk_widget_t *w, void *data, int value) {
  * Set gamma
  */
 static void set_gamma(xitk_widget_t *w, void *data, int value) {
+#ifdef XINE_PARAM_VO_GAMMA
   int gamma;
 
   set_current_param(XINE_PARAM_VO_GAMMA, value);
@@ -238,6 +245,7 @@ static void set_gamma(xitk_widget_t *w, void *data, int value) {
 
   if(gamma_ena)
     config_update_num("gui.vo_gamma", gamma);
+#endif
 }
 
 /*
@@ -303,6 +311,7 @@ void control_inc_image_prop(int prop) {
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
+#ifdef XINE_PARAM_VO_GAMMA
   case XINE_PARAM_VO_GAMMA:
     if(gamma_ena && gGui->video_settings.gamma <= (65535 - STEP_SIZE)) {
       config_update_num("gui.vo_gamma", gGui->video_settings.gamma + STEP_SIZE);
@@ -310,6 +319,7 @@ void control_inc_image_prop(int prop) {
       osd_draw_bar(_("Gamma"), 0, 65535, gGui->video_settings.gamma, OSD_BAR_STEPPER);
     }
     break;
+#endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   case XINE_PARAM_VO_SHARPNESS:
     if(sharp_ena && gGui->video_settings.sharpness <= (65535 - STEP_SIZE)) {
@@ -365,6 +375,7 @@ void control_dec_image_prop(int prop) {
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
+#ifdef XINE_PARAM_VO_GAMMA
   case XINE_PARAM_VO_GAMMA:
     if(gamma_ena && gGui->video_settings.gamma >= STEP_SIZE) {
       config_update_num("gui.vo_gamma", gGui->video_settings.gamma - STEP_SIZE);
@@ -372,6 +383,7 @@ void control_dec_image_prop(int prop) {
       osd_draw_bar(_("Gamma"), 0, 65535, gGui->video_settings.gamma, OSD_BAR_STEPPER);
     }
     break;
+#endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   case XINE_PARAM_VO_SHARPNESS:
     if(sharp_ena && gGui->video_settings.sharpness >= STEP_SIZE) {
@@ -438,6 +450,43 @@ static void active_sliders_video_settings(void) {
     xitk_enable_widget(control->noise);
 }
 
+#ifndef VO_CAP_HUE
+/* xine-lib 1.1 */
+
+static int test_vo_property(int property) {
+  int cur = get_current_param(property);
+  set_current_param(property, TEST_VO_VALUE(cur));
+  if((get_current_param(property)) == cur)
+    return 0;
+  set_current_param(property, cur);
+  return 1;
+}
+
+static void probe_active_controls(void) {
+  hue_ena    = test_vo_property(XINE_PARAM_VO_HUE);
+  bright_ena = test_vo_property(XINE_PARAM_VO_BRIGHTNESS);
+  sat_ena    = test_vo_property(XINE_PARAM_VO_SATURATION);
+  contr_ena  = test_vo_property(XINE_PARAM_VO_CONTRAST);
+# ifdef XINE_PARAM_VO_GAMMA
+  gamma_ena  = test_vo_property(XINE_PARAM_VO_GAMMA);
+# else
+  gamma_ena = 0;
+# endif
+# ifdef XINE_PARAM_VO_SHARPNESS
+  sharp_ena  = test_vo_property(XINE_PARAM_VO_SHARPNESS);
+# else
+  sharp_ena = 0;
+# endif
+# ifdef XINE_PARAM_VO_NOISE_REDUCTION
+  noise_ena  = ((cap & VO_CAP_NOISE_REDUCTION) != 0);
+# else
+  noise_ena = 0;
+# endif
+}
+
+#else
+/* xine-lib 1.2 */
+
 static void probe_active_controls(void) {
   uint64_t cap = gGui->vo_port->get_capabilities(gGui->vo_port);
 
@@ -445,18 +494,24 @@ static void probe_active_controls(void) {
   bright_ena = ((cap & VO_CAP_BRIGHTNESS) != 0);
   sat_ena    = ((cap & VO_CAP_SATURATION) != 0);
   contr_ena  = ((cap & VO_CAP_CONTRAST) != 0);
+# ifdef XINE_PARAM_VO_GAMMA
   gamma_ena  = ((cap & VO_CAP_GAMMA) != 0);
-#ifdef XINE_PARAM_VO_SHARPNESS
+# else
+  gamma_ena = 0;
+# endif
+# ifdef XINE_PARAM_VO_SHARPNESS
   sharp_ena  = ((cap & VO_CAP_SHARPNESS) != 0);
-#else
+# else
   sharp_ena = 0;
-#endif
-#ifdef XINE_PARAM_VO_NOISE_REDUCTION
+# endif
+# ifdef XINE_PARAM_VO_NOISE_REDUCTION
   noise_ena  = ((cap & VO_CAP_NOISE_REDUCTION) != 0);
-#else
+# else
   noise_ena = 0;
-#endif
+# endif
 }
+
+#endif
 
 /*
  * Reset video settings.
@@ -482,10 +537,12 @@ void control_reset(void) {
     set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.default_contrast);
     config_update_num("gui.vo_contrast", -1);
   }
+#ifdef XINE_PARAM_VO_GAMMA
   if(gamma_ena) {
     set_current_param(XINE_PARAM_VO_GAMMA, gGui->video_settings.default_gamma);
     config_update_num("gui.vo_gamma", -1);
   }
+#endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   if(sharp_ena) {
     set_current_param(XINE_PARAM_VO_SHARPNESS, gGui->video_settings.default_sharpness);
@@ -582,6 +639,7 @@ void control_config_register(void) {
     }
   }
 
+#ifdef XINE_PARAM_VO_GAMMA
   if(gamma_ena) {
     gGui->video_settings.gamma =
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_gamma",
@@ -600,6 +658,7 @@ void control_config_register(void) {
       gGui->video_settings.gamma = get_current_param(XINE_PARAM_VO_GAMMA);
     }
   }
+#endif
 
 #ifdef XINE_PARAM_VO_SHARPNESS
   if(sharp_ena) {
@@ -1103,9 +1162,11 @@ void control_panel(void) {
     xitk_disable_widget(control->contr);
 
     /* GAMMA */
+#ifdef XINE_PARAM_VO_GAMMA
     if (gamma_ena)
       cur = get_current_param(XINE_PARAM_VO_GAMMA);
     else
+#endif
       cur = CONTROL_MIN;
 
     sl.skin_element_name = "SliderCtlGamma";
@@ -1133,10 +1194,9 @@ void control_panel(void) {
     if (sharp_ena)
       cur = get_current_param(XINE_PARAM_VO_SHARPNESS);
     else
-      cur = CONTROL_MIN;
-#else
-    cur = CONTROL_MIN;
 #endif
+      cur = CONTROL_MIN;
+
     sl.skin_element_name = "SliderCtlSharp";
     sl.min               = CONTROL_MIN;
     sl.max               = CONTROL_MAX;
@@ -1162,10 +1222,9 @@ void control_panel(void) {
     if (noise_ena)
       cur = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
     else
-      cur = CONTROL_MIN;
-#else
-    cur = CONTROL_MIN;
 #endif
+      cur = CONTROL_MIN;
+
     sl.skin_element_name = "SliderCtlNoise";
     sl.min               = CONTROL_MIN;
     sl.max               = CONTROL_MAX;
