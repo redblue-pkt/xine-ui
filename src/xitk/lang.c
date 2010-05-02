@@ -502,7 +502,7 @@ const langs_t *get_lang(void) {
   
   if(lcmsg) {
     const langs_t *l;
-    for(l = _langs; l->lang != NULL; l++) {
+    for(l = _langs; l->lang[0]; l++) {
       if(!strncasecmp(l->lang, lcmsg, strlen(lcmsg))) {
 	return l;
       }
