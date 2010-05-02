@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-03-06 01:35+0000\n"
+"POT-Creation-Date: 2010-05-02 14:34+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Marcelo Roberto Jimenez <mroberto@cetuc.puc-rio.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
@@ -88,23 +88,23 @@ msgstr "My Fucking Window"
 msgid "Quit"
 msgstr "Sair"
 
-#: src/xitk/xine-toolkit/window.c:1098
+#: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1176 src/xitk/xine-toolkit/window.c:1417
+#: src/xitk/xine-toolkit/window.c:1178 src/xitk/xine-toolkit/window.c:1419
 msgid "Question?"
 msgstr "Pergunta?"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "Yes"
 msgstr "Sim"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "No"
 msgstr "Não"
 
-#: src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1571
 msgid "Cancel"
 msgstr "Cancela"
 

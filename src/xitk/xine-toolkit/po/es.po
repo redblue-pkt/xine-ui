@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-03-06 01:35+0000\n"
+"POT-Creation-Date: 2010-05-02 14:34+0100\n"
 "PO-Revision-Date: 2007-04-26 23:05+0200\n"
 "Last-Translator: Carlos E. Robinson <carloser@users.sourceforge.net>\n"
 "Language-Team: Spanish\n"
@@ -93,23 +93,23 @@ msgstr "Mi jodida ventana"
 msgid "Quit"
 msgstr "Salir"
 
-#: src/xitk/xine-toolkit/window.c:1098
+#: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
 msgstr "Aceptar"
 
-#: src/xitk/xine-toolkit/window.c:1176 src/xitk/xine-toolkit/window.c:1417
+#: src/xitk/xine-toolkit/window.c:1178 src/xitk/xine-toolkit/window.c:1419
 msgid "Question?"
 msgstr "¿Pregunta?"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "Yes"
 msgstr "Sí"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1571
 msgid "Cancel"
 msgstr "Cancelar"
 
