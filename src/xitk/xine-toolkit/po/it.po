@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-03-06 01:35+0000\n"
+"POT-Creation-Date: 2010-05-02 14:34+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>\n"
 "Language-Team: Italian\n"
@@ -94,23 +94,23 @@ msgstr "La mia finestra"
 msgid "Quit"
 msgstr "Esci"
 
-#: src/xitk/xine-toolkit/window.c:1098
+#: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1176 src/xitk/xine-toolkit/window.c:1417
+#: src/xitk/xine-toolkit/window.c:1178 src/xitk/xine-toolkit/window.c:1419
 msgid "Question?"
 msgstr "Domande?"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "Yes"
 msgstr "Sì"
 
-#: src/xitk/xine-toolkit/window.c:1347 src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1569
+#: src/xitk/xine-toolkit/window.c:1571
 msgid "Cancel"
 msgstr "Annulla"
 
