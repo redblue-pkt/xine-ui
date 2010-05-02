@@ -1222,14 +1222,24 @@ void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
 void gui_change_spu_channel(xitk_widget_t *w, void *data) {
   int dir = (int)(intptr_t)data;
   int channel;
+  int maxchannel;
   
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+  maxchannel = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_MAX_SPU_CHANNEL);
+
+  /* maxchannel will always be 0 or higher, which means there's no way to tell if 
+   * a stream is SPU-less */
 
   if(dir == GUI_NEXT)
     channel++;
   else if(dir == GUI_PREV)
     channel--;
-  
+
+  if (channel > maxchannel)
+    channel = -2; /* -2 == off, -1 == auto, 0 == 1st channel */
+  else if (channel < -2)
+    channel = maxchannel;
+
   gui_direct_change_spu_channel(w, data, channel);
 }
 
