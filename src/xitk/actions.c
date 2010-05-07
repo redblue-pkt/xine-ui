@@ -1227,8 +1227,12 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
   maxchannel = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_MAX_SPU_CHANNEL);
 
-  /* maxchannel will always be 0 or higher, which means there's no way to tell if 
-   * a stream is SPU-less */
+  if (xine_get_status(gGui->spu_stream) != XINE_STATUS_IDLE) /* if we have a slave SPU channel, take it into account */
+    maxchannel += xine_get_stream_info(gGui->spu_stream, XINE_STREAM_INFO_MAX_SPU_CHANNEL);
+
+  /* XINE_STREAM_INFO_MAX_SPU_CHANNEL actually returns the number of available spu channels, i.e. 
+   * 0 means no SPUs, 1 means 1 SPU channel, etc. */
+  --maxchannel;
 
   if(dir == GUI_NEXT)
     channel++;
