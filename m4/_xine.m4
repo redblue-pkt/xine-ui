@@ -187,11 +187,11 @@ AC_DEFUN([XINE_LIB_SHIMS],
     CFLAGS="$CFLAGS $XINE_CFLAGS"
     LIBS="$LIBS $XINE_LIBS"
     AC_LINK_IFELSE(
-	[AC_LANG_PROGRAM([[#include <xine/xmlparser.h>]],
-			 [[xml_parser_init_r ((void *)0, 0, XML_PARSER_CASE_INSENSITIVE);]])],
-	[AC_DEFINE([[HAVE_XML_PARSER_REENTRANT]], [[1]], [[Define if xml_parser_init_r etc. are available]])
-	 AC_MSG_RESULT([[yes]])],
-	[AC_MSG_RESULT([[no]])])
+	[AC_LANG_PROGRAM([#include <xine/xmlparser.h>],
+			 [xml_parser_init_r ((void *)0, 0, XML_PARSER_CASE_INSENSITIVE);])],
+	[AC_DEFINE([HAVE_XML_PARSER_REENTRANT], [1], [Define if xml_parser_init_r etc. are available])
+	 AC_MSG_RESULT([yes])],
+	[AC_MSG_RESULT([no])])
     CFLAGS="$tmp_CFLAGS"
     LIBS="$tmp_LIBS"
     ])
