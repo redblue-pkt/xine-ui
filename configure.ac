@@ -648,7 +648,7 @@ dnl
 dnl Use whichever splash & logo happen to be present.
 dnl JPEG is preferred, then PNG then, for the logo, MPV.
 dnl
-SOURCE_SPLASH="${SOURCE_SPLASH:-`cat misc/splash`}"
+SOURCE_SPLASH="${SOURCE_SPLASH:-`cat "${srcdir}${srcdir:+/}misc/splash"`}"
 AC_SUBST([SOURCE_SPLASH])
 
 dnl XINE_LOCATE_MEDIA(variable, extns, pref. extn, leafname, purpose, comment)
@@ -657,15 +657,15 @@ AC_DEFUN([XINE_LOCATE_MEDIA],
   $1=''
   for i in $2; do
     ac_cv_xine_media_file="misc/splash-${SOURCE_SPLASH}/$4.$i"
-    if test -f "$ac_cv_xine_media_file"; then
+    if test -f "${srcdir}${srcdir:+/}$ac_cv_xine_media_file"; then
       $1="$XINE_SKINDIR/$4.$i"
       break
     fi
   done
   if test "$[]$1" = ''; then
     $1="$XINE_SKINDIR/$4.$3"
-    ac_cv_xine_media_file="misc/splash-default/$4.$3"
-    if ! test -f "$ac_cv_xine_media_file"; then
+    ac_cv_xine_media_file="/misc/splash-default/$4.$3"
+    if ! test -f "${srcdir}${srcdir:+/}$ac_cv_xine_media_file"; then
       AC_MSG_RESULT([no])
       AC_MSG_ERROR([Missing $5 image - need $4.* (any of $2)])
     fi
