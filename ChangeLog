@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Fix LIRC library detection (build time).
   * Fix a segfault which prevented the display of the help window.
   * Make building of fbxine optional (--with-fb; enabled by default).
   * "ToggleFullscreen" command takes an optional numeric parameter,

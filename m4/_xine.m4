@@ -39,21 +39,34 @@ AC_DEFUN([AC_CHECK_LIRC],
      AC_CHECK_LIB(lirc_client,lirc_init,
            [AC_CHECK_HEADER(lirc/lirc_client.h, true, have_lirc=no)], have_lirc=no)
      if test "$have_lirc" = "yes"; then
-
+        saved_CFLAGS=$CFLAGS
+        saved_LIBS=$LIBS
         if test x"$LIRC_PREFIX" != "x"; then
-           lirc_libprefix="$LIRC_PREFIX/lib"
 	   LIRC_INCLUDE="-I$LIRC_PREFIX/include"
         fi
-        for llirc in $lirc_libprefix /lib /usr/lib /usr/local/lib; do
-          AC_CHECK_FILE(["$llirc/liblirc_client.so"],
-             [LIRC_LIBS="$llirc/liblirc_client.so"
-              found_lirc=yes]
-             AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblirc_client) installed]),
-             AC_CHECK_FILE(["$llirc/liblirc_client.a"],
-                [LIRC_LIBS="$llirc/liblirc_client.a"
-                 found_lirc=yes],,)
-          )
+        AC_MSG_CHECKING([for liblircclient])
+        for type in "$shrext" .a; do
+          for lib in lib32 lib lib64; do
+            for llirc in "$LIRC_PREFIX/$lib" /$lib /usr/$lib /usr/local/$lib; do
+              CFLAGS="$saved_CFLAGS $LIRC_INCLUDE"
+              LIBS="$saved_LIBS $llirc/liblirc_client$type"
+              AC_LINK_IFELSE(
+                [AC_LANG_PROGRAM([#include <lirc/lirc_client.h>], [lirc_init("",0)])],
+                [LIRC_LIBS="$llirc/liblirc_client$type"
+                 found_lirc=yes]
+                AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblirc_client) installed]),
+              )
+              if test x"$found_lirc" = xyes; then break 3; fi
+            done
+          done
         done
+        CFLAGS=$saved_CFLAGS
+        LIBS=$saved_LIBS
+        if test x"$found_lirc" = xyes; then
+          AC_MSG_RESULT([$LIRC_LIBS])
+        else
+          AC_MSG_RESULT([no])
+        fi
      else
 	test $given = Y && AC_MSG_ERROR([LIRC client support requested but not available])
 	AC_MSG_RESULT([*** LIRC client support not available, LIRC support will be disabled ***])
