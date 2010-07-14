@@ -52,9 +52,10 @@ static const xitk_mrlbrowser_filter_t __mrl_filters[] = {
   { "*.mp3"               , "mp3"          }, /* mp3 */
   { "*.asf, *.wmv"        , "asf,wmv"      }, /* asf */
   { "*.cpk, *.cak, *.film", "cpk,cak,film" }, /* film */
-  { "*.ogg"               , "ogg"          }, /* ogg */
+  { "*.ogg, *.ogm, *.ogv" , "ogg"          }, /* ogg */
   { "*.vdr"               , "vdr"          }, /* pes */
   { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"   }, /* QT */
+  { "*.m4a, *.m4b"        , "mp4 audio"    }, /* QT (audio) */
   { "*.roq"               , "roq"          }, /* roq */
   { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"   }, /* ts */
   { "*.rmvb"              , "rmvb"         }, /* rmvb */
