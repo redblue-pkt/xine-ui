@@ -1020,10 +1020,14 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_GAMMACONTROLp:
+#ifdef XINE_PARAM_VO_GAMMA
     control_inc_image_prop(XINE_PARAM_VO_GAMMA);
+#endif
     break;
   case ACTID_GAMMACONTROLm:
+#ifdef XINE_PARAM_VO_GAMMA
     control_dec_image_prop(XINE_PARAM_VO_GAMMA);
+#endif
     break;
 
   case ACTID_SHARPNESSCONTROLp:
