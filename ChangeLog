@@ -1,6 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Set combo box menu windows' override-redirect flags.
   * MRL browser recognises a few more extensions.
   * Fix LIRC library detection (build time).
   * Fix a segfault which prevented the display of the help window.
