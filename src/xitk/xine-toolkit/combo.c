@@ -572,6 +572,16 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 							(itemw + 2), (itemh * 5) + slidw + 2);
   XLOCK(c->imlibdata->x.disp);
 
+  {
+    XSetWindowAttributes attr;
+    attr.override_redirect = True;
+    XLOCK (c->imlibdata->x.disp);
+    XChangeWindowAttributes (c->imlibdata->x.disp,
+			     (xitk_window_get_window(private_data->xwin)),
+			     CWOverrideRedirect, &attr);
+    XUNLOCK (c->imlibdata->x.disp);
+  }
+
   if(c->layer_above) {
     XA_WIN_LAYER = XInternAtom(c->imlibdata->x.disp, "_WIN_LAYER", False);
     
