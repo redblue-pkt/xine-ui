@@ -700,7 +700,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
     video_window_set_visibility(0);
   
   tvout_deinit(gGui->tvout);
-  video_window_exit();
 
 #ifdef HAVE_XF86VIDMODE
   /* just in case a different modeline than the original one is running,
@@ -747,6 +746,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_close_audio_driver(__xineui_global_xine_instance, gGui->ao_port);
   if(gGui->ao_none)
     xine_close_audio_driver(__xineui_global_xine_instance, gGui->ao_none);
+
+  video_window_exit();
 
   xine_exit(__xineui_global_xine_instance); 
 
