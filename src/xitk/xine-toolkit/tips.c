@@ -28,7 +28,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <sys/time.h>
-
+#include <errno.h>
 #include <X11/Xlib.h>
 
 #include "_xitk.h"
@@ -51,28 +51,52 @@ static struct {
   pthread_cond_t       prewait_cond;
 } tips;
 
+static struct timespec _compute_interval(unsigned int millisecs) {
+  struct timespec ts;
+#if _POSIX_TIMERS > 0
+  clock_gettime(CLOCK_REALTIME, &ts);
+  uint64_t ttimer = (uint64_t)ts.tv_sec*1000 + ts.tv_nsec/1000000 + millisecs;
+  ts.tv_sec = ttimer/1000;
+  ts.tv_nsec = (ttimer%1000)*1000000;
+#else
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  uint64_t ttimer = (uint64_t)tv.tv_sec*1000 + tv.tv_usec/1000 + millisecs;
+  ts.tv_sec = ttimer/1000;
+  ts.tv_nsec = (ttimer%1000)*1000000;
+#endif
+  return ts;
+}
+
+
 static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
   tips.running = 1;
   pthread_mutex_lock(&tips.mutex);
   
   while(tips.running) {
-    struct timeval       tv;
     struct timespec      ts;
 
     /* Wait for a new tip to show */
-    if(!tips.new_widget)
-      pthread_cond_wait(&tips.new_cond, &tips.mutex);
+    if(!tips.new_widget) {
+      while (tips.running) {
+	ts = _compute_interval(1000);
+	if (pthread_cond_timedwait(&tips.new_cond, &tips.mutex, &ts) != ETIMEDOUT)
+	  break;
+      }
+    }
+
+    /* Exit if we're quitting */
+    if (!tips.running)
+      break;
 
     /* Start over if nothing */
     if(!tips.new_widget)
       continue;
     
     tips.prewait = 1;
-    
-    gettimeofday(&tv, NULL);
-    ts.tv_sec  = tv.tv_sec + (tv.tv_usec + 500000) / 1000000;
-    ts.tv_nsec = ((tv.tv_usec + 500000) % 1000000) * 1000;
+
+    ts = _compute_interval(500);
     
     pthread_cond_timedwait(&tips.prewait_cond, &tips.mutex, &ts);
     
@@ -191,11 +215,8 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       XMapRaised(tips.display, (xitk_window_get_window(xwin)));
       XUNLOCK(tips.display);
 
-      gettimeofday(&tv, NULL);
-      /* We round to ms instead of us (tips_timeout is ms anyway) to get out most of an int */
-      ts.tv_sec  = tv.tv_sec + ((tv.tv_usec + 500) / 1000 + tips.widget->tips_timeout) / 1000;
-      ts.tv_nsec = (((tv.tv_usec + 500) / 1000 + tips.widget->tips_timeout) % 1000) * 1000000;
-      
+      ts = _compute_interval(tips.widget->tips_timeout);
+
       pthread_cond_timedwait(&tips.timer_cond, &tips.mutex, &ts);
 
       xitk_window_destroy_window(tips.widget->imlibdata, xwin);
