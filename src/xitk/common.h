@@ -380,7 +380,20 @@ typedef struct {
 
   FILE                      *orig_stdout; /* original stdout at startup        */
                                           /* before an evtl. later redirection */
+
+  /*
+   * there are several threads that call gui_exit() and cause all sorts of
+   * deadlocks and memory corruption, so only a whole redesign could fix that
+   * introducing a new independent thread for executing that code seems easier
+   */
+  pthread_mutex_t            gui_exit_handler_mutex;
+  pthread_cond_t             gui_exit_handler_cond;
+  pthread_t                  gui_exit_handler_thread;
+  int                        gui_exit_handler_fired;
+  
 } gGui_t;
+
+int gui_fire_exit_handler(void);
 
 extern gGui_t *gGui;
 
