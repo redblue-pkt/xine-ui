@@ -137,7 +137,7 @@ struct xitk_widget_list_s {
 #if 1
 
 static int displ;
-#define XLOCK(DISP) {                                                         \
+#define XLOCK(DISP) do {                                                      \
     int i;                                                                    \
     displ++;                                                                  \
     for(i = 0; i < displ; i++) printf("%d",i);                                \
@@ -147,9 +147,9 @@ static int displ;
     XLockDisplay(DISP);                                                       \
     printf(" %s: %s(%d) got the lock\n",                                      \
            __FILE__, __FUNCTION__, __LINE__);                                 \
-  }
+  } while (0)
 
-#define XUNLOCK(DISP) {                                                       \
+#define XUNLOCK(DISP) do {                                                    \
     int i;                                                                    \
     for(i = 0; i < displ; i++) printf("%d",i);                                \
     displ--;                                                                  \
@@ -157,37 +157,33 @@ static int displ;
            __FILE__, __FUNCTION__, __LINE__);                                 \
     fflush(stdout);                                                           \
     XUnlockDisplay(DISP);                                                     \
-  }
+  } while (0)
 
 #else
 
-#define XLOCK(DISP) {                                                         \
+#define XLOCK(DISP) do {                                                      \
     printf("%s: %s(%d) XLockDisplay (%d)\n",                                  \
            __FILE__, __FUNCTION__, __LINE__, DISP);                           \
     fflush(stdout);                                                           \
     XLockDisplay(DISP);                                                       \
     printf("%s: %s(%d) got the lock (%d)\n",                                  \
            __FILE__, __FUNCTION__, __LINE__, DISP);                           \
-  }
+  } while (0)
 
-#define XUNLOCK(DISP) {                                                       \
+#define XUNLOCK(DISP) do {                                                    \
     printf("%s: %s(%d) XUnlockDisplay (%d)\n",                                \
            __FILE__, __FUNCTION__, __LINE__, DISP);                           \
     fflush(stdout);                                                           \
     XUnlockDisplay(DISP);                                                     \
-  }
+  } while (0)
 
 #endif
 
 #else
 
-#define XLOCK(DISP) {                                                         \
-    XLockDisplay(DISP);                                                       \
-  }
+#define XLOCK(DISP) XLockDisplay(DISP)
 
-#define XUNLOCK(DISP) {                                                       \
-    XUnlockDisplay(DISP);                                                     \
-  }
+#define XUNLOCK(DISP) XUnlockDisplay(DISP)
 
 #endif
 
