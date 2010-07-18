@@ -254,6 +254,10 @@ void xitk_usec_sleep(unsigned long usec) {
 #endif
 }
 
+static int _x_ignoring_error_handler(Display *display, XErrorEvent *xevent) {
+  return 0;
+}
+
 static int _x_error_handler(Display *display, XErrorEvent *xevent) {
   char buffer[2048];
   
@@ -2103,8 +2107,15 @@ void xitk_stop(void) {
   xitk_cursors_deinit(gXitk->display);
   gXitk->running = 0;
 
-  if(gXitk->parent.window != None)
+  if(gXitk->parent.window != None) {
+    int (*previous_error_handler)(Display *, XErrorEvent *);
+    XSync(gXitk->display, False);
+    /* don't care about BadWindow when the focussed window is gone already */
+    previous_error_handler = XSetErrorHandler(_x_ignoring_error_handler);
     XSetInputFocus(gXitk->display, gXitk->parent.window, gXitk->parent.focus, CurrentTime);
+    XSync(gXitk->display, False);
+    XSetErrorHandler(previous_error_handler);
+  }
 }
  
 char *xitk_get_system_font(void) {
