@@ -99,11 +99,12 @@ int                 close_helper(FILE *);
 #define INDEX_RGB(r,g,b)  id->fast_rgb[(r<<10)|(g<<5)|(b)]
 #define COLOR_INDEX(i)    id->palette[i].pixel
 #define COLOR_RGB(r,g,b)  id->palette[INDEX_RGB(r,g,b)].pixel
-#define ERROR_RED(rr,i)   rr-id->palette[i].r;
-#define ERROR_GRN(gg,i)   gg-id->palette[i].g;
-#define ERROR_BLU(bb,i)   bb-id->palette[i].b;
+#define ERROR_RED(rr,i)   rr-id->palette[i].r
+#define ERROR_GRN(gg,i)   gg-id->palette[i].g
+#define ERROR_BLU(bb,i)   bb-id->palette[i].b
 
 #define DITHER_ERROR(Der1,Der2,Dex,Der,Deg,Deb) \
+  do {\
      ter=&(Der1[Dex]);\
      (*ter)+=(Der*7)>>4;ter++;\
      (*ter)+=(Deg*7)>>4;ter++;\
@@ -117,4 +118,5 @@ int                 close_helper(FILE *);
      (*ter)+=(Deb*5)>>4;ter++;\
      (*ter)+=Der>>4;ter++;\
      (*ter)+=Deg>>4;ter++;\
-     (*ter)+=Deb>>4;
+     (*ter)+=Deb>>4; \
+  } while (0)
