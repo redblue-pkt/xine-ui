@@ -1374,6 +1374,54 @@ typedef struct {
 
   }
 }
+
+static void *gui_exit_handler(void *arg)
+{
+  int fired;
+
+  pthread_mutex_lock(&gGui->gui_exit_handler_mutex);
+  pthread_cond_wait(&gGui->gui_exit_handler_cond, &gGui->gui_exit_handler_mutex);
+  fired = gGui->gui_exit_handler_fired;
+  pthread_mutex_unlock(&gGui->gui_exit_handler_mutex);
+
+  if (fired)
+    gui_exit(NULL, NULL);
+
+  return NULL;
+}
+
+static void gui_fork_exit_handler(void)
+{
+  gGui->gui_exit_handler_fired = 0;
+  pthread_mutex_init(&gGui->gui_exit_handler_mutex, NULL);
+  pthread_cond_init(&gGui->gui_exit_handler_cond, NULL);
+  pthread_create(&gGui->gui_exit_handler_thread, NULL, gui_exit_handler, NULL);
+}
+
+int gui_fire_exit_handler(void)
+{
+  if (pthread_self() == gGui->gui_exit_handler_thread)
+    return 0;
+
+  pthread_mutex_lock(&gGui->gui_exit_handler_mutex);
+  gGui->gui_exit_handler_fired = 1;
+  pthread_cond_broadcast(&gGui->gui_exit_handler_cond);
+  pthread_mutex_unlock(&gGui->gui_exit_handler_mutex);
+
+  return 1;
+}
+
+static void gui_join_exit_handler(void)
+{
+  pthread_mutex_lock(&gGui->gui_exit_handler_mutex);
+  pthread_cond_broadcast(&gGui->gui_exit_handler_cond);
+  pthread_mutex_unlock(&gGui->gui_exit_handler_mutex);
+
+  pthread_join(gGui->gui_exit_handler_thread, NULL);
+
+  pthread_cond_destroy(&gGui->gui_exit_handler_cond);
+  pthread_mutex_destroy(&gGui->gui_exit_handler_mutex);
+}
   
 /*
  *
@@ -2070,6 +2118,7 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
+  gui_fork_exit_handler();
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
 
   pthread_mutex_init(&gGui->download_mutex, NULL);
@@ -2275,6 +2324,7 @@ int main(int argc, char *argv[]) {
   }
 
   gui_run(session_argv);
+  gui_join_exit_handler();
 
   visual_anim_done();
   free(pplugins);
