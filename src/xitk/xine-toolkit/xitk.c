@@ -63,30 +63,30 @@ extern char **environ;
 #ifdef TRACE_LOCKS
 static int ml = 0;
 #define MUTLOCK()                                                             \
-  {                                                                           \
+  do {                                                                        \
     int i;                                                                    \
     ml++;                                                                     \
     for(i=0; i<ml; i++) printf(".");                                          \
     printf("LOCK\n");                                                         \
     pthread_mutex_lock(&gXitk->mutex);                                        \
-  }
+  } while (0)
 
 #define MUTUNLOCK()                                                           \
-  {                                                                           \
+  do {                                                                           \
     int i;                                                                    \
     for(i=0; i<ml; i++) printf(".");                                          \
     printf("UNLOCK\n");                                                       \
     ml--;                                                                     \
     pthread_mutex_unlock(&gXitk->mutex);                                      \
-  }
+  } while (0)
 
 #else
-#define MUTLOCK()   { pthread_mutex_lock(&gXitk->mutex); }
-#define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
+#define MUTLOCK()   pthread_mutex_lock(&gXitk->mutex)
+#define MUTUNLOCK() pthread_mutex_unlock(&gXitk->mutex)
 #endif
 
-#define FXLOCK(_fx) { pthread_mutex_lock(&_fx->mutex); }
-#define FXUNLOCK(_fx) { pthread_mutex_unlock(&_fx->mutex); }
+#define FXLOCK(_fx) pthread_mutex_lock(&_fx->mutex)
+#define FXUNLOCK(_fx) pthread_mutex_unlock(&_fx->mutex)
 
 
 typedef struct {
