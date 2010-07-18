@@ -174,6 +174,12 @@ static Atom XA_WM_WINDOW_TYPE_MENU = None;
 static Atom XA_WM_WINDOW_TYPE_UTILITY = None;
 static Atom XA_WM_WINDOW_TYPE_SPLASH = None;
 static Atom XA_WM_WINDOW_TYPE_DIALOG = None;
+static Atom XA_WM_WINDOW_TYPE_DROPDOWN_MENU = None;
+static Atom XA_WM_WINDOW_TYPE_POPUP_MENU = None;
+static Atom XA_WM_WINDOW_TYPE_TOOLTIP = None;
+static Atom XA_WM_WINDOW_TYPE_NOTIFICATION = None;
+static Atom XA_WM_WINDOW_TYPE_COMBO = None;
+static Atom XA_WM_WINDOW_TYPE_DND = None;
 static Atom XA_WM_WINDOW_TYPE_NORMAL = None;
 
 void widget_stop(void);
@@ -578,15 +584,21 @@ static uint32_t xitk_check_wm(Display *display) {
     XA_NET_WM_STATE_ABOVE      = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
     XA_NET_WM_STATE_FULLSCREEN = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
 
-    XA_WM_WINDOW_TYPE          = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
-    XA_WM_WINDOW_TYPE_DESKTOP  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DESKTOP", False);
-    XA_WM_WINDOW_TYPE_DOCK     = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", False);
-    XA_WM_WINDOW_TYPE_TOOLBAR  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLBAR", False);
-    XA_WM_WINDOW_TYPE_MENU     = XInternAtom(display, "_NET_WM_WINDOW_TYPE_MENU", False);
-    XA_WM_WINDOW_TYPE_UTILITY  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
-    XA_WM_WINDOW_TYPE_SPLASH   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", False);
-    XA_WM_WINDOW_TYPE_DIALOG   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-    XA_WM_WINDOW_TYPE_NORMAL   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+    XA_WM_WINDOW_TYPE               = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
+    XA_WM_WINDOW_TYPE_DESKTOP       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DESKTOP", False);
+    XA_WM_WINDOW_TYPE_DOCK          = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", False);
+    XA_WM_WINDOW_TYPE_TOOLBAR       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLBAR", False);
+    XA_WM_WINDOW_TYPE_MENU          = XInternAtom(display, "_NET_WM_WINDOW_TYPE_MENU", False);
+    XA_WM_WINDOW_TYPE_UTILITY       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+    XA_WM_WINDOW_TYPE_SPLASH        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", False);
+    XA_WM_WINDOW_TYPE_DIALOG        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+    XA_WM_WINDOW_TYPE_DROPDOWN_MENU = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU", False);
+    XA_WM_WINDOW_TYPE_POPUP_MENU    = XInternAtom(display, "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
+    XA_WM_WINDOW_TYPE_TOOLTIP       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
+    XA_WM_WINDOW_TYPE_NOTIFICATION  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NOTIFICATION", False);
+    XA_WM_WINDOW_TYPE_COMBO         = XInternAtom(display, "_NET_WM_WINDOW_TYPE_COMBO", False);
+    XA_WM_WINDOW_TYPE_DND           = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DND", False);
+    XA_WM_WINDOW_TYPE_NORMAL        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
   }
   
   switch(type & WM_TYPE_COMP_MASK) {
@@ -897,6 +909,24 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
       break;
     case WINDOW_TYPE_DIALOG:
       atom = &XA_WM_WINDOW_TYPE_DIALOG;
+      break;
+    case WINDOW_TYPE_DROPDOWN_MENU:
+      atom = &XA_WM_WINDOW_TYPE_DROPDOWN_MENU;
+      break;
+    case WINDOW_TYPE_POPUP_MENU:
+      atom = &XA_WM_WINDOW_TYPE_POPUP_MENU;
+      break;
+    case WINDOW_TYPE_TOOLTIP:
+      atom = &XA_WM_WINDOW_TYPE_TOOLTIP;
+      break;
+    case WINDOW_TYPE_NOTIFICATION:
+      atom = &XA_WM_WINDOW_TYPE_NOTIFICATION;
+      break;
+    case WINDOW_TYPE_COMBO:
+      atom = &XA_WM_WINDOW_TYPE_COMBO;
+      break;
+    case WINDOW_TYPE_DND:
+      atom = &XA_WM_WINDOW_TYPE_DND;
       break;
     case WINDOW_TYPE_NORMAL:
       atom = &XA_WM_WINDOW_TYPE_NORMAL;
