@@ -1425,7 +1425,7 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
 
 #ifdef DEBUG_SMIL
 static int offset = 0;
-#define palign {int i; for(i = 0; i < offset; i++) { printf(" "); } } while(0)
+#define palign do { int i; for(i = 0; i < offset; i++) { printf(" "); } } while(0)
 #endif
 
 typedef struct smil_node_s smil_node_t;

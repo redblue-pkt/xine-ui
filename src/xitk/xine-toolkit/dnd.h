@@ -84,7 +84,7 @@ typedef struct {
 #define XDND_STATUS_RECT_Y(e)		((e)->xclient.data.l[2] & 0xFFFFL)
 #define XDND_STATUS_RECT_WIDTH(e)	((e)->xclient.data.l[3] >> 16)
 #define XDND_STATUS_RECT_HEIGHT(e)	((e)->xclient.data.l[3] & 0xFFFFL)
-#define XDND_STATUS_RECT_SET(e,x,y,w,h)	{(e)->xclient.data.l[2] = ((x) << 16) | ((y) & 0xFFFFUL); (e)->xclient.data.l[3] = ((w) << 16) | ((h) & 0xFFFFUL); }
+#define XDND_STATUS_RECT_SET(e,x,y,w,h)	do {(e)->xclient.data.l[2] = ((x) << 16) | ((y) & 0xFFFFUL); (e)->xclient.data.l[3] = ((w) << 16) | ((h) & 0xFFFFUL); } while (0)
 #define XDND_STATUS_ACTION(e)		((e)->xclient.data.l[4])
 
 /* XdndLeave */
