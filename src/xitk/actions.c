@@ -648,9 +648,6 @@ int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub) {
  */
 void gui_exit (xitk_widget_t *w, void *data) {
 
-  if (gui_fire_exit_handler())
-    return;
-
   oxine_exit();
 
   if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
