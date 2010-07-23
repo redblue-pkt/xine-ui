@@ -1196,25 +1196,7 @@ void video_window_frame_output_cb (void *data,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
 
-  int ms_timeout = 5;
-  struct timespec timeout;
-  struct timeval now;
-  gettimeofday(&now, 0);
-
-  timeout.tv_sec  = now.tv_sec + ms_timeout / 1000;
-  timeout.tv_nsec = now.tv_usec * 1000 + (ms_timeout % 1000) * 1e6;
-
-  if (timeout.tv_nsec > 1e9)
-  {
-    timeout.tv_nsec -= 1e9;
-    timeout.tv_sec++;
-  }
-
-  /* if this callback happens while we are about to change the drawable
-   * then we'll deadlock here. Using a timed lock of 5 ms avoids this.
-   */
-  if (0 != pthread_mutex_timedlock(&gVw.mutex, &timeout))
-    return;
+  pthread_mutex_lock(&gVw.mutex);
 
   gVw.frame_width = video_width;
   gVw.frame_height = video_height;
