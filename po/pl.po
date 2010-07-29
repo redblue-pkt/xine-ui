@@ -1814,7 +1814,7 @@ msgstr "W³±cz korektê przeplotu automatycznie"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "Wtyczka koretky przeplotu zostanie w³±czona przy starcie. Strumienie "
 "progresywne s± wykrywane automatycznie bez ¿adnego wp³ywu na wydajno¶æ."

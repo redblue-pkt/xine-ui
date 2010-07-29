@@ -1221,7 +1221,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 #endif
 
       default:
-	strlcpy(buffer, _("*sight*, unkown error."), sizeof(buffer));
+	strlcpy(buffer, _("*sight*, unknown error."), sizeof(buffer));
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s %s)", (char *) data + data->explanation, (char *) data + data->parameters);
 	break;
@@ -2056,7 +2056,7 @@ int main(int argc, char *argv[]) {
     xine_config_register_bool(__xineui_global_xine_instance, "gui.deinterlace_by_default", 0,
 			      _("Enable deinterlacing by default"),
 			      _("Deinterlace plugin will be enabled on "
-			        "startup. Progressive streams are automaticaly "
+			        "startup. Progressive streams are automatically "
 			        "detected with no performance penalty."), 
 			        CONFIG_LEVEL_BEG,
 			        NULL,
