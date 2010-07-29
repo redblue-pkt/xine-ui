@@ -580,7 +580,7 @@ Ka¿da linia okre¶la dodatkowy argument lini poleceñ (jeden argument na liniê):
 \-p
 .fi
 .SH ZOBACZ RÓWNIE¿
-\fBxine-remote\fP(1).
+\fBxine\-remote\fP(1).
 .br
 Program jest w pe³ni udokumentowany na stronie domowej projektu xine:
 .UR http://xine.sourceforge.net/
