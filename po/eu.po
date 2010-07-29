@@ -1823,7 +1823,7 @@ msgstr "Gaitu elkar-ezloturikoa lehetsi bezala"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "Elkar-ezloturiko plugin-a gaiturik egongo da abiaraztean. Korronte "
 "progrsiboak automatikoki atzemanak izango dira errendimendua jeitsi gabe."

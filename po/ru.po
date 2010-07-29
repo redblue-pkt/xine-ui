@@ -1849,7 +1849,7 @@ msgstr "Включить деинтерлейсинг по умолчанию"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "При запуске будет включён плагин деинтерлейсинга. Прогрессивные потоки "
 "определяются автоматически без ущерба для производительности."

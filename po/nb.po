@@ -1810,7 +1810,7 @@ msgstr "Aktiver avfletting som standard"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "Avflettingstilleggene aktiveres ved oppstart. Progressive strømmer oppdages "
 "automatisk uten redusert ytelse."

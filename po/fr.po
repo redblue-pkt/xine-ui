@@ -1874,7 +1874,7 @@ msgstr "Mise en fonction de désentrelacement par defaut"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "Le plugin de désentrelacement sera mis en fonction au demarrage. Les flux "
 "progressifs sont automatiquement détectés sans pénalisé les performances."

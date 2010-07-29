@@ -1788,7 +1788,7 @@ msgstr "Povoli» odprekladanie ako default"
 #: src/xitk/main.c:2058
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
-"automaticaly detected with no performance penalty."
+"automatically detected with no performance penalty."
 msgstr ""
 "Odprekladanie (plugin) bude povolený pri ¹tarte. Progressive prúdy sú "
 "automaticky detekované bez straty výkonu."
