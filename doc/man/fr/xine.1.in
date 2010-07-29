@@ -301,7 +301,7 @@ Ne recharge pas l'ancienne liste de lecture. La liste de lecture est sauvée quan
 Charge un ou plusieurs plugin(s) de post-traitement. Les paramètres sont séparés par des virgules. Cette option peut être utilisée plus d'une fois afin de chainer deux ou plusieurs plugins de post-traitement vidéo. Vous pouvez specifier deux (et plus) plugins, séparés par un point-virgule ';'.
 .TP
 .BI \-\-disable\-post
-Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier un ou plusieurs plugins à utiliser, à l'aide de l'option de ligne de commande --post, mais en ne validant pas leurs effets.
+Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier un ou plusieurs plugins à utiliser, à l'aide de l'option de ligne de commande \-\-post, mais en ne validant pas leurs effets.
 .TP
 .BI \-\-no\-splash
 N'affiche las l'écran splash.
@@ -317,7 +317,7 @@ Affiche la liste des plugins disponibles. L'optionel \<\fItype\fP\> peut être:
 audio_out, video_out, demux, input, sub, post, audio_decoder, video_decoder
 .TP
 .BI \-\-bug\-report\ [=mrl]
-Met en fonction le mode de rapport de bogue. Il positionne le mode verbeux, collecte tout les messages et les écris dans un fichier nommé BUG-REPORT.TXT. Si \<\fImrl\fP\> est spécifié, xine jouera cette mrl puis quittera (comme le fais -pq).
+Met en fonction le mode de rapport de bogue. Il positionne le mode verbeux, collecte tout les messages et les écris dans un fichier nommé BUG\-REPORT.TXT. Si \<\fImrl\fP\> est spécifié, xine jouera cette mrl puis quittera (comme le fais \-pq).
 .LP
 Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
 par glisser-lacher.
@@ -427,19 +427,19 @@ Ajoute un mediamark depuis la lecture courante.
 .IP "\fBC\fP\-\fBe\fP"
 Edite le mediamark sélectionné.
 .IP "\fB\<Left\>\fP"
-Déplace la position courante de -60 secondes dans le flux en cours de lecture.
+Déplace la position courante de \-60 secondes dans le flux en cours de lecture.
 .IP "\fB\<Right\>\fP"
 Déplace la position courante de +60 secondes dans le flux en cours de lecture.
 .IP "\fBM\fP\-\fB\<Left\>\fP"
-Déplace la position courante de -30 secondes dans le flux en cours de lecture.
+Déplace la position courante de \-30 secondes dans le flux en cours de lecture.
 .IP "\fBM\fP\-\fB\<Right\>\fP"
 Déplace la position courante de +30 secondes dans le flux en cours de lecture.
 .IP "\fBC\fP\-\fB\<Left\>\fP"
-Déplace la position courante de -15 secondes dans le flux en cours de lecture.
+Déplace la position courante de \-15 secondes dans le flux en cours de lecture.
 .IP "\fBC\fP\-\fB\<Right\>\fP"
 Déplace la position courante de +15 secondes dans le flux en cours de lecture.
 .IP "\fBM3\fP\-\fB\<Left\>\fP"
-Déplace la position courante de -7 secondes dans le flux en cours de lecture.
+Déplace la position courante de \-7 secondes dans le flux en cours de lecture.
 IP "\fBM3\fP\-\fB\<Right\>\fP"
 Déplace la position courante de +7 secondes dans le flux en cours de lecture.
 .IP "\fBC\fP\-\fB0\fP"
