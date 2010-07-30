@@ -9,89 +9,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-05-02 14:34+0100\n"
+"POT-Creation-Date: 2010-07-30 20:35+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.10.1\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1162
 msgid "Select current entry"
 msgstr "Velg gjeldende oppføring"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1170
 msgid "Play selected entry"
 msgstr "Spill av valgte oppføring"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1181
 msgid "Close MRL browser window"
 msgstr "Lukk MRL-blavinduet"
-
-#: src/xitk/xine-toolkit/test.c:118
-#, c-format
-msgid "XInitThreads() failed.\n"
-msgstr "«XInitThreads()» feilet.\n"
-
-#: src/xitk/xine-toolkit/test.c:125
-#, c-format
-msgid "Cannot open display\n"
-msgstr "Klarte ikke åpne visningsenhet\n"
-
-#: src/xitk/xine-toolkit/test.c:139
-#, c-format
-msgid "Imlib_init_with_params() failed.\n"
-msgstr "«Imlib_init_with_params()» feilet.\n"
-
-#: src/xitk/xine-toolkit/test.c:378
-#, c-format
-msgid "New integer value is: %d. Confirm ?"
-msgstr "Ny heltallverdi er %d. Bekrefte?"
-
-#: src/xitk/xine-toolkit/test.c:430
-#, c-format
-msgid "New double value is: %e. Confirm ?"
-msgstr "Ny dobbelverdi er %e. Bekrefte?"
-
-#: src/xitk/xine-toolkit/test.c:532
-msgid "My Frame"
-msgstr "Mitt bilde"
-
-#: src/xitk/xine-toolkit/test.c:572
-msgid "A Label"
-msgstr "En etikett"
-
-#: src/xitk/xine-toolkit/test.c:632
-msgid "Fire !!"
-msgstr "Skyt!"
-
-#: src/xitk/xine-toolkit/test.c:663
-msgid "!BOOM!"
-msgstr "BANG!"
-
-#: src/xitk/xine-toolkit/test.c:755
-#, c-format
-msgid ""
-"New entries selected in combo box is:\n"
-"%s [%d]."
-msgstr ""
-"Nye oppføringer valgt i kombinasjonsboks er\n"
-"%s [%d]."
-
-#: src/xitk/xine-toolkit/test.c:962
-#, c-format
-msgid "init_test() failed\n"
-msgstr "«init_test()» feilet.\n"
-
-#: src/xitk/xine-toolkit/test.c:976
-msgid "My Fucking Window"
-msgstr "MItt jævla horevindu"
-
-#: src/xitk/xine-toolkit/test.c:1009
-msgid "Quit"
-msgstr "Avslutt"
 
 #: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
@@ -113,10 +51,10 @@ msgstr "Nei"
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: src/xitk/xine-toolkit/xitk.h:2225 src/xitk/xine-toolkit/xitk.h:2234
+#: src/xitk/xine-toolkit/xitk.h:2231 src/xitk/xine-toolkit/xitk.h:2240
 msgid "Error"
 msgstr "Feil"
 
-#: src/xitk/xine-toolkit/xitk.h:2228 src/xitk/xine-toolkit/xitk.h:2237
+#: src/xitk/xine-toolkit/xitk.h:2234 src/xitk/xine-toolkit/xitk.h:2243
 msgid "Information"
 msgstr "Informasjon"

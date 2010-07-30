@@ -8,89 +8,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-05-02 14:34+0100\n"
+"POT-Creation-Date: 2010-07-30 20:35+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1162
 msgid "Select current entry"
 msgstr "Hautatu aukeratutako sarrera"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1170
 msgid "Play selected entry"
 msgstr "Erreproduzitu aukeratutako sarrera"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1181
 msgid "Close MRL browser window"
 msgstr "Itxi MRL kudeatzaile leihoa"
-
-#: src/xitk/xine-toolkit/test.c:118
-#, c-format
-msgid "XInitThreads() failed.\n"
-msgstr "XInitThreads()-ek huts egin du.\n"
-
-#: src/xitk/xine-toolkit/test.c:125
-#, c-format
-msgid "Cannot open display\n"
-msgstr "Ezin da pantaila ireki\n"
-
-#: src/xitk/xine-toolkit/test.c:139
-#, c-format
-msgid "Imlib_init_with_params() failed.\n"
-msgstr "Imlib_init_with_params()-ek huts egin du.\n"
-
-#: src/xitk/xine-toolkit/test.c:378
-#, c-format
-msgid "New integer value is: %d. Confirm ?"
-msgstr "Zenbaki oso balio berria: %d. Berretsi?"
-
-#: src/xitk/xine-toolkit/test.c:430
-#, c-format
-msgid "New double value is: %e. Confirm ?"
-msgstr "Bikoitz balio berria: %e. Berretsi?"
-
-#: src/xitk/xine-toolkit/test.c:532
-msgid "My Frame"
-msgstr "Nire Markoa"
-
-#: src/xitk/xine-toolkit/test.c:572
-msgid "A Label"
-msgstr "Etiketa"
-
-#: src/xitk/xine-toolkit/test.c:632
-msgid "Fire !!"
-msgstr "Sua !!"
-
-#: src/xitk/xine-toolkit/test.c:663
-msgid "!BOOM!"
-msgstr "BOOM!"
-
-#: src/xitk/xine-toolkit/test.c:755
-#, c-format
-msgid ""
-"New entries selected in combo box is:\n"
-"%s [%d]."
-msgstr ""
-"Aukera zerrendan aukeratutako sarrera berriak:\n"
-"%s [%d]."
-
-#: src/xitk/xine-toolkit/test.c:962
-#, c-format
-msgid "init_test() failed\n"
-msgstr "init_test()-ek huts egin du.\n"
-
-#: src/xitk/xine-toolkit/test.c:976
-msgid "My Fucking Window"
-msgstr "Nire Leiho Madarikatua"
-
-#: src/xitk/xine-toolkit/test.c:1009
-msgid "Quit"
-msgstr "Itxi"
 
 #: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
@@ -112,10 +50,10 @@ msgstr "Ez"
 msgid "Cancel"
 msgstr "Utzi"
 
-#: src/xitk/xine-toolkit/xitk.h:2225 src/xitk/xine-toolkit/xitk.h:2234
+#: src/xitk/xine-toolkit/xitk.h:2231 src/xitk/xine-toolkit/xitk.h:2240
 msgid "Error"
 msgstr "Errorea"
 
-#: src/xitk/xine-toolkit/xitk.h:2228 src/xitk/xine-toolkit/xitk.h:2237
+#: src/xitk/xine-toolkit/xitk.h:2234 src/xitk/xine-toolkit/xitk.h:2243
 msgid "Information"
 msgstr "Informazioa"
