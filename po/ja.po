@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the xine-ui package.
 # Tadashi Jokagi <elf2000@users.sourceforge.net>, 2004.
 # Satoru SATOH <ss@gnome.gr.jp>, 2005.
+# Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>, 2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine 0.99.1-cvs\n"
+"Project-Id-Version: xine 0.99.6+hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2010-07-30 20:19+0100\n"
-"PO-Revision-Date: 2007-04-25 00:55+0200\n"
-"Last-Translator: Satoru SATOH <ss@gnome.gr.jp>\n"
-"Language-Team: Japanese <ja@li.org>\n"
+"PO-Revision-Date: 2010-07-31 00:32+0700\n"
+"Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
+"Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,9 +41,9 @@ msgstr ""
 "\n"
 
 #: src/xitk/actions.c:446
-#, fuzzy, c-format
+#, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr "%s動画コーデック: %s (%s)\n"
+msgstr "ビデオ CODEC: %s (%s)\n"
 
 #: src/xitk/actions.c:447 src/xitk/actions.c:458 src/xitk/stream_infos.c:140
 #: src/xitk/stream_infos.c:350
@@ -50,22 +51,21 @@ msgid "Unavailable"
 msgstr "利用不可"
 
 #: src/xitk/actions.c:457
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr "%s音声コーデック: %s (%s)\n"
+msgstr "オーディオ CODEC: %s (%s)\n"
 
 #: src/xitk/actions.c:478
 msgid "Start Playback ?"
 msgstr "再生開始しますか?"
 
 #: src/xitk/actions.c:483
-#, fuzzy
 msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
-"%s\n"
-"とにかく再生を開始しますか?\n"
+"\n"
+"それでも再生を開始しますか？\n"
 
 #: src/xitk/actions.c:803
 msgid "No MRL (input stream) specified"
@@ -96,9 +96,9 @@ msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): 新しいスレッド(%s)を作成できません\n"
 
 #: src/xitk/actions.c:1866
-#, fuzzy, c-format
+#, c-format
 msgid "Video post plugins: %s."
-msgstr "後処理プラグイン: %s"
+msgstr "ビデオ後処理プラグイン: %s"
 
 #: src/xitk/actions.c:1956
 msgid "Amplification Level"
@@ -109,9 +109,9 @@ msgid "Audio Volume"
 msgstr "音量"
 
 #: src/xitk/actions.c:2009
-#, fuzzy, c-format
+#, c-format
 msgid "Audio post plugins: %s."
-msgstr "後処理プラグイン: %s"
+msgstr "音声後処理プラグイン: %s"
 
 #: src/xitk/actions.c:2059
 #, c-format
@@ -158,15 +158,15 @@ msgstr "コントラスト"
 
 #: src/xitk/control.c:321 src/xitk/control.c:385
 msgid "Gamma"
-msgstr ""
+msgstr "ガンマ値"
 
 #: src/xitk/control.c:330 src/xitk/control.c:394
 msgid "Sharpness"
-msgstr ""
+msgstr "シャープネス（鮮明度）"
 
 #: src/xitk/control.c:339 src/xitk/control.c:403
 msgid "Noise reduction"
-msgstr ""
+msgstr "ノイズ低減度"
 
 #: src/xitk/control.c:845 src/xitk/panel.c:190 src/xitk/playlist.c:894
 #, c-format
@@ -210,32 +210,28 @@ msgid "Ctr"
 msgstr "コントラスト"
 
 #: src/xitk/control.c:1185
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "色調制御"
+msgstr "ガンマ値を指定"
 
 #: src/xitk/control.c:1188
 msgid "Gam"
-msgstr ""
+msgstr "ガンマ"
 
 #: src/xitk/control.c:1213
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "輝度制御"
+msgstr "シャープネス（鮮明度）を指定"
 
 #: src/xitk/control.c:1216
-#, fuzzy
 msgid "Sha"
-msgstr "彩度"
+msgstr "鮮明度"
 
 #: src/xitk/control.c:1241
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "彩度制御"
+msgstr "ノイズ低減度を指定"
 
 #: src/xitk/control.c:1244
 msgid "Noi"
-msgstr ""
+msgstr "ノイズ"
 
 #: src/xitk/control.c:1265
 msgid "Choose a Skin"
@@ -426,7 +422,7 @@ msgstr "再生リスト: ずっとシャッフル"
 
 #: src/xitk/event.c:982
 msgid "No text to display!"
-msgstr ""
+msgstr "表示するテキストがありません！"
 
 #: src/xitk/event.c:1079
 #, c-format
@@ -435,7 +431,7 @@ msgstr "再生リスト: %s"
 
 #: src/xitk/event.c:1082
 msgid "Stop (persistent)"
-msgstr ""
+msgstr "停止"
 
 #: src/xitk/event.c:1083
 msgid "Stop"
@@ -498,6 +494,8 @@ msgstr "X 同期プロトコル (デバッグ)"
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
+"同期モードで X のトランザクションを実行します。動作がとても遅くなるので、デ"
+"バッグのみに使用してください！"
 
 #: src/xitk/event.c:1616
 #, c-format
@@ -509,22 +507,24 @@ msgid "Windows stacking"
 msgstr "ウィンドウを重ねる"
 
 #: src/xitk/event.c:1622
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
-msgstr "ウィンドウを最前面におくために wm レイヤープロパティを利用"
+msgstr ""
+"ウィンドウを前面（ウィンドウモードでのビデオウィンドウを除く）\n"
+"におくために WM レイヤープロパティを使用します。"
 
 #: src/xitk/event.c:1630
 msgid "Windows stacking (more)"
 msgstr "ウィンドウを重ねる (上級)"
 
 #: src/xitk/event.c:1631
-#, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
-msgstr "ウィンドウを最前面におくために wm レイヤープロパティを利用"
+msgstr ""
+"ウィンドウを最前面におくために WM レイヤープロパティを使用します。\n"
+"('ウィンドウを重ねる' での設定よりも強力です)"
 
 #: src/xitk/event.c:1640
 msgid "Snapshot location"
@@ -536,14 +536,15 @@ msgstr "スナップショットの保存場所"
 
 #: src/xitk/event.c:1648
 msgid "Screensaver reset interval (s)"
-msgstr ""
+msgstr "スクリーンセーバーをリセットする間隔"
 
 #: src/xitk/event.c:1649
-#, fuzzy
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
-msgstr "スクリーンセーバー起動の周期. 起動しないようにするには 0 を指定"
+msgstr ""
+"スクリーンセーバーが起動しないように発生させる偽のイベントの周期. 起動しても"
+"いいなら 0 を指定"
 
 #: src/xitk/event.c:1656
 msgid "Chapter hopping"
@@ -762,7 +763,7 @@ msgstr "ルート"
 
 #: src/xitk/event_sender.c:643 src/xitk/menus.c:933
 msgid "Subpicture"
-msgstr ""
+msgstr "副映像"
 
 #: src/xitk/event_sender.c:644 src/xitk/menus.c:615 src/xitk/menus.c:934
 #: src/xitk/menus.c:987 src/xitk/stream_infos.c:871
@@ -901,7 +902,7 @@ msgstr "削除できるのは別名エントリだけです"
 
 #: src/xitk/kbindings.c:860
 msgid "No more space for additional entries!"
-msgstr ""
+msgstr "もうエントリを追加するためのスペースがありません！"
 
 #: src/xitk/kbindings.c:951
 msgid "Press Keyboard Keys..."
@@ -987,16 +988,18 @@ msgstr "mod5"
 
 #: src/xitk/kbindings.c:1462
 msgid "Grab"
-msgstr ""
+msgstr "取り込む"
 
 #: src/xitk/kbindings_common.c:597
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
 msgstr ""
+"xine-ui: キーマップにあるエイリアスの登録が多過ぎるので、無視したものがありま"
+"す。\n"
 
 #: src/xitk/kbindings_common.c:841
 msgid "and"
-msgstr ""
+msgstr " と "
 
 #: src/xitk/kbindings_common.c:852
 msgid ""
@@ -1044,13 +1047,13 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "xine (X11 gui) - 無償の動画プレイヤー v%s"
 
 #: src/xitk/main.c:429
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2010 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2007 xine チーム\n"
+"© 2000-2010 xine プロジェクト チーム\n"
 
 #: src/xitk/main.c:441
 #, c-format
@@ -1080,7 +1083,7 @@ msgstr "   -入力:\n"
 
 #: src/xitk/main.c:495
 msgid "   -Subpicture:\n"
-msgstr ""
+msgstr "   -副映像:\n"
 
 #: src/xitk/main.c:496
 msgid "   -Post processing:\n"
@@ -1220,9 +1223,9 @@ msgid "  -I, --no-gui                 disable GUI\n"
 msgstr "  -I, --no-gui                 GUI を使わない\n"
 
 #: src/xitk/main.c:623
-#, fuzzy, c-format
+#, c-format
 msgid "      --no-mouse               disable mouse event\n"
-msgstr "  -I, --no-gui                 GUI を使わない\n"
+msgstr "      --no-mouse               マウスを無効にする\n"
 
 #: src/xitk/main.c:624
 #, c-format
@@ -1290,10 +1293,9 @@ msgstr ""
 "  -R, --root                   ルートウィンドウを動画ウィンドウとして使う\n"
 
 #: src/xitk/main.c:640
-#, fuzzy, c-format
+#, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr ""
-"  -W, --wid                    ルートウィンドウを動画ウィンドウとして使う\n"
+msgstr "  -W, --wid                    ウィンドウIDを使用する\n"
 
 #: src/xitk/main.c:641
 #, c-format
@@ -1707,10 +1709,9 @@ msgstr ""
 
 #: src/xitk/main.c:1217
 msgid "Sorry, not implemented (authentication)"
-msgstr ""
+msgstr "すみません、この機能は未だ実装されていません（認証）"
 
 #: src/xitk/main.c:1224
-#, fuzzy
 msgid "*sight*, unknown error."
 msgstr "*sight*. 不明なエラー"
 
@@ -1764,9 +1765,9 @@ msgstr ""
 "す\n"
 
 #: src/xitk/main.c:1914
-#, fuzzy, c-format
+#, c-format
 msgid "window id required for -W option\n"
-msgstr "-W オプションには動画ドライバー ID が必要です\n"
+msgstr "-W オプションにはウィンドウID が必要です\n"
 
 #: src/xitk/main.c:1921
 #, c-format
@@ -1895,7 +1896,7 @@ msgstr "SPU オフセット"
 
 #: src/xitk/mediamark.c:3436
 msgid "Subpicture offset."
-msgstr ""
+msgstr "副映像のオフセット"
 
 #: src/xitk/mediamark.c:3442 src/xitk/post.c:2094 src/xitk/setup.c:1122
 msgid "OK"
@@ -2262,12 +2263,11 @@ msgstr "下に移動"
 
 #: src/xitk/menus.c:1191
 msgid "Reset video settings"
-msgstr ""
+msgstr "ビデオ設定をリセット"
 
 #: src/xitk/menus.c:1198
-#, fuzzy
 msgid "Video Control"
-msgstr "制御"
+msgstr "ビデオコントロール"
 
 #: src/xitk/mrl_browser.c:205
 msgid "All extensions"
@@ -2295,7 +2295,7 @@ msgstr "音声: "
 
 #: src/xitk/osd.c:412
 msgid "of"
-msgstr ""
+msgstr "/"
 
 #: src/xitk/osd.c:558
 msgid "Position in Stream"
@@ -2445,16 +2445,15 @@ msgstr "GUI チップスの表示/非表示"
 
 #: src/xitk/panel.c:1494
 msgid "If disabled, no tooltips are shown."
-msgstr ""
+msgstr "無効にすると、ツールチップを表示しません。"
 
 #: src/xitk/panel.c:1500
 msgid "Tips timeout (ms)"
 msgstr "チップスタイムアウト (ミリ秒)"
 
 #: src/xitk/panel.c:1501
-#, fuzzy
 msgid "Persistence time of tooltips, in milliseconds."
-msgstr "OSD の表示時間 (ミリ秒)"
+msgstr "ツールチップの表示時間 (ミリ秒)"
 
 #: src/xitk/panel.c:1515
 msgid "gui panel visibility"
@@ -2570,14 +2569,12 @@ msgid "There is no parameter available for this plugin."
 msgstr "このプラグインで利用可能なパラメーターはありません"
 
 #: src/xitk/post.c:1997
-#, fuzzy
 msgid "Video Chain Reaction"
-msgstr "連鎖処理"
+msgstr "動画の処理チェイン"
 
 #: src/xitk/post.c:1997
-#, fuzzy
 msgid "Audio Chain Reaction"
-msgstr "連鎖処理"
+msgstr "音声の処理チェイン"
 
 #: src/xitk/post.c:2045
 msgid "New Filter"
@@ -2857,7 +2854,7 @@ msgstr "SPU を無視: "
 
 #: src/xitk/stream_infos.c:700
 msgid "Has Still: "
-msgstr ""
+msgstr "静止画像の有無:"
 
 #: src/xitk/stream_infos.c:723 src/xitk/stream_infos.c:878
 msgid "Has: "
@@ -2877,7 +2874,7 @@ msgstr "コーデック: "
 
 #: src/xitk/stream_infos.c:785 src/xitk/stream_infos.c:940
 msgid "FourCC: "
-msgstr ""
+msgstr "FourCC: "
 
 #: src/xitk/stream_infos.c:799 src/xitk/stream_infos.c:954
 msgid "Channel(s): "
@@ -3136,9 +3133,3 @@ msgstr "再描画"
 
 #~ msgid "Ok"
 #~ msgstr "OK"
-
-#~ msgid "Use wm layer property to place window on top."
-#~ msgstr "ウィンドウを最前面におくために wm レイヤープロパティを利用"
-
-#~ msgid "Screensaver wakeup"
-#~ msgstr "スクリーンセーバー起動"
