@@ -26,25 +26,6 @@
 #include <X11/keysym.h>
 #include <locale.h>
 
-#ifdef ENABLE_NLS
-#    include <libintl.h>
-#    define _(String) gettext (String)
-#    ifdef gettext_noop
-#        define N_(String) gettext_noop (String)
-#    else
-#        define N_(String) (String)
-#    endif
-#else
-/* Stubs that do something close enough.  */
-#    define textdomain(String) (String)
-#    define gettext(String) (String)
-#    define dgettext(Domain,Message) (Message)
-#    define dcgettext(Domain,Message,Type) (Message)
-#    define bindtextdomain(Domain,Directory) (Domain)
-#    define _(String) (String)
-#    define N_(String) (String)
-#endif
-
 #include "xitk.h"
 
 typedef struct {
@@ -115,14 +96,14 @@ static int init_test(void) {
   XColor             black, dummy;
   
   if(!XInitThreads ()) {
-    printf (_("XInitThreads() failed.\n"));
+    printf ("XInitThreads() failed.\n");
     return 0;
   } 
 
   test = (test_t *) xitk_xmalloc(sizeof(test_t));
   
   if((test->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
-    fprintf(stderr, _("Cannot open display\n"));
+    fprintf(stderr, "Cannot open display\n");
     return 0;
   }
   
@@ -136,7 +117,7 @@ static int init_test(void) {
   imlib_init.visualid = visual->visualid;
   test->imlibdata = Imlib_init_with_params(test->display, &imlib_init);
   if (test->imlibdata == NULL) {
-    fprintf(stderr, _("Imlib_init_with_params() failed.\n"));
+    fprintf(stderr, "Imlib_init_with_params() failed.\n");
     XUnlockDisplay (test->display);
     return 0;
   }
@@ -375,7 +356,7 @@ static void notify_intbox_change(xitk_widget_t *w, void *data, int value) {
 				 intchange_cb, 
 				 intchange_cb, 
 				 NULL, ALIGN_DEFAULT, 
-				 _("New integer value is: %d. Confirm ?"), value);
+				 "New integer value is: %d. Confirm?", value);
 }
 
 /*
@@ -427,7 +408,7 @@ static void notify_doublebox_change(xitk_widget_t *w, void *data, double value) 
 				 doublechange_cb, 
 				 doublechange_cb, 
 				 NULL, ALIGN_DEFAULT, 
-				 _("New double value is: %e. Confirm ?"), value);
+				 "New double value is: %e. Confirm?", value);
 }
 
 /*
@@ -529,7 +510,7 @@ static void create_frame(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   
-  draw_outter_frame(test->imlibdata, bg, _("My Frame"), fontname, x, y, w, h);
+  draw_outter_frame(test->imlibdata, bg, "My Frame", fontname, x, y, w, h);
   draw_inner_frame(test->imlibdata, bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
   
   xitk_window_change_background(test->imlibdata, test->xwin, bg->pixmap, width, height);
@@ -557,7 +538,7 @@ static void create_inputtext(void) {
 					 "Black", "Black", fontname)));
   xitk_enable_and_show_widget(test->input);
 
-  xitk_set_widget_tips_default(test->input, "This is an inputtext");
+  xitk_set_widget_tips_default(test->input, "This is an input text.");
 }
 
 /*
@@ -569,7 +550,7 @@ static void create_label(void) {
   int                   x = 150, y = 120, len = 100;
   xitk_font_t          *fs;
   int                   lbear, rbear, wid, asc, des;
-  char                 *label = _("A Label");
+  char                 *label = "A Label";
 
   XITK_WIDGET_INIT(&lbl, test->imlibdata);
 
@@ -629,7 +610,7 @@ static void create_button(void) {
       xitk_font_t   *fs = NULL;
       char          *fontname = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*";
       int            lbear, rbear, wid, asc, des;
-      char          *label = _("Fire !!");
+      char          *label = "Fire!!";
 
 
       col = xitk_get_pixel_color_from_rgb(test->imlibdata, 255, 0, 0);
@@ -660,7 +641,7 @@ static void create_button(void) {
 		  (width) + 50, ((height+asc+des) >> 1) - des, label, strlen(label));
       
       {
-	char *nlabel = _("!BOOM!");
+	char *nlabel = "!BOOM!";
 
       xitk_font_string_extent(fs, nlabel, &lbear, &rbear, &wid, &asc, &des);
       xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
@@ -752,7 +733,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
 			   window_message_cb, 
 			   window_message_cb, 
 			   NULL, ALIGN_DEFAULT, 
-			   _("New entries selected in combo box is:\n%s [%d]."), 
+			   "New entries selected in combo box is:\n%s [%d].", 
 			   test->entries[select], select);
 
 }
@@ -959,7 +940,7 @@ int main(int argc, char **argv) {
   xitk_widget_t              *w;
   
   if(!init_test()) {
-    printf(_("init_test() failed\n"));
+    printf("init_test() failed\n");
     exit(1);
   }
 
@@ -973,7 +954,7 @@ int main(int argc, char **argv) {
 
   /* Create window */
   test->xwin = xitk_window_create_dialog_window(test->imlibdata,
-						_("My Fucking Window"), 
+						"My Test Window", 
 						100, 100, windoww, windowh);
   
   XLockDisplay (test->display);
@@ -1006,7 +987,7 @@ int main(int argc, char **argv) {
   XITK_WIDGET_INIT(&lb, test->imlibdata);
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Quit");
+  lb.label             = "Quit";
   lb.align             = ALIGN_CENTER;
   lb.callback          = test_end;
   lb.state_callback    = NULL;
@@ -1018,7 +999,7 @@ int main(int argc, char **argv) {
 					       100, 30,
 					       "Black", "Black", "White", fontname)));
   xitk_enable_and_show_widget(w);
-  xitk_set_widget_tips_default(w, "Do you really want to leave me ?");
+  xitk_set_widget_tips_default(w, "Do you really want to leave me?");
 
   create_browser();
   create_sliders();
