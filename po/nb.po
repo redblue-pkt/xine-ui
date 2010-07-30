@@ -6,10 +6,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-05-02 14:34+0100\n"
+"POT-Creation-Date: 2010-07-30 20:19+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -65,76 +66,76 @@ msgstr ""
 "%s\n"
 "Starte avspilling likevel?\n"
 
-#: src/xitk/actions.c:802
+#: src/xitk/actions.c:803
 msgid "No MRL (input stream) specified"
 msgstr "Ingen MRL (inndatastrøm) er oppgitt"
 
-#: src/xitk/actions.c:1169
+#: src/xitk/actions.c:1170
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Aspektforhold: %s"
 
-#: src/xitk/actions.c:1184
+#: src/xitk/actions.c:1185
 #, c-format
 msgid "Deinterlace: %s"
 msgstr "Avflett: %s"
 
-#: src/xitk/actions.c:1184 src/xitk/actions.c:1851 src/xitk/actions.c:1994
+#: src/xitk/actions.c:1185 src/xitk/actions.c:1866 src/xitk/actions.c:2009
 msgid "enabled"
 msgstr "aktivert"
 
-#: src/xitk/actions.c:1184 src/xitk/actions.c:1851 src/xitk/actions.c:1994
+#: src/xitk/actions.c:1185 src/xitk/actions.c:1866 src/xitk/actions.c:2009
 msgid "disabled"
 msgstr "deaktivert"
 
-#: src/xitk/actions.c:1408 src/xitk/actions.c:1423 src/xitk/lirc.c:161
+#: src/xitk/actions.c:1423 src/xitk/actions.c:1438 src/xitk/lirc.c:161
 #: src/xitk/stdctl.c:176
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): klarte ikke lage ny tråd (%s)\n"
 
-#: src/xitk/actions.c:1851
+#: src/xitk/actions.c:1866
 #, fuzzy, c-format
 msgid "Video post plugins: %s."
 msgstr "Etterbehandlingsmoduler: %s."
 
-#: src/xitk/actions.c:1941
+#: src/xitk/actions.c:1956
 msgid "Amplification Level"
 msgstr "Forsterkingsnivå"
 
-#: src/xitk/actions.c:1961 src/xitk/menus.c:280 src/xitk/menus.c:294
+#: src/xitk/actions.c:1976 src/xitk/menus.c:280 src/xitk/menus.c:294
 msgid "Audio Volume"
 msgstr "Lydvolum"
 
-#: src/xitk/actions.c:1994
+#: src/xitk/actions.c:2009
 #, fuzzy, c-format
 msgid "Audio post plugins: %s."
 msgstr "Etterbehandlingsmoduler: %s."
 
-#: src/xitk/actions.c:2044
+#: src/xitk/actions.c:2059
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV-modus: %d"
 
-#: src/xitk/actions.c:2065
+#: src/xitk/actions.c:2080
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "«XSendEvent(display, 0x%x ...)» feilet.\n"
 
-#: src/xitk/actions.c:2235 src/xitk/actions.c:2299 src/xitk/event_sender.c:487
+#: src/xitk/actions.c:2250 src/xitk/actions.c:2314 src/xitk/event_sender.c:487
 #: src/xitk/mediamark.c:3210
 msgid "Select"
 msgstr "Velg"
 
-#: src/xitk/actions.c:2238
+#: src/xitk/actions.c:2253
 msgid "Select all"
 msgstr "Velg alle"
 
-#: src/xitk/actions.c:2243
+#: src/xitk/actions.c:2258
 msgid "Stream(s) Loading"
 msgstr "Laster strøm(mer)"
 
-#: src/xitk/actions.c:2322 src/xitk/mediamark.c:3231
+#: src/xitk/actions.c:2337 src/xitk/mediamark.c:3231
 msgid "Pick a subtitle file"
 msgstr "Velg en tekstingsfil"
 
@@ -426,34 +427,34 @@ msgstr "Spilleliste: tilfeldig for evig."
 msgid "No text to display!"
 msgstr ""
 
-#: src/xitk/event.c:1075
+#: src/xitk/event.c:1079
 #, c-format
 msgid "Playlist: %s"
 msgstr "Spilleliste: %s"
 
-#: src/xitk/event.c:1078
+#: src/xitk/event.c:1082
 msgid "Stop (persistent)"
 msgstr ""
 
-#: src/xitk/event.c:1079
+#: src/xitk/event.c:1083
 msgid "Stop"
 msgstr "Stopp"
 
-#: src/xitk/event.c:1080
+#: src/xitk/event.c:1084
 msgid "Continue"
 msgstr "Fortsett"
 
-#: src/xitk/event.c:1470 src/xitk/videowin.c:268
+#: src/xitk/event.c:1474 src/xitk/videowin.c:268
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\n"
 
-#: src/xitk/event.c:1489 src/xitk/videowin.c:287
+#: src/xitk/event.c:1493 src/xitk/videowin.c:287
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
 
-#: src/xitk/event.c:1565
+#: src/xitk/event.c:1569
 #, c-format
 msgid ""
 "\n"
@@ -463,16 +464,16 @@ msgstr ""
 "«XInitThreads» feilet; det ser ut som du ikke har en trådsikker versjon av "
 "«xlib».\n"
 
-#: src/xitk/event.c:1571
+#: src/xitk/event.c:1575
 #, c-format
 msgid "Cannot open display\n"
 msgstr "Klarte ikke åpne visningsenhet\n"
 
-#: src/xitk/event.c:1578
+#: src/xitk/event.c:1582
 msgid "Name of video display"
 msgstr "Navn på visningsenhet"
 
-#: src/xitk/event.c:1579
+#: src/xitk/event.c:1583
 msgid ""
 "Use this setting to configure to which display xine will show videos. When "
 "left blank, the main display will be used. Setting this option to something "
@@ -484,61 +485,61 @@ msgstr ""
 "«:0.1» eller «:1» gjør det mulig å vise video og kontroller på forskjellige "
 "skjermer (nyttig for TV-presentasjoner, for eksempel)."
 
-#: src/xitk/event.c:1592
+#: src/xitk/event.c:1596
 #, c-format
 msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
 msgstr ""
 "Klarte ikke åpne visningsenheten «%s» for video; bytter til hovedenhet.\n"
 
-#: src/xitk/event.c:1602
+#: src/xitk/event.c:1606
 msgid "Synchronized X protocol (debug)"
 msgstr "Synkronisert X-protokoll (feilsøking)"
 
-#: src/xitk/event.c:1603
+#: src/xitk/event.c:1607
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
 
-#: src/xitk/event.c:1612
+#: src/xitk/event.c:1616
 #, c-format
 msgid "Warning! Synchronized X activated - this is very slow...\n"
 msgstr "Advarsel! Synkronisert X er aktivert; dette er veldig treigt . . .\n"
 
-#: src/xitk/event.c:1617
+#: src/xitk/event.c:1621
 msgid "Windows stacking"
 msgstr "Vindustabling"
 
-#: src/xitk/event.c:1618
+#: src/xitk/event.c:1622
 #, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
 msgstr "Bruk «WM»-lag skikkelig for å plassere vinduer øverst."
 
-#: src/xitk/event.c:1626
+#: src/xitk/event.c:1630
 msgid "Windows stacking (more)"
 msgstr "Vindustabling (mer)"
 
-#: src/xitk/event.c:1627
+#: src/xitk/event.c:1631
 #, fuzzy
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
 msgstr "Bruk «WM»-lag skikkelig for å plassere vinduer øverst."
 
-#: src/xitk/event.c:1636
+#: src/xitk/event.c:1640
 msgid "Snapshot location"
 msgstr "Plassering for lagrede bilder"
 
-#: src/xitk/event.c:1637
+#: src/xitk/event.c:1641
 msgid "Where snapshots will be saved."
 msgstr "Bildene som blir tatt lagres her."
 
-#: src/xitk/event.c:1644
+#: src/xitk/event.c:1648
 msgid "Screensaver reset interval (s)"
 msgstr ""
 
-#: src/xitk/event.c:1645
+#: src/xitk/event.c:1649
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
@@ -546,109 +547,109 @@ msgstr ""
 "Tid, i sekunder, mellom to falske hendelser for skjermspareren, 0 for å slå "
 "av."
 
-#: src/xitk/event.c:1652
+#: src/xitk/event.c:1656
 msgid "Chapter hopping"
 msgstr "Kapittelhopping"
 
-#: src/xitk/event.c:1653
+#: src/xitk/event.c:1657
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
 msgstr "Spill neste/forrige kapittel i stedet for MRL («dvdnav»)"
 
-#: src/xitk/event.c:1660
+#: src/xitk/event.c:1664
 msgid "Visibility behavior of output window"
 msgstr "Synlighetsoppførsel for visningsvinduet"
 
-#: src/xitk/event.c:1661
+#: src/xitk/event.c:1665
 msgid "Hide video output window if there is no video in the stream"
 msgstr "Skjul videovisningsvinduet hvis det ikke er video i strømmen"
 
-#: src/xitk/event.c:1668
+#: src/xitk/event.c:1672
 msgid "Visiblility behavior of panel"
 msgstr "Synlighetsoppførsel for panelet"
 
-#: src/xitk/event.c:1669
+#: src/xitk/event.c:1673
 msgid ""
 "Automatically show/hide panel window, according to "
 "auto_video_output_visibility"
 msgstr "Vis/Skjul panelet automatisk ifølge «atuo_video_output_visibility»"
 
-#: src/xitk/event.c:1677
+#: src/xitk/event.c:1681
 msgid "Event sender behavior"
 msgstr "Hendelsessenderens oppførsel"
 
-#: src/xitk/event.c:1678
+#: src/xitk/event.c:1682
 msgid "Event sender window stick to main panel"
 msgstr "Hendelsessendervinduet holder seg til hovedpanelet"
 
-#: src/xitk/event.c:1687
+#: src/xitk/event.c:1691
 msgid "Visual animation style"
 msgstr "Visuell animeringsstil"
 
-#: src/xitk/event.c:1688
+#: src/xitk/event.c:1692
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
 "Vis noen videoanimeringer når den gjeldende strømmen kun inneholder lyd (for "
 "eksempel «mp3»)."
 
-#: src/xitk/event.c:1697
+#: src/xitk/event.c:1701
 msgid "Stream information"
 msgstr "Strøminformasjon"
 
-#: src/xitk/event.c:1698
+#: src/xitk/event.c:1702
 msgid "Update stream information (in stream info window) each half seconds."
 msgstr ""
 "Oppdater strøminformasjonen (i strøminformasjonsvinduet) hvert halve sekund."
 
-#: src/xitk/event.c:1708
+#: src/xitk/event.c:1712
 msgid "Skin Server Url"
 msgstr "URL til hudtjener"
 
-#: src/xitk/event.c:1709
+#: src/xitk/event.c:1713
 msgid "From where we can get skins."
 msgstr "Stedet vi kan hente huder fra."
 
-#: src/xitk/event.c:1720
+#: src/xitk/event.c:1724
 msgid "Enable OSD support"
 msgstr "Aktiver støtte for tekst på skjermen"
 
-#: src/xitk/event.c:1721
+#: src/xitk/event.c:1725
 msgid ""
 "Enabling OSD permit to display some status/informations in output window."
 msgstr ""
 "Å aktivere visning av tekst på skjermen tillater at noen meldinger om status/"
 "informasjon vises i visningsvinduet."
 
-#: src/xitk/event.c:1730
+#: src/xitk/event.c:1734
 msgid "Use unscaled OSD"
 msgstr "Bruk uskalert tekst på skjermen"
 
-#: src/xitk/event.c:1731
+#: src/xitk/event.c:1735
 msgid "Use unscaled (full screen resolution) OSD if possible"
 msgstr "Bruk uskalert (fullskjermsoppløsning) tekst på skjermen hvis mulig"
 
-#: src/xitk/event.c:1739
+#: src/xitk/event.c:1743
 msgid "Dismiss OSD time (s)"
 msgstr "Fjern tekst på skjermen etter (s)"
 
-#: src/xitk/event.c:1740
+#: src/xitk/event.c:1744
 msgid "Persistence time of OSD visual, in seconds."
 msgstr "Hvor lenge tekst på skjermen vises, i sekunder."
 
-#: src/xitk/event.c:1748
+#: src/xitk/event.c:1752
 msgid "Change xine's behavior for unexperienced user"
 msgstr "Endre xines oppførsel for uerfarne brukere"
 
-#: src/xitk/event.c:1749
+#: src/xitk/event.c:1753
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
 "I denne modusen tar xine noen avgjørelser for å bedre brukerens livskvalitet."
 
-#: src/xitk/event.c:1757
+#: src/xitk/event.c:1761
 msgid "Ask user for playback with unsupported codec"
 msgstr "Spør bruker om avspiling med kodeker som ikke støttes"
 
-#: src/xitk/event.c:1758
+#: src/xitk/event.c:1762
 msgid ""
 "If xine don't support audio or video codec of current stream the user will "
 "be asked if the stream should be played or not"
@@ -656,45 +657,45 @@ msgstr ""
 "Brukeren blir spurt om strømmen skal spilles eller ikke hvis den inneholder "
 "en lyd- eller videokodek som ikke støttes"
 
-#: src/xitk/event.c:1767
+#: src/xitk/event.c:1771
 msgid "Configuration experience level"
 msgstr "Erfaringsnivå for oppsett"
 
-#: src/xitk/event.c:1768
+#: src/xitk/event.c:1772
 msgid ""
 "Level of user's experience, this will show more or less configuration "
 "options."
 msgstr "Brukerens erfaringsnivå, dette viser flere eller færre innstillinger."
 
-#: src/xitk/event.c:1776
+#: src/xitk/event.c:1780
 msgid "Amplification level"
 msgstr "Forsterkingsnivå"
 
-#: src/xitk/event.c:1785
+#: src/xitk/event.c:1789
 msgid "Display splash screen"
 msgstr "Vis oppstartsbilde"
 
-#: src/xitk/event.c:1786
+#: src/xitk/event.c:1790
 msgid "If enabled, xine will display its splash screen"
 msgstr "Hvis dette aktiveres, viser xine oppstartsbildet sitt"
 
-#: src/xitk/event.c:1794
+#: src/xitk/event.c:1798
 msgid "Audio mixer control method"
 msgstr "Metode for lydmikserstyring"
 
-#: src/xitk/event.c:1795
+#: src/xitk/event.c:1799
 msgid "Which method used to control audio volume."
 msgstr "Hvilken metode som brukes for å styre volumet."
 
-#: src/xitk/event.c:1803
+#: src/xitk/event.c:1807
 msgid "Menu shortcut style"
 msgstr "Stil for menysnarveier"
 
-#: src/xitk/event.c:1804
+#: src/xitk/event.c:1808
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Snarveioppsett i menyen, «Ctrl,Alt» eller «C,M»."
 
-#: src/xitk/event.c:1897
+#: src/xitk/event.c:1901
 #, c-format
 msgid "Unable to initialize Imlib\n"
 msgstr "Klarte ikke initalisere «Imlib»\n"
@@ -1187,7 +1188,8 @@ msgstr ""
 "                    «h»: skjul grensesnitt (panel etc.).\n"
 "                    «w»: skjul videovindu.\n"
 "                    «q»: avslutt når avspillingen er ferdig.\n"
-"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s DVD».\n"
+"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s "
+"DVD».\n"
 "                    «v»: hent spilleliste fra VCD. (Foreldet; bruk z-s "
 "VCD».)\n"
 
@@ -1401,11 +1403,12 @@ msgstr ""
 "                    session=n   velg øktnummer «<n>»,\n"
 "                    mrl=m       legg MRL'en «<mrl>» til i spillelisten,\n"
 "                    audio=c     velg lydkanal («<c>»: «next» eller «prev»),\n"
-"                    spu=c       velg «spu»-kanal («<c>»: «next» eller «prev»),\n"
+"                    spu=c       velg «spu»-kanal («<c>»: «next» eller "
+"«prev»),\n"
 "                    volume=v    oppgi lydvolum,\n"
 "                    amp=v       oppgi forsterkingsnivå,\n"
-"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», «loop», "
-"«repeat», «shuffle» eller «shuffle+»),\n"
+"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», "
+"«loop», «repeat», «shuffle» eller «shuffle+»),\n"
 "                    get_speed   hent fartverdien (se «man»-siden for den "
 "returnerte verdien.\n"
 "                    (playlist|pl)=p\n"
@@ -1420,8 +1423,8 @@ msgstr ""
 "                                   «last»   spill siste oppføring i "
 "spillelisten,\n"
 "                                   «load:s» last spillelistefilen «s»,\n"
-"                                   «stop»   stopp avspillingen ved slutten av "
-"gjeldende element.\n"
+"                                   «stop»   stopp avspillingen ved slutten "
+"av gjeldende element.\n"
 "                                   «cont»   fortset avspillingen ved slutten "
 "av gjeldende element.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1458,7 +1461,8 @@ msgid ""
 msgstr ""
 "  -r, --aspect-ratio <modus>   Velger aspektforholdet for video. Formater "
 "er\n"
-"                                 «auto», «square», «4:3», «anamorphic» og «dvb».\n"
+"                                 «auto», «square», «4:3», «anamorphic» og "
+"«dvb».\n"
 
 #: src/xitk/main.c:682
 #, c-format
@@ -1717,7 +1721,8 @@ msgid "Sorry, not implemented (authentication)"
 msgstr ""
 
 #: src/xitk/main.c:1224
-msgid "*sight*, unkown error."
+#, fuzzy
+msgid "*sight*, unknown error."
 msgstr "En ukjent feil; de er alltid kjedelige."
 
 #: src/xitk/main.c:1429
@@ -3008,11 +3013,13 @@ msgstr ""
 
 #: src/xitk/videowin.c:1626
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr ""
+"x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 #: src/xitk/videowin.c:1637
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr ""
+"y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 #: src/xitk/videowin.c:1648
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
