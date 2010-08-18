@@ -320,7 +320,6 @@ typedef struct {
     int                     mute;
     int                     amp_level;
     int                     method;
-    int                     original_level;
   } mixer;
 
   xitk_register_key_t       widget_key;
