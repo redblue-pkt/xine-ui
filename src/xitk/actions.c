@@ -716,10 +716,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
   config_update_num("gui.amp_level", gGui->mixer.amp_level);
   xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
   
-  /* Restore old audio volume */
-  if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
-    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.original_level);
-  
   xine_close(gGui->stream);
   xine_close(gGui->visual_anim.stream);
 

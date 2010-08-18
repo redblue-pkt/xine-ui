@@ -2200,10 +2200,6 @@ int main(int argc, char *argv[]) {
       xine_set_param(gGui->stream, XINE_PARAM_EARLY_FINISHED_EVENT, 1);
 #endif
 
-  /* Store audio mixer level */
-  if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
-    gGui->mixer.original_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-
   gGui->vo_none = xine_open_video_driver(__xineui_global_xine_instance, "none", XINE_VISUAL_TYPE_NONE, NULL);
   gGui->ao_none = xine_open_audio_driver(__xineui_global_xine_instance, "none", NULL);
 
