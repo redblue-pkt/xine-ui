@@ -590,7 +590,7 @@ if test -n "$skindir"; then
     if test -d "$skindir"; then
       msg skindir-exists
       cd $skindir
-      if test -f xine-ui_logo.mpv; then
+      if test -f xine-ui_logo.mpv || test -f xine-ui_logo.png || test -f xine-ui_logo.jpg; then
         msg logo-exists
       else
         msg no-xine-logo 2
