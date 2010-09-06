@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-07-30 20:35+0100\n"
+"POT-Creation-Date: 2010-09-06 19:53+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -15,42 +15,32 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1162
 msgid "Select current entry"
 msgstr "Sélectionne l'entrée courante"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1170
 msgid "Play selected entry"
 msgstr "Joue l'entrée sélectionnée"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1181
 msgid "Close MRL browser window"
 msgstr "Ferme la fenêtre du brouteur de MRL"
 
-#: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:1178 src/xitk/xine-toolkit/window.c:1419
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1571
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:2231 src/xitk/xine-toolkit/xitk.h:2240
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:2234 src/xitk/xine-toolkit/xitk.h:2243
 msgid "Information"
 msgstr "Information"
