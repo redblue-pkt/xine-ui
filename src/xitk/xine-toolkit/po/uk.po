@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-07-30 20:35+0100\n"
+"POT-Creation-Date: 2010-09-06 19:53+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -15,42 +15,32 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1162
 msgid "Select current entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1170
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1181
 msgid "Close MRL browser window"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:1100
 msgid "OK"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:1178 src/xitk/xine-toolkit/window.c:1419
 msgid "Question?"
 msgstr "Питання?"
 
-#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "Yes"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:1349 src/xitk/xine-toolkit/window.c:1571
 msgid "No"
 msgstr "Н╕"
 
-#: src/xitk/xine-toolkit/window.c:1571
 msgid "Cancel"
 msgstr "В╕дмова"
 
-#: src/xitk/xine-toolkit/xitk.h:2231 src/xitk/xine-toolkit/xitk.h:2240
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:2234 src/xitk/xine-toolkit/xitk.h:2243
 msgid "Information"
 msgstr ""
