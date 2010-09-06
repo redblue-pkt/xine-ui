@@ -16,3 +16,7 @@ EXTRA_DIST = config.rpath autogen.sh
 slackbuild:
 	@(cd misc && $(MAKE) SlackBuild) && \
 	 export PREFIX="/usr"; ./configure --prefix=$$PREFIX && misc/SlackBuild
+
+translator:
+	$(MAKE) -C $(top_builddir)/po update-po
+	$(MAKE) -C $(top_builddir)/src/xitk/xine-toolkit/po update-po
