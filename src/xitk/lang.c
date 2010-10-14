@@ -262,8 +262,8 @@ static const langs_t _langs[] = {
   { "pl_PL.UTF-8",      POLISH,             "pl",    "UTF-8" },
 
   /* Ukrainian */
-  { "uk_UA",            UKRAINIAN,          "uk",    "KOI8-U"     },
-  { "uk_UA.UTF-8",      UKRAINIAN,          "uk",    "KOI8-U"     },
+  { "uk_UA",            UKRAINIAN,          "uk",    "UTF-8" },
+  { "uk_UA.UTF-8",      UKRAINIAN,          "uk",    "UTF-8" },
 
   /* Czech */
   { "cs_CZ",            CZECH,              "cs",    "UTF-8" },
