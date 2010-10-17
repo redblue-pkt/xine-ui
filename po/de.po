@@ -6,15 +6,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "Keine MRL vorhanden."
 
@@ -145,21 +147,32 @@ msgstr "control: Konnte Hintergrundbild nicht finden\n"
 msgid "Control HUE value"
 msgstr "Farbton ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Ton"
+
 msgid "Control SATURATION value"
 msgstr "Sättigung ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
-msgstr "Sät"
+msgstr "Sat"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Helligkeit ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Hel"
 
 msgid "Control CONTRAST value"
 msgstr "Kontrast ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Kon"
 
@@ -167,6 +180,8 @@ msgstr "Kon"
 msgid "Control GAMMA value"
 msgstr "Farbton ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -174,17 +189,23 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Helligkeit ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
-msgstr "Sät"
+msgstr "Sat"
 
 #, fuzzy
 msgid "Control NOISE REDUCTION value"
 msgstr "Sättigung ändern"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Skin-Auswahl"
 
@@ -197,7 +218,9 @@ msgstr "Einstellungen-Fenster schließen"
 msgid "Download in progress"
 msgstr "Download läuft"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Downloadfortschritt: %d%%."
 
@@ -1863,6 +1886,8 @@ msgstr "Alle Dateitypen"
 msgid "xine MRL Browser"
 msgstr "xine MRL Browser"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Quelle:"
 
@@ -2043,6 +2068,8 @@ msgstr "Playliste speichern"
 msgid "Close playlist window"
 msgstr "Playlisten-Fenster schließen"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Suche nach:"
 
@@ -2400,8 +2427,8 @@ msgstr "videowin: Ausgabetreiber kann kein funktionierendes Visual auswählen\n"
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
-"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x"
-"%lx\n"
+"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
+"lx\n"
 
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"

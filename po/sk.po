@@ -6,17 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
-msgstr "Nie je ¾iadne MRL"
+msgstr "Nie je ziadne MRL"
 
 #, c-format
 msgid ""
@@ -145,21 +147,32 @@ msgstr "control: nemô¾em nájs» obrázok na pozadie.\n"
 msgid "Control HUE value"
 msgstr "Nastavi» odtieò"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Odtien"
+
 msgid "Control SATURATION value"
 msgstr "Nastavi» nasýtenie"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
-msgstr "Nasýtenie"
+msgstr "Nasytenie"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Nastavi» jas"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Jas"
 
 msgid "Control CONTRAST value"
 msgstr "Nastavi» kontrast"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Kontrast"
 
@@ -167,6 +180,8 @@ msgstr "Kontrast"
 msgid "Control GAMMA value"
 msgstr "Nastavi» odtieò"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -174,7 +189,9 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Nastavi» jas"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Nasýtenie"
 
@@ -182,9 +199,13 @@ msgstr "Nasýtenie"
 msgid "Control NOISE REDUCTION value"
 msgstr "Nastavi» nasýtenie"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Vyber skin"
 
@@ -197,9 +218,11 @@ msgstr "Zavrie» okno nastavenia"
 msgid "Download in progress"
 msgstr "S»ahovanie be¾í"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
-msgstr "Stiahnuté: %d%%."
+msgstr "Stiahnute: %d%%."
 
 msgid "Done"
 msgstr "Hotovo"
@@ -1821,6 +1844,8 @@ msgstr "V¹etky prípony"
 msgid "xine MRL Browser"
 msgstr "xine MRL prehliadaè"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Zdroj:"
 
@@ -2001,8 +2026,10 @@ msgstr "Playlist ulo¾i»"
 msgid "Close playlist window"
 msgstr "Zavrie» okno playlistu"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
-msgstr "Hµada»:"
+msgstr "Hladat:"
 
 msgid "Direct MRL entry"
 msgstr "Priame zadanie MRL"

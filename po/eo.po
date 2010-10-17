@@ -13,16 +13,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eo\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Antonio Codazzi <f_sophia@libero.it>\n"
 "Language-Team: Esperanto\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "Neniu MRL estas."
 
@@ -153,21 +155,32 @@ msgstr "regilo: estas neeble trovi bildon por malfono\n"
 msgid "Control HUE value"
 msgstr "Regilo por valoro de NUANCO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Nuan"
+
 msgid "Control SATURATION value"
 msgstr "Regilo por valoro de SATURADO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
 msgstr "Sat"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Regilo por valoro de HELECO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Hel"
 
 msgid "Control CONTRAST value"
 msgstr "Regilo por valoro de KONTRASTO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Ktr"
 
@@ -175,6 +188,8 @@ msgstr "Ktr"
 msgid "Control GAMMA value"
 msgstr "Regilo por valoro de NUANCO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -182,7 +197,8 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Regilo por valoro de HELECO"
 
-#, fuzzy
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sha"
 msgstr "Sat"
 
@@ -190,9 +206,13 @@ msgstr "Sat"
 msgid "Control NOISE REDUCTION value"
 msgstr "Regilo por valoro de SATURADO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Elektu Etoson"
 
@@ -205,9 +225,11 @@ msgstr "Fermu fenestron de regiloj"
 msgid "Download in progress"
 msgstr "Plenumante elŝuton"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
-msgstr "Plenumante elŝuton: %d%%."
+msgstr "Plenumante elsuton: %d%%."
 
 msgid "Done"
 msgstr "Farite"
@@ -1865,6 +1887,8 @@ msgstr "Ĉiuj finaĵoj"
 msgid "xine MRL Browser"
 msgstr "Foliumilo por MRL de xine"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Fonto:"
 
@@ -2044,8 +2068,10 @@ msgstr "Konservu legoliston"
 msgid "Close playlist window"
 msgstr "Fermu fenestron de legolisto"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
-msgstr "Skanserĉo de:"
+msgstr "Skanserco de:"
 
 msgid "Direct MRL entry"
 msgstr "Ero de rekta MRL"
@@ -2177,8 +2203,8 @@ msgstr "Ŝargo de %s/%s malsukcesis. Elirante\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso "
-"'%s'.\n"
+"Ŝargo de etoso %s malsukcesis, malĝusta versio. Ŝargo de anstataŭa etoso '%"
+"s'.\n"
 
 #, c-format
 msgid "Unable to retrieve skin list from %s: %s"

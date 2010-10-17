@@ -1,21 +1,22 @@
 # Czech translate, xine-ui.po.
-# Copyright (C) 2002-2008 Free Software Foundation, Inc.
-# Frantisek Dvorak <valtri@civ.zcu.cz>, 2002-2008.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Frantisek Dvorak <valtri@civ.zcu.cz>, 2002-2010.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui-0.9.24\n"
+"Project-Id-Version: xine-ui-0.99.7\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
-"PO-Revision-Date: 2008-12-27 17:20+0200\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"PO-Revision-Date: 2010-10-14 23:58+0200\n"
 "Last-Translator: František Dvořák <valtri@civ.zcu.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
-"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
 
-# only ISO8859-1 characters (skin)
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "Zde neni zadne MRL."
 
@@ -126,13 +127,13 @@ msgid "Contrast"
 msgstr "Kontrastu."
 
 msgid "Gamma"
-msgstr ""
+msgstr "Gamma"
 
 msgid "Sharpness"
-msgstr ""
+msgstr "Ostrost"
 
 msgid "Noise reduction"
-msgstr ""
+msgstr "Redukce šumu"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -148,47 +149,61 @@ msgstr "control: nelze nalézt obrázek na pozadí\n"
 msgid "Control HUE value"
 msgstr "Nastavení odstínu"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Ods"
+
 msgid "Control SATURATION value"
 msgstr "Nastavení sytosti"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
 msgstr "Syt"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Nastavení jasu"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Jas"
 
 msgid "Control CONTRAST value"
 msgstr "Nastavení kontrastu"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Kon"
 
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "Nastavení odstínu"
+msgstr "Nastavení GAMA"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
-msgstr ""
+msgstr "Gam"
 
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "Nastavení jasu"
+msgstr "Nastavení ostrosti"
 
-#, fuzzy
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sha"
-msgstr "Syt"
+msgstr "Ost"
 
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "Nastavení sytosti"
+msgstr "Nastavení redukce šumu"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
-msgstr ""
+msgstr "Sum"
 
-# only ISO8859-1 characters (skin)
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Vyber skinu"
 
@@ -201,8 +216,9 @@ msgstr "Zavře řídící okno"
 msgid "Download in progress"
 msgstr "Probíhá stahování"
 
-# only ISO8859-1 characters (skin)
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Prubeh stahovani: %d%%."
 
@@ -844,13 +860,13 @@ msgstr "Špatné zobrazení '%s'\n"
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Toto je xine (GUI pro X11) - svobodný videopřehrávač v%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2010 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2007 Tým xine.\n"
+"(c) 2000-2010 Tým xine.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
@@ -1428,9 +1444,8 @@ msgstr ""
 "jiný program."
 
 msgid "Sorry, not implemented (authentication)"
-msgstr ""
+msgstr "Litujeme, není implementováno (autentizace)"
 
-#, fuzzy
 msgid "*sight*, unknown error."
 msgstr "*sight*, neznámá chyba."
 
@@ -1861,6 +1876,8 @@ msgstr "Všechny přípony"
 msgid "xine MRL Browser"
 msgstr "Prohlížeč MRL xine"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Zdroj:"
 
@@ -2044,7 +2061,8 @@ msgstr "Uložení playlistu"
 msgid "Close playlist window"
 msgstr "Zavření okna playlistu"
 
-# only ISO8859-1 characters (skin)
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Hledani:"
 
