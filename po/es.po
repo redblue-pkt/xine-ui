@@ -1,23 +1,23 @@
-# translation of xine-ui.po to Spanish
+# translation of xine-ui.es.po to Spanish
 # translation of xine-ui-es.po to
 # Spanish .po file for xine-ui.
 # Copyright (C) 2001,2003, 2007, 2008 Free Software Foundation, Inc.
 #
 # Juan Manuel García Molina <juanma_gm@wanadoo.es>, 2001-2003.
 # César Chaparro <wendigo3@terra.com.pe>, 2004.
-# Carlos E. Robinson M. <carloser@users.sourceforge.net>, 2006, 2007, 2008.
+# Carlos E. Robinson M. <carloser@users.sourceforge.net>, 2006, 2007, 2008, 2009.
+# Carlos E. Robinson M. <robin.listas@gmail.com>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui\n"
+"Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2010-10-17 17:59+0200\n"
-"PO-Revision-Date: 2008-03-22 00:10+0100\n"
-"Last-Translator: Carlos E. Robinson <carloser@users.sourceforge.net>\n"
+"PO-Revision-Date: 2010-04-29 13:48+0200\n"
+"Last-Translator: Carlos E. Robinson M. <robin.listas@gmail.com>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
@@ -116,7 +116,7 @@ msgid "Stream(s) Loading"
 msgstr "Cargando flujo(s)"
 
 msgid "Pick a subtitle file"
-msgstr "Seleccione un archivo de subtítulos"
+msgstr "Seleccione un fichero de subtítulos"
 
 msgid "Hue"
 msgstr "Tta"
@@ -248,7 +248,7 @@ msgstr ""
 "- error del motor de xine -\n"
 "\n"
 "No hay ningún complemento de entrada disponible para manipular '%s'.\n"
-"Puede ser que la sintaxis de MRL sea incorrecta o el archivo o flujo\n"
+"Puede ser que la sintaxis de MRL sea incorrecta o el fichero o flujo\n"
 "de origen no exista."
 
 #, c-format
@@ -261,7 +261,7 @@ msgstr ""
 "- error del motor de xine -\n"
 "\n"
 "No hay ningún complemento de entrada disponible para manipular '%s'.\n"
-"Normalmente esto significa que el formato de archivo no fue reconocido."
+"Normalmente esto significa que el formato de fichero no fue reconocido."
 
 #, c-format
 msgid ""
@@ -271,7 +271,7 @@ msgid ""
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
-"Falló el demultiplexor. ¿Puede estar corrompido el archivo '%s'?\n"
+"Falló el demultiplexor. ¿Puede estar corrompido el fichero '%s'?\n"
 
 #, c-format
 msgid ""
@@ -670,7 +670,7 @@ msgid "Close"
 msgstr "Cerrar"
 
 msgid "All files"
-msgstr "Todos los archivos"
+msgstr "Todos los ficheros"
 
 msgid "All known subtitles"
 msgstr "Todos los subtítulos conocidos"
@@ -690,7 +690,7 @@ msgstr "No se puede abrir el directorio '%s': %s."
 
 #, c-format
 msgid "Unable to delete file '%s': %s."
-msgstr "No se puede borrar el archivo '%s': %s."
+msgstr "No se puede borrar el fichero '%s': %s."
 
 # CER El signo de cierre de interrogación está en el código fuente.
 #, c-format
@@ -702,10 +702,10 @@ msgstr "¿Confirma el borrado?"
 
 #, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
-msgstr "No se puede renombrar el archivo '%s' a '%s': %s."
+msgstr "No se puede renombrar el fichero '%s' a '%s': %s."
 
 msgid "Rename file"
-msgstr "Renombrar archivo"
+msgstr "Renombrar fichero"
 
 #, c-format
 msgid "Unable to create the directory '%s': %s."
@@ -715,10 +715,10 @@ msgid "Create a new directory"
 msgstr "Crear un directorio nuevo"
 
 msgid "File Browser"
-msgstr "Navegador de archivos"
+msgstr "Navegador de ficheros"
 
 msgid "Show hidden file"
-msgstr "Mostrar archivo oculto"
+msgstr "Mostrar fichero oculto"
 
 msgid "Rename"
 msgstr "Renombrar"
@@ -1072,7 +1072,7 @@ msgstr ""
 "son:\n"
 "                                 'default' : muestra el mapa de teclado "
 "original,\n"
-"                                 'lirc': muestra el borrador de un archivo "
+"                                 'lirc': muestra el borrador de un fichero "
 "de configuración .lircrc.\n"
 "                                 'remapped' : muestra las secuencias "
 "remapeadas por el usuario.\n"
@@ -1123,7 +1123,7 @@ msgstr ""
 #, c-format
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr ""
-"  -P, --playlist <archivo>     Carga un archivo de lista de reproducción.\n"
+"  -P, --playlist <fichero>     Carga un fichero de lista de reproducción.\n"
 
 #, c-format
 msgid ""
@@ -1213,7 +1213,7 @@ msgstr ""
 "                                   'next'   reproduce la entrada siguiente,\n"
 "                                   'last'   reproduce la última entrada en "
 "la lista de reproducción,\n"
-"                                   'load:s' carga el archivo <s> como lista "
+"                                   'load:s' carga el fichero <s> como lista "
 "de reproducción,\n"
 "                                   'stop'   detiene la reproducción al final "
 "de la reproducción en curso,\n"
@@ -1337,7 +1337,7 @@ msgstr ""
 "      --bug-report [=mrl]      Habilita el modo de reporte de errores:\n"
 "                                 Habilita el modo detallado, reune\n"
 "                                 todos los mensajes y los escribe en un "
-"archivo\n"
+"fichero\n"
 "                                 llamado BUG-REPORT.TXT.\n"
 "                                 Si se especifica <mrl> , xine reproducirá "
 "este mrl\n"
@@ -1356,10 +1356,10 @@ msgid ""
 msgstr ""
 "ejemplos de MRL válidos (Media Resource Locator, localizador de recursos de "
 "medios) :\n"
-"  Archivo :  'path/archivo.vob'\n"
-"             '/path/archivo.vob'\n"
-"             'file://patch/archivo.vob'\n"
-"             'fifo://[[mpeg1|mpeg2]:/]path/archivo'\n"
+"  Archivo :  'path/fichero.vob'\n"
+"             '/path/fichero.vob'\n"
+"             'file://patch/fichero.vob'\n"
+"             'fifo://[[mpeg1|mpeg2]:/]path/fichero'\n"
 "             'stdin://[mpeg1|mpeg2]' o '-' (mpeg2 solamente)\n"
 "  DVD:       'dvd://VTS_01_2.VOB'\n"
 "  VCD:       'vcd://<número de pista>'\n"
@@ -1452,7 +1452,7 @@ msgstr ""
 
 msgid "The specified file or MRL could not be found. Please check it twice."
 msgstr ""
-"El archivo o mrl especificado no se encontró. Por favor vuelva a comprobarlo."
+"El fichero o mrl especificado no se encontró. Por favor vuelva a comprobarlo."
 
 msgid ""
 "The source can't be read.\n"
@@ -1532,7 +1532,7 @@ msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 "Modo de reporte de errores: Todos los mensajes de salida serán agregados al "
-"archivo BUG-REPORT.TXT.\n"
+"fichero BUG-REPORT.TXT.\n"
 
 #, c-format
 msgid "window id required for -W option\n"
@@ -1565,6 +1565,7 @@ msgstr "Carga automáticamente los subtítulos, si existen."
 msgid "Enable deinterlacing by default"
 msgstr "Habilita el desentrelazado por defecto"
 
+#, fuzzy
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automatically detected with no performance penalty."
@@ -1580,7 +1581,7 @@ msgstr "¡¡Entrada inválida!!"
 
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
-msgstr "El archivo de la lista de reproducción (%s) es inválido.\n"
+msgstr "El fichero de la lista de reproducción (%s) es inválido.\n"
 
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
@@ -1611,7 +1612,7 @@ msgid "Sub File"
 msgstr "Fich. sbtl."
 
 msgid "Select a subtitle file to use together with the mrl."
-msgstr "Seleccione un archivo de subtítulos para usarlo con el mrl."
+msgstr "Seleccione un fichero de subtítulos para usarlo con el mrl."
 
 msgid "Start at"
 msgstr "Comenzar en"
@@ -2298,7 +2299,7 @@ msgid "Not supported for this video out driver\n"
 msgstr "No soportado para este manejador de salida de vídeo\n"
 
 msgid "File open failed"
-msgstr "Falló la apertura del archivo"
+msgstr "Falló la apertura del fichero"
 
 msgid "png_create_write_struct() failed\n"
 msgstr "png_create_write_struct() falló\n"
