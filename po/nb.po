@@ -6,16 +6,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "X-Generator: KBabel 1.10.1\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "Det er ingen MRL."
 
@@ -146,21 +148,32 @@ msgstr "Kontroller: klarte ikke finne bilde for bakgrunn\n"
 msgid "Control HUE value"
 msgstr "Kontroller nyanse-verdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Nyanse"
+
 msgid "Control SATURATION value"
 msgstr "Kontroller metningsverdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
 msgstr "Met"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Kontroller LYSSTYRKE-verdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Lys"
 
 msgid "Control CONTRAST value"
 msgstr "Kontroller KONTRAST-verdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Kon"
 
@@ -168,6 +181,8 @@ msgstr "Kon"
 msgid "Control GAMMA value"
 msgstr "Kontroller nyanse-verdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -175,7 +190,9 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Kontroller LYSSTYRKE-verdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Met"
 
@@ -183,9 +200,13 @@ msgstr "Met"
 msgid "Control NOISE REDUCTION value"
 msgstr "Kontroller metningsverdi"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Velg en hud"
 
@@ -198,7 +219,9 @@ msgstr "Lukk kontrollervindu"
 msgid "Download in progress"
 msgstr "Holder på å laste ned"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Framgang for nedlasting: %d%%."
 
@@ -941,8 +964,7 @@ msgstr ""
 "                    «h»: skjul grensesnitt (panel etc.).\n"
 "                    «w»: skjul videovindu.\n"
 "                    «q»: avslutt når avspillingen er ferdig.\n"
-"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s "
-"DVD».\n"
+"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s DVD».\n"
 "                    «v»: hent spilleliste fra VCD. (Foreldet; bruk z-s "
 "VCD».)\n"
 
@@ -1132,12 +1154,11 @@ msgstr ""
 "                    session=n   velg øktnummer «<n>»,\n"
 "                    mrl=m       legg MRL'en «<mrl>» til i spillelisten,\n"
 "                    audio=c     velg lydkanal («<c>»: «next» eller «prev»),\n"
-"                    spu=c       velg «spu»-kanal («<c>»: «next» eller "
-"«prev»),\n"
+"                    spu=c       velg «spu»-kanal («<c>»: «next» eller «prev»),\n"
 "                    volume=v    oppgi lydvolum,\n"
 "                    amp=v       oppgi forsterkingsnivå,\n"
-"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», "
-"«loop», «repeat», «shuffle» eller «shuffle+»),\n"
+"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», «loop», "
+"«repeat», «shuffle» eller «shuffle+»),\n"
 "                    get_speed   hent fartverdien (se «man»-siden for den "
 "returnerte verdien.\n"
 "                    (playlist|pl)=p\n"
@@ -1152,8 +1173,8 @@ msgstr ""
 "                                   «last»   spill siste oppføring i "
 "spillelisten,\n"
 "                                   «load:s» last spillelistefilen «s»,\n"
-"                                   «stop»   stopp avspillingen ved slutten "
-"av gjeldende element.\n"
+"                                   «stop»   stopp avspillingen ved slutten av "
+"gjeldende element.\n"
 "                                   «cont»   fortset avspillingen ved slutten "
 "av gjeldende element.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1187,8 +1208,7 @@ msgid ""
 msgstr ""
 "  -r, --aspect-ratio <modus>   Velger aspektforholdet for video. Formater "
 "er\n"
-"                                 «auto», «square», «4:3», «anamorphic» og "
-"«dvb».\n"
+"                                 «auto», «square», «4:3», «anamorphic» og «dvb».\n"
 
 #, c-format
 msgid ""
@@ -1843,6 +1863,8 @@ msgstr "Alle utvidelser"
 msgid "xine MRL Browser"
 msgstr "xines MRL-finner"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Kilde:"
 
@@ -2022,8 +2044,10 @@ msgstr "Lagre spilleliste"
 msgid "Close playlist window"
 msgstr "Lukk spillelistevinduet"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
-msgstr "Søk etter:"
+msgstr "Sok etter:"
 
 msgid "Direct MRL entry"
 msgstr "Direkte MRL-oppføring"
@@ -2396,12 +2420,10 @@ msgstr ""
 "skriver du inn «0 2 3»"
 
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Bredde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"

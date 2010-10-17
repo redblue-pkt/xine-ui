@@ -11,19 +11,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: 2007-12-31 01:35+0100\n"
 "Last-Translator: Diego 'Flameeyes' Pettenò <flameeyes@gmail.com>\n"
 "Language-Team: Italian\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
-msgstr "Non c'è alcun MRL."
+msgstr "Non c'e alcun MRL."
 
 #, c-format
 msgid ""
@@ -152,21 +154,32 @@ msgstr "controllo: non si trova l'immagine di sfondo\n"
 msgid "Control HUE value"
 msgstr "Valore di controllo COLORE"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr "Col."
+
 msgid "Control SATURATION value"
 msgstr "Valore di controllo di SATURAZIONE"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
 msgstr "Sat."
 
 msgid "Control BRIGHTNESS value"
 msgstr "Valore di controllo di LUMINOSITÀ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr "Lum."
 
 msgid "Control CONTRAST value"
 msgstr "Valore di controllo di CONTRASTO"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Contr."
 
@@ -174,6 +187,8 @@ msgstr "Contr."
 msgid "Control GAMMA value"
 msgstr "Valore di controllo COLORE"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -181,7 +196,9 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Valore di controllo di LUMINOSITÀ"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Sat."
 
@@ -189,9 +206,13 @@ msgstr "Sat."
 msgid "Control NOISE REDUCTION value"
 msgstr "Valore di controllo di SATURAZIONE"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Scegli una Skin"
 
@@ -204,7 +225,9 @@ msgstr "Chiudi finestra di controllo"
 msgid "Download in progress"
 msgstr "Download in corso"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Download in corso: %d%%."
 
@@ -1883,6 +1906,8 @@ msgstr "Tutte le estensioni"
 msgid "xine MRL Browser"
 msgstr "Navigatore MRL di xine"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr "Sorgente:"
 
@@ -2062,6 +2087,8 @@ msgstr "Salva playlist"
 msgid "Close playlist window"
 msgstr "Chiudi finestra della playlist"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Ricerca:"
 
@@ -2162,8 +2189,8 @@ msgstr "Non è riuscito a caricare %s/%s. Caricata vecchia skin %s\n"
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Non è riuscito a caricare %s, versione errata. Caricata skin di riserva "
-"'%s'.\n"
+"Non è riuscito a caricare %s, versione errata. Caricata skin di riserva '%"
+"s'.\n"
 
 #, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
@@ -2197,8 +2224,8 @@ msgstr "Non è riuscito a caricare %s/%s. Sta terminando.\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Non è riuscito a caricare skin %s, versione errata. Carica skin di riserva "
-"'%s'.\n"
+"Non è riuscito a caricare skin %s, versione errata. Carica skin di riserva '%"
+"s'.\n"
 
 #, c-format
 msgid "Unable to retrieve skin list from %s: %s"
