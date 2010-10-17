@@ -1234,7 +1234,8 @@ void playlist_editor(void) {
     (playlist->playlist = xitk_browser_create(playlist->widget_list, gGui->skin_config, &br)));
 
   lbl.skin_element_name = "AutoPlayLbl";
-  lbl.label             = _("Scan for:");
+  /* TRANSLATORS: only ASCII characters (skin) */
+  lbl.label             = pgettext("skin", "Scan for:");
   lbl.callback          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)),
 			    xitk_label_create (playlist->widget_list, gGui->skin_config, &lbl));

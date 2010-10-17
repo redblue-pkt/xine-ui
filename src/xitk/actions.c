@@ -382,7 +382,8 @@ static void set_mmk(mediamark_t *mmk) {
     
     snprintf(buffer, sizeof(buffer), "xine-ui version %s", VERSION);
     
-    gGui->mmk.mrl           = strdup(_("There is no MRL."));
+    /* TRANSLATORS: only ASCII characters (skin) */
+    gGui->mmk.mrl           = strdup(pgettext("skin", "There is no MRL."));
     gGui->mmk.ident         = strdup(buffer);
     gGui->mmk.sub           = NULL;
     gGui->mmk.start         = 0;

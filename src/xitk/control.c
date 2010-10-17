@@ -1079,7 +1079,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->hue, _("Control HUE value"));
     
     lbl.skin_element_name = "CtlHueLbl";
-    lbl.label             = _("Hue");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Hue");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1105,7 +1106,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->sat, _("Control SATURATION value"));
 
     lbl.skin_element_name = "CtlSatLbl";
-    lbl.label             = _("Sat");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Sat");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1131,7 +1133,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->bright, _("Control BRIGHTNESS value"));
 
     lbl.skin_element_name = "CtlBrightLbl";
-    lbl.label             = _("Brt");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Brt");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1157,7 +1160,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->contr, _("Control CONTRAST value"));
 
     lbl.skin_element_name = "CtlContLbl";
-    lbl.label             = _("Ctr");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Ctr");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1185,7 +1189,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->gamma, _("Control GAMMA value"));
 
     lbl.skin_element_name = "CtlGammaLbl";
-    lbl.label             = _("Gam");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Gam");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
                             xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1213,7 +1218,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->sharp, _("Control SHARPNESS value"));
 
     lbl.skin_element_name = "CtlSharpLbl";
-    lbl.label             = _("Sha");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Sha");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
                             xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1241,7 +1247,8 @@ void control_panel(void) {
     xitk_set_widget_tips(control->noise, _("Control NOISE REDUCTION value"));
 
     lbl.skin_element_name = "CtlNoiseLbl";
-    lbl.label             = _("Noi");
+    /* TRANSLATORS: only ASCII characters (skin) */
+    lbl.label             = pgettext("skin", "Noi");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
                             xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
@@ -1262,7 +1269,8 @@ void control_panel(void) {
   }
   
   lbl.skin_element_name = "CtlSkLbl";
-  lbl.label             = _("Choose a Skin");
+  /* TRANSLATORS: only ASCII characters (skin) */
+  lbl.label             = pgettext("skin", "Choose a Skin");
   lbl.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			   xitk_label_create(control->widget_list, gGui->skin_config, &lbl));

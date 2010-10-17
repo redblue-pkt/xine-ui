@@ -8,15 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.7hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2010-10-17 17:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr ""
 
@@ -140,42 +141,61 @@ msgstr ""
 msgid "Control HUE value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
+msgid "Hue"
+msgstr ""
+
 msgid "Control SATURATION value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sat"
 msgstr ""
 
 msgid "Control BRIGHTNESS value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Brt"
 msgstr ""
 
 msgid "Control CONTRAST value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Ctr"
 msgstr ""
 
 msgid "Control GAMMA value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
 msgid "Control SHARPNESS value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Sha"
 msgstr ""
 
 msgid "Control NOISE REDUCTION value"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr ""
 
@@ -188,7 +208,9 @@ msgstr ""
 msgid "Download in progress"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr ""
 
@@ -1630,6 +1652,8 @@ msgstr ""
 msgid "xine MRL Browser"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Source:"
 msgstr ""
 
@@ -1809,6 +1833,8 @@ msgstr ""
 msgid "Close playlist window"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Scan for:"
 msgstr ""
 
