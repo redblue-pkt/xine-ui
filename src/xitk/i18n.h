@@ -32,6 +32,19 @@
 #    else
 #        define N_(String) (String)
 #    endif
+#    define pgettext(Ctx, String) pgettext_aux(NULL, Ctx "\004" String, String, LC_MESSAGES)
+
+static const char *
+pgettext_aux(const char *domain, const char *msg_ctxt_id,
+             const char *msgid, int category)
+{
+  const char *translation = dcgettext (domain, msg_ctxt_id, category);
+  if (translation == msg_ctxt_id)
+    return msgid;
+  else
+    return translation;
+}
+
 #else
 /* Stubs that do something close enough.  */
 #    define textdomain(String) (String)
@@ -41,6 +54,7 @@
 #    define bindtextdomain(Domain,Directory) (Domain)
 #    define _(String) (String)
 #    define N_(String) (String)
+#    define pgettext(Ctx, String) (String)
 #endif
 
 #endif

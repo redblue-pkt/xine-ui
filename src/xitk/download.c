@@ -51,7 +51,8 @@ static int progress_callback(void *userdata,
   int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
   
   osd_draw_bar(_("Download in progress"), 0, 100, percent, OSD_BAR_POS);
-  snprintf(buffer, sizeof(buffer), _("Download progress: %d%%."), percent);
+  /* TRANSLATORS: only ASCII characters (skin) */
+  snprintf(buffer, sizeof(buffer), pgettext("skin", "Download progress: %d%%."), percent);
   gGui->mrl_overrided = 3;
   panel_set_title(buffer);
   

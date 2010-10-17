@@ -298,7 +298,8 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
   mb.ip_name.button.skin_element_name      = "MrlPlugNameBG";
 
   mb.ip_name.label.skin_element_name       = "MrlPlugLabel";
-  mb.ip_name.label.label_str               = _("Source:");
+  /* TRANSLATORS: only ASCII characters (skin) */
+  mb.ip_name.label.label_str               = pgettext("skin", "Source:");
 
   mb.xine                                  = (xine_t *)__xineui_global_xine_instance;
 
