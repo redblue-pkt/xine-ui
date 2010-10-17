@@ -28,4 +28,5 @@ AC_DEFUN([AM_NLS],
     USE_NLS=$enableval, USE_NLS=yes)
   AC_MSG_RESULT($USE_NLS)
   AC_SUBST(USE_NLS)
+  AM_CONDITIONAL([USE_NLS], [test "x$USE_NLS" = "xyes"])
 ])
