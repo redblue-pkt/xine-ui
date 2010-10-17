@@ -1,6 +1,10 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Spanish translation update from Carlos E. Robinson M.
+  * Czech translation update.
+  * Use only ASCII for "picture" texts in skin.
+  * Fix of the help texts encoding.
   * Avoid a deadlock in the tooltips code.
   * Set combo box menu windows' override-redirect flags.
   * MRL browser recognises a few more extensions.
