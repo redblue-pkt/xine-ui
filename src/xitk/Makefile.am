@@ -12,10 +12,6 @@ if HAVE_X11
 xine_ui = xine $(remote)
 endif
 
-if USE_NLS
-i18n = i18n.c
-endif
-
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 
@@ -58,8 +54,7 @@ xine_SOURCES = \
 	tvout.c \
 	tvset.c \
 	videowin.c \
-	viewlog.c \
-	$(i18n)
+	viewlog.c
 
 if HAVE_TAR
 xine_SOURCES += skins_download.c skins_internal.h
