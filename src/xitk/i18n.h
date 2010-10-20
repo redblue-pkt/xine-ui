@@ -32,11 +32,8 @@
 #    else
 #        define N_(String) (String)
 #    endif
-#    define pgettext(Ctx, String) xine_ui_pgettext_aux(NULL, Ctx "\004" String, String, LC_MESSAGES)
-
-const char *
-xine_ui_pgettext_aux(const char *domain, const char *msg_ctxt_id,
-             const char *msgid, int category);
+#    define XITK_GETTEXT_SEP "\004"
+#    define pgettext(Ctx, String) gettext(Ctx XITK_GETTEXT_SEP String) == Ctx XITK_GETTEXT_SEP String ? String : gettext(Ctx XITK_GETTEXT_SEP String)
 
 #else
 /* Stubs that do something close enough.  */
