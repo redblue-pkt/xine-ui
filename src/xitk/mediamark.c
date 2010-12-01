@@ -796,7 +796,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	playlist->data = tox_content;
 	
 	if(playlist_split_data(playlist)) {
-	  char    buffer[23768], path[_PATH_MAX + _NAME_MAX + 2];
+	  char    buffer[32768], path[_PATH_MAX + _NAME_MAX + 2];
 	  char   *p, *pp, *origin;
 	  int     start = 0;
 	  int     linen = 0;
