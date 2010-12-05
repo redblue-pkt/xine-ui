@@ -27,6 +27,7 @@
 #include <locale.h>
 
 #include "xitk.h"
+#include "xitkintl.h"
 
 typedef struct {
   Display              *display;
