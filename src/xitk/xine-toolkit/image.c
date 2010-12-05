@@ -514,6 +514,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
           memmove(bp, nextword, wordlen + 1);
 	
         linel = wordlen;
+        lastws = 0;
       }
       
       if(wlinew > maxw)
