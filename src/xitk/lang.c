@@ -236,45 +236,45 @@ static const langs_t _langs[] = {
   /* English section */
   { "C",                ENGLISH,            "en",    ""           }, /* WARNING: This should be the first entry */
   { "POSIX",            ENGLISH,            "en",    ""           },
-  { "en_GB",            ENGLISH,            "en",    "ISO-8859-1" },
+  { "en_GB",            ENGLISH,            "en",    "UTF-8" },
 
   /* French section */
-  { "fr_FR",            FRENCH,             "fr",    "ISO-8859-1" },
-  { "fr_FR@euro",       FRENCH,             "fr",    "ISO-8859-1" },
-  { "french",           FRENCH,             "fr",    "ISO-8859-1" },
+  { "fr_FR",            FRENCH,             "fr",    "UTF-8" },
+  { "fr_FR@euro",       FRENCH,             "fr",    "UTF-8" },
+  { "french",           FRENCH,             "fr",    "UTF-8" },
 
   /* German section */
-  { "de_DE",            GERMAN,             "de",    "ISO-8859-1" },
-  { "de_DE@euro",       GERMAN,             "de",    "ISO-8859-1" },
-  { "deutsch",          GERMAN,             "de",    "ISO-8859-1" },
-  { "german",           GERMAN,             "de",    "ISO-8859-1" },
+  { "de_DE",            GERMAN,             "de",    "UTF-8" },
+  { "de_DE@euro",       GERMAN,             "de",    "UTF-8" },
+  { "deutsch",          GERMAN,             "de",    "UTF-8" },
+  { "german",           GERMAN,             "de",    "UTF-8" },
 
   /* Portuguese section */
-  { "pt_BR",            PORTUGUESE,         "pt_BR", "ISO-8859-1" },
+  { "pt_BR",            PORTUGUESE,         "pt_BR", "UTF-8" },
 
   /* Spanish section */
-  { "es_ES",            SPANISH,            "es",    "ISO-8859-1" },
-  { "es_ES@euro",       SPANISH,            "es",    "ISO-8859-1" },
-  { "spanish",          SPANISH,            "es",    "ISO-8859-1" },
+  { "es_ES",            SPANISH,            "es",    "UTF-8" },
+  { "es_ES@euro",       SPANISH,            "es",    "UTF-8" },
+  { "spanish",          SPANISH,            "es",    "UTF-8" },
 
   /* Polish */
-  { "pl_PL",            POLISH,             "pl",    "ISO-8859-2" },
-  { "pl_PL.UTF-8",      POLISH,             "pl",    "ISO-8859-2" },
+  { "pl_PL",            POLISH,             "pl",    "UTF-8" },
+  { "pl_PL.UTF-8",      POLISH,             "pl",    "UTF-8" },
 
   /* Ukrainian */
-  { "uk_UA",            UKRAINIAN,          "uk",    "KOI8-U"     },
-  { "uk_UA.UTF-8",      UKRAINIAN,          "uk",    "KOI8-U"     },
+  { "uk_UA",            UKRAINIAN,          "uk",    "UTF-8" },
+  { "uk_UA.UTF-8",      UKRAINIAN,          "uk",    "UTF-8" },
 
   /* Czech */
-  { "cs_CZ",            CZECH,              "cs",    "ISO-8859-2" },
-  { "cs_CZ.UTF-8",      CZECH,              "cs",    "ISO-8859-2" },
+  { "cs_CZ",            CZECH,              "cs",    "UTF-8" },
+  { "cs_CZ.UTF-8",      CZECH,              "cs",    "UTF-8" },
 
   /* NORWEGIAN */
-  { "nb_NO",            NORWEGIAN_BOKMAL,   "nb",    "ISO-8859-1" },
-  { "nb_NO.ISO-8859-1", NORWEGIAN_BOKMAL,   "nb",    "ISO-8859-1" },
+  { "nb_NO",            NORWEGIAN_BOKMAL,   "nb",    "UTF-8" },
+  { "nb_NO.ISO-8859-1", NORWEGIAN_BOKMAL,   "nb",    "UTF-8" },
 
   /* The ultimate solution */
-  { "",                 ENGLISH,            "en",    "ISO-8859-1" }
+  { "",                 ENGLISH,            "en",    "UTF-8" }
 };
   
 /* ISO 639-1 */
