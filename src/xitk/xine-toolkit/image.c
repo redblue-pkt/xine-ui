@@ -497,6 +497,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
         lines[numlines++] = bp;
         bp                += linel;
         linel             = 1;
+        bp[linel]         = 0;
       }
       else {
         char *nextword = (bp + lastws);
