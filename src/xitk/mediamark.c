@@ -976,8 +976,9 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		  }
 		  
 		  if(*pp != '\0') {
-		    *p = *pp;
-		    p++;
+		    /* buffer full? don't copy */
+		    if (p - buffer < sizeof (buffer) - 1)
+		      *p++ = *pp;
 		    pp++;
 		  }
 		}
