@@ -16,7 +16,7 @@ m4_define([xine_VERSION], [xine_MAJOR.xine_MINOR.m4_expand([xine_SUB])xine_PRE])
 
 XINE_MAJOR=xine_MAJOR
 XINE_MINOR=xine_MINOR
-XINE_SUBxine_SUB
+XINE_SUB=xine_SUB
 XINE_PRE=xine_PRE
 
 AC_PREREQ(2.59)
