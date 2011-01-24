@@ -61,7 +61,7 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
       png_destroy_read_struct(&png_ptr, NULL, NULL);
       return NULL;
     }
-  if (info_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+  if (png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_RGB_ALPHA)
     {
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return NULL;
