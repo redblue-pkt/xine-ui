@@ -109,7 +109,7 @@ static const char *const shortcut_style[] = {
 
 static volatile int reject_events = 1;
 
-pthread_mutex_t event_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t event_mutex;
 
 
 int hidden_file_cb(int action, int value) {
@@ -1504,7 +1504,10 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 }
 
 void gui_deinit(void) {
+  pthread_mutex_lock(&event_mutex);
   reject_events = 1;
+  pthread_mutex_unlock(&event_mutex);
+
   xitk_unregister_event_handler(&gGui->widget_key);
 }
 
@@ -1515,6 +1518,11 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   int    i;
   char  *server;
   char  *video_display_name;
+  pthread_mutexattr_t attr;
+
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&event_mutex, &attr);
 
   /*
    * init playlist
