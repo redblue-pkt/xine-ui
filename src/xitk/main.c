@@ -2272,6 +2272,9 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
+  xine_event_dispose_queue(gGui->event_queue);
+  xine_event_dispose_queue(gGui->visual_anim.event_queue);
+
   visual_anim_done();
   free(pplugins);
   
