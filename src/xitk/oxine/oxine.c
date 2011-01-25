@@ -43,7 +43,8 @@
 #include "mediamarks.h"
 #include "playlist.h"
 
-static oxine_t         *oxine_instance = NULL;
+static oxine_t *oxine_instance_get(void);
+static void oxine_instance_unget(oxine_t *oxine);
 
 
 typedef struct menuitem_s menuitem_t;
@@ -268,22 +269,31 @@ static void shutdown_cb (void *data) {
 
 static void mrl_cb (void *data) {
   char *parameter = (char *) data;
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
+  if (!oxine)
+    return;
 
   oxine->pauseplay = NULL;
   oxine->main_window = NULL;
   otk_clear(oxine->otk);
   oxine->mode = OXINE_MODE_NORMAL;
   odk_open_and_play(oxine->odk, parameter);
+
+  oxine_instance_unget(oxine);
 }
 
 static void autoplay_cb (void *data) {
   char *parameter = (char *) data;
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
   int    num_mrls, j;
-  char **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
-                         parameter,
-                         &num_mrls);
+  char **autoplay_mrls;
+
+  if (!oxine)
+    return;
+
+  autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
+                  parameter,
+                  &num_mrls);
 
   if(autoplay_mrls) {
     playlist_delete_all(NULL, NULL);
@@ -303,6 +313,8 @@ static void autoplay_cb (void *data) {
     gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
                            gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0);
   }
+
+  oxine_instance_unget(oxine);
 }  
 
 
@@ -637,10 +649,13 @@ static void return_cb(void *this) {
 
 static void oxine_error_msg(char *text)
 {
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
   otk_widget_t *b;
   int l;
   char *text2, *s;
+
+  if (!oxine)
+    return;
 
   s = text2 = strdup(text);
   
@@ -666,6 +681,8 @@ static void oxine_error_msg(char *text)
   otk_draw_all(oxine->otk);
 
   free(text2);
+
+  oxine_instance_unget(oxine);
 }
 
 /*
@@ -723,20 +740,9 @@ static void destroy_oxine(oxine_t *oxine) {
 #endif
 }
 
-void oxine_init(void)
-{
-  oxine_instance = create_oxine();
-}
-
-void oxine_exit(void)
-{
-  destroy_oxine(oxine_instance);
-  oxine_instance = NULL;
-}
-
 void oxine_menu(void)
 {
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
 
   if( !oxine )
     return;
@@ -746,6 +752,7 @@ void oxine_menu(void)
 
   if( !oxine->main_menu_items ) {
     printf("oxine: main menu items missing, check ~/.xine/oxine/mainmenu\n");
+    oxine_instance_unget(oxine);
     return;
   }
 
@@ -764,85 +771,92 @@ void oxine_menu(void)
     oxine->mode = OXINE_MODE_NORMAL;
     otk_clear(oxine->otk);
   }
+
+  oxine_instance_unget(oxine);
 }
 
 int oxine_action_event(int xine_event_type)
 {
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
   oxine_event_t ev;
 
   if( !oxine )
     return 0;
 
-  if( oxine->mode == OXINE_MODE_NORMAL )
+  if( oxine->mode == OXINE_MODE_NORMAL ) {
+    oxine_instance_unget(oxine);
     return 0;
+  }
 
   ev.type = OXINE_EVENT_KEY;
   
   switch( xine_event_type ) {
+  default:
+    oxine_instance_unget(oxine);
+    return 0;
   case XINE_EVENT_INPUT_UP:
-    video_window_reset_ssaver();
     ev.key = OXINE_KEY_UP;
-    otk_send_event(oxine->otk, &ev);
-    return 1;
+    break;
   case XINE_EVENT_INPUT_DOWN:
-    video_window_reset_ssaver();
     ev.key = OXINE_KEY_DOWN;
-    otk_send_event(oxine->otk, &ev);
-    return 1;
+    break;
   case XINE_EVENT_INPUT_LEFT:
-    video_window_reset_ssaver();
     ev.key = OXINE_KEY_LEFT;
-    otk_send_event(oxine->otk, &ev);
-    return 1;
+    break;
   case XINE_EVENT_INPUT_RIGHT:
-    video_window_reset_ssaver();
     ev.key = OXINE_KEY_RIGHT;
-    otk_send_event(oxine->otk, &ev);
-    return 1;
+    break;
   case XINE_EVENT_INPUT_SELECT:
-    video_window_reset_ssaver();
     gGui->nongui_error_msg = oxine_error_msg;
     ev.key = OXINE_KEY_SELECT;
-    otk_send_event(oxine->otk, &ev);
-    return 1;
+    break;
   }
   
-  return 0;
+  video_window_reset_ssaver();
+  otk_send_event(oxine->otk, &ev);
+  oxine_instance_unget(oxine);
+  return 1;
 }
 
 int oxine_mouse_event(int xine_event_type, int x, int y) {
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
   oxine_event_t ev;
+  int retval;
 
   if( !oxine )
     return 0;
 
-  if( oxine->mode == OXINE_MODE_NORMAL )
+  if( oxine->mode == OXINE_MODE_NORMAL ) {
+    oxine_instance_unget(oxine);
     return 0;
+  }
 
   ev.x = x;
   ev.y = y;
     
   switch( xine_event_type ) {
+  default:
+    oxine_instance_unget(oxine);
+    return 0;
   case XINE_EVENT_INPUT_MOUSE_MOVE:
-    video_window_reset_ssaver();
     ev.type = OXINE_EVENT_MOTION;
-    return otk_send_event(oxine->otk, &ev);
+    break;
   case XINE_EVENT_INPUT_MOUSE_BUTTON:
-    video_window_reset_ssaver();
     gGui->nongui_error_msg = oxine_error_msg;
     ev.type = OXINE_EVENT_BUTTON;
     ev.key = OXINE_BUTTON1;
-    return otk_send_event(oxine->otk, &ev);
+    break;
   }
 
-  return 0;
+  video_window_reset_ssaver();
+  retval = otk_send_event(oxine->otk, &ev);
+  oxine_instance_unget(oxine);
+  return retval;
 }
 
 void oxine_adapt(void)
 {
-  oxine_t *oxine = oxine_instance;
+  oxine_t *oxine = oxine_instance_get();
   oxine_event_t ev;
 
   if( !oxine )
@@ -850,5 +864,62 @@ void oxine_adapt(void)
   
   ev.type = OXINE_EVENT_FORMAT_CHANGED;
   otk_send_event(oxine->otk, &ev);
+  oxine_instance_unget(oxine);
 }
 
+static pthread_mutex_t oxine_instance_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t oxine_instance_unlocked = PTHREAD_COND_INITIALIZER;
+static oxine_t *oxine_instance = NULL;
+static int oxine_instance_locks = 0;
+
+oxine_t *oxine_instance_get(void)
+{
+  oxine_t *oxine;
+
+  pthread_mutex_lock(&oxine_instance_mutex);
+  
+  oxine = oxine_instance;
+  if (oxine)
+    oxine_instance_locks++;
+
+  pthread_mutex_unlock(&oxine_instance_mutex);
+
+  return oxine;
+}
+
+void oxine_instance_unget(oxine_t *oxine)
+{
+  pthread_mutex_lock(&oxine_instance_mutex);
+
+  if (0 == --oxine_instance_locks)
+    pthread_cond_broadcast(&oxine_instance_unlocked);
+
+  pthread_mutex_unlock(&oxine_instance_mutex);
+}
+
+void oxine_init(void)
+{
+  pthread_mutex_lock(&oxine_instance_mutex);
+
+  oxine_instance = create_oxine();
+  oxine_instance_locks = 1;
+
+  pthread_mutex_unlock(&oxine_instance_mutex);
+}
+
+void oxine_exit(void)
+{
+  oxine_t *oxine = oxine_instance;
+
+  pthread_mutex_lock(&oxine_instance_mutex);
+
+  oxine_instance = NULL;
+  oxine_instance_locks--;
+  
+  while (oxine_instance_locks > 0)
+    pthread_cond_wait(&oxine_instance_unlocked, &oxine_instance_mutex);
+ 
+  destroy_oxine(oxine);
+
+  pthread_mutex_unlock(&oxine_instance_mutex);
+}
