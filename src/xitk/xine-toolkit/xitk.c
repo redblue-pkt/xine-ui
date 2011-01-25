@@ -85,8 +85,10 @@ static int ml = 0;
 #define MUTUNLOCK() pthread_mutex_unlock(&gXitk->mutex)
 #endif
 
-#define FXLOCK(_fx) pthread_mutex_lock(&_fx->mutex)
-#define FXUNLOCK(_fx) pthread_mutex_unlock(&_fx->mutex)
+#define FXLOCK(_fx)       __gfx_lock(_fx)
+#define FXTRYLOCK(_fx)    __gfx_trylock(_fx)
+#define FXUNLOCK(_fx)     __gfx_unlock(_fx)
+#define FXSELFLOCKED(_fx) __gfx_selflocked(_fx)
 
 
 typedef struct {
@@ -120,7 +122,37 @@ typedef struct {
 
   pthread_mutex_t             mutex;
   int                         destroy;
+  pthread_t                   owning_thread;
 } __gfx_t;
+
+static int __gfx_lock(__gfx_t *fx)
+{
+  int retval = pthread_mutex_lock(&fx->mutex);
+  if (0 == retval)
+    fx->owning_thread = pthread_self();
+
+  return retval;
+}
+
+static int __gfx_trylock(__gfx_t *fx)
+{
+  int retval = pthread_mutex_trylock(&fx->mutex);
+  if (0 == retval)
+    fx->owning_thread = pthread_self();
+
+  return retval;
+}
+
+static int __gfx_unlock(__gfx_t *fx)
+{
+  fx->owning_thread = (pthread_t)0;
+  return pthread_mutex_unlock(&fx->mutex);
+}
+
+static int __gfx_selflocked(__gfx_t *fx)
+{
+  return pthread_equal(fx->owning_thread, pthread_self());
+}
 
 typedef struct {
   Display                    *display;
@@ -1046,6 +1078,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
   fx->height    = 0;
   fx->user_data = user_data;
   pthread_mutex_init(&fx->mutex, NULL);
+  fx->owning_thread = (pthread_t)0;
   
   if(window != None) {
     XWindowAttributes wattr;
@@ -1200,7 +1233,12 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   
   while(fx) {
 
-    if(pthread_mutex_trylock(&fx->mutex)) {
+    if(FXTRYLOCK(fx)) {
+      if (!FXSELFLOCKED(fx)) {
+        FXLOCK(fx);
+        goto locked;
+      }
+
       if(fx->key == *key) {
 	*key        = 0; 
 	fx->destroy = 1;
@@ -1209,6 +1247,7 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
       }
     }
     else {
+locked:
       if(fx->key == *key) {
 	*key = 0; 
 	
@@ -1264,8 +1303,12 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   while(fx) {
     int  already_locked = 0;
     
-    if(pthread_mutex_trylock(&fx->mutex))
-      already_locked = 1;
+    if(FXTRYLOCK(fx)) {
+      if (FXSELFLOCKED(fx))
+        already_locked = 1;
+      else
+        FXLOCK(fx);
+    }
 
     if((fx->key == key) && (fx->window != None)) {
       Window c;
@@ -1304,12 +1347,21 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   return 0;
 }
 
+static void xitk_xevent_notify_impl(XEvent *event);
+
+void xitk_xevent_notify(XEvent *event) {
+  /* protect walking through gfx list */
+  MUTLOCK();
+  xitk_xevent_notify_impl(event);
+  MUTUNLOCK();
+}
+
 /*
  * Here events are handled. All widget are locally
  * handled, then if a event handler callback was passed
  * at register time, it will be called.
  */
-void xitk_xevent_notify(XEvent *event) {
+void xitk_xevent_notify_impl(XEvent *event) {
   __gfx_t  *fx, *fxd;
      
   if(!(fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx)))
@@ -1836,6 +1888,7 @@ void xitk_xevent_notify(XEvent *event) {
  */
 void xitk_init(Display *display, XColor black, int verbosity) {
   char buffer[256];
+  pthread_mutexattr_t attr;
   
   xitk_pid = getppid();
 
@@ -1867,7 +1920,9 @@ void xitk_init(Display *display, XColor black, int verbosity) {
 
   memset(&gXitk->keypress, 0, sizeof(gXitk->keypress));
 
-  pthread_mutex_init (&gXitk->mutex, NULL);
+  pthread_mutexattr_init(&attr);
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init (&gXitk->mutex, &attr);
   
   snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
   
