@@ -720,9 +720,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
   xine_close(gGui->stream);
   xine_close(gGui->visual_anim.stream);
 
-  xine_event_dispose_queue(gGui->event_queue);
-  xine_event_dispose_queue(gGui->visual_anim.event_queue);
-
   /* we are going to dispose this stream, so make sure slider_loop 
    * won't use it anymore (otherwise -> segfault on exit).
    */
