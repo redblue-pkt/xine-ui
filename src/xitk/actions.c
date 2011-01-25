@@ -672,6 +672,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
   
   gGui->on_quit = 1;
 
+  gui_deinit();
+
   panel_deinit();
   playlist_deinit();
   mrl_browser_deinit();
@@ -694,8 +696,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
     filebrowser_end(load_stream);
   if(load_sub)
     filebrowser_end(load_sub);
-
-  gui_deinit();
 
   if(video_window_is_visible())
     video_window_set_visibility(0);
