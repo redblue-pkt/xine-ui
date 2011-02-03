@@ -1,6 +1,10 @@
 xine-ui (0.99.7) unstable; urgency=low
   (add entries here, newest at the top)
 
+  * Avoid a possible overflow when handling media marks. [MWRInfoSecurity]
+  * Avoid a possible overflow when handling M3U files. [MWRInfoSecurity]
+  * Fixes for libpng 1.5 and header checking.
+  * xine-bugreport uses $TMPDIR.
   * Spanish translation update from Carlos E. Robinson M.
   * Czech translation update.
   * Use only ASCII for "picture" texts in skin.
