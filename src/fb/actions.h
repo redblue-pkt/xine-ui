@@ -178,6 +178,9 @@ typedef enum {
   ACTID_EVENT_VDR_SETUP            = XINE_EVENT_VDR_SETUP            | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_VDR_COMMANDS         = XINE_EVENT_VDR_COMMANDS         | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_VDR_BACK             = XINE_EVENT_VDR_BACK             | ACTID_IS_INPUT_EVENT,
+#ifdef XINE_EVENT_VDR_USER0 /* #ifdef is precaution for backward compatibility at the moment */
+  ACTID_EVENT_VDR_USER0            = XINE_EVENT_VDR_USER0            | ACTID_IS_INPUT_EVENT,
+#endif
   ACTID_EVENT_VDR_USER1            = XINE_EVENT_VDR_USER1            | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_VDR_USER2            = XINE_EVENT_VDR_USER2            | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_VDR_USER3            = XINE_EVENT_VDR_USER3            | ACTID_IS_INPUT_EVENT,

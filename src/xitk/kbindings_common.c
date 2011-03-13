@@ -366,6 +366,10 @@ static const kbinding_entry_t default_binding_table[] = {
     "VDRCommands",            ACTID_EVENT_VDR_COMMANDS       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "VDR Command back",
     "VDRBack",                ACTID_EVENT_VDR_BACK           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+#ifdef XINE_EVENT_VDR_USER0 /* #ifdef is precaution for backward compatibility at the moment */
+  { "VDR User command 0",
+    "VDRUser0",               ACTID_EVENT_VDR_USER0          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+#endif
   { "VDR User command 1",
     "VDRUser1",               ACTID_EVENT_VDR_USER1          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "VDR User command 2",

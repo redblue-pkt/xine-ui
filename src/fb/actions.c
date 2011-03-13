@@ -267,6 +267,10 @@ static const struct
 	  "VDRCommands",            ACTID_EVENT_VDR_COMMANDS },
 	{ "VDR Command back",
 	  "VDRBack",                ACTID_EVENT_VDR_BACK },    
+#ifdef XINE_EVENT_VDR_USER0 /* #ifdef is precaution for backward compatibility at the moment */
+	{ "VDR User command 0",
+	  "VDRUser0",               ACTID_EVENT_VDR_USER0 },   
+#endif
 	{ "VDR User command 1",
 	  "VDRUser1",               ACTID_EVENT_VDR_USER1 },   
 	{ "VDR User command 2",
