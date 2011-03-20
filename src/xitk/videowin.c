@@ -2271,7 +2271,9 @@ long int video_window_get_ssaver_idle(void) {
   int dummy = 0;
   if(XScreenSaverQueryExtension(gGui->video_display, &dummy, &dummy)) {
     XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
+    XLockDisplay(gGui->video_display);
     XScreenSaverQueryInfo(gGui->video_display, (DefaultRootWindow(gGui->video_display)), ssaverinfo);
+    XUnlockDisplay(gGui->video_display);
     ssaver_idle = ssaverinfo->idle;
     XFree(ssaverinfo);
     return ssaver_idle/1000;
