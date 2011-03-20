@@ -571,6 +571,20 @@ AC_CHECK_FUNCS([nanosleep])
 AC_REPLACE_FUNCS([getline getsubopt strlcat strlcpy strndup strsep])
 AC_CHECK_HEADERS(string.h strings.h linux/kd.h execinfo.h)
 
+dnl
+dnl Check for clock_gettime() in librt
+dnl
+AC_MSG_CHECKING(whether librt is needed)
+AC_TRY_COMPILE(
+	[#include <unistd.h>
+	 #include <sys/time.h>],
+	[#if _POSIX_TIMERS > 0
+	 struct timespec ts;
+	 clock_gettime(CLOCK_REALTIME, &ts);
+	 #endif],
+	[AC_MSG_RESULT(no); RT_LIBS=""],
+	[AC_MSG_RESULT(yes); RT_LIBS="-lrt"]);
+AC_SUBST(RT_LIBS)
 
 dnl
 dnl Check for GNU getopt_long()
