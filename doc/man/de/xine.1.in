@@ -41,12 +41,12 @@ Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Pl
 Setze Stufe der `Geschwätzigkeit'.
 .TP 
 .BI \-c,\ \-\-config\  <Datei>
-Benutze \fI<Datei>\fP anstatt anstatt der normalen \fBconfig\fP Datei.
+Benutze \fI<Datei>\fP anstatt der normalen \fBconfig\fP Datei.
 .TP 
 .BI \-a,\ \-\-audio\-channel\  <Zahl>
 Wählt die angegebene Tonspur. \fI<Zahl>\fP ist die Nummer der Tonspur, normalerweise \fB0\fP.
 .br 
-Xine 0.5 und neuer versucht, möglichst viele gültige Tonspuren (ac3, mpeg audio, avi audio, ...) des Titels zu sammeln und ordnet diese sogenannten "Virtuelen Kanälen" zu, die von \fB0\fP an beginnend durchnummeriert sind.
+Xine 0.5 und neuer versucht, möglichst viele gültige Tonspuren (ac3, mpeg audio, avi audio, ...) des Titels zu sammeln und ordnet diese sogenannten "Virtuellen Kanälen" zu, die von \fB0\fP an beginnend durchnummeriert sind.
 .TP 
 .BI \-V,\ \-\-video\-driver\  <Treiber>
 Wählt den Video\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Video\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in \fI~/.xine/config\fP gespeichert, so daß der Video\-Treiber nur einmalig gewählt werden braucht.
@@ -65,9 +65,9 @@ Folgende Optionen können angehängt werden:
 .br
 `\fIF\fP' Xinerama Vollbildmodus,
 .br
-`\fIh\fP' GUI (Steuerfenster, etc...) ausbelnden,
+`\fIh\fP' GUI (Steuerfenster, etc...) ausblenden,
 .br
-`\fIw\fP' Videoausgabefenster ausbelnden,
+`\fIw\fP' Videoausgabefenster ausblenden,
 .br
 `\fIq\fP' Programm nach Abspielen beenden,
 .br
@@ -75,7 +75,7 @@ Es ist auch möglich, eine Spielliste von DVD `\fId\fP' oder `\fIv\fP' anzuforder
 Dafür gibt es inzwischen die allgemeinere Option \fI\-\-auto\-scan\fP, mehr dazu siehe weiter unten.
 .TP 
 .BI \-s,\ \-\-auto\-scan\  <plugin>
-Titelliste automatisch vom Input\-Plugin erstellen. Viele Plugins erlauben es, eine standard Titelliste zu erstellen, die "alles" enthält. Dies Funktioniert zum Beispiel gut mit DVDs und VCDs. Das Benutzen dieser Option hat die gleiche Wirkung, als wenn der zugehörige Knopf im xine\-Hauptfenster gedrückt wird.
+Titelliste automatisch vom Input\-Plugin erstellen. Viele Plugins erlauben es, eine Standard-Titelliste zu erstellen, die "alles" enthält. Dies funktioniert zum Beispiel gut mit DVDs und VCDs. Das Benutzen dieser Option hat die gleiche Wirkung, als wenn der zugehörige Knopf im xine\-Hauptfenster gedrückt wird.
 
 Diese Option ist besonders nützlich im Zusammenhang mit auto\-play.
 Durch Starten von \fIxine \-\-auto\-play \-\-auto\-scan dvd\fP kann eine gesamte DVD abgespielt werden, ohne einen weiteren Knopf zu betätigen.
@@ -98,7 +98,7 @@ Verdeckt nach dem Start nur das Steuerfenster, das Video\-Fenster bleibt sichtba
 Position und Größe des Video\-Fensters als X-Geometrie angeben (siehe \fIX\fP(7)). Position \fBX\fP und \fBY\fP sind optional.
 .TP
 .B \-B,\ \-\-borderless
-Rahmen von Video\-Fenster entfernen (Nur im Fenster\-Modus).
+Rahmen vom Video\-Fenster entfernen (Nur im Fenster\-Modus).
 .TP
 .BI \-N,\ \-\-animation\  <mrl>
 Eine oder mehrere MRLs zum Abspielen, falls kein Videoanteil vorhanden ist.
@@ -115,13 +115,13 @@ Setzt den Wiedergabeliste-Wiederholmodus. Wenn der Modus nicht angegeben ist, wi
 .br
 `\fIshuffle\fP': Zufälligen Eintrag aus noch nicht gespielter Wiedergabeliste auswählen.
 .br
-`\fIshuffle+\fP': Das Selbe wie shuffle, nur wird die Playliste unendlichoft wiederholt.
+`\fIshuffle+\fP': Dasselbe wie shuffle, nur wird die Playliste unendlich oft wiederholt.
 .TP
 .BI \-\-skin\-server\-url\  <url>
 Definiert die URL für den Skin-Server.
 .TP
 .BI \-\-enqueue\  <mrl>
-Eine oder mehrere MRLs an laufenden Sitzung (Sitzung 0) anhängen.
+Eine oder mehrere MRLs an laufende Sitzung (Sitzung 0) anhängen.
 .br
 Wenn eine andere Sitzung verwendet werden soll, kann diese mit \fB\-S session=\fP\fIx\fP angegeben werden.
 .TP
@@ -212,7 +212,7 @@ Wenn ein X11\-visual mit veränderlichen Farben (Farbtabellen) benutzt wird, inst
 Zeigt die Tastenbelegung an.
 Optionen sind:
 .br
-`\fBdefault\fP' Zeigt die standard Tastenbelegung an,
+`\fBdefault\fP' Zeigt die Standard-Tastenbelegung an,
 .br
 `\fBlirc\fP' Zeigt die Tastenbelegung aus der \fI~/.lircrc\fP-Konfigurationsdatei an,
 .br
@@ -224,18 +224,18 @@ Wird keine Option angegeben, wird `\fBdefault\fP' ausgewählt.
 .TP
 .B \-n, \-\-network
 Aktiviert netzwerkbasierte Fernsteuerung.
-Für die Benutzung der netzwerkbasierte Fernsteuerung wird eine Passwortdatei benötigt.
+Für die Benutzung der netzwerkbasierten Fernsteuerung wird eine Passwortdatei benötigt.
 Wenn xine diese nicht finden kann, wird der Server gestoppt.
-Der Syntax der Passwortdatei folgt dem (bekannten) Schema <\fIIdentifikation\fP>:<\fIPasswort\fP>.
+Die Syntax der Passwortdatei folgt dem (bekannten) Schema <\fIIdentifikation\fP>:<\fIPasswort\fP>.
 Weil Kryptographie in einigen Ländern gesetzlichen Beschränkungen unterliegt, wird das Passwort unverschlüsselt gespeichert und übertragen, weshalb Netzwerkverbindungen besonders zu beachten sind.
-Zusätzlichen stehen zwei (optionale) allgemeine Regeln stehen zur Verfügung, die sich gegenseitig ausschließen
+Zusätzlichen stehen zwei (optionale) allgemeine Regeln zur Verfügung, die sich gegenseitig ausschließen
 .nf
 \fBALL:ALLOW\fP oder \fBALL:DENY\fP
 .fi
 Im ersten Fall können alle Klienten alle Kommandos ohne Einschränkungen ausführen.
-Im zweiten Fall können keine Klienten irgendwelche Kommandoa ausführen, außer identifizierten Benutzern (durch das \fBidentify\fP-Kommando).
+Im zweiten Fall können keine Klienten irgendwelche Kommandos ausführen, außer identifizierten Benutzern (durch das \fBidentify\fP-Kommando).
 
-Wenn ein Passworteintrag mit einem Stern `\fB*\fP' beginnt, ider der Benutzer blockiert.
+Wenn ein Passworteintrag mit einem Stern `\fB*\fP' beginnt, wird der Benutzer blockiert.
 Wenn das Passwortfeld leer ist, wird der komplette Eintrag ignoriert.
 Hier ein Beispiel für eine kleine \fI~/.xine/passwd\fP Datei:
 .nf
@@ -275,7 +275,7 @@ Zeigt die Syntax von \fIKommando\fP an.
 Benutzt den Desktophintergrund zur Videoausgabe.
 .TP
 .B MRL (media resource locator)
-MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
+MRLs sind ähnlich wie URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
 .RS
 .TP 
 .BI file: <Pfad>
@@ -352,7 +352,7 @@ Viele Funktionen können durch Tastendrücken gesteuert werden.
 `\fBM-\fP' ist die Meta Taste (`\fBAlt\fP' Taste auf PC Tastaturen),
 `\fBC-\fP' ist die Control/Steuerungs `\fBCTRL\fP'/`\fBSTRG\fP' Taste.
 Andere spzielle Tasten sind mit '\fB<\fP' und '\fB>\fP' Zeichen umklammert, z.B.: die `\fBHOME\fP/\fBPos1\fP' Taste ist dargestellt als \fB<Pos1>\fP.
-Die standard Tastaturbelegung ist:
+Die Standard-Tastaturbelegung ist:
 .IP  "\fB0\fP .. \fB9\fP"
 Zu 0%..90% des momentanen Titels springen.
 .IP  "\fB/\fP"
@@ -360,7 +360,7 @@ Springe zum angegebenen Prozentsatz. Diese Möglichkeit ist allgemeiner als die "
 .IP  "\fBA\fP"
 Seitenverhältnis (AUTO/16:9/4:3/DVB) umschalten.
 .IP  "\fBC\fP-\fBa\fP"
-Mediamark für aktuelle Apspielposition der Wiedergabeliste hinzufügen.
+Mediamarke für aktuelle Abspielposition der Wiedergabeliste hinzufügen.
 .IP  "\fBM\fP\-\fBC\fP"
 Fenster mit Video\-Einstellungen anzeigen/verdecken.
 .IP  "\fBE\fP"
@@ -450,7 +450,7 @@ Vorherigen Tonkanal auswählen.
 .IP  "\fB<Esc>\fP"
 Menü 1 (insbesondere Hauptmenü)
 .IP  "\fB<F1>\fP"
-Menü 2 (insbesondere Titlemenü)
+Menü 2 (insbesondere Titelmenü)
 .IP  "\fB<F2>\fP"
 Menü 3
 .IP  "\fB<Einfg>\fP"
@@ -502,7 +502,7 @@ Die Synchronisation der Untertitel kann mit folgenden Tasten korrigiert werden:
 .IP  "\fBN\fP | \fBM\fP"
 
 .SS Numerische Eingabe
-Die Zifferntasten können zur Eingabe von Zahlen verwendet werden, aber aus Rückwärtskompatibilitätsgründen sind die Zifferntasten nicht mit den korrespondirenden Zahlen belegt. Vielmehr sind sie mit Symbolen belegt, die normalerweise nicht mit der Tastatur erzeugt werden können. Deshalb ist die numerische Eingabe standardmäßig deaktiviert.
+Die Zifferntasten können zur Eingabe von Zahlen verwendet werden, aber aus Rückwärtskompatibilitätsgründen sind die Zifferntasten nicht mit den korrespondierenden Zahlen belegt. Vielmehr sind sie mit Symbolen belegt, die normalerweise nicht mit der Tastatur erzeugt werden können. Deshalb ist die numerische Eingabe standardmäßig deaktiviert.
 .PP
 Diese Einstellungen lassen sich aber verändern, indem "SetPosition\fI<X>\fR%" und "Number\fI<Y>\fR" Tasten zugeordnet werden (\fIX\fP ist 0, 10, .. 90 und \fIY\fP ist 0..9). Dazu müssen in der xine keymap-Datei \fI~/.xine/keymap\fP folgende Zeile ersetzt werden:
 
