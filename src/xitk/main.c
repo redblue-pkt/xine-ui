@@ -2275,6 +2275,8 @@ int main(int argc, char *argv[]) {
   xine_event_dispose_queue(gGui->event_queue);
   xine_event_dispose_queue(gGui->visual_anim.event_queue);
 
+  xine_exit(__xineui_global_xine_instance); 
+
   visual_anim_done();
   free(pplugins);
   
