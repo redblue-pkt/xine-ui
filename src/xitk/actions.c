@@ -729,7 +729,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_post_dispose(__xineui_global_xine_instance, gGui->visual_anim.post_output_element.post);
 
   xine_dispose(gGui->stream);
-  /* xine_dispose(gGui->visual_anim.stream); */
+  xine_dispose(gGui->visual_anim.stream);
 
   if(gGui->vo_port)
     xine_close_video_driver(__xineui_global_xine_instance, gGui->vo_port);
@@ -742,8 +742,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_close_audio_driver(__xineui_global_xine_instance, gGui->ao_none);
 
   video_window_exit();
-
-  xine_exit(__xineui_global_xine_instance); 
 
 #ifdef HAVE_LIRC
   if(__xineui_global_lirc_enable)
