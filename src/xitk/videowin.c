@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
@@ -2340,9 +2341,17 @@ long int video_window_reset_ssaver(void) {
 	      gssaver_path = pbuf;
 	  } while(!gssaver_path[0] && *path++);
 	}
-	if(gssaver_path[0] && (fork() == 0)) {
-	  execv(gssaver_path, gssaver_args);
-	  exit(0);
+	if (gssaver_path[0]) {
+	  pid_t pid = fork();
+
+	  if (pid == 0) {
+	    if (fork() == 0) {
+	      execv(gssaver_path, gssaver_args);
+	    }
+	    _exit(0);
+	  } else if (pid > 0) {
+	    waitpid(pid, NULL, 0);
+	  }
 	}
       }
 
