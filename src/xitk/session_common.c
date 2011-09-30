@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -63,8 +64,10 @@ int connect_to_session(int session) {
     snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
     setreuid(stored_uid, euid);
 
-    if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1)
+    if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1) {
+      fcntl(fd, F_SETFD, FD_CLOEXEC);
       return fd;
+    }
 
   }
 
