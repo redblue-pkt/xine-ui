@@ -145,7 +145,8 @@ void lirc_start(void) {
     __xineui_global_lirc_enable = 0;
     return;
   }
-  
+
+  fcntl(lirc.fd, F_SETFD, FD_CLOEXEC);
   fcntl(lirc.fd, F_SETOWN, getpid());
   flags = fcntl(lirc.fd, F_GETFL, 0);
   if(flags != -1)

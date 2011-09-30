@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <strings.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -156,7 +157,11 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     if(((select(ctrl_fd + 1, &set, NULL, NULL, &tv)) <= 0) || 
        ((fd = accept(ctrl_fd, &saddr.sa, &len)) == -1))
       continue;
-    
+
+    if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) {
+        fprintf(stderr, "ctrlsocket_func(): Failed to make socket uninheritable (%s)\n", strerror(errno));
+    }
+
     shdr = (serv_header_packet_t *) calloc(1, sizeof(serv_header_packet_t));
 
     (void) read(fd, &(shdr->hdr), sizeof(ctrl_header_packet_t));
@@ -444,6 +449,11 @@ int init_session(void) {
   int                  i;
   
   if((ctrl_fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
+    if (fcntl(ctrl_fd, F_SETFD, FD_CLOEXEC) != 0) {
+        fprintf(stderr, "setup_ctrlsocket(): failed to make uninheritable (%s)\n",
+                    strerror(errno));
+    }
+
     for(i = 0;; i++)	{
       saddr.un.sun_family = AF_UNIX;
       

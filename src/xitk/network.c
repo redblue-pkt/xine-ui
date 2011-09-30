@@ -482,6 +482,10 @@ static int sock_create(const char *service, const char *transport, struct sockad
     sock_err("Cannot create socket: %s\n", strerror(errno));
     return -1;
   }
+
+  if (fcntl(sock, F_SETFD, FD_CLOEXEC) < 0) {
+    sock_err("** socket cannot be made uninheritable (%s)\n", strerror(errno));
+  }
   
   return sock;
 }
