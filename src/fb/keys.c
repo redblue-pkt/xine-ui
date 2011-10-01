@@ -148,6 +148,8 @@ int fbxine_init_keyboard(void)
 		return 0;
 	}
 
+	fcntl(fbxine.tty_fd, F_SETFD, FD_CLOEXEC);
+
 #ifdef HAVE_LINUX_KD_H
 	if (ioctl(fbxine.tty_fd, KDSETMODE, KD_GRAPHICS) == -1)
 		perror("Failed to set /dev/tty to graphics mode");

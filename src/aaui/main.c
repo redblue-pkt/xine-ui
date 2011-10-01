@@ -928,6 +928,9 @@ int main(int argc, char *argv[]) {
     else {
       if (dup2(error_fd, STDOUT_FILENO) < 0)
 	printf("cannot dup2 stdout");
+
+      /* This was just a temporary so that we could redefine STDOUT */
+      close(error_fd);
     }
   }
 #endif
