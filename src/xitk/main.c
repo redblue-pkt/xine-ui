@@ -1971,11 +1971,18 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "cannot fdopen guiout_fd: %s.\n", strerror(errno));
     else if((stdout_fd = open("/dev/null", O_WRONLY)) < 0)
       fprintf(stderr, "cannot open /dev/null: %s.\n", strerror(errno));
-    else if(dup2(stdout_fd, STDOUT_FILENO) < 0)
-      fprintf(stderr, "cannot dup2 stdout_fd: %s.\n", strerror(errno));
     else {
-      gGui->orig_stdout = guiout_fp;
-      setlinebuf(gGui->orig_stdout);
+      if (fcntl(guiout_fd, F_SETFD, FD_CLOEXEC) < 0) {
+        fprintf(stderr, "cannot make guiout_fd uninheritable: %s.\n", strerror(errno));
+      }
+
+      if(dup2(stdout_fd, STDOUT_FILENO) < 0)
+        fprintf(stderr, "cannot dup2 stdout_fd: %s.\n", strerror(errno));
+      else {
+        gGui->orig_stdout = guiout_fp;
+        setlinebuf(gGui->orig_stdout);
+      }
+
       close(stdout_fd); /* stdout_fd was intermediate, not needed any longer */
     }
   }

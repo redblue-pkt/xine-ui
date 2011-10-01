@@ -370,7 +370,7 @@ static char *read_entire_file (const char *mrl, int *file_size) {
 
   *file_size = statb.st_size;
 
-  fd = open (mrl, O_RDONLY);
+  fd = open_cloexec(mrl, O_RDONLY);
   if (fd<0)
     return NULL;
 
@@ -407,6 +407,9 @@ static int file_is_m3u(const char *mrl) {
   *line = NULL;
   *n = 0;
   a = getline(line, n, file);
+
+  fclose(file);
+
   if(a<=0) {
     ho_free(n);
     ho_free(line);
@@ -448,7 +451,10 @@ static void parse_m3u(const char *mrl, list_t *items) {
   *line = NULL;
   *n = 0;
   a = getline(line, n, file);
-  if(a<=0) return;
+  if(a<=0) {
+    fclose(file);
+    return;
+  }
 
   while((a = getline(line, n, file))>0) {
     char *str;
