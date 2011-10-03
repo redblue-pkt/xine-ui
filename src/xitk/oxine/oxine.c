@@ -416,7 +416,7 @@ static char *read_entire_file (const char *mrl, int *file_size) {
 
   *file_size = statb.st_size;
 
-  fd = open_cloexec(mrl, O_RDONLY);
+  fd = xine_open_cloexec(mrl, O_RDONLY);
   if (fd<0)
     return NULL;
 

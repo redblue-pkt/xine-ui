@@ -49,7 +49,7 @@
 int connect_to_session(int session) {
   int fd;
   
-  if((fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
+  if((fd = xine_socket_cloexec(AF_UNIX, SOCK_STREAM, 0)) != -1) {
     union {
       struct sockaddr_un un;
       struct sockaddr sa;
@@ -65,7 +65,6 @@ int connect_to_session(int session) {
     setreuid(stored_uid, euid);
 
     if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1) {
-      fcntl(fd, F_SETFD, FD_CLOEXEC);
       return fd;
     }
 
