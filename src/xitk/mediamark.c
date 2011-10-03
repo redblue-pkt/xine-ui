@@ -147,7 +147,7 @@ static char *_read_file(const char *filename, int *size) {
     return NULL;
   }
 
-  if((fd = open_cloexec(filename, O_RDONLY)) == -1) {
+  if((fd = xine_open_cloexec(filename, O_RDONLY)) == -1) {
     fprintf(stderr, "%s(): open(%s) failed: %s.\n", __XINE_FUNCTION__, filename, strerror(errno));
     return NULL;
   }

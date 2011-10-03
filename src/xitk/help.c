@@ -100,7 +100,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
       assert(doc_encoding != NULL);
       xr = xitk_recode_init(doc_encoding, NULL);
 
-      if((fd = open_cloexec(filename, O_RDONLY)) >= 0) {
+      if((fd = xine_open_cloexec(filename, O_RDONLY)) >= 0) {
 	char  *buf = NULL, *pbuf;
 	int    bytes_read;
 

@@ -448,11 +448,7 @@ int init_session(void) {
   int                  retval = 0;
   int                  i;
   
-  if((ctrl_fd = socket(AF_UNIX, SOCK_STREAM, 0)) != -1) {
-    if (fcntl(ctrl_fd, F_SETFD, FD_CLOEXEC) != 0) {
-        fprintf(stderr, "setup_ctrlsocket(): failed to make uninheritable (%s)\n",
-                    strerror(errno));
-    }
+  if((ctrl_fd = xine_socket_cloexec(AF_UNIX, SOCK_STREAM, 0)) != -1) {
 
     for(i = 0;; i++)	{
       saddr.un.sun_family = AF_UNIX;
