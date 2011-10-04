@@ -86,6 +86,8 @@ dnl Check for xine-lib
 dnl
 PKG_CHECK_MODULES([XINE], [libxine >= 1.1.0])
 XINE_LIB_SHIMS
+XINE_LIB_OPEN_CLOEXEC
+XINE_LIB_SOCKET_CLOEXEC
 
 CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
 
@@ -232,7 +234,7 @@ dnl
 dnl Checks for Xinerama extension
 dnl
 AC_ARG_ENABLE([xinerama],
-   AS_HELP_STRING([--disable-xinerama], [Don't build support for xinerama (default: check)]))
+   AS_HELP_STRING([--disable-xinerama], [Do not build support for xinerama (default: check)]))
 if test "x$enable_xinerama" != "xno"; then
   PKG_CHECK_MODULES([XINERAMA], [xinerama], [ac_have_xinerama="yes"], [
     AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
@@ -502,7 +504,7 @@ dnl
 dnl xine-ui use tar, check it
 dnl
 AC_ARG_WITH([tar],
-   AS_HELP_STRING([--without-tar], [Don't use the tar command from within xine-ui (disable skin download)]))
+   AS_HELP_STRING([--without-tar], [Do not use the tar command from within xine-ui (disable skin download)]))
 
 if test "x$with_tar" != "xno"; then
    AC_CHECK_PROGS(TAR, [tar bsdtar star])

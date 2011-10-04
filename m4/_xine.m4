@@ -208,3 +208,36 @@ AC_DEFUN([XINE_LIB_SHIMS],
     CFLAGS="$tmp_CFLAGS"
     LIBS="$tmp_LIBS"
     ])
+
+dnl Test for xine_open_cloexec function
+AC_DEFUN([XINE_LIB_OPEN_CLOEXEC],
+   [AC_MSG_CHECKING([for xine_open_cloexec within xine-lib])
+    tmp_CFLAGS="$CFLAGS"
+    tmp_LIBS="$LIBS"
+     CFLAGS="$CFLAGS $XINE_CFLAGS"
+     LIBS="$LIBS $XINE_LIBS"
+     AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM([],[xine_open_cloexec();])],
+         [AC_DEFINE([HAVE_XINE_OPEN_CLOEXEC], [1], [Define if xine-lib supports xine_open_cloexec])
+          AC_MSG_RESULT([yes])],
+         [AC_MSG_RESULT([no])])
+    CFLAGS="$tmp_CFLAGS"
+    LIBS="$tmp_LIBS"
+    ])
+
+dnl Test for xine_socket_cloexec function
+AC_DEFUN([XINE_LIB_SOCKET_CLOEXEC],
+    [AC_MSG_CHECKING([for xine_socket_cloexec within xine-lib])
+    tmp_CFLAGS="$CFLAGS"
+    tmp_LIBS="$LIBS"
+     CFLAGS="$CFLAGS $XINE_CFLAGS"
+     LIBS="$LIBS $XINE_LIBS"
+     AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM([],[xine_socket_cloexec();])],
+         [AC_DEFINE([HAVE_XINE_SOCKET_CLOEXEC], [1], [Define if xine-lib supports xine_socket_cloexec])
+          AC_MSG_RESULT([yes])],
+         [AC_MSG_RESULT([no])])
+    CFLAGS="$tmp_CFLAGS"
+    LIBS="$tmp_LIBS"
+    ])
+

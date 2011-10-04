@@ -17,9 +17,10 @@ endif
 libcommon_a_SOURCES = $(GETOPT_SRC) utils.c \
 	config_wrapper.c config_wrapper.h \
 	dump.c           dump.h           \
-	globals.c globals.h
+	globals.c globals.h \
+	xine_open_cloexec.c xine_socket_cloexec.c xine_compat.h
 libcommon_a_LIBADD = @LIBOBJS@
 
 libcommonx_a_SOURCES = x11utils.c
 
-noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
+noinst_HEADERS = $(GETOPT_HDR) utils.h xine_compat.h libcommon.h
