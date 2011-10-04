@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2008 the xine project
+ * Copyright (C) 2000-2011 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -18,26 +18,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  *
  */
-#ifndef _LIBCOMMON__H
-#define _LIBCOMMON__H
-
-#include "utils.h"
 #include "xine_compat.h"
 
-#ifndef HAVE_GETLINE
-ssize_t getline(char **lineptr, size_t *n, FILE *f);
-#endif
+#ifndef HAVE_XINE_SOCKET_CLOEXEC
 
-#ifndef HAVE_GETSUBOPT
-int getsubopt(char **optionp, char * const *keylistp, char **valuep);
-#endif
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
 
-#ifndef HAVE_STRNDUP
-char *strndup(const char *s, size_t n);
-#endif
+int
+xine_socket_cloexec(int domain, int type, int protocol)
+{
+  int s = socket(domain, type, protocol);
 
-#ifndef HAVE_STRSEP
-char *strsep(char **stringp, const char *delim);
-#endif
+  if (s >= 0) {
+    fcntl(s, F_SETFD, FD_CLOEXEC);
+  }
+
+  return s;
+}
 
 #endif
