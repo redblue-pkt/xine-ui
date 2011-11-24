@@ -25,7 +25,7 @@ Affiche la liste des options ainsi que la liste des pilotes
 .B \-\-verbose\ [=level]
 Défini le niveau de verbiage.
 .TP
-.B \-\-config\ <fichier>
+.B \-c,\ \-\-config\ <fichier>
 Utilise \fBfichier\fP en tand que fichier de configuration.
 .TP
 .B \-a,\ \-\-audio\-channel\ <num>

@@ -34,7 +34,7 @@ de xine.
 .BI \-\-verbose [=nivel]
 Ajusta la cantidad de verborrea.
 .TP 
-.BI \-\-config <fichero>
+.BI \-c,\ \-\-config\  <fichero>
 Use el fichero \fBconfig\fP en lugar del de por omisión.
 .TP 
 .BI \-a,\ \-\-audio\-channel\  <núm>
