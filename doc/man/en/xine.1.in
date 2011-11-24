@@ -41,7 +41,7 @@ Show summary of options and available output drivers (plugins).
 .BI \-\-verbose [=level]
 Set verbose level.
 .TP
-.BI \-\-config <file>
+.BI \-c,\ \-\-config\  <file>
 Use \fBconfig\fP file instead of default one.
 .TP
 .BI \-a,\ \-\-audio\-channel\  <num>

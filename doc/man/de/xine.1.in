@@ -40,7 +40,7 @@ Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Pl
 .BI \-\-verbose\  [=Stufe]
 Setze Stufe der `Geschwätzigkeit'.
 .TP 
-.BI \-\-config\  <Datei>
+.BI \-c,\ \-\-config\  <Datei>
 Benutze \fI<Datei>\fP anstatt anstatt der normalen \fBconfig\fP Datei.
 .TP 
 .BI \-a,\ \-\-audio\-channel\  <Zahl>
