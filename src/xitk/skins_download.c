@@ -575,7 +575,7 @@ void download_skin(char *url) {
   slx_entry_t         **slxs;
   xitk_window_t        *xwin;
   xitk_pixmap_t        *bg;
-  int                   x, y, w, h, width, height;
+  int                   w, width, height;
   xitk_widget_t        *widget;
 
   if(skdloader.running)
@@ -588,10 +588,7 @@ void download_skin(char *url) {
   }
 
   w = 300;
-  h = 50;
   XLockDisplay(gGui->display);
-  x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (w >> 1);
-  y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (h >> 1);
   XUnlockDisplay(gGui->display);
   
   xwin = xitk_window_dialog_button_free_with_width(gGui->imlib_data, _("Be patient..."),

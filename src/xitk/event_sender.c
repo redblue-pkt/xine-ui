@@ -215,12 +215,11 @@ static void event_sender_handle_event(XEvent *event, void *data) {
       XKeyEvent      mykeyevent;
       KeySym         key;
       char           kbuf[256];
-      int            len;
-      
+
       mykeyevent = event->xkey;
       
       XLockDisplay(gGui->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &key, NULL);
+      XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &key, NULL);
       XUnlockDisplay(gGui->display);
 
       switch(key) {

@@ -1854,14 +1854,13 @@ static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, 
       }
       else {
 	const xine_post_in_t *vo_in;
-	int                   err;
-	
+
 	/* look for standard input names */
 	vo_in = xine_post_input(post_elements[i + 1]->post, "video");
 	if( !vo_in )
 	  vo_in = xine_post_input(post_elements[i + 1]->post, "video in");
 	
-	err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
+	xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);
       }
     }
     
@@ -1885,14 +1884,13 @@ static void _applugin_rewire_from_post_elements(post_element_t **post_elements, 
       }
       else {
 	const xine_post_in_t *ao_in;
-	int                   err;
-	
+
 	/* look for standard input names */
 	ao_in = xine_post_input(post_elements[i + 1]->post, "audio");
 	if( !ao_in )
 	  ao_in = xine_post_input(post_elements[i + 1]->post, "audio in");
 	
-	err = xine_post_wire((xine_post_out_t *) ao_out, (xine_post_in_t *) ao_in);	
+	xine_post_wire((xine_post_out_t *) ao_out, (xine_post_in_t *) ao_in);
       }
     }
     

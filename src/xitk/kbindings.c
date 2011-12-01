@@ -782,9 +782,6 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
   if(s >= 0) {
     
     if(kbedit->kbt->entry[s]->is_alias) {
-      int i;
-      
-      
       xitk_browser_release_all_buttons(kbedit->browser);
       
       free(kbedit->kbt->entry[s]->comment);
@@ -793,7 +790,7 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       free(kbedit->kbt->entry[s]);
       
       
-      for(i = s; s < kbedit->num_entries; s++)
+      for(; s < kbedit->num_entries; s++)
 	kbedit->kbt->entry[s] = kbedit->kbt->entry[s + 1];
 
       kbedit->kbt->entry[s]->comment = NULL;

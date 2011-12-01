@@ -1356,7 +1356,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->files_sort);
     xitk_image_t *image;
     XPoint        points[4];
-    int           i, j, w, h, offset;
+    int           i, j, w, offset;
     short         x1, x2, x3;
     short         y1, y2, y3;
 
@@ -1369,8 +1369,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     draw_bevel_three_state(gGui->imlib_data, fb->sort_skin_down);
 
     w = dsimage->width / 3;
-    h = dsimage->height;
-    
+
     for(j = 0; j < 2; j++) {
       if(j == 0)
 	image = fb->sort_skin_up;
