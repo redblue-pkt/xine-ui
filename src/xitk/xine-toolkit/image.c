@@ -1359,7 +1359,7 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
 			char *title, char *fontname, int style, int x, int y, int w, int h) {
   xitk_font_t   *fs = NULL;
   int            sty[2];
-  int            yoff = 0, xstart = 0, xstop = 0, fheight = 0;
+  int            yoff = 0, xstart = 0, xstop = 0;
   int            ascent = 0, descent = 0, lbearing = 0, rbearing = 0;
   int            titlelen = 0;
   char          *titlebuf = NULL;
@@ -1377,7 +1377,6 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
     fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
     xitk_font_set_font(fs, p->gc);
     xitk_font_text_extent(fs, title, titlelen, &lbearing, &rbearing, NULL, &ascent, &descent);
-    fheight = ascent + descent;
 
     /* Limit title to frame width */
     if((rbearing - lbearing) > maxinkwidth) {

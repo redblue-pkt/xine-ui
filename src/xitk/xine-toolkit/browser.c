@@ -325,7 +325,6 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    char         *max_shortcut = NULL;
     int           item_width;
     char         *label_font;
     xitk_font_t  *fs = NULL;
@@ -369,7 +368,6 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 
 	  if(nlen > maxlen) {
 	    maxlen = nlen;
-	    max_shortcut = nshortcut;
 	  }
 	}
       }
@@ -635,12 +633,11 @@ void xitk_browser_page_up(xitk_widget_t *w, void *data) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    int min, max, pos, npos, vis;
+    int min, pos, npos, vis;
 
     private_data = (browser_private_data_t *) w->private_data;
     
     min = xitk_slider_get_min(private_data->item_tree[WSLID]);
-    max = xitk_slider_get_max(private_data->item_tree[WSLID]);
     npos = pos = xitk_slider_get_pos(private_data->item_tree[WSLID]);
     vis = private_data->max_length;
 
@@ -659,11 +656,10 @@ void xitk_browser_page_down(xitk_widget_t *w, void *data) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    int min, max, pos, npos, vis;
+    int max, pos, npos, vis;
 
     private_data = (browser_private_data_t *) w->private_data;
     
-    min = xitk_slider_get_min(private_data->item_tree[WSLID]);
     max = xitk_slider_get_max(private_data->item_tree[WSLID]);
     npos = pos = xitk_slider_get_pos(private_data->item_tree[WSLID]);
     vis = private_data->max_length;

@@ -145,7 +145,6 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
  */
 static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window insert) {
   struct timeval  tv, tv_start;
-  long            nread;
   unsigned long   bytes_after;
   Atom            actual_type;
   int             actual_fmt;
@@ -154,8 +153,6 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
 
   if((xdnd == NULL) || (prop == None))
     return;
-  
-  nread = 0;
 
   XLOCK(xdnd->display);
   if(XGetWindowProperty(xdnd->display, insert, prop, 0, 8, False, AnyPropertyType, 
@@ -544,7 +541,7 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
     } 
     else if(event->xclient.message_type == xdnd->_XA_XdndPosition) {
       XEvent  xevent;
-      Window  parent, child, toplevel, new_child;
+      Window  parent, child, new_child;
 
 #ifdef DEBUG_DND
       printf("XdndPosition\n");
@@ -552,7 +549,6 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
       
       XLOCK(xdnd->display);
       
-      toplevel = event->xany.window;
       parent   = DefaultRootWindow(xdnd->display);
       child    = xdnd->dropper_toplevel;
       

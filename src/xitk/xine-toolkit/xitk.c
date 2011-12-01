@@ -1415,7 +1415,6 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	  XKeyEvent      mykeyevent;
 	  KeySym         mykey;
 	  char           kbuf[256];
-	  int            len;
 	  int            modifier;
 	  int            handled = 0;
 	  xitk_widget_t *w = NULL;
@@ -1425,7 +1424,7 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	  xitk_get_key_modifier(event, &modifier);
 
 	  XLOCK(gXitk->display);
-	  len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+	  XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
 	  XUNLOCK(gXitk->display);
 
 	  xitk_tips_hide_tips();
@@ -1639,8 +1638,7 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	  
 	case MotionNotify: {
 	  XWindowAttributes wattr;
-	  Status            err;
-	  
+
 	  XLOCK(gXitk->display);
 	  while(XCheckMaskEvent(gXitk->display, ButtonMotionMask, event) == True);
 	  XUNLOCK(gXitk->display);
@@ -1671,7 +1669,7 @@ void xitk_xevent_notify_impl(XEvent *event) {
 
 	    XMoveWindow(gXitk->display, fx->window,
 			fx->new_pos.x, fx->new_pos.y);
-	    err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	    XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 
 	    XUNLOCK(gXitk->display);
 
