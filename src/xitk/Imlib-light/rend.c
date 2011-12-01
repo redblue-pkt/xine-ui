@@ -6241,10 +6241,11 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   static GC           tgc = 0, stgc = 0;
   XGCValues           gcv;
   unsigned char      *tmp, *stmp, **yarray, *ptr22;
-  int                 w3, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp,
-                      huge;
+  int                 w3, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp;
   Pixmap              pmap, mask;
-  int                 shared_pixmap, shared_image, ok;
+#ifdef HAVE_SHM
+  int                 shared_pixmap, shared_image, ok, huge;
+#endif
 
   if (!pd)
     pd = id->x.disp;
@@ -6303,7 +6304,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   im->pixmap = 0;
   im->shape_mask = 0;
 /* setup stuff */
-  huge = 0;
   if (id->x.depth <= 8)
     bpp = 1;
   else if (id->x.depth <= 16)
@@ -6313,8 +6313,11 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   else
     bpp = 4;
 
+#ifdef HAVE_SHM
+  huge = 0;
   if ((id->max_shm) && ((bpp * w * h) > id->max_shm))
     huge = 1;
+#endif
   im->width = w;
   im->height = h;
 
@@ -6429,6 +6432,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   }
 
 /* work out if we should use shared pixmap. images etc */
+#ifdef HAVE_SHM
   shared_pixmap = 0;
   shared_image = 0;
   if ((id->x.shmp) && (id->x.shm) && (!huge))
@@ -6451,10 +6455,11 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
       shared_pixmap = 0;
       shared_image = 0;
     }
+#endif
 
 /* init images and pixmaps */
-  ok = 1;
 #ifdef HAVE_SHM
+  ok = 1;
   if (shared_pixmap)
     {
       xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
