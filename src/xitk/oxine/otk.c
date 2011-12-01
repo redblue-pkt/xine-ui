@@ -1860,6 +1860,7 @@ void otk_set_update(otk_widget_t *this, int update) {
 /* FIXME: is this really thread safe?
  * check if all otk updates need lock_job_mutex()
  */
+#ifdef ENABLE_UPDATE_JOB
 static void otk_update_job(void *data) {
   otk_t *otk = (otk_t *) data;
   int changed = 0;
@@ -1905,6 +1906,7 @@ static void otk_update_job(void *data) {
   if (changed) { odk_show(otk->odk); }
   otk->update_job = schedule_job(100, otk_update_job, otk);
 }
+#endif
 
 otk_t *otk_init (odk_t *odk) {
 
