@@ -503,7 +503,7 @@ int session_handle_subopt(char *suboptarg, int *session) {
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp, loop, speed_status, time_status;
-  int          fullscreen, s, c;
+  int          s, c;
   uint32_t     state;
   char        *optstr;
   char       **mrls          = NULL;
@@ -523,7 +523,6 @@ int session_handle_subopt(char *suboptarg, int *session) {
   };
   
   playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = playlist_stop_cont = 0;
-  fullscreen     = 0;
   audio_next     = audio_prev = spu_next = spu_prev = 0;
   volume = amp   = -1;
   state          = 0;

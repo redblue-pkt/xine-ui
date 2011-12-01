@@ -935,12 +935,9 @@ void video_window_menu(xitk_widget_list_t *wl) {
     };
 
     xitk_menu_entry_t   menu_entry;
-    int                 i, j;
+    int                 i;
     const char *const menus_str = _("Menus");
-    
-    if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
-      j = 7; /* Start from the DVD menu */
-    
+
     for(i = 0; i < 7; i++) {
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 

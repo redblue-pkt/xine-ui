@@ -354,7 +354,6 @@ char *skin_get_current_skin_dir(void) {
  * Initialize skin support.
  */
 void preinit_skins_support(void) {
-  int  skin_num;
   int  i;
 
   change_config_entry = 0;
@@ -375,7 +374,7 @@ void preinit_skins_support(void) {
   
   skin_names[skins_avail_num] = NULL;
   
-  skin_num = xine_config_register_enum (__xineui_global_xine_instance, "gui.skin", 
+  xine_config_register_enum (__xineui_global_xine_instance, "gui.skin", 
 					(get_skin_offset(DEFAULT_SKIN)),
 					skin_names,
 					_("gui skin theme"), 
