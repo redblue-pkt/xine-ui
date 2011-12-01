@@ -28,18 +28,6 @@ static char *_SplitID(char *file) {
   }
 }
 
-/*
- * *     Doesn't damage the input
- */
-char *_GetExtension(char *file) {
-  char *p = strrchr(file, '.');
-
-  if (p == NULL)
-    return "";
-  else
-    return p + 1;
-}
-
 /** 
  *  * This error handling is broken beyond belief, but oh well it works
  *  **/
@@ -263,8 +251,6 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   unsigned char      *data = NULL;
   ImlibImage         *im;
   char               *fil = NULL;
-  char               *iden;
-  char               *e;
   FILE               *p;
   enum {
     FORMAT_UNKNOWN,
@@ -298,8 +284,7 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
   if (!p)
 	return NULL;
   fil = strdup(file);
-  iden = _SplitID(fil);
-  e = _GetExtension(fil);
+  _SplitID(fil);
 
   if (ispng(p))
     fmt = FORMAT_PNG;
@@ -315,6 +300,8 @@ ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
 	  break;
 	case FORMAT_JPEG:
 	    data = _LoadJPEG(id, p, &w, &h);
+	  break;
+	default:
 	  break;
 	}
     }

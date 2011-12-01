@@ -87,7 +87,6 @@ Imlib_init(Display * disp)
   char               *palfile;
   int                 loadpal;
   int                 vis;
-  int                 newcm;
   char               *old_locale;
 
   /* fprintf(stderr, "Imlib Init\n");
@@ -529,7 +528,6 @@ Imlib_init(Display * disp)
     at.override_redirect = True;
     mask = CWOverrideRedirect | CWBackPixel | CWBorderPixel |
       CWBackingStore | CWSaveUnder;
-    newcm = 0;
     if (id->x.visual != DefaultVisual(disp, id->x.screen))
       {
 	Colormap            cm;
@@ -541,7 +539,6 @@ Imlib_init(Display * disp)
 	    mask |= CWColormap;
 	    id->x.root_cmap = cm;
 	    at.colormap = cm;
-	    newcm = 1;
 	  }
       }
     id->x.base_window = XCreateWindow(id->x.disp, id->x.root,
@@ -1153,10 +1150,9 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   {
     /* Turn off fastrender if there is an endianess diff between */
     /* client and Xserver */
-    int                 byt, bit;
+    int                 byt;
 
     byt = ImageByteOrder(id->x.disp);	/* LSBFirst | MSBFirst */
-    bit = BitmapBitOrder(id->x.disp);	/* LSBFirst | MSBFirst */
     /* if little endian && server big */
     if ((htonl(1) != 1) && (byt == MSBFirst))
       id->fastrend = 0;
