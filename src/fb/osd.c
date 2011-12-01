@@ -340,7 +340,7 @@ void osd_stream_infos(void) {
     uint32_t    width;
     uint32_t    vwidth, vheight, asrate;
     const char *vcodec, *acodec;
-    char        buffer[256], *p;
+    char        buffer[256];
     int         x, y;
     int         w, h, osdw;
     int         playedtime, totaltime, pos;
@@ -365,7 +365,6 @@ void osd_stream_infos(void) {
     y = x = 0;
 
     xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &osdw, &h);
-    p = buffer;
     
     if(vcodec && vwidth && vheight) {
       sprintf(buffer, "%s: %dX%d", vcodec, vwidth, vheight);
