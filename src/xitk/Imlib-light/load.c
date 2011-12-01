@@ -43,7 +43,7 @@ char *_GetExtension(char *file) {
 /** 
  *  * This error handling is broken beyond belief, but oh well it works
  *  **/
-unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
+static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
   png_structp         png_ptr;
   png_infop           info_ptr;
   unsigned char      *data, *ptr, **lines, *ptr2, r, g, b, a;
@@ -191,7 +191,7 @@ unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
   return data;
 }
 
-unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
+static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
   struct jpeg_error_mgr jpeg_error;
   struct jpeg_decompress_struct jpeg_ptr;
   JSAMPARRAY buffer;
@@ -246,7 +246,7 @@ int ispng(FILE *f) {
   return (int) !png_sig_cmp(buf, 0, 8);
 }
 
-int isjpeg(FILE *f) {
+static int isjpeg(FILE *f) {
   unsigned char       buf[4];
 
   if (!f || fread (buf, 1, sizeof (buf), f) < sizeof (buf))
