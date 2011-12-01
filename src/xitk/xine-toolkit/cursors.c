@@ -690,7 +690,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
     {
       XColor black = xitk_get_black_pixel_color();
       
-      cursor->p      = XCreateBitmapFromData(display, DefaultRootWindow(display), no_data, 8, 8);
+      cursor->p      = XCreateBitmapFromData(display, DefaultRootWindow(display), (const char*)no_data, 8, 8);
       cursor->cursor = XCreatePixmapCursor(display, cursor->p, cursor->p, &black, &black, 0, 0);
     }
     break;
