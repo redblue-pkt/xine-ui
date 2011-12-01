@@ -976,7 +976,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   XWMHints                   *wm_hint;
   XClassHint                 *xclasshint;
   XColor                      black, dummy;
-  int                         screen;
   xitk_widget_t              *mywidget;
   mrlbrowser_private_data_t  *private_data;
   xitk_labelbutton_widget_t   lb;
@@ -1039,7 +1038,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   hint.flags  = PPosition | PSize;
 
   XLOCK(mb->imlibdata->x.disp);
-  screen = DefaultScreen(mb->imlibdata->x.disp);
 
   XAllocNamedColor(mb->imlibdata->x.disp, 
 		   Imlib_get_colormap(mb->imlibdata),

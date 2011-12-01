@@ -670,12 +670,11 @@ static void _window_handle_event(XEvent *event, void *data) {
     XKeyEvent  mykeyevent;
     KeySym     mykey;
     char       kbuf[256];
-    int        len;
     
     mykeyevent = event->xkey;
     
     XLOCK(wd->imlibdata->x.disp);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     XUNLOCK(wd->imlibdata->x.disp);
     
     switch (mykey) {

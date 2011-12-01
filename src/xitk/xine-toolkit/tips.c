@@ -115,7 +115,6 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       xitk_image_t        *image;
       xitk_font_t         *fs;
       unsigned int         cfore, cback;
-      struct timeval       tv;
       struct timespec      ts;
 
       int                  disp_w = xitk_get_display_width();
