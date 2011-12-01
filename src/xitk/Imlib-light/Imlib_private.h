@@ -85,8 +85,6 @@ void                nullify_image(ImlibData * id, ImlibImage * im);
 
 char               *_GetExtension(char *file);
 
-unsigned char      *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t);
-
 int                 ispng(FILE *f);
 
 void                calc_map_tables(ImlibData * id, ImlibImage * im);
