@@ -289,8 +289,9 @@ static void free_command_line_args(char ***argv, int argc) {
 }
 
 static int parse_geometry(window_attributes_t *window_attribute, char *geomstr) {
-  int width, height, xoff, yoff, ret;  
-  
+  int xoff, yoff, ret;
+  unsigned int width, height;
+
   if((ret = XParseGeometry(geomstr, &xoff, &yoff, &width, &height))) {
     if(ret & XValue)
       window_attribute->x      = xoff;
