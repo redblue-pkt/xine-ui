@@ -739,7 +739,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
       
       if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
 	int                num_mrls = 0;
-	char             **autoplay_mrls = xine_get_autoplay_mrls(__xineui_global_xine_instance, autoplay_plugins[i], &num_mrls);
+	const char * const *autoplay_mrls = xine_get_autoplay_mrls(__xineui_global_xine_instance, autoplay_plugins[i], &num_mrls);
 	xine_stream_t      *stream;
 	
 	if(autoplay_mrls) {
