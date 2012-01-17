@@ -575,7 +575,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		      title = strdup(ptitle);
 		  }
 		}
-		else {
+		else if (ln[0] != '#') {
 		  char  buffer[_PATH_MAX + _NAME_MAX + 2];
 		  const char *entry;
 		  
