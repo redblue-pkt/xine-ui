@@ -1921,7 +1921,7 @@ void gui_init_imlib (Visual *vis) {
   
   gGui->icon = XCreateBitmapFromData (gGui->display, 
 				      gGui->imlib_data->x.root,
-				      icon_datas, 40, 40);
+				      (const char *)icon_datas, 40, 40);
 }
 
 /*
