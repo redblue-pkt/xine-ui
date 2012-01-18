@@ -321,8 +321,8 @@ void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
 
   XLOCK(xdnd->display);
 
-  XInternAtoms(xdnd->display, prop_names, _XA_ATOMS_COUNT, False, props);
-  XInternAtoms(xdnd->display, mime_names, MAX_SUPPORTED_TYPE, False, xdnd->supported);
+  XInternAtoms(xdnd->display, (char**)prop_names, _XA_ATOMS_COUNT, False, props);
+  XInternAtoms(xdnd->display, (char**)mime_names, MAX_SUPPORTED_TYPE, False, xdnd->supported);
 
   xdnd->_XA_XdndAware             = props[XdndAware];
   xdnd->_XA_XdndEnter             = props[XdndEnter];
