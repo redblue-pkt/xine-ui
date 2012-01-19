@@ -16,7 +16,7 @@ bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
-kbindings_man_LDADD = @XINE_LIBS@ $(THREAD_LIBS) $(LIBCOMMON) $(INTLLIBS)
+kbindings_man_LDADD = @XINE_LIBS@ $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL)
 kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 
 xine_SOURCES = \
@@ -71,7 +71,7 @@ xine_LDADD = $(XINE_LIBS) $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(JPEG_LIBS) \
-	     $(INTLLIBS) $(THREAD_LIBS) $(RT_LIBS)
+	     $(LTLIBINTL) $(THREAD_LIBS) $(RT_LIBS)
 
 xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
 xine_remote_SOURCES = network.c
