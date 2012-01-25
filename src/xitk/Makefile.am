@@ -64,10 +64,11 @@ if HAVE_LIRC
 xine_SOURCES += lirc.c lirc.h
 endif
 
-xine_LDADD = $(XINE_LIBS) $(LIBCOMMON) $(LIBCOMMONX) \
+xine_LDADD = $(XINE_LIBS) \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
-             $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
+	     $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
 	     $(top_builddir)/src/xitk/oxine/liboxine.a \
+	     $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(JPEG_LIBS) \
