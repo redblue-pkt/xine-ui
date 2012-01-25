@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
 Uploaders: Reinhard Tartler <siretart@tauware.de>
 Build-Depends: debhelper (>> 4.0.0),
-	libxine-dev (>= 1.1.0-1),
+	libxine2-dev | libxine-dev (>= 1.1.0-1),
 	libx11-dev, libxext-dev, libxft-dev, libxinerama-dev,
 	libxt-dev, libxtst-dev,	libxv-dev, libxxf86vm-dev,
 	x11proto-core-dev | x-dev, libfreetype6-dev,
