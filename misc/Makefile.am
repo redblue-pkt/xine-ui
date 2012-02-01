@@ -1,3 +1,5 @@
+include $(top_srcdir)/misc/Makefile.quiet
+
 SUBDIRS = desktops visuals
 
 # splash-foo/manifest contains names of extra source files, distributed only.
@@ -33,12 +35,12 @@ EXTRA_DIST = \
 bin_SCRIPTS = xine-check xine-bugreport
 
 xine-check: xine-check.sh.in xine-check.en
-	test `cd $(srcdir); pwd` = `pwd` || cp $(srcdir)/xine-check.sh.in .
-	perl $(srcdir)/build-xine-check.pl $(srcdir)/xine-check.en
-	chmod a+x xine-check
+	$(AM_V_GEN)test `cd $(srcdir); pwd` = `pwd` || cp $(srcdir)/xine-check.sh.in .
+	$(AM_V_at)perl $(srcdir)/build-xine-check.pl $(srcdir)/xine-check.en
+	$(AM_V_at)chmod a+x xine-check
 
 xine-bugreport: xine-check
-	test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
+	$(AM_V_GEN)test -f xine-bugreport || $(LN_S) xine-check xine-bugreport
 
 install-data-hook:
 	test "x$(DESTDIR)" != "x" || update-mime-database $(mimedir)/..
