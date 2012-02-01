@@ -1,3 +1,5 @@
+include $(top_srcdir)/misc/Makefile.quiet
+
 EXTRA_DIST = $(pixmap_DATA) xine.wmconfig \
 	xine.desktop.in \
 	mime.default \
@@ -28,14 +30,14 @@ desktop_DATA = xine.desktop
 
 if XINE_LIST
 xine.desktop: xine.desktop.in @XINE_LIST@
-	exec > $@; cat $<; \
+	$(AM_V_GEN)exec > $@; cat $<; \
 	@XINE_LIST@; \
 	awk '{ printf "%s;", $$1 }' < $(srcdir)/mime.extra
 else
 XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
 MIME = $(if $(shell test -f $(XINE_MIME) && echo y),$(XINE_MIME),$(srcdir)/mime.default)
 xine.desktop: xine.desktop.in $(MIME) $(srcdir)/mime.extra
-	exec > $@; \
+	$(AM_V_GEN)exec > $@; \
 	cat $<; \
 	cat $(MIME) $(srcdir)/mime.extra | awk '{ printf "%s;", $$1 }'
 endif
