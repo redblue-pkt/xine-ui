@@ -46,9 +46,9 @@ dnl
 dnl Check for programs.
 dnl
 dnl Save CFLAGS, AC_ISC_POSIX set some unwanted default CFLAGS
-saved_CFLAGS="$CFLAGS"
+dnl saved_CFLAGS="$CFLAGS"
 AC_ISC_POSIX
-CFLAGS="$saved_CFLAGS"
+dnl CFLAGS="$saved_CFLAGS"
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_MINIX dnl readline
