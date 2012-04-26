@@ -235,7 +235,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   free(album);
 
   if(atitle) {
-    int len = strlen(atitle);
+    int len = strlen(atitle) + 1;
     
     if(aartist && strlen(aartist))
       len += strlen(aartist) + 3;
