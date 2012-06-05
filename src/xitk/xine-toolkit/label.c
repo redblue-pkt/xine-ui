@@ -319,7 +319,7 @@ static void label_setup_label(xitk_widget_t *w, const char *label_) {
     
     if(label_len > private_data->length) {
       pthread_attr_t       pth_attrs;
-#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
       struct sched_param   pth_params;
 #endif
       
@@ -327,7 +327,7 @@ static void label_setup_label(xitk_widget_t *w, const char *label_) {
       
       pthread_attr_init(&pth_attrs);
 
-#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
       pthread_attr_getschedparam(&pth_attrs, &pth_params);
       pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
       pthread_attr_setschedparam(&pth_attrs, &pth_params);
