@@ -19,7 +19,7 @@ font_DATA = $(fontandpointers)
 endif
 
 dfbxine_DEPENDENCIES = $(LIBCOMMON)
-dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) -lm $(LIBCOMMON)
+dfbxine_LDADD = $(DIRECTFB_LIBS) -lm $(LIBCOMMON) $(XINE_LIBS)
 dfbxine_SOURCES = options.c \
 	dfb.c \
 	main.c
