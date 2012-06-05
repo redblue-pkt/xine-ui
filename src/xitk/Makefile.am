@@ -17,7 +17,7 @@ bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
-kbindings_man_LDADD = @XINE_LIBS@ $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL)
+kbindings_man_LDADD = $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL) $(XINE_LIBS)
 kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 
 xine_SOURCES = \
@@ -65,12 +65,12 @@ if HAVE_LIRC
 xine_SOURCES += lirc.c lirc.h
 endif
 
-xine_LDADD = $(XINE_LIBS) \
+xine_LDADD = \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
 	     $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
 	     $(top_builddir)/src/xitk/oxine/liboxine.a \
 	     $(LIBCOMMON) $(LIBCOMMONX) \
-	     $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
+	     $(XINE_LIBS) $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(JPEG_LIBS) \
 	     $(LTLIBINTL) $(THREAD_LIBS) $(RT_LIBS)
@@ -79,10 +79,10 @@ xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
 xine_remote_SOURCES = network.c
 xine_remote_DEPENDENCIES = $(LIBCOMMON)
 xine_remote_LDADD = $(LTLIBINTL) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) \
-	$(LIBCOMMON)
+	$(LIBCOMMON) $(XINE_LIBS)
 
 session_ctrl_CFLAGS = $(AM_CFLAGS)
-session_ctrl_LDADD = @XINE_LIBS@ $(LIBCOMMON) $(DBG_LIBS)
+session_ctrl_LDADD = $(LIBCOMMON) $(DBG_LIBS) $(XINE_LIBS)
 session_ctrl_SOURCES = session_common.c session_internal.h session.h ctrl_test.c
 
 noinst_HEADERS = \
