@@ -323,7 +323,10 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
 
       if (asprintf(&mrl, "%s/%s", dir, entp->d_name) < 1)
         continue;
-      stat(mrl, &filestat);
+      if (stat(mrl, &filestat) < 0) {
+        free(mrl);
+        continue;
+      }
 
       if(file_is_m3u(mrl)) {
         if (asprintf(&title, "[%s]", entp->d_name) < 0)
