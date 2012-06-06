@@ -321,14 +321,17 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
         continue;
 #endif
 
-      asprintf(&mrl, "%s/%s", dir, entp->d_name);
+      if (asprintf(&mrl, "%s/%s", dir, entp->d_name) < 1)
+        continue;
       stat(mrl, &filestat);
 
       if(file_is_m3u(mrl)) {
-        asprintf(&title, "[%s]", entp->d_name);
+        if (asprintf(&title, "[%s]", entp->d_name) < 0)
+          title = NULL;
 	type = TYPE_M3U;
       } else if(S_ISDIR(filestat.st_mode)) {
-        asprintf(&title, "[%s]", entp->d_name);	  
+        if (asprintf(&title, "[%s]", entp->d_name) < 0)
+          title = NULL;
 	type = TYPE_RDIR;
       } else if (S_ISREG(filestat.st_mode)) {
 	title = strdup(entp->d_name);
