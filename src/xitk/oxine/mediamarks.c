@@ -173,7 +173,7 @@ static void playitem_append(playitem_t *item, list_t *list) {
   list_append_content(list, item);
 }
 
-static playitem_t *playitem_new(int type, char *title, char *mrl, list_t *sub) {
+static playitem_t *playitem_new(int type, const char *title, const char *mrl, list_t *sub) {
 
   playitem_t *item = ho_new(playitem_t);
       
@@ -275,7 +275,11 @@ static playitem_t *playitem_load (xml_node_t *node) {
 static int parse_multiple(oxine_t *oxine, const char *mrl, list_t *list) {
   int i=0, num=0;
   playitem_t *item;
+#if XINE_MAJOR_VERSION < 1 || (XINE_MAJOR_VERSION == 1 && XINE_MINOR_VERSION < 2)
   char **str;
+#else
+  const char * const *str;
+#endif
 
   str = xine_get_autoplay_mrls (oxine->xine, mrl, &num);
   if (num<=0) return 0;
