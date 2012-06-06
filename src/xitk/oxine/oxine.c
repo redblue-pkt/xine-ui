@@ -286,7 +286,11 @@ static void autoplay_cb (void *data) {
   char *parameter = (char *) data;
   oxine_t *oxine = oxine_instance_get();
   int    num_mrls, j;
+#if XINE_MAJOR_VERSION < 1 || (XINE_MAJOR_VERSION == 1 && XINE_MINOR_VERSION < 2)
   char **autoplay_mrls;
+#else
+  const char * const *autoplay_mrls;
+#endif
 
   if (!oxine)
     return;
