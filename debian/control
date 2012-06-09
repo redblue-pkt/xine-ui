@@ -3,17 +3,15 @@ Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
 Uploaders: Reinhard Tartler <siretart@tauware.de>
-Build-Depends: debhelper (>> 4.0.0),
-	libxine2-dev | libxine-dev (>= 1.1.0-1),
+Build-Depends: debhelper (>> 4.0.0), libxine2-dev | libxine-dev (>= 1.1.0-1),
+	libpng-dev, libjpeg8-dev,
 	libx11-dev, libxext-dev, libxft-dev, libxinerama-dev,
-	libxt-dev, libxtst-dev,	libxv-dev, libxxf86vm-dev,
-	x11proto-core-dev | x-dev, libfreetype6-dev,
-	libpng-dev, libaa1-dev, libcaca-dev,
-	libgpmg1-dev (>> 1.19.6) [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386],
-	liblircclient-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev,
-	libreadline5-dev | libreadline-dev,
+	libxt-dev, libxtst-dev, libxv-dev, libxxf86vm-dev, libaa1-dev,
+	libgpm-dev [linux-any],
+	liblircclient-dev, libcurl4-gnutls-dev, libfreetype6-dev,
+	libreadline-dev, libcaca-dev,
 	autotools-dev, autoconf, automake | automake1.9
-Build-Conflicts: libcurl4-openssl-dev, libcurl3-openssl-dev
+Build-Conflicts: libcurl4-openssl-dev
 Standards-Version: 3.7.2
 
 Package: xine-ui
