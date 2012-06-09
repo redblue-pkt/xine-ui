@@ -1,9 +1,7 @@
 xine-ui (0.99.7) unstable; urgency=low
-  (add entries here, newest at the top)
 
   * Support for comments in .m3u playlists
-  * Avoid a possible overflow when handling media marks. [MWRInfoSecurity]
-  * Avoid a possible overflow when handling M3U files. [MWRInfoSecurity]
+  * Avoid possible overflows when handling media marks & M3U files.
   * Fixes for libpng 1.5 and header checking.
   * xine-bugreport uses $TMPDIR.
   * Spanish translation update from Carlos E. Robinson M.
