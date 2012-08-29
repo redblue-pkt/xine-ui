@@ -44,7 +44,7 @@ static int _is_atom_match(xitk_dnd_t *xdnd, Atom **atom) {
   int i, j;
   
   for(i = 0; (*atom)[i] != 0; i++) {
-    for(j = 0; j <= MAX_SUPPORTED_TYPE; j++) {
+    for(j = 0; j < MAX_SUPPORTED_TYPE; j++) {
       if((*atom)[i] == xdnd->supported[j])
 	return i;
     }
