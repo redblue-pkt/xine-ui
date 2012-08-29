@@ -973,7 +973,9 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   do {
     /* Although only release events are evaluated, we must also grab the corresponding press */
     /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
+    XLockDisplay(gGui->display);
     XMaskEvent(gGui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
+    XUnlockDisplay(gGui->display);
   } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
 	   xev.xany.window != xitk_window_get_window(xwin));
   
