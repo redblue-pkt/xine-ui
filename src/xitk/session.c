@@ -499,7 +499,7 @@ static int sanestrcasecmp(char *s1, char *s2) {
   return 1;
 } 
 
-int session_handle_subopt(char *suboptarg, int *session) {
+int session_handle_subopt(char *suboptarg, char *enqueue_mrl, int *session) {
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp, loop, speed_status, time_status;
@@ -633,6 +633,12 @@ int session_handle_subopt(char *suboptarg, int *session) {
       break;
 
     }
+  }
+
+  if (enqueue_mrl != NULL) {
+    mrls = (char **) realloc(mrls, sizeof(char *) * (num_mrls + 2));
+    mrls[num_mrls++] = strdup(enqueue_mrl);
+    mrls[num_mrls]   = NULL;
   }
   
   *session = (optsess >= 0) ? optsess : 0;
