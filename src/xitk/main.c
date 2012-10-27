@@ -1785,7 +1785,7 @@ int main(int argc, char *argv[]) {
       
     case 'S':
       if(is_remote_running(((session >= 0) ? session : 0)))
-	retval = session_handle_subopt(optarg, &session);
+	retval = session_handle_subopt(optarg, NULL, &session);
       else {
 	
 	session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
@@ -1937,9 +1937,9 @@ int main(int argc, char *argv[]) {
       if(_argv[optind]) {
 	for(i = optind; i < _argc; i++) {
 	  char enqueue_mrl[strlen(_argv[i]) + 256];
-
-	  snprintf(enqueue_mrl, sizeof(enqueue_mrl), "session=%d,mrl=%s", session, atoa(_argv[i]));
-	  (void) session_handle_subopt(enqueue_mrl, &session);
+	  char *filename = NULL;
+	  snprintf(enqueue_mrl, sizeof(enqueue_mrl), "session=%d", session);
+	  (void) session_handle_subopt(enqueue_mrl, _argv[i], &session);
 	}
       }
       else

@@ -69,6 +69,6 @@ int is_remote_running(int session);
 int init_session(void);
 void deinit_session(void);
 
-int session_handle_subopt(char *optarg, int *session);
+int session_handle_subopt(char *optarg, char *enqueue_mrl, int *session);
 
 #endif
