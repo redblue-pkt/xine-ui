@@ -2125,7 +2125,13 @@ void gui_run(char **session_opts) {
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
 
+  XLockDisplay(gGui->display);
   XCloseDisplay(gGui->display);
-  if( gGui->video_display != gGui->display )
+  XUnlockDisplay(gGui->display);
+  if( gGui->video_display != gGui->display ) {
+    XLockDisplay(gGui->video_display);
     XCloseDisplay(gGui->video_display);
+    XUnlockDisplay(gGui->video_display);
+  }
 }
+
