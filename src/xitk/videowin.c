@@ -2268,17 +2268,17 @@ static void video_window_handle_event (XEvent *event, void *data) {
 long int video_window_get_ssaver_idle(void) {
 
 #ifdef HAVE_XSSAVEREXTENSION
-  long int ssaver_idle = 0;
+  long int ssaver_idle = -1;
   int dummy = 0;
+  XLockDisplay(gGui->video_display);
   if(XScreenSaverQueryExtension(gGui->video_display, &dummy, &dummy)) {
     XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
-    XLockDisplay(gGui->video_display);
     XScreenSaverQueryInfo(gGui->video_display, (DefaultRootWindow(gGui->video_display)), ssaverinfo);
-    XUnlockDisplay(gGui->video_display);
-    ssaver_idle = ssaverinfo->idle;
+    ssaver_idle = ssaverinfo->idle/1000;
     XFree(ssaverinfo);
-    return ssaver_idle/1000;
   }
+  XUnlockDisplay(gGui->video_display);
+  if(ssaver_idle != -1) return ssaver_idle;
 #endif
 
   return xitk_get_last_keypressed_time();
