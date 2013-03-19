@@ -667,6 +667,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
     }
     
     xine_stop (gGui->stream);
+    while(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+      xine_usec_sleep(50000);
+
     gGui->ignore_next = 0;
   }
   

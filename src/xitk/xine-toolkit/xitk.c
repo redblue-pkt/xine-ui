@@ -2116,6 +2116,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
     tv.tv_usec = 33000;
 
     select(xconnection + 1, &r, 0, 0, &tv);
+
+    if(!gXitk->running)
+      break;
     
     XLOCK(gXitk->display);
     got_event = (XPending(gXitk->display) != 0);
@@ -2126,6 +2129,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
     while(got_event == True) {
 
       xitk_xevent_notify(&myevent);
+
+      if(!gXitk->running)
+        break;
 
       XLOCK(gXitk->display);
       got_event = (XPending(gXitk->display) != 0);
