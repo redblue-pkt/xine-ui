@@ -2148,7 +2148,8 @@ static void fileselector_callback(filebrowser_t *fb) {
 
     /* If an MRL is not being played, select the first file appended. If in "smart mode" start
        playing the entry.  If a an MRL is currently being played, let it continue normally */
-    if((first != gGui->playlist.num) && (xine_get_status(gGui->stream) == XINE_STATUS_STOP)) {
+    if((first != gGui->playlist.num) &&
+      (gGui->logo_mode || (xine_get_status(gGui->stream) == XINE_STATUS_STOP))) {
       gGui->playlist.cur = first;
       if(gGui->smart_mode) {
         gui_set_current_mmk(mediamark_get_current_mmk());
