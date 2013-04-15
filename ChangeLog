@@ -1,3 +1,9 @@
+  * Fixed opening file using menus
+  * Fixed exit on panel close
+  * Fixed deadlocks
+  * Fixed segfault at exit
+  * Fixed keymap editor deadlock
+
 xine-ui (0.99.7) unstable; urgency=low
 
   * Support for comments in .m3u playlists
