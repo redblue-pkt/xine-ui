@@ -3,7 +3,7 @@ include $(top_srcdir)/src/common/Makefile.common
 
 SUBDIRS = Imlib-light xine-toolkit skins oxine .
 
-AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
+AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @LIBPNG_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
 if HAVE_READLINE
 remote = xine-remote
