@@ -67,6 +67,220 @@
 #define PIXSZ 3
 #define BIT_DEPTH 8
 
+static snapshot_messenger_t error_msg_cb;
+static snapshot_messenger_t info_msg_cb;
+static void *msg_cb_data;
+
+static char *snap_build_filename(const char *mrl) {
+  char         *buffer;
+  char          basename[XITK_NAME_MAX + 1] = "xine_snapshot";
+  char         *p = strrchr(mrl, '/');
+  struct stat   sstat;
+  int           i;
+
+  if(p && (strlen(p) > 1)) {
+    char *ext;
+    
+    p++;
+    
+    strlcpy(basename, p, sizeof(basename));
+    
+    if((ext = strrchr(basename, '.')) != NULL)
+      *ext = '\0';
+    
+  }
+
+  for(i = 1;; i++) {
+    asprintf(&buffer, "%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
+    if(((stat(buffer, &sstat)) == -1) && (errno == ENOENT))
+      break;
+    free(buffer);
+  }
+  
+  return buffer;
+}
+
+/*
+ *   Error functions for use as callbacks by the png libraries
+ */
+
+static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
+{
+
+  if(error_msg_cb) {
+    char *uerror;
+
+    asprintf(&uerror, "%s%s\n", _("Error: "), error_msg);
+    error_msg_cb(msg_cb_data, uerror);
+    free(uerror);
+  }
+}
+
+static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
+{
+  if(error_msg_cb) {
+    char *uerror;
+
+    asprintf(&uerror, "%s%s\n", _("Error: "), warning_msg);
+    error_msg_cb(msg_cb_data, uerror);
+    free(uerror);
+  }
+}
+
+/*
+ *
+ */
+static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
+{
+}
+
+
+#ifdef HAVE_XINE_GRAB_VIDEO_FRAME
+
+#include <xine.h>
+
+void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
+  snapshot_messenger_t info_mcb, void *mcb_data) {
+
+  xine_grab_video_frame_t *xgvf = NULL;
+
+  png_bytep *rows        = NULL;
+  png_structp struct_ptr = NULL;
+  png_infop info_ptr     = NULL;
+
+  char  *file_name = NULL;
+  FILE  *fp        = NULL;
+
+  int i;
+
+  error_msg_cb = error_mcb;
+  info_msg_cb  = info_mcb;
+  msg_cb_data  = mcb_data;
+
+  do {
+    xgvf = xine_new_grab_video_frame (gGui->stream);
+    if (!xgvf) {
+      if (error_msg_cb)
+        error_msg_cb (msg_cb_data, _("xine_grab_video_frame.grab () failed\n"));
+      break;
+    }
+
+    xgvf->crop_left   = 0;
+    xgvf->crop_right  = 0;
+    xgvf->crop_top    = 0;
+    xgvf->crop_bottom = 0;
+
+    xgvf->width  = 0;
+    xgvf->height = 0;
+
+    xgvf->flags  = 0;
+
+    if (xgvf->grab (xgvf) != 0) {
+      if (error_msg_cb)
+        error_msg_cb (msg_cb_data, _("xine_new_grab_video_frame () failed\n"));
+      break;
+    }
+
+    if ((!xgvf->width) || (!xgvf->height)) {
+      if(error_msg_cb) {
+        char *umessage;
+
+        asprintf (&umessage, "%s%dx%d%s\n",
+          _("Wrong image size: "), xgvf->width, xgvf->height, _(". Snapshot aborted."));
+        error_msg_cb (msg_cb_data, umessage);
+        free (umessage);
+      }
+      break;
+    }
+
+    /* open file */
+    file_name = snap_build_filename (mrl);
+    if ((fp = fopen (file_name, "wb")) == NULL) {
+      if (error_msg_cb) {
+        char *umessage;
+
+        asprintf (&umessage, "%s (%s)\n", _("File open failed"), file_name);
+        error_msg_cb (msg_cb_data, umessage);
+        free (umessage);
+      }
+      break;
+    }
+
+    /* get write struct */
+    struct_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, (png_voidp)0, user_error_fn, user_warning_fn);
+    if (!struct_ptr) {
+      if (error_msg_cb)
+        error_msg_cb (msg_cb_data, _("png_create_write_struct() failed\n"));
+      break;
+    }
+
+    /* get info struct */
+    info_ptr = png_create_info_struct (struct_ptr);
+    if (!info_ptr) {
+      if (error_msg_cb)
+        error_msg_cb (msg_cb_data, _("png_create_info_struct() failed\n"));
+      break;
+    }
+
+    /* we dont ask for libpng filters, so unaligned rows should be ok */
+    rows = png_malloc (struct_ptr, xgvf->height * sizeof (png_bytep));
+    if (!rows)
+      break;
+    for (i = 0; i < xgvf->height; i++)
+      rows[i] = xgvf->img + i * xgvf->width * PIXSZ;
+
+#ifdef PNG_SETJMP_SUPPORTED /* libpng 1.0.5 has no png_jmpbuf */
+    /* Set up long jump callback for PNG parser */
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+    if (setjmp (png_jmpbuf (struct_ptr)))
+#else
+    if (setjmp (struct_ptr->jmpbuf))
+#endif
+    {
+      if (error_msg_cb)
+        error_msg_cb (msg_cb_data, _("PNG Parsing failed\n"));
+      break;
+    }
+#endif
+
+    png_set_filter (struct_ptr, 0, PNG_FILTER_NONE | PNG_FILTER_VALUE_NONE);
+    png_init_io (struct_ptr, fp);
+    png_set_write_status_fn (struct_ptr, write_row_callback);
+    png_set_IHDR (struct_ptr, info_ptr, xgvf->width, xgvf->height,
+      BIT_DEPTH, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+    png_set_rows (struct_ptr, info_ptr, rows);
+    png_write_png (struct_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+#else
+    png_write_info (struct_ptr, info_ptr);
+    png_write_image (struct_ptr, rows);
+    png_write_end (struct_ptr, NULL);
+#endif
+
+    if (info_msg_cb) {
+      char *umessage;
+      asprintf (&umessage, "%s%s\n", _("File written: "), file_name);
+      info_msg_cb (msg_cb_data, umessage);
+      free (umessage);
+    }
+
+  } while (0);
+
+  if (rows)
+    png_free (struct_ptr, rows);
+  if (info_ptr)
+    png_destroy_info_struct (struct_ptr, &info_ptr);
+  if (struct_ptr)
+    png_destroy_write_struct (&struct_ptr, (png_infopp)NULL);
+  if (fp)
+    fclose (fp);
+  free (file_name);
+  if (xgvf)
+    xgvf->dispose (xgvf);
+}
+
+#else /* old style frame grabbing */
 
 /* internal function use to scale yuv data */
 typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest, int width, int step);
@@ -98,10 +312,6 @@ struct prvt_image_s {
   png_structp struct_ptr;
   png_infop info_ptr;
 };
-
-static snapshot_messenger_t error_msg_cb;
-static snapshot_messenger_t info_msg_cb;
-static void *msg_cb_data;
 
 /*
  *  This function was pinched from filter_yuy2tov12.c, part of
@@ -671,35 +881,6 @@ static void rgb_free( struct prvt_image_s *image )
  *  Handler functions for image structure
  */
 
-static char *snap_build_filename(const char *mrl) {
-  char         *buffer;
-  char          basename[XITK_NAME_MAX + 1] = "xine_snapshot";
-  char         *p = strrchr(mrl, '/');
-  struct stat   sstat;
-  int           i;
-
-  if(p && (strlen(p) > 1)) {
-    char *ext;
-    
-    p++;
-    
-    strlcpy(basename, p, sizeof(basename));
-    
-    if((ext = strrchr(basename, '.')) != NULL)
-      *ext = '\0';
-    
-  }
-
-  for(i = 1;; i++) {
-    asprintf(&buffer, "%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
-    if(((stat(buffer, &sstat)) == -1) && (errno == ENOENT))
-      break;
-    free(buffer);
-  }
-  
-  return buffer;
-}
-
 static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
 {
   *image = (struct prvt_image_s*) calloc(1, sizeof( struct prvt_image_s ) );
@@ -818,40 +999,6 @@ static void yv12_2_rgb( struct prvt_image_s *image )
       image->rgb[i][ (j * PIXSZ) + 2 ] = b;
     }
   }
-}
-
-/*
- *   Error functions for use as callbacks by the png libraries
- */
-
-static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
-{
-
-  if(error_msg_cb) {
-    char *uerror;
-
-    asprintf(&uerror, "%s%s\n", _("Error: "), error_msg);
-    error_msg_cb(msg_cb_data, uerror);
-    free(uerror);
-  }
-}
-
-static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
-{
-  if(error_msg_cb) {
-    char *uerror;
-
-    asprintf(&uerror, "%s%s\n", _("Error: "), warning_msg);
-    error_msg_cb(msg_cb_data, uerror);
-    free(uerror);
-  }
-}
-
-/*
- *
- */
-static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
-{
 }
 
 /*
@@ -1227,3 +1374,5 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   return;
 }
+
+#endif /* HAVE_XINE_GRAB_VIDEO_FRAME */
