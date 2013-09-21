@@ -1987,14 +1987,14 @@ void gui_run(char **session_opts) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
 	  int    num_mrls, j;
-	  char **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
+	  const char * const *autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
 							 gGui->autoscan_plugin,
 							 &num_mrls);
 	  
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)
-	      mediamark_append_entry((const char *)autoplay_mrls[j],
-				     (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
+	      mediamark_append_entry(autoplay_mrls[j],
+				     autoplay_mrls[j], NULL, 0, -1, 0, 0);
 	   
 	    gGui->playlist.cur = 0;
 	    gui_set_current_mmk(mediamark_get_current_mmk());
