@@ -214,7 +214,7 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 }
 static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int       num_mrls;
-  char    **autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, me->menu, &num_mrls);
+  const char * const *autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, me->menu, &num_mrls);
 
   if(autoplay_mrls) {
     int j;
