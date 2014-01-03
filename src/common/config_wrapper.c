@@ -1,7 +1,7 @@
 /* 
- * Copyright (C) 2000-2008 the xine project
+ * Copyright (C) 2000-2009 the xine project
  * 
- * This file is part of __xineui_global_xine_instance, a unix video player.
+ * This file is part of xine, a unix video player.
  * 
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
