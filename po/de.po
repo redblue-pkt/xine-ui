@@ -1709,7 +1709,7 @@ msgid "Menus/SEP"
 msgstr "Menüs/SEP"
 
 msgid "Stream"
-msgstr "Strom"
+msgstr "Datenstrom"
 
 msgid "Stream/Information..."
 msgstr "Datenstrom/Informationen..."
