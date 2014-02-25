@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
+"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "X-Generator: KBabel 1.10.1\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
@@ -964,7 +964,8 @@ msgstr ""
 "                    «h»: skjul grensesnitt (panel etc.).\n"
 "                    «w»: skjul videovindu.\n"
 "                    «q»: avslutt når avspillingen er ferdig.\n"
-"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s DVD».\n"
+"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s "
+"DVD».\n"
 "                    «v»: hent spilleliste fra VCD. (Foreldet; bruk z-s "
 "VCD».)\n"
 
@@ -1154,11 +1155,12 @@ msgstr ""
 "                    session=n   velg øktnummer «<n>»,\n"
 "                    mrl=m       legg MRL'en «<mrl>» til i spillelisten,\n"
 "                    audio=c     velg lydkanal («<c>»: «next» eller «prev»),\n"
-"                    spu=c       velg «spu»-kanal («<c>»: «next» eller «prev»),\n"
+"                    spu=c       velg «spu»-kanal («<c>»: «next» eller "
+"«prev»),\n"
 "                    volume=v    oppgi lydvolum,\n"
 "                    amp=v       oppgi forsterkingsnivå,\n"
-"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», «loop», "
-"«repeat», «shuffle» eller «shuffle+»),\n"
+"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», "
+"«loop», «repeat», «shuffle» eller «shuffle+»),\n"
 "                    get_speed   hent fartverdien (se «man»-siden for den "
 "returnerte verdien.\n"
 "                    (playlist|pl)=p\n"
@@ -1173,8 +1175,8 @@ msgstr ""
 "                                   «last»   spill siste oppføring i "
 "spillelisten,\n"
 "                                   «load:s» last spillelistefilen «s»,\n"
-"                                   «stop»   stopp avspillingen ved slutten av "
-"gjeldende element.\n"
+"                                   «stop»   stopp avspillingen ved slutten "
+"av gjeldende element.\n"
 "                                   «cont»   fortset avspillingen ved slutten "
 "av gjeldende element.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1208,7 +1210,8 @@ msgid ""
 msgstr ""
 "  -r, --aspect-ratio <modus>   Velger aspektforholdet for video. Formater "
 "er\n"
-"                                 «auto», «square», «4:3», «anamorphic» og «dvb».\n"
+"                                 «auto», «square», «4:3», «anamorphic» og "
+"«dvb».\n"
 
 #, c-format
 msgid ""
@@ -2214,7 +2217,12 @@ msgstr "Velg en hud å laste ned . . ."
 msgid "Error: "
 msgstr "Feil: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "«xine_get_current_frame()» feilet\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "«xine_get_current_frame()» feilet\n"
 
 msgid "Wrong image size: "
@@ -2222,15 +2230,6 @@ msgstr "Feil bildestørrelse: "
 
 msgid ". Snapshot aborted."
 msgstr ". Stopper å ta bilde."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "«prvt_image_alloc» feilet\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Bildegriperen feilet\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Støttes ikke får denne videovisningsdriveren\n"
 
 msgid "File open failed"
 msgstr "Klarte ikke åpne fil"
@@ -2244,14 +2243,26 @@ msgstr "«png_create_info_struct()» feilet\n"
 msgid "PNG Parsing failed\n"
 msgstr "Klarte ikke lese PNG\n"
 
+msgid "File written: "
+msgstr "Skrev til fil: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "«xine_get_current_frame()» feilet\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "«prvt_image_alloc» feilet\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Bildegriperen feilet\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Støttes ikke får denne videovisningsdriveren\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Feil: «yuy2_fudge» feilet\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "«rgb_alloc()» feilet\n"
-
-msgid "File written: "
-msgstr "Skrev til fil: "
 
 msgid "xine Splash"
 msgstr "xine-oppstartsbilde"
@@ -2420,10 +2431,12 @@ msgstr ""
 "skriver du inn «0 2 3»"
 
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr ""
+"x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr ""
+"y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Bredde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"

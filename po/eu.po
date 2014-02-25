@@ -8,16 +8,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
-"Language: \n"
+"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "Ez dago mrl-rik."
 
@@ -148,21 +151,36 @@ msgstr "kontrola: ezin izan da atzeko planorako irudia aurkitu\n"
 msgid "Control HUE value"
 msgstr "Kontrolen �BARDURAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
+msgid "Hue"
+msgstr "�bardura"
+
 msgid "Control SATURATION value"
 msgstr "Kontrolen SATURAZIOAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Sat"
 msgstr "Sat"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Kontrolen DISTIRAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Brt"
 msgstr "Dis"
 
 msgid "Control CONTRAST value"
 msgstr "Kontrolen KONTRASTEAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Ktr"
 
@@ -170,6 +188,8 @@ msgstr "Ktr"
 msgid "Control GAMMA value"
 msgstr "Kontrolen �BARDURAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -177,7 +197,9 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Kontrolen DISTIRAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Sat"
 
@@ -185,9 +207,14 @@ msgstr "Sat"
 msgid "Control NOISE REDUCTION value"
 msgstr "Kontrolen SATURAZIOAREN balioa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Aukeratu azal bat"
 
@@ -200,7 +227,9 @@ msgstr "Itxi kontrol leihoa"
 msgid "Download in progress"
 msgstr "Deskargatzen"
 
-#, c-format
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Deskargatzen: %d%%."
 
@@ -1850,6 +1879,9 @@ msgstr "Luzapen guztiak"
 msgid "xine MRL Browser"
 msgstr "xine MRL arakatzailea"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Source:"
 msgstr "Iturburua:"
 
@@ -2030,6 +2062,9 @@ msgstr "Gorde erreprodukzio-zerrenda"
 msgid "Close playlist window"
 msgstr "Itxi erreprodukzio-zerrendaren leihoa"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Bilatu hau:"
 
@@ -2202,7 +2237,12 @@ msgstr "Aukeratu deskargatu beharreko azal bat..."
 msgid "Error: "
 msgstr "Errorea: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame()-k huts egin du\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame()-k huts egin du\n"
 
 msgid "Wrong image size: "
@@ -2210,15 +2250,6 @@ msgstr "Okerrerko irudi tamaina: "
 
 msgid ". Snapshot aborted."
 msgstr ". Argazkia utzirik."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "prvt_image_alloc-ek huts egin du\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber-ek huts egin du\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Ez da bideo-kontrolatzaile honetarako onartzen\n"
 
 msgid "File open failed"
 msgstr "Huts fitxategia irekitzerakoan"
@@ -2232,14 +2263,26 @@ msgstr "png_create_info_struct()-ek huts egin du\n"
 msgid "PNG Parsing failed\n"
 msgstr "Ezin izan da PNG analizatu\n"
 
+msgid "File written: "
+msgstr "Idatzitako fitxategia: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame()-k huts egin du\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc-ek huts egin du\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber-ek huts egin du\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Ez da bideo-kontrolatzaile honetarako onartzen\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Errorea: yuy2_fudge-k huts egin du\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc()-ek huts egin du\n"
-
-msgid "File written: "
-msgstr "Idatzitako fitxategia: "
 
 msgid "xine Splash"
 msgstr "xine Abiarazte pantaila"

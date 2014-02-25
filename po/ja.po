@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.6+hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2010-07-31 00:32+0700\n"
 "Last-Translator: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
@@ -18,6 +18,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "mrl がありません"
 
@@ -147,42 +150,69 @@ msgstr "control: 背景画像をみつけることができませんでした\n"
 msgid "Control HUE value"
 msgstr "色調制御"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
+msgid "Hue"
+msgstr "色調"
+
 msgid "Control SATURATION value"
 msgstr "彩度制御"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Sat"
 msgstr "彩度"
 
 msgid "Control BRIGHTNESS value"
 msgstr "輝度制御"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Brt"
 msgstr "輝度"
 
 msgid "Control CONTRAST value"
 msgstr "コントラスト制御"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Ctr"
 msgstr "コントラスト"
 
 msgid "Control GAMMA value"
 msgstr "ガンマ値を指定"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Gam"
 msgstr "ガンマ"
 
 msgid "Control SHARPNESS value"
 msgstr "シャープネス（鮮明度）を指定"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "鮮明度"
 
 msgid "Control NOISE REDUCTION value"
 msgstr "ノイズ低減度を指定"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Noi"
 msgstr "ノイズ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "スキンを選択"
 
@@ -195,7 +225,9 @@ msgstr "制御ウィンドウを閉じる"
 msgid "Download in progress"
 msgstr "ダウンロード進行中"
 
-#, c-format
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "ダウンロード進捗: %d%%"
 
@@ -1831,6 +1863,9 @@ msgstr "全ての拡張"
 msgid "xine MRL Browser"
 msgstr "xine MRL ブラウザ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Source:"
 msgstr "ソース:"
 
@@ -2010,6 +2045,9 @@ msgstr "再生リスト保存"
 msgid "Close playlist window"
 msgstr "再生リストウィンドウを閉じる"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "走査:"
 
@@ -2180,7 +2218,12 @@ msgstr "ダウンロードするスキンを選択..."
 msgid "Error: "
 msgstr "エラー: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() 失敗\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() 失敗\n"
 
 msgid "Wrong image size: "
@@ -2188,15 +2231,6 @@ msgstr "間違った画像サイズ: "
 
 msgid ". Snapshot aborted."
 msgstr " スナップショット中止"
-
-msgid "prvt_image_alloc failed\n"
-msgstr "prvt_image_alloc 失敗\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber 失敗\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "この動画出力ドライバはサポートされていません\n"
 
 msgid "File open failed"
 msgstr "ファイルを開けませんでした"
@@ -2210,14 +2244,26 @@ msgstr "png_create_info_struct() 失敗\n"
 msgid "PNG Parsing failed\n"
 msgstr "PNG の解析に失敗\n"
 
+msgid "File written: "
+msgstr "書き込みファイル: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() 失敗\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc 失敗\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber 失敗\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "この動画出力ドライバはサポートされていません\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "エラー: yuy2_fudge 失敗\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() 失敗\n"
-
-msgid "File written: "
-msgstr "書き込みファイル: "
 
 msgid "xine Splash"
 msgstr "xine スプラッシュ"

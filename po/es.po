@@ -11,10 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2010-04-29 13:48+0200\n"
 "Last-Translator: Carlos E. Robinson M. <robin.listas@gmail.com>\n"
 "Language-Team: Spanish\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1496,8 +1497,8 @@ msgstr "*suspiro*, error desconocido."
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
-"Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d.%"
-"d.\n"
+"Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d."
+"%d.\n"
 
 #, c-format
 msgid "video driver id required for -V option\n"
@@ -2280,7 +2281,12 @@ msgstr "Seleccione una piel para descargar..."
 msgid "Error: "
 msgstr "Error: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() falló\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() falló\n"
 
 msgid "Wrong image size: "
@@ -2288,15 +2294,6 @@ msgstr "Tamaño incorrecto de imagen: "
 
 msgid ". Snapshot aborted."
 msgstr ". Captura abortada."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "prvt_image_alloc falló\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber falló\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "No soportado para este manejador de salida de vídeo\n"
 
 msgid "File open failed"
 msgstr "Falló la apertura del fichero"
@@ -2310,14 +2307,26 @@ msgstr "png_create_info_struct() falló\n"
 msgid "PNG Parsing failed\n"
 msgstr "PNG Parsing falló\n"
 
+msgid "File written: "
+msgstr "Archivo escrito: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() falló\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc falló\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber falló\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "No soportado para este manejador de salida de vídeo\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Error: yuy2_fudge falló\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() falló\n"
-
-msgid "File written: "
-msgstr "Archivo escrito: "
 
 msgid "xine Splash"
 msgstr "xine Splash"

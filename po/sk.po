@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
+"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -2196,7 +2196,12 @@ msgstr "Vybra» skin na stiahnutie..."
 msgid "Error: "
 msgstr "Chyba"
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() zlyhal\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() zlyhal\n"
 
 msgid "Wrong image size: "
@@ -2205,15 +2210,6 @@ msgstr ""
 #, fuzzy
 msgid ". Snapshot aborted."
 msgstr "Zlé rozmery obrázku      . Ulo¾enie obsahu obr. zru¹ené.\n"
-
-msgid "prvt_image_alloc failed\n"
-msgstr "prvt_image_alloc zlyhal\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber zlyhal\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Nepodporovaný pre tento video out ovládaè\n"
 
 msgid "File open failed"
 msgstr "Otvorenie súboru zlyhalo"
@@ -2227,15 +2223,27 @@ msgstr "png_create_info_struct() zlyhal\n"
 msgid "PNG Parsing failed\n"
 msgstr "PNG parsovanie zlyhalo\n"
 
+#, fuzzy
+msgid "File written: "
+msgstr "Súbor ulo¾ený: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() zlyhal\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc zlyhal\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber zlyhal\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Nepodporovaný pre tento video out ovládaè\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Chyba: yuy2_fudge zlyhal\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() zlyhal\n"
-
-#, fuzzy
-msgid "File written: "
-msgstr "Súbor ulo¾ený: "
 
 #, fuzzy
 msgid "xine Splash"
@@ -2759,8 +2767,8 @@ msgstr "Obnovi»"
 
 #~ msgid "                               Load one or many post plugin(s).\n"
 #~ msgstr ""
-#~ "                                 Nahra» jeden alebo viac post plugin"
-#~ "(ov).\n"
+#~ "                                 Nahra» jeden alebo viac post "
+#~ "plugin(ov).\n"
 
 #~ msgid "                               Parameters are comma separated.\n"
 #~ msgstr "                               Parametre sú oddelené èiarkami.\n"
