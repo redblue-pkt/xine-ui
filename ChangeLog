@@ -1,3 +1,4 @@
+xine-ui (0.99.8)
   * Fixed opening file using menus
   * Fixed exit on panel close
   * Fixed deadlocks
