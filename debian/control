@@ -1,13 +1,11 @@
 Source: xine-ui
 Section: graphics
 Priority: optional
-Maintainer: Siggi Langauf <siggi@debian.org>
-Uploaders: Reinhard Tartler <siretart@tauware.de>
-Build-Depends: debhelper (>> 4.0.0), libxine2-dev | libxine-dev (>= 1.1.0-1),
+Maintainer: Darren Salt <devspam@moreofthesa.me.uk>
+Build-Depends: debhelper (>> 4.0.0), libxine2-dev,
 	libpng-dev, libjpeg8-dev,
 	libx11-dev, libxext-dev, libxft-dev, libxinerama-dev,
 	libxt-dev, libxtst-dev, libxv-dev, libxxf86vm-dev, libaa1-dev,
-	libgpm-dev [linux-any],
 	liblircclient-dev, libcurl4-gnutls-dev, libfreetype6-dev,
 	libreadline-dev, libcaca-dev,
 	autotools-dev, autoconf, automake | automake1.9
