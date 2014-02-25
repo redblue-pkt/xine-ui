@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-1.96\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Pavel Maryanov <acid_jack@ukr.net>\n"
 "Language-Team: Russian <docteam@lafox.net>\n"
@@ -17,6 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr "MRL не указан."
 
@@ -147,21 +150,36 @@ msgstr "control: невозможно найти фоновое изображение\n"
 msgid "Control HUE value"
 msgstr "Управление величиной ЦВЕТА"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
+msgid "Hue"
+msgstr "Цвт"
+
 msgid "Control SATURATION value"
 msgstr "Управление величиной НАСЫЩЕННОСТИ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Sat"
 msgstr "Нсщ"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Управление величиной ЯРКОСТИ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Brt"
 msgstr "Ярк"
 
 msgid "Control CONTRAST value"
 msgstr "Управление величиной КОНТРАСТА"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Ктр"
 
@@ -169,6 +187,8 @@ msgstr "Ктр"
 msgid "Control GAMMA value"
 msgstr "Управление величиной ЦВЕТА"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -176,7 +196,9 @@ msgstr ""
 msgid "Control SHARPNESS value"
 msgstr "Управление величиной ЯРКОСТИ"
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Нсщ"
 
@@ -184,9 +206,14 @@ msgstr "Нсщ"
 msgid "Control NOISE REDUCTION value"
 msgstr "Управление величиной НАСЫЩЕННОСТИ"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Выбрать скин"
 
@@ -199,7 +226,9 @@ msgstr "Закрыть окно управления"
 msgid "Download in progress"
 msgstr "Выполняется загрузка"
 
-#, c-format
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr "Процесс загрузки: %d%%."
 
@@ -1876,6 +1905,9 @@ msgstr "Все расширения"
 msgid "xine MRL Browser"
 msgstr "MRL-браузер xine"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Source:"
 msgstr "Источник:"
 
@@ -2055,6 +2087,9 @@ msgstr "Сохранить плейлист"
 msgid "Close playlist window"
 msgstr "Закрыть окно плейлиста"
 
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Сканирование:"
 
@@ -2228,7 +2263,12 @@ msgstr "Выберите скин для загрузки..."
 msgid "Error: "
 msgstr "Ошибка: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "сбой xine_get_current_frame()\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "сбой xine_get_current_frame()\n"
 
 msgid "Wrong image size: "
@@ -2236,15 +2276,6 @@ msgstr "Неверный размер изображения: "
 
 msgid ". Snapshot aborted."
 msgstr ". Создание снимка прервано."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "сбой prvt_image_alloc\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Сбой механизма захвата кадра\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Не поддерживается для этого драйвера вывода\n"
 
 msgid "File open failed"
 msgstr "Не удалось открыть файл"
@@ -2258,14 +2289,26 @@ msgstr "сбой png_create_info_struct()\n"
 msgid "PNG Parsing failed\n"
 msgstr "Сбой парсинга PNG\n"
 
+msgid "File written: "
+msgstr "Файл записан: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "сбой xine_get_current_frame()\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "сбой prvt_image_alloc\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Сбой механизма захвата кадра\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Не поддерживается для этого драйвера вывода\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Ошибка: сбой yuy2_fudge\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "сбой rgb_alloc()\n"
-
-msgid "File written: "
-msgstr "Файл записан: "
 
 msgid "xine Splash"
 msgstr "заставка xine"

@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.99.7\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2010-10-14 23:58+0200\n"
 "Last-Translator: František Dvořák <valtri@civ.zcu.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -2232,7 +2232,12 @@ msgstr "Vyberte skin ke stáhnutí..."
 msgid "Error: "
 msgstr "Chyba:"
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() selhalo\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() selhalo\n"
 
 msgid "Wrong image size: "
@@ -2240,15 +2245,6 @@ msgstr "Špatná velikost obrazu: "
 
 msgid ". Snapshot aborted."
 msgstr ". Získávaní snímku zrušeno."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "prvt_image_alloc selhalo\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber selhal\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Není podporováno tímto výstupním ovladačem videa\n"
 
 msgid "File open failed"
 msgstr "Otevření souboru selhalo"
@@ -2262,14 +2258,26 @@ msgstr "png_create_info_struct() selhalo\n"
 msgid "PNG Parsing failed\n"
 msgstr "Zpracování PNG selhalo\n"
 
+msgid "File written: "
+msgstr "Soubor zapsán: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() selhalo\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc selhalo\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber selhal\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Není podporováno tímto výstupním ovladačem videa\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Chyba: yuy2_fudge selhalo\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() selhalo\n"
-
-msgid "File written: "
-msgstr "Soubor zapsán: "
 
 msgid "xine Splash"
 msgstr "Úvodní obrázek xine"

@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-10-17 17:59+0200\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: French <fr@li.org>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -2211,8 +2211,8 @@ msgstr "Echec au chargement de %s/%s. Recharge l'ancienne apparence '%s'.\n"
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"Echec au chargement de %s, mauvaise version. Charge l'apparence de secours '%"
-"s'.\n"
+"Echec au chargement de %s, mauvaise version. Charge l'apparence de secours "
+"'%s'.\n"
 
 #, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
@@ -2285,7 +2285,12 @@ msgstr "Choisissez une apparence à télécharger..."
 msgid "Error: "
 msgstr "Erreur: "
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() a échoué\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() a échoué\n"
 
 msgid "Wrong image size: "
@@ -2293,15 +2298,6 @@ msgstr "Mauvaise dimension de l'image: "
 
 msgid ". Snapshot aborted."
 msgstr ". Capture abandonnée."
-
-msgid "prvt_image_alloc failed\n"
-msgstr "<prvt_image_alloc a échoué\n"
-
-msgid "Framegrabber failed\n"
-msgstr "Framegrabber a échoué\n"
-
-msgid "Not supported for this video out driver\n"
-msgstr "Non supporté pour ce pilote de sortie vidéo\n"
 
 msgid "File open failed"
 msgstr "Echec à l'ouverture du fichier"
@@ -2315,14 +2311,26 @@ msgstr "png_create_info_struct() a échoué\n"
 msgid "PNG Parsing failed\n"
 msgstr "PNG Parsing a échoué\n"
 
+msgid "File written: "
+msgstr "Le fichier a été crée: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() a échoué\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr "<prvt_image_alloc a échoué\n"
+
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber a échoué\n"
+
+msgid "Not supported for this video out driver\n"
+msgstr "Non supporté pour ce pilote de sortie vidéo\n"
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr "Erreur:  yuy2_fudge a é&choué\n"
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() a échoué\n"
-
-msgid "File written: "
-msgstr "Le fichier a été crée: "
 
 msgid "xine Splash"
 msgstr "xine Splash"

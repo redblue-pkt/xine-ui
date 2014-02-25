@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2010-09-06 19:52+0100\n"
+"POT-Creation-Date: 2014-02-25 17:44+0000\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -16,6 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "There is no MRL."
 msgstr ""
 
@@ -152,10 +154,20 @@ msgstr "control: не можу знайти зображення тла\n"
 msgid "Control HUE value"
 msgstr "Контролювати в╕дт╕нок"
 
+# src/xitk/control.c:512
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
+msgid "Hue"
+msgstr "В╕дт╕нок"
+
 msgid "Control SATURATION value"
 msgstr "Контролювати насиченн╕сть"
 
 # src/xitk/control.c:535
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Sat"
 msgstr "Суб"
 
@@ -163,6 +175,9 @@ msgid "Control BRIGHTNESS value"
 msgstr "Контролювати яскрав╕сть"
 
 # src/xitk/control.c:558
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Brt"
 msgstr "Яскр"
 
@@ -170,6 +185,9 @@ msgid "Control CONTRAST value"
 msgstr "Контролювати контраст"
 
 # src/xitk/control.c:581
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Ctr"
 msgstr "Ctrl"
 
@@ -177,6 +195,8 @@ msgstr "Ctrl"
 msgid "Control GAMMA value"
 msgstr "Контролювати в╕дт╕нок"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Gam"
 msgstr ""
 
@@ -185,7 +205,9 @@ msgid "Control SHARPNESS value"
 msgstr "Контролювати яскрав╕сть"
 
 # src/xitk/control.c:535
+#. TRANSLATORS: only ASCII characters (skin)
 #, fuzzy
+msgctxt "skin"
 msgid "Sha"
 msgstr "Суб"
 
@@ -193,10 +215,15 @@ msgstr "Суб"
 msgid "Control NOISE REDUCTION value"
 msgstr "Контролювати насиченн╕сть"
 
+#. TRANSLATORS: only ASCII characters (skin)
+msgctxt "skin"
 msgid "Noi"
 msgstr ""
 
 # src/xitk/control.c:617
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Choose a Skin"
 msgstr "Виберить стиль Г╤К"
 
@@ -210,7 +237,9 @@ msgstr "Закрити в╕кно управл╕ння"
 msgid "Download in progress"
 msgstr ""
 
+#. TRANSLATORS: only ASCII characters (skin)
 #, c-format
+msgctxt "skin"
 msgid "Download progress: %d%%."
 msgstr ""
 
@@ -1821,6 +1850,9 @@ msgid "xine MRL Browser"
 msgstr "xine MRL нав╕гатор"
 
 # src/xitk/mrl_browser.c:212
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Source:"
 msgstr "Джерело:"
 
@@ -2043,6 +2075,9 @@ msgid "Close playlist window"
 msgstr "Закрити в╕кно списку"
 
 # src/xitk/playlist.c:851
+#. TRANSLATORS: only ASCII characters (skin)
+#, fuzzy
+msgctxt "skin"
 msgid "Scan for:"
 msgstr "Сканувати на:"
 
@@ -2218,7 +2253,12 @@ msgstr ""
 msgid "Error: "
 msgstr ""
 
-msgid "xine_get_current_frame() failed\n"
+#, fuzzy
+msgid "xine_grab_video_frame.grab () failed\n"
+msgstr "xine_get_current_frame() виявлено зб╕й\n"
+
+#, fuzzy
+msgid "xine_new_grab_video_frame () failed\n"
 msgstr "xine_get_current_frame() виявлено зб╕й\n"
 
 msgid "Wrong image size: "
@@ -2228,15 +2268,6 @@ msgstr ""
 #, fuzzy
 msgid ". Snapshot aborted."
 msgstr "Швидке програвання"
-
-msgid "prvt_image_alloc failed\n"
-msgstr ""
-
-msgid "Framegrabber failed\n"
-msgstr ""
-
-msgid "Not supported for this video out driver\n"
-msgstr ""
 
 # src/xitk/snapshot.c:943
 #, fuzzy
@@ -2252,14 +2283,26 @@ msgstr "png_create_info_struct() виявлено зб╕й\n"
 msgid "PNG Parsing failed\n"
 msgstr ""
 
+msgid "File written: "
+msgstr "Файл записан: "
+
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame() виявлено зб╕й\n"
+
+msgid "prvt_image_alloc failed\n"
+msgstr ""
+
+msgid "Framegrabber failed\n"
+msgstr ""
+
+msgid "Not supported for this video out driver\n"
+msgstr ""
+
 msgid "Error: yuy2_fudge failed\n"
 msgstr ""
 
 msgid "rgb_alloc() failed\n"
 msgstr "rgb_alloc() виявлено зб╕й\n"
-
-msgid "File written: "
-msgstr "Файл записан: "
 
 # src/xitk/setup.c:1109
 #, fuzzy
