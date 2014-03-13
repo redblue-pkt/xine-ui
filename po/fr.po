@@ -7,13 +7,14 @@ msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
 "POT-Creation-Date: 2014-02-25 17:44+0000\n"
-"PO-Revision-Date: 2007-04-25 00:55+0200\n"
-"Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
+"PO-Revision-Date: 2014-03-13 21:40+0100\n"
+"Last-Translator: Xavier Bachelot <xavier@bachelot.org>\n"
 "Language-Team: French <fr@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -24,38 +25,37 @@ msgstr "Il n'y a aucune MRL."
 msgid ""
 "The stream '%s' isn't supported by xine:\n"
 "\n"
-msgstr "Le flux '%s' n'est pas supporté par xine:\n"
+msgstr "Le flux '%s' n'est pas supportÃ© par xine:\n"
 
 #, c-format
 msgid ""
 "The stream '%s' uses an unsupported codec:\n"
 "\n"
-msgstr "Le flux '%s' utilise un codec non supporté:\n"
+msgstr "Le flux '%s' utilise un codec non supportÃ©:\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr "%sCodec Vidéo: %s (%s)\n"
+msgstr "Codec VidÃ©o: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Non Disponible"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr "%sCodec Audio: %s (%s)\n"
+msgstr "Codec Audio: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Lance la Lecture ?\""
 
-#, fuzzy
 msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
-"%s\n"
-"Lance la lecture quand même ?\n"
+"\n"
+"Lance la lecture quand mÃªme ?\n"
 
 msgid "No MRL (input stream) specified"
-msgstr "Pas de MRL (flux d'entrée) spécifié."
+msgstr "Pas de MRL (flux d'entrÃ©e) spÃ©cifiÃ©."
 
 #, c-format
 msgid "Aspect ratio: %s"
@@ -63,7 +63,7 @@ msgstr "Ratio d'aspect: %s"
 
 #, c-format
 msgid "Deinterlace: %s"
-msgstr "Désentrelacement: %s"
+msgstr "DÃ©sentrelacement: %s"
 
 msgid "enabled"
 msgstr "en fonction"
@@ -73,11 +73,11 @@ msgstr "hors fonction"
 
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
-msgstr "%s(): ne peux pas créer le nouveau thread (%s)\n"
+msgstr "%s(): ne peux pas crÃ©er le nouveau thread (%s)\n"
 
 #, c-format
 msgid "Video post plugins: %s."
-msgstr "Post plugins vidéo: %s."
+msgstr "Post plugins vidÃ©o: %s."
 
 msgid "Amplification Level"
 msgstr "Niveau d'Amplification"
@@ -95,13 +95,13 @@ msgstr "Mode TV: %d"
 
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr "XSendEvent(display, 0x%x ...) a échoué.\n"
+msgstr "XSendEvent(display, 0x%x ...) a Ã©chouÃ©.\n"
 
 msgid "Select"
 msgstr "Choisir"
 
 msgid "Select all"
-msgstr "Tout selectionner"
+msgstr "Tout sÃ©lectionner"
 
 msgid "Stream(s) Loading"
 msgstr "Chargement de flux "
@@ -122,26 +122,26 @@ msgid "Contrast"
 msgstr "Contraste"
 
 msgid "Gamma"
-msgstr ""
+msgstr "Gamma"
 
 msgid "Sharpness"
-msgstr ""
+msgstr "NettetÃ©"
 
 msgid "Noise reduction"
-msgstr ""
+msgstr "RÃ©duction du bruit"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s() : ne trouve pas l'image de fond.\n"
 
 msgid "xine Control Window"
-msgstr "Fenêtre de contrôle de xine"
+msgstr "FenÃªtre de contrÃ´le de xine"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: ne trouve pas l'image de fond.\n"
 
 msgid "Control HUE value"
-msgstr "Contrôle la TEINTE"
+msgstr "ContrÃ´le la TEINTE"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -149,7 +149,7 @@ msgid "Hue"
 msgstr "Tte"
 
 msgid "Control SATURATION value"
-msgstr "Contrôle la SATURATION"
+msgstr "ContrÃ´le la SATURATION"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -157,7 +157,7 @@ msgid "Sat"
 msgstr "Sat"
 
 msgid "Control BRIGHTNESS value"
-msgstr "Contrôle la BRILLANCE"
+msgstr "ContrÃ´le la BRILLANCE"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -165,40 +165,36 @@ msgid "Brt"
 msgstr "Bri"
 
 msgid "Control CONTRAST value"
-msgstr "Contrôle le CONTRASTE"
+msgstr "ContrÃ´le le CONTRASTE"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Ctr"
 msgstr "Ctr"
 
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "Contrôle la TEINTE"
+msgstr "ContrÃ´le le GAMMA"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Gam"
-msgstr ""
+msgstr "Gam"
 
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "Contrôle la BRILLANCE"
+msgstr "ContrÃ´le la NETTETE"
 
 #. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
 msgctxt "skin"
 msgid "Sha"
-msgstr "Sat"
+msgstr "Net"
 
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "Contrôle la SATURATION"
+msgstr "ContrÃ´le la REDUCTION DU BRUIT"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Noi"
-msgstr ""
+msgstr "Brt"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -209,19 +205,19 @@ msgid "Dismiss"
 msgstr "Annuler"
 
 msgid "Close control window"
-msgstr "Ferme la fenêtre de contrôle"
+msgstr "Ferme la fenÃªtre de contrÃ´le"
 
 msgid "Download in progress"
-msgstr "Téléchargement en cours"
+msgstr "TÃ©lÃ©chargement en cours"
 
 #. TRANSLATORS: only ASCII characters (skin)
 #, c-format
 msgctxt "skin"
 msgid "Download progress: %d%%."
-msgstr "Progression du telechargement: %d%%."
+msgstr "Progression du tÃ©lÃ©chargement : %d%%."
 
 msgid "Done"
-msgstr "Terminé"
+msgstr "TerminÃ©"
 
 msgid "More..."
 msgstr "Plus..."
@@ -238,8 +234,8 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Il n'y a aucun plugin d'entrée pour gérer '%s'.\n"
-"Ceci est peut être dû à une mauvaise syntaxe de la MRL\n"
+"Il n'y a aucun plugin d'entrÃ©e pour gÃ©rer '%s'.\n"
+"Ceci est peut Ãªtre dÃ» Ã  une mauvaise syntaxe de la MRL\n"
 "ou le flux/fichier n'existe pas."
 
 #, c-format
@@ -251,8 +247,8 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Il n'y a aucun plugin de démultiplexage disponible pour gérer '%s'\n"
-"La plupart du temps celà est dû à un format de fichier non reconnu."
+"Il n'y a aucun plugin de dÃ©multiplexage disponible pour gÃ©rer '%s'\n"
+"La plupart du temps cela est dÃ» Ã  un format de fichier non reconnu."
 
 #, c-format
 msgid ""
@@ -262,7 +258,7 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Echec du démultiplexeur. Le fichier '%s' est peut être corrompu?\n"
+"Echec du dÃ©multiplexeur. Le fichier '%s' est peut Ãªtre corrompu?\n"
 
 #, c-format
 msgid ""
@@ -272,7 +268,7 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Mrl malformée. La mrl '%s' semble malformée/invalide.\n"
+"Mrl malformÃ©e. La mrl '%s' semble malformÃ©e/invalide.\n"
 
 #, c-format
 msgid ""
@@ -282,7 +278,7 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Le plugin d'entrée à échoué a l'ouverture de '%s'\n"
+"Le plugin d'entrÃ©e Ã  Ã©chouÃ© a l'ouverture de '%s'\n"
 
 msgid ""
 "- xine engine error -\n"
@@ -291,7 +287,7 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"!! Erreur non gérée !!\n"
+"!! Erreur non gÃ©rÃ©e !!\n"
 
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Execution du navigateur internet mozilla, soyez patient..."
@@ -305,14 +301,14 @@ msgid ""
 "\n"
 "http://www.xine-project.org/faq#SPEEDUP"
 msgstr ""
-"Le taux de trames sautées est trop haut, votre système semble trop lent, mal "
-"optilisé ou juste surcharché.\n"
+"Le taux de trames sautÃ©es est trop haut, votre systÃ¨me semble trop lent, mal "
+"optimisÃ© ou juste surchargÃ©.\n"
 "\n"
 "http://www.xine-project.org/faq#SPEEDUP"
 
 msgid "Warn user when too much frames are dropped."
 msgstr ""
-"Attirer l'attention de l'utilisateur quand trop de trames sont sautées."
+"Attirer l'attention de l'utilisateur quand trop de trames sont sautÃ©es."
 
 msgid "Learn More..."
 msgstr "En Apprendre Plus..."
@@ -336,14 +332,14 @@ msgid "A/V offset: %s"
 msgstr "Offset A/V: %s"
 
 msgid "A/V Offset: reset."
-msgstr "Offset A/V: ràz"
+msgstr "Offset A/V: rÃ z"
 
 #, c-format
 msgid "SPU Offset: %s"
 msgstr "Offset SPU: %s"
 
 msgid "SPU Offset: reset."
-msgstr "Offset SPU: ràz"
+msgstr "Offset SPU: rÃ z"
 
 msgid "Playlist: no loop."
 msgstr "Liste de lecture: pas de boucle."
@@ -352,26 +348,26 @@ msgid "Playlist: loop."
 msgstr "Liste de lecture: boucle."
 
 msgid "Playlist: entry repeat."
-msgstr "Liste de lecture: répète la sélection."
+msgstr "Liste de lecture: rÃ©pÃ¨te la sÃ©lection."
 
 msgid "Playlist: shuffle."
-msgstr "Liste de lecture: aléatoire."
+msgstr "Liste de lecture: alÃ©atoire."
 
 msgid "Playlist: shuffle forever."
-msgstr "Liste de lecture: aléatoire éternel."
+msgstr "Liste de lecture: alÃ©atoire Ã©ternel."
 
 msgid "No text to display!"
-msgstr "Pas de texte pour montrer!"
+msgstr "Pas de texte Ã  montrer!"
 
 #, c-format
 msgid "Playlist: %s"
 msgstr "Liste de lecture: %s"
 
 msgid "Stop (persistent)"
-msgstr ""
+msgstr "ArrÃªt (persistant)"
 
 msgid "Stop"
-msgstr "Arrêt"
+msgstr "ArrÃªt"
 
 msgid "Continue"
 msgstr "Continue"
@@ -379,8 +375,8 @@ msgstr "Continue"
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr ""
-"gui_main: visuel sélectionné %#lx inexistant, utilisation du visuel par "
-"défaut\n"
+"gui_main: visuel sÃ©lectionnÃ© %#lx inexistant, utilisation du visuel par "
+"dÃ©faut\n"
 
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
@@ -392,14 +388,14 @@ msgid ""
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 "\n"
-"XInitThreads a échoué - il semble que vous ne possédiez pas une xlib sûre.\n"
+"XInitThreads a Ã©chouÃ© - il semble que vous ne possÃ©diez pas une xlib sÃ»re.\n"
 
 #, c-format
 msgid "Cannot open display\n"
 msgstr "Ne peut pas ouvrir l'affichage.\n"
 
 msgid "Name of video display"
-msgstr "Nom de l'affichage vidéo"
+msgstr "Nom de l'affichage vidÃ©o"
 
 msgid ""
 "Use this setting to configure to which display xine will show videos. When "
@@ -407,82 +403,82 @@ msgid ""
 "like ':0.1' or ':1' makes possible to display video and control on different "
 "screens (very useful for TV presentations)."
 msgstr ""
-"Utilisez ce paramètre pour configurer quel display xine devras utiliser pour "
-"afficher les vidéos.\n"
-"Quand il est laissé vide, le display principal est utilisé. Le définir à "
+"Utilisez ce paramÃ¨tre pour configurer quel display xine devras utiliser pour "
+"afficher les vidÃ©os.\n"
+"Quand il est laissÃ© vide, le display principal est utilisÃ©. Le dÃ©finir Ã  "
 "':0.1' ou ':1' rends possible\n"
-"l'affichage et le contrôle de différents écrans (trés utile pour les "
-"presentations TV)."
+"l'affichage et le contrÃ´le de diffÃ©rents Ã©crans (trÃ¨s utile pour les "
+"prÃ©sentations TV)."
 
 #, c-format
 msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
 msgstr ""
-"Ne peut pas ouvrir le display '%s' pour la vidéo. Utilise le display "
-"primaire.\n"
+"Ne peut pas ouvrir l'affichage '%s' pour la vidÃ©o. Utilise l'affichage "
+"principal.\n"
 
 msgid "Synchronized X protocol (debug)"
-msgstr "Protocole X synchronisé (debug)"
+msgstr "Protocole X synchronisÃ© (debug)"
 
 msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
-"Efectue les transactions X en mode synchrone. Très lent, à n'utiliser que "
+"Effectue les transactions X en mode synchrone. TrÃ¨s lent, Ã  n'utiliser que "
 "pour debogger!"
 
 #, c-format
 msgid "Warning! Synchronized X activated - this is very slow...\n"
-msgstr "Attention! Synchronisation X activée - cela ralenti l'exécution...\n"
+msgstr "Attention! Synchronisation X activÃ©e - cela ralenti l'exÃ©cution...\n"
 
 msgid "Windows stacking"
-msgstr "Empilement des fenêtres"
+msgstr "Empilement des fenÃªtres"
 
 msgid ""
 "Use WM layer property to place windows on top\n"
 "except for the video window in non-fullscreen mode."
 msgstr ""
-"Utilise la propriété des couches du WM pour placer les fenêtres devant\n"
-"excepté la fenêtre vidéo en mode ne plein écran pas."
+"Utilise la propriÃ©tÃ© des couches du WM pour placer les fenÃªtres devant\n"
+"exceptÃ© la fenÃªtre vidÃ©o en mode ne plein Ã©cran pas."
 
 msgid "Windows stacking (more)"
-msgstr "Empilement des fenêtres (plus)"
+msgstr "Empilement des fenÃªtres (plus)"
 
 msgid ""
 "Use WM layer property to place windows on top\n"
 "for all windows (surpasses the 'layer_above' setting)."
 msgstr ""
-"Utilise la propriété des couches du WM pour placer les fenêtres devant\n"
-"pour tout les fenêtres (surpass la valeur de 'layer_above')."
+"Utilise la propriÃ©tÃ© des couches du WM pour placer les fenÃªtres devant\n"
+"pour tout les fenÃªtres (surpasse la valeur de 'layer_above')."
 
 msgid "Snapshot location"
 msgstr "Emplacement des captures"
 
 msgid "Where snapshots will be saved."
-msgstr "Où les captures seront sauvées"
+msgstr "OÃ¹ les captures seront sauvÃ©es."
 
 msgid "Screensaver reset interval (s)"
-msgstr "Interval de remise à zéro de l'économiseur d'écran (s)"
+msgstr "Interval de remise Ã  zÃ©ro de l'Ã©conomiseur d'Ã©cran (s)"
 
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
 "disable."
 msgstr ""
-"Temps, en secondes, entre deux évènements trompeur d'economiseur d'écran "
-"afin de le garder silencieux, 0 pour dévalider."
+"Temps, en secondes, entre deux Ã©vÃ¨nements trompeur dâ€™Ã©conomiseur d'Ã©cran "
+"afin de le garder silencieux, 0 pour dÃ©sactiver."
 
 msgid "Chapter hopping"
 msgstr "Saut de chapitre"
 
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
-msgstr "Joue le chapitre suivant/précédent à la place du mrl (dvdnav)"
+msgstr "Joue le chapitre suivant/prÃ©cÃ©dent Ã  la place du mrl (dvdnav)"
 
 msgid "Visibility behavior of output window"
-msgstr "Comportement de la visibilité de la fenêtre de sortie"
+msgstr "Comportement de la visibilitÃ© de la fenÃªtre de sortie"
 
 msgid "Hide video output window if there is no video in the stream"
-msgstr "Cache la fenêtre de sortie vidéo si il n'y a pas de vidéo dans le flux"
+msgstr "Cache la fenÃªtre de sortie vidÃ©o s'il n'y a pas de vidÃ©o dans le flux"
 
 msgid "Visiblility behavior of panel"
-msgstr "Comportement de la visibilité du panneau principal"
+msgstr "Comportement de la visibilitÃ© du panneau principal"
 
 msgid ""
 "Automatically show/hide panel window, according to "
@@ -492,10 +488,10 @@ msgstr ""
 "auto_video_output_visibility"
 
 msgid "Event sender behavior"
-msgstr "Comportement du générateur d'évènement"
+msgstr "Comportement du gÃ©nÃ©rateur d'Ã©vÃ¨nement"
 
 msgid "Event sender window stick to main panel"
-msgstr "La fenêtre du générateur d'évènement colle au panneau principal"
+msgstr "La fenÃªtre du gÃ©nÃ©rateur d'Ã©vÃ¨nement colle au panneau principal"
 
 msgid "Visual animation style"
 msgstr "Style d'animation visuelle"
@@ -503,7 +499,7 @@ msgstr "Style d'animation visuelle"
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
-"Affiche quelques animations vidéo quand le flux courant est seulement audio "
+"Affiche quelques animations vidÃ©o quand le flux courant est seulement audio "
 "(ex: mp3)."
 
 msgid "Stream information"
@@ -511,14 +507,14 @@ msgstr "Information du flux"
 
 msgid "Update stream information (in stream info window) each half seconds."
 msgstr ""
-"Met à jour les informations du flux (dans le fenêtre d'informations de flux) "
+"Met Ã  jour les informations du flux (dans le fenÃªtre d'informations de flux) "
 "toute les demie-secondes."
 
 msgid "Skin Server Url"
 msgstr "Url du serveur d'apparence"
 
 msgid "From where we can get skins."
-msgstr "D'où peut-on récuperer les apparences."
+msgstr "D'oÃ¹ peut-on rÃ©cupÃ©rer les apparences."
 
 msgid "Enable OSD support"
 msgstr "Utilisation de l'OSD"
@@ -527,13 +523,13 @@ msgid ""
 "Enabling OSD permit to display some status/informations in output window."
 msgstr ""
 "L'utilisation de l'OSD permet d'afficher quelques status/informations dans "
-"la fenêtre de sortie video."
+"la fenÃªtre de sortie vidÃ©o."
 
 msgid "Use unscaled OSD"
-msgstr "Utilise l'OSD non mis à l'échelle"
+msgstr "Utilise l'OSD non mis Ã  l'Ã©chelle"
 
 msgid "Use unscaled (full screen resolution) OSD if possible"
-msgstr "Utilise l'OSD non mis à l'échelle (mode plein écran) si possible"
+msgstr "Utilise l'OSD non mis Ã  l'Ã©chelle (mode plein Ã©cran) si possible"
 
 msgid "Dismiss OSD time (s)"
 msgstr "Temps de masquage de l'OSD (s)"
@@ -542,31 +538,31 @@ msgid "Persistence time of OSD visual, in seconds."
 msgstr "Temps de persistance de l'OSD, en secondes."
 
 msgid "Change xine's behavior for unexperienced user"
-msgstr "Change le comportement de xine pour les utilisateurs inexpérimenté"
+msgstr "Change le comportement de xine pour les utilisateurs inexpÃ©rimentÃ©s"
 
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
-"Dans ce mode, xine prends quelques decisions afin de simplifier la vie de "
+"Dans ce mode, xine prends quelques dÃ©cisions afin de simplifier la vie de "
 "l'utilisateur."
 
 msgid "Ask user for playback with unsupported codec"
-msgstr "Interroge l'utilisateur pour la lecture avec les codecs non supportés"
+msgstr "Interroge l'utilisateur pour la lecture avec les codecs non supportÃ©s"
 
 msgid ""
 "If xine don't support audio or video codec of current stream the user will "
 "be asked if the stream should be played or not"
 msgstr ""
-"Si xine ne supporte le codec audio ou vidéo pour le flux courant, "
-"l'utilisateur sera interrogé pour la poursuite ou non de la lecture"
+"Si xine ne supporte le codec audio ou vidÃ©o pour le flux courant, "
+"l'utilisateur sera interrogÃ© pour la poursuite ou non de la lecture"
 
 msgid "Configuration experience level"
-msgstr "Configuration du niveau d'experience"
+msgstr "Configuration du niveau dâ€™expÃ©rience"
 
 msgid ""
 "Level of user's experience, this will show more or less configuration "
 "options."
 msgstr ""
-"Niveau d'experience de l'utilisateur, ceci affichera plus ou moins d'options "
+"Niveau dâ€™expÃ©rience de l'utilisateur, ceci affichera plus ou moins d'options "
 "de configuration"
 
 msgid "Amplification level"
@@ -579,23 +575,23 @@ msgid "If enabled, xine will display its splash screen"
 msgstr "Si en fonction, xine affichera son splash screen"
 
 msgid "Audio mixer control method"
-msgstr "Methode de contrôle du mixer audio"
+msgstr "MÃ©thode de contrÃ´le du mixer audio"
 
 msgid "Which method used to control audio volume."
-msgstr "Quelle methode est à utiliser pour contrôler le volume audio."
+msgstr "Quelle mÃ©thode est Ã  utiliser pour contrÃ´ler le volume audio."
 
 msgid "Menu shortcut style"
 msgstr "Style de raccourcis"
 
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
-msgstr "Representation des raccourcis dans les menus, 'Ctrl,Alt' ou 'C,M'."
+msgstr "ReprÃ©sentation des raccourcis dans les menus, 'Ctrl,Alt' ou 'C,M'."
 
 #, c-format
 msgid "Unable to initialize Imlib\n"
 msgstr "Impossible d'initialiser Imlib.\n"
 
 msgid "xine Event Sender"
-msgstr "Générateur d'évènement de xine"
+msgstr "GÃ©nÃ©rateur d'Ã©vÃ¨nement de xine"
 
 msgid "Up"
 msgstr "Haut"
@@ -677,7 +673,7 @@ msgstr "Abandon"
 
 #, c-format
 msgid "Unable to open directory '%s': %s."
-msgstr "Impossible d'ouvrir le répertoire '%s': %s."
+msgstr "Impossible d'ouvrir le rÃ©pertoire '%s': %s."
 
 #, c-format
 msgid "Unable to delete file '%s': %s."
@@ -685,42 +681,42 @@ msgstr "Impossible de supprimer le fichier '%s': '%s'."
 
 #, c-format
 msgid "Do you really want to delete the file '%s%s%s' ?"
-msgstr "Voulez-vous réellement supprimer le fichier: '%s%s%s'"
+msgstr "Voulez-vous rÃ©ellement supprimer le fichier: '%s%s%s'"
 
 msgid "Confirm deletion ?"
-msgstr "Suppression confirmée ?"
+msgstr "Suppression confirmÃ©e ?"
 
 #, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
-msgstr "Impossible de rebaptiser le fichier '%s' en '%s': %s."
+msgstr "Impossible de renommer le fichier '%s' en '%s': %s."
 
 msgid "Rename file"
-msgstr "Rebaptiser le fichier"
+msgstr "Renommer le fichier"
 
 #, c-format
 msgid "Unable to create the directory '%s': %s."
-msgstr "Impossible de créer le répertoire '%s': %s."
+msgstr "Impossible de crÃ©er le rÃ©pertoire '%s': %s."
 
 msgid "Create a new directory"
-msgstr "Créer un nouveau répertoire"
+msgstr "CrÃ©er un nouveau rÃ©pertoire"
 
 msgid "File Browser"
 msgstr "Brouteur de fichier"
 
 msgid "Show hidden file"
-msgstr "Affiche les fichiers cachés"
+msgstr "Affiche les fichiers cachÃ©s"
 
 msgid "Rename"
-msgstr "Rebaptiser"
+msgstr "Renommer"
 
 msgid "Delete"
 msgstr "Supprimer"
 
 msgid "Create a directory"
-msgstr "Créer un répertoire"
+msgstr "CrÃ©er un rÃ©pertoire"
 
 msgid "Undefined"
-msgstr "Non défini"
+msgstr "Non dÃ©fini"
 
 msgid "Help"
 msgstr "Aide"
@@ -729,7 +725,7 @@ msgid "No Help Section Available"
 msgstr "Pas d'Aide Disponible pour cette Section"
 
 msgid "OOCH: key binding table is NULL.\n"
-msgstr "Aïe : la table des séquences de touches est NULLE.\n"
+msgstr "AÃ¯e : la table des sÃ©quences de touches est NULLE.\n"
 
 msgid "Ctrl"
 msgstr "Ctrl"
@@ -738,23 +734,23 @@ msgid "Alt"
 msgstr "Alt"
 
 msgid "Nothing selected"
-msgstr "Aucune entrée sélectionnée"
+msgstr "Aucune entrÃ©e sÃ©lectionnÃ©e"
 
 msgid "None"
 msgstr "Aucune"
 
 msgid "You can only delete alias entries."
-msgstr "Vous ne pouvez supprimer que les entrées alias."
+msgstr "Vous ne pouvez supprimer que les entrÃ©es alias."
 
 msgid "No more space for additional entries!"
-msgstr ""
+msgstr "Plus de place pour des entrÃ©es additionnelles !"
 
 msgid "Press Keyboard Keys..."
 msgstr "Appuyez sur les touches du clavier..."
 
 msgid "Event Receiver Window:  Press keyboard keys to bind..."
 msgstr ""
-"Fenêtre de reception d'évènements:  Appuyez sur les touches du clavier..."
+"FenÃªtre de rÃ©ception d'Ã©vÃ¨nements:  Appuyez sur les touches du clavier..."
 
 msgid "Accept?"
 msgstr "Accepter ?"
@@ -772,7 +768,7 @@ msgid ""
 "This key binding is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
-"Cette séquence de touches est redondante avec l'action :\n"
+"Cette sÃ©quence de touches est redondante avec l'action :\n"
 "\"%s\".\n"
 
 msgid "Key Binding Editor"
@@ -785,7 +781,7 @@ msgid "Key"
 msgstr "Touche"
 
 msgid "Modifiers"
-msgstr "Modifieurs"
+msgstr "Modificateurs"
 
 msgid "Alias"
 msgstr "Alias"
@@ -797,13 +793,13 @@ msgid "Save"
 msgstr "Sauver"
 
 msgid "Reset"
-msgstr "Ràz"
+msgstr "RÃ z"
 
 msgid "ctrl"
 msgstr "ctrl"
 
 msgid "meta"
-msgstr "méta"
+msgstr "mÃ©ta"
 
 msgid "mod3"
 msgstr "mod3"
@@ -819,7 +815,7 @@ msgstr "Capture"
 
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
-msgstr ""
+msgstr "xine-ui: Trop d'entrÃ©es Alias dans le fichier keymap, entrÃ©e ignorÃ©.\n"
 
 msgid "and"
 msgstr "et"
@@ -828,7 +824,7 @@ msgid ""
 "The following key bindings pairs are identical:\n"
 "\n"
 msgstr ""
-"Les séquences de touches suivantes sont redondantes:\n"
+"Les sÃ©quences de touches suivantes sont redondantes :\n"
 "\n"
 
 msgid ""
@@ -838,7 +834,7 @@ msgid ""
 msgstr ""
 ".\n"
 "\n"
-"Que désirez-vous faire ?\n"
+"Que dÃ©sirez-vous faire ?\n"
 
 msgid "Keybindings error!"
 msgstr "Erreur de Raccourcis!"
@@ -851,7 +847,7 @@ msgstr "Inconnu"
 
 #, c-format
 msgid "Bad geometry '%s'\n"
-msgstr "Mauvaise géométrie '%s'\n"
+msgstr "Mauvaise gÃ©omÃ©trie '%s'\n"
 
 #, c-format
 msgid "Bad visual '%s'\n"
@@ -859,35 +855,35 @@ msgstr "Mauvais visuel '%s'\n"
 
 #, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
-msgstr "Voici xine (X11 gui) - un lecteur vidéo libre v%s"
+msgstr "Voici xine (X11 gui) - un lecteur vidÃ©o libre v%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) 2000-2010 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2007 L'Equipe de xine.\n"
+"(c) 2000-2010 L'Equipe de xine.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
-msgstr "Généré avec la bibliothèque xine %d.%d.%d (%s).\n"
+msgstr "GÃ©nÃ©rÃ© avec la bibliothÃ¨que xine %d.%d.%d (%s).\n"
 
 #, c-format
 msgid "Found xine library version: %d.%d.%d (%s).\n"
-msgstr "Version de la bibliothèque de xine trouvée : %d.%d.%d (%s).\n"
+msgstr "Version de la bibliothÃ¨que de xine trouvÃ©e : %d.%d.%d (%s).\n"
 
 msgid "   -Audio output:\n"
 msgstr "   -Sortie audio:\n"
 
 msgid "   -Video output:\n"
-msgstr "   -Sortie vidéo:\n"
+msgstr "   -Sortie vidÃ©o:\n"
 
 msgid "   -Demuxer:\n"
-msgstr "   -Demultiplexeur:\n"
+msgstr "   -DÃ©multiplexeur:\n"
 
 msgid "   -Input:\n"
-msgstr "   -Entrée:\n"
+msgstr "   -EntrÃ©e:\n"
 
 msgid "   -Subpicture:\n"
 msgstr "   -Sous-titre:\n"
@@ -896,10 +892,10 @@ msgid "   -Post processing:\n"
 msgstr "   -Post-traitement:\n"
 
 msgid "   -Audio decoder:\n"
-msgstr "   -Decodeur audio:\n"
+msgstr "   -DÃ©codeur audio:\n"
 
 msgid "   -Video decoder:\n"
-msgstr "   -Decodeur vidéo:\n"
+msgstr "   -DÃ©codeur vidÃ©o:\n"
 
 #, c-format
 msgid ""
@@ -911,7 +907,7 @@ msgstr ""
 
 #, c-format
 msgid "No available plugins found of %s type!\n"
-msgstr "Aucun plugin trouvé pour le type %s !\n"
+msgstr "Aucun plugin trouvÃ© pour le type %s !\n"
 
 #, c-format
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
@@ -928,21 +924,21 @@ msgstr "  -v, --version                Affiche la version.\n"
 #, c-format
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
 msgstr ""
-"      --verbose [=level]       Défini le niveau de verbiage. Defaut à 1.\n"
+"      --verbose [=level]       DÃ©fini le niveau de verbiage. DÃ©faut Ã  1.\n"
 
 #, c-format
 msgid ""
 "  -c, --config <file>          Use config file instead of default one.\n"
 msgstr ""
-"  -c, --config <fichier>       Utilise le <fichier> de configuration à la "
-"place de celui par defaut.\n"
+"  -c, --config <fichier>       Utilise le <fichier> de configuration Ã  la "
+"place de celui par dÃ©faut.\n"
 
 #, c-format
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
 msgstr ""
-"  -V, --video-driver <drv>     Sélection du pilote vidéo par nom. Pilotes\n"
+"  -V, --video-driver <drv>     SÃ©lection du pilote vidÃ©o par nom. Pilotes\n"
 "                               disponibles : \n"
 
 #, c-format
@@ -950,17 +946,17 @@ msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
 msgstr ""
-"  -A, --audio-drivers <drv>    Sélection du pilote audio par nom. Pilotes\n"
+"  -A, --audio-drivers <drv>    SÃ©lection du pilote audio par nom. Pilotes\n"
 "                               disponibles : \n"
 
 #, c-format
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
 msgstr ""
-"  -u, --spu-channel <#>        Sélection du canal SPU (sous-titre) '#'.\n"
+"  -u, --spu-channel <#>        SÃ©lection du canal SPU (sous-titre) '#'.\n"
 
 #, c-format
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
-msgstr "  -a, --audio-channel <#>      Sélection du canal audio '#'.\n"
+msgstr "  -a, --audio-channel <#>      SÃ©lection du canal audio '#'.\n"
 
 #, c-format
 msgid ""
@@ -974,38 +970,38 @@ msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
 msgstr ""
-"  -p, --auto-play [opt]        Lecture au démarrage. Peut-être suivi par :\n"
-"                    'f' : en mode plein écran.\n"
-"                    'F' : en mode plein écran xinerama.\n"
+"  -p, --auto-play [opt]        Lecture au dÃ©marrage. Peut-Ãªtre suivi par :\n"
+"                    'f' : en mode plein Ã©cran.\n"
+"                    'F' : en mode plein Ã©cran xinerama.\n"
 "                    'h' : cache l'interface utilisateur (panneau "
 "principal, ...)\n"
 ".\n"
-"                    'w': cache la fenêtre de sortie vidéo.\n"
-"                    'q' : quitte quand la lecture est terminée.\n"
-"                    'd' : récupère la liste de lecture a partir du DVD.\n"
-"                         (déprécié, utilisez -s DVD)\n"
-"                    'v' : récupère la liste de lecture à partir du VCD.\n"
-"                         (déprécié, utilisez -s VCD)\n"
+"                    'w': cache la fenÃªtre de sortie vidÃ©o.\n"
+"                    'q' : quitte quand la lecture est terminÃ©e.\n"
+"                    'd' : rÃ©cupÃ¨re la liste de lecture a partir du DVD.\n"
+"                         (dÃ©prÃ©ciÃ©, utilisez -s DVD)\n"
+"                    'v' : rÃ©cupÃ¨re la liste de lecture Ã  partir du VCD.\n"
+"                         (dÃ©prÃ©ciÃ©, utilisez -s VCD)\n"
 
 #, c-format
 msgid "                    'F': in xinerama fullscreen mode.\n"
-msgstr "                    'F' : en mode plein écran xinerama.\n"
+msgstr "                    'F' : en mode plein Ã©cran xinerama.\n"
 
 #, c-format
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
-msgstr "  -s, --auto-scan <plugin>     liste de lecture à partir de <plugin>\n"
+msgstr "  -s, --auto-scan <plugin>     liste de lecture Ã  partir de <plugin>\n"
 
 #, c-format
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
-msgstr "  -f, --fullscreen             passe en plein écran au démarrage,\n"
+msgstr "  -f, --fullscreen             passe en plein Ã©cran au dÃ©marrage,\n"
 
 #, c-format
 msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
 msgstr ""
-"  -F, --xineramafull           passe en plein écran xinerama au démarrage\n"
-"                                 (affiche sur plusieurs écrans),\n"
+"  -F, --xineramafull           passe en plein Ã©cran xinerama au dÃ©marrage\n"
+"                                 (affiche sur plusieurs Ã©crans),\n"
 
 #, c-format
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
@@ -1014,19 +1010,19 @@ msgstr ""
 
 #, c-format
 msgid "  -I, --no-gui                 disable GUI\n"
-msgstr "  -I, --no-gui                 dévalide l'interface utilisateur\n"
+msgstr "  -I, --no-gui                 dÃ©sactive l'interface utilisateur\n"
 
 #, c-format
 msgid "      --no-mouse               disable mouse event\n"
-msgstr "      --no-mouse               invalide les évènement de la souris\n"
+msgstr "      --no-mouse               dÃ©sactive les Ã©vÃ¨nement de la souris\n"
 
 #, c-format
 msgid "  -H, --hide-video             hide video window\n"
-msgstr "  -H, --hide-video             cache la fenêtre de sortie vidéo.\n"
+msgstr "  -H, --hide-video             cache la fenÃªtre de sortie vidÃ©o.\n"
 
 #, c-format
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
-msgstr "  -L, --no-lirc                Désactivation du support de LIRC.\n"
+msgstr "  -L, --no-lirc                DÃ©sactivation du support de LIRC.\n"
 
 #, c-format
 msgid ""
@@ -1034,7 +1030,7 @@ msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
 msgstr ""
-"      --visual <classe-ou-nom> Utilise le visuel X11 spécifié\n"
+"      --visual <classe-ou-nom> Utilise le visuel X11 spÃ©cifiÃ©\n"
 "                               si c'est une classe visuelle X11 ou un\n"
 "                               nom de visuel.\n"
 "\n"
@@ -1042,7 +1038,7 @@ msgstr ""
 #, c-format
 msgid "      --install                Install a private colormap.\n"
 msgstr ""
-"      --install                Installe une table de couleurs privée.\n"
+"      --install                Installe une table de couleurs privÃ©e.\n"
 
 #, c-format
 msgid ""
@@ -1056,51 +1052,51 @@ msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
 msgstr ""
-"      --keymap [=option]       Affiche les séquences clavier. Les options "
+"      --keymap [=option]       Affiche les sÃ©quences clavier. Les options "
 "sont :\n"
-"                                 'default' : affiche les séquences clavier \n"
+"                                 'default' : affiche les sÃ©quences clavier \n"
 "                                             originales,\n"
 "                                 'lirc' : affiche le brouillon d'un fichier "
 "de \n"
 "                                          de configuration .lircrc.\n"
-"                                 'remapped' : affiche les séquences "
-"modifiées.\n"
+"                                 'remapped' : affiche les sÃ©quences "
+"modifiÃ©es.\n"
 "                                 'file:<fichier>' : utilise <fichier> "
 "comme \n"
-"                                                    fichier de séquences.\n"
-"                                 -si aucune option n'est donnée, 'default' \n"
-"                                  sera sélectionné.\n"
+"                                                    fichier de sÃ©quences.\n"
+"                                 -si aucune option n'est donnÃ©e, 'default' \n"
+"                                  sera sÃ©lectionnÃ©.\n"
 
 #, c-format
 msgid "  -n, --network                Enable network remote control server.\n"
 msgstr ""
-"  -n, --network                Démarrage sur serveur de contrôle distant.\n"
+"  -n, --network                DÃ©marrage sur serveur de contrÃ´le distant.\n"
 
 #, c-format
 msgid "      --network-port           Specify network server port number.\n"
 msgstr ""
-"      --network-port           Spécifie le numéro de port du serveur.\n"
+"      --network-port           SpÃ©cifie le numÃ©ro de port du serveur.\n"
 
 #, c-format
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
-"  -R, --root                   Utilise la fenêtre root pour l'affichage "
-"vidéo.\n"
+"  -R, --root                   Utilise la fenÃªtre root pour l'affichage "
+"vidÃ©o.\n"
 
 #, c-format
 msgid "  -W, --wid                    Use a window id.\n"
-msgstr "  -W, --wid                   Utilise l'id de fenêtre.\n"
+msgstr "  -W, --wid                   Utilise l'id de fenÃªtre.\n"
 
 #, c-format
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
 msgstr ""
-"  -G, --geometry <WxH[+X+Y]>   Défini la géométrie de la fenêtre de sortie "
+"  -G, --geometry <WxH[+X+Y]>   DÃ©fini la gÃ©omÃ©trie de la fenÃªtre de sortie "
 "(style X).\n"
 
 #, c-format
 msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr ""
-"  -B, --borderless             Fenêtre de sortie vidéo sans bordures.\n"
+"  -B, --borderless             FenÃªtre de sortie vidÃ©o sans bordures.\n"
 
 #, c-format
 msgid ""
@@ -1108,10 +1104,10 @@ msgid ""
 "used.\n"
 "                                 -can be used more than one time.\n"
 msgstr ""
-"  -N, --animation <mrl>        Spécifie le mrl a jouer quand la sortie vidéo "
+"  -N, --animation <mrl>        SpÃ©cifie le mrl a jouer quand la sortie vidÃ©o "
 "est\n"
-"                               inutilisée.\n"
-"                                 -peut être utilisé plus d'une fois.\n"
+"                               inutilisÃ©e.\n"
+"                                 -peut Ãªtre utilisÃ© plus d'une fois.\n"
 
 #, c-format
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
@@ -1130,28 +1126,28 @@ msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
 "indefinetely replay the playlist.\n"
 msgstr ""
-"  -l, --loop [=mode]           Défini le mode de boucle de la liste de "
+"  -l, --loop [=mode]           DÃ©fini le mode de boucle de la liste de "
 "lecture.\n"
 "                                Les modes sont:\n"
 "                                 'loop': boucle toute la liste.\n"
-"                                 'repeat': Répète la sélection courante.\n"
-"                                 'shuffle': sélection aléatoire d'une "
-"entrée \n"
-"                                            non jouée.\n"
-"                                 'shuffle+': identique à shuffle, mais "
+"                                 'repeat': RÃ©pÃ¨te la sÃ©lection courante.\n"
+"                                 'shuffle': sÃ©lection alÃ©atoire d'une "
+"entrÃ©e \n"
+"                                            non jouÃ©e.\n"
+"                                 'shuffle+': identique Ã  shuffle, mais "
 "rejoue in\n"
-"                                             définiement la liste de "
+"                                             dÃ©finiement la liste de "
 "lecture.\n"
 
 #, c-format
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
-msgstr "      --skin-server-url <url>  Spécifis le serveur d'apparence.\n"
+msgstr "      --skin-server-url <url>  SpÃ©cifie le serveur d'apparence.\n"
 
 #, c-format
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
-"      --enqueue <mrl> ...      Ajoute la mrl à la session déja executée "
+"      --enqueue <mrl> ...      Ajoute la mrl Ã  la session dÃ©jÃ  exÃ©cutÃ©e "
 "(session 0)\n"
 
 #, c-format
@@ -1188,36 +1184,36 @@ msgid ""
 msgstr ""
 "  -S, --session <option1, option2,...>\n"
 "                               Gestion de sessions. les options peuvent "
-"êtres:\n"
-"                    session=n   spécifie le numéro de session <n>,\n"
-"                    mrl=m       ajoute la mrl <m> à la liste de lecture,\n"
+"Ãªtres:\n"
+"                    session=n   spÃ©cifie le numÃ©ro de session <n>,\n"
+"                    mrl=m       ajoute la mrl <m> Ã  la liste de lecture,\n"
 "\n"
-"                    audio=c     sélectionne le canal audio (<c>: 'next' \n"
+"                    audio=c     sÃ©lectionne le canal audio (<c>: 'next' \n"
 "                                ou 'prev')\n"
-"                    spu=c       sélectionne le canal de sous-titre (<c>: "
+"                    spu=c       sÃ©lectionne le canal de sous-titre (<c>: "
 "'next' \n"
 "                                ou 'prev')\n"
-"                    volume=v    règle le volume audio,\n"
-"                    amp=v       règle le niveau d'amplification,\n"
-"                    loop=m      sélectionne le mode de boucle (<m>: 'none'\n"
+"                    volume=v    rÃ¨gle le volume audio,\n"
+"                    amp=v       rÃ¨gle le niveau d'amplification,\n"
+"                    loop=m      sÃ©lectionne le mode de boucle (<m>: 'none'\n"
 "                                'loop' 'repeat' 'shuffle' ou 'shuffle+'),\n"
 "                    get_speed   renvoi la vitesse (voir la page de manuel "
 "pour les valeurs\n"
-"                                retournées).\n"
+"                                retournÃ©es).\n"
 "                    (playlist|pl)=p\n"
-"                                 <p> peux être:\n"
+"                                 <p> peux Ãªtre:\n"
 "                                   'clear'  efface la liste de lecture,\n"
-"                                   'first'  lis la première entrée dans la\n"
+"                                   'first'  lis la premiÃ¨re entrÃ©e dans la\n"
 "                                            liste de lecture,\n"
-"                                   'prev'   joue l'entrée précédente,\n"
-"                                   'next'   joue l'entrée suivante,\n"
-"                                   'last'   lis la dernière entrée dans\n"
+"                                   'prev'   joue l'entrÃ©e prÃ©cÃ©dente,\n"
+"                                   'next'   joue l'entrÃ©e suivante,\n"
+"                                   'last'   lis la derniÃ¨re entrÃ©e dans\n"
 "                                            la liste de lecture,\n"
 "                                   'load:s' charge le fichier <s>.\n"
-"                                   'stop'   arrête la lecture à la fin de "
+"                                   'stop'   arrÃªte la lecture Ã  la fin de "
 "la \n"
 "                                            lecture en cours,\n"
-"                                   'cont'   continue la lecture à la fin de "
+"                                   'cont'   continue la lecture Ã  la fin de "
 "la\n"
 "                                            lecture en cours,\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1228,7 +1224,7 @@ msgid ""
 "  -Z                           Don't automatically start playback (smart "
 "mode).\n"
 msgstr ""
-"  -Z                           Ne démarre pas automatiquement la lecture "
+"  -Z                           Ne dÃ©marre pas automatiquement la lecture "
 "(mode smart).\n"
 
 #, c-format
@@ -1239,12 +1235,12 @@ msgid ""
 "parameters.\n"
 "                                 Syntax is the same as --post option.\n"
 msgstr ""
-"  -D, --deinterlave [post]...  Désentrelace la sortie vidéo. Un ou "
+"  -D, --deinterlave [post]...  DÃ©sentrelace la sortie vidÃ©o. Un ou "
 "plusieurs\n"
-"                                 plugin de post-traitement peuvent êtres\n"
-"                                 spécifiés, avec leurs paramètres "
-"optionels.\n"
-"                                 La syntaxe est identique à l'option --"
+"                                 plugin de post-traitement peuvent Ãªtres\n"
+"                                 spÃ©cifiÃ©s, avec leurs paramÃ¨tres "
+"optionnels.\n"
+"                                 La syntaxe est identique Ã  l'option --"
 "post.\n"
 
 #, c-format
@@ -1253,7 +1249,7 @@ msgid ""
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 msgstr ""
-"  -r, --aspect-ratio <mode>    Défini le ratio d'aspect le la sortie vidéo. "
+"  -r, --aspect-ratio <mode>    DÃ©fini le ratio d'aspect le la sortie vidÃ©o. "
 "Les \n"
 "                               modes sont:\n"
 "                                 'auto', 'square', '4:3', 'anamorphic', "
@@ -1265,8 +1261,8 @@ msgid ""
 "                               Slave is started with 'xine slave://address:"
 "port'\n"
 msgstr ""
-"      --broadcast-port <port>  Défini le port de diffusion (coté maitre)\n"
-"                               L'esclave est lançé par 'xine slave://adresse:"
+"      --broadcast-port <port>  DÃ©fini le port de diffusion (cotÃ© maitre)\n"
+"                               L'esclave est lancÃ© par 'xine slave://adresse:"
 "port'\n"
 
 #, c-format
@@ -1285,12 +1281,12 @@ msgid ""
 "                               Parameters are comma separated.\n"
 "                               This option can be used more than one time.\n"
 msgstr ""
-"      --post <plugin>[:paramètre=valeur][,...][;...]\n"
+"      --post <plugin>[:paramÃ¨tre=valeur][,...][;...]\n"
 "                               Charge un ou plusieurs plugins de\n"
 "                               post-traitement.\n"
-"                               Les paramètres sont séparés par des "
+"                               Les paramÃ¨tres sont sÃ©parÃ©s par des "
 "virgules.\n"
-"                               Cette option peut être utlisée plus d'une "
+"                               Cette option peut Ãªtre utilisÃ©e plus d'une "
 "fois.\n"
 
 #, c-format
@@ -1307,14 +1303,14 @@ msgid ""
 "      --stdctl                 Control xine by the console, using lirc "
 "commands.\n"
 msgstr ""
-"      --stdctl                 Contrôle xine via la console, en utilisant "
+"      --stdctl                 ContrÃ´le xine via la console, en utilisant "
 "les commandes lirc.\n"
 
 #, c-format
 msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
 msgstr ""
 "  -T, --tvout <backend>        Mise en fonction du support de la sortie TV.\n"
-"                               Backend peut être:\n"
+"                               Backend peut Ãªtre:\n"
 
 #, c-format
 msgid ""
@@ -1325,7 +1321,7 @@ msgid ""
 msgstr ""
 "      --list-plugins [=type]   Affiche la liste de tout les plugins "
 "disponibles,\n"
-"                               Le <type> optionel peut être:\n"
+"                               Le <type> optionel peut Ãªtre:\n"
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
 
@@ -1338,12 +1334,12 @@ msgid ""
 "                                 If <mrl> is given, xine will play the mrl\n"
 "                                 then quit (like -pq).\n"
 msgstr ""
-"      --bug-report [=mrl]      Mise en fonction du mode rapport de boggue:\n"
+"      --bug-report [=mrl]      Mise en fonction du mode rapport de bogue:\n"
 "                                 Met en fonction le mode verbeux, collecte\n"
 "                                 tout les messages et les ecris dans un "
 "fichier\n"
-"                                 nommé BUG-REPORT.TXT.\n"
-"                                 Si <mrl> est precisé, xine jouera cette "
+"                                 nommÃ© BUG-REPORT.TXT.\n"
+"                                 Si <mrl> est prÃ©cisÃ©, xine jouera cette "
 "mrl\n"
 "                                 puis quittera (comme -pq).\n"
 
@@ -1368,61 +1364,61 @@ msgstr ""
 "  VCD:       'vcd://<numero piste>'\n"
 
 msgid "video driver to use"
-msgstr "pilote vidéo à utiliser"
+msgstr "pilote vidÃ©o Ã  utiliser"
 
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
-"Choisissez un pilote vidéo. NOTE: vous devez redémarrer xine pour utiliser "
+"Choisissez un pilote vidÃ©o. NOTE: vous devez redÃ©marrer xine pour utiliser "
 "le nouveau pilote."
 
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
-msgstr "main : détection du plugin de sortie vidéo <%s>\n"
+msgstr "main : dÃ©tection du plugin de sortie vidÃ©o <%s>\n"
 
 #, c-format
 msgid "main: all available video drivers failed.\n"
-msgstr "main : tous les pilotes vidéo ont échoué.\n"
+msgstr "main : tous les pilotes vidÃ©o ont Ã©chouÃ©.\n"
 
 #, c-format
 msgid "main: video driver <%s> failed\n"
-msgstr "main : le pilote vidéo <%s> a échoué\n"
+msgstr "main : le pilote vidÃ©o <%s> a Ã©chouÃ©\n"
 
 msgid "audio driver to use"
-msgstr "pilote audio à utiliser"
+msgstr "pilote audio Ã  utiliser"
 
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
-"Choisissez un pilote audio. NOTE: vous devez redémarrer xine pour utiliser "
+"Choisissez un pilote audio. NOTE: vous devez redÃ©marrer xine pour utiliser "
 "le nouveau pilote."
 
 #, c-format
 msgid "main: not using any audio driver (as requested).\n"
-msgstr "main : n'utilise aucun pilote audio (comme demandé).\n"
+msgstr "main : n'utilise aucun pilote audio (comme demandÃ©).\n"
 
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
-msgstr "main : détection du plugin de sortie audio <%s>\n"
+msgstr "main : dÃ©tection du plugin de sortie audio <%s>\n"
 
 #, c-format
 msgid "main: skipping <%s> audio output plugin from auto-probe\n"
 msgstr ""
-"main : saute le plugin de sortie audio <%s> pour l'auto-detection\n"
+"main : saute le plugin de sortie audio <%s> pour l'auto-dÃ©tection\n"
 "\n"
 
 #, c-format
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr "main : échec d'auto-détection du pilote audio => pas de sortie son\n"
+msgstr "main : Ã©chec d'auto-dÃ©tection du pilote audio => pas de sortie son\n"
 
 #, c-format
 msgid "main: audio driver <%s> failed\n"
-msgstr "main : le pilote audio <%s> a échoué\n"
+msgstr "main : le pilote audio <%s> a Ã©chouÃ©\n"
 
 msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
 msgstr ""
-"*roulement de tambour*, la bibliothèque xine requière votre attention afin "
-"de vous délivrer un messate important ;-):"
+"*roulement de tambour*, la bibliothÃ¨que xine requiÃ¨re votre attention afin "
+"de vous dÃ©livrer un message important ;-):"
 
 msgid "No information available."
 msgstr "Pas d'information disponible."
@@ -1431,45 +1427,45 @@ msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
 msgstr ""
-"L'hôte que vous tentez de connecter est inconnu.\n"
-"Verifiez la validité du nom d'hôte spécifié."
+"L'hÃ´te que vous tentez de connecter est inconnu.\n"
+"VÃ©rifiez la validitÃ© du nom d'hÃ´te spÃ©cifiÃ©."
 
 msgid "The device name you specified seems invalid."
-msgstr "Le nom de périphérique que vous avez spécifié semble incorrect."
+msgstr "Le nom de pÃ©riphÃ©rique que vous avez spÃ©cifiÃ© semble incorrect."
 
 msgid ""
 "The network looks unreachable.\n"
 "Check your network setup and/or the server name."
 msgstr ""
-"Le réseau est injoignable.\n"
-"Verifiez votre configuration réseau et/ou le nom du serveur."
+"Le rÃ©seau est injoignable.\n"
+"VÃ©rifiez votre configuration rÃ©seau et/ou le nom du serveur."
 
 msgid ""
 "The connection was refused.\n"
 "Check the host name."
 msgstr ""
-"La connexion a été refusée.\n"
-"Verifiez le nom de l'hôte."
+"La connexion a Ã©tÃ© refusÃ©e.\n"
+"VÃ©rifiez le nom de l'hÃ´te."
 
 msgid "The specified file or MRL could not be found. Please check it twice."
-msgstr "Le fichier ou MRL spécifié est introuvable. Verifiez s'il vous plait."
+msgstr "Le fichier ou MRL spÃ©cifiÃ© est introuvable. VÃ©rifiez s'il vous plait."
 
 msgid ""
 "The source can't be read.\n"
 "Maybe you don't have enough rights for this, or source doesn't contain data "
 "(e.g: not disc in drive)."
 msgstr ""
-"La source ne peut être lue.\n"
-"Il se peux que vous n'ayez pas assez de droits pour çà, ou que la source ne "
-"contienne pas de données (ex: pas de disque dans le lecteur)."
+"La source ne peut Ãªtre lue.\n"
+"Il se peux que vous n'ayez pas assez de droits pour Ã§Ã , ou que la source ne "
+"contienne pas de donnÃ©es (ex: pas de disque dans le lecteur)."
 
 msgid "A problem occurred while loading a library or a decoder"
 msgstr ""
-"Un problème est survenu pendant le chargement d'une bibliothèque ou d'un "
-"décodeur"
+"Un problÃ¨me est survenu pendant le chargement d'une bibliothÃ¨que ou d'un "
+"dÃ©codeur"
 
 msgid "The source seems encrypted, and can't be read."
-msgstr "La source semble criptée, et ne peut être lue."
+msgstr "La source semble cryptÃ©e, et ne peut Ãªtre lue."
 
 msgid ""
 "\n"
@@ -1477,31 +1473,30 @@ msgid ""
 "can't install/use libdvdcss to be able to read this disc, which you bought."
 msgstr ""
 "\n"
-"Votre DVD est probablement crypté. En accord avec les lois de votre pays, "
-"vous pouvez ou ne pouvez pas installer/utiliser libdvdcss, afin d'être en "
-"mesure de lire ce disque, que vous avez pourtant acheté."
+"Votre DVD est probablement cryptÃ©. En accord avec les lois de votre pays, "
+"vous pouvez ou ne pouvez pas installer/utiliser libdvdcss, afin d'Ãªtre en "
+"mesure de lire ce disque, que vous avez pourtant achetÃ©."
 
 msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "uses it."
 msgstr ""
-"Le périphérique audio est indisponible. Verifiez s'il vous plais qu'un autre "
-"programme ne l'utilise pas déjà."
+"Le pÃ©riphÃ©rique audio est indisponible. VÃ©rifiez s'il vous plait qu'un autre "
+"programme ne l'utilise pas dÃ©jÃ ."
 
 msgid "Sorry, not implemented (authentication)"
-msgstr ""
+msgstr "DÃ©solÃ©, non implÃ©mentÃ© (authentification)"
 
-#, fuzzy
 msgid "*sight*, unknown error."
 msgstr "*argl*, erreur inconnue."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
-msgstr "Requière la bibliothèque xine version 1.0.0, a trouvé %d.%d.%d.\n"
+msgstr "RequiÃ¨re la bibliothÃ¨que xine version 1.0.0, a trouvÃ© %d.%d.%d.\n"
 
 #, c-format
 msgid "video driver id required for -V option\n"
-msgstr "Nom du pilote vidéo requis pour l'option -V\n"
+msgstr "Nom du pilote vidÃ©o requis pour l'option -V\n"
 
 #, c-format
 msgid "audio driver id required for -A option\n"
@@ -1513,11 +1508,11 @@ msgstr "Mauvaise valeur de ration d'aspect '%s', voir xine --help\n"
 
 #, c-format
 msgid "Bad port number: %d\n"
-msgstr "Mauvais numéro de port: %d\n"
+msgstr "Mauvais numÃ©ro de port: %d\n"
 
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
-msgstr "Mauvaise géométrie '%s', voir xine --help\n"
+msgstr "Mauvaise gÃ©omÃ©trie '%s', voir xine --help\n"
 
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
@@ -1531,12 +1526,12 @@ msgstr "*** NOTE ***\n"
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
-"Mode Rapport de Boggue: Tout les messages seront ajoutés dans le fichier BUG-"
+"Mode Rapport de Bogue: Tout les messages seront ajoutÃ©s dans le fichier BUG-"
 "REPORT.TXT.\n"
 
 #, c-format
 msgid "window id required for -W option\n"
-msgstr "l'id de la fenêtre est requis avec l'option -W\n"
+msgstr "l'id de la fenÃªtre est requis avec l'option -W\n"
 
 #, c-format
 msgid "invalid argument %d => exit\n"
@@ -1544,7 +1539,7 @@ msgstr "Argument %d non valide => quitte\n"
 
 #, c-format
 msgid "You should specify at least one MRL to enqueue!\n"
-msgstr "Vous devez spécifier au moins une MRL à ajouter!\n"
+msgstr "Vous devez spÃ©cifier au moins une MRL Ã  ajouter!\n"
 
 msgid "Automatically reload old playlist"
 msgstr "Recharge automatiquement l'ancienne liste de lecture"
@@ -1553,33 +1548,33 @@ msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
-"Si cette option est en fonction et que vous ne spécifiez aucune MRL sur la "
+"Si cette option est en fonction et que vous ne spÃ©cifiez aucune MRL sur la "
 "ligne de commande, xine chargeras automatiquement la liste de lecture "
-"precédente."
+"prÃ©cÃ©dente."
 
 msgid "Subtitle autoloading"
 msgstr "Chargement automatique de sous-titre"
 
 msgid "Automatically load subtitles if they exist."
 msgstr ""
-"Recharge automatiquement le fichier de sous-titres, si sa presence est "
-"détectée."
+"Recharge automatiquement le fichier de sous-titres, si sa prÃ©sence est "
+"dÃ©tectÃ©e."
 
 msgid "Enable deinterlacing by default"
-msgstr "Mise en fonction de désentrelacement par defaut"
+msgstr "Mise en fonction de dÃ©sentrelacement par dÃ©faut"
 
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automatically detected with no performance penalty."
 msgstr ""
-"Le plugin de désentrelacement sera mis en fonction au demarrage. Les flux "
-"progressifs sont automatiquement détectés sans pénalisé les performances."
+"Le plugin de dÃ©sentrelacement sera mis en fonction au dÃ©marrage. Les flux "
+"progressifs sont automatiquement dÃ©tectÃ©s sans pÃ©nalisÃ© les performances."
 
 msgid "Logo MRL"
 msgstr "MRL du logo"
 
 msgid "!!Invalid entry!!"
-msgstr "!!Entrée invalide!!"
+msgstr "!!EntrÃ©e invalide!!"
 
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
@@ -1614,16 +1609,16 @@ msgid "Sub File"
 msgstr "Sous-Titre"
 
 msgid "Select a subtitle file to use together with the mrl."
-msgstr "Sélectionnez un fichier de sous-titre à utilisé avec cette mrl."
+msgstr "SÃ©lectionnez un fichier de sous-titre Ã  utilisÃ© avec cette mrl."
 
 msgid "Start at"
-msgstr "Debut à"
+msgstr "DÃ©but Ã "
 
 msgid "Mediamark start time (secs)."
-msgstr "Début du mediamark (secs)."
+msgstr "DÃ©but du mediamark (secs)."
 
 msgid "End at"
-msgstr "Fin à"
+msgstr "Fin Ã "
 
 msgid "Mediamark end time (secs)."
 msgstr "Fin du mediamark (secs)."
@@ -1632,7 +1627,7 @@ msgid "A/V offset"
 msgstr "Offset A/V"
 
 msgid "Offset of Audio and Video."
-msgstr "Offset de l'Audio et de la Vidéo."
+msgstr "Offset de l'Audio et de la VidÃ©o."
 
 msgid "SPU offset"
 msgstr "Offset SPU"
@@ -1644,22 +1639,22 @@ msgid "OK"
 msgstr "D'accord"
 
 msgid "Apply the changes and close the window."
-msgstr "Appliquer les changemements et fermer la fenêtre."
+msgstr "Appliquer les changements et fermer la fenÃªtre."
 
 msgid "Apply the changes to the playlist."
-msgstr "Appliquer les changemements à la liste de lecture."
+msgstr "Appliquer les changements Ã  la liste de lecture."
 
 msgid "Discard changes and dismiss the window."
-msgstr "Abandonne les changements et ferme la fenêtre."
+msgstr "Abandonne les changements et ferme la fenÃªtre."
 
 msgid "Show controls"
-msgstr "Affiche les Contrôles"
+msgstr "Affiche les ContrÃ´les"
 
 msgid "Show video window"
-msgstr "Affiche la fenêtre de sortie vidéo"
+msgstr "Affiche la fenÃªtre de sortie vidÃ©o"
 
 msgid "Fullscreen"
-msgstr "Plein écran"
+msgstr "Plein Ã©cran"
 
 msgid "Open"
 msgstr "Ouvrir"
@@ -1671,7 +1666,7 @@ msgid "Open/Playlist..."
 msgstr "Ouvrir/Liste de lecture..."
 
 msgid "Open/Location..."
-msgstr "Ouvrir/Emplaçement..."
+msgstr "Ouvrir/Emplacement..."
 
 msgid "Playback"
 msgstr "Lecture"
@@ -1680,7 +1675,7 @@ msgid "Playback/Play"
 msgstr "Lecture/Lire"
 
 msgid "Playback/Stop"
-msgstr "Lecture/Arrêt"
+msgstr "Lecture/ArrÃªt"
 
 msgid "Playback/Pause"
 msgstr "Lecture/Pause"
@@ -1692,7 +1687,7 @@ msgid "Playback/Next MRL"
 msgstr "Lecture/MRl suivante"
 
 msgid "Playback/Previous MRL"
-msgstr "Lecture/MRL précedente"
+msgstr "Lecture/MRL prÃ©cÃ©dente"
 
 msgid "Playback/Increase Speed"
 msgstr "Lecture/Augmente vitesse"
@@ -1716,22 +1711,22 @@ msgid "Playlist/SEP"
 msgstr "Liste de lecture/SEP"
 
 msgid "Playlist/Loop modes"
-msgstr "Liste de lecture/Répétitions"
+msgstr "Liste de lecture/RÃ©pÃ©titions"
 
 msgid "Playlist/Loop modes/Disabled"
-msgstr "Liste de lecture/Répétitions/Aucune"
+msgstr "Liste de lecture/RÃ©pÃ©titions/Aucune"
 
 msgid "Playlist/Loop modes/Loop"
-msgstr "Liste de lecture/Répétitions/Boucle"
+msgstr "Liste de lecture/RÃ©pÃ©titions/Boucle"
 
 msgid "Playlist/Loop modes/Repeat Selection"
-msgstr "Liste de lecture/Répétitions/Répète Sélection"
+msgstr "Liste de lecture/RÃ©pÃ©titions/RÃ©pÃ¨te SÃ©lection"
 
 msgid "Playlist/Loop modes/Shuffle"
-msgstr "Liste de lecture/Répétitions/Aléatoire"
+msgstr "Liste de lecture/RÃ©pÃ©titions/AlÃ©atoire"
 
 msgid "Playlist/Loop modes/Non-stop Shuffle"
-msgstr "Liste de lecture/Répétitions/Aléatoire Sans Fin"
+msgstr "Liste de lecture/RÃ©pÃ©titions/AlÃ©atoire Sans Fin"
 
 msgid "Playlist/Continue Playback"
 msgstr "Liste de lecture/Continuer Lecture"
@@ -1755,55 +1750,55 @@ msgid "Stream/Information (OSD)"
 msgstr "Flux/Information (OSD)"
 
 msgid "Video"
-msgstr "Vidéo"
+msgstr "VidÃ©o"
 
 msgid "Video/Deinterlace"
-msgstr "Vidéo/Désentrelacement"
+msgstr "VidÃ©o/DÃ©sentrelacement"
 
 msgid "Video/SEP"
-msgstr "Vidéo/SEP"
+msgstr "VidÃ©o/SEP"
 
 msgid "Video/Aspect ratio"
-msgstr "Vidéo/Ratio d'Aspect"
+msgstr "VidÃ©o/Ratio d'Aspect"
 
 msgid "Video/Aspect ratio/Automatic"
-msgstr "Vidéo/Ratio d'Aspect/Automatique"
+msgstr "VidÃ©o/Ratio d'Aspect/Automatique"
 
 msgid "Video/Aspect ratio/Square"
-msgstr "Vidéo/Ratio d'Aspect/Carré"
+msgstr "VidÃ©o/Ratio d'Aspect/CarrÃ©"
 
 msgid "Video/Aspect ratio/4:3"
-msgstr "Vidéo/Ratio d'Aspect/4:3"
+msgstr "VidÃ©o/Ratio d'Aspect/4:3"
 
 msgid "Video/Aspect ratio/Anamorphic"
-msgstr "Vidéo/Ratio d'Aspect/Anamorphique"
+msgstr "VidÃ©o/Ratio d'Aspect/Anamorphique"
 
 msgid "Video/Aspect ratio/DVB"
-msgstr "Vidéo/Ratio d'Aspect/DVB"
+msgstr "VidÃ©o/Ratio d'Aspect/DVB"
 
 msgid "Video/200%"
-msgstr "Vidéo/200%"
+msgstr "VidÃ©o/200%"
 
 msgid "Video/100%"
-msgstr "Vidéo/100%"
+msgstr "VidÃ©o/100%"
 
 msgid "Video/50%"
-msgstr "Vidéo/50%"
+msgstr "VidÃ©o/50%"
 
 msgid "Video/Postprocess"
-msgstr "Vidéo/Post-traitement"
+msgstr "VidÃ©o/Post-traitement"
 
 msgid "Video/Postprocess/Chain Reaction..."
-msgstr "Vidéo/Post-traitement/Réaction en Chaine..."
+msgstr "VidÃ©o/Post-traitement/RÃ©action en Chaine..."
 
 msgid "Video/Postprocess/Enable Postprocessing"
-msgstr "Vidéo/Post-traitement/En fonction"
+msgstr "VidÃ©o/Post-traitement/En fonction"
 
 msgid "Audio/Volume"
 msgstr "Audio/Volume"
 
 msgid "Audio/Volume/Mute"
-msgstr "Audio/Volume/Muêt"
+msgstr "Audio/Volume/Muet"
 
 msgid "Audio/Volume/Increase 10%"
 msgstr "Audio/Volume/Augmente de 10%"
@@ -1824,7 +1819,7 @@ msgid "Audio/Postprocess"
 msgstr "Audio/Post-traitement"
 
 msgid "Audio/Postprocess/Chain Reaction..."
-msgstr "Audio/Post-traitement/Réaction en Chaine..."
+msgstr "Audio/Post-traitement/RÃ©action en Chaine..."
 
 msgid "Audio/Postprocess/Enable Postprocessing"
 msgstr "Audio/Post-traitement/En fonction"
@@ -1833,22 +1828,22 @@ msgid "Subtitle/Channel"
 msgstr "Sous-titre/Canal"
 
 msgid "Settings"
-msgstr "Réglages"
+msgstr "RÃ©glages"
 
 msgid "Settings/Setup..."
-msgstr "Réglages/Configuration..."
+msgstr "RÃ©glages/Configuration..."
 
 msgid "Settings/Skin Downloader..."
-msgstr "Réglages/Récupérateur d'Apparences..."
+msgstr "RÃ©glages/RÃ©cupÃ©rateur d'Apparences..."
 
 msgid "Settings/Keymap Editor..."
-msgstr "Réglages/Editeur de Raccourcis Clavier..."
+msgstr "RÃ©glages/Editeur de Raccourcis Clavier..."
 
 msgid "Settings/Video..."
-msgstr "Réglages/Vidéo..."
+msgstr "RÃ©glages/VidÃ©o..."
 
 msgid "Settings/TV Analog..."
-msgstr "Réglages/TV analogique..."
+msgstr "RÃ©glages/TV analogique..."
 
 msgid "Help..."
 msgstr "Aide..."
@@ -1906,16 +1901,16 @@ msgid "Delete All"
 msgstr "Supprimer tout"
 
 msgid "Move Up"
-msgstr "Déplacer vers le Haut"
+msgstr "DÃ©placer vers le Haut"
 
 msgid "Move Down"
-msgstr "Déplacer vers le Bas"
+msgstr "DÃ©placer vers le Bas"
 
 msgid "Reset video settings"
-msgstr "Remise à zéro des paramètres vidéo"
+msgstr "Remise Ã  zÃ©ro des paramÃ¨tres vidÃ©o"
 
 msgid "Video Control"
-msgstr "Contrôle Vidéo"
+msgstr "ContrÃ´le VidÃ©o"
 
 msgid "All extensions"
 msgstr "Toutes les extensions"
@@ -1950,16 +1945,16 @@ msgid "Audio Channel: "
 msgstr "Canal Audio: "
 
 msgid "Play previous chapter or mrl"
-msgstr "Joue le chapitre ou le mrl précédent"
+msgstr "Joue le chapitre ou le mrl prÃ©cÃ©dent"
 
 msgid "Play next chapter or mrl"
 msgstr "Joue le chapitre ou le mrl suivant"
 
 msgid "Play previous entry from playlist"
-msgstr "Joue l'entrée précédente de la liste de lecture"
+msgstr "Joue l'entrÃ©e prÃ©cÃ©dente de la liste de lecture"
 
 msgid "Play next entry from playlist"
-msgstr "Joue l'entrée suivante dans la liste de lecture"
+msgstr "Joue l'entrÃ©e suivante dans la liste de lecture"
 
 msgid "Total time: "
 msgstr "Temps total: "
@@ -1979,7 +1974,7 @@ msgid "Audio: %s"
 msgstr "Audio: %s"
 
 msgid "Volume control"
-msgstr "Contrôle du volume"
+msgstr "ContrÃ´le du volume"
 
 msgid "Mute toggle"
 msgstr "Muet"
@@ -1994,7 +1989,7 @@ msgid "Stop playback"
 msgstr "Stoppe la lecture"
 
 msgid "Play selected entry"
-msgstr "Joue l'entrée sélectionnée"
+msgstr "Joue l'entrÃ©e sÃ©lectionnÃ©e"
 
 msgid "Pause/Resume playback"
 msgstr "Pause/Reprise lecture"
@@ -2003,7 +1998,7 @@ msgid "Eject current medium"
 msgstr "Ejecte le medium courant"
 
 msgid "Setup window"
-msgstr "Fenêtre de réglage"
+msgstr "FenÃªtre de rÃ©glage"
 
 msgid "Navigator"
 msgstr "Navigateur"
@@ -2012,19 +2007,19 @@ msgid "Hide GUI"
 msgstr "Cache l'interface utilisateur"
 
 msgid "Fullscreen/Window mode"
-msgstr "Mode plein écran/fenêtre"
+msgstr "Mode plein Ã©cran/fenÃªtre"
 
 msgid "Next audio channel"
 msgstr "Canal audio suivant"
 
 msgid "Previous audio channel"
-msgstr "Canal audio precédent"
+msgstr "Canal audio prÃ©cÃ©dent"
 
 msgid "Next SPU channel"
 msgstr "Canal sous-titre suivant"
 
 msgid "Previous SPU channel"
-msgstr "Canal sous-titre precédent"
+msgstr "Canal sous-titre prÃ©cÃ©dent"
 
 msgid "Total time: --:--:--"
 msgstr "Temps total: --:--:--"
@@ -2039,19 +2034,19 @@ msgid "Slow motion"
 msgstr "Ralenti"
 
 msgid "Fast motion"
-msgstr "Accélère"
+msgstr "AccÃ©lÃ¨re"
 
 msgid "Control"
-msgstr "Contrôle"
+msgstr "ContrÃ´le"
 
 msgid "Open Location"
-msgstr "Ouvrir Emplaçement"
+msgstr "Ouvrir Emplacement"
 
 msgid "gui tips visibility"
 msgstr "bulle d'aide visible"
 
 msgid "If disabled, no tooltips are shown."
-msgstr "Si désactivé, pas de bulles d'aides."
+msgstr "Si dÃ©sactivÃ©, pas de bulles d'aides."
 
 msgid "Tips timeout (ms)"
 msgstr "Timeout des bulles d'aides (ms)"
@@ -2078,31 +2073,31 @@ msgid "playlist: couldn't find image for background\n"
 msgstr "playlist : ne trouve pas l'image de fond.\n"
 
 msgid "Move up selected MRL"
-msgstr "Déplace vers le haut la MRL sélectionnée."
+msgstr "DÃ©place vers le haut la MRL sÃ©lectionnÃ©e."
 
 msgid "Move down selected MRL"
-msgstr "Déplace vers le bas la MRL sélectionnée"
+msgstr "DÃ©place vers le bas la MRL sÃ©lectionnÃ©e"
 
 msgid "Start playback of selected MRL"
-msgstr "Démarre la lecture de la MRL sélectionnée"
+msgstr "DÃ©marre la lecture de la MRL sÃ©lectionnÃ©e"
 
 msgid "Delete selected MRL from playlist"
-msgstr "Supprime la MRL sélectionnée de la liste de lecture"
+msgstr "Supprime la MRL sÃ©lectionnÃ©e de la liste de lecture"
 
 msgid "Delete all entries in playlist"
-msgstr "Supprime toutes les entrée de la liste de lecture"
+msgstr "Supprime toutes les entrÃ©e de la liste de lecture"
 
 msgid "Add one or more entries in playlist"
-msgstr "Ajoute une ou plusieurs selections dans la liste de lecture"
+msgstr "Ajoute une ou plusieurs sÃ©lections dans la liste de lecture"
 
 msgid "Load saved playlist"
-msgstr "Charge la liste de lecture sauvée"
+msgstr "Charge la liste de lecture sauvÃ©e"
 
 msgid "Save playlist"
 msgstr "Sauve la liste de lecture"
 
 msgid "Close playlist window"
-msgstr "Ferme la fenêtre de la liste de lecture"
+msgstr "Ferme la fenÃªtre de la liste de lecture"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -2110,31 +2105,31 @@ msgid "Scan for:"
 msgstr "Source :"
 
 msgid "Direct MRL entry"
-msgstr "Entrée directe de MRL"
+msgstr "EntrÃ©e directe de MRL"
 
 msgid "Audio visualization plugin"
 msgstr "Plugin de visualisation audio"
 
 msgid "Post audio plugin to used when playing streams without video"
 msgstr ""
-"Plugin de post-traitement audio utilisé pour la lecture des flux dans vidéo"
+"Plugin de post-traitement audio utilisÃ© pour la lecture des flux dans vidÃ©o"
 
 #, c-format
 msgid "Entered value is out of bounds (%d>%d<%d)."
-msgstr "La valeur entréé est hors limite (%d>%d<%d)."
+msgstr "La valeur entrÃ©e est hors limite (%d>%d<%d)."
 
 #, c-format
 msgid "Entered value is out of bounds (%e>%e<%e)."
-msgstr "La valeur entréé est hors limite (%e>%e<%e)."
+msgstr "La valeur entrÃ©e est hors limite (%e>%e<%e)."
 
 msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
 msgstr ""
-"Le paramètre de type POST_PARAM_TYPE_STRING est non-supporté pour le "
+"Le paramÃ¨tre de type POST_PARAM_TYPE_STRING est non-supportÃ© pour le "
 "moment.\n"
 
 msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
 msgstr ""
-"Le paramètre de type POST_PARAM_TYPE_STRINGLIST est non-supporté pour le "
+"Le paramÃ¨tre de type POST_PARAM_TYPE_STRINGLIST est non-supportÃ© pour le "
 "moment.\n"
 
 msgid "No description available"
@@ -2147,13 +2142,13 @@ msgid "Plugin Help"
 msgstr "Aide du Plugin"
 
 msgid "There is no parameter available for this plugin."
-msgstr "Il n'y a aucun paramètre disponible pour ce plugin."
+msgstr "Il n'y a aucun paramÃ¨tre disponible pour ce plugin."
 
 msgid "Video Chain Reaction"
-msgstr "Réaction en Chaine Vidéo"
+msgstr "RÃ©action en Chaine VidÃ©o"
 
 msgid "Audio Chain Reaction"
-msgstr "Réaction en Chaine Audio"
+msgstr "RÃ©action en Chaine Audio"
 
 msgid "New Filter"
 msgstr "Nouveau Filtre"
@@ -2162,18 +2157,18 @@ msgid "Enable"
 msgstr "En Fonction"
 
 msgid "Deinterlace plugin."
-msgstr "Plugin de désentrelacement."
+msgstr "Plugin de dÃ©sentrelacement."
 
 msgid ""
 "Plugin (with optional parameters) to use when deinterlace is used (plugin "
 "separator is ';')."
 msgstr ""
-"Plugin (avec ses paramètres optionels) à utiliser quand le désentrelacement "
-"est en fonction (le separateur de plugin est ';')."
+"Plugin (avec ses paramÃ¨tres optionnels) Ã  utiliser quand le dÃ©sentrelacement "
+"est en fonction (le sÃ©parateur de plugin est ';')."
 
 #, c-format
 msgid "Session %d isn't running.\n"
-msgstr "La session %d n'est pas executée.\n"
+msgstr "La session %d n'est pas exÃ©cutÃ©e.\n"
 
 msgid "Important Notice"
 msgstr "Note Importante"
@@ -2182,8 +2177,8 @@ msgid ""
 "You changed some configuration value which require to restart xine to take "
 "effect."
 msgstr ""
-"Vous venez de changer quelques valeurs de configuration qui requièrent un "
-"redémarrage de xine pour leurs prise en compte."
+"Vous venez de changer quelques valeurs de configuration qui requiÃ¨rent un "
+"redÃ©marrage de xine pour leurs prise en compte."
 
 msgid "No help available"
 msgstr "Pas d'aide disponible"
@@ -2191,11 +2186,11 @@ msgstr "Pas d'aide disponible"
 msgid ""
 "There is no configuration option available in this user experience level."
 msgstr ""
-"Il n'y a aucune option de configuration dans ce niveau d'expérience "
+"Il n'y a aucune option de configuration dans ce niveau d'expÃ©rience "
 "utilisateur."
 
 msgid "xine Setup"
-msgstr "Réglage de xine"
+msgstr "RÃ©glage de xine"
 
 msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr "(*) vous devez relancer xine pour que ces valeurs prennent effet"
@@ -2216,30 +2211,30 @@ msgstr ""
 
 #, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Ouille, apparence non trouvée, utilise l'apparence de secours '%s'.\n"
+msgstr "Ouille, apparence non trouvÃ©e, utilise l'apparence de secours '%s'.\n"
 
 #, c-format
 msgid "No available skin found. Say goodbye.\n"
-msgstr "Pas d'apparence trouvée. Au revoir.\n"
+msgstr "Pas d'apparence trouvÃ©e. Au revoir.\n"
 
 msgid "gui skin theme"
-msgstr "Theme visuel"
+msgstr "ThÃ¨me visuel"
 
 #, c-format
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
 msgstr ""
-"Ouille, la section de configuration gui.skin n'est pas enregistrée. Au "
+"Ouille, la section de configuration gui.skin n'est pas enregistrÃ©e. Au "
 "revoir.\n"
 
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
 msgstr ""
-"Ouille, apparence '%s' non trouvée, utilise l'apparence de secours '%s'.\n"
+"Ouille, apparence '%s' non trouvÃ©e, utilise l'apparence de secours '%s'.\n"
 
 #, c-format
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
-"Echec au chargement de l'apparence de secours. Verifiez l'installation des "
+"Echec au chargement de l'apparence de secours. VÃ©rifiez l'installation des "
 "apparences. Sortie.\n"
 
 #, c-format
@@ -2254,83 +2249,81 @@ msgstr ""
 
 #, c-format
 msgid "Unable to retrieve skin list from %s: %s"
-msgstr "Impossible de récuperer la liste des apparences depuis %s: %s."
+msgstr "Impossible de rÃ©cupÃ©rer la liste des apparences depuis %s: %s."
 
 #, c-format
 msgid "Unable to download '%s': %s"
-msgstr "Impossible de télécharger '%s': %s"
+msgstr "Impossible de tÃ©lÃ©charger '%s': %s"
 
 #, c-format
 msgid "Unable to create '%s' directory: %s."
-msgstr "Impossible de créer le répertoire '%s': %s."
+msgstr "Impossible de crÃ©er le rÃ©pertoire '%s': %s."
 
 #, c-format
 msgid "Skin %s correctly installed"
-msgstr "L'apparence %s a été correctement installée."
+msgstr "L'apparence %s a Ã©tÃ© correctement installÃ©e."
 
 #, c-format
 msgid "Unable to create '%s'."
-msgstr "Impossible de créer '%s'."
+msgstr "Impossible de crÃ©er '%s'."
 
 msgid "Be patient..."
 msgstr "Soyez patient..."
 
 #, c-format
 msgid "Retrieving skin list from %s"
-msgstr "Récupération de la liste des apparences depuis %s"
+msgstr "RÃ©cupÃ©ration de la liste des apparences depuis %s"
 
 msgid "Choose a skin to download..."
-msgstr "Choisissez une apparence à télécharger..."
+msgstr "Choisissez une apparence Ã  tÃ©lÃ©charger..."
 
 msgid "Error: "
 msgstr "Erreur: "
 
-#, fuzzy
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr "xine_get_current_frame() a échoué\n"
+msgstr "xine_grab_video_frame.grab () a Ã©chouÃ©\n"
 
-#, fuzzy
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr "xine_get_current_frame() a échoué\n"
+msgstr "xine_new_grab_video_frame () a Ã©chouÃ©\n"
 
 msgid "Wrong image size: "
 msgstr "Mauvaise dimension de l'image: "
 
 msgid ". Snapshot aborted."
-msgstr ". Capture abandonnée."
+msgstr ". Capture abandonnÃ©e."
 
 msgid "File open failed"
-msgstr "Echec à l'ouverture du fichier"
+msgstr "Echec Ã  l'ouverture du fichier"
 
 msgid "png_create_write_struct() failed\n"
-msgstr "png_create_write_struct() a échoué\n"
+msgstr "png_create_write_struct() a Ã©chouÃ©\n"
 
 msgid "png_create_info_struct() failed\n"
-msgstr "png_create_info_struct() a échoué\n"
+msgstr "png_create_info_struct() a Ã©chouÃ©\n"
 
 msgid "PNG Parsing failed\n"
-msgstr "PNG Parsing a échoué\n"
+msgstr "PNG Parsing a Ã©chouÃ©\n"
 
 msgid "File written: "
-msgstr "Le fichier a été crée: "
+msgstr "Le fichier a Ã©tÃ© crÃ©e: "
 
 msgid "xine_get_current_frame() failed\n"
-msgstr "xine_get_current_frame() a échoué\n"
+msgstr "xine_get_current_frame() a Ã©chouÃ©\n"
 
 msgid "prvt_image_alloc failed\n"
-msgstr "<prvt_image_alloc a échoué\n"
+msgstr "prvt_image_alloc a Ã©chouÃ©\n"
 
 msgid "Framegrabber failed\n"
-msgstr "Framegrabber a échoué\n"
+msgstr "Framegrabber a Ã©chouÃ©\n"
 
 msgid "Not supported for this video out driver\n"
-msgstr "Non supporté pour ce pilote de sortie vidéo\n"
+msgstr "Non supportÃ© pour ce pilote de sortie vidÃ©o\n"
 
 msgid "Error: yuy2_fudge failed\n"
-msgstr "Erreur:  yuy2_fudge a é&choué\n"
+msgstr "Erreur:  yuy2_fudge a Ã©chouÃ©\n"
 
 msgid "rgb_alloc() failed\n"
-msgstr "rgb_alloc() a échoué\n"
+msgstr "rgb_alloc() a Ã©chouÃ©\n"
 
 msgid "xine Splash"
 msgstr "xine Splash"
@@ -2339,7 +2332,7 @@ msgid "Stream Information"
 msgstr "Information du flux"
 
 msgid "General"
-msgstr "Général"
+msgstr "GÃ©nÃ©ral"
 
 msgid "Title: "
 msgstr "Titre: "
@@ -2354,7 +2347,7 @@ msgid "Genre: "
 msgstr "Genre: "
 
 msgid "Year: "
-msgstr "Année: "
+msgstr "AnnÃ©e: "
 
 msgid "Album: "
 msgstr "Album: "
@@ -2363,16 +2356,16 @@ msgid "Misc"
 msgstr "Divers"
 
 msgid "Input Plugin: "
-msgstr "Plugin d'Entrée: "
+msgstr "Plugin d'EntrÃ©e: "
 
 msgid "System Layer: "
-msgstr "Couche Système: "
+msgstr "Couche SystÃ¨me: "
 
 msgid "Bitrate: "
 msgstr "Bitrate: "
 
 msgid "Frame Duration: "
-msgstr "Durée de Frame: "
+msgstr "DurÃ©e de Trame: "
 
 msgid "Is Seekable: "
 msgstr "Est Seekable: "
@@ -2381,7 +2374,7 @@ msgid "Has Chapters: "
 msgstr "A Chapitres: "
 
 msgid "Ignore Spu: "
-msgstr "Spu Ignoré: "
+msgstr "Spu IgnorÃ©: "
 
 msgid "Has Still: "
 msgstr "A Still: "
@@ -2390,10 +2383,10 @@ msgid "Has: "
 msgstr "A: "
 
 msgid "Handled: "
-msgstr "Supporté: "
+msgstr "SupportÃ©: "
 
 msgid "Ignore: "
-msgstr "Ignoré: "
+msgstr "IgnorÃ©: "
 
 msgid "Codec: "
 msgstr "Codec: "
@@ -2405,7 +2398,7 @@ msgid "Channel(s): "
 msgstr "Canaux: "
 
 msgid "Resolution: "
-msgstr "Résolution: "
+msgstr "RÃ©solution: "
 
 msgid "Ratio: "
 msgstr "Ratio: "
@@ -2420,13 +2413,13 @@ msgid "Samplerate: "
 msgstr "Taux Echant.: "
 
 msgid "Update"
-msgstr "MàJ"
+msgstr "MÃ J"
 
 msgid "nvtv TV output system"
-msgstr "Système de sortie TV pour nvtv"
+msgstr "SystÃ¨me de sortie TV pour nvtv"
 
 msgid "Select which TV output system supported by your TV."
-msgstr "Sélectionnez le type de système TV supporté par votre tèlèviseur."
+msgstr "SÃ©lectionnez le type de systÃ¨me TV supportÃ© par votre tÃ©lÃ©viseur."
 
 msgid "Enable XRandr extension"
 msgstr "Mise en fonction de l'extension XRandr"
@@ -2434,25 +2427,25 @@ msgstr "Mise en fonction de l'extension XRandr"
 msgid ""
 "Enable the use of xrandr to autofit the screen to match the TV-resolution"
 msgstr ""
-"Mise en fonction de XRandr pour la mise à l'echelle de la sortie vidéo, "
-"correspondant à la résolution du poste de télévision."
+"Mise en fonction de XRandr pour la mise Ã  lâ€™Ã©chelle de la sortie vidÃ©o, "
+"correspondant Ã  la rÃ©solution du poste de tÃ©lÃ©vision."
 
 msgid "Command to turn off TV out"
-msgstr "Commande pour l'arrêt de la sortie TV."
+msgstr "Commande pour l'arrÃªt de la sortie TV."
 
 msgid "atitvout command line used to turn on TV output."
 msgstr ""
-"Ligne de commande d'atitvout utilisé pour la mise en fonction de la sortie "
+"Ligne de commande d'atitvout utilisÃ© pour la mise en fonction de la sortie "
 "TV."
 
 msgid "Command to turn on TV out"
 msgstr "Commande pour la mise en fonction de la sortie TV."
 
 msgid "TV Analog Video Parameters"
-msgstr "Paramètres vidéo pour la télévision analogique"
+msgstr "ParamÃ¨tres vidÃ©o pour la tÃ©lÃ©vision analogique"
 
 msgid "Input: "
-msgstr "Entrée: "
+msgstr "EntrÃ©e: "
 
 msgid "Broadcast System: "
 msgstr "Format de diffusion: "
@@ -2464,13 +2457,13 @@ msgid "Standard"
 msgstr "Standard"
 
 msgid "Frame Rate: "
-msgstr "Durée de Frame: "
+msgstr "DurÃ©e de Trame: "
 
 msgid "Analog Standard: "
-msgstr "Système Analogique: "
+msgstr "SystÃ¨me Analogique: "
 
 msgid "Frame Size"
-msgstr "Dimension de Frame"
+msgstr "Dimension de Trame"
 
 msgid "MPEG2"
 msgstr "MPEG2"
@@ -2478,73 +2471,73 @@ msgstr "MPEG2"
 #, c-format
 msgid "videowin: output driver cannot select a working visual\n"
 msgstr ""
-"videowin: le pilote de sortie ne peux selectionner un visuel fonctionnel\n"
+"videowin: le pilote de sortie ne peux sÃ©lectionner un visuel fonctionnel\n"
 
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
-msgstr "videowin: le pilote de sortie a forcé le visuel selectionné à 0x%lx\n"
+msgstr "videowin: le pilote de sortie a forcÃ© le visuel sÃ©lectionnÃ© Ã  0x%lx\n"
 
 msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "Extension XF86VidMode: le changement de modeline a échoué.\n"
+msgstr "Extension XF86VidMode: le changement de modeline a Ã©chouÃ©.\n"
 
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
 msgstr ""
-"Ecrans a utiliser afin d'avoir un plein écran réel en mode xinerama (exemple "
+"Ecrans a utiliser afin d'avoir un plein Ã©cran rÃ©el en mode xinerama (exemple "
 "0 2 3)"
 
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
-"Exemple, si vous voulez l'affichage étendu sur les écrans 0, 2 et 3, entrez "
+"Exemple, si vous voulez l'affichage Ã©tendu sur les Ã©crans 0, 2 et 3, entrez "
 "0 2 3"
 
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Coordonnée x pour le plein écran xinerama (-8192 = autodétection)"
+msgstr "CoordonnÃ©e x pour le plein Ã©cran xinerama (-8192 = autodÃ©tection)"
 
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Coordonnée y pour le plein écran xinerama (-8192 = autodétection)"
+msgstr "CoordonnÃ©e y pour le plein Ã©cran xinerama (-8192 = autodÃ©tection)"
 
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Largeur pour le plein écran xinerama (-8192 = autodétection)"
+msgstr "Largeur pour le plein Ã©cran xinerama (-8192 = autodÃ©tection)"
 
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Hauteur pour le plein écran xinerama (-8192 = autodétection)"
+msgstr "Hauteur pour le plein Ã©cran xinerama (-8192 = autodÃ©tection)"
 
 msgid "xine Video Window"
-msgstr "Fenêtre Vidéo de xine"
+msgstr "FenÃªtre VidÃ©o de xine"
 
 msgid "xine Video Fullscreen Window"
-msgstr "Fenêtre Vidéo plein-écran de xine"
+msgstr "FenÃªtre VidÃ©o plein-Ã©cran de xine"
 
 msgid "xine Video Borderless Window"
-msgstr "Fenêtre Vidéo sans bordures de xine"
+msgstr "FenÃªtre VidÃ©o sans bordures de xine"
 
 #, c-format
 msgid "XAllocWMHints() failed\n"
-msgstr "XAllocWMHints() a échoué\n"
+msgstr "XAllocWMHints() a Ã©chouÃ©\n"
 
 msgid "New stream sizes resize output window"
-msgstr "Nouvelle taille de flux redimensionne la fenêtre"
+msgstr "Nouvelle taille de flux redimensionne la fenÃªtre"
 
 msgid "Double size for small streams (require stream_resize_window)"
-msgstr "Double la taille pour les petits flux (requière stream_resize_window)"
+msgstr "Double la taille pour les petits flux (requiÃ¨re stream_resize_window)"
 
 msgid "use XVidModeExtension when switching to fullscreen"
-msgstr "utilise XVidModeExtension pour le plein-écran"
+msgstr "utilise XVidModeExtension pour le plein-Ã©cran"
 
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "Extension XF86VidMode (%d.%d) detecté, tente de l'utiliser.\n"
+msgstr "Extension XF86VidMode (%d.%d) dÃ©tectÃ©, tentative pour l'utiliser.\n"
 
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "Extension XF86VidMode: %d modeline(s) trouvé(s).\n"
+msgstr "Extension XF86VidMode: %d modeline(s) trouvÃ©(s).\n"
 
 #, c-format
 msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr "XF86VidModeModeLine %dx%d n'est pas valide: ignoré.\n"
+msgstr "XF86VidModeModeLine %dx%d n'est pas valide: ignorÃ©.\n"
 
 #, c-format
 msgid ""
@@ -2555,36 +2548,36 @@ msgstr ""
 
 #, c-format
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr "Extention XF86VidMode: échec à l'initialisation, ne l'utilise pas.\n"
+msgstr "Extension XF86VidMode: Ã©chec Ã  l'initialisation, ne l'utilise pas.\n"
 
 msgid "log info"
 msgstr "log info"
 
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
-msgstr "Il n'y a aucune entrée dans le log de la section '%s'.\n"
+msgstr "Il n'y a aucune entrÃ©e dans le log de la section '%s'.\n"
 
 msgid "xine Log Viewer"
 msgstr "Visualiseur des logs de xine"
 
 msgid "Refresh"
-msgstr "Rafraîchir"
+msgstr "RafraÃ®chir"
 
 #~ msgid ""
 #~ "You tried to change the configuration with a cfg: MRL.\n"
 #~ "This is not allowed unless you enable the 'misc.implicit_config' setting "
 #~ "after reading and understanding its help text."
 #~ msgstr ""
-#~ "Vous avez essayé de modifier la configuration en utilisant une MRL cfg:.\n"
-#~ "Ceci n'est pas autorisé tand que vous n'aurez pas changé la valeur de \n"
-#~ "'misc.implicit_config' aprés avoir lus et compris son texte d'aide."
+#~ "Vous avez essayÃ© de modifier la configuration en utilisant une MRL cfg:.\n"
+#~ "Ceci n'est pas autorisÃ© tand que vous n'aurez pas changÃ© la valeur de \n"
+#~ "'misc.implicit_config' aprÃ©s avoir lus et compris son texte d'aide."
 
 #~ msgid ""
 #~ "For security reason, you're not allowed to change the configuration entry "
 #~ "named '%s'."
 #~ msgstr ""
-#~ "Pour une raison de sécurité, vous n'êtes pas habilité à changer l'item de "
-#~ "configuration nommé '%s'."
+#~ "Pour une raison de sÃ©curitÃ©, vous n'Ãªtes pas habilitÃ© Ã  changer l'item de "
+#~ "configuration nommÃ© '%s'."
 
 #~ msgid "hue value"
 #~ msgstr "valeur de la teinte"
@@ -2611,7 +2604,7 @@ msgstr "Rafraîchir"
 #~ msgstr "Valeur du Contraste"
 
 #~ msgid "Event receiver window"
-#~ msgstr "Fenêtre de reception d'évènements"
+#~ msgstr "FenÃªtre de reception d'Ã©vÃ¨nements"
 
 #~ msgid "No Informations available."
 #~ msgstr "Pas d'informations disponibles."
@@ -2621,19 +2614,19 @@ msgstr "Rafraîchir"
 
 #~ msgid "Use wm layer property to place window on top."
 #~ msgstr ""
-#~ "Utilise la propriété des couches du WM pour placer les fenêtres devant"
+#~ "Utilise la propriÃ©tÃ© des couches du WM pour placer les fenÃªtres devant"
 
 #~ msgid "Screensaver wakeup"
-#~ msgstr "Reveille economiseur d'écran"
+#~ msgstr "Reveille economiseur d'Ã©cran"
 
 #~ msgid ""
 #~ "Your system seems too slow, the amount of dropped frames is too high."
 #~ msgstr ""
-#~ "Votre système semble trop lent, le nombre de frames sautées est trop "
-#~ "élevé."
+#~ "Votre systÃ¨me semble trop lent, le nombre de frames sautÃ©es est trop "
+#~ "Ã©levÃ©."
 
 #~ msgid "Fullscreen\\/Windowed View"
-#~ msgstr "Vue plein écran\\/fenêtré"
+#~ msgstr "Vue plein Ã©cran\\/fenÃªtrÃ©"
 
 #~ msgid "GUI visiblity"
 #~ msgstr "Interface utilisateur"
@@ -2658,11 +2651,11 @@ msgstr "Rafraîchir"
 
 #~ msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
 #~ msgstr ""
-#~ "  -p, --auto-play [opt]        Lecture au démarrage. Peut-être suivi "
+#~ "  -p, --auto-play [opt]        Lecture au dÃ©marrage. Peut-Ãªtre suivi "
 #~ "par :\n"
 
 #~ msgid "                    'f': in fullscreen mode.\n"
-#~ msgstr "                    'f' : en mode plein écran.\n"
+#~ msgstr "                    'f' : en mode plein Ã©cran.\n"
 
 #~ msgid "                    'h': hide GUI (panel, etc.).\n"
 #~ msgstr ""
@@ -2670,40 +2663,40 @@ msgstr "Rafraîchir"
 #~ "principal, ...).\n"
 
 #~ msgid "                    'w': hide video window.\n"
-#~ msgstr "                    'w': cache la fenêtre de sortie.\n"
+#~ msgstr "                    'w': cache la fenÃªtre de sortie.\n"
 
 #~ msgid "                    'q': quit when play is done.\n"
-#~ msgstr "                    'q' : quitte quand la lecture est terminée.\n"
+#~ msgstr "                    'q' : quitte quand la lecture est terminÃ©e.\n"
 
 #~ msgid ""
 #~ "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 #~ "DVD)\n"
 #~ msgstr ""
-#~ "                    'd' : récupère la liste de lecture a partir du DVD.\n"
-#~ "                         (déprécié, utilisez -s DVD)\n"
+#~ "                    'd' : rÃ©cupÃ¨re la liste de lecture a partir du DVD.\n"
+#~ "                         (dÃ©prÃ©ciÃ©, utilisez -s DVD)\n"
 
 #~ msgid ""
 #~ "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 #~ "VCD)\n"
 #~ msgstr ""
-#~ "                    'v' : récupère la liste de lecture à partir du VCD.\n"
-#~ "                         (déprécié, utilisez -s VCD)\n"
+#~ "                    'v' : rÃ©cupÃ¨re la liste de lecture Ã  partir du VCD.\n"
+#~ "                         (dÃ©prÃ©ciÃ©, utilisez -s VCD)\n"
 
 #~ msgid ""
 #~ "      --visual <class-or-id>   Use the specified X11 visual. <class-or-"
 #~ "id>\n"
-#~ msgstr "      --visual <classe-ou-nom> Utilise le visuel X11 spécifié\n"
+#~ msgstr "      --visual <classe-ou-nom> Utilise le visuel X11 spÃ©cifiÃ©\n"
 
 #~ msgid "      --keymap [=option]       Display keymap. Option are:\n"
 #~ msgstr ""
-#~ "      --keymap [=option]       Affiche les séquences clavier. Les options "
+#~ "      --keymap [=option]       Affiche les sÃ©quences clavier. Les options "
 #~ "sont :\n"
 
 #~ msgid ""
 #~ "                                 'default': display default keymap "
 #~ "table,\n"
 #~ msgstr ""
-#~ "                                 'default' : affiche les séquences "
+#~ "                                 'default' : affiche les sÃ©quences "
 #~ "clavier originales,\n"
 
 #~ msgid ""
@@ -2717,33 +2710,33 @@ msgstr "Rafraîchir"
 #~ msgid ""
 #~ "                                 'remapped': user remapped keymap table.\n"
 #~ msgstr ""
-#~ "                                 'remapped' : affiche les séquences "
-#~ "modifiées.\n"
+#~ "                                 'remapped' : affiche les sÃ©quences "
+#~ "modifiÃ©es.\n"
 
 #~ msgid ""
 #~ "                                 'file:<filename>': use <filename> as "
 #~ "keymap.\n"
 #~ msgstr ""
 #~ "                                 'file:<fichier>': utilise <fichier> "
-#~ "comme fichier de séquences.\n"
+#~ "comme fichier de sÃ©quences.\n"
 
 #~ msgid ""
 #~ "                                 -if no option is given, 'default' is "
 #~ "selected.\n"
 #~ msgstr ""
-#~ "                                 -si aucune option n'est donnée, "
+#~ "                                 -si aucune option n'est donnÃ©e, "
 #~ "'default' \n"
-#~ "                                  sera sélectionné.\n"
+#~ "                                  sera sÃ©lectionnÃ©.\n"
 
 #~ msgid "                                 -can be used more than one time.\n"
 #~ msgstr ""
-#~ "                                 -peut être utilisé plus d'une fois.\n"
+#~ "                                 -peut Ãªtre utilisÃ© plus d'une fois.\n"
 
 #~ msgid ""
 #~ "  -l, --loop [=mode]           Set playlist loop mode (default: loop). "
 #~ "Modes are:\n"
 #~ msgstr ""
-#~ "  -l, --loop [=mode]           Défini le mode de boucle de la liste de "
+#~ "  -l, --loop [=mode]           DÃ©fini le mode de boucle de la liste de "
 #~ "lecture.\n"
 #~ "                                Les modes sont:\n"
 
@@ -2754,21 +2747,21 @@ msgstr "Rafraîchir"
 #~ "                                 'repeat': repeat current playlist "
 #~ "entry.\n"
 #~ msgstr ""
-#~ "                                 'repeat': Répète la sélection courante.\n"
+#~ "                                 'repeat': RÃ©pÃ¨te la sÃ©lection courante.\n"
 
 #~ msgid ""
 #~ "                                 'shuffle': select randomly a yet "
 #~ "unplayed entry from playlist\n"
 #~ msgstr ""
-#~ "                                 'shuffle': sélection aléatoire d'une "
-#~ "entrée non jouée.\n"
+#~ "                                 'shuffle': sÃ©lection alÃ©atoire d'une "
+#~ "entrÃ©e non jouÃ©e.\n"
 
 #~ msgid ""
 #~ "                                 'shuffle+': same as 'shuffle', but "
 #~ "indefinetely replay the playlist.\n"
 #~ msgstr ""
-#~ "                                 'shuffle+': identique à shuffle, mais "
-#~ "rejoue indéfiniement la liste de lecture.\n"
+#~ "                                 'shuffle+': identique Ã  shuffle, mais "
+#~ "rejoue indÃ©finiement la liste de lecture.\n"
 
 #~ msgid "  -S, --session <option1,option2,...>\n"
 #~ msgstr "  -S, --session <option1, option2,...>\n"
@@ -2777,42 +2770,42 @@ msgstr "Rafraîchir"
 #~ "                               Session managements. Options can be:\n"
 #~ msgstr ""
 #~ "                               Gestion de sessions. les options peuvent "
-#~ "êtres:\n"
+#~ "Ãªtres:\n"
 
 #~ msgid "                    session=n   specify session <n> number,\n"
 #~ msgstr ""
-#~ "                    session=n   spécifie le numéro de session <n>,\n"
+#~ "                    session=n   spÃ©cifie le numÃ©ro de session <n>,\n"
 
 #~ msgid "                    mrl=m       add mrl <m> to the playlist,\n"
 #~ msgstr ""
-#~ "                    mrl=m       ajoute la mrl <m> à la liste de lecture,\n"
+#~ "                    mrl=m       ajoute la mrl <m> Ã  la liste de lecture,\n"
 #~ "\n"
 
 #~ msgid ""
 #~ "                    audio=c     select audio channel (<c>: 'next' or "
 #~ "'prev'),\n"
 #~ msgstr ""
-#~ "                    audio=c     sélectionne le canal audio (<c>: 'next' "
+#~ "                    audio=c     sÃ©lectionne le canal audio (<c>: 'next' "
 #~ "ou 'prev')\n"
 
 #~ msgid ""
 #~ "                    spu=c       select spu channel (<c>: 'next' or "
 #~ "'prev'),\n"
 #~ msgstr ""
-#~ "                    spu=c       sélectionne le canal de sous-titre (<c>: "
+#~ "                    spu=c       sÃ©lectionne le canal de sous-titre (<c>: "
 #~ "'next' ou 'prev')\n"
 
 #~ msgid "                    volume=v    set audio volume,\n"
-#~ msgstr "                    volume=v    règle le volume audio,\n"
+#~ msgstr "                    volume=v    rÃ¨gle le volume audio,\n"
 
 #~ msgid "                    amp=v       set amplification level,\n"
-#~ msgstr "                    amp=v       règle le niveau d'amplification,\n"
+#~ msgstr "                    amp=v       rÃ¨gle le niveau d'amplification,\n"
 
 #~ msgid ""
 #~ "                    loop=m      set loop mode (<m>: 'none' 'loop' "
 #~ "'repeat' 'shuffle' or 'shuffle+'),\n"
 #~ msgstr ""
-#~ "                    loop=m      sélectionne le mode de boucle (<m>: "
+#~ "                    loop=m      sÃ©lectionne le mode de boucle (<m>: "
 #~ "'none'\n"
 #~ "                                'loop' 'repeat' 'shuffle' ou 'shuffle"
 #~ "+'),\n"
@@ -2821,7 +2814,7 @@ msgstr "Rafraîchir"
 #~ msgstr "                    (playlist|pl)=p\n"
 
 #~ msgid "                                 <p> can be:\n"
-#~ msgstr "                                 <p> peux être:\n"
+#~ msgstr "                                 <p> peux Ãªtre:\n"
 
 #~ msgid "                                   'clear'  clear the playlist,\n"
 #~ msgstr ""
@@ -2831,7 +2824,7 @@ msgstr "Rafraîchir"
 #~ "                                   'first'  play first entry in the "
 #~ "playlist,\n"
 #~ msgstr ""
-#~ "                                   'first'  lis la première entrée dans "
+#~ "                                   'first'  lis la premiÃ¨re entrÃ©e dans "
 #~ "la\n"
 #~ "                                            liste de lecture,\n"
 
@@ -2839,18 +2832,18 @@ msgstr "Rafraîchir"
 #~ "                                   'prev'   play previous playlist "
 #~ "entry,\n"
 #~ msgstr ""
-#~ "                                   'prev'   joue l'entrée précédente,\n"
+#~ "                                   'prev'   joue l'entrÃ©e prÃ©cÃ©dente,\n"
 
 #~ msgid ""
 #~ "                                   'next'   play next playlist entry,\n"
 #~ msgstr ""
-#~ "                                   'next'   joue l'entrée suivante,\n"
+#~ "                                   'next'   joue l'entrÃ©e suivante,\n"
 
 #~ msgid ""
 #~ "                                   'last'   play last entry in the "
 #~ "playlist,\n"
 #~ msgstr ""
-#~ "                                   'last'   lis la dernière entrée dans\n"
+#~ "                                   'last'   lis la derniÃ¨re entrÃ©e dans\n"
 #~ "                                            la liste de lecture,\n"
 
 #~ msgid ""
@@ -2862,7 +2855,7 @@ msgstr "Rafraîchir"
 #~ "                                   'stop'   stop playback at the end of "
 #~ "current playback.\n"
 #~ msgstr ""
-#~ "                                   'stop'   arrête la lecture à la fin de "
+#~ "                                   'stop'   arrÃªte la lecture Ã  la fin de "
 #~ "la \n"
 #~ "                                            lecture en cours,\n"
 
@@ -2870,7 +2863,7 @@ msgstr "Rafraîchir"
 #~ "                                   'cont'   continue playback at the end "
 #~ "of current playback.\n"
 #~ msgstr ""
-#~ "                                   'cont'   continue la lecture à la fin "
+#~ "                                   'cont'   continue la lecture Ã  la fin "
 #~ "de la\n"
 #~ "                                            lecture en cours,\n"
 
@@ -2884,17 +2877,17 @@ msgstr "Rafraîchir"
 #~ "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes "
 #~ "are:\n"
 #~ msgstr ""
-#~ "  -r, --aspect-ratio <mode>    Défini le ratio d'aspect le la sortie "
-#~ "vidéo. Les modes sont:\n"
+#~ "  -r, --aspect-ratio <mode>    DÃ©fini le ratio d'aspect le la sortie "
+#~ "vidÃ©o. Les modes sont:\n"
 
 #~ msgid ""
 #~ "      --broadcast-port <port>  Set port of xine broadcaster (master "
 #~ "side)\n"
 #~ msgstr ""
-#~ "      --broadcast-port <port>  Défini le port de diffusion (coté maitre)\n"
+#~ "      --broadcast-port <port>  DÃ©fini le port de diffusion (cotÃ© maitre)\n"
 
 #~ msgid "      --post <plugin>[:parameter=value][,...][;...]\n"
-#~ msgstr "      --post <plugin>[:paramètre=valeur][,...][;...]\n"
+#~ msgstr "      --post <plugin>[:paramÃ¨tre=valeur][,...][;...]\n"
 
 #~ msgid "                               Load one or many post plugin(s).\n"
 #~ msgstr ""
@@ -2903,14 +2896,14 @@ msgstr "Rafraîchir"
 
 #~ msgid "                               Parameters are comma separated.\n"
 #~ msgstr ""
-#~ "                               Les paramètres sont séparés par des "
+#~ "                               Les paramÃ¨tres sont sÃ©parÃ©s par des "
 #~ "virgules.\n"
 
 #~ msgid ""
 #~ "                               This option can be used more than one "
 #~ "time.\n"
 #~ msgstr ""
-#~ "                               Cette option peut être utlisée plus d'une "
+#~ "                               Cette option peut Ãªtre utlisÃ©e plus d'une "
 #~ "fois.\n"
 
 #~ msgid ""
@@ -2921,7 +2914,7 @@ msgstr "Rafraîchir"
 #~ "disponibles,\n"
 
 #~ msgid "                               Optional <type> can be:\n"
-#~ msgstr "                               Le <type> optionel peut être:\n"
+#~ msgstr "                               Le <type> optionel peut Ãªtre:\n"
 
 #~ msgid "                    audio_out, video_out, demux, input, sub, post,\n"
 #~ msgstr ""
@@ -2949,13 +2942,13 @@ msgstr "Rafraîchir"
 #~ "fichier\n"
 
 #~ msgid "                                 BUG-REPORT.TXT.\n"
-#~ msgstr "                                 nommé BUG-REPORT.TXT.\n"
+#~ msgstr "                                 nommÃ© BUG-REPORT.TXT.\n"
 
 #~ msgid ""
 #~ "                                 If <mrl> is given, xine will play the "
 #~ "mrl\n"
 #~ msgstr ""
-#~ "                                 Si <mrl> est precisé, xine jouera cette "
+#~ "                                 Si <mrl> est precisÃ©, xine jouera cette "
 #~ "mrl\n"
 
 #~ msgid "                                 then quit (like -pq).\n"
@@ -3001,16 +2994,16 @@ msgstr "Rafraîchir"
 #~ msgstr "        XShmQueryVersion: %d.%d.\n"
 
 #~ msgid "sigprocmask() failed.\n"
-#~ msgstr "sigprocmask() a échoué.\n"
+#~ msgstr "sigprocmask() a Ã©chouÃ©.\n"
 
 #~ msgid "xine video output"
-#~ msgstr "sortie vidéo de xine"
+#~ msgstr "sortie vidÃ©o de xine"
 
 #~ msgid "Stream/OSD Information"
 #~ msgstr "FLux/Information OSD"
 
 #~ msgid "Stream/Window Information..."
-#~ msgstr "Flux/Fenêtre d'Information..."
+#~ msgstr "Flux/FenÃªtre d'Information..."
 
 #~ msgid "README"
 #~ msgstr "Lisez-Moi"
