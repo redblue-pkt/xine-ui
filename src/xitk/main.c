@@ -1255,8 +1255,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
       if(gGui->mixer.method == SOUND_CARD_MIXER) {
 	gGui->mixer.mute = aevent->mute;
-	xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
-	xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+	if (panel) {
+	  xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+	  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+	}
       }
     }
     break;
