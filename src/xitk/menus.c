@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2013 the xine project
+ * Copyright (C) 2000-2014 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -924,24 +924,38 @@ void video_window_menu(xitk_widget_list_t *wl) {
   }
   
   { /* Menus access */
-    static const char menu_entries[14][16] = {
+    static const char menu_entries[21][16] = {
       /* Default menu */
       N_("Menu 1"), N_("Menu 2"), N_("Menu 3"), N_("Menu 4"),
       N_("Menu 5"), N_("Menu 6"), N_("Menu 7"),
 
       /* DVD menu */
-      N_("Menu toggle"), N_("Title"), N_("Root"), N_("Subpicture"), 
+      N_("Menu toggle"), N_("Title"), N_("Root"), N_("Subpicture"),
       N_("Audio"), N_("Angle"), N_("Part"),
+
+      /* BluRay menu */
+      N_("Top Menu"), N_("Popup Menu"), N_("Menu 3"), N_("Menu 4"),
+      N_("Menu 5"), N_("Menu 6"), N_("Menu 7"),
     };
 
     xitk_menu_entry_t   menu_entry;
-    int                 i;
+    int                 i, first_entry = 0;
     const char *const menus_str = _("Menus");
+
+    if (gGui->mmk.mrl) {
+      if (!strncmp(gGui->mmk.mrl, "bd:/", 4)) {
+        first_entry = 14;
+      } else if (!strncmp(gGui->mmk.mrl, "dvd:/", 5)) {
+        first_entry = 7;
+      } else if (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)) {
+        first_entry = 7;
+      }
+    }
 
     for(i = 0; i < 7; i++) {
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
-      asprintf(&menu_entry.menu, "%s/%s", menus_str, gettext(menu_entries[i]));
+      asprintf(&menu_entry.menu, "%s/%s", menus_str, gettext(menu_entries[first_entry + i]));
       menu_entry.cb        = menu_menus_selection;
       menu_entry.user_data = (void *)(intptr_t)i;
       xitk_menu_add_entry(w, &menu_entry);
