@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2014 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -81,6 +81,7 @@ static _eventer_t    *eventer = NULL;
 /* Initialized below */
 static char *menu_items_default[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 static char *menu_items_dvd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static char *menu_items_bd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   int old_sticky_value = gGui->eventer_sticky;
@@ -299,6 +300,8 @@ void event_sender_update_menu_buttons(void) {
     
     if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
       lbls = menu_items_dvd;
+    if(!strncmp(gGui->mmk.mrl, "bd:/", 4))
+      lbls = menu_items_bd;
     
     for(i = 0; i < 7; i++)
       xitk_labelbutton_change_label(eventer->menus.menu[i], lbls[i]);
@@ -643,6 +646,14 @@ void event_sender_panel(void) {
   menu_items_dvd[4]     = _("Audio");
   menu_items_dvd[5]     = _("Angle");
   menu_items_dvd[6]     = _("Part");
+
+  menu_items_bd[0] = _("Top Menu");
+  menu_items_bd[1] = _("Popup Menu");
+  menu_items_bd[2] = _("Menu 3");
+  menu_items_bd[3] = _("Menu 4");
+  menu_items_bd[4] = _("Menu 5");
+  menu_items_bd[5] = _("Menu 6");
+  menu_items_bd[6] = _("Menu 7");
 
   x = 5;
   y = 5;
