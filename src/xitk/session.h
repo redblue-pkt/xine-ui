@@ -19,7 +19,7 @@
  *
  */
 #ifndef CTRLSOCK_H
-#define CTRLSOCKS_H
+#define CTRLSOCK_H
 
 #include <xine/os_types.h>
 
