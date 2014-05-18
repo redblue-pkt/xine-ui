@@ -21,7 +21,7 @@
 /* Largely inspired of xmms control socket stuff */
 
 /* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
-#if ! defined (__sun) && ! defined (__OpenBSD__) && ! defined (__FreeBSD__)
+#if ! defined (__sun) && ! defined (__OpenBSD__) && ! defined (__FreeBSD__) && !defined(__NetBSD__) && !defined(__DragonFly__)
 #define _XOPEN_SOURCE 500
 #endif
 
