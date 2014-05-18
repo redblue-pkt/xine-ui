@@ -145,6 +145,8 @@ static void panel_exit(xitk_widget_t *w, void *data) {
 
     xitk_unregister_event_handler(&panel->widget_key);
 
+    pthread_join(panel->slider_thread, NULL);
+
     XLockDisplay(gGui->display);
     XUnmapWindow(gGui->display, gGui->panel_window);
     XUnlockDisplay(gGui->display);
@@ -361,8 +363,6 @@ static __attribute__((noreturn)) void *slider_loop(void *dummy) {
   int pos, secs;
   int i = 0;
   
-  pthread_detach(pthread_self());
-
   while(gGui->on_quit == 0) {
 
     if(gGui->stream) {
