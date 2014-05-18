@@ -427,7 +427,7 @@ static void show_version(void) {
 #ifdef DEBUG
   printf("-[DEBUG]");
 #endif
-  printf(_(".\n(c) 2000-2010 The xine Team.\n"));
+  printf(_(".\n(c) 2000-2014 The xine Team.\n"));
 }
 
 /*
