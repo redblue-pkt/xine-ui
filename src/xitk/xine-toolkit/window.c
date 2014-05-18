@@ -488,8 +488,11 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
  */
 void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height) {
 
-  if(w == NULL)
+  if (w == NULL) {
+    *width = 0;
+    *height = 0;
     return;
+  }
 
   *width = w->width;
   *height = w->height;
