@@ -1,3 +1,9 @@
+xine-ui (0.99.9)
+  * Handle building using libreadline 6.3 and libcaca 0.99 beta 19.
+  * More shutdown fixes.
+  * Show DVD & BluRay menu names.
+  * More *BSD support – NetBSD, DragonFlyBSD.
+
 xine-ui (0.99.8)
   * Fixed opening file using menus
   * Fixed exit on panel close

@@ -9,7 +9,7 @@ dnl Change these three m4_define lines to set the version
 dnl Presence of .cvsversion causes an "hg" suffix
 m4_define([xine_MAJOR], [0])
 m4_define([xine_MINOR], [99])
-m4_define([xine_SUB],   [8])
+m4_define([xine_SUB],   [9])
 
 m4_define([xine_PRE], [m4_esyscmd([test -f .cvsversion && echo -n hg || :])])
 m4_define([xine_VERSION], [xine_MAJOR.xine_MINOR.m4_expand([xine_SUB])xine_PRE])
