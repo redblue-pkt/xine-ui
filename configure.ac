@@ -362,8 +362,12 @@ dnl
 AC_ARG_WITH([caca],
   AS_HELP_STRING([--without-caca], [Do not build CACA support]))
 
+have_cucul=yes
 if test "x$with_caca" != "xno"; then
-   PKG_CHECK_MODULES([CACA], [caca cucul], [have_caca="yes"], [have_caca="no"])
+   PKG_CHECK_MODULES([CACA], [caca >= 0.99beta19],
+                     [have_caca="yes"
+                      have_cucul="no"],
+                     [PKG_CHECK_MODULES([CACA], [caca cucul], [have_caca="yes"], [have_caca="no"])])
    AM_DL()
    if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
       AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
@@ -375,9 +379,13 @@ if test "x$with_caca" != "xno"; then
                        [],
                        [AC_DEFINE(CACA_EVENT_OPAQUE, [1], ["Define if struct caca_event is opaque and must not be accessed directly"])]
    )
-fi
 
+fi
 AM_CONDITIONAL([HAVE_CACA], [test "x$have_caca" = "xyes"])
+if test x"$have_caca$have_cucul" = x"yesyes"; then
+   HAVE_CUCUL=1
+   AC_SUBST([CUCUL])
+fi
 
 dnl option for font sets and multibyte string support
 AC_ARG_ENABLE([mbs],

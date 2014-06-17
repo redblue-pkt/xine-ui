@@ -64,7 +64,9 @@
 
 #ifdef CACA
 #  include <caca.h>
-#  include <cucul.h>
+#  ifdef CUCUL
+#    include <cucul.h>
+#  endif
 #endif
 
 /* Sound mixer capabilities */
