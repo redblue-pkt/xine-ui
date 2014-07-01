@@ -2864,8 +2864,14 @@ static __attribute__((noreturn)) void *client_thread(void *data) {
   char               buffer[_BUFSIZ];
   int                i;
   int                len;
+  sigset_t           sigpipe_mask;
   
   pthread_detach(pthread_self());
+
+  sigemptyset(&sigpipe_mask);
+  sigaddset(&sigpipe_mask, SIGPIPE);
+  if (pthread_sigmask(SIG_BLOCK, &sigpipe_mask, NULL) == -1)
+    perror("pthread_sigmask");
   
   client_info->finished = 0;
   memset(&client_info->name, 0, sizeof(client_info->name));
