@@ -1294,6 +1294,9 @@ int main(int argc, char **argv) {
     session_update_prompt(&session);
 
     if((grabbed_line = readline(session.prompt)) == NULL) {
+      if (errno == 0 || errno == ENOTTY)
+        exit(0);
+
       fprintf(stderr, "%s(%d): readline() failed: %s\n",
 	      __XINE_FUNCTION__, __LINE__, strerror(errno));
       exit(1);
