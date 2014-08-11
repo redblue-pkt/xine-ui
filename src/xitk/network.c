@@ -294,7 +294,7 @@ static commands_t commands[] = {
     "  playlist next\n"
     "  playlist last\n"
     "  playlist stop\n"
-    "  playlist contine"
+    "  playlist continue"
   },
   { "stop",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_stop,
     "stop playback", 
