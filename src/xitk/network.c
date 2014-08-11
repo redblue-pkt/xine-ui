@@ -458,7 +458,7 @@ static int sock_create(const char *service, const char *transport, struct sockad
   if(!sin->sin_port) {
     iservice = getservbyname(service, "tcp");
 
-    if(!service)
+    if(!iservice)
       sock_err("Service not registered: %s\n", service);
     
     sin->sin_port = iservice->s_port;
