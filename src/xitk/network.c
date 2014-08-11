@@ -2704,7 +2704,7 @@ static void parse_command(client_info_t *client_info) {
   
   if(client_info->command.num_args) {
     for(i = 0; i < client_info->command.num_args; i++)
-      memset(client_info->command.args[i], 0, sizeof(client_info->command.args[i]));
+      *client_info->command.args[i] = 0;
   }
   
   client_info->command.num_args = 0;
@@ -2719,7 +2719,7 @@ static void parse_command(client_info_t *client_info) {
     client_info->command.command = (char *) realloc(client_info->command.command, 
 						    strlen(client_info->command.line) - strlen(cmd) + 1);
 
-    memset(client_info->command.command, 0, sizeof(client_info->command.command));
+    *client_info->command.command = 0;
     strlcpy(client_info->command.command, client_info->command.line,
 	    (strlen(client_info->command.line) - strlen(cmd)));
 
