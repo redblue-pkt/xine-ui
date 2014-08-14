@@ -36,7 +36,7 @@ static xitk_window_t     *xwin = NULL;
 void splash_create(void) {
   xitk_image_t *xim;
   char         *splash_image = XINE_SPLASH;
-  char         *skin_splash_image;
+  char         *skin_splash_image = NULL;
   char         *skin_path = skin_get_current_skin_dir();
   
   if(skin_path && is_a_dir((char *) skin_path)) {

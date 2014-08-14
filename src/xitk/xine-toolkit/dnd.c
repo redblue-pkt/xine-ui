@@ -518,7 +518,7 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 	if((event->xany.window == xdnd->dropper_toplevel) && (xdnd->dropper_window != None))
 	  event->xany.window = xdnd->dropper_window;
 	
-	if((xdnd->dragger_window == XDND_DROP_SOURCE_WIN(event))) {
+	if(xdnd->dragger_window == XDND_DROP_SOURCE_WIN(event)) {
 
 	  xdnd->time = XDND_DROP_TIME (event);
 	  

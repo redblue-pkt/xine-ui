@@ -1737,7 +1737,7 @@ static void paint_image (xitk_widget_t *w) {
   xitk_image_t         *skin;
   GC                    lgc;
   
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
     private_data = (image_private_data_t *) w->private_data;
 
     skin = private_data->skin;
@@ -1770,7 +1770,7 @@ static void paint_image (xitk_widget_t *w) {
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   image_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
     private_data = (image_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {

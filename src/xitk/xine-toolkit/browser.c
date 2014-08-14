@@ -51,7 +51,7 @@ static void paint(xitk_widget_t *w) {
     
     private_data = (browser_private_data_t *) w->private_data;
 
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       if(!private_data->skin_element_name) {
 	int x     = w->x;
 	int y     = w->y;

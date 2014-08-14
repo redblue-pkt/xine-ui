@@ -170,7 +170,7 @@ char *xitk_label_get_label(xitk_widget_t *w) {
  */
 static void paint_label(xitk_widget_t *w) {
 
-  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && (w->visible == 1))) {
+  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && w->visible == 1)) {
     label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
     xitk_image_t          *font = (xitk_image_t *) private_data->font;
     
@@ -255,7 +255,7 @@ static __attribute__((noreturn)) void *xitk_label_animation_loop(void *data) {
   
   do {
     
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       
       private_data->anim_offset += private_data->anim_step;
 

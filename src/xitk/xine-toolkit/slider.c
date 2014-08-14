@@ -249,7 +249,7 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
     
     private_data = (slider_private_data_t *) w->private_data;
     
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       xitk_image_t *skin;
       
       if(private_data->paddle_cover_bg == 1)
@@ -277,7 +277,7 @@ static void paint_slider(xitk_widget_t *w) {
   xitk_image_t           *bg;
   xitk_image_t           *paddle;
   
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && w->visible == 1)) {
     int    x, y, srcx1, srcx2, destx1, srcy1, srcy2, desty1;
     int    xcenter, ycenter;
     int    paddle_width;

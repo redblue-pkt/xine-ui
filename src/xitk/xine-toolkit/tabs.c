@@ -79,7 +79,7 @@ static void tabs_arrange(xitk_widget_t *w) {
   tabs_private_data_t  *private_data;
 
   if(w && ((((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
-	    (w->type & WIDGET_GROUP_WIDGET)) && (w->visible == 1))) {
+	    (w->type & WIDGET_GROUP_WIDGET)) && w->visible == 1)) {
     int i = 0, width, x;
     
     private_data = (tabs_private_data_t*) w->private_data;
@@ -172,7 +172,7 @@ static void paint(xitk_widget_t *w) {
   if(w && (((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
 
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       tabs_arrange(w);
     }
   }

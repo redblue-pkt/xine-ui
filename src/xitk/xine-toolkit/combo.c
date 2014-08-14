@@ -97,7 +97,7 @@ static void paint(xitk_widget_t *w) {
       xitk_checkbox_set_state(private_data->button_widget, 0);
       _combo_rollunroll(private_data->button_widget, (void *)w, 0);
     }
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       int bx, lw;
 
       lw = xitk_get_widget_width(private_data->label_widget);
