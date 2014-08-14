@@ -38,7 +38,7 @@
 #define OVL_PALETTE_SIZE 256
 
 #ifdef	__GNUC__
-#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{y: (_y), cr: (_cr), cb: (_cb)}
+#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ .y = (_y), .cr = (_cr), .cb = (_cb)}
 #else
 #define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ (_cb), (_cr), (_y) }
 #endif

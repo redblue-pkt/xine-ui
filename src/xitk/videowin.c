@@ -459,7 +459,7 @@ static void video_window_adapt_size (void) {
 
       XUnlockDisplay (gGui->video_display);
 
-      if((gGui->video_display == gGui->display))
+      if(gGui->video_display == gGui->display)
         gVw.widget_key = xitk_register_event_handler("video_window", 
 						    gGui->video_window, 
 						    video_window_handle_event,

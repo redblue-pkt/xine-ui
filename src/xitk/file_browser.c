@@ -462,7 +462,7 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
     else {
       if((*filepathname == '\\') && (*(filepathname + 1) == '~'))
 	filepathname++;
-      if((*filepathname == '/'))
+      if(*filepathname == '/')
 	strlcpy(_filepathname, filepathname, sizeof(_filepathname));
       else
 	snprintf(_filepathname, sizeof(_filepathname), "%s/%s", fb->current_dir, filepathname);

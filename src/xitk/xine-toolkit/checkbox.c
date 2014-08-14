@@ -69,7 +69,7 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
     private_data = (checkbox_private_data_t *) w->private_data;
 
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       xitk_image_t *skin = private_data->skin;
       
       if(skin->mask)
@@ -91,7 +91,7 @@ static void paint_checkbox (xitk_widget_t *w) {
   int                      checkbox_width;
   xitk_image_t            *skin;
   
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX) && w->visible == 1)) {
     private_data = (checkbox_private_data_t *) w->private_data;
 
     skin           = private_data->skin;

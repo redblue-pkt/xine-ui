@@ -314,7 +314,7 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
 
       struct stat filestat;
       char *mrl;
-      char *title;
+      char *title = NULL;
       int type = 0;
       
       if((!strcmp(entp->d_name, "."))||(!strcmp(entp->d_name, "..")))

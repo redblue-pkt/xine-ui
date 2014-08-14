@@ -45,23 +45,23 @@
 
 struct fbxine fbxine =
 {
-	tty_fd:        -1,
-	video_port_id: "fb",
+	.tty_fd =        -1,
+	.video_port_id = "fb",
 
-        post_video_elements: NULL,
-        post_video_elements_num: 0,
-        post_video_enable: 1,
-          
-        post_audio_elements: NULL,
-        post_audio_elements_num: 0,
-        post_audio_enable: 1,
+	.post_video_elements = NULL,
+	.post_video_elements_num = 0,
+	.post_video_enable = 1,
 
-        deinterlace_plugin: NULL,
-        deinterlace_elements: NULL,
-        deinterlace_elements_num: 0,
-        deinterlace_enable: 0,
+	.post_audio_elements = NULL,
+	.post_audio_elements_num = 0,
+	.post_audio_enable = 1,
 
-	exit_cond: PTHREAD_COND_INITIALIZER
+	.deinterlace_plugin = NULL,
+	.deinterlace_elements = NULL,
+	.deinterlace_elements_num = 0,
+	.deinterlace_enable = 0,
+
+	.exit_cond = PTHREAD_COND_INITIALIZER
 };
 
 static void load_config(void)

@@ -69,7 +69,7 @@ static void paint(xitk_widget_t *w) {
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
-    if((w->visible == 1)) {
+    if(w->visible == 1) {
       int bx, ih, iw;
 
       iw = xitk_get_widget_width(private_data->input_widget);
