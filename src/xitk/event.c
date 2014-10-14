@@ -1231,6 +1231,16 @@ void gui_execute_action_id(action_id_t action) {
     }
     break;
 
+  case ACTID_PLAYLIST_OPEN:
+    if(gGui->alphanum.set) {
+        mediamark_load_mediamarks(gGui->alphanum.arg);
+        gui_set_current_mmk(mediamark_get_current_mmk());
+        playlist_update_playlist();
+        if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+        	enable_playback_controls(1);
+    }
+    break;
+
   default:
     break;
   }

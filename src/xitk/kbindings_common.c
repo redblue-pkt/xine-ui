@@ -325,6 +325,8 @@ static const kbinding_entry_t default_binding_table[] = {
     "PVRSetName",             ACTID_PVR_SETNAME             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "input_pvr: save the stream section",
     "PVRSave",                ACTID_PVR_SAVE                , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+  { "Open playlist",
+    "PlaylistOpen",           ACTID_PLAYLIST_OPEN           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
 #ifdef ENABLE_VDR_KEYS
   { "VDR Red button",
     "VDRButtonRed",           ACTID_EVENT_VDR_RED            , "VOID",     KEYMOD_NOMOD   , 0 , 0},
