@@ -157,6 +157,7 @@ typedef enum {
   ACTID_PVR_SETMARK,
   ACTID_PVR_SETNAME,
   ACTID_PVR_SAVE,
+  ACTID_PLAYLIST_OPEN,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
