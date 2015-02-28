@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2015 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -379,6 +379,9 @@ typedef struct {
 
   FILE                      *orig_stdout; /* original stdout at startup        */
                                           /* before an evtl. later redirection */
+
+  /* xine_open() may wait for our event handler */
+  int                        suppress_messages;
 } gGui_t;
 
 extern gGui_t *gGui;
