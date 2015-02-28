@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2015 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -33,7 +33,15 @@
 #        define N_(String) (String)
 #    endif
 #    define XITK_GETTEXT_SEP "\004"
-#    define pgettext(Ctx, String) gettext(Ctx XITK_GETTEXT_SEP String) == Ctx XITK_GETTEXT_SEP String ? String : gettext(Ctx XITK_GETTEXT_SEP String)
+#    ifdef __GNUC__
+#        define pgettext(Ctx, String) ({ \
+             const char *msgid = Ctx XITK_GETTEXT_SEP String; \
+             const char *trans = gettext (msgid); \
+             trans == msgid ? String : trans; \
+         })
+#    else
+#        define pgettext(Ctx, String) gettext(Ctx XITK_GETTEXT_SEP String) == Ctx XITK_GETTEXT_SEP String ? String : gettext(Ctx XITK_GETTEXT_SEP String)
+#    endif
 
 #else
 /* Stubs that do something close enough.  */
