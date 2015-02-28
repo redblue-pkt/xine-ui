@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2015 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -1237,8 +1237,14 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	strlcat(buffer, "]", sizeof(buffer));
       }
       
-      if(strlen(buffer))
-	report("%s", buffer);
+      if(strlen(buffer)) {
+	if(gGui->suppress_messages) {
+	  if(__xineui_global_verbosity)
+	    printf("xine-ui: GUI temporarily unavailable. Message:\n%s\n", buffer);
+	} else {
+	  report("%s", buffer);
+	}
+      }
       
     }
     break;

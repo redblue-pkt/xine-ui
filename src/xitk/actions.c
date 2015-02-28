@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2013 the xine project
+ * Copyright (C) 2000-2015 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -508,6 +508,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, 
 			   int start_time, int av_offset, int spu_offset, int report_error) {
   char *mrl = _mrl;
+  int ret;
   
   if(__xineui_global_verbosity)
     printf("%s():\n\tmrl: '%s',\n\tsub '%s',\n\tstart_pos %d, start_time %d, av_offset %d, spu_offset %d.\n",
@@ -585,7 +586,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
     }
   }
 
-  if(!xine_open(gGui->stream, (const char *) mrl)) {
+  gGui->suppress_messages++;
+  ret = xine_open(gGui->stream, (const char *) mrl);
+  gGui->suppress_messages--;
+  if (!ret) {
 
 #ifdef XINE_PARAM_GAPLESS_SWITCH
     if( xine_check_version(1,1,1) )
@@ -602,7 +606,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   
   if(_sub) {
     
-    if(xine_open(gGui->spu_stream, _sub))
+    gGui->suppress_messages++;
+    ret = xine_open(gGui->spu_stream, _sub);
+    gGui->suppress_messages--;
+    if (ret)
       xine_stream_master_slave(gGui->stream, 
 			       gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
   }
@@ -1275,7 +1282,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
 static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
   int  pos = (int)(intptr_t) data;
-  int  update_mmk = 0;
+  int  update_mmk = 0, ret;
   
   pthread_detach(pthread_self());
 
@@ -1284,7 +1291,10 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
   }
   
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
-    if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
+    gGui->suppress_messages++;
+    ret = xine_open(gGui->stream, (mediamark_get_current_mrl()));
+    gGui->suppress_messages--;
+    if (!ret) {
       gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
       pthread_mutex_unlock(&gGui->xe_mutex);
       pthread_exit(NULL);
@@ -1298,10 +1308,15 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
   }
     
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
+    gGui->suppress_messages++;
     xine_open(gGui->stream, gGui->mmk.mrl);
+    gGui->suppress_messages--;
 
     if(gGui->mmk.sub) {
-      if(xine_open(gGui->spu_stream, gGui->mmk.sub))
+      gGui->suppress_messages++;
+      ret = xine_open(gGui->spu_stream, gGui->mmk.sub);
+      gGui->suppress_messages--;
+      if (ret)
 	xine_stream_master_slave(gGui->stream, 
 				 gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
     }
@@ -2257,6 +2272,7 @@ void gui_file_selector(void) {
 
 static void subselector_callback(filebrowser_t *fb) {
   char *file;
+  int ret;
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file) {
@@ -2276,7 +2292,10 @@ static void subselector_callback(filebrowser_t *fb) {
 	  int curpos;
 	  xine_close (gGui->spu_stream);
 
-	  if(xine_open(gGui->spu_stream, mmk->sub))
+	  gGui->suppress_messages++;
+	  ret = xine_open(gGui->spu_stream, mmk->sub);
+	  gGui->suppress_messages--;
+	  if (ret)
 	    xine_stream_master_slave(gGui->stream, 
 				     gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
 	  
