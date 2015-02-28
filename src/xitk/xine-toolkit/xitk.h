@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2012 the xine project
+ * Copyright (C) 2000-2015 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -467,7 +467,7 @@ typedef struct {
   ImlibData                        *imlibdata;
   Window                            window;
   GC                                gc;
-  char                             *label;
+  const char                       *label;
   char                             *skin_element_name;
   xitk_simple_callback_t            callback;
   void                             *userdata;
@@ -596,7 +596,7 @@ typedef struct {
     } button;
 
     struct {
-      char                         *label_str;
+      const char                   *label_str;
       char                         *skin_element_name;
     } label;
 
