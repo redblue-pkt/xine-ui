@@ -116,6 +116,7 @@ static void changelist (otk_widget_t *list) {
     snprintf(tmp, 511, "%s %s",  ( i == gGui->playlist.cur ) ? "->" : "  ", pretty_name);
     otk_add_listentry(list, tmp, NULL, -1);
     free(pretty_name_free);
+    pretty_name_free = NULL;
   }
   otk_list_set_pos(list,0);
   otk_set_focus(list);
