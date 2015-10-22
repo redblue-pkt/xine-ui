@@ -7,19 +7,20 @@
 # César Chaparro <wendigo3@terra.com.pe>, 2004.
 # Carlos E. Robinson M. <carloser@users.sourceforge.net>, 2006, 2007, 2008, 2009.
 # Carlos E. Robinson M. <robin.listas@gmail.com>, 2010.
+# Carlos E. Robinson M. <carlos.e.r@opensuse.org>, 2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
-"PO-Revision-Date: 2010-04-29 13:48+0200\n"
-"Last-Translator: Carlos E. Robinson M. <robin.listas@gmail.com>\n"
-"Language-Team: Spanish\n"
+"POT-Creation-Date: 2014-08-21 22:25+0100\n"
+"PO-Revision-Date: 2015-10-18 01:37+0200\n"
+"Last-Translator: Carlos E. Robinson <carlos.e.r@opensuse.org>\n"
+"Language-Team: Spanish <xine-devel@lists.sourceforge.net>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Generator: Lokalize 1.5\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
@@ -132,13 +133,13 @@ msgid "Contrast"
 msgstr "Contraste"
 
 msgid "Gamma"
-msgstr ""
+msgstr "Gamma"
 
 msgid "Sharpness"
-msgstr ""
+msgstr "Nitidez"
 
 msgid "Noise reduction"
-msgstr ""
+msgstr "Reducción de ruido"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -172,7 +173,7 @@ msgstr "Control del valor de BRILLO"
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Brt"
-msgstr "Brl"
+msgstr "Bri"
 
 msgid "Control CONTRAST value"
 msgstr "Control del valor de CONTRASTE"
@@ -182,33 +183,29 @@ msgctxt "skin"
 msgid "Ctr"
 msgstr "Ctr"
 
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "Control del valor de TINTA (HUE)"
+msgstr "Control del valor de GAMMA"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Gam"
-msgstr ""
+msgstr "Gam"
 
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "Control del valor de BRILLO"
+msgstr "Control del valor de DEFINICIÓN"
 
 #. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
 msgctxt "skin"
 msgid "Sha"
-msgstr "Sat"
+msgstr "Def"
 
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "Control del valor de SATURACIÓN"
+msgstr "Control del valor de REDUCCIÓN DE RUIDO"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Noi"
-msgstr ""
+msgstr "Rui"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -667,6 +664,12 @@ msgstr "Ángulo"
 msgid "Part"
 msgstr "Parte"
 
+msgid "Top Menu"
+msgstr "Menú principal"
+
+msgid "Popup Menu"
+msgstr "Menú contextual"
+
 msgid "Close"
 msgstr "Cerrar"
 
@@ -875,13 +878,13 @@ msgstr "Visual incorrecto '%s'\n"
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Esto es xine (IGU X11) - un reproductor de vídeo libre v%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2007 El Equipo de xine.\n"
+"(c) 2000-2014 El Equipo de xine.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
@@ -1488,11 +1491,10 @@ msgstr ""
 "programa lo está utilizando ahora."
 
 msgid "Sorry, not implemented (authentication)"
-msgstr ""
+msgstr "Lo siento, no implementado (autenticación)"
 
-#, fuzzy
 msgid "*sight*, unknown error."
-msgstr "*suspiro*, error desconocido."
+msgstr "*ains*, error desconocido."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
@@ -1566,7 +1568,6 @@ msgstr "Carga automáticamente los subtítulos, si existen."
 msgid "Enable deinterlacing by default"
 msgstr "Habilita el desentrelazado por defecto"
 
-#, fuzzy
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automatically detected with no performance penalty."
@@ -2281,13 +2282,11 @@ msgstr "Seleccione una piel para descargar..."
 msgid "Error: "
 msgstr "Error: "
 
-#, fuzzy
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr "xine_get_current_frame() falló\n"
+msgstr "xine_grab_video_frame.grab () falló\n"
 
-#, fuzzy
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr "xine_get_current_frame() falló\n"
+msgstr "xine_new_grab_video_frame () falló\n"
 
 msgid "Wrong image size: "
 msgstr "Tamaño incorrecto de imagen: "
@@ -2566,3 +2565,5 @@ msgstr "Visor del registro de xine"
 
 msgid "Refresh"
 msgstr "Refrescar"
+
+
