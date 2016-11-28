@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2016 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -72,6 +72,12 @@ typedef struct {
   ImlibImage           *bg_image;
   xitk_register_key_t   widget_key;
   pthread_t             slider_thread;
+
+#ifdef PANEL_PRIVATE
+  /* private vars to avoid useless updates */
+  unsigned int          shown_time;
+  unsigned int          shown_length;
+#endif
   
 } _panel_t;
 
