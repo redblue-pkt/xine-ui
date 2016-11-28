@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2012 the xine project
+ * Copyright (C) 2000-2016 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -34,67 +34,104 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
   xitk_image_t          *font         = (xitk_image_t *) private_data->font;
   int                    pixwidth;
-  char                  *_label;
-  int                    x_dest, i;
-  int                    len;
+  int                    x_dest;
+  int                    len, anim_add = 0;
   
   private_data->anim_offset = 0;
 
-  if(private_data->animation) {
-    _label = (char *) xitk_xmalloc((strlen(private_data->label) * 2) + 5 + 1);
-    
-    if((strlen(private_data->label)) > private_data->length)
-      sprintf(_label, "%s *** %s", private_data->label, private_data->label);
-    else
-      strcpy(_label, private_data->label);
-    
-  }
-  else
-    _label = strdup(private_data->label);
-  
-  len                    = strlen(_label);
-  pixwidth               = private_data->char_length * ((private_data->length * ((len / private_data->length) + 1)) + 5);
-  private_data->labelpix = xitk_image_create_xitk_pixmap(private_data->imlibdata,
-							 (pixwidth) ? pixwidth : 1, private_data->char_height);
+  len = strlen (private_data->label);
+  if (private_data->animation && (len > private_data->length))
+    anim_add = private_data->length + 5;
 
+  /* reuse or reallocate pixmap */
+  pixwidth = len + anim_add;
+  if (pixwidth < private_data->length)
+    pixwidth = private_data->length;
+  if (pixwidth < 1)
+    pixwidth = 1;
+  pixwidth *= private_data->char_length;
+  if (private_data->labelpix) {
+    if ((private_data->labelpix->width != pixwidth)
+      || (private_data->labelpix->height != private_data->char_height)) {
+      xitk_image_destroy_xitk_pixmap (private_data->labelpix);
+      private_data->labelpix = NULL;
+    }
+  }
+  if (!private_data->labelpix) {
+    private_data->labelpix = xitk_image_create_xitk_pixmap (private_data->imlibdata, pixwidth,
+      private_data->char_height);
+#if 0
+    printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, private_data->char_height,
+      private_data->labelpix->width, private_data->labelpix->height, private_data->label);
+#endif
+  }
   x_dest = 0;
 
-  for (i = 0; i < len; i++) {
-    int c = 0;
-    
-    if ((i < len) && (_label[i] >= 32))
-      c = _label[i] - 32;
-
-    if (c >= 0) {
+  /* [foo] */
+  {
+    const unsigned char *p = (const unsigned char *)private_data->label;
+    XLOCK (private_data->imlibdata->x.disp);
+    while (*p) {
       int px, py;
-         
-      px = (c % 32) * private_data->char_length;
-      py = (c / 32) * private_data->char_height;
-      
-      XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea(private_data->imlibdata->x.disp, font->image->pixmap, 
-		private_data->labelpix->pixmap, private_data->labelpix->gc, px, py,
-		private_data->char_length, private_data->char_height, x_dest, 0);
-      XUNLOCK(private_data->imlibdata->x.disp);
-     
+      if ((*p < 32) || (*p >= 128)) {
+        px = py = 0;
+      } else {
+        px = ((*p) & 31) * private_data->char_length;
+        py = (((*p) >> 5) - 1) * private_data->char_height;
+      }
+      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+        private_data->labelpix->pixmap, private_data->labelpix->gc, px, py,
+        private_data->char_length, private_data->char_height, x_dest, 0);
+      x_dest += private_data->char_length;
+      p++;
     }
-    
+    XUNLOCK (private_data->imlibdata->x.disp);
+  }
+  /* foo[ *** fo] */
+  if (anim_add) {
+    XLOCK (private_data->imlibdata->x.disp);
+#define PX(z) ((z & 31) * private_data->char_length)
+#define PY(z) (((z >> 5) - 1) * private_data->char_height)
+    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, PX (' '), PY (' '),
+        private_data->char_length, private_data->char_height, x_dest, 0);
     x_dest += private_data->char_length;
+    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
+        private_data->char_length, private_data->char_height, x_dest, 0);
+    x_dest += private_data->char_length;
+    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
+        private_data->char_length, private_data->char_height, x_dest, 0);
+    x_dest += private_data->char_length;
+    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
+        private_data->char_length, private_data->char_height, x_dest, 0);
+    x_dest += private_data->char_length;
+    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, PX (' '), PY (' '),
+        private_data->char_length, private_data->char_height, x_dest, 0);
+    x_dest += private_data->char_length;
+    XCopyArea (private_data->imlibdata->x.disp, private_data->labelpix->pixmap,
+      private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
+      pixwidth - x_dest, private_data->char_height, x_dest, 0);
+#undef PX
+#undef PY
+    XUNLOCK (private_data->imlibdata->x.disp);
+    x_dest = pixwidth;
   }
   
   /* fill gap with spaces */
-  if(len < private_data->length) {
-    XLOCK(private_data->imlibdata->x.disp);
-    for(; i < private_data->length; i++) {
-      XCopyArea(private_data->imlibdata->x.disp, font->image->pixmap, 
-		private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
-		private_data->char_length, private_data->char_height, x_dest, 0);
+  if (x_dest < pixwidth) {
+    XLOCK (private_data->imlibdata->x.disp);
+    do {
+      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+                 private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
+                 private_data->char_length, private_data->char_height, x_dest, 0);
       x_dest += private_data->char_length;
-    }
+    } while (x_dest < pixwidth);
     XUNLOCK(private_data->imlibdata->x.disp);
   }
-
-  free(_label);
 }
 
 /*
@@ -285,7 +322,7 @@ static __attribute__((noreturn)) void *xitk_label_animation_loop(void *data) {
  */
 static void label_setup_label(xitk_widget_t *w, const char *label_) {
   label_private_data_t *private_data = (label_private_data_t *) w->private_data;
-  int label_len;
+  size_t new_len;
   
   /* Inform animation thread to not paint the label */
   pthread_mutex_lock(&private_data->paint_mutex);
@@ -298,26 +335,33 @@ static void label_setup_label(xitk_widget_t *w, const char *label_) {
     pthread_join (private_data->thread, &dummy);
   }
 
-  if(private_data->label)
-    XITK_FREE(private_data->label);
-  
-  if(private_data->labelpix) {
-    xitk_image_destroy_xitk_pixmap(private_data->labelpix);
-    private_data->labelpix = NULL;
+  if (!label_)
+    label_ = "";
+  new_len = strlen (label_);
+
+  if (private_data->label) {
+    if (strlen (private_data->label) != new_len) {
+      XITK_FREE (private_data->label);
+      private_data->label = NULL;
+    }
   }
+  if (!private_data->label)
+    private_data->label = xitk_xmalloc (new_len + 1);
+  memcpy (private_data->label, label_, new_len + 1);
 
-  label_len = strlen(label_);
-
-  private_data->label = strdup((label_ != NULL) ? label_ : "");
-
-  if(private_data->skin_element_name != NULL)
+  if (private_data->skin_element_name != NULL) {
     _create_label_pixmap(w);
-  else
+  } else {
+    if (private_data->labelpix) {
+      xitk_image_destroy_xitk_pixmap (private_data->labelpix);
+      private_data->labelpix = NULL;
+    }
     private_data->anim_offset = 0;
+  }
 
   if(private_data->animation) {
     
-    if(label_len > private_data->length) {
+    if(new_len > private_data->length) {
       pthread_attr_t       pth_attrs;
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
       struct sched_param   pth_params;
