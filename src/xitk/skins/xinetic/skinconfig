@@ -87,7 +87,7 @@ skin.TimeLabel {
 	  y = 37
 	}
 	label {
-	  length = 8
+	  length = 12
 	  animation = False
 	  pixmap = Letters.png
 	}
