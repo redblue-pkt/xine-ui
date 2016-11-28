@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2013 the xine project
+ * Copyright (C) 2000-2016 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -29,6 +29,7 @@
 #include <string.h>
 #include <pthread.h>
 
+#define PANEL_PRIVATE
 #include "common.h"
 
 
@@ -288,9 +289,42 @@ void panel_change_skins(int synthetic) {
 /*
  * Update runtime displayed informations.
  */
+static void secs2str (char *s, unsigned int secs) {
+  /* Avoid slow snprintf (). Yes this does not support south asian */
+  /* alternative digits, but neither does the widget bitmap font.  */
+  /* But wait -- what if you modify letters.png now ?              */
+  if (secs >= 24 * 60 * 60) { /* [  dd::hh] */
+    unsigned int days;
+    secs /= 3600u;
+    days = secs / 24u;
+    secs %= 24u;
+    memcpy (s, "    ::  ", 8);
+    s[8] = 0;
+    s[7] = (secs % 10u) + '0';
+    s[6] = (secs / 10u) + '0';
+    s[3] = (days % 10u) + '0';
+    days /= 10u;
+    if (days)
+      s[2] = days + '0';
+  } else { /* [hh:mm:ss] */
+    s[8] = 0;
+    s[7] = (secs % 10u) + '0';
+    secs /= 10u;
+    s[6] = (secs % 6u) + '0';
+    secs /= 6u;
+    s[5] = ':';
+    s[4] = (secs % 10u) + '0';
+    secs /= 10u;
+    s[3] = (secs % 6u) + '0';
+    secs /= 6u;
+    s[2] = ':';
+    s[1] = (secs % 10u) + '0';
+    s[0] = (secs / 10u) + '0';
+  }
+}
 void panel_update_runtime_display(void) {
-  int seconds, pos, length, remain;
-  char timestr[10], buffer[256];
+  int seconds, pos, length;
+  char timestr[16];
 
   if(!panel_is_visible())
     return;
@@ -307,51 +341,58 @@ void panel_update_runtime_display(void) {
 
   }
 
-  if(pos || seconds) {
-    int days, rdays;
-    
-    remain  = (length - seconds) / 1000;
-    seconds /= 1000;
-    days    = seconds / (60*60*24);
-    rdays   = remain / (60*60*24);
-
-    if(panel->runtime_mode == 0) {
-      if(days > 0)
-	snprintf(timestr, sizeof(timestr), "% 4d::%02d", days, seconds / (60*60));
-      else
-	snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
+  do {
+    unsigned int msecs = seconds, secs;
+    if (!(pos || msecs)) { /* are you sure there is something to play? */
+      panel->shown_time = ~3;
+      strcpy (timestr, "--:--:--");
+      break;
     }
-    else
-      if(remain < 0)
-	strcpy(timestr, "  :  :  ");
-      else {
-	if(rdays > 0)
-	  snprintf(timestr, sizeof(timestr), "% 4d::%02d", rdays, remain / (60*60));
-	else
-	  snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
+    if (panel->runtime_mode) { /* show remaining time */
+      if (msecs > (unsigned int)length) {
+        panel->shown_time = ~3;
+        strcpy (timestr, "  :  :  ");
+        break;
       }
-    
-  }
-  else
-    strcpy(timestr, "--:--:--");
+      msecs = length - msecs;
+    }
+    if (msecs == panel->shown_time) {
+      timestr[0] = 0;
+      break;
+    }
+    panel->shown_time = msecs;
+    secs   = msecs / 1000u;
+    msecs %= 1000u;
+    secs2str (timestr, secs);
+    if (xine_get_param (gGui->stream, XINE_PARAM_SPEED) > XINE_SPEED_NORMAL / 2)
+      break;
+    /* millisecond information is useful when editing. since we only update */
+    /* twice a second, show this in slow mode only. */
+    timestr[12] = 0;
+    timestr[11] = (msecs % 10u) + '0';
+    msecs /= 10u;
+    timestr[10] = (msecs % 10u) + '0';
+    timestr[9] = (msecs / 10u) + '0';
+    timestr[8] = '.';
+  } while (0);
   
-  if(length > 0) {
-    int days;
-
-    length /= 1000;
-    days = length / (60*60*24);
-    
-    if(days > 0)
-      snprintf(buffer, sizeof(buffer), "%s% 4d::%02d", _("Total time: "), days, length / (60*60));
+  if ((unsigned int)length != panel->shown_length) {
+    char buffer[256];
+    const char *ts = _("Total time: ");
+    size_t tl = strlen (ts);
+    if (tl > sizeof (buffer) - 9)
+      tl = sizeof (buffer) - 9;
+    memcpy (buffer, ts, tl);
+    panel->shown_length = length;
+    if (length > 0)
+      secs2str (buffer + tl, length / 1000);
     else
-      snprintf(buffer, sizeof(buffer), "%s%02d:%02d:%02d", _("Total time: "), length / (60*60), (length / 60) % 60, length % 60);
+      strcpy (buffer + tl, "??:??:??");
+    xitk_set_widget_tips (panel->runtime_label, buffer);
   }
-  else
-    snprintf(buffer, sizeof(buffer), "%s%s", _("Total time: "), "??:??:??");
-  
-  xitk_set_widget_tips(panel->runtime_label, buffer);
-  
-  xitk_label_change_label(panel->runtime_label, timestr); 
+
+  if (timestr[0])
+    xitk_label_change_label (panel->runtime_label, timestr);
 }
 
 /*
@@ -1095,6 +1136,9 @@ void panel_init (void) {
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
   panel = (_panel_t *) calloc(1, sizeof(_panel_t));
+
+  panel->shown_length = ~3;
+  panel->shown_time = ~3;
 
   panel->playback_widgets.enabled = -1;
 
