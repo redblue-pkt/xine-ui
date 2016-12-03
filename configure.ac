@@ -720,8 +720,8 @@ AC_SUBST(SYSCONF_DIR)
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
-AC_SUBST(INCLUDES)
+AM_CPPFLAGS='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
+AC_SUBST(AM_CPPFLAGS)
 
 AC_DEFINE(NEED_MRLBROWSER,,[Define this to add mrl browser into xitk lib])
 

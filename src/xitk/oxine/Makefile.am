@@ -2,7 +2,7 @@ include $(top_srcdir)/misc/Makefile.quiet
 
 SUBDIRS = data
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/xitk
+AM_CPPFLAGS += -I$(top_srcdir)/src/xitk
 AM_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS)
 
 if HAVE_X11
