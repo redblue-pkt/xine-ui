@@ -1,6 +1,6 @@
 #warning IMPLEMENT POST SUPPORT
 /*
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2014 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
