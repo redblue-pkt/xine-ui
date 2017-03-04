@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2015 the xine project
+ * Copyright (C) 2000-2017 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -1937,7 +1937,6 @@ int main(int argc, char *argv[]) {
       if(_argv[optind]) {
 	for(i = optind; i < _argc; i++) {
 	  char enqueue_mrl[strlen(_argv[i]) + 256];
-	  char *filename = NULL;
 	  snprintf(enqueue_mrl, sizeof(enqueue_mrl), "session=%d", session);
 	  (void) session_handle_subopt(enqueue_mrl, _argv[i], &session);
 	}
