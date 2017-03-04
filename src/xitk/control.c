@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -71,37 +71,44 @@ static int hue_ena, sat_ena, bright_ena, contr_ena, gamma_ena, sharp_ena, noise_
 
 
 static void hue_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.hue =
-    (cfg->num_value < 0) ? gGui->video_settings.default_hue : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.hue =
+    (cfg->num_value < 0) ? gui->video_settings.default_hue : cfg->num_value;
 }
 static void brightness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.brightness =
-    (cfg->num_value < 0) ? gGui->video_settings.default_brightness : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.brightness =
+    (cfg->num_value < 0) ? gui->video_settings.default_brightness : cfg->num_value;
 }
 static void saturation_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.saturation =
-    (cfg->num_value < 0) ? gGui->video_settings.default_saturation : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.saturation =
+    (cfg->num_value < 0) ? gui->video_settings.default_saturation : cfg->num_value;
 }
 static void contrast_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.contrast =
-    (cfg->num_value < 0) ? gGui->video_settings.default_contrast : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.contrast =
+    (cfg->num_value < 0) ? gui->video_settings.default_contrast : cfg->num_value;
 }
 #ifdef XINE_PARAM_VO_GAMMA
 static void gamma_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.gamma =
-    (cfg->num_value < 0) ? gGui->video_settings.default_gamma : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.gamma =
+    (cfg->num_value < 0) ? gui->video_settings.default_gamma : cfg->num_value;
 }
 #endif
 #ifdef XINE_PARAM_VO_SHARPNESS
 static void sharpness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.sharpness =
-    (cfg->num_value < 0) ? gGui->video_settings.default_sharpness : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.sharpness =
+    (cfg->num_value < 0) ? gui->video_settings.default_sharpness : cfg->num_value;
 }
 #endif
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
 static void noise_reduction_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->video_settings.noise_reduction =
-    (cfg->num_value < 0) ? gGui->video_settings.default_noise_reduction : cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->video_settings.noise_reduction =
+    (cfg->num_value < 0) ? gui->video_settings.default_noise_reduction : cfg->num_value;
 }
 #endif
 
@@ -127,14 +134,16 @@ void control_update_tips_timeout(unsigned long timeout) {
  * Get current parameter 'param' value.
  */
 static int get_current_param(int param) {
-  return (xine_get_param(gGui->stream, param));
+  gGui_t *gui = gGui;
+  return (xine_get_param(gui->stream, param));
 }
 
 /*
  * set parameter 'param' to value 'value'.
  */
 static void set_current_param(int param, int value) {
-  xine_set_param(gGui->stream, param, value);
+  gGui_t *gui = gGui;
+  xine_set_param(gui->stream, param, value);
 }
 
 /*
@@ -284,59 +293,60 @@ static void set_noise_reduction(xitk_widget_t *w, void *data, int value) {
 }
 
 void control_inc_image_prop(int prop) {
+  gGui_t *gui = gGui;
   switch(prop) {
   case XINE_PARAM_VO_HUE:
-    if(hue_ena && gGui->video_settings.hue <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
-      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
+    if(hue_ena && gui->video_settings.hue <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_hue", gui->video_settings.hue + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_HUE, gui->video_settings.hue);
+      osd_draw_bar(_("Hue"), 0, 65535, gui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_SATURATION:
-    if(sat_ena && gGui->video_settings.saturation <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
-      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
+    if(sat_ena && gui->video_settings.saturation <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_saturation", gui->video_settings.saturation + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_SATURATION, gui->video_settings.saturation);
+      osd_draw_bar(_("Saturation"), 0, 65535, gui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_BRIGHTNESS:
-    if(bright_ena && gGui->video_settings.brightness <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
-      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
+    if(bright_ena && gui->video_settings.brightness <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_brightness", gui->video_settings.brightness + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gui->video_settings.brightness);
+      osd_draw_bar(_("Brightness"), 0, 65535, gui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_CONTRAST:
-    if(contr_ena && gGui->video_settings.contrast <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
-      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
+    if(contr_ena && gui->video_settings.contrast <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_contrast", gui->video_settings.contrast + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_CONTRAST, gui->video_settings.contrast);
+      osd_draw_bar(_("Contrast"), 0, 65535, gui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
 #ifdef XINE_PARAM_VO_GAMMA
   case XINE_PARAM_VO_GAMMA:
-    if(gamma_ena && gGui->video_settings.gamma <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_gamma", gGui->video_settings.gamma + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_GAMMA, gGui->video_settings.gamma);
-      osd_draw_bar(_("Gamma"), 0, 65535, gGui->video_settings.gamma, OSD_BAR_STEPPER);
+    if(gamma_ena && gui->video_settings.gamma <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_gamma", gui->video_settings.gamma + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_GAMMA, gui->video_settings.gamma);
+      osd_draw_bar(_("Gamma"), 0, 65535, gui->video_settings.gamma, OSD_BAR_STEPPER);
     }
     break;
 #endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   case XINE_PARAM_VO_SHARPNESS:
-    if(sharp_ena && gGui->video_settings.sharpness <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_sharpness", gGui->video_settings.sharpness + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_SHARPNESS, gGui->video_settings.sharpness);
-      osd_draw_bar(_("Sharpness"), 0, 65535, gGui->video_settings.sharpness, OSD_BAR_STEPPER);
+    if(sharp_ena && gui->video_settings.sharpness <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_sharpness", gui->video_settings.sharpness + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_SHARPNESS, gui->video_settings.sharpness);
+      osd_draw_bar(_("Sharpness"), 0, 65535, gui->video_settings.sharpness, OSD_BAR_STEPPER);
     }
     break;
 #endif
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
   case XINE_PARAM_VO_NOISE_REDUCTION:
-    if(noise_ena && gGui->video_settings.noise_reduction <= (65535 - STEP_SIZE)) {
-      config_update_num("gui.vo_noise_reduction", gGui->video_settings.noise_reduction + STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gGui->video_settings.noise_reduction);
-      osd_draw_bar(_("Noise reduction"), 0, 65535, gGui->video_settings.noise_reduction, OSD_BAR_STEPPER);
+    if(noise_ena && gui->video_settings.noise_reduction <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_noise_reduction", gui->video_settings.noise_reduction + STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gui->video_settings.noise_reduction);
+      osd_draw_bar(_("Noise reduction"), 0, 65535, gui->video_settings.noise_reduction, OSD_BAR_STEPPER);
     }
     break;
 #endif
@@ -348,59 +358,60 @@ void control_inc_image_prop(int prop) {
 }
 
 void control_dec_image_prop(int prop) {
+  gGui_t *gui = gGui;
   switch(prop) {
   case XINE_PARAM_VO_HUE:
-    if(hue_ena && gGui->video_settings.hue >= STEP_SIZE) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
-      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
+    if(hue_ena && gui->video_settings.hue >= STEP_SIZE) {
+      config_update_num("gui.vo_hue", gui->video_settings.hue - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_HUE, gui->video_settings.hue);
+      osd_draw_bar(_("Hue"), 0, 65535, gui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_SATURATION:
-    if(sat_ena && gGui->video_settings.saturation >= STEP_SIZE) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
-      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
+    if(sat_ena && gui->video_settings.saturation >= STEP_SIZE) {
+      config_update_num("gui.vo_saturation", gui->video_settings.saturation - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_SATURATION, gui->video_settings.saturation);
+      osd_draw_bar(_("Saturation"), 0, 65535, gui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_BRIGHTNESS:
-    if(bright_ena && gGui->video_settings.brightness >= STEP_SIZE) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
-      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
+    if(bright_ena && gui->video_settings.brightness >= STEP_SIZE) {
+      config_update_num("gui.vo_brightness", gui->video_settings.brightness - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gui->video_settings.brightness);
+      osd_draw_bar(_("Brightness"), 0, 65535, gui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
   case XINE_PARAM_VO_CONTRAST:
-    if(contr_ena && gGui->video_settings.contrast >= STEP_SIZE) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
-      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
+    if(contr_ena && gui->video_settings.contrast >= STEP_SIZE) {
+      config_update_num("gui.vo_contrast", gui->video_settings.contrast - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_CONTRAST, gui->video_settings.contrast);
+      osd_draw_bar(_("Contrast"), 0, 65535, gui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
 #ifdef XINE_PARAM_VO_GAMMA
   case XINE_PARAM_VO_GAMMA:
-    if(gamma_ena && gGui->video_settings.gamma >= STEP_SIZE) {
-      config_update_num("gui.vo_gamma", gGui->video_settings.gamma - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_GAMMA, gGui->video_settings.gamma);
-      osd_draw_bar(_("Gamma"), 0, 65535, gGui->video_settings.gamma, OSD_BAR_STEPPER);
+    if(gamma_ena && gui->video_settings.gamma >= STEP_SIZE) {
+      config_update_num("gui.vo_gamma", gui->video_settings.gamma - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_GAMMA, gui->video_settings.gamma);
+      osd_draw_bar(_("Gamma"), 0, 65535, gui->video_settings.gamma, OSD_BAR_STEPPER);
     }
     break;
 #endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   case XINE_PARAM_VO_SHARPNESS:
-    if(sharp_ena && gGui->video_settings.sharpness >= STEP_SIZE) {
-      config_update_num("gui.vo_sharpness", gGui->video_settings.sharpness - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_SHARPNESS, gGui->video_settings.sharpness);
-      osd_draw_bar(_("Sharpness"), 0, 65535, gGui->video_settings.sharpness, OSD_BAR_STEPPER);
+    if(sharp_ena && gui->video_settings.sharpness >= STEP_SIZE) {
+      config_update_num("gui.vo_sharpness", gui->video_settings.sharpness - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_SHARPNESS, gui->video_settings.sharpness);
+      osd_draw_bar(_("Sharpness"), 0, 65535, gui->video_settings.sharpness, OSD_BAR_STEPPER);
     }
     break;
 #endif
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
   case XINE_PARAM_VO_NOISE_REDUCTION:
-    if(noise_ena && gGui->video_settings.noise_reduction >= STEP_SIZE) {
-      config_update_num("gui.vo_noise_reduction", gGui->video_settings.noise_reduction - STEP_SIZE);
-      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gGui->video_settings.noise_reduction);
-      osd_draw_bar(_("Noise reduction"), 0, 65535, gGui->video_settings.noise_reduction, OSD_BAR_STEPPER);
+    if(noise_ena && gui->video_settings.noise_reduction >= STEP_SIZE) {
+      config_update_num("gui.vo_noise_reduction", gui->video_settings.noise_reduction - STEP_SIZE);
+      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gui->video_settings.noise_reduction);
+      osd_draw_bar(_("Noise reduction"), 0, 65535, gui->video_settings.noise_reduction, OSD_BAR_STEPPER);
     }
     break;
 #endif
@@ -490,7 +501,8 @@ static void probe_active_controls(void) {
 /* xine-lib 1.2 */
 
 static void probe_active_controls(void) {
-  uint64_t cap = gGui->vo_port->get_capabilities(gGui->vo_port);
+  gGui_t *gui = gGui;
+  uint64_t cap = gui->vo_port->get_capabilities(gui->vo_port);
 
   hue_ena    = ((cap & VO_CAP_HUE) != 0);
   bright_ena = ((cap & VO_CAP_BRIGHTNESS) != 0);
@@ -519,41 +531,42 @@ static void probe_active_controls(void) {
  * Reset video settings.
  */
 void control_reset(void) {
+  gGui_t *gui = gGui;
   
   if(hue_ena) {
-    set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.default_hue);
+    set_current_param(XINE_PARAM_VO_HUE, gui->video_settings.default_hue);
     config_update_num("gui.vo_hue", -1);
   }
 
   if(sat_ena) {
-    set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.default_saturation);
+    set_current_param(XINE_PARAM_VO_SATURATION, gui->video_settings.default_saturation);
     config_update_num("gui.vo_saturation", -1);
   }
 
   if(bright_ena) {
-    set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.default_brightness);
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS, gui->video_settings.default_brightness);
     config_update_num("gui.vo_brightness", -1);
   }
 
   if(contr_ena) {
-    set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.default_contrast);
+    set_current_param(XINE_PARAM_VO_CONTRAST, gui->video_settings.default_contrast);
     config_update_num("gui.vo_contrast", -1);
   }
 #ifdef XINE_PARAM_VO_GAMMA
   if(gamma_ena) {
-    set_current_param(XINE_PARAM_VO_GAMMA, gGui->video_settings.default_gamma);
+    set_current_param(XINE_PARAM_VO_GAMMA, gui->video_settings.default_gamma);
     config_update_num("gui.vo_gamma", -1);
   }
 #endif
 #ifdef XINE_PARAM_VO_SHARPNESS
   if(sharp_ena) {
-    set_current_param(XINE_PARAM_VO_SHARPNESS, gGui->video_settings.default_sharpness);
+    set_current_param(XINE_PARAM_VO_SHARPNESS, gui->video_settings.default_sharpness);
     config_update_num("gui.vo_sharpness", -1);
   }
 #endif
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
   if(noise_ena) {
-    set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gGui->video_settings.default_noise_reduction);
+    set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gui->video_settings.default_noise_reduction);
     config_update_num("gui.vo_noise_reduction", -1);
   }
 #endif
@@ -562,11 +575,12 @@ void control_reset(void) {
 }
 
 void control_config_register(void) {
+  gGui_t *gui = gGui;
   
   probe_active_controls();
   
   if(hue_ena) {
-    gGui->video_settings.hue = 
+    gui->video_settings.hue = 
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_hue",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
@@ -575,17 +589,17 @@ void control_config_register(void) {
 				CONFIG_LEVEL_DEB,
 				hue_changes_cb, 
 				CONFIG_NO_DATA);
-    gGui->video_settings.default_hue = get_current_param(XINE_PARAM_VO_HUE);
-    if(gGui->video_settings.hue < 0)
-      gGui->video_settings.hue = gGui->video_settings.default_hue;
+    gui->video_settings.default_hue = get_current_param(XINE_PARAM_VO_HUE);
+    if(gui->video_settings.hue < 0)
+      gui->video_settings.hue = gui->video_settings.default_hue;
     else {
-      set_current_param(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
-      gGui->video_settings.hue = get_current_param(XINE_PARAM_VO_HUE);
+      set_current_param(XINE_PARAM_VO_HUE, gui->video_settings.hue);
+      gui->video_settings.hue = get_current_param(XINE_PARAM_VO_HUE);
     }
   }
   
   if(bright_ena) {
-    gGui->video_settings.brightness = 
+    gui->video_settings.brightness = 
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_brightness",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
@@ -594,17 +608,17 @@ void control_config_register(void) {
 				CONFIG_LEVEL_DEB,
 				brightness_changes_cb, 
 				CONFIG_NO_DATA);
-    gGui->video_settings.default_brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
-    if(gGui->video_settings.brightness < 0)
-      gGui->video_settings.brightness = gGui->video_settings.default_brightness;
+    gui->video_settings.default_brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
+    if(gui->video_settings.brightness < 0)
+      gui->video_settings.brightness = gui->video_settings.default_brightness;
     else {
-      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
-      gGui->video_settings.brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
+      set_current_param(XINE_PARAM_VO_BRIGHTNESS, gui->video_settings.brightness);
+      gui->video_settings.brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
     }
   }
 
   if(sat_ena) {
-   gGui->video_settings.saturation = 
+   gui->video_settings.saturation = 
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_saturation",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
@@ -613,17 +627,17 @@ void control_config_register(void) {
 				CONFIG_LEVEL_DEB,
 				saturation_changes_cb, 
 				CONFIG_NO_DATA);
-    gGui->video_settings.default_saturation = get_current_param(XINE_PARAM_VO_SATURATION);
-    if(gGui->video_settings.saturation < 0)
-      gGui->video_settings.saturation = gGui->video_settings.default_saturation;
+    gui->video_settings.default_saturation = get_current_param(XINE_PARAM_VO_SATURATION);
+    if(gui->video_settings.saturation < 0)
+      gui->video_settings.saturation = gui->video_settings.default_saturation;
     else {
-      set_current_param(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
-      gGui->video_settings.saturation = get_current_param(XINE_PARAM_VO_SATURATION);
+      set_current_param(XINE_PARAM_VO_SATURATION, gui->video_settings.saturation);
+      gui->video_settings.saturation = get_current_param(XINE_PARAM_VO_SATURATION);
     }
   }
 
   if(contr_ena) {
-    gGui->video_settings.contrast = 
+    gui->video_settings.contrast = 
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_contrast",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
@@ -632,18 +646,18 @@ void control_config_register(void) {
 				CONFIG_LEVEL_DEB,
 				contrast_changes_cb, 
 				CONFIG_NO_DATA);
-    gGui->video_settings.default_contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
-    if(gGui->video_settings.contrast < 0)
-      gGui->video_settings.contrast = gGui->video_settings.default_contrast;
+    gui->video_settings.default_contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
+    if(gui->video_settings.contrast < 0)
+      gui->video_settings.contrast = gui->video_settings.default_contrast;
     else {
-      set_current_param(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
-      gGui->video_settings.contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
+      set_current_param(XINE_PARAM_VO_CONTRAST, gui->video_settings.contrast);
+      gui->video_settings.contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
     }
   }
 
 #ifdef XINE_PARAM_VO_GAMMA
   if(gamma_ena) {
-    gGui->video_settings.gamma =
+    gui->video_settings.gamma =
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_gamma",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
@@ -652,19 +666,19 @@ void control_config_register(void) {
                                 CONFIG_LEVEL_DEB,
                                 gamma_changes_cb,
                                 CONFIG_NO_DATA);
-    gGui->video_settings.default_gamma = get_current_param(XINE_PARAM_VO_GAMMA);
-    if(gGui->video_settings.gamma < 0)
-      gGui->video_settings.gamma = gGui->video_settings.default_gamma;
+    gui->video_settings.default_gamma = get_current_param(XINE_PARAM_VO_GAMMA);
+    if(gui->video_settings.gamma < 0)
+      gui->video_settings.gamma = gui->video_settings.default_gamma;
     else {
-      set_current_param(XINE_PARAM_VO_GAMMA, gGui->video_settings.gamma);
-      gGui->video_settings.gamma = get_current_param(XINE_PARAM_VO_GAMMA);
+      set_current_param(XINE_PARAM_VO_GAMMA, gui->video_settings.gamma);
+      gui->video_settings.gamma = get_current_param(XINE_PARAM_VO_GAMMA);
     }
   }
 #endif
 
 #ifdef XINE_PARAM_VO_SHARPNESS
   if(sharp_ena) {
-    gGui->video_settings.sharpness =
+    gui->video_settings.sharpness =
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_sharpness",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
@@ -673,19 +687,19 @@ void control_config_register(void) {
                                 CONFIG_LEVEL_DEB,
                                 sharpness_changes_cb,
                                 CONFIG_NO_DATA);
-    gGui->video_settings.default_sharpness = get_current_param(XINE_PARAM_VO_SHARPNESS);
-    if(gGui->video_settings.sharpness < 0)
-      gGui->video_settings.sharpness = gGui->video_settings.default_sharpness;
+    gui->video_settings.default_sharpness = get_current_param(XINE_PARAM_VO_SHARPNESS);
+    if(gui->video_settings.sharpness < 0)
+      gui->video_settings.sharpness = gui->video_settings.default_sharpness;
     else {
-      set_current_param(XINE_PARAM_VO_SHARPNESS, gGui->video_settings.sharpness);
-      gGui->video_settings.sharpness = get_current_param(XINE_PARAM_VO_SHARPNESS);
+      set_current_param(XINE_PARAM_VO_SHARPNESS, gui->video_settings.sharpness);
+      gui->video_settings.sharpness = get_current_param(XINE_PARAM_VO_SHARPNESS);
     }
   }
 #endif
 
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
   if(noise_ena) {
-    gGui->video_settings.noise_reduction =
+    gui->video_settings.noise_reduction =
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_noise_reduction",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
@@ -694,12 +708,12 @@ void control_config_register(void) {
                                 CONFIG_LEVEL_DEB,
                                 noise_reduction_changes_cb,
                                 CONFIG_NO_DATA);
-    gGui->video_settings.default_noise_reduction = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
-    if(gGui->video_settings.noise_reduction < 0)
-      gGui->video_settings.noise_reduction = gGui->video_settings.default_noise_reduction;
+    gui->video_settings.default_noise_reduction = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
+    if(gui->video_settings.noise_reduction < 0)
+      gui->video_settings.noise_reduction = gui->video_settings.default_noise_reduction;
     else {
-      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gGui->video_settings.noise_reduction);
-      gGui->video_settings.noise_reduction = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
+      set_current_param(XINE_PARAM_VO_NOISE_REDUCTION, gui->video_settings.noise_reduction);
+      gui->video_settings.noise_reduction = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
     }
   }
 #endif
@@ -709,6 +723,7 @@ void control_config_register(void) {
  * Leaving control panel, release memory.
  */
 void control_exit(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   if(control) {
     window_info_t wi;
@@ -725,23 +740,23 @@ void control_exit(xitk_widget_t *w, void *data) {
 
     xitk_unregister_event_handler(&control->widget_key);
 
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, control->window);
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XUnmapWindow(gui->display, control->window);
+    XUnlockDisplay(gui->display);
 
     xitk_destroy_widgets(control->widget_list);
 
-    XLockDisplay(gGui->display);
-    XDestroyWindow(gGui->display, control->window);
-    Imlib_destroy_image(gGui->imlib_data, control->bg_image);
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XDestroyWindow(gui->display, control->window);
+    Imlib_destroy_image(gui->imlib_data, control->bg_image);
+    XUnlockDisplay(gui->display);
 
     control->window = None;
     xitk_list_free((XITK_WIDGET_LIST_LIST(control->widget_list)));
 
-    XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(control->widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(control->widget_list)));
+    XUnlockDisplay(gui->display);
 
     XITK_WIDGET_LIST_FREE(control->widget_list);
 
@@ -751,7 +766,7 @@ void control_exit(xitk_widget_t *w, void *data) {
     free(control);
     control = NULL;
 
-    try_to_set_input_focus(gGui->video_window);
+    try_to_set_input_focus(gui->video_window);
   }
 }
 
@@ -770,12 +785,13 @@ int control_is_running(void) {
  * Return 1 if control panel is visible
  */
 int control_is_visible(void) {
+  gGui_t *gui = gGui;
 
   if(control != NULL) {
-    if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, control->window);
+    if(gui->use_root_window)
+      return xitk_is_window_visible(gui->display, control->window);
     else
-      return control->visible && xitk_is_window_visible(gGui->display, control->window);
+      return control->visible && xitk_is_window_visible(gui->display, control->window);
   }
 
   return 0;
@@ -802,6 +818,7 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
  * Handle X events here.
  */
 static void control_handle_event(XEvent *event, void *data) {
+  gGui_t *gui = gGui;
   
   switch(event->type) {
   case ButtonPress: {
@@ -810,7 +827,7 @@ static void control_handle_event(XEvent *event, void *data) {
     if(bevent->button == Button3) {
       int wx, wy;
       
-      xitk_get_window_position(gGui->display, control->window, &wx, &wy, NULL, NULL);
+      xitk_get_window_position(gui->display, control->window, &wx, &wy, NULL, NULL);
       control_menu(control->widget_list, bevent->x + wx, bevent->y + wy);
     }
   }
@@ -830,37 +847,38 @@ static void control_handle_event(XEvent *event, void *data) {
  * Change the current skin.
  */
 void control_change_skins(int synthetic) {
+  gGui_t *gui = gGui;
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
 
   if(control_is_running()) {
     
-    xitk_skin_lock(gGui->skin_config);
+    xitk_skin_lock(gui->skin_config);
     xitk_hide_widgets(control->widget_list);
 
-    XLockDisplay(gGui->display);
+    XLockDisplay(gui->display);
     
-    if(!(new_img = Imlib_load_image(gGui->imlib_data,
-				    xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
+    if(!(new_img = Imlib_load_image(gui->imlib_data,
+				    xitk_skin_get_skin_filename(gui->skin_config, "CtlBG")))) {
       xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    XUnlockDisplay(gGui->display);
+    XUnlockDisplay(gui->display);
 
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
 
-    XLockDisplay(gGui->display);
-    XSetWMNormalHints(gGui->display, control->window, &hint);
+    XLockDisplay(gui->display);
+    XSetWMNormalHints(gui->display, control->window, &hint);
     
-    XResizeWindow (gGui->display, control->window,
+    XResizeWindow (gui->display, control->window,
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
     
-    XUnlockDisplay(gGui->display);
+    XUnlockDisplay(gui->display);
     
-    while(!xitk_is_window_size(gGui->display, control->window, 
+    while(!xitk_is_window_size(gui->display, control->window, 
 			       new_img->rgb_width, new_img->rgb_height)) {
       xine_usec_sleep(10000);
     }
@@ -868,21 +886,21 @@ void control_change_skins(int synthetic) {
     old_img = control->bg_image;
     control->bg_image = new_img;
     
-    XLockDisplay(gGui->display);
-    if(!gGui->use_root_window && gGui->video_display == gGui->display)
-      XSetTransientForHint(gGui->display, control->window, gGui->video_window);
+    XLockDisplay(gui->display);
+    if(!gui->use_root_window && gui->video_display == gui->display)
+      XSetTransientForHint(gui->display, control->window, gui->video_window);
     
-    Imlib_destroy_image(gGui->imlib_data, old_img);
-    Imlib_apply_image(gGui->imlib_data, new_img, control->window);
+    Imlib_destroy_image(gui->imlib_data, old_img);
+    Imlib_apply_image(gui->imlib_data, new_img, control->window);
     
-    XUnlockDisplay(gGui->display);
+    XUnlockDisplay(gui->display);
 
     if(control_is_visible())
       control_raise_window();
 
-    xitk_skin_unlock(gGui->skin_config);
+    xitk_skin_unlock(gui->skin_config);
     
-    xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
+    xitk_change_skins_widget_list(control->widget_list, gui->skin_config);
     xitk_paint_widget_list(control->widget_list);
 
     active_sliders_video_settings();
@@ -914,6 +932,7 @@ void control_reparent(void) {
  * Create control panel window
  */
 void control_panel(void) {
+  gGui_t *gui = gGui;
   GC                         gc;
   XSizeHints                 hint;
   XWMHints                  *wm_hint;
@@ -929,24 +948,24 @@ void control_panel(void) {
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
 
-  XITK_WIDGET_INIT(&br, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&br, gui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gui->imlib_data);
+  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
 
   control = (_control_t *) calloc(1, sizeof(_control_t));
 
-  XLockDisplay(gGui->display);
+  XLockDisplay(gui->display);
   
   if (!(control->bg_image = 
-	Imlib_load_image(gGui->imlib_data,
-			 xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
+	Imlib_load_image(gui->imlib_data,
+			 xitk_skin_get_skin_filename(gui->skin_config, "CtlBG")))) {
     xine_error(_("control: couldn't find image for background\n"));
     exit(-1);
   }
 
-  XUnlockDisplay(gGui->display);
+  XUnlockDisplay(gui->display);
 
   hint.x = xine_config_register_num (__xineui_global_xine_instance, "gui.control_x", 
 				     200,
@@ -968,7 +987,7 @@ void control_panel(void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = False;
-  attr.background_pixel  = gGui->black.pixel;
+  attr.background_pixel  = gui->black.pixel;
   /*
    * XXX:multivis
    * To avoid BadMatch errors on XCreateWindow:
@@ -979,22 +998,22 @@ void control_panel(void) {
    */
   attr.border_pixel      = 1;
 
-  XLockDisplay(gGui->display);
-  attr.colormap		 = Imlib_get_colormap(gGui->imlib_data);
+  XLockDisplay(gui->display);
+  attr.colormap		 = Imlib_get_colormap(gui->imlib_data);
 
-  control->window = XCreateWindow (gGui->display,
-				   gGui->imlib_data->x.root,
+  control->window = XCreateWindow (gui->display,
+				   gui->imlib_data->x.root,
 				   hint.x, hint.y, hint.width, hint.height, 0, 
-				   gGui->imlib_data->x.depth, InputOutput, 
-				   gGui->imlib_data->x.visual,
+				   gui->imlib_data->x.depth, InputOutput, 
+				   gui->imlib_data->x.visual,
 				   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				   &attr);
   
-  XmbSetWMProperties(gGui->display, control->window, _(title), _(title), NULL, 0, 
+  XmbSetWMProperties(gui->display, control->window, _(title), _(title), NULL, 0, 
                      &hint, NULL, NULL);
   
-  XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
-  XUnlockDisplay(gGui->display);
+  XSelectInput(gui->display, control->window, INPUT_MOTION | KeymapStateMask);
+  XUnlockDisplay(gui->display);
 
   if(!video_window_is_visible())
     xitk_set_wm_window_type(control->window, WINDOW_TYPE_NORMAL);
@@ -1008,12 +1027,12 @@ void control_panel(void) {
    * wm, no border please
    */
 
-  XLockDisplay(gGui->display);
-  prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", True);
+  XLockDisplay(gui->display);
+  prop = XInternAtom(gui->display, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
 
-  XChangeProperty(gGui->display, control->window, prop, prop, 32,
+  XChangeProperty(gui->display, control->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
@@ -1022,7 +1041,7 @@ void control_panel(void) {
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = title;
     xclasshint->res_class = "xine";
-    XSetClassHint(gGui->display, control->window, xclasshint);
+    XSetClassHint(gui->display, control->window, xclasshint);
     XFree(xclasshint);
     
   }
@@ -1031,17 +1050,17 @@ void control_panel(void) {
   if (wm_hint != NULL) {
     wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->icon_pixmap   = gGui->icon;
+    wm_hint->icon_pixmap   = gui->icon;
     wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
-    XSetWMHints(gGui->display, control->window, wm_hint);
+    XSetWMHints(gui->display, control->window, wm_hint);
     XFree(wm_hint);
   }
   
-  gc = XCreateGC(gGui->display, control->window, 0, 0);
+  gc = XCreateGC(gui->display, control->window, 0, 0);
   
-  Imlib_apply_image(gGui->imlib_data, control->bg_image, control->window);
+  Imlib_apply_image(gui->imlib_data, control->bg_image, control->window);
 
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
 
   /*
    * Widget-list
@@ -1074,7 +1093,7 @@ void control_panel(void) {
     sl.motion_callback   = set_hue;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-	     (control->hue = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+	     (control->hue = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->hue, cur);
     xitk_set_widget_tips(control->hue, _("Control HUE value"));
     
@@ -1083,7 +1102,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Hue");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			     xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->hue);
     
     /* SATURATION */
@@ -1101,7 +1120,7 @@ void control_panel(void) {
     sl.motion_callback   = set_saturation;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-	      (control->sat = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+	      (control->sat = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->sat, cur);
     xitk_set_widget_tips(control->sat, _("Control SATURATION value"));
 
@@ -1110,7 +1129,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Sat");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			     xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->sat);
 
     /* BRIGHTNESS */
@@ -1128,7 +1147,7 @@ void control_panel(void) {
     sl.motion_callback   = set_brightness;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-	    (control->bright = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+	    (control->bright = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->bright, cur);
     xitk_set_widget_tips(control->bright, _("Control BRIGHTNESS value"));
 
@@ -1137,7 +1156,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Brt");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			     xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->bright);
       
     /* CONTRAST */
@@ -1155,7 +1174,7 @@ void control_panel(void) {
     sl.motion_callback   = set_contrast;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-	      (control->contr = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+	      (control->contr = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->contr, cur);
     xitk_set_widget_tips(control->contr, _("Control CONTRAST value"));
 
@@ -1164,7 +1183,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Ctr");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			    xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
 
     /* GAMMA */
@@ -1184,7 +1203,7 @@ void control_panel(void) {
     sl.motion_callback   = set_gamma;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-              (control->gamma = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+              (control->gamma = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->gamma, cur);
     xitk_set_widget_tips(control->gamma, _("Control GAMMA value"));
 
@@ -1193,7 +1212,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Gam");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-                            xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+                            xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->gamma);
 
     /* SHARPNESS */
@@ -1213,7 +1232,7 @@ void control_panel(void) {
     sl.motion_callback   = set_sharpness;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-              (control->sharp = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+              (control->sharp = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->sharp, cur);
     xitk_set_widget_tips(control->sharp, _("Control SHARPNESS value"));
 
@@ -1222,7 +1241,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Sha");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-                            xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+                            xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->sharp);
 
     /* NOISE REDUCTION */
@@ -1242,7 +1261,7 @@ void control_panel(void) {
     sl.motion_callback   = set_noise_reduction;
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-              (control->noise = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
+              (control->noise = xitk_slider_create(control->widget_list, gui->skin_config, &sl)));
     xitk_slider_set_pos(control->noise, cur);
     xitk_set_widget_tips(control->noise, _("Control NOISE REDUCTION value"));
 
@@ -1251,7 +1270,7 @@ void control_panel(void) {
     lbl.label             = pgettext("skin", "Noi");
     lbl.callback          = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-                            xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+                            xitk_label_create(control->widget_list, gui->skin_config, &lbl));
     xitk_disable_widget(control->noise);
 
     active_sliders_video_settings();
@@ -1273,7 +1292,7 @@ void control_panel(void) {
   lbl.label             = pgettext("skin", "Choose a Skin");
   lbl.callback          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
-			   xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			   xitk_label_create(control->widget_list, gui->skin_config, &lbl));
 
   br.arrow_up.skin_element_name    = "CtlSkUp";
   br.slider.skin_element_name      = "SliderCtlSk";
@@ -1289,7 +1308,7 @@ void control_panel(void) {
   br.parent_wlist                  = control->widget_list;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(control->widget_list)), 
 			   (control->skinlist = 
-			    xitk_browser_create(control->widget_list, gGui->skin_config, &br)));
+			    xitk_browser_create(control->widget_list, gui->skin_config, &br)));
 
   xitk_browser_update_list(control->skinlist, 
 			   control->skins, NULL, control->skins_num, 0);
@@ -1302,7 +1321,7 @@ void control_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(control->widget_list)), 
-		    (w = xitk_labelbutton_create (control->widget_list, gGui->skin_config, &lb)));
+		    (w = xitk_labelbutton_create (control->widget_list, gui->skin_config, &lb)));
   xitk_set_widget_tips(w, _("Close control window"));
 
   control_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());

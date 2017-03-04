@@ -344,6 +344,7 @@ static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
 }
 
 static void xrm_parse(void) {
+  gGui_t *gui = gGui;
   Display      *display;
   char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
@@ -395,13 +396,13 @@ static void xrm_parse(void) {
     window_attribute.borderless = !get_bool_value((char *) value.addr);
   }
   if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", &str_type, &value) == True) {
-    if(!parse_visual(&gGui->prefered_visual_id, 
-		     &gGui->prefered_visual_class, (char *)value.addr)) {
+    if(!parse_visual(&gui->prefered_visual_id, 
+		     &gui->prefered_visual_class, (char *)value.addr)) {
       printf(_("Bad visual '%s'\n"), (char *)value.addr);
     }
   }
   if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", &str_type, &value) == True) {
-    gGui->install_colormap = !get_bool_value((char *) value.addr);
+    gui->install_colormap = !get_bool_value((char *) value.addr);
   }
   
   XrmDestroyDatabase(rmdb);
@@ -412,10 +413,12 @@ static void xrm_parse(void) {
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->logo_mrl = cfg->str_value;
+  gGui_t *gui = gGui;
+  gui->logo_mrl = cfg->str_value;
 }
 static void sub_autoload_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->subtitle_autoload = cfg->num_value;
+  gGui_t *gui = gGui;
+  gui->subtitle_autoload = cfg->num_value;
 }
 
 /*
@@ -731,6 +734,7 @@ static void show_usage (void) {
  * Try to load video output plugin, by stored name or probing
  */
 static xine_video_port_t *load_video_out_driver(int driver_number) {
+  gGui_t *gui = gGui;
   xine_video_port_t      *video_port = NULL;
   double                  res_h, res_v;
   x11_visual_t            vis;
@@ -739,32 +743,32 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   int                     dummy_event, dummy_error;
 #endif
 
-  vis.display           = gGui->video_display;
-  vis.screen            = gGui->video_screen;
-  vis.d                 = gGui->video_window;
-  XLockDisplay(gGui->video_display);
-  res_h                 = (DisplayWidth  (gGui->video_display, gGui->video_screen)*1000 
-			   / DisplayWidthMM (gGui->video_display, gGui->video_screen));
-  res_v                 = (DisplayHeight (gGui->video_display, gGui->video_screen)*1000
-			   / DisplayHeightMM (gGui->video_display, gGui->video_screen));
-  XUnlockDisplay(gGui->video_display);
-  gGui->pixel_aspect    = res_v / res_h;
+  vis.display           = gui->video_display;
+  vis.screen            = gui->video_screen;
+  vis.d                 = gui->video_window;
+  XLockDisplay(gui->video_display);
+  res_h                 = (DisplayWidth  (gui->video_display, gui->video_screen)*1000 
+			   / DisplayWidthMM (gui->video_display, gui->video_screen));
+  res_v                 = (DisplayHeight (gui->video_display, gui->video_screen)*1000
+			   / DisplayHeightMM (gui->video_display, gui->video_screen));
+  XUnlockDisplay(gui->video_display);
+  gui->pixel_aspect    = res_v / res_h;
   
 #ifdef HAVE_XINERAMA
-  if (XineramaQueryExtension(gGui->video_display, &dummy_event, &dummy_error)) {
+  if (XineramaQueryExtension(gui->video_display, &dummy_event, &dummy_error)) {
     void *info;
     int count = 1;
 
-    info = XineramaQueryScreens(gGui->video_display, &count);
+    info = XineramaQueryScreens(gui->video_display, &count);
     if (count > 1)
       /* multihead -> assuming square pixels */
-      gGui->pixel_aspect = 1.0;
+      gui->pixel_aspect = 1.0;
     if (info) XFree(info);
   }
 #endif
 
 #ifdef DEBUG
-  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
+  printf("pixel_aspect: %f\n", gui->pixel_aspect);
 #endif
 
   vis.dest_size_cb      = video_window_dest_size_cb;
@@ -996,6 +1000,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
  *
  */
 static void event_listener(void *user_data, const xine_event_t *event) {
+  gGui_t *gui = gGui;
   struct timeval tv;
   static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */ 
 
@@ -1003,7 +1008,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
    * Ignoring finished event logo is displayed (or played), that save us
    * from a loop of death
    */
-  if(gGui->logo_mode && (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED))
+  if(gui->logo_mode && (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED))
     return;
   
   gettimeofday (&tv, NULL);
@@ -1013,21 +1018,21 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     return;
   }
   
-  if(gGui->stdctl_enable)
+  if(gui->stdctl_enable)
     stdctl_event(event);
 
   switch(event->type) { 
     
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
 #ifdef XINE_PARAM_GAPLESS_SWITCH
       if( xine_check_version(1,1,1) )
-        xine_set_param(gGui->stream, XINE_PARAM_GAPLESS_SWITCH, 1);
+        xine_set_param(gui->stream, XINE_PARAM_GAPLESS_SWITCH, 1);
 #endif
       gui_playlist_start_next();
     }
-    else if(event->stream == gGui->visual_anim.stream) {
+    else if(event->stream == gui->visual_anim.stream) {
       /* printf("xitk/main.c: restarting visual stream...\n"); */
       visual_anim_play_next();
     }
@@ -1035,28 +1040,28 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* inform ui that new channel info is available */
   case XINE_EVENT_UI_CHANNELS_CHANGED:
-    if(event->stream == gGui->stream)
+    if(event->stream == gui->stream)
       panel_update_channel_display();
     break;
     
     /* request title display change in ui */
   case XINE_EVENT_UI_SET_TITLE:
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      if(strcmp(gGui->mmk.ident, uevent->str)) {
+      if(strcmp(gui->mmk.ident, uevent->str)) {
 	
-	free(gGui->mmk.ident);
-	if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
-	   gGui->playlist.mmk[gGui->playlist.cur]) {
+	free(gui->mmk.ident);
+	if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
+	   gui->playlist.mmk[gui->playlist.cur]) {
 	  
-	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	  free(gui->playlist.mmk[gui->playlist.cur]->ident);
 	  
-	  gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
+	  gui->playlist.mmk[gui->playlist.cur]->ident = strdup(uevent->str);
 	}
-	gGui->mmk.ident = strdup(uevent->str);
+	gui->mmk.ident = strdup(uevent->str);
 	
-	video_window_set_mrl(gGui->mmk.ident);
+	video_window_set_mrl(gui->mmk.ident);
 	playlist_mrlident_toggle();
 	panel_update_mrl_display();
       }
@@ -1065,7 +1070,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* message (dialog) for the ui to display */
   case XINE_EVENT_UI_MESSAGE: 
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
       char                    buffer[8192];
       void                    (*report)(char *message, ...)
@@ -1179,7 +1184,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	/* none */
       case XINE_MSG_ENCRYPTED_SOURCE:
 	strlcpy(buffer, _("The source seems encrypted, and can't be read."), sizeof(buffer));
-	if(!strncasecmp(gGui->mmk.mrl, "dvd:/", 5)) {
+	if(!strncasecmp(gui->mmk.mrl, "dvd:/", 5)) {
 	  strlcat(buffer, _("\nYour DVD is probably crypted. "
 			   "According to your country laws, you can or can't "
 			   "install/use libdvdcss to be able to read this disc, "
@@ -1238,7 +1243,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       }
       
       if(strlen(buffer)) {
-	if(gGui->suppress_messages) {
+	if(gui->suppress_messages) {
 	  if(__xineui_global_verbosity)
 	    printf("xine-ui: GUI temporarily unavailable. Message:\n%s\n", buffer);
 	} else {
@@ -1255,15 +1260,15 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
     /* report current audio vol level (l/r/mute) */
   case XINE_EVENT_AUDIO_LEVEL:
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
 
-      gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
-      if(gGui->mixer.method == SOUND_CARD_MIXER) {
-	gGui->mixer.mute = aevent->mute;
+      gui->mixer.volume_level = (aevent->left + aevent->right) / 2;
+      if(gui->mixer.method == SOUND_CARD_MIXER) {
+	gui->mixer.mute = aevent->mute;
 	if (panel) {
-	  xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
-	  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+	  xitk_slider_set_pos(panel->mixer.slider, gui->mixer.volume_level);
+	  xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
 	}
       }
     }
@@ -1272,15 +1277,15 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 #ifdef XINE_EVENT_AUDIO_AMP_LEVEL	/* Precaution for backward compatibility, will be removed some time */
     /* report current audio amp level (l/r/mute) */
   case XINE_EVENT_AUDIO_AMP_LEVEL:
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
 
-      gGui->mixer.amp_level = (aevent->left + aevent->right) / 2;
-      if(gGui->mixer.method == SOFTWARE_MIXER) {
-	gGui->mixer.mute = aevent->mute;
+      gui->mixer.amp_level = (aevent->left + aevent->right) / 2;
+      if(gui->mixer.method == SOFTWARE_MIXER) {
+	gui->mixer.mute = aevent->mute;
 	if (panel) {
-	  xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.amp_level);
-	  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
+	  xitk_slider_set_pos(panel->mixer.slider, gui->mixer.amp_level);
+	  xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
         }
       }
     }
@@ -1293,19 +1298,19 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* index creation/network connections */
   case XINE_EVENT_PROGRESS:
-    if(event->stream == gGui->stream) {
+    if(event->stream == gui->stream) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
       
       snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
-      gGui->mrl_overrided = 3;
+      gui->mrl_overrided = 3;
       panel_set_title(buffer);
       osd_display_info("%s", buffer);
     }
     break;
 
   case XINE_EVENT_MRL_REFERENCE:
-    if(!mrl_ext && (event->stream == gGui->stream) && gGui->playlist.num) {
+    if(!mrl_ext && (event->stream == gui->stream) && gui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
       if(__xineui_global_verbosity)
@@ -1313,10 +1318,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
                ref->mrl, ref->alternative);
 
       if(ref->alternative == 0) {
-        gGui->playlist.ref_append++;
-        mediamark_insert_entry(gGui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
+        gui->playlist.ref_append++;
+        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
       } else {
-	mediamark_t *mmk = mediamark_get_mmk_by_index(gGui->playlist.ref_append);
+	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
 	
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
@@ -1337,7 +1342,7 @@ typedef struct {
 } xine_mrl_reference_data_ext_t;
 #endif
   case XINE_EVENT_MRL_REFERENCE_EXT:
-    if((event->stream == gGui->stream) && gGui->playlist.num) {
+    if((event->stream == gui->stream) && gui->playlist.num) {
       xine_mrl_reference_data_ext_t *ref = (xine_mrl_reference_data_ext_t *) event->data;
       const char *title = ref->mrl + strlen (ref->mrl) + 1;
 
@@ -1348,12 +1353,12 @@ typedef struct {
                ref->mrl, ref->alternative);
 
       if(ref->alternative == 0) {
-        gGui->playlist.ref_append++;
+        gui->playlist.ref_append++;
         /* FIXME: duration handled correctly? */
-        mediamark_insert_entry(gGui->playlist.ref_append, ref->mrl, title ? title : ref->mrl, NULL, ref->start_time, ref->duration ? ref->start_time + ref->duration : -1, 0, 0);
+        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, title ? title : ref->mrl, NULL, ref->start_time, ref->duration ? ref->start_time + ref->duration : -1, 0, 0);
       } else {
         /* FIXME: title? start? duration? */
-	mediamark_t *mmk = mediamark_get_mmk_by_index(gGui->playlist.ref_append);
+	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
 
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
@@ -1378,7 +1383,7 @@ typedef struct {
     break;
 
   case XINE_EVENT_DROPPED_FRAMES:
-    if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) <= XINE_SPEED_NORMAL) {
+    if (xine_get_param(gui->stream, XINE_PARAM_SPEED) <= XINE_SPEED_NORMAL) {
       too_slow_window();
     }
     break;
@@ -1390,6 +1395,7 @@ typedef struct {
  *
  */
 int main(int argc, char *argv[]) {
+  gGui_t *gui;
   /* command line options will end up in these variables: */
   int                     c = '?', aos    = 0;
   int                     option_index    = 0;
@@ -1448,48 +1454,49 @@ int main(int argc, char *argv[]) {
     fprintf (stderr, "sigprocmask() failed.\n");
 
   gGui = (gGui_t *) calloc(1, sizeof(gGui_t));
+  gui = gGui;
   
-  gGui->stream                 = NULL;
-  gGui->debug_level            = 0;
+  gui->stream                 = NULL;
+  gui->debug_level            = 0;
 
-  gGui->autoscan_plugin        = NULL;
-  gGui->prefered_visual_class  = -1;
-  gGui->prefered_visual_id     = None;
-  gGui->install_colormap       = 0;
-  gGui->cursor_grabbed         = 0;
-  gGui->network                = 0;
-  gGui->network_port           = 0;
-  gGui->video_window           = None;
-  gGui->use_root_window        = 0;
+  gui->autoscan_plugin        = NULL;
+  gui->prefered_visual_class  = -1;
+  gui->prefered_visual_id     = None;
+  gui->install_colormap       = 0;
+  gui->cursor_grabbed         = 0;
+  gui->network                = 0;
+  gui->network_port           = 0;
+  gui->video_window           = None;
+  gui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
-  gGui->XF86VidMode_fullscreen = 0;
+  gui->XF86VidMode_fullscreen = 0;
 #endif
-  gGui->actions_on_start[aos]  = ACTID_NOKEY;
-  gGui->playlist.mmk           = NULL;
-  gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
-  gGui->playlist.control       = 0;
-  gGui->skin_server_url        = NULL;
+  gui->actions_on_start[aos]  = ACTID_NOKEY;
+  gui->playlist.mmk           = NULL;
+  gui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
+  gui->playlist.control       = 0;
+  gui->skin_server_url        = NULL;
   __xineui_global_verbosity              = 0;
-  gGui->broadcast_port         = 0;
-  gGui->display_logo           = 1;
-  gGui->post_video_elements    = NULL;
-  gGui->post_video_elements_num = 0;
-  gGui->post_video_enable      = 1;
-  gGui->post_audio_elements    = NULL;
-  gGui->post_audio_elements_num = 0;
-  gGui->post_audio_enable      = 1;
-  gGui->splash                 = 1;
+  gui->broadcast_port         = 0;
+  gui->display_logo           = 1;
+  gui->post_video_elements    = NULL;
+  gui->post_video_elements_num = 0;
+  gui->post_video_enable      = 1;
+  gui->post_audio_elements    = NULL;
+  gui->post_audio_elements_num = 0;
+  gui->post_audio_enable      = 1;
+  gui->splash                 = 1;
 #ifdef HAVE_LIRC
   __xineui_global_lirc_enable            = 1;
 #endif
-  gGui->deinterlace_enable     = 0;
-  gGui->report                 = stdout;
-  gGui->ssaver_enabled         = 1;
-  gGui->no_gui                 = 0;
-  gGui->no_mouse               = 0;
-  gGui->wid                    = 0;
-  gGui->nongui_error_msg       = NULL;
-  gGui->orig_stdout            = stdout;
+  gui->deinterlace_enable     = 0;
+  gui->report                 = stdout;
+  gui->ssaver_enabled         = 1;
+  gui->no_gui                 = 0;
+  gui->no_mouse               = 0;
+  gui->wid                    = 0;
+  gui->nongui_error_msg       = NULL;
+  gui->orig_stdout            = stdout;
   
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1500,7 +1507,7 @@ int main(int argc, char *argv[]) {
   _rc_file_check_args(_argc, _argv);
 #endif
 
-  pthread_mutex_init(&gGui->mmk_mutex, NULL);
+  pthread_mutex_init(&gui->mmk_mutex, NULL);
 
   visual_anim_init();
 
@@ -1551,58 +1558,58 @@ int main(int argc, char *argv[]) {
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_PLAY;
+	gui->actions_on_start[aos++] = ACTID_PLAY;
       if(optarg != NULL) {
 	if(strrchr(optarg, 'f')) {
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
+	    gui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
 	}
 #ifdef HAVE_XINERAMA
 	if(strrchr(optarg, 'F')) {
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
+	    gui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
 	}
 #endif
 	if(strrchr(optarg, 'h')) {
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
+	    gui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
 	}
 	if(strrchr(optarg, 'q')) {
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_QUIT;
+	    gui->actions_on_start[aos++] = ACTID_QUIT;
 	}
 	if(strrchr(optarg, 'w')) {
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	    gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
 	}
 	if(strrchr(optarg, 'd')) {
-	  gGui->autoscan_plugin = "DVD";
+	  gui->autoscan_plugin = "DVD";
 	}
 	if(strrchr(optarg, 'v')) {
-	  gGui->autoscan_plugin = "VCD";
+	  gui->autoscan_plugin = "VCD";
 	}
       }
       break;
 
     case 'g': /* hide panel on start */
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
+	gui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
       break;
 
     case 'H': /* hide video on start */
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       break;
 
     case 'f': /* full screen mode on start */
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
+	gui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
       break;
 
 #ifdef HAVE_XINERAMA
     case 'F': /* xinerama full screen mode on start */
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
+	gui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
       break;
 #endif
 
@@ -1639,12 +1646,12 @@ int main(int argc, char *argv[]) {
       break;
 
     case 's': /* autoscan on start */
-      gGui->autoscan_plugin = xine_chomp(optarg);
+      gui->autoscan_plugin = xine_chomp(optarg);
       break;
        
     case OPTION_VISUAL:
       if(optarg != NULL) {
-	if(!parse_visual(&gGui->prefered_visual_id, &gGui->prefered_visual_class, optarg)) {
+	if(!parse_visual(&gui->prefered_visual_id, &gui->prefered_visual_class, optarg)) {
 	  show_usage();
 	  exit(1);
 	}
@@ -1652,7 +1659,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_INSTALL_COLORMAP:
-      gGui->install_colormap = 1;
+      gui->install_colormap = 1;
       break;
 
     case OPTION_DISPLAY_KEYMAP:
@@ -1668,8 +1675,8 @@ int main(int argc, char *argv[]) {
 	else if(!strncasecmp(p, "file:", 5)) {
 	  char  *keymap_file = p + 5;
 	  
-	  if((gGui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
-	    gGui->keymap_file = xitk_filter_filename (keymap_file);
+	  if((gui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
+	    gui->keymap_file = xitk_filter_filename (keymap_file);
 	    continue;
 	  }
 	}
@@ -1682,7 +1689,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'n': /* Enable remote control server */
-      gGui->network = 1;
+      gui->network = 1;
       break;
       
     case OPTION_NETWORK_PORT:
@@ -1690,7 +1697,7 @@ int main(int argc, char *argv[]) {
 	int port = strtol(optarg, &optarg, 10);
 
 	if((port >= 1) && (port <= 65535))
-	  gGui->network_port = port;
+	  gui->network_port = port;
 	else
 	  fprintf(stderr, _("Bad port number: %d\n"), port);
 
@@ -1698,7 +1705,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'R': /* Use root window for video output */
-      gGui->use_root_window = 1;
+      gui->use_root_window = 1;
       break;
 
     case 'G': /* Set geometry */
@@ -1719,10 +1726,10 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'P':
-      if((!actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
-	gGui->actions_on_start[aos++] = ACTID_PLAYLIST;
+      if((!actions_on_start(gui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
+	gui->actions_on_start[aos++] = ACTID_PLAYLIST;
       
-      if(!gGui->playlist.mmk)
+      if(!gui->playlist.mmk)
 	mediamark_load_mediamarks(optarg);
       else
 	mediamark_concat_mediamarks(optarg);
@@ -1736,24 +1743,24 @@ int main(int argc, char *argv[]) {
 	char *p = xine_chomp(optarg);
 
 	if(!strcasecmp(p, "loop"))
-	  gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
+	  gui->playlist.loop = PLAYLIST_LOOP_LOOP;
 	else if(!strcasecmp(p, "repeat"))
-	  gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
+	  gui->playlist.loop = PLAYLIST_LOOP_REPEAT;
 	else if(!strcasecmp(p, "shuffle+"))
-	  gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
+	  gui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
 	else if(!strcasecmp(p, "shuffle"))
-	  gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
+	  gui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
 	else {
 	  fprintf(stderr, _("Bad loop mode '%s', see xine --help\n"), optarg);
 	  exit(1);
 	}
       }
       else
-	gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
+	gui->playlist.loop = PLAYLIST_LOOP_LOOP;
       break;
 
     case OPTION_SK_SERVER:
-      gGui->skin_server_url = strdup(optarg);
+      gui->skin_server_url = strdup(optarg);
       break;
       
     case OPTION_ENQUEUE:
@@ -1773,16 +1780,16 @@ int main(int argc, char *argv[]) {
 #ifdef XINE_PARAM_BROADCASTER_PORT    
     case OPTION_BROADCAST_PORT:
       if(optarg != NULL)
-	gGui->broadcast_port = strtol(optarg, &optarg, 10);
+	gui->broadcast_port = strtol(optarg, &optarg, 10);
       break;
 #endif
       
     case OPTION_NO_LOGO:
-      gGui->display_logo = 0;
+      gui->display_logo = 0;
       break;
 
     case OPTION_NO_MOUSE:
-      gGui->no_mouse = 1;
+      gui->no_mouse = 1;
       break;
       
     case 'S':
@@ -1822,12 +1829,12 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_DISABLE_POST:
-      gGui->post_video_enable = 0;
-      gGui->post_audio_enable = 0;
+      gui->post_video_enable = 0;
+      gui->post_audio_enable = 0;
       break;
 
     case OPTION_NO_SPLASH:
-      gGui->splash = 0;
+      gui->splash = 0;
       break;
 
     case 'v': /* Display version and exit*/
@@ -1842,7 +1849,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_STDCTL:
-      gGui->stdctl_enable = 1;
+      gui->stdctl_enable = 1;
       break;
 
     case 'T':
@@ -1886,7 +1893,7 @@ int main(int argc, char *argv[]) {
 	      fprintf(stdout, "dup2() failed: %s.\n", strerror(errno));
 	  }
 
-	  gGui->report = f;
+	  gui->report = f;
 	  __xineui_global_verbosity = 0xff;
 	}
 	
@@ -1900,20 +1907,20 @@ int main(int argc, char *argv[]) {
 	  session_argv[++session_argv_num]   = NULL;
 
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_PLAY;
+	    gui->actions_on_start[aos++] = ACTID_PLAY;
 	  if(aos < MAX_ACTIONS_ON_START)
-	    gGui->actions_on_start[aos++] = ACTID_QUIT;
+	    gui->actions_on_start[aos++] = ACTID_QUIT;
 	}
       }
       break;
 
     case 'I':
-      gGui->no_gui = 1;
+      gui->no_gui = 1;
       break;
     case 'W': /* Select wid */
       if(optarg != NULL) {
         sscanf(optarg, "%i", &window_id);
-     	gGui->wid = window_id;
+     	gui->wid = window_id;
       } 
       else {
 	fprintf(stderr, _("window id required for -W option\n"));
@@ -1955,7 +1962,7 @@ int main(int argc, char *argv[]) {
    * Using root window mode don't allow
    * window geometry, so, reset those params.
    */
-  if(gGui->use_root_window) {
+  if(gui->use_root_window) {
     window_attribute.x     = window_attribute.y      = -8192;
     window_attribute.width = window_attribute.height = -1;
     window_attribute.borderless = 0;
@@ -1983,8 +1990,8 @@ int main(int argc, char *argv[]) {
       if(dup2(stdout_fd, STDOUT_FILENO) < 0)
         fprintf(stderr, "cannot dup2 stdout_fd: %s.\n", strerror(errno));
       else {
-        gGui->orig_stdout = guiout_fp;
-        setlinebuf(gGui->orig_stdout);
+        gui->orig_stdout = guiout_fp;
+        setlinebuf(gui->orig_stdout);
       }
 
       close(stdout_fd); /* stdout_fd was intermediate, not needed any longer */
@@ -2009,7 +2016,7 @@ int main(int argc, char *argv[]) {
     /* Popup setup window if there is no config file */
     if(stat(__xineui_global_config_file, &st) < 0) {
       if(aos < MAX_ACTIONS_ON_START)
-	gGui->actions_on_start[aos++] = ACTID_SETUP;
+	gui->actions_on_start[aos++] = ACTID_SETUP;
     }
     
   }
@@ -2017,18 +2024,18 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize keymap
    */
-  if(gGui->keymap_file == NULL) {
+  if(gui->keymap_file == NULL) {
     char *cfgdir = CONFIGDIR;
     char *keymap = "keymap";
 
-    gGui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
+    gui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
 					      + strlen(cfgdir) 
 					      + strlen(cfgfile)
 					      + strlen(keymap) + 3);
-    sprintf(gGui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
+    sprintf(gui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
   }
   
-  pthread_mutex_init(&gGui->xe_mutex, NULL);
+  pthread_mutex_init(&gui->xe_mutex, NULL);
 
   __xineui_global_xine_instance = xine_new();
   xine_config_load(__xineui_global_xine_instance, __xineui_global_config_file);
@@ -2054,7 +2061,7 @@ int main(int argc, char *argv[]) {
     mediamark_load_mediamarks(buffer);
   }
 
-  gGui->subtitle_autoload = 
+  gui->subtitle_autoload = 
     xine_config_register_bool(__xineui_global_xine_instance, "gui.subtitle_autoload", 1,
 			      _("Subtitle autoloading"),
 			      _("Automatically load subtitles if they exist."), 
@@ -2075,7 +2082,7 @@ int main(int argc, char *argv[]) {
 
   if( enable_deinterlace ) {
     if(aos < MAX_ACTIONS_ON_START)
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+      gui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
   }
 
   /*
@@ -2083,19 +2090,19 @@ int main(int argc, char *argv[]) {
    */
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
 
-  pthread_mutex_init(&gGui->download_mutex, NULL);
+  pthread_mutex_init(&gui->download_mutex, NULL);
 
   pthread_mutexattr_init(&mutexattr);
   pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
-  pthread_mutex_init(&gGui->logo_mutex, &mutexattr);
+  pthread_mutex_init(&gui->logo_mutex, &mutexattr);
   pthread_mutexattr_destroy(&mutexattr);
 
   /* Automatically start playback if new_mode is enabled and playlist is filled */
-  if((gGui->smart_mode && 
-      (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
-      (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0)) {
+  if((gui->smart_mode && 
+      (gui->playlist.num || actions_on_start(gui->actions_on_start, ACTID_PLAYLIST)) &&
+      (!(actions_on_start(gui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0)) {
     if(aos < MAX_ACTIONS_ON_START)
-      gGui->actions_on_start[aos++] = ACTID_PLAY;
+      gui->actions_on_start[aos++] = ACTID_PLAY;
   }
   
   /*
@@ -2108,9 +2115,9 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_entry;
     
     if(xine_config_lookup_entry(__xineui_global_xine_instance, "media.files.origin_path", &cfg_entry))
-      strlcpy(gGui->curdir, cfg_entry.str_value, sizeof(gGui->curdir));
+      strlcpy(gui->curdir, cfg_entry.str_value, sizeof(gui->curdir));
     else
-      getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
+      getcwd(&(gui->curdir[0]), XITK_PATH_MAX);
   }
 
   /*
@@ -2142,7 +2149,7 @@ int main(int argc, char *argv[]) {
 	}
       }
     }
-    gGui->vo_port = load_video_out_driver(driver_num);
+    gui->vo_port = load_video_out_driver(driver_num);
   }  
   
   {
@@ -2156,15 +2163,15 @@ int main(int argc, char *argv[]) {
 	if(xine_config_lookup_entry(__xineui_global_xine_instance, "dxr3.output.mode", &cfg_entry)) {
 	  if(((!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "letterboxed tv")) ||
 	      (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) && 
-	     (!(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
+	     (!(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
 	    if(aos < MAX_ACTIONS_ON_START)
-	      gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	      gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
 	  }
 	}
       }
       else if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "fb")) {
 	if(aos < MAX_ACTIONS_ON_START)
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	  gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       }
 
     }
@@ -2198,74 +2205,74 @@ int main(int argc, char *argv[]) {
 	}
       }
     }
-    gGui->ao_port = load_audio_out_driver(driver_num);    
+    gui->ao_port = load_audio_out_driver(driver_num);    
   }
   SAFE_FREE(audio_driver_id);
 
   post_deinterlace_init(pdeinterlace);
   post_init();
 
-  gGui->stream = xine_stream_new(__xineui_global_xine_instance, gGui->ao_port, gGui->vo_port);
+  gui->stream = xine_stream_new(__xineui_global_xine_instance, gui->ao_port, gui->vo_port);
 #ifdef XINE_PARAM_EARLY_FINISHED_EVENT
   if( xine_check_version(1,1,1) )
-      xine_set_param(gGui->stream, XINE_PARAM_EARLY_FINISHED_EVENT, 1);
+      xine_set_param(gui->stream, XINE_PARAM_EARLY_FINISHED_EVENT, 1);
 #endif
 
-  gGui->vo_none = xine_open_video_driver(__xineui_global_xine_instance, "none", XINE_VISUAL_TYPE_NONE, NULL);
-  gGui->ao_none = xine_open_audio_driver(__xineui_global_xine_instance, "none", NULL);
+  gui->vo_none = xine_open_video_driver(__xineui_global_xine_instance, "none", XINE_VISUAL_TYPE_NONE, NULL);
+  gui->ao_none = xine_open_audio_driver(__xineui_global_xine_instance, "none", NULL);
 
   osd_init();
 
   /*
    * Setup logo.
    */
-  gGui->logo_mode = 0;
-  gGui->logo_has_changed = 0;
-  gGui->logo_mrl = xine_config_register_string (__xineui_global_xine_instance, "gui.logo_mrl", XINE_LOGO_MRL,
+  gui->logo_mode = 0;
+  gui->logo_has_changed = 0;
+  gui->logo_mrl = xine_config_register_string (__xineui_global_xine_instance, "gui.logo_mrl", XINE_LOGO_MRL,
 						_("Logo MRL"),
 						CONFIG_NO_HELP, 
 						CONFIG_LEVEL_EXP,
 						main_change_logo_cb, 
 						CONFIG_NO_DATA);
 
-  gGui->event_queue = xine_event_new_queue(gGui->stream);
-  xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
+  gui->event_queue = xine_event_new_queue(gui->stream);
+  xine_event_create_listener_thread(gui->event_queue, event_listener, NULL);
 
   if(tvout && strlen(tvout)) {
-    if((gGui->tvout = tvout_init(gGui->display, tvout)))
-      tvout_setup(gGui->tvout);
+    if((gui->tvout = tvout_init(gui->display, tvout)))
+      tvout_setup(gui->tvout);
   }
 
-  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
-  xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
-  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
-  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp_level);
+  xine_set_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
+  xine_set_param(gui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
+  xine_set_param(gui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+  xine_set_param(gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gui->mixer.amp_level);
 #ifdef XINE_PARAM_BROADCASTER_PORT
-  xine_set_param(gGui->stream, XINE_PARAM_BROADCASTER_PORT, gGui->broadcast_port);
+  xine_set_param(gui->stream, XINE_PARAM_BROADCASTER_PORT, gui->broadcast_port);
 #endif
 
   /* Visual animation stream init */
-  gGui->visual_anim.stream = xine_stream_new(__xineui_global_xine_instance, NULL, gGui->vo_port);
-  gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);
-  gGui->visual_anim.current = 0;
-  xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
-  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
-  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
-  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+  gui->visual_anim.stream = xine_stream_new(__xineui_global_xine_instance, NULL, gui->vo_port);
+  gui->visual_anim.event_queue = xine_event_new_queue(gui->visual_anim.stream);
+  gui->visual_anim.current = 0;
+  xine_event_create_listener_thread(gui->visual_anim.event_queue, event_listener, NULL);
+  xine_set_param(gui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
+  xine_set_param(gui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
+  xine_set_param(gui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* subtitle stream */
-  gGui->spu_stream = xine_stream_new(__xineui_global_xine_instance, NULL, gGui->vo_port);
-  xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+  gui->spu_stream = xine_stream_new(__xineui_global_xine_instance, NULL, gui->vo_port);
+  xine_set_param(gui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* init the video window */
   video_window_select_visual();
 
-  xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
+  xine_set_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
         
   /*
    * hand control over to gui
    */
-  gGui->actions_on_start[aos] = ACTID_NOKEY;
+  gui->actions_on_start[aos] = ACTID_NOKEY;
   
   /* Initialize posts, if required */
   if(pplugins_num) {
@@ -2283,8 +2290,8 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
-  xine_event_dispose_queue(gGui->event_queue);
-  xine_event_dispose_queue(gGui->visual_anim.event_queue);
+  xine_event_dispose_queue(gui->event_queue);
+  xine_event_dispose_queue(gui->visual_anim.event_queue);
 
   xine_exit(__xineui_global_xine_instance); 
 
@@ -2300,15 +2307,15 @@ int main(int argc, char *argv[]) {
     free(session_argv);
   }
 
-  pthread_mutex_destroy(&gGui->mmk_mutex);
-  pthread_mutex_destroy(&gGui->xe_mutex);
-  pthread_mutex_destroy(&gGui->download_mutex);
-  pthread_mutex_destroy(&gGui->logo_mutex);
+  pthread_mutex_destroy(&gui->mmk_mutex);
+  pthread_mutex_destroy(&gui->xe_mutex);
+  pthread_mutex_destroy(&gui->download_mutex);
+  pthread_mutex_destroy(&gui->logo_mutex);
 
-  if(gGui->report != stdout)
-    fclose(gGui->report);
-  if(gGui->orig_stdout != stdout)
-    fclose(gGui->orig_stdout);
+  if(gui->report != stdout)
+    fclose(gui->report);
+  if(gui->orig_stdout != stdout)
+    fclose(gui->orig_stdout);
 
   free_command_line_args(&_argv, _argc);
 
