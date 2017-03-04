@@ -107,11 +107,6 @@ static const char *const shortcut_style[] = {
   NULL
 };
 
-static volatile int reject_events = 1;
-
-pthread_mutex_t event_mutex;
-
-
 int hidden_file_cb(int action, int value) {
   xine_cfg_entry_t  cfg_entry;
   int               retval = 0;
@@ -367,17 +362,22 @@ static char *pts2str(int64_t pts) {
  *
  */
 void gui_execute_action_id(action_id_t action) {
+  gGui_t *gui = gGui;
   xine_event_t   xine_event;
+  int narg = -1;
+  char *sarg = NULL;
 
-  if(reject_events)
+  if (gui->event_reject)
     return;
 
-  pthread_mutex_lock(&event_mutex);
+  pthread_mutex_lock (&gui->event_mutex);
 
-  if (reject_events) {
-    pthread_mutex_unlock(&event_mutex);
+  if (gui->event_reject) {
+    pthread_mutex_unlock (&gui->event_mutex);
     return;
   }
+
+  gui->event_pending++;
   
   if(action & ACTID_IS_INPUT_EVENT) {
 
@@ -387,43 +387,46 @@ void gui_execute_action_id(action_id_t action) {
     /* chance, depending on expression and rearranging by the compiler).    */
 
     if((action >= ACTID_EVENT_NUMBER_0) && (action <= ACTID_EVENT_NUMBER_9)) {
+      int n = action - ACTID_EVENT_NUMBER_0;
 
-      if(!gGui->numeric.set) {
-	gGui->numeric.set = 1;
-	gGui->numeric.arg = 0;
+      if (!gui->numeric.set) {
+        gui->numeric.set = 1;
+        gui->numeric.arg = n;
       }
-      
-      if(gGui->numeric.arg <= ((INT_MAX - (action - ACTID_EVENT_NUMBER_0)) / 10)) {
-	/* ((gGui->numeric.arg * 10) + (action - ACTID_EVENT_NUMBER_0)) <= INT_MAX */
-	gGui->numeric.arg *= 10;
-	gGui->numeric.arg += (action - ACTID_EVENT_NUMBER_0);
+      else if (gui->numeric.arg <= ((INT_MAX - n) / 10)) {
+        gui->numeric.arg *= 10;
+        gui->numeric.arg += n;
       }
       else
-	fprintf(stderr, "WARNING: Input number canceled, avoid overflow\n");
+        fprintf (stderr, "xine-ui: Input number overflow, using %d\n", gui->numeric.arg);
 
     } 
     else if(action == ACTID_EVENT_NUMBER_10_ADD) {
 
-      if(!gGui->numeric.set) {
-	gGui->numeric.set = 1;
-	gGui->numeric.arg = 0;
+      if (!gui->numeric.set) {
+        gui->numeric.set = 1;
+        gui->numeric.arg = 10;
       }
-      
-      if(gGui->numeric.arg <= (INT_MAX - 10))
-	/* (gGui->numeric.arg + 10) <= INT_MAX */
-	gGui->numeric.arg += 10;
+      else if (gui->numeric.arg <= (INT_MAX - 10))
+        gui->numeric.arg += 10;
       else
-	fprintf(stderr, "WARNING: Input number canceled, avoid overflow\n");
+        fprintf (stderr, "xine-ui: Input number overflow, using %d\n", gui->numeric.arg);
 
     }
     else {
-      gGui->numeric.set = 0;
-      gGui->numeric.arg = 0;
+      gui->numeric.set = 0;
+      gui->numeric.arg = 0;
     }
 
+    pthread_mutex_unlock (&gui->event_mutex);
+
     /* check if osd menu like this event */
-    if( oxine_action_event(action & ~ACTID_IS_INPUT_EVENT) ) {
-      pthread_mutex_unlock(&event_mutex);
+    if (oxine_action_event (action & ~ACTID_IS_INPUT_EVENT)) {
+      pthread_mutex_lock (&gui->event_mutex);
+      gui->event_pending--;
+      if ((gui->event_pending <= 0) && gui->event_reject)
+        pthread_cond_signal (&gui->event_safe);
+      pthread_mutex_unlock (&gui->event_mutex);
       return;
     }
     
@@ -431,13 +434,31 @@ void gui_execute_action_id(action_id_t action) {
     xine_event.type        = action & ~ACTID_IS_INPUT_EVENT;
     xine_event.data_length = 0;
     xine_event.data        = NULL;
-    xine_event.stream      = gGui->stream;
+    xine_event.stream      = gui->stream;
     gettimeofday(&xine_event.tv, NULL);
     
-    xine_event_send(gGui->stream, &xine_event);
-    pthread_mutex_unlock(&event_mutex);
+    xine_event_send(gui->stream, &xine_event);
+    pthread_mutex_lock (&gui->event_mutex);
+    gui->event_pending--;
+    if ((gui->event_pending <= 0) && gui->event_reject)
+      pthread_cond_signal (&gui->event_safe);
+    pthread_mutex_unlock (&gui->event_mutex);
     return;
   }
+
+  if (gui->numeric.set)
+    narg = gui->numeric.arg;
+  gui->numeric.set = 0;
+  gui->numeric.arg = 0;
+
+  if (gui->alphanum.set) {
+    if ((action == ACTID_OSD_WTEXT) || (action == ACTID_PVR_SETNAME) || (action == ACTID_PLAYLIST_OPEN))
+      sarg = strdup (gui->alphanum.arg ? gui->alphanum.arg : "");
+  }
+  gui->alphanum.set = 0;
+  gui->alphanum.arg = "";
+
+  pthread_mutex_unlock (&gui->event_mutex);
 
   switch(action) {
     
@@ -470,7 +491,7 @@ void gui_execute_action_id(action_id_t action) {
       /* so we'll not end up in endless magnification.                             */
 
       video_window_get_output_size(&output_width, &output_height);
-      xitk_get_window_position(gGui->video_display, gGui->video_window,
+      xitk_get_window_position(gui->video_display, gui->video_window,
 			       NULL, NULL, &window_width, &window_height);
       if(output_width < 5000 && output_height < 5000 &&
 	 output_width <= window_width && output_height <= window_height) {
@@ -499,17 +520,17 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SPU_NEXT:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_change_spu_channel(NULL, (void*)GUI_NEXT);
     else
-      gui_direct_change_spu_channel(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
+      gui_direct_change_spu_channel (NULL, (void*)GUI_NEXT, narg);
     break;
     
   case ACTID_SPU_PRIOR:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_change_spu_channel(NULL, (void*)GUI_PREV);
     else
-      gui_direct_change_spu_channel(NULL, (void*)GUI_PREV, gGui->numeric.arg);
+      gui_direct_change_spu_channel (NULL, (void*)GUI_PREV, narg);
     break;
     
   case ACTID_CONTROLSHOW:
@@ -525,17 +546,17 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_AUDIOCHAN_NEXT:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_change_audio_channel(NULL, (void*)GUI_NEXT);
     else
-      gui_direct_change_audio_channel(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
+      gui_direct_change_audio_channel (NULL, (void*)GUI_NEXT, narg);
     break;
     
   case ACTID_AUDIOCHAN_PRIOR:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_change_audio_channel(NULL, (void*)GUI_PREV);
     else
-      gui_direct_change_audio_channel(NULL, (void*)GUI_PREV, gGui->numeric.arg);
+      gui_direct_change_audio_channel (NULL, (void*)GUI_PREV, narg);
     break;
     
   case ACTID_PAUSE:
@@ -551,9 +572,9 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_TOGGLE_FULLSCREEN:
-    if (gGui->numeric.set) {
+    if (narg >= 0) {
       int fullscreen = video_window_get_fullscreen_mode() & FULLSCR_MODE;
-      if ((gGui->numeric.arg && !fullscreen) || (!gGui->numeric.arg && fullscreen))
+      if ((narg && !fullscreen) || (!narg && fullscreen))
         gui_set_fullscreen_mode(NULL, NULL);
     } else
       gui_set_fullscreen_mode(NULL, NULL);
@@ -566,10 +587,10 @@ void gui_execute_action_id(action_id_t action) {
 #endif
 
   case ACTID_TOGGLE_ASPECT_RATIO:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_toggle_aspect(-1);
     else
-      gui_toggle_aspect(gGui->numeric.arg);
+      gui_toggle_aspect (narg);
     break;
 
   case ACTID_STREAM_INFOS:
@@ -581,6 +602,11 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_QUIT:
+    pthread_mutex_lock (&gui->event_mutex);
+    gui->event_pending--;
+    if ((gui->event_pending <= 0) && gui->event_reject)
+      pthread_cond_signal (&gui->event_safe);
+    pthread_mutex_unlock (&gui->event_mutex);
     gui_exit(NULL, NULL);
     break;
 
@@ -601,24 +627,24 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_MRL_NEXT:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_nextprev(NULL, (void*)GUI_NEXT);
     else
-      gui_direct_nextprev(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
+      gui_direct_nextprev (NULL, (void*)GUI_NEXT, narg);
     break;
     
   case ACTID_MRL_PRIOR:
-    if (!gGui->numeric.set)
+    if (narg < 0)
       gui_nextprev(NULL, (void*)GUI_PREV);
     else
-      gui_direct_nextprev(NULL, (void*)GUI_PREV, gGui->numeric.arg);
+      gui_direct_nextprev (NULL, (void*)GUI_PREV, narg);
     break;
 
   case ACTID_MRL_SELECT:
-    if(!gGui->numeric.set)
+    if (narg < 0)
       gui_playlist_play(0);
     else
-      gui_playlist_play(gGui->numeric.arg);
+      gui_playlist_play (narg);
     break;
       
   case ACTID_SETUP:
@@ -630,12 +656,12 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SET_CURPOS:
-    /* Number is a percentage, range [0..100] */
-    if(gGui->numeric.arg < 0)
-      gGui->numeric.arg = 0;
-    if(gGui->numeric.arg > 100)
-      gGui->numeric.arg = 100;
-    gui_set_current_position((65535 * gGui->numeric.arg) / 100);
+    if (narg >= 0) {
+      /* Number is a percentage, range [0..100] */
+      if (narg > 100)
+        narg = 100;
+      gui_set_current_position ((65535 * narg) / 100);
+    }
     break;
 
   case ACTID_SET_CURPOS_0:
@@ -683,15 +709,14 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SEEK_REL_m:
-    if(gGui->numeric.set) {
-      gGui->numeric.arg = -gGui->numeric.arg;
-      gui_seek_relative (gGui->numeric.arg);
+    if (narg >= 0) {
+      gui_seek_relative (-narg);
     }
     break;
 
   case ACTID_SEEK_REL_p:
-    if(gGui->numeric.set)
-      gui_seek_relative (gGui->numeric.arg);
+    if (narg >= 0)
+      gui_seek_relative (narg);
     break;
 
   case ACTID_SEEK_REL_m60:
@@ -731,52 +756,58 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_MUTE:
-    panel_toggle_audio_mute(NULL, NULL, !gGui->mixer.mute);
+    panel_toggle_audio_mute(NULL, NULL, !gui->mixer.mute);
     break;
     
   case ACTID_AV_SYNC_m3600:
     {
-      int av_offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) - 3600);
+      int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) - 3600);
 
-      gGui->mmk.av_offset = av_offset;
-      if (gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
-	  gGui->playlist.mmk[gGui->playlist.cur])
-	if (gGui->playlist.cur < gGui->playlist.num)
-	  gGui->playlist.mmk[gGui->playlist.cur]->av_offset = av_offset;
-      xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
+      pthread_mutex_lock (&gui->event_mutex);
+      gui->mmk.av_offset = av_offset;
+      if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
+	  gui->playlist.mmk[gui->playlist.cur])
+	if (gui->playlist.cur < gui->playlist.num)
+	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
+      pthread_mutex_unlock (&gui->event_mutex);
+      xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
       osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
     }
     break;
     
   case ACTID_AV_SYNC_p3600:
     {
-      int av_offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) + 3600);
+      int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) + 3600);
       
-      gGui->mmk.av_offset = av_offset;
-      if (gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
-	  gGui->playlist.mmk[gGui->playlist.cur])
-	if (gGui->playlist.cur < gGui->playlist.num)
-	  gGui->playlist.mmk[gGui->playlist.cur]->av_offset = av_offset;
-      xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
+      pthread_mutex_lock (&gui->event_mutex);
+      gui->mmk.av_offset = av_offset;
+      if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
+	  gui->playlist.mmk[gui->playlist.cur])
+	if (gui->playlist.cur < gui->playlist.num)
+	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
+      pthread_mutex_unlock (&gui->event_mutex);
+      xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
       osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
     }
     break;
 
   case ACTID_AV_SYNC_RESET:
-    gGui->mmk.av_offset = 0;
-    if (gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
-	gGui->playlist.mmk[gGui->playlist.cur])
-      if (gGui->playlist.cur < gGui->playlist.num)
-	gGui->playlist.mmk[gGui->playlist.cur]->av_offset = 0;
-    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 0);
+    pthread_mutex_lock (&gui->event_mutex);
+    gui->mmk.av_offset = 0;
+    if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
+	gui->playlist.mmk[gui->playlist.cur])
+      if (gui->playlist.cur < gui->playlist.num)
+	gui->playlist.mmk[gui->playlist.cur]->av_offset = 0;
+    pthread_mutex_unlock (&gui->event_mutex);
+    xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, 0);
     osd_display_info(_("A/V Offset: reset."));
     break;
 
   case ACTID_SV_SYNC_p:
     {
-      int spu_offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
+      int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
       
-      xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
+      xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
       
       osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
@@ -784,16 +815,16 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SV_SYNC_m:
     {
-      int spu_offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
+      int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
       
-      xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
+      xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
       
       osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
     break;
     
   case ACTID_SV_SYNC_RESET:
-    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 0);
+    xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, 0);
     osd_display_info(_("SPU Offset: reset."));
     break;
 
@@ -870,21 +901,21 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_GRAB_POINTER:
-    if(!gGui->cursor_grabbed) {
+    if(!gui->cursor_grabbed) {
       if(!panel_is_visible()) {
-	XLockDisplay(gGui->video_display);
-	XGrabPointer(gGui->video_display, gGui->video_window, 1, None, 
-		     GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
-	XUnlockDisplay(gGui->video_display);
+	XLockDisplay(gui->video_display);
+	XGrabPointer(gui->video_display, gui->video_window, 1, None, 
+		     GrabModeAsync, GrabModeAsync, gui->video_window, None, CurrentTime);
+	XUnlockDisplay(gui->video_display);
       }
       
-      gGui->cursor_grabbed = 1;
+      gui->cursor_grabbed = 1;
     }
     else {
-      XLockDisplay(gGui->display);
-      XUngrabPointer(gGui->display, CurrentTime);
-      XUnlockDisplay(gGui->display);
-      gGui->cursor_grabbed = 0;
+      XLockDisplay(gui->display);
+      XUngrabPointer(gui->display, CurrentTime);
+      XUnlockDisplay(gui->display);
+      gui->cursor_grabbed = 0;
     }
     break;
     
@@ -905,10 +936,10 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_KBENABLE:
-    if(gGui->numeric.set)
-      gGui->kbindings_enabled = gGui->numeric.arg;
+    if (narg >= 0)
+      gui->kbindings_enabled = narg;
     else
-      gGui->kbindings_enabled = 1;
+      gui->kbindings_enabled = 1;
     break;
 
   case ACTID_DPMSSTANDBY:
@@ -916,7 +947,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_MRLIDENTTOGGLE:
-    gGui->is_display_mrl = !gGui->is_display_mrl;
+    gui->is_display_mrl = !gui->is_display_mrl;
     panel_update_mrl_display();
     playlist_mrlident_toggle();
     break;
@@ -934,15 +965,15 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_LOOPMODE:
-    if (!gGui->numeric.set)
-      gGui->playlist.loop++;
+    if (narg < 0)
+      gui->playlist.loop++;
     else
-      gGui->playlist.loop = gGui->numeric.arg;
-    if(gGui->playlist.loop >= PLAYLIST_LOOP_MODES_NUM ||
-       gGui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
-      gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
+      gui->playlist.loop = narg;
+    if(gui->playlist.loop >= PLAYLIST_LOOP_MODES_NUM ||
+       gui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
+      gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
     
-    switch(gGui->playlist.loop) {
+    switch(gui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
       osd_display_info(_("Playlist: no loop."));
       break;
@@ -967,7 +998,7 @@ void gui_execute_action_id(action_id_t action) {
 
 #ifdef HAVE_TAR
   case ACTID_SKINDOWNLOAD:
-    download_skin(gGui->skin_server_url);
+    download_skin(gui->skin_server_url);
     break;
 #endif
 
@@ -976,8 +1007,8 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_OSD_WTEXT:
-    if(gGui->alphanum.set) {
-      osd_display_info("%s", gGui->alphanum.arg);
+    if (sarg) {
+      osd_display_info ("%s", sarg);
     } else {
       osd_display_info(_("No text to display!"));
     }
@@ -1065,20 +1096,20 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_PLAYLIST_STOP:
-    if(!gGui->numeric.set) {
-      gGui->playlist.control ^= PLAYLIST_CONTROL_STOP;
-      gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP_PERSIST;
+    if (narg < 0) {
+      gui->playlist.control ^= PLAYLIST_CONTROL_STOP;
+      gui->playlist.control &= ~PLAYLIST_CONTROL_STOP_PERSIST;
     }
     else {
-      if(!gGui->numeric.arg)
-	gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+      if (narg == 0)
+	gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       else
-	gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
-      gGui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
+	gui->playlist.control |= PLAYLIST_CONTROL_STOP;
+      gui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
     }
     osd_display_info(_("Playlist: %s"), 
-		     (gGui->playlist.control & PLAYLIST_CONTROL_STOP) ?
-		     (gGui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST) ?
+		     (gui->playlist.control & PLAYLIST_CONTROL_STOP) ?
+		     (gui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST) ?
 		     _("Stop (persistent)") :
 		     _("Stop") :
 		     _("Continue"));
@@ -1088,12 +1119,12 @@ void gui_execute_action_id(action_id_t action) {
 
     /* Parameter (integer, required): input
     */
-    if(gGui->numeric.set) {
+    if (narg >= 0) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
       /* set input */
-      ev_data.input = gGui->numeric.arg;
+      ev_data.input = narg;
 
       /* do not change tuning */
       ev_data.channel = -1;
@@ -1106,8 +1137,8 @@ void gui_execute_action_id(action_id_t action) {
       xine_event.type = XINE_EVENT_SET_V4L2;
       xine_event.data_length = sizeof(xine_set_v4l2_data_t);
       xine_event.data = &ev_data;
-      xine_event.stream = gGui->stream;
-      xine_event_send(gGui->stream, &xine_event);
+      xine_event.stream = gui->stream;
+      xine_event_send(gui->stream, &xine_event);
     }
     break;
 
@@ -1115,7 +1146,7 @@ void gui_execute_action_id(action_id_t action) {
 
     /* Parameter (integer, required): frequency
     */
-    if(gGui->numeric.set) {
+    if (narg >= 0) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
@@ -1124,7 +1155,7 @@ void gui_execute_action_id(action_id_t action) {
 
       /* change tuning */
       ev_data.channel = -1;
-      ev_data.frequency = gGui->numeric.arg;
+      ev_data.frequency = narg;
 
       /* do not set session id */
       ev_data.session_id = -1;
@@ -1133,8 +1164,8 @@ void gui_execute_action_id(action_id_t action) {
       xine_event.type = XINE_EVENT_SET_V4L2;
       xine_event.data_length = sizeof(xine_set_v4l2_data_t);
       xine_event.data = &ev_data;
-      xine_event.stream = gGui->stream;
-      xine_event_send(gGui->stream, &xine_event);
+      xine_event.stream = gui->stream;
+      xine_event_send(gui->stream, &xine_event);
     }
     break;
 
@@ -1147,7 +1178,7 @@ void gui_execute_action_id(action_id_t action) {
        an existing mark is provided, then the mark for that section
        is moved to the current position.
     */
-    if(gGui->numeric.set) {
+    if (narg >= 0) {
       xine_event_t         xine_event;
       xine_set_v4l2_data_t ev_data;
 
@@ -1159,14 +1190,14 @@ void gui_execute_action_id(action_id_t action) {
       ev_data.frequency = -1;
 
       /* set session id */
-      ev_data.session_id = gGui->numeric.arg;
+      ev_data.session_id = narg;
 
       /* send event */
       xine_event.type = XINE_EVENT_SET_V4L2;
       xine_event.data_length = sizeof(xine_set_v4l2_data_t);
       xine_event.data = &ev_data;
-      xine_event.stream = gGui->stream;
-      xine_event_send(gGui->stream, &xine_event);
+      xine_event.stream = gui->stream;
+      xine_event_send(gui->stream, &xine_event);
     }
     break;
 
@@ -1177,7 +1208,7 @@ void gui_execute_action_id(action_id_t action) {
        Set the name of the current section in the pvr stream. The name
        is used when the section is saved permanently.
     */
-    if(gGui->alphanum.set) {
+    if (sarg) {
       xine_event_t         xine_event;
       xine_pvr_save_data_t ev_data;
 
@@ -1186,14 +1217,14 @@ void gui_execute_action_id(action_id_t action) {
       ev_data.id = -1;
 
       /* name of the show, max 255 is hardcoded in xine.h */
-      strlcpy(ev_data.name, gGui->alphanum.arg, sizeof(ev_data.name));
+      strlcpy (ev_data.name, sarg, sizeof(ev_data.name));
 
       /* send event */
       xine_event.type = XINE_EVENT_PVR_SAVE;
       xine_event.data = &ev_data;
       xine_event.data_length = sizeof(xine_pvr_save_data_t);
-      xine_event.stream = gGui->stream;
-      xine_event_send(gGui->stream, &xine_event);
+      xine_event.stream = gui->stream;
+      xine_event_send(gui->stream, &xine_event);
     }
     break;
 
@@ -1206,10 +1237,10 @@ void gui_execute_action_id(action_id_t action) {
          mode = 1 : save from last mark
          mode = 2 : save entire stream
     */
-    if(gGui->numeric.set) {
+    if (narg >= 0) {
       xine_event_t         xine_event;
       xine_pvr_save_data_t ev_data;
-      int                  mode = gGui->numeric.arg;
+      int                  mode = narg;
 
       /* set mode [0..2] */
       if(mode < 0)
@@ -1226,17 +1257,17 @@ void gui_execute_action_id(action_id_t action) {
       xine_event.type = XINE_EVENT_PVR_SAVE;
       xine_event.data = &ev_data;
       xine_event.data_length = sizeof(xine_pvr_save_data_t);
-      xine_event.stream = gGui->stream;
-      xine_event_send(gGui->stream, &xine_event);
+      xine_event.stream = gui->stream;
+      xine_event_send(gui->stream, &xine_event);
     }
     break;
 
   case ACTID_PLAYLIST_OPEN:
-    if(gGui->alphanum.set) {
-        mediamark_load_mediamarks(gGui->alphanum.arg);
+    if (sarg) {
+        mediamark_load_mediamarks (sarg);
         gui_set_current_mmk(mediamark_get_current_mmk());
         playlist_update_playlist();
-        if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+        if((!is_playback_widgets_enabled()) && gui->playlist.num)
         	enable_playback_controls(1);
     }
     break;
@@ -1244,13 +1275,13 @@ void gui_execute_action_id(action_id_t action) {
   default:
     break;
   }
-    
-  /* Some sort of function was done. Clear arguments. */
-  gGui->numeric.set = 0;
-  gGui->numeric.arg = 0;
-  gGui->alphanum.set = 0;
-  gGui->alphanum.arg = "";
-  pthread_mutex_unlock(&event_mutex);
+
+  free (sarg);
+  pthread_mutex_lock (&gui->event_mutex);
+  gui->event_pending--;
+  if ((gui->event_pending <= 0) && gui->event_reject)
+    pthread_cond_signal (&gui->event_safe);
+  pthread_mutex_unlock (&gui->event_mutex);
 }
 
 /*
@@ -1514,17 +1545,21 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 }
 
 void gui_deinit(void) {
-  pthread_mutex_lock(&event_mutex);
-  reject_events = 1;
-  pthread_mutex_unlock(&event_mutex);
+  gGui_t *gui = gGui;
+  pthread_mutex_lock (&gui->event_mutex);
+  gui->event_reject = 1;
+  while (gui->event_pending > 0)
+    pthread_cond_wait (&gui->event_safe, &gui->event_mutex);
+  pthread_mutex_unlock (&gui->event_mutex);
 
-  xitk_unregister_event_handler(&gGui->widget_key);
+  xitk_unregister_event_handler(&gui->widget_key);
 }
 
 /*
  * Initialize the GUI
  */
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
+  gGui_t *gui = gGui;
   int    i;
   char  *server;
   char  *video_display_name;
@@ -1532,7 +1567,11 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-  pthread_mutex_init(&event_mutex, &attr);
+  pthread_mutex_init (&gui->event_mutex, &attr);
+  pthread_cond_init (&gui->event_safe, NULL);
+
+  gui->event_reject = 1;
+  gui->event_pending = 0;
 
   /*
    * init playlist
@@ -1884,7 +1923,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gui_set_current_mmk(mediamark_get_current_mmk());
 
   panel_init();
-  reject_events = 0;
+  gui->event_reject = 0;
 }
 
 void gui_init_imlib (Visual *vis) {
