@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -124,77 +124,37 @@ void event_sender_update_tips_timeout(unsigned long timeout) {
 }
 
 /* Send given event to xine engine */
-void event_sender_send(int event) {
+void event_sender_send (int event) {
+  xine_event_t   xine_event;
+
+  if (!event)
+    return;
+
+  xine_event.type        = event;
+  xine_event.data_length = 0;
+  xine_event.data        = NULL;
+  xine_event.stream      = gGui->stream;
+  gettimeofday(&xine_event.tv, NULL);
+  xine_event_send (gGui->stream, &xine_event);
+}
+
+static void event_sender_send2 (xitk_widget_t *w, void *data) {
+  int event = (long int)data;
   xine_event_t   xine_event;
 
   xine_event.type        = event;
-  
-  if(xine_event.type != 0) {
-    xine_event.data_length = 0;
-    xine_event.data        = NULL;
-    xine_event.stream      = gGui->stream;
-    gettimeofday(&xine_event.tv, NULL);
-
-    xine_event_send(gGui->stream, &xine_event);
-  }
-}
-
-static void event_sender_up(xitk_widget_t *w, void *data) {
-  event_sender_send(XINE_EVENT_INPUT_UP);
-}
-
-static void event_sender_down(xitk_widget_t *w, void *data) {
-  event_sender_send(XINE_EVENT_INPUT_DOWN);
-}
-
-static void event_sender_left(xitk_widget_t *w, void *data) {
-  event_sender_send(XINE_EVENT_INPUT_LEFT);
-}
-
-static void event_sender_right(xitk_widget_t *w, void *data) {
-  event_sender_send(XINE_EVENT_INPUT_RIGHT);
-}
-
-static void event_sender_select(xitk_widget_t *w, void *data) {
-  event_sender_send(XINE_EVENT_INPUT_SELECT);
-}
-
-static void event_sender_menu(xitk_widget_t *w, void *data) {
-  int event = (int)(intptr_t) data;
-  int events[7] = {
-    XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
-    XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
-    XINE_EVENT_INPUT_MENU7
-  };
-
-  event_sender_send(events[event]);
-}
-
-static void event_sender_num(xitk_widget_t *w, void *data) {
-  int event = (int)(intptr_t) data;
-  int events[11] = { 
-    XINE_EVENT_INPUT_NUMBER_0, XINE_EVENT_INPUT_NUMBER_1, XINE_EVENT_INPUT_NUMBER_2,
-    XINE_EVENT_INPUT_NUMBER_3, XINE_EVENT_INPUT_NUMBER_4, XINE_EVENT_INPUT_NUMBER_5,
-    XINE_EVENT_INPUT_NUMBER_6, XINE_EVENT_INPUT_NUMBER_7, XINE_EVENT_INPUT_NUMBER_8,
-    XINE_EVENT_INPUT_NUMBER_9, XINE_EVENT_INPUT_NUMBER_10_ADD
-  };
-
-  event_sender_send(events[event]);
-}
-
-static void event_sender_angle(xitk_widget_t *w, void *data) {
-  int event = (int)(intptr_t) data;
-  int events[11] = { 
-    XINE_EVENT_INPUT_ANGLE_NEXT, XINE_EVENT_INPUT_ANGLE_PREVIOUS
-  };
-
-  event_sender_send(events[event]);
+  xine_event.data_length = 0;
+  xine_event.data        = NULL;
+  xine_event.stream      = gGui->stream;
+  gettimeofday(&xine_event.tv, NULL);
+  xine_event_send (gGui->stream, &xine_event);
 }
 
 static void event_sender_exit(xitk_widget_t *, void *);
 
 static void event_sender_handle_event(XEvent *event, void *data) {
-  
+  xine_event_t  xine_event;
+
   switch(event->type) {
 
   case ButtonRelease:
@@ -209,7 +169,7 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 	  xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
       }
     }
-    break;
+    return;
 
   case KeyPress:
     {
@@ -225,71 +185,80 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 
       switch(key) {
       case XK_Up:
-	event_sender_up(NULL, NULL);
+        xine_event.type = XINE_EVENT_INPUT_UP;
 	break;
       case XK_Down:
-	event_sender_down(NULL, NULL);
+        xine_event.type = XINE_EVENT_INPUT_DOWN;
 	break;
       case XK_Left:
-	event_sender_left(NULL, NULL);
+        xine_event.type = XINE_EVENT_INPUT_LEFT;
 	break;
       case XK_Right:
-	event_sender_right(NULL, NULL);
+        xine_event.type = XINE_EVENT_INPUT_RIGHT;
 	break;
 
       case XK_Return:
       case XK_KP_Enter:
       case XK_ISO_Enter:
-	event_sender_select(NULL, NULL);
+        xine_event.type = XINE_EVENT_INPUT_SELECT;
 	break;
 	
       case XK_0:
-	event_sender_num(NULL, (void *)0);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_0;
 	break;
       case XK_1:
-	event_sender_num(NULL, (void *)1);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_1;
 	break;
       case XK_2:
-	event_sender_num(NULL, (void *)2);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_2;
 	break;
       case XK_3:
-	event_sender_num(NULL, (void *)3);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_3;
 	break;
       case XK_4:
-	event_sender_num(NULL, (void *)4);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_4;
 	break;
       case XK_5:
-	event_sender_num(NULL, (void *)5);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_5;
 	break;
       case XK_6:
-	event_sender_num(NULL, (void *)6);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_6;
 	break;
       case XK_7:
-	event_sender_num(NULL, (void *)7);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_7;
 	break;
       case XK_8:
-	event_sender_num(NULL, (void *)8);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_8;
 	break;
       case XK_9:
-	event_sender_num(NULL, (void *)9);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_9;
 	break;
 
       case XK_plus:
       case XK_KP_Add:
-	event_sender_num(NULL, (void *)10);
+        xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD;
 	break;
 
       case XK_Escape:
 	event_sender_exit(NULL, NULL);
-	break;
+	return;
 
       default:
 	gui_handle_event(event, data);
-	break;
+	return;
       }
     }
     break;
+
+    default:
+      return;
   }
+
+  xine_event.data_length = 0;
+  xine_event.data        = NULL;
+  xine_event.stream      = gGui->stream;
+  gettimeofday(&xine_event.tv, NULL);
+  xine_event_send (gGui->stream, &xine_event);
 }
 
 void event_sender_update_menu_buttons(void) {
@@ -446,16 +415,19 @@ void event_sender_panel(void) {
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
+  lb.button_type       = CLICK_BUTTON;
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = event_sender_send2;
+  lb.state_callback    = NULL;
+  lb.skin_element_name = NULL;
+
+#define I2PTR(n) (void *)((long int)(n))
+
   x = 80 + 5 + 5;
   y = 5 + 23 * 3 + 5 - 40;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Up");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_up; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_UP);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)),
 	   (eventer->navigator.up = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -467,13 +439,8 @@ void event_sender_panel(void) {
   x -= 70;
   y += 40;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Left");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_left; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_LEFT);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.left = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -485,13 +452,8 @@ void event_sender_panel(void) {
   x += 75;
   y += 5;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Select");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_select; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_SELECT);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.select = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -503,13 +465,8 @@ void event_sender_panel(void) {
   x += 65;
   y -= 5;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Right");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_right; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_RIGHT);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.right = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -521,13 +478,8 @@ void event_sender_panel(void) {
   x -= 70;
   y += 40;
  
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Down");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_down; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_DOWN);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.down = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -544,13 +496,8 @@ void event_sender_panel(void) {
     
     snprintf(number, sizeof(number), "%d", i);
 
-    lb.button_type       = CLICK_BUTTON;
     lb.label             = number;
-    lb.align             = ALIGN_CENTER;
-    lb.callback          = event_sender_num;
-    lb.state_callback    = NULL;
-    lb.userdata          = (void *)(intptr_t)i;
-    lb.skin_element_name = NULL;
+    lb.userdata          = I2PTR (XINE_EVENT_INPUT_NUMBER_0 + i);
 
     if(!i)
       x -= 46;
@@ -580,13 +527,8 @@ void event_sender_panel(void) {
     
     snprintf(number, sizeof(number), "+ %d", i);
     
-    lb.button_type       = CLICK_BUTTON;
     lb.label             = number;
-    lb.align             = ALIGN_CENTER;
-    lb.callback          = event_sender_num;
-    lb.state_callback    = NULL;
-    lb.userdata          = (void *)(intptr_t)i;
-    lb.skin_element_name = NULL;
+    lb.userdata          = I2PTR (XINE_EVENT_INPUT_NUMBER_10_ADD);
     
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->numbers.number[i] = 
@@ -599,13 +541,8 @@ void event_sender_panel(void) {
   x = WINDOW_WIDTH - 80 - 5;
   y = 5 + 23 * 3 + 5 + 40 + 5;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Angle +");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_angle; 
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)1;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_ANGLE_NEXT);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->angles.next = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -615,13 +552,8 @@ void event_sender_panel(void) {
 
   y += 23;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Angle -");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_angle; 
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)0;
-  lb.skin_element_name = NULL;
+  lb.userdata          = I2PTR (XINE_EVENT_INPUT_ANGLE_PREVIOUS);
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->angles.prev = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -659,13 +591,8 @@ void event_sender_panel(void) {
   y = 5;
 
   for(i = 0; i < 7; i++) {
-    lb.button_type       = CLICK_BUTTON;
     lb.label             = "";
-    lb.align             = ALIGN_CENTER;
-    lb.callback          = event_sender_menu; 
-    lb.state_callback    = NULL;
-    lb.userdata          = (void *)(intptr_t)i;
-    lb.skin_element_name = NULL;
+    lb.userdata          = I2PTR (XINE_EVENT_INPUT_MENU1 + i);
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->menus.menu[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
@@ -689,13 +616,9 @@ void event_sender_panel(void) {
   x = WINDOW_WIDTH - 70 - 5;
   y = WINDOW_HEIGHT - 23 - 5;
 
-  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_exit; 
-  lb.state_callback    = NULL;
+  lb.callback          = event_sender_exit;
   lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
    (w = xitk_noskin_labelbutton_create(eventer->widget_list, 
 				       &lb, x, y, 70, 23,
