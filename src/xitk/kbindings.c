@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2012 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -220,9 +220,10 @@ static void kbindings_convert_modifier(int mod, int *modifier) {
  * Save current key binding table to keymap file.
  */
 void kbindings_save_kbinding(kbinding_t *kbt) {
+  gGui_t *gui = gGui;
   FILE   *f;
   
-  if((f = fopen(gGui->keymap_file, "w+")) == NULL) {
+  if((f = fopen(gui->keymap_file, "w+")) == NULL) {
     return;
   }
   else {
@@ -326,12 +327,13 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
 }
 
 static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
+  gGui_t *gui = gGui;
   static char shortcut[32];
 
   if(kbe) {
     shortcut[0] = 0;
     
-    if(gGui->shortcut_style == 0) {
+    if(gui->shortcut_style == 0) {
       if(kbe->modifier & KEYMOD_CONTROL)
 	snprintf(shortcut+strlen(shortcut), sizeof(shortcut)-strlen(shortcut), "%s+", _("Ctrl"));
       if(kbe->modifier & KEYMOD_META)
@@ -483,17 +485,18 @@ static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
  * Handle key event from an XEvent.
  */
 void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
+  gGui_t *gui = gGui;
   int               modifier;
   char              buf[256];
   kbinding_entry_t *k;
 
-  if(!gGui->kbindings_enabled || (kbt == NULL) || (event == NULL))
+  if(!gui->kbindings_enabled || (kbt == NULL) || (event == NULL))
     return;
 
   if (xevent2id(event, &modifier, buf, sizeof(buf)))
     return;
   k = kbindings_lookup_binding(kbt, buf, modifier);
-  if(k && !(gGui->no_gui && k->is_gui))
+  if(k && !(gui->no_gui && k->is_gui))
     gui_execute_action_id(k->action_id);
 #if 0  /* DEBUG */
   else
@@ -519,12 +522,13 @@ int kbedit_is_running(void) {
  * Return 1 if setup panel is visible
  */
 int kbedit_is_visible(void) {
+  gGui_t *gui = gGui;
 
   if(kbedit != NULL) {
-    if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin));
+    if(gui->use_root_window)
+      return xitk_is_window_visible(gui->display, xitk_window_get_window(kbedit->xwin));
     else
-      return kbedit->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin));
+      return kbedit->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(kbedit->xwin));
   }
 
   return 0;
@@ -549,6 +553,7 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void kbedit_create_browser_entries(void) {
+  gGui_t *gui = gGui;
   xitk_font_t  *fs;
   int           i;
   
@@ -561,7 +566,7 @@ static void kbedit_create_browser_entries(void) {
     free((char **)kbedit->shortcuts);
   }
   
-  fs = xitk_font_load_font(gGui->display, br_fontname);
+  fs = xitk_font_load_font(gui->display, br_fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   
   kbedit->entries   = (char **) calloc(kbedit->kbt->num_entries, sizeof(char *));
@@ -675,6 +680,7 @@ static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
  *
  */
 static void kbedit_exit(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   if(kbedit) {
     window_info_t wi;
@@ -691,14 +697,14 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&kbedit->kreg);
     
     xitk_destroy_widgets(kbedit->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, kbedit->xwin);
+    xitk_window_destroy_window(gui->imlib_data, kbedit->xwin);
     
     kbedit->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(kbedit->widget_list)));
     
-    XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
+    XUnlockDisplay(gui->display);
     
     XITK_WIDGET_LIST_FREE(kbedit->widget_list);
     
@@ -718,9 +724,9 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
 
     free(kbedit);
     kbedit = NULL;
-    gGui->ssaver_enabled = 1;
+    gui->ssaver_enabled = 1;
 
-    try_to_set_input_focus(gGui->video_window);
+    try_to_set_input_focus(gui->video_window);
   }
 }
 
@@ -831,13 +837,14 @@ static void kbedit_reset(xitk_widget_t *w, void *data) {
  * Save keymap file, then set global table to hacked one 
  */
 static void kbedit_save(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
   
-  kbindings_free_kbinding(&gGui->kbindings);
-  gGui->kbindings = _kbindings_duplicate_kbindings(kbedit->kbt);
-  kbindings_save_kbinding(gGui->kbindings);
+  kbindings_free_kbinding(&gui->kbindings);
+  gui->kbindings = _kbindings_duplicate_kbindings(kbedit->kbt);
+  kbindings_save_kbinding(gui->kbindings);
 }
 
 /*
@@ -923,6 +930,7 @@ static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
  * Grab key binding.
  */
 static void kbedit_grab(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
   char              *olbl;
   XEvent             xev;
   int                mod, modifier;
@@ -946,36 +954,36 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   kbe->is_gui    = kbedit->ksel->is_gui;
   
   xitk_labelbutton_change_label(kbedit->grab, _("Press Keyboard Keys..."));
-  XLockDisplay(gGui->display);
-  XSync(gGui->display, False);
-  XUnlockDisplay(gGui->display);
+  XLockDisplay(gui->display);
+  XSync(gui->display, False);
+  XUnlockDisplay(gui->display);
 
   {
     int x, y, w, h;
 
-    xitk_get_window_position(gGui->display, 
+    xitk_get_window_position(gui->display, 
 			     (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
         
-    xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+    xwin = xitk_window_create_dialog_window(gui->imlib_data, 
 					    _("Event Receiver Window:  Press keyboard keys to bind..."),
 					    x, y, w, h);
 
     set_window_states_start((xitk_window_get_window(xwin)));
   }
   
-  XLockDisplay(gGui->display);
-  XRaiseWindow(gGui->display, (xitk_window_get_window(xwin)));
-  XMapWindow(gGui->display, (xitk_window_get_window(xwin)));
-  XUnlockDisplay(gGui->display);
+  XLockDisplay(gui->display);
+  XRaiseWindow(gui->display, (xitk_window_get_window(xwin)));
+  XMapWindow(gui->display, (xitk_window_get_window(xwin)));
+  XUnlockDisplay(gui->display);
 
   try_to_set_input_focus(xitk_window_get_window(xwin));
 
   do {
     /* Although only release events are evaluated, we must also grab the corresponding press */
     /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
-    XLockDisplay(gGui->display);
-    XMaskEvent(gGui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XMaskEvent(gui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
+    XUnlockDisplay(gui->display);
   } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
 	   xev.xany.window != xitk_window_get_window(xwin));
   
@@ -994,11 +1002,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   
   xitk_labelbutton_change_label(kbedit->grab, olbl);
 
-  xitk_window_destroy_window(gGui->imlib_data, xwin);
+  xitk_window_destroy_window(gui->imlib_data, xwin);
   
-  XLockDisplay(gGui->display);
-  XSync(gGui->display, False);
-  XUnlockDisplay(gGui->display);
+  XLockDisplay(gui->display);
+  XSync(gui->display, False);
+  XUnlockDisplay(gui->display);
 
   kbedit->grabbing = 0;
   
@@ -1010,7 +1018,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
     
     /* Ask if user wants to store new shortcut */
-    xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Accept?"),
+    xitk_window_dialog_yesno_with_width(gui->imlib_data, _("Accept?"),
 					kbedit_accept_yes, 
 					kbedit_accept_no, 
 					(void *) kbe, 400, ALIGN_CENTER,
@@ -1088,6 +1096,7 @@ void kbedit_reparent(void) {
  *
  */
 void kbedit_window(void) {
+  gGui_t *gui = gGui;
   int                        x, y, y1;
   GC                         gc;
   xitk_pixmap_t             *bg;
@@ -1117,17 +1126,17 @@ void kbedit_window(void) {
   
   kbedit = (_kbedit_t *) calloc(1, sizeof(_kbedit_t));
 
-  kbedit->kbt           = _kbindings_duplicate_kbindings(gGui->kbindings);
+  kbedit->kbt           = _kbindings_duplicate_kbindings(gui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;
-  kbedit->xwin          = xitk_window_create_dialog_window(gGui->imlib_data,
+  kbedit->xwin          = xitk_window_create_dialog_window(gui->imlib_data,
 							   _("Key Binding Editor"),
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   set_window_states_start((xitk_window_get_window(kbedit->xwin)));
 
-  XLockDisplay (gGui->display);
-  gc = XCreateGC(gGui->display, 
+  XLockDisplay (gui->display);
+  gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(kbedit->xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
 
   kbedit->widget_list      = xitk_widget_list_new();
 
@@ -1136,39 +1145,39 @@ void kbedit_window(void) {
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(kbedit->xwin)));
   xitk_widget_list_set(kbedit->widget_list, WIDGET_LIST_GC, gc);
   
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
+  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
+  XLockDisplay (gui->display);
+  XCopyArea(gui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
   
   x = 15;
   y = 34;
   
-  draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box(gui->imlib_data, bg, x, y,
 			     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
 
   y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
   y1 = y; /* remember for later */
-  draw_outter_frame(gGui->imlib_data, bg, 
+  draw_outter_frame(gui->imlib_data, bg, 
 		    _("Binding Action"), hboldfontname,
 		    x, y, 
 		    (WINDOW_WIDTH - 30), 45);
 
   y += 45 + 3;
-  draw_outter_frame(gGui->imlib_data, bg, 
+  draw_outter_frame(gui->imlib_data, bg, 
 		    _("Key"), hboldfontname,
 		    x, y, 
 		    120, 45);
 
-  draw_outter_frame(gGui->imlib_data, bg, 
+  draw_outter_frame(gui->imlib_data, bg, 
 		    _("Modifiers"), hboldfontname,
 		    x + 130, y, 
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
 
-  xitk_window_change_background(gGui->imlib_data, kbedit->xwin, bg->pixmap,
+  xitk_window_change_background(gui->imlib_data, kbedit->xwin, bg->pixmap,
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
@@ -1177,7 +1186,7 @@ void kbedit_window(void) {
 
   y = 34;
 
-  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+  XITK_WIDGET_INIT(&br, gui->imlib_data);
   
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
@@ -1206,7 +1215,7 @@ void kbedit_window(void) {
 
   y = y1 - 30 + 4;
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
   
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Alias");
@@ -1297,9 +1306,9 @@ void kbedit_window(void) {
 
   x = 15;
   
-  XITK_WIDGET_INIT(&l, gGui->imlib_data);
+  XITK_WIDGET_INIT(&l, gui->imlib_data);
 
-  fs = xitk_font_load_font(gGui->display, hboldfontname);
+  fs = xitk_font_load_font(gui->display, hboldfontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   fontheight = xitk_font_get_string_height(fs, " ");
   xitk_font_unload_font(fs);
@@ -1332,7 +1341,7 @@ void kbedit_window(void) {
 						     100, fontheight, hboldfontname)));
   xitk_enable_and_show_widget(kbedit->key);
   
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
   x += 130 + 10;
 
@@ -1481,7 +1490,7 @@ void kbedit_window(void) {
 					     NULL);
   
 
-  gGui->ssaver_enabled = 0;
+  gui->ssaver_enabled = 0;
   kbedit->visible      = 1;
   kbedit->running      = 1;
   kbedit_raise_window();

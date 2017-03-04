@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -129,12 +129,13 @@ char *get_fourcc_string(uint32_t f) {
 }
 
 static void get_meta_info(xitk_widget_t *w, int meta) {
+  gGui_t *gui = gGui;
   char *minfo;
   xitk_recode_t *xr;
   
   xr = xitk_recode_init(METAINFO_CHARSET, NULL);
   
-  minfo = (char *)xine_get_meta_info(gGui->stream, meta);
+  minfo = (char *)xine_get_meta_info(gui->stream, meta);
   if(minfo)
     minfo = xitk_recode(xr, minfo);
   set_label(w, (minfo) ? (char *) minfo : _("Unavailable"));
@@ -144,9 +145,10 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
 }
 
 static void get_stream_info(xitk_widget_t *w, int info) {
+  gGui_t *gui = gGui;
   char *tmp;
 
-  asprintf(&tmp, "%d", xine_get_stream_info(gGui->stream, info));
+  asprintf(&tmp, "%d", xine_get_stream_info(gui->stream, info));
   
   set_label(w, tmp);
 
@@ -154,25 +156,28 @@ static void get_stream_info(xitk_widget_t *w, int info) {
 }
       
 static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
+  gGui_t *gui = gGui;
   uint32_t   iinfo;
   
-  iinfo = xine_get_stream_info(gGui->stream, info);
+  iinfo = xine_get_stream_info(gui->stream, info);
   set_label(w, (get_fourcc_string(iinfo)));
 }
       
 static void get_stream_yesno_info(xitk_widget_t *w, int info) {
+  gGui_t *gui = gGui;
   uint32_t   iinfo;
   
-  iinfo = xine_get_stream_info(gGui->stream, info);
+  iinfo = xine_get_stream_info(gui->stream, info);
   set_label(w, (get_yesno_string(iinfo)));
 }
 
 static void get_stream_video_resolution_info(void) {
+  gGui_t *gui = gGui;
   uint32_t    video_w, video_h;
   char        buffer[1024];
 
-  video_w = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-  video_h = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+  video_w = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+  video_h = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
 
   snprintf(buffer, sizeof(buffer), "%d X %d", video_w, video_h);
   set_label(sinfos.infos.video_resolution, buffer);
@@ -264,6 +269,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
 }
 
 static void stream_infos_exit(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   window_info_t wi;
     
@@ -281,18 +287,18 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&sinfos.widget_key);
 
     xitk_destroy_widgets(sinfos.widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, sinfos.xwin);
+    xitk_window_destroy_window(gui->imlib_data, sinfos.xwin);
 
     sinfos.xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(sinfos.widget_list)));
     
-    XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
+    XUnlockDisplay(gui->display);
     
     XITK_WIDGET_LIST_FREE(sinfos.widget_list);
     
-    try_to_set_input_focus(gGui->video_window);
+    try_to_set_input_focus(gui->video_window);
 }
 
 static void handle_event(XEvent *event, void *data) {
@@ -308,11 +314,12 @@ static void handle_event(XEvent *event, void *data) {
 }
 
 int stream_infos_is_visible(void) {
+  gGui_t *gui = gGui;
   
-    if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos.xwin));
+    if(gui->use_root_window)
+      return xitk_is_window_visible(gui->display, xitk_window_get_window(sinfos.xwin));
     else
-      return sinfos.visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos.xwin));
+      return sinfos.visible && xitk_is_window_visible(gui->display, xitk_window_get_window(sinfos.xwin));
   
   return 0;
 }
@@ -322,11 +329,12 @@ int stream_infos_is_running(void) {
 }
 
 void stream_infos_toggle_auto_update(void) {
-    if(gGui->stream_info_auto_update) {
+  gGui_t *gui = gGui;
+    if(gui->stream_info_auto_update) {
       xitk_hide_widget(sinfos.update);
-      XLockDisplay(gGui->display);
-      XClearWindow(gGui->display, xitk_window_get_window(sinfos.xwin));
-      XUnlockDisplay(gGui->display);
+      XLockDisplay(gui->display);
+      XClearWindow(gui->display, xitk_window_get_window(sinfos.xwin));
+      XUnlockDisplay(gui->display);
       xitk_paint_widget_list(sinfos.widget_list);
     }
     else
@@ -386,7 +394,8 @@ static void stream_info_update_undefined(void) {
 }
 
 void stream_infos_update_infos(void) {
-    if(!gGui->logo_mode) {
+  gGui_t *gui = gGui;
+    if(!gui->logo_mode) {
       
       get_meta_info(sinfos.meta_infos.title, XINE_META_INFO_TITLE);
       get_meta_info(sinfos.meta_infos.comment, XINE_META_INFO_COMMENT);
@@ -432,6 +441,7 @@ void stream_infos_reparent(void) {
 }
 
 void stream_infos_panel(void) {
+  gGui_t *gui = gGui;
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
@@ -456,15 +466,15 @@ void stream_infos_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  sinfos.xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("Stream Information"), x, y,
+  sinfos.xwin = xitk_window_create_dialog_window(gui->imlib_data, _("Stream Information"), x, y,
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start((xitk_window_get_window(sinfos.xwin)));
 
-  XLockDisplay (gGui->display);
-  gc = XCreateGC(gGui->display, 
+  XLockDisplay (gui->display);
+  gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(sinfos.xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
 
   sinfos.widget_list = xitk_widget_list_new();
   xitk_widget_list_set(sinfos.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
@@ -472,28 +482,28 @@ void stream_infos_panel(void) {
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(sinfos.xwin)));
   xitk_widget_list_set(sinfos.widget_list, WIDGET_LIST_GC, gc);
   
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
   xitk_window_get_window_size(sinfos.xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
-  XLockDisplay (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(sinfos.xwin)), bg->pixmap,
+  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
+  XLockDisplay (gui->display);
+  XCopyArea(gui->display, (xitk_window_get_background(sinfos.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
   
   x = 15;
   y = 34 - 6;
   
-  draw_outter_frame(gGui->imlib_data, bg, _("General"), btnfontname, 
+  draw_outter_frame(gui->imlib_data, bg, _("General"), btnfontname, 
 		    x, y, WINDOW_WIDTH - 30, (4 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* First Line */
   x = 20;
   y += 15;
   w = WINDOW_WIDTH - 40 - 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Title: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Title: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -508,7 +518,7 @@ void stream_infos_panel(void) {
 
   /* New Line */
   y += (20 + 22) + 3;
-  draw_inner_frame(gGui->imlib_data, bg, _("Comment: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Comment: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -524,7 +534,7 @@ void stream_infos_panel(void) {
   /* New Line */
   y += (20 + 22) + 3;
   w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Artist: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Artist: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -539,7 +549,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w = ((WINDOW_WIDTH - 40 - 3 * 5) / 4) + 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Genre: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Genre: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -554,7 +564,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Year: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Year: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -571,7 +581,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Album: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Album: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -587,13 +597,13 @@ void stream_infos_panel(void) {
   /* frame space */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("Misc"), btnfontname, 
+  draw_outter_frame(gui->imlib_data, bg, _("Misc"), btnfontname, 
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 3 * 5) / 4;
-  draw_inner_frame(gGui->imlib_data, bg, _("Input Plugin: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Input Plugin: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -608,7 +618,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("System Layer: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("System Layer: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -622,7 +632,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.meta_infos.systemlayer);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -637,7 +647,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Frame Duration: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Frame Duration: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -653,7 +663,7 @@ void stream_infos_panel(void) {
   /* New Line */
   x = 20;
   y += (20 + 22) + 3;
-  draw_inner_frame(gGui->imlib_data, bg, _("Is Seekable: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Is Seekable: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -668,7 +678,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Has Chapters: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Has Chapters: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -682,7 +692,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_chapters);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Ignore Spu: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Ignore Spu: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -697,7 +707,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Has Still: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Has Still: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -713,14 +723,14 @@ void stream_infos_panel(void) {
   /* video frame */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("Video"), btnfontname, 
+  draw_outter_frame(gui->imlib_data, bg, _("Video"), btnfontname, 
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Has: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Has: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -734,7 +744,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_video);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Handled: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Handled: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -749,7 +759,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Ignore: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Ignore: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -765,7 +775,7 @@ void stream_infos_panel(void) {
   x += w + 5;
   w += 1;
   w = (w * 2) + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Codec: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Codec: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -782,7 +792,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (WINDOW_WIDTH - 40 - 5 * 5) / 6;
-  draw_inner_frame(gGui->imlib_data, bg, _("FourCC: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("FourCC: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -796,7 +806,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_fourcc);
   
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Channel(s): "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Channel(s): "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -810,7 +820,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_channels);
   
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -824,7 +834,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_bitrate);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Resolution: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Resolution: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -838,7 +848,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_resolution);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Ratio: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Ratio: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -852,7 +862,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_ratio);
   
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Stream(s): "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Stream(s): "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -868,14 +878,14 @@ void stream_infos_panel(void) {
   /* Audio Frame */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("Audio"), btnfontname, 
+  draw_outter_frame(gui->imlib_data, bg, _("Audio"), btnfontname, 
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Has: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Has: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -889,7 +899,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_audio);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Handled: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Handled: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -904,7 +914,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Ignore: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Ignore: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -920,7 +930,7 @@ void stream_infos_panel(void) {
   x += w + 5;
   w += 1;
   w = (w * 2) + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Codec: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Codec: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -937,7 +947,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("FourCC: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("FourCC: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -951,7 +961,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.audio_fourcc);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Channel(s): "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Channel(s): "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -966,7 +976,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -981,7 +991,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gGui->imlib_data, bg, _("Bits: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Bits: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -995,7 +1005,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.audio_bits);
 
   x += w + 5;
-  draw_inner_frame(gGui->imlib_data, bg, _("Samplerate: "), lfontname, 
+  draw_inner_frame(gui->imlib_data, bg, _("Samplerate: "), lfontname, 
 		   x, y, w, (20 + 22));
   lbl.window            = xitk_window_get_window(sinfos.xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos.widget_list));
@@ -1026,7 +1036,7 @@ void stream_infos_panel(void) {
 					   "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(sinfos.update);
 
-  if(gGui->stream_info_auto_update)
+  if(gui->stream_info_auto_update)
     xitk_hide_widget(sinfos.update);
   
   x = WINDOW_WIDTH - (100 + 15);
@@ -1044,7 +1054,7 @@ void stream_infos_panel(void) {
 					    "Black", "Black", "White", btnfontname)));
   xitk_enable_and_show_widget(widget);
 
-  xitk_window_change_background(gGui->imlib_data, sinfos.xwin, bg->pixmap, width, height);
+  xitk_window_change_background(gui->imlib_data, sinfos.xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
   sinfos.widget_key = xitk_register_event_handler("sinfos", 

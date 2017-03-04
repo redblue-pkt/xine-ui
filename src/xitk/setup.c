@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -47,20 +47,20 @@
     xitk_image_t        *image;                                                                 \
     xitk_image_widget_t  im;                                                                    \
                                                                                                 \
-    image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
+    image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
                                                                                                 \
-    XLockDisplay(gGui->display);                                                                \
-    XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)),                    \
-		   xitk_get_pixel_color_gray(gGui->imlib_data));                                \
-    XFillRectangle(gGui->display, image->image->pixmap,                                         \
+    XLockDisplay(gui->display);                                                                \
+    XSetForeground(gui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)),                    \
+		   xitk_get_pixel_color_gray(gui->imlib_data));                                \
+    XFillRectangle(gui->display, image->image->pixmap,                                         \
 		   (XITK_WIDGET_LIST_GC(setup.widget_list)),                                   \
 		   0, 0, image->width, image->height);                                          \
-    XUnlockDisplay(gGui->display);                                                              \
+    XUnlockDisplay(gui->display);                                                              \
                                                                                                 \
-    draw_inner_frame(gGui->imlib_data, image->image, (char *)title, boldfontname,               \
+    draw_inner_frame(gui->imlib_data, image->image, (char *)title, boldfontname,               \
                      0, 0, FRAME_WIDTH, FRAME_HEIGHT);                                          \
 	                                                                                        \
-    XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
+    XITK_WIDGET_INIT(&im, gui->imlib_data);                                                    \
     im.skin_element_name = NULL;                                                                \
                                                                                                 \
     xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup.widget_list)),                      \
@@ -170,6 +170,7 @@ static void add_widget_to_list(xitk_widget_t *w) {
  * Leaving setup panel, release memory.
  */
 static void setup_exit(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   window_info_t wi;
     
@@ -187,19 +188,19 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&setup.kreg);
     
     xitk_destroy_widgets(setup.widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, setup.xwin);
+    xitk_window_destroy_window(gui->imlib_data, setup.xwin);
     
     setup.xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(setup.widget_list)));
     xitk_list_free(setup.widgets);
     
-    XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)));
+    XUnlockDisplay(gui->display);
     
     XITK_WIDGET_LIST_FREE(setup.widget_list);
     
-    try_to_set_input_focus(gGui->video_window);
+    try_to_set_input_focus(gui->video_window);
 }
 
 void setup_show_tips(int enabled, unsigned long timeout) {
@@ -228,12 +229,13 @@ int setup_is_running(void) {
  * Return 1 if setup panel is visible
  */
 int setup_is_visible(void) {
+  gGui_t *gui = gGui;
 
   if(setup.running) {
-    if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(setup.xwin));
+    if(gui->use_root_window)
+      return xitk_is_window_visible(gui->display, xitk_window_get_window(setup.xwin));
     else
-      return setup.visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(setup.xwin));
+      return setup.visible && xitk_is_window_visible(gui->display, xitk_window_get_window(setup.xwin));
   }
 
   return 0;
@@ -257,6 +259,7 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void setup_apply(xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
   int need_restart = 0;
 
   if(setup.num_wg > 0) {
@@ -331,15 +334,15 @@ static void setup_apply(xitk_widget_t *w, void *data) {
     if(need_restart) {
       xitk_window_t *xw;
       
-      xw = xitk_window_dialog_ok(gGui->imlib_data, _("Important Notice"),
+      xw = xitk_window_dialog_ok(gui->imlib_data, _("Important Notice"),
 				 NULL, NULL,
 				 ALIGN_CENTER,
 				 _("You changed some configuration value which require"
 				   " to restart xine to take effect."));
-      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-	XLockDisplay(gGui->display);
-	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-	XUnlockDisplay(gGui->display);
+      if(!gui->use_root_window && gui->video_display == gui->display) {
+	XLockDisplay(gui->display);
+	XSetTransientForHint(gui->display, xitk_window_get_window(xw), gui->video_window);
+	XUnlockDisplay(gui->display);
       }
       layer_above_video(xitk_window_get_window(xw));
     }
@@ -348,11 +351,12 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 }
 
 static void setup_set_cursor(int state) {
+  gGui_t *gui = gGui;
   if(setup.running) {
     if(state == WAIT_CURS)
-      xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(setup.xwin)), xitk_cursor_watch);
+      xitk_cursors_define_window_cursor(gui->display, (xitk_window_get_window(setup.xwin)), xitk_cursor_watch);
     else
-      xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(setup.xwin)));
+      xitk_cursors_restore_window_cursor(gui->display, (xitk_window_get_window(setup.xwin)));
   }
 }
 
@@ -365,19 +369,20 @@ static void setup_ok(xitk_widget_t *w, void *data) {
  *
  */
 static void setup_clear_tab(void) {
+  gGui_t *gui = gGui;
   xitk_image_t *im;
 
-  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 30),
+  im = xitk_image_create_image(gui->imlib_data, (WINDOW_WIDTH - 30),
 			       (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30));
 
-  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
+  draw_outter(gui->imlib_data, im->image, im->width, im->height);
 
-  XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(setup.xwin)),
+  XLockDisplay(gui->display);
+  XCopyArea(gui->display, im->image->pixmap, (xitk_window_get_window(setup.xwin)),
 	    (XITK_WIDGET_LIST_GC(setup.widget_list)), 0, 0, im->width, im->height, 15, (24 + th));
-  XUnlockDisplay(gGui->display);
+  XUnlockDisplay(gui->display);
 
-  xitk_image_free_image(gGui->imlib_data, &im);
+  xitk_image_free_image(gui->imlib_data, &im);
 }
 
 /*
@@ -509,10 +514,11 @@ static void setup_handle_event(XEvent *event, void *data) {
  */
 static xitk_widget_t *setup_add_label (int x, int y, int w, 
 				       const char *str, xitk_simple_callback_t cb, void *data) {
+  gGui_t *gui = gGui;
   xitk_label_widget_t   lb;
   xitk_widget_t        *label;
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
 
   lb.window              = xitk_window_get_window(setup.xwin);
   lb.gc                  = (XITK_WIDGET_LIST_GC(setup.widget_list));
@@ -549,6 +555,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
 }
 
 static widget_triplet_t *setup_add_nothing_available(const char *title, int x, int y) {
+  gGui_t *gui = gGui;
   static widget_triplet_t *wt; 
   xitk_widget_t           *frame = NULL;
   xitk_image_t            *image;
@@ -556,10 +563,10 @@ static widget_triplet_t *setup_add_nothing_available(const char *title, int x, i
   
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
   
-  image = xitk_image_create_image_from_string(gGui->imlib_data, tabsfontname,
+  image = xitk_image_create_image_from_string(gui->imlib_data, tabsfontname,
 					       FRAME_WIDTH, ALIGN_CENTER, (char *)title);
   
-  XITK_WIDGET_INIT(&im, gGui->imlib_data);
+  XITK_WIDGET_INIT(&im, gui->imlib_data);
   im.skin_element_name = NULL;
   
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup.widget_list)),
@@ -579,13 +586,14 @@ static widget_triplet_t *setup_add_nothing_available(const char *title, int x, i
  */
 static widget_triplet_t *setup_add_slider (const char *title, const char *labelkey, 
 					   int x, int y, xine_cfg_entry_t *entry) {
+  gGui_t *gui = gGui;
   xitk_slider_widget_t     sl;
   xitk_widget_t           *slider;
   static widget_triplet_t *wt;
 
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gui->imlib_data);
 
   ADD_FRAME(title);
 
@@ -618,13 +626,14 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
  */
 static widget_triplet_t *setup_add_inputnum(const char *title, const char *labelkey, 
 					    int x, int y, xine_cfg_entry_t *entry) {
+  gGui_t *gui = gGui;
   xitk_intbox_widget_t      ib;
   xitk_widget_t            *intbox, *wi, *wbu, *wbd;
   static widget_triplet_t  *wt;
   
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&ib, gGui->imlib_data);
+  XITK_WIDGET_INIT(&ib, gui->imlib_data);
 
   ADD_FRAME(title);
 
@@ -656,13 +665,14 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
  */
 static widget_triplet_t *setup_add_inputtext(const char *title, const char *labelkey, 
 					     int x, int y, xine_cfg_entry_t *entry) {
+  gGui_t *gui = gGui;
   xitk_inputtext_widget_t   inp;
   xitk_widget_t            *input;
   static widget_triplet_t  *wt;
 
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&inp, gui->imlib_data);
 
   ADD_FRAME(title);
 
@@ -698,13 +708,14 @@ static void label_cb(xitk_widget_t *w, void *data) {
 }
 static widget_triplet_t *setup_add_checkbox (const char *title, const char *labelkey, 
 					     int x, int y, xine_cfg_entry_t *entry) {
+  gGui_t *gui = gGui;
   xitk_checkbox_widget_t    cb;
   xitk_widget_t            *checkbox;
   static widget_triplet_t  *wt;
   
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
   ADD_FRAME(title);
 
@@ -732,13 +743,14 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
  */
 static widget_triplet_t *setup_add_combo (const char *title, const char *labelkey, 
 					  int x, int y, xine_cfg_entry_t *entry ) {
+  gGui_t *gui = gGui;
   xitk_combo_widget_t       cmb;
   xitk_widget_t            *combo, *lw, *bw;
   static widget_triplet_t  *wt;
 
   wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
 
   ADD_FRAME(title);
 
@@ -771,6 +783,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
  *
  */
 static void setup_section_widgets(int s) {
+  gGui_t *gui = gGui;
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 11);
   int                  y = 0; /* Position will be defined when painting widgets */
   xine_cfg_entry_t *entry;
@@ -790,7 +803,7 @@ static void setup_section_widgets(int s) {
     
   while (cfg_err_result) {
       
-    if((entry->exp_level <= gGui->experience_level) &&
+    if((entry->exp_level <= gui->experience_level) &&
        ((!strncmp(entry->key, section, len)) && entry->description)) {
 	
       labelkey = &entry->key[len+1];
@@ -921,6 +934,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
  * collect config categories, setup tab widget
  */
 static void setup_sections (void) {
+  gGui_t *gui = gGui;
   xitk_pixmap_t       *bg;
   xine_cfg_entry_t  entry;
   int                  cfg_err_result;
@@ -958,7 +972,7 @@ static void setup_sections (void) {
     cfg_err_result = xine_config_get_next_entry(__xineui_global_xine_instance, &entry);
   }
 
-  XITK_WIDGET_INIT(&tab, gGui->imlib_data);
+  XITK_WIDGET_INIT(&tab, gui->imlib_data);
 
   tab.skin_element_name = NULL;
   tab.num_entries       = setup.num_sections;
@@ -974,16 +988,16 @@ static void setup_sections (void) {
   
   xitk_enable_and_show_widget(setup.tabs);
 
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
+  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(setup.xwin)), bg->pixmap,
+  XLockDisplay(gui->display);
+  XCopyArea(gui->display, (xitk_window_get_background(setup.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay(gGui->display);
+  XUnlockDisplay(gui->display);
   
-  draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
+  draw_rectangular_outter_box(gui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
-  xitk_window_change_background(gGui->imlib_data, setup.xwin, bg->pixmap,
+  xitk_window_change_background(gui->imlib_data, setup.xwin, bg->pixmap,
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
@@ -1023,6 +1037,7 @@ void setup_reparent(void) {
  * Create setup panel window
  */
 void setup_panel(void) {
+  gGui_t *gui = gGui;
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_slider_widget_t       sl;
@@ -1049,16 +1064,16 @@ void setup_panel(void) {
 				CONFIG_NO_DATA);
 
   /* Create window */
-  setup.xwin = xitk_window_create_dialog_window(gGui->imlib_data,
+  setup.xwin = xitk_window_create_dialog_window(gui->imlib_data,
 						 _("xine Setup"),
 						 x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start((xitk_window_get_window(setup.xwin)));
 
-  XLockDisplay (gGui->display);
-  gc = XCreateGC(gGui->display, 
+  XLockDisplay (gui->display);
+  gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(setup.xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
 
   setup.widget_list                = xitk_widget_list_new();
   xitk_widget_list_set(setup.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
@@ -1066,13 +1081,13 @@ void setup_panel(void) {
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(setup.xwin)));
   xitk_widget_list_set(setup.widget_list, WIDGET_LIST_GC, gc);
 
-  fs = xitk_font_load_font(gGui->display, fontname);
+  fs = xitk_font_load_font(gui->display, fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(setup.widget_list)));
   fh = xitk_font_get_string_height(fs, " ");
 
   setup_sections();
 
-  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gui->imlib_data);
 
   sl.min                      = 0;
   sl.max                      = 1;
@@ -1098,7 +1113,7 @@ void setup_panel(void) {
     
     len = xitk_font_get_string_length(fs, (const char *) label);
     
-    XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lbl, gui->imlib_data);
     
     lbl.window              = xitk_window_get_window(setup.xwin);
     lbl.gc                  = (XITK_WIDGET_LIST_GC(setup.widget_list));
@@ -1116,7 +1131,7 @@ void setup_panel(void) {
 
   xitk_font_unload_font(fs);
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("OK");

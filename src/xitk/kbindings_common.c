@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -831,6 +831,7 @@ static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
 #endif
 
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
+  gGui_t *gui = gGui;
   int            i, j, found = 0;
   char          *kmsg = NULL;
       
@@ -880,17 +881,17 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 
     dump_error(kmsg);
 
-    xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
+    xw = xitk_window_dialog_three_buttons_with_width(gui->imlib_data,
 						     _("Keybindings error!"),
 						     _("Reset"), _("Editor"), _("Cancel"),
 						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
 						     (void *) kbt, 450, ALIGN_CENTER,
 						     "%s", kmsg);
-    XLockDisplay(gGui->display);
-    if(!gGui->use_root_window && gGui->video_display == gGui->display)
-      XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-    XSync(gGui->display, False);
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    if(!gui->use_root_window && gui->video_display == gui->display)
+      XSetTransientForHint(gui->display, xitk_window_get_window(xw), gui->video_window);
+    XSync(gui->display, False);
+    XUnlockDisplay(gui->display);
     layer_above_video(xitk_window_get_window(xw));
   }
 #endif
@@ -903,16 +904,17 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
  * to remap this one with (system/user) remap files.
  */
 kbinding_t *kbindings_init_kbinding(void) {
+  gGui_t *gui = gGui;
   kbinding_t *kbt = NULL;
 
   kbt = _kbindings_init_to_default();
   
-  _kbinding_load_config(kbt, gGui->keymap_file);
+  _kbinding_load_config(kbt, gui->keymap_file);
   
   /* Just to check is there redundant entries, and inform user */
   _kbindings_check_redundancy(kbt);
 
-  gGui->kbindings_enabled = 1;
+  gui->kbindings_enabled = 1;
 
   return kbt;
 }

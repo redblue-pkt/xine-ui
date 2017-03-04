@@ -143,34 +143,36 @@ static void _applugin_close_help(xitk_widget_t *, void *);
 static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *, void *);
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui_t *gui = gGui;
   post_element_t **posts = NULL;
   int              num, i;
   
-  gGui->deinterlace_plugin = cfg->str_value;
+  gui->deinterlace_plugin = cfg->str_value;
   
-  if(gGui->deinterlace_enable)
+  if(gui->deinterlace_enable)
     _vpplugin_unwire();
   
-  for(i = 0; i < gGui->deinterlace_elements_num; i++) {
-    xine_post_dispose(__xineui_global_xine_instance, gGui->deinterlace_elements[i]->post);
-    free(gGui->deinterlace_elements[i]->name);
-    free(gGui->deinterlace_elements[i]);
+  for(i = 0; i < gui->deinterlace_elements_num; i++) {
+    xine_post_dispose(__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
+    free(gui->deinterlace_elements[i]->name);
+    free(gui->deinterlace_elements[i]);
   }
   
-  SAFE_FREE(gGui->deinterlace_elements);
-  gGui->deinterlace_elements_num = 0;
+  SAFE_FREE(gui->deinterlace_elements);
+  gui->deinterlace_elements_num = 0;
   
-  if((posts = pplugin_parse_and_load(&vpp_wrapper, gGui->deinterlace_plugin, &num))) {
-    gGui->deinterlace_elements     = posts;
-    gGui->deinterlace_elements_num = num;
+  if((posts = pplugin_parse_and_load(&vpp_wrapper, gui->deinterlace_plugin, &num))) {
+    gui->deinterlace_elements     = posts;
+    gui->deinterlace_elements_num = num;
   }
 
-  if(gGui->deinterlace_enable)
+  if(gui->deinterlace_enable)
     _vpplugin_rewire();
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->visual_anim.post_plugin_num = cfg->num_value;  
+  gGui_t *gui = gGui;
+  gui->visual_anim.post_plugin_num = cfg->num_value;  
   post_rewire_visual_anim();
 }
 
@@ -179,13 +181,14 @@ const char **post_get_audio_plugins_names(void) {
 }
 
 void post_init(void) {
+  gGui_t *gui = gGui;
 
-  memset(&gGui->visual_anim.post_output_element, 0, sizeof (gGui->visual_anim.post_output_element));
+  memset(&gui->visual_anim.post_output_element, 0, sizeof (gui->visual_anim.post_output_element));
   
-  gGui->visual_anim.post_plugin_num = -1;
-  gGui->visual_anim.post_changed = 0;
+  gui->visual_anim.post_plugin_num = -1;
+  gui->visual_anim.post_changed = 0;
 
-  if(gGui->ao_port) {
+  if(gui->ao_port) {
     const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance, 
 							  XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
@@ -203,7 +206,7 @@ void post_init(void) {
       
       if(num_plug) {
 	
-	gGui->visual_anim.post_plugin_num = 
+	gui->visual_anim.post_plugin_num = 
 	  xine_config_register_enum(__xineui_global_xine_instance, "gui.post_audio_plugin", 
 				    0, post_audio_plugins,
 				    _("Audio visualization plugin"),
@@ -212,10 +215,10 @@ void post_init(void) {
 				    post_audio_plugin_cb,
 				    CONFIG_NO_DATA);
 	
-	gGui->visual_anim.post_output_element.post = 
+	gui->visual_anim.post_output_element.post = 
 	  xine_post_init(__xineui_global_xine_instance,
-			 post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
-			 &gGui->ao_port, &gGui->vo_port);
+			 post_audio_plugins[gui->visual_anim.post_plugin_num], 0,
+			 &gui->ao_port, &gui->vo_port);
 	
       }
     }
@@ -223,22 +226,23 @@ void post_init(void) {
 }
 
 void post_rewire_visual_anim(void) {
+  gGui_t *gui = gGui;
 
-  if(gGui->visual_anim.post_output_element.post) {
-    (void) post_rewire_audio_port_to_stream(gGui->stream);
+  if(gui->visual_anim.post_output_element.post) {
+    (void) post_rewire_audio_port_to_stream(gui->stream);
     
-    xine_post_dispose(__xineui_global_xine_instance, gGui->visual_anim.post_output_element.post);
+    xine_post_dispose(__xineui_global_xine_instance, gui->visual_anim.post_output_element.post);
   }
   
-  gGui->visual_anim.post_output_element.post = 
+  gui->visual_anim.post_output_element.post = 
     xine_post_init(__xineui_global_xine_instance,
-		   post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
-		   &gGui->ao_port, &gGui->vo_port);
+		   post_audio_plugins[gui->visual_anim.post_plugin_num], 0,
+		   &gui->ao_port, &gui->vo_port);
 
-  if(gGui->visual_anim.post_output_element.post && 
-     (gGui->visual_anim.enabled == 1) && (gGui->visual_anim.running == 1)) {
+  if(gui->visual_anim.post_output_element.post && 
+     (gui->visual_anim.enabled == 1) && (gui->visual_anim.running == 1)) {
 
-    (void) post_rewire_audio_post_to_stream(gGui->stream);
+    (void) post_rewire_audio_post_to_stream(gui->stream);
 
   }
 }
@@ -251,10 +255,11 @@ int post_rewire_audio_port_to_stream(xine_stream_t *stream) {
   ignore_visual_anim = 1;
   _applugin_rewire();
 /*  
+  gGui_t *gui = gGui;
   xine_post_out_t * audio_source;
   
   audio_source = xine_get_audio_source(stream);
-  return xine_post_wire_audio_port(audio_source, gGui->ao_port);
+  return xine_post_wire_audio_port(audio_source, gui->ao_port);
 */
   return 1;
 }
@@ -266,9 +271,10 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
   _applugin_rewire();
 /*
   xine_post_out_t * audio_source;
+  gGui_t *gui = gGui;
 
   audio_source = xine_get_audio_source(stream);
-  return xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]);
+  return xine_post_wire_audio_port(audio_source, gui->visual_anim.post_output->audio_input[0]);
 */
   return 1;
 }
@@ -276,19 +282,21 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
 /* ================================================================ */
 
 static void _vpplugin_unwire(void) {
+  gGui_t *gui = gGui;
   xine_post_out_t  *vo_source;
   
-  vo_source = xine_get_video_source(gGui->stream);
+  vo_source = xine_get_video_source(gui->stream);
 
-  (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
+  (void) xine_post_wire_video_port(vo_source, gui->vo_port);
 }
 
 static void _applugin_unwire(void) {
+  gGui_t *gui = gGui;
   xine_post_out_t  *ao_source;
   
-  ao_source = xine_get_audio_source(gGui->stream);
+  ao_source = xine_get_audio_source(gui->stream);
 
-  (void) xine_post_wire_audio_port(ao_source, gGui->ao_port);
+  (void) xine_post_wire_audio_port(ao_source, gui->ao_port);
 }
 
 static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper) {
@@ -314,7 +322,8 @@ static void _vpplugin_rewire(void) {
   }
 
 #if 0
-  if(pplugin && (gGui->post_enable && !gGui->deinterlace_enable)) {
+  gGui_t *gui = gGui;
+  if(pplugin && (gui->post_enable && !gui->deinterlace_enable)) {
     xine_post_out_t  *vo_source;
     int               post_num = pplugin->object_num;
     int               i = 0;
@@ -325,8 +334,8 @@ static void _vpplugin_rewire(void) {
     if(post_num) {
       int paused = 0;
       
-      if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+      if((paused = (xine_get_param(gui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
+	xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       
       for(i = (post_num - 1); i >= 0; i--) {
 	const char *const *outs = xine_post_list_outputs(pplugin->post_objects[i]->post);
@@ -335,7 +344,7 @@ static void _vpplugin_rewire(void) {
 #ifdef TRACE_REWIRE
 	  printf("  VIDEO_OUT .. OUT<-[PLUGIN %d]\n", i);
 #endif
-	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
+	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gui->vo_port);
 	}
 	else {
 	  const xine_post_in_t *vo_in = xine_post_input(pplugin->post_objects[i+1]->post, "video");
@@ -355,11 +364,11 @@ static void _vpplugin_rewire(void) {
       printf("  [PLUGIN %d]->IN .. STREAM\n", 0);
 #endif
 
-      vo_source = xine_get_video_source(gGui->stream);
+      vo_source = xine_get_video_source(gui->stream);
       xine_post_wire_video_port(vo_source, pplugin->post_objects[0]->post->video_input[0]);
       
       if(paused)
-	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+	xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
 
     }
   }
@@ -524,10 +533,11 @@ static void _pplugin_paint_widgets(_pp_wrapper_t *pp_wrapper) {
 }
 
 static void _pplugin_send_expose(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   if(pp_wrapper->pplugin) {
-    XLockDisplay(gGui->display);
-    XClearWindow(gGui->display, (XITK_WIDGET_LIST_WINDOW(pp_wrapper->pplugin->widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XClearWindow(gui->display, (XITK_WIDGET_LIST_WINDOW(pp_wrapper->pplugin->widget_list)));
+    XUnlockDisplay(gui->display);
   }
 }
 
@@ -641,6 +651,7 @@ static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {
 }
 
 static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
+  gGui_t *gui = gGui;
   
   if(pobj) {
     xitk_label_widget_t   lb;
@@ -649,7 +660,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
     snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description) 
 	     ? pobj->param->description : _("No description available"));
 
-    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lb, gui->imlib_data);
     lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
     lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
@@ -666,7 +677,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	if(pobj->param->enum_values) {
 	  xitk_combo_widget_t         cmb;
 
-	  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+	  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
 	  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -683,7 +694,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	else {
 	  xitk_intbox_widget_t      ib;
 	  
-	  XITK_WIDGET_INIT(&ib, gGui->imlib_data);
+	  XITK_WIDGET_INIT(&ib, gui->imlib_data);
 	  ib.skin_element_name = NULL;
 	  ib.value             = *(int *)(pobj->param_data + pobj->param->offset);
 	  ib.step              = 1;
@@ -701,7 +712,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_doublebox_widget_t      ib;
 	
-	XITK_WIDGET_INIT(&ib, gGui->imlib_data);
+	XITK_WIDGET_INIT(&ib, gui->imlib_data);
 	ib.skin_element_name = NULL;
 	ib.value             = *(double *)(pobj->param_data + pobj->param->offset);
 	ib.step              = .5;
@@ -719,7 +730,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_inputtext_widget_t  inp;
 	
-	XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+	XITK_WIDGET_INIT(&inp, gui->imlib_data);
 	inp.skin_element_name = NULL;
 	inp.text              = (char *)(pobj->param_data + pobj->param->offset);
 	inp.max_length        = 256;
@@ -736,7 +747,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_combo_widget_t         cmb;
 	
-	XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+	XITK_WIDGET_INIT(&cmb, gui->imlib_data);
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = (is_layer_above());
 	cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -756,7 +767,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_checkbox_widget_t    cb;
 	
-	XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+	XITK_WIDGET_INIT(&cb, gui->imlib_data);
 	cb.skin_element_name = NULL;
 	cb.callback          = _pplugin_set_param_bool;
 	cb.userdata          = pobj;
@@ -966,20 +977,21 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
 }
 
 static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   pp_wrapper->pplugin->help_running = 0;
   
   xitk_unregister_event_handler(&pp_wrapper->pplugin->help_widget_key);
   
   xitk_destroy_widgets(pp_wrapper->pplugin->help_widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, pp_wrapper->pplugin->helpwin);
+  xitk_window_destroy_window(gui->imlib_data, pp_wrapper->pplugin->helpwin);
   
   pp_wrapper->pplugin->helpwin = NULL;
   xitk_list_free((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->help_widget_list)));
     
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
-  XUnlockDisplay(gGui->display);
+  XLockDisplay(gui->display);
+  XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
+  XUnlockDisplay(gui->display);
     
   XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->help_widget_list);
 }
@@ -1026,6 +1038,7 @@ static int __line_wrap(char *s, int pos, int line_size)
 }
 
 static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
   post_object_t *pobj = (post_object_t *) data;
   GC                          gc;
   xitk_pixmap_t              *bg = NULL;
@@ -1043,16 +1056,16 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
   if( !pp_wrapper->pplugin->help_running ) {
     x = y = 80;
-    pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+    pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gui->imlib_data, 
                                                                     _("Plugin Help"), x, y,
                                                                     HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
 
     set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
 
-    XLockDisplay (gGui->display);
-    gc = XCreateGC(gGui->display, 
+    XLockDisplay (gui->display);
+    gc = XCreateGC(gui->display, 
   		 (xitk_window_get_window(pp_wrapper->pplugin->helpwin)), None, None);
-    XUnlockDisplay (gGui->display);
+    XUnlockDisplay (gui->display);
     
     pp_wrapper->pplugin->help_widget_list = xitk_widget_list_new();
     xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
@@ -1061,14 +1074,14 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, WIDGET_LIST_GC, gc);
     
     xitk_window_get_window_size(pp_wrapper->pplugin->helpwin, &width, &height);
-    bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+    bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
   
-    XLockDisplay (gGui->display);
-    XCopyArea(gGui->display, (xitk_window_get_background(pp_wrapper->pplugin->helpwin)), bg->pixmap,
+    XLockDisplay (gui->display);
+    XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->helpwin)), bg->pixmap,
   	    bg->gc, 0, 0, width, height, 0, 0);
-    XUnlockDisplay (gGui->display);
+    XUnlockDisplay (gui->display);
   
-    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lb, gui->imlib_data);
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Close");
     lb.align             = ALIGN_CENTER;
@@ -1083,7 +1096,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_enable_and_show_widget(w);
   
   
-    XITK_WIDGET_INIT(&br, gGui->imlib_data);
+    XITK_WIDGET_INIT(&br, gui->imlib_data);
     br.arrow_up.skin_element_name    = NULL;
     br.slider.skin_element_name      = NULL;
     br.arrow_dn.skin_element_name    = NULL;
@@ -1171,7 +1184,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_browser_set_alignment(pp_wrapper->pplugin->help_browser, ALIGN_LEFT);
   
   
-    xitk_window_change_background(gGui->imlib_data, pp_wrapper->pplugin->helpwin, bg->pixmap, width, height);
+    xitk_window_change_background(gui->imlib_data, pp_wrapper->pplugin->helpwin, bg->pixmap, width, height);
     xitk_image_destroy_xitk_pixmap(bg);
   
     pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
@@ -1199,12 +1212,13 @@ static void _applugin_show_help(xitk_widget_t *w, void *data) {
 }
 
 static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
+  gGui_t *gui = gGui;
   xitk_combo_widget_t         cmb;
   xitk_labelbutton_widget_t   lb;
   
   if(__pplugin_retrieve_parameters(pobj)) {
     
-    XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+    XITK_WIDGET_INIT(&cmb, gui->imlib_data);
     cmb.skin_element_name = NULL;
     cmb.layer_above       = (is_layer_above());
     cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -1222,7 +1236,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
 
     if(pobj->api && pobj->api->get_help) {
 
-      XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+      XITK_WIDGET_INIT(&lb, gui->imlib_data);
       lb.button_type       = CLICK_BUTTON;
       lb.label             = _("Help");
       lb.align             = ALIGN_CENTER;
@@ -1239,7 +1253,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
   else {
     xitk_label_widget_t   lb;
     
-    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lb, gui->imlib_data);
     lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
     lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
@@ -1255,6 +1269,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
 }
 
 static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int select) {
+  gGui_t *gui = gGui;
   post_object_t *pobj = (post_object_t *) data;
   
   _pplugin_unwire(pp_wrapper);
@@ -1288,7 +1303,7 @@ static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, 
 
     pobj->post = xine_post_init(__xineui_global_xine_instance, 
 				xitk_combo_get_current_entry_selected(w),
-				0, &gGui->ao_port, &gGui->vo_port);
+				0, &gui->ao_port, &gui->vo_port);
     
     _pplugin_retrieve_parameters(pp_wrapper, pobj);
 
@@ -1361,6 +1376,7 @@ static void _applugin_move_down(xitk_widget_t *w, void *data) {
 }
 
 static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   xitk_combo_widget_t   cmb;
   post_object_t        *pobj;
   xitk_image_widget_t   im;
@@ -1380,43 +1396,43 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->y = pp_wrapper->pplugin->y;
   pp_wrapper->pplugin->object_num++;
 
-  image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
+  image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
-  XLockDisplay(gGui->display);
-  XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
-		 xitk_get_pixel_color_gray(gGui->imlib_data));
-  XFillRectangle(gGui->display, image->image->pixmap,
+  XLockDisplay(gui->display);
+  XSetForeground(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
+		 xitk_get_pixel_color_gray(gui->imlib_data));
+  XFillRectangle(gui->display, image->image->pixmap,
 		 (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
 		 0, 0, image->width, image->height);
-  XUnlockDisplay(gGui->display);
+  XUnlockDisplay(gui->display);
 
   /* Some decorations */
-  draw_outter_frame(gGui->imlib_data, image->image, NULL, NULL,
+  draw_outter_frame(gui->imlib_data, image->image, NULL, NULL,
 		    0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-  draw_rectangular_outter_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_outter_box_light(gui->imlib_data, image->image,
 		    27, 28, FRAME_WIDTH - 27 - 5, 1);
-  draw_rectangular_outter_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_outter_box_light(gui->imlib_data, image->image,
 		    26, 5, 1, FRAME_HEIGHT - 10);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, NULL,
+  draw_inner_frame(gui->imlib_data, image->image, NULL, NULL,
 		    5, 5, 16, 16);
-  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
 		    5, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
 		    10, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
 		    15, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gGui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
 		    20, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gGui->imlib_data, image->image, NULL, NULL,
+  draw_inner_frame(gui->imlib_data, image->image, NULL, NULL,
 		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
-  XITK_WIDGET_INIT(&im, gGui->imlib_data);
+  XITK_WIDGET_INIT(&im, gui->imlib_data);
   im.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)),
    (pobj->frame = xitk_noskin_image_create(pp_wrapper->pplugin->widget_list, &im, image, pobj->x - 5, pobj->y - 5)));
   DISABLE_ME(pobj->frame);
   
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -1434,7 +1450,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
   {
     xitk_image_t *bimage;
 
-    XITK_WIDGET_INIT(&b, gGui->imlib_data);
+    XITK_WIDGET_INIT(&b, gui->imlib_data);
     b.skin_element_name = NULL;
     b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_up : _applugin_move_up;
     b.userdata          = pobj;
@@ -1444,7 +1460,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
     DISABLE_ME(pobj->up);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->up)) != NULL)
-      draw_arrow_up(gGui->imlib_data, bimage);
+      draw_arrow_up(gui->imlib_data, bimage);
     
     b.skin_element_name = NULL;
     b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_down : _applugin_move_down;
@@ -1455,7 +1471,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
     DISABLE_ME(pobj->down);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->down)) != NULL)
-      draw_arrow_down(gGui->imlib_data, bimage);
+      draw_arrow_down(gui->imlib_data, bimage);
 
   }
 }
@@ -1478,7 +1494,8 @@ static void _applugin_add_filter(xitk_widget_t *w, void *data) {
 }
 
 static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
-  post_element_t  **pelem = (pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements : gGui->post_audio_elements;
+  gGui_t *gui = gGui;
+  post_element_t  **pelem = (pp_wrapper == &vpp_wrapper) ? gui->post_video_elements : gui->post_audio_elements;
   int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
   int num_filters = 0;
   
@@ -1512,14 +1529,15 @@ static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
 }
 
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num) {
+  gGui_t *gui = gGui;
   post_element_t **post_elements;
   int i = 0, j = 0;
 
   *post_elements_num = 0;
-  if( gGui->post_video_enable )
-    (*post_elements_num) += gGui->post_video_elements_num;
-  if( gGui->deinterlace_enable )
-    (*post_elements_num) += gGui->deinterlace_elements_num;
+  if( gui->post_video_enable )
+    (*post_elements_num) += gui->post_video_elements_num;
+  if( gui->deinterlace_enable )
+    (*post_elements_num) += gui->deinterlace_elements_num;
 
   if( *post_elements_num == 0 )
     return NULL;
@@ -1527,12 +1545,12 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
   post_elements = (post_element_t **) 
     calloc((*post_elements_num), sizeof(post_element_t *));
 
-  for( i = 0; gGui->deinterlace_enable && i < gGui->deinterlace_elements_num; i++ ) {
-    post_elements[i+j] = gGui->deinterlace_elements[i];
+  for( i = 0; gui->deinterlace_enable && i < gui->deinterlace_elements_num; i++ ) {
+    post_elements[i+j] = gui->deinterlace_elements[i];
   }
 
-  for( j = 0; gGui->post_video_enable && j < gGui->post_video_elements_num; j++ ) {
-    post_elements[i+j] = gGui->post_video_elements[j];
+  for( j = 0; gui->post_video_enable && j < gui->post_video_elements_num; j++ ) {
+    post_elements[i+j] = gui->post_video_elements[j];
   }
   
   return post_elements;
@@ -1540,12 +1558,13 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
 
 
 static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_elements_num) {
+  gGui_t *gui = gGui;
   post_element_t **post_elements;
   int i = 0, j = 0;
 
   *post_elements_num = 0;
-  if( gGui->post_audio_enable )
-    (*post_elements_num) += gGui->post_audio_elements_num;
+  if( gui->post_audio_enable )
+    (*post_elements_num) += gui->post_audio_elements_num;
   if( !ignore_visual_anim )
     (*post_elements_num)++;
 
@@ -1555,12 +1574,12 @@ static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_
   post_elements = (post_element_t **) 
     calloc((*post_elements_num), sizeof(post_element_t *));
   
-  for( j = 0; gGui->post_audio_enable && j < gGui->post_audio_elements_num; j++ ) {
-    post_elements[i+j] = gGui->post_audio_elements[j];
+  for( j = 0; gui->post_audio_enable && j < gui->post_audio_elements_num; j++ ) {
+    post_elements[i+j] = gui->post_audio_elements[j];
   }
 
   for( i = 0; !ignore_visual_anim && i < 1; i++ ) {
-    post_elements[i+j] = &gGui->visual_anim.post_output_element;
+    post_elements[i+j] = &gui->visual_anim.post_output_element;
   }
 
   return post_elements;
@@ -1568,10 +1587,11 @@ static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_
 
 
 static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   
   if(pp_wrapper->pplugin) {
-    post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements : &gGui->post_audio_elements;
-    int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements_num : &gGui->post_audio_elements_num;
+    post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gui->post_video_elements : &gui->post_audio_elements;
+    int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gui->post_video_elements_num : &gui->post_audio_elements_num;
     int i = 0;
     int post_num = pp_wrapper->pplugin->object_num;
     
@@ -1642,6 +1662,7 @@ static void _applugin_nextprev(xitk_widget_t *w, void *data, int pos) {
 }
 
 static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
+  gGui_t *gui = gGui;
 
   if(pp_wrapper->pplugin) {
     window_info_t wi;
@@ -1691,21 +1712,21 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     xitk_unregister_event_handler(&pp_wrapper->pplugin->widget_key);
 
     xitk_destroy_widgets(pp_wrapper->pplugin->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, pp_wrapper->pplugin->xwin);
+    xitk_window_destroy_window(gui->imlib_data, pp_wrapper->pplugin->xwin);
 
     pp_wrapper->pplugin->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)));
     
-    XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
-    XUnlockDisplay(gGui->display);
+    XLockDisplay(gui->display);
+    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
+    XUnlockDisplay(gui->display);
     
     XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->widget_list);
    
     free(pp_wrapper->pplugin);
     pp_wrapper->pplugin = NULL;
 
-    try_to_set_input_focus(gGui->video_window);
+    try_to_set_input_focus(gui->video_window);
   }
 }
 
@@ -1801,10 +1822,11 @@ static void _applugin_handle_event(XEvent *event, void *data) {
 }
 
 static void _pplugin_enability(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int state) {
+  gGui_t *gui = gGui;
   if (pp_wrapper == &vpp_wrapper)
-    gGui->post_video_enable = state;
+    gui->post_video_enable = state;
   else
-    gGui->post_audio_enable = state;
+    gui->post_audio_enable = state;
   
   _pplugin_unwire(pp_wrapper);
   _pplugin_rewire(pp_wrapper);
@@ -1819,6 +1841,7 @@ static void _applugin_enability(xitk_widget_t *w, void *data, int state) {
 }
 
 static int pplugin_is_post_selected(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   
   if(pp_wrapper->pplugin) {
     int post_num = pp_wrapper->pplugin->object_num;
@@ -1829,7 +1852,7 @@ static int pplugin_is_post_selected(_pp_wrapper_t *pp_wrapper) {
     return (post_num > 0);
   }
   
-  return (pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements_num : gGui->post_audio_elements_num;
+  return (pp_wrapper == &vpp_wrapper) ? gui->post_video_elements_num : gui->post_audio_elements_num;
 }
 
 static void pplugin_rewire_from_posts_window(_pp_wrapper_t *pp_wrapper) {
@@ -1840,6 +1863,7 @@ static void pplugin_rewire_from_posts_window(_pp_wrapper_t *pp_wrapper) {
 }
 
 static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+  gGui_t *gui = gGui;
   
   if(post_elements_num) {
     xine_post_out_t   *vo_source;
@@ -1850,7 +1874,7 @@ static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, 
       const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
       const xine_post_out_t *vo_out = xine_post_output(post_elements[i]->post, (char *) *outs);
       if(i == (post_elements_num - 1)) {
-	xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
+	xine_post_wire_video_port((xine_post_out_t *) vo_out, gui->vo_port);
       }
       else {
 	const xine_post_in_t *vo_in;
@@ -1864,12 +1888,13 @@ static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, 
       }
     }
     
-    vo_source = xine_get_video_source(gGui->stream);
+    vo_source = xine_get_video_source(gui->stream);
     xine_post_wire_video_port(vo_source, post_elements[0]->post->video_input[0]);
   }
 }
 
 static void _applugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+  gGui_t *gui = gGui;
   
   if(post_elements_num) {
     xine_post_out_t   *ao_source;
@@ -1880,7 +1905,7 @@ static void _applugin_rewire_from_post_elements(post_element_t **post_elements, 
       const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
       const xine_post_out_t *ao_out = xine_post_output(post_elements[i]->post, (char *) *outs);
       if(i == (post_elements_num - 1)) {
-	xine_post_wire_audio_port((xine_post_out_t *) ao_out, gGui->ao_port);
+	xine_post_wire_audio_port((xine_post_out_t *) ao_out, gui->ao_port);
       }
       else {
 	const xine_post_in_t *ao_in;
@@ -1894,7 +1919,7 @@ static void _applugin_rewire_from_post_elements(post_element_t **post_elements, 
       }
     }
     
-    ao_source = xine_get_audio_source(gGui->stream);
+    ao_source = xine_get_audio_source(gui->stream);
     xine_post_wire_audio_port(ao_source, post_elements[0]->post->audio_input[0]);
   }
 }
@@ -1911,8 +1936,9 @@ static void pplugin_rewire_posts(_pp_wrapper_t *pp_wrapper) {
   _pplugin_rewire(pp_wrapper);
 
 #if 0
-  if(gGui->post_enable && !gGui->deinterlace_enable)
-    _pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
+  gGui_t *gui = gGui;
+  if(gui->post_enable && !gui->deinterlace_enable)
+    _pplugin_rewire_from_post_elements(gui->post_elements, gui->post_elements_num);
 #endif
 }
 
@@ -1921,12 +1947,13 @@ static void pplugin_end(_pp_wrapper_t *pp_wrapper) {
 }
 
 static int pplugin_is_visible(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   
   if(pp_wrapper->pplugin) {
-    if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
+    if(gui->use_root_window)
+      return xitk_is_window_visible(gui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
     else
-      return pp_wrapper->pplugin->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
+      return pp_wrapper->pplugin->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
   }
   
   return 0;
@@ -1953,8 +1980,9 @@ static void pplugin_toggle_visibility(_pp_wrapper_t *pp_wrapper, xitk_widget_t *
 }
 
 static void pplugin_update_enable_button(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   if(pp_wrapper->pplugin)
-    xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gGui->post_video_enable : gGui->post_audio_enable);
+    xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gui->post_video_enable : gui->post_audio_enable);
 }
 
 static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
@@ -1963,6 +1991,7 @@ static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
 }
 
 static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
@@ -1991,16 +2020,16 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   
-  pp_wrapper->pplugin->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+  pp_wrapper->pplugin->xwin = xitk_window_create_dialog_window(gui->imlib_data, 
 						   (pp_wrapper == &vpp_wrapper) ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
                                                    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
 
-  XLockDisplay (gGui->display);
-  gc = XCreateGC(gGui->display, 
+  XLockDisplay (gui->display);
+  gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(pp_wrapper->pplugin->xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
   
   pp_wrapper->pplugin->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(pp_wrapper->pplugin->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
@@ -2008,19 +2037,19 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pp_wrapper->pplugin->xwin)));
   xitk_widget_list_set(pp_wrapper->pplugin->widget_list, WIDGET_LIST_GC, gc);
   
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
   xitk_window_get_window_size(pp_wrapper->pplugin->xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
 
-  XLockDisplay (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(pp_wrapper->pplugin->xwin)), bg->pixmap,
+  XLockDisplay (gui->display);
+  XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (gui->display);
   
-  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gui->imlib_data);
   
   sl.min                      = 0;
   sl.max                      = 1;
@@ -2066,7 +2095,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 								 &lb, x, y, 100, 23,
 								 "Black", "Black", "White", btnfontname)));
 
-  xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gGui->post_video_enable : gGui->post_audio_enable);
+  xitk_labelbutton_set_state(pp_wrapper->pplugin->enable, (pp_wrapper == &vpp_wrapper) ? gui->post_video_enable : gui->post_audio_enable);
   xitk_enable_and_show_widget(pp_wrapper->pplugin->enable);
 
   /* IMPLEMENT ME
@@ -2106,12 +2135,12 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->x = 15;
   pp_wrapper->pplugin->y = 34 - (FRAME_HEIGHT + 4);
   
-  if((pp_wrapper == &vpp_wrapper) ? gGui->post_video_elements : gGui->post_audio_elements)
+  if((pp_wrapper == &vpp_wrapper) ? gui->post_video_elements : gui->post_audio_elements)
     _pplugin_rebuild_filters(pp_wrapper);
   else
     _pplugin_add_filter(pp_wrapper, NULL, NULL);
   
-  xitk_window_change_background(gGui->imlib_data, pp_wrapper->pplugin->xwin, bg->pixmap, width, height);
+  xitk_window_change_background(gui->imlib_data, pp_wrapper->pplugin->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
   
   pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin" : "applugin", 
@@ -2134,6 +2163,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 
 /* pchain: "<post1>:option1=value1,option2=value2..;<post2>:...." */
 static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *pchain, int *post_elements_num) {
+  gGui_t *gui = gGui;
   int plugin_type = (pp_wrapper == &vpp_wrapper) ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
   post_element_t **post_elements = NULL;
 
@@ -2162,7 +2192,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 	if(p && (strlen(p) > 1))
 	  args = p;
 	
-	post = xine_post_init(__xineui_global_xine_instance, plugin, 0, &gGui->ao_port, &gGui->vo_port);
+	post = xine_post_init(__xineui_global_xine_instance, plugin, 0, &gui->ao_port, &gui->vo_port);
 
         if (post && pp_wrapper) {
           if (post->type != plugin_type) {
@@ -2299,8 +2329,9 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 }
 
 static void pplugin_parse_and_store_post(_pp_wrapper_t *pp_wrapper, const char *post_chain) {
-  post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements : &gGui->post_audio_elements;
-  int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gGui->post_video_elements_num : &gGui->post_audio_elements_num;
+  gGui_t *gui = gGui;
+  post_element_t ***_post_elements = (pp_wrapper == &vpp_wrapper) ? &gui->post_video_elements : &gui->post_audio_elements;
+  int *_post_elements_num = (pp_wrapper == &vpp_wrapper) ? &gui->post_video_elements_num : &gui->post_audio_elements_num;
   post_element_t **posts = NULL;
   int              num;
 
@@ -2330,13 +2361,14 @@ static char *_pplugin_get_default_deinterlacer(void) {
 }
 
 void post_deinterlace_init(const char *deinterlace_post) {
+  gGui_t *gui = gGui;
   post_element_t **posts = NULL;
   int              num;
   char            *deinterlace_default;
 
   deinterlace_default = _pplugin_get_default_deinterlacer();
   
-  gGui->deinterlace_plugin = 
+  gui->deinterlace_plugin = 
     (char *) xine_config_register_string (__xineui_global_xine_instance, "gui.deinterlace_plugin", 
 					  deinterlace_default,
 					  _("Deinterlace plugin."),
@@ -2346,19 +2378,20 @@ void post_deinterlace_init(const char *deinterlace_post) {
 					  post_deinterlace_plugin_cb,
 					  CONFIG_NO_DATA);
   if((posts = pplugin_parse_and_load(0, (deinterlace_post && strlen(deinterlace_post)) ? 
-				     deinterlace_post : gGui->deinterlace_plugin, &num))) {
-    gGui->deinterlace_elements     = posts;
-    gGui->deinterlace_elements_num = num;
+				     deinterlace_post : gui->deinterlace_plugin, &num))) {
+    gui->deinterlace_elements     = posts;
+    gui->deinterlace_elements_num = num;
   }
   
 }
 
 void post_deinterlace(void) {
+  gGui_t *gui = gGui;
 
-  if( !gGui->deinterlace_elements_num ) {
+  if( !gui->deinterlace_elements_num ) {
     /* fallback to the old method */
-    xine_set_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE,
-                   gGui->deinterlace_enable);
+    xine_set_param(gui->stream, XINE_PARAM_VO_DEINTERLACE,
+                   gui->deinterlace_enable);
   }
   else {
     _pplugin_unwire(&vpp_wrapper);
@@ -2366,20 +2399,20 @@ void post_deinterlace(void) {
   }
 
 #if 0
-  if(gGui->deinterlace_enable) {
-    if(gGui->post_enable)
+  if(gui->deinterlace_enable) {
+    if(gui->post_enable)
       _pplugin_unwire();
     
-    _pplugin_rewire_from_post_elements(gGui->deinterlace_elements, gGui->deinterlace_elements_num);
+    _pplugin_rewire_from_post_elements(gui->deinterlace_elements, gui->deinterlace_elements_num);
   }
   else {
     _pplugin_unwire();
     
-    if(gGui->post_enable) {
+    if(gui->post_enable) {
       if(pplugin_is_visible() && pplugin)
 	_pplugin_rewire();
       else
-	_pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
+	_pplugin_rewire_from_post_elements(gui->post_elements, gui->post_elements_num);
     }
   }
 #endif
