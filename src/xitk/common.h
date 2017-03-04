@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2015 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -347,15 +347,19 @@ typedef struct {
   int                        shortcut_style;
   int                        kbindings_enabled;
 
+  /* event handling */
   struct {
     int                      set;
     int                      arg;
   } numeric;
-
   struct {
     int                      set;
     char                    *arg;
   } alphanum;
+  int                        event_reject;
+  int                        event_pending;
+  pthread_mutex_t            event_mutex;
+  pthread_cond_t             event_safe;
 
   int                        eventer_sticky;
   int                        stream_info_auto_update;
