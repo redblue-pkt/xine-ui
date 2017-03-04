@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -399,7 +399,7 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
   }
   /* Set focus to parent menu */
   if(xitk_is_window_visible(menu_window->display, (xitk_window_get_window(menu_window->xwin)))) {
-    int    retry = 0;
+    int    t = 5000;
     Window focused_win;
 
     do {
@@ -411,13 +411,14 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
       XSync(menu_window->display, False);
       XUNLOCK(menu_window->display);
 
-      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
-      xitk_usec_sleep(5000);
+      /* Retry 5/15/30/50/75/105/140ms until the WM was mercyful to give us the focus */
+      xitk_usec_sleep (t);
+      t += 5000;
       XLOCK(menu_window->display);
       XGetInputFocus(menu_window->display, &focused_win, &revert);
       XUNLOCK(menu_window->display);
 
-    } while((focused_win != xitk_window_get_window(menu_window->xwin)) && (retry++ < 30));
+    } while ((focused_win != xitk_window_get_window (menu_window->xwin)) && (t <= 140000));
   }
 }
 
@@ -954,9 +955,14 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin)));
   XSync(private_data->imlibdata->x.disp, False);
   XUNLOCK(private_data->imlibdata->x.disp);
-  
-  while(!xitk_is_window_visible(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin))))
-    xitk_usec_sleep(5000);
+
+  {
+    int t = 5000;
+    while (!xitk_is_window_visible (private_data->imlibdata->x.disp, (xitk_window_get_window(xwin))) && (t <= 140000)) {
+      xitk_usec_sleep (t);
+      t += 5000;
+    }
+  }
 
   if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
