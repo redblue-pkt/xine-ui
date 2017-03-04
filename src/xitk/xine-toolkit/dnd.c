@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -118,14 +118,11 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	    p[plen--] = '\0';
 	  
 	  if(strlen(p)) {
-	    char buf[(strlen(p) * 2) + 1];
-	    xitk_subst_special_chars(p, buf);
-	    
 #ifdef DEBUG_DND
-	    printf("GOT '%s'\n", buf);
+	    printf("GOT '%s'\n", p);
 #endif
 	    if(xdnd->callback) {
-	      xdnd->callback(buf);
+	      xdnd->callback(p);
 	    }
 	  }
 	}

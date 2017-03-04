@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2015 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -816,8 +816,7 @@ int xitk_get_white_color(void);
 int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
-//void xitk_subst_special_chars(char *src, char *dest);
-#define xitk_subst_special_chars(SRC,DST) strcpy((DST),(SRC))
+char *xitk_filter_filename(const char *name);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);

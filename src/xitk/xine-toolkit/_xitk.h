@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -239,12 +239,7 @@ int xitk_get_select_color(void);
 
 uint32_t xitk_get_wm_type(void);
 
-/*
- * copy src to dest and substitute special chars. dest should have 
- * enought space to store chars.
- */
-//void xitk_subst_special_chars(char *, char *);
-#define xitk_subst_special_chars(SRC,DST) strcpy((DST),(SRC))
+char *xitk_filter_filename(const char *name);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);

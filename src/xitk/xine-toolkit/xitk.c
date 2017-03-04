@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2013 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -2251,61 +2251,60 @@ void xitk_set_tips_timeout(unsigned long timeout) {
   gXitk->tips_timeout = timeout;
 }
 
-/*
- * copy src to dest and substitute special chars. dest should have 
- * enought space to store chars.
- */
-/*
-void xitk_subst_special_chars(char *src, char *dest) {
-  char *s, *d;
-  
-  if((src == NULL) || (dest == NULL)) {
-    XITK_WARNING("pass NULL argument(s)\n");
-    return;
-  }
-  
-  if(!strlen(src))
-    return;
-
-  memset(dest, 0, sizeof(dest));
-  s = src;
-  d = dest;
-  while(*s != '\0') {
-    
-    switch(*s) {
-    case '%':
-      if((*(s) == '%') && (*(s + 1) != '%')) {
-	char    buffer[5] = { '0', 'x', *(s + 1) , *(s + 2), 0 };
-	char   *p         = buffer;
-	int     character = strtol(p, &p, 16);
-	
-	*d = character;
-	s += 2;
+char *xitk_filter_filename(const char *name) {
+  if (!name)
+    return NULL;
+  if (!strncasecmp (name, "file:", 5)) {
+    static const uint8_t tab_unhex[256] = {
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+        0,  1,  2,  3,  4,  5,  6,  7,  8,  9,255,255,255,255,255,255,
+      255, 10, 11, 12, 13, 14, 15,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255, 10, 11, 12, 13, 14, 15,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
+    };
+    const uint8_t *p = (const uint8_t *)name + 5;
+    uint8_t *ret, *q;
+    size_t l = strlen ((const char *)p);
+    ret = malloc (l + 2);
+    if (!ret)
+      return NULL;
+    while (*p == '/') p++;
+    q = ret;
+    *q++ = '/';
+    while (*p) {
+      uint8_t z = *p++;
+      if (z == '%') {
+        do {
+          uint8_t y;
+          y = tab_unhex[*p];
+          if (y & 128) break;
+          p++;
+          z = y;
+          y = tab_unhex[*p];
+          if (y & 128) break;
+          p++;
+          z = (z << 4) | y;
+        } while (0);
       }
-      else {
-	*d++ = '%';
-	*d = '%';
-      }
-      break;
-      
-    case '~':
-      if(*(s + 1) == '/') {
-	strcat(d, xine_get_homedir());
-	d += (strlen(xine_get_homedir()) - 1);
-      } else
-        *d = *s;
-      break;
-      
-    default:
-      *d = *s;
-      break;
+      *q++ = z;
     }
-    s++;
-    d++;
+    *q = 0;
+    return (char *)ret;
   }
-  *d = '\0';
+  return strdup (name);
 }
-*/
+
 /*
  *
  */

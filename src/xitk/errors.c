@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -111,18 +111,14 @@ void xine_error(char *message, ...) {
     printf("%s\n", buf);
   }
   else {
-    char buf2[(strlen(buf) * 2) + 1];
-    
     dump_error(buf);
 
-    xitk_subst_special_chars(buf, buf2);
-
     if( gGui->nongui_error_msg ) {
-      gGui->nongui_error_msg( buf2 );
+      gGui->nongui_error_msg( buf );
     } else {
       xitk_window_t *xw;
 
-      xw = xitk_window_dialog_error(gGui->imlib_data, "%s", buf2);
+      xw = xitk_window_dialog_error(gGui->imlib_data, "%s", buf);
 
       if(!gGui->use_root_window && gGui->video_display == gGui->display) {
         XLockDisplay(gGui->display);
@@ -171,11 +167,7 @@ void xine_error_with_more(char *message, ...) {
     printf("%s\n", buf);
   }
   else {
-    char buf2[(strlen(buf) * 2) + 1];
-
-    xitk_subst_special_chars(buf, buf2);
-
-    errors_create_window(_("Error"), buf2);
+    errors_create_window(_("Error"), buf);
   }
   
   free(buf);
@@ -216,16 +208,12 @@ void xine_info(char *message, ...) {
     printf("%s\n", buf);
   }
   else {
-    char           buf2[(strlen(buf) * 2) + 1];
-
-    xitk_subst_special_chars(buf, buf2);
-
     if( gGui->nongui_error_msg ) {
-      gGui->nongui_error_msg( buf2 );
+      gGui->nongui_error_msg( buf );
     } else {
       xitk_window_t *xw;
 
-      xw = xitk_window_dialog_info(gGui->imlib_data, "%s", buf2);
+      xw = xitk_window_dialog_info(gGui->imlib_data, "%s", buf);
 
       if(!gGui->use_root_window && gGui->video_display == gGui->display) {
         XLockDisplay(gGui->display);
