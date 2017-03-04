@@ -1669,11 +1669,7 @@ int main(int argc, char *argv[]) {
 	  char  *keymap_file = p + 5;
 	  
 	  if((gGui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
-	    char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-
-	    memset(&buffer, 0, sizeof(buffer));
-	    xitk_subst_special_chars(keymap_file, &buffer[0]);
-	    gGui->keymap_file = strdup(buffer);
+	    gGui->keymap_file = xitk_filter_filename (keymap_file);
 	    continue;
 	  }
 	}
@@ -1808,11 +1804,7 @@ int main(int argc, char *argv[]) {
     case 'c':
       {
 	char *cfg = xine_chomp(optarg);
-	char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-	
-	memset(&buffer, 0, sizeof(buffer));
-	xitk_subst_special_chars(cfg, &buffer[0]);
-	__xineui_global_config_file = strdup(buffer);
+	__xineui_global_config_file = xitk_filter_filename (cfg);
       }
       break;
 

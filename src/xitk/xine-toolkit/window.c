@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1097,10 +1097,8 @@ xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
   }
   
   {
-    char buf2[(strlen(buf) * 2) + 1];
-    xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_one_button_with_width(im, title, _("OK"), cb, userdata, window_width,
-						  align, "%s", buf2);
+						  align, "%s", buf);
   }
   XITK_FREE(buf);
   return xw;
@@ -1345,11 +1343,8 @@ xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
   }
   
   {
-    char buf2[(strlen(buf) * 2) + 1];
-    
-    xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_two_buttons_with_width(im, title, _("Yes"), _("No"), 
-						   ycb, ncb, userdata, window_width, align, "%s", buf2);
+						   ycb, ncb, userdata, window_width, align, "%s", buf);
   }
 
   XITK_FREE(buf);
@@ -1567,11 +1562,8 @@ xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *ti
   }
   
   {
-    char buf2[(strlen(buf) * 2) + 1];
-    
-    xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_three_buttons_with_width(im, title, _("Yes"), _("No"), _("Cancel"),
-						     ycb, ncb, ccb, userdata, window_width, align, "%s", buf2);
+						     ycb, ncb, ccb, userdata, window_width, align, "%s", buf);
   }
   XITK_FREE(buf);
   return xw;
