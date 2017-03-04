@@ -1524,11 +1524,11 @@ int main(int argc, char *argv[]) {
 #endif
 
     case 'u': /* Select SPU channel */
-      sscanf(optarg, "%i", &spu_channel);
+      if (optarg) sscanf(optarg, "%i", &spu_channel);
       break;
 
     case 'a': /* Select audio channel */
-      sscanf(optarg, "%i", &audio_channel);
+      if (optarg) sscanf(optarg, "%i", &audio_channel);
       break;
 
     case 'V': /* select video driver by plugin id */
@@ -1813,10 +1813,12 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_POST:
-      pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
+      if (optarg) {
+        pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
       
-      pplugins[pplugins_num++] = optarg;
-      pplugins[pplugins_num] = NULL;
+        pplugins[pplugins_num++] = optarg;
+        pplugins[pplugins_num] = NULL;
+      }
       break;
 
     case OPTION_DISABLE_POST:
