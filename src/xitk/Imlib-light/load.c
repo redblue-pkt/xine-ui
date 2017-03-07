@@ -81,6 +81,7 @@ static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t)
 
   if (lines == NULL || *w > INT_MAX / 4)
     {
+      free(lines);
       free(data);
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return NULL;
