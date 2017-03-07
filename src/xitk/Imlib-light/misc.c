@@ -224,6 +224,7 @@ Imlib_init(Display * disp)
 
 	  if (!strcasecmp("PaletteFile", s1))
 	    {
+              free(palfile);
 	      palfile = strdup(s2);
 	    }
 	  else if (!strcasecmp("PaletteOverride", s1))
@@ -776,6 +777,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 
 	  if (!strcasecmp("PaletteFile", s1))
 	    {
+              free(palfile);
 	      palfile = strdup(s2);
 	    }
 	  else if (!strcasecmp("PaletteOverride", s1))
