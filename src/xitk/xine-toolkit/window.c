@@ -836,8 +836,6 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
 
-  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
-
   {
     va_list   args;
     char     *buf;
@@ -869,6 +867,8 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
   }
   
   windowh = (image->height) + (TITLE_BAR_HEIGHT + 40);
+
+  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_BUTTONLESS;
@@ -942,8 +942,6 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
 
-  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
-
   {
     va_list   args;
     char     *buf;
@@ -975,6 +973,8 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   }
   
   windowh = (image->height + 50) + (TITLE_BAR_HEIGHT + 40);
+
+  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_OK;
@@ -1133,8 +1133,6 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
 
-  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
-
   {
     va_list   args;
     char     *buf;
@@ -1169,6 +1167,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     checkbox_height = 50;
 
   windowh = (image->height + 50 + checkbox_height) + (TITLE_BAR_HEIGHT + 40);
+
+  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_YESNO;
