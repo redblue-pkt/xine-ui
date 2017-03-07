@@ -1302,8 +1302,8 @@ Imlib_kill_image(ImlibData * id, ImlibImage * im)
     {
       if (id->cache.on_image)
 	{
-	  free_image(id, im);
 	  flush_image(id, im);
+	  free_image(id, im);
 	  clean_caches(id);
 	}
       else
