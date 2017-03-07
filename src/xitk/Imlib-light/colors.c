@@ -201,7 +201,7 @@ Imlib_load_colors(ImlibData * id, char *file)
 	  pal[i++] = g;
 	  pal[i++] = b;
 	}
-      if (i >= 768)
+      if (i >= 768 - 2)
 	break;
     }
   fclose(f);
