@@ -176,7 +176,7 @@ int mkdir_safe(char *path) {
   memset(&buf, 0, sizeof(buf));
   memset(&buf2, 0, sizeof(buf2));
   
-  strcpy(buf, path);
+  strlcpy(buf, path, sizeof(buf));
   pp = buf;
   while((p = xine_strsep(&pp, "/")) != NULL) {
     if(p && strlen(p)) {
