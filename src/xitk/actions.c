@@ -2217,7 +2217,6 @@ static void fileselector_callback(filebrowser_t *fb) {
       mediamark_append_entry(file, ident, NULL, 0, -1, 0, 0);
 
     playlist_update_playlist();
-    free(file);
     free(ident);
 
     /* Enable controls on display */
@@ -2236,6 +2235,7 @@ static void fileselector_callback(filebrowser_t *fb) {
     }
   } /* If valid file name */
 
+  free(file);
   load_stream = NULL;
 }
 
