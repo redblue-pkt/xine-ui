@@ -1372,8 +1372,6 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
 
-  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
-
   {
     va_list   args;
     char     *buf;
@@ -1405,6 +1403,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   }
 
   windowh = (image->height + 50) + (TITLE_BAR_HEIGHT + 40);
+
+  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
 
   wd->imlibdata      = im;
   wd->type           = DIALOG_TYPE_YESNOCANCEL;
