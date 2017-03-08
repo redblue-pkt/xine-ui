@@ -607,6 +607,9 @@ static int sock_client(const char *host, const char *service, const char *transp
   int                  sock;
   
   sock = sock_create(service, transport, &fsin.in);
+  if (sock < 0) {
+    return -1;
+  }
 
   if ((fsin.in.sin_addr.s_addr = inet_addr(host)) == INADDR_NONE) {
     ihost = gethostbyname(host);
@@ -1338,7 +1341,10 @@ static int sock_serv(const char *service, const char *transport, int queue_lengt
   int                 on = 1;
 
   sock = sock_create(service, transport, &fsin.in);
-  
+  if (sock < 0) {
+    return -1;
+  }
+
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
   
   if(bind(sock, &fsin.sa, sizeof(fsin.in)) < 0)
@@ -2998,7 +3004,10 @@ static __attribute__((noreturn)) void *server_thread(void *data) {
     pthread_t            thread_client;
     
     msock = sock_serv(service, "tcp", 5);
-    
+    if (msock < 0) {
+      break;
+    }
+
     client_info = (client_info_t *) calloc(1, sizeof(client_info_t));
     lsin = sizeof(client_info->fsin.in);
     
