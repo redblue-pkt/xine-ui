@@ -1722,7 +1722,9 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'N':
-      visual_anim_add_animation(optarg);
+      if (optarg) {
+        visual_anim_add_animation(optarg);
+      }
       break;
 
     case 'P':
