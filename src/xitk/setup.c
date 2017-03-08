@@ -907,6 +907,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
       
       if (sw == w) {
 	xitk_destroy_widget(sw);
+        sw = NULL;
 
 	xitk_list_delete_current ((XITK_WIDGET_LIST_LIST(setup.widget_list)));
 	
