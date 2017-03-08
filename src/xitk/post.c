@@ -2177,7 +2177,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
     ppost_chain = post_chain;
     while((p = xine_strsep(&ppost_chain, ";"))) {
       
-      if(p && strlen(p)) {
+      if(strlen(p)) {
 	char          *plugin, *args = NULL;
 	xine_post_t   *post;
 	
