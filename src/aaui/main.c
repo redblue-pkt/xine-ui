@@ -696,7 +696,7 @@ int main(int argc, char *argv[]) {
       break;
       
     case 'P':
-      if(!post_plugin_name)
+      if(!post_plugin_name && optarg)
 	post_plugin_name = strdup(optarg);
       break;
 
