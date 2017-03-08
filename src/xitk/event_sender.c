@@ -78,11 +78,6 @@ typedef struct {
 
 static _eventer_t    *eventer = NULL;
 
-/* Initialized below */
-static char *menu_items_default[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-static char *menu_items_dvd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-static char *menu_items_bd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   int old_sticky_value = gGui->eventer_sticky;
   
@@ -264,17 +259,32 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 void event_sender_update_menu_buttons(void) {
 
   if(eventer) {
-    int i;
-    char **lbls = menu_items_default;
-    
-    if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
-      lbls = menu_items_dvd;
-    if(!strncmp(gGui->mmk.mrl, "bd:/", 4))
-      lbls = menu_items_bd;
-    
-    for(i = 0; i < 7; i++)
-      xitk_labelbutton_change_label(eventer->menus.menu[i], lbls[i]);
-
+    if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8))) {
+      xitk_labelbutton_change_label(eventer->menus.menu[0], _("Menu toggle"));
+      xitk_labelbutton_change_label(eventer->menus.menu[1], _("Title"));
+      xitk_labelbutton_change_label(eventer->menus.menu[2], _("Root"));
+      xitk_labelbutton_change_label(eventer->menus.menu[3], _("Subpicture"));
+      xitk_labelbutton_change_label(eventer->menus.menu[4], _("Audio"));
+      xitk_labelbutton_change_label(eventer->menus.menu[5], _("Angle"));
+      xitk_labelbutton_change_label(eventer->menus.menu[6], _("Part"));
+    }
+    else if(!strncmp(gGui->mmk.mrl, "bd:/", 4)) {
+      xitk_labelbutton_change_label(eventer->menus.menu[0], _("Top Menu"));
+      xitk_labelbutton_change_label(eventer->menus.menu[1], _("Popup Menu"));
+      xitk_labelbutton_change_label(eventer->menus.menu[2], _("Menu 3"));
+      xitk_labelbutton_change_label(eventer->menus.menu[3], _("Menu 4"));
+      xitk_labelbutton_change_label(eventer->menus.menu[4], _("Menu 5"));
+      xitk_labelbutton_change_label(eventer->menus.menu[5], _("Menu 6"));
+      xitk_labelbutton_change_label(eventer->menus.menu[6], _("Menu 7"));
+    } else {
+      xitk_labelbutton_change_label(eventer->menus.menu[0], _("Menu 1"));
+      xitk_labelbutton_change_label(eventer->menus.menu[1], _("Menu 2"));
+      xitk_labelbutton_change_label(eventer->menus.menu[2], _("Menu 3"));
+      xitk_labelbutton_change_label(eventer->menus.menu[3], _("Menu 4"));
+      xitk_labelbutton_change_label(eventer->menus.menu[4], _("Menu 5"));
+      xitk_labelbutton_change_label(eventer->menus.menu[5], _("Menu 6"));
+      xitk_labelbutton_change_label(eventer->menus.menu[6], _("Menu 7"));
+    }
   }
 }
 
@@ -561,31 +571,6 @@ void event_sender_panel(void) {
 					   "Black", "Black", "White", hboldfontname)));
   xitk_enable_and_show_widget(eventer->angles.prev);
 
-
-  /* Initialize menu labels */
-  menu_items_default[0] = _("Menu 1");
-  menu_items_default[1] = _("Menu 2");
-  menu_items_default[2] = _("Menu 3");
-  menu_items_default[3] = _("Menu 4");
-  menu_items_default[4] = _("Menu 5");
-  menu_items_default[5] = _("Menu 6");
-  menu_items_default[6] = _("Menu 7");
- 
-  menu_items_dvd[0]     = _("Menu toggle");
-  menu_items_dvd[1]     = _("Title");
-  menu_items_dvd[2]     = _("Root");
-  menu_items_dvd[3]     = _("Subpicture");
-  menu_items_dvd[4]     = _("Audio");
-  menu_items_dvd[5]     = _("Angle");
-  menu_items_dvd[6]     = _("Part");
-
-  menu_items_bd[0] = _("Top Menu");
-  menu_items_bd[1] = _("Popup Menu");
-  menu_items_bd[2] = _("Menu 3");
-  menu_items_bd[3] = _("Menu 4");
-  menu_items_bd[4] = _("Menu 5");
-  menu_items_bd[5] = _("Menu 6");
-  menu_items_bd[6] = _("Menu 7");
 
   x = 5;
   y = 5;
