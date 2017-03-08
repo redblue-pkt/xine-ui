@@ -189,11 +189,13 @@ int schedule_job(int delay, void (*cb)(void *data), void *data) {
   
   struct timeval tv;
   struct timezone tz;
-  job_t *job = malloc(sizeof(job_t));
+  job_t *job;
   int msec;
   int priority;
   
   if (!ox_scheduler) return -1;
+
+  job = malloc(sizeof(job_t));
 
   gettimeofday(&tv, &tz);
   
