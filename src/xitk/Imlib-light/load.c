@@ -225,8 +225,12 @@ static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
 
 int ispng(FILE *f) {
   unsigned char       buf[8];
-  
-  if (!f || fread (buf, 1, sizeof (buf), f) < sizeof (buf))
+
+  if (!f) {
+    return 0;
+  }
+
+  if (fread (buf, 1, sizeof (buf), f) < sizeof (buf))
   {
     rewind (f);
     return 0;
@@ -238,7 +242,11 @@ int ispng(FILE *f) {
 static int isjpeg(FILE *f) {
   unsigned char       buf[4];
 
-  if (!f || fread (buf, 1, sizeof (buf), f) < sizeof (buf))
+  if (!f) {
+    return 0;
+  }
+
+  if (fread (buf, 1, sizeof (buf), f) < sizeof (buf))
   {
     rewind (f);
     return 0;
