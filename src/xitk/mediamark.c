@@ -552,7 +552,6 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	if(playlist_split_data(playlist)) {
 	  int   valid_m3u   = 0;
 	  int   entries_m3u = 0;
-	  char *ptitle      = NULL;
 	  char *title       = NULL;
 	  char *origin;
 	  int   linen = 0;
@@ -566,12 +565,13 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	      if(valid_m3u) {
 		
 		if(!strncmp(ln, "#EXTINF", 7)) {
+                  char *ptitle;
 		  if((ptitle = strchr(ln, ',')) != NULL) {
 		    ptitle++;
 
 		    SAFE_FREE(title);
 
-		    if(ptitle && strlen(ptitle))
+		    if(strlen(ptitle))
 		      title = strdup(ptitle);
 		  }
 		}
@@ -586,9 +586,6 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  playlist->entries = ++entries_m3u;
 
 		  SAFE_FREE(title);
-		  
-		  title = NULL;
-		  ptitle = NULL;
 		}
 		
 	      }
