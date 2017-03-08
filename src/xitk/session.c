@@ -504,6 +504,7 @@ int session_handle_subopt(char *suboptarg, char *enqueue_mrl, int *session) {
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp, loop, speed_status, time_status;
   int          s, c;
+  int          i;
   uint32_t     state;
   char        *optstr;
   char       **mrls          = NULL;
@@ -673,15 +674,8 @@ int session_handle_subopt(char *suboptarg, char *enqueue_mrl, int *session) {
       remote_cmd(*session, CMD_PLAYLIST_CONTINUE);
 
     if(num_mrls) {
-      int i;
-
       for(i = 0; i < num_mrls; i++)
 	send_string(*session, CMD_PLAYLIST_ADD, mrls[i]);
-
-      for(i = 0; i < num_mrls; i++)
-	free(mrls[i]);
-      
-      free(mrls);
     }
     
     /* 
@@ -750,6 +744,11 @@ int session_handle_subopt(char *suboptarg, char *enqueue_mrl, int *session) {
   }
   else
     fprintf(stderr, _("Session %d isn't running.\n"), *session);
+
+  for(i = 0; i < num_mrls; i++)
+    free(mrls[i]);
+
+  free(mrls);
 
   return retval;
 }
