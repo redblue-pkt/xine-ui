@@ -1646,8 +1646,6 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
     return NULL;
   }
 
-  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-  
   XLOCK(im->x.disp);
   if(!(img = Imlib_load_image(im, (char *)image))) {
     XITK_WARNING("%s(): couldn't find image %s\n", __FUNCTION__, image);
@@ -1658,6 +1656,7 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   Imlib_render (im, img, img->rgb_width, img->rgb_height);
   XUNLOCK(im->x.disp);
   
+  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   i->image         = xitk_image_create_xitk_pixmap(im, img->rgb_width, img->rgb_height);
   XLOCK(im->x.disp);
   i->image->pixmap = Imlib_copy_image(im, img);
