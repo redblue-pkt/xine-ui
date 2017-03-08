@@ -95,8 +95,7 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 
 #ifdef WITH_XFT
 /* convert a -*-* .. style font description into something Xft can digest */
-static char * xitk_font_core_string_to_xft( char * old_name) {
-  static char new_name[255];
+static const char * xitk_font_core_string_to_xft(char *new_name, size_t new_name_size, const char * old_name) {
 
   if(old_name[0] == '-' || old_name[0] == '*') {
     char  family[50], weight[15], slant[8], pxsize[5], ptsize[5];
@@ -139,7 +138,7 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
     }
     
     /* Build Xft font description string from the elements */
-    snprintf(new_name, sizeof(new_name), "%s%s%s%s%s%s%s%s%s",
+    snprintf(new_name, new_name_size, "%s%s%s%s%s%s%s%s%s",
 	     family,
 	     ((weight[0]) ? ":weight="    : ""), weight,
 	     ((slant[0])  ? ":slant="     : ""), slant,
@@ -204,9 +203,11 @@ static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
 # endif
 #endif
   {
+    char new_name[255];
     XLOCK(display);
 #ifdef WITH_XFT
-    xtfs->font = XftFontOpenName( display, DefaultScreen(display), xitk_font_core_string_to_xft(font));
+    xtfs->font = XftFontOpenName( display, DefaultScreen(display),
+                                  xitk_font_core_string_to_xft(new_name, sizeof(new_name), font));
 #else
     xtfs->font = XLoadQueryFont(display, font);
 #endif
