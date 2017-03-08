@@ -714,9 +714,10 @@ static oxine_t *create_oxine(void) {
 				NULL,
 				NULL);
  
-  xine_config_lookup_entry (oxine->xine, "input.dvd_device", &centry);
-  oxine->cd_device = centry.str_value;
-  
+  if (xine_config_lookup_entry (oxine->xine, "input.dvd_device", &centry)) {
+    oxine->cd_device = centry.str_value;
+  }
+
   start_scheduler();
   
   oxine->odk = odk_init();
