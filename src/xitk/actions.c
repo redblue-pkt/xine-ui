@@ -2180,6 +2180,8 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
   }
   else if(fb == load_sub)
     load_sub = NULL;
+
+  free(cur_dir);
 }
 
 
@@ -2195,6 +2197,7 @@ static void fileselector_callback(filebrowser_t *fb) {
     strlcpy(gui->curdir, cur_dir, sizeof(gui->curdir));
     config_update_string("media.files.origin_path", gui->curdir);
   }
+  free(cur_dir);
   
   /* Get the file path/name */
   if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
@@ -2283,7 +2286,6 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       } /* End while */
       
       playlist_update_playlist();
-      free(path);
 
       /* Enable playback controls on display */
       if((!is_playback_widgets_enabled()) && gui->playlist.num)
@@ -2306,6 +2308,8 @@ static void fileselector_all_callback(filebrowser_t *fb) {
     
     free(files);
   } /* If valid file list */
+
+  free(path);
 
   load_stream = NULL;
 }
