@@ -3014,6 +3014,8 @@ static __attribute__((noreturn)) void *server_thread(void *data) {
     client_info->socket = accept(msock, &(client_info->fsin.sa), &lsin);
     client_info->authentified = is_client_authorized(client_info);
     
+    close(msock);
+
     if(client_info->socket < 0) {
       
       free(client_info);
@@ -3025,8 +3027,6 @@ static __attribute__((noreturn)) void *server_thread(void *data) {
       continue;
     }
     
-    close(msock);
-
     pthread_create(&thread_client, NULL, client_thread, (void *)client_info);
   }
 
