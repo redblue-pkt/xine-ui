@@ -2229,7 +2229,7 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 		while((*p != '\0') && (*p != '='))
 		  p++;
 		
-		if(p && strlen(p)) {
+		if(strlen(p)) {
 		  int param_num = 0;
 		  
 		  *p++ = '\0';
