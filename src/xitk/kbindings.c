@@ -254,7 +254,7 @@ static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
     k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
   }
 
-  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
+  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
   k->entry[i]->comment   = NULL;
   k->entry[i]->action    = NULL;
   k->entry[i]->action_id = 0;
@@ -873,7 +873,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias  = 1;
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_gui    = kbe->is_gui;
 
-    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
+    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
     kbedit->kbt->entry[kbedit->kbt->num_entries]->comment   = NULL;
     kbedit->kbt->entry[kbedit->kbt->num_entries]->action    = NULL;
     kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
