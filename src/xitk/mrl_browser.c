@@ -240,14 +240,17 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
   xitk_mrlbrowser_widget_t     mb;
-  const char *const           *ip_availables = xine_get_browsable_input_plugin_ids(__xineui_global_xine_instance);
-  xitk_mrlbrowser_filter_t   **mrl_filters = mrl_browser_get_valid_mrl_ending();
+  const char *const           *ip_availables;
+  xitk_mrlbrowser_filter_t   **mrl_filters;
 
   if(mrlb != NULL) {
     show_mrl_browser();
     set_mrl_browser_transient();
     return;
   }
+
+  ip_availables = xine_get_browsable_input_plugin_ids(__xineui_global_xine_instance);
+  mrl_filters = mrl_browser_get_valid_mrl_ending();
 
   XITK_WIDGET_INIT(&mb, gGui->imlib_data);
 
