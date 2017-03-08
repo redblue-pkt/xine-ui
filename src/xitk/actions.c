@@ -449,23 +449,25 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     if(v_unhandled) {
       const char *minfo;
       uint32_t    vfcc;
-      
+      char        tmp[5];
+
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
       asprintf(&v_info, _("Video Codec: %s (%s)\n"),
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-	      (get_fourcc_string(vfcc)));
+               (get_fourcc_string(tmp, vfcc)));
     }
     
     if(a_unhandled) {
       const char *minfo;
       uint32_t    afcc;
-      
+      char        tmp[5];
+
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
       asprintf(&a_info,  _("Audio Codec: %s (%s)\n"),
 	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-	      (get_fourcc_string(afcc)));
+               (get_fourcc_string(tmp, afcc)));
     }
     
 

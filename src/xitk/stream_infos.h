@@ -28,7 +28,7 @@
 
 #include "xitk.h"
 
-char *get_fourcc_string(uint32_t f);
+char *get_fourcc_string(char *dst, uint32_t f);
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream);
 
