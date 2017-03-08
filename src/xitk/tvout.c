@@ -78,7 +78,7 @@ static int nvtv_tvout_init(Display *display, void **data) {
   int             ret;
   
   if((ret = nvtv_simple_init())) {
-    static char *const tv_systems[] = { "PAL", "NTSC", NULL };
+    static const char *const tv_systems[] = { "PAL", "NTSC", NULL };
 
     nvtv_private_t *private = (nvtv_private_t *) calloc(1, sizeof(nvtv_private_t));
 

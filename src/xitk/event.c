@@ -355,7 +355,7 @@ static void gui_signal_handler (int sig, void *data) {
 /*
  * convert pts value to string
  */
-static char *pts2str(int64_t pts) {
+static const char *pts2str(int64_t pts) {
   static char  buf[40];
   int64_t      min;
   double       sec;
