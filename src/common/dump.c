@@ -64,16 +64,17 @@ void dump_cpu_infos(void) {
 #if defined (__linux__)
   FILE *stream;
   char  buffer[2048];
-  
+  size_t got;
+
   if((stream = fopen("/proc/cpuinfo", "r"))) {
     
     printf("   CPU information:\n");
     printf("   ---------------\n");
     
     memset(&buffer, 0, sizeof(buffer));
-    while(fread(&buffer, 1, 2047, stream)) {
+    while((got = fread(&buffer, 1, 2047, stream)) > 0) {
       char *p, *pp;
-      
+      buffer[got] = 0;
       pp = buffer;
       while((p = strsep(&pp, "\n"))) {
 	if(p && strlen(p))
