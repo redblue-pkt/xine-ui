@@ -600,6 +600,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	  }
 
 	  free(origin);
+          free(title);
 
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
