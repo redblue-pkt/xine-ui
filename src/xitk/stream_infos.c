@@ -106,11 +106,8 @@ static const char *get_yesno_string(uint32_t val) {
   return ((val > 0) ? yesno[1] : yesno[0]);
 }
 
-char *get_fourcc_string(uint32_t f) {
-  static char fcc[5];
-  
-  memset(&fcc, 0, sizeof(fcc));
-  
+char *get_fourcc_string(char *fcc, uint32_t f) {
+
   /* Should we take care about endianess ? */
   fcc[0] = f     | 0xFFFFFF00;
   fcc[1] = f>>8  | 0xFFFFFF00;
@@ -125,7 +122,7 @@ char *get_fourcc_string(uint32_t f) {
     strcpy(fcc, "3pm."); /* Force to '.mp3' */
   }
   
-  return &fcc[0];
+  return fcc;
 }
 
 static void get_meta_info(xitk_widget_t *w, int meta) {
@@ -158,9 +155,10 @@ static void get_stream_info(xitk_widget_t *w, int info) {
 static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
   gGui_t *gui = gGui;
   uint32_t   iinfo;
-  
+  char       tmp[5];
+
   iinfo = xine_get_stream_info(gui->stream, info);
-  set_label(w, (get_fourcc_string(iinfo)));
+  set_label(w, (get_fourcc_string(tmp, iinfo)));
 }
       
 static void get_stream_yesno_info(xitk_widget_t *w, int info) {
