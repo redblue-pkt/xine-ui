@@ -1174,7 +1174,7 @@ void gui_set_xinerama_fullscreen_mode(void) {
 
 void gui_toggle_aspect(int aspect) {
   gGui_t *gui = gGui;
-  static char *ratios[XINE_VO_ASPECT_NUM_RATIOS + 1] = {
+  static const char * const ratios[XINE_VO_ASPECT_NUM_RATIOS + 1] = {
     "Auto",
     "Square",
     "4:3",

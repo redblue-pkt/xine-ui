@@ -326,7 +326,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
-static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
+static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
   gGui_t *gui = gGui;
   static char shortcut[32];
 
@@ -575,7 +575,7 @@ static void kbedit_create_browser_entries(void) {
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char  buf[2048];
-    char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i]);
+    const char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i]);
     char  shortcut[32];
         
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', (sc ? sc : "VOID"), ']');
