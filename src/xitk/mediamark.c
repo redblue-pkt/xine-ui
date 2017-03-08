@@ -3211,9 +3211,12 @@ static void mmkeditor_ok(xitk_widget_t *w, void *data) {
 
 static void mmk_fileselector_callback(filebrowser_t *fb) {
   gGui_t *gui = gGui;
-  char *file;
+  char *file, *dir;
 
-  strlcpy(gui->curdir, filebrowser_get_current_dir(fb), sizeof(gui->curdir));
+  if ((dir = filebrowser_get_current_dir(fb)) != NULL) {
+    strlcpy(gui->curdir, dir, sizeof(gui->curdir));
+    free(dir);
+  }
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file)
