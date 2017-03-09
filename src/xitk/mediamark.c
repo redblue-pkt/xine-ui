@@ -503,7 +503,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	    } while((playlist->entries && !stored_nument) && (count < 2));
 	    free(origin);
 	    
-	    if(valid_pls && entries_pls) {
+	    if(mmk && valid_pls && entries_pls) {
 	      int i;
 	      
 	      mmk[entries_pls] = NULL;
