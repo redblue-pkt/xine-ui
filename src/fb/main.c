@@ -76,7 +76,11 @@ static void load_config(void)
 						 + 3);
 		sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(),
 			XINE_CONFIG_DIR);
-		mkdir(__xineui_global_config_file, 0755);
+                if (mkdir(__xineui_global_config_file, 0755) < 0 && errno != EEXIST) {
+                        fprintf(stderr, "Error creating %s: %d (%s)\n",
+                                __xineui_global_config_file, errno, strerror(errno));
+                }
+                
 		sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s",
 			XINE_CONFIG_FILE);
 	}
