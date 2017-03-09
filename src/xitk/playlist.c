@@ -592,7 +592,11 @@ void playlist_scan_for_infos_selected(void) {
   if(gui->playlist.num) {
     int                 selected = xitk_browser_get_current_selected(playlist->playlist);
     xine_stream_t      *stream;
-    
+
+    if (selected < 0) {
+      return;
+    }
+
     stream = xine_stream_new(__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
     _scan_for_playlist_infos(stream, selected);
     
