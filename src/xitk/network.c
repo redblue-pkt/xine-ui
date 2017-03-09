@@ -141,7 +141,7 @@ struct session_commands_s {
 };
 
 static session_t             session;
-static session_commands_t    client_commands[] = {
+static const session_commands_t client_commands[] = {
   { "?",           ORIGIN_CLIENT,   1, client_help    },
   { "version",     ORIGIN_CLIENT,   1, client_version },
   { "open",        ORIGIN_CLIENT,   1, client_open    },
@@ -522,7 +522,7 @@ static int sock_check_opened(int socket) {
 /*
  * Write to socket.
  */
-static int _sock_write(int socket, char *buf, int len) {
+static int _sock_write(int socket, const char *buf, int len) {
   ssize_t  size;
   int      wlen = 0;
   
@@ -546,7 +546,7 @@ static int _sock_write(int socket, char *buf, int len) {
   return wlen;
 }
 
-static int __attribute__ ((format (printf, 3, 4))) __sock_write(int socket, int cr, char *msg, ...) {
+static int __attribute__ ((format (printf, 3, 4))) __sock_write(int socket, int cr, const char *msg, ...) {
   char     buf[_BUFSIZ];
   va_list  args;
   
@@ -2980,7 +2980,7 @@ static __attribute__((noreturn)) void *server_thread(void *data) {
    *
    */
   {
-    char        *passwdfile = ".xine/passwd";
+    const char  *passwdfile = ".xine/passwd";
     char         passwdfilename[(strlen((xine_get_homedir())) + strlen(passwdfile)) + 2];
     struct stat  st;
     
