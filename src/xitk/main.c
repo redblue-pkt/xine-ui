@@ -1728,6 +1728,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'P':
+      if (optarg) {
       if((!actions_on_start(gui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
 	gui->actions_on_start[aos++] = ACTID_PLAYLIST;
       
@@ -1738,6 +1739,7 @@ int main(int argc, char *argv[]) {
 
       /* don't load original playlist when loading this one */
       no_old_playlist = 1;
+      }
       break;
 
     case 'l':
@@ -1762,7 +1764,9 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_SK_SERVER:
-      gui->skin_server_url = strdup(optarg);
+      if (optarg) {
+        gui->skin_server_url = strdup(optarg);
+      }
       break;
       
     case OPTION_ENQUEUE:
@@ -1795,6 +1799,7 @@ int main(int argc, char *argv[]) {
       break;
       
     case 'S':
+      if (optarg) {
       if(is_remote_running(((session >= 0) ? session : 0)))
 	retval = session_handle_subopt(optarg, NULL, &session);
       else {
@@ -1804,6 +1809,7 @@ int main(int argc, char *argv[]) {
 	session_argv[session_argv_num++] = strdup(optarg);
 	session_argv[session_argv_num]   = NULL;
       }
+      }
       break;
 
     case 'Z':
@@ -1812,8 +1818,10 @@ int main(int argc, char *argv[]) {
 
     case 'c':
       {
-	char *cfg = xine_chomp(optarg);
-	__xineui_global_config_file = xitk_filter_filename (cfg);
+        if (optarg) {
+          char *cfg = xine_chomp(optarg);
+          __xineui_global_config_file = xitk_filter_filename (cfg);
+        }
       }
       break;
 

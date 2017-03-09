@@ -672,7 +672,9 @@ int main(int argc, char *argv[]) {
       break;
       
     case 'a': /* Select audio channel */
-      sscanf(optarg, "%i", &audio_channel);
+      if (optarg) {
+        sscanf(optarg, "%i", &audio_channel);
+      }
       break;
       
     case 'q': /* Automatic quit option */
