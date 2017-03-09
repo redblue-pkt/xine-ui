@@ -127,14 +127,28 @@ static const struct {
 static void tvset_update(xitk_widget_t *w, void *data) {
   xine_event_t          xine_event;
   xine_set_v4l2_data_t *ev_data;
-  
+  int current_system, current_chan, current_std;
+
+  current_system = xitk_combo_get_current_selected(tvset.system);
+  current_chan   = xitk_combo_get_current_selected(tvset.chann);
+  current_std    = xitk_combo_get_current_selected(tvset.vidstd);
+
+  if (current_system < 0 || (size_t)current_system >= sizeof(chanlists) / sizeof(chanlists[0])) {
+    current_system = 0;
+  }
+  if (current_chan < 0 || current_chan >= chanlists[current_system].count) {
+    current_chan = 0;
+  }
+  if (current_std < 0 || (size_t)current_std >= sizeof(std_list) / sizeof(std_list[0])) {
+    current_std = 0;
+  }
+
   ev_data = (xine_set_v4l2_data_t *)malloc(sizeof(xine_set_v4l2_data_t));
-  
+
   ev_data->input     = xitk_intbox_get_value(tvset.input);
-  ev_data->frequency = (chanlists[xitk_combo_get_current_selected(tvset.system)].
-			list[xitk_combo_get_current_selected(tvset.chann)].freq * 16) / 1000;
+  ev_data->frequency = (chanlists[current_system].list[current_chan].freq * 16) / 1000;
   
-  ev_data->standard_id = std_list[xitk_combo_get_current_selected(tvset.vidstd)].std;
+  ev_data->standard_id = std_list[current_std].std;
   
   xine_event.type        = XINE_EVENT_SET_V4L2;
   xine_event.data_length = sizeof(xine_set_v4l2_data_t);
