@@ -38,16 +38,19 @@
 #define OVL_PALETTE_SIZE 256
 
 #ifdef	__GNUC__
-#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ .y = (_y), .cr = (_cr), .cb = (_cb)}
+#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{{ .y = (_y), .cr = (_cr), .cb = (_cb)}}
 #else
-#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ (_cb), (_cr), (_y) }
+#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{{ (_cb), (_cr), (_y) }}
 #endif
 
-typedef struct {         /* CLUT == Color LookUp Table */
-  uint8_t cb    : 8;
-  uint8_t cr    : 8;
-  uint8_t y     : 8;
-  uint8_t foo   : 8;
+typedef union {         /* CLUT == Color LookUp Table */
+  struct {
+    uint8_t cb    : 8;
+    uint8_t cr    : 8;
+    uint8_t y     : 8;
+    uint8_t foo   : 8;
+  } u8;
+  uint32_t u32;
 } __attribute__ ((packed)) clut_t;
 
 static const clut_t textpalettes_color[] = {
@@ -177,7 +180,7 @@ void osd_init(void) {
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
   fbxine.osd.bar[0] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_palette(fbxine.osd.bar[0], (uint32_t *)textpalettes_color, textpalettes_trans);
+  xine_osd_set_palette(fbxine.osd.bar[0], &textpalettes_color[0].u32, textpalettes_trans);
 
   fbxine.osd.bar[1] = xine_osd_new(fbxine.stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   xine_osd_set_font(fbxine.osd.bar[1], "sans", fonth);

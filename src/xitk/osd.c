@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -36,16 +36,19 @@
 #define OVL_PALETTE_SIZE 256
 
 #ifdef	__GNUC__
-#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ .y = (_y), .cr = (_cr), .cb = (_cb)}
+#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{{ .y = (_y), .cr = (_cr), .cb = (_cb)}}
 #else
-#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{ (_cb), (_cr), (_y) }
+#define CLUT_Y_CR_CB_INIT(_y,_cr,_cb)	{{ (_cb), (_cr), (_y) }}
 #endif
 
-static const struct {         /* CLUT == Color LookUp Table */
-  uint8_t cb    : 8;
-  uint8_t cr    : 8;
-  uint8_t y     : 8;
-  uint8_t foo   : 8;
+static const union {         /* CLUT == Color LookUp Table */
+  struct {
+    uint8_t cb    : 8;
+    uint8_t cr    : 8;
+    uint8_t y     : 8;
+    uint8_t foo   : 8;
+  } u8;
+  uint32_t u32;
 } __attribute__ ((packed)) textpalettes_color[] = {
   /* white, no border, translucid */
     CLUT_Y_CR_CB_INIT(0x00, 0x00, 0x00), //0
@@ -156,7 +159,7 @@ void osd_init(void) {
 
   gGui->osd.bar.osd[0] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   
-  xine_osd_set_palette(gGui->osd.bar.osd[0], textpalettes_color, textpalettes_trans);
+  xine_osd_set_palette(gGui->osd.bar.osd[0], &textpalettes_color[0].u32, textpalettes_trans);
 
   gGui->osd.bar.osd[1] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   xine_osd_set_font(gGui->osd.bar.osd[1], "sans", fonth);
