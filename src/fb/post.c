@@ -280,13 +280,13 @@ static void pplugin_parse_and_store_post(int plugin_type, const char *post_chain
       (*_post_elements)[i] = NULL;
       (*_post_elements_num) += num;
 
+      free(posts);
     }
     else {
       *_post_elements     = posts;
       *_post_elements_num = num;
     }
   }
-  
 }
 
 

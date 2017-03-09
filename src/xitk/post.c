@@ -2347,13 +2347,13 @@ static void pplugin_parse_and_store_post(_pp_wrapper_t *pp_wrapper, const char *
       (*_post_elements)[i]   = NULL;
       (*_post_elements_num) += num;
 
+      free(posts);
     }
     else {
       *_post_elements     = posts;
       *_post_elements_num = num;
     }
   }
-  
 }
 
 static char *_pplugin_get_default_deinterlacer(void) {
