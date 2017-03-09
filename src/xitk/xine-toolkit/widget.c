@@ -752,7 +752,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   xitk_widget_t   *mywidget;
   widget_event_t   event;
 
-  if(!wl) {
+  if(!wl || !wl->l) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
@@ -761,7 +761,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   event.skonfig = skonfig;
 
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
-  while (mywidget && wl && wl->l && wl->win && wl->gc && skonfig) {
+  while (mywidget && wl->win && wl->gc && skonfig) {
 
     (void) mywidget->event(mywidget, &event, NULL);
 
@@ -776,9 +776,12 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
   xitk_widget_t   *mywidget;
   widget_event_t   event;
 
+  if (!wl || !wl->l) {
+    return 1;
+  }
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 
-  while (mywidget && wl && wl->l && wl->win && wl->gc) {
+  while (mywidget && wl->win && wl->gc) {
     
     if((mywidget->enable != WIDGET_ENABLE) && (mywidget->have_focus != FOCUS_LOST)) {
 
@@ -1191,7 +1194,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
   xitk_widget_t   *first_widget, *widget;
   widget_event_t   event;
 
-  if(!wl) {
+  if(!wl || !wl->l) {
     XITK_WARNING("widget list is NULL.\n");
     return;
   }
@@ -1201,7 +1204,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
   else
     first_widget = widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   
-  while (widget && wl && wl->l && wl->win && wl->gc) {
+  while (widget && wl->win && wl->gc) {
     
     /* There is no widget focused yet */
     if(!wl->widget_focused) {
@@ -1293,14 +1296,14 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
   widget_event_t       event;
   xitk_widget_list_t  *wl = w->wl;
   
-  if(!wl) {
+  if(!wl || !wl->l) {
     XITK_WARNING("widget list is NULL.\n");
     return;
   }
 
   widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   
-  while (widget && wl && wl->l && wl->win && wl->gc && (widget != w))
+  while (widget && wl->win && wl->gc && (widget != w))
     widget = (xitk_widget_t *) xitk_list_next_content(wl->l);
   
   if(widget) {
