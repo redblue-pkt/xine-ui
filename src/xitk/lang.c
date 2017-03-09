@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -481,7 +481,7 @@ const char *get_language_from_iso639_1(char *two_letters) {
     while((*tl == ' ') && (*tl != '\0'))
       tl++;
     
-    if(tl && (strlen(tl) == 2)) {
+    if(strlen(tl) == 2) {
       int   i;
       
       for(i = 0; *(iso639_1[i].two_letters); i++) {
