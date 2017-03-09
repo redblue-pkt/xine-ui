@@ -599,10 +599,10 @@ static void sort_files(filebrowser_t *fb) {
   if(fb->files_num) {
     int i;
     
-    if(fb->files_sort_direction == DEFAULT_SORT)
-      func = _sortfiles_default;
-    else if(fb->files_sort_direction == REVERSE_SORT)
+    if(fb->files_sort_direction == REVERSE_SORT)
       func = _sortfiles_reverse;
+    else /*if(fb->files_sort_direction == DEFAULT_SORT)*/
+      func = _sortfiles_default;
     
     qsort(fb->norm_files, fb->files_num, sizeof(fileinfo_t), func);
     
@@ -632,10 +632,10 @@ static void sort_directories(filebrowser_t *fb) {
   if(fb->directories_num) {
     int i;
     
-    if(fb->directories_sort_direction == DEFAULT_SORT)
-      func = _sortfiles_default;
-    else if(fb->directories_sort_direction == REVERSE_SORT)
+    if(fb->directories_sort_direction == REVERSE_SORT)
       func = _sortfiles_reverse;
+    else /*if(fb->directories_sort_direction == DEFAULT_SORT)*/
+      func = _sortfiles_default;
     
     qsort(fb->dir_files, fb->directories_num, sizeof(fileinfo_t), func);
     
