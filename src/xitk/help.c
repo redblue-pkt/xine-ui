@@ -68,9 +68,9 @@ typedef struct {
   xitk_widget_t        *ok;
   xitk_widget_t        *browser;
 
-  char                 *tab_sections[MAX_SECTIONS];
+  char                 *tab_sections[MAX_SECTIONS + 1];
   
-  help_section_t       *sections[MAX_SECTIONS];
+  help_section_t       *sections[MAX_SECTIONS + 1];
   int                   num_sections;
 
   xitk_register_key_t   kreg;
