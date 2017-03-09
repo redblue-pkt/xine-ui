@@ -292,7 +292,9 @@ static void print_usage (void) {
 				       + strlen(cfgfile)
 				       + 3);
     sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
-    mkdir(configfile, 0755);
+    if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
+      fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
+    }
     sprintf(configfile + strlen(configfile), "/%s", cfgfile);
   }
   
@@ -744,7 +746,9 @@ int main(int argc, char *argv[]) {
 						+ strlen(cfgfile)
 						+ 3);
       sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
-      mkdir(__xineui_global_config_file, 0755);
+      if (mkdir(__xineui_global_config_file, 0755) < 0 && errno != EEXIST) {
+        fprintf(stderr, "Error creating %s: %d (%s)\n", __xineui_global_config_file, errno, strerror(errno));
+      }
       sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
     }
   }
