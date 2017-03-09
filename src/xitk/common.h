@@ -379,7 +379,7 @@ typedef struct {
   int                        no_mouse;
   int                        wid;
 
-  void                     (*nongui_error_msg)(char *text);
+  void                     (*nongui_error_msg)(const char *text);
 
   FILE                      *orig_stdout; /* original stdout at startup        */
                                           /* before an evtl. later redirection */

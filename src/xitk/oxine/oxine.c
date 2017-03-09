@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002-2008 Stefan Holst
+ * Copyright (C) 2005-2017 the xine project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -651,7 +652,7 @@ static void return_cb(void *this) {
   return;
 }
 
-static void oxine_error_msg(char *text)
+static void oxine_error_msg(const char *text)
 {
   oxine_t *oxine = oxine_instance_get();
   otk_widget_t *b;
