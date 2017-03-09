@@ -63,7 +63,7 @@ static int StrCmp(const void *a, const  void *b) {
 }
 void dump_xfree_info(Display *display, int screen, int complete) {
   char                 dummybuf[40];
-  char                *cp;
+  const char          *cp;
   int                  i, n;
   long                 req_size;
   XPixmapFormatValues *pmf;
