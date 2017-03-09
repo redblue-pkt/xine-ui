@@ -655,7 +655,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     /*
      * NULL terminate array.
      */
-    kbt->entry[kbt->num_entries] = (kbinding_entry_t *) calloc(1, sizeof(kbinding_t));
+    kbt->entry[kbt->num_entries] = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
     kbt->entry[kbt->num_entries]->is_gui    = 0;
     kbt->entry[kbt->num_entries]->is_alias  = 0;
     kbt->entry[kbt->num_entries]->comment   = NULL;
