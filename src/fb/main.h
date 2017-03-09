@@ -1,5 +1,6 @@
 /* 
  * Copyright (C) 2003 by Fredrik Noring
+ * Copyright (C) 2003-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -84,7 +85,7 @@ struct fbxine
         int                       post_audio_elements_num;
         int                       post_audio_enable;
 
-        char                     *deinterlace_plugin;
+        const char               *deinterlace_plugin;
         post_element_t          **deinterlace_elements;
         int                       deinterlace_elements_num;
         int                       deinterlace_enable;

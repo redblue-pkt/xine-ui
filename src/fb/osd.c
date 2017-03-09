@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -233,7 +233,7 @@ void osd_deinit(void) {
 }
 
 
-void osd_display_info(char *info, ...) {
+void osd_display_info(const char *info, ...) {
 
   if(fbxine.osd.enabled) {
     va_list   args;
@@ -453,7 +453,7 @@ void osd_stream_infos(void) {
   }
 }
 
-void osd_draw_bar(char *title, int min, int max, int val, int type) {
+void osd_draw_bar(const char *title, int min, int max, int val, int type) {
 
   if(fbxine.osd.enabled) {
     uint32_t width, height;
@@ -586,8 +586,8 @@ void osd_stream_position(void) {
 void osd_display_spu_lang(void) {
   char   buffer[32];
   char   lang_buffer[XINE_LANG_MAX];
-  char  *lang = NULL;
   int    channel;
+  const char *lang = NULL;
   
   channel = xine_get_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL);
 
@@ -615,8 +615,8 @@ void osd_display_spu_lang(void) {
 void osd_display_audio_lang(void) {
   char   buffer[32];
   char   lang_buffer[XINE_LANG_MAX];
-  char  *lang = NULL;
   int    channel;
+  const char *lang = NULL;
 
   channel = xine_get_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
 
