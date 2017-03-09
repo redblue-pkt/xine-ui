@@ -95,6 +95,34 @@ void read_ack(int fd) {
   SAFE_FREE(data);
 }
 
+static int _poll_rd(int fd, int timeout)
+{
+  fd_set         set;
+  struct timeval tv;
+  int            result;
+
+  FD_ZERO(&set);
+  FD_SET(fd, &set);
+
+  tv.tv_sec  = 0;
+  tv.tv_usec = 1000 * timeout;
+
+ retry:
+  result = select(fd + 1, &set, NULL, NULL, &tv);
+  if (result < 0) {
+    if (errno == EINTR)
+      goto retry;
+    perror("polling remote socket failed\n");
+    return result;
+  }
+  if (result == 0) {
+    fprintf(stderr, "remote socket timeout\n");
+    return -1;
+  }
+
+  return 0;
+}
+
 void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
 
   write(fd, hdr, sizeof(ctrl_header_packet_t));
@@ -123,19 +151,28 @@ void send_string(int session, ctrl_commands_t command, char *string) {
   close(fd);
 }
 
-int remote_cmd(int session, ctrl_commands_t command) {
+static int _remote_cmd(int session, ctrl_commands_t command, int timeout) {
   int fd;
   
   if((fd = connect_to_session(session)) == -1)
     return 0;
 
   send_packet(fd, command, NULL, 0);
+
+  if (timeout >= 0 && _poll_rd(fd, timeout) < 0) {
+    return 0;
+  }
+
   read_ack(fd);
   close(fd);
   
   return 1;
 }
 
+int remote_cmd(int session, ctrl_commands_t command) {
+  return _remote_cmd(session, command, -1);
+}
+
 int is_remote_running(int session) {
-  return remote_cmd(session, CMD_PING);
+  return _remote_cmd(session, CMD_PING, 1000);
 }
