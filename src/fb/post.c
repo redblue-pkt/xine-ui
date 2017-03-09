@@ -1,5 +1,6 @@
 /* 
  * Copyright (C) 2008 by Dirk Meyer
+ * Copyright (C) 2003-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -104,7 +105,7 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
     ppost_chain = post_chain;
     while((p = xine_strsep(&ppost_chain, ";"))) {
       
-      if(p && strlen(p)) {
+      if(strlen(p)) {
 	char          *plugin, *args = NULL;
 	xine_post_t   *post;
 	
@@ -160,7 +161,7 @@ static post_element_t **pplugin_parse_and_load(int plugin_type, const char *pcha
 		while((*p != '\0') && (*p != '='))
 		  p++;
 		
-		if(p && strlen(p)) {
+		if(strlen(p)) {
 		  int param_num = 0;
 		  
 		  *p++ = '\0';
