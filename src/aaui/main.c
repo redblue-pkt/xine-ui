@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -282,8 +282,8 @@ static void print_usage (void) {
   const char *const *post_ids;
   char              *post_id;
   xine_t            *xine;
-  char              *cfgdir = ".xine";
-  char              *cfgfile = CONFIGFILE;
+  const char        *cfgdir = ".xine";
+  const char        *cfgfile = CONFIGFILE;
   char              *configfile;
 
   if(!(configfile = getenv("XINERC"))) {
@@ -441,10 +441,10 @@ static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time
   return ret;
 }
 
-static int aaxine_xine_open_and_play(char *mrl, int start_pos, int start_time) {
+static int aaxine_xine_open_and_play(const char *mrl, int start_pos, int start_time) {
   
 
-  if(!xine_open(aaxine.stream, (const char *)mrl)) {
+  if(!xine_open(aaxine.stream, mrl)) {
     aaxine_handle_xine_error(aaxine.stream);
     return 0;
   }
@@ -735,8 +735,8 @@ int main(int argc, char *argv[]) {
    * generate and init a config "object"
    */
   {
-    char *cfgdir = ".xine";
-    char *cfgfile = CONFIGFILE;
+    const char *cfgdir = ".xine";
+    const char *cfgfile = CONFIGFILE;
     
     if (!(__xineui_global_config_file = getenv ("XINERC"))) {
       __xineui_global_config_file = (char *) malloc(strlen(xine_get_homedir())
