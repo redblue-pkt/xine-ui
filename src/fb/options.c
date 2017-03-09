@@ -160,7 +160,9 @@ int parse_options(int argc, char **argv)
 				break;
 		  
 			case 'a':
-				sscanf(optarg, "%i", &fbxine.audio_channel);
+                                if (optarg) {
+                                        sscanf(optarg, "%i", &fbxine.audio_channel);
+                                }
 				break;
 				
 			case 'd':
@@ -202,6 +204,7 @@ int parse_options(int argc, char **argv)
 				break;
 
 		        case OPTION_POST:
+                            if (optarg) {
 			        if(!pplugins_num)
 				     pplugins = (char **) malloc(sizeof(char *) * 2);
 				else
@@ -211,6 +214,7 @@ int parse_options(int argc, char **argv)
 				pplugins[pplugins_num] = optarg;
 				pplugins_num++;
 				pplugins[pplugins_num] = NULL;
+                            }
 				break;
 
                         case OPTION_VERBOSE:
