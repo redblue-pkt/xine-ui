@@ -1976,6 +1976,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
   if(XGetGeometry(gui->video_display, gui->video_window, &rootwin, 
 		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) == BadDrawable) {
     XUnlockDisplay(gui->video_display);
+    pthread_mutex_unlock(&gVw.mutex);
     return 0;
   }
   XUnlockDisplay(gui->video_display);
