@@ -1359,12 +1359,12 @@ static int sock_serv(const char *service, const char *transport, int queue_lengt
 /*
  * Read from socket.
  */
-static int sock_read(int socket, char *buf, int len) {
+static ssize_t sock_read(int socket, char *buf, size_t len) {
   char    *pbuf;
-  int      r, rr;
+  ssize_t  r, rr;
   void    *nl;
   
-  if((socket < 0) || (buf == NULL))
+  if((socket < 0) || (buf == NULL) || (len < 1))
     return -1;
 
   if(!sock_check_opened(socket))
@@ -2884,7 +2884,7 @@ static __attribute__((noreturn)) void *client_thread(void *data) {
   client_info_t     *client_info = (client_info_t *) data;
   char               buffer[_BUFSIZ];
   int                i;
-  int                len;
+  ssize_t            len;
   sigset_t           sigpipe_mask;
   
   pthread_detach(pthread_self());
