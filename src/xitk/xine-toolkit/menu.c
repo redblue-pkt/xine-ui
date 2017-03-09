@@ -980,8 +980,11 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XSetInputFocus(private_data->imlibdata->x.disp, 
 		 (xitk_window_get_window(xwin)), RevertToParent, CurrentTime);
   XUNLOCK(private_data->imlibdata->x.disp);
-  
-  xitk_set_focus_to_widget((xitk_widget_t *) (xitk_list_first_content(menu_window->wl.l)));
+
+  btn = (xitk_widget_t *) xitk_list_first_content(menu_window->wl.l);
+  if (btn) {
+    xitk_set_focus_to_widget(btn);
+  }
 }
 
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
