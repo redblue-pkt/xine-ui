@@ -123,7 +123,7 @@ static int _poll_rd(int fd, int timeout)
   return 0;
 }
 
-void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
+void _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr) {
 
   write(fd, hdr, sizeof(ctrl_header_packet_t));
 
@@ -131,7 +131,7 @@ void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
     write(fd, data, hdr->data_length);
 }
 
-void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length) {
+void send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
   
   hdr.version     = CTRL_PROTO_VERSION;
@@ -141,7 +141,7 @@ void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_leng
   _send_packet(fd, data, &hdr);
 }
 
-void send_string(int session, ctrl_commands_t command, char *string) {
+void send_string(int session, ctrl_commands_t command, const char *string) {
   int fd;
   
   if((fd = connect_to_session(session)) == -1)

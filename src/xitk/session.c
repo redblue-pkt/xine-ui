@@ -51,7 +51,7 @@ static int           going;
 static pthread_t     thread_server;
 static char         *socket_name;
 
-static void ssend_packet(int fd, void *data, uint32_t data_length) {
+static void ssend_packet(int fd, const void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
   
   hdr.version     = CTRL_PROTO_VERSION;
@@ -493,13 +493,13 @@ int init_session(void) {
   return retval;
 }
 
-static int sanestrcasecmp(char *s1, char *s2) {
+static int sanestrcasecmp(const char *s1, const char *s2) {
   if(s1 && s2)
     return strcasecmp(s1, s2);
   return 1;
 } 
 
-int session_handle_subopt(char *suboptarg, char *enqueue_mrl, int *session) {
+int session_handle_subopt(char *suboptarg, const char *enqueue_mrl, int *session) {
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp, loop, speed_status, time_status;
