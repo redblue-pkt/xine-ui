@@ -344,7 +344,7 @@ int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2) {
 	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
 	}
 	
-	if(((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET)) {
 	  combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
 	
