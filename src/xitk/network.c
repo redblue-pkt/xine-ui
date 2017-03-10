@@ -455,7 +455,7 @@ static int sock_create(const char *service, const char *transport, struct sockad
   struct protoent *itransport;
   int                sock;
   int                type;
-  int                proto;
+  int                proto = 0;
 
   memset(sin, 0, sizeof(*sin));
 
@@ -467,16 +467,16 @@ static int sock_create(const char *service, const char *transport, struct sockad
 
     if(!iservice)
       sock_err("Service not registered: %s\n", service);
-    
-    sin->sin_port = iservice->s_port;
+    else
+      sin->sin_port = iservice->s_port;
   }
 
   itransport = getprotobyname(transport);
 
   if(!itransport)
     sock_err("Protocol not registered: %s\n", transport);
-
-  proto = itransport->p_proto;
+  else
+    proto = itransport->p_proto;
 
   if(!strcmp(transport, "udp"))
     type = SOCK_DGRAM;
