@@ -2657,7 +2657,7 @@ static void parse_destock_remain(client_info_t *client_info) {
 	p++;
       
       if(p)
-	strcpy(remaining, (_atoa(p)));
+        strlcpy(remaining, (_atoa(p)), sizeof(remaining));
       
       client_info->command.line = (char *) realloc(client_info->command.line, sizeof(char *) * (strlen(c) + 1));
       
