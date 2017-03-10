@@ -24,13 +24,13 @@
 
 #include <stdarg.h>
 
-void xine_error(char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_error(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
-void xine_error_with_more(char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_error_with_more(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
-void xine_info(char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_info(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
 
-void gui_handle_xine_error(xine_stream_t *stream, char *mrl);
+void gui_handle_xine_error(xine_stream_t *stream, const char *mrl);
 
 void too_slow_window(void);
 

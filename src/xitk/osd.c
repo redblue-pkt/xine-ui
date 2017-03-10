@@ -440,7 +440,7 @@ void osd_stream_infos(void) {
   }
 }
 
-void osd_draw_bar(char *title, int min, int max, int val, int type) {
+void osd_draw_bar(const char *title, int min, int max, int val, int type) {
 
   if(gGui->osd.enabled) {
     int      wwidth, wheight;
@@ -561,7 +561,7 @@ void osd_stream_position(int pos) {
   osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_POS2);
 }
 
-void osd_display_info(char *info, ...) {
+void osd_display_info(const char *info, ...) {
 
   if(gGui->osd.enabled && !gGui->on_quit) {
     va_list   args;
@@ -686,8 +686,8 @@ void osd_update_status(void) {
 void osd_display_spu_lang(void) {
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
-  char  *lang = NULL;
   int    channel;
+  const char *lang = NULL;
   
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
 
@@ -715,8 +715,8 @@ void osd_display_spu_lang(void) {
 void osd_display_audio_lang(void) {
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
-  char  *lang = NULL;
   int    channel;
+  const char *lang = NULL;
 
   channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
 

@@ -45,6 +45,6 @@ typedef struct {
 
 const langs_t *get_lang(void);
 
-const char *get_language_from_iso639_1(char *two_letters);
+const char *get_language_from_iso639_1(const char *two_letters);
 
 #endif

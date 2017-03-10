@@ -473,10 +473,10 @@ static const struct {
 /*
  * Return language from iso639-1 two letters.
  */
-const char *get_language_from_iso639_1(char *two_letters) {
+const char *get_language_from_iso639_1(const char *two_letters) {
 
   if(two_letters) {
-    char *tl = two_letters;
+    const char *tl = two_letters;
     
     while((*tl == ' ') && (*tl != '\0'))
       tl++;
@@ -498,7 +498,7 @@ const char *get_language_from_iso639_1(char *two_letters) {
  * Return a langs_t pointer on static struct langs[];
  */
 const langs_t *get_lang(void) {
-  char    *lcmsg = setlocale(LC_MESSAGES, NULL);
+  const char *lcmsg = setlocale(LC_MESSAGES, NULL);
   
   if(lcmsg) {
     const langs_t *l;
