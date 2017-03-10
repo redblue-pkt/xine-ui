@@ -83,8 +83,6 @@ void                add_pixmap(ImlibData * id, ImlibImage * im, int width, int h
 void                clean_caches(ImlibData * id);
 void                nullify_image(ImlibData * id, ImlibImage * im);
 
-char               *_GetExtension(char *file);
-
 int                 ispng(FILE *f);
 
 void                calc_map_tables(ImlibData * id, ImlibImage * im);
