@@ -243,7 +243,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
  *
  */
 static int notify_inside(xitk_widget_t *w, int x, int y) {
-  slider_private_data_t *private_data = (slider_private_data_t *) w->private_data;
+  slider_private_data_t *private_data;
 
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
