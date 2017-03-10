@@ -466,7 +466,7 @@ static int sock_create(const char *service, const char *transport, struct sockad
 
   itransport = getprotobyname(transport);
 
-  if(!transport)
+  if(!itransport)
     sock_err("Protocol not registered: %s\n", transport);
 
   proto = itransport->p_proto;
