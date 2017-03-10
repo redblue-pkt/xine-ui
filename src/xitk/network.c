@@ -140,8 +140,15 @@ struct session_commands_s {
   client_func_t   function;
 };
 
+typedef struct client_commands_s {
+  const char     *command;
+  int             origin;
+  int             enable;
+  client_func_t   function;
+} client_commands_t;
+
 static session_t             session;
-static const session_commands_t client_commands[] = {
+static const client_commands_t client_commands[] = {
   { "?",           ORIGIN_CLIENT,   1, client_help    },
   { "version",     ORIGIN_CLIENT,   1, client_version },
   { "open",        ORIGIN_CLIENT,   1, client_open    },
@@ -162,31 +169,31 @@ static session_commands_t  **session_commands = NULL;
 typedef struct commands_s commands_t;
 typedef struct client_info_s client_info_t;
 typedef struct passwds_s passwds_t;
-typedef void (*cmd_func_t)(commands_t *, client_info_t *);
+typedef void (*cmd_func_t)(const commands_t *, client_info_t *);
 
 static passwds_t   **passwds = NULL;
 
-static void do_commands(commands_t *, client_info_t *);
-static void do_help(commands_t *, client_info_t *);
-static void do_syntax(commands_t *, client_info_t *);
-static void do_auth(commands_t *, client_info_t *);
-static void do_mrl(commands_t *, client_info_t *);
-static void do_playlist(commands_t *, client_info_t *);
-static void do_play(commands_t *, client_info_t *);
-static void do_stop(commands_t *, client_info_t *);
-static void do_pause(commands_t *, client_info_t *);
-static void do_exit(commands_t *, client_info_t *);
-static void do_fullscreen(commands_t *, client_info_t *);
+static void do_commands(const commands_t *, client_info_t *);
+static void do_help(const commands_t *, client_info_t *);
+static void do_syntax(const commands_t *, client_info_t *);
+static void do_auth(const commands_t *, client_info_t *);
+static void do_mrl(const commands_t *, client_info_t *);
+static void do_playlist(const commands_t *, client_info_t *);
+static void do_play(const commands_t *, client_info_t *);
+static void do_stop(const commands_t *, client_info_t *);
+static void do_pause(const commands_t *, client_info_t *);
+static void do_exit(const commands_t *, client_info_t *);
+static void do_fullscreen(const commands_t *, client_info_t *);
 #ifdef HAVE_XINERAMA
-static void do_xinerama_fullscreen(commands_t *, client_info_t *);
+static void do_xinerama_fullscreen(const commands_t *, client_info_t *);
 #endif
-static void do_get(commands_t *, client_info_t *);
-static void do_set(commands_t *, client_info_t *);
-static void do_gui(commands_t *, client_info_t *);
-static void do_event(commands_t *, client_info_t *);
-static void do_seek(commands_t *, client_info_t *);
-static void do_halt(commands_t *, client_info_t *);
-static void do_snap(commands_t *, client_info_t *);
+static void do_get(const commands_t *, client_info_t *);
+static void do_set(const commands_t *, client_info_t *);
+static void do_gui(const commands_t *, client_info_t *);
+static void do_event(const commands_t *, client_info_t *);
+static void do_seek(const commands_t *, client_info_t *);
+static void do_halt(const commands_t *, client_info_t *);
+static void do_snap(const commands_t *, client_info_t *);
 
 static void handle_client_command(client_info_t *);
 
@@ -209,13 +216,13 @@ static void handle_client_command(client_info_t *);
 #define PASSWD_USER_DENIED  4
 
 struct commands_s {
-  char         *command;
+  const char   *command;
   int           argtype;
   int           public;
   int           need_auth;
   cmd_func_t    function;
-  char         *help;
-  char         *syntax;
+  const char   *help;
+  const char   *syntax;
 };
 
 struct client_info_s {
@@ -254,7 +261,7 @@ typedef struct {
   char              buf[256];
 } fileobj_t;
 
-static commands_t commands[] = {
+static const commands_t commands[] = {
   { "commands",    NO_ARGS,         NOT_PUBLIC,      AUTH_UNNEEDED, do_commands,
     "Display all available commands, tab separated, dot terminated.", 
     "commands"
@@ -408,8 +415,8 @@ static commands_t commands[] = {
   } 
 };
 
-static struct {
-  char        *name;
+static const struct {
+  const char  *name;
   int          status;
 } status_struct[] = {
   { "XINE_STATUS_IDLE"   , XINE_STATUS_IDLE },
@@ -419,8 +426,8 @@ static struct {
   { NULL                 , -1               }
 };
 
-static struct {
-  char        *name;
+static const struct {
+  const char  *name;
   int          speed;
 } speeds_struct[] = {
   { "XINE_SPEED_PAUSE"   , XINE_SPEED_PAUSE  },
@@ -1670,7 +1677,7 @@ static int is_arg_contain(client_info_t *client_info, int pos, const char *arg) 
 /*
  * Set current command line from line.
  */
-static void set_command_line(client_info_t *client_info, char *line) {
+static void set_command_line(client_info_t *client_info, const char *line) {
 
   if(client_info && line && strlen(line)) {
 
@@ -1684,7 +1691,7 @@ static void set_command_line(client_info_t *client_info, char *line) {
 /*
  * Display help of given command.
  */
-static void command_help(commands_t *command, client_info_t *client_info) {
+static void command_help(const commands_t *command, client_info_t *client_info) {
 
   if(command) {
     if(command->help) {
@@ -1700,7 +1707,7 @@ static void command_help(commands_t *command, client_info_t *client_info) {
 /*
  * Display syntax of given command.
  */
-static void command_syntax(commands_t *command, client_info_t *client_info) {
+static void command_syntax(const commands_t *command, client_info_t *client_info) {
   
   if(command) {
     if(command->syntax) {
@@ -1713,7 +1720,7 @@ static void command_syntax(commands_t *command, client_info_t *client_info) {
   }
 }
 
-static void do_commands(commands_t *cmd, client_info_t *client_info) {
+static void do_commands(const commands_t *cmd, client_info_t *client_info) {
   int i = 0;
   char buf[_BUFSIZ];
 
@@ -1729,7 +1736,7 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
   sock_write(client_info->socket, "%s", buf);
 }
 
-static void do_help(commands_t *cmd, client_info_t *client_info) {
+static void do_help(const commands_t *cmd, client_info_t *client_info) {
   char buf[_BUFSIZ] = "Available commands are:\n       ";
 
   if(!client_info->command.num_args) {
@@ -1787,7 +1794,7 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_syntax(commands_t *command, client_info_t *client_info) {
+static void do_syntax(const commands_t *command, client_info_t *client_info) {
   int i;
   
   for(i = 0; commands[i].command != NULL; i++) {
@@ -1800,7 +1807,7 @@ static void do_syntax(commands_t *command, client_info_t *client_info) {
   sock_write(client_info->socket, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
 }
 
-static void do_auth(commands_t *cmd, client_info_t *client_info) {
+static void do_auth(const commands_t *cmd, client_info_t *client_info) {
   int nargs;
   
   nargs = is_args(client_info);
@@ -1837,7 +1844,7 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_mrl(commands_t *cmd, client_info_t *client_info) {
+static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int nargs;
 
@@ -1898,7 +1905,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_playlist(commands_t *cmd, client_info_t *client_info) {
+static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int nargs;
   
@@ -2034,7 +2041,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_play(commands_t *cmd, client_info_t *client_info) {
+static void do_play(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
 
   if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
@@ -2051,7 +2058,7 @@ static void do_play(commands_t *cmd, client_info_t *client_info) {
 
 }
 
-static void do_stop(commands_t *cmd, client_info_t *client_info) {
+static void do_stop(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   gui->ignore_next = 1;
   xine_stop(gui->stream);
@@ -2059,7 +2066,7 @@ static void do_stop(commands_t *cmd, client_info_t *client_info) {
   gui_display_logo();
 }
 
-static void do_pause(commands_t *cmd, client_info_t *client_info) {
+static void do_pause(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
 
   if (xine_get_param (gui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
@@ -2068,27 +2075,27 @@ static void do_pause(commands_t *cmd, client_info_t *client_info) {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
 }
 
-static void do_exit(commands_t *cmd, client_info_t *client_info) {
+static void do_exit(const commands_t *cmd, client_info_t *client_info) {
   if(client_info) {
     client_info->finished = 1;
   }
 }
 
-static void do_fullscreen(commands_t *cmd, client_info_t *client_info) {
+static void do_fullscreen(const commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_FULLSCREEN;
 
   gui_execute_action_id(action);
 }
 
 #ifdef HAVE_XINERAMA
-static void do_xinerama_fullscreen(commands_t *cmd, client_info_t *client_info) {
+static void do_xinerama_fullscreen(const commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
 
   gui_execute_action_id(action);
 }
 #endif
 
-static void do_get(commands_t *cmd, client_info_t *client_info) {
+static void do_get(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int nargs;
   
@@ -2241,7 +2248,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_set(commands_t *cmd, client_info_t *client_info) {
+static void do_set(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int nargs;
 
@@ -2276,9 +2283,9 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "loop")) {
 	int i;
-	struct {
-	  char *mode;
-	  int   loop_mode;
+	static const struct {
+	  const char *mode;
+	  int         loop_mode;
 	} loop_modes[] = {
 	  { "no",       PLAYLIST_LOOP_NO_LOOP   },
 	  { "loop",     PLAYLIST_LOOP_LOOP      },
@@ -2341,7 +2348,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_gui(commands_t *cmd, client_info_t *client_info) {
+static void do_gui(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int nargs;
   
@@ -2407,7 +2414,7 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_event(commands_t *cmd, client_info_t *client_info) {
+static void do_event(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   xine_event_t   xine_event;
   int            nargs;
@@ -2419,9 +2426,9 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
 
     if(nargs == 1) {
       const char *arg = get_arg(client_info, 1);
-      struct {
-	char     *name;
-	int       type;
+      static const struct {
+	const char *name;
+	int         type;
       } events_struct[] = {
 	{ "menu1"   , XINE_EVENT_INPUT_MENU1    },
 	{ "menu2"   , XINE_EVENT_INPUT_MENU2    },
@@ -2490,7 +2497,7 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_seek(commands_t *cmd, client_info_t *client_info) {
+static void do_seek(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   int            nargs;
   
@@ -2557,7 +2564,7 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
   }
 }
 
-static void do_halt(commands_t *cmd, client_info_t *client_info) {
+static void do_halt(const commands_t *cmd, client_info_t *client_info) {
   gui_exit(NULL, NULL);
 }
 
@@ -2567,7 +2574,7 @@ static void network_messenger(void *data, char *message) {
   sock_write(socket, "%s", message);
 }
 
-static void do_snap(commands_t *cmd, client_info_t *client_info) {
+static void do_snap(const commands_t *cmd, client_info_t *client_info) {
   gGui_t *gui = gGui;
   create_snapshot(gui->mmk.mrl, 
 		  network_messenger, network_messenger, (void *)(intptr_t)client_info->socket);

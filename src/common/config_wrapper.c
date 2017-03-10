@@ -41,7 +41,7 @@
 #define XINE_CONFIG_SECURITY   30
 
 
-static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, char *string) {
+static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, const char *string) {
 
   switch(type) {
 
@@ -83,7 +83,7 @@ void config_update_range(const char *key, int min, int max) {
     fprintf(stderr, "WOW, range key %s isn't registered\n", key);
 }
 
-void config_update_string(const char *key, char *string) {
+void config_update_string(const char *key, const char *string) {
   xine_cfg_entry_t entry;
 
   if((xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) && string)
