@@ -1028,6 +1028,7 @@ static void listentry_destroy(otk_widget_t *this) {
     this->otk->focus_ptr = NULL;
 
   remove_widget_from_win(this);
+  ho_free(listentry->text);
   ho_free(listentry);
 }
 
@@ -1110,7 +1111,7 @@ void otk_add_listentry(otk_widget_t *this, const char *text, void *data, int pos
   entry->widget.needupdate  = 0;
   entry->widget.major       = 0;
   entry->list               = list;
-  entry->text               = strdup(text);
+  entry->text               = ho_strdup(text);
   entry->data               = data;
 
     
