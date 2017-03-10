@@ -1515,7 +1515,7 @@ static int server_load_passwd(const char *passwdfilename) {
 static int is_user_in_passwds(client_info_t *client_info) {
   int i;
   
-  if((client_info == NULL) || (client_info->name == NULL))
+  if(client_info == NULL)
     return 0;
   
   for(i = 0; passwds[i]->ident != NULL; i++) {
@@ -1527,7 +1527,7 @@ static int is_user_in_passwds(client_info_t *client_info) {
 static int is_user_allowed(client_info_t *client_info) {
   int i;
   
-  if((client_info == NULL) || (client_info->name == NULL) || (client_info->passwd == NULL))
+  if((client_info == NULL) || (client_info->passwd == NULL))
     return PASSWD_USER_DENIED;
   
   for(i = 0; passwds[i]->ident != NULL; i++) {
