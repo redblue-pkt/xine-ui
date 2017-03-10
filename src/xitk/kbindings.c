@@ -198,9 +198,10 @@ static void _kbindings_display_kbindings(kbinding_t *kbt, int mode) {
  * Convert a modifier to key binding modifier style.
  */
 static void kbindings_convert_modifier(int mod, int *modifier) {
-  *modifier = KEYMOD_NOMOD;
   
   ABORT_IF_NULL(modifier);
+
+  *modifier = KEYMOD_NOMOD;
 
   if(mod & MODIFIER_NOMOD)
     *modifier = KEYMOD_NOMOD;
