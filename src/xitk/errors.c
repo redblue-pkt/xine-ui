@@ -81,7 +81,7 @@ static void errors_create_window(char *title, char *message) {
 /*
  * Display an error window.
  */
-void xine_error(char *message, ...) {
+void xine_error(const char *message, ...) {
   va_list   args;
   char     *buf;
   int       n, size = 100;
@@ -135,7 +135,7 @@ void xine_error(char *message, ...) {
 /*
  * Display an error window, with more button.
  */
-void xine_error_with_more(char *message, ...) {
+void xine_error_with_more(const char *message, ...) {
   va_list   args;
   char     *buf;
   int       n, size = 100;
@@ -176,7 +176,7 @@ void xine_error_with_more(char *message, ...) {
 /*
  * Display an informative window.
  */
-void xine_info(char *message, ...) {
+void xine_info(const char *message, ...) {
   va_list   args;
   char     *buf;
   int       n, size = 100;
@@ -230,9 +230,9 @@ void xine_info(char *message, ...) {
 /*
  * Display an error window error from a xine engine error.
  */
-void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
+void gui_handle_xine_error(xine_stream_t *stream, const char *mrl) {
   int   err;
-  char *_mrl = mrl;
+  const char *_mrl = mrl;
 
   if(_mrl == NULL)
     _mrl = (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current];

@@ -239,8 +239,8 @@ static int _rc_file_get_next_line(file_info_t *rcfile) {
  */
 static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   int            i = 1, j;
-  char          *cfgdir = CONFIGDIR;
-  char          *xinerc = "xinerc";
+  const char    *cfgdir = CONFIGDIR;
+  const char    *xinerc = "xinerc";
   file_info_t   *rcfile;
   char        **_argv = NULL;
   
@@ -349,8 +349,8 @@ static void xrm_parse(void) {
   char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  char         *environment;
-  char         *classname = "xine";
+  const char   *environment;
+  const char   *classname = "xine";
   char         *str_type;
   XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
   XrmValue      value;
@@ -483,8 +483,8 @@ static void print_formatted(char *title, const char *const *plugins) {
 static void list_plugins(char *type) {
   const char   *const  *plugins;
   xine_t               *xine;
-  char                 *cfgdir     = CONFIGDIR;
-  char                 *cfgfile    = CONFIGFILE;
+  const char           *cfgdir     = CONFIGDIR;
+  const char           *cfgfile    = CONFIGFILE;
   char                 *configfile = NULL;
   int                   i;
   static const struct {
@@ -560,8 +560,8 @@ static void show_usage (void) {
   const char   *const *driver_ids;
   const char   *driver_id;
   xine_t       *xine;
-  char         *cfgdir     = CONFIGDIR;
-  char         *cfgfile    = CONFIGFILE;
+  const char   *cfgdir     = CONFIGDIR;
+  const char   *cfgfile    = CONFIGFILE;
   char         *configfile = NULL;
   const char  **backends, *backend;
   
@@ -1073,7 +1073,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
       char                    buffer[8192];
-      void                    (*report)(char *message, ...)
+      void                    (*report)(const char *message, ...)
 #if __GNUC__ >= 3
 				__attribute__ ((format (printf, 1, 2)))
 #endif
@@ -1411,8 +1411,8 @@ int main(int argc, char *argv[]) {
   int                     session         = -1;
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
-  char                   *cfgdir          = CONFIGDIR;
-  char                   *cfgfile         = CONFIGFILE;
+  const char             *cfgdir          = CONFIGDIR;
+  const char             *cfgfile         = CONFIGFILE;
   int                     old_playlist_cfg, no_old_playlist = 0;
   char                  **pplugins        = NULL;
   int                     pplugins_num    = 0;
@@ -2035,8 +2035,8 @@ int main(int argc, char *argv[]) {
    * Initialize keymap
    */
   if(gui->keymap_file == NULL) {
-    char *cfgdir = CONFIGDIR;
-    char *keymap = "keymap";
+    const char *cfgdir = CONFIGDIR;
+    const char *keymap = "keymap";
 
     gui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
 					      + strlen(cfgdir) 
