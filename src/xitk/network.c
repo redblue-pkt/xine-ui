@@ -2659,7 +2659,7 @@ static void parse_destock_remain(client_info_t *client_info) {
       if(p)
         strlcpy(remaining, (_atoa(p)), sizeof(remaining));
       
-      client_info->command.line = (char *) realloc(client_info->command.line, sizeof(char *) * (strlen(c) + 1));
+      client_info->command.line = (char *) realloc(client_info->command.line, sizeof(char) * (strlen(c) + 1));
       
       strcpy(client_info->command.line, c);
       
@@ -2675,7 +2675,7 @@ static void parse_destock_remain(client_info_t *client_info) {
 	
 	if(strlen(remaining)) {
 	  client_info->command.remain = (char *) realloc(client_info->command.remain, 
-							 sizeof(char *) * (strlen(remaining) + 1));
+							 sizeof(char) * (strlen(remaining) + 1));
 	  strcpy(client_info->command.remain, remaining);
 	}
 	else {
@@ -2690,7 +2690,7 @@ static void parse_destock_remain(client_info_t *client_info) {
     }
     else { /* no ';' in remain, copy AS IS remain to line */
       client_info->command.line = (char *) realloc(client_info->command.line, 
-						   sizeof(char *) * (strlen(client_info->command.remain) + 1));
+						   sizeof(char) * (strlen(client_info->command.remain) + 1));
       
       strcpy(client_info->command.line, client_info->command.remain);
       

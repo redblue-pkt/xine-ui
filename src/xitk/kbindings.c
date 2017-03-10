@@ -890,7 +890,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     break;
     
   case KBEDIT_EDITING:
-    kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe->key) + 1));
+    kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char) * (strlen(kbe->key) + 1));
     strcpy(kbedit->ksel->key, kbe->key);
     kbedit->ksel->modifier = kbe->modifier;
     
