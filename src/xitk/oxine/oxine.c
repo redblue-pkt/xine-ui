@@ -170,7 +170,8 @@ static void media_info_cb(void *data) {
   oxine_t *oxine = (oxine_t*) data;
   int pos_time, length, ret;
   int cline = 0;
-  char *buf1, *buf2;
+  const char *buf1;
+  char *buf2;
   /* otk_widget_t *b, *layout; */
 
   oxine->media_info_close_cb = media_info_close_cb;

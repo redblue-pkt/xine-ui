@@ -793,6 +793,7 @@ static void button_destroy(otk_widget_t *this) {
   remove_widget_from_win(this);
   if (this->otk->focus_ptr == this)
     this->otk->focus_ptr = NULL;
+  ho_free(button->text);
   ho_free(button);
 }
 
@@ -842,7 +843,7 @@ otk_widget_t *otk_slider_grid_new (otk_slider_cb_t cb) {
   return (otk_widget_t*) slider;
 }
 
-otk_widget_t *otk_button_grid_new (char *text,
+otk_widget_t *otk_button_grid_new (const char *text,
 			      otk_button_cb_t cb,
 			      void *cb_data) {
   otk_button_t *button;
@@ -850,7 +851,7 @@ otk_widget_t *otk_button_grid_new (char *text,
   button = ho_new(otk_button_t);
 
   button->widget.widget_type = OTK_WIDGET_BUTTON;
-  button->text               = text;
+  button->text               = ho_strdup(text);
   button->type               = OTK_BUTTON_TEXT;
   button->widget.selectable  = 1;
   button->widget.select_cb   = button_selected;
@@ -867,7 +868,7 @@ otk_widget_t *otk_button_grid_new (char *text,
 }
 
 otk_widget_t *otk_button_new (otk_widget_t *win, int x, int y,
-			      int w, int h, char *text,
+			      int w, int h, const char *text,
 			      otk_button_cb_t cb,
 			      void *cb_data) {
   otk_button_t *button;
@@ -882,7 +883,7 @@ otk_widget_t *otk_button_new (otk_widget_t *win, int x, int y,
   button->widget.y           = win->y+y;
   button->widget.w           = w;
   button->widget.h           = h;
-  button->text               = text;
+  button->text               = ho_strdup(text);
   button->type               = OTK_BUTTON_TEXT;
   button->widget.win         = win;
   button->widget.otk         = win->otk;
@@ -1080,7 +1081,7 @@ static void list_adapt_entries(otk_list_t *list) {
                       (list->position+list->entries_visible) * 100 / list->num_entries);
 }
 
-void otk_add_listentry(otk_widget_t *this, char *text, void *data, int pos) {
+void otk_add_listentry(otk_widget_t *this, const char *text, void *data, int pos) {
 
   otk_list_t *list = (otk_list_t*) this;
   otk_listentry_t *entry;
@@ -1402,7 +1403,7 @@ static void label_destroy (otk_widget_t *this) {
   ho_free(label);
 }
 
-otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, char *text) {
+otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, const char *text) {
  
   otk_label_t *label;
   otk_window_t *window = (otk_window_t*) win;

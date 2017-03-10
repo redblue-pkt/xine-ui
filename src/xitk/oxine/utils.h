@@ -49,10 +49,10 @@ void unlock_job_mutex(void);
  */
 
 /* semipublic functions*/
-void *_gen_malloc   ( size_t, const char * , char *, int );
+void *_gen_malloc   ( size_t, const char * , const char *, int );
 void *_gen_free     ( void * );
-void *_gen_realloc  ( void *, size_t, char *, int );
-void *_gen_strdup   ( const char *, char *, int );
+void *_gen_realloc  ( void *, size_t, const char *, int );
+void *_gen_strdup   ( const char *, const char *, int );
 
 /*
  * allocs a new heap object of given type

@@ -625,8 +625,8 @@ void odk_eject(odk_t *odk) {
   xine_eject(odk->stream);
 }
 
-char *odk_get_mrl(odk_t *odk) {
-  return (char *)mediamark_get_current_mrl();
+const char *odk_get_mrl(odk_t *odk) {
+  return mediamark_get_current_mrl();
 }
 
 char *odk_get_meta_info(odk_t *odk, int info) {
@@ -636,7 +636,7 @@ char *odk_get_meta_info(odk_t *odk, int info) {
   return ho_strdup(str);
 }
 
-void odk_user_color(odk_t *odk, char *name, uint32_t *color, uint8_t *trans) {
+void odk_user_color(odk_t *odk, const char *name, uint32_t *color, uint8_t *trans) {
 
   char id[512];
   char value[64];

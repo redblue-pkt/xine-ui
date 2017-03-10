@@ -170,7 +170,7 @@ char *odk_get_meta_info(odk_t *odk, int info);
 int odk_get_seek(odk_t *odk);    /* 1..100 */
 int odk_get_pos_length(odk_t *odk, int *pos, int *time, int *length);
 int odk_get_pos_length_high(odk_t *odk, int *pos, int *time, int *length);
-char *odk_get_mrl(odk_t *odk);
+const char *odk_get_mrl(odk_t *odk);
 
 /*
  * error handling
@@ -178,6 +178,6 @@ char *odk_get_mrl(odk_t *odk);
 
 int odk_get_error(odk_t *odk);
 
-void odk_user_color(odk_t *odk, char *name, uint32_t *color, uint8_t *trans);
+void odk_user_color(odk_t *odk, const char *name, uint32_t *color, uint8_t *trans);
 
 #endif
