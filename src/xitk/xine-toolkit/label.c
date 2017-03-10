@@ -221,6 +221,12 @@ static void paint_label(xitk_widget_t *w) {
       xitk_font_t   *fs = NULL;
       int            lbear, rbear, wid, asc, des;
       xitk_image_t  *bg;
+      const char    *label;
+
+      if (private_data->label && strlen(private_data->label))
+        label = private_data->label;
+      else
+        label = "Label";
 
       /* Clean old */
       XLOCK (private_data->imlibdata->x.disp);
@@ -230,8 +236,7 @@ static void paint_label(xitk_widget_t *w) {
 
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       xitk_font_set_font(fs, private_data->font->image->gc);
-      xitk_font_string_extent(fs, (private_data->label && strlen(private_data->label)) ? private_data->label : "Label",
-			      &lbear, &rbear, &wid, &asc, &des);
+      xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
 
       bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
 
@@ -243,7 +248,7 @@ static void paint_label(xitk_widget_t *w) {
 		     xitk_get_pixel_color_black(private_data->imlibdata));
       xitk_font_draw_string(fs, bg->image->pixmap, font->image->gc,
 		  2, ((private_data->font->height + asc + des)>>1) - des,
-		  private_data->label, strlen(private_data->label));
+		  label, strlen(label));
       XCopyArea (private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, 
 		 font->image->gc, 0, 0, font->width, font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.disp);
