@@ -660,7 +660,7 @@ static void inputtext_erase_with_delete(xitk_widget_t *w) {
       *pp = 0;
       
       XITK_FREE(private_data->text);
-      private_data->text = newtext ? strdup(newtext) : NULL;
+      private_data->text = strdup(newtext);
       
       paint_inputtext(w);
       
