@@ -2395,8 +2395,12 @@ void video_window_get_frame_size(int *w, int *h) {
     *h = gVw.frame_height;
   if (!gVw.frame_width && !gVw.frame_height) {
     /* fall back to meta info */
-    *w = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-    *h = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    if (w) {
+      *w = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    }
+    if (h) {
+      *h = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    }
   }
 }
 
