@@ -994,10 +994,14 @@ void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
     menu_node_t         *me = private_data->mtree->first;
 
-    if(me && me->next)
-      me = me->next;
-    
-    _menu_destroy_subs(private_data, me->menu_window);
+    if (me) {
+      if (me->next)
+        me = me->next;
+
+      if (me)
+        _menu_destroy_subs(private_data, me->menu_window);
+    }
+
     private_data->curbranch = private_data->mtree->first;
   }
 }
