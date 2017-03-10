@@ -304,8 +304,9 @@ Imlib_init(Display * disp)
 	    }
 	  else if (!strcasecmp("ForceVisualID", s1))
 	    {
-	      sscanf(s, "%1024s %x", s1, &num);
-	      vis = num;
+              unsigned int u;
+              sscanf(s, "%1024s %x", s1, &u);
+              vis = u;
 	    }
 	  else if (!strcasecmp("Fallback", s1))
 	    {
@@ -859,8 +860,9 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 	    }
 	  else if (!strcasecmp("ForceVisualID", s1))
 	    {
-	      sscanf(s, "%1024s %x", s1, &num);
-	      vis = num;
+              unsigned int u;
+              sscanf(s, "%1024s %x", s1, &u);
+              vis = u;
 	    }
 	  else if (!strcasecmp("Fallback", s1))
 	    {
