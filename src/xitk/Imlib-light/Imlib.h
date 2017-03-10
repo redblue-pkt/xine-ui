@@ -10,7 +10,7 @@ extern              "C"
 
   ImlibData          *Imlib_init(Display * disp);
   ImlibData	     *Imlib_init_with_params(Display * disp, ImlibInitParams * p);
-  ImlibImage         *Imlib_load_image(ImlibData * id, char *file);
+  ImlibImage         *Imlib_load_image(ImlibData * id, const char *file);
   void                Imlib_apply_image(ImlibData * id, ImlibImage * im, Window p);
   Pixmap              Imlib_copy_image(ImlibData * id, ImlibImage * im);
   Pixmap              Imlib_copy_mask(ImlibData * id, ImlibImage * im);
@@ -20,7 +20,7 @@ extern              "C"
   ImlibImage         *Imlib_clone_image(ImlibData * id, ImlibImage * im);
   void                Imlib_destroy_image(ImlibData * id, ImlibImage * im);
   void                Imlib_kill_image(ImlibData * id, ImlibImage * im);
-  int                 Imlib_load_colors(ImlibData * id, char *file);
+  int                 Imlib_load_colors(ImlibData * id, const char *file);
   int                 Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b);
   void                Imlib_free_colors(ImlibData * id);
   int                 Imlib_load_default_colors(ImlibData * id);

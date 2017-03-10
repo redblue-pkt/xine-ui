@@ -74,11 +74,11 @@ int                 index_best_color_match(ImlibData * id, int *r, int *g, int *
 void                dirty_pixmaps(ImlibData * id, ImlibImage * im);
 void                dirty_images(ImlibData * id, ImlibImage * im);
 void                find_pixmap(ImlibData * id, ImlibImage * im, int width, int height, Pixmap * pmap, Pixmap * mask);
-ImlibImage         *find_image(ImlibData * id, char *file);
+ImlibImage         *find_image(ImlibData * id, const char *file);
 void                free_pixmappmap(ImlibData * id, Pixmap pmap);
 void                free_image(ImlibData * id, ImlibImage * im);
 void                flush_image(ImlibData * id, ImlibImage * im);
-void                add_image(ImlibData * id, ImlibImage * im, char *file);
+void                add_image(ImlibData * id, ImlibImage * im, const char *file);
 void                add_pixmap(ImlibData * id, ImlibImage * im, int width, int height, XImage * xim, XImage * sxim);
 void                clean_caches(ImlibData * id);
 void                nullify_image(ImlibData * id, ImlibImage * im);

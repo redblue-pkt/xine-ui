@@ -97,7 +97,7 @@ find_pixmap(ImlibData * id, ImlibImage * im, int width, int height, Pixmap * pma
 }
 
 ImlibImage         *
-find_image(ImlibData * id, char *file)
+find_image(ImlibData * id, const char *file)
 {
   struct image_cache *ptr;
 
@@ -210,7 +210,7 @@ flush_image(ImlibData * id, ImlibImage * im)
 }
 
 void
-add_image(ImlibData * id, ImlibImage * im, char *file)
+add_image(ImlibData * id, ImlibImage * im, const char *file)
 {
   struct image_cache *ptr;
   struct image_cache *n;

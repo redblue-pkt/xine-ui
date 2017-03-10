@@ -156,7 +156,7 @@ _PaletteAlloc(ImlibData * id, int num, const int *cols)
 }
 
 int
-Imlib_load_colors(ImlibData * id, char *file)
+Imlib_load_colors(ImlibData * id, const char *file)
 {
   FILE               *f;
   char                s[1024];

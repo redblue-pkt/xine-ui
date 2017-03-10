@@ -252,7 +252,7 @@ static int isjpeg(FILE *f) {
   return buf[0] == 0xFF && buf[1] == 0xD8 && buf[2] == 0xFF && buf[3] == 0xE0;
 }
 
-ImlibImage * Imlib_load_image(ImlibData * id, char *file) {
+ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   int                 w, h;
   unsigned char      *data = NULL;
   ImlibImage         *im;
