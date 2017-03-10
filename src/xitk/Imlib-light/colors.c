@@ -162,7 +162,7 @@ Imlib_load_colors(ImlibData * id, const char *file)
   char                s[1024];
   int                 i;
   int                 pal[768];
-  int                 r, g, b;
+  unsigned int        r, g, b;
   int                 rr, gg, bb;
 
 #ifndef __EMX__
@@ -185,16 +185,10 @@ Imlib_load_colors(ImlibData * id, const char *file)
       if (s[0] == '0')
 	{
 	  sscanf(s, "%x %x %x", &r, &g, &b);
-	  if (r < 0)
-	    r = 0;
 	  if (r > 255)
 	    r = 255;
-	  if (g < 0)
-	    g = 0;
 	  if (g > 255)
 	    g = 255;
-	  if (b < 0)
-	    b = 0;
 	  if (b > 255)
 	    b = 255;
 	  pal[i++] = r;
