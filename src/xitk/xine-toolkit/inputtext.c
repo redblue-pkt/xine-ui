@@ -628,14 +628,14 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
  */
 static void inputtext_erase_with_delete(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-  char                      *oldtext, *newtext;
-  char                      *p, *pp;
+  const char                *oldtext, *p;
+  char                      *newtext, *pp;
   int                        offset;
   
   if(private_data->text && (strlen(private_data->text) > 0)) {
     if((private_data->cursor_pos >= 0) && (private_data->cursor_pos < strlen(private_data->text))) {
       
-      oldtext = strdup(private_data->text);
+      oldtext = private_data->text;
       newtext = (char *) xitk_xmalloc(strlen(oldtext));
       
       offset = 0;
@@ -660,12 +660,9 @@ static void inputtext_erase_with_delete(xitk_widget_t *w) {
       *pp = 0;
       
       XITK_FREE(private_data->text);
-      private_data->text = strdup(newtext);
+      private_data->text = newtext;
       
       paint_inputtext(w);
-      
-      XITK_FREE(oldtext);
-      XITK_FREE(newtext);
     }
   }
   else
