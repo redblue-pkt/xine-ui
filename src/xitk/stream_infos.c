@@ -219,21 +219,21 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
    */
   if(title && strlen(title)) {
     atitle = atoa(title);
-    if ( atitle && ! *atitle )
+    if ( ! *atitle )
       atitle = strdup(title);
     else
       atitle = strdup(atitle);
   }
   if(artist && strlen(artist)) {
     aartist = atoa(artist);
-    if ( aartist && ! *aartist )
+    if ( ! *aartist )
       aartist = strdup(artist);
     else
       aartist = strdup(aartist);
   }
   if(album && strlen(album)) {
     aalbum = atoa(album);
-    if ( aalbum && ! *aalbum )
+    if ( ! *aalbum )
       aalbum = strdup(album);
     else
       aalbum = strdup(aalbum);
