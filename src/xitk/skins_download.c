@@ -342,7 +342,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
     else
       skpname = skdloader.slxs[selected]->skin.preview;
     
-    snprintf(tmpfile, sizeof(tmpfile), "%s%d%s", "/tmp/", (unsigned int)time(NULL), skpname);
+    snprintf(tmpfile, sizeof(tmpfile), "%s%u%s", "/tmp/", (unsigned int)time(NULL), skpname);
     
     if((fd = fopen(tmpfile, "w+b")) != NULL) {
       ImlibImage    *img = NULL;
@@ -462,7 +462,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	char   tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 	FILE  *fd;
 	
-	snprintf(tmpskin, sizeof(tmpskin), "%s%d%s", "/tmp/", (unsigned int)time(NULL), filename);
+        snprintf(tmpskin, sizeof(tmpskin), "%s%u%s", "/tmp/", (unsigned int)time(NULL), filename);
 	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char      buffer[2048];

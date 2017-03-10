@@ -30,7 +30,7 @@ DFBEnumerationResult enum_layers_callback( unsigned int                 id,
 {
      IDirectFBDisplayLayer **layer = (IDirectFBDisplayLayer **)data;
 
-     printf( "\nLayer %d:\n", id );
+     printf( "\nLayer %u:\n", id );
 
      if (caps & DLCAPS_SURFACE)
           printf( "  - Has a surface.\n" );

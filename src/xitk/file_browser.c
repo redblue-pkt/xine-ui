@@ -376,7 +376,7 @@ static void fb_create_input_window(char *title, char *text,
 
   {
     char buffer[256];
-    snprintf(buffer, sizeof(buffer), "filenameed%d", (unsigned int) time(NULL));
+    snprintf(buffer, sizeof(buffer), "filenameed%u", (unsigned int) time(NULL));
     
     fne->widget_key = xitk_register_event_handler(buffer, 
 						  (xitk_window_get_window(fne->xwin)),
@@ -1617,7 +1617,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   {
     char buffer[256];
-    snprintf(buffer, sizeof(buffer), "filebrowser%d", (unsigned int) time(NULL));
+    snprintf(buffer, sizeof(buffer), "filebrowser%u", (unsigned int) time(NULL));
     fb->widget_key = xitk_register_event_handler(buffer, 
 						 (xitk_window_get_window(fb->xwin)),
 						 fb_handle_events,

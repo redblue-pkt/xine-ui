@@ -268,7 +268,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
       printf("   No X-Video Extension on %s\n", XDisplayName(NULL));
     } 
     else {
-      printf("   X-Video Extension version: %i.%i\n", ver, rev);
+      printf("   X-Video Extension version: %u.%u\n", ver, rev);
       have_xv = 1;
     }
 #endif /* !HAVE_XV */
@@ -322,7 +322,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
       if ((width == 65535) && (height == 65535))
 	printf("unlimited\n");
       else
-	printf("%dx%d\n", width, height);
+        printf("%ux%u\n", width, height);
 
 #ifdef HAVE_XV
       if(have_xv) {
@@ -345,7 +345,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	  
 	  for(adaptor = 0; adaptor < nadaptors; adaptor++) {
 	    
-	    printf("    Adaptor #%i:         \"%s\"\n", adaptor, ainfo[adaptor].name);
+            printf("    Adaptor #%u:         \"%s\"\n", adaptor, ainfo[adaptor].name);
 	    printf("       Number of ports:   %li\n", ainfo[adaptor].num_ports);
 	    printf("       Port base:         %li\n", ainfo[adaptor].base_id);
 	    printf("       Operations supported: ");
@@ -407,7 +407,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	      }
 	      
 	      if(nencode - ImageEncodings) {
-		printf("     Number of encodings: %i\n", nencode - ImageEncodings);
+                printf("     Number of encodings: %u\n", nencode - ImageEncodings);
 		
 		for(n = 0; n < nencode; n++) {
 		  if(strcmp(encodings[n].name, "XV_IMAGE")) {
@@ -464,7 +464,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	      XvFreeEncodingInfo(encodings);
 	    }
 	    
-	    printf("    End #%i.\n", adaptor);
+            printf("    End #%u.\n", adaptor);
 	  }
 	  
 	  XvFreeAdaptorInfo(ainfo);
