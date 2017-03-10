@@ -430,9 +430,10 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
   if (has_audio)
     has_audio = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_AUDIO);
-  
-  if((v_unhandled = (has_video && (!video_handled))) 
-     || (a_unhandled = (has_audio && (!audio_handled)))) {
+
+  v_unhandled = (has_video && (!video_handled));
+  a_unhandled = (has_audio && (!audio_handled));
+  if(v_unhandled || a_unhandled) {
     char *buffer = NULL;
     char *v_info = NULL;
     char *a_info = NULL;
