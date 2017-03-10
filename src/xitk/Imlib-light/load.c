@@ -265,9 +265,6 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   }                   fmt = FORMAT_UNKNOWN;
   int                 trans;
 
-  fmt = 0;
-  data = NULL;
-
   if (!file)
     return NULL;
   if (id->cache.on_image)
@@ -298,19 +295,19 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
     fmt = FORMAT_JPEG;
 
   trans = 0;
-  if (!data) {
-      switch (fmt)
-	{
-	case FORMAT_PNG:
-	    data = _LoadPNG(id, p, &w, &h, &trans);
-	  break;
-	case FORMAT_JPEG:
-	    data = _LoadJPEG(id, p, &w, &h);
-	  break;
-	default:
-	  break;
-	}
-    }
+
+  switch (fmt)
+  {
+    case FORMAT_PNG:
+        data = _LoadPNG(id, p, &w, &h, &trans);
+        break;
+    case FORMAT_JPEG:
+        data = _LoadJPEG(id, p, &w, &h);
+        break;
+    default:
+        break;
+  }
+
   if (p) {
     if (p != stdin) 
       fclose(p);
