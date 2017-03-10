@@ -1618,7 +1618,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 		screeninfo[i].width + screeninfo[i].x_org - gVw.xinerama_fullscreen_x;
 	    }
 
-            if((screeninfo[i].height + screeninfo[i].x_org) > 
+            if((screeninfo[i].height + screeninfo[i].y_org) >
 	       (gVw.xinerama_fullscreen_y + gVw.xinerama_fullscreen_height)) {
 	      gVw.xinerama_fullscreen_height = 
 		screeninfo[i].height + screeninfo[i].y_org - gVw.xinerama_fullscreen_y;
