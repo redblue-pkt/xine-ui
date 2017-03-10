@@ -203,8 +203,6 @@ static void kbindings_convert_modifier(int mod, int *modifier) {
 
   *modifier = KEYMOD_NOMOD;
 
-  if(mod & MODIFIER_NOMOD)
-    *modifier = KEYMOD_NOMOD;
   if(mod & MODIFIER_CTRL)
     *modifier |= KEYMOD_CONTROL;
   if(mod & MODIFIER_META)
