@@ -423,7 +423,7 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
       sprintf(ext, "%s ", ending);
 
       p = ext;
-      while(*p && (*p != '\0')) {
+      while(*p) {
 	*p = tolower(*p);
 	p++;
       }
