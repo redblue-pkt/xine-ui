@@ -1563,7 +1563,7 @@ static char *smil_get_prop_value(xml_property_t *props, const char *propname) {
 
 static int smil_get_time_in_seconds(const char *time_str) {
   int    retval = 0;
-  int    hours, mins, secs, msecs;
+  //int    hours, mins, secs, msecs;
   int    unit = 0; /* 1 = ms, 2 = s, 3 = min, 4 = h */
 
   if(strstr(time_str, "ms"))
@@ -1576,7 +1576,8 @@ static int smil_get_time_in_seconds(const char *time_str) {
     unit = 4;
   else
     unit = 2;
-  
+
+  /* not reached
   if(unit == 0) {
     if((sscanf(time_str, "%d:%d:%d.%d", &hours, &mins, &secs, &msecs)) == 4)
       retval = (hours * 60 * 60) + (mins * 60) + secs + ((int) msecs / 1000);
@@ -1588,7 +1589,7 @@ static int smil_get_time_in_seconds(const char *time_str) {
       retval = (mins * 60) + secs;
     }
   }
-  else {
+  else*/ {
     int val, dec, args;
 
     if(((args = sscanf(time_str, "%d.%d", &val, &dec)) == 2) ||
