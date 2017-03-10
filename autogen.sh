@@ -25,7 +25,7 @@
 PROG=xine-ui
 
 # Minimum value required to build
-AUTOMAKE_MIN=1.9.0
+AUTOMAKE_MIN=1.11.0
 AUTOCONF_MIN=2.53
 
 # Check how echo works in this /bin/sh
