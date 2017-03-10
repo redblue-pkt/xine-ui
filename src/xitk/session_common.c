@@ -68,9 +68,9 @@ int connect_to_session(int session) {
       return fd;
     }
 
+    close(fd);
   }
 
-  close(fd);
   return -1;
 }
 
