@@ -278,7 +278,7 @@ struct prefix_tag_s {
   prefix_tag_t *prev;         /* previous object in heap      */
   prefix_tag_t* next;         /* next object in heap          */
   postfix_tag_t* postfix;     /* ptr to postfix object        */
-  char* filename;             /* filename ptr or NULL         */
+  const char* filename;       /* filename ptr or NULL         */
   long line;                  /* line number or 0             */
   size_t size;                /* size of allocated block      */
   void* content;              /* _gen_malloc() ptr of object  */
@@ -301,7 +301,7 @@ static void RemoveFromLinkedList ( prefix_tag_t* );
 static void RenderDesc           ( prefix_tag_t*, char* );
 
 
-void *_gen_malloc(size_t wSize, const char* tag, char* lpFile, int nLine) {
+void *_gen_malloc(size_t wSize, const char* tag, const char* lpFile, int nLine) {
   
   prefix_tag_t* prefix;
   
@@ -345,7 +345,7 @@ void *_gen_free(void* content) {
 }
 
 
-void *_gen_strdup(const char* lpS, char* lpFile, int nLine) {
+void *_gen_strdup(const char* lpS, const char* lpFile, int nLine) {
   
   void* lpReturn=NULL;
 
@@ -362,7 +362,7 @@ void *_gen_strdup(const char* lpS, char* lpFile, int nLine) {
 }
 
 
-void *_gen_realloc(void* lpOld, size_t wSize, char* lpFile, int nLine) {
+void *_gen_realloc(void* lpOld, size_t wSize, const char* lpFile, int nLine) {
 
   void* lpNew=NULL;
 

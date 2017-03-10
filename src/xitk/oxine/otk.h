@@ -67,16 +67,16 @@ otk_widget_t *otk_window_new (otk_t *this, const char *title, int x, int y,
 			      int w, int h);
 
 otk_widget_t *otk_button_new (otk_widget_t *win, int x, int y,
-			      int w, int h, char *text,
+			      int w, int h, const char *text,
 			      otk_button_cb_t cb,
 			      void *user_data);
 
-otk_widget_t *otk_button_grid_new (char *text,
+otk_widget_t *otk_button_grid_new (const char *text,
 			      otk_button_cb_t cb,
 			      void *user_data);
 
 otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, 
-                             char *text);
+                             const char *text);
 
 otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h, 
 			  otk_list_cb_t cb,
@@ -140,7 +140,7 @@ void otk_layout_add_widget(otk_widget_t *layout, otk_widget_t *widget, int srow,
  * list widget functions
  */
 
-void otk_add_listentry(otk_widget_t *this, char *text, void *data, int pos);
+void otk_add_listentry(otk_widget_t *this, const char *text, void *data, int pos);
 void otk_remove_listentries(otk_widget_t *this);
 int otk_list_get_pos(otk_widget_t *this);
 void otk_list_set_pos(otk_widget_t *this, int newpos);
