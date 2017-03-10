@@ -282,7 +282,7 @@ void xitk_font_cache_done(void) {
       XITK_WARNING("%s(): list of loaded font isn't empty:\n", __FUNCTION__);
       item = xitk_list_first_content(cache.loaded);
       while(item) {
-	printf("  %s (%d)\n", item->font->name, item->number);
+	printf("  %s (%u)\n", item->font->name, item->number);
 	item = xitk_list_next_content(cache.loaded);
       }
     }
@@ -375,7 +375,7 @@ static void xitk_cache_add_item(xitk_font_t *font) {
     xtfs   = cache.items[oldest].font;
 
 #ifdef LOG
-    printf("xiTK: dropped \"%s\", list: %d, cache: %d\n", xtfs->name, cache.nlist, cache.n);
+    printf("xiTK: dropped \"%s\", list: %zu, cache: %zu\n", xtfs->name, cache.nlist, cache.n);
 #endif
 
     xitk_font_unload_one(xtfs);
@@ -546,7 +546,7 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
     xtfs->display = display;
 
 #ifdef LOG
-    printf("xiTK: loaded new \"%s\", list: %d, cache: %d\n", xtfs->name, cache.nlist, cache.n);
+    printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", xtfs->name, cache.nlist, cache.n);
 #endif
   }
 
@@ -604,7 +604,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
 
 #ifdef DEBUG
   if (nbytes > strlen(text) + 1) {
-    XITK_WARNING("draw: %d > %d\n", nbytes, strlen(text));
+    XITK_WARNING("draw: %zu > %zu\n", nbytes, strlen(text));
   }
 #endif
   

@@ -247,7 +247,7 @@ static int is_correct_widget(otk_widget_t *widget, int expected) {
   }
   if (widget->widget_type != expected) {
 #ifdef LOG
-    printf("otk: bad widget type %u; expecting %u\n", widget->widget_type, expected);
+    printf("otk: bad widget type %d; expecting %d\n", widget->widget_type, expected);
 #endif
     return 0;
   }

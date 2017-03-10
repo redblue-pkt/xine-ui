@@ -429,7 +429,7 @@ void heapstat(void) {
       }
     }
     if (total) 
-      printf("heapstat: memory usage: %li words in %li chunks\n", total, chunks);
+      printf("heapstat: memory usage: %lu words in %lu chunks\n", total, chunks);
   }
 }
 
@@ -491,7 +491,7 @@ int ho_verify(void *content) {
 
 static void RenderDesc(prefix_tag_t* prefix, char* lpBuffer) {
   if (prefix->content==&prefix[1]) {
-    sprintf( lpBuffer, "%zi words @ 0x%08lx:", prefix->size, (unsigned long)prefix->content );
+    sprintf( lpBuffer, "%zu words @ %p:", prefix->size, prefix->content );
     if (prefix->filename) {
       sprintf( lpBuffer+strlen(lpBuffer), "%s:%ld ",
 	  prefix->filename, prefix->line );
