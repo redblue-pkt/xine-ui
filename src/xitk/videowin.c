@@ -2287,9 +2287,9 @@ static void video_window_handle_event (XEvent *event, void *data) {
 }
 
 long int video_window_get_ssaver_idle(void) {
-  gGui_t *gui = gGui;
 
 #ifdef HAVE_XSSAVEREXTENSION
+  gGui_t *gui = gGui;
   long int ssaver_idle = -1;
   int dummy = 0;
   XLockDisplay(gui->video_display);
