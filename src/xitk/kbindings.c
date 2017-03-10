@@ -1055,7 +1055,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
   case KeyRelease: {
     xitk_widget_t *w;
 
-    if((!kbedit) || (kbedit && !kbedit->widget_list))
+    if(!kbedit || !kbedit->widget_list)
       return;
     
     w = xitk_get_focused_widget(kbedit->widget_list);
@@ -1070,7 +1070,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
   case ButtonRelease: {
     xitk_widget_t *w;
 
-    if((!kbedit) || (kbedit && !kbedit->widget_list))
+    if(!kbedit || !kbedit->widget_list)
       return;
 
     w = xitk_get_focused_widget(kbedit->widget_list);
