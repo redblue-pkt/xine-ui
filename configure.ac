@@ -350,7 +350,9 @@ AC_ARG_WITH([aalib],
 
 if test x"$with_aalib" != "xno"; then
   AM_PATH_AALIB(1.2.0,,)
-  AM_DL()
+  if test x"$no_aalib" != "xyes"; then
+    AM_DL()
+  fi
 else
   no_aalib=yes
 fi
@@ -368,9 +370,11 @@ if test "x$with_caca" != "xno"; then
                      [have_caca="yes"
                       have_cucul="no"],
                      [PKG_CHECK_MODULES([CACA], [caca cucul], [have_caca="yes"], [have_caca="no"])])
-   AM_DL()
    if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
       AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
+   fi
+   if test test "x$have_caca" = "xyes"; then
+     AM_DL()
    fi
    AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h> 
                                         caca_event_t ev;]], 
