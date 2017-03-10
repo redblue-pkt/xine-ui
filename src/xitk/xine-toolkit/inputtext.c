@@ -73,7 +73,7 @@ static void notify_destroy(xitk_widget_t *w) {
  *
  */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *private_data;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
