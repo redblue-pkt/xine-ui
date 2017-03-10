@@ -76,7 +76,7 @@ Imlib_init(Display * disp)
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
-  char               *s, *s1, *s2;
+  char               *s, *s1;
   FILE               *f;
   int                 override = 0;
   int                 dither = 0;
@@ -208,6 +208,8 @@ Imlib_init(Display * disp)
       s = NULL;
       while (getline (&s, &length, f) >= 0)
 	{
+          const char *s2;
+
 	  if (s[0] == '#')
 	    continue;
 
@@ -631,7 +633,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
-  char               *s, *s1, *s2;
+  char               *s, *s1;
   FILE               *f;
   int                 override = 0;
   int                 dither = 0;
@@ -761,6 +763,8 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
       s = NULL;
       while (getline (&s, &length, f) >= 0)
 	{
+          const char *s2;
+
 	  if (s[0] == '#')
 	    continue;
 
