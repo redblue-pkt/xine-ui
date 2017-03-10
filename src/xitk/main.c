@@ -309,7 +309,7 @@ static int parse_geometry(window_attributes_t *window_attribute, char *geomstr) 
   
 static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
   int ret = 0;
-  int visual = 0;
+  unsigned int visual = 0;
 
   if(sscanf(visual_str, "%x", &visual) == 1) {
     *vid = visual;

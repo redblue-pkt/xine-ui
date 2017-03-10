@@ -399,7 +399,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	    
 	    if(encodings && nencode) {
 	      unsigned int n;
-	      int ImageEncodings = 0;
+	      unsigned int ImageEncodings = 0;
 	      
 	      for(n = 0; n < nencode; n++) {
 		if(!strcmp(encodings[n].name, "XV_IMAGE"))
