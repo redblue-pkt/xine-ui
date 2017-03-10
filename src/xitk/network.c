@@ -2195,10 +2195,10 @@ static void do_get(const commands_t *cmd, client_info_t *client_info) {
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[XINE_LANG_MAX];
-
-	  xine_get_audio_lang(gui->stream,
-	                      xine_get_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
-			      &buf[0]);
+          int channel = xine_get_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+          if (!xine_get_audio_lang(gui->stream, channel, &buf[0])) {
+            snprintf(buf, sizeof(buf), "%3d", channel);
+          }
 	  sock_write(client_info->socket, "Current audio language: %s\n", buf);
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
@@ -2222,11 +2222,11 @@ static void do_get(const commands_t *cmd, client_info_t *client_info) {
 		     (xine_get_param(gui->stream, XINE_PARAM_SPU_CHANNEL)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
-	  char buf[XINE_LANG_MAX];
-
-	  xine_get_spu_lang (gui->stream,
-	                     xine_get_param(gui->stream, XINE_PARAM_SPU_CHANNEL),
-			     &buf[0]);
+          char buf[XINE_LANG_MAX];
+          int channel = xine_get_param(gui->stream, XINE_PARAM_SPU_CHANNEL);
+          if (!xine_get_spu_lang (gui->stream, channel, &buf[0])) {
+            snprintf(buf, sizeof(buf), "%3d", channel);
+          }
 	  sock_write(client_info->socket, "Current spu language: %s\n", buf);
 	}
 	else if(is_arg_contain(client_info, 2, "offset")) {
