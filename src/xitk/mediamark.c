@@ -674,7 +674,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 
 		      }
 
-		      if(ln && (crc > 0)) {
+		      if(crc > 0) {
 			
 			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
 			
