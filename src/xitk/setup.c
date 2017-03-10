@@ -328,8 +328,12 @@ static void setup_apply(xitk_widget_t *w, void *data) {
     }
     xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
 
-    if(w != setup.ok)
-      setup_change_section(setup.tabs, NULL, xitk_tabs_get_current_selected(setup.tabs));
+    if(w != setup.ok) {
+      int section = xitk_tabs_get_current_selected(setup.tabs);
+      if (section >= 0) {
+        setup_change_section(setup.tabs, NULL, section);
+      }
+    }
 
     if(need_restart) {
       xitk_window_t *xw;

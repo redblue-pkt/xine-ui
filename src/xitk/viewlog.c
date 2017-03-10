@@ -288,7 +288,10 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
  * Refresh current displayed log.
  */
 static void viewlog_refresh(xitk_widget_t *w, void *data) {
-  viewlog_change_section(NULL, NULL, xitk_tabs_get_current_selected(viewlog->tabs));
+  int section =  xitk_tabs_get_current_selected(viewlog->tabs);
+  if (section >= 0) {
+    viewlog_change_section(NULL, NULL, section);
+  }
 }
 
 /* 
