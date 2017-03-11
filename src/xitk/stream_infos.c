@@ -148,13 +148,11 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
 
 static void get_stream_info(xitk_widget_t *w, int info) {
   gGui_t *gui = gGui;
-  char *tmp;
+  char tmp[32];
 
-  asprintf(&tmp, "%d", xine_get_stream_info(gui->stream, info));
-  
+  snprintf(tmp, sizeof(tmp), "%d", xine_get_stream_info(gui->stream, info));
+
   set_label(w, tmp);
-
-  free(tmp);
 }
       
 static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
