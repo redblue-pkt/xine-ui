@@ -111,7 +111,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
 	  char from[256];
 	  
 	  memset(&from, 0, sizeof(from));
-	  if(sscanf(c, "PlaylistFrom:%s", &from[0]) == 1) {
+          if(sscanf(c, "PlaylistFrom:%255s", &from[0]) == 1) {
 	    if(strlen(from))
 	      lirc_get_playlist(from);   
 	  }

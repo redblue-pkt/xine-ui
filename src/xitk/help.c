@@ -169,8 +169,8 @@ static void help_sections(void) {
       memset(&ending, 0, sizeof(ending));
       memset(&section_name, 0, sizeof(section_name));
       
-      if ((sscanf(dir_entry->d_name, "README.en.%d.%s", &order_num, &section_name[0])) == 2) {
-	sscanf(dir_entry->d_name, "README.en.%s", &ending[0]);
+      if ((sscanf(dir_entry->d_name, "README.en.%d.%255s", &order_num, &section_name[0])) == 2) {
+        sscanf(dir_entry->d_name, "README.en.%255s", &ending[0]);
 
 	snprintf(locale_file, sizeof(locale_file), "%s.%s.%s", "README", lang->ext, ending);
 	snprintf(locale_readme, sizeof(locale_readme), "%s/%s", XINE_DOCDIR, locale_file);
