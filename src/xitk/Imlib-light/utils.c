@@ -113,27 +113,23 @@ Imlib_clone_image(ImlibData * id, ImlibImage * im)
 
   if (!im)
     return NULL;
-  im2 = malloc(sizeof(ImlibImage));
+
+  im2 = calloc(1, sizeof(ImlibImage));
   if (!im2)
     return NULL;
+
   im2->rgb_width = im->rgb_width;
   im2->rgb_height = im->rgb_height;
   im2->rgb_data = malloc(im2->rgb_width * im2->rgb_height * 3);
   if (!im2->rgb_data)
-    {
-      free(im2);
-      return NULL;
-    }
+    goto fail;
+
   memcpy(im2->rgb_data, im->rgb_data, im2->rgb_width * im2->rgb_height * 3);
   if (im->alpha_data)
     {
       im2->alpha_data = malloc(im2->rgb_width * im2->rgb_height);
       if (!im2->alpha_data)
-	{
-	  free(im2->rgb_data);
-	  free(im2);
-	  return NULL;
-	}
+        goto fail;
       memcpy(im2->alpha_data, im->alpha_data, im2->rgb_width * im2->rgb_height);
     }
   else
@@ -167,6 +163,13 @@ Imlib_clone_image(ImlibData * id, ImlibImage * im)
   if (id->cache.on_image)
     add_image(id, im2, im2->filename);
   return im2;
+
+ fail:
+  free(im2->alpha_data);
+  free(im2->rgb_data);
+  free(im2->filename);
+  free(im2);
+  return NULL;
 }
 
 void
