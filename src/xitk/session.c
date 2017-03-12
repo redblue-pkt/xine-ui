@@ -66,7 +66,7 @@ static void send_ack(serv_header_packet_t *shdr) {
   close(shdr->fd);
 }
 
-int send_uint32(int session, ctrl_commands_t command, uint32_t value) {
+static int send_uint32(int session, ctrl_commands_t command, uint32_t value) {
   int fd;
   
   if((fd = connect_to_session(session)) == -1)
@@ -79,7 +79,7 @@ int send_uint32(int session, ctrl_commands_t command, uint32_t value) {
   return 0;
 }
 
-uint32_t get_uint32(int session, ctrl_commands_t command) {
+static uint32_t get_uint32(int session, ctrl_commands_t command) {
   ctrl_header_packet_t  hdr;
   void                 *data;
   int                   fd, ret = 0;
