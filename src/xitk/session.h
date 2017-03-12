@@ -58,11 +58,11 @@ typedef enum {
   CMD_PING
 } ctrl_commands_t;
 
-void send_uint32(int session, ctrl_commands_t command, uint32_t value);
+int send_uint32(int session, ctrl_commands_t command, uint32_t value);
 uint32_t get_uint32(int session, ctrl_commands_t command);
-void send_boolean(int session, ctrl_commands_t command, uint8_t value);
-uint8_t get_boolean(int session, ctrl_commands_t command);
-void send_string(int session, ctrl_commands_t command, const char *string);
+//void send_boolean(int session, ctrl_commands_t command, uint8_t value);
+//uint8_t get_boolean(int session, ctrl_commands_t command);
+int send_string(int session, ctrl_commands_t command, const char *string);
 char *get_string(int session, ctrl_commands_t command);
 int is_remote_running(int session);
 

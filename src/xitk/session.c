@@ -51,14 +51,14 @@ static int           going;
 static pthread_t     thread_server;
 static char         *socket_name;
 
-static void ssend_packet(int fd, const void *data, uint32_t data_length) {
+static int ssend_packet(int fd, const void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
   
   hdr.version     = CTRL_PROTO_VERSION;
   hdr.command     = 0;
   hdr.data_length = data_length;
   
-  _send_packet(fd, data, &hdr);
+  return _send_packet(fd, data, &hdr);
 }
 
 static void send_ack(serv_header_packet_t *shdr) {
@@ -66,14 +66,17 @@ static void send_ack(serv_header_packet_t *shdr) {
   close(shdr->fd);
 }
 
-void send_uint32(int session, ctrl_commands_t command, uint32_t value) {
+int send_uint32(int session, ctrl_commands_t command, uint32_t value) {
   int fd;
   
   if((fd = connect_to_session(session)) == -1)
-    return;
-  send_packet(fd, command, &value, sizeof(uint32_t));
-  read_ack(fd);
+    return -1;
+  if (send_packet(fd, command, &value, sizeof(uint32_t)) >= 0) {
+    read_ack(fd);
+  }
   close(fd);
+
+  return 0;
 }
 
 uint32_t get_uint32(int session, ctrl_commands_t command) {
@@ -84,7 +87,10 @@ uint32_t get_uint32(int session, ctrl_commands_t command) {
   if((fd = connect_to_session(session)) == -1)
     return ret;
   
-  send_packet(fd, command, NULL, 0);
+  if (send_packet(fd, command, NULL, 0) < 0) {
+    close(fd);
+    return 0;
+  }
   data = read_packet(fd, &hdr);
   if(data) {
     ret = *((uint32_t *) data);

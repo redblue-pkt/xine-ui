@@ -126,32 +126,51 @@ static int _poll_rd(int fd, int timeout)
   return 0;
 }
 
-void _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr) {
+int _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr) {
 
-  write(fd, hdr, sizeof(ctrl_header_packet_t));
+  ssize_t r;
 
-  if(hdr->data_length && data)
-    write(fd, data, hdr->data_length);
+  r = write(fd, hdr, sizeof(ctrl_header_packet_t));
+  if (r != sizeof(ctrl_header_packet_t)) {
+    perror("socket write failed");
+    return -1;
+  }
+
+  if (hdr->data_length && data) {
+    r = write(fd, data, hdr->data_length);
+    if (r != hdr->data_length) {
+      perror("socket write failed");
+      return -1;
+    }
+  }
+
+  return 0;
 }
 
-void send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length) {
+int send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
   
   hdr.version     = CTRL_PROTO_VERSION;
   hdr.command     = command;
   hdr.data_length = data_length;
 
-  _send_packet(fd, data, &hdr);
+  return _send_packet(fd, data, &hdr);
 }
 
-void send_string(int session, ctrl_commands_t command, const char *string) {
+int send_string(int session, ctrl_commands_t command, const char *string) {
   int fd;
   
   if((fd = connect_to_session(session)) == -1)
-    return;
-  send_packet(fd, command, string, string ? strlen(string) + 1 : 0);
+    return -1;
+  if (send_packet(fd, command, string, string ? strlen(string) + 1 : 0) < 0) {
+    close(fd);
+    return -1;
+  }
+
   read_ack(fd);
   close(fd);
+
+  return 0;
 }
 
 static int _remote_cmd(int session, ctrl_commands_t command, int timeout) {
@@ -160,9 +179,13 @@ static int _remote_cmd(int session, ctrl_commands_t command, int timeout) {
   if((fd = connect_to_session(session)) == -1)
     return 0;
 
-  send_packet(fd, command, NULL, 0);
+  if (send_packet(fd, command, NULL, 0) < 0) {
+    close(fd);
+    return 0;
+  }
 
   if (timeout >= 0 && _poll_rd(fd, timeout) < 0) {
+    close(fd);
     return 0;
   }
 

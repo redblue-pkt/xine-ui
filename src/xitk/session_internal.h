@@ -37,8 +37,8 @@ typedef struct {
 } serv_header_packet_t;
 
 int connect_to_session(int session);
-void send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length);
-void _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr);
+int send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length);
+int _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr);
 void read_ack(int fd);
 void *read_packet(int fd, ctrl_header_packet_t *hdr);
 int remote_cmd(int session, ctrl_commands_t command);
