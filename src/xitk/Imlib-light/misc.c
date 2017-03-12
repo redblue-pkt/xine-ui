@@ -736,7 +736,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
-  asprintf(&s, "%s/.imrc", getenv("HOME"));
+  asprintf(&s, "%s/.imrc", xine_get_homedir ());
 
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
