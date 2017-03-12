@@ -1099,6 +1099,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   prop                 = XInternAtom(mb->imlibdata->x.disp, "_MOTIF_WM_HINTS", True);
   XUNLOCK(mb->imlibdata->x.disp);
 
+  memset(&mwmhints, 0, sizeof(mwmhints));
   mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
