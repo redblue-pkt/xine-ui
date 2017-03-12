@@ -1271,7 +1271,8 @@ void panel_init (void) {
   /*
    * wm, no border please
    */
-  
+
+  memset(&mwmhints, 0, sizeof(mwmhints));
   XLockDisplay(gGui->display);
   prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;

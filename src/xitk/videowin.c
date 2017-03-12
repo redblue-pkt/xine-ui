@@ -768,6 +768,7 @@ static void video_window_adapt_size (void) {
     /*
      * wm, no borders please
      */
+    memset(&mwmhints, 0, sizeof(mwmhints));
     prop = XInternAtom(gui->video_display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
@@ -876,6 +877,7 @@ static void video_window_adapt_size (void) {
     /*
      * wm, no borders please
      */
+    memset(&mwmhints, 0, sizeof(mwmhints));
     prop = XInternAtom(gui->video_display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
@@ -1025,6 +1027,7 @@ static void video_window_adapt_size (void) {
     video_window_lock_opacity();
 
     if(gVw.borderless) {
+      memset(&mwmhints, 0, sizeof(mwmhints));
       prop = XInternAtom(gui->video_display, "_MOTIF_WM_HINTS", False);
       mwmhints.flags = MWM_HINTS_DECORATIONS;
       mwmhints.decorations = 0;
@@ -2461,7 +2464,8 @@ void video_window_toggle_border(void) {
     gVw.borderless = !gVw.borderless;
     
     XLockDisplay(gui->video_display);
-    
+
+    memset(&mwmhints, 0, sizeof(mwmhints));
     prop                 = XInternAtom(gui->video_display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags       = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = gVw.borderless ? 0 : 1;

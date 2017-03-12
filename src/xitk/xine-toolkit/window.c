@@ -299,7 +299,8 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XChangeProperty(im->x.disp, xwin->window, XA_WIN_LAYER,
 		  XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
 		  1);
-  
+
+  memset(&mwmhints, 0, sizeof(mwmhints));
   prop = XInternAtom(im->x.disp, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
