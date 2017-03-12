@@ -566,28 +566,13 @@ void osd_display_info(const char *info, ...) {
   if(gGui->osd.enabled && !gGui->on_quit) {
     va_list   args;
     char     *buf;
-    int       n, size = 100;
-    
-    if((buf = malloc(size)) == NULL) 
+
+    va_start(args, info);
+    buf = xitk_vasprintf(info, args);
+    va_end(args);
+
+    if (!buf)
       return;
-    
-    while(1) {
-      
-      va_start(args, info);
-      n = vsnprintf(buf, size, info, args);
-      va_end(args);
-      
-      if(n > -1 && n < size)
-	break;
-      
-      if(n > -1)
-	size = n + 1;
-      else
-	size *= 2;
-      
-      if((buf = realloc(buf, size)) == NULL)
-	return;
-    }
 
     xine_osd_clear(gGui->osd.info.osd[0]);
 
@@ -599,7 +584,7 @@ void osd_display_info(const char *info, ...) {
     gGui->osd.info.visible = gGui->osd.timeout;
     pthread_mutex_unlock(&osd_mutex);
 
-    SAFE_FREE(buf);
+    free(buf);
   }
 }
 

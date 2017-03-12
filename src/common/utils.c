@@ -336,3 +336,42 @@ int is_a_file(char *filename) {
   
   return (S_ISREG(pstat.st_mode));
 }
+
+char *xitk_vasprintf(const char *format, va_list args)
+{
+  char *result;
+  int   size = 100;
+
+  result = malloc(size);
+  if (!result) {
+    fprintf(stderr, "xitk_vasprintf: out of memory\n");
+    return NULL;
+  }
+
+  while (1) {
+    char *tmp;
+    va_list ap;
+    int n;
+
+    va_copy(ap, args);
+    n = vsnprintf(result, size, format, ap);
+    va_end(ap);
+
+    if (n > -1 && n < size)
+      break;
+
+    if(n > -1)
+      size = n + 1;
+    else
+      size *= 2;
+
+    if((tmp = realloc(result, size)) == NULL) {
+      fprintf(stderr, "xitk_vasprintf: out of memory\n");
+      free(result);
+      return NULL;
+    }
+    result = tmp;
+  }
+
+  return result;
+}

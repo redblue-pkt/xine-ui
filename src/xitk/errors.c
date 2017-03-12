@@ -84,29 +84,14 @@ static void errors_create_window(char *title, char *message) {
 void xine_error(const char *message, ...) {
   va_list   args;
   char     *buf;
-  int       n, size = 100;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
+
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
     return;
-  
-  while(1) {
-    
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return;
-  }
-  
+
   if(gGui->stdctl_enable || !gGui->display) {
     printf("%s\n", buf);
   }
@@ -138,29 +123,14 @@ void xine_error(const char *message, ...) {
 void xine_error_with_more(const char *message, ...) {
   va_list   args;
   char     *buf;
-  int       n, size = 100;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
+
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
     return;
-  
-  while(1) {
-    
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return;
-  }
-  
+
   dump_error(buf);
 
   if(gGui->stdctl_enable) {
@@ -179,29 +149,14 @@ void xine_error_with_more(const char *message, ...) {
 void xine_info(const char *message, ...) {
   va_list   args;
   char     *buf;
-  int       n, size = 100;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
+
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
     return;
-  
-  while(1) {
-    
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return;
-  }
-  
+
   dump_info(buf);
 
   if(gGui->stdctl_enable) {

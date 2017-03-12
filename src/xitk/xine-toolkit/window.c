@@ -840,29 +840,14 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
   {
     va_list   args;
     char     *buf;
-    int       n, size = 100;
-    
-    if((buf = xitk_xmalloc(size)) == NULL) 
+
+    va_start(args, message);
+    buf = xitk_vasprintf(message, args);
+    va_end(args);
+
+    if (!buf)
       return NULL;
-    
-    while(1) {
 
-      va_start(args, message);
-      n = vsnprintf(buf, size, message, args);
-      va_end(args);
-      
-      if(n > -1 && n < size)
-	break;
-      
-      if(n > -1)
-	size = n + 1;
-      else
-	size *= 2;
-
-      if((buf = realloc(buf, size)) == NULL)
-	return NULL;
-    }
-    
     image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
@@ -946,29 +931,14 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   {
     va_list   args;
     char     *buf;
-    int       n, size = 100;
-    
-    if((buf = xitk_xmalloc(size)) == NULL) 
+
+    va_start(args, message);
+    buf = xitk_vasprintf(message, args);
+    va_end(args);
+
+    if (!buf)
       return NULL;
-    
-    while(1) {
 
-      va_start(args, message);
-      n = vsnprintf(buf, size, message, args);
-      va_end(args);
-      
-      if(n > -1 && n < size)
-	break;
-      
-      if(n > -1)
-	size = n + 1;
-      else
-	size *= 2;
-
-      if((buf = realloc(buf, size)) == NULL)
-	return NULL;
-    }
-    
     image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
@@ -1073,34 +1043,17 @@ xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
   
   va_list        args;
   char          *buf;
-  int            n, size = 100;
   xitk_window_t *xw = NULL;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
-    return NULL;
-  
-  while(1) {
 
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return NULL;
-  }
-  
-  {
-    xw = xitk_window_dialog_one_button_with_width(im, title, _("OK"), cb, userdata, window_width,
-						  align, "%s", buf);
-  }
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
+    return NULL;
+
+  xw = xitk_window_dialog_one_button_with_width(im, title, _("OK"), cb, userdata, window_width,
+                                                align, "%s", buf);
   XITK_FREE(buf);
   return xw;
 }
@@ -1137,31 +1090,16 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   {
     va_list   args;
     char     *buf;
-    int       n, size = 100;
-    
-    if((buf = xitk_xmalloc(size)) == NULL) 
-      return NULL;
-    
-    while(1) {
-      
-      va_start(args, message);
-      n = vsnprintf(buf, size, message, args);
-      va_end(args);
-      
-      if(n > -1 && n < size)
-	break;
-      
-      if(n > -1)
-	size = n + 1;
-      else
-	size *= 2;
 
-      if((buf = realloc(buf, size)) == NULL)
-	return NULL;
-    }
-    
+    va_start(args, message);
+    buf = xitk_vasprintf(message, args);
+    va_end(args);
+
+    if (!buf)
+      return NULL;
+
     image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
-    XITK_FREE(buf);
+    free(buf);
   }
   
   if( checkbox_label )
@@ -1319,36 +1257,18 @@ xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 						   int window_width, int align, char *message, ...) {
   va_list        args;
   char          *buf;
-  int            n, size = 100;
   xitk_window_t *xw = NULL;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
-    return NULL;
-  
-  while(1) {
-    
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return NULL;
-  }
-  
-  {
-    xw = xitk_window_dialog_two_buttons_with_width(im, title, _("Yes"), _("No"), 
-						   ycb, ncb, userdata, window_width, align, "%s", buf);
-  }
 
-  XITK_FREE(buf);
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
+    return NULL;
+
+  xw = xitk_window_dialog_two_buttons_with_width(im, title, _("Yes"), _("No"), 
+                                                 ycb, ncb, userdata, window_width, align, "%s", buf);
+  free(buf);
   return xw;
 }
 
@@ -1376,29 +1296,14 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   {
     va_list   args;
     char     *buf;
-    int       n, size = 100;
-    
-    if((buf = xitk_xmalloc(size)) == NULL) 
-      return NULL;
-    
-    while(1) {
-      
-      va_start(args, message);
-      n = vsnprintf(buf, size, message, args);
-      va_end(args);
-      
-      if(n > -1 && n < size)
-	break;
-      
-      if(n > -1)
-	size = n + 1;
-      else
-	size *= 2;
 
-      if((buf = realloc(buf, size)) == NULL)
-	return NULL;
-    }
-    
+    va_start(args, message);
+    buf = xitk_vasprintf(message, args);
+    va_end(args);
+
+    if (!buf)
+      return NULL;
+
     image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
@@ -1538,35 +1443,18 @@ xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *ti
 							 int window_width, int align, char *message, ...) {
   va_list        args;
   char          *buf;
-  int            n, size = 100;
   xitk_window_t *xw = NULL;
-  
-  if((buf = xitk_xmalloc(size)) == NULL) 
+
+  va_start(args, message);
+  buf = xitk_vasprintf(message, args);
+  va_end(args);
+
+  if (!buf)
     return NULL;
-  
-  while(1) {
-    
-    va_start(args, message);
-    n = vsnprintf(buf, size, message, args);
-    va_end(args);
-    
-    if(n > -1 && n < size)
-      break;
-    
-    if(n > -1)
-      size = n + 1;
-    else
-      size *= 2;
-    
-    if((buf = realloc(buf, size)) == NULL)
-      return NULL;
-  }
-  
-  {
-    xw = xitk_window_dialog_three_buttons_with_width(im, title, _("Yes"), _("No"), _("Cancel"),
-						     ycb, ncb, ccb, userdata, window_width, align, "%s", buf);
-  }
-  XITK_FREE(buf);
+
+  xw = xitk_window_dialog_three_buttons_with_width(im, title, _("Yes"), _("No"), _("Cancel"),
+                                                   ycb, ncb, ccb, userdata, window_width, align, "%s", buf);
+  free(buf);
   return xw;
 }
 
