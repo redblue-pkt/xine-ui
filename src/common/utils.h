@@ -25,6 +25,8 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+#include <stdarg.h>
 #include <sys/time.h>
 
 /* sys/time.h does not define timersub() on all platforms... */
@@ -87,5 +89,7 @@ size_t strlcat(char *dst, const char *src, size_t size);
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t size);
 #endif
+
+char *xitk_vasprintf(const char *fmt, va_list ap)  __attribute__ ((format (printf, 1, 0)));
 
 #endif
