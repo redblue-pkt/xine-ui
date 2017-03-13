@@ -1505,7 +1505,7 @@ void gui_seek_relative (int off_sec) {
   }
 }
 
-void gui_dndcallback(char *filename) {
+void gui_dndcallback(const char *filename) {
   gGui_t *gui = gGui;
   int   more_than_one = -2;
   char *mrl           = filename ? strdup(filename) : NULL;

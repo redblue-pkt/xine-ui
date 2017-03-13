@@ -138,7 +138,7 @@ char *atoa(char *str) {
 /*
  *
  */
-static int _mkdir_safe(char *path) {
+static int _mkdir_safe(const char *path) {
   struct stat  pstat;
   
   if(path == NULL)
@@ -166,7 +166,7 @@ static int _mkdir_safe(char *path) {
 /*
  *
  */
-int mkdir_safe(char *path) {
+int mkdir_safe(const char *path) {
   char *p, *pp;
   char  buf[_PATH_MAX + _NAME_MAX + 1];
   char  buf2[_PATH_MAX + _NAME_MAX + 1];

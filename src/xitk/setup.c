@@ -523,7 +523,7 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
 /*
  *
  */
-static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
+static void stringtype_update(xitk_widget_t *w, void *data, const char *str) {
   widget_triplet_t *triplet = (widget_triplet_t *) data;
 
   (void)w;

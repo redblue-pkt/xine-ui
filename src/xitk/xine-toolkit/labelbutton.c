@@ -435,7 +435,7 @@ char *xitk_labelbutton_get_label(xitk_widget_t *w) {
 /*
  * Changing button caption
  */
-int xitk_labelbutton_change_shortcut_label(xitk_widget_t *w, char *newlabel, int pos, char *newfont) {
+int xitk_labelbutton_change_shortcut_label(xitk_widget_t *w, const char *newlabel, int pos, const char *newfont) {
   lbutton_private_data_t *private_data;
 
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) && 

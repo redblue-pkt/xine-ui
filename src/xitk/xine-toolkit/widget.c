@@ -1597,7 +1597,7 @@ xitk_color_names_t *gui_get_color_names(void) {
 /*
  * Return a xitk_color_name_t type from a string color.
  */
-xitk_color_names_t *xitk_get_color_name(char *color) {
+xitk_color_names_t *xitk_get_color_name(const char *color) {
   xitk_color_names_t *cn = NULL;
 
   if(color == NULL) {
@@ -1875,7 +1875,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
 /*
  *
  */
-void xitk_set_widget_tips(xitk_widget_t *w, char *str) {
+void xitk_set_widget_tips(xitk_widget_t *w, const char *str) {
 
   if(!w || !str) {
     XITK_WARNING("widget is NULL\n");
@@ -1888,7 +1888,7 @@ void xitk_set_widget_tips(xitk_widget_t *w, char *str) {
 /*
  *
  */
-void xitk_set_widget_tips_default(xitk_widget_t *w, char *str) {
+void xitk_set_widget_tips_default(xitk_widget_t *w, const char *str) {
 
   if(!w || !str) {
     XITK_WARNING("widget is NULL\n");
@@ -1902,7 +1902,7 @@ void xitk_set_widget_tips_default(xitk_widget_t *w, char *str) {
 /*
  *
  */
-void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned long timeout) {
+void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, const char *str, unsigned long timeout) {
 
   if(!w || !str) {
     XITK_WARNING("widget is NULL\n");

@@ -121,7 +121,8 @@
  * The last window in the hierarchy is the one to draw to.  The
  * numbers show the value of the `depth' argument.  */
 static Window __GetKDEDesktop(Display *display, int screen, 
-			      Window window, Atom atom, char *atomname, int depth) {
+                              Window window, Atom atom,
+                              const char *atomname, int depth) {
   char         *name = NULL;
   Atom         *wintype = NULL;
   Window        winreturn = 0;
@@ -146,7 +147,7 @@ static Window __GetKDEDesktop(Display *display, int screen,
 	    /* OK, at depth 2 */
 	    go_deeper = 1;
 	  }
-	  XFree((char *) tmpatomname);
+          XFree(tmpatomname);
 	}
       }
       else if (depth < 2) {

@@ -64,7 +64,7 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data);
 void gui_change_speed_playback(xitk_widget_t *w, void *data);
 void gui_set_current_position (int pos);
 void gui_seek_relative (int off_sec) ;
-void gui_dndcallback (char *filename);
+void gui_dndcallback (const char *filename);
 void gui_change_skin(xitk_widget_t *w, void *data);
 void gui_direct_nextprev(xitk_widget_t *w, void *data, int value);
 void gui_nextprev(xitk_widget_t *w, void *data);

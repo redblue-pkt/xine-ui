@@ -67,7 +67,7 @@ char *atoa(char *str);
 /*
  * Create directories recursively
  */
-int mkdir_safe(char *path);
+int mkdir_safe(const char *path);
 
 /*
  * return 0/1 regarding to string (1/0, true/false, yes/no, on/off).

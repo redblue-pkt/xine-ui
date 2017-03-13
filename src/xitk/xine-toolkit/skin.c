@@ -810,7 +810,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
 /*
  * Load the skin configfile.
  */
-int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filename) {
+int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const char *filename) {
   char buf[2048];
 
   ABORT_IF_NULL(skonfig);

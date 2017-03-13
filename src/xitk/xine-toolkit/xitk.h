@@ -192,8 +192,8 @@ typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
-typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
-typedef void (*xitk_dnd_callback_t) (char *filename);
+typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, const char *);
+typedef void (*xitk_dnd_callback_t) (const char *filename);
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 #ifdef NEED_MRLBROWSER
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
@@ -834,7 +834,7 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
  * dnd_cb: callback for dnd event.
  * wl:     widget_list handled internaly for xevent reactions.
  */
-xitk_register_key_t xitk_register_event_handler(char *name, Window window,
+xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
 						widget_event_callback_t cb,
 						widget_newpos_callback_t pos_cb,
 						xitk_dnd_callback_t dnd_cb,
@@ -948,7 +948,7 @@ int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int
 /**
  *
  */
-xitk_color_names_t *xitk_get_color_name(char *color);
+xitk_color_names_t *xitk_get_color_name(const char *color);
 
 /**
  * return pointer to the xitk_color_names struct.
@@ -1128,17 +1128,17 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 /**
  *
  */
-void xitk_set_widget_tips(xitk_widget_t *w, char *str);
+void xitk_set_widget_tips(xitk_widget_t *w, const char *str);
 
 /**
  *
  */
-void xitk_set_widget_tips_default(xitk_widget_t *w, char *str);
+void xitk_set_widget_tips_default(xitk_widget_t *w, const char *str);
 
 /**
  *
  */
-void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned long timeout);
+void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, const char *str, unsigned long timeout);
 
 /**
  *
@@ -1290,7 +1290,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
  * Change label of button 'widget'.
  */
 int xitk_labelbutton_change_label (xitk_widget_t *, const char *new_label);
-int xitk_labelbutton_change_shortcut_label (xitk_widget_t *, char *, int, char *);
+int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, const char *, int, const char *);
 
 /**
  * Return label of button 'widget'.
@@ -1364,7 +1364,7 @@ char *xitk_label_get_label(xitk_widget_t *w);
 /**
  * Load image and return a xitk_image_t data type.
  */
-xitk_image_t *xitk_image_load_image(ImlibData *idata, char *image);
+xitk_image_t *xitk_image_load_image(ImlibData *idata, const char *image);
 
 /**
  * Create an image widget type.
@@ -1455,7 +1455,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 					  xitk_browser_widget_t *br, GC gc, 
 					  int x, int y, 
-					  int itemw, int itemh, int slidw, char *fontname);
+					  int itemw, int itemh, int slidw, const char *fontname);
 
 /**
  * Redraw buttons/slider
@@ -1530,7 +1530,7 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 /*
  * Jump to entry in list which match with the alphanum char key.
  */
-void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
+void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier);
 
 xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
 
@@ -1626,7 +1626,7 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 					     xitk_inputtext_widget_t *it,
 					     int x, int y, int width, int height,
-					     char *ncolor, char *fcolor, char *fontname);
+					     const char *ncolor, const char *fcolor, const char *fontname);
 /**
  * Return the text of widget.
  */
@@ -1635,7 +1635,7 @@ char *xitk_inputtext_get_text(xitk_widget_t *it);
 /**
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_t *it, char *text);
+void xitk_inputtext_change_text(xitk_widget_t *it, const char *text);
 
 
 /*
@@ -1655,7 +1655,7 @@ void xitk_skin_free_config(xitk_skin_config_t *);
 /*
  * Load the skin configfile.
  */
-int xitk_skin_load_config(xitk_skin_config_t *, char *, char *);
+int xitk_skin_load_config(xitk_skin_config_t *, const char *, const char *);
 
 /*
  * Check skin version.
@@ -1818,7 +1818,7 @@ void xitk_skin_unlock(xitk_skin_config_t *);
 /*
  *
  */
-xitk_font_t *xitk_font_load_font(Display *display, char *font);
+xitk_font_t *xitk_font_load_font(Display *display, const char *font);
 
 /*
  *
@@ -1845,7 +1845,7 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
-int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes);
+int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
 
 /*
  *
@@ -1860,7 +1860,7 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
-int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes);
+int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
 
 /*
  *
@@ -1992,13 +1992,13 @@ unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
  *
  */
 xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
-							      char *fontname, 
-							      int width, int align, char *str,
+                                                              const char *fontname,
+                                                              int width, int align, const char *str,
 							      unsigned int foreground,
 							      unsigned int background);
 xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
-						  char *fontname, 
-						  int width, int align, char *str);
+                                                  const char *fontname,
+                                                  int width, int align, const char *str);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 
 xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth);
@@ -2110,10 +2110,10 @@ void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p,
 /**
  *
  */
-void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
-		      int x, int y, int w, int h);
-void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
-		       int x, int y, int w, int h);
+void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, const char *title, const char *fontname,
+                      int x, int y, int w, int h);
+void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, const char *title, const char *fontname,
+                       int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);
 
@@ -2143,7 +2143,7 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
 /**
  *
  */
-xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, int x, int y, int width, int height);
+xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title, int x, int y, int width, int height);
 
 
 /**
@@ -2216,12 +2216,12 @@ void xitk_window_get_window_position(ImlibData *im, xitk_window_t *w,
 /*
  *
  */
-void xitk_set_window_title(Display *display, Window window, char *title);
+void xitk_set_window_title(Display *display, Window window, const char *title);
 
 /*
  *
  */
-void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
+void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, const char *title);
 
 /*
  *
@@ -2243,31 +2243,31 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
  */
 int xitk_is_window_size(Display *display, Window window, int width, int height);
 
-xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
-							 int window_width, int align, char *message, ...)
+xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, const char *title,
+                                                         int window_width, int align, const char *message, ...)
 							 __attribute__ ((format (printf, 5, 6)));
 
 /*
  *
  */
-xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
+xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, const char *title, const char *button_label,
 							xitk_state_callback_t cb, void *userdata, 
-							int window_width, int align, char *message, ...)
+                                                        int window_width, int align, const char *message, ...)
 							__attribute__ ((format (printf, 8, 9)));
 
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, const char *title,
 						xitk_state_callback_t cb, void *userdata, 
-						int window_width, int align, char *message, ...)
+                                                int window_width, int align, const char *message, ...)
 						__attribute__ ((format (printf, 7, 8)));
 
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_ok(ImlibData *im, char *title,
-				     xitk_state_callback_t cb, void *userdata, int align, char *message, ...)
+xitk_window_t *xitk_window_dialog_ok(ImlibData *im, const char *title,
+                                     xitk_state_callback_t cb, void *userdata, int align, const char *message, ...)
 				     __attribute__ ((format (printf, 6, 7)));
 
 
@@ -2293,35 +2293,35 @@ xitk_window_t *xitk_window_dialog_ok(ImlibData *im, char *title,
 /* 
  *
  */
-xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title, 
-							   char *button1_label,
-							   char *button2_label,
-							   char *button3_label,
+xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, const char *title, 
+                                                           const char *button1_label,
+                                                           const char *button2_label,
+                                                           const char *button3_label,
 							   xitk_state_callback_t cb1, 
 							   xitk_state_callback_t cb2, 
 							   xitk_state_callback_t cb3, 
 							   void *userdata, 
-							   int window_width, int align, char *message, ...)
+                                                           int window_width, int align, const char *message, ...)
 							   __attribute__ ((format (printf, 12, 13)));
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, const char *title,
 							 xitk_state_callback_t ycb, 
 							 xitk_state_callback_t ncb, 
 							 xitk_state_callback_t ccb, 
 							 void *userdata, 
-							 int window_width, int align, char *message, ...)
+                                                         int window_width, int align, const char *message, ...)
 							 __attribute__ ((format (printf, 9, 10)));
 
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, const char *title,
 					      xitk_state_callback_t ycb, 
 					      xitk_state_callback_t ncb, 
 					      xitk_state_callback_t ccb, 
-					      void *userdata, int align, char *message, ...)
+                                              void *userdata, int align, const char *message, ...)
 					      __attribute__ ((format (printf, 8, 9)));
 
 #ifdef __GNUC__
@@ -2335,14 +2335,15 @@ xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
 /*
  *
  */
-xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, char *title,
-							 char *button1_label, char *button2_label,
-							 xitk_state_callback_t cb1, 
-							 xitk_state_callback_t cb2, 
-                                                         char *checkbox_label, int checkbox_state,
-                                                         xitk_state_callback_t cb3,
-							 void *userdata, 
-							 int window_width, int align, char *message, ...)
+xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, const char *title,
+                                                                  const char *button1_label,
+                                                                  const char *button2_label,
+                                                                  xitk_state_callback_t cb1,
+                                                                  xitk_state_callback_t cb2,
+                                                                  const char *checkbox_label, int checkbox_state,
+                                                                  xitk_state_callback_t cb3,
+                                                                  void *userdata,
+                                                                  int window_width, int align, const char *message, ...)
   __attribute__((__format__(__printf__, 13, 14)));
 
 #ifdef __GNUC__
@@ -2356,20 +2357,20 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, const char *title,
 						   xitk_state_callback_t ycb, 
 						   xitk_state_callback_t ncb, 
 						   void *userdata, 
-						   int window_width, int align, char *message, ...)
+                                                   int window_width, int align, const char *message, ...)
 						   __attribute__ ((format (printf, 8, 9)));
 
 /**
  *
  */
-xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, const char *title,
 					xitk_state_callback_t ycb, 
 					xitk_state_callback_t ncb, 
-					void *userdata, int align, char *message, ...)
+                                        void *userdata, int align, const char *message, ...)
 					__attribute__ ((format (printf, 7, 8)));
 #ifdef __GNUC__
 #define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) \
@@ -2386,7 +2387,7 @@ void xitk_window_dialog_set_modal(xitk_window_t *w);
 
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 
-				       int x, int y, int width, char *fontname);
+                                       int x, int y, int width, const char *fontname);
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);

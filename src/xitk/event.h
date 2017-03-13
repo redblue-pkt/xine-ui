@@ -39,7 +39,7 @@ void gui_init_imlib(Visual *vis);
 void gui_run(char **session_opts);
 int gui_playlist_play(int idx);
 void gui_playlist_start_next(void);
-void gui_dndcallback(char *filename);
+void gui_dndcallback(const char *filename);
 void gui_execute_action_id(action_id_t);
 void gui_handle_event(XEvent *event, void *data);
 

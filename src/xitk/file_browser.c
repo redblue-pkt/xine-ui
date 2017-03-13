@@ -442,7 +442,7 @@ static void fb_update_origin(filebrowser_t *fb) {
   xitk_inputtext_change_text(fb->origin, buf); 
 }
 
-static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
+static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname) {
   if(filepathname && *filepathname) {
     char *dirname = NULL;
     char *filename = NULL;
@@ -831,7 +831,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
 
 }
 
-static void fb_change_origin(xitk_widget_t *w, void *data, char *currenttext) {
+static void fb_change_origin(xitk_widget_t *w, void *data, const char *currenttext) {
   filebrowser_t *fb = (filebrowser_t *)data;
 
   fb_extract_path_and_file(fb, currenttext);
@@ -1003,7 +1003,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
   }
 }
 
-static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
+static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname) {
   filebrowser_t *fb = (filebrowser_t *) data;
   char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   int sel = xitk_browser_get_current_selected(fb->files_browser);
@@ -1034,7 +1034,7 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
   }
 }
 
-static void fb_create_directory_cb(xitk_widget_t *w, void *data, char *newdir) {
+static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *newdir) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   if(!mkdir_safe(newdir))

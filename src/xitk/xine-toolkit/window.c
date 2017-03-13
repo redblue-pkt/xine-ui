@@ -124,7 +124,7 @@ int xitk_is_window_size(Display *display, Window window, int width, int height) 
 /*
  * Set/Change window title.
  */
-void xitk_set_window_title(Display *display, Window window, char *title) {
+void xitk_set_window_title(Display *display, Window window, const char *title) {
 
   if((display == NULL) || (window == None) || (title == NULL))
     return;
@@ -137,7 +137,7 @@ void xitk_set_window_title(Display *display, Window window, char *title) {
 /*
  * Set/Change window title.
  */
-void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title) {
+void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, const char *title) {
 
   if((im == NULL) || (w == NULL) || (title == NULL))
     return;
@@ -358,7 +358,7 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
 /*
  * Create a simple, with title bar, window.
  */
-xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, 
+xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title,
 						int x, int y, int width, int height) {
   xitk_window_t *xwin;
   xitk_pixmap_t  *bar, *pix_bg;
@@ -828,8 +828,8 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
  * @TODO Should be split on a different unit, as it's only used with TAR support
  *       enabled.
  */
-xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
-							 int window_width, int align, char *message, ...) {
+xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, const char *title,
+                                                         int window_width, int align, const char *message, ...) {
   xitk_dialog_t              *wd;
   int                         windoww = window_width, windowh;
   xitk_image_t               *image;
@@ -916,9 +916,11 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
 /*
  * Create a window error, containing an error message.
  */
-xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
+xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, const char *title,
+                                                        const char *button_label,
 							xitk_state_callback_t cb, void *userdata, 
-							int window_width, int align, char *message, ...) {
+                                                        int window_width, int align,
+                                                        const char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -1034,9 +1036,10 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   return wd->xwin;
 }
 
-xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, const char *title,
 						xitk_state_callback_t cb, void *userdata, 
-						int window_width, int align, char *message, ...) {
+                                                int window_width, int align,
+                                                const char *message, ...) {
   
   va_list        args;
   char          *buf;
@@ -1066,14 +1069,17 @@ static void _checkbox_label_click(xitk_widget_t *w, void *data) {
 /*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
-xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, char *title,
-							 char *button1_label, char *button2_label,
-							 xitk_state_callback_t cb1, 
-							 xitk_state_callback_t cb2, 
-                                                         char *checkbox_label, int checkbox_state,
-                                                         xitk_state_callback_t cb3,
-							 void *userdata, 
-							 int window_width, int align, char *message, ...) {
+xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, const char *title,
+                                                                  const char *button1_label,
+                                                                  const char *button2_label,
+                                                                  xitk_state_callback_t cb1,
+                                                                  xitk_state_callback_t cb2,
+                                                                  const char *checkbox_label,
+                                                                  int checkbox_state,
+                                                                  xitk_state_callback_t cb3,
+                                                                  void *userdata,
+                                                                  int window_width, int align,
+                                                                  const char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -1238,11 +1244,12 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
 /*
  *
  */
-xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, const char *title,
 						   xitk_state_callback_t ycb, 
 						   xitk_state_callback_t ncb, 
 						   void *userdata, 
-						   int window_width, int align, char *message, ...) {
+                                                   int window_width, int align,
+                                                   const char *message, ...) {
   va_list        args;
   char          *buf;
   xitk_window_t *xw = NULL;
@@ -1263,15 +1270,16 @@ xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 /*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
-xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
-							   char *button1_label,
-							   char *button2_label,
-							   char *button3_label,
+xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, const char *title,
+                                                           const char *button1_label,
+                                                           const char *button2_label,
+                                                           const char *button3_label,
 							   xitk_state_callback_t cb1, 
 							   xitk_state_callback_t cb2, 
 							   xitk_state_callback_t cb3, 
 							   void *userdata, 
-							   int window_width, int align, char *message, ...) {
+                                                           int window_width, int align,
+                                                           const char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -1414,12 +1422,13 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   return wd->xwin;
 }
 
-xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, const char *title,
 							 xitk_state_callback_t ycb, 
 							 xitk_state_callback_t ncb, 
 							 xitk_state_callback_t ccb, 
 							 void *userdata, 
-							 int window_width, int align, char *message, ...) {
+                                                         int window_width, int align,
+                                                         const char *message, ...) {
   va_list        args;
   char          *buf;
   xitk_window_t *xw = NULL;

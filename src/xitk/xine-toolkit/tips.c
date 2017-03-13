@@ -371,7 +371,7 @@ void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
 /*
  *
  */
-void xitk_tips_set_tips(xitk_widget_t *w, char *str) {
+void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
 
   if((w == NULL) || (str == NULL))
     return;
