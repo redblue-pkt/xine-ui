@@ -1829,7 +1829,7 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 					  xitk_skin_config_t *skonfig, 
 					  xitk_image_widget_t *im,
 					  int x, int y,
-					  char *skin_element_name,
+					  const char *skin_element_name,
 					  xitk_image_t *skin) {
   xitk_widget_t              *mywidget;
   image_private_data_t       *private_data;

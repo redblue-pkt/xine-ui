@@ -421,7 +421,7 @@ int xitk_labelbutton_change_label (xitk_widget_t *w, const char *newlabel) {
 /*
  * Return the current button label
  */
-char *xitk_labelbutton_get_label(xitk_widget_t *w) {
+const char *xitk_labelbutton_get_label(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
 
   if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
@@ -467,7 +467,7 @@ int xitk_labelbutton_change_shortcut_label(xitk_widget_t *w, const char *newlabe
 /*
  * Return the current button label
  */
-char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *w) {
+const char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
 
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) &&

@@ -2181,10 +2181,10 @@ void xitk_stop(void) {
   }
 }
  
-char *xitk_get_system_font(void) {
+const char *xitk_get_system_font(void) {
   return xitk_config_get_system_font(gXitk->config);
 }
-char *xitk_get_default_font(void) {
+const char *xitk_get_default_font(void) {
   return xitk_config_get_default_font(gXitk->config);
 }
 int xitk_get_xmb_enability(void) {
@@ -2308,8 +2308,8 @@ char *xitk_filter_filename(const char *name) {
 /*
  *
  */
-char *xitk_set_locale(void) {
-  char *cur_locale = NULL;
+const char *xitk_set_locale(void) {
+  const char *cur_locale = NULL;
   
 #ifdef ENABLE_NLS
   if(setlocale (LC_ALL,"") == NULL) {

@@ -202,8 +202,8 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
-char *xitk_label_get_label(xitk_widget_t *w) {
-  
+const char *xitk_label_get_label(xitk_widget_t *w) {
+
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
       label_private_data_t *private_data = (label_private_data_t *) w->private_data;
     return private_data->label;

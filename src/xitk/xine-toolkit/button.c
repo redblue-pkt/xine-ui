@@ -246,7 +246,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
 					   xitk_skin_config_t *skonfig, xitk_button_widget_t *b,
 					   int x, int y, 
-					   char *skin_element_name, xitk_image_t *skin,
+                                           const char *skin_element_name, xitk_image_t *skin,
 					   int visible, int enable) {
   xitk_widget_t          *mywidget;
   button_private_data_t  *private_data;

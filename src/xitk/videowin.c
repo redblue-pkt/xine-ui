@@ -2076,7 +2076,7 @@ void video_window_get_mag (xui_vwin_t *vwin, float *xmag, float *ymag) {
  */
 void video_window_update_logo (xui_vwin_t *vwin) {
   xine_cfg_entry_t     cfg_entry;
-  char                *skin_logo;
+  const char          *skin_logo;
   int                  cfg_err_result;
 
   if (!vwin)

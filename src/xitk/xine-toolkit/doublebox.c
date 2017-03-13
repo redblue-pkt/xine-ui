@@ -203,10 +203,10 @@ double xitk_doublebox_get_value(xitk_widget_t *w) {
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
-    char                     *strval;
+    const char               *strval;
 
     strval = xitk_inputtext_get_text(private_data->input_widget);
-    private_data->value = strtod(strval, &strval);
+    private_data->value = strtod(strval, NULL);
     
     return private_data->value;
   }

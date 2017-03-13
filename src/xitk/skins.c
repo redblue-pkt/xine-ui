@@ -208,7 +208,7 @@ static int change_skin(skins_locations_t *sk) {
   skins_locations_t   *sks = sk;
   int                  twice = 0, twice_load = 0;
   int                  ret = 0;
-  char                *skin_anim;
+  const char          *skin_anim;
   xitk_skin_config_t  *nskin_config, *oskin_config;
 
   if(!sk)
@@ -381,7 +381,7 @@ void init_skins_support(void) {
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   int                  twice = 0, twice_load = 0;
   int                  skin_num;
-  char                *skin_anim;
+  const char          *skin_anim;
   xine_cfg_entry_t     entry;
 
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 

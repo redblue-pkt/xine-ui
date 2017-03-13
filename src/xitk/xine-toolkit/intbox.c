@@ -203,10 +203,10 @@ int xitk_intbox_get_value(xitk_widget_t *w) {
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
-    char                  *strval;
-    
+    const char            *strval;
+
     strval = xitk_inputtext_get_text(private_data->input_widget);
-    private_data->value = strtol(strval, &strval, 10);
+    private_data->value = strtol(strval, NULL, 10);
     
     return private_data->value;
   }

@@ -978,7 +978,7 @@ int xitk_skin_get_coord_y(xitk_skin_config_t *skonfig, const char *str) {
 /*
  *
  */
-char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -990,7 +990,7 @@ char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
 /*
  *
  */
-char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1002,7 +1002,7 @@ char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *s
 /*
  *
  */
-char *xitk_skin_get_label_color_click(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_label_color_click(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1059,7 +1059,7 @@ unsigned long xitk_skin_get_label_animation_timer(xitk_skin_config_t *skonfig, c
 /*
  *
  */
-char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1107,7 +1107,7 @@ int xitk_skin_get_label_alignment(xitk_skin_config_t *skonfig, const char *str) 
 /*
  *
  */
-char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
   
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1119,7 +1119,7 @@ char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const c
 /*
  *
  */
-char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1131,7 +1131,7 @@ char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) 
 /*
  *
  */
-char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
+const char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
@@ -1168,7 +1168,7 @@ int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str) {
 /*
  *
  */
-char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
+const char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   
   return skonfig->animation;
@@ -1177,7 +1177,7 @@ char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
 /*
  *
  */
-char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
+const char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   
   return skonfig->logo;

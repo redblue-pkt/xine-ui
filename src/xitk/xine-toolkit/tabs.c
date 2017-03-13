@@ -295,7 +295,7 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w) {
 /*
  *
  */
-char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
+const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
 
   if(!w) {
