@@ -442,7 +442,7 @@ void playlist_save_playlist(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void _playlist_add_input(xitk_widget_t *w, void *data, char *filename) {
+static void _playlist_add_input(xitk_widget_t *w, void *data, const char *filename) {
 
   if(filename)
     gui_dndcallback((char *)filename);

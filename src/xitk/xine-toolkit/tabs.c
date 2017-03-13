@@ -318,7 +318,8 @@ char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
  */
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 
-				       int x, int y, int width, char *fontname) {
+                                       int x, int y, int width,
+                                       const char *fontname) {
   xitk_widget_t         *mywidget;
   tabs_private_data_t   *private_data;
   

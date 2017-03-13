@@ -229,7 +229,7 @@ void xitk_unmodal_window(Window w) {
 /*
  * Execute a shell command.
  */
-int xitk_system(int dont_run_as_root, char *command) {
+int xitk_system(int dont_run_as_root, const char *command) {
   int pid, status;
   
   /* 
@@ -240,7 +240,7 @@ int xitk_system(int dont_run_as_root, char *command) {
       return -1;
   }
   
-  if(command == 0)
+  if(command == NULL)
     return 1;
   
   pid = fork();
@@ -426,7 +426,7 @@ int xitk_is_use_xshm(void) {
   return gXitk->use_xshm;
 }
 
-static char *get_wm_name(Display *display, Window win, char *atom_name) {
+static char *get_wm_name(Display *display, Window win, const char *atom_name) {
   char *wm_name = NULL;
   Atom  atom;
 
@@ -1069,7 +1069,7 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
  */
-xitk_register_key_t xitk_register_event_handler(char *name, Window window,
+xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
 						widget_event_callback_t cb,
 						widget_newpos_callback_t pos_cb,
 						xitk_dnd_callback_t dnd_cb,

@@ -158,7 +158,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
+static void intbox_change_value(xitk_widget_t *x, void *data, const char *string) {
   xitk_widget_t         *w = (xitk_widget_t *)data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
@@ -166,7 +166,7 @@ static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
     intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
     char                   buf[256];
     
-    private_data->value = strtol(string, &string, 10);
+    private_data->value = strtol(string, NULL, 10);
     
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, sizeof(buf), "%d", private_data->value);

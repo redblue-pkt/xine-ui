@@ -1087,7 +1087,7 @@ char *xitk_inputtext_get_text(xitk_widget_t *w) {
 /*
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_t *w, char *text) {
+void xitk_inputtext_change_text(xitk_widget_t *w, const char *text) {
   inputtext_private_data_t *private_data;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
@@ -1110,10 +1110,10 @@ void xitk_inputtext_change_text(xitk_widget_t *w, char *text) {
 static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
 					      xitk_skin_config_t *skonfig, 
 					      xitk_inputtext_widget_t *it,
-					      int x, int y, char *skin_element_name,
+                                              int x, int y, const char *skin_element_name,
 					      xitk_image_t *skin,
-					      char *fontname,
-					      char *ncolor, char *fcolor,
+                                              const char *fontname,
+                                              const char *ncolor, const char *fcolor,
 					      int visible, int enable) {
   xitk_widget_t             *mywidget;
   inputtext_private_data_t  *private_data;
@@ -1199,7 +1199,7 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 					     xitk_inputtext_widget_t *it,
 					     int x, int y, int width, int height,
-					     char *ncolor, char *fcolor, char *fontname) {
+                                             const char *ncolor, const char *fcolor, const char *fontname) {
   xitk_image_t *i;
 
   XITK_CHECK_CONSTITENCY(it);

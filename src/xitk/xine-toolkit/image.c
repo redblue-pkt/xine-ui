@@ -388,8 +388,8 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
  *
  */
 xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
-                                                              char *fontname, 
-                                                              int width, int align, char *str,
+                                                              const char *fontname,
+                                                              int width, int align, const char *str,
                                                               unsigned int foreground,
                                                               unsigned int background) {
   xitk_image_t   *image;
@@ -574,9 +574,9 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 
   return image;
 }
-xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
-						  char *fontname, 
-						  int width, int align, char *str) {
+xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
+                                                  const char *fontname,
+                                                  int width, int align, const char *str) {
 
   return xitk_image_create_image_with_colors_from_string(im,fontname, width, align, str,
 							 xitk_get_pixel_color_black(im),
@@ -1355,14 +1355,15 @@ void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigne
 /*
  * Draw a frame outline with embedded title.
  */
-static void _draw_frame(ImlibData *im, xitk_pixmap_t *p, 
-			char *title, char *fontname, int style, int x, int y, int w, int h) {
+static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
+                        const char *title, const char *fontname,
+                        int style, int x, int y, int w, int h) {
   xitk_font_t   *fs = NULL;
   int            sty[2];
   int            yoff = 0, xstart = 0, xstop = 0;
   int            ascent = 0, descent = 0, lbearing = 0, rbearing = 0;
   int            titlelen = 0;
-  char          *titlebuf = NULL;
+  const char    *titlebuf = NULL;
   char           buf[BUFSIZ];
 
   ABORT_IF_NULL(im);
@@ -1443,12 +1444,14 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
 /*
  *
  */
-void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
-		      int x, int y, int w, int h) {
+void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p,
+                      const char *title, const char *fontname,
+                      int x, int y, int w, int h) {
   _draw_frame(im, p, title, fontname, DRAW_INNER, x, y, w, h);
 }
-void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
-		       int x, int y, int w, int h) {
+void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p,
+                       const char *title, const char *fontname,
+                       int x, int y, int w, int h) {
   _draw_frame(im, p, title, fontname, DRAW_OUTTER, x, y, w, h);
 }
 
@@ -1635,7 +1638,7 @@ void draw_button_minus(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
+xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
 

@@ -210,7 +210,7 @@ extern int xitk_x_error;
 #ifndef _XITK_C_
 
 xitk_widget_list_t *xitk_widget_list_new (void);
-xitk_register_key_t xitk_register_event_handler(char *name, Window window,
+xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
 						widget_event_callback_t cb,
 						widget_newpos_callback_t pos_cb,
 						xitk_dnd_callback_t dnd_cb,
@@ -227,7 +227,7 @@ int xitk_uninstall_x_error_handler(void);
 
 const char *xine_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
-int xitk_system(int dont_run_as_root, char *command);
+int xitk_system(int dont_run_as_root, const char *command);
 int xitk_is_use_xshm(void);
 
 char *xitk_get_system_font(void);

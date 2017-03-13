@@ -158,7 +158,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static void doublebox_change_value(xitk_widget_t *x, void *data, char *string) {
+static void doublebox_change_value(xitk_widget_t *x, void *data, const char *string) {
   xitk_widget_t         *w = (xitk_widget_t *)data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
@@ -166,7 +166,7 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, char *string) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
     char                      buf[256];
     
-    private_data->value = strtod(string, &string);
+    private_data->value = strtod(string, NULL);
     
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, sizeof(buf), "%e", private_data->value);

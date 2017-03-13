@@ -605,7 +605,7 @@ static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value
   }
 }
 
-static void _pplugin_set_param_char(xitk_widget_t *w, void *data, char *text) {
+static void _pplugin_set_param_char(xitk_widget_t *w, void *data, const char *text) {
   post_object_t *pobj = (post_object_t *) data;
 
   if(pobj->readonly)

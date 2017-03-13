@@ -878,7 +878,7 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w) {
 /*
  * Jump to entry in list which match with the alphanum char key.
  */
-void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
+void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
@@ -985,7 +985,7 @@ void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
 static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
 					   xitk_skin_config_t *skonfig, xitk_browser_widget_t *br,
 					   int x, int y, int width, int height,
-					   char *skin_element_name,
+					   const char *skin_element_name,
 					   xitk_widget_t *mywidget,
 					   browser_private_data_t *_private_data,
 					   int visible, int enable) {
@@ -1178,7 +1178,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
  */
 xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 					  xitk_browser_widget_t *br, GC gc, int x, int y, 
-					  int itemw, int itemh, int slidw, char *fontname) {
+					  int itemw, int itemh, int slidw, const char *fontname) {
   xitk_widget_t              *mywidget;
   browser_private_data_t     *private_data;
   xitk_button_widget_t        b;

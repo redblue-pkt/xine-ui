@@ -158,7 +158,7 @@ static const char * xitk_font_core_string_to_xft(char *new_name, size_t new_name
 /*
  * XCreateFontSet requires font name starting with '-'
  */
-static char *xitk_font_right_name(char *name) {
+static char *xitk_font_right_name(const char *name) {
   char *right_name;
 
   ABORT_IF_NULL(name);
@@ -183,7 +183,7 @@ static char *xitk_font_right_name(char *name) {
 /*
  * load the font and returns status
  */
-static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
+static int xitk_font_load_one(Display *display, const char *font, xitk_font_t *xtfs) {
   int    ok;
 #ifdef WITH_XFT
 #else
@@ -416,7 +416,7 @@ static xitk_font_t *xitk_cache_remove_item(size_t pos) {
 /* 
  * search the font of given display in the cache, remove it from the cache
  */
-static xitk_font_t *xitk_cache_take_item(Display *display, char *name) {
+static xitk_font_t *xitk_cache_take_item(Display *display, const char *name) {
   int     left, right;
   size_t  i, j;
   int     cmp;
@@ -476,7 +476,7 @@ static xitk_font_t *xitk_cache_take_item(Display *display, char *name) {
 /*
  * search the font in the list of loaded fonts
  */
-static xitk_font_list_item_t *cache_get_from_list(Display *display, char *name) {
+static xitk_font_list_item_t *cache_get_from_list(Display *display, const char *name) {
   xitk_font_list_item_t *item = (xitk_font_list_item_t *)cache.loaded.head.next;
   while (item->node.next) {
     if ((strcmp(name, item->font->name) == 0) && (display == item->font->display))
@@ -499,7 +499,7 @@ static char *xitk_cache_recode(const char *text)
 /*
  *
  */
-xitk_font_t *xitk_font_load_font(Display *display, char *font) {
+xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
   xitk_font_t           *xtfs;
   xitk_font_list_item_t *list_item;
   
@@ -522,10 +522,10 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
     xtfs = (xitk_font_t *) xitk_xmalloc(sizeof(xitk_font_t));
 
     if(!xitk_font_load_one(display, font, xtfs)) {
-      char *fdname = xitk_get_default_font();
+      const char *fdname = xitk_get_default_font();
 
       if(!fdname || !xitk_font_load_one(display, fdname, xtfs)) {
-        char *fsname = xitk_get_system_font();
+        const char *fsname = xitk_get_system_font();
  	if(!xitk_font_load_one(display, fsname, xtfs)) {
 	  XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
 	  free(xtfs);
@@ -737,7 +737,7 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
-int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes) {
+int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes) {
 #ifndef WITH_XFT
   unsigned int  ch = (*c & 0xff);
   int           width;
@@ -822,7 +822,7 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
-int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes) {
+int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes) {
 # ifdef WITH_XMB
   mbstate_t state;
   size_t    n;
