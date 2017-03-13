@@ -226,7 +226,7 @@ static void setup_apply (xitk_widget_t *w, void *data) {
           ((type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) || (type & WIDGET_GROUP_INTBOX)) {
           xitk_widget_t *w = setup->wg[i]->widget;
           int            numval = 0;
-          char          *strval = NULL;
+          const char    *strval = NULL;
 
 	  if(!need_restart) {
             if (setup->wg[i]->changed && (!setup->wg[i]->cfg.callback_data && !setup->wg[i]->cfg.callback))

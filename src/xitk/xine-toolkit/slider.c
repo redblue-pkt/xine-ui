@@ -772,7 +772,7 @@ void xitk_slider_callback_exec(xitk_widget_t *w) {
  */
 static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
 					  xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
-					  int x, int y, char *skin_element_name,
+					  int x, int y, const char *skin_element_name,
 					  xitk_image_t *bg_skin, xitk_image_t *pad_skin,
 					  int stype, int radius, int visible, int enable) {
   xitk_widget_t           *mywidget;

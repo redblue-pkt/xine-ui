@@ -312,7 +312,7 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
 static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
 					    xitk_skin_config_t *skonfig, 
 					    xitk_checkbox_widget_t *cb, int x, int y, 
-					    char *skin_element_name, xitk_image_t *skin,
+                                            const char *skin_element_name, xitk_image_t *skin,
 					    int visible, int enable) {
   xitk_widget_t *mywidget;
   checkbox_private_data_t *private_data;

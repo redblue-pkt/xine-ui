@@ -66,8 +66,8 @@
 
 
 typedef struct {
-  char                      *name;
-  char                      *ending;
+  const char                *name;
+  const char                *ending;
 } filebrowser_filter_t;
 
 static const filebrowser_filter_t __fb_filters[] = {

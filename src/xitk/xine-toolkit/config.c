@@ -370,14 +370,14 @@ int xitk_config_get_cursors_feature(xitk_config_t *xtcf) {
   
   return (xtcf->features.cursors > 0) ? 1 : 0;
 }
-char *xitk_config_get_system_font(xitk_config_t *xtcf) {
+const char *xitk_config_get_system_font(xitk_config_t *xtcf) {
 
   if(!xtcf)
     return NULL;
   
   return xtcf->fonts.system;
 }
-char *xitk_config_get_default_font(xitk_config_t *xtcf) {
+const char *xitk_config_get_default_font(xitk_config_t *xtcf) {
 
   if(!xtcf)
     return NULL;
@@ -474,7 +474,7 @@ int xitk_config_get_menu_shortcuts_enability(xitk_config_t *xtcf) {
 xitk_config_t *xitk_config_init(void) {
   xitk_config_t *xtcf;
   char          *rcfile;
-  char          *user_rc = "xitkrc";
+  const char    *user_rc = "xitkrc";
 
   xtcf = (xitk_config_t *) xitk_xmalloc(sizeof(xitk_config_t));
   

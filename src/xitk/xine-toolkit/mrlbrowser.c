@@ -43,7 +43,10 @@
 
 #undef DEBUG_MRLB
 
-static const xitk_mrlbrowser_filter_t __mrl_filters[] = {
+static const struct {
+  const char *name;
+  const char *ending;
+} __mrl_filters[] = {
   { "All"                 , "*"            },
   { "*.vob"               , "vob"          }, /* mpeg block */
   { "*.mpv"               , "mpv"          }, /* elementary */
@@ -75,7 +78,7 @@ static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data,
   private_data->filters_num = 0;
 
   if(mrl_f == NULL) {
-    static const size_t len = sizeof(__mrl_filters) / sizeof(xitk_mrlbrowser_filter_t);
+    static const size_t len = sizeof(__mrl_filters) / sizeof(__mrl_filters[0]);
 
     private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * len);

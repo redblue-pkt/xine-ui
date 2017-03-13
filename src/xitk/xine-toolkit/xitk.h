@@ -864,7 +864,7 @@ void xitk_init(Display *display, XColor black, int verbosity);
 /*
  *
  */
-char *xitk_set_locale(void);
+const char *xitk_set_locale(void);
 
 /*
  *
@@ -913,8 +913,8 @@ void xitk_stop(void);
 /*
  * Some user settings values.
  */
-char *xitk_get_system_font(void);
-char *xitk_get_default_font(void);
+const char *xitk_get_system_font(void);
+const char *xitk_get_default_font(void);
 int xitk_get_xmb_enability(void);
 void xitk_set_xmb_enability(int value);
 int xitk_get_black_color(void);
@@ -1295,8 +1295,8 @@ int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, const char *, int, c
 /**
  * Return label of button 'widget'.
  */
-char *xitk_labelbutton_get_label(xitk_widget_t *);
-char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *);
+const char *xitk_labelbutton_get_label(xitk_widget_t *);
+const char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *);
 
 /**
  * Get state of button 'widget'.
@@ -1355,7 +1355,7 @@ int xitk_label_change_label(xitk_widget_t *l, const char *newlabel);
 /**
  * Get label.
  */
-char *xitk_label_get_label(xitk_widget_t *w);
+const char *xitk_label_get_label(xitk_widget_t *w);
 
 /*
  * *** Image
@@ -1704,17 +1704,17 @@ int xitk_skin_get_coord_y(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_label_color(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_label_color(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-char *xitk_skin_get_label_color_focus(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_label_color_focus(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-char *xitk_skin_get_label_color_click(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_label_color_click(xitk_skin_config_t *, const char *);
 
 /*
  *
@@ -1744,7 +1744,7 @@ int xitk_skin_get_label_alignment(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
 
 /*
  *
@@ -1759,12 +1759,12 @@ int xitk_skin_get_label_staticity(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
+const char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
 
 /*
  *
@@ -1779,12 +1779,12 @@ int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_logo(xitk_skin_config_t *);
+const char *xitk_skin_get_logo(xitk_skin_config_t *);
 
 /*
  *
  */
-char *xitk_skin_get_animation(xitk_skin_config_t *);
+const char *xitk_skin_get_animation(xitk_skin_config_t *);
 
 /*
  *
@@ -2389,7 +2389,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 
                                        int x, int y, int width, const char *fontname);
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
-char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
+const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);
 
 xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
