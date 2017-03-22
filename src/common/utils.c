@@ -35,6 +35,7 @@
 #include <xine/xineutils.h>
 
 #include "utils.h"
+#include "libcommon.h" /* strsep replacement */
 
 extern char **environ;
 

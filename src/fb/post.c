@@ -26,6 +26,7 @@
 
 #include "globals.h"
 #include "utils.h"
+#include "libcommon.h"  /* strsep replacement */
 
 typedef struct {
   xine_post_t                 *post;
