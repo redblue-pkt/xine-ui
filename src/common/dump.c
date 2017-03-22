@@ -32,12 +32,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#ifdef HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
+#endif
 
 #include "dump.h"
 #include "globals.h"
 
 void dump_host_info(void) {
+#ifdef HAVE_SYS_UTSNAME_H
   struct utsname uts;
 
   if((uname(&uts)) == -1) {
@@ -58,6 +61,7 @@ void dump_host_info(void) {
 #endif
 #endif
   }
+#endif
 }
 
 void dump_cpu_infos(void) {

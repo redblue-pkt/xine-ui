@@ -586,6 +586,7 @@ AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS([nanosleep])
 AC_REPLACE_FUNCS([getline getsubopt strlcat strlcpy strndup strsep])
 AC_CHECK_HEADERS(string.h strings.h linux/kd.h execinfo.h)
+AC_CHECK_HEADERS(sys/utsname.h)
 
 dnl
 dnl Check for clock_gettime() in librt
