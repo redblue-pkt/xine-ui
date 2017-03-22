@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libcommon.h"
+
 /* This function doesn't exist on most systems (this replacement is
    lifted from the libc sources. */
 #if !defined HAVE___STRCHRNUL && !defined _LIBC
