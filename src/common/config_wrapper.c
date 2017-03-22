@@ -32,6 +32,7 @@
 #include "config_wrapper.h"
 #include "utils.h"
 #include "globals.h"
+#include "libcommon.h" /* strsep replacement */
 
 /* 
  * experience level above this level 
