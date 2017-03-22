@@ -39,7 +39,7 @@ static ssize_t getdelims(char **lineptr, size_t *n, const char *delims, FILE *st
       *n += BLOCK_SIZE;
     }
     (*lineptr)[i++] = (unsigned char)c;
-    if (index(delims, c)) break;
+    if (strchr(delims, c)) break;
   }
   if (i != 0) (*lineptr)[i] = '\0';
 
