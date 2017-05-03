@@ -31,7 +31,7 @@ desktop_DATA = xine.desktop
 if XINE_LIST
 xine.desktop: xine.desktop.in @XINE_LIST@
 	$(AM_V_GEN)exec > $@; cat $<; \
-	@XINE_LIST@; \
+	@XINE_LIST@ | $(AM_V_at)perl -ne 'print join(";",sort(split(";")))' \
 	awk '{ printf "%s;", $$1 }' < $(srcdir)/mime.extra
 else
 XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
