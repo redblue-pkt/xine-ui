@@ -934,6 +934,7 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   if(speed != XINE_SPEED_PAUSE) {
     last_playback_speed = speed;
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+    panel_update_runtime_display ();
   }
   else {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, last_playback_speed);
@@ -1282,8 +1283,15 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   int speed = xine_get_param(gui->stream, XINE_PARAM_SPEED);
 
   if(((intptr_t)data) == GUI_NEXT) {
-    if(speed > XINE_SPEED_PAUSE)
+    if (speed > XINE_SPEED_PAUSE) {
       xine_set_param(gui->stream, XINE_PARAM_SPEED, (speed /= 2));
+    }
+#ifdef XINE_PARAM_VO_SINGLE_STEP
+    else {
+      xine_set_param (gui->stream, XINE_PARAM_VO_SINGLE_STEP, 1);
+      panel_update_runtime_display ();
+    }
+#endif
   }
   else if(((intptr_t)data) == GUI_PREV) {
     if(speed < XINE_SPEED_FAST_4) {

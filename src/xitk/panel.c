@@ -400,28 +400,26 @@ void panel_update_runtime_display(void) {
  */
 static __attribute__((noreturn)) void *slider_loop(void *dummy) {
   int screensaver_timer = 0;
-  int status, speed;
-  int pos, secs;
+  int lastmsecs = -1;
   int i = 0;
   
   while(gGui->on_quit == 0) {
 
     if(gGui->stream) {
       
-      status = xine_get_status(gGui->stream);
-      speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+      int status = xine_get_status (gGui->stream);
+      int speed  = xine_get_param (gGui->stream, XINE_PARAM_SPEED);
       
-      pos = 0;
+      int pos = 0, msecs = 0;
 
       if(status == XINE_STATUS_PLAY) {
-	if(gui_xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
-	  secs /= 1000;
+        if (gui_xine_get_pos_length (gGui->stream, &pos, &msecs, NULL)) {
 
 	  pthread_mutex_lock(&gGui->xe_mutex);
 
 	  if(gGui->playlist.num && gGui->playlist.cur >= 0 && gGui->playlist.mmk &&
 	     gGui->playlist.mmk[gGui->playlist.cur] && gGui->mmk.end != -1) {
-	    if(secs >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
+            if ((msecs / 1000) >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
 	      gGui->ignore_next = 0;
 	      gui_playlist_start_next();
 	      pthread_mutex_unlock(&gGui->xe_mutex);
@@ -459,7 +457,8 @@ static __attribute__((noreturn)) void *slider_loop(void *dummy) {
 	}
       }
       
-      if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
+      if ((status == XINE_STATUS_PLAY) &&
+        ((speed != XINE_SPEED_PAUSE) || (msecs != lastmsecs))) {
 	char *ident = stream_infos_get_ident_from_stream(gGui->stream);
 	
 	if(ident) {
@@ -535,6 +534,7 @@ static __attribute__((noreturn)) void *slider_loop(void *dummy) {
 
 	}
       }
+      lastmsecs = msecs;
     }
     
     if(gGui->cursor_visible) {
