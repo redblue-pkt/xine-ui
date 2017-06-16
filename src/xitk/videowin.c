@@ -152,6 +152,26 @@ static struct {
 
 } gVw;
 
+/* safe external actions */
+void video_window_lock (int lock_or_unlock) {
+  if (lock_or_unlock == 1)
+    pthread_mutex_lock (&gVw.mutex);
+  else if (lock_or_unlock == 0)
+    pthread_mutex_unlock (&gVw.mutex);
+}
+
+void video_window_set_transient_for (Window w) {
+  gGui_t *gui = gGui;
+  if (gui->use_root_window || (gui->video_display != gui->display))
+    return;
+  pthread_mutex_lock (&gVw.mutex);
+  XLockDisplay (gui->display);
+  XSetTransientForHint (gui->display, w, gui->video_window);
+  XUnlockDisplay (gui->display);
+  pthread_mutex_unlock (&gVw.mutex);
+}
+
+
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (void);
 static int  video_window_check_mag (void);
