@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2016 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -213,10 +213,9 @@ void panel_change_skins(int synthetic) {
   old_img = panel->bg_image;
   panel->bg_image = new_img;
 
-  XLockDisplay(gGui->display);
+  video_window_set_transient_for (gGui->panel_window);
 
-  if(!gGui->use_root_window && gGui->video_display == gGui->display)
-    XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
+  XLockDisplay(gGui->display);
 
   Imlib_destroy_image(gGui->imlib_data, old_img);
   Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
@@ -481,19 +480,20 @@ static __attribute__((noreturn)) void *slider_loop(void *dummy) {
 	else
 	  video_window_set_mrl((char *)gGui->mmk.mrl);
 	
-	if(!xitk_is_window_iconified(gGui->video_display, gGui->video_window)) {
-	  
-	  if(gGui->ssaver_timeout) {
-	    
-	    if(!(i % 2))
-	      screensaver_timer++;
-	    
-	    if(screensaver_timer >= gGui->ssaver_timeout) {
-	      screensaver_timer = video_window_reset_ssaver();
-	      
-	    }
-	  }  
-	}
+        {
+          int iconified;
+          video_window_lock (1);
+          iconified = xitk_is_window_iconified (gGui->video_display, gGui->video_window);
+          video_window_lock (0);
+          if (!iconified) {
+            if (gGui->ssaver_timeout) {
+              if (!(i % 2))
+                screensaver_timer++;
+              if (screensaver_timer >= gGui->ssaver_timeout)
+                screensaver_timer = video_window_reset_ssaver ();
+            }
+          }
+        }
 
 	if(gGui->logo_mode == 0) {
 	  
@@ -641,15 +641,41 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       else
 	XMapWindow(gGui->display, gGui->panel_window);
     }
-    
-    if(gGui->cursor_grabbed)
-      XGrabPointer(gGui->video_display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
-    
-    /* Give focus to video output window */
-    try_to_set_input_focus(gGui->video_window);
-    
+
     XUnlockDisplay(gGui->display);
-     
+
+    {
+      Window want;
+      int t;
+      video_window_lock (1);
+      want = gGui->video_window;
+      XLockDisplay (gGui->video_display);
+      if (gGui->cursor_grabbed)
+        XGrabPointer (gGui->video_display, want,
+          1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
+      if (video_window_is_visible ()) {
+        /* Give focus to video output window */
+        XSetInputFocus (gGui->video_display, want, RevertToParent, CurrentTime);
+        XSync (gGui->video_display, False);
+        XUnlockDisplay (gGui->video_display);
+        video_window_lock (0);
+        /* check after 5/15/30/50/75/105/140 ms */
+        for (t = 5000; t < 40000; t += 5000) {
+          Window got;
+          int revert;
+          xine_usec_sleep (t);
+          XLockDisplay (gGui->video_display);
+          XGetInputFocus (gGui->video_display, &got, &revert);
+          XUnlockDisplay (gGui->video_display);
+          if (got == want)
+            break;
+        }
+      } else {
+        XUnlockDisplay (gGui->video_display);
+        video_window_lock (0);
+      }
+    }
+
   }
   else {
 
@@ -661,9 +687,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XRaiseWindow(gGui->display, gGui->panel_window); 
     XMapWindow(gGui->display, gGui->panel_window); 
-    if(!gGui->use_root_window && gGui->video_display == gGui->display)
-      XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay (gGui->display);
+    video_window_set_transient_for (gGui->panel_window);
 
     wait_for_window_visible(gGui->display, gGui->panel_window);
     layer_above_video(gGui->panel_window);
@@ -1256,8 +1281,9 @@ void panel_init (void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  if(!gGui->use_root_window && gGui->video_display == gGui->display)
-    XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
+  XUnlockDisplay (gGui->display);
+  video_window_set_transient_for (gGui->panel_window);
+  XLockDisplay (gGui->display);
 
   /* 
    * set wm properties 

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a free video player.
  * 
@@ -94,5 +94,10 @@ void video_window_get_output_size(int *w, int *h);
 void video_window_set_mrl(char *mrl);
 
 void video_window_toggle_border(void);
+
+void video_window_set_transient_for (Window w);
+
+/* call this with 1 before and with 0 after accessing the video window directly */
+void video_window_lock (int lock_or_unlock);
 
 #endif

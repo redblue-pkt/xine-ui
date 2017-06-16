@@ -124,9 +124,8 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       XLockDisplay(gui->display);
       XRaiseWindow(gui->display, window);
       XMapWindow(gui->display, window);
-      if(!gui->use_root_window && gui->video_display == gui->display)
-        XSetTransientForHint (gui->display, window, gui->video_window);
       XUnlockDisplay(gui->display);
+      video_window_set_transient_for (window);
 
       wait_for_window_visible(gui->display, window);
       layer_above_video(window);
@@ -496,10 +495,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       free(buffer); free(v_info); free(a_info);
 
       XLockDisplay(gui->display);
-      if(!gui->use_root_window && gui->video_display == gui->display)
-	XSetTransientForHint(gui->display, xitk_window_get_window(xw), gui->video_window);
       XSync(gui->display, False);
       XUnlockDisplay(gui->display);
+      video_window_set_transient_for (xitk_window_get_window (xw));
       layer_above_video(xitk_window_get_window(xw));
       
       /* Doesn't work so well yet 
@@ -1198,10 +1196,8 @@ void gui_toggle_aspect(int aspect) {
   if (panel_is_visible())  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, gui->panel_window, gui->video_window);
     XUnlockDisplay(gui->display);
-    
+    video_window_set_transient_for (gui->panel_window);
   }
 }
 
@@ -1214,9 +1210,8 @@ void gui_toggle_interlaced(void) {
   if (panel_is_visible())  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, gui->panel_window, gui->video_window);
     XUnlockDisplay(gui->display);
+    video_window_set_transient_for (gui->panel_window);
   }
 }
 
@@ -2100,9 +2095,8 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
   if (panel_is_visible())  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, gui->panel_window, gui->video_window);
     XUnlockDisplay(gui->display);
+    video_window_set_transient_for (gui->panel_window);
   }
 }
 
@@ -2118,9 +2112,8 @@ void gui_reset_zoom(void) {
   if (panel_is_visible())  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, gui->panel_window, gui->video_window);
     XUnlockDisplay(gui->display);
+    video_window_set_transient_for (gui->panel_window);
   }
 }
 
