@@ -741,6 +741,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   
   xine_close(gui->stream);
   xine_close(gui->visual_anim.stream);
+  xine_close (gui->spu_stream);
 
   /* we are going to dispose this stream, so make sure slider_loop 
    * won't use it anymore (otherwise -> segfault on exit).
@@ -752,6 +753,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   xine_dispose(gui->stream);
   xine_dispose(gui->visual_anim.stream);
+  xine_dispose (gui->spu_stream);
 
   if(gui->vo_port)
     xine_close_video_driver(__xineui_global_xine_instance, gui->vo_port);
