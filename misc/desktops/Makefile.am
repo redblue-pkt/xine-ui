@@ -28,16 +28,20 @@ pixmap_DATA = xine.xpm
 desktopdir = $(datadir)/applications
 desktop_DATA = xine.desktop
 
+# xine input plugins dont tell their mime types yet, assume defaults.
+# fortunately, these sort well to the end of list.
+INPUT_MIME_TYPES = x-content/audio-cdda;x-content/video-dvd;x-content/video-svcd;x-content/video-vcd;
+
 if XINE_LIST
 xine.desktop: xine.desktop.in @XINE_LIST@
-	$(AM_V_GEN)exec > $@; cat $<; \
-	@XINE_LIST@ | $(AM_V_at)perl -ne 'print join(";",sort(split(";")))' \
-	awk '{ printf "%s;", $$1 }' < $(srcdir)/mime.extra
+	$(AM_V_GEN)cat $< > $@; \
+	@XINE_LIST@ | perl -ne 'print join(";",sort(split(";")))' >> $@; \
+	echo ';$(INPUT_MIME_TYPES)' >> $@
 else
 XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
 MIME = $(if $(shell test -f $(XINE_MIME) && echo y),$(XINE_MIME),$(srcdir)/mime.default)
-xine.desktop: xine.desktop.in $(MIME) $(srcdir)/mime.extra
-	$(AM_V_GEN)exec > $@; \
-	cat $<; \
-	cat $(MIME) $(srcdir)/mime.extra | awk '{ printf "%s;", $$1 }'
+xine.desktop: xine.desktop.in $(MIME)
+	$(AM_V_GEN)cat $< > $@; \
+	cat $(MIME) | awk '{ printf "%s;", $$1 }' >> $@; \
+	echo '$(INPUT_MIME_TYPES)' >> $@
 endif

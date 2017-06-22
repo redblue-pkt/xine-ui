@@ -7,4 +7,4 @@ Icon=xine
 Terminal=false
 Type=Application
 Categories=Application;AudioVideo;Player;
-MimeType=x-content/video-dvd;x-content/audio-cdda;x-content/video-vcd;x-content/video-svcd;
+MimeType=
