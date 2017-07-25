@@ -1,3 +1,12 @@
+xine-ui (0.99.10)
+  * Added manual video single step feature
+  * Show millisecond time in slow motion
+  * Updated spanish translation
+  * Make desktop file output reproducible
+  * Fixed memory and resource leaks
+  * Fixed deadlocks
+  * Fixed crashes
+
 xine-ui (0.99.9)
   * Handle building using libreadline 6.3 and libcaca 0.99 beta 19.
   * More shutdown fixes.
