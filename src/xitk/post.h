@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -34,6 +34,7 @@ void post_init(void);
 void post_rewire_visual_anim(void);
 int post_rewire_audio_port_to_stream(xine_stream_t *stream);
 int post_rewire_audio_post_to_stream(xine_stream_t *stream);
+void post_deinit (void);
 
 void vpplugin_end(void);
 int vpplugin_is_visible(void);
@@ -63,5 +64,6 @@ void applugin_reparent(void);
 
 void post_deinterlace_init(const char *deinterlace_post);
 void post_deinterlace(void);
+void post_deinterlace_deinit (void);
 
 #endif
