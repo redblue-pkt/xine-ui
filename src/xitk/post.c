@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2017 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -30,6 +30,7 @@
 
 #include "common.h"
 
+#define VFREE(vfp) do {memset (vfp, 0x55, sizeof (*(vfp))); free (vfp); } while (0)
 
 #undef TRACE_REWIRE
 
@@ -45,6 +46,8 @@
 #define HELP_WINDOW_HEIGHT  402
 
 #define MAX_DISPLAY_FILTERS 5
+/* It hardly makes any sense to use infinitely many filters. */
+#define MAX_USED_FILTERS    32
 
 #define MAX_DISP_ENTRIES    15
 #define BROWSER_LINE_WIDTH  55
@@ -96,11 +99,10 @@ typedef struct {
 
   char                      **plugin_names;
 
+  post_object_t              *post_objects[MAX_USED_FILTERS];
   int                         first_displayed;
-  post_object_t             **post_objects;
   int                         object_num;
 
-  xitk_widget_t              *new_filter;
   xitk_widget_t              *enable;
 
   int                         x, y;
@@ -155,7 +157,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   for(i = 0; i < gui->deinterlace_elements_num; i++) {
     xine_post_dispose(__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
     free(gui->deinterlace_elements[i]->name);
-    free(gui->deinterlace_elements[i]);
+    VFREE(gui->deinterlace_elements[i]);
   }
   
   SAFE_FREE(gui->deinterlace_elements);
@@ -839,7 +841,7 @@ static void _pplugin_destroy_only_obj(_pp_wrapper_t *pp_wrapper, post_object_t *
       _pplugin_destroy_widget(pp_wrapper, pobj->properties);
       pobj->properties = NULL;
       
-      free(pobj->param_data);
+      VFREE(pobj->param_data);
       pobj->param_data = NULL;
       
       if(pobj->properties_names) {
@@ -872,70 +874,6 @@ static void _pplugin_destroy_only_obj(_pp_wrapper_t *pp_wrapper, post_object_t *
       pobj->help = NULL;
     }
     
-  }
-}
-
-static void _pplugin_destroy_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
-  if(pobj) {
-    _pplugin_destroy_only_obj(pp_wrapper, pobj);
-    
-    if(pobj->post) {
-      xine_post_dispose(__xineui_global_xine_instance, pobj->post);
-      pobj->post = NULL;
-    }
-  }
-}
-
-static void _pplugin_destroy_base_obj(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
-  int i = 0;
-
-  while(pp_wrapper->pplugin->post_objects && (pp_wrapper->pplugin->post_objects[i] != pobj)) 
-    i++;
-  
-  if(pp_wrapper->pplugin->post_objects[i]) {
-    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->plugins);
-    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->frame);
-    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->up);
-    _pplugin_destroy_widget(pp_wrapper, pp_wrapper->pplugin->post_objects[i]->down);
-    
-    free(pp_wrapper->pplugin->post_objects[i]);
-    pp_wrapper->pplugin->post_objects[i] = NULL;
-    
-    pp_wrapper->pplugin->object_num--;
-    
-    pp_wrapper->pplugin->x = 15;
-    pp_wrapper->pplugin->y -= FRAME_HEIGHT + 4;
-  }
-}
-
-static void _pplugin_kill_filters_from(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
-  int             num = pp_wrapper->pplugin->object_num;
-  int             i = 0;
-  
-  while(pp_wrapper->pplugin->post_objects && (pp_wrapper->pplugin->post_objects[i] != pobj)) 
-    i++;
-  
-  _pplugin_destroy_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
-  
-  i++;
-  
-  if(pp_wrapper->pplugin->post_objects[i]) {
-
-    while(pp_wrapper->pplugin->post_objects[i]) {
-
-      _pplugin_destroy_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
-      
-      _pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
-
-      i++;
-    }
-  }
-
-  _pplugin_send_expose(pp_wrapper);
-
-  if(num != pp_wrapper->pplugin->object_num) {
-    pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
-    pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
   }
 }
 
@@ -1268,48 +1206,61 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
   }
 }
 
+static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper);
+
 static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int select) {
   gGui_t *gui = gGui;
   post_object_t *pobj = (post_object_t *) data;
+  post_object_t **p = pp_wrapper->pplugin->post_objects;
+  int n;
   
   _pplugin_unwire(pp_wrapper);
 
-  if(!select) {
-    _pplugin_kill_filters_from(pp_wrapper, pobj);
-    
-    if(_pplugin_is_first_filter(pp_wrapper, pobj)) {
-      if(xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
-	xitk_disable_widget(pp_wrapper->pplugin->new_filter);
+  for (n = 0; p[n] && (p[n] != pobj); n++) ;
+  if (!select) {
+    /* User selected first line which is "No filter". Reset this one, and kill everything thereafter. */
+    if (p[n]) {
+      _pplugin_destroy_only_obj (pp_wrapper, pobj);
+      if (pobj->post) {
+        xine_post_dispose (__xineui_global_xine_instance, pobj->post);
+        pobj->post = NULL;
+      }
+      n++;
+      pp_wrapper->pplugin->object_num = n;
+      while (p[n]) {
+        _pplugin_destroy_only_obj (pp_wrapper, p[n]);
+        if (p[n]->post) {
+          xine_post_dispose (__xineui_global_xine_instance, p[n]->post);
+          p[n]->post = NULL;
+        }
+        _pplugin_destroy_widget (pp_wrapper, p[n]->plugins);
+        _pplugin_destroy_widget (pp_wrapper, p[n]->frame);
+        _pplugin_destroy_widget (pp_wrapper, p[n]->up);
+        _pplugin_destroy_widget (pp_wrapper, p[n]->down);
+        VFREE (p[n]);
+        p[n] = NULL;
+        n++;
+      }
+      _pplugin_send_expose (pp_wrapper);
     }
-    else {
-      _pplugin_destroy_base_obj(pp_wrapper, pobj);
-      
-      pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 1));
-      pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = NULL;
-      
-      if(!xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
-	xitk_enable_widget(pp_wrapper->pplugin->new_filter);
-     
-    }
-
     if(pp_wrapper->pplugin->object_num <= MAX_DISPLAY_FILTERS)
       pp_wrapper->pplugin->first_displayed = 0;
     else if((pp_wrapper->pplugin->object_num - pp_wrapper->pplugin->first_displayed) < MAX_DISPLAY_FILTERS)
       pp_wrapper->pplugin->first_displayed = pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS;
-
-  }
-  else {
-    _pplugin_destroy_obj(pp_wrapper, pobj);
-
-    pobj->post = xine_post_init(__xineui_global_xine_instance, 
-				xitk_combo_get_current_entry_selected(w),
-				0, &gui->ao_port, &gui->vo_port);
-    
-    _pplugin_retrieve_parameters(pp_wrapper, pobj);
-
-    if(!xitk_is_widget_enabled(pp_wrapper->pplugin->new_filter))
-      xitk_enable_widget(pp_wrapper->pplugin->new_filter);
-
+  } else {
+    /* Some filter has been selected. Kill old one and set new. */
+    _pplugin_destroy_only_obj (pp_wrapper, pobj);
+    if (pobj->post) {
+      xine_post_dispose (__xineui_global_xine_instance, pobj->post);
+      pobj->post = NULL;
+    }
+    pobj->post = xine_post_init (__xineui_global_xine_instance,
+      xitk_combo_get_current_entry_selected (w), 0, &gui->ao_port, &gui->vo_port);
+    _pplugin_retrieve_parameters (pp_wrapper, pobj);
+    /* If this is the last filter, add a new "No filter" thereafter. */
+    if ((n < MAX_USED_FILTERS - 1) && (n + 1 == pp_wrapper->pplugin->object_num)) {
+      _pplugin_create_filter_object (pp_wrapper);
+    }
   }
   
   if(pp_wrapper->pplugin->help_running)
@@ -1375,25 +1326,26 @@ static void _applugin_move_down(xitk_widget_t *w, void *data) {
   _pplugin_move_down(&app_wrapper, w, data);
 }
 
-static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
+static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) {
   gGui_t *gui = gGui;
   xitk_combo_widget_t   cmb;
   post_object_t        *pobj;
   xitk_image_widget_t   im;
   xitk_image_t         *image;
   xitk_button_widget_t  b;
+
+  if (pp_wrapper->pplugin->object_num >= MAX_USED_FILTERS - 1)
+    return NULL;
+  pobj = calloc (1, sizeof (post_object_t));
+  if (!pobj)
+    return NULL;
   
   pp_wrapper->pplugin->x = 15;
   pp_wrapper->pplugin->y += FRAME_HEIGHT + 4;
   
-  xitk_disable_widget(pp_wrapper->pplugin->new_filter);
-
-  pp_wrapper->pplugin->post_objects = (post_object_t **) realloc(pp_wrapper->pplugin->post_objects, sizeof(post_object_t *) * (pp_wrapper->pplugin->object_num + 2));
-  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num + 1] = NULL;
-  
-  pobj = pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = (post_object_t *) calloc(1, sizeof(post_object_t));
-  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->x = pp_wrapper->pplugin->x;
-  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num]->y = pp_wrapper->pplugin->y;
+  pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num] = pobj;
+  pobj->x = pp_wrapper->pplugin->x;
+  pobj->y = pp_wrapper->pplugin->y;
   pp_wrapper->pplugin->object_num++;
 
   image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
@@ -1474,23 +1426,7 @@ static void _pplugin_create_filter_object(_pp_wrapper_t *pp_wrapper) {
       draw_arrow_down(gui->imlib_data, bimage);
 
   }
-}
-
-static void _pplugin_add_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
-  _pplugin_create_filter_object(pp_wrapper);
-
-  if(pp_wrapper->pplugin->object_num > MAX_DISPLAY_FILTERS)
-    pp_wrapper->pplugin->first_displayed = (pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS);
-
-  _pplugin_paint_widgets(pp_wrapper);
-}
-
-static void _vpplugin_add_filter(xitk_widget_t *w, void *data) {
-  _pplugin_add_filter(&vpp_wrapper, w, data);
-}
-
-static void _applugin_add_filter(xitk_widget_t *w, void *data) {
-  _pplugin_add_filter(&app_wrapper, w, data);
+  return pobj;
 }
 
 static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
@@ -1505,7 +1441,8 @@ static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
     if ((*pelem)->post->type == plugin_type) {
       num_filters++;
       
-      _pplugin_create_filter_object(pp_wrapper);
+      if (!_pplugin_create_filter_object (pp_wrapper))
+        break;
       pp_wrapper->pplugin->post_objects[pp_wrapper->pplugin->object_num - 1]->post = (*pelem)->post;
       
       while(pp_wrapper->pplugin->plugin_names[i] && strcasecmp(pp_wrapper->pplugin->plugin_names[i], (*pelem)->name))
@@ -1520,9 +1457,9 @@ static int _pplugin_rebuild_filters(_pp_wrapper_t *pp_wrapper) {
     
     pelem++;
   }
+  /* Always have 1 "No filter" at the end for later extension. */
+  _pplugin_create_filter_object (pp_wrapper);
   
-  xitk_enable_widget(pp_wrapper->pplugin->new_filter);
-
   _pplugin_paint_widgets(pp_wrapper);
 
   return num_filters;
@@ -1608,7 +1545,7 @@ static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
 	
 	for(j = 0; j < *_post_elements_num; j++) {
 	  free((*_post_elements)[j]->name);
-	  free((*_post_elements)[j]);
+	  VFREE((*_post_elements)[j]);
 	}
 	
 	*_post_elements = (post_element_t **) realloc(*_post_elements, sizeof(post_element_t *) * (post_num + 1));
@@ -1631,10 +1568,10 @@ static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
 	
 	for(j = 0; j < *_post_elements_num; j++) {
 	  free((*_post_elements)[j]->name);
-	  free((*_post_elements)[j]);
+	  VFREE((*_post_elements)[j]);
 	}
 	
-	free((*_post_elements)[j]);
+	/* free((*_post_elements)[j]); */
 	free(*_post_elements);
 
 	*_post_elements_num = 0;
@@ -1689,21 +1626,21 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
       WINDOW_INFO_ZERO(&wi);
     }
     
-    i = pp_wrapper->pplugin->object_num - 1;
-    if(i > 0) {
-
-      while(i > 0) {
-	_pplugin_destroy_only_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
-	_pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[i]);
-	free(pp_wrapper->pplugin->post_objects[i]);
-	i--;
+    {
+      post_object_t **p = pp_wrapper->pplugin->post_objects;
+      while (*p) {
+        _pplugin_destroy_only_obj (pp_wrapper, *p);
+        _pplugin_destroy_widget (pp_wrapper, (*p)->plugins);
+        _pplugin_destroy_widget (pp_wrapper, (*p)->frame);
+        _pplugin_destroy_widget (pp_wrapper, (*p)->up);
+        _pplugin_destroy_widget (pp_wrapper, (*p)->down);
+        VFREE (*p);
+        *p = NULL;
+        p++;
       }
-      
-      _pplugin_destroy_only_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[0]);
-      _pplugin_destroy_base_obj(pp_wrapper, pp_wrapper->pplugin->post_objects[0]);
-      free(pp_wrapper->pplugin->post_objects);
     }
-    
+    pp_wrapper->pplugin->object_num = 0;
+
     for(i = 0; pp_wrapper->pplugin->plugin_names[i]; i++)
       free(pp_wrapper->pplugin->plugin_names[i]);
     
@@ -1723,7 +1660,7 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     
     XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->widget_list);
    
-    free(pp_wrapper->pplugin);
+    VFREE(pp_wrapper->pplugin);
     pp_wrapper->pplugin = NULL;
 
     try_to_set_input_focus(gui->video_window);
@@ -2068,21 +2005,6 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
 
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("New Filter");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_add_filter : _applugin_add_filter; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pp_wrapper->pplugin->widget_list)), 
-   (pp_wrapper->pplugin->new_filter = xitk_noskin_labelbutton_create(pp_wrapper->pplugin->widget_list, 
-								     &lb, x, y, 100, 23,
-								     "Black", "Black", "White", btnfontname)));
-  xitk_show_widget(pp_wrapper->pplugin->new_filter);
-
-  x += (100 + 15);
-
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Enable");
   lb.align             = ALIGN_CENTER;
@@ -2135,10 +2057,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->x = 15;
   pp_wrapper->pplugin->y = 34 - (FRAME_HEIGHT + 4);
   
-  if((pp_wrapper == &vpp_wrapper) ? gui->post_video_elements : gui->post_audio_elements)
-    _pplugin_rebuild_filters(pp_wrapper);
-  else
-    _pplugin_add_filter(pp_wrapper, NULL, NULL);
+  _pplugin_rebuild_filters (pp_wrapper);
   
   xitk_window_change_background(gui->imlib_data, pp_wrapper->pplugin->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
@@ -2315,11 +2234,11 @@ static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const 
 	      free(pobj.properties_names);
 	    }
 	    
-	    free(pobj.param_data);
+	    VFREE(pobj.param_data);
 	  }
 	}
 	
-	free(plugin);
+	VFREE(plugin);
       }
     }
     free(post_chain);
@@ -2356,6 +2275,36 @@ static void pplugin_parse_and_store_post(_pp_wrapper_t *pp_wrapper, const char *
   }
 }
 
+void post_deinit (void) {
+  gGui_t *gui = gGui;
+  int i;
+
+#if 0
+  /* segfaults when video_out is already shut down */
+  if (gui->post_video_enable)
+    _vpplugin_unwire ();
+#endif
+  for (i = 0; i < gui->post_video_elements_num; i++) {
+    xine_post_dispose (__xineui_global_xine_instance, gui->post_video_elements[i]->post);
+    free (gui->post_video_elements[i]->name);
+    VFREE (gui->post_video_elements[i]);
+  }
+  SAFE_FREE (gui->post_video_elements);
+  gui->post_video_elements_num = 0;
+
+#if 0
+  if (gui->post_audio_enable)
+    _applugin_unwire ();
+#endif
+  for (i = 0; i < gui->post_audio_elements_num; i++) {
+    xine_post_dispose (__xineui_global_xine_instance, gui->post_audio_elements[i]->post);
+    free (gui->post_audio_elements[i]->name);
+    VFREE (gui->post_audio_elements[i]);
+  }
+  SAFE_FREE (gui->post_audio_elements);
+  gui->post_audio_elements_num = 0;
+}
+
 static char *_pplugin_get_default_deinterlacer(void) {
   return DEFAULT_DEINTERLACER;
 }
@@ -2383,6 +2332,27 @@ void post_deinterlace_init(const char *deinterlace_post) {
     gui->deinterlace_elements_num = num;
   }
   
+}
+
+void post_deinterlace_deinit (void) {
+  gGui_t *gui = gGui;
+  int i;
+#if 0
+  /* requires <xine/xine_internal.h> */
+  __xineui_global_xine_instance->config->unregister_callback (__xineui_global_xine_instance, "gui.deinterlace_plugin");
+#endif
+#if 0
+  if (gui->deinterlace_enable)
+    _vpplugin_unwire ();
+#endif
+  for (i = 0; i < gui->deinterlace_elements_num; i++) {
+    xine_post_dispose (__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
+    free (gui->deinterlace_elements[i]->name);
+    VFREE (gui->deinterlace_elements[i]);
+  }
+  
+  SAFE_FREE (gui->deinterlace_elements);
+  gui->deinterlace_elements_num = 0;
 }
 
 void post_deinterlace(void) {

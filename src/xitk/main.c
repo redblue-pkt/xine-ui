@@ -2307,6 +2307,9 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
+  post_deinit ();
+  post_deinterlace_deinit ();
+
   xine_event_dispose_queue(gui->event_queue);
   xine_event_dispose_queue(gui->visual_anim.event_queue);
 
@@ -2314,7 +2317,7 @@ int main(int argc, char *argv[]) {
 
   visual_anim_done();
   free(pplugins);
-  
+
   if(session_argv_num) {
     int i = 0;
     
