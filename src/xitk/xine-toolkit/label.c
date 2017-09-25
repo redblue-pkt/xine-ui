@@ -142,8 +142,8 @@ static void notify_destroy(xitk_widget_t *w) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
 
-    pthread_mutex_lock(&private_data->paint_mutex);
     pthread_mutex_lock(&private_data->change_mutex);
+    pthread_mutex_lock(&private_data->paint_mutex);
     
     if(private_data->anim_running) {
       void *dummy;
@@ -330,8 +330,8 @@ static void label_setup_label(xitk_widget_t *w, const char *label_) {
   size_t new_len;
   
   /* Inform animation thread to not paint the label */
-  pthread_mutex_lock(&private_data->paint_mutex);
   pthread_mutex_lock(&private_data->change_mutex);
+  pthread_mutex_lock(&private_data->paint_mutex);
   
   if(private_data->anim_running) {
     void *dummy;
