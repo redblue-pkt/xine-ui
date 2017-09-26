@@ -448,6 +448,10 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       send_ack(shdr);
       break;
 
+    default:
+      fprintf(stderr, "session: unknown command %d\n", shdr->hdr.command);
+      close(shdr->fd);
+      break;
     }
 
     SAFE_FREE(shdr->data);
