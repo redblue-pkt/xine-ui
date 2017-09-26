@@ -151,6 +151,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     xine_usec_sleep(10000);
   
   while(going) {
+    int res;
 
     FD_ZERO(&set);
     FD_SET(ctrl_fd, &set);
@@ -159,9 +160,19 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     tv.tv_usec = 100000;
 
     len = sizeof(saddr.un);
-    
-    if(((select(ctrl_fd + 1, &set, NULL, NULL, &tv)) <= 0) || 
-       ((fd = accept(ctrl_fd, &saddr.sa, &len)) == -1))
+
+    res = select(ctrl_fd + 1, &set, NULL, NULL, &tv);
+    if (res == 0)
+      continue;
+    if (res < 0) {
+      if (errno == EINTR || errno == EAGAIN)
+        continue;
+      fprintf(stderr, "ctrlsocket_func(): select failed: %s (%d)\n", strerror(errno), errno);
+      break;
+    }
+
+    fd = accept(ctrl_fd, &saddr.sa, &len);
+    if (fd < 0)
       continue;
 
     if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) {
