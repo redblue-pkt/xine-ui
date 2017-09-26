@@ -180,12 +180,25 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     }
 
     shdr = (serv_header_packet_t *) calloc(1, sizeof(serv_header_packet_t));
+    if (!shdr) {
+      close(fd);
+      continue;
+    }
 
-    (void) read(fd, &(shdr->hdr), sizeof(ctrl_header_packet_t));
-    
+    if (read(fd, &(shdr->hdr), sizeof(ctrl_header_packet_t)) != (ssize_t)sizeof(ctrl_header_packet_t)) {
+      SAFE_FREE(shdr);
+      close(fd);
+      continue;
+    }
+
     if(shdr->hdr.data_length) {
       shdr->data = malloc(shdr->hdr.data_length);
-      read(fd, shdr->data, shdr->hdr.data_length);
+      if (read(fd, shdr->data, shdr->hdr.data_length) != (ssize_t)shdr->hdr.data_length) {
+        SAFE_FREE(shdr->data);
+        SAFE_FREE(shdr);
+        close(fd);
+        continue;
+      }
     }
 
     shdr->fd = fd;
