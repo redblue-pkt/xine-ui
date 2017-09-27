@@ -49,7 +49,7 @@ static const union {         /* CLUT == Color LookUp Table */
     uint8_t foo   : 8;
   } u8;
   uint32_t u32;
-} __attribute__ ((packed)) textpalettes_color[] = {
+} __attribute__ ((packed)) textpalettes_color[OVL_PALETTE_SIZE] = {
   /* white, no border, translucid */
     CLUT_Y_CR_CB_INIT(0x00, 0x00, 0x00), //0
     CLUT_Y_CR_CB_INIT(0x60, 0x80, 0x80), //1
@@ -76,7 +76,7 @@ static const union {         /* CLUT == Color LookUp Table */
     CLUT_Y_CR_CB_INIT(0xff, 0x90, 0x00), //10
 };
 
-static const uint8_t textpalettes_trans[] = {
+static const uint8_t textpalettes_trans[OVL_PALETTE_SIZE] = {
   /* white, no border, translucid */
   0, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15,
   /* yellow, black border, transparent */
