@@ -750,20 +750,33 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   if(gui->visual_anim.post_output_element.post)
     xine_post_dispose(__xineui_global_xine_instance, gui->visual_anim.post_output_element.post);
+  gui->visual_anim.post_output_element.post = NULL;
+
+  /* unwire post plugins before closing streams */
+  post_deinit ();
+  post_deinterlace_deinit ();
+
+  /* shut down event queue threads */
+  xine_event_dispose_queue(gui->event_queue);
+  xine_event_dispose_queue(gui->visual_anim.event_queue);
+  gui->event_queue = gui->visual_anim.event_queue = NULL;
 
   xine_dispose(gui->stream);
   xine_dispose(gui->visual_anim.stream);
   xine_dispose (gui->spu_stream);
+  gui->stream = gui->visual_anim.stream = gui->spu_stream = NULL;
 
   if(gui->vo_port)
     xine_close_video_driver(__xineui_global_xine_instance, gui->vo_port);
   if(gui->vo_none)
     xine_close_video_driver(__xineui_global_xine_instance, gui->vo_none);
+  gui->vo_port = gui->vo_none = NULL;
 
   if(gui->ao_port)
     xine_close_audio_driver(__xineui_global_xine_instance, gui->ao_port);
   if(gui->ao_none)
     xine_close_audio_driver(__xineui_global_xine_instance, gui->ao_none);
+  gui->ao_port = gui->ao_none = NULL;
 
   video_window_exit();
 

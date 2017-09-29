@@ -2307,12 +2307,6 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
-  post_deinit ();
-  post_deinterlace_deinit ();
-
-  xine_event_dispose_queue(gui->event_queue);
-  xine_event_dispose_queue(gui->visual_anim.event_queue);
-
   xine_exit(__xineui_global_xine_instance); 
 
   visual_anim_done();
