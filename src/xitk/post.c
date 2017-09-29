@@ -286,19 +286,25 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
 static void _vpplugin_unwire(void) {
   gGui_t *gui = gGui;
   xine_post_out_t  *vo_source;
-  
-  vo_source = xine_get_video_source(gui->stream);
 
-  (void) xine_post_wire_video_port(vo_source, gui->vo_port);
+  if (gui->stream) {
+    vo_source = xine_get_video_source(gui->stream);
+
+    if (gui->vo_port)
+      (void) xine_post_wire_video_port(vo_source, gui->vo_port);
+  }
 }
 
 static void _applugin_unwire(void) {
   gGui_t *gui = gGui;
   xine_post_out_t  *ao_source;
-  
-  ao_source = xine_get_audio_source(gui->stream);
 
-  (void) xine_post_wire_audio_port(ao_source, gui->ao_port);
+  if (gui->stream) {
+    ao_source = xine_get_audio_source(gui->stream);
+
+    if (gui->ao_port)
+      (void) xine_post_wire_audio_port(ao_source, gui->ao_port);
+  }
 }
 
 static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper) {
@@ -2279,11 +2285,9 @@ void post_deinit (void) {
   gGui_t *gui = gGui;
   int i;
 
-#if 0
-  /* segfaults when video_out is already shut down */
   if (gui->post_video_enable)
     _vpplugin_unwire ();
-#endif
+
   for (i = 0; i < gui->post_video_elements_num; i++) {
     xine_post_dispose (__xineui_global_xine_instance, gui->post_video_elements[i]->post);
     free (gui->post_video_elements[i]->name);
@@ -2292,10 +2296,10 @@ void post_deinit (void) {
   SAFE_FREE (gui->post_video_elements);
   gui->post_video_elements_num = 0;
 
-#if 0
+
   if (gui->post_audio_enable)
     _applugin_unwire ();
-#endif
+
   for (i = 0; i < gui->post_audio_elements_num; i++) {
     xine_post_dispose (__xineui_global_xine_instance, gui->post_audio_elements[i]->post);
     free (gui->post_audio_elements[i]->name);
@@ -2341,10 +2345,10 @@ void post_deinterlace_deinit (void) {
   /* requires <xine/xine_internal.h> */
   __xineui_global_xine_instance->config->unregister_callback (__xineui_global_xine_instance, "gui.deinterlace_plugin");
 #endif
-#if 0
+
   if (gui->deinterlace_enable)
     _vpplugin_unwire ();
-#endif
+
   for (i = 0; i < gui->deinterlace_elements_num; i++) {
     xine_post_dispose (__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
     free (gui->deinterlace_elements[i]->name);
