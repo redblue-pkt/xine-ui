@@ -2318,6 +2318,15 @@ int main(int argc, char *argv[]) {
   visual_anim_done();
   free(pplugins);
 
+  XLockDisplay(gui->display);
+  XUnlockDisplay(gui->display);
+  XCloseDisplay(gui->display);
+  if( gui->video_display != gui->display ) {
+    XLockDisplay(gui->video_display);
+    XUnlockDisplay(gui->video_display);
+    XCloseDisplay(gui->video_display);
+  }
+
   if(session_argv_num) {
     int i = 0;
     
