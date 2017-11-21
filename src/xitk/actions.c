@@ -694,6 +694,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
   
   gui->on_quit = 1;
 
+  /* shut down event queue threads */
+  /* do it first, events access gui elements ... */
+  xine_event_dispose_queue(gui->event_queue);
+  xine_event_dispose_queue(gui->visual_anim.event_queue);
+  gui->event_queue = gui->visual_anim.event_queue = NULL;
+
   gui_deinit();
 
   panel_deinit();
@@ -755,11 +761,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
   /* unwire post plugins before closing streams */
   post_deinit ();
   post_deinterlace_deinit ();
-
-  /* shut down event queue threads */
-  xine_event_dispose_queue(gui->event_queue);
-  xine_event_dispose_queue(gui->visual_anim.event_queue);
-  gui->event_queue = gui->visual_anim.event_queue = NULL;
 
   xine_dispose(gui->stream);
   xine_dispose(gui->visual_anim.stream);
