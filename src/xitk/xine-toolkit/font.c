@@ -59,6 +59,7 @@ typedef struct {
   pthread_mutex_t          mutex;      /* protecting mutex */
   xitk_font_cache_item_t   items[XITK_CACHE_SIZE]; /* cache */
 
+  pthread_mutex_t          xr_mutex;   /* protecting mutex */
   xitk_recode_t           *xr;         /* text recoding */
 } xitk_font_cache_t;
 
@@ -250,6 +251,7 @@ void xitk_font_cache_init(void) {
   cache.loaded = xitk_list_new();	
 
   pthread_mutex_init(&cache.mutex, NULL);
+  pthread_mutex_init(&cache.xr_mutex, NULL);
   
 #ifdef WITH_XFT
   cache.xr = xitk_recode_init(NULL, "UTF-8");
@@ -291,6 +293,7 @@ void xitk_font_cache_done(void) {
 
   xitk_list_free(cache.loaded);
   pthread_mutex_destroy(&cache.mutex);
+  pthread_mutex_destroy(&cache.xr_mutex);
 
   xitk_recode_done(cache.xr);
 }
@@ -491,6 +494,16 @@ static xitk_font_list_item_t *cache_get_from_list(Display *display, char *name) 
   return NULL;
 }
 
+static char *xitk_cache_recode(const char *text)
+{
+  char *result;
+  pthread_mutex_lock(&cache.xr_mutex);
+  result = xitk_recode(cache.xr, text);
+  pthread_mutex_unlock(&cache.xr_mutex);
+  return result;
+}
+
+
 /*
  *
  */
@@ -626,7 +639,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
     XRenderColor  xr_color;
     XftColor      xcolor;
     XftDraw      *xft_draw;
-    char         *encoded_text = xitk_recode(cache.xr, text);
+    char         *encoded_text = xitk_cache_recode(text);
 
     XGetGCValues(xtfs->display, gc, GCForeground, &gc_color);
     paint_color.pixel = gc_color.foreground;
@@ -886,7 +899,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 
   foo_text = strdup(c);
   foo_text[nbytes] = '\0';
-  encoded_text = xitk_recode(cache.xr, foo_text);
+  encoded_text = xitk_cache_recode(foo_text);
   nbytes = strlen(encoded_text);
   free(foo_text);
   
