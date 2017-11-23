@@ -2342,5 +2342,14 @@ int main(int argc, char *argv[]) {
 
   free_command_line_args(&_argv, _argc);
 
+  {
+    int ii;
+    for (ii = 0; video_driver_ids[ii]; ii++)
+      free(video_driver_ids[ii]);
+    free(video_driver_ids);
+    for (ii = 0; audio_driver_ids[ii]; ii++)
+      free(audio_driver_ids[ii]);
+    free(audio_driver_ids);
+  }
   return retval;
 }
