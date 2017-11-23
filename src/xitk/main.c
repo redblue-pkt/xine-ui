@@ -2307,11 +2307,16 @@ int main(int argc, char *argv[]) {
 
   gui_run(session_argv);
 
-  xine_exit(__xineui_global_xine_instance); 
-
-  visual_anim_done();
-  free(pplugins);
-
+  /*
+   * Close X display before unloading modules linked against libGL.so
+   * https://www.xfree86.org/4.3.0/DRI11.html
+   *
+   * Do not close the library with dlclose() until after XCloseDisplay() has
+   * been called. When libGL.so initializes itself it registers several
+   * callbacks functions with Xlib. When XCloseDisplay() is called those
+   * callback functions are called. If libGL.so has already been unloaded
+   * with dlclose() this will cause a segmentation fault.
+   */
   XLockDisplay(gui->display);
   XUnlockDisplay(gui->display);
   XCloseDisplay(gui->display);
@@ -2320,6 +2325,11 @@ int main(int argc, char *argv[]) {
     XUnlockDisplay(gui->video_display);
     XCloseDisplay(gui->video_display);
   }
+
+  xine_exit(__xineui_global_xine_instance);
+
+  visual_anim_done();
+  free(pplugins);
 
   if(session_argv_num) {
     int i = 0;
