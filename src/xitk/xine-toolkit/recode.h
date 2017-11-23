@@ -40,6 +40,8 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
 
 /**
  * recode string 'src' into 'dst' according to prepared 'xr'
+ *
+ * NOTE: this function is MT-Safe only if callers arrange for mutual exclusion on the xr argument.
  */
 char *xitk_recode(xitk_recode_t *xr, const char *src);
 
