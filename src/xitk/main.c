@@ -1018,7 +1018,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   
   gettimeofday (&tv, NULL);
   
-  if(abs(tv.tv_sec - event->tv.tv_sec) > 3) {
+  if(labs(tv.tv_sec - event->tv.tv_sec) > 3) {
     fprintf(stderr, "Event too old, discarding\n");
     return;
   }
