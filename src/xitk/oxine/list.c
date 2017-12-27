@@ -19,6 +19,8 @@
  * based upon xine_list functions of the xine project
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
