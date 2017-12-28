@@ -1,5 +1,3 @@
-include $(top_srcdir)/misc/Makefile.quiet
-
 SUBDIRS = desktops visuals
 
 # splash-foo/manifest contains names of extra source files, distributed only.
