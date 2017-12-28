@@ -1,5 +1,3 @@
-include $(top_srcdir)/misc/Makefile.quiet
-
 if HAVE_X11
 imlib_lib = libImlib-light.a
 endif

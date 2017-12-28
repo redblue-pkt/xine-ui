@@ -1,5 +1,3 @@
-include $(top_srcdir)/misc/Makefile.quiet
-
 SUBDIRS = data
 
 AM_CPPFLAGS += -I$(top_srcdir)/src/xitk

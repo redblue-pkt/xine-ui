@@ -1,5 +1,3 @@
-include $(top_srcdir)/misc/Makefile.quiet
-
 EXTRA_DIST = $(pixmap_DATA) xine.wmconfig \
 	xine.desktop.in \
 	mime.default \

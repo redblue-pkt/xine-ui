@@ -1,4 +1,3 @@
-include $(top_srcdir)/misc/Makefile.quiet
 include $(top_srcdir)/src/common/Makefile.common
 
 AM_CFLAGS = @XINE_CFLAGS@
