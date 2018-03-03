@@ -799,7 +799,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
       if(strlen(buf) > 1) { /* not '/' directory */
 	  
 	p = &buf[strlen(buf)-1];
-	while(*p && *p != '/') {
+        while(*p && *p != '/' && p > buf) {
 	  *p = '\0';
 	    p--;
 	}
