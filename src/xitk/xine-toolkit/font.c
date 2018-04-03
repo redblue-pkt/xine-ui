@@ -884,7 +884,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     
 #ifdef DEBUG
   if ((size_t)nbytes > strlen(c) + 1) {
-    XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
+    XITK_WARNING("extent: %d > %zu\n", nbytes, strlen(c));
   }
 #endif
 
