@@ -636,6 +636,7 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
     
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data->skin_element_name_ip);
+    XITK_FREE(private_data->last_mrl_source);
     XITK_FREE(private_data->mc);
     XITK_FREE(private_data);
 
