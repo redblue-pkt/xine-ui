@@ -374,7 +374,7 @@ if test "x$with_caca" != "xno"; then
    if test "x$with_caca" = "xyes" && test "x$have_caca" = "xno"; then
       AC_MSG_ERROR([CACA support requested, but libcaca 0.99 not found])
    fi
-   if test test "x$have_caca" = "xyes"; then
+   if test "x$have_caca" = "xyes"; then
      AM_DL()
    fi
    AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h> 
