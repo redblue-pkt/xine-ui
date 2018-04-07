@@ -71,7 +71,6 @@
  * global variables
  */
 gGui_t                       *gGui;
-extern _panel_t              *panel;
 
 static char                 **video_driver_ids;
 static char                 **audio_driver_ids;
@@ -1271,10 +1270,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       gui->mixer.volume_level = (aevent->left + aevent->right) / 2;
       if(gui->mixer.method == SOUND_CARD_MIXER) {
 	gui->mixer.mute = aevent->mute;
-	if (panel) {
-	  xitk_slider_set_pos(panel->mixer.slider, gui->mixer.volume_level);
-	  xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
-	}
+        panel_update_mixer_display();
       }
     }
     break;
@@ -1288,10 +1284,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       gui->mixer.amp_level = (aevent->left + aevent->right) / 2;
       if(gui->mixer.method == SOFTWARE_MIXER) {
 	gui->mixer.mute = aevent->mute;
-	if (panel) {
-	  xitk_slider_set_pos(panel->mixer.slider, gui->mixer.amp_level);
-	  xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
-        }
+        panel_update_mixer_display();
       }
     }
     break;

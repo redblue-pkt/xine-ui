@@ -24,63 +24,7 @@
 #ifndef PANEL_H
 #define PANEL_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <pthread.h>
-
 #include "xitk.h"
-
-typedef struct {
-  xitk_widget_list_t   *widget_list;
-  
-  int                   x;
-  int                   y;
-  int                   skin_on_change;
-
-  xitk_widget_t        *title_label;
-  xitk_widget_t        *runtime_label;
-  int                   runtime_mode;
-
-  struct {
-    int                 enabled;
-    xitk_widget_t      *prev;
-    xitk_widget_t      *stop;
-    xitk_widget_t      *play;
-    xitk_widget_t      *pause;
-    xitk_widget_t      *next;
-    xitk_widget_t      *eject;
-    xitk_widget_t      *slider_play;
-  } playback_widgets;
-  
-  struct {
-    xitk_widget_t      *slider;
-    xitk_widget_t      *mute;
-  } mixer;
-  
-  struct {
-    int                 enable;
-    unsigned long       timeout;
-  } tips;
-  
-  int                   visible;
-  char                  runtime[20];
-  xitk_widget_t        *audiochan_label;
-  xitk_widget_t        *autoplay_plugins[64];
-  xitk_widget_t        *spuid_label;
-  ImlibImage           *bg_image;
-  xitk_register_key_t   widget_key;
-  pthread_t             slider_thread;
-
-#ifdef PANEL_PRIVATE
-  /* private vars to avoid useless updates */
-  unsigned int          shown_time;
-  unsigned int          shown_length;
-#endif
-  
-} _panel_t;
-
 
 void panel_update_nextprev_tips(void);
 int is_playback_widgets_enabled(void);
@@ -92,6 +36,8 @@ unsigned long panel_get_tips_timeout(void);
 
 void panel_deinit(void);
 void panel_init (void);
+
+void panel_paint(void);
 
 void panel_change_skins(int);
 
@@ -117,11 +63,15 @@ void panel_reset_runtime_label(void);
 
 void panel_reset_slider (void);
 
+void panel_update_slider(int pos);
+
 void panel_update_channel_display (void);
 
 void panel_update_runtime_display(void);
 
 void panel_update_mrl_display (void);
+
+void panel_update_mixer_display(void);
 
 void panel_set_title(char*);
 

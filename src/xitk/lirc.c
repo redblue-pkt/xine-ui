@@ -40,8 +40,6 @@
 #endif
 
 
-extern _panel_t        *panel;
-
 static struct {
   struct lirc_config   *config;
   int                   fd;
@@ -120,7 +118,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
       
       if(panel_is_visible()) {
 	XLockDisplay(gGui->display);
-	xitk_paint_widget_list (panel->widget_list);
+        panel_paint();
 	XUnlockDisplay(gGui->display);
       }
       

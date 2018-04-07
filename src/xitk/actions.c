@@ -40,7 +40,6 @@
 #include "common.h"
 #include "oxine/oxine.h"
 
-extern _panel_t        *panel;
 filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
@@ -1389,8 +1388,8 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
     pthread_mutex_lock(&new_pos_mutex);
     opos = gui->new_pos;
     pthread_mutex_unlock(&new_pos_mutex);
-    
-    xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+
+    panel_update_slider(pos);
     osd_stream_position(pos);
     
     (void) gui_xine_play(gui->stream, pos, 0, update_mmk);
@@ -2029,8 +2028,7 @@ void change_amp_vol(int value) {
     value = 200;
   gui->mixer.amp_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gui->mixer.amp_level);
-  if(gui->mixer.method == SOFTWARE_MIXER)
-    xitk_slider_set_pos(panel->mixer.slider, gui->mixer.amp_level);
+  panel_update_mixer_display();
   osd_draw_bar(_("Amplification Level"), 0, 200, gui->mixer.amp_level, OSD_BAR_STEPPER);
 }
 void gui_increase_amp_level(void) {
@@ -2053,7 +2051,7 @@ void change_audio_vol(int value) {
     value = 100;
   gui->mixer.volume_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-  xitk_slider_set_pos(panel->mixer.slider, gui->mixer.volume_level);
+  panel_update_mixer_display();
   osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
 }
 void gui_increase_audio_volume(void) {
