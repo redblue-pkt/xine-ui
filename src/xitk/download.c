@@ -58,7 +58,7 @@ static int progress_callback(void *userdata,
   return download->status;
 }
 
-static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
+static size_t store_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
   download_t  *download = (download_t *) userdata;
   int         rsize = size * nmemb;
 
@@ -88,7 +88,7 @@ int network_download(const char *url, download_t *download) {
   curl_global_init(CURL_GLOBAL_DEFAULT);
   
   if((curl = curl_easy_init()) != NULL) {
-    char error_buffer[CURL_ERROR_SIZE + 1];
+    char error_buffer[CURL_ERROR_SIZE];
     char user_agent[256];
     
     memset(&error_buffer, 0, sizeof(error_buffer));
@@ -118,9 +118,10 @@ int network_download(const char *url, download_t *download) {
     curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
     curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, (void *)download);
     
-    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error_buffer);
     
     if(curl_easy_perform(curl)) {
+      error_buffer[sizeof(error_buffer) - 1] = 0;
       download->error = strdup((strlen(error_buffer)) ? error_buffer : "Unknown error");
       download->status = 1;
     }
