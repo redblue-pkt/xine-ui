@@ -50,8 +50,6 @@
 /*
  * global variables
  */
-extern _panel_t        *panel;
-
 static pid_t            xine_pid;
 
 /* Icon data */
@@ -251,25 +249,10 @@ static void exp_level_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 static void audio_mixer_method_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
-  int max = 100, vol = 0;
-  
-  gui->mixer.method = cfg->num_value;
-
-  switch(gui->mixer.method) {
-  case SOUND_CARD_MIXER:
-    max = 100;
-    vol = gui->mixer.volume_level;
-    break;
-  case SOFTWARE_MIXER:
-    max = 200;
-    vol = gui->mixer.amp_level;
-    break;
-  }
-
-  xitk_slider_set_max(panel->mixer.slider, max);
-  xitk_slider_set_pos(panel->mixer.slider, vol);
+  gGui->mixer.method = cfg->num_value;
+  panel_update_mixer_display();
 }
+
 static void shortcut_style_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = gGui;
   gui->shortcut_style = cfg->num_value;

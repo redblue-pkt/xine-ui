@@ -29,9 +29,54 @@
 #include <string.h>
 #include <pthread.h>
 
-#define PANEL_PRIVATE
 #include "common.h"
 
+typedef struct {
+  xitk_widget_list_t   *widget_list;
+
+  int                   x;
+  int                   y;
+  int                   skin_on_change;
+
+  xitk_widget_t        *title_label;
+  xitk_widget_t        *runtime_label;
+  int                   runtime_mode;
+
+  struct {
+    int                 enabled;
+    xitk_widget_t      *prev;
+    xitk_widget_t      *stop;
+    xitk_widget_t      *play;
+    xitk_widget_t      *pause;
+    xitk_widget_t      *next;
+    xitk_widget_t      *eject;
+    xitk_widget_t      *slider_play;
+  } playback_widgets;
+
+  struct {
+    xitk_widget_t      *slider;
+    xitk_widget_t      *mute;
+  } mixer;
+
+  struct {
+    int                 enable;
+    unsigned long       timeout;
+  } tips;
+
+  int                   visible;
+  char                  runtime[20];
+  xitk_widget_t        *audiochan_label;
+  xitk_widget_t        *autoplay_plugins[64];
+  xitk_widget_t        *spuid_label;
+  ImlibImage           *bg_image;
+  xitk_register_key_t   widget_key;
+  pthread_t             slider_thread;
+
+  /* private vars to avoid useless updates */
+  unsigned int          shown_time;
+  unsigned int          shown_length;
+
+} _panel_t;
 
 _panel_t          *panel = NULL;
 
@@ -796,6 +841,10 @@ void panel_reset_slider (void) {
   panel_reset_runtime_label();
 }
 
+void panel_update_slider (int pos) {
+  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+}
+
 /*
  * Update audio/spu channel displayed informations.
  */
@@ -875,6 +924,28 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
  */
 void panel_update_mrl_display (void) {
   panel_set_title((gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
+}
+
+void panel_update_mixer_display(void) {
+  if (panel) {
+    gGui_t *gui = gGui;
+    int max = 100, vol = 0;
+
+    switch(gui->mixer.method) {
+    case SOUND_CARD_MIXER:
+      max = 100;
+      vol = gui->mixer.volume_level;
+      break;
+    case SOFTWARE_MIXER:
+      max = 200;
+      vol = gui->mixer.amp_level;
+      break;
+    }
+
+    xitk_slider_set_max(panel->mixer.slider, max);
+    xitk_slider_set_pos(panel->mixer.slider, vol);
+    xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
+  }
 }
 
 /*
@@ -1129,6 +1200,11 @@ void panel_deinit(void) {
   if(panel_is_visible())
     _panel_toggle_visibility(NULL, NULL);
   panel_exit(NULL, NULL);
+}
+
+void panel_paint(void) {
+  if (panel_is_visible())
+    xitk_paint_widget_list (panel->widget_list);
 }
 
 void panel_reparent(void) {

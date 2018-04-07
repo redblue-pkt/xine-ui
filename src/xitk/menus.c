@@ -26,8 +26,6 @@
 
 #include "common.h"
 
-extern _panel_t                *panel;
-
 #define PLAYB_PLAY              1
 #define PLAYB_STOP              2
 #define PLAYB_PAUSE             3
@@ -280,7 +278,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 	gui->mixer.volume_level = 100;
       
       xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-      xitk_slider_set_pos(panel->mixer.slider, gui->mixer.volume_level);
+      panel_update_mixer_display();
       osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
     }
     break;
@@ -294,7 +292,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 	gui->mixer.volume_level = 0;
 
       xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-      xitk_slider_set_pos(panel->mixer.slider, gui->mixer.volume_level);
+      panel_update_mixer_display();
       osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
     }
     break;

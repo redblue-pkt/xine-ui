@@ -35,8 +35,6 @@
 
 #define DEBUG_STDCTL 0
 
-extern _panel_t        *panel;
-
 static struct {
   int                   fd;
   pthread_t             thread;
@@ -142,8 +140,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	}
       }
 
-      if(panel_is_visible())
-	xitk_paint_widget_list (panel->widget_list);
+      panel_paint();
 
       if(len <= 0) {
 	gui_execute_action_id(ACTID_QUIT);
