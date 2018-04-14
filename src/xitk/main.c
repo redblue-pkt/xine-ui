@@ -515,6 +515,7 @@ static void list_plugins(char *type) {
   
   xine = xine_new();
   xine_config_load(xine, configfile);
+  free(configfile);
   xine_init(xine);
 
   show_version();
@@ -579,6 +580,7 @@ static void show_usage (void) {
   
   xine = xine_new();
   xine_config_load(xine, configfile);
+  free(configfile);
   xine_init(xine);
   
   printf("\n");
