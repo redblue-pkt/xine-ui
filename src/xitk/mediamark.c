@@ -91,8 +91,11 @@ static char *_download_file(const char *filename, int *size) {
   
   if((network_download(filename, download))) {
     *size = download->size;
-    buf = (char *) malloc(*size);
-    memcpy(buf, download->buf, *size);
+    buf = (char *) malloc(*size + 1);
+    if (buf) {
+      memcpy(buf, download->buf, *size);
+      buf[*size] = 0;
+    }
   }
   else
     xine_error("Unable to download '%s': %s", filename, download->error);
