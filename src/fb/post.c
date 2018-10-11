@@ -30,9 +30,9 @@
 
 typedef struct {
   xine_post_t                 *post;
-  xine_post_api_t             *api;
-  xine_post_api_descr_t       *descr;
-  xine_post_api_parameter_t   *param;
+  const xine_post_api_t             *api;
+  const xine_post_api_descr_t       *descr;
+  const xine_post_api_parameter_t   *param;
   char                        *param_data;
 
   int                          x;
@@ -45,12 +45,12 @@ typedef struct {
 
 
 static int __pplugin_retrieve_parameters(post_object_t *pobj) {
-  xine_post_in_t             *input_api;
+  const xine_post_in_t             *input_api;
   
   if((input_api = (xine_post_in_t *) xine_post_input(pobj->post, "parameters"))) {
-    xine_post_api_t            *post_api;
-    xine_post_api_descr_t      *api_descr;
-    xine_post_api_parameter_t  *parm;
+    const xine_post_api_t            *post_api;
+    const xine_post_api_descr_t      *api_descr;
+    const xine_post_api_parameter_t  *parm;
     int                         pnum = 0;
     
     post_api = (xine_post_api_t *) input_api->data;
