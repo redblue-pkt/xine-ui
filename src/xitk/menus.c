@@ -958,10 +958,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
     for(i = 0; i < 7; i++) {
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
-      asprintf(&menu_entry.menu, "%s/%s", menus_str, gettext(menu_entries[first_entry + i]));
+      menu_entry.menu = xitk_asprintf("%s/%s", menus_str, gettext(menu_entries[first_entry + i]));
       menu_entry.cb        = menu_menus_selection;
       menu_entry.user_data = (void *)(intptr_t)i;
-      xitk_menu_add_entry(w, &menu_entry);
+
+      if (menu_entry.menu)
+        xitk_menu_add_entry(w, &menu_entry);
       free(menu_entry.menu);
     }
   }
@@ -977,12 +979,14 @@ void video_window_menu(xitk_widget_list_t *wl) {
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
-    asprintf(&menu_entry.menu, "%s/%s", _("Playback"), _("Add Mediamark"));
+    menu_entry.menu = xitk_asprintf("%s/%s", _("Playback"), _("Add Mediamark"));
     menu_entry.shortcut  = menu_get_shortcut("AddMediamark");
     menu_entry.cb        = menu_playback_ctrl;
     menu_entry.user_data = (void *) PLAYB_ADDMMK;
-    xitk_menu_add_entry(w, &menu_entry);
-    
+
+    if (menu_entry.menu)
+      xitk_menu_add_entry(w, &menu_entry);
+
     free(menu_entry.shortcut);
     free(menu_entry.menu);
   }

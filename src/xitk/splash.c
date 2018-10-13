@@ -45,9 +45,9 @@ void splash_create(void) {
 
     for (i = 0; i < sizeof (types) / sizeof (types[0]); ++i)
     {
-      asprintf(&skin_splash_image, "%s/xine_splash.%s", skin_path, types[i]);
+      skin_splash_image = xitk_asprintf("%s/xine_splash.%s", skin_path, types[i]);
 
-      if(is_a_file(skin_splash_image))
+      if(skin_splash_image && is_a_file(skin_splash_image))
       {
         splash_image = skin_splash_image;
         break;

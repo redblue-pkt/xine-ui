@@ -375,3 +375,15 @@ char *xitk_vasprintf(const char *format, va_list args)
 
   return result;
 }
+
+char *xitk_asprintf(const char *format, ...)
+{
+  va_list args;
+  char *result;
+
+  va_start(args, format);
+  result = xitk_vasprintf(format, args);
+  va_end(args);
+
+  return result;
+}

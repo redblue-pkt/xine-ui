@@ -180,15 +180,15 @@ Imlib_init(Display * disp)
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
-  asprintf(&s, "%s/.imrc", xine_get_homedir ());
+  s = xitk_asprintf("%s/.imrc", xine_get_homedir ());
 
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
 
 #ifndef __EMX__
-  f = fopen(s, "r");
+  f = s ? fopen(s, "r") : NULL;
 #else
-  f = fopen(s, "rt");
+  f = s ? fopen(s, "rt") : NULL;
 #endif
 
   free(s);
@@ -736,15 +736,15 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
-  asprintf(&s, "%s/.imrc", xine_get_homedir ());
+  s = xitk_asprintf("%s/.imrc", xine_get_homedir ());
 
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
 
 #ifndef __EMX__
-  f = fopen(s, "r");
+  f = s ? fopen(s, "r") : NULL;
 #else
-  f = fopen(s, "rt");
+  f = s ? fopen(s, "rt") : NULL;
 #endif
 
   free(s);

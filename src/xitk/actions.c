@@ -437,12 +437,12 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     char *a_info = NULL;
     
     if(v_unhandled && a_unhandled) {
-      asprintf(&buffer, _("The stream '%s' isn't supported by xine:\n\n"),
-	       (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
+      buffer = xitk_asprintf(_("The stream '%s' isn't supported by xine:\n\n"),
+                             (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
     }
     else {
-      asprintf(&buffer, _("The stream '%s' uses an unsupported codec:\n\n"),
-	       (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
+      buffer = xitk_asprintf(_("The stream '%s' uses an unsupported codec:\n\n"),
+                             (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
     }
     
     if(v_unhandled) {
@@ -452,9 +452,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      asprintf(&v_info, _("Video Codec: %s (%s)\n"),
-	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-               (get_fourcc_string(tmp, sizeof(tmp), vfcc)));
+      v_info = xitk_asprintf(_("Video Codec: %s (%s)\n"),
+                             (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"),
+                             (get_fourcc_string(tmp, sizeof(tmp), vfcc)));
     }
     
     if(a_unhandled) {
@@ -464,14 +464,14 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      asprintf(&a_info,  _("Audio Codec: %s (%s)\n"),
-	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-               (get_fourcc_string(tmp, sizeof(tmp), afcc)));
+      a_info = xitk_asprintf(_("Audio Codec: %s (%s)\n"),
+                             (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"),
+                             (get_fourcc_string(tmp, sizeof(tmp), afcc)));
     }
     
 
     if(v_unhandled && a_unhandled) {
-      xine_error("%s%s%s", buffer, v_info, a_info);
+      xine_error("%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
       free(buffer); free(v_info); free(a_info);
       return 0;
     }
@@ -488,8 +488,8 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       xw = xitk_window_dialog_yesno_with_width(gui->imlib_data, _("Start Playback ?"), 
 					       start_anyway_yesno, start_anyway_yesno, 
 					       NULL, 400, ALIGN_CENTER,
-					       "%s%s%s%s", buffer,
-					       v_info, a_info,
+					       "%s%s%s%s", buffer ? buffer : "",
+					       v_info ? v_info : "", a_info ? a_info : "",
 					       _("\nStart playback anyway ?\n"));
       free(buffer); free(v_info); free(a_info);
 
@@ -2449,14 +2449,16 @@ void visual_anim_init(void) {
   gGui_t *gui = gGui;
   char *buffer;
 
-  asprintf(&buffer, "%s/%s", XINE_VISDIR, "default.mpv");
-  
+  buffer = xitk_asprintf("%s/%s", XINE_VISDIR, "default.mpv");
+
   gui->visual_anim.mrls = (char **) malloc(sizeof(char *) * 3);
   gui->visual_anim.num_mrls = 0;
-  
-  gui->visual_anim.mrls[gui->visual_anim.num_mrls++]   = buffer;
-  gui->visual_anim.mrls[gui->visual_anim.num_mrls]     = NULL;
-  gui->visual_anim.mrls[gui->visual_anim.num_mrls + 1] = NULL;
+
+  if (buffer) {
+    gui->visual_anim.mrls[gui->visual_anim.num_mrls++]   = buffer;
+    gui->visual_anim.mrls[gui->visual_anim.num_mrls]     = NULL;
+    gui->visual_anim.mrls[gui->visual_anim.num_mrls + 1] = NULL;
+  }
 }
 void visual_anim_done(void) {
   gGui_t *gui = gGui;

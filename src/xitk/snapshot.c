@@ -91,8 +91,8 @@ static char *snap_build_filename(const char *mrl) {
   }
 
   for(i = 1;; i++) {
-    asprintf(&buffer, "%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
-    if(((stat(buffer, &sstat)) == -1) && (errno == ENOENT))
+    buffer = xitk_asprintf("%s/%s-%d%s", gGui->snapshot_location, basename, i, ".png");
+    if(!buffer || ((stat(buffer, &sstat) == -1) && (errno == ENOENT)))
       break;
     free(buffer);
   }
@@ -110,9 +110,11 @@ static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
   if(error_msg_cb) {
     char *uerror;
 
-    asprintf(&uerror, "%s%s\n", _("Error: "), error_msg);
-    error_msg_cb(msg_cb_data, uerror);
-    free(uerror);
+    uerror = xitk_asprintf("%s%s\n", _("Error: "), error_msg);
+    if (uerror) {
+      error_msg_cb(msg_cb_data, uerror);
+      free(uerror);
+    }
   }
 }
 
@@ -121,9 +123,11 @@ static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
   if(error_msg_cb) {
     char *uerror;
 
-    asprintf(&uerror, "%s%s\n", _("Error: "), warning_msg);
-    error_msg_cb(msg_cb_data, uerror);
-    free(uerror);
+    uerror = xitk_asprintf("%s%s\n", _("Error: "), warning_msg);
+    if (uerror) {
+      error_msg_cb(msg_cb_data, uerror);
+      free(uerror);
+    }
   }
 }
 
@@ -185,23 +189,27 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
       if(error_msg_cb) {
         char *umessage;
 
-        asprintf (&umessage, "%s%dx%d%s\n",
+        umessage = xitk_asprintf ("%s%dx%d%s\n",
           _("Wrong image size: "), xgvf->width, xgvf->height, _(". Snapshot aborted."));
-        error_msg_cb (msg_cb_data, umessage);
-        free (umessage);
+        if (umessage) {
+          error_msg_cb (msg_cb_data, umessage);
+          free (umessage);
+        }
       }
       break;
     }
 
     /* open file */
     file_name = snap_build_filename (mrl);
-    if ((fp = fopen (file_name, "wb")) == NULL) {
+    if (!file_name || (fp = fopen (file_name, "wb")) == NULL) {
       if (error_msg_cb) {
         char *umessage;
 
-        asprintf (&umessage, "%s (%s)\n", _("File open failed"), file_name);
-        error_msg_cb (msg_cb_data, umessage);
-        free (umessage);
+        umessage = xitk_asprintf ("%s (%s)\n", _("File open failed"), file_name);
+        if (umessage) {
+          error_msg_cb (msg_cb_data, umessage);
+          free (umessage);
+        }
       }
       break;
     }
@@ -260,9 +268,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
     if (info_msg_cb) {
       char *umessage;
-      asprintf (&umessage, "%s%s\n", _("File written: "), file_name);
-      info_msg_cb (msg_cb_data, umessage);
-      free (umessage);
+      umessage = xitk_asprintf ("%s%s\n", _("File written: "), file_name);
+      if (umessage) {
+        info_msg_cb (msg_cb_data, umessage);
+        free (umessage);
+      }
     }
 
   } while (0);
@@ -1041,9 +1051,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     if(error_msg_cb) {
       char *umessage;
       
-      asprintf(&umessage, "%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
-      error_msg_cb(msg_cb_data, umessage);
-      free(umessage);
+      umessage = xitk_asprintf("%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
+      if (umessage) {
+        error_msg_cb(msg_cb_data, umessage);
+        free(umessage);
+      }
     }
     return;
   }
@@ -1172,14 +1184,16 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   image->file_name = snap_build_filename(mrl);
   
-  if ( (image->fp = fopen(image->file_name, "wb")) == NULL ) {
+  if ( !image->file_name || (image->fp = fopen(image->file_name, "wb")) == NULL ) {
     
     if(error_msg_cb) {
       char *umessage;
       
-      asprintf(&umessage, "%s (%s)\n", _("File open failed"), image->file_name);
-      error_msg_cb(msg_cb_data, umessage);
-      free(umessage);
+      umessage = xitk_asprintf("%s (%s)\n", _("File open failed"), image->file_name);
+      if (umessage) {
+        error_msg_cb(msg_cb_data, umessage);
+        free(umessage);
+      }
     }
     prvt_image_free( &image );
     return;
@@ -1358,9 +1372,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /**/
   if(info_msg_cb) {
     char *umessage;
-    asprintf(&umessage, "%s%s\n", _("File written: "), image->file_name);
-    info_msg_cb(msg_cb_data, umessage);
-    free(umessage);
+    umessage = xitk_asprintf("%s%s\n", _("File written: "), image->file_name);
+    if (umessage) {
+      info_msg_cb(msg_cb_data, umessage);
+      free(umessage);
+    }
   }
 
 #ifdef DEBUG

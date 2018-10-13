@@ -2380,8 +2380,8 @@ long int video_window_reset_ssaver(void) {
 	      plen = 1, p = ".";
 	    else
 	      plen = path - p;
-	    asprintf(&pbuf, "%.*s/%s", plen, p, gssaver_args[0]);
-	    if ( access(pbuf, X_OK) ) {
+	    pbuf = xitk_asprintf("%.*s/%s", plen, p, gssaver_args[0]);
+	    if ( pbuf && access(pbuf, X_OK) ) {
 	      free(pbuf);
 	      gssaver_path = "";
 	    } else
