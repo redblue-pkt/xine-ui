@@ -3171,13 +3171,13 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
   if(mmkeditor.mmk) {
     
     mrl = atoa(xitk_inputtext_get_text(mmkeditor.mrl));
-    if(mrl && (!strlen(mrl)))
+    if (!mrl[0])
       mrl = strdup((*mmkeditor.mmk)->mrl);
     else
       mrl = strdup(mrl);
     
     ident = atoa(xitk_inputtext_get_text(mmkeditor.ident));
-    if(ident && (!strlen(ident)))
+    if (!ident[0])
       ident = strdup(mrl);
     else
       ident = strdup(ident);
