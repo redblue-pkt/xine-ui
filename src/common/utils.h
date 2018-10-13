@@ -91,5 +91,6 @@ size_t strlcpy(char *dst, const char *src, size_t size);
 #endif
 
 char *xitk_vasprintf(const char *fmt, va_list ap)  __attribute__ ((format (printf, 1, 0)));
+char *xitk_asprintf(const char *fmt, ...)  __attribute__ ((format (printf, 1, 2)));
 
 #endif

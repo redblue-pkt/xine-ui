@@ -51,10 +51,10 @@ static void get_available_skins_from(char *path) {
     while((pdirent = readdir(pdir)) != NULL) {
       char          *fullfilename = NULL;
       char          *skcfgname = NULL;
-    
-      asprintf(&fullfilename, "%s/%s", path, pdirent->d_name);
-      
-      if((is_a_dir(fullfilename))
+
+      fullfilename = xitk_asprintf("%s/%s", path, pdirent->d_name);
+
+      if (fullfilename && (is_a_dir(fullfilename))
 	 && (!(strlen(pdirent->d_name) == 1 && pdirent->d_name[0] == '.' )
 	     && !(strlen(pdirent->d_name) == 2 
 		  && (pdirent->d_name[0] == '.' && pdirent->d_name[1] == '.')))) {
@@ -62,8 +62,8 @@ static void get_available_skins_from(char *path) {
 	/*
 	 * Check if a skinconfig file exist
 	 */
-	asprintf(&skcfgname, "%s/%s", fullfilename, "skinconfig");
-	if(is_a_file(skcfgname)) {
+        skcfgname = xitk_asprintf("%s/%s", fullfilename, "skinconfig");
+        if(skcfgname && is_a_file(skcfgname)) {
 	  
 	  skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
 	  skins_avail[skins_avail_num] = (skins_locations_t *) calloc(1, sizeof(skins_locations_t));
@@ -103,10 +103,11 @@ static void looking_for_available_skins(void) {
 
   skins_avail = (skins_locations_t **) calloc(1, sizeof(skins_locations_t*));
   
-  asprintf(&buf, "%s%s", xine_get_homedir(), "/.xine/skins");
-  
-  get_available_skins_from(buf);
-  free(buf);
+  buf = xitk_asprintf("%s%s", xine_get_homedir(), "/.xine/skins");
+  if (buf) {
+    get_available_skins_from(buf);
+    free(buf);
+  }
 
   get_available_skins_from(XINE_SKINDIR);
   
@@ -345,7 +346,7 @@ char *skin_get_current_skin_dir(void) {
   (void) xine_config_lookup_entry(__xineui_global_xine_instance, "gui.skin", &entry);
   skin_num = entry.num_value;
   
-  asprintf(&skin_dir, "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
+  skin_dir = xitk_asprintf("%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
 
   return skin_dir;
 }

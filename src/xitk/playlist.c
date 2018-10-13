@@ -378,10 +378,10 @@ void playlist_load_playlist(xitk_widget_t *w, void *data) {
   if(load_fb)
     filebrowser_raise_window(load_fb);
   else {
-    if (asprintf(&buffer, "%s%s", xine_get_homedir(), "/.xine/playlist.tox") < 0) {
+    buffer = xitk_asprintf("%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+    if (!buffer)
       return;
-    }
-    
+
     cbb[0].label = _("Load");
     cbb[0].callback = _playlist_load_callback;
     cbb[0].need_a_file = 1;
@@ -415,10 +415,10 @@ void playlist_save_playlist(xitk_widget_t *w, void *data) {
     if(save_fb)
       filebrowser_raise_window(save_fb);
     else {
-      if (asprintf(&buffer, "%s%s", xine_get_homedir(), "/.xine/playlist.tox") < 0) {
+      buffer = xitk_asprintf("%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+      if (!buffer)
         return;
-      }
-      
+
       cbb[0].label = _("Save");
       cbb[0].callback = _playlist_save_callback;
       cbb[0].need_a_file = 1;
