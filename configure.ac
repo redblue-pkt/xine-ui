@@ -476,9 +476,10 @@ saved_CFLAGS="$CFLAGS"
 saved_LIBS="$LIBS"
 CFLAGS="$CFLAGS $JPEG_CFLAGS"
 LIBS="$LIBS $JPEG_LIBS"
-AC_CHECK_LIB([jpeg], [jpeg_read_header],
-  [AC_CHECK_HEADER([jpeglib.h], [], [AC_MSG_ERROR([JPEG library is required])])
-  ], [$JPEG_LIBS])
+AC_CHECK_LIB([jpeg], [jpeg_read_header],,
+             [AC_CHECK_HEADER([jpeglib.h], [],
+                              [AC_MSG_ERROR([JPEG library is required])])],
+             [$JPEG_LIBS])
 CFLAGS="$saved_CFLAGS"
 LIBS="$saved_LIBS"
 
