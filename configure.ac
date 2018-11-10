@@ -148,8 +148,8 @@ PKG_CHECK_MODULES([XV], [xv], [
   XV_LIB=$XV_LIBS
   ac_have_xv="yes"
   AC_DEFINE(HAVE_XV, 1, [Define this if you have libXv installed])
-], [  
-  AC_CHECK_LIB(Xv, XvQueryExtension, 
+], [
+  AC_CHECK_LIB(Xv, XvQueryExtension,
             [ XV_LIB="-lXv"
 	      AC_DEFINE(HAVE_XV, 1, [Define this if you have libXv installed])
             ],, [$X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS])
@@ -175,11 +175,11 @@ dnl If we are compiling without shared memory support, then don\'t do
 dnl the checks for XShm
 if test "x$enable_shm" != "xno"; then
   dnl Check for the Xext library (needed for XShm extension)
-  AC_CHECK_LIB(Xext, XShmAttach, 
-      X_LIBS="-lXext $X_LIBS", 
+  AC_CHECK_LIB(Xext, XShmAttach,
+      X_LIBS="-lXext $X_LIBS",
       dnl On AIX, it is in XextSam instead, but we still need -lXext
-      AC_CHECK_LIB(XextSam, XShmAttach, 
-          [X_LIBS="-lXextSam -lXext $X_LIBS"], 
+      AC_CHECK_LIB(XextSam, XShmAttach,
+          [X_LIBS="-lXextSam -lXext $X_LIBS"],
           no_xshm_ext=yes; have_shm=no, $X_LIBS),
       $X_LIBS)
 
@@ -240,12 +240,12 @@ AC_ARG_ENABLE([xinerama],
    AS_HELP_STRING([--disable-xinerama], [Do not build support for xinerama (default: check)]))
 if test "x$enable_xinerama" != "xno"; then
   PKG_CHECK_MODULES([XINERAMA], [xinerama], [ac_have_xinerama="yes"], [
-    AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
+    AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
                XINERAMA_LIBS="-lXinerama"
                ac_have_xinerama="yes",,
                $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
   ])
-  
+
   if test "x$ac_have_xinerama" = "xyes"; then
      X_PRE_LIBS="$X_PRE_LIBS $XINERAMA_LIBS"
      AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
@@ -258,7 +258,7 @@ dnl
 dnl Checks for XF86VidMode extension
 dnl
 PKG_CHECK_MODULES([XXF86VM], [xxf86vm], [ac_have_xf86vidmode="yes"], [
-  AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension, 
+  AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension,
              XXF86VM_LIBS="-lXxf86vm"
              ac_have_xf86vidmode="yes",,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
@@ -276,7 +276,7 @@ dnl
 dnl XTest Extension
 dnl
 PKG_CHECK_MODULES([XTEST], [xtst], [ac_have_xtest="yes"], [
-  AC_CHECK_LIB(Xtst, XTestFakeKeyEvent, 
+  AC_CHECK_LIB(Xtst, XTestFakeKeyEvent,
              XTEST_LIBS="-lXtst"
 	     ac_have_xtest="yes",, $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
 ])
@@ -325,7 +325,7 @@ AC_ARG_WITH([curl],
 
 if test x"$with_curl" != xno; then
    PKG_CHECK_MODULES([CURL], [libcurl >= 7.10.2], have_curl="yes", have_curl="no")
-   
+
    if test "x$have_curl" = "xyes"; then
       AC_DEFINE([HAVE_CURL], [1], [Define this if you have libcurl installed])
    else
@@ -359,9 +359,9 @@ else
 fi
 AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
-dnl 
+dnl
 dnl checks for Color AsCii Art library
-dnl 
+dnl
 AC_ARG_WITH([caca],
   AS_HELP_STRING([--without-caca], [Do not build CACA support]))
 
@@ -377,9 +377,9 @@ if test "x$with_caca" != "xno"; then
    if test "x$have_caca" = "xyes"; then
      AM_DL()
    fi
-   AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h> 
-                                        caca_event_t ev;]], 
-                                        [[ev.type = 0;]] 
+   AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h>
+                                        caca_event_t ev;]],
+                                        [[ev.type = 0;]]
                        )],
                        [],
                        [AC_DEFINE(CACA_EVENT_OPAQUE, [1], ["Define if struct caca_event is opaque and must not be accessed directly"])]
@@ -410,18 +410,18 @@ if test x"$XFT" = "xtrue" ; then
   CFLAGS="$CFLAGS $XFT_CFLAGS"
   LIBS="$LIBS $XFT_LIBS"
   AC_TRY_LINK([
-#include <X11/Xft/Xft.h>], [ XftFontClose(0, 0); return 1; ], 
+#include <X11/Xft/Xft.h>], [ XftFontClose(0, 0); return 1; ],
     [
       AC_DEFINE(WITH_XFT, 1, [font antialiasing support])
       AC_MSG_CHECKING([Xft UTF-8 support])
       AC_TRY_LINK([
 #include <X11/Xft/Xft.h>
-        ], [ 
-XftDrawStringUtf8(0, 0, 0, 0, 0, 0, 0); return 0; 
+        ], [
+XftDrawStringUtf8(0, 0, 0, 0, 0, 0, 0); return 0;
         ],
           AC_DEFINE(HAVE_XFT_UTF8_STRING, 1, "Xft UTF8 support")
           AC_MSG_RESULT(yes),
-          AC_MSG_RESULT(no)) 
+          AC_MSG_RESULT(no))
     ],
     [
       AC_MSG_RESULT([***Could not link with Xft. Install Xft if you want support for it***])
@@ -625,14 +625,14 @@ int main(int argc, char **argv) {
   int c;
 
   opterr = 0;
-  while((c = getopt_long(argc, argv, "?hv", 
+  while((c = getopt_long(argc, argv, "?hv",
 			 long_options, &option_index)) != EOF) {
   }
   return 0;
 }
-], [AC_MSG_RESULT(yes); 
-	ac_getopt_long=yes; 
-	AC_DEFINE(HAVE_GETOPT_LONG,,[Define this if you have GNU getopt_long() implemented])], 
+], [AC_MSG_RESULT(yes);
+	ac_getopt_long=yes;
+	AC_DEFINE(HAVE_GETOPT_LONG,,[Define this if you have GNU getopt_long() implemented])],
    [AC_MSG_RESULT(no); ac_getopt_long=no],
    [AC_MSG_RESULT(no); ac_getopt_long=no])
 AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
