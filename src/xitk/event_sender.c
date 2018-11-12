@@ -79,16 +79,17 @@ typedef struct {
 static _eventer_t    *eventer = NULL;
 
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
-  int old_sticky_value = gGui->eventer_sticky;
+  gGui_t *gui = data;
+  int old_sticky_value = gui->eventer_sticky;
   
-  gGui->eventer_sticky = cfg->num_value;
+  gui->eventer_sticky = cfg->num_value;
   if(eventer) {
-    if((!old_sticky_value) && gGui->eventer_sticky) {
+    if((!old_sticky_value) && gui->eventer_sticky) {
       int  px, py, pw;
-      xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, NULL);
+      xitk_get_window_position (gui->display, gui->panel_window, &px, &py, &pw, NULL);
       eventer->x = px + pw;
       eventer->y = py;
-      xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
+      xitk_window_move_window (gui->imlib_data, eventer->xwin, eventer->x, eventer->y);
     }
   }
 }

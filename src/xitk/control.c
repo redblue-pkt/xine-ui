@@ -71,42 +71,42 @@ static int hue_ena, sat_ena, bright_ena, contr_ena, gamma_ena, sharp_ena, noise_
 
 
 static void hue_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.hue =
     (cfg->num_value < 0) ? gui->video_settings.default_hue : cfg->num_value;
 }
 static void brightness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.brightness =
     (cfg->num_value < 0) ? gui->video_settings.default_brightness : cfg->num_value;
 }
 static void saturation_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.saturation =
     (cfg->num_value < 0) ? gui->video_settings.default_saturation : cfg->num_value;
 }
 static void contrast_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.contrast =
     (cfg->num_value < 0) ? gui->video_settings.default_contrast : cfg->num_value;
 }
 #ifdef XINE_PARAM_VO_GAMMA
 static void gamma_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.gamma =
     (cfg->num_value < 0) ? gui->video_settings.default_gamma : cfg->num_value;
 }
 #endif
 #ifdef XINE_PARAM_VO_SHARPNESS
 static void sharpness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.sharpness =
     (cfg->num_value < 0) ? gui->video_settings.default_sharpness : cfg->num_value;
 }
 #endif
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
 static void noise_reduction_changes_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->video_settings.noise_reduction =
     (cfg->num_value < 0) ? gui->video_settings.default_noise_reduction : cfg->num_value;
 }
@@ -588,7 +588,7 @@ void control_config_register(void) {
 				CONFIG_NO_HELP, /* _("Hue value."), */
 				CONFIG_LEVEL_DEB,
 				hue_changes_cb, 
-				CONFIG_NO_DATA);
+				gGui);
     gui->video_settings.default_hue = get_current_param(XINE_PARAM_VO_HUE);
     if(gui->video_settings.hue < 0)
       gui->video_settings.hue = gui->video_settings.default_hue;
@@ -607,7 +607,7 @@ void control_config_register(void) {
 				CONFIG_NO_HELP, /* _("Brightness value."), */
 				CONFIG_LEVEL_DEB,
 				brightness_changes_cb, 
-				CONFIG_NO_DATA);
+				gGui);
     gui->video_settings.default_brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
     if(gui->video_settings.brightness < 0)
       gui->video_settings.brightness = gui->video_settings.default_brightness;
@@ -626,7 +626,7 @@ void control_config_register(void) {
 				CONFIG_NO_HELP, /* _("Saturation value."), */
 				CONFIG_LEVEL_DEB,
 				saturation_changes_cb, 
-				CONFIG_NO_DATA);
+				gGui);
     gui->video_settings.default_saturation = get_current_param(XINE_PARAM_VO_SATURATION);
     if(gui->video_settings.saturation < 0)
       gui->video_settings.saturation = gui->video_settings.default_saturation;
@@ -645,7 +645,7 @@ void control_config_register(void) {
 				CONFIG_NO_HELP, /* _("Contrast value."), */
 				CONFIG_LEVEL_DEB,
 				contrast_changes_cb, 
-				CONFIG_NO_DATA);
+				gGui);
     gui->video_settings.default_contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
     if(gui->video_settings.contrast < 0)
       gui->video_settings.contrast = gui->video_settings.default_contrast;
@@ -661,11 +661,11 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_gamma",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("contrast value"), */
-                                CONFIG_NO_HELP, /* _("Contrast value."), */
+                                CONFIG_NO_DESC, /* _("gamma value"), */
+                                CONFIG_NO_HELP, /* _("Gamma value."), */
                                 CONFIG_LEVEL_DEB,
                                 gamma_changes_cb,
-                                CONFIG_NO_DATA);
+                                gGui);
     gui->video_settings.default_gamma = get_current_param(XINE_PARAM_VO_GAMMA);
     if(gui->video_settings.gamma < 0)
       gui->video_settings.gamma = gui->video_settings.default_gamma;
@@ -682,11 +682,11 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_sharpness",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("contrast value"), */
-                                CONFIG_NO_HELP, /* _("Contrast value."), */
+                                CONFIG_NO_DESC, /* _("sharpness value"), */
+                                CONFIG_NO_HELP, /* _("Sharpness value."), */
                                 CONFIG_LEVEL_DEB,
                                 sharpness_changes_cb,
-                                CONFIG_NO_DATA);
+                                gGui);
     gui->video_settings.default_sharpness = get_current_param(XINE_PARAM_VO_SHARPNESS);
     if(gui->video_settings.sharpness < 0)
       gui->video_settings.sharpness = gui->video_settings.default_sharpness;
@@ -703,11 +703,11 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_noise_reduction",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("contrast value"), */
-                                CONFIG_NO_HELP, /* _("Contrast value."), */
+                                CONFIG_NO_DESC, /* _("noise reduction value"), */
+                                CONFIG_NO_HELP, /* _("Noise reduction value."), */
                                 CONFIG_LEVEL_DEB,
                                 noise_reduction_changes_cb,
-                                CONFIG_NO_DATA);
+                                gGui);
     gui->video_settings.default_noise_reduction = get_current_param(XINE_PARAM_VO_NOISE_REDUCTION);
     if(gui->video_settings.noise_reduction < 0)
       gui->video_settings.noise_reduction = gui->video_settings.default_noise_reduction;

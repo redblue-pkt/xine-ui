@@ -412,11 +412,11 @@ static void xrm_parse(void) {
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->logo_mrl = cfg->str_value;
 }
 static void sub_autoload_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->subtitle_autoload = cfg->num_value;
 }
 
@@ -2064,7 +2064,7 @@ int main(int argc, char *argv[]) {
 				"line, xine will automatically load previous playlist."), 
 			      CONFIG_LEVEL_BEG,
 			      dummy_config_cb,
-			      CONFIG_NO_DATA);
+			      gGui);
 
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
@@ -2079,7 +2079,7 @@ int main(int argc, char *argv[]) {
 			      _("Automatically load subtitles if they exist."), 
 			      CONFIG_LEVEL_BEG,
 			      sub_autoload_cb,
-			      CONFIG_NO_DATA);
+			      gGui);
 
 
   enable_deinterlace +=
@@ -2245,7 +2245,7 @@ int main(int argc, char *argv[]) {
 						CONFIG_NO_HELP, 
 						CONFIG_LEVEL_EXP,
 						main_change_logo_cb, 
-						CONFIG_NO_DATA);
+						gGui);
 
   gui->event_queue = xine_event_new_queue(gui->stream);
   xine_event_create_listener_thread(gui->event_queue, event_listener, NULL);
