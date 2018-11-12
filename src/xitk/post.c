@@ -145,7 +145,7 @@ static void _applugin_close_help(xitk_widget_t *, void *);
 static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *, void *);
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   post_element_t **posts = NULL;
   int              num, i;
   
@@ -173,7 +173,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   gui->visual_anim.post_plugin_num = cfg->num_value;  
   post_rewire_visual_anim();
 }
@@ -215,7 +215,7 @@ void post_init(void) {
 				    _("Post audio plugin to used when playing streams without video"),
 				    CONFIG_LEVEL_BEG,
 				    post_audio_plugin_cb,
-				    CONFIG_NO_DATA);
+				    gGui);
 	
 	gui->visual_anim.post_output_element.post = 
 	  xine_post_init(__xineui_global_xine_instance,
@@ -2329,7 +2329,7 @@ void post_deinterlace_init(const char *deinterlace_post) {
 					    "when deinterlace is used (plugin separator is ';')."),
 					  CONFIG_LEVEL_ADV,
 					  post_deinterlace_plugin_cb,
-					  CONFIG_NO_DATA);
+					  gGui);
   if((posts = pplugin_parse_and_load(0, (deinterlace_post && strlen(deinterlace_post)) ? 
 				     deinterlace_post : gui->deinterlace_plugin, &num))) {
     gui->deinterlace_elements     = posts;
