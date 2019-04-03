@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -118,25 +118,40 @@ static int _file_exist(char *filename) {
 }
 #endif
 
+int mrl_look_like_playlist (const char *mrl) {
+  /* TJ. I dont know whether someone really needs to treat
+   * "foo/bar.m3under/the/table" as an m3u playlist.
+   * Lets keep this behaviour for now, but make sure that
+   * hls (.m3u8) goes to xine-lib verbatim. */
+  const char *extension = strrchr (mrl, '.');
+  if (extension) {
+    /* All known playlist ending */
+    if ((!strncasecmp (extension, ".asx", 4))  ||
+        (!strncasecmp (extension, ".smi", 4))  ||
+      /*(!strncasecmp (extension, ".smil", 5)) || caught by ".smi" */
+        (!strncasecmp (extension, ".pls", 4))  ||
+        (!strncasecmp (extension, ".sfv", 4))  ||
+        (!strncasecmp (extension, ".xml", 4))  ||
+        (!strncasecmp (extension, ".tox", 4))  ||
+        (!strncasecmp (extension, ".fxd", 4)))
+      return 1;
+    if ((!strncasecmp (extension, ".m3u", 4)) && (extension[4] != '8'))
+      return 1;
+  }
+  return 0;
+}
+ 
 static char *_read_file(const char *filename, int *size) {
   struct stat  st;
   char        *buf = NULL;
   int          fd, bytes_read;
-  char        *extension;
 
   if((!filename) || (!strlen(filename))) {
     fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
     return NULL;
   }
-  
-  extension = strrchr(filename, '.');
-  if(extension && 
-     ((!strncasecmp(extension, ".pls", 4)) || (!strncasecmp(extension, ".m3u", 4))  || 
-      (!strncasecmp(extension, ".sfv", 4)) || (!strncasecmp(extension, ".tox", 4))  ||
-      (!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smi", 4))  || 
-      (!strncasecmp(extension, ".smil", 5)) || (!strncasecmp(extension, ".xml", 4)) ||
-      (!strncasecmp(extension, ".fxd", 4))) &&
-     is_downloadable((char *) filename))
+
+  if (mrl_look_like_playlist (filename) && is_downloadable ((char *)filename))
     return _download_file(filename, size);
   
   if(stat(filename, &st) < 0) {
@@ -2970,26 +2985,6 @@ void mediamark_save_mediamarks(const char *filename) {
   free(fullfn);
 }
 
-int mrl_look_like_playlist(char *mrl) {
-  char *extension;
-  
-  extension = strrchr(mrl, '.');
-  if(extension && /* All known playlist ending */
-     ((!strncasecmp(extension, ".asx", 4))  ||
-      (!strncasecmp(extension, ".smi", 4))  ||
-      (!strncasecmp(extension, ".smil", 5)) ||
-      (!strncasecmp(extension, ".pls", 4))  ||
-      (!strncasecmp(extension, ".m3u", 4))  ||
-      (!strncasecmp(extension, ".sfv", 4))  ||
-      (!strncasecmp(extension, ".xml", 4))  ||
-      (!strncasecmp(extension, ".tox", 4))  ||
-      (!strncasecmp(extension, ".fxd", 4)))) {
-    return 1;
-  }
-  
-  return 0;
-}
- 
 int mrl_look_like_file(char *mrl) {
   
   if(mrl && strlen(mrl)) {
