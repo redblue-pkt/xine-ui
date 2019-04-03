@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -83,7 +83,7 @@ int mediamark_concat_mediamarks(const char *filename);
 void mediamark_load_mediamarks(const char *filename);
 void mediamark_save_mediamarks(const char *filename);
 
-int mrl_look_like_playlist(char *mrl);
+int mrl_look_like_playlist (const char *mrl);
 int mrl_look_like_file(char *mrl);
 void mediamark_collect_from_directory(char *filepathname);
 
