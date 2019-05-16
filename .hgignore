@@ -41,3 +41,4 @@
 ^src/fb/fbxine$
 ^src/xitk/xine(|-remote)$
 ^stamp-h1$
+^ar-lib
