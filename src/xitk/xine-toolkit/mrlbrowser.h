@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -25,6 +25,7 @@
 #ifdef NEED_MRLBROWSER
 
 #include "_xitk.h"
+#include "button_list.h"
 
 #define MAXFILES      65535
 
@@ -140,7 +141,7 @@ typedef struct {
   int                        visible; /* Boolean status */
 
   xitk_widget_t             *mrlb_list; /*  Browser list widget */
-  xitk_widget_t             *autodir_plugins[64];
+  xitk_button_list_t        *autodir_buttons;
 
   xitk_widget_t             *combo_filter;
   const char               **filters;
