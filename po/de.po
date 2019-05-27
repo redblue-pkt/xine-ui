@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-05-26 18:39+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
-"Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
+"Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -36,26 +36,25 @@ msgstr ""
 "Der Datenstrom '%s' benutzt einen nichtunterstützten codec:\n"
 "\n"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr "%s Video-Codec: %s (%s)\n"
+msgstr ""
 
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr "%s Audio-Codec: %s (%s)\n"
+msgstr ""
 
 msgid "Start Playback ?"
 msgstr "Wiedergabe starten ?"
 
-#, fuzzy
 msgid ""
 "\n"
 "Start playback anyway ?\n"
 msgstr ""
-"%s\n"
+"\n"
 "Wiedergabe trotzdem starten ?\n"
 
 msgid "No MRL (input stream) specified"
@@ -126,13 +125,13 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 msgid "Gamma"
-msgstr ""
+msgstr "Mittenhelligkeit"
 
 msgid "Sharpness"
-msgstr ""
+msgstr "Bildschärfe"
 
 msgid "Noise reduction"
-msgstr ""
+msgstr "Rauschfilter"
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -176,33 +175,29 @@ msgctxt "skin"
 msgid "Ctr"
 msgstr "Kon"
 
-#, fuzzy
 msgid "Control GAMMA value"
-msgstr "Farbton ändern"
+msgstr "Mittenhelligkeit ändern"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Gam"
-msgstr ""
+msgstr "Mit"
 
-#, fuzzy
 msgid "Control SHARPNESS value"
-msgstr "Helligkeit ändern"
+msgstr "Bildschärfe ändern"
 
 #. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
 msgctxt "skin"
 msgid "Sha"
-msgstr "Sat"
+msgstr "Sch"
 
-#, fuzzy
 msgid "Control NOISE REDUCTION value"
-msgstr "Sättigung ändern"
+msgstr "Rauschfilter ändern"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Noi"
-msgstr ""
+msgstr "Rau"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -370,7 +365,7 @@ msgid "Playlist: %s"
 msgstr "Playliste: %s"
 
 msgid "Stop (persistent)"
-msgstr ""
+msgstr "Ganz anhalten"
 
 msgid "Stop"
 msgstr "Stopp"
@@ -592,48 +587,6 @@ msgstr "Tastenkürzeldarstellung im Menu, 'Strg Alt' oder 'C,M'."
 msgid "Unable to initialize Imlib\n"
 msgstr "Kann Imlib nicht initialisieren\n"
 
-msgid "xine Event Sender"
-msgstr "xine Ereignissender"
-
-msgid "Up"
-msgstr "Hoch"
-
-msgid "Left"
-msgstr "Links"
-
-msgid "Right"
-msgstr "Rechts"
-
-msgid "Down"
-msgstr "Runter"
-
-msgid "Angle +"
-msgstr "Winkel +"
-
-msgid "Angle -"
-msgstr "Winkel -"
-
-msgid "Menu 1"
-msgstr "Menü 1"
-
-msgid "Menu 2"
-msgstr "Menü 2"
-
-msgid "Menu 3"
-msgstr "Menü 3"
-
-msgid "Menu 4"
-msgstr "Menü 4"
-
-msgid "Menu 5"
-msgstr "Menü 5"
-
-msgid "Menu 6"
-msgstr "Menü 6"
-
-msgid "Menu 7"
-msgstr "Menü 7"
-
 msgid "Menu toggle"
 msgstr "Menü"
 
@@ -654,6 +607,54 @@ msgstr "Winkel"
 
 msgid "Part"
 msgstr "Kapitel"
+
+msgid "Top Menu"
+msgstr "Hauptmenü"
+
+msgid "Popup Menu"
+msgstr "Aufklappmenü"
+
+msgid "Menu 3"
+msgstr "Menü 3"
+
+msgid "Menu 4"
+msgstr "Menü 4"
+
+msgid "Menu 5"
+msgstr "Menü 5"
+
+msgid "Menu 6"
+msgstr "Menü 6"
+
+msgid "Menu 7"
+msgstr "Menü 7"
+
+msgid "Menu 1"
+msgstr "Menü 1"
+
+msgid "Menu 2"
+msgstr "Menü 2"
+
+msgid "xine Event Sender"
+msgstr "xine Ereignissender"
+
+msgid "Up"
+msgstr "Hoch"
+
+msgid "Left"
+msgstr "Links"
+
+msgid "Right"
+msgstr "Rechts"
+
+msgid "Down"
+msgstr "Runter"
+
+msgid "Angle +"
+msgstr "Winkel +"
+
+msgid "Angle -"
+msgstr "Winkel -"
 
 msgid "Close"
 msgstr "Schließen"
@@ -745,7 +746,7 @@ msgid "You can only delete alias entries."
 msgstr "Nur Alias-Einträge können entfernt werden."
 
 msgid "No more space for additional entries!"
-msgstr ""
+msgstr "Kein Platz für weitere Einträge!"
 
 msgid "Press Keyboard Keys..."
 msgstr "Drücke Taste auf Tastatur..."
@@ -816,7 +817,7 @@ msgstr "Aufzeichnen"
 
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
-msgstr ""
+msgstr "xine-ui: Zu viele Alternativtasten belegt, Eintrag ignoriert.\n"
 
 msgid "and"
 msgstr "und"
@@ -858,13 +859,13 @@ msgstr "Fehlerhavte visual '%s'\n"
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2007 Das xine Team.\n"
+"(c) 2000-2014 Das xine Team.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
@@ -1453,11 +1454,10 @@ msgstr ""
 "Programm bereits benutzt wird."
 
 msgid "Sorry, not implemented (authentication)"
-msgstr ""
+msgstr "Benutzeranmeldung leider nicht unterstützt"
 
-#, fuzzy
 msgid "*sight*, unknown error."
-msgstr "*Stöhn*, unbekannter Fehler."
+msgstr "*Seufz*, unbekannter Fehler."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
@@ -1941,6 +1941,12 @@ msgstr "N.Stumm"
 msgid "Audio: %s"
 msgstr "Audio: %s"
 
+msgid "..."
+msgstr "..."
+
+msgid "More sources..."
+msgstr "Mehr Quellen..."
+
 msgid "Volume control"
 msgstr "Lautstärke-Regler"
 
@@ -2114,9 +2120,6 @@ msgstr "Video-Kettenreaktion"
 msgid "Audio Chain Reaction"
 msgstr "Audio-Kettenreaktion"
 
-msgid "New Filter"
-msgstr "Neuer Filter"
-
 msgid "Enable"
 msgstr "Aktivieren"
 
@@ -2240,13 +2243,11 @@ msgstr "Wähle einen Skin zum Herunterladen..."
 msgid "Error: "
 msgstr "Fehler: "
 
-#, fuzzy
 msgid "xine_grab_video_frame.grab () failed\n"
-msgstr "xine_get_current_frame() fehlgeschlagen\n"
+msgstr "xine_grab_video_frame.grab () fehlgeschlagen\n"
 
-#, fuzzy
 msgid "xine_new_grab_video_frame () failed\n"
-msgstr "xine_get_current_frame() fehlgeschlagen\n"
+msgstr "xine_new_grab_video_frame () fehlgeschlagen\n"
 
 msgid "Wrong image size: "
 msgstr "Falsche Bildgröße: "
@@ -2435,8 +2436,8 @@ msgstr "videowin: Ausgabetreiber kann kein funktionierendes Visual auswählen\n"
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
-"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x"
-"%lx\n"
+"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
+"lx\n"
 
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
@@ -2524,6 +2525,9 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "New Filter"
+#~ msgstr "Neuer Filter"
 
 #~ msgid ""
 #~ "You tried to change the configuration with a cfg: MRL.\n"

@@ -34,3 +34,4 @@ src/xitk/tvout.c
 src/xitk/tvset.c
 src/xitk/videowin.c
 src/xitk/viewlog.c
+src/xitk/xine-toolkit/button_list.c
