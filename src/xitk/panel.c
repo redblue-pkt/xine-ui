@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -30,6 +30,7 @@
 #include <pthread.h>
 
 #include "common.h"
+#include "xine-toolkit/button_list.h"
 
 typedef struct {
   xitk_widget_list_t   *widget_list;
@@ -66,7 +67,7 @@ typedef struct {
   int                   visible;
   char                  runtime[20];
   xitk_widget_t        *audiochan_label;
-  xitk_widget_t        *autoplay_plugins[64];
+  xitk_button_list_t   *autoplay_buttons;
   xitk_widget_t        *spuid_label;
   ImlibImage           *bg_image;
   xitk_register_key_t   widget_key;
@@ -199,6 +200,7 @@ static void panel_exit(xitk_widget_t *w, void *data) {
 
     panel->title_label = 0;
     xitk_destroy_widgets(panel->widget_list);
+    xitk_button_list_delete (panel->autoplay_buttons);
 
     XLockDisplay(gGui->display);
     XDestroyWindow(gGui->display, gGui->panel_window);
@@ -277,53 +279,8 @@ void panel_change_skins(int synthetic) {
   /*
    * Update position of dynamic buttons.
    */
-  {
-    int i = 0, x, y, dir, max;
-    
-    x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
-    y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
-    dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayGUI");
-    max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayGUI");
+  xitk_button_list_new_skin (panel->autoplay_buttons, gGui->skin_config);
 
-    switch(dir) {
-    case DIRECTION_UP:
-    case DIRECTION_DOWN:
-      while((max && ((i < max) && (panel->autoplay_plugins[i] != NULL))) || (!max && panel->autoplay_plugins[i] != NULL)) {
-	
-	(void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
-	
-	if(dir == DIRECTION_DOWN)
-	  y += xitk_get_widget_height(panel->autoplay_plugins[i]) + 1;
-	else
-	  y -= (xitk_get_widget_height(panel->autoplay_plugins[i]) + 1);
-	
-	i++;
-      }
-      break;
-    case DIRECTION_LEFT:
-    case DIRECTION_RIGHT:
-      while((max && ((i < max) && (panel->autoplay_plugins[i] != NULL))) || (!max && panel->autoplay_plugins[i] != NULL)) {
-	
-	(void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
-	
-	if(dir == DIRECTION_RIGHT)
-	  x += xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
-	else
-	  x -= (xitk_get_widget_width(panel->autoplay_plugins[i]) + 1);
-	
-	i++;
-      }
-      break;
-    }
-
-    if(max) {
-      while(panel->autoplay_plugins[i] != NULL) {
-	xitk_disable_and_hide_widget(panel->autoplay_plugins[i]);
-	i++;
-      }
-    }
-  }
-  
   enable_playback_controls(panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
 
@@ -1081,72 +1038,26 @@ static void panel_handle_event(XEvent *event, void *data) {
  * We couldn't do this into panel_init(), this function is
  * called before xine engine initialization.
  */
-void panel_add_autoplay_buttons(void) {
-  int                        x, y, dir;
-  int                        i = 0, max;
-  xitk_labelbutton_widget_t  lb;
-  const char *const         *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
-  const char                *autoplay_label;
-  
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+void panel_add_autoplay_buttons (void) {
+  char *tips[64];
+  const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (__xineui_global_xine_instance);
+  unsigned int i;
 
-  x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
-  y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
-  dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayGUI");
-  max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayGUI");
+  if (!autoplay_plugins)
+    return;
 
-  if(autoplay_plugins) {
-    autoplay_label = *autoplay_plugins++;
-    while(autoplay_label) {
-      
-      lb.skin_element_name = "AutoPlayGUI";
-      lb.button_type       = CLICK_BUTTON;
-      lb.label             = (char *)autoplay_label;
-      lb.callback          = playlist_scan_input;
-      lb.state_callback    = NULL;
-      lb.userdata          = NULL;
-      xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)),
-				(panel->autoplay_plugins[i] =
-				 xitk_labelbutton_create (panel->widget_list, 
-							  gGui->skin_config, &lb)));
-      xitk_set_widget_tips_and_timeout(panel->autoplay_plugins[i],
-				       (char *) xine_get_input_plugin_description(__xineui_global_xine_instance, autoplay_label),
-				       panel->tips.timeout);
-      
-      if(!panel->tips.enable)
-	xitk_disable_widget_tips(panel->autoplay_plugins[i]);
-      
-      (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
-  
-      switch(dir) {
-      case DIRECTION_UP:
-      case DIRECTION_DOWN:
-	if(dir == DIRECTION_DOWN)
-	  y += xitk_get_widget_height(panel->autoplay_plugins[i]) + 1;
-	else
-	  y -= (xitk_get_widget_height(panel->autoplay_plugins[i]) + 1);
-	break;
-      case DIRECTION_LEFT:
-      case DIRECTION_RIGHT:
-	if(dir == DIRECTION_RIGHT)
-	  x += xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
-	else
-	  x -= (xitk_get_widget_width(panel->autoplay_plugins[i]) + 1);
-	break;
-      }
-      
-      if(max && (i >= max))
-	xitk_disable_and_hide_widget(panel->autoplay_plugins[i]);
-      
-      i++;
-      
-      autoplay_label = *autoplay_plugins++;
-    }
+  for (i = 0; autoplay_plugins[i]; i++) {
+    if (i >= sizeof (tips) / sizeof (tips[0]))
+      break;
+    tips[i] = (char *)xine_get_input_plugin_description (__xineui_global_xine_instance, autoplay_plugins[i]);
   }
-  
-  if(i)
-    panel->autoplay_plugins[i+1] = NULL;
-  
+
+  panel->autoplay_buttons = xitk_button_list_new (
+    gGui->imlib_data, panel->widget_list,
+    gGui->skin_config, "AutoPlayGUI",
+    playlist_scan_input, NULL,
+    (char **)autoplay_plugins,
+    tips, panel->tips.timeout, 0);
 }
 
 /*
@@ -1737,3 +1648,4 @@ void panel_set_title(char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
+

@@ -21,6 +21,7 @@ libxitk_a_CFLAGS = $(AM_CFLAGS) $(NO_STRICT_ALIASING)
 libxitk_a_SOURCES = \
 	browser.c \
 	button.c \
+	button_list.c \
 	checkbox.c \
 	combo.c \
 	config.c \
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	_xitk.h \
 	browser.h \
 	button.h \
+	button_list.h \
 	checkbox.c \
 	checkbox.h \
 	combo.h \

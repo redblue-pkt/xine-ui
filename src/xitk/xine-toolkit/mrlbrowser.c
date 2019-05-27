@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -598,6 +598,7 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
     XUNLOCK(private_data->imlibdata->x.disp);
     
     xitk_destroy_widgets(private_data->widget_list);
+    xitk_button_list_delete (private_data->autodir_buttons);
     
     XLOCK(private_data->imlibdata->x.disp);
     XDestroyWindow(private_data->imlibdata->x.disp, private_data->window);
@@ -659,6 +660,7 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
 /*
  *
  */
+
 void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   ImlibImage                *new_img, *old_img;
   mrlbrowser_private_data_t *private_data;
@@ -710,57 +712,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
 
-    {
-      int x, y;
-      int i = 0;
-      int dir, max;
-      
-      x   = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_ip);
-      y   = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_ip);
-      dir = xitk_skin_get_direction(skonfig, private_data->skin_element_name_ip);
-      max = xitk_skin_get_max_buttons(skonfig, private_data->skin_element_name_ip);
+    xitk_button_list_new_skin (private_data->autodir_buttons, skonfig);
 
-      switch(dir) {
-      case DIRECTION_UP:
-      case DIRECTION_DOWN:
-	while((max && ((i < max) && (private_data->autodir_plugins[i] != NULL))) || 
-	      (!max && private_data->autodir_plugins[i] != NULL)) {
-
-	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
-	  
-	  if(dir == DIRECTION_DOWN)
-	    y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
-	  else
-	    y -= (xitk_get_widget_height(private_data->autodir_plugins[i]) + 1);
-	  
-	  i++;
-	}
-	break;
-      case DIRECTION_LEFT:
-      case DIRECTION_RIGHT:
-	while((max && ((i < max) && (private_data->autodir_plugins[i] != NULL))) || 
-	      (!max && private_data->autodir_plugins[i] != NULL)) {
-	  
-	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
-	  
-	  if(dir == DIRECTION_RIGHT)
-	    x += xitk_get_widget_width(private_data->autodir_plugins[i]) + 1;
-	  else
-	    x -= (xitk_get_widget_width(private_data->autodir_plugins[i]) + 1);
-	  
-	  i++;
-	}
-	break;
-      }
-
-      if(max) {
-	while(private_data->autodir_plugins[i] != NULL) {
-	  xitk_disable_and_hide_widget(private_data->autodir_plugins[i]);
-	  i++;
-	}
-      }
-    }
-    
     xitk_paint_widget_list(private_data->widget_list);
     
   }
@@ -1221,64 +1174,29 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   /*
    * Create buttons with input plugins names.
    */
-  {
-    int x, y;
-    int i = 0;
-    int dir, max;
-    
-    private_data->skin_element_name_ip = strdup(mb->ip_name.button.skin_element_name);
-    x   = xitk_skin_get_coord_x(skonfig, mb->ip_name.button.skin_element_name);
-    y   = xitk_skin_get_coord_y(skonfig, mb->ip_name.button.skin_element_name);
-    dir = xitk_skin_get_direction(skonfig, mb->ip_name.button.skin_element_name);
-    max = xitk_skin_get_max_buttons(skonfig, mb->ip_name.button.skin_element_name);
+  private_data->skin_element_name_ip = strdup (mb->ip_name.button.skin_element_name);
+  do {
+    char *tips[64];
+    const char * const *autodir_plugins = mb->ip_availables;
+    unsigned int i;
 
-    while(mb->ip_availables[i] != NULL) {
+    if (!autodir_plugins)
+      break;
 
-      lb.button_type    = CLICK_BUTTON;
-      lb.label          = mb->ip_availables[i];
-      lb.callback       = mrlbrowser_grab_mrls;
-      lb.state_callback = NULL;
-      lb.userdata       = (void *)private_data;
-      lb.skin_element_name = mb->ip_name.button.skin_element_name;
-
-      xitk_list_append_content(private_data->widget_list->l,
-		       (private_data->autodir_plugins[i] = 
-			xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-      xitk_set_widget_tips(private_data->autodir_plugins[i], 
-			   (char *) xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
-      private_data->autodir_plugins[i]->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-      
-      (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
-
-      /* make "file" the default mrl source */
-      if( !strcasecmp(lb.label, "file") )
-        default_source = private_data->autodir_plugins[i];
-      
-      switch(dir) {
-      case DIRECTION_UP:
-      case DIRECTION_DOWN:
-	if(dir == DIRECTION_DOWN)
-	  y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
-	else
-	  y -= (xitk_get_widget_height(private_data->autodir_plugins[i]) + 1);
-	break;
-      case DIRECTION_LEFT:
-      case DIRECTION_RIGHT:
-	if(dir == DIRECTION_RIGHT)
-	  x += xitk_get_widget_width(private_data->autodir_plugins[i]) + 1;
-	else
-	  x -= (xitk_get_widget_width(private_data->autodir_plugins[i]) + 1);
-	break;
-      }
-      
-      if(max && (i >= max))
-	xitk_disable_and_hide_widget(private_data->autodir_plugins[i]);
-      
-      i++;
+    for (i = 0; autodir_plugins[i]; i++) {
+      if (i >= sizeof (tips) / sizeof (tips[0]))
+        break;
+      tips[i] = (char *)xine_get_input_plugin_description (private_data->xine, autodir_plugins[i]);
     }
-    if(i)
-      private_data->autodir_plugins[i+1] = NULL;
-  }
+
+    private_data->autodir_buttons = xitk_button_list_new (
+      mb->imlibdata, private_data->widget_list,
+      skonfig, private_data->skin_element_name_ip,
+      mrlbrowser_grab_mrls, private_data,
+      (char **)mb->ip_availables,
+      tips, 5000,
+      WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER);
+  } while (0);
 
   _duplicate_mrl_filters(private_data, mb->mrl_filters);
 
@@ -1337,6 +1255,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   XSetInputFocus(mb->imlibdata->x.disp, private_data->window, RevertToParent, CurrentTime);
   XUNLOCK(mb->imlibdata->x.disp);
 
+  default_source = xitk_button_list_find (private_data->autodir_buttons, "file");
   if( default_source && !private_data->last_mrl_source ) {
     mrlbrowser_grab_mrls(default_source, private_data);
   }
@@ -1345,3 +1264,4 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 }
 
 #endif
+
