@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -584,8 +584,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_hue",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
-				CONFIG_NO_DESC, /* _("hue value"), */
-				CONFIG_NO_HELP, /* _("Hue value."), */
+				_("hue value"),
+				_("Hue value."),
 				CONFIG_LEVEL_DEB,
 				hue_changes_cb, 
 				gGui);
@@ -603,8 +603,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_brightness",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
-				CONFIG_NO_DESC, /* _("brightness value"), */
-				CONFIG_NO_HELP, /* _("Brightness value."), */
+				_("brightness value"),
+				_("Brightness value."),
 				CONFIG_LEVEL_DEB,
 				brightness_changes_cb, 
 				gGui);
@@ -622,8 +622,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_saturation",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
-				CONFIG_NO_DESC, /* _("saturation value"), */
-				CONFIG_NO_HELP, /* _("Saturation value."), */
+				_("saturation value"),
+				_("Saturation value."),
 				CONFIG_LEVEL_DEB,
 				saturation_changes_cb, 
 				gGui);
@@ -641,8 +641,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_contrast",
 				-1,
 				CONTROL_MIN, CONTROL_MAX,
-				CONFIG_NO_DESC, /* _("contrast value"), */
-				CONFIG_NO_HELP, /* _("Contrast value."), */
+				_("contrast value"),
+				_("Contrast value."),
 				CONFIG_LEVEL_DEB,
 				contrast_changes_cb, 
 				gGui);
@@ -661,8 +661,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_gamma",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("gamma value"), */
-                                CONFIG_NO_HELP, /* _("Gamma value."), */
+                                _("gamma value"),
+                                _("Gamma value."),
                                 CONFIG_LEVEL_DEB,
                                 gamma_changes_cb,
                                 gGui);
@@ -682,8 +682,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_sharpness",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("sharpness value"), */
-                                CONFIG_NO_HELP, /* _("Sharpness value."), */
+                                _("sharpness value"),
+                                _("Sharpness value."),
                                 CONFIG_LEVEL_DEB,
                                 sharpness_changes_cb,
                                 gGui);
@@ -703,8 +703,8 @@ void control_config_register(void) {
      xine_config_register_range(__xineui_global_xine_instance, "gui.vo_noise_reduction",
                                 -1,
                                 CONTROL_MIN, CONTROL_MAX,
-                                CONFIG_NO_DESC, /* _("noise reduction value"), */
-                                CONFIG_NO_HELP, /* _("Noise reduction value."), */
+                                _("noise reduction value"),
+                                _("Noise reduction value."),
                                 CONFIG_LEVEL_DEB,
                                 noise_reduction_changes_cb,
                                 gGui);

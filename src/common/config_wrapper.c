@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -33,6 +33,17 @@
 #include "utils.h"
 #include "globals.h"
 #include "libcommon.h" /* strsep replacement */
+
+#ifndef _
+/* This is for other GNU distributions with internationalized messages.
+   When compiling libc, the _ macro is predefined.  */
+# ifdef HAVE_LIBINTL_H
+#  include <libintl.h>
+#  define _(msgid)	gettext (msgid)
+# else
+#  define _(msgid)	(msgid)
+# endif
+#endif
 
 /* 
  * experience level above this level 
@@ -135,9 +146,9 @@ void config_mrl(const char *mrl) {
   
   if (!xine_config_lookup_entry(__xineui_global_xine_instance, "misc.implicit_config", &entry) ||
       entry.type != XINE_CONFIG_TYPE_BOOL || !entry.num_value) {
-    fprintf(stderr, "You tried to change the configuration with a cfg: MRL.\n"
-	    "This is not allowed unless you enable the 'misc.implicit_config' setting "
-	    "after reading and understanding its help text.");
+    fprintf (stderr, _("You tried to change the configuration with a cfg: MRL.\n"
+                       "This is not allowed unless you enable the 'misc.implicit_config' setting "
+                       "after reading and understanding its help text."));
     return;
   }
 
@@ -158,8 +169,8 @@ void config_mrl(const char *mrl) {
       if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) {
 
 	if(entry.exp_level >= XINE_CONFIG_SECURITY) {
-	  fprintf(stderr, "For security reason, you're not allowed to change "
-		  "the configuration entry named '%s'.", entry.key);
+          fprintf (stderr, _("For security reason, you're not allowed to change "
+                             "the configuration entry named '%s'."), entry.key);
 	  break;
 	}
 
@@ -193,3 +204,4 @@ void config_mrl(const char *mrl) {
 
   free(_mrl);
 }
+
