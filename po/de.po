@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-05-26 18:39+0200\n"
+"POT-Creation-Date: 2019-05-28 15:08+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,6 +14,68 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+"Sie haben Versucht, die Konfiguration über eine cfg:-MRL zu ändern.\n"
+"Das ist nicht erlaubt, außer Sie aktivieren 'misc.implicit_config', nachdem "
+"Sie den Hilfetext gelesen und verstanden haben."
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+"Aus Sicherheitsgründen ist das Ändern des Konfigurationseintrags '%s' "
+"verboten."
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: Option `%s' ist mehrdeutig\n"
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: Option `--%s' erlaubt kein Argument\n"
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: option `%c%s' erlaubt kein Argument\n"
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: option `%s' erfordert ein Argument\n"
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: unbekannte Option `--%s'\n"
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: unbekannte Option `%c%s'\n"
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: unzulässige Option -- %c\n"
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: ungültige Option -- %c\n"
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: Option -- %c erfordert ein Argument\n"
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: Option `-W %s' ist mehrdeutig\n"
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: Option `-W %s' erlaubt kein Argument\n"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -132,6 +194,48 @@ msgstr "Bildschärfe"
 
 msgid "Noise reduction"
 msgstr "Rauschfilter"
+
+msgid "hue value"
+msgstr "Farbwert"
+
+msgid "Hue value."
+msgstr "Farbwert."
+
+msgid "brightness value"
+msgstr "Helligkeitswert"
+
+msgid "Brightness value."
+msgstr "Helligkeitswert."
+
+msgid "saturation value"
+msgstr "Sättigungswert"
+
+msgid "Saturation value."
+msgstr "Sättigungswert."
+
+msgid "contrast value"
+msgstr "Kontrastwert"
+
+msgid "Contrast value."
+msgstr "Kontrastwert."
+
+msgid "gamma value"
+msgstr "Mittenhelligkeit"
+
+msgid "Gamma value."
+msgstr "Mittenhelligkeit."
+
+msgid "sharpness value"
+msgstr "Bildschärfe"
+
+msgid "Sharpness value."
+msgstr "Bildschärfe."
+
+msgid "noise reduction value"
+msgstr "Rauschfilter"
+
+msgid "Noise reduction value."
+msgstr "Rauschfilter."
 
 #, c-format
 msgid "%s(): couldn't find image for background\n"
@@ -1941,12 +2045,6 @@ msgstr "N.Stumm"
 msgid "Audio: %s"
 msgstr "Audio: %s"
 
-msgid "..."
-msgstr "..."
-
-msgid "More sources..."
-msgstr "Mehr Quellen..."
-
 msgid "Volume control"
 msgstr "Lautstärke-Regler"
 
@@ -2529,46 +2627,6 @@ msgstr "Aktualisieren"
 #~ msgid "New Filter"
 #~ msgstr "Neuer Filter"
 
-#~ msgid ""
-#~ "You tried to change the configuration with a cfg: MRL.\n"
-#~ "This is not allowed unless you enable the 'misc.implicit_config' setting "
-#~ "after reading and understanding its help text."
-#~ msgstr ""
-#~ "Sie haben Versucht, die Konfiguration über eine cfg:-MRL zu ändern.\n"
-#~ "Das ist nicht erlaubt, außer Sie aktivieren 'misc.implicit_config', "
-#~ "nachdem Sie den Hilfetext gelesen und verstanden haben."
-
-#~ msgid ""
-#~ "For security reason, you're not allowed to change the configuration entry "
-#~ "named '%s'."
-#~ msgstr ""
-#~ "Aus Sicherheitsgründen ist das Ändern des Konfigurationseintrags '%s' "
-#~ "verboten."
-
-#~ msgid "hue value"
-#~ msgstr "Farbwert"
-
-#~ msgid "Hue value."
-#~ msgstr "Farbwert."
-
-#~ msgid "brightness value"
-#~ msgstr "Helligkeitswert"
-
-#~ msgid "Brightness value."
-#~ msgstr "Helligkeitswert."
-
-#~ msgid "saturation value"
-#~ msgstr "Sättigungswert"
-
-#~ msgid "Saturation value."
-#~ msgstr "Sättigungswert."
-
-#~ msgid "contrast value"
-#~ msgstr "Kontrastwert"
-
-#~ msgid "Contrast value."
-#~ msgstr "Kontrastwert."
-
 #~ msgid "Event receiver window"
 #~ msgstr "Ereignisempfangsfenster"
 
@@ -2687,43 +2745,6 @@ msgstr "Aktualisieren"
 
 #~ msgid "Can't read %s: %s\n"
 #~ msgstr "Kann %s nicht lesen: %s\n"
-
-#~ msgid "Video Width: "
-#~ msgstr "Videobreite: "
-
-#~ msgid "Video Height: "
-#~ msgstr "Videohöhe: "
-
-#~ msgid "Video Bitrate (bps): "
-#~ msgstr "Videobitrate (b/s): "
-
-#~ msgid "Video handled: "
-#~ msgstr "Videobezeichner: "
-
-#~ msgid "Audio Bitrate: "
-#~ msgstr "Audiobitrate: "
-
-#~ msgid "Audio FourCC: "
-#~ msgstr "Audio FourCC: "
-
-#~ msgid "Ignore Video: "
-#~ msgstr "Ignoriert Video: "
-
-#~ msgid "Ignore Audio: "
-#~ msgstr "Ignoriert Audio: "
-
-#~ msgid "main: probing audio drivers...\n"
-#~ msgstr "main: Audio-Treiber Erkennung...\n"
-
-#~ msgid "main: trying to autoload '%s' audio driver: "
-#~ msgstr "main: Versuche den Audio Treiber \"%s\" automatisch zu laden: "
-
-#~ msgid "main: ...worked, using '%s' audio driver.\n"
-#~ msgstr "main: ...funktioniert, benutze '%s' Audio-Treiber.\n"
-
-#~ msgid "main: the specified audio driver '%s' failed\n"
-#~ msgstr ""
-#~ "main: Der ausgewählte Audio Treiber '%s' konnte nicht geladen werden\n"
 
 #~ msgid "never"
 #~ msgstr "Niemals"
