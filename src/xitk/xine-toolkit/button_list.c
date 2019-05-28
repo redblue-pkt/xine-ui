@@ -44,7 +44,7 @@ static size_t _strlcpy (char *t, const char *s, size_t l) {
 struct xitk_button_list_st {
   xitk_skin_config_t *skin_config;
   char                skin_element_name[64];
-  int                 num, visible, first;
+  int                 flags, num, visible, first;
   int                 fillx, filly, dx, dy;
   xitk_widget_t      *widgets[64];
 };
@@ -109,6 +109,7 @@ xitk_button_list_t *xitk_button_list_new (
     return NULL;
   bl->skin_config = skin_config;
   _strlcpy (bl->skin_element_name, skin_element_name, sizeof (bl->skin_element_name));
+  bl->flags = 1;
 
   max = xitk_skin_get_max_buttons (skin_config, skin_element_name);
   if (max <= 0)
@@ -310,6 +311,8 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
     xitk_set_widget_pos (bl->widgets[i], 0, 0);
     xitk_disable_and_hide_widget (bl->widgets[i]);
   }
+
+  bl->flags |= 1;
 }
 
 xitk_widget_t *xitk_button_list_find (xitk_button_list_t *bl, const char *name) {
@@ -324,6 +327,38 @@ xitk_widget_t *xitk_button_list_find (xitk_button_list_t *bl, const char *name) 
     w++;
   }
   return NULL;
+}
+
+void xitk_button_list_able (xitk_button_list_t *bl, int enable) {
+  if (!bl)
+    return;
+  if (enable) {
+    int a, b;
+    if (bl->flags & 1)
+      return;
+    a = bl->first;
+    b = a + bl->visible;
+    if (b > bl->num)
+      b = bl->num;
+    for (; a < b; a++)
+      xitk_enable_widget (bl->widgets[a]);
+    if (bl->num > bl->visible)
+      xitk_enable_widget (bl->widgets[bl->num + 1]);
+    bl->flags |= 1;
+  } else {
+    int a, b;
+    if (!(bl->flags & 1))
+      return;
+    a = bl->first;
+    b = a + bl->visible;
+    if (b > bl->num)
+      b = bl->num;
+    for (; a < b; a++)
+      xitk_disable_widget (bl->widgets[a]);
+    if (bl->num > bl->visible)
+      xitk_disable_widget (bl->widgets[bl->num + 1]);
+    bl->flags &= ~1;
+  }
 }
 
 void xitk_button_list_delete (xitk_button_list_t *bl) {

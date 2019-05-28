@@ -35,6 +35,7 @@ xitk_button_list_t *xitk_button_list_new (
   char **tips, int tips_timeout, uint32_t widget_type_flags);
 void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config);
 xitk_widget_t *xitk_button_list_find (xitk_button_list_t *xitk_bl, const char *name);
+void xitk_button_list_able (xitk_button_list_t *xitk_bl, int enable);
 void xitk_button_list_delete (xitk_button_list_t *xitk_bl);
 
 #endif

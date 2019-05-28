@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -31,6 +31,7 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/button_list.h"
 
 
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
 
   xitk_widget_t        *playlist;
   xitk_widget_t        *winput;
-  xitk_widget_t        *autoplay_plugins[64];
+  xitk_button_list_t   *autoplay_buttons;
 
   xitk_widget_t        *move_up;
   xitk_widget_t        *move_down;
@@ -67,31 +68,38 @@ static _playlist_t     *playlist;
 
 void playlist_handle_event(XEvent *event, void *data);
 
-static void _playlist_enability(int enable) {
-  void (*enability)(xitk_widget_t *) = (enable == 1) ? xitk_enable_widget : xitk_disable_widget;
-  int    i = 0;
-  
-  if(playlist) {
-    enability(playlist->playlist);
-    enability(playlist->winput);
-    while(playlist->autoplay_plugins[i])
-      enability(playlist->autoplay_plugins[i++]);
-    enability(playlist->move_up);
-    enability(playlist->move_down);
-    enability(playlist->play);
-    enability(playlist->delete);
-    enability(playlist->delete_all);
-    enability(playlist->add);
-    enability(playlist->load);
-    enability(playlist->save);
-    enability(playlist->close);
+static void playlist_deactivate (void) {
+  if (playlist) {
+    xitk_disable_widget (playlist->playlist);
+    xitk_disable_widget (playlist->winput);
+    xitk_button_list_able (playlist->autoplay_buttons, 0);
+    xitk_disable_widget (playlist->move_up);
+    xitk_disable_widget (playlist->move_down);
+    xitk_disable_widget (playlist->play);
+    xitk_disable_widget (playlist->delete);
+    xitk_disable_widget (playlist->delete_all);
+    xitk_disable_widget (playlist->add);
+    xitk_disable_widget (playlist->load);
+    xitk_disable_widget (playlist->save);
+    xitk_disable_widget (playlist->close);
   }
 }
-static void playlist_deactivate(void) {
-  _playlist_enability(0);
-}
-static void playlist_reactivate(void) {
-  _playlist_enability(1);
+
+static void playlist_reactivate (void) {
+  if (playlist) {
+    xitk_enable_widget (playlist->playlist);
+    xitk_enable_widget (playlist->winput);
+    xitk_button_list_able (playlist->autoplay_buttons, 1);
+    xitk_enable_widget (playlist->move_up);
+    xitk_enable_widget (playlist->move_down);
+    xitk_enable_widget (playlist->play);
+    xitk_enable_widget (playlist->delete);
+    xitk_enable_widget (playlist->delete_all);
+    xitk_enable_widget (playlist->add);
+    xitk_enable_widget (playlist->load);
+    xitk_enable_widget (playlist->save);
+    xitk_enable_widget (playlist->close);
+  }
 }
 /*
  *
@@ -702,6 +710,7 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gui->display);
 
     xitk_destroy_widgets(playlist->widget_list);
+    xitk_button_list_delete (playlist->autoplay_buttons);
 
     XLockDisplay(gui->display);
     XDestroyWindow(gui->display, playlist->window);
@@ -759,77 +768,58 @@ int playlist_is_visible(void) {
  */
 void playlist_scan_input(xitk_widget_t *w, void *ip) {
   gGui_t *gui = gGui;
-  const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
-  int                i = 0;
-  
-  if(autoplay_plugins) {
-    while(autoplay_plugins[i] != NULL) {
-      
-      if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
-	int                num_mrls = 0;
-	const char * const *autoplay_mrls = xine_get_autoplay_mrls(__xineui_global_xine_instance, autoplay_plugins[i], &num_mrls);
-	xine_stream_t      *stream;
-	
-	if(autoplay_mrls) {
-	  int                j;
-	  int                cdda_mode = 0;
+  const char *name = xitk_labelbutton_get_label (w);
+  int num_mrls = 0;
+  const char * const * autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, name, &num_mrls);
 
-	  if(!strcasecmp(autoplay_plugins[i], "cd"))
-	    cdda_mode = 1;
-	  
-	  /* Flush playlist in newbie mode */
-	  if(gui->smart_mode) {
-	    mediamark_free_mediamarks();
-	    playlist_update_playlist();
-	    if(playlist != NULL)
-	      xitk_inputtext_change_text(playlist->winput, NULL);
-	  }
-	  
-	  stream = xine_stream_new(__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
-	  
-	  for (j = 0; j < num_mrls; j++) {
-	    char *ident = NULL;
-	    
-	    if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
-	      ident = stream_infos_get_ident_from_stream(stream);
-	      xine_close(stream);
-	    }
-	    
-	    mediamark_append_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
-	    
-	    free(ident);
-	  }
+  if (autoplay_mrls) {
+    xine_stream_t *stream;
+    int j, cdda_mode = 0;
 
-	  xine_dispose(stream);
-	  
-	  gui->playlist.cur = gui->playlist.num ? 0 : -1;
-	  
-	  if(gui->playlist.cur == 0)
-	    gui_set_current_mmk(mediamark_get_current_mmk());
-	  
-	  /* 
-	   * If we're in newbie mode, start playback immediately
-	   * (even ignoring if we're currently playing something
-	   */
-	  if(gui->smart_mode) {
-	    if(xine_get_status(gui->stream) == XINE_STATUS_PLAY)
-	      gui_stop(NULL, NULL);
-	    gui_play(NULL, NULL);
-	  }
-	}
+    if (!strcasecmp (name, "cd"))
+      cdda_mode = 1;
+
+    /* Flush playlist in newbie mode */
+    if (gui->smart_mode) {
+      mediamark_free_mediamarks ();
+      playlist_update_playlist ();
+      if (playlist != NULL)
+        xitk_inputtext_change_text (playlist->winput, NULL);
+    }
+
+    stream = xine_stream_new (__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
+    for (j = 0; j < num_mrls; j++) {
+      char *ident = NULL;
+
+      if (cdda_mode && xine_open (stream, autoplay_mrls[j])) {
+        ident = stream_infos_get_ident_from_stream (stream);
+        xine_close (stream);
       }
-      
-      i++;
+      mediamark_append_entry (autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
+      free (ident);
+    }
+    xine_dispose (stream);
+
+    gui->playlist.cur = gui->playlist.num ? 0 : -1;
+    if (gui->playlist.cur == 0)
+      gui_set_current_mmk (mediamark_get_current_mmk ());
+    /*
+     * If we're in newbie mode, start playback immediately
+     * (even ignoring if we're currently playing something
+     */
+    if (gui->smart_mode) {
+      if (xine_get_status (gui->stream) == XINE_STATUS_PLAY)
+        gui_stop (NULL, NULL);
+      gui_play (NULL, NULL);
     }
     
-    if(playlist) {
-      _playlist_create_playlists();
-      _playlist_update_browser_list(0);
+    if (playlist) {
+      _playlist_create_playlists ();
+      _playlist_update_browser_list (0);
     }
     
-    enable_playback_controls((gui->playlist.num > 0));
+    enable_playback_controls ((gui->playlist.num > 0));
   }
-  
 }
 
 /*
@@ -960,53 +950,7 @@ void playlist_change_skins(int synthetic) {
     
     xitk_change_skins_widget_list(playlist->widget_list, gui->skin_config);
     
-    {
-      int x, y, dir;
-      int i = 0, max;
-      
-      x   = xitk_skin_get_coord_x(gui->skin_config, "AutoPlayBG");
-      y   = xitk_skin_get_coord_y(gui->skin_config, "AutoPlayBG");
-      dir = xitk_skin_get_direction(gui->skin_config, "AutoPlayBG");
-      max = xitk_skin_get_max_buttons(gui->skin_config, "AutoPlayBG");
-
-      switch(dir) {
-      case DIRECTION_UP:
-      case DIRECTION_DOWN:
-	while((max && ((i < max) && (playlist->autoplay_plugins[i] != NULL))) || (!max && playlist->autoplay_plugins[i] != NULL)) {
-	  
-	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
-	  
-	  if(dir == DIRECTION_DOWN)
-	    y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
-	  else
-	    y -= (xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1);
-	  
-	  i++;
-	}
-	break;
-      case DIRECTION_LEFT:
-      case DIRECTION_RIGHT:
-	while((max && ((i < max) && (playlist->autoplay_plugins[i] != NULL))) || (!max && playlist->autoplay_plugins[i] != NULL)) {
-	  
-	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
-	  
-	  if(dir == DIRECTION_RIGHT)
-	    x += xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1;
-	  else
-	    x -= (xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1);
-	  
-	  i++;
-	}
-	break;
-      }
-
-      if(max) {
-	while(playlist->autoplay_plugins[i] != NULL) {
-	  xitk_disable_and_hide_widget(playlist->autoplay_plugins[i]);
-	  i++;
-	}
-      }
-    }
+    xitk_button_list_new_skin (playlist->autoplay_buttons, gui->skin_config);
     
     xitk_paint_widget_list(playlist->widget_list);
   }
@@ -1281,59 +1225,28 @@ void playlist_editor(void) {
    (playlist->winput = xitk_inputtext_create (playlist->widget_list, gui->skin_config, &inp)));
   xitk_set_widget_tips(playlist->winput, _("Direct MRL entry"));
 
-  {
-    int                x, y, dir;
-    int                i = 0, max;
-    const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
-    
-    x   = xitk_skin_get_coord_x(gui->skin_config, "AutoPlayBG");
-    y   = xitk_skin_get_coord_y(gui->skin_config, "AutoPlayBG");
-    dir = xitk_skin_get_direction(gui->skin_config, "AutoPlayBG");
-    max = xitk_skin_get_max_buttons(gui->skin_config, "AutoPlayBG");
+  do {
+    char *tips[64];
+    const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (__xineui_global_xine_instance);
+    unsigned int i;
 
-    while(autoplay_plugins[i] != NULL) {
+    if (!autoplay_plugins)
+      return;
 
-      lb.skin_element_name = "AutoPlayBG";
-      lb.button_type       = CLICK_BUTTON;
-      lb.label             = autoplay_plugins[i];
-      lb.callback          = playlist_scan_input;
-      lb.state_callback    = NULL;
-      lb.userdata          = NULL;
-      xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)),
-	       (playlist->autoplay_plugins[i] = 
-		xitk_labelbutton_create (playlist->widget_list, gui->skin_config, &lb)));
-      xitk_set_widget_tips(playlist->autoplay_plugins[i], 
-		   (char *) xine_get_input_plugin_description(__xineui_global_xine_instance, (char *)autoplay_plugins[i]));
-      
-      (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
-      
-      switch(dir) {
-      case DIRECTION_UP:
-      case DIRECTION_DOWN:
-	if(dir == DIRECTION_DOWN)
-	  y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
-	else
-	  y -= (xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1);
-	break;
-      case DIRECTION_LEFT:
-      case DIRECTION_RIGHT:
-	if(dir == DIRECTION_RIGHT)
-	  x += xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1;
-	else
-	  x -= (xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1);
-	break;
-      }
-
-      if(max && (i >= max))
-	xitk_disable_and_hide_widget(playlist->autoplay_plugins[i]);
-      
-      i++;
-
+    for (i = 0; autoplay_plugins[i]; i++) {
+      if (i >= sizeof (tips) / sizeof (tips[0]))
+        break;
+      tips[i] = (char *)xine_get_input_plugin_description (__xineui_global_xine_instance, autoplay_plugins[i]);
     }
-    if(i)
-      playlist->autoplay_plugins[i+1] = NULL;
 
-  }
+    playlist->autoplay_buttons = xitk_button_list_new (
+      gui->imlib_data, playlist->widget_list,
+      gui->skin_config, "AutoPlayBG",
+      playlist_scan_input, NULL,
+      (char **)autoplay_plugins,
+      tips, 5000, 0);
+  } while (0);
+
   _playlist_update_browser_list(0);
 
   playlist_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
