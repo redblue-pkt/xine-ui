@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -240,7 +240,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, help->xwin);
     
     help->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(help->widget_list)));
+    /* xitk_dlist_init (&help->widget_list->list); */
     
     if(help->num_sections) {
       int i;
@@ -366,7 +366,6 @@ void help_panel(void) {
   XUnlockDisplay (gGui->display);
 
   help->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(help->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(help->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(help->xwin)));
   xitk_widget_list_set(help->widget_list, WIDGET_LIST_GC, gc);
@@ -391,13 +390,10 @@ void help_panel(void) {
   tab.parent_wlist      = help->widget_list;
   tab.callback          = help_change_section;
   tab.userdata          = NULL;
-  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(help->widget_list)),
-    (help->tabs = 
-     xitk_noskin_tabs_create(help->widget_list, 
-			     &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname)));
-
+  help->tabs = xitk_noskin_tabs_create (help->widget_list,
+    &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
+  xitk_add_widget (help->widget_list, help->tabs);
   th = xitk_get_widget_height(help->tabs) - 1;
-  
   xitk_enable_and_show_widget(help->tabs);
 
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -427,13 +423,9 @@ void help_panel(void) {
   br.dbl_click_callback            = NULL;
   br.parent_wlist                  = help->widget_list;
   br.userdata                      = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(help->widget_list)), 
-   (help->browser = 
-    xitk_noskin_browser_create(help->widget_list, &br,
-			       (XITK_WIDGET_LIST_GC(help->widget_list)), 15 + 5, (24 + th) + 5,
-			       WINDOW_WIDTH - (30 + 10 + 16), 20,
-			       16, br_fontname)));
-
+  help->browser = xitk_noskin_browser_create (help->widget_list, &br,
+    (XITK_WIDGET_LIST_GC(help->widget_list)), 15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+  xitk_add_widget (help->widget_list, help->browser);
   xitk_enable_and_show_widget(help->browser);
 
   xitk_browser_set_alignment(help->browser, ALIGN_LEFT);
@@ -449,10 +441,9 @@ void help_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(help->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(help->widget_list, &lb, 
-				       WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23,
-				       "Black", "Black", "White", tabsfontname)));
+  w = xitk_noskin_labelbutton_create (help->widget_list, &lb,
+    WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+  xitk_add_widget (help->widget_list, w);
   xitk_enable_and_show_widget(w);
   
   help->kreg = xitk_register_event_handler("help", 
@@ -469,3 +460,4 @@ void help_panel(void) {
 
   try_to_set_input_focus(xitk_window_get_window(help->xwin));
 }
+

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a free video player.
  * 
@@ -1534,7 +1534,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 
   if(gui->video_display == gui->display) {
     gVw.wl                 = xitk_widget_list_new();
-    xitk_widget_list_set(gVw.wl, WIDGET_LIST_LIST, (xitk_list_new()));
   }
   
   gVw.fullscreen_req     = WINDOWED_MODE;

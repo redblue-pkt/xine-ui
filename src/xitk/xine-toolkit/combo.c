@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -68,7 +68,7 @@ static void notify_destroy(xitk_widget_t *w) {
       _combo_rollunroll(private_data->button_widget, (void *)w, 0);
 
     xitk_destroy_widgets(private_data->widget_list);
-    xitk_list_free(private_data->widget_list->l);
+    /* xitk_dlist_init (&private_data->widget_list->list); */
 
     xitk_unregister_event_handler(&private_data->widget_key);
     xitk_window_destroy_window(private_data->imlibdata, private_data->xwin);
@@ -325,26 +325,27 @@ int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2) {
       xitk_widget_list_t  *wl = w1->wl;
       xitk_widget_t       *w, *wt;
       
-      w = (xitk_widget_t *) xitk_list_first_content(wl->l);
-      while(w && ((w != w1) && (w != w2))) {
-	w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+      w = (xitk_widget_t *)wl->list.head.next;
+      while (w->node.next && ((w != w1) && (w != w2))) {
+        w = (xitk_widget_t *)w->node.next;
       }
 
-      if(w) {
+      if (w->node.next) {
 
 	wt = (w == w1) ? w2 : w1;
 	
 	if((w->type & WIDGET_GROUP_COMBO) && 
 	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
-	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+          w = (xitk_widget_t *)w->node.next;
+          if (w->node.next)
+            w = (xitk_widget_t *)w->node.next;
 	}
 	else if((w->type & WIDGET_GROUP_COMBO) && 
 		((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
-	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+          w = (xitk_widget_t *)w->node.next;
 	}
 	
-	if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+        if (w->node.next && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET)) {
 	  combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
 	
@@ -611,7 +612,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   XUNLOCK(c->imlibdata->x.disp);
 
   private_data->widget_list                = xitk_widget_list_new() ;
-  private_data->widget_list->l             = xitk_list_new ();
+  xitk_dlist_init (&private_data->widget_list->list);
   private_data->widget_list->win           = (xitk_window_get_window(private_data->xwin));
   private_data->widget_list->gc            = private_data->gc;
   
@@ -628,12 +629,9 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   browser.dbl_click_callback            = NULL;
   browser.parent_wlist                  = private_data->widget_list;
   browser.userdata                      = (void*)mywidget;
-  xitk_list_append_content (private_data->widget_list->l, 
-			    (private_data->browser_widget = 
-			     xitk_noskin_browser_create(private_data->widget_list, &browser,
-							private_data->gc, 1, 1, 
-							(itemw - slidw), itemh, slidw,
-							DEFAULT_FONT_10)));
+  private_data->browser_widget = xitk_noskin_browser_create (private_data->widget_list, &browser,
+    private_data->gc, 1, 1, (itemw - slidw), itemh, slidw, DEFAULT_FONT_10);
+  xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->browser_widget->node);
   xitk_enable_and_show_widget(private_data->browser_widget);
   private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
@@ -696,17 +694,15 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   lbl.gc                = c->parent_wlist->gc;
   lbl.callback          = _combo_rollunroll_from_lbl;
   lbl.userdata          = (void *)mywidget;
-  xitk_list_append_content(c->parent_wlist->l,
-			   (private_data->label_widget = 
-			    xitk_label_create(c->parent_wlist, skonfig, &lbl)));
+  private_data->label_widget = xitk_label_create (c->parent_wlist, skonfig, &lbl);
+  xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->label_widget->node);
   private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   cb.skin_element_name = c->skin_element_name;
   cb.callback          = _combo_rollunroll;
   cb.userdata          = (void *)mywidget;
-  xitk_list_append_content(c->parent_wlist->l, 
-			   (private_data->button_widget = 
-			    xitk_checkbox_create(c->parent_wlist, skonfig, &cb)));
+  private_data->button_widget = xitk_checkbox_create (c->parent_wlist, skonfig, &cb);
+  xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->button_widget->node);
   private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   if(lw)
@@ -769,21 +765,18 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     lbl.label             = "";
     lbl.callback          = _combo_rollunroll_from_lbl;
     lbl.userdata          = (void *)mywidget;
-    xitk_list_append_content(c->parent_wlist->l, 
-			     (private_data->label_widget = 
-			      xitk_noskin_label_create(c->parent_wlist, &lbl,
-						       x, y, (width - height), height, DEFAULT_FONT_10)));
+    private_data->label_widget = xitk_noskin_label_create (c->parent_wlist, &lbl,
+      x, y, (width - height), height, DEFAULT_FONT_10);
+    xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->label_widget->node);
     private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;
     cb.userdata          = (void *)mywidget;
 
-    xitk_list_append_content(c->parent_wlist->l, 
-			     (private_data->button_widget = 
-			      xitk_noskin_checkbox_create(c->parent_wlist, &cb,
-							  x + (width - height), y,
-							  height, height)));
+    private_data->button_widget = xitk_noskin_checkbox_create (c->parent_wlist, &cb,
+      x + (width - height), y, height, height);
+    xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->button_widget->node);
     private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
     if(lw)

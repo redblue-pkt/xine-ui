@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -85,6 +85,75 @@
                                       (w)->width  = 0;    \
                                     } while(0)
 
+typedef struct xitk_dnode_st {
+  struct xitk_dnode_st *next, *prev;
+} xitk_dnode_t;
+
+typedef struct {
+  xitk_dnode_t head, tail;
+} xitk_dlist_t;
+
+static inline void xitk_dlist_init (xitk_dlist_t *list) {
+  list->head.next = &list->tail;
+  list->head.prev = NULL;
+  list->tail.next = NULL;
+  list->tail.prev = &list->head;
+}
+
+static inline void xitk_dnode_init (xitk_dnode_t *node) {
+  node->next = node->prev = NULL;
+}
+
+static inline void xitk_dnode_remove (xitk_dnode_t *node) {
+  if (node->next) {
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    node->next = node->prev = NULL;
+  }
+}
+
+static inline void xitk_dlist_add_tail (xitk_dlist_t *list, xitk_dnode_t *node) {
+  node->prev = list->tail.prev;
+  list->tail.prev->next = node;
+  list->tail.prev = node;
+  node->next = &list->tail;
+}
+
+#if 0 /* yet unused */
+
+static inline int xitk_dlist_is_empty (xitk_dlist_t *list) {
+  return list->tail.prev == &list->head;
+}
+
+static inline xitk_dnode_t *xitk_dlist_remove_head (xitk_dlist_t *list) {
+  xitk_dnode_t *node = list->head.next;
+  if (!node->next)
+    return NULL;
+  node->prev->next = node->next;
+  node->next->prev = node->prev;
+  node->next = node->prev = NULL;
+  return node;
+}
+  
+static inline xitk_dnode_t *xitk_dlist_remove_tail (xitk_dlist_t *list) {
+  xitk_dnode_t *node = list->tail.prev;
+  if (!node->prev)
+    return NULL;
+  node->prev->next = node->next;
+  node->next->prev = node->prev;
+  node->next = node->prev = NULL;
+  return node;
+}
+
+static inline void xitk_dlist_add_head (xitk_dlist_t *list, xitk_dnode_t *node) {
+  node->next = list->head.next;
+  list->head.next->prev = node;
+  list->head.next = node;
+  node->prev = &list->head;
+}
+
+#endif
+
 typedef struct xitk_widget_s xitk_widget_t;
 typedef struct xitk_menu_entry_s xitk_menu_entry_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
@@ -92,6 +161,8 @@ typedef struct xitk_skin_config_s xitk_skin_config_t;
 typedef struct xitk_font_s xitk_font_t;
 typedef struct xitk_pixmap_s xitk_pixmap_t;
 typedef struct xitk_window_s xitk_window_t;
+
+void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi);
 
 typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
@@ -422,8 +493,6 @@ typedef enum {
  */
 #define WIDGET_LIST_GC              1
 #define WIDGET_LIST_WINDOW          2
-#define WIDGET_LIST_LIST            3
-#define XITK_WIDGET_LIST_LIST(wl)   (xitk_list_t *) xitk_widget_list_get(wl, WIDGET_LIST_LIST)
 #define XITK_WIDGET_LIST_WINDOW(wl) (Window) xitk_widget_list_get(wl, WIDGET_LIST_WINDOW)
 #define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
 #define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)

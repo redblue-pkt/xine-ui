@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -41,7 +41,7 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   menu_window->display = im->x.disp;
   menu_window->im      = im;
   menu_window->xwin    = xwin;
-  menu_window->wl.l    = xitk_list_new();
+  xitk_dlist_init (&menu_window->wl.list);
   menu_window->wl.win  = xitk_window_get_window(xwin);
 
   menu_attr.override_redirect = True;
@@ -374,7 +374,7 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
   xitk_destroy_widgets(&(*mw)->wl);
   xitk_window_destroy_window((*mw)->im, (*mw)->xwin);
   (*mw)->xwin = NULL;
-  xitk_list_free((*mw)->wl.l);
+  /* xitk_dlist_init (&(*mw)->wl.list); */
 
   XLOCK((*mw)->display);
   XFreeGC((*mw)->display, (*mw)->wl.gc);
@@ -893,12 +893,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       lb.state_callback    = NULL;
       lb.userdata          = (void *) me;
       lb.skin_element_name = NULL;
-      xitk_list_append_content(menu_window->wl.l,
-			       (btn = xitk_noskin_labelbutton_create(&menu_window->wl, &lb,
-								     1, yy,
-								     wwidth, 20,
-								     "Black", "Black", "White", 
-								     DEFAULT_BOLD_FONT_12)));
+      btn = xitk_noskin_labelbutton_create (&menu_window->wl, &lb,
+        1, yy, wwidth, 20, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+      xitk_dlist_add_tail (&menu_window->wl.list, &btn->node);
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
       me->button = btn;
       
@@ -981,7 +978,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 		 (xitk_window_get_window(xwin)), RevertToParent, CurrentTime);
   XUNLOCK(private_data->imlibdata->x.disp);
 
-  btn = (xitk_widget_t *) xitk_list_first_content(menu_window->wl.l);
+  btn = (xitk_widget_t *)menu_window->wl.list.head.next;
   if (btn) {
     xitk_set_focus_to_widget(btn);
   }

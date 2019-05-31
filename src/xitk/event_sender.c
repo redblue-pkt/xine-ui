@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -309,7 +309,7 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
     
     eventer->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(eventer->widget_list)));
+    /* xitk_dlist_init (&eventer->widget_list->list); */
     
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
@@ -419,7 +419,6 @@ void event_sender_panel(void) {
   XUnlockDisplay (gGui->display);
   
   eventer->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(eventer->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(eventer->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(eventer->xwin)));
   xitk_widget_list_set(eventer->widget_list, WIDGET_LIST_GC, gc);
@@ -439,12 +438,10 @@ void event_sender_panel(void) {
 
   lb.label             = _("Up");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_UP);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)),
-	   (eventer->navigator.up = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 70, 40,
-					   "Black", "Black", "White", 
-					   hboldfontname)));
+  eventer->navigator.up = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 70, 40, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->navigator.up);
+
   xitk_enable_and_show_widget(eventer->navigator.up);
 
   x -= 70;
@@ -452,12 +449,10 @@ void event_sender_panel(void) {
 
   lb.label             = _("Left");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_LEFT);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->navigator.left = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 70, 40,
-					   "Black", "Black", "White", 
-					   hboldfontname)));
+  eventer->navigator.left = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 70, 40, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->navigator.left);
+
   xitk_enable_and_show_widget(eventer->navigator.left);
 
   x += 75;
@@ -465,12 +460,10 @@ void event_sender_panel(void) {
 
   lb.label             = _("Select");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_SELECT);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->navigator.select = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 60, 30,
-					   "Black", "Black", "White", 
-					   hboldfontname)));
+  eventer->navigator.select = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 60, 30, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->navigator.select);
+
   xitk_enable_and_show_widget(eventer->navigator.select);
 
   x += 65;
@@ -478,12 +471,10 @@ void event_sender_panel(void) {
 
   lb.label             = _("Right");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_RIGHT);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->navigator.right = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 70, 40,
-					   "Black", "Black", "White", 
-					   hboldfontname)));
+  eventer->navigator.right = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 70, 40, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->navigator.right);
+
   xitk_enable_and_show_widget(eventer->navigator.right);
 
   x -= 70;
@@ -491,12 +482,10 @@ void event_sender_panel(void) {
  
   lb.label             = _("Down");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_DOWN);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->navigator.down = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 70, 40,
-					   "Black", "Black", "White", 
-					   hboldfontname)));
+  eventer->navigator.down = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 70, 40, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->navigator.down);
+
   xitk_enable_and_show_widget(eventer->navigator.down);
 
   x = 23 * 2 + 5 + (80 - 23 * 3) / 2 + 1; /* (+1 to round up) */
@@ -513,11 +502,10 @@ void event_sender_panel(void) {
     if(!i)
       x -= 46;
 
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	     (eventer->numbers.number[i] = 
-	      xitk_noskin_labelbutton_create(eventer->widget_list, 
-					     &lb, x, y, 23, 23,
-					     "Black", "Black", "White", hboldfontname)));
+    eventer->numbers.number[i] = xitk_noskin_labelbutton_create (eventer->widget_list,
+      &lb, x, y, 23, 23, "Black", "Black", "White", hboldfontname);
+    xitk_add_widget (eventer->widget_list, eventer->numbers.number[i]);
+
     xitk_enable_and_show_widget(eventer->numbers.number[i]);
   
     if(!((i - 1) % 3)) {
@@ -541,11 +529,10 @@ void event_sender_panel(void) {
     lb.label             = number;
     lb.userdata          = I2PTR (XINE_EVENT_INPUT_NUMBER_10_ADD);
     
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	     (eventer->numbers.number[i] = 
-	      xitk_noskin_labelbutton_create(eventer->widget_list, 
-					     &lb, x, y, 46, 23,
-					     "Black", "Black", "White", hboldfontname)));
+    eventer->numbers.number[i] = xitk_noskin_labelbutton_create (eventer->widget_list,
+      &lb, x, y, 46, 23, "Black", "Black", "White", hboldfontname);
+    xitk_add_widget (eventer->widget_list, eventer->numbers.number[i]);
+
     xitk_enable_and_show_widget(eventer->numbers.number[i]);
   }
 
@@ -554,22 +541,20 @@ void event_sender_panel(void) {
 
   lb.label             = _("Angle +");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_ANGLE_NEXT);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->angles.next = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 80, 23,
-					   "Black", "Black", "White", hboldfontname)));
+  eventer->angles.next = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 80, 23, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->angles.next);
+
   xitk_enable_and_show_widget(eventer->angles.next);
 
   y += 23;
 
   lb.label             = _("Angle -");
   lb.userdata          = I2PTR (XINE_EVENT_INPUT_ANGLE_PREVIOUS);
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	   (eventer->angles.prev = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 80, 23,
-					   "Black", "Black", "White", hboldfontname)));
+  eventer->angles.prev = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 80, 23, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, eventer->angles.prev);
+
   xitk_enable_and_show_widget(eventer->angles.prev);
 
 
@@ -579,11 +564,10 @@ void event_sender_panel(void) {
   for(i = 0; i < 7; i++) {
     lb.label             = "";
     lb.userdata          = I2PTR (XINE_EVENT_INPUT_MENU1 + i);
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-	     (eventer->menus.menu[i] = 
-	      xitk_noskin_labelbutton_create(eventer->widget_list, 
-					     &lb, x, y, 80, 23,
-					     "Black", "Black", "White", hboldfontname)));
+    eventer->menus.menu[i] = xitk_noskin_labelbutton_create (eventer->widget_list,
+      &lb, x, y, 80, 23, "Black", "Black", "White", hboldfontname);
+    xitk_add_widget (eventer->widget_list, eventer->menus.menu[i]);
+
     xitk_enable_and_show_widget(eventer->menus.menu[i]);
 
     if(i == 2) {
@@ -605,10 +589,10 @@ void event_sender_panel(void) {
   lb.label             = _("Close");
   lb.callback          = event_sender_exit;
   lb.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(eventer->widget_list, 
-				       &lb, x, y, 70, 23,
-				       "Black", "Black", "White", hboldfontname)));
+  w = xitk_noskin_labelbutton_create (eventer->widget_list,
+    &lb, x, y, 70, 23, "Black", "Black", "White", hboldfontname);
+  xitk_add_widget (eventer->widget_list, w);
+
   xitk_enable_and_show_widget(w);
   event_sender_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
