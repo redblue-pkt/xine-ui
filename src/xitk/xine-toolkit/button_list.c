@@ -155,7 +155,7 @@ xitk_button_list_t *xitk_button_list_new (
       break;
 
     bl->widgets[i]->type |= widget_type_flags;
-    xitk_list_append_content (widget_list->l, bl->widgets[i]);
+    xitk_dlist_add_tail (&widget_list->list, &bl->widgets[i]->node);
     if (tips[i])
       xitk_set_widget_tips_and_timeout (bl->widgets[i], tips[i], tips_timeout);
       
@@ -202,7 +202,7 @@ xitk_button_list_t *xitk_button_list_new (
   bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
   if (bl->widgets[i]) {
     bl->widgets[i]->type |= widget_type_flags;
-    xitk_list_append_content (widget_list->l, bl->widgets[i]);
+    xitk_dlist_add_tail (&widget_list->list, &bl->widgets[i]->node);
     (void)xitk_set_widget_pos (bl->widgets[i], x, y);
     xitk_disable_and_hide_widget (bl->widgets[i]);
     i++;
@@ -217,7 +217,7 @@ xitk_button_list_t *xitk_button_list_new (
   bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
   if (bl->widgets[i]) {
     bl->widgets[i]->type |= widget_type_flags;
-    xitk_list_append_content (widget_list->l, bl->widgets[i]);
+    xitk_dlist_add_tail (&widget_list->list, &bl->widgets[i]->node);
     xitk_set_widget_tips_and_timeout (bl->widgets[i], _("More sources..."), tips_timeout);
 /*  if (!tips.enable)
       xitk_disable_widget_tips (bl->widgets[i]); */

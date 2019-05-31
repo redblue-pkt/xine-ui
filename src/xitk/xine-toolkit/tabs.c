@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -379,12 +379,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;
       lb.userdata          = (void *) (private_data->bt[i]);
-      xitk_list_append_content (t->parent_wlist->l, 
-			(private_data->tabs[i] = 
-			 xitk_noskin_labelbutton_create (t->parent_wlist, &lb, xx, y, fwidth + 20, 
-							 private_data->bheight, 
-							 "Black", "Black", "Black",
-							 fontname)));
+      private_data->tabs[i] = xitk_noskin_labelbutton_create (t->parent_wlist, &lb, xx, y, fwidth + 20, 
+        private_data->bheight, "Black", "Black", "Black", fontname);
+      xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->tabs[i]->node);
       private_data->tabs[i]->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       xx += fwidth + 20;
 
@@ -402,10 +399,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       b.skin_element_name = NULL;
       b.callback          = tabs_select_prev;
       b.userdata          = (void *)mywidget;
-      xitk_list_append_content(t->parent_wlist->l,
-	       (private_data->left = 
-		xitk_noskin_button_create(t->parent_wlist, &b, (private_data->x + width) - 40, 
-					  (y-1) + (private_data->bheight - 20), 20, 20)));
+      private_data->left = xitk_noskin_button_create (t->parent_wlist, &b, (private_data->x + width) - 40,
+        (y-1) + (private_data->bheight - 20), 20, 20);
+      xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->left->node);
       private_data->left->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
@@ -416,10 +412,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       b.skin_element_name = NULL;
       b.callback          = tabs_select_next;
       b.userdata          = (void *)mywidget;
-      xitk_list_append_content(t->parent_wlist->l,
-	       (private_data->right = 
-		xitk_noskin_button_create(t->parent_wlist, &b, (private_data->x + width) - 20,
-					  (y-1) + (private_data->bheight - 20), 20, 20)));
+      private_data->right = xitk_noskin_button_create (t->parent_wlist, &b, (private_data->x + width) - 20,
+        (y-1) + (private_data->bheight - 20), 20, 20);
+        xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->right->node);
       private_data->right->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);

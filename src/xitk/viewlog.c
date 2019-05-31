@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -89,7 +89,7 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
     
     viewlog->xwin = NULL;
-    xitk_list_free(XITK_WIDGET_LIST_LIST(viewlog->widget_list));
+    /* xitk_dlist_init (&viewlog->widget_list->list); */
     
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
@@ -321,9 +321,8 @@ static void viewlog_create_tabs(void) {
   tab.parent_wlist      = viewlog->widget_list;
   tab.callback          = viewlog_change_section;
   tab.userdata          = NULL;
-  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(viewlog->widget_list)),
-    (viewlog->tabs = 
-     xitk_noskin_tabs_create(viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname)));
+  viewlog->tabs = xitk_noskin_tabs_create (viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
+  xitk_add_widget (viewlog->widget_list, viewlog->tabs);
 
   th = xitk_get_widget_height(viewlog->tabs) - 1;
 
@@ -412,7 +411,6 @@ void viewlog_panel(void) {
   XUnlockDisplay (gGui->display);
   
   viewlog->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(viewlog->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(viewlog->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(viewlog->xwin)));
   xitk_widget_list_set(viewlog->widget_list, WIDGET_LIST_GC, gc);
@@ -432,12 +430,9 @@ void viewlog_panel(void) {
   br.dbl_click_callback            = NULL;
   br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-   (viewlog->browser_widget = 
-    xitk_noskin_browser_create(viewlog->widget_list, &br,
-			       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + th) + 5,
-			       WINDOW_WIDTH - (30 + 10 + 16), 20,
-			       16, br_fontname)));
+  viewlog->browser_widget = xitk_noskin_browser_create (viewlog->widget_list, &br,
+    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+  xitk_add_widget (viewlog->widget_list, viewlog->browser_widget);
 
   xitk_enable_and_show_widget(viewlog->browser_widget);
 
@@ -458,10 +453,9 @@ void viewlog_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
-				       x, y, 100, 23,
-				       "Black", "Black", "White", tabsfontname)));
+  w =  xitk_noskin_labelbutton_create (viewlog->widget_list, &lb,
+    x, y, 100, 23, "Black", "Black", "White", tabsfontname);
+  xitk_add_widget (viewlog->widget_list, w);
   xitk_enable_and_show_widget(w);
 
   x = WINDOW_WIDTH - (100 + 15);
@@ -473,10 +467,9 @@ void viewlog_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
-				       x, y, 100, 23,
-				       "Black", "Black", "White", tabsfontname)));
+  w =  xitk_noskin_labelbutton_create (viewlog->widget_list, &lb,
+    x, y, 100, 23, "Black", "Black", "White", tabsfontname);
+  xitk_add_widget (viewlog->widget_list, w);
   xitk_enable_and_show_widget(w);
 
   viewlog->kreg = xitk_register_event_handler("viewlog", 
@@ -493,3 +486,4 @@ void viewlog_panel(void) {
   
   try_to_set_input_focus(xitk_window_get_window(viewlog->xwin));
 }
+

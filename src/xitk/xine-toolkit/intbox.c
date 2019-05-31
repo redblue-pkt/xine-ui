@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -331,31 +331,25 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     inp.max_length        = 16;
     inp.callback          = intbox_change_value;
     inp.userdata          = (void *)mywidget;
-    xitk_list_append_content(ib->parent_wlist->l, 
-	     (private_data->input_widget = 
-	      xitk_noskin_inputtext_create(ib->parent_wlist, &inp,
-					   x, y, (width - 10), height,
-					   "Black", "Black", DEFAULT_FONT_10)));
+    private_data->input_widget = xitk_noskin_inputtext_create (ib->parent_wlist, &inp,
+      x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
+    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->input_widget->node);
     private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
     
     b.skin_element_name = NULL;
     b.callback          = intbox_stepup;
     b.userdata          = (void *)mywidget;
-    xitk_list_append_content(ib->parent_wlist->l, 
-	     (private_data->more_widget = 
-	      xitk_noskin_button_create(ib->parent_wlist, &b,
-					(x + width) - (height>>1), y, 
-					(height>>1), (height>>1))));
+    private_data->more_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
+      (x + width) - (height>>1), y, (height>>1), (height>>1));
+    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->more_widget->node);
     private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
     b.skin_element_name = NULL;
     b.callback          = intbox_stepdown;
     b.userdata          = (void *)mywidget;
-    xitk_list_append_content(ib->parent_wlist->l, 
-	     (private_data->less_widget = 
-	      xitk_noskin_button_create(ib->parent_wlist, &b,
-					(x + width) - (height>>1), (y + (height>>1)),
-					(height>>1), (height>>1))));
+    private_data->less_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
+      (x + width) - (height>>1), (y + (height>>1)), (height>>1), (height>>1));
+    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->less_widget->node);
     private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
     /* Draw '+' and '-' in buttons */

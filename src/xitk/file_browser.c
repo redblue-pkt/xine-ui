@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -248,7 +248,7 @@ static void fne_destroy(filename_editor_t *fne) {
     xitk_window_destroy_window(gGui->imlib_data, fne->xwin);
 
     fne->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(fne->widget_list)));
+    /* xitk_dlist_init (&fne->widget_list->list); */
     
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fne->widget_list)));
@@ -317,7 +317,6 @@ static void fb_create_input_window(char *title, char *text,
   
   fne->widget_list                = xitk_widget_list_new();
 
-  xitk_widget_list_set(fne->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(fne->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fne->xwin)));
   xitk_widget_list_set(fne->widget_list, WIDGET_LIST_GC, gc);
@@ -334,10 +333,10 @@ static void fb_create_input_window(char *title, char *text,
   inp.max_length        = XITK_PATH_MAX + XITK_NAME_MAX + 1;
   inp.callback          = NULL;
   inp.userdata          = (void *)fne;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fne->widget_list)),
-	    (fne->input = 
-	     xitk_noskin_inputtext_create(fne->widget_list, &inp,
-					  x, y, w, 20, "Black", "Black", fontname)));
+  fne->input = xitk_noskin_inputtext_create (fne->widget_list, &inp,
+    x, y, w, 20, "Black", "Black", fontname);
+  xitk_add_widget (fne->widget_list, fne->input);
+
   xitk_enable_and_show_widget(fne->input);
 
   y = height - (23 + 15);
@@ -351,11 +350,9 @@ static void fb_create_input_window(char *title, char *text,
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fne;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fne->widget_list)),
-	   (fne->button_apply = 
-	    xitk_noskin_labelbutton_create(fne->widget_list, 
-					   &lb, x, y, w, 23,
-					   "Black", "Black", "White", btnfontname)));
+  fne->button_apply = xitk_noskin_labelbutton_create (fne->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fne->widget_list, fne->button_apply);
   xitk_enable_and_show_widget(fne->button_apply);
 
   x = width - (w + 15);
@@ -367,11 +364,9 @@ static void fb_create_input_window(char *title, char *text,
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fne;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fne->widget_list)),
-	   (fne->button_cancel = 
-	    xitk_noskin_labelbutton_create(fne->widget_list, 
-					   &lb, x, y, w, 23,
-					   "Black", "Black", "White", btnfontname)));
+  fne->button_cancel = xitk_noskin_labelbutton_create (fne->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fne->widget_list, fne->button_cancel);
   xitk_enable_and_show_widget(fne->button_cancel);
 
   {
@@ -902,7 +897,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, fb->xwin);
 
     fb->xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(fb->widget_list)));
+    /* xitk_dlist_init (&fb->widget_list->list); */
     
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
@@ -1244,7 +1239,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   fb->widget_list                = xitk_widget_list_new();
 
-  xitk_widget_list_set(fb->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(fb->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fb->xwin)));
   xitk_widget_list_set(fb->widget_list, WIDGET_LIST_GC, gc);
@@ -1274,10 +1268,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   inp.max_length        = XITK_PATH_MAX + XITK_NAME_MAX + 1;
   inp.callback          = fb_change_origin;
   inp.userdata          = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)),
-	    (fb->origin = 
-	     xitk_noskin_inputtext_create(fb->widget_list, &inp,
-					  x, y, w, 20, "Black", "Black", fontname)));
+  fb->origin = xitk_noskin_inputtext_create (fb->widget_list, &inp,
+    x, y, w, 20, "Black", "Black", fontname);
+  xitk_add_widget (fb->widget_list, fb->origin);
   xitk_enable_and_show_widget(fb->origin);
 
   fb_update_origin(fb);
@@ -1296,11 +1289,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.dbl_click_callback            = fb_dbl_select;
   br.parent_wlist                  = fb->widget_list;
   br.userdata                      = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->directories_browser = 
-	    xitk_noskin_browser_create(fb->widget_list, &br,
-				       (XITK_WIDGET_LIST_GC(fb->widget_list)),
-				       x + 2, y + 2, w - 4 - 12, 20, 12, fontname)));
+  fb->directories_browser = xitk_noskin_browser_create (fb->widget_list, &br,
+    (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
+  xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
   
   draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
@@ -1311,9 +1302,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   b.skin_element_name = NULL;
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->directories_sort =
-	    xitk_noskin_button_create(fb->widget_list, &b, x, y, w, 15)));
+  fb->directories_sort = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
+  xitk_add_widget (fb->widget_list, fb->directories_sort);
   xitk_enable_and_show_widget(fb->directories_sort);
 
   x = WINDOW_WIDTH - (w + 15);
@@ -1330,11 +1320,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.dbl_click_callback            = fb_dbl_select;
   br.parent_wlist                  = fb->widget_list;
   br.userdata                      = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->files_browser = 
-	    xitk_noskin_browser_create(fb->widget_list, &br,
-				       (XITK_WIDGET_LIST_GC(fb->widget_list)),
-				       x + 2, y + 2, w - 4 - 12, 20, 12, fontname)));
+  fb->files_browser = xitk_noskin_browser_create (fb->widget_list, &br,
+    (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
+  xitk_add_widget (fb->widget_list, fb->files_browser);
   xitk_enable_and_show_widget(fb->files_browser);
 
   draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
@@ -1345,9 +1333,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   b.skin_element_name = NULL;
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->files_sort =
-	    xitk_noskin_button_create(fb->widget_list, &b, x, y, w, 15)));
+  fb->files_sort = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
+  xitk_add_widget (fb->widget_list, fb->files_sort);
   xitk_enable_and_show_widget(fb->files_sort);
 
 
@@ -1476,9 +1463,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   cmb.parent_wkey       = &fb->widget_key;
   cmb.callback          = fb_select_file_filter;
   cmb.userdata          = (void *)fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->filters = 
-	    xitk_noskin_combo_create(fb->widget_list, &cmb, x, y, w, NULL, NULL)));
+  fb->filters = xitk_noskin_combo_create (fb->widget_list, &cmb, x, y, w, NULL, NULL);
+  xitk_add_widget (fb->widget_list, fb->filters);
   xitk_combo_set_select(fb->filters, fb->filter_selected);
   xitk_enable_and_show_widget(fb->filters);
 
@@ -1487,9 +1473,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   cb.skin_element_name = NULL;
   cb.callback          = fb_hidden_files;
   cb.userdata          = (void *) fb;
-  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(fb->widget_list)),
-	    (fb->show_hidden = 
-	     xitk_noskin_checkbox_create(fb->widget_list, &cb, x, y+5, 10, 10)));
+  fb->show_hidden = xitk_noskin_checkbox_create (fb->widget_list, &cb, x, y+5, 10, 10);
+  xitk_add_widget (fb->widget_list, fb->show_hidden);
   xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files);
   xitk_enable_and_show_widget(fb->show_hidden);
 
@@ -1499,9 +1484,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lbl.label             = _("Show hidden file");
   lbl.callback          = fb_lbl_hidden_files;
   lbl.userdata          = (void *) fb;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (widget = 
-	    xitk_noskin_label_create(fb->widget_list, &lbl, x + 15, y, w - 15, 20, fontname)));
+  widget = xitk_noskin_label_create (fb->widget_list, &lbl, x + 15, y, w - 15, 20, fontname);
+  xitk_add_widget (fb->widget_list, widget);
   xitk_enable_and_show_widget(widget);
   
   y = WINDOW_HEIGHT - (23 + 15) - (23 + 8);
@@ -1514,11 +1498,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)),
-	   (fb->rename = 
-	    xitk_noskin_labelbutton_create(fb->widget_list, 
-					   &lb, x, y, w, 23,
-					   "Black", "Black", "White", btnfontname)));
+  fb->rename = xitk_noskin_labelbutton_create (fb->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fb->widget_list, fb->rename);
   xitk_enable_and_show_widget(fb->rename);
 
   x = (WINDOW_WIDTH - w) / 2;
@@ -1530,11 +1512,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->delete = 
-	    xitk_noskin_labelbutton_create(fb->widget_list, 
-					   &lb, x, y, w, 23,
-					   "Black", "Black", "White", btnfontname)));
+  fb->delete = xitk_noskin_labelbutton_create (fb->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fb->widget_list, fb->delete);
   xitk_enable_and_show_widget(fb->delete);
   
   x = WINDOW_WIDTH - (w + 15);
@@ -1546,11 +1526,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->create = 
-	    xitk_noskin_labelbutton_create(fb->widget_list, 
-					   &lb, x, y, w, 23,
-					   "Black", "Black", "White", btnfontname)));
+  fb->create = xitk_noskin_labelbutton_create (fb->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fb->widget_list, fb->create);
   xitk_enable_and_show_widget(fb->create);
 
   fb->cb_buttons[0] = fb->cb_buttons[1] = NULL;
@@ -1567,11 +1545,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     lb.state_callback    = NULL;
     lb.userdata          = (void *)fb;
     lb.skin_element_name = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)),
-	     (fb->cb_buttons[0] = 
-	      xitk_noskin_labelbutton_create(fb->widget_list, 
-					     &lb, x, y, w, 23,
-					     "Black", "Black", "White", btnfontname)));
+    fb->cb_buttons[0] = xitk_noskin_labelbutton_create (fb->widget_list,
+      &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (fb->widget_list, fb->cb_buttons[0]);
+
     xitk_enable_and_show_widget(fb->cb_buttons[0]);
 
     if(fb->cbb[1].label) {
@@ -1584,11 +1561,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       lb.state_callback    = NULL;
       lb.userdata          = (void *)fb;
       lb.skin_element_name = NULL;
-      xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	       (fb->cb_buttons[1] = 
-		xitk_noskin_labelbutton_create(fb->widget_list, 
-					       &lb, x, y, w, 23,
-					       "Black", "Black", "White", btnfontname)));
+      fb->cb_buttons[1] = xitk_noskin_labelbutton_create (fb->widget_list,
+        &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+      xitk_add_widget (fb->widget_list, fb->cb_buttons[1]);
       xitk_enable_and_show_widget(fb->cb_buttons[1]);
     }
   }
@@ -1602,10 +1577,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
-	   (fb->close = xitk_noskin_labelbutton_create(fb->widget_list, 
-						       &lb, x, y, w, 23,
-						       "Black", "Black", "White", btnfontname)));
+  fb->close =  xitk_noskin_labelbutton_create (fb->widget_list,
+    &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (fb->widget_list, fb->close);
   xitk_enable_and_show_widget(fb->close);
 
   xitk_window_change_background(gGui->imlib_data, fb->xwin, bg->pixmap, width, height);

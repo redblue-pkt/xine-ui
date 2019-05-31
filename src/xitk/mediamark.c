@@ -3079,7 +3079,7 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gui->imlib_data, mmkeditor.xwin);
     
     mmkeditor.xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)));
+    /* xitk_dlist_init (&mmkeditor.widget_list.list); */
     
     XLockDisplay(gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(mmkeditor.widget_list)));
@@ -3303,7 +3303,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   XUnlockDisplay (gui->display);
   
   mmkeditor.widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(mmkeditor.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(mmkeditor.widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(mmkeditor.xwin)));
   xitk_widget_list_set(mmkeditor.widget_list, WIDGET_LIST_GC, gc);
@@ -3332,11 +3331,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   inp.max_length        = 2048;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	   (mmkeditor.ident = 
-	    xitk_noskin_inputtext_create(mmkeditor.widget_list, &inp,
-					 x + 10, y + 16, w - 20, 20,
-					 "Black", "Black", fontname)));
+  mmkeditor.ident = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
+    x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.ident);
   xitk_set_widget_tips_default(mmkeditor.ident, _("Mediamark Identifier"));
   xitk_enable_and_show_widget(mmkeditor.ident);
 
@@ -3349,11 +3346,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   inp.max_length        = 2048;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.mrl = 
-	     xitk_noskin_inputtext_create(mmkeditor.widget_list, &inp,
-					  x + 10, y + 16, w - 20, 20,
-					  "Black", "Black", fontname)));
+  mmkeditor.mrl = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
+    x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.mrl);
   xitk_set_widget_tips_default(mmkeditor.mrl, _("Mediamark Mrl"));
   xitk_enable_and_show_widget(mmkeditor.mrl);
 
@@ -3366,11 +3361,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   inp.max_length        = 2048;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.sub = 
-	     xitk_noskin_inputtext_create(mmkeditor.widget_list, &inp,
-					  x + 10, y + 16, w - 20 - 100 - 10, 20,
-					  "Black", "Black", fontname)));
+  mmkeditor.sub = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
+    x + 10, y + 16, w - 20 - 100 - 10, 20, "Black", "Black", fontname);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.sub);
   xitk_set_widget_tips_default(mmkeditor.sub, _("Subtitle File"));
   xitk_enable_and_show_widget(mmkeditor.sub);
 
@@ -3381,10 +3374,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)), 
-	   (b = xitk_noskin_labelbutton_create(mmkeditor.widget_list, &lb,
-					       x + 10 + w - 20 - 100, y + 16, 100, 20,
-					       "Black", "Black", "White", btnfontname)));
+  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list, &lb,
+    x + 10 + w - 20 - 100, y + 16, 100, 20, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (mmkeditor.widget_list, b);
   xitk_set_widget_tips_default(b, _("Select a subtitle file to use together with the mrl."));
   xitk_enable_and_show_widget(b);
 
@@ -3399,10 +3391,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.start = 
-	     xitk_noskin_intbox_create(mmkeditor.widget_list, &ib, 
-				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
+  mmkeditor.start = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
+    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.start);
   xitk_set_widget_tips_default(mmkeditor.start, _("Mediamark start time (secs)."));
   xitk_enable_and_show_widget(mmkeditor.start);
 
@@ -3416,10 +3407,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.end = 
-	     xitk_noskin_intbox_create(mmkeditor.widget_list, &ib, 
-				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
+  mmkeditor.end = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
+    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.end);
   xitk_set_widget_tips_default(mmkeditor.end, _("Mediamark end time (secs)."));
   xitk_enable_and_show_widget(mmkeditor.end);
 
@@ -3433,10 +3423,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.av_offset = 
-	     xitk_noskin_intbox_create(mmkeditor.widget_list, &ib, 
-				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
+  mmkeditor.av_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
+    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.av_offset);
   xitk_set_widget_tips_default(mmkeditor.av_offset, _("Offset of Audio and Video."));
   xitk_enable_and_show_widget(mmkeditor.av_offset);
 
@@ -3450,10 +3439,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)),
-	    (mmkeditor.spu_offset = 
-	     xitk_noskin_intbox_create(mmkeditor.widget_list, &ib, 
-				       x + 30, y + 16, w - 60, 20, NULL, NULL, NULL)));
+  mmkeditor.spu_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
+    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+  xitk_add_widget (mmkeditor.widget_list, mmkeditor.spu_offset);
   xitk_set_widget_tips_default(mmkeditor.spu_offset, _("Subpicture offset."));
   xitk_enable_and_show_widget(mmkeditor.spu_offset);
 
@@ -3466,10 +3454,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)), 
-	   (b = xitk_noskin_labelbutton_create(mmkeditor.widget_list, 
-					       &lb, x, y, 100, 23,
-					       "Black", "Black", "White", btnfontname)));
+  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
+    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (mmkeditor.widget_list, b);
   xitk_set_widget_tips_default(b, _("Apply the changes and close the window."));
   xitk_enable_and_show_widget(b);
 
@@ -3481,10 +3468,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)), 
-	   (b = xitk_noskin_labelbutton_create(mmkeditor.widget_list, 
-					       &lb, x, y, 100, 23,
-					       "Black", "Black", "White", btnfontname)));
+  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
+    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (mmkeditor.widget_list, b);
   xitk_set_widget_tips_default(b, _("Apply the changes to the playlist."));
   xitk_enable_and_show_widget(b);
 
@@ -3496,10 +3482,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor.widget_list)), 
-	   (b = xitk_noskin_labelbutton_create(mmkeditor.widget_list, 
-					       &lb, x, y, 100, 23,
-					       "Black", "Black", "White", btnfontname)));
+  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
+    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (mmkeditor.widget_list, b);
   xitk_set_widget_tips_default(b, _("Discard changes and dismiss the window."));
   xitk_enable_and_show_widget(b);
   mmk_editor_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
@@ -3523,3 +3508,4 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   try_to_set_input_focus(xitk_window_get_window(mmkeditor.xwin));
 }
+

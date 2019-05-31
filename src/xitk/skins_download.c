@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -246,7 +246,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
     
     skdloader.xwin = NULL;
     
-    xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader.widget_list)));
+    /* xitk_dlist_init (&skdloader.widget_list->list); */
     
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)));
@@ -657,7 +657,6 @@ void download_skin(char *url) {
     XUnlockDisplay (gGui->display);
 
     skdloader.widget_list = xitk_widget_list_new();
-    xitk_widget_list_set(skdloader.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
     xitk_widget_list_set(skdloader.widget_list, 
 			 WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(skdloader.xwin)));
     xitk_widget_list_set(skdloader.widget_list, WIDGET_LIST_GC, gc);
@@ -692,13 +691,10 @@ void download_skin(char *url) {
     br.dbl_click_callback            = NULL;
     br.parent_wlist                  = skdloader.widget_list;
     br.userdata                      = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader.widget_list)), 
-			     (skdloader.browser = 
-			      xitk_noskin_browser_create(skdloader.widget_list, &br,
-							 (XITK_WIDGET_LIST_GC(skdloader.widget_list)), 
-							 x + 5, y + 5,
-							 WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname)));
-    
+    skdloader.browser = xitk_noskin_browser_create (skdloader.widget_list, &br,
+      (XITK_WIDGET_LIST_GC(skdloader.widget_list)), x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    xitk_add_widget (skdloader.widget_list, skdloader.browser);
+
     xitk_browser_update_list(skdloader.browser, 
     			     (const char *const *)skdloader.entries, NULL, skdloader.num, 0);
     
@@ -720,10 +716,9 @@ void download_skin(char *url) {
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader.widget_list)), 
-	     (widget = xitk_noskin_labelbutton_create(skdloader.widget_list, 
-						      &lb, x, y, 100, 23,
-						      "Black", "Black", "White", btnfontname)));
+    widget =  xitk_noskin_labelbutton_create (skdloader.widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (skdloader.widget_list, widget);
     xitk_enable_and_show_widget(widget);
 
     x = WINDOW_WIDTH - (100 + 15);
@@ -735,10 +730,9 @@ void download_skin(char *url) {
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader.widget_list)), 
-	     (widget = xitk_noskin_labelbutton_create(skdloader.widget_list, 
-						      &lb, x, y, 100, 23,
-						      "Black", "Black", "White", btnfontname)));
+    widget =  xitk_noskin_labelbutton_create (skdloader.widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (skdloader.widget_list, widget);
     xitk_enable_and_show_widget(widget);
     
     skdloader.widget_key = xitk_register_event_handler("skdloader", 

@@ -84,6 +84,8 @@ typedef struct {
 typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_event_result_t *);
 
 struct xitk_widget_s {
+  xitk_dnode_t                    node;
+
   ImlibData                      *imlibdata;
 
   xitk_widget_list_t             *wl;
@@ -109,7 +111,7 @@ struct xitk_widget_s {
 
 struct xitk_widget_list_s {
 
-  xitk_list_t                *l;
+  xitk_dlist_t                list;
 
   xitk_widget_t              *widget_focused;
   xitk_widget_t              *widget_under_mouse;

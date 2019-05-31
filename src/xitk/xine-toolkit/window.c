@@ -756,7 +756,7 @@ void xitk_window_dialog_destroy(xitk_window_t *w) {
       XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
       XUNLOCK(wd->imlibdata->x.disp);
       
-      xitk_list_free(wd->widget_list->l);
+      /* xitk_dlist_init (&wd->widget_list->list); */
      
      XITK_WIDGET_LIST_FREE(wd->widget_list); 
     }
@@ -814,7 +814,7 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
     XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
     XUNLOCK(wd->imlibdata->x.disp);
     
-    xitk_list_free(wd->widget_list->l);
+    /* xitk_dlist_init (&wd->widget_list->list); */
 
     XITK_WIDGET_LIST_FREE(wd->widget_list);
   }
@@ -958,7 +958,7 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
-  wd->widget_list->l             = xitk_list_new ();
+  xitk_dlist_init (&wd->widget_list->list);
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
 
   XLOCK(wd->imlibdata->x.disp);
@@ -981,12 +981,9 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wyes = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wyes->node);
   wd->default_button = wd->wyes;
 
   /* Draw text area */
@@ -1120,7 +1117,7 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
-  wd->widget_list->l             = xitk_list_new ();
+  xitk_dlist_init (&wd->widget_list->list);
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
   XLOCK(wd->imlibdata->x.disp);
   wd->widget_list->gc            = (XCreateGC(im->x.disp, (xitk_window_get_window(wd->xwin)),
@@ -1139,10 +1136,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     cb.skin_element_name = NULL;
     cb.callback          = cb3;
     cb.userdata          = userdata;
-    xitk_list_append_content (XITK_WIDGET_LIST_LIST(wd->widget_list),
-                      (wd->checkbox = 
-                      xitk_noskin_checkbox_create(wd->widget_list, &cb, x, y+5, 10, 10)));
-  
+    wd->checkbox = xitk_noskin_checkbox_create (wd->widget_list, &cb, x, y+5, 10, 10);
+    xitk_dlist_add_tail (&wd->widget_list->list, &wd->checkbox->node);
     xitk_checkbox_set_state(wd->checkbox, checkbox_state);
   
     lbl.window            = xitk_window_get_window(wd->xwin);
@@ -1151,9 +1146,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     lbl.label             = checkbox_label;
     lbl.callback          = _checkbox_label_click;
     lbl.userdata          = wd;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(wd->widget_list)), 
-            (wd->checkbox_label = 
-              xitk_noskin_label_create(wd->widget_list, &lbl, x + 15, y, windoww - x - 40, 20, DEFAULT_FONT_12)));
+    wd->checkbox_label = xitk_noskin_label_create (wd->widget_list, &lbl, x + 15, y, windoww - x - 40, 20, DEFAULT_FONT_12);
+    xitk_dlist_add_tail (&wd->widget_list->list, &wd->checkbox_label->node);
   }
   
   /* Buttons */
@@ -1172,12 +1166,9 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx1, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wyes = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx1, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wyes->node);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
@@ -1186,12 +1177,9 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wno =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx2, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wno = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx2, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wno->node);
 
   wd->default_button = wd->wno;
 
@@ -1326,7 +1314,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
-  wd->widget_list->l             = xitk_list_new ();
+  xitk_dlist_init (&wd->widget_list->list);
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
   XLOCK(wd->imlibdata->x.disp);
   wd->widget_list->gc            = (XCreateGC(im->x.disp, (xitk_window_get_window(wd->xwin)),
@@ -1350,12 +1338,9 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx1, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wyes = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx1, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wyes->node);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
@@ -1364,12 +1349,9 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wno =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx2, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wno = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx2, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wno->node);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button3_label;
@@ -1378,12 +1360,9 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(wd->widget_list->l, 
-	   (wd->wcancel =
-	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
-					   bx3, by,
-					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
+  wd->wcancel = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+    bx3, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+  xitk_dlist_add_tail (&wd->widget_list->list, &wd->wcancel->node);
 
   wd->default_button = wd->wcancel;
 

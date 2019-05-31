@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -291,7 +291,7 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gui->imlib_data, sinfos.xwin);
 
     sinfos.xwin = NULL;
-    xitk_list_free((XITK_WIDGET_LIST_LIST(sinfos.widget_list)));
+    /* xitk_dlist_init (&sinfos.widget_list.list); */
     
     XLockDisplay(gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
@@ -478,7 +478,6 @@ void stream_infos_panel(void) {
   XUnlockDisplay (gui->display);
 
   sinfos.widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(sinfos.widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(sinfos.widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(sinfos.xwin)));
   xitk_widget_list_set(sinfos.widget_list, WIDGET_LIST_GC, gc);
@@ -511,10 +510,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.title = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.title = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.title);
   xitk_enable_and_show_widget(sinfos.meta_infos.title);
 
   /* New Line */
@@ -526,10 +524,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.comment = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.comment = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.comment);
   xitk_enable_and_show_widget(sinfos.meta_infos.comment);
 
   /* New Line */
@@ -542,10 +539,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.artist = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.artist = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.artist);
   xitk_enable_and_show_widget(sinfos.meta_infos.artist);
 
   x += w + 5;
@@ -557,10 +553,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.genre = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.genre = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.genre);
   xitk_enable_and_show_widget(sinfos.meta_infos.genre);
 
   x += w + 5;
@@ -572,10 +567,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.year = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.year = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.year);
   xitk_enable_and_show_widget(sinfos.meta_infos.year);
 
   /* New Line */
@@ -589,10 +583,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.album = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.album = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.album);
   xitk_enable_and_show_widget(sinfos.meta_infos.album);
 
   /* frame space */
@@ -611,10 +604,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.input_plugin = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.input_plugin = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.input_plugin);
   xitk_enable_and_show_widget(sinfos.meta_infos.input_plugin);
 
   x += w + 5;
@@ -626,10 +618,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.systemlayer = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.systemlayer = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.systemlayer);
   xitk_enable_and_show_widget(sinfos.meta_infos.systemlayer);
 
   x += w + 5;
@@ -640,10 +631,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.bitrate = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.bitrate);
   xitk_enable_and_show_widget(sinfos.infos.bitrate);
 
   x += w + 5;
@@ -655,10 +645,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.frame_duration = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.frame_duration = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.frame_duration);
   xitk_enable_and_show_widget(sinfos.infos.frame_duration);
 
   /* New Line */
@@ -671,10 +660,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.seekable = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.seekable = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.seekable);
   xitk_enable_and_show_widget(sinfos.infos.seekable);
 
   x += w + 5;
@@ -686,10 +674,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.has_chapters = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.has_chapters = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_chapters);
   xitk_enable_and_show_widget(sinfos.infos.has_chapters);
 
   x += w + 5;
@@ -700,10 +687,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.ignore_spu = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.ignore_spu = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_spu);
   xitk_enable_and_show_widget(sinfos.infos.ignore_spu);
 
   x += w + 5;
@@ -715,10 +701,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.has_still = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.has_still = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_still);
   xitk_enable_and_show_widget(sinfos.infos.has_still);
 
   /* video frame */
@@ -738,10 +723,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.has_video = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.has_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_video);
   xitk_enable_and_show_widget(sinfos.infos.has_video);
 
   x += w + 5;
@@ -752,10 +736,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_handled = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_handled);
   xitk_enable_and_show_widget(sinfos.infos.video_handled);
 
   x += w + 5;
@@ -767,10 +750,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.ignore_video = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.ignore_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_video);
   xitk_enable_and_show_widget(sinfos.infos.ignore_video);
 
   x += w + 5;
@@ -783,10 +765,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.videocodec = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.videocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.videocodec);
   xitk_enable_and_show_widget(sinfos.meta_infos.videocodec);
 
   /* New Line */
@@ -800,10 +781,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_fourcc = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_fourcc);
   xitk_enable_and_show_widget(sinfos.infos.video_fourcc);
   
   x += w + 5;
@@ -814,10 +794,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_channels = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_channels);
   xitk_enable_and_show_widget(sinfos.infos.video_channels);
   
   x += w + 5;
@@ -828,10 +807,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_bitrate = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_bitrate);
   xitk_enable_and_show_widget(sinfos.infos.video_bitrate);
 
   x += w + 5;
@@ -842,10 +820,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_resolution = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_resolution = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_resolution);
   xitk_enable_and_show_widget(sinfos.infos.video_resolution);
 
   x += w + 5;
@@ -856,10 +833,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_ratio = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_ratio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_ratio);
   xitk_enable_and_show_widget(sinfos.infos.video_ratio);
   
   x += w + 5;
@@ -870,10 +846,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.video_streams = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.video_streams = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_streams);
   xitk_enable_and_show_widget(sinfos.infos.video_streams);
 
   /* Audio Frame */
@@ -893,10 +868,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.has_audio = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.has_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_audio);
   xitk_enable_and_show_widget(sinfos.infos.has_audio);
 
   x += w + 5;
@@ -907,10 +881,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_handled = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_handled);
   xitk_enable_and_show_widget(sinfos.infos.audio_handled);
 
   x += w + 5;
@@ -922,10 +895,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.ignore_audio = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.ignore_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_audio);
   xitk_enable_and_show_widget(sinfos.infos.ignore_audio);
 
   x += w + 5;
@@ -938,10 +910,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.meta_infos.audiocodec = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.meta_infos.audiocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.audiocodec);
   xitk_enable_and_show_widget(sinfos.meta_infos.audiocodec);
   
   /* New Line */
@@ -955,10 +926,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_fourcc = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_fourcc);
   xitk_enable_and_show_widget(sinfos.infos.audio_fourcc);
 
   x += w + 5;
@@ -969,10 +939,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_channels = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_channels);
   xitk_enable_and_show_widget(sinfos.infos.audio_channels);
 
   x += w + 5;
@@ -984,10 +953,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_bitrate = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_bitrate);
   xitk_enable_and_show_widget(sinfos.infos.audio_bitrate);
 
   x += w + 5;
@@ -999,10 +967,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_bits = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_bits = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_bits);
   xitk_enable_and_show_widget(sinfos.infos.audio_bits);
 
   x += w + 5;
@@ -1013,10 +980,9 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-			   (sinfos.infos.audio_samplerate = 
-			    xitk_noskin_label_create(sinfos.widget_list, &lbl,
-						     x + 5, y + 15, w - 10, 20, fontname)));
+  sinfos.infos.audio_samplerate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
+    x + 5, y + 15, w - 10, 20, fontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_samplerate);
   xitk_enable_and_show_widget(sinfos.infos.audio_samplerate);
 
   /*  */
@@ -1030,11 +996,9 @@ void stream_infos_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-	   (sinfos.update = 
-	    xitk_noskin_labelbutton_create(sinfos.widget_list, 
-					   &lb, x, y, 100, 23,
-					   "Black", "Black", "White", btnfontname)));
+  sinfos.update = xitk_noskin_labelbutton_create (sinfos.widget_list,
+    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (sinfos.widget_list, sinfos.update);
   xitk_enable_and_show_widget(sinfos.update);
 
   if(gui->stream_info_auto_update)
@@ -1049,10 +1013,9 @@ void stream_infos_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos.widget_list)), 
-   (widget = xitk_noskin_labelbutton_create(sinfos.widget_list, 
-					    &lb, x, y, 100, 23,
-					    "Black", "Black", "White", btnfontname)));
+  widget =  xitk_noskin_labelbutton_create (sinfos.widget_list,
+    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+  xitk_add_widget (sinfos.widget_list, widget);
   xitk_enable_and_show_widget(widget);
 
   xitk_window_change_background(gui->imlib_data, sinfos.xwin, bg->pixmap, width, height);

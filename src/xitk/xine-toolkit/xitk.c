@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1003,6 +1003,8 @@ xitk_widget_list_t *xitk_widget_list_new (void) {
   l->widget_under_mouse = NULL;
   l->widget_pressed     = NULL;
 
+  xitk_dlist_init (&l->list);
+
   MUTLOCK();
 
   xitk_list_append_content(gXitk->list, l);
@@ -1809,14 +1811,14 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	  XWindowAttributes wattr;
 	  Status            err;
 
-	  if(fx->widget_list && fx->widget_list->l) {
-	    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content(fx->widget_list->l);
-	    while (w) {
+          if (fx->widget_list) {
+            xitk_widget_t *w = (xitk_widget_t *)fx->widget_list->list.head.next;
+            while (w->node.next) {
 	      if(((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 		 (w->type & WIDGET_GROUP_WIDGET)) {
 		xitk_combo_update_pos(w);
 	      }
-	      w = (xitk_widget_t *) xitk_list_next_content (fx->widget_list->l);
+	      w = (xitk_widget_t *)w->node.next;
 	    }
 	  }
 
@@ -2358,3 +2360,4 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
+
