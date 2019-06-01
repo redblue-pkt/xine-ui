@@ -549,11 +549,9 @@ static void _pplugin_send_expose(_pp_wrapper_t *pp_wrapper) {
   }
 }
 
-static void _pplugin_destroy_widget(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w) {
-  if (w) {
-    xitk_hide_widget (w);
-    xitk_destroy_widget (w);
-  }
+static void _pplugin_destroy_widget (xitk_widget_t **w) {
+  xitk_destroy_widget (*w);
+  *w = NULL;
 }
 
 static void _pplugin_update_parameter(post_object_t *pobj) {
@@ -780,11 +778,8 @@ static void _pplugin_change_parameter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *
 
   if(pobj) {
 
-    if(pobj->value)
-      _pplugin_destroy_widget(pp_wrapper, pobj->value);
-    
-    if(pobj->comment)
-      _pplugin_destroy_widget(pp_wrapper, pobj->comment);
+    _pplugin_destroy_widget (&pobj->value);
+    _pplugin_destroy_widget (&pobj->comment);
 
     if(pobj->descr) {
       pobj->param    = pobj->descr->parameter;
@@ -829,8 +824,7 @@ static void _pplugin_destroy_only_obj(_pp_wrapper_t *pp_wrapper, post_object_t *
 
     if(pobj->properties) {
       
-      _pplugin_destroy_widget(pp_wrapper, pobj->properties);
-      pobj->properties = NULL;
+      _pplugin_destroy_widget (&pobj->properties);
       
       VFREE(pobj->param_data);
       pobj->param_data = NULL;
@@ -848,21 +842,13 @@ static void _pplugin_destroy_only_obj(_pp_wrapper_t *pp_wrapper, post_object_t *
       }
     }
     
-    if(pobj->comment) {
-      _pplugin_destroy_widget(pp_wrapper, pobj->comment);
-      pobj->comment = NULL;
-    }
-    
-    if(pobj->value) {
-      _pplugin_destroy_widget(pp_wrapper, pobj->value);
-      pobj->value = NULL;
-    }
+    _pplugin_destroy_widget (&pobj->comment);
+    _pplugin_destroy_widget (&pobj->value);
 
     if(pobj->api && pobj->help) {
       if(pp_wrapper->pplugin->help_running)
 	_pplugin_close_help(pp_wrapper, NULL,NULL);
-      _pplugin_destroy_widget(pp_wrapper, pobj->help);
-      pobj->help = NULL;
+      _pplugin_destroy_widget (&pobj->help);
     }
     
   }
@@ -1217,10 +1203,10 @@ static void _pplugin_select_filter(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, 
           xine_post_dispose (__xineui_global_xine_instance, p[n]->post);
           p[n]->post = NULL;
         }
-        _pplugin_destroy_widget (pp_wrapper, p[n]->plugins);
-        _pplugin_destroy_widget (pp_wrapper, p[n]->frame);
-        _pplugin_destroy_widget (pp_wrapper, p[n]->up);
-        _pplugin_destroy_widget (pp_wrapper, p[n]->down);
+        _pplugin_destroy_widget (&p[n]->plugins);
+        _pplugin_destroy_widget (&p[n]->frame);
+        _pplugin_destroy_widget (&p[n]->up);
+        _pplugin_destroy_widget (&p[n]->down);
         VFREE (p[n]);
         p[n] = NULL;
         n++;
@@ -1612,10 +1598,10 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
       post_object_t **p = pp_wrapper->pplugin->post_objects;
       while (*p) {
         _pplugin_destroy_only_obj (pp_wrapper, *p);
-        _pplugin_destroy_widget (pp_wrapper, (*p)->plugins);
-        _pplugin_destroy_widget (pp_wrapper, (*p)->frame);
-        _pplugin_destroy_widget (pp_wrapper, (*p)->up);
-        _pplugin_destroy_widget (pp_wrapper, (*p)->down);
+        _pplugin_destroy_widget (&(*p)->plugins);
+        _pplugin_destroy_widget (&(*p)->frame);
+        _pplugin_destroy_widget (&(*p)->up);
+        _pplugin_destroy_widget (&(*p)->down);
         VFREE (*p);
         *p = NULL;
         p++;
