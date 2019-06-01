@@ -110,6 +110,7 @@ struct xitk_widget_s {
 };
 
 struct xitk_widget_list_s {
+  xitk_dnode_t                node;
 
   xitk_dlist_t                list;
 

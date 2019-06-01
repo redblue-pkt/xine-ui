@@ -92,6 +92,8 @@ static int ml = 0;
 
 
 typedef struct {
+  xitk_dnode_t                node;
+
   Window                      window;
   Atom                        XA_XITK;
 
@@ -160,8 +162,8 @@ typedef struct {
   int                         display_width;
   int                         display_height;
   int                         verbosity;
-  xitk_list_t                *list;
-  xitk_list_t                *gfx;
+  xitk_dlist_t                wlists;
+  xitk_dlist_t                gfxs;
   int                         use_xshm;
 
   uint32_t                    wm_type;
@@ -355,8 +357,8 @@ static void xitk_signal_handler(int sig) {
     if(cur_pid == xitk_pid) {
       
       if (gXitk) {
-        xitk_list_free(gXitk->list);
-        xitk_list_free(gXitk->gfx);
+        xitk_dlist_clear (&gXitk->wlists);
+        xitk_dlist_clear (&gXitk->gfxs);
         xitk_config_deinit(gXitk->config);
       
         XITK_FREE(gXitk);
@@ -1007,10 +1009,13 @@ xitk_widget_list_t *xitk_widget_list_new (void) {
 
   MUTLOCK();
 
-  xitk_list_append_content(gXitk->list, l);
+  xitk_dlist_add_tail (&gXitk->wlists, &l->node);
 
   MUTUNLOCK();
 
+#ifdef XITK_DEBUG
+  printf  ("xitk: new wl @ %p.\n", (void *)l);
+#endif
   return l;
 }
 
@@ -1024,9 +1029,9 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
   
   MUTLOCK();
       
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
   
-  while(fx) {
+  while (fx->node.next) {
 
     FXLOCK(fx);
     if(fx->key == key) {
@@ -1044,7 +1049,7 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
     }
     
     FXUNLOCK(fx);
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
   }
 
   MUTUNLOCK();
@@ -1074,6 +1079,8 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
   //  printf("%s()\n", __FUNCTION__);
 
   fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
+  if (!fx)
+    return -1;
 
   fx->name = name ? strdup(name) : strdup("NO_SET");
 
@@ -1155,65 +1162,44 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
 
   MUTLOCK();
 
-  xitk_list_append_content(gXitk->gfx, fx);
+  xitk_dlist_add_tail (&gXitk->gfxs, &fx->node);
 
   MUTUNLOCK();
 
+#ifdef XITK_DEBUG
+  printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
+#endif
   return fx->key;
 }
 
 static void __fx_destroy(__gfx_t *fx, int locked) {
-  __gfx_t *cur;
-  
   if(!fx)
     return;
   
   if(!locked)
     MUTLOCK();
   
-  cur = (__gfx_t *) xitk_list_get_current(gXitk->gfx);
-  
   if(fx->xdnd) {
     xitk_unset_dnd_callback(fx->xdnd);
     free(fx->xdnd);
   }
 
-  if (fx->widget_list && fx->widget_list->destroy)
+  if (fx->widget_list && fx->widget_list->destroy) {
+    xitk_dnode_remove (&fx->widget_list->node);
+    xitk_dlist_clear (&fx->widget_list->list);
     free(fx->widget_list);
+#ifdef XITK_DEBUG
+    printf  ("xitk: deferredly killed wl @ %p.\n", (void *)fx->widget_list);
+#endif
+  }
   
   fx->xevent_callback = NULL;
   fx->newpos_callback = NULL;
   fx->user_data       = NULL;
 
   free(fx->name);
-  
-  if(cur) {
-    if(cur == fx)
-      xitk_list_delete_current(gXitk->gfx); 
-    else {
-      __gfx_t *cfx;
-      
-      cfx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-      while(cfx) {
-	if(cfx == fx) {
-	  xitk_list_delete_current(gXitk->gfx); 
-	  break;
-	}
-	
-	cfx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
-      }
-      
-      /* set current back */
-      cfx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-      while(cfx) {
-	
-	if(cfx == cur)
-	  break;
-	
-	cfx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
-      }
-    }
-  }
+
+  xitk_dnode_remove (&fx->node);
   
   FXUNLOCK(fx);
   pthread_mutex_destroy(&fx->mutex);
@@ -1222,6 +1208,10 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   
   if(!locked)
     MUTUNLOCK();
+
+#ifdef XITK_DEBUG
+  printf  ("xitk: killed fx @ %p.\n", (void *)fx);
+#endif
 }
 
 /*
@@ -1235,9 +1225,9 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 
   MUTLOCK();
   
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
   
-  while(fx) {
+  while (fx->node.next) {
 
     if(FXTRYLOCK(fx)) {
       if (!FXSELFLOCKED(fx)) {
@@ -1264,7 +1254,7 @@ locked:
       FXUNLOCK(fx);
     }
 
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
   }
 
   MUTUNLOCK();
@@ -1274,8 +1264,8 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
   __gfx_t  *fx;
 
   MUTLOCK();
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-  while (fx) {
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
+  while (fx->node.next) {
     if (fx->widget_list && fx->widget_list == wl) {
       if (fx->destroy) {
       /* there was pending destroy, widget list needed */
@@ -1288,12 +1278,17 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
       }
     }
 
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
   }
 
+  xitk_dnode_remove (&wl->node);
+  xitk_dlist_clear (&wl->list);
   MUTUNLOCK();
 
   free(wl);
+#ifdef XITK_DEBUG
+  printf  ("xitk: killed wl @ %p.\n", (void *)wl);
+#endif
 }
 
 /*
@@ -1304,9 +1299,9 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 
   MUTLOCK();
 
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
     
-  while(fx) {
+  while (fx->node.next) {
     int  already_locked = 0;
     
     if(FXTRYLOCK(fx)) {
@@ -1346,7 +1341,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
     if(!already_locked)
       FXUNLOCK(fx);
     
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
   }
 
   MUTUNLOCK();
@@ -1369,8 +1364,9 @@ void xitk_xevent_notify(XEvent *event) {
  */
 void xitk_xevent_notify_impl(XEvent *event) {
   __gfx_t  *fx, *fxd;
-     
-  if(!(fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx)))
+
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
+  if (!fx->node.next)
     return;
 
   if(event->type == KeyPress || event->type == KeyRelease) {
@@ -1389,16 +1385,16 @@ void xitk_xevent_notify_impl(XEvent *event) {
   FXLOCK(fx);
   
   if(gXitk->modalw != None) {
-    while(fx && (fx->window != gXitk->modalw)) {
+    while (fx->node.next && (fx->window != gXitk->modalw)) {
       
       if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	fx->xevent_callback(event, fx->user_data);
       
-      fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+      fx = (__gfx_t *)fx->node.next;
     }
   }
   
-  while(fx) {
+  while (fx->node.next) {
 
     if(event->type == KeyRelease)
       gettimeofday(&gXitk->keypress, 0);
@@ -1854,7 +1850,7 @@ void xitk_xevent_notify_impl(XEvent *event) {
     }
     
     fxd = fx;
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
 
     if(fxd->destroy)
       __fx_destroy(fxd, 0);
@@ -1865,14 +1861,14 @@ void xitk_xevent_notify_impl(XEvent *event) {
     if(gXitk->modalw != None) {
 
       /* Flush remain fxs */
-      while(fx && (fx->window != gXitk->modalw)) {
+      while (fx->node.next && (fx->window != gXitk->modalw)) {
 	FXLOCK(fx);
 	
 	if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	  fx->xevent_callback(event, fx->user_data);
 	
 	fxd = fx;
-	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+	fx = (__gfx_t *)fx->node.next;
 
 	if(fxd->destroy)
 	  __fx_destroy(fxd, 0);
@@ -1882,7 +1878,7 @@ void xitk_xevent_notify_impl(XEvent *event) {
       return;
     }
 
-    if(fx)
+    if (fx->node.next)
       FXLOCK(fx);
   }
 }
@@ -1906,8 +1902,8 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   gXitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   gXitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   gXitk->verbosity       = verbosity;
-  gXitk->list            = xitk_list_new();
-  gXitk->gfx             = xitk_list_new();
+  xitk_dlist_init (&gXitk->wlists);
+  xitk_dlist_init (&gXitk->gfxs);
   gXitk->display         = display;
   gXitk->key             = 0;
   gXitk->sig_callback    = NULL;
@@ -2069,9 +2065,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
    */
   MUTLOCK();
   
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *)gXitk->gfxs.head.next;
   
-  while(fx) {
+  while (fx->node.next) {
     FXLOCK(fx);
    
     if(fx->window != None && fx->widget_list) {
@@ -2093,7 +2089,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
     }
 
     FXUNLOCK(fx);
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *)fx->node.next;
   }
 
   MUTUNLOCK();
@@ -2145,18 +2141,21 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   }
 
   /* pending destroys of the event handlers */
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-  while(fx) {
+  while (1) {
+    fx = (__gfx_t *)gXitk->gfxs.head.next;
+    if (!fx->node.next)
+      break;
+    FXLOCK (fx);
     __fx_destroy(fx, 1);
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
-  xitk_list_free(gXitk->gfx);
+  MUTLOCK ();
+  xitk_dlist_clear (&gXitk->gfxs);
+  xitk_dlist_clear (&gXitk->wlists);
+  MUTUNLOCK ();
 
   /* destroy font caching */
   xitk_font_cache_done();
   
-  xitk_list_free(gXitk->list);
-
   xitk_config_deinit(gXitk->config);
   pthread_mutex_destroy(&gXitk->mutex);
   
@@ -2360,4 +2359,3 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
-

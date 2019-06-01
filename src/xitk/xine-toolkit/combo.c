@@ -68,7 +68,6 @@ static void notify_destroy(xitk_widget_t *w) {
       _combo_rollunroll(private_data->button_widget, (void *)w, 0);
 
     xitk_destroy_widgets(private_data->widget_list);
-    /* xitk_dlist_init (&private_data->widget_list->list); */
 
     xitk_unregister_event_handler(&private_data->widget_key);
     xitk_window_destroy_window(private_data->imlibdata, private_data->xwin);
@@ -77,7 +76,7 @@ static void notify_destroy(xitk_widget_t *w) {
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
     XUNLOCK(private_data->imlibdata->x.disp);
 
-    free(private_data->widget_list);
+    xitk_widget_list_defferred_destroy (private_data->widget_list);
 
     XITK_FREE(private_data->skin_element_name);
     free(private_data);
