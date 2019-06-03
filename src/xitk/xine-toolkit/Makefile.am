@@ -35,7 +35,6 @@ libxitk_a_SOURCES = \
 	intbox.c \
 	label.c \
 	labelbutton.c \
-	list.c \
 	menu.c \
 	mrlbrowser.c \
 	recode.h \
@@ -94,3 +93,4 @@ test_LDADD = $(test_DEPENDENCIES) \
 
 $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a:
 	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.a
+

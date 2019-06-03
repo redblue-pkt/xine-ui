@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -24,6 +24,7 @@
 #include "_xitk.h"
 
 typedef struct {
+  /* HACK: embedded widget list, whose node links to menu_private_data_t.menu_windows below. */
   xitk_widget_list_t      wl;
   Display                *display;
   ImlibData              *im;
@@ -55,10 +56,9 @@ typedef struct {
   char                   *skin_element_name;
   menu_tree_t            *mtree;
   menu_node_t            *curbranch;
-  xitk_list_t            *menu_windows;
+  xitk_dlist_t            menu_windows;
   xitk_widget_list_t     *parent_wlist;
   int                     x, y;
 } menu_private_data_t;
 
 #endif
-

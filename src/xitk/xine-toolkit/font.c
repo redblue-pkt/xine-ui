@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -46,8 +46,9 @@ typedef struct {
 } xitk_font_cache_item_t;
 
 typedef struct {
-  unsigned int             number;     /* number of instances of this font */
+  xitk_dnode_t             node;
   xitk_font_t             *font;       /* remembered loaded font */
+  unsigned int             number;     /* number of instances of this font */
 } xitk_font_list_item_t;
 
 typedef struct {
@@ -55,7 +56,7 @@ typedef struct {
   size_t                   nlist;      /* number of fonts in the cache and in the list */
 
   unsigned int             life;       /* life counter for LRU */
-  xitk_list_t             *loaded;     /* list of loaded fonts */
+  xitk_dlist_t             loaded;     /* list of loaded fonts */
   pthread_mutex_t          mutex;      /* protecting mutex */
   xitk_font_cache_item_t   items[XITK_CACHE_SIZE]; /* cache */
 
@@ -248,7 +249,7 @@ void xitk_font_cache_init(void) {
   
   cache.n      = 0;
   cache.life   = 0;
-  cache.loaded = xitk_list_new();	
+  xitk_dlist_init (&cache.loaded);
 
   pthread_mutex_init(&cache.mutex, NULL);
   pthread_mutex_init(&cache.xr_mutex, NULL);
@@ -276,22 +277,20 @@ void xitk_font_cache_done(void) {
   }
   cache.n = 0;
 
-#ifdef DEBUG
+#ifdef XITK_DEBUG
   {
-    xitk_font_list_item_t *item;
-    
-    if(!xitk_list_is_empty(cache.loaded)) {
-      XITK_WARNING("%s(): list of loaded font isn't empty:\n", __FUNCTION__);
-      item = xitk_list_first_content(cache.loaded);
-      while(item) {
-	printf("  %s (%u)\n", item->font->name, item->number);
-	item = xitk_list_next_content(cache.loaded);
-      }
+    xitk_font_list_item_t *item = (xitk_font_list_item_t *)cached.loaded.head.next;
+    if (item->node.next) {
+      XITK_WARNING ("%s(): list of loaded font isn't empty:\n", __FUNCTION__);
+      do {
+        printf ("  %s (%u)\n", item->font->name, item->number);
+        item = (xitk_font_list_item_t *)item->node.next;
+      } while (item->node.next);
     }
   }
 #endif
 
-  xitk_list_free(cache.loaded);
+  xitk_dlist_clear (&cache.loaded);
   pthread_mutex_destroy(&cache.mutex);
   pthread_mutex_destroy(&cache.xr_mutex);
 
@@ -478,19 +477,12 @@ static xitk_font_t *xitk_cache_take_item(Display *display, char *name) {
  * search the font in the list of loaded fonts
  */
 static xitk_font_list_item_t *cache_get_from_list(Display *display, char *name) {
-  xitk_font_list_item_t *item;
-
-  item = xitk_list_first_content(cache.loaded);
-  if(!item)
-    return NULL;
-
-  do {
-    if((strcmp(name, item->font->name) == 0) && (display == item->font->display)) 
+  xitk_font_list_item_t *item = (xitk_font_list_item_t *)cache.loaded.head.next;
+  while (item->node.next) {
+    if ((strcmp(name, item->font->name) == 0) && (display == item->font->display))
       return item;
-
-    item = xitk_list_next_content(cache.loaded);
-  } while(item);
-
+    item = (xitk_font_list_item_t *)item->node.next;
+  }
   return NULL;
 }
 
@@ -567,7 +559,7 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
   list_item         = xitk_xmalloc(sizeof(xitk_font_list_item_t));
   list_item->font   = xtfs;
   list_item->number = 1;
-  xitk_list_append_content(cache.loaded, list_item);
+  xitk_dlist_add_tail (&cache.loaded, &list_item->node);
   cache.nlist++;
 
   pthread_mutex_unlock(&cache.mutex);
@@ -599,7 +591,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
   ABORT_IF_NULL(item);
 
   if(--item->number == 0) {
-    xitk_list_delete_current(cache.loaded);
+    xitk_dnode_remove (&item->node);
     cache.nlist--;
     xitk_cache_add_item(item->font);
     free(item);

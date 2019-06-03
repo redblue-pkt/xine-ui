@@ -261,19 +261,6 @@ typedef struct {
   char                              colorname[20];
 } xitk_color_names_t;
 
-typedef struct xitk_node_s {
-  struct xitk_node_s               *next;
-  struct xitk_node_s               *prev;
-  void                             *content;
-} xitk_node_t;
-
-
-typedef struct {
-  xitk_node_t                      *first;
-  xitk_node_t                      *last;
-  xitk_node_t                      *cur;
-} xitk_list_t;
-
 #define MWM_HINTS_DECORATIONS       (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS     5
 typedef struct _mwmhints {
@@ -1247,69 +1234,6 @@ void xitk_slider_make_backstep(xitk_widget_t *);
  * Call callback for current position
  */
 void xitk_slider_callback_exec(xitk_widget_t *);
-
-/*
- * *** Nodes ***
- */
-/**
- * Create a new list.
- */
-xitk_list_t *xitk_list_new (void);
-
-/**
- * Clear list.
- */
-void xitk_list_clear(xitk_list_t *l);
-
-/**
- * Freeing list.
- */
-void xitk_list_free(xitk_list_t *l);
-
-/**
- * Boolean, status of list.
- */
-int xitk_list_is_empty (xitk_list_t *l);
-
-/**
- * return content of first entry in list.
- */
-void *xitk_list_first_content (xitk_list_t *l);
-
-/**
- * return next content in list.
- */
-void *xitk_list_next_content (xitk_list_t *l);
-
-/**
- * Return last content of list.
- */
-void *xitk_list_last_content (xitk_list_t *l);
-
-/**
- * Return previous content of list.
- */
-void *xitk_list_prev_content (xitk_list_t *l);
-
-/**
- * Append content to list.
- */
-void xitk_list_append_content (xitk_list_t *l, void *content);
-
-/**
- * Insert content in list.
- */
-void xitk_list_insert_content (xitk_list_t *l, void *content);
-
-/**
- * Remove current content in list.
- */
-void xitk_list_delete_current (xitk_list_t *l);
-
-/**
- * Return current content
- */
-xitk_node_t *xitk_list_get_current(xitk_list_t *l);
 
 /*
  * *** Label Buttons
@@ -2469,3 +2393,4 @@ void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cur
 void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
 #endif
+
