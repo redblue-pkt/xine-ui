@@ -153,7 +153,6 @@ static void test_end(xitk_widget_t *w, void *data) {
   xitk_destroy_widgets(test->widget_list);
   xitk_window_destroy_window(test->imlibdata, test->xwin);
 
-  xitk_list_free((XITK_WIDGET_LIST_LIST(test->widget_list)));
   XFreeGC(test->display, (XITK_WIDGET_LIST_GC(test->widget_list)));
 
   XITK_WIDGET_LIST_FREE(test->widget_list);
@@ -375,7 +374,7 @@ static void create_intbox(void) {
   ib.parent_wlist      = test->widget_list;
   ib.callback          = notify_intbox_change;
   ib.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 	    (test->intbox = 
 	     xitk_noskin_intbox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(test->intbox);
@@ -427,7 +426,7 @@ static void create_doublebox(void) {
   ib.parent_wlist      = test->widget_list;
   ib.callback          = notify_doublebox_change;
   ib.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 	    (test->doublebox = 
 	     xitk_noskin_doublebox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(test->doublebox);
@@ -452,7 +451,7 @@ static void create_checkbox(void) {
   cb.skin_element_name = NULL;
   cb.callback          = checkbox_cb;
   cb.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 		    (test->checkbox = 
 		     xitk_noskin_checkbox_create(test->widget_list, &cb, x, y, 20, 20)));
   xitk_enable_and_show_widget(test->checkbox);
@@ -490,7 +489,7 @@ static void create_tabs(void) {
   t.parent_wlist      = test->widget_list;
   t.callback          = NULL;
   t.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 		    (test->tabs = 
 		     xitk_noskin_tabs_create(test->widget_list, &t, x, y, w, fontname)));
   xitk_enable_and_show_widget(test->tabs);
@@ -532,7 +531,7 @@ static void create_inputtext(void) {
   inp.max_length        = 256;
   inp.callback          = change_browser_entry;
   inp.userdata          = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 	   (test->input = 
 	    xitk_noskin_inputtext_create(test->widget_list, &inp,
 					 150, 150, 150, 20,
@@ -565,7 +564,7 @@ static void create_label(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = label;
   lbl.callback          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
+  xitk_add_widget (test->widget_list, 
 	   (test->label = 
 	    xitk_noskin_label_create(test->widget_list, &lbl,
 				     x, y, len, (asc+des)*2, fontname)));
@@ -595,7 +594,7 @@ static void create_button(void) {
   b.skin_element_name = NULL;
   b.callback          = change_label;
   b.userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
+  xitk_add_widget (test->widget_list, 
 	   (test->button = 
 	    xitk_noskin_button_create(test->widget_list, &b,
 				      x, y, width, height)));
@@ -674,7 +673,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 208, 117, 20,
 							      XITK_HSLIDER)));
@@ -691,7 +690,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 		   (test->vslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 230, 20, 117,
 							      XITK_VSLIDER)));
@@ -708,7 +707,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 		   (test->rslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      50, 240, 80, 80,
 							      XITK_RSLIDER)));
@@ -773,7 +772,7 @@ static void create_combo(void) {
   cmb.parent_wkey       = &test->kreg;
   cmb.callback          = combo_select;
   cmb.userdata          = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
+  xitk_add_widget (test->widget_list, 
 		   (test->combo = 
 		    xitk_noskin_combo_create(test->widget_list, &cmb,
 					     x, y, width, NULL, NULL)));
@@ -830,7 +829,7 @@ static void create_browser(void) {
   browser.dbl_click_callback            = change_inputtext_dbl_click;
   browser.parent_wlist                  = test->widget_list;
   browser.userdata                      = NULL;
-  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list), 
+  xitk_add_widget (test->widget_list, 
 		    (test->browser = 
 		     xitk_noskin_browser_create(test->widget_list, &browser,
 						XITK_WIDGET_LIST_GC(test->widget_list), 20, 30, 
@@ -980,7 +979,6 @@ int main(int argc, char **argv) {
 		 (xitk_window_get_window(test->xwin)), None, None);
 
   test->widget_list  = xitk_widget_list_new();
-  xitk_widget_list_set(test->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(test->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(test->xwin)));
   xitk_widget_list_set(test->widget_list, WIDGET_LIST_GC, gc);
@@ -994,7 +992,7 @@ int main(int argc, char **argv) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
+  xitk_add_widget (test->widget_list,
 	   (w = xitk_noskin_labelbutton_create(test->widget_list, &lb,
 					       (windoww / 2) - 50, windowh - 50,
 					       100, 30,

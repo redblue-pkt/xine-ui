@@ -384,6 +384,7 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
   XUNLOCK((*mw)->display);
 
   /* deferred free as widget list */
+  xitk_dnode_remove (&(*mw)->wl.node);
   XITK_WIDGET_LIST_FREE((xitk_widget_list_t *)(*mw));
   (*mw) = NULL;
 }
@@ -391,15 +392,15 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
 static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
   menu_window_t *mw;
   
-  mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
-  if(!mw || (mw == menu_window))
+  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
+  if(!mw->wl.node.prev || (mw == menu_window))
     /* Nothing to be done, save useless following efforts */
     return;
-  while(mw && (mw != menu_window)) {
-    xitk_list_delete_current(private_data->menu_windows);
+  do {
+    xitk_dnode_remove (&mw->wl.node);
     _menu_destroy_menu_window(&mw);
-    mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
-  }
+    mw = (menu_window_t *)private_data->menu_windows.tail.prev;
+  } while (mw->wl.node.prev && (mw != menu_window));
   /* Set focus to parent menu */
   if(xitk_is_window_visible(menu_window->display, (xitk_window_get_window(menu_window->xwin)))) {
     int    t = 5000;
@@ -428,7 +429,9 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
 static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
   menu_window_t *mw;
 
-  mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
+  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
+  if (!mw->wl.node.prev)
+    mw = NULL;
 
   return (mw != menu_window);
 }
@@ -436,12 +439,12 @@ static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *men
 static void _menu_hide_menu(menu_private_data_t *private_data) {
   menu_window_t *mw;
   
-  mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
   XLOCK(private_data->imlibdata->x.disp);
-  while(mw) {
+  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
+  while (mw->wl.node.prev) {
     XUnmapWindow(private_data->imlibdata->x.disp, xitk_window_get_window(mw->xwin));
     XSync(private_data->imlibdata->x.disp, False);
-    mw = (menu_window_t *) xitk_list_prev_content(private_data->menu_windows);
+    mw = (menu_window_t *)mw->wl.node.prev;
   }
   XUNLOCK(private_data->imlibdata->x.disp);
 }
@@ -491,14 +494,14 @@ void xitk_menu_destroy(xitk_widget_t *w) {
     private_data->curbranch = NULL;
     xitk_unset_current_menu();
 
-    mw = (menu_window_t *) xitk_list_first_content(private_data->menu_windows);
-    while(mw) {
-      xitk_list_delete_current(private_data->menu_windows);
+    mw = (menu_window_t *)private_data->menu_windows.head.next;
+    while (mw->wl.node.next) {
+      xitk_dnode_remove (&mw->wl.node);
       _menu_destroy_menu_window(&mw);
-      mw = (menu_window_t *) xitk_list_first_content(private_data->menu_windows);
+      mw = (menu_window_t *)private_data->menu_windows.head.next;
     }
     
-    xitk_list_free(private_data->menu_windows);
+    xitk_dlist_clear (&private_data->menu_windows);
     _menu_destroy_ntree(&private_data->mtree->first);
   }
 }
@@ -827,7 +830,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   menu_window         = _menu_new_menu_window(private_data->imlibdata, xwin);
   menu_window->widget = w;
   
-  xitk_list_append_content(private_data->menu_windows, menu_window);
+  xitk_dlist_add_tail (&private_data->menu_windows, &menu_window->wl.node);
 
   me = branch;
   yy = 1;
@@ -1086,7 +1089,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   private_data->imlibdata    = m->imlibdata;
   private_data->parent_wlist = m->parent_wlist;
   private_data->widget       = mywidget;
-  private_data->menu_windows = xitk_list_new();
+  xitk_dlist_init (&private_data->menu_windows);
   private_data->x            = x;
   private_data->y            = y;
   private_data->curbranch    = NULL;

@@ -1547,16 +1547,22 @@ void xitk_free_widget(xitk_widget_t *w) {
  */
 void xitk_destroy_widget(xitk_widget_t *w) {
 
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
+  if (!w)
     return;
-  }
 
   xitk_hide_widget(w);
   xitk_stop_widget(w);
   xitk_disable_widget(w);
-  if (w == w->wl->widget_focused)
-    w->wl->widget_focused = NULL;
+
+  if (w->wl) {
+    if (w == w->wl->widget_focused)
+      w->wl->widget_focused = NULL;
+    if (w == w->wl->widget_under_mouse)
+      w->wl->widget_under_mouse = NULL;
+    if (w == w->wl->widget_pressed)
+      w->wl->widget_pressed = NULL;
+  }
+
   xitk_dnode_remove (&w->node);
   xitk_free_widget(w);
 }

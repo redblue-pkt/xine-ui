@@ -30,6 +30,8 @@
 
 #include "common.h"
 
+#include <xine/list.h>
+
 
 #define WINDOW_WIDTH             630
 #define WINDOW_HEIGHT            530
@@ -146,7 +148,7 @@ static struct {
   int                   num_sections;
   
   /* Store widgets, this is needed to free them on tabs switching */
-  xitk_list_t          *widgets;
+  xine_list_t          *widgets;
   
   xitk_widget_t        *slider_wg;
   widget_triplet_t     *wg[1024]; /* I hope that will not be reached, never */
@@ -163,7 +165,7 @@ static int          fh; /* Font height */
 static void setup_change_section(xitk_widget_t *, void *, int);
 
 static void add_widget_to_list(xitk_widget_t *w) {
-  xitk_list_append_content(setup.widgets, (void *) w);  
+  xine_list_push_back (setup.widgets, w);
 }
 
 /*
@@ -192,7 +194,7 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     
     setup.xwin = NULL;
     /* xitk_dlist_init (&setup.widget_list->list); */
-    xitk_list_free(setup.widgets);
+    xine_list_delete (setup.widgets);
     
     XLockDisplay(gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(setup.widget_list)));
@@ -876,7 +878,6 @@ static void setup_section_widgets(int s) {
  */
 static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
-  xitk_widget_t *sw;
 
   setup_set_cursor(WAIT_CURS);
 
@@ -884,14 +885,18 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
     free(setup.wg[i]);
 
   /* remove old widgets */
-  sw = (xitk_widget_t *) xitk_list_first_content(setup.widgets);
-  while(sw) {
-    xitk_destroy_widget (sw);
-    sw = (xitk_widget_t *) xitk_list_next_content(setup.widgets);
+  {
+    xitk_widget_t *sw;
+    xine_list_iterator_t ite = NULL;
+    while (1) {
+      sw = xine_list_next_value (setup.widgets, &ite);
+      if (!ite)
+        break;
+      xitk_destroy_widget (sw);
+    }
   }
+  xine_list_clear (setup.widgets);
 
-  
-  xitk_list_clear(setup.widgets);
   setup.num_wg = 0;
   setup.first_displayed = 0;
 
@@ -972,7 +977,7 @@ static void setup_sections (void) {
   
   xitk_image_destroy_xitk_pixmap(bg);
 
-  setup.widgets = xitk_list_new();
+  setup.widgets = xine_list_new ();
 
   setup.num_wg = 0;
   setup.first_displayed = 0;
