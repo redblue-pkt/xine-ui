@@ -522,11 +522,10 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
-					 xitk_skin_config_t *skonfig, xitk_label_widget_t *l,
-					 int x, int y, int width, int height,
-					 char *skin_element_name, char *fontname,
-					 int visible, int enable) {
+static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig,
+  const xitk_label_widget_t *l, int x, int y, int width, int height,
+  const char *skin_element_name, const char *fontname,
+  int visible, int enable) {
   xitk_widget_t          *mywidget;
   label_private_data_t   *private_data;
   
@@ -606,8 +605,8 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
 /*
  *
  */
-xitk_widget_t *xitk_label_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_label_widget_t *l) {
+xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig,
+  const xitk_label_widget_t *l) {
 
   XITK_CHECK_CONSTITENCY(l);
   
@@ -625,9 +624,9 @@ xitk_widget_t *xitk_label_create(xitk_widget_list_t *wl,
 /*
  *
  */
-xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
-					xitk_label_widget_t *l,
-					int x, int y, int width, int height, char *fontname) {
+xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
+  const xitk_label_widget_t *l, int x, int y, int width, int height,
+  const char *fontname) {
   XITK_CHECK_CONSTITENCY(l);
 
   return _xitk_label_create(wl, NULL, l, x, y, width, height, NULL, fontname, 0, 0);

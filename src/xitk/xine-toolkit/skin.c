@@ -1312,6 +1312,46 @@ int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {
   return 0;
 }
 
+int xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name, xitk_skin_element_info_t *info) {
+  xitk_skin_element_t *s;
+  do {
+    if (!info || !skin || !element_name)
+      break;
+    s = skin_lookup_section (skin, element_name);
+    if (!s)
+      break;
+    info->x                 = s->x;
+    info->y                 = s->y;
+    info->direction         = s->direction;
+    info->label_length      = s->length;
+    info->label_alignment   = s->align;
+    info->label_printable   = s->print;
+    info->label_staticity   = s->staticity;
+    info->visibility        = s->visible;
+    info->enability         = s->enable;
+    info->label_color       = s->color;
+    info->label_color_focus = s->color_focus;
+    info->label_color_click = s->color_click;
+    info->label_fontname    = s->font;
+    info->ximg              = NULL;
+    if (skin->cache) {
+      cache_entry_t *cache;
+      for (cache = skin->cache; cache; cache = cache->next) {
+        if (!strcmp (s->pixmap, cache->filename)) {
+          info->ximg = cache->image;
+          break;
+        }
+      }
+    }
+    if (!info->ximg)
+      info->ximg = skin_load_to_cache (skin, (char *)s->pixmap);
+    return 1;
+  } while (0);
+  if (info)
+    memset (info, 0, sizeof (*info));
+  return 0;
+}
+
 /*
  *
  */
@@ -1327,3 +1367,4 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   pthread_mutex_unlock(&skin_mutex);
 }
+

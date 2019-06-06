@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -258,6 +258,17 @@ unsigned long xitk_get_tips_timeout(void);
 void xitk_set_tips_timeout(unsigned long timeout);
 
 int xitk_is_running(void);
+
+typedef struct {
+  int x, y, direction;
+  int label_length, label_alignment, label_printable, label_staticity;
+  int visibility, enability;
+  const char *label_color, *label_color_focus, *label_color_click;
+  const char *label_fontname;
+  xitk_image_t *ximg;
+} xitk_skin_element_info_t;
+int xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name, xitk_skin_element_info_t *info);
+  
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_printability(xitk_skin_config_t *, const char *);

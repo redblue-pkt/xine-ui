@@ -128,17 +128,17 @@ xitk_button_list_t *xitk_button_list_new (
   vis = 0;
   
   XITK_WIDGET_INIT (&lb, imlib_data);
+  lb.skin_element_name = bl->skin_element_name;
+  lb.button_type       = CLICK_BUTTON;
+  lb.callback          = callback;
+  lb.userdata          = callback_data;
+  lb.state_callback    = NULL;
 
   dir = xitk_skin_get_direction (skin_config, skin_element_name);
 
   for (i = 0; i < bl->num; i++) {
 
-    lb.skin_element_name = bl->skin_element_name;
-    lb.button_type       = CLICK_BUTTON;
     lb.label             = names[i];
-    lb.callback          = callback;
-    lb.userdata          = callback_data;
-    lb.state_callback    = NULL;
 
     if (vis == 0) {
       lastx = x;
@@ -193,11 +193,8 @@ xitk_button_list_t *xitk_button_list_new (
 
   bl->fillx = x;
   bl->filly = y;
-  lb.skin_element_name = bl->skin_element_name;
-  lb.button_type       = CLICK_BUTTON;
   lb.callback          = NULL;
   lb.label             = (char *)"";
-  lb.state_callback    = NULL;
   lb.userdata          = NULL;
   bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
   if (bl->widgets[i]) {
@@ -208,11 +205,8 @@ xitk_button_list_t *xitk_button_list_new (
     i++;
   }
 
-  lb.skin_element_name = bl->skin_element_name;
-  lb.button_type       = CLICK_BUTTON;
   lb.callback          = xitk_button_list_swap;
   lb.label             = (char *)_("...");
-  lb.state_callback    = NULL;
   lb.userdata          = (void *)bl;
   bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
   if (bl->widgets[i]) {
