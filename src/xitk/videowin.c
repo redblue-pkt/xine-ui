@@ -55,7 +55,7 @@
 
 
 /* Video window private structure */
-static struct {
+static struct video_window_st {
   xitk_widget_list_t    *wl;
 
   char                   window_title[1024];
@@ -178,10 +178,12 @@ static int  video_window_check_mag (void);
 static void video_window_calc_mag_win_size (float xmag, float ymag);
 
 static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
-  gVw.stream_resize_window = cfg->num_value;
+  struct video_window_st *vw = data;
+  vw->stream_resize_window = cfg->num_value;
 }
 static void _video_window_zoom_small_cb(void *data, xine_cfg_entry_t *cfg) {
-  gVw.zoom_small_stream = cfg->num_value;
+  struct video_window_st *vw = data;
+  vw->zoom_small_stream = cfg->num_value;
 }
 
 static Bool have_xtestextention(void) {  
@@ -207,8 +209,8 @@ static void _set_window_title(void) {
 /* 
  * very small X event loop for the second display
  */
-static __attribute__((noreturn)) void *second_display_loop (void *dummy) {
-  gGui_t *gui = gGui;
+static __attribute__((noreturn)) void *second_display_loop (void *data) {
+  gGui_t *gui = data;
   
   while(gVw.second_display_running) {
     XEvent   xevent;
@@ -1769,7 +1771,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			      CONFIG_NO_HELP,
 			      CONFIG_LEVEL_ADV,
 			      _video_window_resize_cb,
-			      CONFIG_NO_DATA);
+			      &gVw);
   
   gVw.zoom_small_stream = 
     xine_config_register_bool(__xineui_global_xine_instance,
@@ -1779,7 +1781,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			      CONFIG_NO_HELP,
 			      CONFIG_LEVEL_ADV,
 			      _video_window_zoom_small_cb,
-			      CONFIG_NO_DATA);
+			      &gVw);
   
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw.video_width  = window_attribute->width;
@@ -1912,7 +1914,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   
   if( gui->video_display != gui->display ) {
     gVw.second_display_running = 1;
-    pthread_create(&gVw.second_display_thread, NULL, second_display_loop, NULL);
+    pthread_create (&gVw.second_display_thread, NULL, second_display_loop, gGui);
   }
 
 }
@@ -1955,9 +1957,11 @@ void video_window_exit (void) {
     XUnlockDisplay(gui->video_display);
   }
     
-  if(gui->video_display == gui->display)
+  if (gui->video_display == gui->display) {
     xitk_unregister_event_handler(&gVw.widget_key);
-  else
+    XITK_WIDGET_LIST_FREE (gVw.wl);
+    gVw.wl = NULL;
+  } else
     pthread_join(gVw.second_display_thread, NULL);
 
   pthread_mutex_destroy(&gVw.mutex);

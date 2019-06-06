@@ -1241,23 +1241,23 @@ void xitk_slider_callback_exec(xitk_widget_t *);
 /**
  * Create a labeled button.
  */
-xitk_widget_t *xitk_labelbutton_create(xitk_widget_list_t *wl,
-				       xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
+xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, const xitk_labelbutton_widget_t *b);
 
 /**
  *
  */
 xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
-					       xitk_labelbutton_widget_t *b,
-					       int x, int y, int width, int height,
-					       char *ncolor, char *fcolor, char *ccolor, 
-					       char *fname);
+  const xitk_labelbutton_widget_t *b,
+  int x, int y, int width, int height,
+  const char *ncolor, const char *fcolor, const char *ccolor,
+  const char *fname);
 
 /**
  * Change label of button 'widget'.
  */
-int xitk_labelbutton_change_label(xitk_widget_t *, char *);
-int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, char *, int, char *);
+int xitk_labelbutton_change_label (xitk_widget_t *, const char *new_label);
+int xitk_labelbutton_change_shortcut_label (xitk_widget_t *, char *, int, char *);
 
 /**
  * Return label of button 'widget'.
@@ -1304,15 +1304,15 @@ void xitk_labelbutton_callback_exec(xitk_widget_t *w);
 /**
  * Create a label widget.
  */
-xitk_widget_t *xitk_label_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
+xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, const xitk_label_widget_t *l);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
-					xitk_label_widget_t *l,
-					int x, int y, int width, int height, char *fontname);
+xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
+  const xitk_label_widget_t *l, int x, int y, int width, int height,
+  const char *fontname);
 
 /**
  * Change label of widget 'widget'.
