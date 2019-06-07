@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -22,12 +22,11 @@
 #define HAVE_XITK_SKIN_H
 
 #include <pthread.h>
+#include <xine/sorted_array.h>
 
-typedef struct xitk_skin_element_s {
-  struct xitk_skin_element_s   *prev;
-  struct xitk_skin_element_s   *next;
-
-  char                         *section;
+typedef struct {
+  /* this needs to stay first. */
+  char                          section[64];
 
   int                           enable;
   int                           visible;
@@ -77,8 +76,6 @@ struct xitk_skin_config_s {
   char                         *ln;
   char                          buf[256];
 
-  cache_entry_t                *cache;
-  
   char                         *name;
   int                           version;
   char                         *author;
@@ -90,8 +87,12 @@ struct xitk_skin_config_s {
   char                         *load_command;
   char                         *unload_command;
   
-  xitk_skin_element_t          *first, *last;
+  xine_sarray_t                *elements;
   xitk_skin_element_t          *celement;
+
+  xine_sarray_t                *imgs;
+
+  pthread_mutex_t               skin_mutex;
 };
 
 #endif
