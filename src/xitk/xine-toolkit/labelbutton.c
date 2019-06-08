@@ -723,7 +723,7 @@ void xitk_labelbutton_callback_exec(xitk_widget_t *w) {
  * Create the labeled button
  */
 static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
-  const xitk_labelbutton_widget_t *b, xitk_skin_element_info_t *info) {
+  const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info) {
   xitk_widget_t           *mywidget;
   lbutton_private_data_t *private_data;
   
@@ -758,7 +758,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
   private_data->label_visible     = info->label_printable;
   private_data->label_static      = info->label_staticity;
 
-  private_data->skin              = info->ximg;
+  private_data->skin              = info->pixmap_img;
 
   _strlcpy (private_data->skin_element_name, b->skin_element_name, sizeof (private_data->skin_element_name));
   _strlcpy (private_data->normcolor, info->label_color, sizeof (private_data->normcolor));
@@ -795,17 +795,25 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
  */
 xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
   xitk_skin_config_t *skonfig, const xitk_labelbutton_widget_t *b) {
+  const xitk_skin_element_info_t *pinfo;
   xitk_skin_element_info_t info;
 
   XITK_CHECK_CONSTITENCY (b);
-  if (xitk_skin_get_info (skonfig, b->skin_element_name, &info)) {
-    info.visibility = 1;
+  pinfo = xitk_skin_get_info (skonfig, b->skin_element_name);
+  if (pinfo) {
+    if (!pinfo->visibility) {
+      info = *pinfo;
+      info.visibility = 1;
+      pinfo = &info;
+    }
   } else {
+    memset (&info, 0, sizeof (info));
     info.label_alignment = b->align;
     info.visibility = -1;
+    pinfo = &info;
   }
 
-  return _xitk_labelbutton_create (wl, b, &info);
+  return _xitk_labelbutton_create (wl, b, pinfo);
 }
 
 /*
@@ -824,13 +832,13 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.label_staticity   = 0;
   info.visibility        = 0;
   info.enability         = 0;
-  info.label_color       = ncolor;
-  info.label_color_focus = fcolor;
-  info.label_color_click = ccolor;
-  info.label_fontname    = fname;
-  info.ximg              = xitk_image_create_image (b->imlibdata, width * 3, height);
-  if (info.ximg)
-    draw_bevel_three_state (b->imlibdata, info.ximg);
+  info.label_color       = (char *)ncolor;
+  info.label_color_focus = (char *)fcolor;
+  info.label_color_click = (char *)ccolor;
+  info.label_fontname    = (char *)fname;
+  info.pixmap_img        = xitk_image_create_image (b->imlibdata, width * 3, height);
+  if (info.pixmap_img)
+    draw_bevel_three_state (b->imlibdata, info.pixmap_img);
 
   return _xitk_labelbutton_create (wl, b, &info);
 }

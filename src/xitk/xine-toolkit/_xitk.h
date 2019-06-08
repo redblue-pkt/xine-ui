@@ -59,6 +59,30 @@ typedef struct {
   int               sel;
 } btnlist_t;
 
+typedef struct {
+  /* all */
+  int x, y;
+  int visibility, enability;
+  char *pixmap_name;
+  xitk_image_t *pixmap_img;
+  /* button list */
+  int max_buttons, direction;
+  /* browser */
+  int browser_entries;
+  /* label */
+  int label_length, label_alignment, label_printable, label_staticity;
+  int label_animation, label_animation_step;
+  unsigned long int label_animation_timer;
+  char *label_color, *label_color_focus, *label_color_click, *label_fontname;
+  char *label_pixmap_font_name;
+  xitk_image_t *label_pixmap_font_img;
+  /* slider */
+  int slider_type, slider_radius;
+  char *slider_pixmap_pad_name;
+  xitk_image_t *slider_pixmap_pad_img;
+} xitk_skin_element_info_t;
+const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name);
+
 #include "_config.h"
 #include "browser.h"
 #include "button.h"
@@ -259,16 +283,6 @@ void xitk_set_tips_timeout(unsigned long timeout);
 
 int xitk_is_running(void);
 
-typedef struct {
-  int x, y, direction;
-  int label_length, label_alignment, label_printable, label_staticity;
-  int visibility, enability;
-  const char *label_color, *label_color_focus, *label_color_click;
-  const char *label_fontname;
-  xitk_image_t *ximg;
-} xitk_skin_element_info_t;
-int xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name, xitk_skin_element_info_t *info);
-  
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_printability(xitk_skin_config_t *, const char *);
