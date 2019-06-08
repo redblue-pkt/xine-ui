@@ -28,45 +28,8 @@ typedef struct {
   /* this needs to stay first. */
   char                          section[64];
 
-  int                           enable;
-  int                           visible;
-  
-  char                         *pixmap;
-  int                           x;
-  int                           y;
-  int                           direction;
-
-  /* browser */
-  int                           browser_entries;
-  
-  /* slider */
-  char                         *pixmap_pad;
-  int                           slider_type;
-  int                           radius;
-  
-  /* label */
-  int                           staticity;
-  int                           print;
-  int                           align;
-  int                           animation;
-  int                           animation_step;
-  unsigned long                 animation_timer;
-  int                           length;
-  char                         *pixmap_font;
-  char                         *color;
-  char                         *color_focus;
-  char                         *color_click;
-  char                         *font;
-
-  int                          max_buttons;
+  xitk_skin_element_info_t      info;
 } xitk_skin_element_t;
-
-typedef struct cache_entry_s cache_entry_t;
-struct cache_entry_s {
-  xitk_image_t   *image;
-  char           *filename;
-  cache_entry_t  *next;
-};
 
 struct xitk_skin_config_s {
   ImlibData                    *im;
