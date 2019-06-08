@@ -31,6 +31,10 @@ typedef struct {
   xitk_window_t          *xwin;
   xitk_register_key_t     key;
   xitk_widget_t          *widget;
+  xitk_image_t           *bevel_plain;
+  xitk_image_t           *bevel_arrow;
+  xitk_image_t           *bevel_unchecked;
+  xitk_image_t           *bevel_checked;
 } menu_window_t;
 
 typedef struct menu_node_s menu_node_t;
@@ -62,3 +66,4 @@ typedef struct {
 } menu_private_data_t;
 
 #endif
+

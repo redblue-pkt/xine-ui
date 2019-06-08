@@ -41,6 +41,12 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   menu_window->display = im->x.disp;
   menu_window->im      = im;
   menu_window->xwin    = xwin;
+
+  menu_window->bevel_plain     = NULL;
+  menu_window->bevel_arrow     = NULL;
+  menu_window->bevel_unchecked = NULL;
+  menu_window->bevel_checked   = NULL;
+
   xitk_dlist_init (&menu_window->wl.list);
 
   /* HACK: embedded widget list - make sure it is not accidentally (un)listed. */
@@ -372,9 +378,18 @@ static menu_node_t *_menu_get_prev_branch_from_node(menu_node_t *node) {
 }
 
 static void _menu_destroy_menu_window(menu_window_t **mw) {
+  menu_private_data_t *private_data = (menu_private_data_t *)(*mw)->widget->private_data;
 
   xitk_unregister_event_handler(&(*mw)->key);
   xitk_destroy_widgets(&(*mw)->wl);
+  if ((*mw)->bevel_plain)
+    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_plain);
+  if ((*mw)->bevel_arrow)
+    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_arrow);
+  if ((*mw)->bevel_unchecked)
+    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_unchecked);
+  if ((*mw)->bevel_checked)
+    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_checked);
   xitk_window_destroy_window((*mw)->im, (*mw)->xwin);
   (*mw)->xwin = NULL;
   /* xitk_dlist_init (&(*mw)->wl.list); */
@@ -724,6 +739,7 @@ static void _menu_scissor(xitk_widget_t *w,
 }
 
 static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w, int x, int y) {
+  xitk_skin_element_info_t    info;
   menu_private_data_t        *private_data;
   int                         bentries, bsep, btitle, rentries;
   menu_node_t                *maxnode, *me;
@@ -826,10 +842,46 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     	      bg->gc, 0, 0, width, height, 0, 0);
     XUNLOCK(private_data->imlibdata->x.disp);
   }
-  
+
   menu_window         = _menu_new_menu_window(private_data->imlibdata, xwin);
   menu_window->widget = w;
   
+  menu_window->bevel_plain = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
+  if (menu_window->bevel_plain)
+    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_plain);
+
+  menu_window->bevel_arrow = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
+  if (menu_window->bevel_arrow) {
+    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_arrow);
+    menu_draw_arrow_branch (private_data->imlibdata, menu_window->bevel_arrow);
+  }
+
+  menu_window->bevel_unchecked = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
+  if (menu_window->bevel_unchecked) {
+    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_unchecked);
+    menu_draw_check (private_data->imlibdata, menu_window->bevel_unchecked, 0);
+  }
+
+  menu_window->bevel_checked = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
+  if (menu_window->bevel_checked) {
+    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_checked);
+    menu_draw_check (private_data->imlibdata, menu_window->bevel_checked, 1);
+  }
+
+  memset (&info, 0, sizeof (info));
+  info.x                 = 1;
+  info.visibility        = 0;
+  info.enability         = 0;
+  info.pixmap_name       = NULL;
+  info.pixmap_img        = menu_window->bevel_plain;
+  info.label_alignment   = ALIGN_LEFT;
+  info.label_printable   = 1;
+  info.label_staticity   = 0;
+  info.label_color       =
+  info.label_color_focus = (char *)"Black";
+  info.label_color_click = (char *)"White";
+  info.label_fontname    = (char *)DEFAULT_BOLD_FONT_12;
+
   xitk_dlist_add_tail (&private_data->menu_windows, &menu_window->wl.node);
 
   me = branch;
@@ -890,8 +942,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       yy += 2;
     }
     else {
-      xitk_image_t  *wimage;
-
       lb.button_type       = CLICK_BUTTON;
       lb.label             = me->menu_entry->menu;
       lb.align             = ALIGN_LEFT;
@@ -899,24 +949,23 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       lb.state_callback    = NULL;
       lb.userdata          = (void *) me;
       lb.skin_element_name = NULL;
-      btn = xitk_noskin_labelbutton_create (&menu_window->wl, &lb,
-        1, yy, wwidth, 20, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+
+      info.y = yy;
+      if (_menu_is_branch (me->menu_entry)) {
+        info.pixmap_img = menu_window->bevel_arrow;
+      } else if (_menu_is_check (me->menu_entry)) {
+        info.pixmap_img = _menu_is_checked (me->menu_entry) ? menu_window->bevel_checked : menu_window->bevel_unchecked;
+      } else {
+        info.pixmap_img = menu_window->bevel_plain;
+      }
+
+      btn = xitk_info_labelbutton_create (&menu_window->wl, &lb, &info);
       xitk_dlist_add_tail (&menu_window->wl.list, &btn->node);
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
       me->button = btn;
       
       if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut)
 	xitk_labelbutton_change_shortcut_label(btn, me->menu_entry->shortcut, shortcutpos, DEFAULT_FONT_12);
-      
-      wimage = xitk_get_widget_foreground_skin(btn);
-      if(wimage) {
-	draw_flat_three_state(private_data->imlibdata, wimage);				
-	if(_menu_is_branch(me->menu_entry))
-	  menu_draw_arrow_branch(private_data->imlibdata, wimage);
-	else if(_menu_is_check(me->menu_entry)) {
-	  menu_draw_check(private_data->imlibdata, wimage, (_menu_is_checked(me->menu_entry)));
-	}
-      }
       
       xitk_labelbutton_set_label_offset(btn, 20);
       xitk_enable_and_show_widget(btn);
