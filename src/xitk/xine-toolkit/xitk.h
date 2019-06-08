@@ -286,6 +286,29 @@ typedef struct {
   int                               width;
 } window_info_t;
 
+typedef struct {
+  /* all */
+  int x, y;
+  int visibility, enability;
+  char *pixmap_name;
+  xitk_image_t *pixmap_img;
+  /* button list */
+  int max_buttons, direction;
+  /* browser */
+  int browser_entries;
+  /* label */
+  int label_length, label_alignment, label_printable, label_staticity;
+  int label_animation, label_animation_step;
+  unsigned long int label_animation_timer;
+  char *label_color, *label_color_focus, *label_color_click, *label_fontname;
+  char *label_pixmap_font_name;
+  xitk_image_t *label_pixmap_font_img;
+  /* slider */
+  int slider_type, slider_radius;
+  char *slider_pixmap_pad_name;
+  xitk_image_t *slider_pixmap_pad_img;
+} xitk_skin_element_info_t;
+
 /*
  *  1 <widget group >
  *   1 <The groupped widget>
@@ -1243,6 +1266,12 @@ void xitk_slider_callback_exec(xitk_widget_t *);
  */
 xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
   xitk_skin_config_t *skonfig, const xitk_labelbutton_widget_t *b);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
+  const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info);
 
 /**
  *
@@ -2393,4 +2422,3 @@ void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cur
 void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
 #endif
-
