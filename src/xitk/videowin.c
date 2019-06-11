@@ -2214,7 +2214,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if (bevent->button == Button3 && gui->display == gui->video_display)
       video_window_menu(gVw.wl);
     else if (bevent->button == Button2)
-      panel_toggle_visibility(NULL, NULL);
+      panel_toggle_visibility (NULL, gui->panel);
     else if (bevent->button == Button1) {
       struct timeval  old_click_time, tm_diff;
       long int        click_diff;

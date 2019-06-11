@@ -215,7 +215,7 @@ typedef void (*widget_event_callback_t)(XEvent *event, void *data);
  * and, of course, only if there was a window
  * specified at register time.
  */
-typedef void (*widget_newpos_callback_t)(int, int, int, int);
+typedef void (*widget_newpos_callback_t)(void *data, int x, int y, int width, int height);
 
 /*
  * Signal handler callback function.

@@ -94,7 +94,7 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   }
 }
 
-static void event_sender_store_new_position(int x, int y, int w, int h) {
+static void event_sender_store_new_position (void *data, int x, int y, int w, int h) {
 
   if(eventer && !gGui->eventer_sticky) {
     eventer->x = x;
@@ -158,7 +158,7 @@ static void event_sender_handle_event(XEvent *event, void *data) {
      * If we tried to move sticky window, move it back to stored position.
      */
     if(eventer && gGui->eventer_sticky) {
-      if(panel_is_visible()) {
+      if (panel_is_visible (gGui->panel)) {
 	int  x, y;
 	xitk_window_get_window_position(gGui->imlib_data, eventer->xwin, &x, &y, NULL, NULL);
 	if((x != eventer->x) || (y != eventer->y))
@@ -400,7 +400,7 @@ void event_sender_panel(void) {
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   
-  if(gGui->eventer_sticky && panel_is_visible()) {
+  if (gGui->eventer_sticky && panel_is_visible (gGui->panel)) {
     int  px, py, pw;
     xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, NULL);
     eventer->x = px + pw;
@@ -594,7 +594,7 @@ void event_sender_panel(void) {
   xitk_add_widget (eventer->widget_list, w);
 
   xitk_enable_and_show_widget(w);
-  event_sender_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+  event_sender_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
 
   eventer->widget_key = xitk_register_event_handler("eventer", 
 						    (xitk_window_get_window(eventer->xwin)),

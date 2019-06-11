@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2016 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -26,55 +26,47 @@
 
 #include "xitk.h"
 
-void panel_update_nextprev_tips(void);
-int is_playback_widgets_enabled(void);
-void enable_playback_controls(int enable);
+typedef struct xui_panel_st xui_panel_t;
 
-void panel_show_tips(void);
-int panel_get_tips_enable(void);
-unsigned long panel_get_tips_timeout(void);
+void panel_update_nextprev_tips (xui_panel_t *panel);
+int is_playback_widgets_enabled (xui_panel_t *panel);
+void enable_playback_controls (xui_panel_t *panel, int enable);
 
-void panel_deinit(void);
-void panel_init (void);
+void panel_show_tips (xui_panel_t *panel);
+int panel_get_tips_enable (xui_panel_t *panel);
+unsigned long panel_get_tips_timeout (xui_panel_t *panel);
 
-void panel_paint(void);
+void panel_deinit (xui_panel_t *panel);
+xui_panel_t *panel_init (gGui_t *gui);
 
-void panel_change_skins(int);
+void panel_paint (xui_panel_t *panel);
+int panel_is_visible (xui_panel_t *panel);
 
-void panel_add_autoplay_buttons(void);
+void panel_change_skins (xui_panel_t *panel, int synthetic);
 
-void panel_add_mixer_control(void);
+void panel_add_autoplay_buttons (xui_panel_t *panel);
+void panel_add_mixer_control (xui_panel_t *panel);
 
-int panel_is_visible(void);
-
+/* the next 3 are usable both directly and as widget callbacks.
+   w may be NULL, data is xui_panel_t *. */
 void panel_toggle_visibility (xitk_widget_t *w, void *data);
-
 void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int status);
-
-void panel_execute_xineshot(xitk_widget_t *w, void *data);
-
 void panel_snapshot(xitk_widget_t *w, void *data);
 
-void panel_check_pause(void);
+void panel_check_pause (xui_panel_t *panel);
+void panel_check_mute (xui_panel_t *panel);
 
-void panel_check_mute(void);
+void panel_reset_runtime_label (xui_panel_t *panel);
+void panel_reset_slider (xui_panel_t *panel);
 
-void panel_reset_runtime_label(void);
+void panel_update_slider (xui_panel_t *panel, int pos);
+void panel_update_channel_display (xui_panel_t *panel);
+void panel_update_runtime_display (xui_panel_t *panel);
+void panel_update_mrl_display (xui_panel_t *panel);
+void panel_update_mixer_display (xui_panel_t *panel);
 
-void panel_reset_slider (void);
+void panel_set_title (xui_panel_t *panel, char*);
 
-void panel_update_slider(int pos);
-
-void panel_update_channel_display (void);
-
-void panel_update_runtime_display(void);
-
-void panel_update_mrl_display (void);
-
-void panel_update_mixer_display(void);
-
-void panel_set_title(char*);
-
-void panel_reparent(void);
+void panel_reparent (xui_panel_t *panel);
 
 #endif

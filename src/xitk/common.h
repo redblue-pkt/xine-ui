@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -32,6 +32,8 @@
 #include <xine/xineutils.h>
 
 #include "Imlib-light/Imlib.h"
+
+typedef struct gGui_st gGui_t;
 
 #include "xitk.h"
 
@@ -161,7 +163,8 @@
 #define btnfontname    "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 
 
-typedef struct {
+struct gGui_st {
+  xine_t                   *xine;
   xine_video_port_t        *vo_port;
   xine_video_port_t        *vo_none;
   xine_audio_port_t        *ao_none;
@@ -386,7 +389,10 @@ typedef struct {
 
   /* xine_open() may wait for our event handler */
   int                        suppress_messages;
-} gGui_t;
+
+  xui_panel_t               *panel;
+/*  xui_setup_t               *setup; */
+};
 
 extern gGui_t *gGui;
 
@@ -473,3 +479,4 @@ void change_icon(Window window);
 #endif
 
 #endif
+

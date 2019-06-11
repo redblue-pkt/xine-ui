@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -52,7 +52,6 @@ void reparent_all_windows(void) {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { panel_is_visible,         panel_reparent },
     { mrl_browser_is_visible,   mrl_browser_reparent },
     { playlist_is_visible,      playlist_reparent },
     { control_is_visible,       control_reparent },
@@ -68,6 +67,9 @@ void reparent_all_windows(void) {
     { NULL,                     NULL}
   };
   
+  if (panel_is_visible (gGui->panel))
+    panel_reparent (gGui->panel);
+
   for(i = 0; _reparent[i].visible; i++) {
     if(_reparent[i].visible())
       _reparent[i].reparent();
@@ -217,14 +219,14 @@ void gui_display_logo(void) {
 
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -1);
   xine_set_param(gui->stream, XINE_PARAM_SPU_CHANNEL, -1);
-  panel_update_channel_display();
+  panel_update_channel_display (gui->panel);
 
   if(gui->display_logo)
     (void) gui_xine_open_and_play((char *)gui->logo_mrl, NULL, 0, 0, 0, 0, 1);
 
   gui->logo_mode = 1;
   
-  panel_reset_slider();
+  panel_reset_slider (gui->panel);
   if(stream_infos_is_visible())
     stream_infos_update_infos();
   
@@ -287,7 +289,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 	
 	video_window_set_mrl(gui->mmk.ident);
 	playlist_mrlident_toggle();
-	panel_update_mrl_display();
+	panel_update_mrl_display (gui->panel);
 	free(ident);
       }
 
@@ -304,16 +306,16 @@ static int _gui_xine_play(xine_stream_t *stream,
 	}
 
 	if(gui->auto_panel_visibility && video_window_is_visible() &&
-	   panel_is_visible() )
-	  panel_toggle_visibility(NULL, NULL);
+          panel_is_visible (gui->panel))
+          panel_toggle_visibility (NULL, gui->panel);
 	
       }
       else {
 	
 	if(gui->auto_vo_visibility) {
 	  
-	  if(!panel_is_visible())
-	    panel_toggle_visibility(NULL, NULL);
+          if (!panel_is_visible (gui->panel))
+            panel_toggle_visibility (NULL, gui->panel);
 
 	  if(video_window_is_visible())
 	    video_window_set_visibility(0);
@@ -321,8 +323,8 @@ static int _gui_xine_play(xine_stream_t *stream,
 	}
 
 	if(gui->auto_panel_visibility && video_window_is_visible() && 
-	  !panel_is_visible() )
-	  panel_toggle_visibility(NULL, NULL);
+          !panel_is_visible (gui->panel))
+          panel_toggle_visibility (NULL, gui->panel);
 	  
 	if(video_window_is_visible()) {
 	  if(!gui->visual_anim.running)
@@ -405,7 +407,7 @@ static void mmk_set_update(void) {
 
   video_window_set_mrl(gui->mmk.ident);
   event_sender_update_menu_buttons();
-  panel_update_mrl_display();
+  panel_update_mrl_display (gui->panel);
   playlist_update_focused_entry();
   
   gui->playlist.ref_append = gui->playlist.cur;
@@ -701,7 +703,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   gui_deinit();
 
-  panel_deinit();
+  panel_deinit (gui->panel);
   playlist_deinit();
   mrl_browser_deinit();
   control_deinit();
@@ -742,7 +744,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   osd_deinit();
 
   config_update_num("gui.amp_level", gui->mixer.amp_level);
-  xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
+  xine_config_save (gui->xine, __xineui_global_config_file);
   
   xine_close(gui->stream);
   xine_close(gui->visual_anim.stream);
@@ -754,7 +756,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   gui->running = 0;
 
   if(gui->visual_anim.post_output_element.post)
-    xine_post_dispose(__xineui_global_xine_instance, gui->visual_anim.post_output_element.post);
+    xine_post_dispose (gui->xine, gui->visual_anim.post_output_element.post);
   gui->visual_anim.post_output_element.post = NULL;
 
   /* unwire post plugins before closing streams */
@@ -767,15 +769,15 @@ void gui_exit (xitk_widget_t *w, void *data) {
   gui->stream = gui->visual_anim.stream = gui->spu_stream = NULL;
 
   if(gui->vo_port)
-    xine_close_video_driver(__xineui_global_xine_instance, gui->vo_port);
+    xine_close_video_driver (gui->xine, gui->vo_port);
   if(gui->vo_none)
-    xine_close_video_driver(__xineui_global_xine_instance, gui->vo_none);
+    xine_close_video_driver (gui->xine, gui->vo_none);
   gui->vo_port = gui->vo_none = NULL;
 
   if(gui->ao_port)
-    xine_close_audio_driver(__xineui_global_xine_instance, gui->ao_port);
+    xine_close_audio_driver (gui->xine, gui->ao_port);
   if(gui->ao_none)
-    xine_close_audio_driver(__xineui_global_xine_instance, gui->ao_none);
+    xine_close_audio_driver (gui->xine, gui->ao_none);
   gui->ao_port = gui->ao_none = NULL;
 
   video_window_exit();
@@ -857,7 +859,7 @@ void gui_play (xitk_widget_t *w, void *data) {
       osd_update_status();
   }
   
-  panel_check_pause();
+  panel_check_pause (gui->panel);
 }
 
 void gui_stop (xitk_widget_t *w, void *data) {
@@ -883,14 +885,14 @@ void gui_stop (xitk_widget_t *w, void *data) {
   osd_hide_bar();
   osd_hide_info();
   osd_update_status();
-  panel_reset_slider ();
-  panel_check_pause();
-  panel_update_runtime_display();
+  panel_reset_slider (gui->panel);
+  panel_check_pause (gui->panel);
+  panel_update_runtime_display (gui->panel);
 
-  if(is_playback_widgets_enabled()) {
+  if (is_playback_widgets_enabled (gui->panel)) {
     if(!gui->playlist.num) {
       gui_set_current_mmk(NULL);
-      enable_playback_controls(0);
+      enable_playback_controls (gui->panel, 0);
     }
     else if(gui->playlist.num && (strcmp((mediamark_get_current_mrl()), gui->mmk.mrl))) {
       gui_set_current_mmk(mediamark_get_current_mmk());
@@ -922,14 +924,14 @@ void gui_close (xitk_widget_t *w, void *data) {
   osd_hide_bar();
   osd_hide_info();
   osd_update_status();
-  panel_reset_slider ();
-  panel_check_pause();
-  panel_update_runtime_display();
+  panel_reset_slider (gui->panel);
+  panel_check_pause (gui->panel);
+  panel_update_runtime_display (gui->panel);
 
-  if(is_playback_widgets_enabled()) {
+  if (is_playback_widgets_enabled (gui->panel)) {
     if(!gui->playlist.num) {
       gui_set_current_mmk(NULL);
-      enable_playback_controls(0);
+      enable_playback_controls (gui->panel, 0);
     }
     else if(gui->playlist.num && (strcmp((mediamark_get_current_mrl()), gui->mmk.mrl))) {
       gui_set_current_mmk(mediamark_get_current_mmk());
@@ -947,14 +949,14 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   if(speed != XINE_SPEED_PAUSE) {
     last_playback_speed = speed;
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-    panel_update_runtime_display ();
+    panel_update_runtime_display (gui->panel);
   }
   else {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, last_playback_speed);
     video_window_reset_ssaver();
   }
   
-  panel_check_pause();
+  panel_check_pause (gui->panel);
   /* Give xine engine some time before updating OSD, otherwise the */
   /* time disp may be empty when switching to XINE_SPEED_PAUSE.    */
   xine_usec_sleep(10000);
@@ -1034,8 +1036,8 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	  gui->playlist.cur--;
       }
 
-      if(is_playback_widgets_enabled() && (!gui->playlist.num))
-	enable_playback_controls(0);
+      if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num))
+        enable_playback_controls (gui->panel, 0);
 
     }
     
@@ -1056,7 +1058,7 @@ void gui_eject(xitk_widget_t *w, void *data) {
 void gui_toggle_visibility(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
 
-  if(panel_is_visible() && (!gui->use_root_window)) {
+  if (panel_is_visible (gui->panel) && (!gui->use_root_window)) {
     int visible = !video_window_is_visible();
 
     video_window_set_visibility(visible);
@@ -1096,7 +1098,7 @@ void gui_toggle_border(xitk_widget_t *w, void *data) {
 
 static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
-  int panel        = panel_is_visible();
+  int panel        = panel_is_visible (gui->panel);
   int mrl_browser  = mrl_browser_is_visible();
   int playlist     = playlist_is_visible();
   int control      = control_is_visible();
@@ -1114,7 +1116,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     return;
 
   if(panel)
-    panel_toggle_visibility(NULL, NULL);
+    panel_toggle_visibility (NULL, gui->panel);
   else {
     if(mrl_browser)
       mrl_browser_toggle_visibility(NULL, NULL);
@@ -1149,7 +1151,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     video_window_set_cursor_visibility(gui->cursor_visible);
   
   if(panel)
-    panel_toggle_visibility(NULL, NULL);
+    panel_toggle_visibility (NULL, gui->panel);
   else {
     if(mrl_browser)
       mrl_browser_toggle_visibility(NULL, NULL);
@@ -1208,7 +1210,7 @@ void gui_toggle_aspect(int aspect) {
   osd_display_info(_("Aspect ratio: %s"), 
 		   ratios[xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
   
-  if (panel_is_visible())  {
+  if (panel_is_visible (gui->panel))  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
@@ -1222,7 +1224,7 @@ void gui_toggle_interlaced(void) {
   osd_display_info(_("Deinterlace: %s"), (gui->deinterlace_enable) ? _("enabled") : _("disabled"));
   post_deinterlace();
   
-  if (panel_is_visible())  {
+  if (panel_is_visible (gui->panel))  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
@@ -1233,7 +1235,7 @@ void gui_toggle_interlaced(void) {
 void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value) {
   gGui_t *gui = gGui;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
-  panel_update_channel_display();
+  panel_update_channel_display (gui->panel);
   osd_display_audio_lang();
 }
 
@@ -1255,7 +1257,7 @@ void gui_change_audio_channel(xitk_widget_t *w, void *data) {
 void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
   gGui_t *gui = gGui;
   xine_set_param(gui->stream, XINE_PARAM_SPU_CHANNEL, value);
-  panel_update_channel_display();
+  panel_update_channel_display (gui->panel);
   osd_display_spu_lang();
 }
 
@@ -1299,7 +1301,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 #ifdef XINE_PARAM_VO_SINGLE_STEP
     else {
       xine_set_param (gui->stream, XINE_PARAM_VO_SINGLE_STEP, 1);
-      panel_update_runtime_display ();
+      panel_update_runtime_display (gui->panel);
     }
 #endif
   }
@@ -1319,7 +1321,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   if(speed != XINE_SPEED_PAUSE)
     last_playback_speed = speed;
 
-  panel_check_pause();
+  panel_check_pause (gui->panel);
   /* Give xine engine some time before updating OSD, otherwise the        */
   /* time disp may be empty when switching to speeds < XINE_SPEED_NORMAL. */
   xine_usec_sleep(10000);
@@ -1389,7 +1391,7 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
     opos = gui->new_pos;
     pthread_mutex_unlock(&new_pos_mutex);
 
-    panel_update_slider(pos);
+    panel_update_slider (gui->panel, pos);
     osd_stream_position(pos);
     
     (void) gui_xine_play(gui->stream, pos, 0, update_mmk);
@@ -1398,7 +1400,7 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
 			&(gui->stream_length.pos),
 			&(gui->stream_length.time), 
 			&(gui->stream_length.length));
-    panel_update_runtime_display();
+    panel_update_runtime_display (gui->panel);
     
     pthread_mutex_lock(&new_pos_mutex);
     if(opos == gui->new_pos)
@@ -1411,7 +1413,7 @@ static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
   
   gui->ignore_next = 0;
   osd_hide_status();
-  panel_check_pause();
+  panel_check_pause (gui->panel);
 
   pthread_mutex_unlock(&gui->xe_mutex);
   pthread_exit(NULL);
@@ -1465,7 +1467,7 @@ static __attribute__((noreturn)) void *_gui_seek_relative(void *data) {
   
   gui->ignore_next = 0;
   osd_hide_status();
-  panel_check_pause();
+  panel_check_pause (gui->panel);
 
   pthread_exit(NULL);
 }
@@ -1619,8 +1621,8 @@ void gui_dndcallback(char *filename) {
       }
     }
     
-    if((!is_playback_widgets_enabled()) && gui->playlist.num)
-      enable_playback_controls(1);
+    if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+      enable_playback_controls (gui->panel, 1);
 
     pthread_mutex_unlock(&gui->mmk_mutex);
   }
@@ -1768,7 +1770,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
   }
 
-  panel_check_pause();
+  panel_check_pause (gui->panel);
 }
   
 void gui_nextprev(xitk_widget_t *w, void *data) {
@@ -2028,7 +2030,7 @@ void change_amp_vol(int value) {
     value = 200;
   gui->mixer.amp_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gui->mixer.amp_level);
-  panel_update_mixer_display();
+  panel_update_mixer_display (gui->panel);
   osd_draw_bar(_("Amplification Level"), 0, 200, gui->mixer.amp_level, OSD_BAR_STEPPER);
 }
 void gui_increase_amp_level(void) {
@@ -2051,7 +2053,7 @@ void change_audio_vol(int value) {
     value = 100;
   gui->mixer.volume_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-  panel_update_mixer_display();
+  panel_update_mixer_display (gui->panel);
   osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
 }
 void gui_increase_audio_volume(void) {
@@ -2106,7 +2108,7 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y,
 		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
   
-  if (panel_is_visible())  {
+  if (panel_is_visible (gui->panel))  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
@@ -2123,7 +2125,7 @@ void gui_reset_zoom(void) {
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_X, 100);
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
   
-  if (panel_is_visible())  {
+  if (panel_is_visible (gui->panel))  {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
@@ -2238,8 +2240,8 @@ static void fileselector_callback(filebrowser_t *fb) {
     free(ident);
 
     /* Enable controls on display */
-    if((!is_playback_widgets_enabled()) && gui->playlist.num)
-      enable_playback_controls(1);
+    if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+      enable_playback_controls (gui->panel, 1);
 
     /* If an MRL is not being played, select the first file appended. If in "smart mode" start
        playing the entry.  If a an MRL is currently being played, let it continue normally */
@@ -2306,8 +2308,8 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       playlist_update_playlist();
 
       /* Enable playback controls on display */
-      if((!is_playback_widgets_enabled()) && gui->playlist.num)
-        enable_playback_controls(1);
+      if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+        enable_playback_controls (gui->panel, 1);
 
       /* If an MRL is not being played, select the first file appended. If in "smart mode" start
          playing the entry.  If an MRL is currently being played, let it continue normally */

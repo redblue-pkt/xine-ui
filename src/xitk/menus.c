@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -244,7 +244,7 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
       gui_play(NULL, NULL);
     }
 
-    enable_playback_controls((gui->playlist.num > 0));
+    enable_playback_controls (gui->panel, (gui->playlist.num > 0));
   }
 }
 static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
@@ -278,7 +278,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 	gui->mixer.volume_level = 100;
       
       xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-      panel_update_mixer_display();
+      panel_update_mixer_display (gui->panel);
       osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
     }
     break;
@@ -292,7 +292,7 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 	gui->mixer.volume_level = 0;
 
       xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
-      panel_update_mixer_display();
+      panel_update_mixer_display (gui->panel);
       osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
     }
     break;
@@ -398,7 +398,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL, NULL                                                                             },
     { _("Show controls"),
       menu_get_shortcut("ToggleVisibility"),
-      panel_is_visible() ? "<checked>" : "<check>",  
+      panel_is_visible (gui->panel) ? "<checked>" : "<check>",  
       menu_panel_visibility, NULL                                                            },
     { _("Show video window"),
       menu_get_shortcut("ToggleWindowVisibility"),

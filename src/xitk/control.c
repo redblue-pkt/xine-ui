@@ -1315,7 +1315,7 @@ void control_panel(void) {
   xitk_add_widget (control->widget_list, w);
   xitk_set_widget_tips(w, _("Close control window"));
 
-  control_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+  control_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
   control->widget_key = 
     xitk_register_event_handler("control", 

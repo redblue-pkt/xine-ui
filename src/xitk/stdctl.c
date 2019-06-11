@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -140,7 +140,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	}
       }
 
-      panel_paint();
+      panel_paint (gGui->panel);
 
       if(len <= 0) {
 	gui_execute_action_id(ACTID_QUIT);

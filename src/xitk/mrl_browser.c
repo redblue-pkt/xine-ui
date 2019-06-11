@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -371,8 +371,8 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     
     playlist_update_playlist();
     
-    if((!is_playback_widgets_enabled()) && gGui->playlist.num)
-      enable_playback_controls(1);
+    if ((!is_playback_widgets_enabled (gGui->panel)) && gGui->playlist.num)
+      enable_playback_controls (gGui->panel, 1);
   }
 }
 static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
@@ -406,8 +406,8 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       gGui->ignore_next = 0;
     }
     
-    if(!is_playback_widgets_enabled())
-      enable_playback_controls(1);
+    if (!is_playback_widgets_enabled (gGui->panel))
+      enable_playback_controls (gGui->panel, 1);
 
     if(mrl_look_like_playlist(_mrl)) {
       if(mediamark_concat_mediamarks(_mrl)) {
@@ -421,13 +421,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
     if(!xine_open(gGui->stream, (const char *) _mrl)) {
       gui_handle_xine_error(gGui->stream, _mrl);
-      enable_playback_controls(0);
+      enable_playback_controls (gGui->panel, 0);
       gui_display_logo();
       return;
     }
 
     if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
-      enable_playback_controls(0);
+      enable_playback_controls (gGui->panel, 0);
       gui_display_logo();
       return;
     }
@@ -465,12 +465,12 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
   set_mrl_browser_transient();
-  mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+  mrl_browser_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
 }
 
 void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
   set_mrl_browser_transient();
-  mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+  mrl_browser_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
 }

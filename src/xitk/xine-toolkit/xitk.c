@@ -1791,8 +1791,8 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	    /* Inform application about window movement. */
 
 	    if(fx->newpos_callback)
-	      fx->newpos_callback(fx->new_pos.x, fx->new_pos.y, 
-				  fx->width, fx->height);
+              fx->newpos_callback (fx->user_data,
+                fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
 	  }
 	  else {
 	    if(fx->widget_list) {
@@ -1829,9 +1829,8 @@ void xitk_xevent_notify_impl(XEvent *event) {
 	      fx->width = wattr.width;
 	      fx->height = wattr.height;
 	    }
-	    fx->newpos_callback(event->xconfigure.x,
-				event->xconfigure.y,
-				fx->width, fx->height);
+            fx->newpos_callback (fx->user_data,
+              event->xconfigure.x, event->xconfigure.y, fx->width, fx->height);
 	  }
 	}
 	break;
