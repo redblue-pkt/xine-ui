@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -26,7 +26,7 @@
 
 typedef struct {
   ImlibData              *imlibdata;
-  char                   *skin_element_name;
+  char                   skin_element_name[64];
 
   xitk_widget_t          *lWidget;
 
@@ -39,6 +39,7 @@ typedef struct {
   xitk_image_t           *font;
   char                   *fontname;
   char                   *label;
+  size_t                  label_len;
 
   xitk_simple_callback_t  callback;
   void                   *userdata;
@@ -46,15 +47,13 @@ typedef struct {
   int                     animation;
   int                     anim_step;
   int                     anim_timer;
-  int                     anim_running;
   int                     anim_offset;
 
   int                     label_visible;
 
-  pthread_t               thread;
-  pthread_mutex_t         paint_mutex;
+  int                     anim_running;
+  pthread_t               anim_thread;
   pthread_mutex_t         change_mutex;
-
 } label_private_data_t;
 
 #endif
