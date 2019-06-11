@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -323,8 +323,8 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       mediamark_load_mediamarks((const char *)shdr->data);
       gui_set_current_mmk(mediamark_get_current_mmk());
       playlist_update_playlist();
-      if((!is_playback_widgets_enabled()) && gGui->playlist.num)
-	enable_playback_controls(1);
+      if ((!is_playback_widgets_enabled (gGui->panel)) && gGui->playlist.num)
+        enable_playback_controls (gGui->panel, 1);
       send_ack(shdr);
       break;
 

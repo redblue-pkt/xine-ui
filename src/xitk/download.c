@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -52,7 +52,7 @@ static int progress_callback(void *userdata,
   /* TRANSLATORS: only ASCII characters (skin) */
   snprintf(buffer, sizeof(buffer), pgettext("skin", "Download progress: %d%%."), percent);
   gGui->mrl_overrided = 3;
-  panel_set_title(buffer);
+  panel_set_title (gGui->panel, buffer);
   
   /* return non 0 abort transfert */
   return download->status;

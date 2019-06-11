@@ -111,15 +111,15 @@
                                                                                                 \
     if((wtriplet)->label) {                                                                     \
       xitk_enable_and_show_widget((wtriplet)->label);                                           \
-      if(panel_get_tips_enable())					                        \
-	xitk_set_widget_tips_timeout((wtriplet)->label, panel_get_tips_timeout());              \
+      if (panel_get_tips_enable (gGui->panel))					                \
+        xitk_set_widget_tips_timeout ((wtriplet)->label, panel_get_tips_timeout (gGui->panel)); \
       else								                        \
 	xitk_disable_widget_tips((wtriplet)->label);			                        \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_enable_and_show_widget((wtriplet)->widget);                                          \
-      if(panel_get_tips_enable())					                        \
-	xitk_set_widget_tips_timeout((wtriplet)->widget, panel_get_tips_timeout());             \
+      if (panel_get_tips_enable (gGui->panel))				                        \
+        xitk_set_widget_tips_timeout ((wtriplet)->widget, panel_get_tips_timeout (gGui->panel));\
       else								                        \
 	xitk_disable_widget_tips((wtriplet)->widget);			                        \
     }                                                                                           \
@@ -799,14 +799,15 @@ static void setup_section_widgets(int s) {
 	
       switch (entry->type) {
 
-#define _SET_HELP do {						                                           \
-	  xitk_set_widget_tips_and_timeout(setup.wg[setup.num_wg]->widget,                               \
-					   (entry->help) ?  (char *) entry->help : _("No help available"), \
-					   panel_get_tips_timeout());	                                   \
-	  xitk_set_widget_tips_and_timeout(setup.wg[setup.num_wg]->label,                                \
-					   (entry->help) ?  (char *) entry->help : _("No help available"), \
-					   panel_get_tips_timeout());	                                   \
-	} while(0)
+#define _SET_HELP do { \
+  xitk_set_widget_tips_and_timeout (setup.wg[setup.num_wg]->widget, \
+    (entry->help) ? (char *)entry->help : _("No help available"), \
+    panel_get_tips_timeout (gGui->panel)); \
+  xitk_set_widget_tips_and_timeout (setup.wg[setup.num_wg]->label, \
+    (entry->help) ? (char *)entry->help : _("No help available"), \
+    panel_get_tips_timeout (gGui->panel)); \
+} while(0)
+
       case XINE_CONFIG_TYPE_RANGE: /* slider */
 	setup.wg[setup.num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
 	_SET_HELP;
@@ -1138,8 +1139,8 @@ void setup_panel(void) {
     WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
   xitk_add_widget (setup.widget_list, w);
   xitk_enable_and_show_widget(w);
-  setup_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
-  
+  setup_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
+
   setup.kreg = xitk_register_event_handler("setup", 
 					    (xitk_window_get_window(setup.xwin)),
 					    setup_handle_event,

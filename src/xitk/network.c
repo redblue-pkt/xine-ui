@@ -1,6 +1,6 @@
 #warning IMPLEMENT POST SUPPORT
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1996,7 +1996,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
 	  
-	  enable_playback_controls(0);
+          enable_playback_controls (gui->panel, 0);
 	}
 	else {
 	  int j;
@@ -2028,8 +2028,8 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	  gui_set_current_mmk(mediamark_get_current_mmk());
 	else {
 	  
-	  if(is_playback_widgets_enabled())
-	    enable_playback_controls(0);
+          if (is_playback_widgets_enabled (gui->panel))
+            enable_playback_controls (gui->panel, 0);
 	  
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
@@ -2358,8 +2358,8 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
       int flushing = 0;
       
       if(is_arg_contain(client_info, 1, "hide")) {
-	if(panel_is_visible()) {
-	  panel_toggle_visibility(NULL, NULL);
+        if (panel_is_visible (gui->panel)) {
+          panel_toggle_visibility (NULL, gui->panel);
 	  flushing++;
 	}
       }
@@ -2368,7 +2368,7 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "panel")) {
-	panel_toggle_visibility(NULL, NULL);
+	panel_toggle_visibility (NULL, gui->panel);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "playlist")) {

@@ -246,8 +246,8 @@ void playlist_delete_entry(int j) {
 
       gui->playlist.cur = -1;
 
-      if(is_playback_widgets_enabled())
-	enable_playback_controls(0);
+      if (is_playback_widgets_enabled (gui->panel))
+        enable_playback_controls (gui->panel, 0);
 
       if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
 	gui_stop(NULL, NULL);
@@ -293,7 +293,7 @@ void playlist_delete_all(xitk_widget_t *w, void *data) {
     xitk_browser_release_all_buttons(playlist->playlist);
 
   gui_set_current_mmk(NULL);
-  enable_playback_controls(0);
+  enable_playback_controls (gui->panel, 0);
 }
 
 /*
@@ -363,8 +363,8 @@ static void _playlist_load_callback(filebrowser_t *fb) {
     if((xine_get_status(gui->stream) == XINE_STATUS_PLAY))
       gui_stop(NULL, NULL);
 
-    if((!is_playback_widgets_enabled()) && gui->playlist.num)
-      enable_playback_controls(1);
+    if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+      enable_playback_controls (gui->panel, 1);
 
     free(file);
   }
@@ -589,7 +589,7 @@ static void _scan_for_playlist_infos(xine_stream_t *stream, int n) {
 	
 	gui->mmk.ident = strdup(ident);
 	
-	panel_update_mrl_display();
+        panel_update_mrl_display (gui->panel);
       }
       
       free(ident);
@@ -818,7 +818,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
       _playlist_update_browser_list (0);
     }
     
-    enable_playback_controls ((gui->playlist.num > 0));
+    enable_playback_controls (gui->panel, (gui->playlist.num > 0));
   }
 }
 
@@ -1247,7 +1247,7 @@ void playlist_editor(void) {
 
   _playlist_update_browser_list(0);
 
-  playlist_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+  playlist_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
   playlist->widget_key = 
     xitk_register_event_handler("playlist", 
