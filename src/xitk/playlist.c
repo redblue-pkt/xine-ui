@@ -1061,7 +1061,7 @@ void playlist_editor(void) {
   XSelectInput(gui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay (gui->display);
   
-  if(!video_window_is_visible())
+  if (!video_window_is_visible (gui->vwin))
     xitk_set_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
   else
     xitk_unset_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);

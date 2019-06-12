@@ -262,7 +262,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   old_img = panel->bg_image;
   panel->bg_image = new_img;
 
-  video_window_set_transient_for (panel->gui->panel_window);
+  video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
 
   XLockDisplay (panel->gui->display);
 
@@ -475,7 +475,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
               panel->gui->mmk.ident = strdup (ident);
               panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (ident);
 
-              video_window_set_mrl (panel->gui->mmk.ident);
+              video_window_set_mrl (panel->gui->vwin, panel->gui->mmk.ident);
 	      playlist_mrlident_toggle();
               panel_update_mrl_display (panel);
 	    }
@@ -483,19 +483,19 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 	  free(ident);
 	}
 	else
-          video_window_set_mrl ((char *)panel->gui->mmk.mrl);
+          video_window_set_mrl (panel->gui->vwin, (char *)panel->gui->mmk.mrl);
 
         {
           int iconified;
-          video_window_lock (1);
+          video_window_lock (panel->gui->vwin, 1);
           iconified = xitk_is_window_iconified (panel->gui->video_display, panel->gui->video_window);
-          video_window_lock (0);
+          video_window_lock (panel->gui->vwin, 0);
           if (!iconified) {
             if (panel->gui->ssaver_timeout) {
               if (!(i % 2))
                 screensaver_timer++;
               if (screensaver_timer >= panel->gui->ssaver_timeout)
-                screensaver_timer = video_window_reset_ssaver ();
+                screensaver_timer = video_window_reset_ssaver (panel->gui->vwin);
             }
           }
         }
@@ -544,16 +544,16 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
     
     if (panel->gui->cursor_visible) {
       if(!(i % 2))
-	video_window_set_cursor_timer(video_window_get_cursor_timer() + 1);
+	video_window_set_cursor_timer (panel->gui->vwin, video_window_get_cursor_timer (panel->gui->vwin) + 1);
       
-      if(video_window_get_cursor_timer() >= 5) {
+      if (video_window_get_cursor_timer (panel->gui->vwin) >= 5) {
         panel->gui->cursor_visible = !panel->gui->cursor_visible;
-        video_window_set_cursor_visibility (panel->gui->cursor_visible);
+        video_window_set_cursor_visibility (panel->gui->vwin, panel->gui->cursor_visible);
       }
     }
     
     if (panel->gui->logo_has_changed)
-      video_window_update_logo();
+      video_window_update_logo (panel->gui->vwin);
     
   __next_iteration:
     xine_usec_sleep(500000.0);
@@ -625,7 +625,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XLockDisplay (panel->gui->display);
     
-    if (video_window_is_visible ()) {
+    if (video_window_is_visible (panel->gui->vwin)) {
       if (panel->gui->use_root_window) { /* Using root window */
 	if(visible)
           XIconifyWindow (panel->gui->display, panel->gui->panel_window, panel->gui->screen);
@@ -653,18 +653,18 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     {
       Window want;
       int t;
-      video_window_lock (1);
+      video_window_lock (panel->gui->vwin, 1);
       want = panel->gui->video_window;
       XLockDisplay (panel->gui->video_display);
       if (panel->gui->cursor_grabbed)
         XGrabPointer (panel->gui->video_display, want,
           1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
-      if (video_window_is_visible ()) {
+      if (video_window_is_visible (panel->gui->vwin)) {
         /* Give focus to video output window */
         XSetInputFocus (panel->gui->video_display, want, RevertToParent, CurrentTime);
         XSync (panel->gui->video_display, False);
         XUnlockDisplay (panel->gui->video_display);
-        video_window_lock (0);
+        video_window_lock (panel->gui->vwin, 0);
         /* check after 5/15/30/50/75/105/140 ms */
         for (t = 5000; t < 40000; t += 5000) {
           Window got;
@@ -678,7 +678,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
         }
       } else {
         XUnlockDisplay (panel->gui->video_display);
-        video_window_lock (0);
+        video_window_lock (panel->gui->vwin, 0);
       }
     }
 
@@ -694,7 +694,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XRaiseWindow (panel->gui->display, panel->gui->panel_window);
     XMapWindow (panel->gui->display, panel->gui->panel_window);
     XUnlockDisplay (panel->gui->display);
-    video_window_set_transient_for (panel->gui->panel_window);
+    video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
 
     wait_for_window_visible (panel->gui->display, panel->gui->panel_window);
     layer_above_video (panel->gui->panel_window);
@@ -708,8 +708,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
     if(
 #ifdef HAVE_XINERAMA
-       (((video_window_get_fullscreen_mode()) & (WINDOWED_MODE | FULLSCR_MODE)) &&
-	(!((video_window_get_fullscreen_mode()) & FULLSCR_XI_MODE)))
+       (((video_window_get_fullscreen_mode (panel->gui->vwin)) & (WINDOWED_MODE | FULLSCR_MODE)) &&
+	(!((video_window_get_fullscreen_mode (panel->gui->vwin)) & FULLSCR_XI_MODE)))
 #ifdef HAVE_XF86VIDMODE
        ||
 #endif
@@ -1001,7 +1001,7 @@ static void panel_handle_event(XEvent *event, void *data) {
       XButtonEvent *bevent = (XButtonEvent *) event;
 
       if(bevent->button == Button3)
-	video_window_menu(panel->widget_list);
+        video_window_menu (panel->widget_list);
     }
     break;
     
@@ -1260,7 +1260,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * Different WMs and even different versions behave different.
    * There is no guarantee that it works with all WMs/versions.
    */
-  if(!video_window_is_visible()) {
+  if (!video_window_is_visible (panel->gui->vwin)) {
     if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
       xitk_unset_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_TOOLBAR);
     xitk_set_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_NORMAL);
@@ -1288,7 +1288,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
                   PROP_MWM_HINTS_ELEMENTS);
   
   XUnlockDisplay (panel->gui->display);
-  video_window_set_transient_for (panel->gui->panel_window);
+  video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
   XLockDisplay (panel->gui->display);
 
   /* 
@@ -1638,7 +1638,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						  panel);
 
   panel->gui->cursor_visible = 1;
-  video_window_set_cursor_visibility (panel->gui->cursor_visible);
+  video_window_set_cursor_visibility (panel->gui->vwin, panel->gui->cursor_visible);
   
   {
     pthread_attr_t       pth_attrs;

@@ -257,7 +257,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
   mb.window_trans                   = (gGui->use_root_window || gGui->video_display != gGui->display) ? None : gGui->video_window;
   mb.layer_above                    = (is_layer_above());
   mb.icon                           = &gGui->icon;
-  mb.set_wm_window_normal           = !video_window_is_visible();
+  mb.set_wm_window_normal           = !video_window_is_visible (gGui->vwin);
 
   mb.x                              = xine_config_register_num (__xineui_global_xine_instance, "gui.mrl_browser_x", 
 								200,

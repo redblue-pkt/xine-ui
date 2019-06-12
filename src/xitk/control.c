@@ -1015,7 +1015,7 @@ void control_panel(void) {
   XSelectInput(gui->display, control->window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay(gui->display);
 
-  if(!video_window_is_visible())
+  if (!video_window_is_visible (gui->vwin))
     xitk_set_wm_window_type(control->window, WINDOW_TYPE_NORMAL);
   else
     xitk_unset_wm_window_type(control->window, WINDOW_TYPE_NORMAL);
