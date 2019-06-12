@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -123,9 +123,9 @@ static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
 
 static void _osd_get_output_size(int *w, int *h) {
   if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
-    video_window_get_output_size(w, h);
+    video_window_get_output_size (gGui->vwin, w, h);
   else
-    video_window_get_frame_size(w, h);
+    video_window_get_frame_size (gGui->vwin, w, h);
 }
 
 static const char *_osd_get_speed_sym(int speed) {
@@ -311,7 +311,7 @@ void osd_stream_infos(void) {
     if((vwidth == 0) && (vheight == 0)) {
       if(gGui->visual_anim.running) {
 	if(gGui->visual_anim.enabled == 1) {
-	  video_window_get_frame_size(&vwidth, &vheight);
+          video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
 	  vcodec = _("post animation");
 	}
 	else if(gGui->visual_anim.enabled == 2) {
@@ -321,7 +321,7 @@ void osd_stream_infos(void) {
 	}
       }
       else {
-	video_window_get_frame_size(&vwidth, &vheight);
+        video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
 	vcodec = _("unknown");
       }
     }
@@ -739,12 +739,12 @@ void osd_update_osd(void) {
   if((vwidth == 0) && (vheight == 0)) {
     if(gGui->visual_anim.running) {
       if(gGui->visual_anim.enabled == 1)
-	video_window_get_frame_size(&vwidth, &vheight);
+        video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
       else if(gGui->visual_anim.enabled == 2)
 	vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
     }
     else
-      video_window_get_frame_size(&vwidth, &vheight);
+      video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
     
   }
   

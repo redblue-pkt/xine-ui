@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002-2008 Stefan Holst
- * Copyright (C) 2005-2017 the xine project
+ * Copyright (C) 2005-2019 the xine project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -766,7 +766,7 @@ void oxine_menu(void)
   oxine_adapt();
       
   if( oxine->mode != OXINE_MODE_MAINMENU ) {
-    video_window_reset_ssaver();
+    video_window_reset_ssaver (gGui->vwin);
     gGui->nongui_error_msg = oxine_error_msg;
 
     if( oxine->reentry )
@@ -819,7 +819,7 @@ int oxine_action_event(int xine_event_type)
     break;
   }
   
-  video_window_reset_ssaver();
+  video_window_reset_ssaver (gGui->vwin);
   otk_send_event(oxine->otk, &ev);
   oxine_instance_unget(oxine);
   return 1;
@@ -855,7 +855,7 @@ int oxine_mouse_event(int xine_event_type, int x, int y) {
     break;
   }
 
-  video_window_reset_ssaver();
+  video_window_reset_ssaver (gGui->vwin);
   retval = otk_send_event(oxine->otk, &ev);
   oxine_instance_unget(oxine);
   return retval;

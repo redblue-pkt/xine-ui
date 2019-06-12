@@ -126,7 +126,7 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       XRaiseWindow(gui->display, window);
       XMapWindow(gui->display, window);
       XUnlockDisplay(gui->display);
-      video_window_set_transient_for (window);
+      video_window_set_transient_for (gui->vwin, window);
 
       wait_for_window_visible(gui->display, window);
       layer_above_video(window);
@@ -287,7 +287,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 	gui->mmk.ident = strdup(ident);
 	gui->playlist.mmk[gui->playlist.cur]->ident = strdup(ident);
 	
-	video_window_set_mrl(gui->mmk.ident);
+        video_window_set_mrl (gui->vwin, gui->mmk.ident);
 	playlist_mrlident_toggle();
 	panel_update_mrl_display (gui->panel);
 	free(ident);
@@ -300,12 +300,12 @@ static int _gui_xine_play(xine_stream_t *stream,
 	
 	if(gui->auto_vo_visibility) {
 	  
-	  if(!video_window_is_visible())
-	    video_window_set_visibility(1);
+          if (!video_window_is_visible (gui->vwin))
+            video_window_set_visibility (gui->vwin, 1);
 	  
 	}
 
-	if(gui->auto_panel_visibility && video_window_is_visible() &&
+        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) &&
           panel_is_visible (gui->panel))
           panel_toggle_visibility (NULL, gui->panel);
 	
@@ -317,16 +317,16 @@ static int _gui_xine_play(xine_stream_t *stream,
           if (!panel_is_visible (gui->panel))
             panel_toggle_visibility (NULL, gui->panel);
 
-	  if(video_window_is_visible())
-	    video_window_set_visibility(0);
+          if (video_window_is_visible (gui->vwin))
+            video_window_set_visibility (gui->vwin, 0);
 	    
 	}
 
-	if(gui->auto_panel_visibility && video_window_is_visible() && 
+        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) && 
           !panel_is_visible (gui->panel))
           panel_toggle_visibility (NULL, gui->panel);
 	  
-	if(video_window_is_visible()) {
+        if (video_window_is_visible (gui->vwin)) {
 	  if(!gui->visual_anim.running)
 	    visual_anim_play();
 	}
@@ -405,7 +405,7 @@ static void set_mmk(mediamark_t *mmk) {
 static void mmk_set_update(void) {
   gGui_t *gui = gGui;
 
-  video_window_set_mrl(gui->mmk.ident);
+  video_window_set_mrl (gui->vwin, gui->mmk.ident);
   event_sender_update_menu_buttons();
   panel_update_mrl_display (gui->panel);
   playlist_update_focused_entry();
@@ -498,7 +498,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       XLockDisplay(gui->display);
       XSync(gui->display, False);
       XUnlockDisplay(gui->display);
-      video_window_set_transient_for (xitk_window_get_window (xw));
+      video_window_set_transient_for (gui->vwin, xitk_window_get_window (xw));
       layer_above_video(xitk_window_get_window(xw));
       
       /* Doesn't work so well yet 
@@ -726,8 +726,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
   if(load_sub)
     filebrowser_end(load_sub);
 
-  if(video_window_is_visible())
-    video_window_set_visibility(0);
+  if (video_window_is_visible (gui->vwin))
+    video_window_set_visibility (gui->vwin, 0);
   
   tvout_deinit(gui->tvout);
 
@@ -737,7 +737,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * the original modeline
    */
   if(gui->XF86VidMode_fullscreen)
-    video_window_set_fullscreen_mode(WINDOWED_MODE);
+    video_window_set_fullscreen_mode (gui->vwin, WINDOWED_MODE);
   //     gui_set_fullscreen_mode(NULL,NULL);
 #endif
    
@@ -780,7 +780,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_close_audio_driver (gui->xine, gui->ao_none);
   gui->ao_port = gui->ao_none = NULL;
 
-  video_window_exit();
+  video_window_exit (gui->vwin);
 
 #ifdef HAVE_LIRC
   if(__xineui_global_lirc_enable)
@@ -819,7 +819,7 @@ void gui_play (xitk_widget_t *w, void *data) {
   if((!gui->playlist.num) && (xine_get_status(gui->stream) != XINE_STATUS_PLAY))
     return;
 
-  video_window_reset_ssaver();
+  video_window_reset_ssaver (gui->vwin);
   
   if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
     if(gui->logo_mode != 0) {
@@ -953,7 +953,7 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   }
   else {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, last_playback_speed);
-    video_window_reset_ssaver();
+    video_window_reset_ssaver (gui->vwin);
   }
   
   panel_check_pause (gui->panel);
@@ -1059,9 +1059,9 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
 
   if (panel_is_visible (gui->panel) && (!gui->use_root_window)) {
-    int visible = !video_window_is_visible();
+    int visible = !video_window_is_visible (gui->vwin);
 
-    video_window_set_visibility(visible);
+    video_window_set_visibility (gui->vwin, visible);
 
 
     /* We need to reparent all visible windows because of redirect tweaking */
@@ -1076,7 +1076,7 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
     reparent_all_windows();
 
     /* (re)start/stop visual animation */
-    if(video_window_is_visible()) {
+    if (video_window_is_visible (gui->vwin)) {
       layer_above_video(gui->panel_window);
       
       if(gui->visual_anim.enabled && (gui->visual_anim.running == 2))
@@ -1093,7 +1093,7 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 }
 
 void gui_toggle_border(xitk_widget_t *w, void *data) {
-  video_window_toggle_border();
+  video_window_toggle_border (gGui->vwin);
 }
 
 static void set_fullscreen_mode(int fullscreen_mode) {
@@ -1112,7 +1112,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int applugin     = applugin_is_visible();
   int help         = help_is_visible();
 
-  if((!(video_window_is_visible())) || gui->use_root_window)
+  if ((!(video_window_is_visible (gui->vwin))) || gui->use_root_window)
     return;
 
   if(panel)
@@ -1144,11 +1144,11 @@ static void set_fullscreen_mode(int fullscreen_mode) {
       help_toggle_visibility(NULL, NULL);
   }
   
-  video_window_set_fullscreen_mode(fullscreen_mode);
+  video_window_set_fullscreen_mode (gui->vwin, fullscreen_mode);
   
   /* Drawable has changed, update cursor visiblity */
   if(!gui->cursor_visible)
-    video_window_set_cursor_visibility(gui->cursor_visible);
+    video_window_set_cursor_visibility (gui->vwin, gui->cursor_visible);
   
   if(panel)
     panel_toggle_visibility (NULL, gui->panel);
@@ -1214,7 +1214,7 @@ void gui_toggle_aspect(int aspect) {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
-    video_window_set_transient_for (gui->panel_window);
+    video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
 
@@ -1228,7 +1228,7 @@ void gui_toggle_interlaced(void) {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
-    video_window_set_transient_for (gui->panel_window);
+    video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
 
@@ -1311,7 +1311,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 	xine_set_param(gui->stream, XINE_PARAM_SPEED, (speed *= 2));
       else {
 	xine_set_param(gui->stream, XINE_PARAM_SPEED, (speed = XINE_SPEED_SLOW_4));
-	video_window_reset_ssaver();
+	video_window_reset_ssaver (gui->vwin);
       }
     }
   }
@@ -2009,7 +2009,7 @@ void layer_above_video(Window w) {
   if(!(is_layer_above()))
     return;
   
-  if ((!(video_window_get_fullscreen_mode() & WINDOWED_MODE)) && video_window_is_visible()) {
+  if ((!(video_window_get_fullscreen_mode (gGui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gGui->vwin)) {
     layer = xitk_get_layer_level();
   }
   else {
@@ -2112,7 +2112,7 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
-    video_window_set_transient_for (gui->panel_window);
+    video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
 
@@ -2129,7 +2129,7 @@ void gui_reset_zoom(void) {
     XLockDisplay(gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
     XUnlockDisplay(gui->display);
-    video_window_set_transient_for (gui->panel_window);
+    video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
 

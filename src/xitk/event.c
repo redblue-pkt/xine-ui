@@ -476,12 +476,12 @@ void gui_execute_action_id(action_id_t action) {
       /* Limit size to a practical minimum.                         */
       /* Too small window is hard to view or to hit with the mouse. */
 
-      video_window_get_output_size(&output_width, &output_height);
+      video_window_get_output_size (gui->vwin, &output_width, &output_height);
       if(output_width > 50 && output_height > 50) {
 	float	xmag, ymag;
 
-	video_window_get_mag(&xmag, &ymag);
-	video_window_set_mag(xmag * (1/1.2f), ymag * (1/1.2f));
+        video_window_get_mag (gui->vwin, &xmag, &ymag);
+        video_window_set_mag (gui->vwin, xmag * (1/1.2f), ymag * (1/1.2f));
       }
     }
     break;
@@ -497,32 +497,32 @@ void gui_execute_action_id(action_id_t action) {
       /* size (no further ConfigureNotify after size limit is exceeded),           */
       /* so we'll not end up in endless magnification.                             */
 
-      video_window_get_output_size(&output_width, &output_height);
+      video_window_get_output_size (gui->vwin, &output_width, &output_height);
       xitk_get_window_position(gui->video_display, gui->video_window,
 			       NULL, NULL, &window_width, &window_height);
       if(output_width < 5000 && output_height < 5000 &&
 	 output_width <= window_width && output_height <= window_height) {
 	float	xmag, ymag;
 
-	video_window_get_mag(&xmag, &ymag);
-	video_window_set_mag(xmag * 1.2f, ymag * 1.2f);
+        video_window_get_mag (gui->vwin, &xmag, &ymag);
+        video_window_set_mag (gui->vwin, xmag * 1.2f, ymag * 1.2f);
       }
     }
     break;
 
   case ACTID_ZOOM_1_1:
   case ACTID_WINDOW100:
-    if(video_window_set_mag (1.0f, 1.0f))
+    if (video_window_set_mag (gui->vwin, 1.0f, 1.0f))
       osd_display_info(_("Zoom: 1:1"));
     break;
 
   case ACTID_WINDOW200:
-    if(video_window_set_mag (2.0f, 2.0f))
+    if (video_window_set_mag (gui->vwin, 2.0f, 2.0f))
       osd_display_info(_("Zoom: 200%%"));
     break;
 
   case ACTID_WINDOW50:
-    if(video_window_set_mag (0.5f, 0.5f))
+    if (video_window_set_mag (gui->vwin, 0.5f, 0.5f))
       osd_display_info(_("Zoom: 50%%"));
     break;
 
@@ -580,7 +580,7 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_TOGGLE_FULLSCREEN:
     if (narg >= 0) {
-      int fullscreen = video_window_get_fullscreen_mode() & FULLSCR_MODE;
+      int fullscreen = video_window_get_fullscreen_mode (gui->vwin) & FULLSCR_MODE;
       if ((narg && !fullscreen) || (!narg && fullscreen))
         gui_set_fullscreen_mode(NULL, NULL);
     } else
@@ -1928,9 +1928,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gui->on_quit = 0;
   gui->running = 1;
   
-  video_window_init (window_attribute, 
-		     ((actions_on_start(gui->actions_on_start, 
-				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
+  video_window_init (gui, window_attribute,
+    ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
    * when done before the video_window_init(). */
@@ -2033,7 +2032,7 @@ void gui_run(char **session_opts) {
   _startup_t  startup;
   int         i, auto_start = 0;
   
-  video_window_change_skins(0);
+  video_window_change_skins (gui->vwin, 0);
   panel_add_autoplay_buttons (gui->panel);
   panel_show_tips (gui->panel);
   panel_add_mixer_control (gui->panel);
@@ -2106,9 +2105,9 @@ void gui_run(char **session_opts) {
   if(gui->tvout) {
     int w, h;
     
-    video_window_get_visible_size(&w, &h);
-    tvout_set_fullscreen_mode(gui->tvout, 
-			      ((video_window_get_fullscreen_mode() & WINDOWED_MODE) ? 0 : 1), w, h);
+    video_window_get_visible_size (gui->vwin, &w, &h);
+    tvout_set_fullscreen_mode (gui->tvout, 
+      ((video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE) ? 0 : 1), w, h);
   }
   
   if(gui->actions_on_start[0] != ACTID_NOKEY) {
@@ -2125,8 +2124,8 @@ void gui_run(char **session_opts) {
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
       
       /* DXR3 case */
-      if(video_window_is_visible())
-	video_window_set_visibility(!(video_window_is_visible()));
+      if (video_window_is_visible (gui->vwin))
+        video_window_set_visibility (gui->vwin, 0);
       else
 	xine_port_send_gui_data(gui->vo_port,
 			      XINE_GUI_SEND_VIDEOWIN_VISIBLE,

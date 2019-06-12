@@ -391,7 +391,7 @@ struct gGui_st {
   int                        suppress_messages;
 
   xui_panel_t               *panel;
-/*  xui_setup_t               *setup; */
+  xui_vwin_t                *vwin;
 };
 
 extern gGui_t *gGui;
@@ -399,7 +399,7 @@ extern gGui_t *gGui;
 void set_window_states_start(Window window);
 #define set_window_states_start(window)                                   \
   do {                                                                    \
-    if(!video_window_is_visible())                                        \
+    if(!video_window_is_visible(gGui->vwin))                              \
       xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
     else                                                                  \
       xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
@@ -410,13 +410,13 @@ void set_window_states_start(Window window);
 void reparent_window(Window window);
 #define reparent_window(window)                                                          \
   do {                                                                                   \
-    if((!(video_window_get_fullscreen_mode() & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
+    if((!(video_window_get_fullscreen_mode(gGui->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
       XLockDisplay(gGui->display);                                                       \
       /* Don't unmap this window, because on re-mapping, it will not be visible until    \
 	 its ancestor, the video window, is visible. That's not what's intended.         \
          XUnmapWindow(gGui->display, (window));                                          \
       */								                 \
-      if(!video_window_is_visible())                                                     \
+      if(!video_window_is_visible(gGui->vwin))                                           \
         xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);                           \
       else                                                                               \
         xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);                         \

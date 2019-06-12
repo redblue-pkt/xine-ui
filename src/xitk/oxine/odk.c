@@ -159,9 +159,9 @@ static void odk_adapt(odk_t *odk) {
   if (odk->osd) xine_osd_free(odk->osd);
 
   if( odk->unscaled_osd )
-    video_window_get_output_size(&width, &height);
+    video_window_get_output_size (gGui->vwin, &width, &height);
   else
-    video_window_get_frame_size(&width, &height);
+    video_window_get_frame_size (gGui->vwin, &width, &height);
 
   lprintf("odk_adapt to: %i, %i\n", width, height);
   odk->vscale = height / (double)V_HEIGHT;

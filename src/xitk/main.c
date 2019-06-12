@@ -779,7 +779,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 
   vis.dest_size_cb      = video_window_dest_size_cb;
   vis.frame_output_cb   = video_window_frame_output_cb;
-  vis.user_data         = NULL;
+  vis.user_data         = gui->vwin;
   
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
@@ -1068,7 +1068,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	}
 	gui->mmk.ident = strdup(uevent->str);
 	
-	video_window_set_mrl(gui->mmk.ident);
+        video_window_set_mrl (gui->vwin, gui->mmk.ident);
 	playlist_mrlident_toggle();
         panel_update_mrl_display (gui->panel);
       }
@@ -1377,9 +1377,9 @@ typedef struct {
       xine_spu_button_t *spubtn = (xine_spu_button_t *) event->data;
       
       if(spubtn->direction)
-	video_window_set_cursor(CURSOR_HAND);
+        video_window_set_cursor (gui->vwin, CURSOR_HAND);
       else
-	video_window_set_cursor(CURSOR_ARROW);
+        video_window_set_cursor (gui->vwin, CURSOR_ARROW);
     }
     break;
 
@@ -2278,7 +2278,7 @@ int main(int argc, char *argv[]) {
   xine_set_param(gui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* init the video window */
-  video_window_select_visual();
+  video_window_select_visual (gui->vwin);
 
   xine_set_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
         
