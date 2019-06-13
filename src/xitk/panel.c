@@ -33,9 +33,9 @@
 #include "xine-toolkit/button_list.h"
 
 struct xui_panel_st {
-  xitk_widget_list_t   *widget_list;
-
   gGui_t               *gui;
+
+  xitk_widget_list_t   *widget_list;
 
   int                   x;
   int                   y;
@@ -130,7 +130,7 @@ void panel_show_tips (xui_panel_t *panel) {
   mrl_browser_show_tips(panel->tips.enable, panel->tips.timeout);
   event_sender_show_tips(panel->tips.enable, panel->tips.timeout);
   mmk_editor_show_tips(panel->tips.enable, panel->tips.timeout);
-  setup_show_tips(panel->tips.enable, panel->tips.timeout);
+  setup_show_tips (panel->gui->setup, panel->tips.enable, panel->tips.timeout);
 }
 
 /* Somewhat paranoia conditionals (Hans, YOU're paranoid ;-) )*/
@@ -162,6 +162,8 @@ static void panel_timeout_tips_cb(void *data, xine_cfg_entry_t *cfg) {
 static void panel_store_new_position (void *data, int x, int y, int w, int h) {
   xui_panel_t *panel = data;
 
+  (void)h;
+
   if(panel->skin_on_change == 0) {
     
     panel->x = x;
@@ -181,10 +183,15 @@ static void panel_store_new_position (void *data, int x, int y, int w, int h) {
 
 static void panel_exit (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
+
+  (void)w;
+
   if(panel) {
     window_info_t wi;
     
     panel->visible = 0;
+
+    xine_config_unregister_callbacks (panel->gui->xine, NULL, NULL, panel, sizeof (*panel));
 
     if((xitk_get_window_info(panel->widget_key, &wi))) {
       config_update_num ("gui.panel_x", wi.x);
@@ -229,7 +236,9 @@ static void panel_exit (xitk_widget_t *w, void *data) {
 void panel_change_skins (xui_panel_t *panel, int synthetic) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
-  
+
+  (void)synthetic;
+
   panel->skin_on_change++;
 
   xitk_skin_lock (panel->gui->skin_config);
@@ -585,6 +594,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
   int visible = xitk_is_window_visible (panel->gui->display, panel->gui->panel_window);
 
+  (void)w;
+
   if(((!panel->visible || !visible) && !playlist_is_visible()) || (visible && playlist_is_visible()))
     playlist_toggle_visibility(NULL, NULL);
 
@@ -594,8 +605,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if(((!panel->visible || !visible) && !mrl_browser_is_visible()) || (visible && mrl_browser_is_visible()))
     mrl_browser_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !setup_is_visible()) || (visible && setup_is_visible()))
-    setup_toggle_visibility(NULL, NULL);
+  if(((!panel->visible || !visible) && !setup_is_visible (panel->gui->setup)) || (visible && setup_is_visible (panel->gui->setup)))
+    setup_toggle_visibility (NULL, panel->gui->setup);
 
   if(((!panel->visible || !visible) && !viewlog_is_visible()) || (visible && viewlog_is_visible()))
     viewlog_toggle_visibility(NULL, NULL);
@@ -786,6 +797,8 @@ void panel_reset_runtime_label (xui_panel_t *panel) {
 
 static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
+
+  (void)w;
   panel->gui->is_display_mrl = !panel->gui->is_display_mrl;
   panel_update_mrl_display (panel);
   playlist_mrlident_toggle();
@@ -793,6 +806,8 @@ static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
 
 static void _panel_change_time_label(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
+
+  (void)w;
   panel->runtime_mode = !panel->runtime_mode;
   panel_update_runtime_display (panel);
 }
@@ -867,6 +882,7 @@ static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
   int x, y;
   int wx, wy;
 
+  (void)w;
   xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->audiochan_label, &x, &y);
   x += wx;
@@ -879,6 +895,7 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   int x, y;
   int wx, wy;
 
+  (void)w;
   xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->spuid_label, &x, &y);
   x += wx;
@@ -922,6 +939,7 @@ void panel_update_mixer_display (xui_panel_t *panel) {
 void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
   xui_panel_t *panel = data;
 
+  (void)w;
   if (panel->gui->mixer.method == SOFTWARE_MIXER) {
     panel->gui->mixer.mute = state;
     xine_set_param (panel->gui->stream, XINE_PARAM_AUDIO_AMP_MUTE, panel->gui->mixer.mute);
@@ -947,6 +965,8 @@ static void panel_snapshot_info(void *data, char *message) {
 }
 void panel_snapshot (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
+
+  (void)w;
   create_snapshot (panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, NULL);
 }
 
@@ -1025,8 +1045,8 @@ static void panel_handle_event(XEvent *event, void *data) {
       control_toggle_visibility(NULL, NULL);
     if(!mrl_browser_is_visible())
       mrl_browser_toggle_visibility(NULL, NULL);
-    if(!setup_is_visible())
-      setup_toggle_visibility(NULL, NULL);
+    if (!setup_is_visible (panel->gui->setup))
+      setup_toggle_visibility (NULL, panel->gui->setup);
     if(!viewlog_is_visible())
       viewlog_toggle_visibility(NULL, NULL);
     if(!kbedit_is_visible())
@@ -1670,4 +1690,3 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
-

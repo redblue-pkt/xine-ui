@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -28,14 +28,16 @@
 
 #include "xitk.h"
 
-void setup_panel(void);
-int setup_is_visible(void);
-int setup_is_running(void);
-void setup_toggle_visibility(xitk_widget_t *, void *);
-void setup_raise_window(void);
-void setup_reparent(void);
-void setup_end(void);
-void setup_show_tips(int enabled, unsigned long timeout);
-void setup_update_tips_timeout(unsigned long timeout);
+typedef struct xui_setup_st xui_setup_t;
+
+xui_setup_t *setup_panel (gGui_t *gui);
+int setup_is_visible (xui_setup_t *setup);
+int setup_is_running (xui_setup_t *setup);
+void setup_toggle_visibility (xitk_widget_t *w, void *setup);
+void setup_raise_window (xui_setup_t *setup);
+void setup_reparent (xui_setup_t *setup);
+void setup_end (xui_setup_t *setup);
+void setup_show_tips (xui_setup_t *setup, int enabled, unsigned long timeout);
+void setup_update_tips_timeout (xui_setup_t *setup, unsigned long timeout);
 
 #endif
