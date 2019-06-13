@@ -55,7 +55,6 @@ void reparent_all_windows(void) {
     { mrl_browser_is_visible,   mrl_browser_reparent },
     { playlist_is_visible,      playlist_reparent },
     { control_is_visible,       control_reparent },
-    { setup_is_visible,         setup_reparent },
     { viewlog_is_visible,       viewlog_reparent },
     { kbedit_is_visible,        kbedit_reparent },
     { event_sender_is_visible,  event_sender_reparent },
@@ -69,6 +68,8 @@ void reparent_all_windows(void) {
   
   if (panel_is_visible (gGui->panel))
     panel_reparent (gGui->panel);
+  if (setup_is_visible (gGui->setup))
+    setup_reparent (gGui->setup);
 
   for(i = 0; _reparent[i].visible; i++) {
     if(_reparent[i].visible())
@@ -708,7 +709,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   mrl_browser_deinit();
   control_deinit();
   
-  setup_end();
+  setup_end (gui->setup);
   viewlog_end();
   kbedit_end();
   event_sender_end();
@@ -1102,7 +1103,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int mrl_browser  = mrl_browser_is_visible();
   int playlist     = playlist_is_visible();
   int control      = control_is_visible();
-  int setup        = setup_is_visible();
+  int setup        = setup_is_visible (gui->setup);
   int viewlog      = viewlog_is_visible();
   int kbedit       = kbedit_is_visible();
   int event_sender = event_sender_is_visible();
@@ -1125,7 +1126,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(control)
       control_toggle_visibility(NULL, NULL);
     if(setup)
-      setup_toggle_visibility(NULL, NULL);
+      setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
       viewlog_toggle_visibility(NULL, NULL);
     if(kbedit)
@@ -1160,7 +1161,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(control)
       control_toggle_visibility(NULL, NULL);
     if(setup)
-      setup_toggle_visibility(NULL, NULL);
+      setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
       viewlog_toggle_visibility(NULL, NULL);
     if(kbedit)
@@ -1860,15 +1861,15 @@ void gui_control_show(xitk_widget_t *w, void *data) {
 void gui_setup_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
 
-  if (setup_is_running() && !setup_is_visible())
-    setup_toggle_visibility(NULL, NULL);
-  else if(!setup_is_running())
-    setup_panel();
+  if (setup_is_running (gui->setup) && !setup_is_visible (gui->setup))
+    setup_toggle_visibility (NULL, gui->setup);
+  else if (!setup_is_running (gui->setup))
+    setup_panel (gui);
   else {
     if(gui->use_root_window)
-      setup_toggle_visibility(NULL, NULL);
+      setup_toggle_visibility (NULL, gui->setup);
     else
-      setup_end();
+      setup_end (gui->setup);
   }
 }
 

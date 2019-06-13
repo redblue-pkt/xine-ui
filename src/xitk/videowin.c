@@ -56,9 +56,9 @@
 
 /* Video window private structure */
 struct xui_vwin_st {
-  xitk_widget_list_t    *wl;
-
   gGui_t                *gui;
+
+  xitk_widget_list_t    *wl;
 
   char                   window_title[1024];
   int                    current_cursor;  /* arrow or hand */
@@ -1894,6 +1894,9 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   if (!vwin)
     return;
+
+  xine_config_unregister_callbacks (vwin->gui->xine, NULL, NULL, vwin, sizeof (*vwin));
+
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
   if (vwin->gui->XF86VidMode_fullscreen) {
