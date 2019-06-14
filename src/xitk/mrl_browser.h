@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -28,23 +28,25 @@
 
 #include "xitk.h"
 
-typedef void (*select_cb_t) (xitk_widget_t *, void *, int);
+typedef struct xui_mrlb_st xui_mrlb_t;
 
-void mrl_browser_deinit(void);
-void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
-		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
-void mrl_browser_change_skins(int);
-void open_mrlbrowser(xitk_widget_t *w, void *data);
-void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data);
-void destroy_mrl_browser(void);
-int mrl_browser_is_running(void);
-int mrl_browser_is_visible(void);
-void mrl_browser_toggle_visibility(xitk_widget_t *w, void *data);
-void hide_mrl_browser(void);
-void show_mrl_browser(void);
-void set_mrl_browser_transient(void);
-void mrl_browser_show_tips(int enabled, unsigned long timeout);
-void mrl_browser_update_tips_timeout(unsigned long timeout);
-void mrl_browser_reparent(void);
+typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int);
+
+void open_mrlbrowser (xitk_widget_t *w, void *gui);
+void open_mrlbrowser_from_playlist (xitk_widget_t *w, void *gui);
+void destroy_mrl_browser (xui_mrlb_t *mrlb);
+
+void mrl_browser_toggle_visibility (xitk_widget_t *w, void *mrlb);
+
+int mrl_browser_is_running (xui_mrlb_t *mrlb);
+int mrl_browser_is_visible (xui_mrlb_t *mrlb);
+
+void mrl_browser_change_skins (xui_mrlb_t *mrlb, int);
+void hide_mrl_browser (xui_mrlb_t *mrlb);
+void show_mrl_browser (xui_mrlb_t *mrlb);
+void set_mrl_browser_transient (xui_mrlb_t *mrlb);
+void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout);
+void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout);
+void mrl_browser_reparent (xui_mrlb_t *mrlb);
 
 #endif

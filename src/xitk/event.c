@@ -2192,4 +2192,3 @@ void gui_run(char **session_opts) {
   kbindings_save_kbinding(gui->kbindings);
   kbindings_free_kbinding(&gui->kbindings);
 }
-

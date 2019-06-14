@@ -47,12 +47,12 @@ static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 static int             last_playback_speed = XINE_SPEED_NORMAL;
 
 void reparent_all_windows(void) {
+  gGui_t *gui = gGui;
   int                    i;
   static const struct {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { mrl_browser_is_visible,   mrl_browser_reparent },
     { playlist_is_visible,      playlist_reparent },
     { control_is_visible,       control_reparent },
     { viewlog_is_visible,       viewlog_reparent },
@@ -66,10 +66,12 @@ void reparent_all_windows(void) {
     { NULL,                     NULL}
   };
   
-  if (panel_is_visible (gGui->panel))
-    panel_reparent (gGui->panel);
-  if (setup_is_visible (gGui->setup))
-    setup_reparent (gGui->setup);
+  if (panel_is_visible (gui->panel))
+    panel_reparent (gui->panel);
+  if (setup_is_visible (gui->setup))
+    setup_reparent (gui->setup);
+  if (mrl_browser_is_visible (gui->mrlb))
+    mrl_browser_reparent (gui->mrlb);
 
   for(i = 0; _reparent[i].visible; i++) {
     if(_reparent[i].visible())
@@ -702,11 +704,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
   xine_event_dispose_queue(gui->visual_anim.event_queue);
   gui->event_queue = gui->visual_anim.event_queue = NULL;
 
+  panel_deinit (gui->panel);
+  destroy_mrl_browser (gui->mrlb);
+
   gui_deinit();
 
-  panel_deinit (gui->panel);
   playlist_deinit();
-  mrl_browser_deinit();
   control_deinit();
   
   setup_end (gui->setup);
@@ -1100,7 +1103,7 @@ void gui_toggle_border(xitk_widget_t *w, void *data) {
 static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
   int panel        = panel_is_visible (gui->panel);
-  int mrl_browser  = mrl_browser_is_visible();
+  int mrl_browser  = mrl_browser_is_visible (gui->mrlb);
   int playlist     = playlist_is_visible();
   int control      = control_is_visible();
   int setup        = setup_is_visible (gui->setup);
@@ -1120,7 +1123,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     panel_toggle_visibility (NULL, gui->panel);
   else {
     if(mrl_browser)
-      mrl_browser_toggle_visibility(NULL, NULL);
+      mrl_browser_toggle_visibility (NULL, gui->mrlb);
     if(playlist)
       playlist_toggle_visibility(NULL, NULL);
     if(control)
@@ -1801,21 +1804,21 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
   gui->nongui_error_msg = NULL;
 
-  if(!mrl_browser_is_running()) {
-    open_mrlbrowser(NULL, NULL);
+  if (!mrl_browser_is_running (gui->mrlb)) {
+    open_mrlbrowser (NULL, gui);
   }
   else {
 
-    if(!mrl_browser_is_visible()) {
-      show_mrl_browser();
+    if (!mrl_browser_is_visible (gui->mrlb)) {
+      show_mrl_browser (gui->mrlb);
       if(!gui->use_root_window)
-	set_mrl_browser_transient();
+        set_mrl_browser_transient (gui->mrlb);
     }
     else {
       if(gui->use_root_window)
-	show_mrl_browser();
+        show_mrl_browser (gui->mrlb);
       else
-	destroy_mrl_browser();
+        destroy_mrl_browser (gui->mrlb);
     }
 
   }

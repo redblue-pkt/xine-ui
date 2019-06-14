@@ -1895,7 +1895,9 @@ void video_window_exit (xui_vwin_t *vwin) {
   if (!vwin)
     return;
 
+#ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
   xine_config_unregister_callbacks (vwin->gui->xine, NULL, NULL, vwin, sizeof (*vwin));
+#endif
 
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
@@ -2481,3 +2483,4 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->gui->video_window);
   }
 }
+

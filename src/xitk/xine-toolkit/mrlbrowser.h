@@ -150,12 +150,17 @@ typedef struct {
   int                        filter_selected;
 
   xitk_mrl_callback_t        add_callback;
+  void                      *add_userdata;
   xitk_mrl_callback_t        play_callback;
+  void                      *play_userdata;
   xitk_simple_callback_t     kill_callback;
+  void                      *kill_userdata;
   xitk_simple_callback_t     ip_callback;
+  void                      *ip_userdata;
 
 } mrlbrowser_private_data_t;
 
 #endif
 
 #endif
+

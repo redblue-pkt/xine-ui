@@ -1158,7 +1158,7 @@ void playlist_editor(void) {
   lb.label             = _("Add");
   lb.callback          = open_mrlbrowser_from_playlist;
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = gui;
   playlist->add =  xitk_labelbutton_create (playlist->widget_list, gui->skin_config, &lb);
   xitk_add_widget (playlist->widget_list, playlist->add);
   xitk_set_widget_tips(playlist->add, _("Add one or more entries in playlist"));
