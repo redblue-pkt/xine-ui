@@ -393,6 +393,7 @@ struct gGui_st {
   xui_panel_t               *panel;
   xui_vwin_t                *vwin;
   xui_setup_t               *setup;
+  xui_mrlb_t                *mrlb;
 };
 
 extern gGui_t *gGui;

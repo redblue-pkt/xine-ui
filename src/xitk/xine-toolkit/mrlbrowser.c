@@ -651,7 +651,7 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
   
   if(private_data->kill_callback)
-    private_data->kill_callback(private_data->fbWidget, NULL);
+    private_data->kill_callback (private_data->fbWidget, private_data->kill_userdata);
 
   xitk_mrlbrowser_destroy(private_data->fbWidget);
 }
@@ -786,13 +786,20 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     
     xitk_browser_release_all_buttons(private_data->mrlb_list);
 
-    if(add_callback && private_data->add_callback)
-      private_data->add_callback(NULL, (void *)(intptr_t) j, 
-				 private_data->mc->filtered_mrls[j]);
-    
-    if(play_callback && private_data->play_callback)
-      private_data->play_callback(NULL, (void *)(intptr_t) j,
-				  private_data->mc->filtered_mrls[j]);
+    if (add_callback && private_data->add_callback) {
+      /* legacy HACK: give selected index for unset user data. */
+      void *userdata = private_data->add_userdata;
+      if (!userdata)
+        userdata = (void *)(uintptr_t)j;
+      private_data->add_callback (private_data->fbWidget, userdata, private_data->mc->filtered_mrls[j]);
+    }
+
+    if (play_callback && private_data->play_callback) {
+      void *userdata = private_data->play_userdata;
+      if (!userdata)
+        userdata = (void *)(uintptr_t)j;
+      private_data->play_callback (private_data->fbWidget, userdata, private_data->mc->filtered_mrls[j]);
+    }
   }
 }
 
@@ -1134,8 +1141,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   xitk_set_widget_tips(w, _("Close MRL browser window"));
   
   private_data->add_callback      = mb->select.callback;
+  private_data->add_userdata      = mb->select.data;
   private_data->play_callback     = mb->play.callback;
+  private_data->play_userdata     = mb->play.data;
   private_data->kill_callback     = mb->kill.callback;
+  private_data->kill_userdata     = mb->kill.data;
   mb->browser.dbl_click_callback  = handle_dbl_click;
   mb->browser.userdata            = (void *)private_data;
   mb->browser.parent_wlist        = private_data->widget_list;

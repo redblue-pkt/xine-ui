@@ -127,7 +127,7 @@ void panel_show_tips (xui_panel_t *panel) {
 
   playlist_show_tips(panel->tips.enable, panel->tips.timeout);
   control_show_tips(panel->tips.enable, panel->tips.timeout);
-  mrl_browser_show_tips(panel->tips.enable, panel->tips.timeout);
+  mrl_browser_show_tips (panel->gui->mrlb, panel->tips.enable, panel->tips.timeout);
   event_sender_show_tips(panel->tips.enable, panel->tips.timeout);
   mmk_editor_show_tips(panel->tips.enable, panel->tips.timeout);
   setup_show_tips (panel->gui->setup, panel->tips.enable, panel->tips.timeout);
@@ -191,7 +191,9 @@ static void panel_exit (xitk_widget_t *w, void *data) {
     
     panel->visible = 0;
 
+#ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
     xine_config_unregister_callbacks (panel->gui->xine, NULL, NULL, panel, sizeof (*panel));
+#endif
 
     if((xitk_get_window_info(panel->widget_key, &wi))) {
       config_update_num ("gui.panel_x", wi.x);
@@ -602,8 +604,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if(((!panel->visible || !visible) && !control_is_visible()) || (visible && control_is_visible()))
     control_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !mrl_browser_is_visible()) || (visible && mrl_browser_is_visible()))
-    mrl_browser_toggle_visibility(NULL, NULL);
+  if (((!panel->visible || !visible) && !mrl_browser_is_visible (panel->gui->mrlb))
+    || (visible && mrl_browser_is_visible (panel->gui->mrlb)))
+    mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
 
   if(((!panel->visible || !visible) && !setup_is_visible (panel->gui->setup)) || (visible && setup_is_visible (panel->gui->setup)))
     setup_toggle_visibility (NULL, panel->gui->setup);
@@ -1043,8 +1046,8 @@ static void panel_handle_event(XEvent *event, void *data) {
       playlist_toggle_visibility(NULL, NULL);
     if(!control_is_visible())
       control_toggle_visibility(NULL, NULL);
-    if(!mrl_browser_is_visible())
-      mrl_browser_toggle_visibility(NULL, NULL);
+    if (!mrl_browser_is_visible (panel->gui->mrlb))
+      mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
     if (!setup_is_visible (panel->gui->setup))
       setup_toggle_visibility (NULL, panel->gui->setup);
     if(!viewlog_is_visible())
@@ -1690,3 +1693,4 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
+

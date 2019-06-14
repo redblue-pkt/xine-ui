@@ -31,125 +31,120 @@
 
 #include "common.h"
 
-static xitk_widget_t     *mrlb = NULL;
+struct xui_mrlb_st {
+  gGui_t *gui;
+  xitk_widget_t *w;
+};
 
 /*
  *
  */
-void mrl_browser_show_tips(int enabled, unsigned long timeout) {
-  
-  if(mrlb)
-    xitk_mrlbrowser_set_tips_timeout(mrlb, enabled, timeout);
-
+void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout) {
+  if (mrlb && mrlb->w)
+    xitk_mrlbrowser_set_tips_timeout (mrlb->w, enabled, timeout);
 }
 
-void mrl_browser_update_tips_timeout(unsigned long timeout) {
-  if(mrlb) {
-    if(xitk_get_widget_tips_timeout(mrlb) > 0)
-      xitk_mrlbrowser_set_tips_timeout(mrlb, 1, timeout);
-
+void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout) {
+  if (mrlb && mrlb->w) {
+    if (xitk_get_widget_tips_timeout (mrlb->w) > 0)
+      xitk_mrlbrowser_set_tips_timeout (mrlb->w, 1, timeout);
   }
 }
 
 /*
  *
  */
-void set_mrl_browser_transient(void) {
-
-  if(mrlb) {
-    if(!gGui->use_root_window && gGui->video_display == gGui->display)
-      xitk_mrlbrowser_set_transient(mrlb, gGui->video_window);
+void set_mrl_browser_transient (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w) {
+    if (!mrlb->gui->use_root_window && mrlb->gui->video_display == mrlb->gui->display)
+      xitk_mrlbrowser_set_transient (mrlb->w, mrlb->gui->video_window);
   }
 }
 
 /*
  *
  */
-void mrl_browser_change_skins(int synthetic) {
-
-  if(mrlb) {
-    xitk_mrlbrowser_change_skins(mrlb, gGui->skin_config);
-    set_mrl_browser_transient();
-    if(mrl_browser_is_visible())
-      raise_window((xitk_mrlbrowser_get_window_id(mrlb)), 1, 1);
+void mrl_browser_change_skins (xui_mrlb_t *mrlb, int synthetic) {
+  (void)synthetic;
+  if (mrlb && mrlb->w) {
+    xitk_mrlbrowser_change_skins (mrlb->w, mrlb->gui->skin_config);
+    set_mrl_browser_transient (mrlb);
+    if (mrl_browser_is_visible (mrlb))
+      raise_window ((xitk_mrlbrowser_get_window_id (mrlb->w)), 1, 1);
   }
 }
 
 /*
  *
  */
-int mrl_browser_is_visible(void) {
-
-  if(mrlb)
-    return(xitk_mrlbrowser_is_visible(mrlb));
-  
+int mrl_browser_is_visible (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w)
+    return (xitk_mrlbrowser_is_visible (mrlb->w));
   return 0;
 }
 
 /*
  *
  */
-int mrl_browser_is_running(void) {
-
-  if(mrlb)
-    return(xitk_mrlbrowser_is_running(mrlb));
-  
+int mrl_browser_is_running (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w)
+    return (xitk_mrlbrowser_is_running (mrlb->w));
   return 0;
 }
 
 /*
  *
  */
-void show_mrl_browser(void) {
-
-  if(mrlb) {
-    gGui->nongui_error_msg = NULL;
-    xitk_mrlbrowser_show(mrlb);
-    set_mrl_browser_transient();
-    layer_above_video((xitk_mrlbrowser_get_window_id(mrlb)));
+void show_mrl_browser (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w) {
+    mrlb->gui->nongui_error_msg = NULL;
+    xitk_mrlbrowser_show (mrlb->w);
+    set_mrl_browser_transient (mrlb);
+    layer_above_video ((xitk_mrlbrowser_get_window_id (mrlb->w)));
   }
 }
 
 /*
  *
  */
-void hide_mrl_browser(void) {
-
-  if(mrlb) {
-    xitk_mrlbrowser_hide(mrlb);
-  }
+void hide_mrl_browser (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w)
+    xitk_mrlbrowser_hide (mrlb->w);
 }
 
 /*
  *
  */
-void mrl_browser_toggle_visibility(xitk_widget_t *w, void *data) {
-  
-  if(mrlb) {
-    
-    if(mrl_browser_is_visible())
-      hide_mrl_browser();
+void mrl_browser_toggle_visibility (xitk_widget_t *w, void *data) {
+  xui_mrlb_t *mrlb = data;
+
+  (void)w;
+  if (mrlb) {
+    if (mrl_browser_is_visible (mrlb))
+      hide_mrl_browser (mrlb);
     else
-      show_mrl_browser();
-
+      show_mrl_browser (mrlb);
   }
 }
+
 /*
  *
  */
-void destroy_mrl_browser(void) {
-  window_info_t wi;
+void destroy_mrl_browser (xui_mrlb_t *mrlb) {
+  if (mrlb) {
+    if (mrlb->w) {
+      window_info_t wi;
 
-  if(mrlb) {
-    if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_update_num ("gui.mrl_browser_x", wi.x);
-      config_update_num ("gui.mrl_browser_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
+      if ((xitk_mrlbrowser_get_window_info (mrlb->w, &wi))) {
+        config_update_num ("gui.mrl_browser_x", wi.x);
+        config_update_num ("gui.mrl_browser_y", wi.y);
+      }
+      xitk_mrlbrowser_destroy (mrlb->w);
+      mrlb->w = NULL;
     }
-    xitk_mrlbrowser_destroy(mrlb);
-    mrlb = NULL;
-
-    try_to_set_input_focus(gGui->video_window);
+    mrlb->gui->mrlb = NULL;
+    try_to_set_input_focus (mrlb->gui->video_window);
+    free (mrlb);
   }
 }
 
@@ -157,23 +152,28 @@ void destroy_mrl_browser(void) {
  *
  */
 static void mrl_browser_kill(xitk_widget_t *w, void *data) {
-  window_info_t wi;
+  xui_mrlb_t *mrlb = data;
 
-  if(mrlb) {
-    if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_update_num ("gui.mrl_browser_x", wi.x);
-      config_update_num ("gui.mrl_browser_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
+  (void)w;
+  /* xitk_mrlbrowser_exit () calls this, then xitk_mrlbrowser_destroy ().
+     so we just shut down our own stuff here. */
+  if (mrlb) {
+    if (mrlb->w) {
+      window_info_t wi;
+
+      if ((xitk_mrlbrowser_get_window_info (mrlb->w, &wi))) {
+        config_update_num ("gui.mrl_browser_x", wi.x);
+        config_update_num ("gui.mrl_browser_y", wi.y);
+      }
+      mrlb->w = NULL;
     }
-
-    try_to_set_input_focus(gGui->video_window);
+    mrlb->gui->mrlb = NULL;
+    try_to_set_input_focus (mrlb->gui->video_window);
+    free (mrlb);
   }
-
-  /* FIXME */
-  mrlb = NULL;
 }
 
-static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
+static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *mrlb) {
   xitk_mrlbrowser_filter_t **filters = NULL;
   int                        num_endings = 0;
   char                      *mrl_exts, *pmrl_exts, *p, *pp;
@@ -185,7 +185,7 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   filters[num_endings]->name   = strdup("All");
   filters[num_endings]->ending = strdup("*");
 
-  mrl_exts = xine_get_file_extensions(__xineui_global_xine_instance);
+  mrl_exts = xine_get_file_extensions (mrlb->gui->xine);
   if(mrl_exts) {
     char  patterns[2048];
     char *e;
@@ -237,74 +237,79 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 /*
  *
  */
-void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
-		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
+static xui_mrlb_t *mrl_browser (gGui_t *gui,
+  xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb, select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
+  xui_mrlb_t *mrlb;
   xitk_mrlbrowser_widget_t     mb;
   const char *const           *ip_availables;
   xitk_mrlbrowser_filter_t   **mrl_filters;
 
-  if(mrlb != NULL) {
-    show_mrl_browser();
-    set_mrl_browser_transient();
-    return;
+  if (!gui)
+    return NULL;
+
+  if (gui->mrlb) {
+    show_mrl_browser (gui->mrlb);
+    set_mrl_browser_transient (gui->mrlb);
+    return gui->mrlb;
   }
 
-  ip_availables = xine_get_browsable_input_plugin_ids(__xineui_global_xine_instance);
-  mrl_filters = mrl_browser_get_valid_mrl_ending();
+  mrlb = calloc (1, sizeof (*mrlb));
+  if (!mrlb)
+    return NULL;
+  mrlb->gui = gui;
 
-  XITK_WIDGET_INIT(&mb, gGui->imlib_data);
+  ip_availables = xine_get_browsable_input_plugin_ids (mrlb->gui->xine);
+  mrl_filters = mrl_browser_get_valid_mrl_ending (mrlb);
 
-  mb.window_trans                   = (gGui->use_root_window || gGui->video_display != gGui->display) ? None : gGui->video_window;
-  mb.layer_above                    = (is_layer_above());
-  mb.icon                           = &gGui->icon;
-  mb.set_wm_window_normal           = !video_window_is_visible (gGui->vwin);
+  XITK_WIDGET_INIT (&mb, mrlb->gui->imlib_data);
 
-  mb.x                              = xine_config_register_num (__xineui_global_xine_instance, "gui.mrl_browser_x", 
-								200,
-								"gui mrl browser x coordinate",
-								CONFIG_NO_HELP,
-								CONFIG_LEVEL_DEB,
-								CONFIG_NO_CB,
-								CONFIG_NO_DATA);
-  mb.y                              = xine_config_register_num (__xineui_global_xine_instance, "gui.mrl_browser_y",
-								100,
-								"gui mrl browser y coordinate",
-								CONFIG_NO_HELP,
-								CONFIG_LEVEL_DEB,
-								CONFIG_NO_CB,
-								CONFIG_NO_DATA);
+  mb.window_trans = (mrlb->gui->use_root_window || mrlb->gui->video_display != mrlb->gui->display) ? None
+                  : mrlb->gui->video_window;
+  mb.layer_above  = (is_layer_above ());
+  mb.icon         = &mrlb->gui->icon;
+  mb.set_wm_window_normal = !video_window_is_visible (mrlb->gui->vwin);
+  mb.x = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_x",
+    200, "gui mrl browser x coordinate",
+    CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  mb.y = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_y",
+    100, "gui mrl browser y coordinate",
+    CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  mb.window_title = _("xine MRL Browser");
 
-  mb.window_title                          = _("xine MRL Browser");
-  mb.skin_element_name                     = "MrlBG";
-  mb.resource_name                         = mb.window_title;
-  mb.resource_class                        = "xine";
+  mb.skin_element_name        = "MrlBG";
+  mb.resource_name            = mb.window_title;
+  mb.resource_class           = "xine";
   
-  mb.origin.skin_element_name              = "MrlCurOrigin";
-  mb.origin.cur_origin                     = NULL;
+  mb.origin.skin_element_name = "MrlCurOrigin";
+  mb.origin.cur_origin        = NULL;
 
-  mb.dndcallback                           = dnd_cb;
+  mb.dndcallback              = dnd_cb;
+  mb.dnddata                  = gui;
 
-  mb.select.skin_element_name              = "MrlSelect";
-  mb.select.caption                        = _("Add");
-  mb.select.callback                       = add_cb;
+  mb.select.skin_element_name = "MrlSelect";
+  mb.select.caption           = _("Add");
+  mb.select.callback          = add_cb;
+  mb.select.data              = mrlb;
 
-  mb.play.skin_element_name                = "MrlPlay";
-  mb.play.callback                         = play_cb;
+  mb.play.skin_element_name   = "MrlPlay";
+  mb.play.callback            = play_cb;
+  mb.play.data                = mrlb;
 
-  mb.dismiss.skin_element_name             = "MrlDismiss";
-  mb.dismiss.caption                       = _("Dismiss");
+  mb.dismiss.skin_element_name = "MrlDismiss";
+  mb.dismiss.caption           = _("Dismiss");
 
-  mb.kill.callback                         = mrl_browser_kill;
+  mb.kill.callback            = mrl_browser_kill;
+  mb.kill.data                = mrlb;
 
-  mb.ip_availables                         = ip_availables;
+  mb.ip_availables            = ip_availables;
 
-  mb.ip_name.button.skin_element_name      = "MrlPlugNameBG";
+  mb.ip_name.button.skin_element_name = "MrlPlugNameBG";
 
-  mb.ip_name.label.skin_element_name       = "MrlPlugLabel";
+  mb.ip_name.label.skin_element_name  = "MrlPlugLabel";
   /* TRANSLATORS: only ASCII characters (skin) */
-  mb.ip_name.label.label_str               = pgettext("skin", "Source:");
+  mb.ip_name.label.label_str  = pgettext ("skin", "Source:");
 
-  mb.xine                                  = (xine_t *)__xineui_global_xine_instance;
+  mb.xine = mrlb->gui->xine;
 
   /* The browser */
 
@@ -320,13 +325,13 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
   mb.browser.browser.num_entries           = 0;
   mb.browser.browser.entries               = NULL;
   mb.browser.callback                      = sel_cb;
-  mb.browser.userdata                      = NULL;
+  mb.browser.userdata                      = mrlb;
 
   mb.combo.skin_element_name               = "MrlFilt";
 
   mb.mrl_filters                           = mrl_filters;
 
-  mrlb = xitk_mrlbrowser_create(NULL, gGui->skin_config, &mb);
+  mrlb->w = xitk_mrlbrowser_create (NULL, mrlb->gui->skin_config, &mb);
 
   if(mrl_filters) {
     int i;
@@ -339,20 +344,29 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
     free(mrl_filters[i]);
     free(mrl_filters);
   }
+
+  mrlb->gui->mrlb = mrlb;
+  return mrlb;
 }
 
 /*
  *
  */
-static void mrl_handle_selection(xitk_widget_t *w, void *data, int selected) {
+static void mrl_handle_selection (xitk_widget_t *w, void *data, int selected) {
+  (void)w;
+  (void)data;
+  (void)selected;
 }
 
 /*
  * Callback called by mrlbrowser on add event.
  */
 static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
-  if(mrl) {
-    int num = gGui->playlist.num;
+  xui_mrlb_t *mrlb = data;
+
+  (void)w;
+  if (mrlb && mrl) {
+    int num = mrlb->gui->playlist.num;
     
     if(!playlist_is_running()) {
       playlist_editor();
@@ -364,20 +378,23 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     
     mediamark_append_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
     
-    if((!num) && ((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)) {
-      gGui->playlist.cur = (gGui->playlist.num - 1);
+    if ((!num) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
+      mrlb->gui->playlist.cur = mrlb->gui->playlist.num - 1;
       gui_set_current_mmk(mediamark_get_current_mmk());
     }   
     
     playlist_update_playlist();
     
-    if ((!is_playback_widgets_enabled (gGui->panel)) && gGui->playlist.num)
-      enable_playback_controls (gGui->panel, 1);
+    if ((!is_playback_widgets_enabled (mrlb->gui->panel)) && mrlb->gui->playlist.num)
+      enable_playback_controls (mrlb->gui->panel, 1);
   }
 }
-static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
-  if(mrl) {
+static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
+  xui_mrlb_t *mrlb = data;
+
+  (void)w;
+  if (mrlb && mrl) {
     
     if(!playlist_is_running()) {
       playlist_editor();
@@ -395,19 +412,21 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
  * Callback called by mrlbrowser on play event.
  */
 static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
+  xui_mrlb_t *mrlb = data;
 
-  if(mrl) {
+  (void)w;
+  if (mrlb && mrl) {
     mediamark_t mmk;
     char        *_mrl = mrl->mrl;
     
-    if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
-      gGui->ignore_next = 1;
-      xine_stop(gGui->stream);
-      gGui->ignore_next = 0;
+    if ((xine_get_status (mrlb->gui->stream) != XINE_STATUS_STOP)) {
+      mrlb->gui->ignore_next = 1;
+      xine_stop (mrlb->gui->stream);
+      mrlb->gui->ignore_next = 0;
     }
     
-    if (!is_playback_widgets_enabled (gGui->panel))
-      enable_playback_controls (gGui->panel, 1);
+    if (!is_playback_widgets_enabled (mrlb->gui->panel))
+      enable_playback_controls (mrlb->gui->panel, 1);
 
     if(mrl_look_like_playlist(_mrl)) {
       if(mediamark_concat_mediamarks(_mrl)) {
@@ -419,15 +438,15 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     
     osd_hide();
 
-    if(!xine_open(gGui->stream, (const char *) _mrl)) {
-      gui_handle_xine_error(gGui->stream, _mrl);
-      enable_playback_controls (gGui->panel, 0);
+    if (!xine_open (mrlb->gui->stream, (const char *) _mrl)) {
+      gui_handle_xine_error (mrlb->gui->stream, _mrl);
+      enable_playback_controls (mrlb->gui->panel, 0);
       gui_display_logo();
       return;
     }
 
-    if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
-      enable_playback_controls (gGui->panel, 0);
+    if (!gui_xine_play (mrlb->gui->stream, 0, 0, 0)) {
+      enable_playback_controls (mrlb->gui->panel, 0);
       gui_display_logo();
       return;
     }
@@ -446,31 +465,30 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   }
 }
 
-void mrl_browser_deinit(void) {
-  if(mrlb) {
-    if(mrl_browser_is_running())
-      destroy_mrl_browser();
-  }
-}
-
-void mrl_browser_reparent(void) {
-  if(mrlb)
-    reparent_window((xitk_mrlbrowser_get_window_id(mrlb)));
+void mrl_browser_reparent (xui_mrlb_t *mrlb) {
+  if (mrlb && mrlb->w)
+    reparent_window ((xitk_mrlbrowser_get_window_id (mrlb->w)));
 }
 
 /*
  * Create a new mrl browser.
  */
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
-  
-  mrl_browser(mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
-  set_mrl_browser_transient();
-  mrl_browser_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
+  gGui_t *gui = data;
+
+  if (gui) {
+    mrl_browser (gui, mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
+    set_mrl_browser_transient (gui->mrlb);
+    mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
+  }
 }
 
 void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
-  
-  mrl_browser(mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
-  set_mrl_browser_transient();
-  mrl_browser_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
+  gGui_t *gui = data;
+
+  if (gui) {
+    mrl_browser (gui, mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
+    set_mrl_browser_transient (gui->mrlb);
+    mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
+  }
 }

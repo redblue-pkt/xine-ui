@@ -668,16 +668,19 @@ typedef struct {
   } origin;
   
   xitk_dnd_callback_t               dndcallback;
+  void                             *dnddata;
 
   struct {
     char                           *caption;
     char                           *skin_element_name;
     xitk_mrl_callback_t             callback;
+    void                           *data;
   } select;
 
   struct {
     char                           *skin_element_name;
     xitk_mrl_callback_t             callback;
+    void                           *data;
   } play;
 
   struct {
@@ -687,6 +690,7 @@ typedef struct {
 
   struct {
     xitk_simple_callback_t          callback;
+    void                           *data;
   } kill;
 
   const char *const                *ip_availables;

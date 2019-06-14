@@ -427,7 +427,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { _("Open/Location..."),
       menu_get_shortcut("MrlBrowser"),
       NULL,
-      menu_mrl_browser, NULL                                                                 },
+      menu_mrl_browser, gui                                                                  },
     { _("Playback"),
       NULL,
       "<Branch>",
@@ -1149,7 +1149,7 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { _("Scan"),       menu_get_shortcut("ScanPlaylistInfo"),
                                       NULL,          menu_scan_infos,              NULL                    },
-    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
+    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui                     },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
   };
   xitk_menu_entry_t    menu_entries_sel[] = {
@@ -1157,7 +1157,7 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL                    },
-    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
+    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui                     },
     { _("Edit"),       menu_get_shortcut("MediamarkEditor"),
                                       NULL,          menu_playlist_mmk_editor,     NULL                    },
     { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL                    },
