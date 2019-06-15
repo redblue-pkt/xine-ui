@@ -394,6 +394,7 @@ struct gGui_st {
   xui_vwin_t                *vwin;
   xui_setup_t               *setup;
   xui_mrlb_t                *mrlb;
+  xui_vctrl_t               *vctrl;
 };
 
 extern gGui_t *gGui;
@@ -481,4 +482,3 @@ void change_icon(Window window);
 #endif
 
 #endif
-

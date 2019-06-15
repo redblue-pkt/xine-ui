@@ -126,7 +126,7 @@ void panel_show_tips (xui_panel_t *panel) {
     xitk_disable_widgets_tips(panel->widget_list);
 
   playlist_show_tips(panel->tips.enable, panel->tips.timeout);
-  control_show_tips(panel->tips.enable, panel->tips.timeout);
+  control_show_tips (panel->gui->vctrl, panel->tips.enable, panel->tips.timeout);
   mrl_browser_show_tips (panel->gui->mrlb, panel->tips.enable, panel->tips.timeout);
   event_sender_show_tips(panel->tips.enable, panel->tips.timeout);
   mmk_editor_show_tips(panel->tips.enable, panel->tips.timeout);
@@ -601,8 +601,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if(((!panel->visible || !visible) && !playlist_is_visible()) || (visible && playlist_is_visible()))
     playlist_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !control_is_visible()) || (visible && control_is_visible()))
-    control_toggle_visibility(NULL, NULL);
+  if(((!panel->visible || !visible) && !control_is_visible (panel->gui->vctrl)) || (visible && control_is_visible (panel->gui->vctrl)))
+    control_toggle_visibility (NULL, panel->gui->vctrl);
 
   if (((!panel->visible || !visible) && !mrl_browser_is_visible (panel->gui->mrlb))
     || (visible && mrl_browser_is_visible (panel->gui->mrlb)))
@@ -1044,8 +1044,8 @@ static void panel_handle_event(XEvent *event, void *data) {
     /* all other hidden GUI windows shall also become visible */
     if(!playlist_is_visible())
       playlist_toggle_visibility(NULL, NULL);
-    if(!control_is_visible())
-      control_toggle_visibility(NULL, NULL);
+    if (!control_is_visible (panel->gui->vctrl))
+      control_toggle_visibility (NULL, panel->gui->vctrl);
     if (!mrl_browser_is_visible (panel->gui->mrlb))
       mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
     if (!setup_is_visible (panel->gui->setup))

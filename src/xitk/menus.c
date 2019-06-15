@@ -87,7 +87,7 @@ static char *menu_get_shortcut(char *action) {
 }
 
 static void menu_control_reset(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  control_reset();
+  control_reset (data);
 }
 static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   open_mrlbrowser_from_playlist(w, data);
@@ -1211,7 +1211,7 @@ void control_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { _("Reset video settings"),   
-                       NULL,          NULL,          menu_control_reset,           NULL                    },
+                       NULL,          NULL,          menu_control_reset,           gui->vctrl              },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
   };
   

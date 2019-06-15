@@ -541,7 +541,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_CONTROLSHOW:
-    gui_control_show(NULL, NULL);
+    gui_control_show (NULL, gui->vctrl);
     break;
     
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
@@ -1030,63 +1030,63 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_HUECONTROLp:
-    control_inc_image_prop(XINE_PARAM_VO_HUE);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_HUE);
     break;
   case ACTID_HUECONTROLm:
-    control_dec_image_prop(XINE_PARAM_VO_HUE);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_HUE);
     break;
 
   case ACTID_SATURATIONCONTROLp:
-    control_inc_image_prop(XINE_PARAM_VO_SATURATION);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_SATURATION);
     break;
   case ACTID_SATURATIONCONTROLm:
-    control_dec_image_prop(XINE_PARAM_VO_SATURATION);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_SATURATION);
     break;
 
   case ACTID_BRIGHTNESSCONTROLp:
-    control_inc_image_prop(XINE_PARAM_VO_BRIGHTNESS);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_BRIGHTNESS);
     break;
   case ACTID_BRIGHTNESSCONTROLm:
-    control_dec_image_prop(XINE_PARAM_VO_BRIGHTNESS);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_BRIGHTNESS);
     break;
 
   case ACTID_CONTRASTCONTROLp:
-    control_inc_image_prop(XINE_PARAM_VO_CONTRAST);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_CONTRAST);
     break;
   case ACTID_CONTRASTCONTROLm:
-    control_dec_image_prop(XINE_PARAM_VO_CONTRAST);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_CONTRAST);
     break;
 
   case ACTID_GAMMACONTROLp:
 #ifdef XINE_PARAM_VO_GAMMA
-    control_inc_image_prop(XINE_PARAM_VO_GAMMA);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_GAMMA);
 #endif
     break;
   case ACTID_GAMMACONTROLm:
 #ifdef XINE_PARAM_VO_GAMMA
-    control_dec_image_prop(XINE_PARAM_VO_GAMMA);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_GAMMA);
 #endif
     break;
 
   case ACTID_SHARPNESSCONTROLp:
 #ifdef XINE_PARAM_VO_SHARPNESS
-    control_inc_image_prop(XINE_PARAM_VO_SHARPNESS);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_SHARPNESS);
 #endif
     break;
   case ACTID_SHARPNESSCONTROLm:
 #ifdef XINE_PARAM_VO_SHARPNESS
-    control_dec_image_prop(XINE_PARAM_VO_SHARPNESS);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_SHARPNESS);
 #endif
     break;
 
   case ACTID_NOISEREDUCTIONCONTROLp:
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
-    control_inc_image_prop(XINE_PARAM_VO_NOISE_REDUCTION);
+    control_inc_image_prop (gui->vctrl, XINE_PARAM_VO_NOISE_REDUCTION);
 #endif
     break;
   case ACTID_NOISEREDUCTIONCONTROLm:
 #ifdef XINE_PARAM_VO_NOISE_REDUCTION
-    control_dec_image_prop(XINE_PARAM_VO_NOISE_REDUCTION);
+    control_dec_image_prop (gui->vctrl, XINE_PARAM_VO_NOISE_REDUCTION);
 #endif
     break;
 
@@ -2041,7 +2041,7 @@ void gui_run(char **session_opts) {
   panel_update_runtime_display (gui->panel);
 
   /* Register config entries related to video control settings */
-  control_config_register();
+  control_init (gui);
 
   /* autoscan playlist  */
   if(gui->autoscan_plugin != NULL) {
