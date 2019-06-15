@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2010 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -22,21 +22,25 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-void control_config_register(void);
+typedef struct xui_vctrl_st xui_vctrl_t;
 
-void control_reset(void);
-void control_deinit(void);
-void control_panel(void);
-void control_change_skins(int);
-void control_exit(xitk_widget_t *, void *);
-int control_is_visible(void);
-int control_is_running(void);
-void control_toggle_visibility(xitk_widget_t *, void *);
-void control_raise_window(void);
-void control_show_tips(int enabled, unsigned long timeout);
-void control_update_tips_timeout(unsigned long timeout);
-void control_inc_image_prop(int prop);
-void control_dec_image_prop(int prop);
-void control_reparent(void);
+void control_reset (xui_vctrl_t *vctrl);
+void control_deinit (xui_vctrl_t *vctrl);
+xui_vctrl_t *control_init (gGui_t *gui);
+
+void control_exit (xitk_widget_t *w, void *vctrl);
+void control_toggle_visibility (xitk_widget_t *w, void *vctrl);
+
+int control_is_visible (xui_vctrl_t *vctrl);
+int control_is_running (xui_vctrl_t *vctrl);
+
+void control_change_skins (xui_vctrl_t *vctrl, int);
+void control_raise_window (xui_vctrl_t *vctrl);
+void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout);
+void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout);
+void control_inc_image_prop (xui_vctrl_t *vctrl, int prop);
+void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);
+void control_reparent (xui_vctrl_t *vctrl);
 
 #endif
+

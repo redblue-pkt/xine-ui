@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2011 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -202,6 +202,7 @@ static skins_locations_t *get_skin_location(char *skin) {
  * skin file. There is fallback if that fail.
  */
 static int change_skin(skins_locations_t *sk) {
+  gGui_t              *gui = gGui;
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char                *old_skin;
   skins_locations_t   *sks = sk;
@@ -217,7 +218,7 @@ static int change_skin(skins_locations_t *sk) {
 
   old_skin = DEFAULT_SKIN;
   
-  nskin_config = xitk_skin_init_config(gGui->imlib_data);
+  nskin_config = xitk_skin_init_config(gui->imlib_data);
 
  __reload_skin:
   snprintf(buf, sizeof(buf), "%s/%s", sks->pathname, sks->skin);
@@ -252,7 +253,7 @@ static int change_skin(skins_locations_t *sk) {
   /* Check skin version */
   if(xitk_skin_check_version(nskin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(nskin_config);
-    nskin_config = xitk_skin_init_config(gGui->imlib_data);
+    nskin_config = xitk_skin_init_config(gui->imlib_data);
     xine_error(_("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), 
 	       buf, DEFAULT_SKIN);
     ret = get_skin_offset(DEFAULT_SKIN);
@@ -261,34 +262,24 @@ static int change_skin(skins_locations_t *sk) {
     goto __reload_skin;
   }
   
-  if(gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]) {
-    free(gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]);
-    gGui->visual_anim.mrls[gGui->visual_anim.num_mrls--] = NULL;
+  if(gui->visual_anim.mrls[gui->visual_anim.num_mrls]) {
+    free(gui->visual_anim.mrls[gui->visual_anim.num_mrls]);
+    gui->visual_anim.mrls[gui->visual_anim.num_mrls--] = NULL;
   }
   if((skin_anim = xitk_skin_get_animation(nskin_config)) != NULL) {
-    gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++] = strdup(skin_anim);
+    gui->visual_anim.mrls[gui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
   
-  oskin_config = gGui->skin_config;
-  gGui->skin_config = nskin_config;
+  oskin_config = gui->skin_config;
+  gui->skin_config = nskin_config;
 
-  { /* Now, change skins for each window */
-    static const struct {
-      void (*change_skins)(int);
-    } visible_state[] = {
-      { video_window_change_skins },
-      { panel_change_skins        },
-      { control_change_skins      },
-      { playlist_change_skins     },
-      { mrl_browser_change_skins  },
-      { NULL                      }
-    };
-    int   i;
-    
-    for(i = 0; visible_state[i].change_skins != NULL; i++) {
-      visible_state[i].change_skins(1);
-    }
-  }
+  /* Now, change skins for each window */
+  video_window_change_skins (gui->vwin, 1);
+  panel_change_skins (gui->panel, 1);
+  control_change_skins (gui->vctrl, 1);
+  mrl_browser_change_skins (gui->mrlb, 1);
+
+  playlist_change_skins (1);
 
   xitk_skin_unload_config(oskin_config);
 
