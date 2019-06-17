@@ -162,6 +162,10 @@ typedef struct gGui_st gGui_t;
 #define br_fontname    "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*"
 #define btnfontname    "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 
+/* easy pseudo widgets for *_toggle_* calls. not all windows support them yet. */
+#define XUI_W_TOGGLE NULL
+#define XUI_W_ON ((xitk_widget_t *)1)
+#define XUI_W_OFF ((xitk_widget_t *)2)
 
 struct gGui_st {
   xine_t                   *xine;

@@ -71,8 +71,7 @@ void reparent_all_windows(void) {
     setup_reparent (gui->setup);
   if (mrl_browser_is_visible (gui->mrlb))
     mrl_browser_reparent (gui->mrlb);
-  if (control_is_visible (gui->vctrl))
-    control_reparent (gui->vctrl);
+  control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
     if(_reparent[i].visible())
@@ -1106,7 +1105,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int panel        = panel_is_visible (gui->panel);
   int mrl_browser  = mrl_browser_is_visible (gui->mrlb);
   int playlist     = playlist_is_visible();
-  int control      = control_is_visible (gui->vctrl);
+  int control      = control_status (gui->vctrl) == 3;
   int setup        = setup_is_visible (gui->setup);
   int viewlog      = viewlog_is_visible();
   int kbedit       = kbedit_is_visible();
@@ -1128,7 +1127,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(playlist)
       playlist_toggle_visibility(NULL, NULL);
     if(control)
-      control_toggle_visibility(NULL, NULL);
+      control_toggle_visibility (NULL, gui->vctrl);
     if(setup)
       setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
@@ -1159,11 +1158,11 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     panel_toggle_visibility (NULL, gui->panel);
   else {
     if(mrl_browser)
-      mrl_browser_toggle_visibility(NULL, NULL);
+      mrl_browser_toggle_visibility (NULL, gui->mrlb);
     if(playlist)
       playlist_toggle_visibility(NULL, NULL);
     if(control)
-      control_toggle_visibility(NULL, NULL);
+      control_toggle_visibility (NULL, gui->vctrl);
     if(setup)
       setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
@@ -1850,7 +1849,7 @@ void gui_set_current_mmk_by_index(int idx) {
 void gui_control_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
 
-  control_toggle_visibility (w, gui->vctrl);
+  control_toggle_window (w, gui->vctrl);
 }
 
 void gui_setup_show(xitk_widget_t *w, void *data) {
