@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-05-28 15:08+0200\n"
+"POT-Creation-Date: 2019-06-16 14:21+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -192,54 +192,85 @@ msgstr "Mittenhelligkeit"
 msgid "Sharpness"
 msgstr "Bildsch‰rfe"
 
-msgid "Noise reduction"
+msgid "Noise"
 msgstr "Rauschfilter"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Ton"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Sat"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Hel"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Kon"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
+msgstr "Mit"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sha"
+msgstr "Sch"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr "Rau"
 
 msgid "hue value"
 msgstr "Farbwert"
 
-msgid "Hue value."
-msgstr "Farbwert."
+msgid "saturation value"
+msgstr "S‰ttigungswert"
 
 msgid "brightness value"
 msgstr "Helligkeitswert"
 
-msgid "Brightness value."
-msgstr "Helligkeitswert."
-
-msgid "saturation value"
-msgstr "S‰ttigungswert"
-
-msgid "Saturation value."
-msgstr "S‰ttigungswert."
-
 msgid "contrast value"
 msgstr "Kontrastwert"
-
-msgid "Contrast value."
-msgstr "Kontrastwert."
 
 msgid "gamma value"
 msgstr "Mittenhelligkeit"
 
-msgid "Gamma value."
-msgstr "Mittenhelligkeit."
-
 msgid "sharpness value"
 msgstr "Bildsch‰rfe"
-
-msgid "Sharpness value."
-msgstr "Bildsch‰rfe."
 
 msgid "noise reduction value"
 msgstr "Rauschfilter"
 
+msgid "Hue value."
+msgstr "Farbwert."
+
+msgid "Saturation value."
+msgstr "S‰ttigungswert."
+
+msgid "Brightness value."
+msgstr "Helligkeitswert."
+
+msgid "Contrast value."
+msgstr "Kontrastwert."
+
+msgid "Gamma value."
+msgstr "Mittenhelligkeit."
+
+msgid "Sharpness value."
+msgstr "Bildsch‰rfe."
+
 msgid "Noise reduction value."
 msgstr "Rauschfilter."
-
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
 msgid "xine Control Window"
 msgstr "xine Einstellungensfenster"
@@ -250,58 +281,23 @@ msgstr "control: Konnte Hintergrundbild nicht finden\n"
 msgid "Control HUE value"
 msgstr "Farbton ‰ndern"
 
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Ton"
-
 msgid "Control SATURATION value"
 msgstr "S‰ttigung ‰ndern"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Sat"
 
 msgid "Control BRIGHTNESS value"
 msgstr "Helligkeit ‰ndern"
 
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Hel"
-
 msgid "Control CONTRAST value"
 msgstr "Kontrast ‰ndern"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Kon"
 
 msgid "Control GAMMA value"
 msgstr "Mittenhelligkeit ‰ndern"
 
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr "Mit"
-
 msgid "Control SHARPNESS value"
 msgstr "Bildsch‰rfe ‰ndern"
 
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sha"
-msgstr "Sch"
-
 msgid "Control NOISE REDUCTION value"
 msgstr "Rauschfilter ‰ndern"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr "Rau"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -313,6 +309,10 @@ msgstr "Schlieﬂen"
 
 msgid "Close control window"
 msgstr "Einstellungen-Fenster schlieﬂen"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
 msgid "Download in progress"
 msgstr "Download l‰uft"
@@ -2623,6 +2623,9 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "Noise reduction"
+#~ msgstr "Rauschfilter"
 
 #~ msgid "New Filter"
 #~ msgstr "Neuer Filter"
