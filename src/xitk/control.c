@@ -58,7 +58,8 @@ typedef struct {
 struct xui_vctrl_st {
   gGui_t               *gui;
 
-  vctrl_item_t          items[7];
+#define NUM_SLIDERS 7
+  vctrl_item_t          items[NUM_SLIDERS];
 
   Window                window;
 
@@ -69,8 +70,7 @@ struct xui_vctrl_st {
   const char           *skins[64];
   int                   skins_num;
 
-  int                   running;
-  int                   visible;
+  int                   status;
   xitk_register_key_t   widget_key;
 
   xitk_widget_t         *combo;
@@ -86,30 +86,23 @@ static void control_select_new_skin (xitk_widget_t *w, void *data, int selected)
   }
 }
 
-static void update_slider (vctrl_item_t *item) {
-  if (item->w && xitk_is_widget_enabled (item->w))
-    xitk_slider_set_pos (item->w, xine_get_param (item->vctrl->gui->stream, item->prop));
-}
-
-static void set_value (xitk_widget_t *w, void *data, int value) {
+static void control_set_value (xitk_widget_t *w, void *data, int value) {
   vctrl_item_t *item = data;
   int new_value;
 
-  if (w != (xitk_widget_t *)1) {
-    xine_set_param (item->vctrl->gui->stream, item->prop, value);
-    new_value = xine_get_param (item->vctrl->gui->stream, item->prop);
-    if (new_value != value)
-      update_slider (item);
-    if (item->enable)
-      config_update_num (item->cfg, new_value);
-  }
+  (void)w;
+  xine_set_param (item->vctrl->gui->stream, item->prop, value);
+  new_value = xine_get_param (item->vctrl->gui->stream, item->prop);
+  if ((new_value != value) && item->w && xitk_is_widget_enabled (item->w))
+    xitk_slider_set_pos (item->w, new_value);
+  if (item->enable)
+    config_update_num (item->cfg, new_value);
 }
 
-static void changes_cb (void *data, xine_cfg_entry_t *cfg) {
+static void control_changes_cb (void *data, xine_cfg_entry_t *cfg) {
   vctrl_item_t *item = data;
+
   *(item->value) = (cfg->num_value < 0) ? *(item->default_value) : cfg->num_value;
-  /* avoid infinite recursion */
-  set_value ((xitk_widget_t *)1, item, *(item->value));
 }
 
 xui_vctrl_t *control_init (gGui_t *gui) {
@@ -125,9 +118,11 @@ xui_vctrl_t *control_init (gGui_t *gui) {
 
   vctrl->gui = gui;
 
-  vctrl->items[0].vctrl = vctrl->items[1].vctrl = vctrl->items[2].vctrl =
-  vctrl->items[3].vctrl = vctrl->items[4].vctrl = vctrl->items[5].vctrl =
-  vctrl->items[6].vctrl = vctrl;
+  {
+    unsigned int u;
+    for (u = 0; u < NUM_SLIDERS; u++)
+      vctrl->items[u].vctrl = vctrl;
+  }
 
   vctrl->items[0].prop = XINE_PARAM_VO_HUE;
   vctrl->items[1].prop = XINE_PARAM_VO_SATURATION;
@@ -228,13 +223,13 @@ xui_vctrl_t *control_init (gGui_t *gui) {
   /* xine-lib-1.1 */
   {
     unsigned int u;
-    for (u = 0; u < 7; u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       vctrl_item_t *item = &vctrl->items[u];
-      int old_value = xine_get_param (vctrl->gui->xine, item->prop);
+      int old_value = xine_get_param (vctrl->gui->stream, item->prop);
 
-      xine_set_param (vctrl->gui->xine, item->prop, TEST_VO_VALUE (old_value));
-      if (xine_get_param (vctrl->gui->xine, item->prop) != old_value)) {
-        xine_set_param (vctrl->gui->xine, item->prop, old_value);
+      xine_set_param (vctrl->gui->stream, item->prop, TEST_VO_VALUE (old_value));
+      if (xine_get_param (vctrl->gui->stream, item->prop) != old_value) {
+        xine_set_param (vctrl->gui->stream, item->prop, old_value);
         item->enable = 1;
       }
     }
@@ -243,14 +238,14 @@ xui_vctrl_t *control_init (gGui_t *gui) {
 
   {
     unsigned int u;
-    for (u = 0; u < 7; u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       vctrl_item_t *item = &vctrl->items[u];
 
       if (item->enable) {
         *(item->value) = xine_config_register_range (vctrl->gui->xine,
           item->cfg, -1, CONTROL_MIN, CONTROL_MAX,
           item->desc, item->help, CONFIG_LEVEL_DEB,
-          changes_cb, item);
+          control_changes_cb, item);
         *(item->default_value) = xine_get_param (vctrl->gui->stream, item->prop);
         if (*(item->value) < 0) {
           *(item->value) = *(item->default_value);
@@ -263,11 +258,9 @@ xui_vctrl_t *control_init (gGui_t *gui) {
   }
 
   /* defer all window stuff to first use. */
-
   vctrl->window = None;
-  vctrl->visible = 0;
-  vctrl->running = 0;
-  
+  vctrl->status = 1;
+
   vctrl->gui->vctrl = vctrl;
   return vctrl;
 }
@@ -292,7 +285,7 @@ static void control_handle_event(XEvent *event, void *data) {
 
   case KeyPress:
     if(xitk_get_key_pressed(event) == XK_Escape)
-      control_toggle_visibility (NULL, vctrl);
+      control_toggle_window (NULL, vctrl);
     else
       gui_handle_event (event, vctrl->gui);
     break;
@@ -304,7 +297,7 @@ static void control_handle_event(XEvent *event, void *data) {
 /*
  * Create control panel window
  */
-static int vctrl_make_window (xui_vctrl_t *vctrl) {
+static int vctrl_open_window (xui_vctrl_t *vctrl) {
   GC                         gc;
   XSizeHints                 hint;
   XSetWindowAttributes       attr;
@@ -442,10 +435,10 @@ static int vctrl_make_window (xui_vctrl_t *vctrl) {
     sl.min    = CONTROL_MIN;
     sl.max    = CONTROL_MAX;
     sl.step   = CONTROL_STEP;
-    sl.callback = set_value;
-    sl.motion_callback = set_value;
+    sl.callback = control_set_value;
+    sl.motion_callback = control_set_value;
 
-    for (u = 0; u < 7; u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       vctrl_item_t *item = &vctrl->items[u];
       int v;
 
@@ -457,14 +450,15 @@ static int vctrl_make_window (xui_vctrl_t *vctrl) {
       sl.userdata        =
       sl.motion_userdata = item;
       item->w = xitk_slider_create (vctrl->widget_list, vctrl->gui->skin_config, &sl);
-      xitk_add_widget (vctrl->widget_list, item->w);
-      xitk_slider_set_pos (item->w, v);
+      if (item->w) {
+        xitk_add_widget (vctrl->widget_list, item->w);
+        xitk_slider_set_pos (item->w, *(item->value));
         xitk_set_widget_tips (item->w, hints[u]);
-      if (item->enable)
-        xitk_enable_widget (item->w);
-      else
-        xitk_disable_widget (item->w);
-    
+        if (item->enable)
+          xitk_enable_widget (item->w);
+        else
+          xitk_disable_widget (item->w);
+      }
       lbl.skin_element_name = (char *)lbl_skins[u];
       lbl.label             = item->label;
       xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl));
@@ -506,7 +500,7 @@ static int vctrl_make_window (xui_vctrl_t *vctrl) {
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Dismiss");
-  lb.callback          = control_toggle_visibility;
+  lb.callback          = control_toggle_window;
   lb.state_callback    = NULL;
   lb.userdata          = vctrl;
   w = xitk_labelbutton_create (vctrl->widget_list, vctrl->gui->skin_config, &lb);
@@ -519,12 +513,55 @@ static int vctrl_make_window (xui_vctrl_t *vctrl) {
     vctrl->window, control_handle_event, NULL,
     gui_dndcallback, vctrl->widget_list, vctrl);
   
-  vctrl->visible = 1;
-  vctrl->running = 1;
+  vctrl->status = 3;
   control_raise_window (vctrl);
   
   try_to_set_input_focus (vctrl->window);
   return 1;
+}
+
+static void vctrl_close_window (xui_vctrl_t *vctrl) {
+  vctrl->status = 1;
+
+  if (vctrl->window != None) {
+    window_info_t wi;
+    int           i;
+    
+    if ((xitk_get_window_info (vctrl->widget_key, &wi))) {
+      config_update_num ("gui.control_x", wi.x);
+      config_update_num ("gui.control_y", wi.y);
+    }
+
+    xitk_unregister_event_handler (&vctrl->widget_key);
+
+    XLockDisplay (vctrl->gui->display);
+    XUnmapWindow (vctrl->gui->display, vctrl->window);
+    XUnlockDisplay (vctrl->gui->display);
+
+    xitk_destroy_widgets (vctrl->widget_list);
+
+    XLockDisplay (vctrl->gui->display);
+    XDestroyWindow (vctrl->gui->display, vctrl->window);
+    Imlib_destroy_image (vctrl->gui->imlib_data, vctrl->bg_image);
+    XUnlockDisplay (vctrl->gui->display);
+
+    vctrl->window = None;
+    /* xitk_dlist_init (&control->widget_list->list); */
+
+    XLockDisplay (vctrl->gui->display);
+    XFreeGC (vctrl->gui->display, (XITK_WIDGET_LIST_GC (vctrl->widget_list)));
+    XUnlockDisplay (vctrl->gui->display);
+
+    XITK_WIDGET_LIST_FREE (vctrl->widget_list);
+
+    for (i = 0; i < vctrl->skins_num; i++)
+      free ((char *)vctrl->skins[i]);
+
+    for (i = 0; i < NUM_SLIDERS; i++)
+      vctrl->items[0].w = NULL;
+  }
+
+  try_to_set_input_focus (vctrl->gui->video_window);
 }
 
 void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
@@ -532,19 +569,19 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
     vctrl_item_t *item;
     unsigned int u;
 
-    for (u = 0; u < sizeof (vctrl->items) / sizeof (vctrl->items[0]); u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       item = &vctrl->items[u];
       if (item->prop == prop)
         break;
     }
-    if (u < sizeof (vctrl->items) / sizeof (vctrl->items[0])) {
+    if (u < NUM_SLIDERS) {
       int v = *(item->value) - STEP_SIZE;
       if (v < 0)
         v = 0;
       if (item->enable) {
         xine_set_param (item->vctrl->gui->stream, item->prop, v);
         osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
-        if (xitk_is_widget_enabled (item->w))
+        if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
       }
     }
@@ -556,19 +593,19 @@ void control_inc_image_prop (xui_vctrl_t *vctrl, int prop) {
     vctrl_item_t *item;
     unsigned int u;
 
-    for (u = 0; u < sizeof (vctrl->items) / sizeof (vctrl->items[0]); u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       item = &vctrl->items[u];
       if (item->prop == prop)
         break;
     }
-    if (u < sizeof (vctrl->items) / sizeof (vctrl->items[0])) {
+    if (u < NUM_SLIDERS) {
       int v = *(item->value) + STEP_SIZE;
       if (v > 65535)
         v = 65535;
       if (item->enable) {
         xine_set_param (item->vctrl->gui->stream, item->prop, v);
         osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
-        if (xitk_is_widget_enabled (item->w))
+        if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
       }
     }
@@ -579,13 +616,14 @@ void control_reset (xui_vctrl_t *vctrl) {
   if (vctrl) {
     unsigned int u;
 
-    for (u = 0; u < sizeof (vctrl->items) / sizeof (vctrl->items[0]); u++) {
+    for (u = 0; u < NUM_SLIDERS; u++) {
       vctrl_item_t *item = &vctrl->items[u];
 
       if (item->enable) {
         xine_set_param (vctrl->gui->stream, item->prop, *(item->default_value));
         config_update_num (item->cfg, -1);
-        update_slider (item);
+        if (item->w && xitk_is_widget_enabled (item->w))
+          xitk_slider_set_pos (item->w, *(item->default_value));
       }
     }
   }
@@ -608,89 +646,25 @@ void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout) {
     xitk_set_widgets_tips_timeout (vctrl->widget_list, timeout);
 }
 
-/*
- * Leaving control panel, release memory.
- */
-void control_exit (xitk_widget_t *w, void *data) {
-  xui_vctrl_t *vctrl = data;
-
-  (void)w;
-  if (vctrl) {
-
-    vctrl->running = 0;
-    vctrl->visible = 0;
-
-    if (vctrl->window != None) {
-      window_info_t wi;
-      int           i;
-    
-      if ((xitk_get_window_info (vctrl->widget_key, &wi))) {
-        config_update_num ("gui.control_x", wi.x);
-        config_update_num ("gui.control_y", wi.y);
-      }
-
-      xitk_unregister_event_handler (&vctrl->widget_key);
-
-      XLockDisplay (vctrl->gui->display);
-      XUnmapWindow (vctrl->gui->display, vctrl->window);
-      XUnlockDisplay (vctrl->gui->display);
-
-      xitk_destroy_widgets (vctrl->widget_list);
-
-      XLockDisplay (vctrl->gui->display);
-      XDestroyWindow (vctrl->gui->display, vctrl->window);
-      Imlib_destroy_image (vctrl->gui->imlib_data, vctrl->bg_image);
-      XUnlockDisplay (vctrl->gui->display);
-
-      vctrl->window = None;
-      /* xitk_dlist_init (&control->widget_list->list); */
-
-      XLockDisplay (vctrl->gui->display);
-      XFreeGC (vctrl->gui->display, (XITK_WIDGET_LIST_GC (vctrl->widget_list)));
-      XUnlockDisplay (vctrl->gui->display);
-
-      XITK_WIDGET_LIST_FREE (vctrl->widget_list);
-
-      for(i = 0; i < vctrl->skins_num; i++)
-        free ((char *)vctrl->skins[i]);
-    }
-
-    try_to_set_input_focus (vctrl->gui->video_window);
-
-#ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
-    xine_config_unregister_callbacks (vctrl->gui->xine, NULL, NULL, vctrl, sizeof (*vctrl));
-#endif
-    vctrl->gui->vctrl = NULL;
-    free (vctrl);
-  }
-}
-
-/*
- * return 1 if control panel is ON
- */
-int control_is_running (xui_vctrl_t *vctrl) {
-  return vctrl ? vctrl->running : 0;
-}
-
-/*
- * Return 1 if control panel is visible
- */
-int control_is_visible (xui_vctrl_t *vctrl) {
-  if (vctrl) {
-    if (vctrl->gui->use_root_window)
-      return xitk_is_window_visible (vctrl->gui->display, vctrl->window);
-    else
-      return vctrl->visible && xitk_is_window_visible (vctrl->gui->display, vctrl->window);
-  }
-  return 0;
+int control_status (xui_vctrl_t *vctrl) {
+  if (!vctrl)
+    return 0;
+  if (vctrl->status == 1)
+    return 1;
+  if (!vctrl->gui->use_root_window && (vctrl->status == 2))
+    return 2;
+  return (!!xitk_is_window_visible (vctrl->gui->display, vctrl->window)) + 2;
 }
 
 /*
  * Raise control->window
  */
 void control_raise_window (xui_vctrl_t *vctrl) {
-  if (vctrl)
-    raise_window (vctrl->window, vctrl->visible, vctrl->running);
+  if (vctrl && (vctrl->status >= 2)) {
+    int visible = vctrl->status - 2;
+
+    raise_window (vctrl->window, visible, 1);
+  }
 }
 
 /*
@@ -699,12 +673,48 @@ void control_raise_window (xui_vctrl_t *vctrl) {
 void control_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_vctrl_t *vctrl = data;
 
-  (void)w;
+  if (vctrl && (vctrl->status >= 2)) {
+    int visible;
+
+    if (w == XUI_W_ON) {
+      if (vctrl->status == 3)
+        return;
+    } else if (w == XUI_W_OFF) {
+      if (vctrl->status == 2)
+        return;
+    }
+    visible = vctrl->status - 2;
+    toggle_window (vctrl->window, vctrl->widget_list, &visible, 1);
+    vctrl->status = visible + 2;
+  }
+}
+
+void control_toggle_window (xitk_widget_t *w, void *data) {
+  xui_vctrl_t *vctrl = data;
+
   if (vctrl) {
-    if (vctrl->window == None)
-      vctrl_make_window (vctrl);
-    else if (vctrl->window != None)
-      toggle_window (vctrl->window, vctrl->widget_list, &vctrl->visible, vctrl->running);
+    int new_status;
+
+    if (w == XUI_W_ON) {
+      new_status = 3;
+    } else if (w == XUI_W_OFF) {
+      new_status = 1;
+    } else {
+      new_status = vctrl->status < 2 ? 3 : 1;
+    }
+    if (new_status == vctrl->status)
+      return;
+    if (new_status == 3) {
+      if (vctrl->status < 2) {
+        vctrl_open_window (vctrl);
+      } else {
+        int visible = 0;
+        toggle_window (vctrl->window, vctrl->widget_list, &visible, 1);
+        vctrl->status = visible + 2;
+      }
+    } else {
+      vctrl_close_window (vctrl);
+    }
   }
 }
 
@@ -715,7 +725,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
 
-  if (control_is_running (vctrl)) {
+  if (vctrl->status >= 2) {
     
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
@@ -754,8 +764,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     Imlib_apply_image (vctrl->gui->imlib_data, new_img, vctrl->window);
     XUnlockDisplay (vctrl->gui->display);
 
-    if (control_is_visible (vctrl))
-      control_raise_window (vctrl);
+    control_raise_window (vctrl);
 
     xitk_skin_unlock (vctrl->gui->skin_config);
     
@@ -765,7 +774,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     {
       unsigned int u;
 
-      for (u = 0; u < 7; u++) {
+      for (u = 0; u < NUM_SLIDERS; u++) {
         vctrl_item_t *item = &vctrl->items[u];
 
         if (item->enable)
@@ -777,11 +786,17 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
   }
 }
 
+/*
+ * Leaving control panel, release memory.
+ */
 void control_deinit (xui_vctrl_t *vctrl) {
   if (vctrl) {
-    if (control_is_visible (vctrl))
-      control_toggle_visibility (NULL, vctrl);
-    control_exit (NULL, vctrl);
+    vctrl_close_window (vctrl);
+#ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
+    xine_config_unregister_callbacks (vctrl->gui->xine, NULL, NULL, vctrl, sizeof (*vctrl));
+#endif
+    vctrl->gui->vctrl = NULL;
+    free (vctrl);
   }
 }
 
@@ -789,3 +804,4 @@ void control_reparent (xui_vctrl_t *vctrl) {
   if (vctrl && (vctrl->window != None))
     reparent_window (vctrl->window);
 }
+

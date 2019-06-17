@@ -24,15 +24,17 @@
 
 typedef struct xui_vctrl_st xui_vctrl_t;
 
-void control_reset (xui_vctrl_t *vctrl);
-void control_deinit (xui_vctrl_t *vctrl);
 xui_vctrl_t *control_init (gGui_t *gui);
+void control_deinit (xui_vctrl_t *vctrl);
 
-void control_exit (xitk_widget_t *w, void *vctrl);
+/* supports XUI_W_* */
+void control_toggle_window (xitk_widget_t *w, void *vctrl);
 void control_toggle_visibility (xitk_widget_t *w, void *vctrl);
 
-int control_is_visible (xui_vctrl_t *vctrl);
-int control_is_running (xui_vctrl_t *vctrl);
+/* off (0), keyboard only (1), hidden window (2), visible window (3= */
+int control_status (xui_vctrl_t *vctrl);
+
+void control_reset (xui_vctrl_t *vctrl);
 
 void control_change_skins (xui_vctrl_t *vctrl, int);
 void control_raise_window (xui_vctrl_t *vctrl);
@@ -43,4 +45,3 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);
 void control_reparent (xui_vctrl_t *vctrl);
 
 #endif
-

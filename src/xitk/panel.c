@@ -595,44 +595,58 @@ int panel_is_visible (xui_panel_t *panel) {
 static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
   int visible = xitk_is_window_visible (panel->gui->display, panel->gui->panel_window);
+  int invisible = !panel->visible || !visible;
+  unsigned char lut[2] = {invisible, visible};
+  int v;
 
   (void)w;
 
-  if(((!panel->visible || !visible) && !playlist_is_visible()) || (visible && playlist_is_visible()))
+  v = !!playlist_is_visible ();
+  if (lut[v])
     playlist_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !control_is_visible (panel->gui->vctrl)) || (visible && control_is_visible (panel->gui->vctrl)))
+  v = control_status (panel->gui->vctrl) - 2;
+  if ((v >= 0) && (lut[v]))
     control_toggle_visibility (NULL, panel->gui->vctrl);
 
-  if (((!panel->visible || !visible) && !mrl_browser_is_visible (panel->gui->mrlb))
-    || (visible && mrl_browser_is_visible (panel->gui->mrlb)))
+  v = !!mrl_browser_is_visible (panel->gui->mrlb);
+  if (lut[v])
     mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
 
-  if(((!panel->visible || !visible) && !setup_is_visible (panel->gui->setup)) || (visible && setup_is_visible (panel->gui->setup)))
+  v = !!setup_is_visible (panel->gui->setup);
+  if (lut[v])
     setup_toggle_visibility (NULL, panel->gui->setup);
 
-  if(((!panel->visible || !visible) && !viewlog_is_visible()) || (visible && viewlog_is_visible()))
+  v = !!viewlog_is_visible ();
+  if (lut[v])
     viewlog_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !kbedit_is_visible()) || (visible && kbedit_is_visible()))
+  v = !!kbedit_is_visible ();
+  if (lut[v])
     kbedit_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !event_sender_is_visible()) || (visible && event_sender_is_visible()))
+  v = !!event_sender_is_visible ();
+  if (lut[v])
     event_sender_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !stream_infos_is_visible()) || (visible && stream_infos_is_visible()))
+  v = !!stream_infos_is_visible ();
+  if (lut[v])
     stream_infos_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !tvset_is_visible()) || (visible && tvset_is_visible()))
+  v = !!tvset_is_visible ();
+  if (lut[v])
     tvset_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !vpplugin_is_visible()) || (visible && vpplugin_is_visible()))
+  v = !!vpplugin_is_visible ();
+  if (lut[v])
     vpplugin_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !applugin_is_visible()) || (visible && applugin_is_visible()))
+  v = !!applugin_is_visible ();
+  if (lut[v])
     applugin_toggle_visibility(NULL, NULL);
 
-  if(((!panel->visible || !visible) && !help_is_visible()) || (visible && help_is_visible()))
+  v = !!help_is_visible ();
+  if (lut[v])
     help_toggle_visibility(NULL, NULL);
 
   if (panel->visible && panel->gui->video_display == panel->gui->display) {
@@ -1044,7 +1058,7 @@ static void panel_handle_event(XEvent *event, void *data) {
     /* all other hidden GUI windows shall also become visible */
     if(!playlist_is_visible())
       playlist_toggle_visibility(NULL, NULL);
-    if (!control_is_visible (panel->gui->vctrl))
+    if (control_status (panel->gui->vctrl) == 2)
       control_toggle_visibility (NULL, panel->gui->vctrl);
     if (!mrl_browser_is_visible (panel->gui->mrlb))
       mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
