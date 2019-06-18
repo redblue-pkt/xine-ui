@@ -43,9 +43,8 @@
 
 typedef struct {
   xui_vctrl_t   *vctrl;
-  int           *value;
-  int           *default_value;
   char          *name;
+  char          *hint;
   const char    *label;
   const char    *cfg;
   const char    *desc;
@@ -53,6 +52,8 @@ typedef struct {
   xitk_widget_t *w;
   int            prop;
   int            enable;
+  int            value;
+  int            default_value;
 } vctrl_item_t;
 
 struct xui_vctrl_st {
@@ -102,7 +103,7 @@ static void control_set_value (xitk_widget_t *w, void *data, int value) {
 static void control_changes_cb (void *data, xine_cfg_entry_t *cfg) {
   vctrl_item_t *item = data;
 
-  *(item->value) = (cfg->num_value < 0) ? *(item->default_value) : cfg->num_value;
+  item->value = (cfg->num_value < 0) ? item->default_value : cfg->num_value;
 }
 
 xui_vctrl_t *control_init (gGui_t *gui) {
@@ -146,6 +147,14 @@ xui_vctrl_t *control_init (gGui_t *gui) {
   vctrl->items[5].name  = _("Sharpness");
   vctrl->items[6].name  = _("Noise");
 
+  vctrl->items[0].hint = _("Control HUE value");
+  vctrl->items[1].hint = _("Control SATURATION value");
+  vctrl->items[2].hint = _("Control BRIGHTNESS value");
+  vctrl->items[3].hint = _("Control CONTRAST value");
+  vctrl->items[4].hint = _("Control GAMMA value");
+  vctrl->items[5].hint = _("Control SHARPNESS value");
+  vctrl->items[6].hint = _("Control NOISE REDUCTION value");
+
   /* TRANSLATORS: only ASCII characters (skin). */
   vctrl->items[0].label = pgettext ("skin", "Hue");
   /* TRANSLATORS: only ASCII characters (skin). */
@@ -184,21 +193,6 @@ xui_vctrl_t *control_init (gGui_t *gui) {
   vctrl->items[4].help  = _("Gamma value.");
   vctrl->items[5].help  = _("Sharpness value.");
   vctrl->items[6].help  = _("Noise reduction value.");
-
-  vctrl->items[0].value         = &gui->video_settings.hue;
-  vctrl->items[0].default_value = &gui->video_settings.default_hue;
-  vctrl->items[1].value         = &gui->video_settings.saturation;
-  vctrl->items[1].default_value = &gui->video_settings.default_saturation;
-  vctrl->items[2].value         = &gui->video_settings.brightness;
-  vctrl->items[2].default_value = &gui->video_settings.default_brightness;
-  vctrl->items[3].value         = &gui->video_settings.contrast;
-  vctrl->items[3].default_value = &gui->video_settings.default_contrast;
-  vctrl->items[4].value         = &gui->video_settings.gamma;
-  vctrl->items[4].default_value = &gui->video_settings.default_gamma;
-  vctrl->items[5].value         = &gui->video_settings.sharpness;
-  vctrl->items[5].default_value = &gui->video_settings.default_sharpness;
-  vctrl->items[6].value         = &gui->video_settings.noise_reduction;
-  vctrl->items[6].default_value = &gui->video_settings.default_noise_reduction;
 
 #ifdef VO_CAP_HUE
   /* xine-lib-1.2 */
@@ -242,16 +236,16 @@ xui_vctrl_t *control_init (gGui_t *gui) {
       vctrl_item_t *item = &vctrl->items[u];
 
       if (item->enable) {
-        *(item->value) = xine_config_register_range (vctrl->gui->xine,
+        item->value = xine_config_register_range (vctrl->gui->xine,
           item->cfg, -1, CONTROL_MIN, CONTROL_MAX,
           item->desc, item->help, CONFIG_LEVEL_DEB,
           control_changes_cb, item);
-        *(item->default_value) = xine_get_param (vctrl->gui->stream, item->prop);
-        if (*(item->value) < 0) {
-          *(item->value) = *(item->default_value);
+        item->default_value = xine_get_param (vctrl->gui->stream, item->prop);
+        if (item->value < 0) {
+          item->value = item->default_value;
         } else {
-          xine_set_param (vctrl->gui->stream, item->prop, *(item->value));
-          *(item->value) = xine_get_param (vctrl->gui->stream, item->prop);
+          xine_set_param (vctrl->gui->stream, item->prop, item->value);
+          item->value = xine_get_param (vctrl->gui->stream, item->prop);
         }
       }
     }
@@ -423,11 +417,6 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
       "CtlHueLbl", "CtlSatLbl", "CtlBrightLbl", "CtlContLbl",
       "CtlGammaLbl", "CtlSharpLbl", "CtlNoiseLbl"
     };
-    char *hints[] = {
-      _("Control HUE value"), _("Control SATURATION value"), _("Control BRIGHTNESS value"),
-      _("Control CONTRAST value"), _("Control GAMMA value"), _("Control SHARPNESS value"),
-      _("Control NOISE REDUCTION value")
-    };
     xitk_slider_widget_t sl;
     unsigned int u;
 
@@ -452,8 +441,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
       item->w = xitk_slider_create (vctrl->widget_list, vctrl->gui->skin_config, &sl);
       if (item->w) {
         xitk_add_widget (vctrl->widget_list, item->w);
-        xitk_slider_set_pos (item->w, *(item->value));
-        xitk_set_widget_tips (item->w, hints[u]);
+        xitk_slider_set_pos (item->w, item->value);
+        xitk_set_widget_tips (item->w, item->hint);
         if (item->enable)
           xitk_enable_widget (item->w);
         else
@@ -575,11 +564,17 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
         break;
     }
     if (u < NUM_SLIDERS) {
-      int v = *(item->value) - STEP_SIZE;
+      int v = item->value - STEP_SIZE;
       if (v < 0)
         v = 0;
       if (item->enable) {
         xine_set_param (item->vctrl->gui->stream, item->prop, v);
+        /* not doing this here because xine video out may support
+         * just a few coarse steps, and snap us back. in other words:
+         * we are stuck inside a black hole.
+        v = xine_get_param (item->vctrl->gui->stream, item->prop);
+        */
+        item->value = v;
         osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
         if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
@@ -599,11 +594,12 @@ void control_inc_image_prop (xui_vctrl_t *vctrl, int prop) {
         break;
     }
     if (u < NUM_SLIDERS) {
-      int v = *(item->value) + STEP_SIZE;
+      int v = item->value + STEP_SIZE;
       if (v > 65535)
         v = 65535;
       if (item->enable) {
         xine_set_param (item->vctrl->gui->stream, item->prop, v);
+        item->value = v;
         osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
         if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
@@ -620,10 +616,10 @@ void control_reset (xui_vctrl_t *vctrl) {
       vctrl_item_t *item = &vctrl->items[u];
 
       if (item->enable) {
-        xine_set_param (vctrl->gui->stream, item->prop, *(item->default_value));
+        xine_set_param (vctrl->gui->stream, item->prop, item->default_value);
         config_update_num (item->cfg, -1);
         if (item->w && xitk_is_widget_enabled (item->w))
-          xitk_slider_set_pos (item->w, *(item->default_value));
+          xitk_slider_set_pos (item->w, item->default_value);
       }
     }
   }
