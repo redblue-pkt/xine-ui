@@ -187,16 +187,6 @@ struct gGui_st {
   int                       deinterlace_elements_num;
   int                       deinterlace_enable;
 
-  struct {
-    int                     hue, default_hue;
-    int                     brightness, default_brightness;
-    int                     saturation, default_saturation;
-    int                     contrast, default_contrast;
-    int                     gamma, default_gamma;
-    int                     sharpness, default_sharpness;
-    int                     noise_reduction, default_noise_reduction;
-  } video_settings;
-
   xine_audio_port_t        *ao_port;
 
   xine_stream_t            *stream;
