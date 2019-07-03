@@ -89,11 +89,8 @@ int network_download(const char *url, download_t *download) {
   
   if((curl = curl_easy_init()) != NULL) {
     char error_buffer[CURL_ERROR_SIZE];
-    char user_agent[256];
     
     memset(&error_buffer, 0, sizeof(error_buffer));
-    
-    snprintf(user_agent, sizeof(user_agent), "User-Agent: xine/%s", VERSION);
     
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 
 #ifdef DEBUG
@@ -105,7 +102,7 @@ int network_download(const char *url, download_t *download) {
     
     curl_easy_setopt(curl, CURLOPT_URL, url);
     
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "xine/" VERSION);
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, TRUE); 
     curl_easy_setopt(curl, CURLOPT_NETRC, TRUE);
