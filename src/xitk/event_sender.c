@@ -492,7 +492,7 @@ void event_sender_panel(void) {
   y = 5 + 23 * 3 + 5 + 40 + 5;
 
   for(i = 9; i >= 0; i--) {
-    char number[2];
+    char number[3];
     
     snprintf(number, sizeof(number), "%d", i);
 
