@@ -851,7 +851,11 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, const ch
     image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
-  
+
+  if (!image) {
+    return NULL;
+  }
+
   windowh = (image->height) + (TITLE_BAR_HEIGHT + 40);
 
   wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
