@@ -1114,6 +1114,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   private_data->widget_list->gc            = gc;
   
   lb.button_type       = CLICK_BUTTON;
+  lb.align             = ALIGN_DEFAULT;
   lb.label             = mb->select.caption;
   lb.callback          = mrlbrowser_select;
   lb.state_callback    = NULL;

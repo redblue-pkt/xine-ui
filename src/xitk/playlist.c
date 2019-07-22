@@ -1156,6 +1156,7 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Add");
+  lb.align             = ALIGN_DEFAULT;
   lb.callback          = open_mrlbrowser_from_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = gui;

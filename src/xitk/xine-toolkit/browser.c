@@ -1089,6 +1089,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
       private_data->bt[i]->sel      = i;
       
       lb.button_type       = RADIO_BUTTON;
+      lb.align             = ALIGN_DEFAULT;
       lb.label             = "";
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
