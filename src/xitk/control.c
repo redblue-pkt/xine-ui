@@ -488,6 +488,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;
+  lb.align             = ALIGN_DEFAULT;
   lb.label             = _("Dismiss");
   lb.callback          = control_toggle_window;
   lb.state_callback    = NULL;

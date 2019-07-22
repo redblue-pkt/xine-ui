@@ -130,6 +130,7 @@ xitk_button_list_t *xitk_button_list_new (
   XITK_WIDGET_INIT (&lb, imlib_data);
   lb.skin_element_name = bl->skin_element_name;
   lb.button_type       = CLICK_BUTTON;
+  lb.align             = ALIGN_DEFAULT;
   lb.callback          = callback;
   lb.userdata          = callback_data;
   lb.state_callback    = NULL;
