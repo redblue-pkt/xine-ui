@@ -466,15 +466,18 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char      buffer[2048];
-	  char      fskin_path[XITK_PATH_MAX + 1];
+          char     *cmd;
+	  char     *fskin_path;
 	  int       i, skin_found = -1, len;
 
 	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
 
-	  snprintf(buffer, sizeof(buffer), "%s %s %s %s %s", "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
-	  xine_system(0, buffer);
+          cmd = xitk_asprintf("%s %s %s %s %s", "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
+          if (cmd)
+            xine_system(0, cmd);
+          free(cmd);
 	  unlink(tmpskin);
 
 	  len = strlen(filename) - strlen(".tar.gz");
@@ -482,13 +485,16 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  strncpy(buffer, filename, len);
 	  buffer[len] = '\0';
 
-	  snprintf(fskin_path, sizeof(fskin_path), "%s/%s/%s", skindir, buffer, "doinst.sh");
-	  if(is_a_file(fskin_path)) {
-	    char doinst[2048];
+          fskin_path = xitk_asprintf("%s/%s/%s", skindir, buffer, "doinst.sh");
+          if (fskin_path && is_a_file(fskin_path)) {
+	    char *doinst;
 
-	    snprintf(doinst, sizeof(doinst), "%s %s/%s %s", "cd", skindir, buffer, "&& ./doinst.sh");
-	    xine_system(0, doinst);
+	    doinst = xitk_asprintf("%s %s/%s %s", "cd", skindir, buffer, "&& ./doinst.sh");
+            if (doinst)
+              xine_system(0, doinst);
+            free(doinst);
 	  }
+          free(fskin_path);
 	  
 	  for(i = 0; i < skins_avail_num; i++) {
 	    if((!strcmp(skins_avail[i]->pathname, skindir)) 

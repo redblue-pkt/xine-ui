@@ -2536,7 +2536,7 @@ int mediamark_get_entry_from_id(const char *ident) {
 void mediamark_insert_entry(int index, const char *mrl, const char *ident, 
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
   gGui_t *gui = gGui;
-  char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 2];
+  char  autosub[2*XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char  subpath[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   DIR           *dir;
   struct dirent *dentry;
