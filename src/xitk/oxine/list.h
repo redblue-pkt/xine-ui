@@ -32,7 +32,7 @@ typedef struct list_s list_t;
  */
 
 #ifdef DEBUG
-list_t *_list_new_tagged(char*, int) ;
+list_t *_list_new_tagged(const char *file, int line);
 #define list_new() (_list_new_tagged(__FILE__, __LINE__))
 #define xine_list_new() (_list_new_tagged(__FILE__, __LINE__))
 #else
@@ -94,7 +94,7 @@ void list_append_priority_content (list_t *l, void *content, int priority) ;
  */
 
 #ifdef DEBUG
-void _list_append_content (list_t *l, void *content, char*, int) ;
+void _list_append_content (list_t *l, void *content, const char *file, int line);
 #define list_append_content(list,cont) (_list_append_content(list, cont, __FILE__, __LINE__))
 #define xine_list_append_content(list,cont) (_list_append_content(list, cont, __FILE__, __LINE__))
 #else
