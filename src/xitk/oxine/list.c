@@ -62,7 +62,7 @@ struct list_s {
  */
 
 #ifdef DEBUG
-list_t *_list_new_tagged(char *file, int line) {
+list_t *_list_new_tagged(const char *file, int line) {
 
   char tag[TAG_SIZE];
   list_t *list;
@@ -247,7 +247,7 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
 }
 
 #ifdef DEBUG
-void _list_append_content(list_t *l, void *content, char *file, int line) {
+void _list_append_content(list_t *l, void *content, const char *file, int line) {
   node_t *node;
   char tag[TAG_SIZE];
 

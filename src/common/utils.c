@@ -42,7 +42,7 @@ extern char **environ;
 /*
  * Execute a shell command.
  */
-int xine_system(int dont_run_as_root, char *command) {
+int xine_system(int dont_run_as_root, const char *command) {
   int pid, status;
   
   /* 
@@ -53,7 +53,7 @@ int xine_system(int dont_run_as_root, char *command) {
       return -1;
   }
 
-  if(command == 0)
+  if(command == NULL)
     return 1;
 
   pid = fork();
@@ -63,10 +63,10 @@ int xine_system(int dont_run_as_root, char *command) {
   
   if(pid == 0) {
     char *argv[4];
-    argv[0] = "sh";
-    argv[1] = "-c";
-    argv[2] = command;
-    argv[3] = 0;
+    argv[0] = (char *)"sh";
+    argv[1] = (char *)"-c";
+    argv[2] = (char *)command;
+    argv[3] = NULL;
     execve("/bin/sh", argv, environ);
     exit(127);
   }
@@ -312,14 +312,14 @@ int is_ipv6_last_double_semicolon(const char *str) {
   return 0;
 }
 
-int is_downloadable(char *filename) {
+int is_downloadable(const char *filename) {
   if(filename && 
      ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
     return 1;
   return 0;
 }
 
-int is_a_dir(char *filename) {
+int is_a_dir(const char *filename) {
   struct stat  pstat;
   
   if((stat(filename, &pstat)) < 0)
@@ -328,7 +328,7 @@ int is_a_dir(char *filename) {
   return (S_ISDIR(pstat.st_mode));
 }
 
-int is_a_file(char *filename) {
+int is_a_file(const char *filename) {
   struct stat  pstat;
   
   if((stat(filename, &pstat)) < 0)

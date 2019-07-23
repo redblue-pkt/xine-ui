@@ -57,7 +57,7 @@
 /*
  * Execute a shell command.
  */
-int xine_system(int dont_run_as_root, char *command);
+int xine_system(int dont_run_as_root, const char *command);
 
 /*
  * cleanup the str string, take care about '
@@ -78,9 +78,9 @@ int get_bool_value(const char *val);
 const char *get_last_double_semicolon(const char *str);
 int is_ipv6_last_double_semicolon(const char *str);
 
-int is_downloadable(char *filename);
-int is_a_dir(char *filename);
-int is_a_file(char *filename);
+int is_downloadable(const char *filename);
+int is_a_dir(const char *filename);
+int is_a_file(const char *filename);
 
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t size);
