@@ -1,3 +1,16 @@
+xine-ui (0.99.11)
+  * Offer all autoplay/autodir input plugins.
+  * Dont treat hls as playlist.
+  * Play ftp:/ mrls instead of downloading.
+  * Update german translation.
+  * Fix mrl browser background.
+  * Fix user agent.
+  * Fix libjpeg detection.
+  * Fix linking with caca.
+  * Fix memory and resource leaks.
+  * Fix crashes.
+  * Code cleanup and "dust removal".
+
 xine-ui (0.99.10)
   * Added manual video single step feature
   * Show millisecond time in slow motion
