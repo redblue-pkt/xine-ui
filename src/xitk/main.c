@@ -1056,6 +1056,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
+      pthread_mutex_lock (&gui->mmk_mutex);
       if(strcmp(gui->mmk.ident, uevent->str)) {
 	
 	free(gui->mmk.ident);
@@ -1067,10 +1068,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	  gui->playlist.mmk[gui->playlist.cur]->ident = strdup(uevent->str);
 	}
 	gui->mmk.ident = strdup(uevent->str);
+        pthread_mutex_unlock (&gui->mmk_mutex);
 	
-        video_window_set_mrl (gui->vwin, gui->mmk.ident);
+        video_window_set_mrl (gui->vwin, uevent->str);
 	playlist_mrlident_toggle();
         panel_update_mrl_display (gui->panel);
+      } else {
+        pthread_mutex_unlock (&gui->mmk_mutex);
       }
     }
     break;
@@ -1191,12 +1195,17 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	/* none */
       case XINE_MSG_ENCRYPTED_SOURCE:
 	strlcpy(buffer, _("The source seems encrypted, and can't be read."), sizeof(buffer));
-	if(!strncasecmp(gui->mmk.mrl, "dvd:/", 5)) {
-	  strlcat(buffer, _("\nYour DVD is probably crypted. "
-			   "According to your country laws, you can or can't "
-			   "install/use libdvdcss to be able to read this disc, "
-			   "which you bought."), sizeof(buffer));
-	}
+        {
+          int i;
+          pthread_mutex_lock (&gui->mmk_mutex);
+          i = strncasecmp (gui->mmk.mrl, "dvd:/", 5);
+          pthread_mutex_unlock (&gui->mmk_mutex);
+          if (!i) {
+            strlcat (buffer,
+              _("\nYour DVD is probably crypted. According to your country laws, you can or can't "
+                "install/use libdvdcss to be able to read this disc, which you bought."), sizeof(buffer));
+          }
+        }
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
@@ -1322,12 +1331,14 @@ static void event_listener(void *user_data, const xine_event_t *event) {
         gui->playlist.ref_append++;
         mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
       } else {
+        pthread_mutex_lock (&gui->mmk_mutex);
 	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
 	
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
 	}
+        pthread_mutex_unlock (&gui->mmk_mutex);
 
       }
 
@@ -1359,12 +1370,14 @@ typedef struct {
         mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL, ref->start_time, ref->duration ? ref->start_time + ref->duration : -1, 0, 0);
       } else {
         /* FIXME: title? start? duration? */
+        pthread_mutex_lock (&gui->mmk_mutex);
 	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
 
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
 	}
+        pthread_mutex_unlock (&gui->mmk_mutex);
       }
     }
     break;
@@ -1508,7 +1521,13 @@ int main(int argc, char *argv[]) {
   _rc_file_check_args(_argc, _argv);
 #endif
 
-  pthread_mutex_init(&gui->mmk_mutex, NULL);
+  {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init (&attr);
+    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init (&gui->mmk_mutex, &attr);
+    pthread_mutexattr_destroy (&attr);
+  }
 
   visual_anim_init();
 
@@ -1732,11 +1751,13 @@ int main(int argc, char *argv[]) {
       if (optarg) {
       if((!actions_on_start(gui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
 	gui->actions_on_start[aos++] = ACTID_PLAYLIST;
-      
+
+      pthread_mutex_lock (&gui->mmk_mutex);
       if(!gui->playlist.mmk)
 	mediamark_load_mediamarks(optarg);
       else
 	mediamark_concat_mediamarks(optarg);
+      pthread_mutex_unlock (&gui->mmk_mutex);
 
       /* don't load original playlist when loading this one */
       no_old_playlist = 1;

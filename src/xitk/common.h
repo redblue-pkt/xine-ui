@@ -286,7 +286,7 @@ struct gGui_st {
 
   /* Current mediamark */
   mediamark_t               mmk;
-
+  /* Recursive mutex, protecting .mmk and .playlist. */
   pthread_mutex_t           mmk_mutex;
   
   /* playlist */
