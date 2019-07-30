@@ -330,7 +330,9 @@ void osd_stream_infos(void) {
 
     y = x = 0;
 
+    pthread_mutex_lock (&gGui->mmk_mutex);
     strlcpy(buffer, (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident, sizeof(buffer));
+    pthread_mutex_unlock (&gGui->mmk_mutex);
     xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {

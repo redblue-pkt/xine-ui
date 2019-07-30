@@ -945,6 +945,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     int                 i, first_entry = 0;
     const char *const menus_str = _("Menus");
 
+    pthread_mutex_lock (&gui->mmk_mutex);
     if (gui->mmk.mrl) {
       if (!strncmp(gui->mmk.mrl, "bd:/", 4)) {
         first_entry = 14;
@@ -954,6 +955,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
         first_entry = 7;
       }
     }
+    pthread_mutex_unlock (&gui->mmk_mutex);
 
     for(i = 0; i < 7; i++) {
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));

@@ -476,25 +476,30 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
         ((speed != XINE_SPEED_PAUSE) || (msecs != lastmsecs))) {
         char *ident = stream_infos_get_ident_from_stream (panel->gui->stream);
 
-	if(ident) {
-          if (panel->gui->playlist.num && panel->gui->playlist.cur >= 0 && panel->gui->playlist.mmk &&
-            panel->gui->playlist.mmk [panel->gui->playlist.cur]) {
-            if (strcmp (panel->gui->mmk.ident, ident)) {
+        if (!pthread_mutex_trylock (&panel->gui->mmk_mutex)) {
+          if (ident) {
+            if (panel->gui->playlist.num &&
+                (panel->gui->playlist.cur >= 0) &&
+                panel->gui->playlist.mmk &&
+                panel->gui->playlist.mmk[panel->gui->playlist.cur] &&
+                (strcmp (panel->gui->mmk.ident, ident))) {
               free (panel->gui->mmk.ident);
-              free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
-
               panel->gui->mmk.ident = strdup (ident);
+              free (panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident);
               panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (ident);
-
-              video_window_set_mrl (panel->gui->vwin, panel->gui->mmk.ident);
-	      playlist_mrlident_toggle();
+              pthread_mutex_unlock (&panel->gui->mmk_mutex);
+              video_window_set_mrl (panel->gui->vwin, ident);
+              playlist_mrlident_toggle ();
               panel_update_mrl_display (panel);
-	    }
-	  }
-	  free(ident);
-	}
-	else
-          video_window_set_mrl (panel->gui->vwin, (char *)panel->gui->mmk.mrl);
+            } else {
+              pthread_mutex_unlock (&panel->gui->mmk_mutex);
+            }
+          } else {
+            video_window_set_mrl (panel->gui->vwin, (char *)panel->gui->mmk.mrl);
+            pthread_mutex_unlock (&panel->gui->mmk_mutex);
+          }
+        }
+        free (ident);
 
         {
           int iconified;
@@ -924,8 +929,11 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
  * Update displayed MRL according to the current one.
  */
 void panel_update_mrl_display (xui_panel_t *panel) {
-  if (panel)
+  if (panel) {
+    pthread_mutex_lock (&panel->gui->mmk_mutex);
     panel_set_title (panel, (panel->gui->is_display_mrl) ? panel->gui->mmk.mrl : panel->gui->mmk.ident);
+    pthread_mutex_unlock (&panel->gui->mmk_mutex);
+  }
 }
 
 void panel_update_mixer_display (xui_panel_t *panel) {
@@ -984,7 +992,9 @@ void panel_snapshot (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
 
   (void)w;
+  pthread_mutex_lock (&panel->gui->mmk_mutex);
   create_snapshot (panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, NULL);
+  pthread_mutex_unlock (&panel->gui->mmk_mutex);
 }
 
 /*
