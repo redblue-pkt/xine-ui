@@ -284,13 +284,15 @@ static int _gui_xine_play(xine_stream_t *stream,
 	stream_infos_update_infos();
       
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
+        pthread_mutex_lock (&gui->mmk_mutex);
 	free(gui->mmk.ident);
 	free(gui->playlist.mmk[gui->playlist.cur]->ident);
 	
 	gui->mmk.ident = strdup(ident);
 	gui->playlist.mmk[gui->playlist.cur]->ident = strdup(ident);
+        pthread_mutex_unlock (&gui->mmk_mutex);
 	
-        video_window_set_mrl (gui->vwin, gui->mmk.ident);
+        video_window_set_mrl (gui->vwin, ident);
 	playlist_mrlident_toggle();
 	panel_update_mrl_display (gui->panel);
 	free(ident);
@@ -369,6 +371,7 @@ static void start_anyway_yesno(xitk_widget_t *w, void *data, int button) {
 static void set_mmk(mediamark_t *mmk) {
   gGui_t *gui = gGui;
   
+  pthread_mutex_lock (&gui->mmk_mutex);
   free(gui->mmk.mrl);
   free(gui->mmk.ident);
   free(gui->mmk.sub);
@@ -385,15 +388,10 @@ static void set_mmk(mediamark_t *mmk) {
     gui->mmk.spu_offset    = mmk->spu_offset;
     gui->mmk.got_alternate = mmk->got_alternate;
     mediamark_duplicate_alternates(mmk, &(gui->mmk));
-  }
-  else {
-    char buffer[1024];
-    
-    snprintf(buffer, sizeof(buffer), "xine-ui version %s", VERSION);
-    
+  } else {
     /* TRANSLATORS: only ASCII characters (skin) */
     gui->mmk.mrl           = strdup(pgettext("skin", "There is no MRL."));
-    gui->mmk.ident         = strdup(buffer);
+    gui->mmk.ident         = strdup ("xine-ui version " VERSION);
     gui->mmk.sub           = NULL;
     gui->mmk.start         = 0;
     gui->mmk.end           = -1;
@@ -403,6 +401,7 @@ static void set_mmk(mediamark_t *mmk) {
     gui->mmk.alternates    = NULL;
     gui->mmk.cur_alt       = NULL;
   }
+  pthread_mutex_unlock (&gui->mmk_mutex);
 }
 
 static void mmk_set_update(void) {
