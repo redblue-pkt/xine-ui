@@ -1569,7 +1569,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   vwin->fake_key_cur = 0;
 #endif
   
-  strcpy (vwin->window_title, "xine");
+  memcpy (vwin->window_title, "xine", 5);
   
   gettimeofday (&vwin->click_time, 0);
 
@@ -2441,16 +2441,17 @@ void video_window_get_output_size (xui_vwin_t *vwin, int *w, int *h) {
 }
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
-  if (!vwin)
+  if (!vwin || !mrl)
     return;
-  if(mrl && strlen(mrl)) {
-    
-    snprintf (vwin->window_title, sizeof (vwin->window_title), "%s: %s", "xine", mrl);
-    
-    XLockDisplay (vwin->gui->video_display);
-    _set_window_title (vwin);
-    XUnlockDisplay (vwin->gui->video_display);
-  }
+  if (!mrl[0])
+    return;
+  if (!memcmp (vwin->window_title, "xine: ", 6) && !strcmp (vwin->window_title + 6, mrl))
+    return;
+  memcpy (vwin->window_title, "xine: ", 6);
+  strlcpy (vwin->window_title + 6, mrl, sizeof (vwin->window_title) - 6);
+  XLockDisplay (vwin->gui->video_display);
+  _set_window_title (vwin);
+  XUnlockDisplay (vwin->gui->video_display);
 }
 
 void video_window_toggle_border (xui_vwin_t *vwin) {
