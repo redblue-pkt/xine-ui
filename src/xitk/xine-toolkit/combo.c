@@ -524,7 +524,7 @@ xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w) {
  */
 static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 					 xitk_skin_config_t *skonfig,
-					 xitk_combo_widget_t *c, char *skin_element_name,
+                                         xitk_combo_widget_t *c, const char *skin_element_name,
 					 xitk_widget_t *mywidget, 
 					 combo_private_data_t *private_data,
 					 int visible, int enable) {
@@ -600,8 +600,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 		     (xitk_window_get_window(private_data->xwin)), &xclasshint)) != BadWindow) {
     XFree(xclasshint.res_name);
     XFree(xclasshint.res_class);
-    xclasshint.res_name  = "Xitk Combo";
-    xclasshint.res_class = "Xitk";
+    xclasshint.res_name  = (char *)"Xitk Combo";
+    xclasshint.res_class = (char *)"Xitk";
     XSetClassHint(c->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)), &xclasshint);
   }
 
