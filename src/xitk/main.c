@@ -2158,7 +2158,8 @@ int main(int argc, char *argv[]) {
     if(xine_config_lookup_entry (gui->xine, "media.files.origin_path", &cfg_entry))
       strlcpy(gui->curdir, cfg_entry.str_value, sizeof(gui->curdir));
     else
-      getcwd(&(gui->curdir[0]), XITK_PATH_MAX);
+      if (!getcwd(&(gui->curdir[0]), XITK_PATH_MAX))
+        gui->curdir[0] = 0;
   }
 
   /*

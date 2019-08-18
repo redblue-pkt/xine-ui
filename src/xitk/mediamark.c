@@ -2940,7 +2940,7 @@ void mediamark_save_mediamarks(const char *filename) {
     const char *store_item;
     char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX];
 
-    if (getcwd(current_dir, sizeof(current_dir)) > 0) {
+    if (getcwd(current_dir, sizeof(current_dir))) {
       if (current_dir[strlen(current_dir) - 1] != '/')
         strlcat(current_dir, "/", sizeof(current_dir));
     } else
