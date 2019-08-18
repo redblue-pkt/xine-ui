@@ -25,7 +25,15 @@
 /* 
  * Default key mapping table.
  */
-static const kbinding_entry_t default_binding_table[] = {
+static const struct {
+  const char       *comment;     /* Comment automatically added in xbinding_display*() outputs */
+  const char       *action;      /* Human readable action, used in config file too */
+  action_id_t       action_id;   /* The numerical action, handled in a case statement */
+  const char        key[9];      /* key binding */
+  uint8_t           modifier;    /* Modifier key of binding (can be OR'ed) */
+  uint8_t           is_alias : 1;/* is made from an alias entry ? */
+  uint8_t           is_gui : 1;
+}  default_binding_table[] = {
   { "start playback",
     "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   , 0 , 0},
   { "playback pause toggle",
@@ -410,11 +418,11 @@ static const kbinding_entry_t default_binding_table[] = {
 #endif
 #endif
   { 0,
-    0,                        0                              , 0,          0              , 0 , 0}
+    0,                        0                              , "",         0              , 0 , 0}
 };
 
 
-static int _kbinding_get_is_gui_from_default(char *action) {
+static int _kbinding_get_is_gui_from_default(const char *action) {
   int i;
   
   for(i = 0; default_binding_table[i].action != NULL; i++) {
