@@ -1135,7 +1135,7 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
 static void show_version(void) {
   printf("This is %s - xine's remote control v%s.\n"
-	 "(c) 2000-2003 The xine Team.\n", PROGNAME, PROGVERSION);
+	 "(c) 2000-2019 The xine Team.\n", PROGNAME, PROGVERSION);
 }
 
 static void show_usage(void) {
