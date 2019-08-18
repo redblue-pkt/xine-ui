@@ -443,7 +443,7 @@ void change_class_name(Window window);
     if((XGetClassHint(gGui->display, (window), &xclasshint)) != 0) {      \
       XClassHint   nxclasshint;                                           \
       nxclasshint.res_name = xclasshint.res_name;                         \
-      nxclasshint.res_class = "xine";                                     \
+      nxclasshint.res_class = (char*)"xine";                              \
       XSetClassHint(gGui->display, window, &nxclasshint);                 \
       XFree(xclasshint.res_name);                                         \
       XFree(xclasshint.res_class);                                        \

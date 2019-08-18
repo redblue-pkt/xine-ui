@@ -237,7 +237,7 @@ void xitk_window_center_window(ImlibData *im, xitk_window_t *w) {
  */
 xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height) {
   xitk_window_t         *xwin;
-  char                   title[] = {"xiTK Window"};
+  const char             title[] = {"xiTK Window"};
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
@@ -313,8 +313,8 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XSetWMProtocols(im->x.disp, xwin->window, &XA_DELETE_WINDOW, 1);
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = "Xine Window";
-    xclasshint->res_class = "Xitk";
+    xclasshint->res_name = (char *)"Xine Window";
+    xclasshint->res_class = (char *)"Xitk";
     XSetClassHint(im->x.disp, xwin->window, xclasshint);
     XFree(xclasshint);
   }
