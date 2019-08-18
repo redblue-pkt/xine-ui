@@ -9,6 +9,7 @@ xine-ui (0.99.11)
   * Fix linking with caca.
   * Fix memory and resource leaks.
   * Fix crashes.
+  * Fix lirc build.
   * Code cleanup and "dust removal".
 
 xine-ui (0.99.10)
