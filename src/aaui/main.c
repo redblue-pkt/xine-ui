@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -249,11 +249,11 @@ static void config_update_string(char *key, char *string) {
 static void show_version(void) {
 #ifdef AA
   printf("This is xine (aalib ui) - a free video player v%s\n"
-	 "(c) 2000-2004 by G. Bartsch and the xine project team.\n", VERSION);
+	 "(c) 2000-2019 by G. Bartsch and the xine project team.\n", VERSION);
 #endif
 #ifdef CACA
   printf("This is xine (caca ui) - a free video player v%s\n"
-	 "(c) 2000-2004 The xine Team.\n", VERSION);
+	 "(c) 2000-2019 The xine Team.\n", VERSION);
 #endif
 }
 
