@@ -241,3 +241,21 @@ AC_DEFUN([XINE_LIB_SOCKET_CLOEXEC],
     LIBS="$tmp_LIBS"
     ])
 
+dnl Test for xine_list_next_value function
+AC_DEFUN([XINE_LIB_LIST_NEXT_VALUE],
+    [AC_MSG_CHECKING([for xine_list_next_value within xine-lib])
+    tmp_CFLAGS="$CFLAGS"
+    tmp_LIBS="$LIBS"
+     CFLAGS="$CFLAGS $XINE_CFLAGS"
+     LIBS="$LIBS $XINE_LIBS"
+     AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM([
+         ],[
+xine_list_next_value ();
+         ])],
+         [AC_DEFINE([HAVE_XINE_LIST_NEXT_VALUE], [1], [Define if xine-lib supports xine_list_next_value])
+          AC_MSG_RESULT([yes])],
+         [AC_MSG_RESULT([no])])
+    CFLAGS="$tmp_CFLAGS"
+    LIBS="$tmp_LIBS"
+   ])
