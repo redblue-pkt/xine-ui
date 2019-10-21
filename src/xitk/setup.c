@@ -31,6 +31,17 @@
 #include "common.h"
 
 #include <xine/list.h>
+#ifdef HAVE_XINE_LIST_NEXT_VALUE
+#  define _xine_list_next_value(_xlnv_list,_xlnv_ite) xine_list_next_value (_xlnv_list, _xlnv_ite)
+#else
+static inline void *_xine_list_next_value (xine_list_t *list, xine_list_iterator_t *ite) {
+  if (*ite)
+    *ite = xine_list_next (list, *ite);
+  else
+    *ite = xine_list_front (list);
+  return *ite ? xine_list_get_value (list, *ite) : NULL;
+}
+#endif
 
 
 #define WINDOW_WIDTH             630
@@ -809,7 +820,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
     xitk_widget_t *sw;
     xine_list_iterator_t ite = NULL;
     while (1) {
-      sw = xine_list_next_value (setup->widgets, &ite);
+      sw = _xine_list_next_value (setup->widgets, &ite);
       if (!ite)
         break;
       xitk_destroy_widget (sw);
