@@ -535,9 +535,9 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
     if(private_data->visible) {
       private_data->visible = 0;
       xitk_hide_widgets(private_data->widget_list);
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
   }
 }
@@ -554,10 +554,10 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
     
     private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XRaiseWindow(private_data->imlibdata->x.disp, private_data->window); 
     XMapWindow(private_data->imlibdata->x.disp, private_data->window); 
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
 }
 
@@ -572,11 +572,11 @@ void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XSetTransientForHint (private_data->imlibdata->x.disp,
 			    private_data->window, 
 			    window);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
   }
 }
@@ -596,24 +596,24 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
     
     xitk_unregister_event_handler(&private_data->widget_key);
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
     xitk_destroy_widgets(private_data->widget_list);
     xitk_button_list_delete (private_data->autodir_buttons);
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XDestroyWindow(private_data->imlibdata->x.disp, private_data->window);
     Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
     private_data->window = None;
     /* xitk_dlist_init (&private_data->widget_list->list); */
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
     XITK_WIDGET_LIST_FREE(private_data->widget_list);
     
@@ -676,27 +676,27 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     xitk_skin_lock(skonfig);
     xitk_hide_widgets(private_data->widget_list);
 
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     
     if(!(new_img = Imlib_load_image(private_data->imlibdata,
 				    xitk_skin_get_skin_filename(skonfig, 
 							private_data->skin_element_name)))) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
 
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
 
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
 
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     while(!xitk_is_window_size(private_data->imlibdata->x.disp, private_data->window, 
 			       new_img->rgb_width, new_img->rgb_height)) {
@@ -706,10 +706,10 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     old_img = private_data->bg_image;
     private_data->bg_image = new_img;
 
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     Imlib_destroy_image(private_data->imlibdata, old_img);
     Imlib_apply_image(private_data->imlibdata, new_img, private_data->window);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     xitk_skin_unlock(skonfig);
     
@@ -838,9 +838,9 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   XEvent                     xev;
   int                        modifier;
   
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   XPeekEvent(private_data->imlibdata->x.disp, &xev);
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   
   xitk_get_key_modifier(&xev, &modifier);
   
@@ -875,9 +875,9 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case MappingNotify:
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     break;
     
   case KeyPress: {
@@ -980,16 +980,16 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   private_data->xine              = mb->xine;
   private_data->running           = 1;
 
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
 
   if(!(private_data->bg_image = Imlib_load_image(mb->imlibdata, 
 						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     
-    XUNLOCK(mb->imlibdata->x.disp);
+    XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
     return NULL;
   }
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   private_data->mc              = (mrl_contents_t *) xitk_xmalloc(sizeof(mrl_contents_t));
   private_data->mrls_num        = 0;
@@ -1001,12 +1001,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   hint.height = private_data->bg_image->rgb_height;
   hint.flags  = PPosition | PSize;
 
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
 
   XAllocNamedColor(mb->imlibdata->x.disp, 
 		   Imlib_get_colormap(mb->imlibdata),
 		   "black", &black, &dummy);
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   attr.override_redirect = False;
   attr.background_pixel  = black.pixel;
@@ -1021,7 +1021,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   attr.border_pixel      = 1;
   attr.colormap		 = Imlib_get_colormap(mb->imlibdata);
 
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   private_data->window   = XCreateWindow (mb->imlibdata->x.disp,
 					  mb->imlibdata->x.root, 
 					  hint.x, hint.y, hint.width, hint.height, 0, 
@@ -1034,7 +1034,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
                      NULL, 0, &hint, NULL, NULL);
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   if(mb->set_wm_window_normal)
     xitk_set_wm_window_type(private_data->window, WINDOW_TYPE_NORMAL);
@@ -1046,7 +1046,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
    * WIN_LAYER_ABOVE_DOCK  = 10
    *
    */
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   if(mb->layer_above) {
     if((XA_WIN_LAYER = XInternAtom(mb->imlibdata->x.disp, "_WIN_LAYER", False)) != None) {
     
@@ -1061,13 +1061,13 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
    * wm, no border please
    */
   prop                 = XInternAtom(mb->imlibdata->x.disp, "_MOTIF_WM_HINTS", True);
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   memset(&mwmhints, 0, sizeof(mwmhints));
   mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   XChangeProperty(mb->imlibdata->x.disp, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
@@ -1083,9 +1083,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     XSetClassHint(mb->imlibdata->x.disp, private_data->window, xclasshint);
     XFree(xclasshint);
   }
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
   
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input         = True;
@@ -1098,15 +1098,15 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     XSetWMHints(mb->imlibdata->x.disp, private_data->window, wm_hint);
     XFree(wm_hint);
   }
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
   
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   gc = XCreateGC(mb->imlibdata->x.disp, private_data->window, 0, 0);
   
   Imlib_apply_image(mb->imlibdata, 
 		    private_data->bg_image, private_data->window);
 
-  XUNLOCK (mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   private_data->widget_list                = xitk_widget_list_new() ;
   xitk_dlist_init (&private_data->widget_list->list);
@@ -1244,10 +1244,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 			   (const char* const*)private_data->mc->mrls_disp, NULL,
 			   private_data->mrls_num, 0);
 
-  XLOCK (mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   XRaiseWindow(mb->imlibdata->x.disp, private_data->window); 
   XMapWindow(mb->imlibdata->x.disp, private_data->window); 
-  XUNLOCK (mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   private_data->widget_key = 
     xitk_register_event_handler("mrl browser",
@@ -1262,9 +1262,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   
   xitk_mrlbrowser_change_skins(mywidget, skonfig);
   
-  XLOCK(mb->imlibdata->x.disp);
+  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   XSetInputFocus(mb->imlibdata->x.disp, private_data->window, RevertToParent, CurrentTime);
-  XUNLOCK(mb->imlibdata->x.disp);
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   default_source = xitk_button_list_find (private_data->autodir_buttons, "file");
   if( default_source && !private_data->last_mrl_source ) {

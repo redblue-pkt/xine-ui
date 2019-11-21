@@ -177,6 +177,12 @@ static inline void xitk_dlist_add_head (xitk_dlist_t *list, xitk_dnode_t *node) 
 
 #endif
 
+typedef struct {
+  Display  *display;
+  void    (*x_lock_display) (Display *display);
+  void    (*x_unlock_display) (Display *display);
+} xitk_t;
+
 typedef struct xitk_widget_s xitk_widget_t;
 typedef struct xitk_menu_entry_s xitk_menu_entry_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
@@ -859,7 +865,8 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
 /*
  * Initialization function, should be the first call to widget lib.
  */
-void xitk_init(Display *display, XColor black, int verbosity);
+void xitk_init(Display *display, XColor black, void (*x_lock_display) (Display *display),
+  void (*x_unlock_display) (Display *display), int verbosity);
 
 /*
  *

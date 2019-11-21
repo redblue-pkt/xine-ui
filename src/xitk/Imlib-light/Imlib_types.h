@@ -80,6 +80,8 @@ struct _ImlibImage
 struct _xdata
   {
     Display            *disp;
+    void              (*x_lock_display) (Display *display);
+    void              (*x_unlock_display) (Display *display);
     int                 screen;
     Window              root;
     Visual             *visual;

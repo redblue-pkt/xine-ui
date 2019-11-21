@@ -202,8 +202,12 @@ struct gGui_st {
 
   int                       broadcast_port;
 
-  pthread_mutex_t           xe_mutex;
-  int                       new_pos;
+  /* Seek through xine_play () may be slow. We defer it to a separate thread. */
+  pthread_mutex_t           seek_mutex;
+  /* 0 = no, 1 = yes, 2 = shutdown */
+  int                       seek_running;
+  int                       seek_pos;
+  int                       seek_timestep;
 
   xine_event_queue_t       *event_queue;
 
@@ -252,6 +256,8 @@ struct gGui_st {
   char                     *autoscan_plugin;
 
   /* basic X11 stuff */
+  void                    (*x_lock_display) (Display *display);
+  void                    (*x_unlock_display) (Display *display);
   Display                  *display;
   int                       screen;
   int		            depth;
@@ -443,7 +449,7 @@ void change_class_name(Window window);
     if((XGetClassHint(gGui->display, (window), &xclasshint)) != 0) {      \
       XClassHint   nxclasshint;                                           \
       nxclasshint.res_name = xclasshint.res_name;                         \
-      nxclasshint.res_class = (char*)"xine";                              \
+      nxclasshint.res_class = "xine";                                     \
       XSetClassHint(gGui->display, window, &nxclasshint);                 \
       XFree(xclasshint.res_name);                                         \
       XFree(xclasshint.res_class);                                        \

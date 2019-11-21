@@ -307,14 +307,14 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   XITK_WIDGET_INIT (&lb, vctrl->gui->imlib_data);
   XITK_WIDGET_INIT (&cmb, vctrl->gui->imlib_data);
 
-  XLockDisplay (vctrl->gui->display);
+  vctrl->gui->x_lock_display (vctrl->gui->display);
   vctrl->bg_image = Imlib_load_image (vctrl->gui->imlib_data,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
   if (!vctrl->bg_image) {
     xine_error(_("control: couldn't find image for background\n"));
     exit(-1);
   }
-  XUnlockDisplay (vctrl->gui->display);
+  vctrl->gui->x_unlock_display (vctrl->gui->display);
 
   hint.x = xine_config_register_num (vctrl->gui->xine, "gui.control_x",
     200, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
@@ -336,7 +336,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
    */
   attr.border_pixel      = 1;
 
-  XLockDisplay (vctrl->gui->display);
+  vctrl->gui->x_lock_display (vctrl->gui->display);
   attr.colormap = Imlib_get_colormap (vctrl->gui->imlib_data);
   vctrl->window = XCreateWindow (vctrl->gui->display, vctrl->gui->imlib_data->x.root,
     hint.x, hint.y, hint.width, hint.height, 0,
@@ -344,7 +344,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
   XmbSetWMProperties (vctrl->gui->display, vctrl->window, _(title), _(title), NULL, 0, &hint, NULL, NULL);
   XSelectInput (vctrl->gui->display, vctrl->window, INPUT_MOTION | KeymapStateMask);
-  XUnlockDisplay (vctrl->gui->display);
+  vctrl->gui->x_unlock_display (vctrl->gui->display);
 
   if (!video_window_is_visible (vctrl->gui->vwin))
     xitk_set_wm_window_type (vctrl->window, WINDOW_TYPE_NORMAL);
@@ -359,7 +359,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     MWMHints mwmhints;
 
     memset (&mwmhints, 0, sizeof (mwmhints));
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     prop = XInternAtom (vctrl->gui->display, "_MOTIF_WM_HINTS", True);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
@@ -394,7 +394,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   
   gc = XCreateGC (vctrl->gui->display, vctrl->window, 0, 0);
   Imlib_apply_image (vctrl->gui->imlib_data, vctrl->bg_image, vctrl->window);
-  XUnlockDisplay (vctrl->gui->display);
+  vctrl->gui->x_unlock_display (vctrl->gui->display);
 
   /*
    * Widget-list
@@ -524,23 +524,23 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
 
     xitk_unregister_event_handler (&vctrl->widget_key);
 
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     XUnmapWindow (vctrl->gui->display, vctrl->window);
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     xitk_destroy_widgets (vctrl->widget_list);
 
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     XDestroyWindow (vctrl->gui->display, vctrl->window);
     Imlib_destroy_image (vctrl->gui->imlib_data, vctrl->bg_image);
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     vctrl->window = None;
     /* xitk_dlist_init (&control->widget_list->list); */
 
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     XFreeGC (vctrl->gui->display, (XITK_WIDGET_LIST_GC (vctrl->widget_list)));
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     XITK_WIDGET_LIST_FREE (vctrl->widget_list);
 
@@ -727,24 +727,24 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
 
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     
     if (!(new_img = Imlib_load_image (vctrl->gui->imlib_data,
       xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
       xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
 
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     XSetWMNormalHints (vctrl->gui->display, vctrl->window, &hint);
     XResizeWindow (vctrl->gui->display, vctrl->window,
       (unsigned int)new_img->rgb_width, (unsigned int)new_img->rgb_height);
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
     
     while (!xitk_is_window_size (vctrl->gui->display, vctrl->window,
       new_img->rgb_width, new_img->rgb_height)) {
@@ -754,12 +754,12 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     old_img = vctrl->bg_image;
     vctrl->bg_image = new_img;
     
-    XLockDisplay (vctrl->gui->display);
+    vctrl->gui->x_lock_display (vctrl->gui->display);
     if (!vctrl->gui->use_root_window && vctrl->gui->video_display == vctrl->gui->display)
       XSetTransientForHint (vctrl->gui->display, vctrl->window, vctrl->gui->video_window);
     Imlib_destroy_image (vctrl->gui->imlib_data, old_img);
     Imlib_apply_image (vctrl->gui->imlib_data, new_img, vctrl->window);
-    XUnlockDisplay (vctrl->gui->display);
+    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     control_raise_window (vctrl);
 

@@ -55,10 +55,10 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
 
   menu_attr.override_redirect = True;
 
-  XLOCK(im->x.disp);
+  XLOCK (im->x.x_lock_display, im->x.disp);
   XChangeWindowAttributes(im->x.disp, menu_window->wl.win, CWOverrideRedirect, &menu_attr);
   menu_window->wl.gc   = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
-  XUNLOCK(im->x.disp);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   return menu_window;
 }
@@ -394,9 +394,9 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
   (*mw)->xwin = NULL;
   /* xitk_dlist_init (&(*mw)->wl.list); */
 
-  XLOCK((*mw)->display);
+  XLOCK ((*mw)->im->x.x_lock_display, (*mw)->display);
   XFreeGC((*mw)->display, (*mw)->wl.gc);
-  XUNLOCK((*mw)->display);
+  XUNLOCK ((*mw)->im->x.x_unlock_display, (*mw)->display);
 
   /* deferred free as widget list */
   xitk_dnode_remove (&(*mw)->wl.node);
@@ -424,18 +424,18 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
     do {
       int revert;
 
-      XLOCK(menu_window->display);
+      XLOCK (menu_window->im->x.x_lock_display, menu_window->display);
       XSetInputFocus(menu_window->display, (xitk_window_get_window(menu_window->xwin)),
 		     RevertToParent, CurrentTime);
       XSync(menu_window->display, False);
-      XUNLOCK(menu_window->display);
+      XUNLOCK (menu_window->im->x.x_unlock_display, menu_window->display);
 
       /* Retry 5/15/30/50/75/105/140ms until the WM was mercyful to give us the focus */
       xitk_usec_sleep (t);
       t += 5000;
-      XLOCK(menu_window->display);
+      XLOCK (menu_window->im->x.x_lock_display, menu_window->display);
       XGetInputFocus(menu_window->display, &focused_win, &revert);
-      XUNLOCK(menu_window->display);
+      XUNLOCK (menu_window->im->x.x_unlock_display, menu_window->display);
 
     } while ((focused_win != xitk_window_get_window (menu_window->xwin)) && (t <= 140000));
   }
@@ -454,14 +454,14 @@ static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *men
 static void _menu_hide_menu(menu_private_data_t *private_data) {
   menu_window_t *mw;
   
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   mw = (menu_window_t *)private_data->menu_windows.tail.prev;
   while (mw->wl.node.prev) {
     XUnmapWindow(private_data->imlibdata->x.disp, xitk_window_get_window(mw->xwin));
     XSync(private_data->imlibdata->x.disp, False);
     mw = (menu_window_t *)mw->wl.node.prev;
   }
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 }
 
 static void _menu_destroy_ntree(menu_node_t **mn) {
@@ -545,13 +545,13 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
 	_menu_create_menu_from_branch(me->branch, me->widget, x, y);
       }
       else {
-	XLOCK(me->branch->menu_window->display);
+        XLOCK (me->branch->menu_window->im->x.x_lock_display, private_data->imlibdata->x.disp);
 	XRaiseWindow(me->branch->menu_window->display, 
 		     xitk_window_get_window(me->branch->menu_window->xwin));
 	XSetInputFocus(me->branch->menu_window->display, 
 		       (xitk_window_get_window(me->branch->menu_window->xwin)),
 		       RevertToParent, CurrentTime);
-	XUNLOCK(me->branch->menu_window->display);
+        XUNLOCK (me->branch->menu_window->im->x.x_unlock_display, private_data->imlibdata->x.disp);
       }
     }
     else {
@@ -790,12 +790,12 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   shortcutpos = (wwidth - shortcutlen) - 15;
   
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   swidth = DisplayWidth(private_data->imlibdata->x.disp, 
 			(DefaultScreen(private_data->imlibdata->x.disp)));
   sheight = DisplayHeight(private_data->imlibdata->x.disp, 
 			  (DefaultScreen(private_data->imlibdata->x.disp)));
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   
   if(branch != private_data->mtree->first) {
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
@@ -837,10 +837,10 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     
     xitk_window_get_window_size(xwin, &width, &height);
     bg = xitk_image_create_xitk_pixmap(private_data->imlibdata, width, height);
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XCopyArea(private_data->imlibdata->x.disp, (xitk_window_get_background(xwin)), bg->pixmap,
     	      bg->gc, 0, 0, width, height, 0, 0);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
 
   menu_window         = _menu_new_menu_window(private_data->imlibdata, xwin);
@@ -906,17 +906,17 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 	xcolorb.red = xcolorb.blue = xcolorb.green = 140<<8;
 	xcolorf.red = xcolorf.blue = xcolorf.green = 255<<8;
 
-	XLOCK(private_data->imlibdata->x.disp);
+        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XAllocColor(private_data->imlibdata->x.disp,
 		    Imlib_get_colormap(private_data->imlibdata), &xcolorb);
 	XAllocColor(private_data->imlibdata->x.disp,
 		    Imlib_get_colormap(private_data->imlibdata), &xcolorf);
-	XUNLOCK(private_data->imlibdata->x.disp);
+        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
 	cfg = xcolorf.pixel;
 	cbg = xcolorb.pixel;
 
-	XLOCK(private_data->imlibdata->x.disp);
+        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cbg);
 	XFillRectangle(private_data->imlibdata->x.disp, bg->pixmap, private_data->widget->wl->gc, 
 		       1, 1, wwidth , 20);
@@ -925,7 +925,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 			      private_data->widget->wl->gc, 
 			      5, 1+ ((20+asc+des)>>1)-des, 
 			      me->menu_entry->menu, strlen(me->menu_entry->menu));
-	XUNLOCK(private_data->imlibdata->x.disp);
+        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 	
 	xitk_font_unload_font(fs);
 
@@ -984,7 +984,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   xitk_set_layer_above((xitk_window_get_window(xwin)));
   
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
   if(branch == private_data->mtree->first)
@@ -993,7 +993,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   else
     XSetTransientForHint(private_data->imlibdata->x.disp,
 			 (xitk_window_get_window(xwin)), (xitk_window_get_window(branch->prev->menu_window->xwin)));
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
   menu_window->key = xitk_register_event_handler("xitk menu",
 						 (xitk_window_get_window(menu_window->xwin)), 
@@ -1003,10 +1003,10 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 						 &(menu_window->wl),
 						 (void *) menu_window);
 
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin)));
   XSync(private_data->imlibdata->x.disp, False);
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
   {
     int t = 5000;
@@ -1028,10 +1028,10 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
     xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_DOCK);
   
-  XLOCK(private_data->imlibdata->x.disp);
+  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   XSetInputFocus(private_data->imlibdata->x.disp, 
 		 (xitk_window_get_window(xwin)), RevertToParent, CurrentTime);
-  XUNLOCK(private_data->imlibdata->x.disp);
+  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
   btn = (xitk_widget_t *)menu_window->wl.list.head.next;
   if (btn) {

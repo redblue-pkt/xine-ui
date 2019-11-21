@@ -460,9 +460,9 @@ static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
 
     switch (mkey) {
       default:
-        XLockDisplay (event->xany.display);
+        gGui->x_lock_display (event->xany.display);
         keySym = XKeysymToString(mkey);
-        XUnlockDisplay (event->xany.display);
+        gGui->x_unlock_display (event->xany.display);
         if (keySym != NULL) {
           strlcpy(buf, keySym, size);
           return 0;
@@ -701,9 +701,9 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     kbedit->xwin = NULL;
     /* xitk_dlist_init (&kbedit->widget_list->list); */
     
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     
     XITK_WIDGET_LIST_FREE(kbedit->widget_list);
     
@@ -953,9 +953,9 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   kbe->is_gui    = kbedit->ksel->is_gui;
   
   xitk_labelbutton_change_label(kbedit->grab, _("Press Keyboard Keys..."));
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   XSync(gui->display, False);
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
 
   {
     int x, y, w, h;
@@ -970,19 +970,19 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     set_window_states_start((xitk_window_get_window(xwin)));
   }
   
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   XRaiseWindow(gui->display, (xitk_window_get_window(xwin)));
   XMapWindow(gui->display, (xitk_window_get_window(xwin)));
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
 
   try_to_set_input_focus(xitk_window_get_window(xwin));
 
   do {
     /* Although only release events are evaluated, we must also grab the corresponding press */
     /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XMaskEvent(gui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
   } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
 	   xev.xany.window != xitk_window_get_window(xwin));
   
@@ -1003,9 +1003,9 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
   xitk_window_destroy_window(gui->imlib_data, xwin);
   
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   XSync(gui->display, False);
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
 
   kbedit->grabbing = 0;
   
@@ -1132,10 +1132,10 @@ void kbedit_window(void) {
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   set_window_states_start((xitk_window_get_window(kbedit->xwin)));
 
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(kbedit->xwin)), None, None);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
 
   kbedit->widget_list      = xitk_widget_list_new();
 
@@ -1145,10 +1145,10 @@ void kbedit_window(void) {
   
   bg = xitk_image_create_xitk_pixmap(gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   XCopyArea(gui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   x = 15;
   y = 34;

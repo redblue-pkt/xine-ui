@@ -117,9 +117,9 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
       }
       
       if(panel_is_visible(gGui->panel)) {
-	XLockDisplay(gGui->display);
+	gGui->x_lock_display (gGui->display);
         panel_paint(gGui->panel);
-	XUnlockDisplay(gGui->display);
+	gGui->x_unlock_display (gGui->display);
       }
       
       free(code);

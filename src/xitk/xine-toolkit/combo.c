@@ -72,9 +72,9 @@ static void notify_destroy(xitk_widget_t *w) {
     xitk_unregister_event_handler(&private_data->widget_key);
     xitk_window_destroy_window(private_data->imlibdata, private_data->xwin);
 
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     xitk_widget_list_defferred_destroy (private_data->widget_list);
 
@@ -143,9 +143,9 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
     
     xitk_label_change_label(private_data->label_widget, private_data->entries[selected]);
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
     private_data->visible = 0;
     
@@ -271,9 +271,9 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state) {
     else {
       private_data->visible = 0;
 
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
   }      
 }
@@ -301,9 +301,9 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
     else {
       private_data->visible = 0;
       
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
     
   }      
@@ -426,7 +426,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       hint.y = private_data->win_y;
       hint.flags = PPosition;
 
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XSetWMNormalHints (private_data->imlibdata->x.disp,
 			 xitk_window_get_window(private_data->xwin),
 			 &hint);
@@ -435,16 +435,16 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
 		  private_data->win_x, private_data->win_y);
       XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
       XSync(private_data->imlibdata->x.disp, False);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
       while(!xitk_is_window_visible(private_data->imlibdata->x.disp,
 				    (xitk_window_get_window(private_data->xwin))))
 	xitk_usec_sleep(5000);
       
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XSetInputFocus(private_data->imlibdata->x.disp, 
 		     (xitk_window_get_window(private_data->xwin)), RevertToParent, CurrentTime);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
       
       /* No widget focused, give focus to the first one */
       if(private_data->widget_list->widget_focused == NULL)
@@ -570,16 +570,16 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   
   private_data->xwin = xitk_window_create_simple_window(c->imlibdata, 0, 0,
 							(itemw + 2), (itemh * 5) + slidw + 2);
-  XLOCK(c->imlibdata->x.disp);
+  XLOCK (c->imlibdata->x.x_lock_display, c->imlibdata->x.disp);
 
   {
     XSetWindowAttributes attr;
     attr.override_redirect = True;
-    XLOCK (c->imlibdata->x.disp);
+    XLOCK (c->imlibdata->x.x_lock_display, c->imlibdata->x.disp);
     XChangeWindowAttributes (c->imlibdata->x.disp,
 			     (xitk_window_get_window(private_data->xwin)),
 			     CWOverrideRedirect, &attr);
-    XUNLOCK (c->imlibdata->x.disp);
+    XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
   }
 
   if(c->layer_above) {
@@ -608,7 +608,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   private_data->gc = XCreateGC(c->imlibdata->x.disp, 
 			       (xitk_window_get_window(private_data->xwin)), None, None);
 
-  XUNLOCK(c->imlibdata->x.disp);
+  XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
 
   private_data->widget_list                = xitk_widget_list_new() ;
   xitk_dlist_init (&private_data->widget_list->list);

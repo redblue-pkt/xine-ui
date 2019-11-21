@@ -54,6 +54,9 @@
 #include "libcommon.h"
 #include "xitk.h"
 
+extern void (*xitk_x_lock_display) (Display *display);
+extern void (*xitk_x_unlock_display) (Display *display);
+
 typedef struct {
   xitk_widget_t    *itemlist;
   int               sel;

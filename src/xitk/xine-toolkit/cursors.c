@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2004-2011 the xine project
+ * Copyright (C) 2004-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -683,7 +683,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
   fg.green = 0;
   fg.blue  = 0;
   
-  XLOCK(display);
+  XLOCK (xitk_x_lock_display, display);
   switch(cursor->xitk_shape) {
 
   case xitk_cursor_invisible:
@@ -862,7 +862,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
     cursors->cursor = XCreateFontCursor(display, cursor->x_shape);
     break;
   }
-  XUNLOCK(display);
+  XUNLOCK (xitk_x_unlock_display, display);
 }
 
 void xitk_cursors_init(Display *display) {
@@ -876,17 +876,17 @@ void xitk_cursors_init(Display *display) {
     
     if(xitk_cursors) {
       if(cursors[i].embedded == X_CURSOR) {
-	XLOCK(display);
+        XLOCK (xitk_x_lock_display, display);
 	cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
-	XUNLOCK(display);
+        XUNLOCK (xitk_x_unlock_display, display);
       }
       else
 	_cursors_create_cursor(display, &cursors[i]);
     }
     else {
-      XLOCK(display);
+      XLOCK (xitk_x_lock_display, display);
       cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
-      XUNLOCK(display);
+      XUNLOCK (xitk_x_unlock_display, display);
     }
   }
 }
@@ -894,7 +894,7 @@ void xitk_cursors_init(Display *display) {
 void xitk_cursors_deinit(Display *display) {
   int i;
   
-  XLOCK(display);
+  XLOCK (xitk_x_lock_display, display);
   for(i = 0; i < MAX_CURSORS; i++) {
     XFreeCursor(display, cursors[i].cursor);
     
@@ -906,24 +906,24 @@ void xitk_cursors_deinit(Display *display) {
     }
 
   }
-  XUNLOCK(display);
+  XUNLOCK (xitk_x_unlock_display, display);
 }
 
 /* Public */
 void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor) {
   if(window != None) {
-    XLOCK(display);
+    XLOCK (xitk_x_lock_display, display);
     XDefineCursor(display, window, cursors[cursor].cursor);
     XSync(display, False);
-    XUNLOCK(display);
+    XUNLOCK (xitk_x_unlock_display, display);
   }
 }
 
 void xitk_cursors_restore_window_cursor(Display *display, Window window) {
   if(window != None) {
-    XLOCK(display);
+    XLOCK (xitk_x_lock_display, display);
     XUndefineCursor(display, window);
     XSync(display, False);
-    XUNLOCK(display);
+    XUNLOCK (xitk_x_unlock_display, display);
   }
 }

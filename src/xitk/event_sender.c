@@ -175,9 +175,9 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 
       mykeyevent = event->xkey;
       
-      XLockDisplay(gGui->display);
+      gGui->x_lock_display (gGui->display);
       XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &key, NULL);
-      XUnlockDisplay(gGui->display);
+      gGui->x_unlock_display (gGui->display);
 
       switch(key) {
       case XK_Up:
@@ -311,9 +311,9 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     eventer->xwin = NULL;
     /* xitk_dlist_init (&eventer->widget_list->list); */
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     XITK_WIDGET_LIST_FREE(eventer->widget_list);
     
@@ -412,11 +412,11 @@ void event_sender_panel(void) {
 
   set_window_states_start((xitk_window_get_window(eventer->xwin)));
 
-  XLockDisplay (gGui->display);
+  gGui->x_lock_display (gGui->display);
   XStoreName(gGui->display, (xitk_window_get_window(eventer->xwin)), _("xine Event Sender"));
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(eventer->xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   eventer->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(eventer->widget_list, 

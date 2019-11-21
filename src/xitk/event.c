@@ -910,18 +910,18 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_GRAB_POINTER:
     if(!gui->cursor_grabbed) {
       if (!panel_is_visible (gui->panel)) {
-	XLockDisplay(gui->video_display);
+	gui->x_lock_display (gui->video_display);
 	XGrabPointer(gui->video_display, gui->video_window, 1, None, 
 		     GrabModeAsync, GrabModeAsync, gui->video_window, None, CurrentTime);
-	XUnlockDisplay(gui->video_display);
+	gui->x_unlock_display (gui->video_display);
       }
       
       gui->cursor_grabbed = 1;
     }
     else {
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XUngrabPointer(gui->display, CurrentTime);
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
       gui->cursor_grabbed = 0;
     }
     break;
@@ -1302,9 +1302,9 @@ void gui_handle_event (XEvent *event, void *data) {
   switch(event->type) {
 
   case MappingNotify:
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     break;
 
   case DestroyNotify:
@@ -1574,6 +1574,11 @@ void gui_deinit(void) {
 /*
  * Initialize the GUI
  */
+
+static void gui_dummy_un_lock_display (Display *display) {
+  (void)display;
+}
+
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   gGui_t *gui = gGui;
   int    i;
@@ -1632,17 +1637,28 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gui->is_display_mrl = 0;
   gui->mrl_overrided  = 0;
-  gui->new_pos        = -1;
+  /* gui->new_pos        = -1; */
 
   /*
    * X / imlib stuff
    */
 
-  if(!XInitThreads()) {
-    printf (_("\nXInitThreads failed - looks like you don't have a "
-	    "thread-safe xlib.\n"));
+  if (xine_config_register_bool (gui->xine, "gui.use_XLockDisplay", 1,
+        _("Enable extra XLib thread safety."),
+        _("This is needed for some very old XLib/XCB versions.\n"
+          "Otherwise, it may boost or brake performance - just try out."),
+        CONFIG_LEVEL_ADV, NULL, NULL)) {
+    gui->x_lock_display = XLockDisplay;
+    gui->x_unlock_display = XUnlockDisplay;
+  } else {
+    gui->x_lock_display =
+    gui->x_unlock_display = gui_dummy_un_lock_display;
+  }
+
+  if (!XInitThreads ()) {
+    printf (_("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n"));
     exit(1);
-  } 
+  }
   
   if((gui->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
@@ -1683,9 +1699,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA)) {
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XSynchronize (gui->display, True);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     fprintf (stderr, _("Warning! Synchronized X activated - this is very slow...\n"));
   }
 
@@ -1888,13 +1904,13 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gui->alphanum.set = 0;
   gui->alphanum.arg = "";
   
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
 
   gui->screen = DefaultScreen(gui->display);
   
-  XLockDisplay (gui->video_display);
+  gui->x_lock_display (gui->video_display);
   gui->video_screen = DefaultScreen(gui->video_display);
-  XUnlockDisplay (gui->video_display);
+  gui->x_unlock_display (gui->video_display);
 
   
 
@@ -1909,14 +1925,14 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gui_init_imlib (gui->visual);
 
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
 
   /*
    * create and map panel and video window
    */
   xine_pid = getppid();
   
-  xitk_init(gui->display, gui->black, (__xineui_global_verbosity) ? 1 : 0);
+  xitk_init (gui->display, gui->black, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
   
   preinit_skins_support();
   
@@ -1974,6 +1990,9 @@ void gui_init_imlib (Visual *vis) {
     fprintf(stderr, _("Unable to initialize Imlib\n"));
     exit(1);
   }
+
+  gui->imlib_data->x.x_lock_display = gui->x_lock_display;
+  gui->imlib_data->x.x_unlock_display = gui->x_unlock_display;
 
   gui->colormap = Imlib_get_colormap (gui->imlib_data);
 

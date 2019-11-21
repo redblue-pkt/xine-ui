@@ -543,9 +543,9 @@ static void _pplugin_paint_widgets(_pp_wrapper_t *pp_wrapper) {
 static void _pplugin_send_expose(_pp_wrapper_t *pp_wrapper) {
   gGui_t *gui = gGui;
   if(pp_wrapper->pplugin) {
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XClearWindow(gui->display, (XITK_WIDGET_LIST_WINDOW(pp_wrapper->pplugin->widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
   }
 }
 
@@ -904,9 +904,9 @@ static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, voi
   pp_wrapper->pplugin->helpwin = NULL;
   /* xitk_dlist_init (&pp_wrapper->pplugin->help_widget_list->list); */
     
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
     
   XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->help_widget_list);
 }
@@ -977,10 +977,10 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
 
-    XLockDisplay (gui->display);
+    gui->x_lock_display (gui->display);
     gc = XCreateGC(gui->display, 
   		 (xitk_window_get_window(pp_wrapper->pplugin->helpwin)), None, None);
-    XUnlockDisplay (gui->display);
+    gui->x_unlock_display (gui->display);
     
     pp_wrapper->pplugin->help_widget_list = xitk_widget_list_new();
     xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, 
@@ -990,10 +990,10 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_window_get_window_size(pp_wrapper->pplugin->helpwin, &width, &height);
     bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
   
-    XLockDisplay (gui->display);
+    gui->x_lock_display (gui->display);
     XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->helpwin)), bg->pixmap,
   	    bg->gc, 0, 0, width, height, 0, 0);
-    XUnlockDisplay (gui->display);
+    gui->x_unlock_display (gui->display);
   
     XITK_WIDGET_INIT(&lb, gui->imlib_data);
     lb.button_type       = CLICK_BUTTON;
@@ -1320,13 +1320,13 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
 
   image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   XSetForeground(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
 		 xitk_get_pixel_color_gray(gui->imlib_data));
   XFillRectangle(gui->display, image->image->pixmap,
 		 (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
 		 0, 0, image->width, image->height);
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
 
   /* Some decorations */
   draw_outter_frame(gui->imlib_data, image->image, NULL, NULL,
@@ -1622,9 +1622,9 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     pp_wrapper->pplugin->xwin = NULL;
     /* xitk_dlist_init (&pp_wrapper->pplugin->widget_list->list); */
     
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     
     XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->widget_list);
    
@@ -1931,10 +1931,10 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   
   set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
 
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(pp_wrapper->pplugin->xwin)), None, None);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   pp_wrapper->pplugin->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(pp_wrapper->pplugin->widget_list, 
@@ -1948,10 +1948,10 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   xitk_window_get_window_size(pp_wrapper->pplugin->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
 
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   XITK_WIDGET_INIT(&sl, gui->imlib_data);
   

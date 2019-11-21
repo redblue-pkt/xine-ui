@@ -182,9 +182,9 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     tvset.xwin = NULL;
     /* xitk_dlist_init (&tvset.widget_list->list); */
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset.widget_list)));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
 
     free(tvset.system_entries);
     free(tvset.chann_entries);
@@ -304,10 +304,10 @@ void tvset_panel(void) {
   
   set_window_states_start((xitk_window_get_window(tvset.xwin)));
 
-  XLockDisplay (gGui->display);
+  gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(tvset.xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
   tvset.widget_list = xitk_widget_list_new();
   xitk_widget_list_set(tvset.widget_list, 
@@ -320,10 +320,10 @@ void tvset_panel(void) {
 
   xitk_window_get_window_size(tvset.xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
-  XLockDisplay (gGui->display);
+  gGui->x_lock_display (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(tvset.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   x = 15;
   y = 34 - 6;
