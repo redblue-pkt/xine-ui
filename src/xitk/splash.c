@@ -62,27 +62,27 @@ void splash_create(void) {
   if((xim = xitk_image_load_image(gGui->imlib_data, splash_image))) {
     int  x, y;
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (xim->width >> 1);
     y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (xim->height >> 1);
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     xwin = xitk_window_create_simple_window(gGui->imlib_data, x, y, xim->width, xim->height);
     xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_SPLASH);
 
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XStoreName(gGui->display, (xitk_window_get_window(xwin)), _("xine Splash"));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
 
     change_class_name((xitk_window_get_window(xwin)));
     change_icon((xitk_window_get_window(xwin)));
     
     xitk_window_change_background_with_image(gGui->imlib_data, xwin, xim, xim->width, xim->height);
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XRaiseWindow(gGui->display, xitk_window_get_window(xwin)); 
     XMapWindow(gGui->display, xitk_window_get_window(xwin));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
 
     xitk_set_layer_above(xitk_window_get_window(xwin));
 
@@ -95,9 +95,9 @@ void splash_create(void) {
 void splash_destroy(void) {
 
   if(xwin) {
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XUnmapWindow(gGui->display, xitk_window_get_window(xwin)); 
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     xitk_window_destroy_window(gGui->imlib_data, xwin);
     xwin = NULL;

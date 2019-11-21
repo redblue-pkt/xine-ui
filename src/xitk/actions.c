@@ -42,8 +42,6 @@
 
 filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
-static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
-
 static int             last_playback_speed = XINE_SPEED_NORMAL;
 
 void reparent_all_windows(void) {
@@ -100,7 +98,7 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
   gGui_t *gui = gGui;
   if(window && (*visible) && running) {
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     if(gui->use_root_window) {
       if(xitk_is_window_visible(gui->display, window))
         XIconifyWindow(gui->display, window, gui->screen);
@@ -112,12 +110,12 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
     }
     else {
       *visible = 0;
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
       xitk_hide_widgets(widget_list);
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XUnmapWindow(gui->display, window);
     }
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 
   }
   else {
@@ -125,10 +123,10 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       *visible = 1;
       xitk_show_widgets(widget_list);
 
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XRaiseWindow(gui->display, window);
       XMapWindow(gui->display, window);
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
       video_window_set_transient_for (gui->vwin, window);
 
       wait_for_window_visible(gui->display, window);
@@ -137,38 +135,62 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
   }
 }
 
-int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
+int gui_xine_get_pos_length (xine_stream_t *stream, int *ppos, int *ptime, int *plength) {
   gGui_t *gui = gGui;
-  int t = 0, ret = 0;
-  int lpos, ltime, llength;
-  
-  if(pthread_mutex_trylock(&gui->xe_mutex))
-    return 0;
-  
-  if(stream && (xine_get_status(stream) == XINE_STATUS_PLAY)) {
-    while(((ret = xine_get_pos_length(stream, &lpos, &ltime, &llength)) == 0) && (++t < 10) && (!gui->on_quit))
-      xine_usec_sleep(100000); /* wait before trying again */
-  }
-  
-  if(ret == 0) {
-    lpos = ltime = llength = 0;
-  }
-  
-  if(pos)
-    *pos    = lpos;
-  if(time)
-    *time   = ltime;
-  if(length)
-    *length = llength;
-  
-  if((ret != 0) && (stream == gui->stream)) {
-    gui->stream_length.pos = lpos;
-    gui->stream_length.time = ltime;
-    gui->stream_length.length = llength;
-  }
 
-  pthread_mutex_unlock(&gui->xe_mutex);
-  return ret;
+  do {
+
+    if (!stream)
+      break;
+
+    if (stream == gui->stream) {
+      pthread_mutex_lock (&gui->seek_mutex);
+      if (gui->seek_running) {
+        /* xine_play (), xine_get_* () etc. all grab stream frontend lock.
+         * Dont wait for seek thread, just use its values. */
+        if (ppos)
+          *ppos = gui->stream_length.pos;
+        if (ptime)
+          *ptime = gui->stream_length.time;
+        if (plength)
+          *plength = gui->stream_length.length;
+        pthread_mutex_unlock (&gui->seek_mutex);
+        return 1;
+      }
+      pthread_mutex_unlock (&gui->seek_mutex);
+    }
+
+    if (xine_get_status (stream) == XINE_STATUS_PLAY) {
+      int lpos = 0, ltime = 0, llength = 0;
+      int ret, t = 0;
+      while (((ret = xine_get_pos_length (stream, &lpos, &ltime, &llength)) == 0) && (++t < 10) && (!gui->on_quit)) {
+        printf ("gui_xine_get_pos_length: wait 100 ms (%d).\n", t);
+        xine_usec_sleep (100000); /* wait before trying again */
+      }
+      if (ret == 0)
+        break;
+      if (stream == gui->stream) {
+        gui->stream_length.pos = lpos;
+        gui->stream_length.time = ltime;
+        gui->stream_length.length = llength;
+      }
+      if (ppos)
+        *ppos = lpos;
+      if (ptime)
+        *ptime = ltime;
+      if (plength)
+        *plength = llength;
+      return ret;
+    }
+  } while (0);
+
+  if (ppos)
+    *ppos = 0;
+  if (ptime)
+    *ptime = 0;
+  if (plength)
+    *plength = 0;
+  return 0;
 }
 
 /*
@@ -186,16 +208,16 @@ void try_to_set_input_focus(Window window) {
     do {
       int revert;
 
-      XLockDisplay (gui->display);
+      gui->x_lock_display (gui->display);
       XSetInputFocus(gui->display, window, RevertToParent, CurrentTime);
       XSync(gui->display, False);
-      XUnlockDisplay (gui->display);
+      gui->x_unlock_display (gui->display);
 
       /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
       xine_usec_sleep(5000);
-      XLockDisplay (gui->display);
+      gui->x_lock_display (gui->display);
       XGetInputFocus(gui->display, &focused_win, &revert);
-      XUnlockDisplay (gui->display);
+      gui->x_unlock_display (gui->display);
 
     } while((focused_win != window) && (retry++ < 30));
   }
@@ -236,8 +258,7 @@ void gui_display_logo(void) {
   pthread_mutex_unlock(&gui->logo_mutex);
 }
 
-static int _gui_xine_play(xine_stream_t *stream, 
-			  int start_pos, int start_time_in_secs, int update_mmk) {
+static int _gui_xine_play (xine_stream_t *stream, int start_pos, int start_ms, int update_mmk) {
   gGui_t *gui = gGui;
   int      ret;
   int      has_video;
@@ -247,9 +268,6 @@ static int _gui_xine_play(xine_stream_t *stream,
     post_rewire_visual_anim();
     gui->visual_anim.post_changed = 0;
   }
-  
-  if(start_time_in_secs)
-    start_time_in_secs *= 1000;
   
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   if (has_video)
@@ -268,7 +286,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 
   }
 
-  if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0)
+  if ((ret = xine_play (stream, start_pos, start_ms)) == 0)
     gui_handle_xine_error(stream, NULL);
   else {
     char *ident;
@@ -361,8 +379,7 @@ static void start_anyway_yesno(xitk_widget_t *w, void *data, int button) {
   play_data.running = 0;
 
   if(button == XITK_WINDOW_ANSWER_YES)
-    _gui_xine_play(play_data.stream, 
-		   play_data.start_pos, play_data.start_time_in_secs, play_data.update_mmk);
+    _gui_xine_play (play_data.stream, play_data.start_pos, play_data.start_time_in_secs * 1000, play_data.update_mmk);
   else
     gui_playlist_start_next();
 
@@ -497,9 +514,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 					       _("\nStart playback anyway ?\n"));
       free(buffer); free(v_info); free(a_info);
 
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XSync(gui->display, False);
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
       video_window_set_transient_for (gui->vwin, xitk_window_get_window (xw));
       layer_above_video(xitk_window_get_window(xw));
       
@@ -514,7 +531,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     free(buffer); free(v_info); free(a_info);
   }
 
-  return _gui_xine_play(stream, start_pos, start_time_in_secs, update_mmk);
+  return _gui_xine_play (stream, start_pos, start_time_in_secs * 1000, update_mmk);
 }
 
 int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, 
@@ -799,9 +816,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * However, we're not done using displays and we must prevent that
    * from happening until we're finished.
    */
-  XLockDisplay(gui->video_display);
+  gui->x_lock_display (gui->video_display);
   if( gui->video_display != gui->display )
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
   xitk_stop();
   /* 
    * This prevent xine waiting till the end of time for an
@@ -811,9 +828,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
     gui_send_expose_to_window(gui->video_window);
  
   xitk_skin_unload_config(gui->skin_config);
-  XUnlockDisplay(gui->video_display);
+  gui->x_unlock_display (gui->video_display);
   if( gui->video_display != gui->display )
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 }
 
 void gui_play (xitk_widget_t *w, void *data) {
@@ -1072,9 +1089,9 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
       int x = 0, y = 0;
 
       xitk_get_window_position(gui->display, gui->panel_window, &x, &y, NULL, NULL);
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XReparentWindow(gui->display, gui->panel_window, gui->imlib_data->x.root, x, y);
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
     }
     reparent_all_windows();
 
@@ -1214,9 +1231,9 @@ void gui_toggle_aspect(int aspect) {
 		   ratios[xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
   
   if (panel_is_visible (gui->panel))  {
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
@@ -1228,9 +1245,9 @@ void gui_toggle_interlaced(void) {
   post_deinterlace();
   
   if (panel_is_visible (gui->panel))  {
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
@@ -1331,176 +1348,167 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   osd_update_status();
 }
 
-static __attribute__((noreturn)) void *_gui_set_current_position(void *data) {
-  gGui_t *gui = gGui;
-  int  pos = (int)(intptr_t) data;
-  int  update_mmk = 0, ret;
+static void *gui_seek_thread (void *data) {
+  gGui_t *gui = data;
+  int update_mmk = 0, ret;
   
-  pthread_detach(pthread_self());
-
-  if(pthread_mutex_trylock(&gui->xe_mutex)) {
-    pthread_exit(NULL);
-  }
-  
-  if(gui->logo_mode && (mediamark_get_current_mrl())) {
-    gui->suppress_messages++;
-    ret = xine_open(gui->stream, (mediamark_get_current_mrl()));
-    gui->suppress_messages--;
-    if (!ret) {
-      gui_handle_xine_error(gui->stream, (char *)(mediamark_get_current_mrl()));
-      pthread_mutex_unlock(&gui->xe_mutex);
-      pthread_exit(NULL);
-    }
-  }
-
-  if(((xine_get_stream_info(gui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gui->ignore_next == 1)) {
-    pthread_mutex_unlock(&gui->xe_mutex);
-    pthread_exit(NULL);
-  }
-    
-  if(xine_get_status(gui->stream) != XINE_STATUS_PLAY) {
-    gui->suppress_messages++;
-    xine_open(gui->stream, gui->mmk.mrl);
-    gui->suppress_messages--;
-
-    if(gui->mmk.sub) {
-      gui->suppress_messages++;
-      ret = xine_open(gui->spu_stream, gui->mmk.sub);
-      gui->suppress_messages--;
-      if (ret)
-	xine_stream_master_slave(gui->stream, 
-				 gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
-    }
-    else
-      xine_close (gui->spu_stream);
-  }
-  
-  gui->ignore_next = 1;
-  
-  if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
-     gui->playlist.mmk[gui->playlist.cur] &&
-     (!strcmp(gui->playlist.mmk[gui->playlist.cur]->mrl, gui->mmk.mrl)))
-    update_mmk = 1;
-  
-  pthread_mutex_lock(&new_pos_mutex);
-  gui->new_pos = pos;
-  pthread_mutex_unlock(&new_pos_mutex);
+  pthread_detach (pthread_self ());
 
   do {
-    int opos;
+    {
+      const char *mrl = mediamark_get_current_mrl ();
+      if (gui->logo_mode && mrl) {
+        gui->suppress_messages++;
+        ret = xine_open (gui->stream, mrl);
+        gui->suppress_messages--;
+        if (!ret) {
+          gui_handle_xine_error (gui->stream, (char *)mrl);
+          break;
+        }
+      }
+    }
+
+    if (!xine_get_stream_info (gui->stream, XINE_STREAM_INFO_SEEKABLE) || (gui->ignore_next == 1))
+      break;
     
-    pthread_mutex_lock(&new_pos_mutex);
-    opos = gui->new_pos;
-    pthread_mutex_unlock(&new_pos_mutex);
+    if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
+      gui->suppress_messages++;
+      xine_open (gui->stream, gui->mmk.mrl);
+      gui->suppress_messages--;
 
-    panel_update_slider (gui->panel, pos);
-    osd_stream_position(pos);
-    
-    (void) gui_xine_play(gui->stream, pos, 0, update_mmk);
-    
-    xine_get_pos_length(gui->stream,
-			&(gui->stream_length.pos),
-			&(gui->stream_length.time), 
-			&(gui->stream_length.length));
-    panel_update_runtime_display (gui->panel);
-    
-    pthread_mutex_lock(&new_pos_mutex);
-    if(opos == gui->new_pos)
-      gui->new_pos = -1;
-    
-    pos = gui->new_pos;
-    pthread_mutex_unlock(&new_pos_mutex);
-    
-  } while(pos != -1);
+      if (gui->mmk.sub) {
+        gui->suppress_messages++;
+        ret = xine_open (gui->spu_stream, gui->mmk.sub);
+        gui->suppress_messages--;
+        if (ret)
+          xine_stream_master_slave (gui->stream, gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
+      } else {
+        xine_close (gui->spu_stream);
+      }
+    }
   
-  gui->ignore_next = 0;
-  osd_hide_status();
-  panel_check_pause (gui->panel);
+    gui->ignore_next = 1;
+  
+    if ( gui->playlist.num &&
+        (gui->playlist.cur >= 0) &&
+         gui->playlist.mmk &&
+         gui->playlist.mmk[gui->playlist.cur] &&
+        !strcmp (gui->playlist.mmk[gui->playlist.cur]->mrl, gui->mmk.mrl))
+      update_mmk = 1;
 
-  pthread_mutex_unlock(&gui->xe_mutex);
-  pthread_exit(NULL);
-}
+    {
+      int pos = -1;
 
-static __attribute__((noreturn)) void *_gui_seek_relative(void *data) {
-  gGui_t *gui = gGui;
-  int off_sec = (int)(intptr_t)data;
-  int sec, pos;
-  
-  pthread_detach(pthread_self());
-  
-  pthread_mutex_lock(&new_pos_mutex);
-  gui->new_pos = -1;
-  pthread_mutex_unlock(&new_pos_mutex);
+      while (1) {
+        pthread_mutex_lock (&gui->seek_mutex);
+        if ((pos == gui->seek_pos) && (gui->seek_timestep == 0)) {
+          gui->seek_running = 0;
+          gui->seek_pos = -1;
+          pthread_mutex_unlock (&gui->seek_mutex);
+          break;
+        }
+        if (pos != gui->seek_pos) {
 
-  if(!gui_xine_get_pos_length(gui->stream, NULL, &sec, NULL)) {
-    pthread_exit(NULL);
-  }
-  
-  if(pthread_mutex_trylock(&gui->xe_mutex)) {
-    pthread_exit(NULL);
-  }
+          pos = gui->seek_pos;
+          pthread_mutex_unlock (&gui->seek_mutex);
+          /* panel_update_slider (gui->panel, pos); */
+          osd_stream_position (pos);
+          _gui_xine_play (gui->stream, pos, 0, update_mmk);
+          xine_get_pos_length (gui->stream,
+            &gui->stream_length.pos, &gui->stream_length.time, &gui->stream_length.length);
+          panel_update_runtime_display (gui->panel);
 
-  if(((xine_get_stream_info(gui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gui->ignore_next == 1)) {
-    pthread_mutex_unlock(&gui->xe_mutex);
-    pthread_exit(NULL);
-  }
-  
-  if(xine_get_status(gui->stream) != XINE_STATUS_PLAY) {
-    pthread_mutex_unlock(&gui->xe_mutex);
-    pthread_exit(NULL);
-  }
-  
-  gui->ignore_next = 1;
-  
-  sec /= 1000;
+        } else {
 
-  if((sec + off_sec) < 0)
-    sec = 0;
-  else
-    sec += off_sec;
-
-  (void) gui_xine_play(gui->stream, 0, sec, 1);
+          int cur_time, cur_pos;
+          int timestep = gui->seek_timestep;
+          gui->seek_timestep = 0;
+          pthread_mutex_unlock (&gui->seek_mutex);
+          if ( xine_get_stream_info (gui->stream, XINE_STREAM_INFO_SEEKABLE) &&
+              (xine_get_status (gui->stream) == XINE_STATUS_PLAY) &&
+               xine_get_pos_length (gui->stream, NULL, &cur_time, NULL)) {
+            gui->ignore_next = 1;
+            cur_time += timestep;
+            if (cur_time < 0)
+              cur_time = 0;
+            _gui_xine_play (gui->stream, 0, cur_time, 1);
+            if (xine_get_pos_length (gui->stream,
+              &gui->stream_length.pos, &gui->stream_length.time, &gui->stream_length.length)) {
+              panel_update_slider (gui->panel, gui->stream_length.pos);
+              osd_stream_position (gui->stream_length.pos);
+            }
+            gui->ignore_next = 0;
+          }
   
-  pthread_mutex_unlock(&gui->xe_mutex);
+        }
+      }
+    }
 
-  if(gui_xine_get_pos_length(gui->stream, &pos, NULL, NULL))
-    osd_stream_position(pos);
-  
-  gui->ignore_next = 0;
-  osd_hide_status();
-  panel_check_pause (gui->panel);
+    gui->ignore_next = 0;
+    osd_hide_status ();
+    panel_check_pause (gui->panel);
 
-  pthread_exit(NULL);
+    return NULL;
+  } while (0);
+
+  pthread_mutex_lock (&gui->seek_mutex);
+  gui->seek_running = 0;
+  gui->seek_pos = -1;
+  gui->seek_timestep = 0;
+  pthread_mutex_unlock (&gui->seek_mutex);
+  return NULL;
 }
 
 void gui_set_current_position (int pos) {
   gGui_t *gui = gGui;
-  int        err;
-  pthread_t  pth;
 
-  pthread_mutex_lock(&new_pos_mutex);
-  if(gui->new_pos == -1) {
-    pthread_mutex_unlock(&new_pos_mutex);
-    if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)(intptr_t)pos)) != 0) {
-      printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-      abort();
+  pthread_mutex_lock (&gui->seek_mutex);
+  if (gui->seek_running == 0) {
+    pthread_t pth;
+    int err;
+    gui->seek_running = 1;
+    gui->seek_pos = pos;
+    pthread_mutex_unlock (&gui->seek_mutex);
+    err = pthread_create (&pth, NULL, gui_seek_thread, gui);
+    if (err) {
+      printf (_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror (err));
+      pthread_mutex_lock (&gui->seek_mutex);
+      gui->seek_running = 0;
+      gui->seek_pos = -1;
+      gui->seek_timestep = 0;
+      pthread_mutex_unlock (&gui->seek_mutex);
     }
-  }
-  else {
-    gui->new_pos = pos;
-    pthread_mutex_unlock(&new_pos_mutex);
+  } else {
+    gui->seek_pos = pos;
+    pthread_mutex_unlock (&gui->seek_mutex);
   }
 }
 
 void gui_seek_relative (int off_sec) {
-  int        err;
-  pthread_t  pth;
-  
-  if((err = pthread_create(&pth, NULL, _gui_seek_relative, (void *)(intptr_t)off_sec)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    abort();
+  gGui_t *gui = gGui;
+
+  if (off_sec == 0)
+    return;
+
+  pthread_mutex_lock (&gui->seek_mutex);
+  if (gui->seek_running == 0) {
+    pthread_t pth;
+    int err;
+    gui->seek_running = 1;
+    gui->seek_timestep = off_sec * 1000;
+    pthread_mutex_unlock (&gui->seek_mutex);
+    err = pthread_create (&pth, NULL, gui_seek_thread, gui);
+    if (err) {
+      printf (_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror (err));
+      pthread_mutex_lock (&gui->seek_mutex);
+      gui->seek_running = 0;
+      gui->seek_pos = -1;
+      gui->seek_timestep = 0;
+      pthread_mutex_unlock (&gui->seek_mutex);
+    }
+  } else {
+    gui->seek_timestep = off_sec * 1000;
+    pthread_mutex_unlock (&gui->seek_mutex);
   }
 }
 
@@ -2103,9 +2111,9 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
 		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
   
   if (panel_is_visible (gui->panel))  {
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
@@ -2120,9 +2128,9 @@ void gui_reset_zoom(void) {
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
   
   if (panel_is_visible (gui->panel))  {
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRaiseWindow(gui->display, gui->panel_window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     video_window_set_transient_for (gui->vwin, gui->panel_window);
   }
 }
@@ -2156,12 +2164,12 @@ void gui_send_expose_to_window(Window window) {
   xev.xexpose.window     = window;
   xev.xexpose.count      = 0;
   
-  XLockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
   if(!XSendEvent(gui->display, window, False, ExposureMask, &xev)) {
     fprintf(stderr, _("XSendEvent(display, 0x%x ...) failed.\n"), (unsigned int) window);
   }
   XSync(gui->display, False);
-  XUnlockDisplay(gui->display);
+  gui->x_unlock_display (gui->display);
   
 }
 

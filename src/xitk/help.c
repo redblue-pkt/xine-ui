@@ -262,9 +262,9 @@ static void help_exit(xitk_widget_t *w, void *data) {
       }
     }
 
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(help->widget_list)));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     XITK_WIDGET_LIST_FREE(help->widget_list);
     
@@ -360,10 +360,10 @@ void help_panel(void) {
   
   set_window_states_start((xitk_window_get_window(help->xwin)));
 
-  XLockDisplay (gGui->display);
+  gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(help->xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
   help->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(help->widget_list, 
@@ -398,10 +398,10 @@ void help_panel(void) {
 
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(help->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));

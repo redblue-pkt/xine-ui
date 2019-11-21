@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -290,30 +290,30 @@ static void paint_slider(xitk_widget_t *w) {
 
     x = y = srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
         
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, bgc);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
       
     if(bg->mask) {
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XSetClipOrigin(private_data->imlibdata->x.disp, bgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, bgc, bg->mask->pixmap);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XCopyArea(private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, bgc, 0, 0,
 	      bg->width, bg->height, w->x, w->y);
       
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     if(w->enable == WIDGET_ENABLE) {
 
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
       XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, pgc);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
       if(private_data->sType == XITK_RSLIDER) {
 	
@@ -417,22 +417,22 @@ static void paint_slider(xitk_widget_t *w) {
       }
       
       if(paddle->mask) {
-	XLOCK(private_data->imlibdata->x.disp);
+        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
 	XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask->pixmap);
-	XUNLOCK(private_data->imlibdata->x.disp);
+        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
       }
       
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, w->wl->win, pgc,
 		srcx1, srcy1, srcx2, srcy2, destx1, desty1);
       XFreeGC(private_data->imlibdata->x.disp, pgc);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
     
-    XLOCK(private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, bgc);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
 
 }

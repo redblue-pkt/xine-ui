@@ -3081,9 +3081,9 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     mmkeditor.xwin = NULL;
     /* xitk_dlist_init (&mmkeditor.widget_list.list); */
     
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(mmkeditor.widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     
     XITK_WIDGET_LIST_FREE(mmkeditor.widget_list);
     
@@ -3297,10 +3297,10 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   
   set_window_states_start((xitk_window_get_window(mmkeditor.xwin)));
   
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(mmkeditor.xwin)), None, None);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   mmkeditor.widget_list = xitk_widget_list_new();
   xitk_widget_list_set(mmkeditor.widget_list, 
@@ -3315,10 +3315,10 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   xitk_window_get_window_size(mmkeditor.xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   XCopyArea(gui->display, (xitk_window_get_background(mmkeditor.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
 
   x = 15;
   y = 34 - 6;

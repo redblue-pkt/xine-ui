@@ -895,11 +895,11 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
 						     (void *) kbt, 450, ALIGN_CENTER,
 						     "%s", kmsg);
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     if(!gui->use_root_window && gui->video_display == gui->display)
       XSetTransientForHint(gui->display, xitk_window_get_window(xw), gui->video_window);
     XSync(gui->display, False);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     layer_above_video(xitk_window_get_window(xw));
   }
 #endif

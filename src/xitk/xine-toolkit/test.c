@@ -108,7 +108,7 @@ static int init_test(void) {
     return 0;
   }
   
-  XLockDisplay (test->display);
+  XLOCK (XLockDisplay, test->display);
   
   screen = DefaultScreen(test->display);
   depth = DefaultDepth(test->display, screen);
@@ -119,15 +119,18 @@ static int init_test(void) {
   test->imlibdata = Imlib_init_with_params(test->display, &imlib_init);
   if (test->imlibdata == NULL) {
     fprintf(stderr, "Imlib_init_with_params() failed.\n");
-    XUnlockDisplay (test->display);
+    XUNLOCK (XUnlockDisplay, test->display);
     return 0;
   }
 
+  test->imlibdata->x.x_lock_display = XLockDisplay;
+  test->imlibdata->x.x_unlock_display = XUnlockDisplay;
+
   XAllocNamedColor(test->display, Imlib_get_colormap(test->imlibdata), "black", &black, &dummy);
 
-  xitk_init(test->display, black, 1);
+  xitk_init (test->display, black, XLockDisplay, XUnlockDisplay, 1);
 
-  XUnlockDisplay (test->display);
+  XUNLOCK (XUnlockDisplay, test->display);
 
   return 1;
 }
@@ -172,9 +175,9 @@ static void test_handle_event(XEvent *event, void *data) {
   switch(event->type) {
     
   case EnterNotify:
-    XLockDisplay(test->display);
+    XLOCK (XLockDisplay, test->display);
     XRaiseWindow(test->display, xitk_window_get_window(test->xwin));
-    XUnlockDisplay(test->display);
+    XUNLOCK (XUnlockDisplay, test->display);
     break;
 
   case ButtonPress:
@@ -193,9 +196,9 @@ static void test_handle_event(XEvent *event, void *data) {
     
     mykeyevent = event->xkey;
     
-    XLockDisplay (test->display);
+    XLOCK (XLockDisplay, test->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay (test->display);
+    XUNLOCK (XUnlockDisplay, test->display);
     
     switch (mykey) {
       
@@ -210,9 +213,9 @@ static void test_handle_event(XEvent *event, void *data) {
   break;
   
   case MappingNotify:
-    XLockDisplay(test->display);
+    XLOCK (XLockDisplay, test->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay(test->display);
+    XUNLOCK (XUnlockDisplay, test->display);
     break;
     
     //  case ConfigureNotify:
@@ -957,7 +960,7 @@ int main(int argc, char **argv) {
 						"My Test Window", 
 						100, 100, windoww, windowh);
   
-  XLockDisplay (test->display);
+  XLOCK (XLockDisplay, test->display);
 
 #undef DUMP_ATOMS
 #ifdef DUMP_ATOMS
@@ -1020,7 +1023,7 @@ int main(int argc, char **argv) {
 					   test->widget_list,
 					   NULL);
 
-  XUnlockDisplay (test->display);
+  XUNLOCK (XUnlockDisplay, test->display);
 
   XMapRaised(test->display, xitk_window_get_window(test->xwin));
 

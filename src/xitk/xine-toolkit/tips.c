@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2012 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -168,9 +168,9 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	
 	tp_attr.override_redirect = True;
 	
-	XLOCK(tips.display);
+        XLOCK (xitk_x_lock_display, tips.display);
 	XChangeWindowAttributes(tips.display, (xitk_window_get_window(xwin)), CWOverrideRedirect, &tp_attr);
-	XUNLOCK(tips.display);
+        XUNLOCK (xitk_x_unlock_display, tips.display);
 	
       }
       
@@ -182,37 +182,37 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	xitk_window_get_window_size(xwin, &width, &height);
 	bg = xitk_image_create_xitk_pixmap(tips.widget->imlibdata, width, height);
 	
-	XLOCK(tips.display);
+        XLOCK (xitk_x_lock_display, tips.display);
 	gc = XCreateGC(tips.display, tips.widget->imlibdata->x.base_window, None, None);
 	XCopyArea(tips.display, (xitk_window_get_background(xwin)), bg->pixmap, gc, 0, 0, width, height, 0, 0);
-	XUNLOCK(tips.display);
-	
-	XLOCK(tips.display);
+        XUNLOCK (xitk_x_unlock_display, tips.display);
+
+        XLOCK (xitk_x_lock_display, tips.display);
 	XSetForeground(tips.display, gc, cfore);
 	XDrawRectangle(tips.display, bg->pixmap, gc, 0, 0, width - 1, height - 1);
-	XUNLOCK(tips.display);
-	
-	XLOCK(tips.display);
+        XUNLOCK (xitk_x_unlock_display, tips.display);
+
+        XLOCK (xitk_x_lock_display, tips.display);
 	XSetForeground(tips.display, gc, cback);
 	XFillRectangle(tips.display, bg->pixmap, gc, 1, 1, width - 2, height - 2);
 	XCopyArea(tips.display, image->image->pixmap, bg->pixmap,
 		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, (height - image->height)>>1);
-	XUNLOCK(tips.display);
-	
+        XUNLOCK (xitk_x_unlock_display, tips.display);
+
 	xitk_window_change_background(tips.widget->imlibdata, xwin, bg->pixmap, width, height);
 	
 	xitk_image_destroy_xitk_pixmap(bg);
 	
-	XLOCK(tips.display);
+        XLOCK (xitk_x_lock_display, tips.display);
 	XFreeGC(tips.display, gc);
-	XUNLOCK(tips.display);
-	
+        XUNLOCK (xitk_x_unlock_display, tips.display);
+
 	xitk_image_free_image(tips.widget->imlibdata, &image);
       }
       
-      XLOCK(tips.display);
+      XLOCK (xitk_x_lock_display, tips.display);
       XMapRaised(tips.display, (xitk_window_get_window(xwin)));
-      XUNLOCK(tips.display);
+      XUNLOCK (xitk_x_unlock_display, tips.display);
 
       ts = _compute_interval(tips.widget->tips_timeout);
 
@@ -221,9 +221,9 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       xitk_window_destroy_window(tips.widget->imlibdata, xwin);
       
       /* We are flushing here, otherwise tips window will stay displayed */
-      XLOCK(tips.display);
+      XLOCK (xitk_x_lock_display, tips.display);
       XSync(tips.display, False);
-      XUNLOCK(tips.display);
+      XUNLOCK (xitk_x_unlock_display, tips.display);
 
       tips.visible = 0;
     }
@@ -403,3 +403,4 @@ void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
     xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 
 }
+

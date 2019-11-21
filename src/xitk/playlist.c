@@ -556,9 +556,9 @@ static void _playlist_handle_event(XEvent *event, void *data) {
     break;
 
   case MappingNotify:
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     break;
     
   }
@@ -725,24 +725,24 @@ void playlist_exit(xitk_widget_t *w, void *data) {
 
     xitk_unregister_event_handler(&playlist->widget_key);
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XUnmapWindow(gui->display, playlist->window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 
     xitk_destroy_widgets(playlist->widget_list);
     xitk_button_list_delete (playlist->autoplay_buttons);
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XDestroyWindow(gui->display, playlist->window);
     Imlib_destroy_image(gui->imlib_data, playlist->bg_image);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 
     playlist->window = None;
     /* xitk_dlist_init (&playlist->widget_list->list); */
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(playlist->widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 
     _playlist_free_playlists();
     
@@ -928,7 +928,7 @@ void playlist_change_skins(int synthetic) {
     xitk_skin_lock(gui->skin_config);
     xitk_hide_widgets(playlist->widget_list);
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     
     if(!(new_img = Imlib_load_image(gui->imlib_data,
 				    xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
@@ -945,7 +945,7 @@ void playlist_change_skins(int synthetic) {
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
     
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     
     while(!xitk_is_window_size(gui->display, playlist->window, 
 			       new_img->rgb_width, new_img->rgb_height)) {
@@ -955,14 +955,14 @@ void playlist_change_skins(int synthetic) {
     old_img = playlist->bg_image;
     playlist->bg_image = new_img;
 
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     
     if(!gui->use_root_window && gui->video_display == gui->display)
       XSetTransientForHint(gui->display, playlist->window, gui->video_window);
     
     Imlib_destroy_image(gui->imlib_data, old_img);
     Imlib_apply_image(gui->imlib_data, new_img, playlist->window);
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
 
     if(playlist_is_visible())
       playlist_raise_window();
@@ -1027,7 +1027,7 @@ void playlist_editor(void) {
 
   _playlist_create_playlists();
 
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
 
   if (!(playlist->bg_image = Imlib_load_image(gui->imlib_data,
 					      xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
@@ -1080,7 +1080,7 @@ void playlist_editor(void) {
                      &hint, NULL, NULL);
   
   XSelectInput(gui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   if (!video_window_is_visible (gui->vwin))
     xitk_set_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
@@ -1095,7 +1095,7 @@ void playlist_editor(void) {
    */
 
   memset(&mwmhints, 0, sizeof(mwmhints));
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   prop = XInternAtom(gui->display, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
@@ -1127,7 +1127,7 @@ void playlist_editor(void) {
   
   Imlib_apply_image(gui->imlib_data, playlist->bg_image, playlist->window);
 
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
 
   /*
    * Widget-list

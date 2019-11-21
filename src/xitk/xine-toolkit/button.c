@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2014 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -97,19 +97,19 @@ static void paint_button (xitk_widget_t *w) {
     skin         = private_data->skin;
     button_width = skin->width / 3;
 
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
     XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
-    XUNLOCK (private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     if (skin->mask) {
-      XLOCK (private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
-      XUNLOCK (private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
 
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
@@ -127,11 +127,11 @@ static void paint_button (xitk_widget_t *w) {
 		 w->wl->win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
     }
-    XUNLOCK (private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
-    XUNLOCK (private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   } 
 
 }

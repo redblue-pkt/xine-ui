@@ -70,9 +70,9 @@ static void errors_create_window(char *title, char *message) {
   xitk_window_set_parent_window(xw, gGui->video_window);
 
   if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
   }
 
   layer_above_video(xitk_window_get_window(xw));
@@ -106,9 +106,9 @@ void xine_error(const char *message, ...) {
       xw = xitk_window_dialog_error(gGui->imlib_data, "%s", buf);
 
       if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-        XLockDisplay(gGui->display);
+        gGui->x_lock_display (gGui->display);
         XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-        XUnlockDisplay(gGui->display);
+        gGui->x_unlock_display (gGui->display);
       }
       layer_above_video(xitk_window_get_window(xw));
     }
@@ -171,9 +171,9 @@ void xine_info(const char *message, ...) {
       xw = xitk_window_dialog_info(gGui->imlib_data, "%s", buf);
 
       if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-        XLockDisplay(gGui->display);
+        gGui->x_lock_display (gGui->display);
         XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-        XUnlockDisplay(gGui->display);
+        gGui->x_unlock_display (gGui->display);
       }
       layer_above_video(xitk_window_get_window(xw));
     }
@@ -241,7 +241,7 @@ void gui_handle_xine_error(xine_stream_t *stream, const char *mrl) {
     break;
   }
   
-  gGui->new_pos = -1;
+  /* gGui->new_pos = -1; */
 }
 
 
@@ -296,9 +296,9 @@ void too_slow_window(void) {
 						 NULL, 500, ALIGN_CENTER,
 						 "%s", message);
   if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
   }
   layer_above_video(xitk_window_get_window(xw));
 }

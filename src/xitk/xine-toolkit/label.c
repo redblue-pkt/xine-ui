@@ -82,7 +82,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   /* [foo] */
   {
     const unsigned char *p = (const unsigned char *)private_data->label;
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     while (*p) {
       int px, py;
       if ((*p < 32) || (*p >= 128)) {
@@ -97,11 +97,11 @@ static void _create_label_pixmap(xitk_widget_t *w) {
       x_dest += private_data->char_length;
       p++;
     }
-    XUNLOCK (private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
   /* foo[ *** fo] */
   if (anim_add) {
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 #define PX(z) ((z & 31) * private_data->char_length)
 #define PY(z) (((z >> 5) - 1) * private_data->char_height)
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
@@ -129,20 +129,20 @@ static void _create_label_pixmap(xitk_widget_t *w) {
       pixwidth - x_dest, private_data->char_height, x_dest, 0);
 #undef PX
 #undef PY
-    XUNLOCK (private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     x_dest = pixwidth;
   }
   
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
-    XLOCK (private_data->imlibdata->x.disp);
+    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     do {
       XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
                  private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
                  private_data->char_length, private_data->char_height, x_dest, 0);
       x_dest += private_data->char_length;
     } while (x_dest < pixwidth);
-    XUNLOCK(private_data->imlibdata->x.disp);
+    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
 }
 
@@ -231,10 +231,10 @@ static void paint_label(xitk_widget_t *w) {
       xitk_image_t  *bg;
 
       /* Clean old */
-      XLOCK (private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap, w->wl->win, font->image->gc, 
 		 0, 0, private_data->font->width, font->height, w->x, w->y);
-      XUNLOCK (private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       xitk_font_set_font(fs, private_data->font->image->gc);
@@ -242,7 +242,7 @@ static void paint_label(xitk_widget_t *w) {
 
       bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
 
-      XLOCK (private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap, bg->image->pixmap, 
 		 font->image->gc,
 		 0, 0, private_data->font->width, private_data->font->height, 0, 0);
@@ -253,7 +253,7 @@ static void paint_label(xitk_widget_t *w) {
 		  private_data->label, private_data->label_len);
       XCopyArea (private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, 
 		 font->image->gc, 0, 0, font->width, font->height, w->x, w->y);
-      XUNLOCK (private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
       xitk_image_free_image(private_data->imlibdata, &bg);
       
@@ -263,7 +263,7 @@ static void paint_label(xitk_widget_t *w) {
     else {
       int width = private_data->char_length * private_data->length;
       
-      XLOCK(private_data->imlibdata->x.disp);
+      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XCopyArea(private_data->imlibdata->x.disp,
 		private_data->labelpix->pixmap, w->wl->win, font->image->gc, 
 		private_data->anim_offset, 0, width, private_data->char_height, 
@@ -271,7 +271,7 @@ static void paint_label(xitk_widget_t *w) {
 
       if (private_data->anim_running)
         XSync (private_data->imlibdata->x.disp, False);
-      XUNLOCK(private_data->imlibdata->x.disp);
+      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
       
     }
   }

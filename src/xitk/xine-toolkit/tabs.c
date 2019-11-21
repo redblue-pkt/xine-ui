@@ -125,24 +125,24 @@ static void tabs_arrange(xitk_widget_t *w) {
 
 	draw_flat(private_data->imlibdata, p->image, p->width, p->height);
 	
-	XLOCK(private_data->imlibdata->x.disp);
+        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	gc = XCreateGC(private_data->imlibdata->x.disp, 
 		       p->image->pixmap, GCGraphicsExposures, &gcv);
 	XCopyArea(private_data->imlibdata->x.disp, 
 		  p->image->pixmap, private_data->parent_wlist->win, gc, 
 		  0, 0, p->width/3, p->height, 
 		  private_data->x + private_data->gap_widthstart, private_data->y);
-	XUNLOCK(private_data->imlibdata->x.disp);
+        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 	
 	draw_tab(private_data->imlibdata, p);
 	
-	XLOCK(private_data->imlibdata->x.disp);
+        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XCopyArea(private_data->imlibdata->x.disp, 
 		  p->image->pixmap, private_data->parent_wlist->win, gc, 
 		  0, 0, p->width/3, p->height, 
 		  private_data->x + private_data->gap_widthstart, private_data->y + p->height);
 	XFreeGC(private_data->imlibdata->x.disp, gc);
-	XUNLOCK(private_data->imlibdata->x.disp);
+        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
 	xitk_image_free_image(private_data->imlibdata, &p);
       }

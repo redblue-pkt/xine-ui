@@ -250,9 +250,9 @@ static void fne_destroy(filename_editor_t *fne) {
     fne->xwin = NULL;
     /* xitk_dlist_init (&fne->widget_list->list); */
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fne->widget_list)));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     XITK_WIDGET_LIST_FREE(fne->widget_list);
     
@@ -295,10 +295,10 @@ static void fb_create_input_window(char *title, char *text,
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (width >> 1);
   y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (height >> 1);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
   
@@ -311,9 +311,9 @@ static void fb_create_input_window(char *title, char *text,
   change_class_name((xitk_window_get_window(fne->xwin)));
   change_icon((xitk_window_get_window(fne->xwin)));
 
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, (xitk_window_get_window(fne->xwin)), None, None);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   fne->widget_list                = xitk_widget_list_new();
 
@@ -382,13 +382,13 @@ static void fb_create_input_window(char *title, char *text,
 						  (void *)fne);
   }
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   XRaiseWindow(gGui->display, xitk_window_get_window(fne->xwin));
   XMapWindow(gGui->display, xitk_window_get_window(fne->xwin));
   if(!gGui->use_root_window && gGui->video_display == gGui->display)
     XSetTransientForHint(gGui->display, 
 			 xitk_window_get_window(fne->xwin), gGui->video_window);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
   layer_above_video(xitk_window_get_window(fne->xwin));
   
   try_to_set_input_focus(xitk_window_get_window(fne->xwin));
@@ -899,9 +899,9 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
    
     XITK_WIDGET_LIST_FREE(fb->widget_list);
 
@@ -1191,10 +1191,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   if(cbb_close)
     fb->cbb[2].callback = cbb_close->callback;
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (WINDOW_WIDTH >> 1);
   y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (WINDOW_HEIGHT >> 1);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
   /* Create window */
   fb->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
@@ -1232,10 +1232,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->file_filters[i] = NULL;
   fb->filter_selected = 0;
 
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(fb->xwin)), None, None);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
   fb->widget_list                = xitk_widget_list_new();
 
@@ -1253,10 +1253,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   xitk_window_get_window_size(fb->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(fb->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
 
 
   x = 15;
@@ -1421,14 +1421,14 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	
 	offset += w;
 	
-	XLockDisplay(gGui->display);
+	gGui->x_lock_display (gGui->display);
 	XSetForeground(gGui->display, image->image->gc, 
 		       xitk_get_pixel_color_lightgray(gGui->imlib_data));
 	XFillPolygon(gGui->display, image->image->pixmap, image->image->gc, 
 		     &points[0], 4, Convex, CoordModeOrigin);
-	XUnlockDisplay(gGui->display);
+	gGui->x_unlock_display (gGui->display);
 	
-	XLockDisplay(gGui->display);
+	gGui->x_lock_display (gGui->display);
 	for(k = 0; k < 3; k++) {
 	  if(k == 0)
 	    XSetForeground(gGui->display, image->image->gc, 
@@ -1443,7 +1443,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	  XDrawLine(gGui->display, image->image->pixmap, image->image->gc,
 		    points[k].x, points[k].y, points[k+1].x, points[k+1].y);
 	}
-	XUnlockDisplay(gGui->display);
+	gGui->x_unlock_display (gGui->display);
 	
       }
     }

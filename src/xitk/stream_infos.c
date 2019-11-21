@@ -293,9 +293,9 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     sinfos.xwin = NULL;
     /* xitk_dlist_init (&sinfos.widget_list.list); */
     
-    XLockDisplay(gui->display);
+    gui->x_lock_display (gui->display);
     XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
-    XUnlockDisplay(gui->display);
+    gui->x_unlock_display (gui->display);
     
     XITK_WIDGET_LIST_FREE(sinfos.widget_list);
     
@@ -333,9 +333,9 @@ void stream_infos_toggle_auto_update(void) {
   gGui_t *gui = gGui;
     if(gui->stream_info_auto_update) {
       xitk_hide_widget(sinfos.update);
-      XLockDisplay(gui->display);
+      gui->x_lock_display (gui->display);
       XClearWindow(gui->display, xitk_window_get_window(sinfos.xwin));
-      XUnlockDisplay(gui->display);
+      gui->x_unlock_display (gui->display);
       xitk_paint_widget_list(sinfos.widget_list);
     }
     else
@@ -472,10 +472,10 @@ void stream_infos_panel(void) {
   
   set_window_states_start((xitk_window_get_window(sinfos.xwin)));
 
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 
 		 (xitk_window_get_window(sinfos.xwin)), None, None);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
 
   sinfos.widget_list = xitk_widget_list_new();
   xitk_widget_list_set(sinfos.widget_list, 
@@ -493,10 +493,10 @@ void stream_infos_panel(void) {
 
   xitk_window_get_window_size(sinfos.xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
-  XLockDisplay (gui->display);
+  gui->x_lock_display (gui->display);
   XCopyArea(gui->display, (xitk_window_get_background(sinfos.xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  XUnlockDisplay (gui->display);
+  gui->x_unlock_display (gui->display);
   
   x = 15;
   y = 34 - 6;

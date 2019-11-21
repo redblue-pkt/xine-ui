@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #include "common.h"
 #include "xine-toolkit/button_list.h"
@@ -54,6 +55,7 @@ struct xui_panel_st {
     xitk_widget_t      *next;
     xitk_widget_t      *eject;
     xitk_widget_t      *slider_play;
+    unsigned int        slider_play_time;
   } playback_widgets;
 
   struct {
@@ -205,25 +207,25 @@ static void panel_exit (xitk_widget_t *w, void *data) {
 
     pthread_join(panel->slider_thread, NULL);
 
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     XUnmapWindow (panel->gui->display, panel->gui->panel_window);
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
 
     panel->title_label = 0;
     xitk_destroy_widgets(panel->widget_list);
     xitk_button_list_delete (panel->autoplay_buttons);
 
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     XDestroyWindow (panel->gui->display, panel->gui->panel_window);
     Imlib_destroy_image (panel->gui->imlib_data, panel->bg_image);
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
 
     panel->gui->panel_window = None;
     /* xitk_dlist_init (&panel->widget_list->list); */
 
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     XFreeGC (panel->gui->display, (XITK_WIDGET_LIST_GC(panel->widget_list)));
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
 
     XITK_WIDGET_LIST_FREE(panel->widget_list);
 
@@ -246,7 +248,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_skin_lock (panel->gui->skin_config);
   xitk_hide_widgets(panel->widget_list);
 
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
   
   if (!(new_img = Imlib_load_image (panel->gui->imlib_data,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
@@ -263,7 +265,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
 		 (unsigned int)new_img->rgb_width,
 		 (unsigned int)new_img->rgb_height);
   
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
 
   while (!xitk_is_window_size (panel->gui->display, panel->gui->panel_window, 
 			     new_img->rgb_width, new_img->rgb_height)) {
@@ -275,12 +277,12 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
 
   video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
 
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
 
   Imlib_destroy_image (panel->gui->imlib_data, old_img);
   Imlib_apply_image (panel->gui->imlib_data, new_img, panel->gui->panel_window);
   
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
 
   if (panel_is_visible (panel))
     raise_window (panel->gui->panel_window, 1, 1);
@@ -428,16 +430,20 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
       int pos = 0, msecs = 0;
 
       if(status == XINE_STATUS_PLAY) {
-        if (gui_xine_get_pos_length (panel->gui->stream, &pos, &msecs, NULL)) {
+        int seeking;
+        pthread_mutex_lock (&panel->gui->seek_mutex);
+        seeking = panel->gui->seek_running;
+        pthread_mutex_unlock (&panel->gui->seek_mutex);
+        if (!seeking && gui_xine_get_pos_length (panel->gui->stream, &pos, &msecs, NULL)) {
 
-	  pthread_mutex_lock (&panel->gui->xe_mutex);
+          /* pthread_mutex_lock (&panel->gui->xe_mutex); */
 
           if (panel->gui->playlist.num && panel->gui->playlist.cur >= 0 && panel->gui->playlist.mmk &&
             panel->gui->playlist.mmk[panel->gui->playlist.cur] && panel->gui->mmk.end != -1) {
             if ((msecs / 1000) >= panel->gui->playlist.mmk[panel->gui->playlist.cur]->end) {
               panel->gui->ignore_next = 0;
 	      gui_playlist_start_next();
-              pthread_mutex_unlock (&panel->gui->xe_mutex);
+              /* pthread_mutex_unlock (&panel->gui->xe_mutex); */
 	      goto __next_iteration;
 	    }
 	  }
@@ -455,7 +461,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 	    }
 	  }
 
-            pthread_mutex_unlock (&panel->gui->xe_mutex);
+          /* pthread_mutex_unlock (&panel->gui->xe_mutex); */
 	}
 	else
 	  pos = -1;
@@ -656,7 +662,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if (panel->visible && panel->gui->video_display == panel->gui->display) {
     
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     
     if (video_window_is_visible (panel->gui->vwin)) {
       if (panel->gui->use_root_window) { /* Using root window */
@@ -669,9 +675,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	panel->visible = 0;
         XUnmapWindow (panel->gui->display, panel->gui->panel_window);
         XSync (panel->gui->display, False);
-        XUnlockDisplay (panel->gui->display);
+        panel->gui->x_unlock_display (panel->gui->display);
 	xitk_hide_widgets(panel->widget_list);
-        XLockDisplay (panel->gui->display);
+        panel->gui->x_lock_display (panel->gui->display);
       }
     }
     else {
@@ -681,14 +687,14 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
         XMapWindow (panel->gui->display, panel->gui->panel_window);
     }
 
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
 
     {
       Window want;
       int t;
       video_window_lock (panel->gui->vwin, 1);
       want = panel->gui->video_window;
-      XLockDisplay (panel->gui->video_display);
+      panel->gui->x_lock_display (panel->gui->video_display);
       if (panel->gui->cursor_grabbed)
         XGrabPointer (panel->gui->video_display, want,
           1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
@@ -696,21 +702,21 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
         /* Give focus to video output window */
         XSetInputFocus (panel->gui->video_display, want, RevertToParent, CurrentTime);
         XSync (panel->gui->video_display, False);
-        XUnlockDisplay (panel->gui->video_display);
+        panel->gui->x_unlock_display (panel->gui->video_display);
         video_window_lock (panel->gui->vwin, 0);
         /* check after 5/15/30/50/75/105/140 ms */
         for (t = 5000; t < 40000; t += 5000) {
           Window got;
           int revert;
           xine_usec_sleep (t);
-          XLockDisplay (panel->gui->video_display);
+          panel->gui->x_lock_display (panel->gui->video_display);
           XGetInputFocus (panel->gui->video_display, &got, &revert);
-          XUnlockDisplay (panel->gui->video_display);
+          panel->gui->x_unlock_display (panel->gui->video_display);
           if (got == want)
             break;
         }
       } else {
-        XUnlockDisplay (panel->gui->video_display);
+        panel->gui->x_unlock_display (panel->gui->video_display);
         video_window_lock (panel->gui->vwin, 0);
       }
     }
@@ -722,20 +728,20 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     panel->gui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
     
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     
     XRaiseWindow (panel->gui->display, panel->gui->panel_window);
     XMapWindow (panel->gui->display, panel->gui->panel_window);
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
     video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
 
     wait_for_window_visible (panel->gui->display, panel->gui->panel_window);
     layer_above_video (panel->gui->panel_window);
      
     if (panel->gui->cursor_grabbed) {
-      XLockDisplay (panel->gui->display);
+      panel->gui->x_lock_display (panel->gui->display);
       XUngrabPointer (panel->gui->display, CurrentTime);
-      XUnlockDisplay (panel->gui->display);
+      panel->gui->x_unlock_display (panel->gui->display);
     }
     
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
@@ -755,10 +761,10 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       
       xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &x, &y, &w, &h);
       
-      XLockDisplay (panel->gui->display);
+      panel->gui->x_lock_display (panel->gui->display);
       desktopw = DisplayWidth (panel->gui->display, panel->gui->screen);
       desktoph = DisplayHeight (panel->gui->display, panel->gui->screen);
-      XUnlockDisplay (panel->gui->display);
+      panel->gui->x_unlock_display (panel->gui->display);
       
       if(((x + w) <= 0) || ((y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
 	int newx, newy;
@@ -766,9 +772,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	newx = (desktopw - w) >> 1;
 	newy = (desktoph - h) >> 1;
 
-        XLockDisplay (panel->gui->display);
+        panel->gui->x_lock_display (panel->gui->display);
         XMoveWindow (panel->gui->display, panel->gui->panel_window, newx, newy);
-        XUnlockDisplay (panel->gui->display);
+        panel->gui->x_unlock_display (panel->gui->display);
 
         panel_store_new_position (panel, newx, newy, w, h);
       }
@@ -1004,18 +1010,27 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
   xui_panel_t *panel = data;
 
   if(w == panel->playback_widgets.slider_play) {
-    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+    unsigned int stime;
+    struct timeval tv = {0, 0};
+
+    /* Update ui gfx smoothly, at most 20 times a second (~ 5 times less than before).
+     * There is hardly a visible difference, but a lot less X action - especially
+     * with KDE window thumbnails on. Slider thread will fix the final position. */
+    gettimeofday (&tv, NULL);
+    stime = tv.tv_usec / (1000000 / 20) + tv.tv_sec * 20;
+    /* printf ("panel_slider_cb: timeslot #%u.\n", stime); */
+    if (xitk_is_widget_enabled (panel->playback_widgets.slider_play)) {
       gui_set_current_position (pos);
-      if (xine_get_status (panel->gui->stream) != XINE_STATUS_PLAY) {
-        panel_reset_slider (panel);
-      }
-      else {
-	int pos;
-
-        if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
-	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-
-        panel_update_runtime_display (panel);
+      if (stime != panel->playback_widgets.slider_play_time) {
+        panel->playback_widgets.slider_play_time = stime;
+        if (xine_get_status (panel->gui->stream) != XINE_STATUS_PLAY) {
+          panel_reset_slider (panel);
+        } else {
+          int pos;
+          /* if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
+            xitk_slider_set_pos (panel->playback_widgets.slider_play, pos); */
+          panel_update_runtime_display (panel);
+        }
       }
     }
   }
@@ -1058,9 +1073,9 @@ static void panel_handle_event(XEvent *event, void *data) {
     break;
 
   case MappingNotify:
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
     break;
 
   case MapNotify:
@@ -1226,7 +1241,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   panel->skin_on_change = 0;
 
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
   
   /*
    * load bg image before opening window, so we can determine it's size
@@ -1237,7 +1252,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     exit(-1);
   }
 
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
 
   /*
    * open the panel window
@@ -1274,7 +1289,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
   attr.border_pixel      = panel->gui->black.pixel;
 
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
   attr.colormap          = Imlib_get_colormap (panel->gui->imlib_data);
   /*  
       printf ("imlib_data: %d visual : %d\n",gui->imlib_data,gui->imlib_data->x.visual);
@@ -1299,7 +1314,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
                      &hint, NULL, NULL);
 
   XSelectInput (panel->gui->display, panel->gui->panel_window, INPUT_MOTION | KeymapStateMask);
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
   
   /*
    * The following is more or less a hack to keep the panel window visible
@@ -1325,7 +1340,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
 
   memset(&mwmhints, 0, sizeof(mwmhints));
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
   prop = XInternAtom (panel->gui->display, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
@@ -1334,9 +1349,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
   video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
-  XLockDisplay (panel->gui->display);
+  panel->gui->x_lock_display (panel->gui->display);
 
   /* 
    * set wm properties 
@@ -1366,7 +1381,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   gc = XCreateGC (panel->gui->display, panel->gui->panel_window, 0, 0);
 
   Imlib_apply_image (panel->gui->imlib_data, panel->bg_image, panel->gui->panel_window);
-  XUnlockDisplay (panel->gui->display);
+  panel->gui->x_unlock_display (panel->gui->display);
 
   /*
    * Widget-list
@@ -1667,10 +1682,10 @@ xui_panel_t *panel_init (gGui_t *gui) {
     panel->visible = 1;
   
   if (panel->visible) {
-    XLockDisplay (panel->gui->display);
+    panel->gui->x_lock_display (panel->gui->display);
     XRaiseWindow (panel->gui->display, panel->gui->panel_window);
     XMapWindow (panel->gui->display, panel->gui->panel_window);
-    XUnlockDisplay (panel->gui->display);
+    panel->gui->x_unlock_display (panel->gui->display);
   }
   else
     xitk_hide_widgets(panel->widget_list);

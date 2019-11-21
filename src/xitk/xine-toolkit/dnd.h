@@ -27,7 +27,8 @@
 #define MAX_SUPPORTED_TYPE 2
 
 typedef struct {
-  Display             *display;
+  xitk_t              *xitk;
+
   Window               win;
 
   xitk_dnd_callback_t  callback;
@@ -100,7 +101,7 @@ typedef struct {
 /*
  * *** DND
  */
-void xitk_init_dnd(Display *display, xitk_dnd_t *);
+void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *);
 
 int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 

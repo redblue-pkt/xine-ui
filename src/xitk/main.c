@@ -752,12 +752,12 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   vis.display           = gui->video_display;
   vis.screen            = gui->video_screen;
   vis.d                 = gui->video_window;
-  XLockDisplay(gui->video_display);
+  gui->x_lock_display (gui->video_display);
   res_h                 = (DisplayWidth  (gui->video_display, gui->video_screen)*1000 
 			   / DisplayWidthMM (gui->video_display, gui->video_screen));
   res_v                 = (DisplayHeight (gui->video_display, gui->video_screen)*1000
 			   / DisplayHeightMM (gui->video_display, gui->video_screen));
-  XUnlockDisplay(gui->video_display);
+  gui->x_unlock_display (gui->video_display);
   gui->pixel_aspect    = res_v / res_h;
   
 #ifdef HAVE_XINERAMA
@@ -2069,7 +2069,10 @@ int main(int argc, char *argv[]) {
     sprintf(gui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
   }
   
-  pthread_mutex_init(&gui->xe_mutex, NULL);
+  pthread_mutex_init (&gui->seek_mutex, NULL);
+  gui->seek_running = 0;
+  gui->seek_pos = -1;
+  gui->seek_timestep = 0;
 
   __xineui_global_xine_instance = gui->xine = xine_new ();
   xine_config_load (gui->xine, __xineui_global_config_file);
@@ -2334,12 +2337,12 @@ int main(int argc, char *argv[]) {
    * callback functions are called. If libGL.so has already been unloaded
    * with dlclose() this will cause a segmentation fault.
    */
-  XLockDisplay(gui->display);
-  XUnlockDisplay(gui->display);
+  gui->x_lock_display (gui->display);
+  gui->x_unlock_display (gui->display);
   XCloseDisplay(gui->display);
   if( gui->video_display != gui->display ) {
-    XLockDisplay(gui->video_display);
-    XUnlockDisplay(gui->video_display);
+    gui->x_lock_display (gui->video_display);
+    gui->x_unlock_display (gui->video_display);
     XCloseDisplay(gui->video_display);
   }
 
@@ -2358,7 +2361,7 @@ int main(int argc, char *argv[]) {
   }
 
   pthread_mutex_destroy(&gui->mmk_mutex);
-  pthread_mutex_destroy(&gui->xe_mutex);
+  pthread_mutex_destroy (&gui->seek_mutex);
   pthread_mutex_destroy(&gui->download_mutex);
   pthread_mutex_destroy(&gui->logo_mutex);
 
@@ -2380,3 +2383,4 @@ int main(int argc, char *argv[]) {
   }
   return retval;
 }
+

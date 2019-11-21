@@ -734,10 +734,10 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
   XITK_WIDGET_INIT(&menu, gui->imlib_data);
   
-  XLockDisplay(gui->video_display);
+  gui->x_lock_display (gui->video_display);
   (void) xitk_get_mouse_coords(gui->video_display, 
 			       gui->video_window, NULL, NULL, &x, &y);
-  XUnlockDisplay(gui->video_display);
+  gui->x_unlock_display (gui->video_display);
 
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = wl;

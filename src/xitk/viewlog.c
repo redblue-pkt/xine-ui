@@ -91,9 +91,9 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     viewlog->xwin = NULL;
     /* xitk_dlist_init (&viewlog->widget_list->list); */
     
-    XLockDisplay(gGui->display);
+    gGui->x_lock_display (gGui->display);
     XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
-    XUnlockDisplay(gGui->display);
+    gGui->x_unlock_display (gGui->display);
     
     XITK_WIDGET_LIST_FREE(viewlog->widget_list);
     
@@ -170,10 +170,10 @@ static void viewlog_clear_tab(void) {
   
   draw_outter(gGui->imlib_data, im->image, im->width, im->height);
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(viewlog->xwin)),
 	    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + th));
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   xitk_image_free_image(gGui->imlib_data, &im);
 }
@@ -330,10 +330,10 @@ static void viewlog_create_tabs(void) {
 
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay(gGui->display);
+  gGui->x_lock_display (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(viewlog->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay(gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
@@ -405,10 +405,10 @@ void viewlog_panel(void) {
   
   set_window_states_start((xitk_window_get_window(viewlog->xwin)));
 
-  XLockDisplay (gGui->display);
+  gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(viewlog->xwin)), None, None);
-  XUnlockDisplay (gGui->display);
+  gGui->x_unlock_display (gGui->display);
   
   viewlog->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(viewlog->widget_list, 

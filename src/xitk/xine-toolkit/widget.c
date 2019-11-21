@@ -826,11 +826,11 @@ int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int
     if((xx = (x - w->x)) == w->width) xx--;
     if((yy = (y - w->y)) == w->height) yy--;
     
-    XLOCK(display);
+    XLOCK (xitk_x_lock_display, display);
     xi = XGetImage(display, mask, xx, yy, 1, 1, AllPlanes, ZPixmap);
     p = XGetPixel(xi, 0, 0);
     XDestroyImage(xi);
-    XUNLOCK(display);
+    XUNLOCK (xitk_x_unlock_display, display);
 
     return (int) p;
   }
@@ -2048,10 +2048,10 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
     return 0;
   }
   
-  XLOCK(display);
+  XLOCK (xitk_x_lock_display, display);
   ret = XQueryPointer(display, window, 
 		      &root_window, &child_window, &root_x, &root_y, &win_x, &win_y, &mask);
-  XUNLOCK(display);
+  XUNLOCK (xitk_x_unlock_display, display);
   
   if((ret == False) ||
      ((child_window == None) && (win_x == 0) && (win_y == 0))) {
@@ -2081,10 +2081,10 @@ int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *
     return 0;
   }
   
-  XLOCK(display);
+  XLOCK (xitk_x_lock_display, display);
   ret = XQueryPointer(display, window, 
 		      &root_window, &child_window, &root_x, &root_y, &win_x, &win_y, &mask);
-  XUNLOCK(display);
+  XUNLOCK (xitk_x_unlock_display, display);
   
   if((ret == False) ||
      ((child_window == None) && (win_x == 0) && (win_y == 0))) {

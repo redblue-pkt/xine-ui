@@ -145,9 +145,9 @@ static void setup_exit (xitk_widget_t *w, void *data) {
   /* xitk_dlist_init (&setup->widget_list->list); */
   xine_list_delete (setup->widgets);
     
-  XLockDisplay (setup->gui->display);
+  setup->gui->x_lock_display (setup->gui->display);
   XFreeGC (setup->gui->display, (XITK_WIDGET_LIST_GC (setup->widget_list)));
-  XUnlockDisplay (setup->gui->display);
+  setup->gui->x_unlock_display (setup->gui->display);
     
   XITK_WIDGET_LIST_FREE (setup->widget_list);
     
@@ -307,9 +307,9 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 				 _("You changed some configuration value which require"
 				   " to restart xine to take effect."));
       if (!setup->gui->use_root_window && setup->gui->video_display == setup->gui->display) {
-        XLockDisplay (setup->gui->display);
+        setup->gui->x_lock_display (setup->gui->display);
         XSetTransientForHint (setup->gui->display, xitk_window_get_window(xw), setup->gui->video_window);
-        XUnlockDisplay (setup->gui->display);
+        setup->gui->x_unlock_display (setup->gui->display);
       }
       layer_above_video(xitk_window_get_window(xw));
     }
@@ -342,10 +342,10 @@ static void setup_clear_tab (xui_setup_t *setup) {
 
   draw_outter (setup->gui->imlib_data, im->image, im->width, im->height);
 
-  XLockDisplay (setup->gui->display);
+  setup->gui->x_lock_display (setup->gui->display);
   XCopyArea (setup->gui->display, im->image->pixmap, (xitk_window_get_window(setup->xwin)),
     (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, im->width, im->height, 15, (24 + setup->th));
-  XUnlockDisplay (setup->gui->display);
+  setup->gui->x_unlock_display (setup->gui->display);
 
   xitk_image_free_image (setup->gui->imlib_data, &im);
 }
@@ -639,12 +639,12 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       wt->cfg = entry;
 
       image = xitk_image_create_image (setup->gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
-      XLockDisplay (setup->gui->display);
+      setup->gui->x_lock_display (setup->gui->display);
       XSetForeground (setup->gui->display, (XITK_WIDGET_LIST_GC (setup->widget_list)),
         xitk_get_pixel_color_gray (setup->gui->imlib_data));
       XFillRectangle (setup->gui->display, image->image->pixmap,
         (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, image->width, image->height);
-      XUnlockDisplay (setup->gui->display);
+      setup->gui->x_unlock_display (setup->gui->display);
       draw_inner_frame (setup->gui->imlib_data, image->image, (char *)entry.description,
         boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
       XITK_WIDGET_INIT (&im, setup->gui->imlib_data);
@@ -892,10 +892,10 @@ static void setup_sections (xui_setup_t *setup) {
 
   bg = xitk_image_create_xitk_pixmap (setup->gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay (setup->gui->display);
+  setup->gui->x_lock_display (setup->gui->display);
   XCopyArea (setup->gui->display, (xitk_window_get_background (setup->xwin)), bg->pixmap,
     bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  XUnlockDisplay (setup->gui->display);
+  setup->gui->x_unlock_display (setup->gui->display);
   
   draw_rectangular_outter_box (setup->gui->imlib_data, bg, 15, (24 + setup->th),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
@@ -970,9 +970,9 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     win = xitk_window_get_window (setup->xwin);
     set_window_states_start (win);
 
-    XLockDisplay (setup->gui->display);
+    setup->gui->x_lock_display (setup->gui->display);
     gc = XCreateGC (setup->gui->display, win, None, None);
-    XUnlockDisplay (setup->gui->display);
+    setup->gui->x_unlock_display (setup->gui->display);
 
     setup->widget_list = xitk_widget_list_new ();
     xitk_widget_list_set (setup->widget_list, WIDGET_LIST_WINDOW, (void *)win);
