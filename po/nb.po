@@ -6,15 +6,77 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Alexander Nicolaysen Sørnes <alex@thehandofagony.com>\n"
 "Language-Team:  <nb@li.org>\n"
-"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: nb\n"
 "X-Generator: KBabel 1.10.1\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+"Du prøvde å endre oppsettet ved å bruke en «cfg:»-MRL.\n"
+"Dette er bare tillat hvis du aktiverer «misc.implicit_config» etter at du har "
+"lest og forstått hjelpeteksten for denne innstillingen."
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+"Av sikkerhetsmessige årsaker har du ikke lov til å endre innstillingen ved "
+"navn «%s»."
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -132,78 +194,123 @@ msgstr ""
 msgid "Sharpness"
 msgstr ""
 
-msgid "Noise reduction"
+#, fuzzy
+msgid "Noise"
+msgstr "Ingen"
+
+msgid "Control HUE value"
+msgstr "Kontroller nyanse-verdi"
+
+msgid "Control SATURATION value"
+msgstr "Kontroller metningsverdi"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Kontroller LYSSTYRKE-verdi"
+
+msgid "Control CONTRAST value"
+msgstr "Kontroller KONTRAST-verdi"
+
+#, fuzzy
+msgid "Control GAMMA value"
+msgstr "Kontroller nyanse-verdi"
+
+#, fuzzy
+msgid "Control SHARPNESS value"
+msgstr "Kontroller LYSSTYRKE-verdi"
+
+#, fuzzy
+msgid "Control NOISE REDUCTION value"
+msgstr "Kontroller metningsverdi"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Nyanse"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Met"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Lys"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Kon"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
 msgstr ""
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "«%s()»: klarte ikke finne bilde for bakgrunn\n"
+#. TRANSLATORS: only ASCII characters (skin).
+#, fuzzy
+msgctxt "skin"
+msgid "Sha"
+msgstr "Met"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr ""
+
+msgid "hue value"
+msgstr "Nyanseverdi"
+
+msgid "saturation value"
+msgstr "Metningsverdi"
+
+msgid "brightness value"
+msgstr "Lysstyrke-verdi"
+
+msgid "contrast value"
+msgstr "Kontrast-verdi"
+
+#, fuzzy
+msgid "gamma value"
+msgstr "Nyanseverdi"
+
+#, fuzzy
+msgid "sharpness value"
+msgstr "Lysstyrke-verdi"
+
+#, fuzzy
+msgid "noise reduction value"
+msgstr "Metningsverdi"
+
+msgid "Hue value."
+msgstr "Nyanseverdi."
+
+msgid "Saturation value."
+msgstr "Metningsverdi."
+
+msgid "Brightness value."
+msgstr "Lysstyrke-verdi."
+
+msgid "Contrast value."
+msgstr "Kontrast-verdi."
+
+#, fuzzy
+msgid "Gamma value."
+msgstr "Nyanseverdi."
+
+#, fuzzy
+msgid "Sharpness value."
+msgstr "Lysstyrke-verdi."
+
+#, fuzzy
+msgid "Noise reduction value."
+msgstr "Ingen hjelpeseksjon er tilgjengelig"
 
 msgid "xine Control Window"
 msgstr "xine-kontrollervindu"
 
 msgid "control: couldn't find image for background\n"
 msgstr "Kontroller: klarte ikke finne bilde for bakgrunn\n"
-
-msgid "Control HUE value"
-msgstr "Kontroller nyanse-verdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Nyanse"
-
-msgid "Control SATURATION value"
-msgstr "Kontroller metningsverdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Met"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Kontroller LYSSTYRKE-verdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Lys"
-
-msgid "Control CONTRAST value"
-msgstr "Kontroller KONTRAST-verdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Kon"
-
-#, fuzzy
-msgid "Control GAMMA value"
-msgstr "Kontroller nyanse-verdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr ""
-
-#, fuzzy
-msgid "Control SHARPNESS value"
-msgstr "Kontroller LYSSTYRKE-verdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
-msgctxt "skin"
-msgid "Sha"
-msgstr "Met"
-
-#, fuzzy
-msgid "Control NOISE REDUCTION value"
-msgstr "Kontroller metningsverdi"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -215,6 +322,10 @@ msgstr "Vekk"
 
 msgid "Close control window"
 msgstr "Lukk kontrollervindu"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "«%s()»: klarte ikke finne bilde for bakgrunn\n"
 
 msgid "Download in progress"
 msgstr "Holder på å laste ned"
@@ -387,6 +498,14 @@ msgstr "«gui_main»: valgte visuell  %#lx finnes ikke, prøver standardvisuell\
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "«gui_main»: klarte ikke finne sannfarge-visuell.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
 
 #, c-format
 msgid ""
@@ -584,48 +703,6 @@ msgstr "Snarveioppsett i menyen, «Ctrl,Alt» eller «C,M»."
 msgid "Unable to initialize Imlib\n"
 msgstr "Klarte ikke initalisere «Imlib»\n"
 
-msgid "xine Event Sender"
-msgstr "xines hendelsessender"
-
-msgid "Up"
-msgstr "Opp"
-
-msgid "Left"
-msgstr "Venstre"
-
-msgid "Right"
-msgstr "Høyre"
-
-msgid "Down"
-msgstr "Ned"
-
-msgid "Angle +"
-msgstr "Vinkel +"
-
-msgid "Angle -"
-msgstr "Vinkel -"
-
-msgid "Menu 1"
-msgstr "Meny 1"
-
-msgid "Menu 2"
-msgstr "Meny 2"
-
-msgid "Menu 3"
-msgstr "Meny 3"
-
-msgid "Menu 4"
-msgstr "Meny 4"
-
-msgid "Menu 5"
-msgstr "Meny 5"
-
-msgid "Menu 6"
-msgstr "Meny 6"
-
-msgid "Menu 7"
-msgstr "Meny 7"
-
 msgid "Menu toggle"
 msgstr "Meny på/av"
 
@@ -646,6 +723,55 @@ msgstr "Vinkel"
 
 msgid "Part"
 msgstr "Del"
+
+#, fuzzy
+msgid "Top Menu"
+msgstr "Menyer"
+
+msgid "Popup Menu"
+msgstr ""
+
+msgid "Menu 3"
+msgstr "Meny 3"
+
+msgid "Menu 4"
+msgstr "Meny 4"
+
+msgid "Menu 5"
+msgstr "Meny 5"
+
+msgid "Menu 6"
+msgstr "Meny 6"
+
+msgid "Menu 7"
+msgstr "Meny 7"
+
+msgid "Menu 1"
+msgstr "Meny 1"
+
+msgid "Menu 2"
+msgstr "Meny 2"
+
+msgid "xine Event Sender"
+msgstr "xines hendelsessender"
+
+msgid "Up"
+msgstr "Opp"
+
+msgid "Left"
+msgstr "Venstre"
+
+msgid "Right"
+msgstr "Høyre"
+
+msgid "Down"
+msgstr "Ned"
+
+msgid "Angle +"
+msgstr "Vinkel +"
+
+msgid "Angle -"
+msgstr "Vinkel -"
 
 msgid "Close"
 msgstr "Lukk"
@@ -851,7 +977,7 @@ msgstr "Dette er xine (X11-grensesnitt) - en fri videospiller, versjon %s"
 #, fuzzy, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
 "Kopirett 2000-2007 tilhører xine-laget.\n"
@@ -964,8 +1090,7 @@ msgstr ""
 "                    «h»: skjul grensesnitt (panel etc.).\n"
 "                    «w»: skjul videovindu.\n"
 "                    «q»: avslutt når avspillingen er ferdig.\n"
-"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s "
-"DVD».\n"
+"                    zd»: hent spilleliste fra DVD. (Foreldet; bruk «-s DVD».\n"
 "                    «v»: hent spilleliste fra VCD. (Foreldet; bruk z-s "
 "VCD».)\n"
 
@@ -1155,12 +1280,11 @@ msgstr ""
 "                    session=n   velg øktnummer «<n>»,\n"
 "                    mrl=m       legg MRL'en «<mrl>» til i spillelisten,\n"
 "                    audio=c     velg lydkanal («<c>»: «next» eller «prev»),\n"
-"                    spu=c       velg «spu»-kanal («<c>»: «next» eller "
-"«prev»),\n"
+"                    spu=c       velg «spu»-kanal («<c>»: «next» eller «prev»),\n"
 "                    volume=v    oppgi lydvolum,\n"
 "                    amp=v       oppgi forsterkingsnivå,\n"
-"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», "
-"«loop», «repeat», «shuffle» eller «shuffle+»),\n"
+"                    loop=m      oppgi gjentakelsesmodus («<m>»: «none», «loop», "
+"«repeat», «shuffle» eller «shuffle+»),\n"
 "                    get_speed   hent fartverdien (se «man»-siden for den "
 "returnerte verdien.\n"
 "                    (playlist|pl)=p\n"
@@ -1175,8 +1299,8 @@ msgstr ""
 "                                   «last»   spill siste oppføring i "
 "spillelisten,\n"
 "                                   «load:s» last spillelistefilen «s»,\n"
-"                                   «stop»   stopp avspillingen ved slutten "
-"av gjeldende element.\n"
+"                                   «stop»   stopp avspillingen ved slutten av "
+"gjeldende element.\n"
 "                                   «cont»   fortset avspillingen ved slutten "
 "av gjeldende element.\n"
 "                    play, slow2, slow4, pause, fast2,\n"
@@ -1210,8 +1334,7 @@ msgid ""
 msgstr ""
 "  -r, --aspect-ratio <modus>   Velger aspektforholdet for video. Formater "
 "er\n"
-"                                 «auto», «square», «4:3», «anamorphic» og "
-"«dvb».\n"
+"                                 «auto», «square», «4:3», «anamorphic» og «dvb».\n"
 
 #, c-format
 msgid ""
@@ -2097,9 +2220,6 @@ msgstr "Kjedereaksjon"
 msgid "Audio Chain Reaction"
 msgstr "Kjedereaksjon"
 
-msgid "New Filter"
-msgstr "Nytt filter"
-
 msgid "Enable"
 msgstr "Aktiver"
 
@@ -2431,12 +2551,10 @@ msgstr ""
 "skriver du inn «0 2 3»"
 
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "x-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
-"y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
+msgstr "y-koordinat for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
 
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Bredde for «xinerama»-fullskjerm («-8192» for å oppdage automatisk)"
@@ -2502,45 +2620,16 @@ msgstr "Loggviser for xine"
 msgid "Refresh"
 msgstr "Oppdater"
 
-#~ msgid ""
-#~ "You tried to change the configuration with a cfg: MRL.\n"
-#~ "This is not allowed unless you enable the 'misc.implicit_config' setting "
-#~ "after reading and understanding its help text."
-#~ msgstr ""
-#~ "Du prøvde å endre oppsettet ved å bruke en «cfg:»-MRL.\n"
-#~ "Dette er bare tillat hvis du aktiverer «misc.implicit_config» etter at du "
-#~ "har lest og forstått hjelpeteksten for denne innstillingen."
+#, fuzzy
+#~ msgid "..."
+#~ msgstr "Mer . . ."
 
-#~ msgid ""
-#~ "For security reason, you're not allowed to change the configuration entry "
-#~ "named '%s'."
-#~ msgstr ""
-#~ "Av sikkerhetsmessige årsaker har du ikke lov til å endre innstillingen "
-#~ "ved navn «%s»."
+#, fuzzy
+#~ msgid "More sources..."
+#~ msgstr "Mer . . ."
 
-#~ msgid "hue value"
-#~ msgstr "Nyanseverdi"
-
-#~ msgid "Hue value."
-#~ msgstr "Nyanseverdi."
-
-#~ msgid "brightness value"
-#~ msgstr "Lysstyrke-verdi"
-
-#~ msgid "Brightness value."
-#~ msgstr "Lysstyrke-verdi."
-
-#~ msgid "saturation value"
-#~ msgstr "Metningsverdi"
-
-#~ msgid "Saturation value."
-#~ msgstr "Metningsverdi."
-
-#~ msgid "contrast value"
-#~ msgstr "Kontrast-verdi"
-
-#~ msgid "Contrast value."
-#~ msgstr "Kontrast-verdi."
+#~ msgid "New Filter"
+#~ msgstr "Nytt filter"
 
 #~ msgid "Event receiver window"
 #~ msgstr "Hendelsesmottakervindu"

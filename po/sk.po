@@ -6,14 +6,72 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
-"Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+"Z dôvodu bezpeènosti, nemáte povolene zmeni» konf.polo¾ku s názvom '%s'."
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -131,78 +189,123 @@ msgstr ""
 msgid "Sharpness"
 msgstr ""
 
-msgid "Noise reduction"
+#, fuzzy
+msgid "Noise"
+msgstr "Niè"
+
+msgid "Control HUE value"
+msgstr "Nastavi» odtieò"
+
+msgid "Control SATURATION value"
+msgstr "Nastavi» nasýtenie"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Nastavi» jas"
+
+msgid "Control CONTRAST value"
+msgstr "Nastavi» kontrast"
+
+#, fuzzy
+msgid "Control GAMMA value"
+msgstr "Nastavi» odtieò"
+
+#, fuzzy
+msgid "Control SHARPNESS value"
+msgstr "Nastavi» jas"
+
+#, fuzzy
+msgid "Control NOISE REDUCTION value"
+msgstr "Nastavi» nasýtenie"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Odtien"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Nasytenie"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Jas"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Kontrast"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
 msgstr ""
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
+#. TRANSLATORS: only ASCII characters (skin).
+#, fuzzy
+msgctxt "skin"
+msgid "Sha"
+msgstr "Nasýtenie"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr ""
+
+msgid "hue value"
+msgstr "hodnota odtieòu"
+
+msgid "saturation value"
+msgstr "hodnota nasýtenia"
+
+msgid "brightness value"
+msgstr "hodnota jasu"
+
+msgid "contrast value"
+msgstr "hodnota kontrastu"
+
+#, fuzzy
+msgid "gamma value"
+msgstr "hodnota odtieòu"
+
+#, fuzzy
+msgid "sharpness value"
+msgstr "hodnota jasu"
+
+#, fuzzy
+msgid "noise reduction value"
+msgstr "hodnota nasýtenia"
+
+msgid "Hue value."
+msgstr "Hodnota odtieòu"
+
+msgid "Saturation value."
+msgstr "Hodnota nasýtenia"
+
+msgid "Brightness value."
+msgstr "Hodnota jasu"
+
+msgid "Contrast value."
+msgstr "Hodnota kontrastu"
+
+#, fuzzy
+msgid "Gamma value."
+msgstr "Hodnota odtieòu"
+
+#, fuzzy
+msgid "Sharpness value."
+msgstr "Hodnota jasu"
+
+#, fuzzy
+msgid "Noise reduction value."
+msgstr "Nie je dostupná pomoc"
 
 msgid "xine Control Window"
 msgstr "xine ovládanie"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: nemô¾em nájs» obrázok na pozadie.\n"
-
-msgid "Control HUE value"
-msgstr "Nastavi» odtieò"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Odtien"
-
-msgid "Control SATURATION value"
-msgstr "Nastavi» nasýtenie"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Nasytenie"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Nastavi» jas"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Jas"
-
-msgid "Control CONTRAST value"
-msgstr "Nastavi» kontrast"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Kontrast"
-
-#, fuzzy
-msgid "Control GAMMA value"
-msgstr "Nastavi» odtieò"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr ""
-
-#, fuzzy
-msgid "Control SHARPNESS value"
-msgstr "Nastavi» jas"
-
-#. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
-msgctxt "skin"
-msgid "Sha"
-msgstr "Nasýtenie"
-
-#, fuzzy
-msgid "Control NOISE REDUCTION value"
-msgstr "Nastavi» nasýtenie"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -214,6 +317,10 @@ msgstr "Zavrie»"
 
 msgid "Close control window"
 msgstr "Zavrie» okno nastavenia"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
 
 msgid "Download in progress"
 msgstr "S»ahovanie be¾í"
@@ -383,6 +490,14 @@ msgstr "gui_main: vybrané zobrazenie %#lx neexistuje, skú¹am default\n"
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: nemô¾em nájs» true color zobrazenie.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
 
 #, c-format
 msgid ""
@@ -568,6 +683,55 @@ msgstr ""
 msgid "Unable to initialize Imlib\n"
 msgstr "Nemô¾em inicializova» Imlib.\n"
 
+msgid "Menu toggle"
+msgstr "Menú zapnú»"
+
+msgid "Title"
+msgstr "Titul: "
+
+msgid "Root"
+msgstr "Koreò"
+
+msgid "Subpicture"
+msgstr "Podobraz"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Angle"
+msgstr "Uhol"
+
+msgid "Part"
+msgstr "Èas»"
+
+#, fuzzy
+msgid "Top Menu"
+msgstr "Menú"
+
+msgid "Popup Menu"
+msgstr ""
+
+msgid "Menu 3"
+msgstr "Menú 3"
+
+msgid "Menu 4"
+msgstr "Menú 4"
+
+msgid "Menu 5"
+msgstr "Menú 5"
+
+msgid "Menu 6"
+msgstr "Menú 6"
+
+msgid "Menu 7"
+msgstr "Menú 7"
+
+msgid "Menu 1"
+msgstr "Menú 1"
+
+msgid "Menu 2"
+msgstr "Menú 2"
+
 #, fuzzy
 msgid "xine Event Sender"
 msgstr "odosielateµ udalostí"
@@ -589,48 +753,6 @@ msgstr "Uhol +"
 
 msgid "Angle -"
 msgstr "Uhol -"
-
-msgid "Menu 1"
-msgstr "Menú 1"
-
-msgid "Menu 2"
-msgstr "Menú 2"
-
-msgid "Menu 3"
-msgstr "Menú 3"
-
-msgid "Menu 4"
-msgstr "Menú 4"
-
-msgid "Menu 5"
-msgstr "Menú 5"
-
-msgid "Menu 6"
-msgstr "Menú 6"
-
-msgid "Menu 7"
-msgstr "Menú 7"
-
-msgid "Menu toggle"
-msgstr "Menú zapnú»"
-
-msgid "Title"
-msgstr "Titul: "
-
-msgid "Root"
-msgstr "Koreò"
-
-msgid "Subpicture"
-msgstr "Podobraz"
-
-msgid "Audio"
-msgstr "Audio"
-
-msgid "Angle"
-msgstr "Uhol"
-
-msgid "Part"
-msgstr "Èas»"
 
 msgid "Close"
 msgstr "Zavrie»"
@@ -836,7 +958,7 @@ msgstr "Toto je xine (X11 gui) - slobodný video prehrávaè v%s"
 #, fuzzy, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
@@ -2074,9 +2196,6 @@ msgstr "Zre»azenie"
 msgid "Audio Chain Reaction"
 msgstr "Zre»azenie"
 
-msgid "New Filter"
-msgstr "Nový filter"
-
 msgid "Enable"
 msgstr "Povoli»"
 
@@ -2476,35 +2595,16 @@ msgstr "xine prehliadaè logov"
 msgid "Refresh"
 msgstr "Obnovi»"
 
-#~ msgid ""
-#~ "For security reason, you're not allowed to change the configuration entry "
-#~ "named '%s'."
-#~ msgstr ""
-#~ "Z dôvodu bezpeènosti, nemáte povolene zmeni» konf.polo¾ku s názvom '%s'."
+#, fuzzy
+#~ msgid "..."
+#~ msgstr "Viac..."
 
-#~ msgid "hue value"
-#~ msgstr "hodnota odtieòu"
+#, fuzzy
+#~ msgid "More sources..."
+#~ msgstr "Viac..."
 
-#~ msgid "Hue value."
-#~ msgstr "Hodnota odtieòu"
-
-#~ msgid "brightness value"
-#~ msgstr "hodnota jasu"
-
-#~ msgid "Brightness value."
-#~ msgstr "Hodnota jasu"
-
-#~ msgid "saturation value"
-#~ msgstr "hodnota nasýtenia"
-
-#~ msgid "Saturation value."
-#~ msgstr "Hodnota nasýtenia"
-
-#~ msgid "contrast value"
-#~ msgstr "hodnota kontrastu"
-
-#~ msgid "Contrast value."
-#~ msgstr "Hodnota kontrastu"
+#~ msgid "New Filter"
+#~ msgstr "Nový filter"
 
 #~ msgid "Event receiver window"
 #~ msgstr "Okno príjemcu udalostí"
@@ -2767,8 +2867,8 @@ msgstr "Obnovi»"
 
 #~ msgid "                               Load one or many post plugin(s).\n"
 #~ msgstr ""
-#~ "                                 Nahra» jeden alebo viac post "
-#~ "plugin(ov).\n"
+#~ "                                 Nahra» jeden alebo viac post plugin"
+#~ "(ov).\n"
 
 #~ msgid "                               Parameters are comma separated.\n"
 #~ msgstr "                               Parametre sú oddelené èiarkami.\n"

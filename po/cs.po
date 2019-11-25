@@ -6,14 +6,74 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.99.7\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2010-10-14 23:58+0200\n"
 "Last-Translator: František Dvořák <valtri@civ.zcu.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
-"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+"Pokusili jste změnit konfiguraci pomocí konfiguračního MRL cfg://.\n"
+"Toto není dovoleno, pokud nepovolíte nastavení 'misc.implicit_config'."
+"Předtím si přečtěte nápovědu u této volby."
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr "Z bezpečnostních důvodů nemáte dovoleno měnit konfigurační volbu '%s'."
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -132,12 +192,113 @@ msgstr "Gamma"
 msgid "Sharpness"
 msgstr "Ostrost"
 
-msgid "Noise reduction"
+#, fuzzy
+msgid "Noise"
+msgstr "Sum"
+
+msgid "Control HUE value"
+msgstr "Nastavení odstínu"
+
+msgid "Control SATURATION value"
+msgstr "Nastavení sytosti"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Nastavení jasu"
+
+msgid "Control CONTRAST value"
+msgstr "Nastavení kontrastu"
+
+msgid "Control GAMMA value"
+msgstr "Nastavení GAMA"
+
+msgid "Control SHARPNESS value"
+msgstr "Nastavení ostrosti"
+
+msgid "Control NOISE REDUCTION value"
+msgstr "Nastavení redukce šumu"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Ods"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Syt"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Jas"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Kon"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
+msgstr "Gam"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sha"
+msgstr "Ost"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr "Sum"
+
+msgid "hue value"
+msgstr "Odstín"
+
+msgid "saturation value"
+msgstr "Sytost"
+
+msgid "brightness value"
+msgstr "Světlost"
+
+msgid "contrast value"
+msgstr "Kontrast"
+
+#, fuzzy
+msgid "gamma value"
+msgstr "Odstín"
+
+#, fuzzy
+msgid "sharpness value"
+msgstr "Světlost"
+
+#, fuzzy
+msgid "noise reduction value"
 msgstr "Redukce šumu"
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s(): nelze nalézt obrázek na pozadí\n"
+msgid "Hue value."
+msgstr "Hodnota odstínu."
+
+msgid "Saturation value."
+msgstr "Hodnota sytosti."
+
+msgid "Brightness value."
+msgstr "Hodnota světlosti."
+
+msgid "Contrast value."
+msgstr "Hodnota kontrastu."
+
+#, fuzzy
+msgid "Gamma value."
+msgstr "Hodnota odstínu."
+
+#, fuzzy
+msgid "Sharpness value."
+msgstr "Hodnota světlosti."
+
+#, fuzzy
+msgid "Noise reduction value."
+msgstr "Redukce šumu"
 
 # window title
 msgid "xine Control Window"
@@ -145,62 +306,6 @@ msgstr "Řídící okno xine"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: nelze nalézt obrázek na pozadí\n"
-
-msgid "Control HUE value"
-msgstr "Nastavení odstínu"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Ods"
-
-msgid "Control SATURATION value"
-msgstr "Nastavení sytosti"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Syt"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Nastavení jasu"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Jas"
-
-msgid "Control CONTRAST value"
-msgstr "Nastavení kontrastu"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Kon"
-
-msgid "Control GAMMA value"
-msgstr "Nastavení GAMA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr "Gam"
-
-msgid "Control SHARPNESS value"
-msgstr "Nastavení ostrosti"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sha"
-msgstr "Ost"
-
-msgid "Control NOISE REDUCTION value"
-msgstr "Nastavení redukce šumu"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr "Sum"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -212,6 +317,10 @@ msgstr "Zpět"
 
 msgid "Close control window"
 msgstr "Zavře řídící okno"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s(): nelze nalézt obrázek na pozadí\n"
 
 msgid "Download in progress"
 msgstr "Probíhá stahování"
@@ -383,6 +492,14 @@ msgstr "gui_main: vybrané zobrazení %#lx neexistuje, zkusí se standardní\n"
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: nelze nalézt true color zobrazení.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
 
 #, c-format
 msgid ""
@@ -586,6 +703,55 @@ msgstr "Reprezentace zkratek v menu, 'Ctrl,Alt' nebo 'C,M'."
 msgid "Unable to initialize Imlib\n"
 msgstr "Nelze inicializovat Imlib\n"
 
+msgid "Menu toggle"
+msgstr "Přepnutí menu"
+
+msgid "Title"
+msgstr "Název"
+
+msgid "Root"
+msgstr "Počátek"
+
+msgid "Subpicture"
+msgstr "Titulek"
+
+msgid "Audio"
+msgstr "Zvuk"
+
+msgid "Angle"
+msgstr "Úhel"
+
+msgid "Part"
+msgstr "Část"
+
+#, fuzzy
+msgid "Top Menu"
+msgstr "Volby"
+
+msgid "Popup Menu"
+msgstr ""
+
+msgid "Menu 3"
+msgstr "Volba 3"
+
+msgid "Menu 4"
+msgstr "Volba 4"
+
+msgid "Menu 5"
+msgstr "Volba 5"
+
+msgid "Menu 6"
+msgstr "Volba 6"
+
+msgid "Menu 7"
+msgstr "Volba 7"
+
+msgid "Menu 1"
+msgstr "Volba 1"
+
+msgid "Menu 2"
+msgstr "Volba 2"
+
 # window title
 msgid "xine Event Sender"
 msgstr "Posílání událostí"
@@ -607,48 +773,6 @@ msgstr "Úhel +"
 
 msgid "Angle -"
 msgstr "Úhel -"
-
-msgid "Menu 1"
-msgstr "Volba 1"
-
-msgid "Menu 2"
-msgstr "Volba 2"
-
-msgid "Menu 3"
-msgstr "Volba 3"
-
-msgid "Menu 4"
-msgstr "Volba 4"
-
-msgid "Menu 5"
-msgstr "Volba 5"
-
-msgid "Menu 6"
-msgstr "Volba 6"
-
-msgid "Menu 7"
-msgstr "Volba 7"
-
-msgid "Menu toggle"
-msgstr "Přepnutí menu"
-
-msgid "Title"
-msgstr "Název"
-
-msgid "Root"
-msgstr "Počátek"
-
-msgid "Subpicture"
-msgstr "Titulek"
-
-msgid "Audio"
-msgstr "Zvuk"
-
-msgid "Angle"
-msgstr "Úhel"
-
-msgid "Part"
-msgstr "Část"
 
 msgid "Close"
 msgstr "Zavřít"
@@ -860,10 +984,10 @@ msgstr "Špatné zobrazení '%s'\n"
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Toto je xine (GUI pro X11) - svobodný videopřehrávač v%s"
 
-#, c-format
+#, fuzzy, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
 "(c) 2000-2010 Tým xine.\n"
@@ -2108,9 +2232,6 @@ msgstr "Zřetězený účinek na video"
 msgid "Audio Chain Reaction"
 msgstr "Zřetězený účinek na zvuk"
 
-msgid "New Filter"
-msgstr "Nový filtr"
-
 msgid "Enable"
 msgstr "Povolit"
 
@@ -2517,44 +2638,19 @@ msgstr "Prohlížeč zpráv xine"
 msgid "Refresh"
 msgstr "Obnovit"
 
-#~ msgid ""
-#~ "You tried to change the configuration with a cfg: MRL.\n"
-#~ "This is not allowed unless you enable the 'misc.implicit_config' setting "
-#~ "after reading and understanding its help text."
-#~ msgstr ""
-#~ "Pokusili jste změnit konfiguraci pomocí konfiguračního MRL cfg://.\n"
-#~ "Toto není dovoleno, pokud nepovolíte nastavení 'misc.implicit_config'."
-#~ "Předtím si přečtěte nápovědu u této volby."
+#~ msgid "Noise reduction"
+#~ msgstr "Redukce šumu"
 
-#~ msgid ""
-#~ "For security reason, you're not allowed to change the configuration entry "
-#~ "named '%s'."
-#~ msgstr ""
-#~ "Z bezpečnostních důvodů nemáte dovoleno měnit konfigurační volbu '%s'."
+#, fuzzy
+#~ msgid "..."
+#~ msgstr "Více ..."
 
-#~ msgid "hue value"
-#~ msgstr "Odstín"
+#, fuzzy
+#~ msgid "More sources..."
+#~ msgstr "Více ..."
 
-#~ msgid "Hue value."
-#~ msgstr "Hodnota odstínu."
-
-#~ msgid "brightness value"
-#~ msgstr "Světlost"
-
-#~ msgid "Brightness value."
-#~ msgstr "Hodnota světlosti."
-
-#~ msgid "saturation value"
-#~ msgstr "Sytost"
-
-#~ msgid "Saturation value."
-#~ msgstr "Hodnota sytosti."
-
-#~ msgid "contrast value"
-#~ msgstr "Kontrast"
-
-#~ msgid "Contrast value."
-#~ msgstr "Hodnota kontrastu."
+#~ msgid "New Filter"
+#~ msgstr "Nový filtr"
 
 # window title
 #~ msgid "Event receiver window"

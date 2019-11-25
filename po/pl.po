@@ -2,15 +2,77 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Bart³omiej Muryn <bmuryn@gmail.com>\n"
 "Language-Team:  <pl@li.org>\n"
-"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
 "X-Generator: vi\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+"Próbowa³e¶ zmieniæ konfiguracjê za pomoc±: MRL.\n"
+"Jest to dozwolone tylko po uprzednim w³±czeniu opcji 'misc.implicit_config' "
+"po przeczytaniu i zrozumieniu jej tekstu pomocy."
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+"Ze wzglêdów bezpieczeñstwa nie wolno ci zmieniaæ wpisu konfiguracji o nazwie "
+"'%s'."
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -128,78 +190,123 @@ msgstr ""
 msgid "Sharpness"
 msgstr ""
 
-msgid "Noise reduction"
+#, fuzzy
+msgid "Noise"
+msgstr "Brak"
+
+msgid "Control HUE value"
+msgstr "Ustawianie ODCIENIA"
+
+msgid "Control SATURATION value"
+msgstr "Ustawianie NASYCENIA"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Ustawianie JASNO¦CI"
+
+msgid "Control CONTRAST value"
+msgstr "Ustawianie KONTRASTU"
+
+#, fuzzy
+msgid "Control GAMMA value"
+msgstr "Ustawianie ODCIENIA"
+
+#, fuzzy
+msgid "Control SHARPNESS value"
+msgstr "Ustawianie JASNO¦CI"
+
+#, fuzzy
+msgid "Control NOISE REDUCTION value"
+msgstr "Ustawianie NASYCENIA"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Odc"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Nas"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Jas"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Kon"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
 msgstr ""
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s(): nie mogê znale¼æ obrazu t³a\n"
+#. TRANSLATORS: only ASCII characters (skin).
+#, fuzzy
+msgctxt "skin"
+msgid "Sha"
+msgstr "Nas"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr ""
+
+msgid "hue value"
+msgstr "warto¶æ barwy"
+
+msgid "saturation value"
+msgstr "warto¶æ nasycenia"
+
+msgid "brightness value"
+msgstr "warto¶æ jasno¶ci"
+
+msgid "contrast value"
+msgstr "warto¶æ kontrastu"
+
+#, fuzzy
+msgid "gamma value"
+msgstr "warto¶æ barwy"
+
+#, fuzzy
+msgid "sharpness value"
+msgstr "warto¶æ jasno¶ci"
+
+#, fuzzy
+msgid "noise reduction value"
+msgstr "warto¶æ nasycenia"
+
+msgid "Hue value."
+msgstr "Warto¶æ barwy."
+
+msgid "Saturation value."
+msgstr "Warto¶æ nasycenia."
+
+msgid "Brightness value."
+msgstr "Warto¶æ jasno¶ci."
+
+msgid "Contrast value."
+msgstr "Warto¶æ odcienia."
+
+#, fuzzy
+msgid "Gamma value."
+msgstr "Warto¶æ barwy."
+
+#, fuzzy
+msgid "Sharpness value."
+msgstr "Warto¶æ jasno¶ci."
+
+#, fuzzy
+msgid "Noise reduction value."
+msgstr "Brak dostêpnej pomocy"
 
 msgid "xine Control Window"
 msgstr "Okno kontrolne xine"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: nie mogê znale¼æ obrazu t³a\n"
-
-msgid "Control HUE value"
-msgstr "Ustawianie ODCIENIA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Odc"
-
-msgid "Control SATURATION value"
-msgstr "Ustawianie NASYCENIA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Nas"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Ustawianie JASNO¦CI"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Jas"
-
-msgid "Control CONTRAST value"
-msgstr "Ustawianie KONTRASTU"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Kon"
-
-#, fuzzy
-msgid "Control GAMMA value"
-msgstr "Ustawianie ODCIENIA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr ""
-
-#, fuzzy
-msgid "Control SHARPNESS value"
-msgstr "Ustawianie JASNO¦CI"
-
-#. TRANSLATORS: only ASCII characters (skin)
-#, fuzzy
-msgctxt "skin"
-msgid "Sha"
-msgstr "Nas"
-
-#, fuzzy
-msgid "Control NOISE REDUCTION value"
-msgstr "Ustawianie NASYCENIA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -211,6 +318,10 @@ msgstr "Anuluj"
 
 msgid "Close control window"
 msgstr "Zamkniêcie panela kontrolnego"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s(): nie mogê znale¼æ obrazu t³a\n"
 
 msgid "Download in progress"
 msgstr "Pobieranie w toku"
@@ -379,6 +490,14 @@ msgstr "gui_main: selected visual %#lx does not exist, trying default visual\n"
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: nie mogê znale¼æ ekranu w trybie true-color.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
 
 #, c-format
 msgid ""
@@ -573,48 +692,6 @@ msgstr "Prezentacja skrótów w menu, 'Ctrl,Alt' lub 'C,M'."
 msgid "Unable to initialize Imlib\n"
 msgstr "Nie mogê zainicjowaæ Imlib\n"
 
-msgid "xine Event Sender"
-msgstr "Wysy³acz wydarzeñ xine"
-
-msgid "Up"
-msgstr "Góra"
-
-msgid "Left"
-msgstr "Lewo"
-
-msgid "Right"
-msgstr "Prawo"
-
-msgid "Down"
-msgstr "Dó³"
-
-msgid "Angle +"
-msgstr "K±t +"
-
-msgid "Angle -"
-msgstr "K±t -"
-
-msgid "Menu 1"
-msgstr "Menu 1"
-
-msgid "Menu 2"
-msgstr "Menu 2"
-
-msgid "Menu 3"
-msgstr "Menu 3"
-
-msgid "Menu 4"
-msgstr "Menu 4"
-
-msgid "Menu 5"
-msgstr "Menu 5"
-
-msgid "Menu 6"
-msgstr "Menu 6"
-
-msgid "Menu 7"
-msgstr "Menu 7"
-
 msgid "Menu toggle"
 msgstr "Prze³±czanie menu"
 
@@ -635,6 +712,55 @@ msgstr "K±t"
 
 msgid "Part"
 msgstr "Czê¶æ"
+
+#, fuzzy
+msgid "Top Menu"
+msgstr "Menu"
+
+msgid "Popup Menu"
+msgstr ""
+
+msgid "Menu 3"
+msgstr "Menu 3"
+
+msgid "Menu 4"
+msgstr "Menu 4"
+
+msgid "Menu 5"
+msgstr "Menu 5"
+
+msgid "Menu 6"
+msgstr "Menu 6"
+
+msgid "Menu 7"
+msgstr "Menu 7"
+
+msgid "Menu 1"
+msgstr "Menu 1"
+
+msgid "Menu 2"
+msgstr "Menu 2"
+
+msgid "xine Event Sender"
+msgstr "Wysy³acz wydarzeñ xine"
+
+msgid "Up"
+msgstr "Góra"
+
+msgid "Left"
+msgstr "Lewo"
+
+msgid "Right"
+msgstr "Prawo"
+
+msgid "Down"
+msgstr "Dó³"
+
+msgid "Angle +"
+msgstr "K±t +"
+
+msgid "Angle -"
+msgstr "K±t -"
 
 msgid "Close"
 msgstr "Koniec"
@@ -843,7 +969,7 @@ msgstr ""
 #, fuzzy, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) 2000-2014 The xine Team.\n"
 msgstr ""
 ".\n"
 "(c) 2000-2007 The xine Team.\n"
@@ -2098,9 +2224,6 @@ msgstr "Reakcja £añcuchowa"
 msgid "Audio Chain Reaction"
 msgstr "Reakcja £añcuchowa"
 
-msgid "New Filter"
-msgstr "Nowy filtr"
-
 msgid "Enable"
 msgstr "W³±cz"
 
@@ -2508,45 +2631,16 @@ msgstr "Podgl±d logów xine"
 msgid "Refresh"
 msgstr "Od¶wie¿anie"
 
-#~ msgid ""
-#~ "You tried to change the configuration with a cfg: MRL.\n"
-#~ "This is not allowed unless you enable the 'misc.implicit_config' setting "
-#~ "after reading and understanding its help text."
-#~ msgstr ""
-#~ "Próbowa³e¶ zmieniæ konfiguracjê za pomoc±: MRL.\n"
-#~ "Jest to dozwolone tylko po uprzednim w³±czeniu opcji 'misc."
-#~ "implicit_config' po przeczytaniu i zrozumieniu jej tekstu pomocy."
+#, fuzzy
+#~ msgid "..."
+#~ msgstr "Wiêcej..."
 
-#~ msgid ""
-#~ "For security reason, you're not allowed to change the configuration entry "
-#~ "named '%s'."
-#~ msgstr ""
-#~ "Ze wzglêdów bezpieczeñstwa nie wolno ci zmieniaæ wpisu konfiguracji o "
-#~ "nazwie '%s'."
+#, fuzzy
+#~ msgid "More sources..."
+#~ msgstr "Wiêcej..."
 
-#~ msgid "hue value"
-#~ msgstr "warto¶æ barwy"
-
-#~ msgid "Hue value."
-#~ msgstr "Warto¶æ barwy."
-
-#~ msgid "brightness value"
-#~ msgstr "warto¶æ jasno¶ci"
-
-#~ msgid "Brightness value."
-#~ msgstr "Warto¶æ jasno¶ci."
-
-#~ msgid "saturation value"
-#~ msgstr "warto¶æ nasycenia"
-
-#~ msgid "Saturation value."
-#~ msgstr "Warto¶æ nasycenia."
-
-#~ msgid "contrast value"
-#~ msgstr "warto¶æ kontrastu"
-
-#~ msgid "Contrast value."
-#~ msgstr "Warto¶æ odcienia."
+#~ msgid "New Filter"
+#~ msgstr "Nowy filtr"
 
 #~ msgid "Event receiver window"
 #~ msgstr "Okno odbiornika wydarzeñ"

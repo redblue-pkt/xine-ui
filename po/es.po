@@ -12,16 +12,73 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui.es\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-08-21 22:25+0100\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2015-10-18 01:37+0200\n"
 "Last-Translator: Carlos E. Robinson <carlos.e.r@opensuse.org>\n"
 "Language-Team: Spanish <xine-devel@lists.sourceforge.net>\n"
-"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
 "X-Generator: Lokalize 1.5\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -138,74 +195,123 @@ msgstr "Gamma"
 msgid "Sharpness"
 msgstr "Nitidez"
 
-msgid "Noise reduction"
+#, fuzzy
+msgid "Noise"
+msgstr "Rui"
+
+msgid "Control HUE value"
+msgstr "Control del valor de TINTA (HUE)"
+
+msgid "Control SATURATION value"
+msgstr "Control del valor de SATURACIÓN"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Control del valor de BRILLO"
+
+msgid "Control CONTRAST value"
+msgstr "Control del valor de CONTRASTE"
+
+msgid "Control GAMMA value"
+msgstr "Control del valor de GAMMA"
+
+msgid "Control SHARPNESS value"
+msgstr "Control del valor de DEFINICIÓN"
+
+msgid "Control NOISE REDUCTION value"
+msgstr "Control del valor de REDUCCIÓN DE RUIDO"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr "Tta"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr "Sat"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr "Bri"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr "Ctr"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
+msgstr "Gam"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sha"
+msgstr "Def"
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr "Rui"
+
+msgid "hue value"
+msgstr ""
+
+#, fuzzy
+msgid "saturation value"
+msgstr "Saturación"
+
+#, fuzzy
+msgid "brightness value"
+msgstr "Brillo"
+
+#, fuzzy
+msgid "contrast value"
+msgstr "Control del valor de TINTA (HUE)"
+
+msgid "gamma value"
+msgstr ""
+
+#, fuzzy
+msgid "sharpness value"
+msgstr "Nitidez"
+
+#, fuzzy
+msgid "noise reduction value"
 msgstr "Reducción de ruido"
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
+msgid "Hue value."
+msgstr ""
+
+#, fuzzy
+msgid "Saturation value."
+msgstr "Saturación"
+
+#, fuzzy
+msgid "Brightness value."
+msgstr "Brillo"
+
+#, fuzzy
+msgid "Contrast value."
+msgstr "Contraste"
+
+msgid "Gamma value."
+msgstr ""
+
+#, fuzzy
+msgid "Sharpness value."
+msgstr "Nitidez"
+
+#, fuzzy
+msgid "Noise reduction value."
+msgstr "Reducción de ruido"
 
 msgid "xine Control Window"
 msgstr "Ventana de control de xine"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: no se pudo encontrar la imagen de fondo\n"
-
-msgid "Control HUE value"
-msgstr "Control del valor de TINTA (HUE)"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr "Tta"
-
-msgid "Control SATURATION value"
-msgstr "Control del valor de SATURACIÓN"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr "Sat"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Control del valor de BRILLO"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr "Bri"
-
-msgid "Control CONTRAST value"
-msgstr "Control del valor de CONTRASTE"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr "Ctr"
-
-msgid "Control GAMMA value"
-msgstr "Control del valor de GAMMA"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr "Gam"
-
-msgid "Control SHARPNESS value"
-msgstr "Control del valor de DEFINICIÓN"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sha"
-msgstr "Def"
-
-msgid "Control NOISE REDUCTION value"
-msgstr "Control del valor de REDUCCIÓN DE RUIDO"
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
-msgstr "Rui"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -217,6 +323,10 @@ msgstr "Cancelar"
 
 msgid "Close control window"
 msgstr "Cerrar la ventana de control"
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
 
 msgid "Download in progress"
 msgstr "Descarga en progreso"
@@ -391,6 +501,14 @@ msgstr ""
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: no se pudo encontrar la visual de color verdadero.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
 
 #, c-format
 msgid ""
@@ -600,48 +718,6 @@ msgstr "Representación del atajo en el menú, 'Ctrl,Alt' o 'C,M'."
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
-msgid "xine Event Sender"
-msgstr "Emisor de eventos de xine"
-
-msgid "Up"
-msgstr "Arriba"
-
-msgid "Left"
-msgstr "Izquierda"
-
-msgid "Right"
-msgstr "Derecha"
-
-msgid "Down"
-msgstr "Abajo"
-
-msgid "Angle +"
-msgstr "Ángulo +"
-
-msgid "Angle -"
-msgstr "Ángulo -"
-
-msgid "Menu 1"
-msgstr "Menú 1"
-
-msgid "Menu 2"
-msgstr "Menú 2"
-
-msgid "Menu 3"
-msgstr "Menú 3"
-
-msgid "Menu 4"
-msgstr "Menú 4"
-
-msgid "Menu 5"
-msgstr "Menú 5"
-
-msgid "Menu 6"
-msgstr "Menú 6"
-
-msgid "Menu 7"
-msgstr "Menú 7"
-
 msgid "Menu toggle"
 msgstr "Conmutador de menú"
 
@@ -669,6 +745,48 @@ msgstr "Menú principal"
 
 msgid "Popup Menu"
 msgstr "Menú contextual"
+
+msgid "Menu 3"
+msgstr "Menú 3"
+
+msgid "Menu 4"
+msgstr "Menú 4"
+
+msgid "Menu 5"
+msgstr "Menú 5"
+
+msgid "Menu 6"
+msgstr "Menú 6"
+
+msgid "Menu 7"
+msgstr "Menú 7"
+
+msgid "Menu 1"
+msgstr "Menú 1"
+
+msgid "Menu 2"
+msgstr "Menú 2"
+
+msgid "xine Event Sender"
+msgstr "Emisor de eventos de xine"
+
+msgid "Up"
+msgstr "Arriba"
+
+msgid "Left"
+msgstr "Izquierda"
+
+msgid "Right"
+msgstr "Derecha"
+
+msgid "Down"
+msgstr "Abajo"
+
+msgid "Angle +"
+msgstr "Ángulo +"
+
+msgid "Angle -"
+msgstr "Ángulo -"
 
 msgid "Close"
 msgstr "Cerrar"
@@ -1499,8 +1617,8 @@ msgstr "*ains*, error desconocido."
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
-"Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d."
-"%d.\n"
+"Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d.%"
+"d.\n"
 
 #, c-format
 msgid "video driver id required for -V option\n"
@@ -2153,9 +2271,6 @@ msgstr "Reacción en Cadena de Vídeo"
 msgid "Audio Chain Reaction"
 msgstr "Reacción en Cadena de Audio"
 
-msgid "New Filter"
-msgstr "Nuevo filtro"
-
 msgid "Enable"
 msgstr "Habilitado"
 
@@ -2566,4 +2681,16 @@ msgstr "Visor del registro de xine"
 msgid "Refresh"
 msgstr "Refrescar"
 
+#~ msgid "Noise reduction"
+#~ msgstr "Reducción de ruido"
 
+#, fuzzy
+#~ msgid "..."
+#~ msgstr "Más..."
+
+#, fuzzy
+#~ msgid "More sources..."
+#~ msgstr "Más..."
+
+#~ msgid "New Filter"
+#~ msgstr "Nuevo filtro"
