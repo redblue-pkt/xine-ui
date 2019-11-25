@@ -1,3 +1,8 @@
+xine-ui (0.99.12)
+  * Make XLockDisplay use user switchable.
+  * Faster seek.
+  * Fix build with libxine <= 1.2.9.
+
 xine-ui (0.99.11)
   * Offer all autoplay/autodir input plugins.
   * Dont treat hls as playlist.
