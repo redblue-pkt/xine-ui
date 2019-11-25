@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-06-16 14:21+0200\n"
+"POT-Creation-Date: 2019-11-25 18:15+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -21,7 +21,7 @@ msgid ""
 "This is not allowed unless you enable the 'misc.implicit_config' setting "
 "after reading and understanding its help text."
 msgstr ""
-"Sie haben Versucht, die Konfiguration über eine cfg:-MRL zu ändern.\n"
+"Sie haben versucht, die Konfiguration über eine cfg:-MRL zu ändern.\n"
 "Das ist nicht erlaubt, außer Sie aktivieren 'misc.implicit_config', nachdem "
 "Sie den Hilfetext gelesen und verstanden haben."
 
@@ -175,7 +175,7 @@ msgid "Pick a subtitle file"
 msgstr "Wähle eine Untertiteldatei"
 
 msgid "Hue"
-msgstr "Ton"
+msgstr "Farbton"
 
 msgid "Saturation"
 msgstr "Farbsättigung"
@@ -194,6 +194,27 @@ msgstr "Bildschärfe"
 
 msgid "Noise"
 msgstr "Rauschfilter"
+
+msgid "Control HUE value"
+msgstr "Farbton ändern"
+
+msgid "Control SATURATION value"
+msgstr "Sättigung ändern"
+
+msgid "Control BRIGHTNESS value"
+msgstr "Helligkeit ändern"
+
+msgid "Control CONTRAST value"
+msgstr "Kontrast ändern"
+
+msgid "Control GAMMA value"
+msgstr "Mittenhelligkeit ändern"
+
+msgid "Control SHARPNESS value"
+msgstr "Bildschärfe ändern"
+
+msgid "Control NOISE REDUCTION value"
+msgstr "Rauschfilter ändern"
 
 #. TRANSLATORS: only ASCII characters (skin).
 msgctxt "skin"
@@ -277,27 +298,6 @@ msgstr "xine Einstellungensfenster"
 
 msgid "control: couldn't find image for background\n"
 msgstr "control: Konnte Hintergrundbild nicht finden\n"
-
-msgid "Control HUE value"
-msgstr "Farbton ändern"
-
-msgid "Control SATURATION value"
-msgstr "Sättigung ändern"
-
-msgid "Control BRIGHTNESS value"
-msgstr "Helligkeit ändern"
-
-msgid "Control CONTRAST value"
-msgstr "Kontrast ändern"
-
-msgid "Control GAMMA value"
-msgstr "Mittenhelligkeit ändern"
-
-msgid "Control SHARPNESS value"
-msgstr "Bildschärfe ändern"
-
-msgid "Control NOISE REDUCTION value"
-msgstr "Rauschfilter ändern"
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -462,7 +462,7 @@ msgid "Playlist: shuffle forever."
 msgstr "Playliste: Immer mischen."
 
 msgid "No text to display!"
-msgstr "Kein Text zum anzeigen!"
+msgstr "Kein Text zum Anzeigen!"
 
 #, c-format
 msgid "Playlist: %s"
@@ -485,7 +485,18 @@ msgstr ""
 
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
-msgstr "gui_main: Konnte True-Color-Visual nicht finden.\n"
+msgstr "gui_main: Konnte Echtfarb-Visual nicht finden.\n"
+
+msgid "Enable extra XLib thread safety."
+msgstr "Zusätzlicher XLib-Fehlerschutz."
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
+msgstr ""
+"Dies wird für sehr alte XLib/XCB-Versionen gebraucht.\n"
+"Ansonsten kann es die Arbeitsgeschwindigkeit beeinflussen - einfach "
+"ausprobieren."
 
 #, c-format
 msgid ""
@@ -529,7 +540,7 @@ msgstr ""
 
 #, c-format
 msgid "Warning! Synchronized X activated - this is very slow...\n"
-msgstr "Warnung! Synchrones X aktiviert - das wird ziemlich langsam...\n"
+msgstr "Warnung! Synchrones X aktiviert - das wird sehr langsam...\n"
 
 msgid "Windows stacking"
 msgstr "Fensterüberlagerung"
@@ -555,10 +566,10 @@ msgid "Snapshot location"
 msgstr "Schnappschußverzeichnis"
 
 msgid "Where snapshots will be saved."
-msgstr "Wo Schnappschüsse abgespeichert werden."
+msgstr "Schnappschüsse hierher schreiben."
 
 msgid "Screensaver reset interval (s)"
-msgstr "Bildschirmschoner Resetintervall [s]"
+msgstr "Bildschirmschoner unterbrechen (Sekunden)"
 
 msgid ""
 "Time, in seconds, between two faked events to keep a screensaver quiet, 0 to "
@@ -641,9 +652,7 @@ msgid "Change xine's behavior for unexperienced user"
 msgstr "xine-Verhalten für unerfahrene Benutzer anpassen"
 
 msgid "In this mode, xine take some decisions to simplify user's life."
-msgstr ""
-"In diesem Modus wählt xine Entscheidungen, die dem Benutzer das Benutzen "
-"erleichtern."
+msgstr "Einige weniger gebräuchliche Fragen automatisch beantworten."
 
 msgid "Ask user for playback with unsupported codec"
 msgstr "Benutzer fragen bei Wiedergabe mit nichtunterstütztem coder"
@@ -676,10 +685,10 @@ msgid "If enabled, xine will display its splash screen"
 msgstr "Falls aktiviert zeigt xine seinen Startbildschirm an"
 
 msgid "Audio mixer control method"
-msgstr "Audiomischpultmethode"
+msgstr "Tonmischpultmethode"
 
 msgid "Which method used to control audio volume."
-msgstr "Methode, die zum steuern der Lautstärke benutzt wird."
+msgstr "Methode, zum Steuern der Lautstärke."
 
 msgid "Menu shortcut style"
 msgstr "Menu Tastenkürzelstil"
@@ -957,7 +966,7 @@ msgstr "Fehlerhafte Geometrie '%s'\n"
 
 #, c-format
 msgid "Bad visual '%s'\n"
-msgstr "Fehlerhavte visual '%s'\n"
+msgstr "Fehlerhaftes visual '%s'\n"
 
 #, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
@@ -1222,11 +1231,10 @@ msgstr ""
 "(Standard)\n"
 "                                'repeat': Aktuellen Playlisteintrag "
 "wiederholen.\n"
-"                                'shuffle': Zufälligen ungespielten Eintrag "
-"aus                                           Playlist auswählen.\n"
-"                                'shuffle+': Ähnlich wie 'shuffle', nur wird "
-"die                                            Playliste unendlichoft "
-"wiederholt.\n"
+"                                'shuffle': In zufälliger Reihenfolge "
+"abspielen.\n"
+"                                'shuffle+': Zufällige Reihenfolge und "
+"wiederholen.\n"
 
 #, c-format
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
@@ -1644,7 +1652,7 @@ msgid "Logo MRL"
 msgstr "Logo MRL"
 
 msgid "!!Invalid entry!!"
-msgstr "!!Illegaler Eintrag!!"
+msgstr "!!Ungüötiger Eintrag!!"
 
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
