@@ -368,8 +368,7 @@ static const char *pts2str(int64_t pts) {
 /*
  *
  */
-void gui_execute_action_id(action_id_t action) {
-  gGui_t *gui = gGui;
+void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   xine_event_t   xine_event;
   int narg = -1;
   char *sarg = NULL;
@@ -545,29 +544,29 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
-    gui_toggle_visibility(NULL, NULL);
+    gui_toggle_visibility (NULL, gui);
     break;
     
   case ACTID_TOGGLE_WINOUT_BORDER:
-    gui_toggle_border(NULL, NULL);
+    gui_toggle_border (NULL, gui);
     break;
 
   case ACTID_AUDIOCHAN_NEXT:
     if (narg < 0)
       gui_change_audio_channel(NULL, (void*)GUI_NEXT);
     else
-      gui_direct_change_audio_channel (NULL, (void*)GUI_NEXT, narg);
+      gui_direct_change_audio_channel (NULL, gui, narg);
     break;
     
   case ACTID_AUDIOCHAN_PRIOR:
     if (narg < 0)
       gui_change_audio_channel(NULL, (void*)GUI_PREV);
     else
-      gui_direct_change_audio_channel (NULL, (void*)GUI_PREV, narg);
+      gui_direct_change_audio_channel (NULL, gui, narg);
     break;
     
   case ACTID_PAUSE:
-    gui_pause (NULL, (void*)(1), 0); 
+    gui_pause (NULL, gui, 0);
     break;
 
   case ACTID_PLAYLIST:
@@ -582,9 +581,9 @@ void gui_execute_action_id(action_id_t action) {
     if (narg >= 0) {
       int fullscreen = video_window_get_fullscreen_mode (gui->vwin) & FULLSCR_MODE;
       if ((narg && !fullscreen) || (!narg && fullscreen))
-        gui_set_fullscreen_mode(NULL, NULL);
+        gui_set_fullscreen_mode (NULL, gui);
     } else
-      gui_set_fullscreen_mode(NULL, NULL);
+      gui_set_fullscreen_mode (NULL, gui);
     break;
 
 #ifdef HAVE_XINERAMA
@@ -614,19 +613,19 @@ void gui_execute_action_id(action_id_t action) {
     if ((gui->event_pending <= 0) && gui->event_reject)
       pthread_cond_signal (&gui->event_safe);
     pthread_mutex_unlock (&gui->event_mutex);
-    gui_exit(NULL, NULL);
+    gui_exit (NULL, gui);
     break;
 
   case ACTID_PLAY:
-    gui_play(NULL, NULL);
+    gui_play (NULL, gui);
     break;
 
   case ACTID_STOP:
-    gui_stop(NULL, NULL);
+    gui_stop (NULL, gui);
     break;
 
   case ACTID_CLOSE:
-    gui_close(NULL, NULL);
+    gui_close (NULL, gui);
     break;
 
   case ACTID_EVENT_SENDER:
@@ -649,9 +648,9 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_MRL_SELECT:
     if (narg < 0)
-      gui_playlist_play(0);
+      gui_playlist_play (gui, 0);
     else
-      gui_playlist_play (narg);
+      gui_playlist_play (gui, narg);
     break;
       
   case ACTID_SETUP:
@@ -659,7 +658,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_EJECT:
-    gui_eject(NULL, NULL);
+    gui_eject (NULL, gui);
     break;
 
   case ACTID_SET_CURPOS:
@@ -1295,9 +1294,7 @@ void gui_execute_action_id(action_id_t action) {
  * top-level event handler
  */
 void gui_handle_event (XEvent *event, void *data) {
-  gGui_t *gui = gGui;
-
-  (void)data;
+  gGui_t *gui = data;
 
   switch(event->type) {
 
@@ -1349,8 +1346,7 @@ void gui_handle_event (XEvent *event, void *data) {
 /*
  * Start playback of an entry in playlist
  */
-int gui_playlist_play(int idx) {
-  gGui_t *gui = gGui;
+int gui_playlist_play (gGui_t *gui, int idx) {
   int ret = 1;
 
   osd_hide();
@@ -1374,8 +1370,7 @@ int gui_playlist_play(int idx) {
 /*
  * Start playback to next entry in playlist (or stop the engine, then display logo).
  */
-void gui_playlist_start_next() {
-  gGui_t *gui = gGui;
+void gui_playlist_start_next (gGui_t *gui) {
 
   if (gui->ignore_next)
     return;
@@ -1409,7 +1404,7 @@ void gui_playlist_start_next() {
 	mediamark_reset_played_state();
 
 	if(gui->actions_on_start[0] == ACTID_QUIT)
-	  gui_exit(NULL, NULL);
+          gui_exit (NULL, gui);
 	else
 	  gui_display_logo();
 	return;
@@ -1436,7 +1431,7 @@ void gui_playlist_start_next() {
       if(gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS)
 	goto __shuffle_restart;
       else if(gui->actions_on_start[0] == ACTID_QUIT)
-      	gui_exit(NULL, NULL);
+        gui_exit (NULL, gui);
       else
 	gui_display_logo();
       return;    
@@ -1444,14 +1439,14 @@ void gui_playlist_start_next() {
     break;
   }
 
-  if(gui_playlist_play(gui->playlist.cur))
+  if (gui_playlist_play (gui, gui->playlist.cur))
     return;
 
   switch(gui->playlist.loop) {
 
   case PLAYLIST_LOOP_NO_LOOP:
     if(mediamark_all_played() && (gui->actions_on_start[0] == ACTID_QUIT)) {
-      gui_exit(NULL, NULL);
+      gui_exit (NULL, gui);
       return;
     }
     break;
@@ -1557,8 +1552,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
     *visual_return = visual;
 }
 
-void gui_deinit(void) {
-  gGui_t *gui = gGui;
+void gui_deinit (gGui_t *gui) {
 #ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
   xine_config_unregister_callbacks (gui->xine, NULL, NULL, gui, sizeof (*gui));
 #endif
@@ -1579,8 +1573,7 @@ static void gui_dummy_un_lock_display (Display *display) {
   (void)display;
 }
 
-void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
-  gGui_t *gui = gGui;
+void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
   char  *server;
   char  *video_display_name;
@@ -1923,7 +1916,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gui_find_visual(&gui->visual, &gui->depth);
 
-  gui_init_imlib (gui->visual);
+  gui_init_imlib (gui, gui->visual);
 
   gui->x_unlock_display (gui->display);
 
@@ -1957,8 +1950,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gui->event_reject = 0;
 }
 
-void gui_init_imlib (Visual *vis) {
-  gGui_t *gui = gGui;
+void gui_init_imlib (gGui_t *gui, Visual *vis) {
   XColor                dummy;
   ImlibInitParams	imlib_init;
 
@@ -2042,7 +2034,7 @@ static void on_start(void *data) {
   }
   
   if(startup->start)
-    gui_execute_action_id(ACTID_PLAY);
+    gui_execute_action_id (gui, ACTID_PLAY);
   
 }
 
@@ -2112,7 +2104,7 @@ void gui_run(char **session_opts) {
   /*  global event handler */
   gui->widget_key = xitk_register_event_handler("NO WINDOW", None,
 						 gui_handle_event, 
-						 NULL,
+						 gui,
 						 gui_dndcallback, 
 						 NULL, NULL);
   
@@ -2134,13 +2126,13 @@ void gui_run(char **session_opts) {
     /* Popup setup window if there is no config file */
     if(actions_on_start(gui->actions_on_start, ACTID_SETUP)) {
       xine_config_save (gui->xine, __xineui_global_config_file);
-      gui_execute_action_id(ACTID_SETUP);
+      gui_execute_action_id (gui, ACTID_SETUP);
     }
     
     /*  The user wants to hide video window  */
     if(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
       if (!panel_is_visible (gui->panel))
-	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
+        gui_execute_action_id (gui, ACTID_TOGGLE_VISIBLITY);
       
       /* DXR3 case */
       if (video_window_is_visible (gui->vwin))
@@ -2154,12 +2146,12 @@ void gui_run(char **session_opts) {
 
     /* The user wants to see in fullscreen mode  */
     for (i = actions_on_start(gui->actions_on_start, ACTID_TOGGLE_FULLSCREEN); i > 0; i--)
-      gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
+      gui_execute_action_id (gui, ACTID_TOGGLE_FULLSCREEN);
 
 #ifdef HAVE_XINERAMA
     /* The user wants to see in xinerama fullscreen mode  */
     for (i = actions_on_start(gui->actions_on_start, ACTID_TOGGLE_XINERAMA_FULLSCREEN); i > 0; i--)
-      gui_execute_action_id(ACTID_TOGGLE_XINERAMA_FULLSCREEN);
+      gui_execute_action_id (gui, ACTID_TOGGLE_XINERAMA_FULLSCREEN);
 #endif
 
     /* User load a playlist on startup */
@@ -2211,3 +2203,4 @@ void gui_run(char **session_opts) {
   kbindings_save_kbinding(gui->kbindings);
   kbindings_free_kbinding(&gui->kbindings);
 }
+

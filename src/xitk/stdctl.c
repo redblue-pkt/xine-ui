@@ -49,11 +49,12 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   struct timeval    tv;
   int               secs, last_secs;
   char             *params;
+  gGui_t           *gui = gGui;
 
   last_secs = -1;
   params = NULL;
 
-  while(gGui->running) {
+  while (gui->running) {
 
     FD_ZERO(&set);
     FD_SET(stdctl.fd, &set);
@@ -85,7 +86,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	  /* syntax:   "command$parameter"                        */
 	  /* example:  "OSDWriteText$Some Information to Display" */
 
-	  gGui->alphanum.set = 0;
+          gui->alphanum.set = 0;
 	  params = strchr(c, '$');
 
 	  if(params != NULL) {
@@ -95,8 +96,8 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	    *params = '\0';
 	    params++;
 
-	    gGui->alphanum.set = 1;
-	    gGui->alphanum.arg = params;
+            gui->alphanum.set = 1;
+            gui->alphanum.arg = params;
 
 #if DEBUG_STDCTL
 	    fprintf(stderr, "Command: '%s'\nParameters: '%s'\n", c, params);
@@ -107,7 +108,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	  /* syntax:  "command#parameter"                 */
 	  /* example: "SetPosition%#99"                   */
 
-	  gGui->numeric.set = 0;
+          gui->numeric.set = 0;
 	  params = strchr(c, '#');
 
 	  if(params != NULL) {
@@ -117,38 +118,38 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
 	    *params = '\0';
 	    params++;
 
-	    gGui->numeric.set = 1;
-	    gGui->numeric.arg = atoi(params);
+            gui->numeric.set = 1;
+            gui->numeric.arg = atoi(params);
 
-	    if(gGui->numeric.arg < 0)
+            if (gui->numeric.arg < 0)
 	    {
-	      gGui->numeric.arg = 0;
+              gui->numeric.arg = 0;
 	      fprintf(stderr, "WARNING: stdctl: Negative num argument not supported, set to 0\n");
 	    }
 
 #if DEBUG_STDCTL
-	    fprintf(stderr, "Command: '%s'\nParameters: '%d'\n", c, gGui->numeric.arg);
+            fprintf (stderr, "Command: '%s'\nParameters: '%d'\n", c, gui->numeric.arg);
 #endif
 	  }
 
-	  k = kbindings_lookup_action(gGui->kbindings, c);
+          k = kbindings_lookup_action (gui->kbindings, c);
 
 	  if(k)
-	    gui_execute_action_id((kbindings_get_action_id(k)));
+            gui_execute_action_id (gui, kbindings_get_action_id (k));
 
 	  c = c1 + 1;
 	}
       }
 
-      panel_paint (gGui->panel);
+      panel_paint (gui->panel);
 
       if(len <= 0) {
-	gui_execute_action_id(ACTID_QUIT);
+        gui_execute_action_id (gui, ACTID_QUIT);
 	break;
       }
     }
 
-    if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
+    if (gui_xine_get_pos_length (gui->stream, NULL, &secs, NULL)) {
 
       secs /= 1000;
 

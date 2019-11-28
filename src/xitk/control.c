@@ -273,7 +273,7 @@ static void control_handle_event(XEvent *event, void *data) {
       int wx, wy;
       
       xitk_get_window_position (vctrl->gui->display, vctrl->window, &wx, &wy, NULL, NULL);
-      control_menu (vctrl->widget_list, bevent->x + wx, bevent->y + wy);
+      control_menu (vctrl->gui, vctrl->widget_list, bevent->x + wx, bevent->y + wy);
     }
   }
 

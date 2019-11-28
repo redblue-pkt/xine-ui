@@ -33,15 +33,15 @@
 int hidden_file_cb(int action, int value);
 void dummy_config_cb(void *data, xine_cfg_entry_t *cfg);
 int actions_on_start(action_id_t actions[], action_id_t a);
-void gui_deinit(void);
-void gui_init(int nfiles, char *filenames[], window_attributes_t *window_attribute);
-void gui_init_imlib(Visual *vis);
+void gui_deinit (gGui_t *gui);
+void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *window_attribute);
+void gui_init_imlib (gGui_t *gui, Visual *vis);
 void gui_run(char **session_opts);
-int gui_playlist_play(int idx);
-void gui_playlist_start_next(void);
+int gui_playlist_play (gGui_t *gui, int idx);
+void gui_playlist_start_next (gGui_t *gui);
 void gui_dndcallback(const char *filename);
-void gui_execute_action_id(action_id_t);
-void gui_handle_event(XEvent *event, void *data);
+void gui_execute_action_id (gGui_t *gui, action_id_t id);
+void gui_handle_event (XEvent *event, void *gui);
 
 int wm_not_ewmh_only(void);
 #endif

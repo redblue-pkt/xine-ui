@@ -491,7 +491,7 @@ static void setup_handle_event(XEvent *event, void *data) {
         setup_exit (NULL, setup);
 	return;
       }
-      gui_handle_event(event, data);
+      gui_handle_event (event, setup->gui);
     }
     break;
   }

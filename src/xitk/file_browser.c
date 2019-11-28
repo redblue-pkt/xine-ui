@@ -126,6 +126,8 @@ typedef struct {
 #define WAIT_CURS    1
 
 struct filebrowser_s {
+  gGui_t                         *gui;
+
   xitk_window_t                  *xwin;
   
   xitk_widget_list_t             *widget_list;
@@ -226,9 +228,9 @@ static void fb_reactivate(filebrowser_t *fb) {
 static void _fb_set_cursor(filebrowser_t *fb, int state) {
   if(fb) {
     if(state == WAIT_CURS)
-      xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(fb->xwin)), xitk_cursor_watch);
+      xitk_cursors_define_window_cursor (fb->gui->display, (xitk_window_get_window(fb->xwin)), xitk_cursor_watch);
     else
-      xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(fb->xwin)));
+      xitk_cursors_restore_window_cursor (fb->gui->display, (xitk_window_get_window(fb->xwin)));
   }
 }
 /*
@@ -281,7 +283,7 @@ static void fne_handle_event(XEvent *event, void *data) {
     if(xitk_get_key_pressed(event) == XK_Escape)
       fne_cancel_cb(NULL, data);
     else
-      gui_handle_event(event, data);
+      gui_handle_event(event, gGui);
     break;
   }
 }
@@ -295,25 +297,25 @@ static void fb_create_input_window(char *title, char *text,
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
   
-  gGui->x_lock_display (gGui->display);
-  x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (width >> 1);
-  y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (height >> 1);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_lock_display (fb->gui->display);
+  x = (((DisplayWidth (fb->gui->display, fb->gui->screen))) >> 1) - (width >> 1);
+  y = (((DisplayHeight (fb->gui->display, fb->gui->screen))) >> 1) - (height >> 1);
+  fb->gui->x_unlock_display (fb->gui->display);
 
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
   
   fne->callback = cb;
   fne->fb = fb;
 
-  fne->xwin = xitk_window_create_dialog_window(gGui->imlib_data, title, x, y, width, height);
+  fne->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, title, x, y, width, height);
 
   xitk_set_wm_window_type((xitk_window_get_window(fne->xwin)), WINDOW_TYPE_NORMAL);
   change_class_name((xitk_window_get_window(fne->xwin)));
   change_icon((xitk_window_get_window(fne->xwin)));
 
-  gGui->x_lock_display (gGui->display);
-  gc = XCreateGC(gGui->display, (xitk_window_get_window(fne->xwin)), None, None);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_lock_display (fb->gui->display);
+  gc = XCreateGC (fb->gui->display, (xitk_window_get_window(fne->xwin)), None, None);
+  fb->gui->x_unlock_display (fb->gui->display);
   
   fne->widget_list                = xitk_widget_list_new();
 
@@ -321,8 +323,8 @@ static void fb_create_input_window(char *title, char *text,
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fne->xwin)));
   xitk_widget_list_set(fne->widget_list, WIDGET_LIST_GC, gc);
   
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&inp, fb->gui->imlib_data);
 
   x = 15;
   y = 30;
@@ -382,13 +384,12 @@ static void fb_create_input_window(char *title, char *text,
 						  (void *)fne);
   }
   
-  gGui->x_lock_display (gGui->display);
-  XRaiseWindow(gGui->display, xitk_window_get_window(fne->xwin));
-  XMapWindow(gGui->display, xitk_window_get_window(fne->xwin));
-  if(!gGui->use_root_window && gGui->video_display == gGui->display)
-    XSetTransientForHint(gGui->display, 
-			 xitk_window_get_window(fne->xwin), gGui->video_window);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_lock_display (fb->gui->display);
+  XRaiseWindow (fb->gui->display, xitk_window_get_window(fne->xwin));
+  XMapWindow (fb->gui->display, xitk_window_get_window(fne->xwin));
+  if (!fb->gui->use_root_window && fb->gui->video_display == fb->gui->display)
+    XSetTransientForHint (fb->gui->display, xitk_window_get_window (fne->xwin), fb->gui->video_window);
+  fb->gui->x_unlock_display (fb->gui->display);
   layer_above_video(xitk_window_get_window(fne->xwin));
   
   try_to_set_input_focus(xitk_window_get_window(fne->xwin));
@@ -851,10 +852,10 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_hide_widget(fb->directories_sort);
 
     if(fb->directories_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
 			      dsimage, dsimage->width, dsimage->height);
     else
-      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
+      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_up, 
 			    dsimage, dsimage->width, dsimage->height);
 
     xitk_show_widget(fb->directories_sort);
@@ -870,10 +871,10 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_hide_widget(fb->files_sort);
 
     if(fb->files_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
 			      fsimage, fsimage->width, fsimage->height);
     else
-      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
+      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_up, 
 			    fsimage, fsimage->width, fsimage->height);
 
     xitk_show_widget(fb->files_sort);
@@ -894,14 +895,14 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&fb->widget_key);
 
     xitk_destroy_widgets(fb->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, fb->xwin);
+    xitk_window_destroy_window (fb->gui->imlib_data, fb->xwin);
 
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
     
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
-    gGui->x_unlock_display (gGui->display);
+    fb->gui->x_lock_display (fb->gui->display);
+    XFreeGC (fb->gui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
+    fb->gui->x_unlock_display (fb->gui->display);
    
     XITK_WIDGET_LIST_FREE(fb->widget_list);
 
@@ -946,8 +947,8 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
     
-    xitk_image_free_image(gGui->imlib_data, &fb->sort_skin_up);
-    xitk_image_free_image(gGui->imlib_data, &fb->sort_skin_down);
+    xitk_image_free_image (fb->gui->imlib_data, &fb->sort_skin_up);
+    xitk_image_free_image (fb->gui->imlib_data, &fb->sort_skin_down);
 
     free(fb);
     fb = NULL;
@@ -996,7 +997,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
 	     fb->norm_files[sel].name);
     
     fb_deactivate(fb);
-    xitk_window_dialog_yesno(gGui->imlib_data, _("Confirm deletion ?"),
+    xitk_window_dialog_yesno (fb->gui->imlib_data, _("Confirm deletion ?"),
 			     fb_delete_file_cb, 
 			     fb_delete_file_cb, 
 			     (void *)fb, ALIGN_DEFAULT, "%s", buf);
@@ -1166,6 +1167,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   int                         i, x, y, w, width, height;
 
   fb = (filebrowser_t *) calloc(1, sizeof(filebrowser_t));
+  if (!fb)
+    return NULL;
+
+  fb->gui = gGui;
   
   if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
     fb->cbb[0].label = strdup(cbb1->label);
@@ -1191,13 +1196,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   if(cbb_close)
     fb->cbb[2].callback = cbb_close->callback;
   
-  gGui->x_lock_display (gGui->display);
-  x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (WINDOW_WIDTH >> 1);
-  y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (WINDOW_HEIGHT >> 1);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_lock_display (fb->gui->display);
+  x = (((DisplayWidth (fb->gui->display, fb->gui->screen))) >> 1) - (WINDOW_WIDTH >> 1);
+  y = (((DisplayHeight (fb->gui->display, fb->gui->screen))) >> 1) - (WINDOW_HEIGHT >> 1);
+  fb->gui->x_unlock_display (fb->gui->display);
 
   /* Create window */
-  fb->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+  fb->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, 
 					      (window_title) ? window_title : _("File Browser"), 
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -1232,10 +1237,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->file_filters[i] = NULL;
   fb->filter_selected = 0;
 
-  gGui->x_lock_display (gGui->display);
-  gc = XCreateGC(gGui->display, 
+  fb->gui->x_lock_display (fb->gui->display);
+  gc = XCreateGC (fb->gui->display, 
 		 (xitk_window_get_window(fb->xwin)), None, None);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_unlock_display (fb->gui->display);
 
   fb->widget_list                = xitk_widget_list_new();
 
@@ -1243,20 +1248,20 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fb->xwin)));
   xitk_widget_list_set(fb->widget_list, WIDGET_LIST_GC, gc);
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&br, gGui->imlib_data);
-  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&b, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&cb, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&br, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&inp, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&cmb, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&b, fb->gui->imlib_data);
 
   xitk_window_get_window_size(fb->xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
-  gGui->x_lock_display (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(fb->xwin)), bg->pixmap,
+  bg = xitk_image_create_xitk_pixmap (fb->gui->imlib_data, width, height);
+  fb->gui->x_lock_display (fb->gui->display);
+  XCopyArea (fb->gui->display, (xitk_window_get_background(fb->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  gGui->x_unlock_display (gGui->display);
+  fb->gui->x_unlock_display (fb->gui->display);
 
 
   x = 15;
@@ -1294,7 +1299,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
   
-  draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box (fb->gui->imlib_data, bg, x, y,
 			     w - 1, xitk_get_widget_height(fb->directories_browser) + 4 - 1);
   
   y -= 15;
@@ -1325,7 +1330,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->files_browser);
   xitk_enable_and_show_widget(fb->files_browser);
 
-  draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box (fb->gui->imlib_data, bg, x, y,
 			     w - 1, xitk_get_widget_height(fb->files_browser) + 4 - 1);
 
   y -= 15;
@@ -1347,13 +1352,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     short         x1, x2, x3;
     short         y1, y2, y3;
 
-    fb->sort_skin_up = xitk_image_create_image(gGui->imlib_data, 
+    fb->sort_skin_up = xitk_image_create_image (fb->gui->imlib_data, 
 					       dsimage->width, dsimage->height);
-    fb->sort_skin_down = xitk_image_create_image(gGui->imlib_data, 
+    fb->sort_skin_down = xitk_image_create_image (fb->gui->imlib_data, 
 						 dsimage->width, dsimage->height);
     
-    draw_bevel_three_state(gGui->imlib_data, fb->sort_skin_up);
-    draw_bevel_three_state(gGui->imlib_data, fb->sort_skin_down);
+    draw_bevel_three_state (fb->gui->imlib_data, fb->sort_skin_up);
+    draw_bevel_three_state (fb->gui->imlib_data, fb->sort_skin_down);
 
     w = dsimage->width / 3;
 
@@ -1365,17 +1370,17 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       
       offset = 0;
       for(i = 0; i < 2; i++) {
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    5, 4 + offset, w - 45, 1);
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    w - 20, 4 + offset, 10, 1);
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    w + 5, 4 + offset, w - 45, 1);
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    (w * 2) - 20, 4 + offset, 10, 1);
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
-	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
 				    ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
 	offset += 4;
       }
@@ -1421,36 +1426,36 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	
 	offset += w;
 	
-	gGui->x_lock_display (gGui->display);
-	XSetForeground(gGui->display, image->image->gc, 
-		       xitk_get_pixel_color_lightgray(gGui->imlib_data));
-	XFillPolygon(gGui->display, image->image->pixmap, image->image->gc, 
+        fb->gui->x_lock_display (fb->gui->display);
+        XSetForeground (fb->gui->display, image->image->gc, 
+          xitk_get_pixel_color_lightgray (fb->gui->imlib_data));
+        XFillPolygon (fb->gui->display, image->image->pixmap, image->image->gc, 
 		     &points[0], 4, Convex, CoordModeOrigin);
-	gGui->x_unlock_display (gGui->display);
-	
-	gGui->x_lock_display (gGui->display);
+        fb->gui->x_unlock_display (fb->gui->display);
+
+        fb->gui->x_lock_display (fb->gui->display);
 	for(k = 0; k < 3; k++) {
 	  if(k == 0)
-	    XSetForeground(gGui->display, image->image->gc, 
-			   xitk_get_pixel_color_black(gGui->imlib_data));
+            XSetForeground (fb->gui->display, image->image->gc, 
+              xitk_get_pixel_color_black (fb->gui->imlib_data));
 	  else if(k == 1)
-	    XSetForeground(gGui->display, image->image->gc, 
-			   xitk_get_pixel_color_darkgray(gGui->imlib_data));
+            XSetForeground (fb->gui->display, image->image->gc, 
+              xitk_get_pixel_color_darkgray (fb->gui->imlib_data));
 	  else
-	    XSetForeground(gGui->display, image->image->gc, 
-			   xitk_get_pixel_color_white(gGui->imlib_data));
-	  
-	  XDrawLine(gGui->display, image->image->pixmap, image->image->gc,
+            XSetForeground (fb->gui->display, image->image->gc,
+              xitk_get_pixel_color_white (fb->gui->imlib_data));
+  
+          XDrawLine (fb->gui->display, image->image->pixmap, image->image->gc,
 		    points[k].x, points[k].y, points[k+1].x, points[k+1].y);
 	}
-	gGui->x_unlock_display (gGui->display);
+        fb->gui->x_unlock_display (fb->gui->display);
 	
       }
     }
 
-    xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+    xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
 			    dsimage, dsimage->width, dsimage->height);
-    xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+    xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
 			    fsimage, fsimage->width, fsimage->height);
   }
 
@@ -1582,7 +1587,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->close);
   xitk_enable_and_show_widget(fb->close);
 
-  xitk_window_change_background(gGui->imlib_data, fb->xwin, bg->pixmap, width, height);
+  xitk_window_change_background (fb->gui->imlib_data, fb->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
 

@@ -797,6 +797,7 @@ struct xitk_menu_entry_s {
   char                             *type;     /* NULL, <separator>, <branch>, <check>, <checked> */
   xitk_menu_callback_t              cb;
   void                             *user_data;
+  int                               user_id;
 };
 
 typedef struct {

@@ -182,10 +182,10 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 static void _playlist_xine_play(void) {
   gGui_t *gui = gGui;
 
-  if(!gui_playlist_play(gui->playlist.cur)) {
+  if (!gui_playlist_play (gui, gui->playlist.cur)) {
 
     if(mediamark_all_played() && (gui->actions_on_start[0] == ACTID_QUIT))
-      gui_exit(NULL, NULL);
+      gui_exit (NULL, gui);
     else
       gui_display_logo();
   }
@@ -232,7 +232,7 @@ void playlist_delete_entry(int j) {
   if(j  >= 0) {
 
     if((gui->playlist.cur == j) && ((xine_get_status(gui->stream) != XINE_STATUS_STOP)))
-      gui_stop(NULL, NULL);
+      gui_stop (NULL, gui);
 
     mediamark_free_entry(j);
 
@@ -482,7 +482,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 
 	xitk_get_window_position(gui->display, playlist->window, &wx, &wy, NULL, NULL);
 
-	playlist_menu(playlist->widget_list, 
+        playlist_menu (gui, playlist->widget_list,
 		      bevent->x + wx, bevent->y + wy, 
 		      (xitk_browser_get_current_selected(playlist->playlist) >= 0));
       }
@@ -500,7 +500,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 	mmk_editor_end();
     }
 
-    gui_handle_event(event, data);
+    gui_handle_event (event, gui);
     break;
 
   case KeyPress:
@@ -547,9 +547,9 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       case XK_Escape:
 	playlist_exit(NULL, NULL);
 	break;
-	
+
       default:
-	gui_handle_event(event, data);
+        gui_handle_event (event, gui);
 	break;
       }
     }
@@ -830,7 +830,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
     if (gui->smart_mode) {
       if (xine_get_status (gui->stream) == XINE_STATUS_PLAY)
         gui_stop (NULL, NULL);
-      gui_play (NULL, NULL);
+      gui_play (NULL, gui);
     }
     
     if (playlist) {

@@ -137,6 +137,7 @@ uint8_t get_boolean(int session, ctrl_commands_t command) {
 #endif
 
 static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
+  gGui_t *gui = data;
   fd_set                set;
   struct timeval        tv;
   serv_header_packet_t *shdr;
@@ -206,52 +207,52 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     switch(shdr->hdr.command) {
 
     case CMD_PLAY:
-      gui_play(NULL, NULL);
+      gui_play (NULL, gui);
       send_ack(shdr);
       break;
       
     case CMD_SLOW_2:
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_2);
+      xine_set_param (gui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_2);
       send_ack(shdr);
       break;
 
     case CMD_SLOW_4:
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+      xine_set_param (gui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       send_ack(shdr);
       break;
 
     case CMD_PAUSE:
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+      xine_set_param (gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
       send_ack(shdr);
       break;
 
     case CMD_FAST_2:
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_2);
+      xine_set_param (gui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_2);
       send_ack(shdr);
       break;
 
     case CMD_FAST_4:
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_4);
+      xine_set_param (gui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_4);
       send_ack(shdr);
       break;
 
     case CMD_STOP:
-      gui_stop(NULL, NULL);
+      gui_stop (NULL, gui);
       send_ack(shdr);
       break;
 
     case CMD_QUIT:
-      gui_exit(NULL, NULL);
+      gui_exit (NULL, gui);
       send_ack(shdr);
       break;
 
     case CMD_FULLSCREEN:
-      gui_set_fullscreen_mode(NULL, NULL);
+      gui_set_fullscreen_mode (NULL, gui);
       send_ack(shdr);
       break;
 
     case CMD_EJECT:
-      gui_eject(NULL, NULL);
+      gui_eject (NULL, gui);
       send_ack(shdr);
       break;
 
@@ -276,25 +277,25 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 	
     case CMD_PLAYLIST_FIRST:
-      if(gGui->playlist.num) {
-	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
-	  gui_stop(NULL, NULL);
-	
-	gGui->playlist.cur = 0;
+      if (gui->playlist.num) {
+        if (xine_get_status (gui->stream) == XINE_STATUS_PLAY)
+          gui_stop (NULL, gui);
+
+        gui->playlist.cur = 0;
 	gui_set_current_mmk(mediamark_get_current_mmk());
-	gui_play(NULL, NULL);
+        gui_play (NULL, gui);
       }
       send_ack(shdr);
       break;
       
     case CMD_PLAYLIST_LAST:
-      if(gGui->playlist.num) {
-	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
-	  gui_stop(NULL, NULL);
-	
-	gGui->playlist.cur = gGui->playlist.num - 1;
+      if (gui->playlist.num) {
+        if (xine_get_status (gui->stream) == XINE_STATUS_PLAY)
+          gui_stop (NULL, gui);
+
+        gui->playlist.cur = gui->playlist.num - 1;
 	gui_set_current_mmk(mediamark_get_current_mmk());
-	gui_play(NULL, NULL);
+        gui_play (NULL, gui);
       }
       send_ack(shdr);
       break;
@@ -323,31 +324,31 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       mediamark_load_mediamarks((const char *)shdr->data);
       gui_set_current_mmk(mediamark_get_current_mmk());
       playlist_update_playlist();
-      if ((!is_playback_widgets_enabled (gGui->panel)) && gGui->playlist.num)
-        enable_playback_controls (gGui->panel, 1);
+      if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
+        enable_playback_controls (gui->panel, 1);
       send_ack(shdr);
       break;
 
     case CMD_PLAYLIST_STOP:
-      if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-	gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
+      if(xine_get_status (gui->stream) != XINE_STATUS_STOP)
+        gui->playlist.control |= PLAYLIST_CONTROL_STOP;
       send_ack(shdr);
       break;
 
     case CMD_PLAYLIST_CONTINUE:
-      if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-	gGui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
+      if (xine_get_status (gui->stream) != XINE_STATUS_STOP)
+        gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
       send_ack(shdr);
       break;
 
     case CMD_VOLUME:
       {
 	int *vol = (int *)shdr->data;
-	
-	if((gGui->mixer.method == SOUND_CARD_MIXER) && 
-	   (gGui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
+
+        if ((gui->mixer.method == SOUND_CARD_MIXER) && 
+          (gui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
 	  change_audio_vol(*vol);
-	else if((gGui->mixer.method == SOFTWARE_MIXER) && ((*vol >= 0) && (*vol <= 200)))
+        else if ((gui->mixer.method == SOFTWARE_MIXER) && ((*vol >= 0) && (*vol <= 200)))
 	  change_amp_vol(*vol);
 	
 	send_ack(shdr);
@@ -376,7 +377,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 	case PLAYLIST_LOOP_SHUFFLE:
 	case PLAYLIST_LOOP_SHUF_PLUS:
 	case PLAYLIST_LOOP_MODES_NUM:
-	  gGui->playlist.loop = *loop;
+          gui->playlist.loop = *loop;
 	  break;
 	}
 	
@@ -388,8 +389,8 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       {
 	uint32_t status = 2;
 
-	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
-	  int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+        if (xine_get_status (gui->stream) == XINE_STATUS_PLAY) {
+          int speed = xine_get_param (gui->stream, XINE_PARAM_SPEED);
 
 	  switch(speed) {
 	  case XINE_SPEED_NORMAL:
@@ -425,7 +426,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 
     case CMD_GET_TIME_STATUS_IN_SECS:
       {
-	uint32_t status = gGui->stream_length.time / 1000;
+        uint32_t status = gui->stream_length.time / 1000;
 	send_packet(shdr->fd, CMD_GET_TIME_STATUS_IN_SECS, &status, sizeof(status));
 	send_ack(shdr);
       }
@@ -433,7 +434,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 
     case CMD_GET_TIME_STATUS_IN_POS:
       {
-	uint32_t status = gGui->stream_length.pos;
+        uint32_t status = gui->stream_length.pos;
 	send_packet(shdr->fd, CMD_GET_TIME_STATUS_IN_POS, &status, sizeof(status));
 	send_ack(shdr);
       }
@@ -502,8 +503,8 @@ int init_session(void) {
 	session_id = i;
 	listen(ctrl_fd, 100);
 	going = 1;
-	
-	pthread_create(&thread_server, NULL, ctrlsocket_func, NULL);
+
+        pthread_create (&thread_server, NULL, ctrlsocket_func, gGui);
 	socket_name = strdup(saddr.un.sun_path);
 	retval = 1;
 	break;

@@ -925,7 +925,7 @@ static void _pplugin_help_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event,
     if(xitk_get_key_pressed(event) == XK_Escape)
       _pplugin_close_help(pp_wrapper, NULL, NULL);
     else
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
   }
 }
 
@@ -1712,7 +1712,7 @@ static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void
 	pplugin_exit(pp_wrapper, NULL, NULL);
 	return;
       }
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
     }
     break;
   }

@@ -496,7 +496,7 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     return;
   k = kbindings_lookup_binding(kbt, buf, modifier);
   if(k && !(gui->no_gui && k->is_gui))
-    gui_execute_action_id(k->action_id);
+    gui_execute_action_id (gui, k->action_id);
 #if 0  /* DEBUG */
   else
     printf("%s unhandled\n", kbuf);
@@ -1049,7 +1049,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
     if(xitk_get_key_pressed(event) == XK_Escape)
       kbedit_exit(NULL, NULL);
     else
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
     break;
 
   case KeyRelease: {
