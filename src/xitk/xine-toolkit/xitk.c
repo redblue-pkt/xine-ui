@@ -136,24 +136,25 @@ static int __gfx_lock(__gfx_t *fx)
   return retval;
 }
 
-static int __gfx_trylock(__gfx_t *fx)
-{
-  int retval = pthread_mutex_trylock(&fx->mutex);
-  if (0 == retval)
-    fx->owning_thread = pthread_self();
-
-  return retval;
-}
-
 static int __gfx_unlock(__gfx_t *fx)
 {
   fx->owning_thread = (pthread_t)0;
   return pthread_mutex_unlock(&fx->mutex);
 }
 
-static int __gfx_selflocked(__gfx_t *fx)
-{
-  return pthread_equal(fx->owning_thread, pthread_self());
+static int __gfx_safe_lock (__gfx_t *fx) {
+  pthread_t self = pthread_self ();
+  if (!pthread_mutex_trylock (&fx->mutex)) {
+    fx->owning_thread = self;
+    return 0;
+  }
+  if (pthread_equal (self, fx->owning_thread))
+    return 1;
+  if (!pthread_mutex_lock (&fx->mutex)) {
+    fx->owning_thread = self;
+    return 0;
+  }
+  return 2;
 }
 
 typedef struct {
@@ -1149,8 +1150,6 @@ xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
   else
     fx->xdnd = NULL;
 
-  fx->key = ++gXitk->key;
-
   if(fx->window) {
 
     XLOCK (gXitk->x.x_lock_display, gXitk->x.display);
@@ -1164,15 +1163,25 @@ xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
     fx->XA_XITK = None;
 
   MUTLOCK();
-
+  fx->key = ++gXitk->key;
   xitk_dlist_add_tail (&gXitk->gfxs, &fx->node);
-
   MUTUNLOCK();
 
 #ifdef XITK_DEBUG
   printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
 #endif
   return fx->key;
+}
+
+static __gfx_t *__fx_from_key (xitk_register_key_t key) {
+  /* fx->key is set uniquely in xitk_register_event_handler, then never changed.
+   * MUTLOCK () is enough. */
+  __gfx_t *fx;
+  for (fx = (__gfx_t *)gXitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
+    if (fx->key == key)
+      return fx;
+  }
+  return NULL;
 }
 
 static void __fx_destroy(__gfx_t *fx, int locked) {
@@ -1226,41 +1235,22 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 
   //  printf("%s()\n", __FUNCTION__);
 
-  MUTLOCK();
-  
-  fx = (__gfx_t *)gXitk->gfxs.head.next;
-  
-  while (fx->node.next) {
-
-    if(FXTRYLOCK(fx)) {
-      if (!FXSELFLOCKED(fx)) {
-        FXLOCK(fx);
-        goto locked;
-      }
-
-      if(fx->key == *key) {
-	*key        = 0; 
-	fx->destroy = 1;
-	MUTUNLOCK();
-	return;
-      }
+  MUTLOCK ();
+  fx = __fx_from_key (*key);
+  if (fx) {
+    *key = 0;
+    if (__gfx_safe_lock (fx)) {
+      /* We already hold this, we are inside a callback. */
+      /* NOTE: After return from this, application may free () fx->user_data. */
+      fx->xevent_callback = NULL;
+      fx->newpos_callback = NULL;
+      fx->user_data       = NULL;
+      fx->destroy = 1;
+    } else {
+      __fx_destroy (fx, 1);
     }
-    else {
-locked:
-      if(fx->key == *key) {
-	*key = 0; 
-	
-	__fx_destroy(fx, 1);
-	MUTUNLOCK();
-	return;
-      }
-      FXUNLOCK(fx);
-    }
-
-    fx = (__gfx_t *)fx->node.next;
   }
-
-  MUTUNLOCK();
+  MUTUNLOCK ();
 }
 
 void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
@@ -1302,19 +1292,11 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 
   MUTLOCK();
 
-  fx = (__gfx_t *)gXitk->gfxs.head.next;
-    
-  while (fx->node.next) {
-    int  already_locked = 0;
-    
-    if(FXTRYLOCK(fx)) {
-      if (FXSELFLOCKED(fx))
-        already_locked = 1;
-      else
-        FXLOCK(fx);
-    }
+  fx = __fx_from_key (key);
+  if (fx) {
+    int already_locked = __gfx_safe_lock (fx);
 
-    if((fx->key == key) && (fx->window != None)) {
+    if (fx->window != None) {
       Window c;
       
       winf->window = fx->window;
@@ -1333,18 +1315,15 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
       winf->height = fx->height;
       winf->width  = fx->width;
       
-      if(!already_locked)
-	FXUNLOCK(fx);
+      if (!already_locked)
+        __gfx_unlock (fx);
 
       MUTUNLOCK();
       return 1;
 
     }
-    
-    if(!already_locked)
-      FXUNLOCK(fx);
-    
-    fx = (__gfx_t *)fx->node.next;
+    if (!already_locked)
+      __gfx_unlock (fx);
   }
 
   MUTUNLOCK();
