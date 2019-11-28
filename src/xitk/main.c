@@ -1,5 +1,4 @@
-/*
- * Copyright (C) 2000-2019 the xine project
+/** Copyright (C) 2000-2019 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -1037,7 +1036,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       if( xine_check_version(1,1,1) )
         xine_set_param(gui->stream, XINE_PARAM_GAPLESS_SWITCH, 1);
 #endif
-      gui_playlist_start_next();
+      gui_playlist_start_next (gui);
     }
     else if(event->stream == gui->visual_anim.stream) {
       /* printf("xitk/main.c: restarting visual stream...\n"); */
@@ -1220,7 +1219,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	break;
 
       case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
-	gui_stop(NULL, NULL);
+        gui_stop (NULL, gui);
 	strlcpy(buffer, _("The audio device is unavailable. "
 			  "Please verify if another program already uses it."), sizeof(buffer));
 	break;
@@ -2125,7 +2124,7 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
-  gui_init(_argc - optind, &_argv[optind], &window_attribute);
+  gui_init (gui, _argc - optind, &_argv[optind], &window_attribute);
 
   pthread_mutex_init(&gui->download_mutex, NULL);
 
@@ -2383,4 +2382,3 @@ int main(int argc, char *argv[]) {
   }
   return retval;
 }
-

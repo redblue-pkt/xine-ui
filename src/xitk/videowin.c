@@ -351,7 +351,7 @@ void video_window_select_visual (xui_vwin_t *vwin) {
     if (vwin->gui->visual != vwin->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui->visual->visualid);
       vwin->gui->x_lock_display (vwin->gui->display);
-      gui_init_imlib (vwin->gui->visual);
+      gui_init_imlib (vwin->gui, vwin->gui->visual);
       vwin->gui->x_unlock_display (vwin->gui->display);
       pthread_mutex_lock (&vwin->mutex);
       video_window_adapt_size (vwin);
@@ -2149,11 +2149,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case DestroyNotify:
     if (vwin->gui->video_window == event->xany.window)
-      gui_exit(NULL, NULL);
+      gui_exit (NULL, vwin->gui);
     break;
 
   case KeyPress:
-    gui_handle_event(event, data);
+    gui_handle_event (event, vwin->gui);
     break;
 
   case MotionNotify: {
@@ -2198,7 +2198,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
 
     if (bevent->button == Button3 && vwin->gui->display == vwin->gui->video_display)
-      video_window_menu(vwin->wl);
+      video_window_menu (vwin->gui, vwin->wl);
     else if (bevent->button == Button2)
       panel_toggle_visibility (NULL, vwin->gui->panel);
     else if (bevent->button == Button1) {
@@ -2214,7 +2214,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
       click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
       
       if (click_diff < (xitk_get_timer_dbl_click())) {
-	gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
+        gui_execute_action_id (vwin->gui, ACTID_TOGGLE_FULLSCREEN);
         vwin->click_time.tv_sec -= (xitk_get_timer_dbl_click() / 1000.0);
         vwin->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
       }
@@ -2239,7 +2239,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
   break;
 
   case ButtonRelease:
-    gui_handle_event(event, data);
+    gui_handle_event (event, vwin->gui);
     break;
 
   case Expose: {

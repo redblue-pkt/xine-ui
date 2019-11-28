@@ -39,25 +39,25 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
 void wait_for_window_visible(Display *display, Window window);
 void try_to_set_input_focus(Window window);
 void gui_display_logo(void);
-int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
+int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
 int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub);
 int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, 
 			   int start_time, int av_offset, int spu_offset, int report_error);
-void gui_exit (xitk_widget_t *w, void *data);
-void gui_play (xitk_widget_t *w, void *data);
-void gui_stop (xitk_widget_t *w, void *data);
-void gui_close (xitk_widget_t *w, void *data);
-void gui_pause (xitk_widget_t *w, void *data, int state) ;
-void gui_eject(xitk_widget_t *w, void *data);
-void gui_toggle_visibility(xitk_widget_t *w, void *data);
-void gui_toggle_border(xitk_widget_t *w, void *data);
-void gui_set_fullscreen_mode(xitk_widget_t *w, void *data);
+void gui_exit (xitk_widget_t *w, void *gui);
+void gui_play (xitk_widget_t *w, void *gui);
+void gui_stop (xitk_widget_t *w, void *gui);
+void gui_close (xitk_widget_t *w, void *gui);
+void gui_pause (xitk_widget_t *w, void *gui, int state);
+void gui_eject (xitk_widget_t *w, void *gui);
+void gui_toggle_visibility (xitk_widget_t *w, void *gui);
+void gui_toggle_border (xitk_widget_t *w, void *gui);
+void gui_set_fullscreen_mode (xitk_widget_t *w, void *gui);
 #ifdef HAVE_XINERAMA
 void gui_set_xinerama_fullscreen_mode(void);
 #endif
 void gui_toggle_aspect(int aspect);
 void gui_toggle_interlaced(void);
-void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value);
+void gui_direct_change_audio_channel (xitk_widget_t *w, void *gui, int value);
 void gui_change_audio_channel(xitk_widget_t *w, void *data);
 void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value);
 void gui_change_spu_channel(xitk_widget_t *w, void *data);

@@ -282,7 +282,7 @@ static void help_handle_event(XEvent *event, void *data) {
     if(xitk_get_key_pressed(event) == XK_Escape)
       help_exit(NULL, NULL);
     else
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
     break;
   }
 }

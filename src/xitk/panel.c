@@ -442,7 +442,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
             panel->gui->playlist.mmk[panel->gui->playlist.cur] && panel->gui->mmk.end != -1) {
             if ((msecs / 1000) >= panel->gui->playlist.mmk[panel->gui->playlist.cur]->end) {
               panel->gui->ignore_next = 0;
-	      gui_playlist_start_next();
+              gui_playlist_start_next (panel->gui);
               /* pthread_mutex_unlock (&panel->gui->xe_mutex); */
 	      goto __next_iteration;
 	    }
@@ -915,7 +915,7 @@ static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
   xitk_get_widget_pos(panel->audiochan_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->audiochan_label));
-  audio_lang_menu(panel->widget_list, x, y);
+  audio_lang_menu (panel->gui, panel->widget_list, x, y);
 }
 
 static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
@@ -928,7 +928,7 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   xitk_get_widget_pos(panel->spuid_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->spuid_label));
-  spu_lang_menu(panel->widget_list, x, y);
+  spu_lang_menu (panel->gui, panel->widget_list, x, y);
 }
 
 /*
@@ -1055,7 +1055,7 @@ static void panel_handle_event(XEvent *event, void *data) {
   switch(event->type) {
   case DestroyNotify:
     if (panel->gui->panel_window == event->xany.window)
-      gui_exit(NULL, NULL);
+      gui_exit (NULL, panel->gui);
     break;
 
   case ButtonPress:
@@ -1063,13 +1063,13 @@ static void panel_handle_event(XEvent *event, void *data) {
       XButtonEvent *bevent = (XButtonEvent *) event;
 
       if(bevent->button == Button3)
-        video_window_menu (panel->widget_list);
+        video_window_menu (panel->gui, panel->widget_list);
     }
     break;
     
   case KeyPress:
   case ButtonRelease:
-    gui_handle_event(event, data);
+    gui_handle_event (event, panel->gui);
     break;
 
   case MappingNotify:
@@ -1404,7 +1404,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Stop button */
   b.skin_element_name = "Stop";
   b.callback          = gui_stop;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   panel->playback_widgets.stop =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.stop);
   xitk_set_widget_tips(panel->playback_widgets.stop, _("Stop playback"));
@@ -1412,7 +1412,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Play button */
   b.skin_element_name = "Play";
   b.callback          = gui_play;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   panel->playback_widgets.play =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.play);
   xitk_set_widget_tips(panel->playback_widgets.play, _("Play selected entry"));
@@ -1420,7 +1420,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Pause button */
   cb.skin_element_name = "Pause";
   cb.callback          = gui_pause;
-  cb.userdata          = NULL;
+  cb.userdata          = panel->gui;
   panel->playback_widgets.pause =  xitk_checkbox_create (panel->widget_list, panel->gui->skin_config, &cb);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.pause);
   xitk_set_widget_tips(panel->playback_widgets.pause, _("Pause/Resume playback"));
@@ -1435,7 +1435,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Eject button */
   b.skin_element_name = "Eject";
   b.callback          = gui_eject;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   panel->playback_widgets.eject =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.eject);
   xitk_set_widget_tips(panel->playback_widgets.eject, _("Eject current medium"));
@@ -1443,7 +1443,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Exit button */
   b.skin_element_name = "Exit";
   b.callback          = gui_exit;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Quit"));
@@ -1475,7 +1475,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Fullscreen button */
   b.skin_element_name = "FullScreen";
   b.callback          = gui_set_fullscreen_mode;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
    w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Fullscreen/Window mode"));

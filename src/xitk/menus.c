@@ -26,15 +26,6 @@
 
 #include "common.h"
 
-#define PLAYB_PLAY              1
-#define PLAYB_STOP              2
-#define PLAYB_PAUSE             3
-#define PLAYB_NEXT              4
-#define PLAYB_PREV              5
-#define PLAYB_SPEEDM            6
-#define PLAYB_SPEEDL            7
-#define PLAYB_ADDMMK            8
-
 #define PLAYL_LOAD              10
 #define PLAYL_SAVE              11
 #define PLAYL_EDIT              12
@@ -51,31 +42,9 @@
 #define AUDIO_PPROCESS          23
 #define AUDIO_PPROCESS_ENABLE   24
 
-#define VIDEO_MIN               30
-#define VIDEO_FULLSCR           30
-#define VIDEO_2X                31
-#define VIDEO_1X                32
-#define VIDEO__5X               33
-#define VIDEO_INTERLEAVE        34
-#define VIDEO_PPROCESS          35
-#define VIDEO_PPROCESS_ENABLE   36
-#define VIDEO_TOGGLE            37
-
-#define SETS_MIN                40
-#define SETS_SETUP              40
-#define SETS_KEYMAP             41
-#define SETS_VIDEO              42
-#define SETS_LOGS               43
-#define SETS_SKINDL             44
-#define SETS_TVANALOG           45
-
-#define STREAM_OSDI             50
-#define STREAM_WINI             51
-
 #define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
 
-static char *menu_get_shortcut(char *action) {
-  gGui_t *gui = gGui;
+static char *menu_get_shortcut (gGui_t *gui, char *action) {
   char *shortcut = kbindings_get_shortcut(gui->kbindings, action);
 #ifdef DEBUG
   if(!shortcut) {
@@ -87,11 +56,18 @@ static char *menu_get_shortcut(char *action) {
 }
 
 static void menu_control_reset(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  (void)w;
+  (void)me;
   control_reset (data);
 }
+
 static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  open_mrlbrowser_from_playlist(w, data);
+  gGui_t *gui = data;
+
+  (void)me;
+  open_mrlbrowser_from_playlist (w, gui);
 }
+
 static void menu_scan_infos(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   playlist_scan_for_infos();
 }
@@ -113,56 +89,23 @@ static void menu_playlist_play_current(xitk_widget_t *w, xitk_menu_entry_t *me, 
 static void menu_playlist_move_updown(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   playlist_move_current_updown(w, data);
 }
-static void menu_event_sender(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_EVENT_SENDER);
-}
+
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int event = (int)(intptr_t) data;
-  static const int events[7] = {
-    XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
-    XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
-    XINE_EVENT_INPUT_MENU7
-  };
-  
-  event_sender_send(events[event]);
-}
-static void menu_panel_visibility(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
-}
-static void menu_file_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_FILESELECTOR);
-}
-static void menu_mrl_browser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_MRLBROWSER);
-}
-static void menu_subtitle_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_SUBSELECT);
-}
-static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = (int)(intptr_t) data;
+  gGui_t *gui = data;
 
-  static const int actions[] = {
-    ACTID_PLAY,
-    ACTID_STOP,
-    ACTID_PAUSE,
-    ACTID_MRL_NEXT,
-    ACTID_MRL_PRIOR,
-    ACTID_SPEED_FAST,
-    ACTID_SPEED_SLOW,
-    ACTID_ADDMEDIAMARK
-  };
+  (void)w;
+  event_sender_send (me->user_id);
+}
 
-  if ( ctrl >= sizeof(actions)/sizeof(actions[0]) ) {
-    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
-    return;
-  }
-
-  gui_execute_action_id(actions[ctrl]);
+static void menu_gui_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  gui_execute_action_id (gui, me->user_id);
 }
 
 static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gGui_t *gui = gGui;
-  int ctrl = (int)(intptr_t) data;
+  gGui_t *gui = data;
+  int ctrl = me->user_id;
 
   switch(ctrl) {
 
@@ -175,7 +118,7 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
     break;
 
   case PLAYL_EDIT:
-    gui_execute_action_id(ACTID_PLAYLIST);
+    gui_execute_action_id (gui, ACTID_PLAYLIST);
     break;
 
   case PLAYL_NO_LOOP:
@@ -204,7 +147,7 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
     break;
 
   case PLAYL_CTRL_STOP:
-    gui_execute_action_id(ACTID_PLAYLIST_STOP);
+    gui_execute_action_id (gui, ACTID_PLAYLIST_STOP);
     break;
 
   default:
@@ -213,10 +156,12 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   }
 }
 static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gGui_t *gui = gGui;
+  gGui_t *gui = data;
   int       num_mrls;
-  const char * const *autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, me->menu, &num_mrls);
+  const char * const *autoplay_mrls = xine_get_autoplay_mrls (gui->xine, me->menu, &num_mrls);
 
+  (void)w;
+  (void)me;
   if(autoplay_mrls) {
     int j;
     
@@ -240,33 +185,22 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
      */
     if(gui->smart_mode) {
       if(xine_get_status(gui->stream) == XINE_STATUS_PLAY)
-	gui_stop(NULL, NULL);
-      gui_play(NULL, NULL);
+        gui_stop (NULL, gui);
+      gui_play (NULL, gui);
     }
 
     enable_playback_controls (gui->panel, (gui->playlist.num > 0));
   }
 }
-static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int info = (int)(intptr_t) data;
 
-  switch(info) {
-  case STREAM_OSDI:
-    gui_execute_action_id(ACTID_OSD_SINFOS);
-    break;
-    
-  case STREAM_WINI:
-    gui_execute_action_id(ACTID_STREAM_INFOS);
-    break;
-  }
-}
 static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gGui_t *gui = gGui;
-  int ctrl = (int)(intptr_t) data;
+  gGui_t *gui = data;
+  int ctrl = me->user_id;
 
+  (void)w;
   switch(ctrl) {
   case AUDIO_MUTE:
-    gui_execute_action_id(ACTID_MUTE);
+    gui_execute_action_id (gui, ACTID_MUTE);
     break;
 
   case AUDIO_INCRE_VOL:
@@ -298,11 +232,11 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     break;
 
   case AUDIO_PPROCESS:
-    gui_execute_action_id(ACTID_APP);
+    gui_execute_action_id (gui, ACTID_APP);
     break;
 
   case AUDIO_PPROCESS_ENABLE:
-    gui_execute_action_id(ACTID_APP_ENABLE);
+    gui_execute_action_id (gui, ACTID_APP_ENABLE);
     break;
 
   default:
@@ -316,70 +250,29 @@ static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) 
   
   config_update_num("gui.post_audio_plugin", viz);
 }
-static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int channel = (int)(intptr_t) data;
 
-  gui_direct_change_audio_channel(NULL, NULL, channel);
+static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  int channel = me->user_id;
+
+  (void)w;
+  gui_direct_change_audio_channel (NULL, gui, channel);
 }
+
 static void menu_spu_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int channel = (int)(intptr_t) data;
 
   gui_direct_change_spu_channel(NULL, NULL, channel);
 }
 static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int aspect = (int)(intptr_t) data;
-  
-  gui_toggle_aspect(aspect);
-}
-static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int ctrl = ((int)(intptr_t) data) - VIDEO_MIN;
+  gGui_t *gui = data;
+  int aspect = me->user_id;
 
-  static const int actions[] = {
-    ACTID_TOGGLE_FULLSCREEN,
-    ACTID_WINDOW200,
-    ACTID_WINDOW100,
-    ACTID_WINDOW50,
-    ACTID_TOGGLE_INTERLEAVE,
-    ACTID_VPP,
-    ACTID_VPP_ENABLE,
-    ACTID_TOGGLE_WINOUT_VISIBLITY
-  };
-
-  if ( ctrl >= sizeof(actions)/sizeof(actions[0]) ) {
-    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl+VIDEO_MIN);
-    return;
-  }
-
-  gui_execute_action_id(actions[ctrl]);
-}
-static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int sets = ((int)(intptr_t) data) - SETS_MIN;
-
-  static const int actions[] = {
-    ACTID_SETUP,
-    ACTID_KBEDIT,
-    ACTID_CONTROLSHOW,
-    ACTID_VIEWLOG,
-    ACTID_SKINDOWNLOAD,
-    ACTID_TVANALOG
-  };
-
-  if ( sets >= sizeof(actions)/sizeof(actions[0]) ) {
-    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, sets+SETS_MIN);
-    return;
-  }
-
-  gui_execute_action_id(actions[sets]);
-}
-static void menu_help(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_HELP_SHOW);
-}
-static void menu_quit(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gui_execute_action_id(ACTID_QUIT);
+  (void)w;
+  gui_toggle_aspect (aspect);
 }
 
-void video_window_menu(xitk_widget_list_t *wl) {
-  gGui_t *gui = gGui;
+void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   int                  aspect = xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO);
   int                  x, y;
   xitk_menu_widget_t   menu;
@@ -395,332 +288,332 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { NULL ,
       NULL,
       "<title>",      
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Show controls"),
-      menu_get_shortcut("ToggleVisibility"),
+      menu_get_shortcut (gui, "ToggleVisibility"),
       panel_is_visible (gui->panel) ? "<checked>" : "<check>",  
-      menu_panel_visibility, NULL                                                            },
+      menu_gui_action, gui, ACTID_TOGGLE_VISIBLITY},
     { _("Show video window"),
-      menu_get_shortcut("ToggleWindowVisibility"),
+      menu_get_shortcut (gui, "ToggleWindowVisibility"),
       video_window_is_visible (gui->vwin) ? "<checked>" : "<check>",  
-      menu_video_ctrl, (void *) VIDEO_TOGGLE                                                 },
+      menu_gui_action, gui, ACTID_TOGGLE_WINOUT_VISIBLITY },
     { _("Fullscreen"),
-      menu_get_shortcut("ToggleFullscreen"),
+      menu_get_shortcut (gui, "ToggleFullscreen"),
       (video_window_get_fullscreen_mode (gui->vwin) & fullscr_mode) ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO_FULLSCR                                                },
+      menu_gui_action, gui, ACTID_TOGGLE_FULLSCREEN },
     { "SEP",  
       NULL,
       "<separator>",  
-      NULL,  NULL                                                                            },
+      NULL, NULL, 0},
     { _("Open"),
       NULL,
       "<branch>",   
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Open/File..."),
-      menu_get_shortcut("FileSelector"),
+      menu_get_shortcut (gui, "FileSelector"),
       NULL,
-      menu_file_selector,        NULL                                                        },
+      menu_gui_action, gui, ACTID_FILESELECTOR},
     { _("Open/Playlist..."),
       NULL,
       NULL,
-      menu_playlist_ctrl, (void *) PLAYL_LOAD                                                },
+      menu_playlist_ctrl, gui, PLAYL_LOAD },
     { _("Open/Location..."),
-      menu_get_shortcut("MrlBrowser"),
+      menu_get_shortcut (gui, "MrlBrowser"),
       NULL,
-      menu_mrl_browser, gui                                                                  },
+      menu_gui_action, gui, ACTID_MRLBROWSER},
     { _("Playback"),
       NULL,
       "<Branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Playback/Play"),
-      menu_get_shortcut("Play"),
+      menu_get_shortcut (gui, "Play"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_PLAY                                                },
+      menu_gui_action, gui, ACTID_PLAY },
     { _("Playback/Stop"),
-      menu_get_shortcut("Stop"),
+      menu_get_shortcut (gui, "Stop"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_STOP                                                },
+      menu_gui_action, gui, ACTID_STOP },
     { _("Playback/Pause"),
-      menu_get_shortcut("Pause"),
+      menu_get_shortcut (gui,"Pause"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_PAUSE                                               },
+      menu_gui_action, gui, ACTID_PAUSE },
     { _("Playback/SEP"),
       NULL,
       "<separator>",  
-      NULL,  NULL                                                                            },
+      NULL,  NULL, 0},
     { _("Playback/Next MRL"),
-      menu_get_shortcut("NextMrl"),
+      menu_get_shortcut (gui, "NextMrl"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_NEXT                                                },
+      menu_gui_action, gui, ACTID_MRL_NEXT },
     { _("Playback/Previous MRL"),
-      menu_get_shortcut("PriorMrl"),
+      menu_get_shortcut (gui, "PriorMrl"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_PREV                                                },
+      menu_gui_action, gui, ACTID_MRL_PRIOR },
     { _("Playback/SEP"),
       NULL,
       "<separator>",  
-      NULL,  NULL                                                                            },
+      NULL,  NULL, 0},
     { _("Playback/Increase Speed"),
-      menu_get_shortcut("SpeedFaster"),
+      menu_get_shortcut (gui, "SpeedFaster"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_SPEEDM                                              },
+      menu_gui_action, gui, ACTID_SPEED_FAST },
     { _("Playback/Decrease Speed"),
-      menu_get_shortcut("SpeedSlower"),
+      menu_get_shortcut (gui, "SpeedSlower"),
       NULL,
-      menu_playback_ctrl, (void *) PLAYB_SPEEDL                                              },
+      menu_gui_action, gui, ACTID_SPEED_SLOW },
     { _("Playlist"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Playlist/Get from"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Playlist/Load..."),
       NULL,
       NULL,
-      menu_playlist_ctrl, (void *) PLAYL_LOAD                                                },
+      menu_playlist_ctrl, gui, PLAYL_LOAD },
     { _("Playlist/Editor..."),
-      menu_get_shortcut("PlaylistEditor"),
+      menu_get_shortcut (gui, "PlaylistEditor"),
       NULL,
-      menu_playlist_ctrl, (void *) PLAYL_EDIT                                                },
+      menu_playlist_ctrl, gui, PLAYL_EDIT },
     { _("Playlist/SEP"),  
       NULL,
       "<separator>",  
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Playlist/Loop modes"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Playlist/Loop modes/Disabled"),
       NULL,
       (gui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) ? "<checked>" : "<check>",
-      menu_playlist_ctrl, (void *) PLAYL_NO_LOOP                                             },
+      menu_playlist_ctrl, gui, PLAYL_NO_LOOP },
     { _("Playlist/Loop modes/Loop"),
       NULL,
       (gui->playlist.loop == PLAYLIST_LOOP_LOOP) ? "<checked>" : "<check>",
-      menu_playlist_ctrl, (void *) PLAYL_LOOP                                                },
+      menu_playlist_ctrl, gui, PLAYL_LOOP },
     { _("Playlist/Loop modes/Repeat Selection"),
       NULL,
       (gui->playlist.loop == PLAYLIST_LOOP_REPEAT) ? "<checked>" : "<check>",
-      menu_playlist_ctrl, (void *) PLAYL_REPEAT                                              },
+      menu_playlist_ctrl, gui, PLAYL_REPEAT },
     { _("Playlist/Loop modes/Shuffle"),
       NULL,
       (gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) ? "<checked>" : "<check>",
-      menu_playlist_ctrl, (void *) PLAYL_SHUFFLE                                             },
+      menu_playlist_ctrl, gui, PLAYL_SHUFFLE },
     { _("Playlist/Loop modes/Non-stop Shuffle"),
       NULL,
       (gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS) ? "<checked>" : "<check>",
-      menu_playlist_ctrl, (void *) PLAYL_SHUF_PLUS                                           },
+      menu_playlist_ctrl, gui, PLAYL_SHUF_PLUS },
     { _("Playlist/Continue Playback"),
-      menu_get_shortcut("PlaylistStop"),
+      menu_get_shortcut (gui, "PlaylistStop"),
       (gui->playlist.control & PLAYLIST_CONTROL_STOP) ? "<check>" : "<checked>",
-      menu_playlist_ctrl, (void *) PLAYL_CTRL_STOP                                           },
+      menu_playlist_ctrl, gui, PLAYL_CTRL_STOP },
     { "SEP",  
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Menus"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Menus/Navigation..."),
-      menu_get_shortcut("EventSenderShow"),
+      menu_get_shortcut (gui, "EventSenderShow"),
       NULL,
-      menu_event_sender, NULL                                                                },
+      menu_gui_action, gui, ACTID_EVENT_SENDER},
     { _("Menus/SEP"),  
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { "SEP",  
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Stream"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Stream/Information..."),
-      menu_get_shortcut("StreamInfosShow"),
+      menu_get_shortcut (gui, "StreamInfosShow"),
       NULL,
-      menu_stream, (void *) STREAM_WINI                                                      },
+      menu_gui_action, gui, ACTID_STREAM_INFOS},
     { _("Stream/Information (OSD)"),
-      menu_get_shortcut("OSDStreamInfos"),
+      menu_get_shortcut (gui, "OSDStreamInfos"),
       NULL,
-      menu_stream, (void *) STREAM_OSDI                                                      },
+      menu_gui_action, gui, ACTID_OSD_SINFOS},
     { _("Video"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Video/Deinterlace"),
-      menu_get_shortcut("ToggleInterleave"),
+      menu_get_shortcut (gui, "ToggleInterleave"),
       (gui->deinterlace_enable) ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO_INTERLEAVE                                             },
+      menu_gui_action, gui, ACTID_TOGGLE_INTERLEAVE },
     { _("Video/SEP"),
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Video/Aspect ratio"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Video/Aspect ratio/Automatic"),
       NULL,
       (aspect == XINE_VO_ASPECT_AUTO) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_AUTO                                              },
+      menu_aspect, gui, XINE_VO_ASPECT_AUTO},
     { _("Video/Aspect ratio/Square"),
       NULL,
       (aspect == XINE_VO_ASPECT_SQUARE) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_SQUARE                                            },
+      menu_aspect, gui, XINE_VO_ASPECT_SQUARE},
     { _("Video/Aspect ratio/4:3"),
       NULL,
       (aspect == XINE_VO_ASPECT_4_3) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_4_3                                               },
+      menu_aspect, gui, XINE_VO_ASPECT_4_3},
     { _("Video/Aspect ratio/Anamorphic"),
       NULL,
       (aspect == XINE_VO_ASPECT_ANAMORPHIC) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_ANAMORPHIC                                        },
+      menu_aspect, gui, XINE_VO_ASPECT_ANAMORPHIC},
     { _("Video/Aspect ratio/DVB"),
       NULL,
       (aspect == XINE_VO_ASPECT_DVB) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_DVB                                               },
+      menu_aspect, gui, XINE_VO_ASPECT_DVB},
     { _("Video/200%"),
-      menu_get_shortcut("Window200"),
+      menu_get_shortcut (gui, "Window200"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 2.0f && ymag == 2.0f)) ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO_2X                                                     },
+      menu_gui_action, gui, ACTID_WINDOW200 },
     { _("Video/100%"),
-      menu_get_shortcut("Window100"),
+      menu_get_shortcut (gui, "Window100"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 1.0f && ymag == 1.0f)) ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO_1X                                                     },
+      menu_gui_action, gui, ACTID_WINDOW100 },
     { _("Video/50%"),
-      menu_get_shortcut("Window50"),
+      menu_get_shortcut (gui, "Window50"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 0.5f && ymag == 0.5f)) ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO__5X                                                    },
+      menu_gui_action, gui, ACTID_WINDOW50 },
     { _("Video/SEP"),
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Video/Postprocess"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Video/Postprocess/Chain Reaction..."),
-      menu_get_shortcut("VPProcessShow"),
+      menu_get_shortcut (gui, "VPProcessShow"),
       NULL,
-      menu_video_ctrl, (void *) VIDEO_PPROCESS                                               },
+      menu_gui_action, gui, ACTID_VPP },
     { _("Video/Postprocess/Enable Postprocessing"),
-      menu_get_shortcut("VPProcessEnable"),
+      menu_get_shortcut (gui, "VPProcessEnable"),
       gui->post_video_enable ? "<checked>" : "<check>",
-      menu_video_ctrl, (void *) VIDEO_PPROCESS_ENABLE                                        },
+      menu_gui_action, gui, ACTID_VPP_ENABLE },
     { _("Audio"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/Volume"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/Volume/Mute"),
-      menu_get_shortcut("Mute"),
+      menu_get_shortcut (gui, "Mute"),
       gui->mixer.mute ? "<checked>" : "<check>",
-      menu_audio_ctrl, (void *) AUDIO_MUTE                                                   },
+      menu_audio_ctrl, gui, AUDIO_MUTE},
     { _("Audio/Volume/Increase 10%"),
       NULL,
       NULL,
-      menu_audio_ctrl, (void *) AUDIO_INCRE_VOL                                              },
+      menu_audio_ctrl, gui, AUDIO_INCRE_VOL},
     { _("Audio/Volume/Decrease 10%"),
       NULL,
       NULL,
-      menu_audio_ctrl, (void *) AUDIO_DECRE_VOL                                              },
+      menu_audio_ctrl, gui, AUDIO_DECRE_VOL},
     { _("Audio/Channel"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/Visualization"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/SEP"),
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/Postprocess"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Audio/Postprocess/Chain Reaction..."),
-      NULL /* menu_get_shortcut("APProcessShow") */,
+      NULL /* menu_get_shortcut (gui, "APProcessShow") */,
       NULL,
-      menu_audio_ctrl, (void *) AUDIO_PPROCESS                                               },
+      menu_audio_ctrl, gui, AUDIO_PPROCESS},
     { _("Audio/Postprocess/Enable Postprocessing"),
-      NULL /* menu_get_shortcut("APProcessEnable") */,
+      NULL /* menu_get_shortcut (gui, "APProcessEnable") */,
       gui->post_audio_enable ? "<checked>" : "<check>",
-      menu_audio_ctrl, (void *) AUDIO_PPROCESS_ENABLE                                        },
+      menu_audio_ctrl, gui, AUDIO_PPROCESS_ENABLE},
     { _("Subtitle"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Subtitle/Channel"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { "SEP",  
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Settings"),
       NULL,
       "<branch>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Settings/Setup..."),
-      menu_get_shortcut("SetupShow"),
+      menu_get_shortcut (gui, "SetupShow"),
       NULL,
-      menu_settings, (void *) SETS_SETUP                                                     },
+      menu_gui_action, gui, ACTID_SETUP},
 #ifdef HAVE_CURL
     { _("Settings/Skin Downloader..."),
-      menu_get_shortcut("SkinDownload"),
+      menu_get_shortcut (gui, "SkinDownload"),
       NULL,
-      menu_settings, (void *) SETS_SKINDL                                                    },
+      menu_gui_action, gui, ACTID_SKINDOWNLOAD},
 #endif
     { _("Settings/Keymap Editor..."),
-      menu_get_shortcut("KeyBindingEditor"),
+      menu_get_shortcut (gui, "KeyBindingEditor"),
       NULL,
-      menu_settings, (void *) SETS_KEYMAP                                                    },
+      menu_gui_action, gui, ACTID_KBEDIT},
     { _("Settings/Video..."),
-      menu_get_shortcut("ControlShow"),
+      menu_get_shortcut (gui, "ControlShow"),
       NULL,
-      menu_settings, (void *) SETS_VIDEO                                                     },
+      menu_gui_action, gui, ACTID_CONTROLSHOW},
     { _("Settings/TV Analog..."),
-      menu_get_shortcut("TVAnalogShow"),
+      menu_get_shortcut (gui, "TVAnalogShow"),
       NULL,
-      menu_settings, (void *) SETS_TVANALOG                                                  },
+      menu_gui_action, gui, ACTID_TVANALOG},
     { "SEP",
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Help..."),
-      menu_get_shortcut("HelpShow"),
+      menu_get_shortcut (gui, "HelpShow"),
       NULL,
-      menu_help, NULL                                                                        },
+      menu_gui_action, gui, ACTID_HELP_SHOW},
     { _("Logs..."),
-      menu_get_shortcut("ViewlogShow"),
+      menu_get_shortcut (gui, "ViewlogShow"),
       NULL,
-      menu_settings, (void *) SETS_LOGS                                                      },
+      menu_gui_action, gui, ACTID_VIEWLOG},
     { "SEP",
       NULL,
       "<separator>",
-      NULL, NULL                                                                             },
+      NULL, NULL, 0},
     { _("Quit"),
-      menu_get_shortcut("Quit"),
+      menu_get_shortcut (gui, "Quit"),
       NULL,
-      menu_quit, NULL                                                                        },
+      menu_gui_action, gui, ACTID_QUIT},
     { NULL,
       NULL,
       NULL,
-      NULL, NULL                                                                             }
+      NULL, NULL, 0}
   };
   xitk_menu_entry_t *cur_entry;
 
@@ -757,13 +650,16 @@ void video_window_menu(xitk_widget_list_t *wl) {
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Open/Subtitle...");
-    menu_entry.cb        = menu_subtitle_selector;
+    menu_entry.cb        = menu_gui_action;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = ACTID_SUBSELECT;
     xitk_menu_add_entry(w, &menu_entry);
 
     /* Save Playlist */
     menu_entry.menu      = _("Playlist/Save...");
     menu_entry.cb        = menu_playlist_ctrl;
-    menu_entry.user_data = (void *) PLAYL_SAVE;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = PLAYL_SAVE;
     xitk_menu_add_entry(w, &menu_entry);
   }
   
@@ -771,7 +667,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_entry_t   menu_entry;
     char                buffer[2048];
     char               *location = _("Playlist/Get from");
-    const char *const  *plug_ids = xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
+    const char *const  *plug_ids = xine_get_autoplay_input_plugin_ids (gui->xine);
     const char         *plug_id;
     
     plug_id = *plug_ids++;
@@ -783,6 +679,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       
       menu_entry.menu      = buffer;
       menu_entry.cb        = menu_playlist_from;
+      menu_entry.user_data = gui;
       xitk_menu_add_entry(w, &menu_entry);
       
       plug_id = *plug_ids++;
@@ -829,14 +726,16 @@ void video_window_menu(xitk_widget_list_t *wl) {
     menu_entry.menu      = _("Audio/Channel/Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_audio_chan;
-    menu_entry.user_data = (void *) -2;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Audio/Channel/Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_audio_chan;
-    menu_entry.user_data = (void *) -1;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
@@ -853,7 +752,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
-	    menu_entry.user_data = (void *)(intptr_t) i;
+            menu_entry.user_data = gui;
+            menu_entry.user_id   = i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -866,7 +766,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
-      menu_entry.user_data = (void *)(intptr_t) i;
+      menu_entry.user_data = gui;
+      menu_entry.user_id   = i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -962,7 +863,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
       menu_entry.menu = xitk_asprintf("%s/%s", menus_str, gettext(menu_entries[first_entry + i]));
       menu_entry.cb        = menu_menus_selection;
-      menu_entry.user_data = (void *)(intptr_t)i;
+      menu_entry.user_data = gui;
+      menu_entry.user_id   = XINE_EVENT_INPUT_MENU1 + i;
 
       if (menu_entry.menu)
         xitk_menu_add_entry(w, &menu_entry);
@@ -982,9 +884,10 @@ void video_window_menu(xitk_widget_list_t *wl) {
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
     menu_entry.menu = xitk_asprintf("%s/%s", _("Playback"), _("Add Mediamark"));
-    menu_entry.shortcut  = menu_get_shortcut("AddMediamark");
-    menu_entry.cb        = menu_playback_ctrl;
-    menu_entry.user_data = (void *) PLAYB_ADDMMK;
+    menu_entry.shortcut  = menu_get_shortcut (gui, "AddMediamark");
+    menu_entry.cb        = menu_gui_action;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = ACTID_ADDMEDIAMARK;
 
     if (menu_entry.menu)
       xitk_menu_add_entry(w, &menu_entry);
@@ -996,13 +899,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
   xitk_menu_show_menu(w);
 }
 
-void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
-  gGui_t *gui = gGui;
+void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
-    { NULL , NULL, "<title>",      NULL, NULL },
-    { NULL,  NULL, NULL,           NULL, NULL }
+    { NULL , NULL, "<title>",      NULL, NULL, 0 },
+    { NULL,  NULL, NULL,           NULL, NULL, 0 }
   };
 
   menu_entries[0].menu = _("Audio");
@@ -1025,14 +927,16 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     menu_entry.menu      = _("Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_audio_chan;
-    menu_entry.user_data = (void *) -2;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_audio_chan;
-    menu_entry.user_data = (void *) -1;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
@@ -1049,7 +953,8 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
-	    menu_entry.user_data = (void *)(intptr_t) i;
+            menu_entry.user_data = gui;
+            menu_entry.user_id   = i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -1061,7 +966,8 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
-      menu_entry.user_data = (void *)(intptr_t) i;
+      menu_entry.user_data = gui;
+      menu_entry.user_id   = i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -1070,13 +976,12 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_show_menu(w);
 }
 
-void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
-  gGui_t *gui = gGui;
+void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
-    { NULL , NULL, "<title>",      NULL, NULL },
-    { NULL,  NULL, NULL,           NULL, NULL }
+    { NULL , NULL, "<title>",      NULL, NULL, 0 },
+    { NULL,  NULL, NULL,           NULL, NULL, 0 }
   };
 
   menu_entries[0].menu = _("Subtitle");
@@ -1143,31 +1048,30 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_show_menu(w);
 }
 
-void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
-  gGui_t *gui = gGui;
+void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
   xitk_menu_entry_t    menu_entries_nosel[] = {
-    { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { _("Scan"),       menu_get_shortcut("ScanPlaylistInfo"),
-                                      NULL,          menu_scan_infos,              NULL                    },
-    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui                     },
-    { NULL,            NULL,          NULL,          NULL,                         NULL                    }
+    { NULL ,           NULL,          "<title>",     NULL,                         NULL,                    0 },
+    { _("Scan"),       menu_get_shortcut (gui, "ScanPlaylistInfo"),
+                                      NULL,          menu_scan_infos,              NULL,                    0 },
+    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
+    { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
   xitk_menu_entry_t    menu_entries_sel[] = {
-    { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
-    { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL                    },
-    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui                     },
-    { _("Edit"),       menu_get_shortcut("MediamarkEditor"),
-                                      NULL,          menu_playlist_mmk_editor,     NULL                    },
-    { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL                    },
-    { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
-    { _("Move Up"),    NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_UP   },
-    { _("Move Down"),  NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_DOWN },
-    { NULL,            NULL,          NULL,          NULL,                         NULL                    }
+    { NULL ,           NULL,          "<title>",     NULL,                         NULL,                    0 },
+    { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL,                    0 },
+    { "SEP",           NULL,          "<separator>", NULL,                         NULL,                    0 },
+    { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL,                    0 },
+    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
+    { _("Edit"),       menu_get_shortcut (gui, "MediamarkEditor"),
+                                      NULL,          menu_playlist_mmk_editor,     NULL,                    0 },
+    { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL,                    0 },
+    { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     NULL,                    0 },
+    { "SEP",           NULL,          "<separator>", NULL,                         NULL,                    0 },
+    { _("Move Up"),    NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_UP,   0 },
+    { _("Move Down"),  NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_DOWN, 0 },
+    { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
   xitk_menu_entry_t *cur_entry;
 
@@ -1206,15 +1110,13 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_show_menu(w);
 }
 
-void control_menu(xitk_widget_list_t *wl, int x, int y) {
-  gGui_t *gui = gGui;
+void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
   xitk_menu_entry_t    menu_entries[] = {
-    { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
-    { _("Reset video settings"),   
-                       NULL,          NULL,          menu_control_reset,           gui->vctrl              },
-    { NULL,            NULL,          NULL,          NULL,                         NULL                    }
+    { NULL,                      NULL, "<title>", NULL,               NULL, 0      },
+    { _("Reset video settings"), NULL, NULL,      menu_control_reset, gui->vctrl, 0},
+    { NULL,                      NULL, NULL,      NULL,               NULL, 0      }
   };
   
   XITK_WIDGET_INIT(&menu, gui->imlib_data);

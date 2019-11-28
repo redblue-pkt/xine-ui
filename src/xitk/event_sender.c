@@ -240,7 +240,7 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 	return;
 
       default:
-	gui_handle_event(event, data);
+        gui_handle_event (event, gGui);
 	return;
       }
     }

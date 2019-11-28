@@ -485,12 +485,12 @@ int odk_open_and_play(odk_t *odk, const char *mrl) {
 
 void odk_play(odk_t *odk) {
 
-  gui_xine_play(odk->stream, 0, 0, 1);
+  gui_xine_play (gGui, odk->stream, 0, 0, 1);
 }
 
 void odk_stop(odk_t *odk) {
 
-  gui_stop(NULL, NULL);
+  gui_stop (NULL, gGui);
 }
 
 static int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
@@ -616,7 +616,7 @@ uint32_t odk_get_speed(odk_t *odk) {
 #if 0
 void odk_toggle_pause(odk_t *odk) {
 
-  gui_pause (NULL, (void*)(1), 0);
+  gui_pause (NULL, gGui, 0);
 }
 #endif
 

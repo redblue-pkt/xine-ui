@@ -107,6 +107,7 @@ static xitk_menu_entry_t *_menu_build_menu_entry(xitk_menu_entry_t *me, char *na
   mentry->type      = (me->type) ? strdup(me->type) : NULL;
   mentry->cb        = me->cb;
   mentry->user_data = me->user_data;
+  mentry->user_id   = me->user_id;
 
   return mentry;
 }

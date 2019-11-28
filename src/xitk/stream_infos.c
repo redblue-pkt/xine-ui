@@ -309,7 +309,7 @@ static void handle_event(XEvent *event, void *data) {
     if(xitk_get_key_pressed(event) == XK_Escape)
       stream_infos_exit(NULL, NULL);
     else
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
     break;
   }
 }

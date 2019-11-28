@@ -66,6 +66,7 @@ static const struct {
 };
 
 extern void gui_handle_event(XEvent *event, void *data);
+extern void *gGui;
 
 /*
  *
@@ -917,7 +918,7 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
       break;
       
     default:
-      gui_handle_event(event, data);
+      gui_handle_event (event, gGui);
       break;
     }
   }

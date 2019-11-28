@@ -445,7 +445,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       return;
     }
 
-    if (!gui_xine_play (mrlb->gui->stream, 0, 0, 0)) {
+    if (!gui_xine_play (mrlb->gui, mrlb->gui->stream, 0, 0, 0)) {
       enable_playback_controls (mrlb->gui->panel, 0);
       gui_display_logo();
       return;

@@ -266,7 +266,7 @@ static void media_info_cb(void *data) {
 #endif
 
 static void shutdown_cb (void *data) {
-  gui_execute_action_id(ACTID_QUIT);
+  gui_execute_action_id (gGui, ACTID_QUIT);
 }
 
 static void mrl_cb (void *data) {

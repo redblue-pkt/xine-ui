@@ -1859,7 +1859,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	gui->ignore_next = 1;
 	xine_stop (gui->stream);
 	gui->ignore_next = 0;
-	gui_playlist_start_next();
+        gui_playlist_start_next (gui);
       }
       else if(is_arg_contain(client_info, 1, "prev")) {
 	gui->ignore_next = 1;
@@ -1961,7 +1961,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 
 	    gui->playlist.cur = entry;
 	    gui_set_current_mmk(mediamark_get_current_mmk());
-	    gui_play(NULL, NULL);
+            gui_play (NULL, gui);
 	  }
 	}
       }
@@ -1997,15 +1997,15 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "delete")) {
 	int i;
-	
+
 	if((is_arg_contain(client_info, 2, "all")) || 
 	   (is_arg_contain(client_info, 2, "*"))) {
-	  
+  
 	  mediamark_free_mediamarks();
-	  
+  
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
-	    gui_stop(NULL, NULL);
-	  
+            gui_stop (NULL, gui);
+  
           enable_playback_controls (gui->panel, 0);
 	}
 	else {
@@ -2098,14 +2098,14 @@ static void do_exit(const commands_t *cmd, client_info_t *client_info) {
 static void do_fullscreen(const commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_FULLSCREEN;
 
-  gui_execute_action_id(action);
+  gui_execute_action_id (gGui, action);
 }
 
 #ifdef HAVE_XINERAMA
 static void do_xinerama_fullscreen(const commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
 
-  gui_execute_action_id(action);
+  gui_execute_action_id (gGui, action);
 }
 #endif
 
@@ -2378,7 +2378,7 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
 	}
       }
       else if(is_arg_contain(client_info, 1, "output")) {
-	gui_toggle_visibility(NULL, NULL);
+        gui_toggle_visibility (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "panel")) {
@@ -2579,7 +2579,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 }
 
 static void do_halt(const commands_t *cmd, client_info_t *client_info) {
-  gui_exit(NULL, NULL);
+  gui_exit (NULL, gGui);
 }
 
 static void network_messenger(void *data, char *message) {
