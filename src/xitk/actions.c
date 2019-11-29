@@ -44,6 +44,20 @@ filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
 static int             last_playback_speed = XINE_SPEED_NORMAL;
 
+static void gui_messages_off (gGui_t *gui) {
+  pthread_mutex_lock (&gui->no_messages.mutex);
+  ++gui->no_messages.level;
+  gui->no_messages.until.tv_sec = sizeof (gui->no_messages.until.tv_sec) > 4 ? ((~(uint64_t)0) >> 1) : 0x7fffffff;
+  pthread_mutex_unlock (&gui->no_messages.mutex);
+}
+
+static void gui_messages_on (gGui_t *gui) {
+  pthread_mutex_lock (&gui->no_messages.mutex);
+  if (--gui->no_messages.level == 0)
+    gettimeofday (&gui->no_messages.until, NULL);
+  pthread_mutex_unlock (&gui->no_messages.mutex);
+}
+
 void reparent_all_windows(void) {
   gGui_t *gui = gGui;
   int                    i;
@@ -615,9 +629,9 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
     }
   }
 
-  gui->suppress_messages++;
+  gui_messages_off (gui);
   ret = xine_open(gui->stream, (const char *) mrl);
-  gui->suppress_messages--;
+  gui_messages_on (gui);
   if (!ret) {
 
 #ifdef XINE_PARAM_GAPLESS_SWITCH
@@ -635,9 +649,9 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   
   if(_sub) {
     
-    gui->suppress_messages++;
+    gui_messages_off (gui);
     ret = xine_open(gui->spu_stream, _sub);
-    gui->suppress_messages--;
+    gui_messages_on (gui);
     if (ret)
       xine_stream_master_slave(gui->stream, 
 			       gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
@@ -1359,9 +1373,9 @@ static void *gui_seek_thread (void *data) {
     {
       const char *mrl = mediamark_get_current_mrl ();
       if (gui->logo_mode && mrl) {
-        gui->suppress_messages++;
+        gui_messages_off (gui);
         ret = xine_open (gui->stream, mrl);
-        gui->suppress_messages--;
+        gui_messages_on (gui);
         if (!ret) {
           gui_handle_xine_error (gui->stream, (char *)mrl);
           break;
@@ -1373,14 +1387,14 @@ static void *gui_seek_thread (void *data) {
       break;
     
     if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
-      gui->suppress_messages++;
+      gui_messages_off (gui);
       xine_open (gui->stream, gui->mmk.mrl);
-      gui->suppress_messages--;
+      gui_messages_on (gui);
 
       if (gui->mmk.sub) {
-        gui->suppress_messages++;
+        gui_messages_off (gui);
         ret = xine_open (gui->spu_stream, gui->mmk.sub);
-        gui->suppress_messages--;
+        gui_messages_on (gui);
         if (ret)
           xine_stream_master_slave (gui->stream, gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
       } else {
@@ -1421,7 +1435,7 @@ static void *gui_seek_thread (void *data) {
 
         } else {
 
-          int cur_time, cur_pos;
+          int cur_time;
           int timestep = gui->seek_timestep;
           gui->seek_timestep = 0;
           pthread_mutex_unlock (&gui->seek_mutex);
@@ -2382,9 +2396,9 @@ static void subselector_callback(filebrowser_t *fb) {
 	  int curpos;
 	  xine_close (gui->spu_stream);
 
-	  gui->suppress_messages++;
+	  gui_messages_off (gui);
 	  ret = xine_open(gui->spu_stream, mmk->sub);
-	  gui->suppress_messages--;
+	  gui_messages_on (gui);
 	  if (ret)
 	    xine_stream_master_slave(gui->stream, 
 				     gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
