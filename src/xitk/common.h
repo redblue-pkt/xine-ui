@@ -387,8 +387,12 @@ struct gGui_st {
   FILE                      *orig_stdout; /* original stdout at startup        */
                                           /* before an evtl. later redirection */
 
-  /* xine_open() may wait for our event handler */
-  int                        suppress_messages;
+  /* suspend event messages */
+  struct {
+    pthread_mutex_t          mutex;
+    struct timeval           until;
+    int                      level;
+  } no_messages;
 
   xui_panel_t               *panel;
   xui_vwin_t                *vwin;

@@ -1005,8 +1005,8 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 /*
  *
  */
-static void event_listener(void *user_data, const xine_event_t *event) {
-  gGui_t *gui = gGui;
+static void event_listener (void *user_data, const xine_event_t *event) {
+  gGui_t *gui = user_data;
   struct timeval tv;
   static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */ 
 
@@ -1257,13 +1257,18 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	strlcat(buffer, "]", sizeof(buffer));
       }
       
-      if(strlen(buffer)) {
-	if(gui->suppress_messages) {
-	  if(__xineui_global_verbosity)
-	    printf("xine-ui: GUI temporarily unavailable. Message:\n%s\n", buffer);
-	} else {
-	  report("%s", buffer);
-	}
+      if (buffer[0]) {
+        struct timeval tv;
+        pthread_mutex_lock (&gui->no_messages.mutex);
+        tv = gui->no_messages.until;
+        pthread_mutex_unlock (&gui->no_messages.mutex);
+        if ((event->tv.tv_sec < tv.tv_sec)
+          || ((event->tv.tv_sec == tv.tv_sec) && (event->tv.tv_usec < tv.tv_usec))) {
+          if (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG)
+            printf ("xine-ui: suppressed message:\n%s\n", buffer);
+        } else {
+          report ("%s", buffer);
+        }
       }
       
     }
@@ -2073,6 +2078,11 @@ int main(int argc, char *argv[]) {
   gui->seek_pos = -1;
   gui->seek_timestep = 0;
 
+  pthread_mutex_init (&gui->no_messages.mutex, NULL);
+  gui->no_messages.until.tv_sec = 0;
+  gui->no_messages.until.tv_usec = 0;
+  gui->no_messages.level = 0;
+
   __xineui_global_xine_instance = gui->xine = xine_new ();
   xine_config_load (gui->xine, __xineui_global_config_file);
   xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, __xineui_global_verbosity);
@@ -2272,7 +2282,7 @@ int main(int argc, char *argv[]) {
 						gGui);
 
   gui->event_queue = xine_event_new_queue(gui->stream);
-  xine_event_create_listener_thread(gui->event_queue, event_listener, NULL);
+  xine_event_create_listener_thread (gui->event_queue, event_listener, gui);
 
   if(tvout && strlen(tvout)) {
     if((gui->tvout = tvout_init(gui->display, tvout)))
@@ -2291,7 +2301,7 @@ int main(int argc, char *argv[]) {
   gui->visual_anim.stream = xine_stream_new (gui->xine, NULL, gui->vo_port);
   gui->visual_anim.event_queue = xine_event_new_queue(gui->visual_anim.stream);
   gui->visual_anim.current = 0;
-  xine_event_create_listener_thread(gui->visual_anim.event_queue, event_listener, NULL);
+  xine_event_create_listener_thread (gui->visual_anim.event_queue, event_listener, gui);
   xine_set_param(gui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
   xine_set_param(gui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
   xine_set_param(gui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
@@ -2360,6 +2370,7 @@ int main(int argc, char *argv[]) {
   }
 
   pthread_mutex_destroy(&gui->mmk_mutex);
+  pthread_mutex_destroy (&gui->no_messages.mutex);
   pthread_mutex_destroy (&gui->seek_mutex);
   pthread_mutex_destroy(&gui->download_mutex);
   pthread_mutex_destroy(&gui->logo_mutex);
@@ -2382,3 +2393,5 @@ int main(int argc, char *argv[]) {
   }
   return retval;
 }
+
+
