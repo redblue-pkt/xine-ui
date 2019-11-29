@@ -895,6 +895,8 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   nbytes = strlen(encoded_text);
   free(foo_text);
   
+  /* FIXME: XftTextExtentsUtf8 () seems to be non reentrant - at least when called
+   * with same font. We probably need to mutex it when XLockDisplay () is turned off. */
   XLOCK (xitk_x_lock_display, xtfs->display);
   XftTextExtentsUtf8(xtfs->display, xtfs->font, (FcChar8*)encoded_text, nbytes, &xft_extents);
   XUNLOCK (xitk_x_unlock_display, xtfs->display);
