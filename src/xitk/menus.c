@@ -44,15 +44,21 @@
 
 #define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
 
-static char *menu_get_shortcut (gGui_t *gui, char *action) {
-  char *shortcut = kbindings_get_shortcut(gui->kbindings, action);
+typedef struct {
+  char *write, *end, buf[1024];
+} menu_text_buf_t;
+
+static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, char *action) {
+  char *ret, *shortcut = kbindings_get_shortcut (gui->kbindings, action);
+  if (!shortcut) {
 #ifdef DEBUG
-  if(!shortcut) {
-    fprintf(stderr, "Action '%s' is invalid\n", action);
-    abort();
-  }
+    fprintf (stderr, "Action '%s' is invalid\n", action);
 #endif
-  return (shortcut ? strdup(shortcut) : NULL);
+    return NULL;
+  }
+  ret = tbuf->write;
+  tbuf->write += strlcpy (tbuf->write, shortcut, tbuf->end - tbuf->write) + 1;
+  return ret;
 }
 
 static void menu_control_reset(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
@@ -284,21 +290,22 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 #else
   int                  fullscr_mode = FULLSCR_MODE;
 #endif
+  menu_text_buf_t      tbuf = {tbuf.buf, tbuf.buf + sizeof (tbuf.buf) - 1, {0}};
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,
       NULL,
       "<title>",      
       NULL, NULL, 0},
     { _("Show controls"),
-      menu_get_shortcut (gui, "ToggleVisibility"),
+      menu_get_shortcut (gui, &tbuf, "ToggleVisibility"),
       panel_is_visible (gui->panel) ? "<checked>" : "<check>",  
       menu_gui_action, gui, ACTID_TOGGLE_VISIBLITY},
     { _("Show video window"),
-      menu_get_shortcut (gui, "ToggleWindowVisibility"),
+      menu_get_shortcut (gui, &tbuf, "ToggleWindowVisibility"),
       video_window_is_visible (gui->vwin) ? "<checked>" : "<check>",  
       menu_gui_action, gui, ACTID_TOGGLE_WINOUT_VISIBLITY },
     { _("Fullscreen"),
-      menu_get_shortcut (gui, "ToggleFullscreen"),
+      menu_get_shortcut (gui, &tbuf, "ToggleFullscreen"),
       (video_window_get_fullscreen_mode (gui->vwin) & fullscr_mode) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_TOGGLE_FULLSCREEN },
     { "SEP",  
@@ -310,7 +317,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",   
       NULL, NULL, 0},
     { _("Open/File..."),
-      menu_get_shortcut (gui, "FileSelector"),
+      menu_get_shortcut (gui, &tbuf, "FileSelector"),
       NULL,
       menu_gui_action, gui, ACTID_FILESELECTOR},
     { _("Open/Playlist..."),
@@ -318,7 +325,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       NULL,
       menu_playlist_ctrl, gui, PLAYL_LOAD },
     { _("Open/Location..."),
-      menu_get_shortcut (gui, "MrlBrowser"),
+      menu_get_shortcut (gui, &tbuf, "MrlBrowser"),
       NULL,
       menu_gui_action, gui, ACTID_MRLBROWSER},
     { _("Playback"),
@@ -326,15 +333,15 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<Branch>",
       NULL, NULL, 0},
     { _("Playback/Play"),
-      menu_get_shortcut (gui, "Play"),
+      menu_get_shortcut (gui, &tbuf, "Play"),
       NULL,
       menu_gui_action, gui, ACTID_PLAY },
     { _("Playback/Stop"),
-      menu_get_shortcut (gui, "Stop"),
+      menu_get_shortcut (gui, &tbuf, "Stop"),
       NULL,
       menu_gui_action, gui, ACTID_STOP },
     { _("Playback/Pause"),
-      menu_get_shortcut (gui,"Pause"),
+      menu_get_shortcut (gui, &tbuf, "Pause"),
       NULL,
       menu_gui_action, gui, ACTID_PAUSE },
     { _("Playback/SEP"),
@@ -342,11 +349,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<separator>",  
       NULL,  NULL, 0},
     { _("Playback/Next MRL"),
-      menu_get_shortcut (gui, "NextMrl"),
+      menu_get_shortcut (gui, &tbuf, "NextMrl"),
       NULL,
       menu_gui_action, gui, ACTID_MRL_NEXT },
     { _("Playback/Previous MRL"),
-      menu_get_shortcut (gui, "PriorMrl"),
+      menu_get_shortcut (gui, &tbuf, "PriorMrl"),
       NULL,
       menu_gui_action, gui, ACTID_MRL_PRIOR },
     { _("Playback/SEP"),
@@ -354,11 +361,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<separator>",  
       NULL,  NULL, 0},
     { _("Playback/Increase Speed"),
-      menu_get_shortcut (gui, "SpeedFaster"),
+      menu_get_shortcut (gui, &tbuf, "SpeedFaster"),
       NULL,
       menu_gui_action, gui, ACTID_SPEED_FAST },
     { _("Playback/Decrease Speed"),
-      menu_get_shortcut (gui, "SpeedSlower"),
+      menu_get_shortcut (gui, &tbuf, "SpeedSlower"),
       NULL,
       menu_gui_action, gui, ACTID_SPEED_SLOW },
     { _("Playlist"),
@@ -374,7 +381,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       NULL,
       menu_playlist_ctrl, gui, PLAYL_LOAD },
     { _("Playlist/Editor..."),
-      menu_get_shortcut (gui, "PlaylistEditor"),
+      menu_get_shortcut (gui, &tbuf, "PlaylistEditor"),
       NULL,
       menu_playlist_ctrl, gui, PLAYL_EDIT },
     { _("Playlist/SEP"),  
@@ -406,7 +413,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       (gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS) ? "<checked>" : "<check>",
       menu_playlist_ctrl, gui, PLAYL_SHUF_PLUS },
     { _("Playlist/Continue Playback"),
-      menu_get_shortcut (gui, "PlaylistStop"),
+      menu_get_shortcut (gui, &tbuf, "PlaylistStop"),
       (gui->playlist.control & PLAYLIST_CONTROL_STOP) ? "<check>" : "<checked>",
       menu_playlist_ctrl, gui, PLAYL_CTRL_STOP },
     { "SEP",  
@@ -418,7 +425,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Menus/Navigation..."),
-      menu_get_shortcut (gui, "EventSenderShow"),
+      menu_get_shortcut (gui, &tbuf, "EventSenderShow"),
       NULL,
       menu_gui_action, gui, ACTID_EVENT_SENDER},
     { _("Menus/SEP"),  
@@ -434,11 +441,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Stream/Information..."),
-      menu_get_shortcut (gui, "StreamInfosShow"),
+      menu_get_shortcut (gui, &tbuf, "StreamInfosShow"),
       NULL,
       menu_gui_action, gui, ACTID_STREAM_INFOS},
     { _("Stream/Information (OSD)"),
-      menu_get_shortcut (gui, "OSDStreamInfos"),
+      menu_get_shortcut (gui, &tbuf, "OSDStreamInfos"),
       NULL,
       menu_gui_action, gui, ACTID_OSD_SINFOS},
     { _("Video"),
@@ -446,7 +453,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Video/Deinterlace"),
-      menu_get_shortcut (gui, "ToggleInterleave"),
+      menu_get_shortcut (gui, &tbuf, "ToggleInterleave"),
       (gui->deinterlace_enable) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_TOGGLE_INTERLEAVE },
     { _("Video/SEP"),
@@ -478,17 +485,17 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       (aspect == XINE_VO_ASPECT_DVB) ? "<checked>" : "<check>",
       menu_aspect, gui, XINE_VO_ASPECT_DVB},
     { _("Video/200%"),
-      menu_get_shortcut (gui, "Window200"),
+      menu_get_shortcut (gui, &tbuf, "Window200"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 2.0f && ymag == 2.0f)) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_WINDOW200 },
     { _("Video/100%"),
-      menu_get_shortcut (gui, "Window100"),
+      menu_get_shortcut (gui, &tbuf, "Window100"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 1.0f && ymag == 1.0f)) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_WINDOW100 },
     { _("Video/50%"),
-      menu_get_shortcut (gui, "Window50"),
+      menu_get_shortcut (gui, &tbuf, "Window50"),
       (video_window_get_mag (gui->vwin, &xmag, &ymag),
         (xmag == 0.5f && ymag == 0.5f)) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_WINDOW50 },
@@ -501,11 +508,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Video/Postprocess/Chain Reaction..."),
-      menu_get_shortcut (gui, "VPProcessShow"),
+      menu_get_shortcut (gui, &tbuf, "VPProcessShow"),
       NULL,
       menu_gui_action, gui, ACTID_VPP },
     { _("Video/Postprocess/Enable Postprocessing"),
-      menu_get_shortcut (gui, "VPProcessEnable"),
+      menu_get_shortcut (gui, &tbuf, "VPProcessEnable"),
       gui->post_video_enable ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_VPP_ENABLE },
     { _("Audio"),
@@ -517,7 +524,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Audio/Volume/Mute"),
-      menu_get_shortcut (gui, "Mute"),
+      menu_get_shortcut (gui, &tbuf, "Mute"),
       gui->mixer.mute ? "<checked>" : "<check>",
       menu_audio_ctrl, gui, AUDIO_MUTE},
     { _("Audio/Volume/Increase 10%"),
@@ -545,11 +552,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Audio/Postprocess/Chain Reaction..."),
-      NULL /* menu_get_shortcut (gui, "APProcessShow") */,
+      NULL /* menu_get_shortcut (gui, &tbuf, "APProcessShow") */,
       NULL,
       menu_audio_ctrl, gui, AUDIO_PPROCESS},
     { _("Audio/Postprocess/Enable Postprocessing"),
-      NULL /* menu_get_shortcut (gui, "APProcessEnable") */,
+      NULL /* menu_get_shortcut (gui, &tbuf, "APProcessEnable") */,
       gui->post_audio_enable ? "<checked>" : "<check>",
       menu_audio_ctrl, gui, AUDIO_PPROCESS_ENABLE},
     { _("Subtitle"),
@@ -569,25 +576,25 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<branch>",
       NULL, NULL, 0},
     { _("Settings/Setup..."),
-      menu_get_shortcut (gui, "SetupShow"),
+      menu_get_shortcut (gui, &tbuf, "SetupShow"),
       NULL,
       menu_gui_action, gui, ACTID_SETUP},
 #ifdef HAVE_CURL
     { _("Settings/Skin Downloader..."),
-      menu_get_shortcut (gui, "SkinDownload"),
+      menu_get_shortcut (gui, &tbuf, "SkinDownload"),
       NULL,
       menu_gui_action, gui, ACTID_SKINDOWNLOAD},
 #endif
     { _("Settings/Keymap Editor..."),
-      menu_get_shortcut (gui, "KeyBindingEditor"),
+      menu_get_shortcut (gui, &tbuf, "KeyBindingEditor"),
       NULL,
       menu_gui_action, gui, ACTID_KBEDIT},
     { _("Settings/Video..."),
-      menu_get_shortcut (gui, "ControlShow"),
+      menu_get_shortcut (gui, &tbuf, "ControlShow"),
       NULL,
       menu_gui_action, gui, ACTID_CONTROLSHOW},
     { _("Settings/TV Analog..."),
-      menu_get_shortcut (gui, "TVAnalogShow"),
+      menu_get_shortcut (gui, &tbuf, "TVAnalogShow"),
       NULL,
       menu_gui_action, gui, ACTID_TVANALOG},
     { "SEP",
@@ -595,11 +602,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<separator>",
       NULL, NULL, 0},
     { _("Help..."),
-      menu_get_shortcut (gui, "HelpShow"),
+      menu_get_shortcut (gui, &tbuf, "HelpShow"),
       NULL,
       menu_gui_action, gui, ACTID_HELP_SHOW},
     { _("Logs..."),
-      menu_get_shortcut (gui, "ViewlogShow"),
+      menu_get_shortcut (gui, &tbuf, "ViewlogShow"),
       NULL,
       menu_gui_action, gui, ACTID_VIEWLOG},
     { "SEP",
@@ -607,7 +614,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       "<separator>",
       NULL, NULL, 0},
     { _("Quit"),
-      menu_get_shortcut (gui, "Quit"),
+      menu_get_shortcut (gui, &tbuf, "Quit"),
       NULL,
       menu_gui_action, gui, ACTID_QUIT},
     { NULL,
@@ -615,7 +622,6 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       NULL,
       NULL, NULL, 0}
   };
-  xitk_menu_entry_t *cur_entry;
 
   if(gui->no_gui)
     return;
@@ -637,12 +643,6 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   menu.skin_element_name = NULL;
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
-
-  cur_entry = &menu_entries[0];
-  while(cur_entry->menu) {
-    free(cur_entry->shortcut);
-    cur_entry++;
-  }
 
   /* Subtitle loader */
   if(gui->playlist.num) {
@@ -884,7 +884,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
     menu_entry.menu = xitk_asprintf("%s/%s", _("Playback"), _("Add Mediamark"));
-    menu_entry.shortcut  = menu_get_shortcut (gui, "AddMediamark");
+    menu_entry.shortcut  = menu_get_shortcut (gui, &tbuf, "AddMediamark");
     menu_entry.cb        = menu_gui_action;
     menu_entry.user_data = gui;
     menu_entry.user_id   = ACTID_ADDMEDIAMARK;
@@ -892,7 +892,6 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     if (menu_entry.menu)
       xitk_menu_add_entry(w, &menu_entry);
 
-    free(menu_entry.shortcut);
     free(menu_entry.menu);
   }
 
@@ -1051,9 +1050,10 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
+  menu_text_buf_t      tbuf = {tbuf.buf, tbuf.buf + sizeof (tbuf.buf) - 1, {0}};
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL,                    0 },
-    { _("Scan"),       menu_get_shortcut (gui, "ScanPlaylistInfo"),
+    { _("Scan"),       menu_get_shortcut (gui, &tbuf, "ScanPlaylistInfo"),
                                       NULL,          menu_scan_infos,              NULL,                    0 },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
     { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
@@ -1064,7 +1064,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     { "SEP",           NULL,          "<separator>", NULL,                         NULL,                    0 },
     { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL,                    0 },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
-    { _("Edit"),       menu_get_shortcut (gui, "MediamarkEditor"),
+    { _("Edit"),       menu_get_shortcut (gui, &tbuf, "MediamarkEditor"),
                                       NULL,          menu_playlist_mmk_editor,     NULL,                    0 },
     { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL,                    0 },
     { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     NULL,                    0 },
@@ -1073,9 +1073,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     { _("Move Down"),  NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_DOWN, 0 },
     { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
-  xitk_menu_entry_t *cur_entry;
 
-  
   XITK_WIDGET_INIT(&menu, gui->imlib_data);
   
   if(selected) {
@@ -1092,12 +1090,6 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
 
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
-  cur_entry = &menu_entries_sel[0];
-  while(cur_entry->menu) {
-    free(cur_entry->shortcut);
-    cur_entry++;
-  }
-  
   if(!selected && gui->playlist.num) {
     xitk_menu_entry_t   menu_entry;
     
@@ -1130,3 +1122,4 @@ void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   
   xitk_menu_show_menu(w);
 }
+
