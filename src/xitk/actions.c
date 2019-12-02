@@ -40,10 +40,6 @@
 #include "common.h"
 #include "oxine/oxine.h"
 
-filebrowser_t          *load_stream = NULL, *load_sub = NULL;
-
-static int             last_playback_speed = XINE_SPEED_NORMAL;
-
 static void gui_messages_off (gGui_t *gui) {
   pthread_mutex_lock (&gui->no_messages.mutex);
   ++gui->no_messages.level;
@@ -754,10 +750,14 @@ void gui_exit (xitk_widget_t *w, void *data) {
   download_skin_end();
 #endif
   
-  if(load_stream)
-    filebrowser_end(load_stream);
-  if(load_sub)
-    filebrowser_end(load_sub);
+  if (gui->load_stream) {
+    filebrowser_end (gui->load_stream);
+    gui->load_stream = NULL;
+  }
+  if (gui->load_sub) {
+    filebrowser_end (gui->load_sub);
+    gui->load_sub = NULL;
+  }
 
   if (video_window_is_visible (gui->vwin))
     video_window_set_visibility (gui->vwin, 0);
@@ -980,12 +980,12 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   int speed = xine_get_param(gui->stream, XINE_PARAM_SPEED);
 
   if(speed != XINE_SPEED_PAUSE) {
-    last_playback_speed = speed;
+    gui->last_playback_speed = speed;
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
     panel_update_runtime_display (gui->panel);
   }
   else {
-    xine_set_param(gui->stream, XINE_PARAM_SPEED, last_playback_speed);
+    xine_set_param (gui->stream, XINE_PARAM_SPEED, gui->last_playback_speed);
     video_window_reset_ssaver (gui->vwin);
   }
   
@@ -1354,7 +1354,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
     xine_set_param(gui->stream, XINE_PARAM_SPEED, (speed = XINE_SPEED_NORMAL));
   }
   if(speed != XINE_SPEED_PAUSE)
-    last_playback_speed = speed;
+    gui->last_playback_speed = speed;
 
   panel_check_pause (gui->panel);
   /* Give xine engine some time before updating OSD, otherwise the        */
@@ -2208,15 +2208,15 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
   gGui_t *gui = gGui;
   char *cur_dir = filebrowser_get_current_dir(fb);
 
-  if(fb == load_stream) {
+  if (fb == gui->load_stream) {
     if(cur_dir && strlen(cur_dir)) {
       strlcpy(gui->curdir, cur_dir, sizeof(gui->curdir));
       config_update_string("media.files.origin_path", gui->curdir);
     }
-    load_stream = NULL;
+    gui->load_stream = NULL;
   }
-  else if(fb == load_sub)
-    load_sub = NULL;
+  else if (fb == gui->load_sub)
+    gui->load_sub = NULL;
 
   free(cur_dir);
 }
@@ -2273,7 +2273,7 @@ static void fileselector_callback(filebrowser_t *fb) {
   } /* If valid file name */
 
   free(file);
-  load_stream = NULL;
+  gui->load_stream = NULL;
 }
 
 
@@ -2348,7 +2348,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
 
   free(path);
 
-  load_stream = NULL;
+  gui->load_stream = NULL;
 }
 
 
@@ -2358,8 +2358,8 @@ void gui_file_selector(void) {
 
   gui->nongui_error_msg = NULL;
 
-  if(load_stream)
-    filebrowser_raise_window(load_stream);
+  if (gui->load_stream)
+    filebrowser_raise_window (gui->load_stream);
   else {
     cbb[0].label = _("Select");
     cbb[0].callback = fileselector_callback;
@@ -2369,7 +2369,7 @@ void gui_file_selector(void) {
     cbb[1].need_a_file = 0;
     cbb[2].callback = fileselector_cancel_callback;
     cbb[2].need_a_file = 0;
-    load_stream = create_filebrowser(_("Stream(s) Loading"), gui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
+    gui->load_stream = create_filebrowser(_("Stream(s) Loading"), gui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
   }
 }
 
@@ -2413,15 +2413,15 @@ static void subselector_callback(filebrowser_t *fb) {
     free(file);
   }
 
-  load_sub = NULL;
+  gui->load_sub = NULL;
 }
 
 void gui_select_sub(void) {
   gGui_t *gui = gGui;
   
   if(gui->playlist.num) {
-    if(load_sub)
-      filebrowser_raise_window(load_sub);
+    if (gui->load_sub)
+      filebrowser_raise_window (gui->load_sub);
     else {
       filebrowser_callback_button_t  cbb[2];
       mediamark_t *mmk;
@@ -2454,7 +2454,7 @@ void gui_select_sub(void) {
 	else
 	  open_path = strdup(gui->curdir);
 	
-	load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+        gui->load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
 	free(open_path);
       }
     }

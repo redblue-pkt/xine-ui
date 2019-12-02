@@ -399,6 +399,16 @@ struct gGui_st {
   xui_setup_t               *setup;
   xui_mrlb_t                *mrlb;
   xui_vctrl_t               *vctrl;
+
+  /* actions.c */
+  filebrowser_t             *load_stream;
+  filebrowser_t             *load_sub;
+  int                        last_playback_speed;
+
+  /* main.c */
+  char                     **video_driver_ids;
+  char                     **audio_driver_ids;
+  window_attributes_t        window_attribute;
 };
 
 extern gGui_t *gGui;
