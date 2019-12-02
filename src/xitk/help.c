@@ -98,7 +98,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
       int   fd;
 
       assert(doc_encoding != NULL);
-      xr = xitk_recode_init(doc_encoding, NULL);
+      xr = xitk_recode_init (doc_encoding, NULL, 0);
 
       if((fd = xine_open_cloexec(filename, O_RDONLY)) >= 0) {
 	char  *buf = NULL, *pbuf;
