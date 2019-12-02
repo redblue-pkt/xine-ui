@@ -69,11 +69,7 @@
 /*
  * global variables
  */
-gGui_t                       *gGui;
-
-static char                 **video_driver_ids;
-static char                 **audio_driver_ids;
-static window_attributes_t    window_attribute;
+gGui_t *gGui;
 
 #define CONFIGFILE "config"
 #define CONFIGDIR  ".xine"
@@ -387,11 +383,11 @@ static void xrm_parse(void) {
   (void) XrmMergeDatabases(home_rmdb, &rmdb);
 
   if(XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", &str_type, &value) == True) {
-    if(!parse_geometry(&window_attribute, (char *)value.addr))
+    if (!parse_geometry (&gui->window_attribute, (char *)value.addr))
       printf(_("Bad geometry '%s'\n"), (char *)value.addr);
   } 
   if(XrmGetResource(rmdb, "xine.border", "xine.Border", &str_type, &value) == True) {
-    window_attribute.borderless = !get_bool_value((char *) value.addr);
+    gui->window_attribute.borderless = !get_bool_value((char *) value.addr);
   }
   if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", &str_type, &value) == True) {
     if(!parse_visual(&gui->prefered_visual_id, 
@@ -784,8 +780,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
    * Setting default (configfile stuff need registering before updating, etc...).
    */
   driver_num = 
-    xine_config_register_enum (gui->xine, "video.driver", 
-			      0, video_driver_ids,
+    xine_config_register_enum (gui->xine, "video.driver", 0, gui->video_driver_ids,
 			      _("video driver to use"),
 			      _("Choose video driver. "
 				"NOTE: you may restart xine to use the new driver"),
@@ -798,30 +793,24 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
     const char *const *driver_ids;
     int                i;
     
-    if((!strcasecmp(video_driver_ids[driver_num], "none")) || 
-       (!strcasecmp(video_driver_ids[driver_num], "null"))) {
-      video_port = xine_open_video_driver (gui->xine,
-					  video_driver_ids[driver_num],
-					  XINE_VISUAL_TYPE_NONE,
-					  (void *) &vis);
+    if ((!strcasecmp (gui->video_driver_ids[driver_num], "none")) ||
+        (!strcasecmp (gui->video_driver_ids[driver_num], "null"))) {
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_num],
+        XINE_VISUAL_TYPE_NONE, (void *) &vis);
       if (video_port)
 	return video_port;
       
     }
-    else if(!strcasecmp(video_driver_ids[driver_num], "fb")) {
-      video_port = xine_open_video_driver (gui->xine,
-					  video_driver_ids[driver_num],
-					  XINE_VISUAL_TYPE_FB, NULL);
+    else if (!strcasecmp (gui->video_driver_ids[driver_num], "fb")) {
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_num],
+        XINE_VISUAL_TYPE_FB, NULL);
       if (video_port)
 	return video_port;
       
     }
-    else if(strcasecmp(video_driver_ids[driver_num], "auto")) {
-      
-      video_port = xine_open_video_driver (gui->xine, 
-					  video_driver_ids[driver_num],
-					  XINE_VISUAL_TYPE_X11,
-					  (void *) &vis);
+    else if (strcasecmp (gui->video_driver_ids[driver_num], "auto")) {
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_num],
+        XINE_VISUAL_TYPE_X11, (void *) &vis);
       if (video_port)
 	return video_port;
     }
@@ -857,30 +846,25 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   else {
     
     /* 'none' plugin is a special case, just change the visual type */
-    if((!strcasecmp(video_driver_ids[driver_number], "none")) 
-       || (!strcasecmp(video_driver_ids[driver_number], "null"))) {
-      video_port = xine_open_video_driver (gui->xine,
-					  video_driver_ids[driver_number],
-					  XINE_VISUAL_TYPE_NONE,
-					  (void *) &vis);
+    if ((!strcasecmp (gui->video_driver_ids[driver_number], "none"))
+      || (!strcasecmp (gui->video_driver_ids[driver_number], "null"))) {
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_number],
+        XINE_VISUAL_TYPE_NONE, (void *) &vis);
       
       /* do not save on config, otherwise user would never see images again... */
     }
-    else if(!strcasecmp(video_driver_ids[driver_number], "fb")) {
-      video_port = xine_open_video_driver (gui->xine,
-					  video_driver_ids[driver_number],
-					  XINE_VISUAL_TYPE_FB, NULL);
+    else if (!strcasecmp (gui->video_driver_ids[driver_number], "fb")) {
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_number],
+        XINE_VISUAL_TYPE_FB, NULL);
 
     }
     else {
-      video_port = xine_open_video_driver (gui->xine,
-					  video_driver_ids[driver_number],
-					  XINE_VISUAL_TYPE_X11, 
-					  (void *) &vis);
+      video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_number],
+        XINE_VISUAL_TYPE_X11, (void *) &vis);
     }
     
     if(!video_port) {
-      printf (_("main: video driver <%s> failed\n"), video_driver_ids[driver_number]);
+      printf (_("main: video driver <%s> failed\n"), gui->video_driver_ids[driver_number]);
       exit (1);
     }
     
@@ -901,8 +885,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
    * Setting default (configfile stuff need registering before updating, etc...).
    */
   driver_num = 
-    xine_config_register_enum (gui->xine, "video.driver", 
-			      0, video_driver_ids,
+    xine_config_register_enum (gui->xine, "video.driver", 0, gui->video_driver_ids,
 			      _("video driver to use"),
 			      _("Choose video driver. "
 				"NOTE: you may restart xine to use the new driver"),
@@ -912,8 +895,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
   
 
   driver_num = 
-    xine_config_register_enum (gui->xine, "audio.driver", 
-			      0, audio_driver_ids,
+    xine_config_register_enum (gui->xine, "audio.driver", 0, gui->audio_driver_ids,
 			      _("audio driver to use"),
 			      _("Choose audio driver. "
 				"NOTE: you may restart xine to use the new driver"),
@@ -925,18 +907,16 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
     const char *const *driver_ids;
     int    i;
     
-    if (strcasecmp(audio_driver_ids[driver_num], "auto")) {
+    if (strcasecmp (gui->audio_driver_ids[driver_num], "auto")) {
       
       /* don't want to load an audio driver ? */
-      if (!strncasecmp(audio_driver_ids[driver_num], "NULL", 4)) {
+      if (!strncasecmp (gui->audio_driver_ids[driver_num], "NULL", 4)) {
 	if(__xineui_global_verbosity)
 	  printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
       
-      audio_port = xine_open_audio_driver (gui->xine, 
-					  audio_driver_ids[driver_num],
-					  NULL);
+      audio_port = xine_open_audio_driver (gui->xine, gui->audio_driver_ids[driver_num], NULL);
       if (audio_port)
 	return audio_port;
     }
@@ -975,7 +955,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
   else {
     
     /* don't want to load an audio driver ? */
-    if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
+    if (!strncasecmp (gui->audio_driver_ids[driver_number], "NULL", 4)) {
 
       if(__xineui_global_verbosity)
 	printf(_("main: not using any audio driver (as requested).\n"));
@@ -988,10 +968,10 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
     }
     else {
     
-      audio_port = xine_open_audio_driver (gui->xine, audio_driver_ids[driver_number], NULL);
+      audio_port = xine_open_audio_driver (gui->xine, gui->audio_driver_ids[driver_number], NULL);
 
       if (!audio_port) {
-        printf (_("main: audio driver <%s> failed\n"), audio_driver_ids[driver_number]);
+        printf (_("main: audio driver <%s> failed\n"), gui->audio_driver_ids[driver_number]);
         exit(1);
       }
     
@@ -1516,9 +1496,22 @@ int main(int argc, char *argv[]) {
   gui->nongui_error_msg       = NULL;
   gui->orig_stdout            = stdout;
   
-  window_attribute.x     = window_attribute.y      = -8192;
-  window_attribute.width = window_attribute.height = -1;
-  window_attribute.borderless = 0;
+  gui->panel                  = NULL;
+  gui->vwin                   = NULL;
+  gui->setup                  = NULL;
+  gui->mrlb                   = NULL;
+  gui->vctrl                  = NULL;
+
+  gui->load_stream            = NULL;
+  gui->load_sub               = NULL;
+
+  gui->last_playback_speed    = XINE_FINE_SPEED_NORMAL;
+
+  gui->window_attribute.x     =
+  gui->window_attribute.y     = -8192;
+  gui->window_attribute.width =
+  gui->window_attribute.height = -1;
+  gui->window_attribute.borderless = 0;
 
   _argv = build_command_line_args(argc, argv, &_argc);
 #ifdef TRACE_RC
@@ -1734,7 +1727,7 @@ int main(int argc, char *argv[]) {
 
     case 'G': /* Set geometry */
       if(optarg != NULL) {
-	if(!parse_geometry(&window_attribute, optarg)) {
+        if (!parse_geometry (&gui->window_attribute, optarg)) {
 	  fprintf(stderr, _("Bad geometry '%s', see xine --help\n"), optarg);
 	  exit(1);
 	}
@@ -1742,7 +1735,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'B':
-      window_attribute.borderless = 1;
+      gui->window_attribute.borderless = 1;
       break;
 
     case 'N':
@@ -1999,9 +1992,11 @@ int main(int argc, char *argv[]) {
    * window geometry, so, reset those params.
    */
   if(gui->use_root_window) {
-    window_attribute.x     = window_attribute.y      = -8192;
-    window_attribute.width = window_attribute.height = -1;
-    window_attribute.borderless = 0;
+    gui->window_attribute.x =
+    gui->window_attribute.y = -8192;
+    gui->window_attribute.width =
+    gui->window_attribute.height = -1;
+    gui->window_attribute.borderless = 0;
   }
   
   show_banner();
@@ -2134,7 +2129,7 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
-  gui_init (gui, _argc - optind, &_argv[optind], &window_attribute);
+  gui_init (gui, _argc - optind, &_argv[optind], &gui->window_attribute);
 
   pthread_mutex_init(&gui->download_mutex, NULL);
 
@@ -2177,19 +2172,19 @@ int main(int argc, char *argv[]) {
     
     while(vids[i++]);
     
-    video_driver_ids = (char **) calloc((i + 1), sizeof(char *));
+    gui->video_driver_ids = (char **)calloc ((i + 1), sizeof (char *));
     i = 0;
-    video_driver_ids[i] = strdup("auto");
+    gui->video_driver_ids[i] = strdup ("auto");
     while(vids[i]) {
-      video_driver_ids[i + 1] = strdup(vids[i]);
+      gui->video_driver_ids[i + 1] = strdup (vids[i]);
       i++;
     }
     
-    video_driver_ids[i + 1] = NULL;
+    gui->video_driver_ids[i + 1] = NULL;
     
     if(video_driver_id) {
-      for(i = 0; video_driver_ids[i] != NULL; i++) {
-	if(!strcasecmp(video_driver_id, video_driver_ids[i])) {
+      for (i = 0; gui->video_driver_ids[i] != NULL; i++) {
+        if (!strcasecmp (video_driver_id, gui->video_driver_ids[i])) {
 	  driver_num = i;
 	  break;
 	}
@@ -2203,7 +2198,7 @@ int main(int argc, char *argv[]) {
     
     if(xine_config_lookup_entry (gui->xine, "video.driver", &cfg_vo_entry)) {
 
-      if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "dxr3")) {
+      if (!strcasecmp (gui->video_driver_ids[cfg_vo_entry.num_value], "dxr3")) {
 	xine_cfg_entry_t  cfg_entry;
 	
 	if(xine_config_lookup_entry (gui->xine, "dxr3.output.mode", &cfg_entry)) {
@@ -2215,7 +2210,7 @@ int main(int argc, char *argv[]) {
 	  }
 	}
       }
-      else if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "fb")) {
+      else if (!strcasecmp (gui->video_driver_ids[cfg_vo_entry.num_value], "fb")) {
 	if(aos < MAX_ACTIONS_ON_START)
 	  gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       }
@@ -2232,20 +2227,20 @@ int main(int argc, char *argv[]) {
     
     while(aids[i++]);
     
-    audio_driver_ids = (char **) calloc((i + 2), sizeof(char *));
+    gui->audio_driver_ids = (char **)calloc ((i + 2), sizeof (char *));
     i = 0;
-    audio_driver_ids[i] = strdup("auto");
-    audio_driver_ids[i + 1] = strdup("null");
+    gui->audio_driver_ids[i] = strdup ("auto");
+    gui->audio_driver_ids[i + 1] = strdup ("null");
     while(aids[i]) {
-      audio_driver_ids[i + 2] = strdup(aids[i]);
+      gui->audio_driver_ids[i + 2] = strdup (aids[i]);
       i++;
     }
     
-    audio_driver_ids[i + 2] = NULL;
+    gui->audio_driver_ids[i + 2] = NULL;
     
     if(audio_driver_id) {
-      for(i = 0; audio_driver_ids[i] != NULL; i++) {
-	if(!strcasecmp(audio_driver_id, audio_driver_ids[i])) {
+      for (i = 0; gui->audio_driver_ids[i] != NULL; i++) {
+        if (!strcasecmp (audio_driver_id, gui->audio_driver_ids[i])) {
 	  driver_num = i;
 	  break;
 	}
@@ -2384,14 +2379,13 @@ int main(int argc, char *argv[]) {
 
   {
     int ii;
-    for (ii = 0; video_driver_ids[ii]; ii++)
-      free(video_driver_ids[ii]);
-    free(video_driver_ids);
-    for (ii = 0; audio_driver_ids[ii]; ii++)
-      free(audio_driver_ids[ii]);
-    free(audio_driver_ids);
+    for (ii = 0; gui->video_driver_ids[ii]; ii++)
+      free (gui->video_driver_ids[ii]);
+    free (gui->video_driver_ids);
+    for (ii = 0; gui->audio_driver_ids[ii]; ii++)
+      free (gui->audio_driver_ids[ii]);
+    free (gui->audio_driver_ids);
   }
   return retval;
 }
-
 
