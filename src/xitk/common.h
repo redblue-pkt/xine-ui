@@ -154,12 +154,12 @@ typedef struct gGui_st gGui_t;
 /* Our default location for skin downloads */
 #define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
 
-#define fontname       "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
-#define boldfontname   "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
+#define fontname       "-*-helvetica-medium-r-*-*-11-*-*-*-*-*-*-*"
+#define boldfontname   "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*"
 #define hboldfontname  "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-#define lfontname      "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*"
+#define lfontname      "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*"
 #define tabsfontname   "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-#define br_fontname    "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*"
+#define br_fontname    "-misc-fixed-medium-r-normal-*-11-*-*-*-*-*-*-*"
 #define btnfontname    "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 
 /* easy pseudo widgets for *_toggle_* calls. not all windows support them yet. */
