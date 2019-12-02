@@ -177,11 +177,7 @@ static inline void xitk_dlist_add_head (xitk_dlist_t *list, xitk_dnode_t *node) 
 
 #endif
 
-typedef struct {
-  Display  *display;
-  void    (*x_lock_display) (Display *display);
-  void    (*x_unlock_display) (Display *display);
-} xitk_t;
+typedef struct xitk_s xitk_t;
 
 typedef struct xitk_widget_s xitk_widget_t;
 typedef struct xitk_menu_entry_s xitk_menu_entry_t;

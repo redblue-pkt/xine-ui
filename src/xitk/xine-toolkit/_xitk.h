@@ -54,6 +54,18 @@
 #include "libcommon.h"
 #include "xitk.h"
 
+typedef struct xitk_font_cache_s xitk_font_cache_t;
+
+struct xitk_s {
+  Display  *display;
+  void    (*x_lock_display) (Display *display);
+  void    (*x_unlock_display) (Display *display);
+
+  xitk_font_cache_t *font_cache;
+};
+
+extern xitk_t *gXitk;
+
 extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 

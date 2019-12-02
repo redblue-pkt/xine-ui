@@ -22,6 +22,7 @@
 #include "config.h"
 #endif
 
+#include <string.h>
 #include <iconv.h>
 
 #ifdef HAVE_LANGINFO_CODESET
@@ -29,9 +30,7 @@
 #endif
 
 #include <assert.h>
-
-#define BUILD_RECODE_C
-typedef iconv_t xitk_recode_t;
+#include <pthread.h>
 
 #include "_xitk.h"
 #include "recode.h"
@@ -41,6 +40,12 @@ typedef struct {
   const char               encoding[11];
 } lang_locale_t;
 
+struct xitk_recode_s {
+  iconv_t iconv_handle;
+  int use_mutex;
+  pthread_mutex_t mutex;
+};
+  
 static const lang_locale_t lang_locales[] = {
   { "af_ZA",    "iso88591"   },
   { "ar_AE",    "iso88596"   },
@@ -271,66 +276,114 @@ static char *xitk_get_system_encoding(void) {
   return codeset;
 }
 
-xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
-  iconv_t        id, *pid = NULL;
-  char           *src_enc = NULL, *dst_enc = NULL;
+xitk_recode_t *xitk_recode_init (const char *src_encoding, const char *dst_encoding, int threadsafe) {
+  xitk_recode_t *xrt = NULL;
+  char *src_enc, *dst_enc;
   
-  if (!src_encoding)
-    src_enc = xitk_get_system_encoding();
-  else
-    src_enc = strdup(src_encoding);
+  src_enc = src_encoding ? (char *)src_encoding : xitk_get_system_encoding ();
+  dst_enc = dst_encoding ? (char *)dst_encoding : xitk_get_system_encoding ();
 
-  if (!src_enc)
-    goto end;
-  
-  if (!dst_encoding)
-    dst_enc = xitk_get_system_encoding();
-  else
-    dst_enc = strdup(dst_encoding);
+  if (src_enc && dst_enc && strcasecmp (src_enc, dst_enc)) {
+    iconv_t ih = iconv_open (dst_enc, src_enc);
+    if (ih != (iconv_t)-1) {
+      xrt = malloc (sizeof (*xrt));
+      if (xrt) {
+        xrt->iconv_handle = ih;
+        xrt->use_mutex = threadsafe;
+        if (threadsafe)
+          pthread_mutex_init (&xrt->mutex, NULL);
+      } else {
+        iconv_close (xrt->iconv_handle);
+      }
+    }
+  }
 
-  if (!dst_enc)
-    goto end;
-
-  if ((id = iconv_open(dst_enc, src_enc)) == (iconv_t)-1)
-    goto end;
-
-  pid = malloc(sizeof(iconv_t));
-  assert(id != NULL);
-
-  *pid = id;
-  
- end:
-  free(dst_enc);
-  free(src_enc);
-  return pid;
+  if (src_enc != (char *)src_encoding)
+    free (src_enc);
+  if (dst_enc != (char *)dst_encoding)
+    free (dst_enc);
+  return xrt;
 }
 
-void xitk_recode_done(xitk_recode_t *id) {
-  if ( ! id ) return;
-
-  iconv_close(*id);
-
-  free(id);
+void xitk_recode_done (xitk_recode_t *xrt) {
+  if (xrt) {
+    iconv_close (xrt->iconv_handle);
+    if (xrt->use_mutex)
+      pthread_mutex_destroy (&xrt->mutex);
+    free (xrt);
+  }
 }
 
-char *xitk_recode(xitk_recode_t *id, const char *src) {
+char *xitk_recode (xitk_recode_t *xrt, const char *src) {
   char *buffer = NULL;
 
-  if ( id ) {
+  if (xrt) {
     size_t inbytes  = strlen(src);
     size_t outbytes = 2 * inbytes;
-    ICONV_CONST char *inbuf     = (ICONV_CONST char *)src;
+    ICONV_CONST char *inbuf = (ICONV_CONST char *)src;
     char *outbuf    = calloc(outbytes + 1, sizeof(char));
 
-    buffer    = outbuf;
+    if (xrt->use_mutex)
+      pthread_mutex_lock (&xrt->mutex);
+    iconv (xrt->iconv_handle, NULL, &inbytes, NULL, &outbytes);
+    buffer = outbuf;
     while (inbytes) {
-      if (iconv(*id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
+      if (iconv (xrt->iconv_handle, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
 	free(buffer);
 	buffer = NULL;
 	break;
       }
     }
+    if (xrt->use_mutex)
+      pthread_mutex_unlock (&xrt->mutex);
   }
 
   return buffer ? buffer : strdup(src);
+}
+
+void xitk_recode2_do (xitk_recode_t *xrt, xitk_recode_string_t *s) {
+  size_t slen, dsize;
+  char *buf, *write;
+
+  if (!s)
+    return;
+  if (!xrt || !s->src || !s->ssize) {
+    s->res = s->src;
+    s->rsize = s->ssize;
+    return;
+  }
+
+  slen = s->ssize;
+  dsize = 2 * slen;
+  if (s->buf && (dsize <= s->bsize)) {
+    s->res = s->buf;
+    dsize = s->bsize;
+  } else {
+    s->res = malloc (dsize);
+    if (!s->res) {
+      s->res = s->src;
+      s->rsize = s->ssize;
+      return;
+    }
+  }
+
+  if (xrt->use_mutex)
+    pthread_mutex_lock (&xrt->mutex);
+  buf = (char *)s->src;
+  write = (char *)s->res;
+  iconv (xrt->iconv_handle, NULL, &slen, NULL, &dsize);
+  while (slen) {
+    if (iconv (xrt->iconv_handle, &buf, &slen, &write, &dsize) == (size_t)-1)
+      break;
+  }
+  if (xrt->use_mutex)
+    pthread_mutex_unlock (&xrt->mutex);
+  s->rsize = write - s->res;
+}
+
+void xitk_recode2_done (xitk_recode_t *xrt, xitk_recode_string_t *s) {
+  (void)xrt;
+  if (s && s->res && (s->res != s->src) && (s->res != (const char *)s->buf))
+    free ((char *)s->res);
+  s->res = NULL;
 }

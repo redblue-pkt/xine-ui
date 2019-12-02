@@ -135,7 +135,7 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
   char *minfo;
   xitk_recode_t *xr;
   
-  xr = xitk_recode_init(METAINFO_CHARSET, NULL);
+  xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
   
   minfo = (char *)xine_get_meta_info(gui->stream, meta);
   if(minfo)
@@ -201,7 +201,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   artist = (char *)xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
   album = (char *)xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
   
-  xr = xitk_recode_init(METAINFO_CHARSET, NULL);
+  xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
   if(title)
     title = xitk_recode(xr, title);
   if(artist)

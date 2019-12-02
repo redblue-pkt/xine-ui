@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -21,12 +21,16 @@
 #ifndef HAVE_XITK_RECODE_H
 #define HAVE_XITK_RECODE_H
 
-/* Unless building recode.c, make xitk_recode_t an opaque type.
- */
+typedef struct xitk_recode_s xitk_recode_t;
 
-#ifndef BUILD_RECODE_C
-typedef void xitk_recode_t;
-#endif
+typedef struct {
+  const char *src;    /** << text to recode (no \0 needed) */
+  size_t      ssize;  /** << bytes to recode */
+  char       *buf;    /** << optional application supplied, or NULL */
+  size_t      bsize;  /** << bytes room in buf */
+  const char *res;    /** << can be src, buf, or malloc'ed. no \0. */
+  size_t      rsize;  /** << bytes in res */
+} xitk_recode_string_t;
 
 #ifdef HAVE_ICONV
 
@@ -36,12 +40,10 @@ typedef void xitk_recode_t;
  *     be strdup()ed
  *   - when encoding is "", it's got from system
  */
-xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding);
+xitk_recode_t *xitk_recode_init (const char *src_encoding, const char *dst_encoding, int threadsafe);
 
 /**
  * recode string 'src' into 'dst' according to prepared 'xr'
- *
- * NOTE: this function is MT-Safe only if callers arrange for mutual exclusion on the xr argument.
  */
 char *xitk_recode(xitk_recode_t *xr, const char *src);
 
@@ -50,15 +52,20 @@ char *xitk_recode(xitk_recode_t *xr, const char *src);
  */
 void xitk_recode_done(xitk_recode_t *xr);
 
+void xitk_recode2_do (xitk_recode_t *xr, xitk_recode_string_t *s);
+void xitk_recode2_done (xitk_recode_t *xr, xitk_recode_string_t *s);
+
 #else
 
 /* If we're not using iconv(), just define everything as no-op, and
  * xitk_recode as strdup.
  */
 
-#define xitk_recode_init(src_encoding, dst_encoding) NULL
+#define xitk_recode_init(src_encoding, dst_encoding, threadsafe) NULL
 #define xitk_recode(xr, src) strdup(src)
 #define xitk_recode_done(xr)
+#define xitk_recode2_do(xr, rs) do {(rs)->res = (rs)->src; (rs)->rsize = (rs)->ssize;} while (0)
+#define xitk_recode2_done(xr, rs) (rs)->res = NULL
 
 #endif
 
