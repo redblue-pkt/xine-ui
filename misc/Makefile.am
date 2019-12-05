@@ -5,7 +5,7 @@ SUBDIRS = desktops visuals
 MANIFEST := $(shell test ! -f splash-@SOURCE_SPLASH@/manifest || cat splash-@SOURCE_SPLASH@/manifest)
 skindir = $(XINE_SKINDIR)
 skin_DATA = \
-	$(top_srcdir)/@XINE_SPLASH@ $(top_srcdir)/@XINE_LOGO_MRL@
+	$(top_srcdir)/@XINE_SPLASH@ $(top_srcdir)/@XINE_LOGO_MRL@ $(top_srcdir)/@XINE_LOGO2_MRL@
 #	$(wildcard splash-@SOURCE_SPLASH@/xine-ui_logo.jpg) \
 #	$(wildcard splash-@SOURCE_SPLASH@/xine-ui_logo.mpv) \
 #	$(wildcard splash-@SOURCE_SPLASH@/xine-ui_logo.png) \
