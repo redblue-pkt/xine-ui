@@ -710,6 +710,7 @@ AC_DEFUN([XINE_LOCATE_MEDIA],
 ])
 
 XINE_LOCATE_MEDIA([XINE_LOGO_MRL], [jpg png mpv], [mpv], [xine-ui_logo], [logo], [official logo MRL])
+XINE_LOCATE_MEDIA([XINE_LOGO2_MRL], [mpg], [mpg], [xine-ui_logo], [logo2], [official logo MRL])
 XINE_LOCATE_MEDIA([XINE_SPLASH], [jpg png], [png], [xine_splash], [splash], [splash image filename])
 
 XINE_VISDIR="${datadir}/xine/visuals"
