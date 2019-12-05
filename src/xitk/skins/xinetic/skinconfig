@@ -73,9 +73,9 @@ skin.TitleLabel {
 	  y = 18
 	}
 	label {
-	  length = 51
+	  length = 43
 	  animation = True
-	  step = 6
+	  step = 7
           timer = 500000
 	  pixmap = Letters.png
 	}
@@ -83,7 +83,7 @@ skin.TitleLabel {
 
 skin.TimeLabel {
 	coords {
-	  x = 66
+	  x = 70
 	  y = 37
 	}
 	label {
@@ -95,7 +95,7 @@ skin.TimeLabel {
 
 skin.AudioNext {
 	coords {
-	  x = 186
+	  x = 187
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -103,7 +103,7 @@ skin.AudioNext {
 
 skin.AudioPrev {
 	coords {
-	  x = 186
+	  x = 187
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -111,7 +111,7 @@ skin.AudioPrev {
 
 skin.AudioLabel {
 	coords {
-	  x = 222
+	  x = 224
 	  y = 37
 	}
 	label {
@@ -123,7 +123,7 @@ skin.AudioLabel {
 
 skin.SpuNext {
 	coords {
-	  x = 268
+	  x = 272
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -131,7 +131,7 @@ skin.SpuNext {
 
 skin.SpuPrev {
 	coords {
-	  x = 268
+	  x = 272
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -139,11 +139,11 @@ skin.SpuPrev {
 
 skin.SpuLabel {
 	coords {
-	  x = 306
+	  x = 309
 	  y = 37
 	}
 	label {
-	  length = 6
+	  length = 5
 	  animation = False
 	pixmap = Letters.png
 	}
