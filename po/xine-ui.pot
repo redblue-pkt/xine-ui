@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR The xine project
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the xine-ui package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.99.8\n"
+"Project-Id-Version: xine-ui 0.99.12hg\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2014-02-25 17:44+0000\n"
+"POT-Creation-Date: 2019-12-06 14:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,63 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, c-format
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr ""
+
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr ""
+
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
@@ -126,73 +183,111 @@ msgstr ""
 msgid "Sharpness"
 msgstr ""
 
-msgid "Noise reduction"
+msgid "Noise"
 msgstr ""
 
-#, c-format
-msgid "%s(): couldn't find image for background\n"
+msgid "Control HUE value"
+msgstr ""
+
+msgid "Control SATURATION value"
+msgstr ""
+
+msgid "Control BRIGHTNESS value"
+msgstr ""
+
+msgid "Control CONTRAST value"
+msgstr ""
+
+msgid "Control GAMMA value"
+msgstr ""
+
+msgid "Control SHARPNESS value"
+msgstr ""
+
+msgid "Control NOISE REDUCTION value"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Hue"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sat"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Brt"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Ctr"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Gam"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Sha"
+msgstr ""
+
+#. TRANSLATORS: only ASCII characters (skin).
+msgctxt "skin"
+msgid "Noi"
+msgstr ""
+
+msgid "hue value"
+msgstr ""
+
+msgid "saturation value"
+msgstr ""
+
+msgid "brightness value"
+msgstr ""
+
+msgid "contrast value"
+msgstr ""
+
+msgid "gamma value"
+msgstr ""
+
+msgid "sharpness value"
+msgstr ""
+
+msgid "noise reduction value"
+msgstr ""
+
+msgid "Hue value."
+msgstr ""
+
+msgid "Saturation value."
+msgstr ""
+
+msgid "Brightness value."
+msgstr ""
+
+msgid "Contrast value."
+msgstr ""
+
+msgid "Gamma value."
+msgstr ""
+
+msgid "Sharpness value."
+msgstr ""
+
+msgid "Noise reduction value."
 msgstr ""
 
 msgid "xine Control Window"
 msgstr ""
 
 msgid "control: couldn't find image for background\n"
-msgstr ""
-
-msgid "Control HUE value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Hue"
-msgstr ""
-
-msgid "Control SATURATION value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sat"
-msgstr ""
-
-msgid "Control BRIGHTNESS value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Brt"
-msgstr ""
-
-msgid "Control CONTRAST value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Ctr"
-msgstr ""
-
-msgid "Control GAMMA value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Gam"
-msgstr ""
-
-msgid "Control SHARPNESS value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Sha"
-msgstr ""
-
-msgid "Control NOISE REDUCTION value"
-msgstr ""
-
-#. TRANSLATORS: only ASCII characters (skin)
-msgctxt "skin"
-msgid "Noi"
 msgstr ""
 
 #. TRANSLATORS: only ASCII characters (skin)
@@ -204,6 +299,10 @@ msgid "Dismiss"
 msgstr ""
 
 msgid "Close control window"
+msgstr ""
+
+#, c-format
+msgid "%s(): couldn't find image for background\n"
 msgstr ""
 
 msgid "Download in progress"
@@ -351,6 +450,14 @@ msgstr ""
 
 #, c-format
 msgid "gui_main: couldn't find true color visual.\n"
+msgstr ""
+
+msgid "Enable extra XLib thread safety."
+msgstr ""
+
+msgid ""
+"This is needed for some very old XLib/XCB versions.\n"
+"Otherwise, it may boost or brake performance - just try out."
 msgstr ""
 
 #, c-format
@@ -529,48 +636,6 @@ msgstr ""
 msgid "Unable to initialize Imlib\n"
 msgstr ""
 
-msgid "xine Event Sender"
-msgstr ""
-
-msgid "Up"
-msgstr ""
-
-msgid "Left"
-msgstr ""
-
-msgid "Right"
-msgstr ""
-
-msgid "Down"
-msgstr ""
-
-msgid "Angle +"
-msgstr ""
-
-msgid "Angle -"
-msgstr ""
-
-msgid "Menu 1"
-msgstr ""
-
-msgid "Menu 2"
-msgstr ""
-
-msgid "Menu 3"
-msgstr ""
-
-msgid "Menu 4"
-msgstr ""
-
-msgid "Menu 5"
-msgstr ""
-
-msgid "Menu 6"
-msgstr ""
-
-msgid "Menu 7"
-msgstr ""
-
 msgid "Menu toggle"
 msgstr ""
 
@@ -590,6 +655,54 @@ msgid "Angle"
 msgstr ""
 
 msgid "Part"
+msgstr ""
+
+msgid "Top Menu"
+msgstr ""
+
+msgid "Popup Menu"
+msgstr ""
+
+msgid "Menu 3"
+msgstr ""
+
+msgid "Menu 4"
+msgstr ""
+
+msgid "Menu 5"
+msgstr ""
+
+msgid "Menu 6"
+msgstr ""
+
+msgid "Menu 7"
+msgstr ""
+
+msgid "Menu 1"
+msgstr ""
+
+msgid "Menu 2"
+msgstr ""
+
+msgid "xine Event Sender"
+msgstr ""
+
+msgid "Up"
+msgstr ""
+
+msgid "Left"
+msgstr ""
+
+msgid "Right"
+msgstr ""
+
+msgid "Down"
+msgstr ""
+
+msgid "Angle +"
+msgstr ""
+
+msgid "Angle -"
 msgstr ""
 
 msgid "Close"
@@ -789,7 +902,7 @@ msgstr ""
 #, c-format
 msgid ""
 ".\n"
-"(c) 2000-2010 The xine Team.\n"
+"(c) %s The xine Team.\n"
 msgstr ""
 
 #, c-format
@@ -1878,9 +1991,6 @@ msgid "Video Chain Reaction"
 msgstr ""
 
 msgid "Audio Chain Reaction"
-msgstr ""
-
-msgid "New Filter"
 msgstr ""
 
 msgid "Enable"
