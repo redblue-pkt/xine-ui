@@ -293,7 +293,7 @@ xitk_recode_t *xitk_recode_init (const char *src_encoding, const char *dst_encod
         if (threadsafe)
           pthread_mutex_init (&xrt->mutex, NULL);
       } else {
-        iconv_close (xrt->iconv_handle);
+        iconv_close (ih);
       }
     }
   }
