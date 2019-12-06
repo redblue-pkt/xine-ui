@@ -1216,7 +1216,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
 }
 
 void gui_set_fullscreen_mode (xitk_widget_t *w, void *data) {
-  gGui_t *gui = data;
+  (void)data;
   set_fullscreen_mode(FULLSCR_MODE);
 }
 

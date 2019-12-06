@@ -1026,8 +1026,9 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
         if (xine_get_status (panel->gui->stream) != XINE_STATUS_PLAY) {
           panel_reset_slider (panel);
         } else {
+          /*
           int pos;
-          /* if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
+          if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
             xitk_slider_set_pos (panel->playback_widgets.slider_play, pos); */
           panel_update_runtime_display (panel);
         }
