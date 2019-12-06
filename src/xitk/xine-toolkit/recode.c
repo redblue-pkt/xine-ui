@@ -383,7 +383,9 @@ void xitk_recode2_do (xitk_recode_t *xrt, xitk_recode_string_t *s) {
 
 void xitk_recode2_done (xitk_recode_t *xrt, xitk_recode_string_t *s) {
   (void)xrt;
-  if (s && s->res && (s->res != s->src) && (s->res != (const char *)s->buf))
-    free ((char *)s->res);
-  s->res = NULL;
+  if (s) {
+    if (s->res && (s->res != s->src) && (s->res != (const char *)s->buf))
+      free ((char *)s->res);
+    s->res = NULL;
+  }
 }
