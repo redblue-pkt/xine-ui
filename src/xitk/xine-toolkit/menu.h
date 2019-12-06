@@ -57,7 +57,6 @@ typedef struct {
 typedef struct {
   ImlibData              *imlibdata;
   xitk_widget_t          *widget;
-  char                   *skin_element_name;
   menu_tree_t            *mtree;
   menu_node_t            *curbranch;
   xitk_dlist_t            menu_windows;
