@@ -97,9 +97,8 @@ static void menu_playlist_move_updown(xitk_widget_t *w, xitk_menu_entry_t *me, v
 }
 
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gGui_t *gui = data;
-
   (void)w;
+  (void)data;
   event_sender_send (me->user_id);
 }
 
@@ -271,10 +270,10 @@ static void menu_spu_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_direct_change_spu_channel(NULL, NULL, channel);
 }
 static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  gGui_t *gui = data;
   int aspect = me->user_id;
 
   (void)w;
+  (void)data;
   gui_toggle_aspect (aspect);
 }
 
