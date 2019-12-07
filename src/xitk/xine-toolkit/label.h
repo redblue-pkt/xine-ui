@@ -30,10 +30,9 @@ typedef struct {
 
   xitk_widget_t          *lWidget;
 
-  int                     char_length; /* length of 1 char */
-  int                     char_height; /* height of 1 char */
-
   xitk_pixmap_t          *labelpix;
+
+  xitk_pix_font_t        *pix_font;
 
   int                     length;      /* length in char */
   xitk_image_t           *font;

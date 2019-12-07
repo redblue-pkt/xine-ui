@@ -42,16 +42,67 @@ static size_t _strlcpy (char *d, const char *s, size_t l) {
   return n;
 }
 
+static int _find_pix_font_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
+  int range, n = 0;
+
+  for (range = 0; pf->unicode_ranges[range].first > 0; range++) {
+    if ((this_char >= pf->unicode_ranges[range].first) && (this_char <= pf->unicode_ranges[range].last))
+      break;
+    n += pf->unicode_ranges[range].last - pf->unicode_ranges[range].first + 1;
+  }
+
+  if (pf->unicode_ranges[range].first <= 0) {
+    *found = pf->unknown;
+    return 0;
+  }
+
+  n += this_char - pf->unicode_ranges[range].first;
+  found->x = (n % pf->chars_per_row) * pf->char_width;
+  found->y = (n / pf->chars_per_row) * pf->char_height;
+  return 1;
+}
+
 static void _create_label_pixmap(xitk_widget_t *w) {
   label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
   xitk_image_t          *font         = (xitk_image_t *) private_data->font;
+  xitk_pix_font_t       *pix_font;
   int                    pixwidth;
   int                    x_dest;
   int                    len, anim_add = 0;
+  uint16_t               buf[2048];
   
   private_data->anim_offset = 0;
 
-  len = private_data->label_len;
+  if (!font->pix_font) {
+    /* old style */
+    xitk_image_set_pix_font (font, "");
+    if (!font->pix_font)
+      return;
+  }
+  pix_font = font->pix_font;
+
+  {
+    const uint8_t *p = (const uint8_t *)private_data->label;
+    uint16_t *q = buf, *e = buf + sizeof (buf) / sizeof (buf[0]) - 1;
+    while (*p && (q < e)) {
+      if (!(p[0] & 0x80)) {
+        *q++ = p[0];
+        p += 1;
+      } else if (((p[0] & 0xe0) == 0xc0) && ((p[1] & 0xc0) == 0x80)) {
+        *q++ = ((uint32_t)(p[0] & 0x1f) << 6) | (p[1] & 0x3f);
+        p += 2;
+      } else if (((p[0] & 0xf0) == 0xe0) && ((p[1] & 0xc0) == 0x80) && ((p[2] & 0xc0) == 0x80)) {
+        *q++ = ((uint32_t)(p[0] & 0x0f) << 12) | ((uint32_t)(p[1] & 0x3f) << 6) | (p[2] & 0x3f);
+        p += 3;
+      } else {
+        *q++ = p[0];
+        p += 1;
+      }
+    }
+    *q = 0;
+    private_data->label_len = len = q - buf;
+  }
+
   if (private_data->animation && (len > private_data->length))
     anim_add = private_data->length + 5;
 
@@ -61,19 +112,19 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     pixwidth = private_data->length;
   if (pixwidth < 1)
     pixwidth = 1;
-  pixwidth *= private_data->char_length;
+  pixwidth *= pix_font->char_width;
   if (private_data->labelpix) {
     if ((private_data->labelpix->width != pixwidth)
-      || (private_data->labelpix->height != private_data->char_height)) {
+      || (private_data->labelpix->height != pix_font->char_height)) {
       xitk_image_destroy_xitk_pixmap (private_data->labelpix);
       private_data->labelpix = NULL;
     }
   }
   if (!private_data->labelpix) {
     private_data->labelpix = xitk_image_create_xitk_pixmap (private_data->imlibdata, pixwidth,
-      private_data->char_height);
+      pix_font->char_height);
 #if 0
-    printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, private_data->char_height,
+    printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, pix_font->char_height,
       private_data->labelpix->width, private_data->labelpix->height, private_data->label);
 #endif
   }
@@ -81,54 +132,50 @@ static void _create_label_pixmap(xitk_widget_t *w) {
 
   /* [foo] */
   {
-    const unsigned char *p = (const unsigned char *)private_data->label;
+    const uint16_t *p = buf;
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     while (*p) {
-      int px, py;
-      if ((*p < 32) || (*p >= 128)) {
-        px = py = 0;
-      } else {
-        px = ((*p) & 31) * private_data->char_length;
-        py = (((*p) >> 5) - 1) * private_data->char_height;
-      }
-      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-        private_data->labelpix->pixmap, private_data->labelpix->gc, px, py,
-        private_data->char_length, private_data->char_height, x_dest, 0);
-      x_dest += private_data->char_length;
+      xitk_point_t pt;
+      _find_pix_font_char (font->pix_font, &pt, *p);
       p++;
+      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
+        private_data->labelpix->pixmap, private_data->labelpix->gc, pt.x, pt.y,
+        pix_font->char_width, pix_font->char_height, x_dest, 0);
+      x_dest += pix_font->char_width;
     }
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
   /* foo[ *** fo] */
   if (anim_add) {
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-#define PX(z) ((z & 31) * private_data->char_length)
-#define PY(z) (((z >> 5) - 1) * private_data->char_height)
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, PX (' '), PY (' '),
-        private_data->char_length, private_data->char_height, x_dest, 0);
-    x_dest += private_data->char_length;
+      private_data->labelpix->pixmap, private_data->labelpix->gc,
+      pix_font->space.x, pix_font->space.y,
+      pix_font->char_width, pix_font->char_height, x_dest, 0);
+    x_dest += pix_font->char_width;
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
-        private_data->char_length, private_data->char_height, x_dest, 0);
-    x_dest += private_data->char_length;
+      private_data->labelpix->pixmap, private_data->labelpix->gc,
+      pix_font->asterisk.x, pix_font->asterisk.y,
+      pix_font->char_width, pix_font->char_height, x_dest, 0);
+    x_dest += pix_font->char_width;
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
-        private_data->char_length, private_data->char_height, x_dest, 0);
-    x_dest += private_data->char_length;
+      private_data->labelpix->pixmap, private_data->labelpix->gc,
+      pix_font->asterisk.x, pix_font->asterisk.y,
+      pix_font->char_width, pix_font->char_height, x_dest, 0);
+    x_dest += pix_font->char_width;
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, PX ('*'), PY ('*'),
-        private_data->char_length, private_data->char_height, x_dest, 0);
-    x_dest += private_data->char_length;
+      private_data->labelpix->pixmap, private_data->labelpix->gc,
+      pix_font->asterisk.x, pix_font->asterisk.y,
+      pix_font->char_width, pix_font->char_height, x_dest, 0);
+    x_dest += pix_font->char_width;
     XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, PX (' '), PY (' '),
-        private_data->char_length, private_data->char_height, x_dest, 0);
-    x_dest += private_data->char_length;
+      private_data->labelpix->pixmap, private_data->labelpix->gc,
+      pix_font->space.x, pix_font->space.y,
+      pix_font->char_width, pix_font->char_height, x_dest, 0);
+    x_dest += pix_font->char_width;
     XCopyArea (private_data->imlibdata->x.disp, private_data->labelpix->pixmap,
       private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
-      pixwidth - x_dest, private_data->char_height, x_dest, 0);
-#undef PX
-#undef PY
+      pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     x_dest = pixwidth;
   }
@@ -138,9 +185,10 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     do {
       XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-                 private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
-                 private_data->char_length, private_data->char_height, x_dest, 0);
-      x_dest += private_data->char_length;
+        private_data->labelpix->pixmap, private_data->labelpix->gc,
+        pix_font->space.x, pix_font->space.y,
+        pix_font->char_width, pix_font->char_height, x_dest, 0);
+      x_dest += pix_font->char_width;
     } while (x_dest < pixwidth);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
@@ -260,14 +308,13 @@ static void paint_label(xitk_widget_t *w) {
       xitk_font_unload_font(fs);
       return;
     }
-    else {
-      int width = private_data->char_length * private_data->length;
+    else if (private_data->pix_font) {
+      int width = private_data->pix_font->char_width * private_data->length;
       
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea(private_data->imlibdata->x.disp,
-		private_data->labelpix->pixmap, w->wl->win, font->image->gc, 
-		private_data->anim_offset, 0, width, private_data->char_height, 
-		w->x, w->y);
+      XCopyArea (private_data->imlibdata->x.disp,
+        private_data->labelpix->pixmap, w->wl->win, font->image->gc,
+        private_data->anim_offset, 0, width, private_data->pix_font->char_height, w->x, w->y);
 
       if (private_data->anim_running)
         XSync (private_data->imlibdata->x.disp, False);
@@ -291,9 +338,9 @@ static void *xitk_label_animation_loop (void *data) {
 
     if (!w->running || (private_data->anim_running != 1))
       break;
-    if (w->visible == 1) {
+    if ((w->visible == 1) && private_data->pix_font) {
       private_data->anim_offset += private_data->anim_step;
-      if (private_data->anim_offset >= (private_data->char_length * ((int)private_data->label_len + 5)))
+      if (private_data->anim_offset >= (private_data->pix_font->char_width * ((int)private_data->label_len + 5)))
         private_data->anim_offset = 0;
       paint_label (private_data->lWidget);
     }
@@ -399,8 +446,11 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
       if (info) {
         private_data->font          = info->label_pixmap_font_img;
-        private_data->char_length   = private_data->font->width / 32;
-        private_data->char_height   = private_data->font->height / 3;
+        private_data->pix_font      = private_data->font->pix_font;
+        if (!private_data->pix_font) {
+          xitk_image_set_pix_font (private_data->font, "");
+          private_data->pix_font    = private_data->font->pix_font;
+        }
         private_data->length        = info->label_length;
         private_data->animation     = info->label_animation;
         private_data->anim_step     = info->label_animation_step;
@@ -410,8 +460,10 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
         private_data->label_visible = info->label_printable;
         w->x                        = info->x;
         w->y                        = info->y;
-        w->width                    = private_data->char_length * private_data->length;
-        w->height                   = private_data->char_height;
+        if (private_data->pix_font) {
+          w->width                  = private_data->pix_font->char_width * private_data->length;
+          w->height                 = private_data->pix_font->char_height;
+        }
         w->visible                  = info->visibility ? 1 : -1;
         w->enable                   = info->enability;
         label_setup_label (w, private_data->label, 1);
@@ -539,8 +591,7 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
     mywidget->width             =
     private_data->length        = info->label_pixmap_font_img->width;
     private_data->fontname      = strdup (info->label_fontname);
-    private_data->char_length   = 0;
-    private_data->char_height   = 0;
+    private_data->pix_font      = NULL;
     private_data->animation     = 0;
     private_data->anim_step     = 1;
     private_data->anim_timer    = xitk_get_timer_label_animation ();
@@ -548,16 +599,21 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
   } else {
     private_data->length        = info->label_length;
     private_data->fontname      = NULL;
-    private_data->char_length   = private_data->font->width / 32;
-    private_data->char_height   = private_data->font->height / 3;
+    private_data->pix_font      = private_data->font->pix_font;
+    if (!private_data->pix_font) {
+      xitk_image_set_pix_font (private_data->font, "");
+      private_data->pix_font    = private_data->font->pix_font;
+    }
     private_data->animation     = info->label_animation;
     private_data->anim_step     = info->label_animation_step;
     private_data->anim_timer    = info->label_animation_timer;
     if (private_data->anim_timer <= 0)
       private_data->anim_timer = xitk_get_timer_label_animation ();
     private_data->label_visible = info->label_printable;
-    mywidget->width             = private_data->char_length * private_data->length;
-    mywidget->height            = private_data->char_height;
+    if (private_data->pix_font) {
+      mywidget->width           = private_data->pix_font->char_width * private_data->length;
+      mywidget->height          = private_data->pix_font->char_height;
+    }
   }
   private_data->anim_running  = 0;
   private_data->label         = NULL;
@@ -635,3 +691,4 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
 
   return _xitk_label_create (wl, l, &info);
 }
+

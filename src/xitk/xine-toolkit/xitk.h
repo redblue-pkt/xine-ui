@@ -234,6 +234,14 @@ typedef void (*xitk_signal_callback_t)(int, void *);
 typedef int xitk_register_key_t;
 
 
+typedef struct {
+  int x, y;
+} xitk_point_t;
+
+typedef struct {
+  int first, last;
+} xitk_range_t;
+
 struct xitk_pixmap_s {
   ImlibData                        *imlibdata;
   XImage                           *xim;
@@ -250,8 +258,23 @@ struct xitk_pixmap_s {
 };
 
 typedef struct {
+  int                               width;
+  int                               height;
+  int                               chars_per_row;
+  int                               chars_total;
+  int                               char_width;
+  int                               char_height;
+  xitk_point_t                      space;
+  xitk_point_t                      asterisk;
+  xitk_point_t                      unknown;
+#define XITK_MAX_UNICODE_RANGES 16
+  xitk_range_t                      unicode_ranges[XITK_MAX_UNICODE_RANGES + 1];
+} xitk_pix_font_t;
+
+typedef struct {
   xitk_pixmap_t                    *image;
   xitk_pixmap_t                    *mask;
+  xitk_pix_font_t                  *pix_font;
   int                               width;
   int                               height;
 } xitk_image_t;
@@ -304,6 +327,7 @@ typedef struct {
   unsigned long int label_animation_timer;
   char *label_color, *label_color_focus, *label_color_click, *label_fontname;
   char *label_pixmap_font_name;
+  char *label_pixmap_font_format;
   xitk_image_t *label_pixmap_font_img;
   /* slider */
   int slider_type, slider_radius;
@@ -1369,6 +1393,7 @@ const char *xitk_label_get_label(xitk_widget_t *w);
  * Load image and return a xitk_image_t data type.
  */
 xitk_image_t *xitk_image_load_image(ImlibData *idata, const char *image);
+void xitk_image_set_pix_font (xitk_image_t *image, const char *format);
 
 /**
  * Create an image widget type.
