@@ -1,6 +1,6 @@
 #Xine skin data file
 # revision 0.8
-# last modified: 31.12.2006
+# last modified: 07.12.2019
 #  Licence : GNU GENERAL PUBLIC LICENSE Version 2, June 1991: http://www.gnu.org/copyleft/gpl.html
 
 skin.name    = Xinetic
@@ -78,6 +78,10 @@ skin.TitleLabel {
 	  step = 7
           timer = 500000
 	  pixmap = Letters.png
+#  note: pixmap format descriptor, only once per file needed:
+#        (CharsPerImageRow!FirstUnicode-LastUnicode!FirstUnicode-...)
+#        or there will be assumed (32!32-127).
+          pixmap_format = (32!32-127!160-255)
 	}
 }
 
