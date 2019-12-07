@@ -103,6 +103,123 @@ unsigned int xitk_get_pixel_color_warning_background(ImlibData *im) {
   return xitk_get_pixel_color_from_rgb(im, 255, 255, 0);
 }
 
+static int _xitk_pix_font_find_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
+  int range, n = 0;
+
+  for (range = 0; pf->unicode_ranges[range].first > 0; range++) {
+    if ((this_char >= pf->unicode_ranges[range].first) && (this_char <= pf->unicode_ranges[range].last))
+      break;
+    n += pf->unicode_ranges[range].last - pf->unicode_ranges[range].first + 1;
+  }
+
+  if (pf->unicode_ranges[range].first <= 0) {
+    *found = pf->unknown;
+    return 0;
+  }
+
+  n += this_char - pf->unicode_ranges[range].first;
+  found->x = (n % pf->chars_per_row) * pf->char_width;
+  found->y = (n / pf->chars_per_row) * pf->char_height;
+  return 1;
+}
+
+void xitk_image_set_pix_font (xitk_image_t *image, const char *format) {
+  xitk_pix_font_t *pf;
+  int range, total;
+
+  if (!image || !format)
+    return;
+  if (image->pix_font)
+    return;
+  image->pix_font = pf = malloc (sizeof (*pf));
+  if (!pf)
+    return;
+
+  pf->width = image->width;
+  pf->height = image->height;
+
+  range = 0;
+  total = 0;
+  do {
+    const uint8_t *p = (const uint8_t *)format;
+    int v;
+    uint8_t z;
+    if (!p)
+      break;
+    while (1) {
+      while (*p && (*p != '('))
+        p++;
+      if (!(*p))
+        break;
+      p++;
+      if ((*p ^ '0') < 10)
+        break;
+    }
+    if (!(*p))
+      break;
+
+    v = 0;
+    while ((z = (*p ^ '0')) < 10)
+      v = v * 10u + z, p++;
+    if (v <= 0)
+      break;
+    pf->chars_per_row = v;
+    if (*p != '!')
+      break;
+    p++;
+
+    while (1) {
+      pf->unicode_ranges[range].last = 0;
+      v = 0;
+      while ((z = (*p ^ '0')) < 10)
+        v = v * 10u + z, p++;
+      pf->unicode_ranges[range].first = v;
+      if (*p != '-')
+        break;
+      p++;
+      v = 0;
+      while ((z = (*p ^ '0')) < 10)
+        v = v * 10u + z, p++;
+      pf->unicode_ranges[range].last = v;
+      if (pf->unicode_ranges[range].last < pf->unicode_ranges[range].first)
+        pf->unicode_ranges[range].last = pf->unicode_ranges[range].first;
+      total += pf->unicode_ranges[range].last - pf->unicode_ranges[range].first + 1;
+      range++;
+      if (range >= XITK_MAX_UNICODE_RANGES)
+        break;
+      if (*p != '!')
+        break;
+      p++;
+    }
+  } while (0);
+
+  if (range == 0) {
+    pf->chars_per_row = 32;
+    pf->unicode_ranges[0].first = 32;
+    pf->unicode_ranges[0].last = 127;
+    total = 127 - 32 + 1;
+    range = 1;
+  }
+
+  pf->char_width = pf->width / pf->chars_per_row;
+  pf->chars_total = total;
+  total = (total + pf->chars_per_row - 1) / pf->chars_per_row;
+  pf->char_height = pf->height / total;
+  pf->unicode_ranges[range].first = 0;
+  pf->unicode_ranges[range].last = 0;
+
+  pf->unknown.x = 0;
+  pf->unknown.y = 0;
+  _xitk_pix_font_find_char (pf, &pf->unknown, 127);
+  _xitk_pix_font_find_char (pf, &pf->space, ' ');
+  _xitk_pix_font_find_char (pf, &pf->asterisk, '*');
+}
+
+static void _xitk_image_destroy_pix_font (xitk_pix_font_t **pix_font) {
+  free (*pix_font);
+  *pix_font = NULL;
+}
+
 /*
  *
  */
@@ -116,6 +233,8 @@ void xitk_image_free_image(ImlibData *im, xitk_image_t **src) {
   
   if((*src)->image)
     xitk_image_destroy_xitk_pixmap((*src)->image);
+
+  _xitk_image_destroy_pix_font (&(*src)->pix_font);
 
   XITK_FREE((*src));
   *src = NULL;
@@ -1661,6 +1780,7 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   
   i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   i->image         = xitk_image_create_xitk_pixmap(im, img->rgb_width, img->rgb_height);
+  i->pix_font      = NULL;
   XLOCK (im->x.x_lock_display, im->x.disp);
   i->image->pixmap = Imlib_copy_image(im, img);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);

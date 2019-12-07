@@ -51,7 +51,7 @@ static int xitk_simg_cmp (void *a, void *b) {
 /*
  *
  */
-static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, const char *pixmap) {
+static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, const char *pixmap, const char *format) {
 
   if (!skonfig || !pixmap)
     return NULL;
@@ -63,6 +63,8 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, const char *pix
     pos = xine_sarray_binary_search (skonfig->imgs, &here);
     if (pos >= 0) {
       xitk_skin_img_t *si = xine_sarray_get (skonfig->imgs, pos);
+      if (format && !si->image->pix_font)
+        xitk_image_set_pix_font (si->image, format);
       return si->image;
     }
   }
@@ -82,6 +84,8 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, const char *pix
       free (nimg);
       return NULL;
     }
+    if (format)
+      xitk_image_set_pix_font (nimg->image, format);
     xine_sarray_add (skonfig->imgs, nimg);
     return nimg->image;
   }
@@ -97,6 +101,50 @@ static void skin_free_imgs (xitk_skin_config_t *skonfig) {
   }
   xine_sarray_clear (skonfig->imgs);
 }
+
+#if 0
+static int _key_from_name (const char *name) {
+  static const char * const names[] = {
+    "\x13""align",
+    "\x0f""animation",
+    "\x00""browser",
+    "\x14""color",
+    "\x0e""color_click",
+    "\x0d""color_focus",
+    "\x02""coords",
+    "\x01""entries",
+    "\x17""font",
+    "\x09""horizontal",
+    "\x0c""label",
+    "\x10""length",
+    "\x06""pixmap",
+    "\x11""pixmap_format",
+    "\x15""print",
+    "\x07""radius",
+    "\x0b""rotate",
+    "\x05""slider",
+    "\x12""static",
+    "\x18""step",
+    "\x16""timer",
+    "\x08""type",
+    "\x0a""vertical",
+    "\x03""x",
+    "\x04""y",
+  };
+  int b = 0, e = sizeof (names) / sizeof (names[0]), m = e >> 1;
+  do {
+    int d = strcasecmp (name, names[m] + 1);
+    if (d == 0)
+      return names[m][0];
+    if (d < 0)
+      e = m;
+    else
+      b = m + 1;
+    m = (b + e) >> 1;
+  } while (b != e);
+  return -1;
+}
+#endif
 
 /*
  *
@@ -433,7 +481,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.slider_pixmap_pad_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	  sprintf (skonfig->celement->info.slider_pixmap_pad_name, "%s/%s", skonfig->path, p);
-          skonfig->celement->info.slider_pixmap_pad_img = skin_load_img (skonfig, skonfig->celement->info.slider_pixmap_pad_name);
+          skonfig->celement->info.slider_pixmap_pad_img = skin_load_img (skonfig, skonfig->celement->info.slider_pixmap_pad_name, NULL);
 	}
 	else if(!strncasecmp(skonfig->ln, "radius", 6)) {
 	  skin_set_pos_to_value(&p);
@@ -483,12 +531,26 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_length = strtol(p, &p, 10);
 	}
+	else if(!strncasecmp(skonfig->ln, "pixmap_format", 13)) {
+	  skin_set_pos_to_value(&p);
+          if (!skonfig->celement->info.label_pixmap_font_format) {
+            skonfig->celement->info.label_pixmap_font_format = strdup (p);
+            if (skonfig->celement->info.label_pixmap_font_name)
+              skonfig->celement->info.label_pixmap_font_img = skin_load_img (skonfig,
+                skonfig->celement->info.label_pixmap_font_name,
+                skonfig->celement->info.label_pixmap_font_format);
+          }
+        }
 	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_pixmap_font_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
-	  sprintf(skonfig->celement->info.label_pixmap_font_name, "%s/%s", skonfig->path, p);
-          skonfig->celement->info.label_pixmap_font_img = skin_load_img (skonfig, skonfig->celement->info.label_pixmap_font_name);
-	}
+          if (skonfig->celement->info.label_pixmap_font_name) {
+            sprintf (skonfig->celement->info.label_pixmap_font_name, "%s/%s", skonfig->path, p);
+            skonfig->celement->info.label_pixmap_font_img = skin_load_img (skonfig,
+              skonfig->celement->info.label_pixmap_font_name,
+              skonfig->celement->info.label_pixmap_font_format);
+          }
+        }
 	else if(!strncasecmp(skonfig->ln, "static", 6)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_staticity = xitk_get_bool_value(p);
@@ -585,7 +647,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	      skin_set_pos_to_value(&p);
 	      s->info.pixmap_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	      sprintf (s->info.pixmap_name, "%s/%s", skonfig->path, p);
-              s->info.pixmap_img = skin_load_img (skonfig, s->info.pixmap_name);
+              s->info.pixmap_img = skin_load_img (skonfig, s->info.pixmap_name, NULL);
 	    }
 	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
 	      skin_set_pos_to_value(&p);
@@ -705,6 +767,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color focus = '%s'\n", s->info.label_color_focus);
       printf("  color click = '%s'\n", s->info.label_color_click);
       printf("  pixmap font = '%s'\n", s->info.label_pixmap_font_name);
+      printf("  pixmap fmt  = '%s'\n", s->info.label_pixmap_font_format);
       printf("  font        = '%s'\n", s->info.label_fontname);
       printf("  max_buttons = %d\n", s->info.max_buttons);
     }
@@ -778,6 +841,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
       XITK_FREE(s->info.pixmap_name);
       XITK_FREE(s->info.slider_pixmap_pad_name);
       XITK_FREE(s->info.label_pixmap_font_name);
+      XITK_FREE(s->info.label_pixmap_font_format);
       XITK_FREE(s->info.label_color);
       XITK_FREE(s->info.label_color_focus);
       XITK_FREE(s->info.label_color_click);
@@ -1201,7 +1265,7 @@ int xitk_skin_get_browser_entries(xitk_skin_config_t *skonfig, const char *str) 
 xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *skonfig, const char *str) {
   ABORT_IF_NULL(skonfig);
 
-  return skin_load_img (skonfig, str);
+  return skin_load_img (skonfig, str, NULL);
 }
 
 int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {
