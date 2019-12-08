@@ -1939,6 +1939,16 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   pthread_mutex_destroy (&vwin->mutex);
   vwin->gui->vwin = NULL;
+
+  if (vwin->xclasshint != NULL)
+    XFree (vwin->xclasshint);
+  if (vwin->xclasshint_fullscreen != NULL)
+    XFree (vwin->xclasshint_fullscreen);
+  if (vwin->xclasshint_borderless != NULL)
+    XFree (vwin->xclasshint_borderless);
+  if (vwin->wm_hint != NULL)
+    XFree (vwin->wm_hint);
+
   free (vwin);
 }
 
