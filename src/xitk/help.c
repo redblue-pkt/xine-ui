@@ -160,7 +160,7 @@ static void help_sections(void) {
     char                 locale_file[XITK_NAME_MAX + 16];
     char                 locale_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     char                 default_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    char                 ending[XITK_NAME_MAX];
+    char                 ending[XITK_NAME_MAX + 2];
     char                 section_name[1024];
 
     while ((dir_entry = readdir(dir)) != NULL) {
