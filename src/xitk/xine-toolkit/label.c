@@ -597,6 +597,12 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
     private_data->anim_timer    = xitk_get_timer_label_animation ();
     private_data->label_visible = 1;
   } else {
+    if (!private_data->font) {
+      /* wrong pixmmap name in skin? */
+      free (private_data);
+      free (mywidget);
+      return NULL;
+    }
     private_data->length        = info->label_length;
     private_data->fontname      = NULL;
     private_data->pix_font      = private_data->font->pix_font;
