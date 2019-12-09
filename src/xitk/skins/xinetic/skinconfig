@@ -8,7 +8,7 @@ skin.version = 5
 skin.date    = 25.05.2002
 skin.author  = Jérôme Villette <garogoril@wanadoo.fr>
 skin.url     = none
-#skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.png
+#skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpg
 
 ## Main GUI ##
 skin.BackGround {
@@ -99,7 +99,7 @@ skin.TimeLabel {
 
 skin.AudioNext {
 	coords {
-	  x = 187
+	  x = 189
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -107,7 +107,7 @@ skin.AudioNext {
 
 skin.AudioPrev {
 	coords {
-	  x = 187
+	  x = 189
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -127,7 +127,7 @@ skin.AudioLabel {
 
 skin.SpuNext {
 	coords {
-	  x = 272
+	  x = 273
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -135,7 +135,7 @@ skin.SpuNext {
 
 skin.SpuPrev {
 	coords {
-	  x = 272
+	  x = 273
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -143,7 +143,7 @@ skin.SpuPrev {
 
 skin.SpuLabel {
 	coords {
-	  x = 309
+	  x = 308
 	  y = 37
 	}
 	label {
@@ -478,6 +478,7 @@ skin.AutoPlayLbl {
 	  length = 9
 	  animation = True
 	  pixmap = Letters2.png
+          pixmap_format = (32!32-127!160-255)
 	}
 }
 
@@ -914,7 +915,7 @@ skin.MrlCurOrigin {
 	}
 
 	label {
-	  length = 35
+	  length = 38
 	  animation = True
 	pixmap = Letters2.png
 	}
