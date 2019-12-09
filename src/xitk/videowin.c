@@ -2113,8 +2113,13 @@ void video_window_update_logo (xui_vwin_t *vwin) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if (vwin->logo_synthetic && (cfg_err_result) && (strcmp (cfg_entry.str_value, XINE_LOGO_MRL))) {
-      config_update_string("gui.logo_mrl", XINE_LOGO_MRL);
+#ifdef XINE_LOGO2_MRL
+#  define USE_XINE_LOGO_MRL XINE_LOGO2_MRL
+#else
+#  define USE_XINE_LOGO_MRL XINE_LOGO_MRL
+#endif
+    if (vwin->logo_synthetic && (cfg_err_result) && (strcmp (cfg_entry.str_value, USE_XINE_LOGO_MRL))) {
+        config_update_string ("gui.logo_mrl", USE_XINE_LOGO_MRL);
 
     __play_logo_now:
       
