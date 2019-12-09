@@ -2267,14 +2267,15 @@ int main(int argc, char *argv[]) {
   /*
    * Setup logo.
    */
+#ifdef XINE_LOGO2_MRL
+#  define USE_XINE_LOGO_MRL XINE_LOGO2_MRL
+#else
+#  define USE_XINE_LOGO_MRL XINE_LOGO_MRL
+#endif
   gui->logo_mode = 0;
   gui->logo_has_changed = 0;
-  gui->logo_mrl = xine_config_register_string (gui->xine, "gui.logo_mrl", XINE_LOGO_MRL,
-						_("Logo MRL"),
-						CONFIG_NO_HELP, 
-						CONFIG_LEVEL_EXP,
-						main_change_logo_cb, 
-						gGui);
+  gui->logo_mrl = xine_config_register_string (gui->xine, "gui.logo_mrl", USE_XINE_LOGO_MRL,
+    _("Logo MRL"), CONFIG_NO_HELP, CONFIG_LEVEL_EXP, main_change_logo_cb, gGui);
 
   gui->event_queue = xine_event_new_queue(gui->stream);
   xine_event_create_listener_thread (gui->event_queue, event_listener, gui);
