@@ -66,6 +66,10 @@
 #  include "getopt.h"
 #endif
 
+#ifndef XINE_VERSION_CODE
+#define XINE_VERSION_CODE  XINE_MAJOR_VERSION*10000+XINE_MINOR_VERSION*100+XINE_SUB_VERSION
+#endif
+
 /*
  * global variables
  */
@@ -988,7 +992,9 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 static void event_listener (void *user_data, const xine_event_t *event) {
   gGui_t *gui = user_data;
   struct timeval tv;
+#if XINE_VERSION_CODE < 10200
   static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */ 
+#endif
 
   /*
    * Ignoring finished event logo is displayed (or played), that save us
@@ -1303,6 +1309,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     }
     break;
 
+#if XINE_VERSION_CODE < 10200
   case XINE_EVENT_MRL_REFERENCE:
     if(!mrl_ext && (event->stream == gui->stream) && gui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
@@ -1328,6 +1335,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 
     }
     break;
+#endif
 
 #ifndef XINE_EVENT_MRL_REFERENCE_EXT
 /* present in 1.1.0 but not 1.0.2 */
@@ -1341,9 +1349,9 @@ typedef struct {
     if((event->stream == gui->stream) && gui->playlist.num) {
       xine_mrl_reference_data_ext_t *ref = (xine_mrl_reference_data_ext_t *) event->data;
       const char *title = ref->mrl + strlen (ref->mrl) + 1;
-
+#if XINE_VERSION_CODE < 10200
       mrl_ext = 1; /* use this to ignore MRL_REFERENCE events */
-
+#endif
       if(__xineui_global_verbosity)
 	printf("XINE_EVENT_MRL_REFERENCE_EXT got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
