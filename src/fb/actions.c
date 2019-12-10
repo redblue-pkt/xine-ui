@@ -26,6 +26,7 @@
 #define _XOPEN_SOURCE 500
 #endif
 #define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
