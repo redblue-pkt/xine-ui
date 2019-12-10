@@ -29,6 +29,9 @@ EXTRA_DIST = \
 	m4/xft.m4 \
 	m4/_xine.m4
 
+
+distuninstallcheck_listfiles = find . -type f -print | grep -v share/mime/
+
 slackbuild:
 	@(cd misc && $(MAKE) SlackBuild) && \
 	 export PREFIX="/usr"; ./configure --prefix=$$PREFIX && misc/SlackBuild
