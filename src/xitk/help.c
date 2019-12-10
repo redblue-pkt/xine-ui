@@ -157,7 +157,7 @@ static void help_sections(void) {
   else {
     struct dirent       *dir_entry;
     const langs_t       *lang = get_lang();
-    char                 locale_file[XITK_NAME_MAX + 16];
+    char                 locale_file[XITK_NAME_MAX + 18];
     char                 locale_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     char                 default_readme[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     char                 ending[XITK_NAME_MAX + 2];
