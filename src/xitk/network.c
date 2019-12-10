@@ -29,6 +29,7 @@
 #endif
 /* required for strncasecmp() */
 #define _BSD_SOURCE 1
+#define _DEFAULT_SOURCE 1
 /* required to enable POSIX variant of getpwuid_r on solaris */
 #define _POSIX_PTHREAD_SEMANTICS 1
 
