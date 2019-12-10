@@ -2265,7 +2265,7 @@ void post_deinit (void) {
   gui->post_audio_elements_num = 0;
 }
 
-static char *_pplugin_get_default_deinterlacer(void) {
+static const char *_pplugin_get_default_deinterlacer(void) {
   return DEFAULT_DEINTERLACER;
 }
 
@@ -2273,7 +2273,7 @@ void post_deinterlace_init(const char *deinterlace_post) {
   gGui_t *gui = gGui;
   post_element_t **posts = NULL;
   int              num;
-  char            *deinterlace_default;
+  const char      *deinterlace_default;
 
   deinterlace_default = _pplugin_get_default_deinterlacer();
   

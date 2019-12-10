@@ -364,7 +364,7 @@ static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
   return NULL;
 }
 
-char *kbindings_get_shortcut(kbinding_t *kbt, char *action) {
+const char *kbindings_get_shortcut(kbinding_t *kbt, const char *action) {
   kbinding_entry_t  *k;
   static char        shortcut[32];
   

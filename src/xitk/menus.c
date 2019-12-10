@@ -48,8 +48,9 @@ typedef struct {
   char *write, *end, buf[1024];
 } menu_text_buf_t;
 
-static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, char *action) {
-  char *ret, *shortcut = kbindings_get_shortcut (gui->kbindings, action);
+static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, const char *action) {
+  const char *shortcut = kbindings_get_shortcut (gui->kbindings, action);
+  char *ret;
   if (!shortcut) {
 #ifdef DEBUG
     fprintf (stderr, "Action '%s' is invalid\n", action);

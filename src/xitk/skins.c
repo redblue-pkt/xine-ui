@@ -40,7 +40,7 @@ static int                 change_config_entry;
 /*
  * Fill **skins_avail with available skins from path.
  */ 
-static void get_available_skins_from(char *path) {
+static void get_available_skins_from(const char *path) {
   DIR             *pdir;
   struct dirent   *pdirent;
 
@@ -186,7 +186,7 @@ int get_skin_offset(const char *skin) {
  * Try to find desired skin in skins_avail, then return
  * a pointer to the right entry.
  */
-static skins_locations_t *get_skin_location(char *skin) {
+static skins_locations_t *get_skin_location(const char *skin) {
   int i = 0;
   
   while(skins_avail[i] != NULL) {
@@ -204,7 +204,7 @@ static skins_locations_t *get_skin_location(char *skin) {
 static int change_skin(skins_locations_t *sk) {
   gGui_t              *gui = gGui;
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  char                *old_skin;
+  const char          *old_skin;
   skins_locations_t   *sks = sk;
   int                  twice = 0, twice_load = 0;
   int                  ret = 0;

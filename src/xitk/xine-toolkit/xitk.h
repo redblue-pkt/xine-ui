@@ -571,7 +571,7 @@ typedef struct {
   int                               min;
   int                               max;
   int                               step;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
   xitk_state_callback_t             callback;
   void                             *userdata;
   xitk_state_callback_t             motion_callback;
@@ -587,7 +587,7 @@ typedef struct {
   xitk_simple_callback_t            callback;
   xitk_state_callback_t             state_callback;
   void                             *userdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
 } xitk_labelbutton_widget_t;
 
 typedef struct {
@@ -596,7 +596,7 @@ typedef struct {
   Window                            window;
   GC                                gc;
   const char                       *label;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
   xitk_simple_callback_t            callback;
   void                             *userdata;
 } xitk_label_widget_t;
@@ -604,7 +604,7 @@ typedef struct {
 typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
 } xitk_image_widget_t;
 
 typedef struct {
@@ -612,13 +612,13 @@ typedef struct {
   ImlibData                        *imlibdata;
   xitk_state_callback_t             callback;
   void                             *userdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
 } xitk_checkbox_widget_t;
 
 typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
   xitk_simple_callback_t            callback;
   void                             *userdata;
 } xitk_button_widget_t;
@@ -628,31 +628,31 @@ typedef struct {
   ImlibData                        *imlibdata;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } arrow_up;
   
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } slider;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } arrow_dn;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } arrow_left;
   
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } slider_h;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } arrow_right;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
     int                             max_displayed_entries;
     int                             num_entries;
     const char *const              *entries;
@@ -676,7 +676,7 @@ typedef struct {
 typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
   Window                            window_trans;
   int                               layer_above;
   Pixmap                           *icon;
@@ -690,7 +690,7 @@ typedef struct {
 
   struct {
     char                           *cur_origin;
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } origin;
   
   xitk_dnd_callback_t               dndcallback;
@@ -698,20 +698,20 @@ typedef struct {
 
   struct {
     char                           *caption;
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
     xitk_mrl_callback_t             callback;
     void                           *data;
   } select;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
     xitk_mrl_callback_t             callback;
     void                           *data;
   } play;
 
   struct {
     char                           *caption;
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } dismiss;
 
   struct {
@@ -724,12 +724,12 @@ typedef struct {
   struct {
 
     struct {
-      char                         *skin_element_name;
+      const char                   *skin_element_name;
     } button;
 
     struct {
       const char                   *label_str;
-      char                         *skin_element_name;
+      const char                   *skin_element_name;
     } label;
 
   } ip_name;
@@ -741,7 +741,7 @@ typedef struct {
   xitk_mrlbrowser_filter_t        **mrl_filters;
 
   struct {
-    char                           *skin_element_name;
+    const char                     *skin_element_name;
   } combo;
 
 } xitk_mrlbrowser_widget_t;
@@ -755,13 +755,13 @@ typedef struct {
   int                               max_length;
   xitk_string_callback_t            callback;
   void                             *userdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
 } xitk_inputtext_widget_t;
 
 typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
-  char                             *skin_element_name;
+  const char                       *skin_element_name;
   xitk_widget_list_t               *parent_wlist;
   const char                      **entries;
   int                              layer_above;
@@ -773,7 +773,7 @@ typedef struct {
 typedef struct {
   int                              magic;
   ImlibData                       *imlibdata;
-  char                            *skin_element_name;
+  const char                      *skin_element_name;
   int                              num_entries;
   char                           **entries;
   xitk_widget_list_t              *parent_wlist;
@@ -785,7 +785,7 @@ typedef struct {
   int                              magic;
   ImlibData                       *imlibdata;
   
-  char                            *skin_element_name;
+  const char                      *skin_element_name;
   
   int                              value;
   int                              step;
@@ -800,7 +800,7 @@ typedef struct {
   int                              magic;
   ImlibData                       *imlibdata;
   
-  char                            *skin_element_name;
+  const char                      *skin_element_name;
   
   double                           value;
   double                           step;
@@ -824,7 +824,7 @@ typedef struct {
   int                              magic;
   ImlibData                       *imlibdata;
   
-  char                            *skin_element_name;
+  const char                      *skin_element_name;
   
   xitk_widget_list_t              *parent_wlist;
 
