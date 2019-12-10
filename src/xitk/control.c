@@ -435,7 +435,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
         v = xine_get_param (vctrl->gui->stream, item->prop);
       else
         v = CONTROL_MIN;
-      sl.skin_element_name = (char *)sl_skins[u];
+      sl.skin_element_name = sl_skins[u];
       sl.userdata        =
       sl.motion_userdata = item;
       item->w = xitk_slider_create (vctrl->widget_list, vctrl->gui->skin_config, &sl);
@@ -448,7 +448,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
         else
           xitk_disable_widget (item->w);
       }
-      lbl.skin_element_name = (char *)lbl_skins[u];
+      lbl.skin_element_name = lbl_skins[u];
       lbl.label             = item->label;
       xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl));
     }

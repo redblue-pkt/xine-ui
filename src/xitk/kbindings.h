@@ -250,7 +250,7 @@ void kbindings_display_default_bindings(void);
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
 void kbindings_handle_kbinding(kbinding_t *, XEvent *);
 action_id_t kbindings_get_action_id(kbinding_entry_t *);
-char *kbindings_get_shortcut(kbinding_t *, char *);
+const char *kbindings_get_shortcut(kbinding_t *, const char *);
 
 void kbedit_window(void);
 void kbedit_end(void);

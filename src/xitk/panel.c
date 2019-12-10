@@ -858,7 +858,7 @@ void panel_update_slider (xui_panel_t *panel, int pos) {
 void panel_update_channel_display (xui_panel_t *panel) {
   int   channel;
   char  buffer[XINE_LANG_MAX];
-  char *lang = NULL;
+  const char *lang = NULL;
 
   memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
