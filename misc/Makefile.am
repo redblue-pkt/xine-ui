@@ -42,3 +42,6 @@ xine-bugreport: xine-check
 
 install-data-hook:
 	test "x$(DESTDIR)" != "x" || update-mime-database $(mimedir)/..
+
+uninstall-hook:
+	test "x$(DESTDIR)" != "x" || update-mime-database $(mimedir)/..
