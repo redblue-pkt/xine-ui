@@ -546,10 +546,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->gui->video_display, &dummy_event, &dummy_error)) {
 	    int count = 1;
-            XineramaQueryScreens (vwin->gui->video_display, &count);
+            XineramaScreenInfo *xsi;
+            xsi = XineramaQueryScreens (vwin->gui->video_display, &count);
 	    if (count > 1)
 	      /* multihead -> assuming square pixels */
 	      vwin->gui->pixel_aspect = 1.0;
+            if (xsi)
+              XFree (xsi);
 	  }
 #endif
 #ifdef DEBUG
@@ -934,10 +937,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->gui->video_display, &dummy_event, &dummy_error)) {
             int count = 1;
-            XineramaQueryScreens (vwin->gui->video_display, &count);
+            XineramaScreenInfo *xsi;
+            xsi = XineramaQueryScreens (vwin->gui->video_display, &count);
             if (count > 1)
               /* multihead -> assuming square pixels */
               vwin->gui->pixel_aspect = 1.0;
+            if (xsi)
+              XFree (xsi);
           }
 #endif
 #ifdef DEBUG
@@ -1693,6 +1699,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
       vwin->xinerama_fullscreen_y      = 0;
       vwin->xinerama_fullscreen_width  = vwin->fullscreen_width;
       vwin->xinerama_fullscreen_height = vwin->fullscreen_height;
+
+      XFree (screeninfo);
     }
 
   } else 
@@ -1948,6 +1956,12 @@ void video_window_exit (xui_vwin_t *vwin) {
     XFree (vwin->xclasshint_borderless);
   if (vwin->wm_hint != NULL)
     XFree (vwin->wm_hint);
+  if (vwin->gc != None)
+    XFreeGC (vwin->gui->video_display, vwin->gc);
+#ifdef HAVE_XINERAMA
+  if (vwin->xinerama)
+    XFree (vwin->xinerama);
+#endif
 
   free (vwin);
 }
