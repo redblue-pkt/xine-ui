@@ -929,7 +929,8 @@ void xitk_unset_ewmh_fullscreen(Window window);
  * This function start the widget live. It's a block function,
  * it will only return after a widget_stop() call.
  */
-void xitk_run(xitk_startup_callback_t cb, void *data);
+void xitk_run (void (* start_cb)(void *data), void *start_data,
+  void (* stop_cb)(void *data), void *stop_data);
 
 /*
  * This function terminate the widget lib loop event. 

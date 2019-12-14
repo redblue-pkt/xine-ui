@@ -2038,6 +2038,11 @@ static void on_start(void *data) {
   
 }
 
+static void on_stop (void *data) {
+  gGui_t *gui = data;
+  gui_exit_2 (gui);
+}
+
 void gui_run(char **session_opts) {
   gGui_t *gui = gGui;
   _startup_t  startup;
@@ -2102,11 +2107,8 @@ void gui_run(char **session_opts) {
     stdctl_start();
 
   /*  global event handler */
-  gui->widget_key = xitk_register_event_handler("NO WINDOW", None,
-						 gui_handle_event, 
-						 gui,
-						 gui_dndcallback, 
-						 NULL, NULL);
+  gui->widget_key = xitk_register_event_handler ("NO WINDOW", None,
+    gui_handle_event, NULL, gui_dndcallback, NULL, gui);
   
 #ifdef HAVE_READLINE
   start_remote_server();
@@ -2187,7 +2189,7 @@ void gui_run(char **session_opts) {
 
   oxine_init();
   
-  xitk_run(on_start, (void *)&startup);
+  xitk_run (on_start, &startup, on_stop, gui);
 
   /* save playlist */
   if(gui->playlist.mmk && gui->playlist.num) {

@@ -697,6 +697,12 @@ int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub) {
 void gui_exit (xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
+  /* NOTE: This runs as xitk callback, with xitk lock held.
+   * Do not wait for threads that try to use xitk here -- see gui_exit_2 () below. */
+
+  if (__xineui_global_verbosity)
+    printf ("xine_ui: gui_exit ().\n");
+
   oxine_exit();
 
   if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
@@ -722,6 +728,13 @@ void gui_exit (xitk_widget_t *w, void *data) {
   }
   
   gui->on_quit = 1;
+  xitk_stop ();
+}
+
+void gui_exit_2 (gGui_t *gui) {
+
+  if (__xineui_global_verbosity)
+    printf ("xine_ui: gui_exit_2 ().\n");
 
   /* shut down event queue threads */
   /* do it first, events access gui elements ... */
@@ -828,11 +841,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * and do some house cleaning which includes closing displays.
    * However, we're not done using displays and we must prevent that
    * from happening until we're finished.
+   * NEWS FLASH: gui_exit_2 () now runs inside xitk_run ().
    */
   gui->x_lock_display (gui->video_display);
   if( gui->video_display != gui->display )
     gui->x_lock_display (gui->display);
-  xitk_stop();
+/*xitk_stop();*/
   /* 
    * This prevent xine waiting till the end of time for an
    * XEvent when lirc (and futur other control ways) is used to quit .

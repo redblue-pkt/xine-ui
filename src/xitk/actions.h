@@ -44,6 +44,7 @@ int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub);
 int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, 
 			   int start_time, int av_offset, int spu_offset, int report_error);
 void gui_exit (xitk_widget_t *w, void *gui);
+void gui_exit_2 (gGui_t *gui); /** << internal use */
 void gui_play (xitk_widget_t *w, void *gui);
 void gui_stop (xitk_widget_t *w, void *gui);
 void gui_close (xitk_widget_t *w, void *gui);
