@@ -1365,23 +1365,12 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   return 0;
 }
 
-static void xitk_xevent_notify_impl(XEvent *event);
-
-void xitk_xevent_notify(XEvent *event) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
-  /* protect walking through gfx list */
-  MUTLOCK();
-  xitk_xevent_notify_impl(event);
-  MUTUNLOCK();
-}
-
 /*
  * Here events are handled. All widget are locally
  * handled, then if a event handler callback was passed
  * at register time, it will be called.
  */
-void xitk_xevent_notify_impl(XEvent *event) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
   __gfx_t  *fx, *fxd;
 
   fx = (__gfx_t *)xitk->gfxs.head.next;
@@ -1901,6 +1890,14 @@ void xitk_xevent_notify_impl(XEvent *event) {
   }
 }
 
+void xitk_xevent_notify (XEvent *event) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  /* protect walking through gfx list */
+  MUTLOCK ();
+  xitk_xevent_notify_impl (xitk, event);
+  MUTUNLOCK ();
+}
+
 /*
  * Initiatization of widget internals.
  */
@@ -2056,60 +2053,64 @@ void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display 
  * Start widget event handling.
  * It will block till widget_stop() call
  */
-void xitk_run (xitk_startup_callback_t cb, void *data) {
+void xitk_run (void (* start_cb)(void *data), void *start_data,
+  void (* stop_cb)(void *data), void *stop_data) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
-  XEvent            myevent;
-  struct sigaction  action;
-  fd_set            r;
-  Bool              got_event;
-  __gfx_t          *fx;
-  struct timeval    tv;
-  int               xconnection;
 
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGHUP, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGHUP) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGUSR1, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGUSR1) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGUSR2, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGUSR2) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGINT, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGINT) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGTERM, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGTERM) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGQUIT, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGQUIT) failed: %s\n", strerror(errno));
-  }
+  {
+    struct sigaction  action;
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGHUP, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGHUP) failed: %s\n", strerror (errno));
+    }
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGUSR1, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGUSR1) failed: %s\n", strerror (errno));
+    }
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGUSR2, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGUSR2) failed: %s\n", strerror (errno));
+    }
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGINT, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGINT) failed: %s\n", strerror (errno));
+    }
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGTERM, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGTERM) failed: %s\n", strerror (errno));
+    }
+
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&(action.sa_mask));
+    action.sa_flags = 0;
+    if (sigaction (SIGQUIT, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGQUIT) failed: %s\n", strerror (errno));
+    }
 #ifndef DEBUG
-  action.sa_handler = xitk_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGSEGV, &action, NULL) != 0) {
-    XITK_WARNING("sigaction(SIGSEGV) failed: %s\n", strerror(errno));
+    action.sa_handler = xitk_signal_handler;
+    sigemptyset (&action.sa_mask);
+    action.sa_flags = 0;
+    if (sigaction (SIGSEGV, &action, NULL) != 0) {
+      XITK_WARNING ("sigaction(SIGSEGV) failed: %s\n", strerror (errno));
+    }
+#endif
   }
-#endif  
+
   xitk->running = 1;
   
   XLOCK (xitk->x.x_lock_display, xitk->x.display);
@@ -2119,92 +2120,89 @@ void xitk_run (xitk_startup_callback_t cb, void *data) {
   /*
    * Force to repain the widget list if it exist
    */
-  MUTLOCK();
-  
-  fx = (__gfx_t *)xitk->gfxs.head.next;
-  
-  while (fx->node.next) {
-    FXLOCK(fx);
+  {
+    __gfx_t *fx;
+
+    MUTLOCK ();
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
+      FXLOCK (fx);
    
-    if(fx->window != None && fx->widget_list) {
-      XEvent xexp;
+      if ((fx->window != None) && fx->widget_list) {
+        XEvent xexp;
 
-      memset(&xexp, 0, sizeof xexp);
-      xexp.xany.type          = Expose;
-      xexp.xexpose.type       = Expose;
-      xexp.xexpose.send_event = True;
-      xexp.xexpose.display    = xitk->x.display;
-      xexp.xexpose.window     = fx->window;
-      xexp.xexpose.count      = 0;
+        memset(&xexp, 0, sizeof xexp);
+        xexp.xany.type          = Expose;
+        xexp.xexpose.type       = Expose;
+        xexp.xexpose.send_event = True;
+        xexp.xexpose.display    = xitk->x.display;
+        xexp.xexpose.window     = fx->window;
+        xexp.xexpose.count      = 0;
       
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
-      if (!XSendEvent (xitk->x.display, fx->window, False, ExposureMask, &xexp)) {
-	XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
+        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        if (!XSendEvent (xitk->x.display, fx->window, False, ExposureMask, &xexp)) {
+          XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
+        }
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
       }
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+
+      FXUNLOCK (fx);
     }
-
-    FXUNLOCK(fx);
-    fx = (__gfx_t *)fx->node.next;
+    MUTUNLOCK ();
   }
-
-  MUTUNLOCK();
 
   /* We're ready to handle anything */
-  if(cb)
-    cb(data);
+  if (start_cb)
+    start_cb (start_data);
 
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
-  xconnection = ConnectionNumber (xitk->x.display);
-  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-  
-  /*
-   * Now, wait for a new xevent
-   */
-  while (xitk->running) {
-    
-    FD_ZERO(&r);
-    FD_SET(xconnection, &r);
+  {
+    int xconnection;
 
-    tv.tv_sec  = 0;
-    tv.tv_usec = 33000;
-
-    select(xconnection + 1, &r, 0, 0, &tv);
-
-    if (!xitk->running)
-      break;
-    
     XLOCK (xitk->x.x_lock_display, xitk->x.display);
-    got_event = (XPending (xitk->x.display) != 0);
-    if( got_event )
-      XNextEvent (xitk->x.display, &myevent);
+    xconnection = ConnectionNumber (xitk->x.display);
     XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-      
-    while(got_event == True) {
 
-      xitk_xevent_notify(&myevent);
-
-      if (!xitk->running)
-        break;
-
+    /* Now, wait for a new xevent */
+    while (xitk->running) {
+      XEvent myevent;
+      int have_events;
+    
       XLOCK (xitk->x.x_lock_display, xitk->x.display);
-      got_event = (XPending (xitk->x.display) != 0);
-      if( got_event )
-        XNextEvent (xitk->x.display, &myevent);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-    }
+      have_events = XPending (xitk->x.display);
 
+      if (have_events <= 0) {
+        fd_set fdset;
+        struct timeval tv;
+
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        FD_ZERO (&fdset);
+        FD_SET (xconnection, &fdset);
+        tv.tv_sec  = 0;
+        tv.tv_usec = 33000;
+        select (xconnection + 1, &fdset, 0, 0, &tv);
+        continue;
+      }
+
+      XNextEvent (xitk->x.display, &myevent);
+      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      
+      MUTLOCK ();
+      xitk_xevent_notify_impl (xitk, &myevent);
+      MUTUNLOCK ();
+    }
   }
 
+  if (stop_cb)
+    stop_cb (stop_data);
+
   /* pending destroys of the event handlers */
+  MUTLOCK ();
   while (1) {
-    fx = (__gfx_t *)xitk->gfxs.head.next;
+    __gfx_t *fx = (__gfx_t *)xitk->gfxs.head.next;
     if (!fx->node.next)
       break;
     FXLOCK (fx);
     __fx_destroy(fx, 1);
   }
-  MUTLOCK ();
   xitk_dlist_clear (&xitk->gfxs);
   xitk_dlist_clear (&xitk->wlists);
   MUTUNLOCK ();
@@ -2215,7 +2213,8 @@ void xitk_run (xitk_startup_callback_t cb, void *data) {
   xitk_config_deinit (xitk->config);
   pthread_mutex_destroy (&xitk->mutex);
   
-  XITK_FREE (gXitk);
+  XITK_FREE (xitk);
+  gXitk = NULL;
 
 }
 
