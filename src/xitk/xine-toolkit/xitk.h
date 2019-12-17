@@ -2273,142 +2273,25 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
  */
 int xitk_is_window_size(Display *display, Window window, int width, int height);
 
-xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, const char *title,
-                                                         int window_width, int align, const char *message, ...)
-							 __attribute__ ((format (printf, 5, 6)));
-
-/*
- *
- */
-xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, const char *title, const char *button_label,
-							xitk_state_callback_t cb, void *userdata, 
-                                                        int window_width, int align, const char *message, ...)
-							__attribute__ ((format (printf, 8, 9)));
-
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, const char *title,
-						xitk_state_callback_t cb, void *userdata, 
-                                                int window_width, int align, const char *message, ...)
-						__attribute__ ((format (printf, 7, 8)));
-
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_ok(ImlibData *im, const char *title,
-                                     xitk_state_callback_t cb, void *userdata, int align, const char *message, ...)
-				     __attribute__ ((format (printf, 6, 7)));
-
-
-#ifdef	__GNUC__
-#define xitk_window_dialog_ok(im, title, cb, userdata, align, message, args...) \
-  xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, message, ##args)
-
-#define xitk_window_dialog_error(im, message, args...) \
-  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, message, ##args)
-
-#define xitk_window_dialog_info(im, message, args...) \
-  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, message, ##args)
-#else
-#define xitk_window_dialog_ok(im, title, cb, userdata, align, ...) \
-  xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, __VA_ARGS__)
-
-#define xitk_window_dialog_error(im, ...) \
-  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__)
-
-#define xitk_window_dialog_info(im, ...) \
-  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__)
-#endif
-/* 
- *
- */
-xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, const char *title, 
-                                                           const char *button1_label,
-                                                           const char *button2_label,
-                                                           const char *button3_label,
-							   xitk_state_callback_t cb1, 
-							   xitk_state_callback_t cb2, 
-							   xitk_state_callback_t cb3, 
-							   void *userdata, 
-                                                           int window_width, int align, const char *message, ...)
-							   __attribute__ ((format (printf, 12, 13)));
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, const char *title,
-							 xitk_state_callback_t ycb, 
-							 xitk_state_callback_t ncb, 
-							 xitk_state_callback_t ccb, 
-							 void *userdata, 
-                                                         int window_width, int align, const char *message, ...)
-							 __attribute__ ((format (printf, 9, 10)));
-
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, const char *title,
-					      xitk_state_callback_t ycb, 
-					      xitk_state_callback_t ncb, 
-					      xitk_state_callback_t ccb, 
-                                              void *userdata, int align, const char *message, ...)
-					      __attribute__ ((format (printf, 8, 9)));
-
-#ifdef __GNUC__
-#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, message, args...) \
-  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, message, ##args)
-#else
-#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, ...) \
-  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, __VA_ARGS__)
-#endif
-
-/*
- *
- */
-xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, const char *title,
-                                                                  const char *button1_label,
-                                                                  const char *button2_label,
-                                                                  xitk_state_callback_t cb1,
-                                                                  xitk_state_callback_t cb2,
-                                                                  const char *checkbox_label, int checkbox_state,
-                                                                  xitk_state_callback_t cb3,
-                                                                  void *userdata,
-                                                                  int window_width, int align, const char *message, ...)
-  __attribute__((__format__(__printf__, 13, 14)));
-
-#ifdef __GNUC__
-#define xitk_window_dialog_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, userdata, window_width, align, message, args...) \
-  xitk_window_dialog_checkbox_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, NULL, 0, NULL, userdata, window_width, align, message, ##args)
-#else
-#define xitk_window_dialog_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, userdata, window_width, align, ...) \
-  xitk_window_dialog_checkbox_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, NULL, 0, NULL, userdata, window_width, align, __VA_ARGS__)
-#endif
-
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, const char *title,
-						   xitk_state_callback_t ycb, 
-						   xitk_state_callback_t ncb, 
-						   void *userdata, 
-                                                   int window_width, int align, const char *message, ...)
-						   __attribute__ ((format (printf, 8, 9)));
-
-/**
- *
- */
-xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, const char *title,
-					xitk_state_callback_t ycb, 
-					xitk_state_callback_t ncb, 
-                                        void *userdata, int align, const char *message, ...)
-					__attribute__ ((format (printf, 7, 8)));
-#ifdef __GNUC__
-#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) \
-  xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args)
-#else
-#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, ...) \
-  xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, __VA_ARGS__)
-#endif
+/* done_cb status */
+#define XITK_WINDOW_DIALOG_BUTTONS_MASK 0x7fff
+#define XITK_WINDOW_DIALOG_CHECKED 0x8000
+/* preset titles */
+#define XITK_TITLE_INFO (_("Information"))
+#define XITK_TITLE_WARN (_("Warning"))
+#define XITK_TITLE_ERROR (_("Error"))
+/* button label presets */
+#define XITK_LABEL_OK     ((const char *)1)
+#define XITK_LABEL_NO     ((const char *)2)
+#define XITK_LABEL_YES    ((const char *)3)
+#define XITK_LABEL_CANCEL ((const char *)4)
+/* non NULL labels show 1-2-3, default preference is 3-1-2. */
+xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, int layer_above,
+  int width, const char *title,
+  void (*done_cb)(void *userdata, int state), void *userdata,
+  const char *button1_label, const char *button2_label, const char *button3_label,
+  const char *check_label, int checked,
+  int text_align, const char *text_fmt, ...) __attribute__ ((format (printf, 14, 15)));
 
 void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent);
 
