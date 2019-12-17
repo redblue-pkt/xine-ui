@@ -122,6 +122,9 @@ typedef struct {
   pthread_mutex_t             mutex;
   int                         destroy;
   pthread_t                   owning_thread;
+
+  void                      (*destructor)(void *userdata);
+  void                       *destr_data;
 } __gfx_t;
 
 
@@ -1125,6 +1128,8 @@ xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
   fx->width     = 0;
   fx->height    = 0;
   fx->user_data = user_data;
+  fx->destructor = NULL;
+  fx->destr_data = NULL;
   pthread_mutex_init(&fx->mutex, NULL);
   fx->owning_thread = (pthread_t)0;
   
@@ -1215,8 +1220,27 @@ static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
   return NULL;
 }
 
+void xitk_register_eh_destructor (xitk_register_key_t key,
+  void (*destructor)(void *userdata), void *destr_data) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __gfx_t *fx;
+
+  MUTLOCK ();
+  fx = __fx_from_key (xitk, key);
+  if (fx) {
+    FXLOCK (fx);
+    fx->destructor = destructor;
+    fx->destr_data = destr_data;
+    FXUNLOCK (fx);
+  }
+  MUTUNLOCK ();
+}
+
 static void __fx_destroy(__gfx_t *fx, int locked) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
+  void (*destructor)(void *userdata);
+  void *destr_data;
+
   if(!fx)
     return;
   
@@ -1241,6 +1265,11 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   fx->newpos_callback = NULL;
   fx->user_data       = NULL;
 
+  destructor = fx->destructor;
+  destr_data = fx->destr_data;
+  fx->destructor = NULL;
+  fx->destr_data = NULL;
+
   free(fx->name);
 
   xitk_dnode_remove (&fx->node);
@@ -1252,6 +1281,9 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   
   if(!locked)
     MUTUNLOCK();
+
+  if (destructor)
+    destructor (destr_data);
 
 #ifdef XITK_DEBUG
   printf  ("xitk: killed fx @ %p.\n", (void *)fx);

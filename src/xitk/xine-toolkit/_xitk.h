@@ -330,30 +330,28 @@ struct xitk_window_s {
   xitk_pixmap_t            *background_mask;
   int                       width;
   int                       height;
-  xitk_dialog_t            *parent;
+  xitk_dialog_t            *dialog;
 };
 
 struct xitk_dialog_s {
   ImlibData              *imlibdata;
   xitk_window_t          *xwin;
-  xitk_register_key_t     key;
   xitk_widget_list_t     *widget_list;
-
+  xitk_register_key_t     key;
   int                     type;
 
-  xitk_widget_t          *wyes;
-  xitk_widget_t          *wno;
-  xitk_widget_t          *wcancel;
+  xitk_widget_t          *w1, *w2, *w3;
+  void                  (*done3cb)(void *userdata, int state);
+  void                   *done3data;
+
   xitk_widget_t          *checkbox;
   xitk_widget_t          *checkbox_label;
 
   xitk_widget_t          *default_button;
-
-  xitk_state_callback_t  yescallback;
-  xitk_state_callback_t  nocallback;
-  xitk_state_callback_t  cancelcallback;
-
-  void                   *userdata;
 };
+
+void xitk_register_eh_destructor (xitk_register_key_t key,
+  void (*destructor)(void *userdata), void *destr_data);
+
 
 #endif
