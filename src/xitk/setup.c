@@ -102,6 +102,7 @@ struct xui_setup_st {
   int                   first_displayed;
 
   xitk_register_key_t   kreg;
+  xitk_register_key_t   dialog;
 
   int                   th; /* Tabs height */
   int                   fh; /* Font height */
@@ -129,6 +130,9 @@ static void setup_exit (xitk_widget_t *w, void *data) {
   */
   setup->running = 0;
   setup->visible = 0;
+
+  if (setup->dialog)
+    xitk_unregister_event_handler (&setup->dialog);
     
   if ((xitk_get_window_info (setup->kreg, &wi))) {
     config_update_num ("gui.setup_x", wi.x);
@@ -298,20 +302,13 @@ static void setup_apply (xitk_widget_t *w, void *data) {
       }
     }
 
+
     if(need_restart) {
-      xitk_window_t *xw;
-      
-      xw = xitk_window_dialog_ok (setup->gui->imlib_data, _("Important Notice"),
-				 NULL, NULL,
-				 ALIGN_CENTER,
-				 _("You changed some configuration value which require"
-				   " to restart xine to take effect."));
-      if (!setup->gui->use_root_window && setup->gui->video_display == setup->gui->display) {
-        setup->gui->x_lock_display (setup->gui->display);
-        XSetTransientForHint (setup->gui->display, xitk_window_get_window(xw), setup->gui->video_window);
-        setup->gui->x_unlock_display (setup->gui->display);
-      }
-      layer_above_video(xitk_window_get_window(xw));
+      setup->dialog = xitk_window_dialog_3 (setup->gui->imlib_data,
+        (!setup->gui->use_root_window && (setup->gui->video_display == setup->gui->display)) ? setup->gui->video_window : None,
+        get_layer_above_video (setup->gui), 400, _("Important Notice"), NULL, NULL,
+        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
+        "%s", _("You changed some configuration value which require to restart xine to take effect."));
     }
 
   }
@@ -1065,6 +1062,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     xitk_window_get_window (setup->xwin),
     setup_handle_event, NULL, NULL,
     setup->widget_list, setup);
+  setup->dialog = 0;
   
   setup->visible = 1;
   setup->running = 1;
@@ -1075,3 +1073,4 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
+

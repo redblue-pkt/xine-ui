@@ -829,12 +829,12 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
  * Check if there some redundant entries in key binding table kbt.
  */
 #ifndef KBINDINGS_MAN
-static void _kbinding_reset_cb(xitk_widget_t *w, void *data, int button) {
-  kbinding_t *kbt = (kbinding_t *) data;
-  kbindings_reset_kbinding(kbt);
-}
-static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
-  kbedit_window();
+static void _kbinding_done (void *data, int state) {
+  kbinding_t *kbt = data;
+  if (state == 1)
+    kbindings_reset_kbinding (kbt);
+  else if (state == 2)
+    kbedit_window ();
 }
 #endif
 
@@ -881,7 +881,6 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 
 #ifndef KBINDINGS_MAN
   if(found) {
-    xitk_window_t *xw;
     char          *footer = _(".\n\nWhat do you want to do ?\n");
     
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
@@ -889,18 +888,10 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 
     dump_error(kmsg);
 
-    xw = xitk_window_dialog_three_buttons_with_width(gui->imlib_data,
-						     _("Keybindings error!"),
-						     _("Reset"), _("Editor"), _("Cancel"),
-						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
-						     (void *) kbt, 450, ALIGN_CENTER,
-						     "%s", kmsg);
-    gui->x_lock_display (gui->display);
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, xitk_window_get_window(xw), gui->video_window);
-    XSync(gui->display, False);
-    gui->x_unlock_display (gui->display);
-    layer_above_video(xitk_window_get_window(xw));
+    xitk_window_dialog_3 (gui->imlib_data,
+      (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+      get_layer_above_video (gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
+      _("Reset"), _("Editor"), _("Cancel"), NULL, 0, ALIGN_CENTER, "%s", kmsg);
   }
 #endif
 

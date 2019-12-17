@@ -125,7 +125,7 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
   int          i;
 
   if(kbt == NULL) {
-    xine_error(_("OOCH: key binding table is NULL.\n"));
+    xine_error (gGui, _("OOCH: key binding table is NULL.\n"));
     return;
   }
 
@@ -811,7 +811,7 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
 			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
     }
     else
-      xine_error(_("You can only delete alias entries."));
+      xine_error (gGui, _("You can only delete alias entries."));
     
   }
 }
@@ -853,76 +853,68 @@ void kbedit_end(void) {
   kbedit_exit(NULL, NULL);
 }
 
-static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
+static void _kbedit_accept_done (void *data, int state) {
   kbinding_entry_t *kbe = (kbinding_entry_t *) data;
+
+  if (state == 2) {
   
-  switch(kbedit->action_wanted) {
-    
-  case KBEDIT_ALIASING:
-    if(kbedit->kbt->num_entries >= MAX_ENTRIES) {
-      xine_error(_("No more space for additional entries!"));
-      return;
+    switch (kbedit->action_wanted) {
+      case KBEDIT_ALIASING:
+        if (kbedit->kbt->num_entries >= MAX_ENTRIES) {
+          xine_error (gGui, _("No more space for additional entries!"));
+          return;
+        }
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment   = strdup (kbedit->ksel->comment);
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action    = strdup (kbedit->ksel->action);
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key       = strdup (kbe->key);
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier  = kbe->modifier;
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias  = 1;
+        kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_gui    = kbe->is_gui;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]            = calloc (1, sizeof (kbinding_entry_t));
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->comment   = NULL;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->action    = NULL;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->key       = NULL;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier  = 0;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias  = 0;
+        kbedit->kbt->entry[kbedit->kbt->num_entries]->is_gui    = 0;
+        kbedit->kbt->num_entries++;
+        kbedit_create_browser_entries ();
+        xitk_browser_update_list (kbedit->browser,
+          (const char* const*) kbedit->entries,
+          (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
+        break;
+      case KBEDIT_EDITING:
+        kbedit->ksel->key = realloc (kbedit->ksel->key, sizeof (char) * (strlen (kbe->key) + 1));
+        strcpy (kbedit->ksel->key, kbe->key);
+        kbedit->ksel->modifier = kbe->modifier;
+        kbedit_create_browser_entries ();
+        xitk_browser_update_list (kbedit->browser,
+          (const char* const*) kbedit->entries,
+          (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
+        break;
     }
+    kbedit->action_wanted = KBEDIT_NOOP;
+    SAFE_FREE (kbe->comment);
+    SAFE_FREE (kbe->action);
+    SAFE_FREE (kbe->key);
+    SAFE_FREE (kbe);
+    kbedit_unset ();
 
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment   = strdup(kbedit->ksel->comment);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action    = strdup(kbedit->ksel->action);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key       = strdup(kbe->key);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier  = kbe->modifier;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias  = 1;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_gui    = kbe->is_gui;
+  } else if (state == 3) {
 
-    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->comment   = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->action    = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->key       = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier  = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias  = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_gui    = 0;
-    
-    kbedit->kbt->num_entries++;
-    
-    kbedit_create_browser_entries();
-    xitk_browser_update_list(kbedit->browser, 
-			     (const char* const*) kbedit->entries, 
-			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
-    break;
-    
-  case KBEDIT_EDITING:
-    kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char) * (strlen(kbe->key) + 1));
-    strcpy(kbedit->ksel->key, kbe->key);
-    kbedit->ksel->modifier = kbe->modifier;
-    
-    kbedit_create_browser_entries();
-    xitk_browser_update_list(kbedit->browser, 
-			     (const char* const*) kbedit->entries, 
-			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
-    break;
+    kbedit->action_wanted = KBEDIT_NOOP;
+    xitk_browser_update_list (kbedit->browser,
+      (const char* const*) kbedit->entries,
+      (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
+    SAFE_FREE (kbe->comment);
+    SAFE_FREE (kbe->action);
+    SAFE_FREE (kbe->key);
+    SAFE_FREE (kbe);
+    kbedit_unset ();
+
   }
-
-  kbedit->action_wanted = KBEDIT_NOOP;
-  
-  SAFE_FREE(kbe->comment);
-  SAFE_FREE(kbe->action);
-  SAFE_FREE(kbe->key);
-  SAFE_FREE(kbe);
-  kbedit_unset();
-}
-
-static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
-  kbinding_entry_t *kbe = (kbinding_entry_t *) data;
-  
-  kbedit->action_wanted = KBEDIT_NOOP;
-  
-  xitk_browser_update_list(kbedit->browser, 
-			   (const char* const*) kbedit->entries, 
-			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
-  SAFE_FREE(kbe->comment);
-  SAFE_FREE(kbe->action);
-  SAFE_FREE(kbe->key);
-  SAFE_FREE(kbe);
-  kbedit_unset();
 }
 
 /*
@@ -1017,18 +1009,17 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
     
     /* Ask if user wants to store new shortcut */
-    xitk_window_dialog_yesno_with_width(gui->imlib_data, _("Accept?"),
-					kbedit_accept_yes, 
-					kbedit_accept_no, 
-					(void *) kbe, 400, ALIGN_CENTER,
-					_("Store %s as\n'%s' key binding ?"),
-					shortcut, kbedit->ksel->comment);
+    xitk_window_dialog_3 (gui->imlib_data,
+      (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+      get_layer_above_video (gui), 400, _("Accept?"), _kbedit_accept_done, kbe,
+      NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
+      _("Store %s as\n'%s' key binding ?"), shortcut, kbedit->ksel->comment);
   }
   else {
     /* error, redundant */
     if(redundant >= 0) {
-      xine_error(_("This key binding is redundant with action:\n\"%s\".\n"),
-		 kbedit->kbt->entry[redundant]->comment);
+      xine_error (gGui, _("This key binding is redundant with action:\n\"%s\".\n"),
+        kbedit->kbt->entry[redundant]->comment);
     }
   }
   

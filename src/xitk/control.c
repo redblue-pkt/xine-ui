@@ -311,7 +311,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   vctrl->bg_image = Imlib_load_image (vctrl->gui->imlib_data,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
   if (!vctrl->bg_image) {
-    xine_error(_("control: couldn't find image for background\n"));
+    xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
     exit(-1);
   }
   vctrl->gui->x_unlock_display (vctrl->gui->display);
@@ -731,7 +731,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     
     if (!(new_img = Imlib_load_image (vctrl->gui->imlib_data,
       xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
-      xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+      xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
     vctrl->gui->x_unlock_display (vctrl->gui->display);

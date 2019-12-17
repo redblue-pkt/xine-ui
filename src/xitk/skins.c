@@ -230,13 +230,12 @@ static int change_skin(skins_locations_t *sk) {
 
     osks = get_skin_location(old_skin);
     if((!strcmp(osks->pathname, sks->pathname)) && (!strcmp(osks->skin, sks->skin))) {
-      xine_error(_("Failed to load %s/%s. Load fallback skin %s\n"), 
-		 buf, "skinconfig", DEFAULT_SKIN);
+      xine_error (gui, _("Failed to load %s/%s. Load fallback skin %s\n"), buf, "skinconfig", DEFAULT_SKIN);
       ret = get_skin_offset(DEFAULT_SKIN);
       sks = get_skin_location(DEFAULT_SKIN);
     }
     else {
-      xine_error(_("Failed to load %s/%s. Reload old skin '%s'.\n"), buf, "skinconfig", old_skin);
+      xine_error (gui, _("Failed to load %s/%s. Reload old skin '%s'.\n"), buf, "skinconfig", old_skin);
       sks = osks;
     }
     
@@ -254,8 +253,7 @@ static int change_skin(skins_locations_t *sk) {
   if(xitk_skin_check_version(nskin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(nskin_config);
     nskin_config = xitk_skin_init_config(gui->imlib_data);
-    xine_error(_("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), 
-	       buf, DEFAULT_SKIN);
+    xine_error (gui, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), buf, DEFAULT_SKIN);
     ret = get_skin_offset(DEFAULT_SKIN);
     sks = get_skin_location(DEFAULT_SKIN);
     twice++;
@@ -299,7 +297,7 @@ void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   /* First, try to see if the skin exist somewhere */
   sk = skins_avail[cfg->num_value];
   if(!sk) {
-    xine_error(_("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
+    xine_error (gGui, _("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
     sk = get_skin_location(DEFAULT_SKIN);
   }
   
@@ -395,8 +393,8 @@ void init_skins_support(void) {
   sk = (skin_num < skins_avail_num) ? skins_avail[skin_num] : NULL;
   
   if(!sk) {
-    xine_error(_("Ooch, skin '%s' not found, use fallback '%s'.\n"), skins_avail[skin_num]->skin,
-	       (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
+    xine_error (gGui, _("Ooch, skin '%s' not found, use fallback '%s'.\n"), skins_avail[skin_num]->skin,
+      (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
     config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
     sk = get_skin_location(DEFAULT_SKIN);
     if(!sk) {

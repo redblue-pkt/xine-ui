@@ -98,7 +98,7 @@ static char *_download_file(const char *filename, int *size) {
     }
   }
   else
-    xine_error("Unable to download '%s': %s", filename, download->error);
+    xine_error (gGui, "Unable to download '%s': %s", filename, download->error);
 
   SAFE_FREE(download->buf);
   SAFE_FREE(download->error);

@@ -2532,7 +2532,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 	
 	gui->ignore_next = 1;
 	if(!xine_play(gui->stream, ((int) (655.35 * pos)), 0)) {
-	  gui_handle_xine_error(gui->stream, NULL);
+          gui_handle_xine_error (gui, gui->stream, NULL);
 	  gui_display_logo();
 	}
 	else
@@ -2565,7 +2565,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 	  
 	  gui->ignore_next = 1;
 	  if(!xine_play(gui->stream, 0, msec)) {
-	    gui_handle_xine_error(gui->stream, NULL);
+            gui_handle_xine_error (gui, gui->stream, NULL);
 	    gui_display_logo();
 	  }
 	  else

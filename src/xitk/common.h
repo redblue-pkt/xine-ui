@@ -401,6 +401,13 @@ struct gGui_st {
   xui_vctrl_t               *vctrl;
 
   /* actions.c */
+  struct {
+    xine_stream_t           *stream;
+    int                      start_pos;
+    int                      start_time_in_secs;
+    int                      update_mmk;
+    int                      running;
+  } play_data;
   filebrowser_t             *load_stream;
   filebrowser_t             *load_sub;
   int                        last_playback_speed;

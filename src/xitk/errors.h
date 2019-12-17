@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2019 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -24,15 +24,15 @@
 
 #include <stdarg.h>
 
-void xine_error(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_error (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
 
-void xine_error_with_more(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_error_with_more (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
 
-void xine_info(const char *message, ...) __attribute__ ((format (printf, 1, 2)));
+void xine_info (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
 
-void gui_handle_xine_error(xine_stream_t *stream, const char *mrl);
+void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl);
 
-void too_slow_window(void);
+void too_slow_window (gGui_t *gui);
 
 #endif
 
