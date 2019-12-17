@@ -932,7 +932,7 @@ void playlist_change_skins(int synthetic) {
     
     if(!(new_img = Imlib_load_image(gui->imlib_data,
 				    xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
-      xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+      xine_error (gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
     
@@ -1031,7 +1031,7 @@ void playlist_editor(void) {
 
   if (!(playlist->bg_image = Imlib_load_image(gui->imlib_data,
 					      xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
-    xine_error(_("playlist: couldn't find image for background\n"));
+    xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
 

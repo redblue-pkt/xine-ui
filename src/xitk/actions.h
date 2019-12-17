@@ -87,6 +87,7 @@ void gui_vpp_enable(void);
 int is_layer_above(void);
 void change_audio_vol(int value);
 void layer_above_video(Window w);
+int get_layer_above_video (gGui_t *gui);
 void gui_increase_audio_volume(void);
 void gui_decrease_audio_volume(void);
 void gui_app_show(xitk_widget_t *w, void *data);

@@ -296,7 +296,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   }
 
   if ((ret = xine_play (stream, start_pos, start_ms)) == 0)
-    gui_handle_xine_error(stream, NULL);
+    gui_handle_xine_error (gui, stream, NULL);
   else {
     char *ident;
 
@@ -375,26 +375,6 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   return ret;
 }
 
-typedef struct {
-  xine_stream_t *stream;
-  int            start_pos;
-  int            start_time_in_secs;
-  int            update_mmk;
-  int            running;
-} play_data_t;
-static play_data_t play_data;
-
-static void start_anyway_yesno(xitk_widget_t *w, void *data, int button) {
-  gGui_t *gui = data;
-  play_data.running = 0;
-
-  if(button == XITK_WINDOW_ANSWER_YES)
-    _gui_xine_play (gui, play_data.stream, play_data.start_pos, play_data.start_time_in_secs * 1000, play_data.update_mmk);
-  else
-    gui_playlist_start_next (gui);
-
-}
-
 static void set_mmk(mediamark_t *mmk) {
   gGui_t *gui = gGui;
   
@@ -442,11 +422,22 @@ static void mmk_set_update(void) {
   gui->playlist.ref_append = gui->playlist.cur;
 }
 
+static void _start_anyway_done (void *data, int state) {
+  gGui_t *gui = data;
+  gui->play_data.running = 0;
+
+  if (state == 2)
+    _gui_xine_play (gui, gui->play_data.stream, gui->play_data.start_pos,
+      gui->play_data.start_time_in_secs * 1000, gui->play_data.update_mmk);
+  else
+    gui_playlist_start_next (gui);
+}
+
 int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
   int has_video, has_audio, v_unhandled = 0, a_unhandled = 0;
   uint32_t video_handled, audio_handled;
   
-  if(play_data.running)
+  if (gui->play_data.running)
     return 0;
 
   has_video     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
@@ -501,37 +492,33 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
     
 
     if(v_unhandled && a_unhandled) {
-      xine_error("%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
+      xine_error (gui, "%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
       free(buffer); free(v_info); free(a_info);
       return 0;
     }
 
     if(!gui->play_anyway) {
-      xitk_window_t *xw;
 
-      play_data.stream             = stream;
-      play_data.start_pos          = start_pos;
-      play_data.start_time_in_secs = start_time_in_secs;
-      play_data.update_mmk         = update_mmk;
-      play_data.running            = 1;
+      gui->play_data.stream             = stream;
+      gui->play_data.start_pos          = start_pos;
+      gui->play_data.start_time_in_secs = start_time_in_secs;
+      gui->play_data.update_mmk         = update_mmk;
+      gui->play_data.running            = 1;
       
-      xw = xitk_window_dialog_yesno_with_width(gui->imlib_data, _("Start Playback ?"), 
-					       start_anyway_yesno, start_anyway_yesno, 
-					       gui, 400, ALIGN_CENTER,
-					       "%s%s%s%s", buffer ? buffer : "",
-					       v_info ? v_info : "", a_info ? a_info : "",
-					       _("\nStart playback anyway ?\n"));
+      xitk_window_dialog_3 (gui->imlib_data,
+        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        get_layer_above_video (gui), 400, _("Start Playback ?"), _start_anyway_done, gui,
+        NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
+        "%s%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "", _("\nStart playback anyway ?\n"));
       free(buffer); free(v_info); free(a_info);
 
       gui->x_lock_display (gui->display);
       XSync(gui->display, False);
       gui->x_unlock_display (gui->display);
-      video_window_set_transient_for (gui->vwin, xitk_window_get_window (xw));
-      layer_above_video(xitk_window_get_window(xw));
       
       /* Doesn't work so well yet 
-	 use play_data.running hack for a while
-	 xitk_window_dialog_set_modal(xw);
+         use gui->play_data.running hack for a while
+         xitk_window_dialog_set_modal(xw);
       */
       
       return 1;
@@ -639,7 +626,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       gui->playlist.mmk[gui->playlist.cur]->played = 1;
     
     if(report_error)
-      gui_handle_xine_error(gui->stream, mrl);
+      gui_handle_xine_error (gui, gui->stream, mrl);
     return 0;
   }
   
@@ -878,8 +865,8 @@ void gui_play (xitk_widget_t *w, void *data) {
 
   if(xine_get_status(gui->stream) != XINE_STATUS_PLAY) {
     
-    if (!strncmp(gui->mmk.ident, "xine-ui version", 15)) {
-      xine_error (_("No MRL (input stream) specified"));
+    if (!strncmp (gui->mmk.ident, "xine-ui version", 15)) {
+      xine_error (gui, _("No MRL (input stream) specified"));
       return;
     }
     
@@ -1391,7 +1378,7 @@ static void *gui_seek_thread (void *data) {
         ret = xine_open (gui->stream, mrl);
         gui_messages_on (gui);
         if (!ret) {
-          gui_handle_xine_error (gui->stream, (char *)mrl);
+          gui_handle_xine_error (gui, gui->stream, (char *)mrl);
           break;
         }
       }
@@ -2053,6 +2040,16 @@ void layer_above_video(Window w) {
   xitk_set_window_layer(w, layer);
 }
 
+int get_layer_above_video (gGui_t *gui) {
+  if (!(gui->always_layer_above || gui->layer_above))
+    return 0;
+  if ((!(video_window_get_fullscreen_mode (gGui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gGui->vwin))
+    return xitk_get_layer_level ();
+  if (gui->always_layer_above || gui->layer_above)
+    return xitk_get_layer_level ();
+  return 4;
+}
+
 void change_amp_vol(int value) {
   gGui_t *gui = gGui;
   if(value < 0)
@@ -2518,10 +2515,10 @@ static int visual_anim_open_and_play(xine_stream_t *stream, const char *mrl) {
 void visual_anim_play(void) {
   gGui_t *gui = gGui;
   if(gui->visual_anim.enabled == 2) {
-    if(!visual_anim_open_and_play(gui->visual_anim.stream, 
-				  gui->visual_anim.mrls[gui->visual_anim.current]))
-      gui_handle_xine_error(gui->visual_anim.stream, 
-			    gui->visual_anim.mrls[gui->visual_anim.current]);
+    if (!visual_anim_open_and_play (gui->visual_anim.stream,
+      gui->visual_anim.mrls[gui->visual_anim.current]))
+      gui_handle_xine_error (gui, gui->visual_anim.stream,
+        gui->visual_anim.mrls[gui->visual_anim.current]);
     gui->visual_anim.running = 1;
   }
 }

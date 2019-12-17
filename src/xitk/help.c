@@ -152,7 +152,7 @@ static void help_sections(void) {
   int                  i;
 
   if ((dir = opendir(XINE_DOCDIR)) == NULL) {
-    xine_error("Cannot open help files: %s", strerror(errno));
+    xine_error (gGui, "Cannot open help files: %s", strerror(errno));
   }
   else {
     struct dirent       *dir_entry;

@@ -1063,9 +1063,9 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     if(event->stream == gui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
       char                    buffer[8192];
-      void                    (*report)(const char *message, ...)
+      void                    (*report)(gGui_t *gui, const char *message, ...)
 #if __GNUC__ >= 3
-				__attribute__ ((format (printf, 1, 2)))
+				__attribute__ ((format (printf, 2, 3)))
 #endif
       ;
       
@@ -1247,7 +1247,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
           if (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG)
             printf ("xine-ui: suppressed message:\n%s\n", buffer);
         } else {
-          report ("%s", buffer);
+          report (gui, "%s", buffer);
         }
       }
       
@@ -1382,7 +1382,7 @@ typedef struct {
 
   case XINE_EVENT_DROPPED_FRAMES:
     if (xine_get_param(gui->stream, XINE_PARAM_SPEED) <= XINE_SPEED_NORMAL) {
-      too_slow_window();
+      too_slow_window (gui);
     }
     break;
 

@@ -252,7 +252,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   
   if (!(new_img = Imlib_load_image (panel->gui->imlib_data,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
-    xine_error (_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+    xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
   
@@ -989,17 +989,19 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  *  to snapshot current frame.
  */
 static void panel_snapshot_error(void *data, char *message) {
-  xine_error("%s", message);
+  gGui_t *gui = data;
+  xine_error (gui, "%s", message);
 }
 static void panel_snapshot_info(void *data, char *message) {
-  xine_info("%s", message);
+  gGui_t *gui = data;
+  xine_info (gui, "%s", message);
 }
 void panel_snapshot (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
 
   (void)w;
   pthread_mutex_lock (&panel->gui->mmk_mutex);
-  create_snapshot (panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, NULL);
+  create_snapshot (panel->gui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, panel->gui);
   pthread_mutex_unlock (&panel->gui->mmk_mutex);
 }
 
@@ -1249,7 +1251,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
   if (!(panel->bg_image = Imlib_load_image (panel->gui->imlib_data,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
-    xine_error(_("panel: couldn't find image for background\n"));
+    xine_error (panel->gui, _("panel: couldn't find image for background\n"));
     exit(-1);
   }
 

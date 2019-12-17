@@ -33,55 +33,45 @@
 
 #include "common.h"
 
-
 /*
  * Callback used to display the viewlog window.
  */
-static void _errors_display_log(xitk_widget_t *w, void *data, int state) {
-  
-  if(viewlog_is_visible())
-    viewlog_raise_window();
-  else
-    viewlog_panel();
+static void _errors_display_log_3 (void *data, int state) {
+  gGui_t *gui = data;
+
+  (void)gui;
+  if (state == 2) {
+    if (viewlog_is_visible ())
+      viewlog_raise_window ();
+    else
+      viewlog_panel ();
+  }
 }
 
 /*
  * Create the real window.
  */
-static void errors_create_window(char *title, char *message) {
-  xitk_window_t *xw;
+static void errors_create_window (gGui_t *gui, char *title, char *message) {
 
   if((title == NULL) || (message == NULL))
     return;
   
   dump_error(message);
 
-  if( gGui->nongui_error_msg ) {
-    gGui->nongui_error_msg( message );
+  if (gui->nongui_error_msg) {
+    gui->nongui_error_msg (message);
     return;
   }
-  
-  xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data, title, 
-						 _("Done"), _("More..."),
-						 NULL, _errors_display_log, 
-						 NULL, 400, ALIGN_CENTER,
-						 "%s", message);
-
-  xitk_window_set_parent_window(xw, gGui->video_window);
-
-  if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-    gGui->x_lock_display (gGui->display);
-    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-    gGui->x_unlock_display (gGui->display);
-  }
-
-  layer_above_video(xitk_window_get_window(xw));
+  xitk_window_dialog_3 (gui->imlib_data,
+    (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+    get_layer_above_video (gui), 400, title, _errors_display_log_3, gui,
+    _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", message);
 }
 
 /*
  * Display an error window.
  */
-void xine_error(const char *message, ...) {
+void xine_error (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
 
@@ -92,25 +82,19 @@ void xine_error(const char *message, ...) {
   if (!buf)
     return;
 
-  if(gGui->stdctl_enable || !gGui->display) {
+  if (gui->stdctl_enable || !gui->display) {
     printf("%s\n", buf);
   }
   else {
     dump_error(buf);
 
-    if( gGui->nongui_error_msg ) {
-      gGui->nongui_error_msg( buf );
+    if (gui->nongui_error_msg) {
+      gui->nongui_error_msg (buf);
     } else {
-      xitk_window_t *xw;
-
-      xw = xitk_window_dialog_error(gGui->imlib_data, "%s", buf);
-
-      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-        gGui->x_lock_display (gGui->display);
-        XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-        gGui->x_unlock_display (gGui->display);
-      }
-      layer_above_video(xitk_window_get_window(xw));
+      xitk_window_dialog_3 (gui->imlib_data,
+        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        get_layer_above_video (gui), 400, XITK_TITLE_ERROR, NULL, NULL,
+        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
     }
   }
 
@@ -120,7 +104,7 @@ void xine_error(const char *message, ...) {
 /*
  * Display an error window, with more button.
  */
-void xine_error_with_more(const char *message, ...) {
+void xine_error_with_more (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
 
@@ -133,11 +117,11 @@ void xine_error_with_more(const char *message, ...) {
 
   dump_error(buf);
 
-  if(gGui->stdctl_enable) {
+  if (gui->stdctl_enable) {
     printf("%s\n", buf);
   }
   else {
-    errors_create_window(_("Error"), buf);
+    errors_create_window (gui, _("Error"), buf);
   }
   
   free(buf);
@@ -146,7 +130,7 @@ void xine_error_with_more(const char *message, ...) {
 /*
  * Display an informative window.
  */
-void xine_info(const char *message, ...) {
+void xine_info (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
 
@@ -159,23 +143,17 @@ void xine_info(const char *message, ...) {
 
   dump_info(buf);
 
-  if(gGui->stdctl_enable) {
+  if (gui->stdctl_enable) {
     printf("%s\n", buf);
   }
   else {
-    if( gGui->nongui_error_msg ) {
-      gGui->nongui_error_msg( buf );
+    if (gui->nongui_error_msg) {
+      gui->nongui_error_msg (buf);
     } else {
-      xitk_window_t *xw;
-
-      xw = xitk_window_dialog_info(gGui->imlib_data, "%s", buf);
-
-      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-        gGui->x_lock_display (gGui->display);
-        XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-        gGui->x_unlock_display (gGui->display);
-      }
-      layer_above_video(xitk_window_get_window(xw));
+      xitk_window_dialog_3 (gui->imlib_data,
+        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        get_layer_above_video (gui), 400, XITK_TITLE_INFO, NULL, NULL,
+        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
     }
   }
 
@@ -185,12 +163,12 @@ void xine_info(const char *message, ...) {
 /*
  * Display an error window error from a xine engine error.
  */
-void gui_handle_xine_error(xine_stream_t *stream, const char *mrl) {
+void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl) {
   int   err;
   const char *_mrl = mrl;
 
   if(_mrl == NULL)
-    _mrl = (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current];
+    _mrl = (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls [gui->visual_anim.current];
 
   err = xine_get_error(stream);
 
@@ -203,71 +181,71 @@ void gui_handle_xine_error(xine_stream_t *stream, const char *mrl) {
     
   case XINE_ERROR_NO_INPUT_PLUGIN:
     dump_error("got XINE_ERROR_NO_INPUT_PLUGIN.");
-    xine_error_with_more(_("- xine engine error -\n\n"
-			   "There is no input plugin available to handle '%s'.\n"
-			   "Maybe MRL syntax is wrong or file/stream source doesn't exist."),
-			 _mrl);
+    xine_error_with_more (gui,
+      _("- xine engine error -\n\n"
+        "There is no input plugin available to handle '%s'.\n"
+        "Maybe MRL syntax is wrong or file/stream source doesn't exist."), _mrl);
     break;
     
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     dump_error("got XINE_ERROR_NO_DEMUX_PLUGIN.");
-    xine_error_with_more(_("- xine engine error -\n\nThere is no demuxer plugin available "
-			   "to handle '%s'.\n"
-			   "Usually this means that the file format was not recognized."), 
-			 _mrl);
+    xine_error_with_more (gui,
+      _("- xine engine error -\n\n"
+        "There is no demuxer plugin available to handle '%s'.\n"
+        "Usually this means that the file format was not recognized."), _mrl);
     break;
     
   case XINE_ERROR_DEMUX_FAILED:
     dump_error("got XINE_ERROR_DEMUX_FAILED.");
-    xine_error_with_more(_("- xine engine error -\n\nDemuxer failed. "
-			   "Maybe '%s' is a broken file?\n"), _mrl);
+    xine_error_with_more (gui,
+      _("- xine engine error -\n\n"
+        "Demuxer failed. Maybe '%s' is a broken file?\n"), _mrl);
     break;
     
   case XINE_ERROR_MALFORMED_MRL:
     dump_error("got XINE_ERROR_MALFORMED_MRL.");
-    xine_error_with_more(_("- xine engine error -\n\nMalformed mrl. "
-			   "Mrl '%s' seems malformed/invalid.\n"), _mrl);
+    xine_error_with_more (gui,
+      _("- xine engine error -\n\n"
+        "Malformed mrl. Mrl '%s' seems malformed/invalid.\n"), _mrl);
     break;
 
   case XINE_ERROR_INPUT_FAILED:
     dump_error("got XINE_ERROR_INPUT_FAILED.");
-    xine_error_with_more(_("- xine engine error -\n\nInput plugin failed to open "
-			   "mrl '%s'\n"), _mrl);
+    xine_error_with_more (gui,
+      _("- xine engine error -\n\n"
+        "Input plugin failed to open mrl '%s'\n"), _mrl);
     break;
     
   default:
     dump_error("got unhandle error.");
-    xine_error_with_more(_("- xine engine error -\n\n!! Unhandled error !!\n"));
+    xine_error_with_more (gui, _("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }
   
-  /* gGui->new_pos = -1; */
+  /* gui->new_pos = -1; */
 }
 
+static void _too_slow_done (void *data, int state) {
+  gGui_t *gui = data;
 
-static void _dont_show_too_slow_again(xitk_widget_t *w, void *data, int state) {
-  config_update_num ("gui.dropped_frames_warning", !state);
-}
+  if (state & XITK_WINDOW_DIALOG_CHECKED)
+    config_update_num ("gui.dropped_frames_warning", 0);
 
-static void _learn_more_about_too_slow(xitk_widget_t *w, void *data, int state) {
-  /*
-   * fixme: how to properly open the system browser? 
-   * should we just make it configurable? 
-   */
-  xine_info(_("Opening mozilla web browser, this might take a while..."));
-  system ("mozilla http://www.xine-project.org/faq#SPEEDUP");
+  if ((state & XITK_WINDOW_DIALOG_BUTTONS_MASK) == 2) {
+    /* FIXME: how to properly open the system browser?
+     * should we just make it configurable? */
+    xine_info (gui, _("Opening mozilla web browser, this might take a while..."));
+    system ("mozilla http://www.xine-project.org/faq#SPEEDUP");
+  }
 }
 
 /*
  * Create the real window.
  */
-void too_slow_window(void) {
-  xitk_window_t *xw;
-  char *title, *message;
+void too_slow_window (gGui_t *gui) {
+  char *message;
   int display_warning;
-  int checked = 0;
     
-  title = _("Warning");
   message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://www.xine-project.org/faq#SPEEDUP");
   
   dump_error(message);
@@ -283,22 +261,11 @@ void too_slow_window(void) {
   if( !display_warning )
     return;
 
-  if( gGui->nongui_error_msg || gGui->stdctl_enable )
+  if (gui->nongui_error_msg || gui->stdctl_enable)
     return;
       
-  _dont_show_too_slow_again(NULL, NULL, checked);
-    
-  xw = xitk_window_dialog_checkbox_two_buttons_with_width(gGui->imlib_data, title, 
-						 _("Done"), _("Learn More..."),
-						 NULL, _learn_more_about_too_slow, 
-                                                 _("Disable this warning."),
-                                                 checked, _dont_show_too_slow_again,
-						 NULL, 500, ALIGN_CENTER,
-						 "%s", message);
-  if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-    gGui->x_lock_display (gGui->display);
-    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-    gGui->x_unlock_display (gGui->display);
-  }
-  layer_above_video(xitk_window_get_window(xw));
+  xitk_window_dialog_3 (gui->imlib_data,
+    (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+    get_layer_above_video (gui), 500, XITK_TITLE_WARN, _too_slow_done, gui,
+    _("Done"), _("Learn More..."), NULL, _("Disable this warning."), 0, ALIGN_CENTER, "%s", message);
 }
