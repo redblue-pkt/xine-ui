@@ -1378,7 +1378,7 @@ static void *gui_seek_thread (void *data) {
         ret = xine_open (gui->stream, mrl);
         gui_messages_on (gui);
         if (!ret) {
-          gui_handle_xine_error (gui, gui->stream, (char *)mrl);
+          gui_handle_xine_error (gui, gui->stream, mrl);
           break;
         }
       }

@@ -2148,7 +2148,7 @@ void video_window_update_logo (xui_vwin_t *vwin) {
         if (vwin->gui->display_logo) {
           if ((!xine_open (vwin->gui->stream, vwin->gui->logo_mrl))
             || (!xine_play (vwin->gui->stream, 0, 0))) {
-            gui_handle_xine_error (vwin->gui, vwin->gui->stream, (char *)vwin->gui->logo_mrl);
+            gui_handle_xine_error (vwin->gui, vwin->gui->stream, vwin->gui->logo_mrl);
 	    goto __done;
 	  }
 	}
