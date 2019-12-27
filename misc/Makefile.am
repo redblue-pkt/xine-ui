@@ -2,7 +2,7 @@ SUBDIRS = desktops visuals
 
 # splash-foo/manifest contains names of extra source files, distributed only.
 
-MANIFEST := $(shell test ! -f splash-@SOURCE_SPLASH@/manifest || cat splash-@SOURCE_SPLASH@/manifest)
+#MANIFEST := $(shell test ! -f splash-@SOURCE_SPLASH@/manifest || cat splash-@SOURCE_SPLASH@/manifest)
 skindir = $(XINE_SKINDIR)
 skin_DATA = \
 	$(top_srcdir)/@XINE_SPLASH@ $(top_srcdir)/@XINE_LOGO_MRL@ $(top_srcdir)/@XINE_LOGO2_MRL@
@@ -28,7 +28,8 @@ EXTRA_DIST = \
 	xine_bash_completion \
 	xine-ui.xml \
 	splash \
-	$(skin_DATA) $(wildcard splash-@SOURCE_SPLASH@/manifest) $(addprefix splash-@SOURCE_SPLASH@/,$(MANIFEST))
+	$(skin_DATA)
+#	$(wildcard splash-@SOURCE_SPLASH@/manifest) $(addprefix splash-@SOURCE_SPLASH@/,$(MANIFEST))
 
 bin_SCRIPTS = xine-check xine-bugreport
 
