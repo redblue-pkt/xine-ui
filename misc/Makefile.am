@@ -1,4 +1,7 @@
-SUBDIRS = desktops visuals
+SUBDIRS = desktops
+
+visualsdir = $(XINE_VISDIR)
+visuals_DATA = visuals/default.mpv
 
 # splash-foo/manifest contains names of extra source files, distributed only.
 
@@ -17,6 +20,7 @@ mime_DATA = xine-ui.xml
 
 EXTRA_DIST = \
 	$(bin_SCRIPTS) \
+	$(visuals_DATA) \
 	SlackBuild.in \
 	SlackBuild \
 	build_rpms.sh \

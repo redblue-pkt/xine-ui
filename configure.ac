@@ -787,7 +787,6 @@ dnl Output configuration files
 dnl
 AC_CONFIG_FILES([
 Makefile
-m4/Makefile
 src/Makefile
 src/common/Makefile
 src/xitk/Makefile
@@ -822,7 +821,6 @@ misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
 misc/desktops/Makefile
-misc/visuals/Makefile
 po/Makefile.in
 ])
 AC_CONFIG_COMMANDS([default],[[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh]],[[]])
