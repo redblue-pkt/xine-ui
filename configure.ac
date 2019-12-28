@@ -96,7 +96,7 @@ XINE_LIB_LIST_NEXT_VALUE
 CFLAGS="${CFLAGS} ${XINE_CFLAGS}"
 
 dnl Check for xine-list-* (MIME types)
-XINE_LIST="`pkg-config --variable=xine_list libxine 2>/dev/null || xine-config --xine-list 2>/dev/null`"
+XINE_LIST="`$PKG_CONFIG --variable=xine_list libxine 2>/dev/null || xine-config --xine-list 2>/dev/null`"
 AM_CONDITIONAL([XINE_LIST], [test "$XINE_LIST" != ''])
 AC_SUBST(XINE_LIST)
 
