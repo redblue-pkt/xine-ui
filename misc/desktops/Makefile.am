@@ -35,10 +35,8 @@ xine.desktop: xine.desktop.in @XINE_LIST@
 	@XINE_LIST@ | perl -ne 'print join(";",sort(split(";")))' >> $@; \
 	echo ';$(INPUT_MIME_TYPES)' >> $@
 else
-XINE_MIME = $(if $(shell test "$(XINE_CONFIG)" = '' && echo y),$(shell pkg-config --variable=plugindir libxine),$(shell $(XINE_CONFIG) --plugindir))/mime.types
-MIME = $(if $(shell test -f $(XINE_MIME) && echo y),$(XINE_MIME),$(srcdir)/mime.default)
-xine.desktop: xine.desktop.in $(MIME)
+xine.desktop: xine.desktop.in $(XINE_MIME) "$(srcdir)/mime.default"
 	$(AM_V_GEN)cat $< > $@; \
-	cat $(MIME) | awk '{ printf "%s;", $$1 }' >> $@; \
+	(cat "$(XINE_MIME)" 2>/dev/null || cat "$(srcdir)/mime.default" 2>/dev/null) | awk '{ printf "%s;", $$1 }' >> $@; \
 	echo '$(INPUT_MIME_TYPES)' >> $@
 endif

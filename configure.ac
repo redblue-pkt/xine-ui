@@ -100,6 +100,9 @@ XINE_LIST="`pkg-config --variable=xine_list libxine 2>/dev/null || xine-config -
 AM_CONDITIONAL([XINE_LIST], [test "$XINE_LIST" != ''])
 AC_SUBST(XINE_LIST)
 
+XINE_MIME="`$PKG_CONFIG --variable=plugindir libxine 2>/dev/null || xine-config --plugindir 2>/dev/null`"/mime.types
+AC_SUBST(XINE_MIME)
+
 dnl
 dnl threads: pkgconfig tell us what should be used, but xitk needs to be
 dnl          linked to thread lib, so the following AC_SUBST() are only used
