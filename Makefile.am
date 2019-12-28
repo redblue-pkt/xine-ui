@@ -5,13 +5,29 @@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = dist-bzip2
 
-SUBDIRS = doc m4 po misc src  
+SUBDIRS = doc po misc src
 
 DEBFILES = debian/README.Debian debian/changelog debian/control \
 	debian/copyright debian/links debian/menu \
 	debian/rules debian/shlibdeps.sh debian/xine-ui.mime 
 
-EXTRA_DIST = config.rpath autogen.sh
+EXTRA_DIST = \
+	config.rpath \
+	autogen.sh \
+	\
+	m4/aa.m4 \
+	m4/gettext.m4 \
+	m4/iconv.m4 \
+	m4/lib-ld.m4 \
+	m4/lib-link.m4 \
+	m4/lib-prefix.m4 \
+	m4/nls.m4 \
+	m4/po.m4 \
+	m4/progtest.m4 \
+	m4/dl.m4 \
+	m4/readline.m4 \
+	m4/xft.m4 \
+	m4/_xine.m4
 
 slackbuild:
 	@(cd misc && $(MAKE) SlackBuild) && \
