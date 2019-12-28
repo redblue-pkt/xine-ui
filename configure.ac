@@ -794,7 +794,6 @@ src/xitk/Makefile
 src/xitk/Imlib-light/Makefile
 src/xitk/xine-toolkit/Makefile
 src/xitk/xine-toolkit/po/Makefile.in
-src/xitk/skins/Makefile
 src/xitk/skins/xinetic/Makefile
 src/xitk/oxine/Makefile
 src/xitk/oxine/data/Makefile
