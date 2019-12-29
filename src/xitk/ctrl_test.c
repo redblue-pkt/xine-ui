@@ -30,7 +30,7 @@
 #include "session.h"
 #include "session_internal.h"
 
-char *get_string(int session, ctrl_commands_t command) {
+static char *get_string(int session, ctrl_commands_t command) {
   ctrl_header_packet_t  hdr;
   char                 *data = NULL;
   int                   fd;
