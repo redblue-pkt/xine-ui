@@ -22,7 +22,44 @@
 #ifndef SESSION_INTERNAL_H
 #define SESSION_INTERNAL_H
 
+#include <xine/os_types.h>
+
 #define CTRL_PROTO_VERSION    0x1
+
+typedef enum {
+  /* Don't change order */
+  CMD_PLAY = 1,
+  CMD_SLOW_4,
+  CMD_SLOW_2,
+  CMD_PAUSE,
+  CMD_FAST_2,
+  CMD_FAST_4,
+  CMD_STOP,
+  CMD_QUIT,
+  CMD_FULLSCREEN,
+  CMD_EJECT,
+  CMD_AUDIO_NEXT,
+  CMD_AUDIO_PREV,
+  CMD_SPU_NEXT,
+  CMD_SPU_PREV,
+  CMD_PLAYLIST_FLUSH,
+  CMD_PLAYLIST_ADD,
+  CMD_PLAYLIST_FIRST,
+  CMD_PLAYLIST_PREV,
+  CMD_PLAYLIST_NEXT,
+  CMD_PLAYLIST_LAST,
+  CMD_PLAYLIST_LOAD,
+  CMD_PLAYLIST_STOP,
+  CMD_PLAYLIST_CONTINUE,
+  CMD_VOLUME,
+  CMD_AMP,
+  CMD_LOOP,
+  CMD_GET_SPEED_STATUS,
+  CMD_GET_TIME_STATUS_IN_SECS,
+  CMD_GET_TIME_STATUS_IN_POS,
+  CMD_GET_VERSION,
+  CMD_PING
+} ctrl_commands_t;
 
 typedef struct {
   uint16_t         version;     /* client/server version */
@@ -42,5 +79,6 @@ int _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr);
 void read_ack(int fd);
 void *read_packet(int fd, ctrl_header_packet_t *hdr);
 int remote_cmd(int session, ctrl_commands_t command);
+int send_string(int session, ctrl_commands_t command, const char *string);
 
 #endif

@@ -21,46 +21,6 @@
 #ifndef CTRLSOCK_H
 #define CTRLSOCK_H
 
-#include <xine/os_types.h>
-
-typedef enum {
-  /* Don't change order */
-  CMD_PLAY = 1,
-  CMD_SLOW_4,
-  CMD_SLOW_2,
-  CMD_PAUSE,
-  CMD_FAST_2,
-  CMD_FAST_4,
-  CMD_STOP,
-  CMD_QUIT,
-  CMD_FULLSCREEN,
-  CMD_EJECT,
-  CMD_AUDIO_NEXT,
-  CMD_AUDIO_PREV,
-  CMD_SPU_NEXT,
-  CMD_SPU_PREV,
-  CMD_PLAYLIST_FLUSH,
-  CMD_PLAYLIST_ADD,
-  CMD_PLAYLIST_FIRST,
-  CMD_PLAYLIST_PREV,
-  CMD_PLAYLIST_NEXT,
-  CMD_PLAYLIST_LAST,
-  CMD_PLAYLIST_LOAD,
-  CMD_PLAYLIST_STOP,
-  CMD_PLAYLIST_CONTINUE,
-  CMD_VOLUME,
-  CMD_AMP,
-  CMD_LOOP,
-  CMD_GET_SPEED_STATUS,
-  CMD_GET_TIME_STATUS_IN_SECS,
-  CMD_GET_TIME_STATUS_IN_POS,
-  CMD_GET_VERSION,
-  CMD_PING
-} ctrl_commands_t;
-
-//void send_boolean(int session, ctrl_commands_t command, uint8_t value);
-//uint8_t get_boolean(int session, ctrl_commands_t command);
-int send_string(int session, ctrl_commands_t command, const char *string);
 int is_remote_running(int session);
 
 int init_session(void);
