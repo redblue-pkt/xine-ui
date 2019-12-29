@@ -3006,8 +3006,6 @@ void mediamark_collect_from_directory(char *filepathname) {
       char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX + 2] = "";
       
       snprintf(fullpathname, sizeof(fullpathname) - 1, "%s/%s", filepathname, dentry->d_name);
-      
-      if(strlen(fullpathname)) {
 
 	if(fullpathname[strlen(fullpathname) - 1] == '/')
 	  fullpathname[strlen(fullpathname) - 1] = '\0';
@@ -3020,18 +3018,17 @@ void mediamark_collect_from_directory(char *filepathname) {
 	  }
 	}
 	else {
-	  char *p, *extension;
-	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX + 2] = "";
-	  
-	  p = strncat(loname, fullpathname, strlen(fullpathname));
-	  while(*p && (*p != '\0')) {
-	    *p = tolower(*p);
-	    p++;
-	  }
-	  
-	  if((extension = strrchr(loname, '.')) && (strlen(extension) > 1)) {
-	    char  ext[strlen(extension) + 2];
-	    char *valid_endings = 
+          char   *extension = strrchr(fullpathname, '.');
+          size_t  ext_len = extension ? strlen(extension) : 0;
+          if (ext_len > 1 && ext_len < 7) {
+            char   lo_ext[10];
+            size_t i;
+            for (i = 0; i < ext_len; i++) {
+              lo_ext[i] = tolower(extension[i]);
+            }
+            lo_ext[i++] = ' ';
+            lo_ext[i]   = 0;
+            static const char valid_endings[] =
 	      ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
 	      ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
 	      ".film .dv .dif .fli .flc .mjpg .mov .qt .m2p .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
@@ -3039,15 +3036,11 @@ void mediamark_collect_from_directory(char *filepathname) {
 	      ".ram .rmvb .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
 	      ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
 	    
-	    snprintf(ext, sizeof(ext), "%s ", extension);
-	    
-	    if(strstr(valid_endings, ext)) {
-	      mediamark_append_entry((const char *)fullpathname, 
-				     (const char *)fullpathname, NULL, 0, -1, 0, 0);
-	    }	    
+            if (strstr(valid_endings, lo_ext)) {
+              mediamark_append_entry(fullpathname, fullpathname, NULL, 0, -1, 0, 0);
+            }
 	  }
 	}
-      }
     }
     closedir(dir);
   }
