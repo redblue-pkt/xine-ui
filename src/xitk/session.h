@@ -61,7 +61,6 @@ typedef enum {
 //void send_boolean(int session, ctrl_commands_t command, uint8_t value);
 //uint8_t get_boolean(int session, ctrl_commands_t command);
 int send_string(int session, ctrl_commands_t command, const char *string);
-char *get_string(int session, ctrl_commands_t command);
 int is_remote_running(int session);
 
 int init_session(void);
