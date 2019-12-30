@@ -144,6 +144,8 @@ static void tvset_update(xitk_widget_t *w, void *data) {
   }
 
   ev_data = (xine_set_v4l2_data_t *)malloc(sizeof(xine_set_v4l2_data_t));
+  if (!ev_data)
+    return;
 
   ev_data->input     = xitk_intbox_get_value(tvset.input);
   ev_data->frequency = (chanlists[current_system].list[current_chan].freq * 16) / 1000;
