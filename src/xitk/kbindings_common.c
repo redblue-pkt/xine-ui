@@ -854,23 +854,18 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	   (strcasecmp(kbt->entry[i]->key, "void"))) {
 	  char *action1, *action2;
 	  char *dna = _("and");
-	  int  len;
 	  
 	  found++;
 	  
 	  action1 = kbt->entry[i]->action;
 	  action2 = kbt->entry[j]->action;
 
-	  len = strlen(action1) + 1 + strlen(dna) + 1 + strlen(action2);
-
 	  if(!kmsg) {
-	    char *header = _("The following key bindings pairs are identical:\n\n");
-	    len += strlen(header);
-	    kmsg = (char *) malloc(len + 1);
-	    sprintf(kmsg, "%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
+            const char *header = _("The following key bindings pairs are identical:\n\n");
+            kmsg = xitk_asprintf("%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
 	  }
 	  else {
-	    len += 2;
+            size_t len = strlen(action1) + 1 + strlen(dna) + 1 + strlen(action2) + 2;
 	    kmsg = (char *) realloc(kmsg, strlen(kmsg) + len + 1);
 	    sprintf(kmsg+strlen(kmsg), "%s%s%c%s%c%s", ", ", action1, ' ', dna, ' ', action2);
 	  }
