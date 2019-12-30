@@ -51,6 +51,12 @@ typedef struct {
 static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, const char *action) {
   const char *shortcut = kbindings_get_shortcut (gui->kbindings, action);
   char *ret;
+  if (tbuf->write + 1 >= tbuf->end) {
+#ifdef DEBUG
+    fprintf (stderr, "Menu text buffer overflow\n");
+#endif
+    return NULL;
+  }
   if (!shortcut) {
 #ifdef DEBUG
     fprintf (stderr, "Action '%s' is invalid\n", action);
