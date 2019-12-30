@@ -249,9 +249,7 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   _argv[0] = strdup(argv[0]);
   
   rcfile           = (file_info_t *) calloc(1, sizeof(file_info_t));
-  rcfile->filename = (char *) malloc((strlen((xine_get_homedir())) + 
-					    strlen(cfgdir) + strlen(xinerc)) + 3);
-  sprintf(rcfile->filename, "%s/%s/%s", (xine_get_homedir()), cfgdir, xinerc);
+  rcfile->filename = xitk_asprintf("%s/%s/%s", (xine_get_homedir()), cfgdir, xinerc);
   
   if((rcfile->fd = fopen(rcfile->filename, "r")) != NULL) {
     
@@ -1946,8 +1944,7 @@ int main(int argc, char *argv[]) {
 
 	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 	  
-	  session_argv[session_argv_num] = (char *) malloc(strlen(p) + 5);
-	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
+          session_argv[session_argv_num] = xitk_asprintf("mrl=%s", p);
 	  session_argv[++session_argv_num]   = NULL;
 
 	  if(aos < MAX_ACTIONS_ON_START)
@@ -2067,10 +2064,7 @@ int main(int argc, char *argv[]) {
     const char *cfgdir = CONFIGDIR;
     const char *keymap = "keymap";
 
-    gui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
-					      + strlen(cfgdir) 
-					      + strlen(keymap) + 3);
-    sprintf(gui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
+    gui->keymap_file = xitk_asprintf("%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
   }
   
   pthread_mutex_init (&gui->seek_mutex, NULL);
