@@ -642,8 +642,7 @@ static void sort_directories(filebrowser_t *fb) {
     
     fb->directories = (char **) realloc(fb->directories, sizeof(char *) * (fb->directories_num + 2));
     for(i = 0; i < fb->directories_num; i++) {
-      fb->directories[i] = (char *) malloc(strlen(fb->dir_files[i].name) + 2);
-      sprintf(fb->directories[i], "%s%c", fb->dir_files[i].name, '/');
+      fb->directories[i] = xitk_asprintf("%s%c", fb->dir_files[i].name, '/');
     }
 
     fb->directories[i] = NULL;

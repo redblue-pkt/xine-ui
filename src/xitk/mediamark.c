@@ -1374,36 +1374,21 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
 	    }
 	    
 	    if(url) {
-	      int   titlen = 0;
-	      
 	      /*
 		title (artist - album)
 	      */
-	      if(title && (titlen = strlen(title))) {
-		int artlen = 0;
-		int alblen = 0;
-		
-		if(artist && (artlen = strlen(artist)) && album && (alblen = strlen(album))) {
-		  int len = titlen + artlen + alblen + 7;
-		  
-		  real_title = (char *) malloc(len);
-		  sprintf(real_title, "%s (%s - %s)", title, artist, album);
-		}
-		else if(artist && (artlen = strlen(artist))) {
-		  int len = titlen + artlen + 4;
-		  
-		  real_title = (char *) malloc(len);
-		  sprintf(real_title, "%s (%s)", title, artist);
-		}
-		else if(album && (alblen = strlen(album))) {
-		  int len = titlen + alblen + 4;
-		  
-		  real_title = (char *) malloc(len);
-		  sprintf(real_title, "%s (%s)", title, album);
-		}
-		else
-		  real_title = strdup(title);
-		
+              if(title && title[0]) {
+                if(artist && artist[0] && album && album[0]) {
+                  real_title = xitk_asprintf("%s (%s - %s)", title, artist, album);
+                }
+                else if(artist && artist[0]) {
+                  real_title = xitk_asprintf("%s (%s)", title, artist);
+                }
+                else if(album && album[0]) {
+                  real_title = xitk_asprintf("%s (%s)", title, album);
+                }
+                else
+                  real_title = strdup(title);
 	      }
 	      
 	      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
