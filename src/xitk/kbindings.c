@@ -325,39 +325,38 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
-static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
+static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size) {
   gGui_t *gui = gGui;
-  static char shortcut[32];
 
   if(kbe) {
     shortcut[0] = 0;
     
     if(gui->shortcut_style == 0) {
       if(kbe->modifier & KEYMOD_CONTROL)
-	snprintf(shortcut+strlen(shortcut), sizeof(shortcut)-strlen(shortcut), "%s+", _("Ctrl"));
+        snprintf(shortcut+strlen(shortcut), shortcut_size-strlen(shortcut), "%s+", _("Ctrl"));
       if(kbe->modifier & KEYMOD_META)
-	snprintf(shortcut+strlen(shortcut), sizeof(shortcut)-strlen(shortcut), "%s+", _("Alt"));
+        snprintf(shortcut+strlen(shortcut), shortcut_size-strlen(shortcut), "%s+", _("Alt"));
       if(kbe->modifier & KEYMOD_MOD3)
-	strlcat(shortcut, "M3+", sizeof(shortcut));
+        strlcat(shortcut, "M3+", shortcut_size);
       if(kbe->modifier & KEYMOD_MOD4)
-	strlcat(shortcut, "M4+", sizeof(shortcut));
+        strlcat(shortcut, "M4+", shortcut_size);
       if(kbe->modifier & KEYMOD_MOD5)
-	strlcat(shortcut, "M5+", sizeof(shortcut));
+        strlcat(shortcut, "M5+", shortcut_size);
     }
     else {
       if(kbe->modifier & KEYMOD_CONTROL)
-	strlcat(shortcut, "C-", sizeof(shortcut));
+        strlcat(shortcut, "C-", shortcut_size);
       if(kbe->modifier & KEYMOD_META)
-	strlcat(shortcut, "M-", sizeof(shortcut));
+        strlcat(shortcut, "M-", shortcut_size);
       if(kbe->modifier & KEYMOD_MOD3)
-	strlcat(shortcut, "M3-", sizeof(shortcut));
+        strlcat(shortcut, "M3-", shortcut_size);
       if(kbe->modifier & KEYMOD_MOD4)
-	strlcat(shortcut, "M4-", sizeof(shortcut));
+        strlcat(shortcut, "M4-", shortcut_size);
       if(kbe->modifier & KEYMOD_MOD5)
-	strlcat(shortcut, "M5-", sizeof(shortcut));
+        strlcat(shortcut, "M5-", shortcut_size);
     }
     
-    strlcat(shortcut, kbe->key, sizeof(shortcut));
+    strlcat(shortcut, kbe->key, shortcut_size);
     
     return shortcut;
   }
@@ -371,7 +370,8 @@ const char *kbindings_get_shortcut(kbinding_t *kbt, const char *action) {
   if(kbt) {
     if(action && (k = kbindings_lookup_action(kbt, action))) {
       if(strcmp(k->key, "VOID")) {
-	snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k), ']');
+        char kbuf[32];
+        snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k, kbuf, sizeof(kbuf)), ']');
 	return shortcut;
       }
     }
@@ -574,11 +574,12 @@ static void kbedit_create_browser_entries(void) {
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char  buf[2048];
-    const char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i]);
+    char  kbuf[32];
+    const char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i], kbuf, sizeof(kbuf));
     char  shortcut[32];
         
     snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', (sc ? sc : "VOID"), ']');
-    
+
     if(kbedit->kbt->entry[i]->is_alias)
       snprintf(buf, sizeof(buf), "@{%s}", kbedit->kbt->entry[i]->comment);
     else
@@ -1003,10 +1004,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   
   if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
     char shortcut[32];
+    char kbuf[32];
     
     kbedit_display_kbinding(xitk_label_get_label(kbedit->comment), kbe);
     
-    snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe), ']');
+    snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe, kbuf, sizeof(kbuf)), ']');
     
     /* Ask if user wants to store new shortcut */
     xitk_window_dialog_3 (gui->imlib_data,
