@@ -292,15 +292,18 @@ static void print_usage (void) {
 				       + strlen(cfgdir) 
 				       + strlen(cfgfile)
 				       + 3);
-    sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
-    if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
-      fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
+    if (configfile) {
+      sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
+      if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
+        fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
+      }
+      sprintf(configfile + strlen(configfile), "/%s", cfgfile);
     }
-    sprintf(configfile + strlen(configfile), "/%s", cfgfile);
   }
   
   xine = xine_new();
-  xine_config_load(xine, configfile);
+  if (configfile)
+    xine_config_load(xine, configfile);
   xine_init(xine);
 
 #ifdef AA
@@ -748,16 +751,19 @@ int main(int argc, char *argv[]) {
 						+ strlen(cfgdir) 
 						+ strlen(cfgfile)
 						+ 3);
-      sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
-      if (mkdir(__xineui_global_config_file, 0755) < 0 && errno != EEXIST) {
-        fprintf(stderr, "Error creating %s: %d (%s)\n", __xineui_global_config_file, errno, strerror(errno));
+      if (__xineui_global_config_file) {
+        sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
+        if (mkdir(__xineui_global_config_file, 0755) < 0 && errno != EEXIST) {
+          fprintf(stderr, "Error creating %s: %d (%s)\n", __xineui_global_config_file, errno, strerror(errno));
+        }
+        sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
       }
-      sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
     }
   }
 
   __xineui_global_xine_instance = (xine_t *)xine_new();
-  xine_config_load (__xineui_global_xine_instance, __xineui_global_config_file);
+  if (__xineui_global_config_file)
+    xine_config_load (__xineui_global_xine_instance, __xineui_global_config_file);
   xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
   
   /*
@@ -1106,7 +1112,7 @@ int main(int argc, char *argv[]) {
   
  failure:
   
-  if(__xineui_global_xine_instance) 
+  if(__xineui_global_xine_instance && __xineui_global_config_file)
     xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
   
   if(aaxine.stream) {
