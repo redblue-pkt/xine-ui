@@ -325,7 +325,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
-static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size) {
+static size_t _kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size) {
   gGui_t *gui = gGui;
 
   if(kbe) {
@@ -357,25 +357,22 @@ static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char 
     }
     
     strlcat(shortcut, kbe->key, shortcut_size);
-    strlcat(shortcut, "]", shortcut_size);
-    
-    return shortcut;
+    return strlcat(shortcut, "]", shortcut_size); /* result >= shortcut_size if buffer was too small */
   }
-  return NULL;
+  return 0;
 }
 
-const char *kbindings_get_shortcut(kbinding_t *kbt, const char *action) {
+size_t kbindings_get_shortcut(kbinding_t *kbt, const char *action, char *buf, size_t buf_size) {
   kbinding_entry_t  *k;
-  static char        shortcut[32];
   
   if(kbt) {
     if(action && (k = kbindings_lookup_action(kbt, action))) {
       if(strcmp(k->key, "VOID")) {
-        return _kbindings_get_shortcut_from_kbe(k, shortcut, sizeof(shortcut));
+        return _kbindings_get_shortcut_from_kbe(k, buf, buf_size);
       }
     }
   }
-  return NULL;
+  return 0;
 }
 
 /*
@@ -575,7 +572,7 @@ static void kbedit_create_browser_entries(void) {
     char  buf[2048];
     char  shortcut[32];
         
-    if (!_kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i], shortcut, sizeof(shortcut)))
+    if (_kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i], shortcut, sizeof(shortcut)) < 1)
       strcpy(shortcut, "[VOID]");
 
     if(kbedit->kbt->entry[i]->is_alias)
