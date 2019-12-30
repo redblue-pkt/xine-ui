@@ -329,7 +329,7 @@ static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char 
   gGui_t *gui = gGui;
 
   if(kbe) {
-    shortcut[0] = 0;
+    strlcpy(shortcut, "[", shortcut_size);
     
     if(gui->shortcut_style == 0) {
       if(kbe->modifier & KEYMOD_CONTROL)
@@ -357,6 +357,7 @@ static const char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char 
     }
     
     strlcat(shortcut, kbe->key, shortcut_size);
+    strlcat(shortcut, "]", shortcut_size);
     
     return shortcut;
   }
@@ -370,9 +371,7 @@ const char *kbindings_get_shortcut(kbinding_t *kbt, const char *action) {
   if(kbt) {
     if(action && (k = kbindings_lookup_action(kbt, action))) {
       if(strcmp(k->key, "VOID")) {
-        char kbuf[32];
-        snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k, kbuf, sizeof(kbuf)), ']');
-	return shortcut;
+        return _kbindings_get_shortcut_from_kbe(k, shortcut, sizeof(shortcut));
       }
     }
   }
@@ -574,11 +573,10 @@ static void kbedit_create_browser_entries(void) {
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char  buf[2048];
-    char  kbuf[32];
-    const char *sc = _kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i], kbuf, sizeof(kbuf));
     char  shortcut[32];
         
-    snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', (sc ? sc : "VOID"), ']');
+    if (!_kbindings_get_shortcut_from_kbe(kbedit->kbt->entry[i], shortcut, sizeof(shortcut)))
+      strcpy(shortcut, "[VOID]");
 
     if(kbedit->kbt->entry[i]->is_alias)
       snprintf(buf, sizeof(buf), "@{%s}", kbedit->kbt->entry[i]->comment);
@@ -1004,11 +1002,10 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   
   if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
     char shortcut[32];
-    char kbuf[32];
     
     kbedit_display_kbinding(xitk_label_get_label(kbedit->comment), kbe);
     
-    snprintf(shortcut, sizeof(shortcut), "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(kbe, kbuf, sizeof(kbuf)), ']');
+    _kbindings_get_shortcut_from_kbe(kbe, shortcut, sizeof(shortcut));
     
     /* Ask if user wants to store new shortcut */
     xitk_window_dialog_3 (gui->imlib_data,
