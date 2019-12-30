@@ -583,7 +583,7 @@ void download_skin(char *url) {
   gGui_t *gui = gGui;
   slx_entry_t         **slxs;
   xitk_pixmap_t        *bg;
-  int                   w, width, height;
+  int                   width, height;
   xitk_widget_t        *widget;
   xitk_register_key_t   dialog;
 
@@ -596,7 +596,6 @@ void download_skin(char *url) {
     return;
   }
 
-  w = 300;
   gui->x_lock_display (gui->display);
   gui->x_unlock_display (gui->display);
   
