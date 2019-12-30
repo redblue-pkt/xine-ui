@@ -2963,16 +2963,12 @@ static __attribute__((noreturn)) void *server_thread(void *data) {
   int              msock;
   
   if(gui->network_port) {
-    int len = (int) log10(gui->network_port) + 1;
-
-    service = (char *) malloc(len + 1);
-    sprintf(service, "%u", gui->network_port);
+    service = xitk_asprintf("%u", gui->network_port);
   } 
   else {
     /*  Search in /etc/services if a xinectl entry exist */
     if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
-      service = (char *) malloc(ntohs(serv_ent->s_port));
-      sprintf(service, "%u", ntohs(serv_ent->s_port));
+      service = xitk_asprintf("%u", ntohs(serv_ent->s_port));
     }
     else
       service = strdup(DEFAULT_XINECTL_PORT);
