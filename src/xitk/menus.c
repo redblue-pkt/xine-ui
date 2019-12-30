@@ -49,22 +49,28 @@ typedef struct {
 } menu_text_buf_t;
 
 static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, const char *action) {
-  const char *shortcut = kbindings_get_shortcut (gui->kbindings, action);
-  char *ret;
+  char *ret = tbuf->write;
+  size_t sz;
   if (tbuf->write + 1 >= tbuf->end) {
 #ifdef DEBUG
     fprintf (stderr, "Menu text buffer overflow\n");
 #endif
     return NULL;
   }
-  if (!shortcut) {
+  sz = kbindings_get_shortcut (gui->kbindings, action,
+                               tbuf->write, tbuf->end - tbuf->write);
+  if (!sz) {
 #ifdef DEBUG
     fprintf (stderr, "Action '%s' is invalid\n", action);
 #endif
     return NULL;
   }
-  ret = tbuf->write;
-  tbuf->write += strlcpy (tbuf->write, shortcut, tbuf->end - tbuf->write) + 1;
+#ifdef DEBUG
+  if (sz == tbuf->end - tbuf->write) {
+    fprintf (stderr, "Shortcut for action '%s' was truncated\n", action);
+  }
+#endif
+  tbuf->write += sz + 1;
   return ret;
 }
 
