@@ -196,9 +196,9 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
   node_t *node;
   
 #ifdef DEBUG
-  char tag[TAG_SIZE];
+  char tag[TAG_SIZE + 12];
 
-  snprintf(tag, TAG_SIZE, "pri node in %s", l->tag);
+  snprintf(tag, sizeof(tag), "pri node in %s", l->tag);
   node = ho_new_tagged(node_t, tag);
 #else
   node = ho_new(node_t);
@@ -279,9 +279,9 @@ void list_insert_content (list_t *l, void *content) {
   node_t *nodecur, *nodenew, *nodeprev;
   
 #ifdef DEBUG
-  char tag[TAG_SIZE];
+  char tag[TAG_SIZE + 12];
 
-  snprintf(tag, TAG_SIZE, "ins node in %s", l->tag);
+  snprintf(tag, sizeof(tag), "ins node in %s", l->tag);
   nodenew = ho_new_tagged(node_t, tag);
 #else
   nodenew = ho_new(node_t);
