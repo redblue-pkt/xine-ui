@@ -37,7 +37,6 @@
 #define DEBUG_VIEWLOG
 */
 
-
 #define WINDOW_WIDTH        630
 #define WINDOW_HEIGHT       473
 #define MAX_DISP_ENTRIES    17
@@ -185,7 +184,9 @@ static void viewlog_clear_tab(void) {
  *
  */
 static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
+#if DEBUG_VIEWLOG
   gGui_t *gui = gGui;
+#endif
   int    i, j, k;
   const char *const *log = xine_get_log(__xineui_global_xine_instance, section);
   char   buf[2048];
