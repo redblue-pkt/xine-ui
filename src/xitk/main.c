@@ -479,12 +479,45 @@ static void print_formatted(char *title, const char *const *plugins) {
   
   printf("%s.\n\n", buffer);
 }
+
+static char *_config_file()
+{
+  const char *home       = xine_get_homedir();
+  const char *cfgdir     = CONFIGDIR;
+  const char *cfgfile    = CONFIGFILE;
+  char       *configfile = NULL;
+
+  if (!home)
+    return NULL;
+
+  configfile = (char *) malloc(strlen(home)
+                               + strlen(cfgdir)
+                               + strlen(cfgfile)
+                               + 3);
+  if (!configfile)
+    return NULL;
+
+  sprintf(configfile, "%s/%s", home, cfgdir);
+  if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
+    fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
+  }
+  sprintf(configfile + strlen(configfile), "/%s", cfgfile);
+
+  return configfile;
+}
+
+static void _config_load(xine_t *xine)
+{
+  char *configfile = _config_file();
+  if (configfile) {
+    xine_config_load(xine, configfile);
+    free(configfile);
+  }
+}
+
 static void list_plugins(char *type) {
   const char   *const  *plugins;
   xine_t               *xine;
-  const char           *cfgdir     = CONFIGDIR;
-  const char           *cfgfile    = CONFIGFILE;
-  char                 *configfile = NULL;
   int                   i;
   static const struct {
     const char *const *(*func)(xine_t *);
@@ -502,20 +535,9 @@ static void list_plugins(char *type) {
     { NULL,                            "",                           ""              }
   };
     
-  configfile = (char *) malloc(strlen(xine_get_homedir())
-				     + strlen(cfgdir) 
-				     + strlen(cfgfile)
-				     + 3);
-  sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
-  if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
-    fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
-  }
 
-  sprintf(configfile + strlen(configfile), "/%s", cfgfile);
-  
   xine = xine_new();
-  xine_config_load(xine, configfile);
-  free(configfile);
+  _config_load(xine);
   xine_init(xine);
 
   show_version();
@@ -563,24 +585,10 @@ static void show_usage (void) {
   const char   *const *driver_ids;
   const char   *driver_id;
   xine_t       *xine;
-  const char   *cfgdir     = CONFIGDIR;
-  const char   *cfgfile    = CONFIGFILE;
-  char         *configfile = NULL;
   const char  **backends, *backend;
   
-  configfile = (char *) malloc(strlen(xine_get_homedir())
-				     + strlen(cfgdir) 
-				     + strlen(cfgfile)
-				     + 3);
-  sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
-  if (mkdir(configfile, 0755) < 0 && errno != EEXIST) {
-    fprintf(stderr, "Error creating %s: %d (%s)\n", configfile, errno, strerror(errno));
-  }
-  sprintf(configfile + strlen(configfile), "/%s", cfgfile);
-  
   xine = xine_new();
-  xine_config_load(xine, configfile);
-  free(configfile);
+  _config_load(xine);
   xine_init(xine);
   
   printf("\n");
@@ -1418,8 +1426,6 @@ int main(int argc, char *argv[]) {
   int                     session         = -1;
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
-  const char             *cfgdir          = CONFIGDIR;
-  const char             *cfgfile         = CONFIGFILE;
   int                     old_playlist_cfg, no_old_playlist = 0;
   char                  **pplugins        = NULL;
   int                     pplugins_num    = 0;
@@ -2044,19 +2050,10 @@ int main(int argc, char *argv[]) {
    */
   if(__xineui_global_config_file == NULL) {
     struct stat st;
-    
-    __xineui_global_config_file = (char *) malloc(strlen(xine_get_homedir())
-					     + strlen(cfgdir) 
-					     + strlen(cfgfile)
-					     + 3);
-    sprintf (__xineui_global_config_file, "%s/%s", xine_get_homedir(), cfgdir);
-    if (mkdir(__xineui_global_config_file, 0755) < 0 && errno != EEXIST) {
-      fprintf(stderr, "Error creating %s: %d (%s)\n", __xineui_global_config_file, errno, strerror(errno));
-    }
-    sprintf (__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s", cfgfile);
-    
+    __xineui_global_config_file = _config_file();
+
     /* Popup setup window if there is no config file */
-    if(stat(__xineui_global_config_file, &st) < 0) {
+    if(!__xineui_global_config_file || stat(__xineui_global_config_file, &st) < 0) {
       if(aos < MAX_ACTIONS_ON_START)
 	gui->actions_on_start[aos++] = ACTID_SETUP;
     }
@@ -2072,7 +2069,6 @@ int main(int argc, char *argv[]) {
 
     gui->keymap_file = (char *) malloc(strlen(xine_get_homedir())
 					      + strlen(cfgdir) 
-					      + strlen(cfgfile)
 					      + strlen(keymap) + 3);
     sprintf(gui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
   }
@@ -2088,7 +2084,8 @@ int main(int argc, char *argv[]) {
   gui->no_messages.level = 0;
 
   __xineui_global_xine_instance = gui->xine = xine_new ();
-  xine_config_load (gui->xine, __xineui_global_config_file);
+  if (__xineui_global_config_file)
+    xine_config_load (gui->xine, __xineui_global_config_file);
   xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, __xineui_global_verbosity);
   
   /* 
@@ -2397,6 +2394,9 @@ int main(int argc, char *argv[]) {
       free (gui->audio_driver_ids[ii]);
     free (gui->audio_driver_ids);
   }
+
+  free (__xineui_global_config_file);
+
   return retval;
 }
 
