@@ -519,6 +519,10 @@ void xitk_menu_destroy(xitk_widget_t *w) {
     
     xitk_dlist_clear (&private_data->menu_windows);
     _menu_destroy_ntree(&private_data->mtree->first);
+
+    XITK_FREE(private_data->mtree);
+
+    XITK_FREE(private_data);
   }
 }
 

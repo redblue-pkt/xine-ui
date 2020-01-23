@@ -32,6 +32,7 @@
 /*
  * Freeing/zeroing all of entries of given mrl.
  */
+
 #define MRL_ZERO(m) {                                                         \
   if((m)) {                                                                   \
     free((m)->origin);                                                        \
@@ -61,7 +62,7 @@
       (d)->origin = strdup((s)->origin);                                      \
   }                                                                           \
   else                                                                        \
-    (d)->origin = NULL;                                                       \
+    XITK_FREE(((d)->origin));                                                 \
                                                                               \
   if((s)->mrl) {                                                              \
     if((d)->mrl) {                                                            \
@@ -72,7 +73,7 @@
       (d)->mrl = strdup((s)->mrl);                                            \
   }                                                                           \
   else                                                                        \
-    (d)->mrl = NULL;                                                          \
+    XITK_FREE(((d)->mrl));                                                    \
                                                                               \
   if((s)->link) {                                                             \
     if((d)->link) {                                                           \
@@ -83,7 +84,7 @@
       (d)->link = strdup((s)->link);                                          \
   }                                                                           \
   else                                                                        \
-    (d)->link = NULL;                                                         \
+    XITK_FREE(((d)->link));                                                   \
                                                                               \
   (d)->type = (s)->type;                                                      \
   (d)->size = (s)->size;                                                      \

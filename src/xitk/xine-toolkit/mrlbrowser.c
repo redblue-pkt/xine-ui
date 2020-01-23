@@ -252,6 +252,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
     MRL_ZERO(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
     XITK_FREE(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
     private_data->mc->filtered_mrls[old_filtered_mrls_num - 1] = NULL;
+    XITK_FREE(private_data->mc->mrls_disp[old_filtered_mrls_num - 1]);
     old_filtered_mrls_num--;
   }
 

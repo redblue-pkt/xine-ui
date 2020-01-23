@@ -120,6 +120,7 @@ static void add_widget_to_list (xui_setup_t *setup, xitk_widget_t *w) {
 static void setup_exit (xitk_widget_t *w, void *data) {
   xui_setup_t *setup = data;
   window_info_t wi;
+  int i;
 
   (void)w;
   if (!setup)
@@ -158,6 +159,12 @@ static void setup_exit (xitk_widget_t *w, void *data) {
   try_to_set_input_focus (setup->gui->video_window);
 
   setup->gui->setup = NULL;
+
+  for(i = 0; i < setup->num_sections; i++)
+    free(setup->sections[i]);
+  for(i = 0; i < setup->num_wg; i++)
+    free(setup->wg[i]);
+      
   free (setup);
 }
 
