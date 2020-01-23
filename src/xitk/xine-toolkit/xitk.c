@@ -322,7 +322,7 @@ void xitk_set_current_menu(xitk_widget_t *menu) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
   if (xitk->menu)
-    xitk_menu_destroy (xitk->menu);
+    xitk_destroy_widget (xitk->menu);
   xitk->menu = menu;
 }
 
@@ -1498,7 +1498,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
 	      xitk_widget_t *m = xitk_menu_get_menu(w);
 	      
-	      xitk_menu_destroy(m);
+              xitk_destroy_widget(m);
 	      FXUNLOCK(fx);
 	      return;
 	    }
@@ -2225,6 +2225,8 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
   if (stop_cb)
     stop_cb (stop_data);
+
+  xitk_set_current_menu(NULL);
 
   /* pending destroys of the event handlers */
   MUTLOCK ();
