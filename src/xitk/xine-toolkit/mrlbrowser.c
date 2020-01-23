@@ -126,12 +126,15 @@ static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data,
 /*
  *
  */
+
+static void mrlbrowser_destroy(xitk_widget_t *w);
+
 static void notify_destroy(xitk_widget_t *w) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     
-    xitk_mrlbrowser_destroy(w);
+    mrlbrowser_destroy(w);
   }
 }
 
@@ -590,7 +593,7 @@ void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
 /*
  * Destroy the mrlbrowser.
  */
-void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
+static void mrlbrowser_destroy(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) && 
@@ -662,7 +665,7 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
   if(private_data->kill_callback)
     private_data->kill_callback (private_data->fbWidget, private_data->kill_userdata);
 
-  xitk_mrlbrowser_destroy(private_data->fbWidget);
+  xitk_destroy_widget(private_data->fbWidget);
 }
 
 
