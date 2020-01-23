@@ -520,6 +520,7 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
     if ((xitk_get_window_info (vctrl->widget_key, &wi))) {
       config_update_num ("gui.control_x", wi.x);
       config_update_num ("gui.control_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
     }
 
     xitk_unregister_event_handler (&vctrl->widget_key);
