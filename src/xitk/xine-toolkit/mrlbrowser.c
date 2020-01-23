@@ -308,6 +308,10 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
   int i;
   int old_mrls_num = private_data->mrls_num;
 
+  const int max_mrls = sizeof(private_data->mc->mrls) / sizeof(private_data->mc->mrls[0]) - 1;
+  if (num_mrls >= max_mrls)
+    num_mrls = max_mrls;
+
   for (i = 0; i < num_mrls; i++) {
     if(private_data->mc->mrls[i] == NULL)
       private_data->mc->mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
