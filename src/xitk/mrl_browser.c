@@ -140,7 +140,7 @@ void destroy_mrl_browser (xui_mrlb_t *mrlb) {
         config_update_num ("gui.mrl_browser_y", wi.y);
         WINDOW_INFO_ZERO(&wi);
       }
-      xitk_mrlbrowser_destroy (mrlb->w);
+      xitk_destroy_widget (mrlb->w);
       mrlb->w = NULL;
     }
     mrlb->gui->mrlb = NULL;
