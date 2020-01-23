@@ -244,6 +244,8 @@ static void _menu_dump(menu_private_data_t *private_data) {
 }
 #endif
 
+static void notify_destroy(xitk_widget_t *w);
+
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
 
@@ -261,6 +263,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   case WIDGET_EVENT_CHANGE_SKIN:
     break;
   case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
     break;
   case WIDGET_EVENT_GET_SKIN:
     break;
@@ -500,7 +503,7 @@ xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w) {
   return widget;
 }
 
-void xitk_menu_destroy(xitk_widget_t *w) {
+static void notify_destroy(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
@@ -572,7 +575,7 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
     if(me->menu_entry->cb)
       me->menu_entry->cb(widget, me->menu_entry, me->menu_entry->user_data);
     
-    xitk_menu_destroy(widget);
+    xitk_destroy_widget(widget);
   }
 #ifdef DEBUG_MENU
   if(_menu_is_separator(me->menu_entry))
@@ -1091,7 +1094,7 @@ void xitk_menu_destroy_branch(xitk_widget_t *w) {
       private_data->curbranch = me;
     }
     else {
-      xitk_menu_destroy(xitk_menu_get_menu(w));
+      xitk_destroy_widget(xitk_menu_get_menu(w));
     }
   }
 }
