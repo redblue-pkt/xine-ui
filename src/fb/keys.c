@@ -106,6 +106,7 @@ static int default_key_action(int key)
 
 static __attribute__((noreturn)) void *fbxine_keyboard_loop(void *dummy)
 {
+        (void)dummy;
 	pthread_detach(pthread_self());
 
 	for(;;) {

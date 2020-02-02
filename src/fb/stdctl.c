@@ -59,6 +59,8 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   int               secs, last_secs;
   char             *params;
 
+  (void)dummy;
+
   last_secs = -1;
   params = NULL;
 

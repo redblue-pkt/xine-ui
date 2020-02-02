@@ -153,6 +153,7 @@ static struct option long_options[] = {
 
 
 static void post_plugin_cb(void *data, xine_cfg_entry_t *entry) {
+  (void)data;
   aaxine.post_plugin_name = entry->str_value;
 }
 
@@ -507,7 +508,8 @@ static void aaxine_start_next(void) {
 
 static void aaxine_event_listener(void *user_data, const xine_event_t *event) {
   struct timeval tv;
-  
+  (void)user_data;
+
   if(aaxine.logo_mode)
     return;
   

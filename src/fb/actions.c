@@ -350,14 +350,14 @@ int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length)
 }
 
 static int play(xine_stream_t *stream, 
-		int start_pos, int start_time_in_secs, int update_mmk)
+                int start_pos, int start_time_in_secs)
 {
 	return xine_play(stream, start_pos, start_time_in_secs * 1000);
 }
 
 static void action_play(void)
 {
-	play(fbxine.stream, 0, 0, 0);
+	play(fbxine.stream, 0, 0);
 }
 
 static __attribute__((noreturn)) void *seek_relative_thread(void *data)
@@ -375,7 +375,7 @@ static __attribute__((noreturn)) void *seek_relative_thread(void *data)
 		else
 			sec += off_sec;
 		
-		play(fbxine.stream, 0, sec, 1);
+                play(fbxine.stream, 0, sec);
 		osd_stream_position();
 	}
 	
