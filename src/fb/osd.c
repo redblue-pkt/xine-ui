@@ -150,7 +150,7 @@ static __attribute__((noreturn)) void *osd_loop(void *dummy)
 }
 
 static const char *_osd_get_speed_sym(int speed) {
-  int i;
+  unsigned int i;
 
   for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
     if(speed == xine_speeds[i].speed)
@@ -161,7 +161,7 @@ static const char *_osd_get_speed_sym(int speed) {
 }
 
 static const char *_osd_get_status_sym(int status) {
-  int i;
+  unsigned int i;
 
   for(i = 0; i < sizeof(xine_status)/sizeof(xine_status[0]); i++) {
     if(status == xine_status[i].status)

@@ -198,7 +198,7 @@ int get_bool_value(const char *val) {
     { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
     { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 },
   };
-  int i;
+  unsigned int i;
 
   if(val) {
     for(i = 0; i < sizeof(bools)/sizeof(bools[0]); i++) {
