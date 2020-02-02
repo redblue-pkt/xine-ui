@@ -115,6 +115,7 @@ static const struct xine_speeds_s {
 
 static __attribute__((noreturn)) void *osd_loop(void *dummy)
 {
+        (void)dummy;
 	pthread_detach(pthread_self());
 	while(1) {
 	    sleep(1);

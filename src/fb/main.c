@@ -103,6 +103,7 @@ static int check_version(void)
 
 static void event_listener(void *user_data, const xine_event_t *event)
 {
+        (void)user_data;
 	switch(event->type)
 	{
 		case XINE_EVENT_UI_PLAYBACK_FINISHED:
