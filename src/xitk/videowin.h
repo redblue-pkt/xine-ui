@@ -63,6 +63,8 @@ void video_window_dest_size_cb (void *vwin,
 void video_window_set_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen);
 int video_window_get_fullscreen_mode (xui_vwin_t *vwin);
 
+int video_window_is_window_iconified (xui_vwin_t *vwin);
+
 /* Set cursor */
 void video_window_set_cursor (xui_vwin_t *vwin, int cursor);
 /* hide/show cursor in video window*/

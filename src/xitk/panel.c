@@ -508,11 +508,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
         free (ident);
 
         {
-          int iconified;
-          video_window_lock (panel->gui->vwin, 1);
-          iconified = xitk_is_window_iconified (panel->gui->video_display, panel->gui->video_window);
-          video_window_lock (panel->gui->vwin, 0);
-          if (!iconified) {
+          if (!video_window_is_window_iconified (panel->gui->vwin)) {
             if (panel->gui->ssaver_timeout) {
               if (!(i % 2))
                 screensaver_timer++;
