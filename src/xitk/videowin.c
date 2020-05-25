@@ -1339,6 +1339,15 @@ int video_window_get_fullscreen_mode (xui_vwin_t *vwin) {
   return vwin ? vwin->fullscreen_mode : 0;
 }
 
+int video_window_is_window_iconified (xui_vwin_t *vwin)
+{
+  int iconified;
+  video_window_lock (vwin, 1);
+  iconified = xitk_is_window_iconified (vwin->gui->video_display, vwin->gui->video_window);
+  video_window_lock (vwin, 0);
+  return iconified;
+}
+
 #if 0
 /*
  * set/reset xine in xinerama fullscreen
