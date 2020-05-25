@@ -1942,7 +1942,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   return vwin;
 }
 
-
 /*
  * Necessary cleanup
  */
@@ -1966,7 +1965,7 @@ void video_window_exit (xui_vwin_t *vwin) {
 #endif
 
   vwin->second_display_running = 0;
-  if (vwin->gui->use_root_window || vwin->gui->video_display != vwin->gui->display) {
+  {
     union {
       XExposeEvent expose;
       XEvent event;

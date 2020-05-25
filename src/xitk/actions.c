@@ -800,21 +800,10 @@ void gui_exit_2 (gGui_t *gui) {
    * from happening until we're finished.
    * NEWS FLASH: gui_exit_2 () now runs inside xitk_run ().
    */
-  gui->x_lock_display (gui->video_display);
-  if( gui->video_display != gui->display )
-    gui->x_lock_display (gui->display);
+  gui->x_lock_display (gui->display);
 /*xitk_stop();*/
-  /* 
-   * This prevent xine waiting till the end of time for an
-   * XEvent when lirc (and futur other control ways) is used to quit .
-   */
-  if( gui->video_display == gui->display )
-    gui_send_expose_to_window(gui->video_window);
- 
   xitk_skin_unload_config(gui->skin_config);
-  gui->x_unlock_display (gui->video_display);
-  if( gui->video_display != gui->display )
-    gui->x_unlock_display (gui->display);
+  gui->x_unlock_display (gui->display);
 
   mediamark_free_mediamarks();
 }
@@ -2104,32 +2093,6 @@ void gui_toggle_tvmode(void) {
 		 xine_get_param(gui->stream, XINE_PARAM_VO_TVMODE) + 1);
 
   osd_display_info(_("TV Mode: %d"), xine_get_param(gui->stream, XINE_PARAM_VO_TVMODE));
-}
-
-/*
- * Send an Expose event to given window.
- */
-void gui_send_expose_to_window(Window window) {
-  gGui_t *gui = gGui;
-  XEvent xev;
-
-  if(window == None)
-    return;
-
-  xev.xany.type          = Expose;
-  xev.xexpose.type       = Expose;
-  xev.xexpose.send_event = True;
-  xev.xexpose.display    = gui->display;
-  xev.xexpose.window     = window;
-  xev.xexpose.count      = 0;
-  
-  gui->x_lock_display (gui->display);
-  if(!XSendEvent(gui->display, window, False, ExposureMask, &xev)) {
-    fprintf(stderr, _("XSendEvent(display, 0x%x ...) failed.\n"), (unsigned int) window);
-  }
-  XSync(gui->display, False);
-  gui->x_unlock_display (gui->display);
-  
 }
 
 void gui_add_mediamark(void) {
