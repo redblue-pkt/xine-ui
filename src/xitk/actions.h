@@ -98,7 +98,6 @@ void gui_reset_amp_level(void);
 void gui_change_zoom(int zoom_dx, int zoom_dy);
 void gui_reset_zoom(void);
 void gui_toggle_tvmode(void);
-void gui_send_expose_to_window(Window window);
 void gui_add_mediamark(void);
 void gui_file_selector(void);
 void gui_select_sub(void);
