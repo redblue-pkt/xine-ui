@@ -22,9 +22,8 @@
 #ifndef STREAM_INFOS_H
 #define STREAM_INFOS_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <stdint.h>
+#include <xine.h>
 
 #include "xitk.h"
 

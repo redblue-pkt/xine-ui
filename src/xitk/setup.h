@@ -22,10 +22,6 @@
 #ifndef SETUP_H
 #define SETUP_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "xitk.h"
 
 typedef struct xui_setup_st xui_setup_t;

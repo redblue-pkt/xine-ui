@@ -19,8 +19,12 @@
  *
  */
 
-#ifndef HAVE_I18N_H
-#define HAVE_I18N_H
+#ifndef _XITK_I18N_H
+#define _XITK_I18N_H
+
+#ifndef PACKAGE_NAME
+#error config.h not included
+#endif
 
 #include <locale.h>
 

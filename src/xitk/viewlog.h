@@ -22,10 +22,6 @@
 #ifndef VIEWLOG_H
 #define VIEWLOG_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "xitk.h"
 
 void viewlog_panel(void);

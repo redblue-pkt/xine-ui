@@ -23,8 +23,8 @@
 #ifndef __XITK_H_
 #define __XITK_H_
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef PACKAGE_NAME
+#error config.h not included
 #endif
 
 #include <stdio.h>

@@ -24,10 +24,6 @@
 #ifndef LIRC_H
 #define LIRC_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 void lirc_start(void);
 void lirc_stop(void);
 

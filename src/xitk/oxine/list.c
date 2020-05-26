@@ -19,7 +19,9 @@
  * based upon xine_list functions of the xine project
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

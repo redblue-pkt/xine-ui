@@ -21,10 +21,6 @@
  * and dfb sources.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 int parse_options(int argc, char **argv);
 extern int no_lirc;
 extern int stdctl;

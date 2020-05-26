@@ -22,10 +22,6 @@
 #ifndef TVSET_H
 #define TVSET_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "xitk.h"
 
 void tvset_panel(void);

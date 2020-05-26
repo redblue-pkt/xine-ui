@@ -21,8 +21,8 @@
 #ifndef _XINE_COMPAT_H
 #define _XINE_COMPAT_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef PACKAGE_NAME
+#error config.h not included
 #endif
 
 #ifndef HAVE_XINE_SOCKET_CLOEXEC
