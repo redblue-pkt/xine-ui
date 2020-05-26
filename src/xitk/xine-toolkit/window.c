@@ -969,6 +969,7 @@ int xitk_window_change_background_with_image(ImlibData *im, xitk_window_t *w, xi
   return 1;
 }
 
+/*
 void xitk_window_set_modal(xitk_window_t *w) {
   xitk_modal_window(w->window);  
 }
@@ -976,6 +977,8 @@ void xitk_window_dialog_set_modal(xitk_window_t *w) {
   xitk_dialog_t *wd = w->dialog;
   xitk_window_set_modal(wd->xwin);
 }
+*/
+
 void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK (im->x.x_lock_display, im->x.disp);
@@ -988,7 +991,7 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
   w->width = -1;
   w->height = -1;
 
-  xitk_unmodal_window(w->window);
+  //xitk_unmodal_window(w->window);
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   XDestroyWindow(im->x.disp, w->window);

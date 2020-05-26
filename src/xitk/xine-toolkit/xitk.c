@@ -180,7 +180,7 @@ typedef struct {
   xitk_signal_callback_t      sig_callback;
   void                       *sig_data;
 
-  Window                      modalw;
+  //Window                      modalw;
   xitk_widget_t              *menu;
   
   struct timeval              keypress;
@@ -228,6 +228,7 @@ xitk_t *gXitk;
 
 void widget_stop(void);
 
+/*
 void xitk_modal_window(Window w) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   xitk->modalw = w;
@@ -237,6 +238,7 @@ void xitk_unmodal_window(Window w) {
   if (w == xitk->modalw)
     xitk->modalw = None;
 }
+*/
 
 /*
  * Execute a shell command.
@@ -1423,7 +1425,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
   }
   
   FXLOCK(fx);
-  
+
+  /*
   if (xitk->modalw != None) {
     while (fx->node.next && (fx->window != xitk->modalw)) {
       
@@ -1433,7 +1436,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       fx = (__gfx_t *)fx->node.next;
     }
   }
-  
+  */
+
   while (fx->node.next) {
 
     if(event->type == KeyRelease)
@@ -1896,6 +1900,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
     else
       FXUNLOCK(fxd);
     
+#if 0
 #warning FIXME
     if (xitk->modalw != None) {
 
@@ -1916,6 +1921,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       }
       return;
     }
+#endif
 
     if (fx->node.next)
       FXLOCK(fx);
@@ -1973,7 +1979,7 @@ void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display 
   xitk->use_xshm        = (xitk_config_get_shm_feature(xitk->config)) ? (xitk_check_xshm(display)) : 0;
   xitk_x_error           = 0;
   xitk->x_error_handler = NULL;
-  xitk->modalw          = None;
+  //xitk->modalw          = None;
   xitk->ignore_keys[0]  = XKeysymToKeycode(display, XK_Shift_L);
   xitk->ignore_keys[1]  = XKeysymToKeycode(display, XK_Control_L);
   xitk->tips_timeout    = TIPS_TIMEOUT;

@@ -2290,8 +2290,8 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, i
 
 void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent);
 
-void xitk_window_set_modal(xitk_window_t *w);
-void xitk_window_dialog_set_modal(xitk_window_t *w);
+//void xitk_window_set_modal(xitk_window_t *w);
+//void xitk_window_dialog_set_modal(xitk_window_t *w);
 
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 
