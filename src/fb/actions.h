@@ -22,11 +22,6 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <xine.h>
 #include <xine/xineutils.h>
 

@@ -24,10 +24,6 @@
 #ifndef STDCTL_H
 #define STDCTL_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 /*
  * Initialize stdctl support
  */

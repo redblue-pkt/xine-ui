@@ -22,10 +22,6 @@
 #ifndef XINEUI_DUMP_H
 #define XINEUI_DUMP_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #ifdef HAVE_X11
 #include <X11/Xlib.h>
 #endif

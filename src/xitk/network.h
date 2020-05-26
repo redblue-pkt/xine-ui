@@ -24,16 +24,9 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #ifdef HAVE_READLINE
-
 int get_bool_value(const char *val);
-
 void start_remote_server(void);
-
 #endif
 
 #endif

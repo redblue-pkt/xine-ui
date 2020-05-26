@@ -21,6 +21,10 @@
  * The code is taken from xine-ui/src/xitk/post.c at changed to work with fbxine
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "post.h"
 #include "main.h"
 

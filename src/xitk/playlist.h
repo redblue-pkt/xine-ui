@@ -22,10 +22,6 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "xitk.h"
 
 void playlist_mmk_editor(void);

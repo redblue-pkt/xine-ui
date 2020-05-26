@@ -21,8 +21,8 @@
 #ifndef _COMMON_UTILS_H
 #define _COMMON_UTILS_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef HAVE_CONFIG_H
+#error config.h not included
 #endif
 
 #include <stdio.h>

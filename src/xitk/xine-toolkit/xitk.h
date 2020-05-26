@@ -24,8 +24,8 @@
 #ifndef _XITK_H_
 #define _XITK_H_
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef PACKAGE_NAME
+#error config.h not included
 #endif
 
 #include <stdlib.h>

@@ -22,10 +22,6 @@
 #ifndef MRL_BROWSER_H
 #define MRL_BROWSER_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "xitk.h"
 
 typedef struct xui_mrlb_st xui_mrlb_t;

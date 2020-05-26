@@ -21,10 +21,6 @@
  * Initial version by Fredrik Noring January 2003.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

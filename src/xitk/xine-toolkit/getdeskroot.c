@@ -97,6 +97,10 @@
  * no window managers that I know yet use these particular hints, I
  * haven't yet added any code to parse them.  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <X11/Xlib.h>

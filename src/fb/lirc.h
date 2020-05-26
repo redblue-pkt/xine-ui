@@ -24,10 +24,6 @@
 #ifndef LIRC_H
 #define LIRC_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 void fbxine_init_lirc(void);
 
 #endif /* HAVE_LIRC */

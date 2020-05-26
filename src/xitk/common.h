@@ -22,8 +22,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef PACKAGE_NAME
+#error config.h not included
 #endif
 
 #include <stdio.h>
