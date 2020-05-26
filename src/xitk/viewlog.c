@@ -49,11 +49,12 @@ typedef struct {
   int                   visible;
 
   xitk_widget_t        *tabs;
+  int                   tabs_height;
 
   const char          **log;
   int                   log_entries;
   int                   real_num_entries;
-  
+
   xitk_widget_t        *browser_widget;
 
   xitk_register_key_t   kreg;
@@ -61,8 +62,6 @@ typedef struct {
 } _viewlog_t;
 
 static _viewlog_t    *viewlog = NULL;
-
-static int            th; /* Tabs height */
 
 /*
  * Leaving setup panel, release memory.
@@ -174,7 +173,7 @@ static void viewlog_clear_tab(void) {
   
   gui->x_lock_display (gui->display);
   XCopyArea (gui->display, im->image->pixmap, (xitk_window_get_window (viewlog->xwin)),
-    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + th));
+    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + viewlog->tabs_height));
   gui->x_unlock_display (gui->display);
   
   xitk_image_free_image (gui->imlib_data, &im);
@@ -332,7 +331,7 @@ static void viewlog_create_tabs(void) {
   viewlog->tabs = xitk_noskin_tabs_create (viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
   xitk_add_widget (viewlog->widget_list, viewlog->tabs);
 
-  th = xitk_get_widget_height(viewlog->tabs) - 1;
+  viewlog->tabs_height = xitk_get_widget_height(viewlog->tabs) - 1;
 
   xitk_enable_and_show_widget(viewlog->tabs);
 
@@ -343,7 +342,7 @@ static void viewlog_create_tabs(void) {
     bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   gui->x_unlock_display (gui->display);
   
-  draw_rectangular_outter_box (gui->imlib_data, bg, 15, (24 + th),
+  draw_rectangular_outter_box (gui->imlib_data, bg, 15, (24 + viewlog->tabs_height),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_change_background (gui->imlib_data, viewlog->xwin, bg->pixmap,
     WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -438,7 +437,7 @@ void viewlog_panel(void) {
   br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
   viewlog->browser_widget = xitk_noskin_browser_create (viewlog->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + viewlog->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
   xitk_add_widget (viewlog->widget_list, viewlog->browser_widget);
 
   xitk_enable_and_show_widget(viewlog->browser_widget);
