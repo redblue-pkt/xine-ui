@@ -62,7 +62,7 @@ struct xui_vctrl_st {
 #define NUM_SLIDERS 7
   vctrl_item_t          items[NUM_SLIDERS];
 
-  Window                window;
+  xitk_window_t        *xwin;
 
   ImlibImage           *bg_image;
   xitk_widget_list_t   *widget_list;
@@ -252,7 +252,6 @@ xui_vctrl_t *control_init (gGui_t *gui) {
   }
 
   /* defer all window stuff to first use. */
-  vctrl->window = None;
   vctrl->status = 1;
 
   vctrl->gui->vctrl = vctrl;
@@ -272,7 +271,7 @@ static void control_handle_event(XEvent *event, void *data) {
     if(bevent->button == Button3) {
       int wx, wy;
       
-      xitk_get_window_position (vctrl->gui->display, vctrl->window, &wx, &wy, NULL, NULL);
+      xitk_window_get_window_position (vctrl->gui->imlib_data, vctrl->xwin, &wx, &wy, NULL, NULL);
       control_menu (vctrl->gui, vctrl->widget_list, bevent->x + wx, bevent->y + wy);
     }
   }
@@ -293,15 +292,13 @@ static void control_handle_event(XEvent *event, void *data) {
  */
 static int vctrl_open_window (xui_vctrl_t *vctrl) {
   GC                         gc;
-  XSizeHints                 hint;
-  XSetWindowAttributes       attr;
   char                      *title = _("xine Control Window");
-  Atom                       prop;
   xitk_browser_widget_t      br;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        lbl;
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
+  int x, y;
 
   XITK_WIDGET_INIT (&br, vctrl->gui->imlib_data);
   XITK_WIDGET_INIT (&lb, vctrl->gui->imlib_data);
@@ -310,97 +307,36 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   vctrl->gui->x_lock_display (vctrl->gui->display);
   vctrl->bg_image = Imlib_load_image (vctrl->gui->imlib_data,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
+  vctrl->gui->x_unlock_display (vctrl->gui->display);
   if (!vctrl->bg_image) {
     xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
     exit(-1);
   }
-  vctrl->gui->x_unlock_display (vctrl->gui->display);
 
-  hint.x = xine_config_register_num (vctrl->gui->xine, "gui.control_x",
+  x = xine_config_register_num (vctrl->gui->xine, "gui.control_x",
     200, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  hint.y = xine_config_register_num (vctrl->gui->xine, "gui.control_y",
+  y = xine_config_register_num (vctrl->gui->xine, "gui.control_y",
     100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  hint.width = vctrl->bg_image->rgb_width;
-  hint.height = vctrl->bg_image->rgb_height;
-  hint.flags = PPosition | PSize;
-  
-  attr.override_redirect = False;
-  attr.background_pixel  = vctrl->gui->black.pixel;
-  /*
-   * XXX:multivis
-   * To avoid BadMatch errors on XCreateWindow:
-   * If the parent and the new window have different depths, we must supply either
-   * a BorderPixmap or a BorderPixel.
-   * If the parent and the new window use different visuals, we must supply a
-   * Colormap
-   */
-  attr.border_pixel      = 1;
+
+  vctrl->xwin = xitk_window_create_simple_window(vctrl->gui->imlib_data, x + 100, y + 100,
+                                                 vctrl->bg_image->rgb_width, vctrl->bg_image->rgb_height);
+  xitk_window_set_window_title(vctrl->gui->imlib_data, vctrl->xwin, _(title));
+
+  set_window_states_start(xitk_window_get_window(vctrl->xwin));
+
+  if (is_layer_above ())
+    xitk_set_layer_above (xitk_window_get_window(vctrl->xwin));
 
   vctrl->gui->x_lock_display (vctrl->gui->display);
-  attr.colormap = Imlib_get_colormap (vctrl->gui->imlib_data);
-  vctrl->window = XCreateWindow (vctrl->gui->display, vctrl->gui->imlib_data->x.root,
-    hint.x, hint.y, hint.width, hint.height, 0,
-    vctrl->gui->imlib_data->x.depth, InputOutput, vctrl->gui->imlib_data->x.visual,
-    CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
-  XmbSetWMProperties (vctrl->gui->display, vctrl->window, _(title), _(title), NULL, 0, &hint, NULL, NULL);
-  XSelectInput (vctrl->gui->display, vctrl->window, INPUT_MOTION | KeymapStateMask);
-  vctrl->gui->x_unlock_display (vctrl->gui->display);
-
-  if (!video_window_is_visible (vctrl->gui->vwin))
-    xitk_set_wm_window_type (vctrl->window, WINDOW_TYPE_NORMAL);
-  else
-    xitk_unset_wm_window_type (vctrl->window, WINDOW_TYPE_NORMAL);
-  
-  if (is_layer_above ())
-    xitk_set_layer_above (vctrl->window);
-
-  /* wm, no border please */
-  {
-    MWMHints mwmhints;
-
-    memset (&mwmhints, 0, sizeof (mwmhints));
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-    prop = XInternAtom (vctrl->gui->display, "_MOTIF_WM_HINTS", True);
-    mwmhints.flags = MWM_HINTS_DECORATIONS;
-    mwmhints.decorations = 0;
-    XChangeProperty (vctrl->gui->display, vctrl->window, prop, prop, 32,
-      PropModeReplace, (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS);
-  }
-
-  /* set xclass */
-  {
-    XClassHint *xclasshint = XAllocClassHint ();
-
-    if (xclasshint) {
-      xclasshint->res_name = title;
-      xclasshint->res_class = "xine";
-      XSetClassHint (vctrl->gui->display, vctrl->window, xclasshint);
-      XFree (xclasshint);
-    }
-  }
-
-  {
-    XWMHints *wm_hint = XAllocWMHints ();
-
-    if (wm_hint) {
-      wm_hint->input         = True;
-      wm_hint->initial_state = NormalState;
-      wm_hint->icon_pixmap   = vctrl->gui->icon;
-      wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
-      XSetWMHints (vctrl->gui->display, vctrl->window, wm_hint);
-      XFree (wm_hint);
-    }
-  }
-  
-  gc = XCreateGC (vctrl->gui->display, vctrl->window, 0, 0);
-  Imlib_apply_image (vctrl->gui->imlib_data, vctrl->bg_image, vctrl->window);
+  gc = XCreateGC (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), 0, 0);
+  Imlib_apply_image (vctrl->gui->imlib_data, vctrl->bg_image, xitk_window_get_window(vctrl->xwin));
   vctrl->gui->x_unlock_display (vctrl->gui->display);
 
   /*
    * Widget-list
    */
   vctrl->widget_list = xitk_widget_list_new ();
-  xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_WINDOW, (void *)vctrl->window);
+  xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window(vctrl->xwin));
   xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT (&lbl, vctrl->gui->imlib_data);
@@ -500,20 +436,20 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   control_show_tips (vctrl, panel_get_tips_enable (vctrl->gui->panel), panel_get_tips_timeout (vctrl->gui->panel));
 
   vctrl->widget_key = xitk_register_event_handler ("control",
-    vctrl->window, control_handle_event, NULL,
+    xitk_window_get_window(vctrl->xwin), control_handle_event, NULL,
     gui_dndcallback, vctrl->widget_list, vctrl);
   
   vctrl->status = 3;
   control_raise_window (vctrl);
   
-  try_to_set_input_focus (vctrl->window);
+  try_to_set_input_focus (xitk_window_get_window(vctrl->xwin));
   return 1;
 }
 
 static void vctrl_close_window (xui_vctrl_t *vctrl) {
   vctrl->status = 1;
 
-  if (vctrl->window != None) {
+  if (vctrl->xwin) {
     window_info_t wi;
     int           i;
     
@@ -525,18 +461,15 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
 
     xitk_unregister_event_handler (&vctrl->widget_key);
 
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-    XUnmapWindow (vctrl->gui->display, vctrl->window);
-    vctrl->gui->x_unlock_display (vctrl->gui->display);
-
     xitk_destroy_widgets (vctrl->widget_list);
 
+    xitk_window_destroy_window(gGui->imlib_data, vctrl->xwin);
+    vctrl->xwin = NULL;
+
     vctrl->gui->x_lock_display (vctrl->gui->display);
-    XDestroyWindow (vctrl->gui->display, vctrl->window);
     Imlib_destroy_image (vctrl->gui->imlib_data, vctrl->bg_image);
     vctrl->gui->x_unlock_display (vctrl->gui->display);
 
-    vctrl->window = None;
     /* xitk_dlist_init (&control->widget_list->list); */
 
     vctrl->gui->x_lock_display (vctrl->gui->display);
@@ -653,7 +586,7 @@ int control_status (xui_vctrl_t *vctrl) {
     return 1;
   if (!vctrl->gui->use_root_window && (vctrl->status == 2))
     return 2;
-  return (!!xitk_is_window_visible (vctrl->gui->display, vctrl->window)) + 2;
+  return (!!xitk_is_window_visible (vctrl->gui->display, xitk_window_get_window(vctrl->xwin))) + 2;
 }
 
 /*
@@ -663,7 +596,7 @@ void control_raise_window (xui_vctrl_t *vctrl) {
   if (vctrl && (vctrl->status >= 2)) {
     int visible = vctrl->status - 2;
 
-    raise_window (vctrl->window, visible, 1);
+    raise_window (xitk_window_get_window(vctrl->xwin), visible, 1);
   }
 }
 
@@ -684,7 +617,7 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
         return;
     }
     visible = vctrl->status - 2;
-    toggle_window (vctrl->window, vctrl->widget_list, &visible, 1);
+    toggle_window (xitk_window_get_window(vctrl->xwin), vctrl->widget_list, &visible, 1);
     vctrl->status = visible + 2;
   }
 }
@@ -709,7 +642,7 @@ void control_toggle_window (xitk_widget_t *w, void *data) {
         vctrl_open_window (vctrl);
       } else {
         int visible = 0;
-        toggle_window (vctrl->window, vctrl->widget_list, &visible, 1);
+        toggle_window (xitk_window_get_window(vctrl->xwin), vctrl->widget_list, &visible, 1);
         vctrl->status = visible + 2;
       }
     } else {
@@ -726,42 +659,39 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
   XSizeHints    hint;
 
   if (vctrl->status >= 2) {
-    
+
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
 
     vctrl->gui->x_lock_display (vctrl->gui->display);
-    
+
     if (!(new_img = Imlib_load_image (vctrl->gui->imlib_data,
       xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
     vctrl->gui->x_unlock_display (vctrl->gui->display);
-
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
 
     vctrl->gui->x_lock_display (vctrl->gui->display);
-    XSetWMNormalHints (vctrl->gui->display, vctrl->window, &hint);
-    XResizeWindow (vctrl->gui->display, vctrl->window,
+    XSetWMNormalHints (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), &hint);
+    XResizeWindow (vctrl->gui->display, xitk_window_get_window(vctrl->xwin),
       (unsigned int)new_img->rgb_width, (unsigned int)new_img->rgb_height);
     vctrl->gui->x_unlock_display (vctrl->gui->display);
     
-    while (!xitk_is_window_size (vctrl->gui->display, vctrl->window,
+    while (!xitk_is_window_size (vctrl->gui->display, xitk_window_get_window(vctrl->xwin),
       new_img->rgb_width, new_img->rgb_height)) {
       xine_usec_sleep(10000);
     }
-    
     old_img = vctrl->bg_image;
     vctrl->bg_image = new_img;
-    
     vctrl->gui->x_lock_display (vctrl->gui->display);
     if (!vctrl->gui->use_root_window && vctrl->gui->video_display == vctrl->gui->display)
-      XSetTransientForHint (vctrl->gui->display, vctrl->window, vctrl->gui->video_window);
+      XSetTransientForHint (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), vctrl->gui->video_window);
     Imlib_destroy_image (vctrl->gui->imlib_data, old_img);
-    Imlib_apply_image (vctrl->gui->imlib_data, new_img, vctrl->window);
+    Imlib_apply_image (vctrl->gui->imlib_data, new_img, xitk_window_get_window(vctrl->xwin));
     vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     control_raise_window (vctrl);
@@ -801,7 +731,7 @@ void control_deinit (xui_vctrl_t *vctrl) {
 }
 
 void control_reparent (xui_vctrl_t *vctrl) {
-  if (vctrl && (vctrl->window != None))
-    reparent_window (vctrl->window);
+  if (vctrl && vctrl->xwin)
+    reparent_window((xitk_window_get_window(vctrl->xwin)));
 }
 
