@@ -1648,8 +1648,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      }
 	    }
 	    
-	    if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && 
-	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter))) {
+	    if(((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter))
+               && w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
 	      widget_event_t  event;
 	      
 	      event.type = WIDGET_EVENT_PAINT;
