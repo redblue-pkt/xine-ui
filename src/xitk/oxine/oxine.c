@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <pthread.h>
 
 #include <xine.h>
 #include "common.h"
