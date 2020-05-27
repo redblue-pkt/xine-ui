@@ -1,6 +1,8 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 include $(top_srcdir)/src/common/Makefile.common
 
-SUBDIRS = Imlib-light xine-toolkit skins/xinetic oxine .
+SUBDIRS = Imlib-light xine-toolkit skins/xinetic .
 
 AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @LIBPNG_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
@@ -10,14 +12,43 @@ endif
 
 if HAVE_X11
 xine_ui = xine $(remote)
+oxine_lib = liboxine.a
 endif
 
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
+noinst_LIBRARIES = $(oxine_lib)
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
 kbindings_man_LDADD = $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL) $(XINE_LIBS)
 kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
+
+EXTRA_DIST = \
+	$(oxine_DATA)
+
+oxinedir = @XINE_OXINEDIR@
+oxine_DATA = \
+	oxine/data/mediamarks \
+	oxine/data/mainmenu
+
+liboxine_a_SOURCES = \
+       oxine/list.c \
+       oxine/list.h \
+       oxine/mediamarks.c \
+       oxine/mediamarks.h \
+       oxine/odk.c \
+       oxine/odk.h \
+       oxine/otk.c \
+       oxine/otk.h \
+       oxine/oxine.c \
+       oxine/oxine.h \
+       oxine/oxine_event.h \
+       oxine/playlist.c \
+       oxine/playlist.h \
+       oxine/utils.c \
+       oxine/utils.h
+liboxine_a_CFLAGS = @XINE_CFLAGS@ $(X_CFLAGS)
+liboxine_a_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src/xitk
 
 xine_SOURCES = \
 	actions.c \
@@ -67,7 +98,7 @@ endif
 xine_LDADD = \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
 	     $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
-	     $(top_builddir)/src/xitk/oxine/liboxine.a \
+	     $(oxine_lib) \
 	     $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(XINE_LIBS) $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
