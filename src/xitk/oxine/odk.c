@@ -31,9 +31,10 @@
 #include <xine.h>
 
 #include "common.h"
+#include "globals.h"
+
 #include "odk.h"
 #include "utils.h"
-#include "globals.h"
 
 
 #define V_WIDTH 800
