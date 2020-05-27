@@ -484,7 +484,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
 	  len = strlen(filename) - strlen(".tar.gz");
 	  if (len > sizeof(buffer) - 1) len = sizeof(buffer) - 1;
-	  strncpy(buffer, filename, len);
+	  memcpy(buffer, filename, len);
 	  buffer[len] = '\0';
 
           fskin_path = xitk_asprintf("%s/%s/%s", skindir, buffer, "doinst.sh");
