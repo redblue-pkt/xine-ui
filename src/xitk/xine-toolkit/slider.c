@@ -849,15 +849,19 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
 				  xitk_skin_config_t *skonfig, xitk_slider_widget_t *s) {
 
   XITK_CHECK_CONSTITENCY(s);
-  
+
+  xitk_image_t *bg_skin = xitk_skin_get_image(skonfig,
+      xitk_skin_get_skin_filename(skonfig, s->skin_element_name));
+  xitk_image_t *pad_skin = xitk_skin_get_image(skonfig,
+      xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name));
+  if (!bg_skin || !pad_skin)
+    return NULL;
+
   return _xitk_slider_create(wl, skonfig, s,
 			     (xitk_skin_get_coord_x(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_coord_y(skonfig, s->skin_element_name)),
 			     s->skin_element_name,
-			     (xitk_skin_get_image(skonfig, 
-						  xitk_skin_get_skin_filename(skonfig, s->skin_element_name))),
-			     (xitk_skin_get_image(skonfig, 
-						  xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
+			     bg_skin, pad_skin,
 			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_slider_radius(skonfig, s->skin_element_name)),
 			     ((xitk_skin_get_visibility(skonfig, s->skin_element_name)) ? 1 : -1),
