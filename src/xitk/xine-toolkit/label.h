@@ -24,6 +24,8 @@
 
 #include "_xitk.h"
 
+#include <pthread.h>
+
 typedef struct {
   ImlibData              *imlibdata;
   char                   skin_element_name[64];
