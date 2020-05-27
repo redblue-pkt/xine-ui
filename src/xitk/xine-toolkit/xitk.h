@@ -31,13 +31,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <X11/Xlib.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include "xitk/Imlib-light/Imlib.h"
-
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
 
 #ifdef NEED_MRLBROWSER
 #include <xine.h>
