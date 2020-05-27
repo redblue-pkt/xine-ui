@@ -23,8 +23,6 @@
 
 #include <stdlib.h>
 #include <sys/types.h>
-#include <X11/Xlib.h>
-#include <pthread.h>
 #include <xine.h>
 
 #include "otk.h"

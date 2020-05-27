@@ -27,6 +27,8 @@
 #include <string.h>
 #include <math.h>
 #include <errno.h>
+#include <pthread.h>
+
 #include "oxine.h"
 #include "odk.h"
 #include "otk.h"

@@ -29,8 +29,8 @@
 #ifndef HAVE_ODK_H
 #define HAVE_ODK_H
 
-#include <xine.h>
-#include <pthread.h>
+#include <stdint.h>
+
 #include "oxine_event.h"
 
 /*
