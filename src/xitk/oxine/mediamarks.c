@@ -32,15 +32,18 @@
 #include <string.h>
 #include <libgen.h>
 
+#include <xine.h>
+#include <xine/xineutils.h>
+#include <xine/xmlparser.h>
+
 #include "common.h"
+#include "xitk.h"  // XITK_NAME_MAX
 
 #include "oxine.h"
 #include "mediamarks.h"
 #include "playlist.h"
 #include "otk.h"
-#include "xine/xmlparser.h"
 #include "utils.h"
-
 
 #define TYPE_NONE (0)
 #define TYPE_DIR  (1)

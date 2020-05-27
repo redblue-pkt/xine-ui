@@ -35,15 +35,16 @@
 #include <pthread.h>
 
 #include <xine.h>
+#include <xine/xmlparser.h>
+
 #include "common.h"
+#include "globals.h"
+
 #include "oxine.h"
 #include "odk.h"
 #include "otk.h"
 #include "oxine_event.h"
-#include "xine/xmlparser.h"
 #include "utils.h"
-#include "globals.h"
-
 #include "mediamarks.h"
 #include "playlist.h"
 
