@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <inttypes.h> 
-#include <pthread.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
