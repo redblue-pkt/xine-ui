@@ -187,7 +187,6 @@ typedef struct {
 
   KeyCode                     ignore_keys[2];
 
-  pthread_t                  *tips_thread;
   unsigned long               tips_timeout;
 
   struct {
