@@ -35,7 +35,7 @@
 
 
 typedef struct {
-  Window                window;
+  xitk_window_t        *xwin;
   ImlibImage           *bg_image;
   xitk_widget_list_t   *widget_list;
 
@@ -480,7 +480,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       if(w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
 	int wx, wy;
 
-	xitk_get_window_position(gui->display, playlist->window, &wx, &wy, NULL, NULL);
+        xitk_window_get_window_position(gui->imlib_data, playlist->xwin, &wx, &wy, NULL, NULL);
 
         playlist_menu (gui, playlist->widget_list,
 		      bevent->x + wx, bevent->y + wy, 
@@ -571,7 +571,7 @@ static void _playlist_apply_cb(void *data) {
 
 void playlist_get_input_focus(void) {
   if(playlist)
-    try_to_set_input_focus(playlist->window);
+    try_to_set_input_focus(xitk_window_get_window(playlist->xwin));
 }
 
 void playlist_mmk_editor(void) {
@@ -727,19 +727,16 @@ void playlist_exit(xitk_widget_t *w, void *data) {
 
     xitk_unregister_event_handler(&playlist->widget_key);
 
-    gui->x_lock_display (gui->display);
-    XUnmapWindow(gui->display, playlist->window);
-    gui->x_unlock_display (gui->display);
-
     xitk_destroy_widgets(playlist->widget_list);
     xitk_button_list_delete (playlist->autoplay_buttons);
 
+    xitk_window_destroy_window(gui->imlib_data, playlist->xwin);
+    playlist->xwin = NULL;
+
     gui->x_lock_display (gui->display);
-    XDestroyWindow(gui->display, playlist->window);
     Imlib_destroy_image(gui->imlib_data, playlist->bg_image);
     gui->x_unlock_display (gui->display);
 
-    playlist->window = None;
     /* xitk_dlist_init (&playlist->widget_list->list); */
 
     gui->x_lock_display (gui->display);
@@ -777,9 +774,9 @@ int playlist_is_visible(void) {
 
   if(playlist != NULL) {
     if(gui->use_root_window)
-      return xitk_is_window_visible(gui->display, playlist->window);
+      return xitk_is_window_visible(gui->display, xitk_window_get_window(playlist->xwin));
     else
-      return playlist->visible && xitk_is_window_visible(gui->display, playlist->window);
+      return playlist->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(playlist->xwin));
   }
 
   return 0;
@@ -850,7 +847,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 void playlist_raise_window(void) {
   
   if(playlist != NULL) {
-    raise_window(playlist->window, playlist->visible, playlist->running);
+    raise_window(xitk_window_get_window(playlist->xwin), playlist->visible, playlist->running);
     mmk_editor_raise_window();
   }
 }
@@ -861,7 +858,7 @@ void playlist_raise_window(void) {
 void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if(playlist != NULL) {
-    toggle_window(playlist->window, playlist->widget_list, 
+    toggle_window(xitk_window_get_window(playlist->xwin), playlist->widget_list,
 		  &playlist->visible, playlist->running);
     mmk_editor_toggle_visibility();
   }
@@ -875,7 +872,7 @@ void playlist_update_focused_entry(void) {
   gGui_t *gui = gGui;
 
   if(playlist != NULL) {
-    if(playlist->window) {
+    if (playlist->xwin) {
       if(playlist->visible && playlist->running && playlist->playlist_len) {
 	char        *pa_mrl, *pl_mrl;
 	mediamark_t *mmk;
@@ -941,15 +938,15 @@ void playlist_change_skins(int synthetic) {
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
-    XSetWMNormalHints(gui->display, playlist->window, &hint);
+    XSetWMNormalHints(gui->display, xitk_window_get_window(playlist->xwin), &hint);
 
-    XResizeWindow (gui->display, playlist->window,
+    XResizeWindow (gui->display, xitk_window_get_window(playlist->xwin),
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
     
     gui->x_unlock_display (gui->display);
     
-    while(!xitk_is_window_size(gui->display, playlist->window, 
+    while(!xitk_is_window_size(gui->display, xitk_window_get_window(playlist->xwin),
 			       new_img->rgb_width, new_img->rgb_height)) {
       xine_usec_sleep(10000);
     }
@@ -960,10 +957,10 @@ void playlist_change_skins(int synthetic) {
     gui->x_lock_display (gui->display);
     
     if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, playlist->window, gui->video_window);
+      XSetTransientForHint(gui->display, xitk_window_get_window(playlist->xwin), gui->video_window);
     
     Imlib_destroy_image(gui->imlib_data, old_img);
-    Imlib_apply_image(gui->imlib_data, new_img, playlist->window);
+    Imlib_apply_image(gui->imlib_data, new_img, xitk_window_get_window(playlist->xwin));
     gui->x_unlock_display (gui->display);
 
     if(playlist_is_visible())
@@ -994,8 +991,8 @@ void playlist_deinit(void) {
 }
 
 void playlist_reparent(void) {
-  if(playlist)
-    reparent_window(playlist->window);
+  if (playlist && playlist->xwin)
+    reparent_window(xitk_window_get_window(playlist->xwin));
 }
 
 /*
@@ -1004,18 +1001,13 @@ void playlist_reparent(void) {
 void playlist_editor(void) {
   gGui_t *gui = gGui;
   GC                         gc;
-  XSizeHints                 hint;
-  XWMHints                  *wm_hint;
-  XSetWindowAttributes       attr;
   char                      *title = _("xine Playlist Editor");
-  Atom                       prop;
-  MWMHints                   mwmhints;
-  XClassHint                *xclasshint;
   xitk_browser_widget_t      br;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        lbl;
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
+  int                        x, y;
 
   XITK_WIDGET_INIT(&br, gui->imlib_data);
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
@@ -1036,106 +1028,43 @@ void playlist_editor(void) {
     xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
-
-  hint.x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
-				     200,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_DEB,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
-  hint.y = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_y", 
-				     200,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_DEB,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
-
-  hint.width = playlist->bg_image->rgb_width;
-  hint.height = playlist->bg_image->rgb_height;
-  hint.flags = PPosition | PSize;
-  
-  attr.override_redirect = False;
-  attr.background_pixel  = gui->black.pixel;
-  /*
-   * XXX:multivis
-   * To avoid BadMatch errors on XCreateWindow:
-   * If the parent and the new window have different depths, we must supply either
-   * a BorderPixmap or a BorderPixel.
-   * If the parent and the new window use different visuals, we must supply a
-   * Colormap
-   */
-  attr.border_pixel      = 1;
-  attr.colormap		 = Imlib_get_colormap(gui->imlib_data);
-
-  playlist->window = XCreateWindow (gui->display, 
-				    gui->imlib_data->x.root, 
-				    hint.x, hint.y, hint.width, 
-				    hint.height, 0, 
-				    gui->imlib_data->x.depth, InputOutput, 
-				    gui->imlib_data->x.visual,
-				    CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
-				    &attr);
-  
-  XmbSetWMProperties(gui->display, playlist->window, title, title, NULL, 0,
-                     &hint, NULL, NULL);
-  
-  XSelectInput(gui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
   gui->x_unlock_display (gui->display);
-  
-  if (!video_window_is_visible (gui->vwin))
-    xitk_set_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
-  else
-    xitk_unset_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
+
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
+				     200,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_DEB,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_y",
+				     200,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_DEB,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
+
+  playlist->xwin = xitk_window_create_simple_window(gui->imlib_data, x, y,
+                                                    playlist->bg_image->rgb_width,
+                                                    playlist->bg_image->rgb_height);
+  xitk_window_set_window_title(gui->imlib_data, playlist->xwin, title);
+
+  set_window_states_start(playlist->xwin);
 
   if(is_layer_above())
-    xitk_set_layer_above(playlist->window);
+    xitk_set_layer_above(xitk_window_get_window(playlist->xwin));
 
-  /*
-   * wm, no border please
-   */
-
-  memset(&mwmhints, 0, sizeof(mwmhints));
   gui->x_lock_display (gui->display);
-  prop = XInternAtom(gui->display, "_MOTIF_WM_HINTS", True);
-  mwmhints.flags = MWM_HINTS_DECORATIONS;
-  mwmhints.decorations = 0;
-
-  XChangeProperty(gui->display, playlist->window, prop, prop, 32,
-                  PropModeReplace, (unsigned char *) &mwmhints,
-                  PROP_MWM_HINTS_ELEMENTS);
-  
-  /* set xclass */
-
-  if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = title;
-    xclasshint->res_class = "xine";
-    XSetClassHint(gui->display, playlist->window, xclasshint);
-    XFree(xclasshint);
-  }
-
-  wm_hint = XAllocWMHints();
-  if (wm_hint != NULL) {
-    wm_hint->input = True;
-    wm_hint->initial_state = NormalState;
-    wm_hint->icon_pixmap   = gui->icon;
-    wm_hint->flags = InputHint | StateHint | IconPixmapHint;
-    XSetWMHints(gui->display, playlist->window, wm_hint);
-    XFree(wm_hint);
-  }
-  
-  gc = XCreateGC(gui->display, playlist->window, 0, 0);
-  
-  Imlib_apply_image(gui->imlib_data, playlist->bg_image, playlist->window);
-
+  gc = XCreateGC(gui->display, xitk_window_get_window(playlist->xwin), 0, 0);
+  Imlib_apply_image(gui->imlib_data, playlist->bg_image, xitk_window_get_window(playlist->xwin));
   gui->x_unlock_display (gui->display);
 
   /*
    * Widget-list
    */
   playlist->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) playlist->window);
+  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) xitk_window_get_window(playlist->xwin));
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_GC, gc);
 
   lbl.window          = (XITK_WIDGET_LIST_WINDOW(playlist->widget_list));
@@ -1275,7 +1204,7 @@ void playlist_editor(void) {
 
   playlist->widget_key = 
     xitk_register_event_handler("playlist", 
-				playlist->window, 
+                                xitk_window_get_window(playlist->xwin),
 				_playlist_handle_event,
 				NULL,
 				gui_dndcallback,
@@ -1288,7 +1217,7 @@ void playlist_editor(void) {
 
   playlist_raise_window();
 
-  try_to_set_input_focus(playlist->window);
+  try_to_set_input_focus(xitk_window_get_window(playlist->xwin));
 
   xitk_set_focus_to_widget(playlist->winput);
 }
