@@ -427,8 +427,8 @@ void set_window_states_start(Window window);
       xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
     else                                                                  \
       xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
-    change_class_name((window));                                          \
-    change_icon((window));                                                \
+    xitk_set_window_class(gGui->display, (window), NULL, "xine");         \
+    xitk_set_window_icon(gGui->display, (window), gGui->icon);            \
   } while(0)
 
 void reparent_window(Window window);
@@ -460,36 +460,6 @@ void reparent_window(Window window);
       XUnlockDisplay(gGui->display);                                                     \
       layer_above_video(window);                                                         \
     }                                                                                    \
-  } while(0)
-
-void change_class_name(Window window);
-#define change_class_name(window)                                         \
-  do {                                                                    \
-    XClassHint  xclasshint;                                               \
-    XLockDisplay (gGui->display);                                         \
-    if((XGetClassHint(gGui->display, (window), &xclasshint)) != 0) {      \
-      XClassHint   nxclasshint;                                           \
-      nxclasshint.res_name = xclasshint.res_name;                         \
-      nxclasshint.res_class = "xine";                                     \
-      XSetClassHint(gGui->display, window, &nxclasshint);                 \
-      XFree(xclasshint.res_name);                                         \
-      XFree(xclasshint.res_class);                                        \
-    }                                                                     \
-    XUnlockDisplay (gGui->display);                                       \
-  } while(0)
-
-void change_icon(Window window);
-#define change_icon(window)                                               \
-  do {                                                                    \
-    XWMHints *wmhints;                                                    \
-    XLockDisplay(gGui->display);                                          \
-    if((wmhints = XAllocWMHints())) {                                     \
-      wmhints->icon_pixmap   = gGui->icon;                                \
-      wmhints->flags         = IconPixmapHint;                            \
-      XSetWMHints(gGui->display, (window), wmhints);                      \
-      XFree(wmhints);                                                     \
-    }                                                                     \
-    XUnlockDisplay(gGui->display);                                        \
   } while(0)
 
 #ifdef HAVE_XML_PARSER_REENTRANT
