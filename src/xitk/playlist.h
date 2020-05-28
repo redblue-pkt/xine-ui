@@ -28,12 +28,13 @@ void playlist_mmk_editor(void);
 void playlist_scan_for_infos_selected(void);
 void playlist_scan_for_infos(void);
 void playlist_show_tips(int enabled, unsigned long timeout);
-void playlist_update_tips_timeout(unsigned long timeout);
+//void playlist_update_tips_timeout(unsigned long timeout);
 void playlist_mrlident_toggle(void);
 void playlist_update_playlist(void);
 void playlist_exit(xitk_widget_t *, void *);
 int playlist_is_running(void);
 int playlist_is_visible(void);
+// XXX these callbacks: add (void) params version as wrapper --> no need to expose here. (xitk callback syntax)
 void playlist_scan_input(xitk_widget_t *, void *);
 void playlist_raise_window(void);
 void playlist_toggle_visibility(xitk_widget_t *, void *);

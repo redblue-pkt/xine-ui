@@ -114,10 +114,12 @@ void event_sender_show_tips(int enabled, unsigned long timeout) {
   }
 }
 
+/*
 void event_sender_update_tips_timeout(unsigned long timeout) {
   if(eventer)
     xitk_set_widgets_tips_timeout(eventer->widget_list, timeout);
 }
+*/
 
 /* Send given event to xine engine */
 void event_sender_send (int event) {

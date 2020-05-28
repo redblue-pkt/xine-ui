@@ -3090,10 +3090,12 @@ void mmk_editor_show_tips(int enabled, unsigned long timeout) {
   }
 }
 
+/*
 void mmk_editor_update_tips_timeout(unsigned long timeout) {
   if(mmkeditor.running)
     xitk_set_widgets_tips_timeout(mmkeditor.widget_list, timeout);
 }
+*/
 
 int mmk_editor_is_visible(void) {
   if(mmkeditor.running)

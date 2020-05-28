@@ -44,12 +44,14 @@ void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout
     xitk_mrlbrowser_set_tips_timeout (mrlb->w, enabled, timeout);
 }
 
+/*
 void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout) {
   if (mrlb && mrlb->w) {
     if (xitk_get_widget_tips_timeout (mrlb->w) > 0)
       xitk_mrlbrowser_set_tips_timeout (mrlb->w, 1, timeout);
   }
 }
+*/
 
 /*
  *

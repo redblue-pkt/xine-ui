@@ -639,10 +639,12 @@ void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout) 
   }
 }
 
+/*
 void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout) {
   if (vctrl)
     xitk_set_widgets_tips_timeout (vctrl->widget_list, timeout);
 }
+*/
 
 int control_status (xui_vctrl_t *vctrl) {
   if (!vctrl)
