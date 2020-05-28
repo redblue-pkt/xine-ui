@@ -640,7 +640,7 @@ void download_skin(char *url) {
 						       _("Choose a skin to download..."),
 						       x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     
-    set_window_states_start((xitk_window_get_window(skdloader.xwin)));
+    set_window_states_start(skdloader.xwin);
 
     gui->x_lock_display (gui->display);
     gc = XCreateGC (gui->display, (xitk_window_get_window (skdloader.xwin)), None, None);

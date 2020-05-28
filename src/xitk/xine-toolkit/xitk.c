@@ -1025,6 +1025,16 @@ void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
   _set_wm_window_type(window, type, 1);
 }
 
+void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
+  if (w)
+    _set_wm_window_type(w->window, type, 0);
+}
+
+void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
+  if (w)
+    _set_wm_window_type(w->window, type, 1);
+}
+
 /*
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.

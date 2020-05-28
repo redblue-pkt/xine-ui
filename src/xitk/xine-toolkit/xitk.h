@@ -460,6 +460,10 @@ typedef enum {
 void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type);
 void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type);
 
+void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type);
+void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type);
+
+
 typedef enum {
   xitk_cursor_invisible,
   xitk_cursor_X_cursor,

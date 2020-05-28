@@ -68,7 +68,7 @@ void splash_create(void) {
     gGui->x_unlock_display (gGui->display);
     
     xwin = xitk_window_create_simple_window(gGui->imlib_data, x, y, xim->width, xim->height);
-    xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_SPLASH);
+    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
 
     gGui->x_lock_display (gGui->display);
     XStoreName(gGui->display, (xitk_window_get_window(xwin)), _("xine Splash"));

@@ -975,7 +975,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
                                                                     _("Plugin Help"), x, y,
                                                                     HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
 
-    set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
+    set_window_states_start(pp_wrapper->pplugin->helpwin);
 
     gui->x_lock_display (gui->display);
     gc = XCreateGC(gui->display, 
@@ -1929,7 +1929,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 						   (pp_wrapper == &vpp_wrapper) ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
                                                    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
+  set_window_states_start(pp_wrapper->pplugin->xwin);
 
   gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 

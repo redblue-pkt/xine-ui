@@ -410,7 +410,7 @@ void viewlog_panel(void) {
   viewlog->xwin = xitk_window_create_dialog_window (gui->imlib_data,
     _("xine Log Viewer"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(viewlog->xwin)));
+  set_window_states_start(viewlog->xwin);
 
   gui->x_lock_display (gui->display);
   gc = XCreateGC (gui->display, (xitk_window_get_window (viewlog->xwin)), None, None);

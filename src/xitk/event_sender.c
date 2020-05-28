@@ -412,7 +412,7 @@ void event_sender_panel(void) {
   /* Create window */
   eventer->xwin = xitk_window_create_simple_window(gGui->imlib_data, eventer->x, eventer->y, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-  set_window_states_start((xitk_window_get_window(eventer->xwin)));
+  set_window_states_start(eventer->xwin);
 
   gGui->x_lock_display (gGui->display);
   XStoreName(gGui->display, (xitk_window_get_window(eventer->xwin)), _("xine Event Sender"));

@@ -322,7 +322,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
                                                  vctrl->bg_image->rgb_width, vctrl->bg_image->rgb_height);
   xitk_window_set_window_title(vctrl->gui->imlib_data, vctrl->xwin, _(title));
 
-  set_window_states_start(xitk_window_get_window(vctrl->xwin));
+  set_window_states_start(vctrl->xwin);
 
   if (is_layer_above ())
     xitk_set_layer_above (xitk_window_get_window(vctrl->xwin));
