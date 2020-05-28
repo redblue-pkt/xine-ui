@@ -34,6 +34,7 @@
 #include <X11/Intrinsic.h>
 
 #include "_xitk.h"
+#include "tips.h"
 
 static const xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
@@ -926,7 +927,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     if (wl->widget_under_mouse) {
       
       /* Kill (hide) tips */
-      xitk_tips_hide_tips();
+      xitk_tips_hide_tips(wl->xitk->tips);
       
       if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
 	   (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
@@ -954,7 +955,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       
       /* Only give focus and paint when tips are accepted, otherwise associated window is invisible. */
       /* This call may occur from MotionNotify directly after iconifying window.                     */
-      if(xitk_tips_show_widget_tips(mywidget)) {
+      if(xitk_tips_show_widget_tips(wl->xitk->tips, mywidget)) {
       
 	if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
 	     (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
@@ -1015,7 +1016,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     if (wl->widget_focused) {
       
       /* Kill (hide) tips */
-      xitk_tips_hide_tips();
+      xitk_tips_hide_tips(wl->xitk->tips);
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
@@ -1090,7 +1091,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       widget_event_result_t result;
 
       /* Kill (hide) tips */
-      xitk_tips_hide_tips();
+      xitk_tips_hide_tips(wl->xitk->tips);
       
       if((mywidget->type & WIDGET_CLICKABLE) && 
 	 mywidget->enable == WIDGET_ENABLE && mywidget->running) {
@@ -1200,7 +1201,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
 
   }
         
-  xitk_tips_hide_tips ();
+  xitk_tips_hide_tips (wl->xitk->tips);
 
   if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
       (wl->widget_focused->enable == WIDGET_ENABLE)) {
@@ -1284,7 +1285,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     if(wl->widget_focused) {
       
       /* Kill (hide) tips */
-      xitk_tips_hide_tips();
+      xitk_tips_hide_tips(wl->xitk->tips);
       
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) && 
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
@@ -1498,7 +1499,7 @@ void xitk_disable_widget(xitk_widget_t *w) {
     
     if((w->wl->widget_under_mouse != NULL) && (w == w->wl->widget_under_mouse)) {
       /* Kill (hide) tips */
-      xitk_tips_hide_tips();
+      xitk_tips_hide_tips(w->wl->xitk->tips);
     }
     
     if((w->type & WIDGET_FOCUSABLE) && 
@@ -1534,8 +1535,10 @@ void xitk_free_widget(xitk_widget_t *w) {
   
   event.type = WIDGET_EVENT_DESTROY;
   (void) w->event(w, &event, NULL);
-  
-  xitk_tips_hide_tips();
+
+  if (w->wl != NULL)
+    xitk_tips_hide_tips(w->wl->xitk->tips);
+
   XITK_FREE(w->tips_string);
   XITK_FREE(w);
   w = NULL;
@@ -1786,7 +1789,8 @@ void xitk_hide_widget(xitk_widget_t *w) {
     
     w->visible = 0;
 
-    xitk_tips_hide_tips();
+    if (w->wl != NULL)
+      xitk_tips_hide_tips(w->wl->xitk->tips);
     
     event.type = WIDGET_EVENT_PAINT;
     (void) w->event(w, &event, NULL);

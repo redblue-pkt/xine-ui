@@ -56,6 +56,7 @@
 
 #include "utils.h"
 #include "_xitk.h"
+#include "tips.h"
 
 extern char **environ;
 #undef TRACE_LOCKS
@@ -1483,7 +1484,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
           XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
 
-	  xitk_tips_hide_tips();
+          xitk_tips_hide_tips(xitk->x.tips);
 	  
 	  if(fx->widget_list && fx->widget_list->widget_focused) {
 	    w = fx->widget_list->widget_focused;
@@ -1758,7 +1759,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  XWindowAttributes   wattr;
 	  Status              status;
 
-	  xitk_tips_hide_tips();
+          xitk_tips_hide_tips(xitk->x.tips);
 	  
           XLOCK (xitk->x.x_lock_display, xitk->x.display);
           status = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
@@ -1837,7 +1838,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  
 	case ButtonRelease:
 
-	  xitk_tips_hide_tips();
+          xitk_tips_hide_tips(xitk->x.tips);
 	  
 	  if(fx->move.enabled) {
 
@@ -2094,7 +2095,7 @@ void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display 
   xitk_font_cache_init();
   
   xitk_cursors_init(display);
-  xitk_tips_init(display);
+  xitk->x.tips = xitk_tips_init(display);
 }
 
 /*
@@ -2259,6 +2260,8 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
   /* destroy font caching */
   xitk_font_cache_done();
+
+  xitk_tips_deinit(&xitk->x.tips);
   
   xitk_config_deinit (xitk->config);
   pthread_mutex_destroy (&xitk->mutex);
@@ -2273,7 +2276,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
  */
 void xitk_stop(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
-  xitk_tips_deinit();
+  xitk_tips_stop(xitk->x.tips);
   xitk_cursors_deinit (xitk->x.display);
   xitk->running = 0;
 

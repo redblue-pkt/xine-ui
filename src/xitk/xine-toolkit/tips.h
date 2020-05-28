@@ -24,11 +24,14 @@
 
 #define TIPS_TIMEOUT 5000
 
-void xitk_tips_init(Display *display);
-void xitk_tips_deinit(void);
-void xitk_tips_hide_tips(void);
+typedef struct xitk_tips_s xitk_tips_t;
 
-int xitk_tips_show_widget_tips(xitk_widget_t *w);
+xitk_tips_t *xitk_tips_init(Display *display);
+void xitk_tips_stop(xitk_tips_t *);
+void xitk_tips_deinit(xitk_tips_t **);
+void xitk_tips_hide_tips(xitk_tips_t *);
+
+int xitk_tips_show_widget_tips(xitk_tips_t *, xitk_widget_t *w);
 
 void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout);
 void xitk_tips_set_tips(xitk_widget_t *w, const char *str);
