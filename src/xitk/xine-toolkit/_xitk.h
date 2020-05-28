@@ -54,6 +54,7 @@
 #include "xitk.h"
 
 typedef struct xitk_font_cache_s xitk_font_cache_t;
+struct xitk_tips_s;
 
 struct xitk_s {
   Display  *display;
@@ -61,6 +62,8 @@ struct xitk_s {
   void    (*x_unlock_display) (Display *display);
 
   xitk_font_cache_t *font_cache;
+
+  struct xitk_tips_s *tips;
 };
 
 extern xitk_t *gXitk;
@@ -93,7 +96,6 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 #include "skin.h"
 #include "slider.h"
 #include "tabs.h"
-#include "tips.h"
 #include "widget.h"
 #include "window.h"
 #include "menu.h"
