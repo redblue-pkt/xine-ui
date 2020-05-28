@@ -315,8 +315,8 @@ static void fb_create_input_window(char *title, char *text,
   fne->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, title, x, y, width, height);
 
   xitk_set_wm_window_type((xitk_window_get_window(fne->xwin)), WINDOW_TYPE_NORMAL);
-  change_class_name((xitk_window_get_window(fne->xwin)));
-  change_icon((xitk_window_get_window(fne->xwin)));
+  xitk_window_set_window_class(gGui->imlib_data, fne->xwin, NULL, "xine");
+  xitk_window_set_window_icon(gGui->imlib_data, fne->xwin, gGui->icon);
 
   fb->gui->x_lock_display (fb->gui->display);
   gc = XCreateGC (fb->gui->display, (xitk_window_get_window(fne->xwin)), None, None);
@@ -1223,8 +1223,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_set_wm_window_type((xitk_window_get_window(fb->xwin)), WINDOW_TYPE_NORMAL);
-  change_class_name((xitk_window_get_window(fb->xwin)));
-  change_icon((xitk_window_get_window(fb->xwin)));
+  xitk_window_set_window_class(gGui->imlib_data, fb->xwin, NULL, "xine");
+  xitk_window_set_window_icon(gGui->imlib_data, fb->xwin, gGui->icon);
 
   fb->directories                = NULL;
   fb->directories_num            = 0;

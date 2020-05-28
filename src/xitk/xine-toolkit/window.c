@@ -483,6 +483,70 @@ void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, const char *t
 }
 
 /*
+ *
+ */
+
+void xitk_set_window_icon(Display *display, Window window, Pixmap icon) {
+
+  XWMHints *wmhints;
+
+  if ((display == NULL) || (window == None)) /* icon == None is valid */
+    return;
+
+  xitk_x_lock_display (display);
+
+  wmhints = XAllocWMHints();
+  if (wmhints) {
+    wmhints->icon_pixmap   = icon;
+    wmhints->flags         = IconPixmapHint;
+    XSetWMHints(display, (window), wmhints);
+    XFree(wmhints);
+  }
+  xitk_x_unlock_display (display);
+}
+
+void xitk_window_set_window_icon(ImlibData *im, xitk_window_t *w, Pixmap icon) {
+
+  if((im == NULL) || (w == NULL))
+    return;
+
+  xitk_set_window_icon(im->x.disp, w->window, icon);
+}
+
+/*
+ *
+ */
+
+void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class) {
+
+  XClassHint xclasshint, new_xclasshint;
+
+  if ((display == NULL) || (window == None))
+    return;
+
+  xitk_x_lock_display (display);
+
+  if ((XGetClassHint(display, (window), &xclasshint)) != 0) {
+    new_xclasshint.res_name  = res_name  ? (char*)res_name  : xclasshint.res_name;
+    new_xclasshint.res_class = res_class ? (char*)res_class : xclasshint.res_class;
+    XSetClassHint(display, window, &new_xclasshint);
+    XFree(xclasshint.res_name);
+    XFree(xclasshint.res_class);
+  }
+
+  xitk_x_unlock_display (display);
+}
+
+void xitk_window_set_window_class(ImlibData *im, xitk_window_t *w, const char *res_name, const char *res_class) {
+
+  if((im == NULL) || (w == NULL))
+    return;
+
+  xitk_set_window_class(im->x.disp, w->window, res_name, res_class);
+}
+
+
+/*
  * Get (safely) window pos.
  */
 void xitk_get_window_position(Display *display, Window window, 

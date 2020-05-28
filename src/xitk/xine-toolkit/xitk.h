@@ -2246,6 +2246,18 @@ void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, const char *t
 /*
  *
  */
+void xitk_set_window_icon(Display *display, Window window, Pixmap icon);
+void xitk_window_set_window_icon(ImlibData *im, xitk_window_t *w, Pixmap icon);
+
+/*
+ *
+ */
+void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class);
+void xitk_window_set_window_class(ImlibData *im, xitk_window_t *w, const char *res_name, const char *res_class);
+
+/*
+ *
+ */
 int xitk_is_window_iconified(Display *display, Window window);
 
 /*
