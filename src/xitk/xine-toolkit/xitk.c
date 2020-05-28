@@ -383,6 +383,7 @@ static void xitk_signal_handler(int sig) {
       xitk_dlist_clear (&xitk->gfxs);
       xitk_config_deinit (xitk->config);
       XITK_FREE (xitk);
+      gXitk = NULL;
       exit(1);
     }
     break;
