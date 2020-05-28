@@ -179,12 +179,14 @@ void setup_show_tips (xui_setup_t *setup, int enabled, unsigned long timeout) {
   }
 }
 
+/*
 void setup_update_tips_timeout (xui_setup_t *setup, unsigned long timeout) {
   if (!setup)
     return;
   if (setup->running)
     xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
 }
+*/
 
 /*
  * return 1 if setup panel is ON

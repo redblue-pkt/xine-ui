@@ -42,7 +42,7 @@ void hide_mrl_browser (xui_mrlb_t *mrlb);
 void show_mrl_browser (xui_mrlb_t *mrlb);
 void set_mrl_browser_transient (xui_mrlb_t *mrlb);
 void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout);
-void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout);
+//void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout);
 void mrl_browser_reparent (xui_mrlb_t *mrlb);
 
 #endif

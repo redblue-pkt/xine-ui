@@ -34,6 +34,6 @@ void event_sender_update_menu_buttons(void);
 void event_sender_send(int event);
 void event_sender_reparent(void);
 void event_sender_show_tips(int enabled, unsigned long timeout);
-void event_sender_update_tips_timeout(unsigned long timeout);
+//void event_sender_update_tips_timeout(unsigned long timeout);
 
 #endif
