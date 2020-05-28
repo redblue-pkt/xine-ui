@@ -974,7 +974,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     setup->xwin = xitk_window_create_dialog_window (setup->gui->imlib_data,
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     win = xitk_window_get_window (setup->xwin);
-    set_window_states_start (win);
+    set_window_states_start (setup->xwin);
 
     setup->gui->x_lock_display (setup->gui->display);
     gc = XCreateGC (setup->gui->display, win, None, None);

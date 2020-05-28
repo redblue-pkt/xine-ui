@@ -470,7 +470,7 @@ void stream_infos_panel(void) {
   sinfos.xwin = xitk_window_create_dialog_window(gui->imlib_data, _("Stream Information"), x, y,
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(sinfos.xwin)));
+  set_window_states_start(sinfos.xwin);
 
   gui->x_lock_display (gui->display);
   gc = XCreateGC(gui->display, 

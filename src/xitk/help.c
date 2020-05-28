@@ -358,7 +358,7 @@ void help_panel(void) {
 						_("Help"), 
 						x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(help->xwin)));
+  set_window_states_start(help->xwin);
 
   gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 

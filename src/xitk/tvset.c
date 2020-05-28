@@ -304,7 +304,7 @@ void tvset_panel(void) {
 						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start((xitk_window_get_window(tvset.xwin)));
+  set_window_states_start(tvset.xwin);
 
   gGui->x_lock_display (gGui->display);
   gc = XCreateGC(gGui->display, 
