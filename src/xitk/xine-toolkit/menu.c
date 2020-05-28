@@ -52,6 +52,7 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   /* HACK: embedded widget list - make sure it is not accidentally (un)listed. */
   xitk_dnode_init (&menu_window->wl.node);
   menu_window->wl.win  = xitk_window_get_window(xwin);
+  menu_window->wl.xitk = gXitk;
 
   menu_attr.override_redirect = True;
 
