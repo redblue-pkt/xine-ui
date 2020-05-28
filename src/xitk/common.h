@@ -420,15 +420,15 @@ struct gGui_st {
 
 extern gGui_t *gGui;
 
-void set_window_states_start(Window window);
-#define set_window_states_start(window)                                   \
+void set_window_states_start(xitk_window_t *xwin);
+#define set_window_states_start(xwin)                                     \
   do {                                                                    \
     if(!video_window_is_visible(gGui->vwin))                              \
-      xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
+      xitk_window_set_wm_window_type((xwin), WINDOW_TYPE_NORMAL);         \
     else                                                                  \
-      xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
-    xitk_set_window_class(gGui->display, (window), NULL, "xine");         \
-    xitk_set_window_icon(gGui->display, (window), gGui->icon);            \
+      xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);       \
+    xitk_window_set_window_class(gGui->imlib_data, (xwin), NULL, "xine"); \
+    xitk_window_set_window_icon(gGui->imlib_data, (xwin), gGui->icon);    \
   } while(0)
 
 void reparent_window(Window window);
