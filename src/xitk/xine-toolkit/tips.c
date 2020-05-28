@@ -37,20 +37,15 @@
 
 struct xitk_tips_s {
   Display             *display;
-  pthread_t            thread;
 
   xitk_widget_t       *widget, *new_widget;
   int                  visible;
   int                  running;
-
-  pthread_mutex_t      mutex;
-
-  pthread_cond_t       new_cond;
-
-  pthread_cond_t       timer_cond;
-
   int                  prewait;
-  pthread_cond_t       prewait_cond;
+
+  pthread_t            thread;
+  pthread_mutex_t      mutex;
+  pthread_cond_t       cond;
 };
 
 static struct timespec _compute_interval(unsigned int millisecs) {
@@ -85,7 +80,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
     if (!tips->new_widget) {
       while (tips->running) {
 	ts = _compute_interval(1000);
-        if (pthread_cond_timedwait(&tips->new_cond, &tips->mutex, &ts) != ETIMEDOUT)
+        if (pthread_cond_timedwait(&tips->cond, &tips->mutex, &ts) != ETIMEDOUT)
 	  break;
       }
     }
@@ -102,7 +97,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
     ts = _compute_interval(500);
     
-    pthread_cond_timedwait (&tips->prewait_cond, &tips->mutex, &ts);
+    pthread_cond_timedwait (&tips->cond, &tips->mutex, &ts);
     
     /* Start over if interrupted */
     if (!tips->prewait)
@@ -220,7 +215,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
       ts = _compute_interval(tips->widget->tips_timeout);
 
-      pthread_cond_timedwait(&tips->timer_cond, &tips->mutex, &ts);
+      pthread_cond_timedwait(&tips->cond, &tips->mutex, &ts);
 
       xitk_window_destroy_window(xwin);
       
@@ -258,11 +253,8 @@ xitk_tips_t *xitk_tips_init(Display *disp) {
     tips->prewait    = 0;
 
     pthread_mutex_init(&tips->mutex, NULL);
+    pthread_cond_init(&tips->cond, NULL);
 
-    pthread_cond_init(&tips->new_cond, NULL);
-    pthread_cond_init(&tips->timer_cond, NULL);
-    pthread_cond_init(&tips->prewait_cond, NULL);
-    
     pthread_attr_init(&pth_attrs);
 
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
@@ -288,14 +280,8 @@ void xitk_tips_stop(xitk_tips_t *tips) {
   
   pthread_mutex_lock(&tips->mutex);
   tips->new_widget = NULL;
-  if (tips->prewait) {
-    tips->prewait = 0;
-    pthread_cond_signal(&tips->prewait_cond);
-  }
-  else if(tips->visible)
-    pthread_cond_signal(&tips->timer_cond);
-  else
-    pthread_cond_signal(&tips->new_cond);
+  tips->prewait = 0;
+  pthread_cond_signal(&tips->cond);
   pthread_mutex_unlock(&tips->mutex);
 
   /* Wait until tips are hidden to avoid a race condition causing a segfault when */
@@ -315,10 +301,7 @@ void xitk_tips_deinit(xitk_tips_t **ptips) {
   *ptips = NULL;
 
   pthread_mutex_destroy(&tips->mutex);
-
-  pthread_cond_destroy(&tips->new_cond);
-  pthread_cond_destroy(&tips->timer_cond);
-  pthread_cond_destroy(&tips->prewait_cond);
+  pthread_cond_destroy(&tips->cond);
 
   free(tips);
 }
@@ -328,14 +311,8 @@ static void _tips_update_widget(xitk_tips_t *tips, xitk_widget_t *w)
   pthread_mutex_lock(&tips->mutex);
   if (tips->running) {
     tips->new_widget = w;
-    if (tips->prewait) {
-      tips->prewait = 0;
-      pthread_cond_signal(&tips->prewait_cond);
-    }
-    else if (tips->visible)
-      pthread_cond_signal(&tips->timer_cond);
-    else if (w)
-      pthread_cond_signal(&tips->new_cond);
+    tips->prewait = 0;
+    pthread_cond_signal(&tips->cond);
   }
   pthread_mutex_unlock(&tips->mutex);
 }
