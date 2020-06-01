@@ -86,7 +86,7 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   if(eventer) {
     if((!old_sticky_value) && gui->eventer_sticky) {
       int  px, py, pw;
-      xitk_get_window_position (gui->display, gui->panel_window, &px, &py, &pw, NULL);
+      panel_get_window_position(gui->panel, &px, &py, &pw, NULL);
       eventer->x = px + pw;
       eventer->y = py;
       xitk_window_move_window (gui->imlib_data, eventer->xwin, eventer->x, eventer->y);
@@ -404,7 +404,7 @@ void event_sender_panel(void) {
   
   if (gGui->eventer_sticky && panel_is_visible (gGui->panel)) {
     int  px, py, pw;
-    xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, NULL);
+    panel_get_window_position(gGui->panel, &px, &py, &pw, NULL);
     eventer->x = px + pw;
     eventer->y = py;
   }

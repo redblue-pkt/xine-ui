@@ -1102,7 +1102,7 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
     if(!visible) { /* Show the panel in taskbar */
       int x = 0, y = 0;
 
-      xitk_get_window_position(gui->display, gui->panel_window, &x, &y, NULL, NULL);
+      panel_get_window_position(gui->panel, &x, &y, NULL, NULL);
       gui->x_lock_display (gui->display);
       XReparentWindow(gui->display, gui->panel_window, gui->imlib_data->x.root, x, y);
       gui->x_unlock_display (gui->display);
