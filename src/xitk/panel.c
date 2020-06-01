@@ -634,7 +634,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
   v = !!event_sender_is_visible ();
   if (lut[v])
-    event_sender_toggle_visibility(NULL, NULL);
+    event_sender_toggle_visibility();
 
   v = !!stream_infos_is_visible ();
   if (lut[v])
@@ -1103,7 +1103,7 @@ static void panel_handle_event(XEvent *event, void *data) {
     if(!kbedit_is_visible())
       kbedit_toggle_visibility(NULL, NULL);
     if(!event_sender_is_visible())
-      event_sender_toggle_visibility(NULL, NULL);
+      event_sender_toggle_visibility();
     if(!stream_infos_is_visible())
       stream_infos_toggle_visibility(NULL, NULL);
     if(!tvset_is_visible())

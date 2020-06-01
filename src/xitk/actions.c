@@ -1166,7 +1166,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
-      event_sender_toggle_visibility(NULL, NULL);
+      event_sender_toggle_visibility();
     if(stream_infos)
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
@@ -1201,7 +1201,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
-      event_sender_toggle_visibility(NULL, NULL);
+      event_sender_toggle_visibility();
     if(stream_infos)
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
@@ -1884,12 +1884,12 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
   
   if (event_sender_is_running() && !event_sender_is_visible())
-    event_sender_toggle_visibility(NULL, NULL);
+    event_sender_toggle_visibility();
   else if(!event_sender_is_running())
     event_sender_panel();
   else {
     if(gui->use_root_window)
-      event_sender_toggle_visibility(NULL, NULL);
+      event_sender_toggle_visibility();
     else
       event_sender_end();
   }
