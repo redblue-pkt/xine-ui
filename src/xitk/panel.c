@@ -35,6 +35,7 @@
 
 struct xui_panel_st {
   gGui_t               *gui;
+  xitk_window_t        *xwin;
 
   xitk_widget_list_t   *widget_list;
 
@@ -207,20 +208,17 @@ static void panel_exit (xitk_widget_t *w, void *data) {
 
     pthread_join(panel->slider_thread, NULL);
 
-    panel->gui->x_lock_display (panel->gui->display);
-    XUnmapWindow (panel->gui->display, panel->gui->panel_window);
-    panel->gui->x_unlock_display (panel->gui->display);
-
-    panel->title_label = 0;
+    panel->title_label = NULL;
     xitk_destroy_widgets(panel->widget_list);
     xitk_button_list_delete (panel->autoplay_buttons);
 
+    xitk_window_destroy_window(panel->gui->imlib_data, panel->xwin);
+    panel->xwin = NULL;
+
     panel->gui->x_lock_display (panel->gui->display);
-    XDestroyWindow (panel->gui->display, panel->gui->panel_window);
     Imlib_destroy_image (panel->gui->imlib_data, panel->bg_image);
     panel->gui->x_unlock_display (panel->gui->display);
 
-    panel->gui->panel_window = None;
     /* xitk_dlist_init (&panel->widget_list->list); */
 
     panel->gui->x_lock_display (panel->gui->display);
@@ -259,15 +257,15 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   hint.width  = new_img->rgb_width;
   hint.height = new_img->rgb_height;
   hint.flags  = PPosition | PSize;
-  XSetWMNormalHints (panel->gui->display, panel->gui->panel_window, &hint);
+  XSetWMNormalHints (panel->gui->display, xitk_window_get_window(panel->xwin), &hint);
   
-  XResizeWindow (panel->gui->display, panel->gui->panel_window,
+  XResizeWindow (panel->gui->display, xitk_window_get_window(panel->xwin),
 		 (unsigned int)new_img->rgb_width,
 		 (unsigned int)new_img->rgb_height);
   
   panel->gui->x_unlock_display (panel->gui->display);
 
-  while (!xitk_is_window_size (panel->gui->display, panel->gui->panel_window, 
+  while (!xitk_is_window_size (panel->gui->display, xitk_window_get_window(panel->xwin),
 			     new_img->rgb_width, new_img->rgb_height)) {
     xine_usec_sleep(10000);
   }
@@ -275,17 +273,17 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   old_img = panel->bg_image;
   panel->bg_image = new_img;
 
-  video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
+  video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
 
   panel->gui->x_lock_display (panel->gui->display);
 
   Imlib_destroy_image (panel->gui->imlib_data, old_img);
-  Imlib_apply_image (panel->gui->imlib_data, new_img, panel->gui->panel_window);
+  Imlib_apply_image (panel->gui->imlib_data, new_img, xitk_window_get_window(panel->xwin));
   
   panel->gui->x_unlock_display (panel->gui->display);
 
   if (panel_is_visible (panel))
-    raise_window (panel->gui->panel_window, 1, 1);
+    raise_window (xitk_window_get_window(panel->xwin), 1, 1);
 
   xitk_skin_unlock (panel->gui->skin_config);
   
@@ -588,9 +586,9 @@ int panel_is_visible (xui_panel_t *panel) {
 
   if(panel) {
     if (panel->gui->use_root_window)
-      return xitk_is_window_visible (panel->gui->display, panel->gui->panel_window);
+      return xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
     else
-      return panel->visible && xitk_is_window_visible (panel->gui->display, panel->gui->panel_window);
+      return panel->visible && xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
   }
 
   return 0;
@@ -601,7 +599,7 @@ int panel_is_visible (xui_panel_t *panel) {
  */
 static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
-  int visible = xitk_is_window_visible (panel->gui->display, panel->gui->panel_window);
+  int visible = xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
   int invisible = !panel->visible || !visible;
   unsigned char lut[2] = {invisible, visible};
   int v;
@@ -663,13 +661,13 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if (video_window_is_visible (panel->gui->vwin)) {
       if (panel->gui->use_root_window) { /* Using root window */
 	if(visible)
-          XIconifyWindow (panel->gui->display, panel->gui->panel_window, panel->gui->screen);
+          XIconifyWindow (panel->gui->display, xitk_window_get_window(panel->xwin), panel->gui->screen);
 	else
-          XMapWindow (panel->gui->display, panel->gui->panel_window);
+          XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
       }
       else {
 	panel->visible = 0;
-        XUnmapWindow (panel->gui->display, panel->gui->panel_window);
+        XUnmapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
         XSync (panel->gui->display, False);
         panel->gui->x_unlock_display (panel->gui->display);
 	xitk_hide_widgets(panel->widget_list);
@@ -678,9 +676,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     }
     else {
       if(visible)
-        XIconifyWindow (panel->gui->display, panel->gui->panel_window, (XDefaultScreen (panel->gui->display)));
+        XIconifyWindow (panel->gui->display, xitk_window_get_window(panel->xwin), (XDefaultScreen (panel->gui->display)));
       else
-        XMapWindow (panel->gui->display, panel->gui->panel_window);
+        XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
     }
 
     panel->gui->x_unlock_display (panel->gui->display);
@@ -726,13 +724,13 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     panel->gui->x_lock_display (panel->gui->display);
     
-    XRaiseWindow (panel->gui->display, panel->gui->panel_window);
-    XMapWindow (panel->gui->display, panel->gui->panel_window);
+    XRaiseWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
+    XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
     panel->gui->x_unlock_display (panel->gui->display);
-    video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
+    video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
 
-    wait_for_window_visible (panel->gui->display, panel->gui->panel_window);
-    layer_above_video (panel->gui->panel_window);
+    wait_for_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
+    layer_above_video (xitk_window_get_window(panel->xwin));
      
     if (panel->gui->cursor_grabbed) {
       panel->gui->x_lock_display (panel->gui->display);
@@ -755,7 +753,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
        ) {
       int x, y, w, h, desktopw, desktoph;
       
-      xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &x, &y, &w, &h);
+      xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &x, &y, &w, &h);
       
       panel->gui->x_lock_display (panel->gui->display);
       desktopw = DisplayWidth (panel->gui->display, panel->gui->screen);
@@ -769,7 +767,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	newy = (desktoph - h) >> 1;
 
         panel->gui->x_lock_display (panel->gui->display);
-        XMoveWindow (panel->gui->display, panel->gui->panel_window, newx, newy);
+        XMoveWindow (panel->gui->display, xitk_window_get_window(panel->xwin), newx, newy);
         panel->gui->x_unlock_display (panel->gui->display);
 
         panel_store_new_position (panel, newx, newy, w, h);
@@ -802,15 +800,15 @@ void panel_raise_window(xui_panel_t *panel)
 {
   if (panel_is_visible (panel))  {
     panel->gui->x_lock_display (panel->gui->display);
-    XRaiseWindow(panel->gui->display, panel->gui->panel_window);
+    XRaiseWindow(panel->gui->display, xitk_window_get_window(panel->xwin));
     panel->gui->x_unlock_display (panel->gui->display);
-    video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
+    video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
   }
 }
 
 void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, int *ph)
 {
-  xitk_get_window_position(gGui->display, gGui->panel_window, px, py, pw, ph);
+  xitk_window_get_window_position(panel->gui->imlib_data, panel->xwin, px, py, pw, ph);
 }
 
 void panel_check_mute (xui_panel_t *panel) {
@@ -922,7 +920,7 @@ static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
   int wx, wy;
 
   (void)w;
-  xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->audiochan_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->audiochan_label));
@@ -935,7 +933,7 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   int wx, wy;
 
   (void)w;
-  xitk_get_window_position (panel->gui->display, panel->gui->panel_window, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->spuid_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->spuid_label));
@@ -1068,7 +1066,7 @@ static void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
   case DestroyNotify:
-    if (panel->gui->panel_window == event->xany.window)
+    if (xitk_window_get_window(panel->xwin) == event->xany.window)
       gui_exit (NULL, panel->gui);
     break;
 
@@ -1217,14 +1215,14 @@ void panel_reparent (xui_panel_t *panel) {
 
       panel_get_window_position(panel, &x, &y, NULL, NULL);
       panel->gui->x_lock_display (panel->gui->display);
-      XReparentWindow(panel->gui->display, panel->gui->panel_window, panel->gui->imlib_data->x.root, x, y);
+      XReparentWindow(panel->gui->display, xitk_window_get_window(panel->xwin), panel->gui->imlib_data->x.root, x, y);
       panel->gui->x_unlock_display (panel->gui->display);
     }
 
-    reparent_window (panel->gui->panel_window);
+    reparent_window (xitk_window_get_window(panel->xwin));
 
     if (video_window_is_visible (panel->gui->vwin)) {
-      layer_above_video(panel->gui->panel_window);
+      layer_above_video(xitk_window_get_window(panel->xwin));
     }
   }
 }
@@ -1235,13 +1233,7 @@ void panel_reparent (xui_panel_t *panel) {
 xui_panel_t *panel_init (gGui_t *gui) {
   xui_panel_t              *panel;
   GC                        gc;
-  XSizeHints                hint;
-  XWMHints                 *wm_hint;
-  XSetWindowAttributes      attr;
   char                     *title = _("xine Panel");
-  Atom                      prop;
-  MWMHints                  mwmhints;
-  XClassHint               *xclasshint;
   xitk_button_widget_t      b;
   xitk_checkbox_widget_t    cb;
   xitk_label_widget_t       lbl;
@@ -1286,14 +1278,14 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * open the panel window
    */
 
-  panel->x = hint.x = xine_config_register_num (panel->gui->xine, "gui.panel_x", 
+  panel->x = xine_config_register_num (panel->gui->xine, "gui.panel_x",
 						200,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
 						CONFIG_LEVEL_DEB,
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
-  panel->y = hint.y = xine_config_register_num (panel->gui->xine, "gui.panel_y",
+  panel->y = xine_config_register_num (panel->gui->xine, "gui.panel_y",
 						100,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
@@ -1301,49 +1293,14 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
 
-  hint.width = panel->bg_image->rgb_width;
-  hint.height = panel->bg_image->rgb_height;
-  hint.flags = PPosition | PSize;
-  
-  attr.override_redirect = False;
-  attr.background_pixel  = panel->gui->black.pixel;
-  /*
-   * XXX:multivis
-   * To avoid BadMatch errors on XCreateWindow:
-   * If the parent and the new window have different depths, we must supply either
-   * a BorderPixmap or a BorderPixel.
-   * If the parent and the new window use different visuals, we must supply a
-   * Colormap
-   */
-  attr.border_pixel      = panel->gui->black.pixel;
+  panel->xwin = xitk_window_create_simple_window(gui->imlib_data, panel->x, panel->y,
+                                                 panel->bg_image->rgb_width,
+                                                 panel->bg_image->rgb_height);
+  xitk_window_set_window_title(gui->imlib_data, panel->xwin, title);
+  xitk_window_set_window_class(gui->imlib_data, panel->xwin, title, "xine");
+  xitk_window_set_window_icon(gui->imlib_data, panel->xwin, gGui->icon);
 
   panel->gui->x_lock_display (panel->gui->display);
-  attr.colormap          = Imlib_get_colormap (panel->gui->imlib_data);
-  /*  
-      printf ("imlib_data: %d visual : %d\n",gui->imlib_data,gui->imlib_data->x.visual);
-      printf ("w : %d h : %d\n",hint.width, hint.height);
-  */
-  
-  panel->gui->panel_window = XCreateWindow (panel->gui->display, panel->gui->imlib_data->x.root,
-    hint.x, hint.y, hint.width, hint.height, 0,
-    panel->gui->imlib_data->x.depth, InputOutput,
-    panel->gui->imlib_data->x.visual,
-    CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
-
-  {
-    /* prevent window manager from killing us through exit() when user closes panel.
-       That wont work with OpenGL* video out because libGL does install an exit handler
-       that calls X functions - while video out loop still tries the same -> deadlock */
-    Atom wm_delete_window = XInternAtom (panel->gui->display, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols (panel->gui->display, panel->gui->panel_window, &wm_delete_window, 1);
-  }
-
-  XmbSetWMProperties (panel->gui->display, panel->gui->panel_window, title, title, NULL, 0,
-                     &hint, NULL, NULL);
-
-  XSelectInput (panel->gui->display, panel->gui->panel_window, INPUT_MOTION | KeymapStateMask);
-  panel->gui->x_unlock_display (panel->gui->display);
-  
   /*
    * The following is more or less a hack to keep the panel window visible
    * with and without focus in windowed and fullscreen mode.
@@ -1352,63 +1309,28 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
   if (!video_window_is_visible (panel->gui->vwin)) {
     if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
-      xitk_unset_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_TOOLBAR);
-    xitk_set_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_NORMAL);
+      xitk_window_unset_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
+    xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_NORMAL);
   } else {
-    xitk_unset_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_NORMAL);
+    xitk_window_unset_wm_window_type (panel->xwin, WINDOW_TYPE_NORMAL);
     if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
-      xitk_set_wm_window_type (panel->gui->panel_window, WINDOW_TYPE_TOOLBAR);
+      xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
   }
   
   if(is_layer_above())
-    xitk_set_layer_above (panel->gui->panel_window);
-  
-  /*
-   * wm, no border please
-   */
-
-  memset(&mwmhints, 0, sizeof(mwmhints));
-  panel->gui->x_lock_display (panel->gui->display);
-  prop = XInternAtom (panel->gui->display, "_MOTIF_WM_HINTS", False);
-  mwmhints.flags = MWM_HINTS_DECORATIONS;
-  mwmhints.decorations = 0;
-
-  XChangeProperty (panel->gui->display, panel->gui->panel_window, prop, prop, 32,
-                  PropModeReplace, (unsigned char *) &mwmhints,
-                  PROP_MWM_HINTS_ELEMENTS);
+    xitk_set_layer_above (xitk_window_get_window(panel->xwin));
   
   panel->gui->x_unlock_display (panel->gui->display);
-  video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
+  video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
   panel->gui->x_lock_display (panel->gui->display);
-
-  /* 
-   * set wm properties 
-   */
-
-  if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = title;
-    xclasshint->res_class = "xine";
-    XSetClassHint (panel->gui->display, panel->gui->panel_window, xclasshint);
-    XFree(xclasshint);
-  }
-
-  wm_hint = XAllocWMHints();
-  if (wm_hint != NULL) {
-    wm_hint->input         = True;
-    wm_hint->initial_state = NormalState;
-    wm_hint->icon_pixmap   = panel->gui->icon;
-    wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
-    XSetWMHints (panel->gui->display, panel->gui->panel_window, wm_hint);
-    XFree(wm_hint);
-  }
 
   /*
    * set background image
    */
   
-  gc = XCreateGC (panel->gui->display, panel->gui->panel_window, 0, 0);
+  gc = XCreateGC (panel->gui->display, xitk_window_get_window(panel->xwin), 0, 0);
 
-  Imlib_apply_image (panel->gui->imlib_data, panel->bg_image, panel->gui->panel_window);
+  Imlib_apply_image (panel->gui->imlib_data, panel->bg_image, xitk_window_get_window(panel->xwin));
   panel->gui->x_unlock_display (panel->gui->display);
 
   /*
@@ -1416,7 +1338,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
 
   panel->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set (panel->widget_list, WIDGET_LIST_WINDOW, (void *)panel->gui->panel_window);
+  xitk_widget_list_set (panel->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window(panel->xwin));
   xitk_widget_list_set(panel->widget_list, WIDGET_LIST_GC, gc);
  
   lbl.window    = (XITK_WIDGET_LIST_WINDOW(panel->widget_list));
@@ -1711,8 +1633,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
   
   if (panel->visible) {
     panel->gui->x_lock_display (panel->gui->display);
-    XRaiseWindow (panel->gui->display, panel->gui->panel_window);
-    XMapWindow (panel->gui->display, panel->gui->panel_window);
+    XRaiseWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
+    XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
     panel->gui->x_unlock_display (panel->gui->display);
   }
   else
@@ -1720,7 +1642,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   
   
   panel->widget_key = xitk_register_event_handler("panel", 
-						  panel->gui->panel_window,
+                                                  xitk_window_get_window(panel->xwin),
 						  panel_handle_event,
 						  panel_store_new_position,
 						  gui_dndcallback,
@@ -1750,7 +1672,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   }
 
   if (panel->visible)
-    try_to_set_input_focus (panel->gui->panel_window);
+    try_to_set_input_focus (xitk_window_get_window(panel->xwin));
 
   panel->gui->panel = panel;
   return panel;
