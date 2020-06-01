@@ -808,6 +808,11 @@ void panel_raise_window(xui_panel_t *panel)
   }
 }
 
+void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, int *ph)
+{
+  xitk_get_window_position(gGui->display, gGui->panel_window, px, py, pw, ph);
+}
+
 void panel_check_mute (xui_panel_t *panel) {
   xitk_checkbox_set_state (panel->mixer.mute, panel->gui->mixer.mute);
 }
