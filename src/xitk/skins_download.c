@@ -741,8 +741,8 @@ void download_skin(char *url) {
 							NULL);
     
     xitk_window_show_window(skdloader.xwin);
-    video_window_set_transient_for (gui->vwin, xitk_window_get_window(skdloader.xwin));
-    layer_above_video(xitk_window_get_window(skdloader.xwin));
+    video_window_set_transient_for (gui->vwin, skdloader.xwin);
+    layer_above_video(skdloader.xwin);
 
     try_to_set_input_focus(xitk_window_get_window(skdloader.xwin));
     download_update_blank_preview();

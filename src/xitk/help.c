@@ -289,7 +289,7 @@ static void help_handle_event(XEvent *event, void *data) {
 
 void help_raise_window(void) {
   if(help != NULL)
-    raise_window(xitk_window_get_window(help->xwin), help->visible, help->running);
+    raise_window(help->xwin, help->visible, help->running);
 }
 
 void help_end(void) {
@@ -318,13 +318,12 @@ int help_is_visible(void) {
 
 void help_toggle_visibility (xitk_widget_t *w, void *data) {
   if(help != NULL)
-    toggle_window(xitk_window_get_window(help->xwin), help->widget_list, 
-		  &help->visible, help->running);
+    toggle_window(help->xwin, help->widget_list, &help->visible, help->running);
 }
 
 void help_reparent(void) {
   if(help)
-    reparent_window((xitk_window_get_window(help->xwin)));
+    reparent_window(help->xwin);
 }
 
 void help_panel(void) {

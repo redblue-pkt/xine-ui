@@ -535,7 +535,7 @@ int kbedit_is_visible(void) {
 void kbedit_raise_window(void) {
   
   if(kbedit != NULL)
-    raise_window(xitk_window_get_window(kbedit->xwin), kbedit->visible, kbedit->running);
+    raise_window(kbedit->xwin, kbedit->visible, kbedit->running);
 }
 
 /*
@@ -543,8 +543,7 @@ void kbedit_raise_window(void) {
  */
 void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
   if(kbedit != NULL)
-    toggle_window(xitk_window_get_window(kbedit->xwin), kbedit->widget_list,
-		  &kbedit->visible, kbedit->running);
+    toggle_window(kbedit->xwin, kbedit->widget_list, &kbedit->visible, kbedit->running);
 }
 
 static void kbedit_create_browser_entries(void) {
@@ -1076,7 +1075,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
 
 void kbedit_reparent(void) {
   if(kbedit)
-    reparent_window((xitk_window_get_window(kbedit->xwin)));
+    reparent_window(kbedit->xwin);
 }
 
 /*

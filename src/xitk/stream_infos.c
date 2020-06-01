@@ -343,12 +343,11 @@ void stream_infos_toggle_auto_update(void) {
 }
 
 void stream_infos_raise_window(void) {
-    raise_window(xitk_window_get_window(sinfos.xwin), sinfos.visible, sinfos.running);
+    raise_window(sinfos.xwin, sinfos.visible, sinfos.running);
 }
 
 void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
-    toggle_window(xitk_window_get_window(sinfos.xwin), sinfos.widget_list, 
-		  &sinfos.visible, sinfos.running);
+    toggle_window(sinfos.xwin, sinfos.widget_list, &sinfos.visible, sinfos.running);
 }
 
 void stream_infos_end(void) {
@@ -438,7 +437,7 @@ void stream_infos_update_infos(void) {
 }
 
 void stream_infos_reparent(void) {
-    reparent_window((xitk_window_get_window(sinfos.xwin)));
+    reparent_window(sinfos.xwin);
 }
 
 void stream_infos_panel(void) {

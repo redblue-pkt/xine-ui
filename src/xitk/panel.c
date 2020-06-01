@@ -273,7 +273,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   old_img = panel->bg_image;
   panel->bg_image = new_img;
 
-  video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
+  video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   panel->gui->x_lock_display (panel->gui->display);
 
@@ -283,7 +283,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   panel->gui->x_unlock_display (panel->gui->display);
 
   if (panel_is_visible (panel))
-    raise_window (xitk_window_get_window(panel->xwin), 1, 1);
+    raise_window (panel->xwin, 1, 1);
 
   xitk_skin_unlock (panel->gui->skin_config);
   
@@ -723,10 +723,10 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     xitk_show_widgets(panel->widget_list);
 
     xitk_window_show_window(panel->xwin);
-    video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
+    video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
     wait_for_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
-    layer_above_video (xitk_window_get_window(panel->xwin));
+    layer_above_video (panel->xwin);
      
     if (panel->gui->cursor_grabbed) {
       panel->gui->x_lock_display (panel->gui->display);
@@ -798,7 +798,7 @@ void panel_raise_window(xui_panel_t *panel)
     panel->gui->x_lock_display (panel->gui->display);
     XRaiseWindow(panel->gui->display, xitk_window_get_window(panel->xwin));
     panel->gui->x_unlock_display (panel->gui->display);
-    video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
+    video_window_set_transient_for (panel->gui->vwin, panel->xwin);
   }
 }
 
@@ -1215,10 +1215,10 @@ void panel_reparent (xui_panel_t *panel) {
       panel->gui->x_unlock_display (panel->gui->display);
     }
 
-    reparent_window (xitk_window_get_window(panel->xwin));
+    reparent_window (panel->xwin);
 
     if (video_window_is_visible (panel->gui->vwin)) {
-      layer_above_video(xitk_window_get_window(panel->xwin));
+      layer_above_video(panel->xwin);
     }
   }
 }
@@ -1296,7 +1296,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
   xitk_window_set_window_class(panel->xwin, title, "xine");
   xitk_window_set_window_icon(panel->xwin, gGui->icon);
 
-  panel->gui->x_lock_display (panel->gui->display);
   /*
    * The following is more or less a hack to keep the panel window visible
    * with and without focus in windowed and fullscreen mode.
@@ -1315,17 +1314,15 @@ xui_panel_t *panel_init (gGui_t *gui) {
   
   if(is_layer_above())
     xitk_set_layer_above (xitk_window_get_window(panel->xwin));
-  
-  panel->gui->x_unlock_display (panel->gui->display);
-  video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
-  panel->gui->x_lock_display (panel->gui->display);
+
+  video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   /*
    * set background image
    */
-  
-  gc = XCreateGC (panel->gui->display, xitk_window_get_window(panel->xwin), 0, 0);
 
+  panel->gui->x_lock_display (panel->gui->display);
+  gc = XCreateGC (panel->gui->display, xitk_window_get_window(panel->xwin), 0, 0);
   Imlib_apply_image (panel->gui->imlib_data, panel->bg_image, xitk_window_get_window(panel->xwin));
   panel->gui->x_unlock_display (panel->gui->display);
 

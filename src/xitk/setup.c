@@ -214,10 +214,8 @@ int setup_is_visible (xui_setup_t *setup) {
  * Raise setup->xwin
  */
 void setup_raise_window (xui_setup_t *setup) {
-  if (!setup)
-    return;
-  if (setup->running)
-    raise_window (xitk_window_get_window (setup->xwin), setup->visible, setup->running);
+  if (setup && setup->running)
+    raise_window (setup->xwin, setup->visible, setup->running);
 }
 
 /*
@@ -226,11 +224,8 @@ void setup_raise_window (xui_setup_t *setup) {
 void setup_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_setup_t *setup = data;
   (void)w;
-  if (!setup)
-    return;
-  if (setup->running)
-    toggle_window (xitk_window_get_window (setup->xwin), setup->widget_list,
-      &setup->visible, setup->running);
+  if (setup && setup->running)
+    toggle_window (setup->xwin, setup->widget_list, &setup->visible, setup->running);
 }
 
 static void setup_apply (xitk_widget_t *w, void *data) {
@@ -939,7 +934,7 @@ void setup_reparent (xui_setup_t *setup) {
   if (!setup)
     return;
   if (setup->running)
-    reparent_window ((xitk_window_get_window (setup->xwin)));
+    reparent_window (setup->xwin);
 }
 
 /*
@@ -959,7 +954,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui = gui;
 
   {
-    Window win;
     GC gc;
     int x, y;
 
@@ -970,15 +964,14 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     /* Create window */
     setup->xwin = xitk_window_create_dialog_window (setup->gui->imlib_data,
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-    win = xitk_window_get_window (setup->xwin);
     set_window_states_start (setup->xwin);
 
     setup->gui->x_lock_display (setup->gui->display);
-    gc = XCreateGC (setup->gui->display, win, None, None);
+    gc = XCreateGC (setup->gui->display, xitk_window_get_window (setup->xwin), None, None);
     setup->gui->x_unlock_display (setup->gui->display);
 
     setup->widget_list = xitk_widget_list_new ();
-    xitk_widget_list_set (setup->widget_list, WIDGET_LIST_WINDOW, (void *)win);
+    xitk_widget_list_set (setup->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window (setup->xwin));
     xitk_widget_list_set (setup->widget_list, WIDGET_LIST_GC, gc);
 
     fs = xitk_font_load_font (setup->gui->display, fontname);

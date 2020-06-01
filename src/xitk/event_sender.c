@@ -357,13 +357,12 @@ int event_sender_is_running(void) {
 
 void event_sender_raise_window(void) {
   if(eventer != NULL)
-    raise_window(xitk_window_get_window(eventer->xwin), eventer->visible, eventer->running);
+    raise_window(eventer->xwin, eventer->visible, eventer->running);
 }
 
 void event_sender_toggle_visibility(void) {
   if(eventer != NULL)
-    toggle_window(xitk_window_get_window(eventer->xwin), eventer->widget_list,
-		  &eventer->visible, eventer->running);
+    toggle_window(eventer->xwin, eventer->widget_list, &eventer->visible, eventer->running);
 }
 
 void event_sender_move(int x, int y) {
@@ -385,7 +384,7 @@ void event_sender_end(void) {
 
 void event_sender_reparent(void) {
   if(eventer)
-    reparent_window((xitk_window_get_window(eventer->xwin)));
+    reparent_window(eventer->xwin);
 }
 
 void event_sender_panel(void) {

@@ -226,12 +226,11 @@ int tvset_is_running(void) {
 }
 
 void tvset_raise_window(void) {
-    raise_window(xitk_window_get_window(tvset.xwin), tvset.visible, tvset.running);
+    raise_window(tvset.xwin, tvset.visible, tvset.running);
 }
 
 void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
-    toggle_window(xitk_window_get_window(tvset.xwin), tvset.widget_list,
-		  &tvset.visible, tvset.running);
+    toggle_window(tvset.xwin, tvset.widget_list, &tvset.visible, tvset.running);
 }
 
 void tvset_end(void) {
@@ -268,7 +267,7 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
 
 
 void tvset_reparent(void) {
-    reparent_window((xitk_window_get_window(tvset.xwin)));
+    reparent_window(tvset.xwin);
 }
 
 void tvset_panel(void) {

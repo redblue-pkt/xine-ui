@@ -325,7 +325,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   set_window_states_start(vctrl->xwin);
 
   if (is_layer_above ())
-    xitk_set_layer_above (xitk_window_get_window(vctrl->xwin));
+    xitk_window_set_layer_above (vctrl->xwin);
 
   vctrl->gui->x_lock_display (vctrl->gui->display);
   gc = XCreateGC (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), 0, 0);
@@ -594,7 +594,7 @@ void control_raise_window (xui_vctrl_t *vctrl) {
   if (vctrl && (vctrl->status >= 2)) {
     int visible = vctrl->status - 2;
 
-    raise_window (xitk_window_get_window(vctrl->xwin), visible, 1);
+    raise_window (vctrl->xwin, visible, 1);
   }
 }
 
@@ -615,7 +615,7 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
         return;
     }
     visible = vctrl->status - 2;
-    toggle_window (xitk_window_get_window(vctrl->xwin), vctrl->widget_list, &visible, 1);
+    toggle_window (vctrl->xwin, vctrl->widget_list, &visible, 1);
     vctrl->status = visible + 2;
   }
 }
@@ -640,7 +640,7 @@ void control_toggle_window (xitk_widget_t *w, void *data) {
         vctrl_open_window (vctrl);
       } else {
         int visible = 0;
-        toggle_window (xitk_window_get_window(vctrl->xwin), vctrl->widget_list, &visible, 1);
+        toggle_window (vctrl->xwin, vctrl->widget_list, &visible, 1);
         vctrl->status = visible + 2;
       }
     } else {
@@ -686,7 +686,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     old_img = vctrl->bg_image;
     vctrl->bg_image = new_img;
 
-    video_window_set_transient_for (vctrl->gui->vwin, xitk_window_get_window(vctrl->xwin));
+    video_window_set_transient_for (vctrl->gui->vwin, vctrl->xwin);
 
     vctrl->gui->x_lock_display (vctrl->gui->display);
     Imlib_destroy_image (vctrl->gui->imlib_data, old_img);
@@ -731,6 +731,6 @@ void control_deinit (xui_vctrl_t *vctrl) {
 
 void control_reparent (xui_vctrl_t *vctrl) {
   if (vctrl && vctrl->xwin)
-    reparent_window((xitk_window_get_window(vctrl->xwin)));
+    reparent_window(vctrl->xwin);
 }
 
