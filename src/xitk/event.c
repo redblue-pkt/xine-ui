@@ -1304,14 +1304,6 @@ void gui_handle_event (XEvent *event, void *data) {
     gui->x_unlock_display (gui->display);
     break;
 
-  case DestroyNotify:
-    if(event->xany.window == gui->panel_window
-       || event->xany.window == gui->video_window) {
-      xine_exit (gui->xine);
-      gui->running = 0;
-    }
-    break;
-    
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     /* printf ("ButtonPress\n"); */
