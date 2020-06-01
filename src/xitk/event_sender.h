@@ -28,7 +28,7 @@ void event_sender_end(void);
 void event_sender_move(int x, int y);
 int event_sender_is_visible(void);
 int event_sender_is_running(void);
-void event_sender_toggle_visibility(xitk_widget_t *, void *);
+void event_sender_toggle_visibility(void);
 void event_sender_raise_window(void);
 void event_sender_update_menu_buttons(void);
 void event_sender_send(int event);

@@ -351,7 +351,7 @@ void event_sender_raise_window(void) {
     raise_window(xitk_window_get_window(eventer->xwin), eventer->visible, eventer->running);
 }
 
-void event_sender_toggle_visibility(xitk_widget_t *w, void *data) {
+void event_sender_toggle_visibility(void) {
   if(eventer != NULL)
     toggle_window(xitk_window_get_window(eventer->xwin), eventer->widget_list,
 		  &eventer->visible, eventer->running);
