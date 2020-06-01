@@ -692,7 +692,7 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&kbedit->kreg);
     
     xitk_destroy_widgets(kbedit->widget_list);
-    xitk_window_destroy_window(gui->imlib_data, kbedit->xwin);
+    xitk_window_destroy_window(kbedit->xwin);
     
     kbedit->xwin = NULL;
     /* xitk_dlist_init (&kbedit->widget_list->list); */
@@ -989,7 +989,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   
   xitk_labelbutton_change_label(kbedit->grab, olbl);
 
-  xitk_window_destroy_window(gui->imlib_data, xwin);
+  xitk_window_destroy_window(xwin);
   
   gui->x_lock_display (gui->display);
   XSync(gui->display, False);
@@ -1166,8 +1166,7 @@ void kbedit_window(void) {
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
 
-  xitk_window_change_background(gui->imlib_data, kbedit->xwin, bg->pixmap,
-				WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background(kbedit->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
 

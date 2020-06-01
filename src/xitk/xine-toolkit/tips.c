@@ -199,7 +199,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, (height - image->height)>>1);
         XUNLOCK (xitk_x_unlock_display, tips.display);
 
-	xitk_window_change_background(tips.widget->imlibdata, xwin, bg->pixmap, width, height);
+        xitk_window_change_background(xwin, bg->pixmap, width, height);
 	
 	xitk_image_destroy_xitk_pixmap(bg);
 	
@@ -218,7 +218,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
       pthread_cond_timedwait(&tips.timer_cond, &tips.mutex, &ts);
 
-      xitk_window_destroy_window(tips.widget->imlibdata, xwin);
+      xitk_window_destroy_window(xwin);
       
       /* We are flushing here, otherwise tips window will stay displayed */
       XLOCK (xitk_x_lock_display, tips.display);

@@ -395,7 +395,7 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
     xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_unchecked);
   if ((*mw)->bevel_checked)
     xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_checked);
-  xitk_window_destroy_window((*mw)->im, (*mw)->xwin);
+  xitk_window_destroy_window((*mw)->xwin);
   (*mw)->xwin = NULL;
   /* xitk_dlist_init (&(*mw)->wl.list); */
 
@@ -542,8 +542,7 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
       if(!_menu_branch_is_in_curbranch(me->branch)) {
 	int   wx = 0, wy = 0, x = 0, y = 0;
 	
-	xitk_window_get_window_position(private_data->imlibdata, 
-					me->menu_window->xwin, &wx, &wy, NULL, NULL);
+        xitk_window_get_window_position(me->menu_window->xwin, &wx, &wy, NULL, NULL);
 	xitk_get_widget_pos(me->button, &x, &y);
 	
 	x += (xitk_get_widget_width(me->button)) + wx;
@@ -986,8 +985,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   }
   
   if(bg) {
-    xitk_window_change_background(private_data->imlibdata, xwin, 
-				  bg->pixmap, bg->width, bg->height);
+    xitk_window_change_background(xwin, bg->pixmap, bg->width, bg->height);
     xitk_image_destroy_xitk_pixmap(bg);
   }
 

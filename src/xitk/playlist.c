@@ -480,7 +480,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       if(w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
 	int wx, wy;
 
-        xitk_window_get_window_position(gui->imlib_data, playlist->xwin, &wx, &wy, NULL, NULL);
+        xitk_window_get_window_position(playlist->xwin, &wx, &wy, NULL, NULL);
 
         playlist_menu (gui, playlist->widget_list,
 		      bevent->x + wx, bevent->y + wy, 
@@ -730,7 +730,7 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(playlist->widget_list);
     xitk_button_list_delete (playlist->autoplay_buttons);
 
-    xitk_window_destroy_window(gui->imlib_data, playlist->xwin);
+    xitk_window_destroy_window(playlist->xwin);
     playlist->xwin = NULL;
 
     gui->x_lock_display (gui->display);
@@ -1048,7 +1048,7 @@ void playlist_editor(void) {
   playlist->xwin = xitk_window_create_simple_window(gui->imlib_data, x, y,
                                                     playlist->bg_image->rgb_width,
                                                     playlist->bg_image->rgb_height);
-  xitk_window_set_window_title(gui->imlib_data, playlist->xwin, title);
+  xitk_window_set_window_title(playlist->xwin, title);
 
   set_window_states_start(playlist->xwin);
 

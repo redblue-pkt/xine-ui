@@ -179,7 +179,7 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&tvset.widget_key);
 
     xitk_destroy_widgets(tvset.widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, tvset.xwin);
+    xitk_window_destroy_window(tvset.xwin);
 
     tvset.xwin = NULL;
     /* xitk_dlist_init (&tvset.widget_list->list); */
@@ -500,7 +500,7 @@ void tvset_panel(void) {
   xitk_add_widget (tvset.widget_list, widget);
   xitk_enable_and_show_widget(widget);
   
-  xitk_window_change_background(gGui->imlib_data, tvset.xwin, bg->pixmap, width, height);
+  xitk_window_change_background(tvset.xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
   tvset.widget_key = xitk_register_event_handler("tvset", 

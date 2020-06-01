@@ -242,7 +242,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
       xitk_image_free_image(gGui->imlib_data, &skdloader.preview_image);
     
     xitk_destroy_widgets(skdloader.widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, skdloader.xwin);
+    xitk_window_destroy_window(skdloader.xwin);
     
     skdloader.xwin = NULL;
     
@@ -700,7 +700,7 @@ void download_skin(char *url) {
     draw_rectangular_inner_box (gui->imlib_data, bg, x, y,
       (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
     
-    xitk_window_change_background (gui->imlib_data, skdloader.xwin, bg->pixmap, width, height);
+    xitk_window_change_background (skdloader.xwin, bg->pixmap, width, height);
     xitk_image_destroy_xitk_pixmap(bg);
 
     y = WINDOW_HEIGHT - (23 + 15);

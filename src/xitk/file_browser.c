@@ -248,7 +248,7 @@ static void fne_destroy(filename_editor_t *fne) {
     xitk_unregister_event_handler(&fne->widget_key);
 
     xitk_destroy_widgets(fne->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, fne->xwin);
+    xitk_window_destroy_window(fne->xwin);
 
     fne->xwin = NULL;
     /* xitk_dlist_init (&fne->widget_list->list); */
@@ -315,8 +315,8 @@ static void fb_create_input_window(char *title, char *text,
   fne->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, title, x, y, width, height);
 
   xitk_window_set_wm_window_type(fne->xwin, WINDOW_TYPE_NORMAL);
-  xitk_window_set_window_class(gGui->imlib_data, fne->xwin, NULL, "xine");
-  xitk_window_set_window_icon(gGui->imlib_data, fne->xwin, gGui->icon);
+  xitk_window_set_window_class(fne->xwin, NULL, "xine");
+  xitk_window_set_window_icon(fne->xwin, gGui->icon);
 
   fb->gui->x_lock_display (fb->gui->display);
   gc = XCreateGC (fb->gui->display, (xitk_window_get_window(fne->xwin)), None, None);
@@ -906,7 +906,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&fb->widget_key);
 
     xitk_destroy_widgets(fb->widget_list);
-    xitk_window_destroy_window (fb->gui->imlib_data, fb->xwin);
+    xitk_window_destroy_window (fb->xwin);
 
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
@@ -1223,8 +1223,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_window_set_wm_window_type(fb->xwin, WINDOW_TYPE_NORMAL);
-  xitk_window_set_window_class(gGui->imlib_data, fb->xwin, NULL, "xine");
-  xitk_window_set_window_icon(gGui->imlib_data, fb->xwin, gGui->icon);
+  xitk_window_set_window_class(fb->xwin, NULL, "xine");
+  xitk_window_set_window_icon(fb->xwin, gGui->icon);
 
   fb->directories                = NULL;
   fb->directories_num            = 0;
@@ -1603,7 +1603,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->close);
   xitk_enable_and_show_widget(fb->close);
 
-  xitk_window_change_background (fb->gui->imlib_data, fb->xwin, bg->pixmap, width, height);
+  xitk_window_change_background (fb->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
 

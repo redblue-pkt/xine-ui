@@ -271,7 +271,7 @@ static void control_handle_event(XEvent *event, void *data) {
     if(bevent->button == Button3) {
       int wx, wy;
       
-      xitk_window_get_window_position (vctrl->gui->imlib_data, vctrl->xwin, &wx, &wy, NULL, NULL);
+      xitk_window_get_window_position (vctrl->xwin, &wx, &wy, NULL, NULL);
       control_menu (vctrl->gui, vctrl->widget_list, bevent->x + wx, bevent->y + wy);
     }
   }
@@ -320,7 +320,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   vctrl->xwin = xitk_window_create_simple_window(vctrl->gui->imlib_data, x + 100, y + 100,
                                                  vctrl->bg_image->rgb_width, vctrl->bg_image->rgb_height);
-  xitk_window_set_window_title(vctrl->gui->imlib_data, vctrl->xwin, _(title));
+  xitk_window_set_window_title(vctrl->xwin, _(title));
 
   set_window_states_start(vctrl->xwin);
 
@@ -463,7 +463,7 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
 
     xitk_destroy_widgets (vctrl->widget_list);
 
-    xitk_window_destroy_window(gGui->imlib_data, vctrl->xwin);
+    xitk_window_destroy_window(vctrl->xwin);
     vctrl->xwin = NULL;
 
     vctrl->gui->x_lock_display (vctrl->gui->display);

@@ -3054,7 +3054,7 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&mmkeditor.widget_key);
     
     xitk_destroy_widgets(mmkeditor.widget_list);
-    xitk_window_destroy_window(gui->imlib_data, mmkeditor.xwin);
+    xitk_window_destroy_window(mmkeditor.xwin);
     
     mmkeditor.xwin = NULL;
     /* xitk_dlist_init (&mmkeditor.widget_list.list); */
@@ -3469,7 +3469,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(b);
   mmk_editor_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
-  xitk_window_change_background(gui->imlib_data, mmkeditor.xwin, bg->pixmap, width, height);
+  xitk_window_change_background(mmkeditor.xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
   mmkeditor.widget_key = xitk_register_event_handler("mmkeditor", 
