@@ -282,8 +282,6 @@ struct gGui_st {
   int                       cursor_visible;
   int                       cursor_grabbed;
 
-  Window                    panel_window;
-
   uint32_t                  debug_level;
 
   int                       is_display_mrl;
