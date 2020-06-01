@@ -1108,10 +1108,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #endif
   }
 
-  /* Update WM_TRANSIENT_FOR hints on other windows for the new video_window */
-  if ((vwin->gui->panel_window != None) && (!vwin->gui->use_root_window))
-    XSetTransientForHint (vwin->gui->video_display, vwin->gui->panel_window,vwin->gui->video_window);
-
   /* The old window should be destroyed now */
   if(old_video_window != None) {
     XDestroyWindow (vwin->gui->video_display, old_video_window);
