@@ -1245,13 +1245,8 @@ void gui_toggle_aspect(int aspect) {
   
   osd_display_info(_("Aspect ratio: %s"), 
 		   ratios[xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
-  
-  if (panel_is_visible (gui->panel))  {
-    gui->x_lock_display (gui->display);
-    XRaiseWindow(gui->display, gui->panel_window);
-    gui->x_unlock_display (gui->display);
-    video_window_set_transient_for (gui->vwin, gui->panel_window);
-  }
+
+  panel_raise_window(gui->panel);
 }
 
 void gui_toggle_interlaced(void) {
@@ -1259,13 +1254,8 @@ void gui_toggle_interlaced(void) {
   gui->deinterlace_enable = !gui->deinterlace_enable;
   osd_display_info(_("Deinterlace: %s"), (gui->deinterlace_enable) ? _("enabled") : _("disabled"));
   post_deinterlace();
-  
-  if (panel_is_visible (gui->panel))  {
-    gui->x_lock_display (gui->display);
-    XRaiseWindow(gui->display, gui->panel_window);
-    gui->x_unlock_display (gui->display);
-    video_window_set_transient_for (gui->vwin, gui->panel_window);
-  }
+
+  panel_raise_window(gui->panel);
 }
 
 void gui_direct_change_audio_channel (xitk_widget_t *w, void *data, int value) {
@@ -2135,13 +2125,8 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
 		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_X) + zoom_dx);
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y,
 		 xine_get_param(gui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
-  
-  if (panel_is_visible (gui->panel))  {
-    gui->x_lock_display (gui->display);
-    XRaiseWindow(gui->display, gui->panel_window);
-    gui->x_unlock_display (gui->display);
-    video_window_set_transient_for (gui->vwin, gui->panel_window);
-  }
+
+  panel_raise_window(gui->panel);
 }
 
 /*
@@ -2152,13 +2137,8 @@ void gui_reset_zoom(void) {
 
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_X, 100);
   xine_set_param(gui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
-  
-  if (panel_is_visible (gui->panel))  {
-    gui->x_lock_display (gui->display);
-    XRaiseWindow(gui->display, gui->panel_window);
-    gui->x_unlock_display (gui->display);
-    video_window_set_transient_for (gui->vwin, gui->panel_window);
-  }
+
+  panel_raise_window(gui->panel);
 }
 
 /* 
