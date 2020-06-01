@@ -798,6 +798,16 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   config_update_num ("gui.panel_visible", panel->visible);
 }
 
+void panel_raise_window(xui_panel_t *panel)
+{
+  if (panel_is_visible (panel))  {
+    panel->gui->x_lock_display (panel->gui->display);
+    XRaiseWindow(panel->gui->display, panel->gui->panel_window);
+    panel->gui->x_unlock_display (panel->gui->display);
+    video_window_set_transient_for (panel->gui->vwin, panel->gui->panel_window);
+  }
+}
+
 void panel_check_mute (xui_panel_t *panel) {
   xitk_checkbox_set_state (panel->mixer.mute, panel->gui->mixer.mute);
 }

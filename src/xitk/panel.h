@@ -35,6 +35,7 @@ void enable_playback_controls (xui_panel_t *panel, int enable);
 void panel_show_tips (xui_panel_t *panel);
 int panel_get_tips_enable (xui_panel_t *panel);
 unsigned long panel_get_tips_timeout (xui_panel_t *panel);
+void panel_raise_window(xui_panel_t *panel);
 
 void panel_deinit (xui_panel_t *panel);
 xui_panel_t *panel_init (gGui_t *gui);
