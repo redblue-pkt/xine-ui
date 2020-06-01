@@ -30,10 +30,10 @@
 #define GUI_PREV     2
 #define GUI_RESET    3
 
-void reparent_window(Window window);
+void reparent_window(xitk_window_t *xwin);
 void reparent_all_windows(void);
-void raise_window(Window window, int visible, int running);
-void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running);
+void raise_window(xitk_window_t *xwin, int visible, int running);
+void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running);
 
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
 void wait_for_window_visible(Display *display, Window window);
@@ -86,7 +86,7 @@ void gui_vpp_show(xitk_widget_t *w, void *data);
 void gui_vpp_enable(void);
 int is_layer_above(void);
 void change_audio_vol(int value);
-void layer_above_video(Window w);
+void layer_above_video(xitk_window_t *xwin);
 int get_layer_above_video (gGui_t *gui);
 void gui_increase_audio_volume(void);
 void gui_decrease_audio_volume(void);

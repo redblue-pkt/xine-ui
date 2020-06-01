@@ -95,52 +95,52 @@ void wait_for_window_visible(Display *display, Window window) {
     xine_usec_sleep(5000);
 }
 
-void raise_window(Window window, int visible, int running) {
-  if(window) {
-    if(visible && running) {
-      reparent_window(window);
-      layer_above_video(window);
-    }
+void raise_window(xitk_window_t *xwin, int visible, int running) {
+  if (xwin && visible && running) {
+    reparent_window(xwin);
+    layer_above_video(xwin);
   }
 }
 
-void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
+void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running) {
   gGui_t *gui = gGui;
+  Window window;
+
+  if (!xwin)
+    return;
+  window = xitk_window_get_window(xwin);
+
   if(window && (*visible) && running) {
 
-    gui->x_lock_display (gui->display);
     if(gui->use_root_window) {
-      if(xitk_is_window_visible(gui->display, window))
+      gui->x_lock_display (gui->display);
+      if (xitk_window_is_window_visible(xwin))
         XIconifyWindow(gui->display, window, gui->screen);
       else
 	XMapWindow(gui->display, window);
+      gui->x_unlock_display (gui->display);
     }
-    else if(!xitk_is_window_visible(gui->display, window)) {
+    else if (!xitk_window_is_window_visible(xwin)) {
       /* Obviously user has iconified the window, let it be */
     }
     else {
       *visible = 0;
-      gui->x_unlock_display (gui->display);
       xitk_hide_widgets(widget_list);
       gui->x_lock_display (gui->display);
       XUnmapWindow(gui->display, window);
+      gui->x_unlock_display (gui->display);
     }
-    gui->x_unlock_display (gui->display);
-
   }
   else {
     if(running) {
       *visible = 1;
       xitk_show_widgets(widget_list);
 
-      gui->x_lock_display (gui->display);
-      XRaiseWindow(gui->display, window);
-      XMapWindow(gui->display, window);
-      gui->x_unlock_display (gui->display);
-      video_window_set_transient_for (gui->vwin, window);
+      xitk_window_show_window(xwin);
+      video_window_set_transient_for (gui->vwin, xwin);
 
       wait_for_window_visible(gui->display, window);
-      layer_above_video(window);
+      layer_above_video(xwin);
     }
   }
 }
@@ -1996,7 +1996,7 @@ int is_layer_above(void) {
  * set window layer property to something above GNOME (and KDE?) panel
  * (reset to normal if do_raise == 0)
  */
-void layer_above_video(Window w) {
+void layer_above_video(xitk_window_t *xwin) {
   int layer = 10;
   
   if(!(is_layer_above()))
@@ -2012,7 +2012,7 @@ void layer_above_video(Window w) {
       layer = 4;
   }
   
-  xitk_set_window_layer(w, layer);
+  xitk_window_set_window_layer(xwin, layer);
 }
 
 int get_layer_above_video (gGui_t *gui) {

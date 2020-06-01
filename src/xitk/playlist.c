@@ -838,7 +838,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 void playlist_raise_window(void) {
   
   if(playlist != NULL) {
-    raise_window(xitk_window_get_window(playlist->xwin), playlist->visible, playlist->running);
+    raise_window(playlist->xwin, playlist->visible, playlist->running);
     mmk_editor_raise_window();
   }
 }
@@ -849,8 +849,7 @@ void playlist_raise_window(void) {
 void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if(playlist != NULL) {
-    toggle_window(xitk_window_get_window(playlist->xwin), playlist->widget_list,
-		  &playlist->visible, playlist->running);
+    toggle_window(playlist->xwin, playlist->widget_list, &playlist->visible, playlist->running);
     mmk_editor_toggle_visibility();
   }
 }
@@ -945,7 +944,7 @@ void playlist_change_skins(int synthetic) {
     old_img = playlist->bg_image;
     playlist->bg_image = new_img;
 
-    video_window_set_transient_for (gui->vwin, xitk_window_get_window(playlist->xwin));
+    video_window_set_transient_for (gui->vwin, playlist->xwin);
 
     gui->x_lock_display (gui->display);
     Imlib_destroy_image(gui->imlib_data, old_img);
@@ -981,7 +980,7 @@ void playlist_deinit(void) {
 
 void playlist_reparent(void) {
   if (playlist && playlist->xwin)
-    reparent_window(xitk_window_get_window(playlist->xwin));
+    reparent_window(playlist->xwin);
 }
 
 /*

@@ -1108,7 +1108,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     pp_wrapper->pplugin->help_running = 1;
   }
 
-  raise_window(xitk_window_get_window(pp_wrapper->pplugin->helpwin), 1, pp_wrapper->pplugin->help_running);
+  raise_window(pp_wrapper->pplugin->helpwin, 1, pp_wrapper->pplugin->help_running);
   
   try_to_set_input_focus(xitk_window_get_window(pp_wrapper->pplugin->helpwin));
 }
@@ -1870,13 +1870,13 @@ static int pplugin_is_running(_pp_wrapper_t *pp_wrapper) {
 
 static void pplugin_raise_window(_pp_wrapper_t *pp_wrapper) {
   if(pp_wrapper->pplugin != NULL)
-    raise_window(xitk_window_get_window(pp_wrapper->pplugin->xwin), pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
+    raise_window(pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
 
 static void pplugin_toggle_visibility(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   if(pp_wrapper->pplugin != NULL)
-    toggle_window(xitk_window_get_window(pp_wrapper->pplugin->xwin), pp_wrapper->pplugin->widget_list,
+    toggle_window(pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->widget_list,
 		  &pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
@@ -1888,7 +1888,7 @@ static void pplugin_update_enable_button(_pp_wrapper_t *pp_wrapper) {
 
 static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
   if(pp_wrapper->pplugin)
-    reparent_window((xitk_window_get_window(pp_wrapper->pplugin->xwin)));
+    reparent_window(pp_wrapper->pplugin->xwin);
 }
 
 static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {

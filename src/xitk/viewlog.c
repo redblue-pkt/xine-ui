@@ -138,16 +138,15 @@ int viewlog_is_visible(void) {
  * Raise viewlog->xwin
  */
 void viewlog_raise_window(void) {
-  if(viewlog != NULL)
-    raise_window(xitk_window_get_window(viewlog->xwin), viewlog->visible, viewlog->running);
+  if (viewlog != NULL)
+    raise_window(viewlog->xwin, viewlog->visible, viewlog->running);
 }
 /*
  * Hide/show the viewlog window.
  */
 void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
   if(viewlog != NULL)
-    toggle_window(xitk_window_get_window(viewlog->xwin), viewlog->widget_list, 
-		  &viewlog->visible, viewlog->running);
+    toggle_window(viewlog->xwin, viewlog->widget_list, &viewlog->visible, viewlog->running);
 }
 
 /*
@@ -373,7 +372,7 @@ static void viewlog_handle_event(XEvent *event, void *data) {
 
 void viewlog_reparent(void) {
   if(viewlog)
-    reparent_window((xitk_window_get_window(viewlog->xwin)));
+    reparent_window(viewlog->xwin);
 }
 
 /*

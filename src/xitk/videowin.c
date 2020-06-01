@@ -164,14 +164,14 @@ void video_window_lock (xui_vwin_t *vwin, int lock_or_unlock) {
     pthread_mutex_unlock (&vwin->mutex);
 }
 
-void video_window_set_transient_for (xui_vwin_t *vwin, Window w) {
-  if (!vwin)
+void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
+  if (!vwin || !xwin)
     return;
   if (vwin->gui->use_root_window || (vwin->gui->video_display != vwin->gui->display))
     return;
   pthread_mutex_lock (&vwin->mutex);
   vwin->gui->x_lock_display (vwin->gui->display);
-  XSetTransientForHint (vwin->gui->display, w, vwin->gui->video_window);
+  XSetTransientForHint (vwin->gui->display, xitk_window_get_window(xwin), vwin->gui->video_window);
   vwin->gui->x_unlock_display (vwin->gui->display);
   pthread_mutex_unlock (&vwin->mutex);
 }

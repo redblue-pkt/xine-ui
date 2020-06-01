@@ -69,10 +69,11 @@ void set_mrl_browser_transient (xui_mrlb_t *mrlb) {
 void mrl_browser_change_skins (xui_mrlb_t *mrlb, int synthetic) {
   (void)synthetic;
   if (mrlb && mrlb->w) {
+    xitk_window_t *xwin = xitk_mrlbrowser_get_window(mrlb->w);
     xitk_mrlbrowser_change_skins (mrlb->w, mrlb->gui->skin_config);
-    set_mrl_browser_transient (mrlb);
+    video_window_set_transient_for(mrlb->gui->vwin, xwin);
     if (mrl_browser_is_visible (mrlb))
-      raise_window ((xitk_mrlbrowser_get_window_id (mrlb->w)), 1, 1);
+      raise_window (xwin, 1, 1);
   }
 }
 
@@ -101,8 +102,8 @@ void show_mrl_browser (xui_mrlb_t *mrlb) {
   if (mrlb && mrlb->w) {
     mrlb->gui->nongui_error_msg = NULL;
     xitk_mrlbrowser_show (mrlb->w);
-    set_mrl_browser_transient (mrlb);
-    layer_above_video ((xitk_mrlbrowser_get_window_id (mrlb->w)));
+    video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
+    layer_above_video ((xitk_mrlbrowser_get_window (mrlb->w)));
   }
 }
 
@@ -253,7 +254,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   if (gui->mrlb) {
     show_mrl_browser (gui->mrlb);
-    set_mrl_browser_transient (gui->mrlb);
+    video_window_set_transient_for(gui->vwin, xitk_mrlbrowser_get_window(gui->mrlb->w));
     return gui->mrlb;
   }
 
@@ -267,8 +268,6 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   XITK_WIDGET_INIT (&mb, mrlb->gui->imlib_data);
 
-  mb.window_trans = (mrlb->gui->use_root_window || mrlb->gui->video_display != mrlb->gui->display) ? None
-                  : mrlb->gui->video_window;
   mb.layer_above  = (is_layer_above ());
   mb.icon         = &mrlb->gui->icon;
   mb.set_wm_window_normal = !video_window_is_visible (mrlb->gui->vwin);
@@ -336,6 +335,8 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   mb.mrl_filters                           = mrl_filters;
 
   mrlb->w = xitk_mrlbrowser_create (NULL, mrlb->gui->skin_config, &mb);
+
+  video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
 
   if(mrl_filters) {
     int i;
@@ -471,7 +472,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
 void mrl_browser_reparent (xui_mrlb_t *mrlb) {
   if (mrlb && mrlb->w)
-    reparent_window ((xitk_mrlbrowser_get_window_id (mrlb->w)));
+    reparent_window ((xitk_mrlbrowser_get_window (mrlb->w)));
 }
 
 /*
@@ -482,7 +483,6 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
 
   if (gui) {
     mrl_browser (gui, mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
-    set_mrl_browser_transient (gui->mrlb);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
   }
 }
@@ -492,7 +492,6 @@ void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
 
   if (gui) {
     mrl_browser (gui, mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
-    set_mrl_browser_transient (gui->mrlb);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
   }
 }
