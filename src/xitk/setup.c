@@ -144,7 +144,7 @@ static void setup_exit (xitk_widget_t *w, void *data) {
   xitk_unregister_event_handler (&setup->kreg);
     
   xitk_destroy_widgets (setup->widget_list);
-  xitk_window_destroy_window (setup->gui->imlib_data, setup->xwin);
+  xitk_window_destroy_window (setup->xwin);
     
   setup->xwin = NULL;
   /* xitk_dlist_init (&setup->widget_list->list); */
@@ -905,8 +905,7 @@ static void setup_sections (xui_setup_t *setup) {
   
   draw_rectangular_outter_box (setup->gui->imlib_data, bg, 15, (24 + setup->th),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
-  xitk_window_change_background (setup->gui->imlib_data, setup->xwin, bg->pixmap,
-    WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background (setup->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
 

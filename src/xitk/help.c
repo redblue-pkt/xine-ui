@@ -237,7 +237,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&help->kreg);
     
     xitk_destroy_widgets(help->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, help->xwin);
+    xitk_window_destroy_window(help->xwin);
     
     help->xwin = NULL;
     /* xitk_dlist_init (&help->widget_list->list); */
@@ -405,8 +405,7 @@ void help_panel(void) {
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-  xitk_window_change_background(gGui->imlib_data, help->xwin, bg->pixmap, 
-				WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background(help->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
   

@@ -425,8 +425,8 @@ void set_window_states_start(xitk_window_t *xwin);
       xitk_window_set_wm_window_type((xwin), WINDOW_TYPE_NORMAL);         \
     else                                                                  \
       xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);       \
-    xitk_window_set_window_class(gGui->imlib_data, (xwin), NULL, "xine"); \
-    xitk_window_set_window_icon(gGui->imlib_data, (xwin), gGui->icon);    \
+    xitk_window_set_window_class((xwin), NULL, "xine"); \
+    xitk_window_set_window_icon((xwin), gGui->icon);    \
   } while(0)
 
 void reparent_window(Window window);

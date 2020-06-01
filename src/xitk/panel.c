@@ -212,7 +212,7 @@ static void panel_exit (xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(panel->widget_list);
     xitk_button_list_delete (panel->autoplay_buttons);
 
-    xitk_window_destroy_window(panel->gui->imlib_data, panel->xwin);
+    xitk_window_destroy_window(panel->xwin);
     panel->xwin = NULL;
 
     panel->gui->x_lock_display (panel->gui->display);
@@ -753,7 +753,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
        ) {
       int x, y, w, h, desktopw, desktoph;
       
-      xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &x, &y, &w, &h);
+      xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
       
       panel->gui->x_lock_display (panel->gui->display);
       desktopw = DisplayWidth (panel->gui->display, panel->gui->screen);
@@ -808,7 +808,7 @@ void panel_raise_window(xui_panel_t *panel)
 
 void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, int *ph)
 {
-  xitk_window_get_window_position(panel->gui->imlib_data, panel->xwin, px, py, pw, ph);
+  xitk_window_get_window_position(panel->xwin, px, py, pw, ph);
 }
 
 void panel_check_mute (xui_panel_t *panel) {
@@ -920,7 +920,7 @@ static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
   int wx, wy;
 
   (void)w;
-  xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->xwin, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->audiochan_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->audiochan_label));
@@ -933,7 +933,7 @@ static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
   int wx, wy;
 
   (void)w;
-  xitk_window_get_window_position (panel->gui->imlib_data, panel->xwin, &wx, &wy, NULL, NULL);
+  xitk_window_get_window_position (panel->xwin, &wx, &wy, NULL, NULL);
   xitk_get_widget_pos(panel->spuid_label, &x, &y);
   x += wx;
   y += (wy + xitk_get_widget_height(panel->spuid_label));
@@ -1296,9 +1296,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
   panel->xwin = xitk_window_create_simple_window(gui->imlib_data, panel->x, panel->y,
                                                  panel->bg_image->rgb_width,
                                                  panel->bg_image->rgb_height);
-  xitk_window_set_window_title(gui->imlib_data, panel->xwin, title);
-  xitk_window_set_window_class(gui->imlib_data, panel->xwin, title, "xine");
-  xitk_window_set_window_icon(gui->imlib_data, panel->xwin, gGui->icon);
+  xitk_window_set_window_title(panel->xwin, title);
+  xitk_window_set_window_class(panel->xwin, title, "xine");
+  xitk_window_set_window_icon(panel->xwin, gGui->icon);
 
   panel->gui->x_lock_display (panel->gui->display);
   /*

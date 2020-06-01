@@ -89,7 +89,7 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
       panel_get_window_position(gui->panel, &px, &py, &pw, NULL);
       eventer->x = px + pw;
       eventer->y = py;
-      xitk_window_move_window (gui->imlib_data, eventer->xwin, eventer->x, eventer->y);
+      xitk_window_move_window (eventer->xwin, eventer->x, eventer->y);
     }
   }
 }
@@ -162,9 +162,9 @@ static void event_sender_handle_event(XEvent *event, void *data) {
     if(eventer && gGui->eventer_sticky) {
       if (panel_is_visible (gGui->panel)) {
 	int  x, y;
-	xitk_window_get_window_position(gGui->imlib_data, eventer->xwin, &x, &y, NULL, NULL);
+        xitk_window_get_window_position(eventer->xwin, &x, &y, NULL, NULL);
 	if((x != eventer->x) || (y != eventer->y))
-	  xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
+          xitk_window_move_window(eventer->xwin, eventer->x, eventer->y);
       }
     }
     return;
@@ -317,7 +317,7 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&eventer->widget_key);
     
     xitk_destroy_widgets(eventer->widget_list);
-    xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
+    xitk_window_destroy_window(eventer->xwin);
     
     eventer->xwin = NULL;
     /* xitk_dlist_init (&eventer->widget_list->list); */
@@ -374,7 +374,7 @@ void event_sender_move(int x, int y) {
       eventer->y = y;
       config_update_num ("gui.eventer_x", x);
       config_update_num ("gui.eventer_y", y);
-      xitk_window_move_window(gGui->imlib_data, eventer->xwin, x, y);
+      xitk_window_move_window(eventer->xwin, x, y);
     }
   }
 }

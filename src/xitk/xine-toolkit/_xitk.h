@@ -323,6 +323,7 @@ struct xitk_font_s {
 typedef struct xitk_dialog_s xitk_dialog_t;
 
 struct xitk_window_s {
+  ImlibData                *imlibdata;
   Window                    window;
   Window                    win_parent;
   xitk_pixmap_t            *background;

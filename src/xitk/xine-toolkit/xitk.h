@@ -2178,17 +2178,17 @@ void xitk_window_dialog_destroy(xitk_window_t *w);
 /**
  *
  */
-void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w);
+void xitk_window_destroy_window(xitk_window_t *w);
 
 /**
  *
  */
-void xitk_window_move_window(ImlibData *im, xitk_window_t *w, int x, int y);
+void xitk_window_move_window(xitk_window_t *w, int x, int y);
 
 /**
  *
  */
-void xitk_window_center_window(ImlibData *im, xitk_window_t *w);
+void xitk_window_center_window(xitk_window_t *w);
 
 /**
  *
@@ -2208,17 +2208,17 @@ Pixmap xitk_window_get_background_mask(xitk_window_t *w);
 /**
  *
  */
-void xitk_window_apply_background(ImlibData *im, xitk_window_t *w);
+void xitk_window_apply_background(xitk_window_t *w);
 
 /**
  *
  */
-int xitk_window_change_background(ImlibData *im, xitk_window_t *w, Pixmap bg, int width, int height);
+int xitk_window_change_background(xitk_window_t *w, Pixmap bg, int width, int height);
 
 /**
  *
  */
-int xitk_window_change_background_with_image(ImlibData *im, xitk_window_t *w, xitk_image_t *img, int width, int height);
+int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img, int width, int height);
 
 /**
  *
@@ -2234,8 +2234,7 @@ void xitk_get_window_position(Display *display, Window window,
 /*
  *
  */
-void xitk_window_get_window_position(ImlibData *im, xitk_window_t *w, 
-				     int *x, int *y, int *width, int *height);
+void xitk_window_get_window_position(xitk_window_t *w, int *x, int *y, int *width, int *height);
 
 /*
  *
@@ -2245,19 +2244,19 @@ void xitk_set_window_title(Display *display, Window window, const char *title);
 /*
  *
  */
-void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, const char *title);
+void xitk_window_set_window_title(xitk_window_t *w, const char *title);
 
 /*
  *
  */
 void xitk_set_window_icon(Display *display, Window window, Pixmap icon);
-void xitk_window_set_window_icon(ImlibData *im, xitk_window_t *w, Pixmap icon);
+void xitk_window_set_window_icon(xitk_window_t *w, Pixmap icon);
 
 /*
  *
  */
 void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class);
-void xitk_window_set_window_class(ImlibData *im, xitk_window_t *w, const char *res_name, const char *res_class);
+void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const char *res_class);
 
 /*
  *

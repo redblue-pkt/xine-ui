@@ -288,7 +288,7 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&sinfos.widget_key);
 
     xitk_destroy_widgets(sinfos.widget_list);
-    xitk_window_destroy_window(gui->imlib_data, sinfos.xwin);
+    xitk_window_destroy_window(sinfos.xwin);
 
     sinfos.xwin = NULL;
     /* xitk_dlist_init (&sinfos.widget_list.list); */
@@ -858,7 +858,7 @@ void stream_infos_panel(void) {
   xitk_add_widget (sinfos.widget_list, widget);
   xitk_enable_and_show_widget(widget);
 
-  xitk_window_change_background(gui->imlib_data, sinfos.xwin, bg->pixmap, width, height);
+  xitk_window_change_background(sinfos.xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 
   sinfos.widget_key = xitk_register_event_handler("sinfos", 

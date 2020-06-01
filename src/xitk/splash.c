@@ -74,10 +74,10 @@ void splash_create(void) {
     XStoreName(gGui->display, (xitk_window_get_window(xwin)), _("xine Splash"));
     gGui->x_unlock_display (gGui->display);
 
-    xitk_window_set_window_class(gGui->imlib_data, xwin, NULL, "xine");
-    xitk_window_set_window_icon(gGui->imlib_data, xwin, gGui->icon);
+    xitk_window_set_window_class(xwin, NULL, "xine");
+    xitk_window_set_window_icon(xwin, gGui->icon);
 
-    xitk_window_change_background_with_image(gGui->imlib_data, xwin, xim, xim->width, xim->height);
+    xitk_window_change_background_with_image(xwin, xim, xim->width, xim->height);
     
     gGui->x_lock_display (gGui->display);
     XRaiseWindow(gGui->display, xitk_window_get_window(xwin)); 
@@ -99,7 +99,7 @@ void splash_destroy(void) {
     XUnmapWindow(gGui->display, xitk_window_get_window(xwin)); 
     gGui->x_unlock_display (gGui->display);
     
-    xitk_window_destroy_window(gGui->imlib_data, xwin);
+    xitk_window_destroy_window(xwin);
     xwin = NULL;
   }
 }

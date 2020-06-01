@@ -85,7 +85,7 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&viewlog->kreg);
     
     xitk_destroy_widgets(viewlog->widget_list);
-    xitk_window_destroy_window (gui->imlib_data, viewlog->xwin);
+    xitk_window_destroy_window (viewlog->xwin);
     
     viewlog->xwin = NULL;
     /* xitk_dlist_init (&viewlog->widget_list->list); */
@@ -344,8 +344,7 @@ static void viewlog_create_tabs(void) {
   
   draw_rectangular_outter_box (gui->imlib_data, bg, 15, (24 + viewlog->tabs_height),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-  xitk_window_change_background (gui->imlib_data, viewlog->xwin, bg->pixmap,
-    WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background (viewlog->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   xitk_image_destroy_xitk_pixmap(bg);
   

@@ -70,7 +70,7 @@ static void notify_destroy(xitk_widget_t *w) {
     xitk_destroy_widgets(private_data->widget_list);
 
     xitk_unregister_event_handler(&private_data->widget_key);
-    xitk_window_destroy_window(private_data->imlibdata, private_data->xwin);
+    xitk_window_destroy_window(private_data->xwin);
 
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
@@ -177,8 +177,7 @@ static void _combo_handle_event(XEvent *event, void *data) {
      */
     if(private_data && private_data->visible) { 
       int  x, y;
-      xitk_window_get_window_position(private_data->combo_widget->imlibdata, 
-				      private_data->xwin, &x, &y, NULL, NULL);
+      xitk_window_get_window_position(private_data->xwin, &x, &y, NULL, NULL);
       if((x != private_data->win_x) || (y != private_data->win_y))
 	xitk_combo_update_pos(private_data->combo_widget);
     }
