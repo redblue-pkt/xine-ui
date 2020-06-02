@@ -470,7 +470,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     
   case ACTID_WINDOWREDUCE:
     {
-      int	output_width, output_height;
+      int output_width = 0, output_height = 0;
 
       /* Limit size to a practical minimum.                         */
       /* Too small window is hard to view or to hit with the mouse. */
@@ -487,7 +487,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_WINDOWENLARGE:
     {
-      int	output_width, output_height, window_width, window_height;
+      int output_width = 1, output_height = 1, window_width = 0, window_height = 0;
 
       /* Limit size to a practical maximum.                                        */
       /* Too large window can grab system resources up to a virtual dead lock.     */
