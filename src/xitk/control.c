@@ -687,9 +687,10 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     }
     old_img = vctrl->bg_image;
     vctrl->bg_image = new_img;
+
+    video_window_set_transient_for (vctrl->gui->vwin, xitk_window_get_window(vctrl->xwin));
+
     vctrl->gui->x_lock_display (vctrl->gui->display);
-    if (!vctrl->gui->use_root_window && vctrl->gui->video_display == vctrl->gui->display)
-      XSetTransientForHint (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), vctrl->gui->video_window);
     Imlib_destroy_image (vctrl->gui->imlib_data, old_img);
     Imlib_apply_image (vctrl->gui->imlib_data, new_img, xitk_window_get_window(vctrl->xwin));
     vctrl->gui->x_unlock_display (vctrl->gui->display);

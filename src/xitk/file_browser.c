@@ -390,10 +390,7 @@ static void fb_create_input_window(char *title, char *text,
   }
 
   xitk_window_show_window(fne->xwin);
-  fb->gui->x_lock_display (fb->gui->display);
-  if (!fb->gui->use_root_window && fb->gui->video_display == fb->gui->display)
-    XSetTransientForHint (fb->gui->display, xitk_window_get_window (fne->xwin), fb->gui->video_window);
-  fb->gui->x_unlock_display (fb->gui->display);
+  video_window_set_transient_for (fb->gui->vwin, xitk_window_get_window(fne->xwin));
   layer_above_video(xitk_window_get_window(fne->xwin));
   
   try_to_set_input_focus(xitk_window_get_window(fne->xwin));
