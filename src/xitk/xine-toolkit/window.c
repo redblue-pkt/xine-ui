@@ -553,6 +553,13 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
   xitk_set_window_class(w->imlibdata->x.disp, w->window, res_name, res_class);
 }
 
+void xitk_window_show_window(xitk_window_t *w)
+{
+  XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
+  XRaiseWindow(w->imlibdata->x.disp, w->window);
+  XMapWindow(w->imlibdata->x.disp, w->window);
+  XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+}
 
 /*
  * Get (safely) window pos.

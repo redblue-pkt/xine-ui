@@ -721,12 +721,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     panel->visible = 1;
     panel->gui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
-    
-    panel->gui->x_lock_display (panel->gui->display);
-    
-    XRaiseWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
-    XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
-    panel->gui->x_unlock_display (panel->gui->display);
+
+    xitk_window_show_window(panel->xwin);
     video_window_set_transient_for (panel->gui->vwin, xitk_window_get_window(panel->xwin));
 
     wait_for_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
@@ -1632,10 +1628,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     panel->visible = 1;
   
   if (panel->visible) {
-    panel->gui->x_lock_display (panel->gui->display);
-    XRaiseWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
-    XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
-    panel->gui->x_unlock_display (panel->gui->display);
+    xitk_window_show_window(panel->xwin);
   }
   else
     xitk_hide_widgets(panel->widget_list);

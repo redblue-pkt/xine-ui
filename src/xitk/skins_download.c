@@ -740,9 +740,8 @@ void download_skin(char *url) {
 							skdloader.widget_list,
 							NULL);
     
+    xitk_window_show_window(skdloader.xwin);
     gui->x_lock_display (gui->display);
-    XRaiseWindow (gui->display, xitk_window_get_window (skdloader.xwin));
-    XMapWindow (gui->display, xitk_window_get_window(skdloader.xwin));
     if (!gui->use_root_window && gui->video_display == gui->display)
       XSetTransientForHint (gui->display, xitk_window_get_window(skdloader.xwin), gui->video_window);
     gui->x_unlock_display (gui->display);
