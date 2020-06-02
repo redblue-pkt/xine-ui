@@ -1433,6 +1433,12 @@ void video_window_set_cursor_timer (xui_vwin_t *vwin, int timer) {
     vwin->cursor_timer = timer;
 }
 
+
+void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y) {
+  xitk_get_mouse_coords(vwin->gui->video_display,
+                        vwin->gui->video_window, NULL, NULL, x, y);
+}
+
 /* 
  * hide/show video window 
  */
