@@ -497,8 +497,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       /* so we'll not end up in endless magnification.                             */
 
       video_window_get_output_size (gui->vwin, &output_width, &output_height);
-      xitk_get_window_position(gui->video_display, gui->video_window,
-			       NULL, NULL, &window_width, &window_height);
+      video_window_get_window_size (gui->vwin, &window_width, &window_height);
       if(output_width < 5000 && output_height < 5000 &&
 	 output_width <= window_width && output_height <= window_height) {
 	float	xmag, ymag;

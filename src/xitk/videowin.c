@@ -2474,6 +2474,11 @@ void video_window_get_output_size (xui_vwin_t *vwin, int *w, int *h) {
     *h = vwin->output_height;
 }
 
+void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *window_height) {
+  xitk_get_window_position(vwin->gui->video_display, vwin->gui->video_window,
+                           NULL, NULL, window_width, window_height);
+}
+
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
   if (!vwin || !mrl)
     return;

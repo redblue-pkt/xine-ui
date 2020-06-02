@@ -90,6 +90,7 @@ long int video_window_reset_ssaver (xui_vwin_t *vwin);
 void video_window_get_frame_size (xui_vwin_t *vwin, int *w, int *h);
 void video_window_get_visible_size (xui_vwin_t *vwin, int *w, int *h);
 void video_window_get_output_size (xui_vwin_t *vwin, int *w, int *h);
+void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *window_height);
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl);
 
