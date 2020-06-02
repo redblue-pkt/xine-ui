@@ -1211,7 +1211,21 @@ void panel_paint (xui_panel_t *panel) {
 
 void panel_reparent (xui_panel_t *panel) {
   if (panel) {
+
+    if (!video_window_is_visible (panel->gui->vwin)) { /* Show the panel in taskbar */
+      int x = 0, y = 0;
+
+      panel_get_window_position(panel, &x, &y, NULL, NULL);
+      panel->gui->x_lock_display (panel->gui->display);
+      XReparentWindow(panel->gui->display, panel->gui->panel_window, panel->gui->imlib_data->x.root, x, y);
+      panel->gui->x_unlock_display (panel->gui->display);
+    }
+
     reparent_window (panel->gui->panel_window);
+
+    if (video_window_is_visible (panel->gui->vwin)) {
+      layer_above_video(panel->gui->panel_window);
+    }
   }
 }
 
