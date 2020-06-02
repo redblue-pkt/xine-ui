@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -32,40 +32,274 @@
 
 #include "_xitk.h"
 
-#define NORMAL                  1
-#define FOCUS                   2
+#define NORMAL 1
+#define FOCUS  2
+
+#define DIRTY_BEFORE     1
+#define DIRTY_AFTER      2
+#define DIRTY_MOVE_LEFT  4
+#define DIRTY_MOVE_RIGHT 8
+
+#define SBUF_PAD 4
+#define SBUF_MASK 127
+
+static uint32_t _X_BE_32 (const uint8_t *p) {
+  static const union {
+    uint8_t byte;
+    uint32_t word;
+  } test = {
+    .word = 1
+  };
+  uint32_t v;
+  memcpy (&v, p, 4);
+  if (test.byte == 1)
+    v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24);
+  return v;
+}
+
+typedef struct {
+  int bytes;
+  int pixels;
+} _inputtext_pos_t;
+
+/* exact text width may be fractional, dont try to assemble it from text fragments.
+ * xitk_font_get_text_width () may be slow, try to minimize its use by phonebook search.
+ * negative values count from end of text.
+ * input: pos.bytes = text length, pos.pixels = wanted pos.
+ * output: pos = found pos. */
+static int _inputtext_find_text_pos (inputtext_private_data_t *wp,
+  const char *text, _inputtext_pos_t *pos, xitk_font_t *font, int round_up) {
+  const uint8_t *btext = (const uint8_t *)text;
+  xitk_font_t *fs;
+  _inputtext_pos_t want, ref, try, best;
+  int tries;
+      
+  if (!wp->text.buf)
+    return 0;
+  if ((pos->bytes == 0) || (pos->pixels == 0)) {
+    pos->bytes = 0;
+    pos->pixels = 0;
+    return 1;
+  }
+
+  fs = font;
+  if (!fs) {
+    if (wp->fontname)
+      fs = xitk_font_load_font (wp->imlibdata->x.disp, wp->fontname);
+    if (!fs)
+      fs = xitk_font_load_font (wp->imlibdata->x.disp, xitk_get_system_font ());
+    if (!fs)
+      return 0;
+    xitk_font_set_font (fs, wp->iWidget->wl->gc);
+  }
+
+  tries = 12;
+  ref.bytes = 0;
+  ref.pixels = 0;
+  best.bytes = 0;
+  best.pixels = 0;
+  want.pixels = pos->pixels;
+  if (want.pixels < 0) {
+    /* start with 200 bytes, or the entire text if less. */
+    int best_diff = -pos->pixels /* + best.pixels */, last_bytes = 1;
+    if (pos->bytes < 0) {
+      want.bytes = pos->bytes;
+    } else {
+      btext += pos->bytes;
+      want.bytes = -pos->bytes;
+    }
+    try.bytes = -200;
+    try.pixels = -1000000;
+    do {
+      int diff;
+      if (try.bytes >= 0) {
+        try.bytes = 0;
+      } else if (try.bytes <= want.bytes) {
+        try.bytes = want.bytes;
+      } else {
+        while ((btext[try.bytes] & 0xc0) == 0x80)
+          try.bytes += 1;
+        if (try.bytes > 0)
+          try.bytes = 0;
+      }
+      if (try.bytes == last_bytes)
+        break;
+      last_bytes = try.bytes;
+      /* naive optimization: do it from the near side. */
+      tries -= 1;
+      if (try.bytes <= ref.bytes) {
+        try.pixels = -xitk_font_get_text_width (fs, (char *)btext + try.bytes, -try.bytes);
+        ref = try;
+      } else if (try.bytes > (ref.bytes >> 1)) {
+        try.pixels = -xitk_font_get_text_width (fs, (char *)btext + try.bytes, -try.bytes);
+      } else {
+        try.pixels = ref.pixels + xitk_font_get_text_width (fs, (char *)btext + ref.bytes, -ref.bytes + try.bytes);
+      }
+      diff = want.pixels - try.pixels;
+      diff = diff < 0 ? -diff : diff;
+      if (diff < best_diff) {
+        best_diff = diff;
+        best = try;
+      } else if (try.bytes == best.bytes) {
+        break;
+      }
+      diff = try.pixels;
+      if (diff >= 0)
+        diff = 1;
+      try.bytes = (try.bytes * want.pixels + (diff >> 1)) / diff;
+    } while (tries > 0);
+    if (round_up && (want.pixels < best.pixels)) {
+      int b = best.bytes;
+      while ((btext[--b] & 0xc0) == 0x80) ;
+      if (b >= want.bytes) {
+        best.bytes = b;
+        best.pixels = -xitk_font_get_text_width (fs, (char *)btext + best.bytes, -best.bytes);
+        tries -= 1;
+      }
+    }
+    if (pos->bytes >= 0)
+      best.bytes += pos->bytes;
+  } else {
+    int best_diff = pos->pixels /* - best.pixels */, last_bytes = -1;
+    if (pos->bytes < 0) {
+      btext += pos->bytes;
+      want.bytes = -pos->bytes;
+    } else {
+      want.bytes = pos->bytes;
+    }
+    try.bytes = 200;
+    try.pixels = 1000000;
+    do {
+      int diff;
+      if (try.bytes <= 0) {
+        try.bytes = 0;
+      } else if (try.bytes >= want.bytes) {
+        try.bytes = want.bytes;
+      } else {
+        while ((btext[try.bytes] & 0xc0) == 0x80)
+          try.bytes -= 1;
+        if (try.bytes < 0)
+          try.bytes = 0;
+      }
+      if (try.bytes == last_bytes)
+        break;
+      last_bytes = try.bytes;
+      /* naive optimization: do it from the near side. */
+      tries -= 1;
+      if (try.bytes >= ref.bytes) {
+        try.pixels = xitk_font_get_text_width (fs, (char *)btext, try.bytes);
+        ref = try;
+      } else if (try.bytes < (ref.bytes >> 1)) {
+        try.pixels = xitk_font_get_text_width (fs, (char *)btext, try.bytes);
+      } else {
+        try.pixels = ref.pixels - xitk_font_get_text_width (fs, (char *)btext + try.bytes, ref.bytes - try.bytes);
+      }
+      diff = want.pixels - try.pixels;
+      diff = diff < 0 ? -diff : diff;
+      if (diff < best_diff) {
+        best_diff = diff;
+        best = try;
+      } else if (try.bytes == best.bytes) {
+        break;
+      }
+      diff = try.pixels;
+      if (diff <= 0)
+        diff = 1;
+      try.bytes = (try.bytes * want.pixels + (diff >> 1)) / diff;
+    } while (tries > 0);
+    if (round_up && (want.pixels > best.pixels)) {
+      int b = best.bytes;
+      while ((btext[++b] & 0xc0) == 0x80) ;
+      if (b <= want.bytes) {
+        best.bytes = b;
+        best.pixels = xitk_font_get_text_width (fs, (char *)btext, best.bytes);
+        tries -= 1;
+      }
+    }
+    if (pos->bytes < 0)
+      best.bytes += pos->bytes;
+  }
+
+  if (!font)
+    xitk_font_unload_font (fs);
+#if 0
+  printf ("_inputtext_find_text_pos (%d, %d, %d) = (%d, %d) after %d iterations.\n",
+    pos->bytes, pos->pixels, round_up, best.bytes, best.pixels, 12 - tries);
+#endif
+  *pos = best;
+  return 1;
+}
+
+
+static char *_inputtext_sbuf_set (inputtext_private_data_t *wp, int need_size) {
+  do {
+    int nsize = (need_size + 2 * SBUF_PAD + SBUF_MASK) & ~SBUF_MASK;
+    char *nbuf;
+    if (!wp->text.buf) {
+      nbuf = malloc (nsize);
+    } else if (wp->text.size < need_size) {
+      nbuf = realloc (wp->text.buf - SBUF_PAD, nsize);
+    } else {
+      break;
+    }
+    if (!nbuf)
+      return NULL;
+    memset (nbuf, 0, SBUF_PAD);
+    wp->text.buf = nbuf + SBUF_PAD;
+    wp->text.size = nsize - 2 * SBUF_PAD;
+  } while (0);
+  return wp->text.buf;
+}
+
+static void _inputtext_sbuf_unset (inputtext_private_data_t *wp) {
+  if (wp->text.buf) {
+    free (wp->text.buf - SBUF_PAD);
+    wp->text.buf = NULL;
+    wp->text.size = 0;
+    wp->text.used = 0;
+  }
+}
+
 
 /*
  *
  */
-static void _cursor_focus(inputtext_private_data_t *private_data, Window win, int focus) {
+static void _cursor_focus(inputtext_private_data_t *wp, Window win, int focus) {
 
-  private_data->cursor_focus = focus;
+  wp->cursor_focus = focus;
   
   if(focus)
-    xitk_cursors_define_window_cursor(private_data->imlibdata->x.disp, win, xitk_cursor_xterm);
+    xitk_cursors_define_window_cursor(wp->imlibdata->x.disp, win, xitk_cursor_xterm);
   else
-    xitk_cursors_restore_window_cursor(private_data->imlibdata->x.disp, win);
+    xitk_cursors_restore_window_cursor(wp->imlibdata->x.disp, win);
 }
 
 /*
  *
  */
 static void notify_destroy(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
 
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
-  
-    if(!private_data->skin_element_name)
-      xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
+    wp = (inputtext_private_data_t *) w->private_data;
+
+    if (wp->text.temp_pixmap) {
+      xitk_image_destroy_xitk_pixmap (wp->text.temp_pixmap);
+      wp->text.temp_pixmap = NULL;
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+      wp->text.temp_gc = None;
+    }
+    if(!wp->skin_element_name)
+      xitk_image_free_image(wp->imlibdata, &(wp->skin));
     
-    XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data->text);
-    XITK_FREE(private_data->normal_color);
-    XITK_FREE(private_data->focused_color);
-    XITK_FREE(private_data->fontname);
-    XITK_FREE(private_data);
+    XITK_FREE(wp->skin_element_name);
+    _inputtext_sbuf_unset (wp);
+    XITK_FREE(wp->normal_color);
+    XITK_FREE(wp->focused_color);
+    XITK_FREE(wp->fontname);
+    XITK_FREE(wp);
   }
 }
 
@@ -73,12 +307,12 @@ static void notify_destroy(xitk_widget_t *w) {
  *
  */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
-    if(sk == BACKGROUND_SKIN && private_data->skin) {
-      return private_data->skin;
+    wp = (inputtext_private_data_t *) w->private_data;
+    if(sk == BACKGROUND_SKIN && wp->skin) {
+      return wp->skin;
     }
   }
   
@@ -89,15 +323,15 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
  *
  */
 static int notify_inside(xitk_widget_t *w, int x, int y) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
+    wp = (inputtext_private_data_t *) w->private_data;
     if(w->visible == 1) {
-      xitk_image_t *skin = private_data->skin;
+      xitk_image_t *skin = wp->skin;
       
       if(skin->mask)
-	return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
+	return xitk_is_cursor_out_mask(wp->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
     }
     else
       return 0;
@@ -174,387 +408,298 @@ KeySym xitk_get_key_pressed(XEvent *event) {
 }
 
 /*
- * Recalculate display offsets.
+ * Paint the input text box.
  */
-static void inputtext_recalc_offsets(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-
-  if(private_data->cursor_pos >= 0) {
-    char *label;
-    
-    if((label = private_data->text)) {
-      char         *p;
-      xitk_font_t  *fs = NULL;
-      int           width;
-      int           i = 0;
-      
-      if(private_data->fontname)
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
-      
-      if(fs == NULL) 
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
-      
-      if(fs == NULL)
-	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-      
-      xitk_font_set_font(fs, w->wl->gc);
-      
-      private_data->disp_offset = private_data->pos_in_pos = 0;
-      
-      while(i < private_data->cursor_pos) {
-	
-	p = label;
-	p += private_data->disp_offset;
-	
-	width = xitk_font_get_string_length(fs, p);
-	
-	if(((i == (strlen(label))) && (width > private_data->max_visible)) 
-	   || ((xitk_font_get_text_width(fs, p, 
-					 (i - private_data->disp_offset))) 
-	       >= private_data->max_visible)) {
-	  
-	  private_data->pos[++private_data->pos_in_pos] = i - 1;
-	  private_data->disp_offset = private_data->pos[private_data->pos_in_pos];
-	}
-	
-	i++;
-      }
-      
-      xitk_font_unload_font(fs);
-    }
-    else {
-      private_data->pos_in_pos = 0;
-      private_data->pos[0]     = 0;
-    }
-  }
-}
-
-/*
- * Return a pixmap with text drawed.
- */
-static void create_labelofinputtext(xitk_widget_t *w, 
-				    Window win, GC gc, Pixmap pix, 
-				    int xsize, int ysize, char *label, int state) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-  char                     *plabel = label;
-  char                     *p = label;
+static void paint_inputtext (xitk_widget_t *w) {
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
+  XWindowAttributes         attr;
+  XColor                    xcolor;
   xitk_font_t              *fs = NULL;
+  int                       xsize, ysize, state = 0;
   int                       lbear, rbear, width, asc, des;
+  int                       cursor_x;
   int                       yoff = 0, DefaultColor = -1;
   unsigned int              fg = 0;
-  XColor                    xcolor;
   xitk_color_names_t       *color = NULL;
 
-  xcolor.flags = DoRed|DoBlue|DoGreen;
+  if (!w)
+    return;
+  if ((w->type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INPUTTEXT)
+    return;
+
+  if (w->visible != 1) {
+    if (wp->cursor_focus)
+      _cursor_focus (wp, w->wl->win, 0);
+    return;
+  }
+
+  if (w->enable && (!wp->cursor_focus)
+    && (xitk_is_mouse_over_widget (wp->imlibdata->x.disp, w->wl->win, w)))
+      _cursor_focus (wp, w->wl->win, 1);
+
+  /* FIXME: what is this needed for? */
+  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+  XGetWindowAttributes (wp->imlibdata->x.disp, w->wl->win, &attr);
+  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+
+  if (!wp->text.temp_pixmap) {
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    wp->text.temp_gc = XCreateGC (wp->imlibdata->x.disp, w->wl->win, None, None);
+    XCopyGC (wp->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, wp->text.temp_gc);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+  }
+
+  if (wp->skin->mask) {
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XSetClipOrigin (wp->imlibdata->x.disp, wp->text.temp_gc, w->x, w->y);
+    XSetClipMask (wp->imlibdata->x.disp, wp->text.temp_gc, wp->skin->mask->pixmap);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+  }
+      
+  xsize = wp->skin->width / 2;
+  ysize = wp->skin->height;
+  if (!wp->text.temp_pixmap)
+    wp->text.temp_pixmap = xitk_image_create_xitk_pixmap (wp->imlibdata, xsize + 2 * ysize, ysize);
+      
+  state = (w->have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? FOCUS : NORMAL;
+      
+  xcolor.flags = DoRed | DoBlue | DoGreen;
 
   /* Try to load font */
 
-  if(label && strlen(label)) {
-    if(private_data->fontname)
-      fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
-    
-    if(fs == NULL) 
-      fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
-    
-    if(fs == NULL)
-      XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-    
-    xitk_font_set_font(fs, gc);
-    xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
+  if (wp->text.buf && wp->text.buf[0]) {
+    if (wp->fontname)
+      fs = xitk_font_load_font (wp->imlibdata->x.disp, wp->fontname);
+    if (!fs) 
+      fs = xitk_font_load_font (wp->imlibdata->x.disp, xitk_get_system_font ());
+    if (!fs)
+      XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
+    xitk_font_set_font (fs, wp->text.temp_gc);
+    xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
   
-  if((private_data->skin_element_name != NULL) ||
-     ((private_data->skin_element_name == NULL) && ((fg = xitk_get_black_color()) == (unsigned int)-1))) {
-    
+  if (wp->skin_element_name || (!wp->skin_element_name && (fg = xitk_get_black_color ()) == (unsigned int)-1)) {
     /*  Some colors configurations */
-    switch(state) {
-    case NORMAL:
-      if(!strcasecmp(private_data->normal_color, "Default")) {
-	DefaultColor = 0;
-      }
-      else {
-	color = xitk_get_color_name(private_data->normal_color);
-      }
-      break;
-      
-    case FOCUS:
-      if(!strcasecmp(private_data->focused_color, "Default")) {
-	DefaultColor = 0;
-      }
-      else {
-	color = xitk_get_color_name(private_data->focused_color);
-      }
-      break;
-      
+    switch (state) {
+      case NORMAL:
+        if (!strcasecmp (wp->normal_color, "Default"))
+          DefaultColor = 0;
+        else
+          color = xitk_get_color_name (wp->normal_color);
+        break;
+      case FOCUS:
+        if (!strcasecmp (wp->focused_color, "Default"))
+          DefaultColor = 0;
+        else
+          color = xitk_get_color_name (wp->focused_color);
+        break;
+      default: ;
     }
-    
-    if(color == NULL || DefaultColor != -1) {
-      xcolor.red = xcolor.blue = xcolor.green = DefaultColor<<8;
+    if (!color || (DefaultColor != -1)) {
+      xcolor.red = xcolor.blue = xcolor.green = DefaultColor << 8;
+    } else {
+      xcolor.red = color->red << 8;
+      xcolor.blue = color->blue << 8;
+      xcolor.green = color->green << 8;
     }
-    else {
-      xcolor.red = color->red<<8; 
-      xcolor.blue = color->blue<<8;
-      xcolor.green = color->green<<8;
-    }
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XAllocColor(private_data->imlibdata->x.disp, Imlib_get_colormap(private_data->imlibdata), &xcolor);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XAllocColor (wp->imlibdata->x.disp, Imlib_get_colormap (wp->imlibdata), &xcolor);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     fg = xcolor.pixel;
-    
   }
-  
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-  XSetForeground(private_data->imlibdata->x.disp, gc, fg);
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-  
-  if(label && strlen(label)) {
-    if(private_data->cursor_pos >= 0) {
-      
-      if(private_data->disp_offset)
-	p += private_data->disp_offset;
-      
-      width = xitk_font_get_string_length(fs, p);
-      
-      if(private_data->disp_offset > private_data->cursor_pos && private_data->pos_in_pos) {
-	
-	private_data->disp_offset = private_data->pos[--private_data->pos_in_pos];
-	
-	if(private_data->disp_offset < 0) {
-	  private_data->pos[private_data->pos_in_pos] = private_data->disp_offset = 0;
-	}
-	
-      }
-      else if(((private_data->cursor_pos == (strlen(label)))
-	       && (width > private_data->max_visible))
-	      || ((xitk_font_get_text_width(fs, p, 
-					    (private_data->cursor_pos - private_data->disp_offset)))
-		  >= private_data->max_visible)) {
-	
-	private_data->pos[++private_data->pos_in_pos] = private_data->cursor_pos - 1;
-	private_data->disp_offset = private_data->pos[private_data->pos_in_pos];
-      }
-    }
-    
-    if(private_data->disp_offset)
-      plabel += private_data->disp_offset;
 
+  cursor_x = 0;
+  if (fs) {
+    _inputtext_pos_t pos;
+    cursor_x = -1;
+    if (wp->text.cursor_pos < 0) {
+      wp->text.draw_start = 0;
+      wp->text.dirty |= DIRTY_MOVE_LEFT;
+    } else if (wp->text.cursor_pos <= wp->text.draw_start) {
+      if (wp->text.dirty & DIRTY_BEFORE) {
+        wp->text.draw_stop = wp->text.cursor_pos;
+        wp->text.dirty |= DIRTY_MOVE_RIGHT;
+      } else {
+        wp->text.draw_start = wp->text.cursor_pos;
+        wp->text.dirty |= DIRTY_MOVE_LEFT;
+      }
+    } else if (wp->text.cursor_pos >= wp->text.draw_stop) {
+      wp->text.draw_stop = wp->text.cursor_pos;
+      wp->text.dirty |= DIRTY_MOVE_RIGHT;
+    }
+    if (wp->text.cursor_pos >= wp->text.used) {
+      wp->text.cursor_pos =
+      wp->text.draw_stop  = wp->text.used;
+      wp->text.dirty |= DIRTY_MOVE_RIGHT;
+    }
+    do {
+      if (!wp->text.dirty)
+        break;
+      if (!(wp->text.dirty & (DIRTY_MOVE_LEFT | DIRTY_MOVE_RIGHT))
+        && (wp->text.dirty & (DIRTY_BEFORE | DIRTY_AFTER))) {
+        /* keep render pos if cursor still visible.
+         * pitfall: partial chars both left (inherited) and right (due to editing). */
+        pos.bytes = wp->text.used - wp->text.draw_start;
+        pos.pixels = wp->text.box_width - wp->text.shift;
+        if (_inputtext_find_text_pos (wp, wp->text.buf + wp->text.draw_start, &pos, fs, 1)) {
+          int stop;
+          pos.bytes += wp->text.draw_start;
+          stop = pos.bytes;
+          if (pos.pixels > wp->text.box_width - wp->text.shift) {
+            while ((wp->text.buf[--stop] & 0xc0) == 0x80) ;
+            if (stop < 0)
+              stop = 0;
+          }
+          if (stop >= wp->text.cursor_pos) {
+            wp->text.draw_stop = pos.bytes;
+            wp->text.width = pos.pixels;
+            break;
+          }
+        }
+      }
+      if (wp->text.dirty & DIRTY_MOVE_RIGHT) {
+        /* right align cursor, with left fallback when leading text is too short.
+         * check for right part as well. */
+        pos.bytes = wp->text.cursor_pos;
+        pos.pixels = -wp->text.box_width;
+        if (_inputtext_find_text_pos (wp, wp->text.buf, &pos, fs, 1)) {
+          wp->text.draw_start = pos.bytes;
+          wp->text.draw_stop = wp->text.cursor_pos;
+          wp->text.width = cursor_x = -pos.pixels;
+          wp->text.shift = pos.pixels + wp->text.box_width;
+          if (wp->text.shift <= 0)
+            break;
+          wp->text.shift = 0;
+          if (wp->text.cursor_pos >= wp->text.used)
+            break;
+          pos.bytes = wp->text.used - wp->text.draw_start;
+          pos.pixels = wp->text.box_width;
+          if (_inputtext_find_text_pos (wp, wp->text.buf + wp->text.draw_start, &pos, fs, 1)) {
+            pos.bytes += wp->text.draw_start;
+            wp->text.draw_stop = pos.bytes;
+            wp->text.width = pos.pixels;
+          }
+          break;
+        }
+      }
+      {
+        /* left align. */
+        wp->text.shift = 0;
+        cursor_x = 0;
+        if (wp->text.dirty & (DIRTY_MOVE_LEFT | DIRTY_AFTER)) {
+          pos.bytes = wp->text.used - wp->text.draw_start;
+          pos.pixels = wp->text.box_width;
+          if (_inputtext_find_text_pos (wp, wp->text.buf + wp->text.draw_start, &pos, fs, 1)) {
+            pos.bytes += wp->text.draw_start;
+            wp->text.draw_stop = pos.bytes;
+            wp->text.width = pos.pixels;
+          }
+        }
+      }
+    } while (0);
+    wp->text.dirty = 0;
   }
+
+  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+  XSetForeground (wp->imlibdata->x.disp, wp->text.temp_gc, fg);
+  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   
   /*  Put text in the right place */
-  if(private_data->skin_element_name) {
-    if(label && strlen(label)) {
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      xitk_font_draw_string(fs, pix, gc, 
-			    2, ((ysize+asc+des+yoff)>>1)-des, 
-			    plabel, strlen(plabel));
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    }
-  }
-  else {
-    XWindowAttributes  attr;
-    xitk_pixmap_t     *tpix;
-    GC                 lgc;
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
-    
-    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
-    tpix = xitk_image_create_xitk_pixmap(private_data->imlibdata, xsize, ysize);
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, pix, tpix->pixmap, lgc, 0, 0, xsize, ysize, 0, 0);
-    
-    if(label && strlen(label))
-      xitk_font_draw_string(fs, tpix->pixmap, lgc, 3 , ((ysize+asc+des+yoff)>>1)-des, plabel, strlen(plabel));
-    
-    XCopyArea (private_data->imlibdata->x.disp, tpix->pixmap, pix, lgc, 0, 0, xsize - 1, ysize, 0, 0);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
-    xitk_image_destroy_xitk_pixmap(tpix);
+  {
+    int src_x = state == FOCUS ? xsize : 0;
 
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XFreeGC(private_data->imlibdata->x.disp, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XCopyArea (wp->imlibdata->x.disp, wp->skin->image->pixmap, wp->text.temp_pixmap->pixmap, w->wl->gc,
+      src_x, 0, xsize, ysize, ysize, 0);
+    if (fs) {
+      xitk_font_draw_string (fs, wp->text.temp_pixmap->pixmap, wp->text.temp_gc,
+        ysize + wp->text.box_start + wp->text.shift,
+        ((ysize + asc + des + yoff) >> 1) - des,
+        wp->text.buf + wp->text.draw_start,
+        wp->text.draw_stop - wp->text.draw_start);
+      /* with 1 partial char left and/or right, fix borders. */
+      if (wp->text.shift < 0)
+        XCopyArea (wp->imlibdata->x.disp, wp->skin->image->pixmap, wp->text.temp_pixmap->pixmap, w->wl->gc,
+          src_x, 0, wp->text.box_start, ysize, ysize, 0);
+      if (wp->text.shift + wp->text.width > wp->text.box_width)
+        XCopyArea (wp->imlibdata->x.disp, wp->skin->image->pixmap, wp->text.temp_pixmap->pixmap, w->wl->gc,
+          src_x + wp->text.box_start + wp->text.box_width, 0,
+          xsize - wp->text.box_start - wp->text.box_width, ysize,
+          ysize + wp->text.box_start + wp->text.box_width, ysize);
+    }
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
 
   /* Draw cursor pointer */
-  if(private_data->cursor_pos >= 0) {
-    
-    width = (label && strlen(label)) ? 
-      xitk_font_get_text_width(fs, plabel, (private_data->cursor_pos - private_data->disp_offset)) : 0;
-
-#ifdef WITH_XFT
-    if(width)
+  if (wp->text.cursor_pos >= 0) {
+    width = cursor_x >= 0
+          ? cursor_x
+          : xitk_font_get_text_width (fs,
+              wp->text.buf + wp->text.draw_start,
+              wp->text.cursor_pos - wp->text.draw_start);
+#if 0 /* ifdef WITH_XFT */
+    if (width)
       width += 2;
 #endif
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XDrawLine(private_data->imlibdata->x.disp, pix, gc,
-	      width + 1, 2, width + 3, 2);
-    
-    XDrawLine(private_data->imlibdata->x.disp, pix, gc, 
-	      width + 2, 2, width + 2, ysize - 3);
-    
-    XDrawLine(private_data->imlibdata->x.disp, pix, gc, 
-	      width + 1, ysize - 3, width + 3, ysize - 3);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    width += ysize + wp->text.box_start + wp->text.shift;
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XDrawLine (wp->imlibdata->x.disp, wp->text.temp_pixmap->pixmap, wp->text.temp_gc,
+      width - 1,         2, width + 1, 2);
+    XDrawLine (wp->imlibdata->x.disp, wp->text.temp_pixmap->pixmap, wp->text.temp_gc,
+      width,             2, width,     ysize - 3);
+    XDrawLine (wp->imlibdata->x.disp, wp->text.temp_pixmap->pixmap, wp->text.temp_gc,
+      width - 1, ysize - 3, width,     ysize - 3);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
+
+  if (fs)
+    xitk_font_unload_font (fs);
   
-  if(label && strlen(label))  
-    xitk_font_unload_font(fs);
-  
-  if(color)
-    xitk_free_color_name(color);
-}
-
-/*
- * Paint the input text box.
- */
-static void paint_inputtext(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data;
-  int                       button_width, state = 0;
-  xitk_image_t             *skin;
-  xitk_pixmap_t            *btn;
-  GC                        lgc;
-  XWindowAttributes         attr;
-
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
-    private_data = (inputtext_private_data_t *) w->private_data;
-
-    if(w->visible == 1) {
-
-      if(w->enable && (!private_data->cursor_focus) 
-	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, w->wl->win, w)))
-	_cursor_focus(private_data, w->wl->win, 1);
-
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XGetWindowAttributes(private_data->imlibdata->x.disp, w->wl->win, &attr);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
-      skin = private_data->skin;
+  if (color)
+    xitk_free_color_name (color);
       
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
-      XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-      
-      if (skin->mask) {
-        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-	XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
-        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-      }
-      
-      button_width = skin->width / 2;
-      
-      btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
-      
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
-	state = FOCUS;
-	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		   btn->pixmap, w->wl->gc, button_width, 0,
-		   button_width, skin->height, 0, 0);
-      }
-      else {
-	state = NORMAL;
-	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		   btn->pixmap, w->wl->gc, 0, 0,
-		   button_width, skin->height, 0, 0);
-      }
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-      
-      create_labelofinputtext(w, w->wl->win, w->wl->gc, btn->pixmap, 
-			      button_width, skin->height, private_data->text, state);
-      
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, w->wl->win, lgc, 0, 0,
-		 button_width, skin->height, w->x, w->y);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+  XCopyArea (wp->imlibdata->x.disp, wp->text.temp_pixmap->pixmap, w->wl->win, wp->text.temp_gc,
+    ysize, 0, xsize, ysize, w->x, w->y);
+  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
-      xitk_image_destroy_xitk_pixmap(btn);
-
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XFreeGC(private_data->imlibdata->x.disp, lgc);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    }
-    else {
-      if(private_data->cursor_focus)
-	_cursor_focus(private_data, w->wl->win, 0);
-    }
- }
-
+  if (state != FOCUS) {
+    xitk_image_destroy_xitk_pixmap (wp->text.temp_pixmap);
+    wp->text.temp_pixmap = NULL;
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    wp->text.temp_gc = None;
+  }
 }
 
 /*
  * Handle click events.
  */
 static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, int y) {
-  inputtext_private_data_t *private_data;
-  int                       pos;
-  
+  (void)button;
+  (void)bUp;
+  (void)y;
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    char  *p;
-
-    private_data = (inputtext_private_data_t *) w->private_data;
+    inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
     
     if(w->have_focus == FOCUS_LOST)
-      w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
+      w->have_focus = wp->have_focus = FOCUS_RECEIVED;
     
-    if(w->enable && (!private_data->cursor_focus)
-       && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, w->wl->win, w)))
-      _cursor_focus(private_data, w->wl->win, 1);
-    
-    pos = x - w->x;
+    if(w->enable && (!wp->cursor_focus)
+       && (xitk_is_mouse_over_widget(wp->imlibdata->x.disp, w->wl->win, w)))
+      _cursor_focus(wp, w->wl->win, 1);
 
-    if((p = private_data->text)) {
-      xitk_font_t *fs = NULL;
-      int          width = 0, i = 0;
-      int          max_len;
-      
-      p += private_data->disp_offset;
-
-      if(private_data->fontname)
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
-      
-      if(fs == NULL) 
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
-      
-      if(fs == NULL)
-	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-      
-      xitk_font_set_font(fs, w->wl->gc);
-      
-      max_len = xitk_font_get_text_width(fs, p, strlen(p));
-      
-      if(pos > max_len) {
-	/* cursor behind the last character */
-	i = strlen(p) + 1;
-      } else {
-	/* cursor in the text */
-        /* FIXME: implement multibyte string support */
-        while(width < pos) {
-          width = xitk_font_get_text_width(fs, p, i + 1);
-          i++;
-	}
-      }
-
-      xitk_font_unload_font(fs);
-      pos = (i - 1) + private_data->disp_offset;
-      
-      if(pos > strlen(private_data->text))
-	pos = strlen(private_data->text);
-
+    {
+      _inputtext_pos_t pos;
+      pos.bytes = wp->text.used - wp->text.draw_start;
+      pos.pixels = x - w->x - wp->text.box_start - wp->text.shift;
+      if (pos.pixels < 0)
+        pos.pixels = 0;
+      if (_inputtext_find_text_pos (wp, wp->text.buf + wp->text.draw_start, &pos, NULL, 0))
+        wp->text.cursor_pos = pos.bytes + wp->text.draw_start;
     }
-    else
-      pos = 0;
     
-    private_data->cursor_pos = (pos < 0) ? 0 : pos;
     paint_inputtext(w);
   }
 
@@ -565,18 +710,18 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
  * Handle motion on input text box.
  */
 static int notify_focus_inputtext(xitk_widget_t *w, int focus) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
+    wp = (inputtext_private_data_t *) w->private_data;
     
-    if((private_data->have_focus = focus) == FOCUS_LOST)
-      private_data->cursor_pos = -1;
+    if((wp->have_focus = focus) == FOCUS_LOST)
+      wp->text.cursor_pos = -1;
   
     if((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
-      _cursor_focus(private_data, w->wl->win, 0);
+      _cursor_focus(wp, w->wl->win, 0);
     else if(w->enable && (focus == FOCUS_MOUSE_IN))
-      _cursor_focus(private_data, w->wl->win, 1);
+      _cursor_focus(wp, w->wl->win, 1);
 
   }
   
@@ -587,34 +732,42 @@ static int notify_focus_inputtext(xitk_widget_t *w, int focus) {
  *
  */
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
+    wp = (inputtext_private_data_t *) w->private_data;
 
-    if(private_data->skin_element_name) {
+    if (wp->text.temp_pixmap) {
+      xitk_image_destroy_xitk_pixmap (wp->text.temp_pixmap);
+      wp->text.temp_pixmap = NULL;
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+      wp->text.temp_gc = None;
+    }
+
+    if(wp->skin_element_name) {
 
       xitk_skin_lock(skonfig);
 
-      XITK_FREE(private_data->fontname);
-      private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name));
+      XITK_FREE(wp->fontname);
+      wp->fontname = strdup (xitk_skin_get_label_fontname(skonfig, wp->skin_element_name));
       
-      private_data->skin          = xitk_skin_get_image(skonfig,
-							xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      wp->skin     = xitk_skin_get_image (skonfig, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
       
-      private_data->max_visible   = (private_data->skin->width/2);
+      wp->text.box_width = wp->skin->width / 2 - 2 * 2;
       
-      XITK_FREE(private_data->normal_color);
-      private_data->normal_color  = strdup(xitk_skin_get_label_color(skonfig, private_data->skin_element_name));
-      XITK_FREE(private_data->focused_color);
-      private_data->focused_color = strdup(xitk_skin_get_label_color_focus(skonfig, private_data->skin_element_name));
+      XITK_FREE(wp->normal_color);
+      wp->normal_color  = strdup(xitk_skin_get_label_color(skonfig, wp->skin_element_name));
+      XITK_FREE(wp->focused_color);
+      wp->focused_color = strdup(xitk_skin_get_label_color_focus(skonfig, wp->skin_element_name));
       
-      w->x                       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      w->y                       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      w->width                   = private_data->skin->width/2;
-      w->height                  = private_data->skin->height;
-      w->visible                 = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      w->enable                  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+      w->x        = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
+      w->y        = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
+      w->width    = wp->skin->width / 2;
+      w->height   = wp->skin->height;
+      w->visible  = (xitk_skin_get_visibility (skonfig, wp->skin_element_name)) ? 1 : -1;
+      w->enable   = xitk_skin_get_enability (skonfig, wp->skin_element_name);
      
       xitk_skin_unlock(skonfig);
 
@@ -623,97 +776,72 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   }
 }
 
+static int _inputtext_utf8_peek_left (const char *s, int have) {
+  const uint8_t *p = (const uint8_t *)s;
+  uint32_t v;
+  if (have <= 0)
+    return 0;
+  v = _X_BE_32 (p - 4);
+  if ((v & 0x0000e0c0) == 0x0000c080)
+    return 2;
+  if ((v & 0x00f0c0c0) == 0x00e08080)
+    return 3;
+  if ((v & 0xf8c0c0c0) == 0xf0808080)
+    return 4;
+  return 1;
+}
+
+static int _inputtext_utf8_peek_right (const char *s, int have) {
+  const uint8_t *p = (const uint8_t *)s;
+  uint32_t v;
+  if (have <= 0)
+    return 0;
+  v = _X_BE_32 (p);
+  if ((v & 0xe0c00000) == 0xc0800000)
+    return 2;
+  if ((v & 0xf0c0c000) == 0xe0808000)
+    return 3;
+  if ((v & 0xf8c0c0c0) == 0xf0808080)
+    return 4;
+  return 1;
+}
+
 /*
  * Erase one char from right of cursor.
  */
 static void inputtext_erase_with_delete(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-  const char                *oldtext, *p;
-  char                      *newtext, *pp;
-  int                        offset;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
-  if(private_data->text && (strlen(private_data->text) > 0)) {
-    if((private_data->cursor_pos >= 0) && (private_data->cursor_pos < strlen(private_data->text))) {
-      
-      oldtext = private_data->text;
-      newtext = (char *) xitk_xmalloc(strlen(oldtext));
-      
-      offset = 0;
-      p = oldtext;
-      pp = newtext;
-      
-      while(offset < private_data->cursor_pos) {
-	*pp = *p;
-	p++;
-	pp++;
-	offset++;
-      }
-      p++;
-      
-      while(*p != '\0') {
-	*pp = *p;
-	offset++;
-	p++;
-	pp++;
-      } 
-      
-      *pp = 0;
-      
-      XITK_FREE(private_data->text);
-      private_data->text = newtext;
-      
-      paint_inputtext(w);
-    }
+  if (wp->text.buf) {
+    char *p = wp->text.buf + wp->text.cursor_pos;
+    int rest = wp->text.used - wp->text.cursor_pos;
+    int n = _inputtext_utf8_peek_right (p, rest);
+    if ((n > 0) && (n < rest))
+      memmove (p, p + n, rest - n);
+    wp->text.used -= n;
+    wp->text.buf[wp->text.used] = 0;
+    wp->text.dirty |= DIRTY_AFTER;
+    paint_inputtext (w);
   }
-  else
-    paint_inputtext(w);
-
 }
 
 /*
  * Erase one char from left of cursor.
  */
 static void inputtext_erase_with_backspace(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-  char                     *oldtext, *newtext;
-  char                     *p, *pp;
-  int                       offset;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
-  if(private_data->text && (strlen(private_data->text) >= 1)) {
-    if(private_data->cursor_pos > 0) {
-      
-      oldtext = strdup(private_data->text);
-      newtext = (char *) xitk_xmalloc(strlen(oldtext));
-      
-      private_data->cursor_pos--;
-      
-      offset = 0;
-      p = oldtext;
-      pp = newtext;
-      
-      while(offset < private_data->cursor_pos) {
-	*pp++ = *p++;
-	offset++;
-      }
-      p++;
-      
-      while(*p != '\0') {
-	*pp++ = *p++;
-      } 
-      *pp = '\0';
-      
-      XITK_FREE(private_data->text);
-      private_data->text = strdup(newtext);
-      
-      paint_inputtext(w);
-      
-      XITK_FREE(oldtext);
-      XITK_FREE(newtext);
-    }
-  }
-  else {
-    private_data->cursor_pos = 0;
-    paint_inputtext(w);
+  if (wp->text.buf) {
+    char *p = wp->text.buf + wp->text.cursor_pos;
+    int rest = wp->text.used - wp->text.cursor_pos;
+    int n = _inputtext_utf8_peek_left (p, wp->text.cursor_pos);
+    if ((n > 0) && (rest > 0))
+      memmove (p - n, p, rest);
+    wp->text.cursor_pos -= n;
+    wp->text.used -= n;
+    wp->text.buf[wp->text.used] = 0;
+    wp->text.dirty |= DIRTY_BEFORE;
+    paint_inputtext (w);
   }
 }
 
@@ -721,31 +849,96 @@ static void inputtext_erase_with_backspace(xitk_widget_t *w) {
  * Erase chars from cursor pos to EOL.
  */
 static void inputtext_kill_line(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
-  if(private_data->text && (strlen(private_data->text) > 1)) {
-    if(private_data->cursor_pos >= 0) {
-      char *newtext = NULL;
-      
-      newtext = strndup(private_data->text, private_data->cursor_pos);
-      
-      XITK_FREE(private_data->text);
-      private_data->text = newtext;
-      
-      paint_inputtext(w);
+  if (wp->text.buf && (wp->text.used > 1)) {
+    if (wp->text.cursor_pos >= 0) {
+      wp->text.used = wp->text.cursor_pos;
+      wp->text.buf[wp->text.used] = 0;
+      wp->text.dirty |= DIRTY_AFTER;
+      paint_inputtext (w);
     }
   }
+}
+
+static void inputtext_copy (xitk_widget_t *w) {
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
+  
+  if (wp->text.buf && (wp->text.used > 0)) {
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+  }
+}
+
+static void inputtext_cut (xitk_widget_t *w) {
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
+  
+  if (wp->text.buf && (wp->text.used > 0)) {
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    wp->text.buf[0] = 0;
+    wp->text.cursor_pos = 0;
+    wp->text.used = 0;
+    wp->text.dirty |= DIRTY_BEFORE | DIRTY_AFTER;
+    paint_inputtext (w);
+  }
+}
+
+static void inputtext_paste (xitk_widget_t *w) {
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
+  char *insert = NULL, *newtext;
+  int olen = 0, ilen = 0, pos = 0, nlen;
+
+  if (wp->text.buf && wp->text.buf[0])
+    olen = wp->text.used;
+  pos = wp->text.cursor_pos;
+  if (pos < 0)
+    pos = 0;
+  else if (pos > olen)
+    pos = olen;
+  olen -= pos;
+  
+  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+  insert = XFetchBytes (wp->imlibdata->x.disp, &ilen);
+  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+  if (insert) {
+    int i;
+    for (i = 0; (i < ilen) && (insert[i] & 0xe0); i++) ;
+    ilen = i;
+  } else {
+    ilen = 0;
+  }
+
+  nlen = pos + ilen + olen;
+  newtext = _inputtext_sbuf_set (wp, nlen);
+  if (newtext) {
+    if (olen > 0)
+      memmove (newtext + pos + ilen, newtext + pos, olen);
+    if (ilen > 0)
+      memcpy (newtext + pos, insert, ilen);
+    newtext[nlen] = 0;
+    wp->text.cursor_pos = pos + ilen;
+    wp->text.used = nlen;
+    wp->text.dirty |= DIRTY_BEFORE;
+    paint_inputtext (w);
+  }
+
+  if (insert)
+    XFree (insert);
 }
 
 /*
  * Move cursor pos to left.
  */
 static void inputtext_move_left(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
-  
-  if(private_data->cursor_pos > 0) {
-    private_data->cursor_pos--;
-    paint_inputtext(w);
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
+
+  if (wp->text.buf) {
+    wp->text.cursor_pos -= _inputtext_utf8_peek_left (
+      wp->text.buf + wp->text.cursor_pos, wp->text.cursor_pos);
+    paint_inputtext (w);
   }
 }
 
@@ -753,11 +946,12 @@ static void inputtext_move_left(xitk_widget_t *w) {
  * Move cursor pos to right.
  */
 static void inputtext_move_right(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
 
-  if(private_data->cursor_pos < strlen(private_data->text)) {
-    private_data->cursor_pos++;
-    paint_inputtext(w);
+  if (wp->text.buf) {
+    wp->text.cursor_pos += _inputtext_utf8_peek_right (
+      wp->text.buf + wp->text.cursor_pos, wp->text.used - wp->text.cursor_pos);
+    paint_inputtext (w);
   }
 }
 
@@ -765,18 +959,18 @@ static void inputtext_move_right(xitk_widget_t *w) {
  * Remove focus of widget, then call callback function.
  */
 static void inputtext_exec_return(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
 
-  private_data->cursor_pos   = -1;
+  wp->text.cursor_pos   = -1;
   w->have_focus              = 
-    private_data->have_focus = FOCUS_LOST;
+    wp->have_focus = FOCUS_LOST;
   //  wl->widget_focused = NULL;
-  _cursor_focus(private_data, w->wl->win, 0);
+  _cursor_focus(wp, w->wl->win, 0);
   paint_inputtext(w);
   
-  if(private_data->text && (strlen(private_data->text) > 0)) {
-    if(private_data->callback)
-      private_data->callback(w, private_data->userdata, private_data->text);
+  if(wp->text.buf && (strlen(wp->text.buf) > 0)) {
+    if(wp->callback)
+      wp->callback(w, wp->userdata, wp->text.buf);
   }
 }
 
@@ -784,12 +978,12 @@ static void inputtext_exec_return(xitk_widget_t *w) {
  * Remove focus of widget.
  */
 static void inputtext_exec_escape(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
-  private_data->cursor_pos = -1;
-  w->have_focus = private_data->have_focus = FOCUS_LOST;
+  wp->text.cursor_pos = -1;
+  w->have_focus = wp->have_focus = FOCUS_LOST;
   w->wl->widget_focused = NULL;
-  _cursor_focus(private_data, w->wl->win, 0);
+  _cursor_focus(wp, w->wl->win, 0);
   paint_inputtext(w);
 }
 
@@ -797,11 +991,10 @@ static void inputtext_exec_escape(xitk_widget_t *w) {
  *
  */
 static void inputtext_move_bol(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
 
-  if(private_data->text) {
-    private_data->cursor_pos = private_data->disp_offset = 0;
-    inputtext_recalc_offsets(w);
+  if(wp->text.buf) {
+    wp->text.cursor_pos = 0;
     paint_inputtext(w);
   }
 }
@@ -810,13 +1003,11 @@ static void inputtext_move_bol(xitk_widget_t *w) {
  *
  */
 static void inputtext_move_eol(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
 
-  if(private_data->text) {
-    private_data->cursor_pos = strlen(private_data->text);
-    inputtext_recalc_offsets(w);
-    
-    paint_inputtext(w);
+  if (wp->text.buf) {
+    wp->text.cursor_pos = wp->text.used;
+    paint_inputtext (w);
   }
 }
 
@@ -824,17 +1015,25 @@ static void inputtext_move_eol(xitk_widget_t *w) {
  * Transpose two characters.
  */
 static void inputtext_transpose_chars(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
+  inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
-  if(private_data->text && (strlen(private_data->text) >= 2)) {
-    if((private_data->cursor_pos >= 2)) {
-      int c = private_data->text[private_data->cursor_pos - 2];
-
-      private_data->text[private_data->cursor_pos - 2] = private_data->text[private_data->cursor_pos - 1];
-      private_data->text[private_data->cursor_pos - 1] = c;
-      
-      paint_inputtext(w);
+  if (wp->text.buf) {
+    char *p = wp->text.buf + wp->text.cursor_pos;
+    int b = _inputtext_utf8_peek_left (p, wp->text.cursor_pos);
+    int a = _inputtext_utf8_peek_left (p - b, wp->text.cursor_pos - b);
+    if (a && b) {
+      char temp[8];
+      int i;
+      p -= a + b;
+      for (i = 0; i < a + b; i++)
+        temp[i] = p[i];
+      for (i = 0; i < a; i++)
+        p[b + i] = temp[i];
+      for (i = 0; i < b; i++)
+        p[i] = temp[a + i];
     }
+    wp->text.dirty |= DIRTY_BEFORE;
+    paint_inputtext (w);
   }
 }
 
@@ -842,17 +1041,14 @@ static void inputtext_transpose_chars(xitk_widget_t *w) {
  * Handle keyboard event in input text box.
  */
 static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
-  inputtext_private_data_t *private_data;
-  
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+    inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
     KeySym      key;
     char        buf[256];
     int         len;
     int         modifier;
     
-    private_data = (inputtext_private_data_t *) w->private_data;
-
-    private_data->have_focus = FOCUS_RECEIVED;
+    wp->have_focus = FOCUS_RECEIVED;
 
     len = xitk_get_keysym_and_buf(xev, &key, buf, sizeof(buf));
     buf[len] = '\0';
@@ -860,174 +1056,124 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
     (void) xitk_get_key_modifier(xev, &modifier);
 
     /* One of modifier key is pressed, none of keylock or shift */
-    if(((buf[0] != 0) && (buf[1] == 0)) 
-       && ((modifier & MODIFIER_CTRL) 
-	   || (modifier & MODIFIER_META)
-	   || (modifier & MODIFIER_MOD3) 
-	   || (modifier & MODIFIER_MOD4)
-	   || (modifier & MODIFIER_MOD5))) {
-      
-      switch(key) {
+    if (buf[0] && !buf[1] && (modifier & MODIFIER_CTRL)) {
+      switch (key) {
+        /* Beginning of line */
+        case XK_a:
+        case XK_A:
+          inputtext_move_bol (w);
+          break;
+        /* Backward */
+        case XK_b:
+        case XK_B:
+          inputtext_move_left (w);
+          break;
+        /* Copy */
+        case XK_c:
+        case XK_C:
+          inputtext_copy (w);
+          break;
+        /* Delete current char */
+        case XK_d:
+        case XK_D:
+          inputtext_erase_with_delete (w);
+          break;
+        /* End of line */
+        case XK_e:
+        case XK_E:
+          inputtext_move_eol (w);
+          break;
+        /* Forward */
+        case XK_f:
+        case XK_F:
+          inputtext_move_right (w);
+          break;
+        /* Kill line (from cursor) */
+        case XK_k:
+        case XK_K:
+          inputtext_kill_line (w);
+          break;
+        /* Return */
+        case XK_m:
+        case XK_M:
+          inputtext_exec_return (w);
+          break;
+        /* Transpose chars */
+        case XK_t:
+        case XK_T:
+          inputtext_transpose_chars (w);
+          break;
+        /* Paste */
+        case XK_v:
+        case XK_V:
+          inputtext_paste (w);
+          break;
+        /* Cut */
+        case XK_x:
+        case XK_X:
+          inputtext_cut (w);
+          break;
+        case XK_question:
+          inputtext_erase_with_backspace (w);
+          break;
+        default: ;
+      }
+    } else if (modifier & (MODIFIER_CTRL | MODIFIER_META)) {
+      ;
+    } else {
+      switch (key) {
+        case XK_Tab:
+          return;
+        case XK_Delete:
+          inputtext_erase_with_delete (w);
+          break;
+        case XK_BackSpace:
+          inputtext_erase_with_backspace (w);
+          break;
+        case XK_Left:
+          inputtext_move_left (w);
+          break;
+        case XK_Right:
+          inputtext_move_right (w);
+          break;
+        case XK_Home:
+          inputtext_move_bol (w);
+          break;
+        case XK_End:
+          inputtext_move_eol (w);
+          break;
+        case XK_Return:
+        case XK_KP_Enter:
+          inputtext_exec_return (w);
+          break;
+        case XK_Escape:
+/*      case XK_Tab: */
+          inputtext_exec_escape (w);
+          break;
+        default:
+          if (buf[0] && (wp->text.used < wp->max_length)) {
+            char *newtext = _inputtext_sbuf_set (wp, wp->text.used + len);
 
-	/* BOL */
-      case XK_a:
-      case XK_A:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_bol(w);
-	}
-	break;
-	
-	/* Backward */
-      case XK_b:
-      case XK_B:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_left(w);
-	}
-	break;
-	
-	/* Cancel */
-      case XK_c:
-      case XK_C:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_exec_escape(w);
-	}
-	break;
-	
-	/* Delete current char */
-      case XK_d:
-      case XK_D:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_erase_with_delete(w);
-	}
-	break;
-	
-	/* EOL */
-      case XK_e:
-      case XK_E:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_eol(w);
-	}
-	break;
+            if (newtext) {
+              int pos = wp->text.cursor_pos, rest;
 
-	/* Forward */
-      case XK_f:
-      case XK_F:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_right(w);
-	}
-	break;
-
-	/* Kill line (from cursor) */
-      case XK_k:
-      case XK_K:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_kill_line(w);
-	}
-	break;
-
-	/* Return */
-      case XK_m:
-      case XK_M:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_exec_return(w);
-	}
-	break;
-
-	/* Transpose chars */
-      case XK_t:
-      case XK_T:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_transpose_chars(w);
-	}
-	break;
-
-      case XK_question:
-	if(modifier & MODIFIER_CTRL) {
-	  inputtext_erase_with_backspace(w);
-	}
-	break;
-	
-      default:
-	if((!(modifier & MODIFIER_CTRL)) &&
-	   (!(modifier & MODIFIER_META)))
-	  goto __store_as_is;
-	break;
-
+              if (pos > wp->text.used)
+                pos = wp->text.used;
+              rest = wp->text.used - pos;
+              if (rest > 0)
+                memmove (newtext + pos + len, newtext + pos, rest);
+              for (rest = 0; rest < len; rest++)
+                newtext[pos + rest] = buf[rest];
+              wp->text.used += len;
+              newtext[wp->text.used] = 0;
+              wp->text.cursor_pos = pos + len;
+              wp->text.dirty |= DIRTY_BEFORE;
+              paint_inputtext (w);
+            }
+          }
       }
     }
-    else if(key == XK_Tab) {
-      return;
-    }
-    else if(key == XK_Delete) {
-      inputtext_erase_with_delete(w);
-    }
-    else if(key == XK_BackSpace) {
-      inputtext_erase_with_backspace(w);
-    }
-    else if(key == XK_Left) {
-      inputtext_move_left(w);
-    }
-    else if(key == XK_Right) {
-      inputtext_move_right(w);
-    }
-    else if(key == XK_Home) {
-      inputtext_move_bol(w);
-    }
-    else if(key == XK_End) {
-      inputtext_move_eol(w);
-    }
-    else if((key == XK_Return) || (key == XK_KP_Enter)) {
-      inputtext_exec_return(w);
-    }
-    else if((key == XK_Escape) || (key == XK_Tab)) {
-      inputtext_exec_escape(w);
-    }
-    else if((buf[0] != 0) && (buf[1] == 0)) {
-    __store_as_is:
-      {
-	char *oldtext;
-	int pos;
-	
-	if(private_data->text) {
-	  if(strlen(private_data->text) < private_data->max_length) {	   
-	    
-	    oldtext = strdup(private_data->text);
-	    
-	    if(strlen(private_data->text) <= private_data->cursor_pos)
-	      pos = strlen(private_data->text);
-	    else
-	      pos = private_data->cursor_pos;
-	    
-	    private_data->text = (char *) realloc(private_data->text, strlen(oldtext) + 3);
-
-	    strcpy(private_data->text, oldtext);
-	    sprintf(&private_data->text[pos], "%c%s", buf[0], &oldtext[pos]);
-	    private_data->text[strlen(private_data->text)] = '\0';
-	    free(oldtext);
-	    
-	    private_data->cursor_pos++;
-	    paint_inputtext(w);
-	  }
-	  
-	}
-	else {
-	  private_data->text = (char *) xitk_xmalloc(2);
-	  
-	  private_data->text[0] = buf[0];
-	  private_data->text[1] = 0;
-	  
-	  private_data->cursor_pos++;
-	  paint_inputtext(w);
-	}
-      }
-    }
-#if 0
-    else {
-      printf("got unhandled key = [%ld]\n", key);
-    }
-#endif
   }
-
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -1073,35 +1219,44 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  * Return the text of widget.
  */
 char *xitk_inputtext_get_text(xitk_widget_t *w) {
-  inputtext_private_data_t *private_data;
-  
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
+    inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
     
-    return private_data->text ? private_data->text : "";
+    return wp->text.buf ? wp->text.buf : "";
   }
-  
   return NULL;
+}
+
+static void _xitk_inputtext_set_text (inputtext_private_data_t *wp, const char *text) {
+  wp->text.size = 0;
+  wp->text.used = 0;
+  wp->text.dirty |= DIRTY_AFTER;
+  if (text) {
+    int nlen = strlen (text);
+    char *nbuf = _inputtext_sbuf_set (wp, nlen);
+    if (nbuf) {
+      memcpy (nbuf, text, nlen + 1);
+      wp->text.used = nlen;
+    }
+  }
+  wp->text.draw_start = 0;
+  wp->text.draw_stop = 0;
+  wp->text.cursor_pos = -1;
 }
 
 /*
  * Change and redisplay the text of widget.
  */
 void xitk_inputtext_change_text(xitk_widget_t *w, const char *text) {
-  inputtext_private_data_t *private_data;
+  inputtext_private_data_t *wp;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    private_data = (inputtext_private_data_t *) w->private_data;
+    wp = (inputtext_private_data_t *) w->private_data;
 
-    XITK_FREE(private_data->text);
-    if(text)
-      private_data->text = strdup(text);
-
-    private_data->disp_offset = 0;
-    private_data->cursor_pos = -1;
-    paint_inputtext(w);
+    _inputtext_sbuf_unset (wp);
+    _xitk_inputtext_set_text (wp, text);
+    paint_inputtext (w);
   }
-
 }
 
 /*
@@ -1116,44 +1271,44 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
                                               const char *ncolor, const char *fcolor,
 					      int visible, int enable) {
   xitk_widget_t             *mywidget;
-  inputtext_private_data_t  *private_data;
-  
-  mywidget                        = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
-  
-  private_data                    = (inputtext_private_data_t *) xitk_xmalloc(sizeof(inputtext_private_data_t));
-  
-  private_data->imlibdata         = it->imlibdata;
-  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(it->skin_element_name);
+  inputtext_private_data_t  *wp;
 
-  private_data->iWidget           = mywidget;
+  (void)skonfig;
+  mywidget              = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
+  
+  wp                    = (inputtext_private_data_t *) xitk_xmalloc(sizeof(inputtext_private_data_t));
+  
+  wp->imlibdata         = it->imlibdata;
+  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(it->skin_element_name);
 
-  private_data->text = it->text ? strdup(it->text) : NULL;
+  wp->iWidget           = mywidget;
+
+  _xitk_inputtext_set_text (wp, it->text);
     
-  private_data->fontname          = strdup(fontname);
+  wp->fontname          = strdup(fontname);
  
-  private_data->max_length        = it->max_length;
-  private_data->cursor_pos        = -1;
+  wp->max_length        = it->max_length;
 
-  private_data->skin              = skin;
+  wp->skin              = skin;
 
-  private_data->max_visible   = (private_data->skin->width/2);
-  if(private_data->skin_element_name == NULL)
-    private_data->max_visible -= 2;
+  wp->text.box_width    = wp->skin->width / 2 - 2 * 2;
+  wp->text.box_start    = 2;
+  if (!wp->skin_element_name) {
+    wp->text.box_width -= 2 * 1;
+    wp->text.box_start += 1;
+  }
+  wp->text.temp_pixmap  = NULL;
+  wp->text.temp_gc      = None;
 
-  private_data->disp_offset       = 0;
+  wp->cursor_focus      = 0;
 
-  private_data->cursor_focus      = 0;
-
-  private_data->callback          = it->callback;
-  private_data->userdata          = it->userdata;
+  wp->callback          = it->callback;
+  wp->userdata          = it->userdata;
   
-  private_data->normal_color      = strdup(ncolor);
-  private_data->focused_color     = strdup(fcolor);
+  wp->normal_color      = strdup(ncolor);
+  wp->focused_color     = strdup(fcolor);
 
-  private_data->pos_in_pos        = 0;
-  private_data->pos[0]            = 0;
-
-  mywidget->private_data          = private_data;
+  mywidget->private_data          = wp;
 
   mywidget->wl                    = wl;
 
@@ -1161,11 +1316,11 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->imlibdata             = private_data->imlibdata;
+  mywidget->imlibdata             = wp->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
-  mywidget->width                 = private_data->skin->width/2;
-  mywidget->height                = private_data->skin->height;
+  mywidget->width                 = wp->skin->width/2;
+  mywidget->height                = wp->skin->height;
   mywidget->type                  = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_CLICKABLE | WIDGET_KEYABLE;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
@@ -1173,7 +1328,6 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
 
   return mywidget;
 }
-
 
 xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 				      xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it) {

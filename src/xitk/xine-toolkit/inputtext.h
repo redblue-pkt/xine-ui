@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -38,21 +38,31 @@ typedef struct {
   xitk_string_callback_t  callback;
   void                   *userdata;
 
-  char                   *text;
   char                   *fontname;
   char                   *normal_color;
   char                   *focused_color;
 
   int                     have_focus;
 
-  int                     max_length;
-  int                     max_visible;
-  int                     disp_offset;
-  int                     cursor_pos;
-  
-  unsigned int            pos[128];
-  int                     pos_in_pos;
+  struct {
+    char                 *buf;
+    xitk_pixmap_t        *temp_pixmap;
+    GC                    temp_gc;
+    /* next 2 _without_ trailing 0. */
+    int                   size;
+    int                   used;
+    int                   draw_start;
+    int                   draw_stop;
+    int                   cursor_pos;
+    int                   dirty;
+    int                   box_start;
+    int                   box_width;
+    int                   shift;
+    int                   width;
+  } text;
 
+  int                     max_length;
 } inputtext_private_data_t;
 
 #endif
+
