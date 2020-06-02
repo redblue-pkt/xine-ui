@@ -845,6 +845,8 @@ void gui_exit_2 (gGui_t *gui) {
   gui->x_unlock_display (gui->video_display);
   if( gui->video_display != gui->display )
     gui->x_unlock_display (gui->display);
+
+  mediamark_free_mediamarks();
 }
 
 void gui_play (xitk_widget_t *w, void *data) {
@@ -1057,17 +1059,11 @@ void gui_eject (xitk_widget_t *w, void *data) {
 	/*
 	 * Remove only the current MRL
 	 */
-	mediamark_free_entry(gui->playlist.cur);
-	
-	for(i = gui->playlist.cur; i < gui->playlist.num; i++)
-	  gui->playlist.mmk[i] = gui->playlist.mmk[i + 1];
-	
-	gui->playlist.mmk = (mediamark_t **) realloc(gui->playlist.mmk, sizeof(mediamark_t *) * (gui->playlist.num + 2));
-
-	gui->playlist.mmk[gui->playlist.num] = NULL;
-	
+        pthread_mutex_lock(&gui->mmk_mutex);
+        mediamark_delete_entry(gui->playlist.cur);
 	if(gui->playlist.cur)
 	  gui->playlist.cur--;
+        pthread_mutex_unlock(&gui->mmk_mutex);
       }
 
       if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num))

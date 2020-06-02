@@ -67,7 +67,7 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident, const
 void mediamark_append_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_mediamarks(void);
 void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_free_entry(int offset);
+void mediamark_delete_entry(int offset);
 void mediamark_reset_played_state(void);
 int mediamark_all_played(void);
 int mediamark_get_shuffle_next(void);

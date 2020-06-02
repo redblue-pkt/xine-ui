@@ -1997,7 +1997,6 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	}
       }
       else if(is_arg_contain(client_info, 1, "delete")) {
-	int i;
 
 	if((is_arg_contain(client_info, 2, "all")) || 
 	   (is_arg_contain(client_info, 2, "*"))) {
@@ -2019,16 +2018,8 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	    if((gui->playlist.cur == j) && ((xine_get_status(gui->stream) != XINE_STATUS_STOP)))
               gui_stop (NULL, gui);
 	    
-	    mediamark_free_entry(j);
-	    
             pthread_mutex_lock (&gui->mmk_mutex);
-	    for(i = j; i < gui->playlist.num; i++)
-	      gui->playlist.mmk[i] = gui->playlist.mmk[i + 1];
-	    
-	    gui->playlist.mmk = (mediamark_t **) realloc(gui->playlist.mmk, sizeof(mediamark_t *) * (gui->playlist.num + 2));
-	    
-	    gui->playlist.mmk[gui->playlist.num + 1] = NULL;
-	    
+            mediamark_delete_entry(j);
 	    gui->playlist.cur = 0;
             pthread_mutex_unlock (&gui->mmk_mutex);
 	  }
