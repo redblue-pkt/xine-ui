@@ -957,11 +957,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
     set_window_states_start(xwin);
   }
-  
-  gui->x_lock_display (gui->display);
-  XRaiseWindow(gui->display, (xitk_window_get_window(xwin)));
-  XMapWindow(gui->display, (xitk_window_get_window(xwin)));
-  gui->x_unlock_display (gui->display);
+
+  xitk_window_show_window(xwin);
 
   try_to_set_input_focus(xitk_window_get_window(xwin));
 

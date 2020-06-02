@@ -388,10 +388,9 @@ static void fb_create_input_window(char *title, char *text,
 						  fne->widget_list,
 						  (void *)fne);
   }
-  
+
+  xitk_window_show_window(fne->xwin);
   fb->gui->x_lock_display (fb->gui->display);
-  XRaiseWindow (fb->gui->display, xitk_window_get_window(fne->xwin));
-  XMapWindow (fb->gui->display, xitk_window_get_window(fne->xwin));
   if (!fb->gui->use_root_window && fb->gui->video_display == fb->gui->display)
     XSetTransientForHint (fb->gui->display, xitk_window_get_window (fne->xwin), fb->gui->video_window);
   fb->gui->x_unlock_display (fb->gui->display);
