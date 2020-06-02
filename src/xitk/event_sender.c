@@ -279,6 +279,15 @@ void event_sender_update_menu_buttons(void) {
       xitk_labelbutton_change_label(eventer->menus.menu[4], _("Menu 5"));
       xitk_labelbutton_change_label(eventer->menus.menu[5], _("Menu 6"));
       xitk_labelbutton_change_label(eventer->menus.menu[6], _("Menu 7"));
+    }
+    else if(!strncmp(gGui->mmk.mrl, "xvdr", 4)) {
+      xitk_labelbutton_change_label(eventer->menus.menu[0], _("Menu"));
+      xitk_labelbutton_change_label(eventer->menus.menu[1], _("Red"));
+      xitk_labelbutton_change_label(eventer->menus.menu[2], _("Green"));
+      xitk_labelbutton_change_label(eventer->menus.menu[3], _("Yellow"));
+      xitk_labelbutton_change_label(eventer->menus.menu[4], _("Blue"));
+      xitk_labelbutton_change_label(eventer->menus.menu[5], _("Menu 6"));
+      xitk_labelbutton_change_label(eventer->menus.menu[6], _("Menu 7"));
     } else {
       xitk_labelbutton_change_label(eventer->menus.menu[0], _("Menu 1"));
       xitk_labelbutton_change_label(eventer->menus.menu[1], _("Menu 2"));
