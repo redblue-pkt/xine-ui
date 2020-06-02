@@ -216,9 +216,9 @@ static void tvset_handle_event(XEvent *event, void *data) {
 int tvset_is_visible(void) {
   
     if(gGui->use_root_window)
-      return xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset.xwin));
+      return xitk_window_is_window_visible(tvset.xwin);
     else
-      return tvset.visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset.xwin));
+      return tvset.visible && xitk_window_is_window_visible(tvset.xwin);
 }
 
 int tvset_is_running(void) {

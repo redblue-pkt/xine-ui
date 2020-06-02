@@ -2267,6 +2267,7 @@ int xitk_is_window_iconified(Display *display, Window window);
  *
  */
 int xitk_is_window_visible(Display *display, Window window);
+int xitk_window_is_window_visible(xitk_window_t *w);
 
 /*
  *

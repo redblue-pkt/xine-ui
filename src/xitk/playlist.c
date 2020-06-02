@@ -774,9 +774,9 @@ int playlist_is_visible(void) {
 
   if(playlist != NULL) {
     if(gui->use_root_window)
-      return xitk_is_window_visible(gui->display, xitk_window_get_window(playlist->xwin));
+      return xitk_window_is_window_visible(playlist->xwin);
     else
-      return playlist->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(playlist->xwin));
+      return playlist->visible && xitk_window_is_window_visible(playlist->xwin);
   }
 
   return 0;

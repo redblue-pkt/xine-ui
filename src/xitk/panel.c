@@ -586,9 +586,9 @@ int panel_is_visible (xui_panel_t *panel) {
 
   if(panel) {
     if (panel->gui->use_root_window)
-      return xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
+      return xitk_window_is_window_visible (panel->xwin);
     else
-      return panel->visible && xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
+      return panel->visible && xitk_window_is_window_visible (panel->xwin);
   }
 
   return 0;
@@ -599,7 +599,7 @@ int panel_is_visible (xui_panel_t *panel) {
  */
 static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
-  int visible = xitk_is_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
+  int visible = xitk_window_is_window_visible (panel->xwin);
   int invisible = !panel->visible || !visible;
   unsigned char lut[2] = {invisible, visible};
   int v;

@@ -422,7 +422,7 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
     mw = (menu_window_t *)private_data->menu_windows.tail.prev;
   } while (mw->wl.node.prev && (mw != menu_window));
   /* Set focus to parent menu */
-  if(xitk_is_window_visible(menu_window->display, (xitk_window_get_window(menu_window->xwin)))) {
+  if (xitk_window_is_window_visible(menu_window->xwin)) {
     int    t = 5000;
     Window focused_win;
 
@@ -1017,7 +1017,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   {
     int t = 5000;
-    while (!xitk_is_window_visible (private_data->imlibdata->x.disp, (xitk_window_get_window(xwin))) && (t <= 140000)) {
+    while (!xitk_window_is_window_visible (xwin) && (t <= 140000)) {
       xitk_usec_sleep (t);
       t += 5000;
     }
