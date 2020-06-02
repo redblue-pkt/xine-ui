@@ -1003,7 +1003,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     
     /* Ask if user wants to store new shortcut */
     xitk_window_dialog_3 (gui->imlib_data,
-      (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+      xitk_window_get_window(kbedit->xwin),
       get_layer_above_video (gui), 400, _("Accept?"), _kbedit_accept_done, kbe,
       NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
       _("Store %s as\n'%s' key binding ?"), shortcut, kbedit->ksel->comment);
