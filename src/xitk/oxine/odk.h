@@ -69,7 +69,8 @@ typedef struct odk_s odk_t;
  * the given xine struct must have been initialized.
  */
 
-odk_t *odk_init(void);
+struct gGui_st;
+odk_t *odk_init(struct gGui_st *gui);
 
 /*
  * draw primitives

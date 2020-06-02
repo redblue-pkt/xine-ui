@@ -47,6 +47,7 @@
 
 struct  odk_s {
 
+  gGui_t     *gui;
   xine_t     *xine;
   xine_stream_t *stream;
   
@@ -166,9 +167,9 @@ static void odk_adapt(odk_t *odk) {
   if (odk->osd) xine_osd_free(odk->osd);
 
   if( odk->unscaled_osd )
-    video_window_get_output_size (gGui->vwin, &width, &height);
+    video_window_get_output_size (odk->gui->vwin, &width, &height);
   else
-    video_window_get_frame_size (gGui->vwin, &width, &height);
+    video_window_get_frame_size (odk->gui->vwin, &width, &height);
 
   lprintf("odk_adapt to: %i, %i\n", width, height);
   odk->vscale = height / (double)V_HEIGHT;
@@ -227,18 +228,19 @@ uint8_t *odk_get_pixmap(int type) {
  * initializes drawable, xine stream and osd
  */
 
-odk_t *odk_init(void) {
+odk_t *odk_init(gGui_t *gui) {
 
   odk_t *odk = ho_new_tagged(odk_t, "odk object");
 
   lprintf("initializing\n");
 
+  odk->gui = gui;
   odk->palette_fill = 0;
   odk->hscale = 0;
   odk->vscale = 0;
 
   odk->xine = __xineui_global_xine_instance;
-  odk->stream = gGui->stream;
+  odk->stream = odk->gui->stream;
 
   /* test unscaled osd support */
   odk->osd = xine_osd_new(odk->stream, 0, 0, 10, 10);
@@ -421,7 +423,7 @@ int odk_send_event(odk_t *odk, oxine_event_t *event) {
         rect.w = 0;
         rect.h = 0;
 
-        if (xine_port_send_gui_data(gGui->vo_port,
+        if (xine_port_send_gui_data(odk->gui->vo_port,
             XINE_GUI_SEND_TRANSLATE_GUI_TO_VIDEO, (void*)&rect) == -1) {
           return 0;
         }
@@ -470,34 +472,34 @@ void odk_enqueue(odk_t *odk, const char *mrl)
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {
-  int entry_num = gGui->playlist.num;
+  int entry_num = odk->gui->playlist.num;
 
   odk_enqueue(odk, mrl);
 
-  if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
-    gGui->ignore_next = 1;
-    xine_stop(gGui->stream);
-    gGui->ignore_next = 0;
+  if((xine_get_status(odk->gui->stream) != XINE_STATUS_STOP)) {
+    odk->gui->ignore_next = 1;
+    xine_stop(odk->gui->stream);
+    odk->gui->ignore_next = 0;
   }
 
-  if( gGui->playlist.num > entry_num ) {
-    gGui->playlist.cur = entry_num;
-    gui_set_current_mmk(gGui->playlist.mmk[entry_num]);
+  if( odk->gui->playlist.num > entry_num ) {
+    odk->gui->playlist.cur = entry_num;
+    gui_set_current_mmk(odk->gui->playlist.mmk[entry_num]);
 
-    return gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
-           gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0);
+    return gui_xine_open_and_play(odk->gui->mmk.mrl, odk->gui->mmk.sub, 0,
+           odk->gui->mmk.start, odk->gui->mmk.av_offset, odk->gui->mmk.spu_offset, 0);
   } else
     return 0;
 }
 
 void odk_play(odk_t *odk) {
 
-  gui_xine_play (gGui, odk->stream, 0, 0, 1);
+  gui_xine_play (odk->gui, odk->stream, 0, 0, 1);
 }
 
 void odk_stop(odk_t *odk) {
 
-  gui_stop (NULL, gGui);
+  gui_stop (NULL, odk->gui);
 }
 
 static int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
@@ -623,7 +625,7 @@ uint32_t odk_get_speed(odk_t *odk) {
 #if 0
 void odk_toggle_pause(odk_t *odk) {
 
-  gui_pause (NULL, gGui, 0);
+  gui_pause (NULL, odk->gui, 0);
 }
 #endif
 

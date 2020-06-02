@@ -727,7 +727,7 @@ static oxine_t *create_oxine(void) {
 
   start_scheduler();
   
-  oxine->odk = odk_init();
+  oxine->odk = odk_init(gGui);
     
   oxine->otk = otk_init(oxine->odk);
     
