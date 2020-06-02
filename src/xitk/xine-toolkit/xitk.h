@@ -912,11 +912,13 @@ uint32_t xitk_get_wm_type(void);
  *
  */
 void xitk_set_layer_above(Window window);
+void xitk_window_set_layer_above(xitk_window_t *window);
 
 /*
  *
  */
 void xitk_set_window_layer(Window window, int layer);
+void xitk_window_set_window_layer(xitk_window_t *w, int layer);
 
 /*
  *

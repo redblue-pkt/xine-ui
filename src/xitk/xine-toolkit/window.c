@@ -377,7 +377,7 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, i
     XUNLOCK (im->x.x_unlock_display, im->x.disp);
   }
   if (layer_above)
-    xitk_set_window_layer (_xitk_window_get_window (wd->xwin), layer_above);
+    xitk_window_set_window_layer (wd->xwin, layer_above);
   _xitk_window_set_focus (im->x.disp, _xitk_window_get_window (wd->xwin));
 
   {
@@ -519,6 +519,22 @@ void xitk_window_set_window_icon(xitk_window_t *w, Pixmap icon) {
     return;
 
   xitk_set_window_icon(w->imlibdata->x.disp, w->window, icon);
+}
+
+void xitk_window_set_layer_above(xitk_window_t *w) {
+
+  if (w == NULL)
+    return;
+
+  xitk_set_layer_above(w->window);
+}
+
+void xitk_window_set_window_layer(xitk_window_t *w, int layer) {
+
+  if (w == NULL)
+    return;
+
+  xitk_set_window_layer(w->window, layer);
 }
 
 /*
