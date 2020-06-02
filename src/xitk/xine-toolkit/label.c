@@ -681,8 +681,9 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   const xitk_label_widget_t *l, int x, int y, int width, int height,
   const char *fontname) {
   xitk_skin_element_info_t info;
-  
+
   XITK_CHECK_CONSTITENCY (l);
+  memset (&info, 0, sizeof (info));
   info.x                 = x;
   info.y                 = y;
   info.label_printable   = 1;
