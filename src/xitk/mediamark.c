@@ -2621,11 +2621,11 @@ void mediamark_append_entry(const char *mrl, const char *ident,
 void mediamark_free_mediamarks(void) {
   gGui_t *gui = gGui;
   
-  if(gui->playlist.num) {
+  if(gui->playlist.num > 0) {
     int i;
     
-    for(i = 0; i < gui->playlist.num; i++)
-      mediamark_free_entry(i);
+    for (i = 0; i < gui->playlist.num; i++)
+      mediamark_free_mmk(&gui->playlist.mmk[i]);
     
     SAFE_FREE(gui->playlist.mmk);
     gui->playlist.num = 0;
@@ -2771,13 +2771,22 @@ const char *mediamark_get_current_sub(void) {
   return NULL;
 }
 
-void mediamark_free_entry(int offset) {
+void mediamark_delete_entry(int offset) {
   gGui_t *gui = gGui;
 
   if(offset < gui->playlist.num && offset >= 0 && gui->playlist.mmk &&
-     gui->playlist.mmk[offset])
-    if(mediamark_free_mmk(&gui->playlist.mmk[offset]))
-      gui->playlist.num--;
+     gui->playlist.mmk[offset]) {
+
+    int i;
+    mediamark_free_mmk(&gui->playlist.mmk[offset]);
+
+    for (i = offset; i < gui->playlist.num; i++)
+      gui->playlist.mmk[i] = gui->playlist.mmk[i + 1];
+    gui->playlist.num--;
+    gui->playlist.mmk[gui->playlist.num] = NULL;
+
+    gui->playlist.mmk = (mediamark_t **) realloc(gui->playlist.mmk, sizeof(mediamark_t *) * (gui->playlist.num + 2));
+  }
 }
 
 int mediamark_concat_mediamarks(const char *_filename) {

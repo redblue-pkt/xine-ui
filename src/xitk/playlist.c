@@ -227,24 +227,15 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
  */
 void playlist_delete_entry(int j) {
   gGui_t *gui = gGui;
-  int i;
 
   if(j  >= 0) {
 
     if((gui->playlist.cur == j) && ((xine_get_status(gui->stream) != XINE_STATUS_STOP)))
       gui_stop (NULL, gui);
 
-    mediamark_free_entry(j);
-
     pthread_mutex_lock (&gui->mmk_mutex);
-    for(i = j; i < gui->playlist.num; i++)
-      gui->playlist.mmk[i] = gui->playlist.mmk[i + 1];
-
-    gui->playlist.mmk = (mediamark_t **) realloc(gui->playlist.mmk, sizeof(mediamark_t *) * (gui->playlist.num + 2));
-
-    gui->playlist.mmk[gui->playlist.num] = NULL;
+    mediamark_delete_entry(j);
     pthread_mutex_unlock (&gui->mmk_mutex);
-
 
     playlist_update_playlist();
 
