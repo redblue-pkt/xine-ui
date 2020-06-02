@@ -1856,9 +1856,9 @@ static int pplugin_is_visible(_pp_wrapper_t *pp_wrapper) {
   
   if(pp_wrapper->pplugin) {
     if(gui->use_root_window)
-      return xitk_is_window_visible(gui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
+      return xitk_window_is_window_visible(pp_wrapper->pplugin->xwin);
     else
-      return pp_wrapper->pplugin->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(pp_wrapper->pplugin->xwin));
+      return pp_wrapper->pplugin->visible && xitk_window_is_window_visible(pp_wrapper->pplugin->xwin);
   }
   
   return 0;

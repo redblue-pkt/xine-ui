@@ -436,8 +436,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       XSync(private_data->imlibdata->x.disp, False);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-      while(!xitk_is_window_visible(private_data->imlibdata->x.disp,
-				    (xitk_window_get_window(private_data->xwin))))
+      while (!xitk_window_is_window_visible(private_data->xwin))
 	xitk_usec_sleep(5000);
       
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);

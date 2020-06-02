@@ -435,6 +435,14 @@ int xitk_is_window_visible(Display *display, Window window) {
   return 0;
 }
 
+int xitk_window_is_window_visible(xitk_window_t *w) {
+
+  if (w == NULL)
+    return 0;
+
+  return xitk_is_window_visible(w->imlibdata->x.disp, w->window);
+}
+
 /*
  * Is window is size match with given args
  */

@@ -126,9 +126,9 @@ int viewlog_is_visible(void) {
 
   if(viewlog != NULL) {
     if (gui->use_root_window)
-      return xitk_is_window_visible (gui->display, xitk_window_get_window (viewlog->xwin));
+      return xitk_window_is_window_visible (viewlog->xwin);
     else
-      return viewlog->visible && xitk_is_window_visible (gui->display, xitk_window_get_window (viewlog->xwin));
+      return viewlog->visible && xitk_window_is_window_visible (viewlog->xwin);
   }
 
   return 0;

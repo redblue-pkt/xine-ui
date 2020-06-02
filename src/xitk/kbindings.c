@@ -521,9 +521,9 @@ int kbedit_is_visible(void) {
 
   if(kbedit != NULL) {
     if(gui->use_root_window)
-      return xitk_is_window_visible(gui->display, xitk_window_get_window(kbedit->xwin));
+      return xitk_window_is_window_visible(kbedit->xwin);
     else
-      return kbedit->visible && xitk_is_window_visible(gui->display, xitk_window_get_window(kbedit->xwin));
+      return kbedit->visible && xitk_window_is_window_visible(kbedit->xwin);
   }
 
   return 0;
