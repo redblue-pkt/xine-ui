@@ -954,11 +954,9 @@ void playlist_change_skins(int synthetic) {
     old_img = playlist->bg_image;
     playlist->bg_image = new_img;
 
+    video_window_set_transient_for (gui->vwin, xitk_window_get_window(playlist->xwin));
+
     gui->x_lock_display (gui->display);
-    
-    if(!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint(gui->display, xitk_window_get_window(playlist->xwin), gui->video_window);
-    
     Imlib_destroy_image(gui->imlib_data, old_img);
     Imlib_apply_image(gui->imlib_data, new_img, xitk_window_get_window(playlist->xwin));
     gui->x_unlock_display (gui->display);

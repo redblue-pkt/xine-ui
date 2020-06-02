@@ -741,10 +741,7 @@ void download_skin(char *url) {
 							NULL);
     
     xitk_window_show_window(skdloader.xwin);
-    gui->x_lock_display (gui->display);
-    if (!gui->use_root_window && gui->video_display == gui->display)
-      XSetTransientForHint (gui->display, xitk_window_get_window(skdloader.xwin), gui->video_window);
-    gui->x_unlock_display (gui->display);
+    video_window_set_transient_for (gui->vwin, xitk_window_get_window(skdloader.xwin));
     layer_above_video(xitk_window_get_window(skdloader.xwin));
 
     try_to_set_input_focus(xitk_window_get_window(skdloader.xwin));
