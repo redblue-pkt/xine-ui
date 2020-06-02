@@ -38,6 +38,7 @@
 #include <xine.h>
 
 #include "_xitk.h"
+#include "mrlbrowser.h"
 
 #include "utils.h"
 
@@ -480,6 +481,19 @@ Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
   return None;
 }
 
+xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
+  mrlbrowser_private_data_t *private_data;
+
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+           (w->type & WIDGET_GROUP_WIDGET))) {
+
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
+    return private_data->xwin;
+  }
+
+  return NULL;
+}
+
 
 /*
  * Fill window information struct of given widget.
@@ -563,10 +577,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
     
     private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XRaiseWindow(private_data->imlibdata->x.disp, private_data->window); 
-    XMapWindow(private_data->imlibdata->x.disp, private_data->window); 
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    xitk_window_show_window(private_data->xwin);
   }
 }
 
@@ -604,16 +615,14 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
     private_data->visible = 0;
     
     xitk_unregister_event_handler(&private_data->widget_key);
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
+
     xitk_destroy_widgets(private_data->widget_list);
     xitk_button_list_delete (private_data->autodir_buttons);
-    
+
+    xitk_window_destroy_window(private_data->xwin);
+    private_data->xwin = NULL;
+
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XDestroyWindow(private_data->imlibdata->x.disp, private_data->window);
     Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
@@ -942,13 +951,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
   GC                          gc;
   XSizeHints                  hint;
-  XSetWindowAttributes        attr;
   char                       *title = mb->window_title;
-  Atom                        prop, XA_WIN_LAYER;
-  MWMHints                    mwmhints;
-  XWMHints                   *wm_hint;
-  XClassHint                 *xclasshint;
-  XColor                      black, dummy;
+  Atom                        XA_WIN_LAYER;
   xitk_widget_t              *mywidget;
   mrlbrowser_private_data_t  *private_data;
   xitk_labelbutton_widget_t   lb;
@@ -1010,45 +1014,20 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   hint.height = private_data->bg_image->rgb_height;
   hint.flags  = PPosition | PSize;
 
-  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-
-  XAllocNamedColor(mb->imlibdata->x.disp, 
-		   Imlib_get_colormap(mb->imlibdata),
-		   "black", &black, &dummy);
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
-
-  attr.override_redirect = False;
-  attr.background_pixel  = black.pixel;
-  /*
-   * XXX:multivis
-   * To avoid BadMatch errors on XCreateWindow:
-   * If the parent and the new window have different depths, we must supply either
-   * a BorderPixmap or a BorderPixel.
-   * If the parent and the new window use different visuals, we must supply a
-   * Colormap
-   */
-  attr.border_pixel      = 1;
-  attr.colormap		 = Imlib_get_colormap(mb->imlibdata);
+  private_data->xwin = xitk_window_create_window(mb->imlibdata, mb->x, mb->y,
+                                                 private_data->bg_image->rgb_width,
+                                                 private_data->bg_image->rgb_height);
+  private_data->window = xitk_window_get_window(private_data->xwin);
 
   XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-  private_data->window   = XCreateWindow (mb->imlibdata->x.disp,
-					  mb->imlibdata->x.root, 
-					  hint.x, hint.y, hint.width, hint.height, 0, 
-					  mb->imlibdata->x.depth, InputOutput, 
-					  mb->imlibdata->x.visual,
-					  CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
-					  &attr);
-
   XmbSetWMProperties(mb->imlibdata->x.disp, private_data->window, title, title,
                      NULL, 0, &hint, NULL, NULL);
-
-  XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   if(mb->set_wm_window_normal)
-    xitk_set_wm_window_type(private_data->window, WINDOW_TYPE_NORMAL);
+    xitk_window_set_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
   else
-    xitk_unset_wm_window_type(private_data->window, WINDOW_TYPE_NORMAL);
+    xitk_window_unset_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
 
   /*
    * layer above most other things, like gnome panel
@@ -1065,50 +1044,20 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 		      1);
     }
   }
-  
-  /*
-   * wm, no border please
-   */
-  prop                 = XInternAtom(mb->imlibdata->x.disp, "_MOTIF_WM_HINTS", True);
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
-
-  memset(&mwmhints, 0, sizeof(mwmhints));
-  mwmhints.flags       = MWM_HINTS_DECORATIONS;
-  mwmhints.decorations = 0;
-  
-  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-  XChangeProperty(mb->imlibdata->x.disp, private_data->window, prop, prop, 32,
-                  PropModeReplace, (unsigned char *) &mwmhints,
-                  PROP_MWM_HINTS_ELEMENTS);						
 
   if(mb->window_trans != None)
     XSetTransientForHint (mb->imlibdata->x.disp, private_data->window, mb->window_trans);
 
+  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
+
   /* set xclass */
-  
-  if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name  = (char *) (mb->resource_name ? mb->resource_name : "xitk mrl browser");
-    xclasshint->res_class = (char *) (mb->resource_class ? mb->resource_class : "xitk");
-    XSetClassHint(mb->imlibdata->x.disp, private_data->window, xclasshint);
-    XFree(xclasshint);
-  }
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
-  
-  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-  wm_hint = XAllocWMHints();
-  if (wm_hint != NULL) {
-    wm_hint->input         = True;
-    wm_hint->initial_state = NormalState;
-    if(mb->icon) {
-      wm_hint->icon_pixmap = *mb->icon;
-      wm_hint->flags       = IconPixmapHint;
-    }
-    wm_hint->flags         |= InputHint | StateHint;
-    XSetWMHints(mb->imlibdata->x.disp, private_data->window, wm_hint);
-    XFree(wm_hint);
-  }
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
-  
+  xitk_window_set_window_class(private_data->xwin,
+                               mb->resource_name ? mb->resource_name : "xitk mrl browser",
+                               mb->resource_class ? mb->resource_class : "xitk");
+
+  if (mb->icon)
+    xitk_window_set_window_icon(private_data->xwin, *mb->icon);
+
   XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
   gc = XCreateGC(mb->imlibdata->x.disp, private_data->window, 0, 0);
   
@@ -1253,10 +1202,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 			   (const char* const*)private_data->mc->mrls_disp, NULL,
 			   private_data->mrls_num, 0);
 
-  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-  XRaiseWindow(mb->imlibdata->x.disp, private_data->window); 
-  XMapWindow(mb->imlibdata->x.disp, private_data->window); 
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
+  xitk_window_show_window(private_data->xwin);
 
   private_data->widget_key = 
     xitk_register_event_handler("mrl browser",
@@ -1266,7 +1212,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				mb->dndcallback,
 				private_data->widget_list,(void *) private_data);
 
-  while(!xitk_is_window_visible(mb->imlibdata->x.disp, private_data->window))
+  while (!xitk_window_is_window_visible(private_data->xwin))
     xitk_usec_sleep(5000);
   
   xitk_mrlbrowser_change_skins(mywidget, skonfig);
