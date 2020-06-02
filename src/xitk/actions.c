@@ -1097,22 +1097,11 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
 
     video_window_set_visibility (gui->vwin, visible);
 
-
     /* We need to reparent all visible windows because of redirect tweaking */
-    if(!visible) { /* Show the panel in taskbar */
-      int x = 0, y = 0;
-
-      panel_get_window_position(gui->panel, &x, &y, NULL, NULL);
-      gui->x_lock_display (gui->display);
-      XReparentWindow(gui->display, gui->panel_window, gui->imlib_data->x.root, x, y);
-      gui->x_unlock_display (gui->display);
-    }
     reparent_all_windows();
 
     /* (re)start/stop visual animation */
     if (video_window_is_visible (gui->vwin)) {
-      layer_above_video(gui->panel_window);
-      
       if(gui->visual_anim.enabled && (gui->visual_anim.running == 2))
 	visual_anim_play();
     }
