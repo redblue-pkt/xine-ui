@@ -73,6 +73,7 @@ void video_window_set_cursor_visibility (xui_vwin_t *vwin, int show_cursor);
 int video_window_is_cursor_visible (xui_vwin_t *vwin);
 int video_window_get_cursor_timer (xui_vwin_t *vwin);
 void video_window_set_cursor_timer (xui_vwin_t *vwin, int timer);
+void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y);
 
 /* hide/show video window */
 void video_window_set_visibility (xui_vwin_t *vwin, int show_window);
