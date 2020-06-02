@@ -314,7 +314,7 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 
     if(need_restart) {
       setup->dialog = xitk_window_dialog_3 (setup->gui->imlib_data,
-        (!setup->gui->use_root_window && (setup->gui->video_display == setup->gui->display)) ? setup->gui->video_window : None,
+        xitk_window_get_window (setup->xwin),
         get_layer_above_video (setup->gui), 400, _("Important Notice"), NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
         "%s", _("You changed some configuration value which require to restart xine to take effect."));

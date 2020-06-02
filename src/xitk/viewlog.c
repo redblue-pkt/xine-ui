@@ -264,7 +264,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 #if DEBUG_VIEWLOG
   if ((viewlog->log_entries == 0) || (log == NULL))
     xitk_window_dialog_3 (gui->imlib_data,
-      (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+      xitk_window_get_window (viewlog->xwin),
       get_layer_above_video (gui), 400, _("log info"), NULL, NULL,
       XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
       _("There is no log entry for logging section '%s'.\n"),
