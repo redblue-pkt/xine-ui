@@ -1612,6 +1612,8 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
  */
 Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w);
 
+xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w);
+
 /**
  *
  */
