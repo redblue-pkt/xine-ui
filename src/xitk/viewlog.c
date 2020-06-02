@@ -226,7 +226,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    
 	  case '\n':
 	    if(buflen > 0) {
-	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
 	      viewlog->log[j++] = strdup(buf);
 	      viewlog->real_num_entries++;
 	    }
@@ -243,7 +243,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 
 	/* Remaining chars */
 	if(buflen > 0) {
-	  viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	  viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
 	  viewlog->log[j++] = strdup(buf);
 	}
 	
