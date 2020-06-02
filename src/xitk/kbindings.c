@@ -325,7 +325,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
-static size_t _kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size) {
+static size_t _kbindings_get_shortcut_from_kbe(const kbinding_entry_t *kbe, char *shortcut, size_t shortcut_size) {
   gGui_t *gui = gGui;
 
   if(kbe) {
@@ -651,7 +651,7 @@ static void kbedit_unset(void) {
  *         -1 on success
  *         >=0 if a redundant entry found (bkt array entry num).
  */
-static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
+static int bkedit_check_redundancy(const kbinding_t *kbt, kbinding_entry_t *kbe) {
   int ret = -1;
   
   if(kbt && kbe) {
@@ -1017,6 +1017,10 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
       xine_error (gGui, _("This key binding is redundant with action:\n\"%s\".\n"),
         kbedit->kbt->entry[redundant]->comment);
     }
+    SAFE_FREE (kbe->comment);
+    SAFE_FREE (kbe->action);
+    SAFE_FREE (kbe->key);
+    SAFE_FREE (kbe);
   }
   
   free(olbl);
