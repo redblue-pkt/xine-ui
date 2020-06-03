@@ -725,7 +725,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     xitk_window_show_window(panel->xwin);
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
-    wait_for_window_visible (panel->gui->display, xitk_window_get_window(panel->xwin));
+    wait_for_window_visible (panel->xwin);
     layer_above_video (panel->xwin);
      
     if (panel->gui->cursor_grabbed) {
