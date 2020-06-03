@@ -1809,8 +1809,6 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
     if (!mrl_browser_is_visible (gui->mrlb)) {
       show_mrl_browser (gui->mrlb);
-      if(!gui->use_root_window)
-        set_mrl_browser_transient (gui->mrlb);
     }
     else {
       if(gui->use_root_window)

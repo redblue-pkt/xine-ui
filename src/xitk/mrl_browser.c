@@ -56,16 +56,6 @@ void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout) {
 /*
  *
  */
-void set_mrl_browser_transient (xui_mrlb_t *mrlb) {
-  if (mrlb && mrlb->w) {
-    if (!mrlb->gui->use_root_window && mrlb->gui->video_display == mrlb->gui->display)
-      xitk_mrlbrowser_set_transient (mrlb->w, mrlb->gui->video_window);
-  }
-}
-
-/*
- *
- */
 void mrl_browser_change_skins (xui_mrlb_t *mrlb, int synthetic) {
   (void)synthetic;
   if (mrlb && mrlb->w) {
