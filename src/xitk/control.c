@@ -340,8 +340,6 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT (&lbl, vctrl->gui->imlib_data);
-  lbl.window = XITK_WIDGET_LIST_WINDOW (vctrl->widget_list);
-  lbl.gc     = XITK_WIDGET_LIST_GC (vctrl->widget_list);
   lbl.callback = NULL;
 
   {

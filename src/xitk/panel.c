@@ -1337,9 +1337,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
   xitk_widget_list_set (panel->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window(panel->xwin));
   xitk_widget_list_set(panel->widget_list, WIDGET_LIST_GC, gc);
  
-  lbl.window    = (XITK_WIDGET_LIST_WINDOW(panel->widget_list));
-  lbl.gc        = (XITK_WIDGET_LIST_GC(panel->widget_list));
-
   /* Prev button */
   b.skin_element_name = "Prev";
   b.callback          = gui_nextprev;

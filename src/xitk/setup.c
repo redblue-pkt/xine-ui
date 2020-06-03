@@ -513,8 +513,6 @@ static xitk_widget_t *setup_add_label (xui_setup_t *setup,
 
   XITK_WIDGET_INIT (&lb, setup->gui->imlib_data);
 
-  lb.window              = xitk_window_get_window (setup->xwin);
-  lb.gc                  = (XITK_WIDGET_LIST_GC (setup->widget_list));
   lb.skin_element_name   = NULL;
   lb.label               = (char *)str;
   lb.callback            = cb;
@@ -1019,8 +1017,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     len = xitk_font_get_string_length (fs, label);
     
     XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-    lbl.window              = xitk_window_get_window (setup->xwin);
-    lbl.gc                  = (XITK_WIDGET_LIST_GC (setup->widget_list));
     lbl.skin_element_name   = NULL;
     lbl.label               = label;
     lbl.callback            = NULL;

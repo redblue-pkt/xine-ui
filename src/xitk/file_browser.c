@@ -1495,8 +1495,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files);
   xitk_enable_and_show_widget(fb->show_hidden);
 
-  lbl.window            = xitk_window_get_window(fb->xwin);
-  lbl.gc                = (XITK_WIDGET_LIST_GC(fb->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = _("Show hidden file");
   lbl.callback          = fb_lbl_hidden_files;

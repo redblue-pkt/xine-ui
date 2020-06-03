@@ -1292,8 +1292,6 @@ void kbedit_window(void) {
   y = y1 + (45 / 2);                /* Checkbox                     */
   y1 = y - ((fontheight - 10) / 2); /* Text, v-centered to ckeckbox */
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = "Binding Action";
   l.callback          = NULL;
@@ -1305,8 +1303,6 @@ void kbedit_window(void) {
   y += 45 + 3;
   y1 += 45 + 3;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = "THE Key";
   l.callback          = NULL;
@@ -1330,8 +1326,6 @@ void kbedit_window(void) {
 
   x += 15;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = _("ctrl");
   l.callback          = NULL;
@@ -1352,8 +1346,6 @@ void kbedit_window(void) {
 
   x += 15;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = _("meta");
   l.callback          = NULL;
@@ -1374,8 +1366,6 @@ void kbedit_window(void) {
 
   x += 15;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = _("mod3");
   l.callback          = NULL;
@@ -1396,8 +1386,6 @@ void kbedit_window(void) {
 
   x += 15;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = _("mod4");
   l.callback          = NULL;
@@ -1418,8 +1406,6 @@ void kbedit_window(void) {
 
   x += 15;
 
-  l.window            = (XITK_WIDGET_LIST_WINDOW(kbedit->widget_list));
-  l.gc                = (XITK_WIDGET_LIST_GC(kbedit->widget_list));
   l.skin_element_name = NULL;
   l.label             = _("mod5");
   l.callback          = NULL;

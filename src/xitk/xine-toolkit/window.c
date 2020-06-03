@@ -290,8 +290,6 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, i
       xitk_checkbox_set_state (wd->checkbox, checked);
     }
 
-    lbl.window            = _xitk_window_get_window (wd->xwin);
-    lbl.gc                = wd->widget_list->gc;
     lbl.skin_element_name = NULL;
     lbl.label             = check_label;
     lbl.callback          = _checkbox_label_click;

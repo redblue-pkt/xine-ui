@@ -1056,9 +1056,6 @@ void playlist_editor(void) {
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) xitk_window_get_window(playlist->xwin));
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_GC, gc);
 
-  lbl.window          = (XITK_WIDGET_LIST_WINDOW(playlist->widget_list));
-  lbl.gc              = (XITK_WIDGET_LIST_GC(playlist->widget_list));
-
   b.skin_element_name = "PlMoveUp";
   b.callback          = playlist_move_current_updown;
   b.userdata          = (void *)DIRECTION_UP;
