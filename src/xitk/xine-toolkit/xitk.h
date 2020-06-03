@@ -674,7 +674,6 @@ typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
   const char                       *skin_element_name;
-  Window                            window_trans;
   int                               layer_above;
   Pixmap                           *icon;
   int                               set_wm_window_normal;
@@ -1598,18 +1597,11 @@ void xitk_mrlbrowser_show(xitk_widget_t *w);
 /**
  *
  */
-void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window);
-
-/**
- *
- */
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
 
 /**
  *
  */
-Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w);
-
 xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w);
 
 /**

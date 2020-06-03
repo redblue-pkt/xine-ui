@@ -466,21 +466,8 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
 }
 
 /*
- * Return window id of widget.
+ * Return window of widget.
  */
-Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    return private_data->window;
-  }
-
-  return None;
-}
-
 xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
@@ -578,26 +565,6 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
     private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
     xitk_window_show_window(private_data->xwin);
-  }
-}
-
-/*
- * Set mrlbrowser transient for hints for given window.
- */
-void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
-  mrlbrowser_private_data_t *private_data;
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET)) && (window != None)) {
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-
-    if(private_data->visible) {
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetTransientForHint (private_data->imlibdata->x.disp,
-			    private_data->window, 
-			    window);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    }
   }
 }
 
@@ -1044,10 +1011,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 		      1);
     }
   }
-
-  if(mb->window_trans != None)
-    XSetTransientForHint (mb->imlibdata->x.disp, private_data->window, mb->window_trans);
-
   XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   /* set xclass */
