@@ -1117,8 +1117,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 
   lbl.label             = "";
   lbl.skin_element_name = mb->origin.skin_element_name;
-  lbl.window            = private_data->widget_list->win;
-  lbl.gc                = private_data->widget_list->gc;
   lbl.callback          = NULL;
   private_data->widget_origin = xitk_label_create (private_data->widget_list, skonfig, &lbl);
   xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->widget_origin->node);
@@ -1132,8 +1130,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 
     lbl.label             = mb->ip_name.label.label_str;
     lbl.skin_element_name = mb->ip_name.label.skin_element_name;
-    lbl.window            = private_data->widget_list->win;
-    lbl.gc                = private_data->widget_list->gc;
     lbl.callback          = NULL;
     w = xitk_label_create (private_data->widget_list, skonfig, &lbl);
     xitk_dlist_add_tail (&private_data->widget_list->list, &w->node);

@@ -656,8 +656,6 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	     ? pobj->param->description : _("No description available"));
 
     XITK_WIDGET_INIT(&lb, gui->imlib_data);
-    lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
-    lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
     lb.label               = buffer;
     lb.callback            = NULL;
@@ -1163,8 +1161,6 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     xitk_label_widget_t   lb;
     
     XITK_WIDGET_INIT(&lb, gui->imlib_data);
-    lb.window              = xitk_window_get_window(pp_wrapper->pplugin->xwin);
-    lb.gc                  = (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list));
     lb.skin_element_name   = NULL;
     lb.label               = _("There is no parameter available for this plugin.");
     lb.callback            = NULL;

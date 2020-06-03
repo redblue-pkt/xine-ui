@@ -484,8 +484,6 @@ void stream_infos_panel(void) {
   
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-  lbl.window            = xitk_window_get_window (sinfos.xwin);
-  lbl.gc                = (XITK_WIDGET_LIST_GC (sinfos.widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;

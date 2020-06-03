@@ -592,8 +592,6 @@ typedef struct {
 typedef struct {
   int                               magic;
   ImlibData                        *imlibdata;
-  Window                            window;
-  GC                                gc;
   const char                       *label;
   const char                       *skin_element_name;
   xitk_simple_callback_t            callback;

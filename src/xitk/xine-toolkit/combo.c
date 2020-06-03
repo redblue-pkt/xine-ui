@@ -687,8 +687,6 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   /* Create label and button (skinable) */
   lbl.label             = "";
   lbl.skin_element_name = c->skin_element_name;
-  lbl.window            = c->parent_wlist->win;
-  lbl.gc                = c->parent_wlist->gc;
   lbl.callback          = _combo_rollunroll_from_lbl;
   lbl.userdata          = (void *)mywidget;
   private_data->label_widget = xitk_label_create (c->parent_wlist, skonfig, &lbl);
@@ -755,9 +753,6 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     height = xitk_font_get_string_height(fs, " ") + 4;
     xitk_font_unload_font(fs);
 
-
-    lbl.window            = c->parent_wlist->win;
-    lbl.gc                = c->parent_wlist->gc;
     lbl.skin_element_name = NULL;
     lbl.label             = "";
     lbl.callback          = _combo_rollunroll_from_lbl;
