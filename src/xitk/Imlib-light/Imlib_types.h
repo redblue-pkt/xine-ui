@@ -1,3 +1,6 @@
+#ifndef _XITK_IMLIB_TYPES_H
+#define _XITK_IMLIB_TYPES_H
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -191,3 +194,5 @@ struct _ImlibInitParams
 #define RT_PLAIN_TRUECOL       4
 /* a special high-quality renderer for people with 15 and 16bpp that dithers */
 #define RT_DITHER_TRUECOL      5
+
+#endif /* _XITK_IMLIB_TYPES_H */
