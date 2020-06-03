@@ -24,6 +24,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+
 #include <stdio.h>
 
 #include "_xitk.h"
@@ -526,8 +527,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 					 xitk_widget_t *mywidget, 
 					 combo_private_data_t *private_data,
 					 int visible, int enable) {
-  Atom                        XA_WIN_LAYER;
-  long                        data[1];
   const char                **entries = c->entries;
   unsigned int                itemw, itemh = 20;
   unsigned int                slidw = 12;
@@ -578,16 +577,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 			     (xitk_window_get_window(private_data->xwin)),
 			     CWOverrideRedirect, &attr);
     XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
-  }
-
-  if(c->layer_above) {
-    XA_WIN_LAYER = XInternAtom(c->imlibdata->x.disp, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(c->imlibdata->x.disp, 
-		    (xitk_window_get_window(private_data->xwin)), XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
   }
 
   XSetTransientForHint (c->imlibdata->x.disp,
