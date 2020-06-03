@@ -919,7 +919,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   GC                          gc;
   XSizeHints                  hint;
   char                       *title = mb->window_title;
-  Atom                        XA_WIN_LAYER;
   xitk_widget_t              *mywidget;
   mrlbrowser_private_data_t  *private_data;
   xitk_labelbutton_widget_t   lb;
@@ -928,8 +927,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   xitk_label_widget_t         lbl;
   xitk_combo_widget_t         cmb;
   xitk_widget_t              *w;
-  long                        data[1];
-  
+
   XITK_CHECK_CONSTITENCY(mb);
 
   if(mb->ip_availables == NULL) {
@@ -995,23 +993,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     xitk_window_set_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
   else
     xitk_window_unset_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
-
-  /*
-   * layer above most other things, like gnome panel
-   * WIN_LAYER_ABOVE_DOCK  = 10
-   *
-   */
-  XLOCK (mb->imlibdata->x.x_lock_display, mb->imlibdata->x.disp);
-  if(mb->layer_above) {
-    if((XA_WIN_LAYER = XInternAtom(mb->imlibdata->x.disp, "_WIN_LAYER", False)) != None) {
-    
-      data[0] = 10;
-      XChangeProperty(mb->imlibdata->x.disp, private_data->window, XA_WIN_LAYER,
-		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		      1);
-    }
-  }
-  XUNLOCK (mb->imlibdata->x.x_unlock_display, mb->imlibdata->x.disp);
 
   /* set xclass */
   xitk_window_set_window_class(private_data->xwin,
