@@ -265,7 +265,6 @@ struct gGui_st {
   XColor                    black;
   Pixmap                    icon;
   Colormap                  colormap;
-  double                    pixel_aspect;
 
   VisualID	            prefered_visual_id;
   int		            prefered_visual_class;

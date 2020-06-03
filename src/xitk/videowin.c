@@ -80,6 +80,7 @@ struct xui_vwin_st {
   double                 video_duration;  /* frame duratrion in seconds */
   double                 video_average;   /* average frame duration in seconds */
   double                 use_duration;    /* duration used for tv mode selection */
+  double                 pixel_aspect;
   int                    video_duration_valid; /* is use_duration trustable? */
   int                    win_width;       /* size of non-fullscreen window         */
   int                    win_height;
@@ -412,7 +413,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->output_height   = vwin->fullscreen_height;
     vwin->visible_width   = vwin->fullscreen_width;
     vwin->visible_height  = vwin->fullscreen_height;
-    vwin->visible_aspect  = vwin->gui->pixel_aspect = 1.0;
+    vwin->visible_aspect  = vwin->pixel_aspect = 1.0;
 
     if (vwin->gui->video_window == None) {
       XGCValues   gcv;
@@ -546,7 +547,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           res_v = (DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen) * 1000
             / DisplayHeightMM (vwin->gui->video_display, vwin->gui->video_screen));
   
-	  vwin->gui->pixel_aspect    = res_v / res_h;
+          vwin->pixel_aspect    = res_v / res_h;
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->gui->video_display, &dummy_event, &dummy_error)) {
 	    int count = 1;
@@ -554,13 +555,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
             xsi = XineramaQueryScreens (vwin->gui->video_display, &count);
 	    if (count > 1)
 	      /* multihead -> assuming square pixels */
-	      vwin->gui->pixel_aspect = 1.0;
+              vwin->pixel_aspect = 1.0;
             if (xsi)
               XFree (xsi);
 	  }
 #endif
 #ifdef DEBUG
-          printf ("pixel_aspect: %f\n", vwin->gui->pixel_aspect);
+          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
 
 	  // TODO
@@ -673,7 +674,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
-  vwin->visible_aspect = vwin->gui->pixel_aspect;
+  vwin->visible_aspect = vwin->pixel_aspect;
 
   /* Retrieve size/aspect from tvout backend, if it should be set */
   if (vwin->gui->tvout) {
@@ -937,7 +938,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           res_v = (DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen) * 1000
             / DisplayHeightMM (vwin->gui->video_display, vwin->gui->video_screen));
   
-          vwin->gui->pixel_aspect = res_v / res_h;
+          vwin->pixel_aspect = res_v / res_h;
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->gui->video_display, &dummy_event, &dummy_error)) {
             int count = 1;
@@ -945,13 +946,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
             xsi = XineramaQueryScreens (vwin->gui->video_display, &count);
             if (count > 1)
               /* multihead -> assuming square pixels */
-              vwin->gui->pixel_aspect = 1.0;
+              vwin->pixel_aspect = 1.0;
             if (xsi)
               XFree (xsi);
           }
 #endif
 #ifdef DEBUG
-          printf ("pixel_aspect: %f\n", vwin->gui->pixel_aspect);
+          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
 	}
 #endif
@@ -1168,10 +1169,10 @@ void video_window_dest_size_cb (void *data,
   vwin->frame_height = video_height;
 
   /* correct size with video_pixel_aspect */
-  if (video_pixel_aspect >= vwin->gui->pixel_aspect)
-    video_width  = video_width * video_pixel_aspect / vwin->gui->pixel_aspect + .5;
+  if (video_pixel_aspect >= vwin->pixel_aspect)
+    video_width  = video_width * video_pixel_aspect / vwin->pixel_aspect + .5;
   else
-    video_height = video_height * vwin->gui->pixel_aspect / video_pixel_aspect + .5;
+    video_height = video_height * vwin->pixel_aspect / video_pixel_aspect + .5;
 
   if (vwin->stream_resize_window && (vwin->fullscreen_mode & WINDOWED_MODE)) {
 
@@ -1189,7 +1190,7 @@ void video_window_dest_size_cb (void *data,
          */
         *dest_width  = (int) ((float) video_width * xmag + 0.5f);
         *dest_height = (int) ((float) video_height * ymag + 0.5f);
-        *dest_pixel_aspect = vwin->gui->pixel_aspect;
+        *dest_pixel_aspect = vwin->pixel_aspect;
         pthread_mutex_unlock (&vwin->mutex);
         return;
       }
@@ -1203,7 +1204,7 @@ void video_window_dest_size_cb (void *data,
   } else {
     *dest_width  = vwin->output_width;
     *dest_height = vwin->output_height;
-    *dest_pixel_aspect = vwin->gui->pixel_aspect;
+    *dest_pixel_aspect = vwin->pixel_aspect;
   }
 
   pthread_mutex_unlock (&vwin->mutex);
@@ -1229,10 +1230,10 @@ void video_window_frame_output_cb (void *data,
   vwin->frame_height = video_height;
 
   /* correct size with video_pixel_aspect */
-  if (video_pixel_aspect >= vwin->gui->pixel_aspect)
-    video_width  = video_width * video_pixel_aspect / vwin->gui->pixel_aspect + .5;
+  if (video_pixel_aspect >= vwin->pixel_aspect)
+    video_width  = video_width * video_pixel_aspect / vwin->pixel_aspect + .5;
   else
-    video_height = video_height * vwin->gui->pixel_aspect / video_pixel_aspect + .5;
+    video_height = video_height * vwin->pixel_aspect / video_pixel_aspect + .5;
 
   /* Please do NOT remove, support will be added soon! */
 #if 0
@@ -1281,7 +1282,7 @@ void video_window_frame_output_cb (void *data,
   } else {
     *dest_width  = vwin->output_width;
     *dest_height = vwin->output_height;
-    *dest_pixel_aspect = vwin->gui->pixel_aspect;
+    *dest_pixel_aspect = vwin->pixel_aspect;
   }
 
   *win_x = (vwin->xwin < 0) ? 0 : vwin->xwin;
@@ -1903,6 +1904,38 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   if (vwin->gui->video_display != vwin->gui->display) {
     vwin->second_display_running = 1;
     pthread_create (&vwin->second_display_thread, NULL, second_display_loop, vwin);
+  }
+
+  {
+#ifdef HAVE_XINERAMA
+    int    dummy_event, dummy_error;
+#endif
+    double res_h, res_v;
+    gui->x_lock_display (gui->video_display);
+    res_h                 = (DisplayWidth  (gui->video_display, gui->video_screen) * 1000
+                             / DisplayWidthMM (gui->video_display, gui->video_screen));
+    res_v                 = (DisplayHeight (gui->video_display, gui->video_screen) * 1000
+                             / DisplayHeightMM (gui->video_display, gui->video_screen));
+    gui->x_unlock_display (gui->video_display);
+    vwin->pixel_aspect    = res_v / res_h;
+
+#ifdef HAVE_XINERAMA
+    if (XineramaQueryExtension(gui->video_display, &dummy_event, &dummy_error)) {
+      void *info;
+      int count = 1;
+
+      info = XineramaQueryScreens(gui->video_display, &count);
+      if (count > 1)
+        /* multihead -> assuming square pixels */
+        vwin->pixel_aspect = 1.0;
+      if (info)
+        XFree(info);
+    }
+#endif
+
+#ifdef DEBUG
+    printf("pixel_aspect: %f\n", vwin->pixel_aspect);
+#endif
   }
 
   vwin->gui->vwin = vwin;

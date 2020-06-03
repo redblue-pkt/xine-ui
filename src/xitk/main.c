@@ -50,9 +50,6 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xresource.h>
-#ifdef HAVE_XINERAMA
-#include <X11/extensions/Xinerama.h>
-#endif
 
 #include <locale.h>
 
@@ -748,41 +745,12 @@ static void show_usage (void) {
 static xine_video_port_t *load_video_out_driver(int driver_number) {
   gGui_t *gui = gGui;
   xine_video_port_t      *video_port = NULL;
-  double                  res_h, res_v;
   x11_visual_t            vis;
   int                     driver_num;
-#ifdef HAVE_XINERAMA
-  int                     dummy_event, dummy_error;
-#endif
 
   vis.display           = gui->video_display;
   vis.screen            = gui->video_screen;
   vis.d                 = gui->video_window;
-  gui->x_lock_display (gui->video_display);
-  res_h                 = (DisplayWidth  (gui->video_display, gui->video_screen)*1000 
-			   / DisplayWidthMM (gui->video_display, gui->video_screen));
-  res_v                 = (DisplayHeight (gui->video_display, gui->video_screen)*1000
-			   / DisplayHeightMM (gui->video_display, gui->video_screen));
-  gui->x_unlock_display (gui->video_display);
-  gui->pixel_aspect    = res_v / res_h;
-  
-#ifdef HAVE_XINERAMA
-  if (XineramaQueryExtension(gui->video_display, &dummy_event, &dummy_error)) {
-    void *info;
-    int count = 1;
-
-    info = XineramaQueryScreens(gui->video_display, &count);
-    if (count > 1)
-      /* multihead -> assuming square pixels */
-      gui->pixel_aspect = 1.0;
-    if (info) XFree(info);
-  }
-#endif
-
-#ifdef DEBUG
-  printf("pixel_aspect: %f\n", gui->pixel_aspect);
-#endif
-
   vis.dest_size_cb      = video_window_dest_size_cb;
   vis.frame_output_cb   = video_window_frame_output_cb;
   vis.user_data         = gui->vwin;
