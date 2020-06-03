@@ -807,7 +807,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
     if ((!strcasecmp (gui->video_driver_ids[driver_num], "none")) ||
         (!strcasecmp (gui->video_driver_ids[driver_num], "null"))) {
       video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_num],
-        XINE_VISUAL_TYPE_NONE, (void *) &vis);
+        XINE_VISUAL_TYPE_NONE, NULL);
       if (video_port)
 	return video_port;
       
@@ -860,7 +860,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
     if ((!strcasecmp (gui->video_driver_ids[driver_number], "none"))
       || (!strcasecmp (gui->video_driver_ids[driver_number], "null"))) {
       video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_number],
-        XINE_VISUAL_TYPE_NONE, (void *) &vis);
+        XINE_VISUAL_TYPE_NONE, NULL);
       
       /* do not save on config, otherwise user would never see images again... */
     }
