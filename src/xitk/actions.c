@@ -88,10 +88,10 @@ void reparent_all_windows(void) {
 
 }
 
-void wait_for_window_visible(Display *display, Window window) {
+void wait_for_window_visible(xitk_window_t *xwin) {
   int t = 0;
 
-  while((!xitk_is_window_visible(display, window)) && (++t < 3))
+  while ((!xitk_window_is_window_visible(xwin)) && (++t < 3))
     xine_usec_sleep(5000);
 }
 
@@ -139,7 +139,7 @@ void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *vi
       xitk_window_show_window(xwin);
       video_window_set_transient_for (gui->vwin, xwin);
 
-      wait_for_window_visible(gui->display, window);
+      wait_for_window_visible(xwin);
       layer_above_video(xwin);
     }
   }
