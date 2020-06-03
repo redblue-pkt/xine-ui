@@ -137,7 +137,7 @@ void destroy_mrl_browser (xui_mrlb_t *mrlb) {
       mrlb->w = NULL;
     }
     mrlb->gui->mrlb = NULL;
-    try_to_set_input_focus (mrlb->gui->video_window);
+    video_window_set_input_focus (mrlb->gui->vwin);
     free (mrlb);
   }
 }
@@ -163,7 +163,7 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
       mrlb->w = NULL;
     }
     mrlb->gui->mrlb = NULL;
-    try_to_set_input_focus (mrlb->gui->video_window);
+    video_window_set_input_focus (mrlb->gui->vwin);
     free (mrlb);
   }
 }

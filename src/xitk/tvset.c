@@ -197,7 +197,7 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
 
     XITK_WIDGET_LIST_FREE(tvset.widget_list);
     
-    try_to_set_input_focus(gGui->video_window);
+    video_window_set_input_focus(gGui->vwin);
 }
 
 static void tvset_handle_event(XEvent *event, void *data) {
@@ -514,5 +514,5 @@ void tvset_panel(void) {
   tvset.running = 1;
   tvset_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(tvset.xwin));
+  xitk_window_try_to_set_input_focus(tvset.xwin);
 }

@@ -299,7 +299,7 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     
     XITK_WIDGET_LIST_FREE(sinfos.widget_list);
     
-    try_to_set_input_focus(gui->video_window);
+    video_window_set_input_focus(gui->vwin);
 }
 
 static void handle_event(XEvent *event, void *data) {
@@ -872,5 +872,5 @@ void stream_infos_panel(void) {
   sinfos.running = 1;
   stream_infos_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(sinfos.xwin));
+  xitk_window_try_to_set_input_focus(sinfos.xwin);
 }

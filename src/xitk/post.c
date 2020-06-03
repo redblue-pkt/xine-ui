@@ -1109,8 +1109,8 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   }
 
   raise_window(pp_wrapper->pplugin->helpwin, 1, pp_wrapper->pplugin->help_running);
-  
-  try_to_set_input_focus(xitk_window_get_window(pp_wrapper->pplugin->helpwin));
+
+  xitk_window_try_to_set_input_focus(pp_wrapper->pplugin->helpwin);
 }
 
 static void _vpplugin_show_help(xitk_widget_t *w, void *data) {
@@ -1627,7 +1627,7 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     VFREE(pp_wrapper->pplugin);
     pp_wrapper->pplugin = NULL;
 
-    try_to_set_input_focus(gui->video_window);
+    video_window_set_input_focus(gui->vwin);
   }
 }
 
@@ -2034,8 +2034,8 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   _pplugin_paint_widgets(pp_wrapper);
 
   pplugin_raise_window(pp_wrapper);
-  
-  try_to_set_input_focus(xitk_window_get_window(pp_wrapper->pplugin->xwin));
+
+  xitk_window_try_to_set_input_focus(pp_wrapper->pplugin->xwin);
 }
 
 /* pchain: "<post1>:option1=value1,option2=value2..;<post2>:...." */

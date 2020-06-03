@@ -271,7 +271,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
 
     skdloader.running = 0;
 
-    try_to_set_input_focus(gGui->video_window);
+    video_window_set_input_focus(gGui->vwin);
   }
 }
 
@@ -744,7 +744,7 @@ void download_skin(char *url) {
     video_window_set_transient_for (gui->vwin, skdloader.xwin);
     layer_above_video(skdloader.xwin);
 
-    try_to_set_input_focus(xitk_window_get_window(skdloader.xwin));
+    xitk_window_try_to_set_input_focus(skdloader.xwin);
     download_update_blank_preview();
   }
   else

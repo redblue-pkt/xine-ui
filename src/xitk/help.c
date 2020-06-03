@@ -270,7 +270,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
     
     SAFE_FREE(help);
 
-    try_to_set_input_focus(gGui->video_window);
+    video_window_set_input_focus(gGui->vwin);
   }
 }
 
@@ -456,6 +456,6 @@ void help_panel(void) {
   help->running = 1;
   help_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(help->xwin));
+  xitk_window_try_to_set_input_focus(help->xwin);
 }
 

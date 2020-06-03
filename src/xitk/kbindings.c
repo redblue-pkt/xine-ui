@@ -720,7 +720,7 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     kbedit = NULL;
     gui->ssaver_enabled = 1;
 
-    try_to_set_input_focus(gui->video_window);
+    video_window_set_input_focus(gui->vwin);
   }
 }
 
@@ -958,8 +958,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   }
 
   xitk_window_show_window(xwin);
-
-  try_to_set_input_focus(xitk_window_get_window(xwin));
+  xitk_window_try_to_set_input_focus(xwin);
 
   do {
     /* Although only release events are evaluated, we must also grab the corresponding press */
@@ -1443,6 +1442,6 @@ void kbedit_window(void) {
   kbedit->running      = 1;
   kbedit_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(kbedit->xwin));
+  xitk_window_try_to_set_input_focus(kbedit->xwin);
 }
 

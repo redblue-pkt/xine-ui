@@ -103,7 +103,7 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     free(viewlog);
     viewlog = NULL;
 
-    try_to_set_input_focus (gui->video_window);
+    video_window_set_input_focus (gui->vwin);
   }
 }
 
@@ -487,6 +487,6 @@ void viewlog_panel(void) {
   viewlog->visible = 1;
   viewlog->running = 1;
   viewlog_raise_window();
-  
-  try_to_set_input_focus(xitk_window_get_window(viewlog->xwin));
+
+  xitk_window_try_to_set_input_focus(viewlog->xwin);
 }
