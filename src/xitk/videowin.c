@@ -176,6 +176,10 @@ void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
   pthread_mutex_unlock (&vwin->mutex);
 }
 
+void video_window_set_input_focus(xui_vwin_t *vwin)
+{
+  xitk_try_to_set_input_focus (vwin->gui->video_display, vwin->gui->video_window);
+}
 
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (xui_vwin_t *vwin);
@@ -1096,7 +1100,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))) {
     /* Waiting for visibility, avoid X error on some cases */
 
-    try_to_set_input_focus (vwin->gui->video_window);
+    xitk_try_to_set_input_focus (vwin->gui->video_display, vwin->gui->video_window);
 
 #ifdef HAVE_XINERAMA
     if (vwin->xinerama)
@@ -1322,7 +1326,7 @@ void video_window_set_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen) {
 
   video_window_adapt_size (vwin);
 
-  try_to_set_input_focus (vwin->gui->video_window);
+  xitk_try_to_set_input_focus (vwin->gui->video_display, vwin->gui->video_window);
   osd_update_osd();
 
   pthread_mutex_unlock (&vwin->mutex);

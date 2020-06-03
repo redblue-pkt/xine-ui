@@ -2189,6 +2189,13 @@ void xitk_window_center_window(xitk_window_t *w);
  */
 Window xitk_window_get_window(xitk_window_t *w);
 
+/*
+ *
+ */
+void xitk_try_to_set_input_focus(Display *display, Window window);
+void xitk_window_try_to_set_input_focus(xitk_window_t *w);
+
+
 /**
  *
  */

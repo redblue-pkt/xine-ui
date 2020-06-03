@@ -3494,6 +3494,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor_set_mmk(mmk);
   mmk_editor_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(mmkeditor.xwin));
+  xitk_window_try_to_set_input_focus(mmkeditor.xwin);
 }
 

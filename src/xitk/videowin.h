@@ -99,6 +99,8 @@ void video_window_toggle_border (xui_vwin_t *vwin);
 
 void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin);
 
+void video_window_set_input_focus(xui_vwin_t *vwin);
+
 /* call this with 1 before and with 0 after accessing the video window directly */
 void video_window_lock (xui_vwin_t *vwin, int lock_or_unlock);
 

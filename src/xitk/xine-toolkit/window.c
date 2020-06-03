@@ -157,7 +157,7 @@ static Window _xitk_window_get_window (xitk_window_t *w) {
   return w->window;
 }
 
-static void _xitk_window_set_focus (Display *display, Window window) {
+static int _xitk_window_set_focus (Display *display, Window window) {
   int t = 0;
 
   while ((!xitk_is_window_visible (display, window)) && (++t < 3))
@@ -167,7 +167,54 @@ static void _xitk_window_set_focus (Display *display, Window window) {
     xitk_x_lock_display (display);
     XSetInputFocus (display, window, RevertToParent, CurrentTime);
     xitk_x_unlock_display (display);
+    return 0;
   }
+
+  return -1;
+}
+
+static int _xitk_window_has_focus(Display *display, Window window) {
+  Window focused_win;
+  int revert;
+
+  xitk_x_lock_display (display);
+  XGetInputFocus(display, &focused_win, &revert);
+  xitk_x_unlock_display (display);
+
+  return (focused_win == window);
+}
+
+void xitk_try_to_set_input_focus(Display *display, Window window) {
+  int retry = 0;
+
+  if (_xitk_window_set_focus(display, window) < 0)
+    return;
+
+  do {
+
+    /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
+
+    xitk_x_lock_display (display);
+    XSync(display, False);
+    xitk_x_unlock_display (display);
+
+    if (_xitk_window_has_focus(display, window))
+      break;
+
+    xitk_usec_sleep(5000);
+
+    if (_xitk_window_set_focus(display, window) < 0)
+      break;
+
+  } while (retry++ < 30);
+}
+
+void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
+
+  if (w == NULL)
+    return;
+
+  return xitk_try_to_set_input_focus(w->imlibdata->x.disp, w->window);
 }
 
 /*

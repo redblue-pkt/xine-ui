@@ -206,36 +206,6 @@ int gui_xine_get_pos_length (xine_stream_t *stream, int *ppos, int *ptime, int *
 /*
  *
  */
-void try_to_set_input_focus(Window window) {
-  gGui_t *gui = gGui;
-
-  wait_for_window_visible(gui->display, window);
-  
-  if(xitk_is_window_visible(gui->display, window)) {
-    int    retry = 0;
-    Window focused_win;
-
-    do {
-      int revert;
-
-      gui->x_lock_display (gui->display);
-      XSetInputFocus(gui->display, window, RevertToParent, CurrentTime);
-      XSync(gui->display, False);
-      gui->x_unlock_display (gui->display);
-
-      /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
-      xine_usec_sleep(5000);
-      gui->x_lock_display (gui->display);
-      XGetInputFocus(gui->display, &focused_win, &revert);
-      gui->x_unlock_display (gui->display);
-
-    } while((focused_win != window) && (retry++ < 30));
-  }
-}
-
-/*
- *
- */
 void gui_display_logo(void) {
   gGui_t *gui = gGui;
 

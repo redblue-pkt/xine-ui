@@ -562,7 +562,7 @@ static void _playlist_apply_cb(void *data) {
 
 void playlist_get_input_focus(void) {
   if(playlist)
-    try_to_set_input_focus(xitk_window_get_window(playlist->xwin));
+    xitk_window_try_to_set_input_focus(playlist->xwin);
 }
 
 void playlist_mmk_editor(void) {
@@ -741,7 +741,7 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     free(playlist);
     playlist = NULL;
 
-    try_to_set_input_focus(gui->video_window);
+    video_window_set_input_focus(gui->vwin);
   }
 }
 
@@ -1202,7 +1202,7 @@ void playlist_editor(void) {
 
   playlist_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(playlist->xwin));
+  xitk_window_try_to_set_input_focus(playlist->xwin);
 
   xitk_set_focus_to_widget(playlist->winput);
 }

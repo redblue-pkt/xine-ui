@@ -331,7 +331,7 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     free(eventer);
     eventer = NULL;
 
-    try_to_set_input_focus(gGui->video_window);
+    video_window_set_input_focus(gGui->vwin);
   }
 }
 
@@ -619,5 +619,5 @@ void event_sender_panel(void) {
   eventer->running = 1;
   event_sender_raise_window();
 
-  try_to_set_input_focus(xitk_window_get_window(eventer->xwin));
+  xitk_window_try_to_set_input_focus(eventer->xwin);
 }

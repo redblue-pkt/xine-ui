@@ -439,8 +439,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   
   vctrl->status = 3;
   control_raise_window (vctrl);
-  
-  try_to_set_input_focus (xitk_window_get_window(vctrl->xwin));
+
+  xitk_window_try_to_set_input_focus(vctrl->xwin);
   return 1;
 }
 
@@ -483,7 +483,7 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
       vctrl->items[0].w = NULL;
   }
 
-  try_to_set_input_focus (vctrl->gui->video_window);
+  video_window_set_input_focus (vctrl->gui->vwin);
 }
 
 void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {

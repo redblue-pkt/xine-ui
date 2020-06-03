@@ -1659,7 +1659,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   }
 
   if (panel->visible)
-    try_to_set_input_focus (xitk_window_get_window(panel->xwin));
+    xitk_window_try_to_set_input_focus(panel->xwin);
 
   panel->gui->panel = panel;
   return panel;

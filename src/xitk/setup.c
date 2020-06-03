@@ -168,7 +168,7 @@ static void setup_exit (xitk_widget_t *w, void *data) {
     
   XITK_WIDGET_LIST_FREE (setup->widget_list);
     
-  try_to_set_input_focus (setup->gui->video_window);
+  video_window_set_input_focus (setup->gui->vwin);
 
   setup->gui->setup = NULL;
 
@@ -1160,7 +1160,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->running = 1;
   setup_raise_window (setup);
 
-  try_to_set_input_focus (xitk_window_get_window (setup->xwin));
+  xitk_window_try_to_set_input_focus(setup->xwin);
 
   setup->gui->setup = setup;
   return setup;

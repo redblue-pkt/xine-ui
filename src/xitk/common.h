@@ -442,7 +442,7 @@ void reparent_window(xitk_window_t *xwin);
       else                                                                               \
         xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);                    \
       xitk_window_show_window((xwin));                                                   \
-      try_to_set_input_focus(xitk_window_get_window((xwin)));                            \
+      xitk_window_try_to_set_input_focus((xwin));                                        \
       video_window_set_transient_for(gGui->vwin, (xwin));                                \
     }                                                                                    \
     else {                                                                               \

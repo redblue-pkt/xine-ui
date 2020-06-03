@@ -37,7 +37,6 @@ void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *vi
 
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
 void wait_for_window_visible(Display *display, Window window);
-void try_to_set_input_focus(Window window);
 void gui_display_logo(void);
 int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
 int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub);
