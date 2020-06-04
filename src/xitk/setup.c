@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -42,6 +42,7 @@ static inline void *_xine_list_next_value (xine_list_t *list, xine_list_iterator
   return *ite ? xine_list_get_value (list, *ite) : NULL;
 }
 #endif
+#include <xine/sorted_array.h>
 
 
 #define WINDOW_WIDTH             630
@@ -71,12 +72,18 @@ static inline void *_xine_list_next_value (xine_list_t *list, xine_list_iterator
 
 
 typedef struct {
+  char *name;
+  int   nlen;
+  int   num_entries;
+} _setup_section_t;
+
+typedef struct {
   xitk_widget_t    *frame;
   xitk_widget_t    *label;
   xitk_widget_t    *widget;
   int               changed;
   xine_cfg_entry_t  cfg;
-} widget_triplet_t;
+} _widget_triplet_t;
 
 struct xui_setup_st {
   gGui_t               *gui;
@@ -90,15 +97,19 @@ struct xui_setup_st {
   xitk_widget_t        *tabs;
   xitk_widget_t        *ok;
 
-  char                 *sections[20];
+#define SETUP_MAX_SECTIONS 20
+  _setup_section_t      sections[SETUP_MAX_SECTIONS + 1];
+  char                 *section_names[SETUP_MAX_SECTIONS];
   int                   num_sections;
   
   /* Store widgets, this is needed to free them on tabs switching */
   xine_list_t          *widgets;
   
   xitk_widget_t        *slider_wg;
-  widget_triplet_t     *wg[1024]; /* I hope that will not be reached, never */
+
+  _widget_triplet_t    *wg;
   int                   num_wg;
+  int                   max_wg;
   int                   first_displayed;
 
   xitk_register_key_t   kreg;
@@ -106,6 +117,8 @@ struct xui_setup_st {
 
   int                   th; /* Tabs height */
   int                   fh; /* Font height */
+
+  char                  namebuf[1024];
 };
 
 static void setup_change_section (xitk_widget_t *, void *, int);
@@ -120,7 +133,6 @@ static void add_widget_to_list (xui_setup_t *setup, xitk_widget_t *w) {
 static void setup_exit (xitk_widget_t *w, void *data) {
   xui_setup_t *setup = data;
   window_info_t wi;
-  int i;
 
   (void)w;
   if (!setup)
@@ -160,10 +172,7 @@ static void setup_exit (xitk_widget_t *w, void *data) {
 
   setup->gui->setup = NULL;
 
-  for(i = 0; i < setup->num_sections; i++)
-    free(setup->sections[i]);
-  for(i = 0; i < setup->num_wg; i++)
-    free(setup->wg[i]);
+  free (setup->wg);
       
   free (setup);
 }
@@ -238,21 +247,21 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 
     for (i = 0; i < setup->num_wg; i++) {
 
-      if (setup->wg[i]->widget) {
-        int type = xitk_get_widget_type (setup->wg[i]->widget);
+      if (setup->wg[i].widget) {
+        int type = xitk_get_widget_type (setup->wg[i].widget);
 
-        if (setup->wg[i]->changed ||
+        if (setup->wg[i].changed ||
           ((type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) || (type & WIDGET_GROUP_INTBOX)) {
-          xitk_widget_t *w = setup->wg[i]->widget;
+          xitk_widget_t *w = setup->wg[i].widget;
           int            numval = 0;
           const char    *strval = NULL;
 
 	  if(!need_restart) {
-            if (setup->wg[i]->changed && (!setup->wg[i]->cfg.callback_data && !setup->wg[i]->cfg.callback))
+            if (setup->wg[i].changed && (!setup->wg[i].cfg.callback_data && !setup->wg[i].cfg.callback))
 	      need_restart = 1;
 	  }
 
-          setup->wg[i]->changed = 0;
+          setup->wg[i].changed = 0;
 
 	  switch(type & WIDGET_TYPE_MASK) {
 	  case WIDGET_TYPE_SLIDER:
@@ -265,7 +274,7 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 
 	  case WIDGET_TYPE_INPUTTEXT:
 	    strval = xitk_inputtext_get_text(w);
-	    if(!strcmp(strval, setup->wg[i]->cfg.str_value))
+	    if(!strcmp(strval, setup->wg[i].cfg.str_value))
 	      continue;
 	    break;
 
@@ -274,22 +283,22 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 	      numval = xitk_combo_get_current_selected(w);
 	    else if(type & WIDGET_GROUP_INTBOX) {
 	      numval = xitk_intbox_get_value(w);
-              if (numval == setup->wg[i]->cfg.num_value)
+              if (numval == setup->wg[i].cfg.num_value)
 		continue;
 	    }
 
 	    break;
 	  }
 
-          switch (setup->wg[i]->cfg.type) {
+          switch (setup->wg[i].cfg.type) {
 	  case XINE_CONFIG_TYPE_STRING:
-            config_update_string ((char *)setup->wg[i]->cfg.key, strval);
+            config_update_string ((char *)setup->wg[i].cfg.key, strval);
 	    break;
 	  case XINE_CONFIG_TYPE_ENUM:
 	  case XINE_CONFIG_TYPE_NUM:
 	  case XINE_CONFIG_TYPE_BOOL:
 	  case XINE_CONFIG_TYPE_RANGE:
-            config_update_num ((char *)setup->wg[i]->cfg.key, numval);
+            config_update_num ((char *)setup->wg[i].cfg.key, numval);
 	    break;
 	  case XINE_CONFIG_TYPE_UNKNOWN:
 	    break;
@@ -351,51 +360,14 @@ static void setup_clear_tab (xui_setup_t *setup) {
   xitk_image_free_image (setup->gui->imlib_data, &im);
 }
 
-/*
- *
- */
-static void setup_paint_widgets (xui_setup_t *setup) {
+static void setup_triplets_enable_and_show (xui_setup_t *setup, int start, int stop, int tips_timeout) {
   int i;
-  int last;
-  int wx, wy, y = (24 + setup->th + 13);
-  int tips_timeout;
 
-  tips_timeout = !panel_get_tips_enable (setup->gui->panel) ? 0
-               : panel_get_tips_timeout (setup->gui->panel);
-
-  last = setup->num_wg <= (setup->first_displayed + MAX_DISPLAY_WIDGETS)
-    ? setup->num_wg : (setup->first_displayed + MAX_DISPLAY_WIDGETS);
-
-  /* First, disable all widgets */
-  for (i = 0; i < setup->num_wg; i++)
-    DISABLE_ME (setup->wg[i]);
-
-  /* Move widgets to new position, then display them */
-  for (i = setup->first_displayed; i < last; i++) {
-    widget_triplet_t *t = setup->wg[i];
-
-    if (t->frame) {
-      xitk_get_widget_pos (t->frame, &wx, &wy);
-      xitk_set_widget_pos (t->frame, wx, y);
-    }
-
-    y += FRAME_HEIGHT >> 1;
-
-    if (t->label) {
-      xitk_get_widget_pos (t->label, &wx, &wy);
-      xitk_set_widget_pos (t->label,
-        wx, y + 4 - xitk_get_widget_height (t->label) / 2);
-    }
-
-    if (t->widget) {
-      xitk_get_widget_pos (t->widget, &wx, &wy);
-      xitk_set_widget_pos (t->widget,
-        wx, y + 4 - xitk_get_widget_height (t->widget) / 2);
-    }
+  for (i = start; i < stop; i++) {
+    _widget_triplet_t *t = setup->wg + i;
 
     if (t->frame)
       xitk_enable_and_show_widget (t->frame);
-
     if (t->label) {
       xitk_enable_and_show_widget (t->label);
       if (tips_timeout)
@@ -410,12 +382,80 @@ static void setup_paint_widgets (xui_setup_t *setup) {
       else
         xitk_disable_widget_tips (t->widget);
     }
+  }
+}
 
+static void setup_triplets_disable_and_hide (xui_setup_t *setup, int start, int stop) {
+  int i;
+
+  for (i = start; i < stop; i++) {
+    _widget_triplet_t *t = setup->wg + i;
+
+    if (t->frame)
+      xitk_disable_and_hide_widget (t->frame);
+    if (t->label) {
+      xitk_disable_and_hide_widget (t->label);
+      xitk_disable_widget_tips (t->label);
+    }
+    if (t->widget) {
+      xitk_disable_and_hide_widget (t->widget);
+      xitk_disable_widget_tips (t->widget);
+    }
+  }
+}
+
+/*
+ *
+ */
+static void setup_paint_widgets (xui_setup_t *setup, int first) {
+  int i, last;
+  int wx, wy, y = (24 + setup->th + 13);
+  int tips_timeout = !panel_get_tips_enable (setup->gui->panel) ? 0
+                   : panel_get_tips_timeout (setup->gui->panel);
+
+  last = setup->num_wg - setup->first_displayed;
+  if (last > MAX_DISPLAY_WIDGETS)
+    last = MAX_DISPLAY_WIDGETS;
+  last += setup->first_displayed;
+
+  /* First, disable old widgets. */
+  setup_triplets_disable_and_hide (setup, setup->first_displayed, last);
+
+  last = setup->num_wg - MAX_DISPLAY_WIDGETS;
+  if (first > last)
+    first = last;
+  if (first < 0)
+    first = 0;
+  setup->first_displayed = first;
+  last = setup->num_wg - setup->first_displayed;
+  if (last > MAX_DISPLAY_WIDGETS)
+    last = MAX_DISPLAY_WIDGETS;
+  last += setup->first_displayed;
+
+  /* Move widgets to new position. */
+  for (i = setup->first_displayed; i < last; i++) {
+    _widget_triplet_t *t = setup->wg + i;
+
+    if (t->frame) {
+      xitk_get_widget_pos (t->frame, &wx, &wy);
+      xitk_set_widget_pos (t->frame, wx, y);
+    }
+    y += FRAME_HEIGHT >> 1;
+    if (t->label) {
+      xitk_get_widget_pos (t->label, &wx, &wy);
+      xitk_set_widget_pos (t->label, wx, y + 4 - xitk_get_widget_height (t->label) / 2);
+    }
+    if (t->widget) {
+      xitk_get_widget_pos (t->widget, &wx, &wy);
+      xitk_set_widget_pos (t->widget, wx, y + 4 - xitk_get_widget_height (t->widget) / 2);
+    }
     y += (FRAME_HEIGHT >> 1) + 3;
   }
 
-  /* Repaint them now */
-  xitk_paint_widget_list (setup->widget_list); 
+  /* Repaint everything else... */
+  xitk_paint_widget_list (setup->widget_list);
+  /* ...and our new ones just 1 time. */
+  setup_triplets_enable_and_show (setup, setup->first_displayed, last, tips_timeout);
   setup_set_cursor (setup, NORMAL_CURS);
 }
 
@@ -523,7 +563,7 @@ static xitk_widget_t *setup_add_label (xui_setup_t *setup,
  *
  */
 static void numtype_update(xitk_widget_t *w, void *data, int value) {
-  widget_triplet_t *triplet = (widget_triplet_t *) data;
+  _widget_triplet_t *triplet = (_widget_triplet_t *) data;
 
   (void)w;
   (void)value;
@@ -534,20 +574,18 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
  *
  */
 static void stringtype_update(xitk_widget_t *w, void *data, const char *str) {
-  widget_triplet_t *triplet = (widget_triplet_t *) data;
+  _widget_triplet_t *triplet = (_widget_triplet_t *) data;
 
   (void)w;
   (void)str;
   triplet->changed = 1;
 }
 
-static widget_triplet_t *setup_add_nothing_available (xui_setup_t *setup, const char *title, int x, int y) {
-  static widget_triplet_t *wt; 
+static void setup_add_nothing_available (xui_setup_t *setup, const char *title, int x, int y) {
+  _widget_triplet_t *wt = setup->wg;
   xitk_widget_t           *frame = NULL;
   xitk_image_t            *image;
   xitk_image_widget_t      im;
-  
-  wt = (widget_triplet_t *) calloc(1, sizeof(widget_triplet_t));
   
   image = xitk_image_create_image_from_string (setup->gui->imlib_data, tabsfontname,
     FRAME_WIDTH, ALIGN_CENTER, (char *)title);
@@ -561,8 +599,9 @@ static widget_triplet_t *setup_add_nothing_available (xui_setup_t *setup, const 
   wt->frame = frame;
   wt->label = NULL;
   wt->widget = NULL;
-  
-  return wt;
+  wt->changed = 0;
+
+  setup->num_wg = 1;
 }
 
 static void label_cb(xitk_widget_t *w, void *data) {
@@ -599,8 +638,7 @@ static void label_cb(xitk_widget_t *w, void *data) {
 static void setup_section_widgets (xui_setup_t *setup, int s) {
   int                  y = 0; /* Position will be defined when painting widgets */
   int                  cfg_err_result;
-  int                  len;
-  char                *section;
+  _setup_section_t    *section;
   int                  slidmax = 1;
   unsigned int         known_types;
   int                  tips_timeout = panel_get_tips_timeout (setup->gui->panel);
@@ -615,27 +653,40 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
   xitk_disable_widget (setup->slider_wg);
   xitk_hide_widget (setup->slider_wg);
   
-  section = setup->sections[s];
-  len     = strlen (section);
+  section = setup->sections + s;
   memset (&entry, 0, sizeof (entry));
-  cfg_err_result   = xine_config_get_first_entry (setup->gui->xine, &entry);
+
+  setup->max_wg = (section->num_entries + 7) & ~7;
+  setup->wg = malloc (setup->max_wg * sizeof (*setup->wg));
+
+  cfg_err_result = setup->wg ? xine_config_get_first_entry (setup->gui->xine, &entry) : 0;
     
   while (cfg_err_result) {
       
     if ((entry.exp_level <= setup->gui->experience_level)
-      && !strncmp (entry.key, section, len)
+      && !strncmp (entry.key, section->name, section->nlen)
       && entry.description
       && ((1 << entry.type) & known_types)) {
-      widget_triplet_t    *wt;
+      _widget_triplet_t   *wt = setup->wg + setup->num_wg;
       xitk_widget_t       *frame = NULL;
       xitk_image_t        *image;
       xitk_image_widget_t  im;
-      const char          *labelkey = entry.key + len + 1;
+      const char          *labelkey = entry.key + section->nlen + 1;
       int                  x = (WINDOW_WIDTH >> 1) - (FRAME_WIDTH >> 1) - 11;
 
-      wt = calloc (1, sizeof (*wt));
-      setup->wg[setup->num_wg++] = wt;
+      if (setup->num_wg >= setup->max_wg) {
+        /* should be rare. */
+        wt = realloc (setup->wg, (setup->max_wg + 8) * sizeof (*setup->wg));
+        if (!wt)
+          break;
+        setup->max_wg += 8;
+        setup->wg = wt;
+        wt += setup->num_wg;
+      }
+      setup->num_wg += 1;
+
       wt->cfg = entry;
+      wt->changed = 0;
 
       image = xitk_image_create_image (setup->gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
       setup->gui->x_lock_display (setup->gui->display);
@@ -778,10 +829,11 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
     cfg_err_result = xine_config_get_next_entry (setup->gui->xine, &entry);
   }
 
-    
-  if(setup->num_wg == 0) {
+  section->num_entries = setup->num_wg;
+
+  if (!setup->num_wg && setup->wg) {
     int x = (WINDOW_WIDTH >> 1) - (FRAME_WIDTH >> 1) - 11;
-    setup->wg[setup->num_wg++] = setup_add_nothing_available (setup,
+    setup_add_nothing_available (setup,
       _("There is no configuration option available in this user experience level."), x, y);
   }
 
@@ -804,13 +856,12 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
  */
 static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   xui_setup_t *setup = data;
-  int i;
 
   (void)wx;
   setup_set_cursor (setup, WAIT_CURS);
 
-  for (i = 0; i < setup->num_wg; i++ )
-    free (setup->wg[i]);
+  free (setup->wg);
+  setup->wg = NULL;
   setup->num_wg = 0;
   setup->first_displayed = 0;
 
@@ -830,43 +881,87 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   setup_section_widgets (setup, section);
   
   setup_clear_tab (setup);
-  setup_paint_widgets (setup);
+  setup_paint_widgets (setup, 0);
 }
 
 /* 
  * collect config categories, setup tab widget
  */
-static void setup_sections (xui_setup_t *setup) {
-  xitk_pixmap_t       *bg;
-  xine_cfg_entry_t  entry;
-  int                  cfg_err_result;
-  xitk_tabs_widget_t   tab;
+#ifdef XINE_SARRAY_MODE_UNIQUE
+static int _section_cmp (void *a, void *b) {
+  _setup_section_t *d = (_setup_section_t *)a;
+  _setup_section_t *e = (_setup_section_t *)b;
+  const uint8_t *n1 = (const uint8_t *)d->name;
+  const uint8_t *n2 = (const uint8_t *)e->name;
+  int i = d->nlen;
+  /* these are quite short, inline strncmp (). */
+  while (--i >= 0) {
+    if (*n1 < *n2)
+      return -1;
+    if (*n1 > *n2)
+      return 1;
+    n1++;
+    n2++;
+  }
+  return 0;
+}
+#endif
 
+static void setup_sections (xui_setup_t *setup) {
+  xitk_pixmap_t      *bg;
+  xine_cfg_entry_t    entry;
+  int                 cfg_err_result;
+  xitk_tabs_widget_t  tab;
+  char               *q, *e;
+#ifdef XINE_SARRAY_MODE_UNIQUE
+  xine_sarray_t      *a = xine_sarray_new (20, _section_cmp);
+
+  xine_sarray_set_mode (a, XINE_SARRAY_MODE_UNIQUE);
+#endif
+
+  q = setup->namebuf;
+  e = q + sizeof (setup->namebuf);
   setup->num_sections = 0;
+
   cfg_err_result = xine_config_get_first_entry (setup->gui->xine, &entry);
   while (cfg_err_result) {
+    char *point = strchr (entry.key, '.');
 
-    char *point;
-    
-    point = strchr(entry.key, '.');
-    
-    if (entry.type != XINE_CONFIG_TYPE_UNKNOWN && point) {
-      int found ;
-      int i;
-      int len;
-
-      len = point - entry.key;
-      found = 0;
-
-      for (i = 0; i < setup->num_sections; i++) {
-        if (!strncmp (setup->sections[i], entry.key, len)) {
-	  found = 1;
-	  break;
-	}
+    if ((entry.type != XINE_CONFIG_TYPE_UNKNOWN) && point) {
+      _setup_section_t *s = setup->sections;
+      int nlen = point - entry.key + 1, i;
+#ifdef XINE_SARRAY_MODE_UNIQUE
+      s += setup->num_sections;
+      s->name = (char *)entry.key; /* will not be written to. */
+      s->nlen = nlen;
+      i = xine_sarray_add (a, s);
+      if (i < 0) {
+        s = xine_sarray_get (a, ~i);
+        s->num_entries += 1;
       }
-
-      if (!found) {
-        setup->sections[setup->num_sections] = strndup (entry.key, len);
+#else
+      for (i = 0; i < setup->num_sections; i++) {
+        if (!strncmp (s->name, entry.key, nlen))
+          break;
+        s++;
+      }
+      if (i < setup->num_sections) {
+        s->num_entries += 1;
+      }
+#endif
+      else if ((setup->num_sections < SETUP_MAX_SECTIONS) && (2 * nlen + 1 <= e - q)) {
+        s->nlen = nlen;
+        s->name = q;
+        memcpy (q, entry.key, nlen);
+        q += nlen;
+        *q++ = 0;
+        /* Aargh. xitk_noskin_tabs_create () does not copy the strings.
+         * Give it a "permanent" copy without the trailing . */
+        setup->section_names[setup->num_sections] = q;
+        memcpy (q, entry.key, nlen);
+        q += nlen;
+        q[-1] = 0;
+        s->num_entries = 1;
         setup->num_sections++;
       }
     }      
@@ -874,11 +969,15 @@ static void setup_sections (xui_setup_t *setup) {
     cfg_err_result = xine_config_get_next_entry (setup->gui->xine, &entry);
   }
 
+#ifdef XINE_SARRAY_MODE_UNIQUE
+  xine_sarray_delete (a);
+#endif
+
   XITK_WIDGET_INIT (&tab, setup->gui->imlib_data);
 
   tab.skin_element_name = NULL;
   tab.num_entries       = setup->num_sections;
-  tab.entries           = setup->sections;
+  tab.entries           = setup->section_names;
   tab.parent_wlist      = setup->widget_list;
   tab.callback          = setup_change_section;
   tab.userdata          = setup;
@@ -923,11 +1022,7 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
   int rpos = (xitk_slider_get_max (setup->slider_wg)) - pos;
 
   (void)w;
-  if (rpos != setup->first_displayed) {
-    setup->first_displayed = rpos;
-    setup_clear_tab (setup);
-    setup_paint_widgets (setup);
-  }
+  setup_paint_widgets (setup, rpos);
 }
 
 void setup_reparent (xui_setup_t *setup) {
@@ -1000,7 +1095,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   xitk_add_widget (setup->widget_list, setup->slider_wg);
 
   setup_section_widgets (setup, 0);
-  setup_paint_widgets (setup);
+  setup_paint_widgets (setup, 0);
 
   {
     xitk_label_widget_t lbl;
@@ -1070,4 +1165,3 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
-
