@@ -671,7 +671,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       xitk_widget_t       *frame = NULL;
       xitk_image_t        *image;
       xitk_image_widget_t  im;
-      const char          *labelkey = entry.key + section->nlen + 1;
+      const char          *labelkey = entry.key + section->nlen;
       int                  x = (WINDOW_WIDTH >> 1) - (FRAME_WIDTH >> 1) - 11;
 
       if (setup->num_wg >= setup->max_wg) {
