@@ -955,8 +955,8 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
     
-    xitk_image_free_image (fb->gui->imlib_data, &fb->sort_skin_up);
-    xitk_image_free_image (fb->gui->imlib_data, &fb->sort_skin_down);
+    xitk_image_free_image (&fb->sort_skin_up);
+    xitk_image_free_image (&fb->sort_skin_down);
 
     free(fb);
     fb = NULL;

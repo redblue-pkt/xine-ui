@@ -86,7 +86,7 @@ void splash_create(void) {
 
     xitk_set_layer_above(xitk_window_get_window(xwin));
 
-    xitk_image_free_image(gGui->imlib_data, &xim);
+    xitk_image_free_image(&xim);
   }
 
   free(skin_splash_image);

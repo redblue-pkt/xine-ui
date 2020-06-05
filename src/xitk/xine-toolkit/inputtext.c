@@ -209,7 +209,7 @@ static int _inputtext_find_text_pos (inputtext_private_data_t *wp,
     } while (tries > 0);
     if (round_up && (want.pixels > best.pixels)) {
       int b = best.bytes;
-      while ((btext[++b] & 0xc0) == 0x80) ;
+      while (btext[b] && (btext[++b] & 0xc0) == 0x80) ;
       if (b <= want.bytes) {
         best.bytes = b;
         best.pixels = xitk_font_get_text_width (fs, (char *)btext, best.bytes);
@@ -292,7 +292,7 @@ static void notify_destroy(xitk_widget_t *w) {
       wp->text.temp_gc = None;
     }
     if(!wp->skin_element_name)
-      xitk_image_free_image(wp->imlibdata, &(wp->skin));
+      xitk_image_free_image(&(wp->skin));
     
     XITK_FREE(wp->skin_element_name);
     _inputtext_sbuf_unset (wp);

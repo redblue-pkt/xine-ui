@@ -144,7 +144,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 	XFreeGC(private_data->imlibdata->x.disp, gc);
         XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-	xitk_image_free_image(private_data->imlibdata, &p);
+        xitk_image_free_image(&p);
       }
     }
 

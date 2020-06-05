@@ -174,8 +174,8 @@ static void viewlog_clear_tab(void) {
   XCopyArea (gui->display, im->image->pixmap, (xitk_window_get_window (viewlog->xwin)),
     (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + viewlog->tabs_height));
   gui->x_unlock_display (gui->display);
-  
-  xitk_image_free_image (gui->imlib_data, &im);
+
+  xitk_image_free_image (&im);
 }
 
 /*
