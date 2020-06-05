@@ -235,10 +235,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
     }
     
     xitk_unregister_event_handler(&help->kreg);
-    
-    xitk_destroy_widgets(help->widget_list);
     xitk_window_destroy_window(help->xwin);
-    
     help->xwin = NULL;
     /* xitk_dlist_init (&help->widget_list->list); */
     
@@ -262,12 +259,6 @@ static void help_exit(xitk_widget_t *w, void *data) {
       }
     }
 
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(help->widget_list)));
-    gGui->x_unlock_display (gGui->display);
-    
-    XITK_WIDGET_LIST_FREE(help->widget_list);
-    
     SAFE_FREE(help);
 
     video_window_set_input_focus(gGui->vwin);
@@ -327,7 +318,6 @@ void help_reparent(void) {
 }
 
 void help_panel(void) {
-  GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
   xitk_tabs_widget_t         tab;
@@ -359,15 +349,7 @@ void help_panel(void) {
   
   set_window_states_start(help->xwin);
 
-  gGui->x_lock_display (gGui->display);
-  gc = XCreateGC(gGui->display, 
-		 (xitk_window_get_window(help->xwin)), None, None);
-  gGui->x_unlock_display (gGui->display);
-
-  help->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(help->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(help->xwin)));
-  xitk_widget_list_set(help->widget_list, WIDGET_LIST_GC, gc);
+  help->widget_list = xitk_window_widget_list(help->xwin);
 
   help_sections();
 

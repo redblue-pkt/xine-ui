@@ -291,7 +291,6 @@ static void control_handle_event(XEvent *event, void *data) {
  * Create control panel window
  */
 static int vctrl_open_window (xui_vctrl_t *vctrl) {
-  GC                         gc;
   char                      *title = _("xine Control Window");
   xitk_browser_widget_t      br;
   xitk_labelbutton_widget_t  lb;
@@ -328,17 +327,14 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     xitk_window_set_layer_above (vctrl->xwin);
 
   vctrl->gui->x_lock_display (vctrl->gui->display);
-  gc = XCreateGC (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), 0, 0);
   Imlib_apply_image (vctrl->gui->imlib_data, vctrl->bg_image, xitk_window_get_window(vctrl->xwin));
   vctrl->gui->x_unlock_display (vctrl->gui->display);
 
   /*
    * Widget-list
    */
-  vctrl->widget_list = xitk_widget_list_new ();
-  xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window(vctrl->xwin));
-  xitk_widget_list_set (vctrl->widget_list, WIDGET_LIST_GC, gc);
-  
+  vctrl->widget_list = xitk_window_widget_list(vctrl->xwin);
+
   XITK_WIDGET_INIT (&lbl, vctrl->gui->imlib_data);
   lbl.callback = NULL;
 
@@ -459,8 +455,6 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
 
     xitk_unregister_event_handler (&vctrl->widget_key);
 
-    xitk_destroy_widgets (vctrl->widget_list);
-
     xitk_window_destroy_window(vctrl->xwin);
     vctrl->xwin = NULL;
 
@@ -469,12 +463,6 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
     vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     /* xitk_dlist_init (&control->widget_list->list); */
-
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-    XFreeGC (vctrl->gui->display, (XITK_WIDGET_LIST_GC (vctrl->widget_list)));
-    vctrl->gui->x_unlock_display (vctrl->gui->display);
-
-    XITK_WIDGET_LIST_FREE (vctrl->widget_list);
 
     for (i = 0; i < vctrl->skins_num; i++)
       free ((char *)vctrl->skins[i]);

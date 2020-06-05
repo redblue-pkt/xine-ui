@@ -689,19 +689,11 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     }
     
     xitk_unregister_event_handler(&kbedit->kreg);
-    
-    xitk_destroy_widgets(kbedit->widget_list);
+
     xitk_window_destroy_window(kbedit->xwin);
-    
     kbedit->xwin = NULL;
     /* xitk_dlist_init (&kbedit->widget_list->list); */
-    
-    gui->x_lock_display (gui->display);
-    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-    gui->x_unlock_display (gui->display);
-    
-    XITK_WIDGET_LIST_FREE(kbedit->widget_list);
-    
+
     {
       int i;
       
@@ -1083,7 +1075,6 @@ void kbedit_reparent(void) {
 void kbedit_window(void) {
   gGui_t *gui = gGui;
   int                        x, y, y1;
-  GC                         gc;
   xitk_pixmap_t             *bg;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        l;
@@ -1118,17 +1109,8 @@ void kbedit_window(void) {
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   set_window_states_start(kbedit->xwin);
 
-  gui->x_lock_display (gui->display);
-  gc = XCreateGC(gui->display, 
-		 (xitk_window_get_window(kbedit->xwin)), None, None);
-  gui->x_unlock_display (gui->display);
+  kbedit->widget_list = xitk_window_widget_list(kbedit->xwin);
 
-  kbedit->widget_list      = xitk_widget_list_new();
-
-  xitk_widget_list_set(kbedit->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(kbedit->xwin)));
-  xitk_widget_list_set(kbedit->widget_list, WIDGET_LIST_GC, gc);
-  
   bg = xitk_image_create_xitk_pixmap(gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   gui->x_lock_display (gui->display);

@@ -333,6 +333,8 @@ struct xitk_window_s {
   int                       width;
   int                       height;
   xitk_dialog_t            *dialog;
+
+  xitk_widget_list_t       *widget_list;
 };
 
 struct xitk_dialog_s {

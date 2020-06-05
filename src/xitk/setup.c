@@ -154,20 +154,12 @@ static void setup_exit (xitk_widget_t *w, void *data) {
   }
     
   xitk_unregister_event_handler (&setup->kreg);
-    
-  xitk_destroy_widgets (setup->widget_list);
+
   xitk_window_destroy_window (setup->xwin);
-    
   setup->xwin = NULL;
   /* xitk_dlist_init (&setup->widget_list->list); */
   xine_list_delete (setup->widgets);
-    
-  setup->gui->x_lock_display (setup->gui->display);
-  XFreeGC (setup->gui->display, (XITK_WIDGET_LIST_GC (setup->widget_list)));
-  setup->gui->x_unlock_display (setup->gui->display);
-    
-  XITK_WIDGET_LIST_FREE (setup->widget_list);
-    
+
   video_window_set_input_focus (setup->gui->vwin);
 
   setup->gui->setup = NULL;
@@ -1049,7 +1041,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui = gui;
 
   {
-    GC gc;
     int x, y;
 
     x = xine_config_register_num (setup->gui->xine, "gui.setup_x", 80,
@@ -1061,16 +1052,10 @@ xui_setup_t *setup_panel (gGui_t *gui) {
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     set_window_states_start (setup->xwin);
 
-    setup->gui->x_lock_display (setup->gui->display);
-    gc = XCreateGC (setup->gui->display, xitk_window_get_window (setup->xwin), None, None);
-    setup->gui->x_unlock_display (setup->gui->display);
-
-    setup->widget_list = xitk_widget_list_new ();
-    xitk_widget_list_set (setup->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window (setup->xwin));
-    xitk_widget_list_set (setup->widget_list, WIDGET_LIST_GC, gc);
+    setup->widget_list = xitk_window_widget_list(setup->xwin);
 
     fs = xitk_font_load_font (setup->gui->display, fontname);
-    xitk_font_set_font (fs, gc);
+    xitk_font_set_font (fs, (XITK_WIDGET_LIST_GC (setup->widget_list)));
     setup->fh = xitk_font_get_string_height (fs, " ");
   }
 

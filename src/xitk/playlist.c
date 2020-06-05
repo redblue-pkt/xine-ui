@@ -718,7 +718,6 @@ void playlist_exit(xitk_widget_t *w, void *data) {
 
     xitk_unregister_event_handler(&playlist->widget_key);
 
-    xitk_destroy_widgets(playlist->widget_list);
     xitk_button_list_delete (playlist->autoplay_buttons);
 
     xitk_window_destroy_window(playlist->xwin);
@@ -730,14 +729,8 @@ void playlist_exit(xitk_widget_t *w, void *data) {
 
     /* xitk_dlist_init (&playlist->widget_list->list); */
 
-    gui->x_lock_display (gui->display);
-    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(playlist->widget_list)));
-    gui->x_unlock_display (gui->display);
-
     _playlist_free_playlists();
-    
-    XITK_WIDGET_LIST_FREE(playlist->widget_list);
-    
+
     free(playlist);
     playlist = NULL;
 
@@ -988,7 +981,6 @@ void playlist_reparent(void) {
  */
 void playlist_editor(void) {
   gGui_t *gui = gGui;
-  GC                         gc;
   char                      *title = _("xine Playlist Editor");
   xitk_browser_widget_t      br;
   xitk_labelbutton_widget_t  lb;
@@ -1044,16 +1036,13 @@ void playlist_editor(void) {
     xitk_set_layer_above(xitk_window_get_window(playlist->xwin));
 
   gui->x_lock_display (gui->display);
-  gc = XCreateGC(gui->display, xitk_window_get_window(playlist->xwin), 0, 0);
   Imlib_apply_image(gui->imlib_data, playlist->bg_image, xitk_window_get_window(playlist->xwin));
   gui->x_unlock_display (gui->display);
 
   /*
    * Widget-list
    */
-  playlist->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) xitk_window_get_window(playlist->xwin));
-  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_GC, gc);
+  playlist->widget_list = xitk_window_widget_list(playlist->xwin);
 
   b.skin_element_name = "PlMoveUp";
   b.callback          = playlist_move_current_updown;

@@ -3044,7 +3044,6 @@ void mediamark_collect_from_directory(char *filepathname) {
  *  EDITOR
  */
 static void mmkeditor_exit(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
 
   if(mmkeditor.running) {
     window_info_t wi;
@@ -3061,19 +3060,11 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     mmkeditor.mmk = NULL;
     
     xitk_unregister_event_handler(&mmkeditor.widget_key);
-    
-    xitk_destroy_widgets(mmkeditor.widget_list);
+
     xitk_window_destroy_window(mmkeditor.xwin);
-    
     mmkeditor.xwin = NULL;
     /* xitk_dlist_init (&mmkeditor.widget_list.list); */
-    
-    gui->x_lock_display (gui->display);
-    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(mmkeditor.widget_list)));
-    gui->x_unlock_display (gui->display);
-    
-    XITK_WIDGET_LIST_FREE(mmkeditor.widget_list);
-    
+
     playlist_get_input_focus();
   }
 }
@@ -3243,7 +3234,6 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {
   gGui_t *gui = gGui;
-  GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
@@ -3284,17 +3274,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 						     WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start(mmkeditor.xwin);
-  
-  gui->x_lock_display (gui->display);
-  gc = XCreateGC(gui->display, 
-		 (xitk_window_get_window(mmkeditor.xwin)), None, None);
-  gui->x_unlock_display (gui->display);
-  
-  mmkeditor.widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(mmkeditor.widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(mmkeditor.xwin)));
-  xitk_widget_list_set(mmkeditor.widget_list, WIDGET_LIST_GC, gc);
-  
+
+  mmkeditor.widget_list = xitk_window_widget_list(mmkeditor.xwin);
+
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gui->imlib_data);
   XITK_WIDGET_INIT(&cb, gui->imlib_data);

@@ -209,7 +209,6 @@ static void panel_exit (xitk_widget_t *w, void *data) {
     pthread_join(panel->slider_thread, NULL);
 
     panel->title_label = NULL;
-    xitk_destroy_widgets(panel->widget_list);
     xitk_button_list_delete (panel->autoplay_buttons);
 
     xitk_window_destroy_window(panel->xwin);
@@ -220,12 +219,6 @@ static void panel_exit (xitk_widget_t *w, void *data) {
     panel->gui->x_unlock_display (panel->gui->display);
 
     /* xitk_dlist_init (&panel->widget_list->list); */
-
-    panel->gui->x_lock_display (panel->gui->display);
-    XFreeGC (panel->gui->display, (XITK_WIDGET_LIST_GC(panel->widget_list)));
-    panel->gui->x_unlock_display (panel->gui->display);
-
-    XITK_WIDGET_LIST_FREE(panel->widget_list);
 
     panel->gui->panel = NULL;
     free (panel);
@@ -1221,7 +1214,6 @@ void panel_reparent (xui_panel_t *panel) {
  */
 xui_panel_t *panel_init (gGui_t *gui) {
   xui_panel_t              *panel;
-  GC                        gc;
   char                     *title = _("xine Panel");
   xitk_button_widget_t      b;
   xitk_checkbox_widget_t    cb;
@@ -1315,7 +1307,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
    */
 
   panel->gui->x_lock_display (panel->gui->display);
-  gc = XCreateGC (panel->gui->display, xitk_window_get_window(panel->xwin), 0, 0);
   Imlib_apply_image (panel->gui->imlib_data, panel->bg_image, xitk_window_get_window(panel->xwin));
   panel->gui->x_unlock_display (panel->gui->display);
 
@@ -1323,10 +1314,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * Widget-list
    */
 
-  panel->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set (panel->widget_list, WIDGET_LIST_WINDOW, (void *)xitk_window_get_window(panel->xwin));
-  xitk_widget_list_set(panel->widget_list, WIDGET_LIST_GC, gc);
- 
+  panel->widget_list = xitk_window_widget_list(panel->xwin);
+
   /* Prev button */
   b.skin_element_name = "Prev";
   b.callback          = gui_nextprev;

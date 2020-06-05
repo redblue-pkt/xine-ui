@@ -83,19 +83,10 @@ static void viewlog_exit(xitk_widget_t *w, void *data) {
     }
     
     xitk_unregister_event_handler(&viewlog->kreg);
-    
-    xitk_destroy_widgets(viewlog->widget_list);
     xitk_window_destroy_window (viewlog->xwin);
-    
     viewlog->xwin = NULL;
     /* xitk_dlist_init (&viewlog->widget_list->list); */
-    
-    gui->x_lock_display (gui->display);
-    XFreeGC (gui->display, XITK_WIDGET_LIST_GC (viewlog->widget_list));
-    gui->x_unlock_display (gui->display);
-    
-    XITK_WIDGET_LIST_FREE(viewlog->widget_list);
-    
+
     for(i = 0; i < viewlog->log_entries; i++)
       free((char *)viewlog->log[i]);
     free(viewlog->log);
@@ -380,7 +371,6 @@ void viewlog_reparent(void) {
  */
 void viewlog_panel(void) {
   gGui_t *gui = gGui;
-  GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
   int                        x, y;
@@ -410,14 +400,7 @@ void viewlog_panel(void) {
   
   set_window_states_start(viewlog->xwin);
 
-  gui->x_lock_display (gui->display);
-  gc = XCreateGC (gui->display, (xitk_window_get_window (viewlog->xwin)), None, None);
-  gui->x_unlock_display (gui->display);
-  
-  viewlog->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(viewlog->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(viewlog->xwin)));
-  xitk_widget_list_set(viewlog->widget_list, WIDGET_LIST_GC, gc);
+  viewlog->widget_list = xitk_window_widget_list(viewlog->xwin);
 
   viewlog_create_tabs();
 

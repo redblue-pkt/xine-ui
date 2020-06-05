@@ -287,18 +287,10 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     
     xitk_unregister_event_handler(&sinfos.widget_key);
 
-    xitk_destroy_widgets(sinfos.widget_list);
     xitk_window_destroy_window(sinfos.xwin);
-
     sinfos.xwin = NULL;
     /* xitk_dlist_init (&sinfos.widget_list.list); */
-    
-    gui->x_lock_display (gui->display);
-    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(sinfos.widget_list)));
-    gui->x_unlock_display (gui->display);
-    
-    XITK_WIDGET_LIST_FREE(sinfos.widget_list);
-    
+
     video_window_set_input_focus(gui->vwin);
 }
 
@@ -440,7 +432,6 @@ void stream_infos_reparent(void) {
 
 void stream_infos_panel(void) {
   gGui_t *gui = gGui;
-  GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
@@ -469,16 +460,8 @@ void stream_infos_panel(void) {
   
   set_window_states_start(sinfos.xwin);
 
-  gui->x_lock_display (gui->display);
-  gc = XCreateGC(gui->display, 
-		 (xitk_window_get_window(sinfos.xwin)), None, None);
-  gui->x_unlock_display (gui->display);
+  sinfos.widget_list = xitk_window_widget_list(sinfos.xwin);
 
-  sinfos.widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(sinfos.widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(sinfos.xwin)));
-  xitk_widget_list_set(sinfos.widget_list, WIDGET_LIST_GC, gc);
-  
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gui->imlib_data);
   lbl.skin_element_name = NULL;
