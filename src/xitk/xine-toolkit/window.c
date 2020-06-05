@@ -637,6 +637,13 @@ void xitk_window_hide_window(xitk_window_t *w)
   XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
 }
 
+void xitk_window_clear_window(xitk_window_t *w)
+{
+  XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
+  XClearWindow(w->imlibdata->x.disp, w->window);
+  XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+}
+
 /*
  * Get (safely) window pos.
  */
