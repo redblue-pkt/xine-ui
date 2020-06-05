@@ -541,11 +541,8 @@ static void _pplugin_paint_widgets(_pp_wrapper_t *pp_wrapper) {
 }
 
 static void _pplugin_send_expose(_pp_wrapper_t *pp_wrapper) {
-  gGui_t *gui = gGui;
   if(pp_wrapper->pplugin) {
-    gui->x_lock_display (gui->display);
-    XClearWindow(gui->display, (XITK_WIDGET_LIST_WINDOW(pp_wrapper->pplugin->widget_list)));
-    gui->x_unlock_display (gui->display);
+    xitk_window_clear_window(pp_wrapper->pplugin->xwin);
   }
 }
 

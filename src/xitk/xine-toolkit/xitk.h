@@ -2219,6 +2219,11 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
 /**
  *
  */
+void xitk_window_clear_window(xitk_window_t *);
+
+/**
+ *
+ */
 void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
 
 /*

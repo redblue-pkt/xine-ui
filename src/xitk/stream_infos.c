@@ -333,9 +333,7 @@ void stream_infos_toggle_auto_update(void) {
   gGui_t *gui = gGui;
     if(gui->stream_info_auto_update) {
       xitk_hide_widget(sinfos.update);
-      gui->x_lock_display (gui->display);
-      XClearWindow(gui->display, xitk_window_get_window(sinfos.xwin));
-      gui->x_unlock_display (gui->display);
+      xitk_window_clear_window(sinfos.xwin);
       xitk_paint_widget_list(sinfos.widget_list);
     }
     else
