@@ -357,7 +357,7 @@ static void setup_clear_tab (xui_setup_t *setup) {
     (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, im->width, im->height, 15, (24 + setup->th));
   setup->gui->x_unlock_display (setup->gui->display);
 
-  xitk_image_free_image (setup->gui->imlib_data, &im);
+  xitk_image_free_image (&im);
 }
 
 static void setup_triplets_enable_and_show (xui_setup_t *setup, int start, int stop, int tips_timeout) {

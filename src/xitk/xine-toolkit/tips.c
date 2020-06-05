@@ -206,7 +206,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
         XFreeGC(tips->display, gc);
         XUNLOCK (xitk_x_unlock_display, tips->display);
 
-        xitk_image_free_image(tips->widget->imlibdata, &image);
+        xitk_image_free_image(&image);
       }
       
       XLOCK (xitk_x_lock_display, tips->display);

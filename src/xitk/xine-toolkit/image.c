@@ -223,9 +223,8 @@ static void _xitk_image_destroy_pix_font (xitk_pix_font_t **pix_font) {
 /*
  *
  */
-void xitk_image_free_image(ImlibData *im, xitk_image_t **src) {
+void xitk_image_free_image(xitk_image_t **src) {
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(*src);
 
   if((*src)->mask)
@@ -1821,7 +1820,7 @@ static void notify_destroy(xitk_widget_t *w) {
     private_data = (image_private_data_t *) w->private_data;
 
     if(!private_data->skin_element_name)
-      xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
+      xitk_image_free_image(&(private_data->skin));
 
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);

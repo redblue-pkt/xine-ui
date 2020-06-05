@@ -69,7 +69,7 @@ static void notify_destroy(xitk_widget_t *w) {
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if (private_data->skin_element_name[0] == '\x01')
-      xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
+      xitk_image_free_image(&(private_data->skin));
 
     if (private_data->label != private_data->lbuf) {
       XITK_FREE (private_data->label);

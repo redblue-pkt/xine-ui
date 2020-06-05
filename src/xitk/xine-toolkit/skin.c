@@ -96,7 +96,7 @@ static void skin_free_imgs (xitk_skin_config_t *skonfig) {
 
   for (n = xine_sarray_size (skonfig->imgs) - 1; n >= 0; n--) {
     xitk_skin_img_t *simg = xine_sarray_get (skonfig->imgs, n);
-    xitk_image_free_image (skonfig->im, &simg->image);
+    xitk_image_free_image (&simg->image);
     free (simg);
   }
   xine_sarray_clear (skonfig->imgs);

@@ -383,18 +383,17 @@ static menu_node_t *_menu_get_prev_branch_from_node(menu_node_t *node) {
 }
 
 static void _menu_destroy_menu_window(menu_window_t **mw) {
-  menu_private_data_t *private_data = (menu_private_data_t *)(*mw)->widget->private_data;
 
   xitk_unregister_event_handler(&(*mw)->key);
   xitk_destroy_widgets(&(*mw)->wl);
   if ((*mw)->bevel_plain)
-    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_plain);
+    xitk_image_free_image (&(*mw)->bevel_plain);
   if ((*mw)->bevel_arrow)
-    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_arrow);
+    xitk_image_free_image (&(*mw)->bevel_arrow);
   if ((*mw)->bevel_unchecked)
-    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_unchecked);
+    xitk_image_free_image (&(*mw)->bevel_unchecked);
   if ((*mw)->bevel_checked)
-    xitk_image_free_image (private_data->imlibdata, &(*mw)->bevel_checked);
+    xitk_image_free_image (&(*mw)->bevel_checked);
   xitk_window_destroy_window((*mw)->xwin);
   (*mw)->xwin = NULL;
   /* xitk_dlist_init (&(*mw)->wl.list); */

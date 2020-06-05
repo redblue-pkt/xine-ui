@@ -239,7 +239,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
     xitk_unregister_event_handler(&skdloader.widget_key);
     
     if(skdloader.preview_image)
-      xitk_image_free_image(gGui->imlib_data, &skdloader.preview_image);
+      xitk_image_free_image(&skdloader.preview_image);
     
     xitk_destroy_widgets(skdloader.widget_list);
     xitk_window_destroy_window(skdloader.xwin);
@@ -400,7 +400,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 	skdloader.preview_image = ximg;
 
 	if(oimg)
-          xitk_image_free_image (gui->imlib_data, &oimg);
+          xitk_image_free_image (&oimg);
 
 	download_update_preview();
       }

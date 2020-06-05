@@ -219,7 +219,7 @@ static void notify_destroy(xitk_widget_t *w) {
     }
     
     if (!(private_data->skin_element_name[0] & ~1))
-      xitk_image_free_image(private_data->imlibdata, &(private_data->font));
+      xitk_image_free_image(&(private_data->font));
 
     XITK_FREE(private_data->label);
     XITK_FREE(private_data->fontname);
@@ -303,7 +303,7 @@ static void paint_label(xitk_widget_t *w) {
 		 font->image->gc, 0, 0, font->width, font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-      xitk_image_free_image(private_data->imlibdata, &bg);
+      xitk_image_free_image(&bg);
       
       xitk_font_unload_font(fs);
       return;
