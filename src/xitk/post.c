@@ -887,23 +887,14 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
 }
 
 static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
 
   pp_wrapper->pplugin->help_running = 0;
   
   xitk_unregister_event_handler(&pp_wrapper->pplugin->help_widget_key);
-  
-  xitk_destroy_widgets(pp_wrapper->pplugin->help_widget_list);
+
   xitk_window_destroy_window(pp_wrapper->pplugin->helpwin);
-  
   pp_wrapper->pplugin->helpwin = NULL;
   /* xitk_dlist_init (&pp_wrapper->pplugin->help_widget_list->list); */
-    
-  gui->x_lock_display (gui->display);
-  XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)));
-  gui->x_unlock_display (gui->display);
-    
-  XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->help_widget_list);
 }
 
 static void _vpplugin_close_help(xitk_widget_t *w, void *data) {
@@ -950,7 +941,6 @@ static int __line_wrap(char *s, int pos, int line_size)
 static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
   post_object_t *pobj = (post_object_t *) data;
-  GC                          gc;
   xitk_pixmap_t              *bg = NULL;
   int                         x, y, width, height;
   xitk_labelbutton_widget_t   lb;
@@ -972,16 +962,8 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     set_window_states_start(pp_wrapper->pplugin->helpwin);
 
-    gui->x_lock_display (gui->display);
-    gc = XCreateGC(gui->display, 
-  		 (xitk_window_get_window(pp_wrapper->pplugin->helpwin)), None, None);
-    gui->x_unlock_display (gui->display);
-    
-    pp_wrapper->pplugin->help_widget_list = xitk_widget_list_new();
-    xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, 
-                         WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pp_wrapper->pplugin->helpwin)));
-    xitk_widget_list_set(pp_wrapper->pplugin->help_widget_list, WIDGET_LIST_GC, gc);
-    
+    pp_wrapper->pplugin->help_widget_list = xitk_window_widget_list(pp_wrapper->pplugin->helpwin);
+
     xitk_window_get_window_size(pp_wrapper->pplugin->helpwin, &width, &height);
     bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
   
@@ -1609,18 +1591,9 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
     
     xitk_unregister_event_handler(&pp_wrapper->pplugin->widget_key);
 
-    xitk_destroy_widgets(pp_wrapper->pplugin->widget_list);
     xitk_window_destroy_window(pp_wrapper->pplugin->xwin);
-
-    pp_wrapper->pplugin->xwin = NULL;
     /* xitk_dlist_init (&pp_wrapper->pplugin->widget_list->list); */
-    
-    gui->x_lock_display (gui->display);
-    XFreeGC(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)));
-    gui->x_unlock_display (gui->display);
-    
-    XITK_WIDGET_LIST_FREE(pp_wrapper->pplugin->widget_list);
-   
+
     VFREE(pp_wrapper->pplugin);
     pp_wrapper->pplugin = NULL;
 
@@ -1890,7 +1863,6 @@ static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
 
 static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   gGui_t *gui = gGui;
-  GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
@@ -1924,16 +1896,8 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   
   set_window_states_start(pp_wrapper->pplugin->xwin);
 
-  gui->x_lock_display (gui->display);
-  gc = XCreateGC(gui->display, 
-		 (xitk_window_get_window(pp_wrapper->pplugin->xwin)), None, None);
-  gui->x_unlock_display (gui->display);
-  
-  pp_wrapper->pplugin->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(pp_wrapper->pplugin->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pp_wrapper->pplugin->xwin)));
-  xitk_widget_list_set(pp_wrapper->pplugin->widget_list, WIDGET_LIST_GC, gc);
-  
+  pp_wrapper->pplugin->widget_list = xitk_window_widget_list(pp_wrapper->pplugin->xwin);
+
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gui->imlib_data);
   XITK_WIDGET_INIT(&cb, gui->imlib_data);

@@ -858,6 +858,25 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
   return xwin;
 }
 
+xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
+{
+  GC gc;
+
+  if (w->widget_list)
+    return w->widget_list;
+
+  w->widget_list = xitk_widget_list_new();
+
+  XLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+  gc = XCreateGC (w->imlibdata->x.disp, w->window, None, None);
+  XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+
+  xitk_widget_list_set(w->widget_list, WIDGET_LIST_WINDOW, (void *) w->window);
+  xitk_widget_list_set(w->widget_list, WIDGET_LIST_GC, gc);
+
+  return w->widget_list;
+}
+
 /*
  * Create a simple, with title bar, window.
  */
@@ -1156,6 +1175,9 @@ void xitk_window_destroy_window(xitk_window_t *w) {
 
   ImlibData *im = w->imlibdata;
 
+  if (w->widget_list)
+    xitk_destroy_widgets(w->widget_list);
+
   XLOCK (im->x.x_lock_display, im->x.disp);
   XUnmapWindow(im->x.disp, w->window);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
@@ -1174,7 +1196,13 @@ void xitk_window_destroy_window(xitk_window_t *w) {
   if((w->win_parent != None) && xitk_is_window_visible(im->x.disp, w->win_parent))
     XSetInputFocus(im->x.disp, w->win_parent, RevertToParent, CurrentTime);
 
+  if (w->widget_list)
+    XFreeGC (im->x.disp, XITK_WIDGET_LIST_GC (w->widget_list));
+
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  if (w->widget_list)
+    XITK_WIDGET_LIST_FREE(w->widget_list);
 
   XITK_FREE(w);
 }

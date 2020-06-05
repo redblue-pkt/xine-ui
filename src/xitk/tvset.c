@@ -178,15 +178,9 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     
     xitk_unregister_event_handler(&tvset.widget_key);
 
-    xitk_destroy_widgets(tvset.widget_list);
     xitk_window_destroy_window(tvset.xwin);
-
     tvset.xwin = NULL;
     /* xitk_dlist_init (&tvset.widget_list->list); */
-    
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset.widget_list)));
-    gGui->x_unlock_display (gGui->display);
 
     free(tvset.system_entries);
     free(tvset.chann_entries);
@@ -195,8 +189,6 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     tvset.chann_entries = NULL;
     tvset.vidstd_entries = NULL;
 
-    XITK_WIDGET_LIST_FREE(tvset.widget_list);
-    
     video_window_set_input_focus(gGui->vwin);
 }
 
@@ -271,7 +263,6 @@ void tvset_reparent(void) {
 }
 
 void tvset_panel(void) {
-  GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_intbox_widget_t        ib;
@@ -305,16 +296,8 @@ void tvset_panel(void) {
   
   set_window_states_start(tvset.xwin);
 
-  gGui->x_lock_display (gGui->display);
-  gc = XCreateGC(gGui->display, 
-		 (xitk_window_get_window(tvset.xwin)), None, None);
-  gGui->x_unlock_display (gGui->display);
+  tvset.widget_list = xitk_window_widget_list(tvset.xwin);
 
-  tvset.widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(tvset.widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(tvset.xwin)));
-  xitk_widget_list_set(tvset.widget_list, WIDGET_LIST_GC, gc);
-  
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);

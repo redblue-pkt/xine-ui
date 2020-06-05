@@ -247,18 +247,10 @@ static void fne_destroy(filename_editor_t *fne) {
 
     xitk_unregister_event_handler(&fne->widget_key);
 
-    xitk_destroy_widgets(fne->widget_list);
     xitk_window_destroy_window(fne->xwin);
-
     fne->xwin = NULL;
     /* xitk_dlist_init (&fne->widget_list->list); */
-    
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fne->widget_list)));
-    gGui->x_unlock_display (gGui->display);
-    
-    XITK_WIDGET_LIST_FREE(fne->widget_list);
-    
+
     free(fne);
   }
 }
@@ -295,7 +287,6 @@ static void fne_handle_event(XEvent *event, void *data) {
 static void fb_create_input_window(char *title, char *text,
 				   xitk_string_callback_t cb, filebrowser_t *fb) {
   filename_editor_t          *fne;
-  GC                          gc;
   int                         x, y, w;
   int                         width = WINDOW_WIDTH;
   int                         height = 102;
@@ -318,16 +309,8 @@ static void fb_create_input_window(char *title, char *text,
   xitk_window_set_window_class(fne->xwin, NULL, "xine");
   xitk_window_set_window_icon(fne->xwin, gGui->icon);
 
-  fb->gui->x_lock_display (fb->gui->display);
-  gc = XCreateGC (fb->gui->display, (xitk_window_get_window(fne->xwin)), None, None);
-  fb->gui->x_unlock_display (fb->gui->display);
-  
-  fne->widget_list                = xitk_widget_list_new();
+  fne->widget_list                = xitk_window_widget_list(fne->xwin);
 
-  xitk_widget_list_set(fne->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fne->xwin)));
-  xitk_widget_list_set(fne->widget_list, WIDGET_LIST_GC, gc);
-  
   XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
   XITK_WIDGET_INIT(&inp, fb->gui->imlib_data);
 
@@ -902,17 +885,9 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     
     xitk_unregister_event_handler(&fb->widget_key);
 
-    xitk_destroy_widgets(fb->widget_list);
     xitk_window_destroy_window (fb->xwin);
-
     fb->xwin = NULL;
     /* xitk_dlist_init (&fb->widget_list->list); */
-    
-    fb->gui->x_lock_display (fb->gui->display);
-    XFreeGC (fb->gui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
-    fb->gui->x_unlock_display (fb->gui->display);
-   
-    XITK_WIDGET_LIST_FREE(fb->widget_list);
 
     if(fb->norm_files) {
       while(fb->files_num) {
@@ -1167,7 +1142,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 				  filebrowser_callback_button_t *cbb2,
 				  filebrowser_callback_button_t *cbb_close) {
   filebrowser_t              *fb;
-  GC                          gc;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
@@ -1250,16 +1224,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->file_filters[i] = NULL;
   fb->filter_selected = 0;
 
-  fb->gui->x_lock_display (fb->gui->display);
-  gc = XCreateGC (fb->gui->display, 
-		 (xitk_window_get_window(fb->xwin)), None, None);
-  fb->gui->x_unlock_display (fb->gui->display);
-
-  fb->widget_list                = xitk_widget_list_new();
-
-  xitk_widget_list_set(fb->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(fb->xwin)));
-  xitk_widget_list_set(fb->widget_list, WIDGET_LIST_GC, gc);
+  fb->widget_list = xitk_window_widget_list(fb->xwin);
 
   XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
   XITK_WIDGET_INIT(&lbl, fb->gui->imlib_data);

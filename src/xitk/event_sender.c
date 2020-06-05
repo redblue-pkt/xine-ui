@@ -315,19 +315,8 @@ static void event_sender_exit(xitk_widget_t *w, void *data) {
     }
     
     xitk_unregister_event_handler(&eventer->widget_key);
-    
-    xitk_destroy_widgets(eventer->widget_list);
     xitk_window_destroy_window(eventer->xwin);
-    
     eventer->xwin = NULL;
-    /* xitk_dlist_init (&eventer->widget_list->list); */
-    
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
-    gGui->x_unlock_display (gGui->display);
-    
-    XITK_WIDGET_LIST_FREE(eventer->widget_list);
-    
     free(eventer);
     eventer = NULL;
 
@@ -388,7 +377,6 @@ void event_sender_reparent(void) {
 }
 
 void event_sender_panel(void) {
-  GC                         gc;
   xitk_labelbutton_widget_t  lb;
   int                        x, y, i;
   xitk_widget_t             *w;
@@ -419,19 +407,10 @@ void event_sender_panel(void) {
 
   /* Create window */
   eventer->xwin = xitk_window_create_simple_window(gGui->imlib_data, eventer->x, eventer->y, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+  xitk_window_set_window_title(eventer->xwin, _("xine Event Sender"));
   set_window_states_start(eventer->xwin);
 
-  gGui->x_lock_display (gGui->display);
-  XStoreName(gGui->display, (xitk_window_get_window(eventer->xwin)), _("xine Event Sender"));
-  gc = XCreateGC(gGui->display, 
-		 (xitk_window_get_window(eventer->xwin)), None, None);
-  gGui->x_unlock_display (gGui->display);
-  
-  eventer->widget_list = xitk_widget_list_new();
-  xitk_widget_list_set(eventer->widget_list, 
-		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(eventer->xwin)));
-  xitk_widget_list_set(eventer->widget_list, WIDGET_LIST_GC, gc);
+  eventer->widget_list = xitk_window_widget_list(eventer->xwin);
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 

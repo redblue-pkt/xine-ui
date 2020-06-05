@@ -240,20 +240,11 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
     
     if(skdloader.preview_image)
       xitk_image_free_image(&skdloader.preview_image);
-    
-    xitk_destroy_widgets(skdloader.widget_list);
+
     xitk_window_destroy_window(skdloader.xwin);
-    
     skdloader.xwin = NULL;
-    
     /* xitk_dlist_init (&skdloader.widget_list->list); */
-    
-    gGui->x_lock_display (gGui->display);
-    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)));
-    gGui->x_unlock_display (gGui->display);
-    
-    XITK_WIDGET_LIST_FREE(skdloader.widget_list);
-    
+
     for(i = 0; i < skdloader.num; i++) {
       SAFE_FREE(skdloader.slxs[i]->name);
       SAFE_FREE(skdloader.slxs[i]->author.name);
@@ -608,7 +599,6 @@ void download_skin(char *url) {
     int                        i;
     xitk_browser_widget_t      br;
     xitk_labelbutton_widget_t  lb;
-    GC                         gc;
     int                        x, y;
 
     xitk_unregister_event_handler (&dialog);
@@ -642,10 +632,6 @@ void download_skin(char *url) {
     
     set_window_states_start(skdloader.xwin);
 
-    gui->x_lock_display (gui->display);
-    gc = XCreateGC (gui->display, (xitk_window_get_window (skdloader.xwin)), None, None);
-    gui->x_unlock_display (gui->display);
-
     xitk_window_get_window_size(skdloader.xwin, &width, &height);
     bg = xitk_image_create_xitk_pixmap (gui->imlib_data, width, height);
     gui->x_lock_display (gui->display);
@@ -653,11 +639,8 @@ void download_skin(char *url) {
       bg->gc, 0, 0, width, height, 0, 0);
     gui->x_unlock_display (gui->display);
 
-    skdloader.widget_list = xitk_widget_list_new();
-    xitk_widget_list_set(skdloader.widget_list, 
-			 WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(skdloader.xwin)));
-    xitk_widget_list_set(skdloader.widget_list, WIDGET_LIST_GC, gc);
-    
+    skdloader.widget_list = xitk_window_widget_list(skdloader.xwin);
+
     skdloader.slxs = slxs;
     
     i = 0;

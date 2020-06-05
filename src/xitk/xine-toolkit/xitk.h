@@ -2163,6 +2163,12 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
  */
 xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title, int x, int y, int width, int height);
 
+/*
+ * Get widget list of window.
+ *  - list is created during first call.
+ *  - list is automatically released when window is destroyed.
+ */
+xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *);
 
 /**
  *
