@@ -740,7 +740,7 @@ void download_skin(char *url) {
 							skdloader.widget_list,
 							NULL);
     
-    xitk_window_show_window(skdloader.xwin);
+    xitk_window_show_window(skdloader.xwin, 1);
     video_window_set_transient_for (gui->vwin, skdloader.xwin);
     layer_above_video(skdloader.xwin);
 

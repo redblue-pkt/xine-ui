@@ -2257,12 +2257,14 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
 /*
  *
  */
-void xitk_window_show_window(xitk_window_t *w);
+void xitk_window_show_window(xitk_window_t *w, int raise);
+void xitk_window_hide_window(xitk_window_t *w);
 
 /*
  *
  */
 int xitk_is_window_iconified(Display *display, Window window);
+void xitk_window_iconify_window(xitk_window_t *w);
 
 /*
  *

@@ -78,13 +78,8 @@ void splash_create(void) {
     xitk_window_set_window_icon(xwin, gGui->icon);
 
     xitk_window_change_background_with_image(xwin, xim, xim->width, xim->height);
-    
-    gGui->x_lock_display (gGui->display);
-    XRaiseWindow(gGui->display, xitk_window_get_window(xwin)); 
-    XMapWindow(gGui->display, xitk_window_get_window(xwin));
-    gGui->x_unlock_display (gGui->display);
-
-    xitk_set_layer_above(xitk_window_get_window(xwin));
+    xitk_window_show_window(xwin, 1);
+    xitk_window_set_layer_above(xwin);
 
     xitk_image_free_image(&xim);
   }
@@ -95,10 +90,7 @@ void splash_create(void) {
 void splash_destroy(void) {
 
   if(xwin) {
-    gGui->x_lock_display (gGui->display);
-    XUnmapWindow(gGui->display, xitk_window_get_window(xwin)); 
-    gGui->x_unlock_display (gGui->display);
-    
+    xitk_window_hide_window(xwin);
     xitk_window_destroy_window(xwin);
     xwin = NULL;
   }

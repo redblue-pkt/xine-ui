@@ -104,21 +104,17 @@ void raise_window(xitk_window_t *xwin, int visible, int running) {
 
 void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running) {
   gGui_t *gui = gGui;
-  Window window;
 
   if (!xwin)
     return;
-  window = xitk_window_get_window(xwin);
 
-  if(window && (*visible) && running) {
+  if((*visible) && running) {
 
     if(gui->use_root_window) {
-      gui->x_lock_display (gui->display);
       if (xitk_window_is_window_visible(xwin))
-        XIconifyWindow(gui->display, window, gui->screen);
+        xitk_window_iconify_window(xwin);
       else
-	XMapWindow(gui->display, window);
-      gui->x_unlock_display (gui->display);
+        xitk_window_show_window(xwin, 0);
     }
     else if (!xitk_window_is_window_visible(xwin)) {
       /* Obviously user has iconified the window, let it be */
@@ -126,9 +122,7 @@ void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *vi
     else {
       *visible = 0;
       xitk_hide_widgets(widget_list);
-      gui->x_lock_display (gui->display);
-      XUnmapWindow(gui->display, window);
-      gui->x_unlock_display (gui->display);
+      xitk_window_hide_window(xwin);
     }
   }
   else {
@@ -136,7 +130,7 @@ void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *vi
       *visible = 1;
       xitk_show_widgets(widget_list);
 
-      xitk_window_show_window(xwin);
+      xitk_window_show_window(xwin, 1);
       video_window_set_transient_for (gui->vwin, xwin);
 
       wait_for_window_visible(xwin);

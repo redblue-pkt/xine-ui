@@ -389,7 +389,7 @@ static void fb_create_input_window(char *title, char *text,
 						  (void *)fne);
   }
 
-  xitk_window_show_window(fne->xwin);
+  xitk_window_show_window(fne->xwin, 1);
 
   video_window_set_transient_for (fb->gui->vwin, fne->xwin);
   layer_above_video(fne->xwin);

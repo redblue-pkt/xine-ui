@@ -614,11 +614,26 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
   xitk_set_window_class(w->imlibdata->x.disp, w->window, res_name, res_class);
 }
 
-void xitk_window_show_window(xitk_window_t *w)
+void xitk_window_show_window(xitk_window_t *w, int raise)
 {
   XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
-  XRaiseWindow(w->imlibdata->x.disp, w->window);
+  if (raise)
+    XRaiseWindow(w->imlibdata->x.disp, w->window);
   XMapWindow(w->imlibdata->x.disp, w->window);
+  XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+}
+
+void xitk_window_iconify_window(xitk_window_t *w)
+{
+  XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
+  XIconifyWindow(w->imlibdata->x.disp, w->window, w->imlibdata->x.screen);
+  XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+}
+
+void xitk_window_hide_window(xitk_window_t *w)
+{
+  XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
+  XUnmapWindow(w->imlibdata->x.disp, w->window);
   XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
 }
 
