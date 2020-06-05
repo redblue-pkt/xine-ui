@@ -564,7 +564,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
     
     private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
-    xitk_window_show_window(private_data->xwin);
+    xitk_window_show_window(private_data->xwin, 1);
   }
 }
 
@@ -1142,7 +1142,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 			   (const char* const*)private_data->mc->mrls_disp, NULL,
 			   private_data->mrls_num, 0);
 
-  xitk_window_show_window(private_data->xwin);
+  xitk_window_show_window(private_data->xwin, 1);
 
   private_data->widget_key = 
     xitk_register_event_handler("mrl browser",

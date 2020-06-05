@@ -656,32 +656,25 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if (panel->visible && panel->gui->video_display == panel->gui->display) {
     
-    panel->gui->x_lock_display (panel->gui->display);
-    
     if (video_window_is_visible (panel->gui->vwin)) {
       if (panel->gui->use_root_window) { /* Using root window */
-	if(visible)
-          XIconifyWindow (panel->gui->display, xitk_window_get_window(panel->xwin), panel->gui->screen);
-	else
-          XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
+        if(visible)
+          xitk_window_iconify_window(panel->xwin);
+        else
+          xitk_window_show_window(panel->xwin, 0);
       }
       else {
 	panel->visible = 0;
-        XUnmapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
-        XSync (panel->gui->display, False);
-        panel->gui->x_unlock_display (panel->gui->display);
+        xitk_window_hide_window(panel->xwin);
 	xitk_hide_widgets(panel->widget_list);
-        panel->gui->x_lock_display (panel->gui->display);
       }
     }
     else {
       if(visible)
-        XIconifyWindow (panel->gui->display, xitk_window_get_window(panel->xwin), (XDefaultScreen (panel->gui->display)));
+        xitk_window_iconify_window(panel->xwin);
       else
-        XMapWindow (panel->gui->display, xitk_window_get_window(panel->xwin));
+        xitk_window_show_window(panel->xwin, 0);
     }
-
-    panel->gui->x_unlock_display (panel->gui->display);
 
     {
       Window want;
@@ -722,7 +715,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     panel->gui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
 
-    xitk_window_show_window(panel->xwin);
+    xitk_window_show_window(panel->xwin, 1);
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
     wait_for_window_visible (panel->xwin);
@@ -1622,7 +1615,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     panel->visible = 1;
   
   if (panel->visible) {
-    xitk_window_show_window(panel->xwin);
+    xitk_window_show_window(panel->xwin, 1);
   }
   else
     xitk_hide_widgets(panel->widget_list);
