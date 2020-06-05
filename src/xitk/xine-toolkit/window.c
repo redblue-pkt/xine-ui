@@ -1162,6 +1162,7 @@ void xitk_window_destroy_window(xitk_window_t *w) {
  * @TODO Should be split on a different unit, as it's only used with TAR support
  *       enabled.
  */
+#if 0
 void xitk_window_dialog_destroy(xitk_window_t *w) {
   xitk_dialog_t *wd = w->dialog;
 
@@ -1182,7 +1183,7 @@ void xitk_window_dialog_destroy(xitk_window_t *w) {
     XITK_FREE(wd);
   }  
 }
-
+#endif
 void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent) {
   if(xwin)
     xwin->win_parent = parent;

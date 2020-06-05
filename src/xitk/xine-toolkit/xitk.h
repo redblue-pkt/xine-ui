@@ -2167,11 +2167,6 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title
 /**
  *
  */
-void xitk_window_dialog_destroy(xitk_window_t *w);
-
-/**
- *
- */
 void xitk_window_destroy_window(xitk_window_t *w);
 
 /**
