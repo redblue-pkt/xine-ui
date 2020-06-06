@@ -359,12 +359,14 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
     for (u = 0; u < NUM_SLIDERS; u++) {
       vctrl_item_t *item = &vctrl->items[u];
+      /*
       int v;
 
       if (item->enable)
         v = xine_get_param (vctrl->gui->stream, item->prop);
       else
         v = CONTROL_MIN;
+      */
       sl.skin_element_name = sl_skins[u];
       sl.userdata        =
       sl.motion_userdata = item;
