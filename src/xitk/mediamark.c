@@ -3459,8 +3459,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(b);
   mmk_editor_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
-  xitk_window_change_background(mmkeditor.xwin, bg->pixmap, width, height);
-  xitk_image_destroy_xitk_pixmap(bg);
+  xitk_window_set_background(mmkeditor.xwin, bg);
 
   mmkeditor.widget_key = xitk_register_event_handler("mmkeditor", 
 						      (xitk_window_get_window(mmkeditor.xwin)),

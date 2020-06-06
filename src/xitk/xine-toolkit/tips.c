@@ -198,10 +198,8 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, (height - image->height)>>1);
         XUNLOCK (xitk_x_unlock_display, tips->display);
 
-        xitk_window_change_background(xwin, bg->pixmap, width, height);
-	
-	xitk_image_destroy_xitk_pixmap(bg);
-	
+        xitk_window_set_background(xwin, bg);
+
         XLOCK (xitk_x_lock_display, tips->display);
         XFreeGC(tips->display, gc);
         XUNLOCK (xitk_x_unlock_display, tips->display);

@@ -682,9 +682,8 @@ void download_skin(char *url) {
     
     draw_rectangular_inner_box (gui->imlib_data, bg, x, y,
       (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-    
-    xitk_window_change_background (skdloader.xwin, bg->pixmap, width, height);
-    xitk_image_destroy_xitk_pixmap(bg);
+
+    xitk_window_set_background (skdloader.xwin, bg);
 
     y = WINDOW_HEIGHT - (23 + 15);
     x = 15;

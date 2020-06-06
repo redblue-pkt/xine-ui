@@ -481,9 +481,8 @@ void tvset_panel(void) {
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
   xitk_add_widget (tvset.widget_list, widget);
   xitk_enable_and_show_widget(widget);
-  
-  xitk_window_change_background(tvset.xwin, bg->pixmap, width, height);
-  xitk_image_destroy_xitk_pixmap(bg);
+
+  xitk_window_set_background(tvset.xwin, bg);
 
   tvset.widget_key = xitk_register_event_handler("tvset", 
 						  (xitk_window_get_window(tvset.xwin)),

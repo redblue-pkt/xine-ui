@@ -1143,9 +1143,7 @@ void kbedit_window(void) {
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
 
-  xitk_window_change_background(kbedit->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  xitk_image_destroy_xitk_pixmap(bg);
+  xitk_window_set_background(kbedit->xwin, bg);
 
   kbedit_create_browser_entries();
 

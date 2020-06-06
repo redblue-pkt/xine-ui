@@ -1071,11 +1071,9 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     xitk_enable_and_show_widget(pp_wrapper->pplugin->help_browser);
     xitk_browser_set_alignment(pp_wrapper->pplugin->help_browser, ALIGN_LEFT);
-  
-  
-    xitk_window_change_background(pp_wrapper->pplugin->helpwin, bg->pixmap, width, height);
-    xitk_image_destroy_xitk_pixmap(bg);
-  
+
+    xitk_window_set_background(pp_wrapper->pplugin->helpwin, bg);
+
     pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
                                                                        (xitk_window_get_window(pp_wrapper->pplugin->helpwin)),
 								       (pp_wrapper == &vpp_wrapper) ? _vpplugin_help_handle_event : _applugin_help_handle_event,
@@ -1977,10 +1975,9 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   pp_wrapper->pplugin->y = 34 - (FRAME_HEIGHT + 4);
   
   _pplugin_rebuild_filters (pp_wrapper);
-  
-  xitk_window_change_background(pp_wrapper->pplugin->xwin, bg->pixmap, width, height);
-  xitk_image_destroy_xitk_pixmap(bg);
-  
+
+  xitk_window_set_background(pp_wrapper->pplugin->xwin, bg);
+
   pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin" : "applugin", 
 						    (xitk_window_get_window(pp_wrapper->pplugin->xwin)),
 						    (pp_wrapper == &vpp_wrapper) ? _vpplugin_handle_event : _applugin_handle_event,
