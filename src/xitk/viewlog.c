@@ -177,7 +177,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   gGui_t *gui = gGui;
 #endif
   int    i, j, k;
-  const char *const *log = xine_get_log(__xineui_global_xine_instance, section);
+  const char *const *log = (const char * const *)xine_get_log(__xineui_global_xine_instance, section);
   char   buf[2048];
   const char *p;
   
