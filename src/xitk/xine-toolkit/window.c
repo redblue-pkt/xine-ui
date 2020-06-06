@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1177,6 +1177,8 @@ void xitk_window_destroy_window(xitk_window_t *w) {
 
   if (w->widget_list)
     xitk_destroy_widgets(w->widget_list);
+
+  xitk_clipboard_unregister_window (w->window);
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   XUnmapWindow(im->x.disp, w->window);

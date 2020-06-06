@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1553,6 +1553,7 @@ void xitk_destroy_widget(xitk_widget_t *w) {
   if (!w)
     return;
 
+  xitk_clipboard_unregister_widget (w);
   xitk_hide_widget(w);
   xitk_stop_widget(w);
   xitk_disable_widget(w);

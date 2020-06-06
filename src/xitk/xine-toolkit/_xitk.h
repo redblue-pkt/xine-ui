@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -308,7 +308,6 @@ void menu_auto_pop(xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
 
-
 struct xitk_font_s {
   Display       *display;
 #ifdef WITH_XFT
@@ -357,5 +356,13 @@ struct xitk_dialog_s {
 void xitk_register_eh_destructor (xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
 
+void xitk_clipboard_unregister_widget (xitk_widget_t *w);
+void xitk_clipboard_unregister_window (Window win);
+/* text == NULL: just tell length.
+ * *text == NULL: return live buf.
+ * *text != NULL: copy there.
+ * return -1: wait for WIDGET_EVENT_CLIP_READY, then try again. */
+int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
 #endif
+

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -57,6 +57,8 @@
 #include "utils.h"
 #include "_xitk.h"
 #include "tips.h"
+
+#define _XITK_CLIPBOARD_DEBUG
 
 extern char **environ;
 #undef TRACE_LOCKS
@@ -222,9 +224,320 @@ typedef struct {
     Atom                      XA_WM_WINDOW_TYPE_NORMAL;
   } atoms;
 
+  struct {
+    char                   *text;
+    int                     text_len;
+    xitk_widget_t          *widget_in;
+    Window                  window_in;
+    Window                  window_out;
+    Atom                    req;
+    Atom                    prop;
+    Atom                    target;
+    Atom                    dummy;
+    Time                    own_time;
+    union {
+      Atom                  a[15];
+      struct {
+        Atom                null;
+        Atom                atom;
+        Atom                timestamp;
+        Atom                integer;
+        Atom                c_string;
+        Atom                string;
+        Atom                utf8_string;
+        Atom                text;
+        Atom                filename;
+        Atom                net_address;
+        Atom                window;
+        Atom                clipboard;
+        Atom                length;
+        Atom                targets;
+        Atom                multiple;
+      }                     n;
+    }                       atoms;
+  }                         clipboard;
 } __xitk_t;
 
 xitk_t *gXitk;
+
+void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  if (xitk->clipboard.widget_in == w) {
+    xitk->clipboard.widget_in = NULL;
+    xitk->clipboard.window_in = None;
+  }
+}
+
+void xitk_clipboard_unregister_window (Window win) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  if (xitk->clipboard.window_out == win)
+    xitk->clipboard.window_out = None;
+}
+
+static void _xitk_clipboard_init (__xitk_t *xitk) {
+  static const char *atom_names[] = {
+    "NULL", "ATOM", "TIMESTAMP", "INTEGER", "C_STRING", "STRING", "UTF8_STRING", "TEXT",
+    "FILENAME", "NET_ADDRESS", "WINDOW", "CLIPBOARD", "LENGTH", "TARGETS", "MULTIPLE"
+  };
+
+  xitk->clipboard.text = NULL;
+  xitk->clipboard.text_len = 0;
+  xitk->clipboard.widget_in = NULL;
+  xitk->clipboard.window_in = None;
+  xitk->clipboard.window_out = None;
+  xitk->clipboard.own_time = CurrentTime;
+
+  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  XInternAtoms (xitk->x.display,
+    (char **)atom_names, sizeof (atom_names) / sizeof (atom_names[0]), True,
+    xitk->clipboard.atoms.a);
+  xitk->clipboard.dummy = XInternAtom (xitk->x.display, "_XITK_CLIP", False);
+  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+#ifdef _XITK_CLIPBOARD_DEBUG
+  printf ("xitk.window.clipboard: "
+    "null=%d atom=%d timestamp=%d integer=%d c_string=%d string=%d utf8_string=%d text=%d "
+    "filename=%d net_address=%d window=%d clipboard=%d length=%d targets=%d multiple=%d dummy=%d.\n",
+    (int)xitk->clipboard.atoms.n.null,
+    (int)xitk->clipboard.atoms.n.atom,
+    (int)xitk->clipboard.atoms.n.timestamp,
+    (int)xitk->clipboard.atoms.n.integer,
+    (int)xitk->clipboard.atoms.n.c_string,
+    (int)xitk->clipboard.atoms.n.string,
+    (int)xitk->clipboard.atoms.n.utf8_string,
+    (int)xitk->clipboard.atoms.n.text,
+    (int)xitk->clipboard.atoms.n.filename,
+    (int)xitk->clipboard.atoms.n.net_address,
+    (int)xitk->clipboard.atoms.n.window,
+    (int)xitk->clipboard.atoms.n.clipboard,
+    (int)xitk->clipboard.atoms.n.length,
+    (int)xitk->clipboard.atoms.n.targets,
+    (int)xitk->clipboard.atoms.n.multiple,
+    (int)xitk->clipboard.dummy);
+#endif
+}
+
+static void _xitk_clipboard_deinit (__xitk_t *xitk) {
+  free (xitk->clipboard.text);
+  xitk->clipboard.text = NULL;
+  xitk->clipboard.text_len = 0;
+}
+
+static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
+  if (event->type == PropertyNotify) {
+    if (event->xproperty.atom == xitk->clipboard.dummy) {
+      if (event->xproperty.window == xitk->clipboard.window_out) {
+        /* set #2. */
+#ifdef _XITK_CLIPBOARD_DEBUG
+        printf ("xitk.clipboard: set #2: own clipboard @ time=%ld.\n", (long int)event->xproperty.time);
+#endif
+        xitk->clipboard.own_time = event->xproperty.time;
+        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        XSetSelectionOwner (xitk->x.display, xitk->clipboard.atoms.n.clipboard, xitk->clipboard.window_out, xitk->clipboard.own_time);
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      } else if (event->xproperty.window == xitk->clipboard.window_in) {
+        /* get #2. */
+#ifdef _XITK_CLIPBOARD_DEBUG
+        printf ("xitk.clipboard: get #2 time=%ld.\n", (long int)event->xproperty.time);
+#endif
+        if (event->xproperty.state == PropertyNewValue) {
+          do {
+            Atom actual_type;
+            int actual_format = 0;
+            unsigned long nitems, bytes_after;
+            unsigned char *prop;
+
+            XLOCK (xitk->x.x_lock_display, xitk->x.display);
+            XGetWindowProperty (xitk->x.display, xitk->clipboard.window_in,
+              xitk->clipboard.dummy, 0, 0, False, xitk->clipboard.atoms.n.utf8_string,
+              &actual_type, &actual_format, &nitems, &bytes_after, &prop);
+            XFree (prop);
+            if ((actual_type != xitk->clipboard.atoms.n.utf8_string) || (actual_format != 8))
+              break;
+            xitk->clipboard.text = malloc ((bytes_after + 1 + 3) & ~3);
+            if (!xitk->clipboard.text)
+              break;
+            xitk->clipboard.text_len = bytes_after;
+            XGetWindowProperty (xitk->x.display, xitk->clipboard.window_in,
+              xitk->clipboard.dummy, 0, (xitk->clipboard.text_len + 3) >> 2,
+              True, xitk->clipboard.atoms.n.utf8_string,
+              &actual_type, &actual_format, &nitems, &bytes_after, &prop);
+            if (!prop)
+              break;
+            memcpy (xitk->clipboard.text, prop, xitk->clipboard.text_len);
+            XFree (prop);
+            xitk->clipboard.text[xitk->clipboard.text_len] = 0;
+          } while (0);
+          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          if (xitk->clipboard.widget_in && (xitk->clipboard.text_len > 0)) {
+            widget_event_t  event;
+
+            event.type = WIDGET_EVENT_CLIP_READY;
+            (void)xitk->clipboard.widget_in->event (xitk->clipboard.widget_in, &event, NULL);
+          }
+        }
+        xitk->clipboard.widget_in = NULL;
+        xitk->clipboard.window_in = None;
+      }
+      return 1;
+    }
+  } else if (event->type == SelectionClear) {
+    if ((event->xselectionclear.window == xitk->clipboard.window_out)
+     && (event->xselectionclear.selection == xitk->clipboard.atoms.n.clipboard))
+#ifdef _XITK_CLIPBOARD_DEBUG
+      printf ("xitk.clipboard: lost.\n");
+#endif
+      xitk->clipboard.window_out = None;
+      return 1;
+  } else if (event->type == SelectionNotify) {
+  } else if (event->type == SelectionRequest) {
+    if ((event->xselectionrequest.owner == xitk->clipboard.window_out)
+     && (event->xselectionrequest.selection == xitk->clipboard.atoms.n.clipboard)) {
+#ifdef _XITK_CLIPBOARD_DEBUG
+      char *tname, *pname;
+      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      tname = XGetAtomName (xitk->x.display, event->xselectionrequest.target);
+      pname = XGetAtomName (xitk->x.display, event->xselectionrequest.property);
+      printf ("xitk.clipboard: serve #1 requestor=%d target=%d (%s) property=%d (%s).\n",
+        (int)event->xselectionrequest.requestor,
+        (int)event->xselectionrequest.target, tname,
+        (int)event->xselectionrequest.property, pname);
+      XFree (pname);
+      XFree (tname);
+#endif
+      xitk->clipboard.req    = event->xselectionrequest.requestor;
+      xitk->clipboard.target = event->xselectionrequest.target;
+      xitk->clipboard.prop   = event->xselectionrequest.property;
+      if (xitk->clipboard.target == xitk->clipboard.atoms.n.targets) {
+        int r;
+        Atom atoms[] = {
+          xitk->clipboard.atoms.n.string, xitk->clipboard.atoms.n.utf8_string,
+          xitk->clipboard.atoms.n.length, xitk->clipboard.atoms.n.timestamp
+        };
+#ifdef _XITK_CLIPBOARD_DEBUG
+        printf ("xitk.clipboard: serve #2: reporting %d (STRING) %d (UTF8_STRING) %d (LENGTH) %d (TIMESTAMP).\n",
+          (int)xitk->clipboard.atoms.n.string, (int)xitk->clipboard.atoms.n.utf8_string,
+          (int)xitk->clipboard.atoms.n.length, (int)xitk->clipboard.atoms.n.timestamp);
+#endif
+        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
+          xitk->clipboard.atoms.n.atom, 32, PropModeReplace,
+          (const unsigned char *)atoms, sizeof (atoms) / sizeof (atoms[0]));
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        if (r) {
+#ifdef _XITK_CLIPBOARD_DEBUG
+          printf ("xitk.clipboard: serve #2: reporting OK.\n");
+#endif
+        }
+      } else if ((xitk->clipboard.target == xitk->clipboard.atoms.n.string)
+        || (xitk->clipboard.target == xitk->clipboard.atoms.n.utf8_string)) {
+        int r;
+#ifdef _XITK_CLIPBOARD_DEBUG
+        printf ("xitk.clipboard: serve #3: sending %d bytes.\n", xitk->clipboard.text_len + 1);
+#endif
+        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
+          xitk->clipboard.atoms.n.utf8_string, 8, PropModeReplace,
+          (const unsigned char *)xitk->clipboard.text, xitk->clipboard.text_len + 1);
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        if (r) {
+#ifdef _XITK_CLIPBOARD_DEBUG
+          printf ("xitk.clipboard: serve #3 len=%d OK.\n", xitk->clipboard.text_len);
+#endif
+        }
+      }
+      {
+        XEvent event2;
+        event2.xany.type = SelectionNotify;
+        event2.xselection.requestor = event->xselectionrequest.requestor;
+        event2.xselection.target = event->xselectionrequest.target;
+        event2.xselection.property = event->xselectionrequest.property;
+        event2.xselection.time = event->xselectionrequest.time;
+        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        XSendEvent (xitk->x.display, event->xselectionrequest.requestor, False, 0, &event2);
+        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      }
+      return 1;
+    }
+  }
+  return 0;
+}
+  
+int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  Window win = w->wl->win;
+
+  free (xitk->clipboard.text);
+  xitk->clipboard.text = NULL;
+  xitk->clipboard.text_len = 0;
+  if (!text || (text_len <= 0))
+    return 0;
+  xitk->clipboard.text = malloc (text_len + 1);
+  if (!xitk->clipboard.text)
+    return 0;
+  memcpy (xitk->clipboard.text, text, text_len);
+  xitk->clipboard.text[text_len] = 0;
+  xitk->clipboard.text_len = text_len;
+
+#ifdef _XITK_CLIPBOARD_DEBUG
+  printf ("xitk.clipboard: set #1.\n");
+#endif
+  xitk->clipboard.window_out = win;
+  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  /* set #1: HACK: get current server time. */
+  XChangeProperty (xitk->x.display, win,
+    xitk->clipboard.dummy, xitk->clipboard.atoms.n.utf8_string, 8, PropModeAppend, NULL, 0);
+  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+
+  return text_len;
+}
+
+int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  Window win = w->wl->win;
+  int l;
+
+  if (xitk->clipboard.widget_in != w) {
+
+    if (xitk->clipboard.window_out == None) {
+      free (xitk->clipboard.text);
+      xitk->clipboard.text = NULL;
+      xitk->clipboard.text_len = 0;
+      xitk->clipboard.widget_in = w;
+      xitk->clipboard.window_in = win;
+      /* get #1. */
+#ifdef _XITK_CLIPBOARD_DEBUG
+      printf ("xitk.clipboard: get #1.\n");
+#endif
+      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      XConvertSelection (xitk->x.display, xitk->clipboard.atoms.n.clipboard,
+        xitk->clipboard.atoms.n.utf8_string, xitk->clipboard.dummy, win, CurrentTime);
+      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      return -1;
+    }
+#ifdef _XITK_CLIPBOARD_DEBUG
+    printf ("xitk.clipboard: get #1 from self: %d bytes.\n", xitk->clipboard.text_len);
+#endif
+  } else {
+#ifdef _XITK_CLIPBOARD_DEBUG
+    printf ("xitk.clipboard: get #3: %d bytes.\n", xitk->clipboard.text_len);
+#endif
+  }
+
+  if (!xitk->clipboard.text || (xitk->clipboard.text_len <= 0))
+    return 0;
+  l = xitk->clipboard.text_len;
+  if (l > max_len)
+    l = max_len;
+  if (l <= 0)
+    return 0;
+  if (!text)
+    return l;
+  if (*text)
+    memcpy (*text, xitk->clipboard.text, l);
+  else
+    *text = xitk->clipboard.text;
+  return l;
+}
 
 void widget_stop(void);
 
@@ -1459,8 +1772,14 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       //printf("event %d\n", event->type);
 
       if(fx->window == event->xany.window) {
-	
+
 	switch(event->type) {
+
+        case PropertyNotify:
+        case SelectionClear:
+        case SelectionRequest:
+          _xitk_clipboard_event (xitk, event);
+          break;
 
 	case MappingNotify:
           XLOCK (xitk->x.x_lock_display, xitk->x.display);
@@ -1891,6 +2210,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	break;
 
 	case SelectionNotify:
+          if (_xitk_clipboard_event (xitk, event))
+            break;
+          /* fall through */
 	case ClientMessage:
 	  if(fx->xdnd)
 	    xitk_process_client_dnd_message(fx->xdnd, event);
@@ -2160,6 +2482,8 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 #endif
   }
 
+  _xitk_clipboard_init (xitk);
+
   xitk->running = 1;
   
   XLOCK (xitk->x.x_lock_display, xitk->x.display);
@@ -2244,6 +2568,8 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
     stop_cb (stop_data);
 
   xitk_set_current_menu(NULL);
+
+  _xitk_clipboard_deinit (xitk);
 
   /* pending destroys of the event handlers */
   MUTLOCK ();
@@ -2531,3 +2857,4 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
+

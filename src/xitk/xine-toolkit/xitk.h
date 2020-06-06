@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -2357,5 +2357,7 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w);
 
 void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
 void xitk_cursors_restore_window_cursor(Display *display, Window window);
+
+int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
