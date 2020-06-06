@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -56,6 +56,7 @@ typedef struct {
 #define WIDGET_EVENT_GET_SKIN        8
 #define WIDGET_EVENT_DESTROY         9
 #define WIDGET_EVENT_TIPS_TIMEOUT   10
+#define WIDGET_EVENT_CLIP_READY     11
 
 typedef struct {
   int                   type; /* See WIDGET_EVENT_x */

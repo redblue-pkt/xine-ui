@@ -32,6 +32,8 @@
 
 #include "_xitk.h"
 
+#define NEW_CLIPBOARD
+
 #define NORMAL 1
 #define FOCUS  2
 
@@ -865,9 +867,13 @@ static void inputtext_copy (xitk_widget_t *w) {
   inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
   if (wp->text.buf && (wp->text.used > 0)) {
+#ifndef NEW_CLIPBOARD
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+#else
+    xitk_clipboard_set_text (w, wp->text.buf, wp->text.used);
+#endif
   }
 }
 
@@ -875,9 +881,13 @@ static void inputtext_cut (xitk_widget_t *w) {
   inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   
   if (wp->text.buf && (wp->text.used > 0)) {
+#ifndef NEW_CLIPBOARD
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+#else
+    xitk_clipboard_set_text (w, wp->text.buf, wp->text.used);
+#endif
     wp->text.buf[0] = 0;
     wp->text.cursor_pos = 0;
     wp->text.used = 0;
@@ -900,9 +910,14 @@ static void inputtext_paste (xitk_widget_t *w) {
     pos = olen;
   olen -= pos;
   
+#ifndef NEW_CLIPBOARD
   XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
   insert = XFetchBytes (wp->imlibdata->x.disp, &ilen);
   XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+#else
+  insert = NULL;
+  ilen = xitk_clipboard_get_text (w, &insert, wp->text.size - wp->text.used);
+#endif
   if (insert) {
     int i;
     for (i = 0; (i < ilen) && (insert[i] & 0xe0); i++) ;
@@ -925,8 +940,10 @@ static void inputtext_paste (xitk_widget_t *w) {
     paint_inputtext (w);
   }
 
+#ifndef NEW_CLIPBOARD
   if (insert)
     XFree (insert);
+#endif
 }
 
 /*
@@ -1209,6 +1226,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       result->image = get_skin(w, event->skin_layer);
       retval = 1;
     }
+    break;
+  case WIDGET_EVENT_CLIP_READY:
+    inputtext_paste (w);
     break;
   }
   
