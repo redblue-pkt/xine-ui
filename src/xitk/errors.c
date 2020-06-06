@@ -235,7 +235,7 @@ static void _too_slow_done (void *data, int state) {
     /* FIXME: how to properly open the system browser?
      * should we just make it configurable? */
     xine_info (gui, _("Opening mozilla web browser, this might take a while..."));
-    system ("mozilla http://www.xine-project.org/faq#SPEEDUP");
+    xine_system (1, "mozilla http://www.xine-project.org/faq#SPEEDUP");
   }
 }
 
