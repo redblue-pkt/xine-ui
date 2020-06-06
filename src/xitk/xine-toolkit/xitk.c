@@ -292,7 +292,7 @@ static void _xitk_clipboard_init (__xitk_t *xitk) {
     (char **)atom_names, sizeof (atom_names) / sizeof (atom_names[0]), True,
     xitk->clipboard.atoms.a);
   xitk->clipboard.dummy = XInternAtom (xitk->x.display, "_XITK_CLIP", False);
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
 #ifdef _XITK_CLIPBOARD_DEBUG
   printf ("xitk.window.clipboard: "
     "null=%d atom=%d timestamp=%d integer=%d c_string=%d string=%d utf8_string=%d text=%d "
@@ -397,6 +397,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
       XLOCK (xitk->x.x_lock_display, xitk->x.display);
       tname = XGetAtomName (xitk->x.display, event->xselectionrequest.target);
       pname = XGetAtomName (xitk->x.display, event->xselectionrequest.property);
+      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
       printf ("xitk.clipboard: serve #1 requestor=%d target=%d (%s) property=%d (%s).\n",
         (int)event->xselectionrequest.requestor,
         (int)event->xselectionrequest.target, tname,
