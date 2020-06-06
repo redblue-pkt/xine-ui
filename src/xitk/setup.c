@@ -989,9 +989,7 @@ static void setup_sections (xui_setup_t *setup) {
   
   draw_rectangular_outter_box (setup->gui->imlib_data, bg, 15, (24 + setup->th),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
-  xitk_window_change_background (setup->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  xitk_image_destroy_xitk_pixmap(bg);
+  xitk_window_set_background (setup->xwin, bg);
 
   setup->widgets = xine_list_new ();
 

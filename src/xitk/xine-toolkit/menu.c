@@ -984,8 +984,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   }
   
   if(bg) {
-    xitk_window_change_background(xwin, bg->pixmap, bg->width, bg->height);
-    xitk_image_destroy_xitk_pixmap(bg);
+    xitk_window_set_background(xwin, bg);
   }
 
   xitk_set_layer_above((xitk_window_get_window(xwin)));

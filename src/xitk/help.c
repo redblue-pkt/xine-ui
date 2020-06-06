@@ -386,10 +386,8 @@ void help_panel(void) {
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-  xitk_window_change_background(help->xwin, bg->pixmap, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  xitk_image_destroy_xitk_pixmap(bg);
-  
+  xitk_window_set_background(help->xwin, bg);
+
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
 
   br.arrow_up.skin_element_name    = NULL;

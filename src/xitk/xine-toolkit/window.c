@@ -98,8 +98,7 @@ static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
       XCopyArea (im->x.disp, image->image->pixmap, bg->pixmap,
         image->image->gc, 0, 0, image->width, image->height, 20, TITLE_BAR_HEIGHT + 20);
       XUNLOCK (im->x.x_unlock_display, im->x.disp);
-        xitk_window_change_background (wd->xwin, bg->pixmap, wwidth, wheight);
-      xitk_image_destroy_xitk_pixmap (bg);
+      xitk_window_set_background (wd->xwin, bg);
       XLOCK (im->x.x_lock_display, im->x.disp);
       XFreeGC (im->x.disp, gc);
       XUNLOCK (im->x.x_unlock_display, im->x.disp);
@@ -1080,12 +1079,32 @@ void xitk_window_apply_background(xitk_window_t *w) {
  * Change window background with 'bg', then draw it.
  */
 int xitk_window_change_background(xitk_window_t *w, Pixmap bg, int width, int height) {
+
+  ImlibData     *im;
+  xitk_pixmap_t *pixmap;
+
+  if ((w == NULL) || (bg == None) || (width == 0 || height == 0))
+    return 0;
+
+  im = w->imlibdata;
+
+  pixmap = xitk_image_create_xitk_pixmap(im, width, height);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XCopyArea(im->x.disp, bg, pixmap->pixmap, pixmap->gc, 0, 0, width, height, 0, 0);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  return xitk_window_set_background(w, pixmap);
+}
+
+int xitk_window_set_background(xitk_window_t *w, xitk_pixmap_t *bg) {
+
   ImlibData    *im;
   Window        rootwin;
   int           xwin, ywin;
   unsigned int  wwin, hwin, bwin, dwin;
 
-  if ((w == NULL) || (bg == None) || (width == 0 || height == 0))
+  if ((w == NULL) || (bg == NULL))
     return 0;
 
   im = w->imlibdata;
@@ -1093,22 +1112,21 @@ int xitk_window_change_background(xitk_window_t *w, Pixmap bg, int width, int he
   xitk_image_destroy_xitk_pixmap(w->background);
   if(w->background_mask)
     xitk_image_destroy_xitk_pixmap(w->background_mask);
-  
-  w->background      = xitk_image_create_xitk_pixmap(im, width, height);
+
+  w->background      = bg;
   w->background_mask = NULL;
-  
+
   XLOCK (im->x.x_lock_display, im->x.disp);
-  if(XGetGeometry(im->x.disp, w->window, &rootwin, 
-		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
-    
+  if(XGetGeometry(im->x.disp, w->window, &rootwin,
+                  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+
     XResizeWindow (im->x.disp, w->window, wwin, hwin);
   }
   else {
     XUNLOCK (im->x.x_unlock_display, im->x.disp);
     return 0;
   }
-  
-  XCopyArea(im->x.disp, bg, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
+
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   xitk_window_apply_background(w);

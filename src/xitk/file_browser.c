@@ -1563,9 +1563,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->close);
   xitk_enable_and_show_widget(fb->close);
 
-  xitk_window_change_background (fb->xwin, bg->pixmap, width, height);
-  xitk_image_destroy_xitk_pixmap(bg);
-
+  xitk_window_set_background (fb->xwin, bg);
 
   if(fb->cb_buttons[0])
     xitk_set_focus_to_widget(fb->cb_buttons[0]);

@@ -836,8 +836,7 @@ void stream_infos_panel(void) {
   xitk_add_widget (sinfos.widget_list, widget);
   xitk_enable_and_show_widget(widget);
 
-  xitk_window_change_background(sinfos.xwin, bg->pixmap, width, height);
-  xitk_image_destroy_xitk_pixmap(bg);
+  xitk_window_set_background(sinfos.xwin, bg);
 
   sinfos.widget_key = xitk_register_event_handler("sinfos", 
 						   (xitk_window_get_window(sinfos.xwin)),

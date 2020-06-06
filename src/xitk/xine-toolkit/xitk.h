@@ -2217,6 +2217,12 @@ void xitk_window_apply_background(xitk_window_t *w);
  */
 int xitk_window_change_background(xitk_window_t *w, Pixmap bg, int width, int height);
 
+/*
+ * Change background.
+ *  - ownership of bg is transfered to window.
+ */
+int xitk_window_set_background(xitk_window_t *w, xitk_pixmap_t *bg);
+
 /**
  *
  */
