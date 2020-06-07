@@ -942,7 +942,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   gGui_t *gui = gGui;
   post_object_t *pobj = (post_object_t *) data;
   xitk_pixmap_t              *bg = NULL;
-  int                         x, y, width, height;
+  int                         x, y;
   xitk_labelbutton_widget_t   lb;
   xitk_browser_widget_t       br;
 
@@ -964,14 +964,8 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     pp_wrapper->pplugin->help_widget_list = xitk_window_widget_list(pp_wrapper->pplugin->helpwin);
 
-    xitk_window_get_window_size(pp_wrapper->pplugin->helpwin, &width, &height);
-    bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
-  
-    gui->x_lock_display (gui->display);
-    XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->helpwin)), bg->pixmap,
-  	    bg->gc, 0, 0, width, height, 0, 0);
-    gui->x_unlock_display (gui->display);
-  
+    bg = xitk_window_get_background_pixmap(pp_wrapper->pplugin->helpwin);
+
     XITK_WIDGET_INIT(&lb, gui->imlib_data);
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Close");
@@ -1865,7 +1859,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
   xitk_pixmap_t              *bg;
-  int                         x, y, width, height;
+  int                         x, y;
   xitk_slider_widget_t        sl;
   xitk_widget_t              *w;
 
@@ -1900,14 +1894,8 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   XITK_WIDGET_INIT(&lbl, gui->imlib_data);
   XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
-  xitk_window_get_window_size(pp_wrapper->pplugin->xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
+  bg = xitk_window_get_background_pixmap(pp_wrapper->pplugin->xwin);
 
-  gui->x_lock_display (gui->display);
-  XCopyArea(gui->display, (xitk_window_get_background(pp_wrapper->pplugin->xwin)), bg->pixmap,
-	    bg->gc, 0, 0, width, height, 0, 0);
-  gui->x_unlock_display (gui->display);
-  
   XITK_WIDGET_INIT(&sl, gui->imlib_data);
   
   sl.min                      = 0;

@@ -1151,7 +1151,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_button_widget_t        b;
   xitk_combo_widget_t         cmb;
   xitk_widget_t              *widget;
-  int                         i, x, y, w, width, height;
+  int                         i, x, y, w;
 
   fb = (filebrowser_t *) calloc(1, sizeof(filebrowser_t));
   if (!fb)
@@ -1234,13 +1234,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   XITK_WIDGET_INIT(&cmb, fb->gui->imlib_data);
   XITK_WIDGET_INIT(&b, fb->gui->imlib_data);
 
-  xitk_window_get_window_size(fb->xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap (fb->gui->imlib_data, width, height);
-  fb->gui->x_lock_display (fb->gui->display);
-  XCopyArea (fb->gui->display, (xitk_window_get_background(fb->xwin)), bg->pixmap,
-	    bg->gc, 0, 0, width, height, 0, 0);
-  fb->gui->x_unlock_display (fb->gui->display);
-
+  bg = xitk_window_get_background_pixmap(fb->xwin);
 
   x = 15;
   y = 30;

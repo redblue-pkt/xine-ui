@@ -85,23 +85,14 @@ static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
   /* Draw text area */
   {
     xitk_pixmap_t  *bg;
-    int             wwidth, wheight;
-    GC              gc;
-    
-    xitk_window_get_window_size (wd->xwin, &wwidth, &wheight);
-    bg = xitk_image_create_xitk_pixmap (im, wwidth, wheight);
+
+    bg = xitk_window_get_background_pixmap (wd->xwin);
     if (bg) {
       XLOCK (im->x.x_lock_display, im->x.disp);
-      gc = XCreateGC (im->x.disp, xitk_window_get_background (wd->xwin), None, None);
-      XCopyArea (im->x.disp, xitk_window_get_background (wd->xwin), bg->pixmap,
-        gc, 0, 0, wwidth, wheight, 0, 0);
       XCopyArea (im->x.disp, image->image->pixmap, bg->pixmap,
         image->image->gc, 0, 0, image->width, image->height, 20, TITLE_BAR_HEIGHT + 20);
       XUNLOCK (im->x.x_unlock_display, im->x.disp);
       xitk_window_set_background (wd->xwin, bg);
-      XLOCK (im->x.x_lock_display, im->x.disp);
-      XFreeGC (im->x.disp, gc);
-      XUNLOCK (im->x.x_unlock_display, im->x.disp);
     }
   }
   xitk_image_free_image (&image);
@@ -866,7 +857,7 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
 
   w->widget_list = xitk_widget_list_new();
 
-  XLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+  XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
   gc = XCreateGC (w->imlibdata->x.disp, w->window, None, None);
   XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
 
@@ -1036,6 +1027,28 @@ Pixmap xitk_window_get_background(xitk_window_t *w) {
     return None;
 
   return w->background->pixmap;
+}
+
+xitk_pixmap_t *xitk_window_get_background_pixmap(xitk_window_t *w) {
+
+  ImlibData *im;
+  xitk_pixmap_t *pixmap;
+  int width, height;
+
+  if(w == NULL)
+    return None;
+
+  im = w->imlibdata;
+
+  xitk_window_get_window_size(w, &width, &height);
+  pixmap = xitk_image_create_xitk_pixmap(im, width, height);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XCopyArea(im->x.disp, xitk_window_get_background(w), pixmap->pixmap,
+            pixmap->gc, 0, 0, width, height, 0, 0);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  return pixmap;
 }
 
 /*

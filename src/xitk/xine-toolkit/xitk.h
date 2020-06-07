@@ -2201,6 +2201,7 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w);
  *
  */
 Pixmap xitk_window_get_background(xitk_window_t *w);
+xitk_pixmap_t *xitk_window_get_background_pixmap(xitk_window_t *w);
 
 /**
  *

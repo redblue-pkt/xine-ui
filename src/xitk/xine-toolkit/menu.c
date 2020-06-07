@@ -840,14 +840,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 					  x, y, wwidth + 2, wheight + 2);
 
   if(bsep || btitle) {
-    int width, height;
-    
-    xitk_window_get_window_size(xwin, &width, &height);
-    bg = xitk_image_create_xitk_pixmap(private_data->imlibdata, width, height);
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea(private_data->imlibdata->x.disp, (xitk_window_get_background(xwin)), bg->pixmap,
-    	      bg->gc, 0, 0, width, height, 0, 0);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    bg = xitk_window_get_background_pixmap(xwin);
   }
 
   menu_window         = _menu_new_menu_window(private_data->imlibdata, xwin);

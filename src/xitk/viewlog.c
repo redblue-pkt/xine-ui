@@ -325,13 +325,8 @@ static void viewlog_create_tabs(void) {
 
   xitk_enable_and_show_widget(viewlog->tabs);
 
-  bg = xitk_image_create_xitk_pixmap (gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  gui->x_lock_display (gui->display);
-  XCopyArea (gui->display, (xitk_window_get_background (viewlog->xwin)), bg->pixmap,
-    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  gui->x_unlock_display (gui->display);
-  
+  bg = xitk_window_get_background_pixmap (viewlog->xwin);
+
   draw_rectangular_outter_box (gui->imlib_data, bg, 15, (24 + viewlog->tabs_height),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_set_background (viewlog->xwin, bg);

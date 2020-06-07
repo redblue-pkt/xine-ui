@@ -271,7 +271,7 @@ void tvset_panel(void) {
   xitk_inputtext_widget_t     inp;
   xitk_pixmap_t              *bg;
   size_t                      i;
-  int                         x, y, w, width, height;
+  int                         x, y, w;
   xitk_widget_t              *widget;
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_x", 
@@ -302,13 +302,8 @@ void tvset_panel(void) {
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
 
-  xitk_window_get_window_size(tvset.xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
-  gGui->x_lock_display (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(tvset.xwin)), bg->pixmap,
-	    bg->gc, 0, 0, width, height, 0, 0);
-  gGui->x_unlock_display (gGui->display);
-  
+  bg = xitk_window_get_background_pixmap(tvset.xwin);
+
   x = 15;
   y = 34 - 6;
   
