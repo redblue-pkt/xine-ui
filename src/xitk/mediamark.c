@@ -3241,7 +3241,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_intbox_widget_t        ib;
   xitk_pixmap_t              *bg;
   xitk_widget_t              *b;
-  int                         x, y, w, width, height;
+  int                         x, y, w;
 
   if(mmkeditor.running) {
     if(!mmkeditor.visible)
@@ -3283,12 +3283,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   XITK_WIDGET_INIT(&inp, gui->imlib_data);
   XITK_WIDGET_INIT(&ib, gui->imlib_data);
 
-  xitk_window_get_window_size(mmkeditor.xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
-  gui->x_lock_display (gui->display);
-  XCopyArea(gui->display, (xitk_window_get_background(mmkeditor.xwin)), bg->pixmap,
-	    bg->gc, 0, 0, width, height, 0, 0);
-  gui->x_unlock_display (gui->display);
+  bg = xitk_window_get_background_pixmap(mmkeditor.xwin);
 
   x = 15;
   y = 34 - 6;

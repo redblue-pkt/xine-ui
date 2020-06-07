@@ -980,13 +980,7 @@ static void setup_sections (xui_setup_t *setup) {
   
   xitk_enable_and_show_widget (setup->tabs);
 
-  bg = xitk_image_create_xitk_pixmap (setup->gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  setup->gui->x_lock_display (setup->gui->display);
-  XCopyArea (setup->gui->display, (xitk_window_get_background (setup->xwin)), bg->pixmap,
-    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  setup->gui->x_unlock_display (setup->gui->display);
-  
+  bg = xitk_window_get_background_pixmap (setup->xwin);
   draw_rectangular_outter_box (setup->gui->imlib_data, bg, 15, (24 + setup->th),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
   xitk_window_set_background (setup->xwin, bg);

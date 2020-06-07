@@ -377,13 +377,8 @@ void help_panel(void) {
   th = xitk_get_widget_height(help->tabs) - 1;
   xitk_enable_and_show_widget(help->tabs);
 
-  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  gGui->x_lock_display (gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(help->xwin)), bg->pixmap,
-	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  gGui->x_unlock_display (gGui->display);
-  
+  bg = xitk_window_get_background_pixmap(help->xwin);
+
   draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_set_background(help->xwin, bg);

@@ -1111,13 +1111,8 @@ void kbedit_window(void) {
 
   kbedit->widget_list = xitk_window_widget_list(kbedit->xwin);
 
-  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  gui->x_lock_display (gui->display);
-  XCopyArea(gui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
-	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
-  gui->x_unlock_display (gui->display);
-  
+  bg = xitk_window_get_background_pixmap(kbedit->xwin);
+
   x = 15;
   y = 34;
   

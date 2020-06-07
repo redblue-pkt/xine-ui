@@ -574,7 +574,6 @@ void download_skin(char *url) {
   gGui_t *gui = gGui;
   slx_entry_t         **slxs;
   xitk_pixmap_t        *bg;
-  int                   width, height;
   xitk_widget_t        *widget;
   xitk_register_key_t   dialog;
 
@@ -632,12 +631,7 @@ void download_skin(char *url) {
     
     set_window_states_start(skdloader.xwin);
 
-    xitk_window_get_window_size(skdloader.xwin, &width, &height);
-    bg = xitk_image_create_xitk_pixmap (gui->imlib_data, width, height);
-    gui->x_lock_display (gui->display);
-    XCopyArea (gui->display, (xitk_window_get_background (skdloader.xwin)), bg->pixmap,
-      bg->gc, 0, 0, width, height, 0, 0);
-    gui->x_unlock_display (gui->display);
+    bg = xitk_window_get_background_pixmap (skdloader.xwin);
 
     skdloader.widget_list = xitk_window_widget_list(skdloader.xwin);
 

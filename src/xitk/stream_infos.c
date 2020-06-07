@@ -436,7 +436,7 @@ void stream_infos_panel(void) {
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
   xitk_pixmap_t              *bg;
-  int                         x, y, w, width, height;
+  int                         x, y, w;
   xitk_widget_t              *widget;
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.sinfos_x", 
@@ -469,13 +469,8 @@ void stream_infos_panel(void) {
   lbl.callback          = NULL;
   XITK_WIDGET_INIT(&cb, gui->imlib_data);
 
-  xitk_window_get_window_size(sinfos.xwin, &width, &height);
-  bg = xitk_image_create_xitk_pixmap(gui->imlib_data, width, height);
-  gui->x_lock_display (gui->display);
-  XCopyArea(gui->display, (xitk_window_get_background(sinfos.xwin)), bg->pixmap,
-	    bg->gc, 0, 0, width, height, 0, 0);
-  gui->x_unlock_display (gui->display);
-  
+  bg = xitk_window_get_background_pixmap(sinfos.xwin);
+
   x = 15;
   y = 34 - 6;
   
