@@ -36,7 +36,6 @@
 
 typedef struct {
   xitk_window_t        *xwin;
-  ImlibImage           *bg_image;
   xitk_widget_list_t   *widget_list;
 
   xitk_widget_t        *playlist;
@@ -723,10 +722,6 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(playlist->xwin);
     playlist->xwin = NULL;
 
-    gui->x_lock_display (gui->display);
-    Imlib_destroy_image(gui->imlib_data, playlist->bg_image);
-    gui->x_unlock_display (gui->display);
-
     /* xitk_dlist_init (&playlist->widget_list->list); */
 
     _playlist_free_playlists();
@@ -902,7 +897,7 @@ void playlist_update_focused_entry(void) {
  */
 void playlist_change_skins(int synthetic) {
   gGui_t *gui = gGui;
-  ImlibImage   *new_img, *old_img;
+  ImlibImage   *new_img;
   XSizeHints    hint;
 
   if(playlist_is_running()) {
@@ -933,15 +928,12 @@ void playlist_change_skins(int synthetic) {
 			       new_img->rgb_width, new_img->rgb_height)) {
       xine_usec_sleep(10000);
     }
-    
-    old_img = playlist->bg_image;
-    playlist->bg_image = new_img;
 
     video_window_set_transient_for (gui->vwin, playlist->xwin);
 
     gui->x_lock_display (gui->display);
-    Imlib_destroy_image(gui->imlib_data, old_img);
     Imlib_apply_image(gui->imlib_data, new_img, xitk_window_get_window(playlist->xwin));
+    Imlib_destroy_image(gui->imlib_data, new_img);
     gui->x_unlock_display (gui->display);
 
     if(playlist_is_visible())
@@ -988,6 +980,7 @@ void playlist_editor(void) {
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
   int                        x, y;
+  ImlibImage                *bg_image;
 
   XITK_WIDGET_INIT(&br, gui->imlib_data);
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
@@ -1003,7 +996,7 @@ void playlist_editor(void) {
 
   gui->x_lock_display (gui->display);
 
-  if (!(playlist->bg_image = Imlib_load_image(gui->imlib_data,
+  if (!(bg_image = Imlib_load_image(gui->imlib_data,
 					      xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
     xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
@@ -1026,8 +1019,8 @@ void playlist_editor(void) {
 				     CONFIG_NO_DATA);
 
   playlist->xwin = xitk_window_create_simple_window(gui->imlib_data, x, y,
-                                                    playlist->bg_image->rgb_width,
-                                                    playlist->bg_image->rgb_height);
+                                                    bg_image->rgb_width,
+                                                    bg_image->rgb_height);
   xitk_window_set_window_title(playlist->xwin, title);
 
   set_window_states_start(playlist->xwin);
@@ -1036,7 +1029,8 @@ void playlist_editor(void) {
     xitk_set_layer_above(xitk_window_get_window(playlist->xwin));
 
   gui->x_lock_display (gui->display);
-  Imlib_apply_image(gui->imlib_data, playlist->bg_image, xitk_window_get_window(playlist->xwin));
+  Imlib_apply_image(gui->imlib_data, bg_image, xitk_window_get_window(playlist->xwin));
+  Imlib_destroy_image(gui->imlib_data, bg_image);
   gui->x_unlock_display (gui->display);
 
   /*
