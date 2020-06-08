@@ -158,7 +158,7 @@ struct xui_vwin_st {
 };
 
 /* safe external actions */
-void video_window_lock (xui_vwin_t *vwin, int lock_or_unlock) {
+static void video_window_lock (xui_vwin_t *vwin, int lock_or_unlock) {
   if (!vwin)
     return;
   if (lock_or_unlock == 1)
@@ -182,6 +182,40 @@ void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
 void video_window_set_input_focus(xui_vwin_t *vwin)
 {
   xitk_try_to_set_input_focus (vwin->gui->video_display, vwin->gui->video_window);
+}
+
+void video_window_grab_input_focus(xui_vwin_t *vwin)
+{
+  Window want;
+  int t;
+  video_window_lock (vwin->gui->vwin, 1);
+  want = vwin->gui->video_window;
+  vwin->gui->x_lock_display (vwin->gui->video_display);
+  if (vwin->gui->cursor_grabbed) {
+    XGrabPointer (vwin->gui->video_display, want,
+                  1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
+  }
+  if (video_window_is_visible (vwin->gui->vwin)) {
+    /* Give focus to video output window */
+    XSetInputFocus (vwin->gui->video_display, want, RevertToParent, CurrentTime);
+    XSync (vwin->gui->video_display, False);
+    vwin->gui->x_unlock_display (vwin->gui->video_display);
+    video_window_lock (vwin->gui->vwin, 0);
+    /* check after 5/15/30/50/75/105/140 ms */
+    for (t = 5000; t < 40000; t += 5000) {
+      Window got;
+      int revert;
+      xine_usec_sleep (t);
+      vwin->gui->x_lock_display (vwin->gui->video_display);
+      XGetInputFocus (vwin->gui->video_display, &got, &revert);
+      vwin->gui->x_unlock_display (vwin->gui->video_display);
+      if (got == want)
+        break;
+    }
+  } else {
+    vwin->gui->x_unlock_display (vwin->gui->video_display);
+    video_window_lock (vwin->gui->vwin, 0);
+  }
 }
 
 void video_window_grab_pointer(xui_vwin_t *vwin)
