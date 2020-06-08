@@ -342,7 +342,7 @@ static void setup_clear_tab (xui_setup_t *setup) {
   im = xitk_image_create_image (setup->gui->imlib_data, (WINDOW_WIDTH - 30),
     (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30));
 
-  draw_outter (setup->gui->imlib_data, im->image, im->width, im->height);
+  draw_outter (im->image, im->width, im->height);
   xitk_image_draw_image (setup->widget_list, im, 0, 0, im->width, im->height, 15, (24 + setup->th));
   xitk_image_free_image (&im);
 }
@@ -682,7 +682,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       XFillRectangle (setup->gui->display, image->image->pixmap,
         (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, image->width, image->height);
       setup->gui->x_unlock_display (setup->gui->display);
-      draw_inner_frame (setup->gui->imlib_data, image->image, (char *)entry.description,
+      draw_inner_frame (image->image, (char *)entry.description,
         boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
       XITK_WIDGET_INIT (&im, setup->gui->imlib_data);
       im.skin_element_name = NULL;
@@ -976,7 +976,7 @@ static void setup_sections (xui_setup_t *setup) {
   xitk_enable_and_show_widget (setup->tabs);
 
   bg = xitk_window_get_background_pixmap (setup->xwin);
-  draw_rectangular_outter_box (setup->gui->imlib_data, bg, 15, (24 + setup->th),
+  draw_rectangular_outter_box (bg, 15, (24 + setup->th),
     (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
   xitk_window_set_background (setup->xwin, bg);
 

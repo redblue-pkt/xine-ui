@@ -704,7 +704,7 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   info.label_pixmap_font_name  = (char *)"\x01";
   info.label_pixmap_font_img   = xitk_image_create_image (l->imlibdata, width, height);
   if (info.label_pixmap_font_img)
-    draw_flat (l->imlibdata, info.label_pixmap_font_img->image, width, height);
+    draw_flat (info.label_pixmap_font_img->image, width, height);
 
   return _xitk_label_create (wl, l, &info);
 }

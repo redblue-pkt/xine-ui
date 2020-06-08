@@ -658,7 +658,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
     width = MIN(maxw, width);
   
   image = xitk_image_create_image(im, width, (height + add_line_spc) * numlines - add_line_spc);
-  draw_flat_with_color(im, image->image, image->width, image->height, background);
+  draw_flat_with_color(image->image, image->width, image->height, background);
   
   { /* Draw string in image */
     int i, y, x = 0;
@@ -924,9 +924,11 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p, 
+static void _draw_rectangular_box(xitk_pixmap_t *p,
 				  int x, int y, int excstart, int excstop,
 				  int width, int height, int relief) {
+  ImlibData *im = p->imlibdata;
+
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
 
@@ -955,9 +957,11 @@ static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p,
 /*
  *
  */
-static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p, 
+static void _draw_rectangular_box_light(xitk_pixmap_t *p,
 					int x, int y, int excstart, int excstop,
 					int width, int height, int relief) {
+  ImlibData *im = p->imlibdata;
+
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
 
@@ -986,10 +990,12 @@ static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p,
 /*
  *
  */
-static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p, 
+static void _draw_rectangular_box_with_colors(xitk_pixmap_t *p,
 					      int x, int y, int width, int height, 
 					      unsigned int lcolor, unsigned int dcolor,
 					      int relief) {
+  ImlibData *im = p->imlibdata;
+
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
 
@@ -1017,21 +1023,21 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p,
 /*
  *
  */
-void draw_rectangular_inner_box(ImlibData *im, xitk_pixmap_t *p, 
+void draw_rectangular_inner_box(xitk_pixmap_t *p,
 				int x, int y, int width, int height) {
-  _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_INNER);
+  _draw_rectangular_box(p, x, y, 0, 0, width, height, DRAW_INNER);
 }
-void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p, 
+void draw_rectangular_outter_box(xitk_pixmap_t *p,
 				 int x, int y, int width, int height) {
-  _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
+  _draw_rectangular_box(p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
-void draw_rectangular_inner_box_light(ImlibData *im, xitk_pixmap_t *p, 
+void draw_rectangular_inner_box_light(xitk_pixmap_t *p,
 				      int x, int y, int width, int height) {
-  _draw_rectangular_box_light(im, p, x, y, 0, 0, width, height, DRAW_INNER);
+  _draw_rectangular_box_light(p, x, y, 0, 0, width, height, DRAW_INNER);
 }
-void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p, 
+void draw_rectangular_outter_box_light(xitk_pixmap_t *p,
 				       int x, int y, int width, int height) {
-  _draw_rectangular_box_light(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
+  _draw_rectangular_box_light(p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
 
 static void _draw_check_round(ImlibData *im, xitk_image_t *p, int x, int y, int d, int checked) {
@@ -1147,9 +1153,9 @@ void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
       
       w = p->width / 3;
       h = p->height - 12;
-      _draw_rectangular_box(im, p->image, 4,               6,     0, 0, 12, h, relief);
-      _draw_rectangular_box(im, p->image, w + 4,           6,     0, 0, 12, h, relief);
-      _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
+      _draw_rectangular_box(p->image, 4,               6,     0, 0, 12, h, relief);
+      _draw_rectangular_box(p->image, w + 4,           6,     0, 0, 12, h, relief);
+      _draw_rectangular_box(p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
     }
     break;
   }
@@ -1262,7 +1268,9 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
 /*
  *
  */
-static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int relief, int light) {
+static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) {
+  ImlibData *im = p->imlibdata;
+
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
   
@@ -1273,7 +1281,7 @@ static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int reli
   
   if(relief != DRAW_FLATTER) {
     
-    _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1,
+    _draw_rectangular_box_with_colors(p, 0, 0, w-1, h-1,
 				      xitk_get_pixel_color_white(im),
 				      ((light)
 				       ? xitk_get_pixel_color_darkgray(im)
@@ -1384,15 +1392,15 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
   
-  _draw_rectangular_box_with_colors(im, p->image, 2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(p->image, 2, 2, (w-1)-4, (h-1)-4,
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(im, p->image, w+2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(p->image, w+2, 2, (w-1)-4, (h-1)-4,
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(im, p->image, (w*2)+2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(p->image, (w*2)+2, 2, (w-1)-4, (h-1)-4,
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_INNER);
@@ -1414,7 +1422,7 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
 
     for(i = 0; i < 3; i++, offset += w) {
       if(i == 2) { xx++; yy++; }
-      draw_rectangular_outter_box(im, p->image, xx + offset, yy, ww, hh);
+      draw_rectangular_outter_box(p->image, xx + offset, yy, ww, hh);
     }
   }
   
@@ -1433,34 +1441,36 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_inner(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_INNER, 0);
+void draw_inner(xitk_pixmap_t *p, int w, int h) {
+  _draw_relief(p, w, h, DRAW_INNER, 0);
 }
-void draw_inner_light(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_INNER, 1);
-}
-
-/*
- *
- */
-void draw_outter(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_OUTTER, 0);
-}
-void draw_outter_light(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_OUTTER, 1);
+void draw_inner_light(xitk_pixmap_t *p, int w, int h) {
+  _draw_relief(p, w, h, DRAW_INNER, 1);
 }
 
 /*
  *
  */
-void draw_flat(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_FLATTER, 1);
+void draw_outter(xitk_pixmap_t *p, int w, int h) {
+  _draw_relief(p, w, h, DRAW_OUTTER, 0);
+}
+void draw_outter_light(xitk_pixmap_t *p, int w, int h) {
+  _draw_relief(p, w, h, DRAW_OUTTER, 1);
 }
 
 /*
  *
  */
-void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigned int color) {
+void draw_flat(xitk_pixmap_t *p, int w, int h) {
+  _draw_relief(p, w, h, DRAW_FLATTER, 1);
+}
+
+/*
+ *
+ */
+void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
+  ImlibData *im = p->imlibdata;
+
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
 
@@ -1473,9 +1483,10 @@ void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigne
 /*
  * Draw a frame outline with embedded title.
  */
-static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
+static void _draw_frame(xitk_pixmap_t *p,
                         const char *title, const char *fontname,
                         int style, int x, int y, int w, int h) {
+  ImlibData     *im = p->imlibdata;
   xitk_font_t   *fs = NULL;
   int            sty[2];
   int            yoff = 0, xstart = 0, xstop = 0;
@@ -1537,14 +1548,14 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
     xstop = (rbearing - lbearing) + 8;
   }
 
-  _draw_rectangular_box_light(im, p, x, (y + yoff), 
+  _draw_rectangular_box_light(p, x, (y + yoff),
 			      xstart, xstop,
 			      w, (h - yoff), sty[0]);
   
   if(title)
     xstart--, xstop--;
   
-  _draw_rectangular_box_light(im, p, (x + 1), ((y + yoff) + 1), 
+  _draw_rectangular_box_light(p, (x + 1), ((y + yoff) + 1),
 			      xstart, xstop,
 			      (w - 2), ((h - yoff) - 2), sty[1]);
   
@@ -1562,15 +1573,15 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
 /*
  *
  */
-void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p,
+void draw_inner_frame(xitk_pixmap_t *p,
                       const char *title, const char *fontname,
                       int x, int y, int w, int h) {
-  _draw_frame(im, p, title, fontname, DRAW_INNER, x, y, w, h);
+  _draw_frame(p, title, fontname, DRAW_INNER, x, y, w, h);
 }
-void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p,
+void draw_outter_frame(xitk_pixmap_t *p,
                        const char *title, const char *fontname,
                        int x, int y, int w, int h) {
-  _draw_frame(im, p, title, fontname, DRAW_OUTTER, x, y, w, h);
+  _draw_frame(p, title, fontname, DRAW_OUTTER, x, y, w, h);
 }
 
 /*

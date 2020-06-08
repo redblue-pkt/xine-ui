@@ -1267,7 +1267,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
   
-  draw_rectangular_inner_box (fb->gui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box (bg, x, y,
 			     w - 1, xitk_get_widget_height(fb->directories_browser) + 4 - 1);
   
   y -= 15;
@@ -1298,7 +1298,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->files_browser);
   xitk_enable_and_show_widget(fb->files_browser);
 
-  draw_rectangular_inner_box (fb->gui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box (bg, x, y,
 			     w - 1, xitk_get_widget_height(fb->files_browser) + 4 - 1);
 
   y -= 15;
@@ -1338,17 +1338,17 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       
       offset = 0;
       for(i = 0; i < 2; i++) {
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    5, 4 + offset, w - 45, 1);
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    w - 20, 4 + offset, 10, 1);
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    w + 5, 4 + offset, w - 45, 1);
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    (w * 2) - 20, 4 + offset, 10, 1);
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
-	draw_rectangular_outter_box (fb->gui->imlib_data, image->image, 
+        draw_rectangular_outter_box (image->image,
 				    ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
 	offset += 4;
       }

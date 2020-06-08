@@ -1296,23 +1296,23 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   gui->x_unlock_display (gui->display);
 
   /* Some decorations */
-  draw_outter_frame(gui->imlib_data, image->image, NULL, NULL,
+  draw_outter_frame(image->image, NULL, NULL,
 		    0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-  draw_rectangular_outter_box_light(gui->imlib_data, image->image,
+  draw_rectangular_outter_box_light(image->image,
 		    27, 28, FRAME_WIDTH - 27 - 5, 1);
-  draw_rectangular_outter_box_light(gui->imlib_data, image->image,
+  draw_rectangular_outter_box_light(image->image,
 		    26, 5, 1, FRAME_HEIGHT - 10);
-  draw_inner_frame(gui->imlib_data, image->image, NULL, NULL,
+  draw_inner_frame(image->image, NULL, NULL,
 		    5, 5, 16, 16);
-  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(image->image,
 		    5, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(image->image,
 		    10, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(image->image,
 		    15, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(gui->imlib_data, image->image,
+  draw_rectangular_inner_box_light(image->image,
 		    20, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(gui->imlib_data, image->image, NULL, NULL,
+  draw_inner_frame(image->image, NULL, NULL,
 		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
   XITK_WIDGET_INIT(&im, gui->imlib_data);

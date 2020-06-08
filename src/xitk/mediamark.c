@@ -3288,7 +3288,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   x = 15;
   y = 34 - 6;
   w = WINDOW_WIDTH - 30;
-  draw_outter_frame(gui->imlib_data, bg, _("Identifier"), btnfontname, 
+  draw_outter_frame(bg, _("Identifier"), btnfontname,
 		    x, y, w, 45);
 
   inp.skin_element_name = NULL;
@@ -3303,7 +3303,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(mmkeditor.ident);
 
   y += 45 + 3;
-  draw_outter_frame(gui->imlib_data, bg, _("Mrl"), btnfontname, 
+  draw_outter_frame(bg, _("Mrl"), btnfontname,
 		    x, y, w, 45);
 
   inp.skin_element_name = NULL;
@@ -3318,7 +3318,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(mmkeditor.mrl);
 
   y += 45 + 3;
-  draw_outter_frame(gui->imlib_data, bg, _("Subtitle"), btnfontname, 
+  draw_outter_frame(bg, _("Subtitle"), btnfontname,
 		    x, y, w, 45);
 
   inp.skin_element_name = NULL;
@@ -3347,7 +3347,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   y += 45 + 3;
   w = 120;
-  draw_outter_frame(gui->imlib_data, bg, _("Start at"), btnfontname, 
+  draw_outter_frame(bg, _("Start at"), btnfontname,
 		    x, y, w, 45);
 
   ib.skin_element_name = NULL;
@@ -3363,7 +3363,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(mmkeditor.start);
 
   x += w + 5;
-  draw_outter_frame(gui->imlib_data, bg, _("End at"), btnfontname, 
+  draw_outter_frame(bg, _("End at"), btnfontname,
 		    x, y, w, 45);
 
   ib.skin_element_name = NULL;
@@ -3379,7 +3379,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(mmkeditor.end);
 
   x += w + 5;
-  draw_outter_frame(gui->imlib_data, bg, _("A/V offset"), btnfontname, 
+  draw_outter_frame(bg, _("A/V offset"), btnfontname,
 		    x, y, w, 45);
 
   ib.skin_element_name = NULL;
@@ -3395,7 +3395,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   xitk_enable_and_show_widget(mmkeditor.av_offset);
 
   x += w + 5;
-  draw_outter_frame(gui->imlib_data, bg, _("SPU offset"), btnfontname, 
+  draw_outter_frame(bg, _("SPU offset"), btnfontname,
 		    x, y, w, 45);
 
   ib.skin_element_name = NULL;

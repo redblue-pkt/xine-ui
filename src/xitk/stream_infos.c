@@ -474,14 +474,14 @@ void stream_infos_panel(void) {
   x = 15;
   y = 34 - 6;
   
-  draw_outter_frame(gui->imlib_data, bg, _("General"), btnfontname, 
+  draw_outter_frame(bg, _("General"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, (4 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* First Line */
   x = 20;
   y += 15;
   w = WINDOW_WIDTH - 40 - 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Title: "), lfontname, 
+  draw_inner_frame(bg, _("Title: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.title = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -490,7 +490,7 @@ void stream_infos_panel(void) {
 
   /* New Line */
   y += (20 + 22) + 3;
-  draw_inner_frame(gui->imlib_data, bg, _("Comment: "), lfontname, 
+  draw_inner_frame(bg, _("Comment: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.comment = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -500,7 +500,7 @@ void stream_infos_panel(void) {
   /* New Line */
   y += (20 + 22) + 3;
   w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Artist: "), lfontname, 
+  draw_inner_frame(bg, _("Artist: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.artist = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -509,7 +509,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w = ((WINDOW_WIDTH - 40 - 3 * 5) / 4) + 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Genre: "), lfontname, 
+  draw_inner_frame(bg, _("Genre: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.genre = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -518,7 +518,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Year: "), lfontname, 
+  draw_inner_frame(bg, _("Year: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.year = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -529,7 +529,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Album: "), lfontname, 
+  draw_inner_frame(bg, _("Album: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.album = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -539,13 +539,13 @@ void stream_infos_panel(void) {
   /* frame space */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gui->imlib_data, bg, _("Misc"), btnfontname, 
+  draw_outter_frame(bg, _("Misc"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 3 * 5) / 4;
-  draw_inner_frame(gui->imlib_data, bg, _("Input Plugin: "), lfontname, 
+  draw_inner_frame(bg, _("Input Plugin: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.input_plugin = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -554,7 +554,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gui->imlib_data, bg, _("System Layer: "), lfontname, 
+  draw_inner_frame(bg, _("System Layer: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.systemlayer = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -562,7 +562,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.meta_infos.systemlayer);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(bg, _("Bitrate: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -571,7 +571,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Frame Duration: "), lfontname, 
+  draw_inner_frame(bg, _("Frame Duration: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.frame_duration = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -581,7 +581,7 @@ void stream_infos_panel(void) {
   /* New Line */
   x = 20;
   y += (20 + 22) + 3;
-  draw_inner_frame(gui->imlib_data, bg, _("Is Seekable: "), lfontname, 
+  draw_inner_frame(bg, _("Is Seekable: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.seekable = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -590,7 +590,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Has Chapters: "), lfontname, 
+  draw_inner_frame(bg, _("Has Chapters: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.has_chapters = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -598,7 +598,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_chapters);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Ignore Spu: "), lfontname, 
+  draw_inner_frame(bg, _("Ignore Spu: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.ignore_spu = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -607,7 +607,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Has Still: "), lfontname, 
+  draw_inner_frame(bg, _("Has Still: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.has_still = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -617,14 +617,14 @@ void stream_infos_panel(void) {
   /* video frame */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gui->imlib_data, bg, _("Video"), btnfontname, 
+  draw_outter_frame(bg, _("Video"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Has: "), lfontname, 
+  draw_inner_frame(bg, _("Has: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.has_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -632,7 +632,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_video);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Handled: "), lfontname, 
+  draw_inner_frame(bg, _("Handled: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -641,7 +641,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Ignore: "), lfontname, 
+  draw_inner_frame(bg, _("Ignore: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.ignore_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -651,7 +651,7 @@ void stream_infos_panel(void) {
   x += w + 5;
   w += 1;
   w = (w * 2) + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Codec: "), lfontname, 
+  draw_inner_frame(bg, _("Codec: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.videocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -662,7 +662,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (WINDOW_WIDTH - 40 - 5 * 5) / 6;
-  draw_inner_frame(gui->imlib_data, bg, _("FourCC: "), lfontname, 
+  draw_inner_frame(bg, _("FourCC: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -670,7 +670,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_fourcc);
   
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Channel(s): "), lfontname, 
+  draw_inner_frame(bg, _("Channel(s): "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -678,7 +678,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_channels);
   
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(bg, _("Bitrate: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -686,7 +686,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_bitrate);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Resolution: "), lfontname, 
+  draw_inner_frame(bg, _("Resolution: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_resolution = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -694,7 +694,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_resolution);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Ratio: "), lfontname, 
+  draw_inner_frame(bg, _("Ratio: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_ratio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -702,7 +702,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.video_ratio);
   
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Stream(s): "), lfontname, 
+  draw_inner_frame(bg, _("Stream(s): "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.video_streams = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -712,14 +712,14 @@ void stream_infos_panel(void) {
   /* Audio Frame */
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gui->imlib_data, bg, _("Audio"), btnfontname, 
+  draw_outter_frame(bg, _("Audio"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
 
   /* New Line */
   x = 20;
   y += 15;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Has: "), lfontname, 
+  draw_inner_frame(bg, _("Has: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.has_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -727,7 +727,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.has_audio);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Handled: "), lfontname, 
+  draw_inner_frame(bg, _("Handled: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -736,7 +736,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Ignore: "), lfontname, 
+  draw_inner_frame(bg, _("Ignore: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.ignore_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -746,7 +746,7 @@ void stream_infos_panel(void) {
   x += w + 5;
   w += 1;
   w = (w * 2) + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Codec: "), lfontname, 
+  draw_inner_frame(bg, _("Codec: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.meta_infos.audiocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -757,7 +757,7 @@ void stream_infos_panel(void) {
   x = 20;
   y += (20 + 22) + 3;
   w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(gui->imlib_data, bg, _("FourCC: "), lfontname, 
+  draw_inner_frame(bg, _("FourCC: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -765,7 +765,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.audio_fourcc);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Channel(s): "), lfontname, 
+  draw_inner_frame(bg, _("Channel(s): "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -774,7 +774,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w -= 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Bitrate: "), lfontname, 
+  draw_inner_frame(bg, _("Bitrate: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -783,7 +783,7 @@ void stream_infos_panel(void) {
 
   x += w + 5;
   w += 1;
-  draw_inner_frame(gui->imlib_data, bg, _("Bits: "), lfontname, 
+  draw_inner_frame(bg, _("Bits: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_bits = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
@@ -791,7 +791,7 @@ void stream_infos_panel(void) {
   xitk_enable_and_show_widget(sinfos.infos.audio_bits);
 
   x += w + 5;
-  draw_inner_frame(gui->imlib_data, bg, _("Samplerate: "), lfontname, 
+  draw_inner_frame(bg, _("Samplerate: "), lfontname,
 		   x, y, w, (20 + 22));
   sinfos.infos.audio_samplerate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
     x + 5, y + 15, w - 10, 20, fontname);
