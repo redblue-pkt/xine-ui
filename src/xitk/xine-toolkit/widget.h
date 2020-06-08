@@ -57,11 +57,11 @@ typedef struct {
 #define WIDGET_EVENT_DESTROY         9
 #define WIDGET_EVENT_TIPS_TIMEOUT   10
 #define WIDGET_EVENT_CLIP_READY     11
+#define WIDGET_EVENT_PARTIAL_PAINT  12
 
 typedef struct {
   int                   type; /* See WIDGET_EVENT_x */
-  int                   x;
-  int                   y;
+  int                   x, y, width, height;
   
   int                   button_pressed;
   int                   button;

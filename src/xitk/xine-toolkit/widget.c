@@ -773,6 +773,87 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
 /*
  * (re)paint the specified widget list.
  */
+static void _xitk_widget_to_hull (xitk_widget_t *w, xitk_hull_t *hull) {
+  hull->x1 = w->x;
+  hull->x2 = w->x + w->width;
+  hull->y1 = w->y;
+  hull->y2 = w->y + w->height;
+}
+static int _xitk_is_hull_in_hull (xitk_hull_t *h1, xitk_hull_t *h2) {
+  if (h1->x1 >= h2->x2)
+    return 0;
+  if (h1->x2 <= h2->x1)
+    return 0;
+  if (h1->y1 >= h2->y2)
+    return 0;
+  if (h1->y2 <= h2->y1)
+    return 0;
+  return 1;
+}
+static void _xitk_or_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
+  if (h1->x1 < h2->x1)
+    h2->x1 = h1->x1;
+  if (h1->x2 > h2->x2)
+    h2->x2 = h1->x2;
+  if (h1->y1 < h2->y1)
+    h2->y1 = h1->y1;
+  if (h1->y2 > h2->y2)
+    h2->y2 = h1->y2;
+}
+static void _xitk_and_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
+  if (h1->x1 > h2->x1)
+    h2->x1 = h1->x1;
+  if (h1->x2 < h2->x2)
+    h2->x2 = h1->x2;
+  if (h1->y1 > h2->y1)
+    h2->y1 = h1->y1;
+  if (h1->y2 < h2->y2)
+    h2->y2 = h1->y2;
+}
+
+int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
+  xitk_widget_t   *w;
+  widget_event_t   event;
+  int n = 0;
+
+  if (!wl || !hull)
+    return 0;
+  w = (xitk_widget_t *)wl->list.head.next;
+
+  while (w->node.next && wl->win && wl->gc) {
+    xitk_hull_t wh;
+
+    _xitk_widget_to_hull (w, &wh);
+    if ((w->enable != WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST)) {
+      event.type = WIDGET_EVENT_FOCUS;
+      event.focus = FOCUS_LOST;
+      (void)w->event (w, &event, NULL);
+      event.type = WIDGET_EVENT_PAINT;
+      (void)w->event (w, &event, NULL);
+      w->have_focus = FOCUS_LOST;
+      _xitk_or_hulls (&wh, hull);
+      n += 1;
+    } else if (_xitk_is_hull_in_hull (&wh, hull)) {
+      if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) {
+        _xitk_and_hulls (hull, &wh);
+        event.type = WIDGET_EVENT_PARTIAL_PAINT;
+        event.x = wh.x1;
+        event.width = wh.x2 - wh.x1;
+        event.y = wh.y1;
+        event.height = wh.y2 - wh.y1;
+        (void)w->event (w, &event, NULL);
+      } else {
+        event.type = WIDGET_EVENT_PAINT;
+        (void)w->event (w, &event, NULL);
+        _xitk_or_hulls (&wh, hull);
+      }
+      n += 1;
+    }
+    w = (xitk_widget_t *)w->node.next;
+  }
+  return n;
+}
+
 int xitk_paint_widget_list (xitk_widget_list_t *wl) {
   xitk_widget_t   *mywidget;
   widget_event_t   event;

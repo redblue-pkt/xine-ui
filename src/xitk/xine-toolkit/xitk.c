@@ -112,6 +112,8 @@ typedef struct {
   int                         width;
   int                         height;
 
+  xitk_hull_t                 expose;
+    
   XEvent                     *old_event;
 
   xitk_widget_list_t         *widget_list;
@@ -1429,6 +1431,13 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
   }
 }
 
+void _xitk_reset_hull (xitk_hull_t *hull) {
+  hull->x1 = 0x7fffffff;
+  hull->x2 = 0;
+  hull->y1 = 0x7fffffff;
+  hull->y2 = 0;
+}
+
 /*
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
@@ -1454,6 +1463,9 @@ xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
   fx->new_pos.y = 0;
   fx->width     = 0;
   fx->height    = 0;
+
+  _xitk_reset_hull (&fx->expose);
+
   fx->user_data = user_data;
   fx->destructor = NULL;
   fx->destr_data = NULL;
@@ -2002,14 +2014,30 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
 	case Expose:
 	  if (fx->widget_list) {
-
-            XLOCK (xitk->x.x_lock_display, xitk->x.display);
-            while (XCheckTypedWindowEvent (xitk->x.display, fx->window, 
-					 Expose, event) == True);
-            XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-
-	    if(event->xexpose.count == 0)
-	      xitk_paint_widget_list(fx->widget_list);
+            int r;
+            do {
+              if (event->xexpose.x < fx->expose.x1)
+                fx->expose.x1 = event->xexpose.x;
+              if (event->xexpose.x + event->xexpose.width > fx->expose.x2)
+                fx->expose.x2 = event->xexpose.x + event->xexpose.width;
+              if (event->xexpose.y < fx->expose.y1)
+                fx->expose.y1 = event->xexpose.y;
+              if (event->xexpose.y + event->xexpose.height > fx->expose.y2)
+                fx->expose.y2 = event->xexpose.y + event->xexpose.height;
+              XLOCK (xitk->x.x_lock_display, xitk->x.display);
+              r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, event);
+              XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+            } while (r == True);
+            if (event->xexpose.count == 0) {
+#ifdef XITK_PAINT_DEBUG
+              printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
+#endif
+              /* initial panel open yields this?? */
+              if ((fx->expose.x1 | fx->expose.x2 | fx->expose.y1 | fx->expose.y2) == 0)
+                fx->expose.x2 = fx->expose.y2 = 0x7fffffff;
+              xitk_partial_paint_widget_list (fx->widget_list, &fx->expose);
+              _xitk_reset_hull (&fx->expose);
+            }
 	  }
 	  break;
 	  
