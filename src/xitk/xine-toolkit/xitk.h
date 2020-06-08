@@ -2375,6 +2375,9 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w);
 void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
 void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
+void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor);
+void xitk_window_restore_window_cursor(xitk_window_t *w);
+
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif

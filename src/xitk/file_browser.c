@@ -229,9 +229,9 @@ static void fb_reactivate(filebrowser_t *fb) {
 static void _fb_set_cursor(filebrowser_t *fb, int state) {
   if(fb) {
     if(state == WAIT_CURS)
-      xitk_cursors_define_window_cursor (fb->gui->display, (xitk_window_get_window(fb->xwin)), xitk_cursor_watch);
+      xitk_window_define_window_cursor (fb->xwin, xitk_cursor_watch);
     else
-      xitk_cursors_restore_window_cursor (fb->gui->display, (xitk_window_get_window(fb->xwin)));
+      xitk_window_restore_window_cursor (fb->xwin);
   }
 }
 /*
