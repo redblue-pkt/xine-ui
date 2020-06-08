@@ -343,12 +343,7 @@ static void setup_clear_tab (xui_setup_t *setup) {
     (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30));
 
   draw_outter (setup->gui->imlib_data, im->image, im->width, im->height);
-
-  setup->gui->x_lock_display (setup->gui->display);
-  XCopyArea (setup->gui->display, im->image->pixmap, (xitk_window_get_window(setup->xwin)),
-    (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, im->width, im->height, 15, (24 + setup->th));
-  setup->gui->x_unlock_display (setup->gui->display);
-
+  xitk_image_draw_image (setup->widget_list, im, 0, 0, im->width, im->height, 15, (24 + setup->th));
   xitk_image_free_image (&im);
 }
 

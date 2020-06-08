@@ -2043,6 +2043,8 @@ xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int 
 
 void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
 
+void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
+
 /**
  * Free an image object.
  */

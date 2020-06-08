@@ -280,24 +280,13 @@ static void download_update_blank_preview(void) {
 
 static void redraw_preview(void) {
   int  x, y;
-  
+
   x = 15 + ((PREVIEW_WIDTH - skdloader.preview_image->image->width) >> 1);
   y = 34 + ((PREVIEW_HEIGHT - skdloader.preview_image->image->height) >> 1);
-  
-  if(skdloader.preview_image->mask && skdloader.preview_image->mask->pixmap) {
-    gGui->x_lock_display (gGui->display);
-    XSetClipOrigin(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)), x, y);
-    XSetClipMask(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)), skdloader.preview_image->mask->pixmap);
-    gGui->x_unlock_display (gGui->display);
-  }
-  
-  gGui->x_lock_display (gGui->display);
-  XCopyArea (gGui->display, skdloader.preview_image->image->pixmap, 
-	     (XITK_WIDGET_LIST_WINDOW(skdloader.widget_list)), (XITK_WIDGET_LIST_GC(skdloader.widget_list)), 0, 0,
-	     skdloader.preview_image->image->width, skdloader.preview_image->image->height, x, y);
-  XSetClipMask(gGui->display, (XITK_WIDGET_LIST_GC(skdloader.widget_list)), None);
-  XSync(gGui->display, False);
-  gGui->x_unlock_display (gGui->display);
+
+  xitk_image_draw_image (skdloader.widget_list, skdloader.preview_image,
+                         0, 0, skdloader.preview_image->image->width, skdloader.preview_image->image->height,
+                         x, y);
 }
 
 static void download_update_preview(void) {

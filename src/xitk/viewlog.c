@@ -155,17 +155,12 @@ static void viewlog_paint_widgets(void) {
 static void viewlog_clear_tab(void) {
   gGui_t *gui = gGui;
   xitk_image_t *im;
-  
+
   im = xitk_image_create_image (gui->imlib_data, (WINDOW_WIDTH - 30),
     (MAX_DISP_ENTRIES * 20 + 16 + 10));
-  
-  draw_outter (gui->imlib_data, im->image, im->width, im->height);
-  
-  gui->x_lock_display (gui->display);
-  XCopyArea (gui->display, im->image->pixmap, (xitk_window_get_window (viewlog->xwin)),
-    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 15, (24 + viewlog->tabs_height));
-  gui->x_unlock_display (gui->display);
 
+  draw_outter (gui->imlib_data, im->image, im->width, im->height);
+  xitk_image_draw_image (viewlog->widget_list, im, 0, 0, im->width, im->height, 15, (24 + viewlog->tabs_height));
   xitk_image_free_image (&im);
 }
 
