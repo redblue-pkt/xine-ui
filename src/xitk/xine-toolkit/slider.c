@@ -287,7 +287,8 @@ static void paint_slider(xitk_widget_t *w) {
     private_data = (slider_private_data_t *) w->private_data;
     bg = (xitk_image_t *) private_data->bg_skin;
     paddle = (xitk_image_t *) private_data->paddle_skin;
-
+    if (!paddle || !bg)
+      return;
     x = y = srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
         
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
@@ -452,6 +453,10 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       xitk_skin_lock(skonfig);
 
       private_data->paddle_skin     = xitk_skin_get_image(skonfig, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
+      if (!private_data->paddle_skin) {
+        xitk_skin_unlock(skonfig);
+        return;
+      }
       private_data->button_width    = private_data->paddle_skin->width / 3;
       private_data->bg_skin         = xitk_skin_get_image(skonfig, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       private_data->sType = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
