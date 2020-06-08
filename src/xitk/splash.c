@@ -61,12 +61,10 @@ void splash_create(void) {
 
   if((xim = xitk_image_load_image(gGui->imlib_data, splash_image))) {
     int  x, y;
-    
-    gGui->x_lock_display (gGui->display);
-    x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (xim->width >> 1);
-    y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (xim->height >> 1);
-    gGui->x_unlock_display (gGui->display);
-    
+
+    x = (xitk_get_display_width() >> 1) - (xim->width >> 1);
+    y = (xitk_get_display_height() >> 1) - (xim->height >> 1);
+
     xwin = xitk_window_create_simple_window(gGui->imlib_data, x, y, xim->width, xim->height);
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
     xitk_window_set_window_title(xwin, _("xine Splash"));

@@ -676,21 +676,17 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       int x, y, w, h, desktopw, desktoph;
       
       xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
-      
-      panel->gui->x_lock_display (panel->gui->display);
-      desktopw = DisplayWidth (panel->gui->display, panel->gui->screen);
-      desktoph = DisplayHeight (panel->gui->display, panel->gui->screen);
-      panel->gui->x_unlock_display (panel->gui->display);
-      
+
+      desktopw = xitk_get_display_width();
+      desktoph = xitk_get_display_height();
+
       if(((x + w) <= 0) || ((y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
 	int newx, newy;
 	
 	newx = (desktopw - w) >> 1;
 	newy = (desktoph - h) >> 1;
 
-        panel->gui->x_lock_display (panel->gui->display);
-        XMoveWindow (panel->gui->display, xitk_window_get_window(panel->xwin), newx, newy);
-        panel->gui->x_unlock_display (panel->gui->display);
+        xitk_window_move_window(panel->xwin, newx, newy);
 
         panel_store_new_position (panel, newx, newy, w, h);
       }

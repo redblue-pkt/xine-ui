@@ -621,11 +621,9 @@ void download_skin(char *url) {
 
     skdloader.running = 1;
 
-    gui->x_lock_display (gui->display);
-    x = ((DisplayWidth (gui->display, gui->screen)) >> 1) - (WINDOW_WIDTH >> 1);
-    y = ((DisplayHeight (gui->display, gui->screen)) >> 1) - (WINDOW_HEIGHT >> 1);
-    gui->x_unlock_display (gui->display);
-    
+    x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
+    y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
+
     skdloader.xwin = xitk_window_create_dialog_window (gui->imlib_data, 
 						       _("Choose a skin to download..."),
 						       x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
