@@ -590,10 +590,11 @@ void download_skin(char *url) {
   gui->x_unlock_display (gui->display);
   
   dialog = xitk_window_dialog_3 (gui->imlib_data,
-    (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+    None,
     get_layer_above_video (gui), 400, _("Be patient..."), NULL, NULL,
     NULL, NULL, NULL, NULL, 0, ALIGN_CENTER, _("Retrieving skin list from %s"), url);
-  
+  video_window_set_transient_for(gui->vwin, xitk_get_window(dialog));
+
   if((slxs = skins_get_slx_entries(url)) != NULL) {
     int                        i;
     xitk_browser_widget_t      br;

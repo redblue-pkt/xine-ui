@@ -883,6 +883,8 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
 
 int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
 
+xitk_window_t *xitk_get_window(xitk_register_key_t key);
+
 /*
  * Initialization function, should be the first call to widget lib.
  */

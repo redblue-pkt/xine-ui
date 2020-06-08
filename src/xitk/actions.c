@@ -468,13 +468,16 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
       gui->play_data.start_time_in_secs = start_time_in_secs;
       gui->play_data.update_mmk         = update_mmk;
       gui->play_data.running            = 1;
-      
+
+      xitk_register_key_t key =
       xitk_window_dialog_3 (gui->imlib_data,
-        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        None,
         get_layer_above_video (gui), 400, _("Start Playback ?"), _start_anyway_done, gui,
         NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
         "%s%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "", _("\nStart playback anyway ?\n"));
       free(buffer); free(v_info); free(a_info);
+
+      video_window_set_transient_for(gui->vwin, xitk_get_window(key));
 
       gui->x_lock_display (gui->display);
       XSync(gui->display, False);
