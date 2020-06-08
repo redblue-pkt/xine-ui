@@ -43,21 +43,9 @@ typedef struct {
 xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribute, int hide_on_start);
 void video_window_exit (xui_vwin_t *vwin);
 
+void *video_window_get_xine_visual(xui_vwin_t *vwin);
+
 void video_window_select_visual (xui_vwin_t *vwin);
-
-void video_window_frame_output_cb (void *vwin,
-				   int video_width, int video_height,
-				   double video_pixel_aspect,
-				   int *dest_x, int *dest_y, 
-				   int *dest_width, int *dest_height,
-				   double *dest_pixel_aspect,
-				   int *win_x, int *win_y);
-
-void video_window_dest_size_cb (void *vwin,
-				int video_width, int video_height,
-				double video_pixel_aspect,
-				int *dest_width, int *dest_height,
-				double *dest_pixel_aspect);
 
 /* set/check fullscreen mode */
 void video_window_set_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen);

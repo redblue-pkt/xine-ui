@@ -70,6 +70,7 @@ struct xui_vwin_st {
   XClassHint            *xclasshint_fullscreen;
   XClassHint            *xclasshint_borderless;
   GC                     gc;
+  int                    video_screen;
 
   int                    video_width;     /* size of currently displayed video     */
   int                    video_height;
@@ -153,6 +154,7 @@ struct xui_vwin_st {
 
   pthread_mutex_t        mutex;
 
+  x11_visual_t            xine_visual;
 };
 
 /* safe external actions */
@@ -269,7 +271,7 @@ static void video_window_find_visual (xui_vwin_t *vwin, Visual **visual_return, 
      * We prefer visuals of depth 15/16 (fast).  Depth 24/32 may be OK, 
      * but could be slow.
      */
-    vinfo_tmpl.screen = vwin->gui->video_screen;
+    vinfo_tmpl.screen = vwin->video_screen;
     vinfo_tmpl.class  = (vwin->gui->prefered_visual_class != -1
 			 ? vwin->gui->prefered_visual_class : TrueColor);
     vinfo = XGetVisualInfo (vwin->gui->video_display,
@@ -326,13 +328,13 @@ static void video_window_find_visual (xui_vwin_t *vwin, Visual **visual_return, 
 
     depth = attribs.depth;
   
-    if (XMatchVisualInfo (vwin->gui->video_display, vwin->gui->video_screen, depth, TrueColor, &vinfo)) {
+    if (XMatchVisualInfo (vwin->gui->video_display, vwin->video_screen, depth, TrueColor, &vinfo)) {
       visual = vinfo.visual;
     } else {
       printf (_("gui_main: couldn't find true color visual.\n"));
 
-      depth = DefaultDepth (vwin->gui->video_display, vwin->gui->video_screen);
-      visual = DefaultVisual (vwin->gui->video_display, vwin->gui->video_screen); 
+      depth = DefaultDepth (vwin->gui->video_display, vwin->video_screen);
+      visual = DefaultVisual (vwin->gui->video_display, vwin->video_screen);
     }
   }
 
@@ -435,12 +437,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       if (vwin->gui->video_display != vwin->gui->display) {
         video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-        vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->gui->video_screen);
+        vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
       }
       
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->gui->video_display,
-        vwin->gui->video_screen, &wparent)) == None)
+        vwin->video_screen, &wparent)) == None)
         rootwindow = DefaultRootWindow (vwin->gui->video_display);
 
       attr.override_redirect = True;
@@ -550,10 +552,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
 
 	  /* update pixel aspect */
-          res_h = (DisplayWidth (vwin->gui->video_display, vwin->gui->video_screen) * 1000
-            / DisplayWidthMM (vwin->gui->video_display, vwin->gui->video_screen));
-          res_v = (DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen) * 1000
-            / DisplayHeightMM (vwin->gui->video_display, vwin->gui->video_screen));
+          res_h = (DisplayWidth (vwin->gui->video_display, vwin->video_screen) * 1000
+            / DisplayWidthMM (vwin->gui->video_display, vwin->video_screen));
+          res_v = (DisplayHeight (vwin->gui->video_display, vwin->video_screen) * 1000
+            / DisplayHeightMM (vwin->gui->video_display, vwin->video_screen));
   
           vwin->pixel_aspect    = res_v / res_h;
 #ifdef HAVE_XINERAMA
@@ -624,7 +626,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     } 
     else {
       /* Get mouse cursor position */
-      XQueryPointer (vwin->gui->video_display, RootWindow (vwin->gui->video_display, vwin->gui->video_screen),
+      XQueryPointer (vwin->gui->video_display, RootWindow (vwin->gui->video_display, vwin->video_screen),
 		    &root_win, &dummy_win, &x_mouse, &y_mouse, &dummy_x, &dummy_y, &dummy_opts);
 
       for (i = 0; i < vwin->xinerama_cnt; i++) {
@@ -732,7 +734,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->colormap = vwin->gui->colormap;
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->gui->video_screen);
+      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
     }
     /*
      * open fullscreen window
@@ -829,7 +831,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->gui->video_screen); 
+      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
     }
 
     /*
@@ -941,10 +943,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
 
           /* update pixel aspect */
-          res_h = (DisplayWidth (vwin->gui->video_display, vwin->gui->video_screen) * 1000
-            / DisplayWidthMM (vwin->gui->video_display, vwin->gui->video_screen));
-          res_v = (DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen) * 1000
-            / DisplayHeightMM (vwin->gui->video_display, vwin->gui->video_screen));
+          res_h = (DisplayWidth (vwin->gui->video_display, vwin->video_screen) * 1000
+            / DisplayWidthMM (vwin->gui->video_display, vwin->video_screen));
+          res_v = (DisplayHeight (vwin->gui->video_display, vwin->video_screen) * 1000
+            / DisplayHeightMM (vwin->gui->video_display, vwin->video_screen));
   
           vwin->pixel_aspect = res_v / res_h;
 #ifdef HAVE_XINERAMA
@@ -990,7 +992,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->gui->video_screen);
+      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
     }
     attr.background_pixel  = vwin->gui->black.pixel;
     attr.border_pixel      = vwin->gui->black.pixel;
@@ -1162,11 +1164,11 @@ static void get_default_mag (xui_vwin_t *vwin, int video_width, int video_height
 /*
  *
  */
-void video_window_dest_size_cb (void *data,
-				int video_width, int video_height,
-				double video_pixel_aspect,
-				int *dest_width, int *dest_height,
-				double *dest_pixel_aspect)  {
+static void _video_window_dest_size_cb (void *data,
+                                        int video_width, int video_height,
+                                        double video_pixel_aspect,
+                                        int *dest_width, int *dest_height,
+                                        double *dest_pixel_aspect)  {
   xui_vwin_t *vwin = data;
 
   if (!vwin)
@@ -1221,13 +1223,13 @@ void video_window_dest_size_cb (void *data,
 /*
  *
  */
-void video_window_frame_output_cb (void *data,
-				   int video_width, int video_height,
-				   double video_pixel_aspect,
-				   int *dest_x, int *dest_y, 
-				   int *dest_width, int *dest_height,
-				   double *dest_pixel_aspect,
-				   int *win_x, int *win_y) {
+static void _video_window_frame_output_cb (void *data,
+                                           int video_width, int video_height,
+                                           double video_pixel_aspect,
+                                           int *dest_x, int *dest_y,
+                                           int *dest_width, int *dest_height,
+                                           double *dest_pixel_aspect,
+                                           int *win_x, int *win_y) {
   xui_vwin_t *vwin = data;
 
   if (!vwin)
@@ -1298,6 +1300,21 @@ void video_window_frame_output_cb (void *data,
 
   pthread_mutex_unlock (&vwin->mutex);
 }
+
+void *video_window_get_xine_visual(xui_vwin_t *vwin)
+{
+  x11_visual_t *v = &vwin->xine_visual;
+
+  v->display           = vwin->gui->video_display;
+  v->screen            = vwin->video_screen;
+  v->d                 = vwin->gui->video_window;
+  v->dest_size_cb      = _video_window_dest_size_cb;
+  v->frame_output_cb   = _video_window_frame_output_cb;
+  v->user_data         = vwin;
+
+  return v;
+}
+
 
 /*
  *
@@ -1557,6 +1574,10 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   if (!vwin)
     return NULL;
 
+  gui->x_lock_display (gui->video_display);
+  vwin->video_screen = DefaultScreen(gui->video_display);
+  gui->x_unlock_display (gui->video_display);
+
   vwin->gui = gui;
   pthread_mutex_init (&vwin->mutex, NULL);
 
@@ -1583,15 +1604,15 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
  
   if (vwin->gui->video_display != vwin->gui->display) {
     video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-    vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->gui->video_screen);
+    vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
   }
   
   vwin->xwin               = window_attribute->x;
   vwin->ywin               = window_attribute->y;
 
   vwin->gui->x_lock_display (vwin->gui->video_display);
-  vwin->desktopWidth       = DisplayWidth(vwin->gui->video_display, vwin->gui->video_screen);
-  vwin->desktopHeight      = DisplayHeight(vwin->gui->video_display, vwin->gui->video_screen);
+  vwin->desktopWidth       = DisplayWidth(vwin->gui->video_display, vwin->video_screen);
+  vwin->desktopHeight      = DisplayHeight(vwin->gui->video_display, vwin->video_screen);
 
 #ifdef HAVE_XTESTEXTENSION
   vwin->fake_keys[0] = XKeysymToKeycode (vwin->gui->video_display, XK_Shift_L);
@@ -1717,8 +1738,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
 #endif
     } 
     else {
-      vwin->fullscreen_width           = DisplayWidth  (vwin->gui->video_display, vwin->gui->video_screen);
-      vwin->fullscreen_height          = DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen);
+      vwin->fullscreen_width           = DisplayWidth  (vwin->gui->video_display, vwin->video_screen);
+      vwin->fullscreen_height          = DisplayHeight (vwin->gui->video_display, vwin->video_screen);
       vwin->xinerama_fullscreen_x      = 0;
       vwin->xinerama_fullscreen_y      = 0;
       vwin->xinerama_fullscreen_width  = vwin->fullscreen_width;
@@ -1733,8 +1754,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
     /* no Xinerama */
     if (__xineui_global_verbosity) 
       printf ("Display is not using Xinerama.\n");
-    vwin->fullscreen_width  = DisplayWidth (vwin->gui->video_display, vwin->gui->video_screen);
-    vwin->fullscreen_height = DisplayHeight (vwin->gui->video_display, vwin->gui->video_screen);
+    vwin->fullscreen_width  = DisplayWidth (vwin->gui->video_display, vwin->video_screen);
+    vwin->fullscreen_height = DisplayHeight (vwin->gui->video_display, vwin->video_screen);
   }
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
@@ -1831,7 +1852,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
 	/* first, kick off unsupported modes */
         for (mode = 1; mode < vwin->XF86_modelines_count; mode++) {
 
-          if (!XF86VidModeValidateModeLine (vwin->gui->video_display, vwin->gui->video_screen,
+          if (!XF86VidModeValidateModeLine (vwin->gui->video_display, vwin->video_screen,
             vwin->XF86_modelines[mode])) {
 	    int wrong_mode;
 
@@ -1920,10 +1941,10 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
 #endif
     double res_h, res_v;
     gui->x_lock_display (gui->video_display);
-    res_h                 = (DisplayWidth  (gui->video_display, gui->video_screen) * 1000
-                             / DisplayWidthMM (gui->video_display, gui->video_screen));
-    res_v                 = (DisplayHeight (gui->video_display, gui->video_screen) * 1000
-                             / DisplayHeightMM (gui->video_display, gui->video_screen));
+    res_h                 = (DisplayWidth  (gui->video_display, vwin->video_screen) * 1000
+                             / DisplayWidthMM (gui->video_display, vwin->video_screen));
+    res_v                 = (DisplayHeight (gui->video_display, vwin->video_screen) * 1000
+                             / DisplayHeightMM (gui->video_display, vwin->video_screen));
     gui->x_unlock_display (gui->video_display);
     vwin->pixel_aspect    = res_v / res_h;
 
