@@ -1983,7 +1983,7 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width;
   mywidget->height                = private_data->skin->height;
-  mywidget->type                  = WIDGET_TYPE_IMAGE;
+  mywidget->type                  = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
