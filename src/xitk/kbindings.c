@@ -939,9 +939,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   {
     int x, y, w, h;
 
-    xitk_get_window_position(gui->display, 
-			     (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
-        
+    xitk_window_get_window_position(kbedit->xwin, &x, &y, &w, &h);
+
     xwin = xitk_window_create_dialog_window(gui->imlib_data, 
 					    _("Event Receiver Window:  Press keyboard keys to bind..."),
 					    x, y, w, h);

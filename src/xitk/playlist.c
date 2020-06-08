@@ -997,7 +997,7 @@ void playlist_editor(void) {
   set_window_states_start(playlist->xwin);
 
   if(is_layer_above())
-    xitk_set_layer_above(xitk_window_get_window(playlist->xwin));
+    xitk_window_set_layer_above(playlist->xwin);
 
   xitk_window_change_background_with_image(playlist->xwin, bg_image, bg_image->width, bg_image->height);
   xitk_image_free_image(&bg_image);
