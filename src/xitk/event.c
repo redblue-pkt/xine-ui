@@ -914,9 +914,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       gui->cursor_grabbed = 1;
     }
     else {
-      gui->x_lock_display (gui->display);
-      XUngrabPointer(gui->display, CurrentTime);
-      gui->x_unlock_display (gui->display);
+      xitk_ungrab_pointer();
       gui->cursor_grabbed = 0;
     }
     break;

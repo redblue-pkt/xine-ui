@@ -901,6 +901,8 @@ const char *xitk_set_locale(void);
  */
 long int xitk_get_last_keypressed_time(void);
 
+void xitk_ungrab_pointer(void);
+
 /*
  *
  */

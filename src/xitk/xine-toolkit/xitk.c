@@ -1353,6 +1353,14 @@ void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type
     _set_wm_window_type(w->window, type, 1);
 }
 
+void xitk_ungrab_pointer(void) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+
+  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  XUngrabPointer(xitk->x.display, CurrentTime);
+  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+}
+
 /*
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.
