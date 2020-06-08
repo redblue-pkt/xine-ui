@@ -585,8 +585,8 @@ void event_sender_panel(void) {
   xitk_enable_and_show_widget(w);
   event_sender_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
 
-  eventer->widget_key = xitk_register_event_handler("eventer", 
-						    (xitk_window_get_window(eventer->xwin)),
+  eventer->widget_key = xitk_register_event_handler("eventer",
+                                                    eventer->xwin,
 						    event_sender_handle_event,
 						    event_sender_store_new_position,
 						    NULL,

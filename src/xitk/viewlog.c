@@ -452,8 +452,8 @@ void viewlog_panel(void) {
   xitk_add_widget (viewlog->widget_list, w);
   xitk_enable_and_show_widget(w);
 
-  viewlog->kreg = xitk_register_event_handler("viewlog", 
-					      (xitk_window_get_window(viewlog->xwin)),
+  viewlog->kreg = xitk_register_event_handler("viewlog",
+                                              viewlog->xwin,
 					      viewlog_handle_event,
 					      NULL,
 					      NULL,

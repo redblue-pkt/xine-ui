@@ -627,7 +627,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   
   private_data->widget_key = 
     xitk_register_event_handler("xitk combo",
-				(xitk_window_get_window(private_data->xwin)), 
+                                private_data->xwin,
 				_combo_handle_event,
 				NULL,
 				NULL,

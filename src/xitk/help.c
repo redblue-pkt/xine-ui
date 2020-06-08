@@ -419,8 +419,8 @@ void help_panel(void) {
   xitk_add_widget (help->widget_list, w);
   xitk_enable_and_show_widget(w);
   
-  help->kreg = xitk_register_event_handler("help", 
-					   (xitk_window_get_window(help->xwin)),
+  help->kreg = xitk_register_event_handler("help",
+                                           help->xwin,
 					   help_handle_event,
 					   NULL,
 					   NULL,

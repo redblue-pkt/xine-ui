@@ -197,16 +197,6 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
       (d)->tv_usec = (s)->tv_usec;                                            \
 } while(0)
 
-#define WINDOW_INFO_ZERO(w) do {                                              \
-      free((w)->name);                                                      \
-      (w)->window = None;                                                     \
-      (w)->name   = NULL;                                                     \
-      (w)->x      = 0;                                                        \
-      (w)->y      = 0;                                                        \
-      (w)->height = 0;                                                        \
-      (w)->width  = 0;                                                        \
-} while(0)
-
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
                       StructureNotifyMask | PropertyChangeMask |              \
@@ -226,7 +216,9 @@ extern int xitk_x_error;
 #ifndef _XITK_C_
 
 xitk_widget_list_t *xitk_widget_list_new (void);
-xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
+xitk_register_key_t xitk_register_event_handler(const char *name,
+                                                xitk_window_t *w,
+                                                //Window window,
 						widget_event_callback_t cb,
 						widget_newpos_callback_t pos_cb,
 						xitk_dnd_callback_t dnd_cb,

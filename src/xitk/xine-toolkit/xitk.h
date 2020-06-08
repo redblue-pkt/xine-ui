@@ -72,7 +72,7 @@
 
 #define WINDOW_INFO_ZERO(w)         do {                  \
 	                              free((w)->name);    \
-                                      (w)->window = None; \
+                                      (w)->xwin   = NULL; \
                                       (w)->name   = NULL; \
                                       (w)->x      = 0;    \
                                       (w)->y      = 0;    \
@@ -298,7 +298,7 @@ typedef struct {
 } xitk_move_t;
 
 typedef struct {
-  Window                            window;
+  xitk_window_t                    *xwin;
   char                             *name;
   int                               x;
   int                               y;
@@ -841,11 +841,6 @@ typedef struct {
 xitk_widget_list_t *xitk_widget_list_new (void);
 
 /*
- * Humm, this should be probably removed soon.
- */
-void xitk_change_window_for_event_handler (xitk_register_key_t key, Window window);
-
-/*
  * Register a callback function called when a signal heppen.
  */
 void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data);
@@ -859,7 +854,14 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
  * dnd_cb: callback for dnd event.
  * wl:     widget_list handled internaly for xevent reactions.
  */
-xitk_register_key_t xitk_register_event_handler(const char *name, Window window,
+xitk_register_key_t xitk_register_x_event_handler(const char *name,
+                                                  Window window,
+                                                  widget_event_callback_t cb,
+                                                  widget_newpos_callback_t pos_cb,
+                                                  xitk_dnd_callback_t dnd_cb,
+                                                  xitk_widget_list_t *wl, void *user_data);
+xitk_register_key_t xitk_register_event_handler(const char *name,
+                                                xitk_window_t *w,
 						widget_event_callback_t cb,
 						widget_newpos_callback_t pos_cb,
 						xitk_dnd_callback_t dnd_cb,
