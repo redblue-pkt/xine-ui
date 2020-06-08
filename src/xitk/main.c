@@ -1440,7 +1440,6 @@ int main(int argc, char *argv[]) {
   gui->cursor_grabbed         = 0;
   gui->network                = 0;
   gui->network_port           = 0;
-  gui->video_window           = None;
   gui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
   gui->XF86VidMode_fullscreen = 0;
