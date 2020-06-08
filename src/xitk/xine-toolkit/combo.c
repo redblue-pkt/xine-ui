@@ -143,11 +143,7 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
     private_data->selected = selected;
     
     xitk_label_change_label(private_data->label_widget, private_data->entries[selected]);
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
+    xitk_window_hide_window(private_data->xwin);
     private_data->visible = 0;
     
     xitk_browser_release_all_buttons(private_data->browser_widget);
@@ -270,10 +266,7 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state) {
     }
     else {
       private_data->visible = 0;
-
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+      xitk_window_hide_window(private_data->xwin);
     }
   }      
 }
@@ -300,10 +293,7 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
     }
     else {
       private_data->visible = 0;
-      
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+      xitk_window_hide_window(private_data->xwin);
     }
     
   }      
@@ -531,8 +521,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   unsigned int                itemw, itemh = 20;
   unsigned int                slidw = 12;
   xitk_browser_widget_t       browser;
-  XClassHint                  xclasshint;
-  Status                      status;
   
   XITK_WIDGET_INIT(&browser, c->imlibdata);
 
@@ -582,22 +570,15 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   XSetTransientForHint (c->imlibdata->x.disp,
 			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
   
-  /* Change default classhint to new one. */
-  if((status = XGetClassHint(c->imlibdata->x.disp,
-		     (xitk_window_get_window(private_data->xwin)), &xclasshint)) != BadWindow) {
-    XFree(xclasshint.res_name);
-    XFree(xclasshint.res_class);
-    xclasshint.res_name  = (char *)"Xitk Combo";
-    xclasshint.res_class = (char *)"Xitk";
-    XSetClassHint(c->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)), &xclasshint);
-  }
-
   private_data->gc = XCreateGC(c->imlibdata->x.disp, 
 			       (xitk_window_get_window(private_data->xwin)), None, None);
 
   XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
 
-  private_data->widget_list                = xitk_widget_list_new() ;
+  /* Change default classhint to new one. */
+  xitk_window_set_window_class(private_data->xwin, "Xitk Combo", "Xitk");
+
+  private_data->widget_list                = xitk_widget_list_new();
   xitk_dlist_init (&private_data->widget_list->list);
   private_data->widget_list->win           = (xitk_window_get_window(private_data->xwin));
   private_data->widget_list->gc            = private_data->gc;
