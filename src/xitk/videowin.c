@@ -182,6 +182,14 @@ void video_window_set_input_focus(xui_vwin_t *vwin)
   xitk_try_to_set_input_focus (vwin->gui->video_display, vwin->gui->video_window);
 }
 
+void video_window_grab_pointer(xui_vwin_t *vwin)
+{
+  vwin->gui->x_lock_display (vwin->gui->video_display);
+  XGrabPointer(vwin->gui->video_display, vwin->gui->video_window, 1, None,
+               GrabModeAsync, GrabModeAsync, vwin->gui->video_window, None, CurrentTime);
+  vwin->gui->x_unlock_display (vwin->gui->video_display);
+}
+
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (xui_vwin_t *vwin);
 static int  video_window_check_mag (xui_vwin_t *vwin);

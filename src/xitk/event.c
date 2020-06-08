@@ -908,10 +908,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_GRAB_POINTER:
     if(!gui->cursor_grabbed) {
       if (!panel_is_visible (gui->panel)) {
-	gui->x_lock_display (gui->video_display);
-	XGrabPointer(gui->video_display, gui->video_window, 1, None, 
-		     GrabModeAsync, GrabModeAsync, gui->video_window, None, CurrentTime);
-	gui->x_unlock_display (gui->video_display);
+        video_window_grab_pointer(gui->vwin);
       }
       
       gui->cursor_grabbed = 1;
