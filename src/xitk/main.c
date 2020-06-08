@@ -745,16 +745,11 @@ static void show_usage (void) {
 static xine_video_port_t *load_video_out_driver(int driver_number) {
   gGui_t *gui = gGui;
   xine_video_port_t      *video_port = NULL;
-  x11_visual_t            vis;
+  void                   *vis;
   int                     driver_num;
 
-  vis.display           = gui->video_display;
-  vis.screen            = gui->video_screen;
-  vis.d                 = gui->video_window;
-  vis.dest_size_cb      = video_window_dest_size_cb;
-  vis.frame_output_cb   = video_window_frame_output_cb;
-  vis.user_data         = gui->vwin;
-  
+  vis = video_window_get_xine_visual(gui->vwin);
+
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
    */
@@ -789,7 +784,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
     }
     else if (strcasecmp (gui->video_driver_ids[driver_num], "auto")) {
       video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_num],
-        XINE_VISUAL_TYPE_X11, (void *) &vis);
+        XINE_VISUAL_TYPE_X11, vis);
       if (video_port)
 	return video_port;
     }
@@ -808,7 +803,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
       video_port = xine_open_video_driver (gui->xine, 
 					  driver_ids[i],
 					  XINE_VISUAL_TYPE_X11, 
-					  (void *) &vis);
+                                           vis);
       if (video_port) {
 	return video_port;
       }
@@ -839,7 +834,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
     }
     else {
       video_port = xine_open_video_driver (gui->xine, gui->video_driver_ids[driver_number],
-        XINE_VISUAL_TYPE_X11, (void *) &vis);
+        XINE_VISUAL_TYPE_X11, vis);
     }
     
     if(!video_port) {

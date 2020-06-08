@@ -1868,12 +1868,6 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   gui->x_lock_display (gui->display);
 
   gui->screen = DefaultScreen(gui->display);
-  
-  gui->x_lock_display (gui->video_display);
-  gui->video_screen = DefaultScreen(gui->video_display);
-  gui->x_unlock_display (gui->video_display);
-
-  
 
   /* Some infos */
   if(__xineui_global_verbosity) {
