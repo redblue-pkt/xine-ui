@@ -91,36 +91,17 @@ static void paint_button (xitk_widget_t *w, widget_event_t *event) {
 #endif
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && w->visible == 1)) {
     button_private_data_t *private_data = (button_private_data_t *) w->private_data;
-    xitk_image_t *skin = private_data->skin;
-    GC lgc;
     int mode;
-
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
-    if (skin->mask) {
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    }
 
     mode = (private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)
          ? (private_data->bClicked ? 2 : 1)
          : 0;
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc,
+
+    xitk_image_draw_image(w->wl, private_data->skin,
       mode * w->width + event->x - w->x, event->y - w->y,
       event->width, event->height,
       event->x, event->y);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XFreeGC(private_data->imlibdata->x.disp, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-  } 
+  }
 
 }
 

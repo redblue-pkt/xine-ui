@@ -1804,6 +1804,37 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   return i;
 } 
 
+void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *img,
+                           int src_x, int src_y, int width, int height, int dst_x, int dst_y) {
+
+  ImlibData *im;
+  GC lgc;
+
+  if (!img->image)
+    return;
+
+  im = img->image->imlibdata;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  lgc = XCreateGC(im->x.disp, wl->win, None, None);
+  if (wl)
+    XCopyGC(im->x.disp, wl->gc, (1 << GCLastBit) - 1, lgc);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  if (img->mask && img->mask->pixmap) {
+    XLOCK (im->x.x_lock_display, im->x.disp);
+    XSetClipOrigin(im->x.disp, lgc, dst_x, dst_y);
+    XSetClipMask(im->x.disp, lgc, img->mask->pixmap);
+    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  }
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XCopyArea (im->x.disp, img->image->pixmap, wl->win, lgc, src_x, src_y, width, height, dst_x, dst_y);
+  XFreeGC(im->x.disp, lgc);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+}
+
+
 /*
  * ********************************************************************************
  *                              Widget specific part
@@ -1859,30 +1890,11 @@ static void paint_image (xitk_widget_t *w, widget_event_t *event) {
 #endif
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
     image_private_data_t *private_data = (image_private_data_t *) w->private_data;
-    xitk_image_t *skin;
-    GC lgc;
 
-    skin = private_data->skin;
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    lgc = XCreateGC (private_data->imlibdata->x.disp, w->wl->win, None, None);
-    XCopyGC (private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
-    if (skin->mask) {
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetClipOrigin (private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask (private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    }
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc,
+    xitk_image_draw_image(w->wl, private_data->skin,
         event->x - w->x, event->y - w->y,
         event->width, event->height,
         event->x, event->y);
-    XFreeGC(private_data->imlibdata->x.disp, lgc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
 }
 
