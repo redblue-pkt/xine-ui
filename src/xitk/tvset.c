@@ -307,7 +307,7 @@ void tvset_panel(void) {
   x = 15;
   y = 34 - 6;
   
-  draw_outter_frame(gGui->imlib_data, bg, _("General"), btnfontname, 
+  draw_outter_frame(bg, _("General"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
@@ -315,7 +315,7 @@ void tvset_panel(void) {
   x = 20;
   y += 15;
   w = 139;
-  draw_inner_frame(gGui->imlib_data, bg, _("Input: "), lfontname, 
+  draw_inner_frame(bg, _("Input: "), lfontname,
 		   x, y, w, (20 + 22));
   XITK_WIDGET_INIT(&ib, gGui->imlib_data);
   ib.skin_element_name = NULL;
@@ -340,7 +340,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(gGui->imlib_data, bg, _("Broadcast System: "), lfontname, 
+  draw_inner_frame(bg, _("Broadcast System: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
@@ -362,7 +362,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(gGui->imlib_data, bg, _("Channel: "), lfontname, 
+  draw_inner_frame(bg, _("Channel: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
@@ -381,14 +381,14 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("Standard"), btnfontname, 
+  draw_outter_frame(bg, _("Standard"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
   x = 20;
   y += 15;
   w = 139;
-  draw_inner_frame(gGui->imlib_data, bg, _("Frame Rate: "), lfontname, 
+  draw_inner_frame(bg, _("Frame Rate: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
@@ -411,7 +411,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(gGui->imlib_data, bg, _("Analog Standard: "), lfontname, 
+  draw_inner_frame(bg, _("Analog Standard: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
@@ -429,7 +429,7 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("Frame Size"), btnfontname, 
+  draw_outter_frame(bg, _("Frame Size"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
@@ -439,7 +439,7 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(gGui->imlib_data, bg, _("MPEG2"), btnfontname, 
+  draw_outter_frame(bg, _("MPEG2"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 

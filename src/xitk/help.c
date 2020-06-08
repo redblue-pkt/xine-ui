@@ -379,7 +379,7 @@ void help_panel(void) {
 
   bg = xitk_window_get_background_pixmap(help->xwin);
 
-  draw_rectangular_outter_box(gGui->imlib_data, bg, 15, (24 + th),
+  draw_rectangular_outter_box(bg, 15, (24 + th),
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_set_background(help->xwin, bg);
 

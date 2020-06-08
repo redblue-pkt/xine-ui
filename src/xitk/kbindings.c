@@ -1115,23 +1115,23 @@ void kbedit_window(void) {
   x = 15;
   y = 34;
   
-  draw_rectangular_inner_box(gui->imlib_data, bg, x, y,
+  draw_rectangular_inner_box(bg, x, y,
 			     (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
 
   y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
   y1 = y; /* remember for later */
-  draw_outter_frame(gui->imlib_data, bg, 
+  draw_outter_frame(bg,
 		    _("Binding Action"), hboldfontname,
 		    x, y, 
 		    (WINDOW_WIDTH - 30), 45);
 
   y += 45 + 3;
-  draw_outter_frame(gui->imlib_data, bg, 
+  draw_outter_frame(bg,
 		    _("Key"), hboldfontname,
 		    x, y, 
 		    120, 45);
 
-  draw_outter_frame(gui->imlib_data, bg, 
+  draw_outter_frame(bg,
 		    _("Modifiers"), hboldfontname,
 		    x + 130, y, 
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);

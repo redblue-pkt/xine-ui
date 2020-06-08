@@ -662,7 +662,7 @@ void download_skin(char *url) {
     
     xitk_enable_and_show_widget(skdloader.browser);
     
-    draw_rectangular_inner_box (gui->imlib_data, bg, x, y,
+    draw_rectangular_inner_box (bg, x, y,
       (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
 
     xitk_window_set_background (skdloader.xwin, bg);

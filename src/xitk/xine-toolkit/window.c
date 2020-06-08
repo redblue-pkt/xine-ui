@@ -834,7 +834,7 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
   xwin->height = height;
   
   xwin->background = xitk_image_create_xitk_pixmap(im, width, height);
-  draw_outter(im, xwin->background, width, height);
+  draw_outter(xwin->background, width, height);
   xitk_window_apply_background(xwin);
 
   xitk_window_move_window(xwin, x, y);
@@ -918,8 +918,8 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title
     cd = xitk_get_pixel_color_from_rgb(im, 115, 12, 206);
     c = xitk_get_pixel_color_from_rgb(im, 135, 97, 168);
 
-    draw_flat_with_color(im, bar, width, TITLE_BAR_HEIGHT, colorgray);
-    draw_rectangular_inner_box(im, bar, 2, 2, width - 6, (TITLE_BAR_HEIGHT - 1 - 4));
+    draw_flat_with_color(bar, width, TITLE_BAR_HEIGHT, colorgray);
+    draw_rectangular_inner_box(bar, 2, 2, width - 6, (TITLE_BAR_HEIGHT - 1 - 4));
     
     XLOCK (im->x.x_lock_display, im->x.disp);
     for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {

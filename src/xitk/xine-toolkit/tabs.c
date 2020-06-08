@@ -123,7 +123,7 @@ static void tabs_arrange(xitk_widget_t *w) {
       if(p) {
 	gcv.graphics_exposures = False;
 
-	draw_flat(private_data->imlibdata, p->image, p->width, p->height);
+        draw_flat(p->image, p->width, p->height);
 	
         XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	gc = XCreateGC(private_data->imlibdata->x.disp, 

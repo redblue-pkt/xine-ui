@@ -2084,20 +2084,20 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_inner(ImlibData *im, xitk_pixmap_t *p, int w, int h);
-void draw_inner_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
+void draw_inner(xitk_pixmap_t *p, int w, int h);
+void draw_inner_light(xitk_pixmap_t *p, int w, int h);
 
 /**
  *
  */
-void draw_outter(ImlibData *im, xitk_pixmap_t *p, int w, int h);
-void draw_outter_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
+void draw_outter(xitk_pixmap_t *p, int w, int h);
+void draw_outter_light(xitk_pixmap_t *p, int w, int h);
 
-void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigned int color);
+void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color);
 /**
  *
  */
-void draw_flat(ImlibData *im, xitk_pixmap_t *p, int w, int h);
+void draw_flat(xitk_pixmap_t *p, int w, int h);
 
 /**
  *
@@ -2122,33 +2122,29 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_rectangular_inner_box(ImlibData *im, xitk_pixmap_t *p, 
-				int x, int y, int width, int height);
+void draw_rectangular_inner_box(xitk_pixmap_t *p, int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p,
-				 int x, int y, int width, int height);
+void draw_rectangular_outter_box(xitk_pixmap_t *p, int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_rectangular_inner_box_light(ImlibData *im, xitk_pixmap_t *p, 
-				      int x, int y, int width, int height);
+void draw_rectangular_inner_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p,
-				       int x, int y, int width, int height);
+void draw_rectangular_outter_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, const char *title, const char *fontname,
+void draw_inner_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
                       int x, int y, int w, int h);
-void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, const char *title, const char *fontname,
+void draw_outter_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
                        int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);

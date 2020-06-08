@@ -934,7 +934,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     else if(_menu_is_separator(me->menu_entry)) {
     __sep:
       if(bg)
-	draw_rectangular_inner_box_light(private_data->imlibdata, bg, 3, yy, wwidth - 6, 1);
+        draw_rectangular_inner_box_light(bg, 3, yy, wwidth - 6, 1);
       yy += 2;
     }
     else {
