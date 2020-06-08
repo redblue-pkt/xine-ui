@@ -1011,6 +1011,35 @@ void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height) {
   *height = w->height;
 }
 
+void xitk_window_resize_window(xitk_window_t *w, int width, int height) {
+  ImlibData   *im;
+  XSizeHints   hint;
+  int          t = 0;
+
+  if (w == NULL)
+    return;
+
+  im = w->imlibdata;
+
+  w->width = width;
+  w->height = height;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+
+  hint.width  = width;
+  hint.height = height;
+  hint.flags  = PPosition | PSize;
+  XSetWMNormalHints(im->x.disp, w->window, &hint);
+  XResizeWindow (im->x.disp, w->window, width, height);
+  XSync(im->x.disp, False);
+
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  while (t < 10 && !xitk_is_window_size(im->x.disp, w->window, w->width, w->height)) {
+    xitk_usec_sleep(10000);
+  }
+}
+
 /*
  * Get window (X) id.
  */

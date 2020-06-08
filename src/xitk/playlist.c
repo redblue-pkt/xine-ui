@@ -897,44 +897,25 @@ void playlist_update_focused_entry(void) {
  */
 void playlist_change_skins(int synthetic) {
   gGui_t *gui = gGui;
-  ImlibImage   *new_img;
-  XSizeHints    hint;
 
   if(playlist_is_running()) {
-    
+    xitk_image_t *bg_image;
+
     xitk_skin_lock(gui->skin_config);
     xitk_hide_widgets(playlist->widget_list);
 
-    gui->x_lock_display (gui->display);
-    
-    if(!(new_img = Imlib_load_image(gui->imlib_data,
-				    xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
+    if(!(bg_image = xitk_image_load_image(gui->imlib_data,
+                                          xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
       xine_error (gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    
-    hint.width  = new_img->rgb_width;
-    hint.height = new_img->rgb_height;
-    hint.flags  = PPosition | PSize;
-    XSetWMNormalHints(gui->display, xitk_window_get_window(playlist->xwin), &hint);
 
-    XResizeWindow (gui->display, xitk_window_get_window(playlist->xwin),
-		   (unsigned int)new_img->rgb_width,
-		   (unsigned int)new_img->rgb_height);
-    
-    gui->x_unlock_display (gui->display);
-    
-    while(!xitk_is_window_size(gui->display, xitk_window_get_window(playlist->xwin),
-			       new_img->rgb_width, new_img->rgb_height)) {
-      xine_usec_sleep(10000);
-    }
+    xitk_window_resize_window (playlist->xwin, bg_image->width, bg_image->height);
+    xitk_window_change_background_with_image(playlist->xwin, bg_image,
+                                             bg_image->width, bg_image->height);
+    xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (gui->vwin, playlist->xwin);
-
-    gui->x_lock_display (gui->display);
-    Imlib_apply_image(gui->imlib_data, new_img, xitk_window_get_window(playlist->xwin));
-    Imlib_destroy_image(gui->imlib_data, new_img);
-    gui->x_unlock_display (gui->display);
 
     if(playlist_is_visible())
       playlist_raise_window();
@@ -980,7 +961,7 @@ void playlist_editor(void) {
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
   int                        x, y;
-  ImlibImage                *bg_image;
+  xitk_image_t              *bg_image;
 
   XITK_WIDGET_INIT(&br, gui->imlib_data);
   XITK_WIDGET_INIT(&lb, gui->imlib_data);
@@ -994,14 +975,11 @@ void playlist_editor(void) {
 
   _playlist_create_playlists();
 
-  gui->x_lock_display (gui->display);
-
-  if (!(bg_image = Imlib_load_image(gui->imlib_data,
-					      xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
+  if (!(bg_image = xitk_image_load_image(gui->imlib_data,
+                                         xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
     xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
-  gui->x_unlock_display (gui->display);
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
 				     200,
@@ -1019,8 +997,8 @@ void playlist_editor(void) {
 				     CONFIG_NO_DATA);
 
   playlist->xwin = xitk_window_create_simple_window(gui->imlib_data, x, y,
-                                                    bg_image->rgb_width,
-                                                    bg_image->rgb_height);
+                                                    bg_image->width,
+                                                    bg_image->height);
   xitk_window_set_window_title(playlist->xwin, title);
 
   set_window_states_start(playlist->xwin);
@@ -1028,10 +1006,8 @@ void playlist_editor(void) {
   if(is_layer_above())
     xitk_set_layer_above(xitk_window_get_window(playlist->xwin));
 
-  gui->x_lock_display (gui->display);
-  Imlib_apply_image(gui->imlib_data, bg_image, xitk_window_get_window(playlist->xwin));
-  Imlib_destroy_image(gui->imlib_data, bg_image);
-  gui->x_unlock_display (gui->display);
+  xitk_window_change_background_with_image(playlist->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_image_free_image(&bg_image);
 
   /*
    * Widget-list
