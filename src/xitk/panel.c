@@ -1262,7 +1262,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   }
   
   if(is_layer_above())
-    xitk_set_layer_above (xitk_window_get_window(panel->xwin));
+    xitk_window_set_layer_above (panel->xwin);
 
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
