@@ -834,7 +834,7 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
       _xitk_or_hulls (&wh, hull);
       n += 1;
     } else if (_xitk_is_hull_in_hull (&wh, hull)) {
-      if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) {
+      if (w->type & WIDGET_PARTIAL_PAINTABLE) {
         _xitk_and_hulls (hull, &wh);
         event.type = WIDGET_EVENT_PARTIAL_PAINT;
         event.x = wh.x1;

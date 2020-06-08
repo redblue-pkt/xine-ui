@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -253,25 +253,24 @@ static void create_labelofbutton(xitk_widget_t *lb,
 /*
  * Paint the button with correct background pixmap
  */
-static void paint_labelbutton (xitk_widget_t *w) {
-  lbutton_private_data_t *private_data;
-  int               button_width, state = 0;
-  GC                lgc;
-  xitk_image_t     *skin;
-  XWindowAttributes attr;
-  xitk_pixmap_t    *btn;
-
+static void paint_partial_labelbutton (xitk_widget_t *w, widget_event_t *event) {
+#ifdef XITK_PAINT_DEBUG */
+  printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
+#endif
   if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    lbutton_private_data_t *private_data = (lbutton_private_data_t *) w->private_data;
 
-    private_data = (lbutton_private_data_t *) w->private_data;
+    if (w->visible == 1) {
+      xitk_image_t *skin = private_data->skin;
+      xitk_pixmap_t *btn;
+      XWindowAttributes attr;
+      GC lgc;
+      int button_width, state = 0, mode;
 
-    if(w->visible == 1) {
-      
+      /* FIXME: what is this good for? */
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       XGetWindowAttributes(private_data->imlibdata->x.disp, w->wl->win, &attr);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-      
-      skin = private_data->skin;
       
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
       lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
@@ -286,79 +285,81 @@ static void paint_labelbutton (xitk_widget_t *w) {
       }
       
       button_width = skin->width / 3;
-      btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
+      btn = xitk_image_create_xitk_pixmap (private_data->imlibdata, button_width, skin->height);
       
+      mode = -1;
       if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
-	if (private_data->bClicked) {
-	  state = CLICK;
-          XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		     btn->pixmap, w->wl->gc, 2*button_width, 0,
-		     button_width, skin->height, 0, 0);
-          XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-	}
-	else {
-	  if(!private_data->bState || private_data->bType == CLICK_BUTTON) {
-	    state = FOCUS;
-            XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		       btn->pixmap, w->wl->gc, button_width, 0,
-		       button_width, skin->height, 0, 0);
-            XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-	  }
-	  else {
-	    if(private_data->bType == RADIO_BUTTON) {
-	      state = CLICK;
-              XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-			 btn->pixmap, w->wl->gc, 2*button_width, 0,
-			 button_width, skin->height, 0, 0);
-              XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-	    }
-	  }
-	}
+        if (private_data->bClicked) {
+          mode = 2;
+          state = CLICK;
+        } else {
+          if (!private_data->bState || (private_data->bType == CLICK_BUTTON)) {
+            mode = 1;
+            state = FOCUS;
+          } else {
+            if (private_data->bType == RADIO_BUTTON) {
+              mode = 2;
+              state = CLICK;
+            } else {
+              /* FIXME: original code did nothing here. however, initial contents of pixmap
+               * are proven undefined... */
+              mode = 0;
+              state = NORMAL;
+            }
+          }
+        }
+      } else {
+        if (private_data->bState && private_data->bType == RADIO_BUTTON) {
+          if ((private_data->bOldState == 1) && (private_data->bClicked == 1)) {
+            mode = 0;
+            state = NORMAL;
+          } else {
+            mode = 2;
+            state = CLICK;
+          }
+        } else {
+          mode = 0;
+          state = NORMAL;
+        }
       }
-      else {
+      if (mode >= 0) {
         XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	if(private_data->bState && private_data->bType == RADIO_BUTTON) {
-	  if(private_data->bOldState == 1 && private_data->bClicked == 1) {
-	    state = NORMAL;
-	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, 
-		       w->wl->gc, 0, 0, button_width, skin->height, 0, 0);
-	  }
-	  else {
-	    state = CLICK;
-	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		       btn->pixmap, w->wl->gc, 2*button_width, 0,
-		       button_width, skin->height, 0, 0);
-	  }
-	}
-	else {
-	  state = NORMAL;
-	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, 
-		     w->wl->gc, 0, 0, button_width, skin->height, 0, 0);
-	}
+        XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, w->wl->gc,
+          mode * button_width, 0,
+          button_width, skin->height,
+          0, 0);
         XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
       }
       
-      if(private_data->label_visible) {
-	create_labelofbutton(w, w->wl->win, w->wl->gc, btn->pixmap,
-			     button_width, skin->height, 
-			     private_data->label, private_data->shortcut_label, private_data->shortcut_pos, state);
+      if (private_data->label_visible) {
+        create_labelofbutton (w, w->wl->win, w->wl->gc, btn->pixmap,
+          button_width, skin->height,
+          private_data->label, private_data->shortcut_label, private_data->shortcut_pos, state);
       }
       
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, w->wl->win, lgc, 0, 0,
-		 button_width, skin->height, w->x, w->y);
+      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, w->wl->win, lgc,
+        event->x - w->x, event->y - w->y,
+        event->width, event->height,
+        event->x, event->y);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-      xitk_image_destroy_xitk_pixmap(btn);
+      xitk_image_destroy_xitk_pixmap (btn);
 
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XFreeGC(private_data->imlibdata->x.disp, lgc);
+      XFreeGC (private_data->imlibdata->x.disp, lgc);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
   }
+}
+
+static void paint_labelbutton (xitk_widget_t *w) {
+  widget_event_t event;
+  event.x = w->x;
+  event.y = w->y;
+  event.width = w->width;
+  event.height = w->height;
+  paint_partial_labelbutton (w, &event);
 }
 
 /*
@@ -537,7 +538,13 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
-    paint_labelbutton(w);
+    event->x = w->x;
+    event->y = w->y;
+    event->width = w->width;
+    event->height = w->height;
+    /* fall through */
+  case WIDGET_EVENT_PARTIAL_PAINT:
+    paint_partial_labelbutton (w, event);
     break;
   case WIDGET_EVENT_CLICK:
     result->value = notify_click_labelbutton(w, event->button,
@@ -778,7 +785,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   mywidget->y                     = info->y;
   mywidget->width                 = private_data->skin->width/3;
   mywidget->height                = private_data->skin->height;
-  mywidget->type                  = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_CLICKABLE | WIDGET_KEYABLE;
+  mywidget->type                  = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE
+                                  | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;

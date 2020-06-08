@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -85,17 +85,15 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 /**
  *
  */
-static void paint_button (xitk_widget_t *w) {
-  button_private_data_t *private_data;
-  GC                     lgc;
-  int                    button_width;
-  xitk_image_t          *skin;
-
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && w->visible == 1)) {
-    
-    private_data = (button_private_data_t *) w->private_data;
-    skin         = private_data->skin;
-    button_width = skin->width / 3;
+static void paint_button (xitk_widget_t *w, widget_event_t *event) {
+#ifdef XITK_PAINT_DEBUG
+  printf ("xitk.button.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
+#endif
+  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && w->visible == 1)) {
+    button_private_data_t *private_data = (button_private_data_t *) w->private_data;
+    xitk_image_t *skin = private_data->skin;
+    GC lgc;
+    int mode;
 
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
@@ -109,24 +107,14 @@ static void paint_button (xitk_widget_t *w) {
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
 
+    mode = (private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)
+         ? (private_data->bClicked ? 2 : 1)
+         : 0;
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
-      if(private_data->bClicked) {
-	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
-		   w->wl->win, lgc, 2*button_width, 0,
-		   button_width, skin->height, w->x, w->y);
-      } 
-      else {
-	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
-		   w->wl->win, lgc, button_width, 0,
-		   button_width, skin->height, w->x, w->y);
-      }
-    } 
-    else {
-      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		 w->wl->win, lgc, 0, 0,
-		 button_width, skin->height, w->x, w->y);
-    }
+    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc,
+      mode * w->width + event->x - w->x, event->y - w->y,
+      event->width, event->height,
+      event->x, event->y);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
@@ -170,12 +158,17 @@ static int notify_click_button (xitk_widget_t *w, int button, int bUp, int x, in
   button_private_data_t *private_data;
   int                    ret = 0;
     
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    if(button == Button1) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    if (button == Button1) {
       private_data = (button_private_data_t *) w->private_data;
-      private_data->bClicked = !bUp;
+      widget_event_t event;
       
-      paint_button(w);
+      private_data->bClicked = !bUp;
+      event.x = w->x;
+      event.y = w->y;
+      event.width = w->width;
+      event.height = w->height;
+      paint_button (w, &event);
       
       if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
 	if(private_data->callback) {
@@ -209,7 +202,13 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
-    paint_button(w);
+    event->x = w->x;
+    event->y = w->y;
+    event->width = w->width;
+    event->height = w->height;
+    /* fall through */
+  case WIDGET_EVENT_PARTIAL_PAINT:
+    paint_button (w, event);
     break;
   case WIDGET_EVENT_CLICK:
     result->value = notify_click_button(w, event->button, 
@@ -280,7 +279,8 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
   mywidget->height                = private_data->skin->height;
-  mywidget->type                  = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;
+  mywidget->type                  = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE
+                                  | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;

@@ -336,7 +336,7 @@ typedef struct {
  *    1 <focusable>
  *     1 <clickable>
  *      1 <support key events>
- *       0 <reserved, not used yet>
+ *       1 <support for partial repaint>
  *        1111111111111 <group types>         <13 types>
  *                     1111111111111 <widget> <13 types>
 */
@@ -350,6 +350,8 @@ typedef struct {
 #define WIDGET_CLICKABLE            0x10000000
 /* Widget support key events */
 #define WIDGET_KEYABLE              0x08000000
+/* Widget support partial repaint */
+#define WIDGET_PARTIAL_PAINTABLE    0x04000000
 
 /* Grouped widgets */
 #define WIDGET_GROUP_MASK           0x03FFE000
@@ -2374,3 +2376,4 @@ void xitk_cursors_restore_window_cursor(Display *display, Window window);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+
