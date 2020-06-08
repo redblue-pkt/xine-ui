@@ -991,6 +991,11 @@ void xitk_free_color_name(xitk_color_names_t *color);
  * (re)Paint a widget list.
  */
 int xitk_paint_widget_list (xitk_widget_list_t *wl) ;
+typedef struct {
+  int x1, x2, y1, y2;
+} xitk_hull_t;
+/* Behold the master of partial arts ;-) */
+int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull);
 
 /**
  *

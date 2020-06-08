@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1853,36 +1853,37 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
-static void paint_image (xitk_widget_t *w) {
-  image_private_data_t *private_data;
-  xitk_image_t         *skin;
-  GC                    lgc;
-  
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
-    private_data = (image_private_data_t *) w->private_data;
+static void paint_image (xitk_widget_t *w, widget_event_t *event) {
+#ifdef XITK_PAINT_DEBUG
+  printf ("xitk.image.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
+#endif
+  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
+    image_private_data_t *private_data = (image_private_data_t *) w->private_data;
+    xitk_image_t *skin;
+    GC lgc;
 
     skin = private_data->skin;
     
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
+    lgc = XCreateGC (private_data->imlibdata->x.disp, w->wl->win, None, None);
+    XCopyGC (private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     
     if (skin->mask) {
       XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
+      XSetClipOrigin (private_data->imlibdata->x.disp, lgc, w->x, w->y);
+      XSetClipMask (private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
       XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
     }
     
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc, 0, 0,
-	       skin->width, skin->height, w->x, w->y);
-    
+    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc,
+        event->x - w->x, event->y - w->y,
+        event->width, event->height,
+        event->x, event->y);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
   }
-
 }
 
 /*
@@ -1918,7 +1919,13 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
-    paint_image(w);
+    event->x = w->x;
+    event->y = w->y;
+    event->width = w->width;
+    event->height = w->height;
+    /* fall through */
+  case WIDGET_EVENT_PARTIAL_PAINT:
+    paint_image (w, event);
     break;
   case WIDGET_EVENT_INSIDE:
     result->value = notify_inside(w, event->x, event->y);
