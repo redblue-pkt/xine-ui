@@ -206,10 +206,8 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
         xitk_image_free_image(&image);
       }
-      
-      XLOCK (xitk_x_lock_display, tips->display);
-      XMapRaised(tips->display, (xitk_window_get_window(xwin)));
-      XUNLOCK (xitk_x_unlock_display, tips->display);
+
+      xitk_window_show_window(xwin, 1);
 
       ts = _compute_interval(tips->widget->tips_timeout);
 

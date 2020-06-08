@@ -980,8 +980,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     xitk_window_set_background(xwin, bg);
   }
 
-  xitk_set_layer_above((xitk_window_get_window(xwin)));
-  
+  xitk_window_set_layer_above(xwin);
+
   XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
@@ -1016,7 +1016,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
-    xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_MENU);
+    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_MENU);
   else
     /* However, KWin has unacceptable behaviour for WINDOW_TYPE_MENU in  */
     /* our transient-for scheme: The transient-for window must be mapped */
@@ -1024,7 +1024,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     /* the menu itself) must have focus, otherwise it unmaps the menu.   */
     /* This causes menus not to be shown under many several conditions.  */
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
-    xitk_set_wm_window_type(xitk_window_get_window(xwin), WINDOW_TYPE_DOCK);
+    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_DOCK);
   
   XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   XSetInputFocus(private_data->imlibdata->x.disp, 
