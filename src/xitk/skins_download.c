@@ -227,9 +227,9 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
  */
 static void download_set_cursor_state(int state) {
   if(state == WAIT_CURS)
-    xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(skdloader.xwin)), xitk_cursor_watch);
+    xitk_window_define_window_cursor(skdloader.xwin, xitk_cursor_watch);
   else
-    xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(skdloader.xwin)));
+    xitk_window_restore_window_cursor(skdloader.xwin);
 }
 
 static void download_skin_exit(xitk_widget_t *w, void *data) {

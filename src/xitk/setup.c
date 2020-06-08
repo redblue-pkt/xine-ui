@@ -322,9 +322,9 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 static void setup_set_cursor (xui_setup_t *setup, int state) {
   if (setup->running) {
     if(state == WAIT_CURS)
-      xitk_cursors_define_window_cursor (setup->gui->display, (xitk_window_get_window (setup->xwin)), xitk_cursor_watch);
+      xitk_window_define_window_cursor (setup->xwin, xitk_cursor_watch);
     else
-      xitk_cursors_restore_window_cursor (setup->gui->display, (xitk_window_get_window (setup->xwin)));
+      xitk_window_restore_window_cursor (setup->xwin);
   }
 }
 
