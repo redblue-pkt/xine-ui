@@ -1297,12 +1297,6 @@ void gui_handle_event (XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case MappingNotify:
-    gui->x_lock_display (gui->display);
-    XRefreshKeyboardMapping((XMappingEvent *) event);
-    gui->x_unlock_display (gui->display);
-    break;
-
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     /* printf ("ButtonPress\n"); */

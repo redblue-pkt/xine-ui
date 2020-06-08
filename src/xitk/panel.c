@@ -1039,12 +1039,6 @@ static void panel_handle_event(XEvent *event, void *data) {
     gui_handle_event (event, panel->gui);
     break;
 
-  case MappingNotify:
-    panel->gui->x_lock_display (panel->gui->display);
-    XRefreshKeyboardMapping((XMappingEvent *) event);
-    panel->gui->x_unlock_display (panel->gui->display);
-    break;
-
   case MapNotify:
     /* When panel becomes visible by any means,               */
     /* all other hidden GUI windows shall also become visible */
