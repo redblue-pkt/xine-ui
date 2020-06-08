@@ -171,15 +171,10 @@ static void event_sender_handle_event(XEvent *event, void *data) {
 
   case KeyPress:
     {
-      XKeyEvent      mykeyevent;
-      KeySym         key;
+      KeySym         key = XK_VoidSymbol;
       char           kbuf[256];
 
-      mykeyevent = event->xkey;
-      
-      gGui->x_lock_display (gGui->display);
-      XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &key, NULL);
-      gGui->x_unlock_display (gGui->display);
+      xitk_get_keysym_and_buf(event, &key, kbuf, sizeof(kbuf));
 
       switch(key) {
       case XK_Up:
