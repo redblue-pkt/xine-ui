@@ -642,38 +642,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
         xitk_window_show_window(panel->xwin, 0);
     }
 
-    {
-      Window want;
-      int t;
-      video_window_lock (panel->gui->vwin, 1);
-      want = panel->gui->video_window;
-      panel->gui->x_lock_display (panel->gui->video_display);
-      if (panel->gui->cursor_grabbed)
-        XGrabPointer (panel->gui->video_display, want,
-          1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
-      if (video_window_is_visible (panel->gui->vwin)) {
-        /* Give focus to video output window */
-        XSetInputFocus (panel->gui->video_display, want, RevertToParent, CurrentTime);
-        XSync (panel->gui->video_display, False);
-        panel->gui->x_unlock_display (panel->gui->video_display);
-        video_window_lock (panel->gui->vwin, 0);
-        /* check after 5/15/30/50/75/105/140 ms */
-        for (t = 5000; t < 40000; t += 5000) {
-          Window got;
-          int revert;
-          xine_usec_sleep (t);
-          panel->gui->x_lock_display (panel->gui->video_display);
-          XGetInputFocus (panel->gui->video_display, &got, &revert);
-          panel->gui->x_unlock_display (panel->gui->video_display);
-          if (got == want)
-            break;
-        }
-      } else {
-        panel->gui->x_unlock_display (panel->gui->video_display);
-        video_window_lock (panel->gui->vwin, 0);
-      }
-    }
-
+    video_window_grab_input_focus(panel->gui->vwin);
   }
   else {
 
