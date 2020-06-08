@@ -688,9 +688,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     layer_above_video (panel->xwin);
      
     if (panel->gui->cursor_grabbed) {
-      panel->gui->x_lock_display (panel->gui->display);
-      XUngrabPointer (panel->gui->display, CurrentTime);
-      panel->gui->x_unlock_display (panel->gui->display);
+      xitk_ungrab_pointer();
     }
     
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
