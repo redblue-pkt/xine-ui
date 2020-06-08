@@ -859,12 +859,6 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
-  case MappingNotify:
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    break;
-    
   case KeyPress: {
     KeySym         mkey;
     int            modifier;

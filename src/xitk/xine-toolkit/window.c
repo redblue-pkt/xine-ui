@@ -231,12 +231,6 @@ static void _window_handle_event (XEvent *event, void *data) {
         }
       }
       break;
-    
-    case MappingNotify:
-      XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
-      XRefreshKeyboardMapping ((XMappingEvent *) event);
-      XUNLOCK (wd->imlibdata->x.x_unlock_display, wd->imlibdata->x.disp);
-      break;
 
     case KeyPress: {
       XKeyEvent  mykeyevent;

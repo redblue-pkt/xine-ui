@@ -544,13 +544,6 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       }
     }
     break;
-
-  case MappingNotify:
-    gui->x_lock_display (gui->display);
-    XRefreshKeyboardMapping((XMappingEvent *) event);
-    gui->x_unlock_display (gui->display);
-    break;
-    
   }
 }
 
