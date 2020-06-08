@@ -272,7 +272,7 @@ static const char *_xitk_window_dialog_label (const char *label) {
   }
 }
 
-xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, int layer_above,
+xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transient_for, int layer_above,
   int width, const char *title,
   void (*done_cb)(void *userdata, int state), void *userdata,
   const char *button1_label, const char *button2_label, const char *button3_label,
@@ -399,10 +399,10 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, i
     xitk_enable_and_show_widget (wd->checkbox_label);
   }
 
-  if (transient_for != None) {
-    xitk_window_set_parent_window (wd->xwin, transient_for);
+  if (transient_for) {
+    xitk_window_set_parent_window (wd->xwin, transient_for->window);
     XLOCK (im->x.x_lock_display, im->x.disp);
-    XSetTransientForHint (im->x.disp, _xitk_window_get_window (wd->xwin), transient_for);
+    XSetTransientForHint (im->x.disp, _xitk_window_get_window (wd->xwin), transient_for->window);
     XUNLOCK (im->x.x_unlock_display, im->x.disp);
   }
   if (layer_above)

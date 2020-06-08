@@ -471,7 +471,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
 
       xitk_register_key_t key =
       xitk_window_dialog_3 (gui->imlib_data,
-        None,
+        NULL,
         get_layer_above_video (gui), 400, _("Start Playback ?"), _start_anyway_done, gui,
         NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
         "%s%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "", _("\nStart playback anyway ?\n"));

@@ -979,7 +979,7 @@ static void fb_delete_file (xitk_widget_t *w, void *data) {
     
     fb_deactivate(fb);
     fb->dialog = xitk_window_dialog_3 (fb->gui->imlib_data,
-      xitk_window_get_window(fb->xwin),
+      fb->xwin,
       get_layer_above_video (fb->gui), 400, _("Confirm deletion ?"), _fb_delete_file_done, fb,
       NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_DEFAULT, "%s", buf);
   }

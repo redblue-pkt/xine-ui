@@ -2325,7 +2325,7 @@ int xitk_is_window_size(Display *display, Window window, int width, int height);
 #define XITK_LABEL_YES    ((const char *)3)
 #define XITK_LABEL_CANCEL ((const char *)4)
 /* non NULL labels show 1-2-3, default preference is 3-1-2. */
-xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, int layer_above,
+xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transient_for, int layer_above,
   int width, const char *title,
   void (*done_cb)(void *userdata, int state), void *userdata,
   const char *button1_label, const char *button2_label, const char *button3_label,
