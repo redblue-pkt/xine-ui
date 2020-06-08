@@ -1294,18 +1294,6 @@ void gui_handle_event (XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case ButtonPress: {
-    XButtonEvent *bevent = (XButtonEvent *) event;
-    /* printf ("ButtonPress\n"); */
-
-    /* printf ("button: %d\n",bevent->button); */
-
-    if ((bevent->button == 3) && (bevent->window == gui->video_window))
-      panel_toggle_visibility (NULL, gui->panel);
-    
-  }
-  break;
-
   case KeyPress:
     if(gui->stdctl_enable)
       stdctl_keypress(event->xkey);
