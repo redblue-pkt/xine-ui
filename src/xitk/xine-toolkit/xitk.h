@@ -903,6 +903,9 @@ long int xitk_get_last_keypressed_time(void);
 
 void xitk_ungrab_pointer(void);
 
+int xitk_get_display_width(void);
+int xitk_get_display_height(void);
+
 /*
  *
  */

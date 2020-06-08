@@ -292,11 +292,9 @@ static void fb_create_input_window(char *title, char *text,
   int                         height = 102;
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
-  
-  fb->gui->x_lock_display (fb->gui->display);
-  x = (((DisplayWidth (fb->gui->display, fb->gui->screen))) >> 1) - (width >> 1);
-  y = (((DisplayHeight (fb->gui->display, fb->gui->screen))) >> 1) - (height >> 1);
-  fb->gui->x_unlock_display (fb->gui->display);
+
+  x = (xitk_get_display_width()  >> 1) - (width >> 1);
+  y = (xitk_get_display_height() >> 1) - (height >> 1);
 
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
   
@@ -1182,11 +1180,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   if(cbb_close)
     fb->cbb[2].callback = cbb_close->callback;
-  
-  fb->gui->x_lock_display (fb->gui->display);
-  x = (((DisplayWidth (fb->gui->display, fb->gui->screen))) >> 1) - (WINDOW_WIDTH >> 1);
-  y = (((DisplayHeight (fb->gui->display, fb->gui->screen))) >> 1) - (WINDOW_HEIGHT >> 1);
-  fb->gui->x_unlock_display (fb->gui->display);
+
+  x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
+  y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
 
   /* Create window */
   fb->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, 

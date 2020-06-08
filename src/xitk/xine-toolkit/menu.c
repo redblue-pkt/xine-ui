@@ -796,14 +796,10 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
 
   shortcutpos = (wwidth - shortcutlen) - 15;
-  
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-  swidth = DisplayWidth(private_data->imlibdata->x.disp, 
-			(DefaultScreen(private_data->imlibdata->x.disp)));
-  sheight = DisplayHeight(private_data->imlibdata->x.disp, 
-			  (DefaultScreen(private_data->imlibdata->x.disp)));
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-  
+
+  swidth = xitk_get_display_width();
+  sheight = xitk_get_display_height();
+
   if(branch != private_data->mtree->first) {
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
     y -= 1; /* Top item of submenu in line with parent item */
