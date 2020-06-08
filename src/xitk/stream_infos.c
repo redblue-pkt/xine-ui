@@ -834,7 +834,7 @@ void stream_infos_panel(void) {
   xitk_window_set_background(sinfos.xwin, bg);
 
   sinfos.widget_key = xitk_register_event_handler("sinfos", 
-						   (xitk_window_get_window(sinfos.xwin)),
+                                                  sinfos.xwin,
 						   handle_event,
 						   NULL,
 						   NULL,

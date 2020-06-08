@@ -1140,8 +1140,8 @@ void playlist_editor(void) {
   playlist_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
   playlist->widget_key = 
-    xitk_register_event_handler("playlist", 
-                                xitk_window_get_window(playlist->xwin),
+    xitk_register_event_handler("playlist",
+                                playlist->xwin,
 				_playlist_handle_event,
 				NULL,
 				gui_dndcallback,

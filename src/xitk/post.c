@@ -1069,7 +1069,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_window_set_background(pp_wrapper->pplugin->helpwin, bg);
 
     pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
-                                                                       (xitk_window_get_window(pp_wrapper->pplugin->helpwin)),
+                                                                       pp_wrapper->pplugin->helpwin,
 								       (pp_wrapper == &vpp_wrapper) ? _vpplugin_help_handle_event : _applugin_help_handle_event,
                                                                        NULL,
                                                                        NULL,
@@ -1967,7 +1967,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   xitk_window_set_background(pp_wrapper->pplugin->xwin, bg);
 
   pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin" : "applugin", 
-						    (xitk_window_get_window(pp_wrapper->pplugin->xwin)),
+                                                                pp_wrapper->pplugin->xwin,
 						    (pp_wrapper == &vpp_wrapper) ? _vpplugin_handle_event : _applugin_handle_event,
 						    NULL,
 						    NULL,

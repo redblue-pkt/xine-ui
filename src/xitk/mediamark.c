@@ -3456,8 +3456,8 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   xitk_window_set_background(mmkeditor.xwin, bg);
 
-  mmkeditor.widget_key = xitk_register_event_handler("mmkeditor", 
-						      (xitk_window_get_window(mmkeditor.xwin)),
+  mmkeditor.widget_key = xitk_register_event_handler("mmkeditor",
+                                                     mmkeditor.xwin,
 						      mmkeditor_handle_event,
 						      NULL,
 						      NULL,

@@ -2092,7 +2092,7 @@ void gui_run(char **session_opts) {
     stdctl_start();
 
   /*  global event handler */
-  gui->widget_key = xitk_register_event_handler ("NO WINDOW", None,
+  gui->widget_key = xitk_register_event_handler ("NO WINDOW", NULL,
     gui_handle_event, NULL, gui_dndcallback, NULL, gui);
   
 #ifdef HAVE_READLINE

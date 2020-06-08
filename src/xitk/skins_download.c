@@ -708,8 +708,8 @@ void download_skin(char *url) {
     xitk_add_widget (skdloader.widget_list, widget);
     xitk_enable_and_show_widget(widget);
     
-    skdloader.widget_key = xitk_register_event_handler("skdloader", 
-							(xitk_window_get_window(skdloader.xwin)),
+    skdloader.widget_key = xitk_register_event_handler("skdloader",
+                                                       skdloader.xwin,
 							download_skin_handle_event,
 							NULL,
 							NULL,

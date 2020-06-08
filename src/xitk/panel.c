@@ -1574,8 +1574,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
     xitk_hide_widgets(panel->widget_list);
   
   
-  panel->widget_key = xitk_register_event_handler("panel", 
-                                                  xitk_window_get_window(panel->xwin),
+  panel->widget_key = xitk_register_event_handler("panel",
+                                                  panel->xwin,
 						  panel_handle_event,
 						  panel_store_new_position,
 						  gui_dndcallback,

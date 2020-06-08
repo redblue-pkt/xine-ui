@@ -994,7 +994,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
   menu_window->key = xitk_register_event_handler("xitk menu",
-						 (xitk_window_get_window(menu_window->xwin)), 
+                                                 menu_window->xwin,
 						 _menu_handle_xevents,
 						 NULL,
 						 NULL,

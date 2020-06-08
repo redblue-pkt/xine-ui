@@ -493,7 +493,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->gui->x_unlock_display (vwin->gui->video_display);
 
       if (vwin->gui->video_display == vwin->gui->display)
-        vwin->widget_key = xitk_register_event_handler ("video_window",
+        vwin->widget_key = xitk_register_x_event_handler ("video_window",
           vwin->gui->video_window, video_window_handle_event,
           NULL, gui_dndcallback, NULL, vwin);
     
@@ -1127,7 +1127,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   vwin->old_widget_key = vwin->widget_key;
 
   if (vwin->gui->video_display == vwin->gui->display)
-    vwin->widget_key = xitk_register_event_handler ("video_window",
+    vwin->widget_key = xitk_register_x_event_handler ("video_window",
       vwin->gui->video_window, video_window_handle_event, NULL, gui_dndcallback,
       NULL, vwin);
   

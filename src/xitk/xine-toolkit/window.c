@@ -411,7 +411,7 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, Window transient_for, i
 
   {
     xitk_register_key_t key;
-    wd->key = key = xitk_register_event_handler ("xitk_dialog_3", _xitk_window_get_window (wd->xwin),
+    wd->key = key = xitk_register_event_handler ("xitk_dialog_3", wd->xwin,
       _window_handle_event, NULL, NULL, wd->widget_list, wd);
     xitk_register_eh_destructor (key, _xitk_window_dialog_3_destr, wd);
     return key;

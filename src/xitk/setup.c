@@ -1128,7 +1128,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup_show_tips (setup, panel_get_tips_enable (setup->gui->panel), panel_get_tips_timeout (setup->gui->panel));
 
   setup->kreg = xitk_register_event_handler ("setup",
-    xitk_window_get_window (setup->xwin),
+    setup->xwin,
     setup_handle_event, NULL, NULL,
     setup->widget_list, setup);
   setup->dialog = 0;

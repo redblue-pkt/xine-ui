@@ -1140,7 +1140,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 
   private_data->widget_key = 
     xitk_register_event_handler("mrl browser",
-				private_data->window, 
+                                private_data->xwin,
 				mrlbrowser_handle_event,
 				NULL,
 				mb->dndcallback,

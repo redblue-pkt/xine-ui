@@ -479,8 +479,8 @@ void tvset_panel(void) {
 
   xitk_window_set_background(tvset.xwin, bg);
 
-  tvset.widget_key = xitk_register_event_handler("tvset", 
-						  (xitk_window_get_window(tvset.xwin)),
+  tvset.widget_key = xitk_register_event_handler("tvset",
+                                                 tvset.xwin,
 						  tvset_handle_event,
 						  NULL,
 						  NULL,

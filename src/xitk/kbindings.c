@@ -1403,8 +1403,8 @@ void kbedit_window(void) {
 
   kbedit_unset();
   
-  kbedit->kreg = xitk_register_event_handler("kbedit", 
-					     (xitk_window_get_window(kbedit->xwin)),
+  kbedit->kreg = xitk_register_event_handler("kbedit",
+                                             kbedit->xwin,
 					     kbedit_handle_event,
 					     NULL,
 					     NULL,
