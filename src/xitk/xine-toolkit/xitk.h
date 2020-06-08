@@ -2184,6 +2184,7 @@ void xitk_window_destroy_window(xitk_window_t *w);
  *
  */
 void xitk_window_move_window(xitk_window_t *w, int x, int y);
+void xitk_window_resize_window(xitk_window_t *w, int width, int height);
 
 /**
  *

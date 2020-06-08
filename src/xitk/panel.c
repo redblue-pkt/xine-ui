@@ -224,8 +224,8 @@ static void panel_exit (xitk_widget_t *w, void *data) {
  * Change the current skin.
  */
 void panel_change_skins (xui_panel_t *panel, int synthetic) {
-  ImlibImage   *new_img;
-  XSizeHints    hint;
+  xitk_image_t *bg_image;
+  int           new_width;
 
   (void)synthetic;
 
@@ -234,39 +234,19 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_skin_lock (panel->gui->skin_config);
   xitk_hide_widgets(panel->widget_list);
 
-  panel->gui->x_lock_display (panel->gui->display);
-  
-  if (!(new_img = Imlib_load_image (panel->gui->imlib_data,
+  if (!(bg_image = xitk_image_load_image (panel->gui->imlib_data,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
     xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
-  
-  hint.width  = new_img->rgb_width;
-  hint.height = new_img->rgb_height;
-  hint.flags  = PPosition | PSize;
-  XSetWMNormalHints (panel->gui->display, xitk_window_get_window(panel->xwin), &hint);
-  
-  XResizeWindow (panel->gui->display, xitk_window_get_window(panel->xwin),
-		 (unsigned int)new_img->rgb_width,
-		 (unsigned int)new_img->rgb_height);
-  
-  panel->gui->x_unlock_display (panel->gui->display);
+  new_width = bg_image->width;
 
-  while (!xitk_is_window_size (panel->gui->display, xitk_window_get_window(panel->xwin),
-			     new_img->rgb_width, new_img->rgb_height)) {
-    xine_usec_sleep(10000);
-  }
+  xitk_window_resize_window (panel->xwin, bg_image->width, bg_image->height);
+  xitk_window_change_background_with_image(panel->xwin, bg_image,
+                                           bg_image->width, bg_image->height);
+  xitk_image_free_image(&bg_image);
 
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
-
-  panel->gui->x_lock_display (panel->gui->display);
-
-  Imlib_apply_image (panel->gui->imlib_data, new_img, xitk_window_get_window(panel->xwin));
-  Imlib_destroy_image (panel->gui->imlib_data, new_img);
-
-  panel->gui->x_unlock_display (panel->gui->display);
-
 
   if (panel_is_visible (panel))
     raise_window (panel->xwin, 1, 1);
@@ -283,7 +263,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   enable_playback_controls (panel, panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
 
-  event_sender_move(panel->x + hint.width, panel->y);
+  event_sender_move(panel->x + new_width, panel->y);
 }
 
 /*
@@ -1213,7 +1193,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   xitk_label_widget_t       lbl;
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
-  ImlibImage               *bg_image;
+  xitk_image_t             *bg_image;
 
   if (!gui)
     return NULL;
@@ -1236,18 +1216,14 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   panel->skin_on_change = 0;
 
-  panel->gui->x_lock_display (panel->gui->display);
-  
   /*
    * load bg image before opening window, so we can determine it's size
    */
-  if (!(bg_image = Imlib_load_image (panel->gui->imlib_data,
+  if (!(bg_image = xitk_image_load_image (panel->gui->imlib_data,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
     xine_error (panel->gui, _("panel: couldn't find image for background\n"));
     exit(-1);
   }
-
-  panel->gui->x_unlock_display (panel->gui->display);
 
   /*
    * open the panel window
@@ -1269,8 +1245,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_DATA);
 
   panel->xwin = xitk_window_create_simple_window(gui->imlib_data, panel->x, panel->y,
-                                                 bg_image->rgb_width,
-                                                 bg_image->rgb_height);
+                                                 bg_image->width,
+                                                 bg_image->height);
   xitk_window_set_window_title(panel->xwin, title);
   xitk_window_set_window_class(panel->xwin, title, "xine");
   xitk_window_set_window_icon(panel->xwin, gGui->icon);
@@ -1300,10 +1276,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * set background image
    */
 
-  panel->gui->x_lock_display (panel->gui->display);
-  Imlib_apply_image (panel->gui->imlib_data, bg_image, xitk_window_get_window(panel->xwin));
-  Imlib_destroy_image (panel->gui->imlib_data, bg_image);
-  panel->gui->x_unlock_display (panel->gui->display);
+  xitk_window_change_background_with_image(panel->xwin, bg_image,
+                                           bg_image->width, bg_image->height);
+  xitk_image_free_image(&bg_image);
 
   /*
    * Widget-list

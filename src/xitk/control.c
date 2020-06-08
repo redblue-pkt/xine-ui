@@ -296,17 +296,15 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   xitk_label_widget_t        lbl;
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
-  ImlibImage                *bg_image;
+  xitk_image_t              *bg_image;
   int x, y;
 
   XITK_WIDGET_INIT (&br, vctrl->gui->imlib_data);
   XITK_WIDGET_INIT (&lb, vctrl->gui->imlib_data);
   XITK_WIDGET_INIT (&cmb, vctrl->gui->imlib_data);
 
-  vctrl->gui->x_lock_display (vctrl->gui->display);
-  bg_image = Imlib_load_image (vctrl->gui->imlib_data,
+  bg_image = xitk_image_load_image(vctrl->gui->imlib_data,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
-  vctrl->gui->x_unlock_display (vctrl->gui->display);
   if (!bg_image) {
     xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
     exit(-1);
@@ -318,7 +316,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
 
   vctrl->xwin = xitk_window_create_simple_window(vctrl->gui->imlib_data, x + 100, y + 100,
-                                                 bg_image->rgb_width, bg_image->rgb_height);
+                                                 bg_image->width, bg_image->height);
   xitk_window_set_window_title(vctrl->xwin, _(title));
 
   set_window_states_start(vctrl->xwin);
@@ -326,10 +324,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   if (is_layer_above ())
     xitk_window_set_layer_above (vctrl->xwin);
 
-  vctrl->gui->x_lock_display (vctrl->gui->display);
-  Imlib_apply_image (vctrl->gui->imlib_data, bg_image, xitk_window_get_window(vctrl->xwin));
-  Imlib_destroy_image (vctrl->gui->imlib_data, bg_image);
-  vctrl->gui->x_unlock_display (vctrl->gui->display);
+  xitk_window_change_background_with_image(vctrl->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_image_free_image(&bg_image);
 
   /*
    * Widget-list
@@ -640,43 +636,25 @@ void control_toggle_window (xitk_widget_t *w, void *data) {
  * Change the current skin.
  */
 void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
-  ImlibImage   *new_img;
-  XSizeHints    hint;
 
   if (vctrl->status >= 2) {
+    xitk_image_t *bg_image;
 
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
 
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-
-    if (!(new_img = Imlib_load_image (vctrl->gui->imlib_data,
+    if (!(bg_image = xitk_image_load_image (vctrl->gui->imlib_data,
       xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    vctrl->gui->x_unlock_display (vctrl->gui->display);
-    hint.width  = new_img->rgb_width;
-    hint.height = new_img->rgb_height;
-    hint.flags  = PPosition | PSize;
 
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-    XSetWMNormalHints (vctrl->gui->display, xitk_window_get_window(vctrl->xwin), &hint);
-    XResizeWindow (vctrl->gui->display, xitk_window_get_window(vctrl->xwin),
-      (unsigned int)new_img->rgb_width, (unsigned int)new_img->rgb_height);
-    vctrl->gui->x_unlock_display (vctrl->gui->display);
-    
-    while (!xitk_is_window_size (vctrl->gui->display, xitk_window_get_window(vctrl->xwin),
-      new_img->rgb_width, new_img->rgb_height)) {
-      xine_usec_sleep(10000);
-    }
+    xitk_window_resize_window (vctrl->xwin, bg_image->width, bg_image->height);
+    xitk_window_change_background_with_image(vctrl->xwin, bg_image,
+                                             bg_image->width, bg_image->height);
+    xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (vctrl->gui->vwin, vctrl->xwin);
-
-    vctrl->gui->x_lock_display (vctrl->gui->display);
-    Imlib_apply_image (vctrl->gui->imlib_data, new_img, xitk_window_get_window(vctrl->xwin));
-    Imlib_destroy_image (vctrl->gui->imlib_data, new_img);
-    vctrl->gui->x_unlock_display (vctrl->gui->display);
 
     control_raise_window (vctrl);
 
