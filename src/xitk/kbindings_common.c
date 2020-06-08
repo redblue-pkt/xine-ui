@@ -889,7 +889,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 
     xitk_register_key_t key =
     xitk_window_dialog_3 (gui->imlib_data,
-      None,
+      NULL,
       get_layer_above_video (gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
       _("Reset"), _("Editor"), _("Cancel"), NULL, 0, ALIGN_CENTER, "%s", kmsg);
     video_window_set_transient_for(gui->vwin, xitk_get_window(key));

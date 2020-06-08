@@ -274,7 +274,7 @@ static void change_label(xitk_widget_t *w, void *data) {
   //xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "** This program is free software; you can redistribute it and/or modify\n** it under the terms of the GNU General Public License as published by\n** the Free Software Foundation; either version 2 of the License, or\n** (at your option) any later version.");
   // xitk_window_dialog_yesno(test->imlibdata, NULL, NULL, NULL, NULL, ALIGN_LEFT, "Le programme <linux kernel> a provoqué une faute de protection dans le module <unknown> à l'adresse 0x00001234.\nCitroën dump:\nAX:0x00\t\tBX:0x00\nCX:0x00\t\tGS:0x00;-)");
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "**Thisprogramisfreesoftware;youcanredistributeitand/ormodify**itunderthetermsoftheGNUGeneralPublicLicenseaspublishedby**TheFreeSoftwareFoundation;eitherversion2oftheLicense,or**(atyouroption)anylaterversion.");
-  xitk_window_dialog_3 (test->imlibdata, None, 0, 400, XITK_TITLE_ERROR, NULL, NULL,
+  xitk_window_dialog_3 (test->imlibdata, NULL, 0, 400, XITK_TITLE_ERROR, NULL, NULL,
     XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "Stream number %d <%s.mpg> is not valid.\n", nlab, labels[nlab]);
 }
 
@@ -333,7 +333,7 @@ static void intchange_cb (void *data, int btn) {
  */
 static void notify_intbox_change(xitk_widget_t *w, void *data, int value) {
 
-  xitk_window_dialog_3 (test->imlibdata, None, 0, 400, NULL, intchange_cb, NULL,
+  xitk_window_dialog_3 (test->imlibdata, NULL, 0, 400, NULL, intchange_cb, NULL,
     XITK_LABEL_YES, XITK_LABEL_NO, XITK_LABEL_CANCEL, NULL, 0, ALIGN_CENTER,
     "New integer value is: %d. Confirm?", value);
 }
@@ -382,7 +382,7 @@ static void doublechange_cb (void *data, int btn) {
  */
 static void notify_doublebox_change(xitk_widget_t *w, void *data, double value) {
 
-  xitk_window_dialog_3 (test->imlibdata, None, 0, 400, NULL, doublechange_cb, NULL,
+  xitk_window_dialog_3 (test->imlibdata, NULL, 0, 400, NULL, doublechange_cb, NULL,
     XITK_LABEL_YES, XITK_LABEL_NO, XITK_LABEL_CANCEL, NULL, 0, ALIGN_CENTER,
     "New double value is: %e. Confirm?", value);
 }
@@ -696,7 +696,7 @@ static void create_sliders(void) {
 
 static void combo_select(xitk_widget_t *w, void *data, int select) {
 
-  xitk_window_dialog_3 (test->imlibdata, None, 0, 400, NULL, _window_message_done, NULL,
+  xitk_window_dialog_3 (test->imlibdata, NULL, 0, 400, NULL, _window_message_done, NULL,
     NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_DEFAULT,
     "New entries selected in combo box is:\n%s [%d].", test->entries[select], select);
 }
