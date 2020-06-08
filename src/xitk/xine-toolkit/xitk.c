@@ -1686,11 +1686,11 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 
   fx = __fx_from_key (xitk, key);
   if (fx) {
+      Window c;
+      
     int already_locked = __gfx_safe_lock (fx);
 
     if (fx->window != None) {
-      Window c;
-      
       winf->xwin = fx->w;
       
       if(fx->name)
@@ -1720,6 +1720,27 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 
   MUTUNLOCK();
   return 0;
+}
+
+xitk_window_t *xitk_get_window(xitk_register_key_t key) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __gfx_t  *fx;
+  xitk_window_t *w = NULL;
+
+  MUTLOCK();
+
+  fx = __fx_from_key (xitk, key);
+  if (fx) {
+    int already_locked = __gfx_safe_lock (fx);
+
+    w = fx->w;
+
+    if (!already_locked)
+      __gfx_unlock (fx);
+  }
+
+  MUTUNLOCK();
+  return w;
 }
 
 /*

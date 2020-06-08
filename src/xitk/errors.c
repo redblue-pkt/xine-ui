@@ -62,10 +62,12 @@ static void errors_create_window (gGui_t *gui, char *title, char *message) {
     gui->nongui_error_msg (message);
     return;
   }
+  xitk_register_key_t key =
   xitk_window_dialog_3 (gui->imlib_data,
-    (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+    None,
     get_layer_above_video (gui), 400, title, _errors_display_log_3, gui,
     _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", message);
+  video_window_set_transient_for(gui->vwin, xitk_get_window(key));
 }
 
 /*
@@ -91,10 +93,12 @@ void xine_error (gGui_t *gui, const char *message, ...) {
     if (gui->nongui_error_msg) {
       gui->nongui_error_msg (buf);
     } else {
+      xitk_register_key_t key =
       xitk_window_dialog_3 (gui->imlib_data,
-        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        None,
         get_layer_above_video (gui), 400, XITK_TITLE_ERROR, NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
+      video_window_set_transient_for(gui->vwin, xitk_get_window(key));
     }
   }
 
@@ -150,10 +154,12 @@ void xine_info (gGui_t *gui, const char *message, ...) {
     if (gui->nongui_error_msg) {
       gui->nongui_error_msg (buf);
     } else {
+      xitk_register_key_t key =
       xitk_window_dialog_3 (gui->imlib_data,
-        (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+        None,
         get_layer_above_video (gui), 400, XITK_TITLE_INFO, NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
+      video_window_set_transient_for(gui->vwin, xitk_get_window(key));
     }
   }
 
@@ -263,9 +269,11 @@ void too_slow_window (gGui_t *gui) {
 
   if (gui->nongui_error_msg || gui->stdctl_enable)
     return;
-      
+
+  xitk_register_key_t key =
   xitk_window_dialog_3 (gui->imlib_data,
-    (!gui->use_root_window && (gui->video_display == gui->display)) ? gui->video_window : None,
+    None,
     get_layer_above_video (gui), 500, XITK_TITLE_WARN, _too_slow_done, gui,
     _("Done"), _("Learn More..."), NULL, _("Disable this warning."), 0, ALIGN_CENTER, "%s", message);
+  video_window_set_transient_for(gui->vwin, xitk_get_window(key));
 }
