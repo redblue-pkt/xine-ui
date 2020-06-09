@@ -333,7 +333,7 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
       xitk_image_t *skin = wp->skin;
       
       if(skin->mask)
-	return xitk_is_cursor_out_mask(wp->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
+        return xitk_is_cursor_out_mask(w, skin->mask->pixmap, x, y);
     }
     else
       return 0;

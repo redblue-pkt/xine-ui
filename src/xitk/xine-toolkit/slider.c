@@ -258,7 +258,7 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 	skin = private_data->bg_skin;
 
       if(skin->mask)
-	return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
+        return xitk_is_cursor_out_mask(w, skin->mask->pixmap, x, y);
     }
     else
       return 0;
