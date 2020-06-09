@@ -566,8 +566,6 @@ fi
 
 dnl Flags not supported by all *cc* variants
 AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
-AC_TRY_CFLAGS("-fno-strict-aliasing", NO_STRICT_ALIASING="-fno-strict-aliasing")
-AC_SUBST(NO_STRICT_ALIASING)
 
 CFLAGS="$wall -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 AC_SUBST(CFLAGS)

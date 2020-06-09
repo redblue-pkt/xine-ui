@@ -128,7 +128,7 @@ static Window __GetKDEDesktop(Display *display, int screen,
                               Window window, Atom atom,
                               const char *atomname, int depth) {
   char         *name = NULL;
-  Atom         *wintype = NULL;
+  unsigned char *wintype = NULL;
   Window        winreturn = 0;
   unsigned long nitems, bytesafter;
   Atom          actual_type;
@@ -143,8 +143,8 @@ static Window __GetKDEDesktop(Display *display, int screen,
       if ((XGetWindowProperty(display, window, atom, 0, 1,
 			      False, XA_ATOM, &actual_type, &actual_format,
 			      &nitems, &bytesafter, 
-			      (unsigned char **) &wintype)) == Success && wintype) {
-	char *tmpatomname = XGetAtomName(display, *wintype);
+                              &wintype)) == Success && wintype) {
+        char *tmpatomname = XGetAtomName(display, *(Atom *)wintype);
 	
 	if (tmpatomname) {
 	  if ((strcmp(atomname, tmpatomname) == 0) && depth == 2) {
@@ -242,13 +242,13 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
   Window         background = None; /* The return value */
   Window         root = RootWindow(display, screen);
   Window         rootReturn, parentReturn, *children;
-  Window        *toplevel = (Window *) 0;
+  unsigned char *toplevel = NULL;
   unsigned int   nChildren;
   unsigned long  nitems, bytesafter;
   Atom           actual_type;
   int            actual_format;
-  unsigned long *workspace = NULL;
-  unsigned long *desktop = NULL;
+  unsigned char *workspace = NULL;
+  unsigned char *desktop = NULL;
   Atom           NAUTILUS_DESKTOP_WINDOW_ID;
 
   NAUTILUS_DESKTOP_WINDOW_ID = XInternAtom(display, "NAUTILUS_DESKTOP_WINDOW_ID", False);
@@ -258,9 +258,9 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
   if ((XGetWindowProperty(display, root, NAUTILUS_DESKTOP_WINDOW_ID,
 			  0, 1, False, XA_WINDOW, &actual_type, 
 			  &actual_format, &nitems, &bytesafter, 
-			  (unsigned char **) &toplevel) == Success) && toplevel) {
+                          &toplevel) == Success) && toplevel) {
     /* Nautilus is running */
-    background = __GetNautilusDesktop(display, screen, *toplevel, 0);
+    background = __GetNautilusDesktop(display, screen, *(Window *)toplevel, 0);
     XFree((char *) toplevel);
   }
 
@@ -274,27 +274,28 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
     __SWM_VROOT = XInternAtom(display, "__SWM_VROOT", False);
 
     for (i = 0; i < nChildren && (background == None); ++i) {
-      Window *newroot = (Window *) 0;
+      unsigned char *newroot = NULL;
 
       if ((XGetWindowProperty(display, children[i],
 			      __SWM_VROOT, 0, 1, False, XA_WINDOW,
 			      &actual_type, &actual_format, &nitems, &bytesafter, 
-			      (unsigned char **) &newroot) == Success) && newroot) {
+                              &newroot) == Success) && newroot) {
 	/* Found a window with a __SWM_VROOT property that contains
 	 * the window ID of the virtual root. Now we must check
 	 * whether it is KDE (2.1+) or not. If it is KDE then it does
 	 * not reparent the clients. If the root window has the
 	 * _NET_SUPPORTED property but not the _NET_VIRTUAL_ROOTS
 	 * property then we assume it is KDE. */
-	Atom  _NET_SUPPORTED, *tmpatom;
+        Atom  _NET_SUPPORTED;
+        unsigned char *tmpatom = NULL;
 	
 	_NET_SUPPORTED = XInternAtom(display, "_NET_SUPPORTED", False);
 	
 	if ((XGetWindowProperty(display, root,
 				_NET_SUPPORTED, 0, 1, False, XA_ATOM, 
 				&actual_type, &actual_format, &nitems, &bytesafter, 
-				(unsigned char **) &tmpatom) == Success) && tmpatom) {
-	  Window  *tmpwindow = (Window *) 0;
+                                &tmpatom) == Success) && tmpatom) {
+          unsigned char *tmpwindow = NULL;
 	  Atom    _NET_VIRTUAL_ROOTS;
 
 	  _NET_VIRTUAL_ROOTS = XInternAtom(display, "_NET_VIRTUAL_ROOTS", False);
@@ -304,9 +305,9 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 	  if ((XGetWindowProperty(display, root,
 				  _NET_VIRTUAL_ROOTS, 0, 1, False, XA_WINDOW, &actual_type, 
 				  &actual_format, &nitems, &bytesafter,
-				  (unsigned char **) &tmpwindow) != Success) || !tmpwindow) {
+                                  &tmpwindow) != Success) || !tmpwindow) {
 	    /* Must be KDE 2.1+ */
-	    background = *newroot;
+            background = *(Window *)newroot;
 	  }
 	  else if (tmpwindow) {
 	    XFree((char *) tmpwindow);
@@ -315,7 +316,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 
 	if (background == None) {  
 	  /* Not KDE: assume windows are reparented */
-	  background = *clientparent = *newroot;
+          background = *clientparent = *(Window *)newroot;
 	}
 	XFree((char *) newroot);
       }
@@ -337,7 +338,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
     
     if ((XGetWindowProperty(display, root, _WIN_WORKSPACE, 0, 1, False, XA_CARDINAL,
 			    &actual_type, &actual_format, &nitems, &bytesafter,
-			    (unsigned char **) &workspace) == Success) && workspace) {
+                            &workspace) == Success) && workspace) {
       /* Found a _WIN_WORKSPACE property - this is the desktop to look for.
        * For now assume that this is Enlightenment.
        * We're looking for a child of the root window that has an
@@ -351,8 +352,8 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
       if ((XGetWindowProperty(display, root,
 			      ENLIGHTENMENT_DESKTOP, 0, 1, False, XA_CARDINAL,
 			      &actual_type, &actual_format, &nitems, &bytesafter,
-			      (unsigned char **) &desktop) == Success) && 
-	  desktop && (*desktop == *workspace)) {
+                              &desktop) == Success) && 
+          desktop && (*(unsigned long *)desktop == *(unsigned long *)workspace)) {
 	/* The root window is the current Enlightenment desktop */
 	background = root;
 	XFree((char *) desktop);
@@ -366,8 +367,8 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 	  if ((XGetWindowProperty(display, children[i],
 				  ENLIGHTENMENT_DESKTOP, 0, 1, False, XA_CARDINAL,
 				  &actual_type, &actual_format, &nitems, &bytesafter,
-				  (unsigned char **) &desktop) == Success) 
-	      && desktop && *desktop == *workspace) {
+                                  &desktop) == Success)
+	      && desktop && *(unsigned long *)desktop == *(unsigned long *)workspace) {
 	    
 	    /* Found current Enlightenment desktop */
 	    background = *clientparent = children[i];

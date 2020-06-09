@@ -17,7 +17,7 @@ endif
 EXTRA_PROGRAMS = test
 noinst_LIBRARIES = $(xitk_lib)
 
-libxitk_a_CFLAGS = $(AM_CFLAGS) $(NO_STRICT_ALIASING)
+libxitk_a_CFLAGS = $(AM_CFLAGS)
 libxitk_a_SOURCES = \
 	browser.c \
 	button.c \
