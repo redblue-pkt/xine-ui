@@ -281,11 +281,11 @@ static void download_update_blank_preview(void) {
 static void redraw_preview(void) {
   int  x, y;
 
-  x = 15 + ((PREVIEW_WIDTH - skdloader.preview_image->image->width) >> 1);
-  y = 34 + ((PREVIEW_HEIGHT - skdloader.preview_image->image->height) >> 1);
+  x = 15 + ((PREVIEW_WIDTH - skdloader.preview_image->width) >> 1);
+  y = 34 + ((PREVIEW_HEIGHT - skdloader.preview_image->height) >> 1);
 
   xitk_image_draw_image (skdloader.widget_list, skdloader.preview_image,
-                         0, 0, skdloader.preview_image->image->width, skdloader.preview_image->image->height,
+                         0, 0, skdloader.preview_image->width, skdloader.preview_image->height,
                          x, y);
 }
 
