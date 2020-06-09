@@ -2023,7 +2023,66 @@ unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im);
 unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
 
 /**
+ * xitk pixmaps
+ */
+
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth);
+
+xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
+
+xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
+
+void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
+
+/*
  *
+ */
+
+void draw_inner(xitk_pixmap_t *p, int w, int h);
+void draw_inner_light(xitk_pixmap_t *p, int w, int h);
+
+/**
+ *
+ */
+void draw_outter(xitk_pixmap_t *p, int w, int h);
+void draw_outter_light(xitk_pixmap_t *p, int w, int h);
+
+void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color);
+/**
+ *
+ */
+void draw_flat(xitk_pixmap_t *p, int w, int h);
+
+/**
+ *
+ */
+void draw_rectangular_inner_box(xitk_pixmap_t *p, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_rectangular_outter_box(xitk_pixmap_t *p, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_rectangular_inner_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_rectangular_outter_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_inner_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
+                      int x, int y, int w, int h);
+void draw_outter_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
+                       int x, int y, int w, int h);
+
+/**
+ * xitk image
  */
 xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
                                                               const char *fontname,
@@ -2034,14 +2093,6 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
                                                   const char *fontname,
                                                   int width, int align, const char *str);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
-
-xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth);
-
-xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
-
-xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
-
-void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
 
 void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
 
@@ -2084,24 +2135,6 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_inner(xitk_pixmap_t *p, int w, int h);
-void draw_inner_light(xitk_pixmap_t *p, int w, int h);
-
-/**
- *
- */
-void draw_outter(xitk_pixmap_t *p, int w, int h);
-void draw_outter_light(xitk_pixmap_t *p, int w, int h);
-
-void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color);
-/**
- *
- */
-void draw_flat(xitk_pixmap_t *p, int w, int h);
-
-/**
- *
- */
 void draw_arrow_up(ImlibData *im, xitk_image_t *p);
 
 /**
@@ -2119,33 +2152,9 @@ void draw_arrow_left(ImlibData *im, xitk_image_t *p);
  */
 void draw_arrow_right(ImlibData *im, xitk_image_t *p);
 
-/**
+/*
  *
  */
-void draw_rectangular_inner_box(xitk_pixmap_t *p, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_outter_box(xitk_pixmap_t *p, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_inner_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_outter_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_inner_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
-                      int x, int y, int w, int h);
-void draw_outter_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
-                       int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);
 
@@ -2213,15 +2222,10 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w);
 
 
 /**
- *
+ * Return copy of current background pixmap
+ *  - caller must free pixmap (or use xitk_window_set_background)
  */
-Pixmap xitk_window_get_background(xitk_window_t *w);
 xitk_pixmap_t *xitk_window_get_background_pixmap(xitk_window_t *w);
-
-/**
- *
- */
-Pixmap xitk_window_get_background_mask(xitk_window_t *w);
 
 /**
  *

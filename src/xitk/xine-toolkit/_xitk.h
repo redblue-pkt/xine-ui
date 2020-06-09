@@ -345,6 +345,10 @@ struct xitk_dialog_s {
   xitk_widget_t          *default_button;
 };
 
+Pixmap xitk_window_get_background(xitk_window_t *w);
+Pixmap xitk_window_get_background_mask(xitk_window_t *w);
+
+
 void xitk_register_eh_destructor (xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
 
