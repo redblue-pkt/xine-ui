@@ -762,8 +762,8 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
       wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
       
       if(wimage) {
-        draw_bevel_three_state(wl->imlibdata, wimage);
-        draw_arrow_down(wl->imlibdata, wimage);
+        draw_bevel_three_state(wimage);
+        draw_arrow_down(wimage);
       }
       
     }

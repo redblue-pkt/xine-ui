@@ -357,12 +357,12 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
     
     if(wimage)
-      draw_button_plus(wl->imlibdata, wimage);
+      draw_button_plus(wimage);
 
     wimage = xitk_get_widget_foreground_skin(private_data->less_widget);
     
     if(wimage)
-      draw_button_minus(wl->imlibdata, wimage);
+      draw_button_minus(wimage);
 
   }
 

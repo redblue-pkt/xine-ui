@@ -1228,7 +1228,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 
       wimage = xitk_get_widget_foreground_skin(private_data->item_tree[i]);
       if(wimage)
-        draw_flat_three_state(wl->imlibdata, wimage);
+        draw_flat_three_state(wimage);
 
       (void) xitk_set_widget_pos(private_data->item_tree[i], ix, iy);
       
@@ -1249,7 +1249,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBUP]);
     
     if(wimage)
-      draw_arrow_up(wl->imlibdata, wimage);
+      draw_arrow_up(wimage);
 
   }
 
@@ -1280,7 +1280,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBDN]);
     
     if(wimage)
-      draw_arrow_down(wl->imlibdata, wimage);
+      draw_arrow_down(wimage);
 
   }
   
@@ -1296,7 +1296,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBLF]);
     
     if(wimage)
-      draw_arrow_left(wl->imlibdata, wimage);
+      draw_arrow_left(wimage);
 
   }
 
@@ -1327,7 +1327,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBRT]);
     
     if(wimage)
-      draw_arrow_right(wl->imlibdata, wimage);
+      draw_arrow_right(wimage);
 
   }
 

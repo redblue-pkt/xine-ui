@@ -1400,7 +1400,7 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(it);
   i = xitk_image_create_image(wl->imlibdata, width * 2, height);
-  draw_bevel_two_state(wl->imlibdata, i);
+  draw_bevel_two_state(i);
   
   return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 0, 0);
 }

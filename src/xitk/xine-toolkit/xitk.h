@@ -1411,8 +1411,7 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
 /**
  *
  */
-void xitk_image_change_image(ImlibData *im, 
-			     xitk_image_t *src, xitk_image_t *dest, int width, int height);
+void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, int height);
 
 /*
  * *** Checkbox
@@ -2088,69 +2087,69 @@ void xitk_image_free_image(xitk_image_t **src);
 /**
  *
  */
-void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest);
+void xitk_image_add_mask(xitk_image_t *dest);
 
 /**
  *
  */
-Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
+//Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
 
 /**
  *
  */
-void draw_flat_three_state(ImlibData *im, xitk_image_t *p);
+void draw_flat_three_state(xitk_image_t *p);
 
 /**
  *
  */
-void draw_bevel_three_state(ImlibData *im, xitk_image_t *p);
+void draw_bevel_three_state(xitk_image_t *p);
 
 /**
  *
  */
-void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
+void draw_bevel_two_state(xitk_image_t *p);
 
-void draw_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked);
-void draw_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked);
+void draw_three_state_round_style(xitk_image_t *p, int x, int y, int d, int w, int checked);
+void draw_three_state_check_style(xitk_image_t *p, int x, int y, int d, int w, int checked);
 
 
-void draw_paddle_three_state_vertical(ImlibData *im, xitk_image_t *p);
-void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
-
-/**
- *
- */
-void draw_arrow_up(ImlibData *im, xitk_image_t *p);
+void draw_paddle_three_state_vertical(xitk_image_t *p);
+void draw_paddle_three_state_horizontal(xitk_image_t *p);
 
 /**
  *
  */
-void draw_arrow_down(ImlibData *im, xitk_image_t *p);
+void draw_arrow_up(xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_arrow_down(xitk_image_t *p);
 
 /*
  * Draw and arrow (direction is LEFT).
  */
-void draw_arrow_left(ImlibData *im, xitk_image_t *p);
+void draw_arrow_left(xitk_image_t *p);
 
 /*
  * Draw and arrow (direction is RIGHT).
  */
-void draw_arrow_right(ImlibData *im, xitk_image_t *p);
+void draw_arrow_right(xitk_image_t *p);
 
 /*
  *
  */
 
-void draw_tab(ImlibData *im, xitk_image_t *p);
+void draw_tab(xitk_image_t *p);
 
-void draw_paddle_rotate(ImlibData *im, xitk_image_t *p);
-void draw_rotate_button(ImlibData *im, xitk_image_t *p);
+void draw_paddle_rotate(xitk_image_t *p);
+void draw_rotate_button(xitk_image_t *p);
 
-void draw_button_plus(ImlibData *im, xitk_image_t *p);
-void draw_button_minus(ImlibData *im, xitk_image_t *p);
+void draw_button_plus(xitk_image_t *p);
+void draw_button_minus(xitk_image_t *p);
 
-void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked);
-void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p);
+void menu_draw_check(xitk_image_t *p, int checked);
+void menu_draw_arrow_branch(xitk_image_t *p);
 
 /*
  * Windows

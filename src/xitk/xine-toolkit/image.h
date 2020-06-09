@@ -47,4 +47,4 @@ typedef struct {
 
 #endif
 
-void draw_checkbox_check(ImlibData *im, xitk_image_t *p);
+void draw_checkbox_check(xitk_image_t *p);

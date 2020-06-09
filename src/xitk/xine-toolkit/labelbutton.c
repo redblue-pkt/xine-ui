@@ -848,7 +848,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.pixmap_name       = (char *)"\x01";
   info.pixmap_img        = xitk_image_create_image (wl->imlibdata, width * 3, height);
   if (info.pixmap_img)
-    draw_bevel_three_state (wl->imlibdata, info.pixmap_img);
+    draw_bevel_three_state (info.pixmap_img);
 
   return xitk_info_labelbutton_create (wl, b, &info);
 }
