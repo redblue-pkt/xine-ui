@@ -2022,6 +2022,14 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
  *
  */
 
+void pixmap_draw_line(xitk_pixmap_t *p, int x0, int y0, int x1, int y1, unsigned color);
+void pixmap_fill_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned color);
+void pixmap_fill_polygon(xitk_pixmap_t *p, XPoint *points, int npoints, unsigned color);
+
+/*
+ *
+ */
+
 void draw_inner(xitk_pixmap_t *p, int w, int h);
 void draw_inner_light(xitk_pixmap_t *p, int w, int h);
 

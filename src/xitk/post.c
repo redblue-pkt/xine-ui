@@ -1285,13 +1285,9 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
 
   image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
-  gui->x_lock_display (gui->display);
-  XSetForeground(gui->display, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
-		 xitk_get_pixel_color_gray(gui->imlib_data));
-  XFillRectangle(gui->display, image->image->pixmap,
-		 (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->widget_list)),
-		 0, 0, image->width, image->height);
-  gui->x_unlock_display (gui->display);
+  pixmap_fill_rectangle(image->image,
+                        0, 0, image->width, image->height,
+                        xitk_get_pixel_color_gray(gui->imlib_data));
 
   /* Some decorations */
   draw_outter_frame(image->image, NULL, NULL,

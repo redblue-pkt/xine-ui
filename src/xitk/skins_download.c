@@ -268,33 +268,24 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
 
 static void download_update_blank_preview(void) {
 
-  gGui->x_lock_display (gGui->display);
-  XSetForeground(gGui->display,(XITK_WIDGET_LIST_GC(skdloader.widget_list)),
-		 (xitk_get_pixel_color_from_rgb(gGui->imlib_data, 52, 52, 52)));
-  XFillRectangle(gGui->display, 
-		 (XITK_WIDGET_LIST_WINDOW(skdloader.widget_list)),
-		 (XITK_WIDGET_LIST_GC(skdloader.widget_list)), 15, 34, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-  gGui->x_unlock_display (gGui->display);
-
+  xitk_image_t *p = xitk_image_create_image(gGui->imlib_data, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+  pixmap_fill_rectangle(p->image, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
+                        xitk_get_pixel_color_from_rgb(gGui->imlib_data, 52, 52, 52));
+  xitk_image_draw_image (skdloader.widget_list, p,
+                         0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34);
+  xitk_image_free_image (&p);
 }
 
-static void redraw_preview(void) {
-  int  x, y;
-
-  x = 15 + ((PREVIEW_WIDTH - skdloader.preview_image->width) >> 1);
-  y = 34 + ((PREVIEW_HEIGHT - skdloader.preview_image->height) >> 1);
-
-  xitk_image_draw_image (skdloader.widget_list, skdloader.preview_image,
-                         0, 0, skdloader.preview_image->width, skdloader.preview_image->height,
-                         x, y);
-}
-
-static void download_update_preview(void) {
+static void download_update_preview(xitk_image_t *p) {
 
   download_update_blank_preview();
 
-  if(skdloader.preview_image && skdloader.preview_image->image && skdloader.preview_image->image->pixmap)
-    redraw_preview();
+  if (p && p->image) {
+    xitk_image_draw_image (skdloader.widget_list, p,
+                           0, 0, p->width, p->height,
+                           15 + ((PREVIEW_WIDTH - p->width) >> 1),
+                           34 + ((PREVIEW_HEIGHT - p->height) >> 1));
+  }
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
@@ -382,7 +373,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 	if(oimg)
           xitk_image_free_image (&oimg);
 
-	download_update_preview();
+	download_update_preview(skdloader.preview_image);
       }
 
       unlink(tmpfile);
@@ -542,7 +533,7 @@ static void download_skin_handle_event(XEvent *event, void *data) {
 
   case Expose:
     if(event->xexpose.count == 0)
-      download_update_preview();
+      download_update_preview(skdloader.preview_image);
     break;
 
   case KeyPress:
