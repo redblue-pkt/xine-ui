@@ -1369,20 +1369,23 @@ xitk_widget_list_t *xitk_widget_list_new (void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   xitk_widget_list_t *l;
 
-  l = (xitk_widget_list_t *) xitk_xmalloc(sizeof(xitk_widget_list_t));
+  l = (xitk_widget_list_t *)xitk_xmalloc (sizeof (xitk_widget_list_t));
+  if (!l)
+    return NULL;
 
+  l->xitk               = &xitk->x;
+  xitk_dlist_init (&l->list);
+  l->win                = None;
+  l->gc                 = NULL;
+  l->origin_gc          = NULL;
+  l->temp_gc            = NULL;
   l->widget_focused     = NULL;
   l->widget_under_mouse = NULL;
   l->widget_pressed     = NULL;
-
-  xitk_dlist_init (&l->list);
-
-  l->xitk = &xitk->x;
+  l->destroy            = 0;
 
   MUTLOCK();
-
   xitk_dlist_add_tail (&xitk->wlists, &l->node);
-
   MUTUNLOCK();
 
 #ifdef XITK_DEBUG
@@ -1403,7 +1406,7 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
   }
 }
 
-void _xitk_reset_hull (xitk_hull_t *hull) {
+static void _xitk_reset_hull (xitk_hull_t *hull) {
   hull->x1 = 0x7fffffff;
   hull->x2 = 0;
   hull->y1 = 0x7fffffff;
@@ -1586,6 +1589,12 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   }
 
   if (fx->widget_list && fx->widget_list->destroy) {
+    if (fx->widget_list->temp_gc) {
+      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      XFreeGC (xitk->x.display, fx->widget_list->temp_gc);
+      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      fx->widget_list->temp_gc = NULL;
+    }
     xitk_dnode_remove (&fx->widget_list->node);
     xitk_dlist_clear (&fx->widget_list->list);
     free(fx->widget_list);

@@ -1804,9 +1804,8 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   return i;
 } 
 
-void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *img,
-                           int src_x, int src_y, int width, int height, int dst_x, int dst_y) {
-
+void xitk_image_draw_image (xitk_widget_list_t *wl, xitk_image_t *img,
+  int src_x, int src_y, int width, int height, int dst_x, int dst_y) {
   ImlibData *im;
   GC lgc;
 
@@ -1815,22 +1814,43 @@ void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *img,
 
   im = img->image->imlibdata;
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  lgc = XCreateGC(im->x.disp, wl->win, None, None);
-  if (wl)
-    XCopyGC(im->x.disp, wl->gc, (1 << GCLastBit) - 1, lgc);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-
-  if (img->mask && img->mask->pixmap) {
+  if (wl) {
+    if (wl->temp_gc && (wl->origin_gc == wl->gc)) {
+      lgc = wl->temp_gc;
+    } else {
+      XLOCK (im->x.x_lock_display, im->x.disp);
+      if (wl->temp_gc)
+        XFreeGC (im->x.disp, wl->temp_gc);
+      wl->temp_gc = lgc = XCreateGC (im->x.disp, wl->win, None, None);
+      if (!wl->temp_gc) {
+        XUNLOCK (im->x.x_unlock_display, im->x.disp);
+        return;
+      }
+      wl->origin_gc = wl->gc;
+      XCopyGC (im->x.disp, wl->gc, (1 << GCLastBit) - 1, lgc);
+      XUNLOCK (im->x.x_unlock_display, im->x.disp);
+    }
+  } else {
     XLOCK (im->x.x_lock_display, im->x.disp);
-    XSetClipOrigin(im->x.disp, lgc, dst_x, dst_y);
-    XSetClipMask(im->x.disp, lgc, img->mask->pixmap);
+    lgc = XCreateGC (im->x.disp, wl->win, None, None);
     XUNLOCK (im->x.x_unlock_display, im->x.disp);
+    if (!lgc)
+      return;
   }
 
   XLOCK (im->x.x_lock_display, im->x.disp);
-  XCopyArea (im->x.disp, img->image->pixmap, wl->win, lgc, src_x, src_y, width, height, dst_x, dst_y);
-  XFreeGC(im->x.disp, lgc);
+  if (img->mask && img->mask->pixmap) {
+    /* NOTE: clip origin always refers to the full source image,
+     * even with partial draws. */
+    XSetClipOrigin (im->x.disp, lgc, dst_x - src_x, dst_y - src_y);
+    XSetClipMask (im->x.disp, lgc, img->mask->pixmap);
+    XCopyArea (im->x.disp, img->image->pixmap, wl->win, lgc, src_x, src_y, width, height, dst_x, dst_y);
+    XSetClipMask (im->x.disp, lgc, None);
+  } else {
+    XCopyArea (im->x.disp, img->image->pixmap, wl->win, lgc, src_x, src_y, width, height, dst_x, dst_y);
+  }
+  if (!wl)
+    XFreeGC (im->x.disp, lgc);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 

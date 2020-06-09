@@ -122,7 +122,7 @@ struct xitk_widget_list_s {
   xitk_widget_t              *widget_pressed;
 
   Window                      win;
-  GC                          gc;
+  GC                          gc, origin_gc, temp_gc;
   int                         destroy;
 };
 
