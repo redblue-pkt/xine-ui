@@ -407,7 +407,7 @@ void event_sender_panel(void) {
 
   eventer->widget_list = xitk_window_widget_list(eventer->xwin);
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
 
   lb.button_type       = CLICK_BUTTON;
   lb.align             = ALIGN_CENTER;

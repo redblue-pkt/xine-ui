@@ -345,7 +345,7 @@ static void create_intbox(void) {
   int x = 150, y = 300;
   xitk_intbox_widget_t ib;
 
-  XITK_WIDGET_INIT(&ib, test->imlibdata);
+  XITK_WIDGET_INIT(&ib);
 
   ib.skin_element_name = NULL;
   ib.value             = test->oldintvalue = 10;
@@ -394,7 +394,7 @@ static void create_doublebox(void) {
   int x = 150, y = 330;
   xitk_doublebox_widget_t ib;
 
-  XITK_WIDGET_INIT(&ib, test->imlibdata);
+  XITK_WIDGET_INIT(&ib);
 
   ib.skin_element_name = NULL;
   ib.value             = test->olddoublevalue = 1.500;
@@ -422,7 +422,7 @@ static void create_checkbox(void) {
   int x = 250, y = 300;
   xitk_checkbox_widget_t cb;
 
-  XITK_WIDGET_INIT(&cb, test->imlibdata);
+  XITK_WIDGET_INIT(&cb);
 
   cb.skin_element_name = NULL;
   cb.callback          = checkbox_cb;
@@ -448,7 +448,7 @@ static void create_tabs(void) {
     "Jumpin'", "Jack", "Flash", "It's", "Gas", "Gas", "Gas", ",", "Tabarnak"
   };
 
-  XITK_WIDGET_INIT(&t, test->imlibdata);
+  XITK_WIDGET_INIT(&t);
 
   xitk_window_get_window_size(test->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(test->imlibdata, width, height);
@@ -500,7 +500,7 @@ static void create_inputtext(void) {
   xitk_inputtext_widget_t  inp;
   char                    *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
-  XITK_WIDGET_INIT(&inp, test->imlibdata);
+  XITK_WIDGET_INIT(&inp);
 
   inp.skin_element_name = NULL;
   inp.text              = NULL;
@@ -528,7 +528,7 @@ static void create_label(void) {
   int                   lbear, rbear, wid, asc, des;
   char                 *label = "A Label";
 
-  XITK_WIDGET_INIT(&lbl, test->imlibdata);
+  XITK_WIDGET_INIT(&lbl);
 
   fs = xitk_font_load_font(test->display, fontname);
   xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
@@ -565,7 +565,7 @@ static void create_button(void) {
   xitk_button_widget_t b;
   int                  width = 130, height = 40, x = 150, y = 60;
 
-  XITK_WIDGET_INIT(&b, test->imlibdata);
+  XITK_WIDGET_INIT(&b);
 
   b.skin_element_name = NULL;
   b.callback          = change_label;
@@ -639,7 +639,7 @@ static void create_button(void) {
 static void create_sliders(void) {
   xitk_slider_widget_t sl;
 
-  XITK_WIDGET_INIT(&sl, test->imlibdata);
+  XITK_WIDGET_INIT(&sl);
 
   sl.min                      = -1000;
   sl.max                      = 1000;
@@ -710,7 +710,7 @@ static void create_combo(void) {
   int                    x = 150, y = 36, width = 100, height;
   xitk_font_t           *fs;
 
-  XITK_WIDGET_INIT(&cmb, test->imlibdata);
+  XITK_WIDGET_INIT(&cmb);
   /*
   xitk_window_get_window_size(test->xwin, &wwidth, &wheight);
   bg = xitk_image_create_pixmap(test->imlibdata, wwidth, wheight);
@@ -752,7 +752,7 @@ static void create_browser(void) {
   Pixmap                 bg;
   int                    width, height;
 
-  XITK_WIDGET_INIT(&browser, test->imlibdata);
+  XITK_WIDGET_INIT(&browser);
 
   xitk_window_get_window_size(test->xwin, &width, &height);
   bg = xitk_image_create_pixmap(test->imlibdata, width, height);
@@ -865,7 +865,7 @@ static void create_menu(void) {
     { NULL,                              NULL,     NULL,            NULL,     NULL }
   };
   
-  XITK_WIDGET_INIT(&menu, test->imlibdata);
+  XITK_WIDGET_INIT(&menu);
 
   (void) xitk_get_mouse_coords(test->display, 
 			       (xitk_window_get_window(test->xwin)), NULL, NULL, &x, &y);
@@ -941,12 +941,12 @@ int main(int argc, char **argv) {
   gc = XCreateGC(test->display, 
 		 (xitk_window_get_window(test->xwin)), None, None);
 
-  test->widget_list  = xitk_widget_list_new();
+  test->widget_list  = xitk_widget_list_new(test->imlibdata);
   xitk_widget_list_set(test->widget_list, 
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(test->xwin)));
   xitk_widget_list_set(test->widget_list, WIDGET_LIST_GC, gc);
   
-  XITK_WIDGET_INIT(&lb, test->imlibdata);
+  XITK_WIDGET_INIT(&lb);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = "Quit";

@@ -724,7 +724,10 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info) {
   xitk_widget_t           *mywidget;
   lbutton_private_data_t *private_data;
-  
+
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   if (!mywidget)
     return NULL;
@@ -734,7 +737,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
     return NULL;
   }
 
-  private_data->imlibdata         = b->imlibdata;
+  private_data->imlibdata         = wl->imlibdata;
 
   private_data->bWidget           = mywidget;
   private_data->bType             = b->button_type;
@@ -780,7 +783,6 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = info->visibility;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = info->x;
   mywidget->y                     = info->y;
   mywidget->width                 = private_data->skin->width/3;
@@ -827,7 +829,10 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, int x, int y, int width, int height,
   const char *ncolor, const char *fcolor, const char *ccolor, const char *fname) {
   xitk_skin_element_info_t info;
-  
+
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(b);
   info.x                 = x;
   info.y                 = y;
@@ -841,9 +846,9 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.label_color_click = (char *)ccolor;
   info.label_fontname    = (char *)fname;
   info.pixmap_name       = (char *)"\x01";
-  info.pixmap_img        = xitk_image_create_image (b->imlibdata, width * 3, height);
+  info.pixmap_img        = xitk_image_create_image (wl->imlibdata, width * 3, height);
   if (info.pixmap_img)
-    draw_bevel_three_state (b->imlibdata, info.pixmap_img);
+    draw_bevel_three_state (wl->imlibdata, info.pixmap_img);
 
   return xitk_info_labelbutton_create (wl, b, &info);
 }

@@ -1618,7 +1618,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   pthread_mutex_init (&vwin->mutex, NULL);
 
   if (vwin->gui->video_display == vwin->gui->display) {
-    vwin->wl = xitk_widget_list_new ();
+    vwin->wl = xitk_widget_list_new (vwin->gui->imlib_data);
   }
 
   vwin->video_window       = None;

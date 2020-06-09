@@ -1309,12 +1309,15 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   xitk_widget_t             *mywidget;
   inputtext_private_data_t  *wp;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   (void)skonfig;
   mywidget              = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   
   wp                    = (inputtext_private_data_t *) xitk_xmalloc(sizeof(inputtext_private_data_t));
   
-  wp->imlibdata         = it->imlibdata;
+  wp->imlibdata         = wl->imlibdata;
   wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(it->skin_element_name);
 
   wp->iWidget           = mywidget;
@@ -1352,7 +1355,6 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->imlibdata             = wp->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = wp->skin->width/2;
@@ -1393,9 +1395,12 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
                                              const char *ncolor, const char *fcolor, const char *fontname) {
   xitk_image_t *i;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(it);
-  i = xitk_image_create_image(it->imlibdata, width * 2, height);
-  draw_bevel_two_state(it->imlibdata, i);
+  i = xitk_image_create_image(wl->imlibdata, width * 2, height);
+  draw_bevel_two_state(wl->imlibdata, i);
   
   return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 0, 0);
 }

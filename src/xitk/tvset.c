@@ -298,9 +298,9 @@ void tvset_panel(void) {
 
   tvset.widget_list = xitk_window_widget_list(tvset.xwin);
 
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&cb);
 
   bg = xitk_window_get_background_pixmap(tvset.xwin);
 
@@ -317,7 +317,7 @@ void tvset_panel(void) {
   w = 139;
   draw_inner_frame(bg, _("Input: "), lfontname,
 		   x, y, w, (20 + 22));
-  XITK_WIDGET_INIT(&ib, gGui->imlib_data);
+  XITK_WIDGET_INIT(&ib);
   ib.skin_element_name = NULL;
   ib.value             = 4;
   ib.step              = 1;
@@ -343,7 +343,7 @@ void tvset_panel(void) {
   draw_inner_frame(bg, _("Broadcast System: "), lfontname,
 		   x, y, w, (20 + 22));
 
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = tvset.widget_list;
@@ -365,7 +365,7 @@ void tvset_panel(void) {
   draw_inner_frame(bg, _("Channel: "), lfontname,
 		   x, y, w, (20 + 22));
 
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = tvset.widget_list;
@@ -391,7 +391,7 @@ void tvset_panel(void) {
   draw_inner_frame(bg, _("Frame Rate: "), lfontname,
 		   x, y, w, (20 + 22));
 
-  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&inp);
   inp.skin_element_name = NULL;
   inp.text              = NULL;
   inp.max_length        = 20;
@@ -414,7 +414,7 @@ void tvset_panel(void) {
   draw_inner_frame(bg, _("Analog Standard: "), lfontname,
 		   x, y, w, (20 + 22));
 
-  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = tvset.widget_list;

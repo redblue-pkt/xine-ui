@@ -994,14 +994,17 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   xitk_labelbutton_widget_t      lb;
   xitk_slider_widget_t           sl;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(br);
 
-  XITK_WIDGET_INIT(&b, br->imlibdata);
-  XITK_WIDGET_INIT(&lb, br->imlibdata);
-  XITK_WIDGET_INIT(&sl, br->imlibdata);
+  XITK_WIDGET_INIT(&b);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&sl);
 
   private_data->bWidget              = mywidget;
-  private_data->imlibdata            = br->imlibdata;
+  private_data->imlibdata            = wl->imlibdata;
   private_data->skin_element_name    = (skin_element_name == NULL) ? NULL : strdup(br->browser.skin_element_name);
   private_data->jumped               = -1;
   private_data->content              = (char **)br->browser.entries;
@@ -1036,8 +1039,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   mywidget->running                    = 1;
   mywidget->visible                    = visible;
   mywidget->have_focus                 = FOCUS_LOST;
-  
-  mywidget->imlibdata                  = private_data->imlibdata;
+
   mywidget->x                          = x;
   mywidget->y                          = y;
   mywidget->width                      = width;
@@ -1061,11 +1063,14 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   xitk_labelbutton_widget_t      lb;
   xitk_slider_widget_t           sl;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(br);
 
-  XITK_WIDGET_INIT(&b, br->imlibdata);
-  XITK_WIDGET_INIT(&lb, br->imlibdata);
-  XITK_WIDGET_INIT(&sl, br->imlibdata);
+  XITK_WIDGET_INIT(&b);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&sl);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
@@ -1187,10 +1192,13 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
   xitk_slider_widget_t        sl;
   int                         btnh = (itemh - (itemh /2)) < slidw ? slidw : (itemh - (itemh /2));
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(br);
-  XITK_WIDGET_INIT(&b, br->imlibdata);
-  XITK_WIDGET_INIT(&lb, br->imlibdata);
-  XITK_WIDGET_INIT(&sl, br->imlibdata);
+  XITK_WIDGET_INIT(&b);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&sl);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
@@ -1220,7 +1228,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 
       wimage = xitk_get_widget_foreground_skin(private_data->item_tree[i]);
       if(wimage)
-	draw_flat_three_state(br->imlibdata, wimage);				
+        draw_flat_three_state(wl->imlibdata, wimage);
 
       (void) xitk_set_widget_pos(private_data->item_tree[i], ix, iy);
       
@@ -1241,7 +1249,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBUP]);
     
     if(wimage)
-      draw_arrow_up(b.imlibdata, wimage);
+      draw_arrow_up(wl->imlibdata, wimage);
 
   }
 
@@ -1272,7 +1280,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBDN]);
     
     if(wimage)
-      draw_arrow_down(b.imlibdata, wimage);
+      draw_arrow_down(wl->imlibdata, wimage);
 
   }
   
@@ -1288,7 +1296,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBLF]);
     
     if(wimage)
-      draw_arrow_left(b.imlibdata, wimage);
+      draw_arrow_left(wl->imlibdata, wimage);
 
   }
 
@@ -1319,7 +1327,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBRT]);
     
     if(wimage)
-      draw_arrow_right(b.imlibdata, wimage);
+      draw_arrow_right(wl->imlibdata, wimage);
 
   }
 

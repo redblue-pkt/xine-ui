@@ -272,7 +272,7 @@ static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
 					  doublebox_private_data_t *private_data,
 					  int visible, int enable) {
   
-  private_data->imlibdata                = ib->imlibdata;
+  private_data->imlibdata                = wl->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   private_data->parent_wlist             = ib->parent_wlist;
   private_data->callback                 = ib->callback;
@@ -289,8 +289,6 @@ static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
   mywidget->running                      = 1;
   mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
-  
-  mywidget->imlibdata                    = private_data->imlibdata;
 
   mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_DOUBLEBOX;
   mywidget->event                        = notify_event;
@@ -312,12 +310,15 @@ xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
   xitk_button_widget_t        b;
   xitk_inputtext_widget_t     inp;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(ib);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
-  XITK_WIDGET_INIT(&b, ib->imlibdata);
-  XITK_WIDGET_INIT(&inp, ib->imlibdata);
+  XITK_WIDGET_INIT(&b);
+  XITK_WIDGET_INIT(&inp);
 
   private_data = (doublebox_private_data_t *) xitk_xmalloc(sizeof(doublebox_private_data_t));
   
@@ -359,12 +360,12 @@ xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
     wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
     
     if(wimage)
-      draw_button_plus(ib->imlibdata, wimage);
+      draw_button_plus(wl->imlibdata, wimage);
 
     wimage = xitk_get_widget_foreground_skin(private_data->less_widget);
     
     if(wimage)
-      draw_button_minus(ib->imlibdata, wimage);
+      draw_button_minus(wl->imlibdata, wimage);
 
   }
 

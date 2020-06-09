@@ -157,8 +157,7 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 
 #define XITK_CHECK_CONSTITENCY(X)                                                \
   do {                                                                           \
-    if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC)                        \
-       || ((X)->imlibdata == NULL))                                              \
+    if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC))                       \
       XITK_DIE("%s(%d): widget consistency failed.!\n", __FUNCTION__, __LINE__); \
   } while(0)
 
@@ -215,7 +214,7 @@ extern int xitk_x_error;
 
 #ifndef _XITK_C_
 
-xitk_widget_list_t *xitk_widget_list_new (void);
+xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata);
 xitk_register_key_t xitk_register_event_handler(const char *name,
                                                 xitk_window_t *w,
                                                 //Window window,

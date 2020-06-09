@@ -309,8 +309,8 @@ static void fb_create_input_window(char *title, char *text,
 
   fne->widget_list                = xitk_window_widget_list(fne->xwin);
 
-  XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&inp, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&inp);
 
   x = 15;
   y = 30;
@@ -1222,13 +1222,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   fb->widget_list = xitk_window_widget_list(fb->xwin);
 
-  XITK_WIDGET_INIT(&lb, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&cb, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&br, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&inp, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&cmb, fb->gui->imlib_data);
-  XITK_WIDGET_INIT(&b, fb->gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT(&br);
+  XITK_WIDGET_INIT(&inp);
+  XITK_WIDGET_INIT(&cmb);
+  XITK_WIDGET_INIT(&b);
 
   bg = xitk_window_get_background_pixmap(fb->xwin);
 

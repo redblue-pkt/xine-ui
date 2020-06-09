@@ -748,11 +748,14 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
   xitk_widget_t           *mywidget;
   slider_private_data_t   *private_data;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (slider_private_data_t *) xitk_xmalloc (sizeof (slider_private_data_t));
 
-  private_data->imlibdata                = s->imlibdata;
+  private_data->imlibdata                = wl->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(s->skin_element_name);
 
   private_data->sWidget                  = mywidget;
@@ -799,7 +802,6 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
   mywidget->running                      = 1;
   mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
-  mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x                            = x;
   mywidget->y                            = y;
   mywidget->width                        = private_data->bg_skin->width;
@@ -847,36 +849,39 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   xitk_image_t   *b, *p;
   int             radius;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(s);
   
   if(type == XITK_VSLIDER)
-    p = xitk_image_create_image(s->imlibdata, width * 3, height / 5);
+    p = xitk_image_create_image(wl->imlibdata, width * 3, height / 5);
   else if(type == XITK_HSLIDER)
-    p = xitk_image_create_image(s->imlibdata, (width / 5) * 3, height);
+    p = xitk_image_create_image(wl->imlibdata, (width / 5) * 3, height);
   else if(type == XITK_RSLIDER) {
     int w;
     
     w = ((((width + height) >> 1) >> 1) / 10) * 3;
-    p = xitk_image_create_image(s->imlibdata, (w * 3), w);
+    p = xitk_image_create_image(wl->imlibdata, (w * 3), w);
   }
   else
     XITK_DIE("Slider type unhandled.\n");
   
-  xitk_image_add_mask(s->imlibdata, p);
+  xitk_image_add_mask(wl->imlibdata, p);
   if(type == XITK_VSLIDER)
-    draw_paddle_three_state_vertical(s->imlibdata, p);
+    draw_paddle_three_state_vertical(wl->imlibdata, p);
   else if(type == XITK_HSLIDER)
-    draw_paddle_three_state_horizontal(s->imlibdata, p);
+    draw_paddle_three_state_horizontal(wl->imlibdata, p);
   else if(type == XITK_RSLIDER) {
-    draw_paddle_rotate(s->imlibdata, p);
+    draw_paddle_rotate(wl->imlibdata, p);
   }
   
-  b = xitk_image_create_image(s->imlibdata, width, height);
-  xitk_image_add_mask(s->imlibdata, b);
+  b = xitk_image_create_image(wl->imlibdata, width, height);
+  xitk_image_add_mask(wl->imlibdata, b);
   if((type == XITK_HSLIDER) || (type == XITK_VSLIDER))
     draw_inner(b->image, width, height);
   else if(type == XITK_RSLIDER) {
-    draw_rotate_button(s->imlibdata, b);
+    draw_rotate_button(wl->imlibdata, b);
   }
   
   radius = (b->height >> 1) - (p->height);

@@ -533,7 +533,7 @@ static xitk_widget_t *setup_add_label (xui_setup_t *setup,
   xitk_label_widget_t   lb;
   xitk_widget_t        *label;
 
-  XITK_WIDGET_INIT (&lb, setup->gui->imlib_data);
+  XITK_WIDGET_INIT (&lb);
 
   lb.skin_element_name   = NULL;
   lb.label               = (char *)str;
@@ -577,7 +577,7 @@ static void setup_add_nothing_available (xui_setup_t *setup, const char *title, 
   image = xitk_image_create_image_from_string (setup->gui->imlib_data, tabsfontname,
     FRAME_WIDTH, ALIGN_CENTER, (char *)title);
   
-  XITK_WIDGET_INIT (&im, setup->gui->imlib_data);
+  XITK_WIDGET_INIT (&im);
   im.skin_element_name = NULL;
   frame =  xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
   xitk_add_widget (setup->widget_list, frame);
@@ -684,7 +684,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       setup->gui->x_unlock_display (setup->gui->display);
       draw_inner_frame (image->image, (char *)entry.description,
         boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-      XITK_WIDGET_INIT (&im, setup->gui->imlib_data);
+      XITK_WIDGET_INIT (&im);
       im.skin_element_name = NULL;
       frame = xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
       xitk_add_widget (setup->widget_list, frame);
@@ -700,7 +700,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_slider_widget_t sl;
             xitk_widget_t *slider;
 
-            XITK_WIDGET_INIT (&sl, setup->gui->imlib_data);
+            XITK_WIDGET_INIT (&sl);
             sl.min                      = entry.range_min;
             sl.max                      = entry.range_max;
             sl.step                     = 1;
@@ -724,7 +724,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_inputtext_widget_t inp;
             xitk_widget_t *input;
 
-            XITK_WIDGET_INIT (&inp, setup->gui->imlib_data);
+            XITK_WIDGET_INIT (&inp);
             inp.skin_element_name = NULL;
             inp.text              = entry.str_value;
             inp.max_length        = 256;
@@ -745,7 +745,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_combo_widget_t cmb;
             xitk_widget_t *combo, *lw, *bw;
 
-            XITK_WIDGET_INIT (&cmb, setup->gui->imlib_data);
+            XITK_WIDGET_INIT (&cmb);
             cmb.skin_element_name = NULL;
             cmb.layer_above       = (is_layer_above ());
             cmb.parent_wlist      = setup->widget_list;
@@ -770,7 +770,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_intbox_widget_t ib;
             xitk_widget_t *intbox, *wi, *wbu, *wbd;
 
-            XITK_WIDGET_INIT (&ib, setup->gui->imlib_data);
+            XITK_WIDGET_INIT (&ib);
             ib.skin_element_name = NULL;
             ib.value             = entry.num_value;
             ib.step              = 1;
@@ -794,7 +794,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_checkbox_widget_t cb;
             xitk_widget_t *checkbox;
 
-            XITK_WIDGET_INIT (&cb, setup->gui->imlib_data);
+            XITK_WIDGET_INIT (&cb);
             cb.skin_element_name = NULL;
             cb.callback          = numtype_update;
             cb.userdata          = wt;
@@ -960,7 +960,7 @@ static void setup_sections (xui_setup_t *setup) {
   xine_sarray_delete (a);
 #endif
 
-  XITK_WIDGET_INIT (&tab, setup->gui->imlib_data);
+  XITK_WIDGET_INIT (&tab);
 
   tab.skin_element_name = NULL;
   tab.num_entries       = setup->num_sections;
@@ -1051,7 +1051,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   {
     xitk_slider_widget_t sl;
 
-    XITK_WIDGET_INIT (&sl, setup->gui->imlib_data);
+    XITK_WIDGET_INIT (&sl);
     sl.min               = 0;
     sl.max               = 1;
     sl.step              = 1;
@@ -1076,7 +1076,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     
     len = xitk_font_get_string_length (fs, label);
     
-    XITK_WIDGET_INIT(&lbl, gui->imlib_data);
+    XITK_WIDGET_INIT(&lbl);
     lbl.skin_element_name   = NULL;
     lbl.label               = label;
     lbl.callback            = NULL;
@@ -1092,7 +1092,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   {
     xitk_labelbutton_widget_t lb;
 
-    XITK_WIDGET_INIT (&lb, setup->gui->imlib_data);
+    XITK_WIDGET_INIT (&lb);
     lb.button_type       = CLICK_BUTTON;
     lb.align             = ALIGN_CENTER;
     lb.state_callback    = NULL;

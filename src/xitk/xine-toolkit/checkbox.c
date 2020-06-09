@@ -294,12 +294,15 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
   xitk_widget_t *mywidget;
   checkbox_private_data_t *private_data;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (checkbox_private_data_t *) 
     xitk_xmalloc (sizeof (checkbox_private_data_t));
 
-  private_data->imlibdata         = cb->imlibdata;
+  private_data->imlibdata         = wl->imlibdata;
   private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(cb->skin_element_name);
 
   private_data->cWidget           = mywidget;
@@ -319,7 +322,6 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
@@ -359,10 +361,13 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
 					   int x, int y, int width, int height) {
   xitk_image_t  *i;
   
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(cb);
 
-  i = xitk_image_create_image(cb->imlibdata, width * 3, height);
-  draw_checkbox_check(cb->imlibdata, i);
+  i = xitk_image_create_image(wl->imlibdata, width * 3, height);
+  draw_checkbox_check(wl->imlibdata, i);
   
   return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 0, 0);
 }
