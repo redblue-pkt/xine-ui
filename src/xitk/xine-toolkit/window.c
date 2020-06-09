@@ -1240,6 +1240,8 @@ void xitk_window_destroy_window(xitk_window_t *w) {
 
   if(w->background)
     xitk_image_destroy_xitk_pixmap(w->background);
+  if(w->background_mask)
+    xitk_image_destroy_xitk_pixmap(w->background_mask);
 
   w->width = -1;
   w->height = -1;
