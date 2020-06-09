@@ -63,15 +63,15 @@ static int _find_pix_font_char (xitk_pix_font_t *pf, xitk_point_t *found, int th
 }
 
 static void _create_label_pixmap(xitk_widget_t *w) {
-  label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
-  xitk_image_t          *font         = (xitk_image_t *) private_data->font;
+  label_private_data_t  *wp = (label_private_data_t *) w->private_data;
+  xitk_image_t          *font         = (xitk_image_t *) wp->font;
   xitk_pix_font_t       *pix_font;
   int                    pixwidth;
   int                    x_dest;
   int                    len, anim_add = 0;
   uint16_t               buf[2048];
   
-  private_data->anim_offset = 0;
+  wp->anim_offset = 0;
 
   if (!font->pix_font) {
     /* old style */
@@ -82,7 +82,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   pix_font = font->pix_font;
 
   {
-    const uint8_t *p = (const uint8_t *)private_data->label;
+    const uint8_t *p = (const uint8_t *)wp->label;
     uint16_t *q = buf, *e = buf + sizeof (buf) / sizeof (buf[0]) - 1;
     while (*p && (q < e)) {
       if (!(p[0] & 0x80)) {
@@ -100,32 +100,32 @@ static void _create_label_pixmap(xitk_widget_t *w) {
       }
     }
     *q = 0;
-    private_data->label_len = len = q - buf;
+    wp->label_len = len = q - buf;
   }
 
-  if (private_data->animation && (len > private_data->length))
-    anim_add = private_data->length + 5;
+  if (wp->animation && (len > wp->length))
+    anim_add = wp->length + 5;
 
   /* reuse or reallocate pixmap */
   pixwidth = len + anim_add;
-  if (pixwidth < private_data->length)
-    pixwidth = private_data->length;
+  if (pixwidth < wp->length)
+    pixwidth = wp->length;
   if (pixwidth < 1)
     pixwidth = 1;
   pixwidth *= pix_font->char_width;
-  if (private_data->labelpix) {
-    if ((private_data->labelpix->width != pixwidth)
-      || (private_data->labelpix->height != pix_font->char_height)) {
-      xitk_image_destroy_xitk_pixmap (private_data->labelpix);
-      private_data->labelpix = NULL;
+  if (wp->labelpix) {
+    if ((wp->labelpix->width != pixwidth)
+      || (wp->labelpix->height != pix_font->char_height)) {
+      xitk_image_destroy_xitk_pixmap (wp->labelpix);
+      wp->labelpix = NULL;
     }
   }
-  if (!private_data->labelpix) {
-    private_data->labelpix = xitk_image_create_xitk_pixmap (private_data->imlibdata, pixwidth,
+  if (!wp->labelpix) {
+    wp->labelpix = xitk_image_create_xitk_pixmap (wp->imlibdata, pixwidth,
       pix_font->char_height);
 #if 0
     printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, pix_font->char_height,
-      private_data->labelpix->width, private_data->labelpix->height, private_data->label);
+      wp->labelpix->width, wp->labelpix->height, wp->label);
 #endif
   }
   x_dest = 0;
@@ -133,64 +133,64 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   /* [foo] */
   {
     const uint16_t *p = buf;
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     while (*p) {
       xitk_point_t pt;
       _find_pix_font_char (font->pix_font, &pt, *p);
       p++;
-      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-        private_data->labelpix->pixmap, private_data->labelpix->gc, pt.x, pt.y,
+      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+        wp->labelpix->pixmap, wp->labelpix->gc, pt.x, pt.y,
         pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     }
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
   /* foo[ *** fo] */
   if (anim_add) {
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc,
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc,
+    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc,
+    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc,
+    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc,
+    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (private_data->imlibdata->x.disp, private_data->labelpix->pixmap,
-      private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
+    XCopyArea (wp->imlibdata->x.disp, wp->labelpix->pixmap,
+      wp->labelpix->pixmap, wp->labelpix->gc, 0, 0,
       pixwidth - x_dest, pix_font->char_height, x_dest, 0);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     x_dest = pixwidth;
   }
   
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     do {
-      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap,
-        private_data->labelpix->pixmap, private_data->labelpix->gc,
+      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
+        wp->labelpix->pixmap, wp->labelpix->gc,
         pix_font->space.x, pix_font->space.y,
         pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     } while (x_dest < pixwidth);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
 }
 
@@ -200,34 +200,34 @@ static void _create_label_pixmap(xitk_widget_t *w) {
 static void notify_destroy(xitk_widget_t *w) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+    label_private_data_t *wp = (label_private_data_t *) w->private_data;
 
-    pthread_mutex_lock (&private_data->change_mutex);
+    pthread_mutex_lock (&wp->change_mutex);
     
-    if(private_data->anim_running) {
+    if(wp->anim_running) {
       void *dummy;
       
-      private_data->anim_running = 0;
-      pthread_mutex_unlock (&private_data->change_mutex);
-      pthread_join (private_data->anim_thread, &dummy);
-      pthread_mutex_lock (&private_data->change_mutex);
+      wp->anim_running = 0;
+      pthread_mutex_unlock (&wp->change_mutex);
+      pthread_join (wp->anim_thread, &dummy);
+      pthread_mutex_lock (&wp->change_mutex);
     }
     
-    if (private_data->labelpix) {
-      xitk_image_destroy_xitk_pixmap(private_data->labelpix);
-      private_data->labelpix = NULL;
+    if (wp->labelpix) {
+      xitk_image_destroy_xitk_pixmap(wp->labelpix);
+      wp->labelpix = NULL;
     }
     
-    if (!(private_data->skin_element_name[0] & ~1))
-      xitk_image_free_image(&(private_data->font));
+    if (!(wp->skin_element_name[0] & ~1))
+      xitk_image_free_image(&(wp->font));
 
-    XITK_FREE(private_data->label);
-    XITK_FREE(private_data->fontname);
+    XITK_FREE(wp->label);
+    XITK_FREE(wp->fontname);
 
-    pthread_mutex_unlock (&private_data->change_mutex);
-    pthread_mutex_destroy (&private_data->change_mutex);
+    pthread_mutex_unlock (&wp->change_mutex);
+    pthread_mutex_destroy (&wp->change_mutex);
 
-    XITK_FREE(private_data);
+    XITK_FREE(wp);
   }
 }
 
@@ -237,10 +237,10 @@ static void notify_destroy(xitk_widget_t *w) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+    label_private_data_t *wp = (label_private_data_t *) w->private_data;
 
-    if(sk == FOREGROUND_SKIN && private_data->font) {
-      return private_data->font;
+    if(sk == FOREGROUND_SKIN && wp->font) {
+      return wp->font;
     }
   }
 
@@ -253,8 +253,8 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 const char *xitk_label_get_label(xitk_widget_t *w) {
 
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-      label_private_data_t *private_data = (label_private_data_t *) w->private_data;
-    return private_data->label;
+      label_private_data_t *wp = (label_private_data_t *) w->private_data;
+    return wp->label;
   }
 
   return NULL;
@@ -263,63 +263,57 @@ const char *xitk_label_get_label(xitk_widget_t *w) {
 /*
  *
  */
-static void paint_label(xitk_widget_t *w) {
-
+static void paint_label (xitk_widget_t *w, widget_event_t *event) {
+#ifdef XITK_PAINT_DEBUG
+    printf ("xitk.label.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
+#endif
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && w->visible == 1)) {
-    label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
-    xitk_image_t          *font = (xitk_image_t *) private_data->font;
+    label_private_data_t  *wp = (label_private_data_t *) w->private_data;
+    xitk_image_t          *font = (xitk_image_t *) wp->font;
     
-    if(!private_data->label_visible)
+    if(!wp->label_visible)
       return;
     
     /* non skinable widget */
-    if (!(private_data->skin_element_name[0] & ~1)) {
+    if (!(wp->skin_element_name[0] & ~1)) {
       xitk_font_t   *fs = NULL;
       int            lbear, rbear, wid, asc, des;
       xitk_image_t  *bg;
 
-      /* Clean old */
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap, w->wl->win, font->image->gc, 
-		 0, 0, private_data->font->width, font->height, w->x, w->y);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+      fs = xitk_font_load_font(wp->imlibdata->x.disp, wp->fontname);
+      xitk_font_set_font(fs, wp->font->image->gc);
+      xitk_font_string_extent (fs, wp->label, &lbear, &rbear, &wid, &asc, &des);
 
-      fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
-      xitk_font_set_font(fs, private_data->font->image->gc);
-      xitk_font_string_extent (fs, private_data->label, &lbear, &rbear, &wid, &asc, &des);
+      bg = xitk_image_create_image(wp->imlibdata, w->width, w->height);
 
-      bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
-
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, font->image->pixmap, bg->image->pixmap, 
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap, bg->image->pixmap, 
 		 font->image->gc,
-		 0, 0, private_data->font->width, private_data->font->height, 0, 0);
-      XSetForeground(private_data->imlibdata->x.disp, font->image->gc, 
-		     xitk_get_pixel_color_black(private_data->imlibdata));
+		 0, 0, wp->font->width, wp->font->height, 0, 0);
+      XSetForeground(wp->imlibdata->x.disp, font->image->gc, 
+		     xitk_get_pixel_color_black(wp->imlibdata));
       xitk_font_draw_string(fs, bg->image->pixmap, font->image->gc,
-		  2, ((private_data->font->height + asc + des)>>1) - des,
-		  private_data->label, private_data->label_len);
-      XCopyArea (private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, 
-		 font->image->gc, 0, 0, font->width, font->height, w->x, w->y);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+		  2, ((wp->font->height + asc + des)>>1) - des,
+		  wp->label, wp->label_len);
+      XCopyArea (wp->imlibdata->x.disp, bg->image->pixmap, w->wl->win, font->image->gc,
+        event->x - w->x, event->y - w->y, event->width, event->height, event->x, event->y);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
       xitk_image_free_image(&bg);
       
       xitk_font_unload_font(fs);
       return;
     }
-    else if (private_data->pix_font) {
-      int width = private_data->pix_font->char_width * private_data->length;
-      
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp,
-        private_data->labelpix->pixmap, w->wl->win, font->image->gc,
-        private_data->anim_offset, 0, width, private_data->pix_font->char_height, w->x, w->y);
-
-      if (private_data->anim_running)
-        XSync (private_data->imlibdata->x.disp, False);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-      
+    else if (wp->pix_font) {
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XCopyArea (wp->imlibdata->x.disp,
+        wp->labelpix->pixmap, w->wl->win, font->image->gc,
+        wp->anim_offset + event->x - w->x, event->y - w->y,
+        event->width, event->height,
+        event->x, event->y);
+      if (wp->anim_running)
+        XSync (wp->imlibdata->x.disp, False);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     }
   }
 }
@@ -328,29 +322,35 @@ static void paint_label(xitk_widget_t *w) {
  *
  */
 static void *xitk_label_animation_loop (void *data) {
-  label_private_data_t *private_data = (label_private_data_t *)data;
+  label_private_data_t *wp = (label_private_data_t *)data;
 
-  pthread_mutex_lock (&private_data->change_mutex);
+  pthread_mutex_lock (&wp->change_mutex);
   
   while (1) {
-    xitk_widget_t *w = private_data->lWidget;
+    xitk_widget_t *w = wp->lWidget;
     unsigned long t_anim;
 
-    if (!w->running || (private_data->anim_running != 1))
+    if (!w->running || (wp->anim_running != 1))
       break;
-    if ((w->visible == 1) && private_data->pix_font) {
-      private_data->anim_offset += private_data->anim_step;
-      if (private_data->anim_offset >= (private_data->pix_font->char_width * ((int)private_data->label_len + 5)))
-        private_data->anim_offset = 0;
-      paint_label (private_data->lWidget);
+    if ((w->visible == 1) && wp->pix_font) {
+      widget_event_t event;
+
+      event.x = w->x;
+      event.y = w->y;
+      event.width = w->width;
+      event.height = w->height;
+      wp->anim_offset += wp->anim_step;
+      if (wp->anim_offset >= (wp->pix_font->char_width * ((int)wp->label_len + 5)))
+        wp->anim_offset = 0;
+      paint_label (w, &event);
     }
-    t_anim = private_data->anim_timer;
-    pthread_mutex_unlock (&private_data->change_mutex);
+    t_anim = wp->anim_timer;
+    pthread_mutex_unlock (&wp->change_mutex);
     xitk_usec_sleep (t_anim);
-    pthread_mutex_lock (&private_data->change_mutex);
+    pthread_mutex_lock (&wp->change_mutex);
   }
-  private_data->anim_running = 0;
-  pthread_mutex_unlock (&private_data->change_mutex);
+  wp->anim_running = 0;
+  pthread_mutex_unlock (&wp->change_mutex);
   
   return NULL;
 }
@@ -359,12 +359,12 @@ static void *xitk_label_animation_loop (void *data) {
  *
  */
 static void label_setup_label(xitk_widget_t *w, const char *new_label, int paint) {
-  label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+  label_private_data_t *wp = (label_private_data_t *) w->private_data;
   
   /* Inform animation thread to not paint the label */
-  pthread_mutex_lock (&private_data->change_mutex);
+  pthread_mutex_lock (&wp->change_mutex);
   
-  if (new_label != private_data->label) {
+  if (new_label != wp->label) {
     size_t new_len;
 
     if (!new_label) {
@@ -373,62 +373,69 @@ static void label_setup_label(xitk_widget_t *w, const char *new_label, int paint
     } else {
       new_len = strlen (new_label);
     }
-    if (private_data->label) {
-      if (private_data->label_len != new_len) {
-        free (private_data->label);
-        private_data->label = NULL;
+    if (wp->label) {
+      if (wp->label_len != new_len) {
+        free (wp->label);
+        wp->label = NULL;
       }
     }
-    if (!private_data->label)
-      private_data->label = xitk_xmalloc (new_len + 1);
-    if (private_data->label)
-      memcpy (private_data->label, new_label, new_len + 1);
-    private_data->label_len = new_len;
+    if (!wp->label)
+      wp->label = xitk_xmalloc (new_len + 1);
+    if (wp->label)
+      memcpy (wp->label, new_label, new_len + 1);
+    wp->label_len = new_len;
   }
 
-  if (private_data->skin_element_name[0] & ~1) {
+  if (wp->skin_element_name[0] & ~1) {
     _create_label_pixmap(w);
   } else {
-    if (private_data->labelpix) {
-      xitk_image_destroy_xitk_pixmap (private_data->labelpix);
-      private_data->labelpix = NULL;
+    if (wp->labelpix) {
+      xitk_image_destroy_xitk_pixmap (wp->labelpix);
+      wp->labelpix = NULL;
     }
-    private_data->anim_offset = 0;
+    wp->anim_offset = 0;
   }
 
-  if (private_data->animation && ((int)private_data->label_len > private_data->length)) {
-    if (!private_data->anim_running) {
+  if (wp->animation && ((int)wp->label_len > wp->length)) {
+    if (!wp->anim_running) {
       pthread_attr_t       pth_attrs;
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
       struct sched_param   pth_params;
 #endif
       int r;
       
-      private_data->anim_running = 1;
+      wp->anim_running = 1;
       pthread_attr_init (&pth_attrs);
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
       pthread_attr_getschedparam(&pth_attrs, &pth_params);
       pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
       pthread_attr_setschedparam(&pth_attrs, &pth_params);
 #endif
-      r = pthread_create (&private_data->anim_thread, &pth_attrs, xitk_label_animation_loop, (void *)private_data);
+      r = pthread_create (&wp->anim_thread, &pth_attrs, xitk_label_animation_loop, (void *)wp);
       pthread_attr_destroy (&pth_attrs);
       if (r)
-        private_data->anim_running = 0;
+        wp->anim_running = 0;
     } else {
-      private_data->anim_running = 1;
+      wp->anim_running = 1;
     }
   } else {
-    if (private_data->anim_running) {
+    if (wp->anim_running) {
       /* panel mrl animation has a long interval of 0.5s.
        * better not wait for that, as it may interfere with
        * gapleess stream switch. */
-      private_data->anim_running = 2;
+      wp->anim_running = 2;
     }
   }
-  if (paint)
-    paint_label (w);
-  pthread_mutex_unlock (&private_data->change_mutex);
+  if (paint) {
+    widget_event_t event;
+
+    event.x = w->x;
+    event.y = w->y;
+    event.width = w->width;
+    event.height = w->height;
+    paint_label (w, &event);
+  }
+  pthread_mutex_unlock (&wp->change_mutex);
 }
 
 /*
@@ -437,36 +444,36 @@ static void label_setup_label(xitk_widget_t *w, const char *new_label, int paint
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+    label_private_data_t *wp = (label_private_data_t *) w->private_data;
     
-    if (private_data->skin_element_name[0] & ~1) {
+    if (wp->skin_element_name[0] & ~1) {
       const xitk_skin_element_info_t *info;
 
       xitk_skin_lock(skonfig);
-      info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
+      info = xitk_skin_get_info (skonfig, wp->skin_element_name);
       if (info) {
-        private_data->font          = info->label_pixmap_font_img;
-        private_data->pix_font      = private_data->font->pix_font;
-        if (!private_data->pix_font) {
-          xitk_image_set_pix_font (private_data->font, "");
-          private_data->pix_font    = private_data->font->pix_font;
+        wp->font          = info->label_pixmap_font_img;
+        wp->pix_font      = wp->font->pix_font;
+        if (!wp->pix_font) {
+          xitk_image_set_pix_font (wp->font, "");
+          wp->pix_font    = wp->font->pix_font;
         }
-        private_data->length        = info->label_length;
-        private_data->animation     = info->label_animation;
-        private_data->anim_step     = info->label_animation_step;
-        private_data->anim_timer    = info->label_animation_timer;
-        if (private_data->anim_timer <= 0)
-          private_data->anim_timer = xitk_get_timer_label_animation ();
-        private_data->label_visible = info->label_printable;
+        wp->length        = info->label_length;
+        wp->animation     = info->label_animation;
+        wp->anim_step     = info->label_animation_step;
+        wp->anim_timer    = info->label_animation_timer;
+        if (wp->anim_timer <= 0)
+          wp->anim_timer = xitk_get_timer_label_animation ();
+        wp->label_visible = info->label_printable;
         w->x                        = info->x;
         w->y                        = info->y;
-        if (private_data->pix_font) {
-          w->width                  = private_data->pix_font->char_width * private_data->length;
-          w->height                 = private_data->pix_font->char_height;
+        if (wp->pix_font) {
+          w->width                  = wp->pix_font->char_width * wp->length;
+          w->height                 = wp->pix_font->char_height;
         }
         w->visible                  = info->visibility ? 1 : -1;
         w->enable                   = info->enability;
-        label_setup_label (w, private_data->label, 1);
+        label_setup_label (w, wp->label, 1);
       }
       
       xitk_skin_unlock(skonfig);
@@ -481,10 +488,10 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 int xitk_label_change_label(xitk_widget_t *w, const char *newlabel) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+    label_private_data_t *wp = (label_private_data_t *) w->private_data;
     
-    if(!newlabel || !private_data->label ||
-       (newlabel && (strcmp(private_data->label, newlabel))))
+    if(!newlabel || !wp->label ||
+       (newlabel && (strcmp(wp->label, newlabel))))
       label_setup_label (w, newlabel, 1);
     return 1;
   }
@@ -502,11 +509,11 @@ static int notify_click_label(xitk_widget_t *w, int button, int bUp, int x, int 
   (void)y;
   if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     if(button == Button1) {
-      label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+      label_private_data_t *wp = (label_private_data_t *) w->private_data;
       
-      if(private_data->callback) {
+      if(wp->callback) {
 	if(bUp)
-	  private_data->callback(private_data->lWidget, private_data->userdata);
+	  wp->callback(wp->lWidget, wp->userdata);
 	ret = 1;
       }
     }
@@ -519,36 +526,39 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   int retval = 0;
   
   switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    {
-      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
-	label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
+    case WIDGET_EVENT_PAINT:
+      event->x = w->x;
+      event->y = w->y;
+      event->width = w->width;
+      event->height = w->height;
+      /* fall through */
+    case WIDGET_EVENT_PARTIAL_PAINT:
+      if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
+        label_private_data_t *wp = (label_private_data_t *) w->private_data;
 
-	if(!pthread_mutex_trylock(&private_data->change_mutex)) {
-	  paint_label(w);
-	  pthread_mutex_unlock(&private_data->change_mutex);
-	}
-	
+        if (!pthread_mutex_trylock (&wp->change_mutex)) {
+          paint_label (w, event);
+          pthread_mutex_unlock (&wp->change_mutex);
+        }
       }
-    }
-    break;
-  case WIDGET_EVENT_CLICK:
-    result->value = notify_click_label(w, event->button, 
-				       event->button_pressed, event->x, event->y);
-    retval = 1;
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    notify_change_skin(w, event->skonfig);
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_GET_SKIN:
-    if(result) {
-      result->image = get_skin(w, event->skin_layer);
+      break;
+    case WIDGET_EVENT_CLICK:
+      result->value = notify_click_label (w, event->button,
+        event->button_pressed, event->x, event->y);
       retval = 1;
-    }
-    break;
+      break;
+    case WIDGET_EVENT_CHANGE_SKIN:
+      notify_change_skin (w, event->skonfig);
+      break;
+    case WIDGET_EVENT_DESTROY:
+      notify_destroy (w);
+      break;
+    case WIDGET_EVENT_GET_SKIN:
+      if (result) {
+        result->image = get_skin (w, event->skin_layer);
+        retval = 1;
+      }
+      break;
   }
   
   return retval;
@@ -560,86 +570,86 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_label_widget_t *l,
   const xitk_skin_element_info_t *info) {
   xitk_widget_t          *mywidget;
-  label_private_data_t   *private_data;
+  label_private_data_t   *wp;
   
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   if (!mywidget)
     return NULL;
   
-  private_data = (label_private_data_t *) xitk_xmalloc(sizeof(label_private_data_t));
-  if (!private_data) {
+  wp = (label_private_data_t *) xitk_xmalloc(sizeof(label_private_data_t));
+  if (!wp) {
     free (mywidget);
     return NULL;
   }
 
-  private_data->imlibdata = l->imlibdata;
-  private_data->callback  = l->callback;
-  private_data->userdata  = l->userdata;
+  wp->imlibdata = l->imlibdata;
+  wp->callback  = l->callback;
+  wp->userdata  = l->userdata;
   
-  private_data->lWidget = mywidget;
+  wp->lWidget = mywidget;
 
-  private_data->font = info->label_pixmap_font_img;
+  wp->font = info->label_pixmap_font_img;
 
   if (info->label_pixmap_font_name && (info->label_pixmap_font_name[0] == '\x01') && (info->label_pixmap_font_name[0] == 0)) {
-    private_data->skin_element_name[0] = '\x01';
-    private_data->skin_element_name[1] = 0;
+    wp->skin_element_name[0] = '\x01';
+    wp->skin_element_name[1] = 0;
   } else {
-    _strlcpy (private_data->skin_element_name, l->skin_element_name, sizeof (private_data->skin_element_name));
+    _strlcpy (wp->skin_element_name, l->skin_element_name, sizeof (wp->skin_element_name));
   }
-  if (!(private_data->skin_element_name[0] & ~1)) {
+  if (!(wp->skin_element_name[0] & ~1)) {
     mywidget->height            = info->label_pixmap_font_img->height;
     mywidget->width             =
-    private_data->length        = info->label_pixmap_font_img->width;
-    private_data->fontname      = strdup (info->label_fontname);
-    private_data->pix_font      = NULL;
-    private_data->animation     = 0;
-    private_data->anim_step     = 1;
-    private_data->anim_timer    = xitk_get_timer_label_animation ();
-    private_data->label_visible = 1;
+    wp->length        = info->label_pixmap_font_img->width;
+    wp->fontname      = strdup (info->label_fontname);
+    wp->pix_font      = NULL;
+    wp->animation     = 0;
+    wp->anim_step     = 1;
+    wp->anim_timer    = xitk_get_timer_label_animation ();
+    wp->label_visible = 1;
   } else {
-    if (!private_data->font) {
+    if (!wp->font) {
       /* wrong pixmmap name in skin? */
-      free (private_data);
+      free (wp);
       free (mywidget);
       return NULL;
     }
-    private_data->length        = info->label_length;
-    private_data->fontname      = NULL;
-    private_data->pix_font      = private_data->font->pix_font;
-    if (!private_data->pix_font) {
-      xitk_image_set_pix_font (private_data->font, "");
-      private_data->pix_font    = private_data->font->pix_font;
+    wp->length        = info->label_length;
+    wp->fontname      = NULL;
+    wp->pix_font      = wp->font->pix_font;
+    if (!wp->pix_font) {
+      xitk_image_set_pix_font (wp->font, "");
+      wp->pix_font    = wp->font->pix_font;
     }
-    private_data->animation     = info->label_animation;
-    private_data->anim_step     = info->label_animation_step;
-    private_data->anim_timer    = info->label_animation_timer;
-    if (private_data->anim_timer <= 0)
-      private_data->anim_timer = xitk_get_timer_label_animation ();
-    private_data->label_visible = info->label_printable;
-    if (private_data->pix_font) {
-      mywidget->width           = private_data->pix_font->char_width * private_data->length;
-      mywidget->height          = private_data->pix_font->char_height;
+    wp->animation     = info->label_animation;
+    wp->anim_step     = info->label_animation_step;
+    wp->anim_timer    = info->label_animation_timer;
+    if (wp->anim_timer <= 0)
+      wp->anim_timer = xitk_get_timer_label_animation ();
+    wp->label_visible = info->label_printable;
+    if (wp->pix_font) {
+      mywidget->width  = wp->pix_font->char_width * wp->length;
+      mywidget->height = wp->pix_font->char_height;
     }
   }
-  private_data->anim_running  = 0;
-  private_data->label         = NULL;
-  private_data->labelpix      = NULL;
+  wp->anim_running  = 0;
+  wp->label         = NULL;
+  wp->labelpix      = NULL;
 
-  pthread_mutex_init (&private_data->change_mutex, NULL);
+  pthread_mutex_init (&wp->change_mutex, NULL);
 
-  mywidget->private_data       = private_data;
+  mywidget->private_data       = wp;
 
   mywidget->wl                 = wl;
 
   mywidget->enable             = info->enability;
   mywidget->visible            = info->visibility;
-  mywidget->imlibdata          = private_data->imlibdata;
+  mywidget->imlibdata          = wp->imlibdata;
   mywidget->x                  = info->x;
   mywidget->y                  = info->y;
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->running            = 1;
 
-  mywidget->type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_KEYABLE;
+  mywidget->type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
@@ -698,4 +708,3 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
 
   return _xitk_label_create (wl, l, &info);
 }
-
