@@ -790,6 +790,7 @@ static int _xitk_is_hull_in_hull (xitk_hull_t *h1, xitk_hull_t *h2) {
     return 0;
   return 1;
 }
+#if 0
 static void _xitk_or_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
   if (h1->x1 < h2->x1)
     h2->x1 = h1->x1;
@@ -800,6 +801,7 @@ static void _xitk_or_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
   if (h1->y2 > h2->y2)
     h2->y2 = h1->y2;
 }
+#endif
 static void _xitk_and_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
   if (h1->x1 > h2->x1)
     h2->x1 = h1->x1;
@@ -831,7 +833,9 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
       event.type = WIDGET_EVENT_PAINT;
       (void)w->event (w, &event, NULL);
       w->have_focus = FOCUS_LOST;
+#if 0
       _xitk_or_hulls (&wh, hull);
+#endif
       n += 1;
     } else if (_xitk_is_hull_in_hull (&wh, hull)) {
       if (w->type & WIDGET_PARTIAL_PAINTABLE) {
@@ -845,7 +849,9 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
       } else {
         event.type = WIDGET_EVENT_PAINT;
         (void)w->event (w, &event, NULL);
+#if 0
         _xitk_or_hulls (&wh, hull);
+#endif
       }
       n += 1;
     }

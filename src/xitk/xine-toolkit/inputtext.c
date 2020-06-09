@@ -412,7 +412,7 @@ KeySym xitk_get_key_pressed(XEvent *event) {
 /*
  * Paint the input text box.
  */
-static void paint_inputtext (xitk_widget_t *w) {
+static void paint_partial_inputtext (xitk_widget_t *w, widget_event_t *event) {
   inputtext_private_data_t *wp = (inputtext_private_data_t *) w->private_data;
   XWindowAttributes         attr;
   XColor                    xcolor;
@@ -435,6 +435,9 @@ static void paint_inputtext (xitk_widget_t *w) {
     return;
   }
 
+#ifdef XITK_PAINT_DEBUG
+  printf ("xitk.inputtext.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
+#endif
   if (w->enable && (!wp->cursor_focus)
     && (xitk_is_mouse_over_widget (wp->imlibdata->x.disp, w->wl->win, w)))
       _cursor_focus (wp, w->wl->win, 1);
@@ -662,7 +665,7 @@ static void paint_inputtext (xitk_widget_t *w) {
       
   XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
   XCopyArea (wp->imlibdata->x.disp, wp->text.temp_pixmap->pixmap, w->wl->win, wp->text.temp_gc,
-    ysize, 0, xsize, ysize, w->x, w->y);
+    ysize + event->x - w->x, event->y - w->y, event->width, event->height, event->x, event->y);
   XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
   if (state != FOCUS) {
@@ -673,6 +676,16 @@ static void paint_inputtext (xitk_widget_t *w) {
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     wp->text.temp_gc = None;
   }
+}
+
+static void paint_inputtext (xitk_widget_t *w) {
+  widget_event_t event;
+
+  event.x = w->x;
+  event.y = w->y;
+  event.width = w->width;
+  event.height = w->height;
+  paint_partial_inputtext (w, &event);
 }
 
 /*
@@ -1197,8 +1210,11 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   int retval = 0;
 
   switch(event->type) {
+  case WIDGET_EVENT_PARTIAL_PAINT:
+    paint_partial_inputtext (w, event);
+    break;
   case WIDGET_EVENT_PAINT:
-    paint_inputtext(w);
+    paint_inputtext (w);
     break;
   case WIDGET_EVENT_CLICK:
     result->value = notify_click_inputtext(w, event->button,
@@ -1341,7 +1357,8 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = wp->skin->width/2;
   mywidget->height                = wp->skin->height;
-  mywidget->type                  = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_CLICKABLE | WIDGET_KEYABLE;
+  mywidget->type                  = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE
+                                  | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
