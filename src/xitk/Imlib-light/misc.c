@@ -1229,7 +1229,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 }
 
 Pixmap
-Imlib_copy_image(ImlibData * id, ImlibImage * im)
+Imlib_copy_image(ImlibData * id, const ImlibImage * im)
 {
   Pixmap              p;
   GC                  tgc;
@@ -1258,7 +1258,7 @@ Imlib_move_image(ImlibData * id, ImlibImage * im)
 }
 
 Pixmap
-Imlib_copy_mask(ImlibData * id, ImlibImage * im)
+Imlib_copy_mask(ImlibData * id, const ImlibImage * im)
 {
   Pixmap              p;
   GC                  tgc;
