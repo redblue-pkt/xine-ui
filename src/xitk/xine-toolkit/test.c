@@ -29,6 +29,19 @@
 #include "xitk.h"
 #include "xitkintl.h"
 
+#define XLOCK(FUNC,DISP) (FUNC)(DISP)
+#define XUNLOCK(FUNC,DISP) (FUNC)(DISP)
+
+#define ABORT_IF_NOT_COND(cond)                                         \
+  do {                                                                                               \
+    if(!(cond)) {                                                                                    \
+      fprintf(stderr, "%s(%d): condition '%s' failed. Aborting.\n",  __FUNCTION__, __LINE__, #cond); \
+      abort();                                                                                       \
+    }                                                                                                \
+  } while(0)
+
+#define ABORT_IF_NULL(p) ABORT_IF_NOT_COND((p) != NULL)
+
 typedef struct {
   Display              *display;
   ImlibData            *imlibdata;
@@ -92,7 +105,6 @@ static void create_menu(void);
 static int init_test(void) {
   ImlibInitParams    imlib_init;
   int                screen;
-  int		     depth = 0;
   Visual	    *visual = NULL;
   XColor             black, dummy;
   
@@ -111,7 +123,6 @@ static int init_test(void) {
   XLOCK (XLockDisplay, test->display);
   
   screen = DefaultScreen(test->display);
-  depth = DefaultDepth(test->display, screen);
   visual = DefaultVisual(test->display, screen); 
 
   imlib_init.flags = PARAMS_VISUALID;
@@ -154,7 +165,7 @@ static void test_end(xitk_widget_t *w, void *data) {
   xitk_unregister_event_handler(&test->kreg);
 
   xitk_destroy_widgets(test->widget_list);
-  xitk_window_destroy_window(test->imlibdata, test->xwin);
+  xitk_window_destroy_window(test->xwin);
 
   XFreeGC(test->display, (XITK_WIDGET_LIST_GC(test->widget_list)));
 
@@ -170,7 +181,6 @@ static void test_handle_event(XEvent *event, void *data) {
   XKeyEvent      mykeyevent;
   KeySym         mykey;
   char           kbuf[256];
-  int            len;
   
   switch(event->type) {
     
@@ -197,7 +207,7 @@ static void test_handle_event(XEvent *event, void *data) {
     mykeyevent = event->xkey;
     
     XLOCK (XLockDisplay, test->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     XUNLOCK (XUnlockDisplay, test->display);
     
     switch (mykey) {
@@ -246,7 +256,7 @@ static void move_sliders(xitk_widget_t *w, void *data, int pos) {
 /*
  *
  */
-static void _window_message_done (void data, int btn) {
+static void _window_message_done (void *data, int btn) {
 
   printf ("Button %d pressed.\n", btn);
 }
@@ -301,7 +311,7 @@ static void change_inputtext_dbl_click(xitk_widget_t *w, void *data, int selecte
 /*
  *
  */
-static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext) {
+static void change_browser_entry(xitk_widget_t *w, void *data, const char *currenttext) {
   int j;
 
   if((j = xitk_browser_get_current_selected(test->browser)) >= 0) {
@@ -435,6 +445,8 @@ static void create_checkbox(void) {
   xitk_set_widget_tips_default(test->checkbox, "This is a checkbox");
 }
 
+Pixmap xitk_window_get_background(xitk_window_t *w);
+
 /*
  *
  */
@@ -455,8 +467,8 @@ static void create_tabs(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   
-  draw_rectangular_outter_box(test->imlibdata, bg, x, y+20, (w-1), 60);
-  xitk_window_change_background(test->imlibdata, test->xwin, bg->pixmap, width, height);
+  draw_rectangular_outter_box(bg, x, y+20, (w-1), 60);
+  xitk_window_change_background(test->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
   
   t.skin_element_name = NULL;
@@ -486,10 +498,10 @@ static void create_frame(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   
-  draw_outter_frame(test->imlibdata, bg, "My Frame", fontname, x, y, w, h);
-  draw_inner_frame(test->imlibdata, bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
+  draw_outter_frame(bg, "My Frame", fontname, x, y, w, h);
+  draw_inner_frame(bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
   
-  xitk_window_change_background(test->imlibdata, test->xwin, bg->pixmap, width, height);
+  xitk_window_change_background(test->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 }
 
@@ -535,8 +547,6 @@ static void create_label(void) {
   xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
   xitk_font_unload_font(fs);
 
-  lbl.window            = xitk_window_get_window(test->xwin);
-  lbl.gc                = XITK_WIDGET_LIST_GC(test->widget_list);
   lbl.skin_element_name = NULL;
   lbl.label             = label;
   lbl.callback          = NULL;
@@ -552,8 +562,7 @@ static void create_label(void) {
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
     
     if(wimage) {
-      draw_rectangular_inner_box(test->imlibdata, 
-				 wimage->image, 0, 0, wimage->width-1, wimage->height-1);
+      draw_rectangular_inner_box(wimage->image, 0, 0, wimage->width-1, wimage->height-1);
     }
   }
 }
@@ -707,7 +716,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
 static void create_combo(void) {
   xitk_combo_widget_t    cmb;
   char                  *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-  int                    x = 150, y = 36, width = 100, height;
+  int                    x = 150, y = 36, width = 100/*, height*/;
   xitk_font_t           *fs;
 
   XITK_WIDGET_INIT(&cmb);
@@ -719,11 +728,11 @@ static void create_combo(void) {
   */
   fs = xitk_font_load_font(test->display, fontname);
   xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
-  height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
+  //height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
   xitk_font_unload_font(fs);
   /*
   draw_rectangular_inner_box(test->imlibdata, bg, (x - 4), (y - 4), (width + 8), (height + 7));
-  xitk_window_change_background(test->imlibdata, test->xwin, bg, wwidth, wheight);
+  xitk_window_change_background(test->xwin, bg, wwidth, wheight);
   
   XFreePixmap(test->display, bg);
   */
@@ -746,6 +755,24 @@ static void create_combo(void) {
 /*
  *
  */
+
+static Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
+  Pixmap p;
+  
+  ABORT_IF_NULL(im);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
+  
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, im->x.depth);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  return p;
+}
+
+/*
+ *
+ */
 static void create_browser(void) {
   xitk_browser_widget_t  browser;
   char                  *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
@@ -763,8 +790,7 @@ static void create_browser(void) {
 		 xitk_get_pixel_color_black(test->imlibdata));
   XDrawRectangle(test->display, bg, XITK_WIDGET_LIST_GC(test->widget_list), 17, 27, 117, 176);
 
-  xitk_window_change_background(test->imlibdata, 
-				test->xwin, bg, width, height);
+  xitk_window_change_background(test->xwin, bg, width, height);
   XFreePixmap(test->display, bg);
 
   {
@@ -888,7 +914,7 @@ static void create_menu(void) {
   xitk_menu_show_menu(test->menu);
 }
 
-static void test_dndcb(char *file) {
+static void test_dndcb(const char *file) {
   printf("file: '%s'\n", file);
 }
 
@@ -976,7 +1002,7 @@ int main(int argc, char **argv) {
   create_checkbox();
   
   test->kreg = xitk_register_event_handler("test", 
-					   (xitk_window_get_window(test->xwin)),
+                                           test->xwin,
 					   test_handle_event,
 					   NULL,
 					   test_dndcb,
@@ -987,7 +1013,7 @@ int main(int argc, char **argv) {
 
   XMapRaised(test->display, xitk_window_get_window(test->xwin));
 
-  xitk_run(NULL, NULL);
+  xitk_run(NULL, NULL, NULL, NULL);
 
   deinit_test();
 
