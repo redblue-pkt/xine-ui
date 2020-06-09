@@ -2003,11 +2003,14 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   xitk_widget_t              *mywidget;
   image_private_data_t       *private_data;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (image_private_data_t *) xitk_xmalloc (sizeof (image_private_data_t));
 
-  private_data->imlibdata         = im->imlibdata;
+  private_data->imlibdata         = wl->imlibdata;
   private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(im->skin_element_name);
 
   private_data->bWidget           = mywidget;
@@ -2021,7 +2024,6 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = 0;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width;

@@ -522,13 +522,16 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   unsigned int                slidw = 12;
   xitk_browser_widget_t       browser;
   
-  XITK_WIDGET_INIT(&browser, c->imlibdata);
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
+  XITK_WIDGET_INIT(&browser);
 
   itemw = xitk_get_widget_width(private_data->label_widget);
   itemw += xitk_get_widget_width(private_data->button_widget);
   itemw -= 2; /* space for border */
 
-  private_data->imlibdata                = c->imlibdata;
+  private_data->imlibdata                = wl->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   private_data->entries                  = c->entries;
   private_data->combo_widget             = mywidget;
@@ -553,38 +556,35 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
     private_data->selected = 0;
   }
   
-  private_data->xwin = xitk_window_create_simple_window(c->imlibdata, 0, 0,
+  private_data->xwin = xitk_window_create_simple_window(wl->imlibdata, 0, 0,
 							(itemw + 2), (itemh * 5) + slidw + 2);
-  XLOCK (c->imlibdata->x.x_lock_display, c->imlibdata->x.disp);
+  XLOCK (wl->imlibdata->x.x_lock_display, wl->imlibdata->x.disp);
 
   {
     XSetWindowAttributes attr;
     attr.override_redirect = True;
-    XLOCK (c->imlibdata->x.x_lock_display, c->imlibdata->x.disp);
-    XChangeWindowAttributes (c->imlibdata->x.disp,
+    XChangeWindowAttributes (wl->imlibdata->x.disp,
 			     (xitk_window_get_window(private_data->xwin)),
 			     CWOverrideRedirect, &attr);
-    XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
   }
 
-  XSetTransientForHint (c->imlibdata->x.disp,
+  XSetTransientForHint (wl->imlibdata->x.disp,
 			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
   
-  private_data->gc = XCreateGC(c->imlibdata->x.disp, 
+  private_data->gc = XCreateGC(wl->imlibdata->x.disp, 
 			       (xitk_window_get_window(private_data->xwin)), None, None);
 
-  XUNLOCK (c->imlibdata->x.x_unlock_display, c->imlibdata->x.disp);
+  XUNLOCK (wl->imlibdata->x.x_unlock_display, wl->imlibdata->x.disp);
 
   /* Change default classhint to new one. */
   xitk_window_set_window_class(private_data->xwin, "Xitk Combo", "Xitk");
 
-  private_data->widget_list                = xitk_widget_list_new();
+  private_data->widget_list                = xitk_widget_list_new(wl->imlibdata);
   xitk_dlist_init (&private_data->widget_list->list);
   private_data->widget_list->win           = (xitk_window_get_window(private_data->xwin));
   private_data->widget_list->gc            = private_data->gc;
   
   /* Browser */
-  browser.imlibdata                     = private_data->imlibdata;
   browser.arrow_up.skin_element_name    = NULL;
   browser.slider.skin_element_name      = NULL;
   browser.arrow_dn.skin_element_name    = NULL;
@@ -624,7 +624,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   mywidget->visible      = visible;
   mywidget->have_focus   = FOCUS_LOST;
 
-  mywidget->imlibdata    = private_data->imlibdata;
   //  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
   mywidget->type         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
   mywidget->event        = notify_event;
@@ -649,8 +648,8 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
-  XITK_WIDGET_INIT(&cb, c->imlibdata);
-  XITK_WIDGET_INIT(&lbl, c->imlibdata);
+  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT(&lbl);
 
   private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
 
@@ -704,12 +703,15 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
   xitk_checkbox_widget_t      cb;
   xitk_label_widget_t         lbl;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(c);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
-  XITK_WIDGET_INIT(&cb, c->imlibdata);
-  XITK_WIDGET_INIT(&lbl, c->imlibdata);
+  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT(&lbl);
 
   private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
 
@@ -718,7 +720,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     xitk_font_t    *fs;
     int             height;
     
-    fs = xitk_font_load_font(c->imlibdata->x.disp, DEFAULT_FONT_10);
+    fs = xitk_font_load_font(wl->imlibdata->x.disp, DEFAULT_FONT_10);
     xitk_font_set_font(fs, c->parent_wlist->gc);
     height = xitk_font_get_string_height(fs, " ") + 4;
     xitk_font_unload_font(fs);
@@ -760,8 +762,8 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
       wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
       
       if(wimage) {
-	draw_bevel_three_state(c->imlibdata, wimage);
-	draw_arrow_down(c->imlibdata, wimage);
+        draw_bevel_three_state(wl->imlibdata, wimage);
+        draw_arrow_down(wl->imlibdata, wimage);
       }
       
     }

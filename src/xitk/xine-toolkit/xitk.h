@@ -557,9 +557,8 @@ typedef enum {
 #define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
 #define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)
 
-#define XITK_WIDGET_INIT(X, I)      do {                              \
+#define XITK_WIDGET_INIT(X)         do {                              \
                                       (X)->magic = XITK_WIDGET_MAGIC; \
-                                      (X)->imlibdata = I;             \
                                     } while(0)
 
 /**
@@ -568,7 +567,6 @@ typedef enum {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   int                               min;
   int                               max;
   int                               step;
@@ -581,7 +579,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   int                               button_type;
   int                               align;
   const char                       *label;
@@ -593,7 +590,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   const char                       *label;
   const char                       *skin_element_name;
   xitk_simple_callback_t            callback;
@@ -602,13 +598,11 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   const char                       *skin_element_name;
 } xitk_image_widget_t;
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   xitk_state_callback_t             callback;
   void                             *userdata;
   const char                       *skin_element_name;
@@ -616,7 +610,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   const char                       *skin_element_name;
   xitk_simple_callback_t            callback;
   void                             *userdata;
@@ -624,7 +617,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
 
   struct {
     const char                     *skin_element_name;
@@ -674,7 +666,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   const char                       *skin_element_name;
   int                               layer_above;
   Pixmap                           *icon;
@@ -748,7 +739,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   char                             *text;
   int                               max_length;
   xitk_string_callback_t            callback;
@@ -758,7 +748,6 @@ typedef struct {
 
 typedef struct {
   int                               magic;
-  ImlibData                        *imlibdata;
   const char                       *skin_element_name;
   xitk_widget_list_t               *parent_wlist;
   const char                      **entries;
@@ -770,7 +759,6 @@ typedef struct {
 
 typedef struct {
   int                              magic;
-  ImlibData                       *imlibdata;
   const char                      *skin_element_name;
   int                              num_entries;
   char                           **entries;
@@ -781,8 +769,7 @@ typedef struct {
 
 typedef struct {
   int                              magic;
-  ImlibData                       *imlibdata;
-  
+
   const char                      *skin_element_name;
   
   int                              value;
@@ -796,8 +783,7 @@ typedef struct {
 
 typedef struct {
   int                              magic;
-  ImlibData                       *imlibdata;
-  
+
   const char                      *skin_element_name;
   
   double                           value;
@@ -820,8 +806,7 @@ struct xitk_menu_entry_s {
 
 typedef struct {
   int                              magic;
-  ImlibData                       *imlibdata;
-  
+
   const char                      *skin_element_name;
   
   xitk_widget_list_t              *parent_wlist;
@@ -838,7 +823,7 @@ typedef struct {
  * Create a new widget list, store it internaly,
  * then return the pointer to app.
  */
-xitk_widget_list_t *xitk_widget_list_new (void);
+xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata);
 
 /*
  * Register a callback function called when a signal heppen.

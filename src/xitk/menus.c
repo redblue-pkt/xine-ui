@@ -643,7 +643,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   snprintf(buffer, sizeof(buffer), _("xine %s"), VERSION);
   menu_entries[0].menu = buffer;
 
-  XITK_WIDGET_INIT(&menu, gui->imlib_data);
+  XITK_WIDGET_INIT(&menu);
   
   video_window_get_mouse_coords(gui->vwin, &x, &y);
 
@@ -917,7 +917,7 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 
   menu_entries[0].menu = _("Audio");
   
-  XITK_WIDGET_INIT(&menu, gui->imlib_data);
+  XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = wl;
@@ -994,7 +994,7 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 
   menu_entries[0].menu = _("Subtitle");
   
-  XITK_WIDGET_INIT(&menu, gui->imlib_data);
+  XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = wl;
@@ -1083,7 +1083,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
 
-  XITK_WIDGET_INIT(&menu, gui->imlib_data);
+  XITK_WIDGET_INIT(&menu);
   
   if(selected) {
     menu_entries_sel[0].menu = _("Playlist");
@@ -1120,7 +1120,7 @@ void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     { NULL,                      NULL, NULL,      NULL,               NULL, 0      }
   };
   
-  XITK_WIDGET_INIT(&menu, gui->imlib_data);
+  XITK_WIDGET_INIT(&menu);
   
   menu_entries[0].menu   = _("Video Control");
   menu.menu_tree         = &menu_entries[0];

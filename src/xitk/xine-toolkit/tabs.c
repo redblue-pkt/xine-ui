@@ -322,7 +322,10 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
                                        const char *fontname) {
   xitk_widget_t         *mywidget;
   tabs_private_data_t   *private_data;
-  
+
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(t);
   
   if((t->entries == NULL) || (t->num_entries == 0))
@@ -331,7 +334,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (tabs_private_data_t *) xitk_xmalloc(sizeof(tabs_private_data_t));
   
-  private_data->imlibdata   = t->imlibdata;
+  private_data->imlibdata   = wl->imlibdata;
   private_data->widget      = mywidget;
 
   private_data->entries     = t->entries;
@@ -355,13 +358,13 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_button_widget_t       b;
     int                        xx = x;
       
-    fs = xitk_font_load_font(t->imlibdata->x.disp, fontname);
+    fs = xitk_font_load_font(wl->imlibdata->x.disp, fontname);
 
     xitk_font_set_font(fs, t->parent_wlist->gc);
     fheight = xitk_font_get_string_height(fs, " ");
 
-    XITK_WIDGET_INIT(&lb, t->imlibdata);
-    XITK_WIDGET_INIT(&b, t->imlibdata);
+    XITK_WIDGET_INIT(&lb);
+    XITK_WIDGET_INIT(&b);
 
     private_data->bheight = fheight + 18;
 
@@ -387,7 +390,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       xx += fwidth + 20;
 
       xitk_hide_widget(private_data->tabs[i]);
-      draw_tab(t->imlibdata, (xitk_get_widget_foreground_skin(private_data->tabs[i])));
+      draw_tab(wl->imlibdata, (xitk_get_widget_foreground_skin(private_data->tabs[i])));
       
     }
 
@@ -407,7 +410,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
       if(wimage)
-	draw_arrow_left(t->imlibdata, wimage);
+	draw_arrow_left(wl->imlibdata, wimage);
 
       xx += 20;
       b.skin_element_name = NULL;
@@ -420,7 +423,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);
       if(wimage)
-	draw_arrow_right(t->imlibdata, wimage);
+	draw_arrow_right(wl->imlibdata, wimage);
 
     }
 
@@ -440,7 +443,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   mywidget->visible               = 0;
 
   mywidget->have_focus            = FOCUS_LOST; 
-  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x = mywidget->y       = 0;
   mywidget->width                 = private_data->width;
   mywidget->height                = private_data->bheight;

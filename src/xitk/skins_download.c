@@ -592,8 +592,8 @@ void download_skin(char *url) {
 
     xitk_unregister_event_handler (&dialog);
 
-    XITK_WIDGET_INIT (&br, gui->imlib_data);
-    XITK_WIDGET_INIT (&lb, gui->imlib_data);
+    XITK_WIDGET_INIT (&br);
+    XITK_WIDGET_INIT (&lb);
     
 #if 0
     for(i = 0; slxs[i]; i++) {

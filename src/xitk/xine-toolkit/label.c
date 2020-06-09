@@ -572,6 +572,9 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
   xitk_widget_t          *mywidget;
   label_private_data_t   *wp;
   
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   if (!mywidget)
     return NULL;
@@ -582,7 +585,7 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
     return NULL;
   }
 
-  wp->imlibdata = l->imlibdata;
+  wp->imlibdata = wl->imlibdata;
   wp->callback  = l->callback;
   wp->userdata  = l->userdata;
   
@@ -643,7 +646,6 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
 
   mywidget->enable             = info->enability;
   mywidget->visible            = info->visibility;
-  mywidget->imlibdata          = wp->imlibdata;
   mywidget->x                  = info->x;
   mywidget->y                  = info->y;
   mywidget->have_focus         = FOCUS_LOST;
@@ -692,6 +694,9 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   const char *fontname) {
   xitk_skin_element_info_t info;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY (l);
   memset (&info, 0, sizeof (info));
   info.x                 = x;
@@ -702,7 +707,7 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   info.enability         = 0;
   info.label_fontname    = (char *)fontname;
   info.label_pixmap_font_name  = (char *)"\x01";
-  info.label_pixmap_font_img   = xitk_image_create_image (l->imlibdata, width, height);
+  info.label_pixmap_font_img   = xitk_image_create_image (wl->imlibdata, width, height);
   if (info.label_pixmap_font_img)
     draw_flat (info.label_pixmap_font_img->image, width, height);
 

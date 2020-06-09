@@ -1143,7 +1143,7 @@ void kbedit_window(void) {
 
   y = 34;
 
-  XITK_WIDGET_INIT(&br, gui->imlib_data);
+  XITK_WIDGET_INIT(&br);
   
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
@@ -1168,7 +1168,7 @@ void kbedit_window(void) {
 
   y = y1 - 30 + 4;
 
-  XITK_WIDGET_INIT(&lb, gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
   
   lb.button_type       = RADIO_BUTTON;
   lb.label             = _("Alias");
@@ -1254,7 +1254,7 @@ void kbedit_window(void) {
 
   x = 15;
   
-  XITK_WIDGET_INIT(&l, gui->imlib_data);
+  XITK_WIDGET_INIT(&l);
 
   fs = xitk_font_load_font(gui->display, hboldfontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
@@ -1283,7 +1283,7 @@ void kbedit_window(void) {
   xitk_add_widget (kbedit->widget_list, kbedit->key);
   xitk_enable_and_show_widget(kbedit->key);
   
-  XITK_WIDGET_INIT(&cb, gui->imlib_data);
+  XITK_WIDGET_INIT(&cb);
 
   x += 130 + 10;
 

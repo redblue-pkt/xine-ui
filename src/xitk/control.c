@@ -299,9 +299,9 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   xitk_image_t              *bg_image;
   int x, y;
 
-  XITK_WIDGET_INIT (&br, vctrl->gui->imlib_data);
-  XITK_WIDGET_INIT (&lb, vctrl->gui->imlib_data);
-  XITK_WIDGET_INIT (&cmb, vctrl->gui->imlib_data);
+  XITK_WIDGET_INIT (&br);
+  XITK_WIDGET_INIT (&lb);
+  XITK_WIDGET_INIT (&cmb);
 
   bg_image = xitk_image_load_image(vctrl->gui->imlib_data,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
@@ -332,7 +332,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
    */
   vctrl->widget_list = xitk_window_widget_list(vctrl->xwin);
 
-  XITK_WIDGET_INIT (&lbl, vctrl->gui->imlib_data);
+  XITK_WIDGET_INIT (&lbl);
   lbl.callback = NULL;
 
   {
@@ -347,7 +347,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     xitk_slider_widget_t sl;
     unsigned int u;
 
-    XITK_WIDGET_INIT (&sl, vctrl->gui->imlib_data);
+    XITK_WIDGET_INIT (&sl);
     sl.min    = CONTROL_MIN;
     sl.max    = CONTROL_MAX;
     sl.step   = CONTROL_STEP;

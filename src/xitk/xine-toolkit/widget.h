@@ -87,8 +87,6 @@ typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_e
 struct xitk_widget_s {
   xitk_dnode_t                    node;
 
-  ImlibData                      *imlibdata;
-
   xitk_widget_list_t             *wl;
 
   int                             x;
@@ -114,6 +112,7 @@ struct xitk_widget_list_s {
   xitk_dnode_t                node;
 
   xitk_t                     *xitk;
+  ImlibData                  *imlibdata;
 
   xitk_dlist_t                list;
 

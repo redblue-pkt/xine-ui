@@ -956,11 +956,11 @@ void playlist_editor(void) {
   int                        x, y;
   xitk_image_t              *bg_image;
 
-  XITK_WIDGET_INIT(&br, gui->imlib_data);
-  XITK_WIDGET_INIT(&lb, gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-  XITK_WIDGET_INIT(&inp, gui->imlib_data);
-  XITK_WIDGET_INIT(&b, gui->imlib_data);
+  XITK_WIDGET_INIT(&br);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&inp);
+  XITK_WIDGET_INIT(&b);
 
   playlist = (_playlist_t *) calloc(1, sizeof(_playlist_t));
 

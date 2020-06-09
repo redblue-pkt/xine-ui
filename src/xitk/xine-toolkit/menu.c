@@ -53,6 +53,7 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   xitk_dnode_init (&menu_window->wl.node);
   menu_window->wl.win  = xitk_window_get_window(xwin);
   menu_window->wl.xitk = gXitk;
+  menu_window->wl.imlibdata = im;
 
   menu_attr.override_redirect = True;
 
@@ -763,7 +764,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   
   private_data->curbranch = branch;
 
-  XITK_WIDGET_INIT(&lb, private_data->imlibdata);
+  XITK_WIDGET_INIT(&lb);
   
   bentries = _menu_count_entry_from_branch(branch);
   bsep     = _menu_count_separator_from_branch(branch);
@@ -1125,11 +1126,14 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   xitk_widget_t         *mywidget;
   menu_private_data_t   *private_data;
   
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(m);
   
   mywidget                   = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   private_data               = (menu_private_data_t *) xitk_xmalloc(sizeof(menu_private_data_t));
-  private_data->imlibdata    = m->imlibdata;
+  private_data->imlibdata    = wl->imlibdata;
   private_data->parent_wlist = m->parent_wlist;
   private_data->widget       = mywidget;
   xitk_dlist_init (&private_data->menu_windows);
@@ -1157,7 +1161,6 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   mywidget->running                      = 1;
   mywidget->visible                      = 0;
   mywidget->have_focus                   = FOCUS_RECEIVED;
-  mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;

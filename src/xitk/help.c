@@ -353,7 +353,7 @@ void help_panel(void) {
 
   help_sections();
 
-  XITK_WIDGET_INIT(&tab, gGui->imlib_data);
+  XITK_WIDGET_INIT(&tab);
   
   if(help->num_sections) {
     tab.num_entries       = help->num_sections;
@@ -383,7 +383,7 @@ void help_panel(void) {
 			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
   xitk_window_set_background(help->xwin, bg);
 
-  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+  XITK_WIDGET_INIT(&br);
 
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
@@ -404,7 +404,7 @@ void help_panel(void) {
   xitk_browser_set_alignment(help->browser, ALIGN_LEFT);
   help_change_section(NULL, NULL, 0);
   
-  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
 
   
   lb.button_type       = CLICK_BUTTON;

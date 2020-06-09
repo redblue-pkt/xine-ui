@@ -297,7 +297,7 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
   wd->type = 33;
 
   if (num_buttons || check_label) {
-    wd->widget_list = xitk_widget_list_new ();
+    wd->widget_list = xitk_widget_list_new (im);
     wd->widget_list->win = _xitk_window_get_window (wd->xwin);
     XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
     wd->widget_list->gc = XCreateGC (im->x.disp, _xitk_window_get_window (wd->xwin), None, None);
@@ -309,8 +309,8 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
     xitk_checkbox_widget_t cb;
     xitk_label_widget_t lbl;
   
-    XITK_WIDGET_INIT(&cb, im);
-    XITK_WIDGET_INIT(&lbl, im);
+    XITK_WIDGET_INIT(&cb);
+    XITK_WIDGET_INIT(&lbl);
   
     cb.skin_element_name = NULL;
     cb.callback          = NULL;
@@ -343,7 +343,7 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
     bdx = bx + bwidth;
     by = winh - 50;
 
-    XITK_WIDGET_INIT (&lb, im);
+    XITK_WIDGET_INIT (&lb);
     lb.button_type       = CLICK_BUTTON;
     lb.align             = ALIGN_CENTER;
     lb.callback          = _xitk_window_dialog_3_done;
@@ -849,7 +849,7 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
   if (w->widget_list)
     return w->widget_list;
 
-  w->widget_list = xitk_widget_list_new();
+  w->widget_list = xitk_widget_list_new(w->imlibdata);
 
   XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
   gc = XCreateGC (w->imlibdata->x.disp, w->window, None, None);

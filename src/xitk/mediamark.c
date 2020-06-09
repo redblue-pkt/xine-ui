@@ -3277,11 +3277,11 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   mmkeditor.widget_list = xitk_window_widget_list(mmkeditor.xwin);
 
-  XITK_WIDGET_INIT(&lb, gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gui->imlib_data);
-  XITK_WIDGET_INIT(&inp, gui->imlib_data);
-  XITK_WIDGET_INIT(&ib, gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT(&inp);
+  XITK_WIDGET_INIT(&ib);
 
   bg = xitk_window_get_background_pixmap(mmkeditor.xwin);
 

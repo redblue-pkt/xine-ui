@@ -231,11 +231,14 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   xitk_widget_t          *mywidget;
   button_private_data_t  *private_data;
   
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   
   private_data = (button_private_data_t *) xitk_xmalloc(sizeof(button_private_data_t));
   
-  private_data->imlibdata         = b->imlibdata;
+  private_data->imlibdata         = wl->imlibdata;
   
   private_data->bWidget           = mywidget;
   private_data->bClicked          = 0;
@@ -255,7 +258,6 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   mywidget->running               = 1;
   mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST; 
-  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
@@ -295,10 +297,13 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 					  int x, int y, int width, int height) {
   xitk_image_t *i;
 
+  ABORT_IF_NULL(wl);
+  ABORT_IF_NULL(wl->imlibdata);
+
   XITK_CHECK_CONSTITENCY(b);
 
-  i = xitk_image_create_image(b->imlibdata, width * 3, height);
-  draw_bevel_three_state(b->imlibdata, i);
+  i = xitk_image_create_image(wl->imlibdata, width * 3, height);
+  draw_bevel_three_state(wl->imlibdata, i);
 
   return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 0, 0);
 }

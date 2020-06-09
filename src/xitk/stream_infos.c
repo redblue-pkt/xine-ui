@@ -462,12 +462,12 @@ void stream_infos_panel(void) {
 
   sinfos.widget_list = xitk_window_widget_list(sinfos.xwin);
 
-  XITK_WIDGET_INIT(&lb, gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  XITK_WIDGET_INIT(&cb, gui->imlib_data);
+  XITK_WIDGET_INIT(&cb);
 
   bg = xitk_window_get_background_pixmap(sinfos.xwin);
 

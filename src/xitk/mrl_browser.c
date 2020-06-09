@@ -256,7 +256,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   ip_availables = xine_get_browsable_input_plugin_ids (mrlb->gui->xine);
   mrl_filters = mrl_browser_get_valid_mrl_ending (mrlb);
 
-  XITK_WIDGET_INIT (&mb, mrlb->gui->imlib_data);
+  XITK_WIDGET_INIT (&mb);
 
   mb.layer_above  = (is_layer_above ());
   mb.icon         = &mrlb->gui->icon;

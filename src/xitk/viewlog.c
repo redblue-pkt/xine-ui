@@ -289,7 +289,6 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
  * collect config categories, viewlog tab widget
  */
 static void viewlog_create_tabs(void) {
-  gGui_t *gui = gGui;
   xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
   const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
@@ -305,7 +304,7 @@ static void viewlog_create_tabs(void) {
   }
   tab_sections[i] = NULL;
 
-  XITK_WIDGET_INIT (&tab, gui->imlib_data);
+  XITK_WIDGET_INIT (&tab);
   
   tab.skin_element_name = NULL;
   tab.num_entries       = log_section_count;
@@ -392,7 +391,7 @@ void viewlog_panel(void) {
 
   viewlog_create_tabs();
 
-  XITK_WIDGET_INIT (&br, gui->imlib_data);
+  XITK_WIDGET_INIT (&br);
 
   br.arrow_up.skin_element_name    = NULL;
   br.slider.skin_element_name      = NULL;
@@ -416,7 +415,7 @@ void viewlog_panel(void) {
   
   viewlog_paint_widgets();
   
-  XITK_WIDGET_INIT (&lb, gui->imlib_data);
+  XITK_WIDGET_INIT (&lb);
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;

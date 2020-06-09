@@ -1155,10 +1155,10 @@ xui_panel_t *panel_init (gGui_t *gui) {
   if (!gui)
     return NULL;
   
-  XITK_WIDGET_INIT(&b, gui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-  XITK_WIDGET_INIT(&sl, gui->imlib_data);
+  XITK_WIDGET_INIT(&b);
+  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&sl);
 
   panel = calloc (1, sizeof (*panel));
   if (!panel)

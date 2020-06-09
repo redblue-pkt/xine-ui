@@ -135,11 +135,11 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
       xitk_font_unload_font(fs);
       
-      cfore = xitk_get_pixel_color_black(tips->widget->imlibdata);
-      cback = xitk_get_pixel_color_lightgray(tips->widget->imlibdata);
+      cfore = xitk_get_pixel_color_black(tips->widget->wl->imlibdata);
+      cback = xitk_get_pixel_color_lightgray(tips->widget->wl->imlibdata);
       
       /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
-      image = xitk_image_create_image_with_colors_from_string(tips->widget->imlibdata, DEFAULT_FONT_10,
+      image = xitk_image_create_image_with_colors_from_string(tips->widget->wl->imlibdata, DEFAULT_FONT_10,
 							      (disp_w/3), ALIGN_LEFT, 
                                                               tips->widget->tips_string, cfore, cback);
       
@@ -159,7 +159,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	/*                                           v                      */
         y -= (tips->widget->height + h + bottom_gap + 1);
       /* No further alternative to y-position the tips (just either below or above widget) */
-      xwin = xitk_window_create_simple_window(tips->widget->imlibdata, x, y, w, h);
+      xwin = xitk_window_create_simple_window(tips->widget->wl->imlibdata, x, y, w, h);
       
       /* WM should ignore tips windows */
       {
@@ -179,10 +179,10 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	GC             gc;
 	
 	xitk_window_get_window_size(xwin, &width, &height);
-        bg = xitk_image_create_xitk_pixmap(tips->widget->imlibdata, width, height);
+        bg = xitk_image_create_xitk_pixmap(tips->widget->wl->imlibdata, width, height);
 	
         XLOCK (xitk_x_lock_display, tips->display);
-        gc = XCreateGC(tips->display, tips->widget->imlibdata->x.base_window, None, None);
+        gc = XCreateGC(tips->display, tips->widget->wl->imlibdata->x.base_window, None, None);
         XCopyArea(tips->display, (xitk_window_get_background(xwin)), bg->pixmap, gc, 0, 0, width, height, 0, 0);
         XUNLOCK (xitk_x_unlock_display, tips->display);
 
@@ -332,7 +332,7 @@ void xitk_tips_hide_tips(xitk_tips_t *tips) {
 int xitk_tips_show_widget_tips(xitk_tips_t *tips, xitk_widget_t *w) {
 
   /* Don't show when window invisible. This call may occur directly after iconifying window. */
-  if(!xitk_is_window_visible(w->imlibdata->x.disp, w->wl->win))
+  if(!xitk_is_window_visible(w->wl->imlibdata->x.disp, w->wl->win))
     return 0;
 
   _tips_update_widget(tips, w);

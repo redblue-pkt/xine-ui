@@ -643,8 +643,7 @@ static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {
 }
 
 static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
-  gGui_t *gui = gGui;
-  
+
   if(pobj) {
     xitk_label_widget_t   lb;
     char                  buffer[2048];
@@ -652,7 +651,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
     snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description) 
 	     ? pobj->param->description : _("No description available"));
 
-    XITK_WIDGET_INIT(&lb, gui->imlib_data);
+    XITK_WIDGET_INIT(&lb);
     lb.skin_element_name   = NULL;
     lb.label               = buffer;
     lb.callback            = NULL;
@@ -667,7 +666,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	if(pobj->param->enum_values) {
 	  xitk_combo_widget_t         cmb;
 
-	  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
+          XITK_WIDGET_INIT(&cmb);
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
 	  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -683,7 +682,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	else {
 	  xitk_intbox_widget_t      ib;
 	  
-	  XITK_WIDGET_INIT(&ib, gui->imlib_data);
+          XITK_WIDGET_INIT(&ib);
 	  ib.skin_element_name = NULL;
 	  ib.value             = *(int *)(pobj->param_data + pobj->param->offset);
 	  ib.step              = 1;
@@ -701,7 +700,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_doublebox_widget_t      ib;
 	
-	XITK_WIDGET_INIT(&ib, gui->imlib_data);
+        XITK_WIDGET_INIT(&ib);
 	ib.skin_element_name = NULL;
 	ib.value             = *(double *)(pobj->param_data + pobj->param->offset);
 	ib.step              = .5;
@@ -719,7 +718,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_inputtext_widget_t  inp;
 	
-	XITK_WIDGET_INIT(&inp, gui->imlib_data);
+        XITK_WIDGET_INIT(&inp);
 	inp.skin_element_name = NULL;
 	inp.text              = (char *)(pobj->param_data + pobj->param->offset);
 	inp.max_length        = 256;
@@ -735,7 +734,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_combo_widget_t         cmb;
 	
-	XITK_WIDGET_INIT(&cmb, gui->imlib_data);
+        XITK_WIDGET_INIT(&cmb);
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = (is_layer_above());
 	cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -754,7 +753,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
       {
 	xitk_checkbox_widget_t    cb;
 	
-	XITK_WIDGET_INIT(&cb, gui->imlib_data);
+        XITK_WIDGET_INIT(&cb);
 	cb.skin_element_name = NULL;
 	cb.callback          = _pplugin_set_param_bool;
 	cb.userdata          = pobj;
@@ -966,7 +965,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     bg = xitk_window_get_background_pixmap(pp_wrapper->pplugin->helpwin);
 
-    XITK_WIDGET_INIT(&lb, gui->imlib_data);
+    XITK_WIDGET_INIT(&lb);
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Close");
     lb.align             = ALIGN_CENTER;
@@ -981,7 +980,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     xitk_enable_and_show_widget(w);
   
   
-    XITK_WIDGET_INIT(&br, gui->imlib_data);
+    XITK_WIDGET_INIT(&br);
     br.arrow_up.skin_element_name    = NULL;
     br.slider.skin_element_name      = NULL;
     br.arrow_dn.skin_element_name    = NULL;
@@ -1093,13 +1092,12 @@ static void _applugin_show_help(xitk_widget_t *w, void *data) {
 }
 
 static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_t *pobj) {
-  gGui_t *gui = gGui;
   xitk_combo_widget_t         cmb;
   xitk_labelbutton_widget_t   lb;
   
   if(__pplugin_retrieve_parameters(pobj)) {
     
-    XITK_WIDGET_INIT(&cmb, gui->imlib_data);
+    XITK_WIDGET_INIT(&cmb);
     cmb.skin_element_name = NULL;
     cmb.layer_above       = (is_layer_above());
     cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -1115,7 +1113,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
 
     if(pobj->api && pobj->api->get_help) {
 
-      XITK_WIDGET_INIT(&lb, gui->imlib_data);
+      XITK_WIDGET_INIT(&lb);
       lb.button_type       = CLICK_BUTTON;
       lb.label             = _("Help");
       lb.align             = ALIGN_CENTER;
@@ -1131,7 +1129,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
   else {
     xitk_label_widget_t   lb;
     
-    XITK_WIDGET_INIT(&lb, gui->imlib_data);
+    XITK_WIDGET_INIT(&lb);
     lb.skin_element_name   = NULL;
     lb.label               = _("There is no parameter available for this plugin.");
     lb.callback            = NULL;
@@ -1315,14 +1313,14 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   draw_inner_frame(image->image, NULL, NULL,
 		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
-  XITK_WIDGET_INIT(&im, gui->imlib_data);
+  XITK_WIDGET_INIT(&im);
   im.skin_element_name = NULL;
   pobj->frame =  xitk_noskin_image_create (pp_wrapper->pplugin->widget_list, &im, image, pobj->x - 5, pobj->y - 5);
   xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->frame);
 
   DISABLE_ME(pobj->frame);
   
-  XITK_WIDGET_INIT(&cmb, gui->imlib_data);
+  XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
@@ -1339,7 +1337,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   {
     xitk_image_t *bimage;
 
-    XITK_WIDGET_INIT(&b, gui->imlib_data);
+    XITK_WIDGET_INIT(&b);
     b.skin_element_name = NULL;
     b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_up : _applugin_move_up;
     b.userdata          = pobj;
@@ -1890,13 +1888,13 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 
   pp_wrapper->pplugin->widget_list = xitk_window_widget_list(pp_wrapper->pplugin->xwin);
 
-  XITK_WIDGET_INIT(&lb, gui->imlib_data);
-  XITK_WIDGET_INIT(&lbl, gui->imlib_data);
-  XITK_WIDGET_INIT(&cb, gui->imlib_data);
+  XITK_WIDGET_INIT(&lb);
+  XITK_WIDGET_INIT(&lbl);
+  XITK_WIDGET_INIT(&cb);
 
   bg = xitk_window_get_background_pixmap(pp_wrapper->pplugin->xwin);
 
-  XITK_WIDGET_INIT(&sl, gui->imlib_data);
+  XITK_WIDGET_INIT(&sl);
   
   sl.min                      = 0;
   sl.max                      = 1;
