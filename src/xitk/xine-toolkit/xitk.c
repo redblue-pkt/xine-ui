@@ -1685,6 +1685,12 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
     fx = (__gfx_t *)fx->node.next;
   }
 
+  if (wl->temp_gc) {
+    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    XFreeGC (xitk->x.display, wl->temp_gc);
+    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+  }
+
   xitk_dnode_remove (&wl->node);
   xitk_dlist_clear (&wl->list);
   MUTUNLOCK();
