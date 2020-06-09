@@ -87,7 +87,7 @@ test_DEPENDENCIES = libxitk.a \
 	     $(LIBCOMMON)
 
 test_LDADD = $(test_DEPENDENCIES) \
-	     $(X_PRE_LIBS) $(X_LIBS) $(XFT_LIBS) -lX11 \
+	     $(X_PRE_LIBS) $(X_LIBS) $(XFT_LIBS) -lX11 -lm \
 	     $(THREAD_LIBS) $(LIBPNG_LIBS) $(LTLIBINTL) \
 	     $(JPEG_LIBS) $(XINE_LIBS)
 
