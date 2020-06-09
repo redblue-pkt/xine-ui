@@ -867,21 +867,21 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   else
     XITK_DIE("Slider type unhandled.\n");
   
-  xitk_image_add_mask(wl->imlibdata, p);
+  xitk_image_add_mask(p);
   if(type == XITK_VSLIDER)
-    draw_paddle_three_state_vertical(wl->imlibdata, p);
+    draw_paddle_three_state_vertical(p);
   else if(type == XITK_HSLIDER)
-    draw_paddle_three_state_horizontal(wl->imlibdata, p);
+    draw_paddle_three_state_horizontal(p);
   else if(type == XITK_RSLIDER) {
-    draw_paddle_rotate(wl->imlibdata, p);
+    draw_paddle_rotate(p);
   }
   
   b = xitk_image_create_image(wl->imlibdata, width, height);
-  xitk_image_add_mask(wl->imlibdata, b);
+  xitk_image_add_mask(b);
   if((type == XITK_HSLIDER) || (type == XITK_VSLIDER))
     draw_inner(b->image, width, height);
   else if(type == XITK_RSLIDER) {
-    draw_rotate_button(wl->imlibdata, b);
+    draw_rotate_button(b);
   }
   
   radius = (b->height >> 1) - (p->height);

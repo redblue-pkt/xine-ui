@@ -303,7 +303,7 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   XITK_CHECK_CONSTITENCY(b);
 
   i = xitk_image_create_image(wl->imlibdata, width * 3, height);
-  draw_bevel_three_state(wl->imlibdata, i);
+  draw_bevel_three_state(i);
 
   return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 0, 0);
 }

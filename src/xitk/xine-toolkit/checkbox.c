@@ -367,7 +367,7 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
   XITK_CHECK_CONSTITENCY(cb);
 
   i = xitk_image_create_image(wl->imlibdata, width * 3, height);
-  draw_checkbox_check(wl->imlibdata, i);
+  draw_checkbox_check(i);
   
   return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 0, 0);
 }

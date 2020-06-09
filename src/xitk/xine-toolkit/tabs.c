@@ -134,7 +134,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 		  private_data->x + private_data->gap_widthstart, private_data->y);
         XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 	
-	draw_tab(private_data->imlibdata, p);
+        draw_tab(p);
 	
         XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XCopyArea(private_data->imlibdata->x.disp, 
@@ -390,7 +390,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       xx += fwidth + 20;
 
       xitk_hide_widget(private_data->tabs[i]);
-      draw_tab(wl->imlibdata, (xitk_get_widget_foreground_skin(private_data->tabs[i])));
+      draw_tab(xitk_get_widget_foreground_skin(private_data->tabs[i]));
       
     }
 
@@ -410,7 +410,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
       if(wimage)
-	draw_arrow_left(wl->imlibdata, wimage);
+        draw_arrow_left(wimage);
 
       xx += 20;
       b.skin_element_name = NULL;
@@ -423,7 +423,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);
       if(wimage)
-	draw_arrow_right(wl->imlibdata, wimage);
+        draw_arrow_right(wimage);
 
     }
 

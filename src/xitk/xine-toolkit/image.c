@@ -31,6 +31,13 @@
 
 #include "utils.h"
 
+#define CHECK_IMAGE(p)                          \
+  do {                                          \
+    ABORT_IF_NULL((p));                         \
+    ABORT_IF_NULL((p)->image);                  \
+    ABORT_IF_NULL((p)->image->imlibdata);       \
+  } while (0)
+
 int xitk_x_error = 0;
 
 /*
@@ -242,23 +249,6 @@ void xitk_image_free_image(xitk_image_t **src) {
 /*
  *
  */
-Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
-  Pixmap p;
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NOT_COND(width > 0);
-  ABORT_IF_NOT_COND(height > 0);
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, im->x.depth);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-
-  return p;
-}
-
-/*
- *
- */
 static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
   ABORT_IF_NULL(xpix);
 
@@ -444,14 +434,16 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
 /*
  *
  */
-void xitk_image_change_image(ImlibData *im, 
-			     xitk_image_t *src, xitk_image_t *dest, int width, int height) {
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(src);
+void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, int height) {
+  ImlibData *im;
+
+  CHECK_IMAGE(src);
   ABORT_IF_NULL(dest);
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
-  
+
+  im = src->image->imlibdata;
+
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
   
@@ -703,10 +695,13 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
 /*
  *
  */
-void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(dest);
-  
+void xitk_image_add_mask(xitk_image_t *dest) {
+  ImlibData *im;
+
+  CHECK_IMAGE(dest);
+
+  im = dest->image->imlibdata;
+
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
 
@@ -718,17 +713,19 @@ void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 
-void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
+void menu_draw_arrow_branch(xitk_image_t *p) {
   int            w;
   int            h;
   XPoint         points[4];
   int            i;
   int            x1, x2, x3;
   int            y1, y2, y3;
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  ImlibData     *im;
+
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
   w = p->width / 3;
   h = p->height;
   
@@ -776,7 +773,7 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
+static void _draw_arrow(xitk_image_t *p, int direction) {
   int            w;
   int            h;
   XSegment      *segments;
@@ -784,10 +781,12 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
   int            i, s;
   int            x1, x2, dx;
   int            y1, y2, dy;
+  ImlibData     *im;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
   w = p->width / 3;
   h = p->height;
 
@@ -908,17 +907,17 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
 /*
  *
  */
-void draw_arrow_up(ImlibData *im, xitk_image_t *p) {
-  _draw_arrow(im, p, DIRECTION_UP);
+void draw_arrow_up(xitk_image_t *p) {
+  _draw_arrow(p, DIRECTION_UP);
 }
-void draw_arrow_down(ImlibData *im, xitk_image_t *p) {
-  _draw_arrow(im, p, DIRECTION_DOWN);
+void draw_arrow_down(xitk_image_t *p) {
+  _draw_arrow(p, DIRECTION_DOWN);
 }
-void draw_arrow_left(ImlibData *im, xitk_image_t *p) {
-  _draw_arrow(im, p, DIRECTION_LEFT);
+void draw_arrow_left(xitk_image_t *p) {
+  _draw_arrow(p, DIRECTION_LEFT);
 }
-void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
-  _draw_arrow(im, p, DIRECTION_RIGHT);
+void draw_arrow_right(xitk_image_t *p) {
+  _draw_arrow(p, DIRECTION_RIGHT);
 }
 
 /*
@@ -927,10 +926,12 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
 static void _draw_rectangular_box(xitk_pixmap_t *p,
 				  int x, int y, int excstart, int excstop,
 				  int width, int height, int relief) {
-  ImlibData *im = p->imlibdata;
+  ImlibData *im;
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -960,10 +961,12 @@ static void _draw_rectangular_box(xitk_pixmap_t *p,
 static void _draw_rectangular_box_light(xitk_pixmap_t *p,
 					int x, int y, int excstart, int excstop,
 					int width, int height, int relief) {
-  ImlibData *im = p->imlibdata;
+  ImlibData *im;
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -994,10 +997,12 @@ static void _draw_rectangular_box_with_colors(xitk_pixmap_t *p,
 					      int x, int y, int width, int height, 
 					      unsigned int lcolor, unsigned int dcolor,
 					      int relief) {
-  ImlibData *im = p->imlibdata;
+  ImlibData *im;
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -1040,7 +1045,9 @@ void draw_rectangular_outter_box_light(xitk_pixmap_t *p,
   _draw_rectangular_box_light(p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
 
-static void _draw_check_round(ImlibData *im, xitk_image_t *p, int x, int y, int d, int checked) {
+static void _draw_check_round(xitk_image_t *p, int x, int y, int d, int checked) {
+  ImlibData *im = p->image->imlibdata;
+
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x, y, d, d, (30 * 64), (180 * 64));
@@ -1063,7 +1070,9 @@ static void _draw_check_round(ImlibData *im, xitk_image_t *p, int x, int y, int 
     XUNLOCK (im->x.x_unlock_display, im->x.disp);
   }
 }
-static void _draw_check_check(ImlibData *im, xitk_image_t *p, int x, int y, int d, int checked) {
+static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked) {
+  ImlibData     *im = p->image->imlibdata;
+
   /* background */
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
@@ -1094,11 +1103,10 @@ static void _draw_check_check(ImlibData *im, xitk_image_t *p, int x, int y, int 
   
 }
 
-static void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+static void draw_check_three_state_round_style(xitk_image_t *p, int x, int y, int d, int w, int checked) {
   int i;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  CHECK_IMAGE(p);
 
   for(i = 0; i < 3; i++) {
     if(i == 2) {
@@ -1106,42 +1114,40 @@ static void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, i
       y++;
     }
 
-    _draw_check_round(im, p, x, y, d, checked);
+    _draw_check_round(p, x, y, d, checked);
     x += w;
   }
 }
 
-static void draw_check_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+static void draw_check_three_state_check_style(xitk_image_t *p, int x, int y, int d, int w, int checked) {
   int i;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  CHECK_IMAGE(p);
+
   for(i = 0; i < 3; i++) {
     if(i == 2) {
       x++;
       y++;
     }
 
-    _draw_check_check(im, p, x, y, d, checked);
+    _draw_check_check(p, x, y, d, checked);
     x += w;
   }
 }
 
-void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
+void menu_draw_check(xitk_image_t *p, int checked) {
   int  style = xitk_get_checkstyle_feature();
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+
+  CHECK_IMAGE(p);
+
   switch(style) {
     
   case CHECK_STYLE_CHECK:
-    draw_check_three_state_check_style(im, p, 4, 4, p->height - 8, p->width / 3, checked);
+    draw_check_three_state_check_style(p, 4, 4, p->height - 8, p->width / 3, checked);
     break;
     
   case CHECK_STYLE_ROUND:
-    draw_check_three_state_round_style(im, p, 4, 4, p->height - 8, p->width / 3, checked);
+    draw_check_three_state_round_style(p, 4, 4, p->height - 8, p->width / 3, checked);
     break;
     
   case CHECK_STYLE_OLD:
@@ -1164,12 +1170,14 @@ void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
 /*
  *
  */
-static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
+static void _draw_three_state(xitk_image_t *p, int style) {
+  ImlibData    *im;
   int           w;
   int           h;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
 
   w = p->width / 3;
   h = p->height;
@@ -1227,12 +1235,14 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
 /*
  *
  */
-static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
+static void _draw_two_state(xitk_image_t *p, int style) {
   int           w;
   int           h;
+  ImlibData    *im;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
 
   w = p->width / 2;
   h = p->height;
@@ -1269,11 +1279,13 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
  *
  */
 static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) {
-  ImlibData *im = p->imlibdata;
+  ImlibData *im;
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
-  
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
+
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_gray(im));
   XFillRectangle(im->x.disp, p->pixmap, p->gc, 0, 0, w , h);
@@ -1291,7 +1303,8 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) 
 
 }
 
-void draw_checkbox_check(ImlibData *im, xitk_image_t *p) {
+void draw_checkbox_check(xitk_image_t *p) {
+  ImlibData *im = p->image->imlibdata;
   int  style = xitk_get_checkstyle_feature();
   
   XLOCK (im->x.x_lock_display, im->x.disp);
@@ -1306,9 +1319,9 @@ void draw_checkbox_check(ImlibData *im, xitk_image_t *p) {
       int w;
       
       w = p->width / 3;
-      _draw_check_check(im, p, 0, 0, p->height, 0);
-      _draw_check_check(im, p, w, 0, p->height, 0);
-      _draw_check_check(im, p, w * 2, 0, p->height, 1);
+      _draw_check_check(p, 0, 0, p->height, 0);
+      _draw_check_check(p, w, 0, p->height, 0);
+      _draw_check_check(p, w * 2, 0, p->height, 1);
     }
     break;
     
@@ -1317,15 +1330,15 @@ void draw_checkbox_check(ImlibData *im, xitk_image_t *p) {
       int w;
       
       w = p->width / 3;
-      _draw_check_round(im, p, 0, 0, p->height, 0);
-      _draw_check_round(im, p, w, 0, p->height, 0);
-      _draw_check_round(im, p, w * 2, 0, p->height, 1);
+      _draw_check_round(p, 0, 0, p->height, 0);
+      _draw_check_round(p, w, 0, p->height, 0);
+      _draw_check_round(p, w * 2, 0, p->height, 1);
     }
     break;
     
   case CHECK_STYLE_OLD:
   default: 
-    _draw_three_state(im, p, STYLE_BEVEL);
+    _draw_three_state(p, STYLE_BEVEL);
     break;
   }
 }
@@ -1333,33 +1346,35 @@ void draw_checkbox_check(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_flat_three_state(ImlibData *im, xitk_image_t *p) {
-  _draw_three_state(im, p, STYLE_FLAT);
+void draw_flat_three_state(xitk_image_t *p) {
+  _draw_three_state(p, STYLE_FLAT);
 }
 
 /*
  *
  */
-void draw_bevel_three_state(ImlibData *im, xitk_image_t *p) {
-  _draw_three_state(im, p, STYLE_BEVEL);
+void draw_bevel_three_state(xitk_image_t *p) {
+  _draw_three_state(p, STYLE_BEVEL);
 }
 
 /*
  *
  */
-void draw_bevel_two_state(ImlibData *im, xitk_image_t *p) {
-  _draw_two_state(im, p, STYLE_BEVEL);
+void draw_bevel_two_state(xitk_image_t *p) {
+  _draw_two_state(p, STYLE_BEVEL);
 }
 
 /*
  *
  */
-static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int direction) {
+static void _draw_paddle_three_state(xitk_image_t *p, int direction) {
   int           w;
   int           h;
+  ImlibData    *im;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
 
   w = p->width / 3;
   h = p->height;
@@ -1431,11 +1446,11 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
 /*
  *
  */
-void draw_paddle_three_state_vertical(ImlibData *im, xitk_image_t *p) {
-  _draw_paddle_three_state(im, p, DIRECTION_UP);
+void draw_paddle_three_state_vertical(xitk_image_t *p) {
+  _draw_paddle_three_state(p, DIRECTION_UP);
 }
-void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p) {
-  _draw_paddle_three_state(im, p, DIRECTION_LEFT);
+void draw_paddle_three_state_horizontal(xitk_image_t *p) {
+  _draw_paddle_three_state(p, DIRECTION_LEFT);
 }
 
 /*
@@ -1469,10 +1484,12 @@ void draw_flat(xitk_pixmap_t *p, int w, int h) {
  *
  */
 void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
-  ImlibData *im = p->imlibdata;
+  ImlibData *im;
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->gc, color);
@@ -1486,7 +1503,7 @@ void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
 static void _draw_frame(xitk_pixmap_t *p,
                         const char *title, const char *fontname,
                         int style, int x, int y, int w, int h) {
-  ImlibData     *im = p->imlibdata;
+  ImlibData     *im;
   xitk_font_t   *fs = NULL;
   int            sty[2];
   int            yoff = 0, xstart = 0, xstop = 0;
@@ -1495,9 +1512,11 @@ static void _draw_frame(xitk_pixmap_t *p,
   const char    *titlebuf = NULL;
   char           buf[BUFSIZ];
 
-  ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
-  
+  ABORT_IF_NULL(p->imlibdata);
+
+  im = p->imlibdata;
+
   if(title) {
     int maxinkwidth = (w - 12);
 
@@ -1587,11 +1606,13 @@ void draw_outter_frame(xitk_pixmap_t *p,
 /*
  *
  */
-void draw_tab(ImlibData *im, xitk_image_t *p) {
+void draw_tab(xitk_image_t *p) {
+  ImlibData    *im;
   int           w, h;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
 
   w = p->width / 3;
   h = p->height;
@@ -1634,14 +1655,16 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
+void draw_paddle_rotate(xitk_image_t *p) {
   int           w;
   int           h;
   unsigned int  ccolor, fcolor, ncolor;
+  ImlibData    *im;
 
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
   w = p->width/3;
   h = p->height;
   ncolor = xitk_get_pixel_color_darkgray(im);
@@ -1681,13 +1704,15 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
+void draw_rotate_button(xitk_image_t *p) {
   int           w;
   int           h;
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  ImlibData    *im;
+
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
   w = p->width;
   h = p->height;
 
@@ -1721,13 +1746,15 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_button_plus(ImlibData *im, xitk_image_t *p) {
+void draw_button_plus(xitk_image_t *p) {
   int           w, h;
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
+  ImlibData    *im;
 
-  draw_button_minus(im, p);
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
+  draw_button_minus(p);
   
   w = p->width / 3;
   h = p->height;
@@ -1745,12 +1772,14 @@ void draw_button_plus(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_button_minus(ImlibData *im, xitk_image_t *p) {
+void draw_button_minus(xitk_image_t *p) {
   int           w, h;
-  
-  ABORT_IF_NULL(im);
-  ABORT_IF_NULL(p);
-  
+  ImlibData    *im;
+
+  CHECK_IMAGE(p);
+
+  im = p->image->imlibdata;
+
   w = p->width / 3;
   h = p->height;
   

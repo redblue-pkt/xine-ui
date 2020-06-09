@@ -845,24 +845,24 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   
   menu_window->bevel_plain = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
   if (menu_window->bevel_plain)
-    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_plain);
+    draw_flat_three_state (menu_window->bevel_plain);
 
   menu_window->bevel_arrow = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
   if (menu_window->bevel_arrow) {
-    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_arrow);
-    menu_draw_arrow_branch (private_data->imlibdata, menu_window->bevel_arrow);
+    draw_flat_three_state (menu_window->bevel_arrow);
+    menu_draw_arrow_branch (menu_window->bevel_arrow);
   }
 
   menu_window->bevel_unchecked = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
   if (menu_window->bevel_unchecked) {
-    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_unchecked);
-    menu_draw_check (private_data->imlibdata, menu_window->bevel_unchecked, 0);
+    draw_flat_three_state (menu_window->bevel_unchecked);
+    menu_draw_check (menu_window->bevel_unchecked, 0);
   }
 
   menu_window->bevel_checked = xitk_image_create_image (private_data->imlibdata, wwidth * 3, 20);
   if (menu_window->bevel_checked) {
-    draw_flat_three_state (private_data->imlibdata, menu_window->bevel_checked);
-    menu_draw_check (private_data->imlibdata, menu_window->bevel_checked, 1);
+    draw_flat_three_state (menu_window->bevel_checked);
+    menu_draw_check (menu_window->bevel_checked, 1);
   }
 
   memset (&info, 0, sizeof (info));

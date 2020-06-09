@@ -837,11 +837,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_hide_widget(fb->directories_sort);
 
     if(fb->directories_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
-			      dsimage, dsimage->width, dsimage->height);
+      xitk_image_change_image (fb->sort_skin_down, dsimage, dsimage->width, dsimage->height);
     else
-      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_up, 
-			    dsimage, dsimage->width, dsimage->height);
+      xitk_image_change_image (fb->sort_skin_up, dsimage, dsimage->width, dsimage->height);
 
     xitk_show_widget(fb->directories_sort);
     
@@ -856,11 +854,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_hide_widget(fb->files_sort);
 
     if(fb->files_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
-			      fsimage, fsimage->width, fsimage->height);
+      xitk_image_change_image (fb->sort_skin_down, fsimage, fsimage->width, fsimage->height);
     else
-      xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_up, 
-			    fsimage, fsimage->width, fsimage->height);
+      xitk_image_change_image (fb->sort_skin_up, fsimage, fsimage->width, fsimage->height);
 
     xitk_show_widget(fb->files_sort);
 
@@ -1325,8 +1321,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     fb->sort_skin_down = xitk_image_create_image (fb->gui->imlib_data, 
 						 dsimage->width, dsimage->height);
     
-    draw_bevel_three_state (fb->gui->imlib_data, fb->sort_skin_up);
-    draw_bevel_three_state (fb->gui->imlib_data, fb->sort_skin_down);
+    draw_bevel_three_state (fb->sort_skin_up);
+    draw_bevel_three_state (fb->sort_skin_down);
 
     w = dsimage->width / 3;
 
@@ -1421,10 +1417,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       }
     }
 
-    xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
-			    dsimage, dsimage->width, dsimage->height);
-    xitk_image_change_image (fb->gui->imlib_data, fb->sort_skin_down,
-			    fsimage, fsimage->width, fsimage->height);
+    xitk_image_change_image (fb->sort_skin_down, dsimage, dsimage->width, dsimage->height);
+    xitk_image_change_image (fb->sort_skin_down, fsimage, fsimage->width, fsimage->height);
   }
 
   y += xitk_get_widget_height(fb->files_browser) + 15 + 4 + 5;

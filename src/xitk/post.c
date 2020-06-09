@@ -1346,7 +1346,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
     DISABLE_ME(pobj->up);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->up)) != NULL)
-      draw_arrow_up(gui->imlib_data, bimage);
+      draw_arrow_up(bimage);
     
     b.skin_element_name = NULL;
     b.callback          = (pp_wrapper == &vpp_wrapper) ? _vpplugin_move_down : _applugin_move_down;
@@ -1356,7 +1356,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
     DISABLE_ME(pobj->down);
 
     if((bimage = xitk_get_widget_foreground_skin(pobj->down)) != NULL)
-      draw_arrow_down(gui->imlib_data, bimage);
+      draw_arrow_down(bimage);
 
   }
   return pobj;
