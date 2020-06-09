@@ -676,12 +676,10 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       wt->changed = 0;
 
       image = xitk_image_create_image (setup->gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
-      setup->gui->x_lock_display (setup->gui->display);
-      XSetForeground (setup->gui->display, (XITK_WIDGET_LIST_GC (setup->widget_list)),
-        xitk_get_pixel_color_gray (setup->gui->imlib_data));
-      XFillRectangle (setup->gui->display, image->image->pixmap,
-        (XITK_WIDGET_LIST_GC (setup->widget_list)), 0, 0, image->width, image->height);
-      setup->gui->x_unlock_display (setup->gui->display);
+
+      pixmap_fill_rectangle (image->image,
+                             0, 0, image->width, image->height,
+                             xitk_get_pixel_color_gray (setup->gui->imlib_data));
       draw_inner_frame (image->image, (char *)entry.description,
         boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
       XITK_WIDGET_INIT (&im);

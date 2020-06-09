@@ -1390,30 +1390,22 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	
 	offset += w;
 	
-        fb->gui->x_lock_display (fb->gui->display);
-        XSetForeground (fb->gui->display, image->image->gc, 
+        pixmap_fill_polygon (image->image, &points[0], 4,
           xitk_get_pixel_color_lightgray (fb->gui->imlib_data));
-        XFillPolygon (fb->gui->display, image->image->pixmap, image->image->gc, 
-		     &points[0], 4, Convex, CoordModeOrigin);
-        fb->gui->x_unlock_display (fb->gui->display);
 
-        fb->gui->x_lock_display (fb->gui->display);
 	for(k = 0; k < 3; k++) {
-	  if(k == 0)
-            XSetForeground (fb->gui->display, image->image->gc, 
-              xitk_get_pixel_color_black (fb->gui->imlib_data));
+          int color;
+          if (k == 0)
+            color = xitk_get_pixel_color_black (fb->gui->imlib_data);
 	  else if(k == 1)
-            XSetForeground (fb->gui->display, image->image->gc, 
-              xitk_get_pixel_color_darkgray (fb->gui->imlib_data));
+            color = xitk_get_pixel_color_darkgray (fb->gui->imlib_data);
 	  else
-            XSetForeground (fb->gui->display, image->image->gc,
-              xitk_get_pixel_color_white (fb->gui->imlib_data));
+            color = xitk_get_pixel_color_white (fb->gui->imlib_data);
   
-          XDrawLine (fb->gui->display, image->image->pixmap, image->image->gc,
-		    points[k].x, points[k].y, points[k+1].x, points[k+1].y);
+          pixmap_draw_line(image->image,
+                           points[k].x, points[k].y, points[k+1].x, points[k+1].y,
+                           color);
 	}
-        fb->gui->x_unlock_display (fb->gui->display);
-	
       }
     }
 

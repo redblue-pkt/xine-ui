@@ -479,10 +479,6 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
 
       video_window_set_transient_for(gui->vwin, xitk_get_window(key));
 
-      gui->x_lock_display (gui->display);
-      XSync(gui->display, False);
-      gui->x_unlock_display (gui->display);
-      
       /* Doesn't work so well yet 
          use gui->play_data.running hack for a while
          xitk_window_dialog_set_modal(xw);

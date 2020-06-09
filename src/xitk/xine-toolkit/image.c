@@ -707,10 +707,7 @@ void xitk_image_add_mask(xitk_image_t *dest) {
 
   dest->mask = xitk_image_create_xitk_mask_pixmap(im, dest->width, dest->height);
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, dest->mask->gc, 1);
-  XFillRectangle(im->x.disp, dest->mask->pixmap, dest->mask->gc, 0, 0, dest->width, dest->height);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  pixmap_fill_rectangle(dest->mask, 0, 0, dest->width, dest->height, 1);
 }
 
 void menu_draw_arrow_branch(xitk_image_t *p) {
@@ -737,10 +734,6 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
 
   x3 = (w - 10);
   y3 = ((h / 2) - 5);
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   for(i = 0; i < 3; i++) {
     
@@ -758,10 +751,7 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
     points[3].x = x1;
     points[3].y = y1;
 
-    XLOCK (im->x.x_lock_display, im->x.disp);
-    XFillPolygon(im->x.disp, p->image->pixmap, p->image->gc, 
-		 &points[0], 4, Convex, CoordModeOrigin);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+    pixmap_fill_polygon(p->image, &points[0], 4, xitk_get_pixel_color_black(im));
 
     x1 += w;
     x2 += w;
@@ -923,6 +913,53 @@ void draw_arrow_right(xitk_image_t *p) {
 /*
  *
  */
+
+
+void pixmap_draw_line(xitk_pixmap_t *p,
+                      int x0, int y0, int x1, int y1, unsigned color) {
+  ImlibData *im = p->imlibdata;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+
+  XSetForeground (im->x.disp, p->gc, color);
+  XDrawLine (im->x.disp, p->pixmap, p->gc, x0, y0, x1, y1);
+
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+}
+
+void pixmap_fill_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned int color) {
+  ImlibData *im = p->imlibdata;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground(im->x.disp, p->gc, color);
+  XFillRectangle(im->x.disp, p->pixmap, p->gc, x, y, w , h);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+}
+
+void pixmap_fill_polygon(xitk_pixmap_t *p,
+                         XPoint *points, int npoints, unsigned color) {
+  ImlibData *im = p->imlibdata;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+
+  XSetForeground (im->x.disp, p->gc, color);
+  XFillPolygon (im->x.disp, p->pixmap, p->gc, points, npoints, Convex, CoordModeOrigin);
+
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+}
+
+/*
+ *
+ */
 static void _draw_rectangular_box(xitk_pixmap_t *p,
 				  int x, int y, int excstart, int excstop,
 				  int width, int height, int relief) {
@@ -1074,10 +1111,7 @@ static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked)
   ImlibData     *im = p->image->imlibdata;
 
   /* background */
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, x, y, d, d);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  pixmap_fill_rectangle(p->image, x, y, d, d, xitk_get_pixel_color_lightgray(im));
   /* */
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
@@ -1286,11 +1320,8 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) 
 
   im = p->imlibdata;
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->pixmap, p->gc, 0, 0, w , h);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+  pixmap_fill_rectangle(p, 0, 0, w, h, xitk_get_pixel_color_gray(im));
+
   if(relief != DRAW_FLATTER) {
     
     _draw_rectangular_box_with_colors(p, 0, 0, w-1, h-1,
@@ -1306,12 +1337,9 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) 
 void draw_checkbox_check(xitk_image_t *p) {
   ImlibData *im = p->image->imlibdata;
   int  style = xitk_get_checkstyle_feature();
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, p->width, p->height);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+
+  pixmap_fill_rectangle(p->image, 0, 0, p->width, p->height, xitk_get_pixel_color_gray(im));
+
   switch(style) {
     
   case CHECK_STYLE_CHECK:
@@ -1395,18 +1423,11 @@ static void _draw_paddle_three_state(xitk_image_t *p, int direction) {
   XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1), 0, (w - 1), (h - 1));
   XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1) - 1, 0, (w - 1) - 1, (h - 1));
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 2, 2, w - 4, (h - 1) - 2);
 
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w + 2, 2, (w * 2) - 4, (h - 1) - 2);
+  pixmap_fill_rectangle(p->image, 2, 2, w - 4, (h - 1) - 2, xitk_get_pixel_color_gray(im));
+  pixmap_fill_rectangle(p->image, w + 2, 2, (w * 2) - 4, (h - 1) - 2, xitk_get_pixel_color_lightgray(im));
+  pixmap_fill_rectangle(p->image, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2, xitk_get_pixel_color_darkgray(im));
 
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
   _draw_rectangular_box_with_colors(p->image, 2, 2, (w-1)-4, (h-1)-4,
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
@@ -1484,17 +1505,8 @@ void draw_flat(xitk_pixmap_t *p, int w, int h) {
  *
  */
 void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
-  ImlibData *im;
 
-  ABORT_IF_NULL(p);
-  ABORT_IF_NULL(p->imlibdata);
-
-  im = p->imlibdata;
-
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->gc, color);
-  XFillRectangle(im->x.disp, p->pixmap, p->gc, 0, 0, w , h);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  pixmap_fill_rectangle(p, 0, 0, w, h, color);
 }
 
 /*
@@ -1674,13 +1686,9 @@ void draw_paddle_rotate(xitk_image_t *p) {
   {
     int x, i;
     unsigned int bg_colors[3] = { ncolor, fcolor, ccolor };
-    
-    XLOCK (im->x.x_lock_display, im->x.disp);
-    XSetForeground(im->x.disp, p->mask->gc, 0);
-    XFillRectangle(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, w * 3 , h);
-    XSetForeground(im->x.disp, p->mask->gc, 1);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+
+    pixmap_fill_rectangle(p->mask, 0, 0, w * 3, h, 0);
+
     for(x = 0, i = 0; i < 3; i++) {
       XLOCK (im->x.x_lock_display, im->x.disp);
       XSetForeground(im->x.disp, p->mask->gc, 1);
