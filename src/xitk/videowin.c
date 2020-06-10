@@ -67,6 +67,7 @@ struct xui_vwin_st {
 
   Window                 video_window;
   int                    gui_depth;
+  Visual                *gui_visual;
   Visual	        *visual;          /* Visual for video window               */
   XClassHint            *xclasshint;
   XClassHint            *xclasshint_fullscreen;
@@ -396,13 +397,13 @@ void video_window_select_visual (xui_vwin_t *vwin) {
         fprintf (stderr, _("videowin: output driver cannot select a working visual\n"));
         exit (1);
       }
-      vwin->gui->visual = vinfo->visual;
+      vwin->gui_visual  = vinfo->visual;
       vwin->gui_depth   = vinfo->depth;
     }
-    if (vwin->gui->visual != vwin->visual) {
-      printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui->visual->visualid);
+    if (vwin->gui_visual != vwin->visual) {
+      printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui_visual->visualid);
       vwin->gui->x_lock_display (vwin->gui->display);
-      gui_init_imlib (vwin->gui, vwin->gui->visual);
+      gui_init_imlib (vwin->gui, vwin->gui_visual);
       vwin->gui->x_unlock_display (vwin->gui->display);
       pthread_mutex_lock (&vwin->mutex);
       video_window_adapt_size (vwin);
@@ -469,7 +470,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       Colormap    colormap;
 
       vwin->fullscreen_mode = FULLSCR_MODE;
-      vwin->visual          = vwin->gui->visual;
+      vwin->visual          = vwin->gui_visual;
       vwin->depth           = vwin->gui_depth;
 
       if (vwin->gui->video_display != vwin->gui->display) {
@@ -746,7 +747,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->video_window) {
       int dummy;
 
-      if ((vwin->fullscreen_mode & FULLSCR_XI_MODE) && vwin->gui->visual == vwin->visual) {
+      if ((vwin->fullscreen_mode & FULLSCR_XI_MODE) && vwin->gui_visual == vwin->visual) {
         if (vwin->visible_width != vwin->output_width || vwin->visible_height != vwin->output_height) {
           /*
            * resizing the video window may be necessary if the modeline or tv mode has
@@ -772,7 +773,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
-    vwin->visual   = vwin->gui->visual;
+    vwin->visual   = vwin->gui_visual;
     vwin->depth    = vwin->gui_depth;
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
@@ -844,7 +845,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->video_window) {
       int dummy;
 
-      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (vwin->gui->visual == vwin->visual)) {
+      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (vwin->gui_visual == vwin->visual)) {
 //#ifdef HAVE_XF86VIDMODE
 //	if(vwin->XF86_modelines_count > 1) {
         if ((vwin->visible_width != vwin->output_width) || (vwin->visible_height != vwin->output_height)) {
@@ -873,7 +874,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
-    vwin->visual   = vwin->gui->visual;
+    vwin->visual   = vwin->gui_visual;
     vwin->depth    = vwin->gui_depth;
 
     if (vwin->gui->video_display != vwin->gui->display) {
@@ -974,7 +975,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if (vwin->video_window) {
 
-      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) || (vwin->visual != vwin->gui->visual)) {
+      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) || (vwin->visual != vwin->gui_visual)) {
 #ifdef HAVE_XF86VIDMODE
 	/*
 	 * toggling from fullscreen to window mode - time to switch back to
@@ -1038,7 +1039,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode   = WINDOWED_MODE;
-    vwin->visual            = vwin->gui->visual;
+    vwin->visual            = vwin->gui_visual;
     vwin->depth             = vwin->gui_depth;
 
     if (vwin->gui->video_display != vwin->gui->display) {
@@ -1653,7 +1654,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int depth, window_attributes_t *wind
   vwin->hide_on_start      = hide_on_start;
 
   vwin->depth              = vwin->gui_depth;
-  vwin->visual             = vwin->gui->visual;
+  vwin->visual             = Imlib_get_visual(gui->imlib_data);
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual (vwin);
  
