@@ -1452,11 +1452,7 @@ int main(int argc, char *argv[]) {
   __xineui_global_verbosity              = 0;
   gui->broadcast_port         = 0;
   gui->display_logo           = 1;
-  gui->post_video_elements    = NULL;
-  gui->post_video_elements_num = 0;
   gui->post_video_enable      = 1;
-  gui->post_audio_elements    = NULL;
-  gui->post_audio_elements_num = 0;
   gui->post_audio_enable      = 1;
   gui->splash                 = 1;
 #ifdef HAVE_LIRC

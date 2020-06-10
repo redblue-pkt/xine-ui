@@ -175,16 +175,8 @@ struct gGui_st {
 
   tvout_t                  *tvout;
 
-  post_element_t          **post_video_elements;
-  int                       post_video_elements_num;
   int                       post_video_enable;
-  post_element_t          **post_audio_elements;
-  int                       post_audio_elements_num;
   int                       post_audio_enable;
-
-  char                     *deinterlace_plugin;
-  post_element_t          **deinterlace_elements;
-  int                       deinterlace_elements_num;
   int                       deinterlace_enable;
 
   xine_audio_port_t        *ao_port;
