@@ -68,7 +68,6 @@ struct xui_vwin_st {
   Window                 video_window;
   int                    gui_depth;
   Visual	        *visual;          /* Visual for video window               */
-  Colormap	         colormap;        /* Colormap for video window		   */
   XClassHint            *xclasshint;
   XClassHint            *xclasshint_fullscreen;
   XClassHint            *xclasshint_borderless;
@@ -466,24 +465,29 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       XGCValues   gcv;
       Window      wparent;
       Window      rootwindow = None;
+      XColor      dummy, black;
+      Colormap    colormap;
 
       vwin->fullscreen_mode = FULLSCR_MODE;
       vwin->visual          = vwin->gui->visual;
       vwin->depth           = vwin->gui_depth;
-      vwin->colormap        = vwin->gui->colormap;
 
       if (vwin->gui->video_display != vwin->gui->display) {
         video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-        vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+        colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+      } else {
+        colormap = Imlib_get_colormap (vwin->gui->imlib_data);
       }
       
+      XAllocNamedColor(vwin->gui->video_display, colormap, "black", &black, &dummy);
+
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->gui->video_display,
         vwin->video_screen, &wparent)) == None)
         rootwindow = DefaultRootWindow (vwin->gui->video_display);
 
       attr.override_redirect = True;
-      attr.background_pixel  = vwin->gui->black.pixel;
+      attr.background_pixel  = black.pixel;
       
       border_width = 0;
 
@@ -511,8 +515,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       
       _set_window_title (vwin);
       
-      gcv.foreground         = vwin->gui->black.pixel;
-      gcv.background         = vwin->gui->black.pixel;
+      gcv.foreground         = black.pixel;
+      gcv.background         = black.pixel;
       gcv.graphics_exposures = False;
       vwin->gc = XCreateGC (vwin->gui->video_display, vwin->video_window,
         GCForeground | GCBackground | GCGraphicsExposures, &gcv);
@@ -736,6 +740,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #ifdef HAVE_XINERAMA
   /* ask for xinerama fullscreen mode */
   if (vwin->xinerama && (vwin->fullscreen_req & FULLSCR_XI_MODE)) {
+    Colormap colormap;
+    XColor black, dummy;
 
     if (vwin->video_window) {
       int dummy;
@@ -768,18 +774,21 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->fullscreen_mode = vwin->fullscreen_req;
     vwin->visual   = vwin->gui->visual;
     vwin->depth    = vwin->gui_depth;
-    vwin->colormap = vwin->gui->colormap;
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+      colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+    } else {
+      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
     }
+    XAllocNamedColor(vwin->gui->video_display, colormap, "black", &black, &dummy);
+
     /*
      * open fullscreen window
      */
 
-    attr.background_pixel  = vwin->gui->black.pixel;
-    attr.border_pixel      = vwin->gui->black.pixel;
-    attr.colormap	   = vwin->colormap;
+    attr.background_pixel  = black.pixel;
+    attr.border_pixel      = black.pixel;
+    attr.colormap          = colormap;
 
     border_width           = 0;
     if(vwin->gui->wid)
@@ -829,6 +838,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   } else
 #endif /* HAVE_XINERAMA */
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
+    Colormap colormap;
+    XColor black, dummy;
 
     if (vwin->video_window) {
       int dummy;
@@ -864,20 +875,22 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->fullscreen_mode = vwin->fullscreen_req;
     vwin->visual   = vwin->gui->visual;
     vwin->depth    = vwin->gui_depth;
-    vwin->colormap = vwin->gui->colormap;
-    
+
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+      colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+    } else {
+      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
     }
+    XAllocNamedColor(vwin->gui->video_display, colormap, "black", &black, &dummy);
 
     /*
      * open fullscreen window
      */
 
-    attr.background_pixel  = vwin->gui->black.pixel;
-    attr.border_pixel      = vwin->gui->black.pixel;
-    attr.colormap	   = vwin->colormap;
+    attr.background_pixel  = black.pixel;
+    attr.border_pixel      = black.pixel;
+    attr.colormap          = colormap;
 
     border_width           = 0;
 
@@ -934,7 +947,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   } 
   else {
-       
+    Colormap colormap;
+    XColor black, dummy;
+
 #ifndef HAVE_XINERAMA
     hint.x           = 0;
     hint.y           = 0;
@@ -1025,15 +1040,17 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->fullscreen_mode   = WINDOWED_MODE;
     vwin->visual            = vwin->gui->visual;
     vwin->depth             = vwin->gui_depth;
-    vwin->colormap          = vwin->gui->colormap;
-      
+
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-      vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+      colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
+    } else {
+      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
     }
-    attr.background_pixel  = vwin->gui->black.pixel;
-    attr.border_pixel      = vwin->gui->black.pixel;
-    attr.colormap	   = vwin->colormap;
+    XAllocNamedColor(vwin->gui->video_display, colormap, "black", &black, &dummy);
+    attr.background_pixel  = black.pixel;
+    attr.border_pixel      = black.pixel;
+    attr.colormap          = colormap;
 
     if (vwin->borderless)
       border_width = 0;
@@ -1637,13 +1654,11 @@ xui_vwin_t *video_window_init (gGui_t *gui, int depth, window_attributes_t *wind
 
   vwin->depth              = vwin->gui_depth;
   vwin->visual             = vwin->gui->visual;
-  vwin->colormap           = vwin->gui->colormap;
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual (vwin);
  
   if (vwin->gui->video_display != vwin->gui->display) {
     video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
-    vwin->colormap = DefaultColormap (vwin->gui->video_display, vwin->video_screen);
   }
   
   vwin->xwin               = window_attribute->x;
