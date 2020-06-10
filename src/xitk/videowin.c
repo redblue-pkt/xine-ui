@@ -66,6 +66,7 @@ struct xui_vwin_st {
   int                    cursor_timer;
 
   Window                 video_window;
+  int                    gui_depth;
   Visual	        *visual;          /* Visual for video window               */
   Colormap	         colormap;        /* Colormap for video window		   */
   XClassHint            *xclasshint;
@@ -397,7 +398,7 @@ void video_window_select_visual (xui_vwin_t *vwin) {
         exit (1);
       }
       vwin->gui->visual = vinfo->visual;
-      vwin->gui->depth  = vinfo->depth;
+      vwin->gui_depth   = vinfo->depth;
     }
     if (vwin->gui->visual != vwin->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui->visual->visualid);
@@ -468,7 +469,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       vwin->fullscreen_mode = FULLSCR_MODE;
       vwin->visual          = vwin->gui->visual;
-      vwin->depth           = vwin->gui->depth;
+      vwin->depth           = vwin->gui_depth;
       vwin->colormap        = vwin->gui->colormap;
 
       if (vwin->gui->video_display != vwin->gui->display) {
@@ -766,7 +767,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
     vwin->visual   = vwin->gui->visual;
-    vwin->depth    = vwin->gui->depth;
+    vwin->depth    = vwin->gui_depth;
     vwin->colormap = vwin->gui->colormap;
     if (vwin->gui->video_display != vwin->gui->display) {
       video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
@@ -862,7 +863,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
     vwin->visual   = vwin->gui->visual;
-    vwin->depth    = vwin->gui->depth;
+    vwin->depth    = vwin->gui_depth;
     vwin->colormap = vwin->gui->colormap;
     
     if (vwin->gui->video_display != vwin->gui->display) {
@@ -1023,7 +1024,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     vwin->fullscreen_mode   = WINDOWED_MODE;
     vwin->visual            = vwin->gui->visual;
-    vwin->depth             = vwin->gui->depth;
+    vwin->depth             = vwin->gui_depth;
     vwin->colormap          = vwin->gui->colormap;
       
     if (vwin->gui->video_display != vwin->gui->display) {
@@ -1591,7 +1592,7 @@ static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_n
 /*
  *
  */
-xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribute, int hide_on_start) {
+xui_vwin_t *video_window_init (gGui_t *gui, int depth, window_attributes_t *window_attribute, int hide_on_start) {
   xui_vwin_t           *vwin;
   int                   i;
 #ifdef HAVE_XINERAMA
@@ -1622,6 +1623,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   }
 
   vwin->video_window       = None;
+  vwin->gui_depth          = depth;
   vwin->fullscreen_req     = WINDOWED_MODE;
   vwin->fullscreen_mode    = WINDOWED_MODE;
   vwin->video_window  = None;
@@ -1633,7 +1635,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, window_attributes_t *window_attribut
   vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
 
-  vwin->depth              = vwin->gui->depth;
+  vwin->depth              = vwin->gui_depth;
   vwin->visual             = vwin->gui->visual;
   vwin->colormap           = vwin->gui->colormap;
   /* Currently, there no plugin loaded so far, but that might change */

@@ -260,7 +260,6 @@ struct gGui_st {
   void                    (*x_unlock_display) (Display *display);
   Display                  *display;
   int                       screen;
-  int		            depth;
   Visual	           *visual;
   XColor                    black;
   Pixmap                    icon;
