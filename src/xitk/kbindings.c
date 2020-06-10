@@ -435,7 +435,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
 static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
   int    mod;
   KeySym mkey;
-  char  *keySym;
+  const char *keySym;
 
   if (event == NULL)
     return -1;
@@ -932,9 +932,6 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   kbe->is_gui    = kbedit->ksel->is_gui;
   
   xitk_labelbutton_change_label(kbedit->grab, _("Press Keyboard Keys..."));
-  gui->x_lock_display (gui->display);
-  XSync(gui->display, False);
-  gui->x_unlock_display (gui->display);
 
   {
     int x, y, w, h;
@@ -976,10 +973,6 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   xitk_labelbutton_change_label(kbedit->grab, olbl);
 
   xitk_window_destroy_window(xwin);
-  
-  gui->x_lock_display (gui->display);
-  XSync(gui->display, False);
-  gui->x_unlock_display (gui->display);
 
   kbedit->grabbing = 0;
   

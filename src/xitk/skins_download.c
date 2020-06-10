@@ -566,9 +566,6 @@ void download_skin(char *url) {
     return;
   }
 
-  gui->x_lock_display (gui->display);
-  gui->x_unlock_display (gui->display);
-  
   dialog = xitk_window_dialog_3 (gui->imlib_data,
     NULL,
     get_layer_above_video (gui), 400, _("Be patient..."), NULL, NULL,

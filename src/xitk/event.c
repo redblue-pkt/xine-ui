@@ -1299,14 +1299,6 @@ void gui_handle_event (XEvent *event, void *data) {
   case ButtonRelease:
     kbindings_handle_kbinding(gui->kbindings, event);
     break;
-    
-  case ConfigureNotify:
-    break;
-
-    /*
-      default:
-      printf("Got event: %i\n", event->type);
-    */
   }
 
 }
