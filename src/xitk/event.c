@@ -1535,6 +1535,7 @@ static void gui_dummy_un_lock_display (Display *display) {
 
 void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
+  int    depth;
   char  *server;
   char  *video_display_name;
   pthread_mutexattr_t attr;
@@ -1868,7 +1869,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
     dump_xfree_info(gui->display, gui->screen, (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
   }
 
-  gui_find_visual(&gui->visual, &gui->depth);
+  gui_find_visual(&gui->visual, &depth);
 
   gui_init_imlib (gui, gui->visual);
 
@@ -1891,7 +1892,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   gui->on_quit = 0;
   gui->running = 1;
   
-  video_window_init (gui, window_attribute,
+  video_window_init (gui, depth, window_attribute,
     ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
