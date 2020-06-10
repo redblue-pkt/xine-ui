@@ -131,17 +131,14 @@ static char        **post_audio_plugins;
 /* Some functions prototype */
 static void _vpplugin_unwire(void);
 static void _applugin_unwire(void);
-static void _pplugin_unwire(_pp_wrapper_t *pp_wrapper);
 static post_element_t **pplugin_parse_and_load(_pp_wrapper_t *pp_wrapper, const char *, int *);
 static void _vpplugin_rewire(void);
 static void _applugin_rewire(void);
-static void _pplugin_rewire(_pp_wrapper_t *pp_wrapper);
-static void _pplugin_rewire_from_post_elements(_pp_wrapper_t *pp_wrapper, post_element_t **, int);
+static void _vpplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
+static void _applugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *);
 static post_element_t **_pplugin_join_visualization_and_post_elements(int *);
 static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper);
-static void _vpplugin_close_help(xitk_widget_t *, void *);
-static void _applugin_close_help(xitk_widget_t *, void *);
 static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *, void *);
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -324,63 +321,10 @@ static void _vpplugin_rewire(void) {
   post_elements = _pplugin_join_deinterlace_and_post_elements(&post_elements_num);
 
   if( post_elements ) {
-    _pplugin_rewire_from_post_elements(pp_wrapper, post_elements, post_elements_num);
+    _vpplugin_rewire_from_post_elements(post_elements, post_elements_num);
 
     free(post_elements);
   }
-
-#if 0
-  gGui_t *gui = gGui;
-  if(pplugin && (gui->post_enable && !gui->deinterlace_enable)) {
-    xine_post_out_t  *vo_source;
-    int               post_num = pplugin->object_num;
-    int               i = 0;
-    
-    if(!xitk_combo_get_current_selected(pplugin->post_objects[post_num - 1]->plugins))
-      post_num--;
-    
-    if(post_num) {
-      int paused = 0;
-      
-      if((paused = (xine_get_param(gui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-	xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
-      
-      for(i = (post_num - 1); i >= 0; i--) {
-	const char *const *outs = xine_post_list_outputs(pplugin->post_objects[i]->post);
-	const xine_post_out_t *vo_out = xine_post_output(pplugin->post_objects[i]->post, (char *) *outs);
-	if(i == (post_num - 1)) {
-#ifdef TRACE_REWIRE
-	  printf("  VIDEO_OUT .. OUT<-[PLUGIN %d]\n", i);
-#endif
-	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gui->vo_port);
-	}
-	else {
-	  const xine_post_in_t *vo_in = xine_post_input(pplugin->post_objects[i+1]->post, "video");
-	  int                   err;
-	  
-#ifdef TRACE_REWIRE
-	  printf("  [PLUGIN %d]->IN ... OUT<-[PLUGIN %d]", i+1, i);
-#endif
-	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
-#ifdef TRACE_REWIRE
-	  printf(" (RESULT: %d)\n", err);
-#endif
-	}
-      }
-      
-#ifdef TRACE_REWIRE
-      printf("  [PLUGIN %d]->IN .. STREAM\n", 0);
-#endif
-
-      vo_source = xine_get_video_source(gui->stream);
-      xine_post_wire_video_port(vo_source, pplugin->post_objects[0]->post->video_input[0]);
-      
-      if(paused)
-	xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-
-    }
-  }
-#endif
 }
 
 static void _applugin_rewire(void) {
@@ -393,7 +337,7 @@ static void _applugin_rewire(void) {
   post_elements = _pplugin_join_visualization_and_post_elements(&post_elements_num);
   
   if( post_elements ) {
-    _pplugin_rewire_from_post_elements(pp_wrapper, post_elements, post_elements_num);
+    _applugin_rewire_from_post_elements(post_elements, post_elements_num);
 
     free(post_elements);
   }
@@ -1774,22 +1718,9 @@ static void _applugin_rewire_from_post_elements(post_element_t **post_elements, 
   }
 }
 
-static void _pplugin_rewire_from_post_elements(_pp_wrapper_t *pp_wrapper, post_element_t **post_elements, int post_elements_num) {
-  if (pp_wrapper == &vpp_wrapper)
-    _vpplugin_rewire_from_post_elements(post_elements, post_elements_num);
-  else
-    _applugin_rewire_from_post_elements(post_elements, post_elements_num);
-}
-
 static void pplugin_rewire_posts(_pp_wrapper_t *pp_wrapper) {
   _pplugin_unwire(pp_wrapper);
   _pplugin_rewire(pp_wrapper);
-
-#if 0
-  gGui_t *gui = gGui;
-  if(gui->post_enable && !gui->deinterlace_enable)
-    _pplugin_rewire_from_post_elements(gui->post_elements, gui->post_elements_num);
-#endif
 }
 
 static void pplugin_end(_pp_wrapper_t *pp_wrapper) {
@@ -2170,7 +2101,7 @@ void post_deinit (void) {
   gGui_t *gui = gGui;
   int i;
 
-  if (gui->post_video_enable)
+  if (gui->post_video_enable || gui->deinterlace_enable)
     _vpplugin_unwire ();
 
   for (i = 0; i < gui->post_video_elements_num; i++) {
@@ -2181,7 +2112,7 @@ void post_deinit (void) {
   SAFE_FREE (gui->post_video_elements);
   gui->post_video_elements_num = 0;
 
-
+  
   if (gui->post_audio_enable)
     _applugin_unwire ();
 
@@ -2192,6 +2123,20 @@ void post_deinit (void) {
   }
   SAFE_FREE (gui->post_audio_elements);
   gui->post_audio_elements_num = 0;
+
+#if 0
+  /* requires <xine/xine_internal.h> */
+  __xineui_global_xine_instance->config->unregister_callback (__xineui_global_xine_instance, "gui.deinterlace_plugin");
+#endif
+
+  for (i = 0; i < gui->deinterlace_elements_num; i++) {
+    xine_post_dispose (__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
+    free (gui->deinterlace_elements[i]->name);
+    VFREE (gui->deinterlace_elements[i]);
+  }
+
+  SAFE_FREE (gui->deinterlace_elements);
+  gui->deinterlace_elements_num = 0;
 }
 
 static const char *_pplugin_get_default_deinterlacer(void) {
@@ -2223,27 +2168,6 @@ void post_deinterlace_init(const char *deinterlace_post) {
   
 }
 
-void post_deinterlace_deinit (void) {
-  gGui_t *gui = gGui;
-  int i;
-#if 0
-  /* requires <xine/xine_internal.h> */
-  __xineui_global_xine_instance->config->unregister_callback (__xineui_global_xine_instance, "gui.deinterlace_plugin");
-#endif
-
-  if (gui->deinterlace_enable)
-    _vpplugin_unwire ();
-
-  for (i = 0; i < gui->deinterlace_elements_num; i++) {
-    xine_post_dispose (__xineui_global_xine_instance, gui->deinterlace_elements[i]->post);
-    free (gui->deinterlace_elements[i]->name);
-    VFREE (gui->deinterlace_elements[i]);
-  }
-  
-  SAFE_FREE (gui->deinterlace_elements);
-  gui->deinterlace_elements_num = 0;
-}
-
 void post_deinterlace(void) {
   gGui_t *gui = gGui;
 
@@ -2256,25 +2180,6 @@ void post_deinterlace(void) {
     _pplugin_unwire(&vpp_wrapper);
     _pplugin_rewire(&vpp_wrapper);
   }
-
-#if 0
-  if(gui->deinterlace_enable) {
-    if(gui->post_enable)
-      _pplugin_unwire();
-    
-    _pplugin_rewire_from_post_elements(gui->deinterlace_elements, gui->deinterlace_elements_num);
-  }
-  else {
-    _pplugin_unwire();
-    
-    if(gui->post_enable) {
-      if(pplugin_is_visible() && pplugin)
-	_pplugin_rewire();
-      else
-	_pplugin_rewire_from_post_elements(gui->post_elements, gui->post_elements_num);
-    }
-  }
-#endif
 }
 
 void vpplugin_end(void)

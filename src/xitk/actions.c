@@ -757,7 +757,6 @@ void gui_exit_2 (gGui_t *gui) {
 
   /* unwire post plugins before closing streams */
   post_deinit ();
-  post_deinterlace_deinit ();
 
   xine_dispose(gui->stream);
   xine_dispose(gui->visual_anim.stream);
@@ -786,17 +785,7 @@ void gui_exit_2 (gGui_t *gui) {
   if(gui->stdctl_enable) 
     stdctl_stop();
 
-  /* this will prevent a race condition that may lead to a lock:
-   * xitk_stop() makes gui_run() in event.c return from xitk_run()
-   * and do some house cleaning which includes closing displays.
-   * However, we're not done using displays and we must prevent that
-   * from happening until we're finished.
-   * NEWS FLASH: gui_exit_2 () now runs inside xitk_run ().
-   */
-  gui->x_lock_display (gui->display);
-/*xitk_stop();*/
   xitk_skin_unload_config(gui->skin_config);
-  gui->x_unlock_display (gui->display);
 
   mediamark_free_mediamarks();
 }

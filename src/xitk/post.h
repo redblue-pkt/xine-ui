@@ -64,6 +64,5 @@ void applugin_reparent(void);
 
 void post_deinterlace_init(const char *deinterlace_post);
 void post_deinterlace(void);
-void post_deinterlace_deinit (void);
 
 #endif
