@@ -180,7 +180,8 @@ static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t)
 static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
   struct jpeg_error_mgr jpeg_error;
   struct jpeg_decompress_struct jpeg_ptr;
-  JSAMPARRAY buffer;
+  JSAMPROW rowptr;
+  JSAMPARRAY buffer = &rowptr;
   int rowstride;
   unsigned char *out, *outptr;
 
@@ -194,7 +195,6 @@ static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
   jpeg_start_decompress (&jpeg_ptr);
 
   rowstride = jpeg_ptr.output_width * jpeg_ptr.output_components;
-  buffer = (*jpeg_ptr.mem->alloc_sarray) ((j_common_ptr) &jpeg_ptr, JPOOL_IMAGE, rowstride, 1);
   outptr = out = malloc (rowstride * jpeg_ptr.output_height);
 
   if (!buffer || !out)
@@ -206,8 +206,8 @@ static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
 
   while (jpeg_ptr.output_scanline < jpeg_ptr.output_height)
   {
+    buffer[0] = outptr;
     jpeg_read_scanlines (&jpeg_ptr, buffer, 1);
-    memcpy (outptr, buffer[0], rowstride);
     outptr += rowstride;
   }
 
