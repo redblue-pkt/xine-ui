@@ -1539,6 +1539,8 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   char  *server;
   char  *video_display_name;
   pthread_mutexattr_t attr;
+  XColor              black, dummy;
+  Colormap            colormap;
 
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -1880,7 +1882,10 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
    */
   xine_pid = getppid();
   
-  xitk_init (gui->display, gui->black, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
+  colormap = Imlib_get_colormap (gui->imlib_data);
+  XAllocNamedColor(gui->display, colormap, "black", &black, &dummy);
+
+  xitk_init (gui->display, black, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
   
   preinit_skins_support();
   
@@ -1906,7 +1911,6 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
 }
 
 void gui_init_imlib (gGui_t *gui, Visual *vis) {
-  XColor                dummy;
   ImlibInitParams	imlib_init;
 
   /*
@@ -1940,11 +1944,6 @@ void gui_init_imlib (gGui_t *gui, Visual *vis) {
 
   gui->imlib_data->x.x_lock_display = gui->x_lock_display;
   gui->imlib_data->x.x_unlock_display = gui->x_unlock_display;
-
-  gui->colormap = Imlib_get_colormap (gui->imlib_data);
-
-  XAllocNamedColor(gui->display, gui->colormap,
-		   "black", &gui->black, &dummy);
 
   /*
    * create an icon pixmap

@@ -261,9 +261,7 @@ struct gGui_st {
   Display                  *display;
   int                       screen;
   Visual	           *visual;
-  XColor                    black;
   Pixmap                    icon;
-  Colormap                  colormap;
 
   VisualID	            prefered_visual_id;
   int		            prefered_visual_class;
