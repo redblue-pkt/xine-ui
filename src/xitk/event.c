@@ -1541,6 +1541,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   pthread_mutexattr_t attr;
   XColor              black, dummy;
   Colormap            colormap;
+  Visual             *visual;
 
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -1871,9 +1872,9 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
     dump_xfree_info(gui->display, gui->screen, (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
   }
 
-  gui_find_visual(&gui->visual, &depth);
+  gui_find_visual(&visual, &depth);
 
-  gui_init_imlib (gui, gui->visual);
+  gui_init_imlib (gui, visual);
 
   gui->x_unlock_display (gui->display);
 

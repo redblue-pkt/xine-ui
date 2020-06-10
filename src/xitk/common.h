@@ -260,7 +260,6 @@ struct gGui_st {
   void                    (*x_unlock_display) (Display *display);
   Display                  *display;
   int                       screen;
-  Visual	           *visual;
   Pixmap                    icon;
 
   VisualID	            prefered_visual_id;
