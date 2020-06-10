@@ -904,7 +904,8 @@ static void _applugin_close_help(xitk_widget_t *w, void *data) {
   _pplugin_close_help(&app_wrapper, w, data);
 }
 
-static void _pplugin_help_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void *data) {
+static void _pplugin_help_handle_event(XEvent *event, void *data) {
+  _pp_wrapper_t *pp_wrapper = data;
 
   if(event->type == KeyPress) {
     if(xitk_get_key_pressed(event) == XK_Escape)
@@ -912,14 +913,6 @@ static void _pplugin_help_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event,
     else
       gui_handle_event (event, gGui);
   }
-}
-
-static void _vpplugin_help_handle_event(XEvent *event, void *data) {
-  _pplugin_help_handle_event(&vpp_wrapper, event, data);
-}
-
-static void _applugin_help_handle_event(XEvent *event, void *data) {
-  _pplugin_help_handle_event(&app_wrapper, event, data);
 }
 
 static int __line_wrap(char *s, int pos, int line_size)
@@ -1069,11 +1062,11 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &vpp_wrapper) ? "vpplugin_help" : "applugin_help", 
                                                                        pp_wrapper->pplugin->helpwin,
-								       (pp_wrapper == &vpp_wrapper) ? _vpplugin_help_handle_event : _applugin_help_handle_event,
+                                                                       _pplugin_help_handle_event,
                                                                        NULL,
                                                                        NULL,
                                                                        pp_wrapper->pplugin->help_widget_list,
-                                                                       NULL);
+                                                                       pp_wrapper);
   
     pp_wrapper->pplugin->help_running = 1;
   }
