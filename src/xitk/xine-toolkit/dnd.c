@@ -89,11 +89,12 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
   do {
     Atom      actual_type;
     int       actual_fmt;
-    char *buf = 0;
-    
+    unsigned char *buf = NULL;
+    char *pbuf;
+
     if(XGetWindowProperty (xdnd->xitk->display, insert, prop, 
 			  nread / (sizeof(unsigned char *)), 65536, delete_prop, AnyPropertyType, 
-              &actual_type, &actual_fmt, &nitems, &bytes_after, (unsigned char **)&buf) != Success) {
+              &actual_type, &actual_fmt, &nitems, &bytes_after, &buf) != Success) {
       /* Note that per XGetWindowProperty man page, buf will always be NULL-terminated */
       if(buf)
 	XFree(buf);
@@ -103,11 +104,11 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
     nread += nitems;
     
     /* Okay, got something, handle */
-      if(strlen(buf)) {
-	char *p, *pbuf;
+    pbuf = (char *)buf;
+      if(strlen(pbuf)) {
+	char *p;
 	int   plen;
 	
-	pbuf = buf;
 	/* Extract all data, '\n' separated */
 	while((p = strsep(&pbuf, "\n")) != NULL) {
 	  
