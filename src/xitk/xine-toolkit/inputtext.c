@@ -434,6 +434,79 @@ KeySym xitk_get_key_pressed(XEvent *event) {
   return pkey;
 }
 
+int xitk_keysym_to_string(KeySym keysym, char *buf, size_t buf_size) {
+  const char *s = XKeysymToString(keysym);
+  if (!s)
+    return -1;
+  return strlcpy(buf, s, buf_size);
+}
+
+KeySym xitk_keycode_to_keysym(XEvent *event) {
+  KeySym pkey = XK_VoidSymbol;
+
+  if (event) {
+    XLOCK (xitk_x_lock_display, event->xany.display);
+    pkey = XKeycodeToKeysym(event->xany.display, event->xkey.keycode, 0);
+    XUNLOCK (xitk_x_unlock_display, event->xany.display);
+  }
+  return pkey;
+}
+
+int xitk_window_grab_input(xitk_window_t *w, KeySym *keysym,
+                           unsigned int *keycode, int *modifier, int *button) {
+  XEvent xev;
+  long mask = 0;
+
+  if (!keysym && !keycode && !button)
+    return -1;
+  if (!w)
+    return -1;
+
+  if (button)
+    mask |= (ButtonPressMask | ButtonReleaseMask);
+  if (keysym || keycode)
+    mask |= (KeyPressMask | KeyReleaseMask);
+
+  if (keysym)
+    *keysym = XK_VoidSymbol;
+  if (keycode)
+    *keycode = 0;
+  if (modifier)
+    *modifier = MODIFIER_NOMOD;
+  if (button)
+    *button = -1;
+
+  do {
+    /* Although only release events are evaluated, we must also grab the corresponding press */
+    /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
+    XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
+    XMaskEvent(w->imlibdata->x.disp, mask, &xev);
+    XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+    if (xev.xany.window != xitk_window_get_window(w))
+      return -1;
+  } while (xev.type != KeyRelease && xev.type != ButtonRelease);
+
+  switch (xev.type) {
+    case ButtonRelease:
+      if (modifier)
+        xitk_get_key_modifier(&xev, modifier);
+      if (button)
+        *button = xev.xbutton.button;
+      return 0;
+    case KeyRelease:
+      if (modifier)
+        xitk_get_key_modifier(&xev, modifier);
+      if (keysym)
+        *keysym = xitk_get_key_pressed(&xev);
+      if (keycode)
+        *keycode = xev.xkey.keycode;
+      return 0;
+    default:
+      break;
+  }
+  return -1;
+}
+
 /*
  * Paint the input text box.
  */

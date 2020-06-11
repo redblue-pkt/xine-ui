@@ -1291,19 +1291,29 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
  */
 void gui_handle_event (XEvent *event, void *data) {
   gGui_t *gui = data;
+  int modifiers;
+  KeySym keysym;
 
   switch(event->type) {
 
   case KeyPress:
-    if(gui->stdctl_enable)
-      stdctl_keypress(event->xkey);
-    /* no break */
+    if (gui->stdctl_enable) {
+      char str[32];
+      if (xitk_keysym_to_string(xitk_keycode_to_keysym(event), str, sizeof(str)) > 0)
+        stdctl_keypress(str);
+    }
+    xitk_get_key_modifier(event, &modifiers);
+    keysym = xitk_get_key_pressed(event);
+    kbindings_handle_kbinding(gui->kbindings, keysym, event->xkey.keycode, modifiers, -1);
+    break;
+
   case ButtonRelease:
-    kbindings_handle_kbinding(gui->kbindings, event);
+    xitk_get_key_modifier(event, &modifiers);
+    kbindings_handle_kbinding(gui->kbindings, XK_VoidSymbol, 0, modifiers, event->xbutton.button);
     break;
   }
 }
-
+  
 /*
  * Start playback of an entry in playlist
  */

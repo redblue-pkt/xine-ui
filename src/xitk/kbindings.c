@@ -432,64 +432,38 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
 }
 
 /* Convert X(Button|Key)(Press|Release) events into string identifier. */
-static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
-  int    mod;
-  KeySym mkey;
-  const char *keySym;
-
-  if (event == NULL)
-    return -1;
-
-  switch (event->type) {
-  case ButtonPress:
-  case ButtonRelease:
-    (void) xitk_get_key_modifier(event, &mod);
-    kbindings_convert_modifier(mod, modifier);
-    snprintf(buf, size, "XButton_%d", event->xbutton.button);
-    return 0;
-
-  case KeyPress:
-  case KeyRelease:
-    (void) xitk_get_key_modifier(event, &mod);
-    kbindings_convert_modifier(mod, modifier);
-    mkey = xitk_get_key_pressed(event);
-
-    switch (mkey) {
-      default:
-        gGui->x_lock_display (event->xany.display);
-        keySym = XKeysymToString(mkey);
-        gGui->x_unlock_display (event->xany.display);
-        if (keySym != NULL) {
-          strlcpy(buf, keySym, size);
-          return 0;
-        }
-      case 0: /* Key without assigned KeySymbol */
-      case XK_VoidSymbol:
-        /* For keys without assigned KeySyms. */
-        snprintf(buf, size, "XKey_%d", event->xkey.keycode);
-        return 0;
-    }
-
-  default:
-    memset(buf, 0, size);
-    return -1;
+static void event2id(KeySym keysym, unsigned int keycode, int button, char *buf, size_t size) {
+  if (button >= 0) {
+    snprintf(buf, size, "XButton_%d", button);
+    return;
+  }
+  switch (keysym) {
+    default:
+      if (xitk_keysym_to_string(keysym, buf, size) > 0)
+        break;
+      /* fall through */
+    case 0: /* Key without assigned KeySymbol */
+    case XK_VoidSymbol:
+      /* For keys without assigned KeySyms. */
+      snprintf(buf, size, "XKey_%d", keycode);
+      break;
   }
 }
 
 /*
  * Handle key event from an XEvent.
  */
-void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
+void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int modifier, int button) {
   gGui_t *gui = gGui;
-  int               modifier;
   char              buf[256];
   kbinding_entry_t *k;
 
-  if(!gui->kbindings_enabled || (kbt == NULL) || (event == NULL))
+  if (!gui->kbindings_enabled || (kbt == NULL))
     return;
 
-  if (xevent2id(event, &modifier, buf, sizeof(buf)))
-    return;
+  kbindings_convert_modifier(modifier, &modifier);
+  event2id(keysym, keycode, button, buf, sizeof(buf));
+
   k = kbindings_lookup_binding(kbt, buf, modifier);
   if(k && !(gui->no_gui && k->is_gui))
     gui_execute_action_id (gui, k->action_id);
@@ -910,8 +884,6 @@ static void _kbedit_accept_done (void *data, int state) {
 static void kbedit_grab(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
   char              *olbl;
-  XEvent             xev;
-  int                mod, modifier;
   xitk_window_t     *xwin;
   kbinding_entry_t  *kbe;
   int                redundant;
@@ -948,24 +920,16 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);
 
-  do {
-    /* Although only release events are evaluated, we must also grab the corresponding press */
-    /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
-    gui->x_lock_display (gui->display);
-    XMaskEvent(gui->display, ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask, &xev);
-    gui->x_unlock_display (gui->display);
-  } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
-	   xev.xany.window != xitk_window_get_window(xwin));
-  
-  (void) xitk_get_key_modifier(&xev, &mod);
-  kbindings_convert_modifier(mod, &modifier);
-
-  kbe->modifier = modifier;
-  
-
   {
-    char buf[256];
-    xevent2id(&xev, &kbe->modifier, buf, sizeof(buf));
+    KeySym key;
+    int button, modifier;
+    unsigned int keycode;
+    char buf[256] = "";
+    if (xitk_window_grab_input(xwin, &key, &keycode, &modifier, &button) == 0) {
+      kbindings_convert_modifier(modifier, &kbe->modifier);
+      event2id(key, keycode, button, buf, sizeof(buf));
+    }
+
     kbe->key = strdup(buf);
     kbe->modifier &= ~MODIFIER_NUML;
   }
