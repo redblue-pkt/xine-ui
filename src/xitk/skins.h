@@ -35,9 +35,11 @@ void init_skins_support(void);
 void select_new_skin(int selected);
 char *skin_get_current_skin_dir(void);
 
+typedef struct xui_skdloader_s xui_skdloader_t;
+
 #ifdef HAVE_TAR
-void download_skin(char *url);
-void download_skin_end(void);
+void download_skin(gGui_t *gui, char *url);
+void download_skin_end(xui_skdloader_t *skd);
 #endif
 
 #endif

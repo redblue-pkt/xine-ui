@@ -1000,7 +1000,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
 #ifdef HAVE_TAR
   case ACTID_SKINDOWNLOAD:
-    download_skin(gui->skin_server_url);
+    download_skin(gui, gui->skin_server_url);
     break;
 #endif
 
