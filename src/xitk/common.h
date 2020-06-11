@@ -308,8 +308,6 @@ struct gGui_st {
     int                     method;
   } mixer;
 
-  xitk_register_key_t       widget_key;
-
   int                       layer_above;
   int                       always_layer_above;
   

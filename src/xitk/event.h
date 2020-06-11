@@ -35,7 +35,6 @@ void gui_init_imlib (gGui_t *gui, Visual *vis);
 void gui_run(char **session_opts);
 int gui_playlist_play (gGui_t *gui, int idx);
 void gui_playlist_start_next (gGui_t *gui);
-void gui_dndcallback(const char *filename);
 void gui_execute_action_id (gGui_t *gui, action_id_t id);
 void gui_handle_event (XEvent *event, void *gui);
 
