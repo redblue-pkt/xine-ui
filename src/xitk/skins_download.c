@@ -303,28 +303,10 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
   download_set_cursor_state(WAIT_CURS);
 
   if((network_download(skdloader.slxs[selected]->skin.preview, &download))) {
-    char          *skpname;
-    FILE          *fd;
-    char           tmpfile[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-
-    skpname = strrchr(skdloader.slxs[selected]->skin.preview, '/');
-
-    if(skpname)
-      skpname++;
-    else
-      skpname = skdloader.slxs[selected]->skin.preview;
-    
-    snprintf(tmpfile, sizeof(tmpfile), "%s%u%s", "/tmp/", (unsigned int)time(NULL), skpname);
-    
-    if((fd = fopen(tmpfile, "w+b")) != NULL) {
       ImlibImage    *img = NULL;
-      
-      fwrite(download.buf, download.size, 1, fd);
-      fflush(fd);
-      fclose(fd);
 
       gui->x_lock_display (gui->display);
-      img = Imlib_load_image (gui->imlib_data, tmpfile);
+      img = Imlib_decode_image (gui->imlib_data, download.buf, download.size);
       gui->x_unlock_display (gui->display);
 
       if(img) {
@@ -375,9 +357,6 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 
 	download_update_preview(skdloader.preview_image);
       }
-
-      unlink(tmpfile);
-    }
   }
   else {
     xine_error (gui, _("Unable to download '%s': %s"),

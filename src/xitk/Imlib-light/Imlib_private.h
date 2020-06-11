@@ -80,8 +80,6 @@ void                add_pixmap(ImlibData * id, ImlibImage * im, int width, int h
 void                clean_caches(ImlibData * id);
 void                nullify_image(ImlibData * id, ImlibImage * im);
 
-int                 ispng(FILE *f);
-
 void                calc_map_tables(ImlibData * id, ImlibImage * im);
 
 void                _PaletteAlloc(ImlibData * id, int num, const int *cols);
