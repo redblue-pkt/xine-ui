@@ -688,8 +688,8 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
 
   case xitk_cursor_invisible:
     {
-      XColor black = xitk_get_black_pixel_color();
-      
+      XColor dummy, black;
+      XAllocNamedColor(display, DefaultColormap (display, DefaultScreen(display)), "black", &black, &dummy);
       cursor->p      = XCreateBitmapFromData(display, DefaultRootWindow(display), (const char*)no_data, 8, 8);
       cursor->cursor = XCreatePixmapCursor(display, cursor->p, cursor->p, &black, &black, 0, 0);
     }

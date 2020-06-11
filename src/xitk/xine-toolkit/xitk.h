@@ -873,7 +873,7 @@ xitk_window_t *xitk_get_window(xitk_register_key_t key);
 /*
  * Initialization function, should be the first call to widget lib.
  */
-void xitk_init(Display *display, XColor black, void (*x_lock_display) (Display *display),
+xitk_t *xitk_init(Display *display, void (*x_lock_display) (Display *display),
   void (*x_unlock_display) (Display *display), int verbosity);
 
 /*

@@ -1537,8 +1537,6 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   char  *server;
   char  *video_display_name;
   pthread_mutexattr_t attr;
-  XColor              black, dummy;
-  Colormap            colormap;
   Visual             *visual;
 
   pthread_mutexattr_init(&attr);
@@ -1879,10 +1877,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
    */
   xine_pid = getppid();
   
-  colormap = Imlib_get_colormap (gui->imlib_data);
-  XAllocNamedColor(gui->display, colormap, "black", &black, &dummy);
-
-  xitk_init (gui->display, black, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
+  xitk_init (gui->display, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
   
   preinit_skins_support();
   
