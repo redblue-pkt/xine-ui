@@ -41,7 +41,7 @@ void splash_create(void) {
   
   if(skin_path && is_a_dir((char *) skin_path)) {
     static const char types[][4] = { "png", "jpg" };
-    int i;
+    size_t i;
 
     for (i = 0; i < sizeof (types) / sizeof (types[0]); ++i)
     {
