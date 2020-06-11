@@ -67,9 +67,11 @@
 #define PIXSZ 3
 #define BIT_DEPTH 8
 
-static snapshot_messenger_t error_msg_cb;
-static snapshot_messenger_t info_msg_cb;
-static void *msg_cb_data;
+typedef struct {
+  snapshot_messenger_t  error_msg_cb;
+  snapshot_messenger_t  info_msg_cb;
+  void                 *msg_cb_data;
+} msg_cb_t;
 
 static char *snap_build_filename(const char *mrl) {
   char         *buffer;
@@ -106,13 +108,14 @@ static char *snap_build_filename(const char *mrl) {
 
 static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
+  msg_cb_t *cbs = png_get_error_ptr(png_ptr);
 
-  if(error_msg_cb) {
+  if(cbs && cbs->error_msg_cb) {
     char *uerror;
 
     uerror = xitk_asprintf("%s%s\n", _("Error: "), error_msg);
     if (uerror) {
-      error_msg_cb(msg_cb_data, uerror);
+      cbs->error_msg_cb(cbs->msg_cb_data, uerror);
       free(uerror);
     }
   }
@@ -120,12 +123,14 @@ static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 
 static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 {
-  if(error_msg_cb) {
+  msg_cb_t *cbs = png_get_error_ptr(png_ptr);
+
+  if(cbs && cbs->error_msg_cb) {
     char *uerror;
 
     uerror = xitk_asprintf("%s%s\n", _("Error: "), warning_msg);
     if (uerror) {
-      error_msg_cb(msg_cb_data, uerror);
+      cbs->error_msg_cb(cbs->msg_cb_data, uerror);
       free(uerror);
     }
   }
@@ -143,6 +148,41 @@ static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
 
 #include <xine.h>
 
+static int _encode(png_structp struct_ptr, png_infop info_ptr, png_bytep *rows, int width, int height,
+                   FILE *fp, snapshot_messenger_t error_mcb, void *mcb_data ) {
+
+#ifdef PNG_SETJMP_SUPPORTED /* libpng 1.0.5 has no png_jmpbuf */
+    /* Set up long jump callback for PNG parser */
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+    if (setjmp (png_jmpbuf (struct_ptr)))
+#else
+    if (setjmp (struct_ptr->jmpbuf))
+#endif
+    {
+      if (error_mcb)
+        error_mcb (mcb_data, _("PNG Parsing failed\n"));
+      return -1;
+    }
+#endif
+
+    png_set_filter (struct_ptr, 0, PNG_FILTER_NONE | PNG_FILTER_VALUE_NONE);
+    png_init_io (struct_ptr, fp);
+    png_set_write_status_fn (struct_ptr, write_row_callback);
+    png_set_IHDR (struct_ptr, info_ptr, width, height,
+      BIT_DEPTH, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
+    png_set_rows (struct_ptr, info_ptr, rows);
+    png_write_png (struct_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+#else
+    png_write_info (struct_ptr, info_ptr);
+    png_write_image (struct_ptr, rows);
+    png_write_end (struct_ptr, NULL);
+#endif
+
+    return 0;
+}
+
 void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   snapshot_messenger_t info_mcb, void *mcb_data) {
 
@@ -157,15 +197,13 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   int i;
 
-  error_msg_cb = error_mcb;
-  info_msg_cb  = info_mcb;
-  msg_cb_data  = mcb_data;
+  msg_cb_t cbs = { error_mcb, info_mcb, mcb_data };
 
   do {
     xgvf = xine_new_grab_video_frame (gGui->stream);
     if (!xgvf) {
-      if (error_msg_cb)
-        error_msg_cb (msg_cb_data, _("xine_grab_video_frame.grab () failed\n"));
+      if (error_mcb)
+        error_mcb (mcb_data, _("xine_grab_video_frame.grab () failed\n"));
       break;
     }
 
@@ -180,19 +218,19 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     xgvf->flags  = 0;
 
     if (xgvf->grab (xgvf) != 0) {
-      if (error_msg_cb)
-        error_msg_cb (msg_cb_data, _("xine_new_grab_video_frame () failed\n"));
+      if (error_mcb)
+        error_mcb (mcb_data, _("xine_new_grab_video_frame () failed\n"));
       break;
     }
 
     if ((!xgvf->width) || (!xgvf->height)) {
-      if(error_msg_cb) {
+      if(error_mcb) {
         char *umessage;
 
         umessage = xitk_asprintf ("%s%dx%d%s\n",
           _("Wrong image size: "), xgvf->width, xgvf->height, _(". Snapshot aborted."));
         if (umessage) {
-          error_msg_cb (msg_cb_data, umessage);
+          error_mcb (mcb_data, umessage);
           free (umessage);
         }
       }
@@ -202,12 +240,12 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     /* open file */
     file_name = snap_build_filename (mrl);
     if (!file_name || (fp = fopen (file_name, "wb")) == NULL) {
-      if (error_msg_cb) {
+      if (error_mcb) {
         char *umessage;
 
         umessage = xitk_asprintf ("%s (%s)\n", _("File open failed"), file_name);
         if (umessage) {
-          error_msg_cb (msg_cb_data, umessage);
+          error_mcb (mcb_data, umessage);
           free (umessage);
         }
       }
@@ -215,18 +253,18 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     }
 
     /* get write struct */
-    struct_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, (png_voidp)0, user_error_fn, user_warning_fn);
+    struct_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, &cbs, user_error_fn, user_warning_fn);
     if (!struct_ptr) {
-      if (error_msg_cb)
-        error_msg_cb (msg_cb_data, _("png_create_write_struct() failed\n"));
+      if (error_mcb)
+        error_mcb (mcb_data, _("png_create_write_struct() failed\n"));
       break;
     }
 
     /* get info struct */
     info_ptr = png_create_info_struct (struct_ptr);
     if (!info_ptr) {
-      if (error_msg_cb)
-        error_msg_cb (msg_cb_data, _("png_create_info_struct() failed\n"));
+      if (error_mcb)
+        error_mcb (mcb_data, _("png_create_info_struct() failed\n"));
       break;
     }
 
@@ -237,40 +275,14 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     for (i = 0; i < xgvf->height; i++)
       rows[i] = xgvf->img + i * xgvf->width * PIXSZ;
 
-#ifdef PNG_SETJMP_SUPPORTED /* libpng 1.0.5 has no png_jmpbuf */
-    /* Set up long jump callback for PNG parser */
-#if defined(PNG_INFO_IMAGE_SUPPORTED)
-    if (setjmp (png_jmpbuf (struct_ptr)))
-#else
-    if (setjmp (struct_ptr->jmpbuf))
-#endif
-    {
-      if (error_msg_cb)
-        error_msg_cb (msg_cb_data, _("PNG Parsing failed\n"));
+    if (_encode(struct_ptr, info_ptr, rows, xgvf->width, xgvf->height, fp, error_mcb, mcb_data) < 0)
       break;
-    }
-#endif
 
-    png_set_filter (struct_ptr, 0, PNG_FILTER_NONE | PNG_FILTER_VALUE_NONE);
-    png_init_io (struct_ptr, fp);
-    png_set_write_status_fn (struct_ptr, write_row_callback);
-    png_set_IHDR (struct_ptr, info_ptr, xgvf->width, xgvf->height,
-      BIT_DEPTH, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-#if defined(PNG_INFO_IMAGE_SUPPORTED)
-    png_set_rows (struct_ptr, info_ptr, rows);
-    png_write_png (struct_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-#else
-    png_write_info (struct_ptr, info_ptr);
-    png_write_image (struct_ptr, rows);
-    png_write_end (struct_ptr, NULL);
-#endif
-
-    if (info_msg_cb) {
+    if (info_mcb) {
       char *umessage;
       umessage = xitk_asprintf ("%s%s\n", _("File written: "), file_name);
       if (umessage) {
-        info_msg_cb (msg_cb_data, umessage);
+        info_mcb (mcb_data, umessage);
         free (umessage);
       }
     }
@@ -1022,6 +1034,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   struct prvt_image_s *image;
   int width, height, ratio_code, format;
   double aspect, destaspect, scale;
+  msg_cb_t cbs = { error_mcb, info_mcb, mcb_data };
   
 #ifdef DEBUG
   static int	   prof_scale_image = -1;
@@ -1036,24 +1049,20 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     prof_png = xine_profiler_allocate_slot ("snapshot convert to png");
 #endif /* DEBUG */
 
-  error_msg_cb = error_mcb;
-  info_msg_cb = info_mcb;
-  msg_cb_data = mcb_data;
-
   err = xine_get_current_frame(gGui->stream, &width, &height, &ratio_code, &format, NULL);
   
   if (err == 0) {
-    error_msg_cb(msg_cb_data, _("xine_get_current_frame() failed\n"));
+    error_mcb(mcb_data, _("xine_get_current_frame() failed\n"));
     return;
   }
 
   if((!width) || (!height)) {
-    if(error_msg_cb) {
+    if(error_mcb) {
       char *umessage;
       
       umessage = xitk_asprintf("%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
       if (umessage) {
-        error_msg_cb(msg_cb_data, umessage);
+        error_mcb(mcb_data, umessage);
         free(umessage);
       }
     }
@@ -1066,7 +1075,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   
   if ( ! prvt_image_alloc( &image, width*height*2 ) )
   {
-    error_msg_cb(msg_cb_data, _("prvt_image_alloc failed\n"));
+    error_mcb(mcb_data, _("prvt_image_alloc failed\n"));
     return;
   }
 
@@ -1075,14 +1084,14 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 			       &image->format, image->img);
   
   if (err == 0) {
-    error_msg_cb(msg_cb_data, _("Framegrabber failed\n"));
+    error_mcb(mcb_data, _("Framegrabber failed\n"));
     prvt_image_free( &image );
     return;
   }
 
   /* the dxr3 driver does not allocate yuv buffers */
   if (! image->img) { /* image->u and image->v are always 0 for YUY2 */
-    error_msg_cb(msg_cb_data, _("Not supported for this video out driver\n"));
+    error_mcb(mcb_data, _("Not supported for this video out driver\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1186,12 +1195,12 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   
   if ( !image->file_name || (image->fp = fopen(image->file_name, "wb")) == NULL ) {
     
-    if(error_msg_cb) {
+    if(error_mcb) {
       char *umessage;
       
       umessage = xitk_asprintf("%s (%s)\n", _("File open failed"), image->file_name);
       if (umessage) {
-        error_msg_cb(msg_cb_data, umessage);
+        error_mcb(mcb_data, umessage);
         free(umessage);
       }
     }
@@ -1207,12 +1216,12 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   image->struct_ptr = png_create_write_struct (
     PNG_LIBPNG_VER_STRING,
-    (png_voidp)0,
+    &cbs,
     user_error_fn,
     user_warning_fn);
 
   if (image->struct_ptr == NULL) {
-    error_msg_cb(msg_cb_data, _("png_create_write_struct() failed\n"));
+    error_mcb(mcb_data, _("png_create_write_struct() failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1226,7 +1235,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   image->info_ptr = png_create_info_struct(image->struct_ptr);
 
   if (image->info_ptr == NULL) {
-    error_msg_cb(msg_cb_data, _("png_create_info_struct() failed\n"));
+    error_mcb(mcb_data, _("png_create_info_struct() failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1246,7 +1255,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   if (setjmp(image->struct_ptr->jmpbuf))
 #endif
   {
-    error_msg_cb(msg_cb_data, _("PNG Parsing failed\n"));
+    error_mcb(mcb_data, _("PNG Parsing failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1260,7 +1269,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     printf("  Convert YUY2 to YV12\n" );
 #endif
     if ( yuy2_fudge( image ) == 0 ) {
-      error_msg_cb(msg_cb_data, _("Error: yuy2_fudge failed\n"));
+      error_mcb(mcb_data, _("Error: yuy2_fudge failed\n"));
       prvt_image_free( &image );
       return;
     }
@@ -1292,7 +1301,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   if ( !rgb_alloc( image ) )
   {
-    error_msg_cb(msg_cb_data, _("rgb_alloc() failed\n"));
+    error_mcb(mcb_data, _("rgb_alloc() failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1370,11 +1379,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 #endif
 
   /**/
-  if(info_msg_cb) {
+  if(info_mcb) {
     char *umessage;
     umessage = xitk_asprintf("%s%s\n", _("File written: "), image->file_name);
     if (umessage) {
-      info_msg_cb(msg_cb_data, umessage);
+      info_mcb(mcb_data, umessage);
       free(umessage);
     }
   }
