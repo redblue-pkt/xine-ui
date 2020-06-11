@@ -1432,6 +1432,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
   int		     num_visuals;
   int		     depth = 0;
   Visual	    *visual = NULL;
+  int                screen = DefaultScreen(gui->display);
 
   if (gui->prefered_visual_id == None) {
     /*
@@ -1439,7 +1440,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
      * We prefer visuals of depth 15/16 (fast).  Depth 24/32 may be OK, 
      * but could be slow.
      */
-    vinfo_tmpl.screen = gui->screen;
+    vinfo_tmpl.screen = screen;
     vinfo_tmpl.class  = (gui->prefered_visual_class != -1
 			 ? gui->prefered_visual_class : TrueColor);
     vinfo = XGetVisualInfo(gui->display,
@@ -1496,13 +1497,13 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 
     depth = attribs.depth;
   
-    if (XMatchVisualInfo(gui->display, gui->screen, depth, TrueColor, &vinfo)) {
+    if (XMatchVisualInfo(gui->display, screen, depth, TrueColor, &vinfo)) {
       visual = vinfo.visual;
     } else {
       printf (_("gui_main: couldn't find true color visual.\n"));
 
-      depth = DefaultDepth (gui->display, gui->screen);
-      visual = DefaultVisual (gui->display, gui->screen); 
+      depth = DefaultDepth (gui->display, screen);
+      visual = DefaultVisual (gui->display, screen);
     }
   }
 
@@ -1860,16 +1861,14 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   gui->numeric.arg = 0;
   gui->alphanum.set = 0;
   gui->alphanum.arg = "";
-  
-  gui->x_lock_display (gui->display);
 
-  gui->screen = DefaultScreen(gui->display);
+  gui->x_lock_display (gui->display);
 
   /* Some infos */
   if(__xineui_global_verbosity) {
     dump_host_info();
     dump_cpu_infos();
-    dump_xfree_info(gui->display, gui->screen, (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
+    dump_xfree_info(gui->display, DefaultScreen(gui->display), (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
   }
 
   gui_find_visual(&visual, &depth);
@@ -1931,7 +1930,7 @@ void gui_init_imlib (gGui_t *gui, Visual *vis) {
        */
       Colormap cm;
       cm = XCreateColormap(gui->display, 
-			   RootWindow(gui->display, gui->screen),
+                           RootWindow(gui->display, DefaultScreen(gui->display)),
 			   vis, AllocNone);
 
       imlib_init.cmap = cm;
