@@ -22,6 +22,10 @@
 #ifndef HAVE_XITK_WIDGET_H
 #define HAVE_XITK_WIDGET_H
 
+#include "dlist.h"
+
+#include <X11/Xlib.h>
+
 #define FOCUS_LOST      0
 #define FOCUS_RECEIVED  1
 #define FOCUS_MOUSE_IN  3
