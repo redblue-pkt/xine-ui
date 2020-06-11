@@ -791,7 +791,6 @@ src/xitk/Makefile
 src/xitk/Imlib-light/Makefile
 src/xitk/xine-toolkit/Makefile
 src/xitk/xine-toolkit/po/Makefile.in
-src/xitk/skins/xinetic/Makefile
 src/aaui/Makefile
 src/dfb/Makefile
 src/fb/Makefile
