@@ -1535,7 +1535,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   int    i;
   int    depth;
   char  *server;
-  char  *video_display_name;
+  const char *video_display_name;
   pthread_mutexattr_t attr;
   Visual             *visual;
 
@@ -1619,7 +1619,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   }
 
   video_display_name = 
-    (char *)xine_config_register_string (gui->xine, "gui.video_display", 
+    xine_config_register_string (gui->xine, "gui.video_display",
 					 "",
 					 _("Name of video display"),
 					 _("Use this setting to configure to which "
@@ -1631,17 +1631,6 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
 					 NULL,
 					 CONFIG_NO_DATA);
   
-  gui->video_display = NULL;
-  if ( strlen(video_display_name) ) {
-  
-    if ((gui->video_display = XOpenDisplay(video_display_name)) == NULL )
-      fprintf(stderr, _("Cannot open display '%s' for video. Falling back to primary display.\n"),
-              video_display_name);
-  }
-  
-  if ( gui->video_display == NULL ) {
-    gui->video_display = gui->display;
-  }
 
   if (xine_config_register_bool (gui->xine, "gui.xsynchronize", 
 				 0,
@@ -1889,7 +1878,7 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   gui->on_quit = 0;
   gui->running = 1;
   
-  video_window_init (gui, depth, window_attribute,
+  video_window_init (gui, video_display_name, depth, window_attribute,
     ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,

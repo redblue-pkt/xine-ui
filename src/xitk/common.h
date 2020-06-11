@@ -262,8 +262,6 @@ struct gGui_st {
 
   ImlibData                *imlib_data;
 
-  Display                  *video_display;
-  Window                    video_window; 
   int                       cursor_visible;
   int                       cursor_grabbed;
 

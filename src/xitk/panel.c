@@ -620,7 +620,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if (lut[v])
     help_toggle_visibility(NULL, NULL);
 
-  if (panel->visible && panel->gui->video_display == panel->gui->display) {
+  if (panel->visible && !video_window_is_separate_display(panel->gui->vwin)) {
     
     if (video_window_is_visible (panel->gui->vwin)) {
       if (panel->gui->use_root_window) { /* Using root window */
@@ -1522,8 +1522,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
     panel->visible = !panel->visible;
     config_update_num ("gui.panel_visible", panel->visible);
   }
-  
-  if ((panel->gui->use_root_window || panel->gui->video_display != panel->gui->display) && (!panel->visible))
+
+  if ((panel->gui->use_root_window || video_window_is_separate_display(panel->gui->vwin)) && (!panel->visible))
     panel->visible = 1;
   
   if (panel->visible) {

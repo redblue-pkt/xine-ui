@@ -40,7 +40,8 @@ typedef struct {
 #define CURSOR_ARROW               1
 #define CURSOR_HAND                2
 
-xui_vwin_t *video_window_init (gGui_t *gui, int depth, window_attributes_t *window_attribute, int hide_on_start);
+xui_vwin_t *video_window_init (gGui_t *gui, const char *display_name,
+                               int depth, window_attributes_t *window_attribute, int hide_on_start);
 void video_window_exit (xui_vwin_t *vwin);
 
 void *video_window_get_xine_visual(xui_vwin_t *vwin);
@@ -66,6 +67,7 @@ void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y);
 /* hide/show video window */
 void video_window_set_visibility (xui_vwin_t *vwin, int show_window);
 int video_window_is_visible (xui_vwin_t *vwin);
+int video_window_is_separate_display(xui_vwin_t *vwin);
 
 int video_window_set_mag (xui_vwin_t *vwin, float xmag, float ymag);
 void video_window_get_mag (xui_vwin_t *vwin, float *xmag, float *ymag);

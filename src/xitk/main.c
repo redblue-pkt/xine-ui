@@ -2304,11 +2304,6 @@ int main(int argc, char *argv[]) {
   gui->x_lock_display (gui->display);
   gui->x_unlock_display (gui->display);
   XCloseDisplay(gui->display);
-  if( gui->video_display != gui->display ) {
-    gui->x_lock_display (gui->video_display);
-    gui->x_unlock_display (gui->video_display);
-    XCloseDisplay(gui->video_display);
-  }
 
   xine_exit (gui->xine);
 
