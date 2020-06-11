@@ -28,13 +28,17 @@
 #include <X11/keysym.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
 #include <assert.h>
 
+#include "xine-toolkit/recode.h"
+
 #include "common.h"
-#include "recode.h"
+
+#include "lang.h"
 
 #if defined(HAVE_ICONV) && defined(HAVE_LANGINFO_CODESET)
 #  include <iconv.h>

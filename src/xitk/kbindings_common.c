@@ -23,6 +23,8 @@
 #include "config.h"
 #endif
 
+#include "dump.h"
+
 #include "common.h"
 #include "kbindings_common.h"
 

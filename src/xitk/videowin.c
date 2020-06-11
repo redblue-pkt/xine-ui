@@ -30,6 +30,8 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #ifdef HAVE_XINERAMA

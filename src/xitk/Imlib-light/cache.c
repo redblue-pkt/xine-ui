@@ -3,6 +3,7 @@
 #endif
 
 #include "Imlib.h"
+#include "Imlib_types.h"
 #include "Imlib_private.h"
 
 /* uncomment this to compile imlib's cahce with pixmap accounting output */

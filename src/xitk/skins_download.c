@@ -24,6 +24,7 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include <X11/keysym.h>
 

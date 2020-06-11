@@ -24,6 +24,8 @@
 
 #include "_xitk.h"
 
+#include <X11/Xlib.h>
+
 #define MAX_SUPPORTED_TYPE 2
 
 typedef struct {

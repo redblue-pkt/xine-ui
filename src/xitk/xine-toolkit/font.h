@@ -23,6 +23,8 @@
 
 #include "_xitk.h"
 
+#include <X11/Xlib.h>
+
 #define DEFAULT_FONT_10      "-*-helvetica-medium-r-*-*-11-*-*-*-*-*-*-*"
 #define DEFAULT_FONT_12      "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*"
 #define DEFAULT_FONT_14      "-*-helvetica-medium-r-*-*-14-*-*-*-*-*-*-*"

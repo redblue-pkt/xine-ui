@@ -30,6 +30,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "lang.h"
+
 #include "common.h"
 
 

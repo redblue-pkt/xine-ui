@@ -2,13 +2,10 @@
 #define _XITK_IMLIB_TYPES_H
 
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/Xos.h>
 #ifdef HAVE_X11_EXTENSIONS_XSHM_H
 #include <X11/extensions/XShm.h>
 #endif
-#include <X11/extensions/shape.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
