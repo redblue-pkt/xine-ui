@@ -2245,6 +2245,8 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
  */
 void xitk_window_clear_window(xitk_window_t *);
 
+void xitk_window_reparent_window(xitk_window_t *w, xitk_window_t *parent, int x, int y);
+
 /**
  *
  */
@@ -2287,6 +2289,7 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
  *
  */
 void xitk_window_show_window(xitk_window_t *w, int raise);
+void xitk_window_raise_window(xitk_window_t *w);
 void xitk_window_hide_window(xitk_window_t *w);
 
 /*
