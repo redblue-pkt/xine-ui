@@ -60,7 +60,7 @@ typedef struct {
 /* header was ripped from xdnd's example on its page */
 
 #define XDND_THREE 3
-#define XDND_ENTER_SOURCE_WIN(e)	((e)->xclient.data.l[0])
+#define XDND_ENTER_SOURCE_WIN(e)	((Atom)(e)->xclient.data.l[0])
 #define XDND_ENTER_THREE_TYPES(e)	(((e)->xclient.data.l[1] & 0x1UL) == 0)
 #define XDND_ENTER_THREE_TYPES_SET(e,b)	(e)->xclient.data.l[1] = ((e)->xclient.data.l[1] & ~0x1UL) | (((b) == 0) ? 0 : 0x1UL)
 #define XDND_ENTER_VERSION(e)		((e)->xclient.data.l[1] >> 24)
@@ -89,10 +89,10 @@ typedef struct {
 #define XDND_STATUS_ACTION(e)		((e)->xclient.data.l[4])
 
 /* XdndLeave */
-#define XDND_LEAVE_SOURCE_WIN(e)	((e)->xclient.data.l[0])
+#define XDND_LEAVE_SOURCE_WIN(e)	((Window)(e)->xclient.data.l[0])
 
 /* XdndDrop */
-#define XDND_DROP_SOURCE_WIN(e)		((e)->xclient.data.l[0])
+#define XDND_DROP_SOURCE_WIN(e)		((Window)(e)->xclient.data.l[0])
 #define XDND_DROP_TIME(e)		((e)->xclient.data.l[2])
 
 /* XdndFinished */
