@@ -243,6 +243,14 @@ void xitk_image_free_image(xitk_image_t **src) {
 
   ABORT_IF_NULL(*src);
 
+  if ((*src)->raw) {
+    ImlibData *im = (*src)->im;
+    ABORT_IF_NULL(im);
+    XLOCK (im->x.x_lock_display, im->x.disp);
+    Imlib_destroy_image(im, (*src)->raw);
+    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  }
+
   if((*src)->mask)
     xitk_image_destroy_xitk_pixmap((*src)->mask);
   
@@ -1813,6 +1821,95 @@ void draw_button_minus(xitk_image_t *p) {
 /*
  *
  */
+
+static xitk_image_t *_image_new(ImlibData *im, ImlibImage *img) {
+  xitk_image_t  *i;
+
+  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
+  if (!i) {
+    XLOCK (im->x.x_lock_display, im->x.disp);
+    Imlib_destroy_image(im, img);
+    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+    return NULL;
+  }
+  i->im     = im;
+  i->raw    = img;
+  i->width  = img->rgb_width;
+  i->height = img->rgb_height;
+  return i;
+}
+
+xitk_image_t *xitk_image_decode_raw(ImlibData *im, const void *data, size_t size) {
+  ImlibImage *img;
+
+  if (size < 4)
+    return NULL;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(data);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  img = Imlib_decode_image(im, data, size);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  if (!img) {
+    XITK_WARNING("%s(): couldn't decode image\n", __FUNCTION__);
+    return NULL;
+  }
+
+  return _image_new(im, img);
+}
+
+int xitk_image_render(xitk_image_t *i, int width, int height) {
+  ImlibData  *im;
+  ImlibImage *img;
+  int ret;
+
+  ABORT_IF_NULL(i);
+  ABORT_IF_NULL(i->im);
+  ABORT_IF_NULL(i->raw);
+
+  im  = i->im;
+  img = i->raw;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  ret = Imlib_render (im, img, width, height);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  if (!ret) {
+    XITK_WARNING("%s(): couldn't render image\n", __FUNCTION__);
+    return -1;
+  }
+
+  i->image         = xitk_image_create_xitk_pixmap(im, width, height);
+  i->pix_font      = NULL;
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  i->image->pixmap = Imlib_copy_image(im, img);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  if(img->shape_mask) {
+    i->mask          = xitk_image_create_xitk_mask_pixmap(im, width, height);
+    XLOCK (im->x.x_lock_display, im->x.disp);
+    i->mask->pixmap  = Imlib_copy_mask(im, img);
+    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  }
+  else {
+    i->mask = NULL;
+  }
+
+  i->width  = width;
+  i->height = height;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  Imlib_destroy_image(i->im, i->raw);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  i->im  = NULL;
+  i->raw = NULL;
+
+  return 0;
+}
+
 xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
@@ -1825,41 +1922,22 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
   }
 
   XLOCK (im->x.x_lock_display, im->x.disp);
-  if(!(img = Imlib_load_image(im, (char *)image))) {
+  img = Imlib_load_image(im, image);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  if(!img) {
     XITK_WARNING("%s(): couldn't find image %s\n", __FUNCTION__, image);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
     return NULL;
   }
-  
-  Imlib_render (im, img, img->rgb_width, img->rgb_height);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
-  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-  i->image         = xitk_image_create_xitk_pixmap(im, img->rgb_width, img->rgb_height);
-  i->pix_font      = NULL;
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  i->image->pixmap = Imlib_copy_image(im, img);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  if(img->shape_mask) {
-    i->mask          = xitk_image_create_xitk_mask_pixmap(im, img->rgb_width, img->rgb_height);
-    XLOCK (im->x.x_lock_display, im->x.disp);
-    i->mask->pixmap  = Imlib_copy_mask(im, img);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  }
-  else {
-    i->mask = NULL;
-  }
-    
-  i->width         = img->rgb_width;
-  i->height        = img->rgb_height;
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  Imlib_destroy_image(im, img);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+  i = _image_new(im, img);
+  if (!i)
+    return NULL;
+
+  if (xitk_image_render(i, img->rgb_width, img->rgb_height) < 0)
+    xitk_image_free_image(&i);
+
   return i;
-} 
+}
 
 void xitk_image_draw_image (xitk_widget_list_t *wl, xitk_image_t *img,
   int src_x, int src_y, int width, int height, int dst_x, int dst_y) {

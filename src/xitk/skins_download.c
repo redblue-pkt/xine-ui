@@ -293,55 +293,35 @@ static void download_update_preview(xui_skdloader_t *skd) {
 }
 
 static xitk_image_t *decode(gGui_t *gui, const void *buf, int size) {
-  xitk_image_t  *ximg = NULL;
-  ImlibImage    *img;
+  int            preview_width, preview_height;
+  float          ratio;
+  xitk_image_t  *i;
 
-  gui->x_lock_display (gui->display);
-  img = Imlib_decode_image (gui->imlib_data, buf, size);
-  gui->x_unlock_display (gui->display);
+  i = xitk_image_decode_raw(gui->imlib_data, buf, size);
+  if (!i)
+    return NULL;
 
-  if (img) {
-    int           preview_width, preview_height;
-    float         ratio;
+  preview_width  = i->width;
+  preview_height = i->height;
+  ratio = ((float)preview_width / (float)preview_height);
 
-    preview_width = img->rgb_width;
-    preview_height = img->rgb_height;
-
-    ratio = ((float)preview_width / (float)preview_height);
-
-    if(ratio > PREVIEW_RATIO) {
-      if(preview_width > PREVIEW_WIDTH) {
-        preview_width = PREVIEW_WIDTH;
-        preview_height = (float)preview_width / ratio;
-      }
+  if (ratio > PREVIEW_RATIO) {
+    if (preview_width > PREVIEW_WIDTH) {
+      preview_width = PREVIEW_WIDTH;
+      preview_height = (float)preview_width / ratio;
     }
-    else {
-      if(preview_height > PREVIEW_HEIGHT) {
-        preview_height = PREVIEW_HEIGHT;
-        preview_width = (float)preview_height * ratio;
-      }
+  } else {
+    if (preview_height > PREVIEW_HEIGHT) {
+      preview_height = PREVIEW_HEIGHT;
+      preview_width = (float)preview_height * ratio;
     }
-
-    /* Rescale preview */
-    gui->x_lock_display (gui->display);
-    Imlib_render (gui->imlib_data, img, preview_width, preview_height);
-    gui->x_unlock_display (gui->display);
-
-    ximg = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-    ximg->width  = preview_width;
-    ximg->height = preview_height;
-
-    ximg->image = xitk_image_create_xitk_pixmap (gui->imlib_data, preview_width, preview_height);
-    ximg->mask = xitk_image_create_xitk_mask_pixmap (gui->imlib_data, preview_width, preview_height);
-
-    gui->x_lock_display (gui->display);
-    ximg->image->pixmap = Imlib_copy_image (gui->imlib_data, img);
-    ximg->mask->pixmap = Imlib_copy_mask (gui->imlib_data, img);
-    Imlib_destroy_image (gui->imlib_data, img);
-    gui->x_unlock_display (gui->display);
   }
 
-  return ximg;
+  /* Rescale preview */
+  if (xitk_image_render(i, preview_width, preview_height) < 0)
+    xitk_image_free_image(&i);
+
+  return i;
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
