@@ -25,15 +25,39 @@ static void _SplitID(char *file) {
   }
 }
 
+struct _png_data {
+  unsigned long pos;
+  unsigned long size;
+  const unsigned char *p;
+};
+static void _png_user_read(png_structp png, png_bytep data, png_size_t length)
+{
+  struct _png_data *p = (struct _png_data *)png_get_io_ptr(png);
+
+  if (p->pos + length > p->size) {
+    length = p->size - p->pos;
+    fprintf(stderr, "png: not enough data\n");
+  }
+
+  memcpy(data, p->p + p->pos, length);
+  p->pos += length;
+}
+
 /** 
  *  * This error handling is broken beyond belief, but oh well it works
  *  **/
-static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t) {
+static unsigned char *_LoadPNG(ImlibData * id,
+                               FILE * f,
+                               struct _png_data *indata,
+                               int *w, int *h, int *t) {
   png_structp         png_ptr;
   png_infop           info_ptr;
   unsigned char      *data, *ptr, **lines, *ptr2, r, g, b, a;
   int                 i, x, y, transp, bit_depth, color_type, interlace_type;
   png_uint_32         ww, hh;
+
+  if (!f && (!indata || !indata->p))
+    return NULL;
 
   /* Init PNG Reader */
   transp = 0;
@@ -51,7 +75,11 @@ static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t)
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return NULL;
     }
-  png_init_io(png_ptr, f);
+  if (f) {
+    png_init_io(png_ptr, f);
+  } else {
+    png_set_read_fn (png_ptr, indata, _png_user_read);
+  }
   /* Read Header */
   png_read_info(png_ptr, info_ptr);
   png_get_IHDR(png_ptr, info_ptr, &ww, &hh, &bit_depth, &color_type, &interlace_type,
@@ -177,7 +205,10 @@ static unsigned char *_LoadPNG(ImlibData * id, FILE * f, int *w, int *h, int *t)
   return data;
 }
 
-static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
+static unsigned char *_LoadJPEG(ImlibData * id,
+                                FILE * f,
+                                const unsigned char *inbuf, unsigned long insize,
+                                int *w, int *h) {
   struct jpeg_error_mgr jpeg_error;
   struct jpeg_decompress_struct jpeg_ptr;
   JSAMPROW rowptr;
@@ -185,11 +216,17 @@ static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
   int rowstride;
   unsigned char *out, *outptr;
 
-  rewind (f);
-       
+  if (!f && !inbuf)
+    return NULL;
+
   jpeg_ptr.err = jpeg_std_error (&jpeg_error);
   jpeg_create_decompress (&jpeg_ptr);
-  jpeg_stdio_src (&jpeg_ptr, f);
+  if (f) {
+    rewind (f);
+    jpeg_stdio_src (&jpeg_ptr, f);
+  } else {
+    jpeg_mem_src(&jpeg_ptr, inbuf, insize);
+  }
 
   jpeg_read_header (&jpeg_ptr, TRUE);
   jpeg_start_decompress (&jpeg_ptr);
@@ -220,7 +257,94 @@ static unsigned char *_LoadJPEG(ImlibData * id, FILE * f, int *w, int *h) {
   return out;
 }
 
-int ispng(FILE *f) {
+static int ispng(const unsigned char *p, size_t size) {
+  return (int) !png_sig_cmp(p, 0, size);
+}
+
+static int isjpeg(const unsigned char *p, size_t size) {
+  return (size > 3) && p[0] == 0xFF && p[1] == 0xD8 && p[2] == 0xFF && p[3] == 0xE0;
+}
+
+static ImlibImage * new_image(ImlibData * id, unsigned char *data, int w, int h, int trans) {
+  ImlibImage         *im;
+
+  im = (ImlibImage *) malloc(sizeof(ImlibImage));
+  if (!im)
+    return NULL;
+
+  im->alpha_data = NULL;
+  if (trans) {
+    im->shape_color.r = 255;
+    im->shape_color.g = 0;
+    im->shape_color.b = 255;
+  } else {
+    im->shape_color.r = -1;
+    im->shape_color.g = -1;
+    im->shape_color.b = -1;
+  }
+  im->border.left = 0;
+  im->border.right = 0;
+  im->border.top = 0;
+  im->border.bottom = 0;
+  im->cache = 1;
+  im->rgb_data = data;
+  im->rgb_width = w;
+  im->rgb_height = h;
+  im->pixmap = 0;
+  im->shape_mask = 0;
+  im->mod.gamma = id->mod.gamma;
+  im->mod.brightness = id->mod.brightness;
+  im->mod.contrast = id->mod.contrast;
+  im->rmod.gamma = id->rmod.gamma;
+  im->rmod.brightness = id->rmod.brightness;
+  im->rmod.contrast = id->rmod.contrast;
+  im->gmod.gamma = id->gmod.gamma;
+  im->gmod.brightness = id->gmod.brightness;
+  im->gmod.contrast = id->gmod.contrast;
+  im->bmod.gamma = id->bmod.gamma;
+  im->bmod.brightness = id->bmod.brightness;
+  im->bmod.contrast = id->bmod.contrast;
+
+  return im;
+}
+
+ImlibImage * Imlib_decode_image(ImlibData * id, const void *p, size_t size) {
+  int                 w, h;
+  unsigned char      *data = NULL;
+  ImlibImage         *im;
+  int                 trans = 0;
+
+  if (!id || !p)
+    return NULL;
+
+  if (ispng(p, size)) {
+    struct _png_data d = {0, size, p };
+    data = _LoadPNG(id, NULL, &d, &w, &h, &trans);
+  } else if (isjpeg(p, size))
+    data = _LoadJPEG(id, NULL, p, size, &w, &h);
+
+  if (!data) {
+    fprintf(stderr, "IMLIB ERROR: Cannot load image from memory\nAll fallbacks failed.\n");
+    return NULL;
+    }
+
+  if (!w || !h) {
+    fprintf(stderr, "IMLIB ERROR: zero image\n" );
+    return NULL;
+  }
+
+  im = new_image(id, data, w, h, trans);
+  if (!im) {
+      fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for image structure\n");
+      return NULL;
+  }
+
+  im->filename = strdup("data");
+  calc_map_tables(id, im);
+  return im;
+}
+
+static int ispng_file(FILE *f) {
   unsigned char       buf[8];
 
   if (!f) {
@@ -233,10 +357,10 @@ int ispng(FILE *f) {
     return 0;
   }
   rewind (f);
-  return (int) !png_sig_cmp(buf, 0, 8);
+  return ispng(buf, sizeof(buf));
 }
 
-static int isjpeg(FILE *f) {
+static int isjpeg_file(FILE *f) {
   unsigned char       buf[4];
 
   if (!f) {
@@ -249,7 +373,7 @@ static int isjpeg(FILE *f) {
     return 0;
   }
   rewind (f);
-  return buf[0] == 0xFF && buf[1] == 0xD8 && buf[2] == 0xFF && buf[3] == 0xE0;
+  return isjpeg(buf, sizeof(buf));
 }
 
 ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
@@ -289,9 +413,9 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   fil = strdup(file);
   _SplitID(fil);
 
-  if (ispng(p))
+  if (ispng_file(p))
     fmt = FORMAT_PNG;
-  else if (isjpeg(p))
+  else if (isjpeg_file(p))
     fmt = FORMAT_JPEG;
 
   trans = 0;
@@ -299,10 +423,10 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   switch (fmt)
   {
     case FORMAT_PNG:
-        data = _LoadPNG(id, p, &w, &h, &trans);
+      data = _LoadPNG(id, p, NULL, &w, &h, &trans);
         break;
     case FORMAT_JPEG:
-        data = _LoadJPEG(id, p, &w, &h);
+      data = _LoadJPEG(id, p, NULL, 0, &w, &h);
         break;
     default:
         break;
@@ -324,48 +448,13 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
       fprintf(stderr, "IMLIB ERROR: zero image\n" );
       goto error;
     }
-    
-  im = (ImlibImage *) malloc(sizeof(ImlibImage));
+
+  im = new_image(id, data, w, h, trans);
   if (!im)
     {
       fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for image structure\n");
       goto error;
     }
-  im->alpha_data = NULL;
-  if (trans)
-    {
-      im->shape_color.r = 255;
-      im->shape_color.g = 0;
-      im->shape_color.b = 255;
-    }
-  else
-    {
-      im->shape_color.r = -1;
-      im->shape_color.g = -1;
-      im->shape_color.b = -1;
-    }
-  im->border.left = 0;
-  im->border.right = 0;
-  im->border.top = 0;
-  im->border.bottom = 0;
-  im->cache = 1;
-  im->rgb_data = data;
-  im->rgb_width = w;
-  im->rgb_height = h;
-  im->pixmap = 0;
-  im->shape_mask = 0;
-  im->mod.gamma = id->mod.gamma;
-  im->mod.brightness = id->mod.brightness;
-  im->mod.contrast = id->mod.contrast;
-  im->rmod.gamma = id->rmod.gamma;
-  im->rmod.brightness = id->rmod.brightness;
-  im->rmod.contrast = id->rmod.contrast;
-  im->gmod.gamma = id->gmod.gamma;
-  im->gmod.brightness = id->gmod.brightness;
-  im->gmod.contrast = id->gmod.contrast;
-  im->bmod.gamma = id->bmod.gamma;
-  im->bmod.brightness = id->bmod.brightness;
-  im->bmod.contrast = id->bmod.contrast;
   im->filename = strdup(file);
   if ((id->cache.on_image) && (im))
     add_image(id, im, fil);

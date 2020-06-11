@@ -1,6 +1,8 @@
 #ifndef __IMLIB_H__
 #define __IMLIB_H__
 
+#include <stddef.h>
+
 #include "Imlib_types.h"
 
 #ifdef __cplusplus
@@ -11,6 +13,7 @@ extern              "C"
   ImlibData          *Imlib_init(Display * disp);
   ImlibData	     *Imlib_init_with_params(Display * disp, ImlibInitParams * p);
   ImlibImage         *Imlib_load_image(ImlibData * id, const char *file);
+  ImlibImage         *Imlib_decode_image(ImlibData * id, const void *data, size_t size);
   void                Imlib_apply_image(ImlibData * id, ImlibImage * im, Window p);
   Pixmap              Imlib_copy_image(ImlibData * id, const ImlibImage * im);
   Pixmap              Imlib_copy_mask(ImlibData * id, const ImlibImage * im);
