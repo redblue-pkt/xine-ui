@@ -28,6 +28,7 @@
 #error config.h not included
 #endif
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <X11/Xlib.h>
@@ -180,6 +181,10 @@ typedef struct {
   xitk_pix_font_t                  *pix_font;
   int                               width;
   int                               height;
+
+  /* image private */
+  ImlibData                        *im;
+  ImlibImage                       *raw;
 } xitk_image_t;
 
 typedef struct {
@@ -1265,6 +1270,9 @@ const char *xitk_label_get_label(xitk_widget_t *w);
  */
 xitk_image_t *xitk_image_load_image(ImlibData *idata, const char *image);
 void xitk_image_set_pix_font (xitk_image_t *image, const char *format);
+
+xitk_image_t *xitk_image_decode_raw(ImlibData *im, const void *data, size_t size);
+int xitk_image_render(xitk_image_t *, int width, int height);
 
 /**
  * Create an image widget type.
