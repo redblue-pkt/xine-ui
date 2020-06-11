@@ -167,7 +167,6 @@ static int __gfx_safe_lock (__gfx_t *fx) {
 typedef struct {
   xitk_t                      x;
 
-  XColor                      black;
   int                         display_width;
   int                         display_height;
   int                         verbosity;
@@ -2338,12 +2337,12 @@ void xitk_xevent_notify (XEvent *event) {
 void (*xitk_x_lock_display) (Display *display);
 void (*xitk_x_unlock_display) (Display *display);
 
-void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display *display),
+xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
   void (*x_unlock_display) (Display *display), int verbosity) {
   __xitk_t *xitk;
   char buffer[256];
   pthread_mutexattr_t attr;
-  
+
   /* Nasty (temporary) kludge. */
   xitk_x_lock_display = x_lock_display;
   xitk_x_unlock_display = x_unlock_display;
@@ -2360,7 +2359,6 @@ void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display 
   xitk->x.x_lock_display   = x_lock_display;
   xitk->x.x_unlock_display = x_unlock_display;
 
-  xitk->black           = black;
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   xitk->verbosity       = verbosity;
@@ -2480,6 +2478,8 @@ void xitk_init (Display *display, XColor black, void (*x_lock_display) (Display 
   
   xitk_cursors_init(display);
   xitk->x.tips = xitk_tips_init(display);
+
+  return &xitk->x;
 }
 
 /*
@@ -2791,12 +2791,6 @@ int xitk_get_display_height(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
   return xitk->display_height;
-}
-
-XColor xitk_get_black_pixel_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
-
-  return xitk->black;
 }
 
 unsigned long xitk_get_tips_timeout(void) {

@@ -262,7 +262,6 @@ void xitk_set_current_menu(xitk_widget_t *menu);
 void xitk_unset_current_menu(void);
 //int xitk_get_display_width(void);
 //int xitk_get_display_height(void);
-XColor xitk_get_black_pixel_color(void);
 unsigned long xitk_get_tips_timeout(void);
 void xitk_set_tips_timeout(unsigned long timeout);
 
