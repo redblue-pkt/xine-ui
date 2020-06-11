@@ -717,9 +717,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 void panel_raise_window(xui_panel_t *panel)
 {
   if (panel_is_visible (panel))  {
-    panel->gui->x_lock_display (panel->gui->display);
-    XRaiseWindow(panel->gui->display, xitk_window_get_window(panel->xwin));
-    panel->gui->x_unlock_display (panel->gui->display);
+    xitk_window_raise_window(panel->xwin);
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
   }
 }
@@ -1126,9 +1124,7 @@ void panel_reparent (xui_panel_t *panel) {
       int x = 0, y = 0;
 
       panel_get_window_position(panel, &x, &y, NULL, NULL);
-      panel->gui->x_lock_display (panel->gui->display);
-      XReparentWindow(panel->gui->display, xitk_window_get_window(panel->xwin), panel->gui->imlib_data->x.root, x, y);
-      panel->gui->x_unlock_display (panel->gui->display);
+      xitk_window_reparent_window(panel->xwin, NULL, x, y);
     }
 
     reparent_window (panel->xwin);

@@ -559,10 +559,8 @@ void download_skin(char *url) {
 
   if(skdloader.running)
   {
-    gui->x_lock_display (gui->display);
-    XRaiseWindow (gui->display, xitk_window_get_window (skdloader.xwin));
-    XSetInputFocus (gui->display, xitk_window_get_window (skdloader.xwin), RevertToParent, CurrentTime);
-    gui->x_unlock_display (gui->display);
+    xitk_window_raise_window(skdloader.xwin);
+    xitk_window_try_to_set_input_focus(skdloader.xwin);
     return;
   }
 
