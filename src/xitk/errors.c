@@ -31,6 +31,8 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include "dump.h"
+
 #include "common.h"
 
 /*

@@ -31,6 +31,10 @@
 #include <unistd.h>
 #include <string.h>
 
+#ifdef HAVE_LIRC
+#include <lirc/lirc_client.h>
+#endif
+
 #include "common.h"
 
 #ifdef DEBUG

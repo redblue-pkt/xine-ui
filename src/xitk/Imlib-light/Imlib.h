@@ -5,6 +5,8 @@
 
 #include "Imlib_types.h"
 
+#include <X11/Xlib.h>
+
 #ifdef __cplusplus
 extern              "C"
 {

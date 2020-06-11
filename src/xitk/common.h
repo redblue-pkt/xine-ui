@@ -48,7 +48,6 @@ typedef struct gGui_st gGui_t;
 #include "event_sender.h"
 #include "help.h"
 #include "i18n.h"
-#include "lang.h"
 #ifdef HAVE_LIRC
 #include "lirc.h"
 #endif
@@ -74,14 +73,9 @@ typedef struct gGui_st gGui_t;
 
 #include "libcommon.h"
 #include "globals.h"
-#include "dump.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
-#endif
-
-#ifdef HAVE_LIRC
-#include <lirc/lirc_client.h>
 #endif
 
 /*

@@ -24,6 +24,8 @@
 
 #include "_xitk.h"
 
+#include <X11/Xlib.h>
+
 void xitk_cursors_init(Display *display);
 void xitk_cursors_deinit(Display *display);
 

@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <xine.h>
 #include <xine/xmlparser.h>

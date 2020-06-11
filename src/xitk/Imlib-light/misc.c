@@ -3,7 +3,9 @@
 #endif
 
 #include "Imlib.h"
+#include "Imlib_types.h"
 #include "Imlib_private.h"
+
 #include <locale.h>
 #include <stdio.h>
 #include "libcommon.h"

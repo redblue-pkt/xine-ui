@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "Imlib.h"
+#include "Imlib_types.h"
 #include "Imlib_private.h"
 
 #ifdef __EMX__

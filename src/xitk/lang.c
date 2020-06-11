@@ -23,7 +23,11 @@
 #include "config.h"
 #endif
 
-#include "common.h"
+#include "lang.h"
+
+#include <string.h>
+
+#include "i18n.h"
 
 /*
  * Our LC_MESSAGES handling.

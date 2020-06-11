@@ -3,6 +3,7 @@
 #endif
 
 #include "Imlib.h"
+#include "Imlib_types.h"
 #include "Imlib_private.h"
 
 int

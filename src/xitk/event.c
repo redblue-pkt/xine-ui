@@ -44,6 +44,8 @@
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
 
+#include "dump.h"
+
 #include "common.h"
 #include "oxine/oxine.h"
 

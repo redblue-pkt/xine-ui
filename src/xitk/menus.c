@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 
+#include "lang.h"
+
 #include "common.h"
 
 #define PLAYL_LOAD              10
