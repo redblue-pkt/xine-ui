@@ -579,6 +579,13 @@ else
    CFLAGS="$CFLAGS -DNDEBUG"
 fi
 
+AC_ARG_ENABLE([asan],
+   [AS_HELP_STRING([--enable-asan], [Compile with address sanitizer])])
+AC_ARG_ENABLE([lto],
+   [AS_HELP_STRING([--enable-lto], [Enable link-time optimization])])
+AC_ARG_ENABLE([extra-warnings],
+  [AS_HELP_STRING([--enable-extra-warnings], [build with extra warnings enabled])])
+
 dnl gcc __attribute__ ((aligned ()))
 AC_C_ATTRIBUTE_ALIGNED
 
@@ -755,6 +762,22 @@ CFLAGS="$CFLAGS $wbits"
 AC_TRY_CFLAGS("-Wstrict-aliasing", wsa="-Wstrict-aliasing")
 AC_TRY_CFLAGS("-Wstrict-aliasing=2", wsa="-Wstrict-aliasing=2")
 CFLAGS="$CFLAGS $wsa"
+
+extraflags=''
+if test x"$enable_extra_warnings" = x"yes"; then
+    AC_TRY_CFLAGS("-Wextra",               extraflags="$extraflags -Wextra")
+    dnl AC_TRY_CFLAGS("-Wpedantic",            extraflags="$extraflags -Wpedantic")
+    AC_TRY_CFLAGS("-Wsign-compare",        extraflags="$extraflags -Wsign-compare")
+    AC_TRY_CFLAGS("-Wno-unused-parameter", extraflags="$extraflags -Wno-unused-parameter")
+    CFLAGS="$CFLAGS $extraflags"
+fi
+
+if test "x$enable_asan" = "xyes"; then
+   CFLAGS="$CFLAGS -fsanitize=address -no-pie -fno-omit-frame-pointer"
+fi
+if test "x$enable_lto" = "xyes"; then
+   CFLAGS="$CFLAGS -flto"
+fi
 
 dnl
 dnl It seems automake 1.5 don't take care about this script
