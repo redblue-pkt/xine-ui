@@ -710,7 +710,7 @@ void gui_exit_2 (gGui_t *gui) {
   applugin_end();
   help_end();
 #ifdef HAVE_TAR
-  download_skin_end();
+  download_skin_end(gui->skdloader);
 #endif
   
   if (gui->load_stream) {

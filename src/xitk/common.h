@@ -372,6 +372,7 @@ struct gGui_st {
   xui_setup_t               *setup;
   xui_mrlb_t                *mrlb;
   xui_vctrl_t               *vctrl;
+  xui_skdloader_t           *skdloader;
 
   /* actions.c */
   struct {
