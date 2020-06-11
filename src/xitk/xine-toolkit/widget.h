@@ -127,7 +127,7 @@ struct xitk_widget_list_s {
 
 /* ****************************************************************** */
 
-#ifndef __GNUC__
+#if !defined(__GNUC__) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 #define	__FUNCTION__	__func__
 #endif
 

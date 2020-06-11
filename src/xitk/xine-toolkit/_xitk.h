@@ -101,6 +101,10 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 #include "menu.h"
 #include "xitkintl.h"
 
+#if !defined(__GNUC__) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#define	__FUNCTION__	__func__
+#endif
+
 #define XITK_WIDGET_MAGIC 0x7869746b
 
 #ifndef BUFSIZ
@@ -113,7 +117,7 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 #undef  MIN
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
-#ifdef	__GNUC__
+#if defined(__GNUC__) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
 #define XITK_DIE(FMT, ARGS...)                                        \
   do {                                                                \
     fprintf(stderr, "xiTK DIE: "FMT, ##ARGS);                         \
