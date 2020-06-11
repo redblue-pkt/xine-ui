@@ -1502,6 +1502,19 @@ int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen)
  */
 KeySym xitk_get_key_pressed(XEvent *event);
 
+KeySym xitk_keycode_to_keysym(XEvent *event);
+
+/* Return size of output string (>=buf_size if truncated). -1 on error. */
+int xitk_keysym_to_string(KeySym keysym, char *buf, size_t buf_size);
+
+/* grab one input event (mouse button or keyboard key).
+ * return -1 on error.
+ */
+int xitk_window_grab_input(xitk_window_t *w,
+                           KeySym *key, unsigned int *keycode, int *modifier,
+                           int *button);
+
+
 /**
  * All states of modifiers (see xitk_get_key_modifier() bellow).
  */

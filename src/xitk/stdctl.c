@@ -198,14 +198,9 @@ void stdctl_event(const xine_event_t *event)
   }
 }
 
-void stdctl_keypress(XKeyEvent event)
+void stdctl_keypress(const char *str)
 {
-    KeySym  sym;
-    char   *str;
-
-    if((sym = XKeycodeToKeysym(event.display, event.keycode, 0)))
-      if((str = XKeysymToString(sym)))
-	fprintf(stdctl.fbk, "KeyPress$%s\n", str);
+    fprintf(stdctl.fbk, "KeyPress$%s\n", str);
 }
 
 void stdctl_playing(const char *mrl)

@@ -248,7 +248,7 @@ void kbindings_display_current_bindings(kbinding_t *);
 void kbindings_display_default_lirc_bindings(void);
 void kbindings_display_default_bindings(void);
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
-void kbindings_handle_kbinding(kbinding_t *, XEvent *);
+void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int modifier, int button);
 action_id_t kbindings_get_action_id(kbinding_entry_t *);
 
 /* return bytes written (without terminating nul).

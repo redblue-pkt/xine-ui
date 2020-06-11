@@ -24,13 +24,12 @@
 #ifndef STDCTL_H
 #define STDCTL_H
 
-#include <X11/Xlib.h>
 #include <xine.h>
 
 void stdctl_start(void);
 void stdctl_stop(void);
 void stdctl_event(const xine_event_t *event);
-void stdctl_keypress(XKeyEvent event);
+void stdctl_keypress(const char *str);
 void stdctl_playing(const char *mrl);
 
 #endif
