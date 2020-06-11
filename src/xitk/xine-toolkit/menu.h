@@ -22,6 +22,9 @@
 #define HAVE_XITK_MENU_H
 
 #include "_xitk.h"
+#include "dlist.h"
+
+#include <X11/Xlib.h>
 
 typedef struct {
   /* HACK: embedded widget list, whose node links to menu_private_data_t.menu_windows below. */
