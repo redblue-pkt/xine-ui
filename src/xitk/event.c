@@ -1300,7 +1300,6 @@ void gui_handle_event (XEvent *event, void *data) {
     kbindings_handle_kbinding(gui->kbindings, event);
     break;
   }
-
 }
 
 /*
@@ -1522,8 +1521,6 @@ void gui_deinit (gGui_t *gui) {
   while (gui->event_pending > 0)
     pthread_cond_wait (&gui->event_safe, &gui->event_mutex);
   pthread_mutex_unlock (&gui->event_mutex);
-
-  xitk_unregister_event_handler(&gui->widget_key);
 }
 
 /*
@@ -2060,10 +2057,6 @@ void gui_run(char **session_opts) {
   if(gui->stdctl_enable)
     stdctl_start();
 
-  /*  global event handler */
-  gui->widget_key = xitk_register_event_handler ("NO WINDOW", NULL,
-    gui_handle_event, NULL, gui_dndcallback, NULL, gui);
-  
 #ifdef HAVE_READLINE
   start_remote_server();
 #endif
