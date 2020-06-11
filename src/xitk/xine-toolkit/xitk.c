@@ -2902,7 +2902,7 @@ int xitk_get_bool_value(const char *val) {
     { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
     { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 }
   };
-  int i;
+  size_t i;
   
   ABORT_IF_NULL(val);
 

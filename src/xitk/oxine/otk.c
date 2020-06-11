@@ -1623,7 +1623,7 @@ static void selector_selected (otk_widget_t *this) {
   if (!is_correct_widget(this, OTK_WIDGET_SELECTOR)) return;
 
   selector->pos++;
-  if (selector->pos > g_list_length(selector->items)) selector->pos = 1;
+  if (selector->pos < 1 || (unsigned)selector->pos > g_list_length(selector->items)) selector->pos = 1;
 
   selector_draw(this);
   odk_show (this->odk);
@@ -1709,7 +1709,7 @@ void otk_selector_set(otk_widget_t *this, int pos) {
   if (!is_correct_widget(this, OTK_WIDGET_SELECTOR)) return;
 
   if (pos < 1 ) pos = 1;
-  if (pos > g_list_length(selector->items)) pos = g_list_length(selector->items);
+  if ((unsigned)pos > g_list_length(selector->items)) pos = g_list_length(selector->items);
   selector->pos = pos;
 
 }

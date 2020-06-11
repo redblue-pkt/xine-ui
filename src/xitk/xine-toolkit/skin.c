@@ -296,7 +296,7 @@ static int skin_end_section(xitk_skin_config_t *skonfig) {
 }
 
 static int istriplet(char *c) {
-  int dummy1, dummy2, dummy3;
+  unsigned int dummy1, dummy2, dummy3;
 
   if((strncasecmp(c, "#", 1) <= 0) && (strlen(c) >= 7)) {
 
