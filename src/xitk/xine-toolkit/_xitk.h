@@ -315,6 +315,21 @@ struct xitk_font_s {
   char          *name;
 };
 
+struct xitk_pixmap_s {
+  ImlibData                        *imlibdata;
+  XImage                           *xim;
+  Pixmap                            pixmap;
+  GC                                gc;
+  XGCValues                         gcv;
+  int                               width;
+  int                               height;
+  int                               shm;
+#ifdef HAVE_SHM
+  XShmSegmentInfo                  *shminfo;
+#endif
+  xitk_pixmap_destroyer_t           destroy;
+};
+
 typedef struct xitk_dialog_s xitk_dialog_t;
 
 struct xitk_window_s {
