@@ -146,21 +146,6 @@ typedef struct {
   int first, last;
 } xitk_range_t;
 
-struct xitk_pixmap_s {
-  ImlibData                        *imlibdata;
-  XImage                           *xim;
-  Pixmap                            pixmap;
-  GC                                gc;
-  XGCValues                         gcv;
-  int                               width;
-  int                               height;
-  int                               shm;
-#ifdef HAVE_SHM
-  XShmSegmentInfo                  *shminfo;
-#endif
-  xitk_pixmap_destroyer_t           destroy;
-};
-
 typedef struct {
   int                               width;
   int                               height;
