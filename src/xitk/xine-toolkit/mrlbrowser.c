@@ -354,12 +354,14 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
       xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
 					       private_data->last_mrl_source, 
 					       NULL, &num_mrls);
+#if 0
+      
       if(!mtmp) {
         free(private_data->last_mrl_source);
         private_data->last_mrl_source = old_old_src;
 	return;
       }
-      
+#endif
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
 
