@@ -26,197 +26,169 @@
 
 #include "_xitk.h"
 
+typedef struct {
+  xitk_widget_t    w;
+
+  ImlibData       *imlibdata;
+  char            *skin_element_name;
+  xitk_widget_t   *bWidget;
+  int              bClicked;
+  int              focus;
+  xitk_image_t    *skin;
+
+  /* callback function (active_widget, user_data) */
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
+} _button_private_t;
+
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w) {
-  button_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-    
-    if(!private_data->skin_element_name)
-      xitk_image_free_image(&(private_data->skin));
-
-    XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data);
+static void _notify_destroy (_button_private_t *wp) {
+  if (!wp->skin_element_name) {
+    xitk_image_free_image (&wp->skin);
+    XITK_FREE (wp->skin_element_name);
   }
 }
 
 /*
  *
  */
-static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  button_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-    
-    if(sk == FOREGROUND_SKIN && private_data->skin) {
-      return private_data->skin;
-    }
-  }
-
+static xitk_image_t *_get_skin (_button_private_t *wp, int sk) {
+  if ((sk == FOREGROUND_SKIN) && wp->skin)
+    return wp->skin;
   return NULL;
 }
 
 /*
  *
  */
-static int notify_inside(xitk_widget_t *w, int x, int y) {
-  button_private_data_t *private_data;
+static int _notify_inside (_button_private_t *wp, int x, int y) {
+  if (wp->w.visible == 1) {
+    xitk_image_t *skin = wp->skin;
 
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-
-    if(w->visible == 1) {
-      xitk_image_t *skin = private_data->skin;
-      
-      if(skin->mask)
-        return xitk_is_cursor_out_mask(w, skin->mask->pixmap, x, y);
-    }
+    if (skin->mask)
+      return xitk_is_cursor_out_mask (&wp->w, skin->mask->pixmap, x, y);
     else 
-      return 0;
+      return 1;
   }
-  
-  return 1;
+  return 0;
 }
 
 /**
  *
  */
-static void paint_button (xitk_widget_t *w, widget_event_t *event) {
+static void _paint_button (_button_private_t *wp, widget_event_t *event) {
+  int mode;
+
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.button.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && w->visible == 1)) {
-    button_private_data_t *private_data = (button_private_data_t *) w->private_data;
-    int mode;
-
-    mode = (private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)
-         ? (private_data->bClicked ? 2 : 1)
+  if (wp->w.visible) {
+    mode = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
+         ? (wp->bClicked ? 2 : 1)
          : 0;
-
-    xitk_image_draw_image(w->wl, private_data->skin,
-      mode * w->width + event->x - w->x, event->y - w->y,
+    xitk_image_draw_image (wp->w.wl, wp->skin,
+      mode * wp->w.width + event->x - wp->w.x, event->y - wp->w.y,
       event->width, event->height,
       event->x, event->y);
   }
-
 }
 
 /*
  *
  */
-static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  button_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-    
-    if(private_data->skin_element_name) {
-      xitk_skin_lock(skonfig);
-      private_data->skin              = xitk_skin_get_image(skonfig, 
-							    (xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)));
-      w->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      w->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      w->width                        = private_data->skin->width/3;
-      w->height                       = private_data->skin->height;
-      
-      w->visible                      = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      w->enable                       = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
-    
-      xitk_skin_unlock(skonfig);
-      xitk_set_widget_pos(w, w->x, w->y);
-    }
+static void _notify_change_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
+  if (wp->skin_element_name) {
+    xitk_skin_lock (skonfig);
+    wp->skin        = xitk_skin_get_image (skonfig, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
+    wp->w.x         = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
+    wp->w.y         = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
+    wp->w.width     = wp->skin->width / 3;
+    wp->w.height    = wp->skin->height;
+    wp->w.visible   = (xitk_skin_get_visibility (skonfig, wp->skin_element_name)) ? 1 : -1;
+    wp->w.enable    = xitk_skin_get_enability (skonfig, wp->skin_element_name);
+    xitk_skin_unlock (skonfig);
+    xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
   }
 }
 
 /*
  *
  */
-static int notify_click_button (xitk_widget_t *w, int button, int bUp, int x, int y) {
-  button_private_data_t *private_data;
-  int                    ret = 0;
-    
-  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    if (button == Button1) {
-      private_data = (button_private_data_t *) w->private_data;
-      widget_event_t event;
-      
-      private_data->bClicked = !bUp;
-      event.x = w->x;
-      event.y = w->y;
-      event.width = w->width;
-      event.height = w->height;
-      paint_button (w, &event);
-      
-      if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
-	if(private_data->callback) {
-	  private_data->callback(private_data->bWidget, 
-				 private_data->userdata);
-	}
-      }
-      ret = 1;
-    }
-  }
+static int _notify_click_button (_button_private_t *wp, int button, int bUp, int x, int y) {
+  int ret = 0;
 
+  (void)x;
+  (void)y;
+  if (button == Button1) {
+    widget_event_t event;
+
+    wp->bClicked = !bUp;
+    event.x = wp->w.x;
+    event.y = wp->w.y;
+    event.width = wp->w.width;
+    event.height = wp->w.height;
+    _paint_button (wp, &event);
+
+    if (bUp && (wp->focus == FOCUS_RECEIVED)) {
+      if (wp->callback)
+        wp->callback (&wp->w, wp->userdata);
+    }
+    ret = 1;
+  }
   return ret;
 }
 
 /*
  *
  */
-static int notify_focus_button (xitk_widget_t *w, int focus) {
-  button_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-    private_data->focus = focus;
-  } 
-  
+static int _notify_focus_button (_button_private_t *wp, int focus) {
+  wp->focus = focus;
   return 1;
 }
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  _button_private_t *wp = (_button_private_t *)w;
   int retval = 0;
 
-  switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    event->x = w->x;
-    event->y = w->y;
-    event->width = w->width;
-    event->height = w->height;
-    /* fall through */
-  case WIDGET_EVENT_PARTIAL_PAINT:
-    paint_button (w, event);
-    break;
-  case WIDGET_EVENT_CLICK:
-    result->value = notify_click_button(w, event->button, 
-					event->button_pressed, event->x, event->y);
-    retval = 1;
-    break;
-  case WIDGET_EVENT_FOCUS:
-    notify_focus_button(w, event->focus);
-    break;
-  case WIDGET_EVENT_INSIDE:
-    result->value = notify_inside(w, event->x, event->y);
-    retval = 1;
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    notify_change_skin(w, event->skonfig);
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_GET_SKIN:
-    if(result) {
-      result->image = get_skin(w, event->skin_layer);
-      retval = 1;
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) {
+    switch (event->type) {
+      case WIDGET_EVENT_PAINT:
+        event->x = wp->w.x;
+        event->y = wp->w.y;
+        event->width = wp->w.width;
+        event->height = wp->w.height;
+        /* fall through */
+      case WIDGET_EVENT_PARTIAL_PAINT:
+        _paint_button (wp, event);
+        break;
+      case WIDGET_EVENT_CLICK:
+        result->value = _notify_click_button (wp, event->button,
+          event->button_pressed, event->x, event->y);
+        retval = 1;
+        break;
+      case WIDGET_EVENT_FOCUS:
+        _notify_focus_button (wp, event->focus);
+        break;
+      case WIDGET_EVENT_INSIDE:
+        result->value = _notify_inside (wp, event->x, event->y);
+        retval = 1;
+        break;
+      case WIDGET_EVENT_CHANGE_SKIN:
+        _notify_change_skin (wp, event->skonfig);
+        break;
+      case WIDGET_EVENT_DESTROY:
+        _notify_destroy (wp);
+        break;
+      case WIDGET_EVENT_GET_SKIN:
+        if (result) {
+          result->image = _get_skin (wp, event->skin_layer);
+          retval = 1;
+        }
+        break;
     }
-    break;
   }
-  
   return retval;
 }
 
@@ -228,47 +200,46 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
 					   int x, int y, 
                                            const char *skin_element_name, xitk_image_t *skin,
 					   int visible, int enable) {
-  xitk_widget_t          *mywidget;
-  button_private_data_t  *private_data;
+  _button_private_t  *wp;
   
   ABORT_IF_NULL(wl);
   ABORT_IF_NULL(wl->imlibdata);
 
-  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
+  wp = (_button_private_t *)xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
   
-  private_data = (button_private_data_t *) xitk_xmalloc(sizeof(button_private_data_t));
+  wp->imlibdata         = wl->imlibdata;
   
-  private_data->imlibdata         = wl->imlibdata;
-  
-  private_data->bWidget           = mywidget;
-  private_data->bClicked          = 0;
-  private_data->focus             = FOCUS_LOST;
+  wp->bWidget           = &wp->w;
+  wp->bClicked          = 0;
+  wp->focus             = FOCUS_LOST;
 
-  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(b->skin_element_name);
-  private_data->skin              = skin;
+  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup (b->skin_element_name);
+  wp->skin              = skin;
   
-  private_data->callback          = b->callback;
-  private_data->userdata          = b->userdata;
+  wp->callback          = b->callback;
+  wp->userdata          = b->userdata;
   
-  mywidget->private_data          = private_data;
+  wp->w.private_data    = wp;
 
-  mywidget->wl                    = wl;
+  wp->w.wl              = wl;
 
-  mywidget->enable                = enable;
-  mywidget->running               = 1;
-  mywidget->visible               = visible;
-  mywidget->have_focus            = FOCUS_LOST; 
-  mywidget->x                     = x;
-  mywidget->y                     = y;
-  mywidget->width                 = private_data->skin->width/3;
-  mywidget->height                = private_data->skin->height;
-  mywidget->type                  = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE
-                                  | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
-  mywidget->event                 = notify_event;
-  mywidget->tips_timeout          = 0;
-  mywidget->tips_string           = NULL;
+  wp->w.enable          = enable;
+  wp->w.running         = 1;
+  wp->w.visible         = visible;
+  wp->w.have_focus      = FOCUS_LOST;
+  wp->w.x               = x;
+  wp->w.y               = y;
+  wp->w.width           = wp->skin->width / 3;
+  wp->w.height          = wp->skin->height;
+  wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE
+                        | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event           = notify_event;
+  wp->w.tips_timeout    = 0;
+  wp->w.tips_string     = NULL;
 
-  return mywidget;
+  return &wp->w;
 }
 
 /*
