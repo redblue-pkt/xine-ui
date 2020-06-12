@@ -824,16 +824,27 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
 
   if (setup->num_wg > MAX_DISPLAY_WIDGETS) {
+    xitk_slider_hv_t si;
+
+    si.h.pos = 0;
+    si.h.visible = 0;
+    si.h.step = 0;
+    si.h.max = 0;
+    si.v.pos = 0;
+    si.v.visible = MAX_DISPLAY_WIDGETS;
+    si.v.step = 1;
+    si.v.max = setup->num_wg;
+    xitk_slider_hv_sync (setup->slider_wg, &si, XITK_SLIDER_SYNC_SET);
     slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
     xitk_show_widget (setup->slider_wg);
     xitk_enable_widget (setup->slider_wg);
   }
   else
     slidmax = 1;
-
+#if 0
   xitk_slider_set_max (setup->slider_wg, slidmax);
   xitk_slider_set_pos (setup->slider_wg, slidmax);
-
+#endif
 }
 
 /*
@@ -1060,7 +1071,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     sl.motion_userdata   = setup;
     setup->slider_wg =  xitk_noskin_slider_create (setup->widget_list, &sl,
       (WINDOW_WIDTH - 15 - 16 - 4 - 1), (24 + setup->th + 15),
-      16, (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3), XITK_VSLIDER);
+      16, (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3), XITK_HVSLIDER);
   }
   xitk_add_widget (setup->widget_list, setup->slider_wg);
 
