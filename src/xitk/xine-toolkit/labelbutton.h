@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -26,44 +26,5 @@
 
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
-
-typedef struct {
-
-  ImlibData		 *imlibdata;
-
-  xitk_widget_t          *bWidget;
-  int                     bType;
-  int                     bClicked;
-
-  int                     focus;
-
-  int                     bState;
-  int                     bOldState;
-  xitk_image_t           *skin;
-
-  xitk_simple_callback_t  callback;
-  xitk_state_callback_t   state_callback;
-   
-  void                   *userdata;
-   
-  int                     align;
-  int                     label_offset;
-  int                     label_visible;
-  int                     label_static;
-
-  char                   *label;
-  char                   *fontname;
-  
-  /* Only used if (w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_BROWSER || WIDGET_GROUP_MENU */
-  char                   *shortcut_label;
-  char                   *shortcut_font;
-  int                     shortcut_pos;
-
-  char                    skin_element_name[64];
-  char                    lbuf[32];
-  char                    normcolor[32];
-  char                    focuscolor[32];
-  char                    clickcolor[32];
-} lbutton_private_data_t;
 
 #endif

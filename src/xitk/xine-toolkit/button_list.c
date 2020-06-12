@@ -316,8 +316,8 @@ xitk_widget_t *xitk_button_list_find (xitk_button_list_t *bl, const char *name) 
     return NULL;
   w = bl->widgets;
   while (*w) {
-    lbutton_private_data_t *p = (lbutton_private_data_t *)w[0]->private_data;
-    if (p && p->label && !strcasecmp (p->label, name))
+    const char *p = xitk_labelbutton_get_label (w[0]);
+    if (p && !strcasecmp (p, name))
       return *w;
     w++;
   }
