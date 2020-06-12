@@ -287,13 +287,6 @@ typedef struct {
 #define ALIGN_RIGHT                 3
 #define ALIGN_DEFAULT               (ALIGN_LEFT)
 
-/* 
- * Slider type
- */
-#define XITK_VSLIDER                1
-#define XITK_HSLIDER                2
-#define XITK_RSLIDER                3
-
 /*
  * Label button type
  */
@@ -473,6 +466,11 @@ typedef enum {
  *  Widget struct
  */
 
+/* Slider type */
+#define XITK_VSLIDER                1
+#define XITK_HSLIDER                2
+#define XITK_RSLIDER                3
+#define XITK_HVSLIDER               4
 typedef struct {
   int                               magic;
   int                               min;
@@ -484,6 +482,43 @@ typedef struct {
   xitk_state_callback_t             motion_callback;
   void                             *motion_userdata;
 } xitk_slider_widget_t;
+typedef struct {
+  struct {
+    int pos, step, visible, max;
+  } h, v;
+} xitk_slider_hv_t;
+typedef enum {
+  XITK_SLIDER_SYNC_GET = 0,
+  XITK_SLIDER_SYNC_SET,
+  XITK_SLIDER_SYNC_SET_AND_PAINT
+} xitk_slider_sync_t;
+void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_sync_t mode);
+/** Create a slider */
+xitk_widget_t *xitk_slider_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
+xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl, xitk_slider_widget_t *s,
+  int x, int y, int width, int height, int type);
+/** * Get current position of paddle. */
+int xitk_slider_get_pos (xitk_widget_t *);
+/** Set position of paddle. */
+void xitk_slider_set_pos (xitk_widget_t *, int);
+/** * Set min value of slider. */
+void xitk_slider_set_min (xitk_widget_t *, int);
+/** Set max value of slider. */
+void xitk_slider_set_max (xitk_widget_t *, int);
+/** * Get min value of slider. */
+int xitk_slider_get_min (xitk_widget_t *);
+/** Get max value of slider. */
+int xitk_slider_get_max (xitk_widget_t *);
+/** Set position to 0 and redraw the widget. */
+void xitk_slider_reset (xitk_widget_t *);
+/** Set position to max and redraw the widget. */
+void xitk_slider_set_to_max (xitk_widget_t *);
+/** Increment by step the paddle position */
+void xitk_slider_make_step (xitk_widget_t *);
+/** Decrement by step the paddle position. */
+void xitk_slider_make_backstep (xitk_widget_t *);
+/** Call callback for current position */
+void xitk_slider_callback_exec (xitk_widget_t *);
 
 typedef struct {
   int                               magic;
@@ -1125,78 +1160,6 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
  * Pass events to UI
  */
 void xitk_xevent_notify(XEvent *event);
-
-/* 
- * *** Sliders ***
- */
-
-/**
- * Create a slider
- */
-xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
-				  xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl,
-					  xitk_slider_widget_t *s,
-					  int x, int y, int width, int height, int type);
-
-/**
- * Get current position of paddle.
- */
-int xitk_slider_get_pos(xitk_widget_t *);
-
-/**
- * Set position of paddle.
- */
-void xitk_slider_set_pos(xitk_widget_t *, int);
-
-/**
- * Set min value of slider.
- */
-void xitk_slider_set_min(xitk_widget_t *, int);
-
-/**
- * Set max value of slider.
- */
-void xitk_slider_set_max(xitk_widget_t *, int);
-
-/**
- * Get min value of slider.
- */
-int xitk_slider_get_min(xitk_widget_t *);
-
-/**
- * Get max value of slider.
- */
-int xitk_slider_get_max(xitk_widget_t *);
-
-/**
- * Set position to 0 and redraw the widget.
- */
-void xitk_slider_reset(xitk_widget_t *);
-
-/**
- * Set position to max and redraw the widget.
- */
-void xitk_slider_set_to_max(xitk_widget_t *);
-
-/**
- * Increment by step the paddle position
- */
-void xitk_slider_make_step(xitk_widget_t *);
-
-/**
- * Decrement by step the paddle position.
- */
-void xitk_slider_make_backstep(xitk_widget_t *);
-
-/**
- * Call callback for current position
- */
-void xitk_slider_callback_exec(xitk_widget_t *);
 
 /*
  * *** Label Buttons
@@ -2293,4 +2256,3 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
-
