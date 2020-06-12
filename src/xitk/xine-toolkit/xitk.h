@@ -1430,7 +1430,7 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
 /**
  *
  */
-xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
+xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
 
 /**
