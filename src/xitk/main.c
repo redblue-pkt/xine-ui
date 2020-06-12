@@ -400,9 +400,7 @@ static void xrm_parse(void) {
   
   XrmDestroyDatabase(rmdb);
   
-  if(display)
-    XCloseDisplay(display);
-
+  XCloseDisplay(display);
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -2239,7 +2237,7 @@ int main(int argc, char *argv[]) {
   xine_event_create_listener_thread (gui->event_queue, event_listener, gui);
 
   if(tvout && strlen(tvout)) {
-    if((gui->tvout = tvout_init(gui->display, tvout)))
+    if((gui->tvout = tvout_init(tvout)))
       tvout_setup(gui->tvout);
   }
 

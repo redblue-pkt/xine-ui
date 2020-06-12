@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <strings.h>
-#include <X11/Xlib.h>
 
 #include "common.h"
 
@@ -32,7 +31,7 @@
 
 
 struct tvout_s {
-  int    (*init)(Display *display, void **private);
+  int    (*init)(void **private);
   int    (*setup)(void *private);
   void   (*get_size_and_aspect)(int *width, int *height, double *pixaspect, void *private);
   int    (*set_fullscreen)(int fullscreen, int width, int height, void *private);
@@ -41,13 +40,13 @@ struct tvout_s {
   void   *private;
 };
 
-typedef tvout_t *(*backend_init_t)(Display *);
+typedef tvout_t *(*backend_init_t)(void);
 
 /* Backend init prototypes */
 #ifdef HAVE_NVTVSIMPLE
-static tvout_t *nvtv_backend(Display *);
+static tvout_t *nvtv_backend(void);
 #endif
-static tvout_t *ati_backend(Display *);
+static tvout_t *ati_backend(void);
 
 static const struct {
   char            name[8];
@@ -74,7 +73,7 @@ typedef struct {
 
 
 /* ===== NVTV ===== */
-static int nvtv_tvout_init(Display *display, void **data) {
+static int nvtv_tvout_init(void **data) {
   int             ret;
   
   if((ret = nvtv_simple_init())) {
@@ -170,7 +169,7 @@ static void nvtv_tvout_deinit(void *data) {
   free(private);
 }
 
-static tvout_t *nvtv_backend(Display *display) {
+static tvout_t *nvtv_backend(void) {
   static tvout_t tvout;
   
   tvout.init                = nvtv_tvout_init;
@@ -191,7 +190,7 @@ typedef struct {
   int     fullscreen;
 } ati_private_t;
 
-static int ati_tvout_init(Display *display, void **data) {
+static int ati_tvout_init(void **data) {
   ati_private_t *private = (ati_private_t *) calloc(1, sizeof(ati_private_t));
   
   *data = private;
@@ -262,7 +261,7 @@ static void ati_tvout_deinit(void *data) {
   free(private);
 }
 
-static tvout_t *ati_backend(Display *display) {
+static tvout_t *ati_backend(void) {
   static tvout_t tvout;
 
   tvout.init                = ati_tvout_init;
@@ -279,7 +278,7 @@ static tvout_t *ati_backend(Display *display) {
 
 
 /* ===== Wrapper ===== */
-tvout_t *tvout_init(Display *display, char *backend) {
+tvout_t *tvout_init(char *backend) {
   if(backend) {
     int i;
     
@@ -289,10 +288,10 @@ tvout_t *tvout_init(Display *display, char *backend) {
     
     for(i = 0; backends[i].init; i++) {
       if(!strcasecmp(backends[i].name, backend)) {
-	tvout_t *tvout = backends[i].init(display);
+	tvout_t *tvout = backends[i].init();
 	
 	if(tvout) {
-	  if(!tvout->init(display, &(tvout->private)))
+	  if(!tvout->init(&(tvout->private)))
 	    tvout = NULL;
 #ifdef TVOUT_DEBUG
 	  else

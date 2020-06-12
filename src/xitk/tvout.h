@@ -24,7 +24,7 @@
 
 typedef struct tvout_s tvout_t;
 
-tvout_t *tvout_init(Display *display, char *backend);
+tvout_t *tvout_init(char *backend);
 int tvout_setup(tvout_t *tvout);
 void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *pix_aspect);
 int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height);
