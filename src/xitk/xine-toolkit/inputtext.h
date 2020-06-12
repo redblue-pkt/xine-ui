@@ -24,45 +24,5 @@
 
 #include "_xitk.h"
 
-typedef struct {
-
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
-
-  xitk_widget_t          *iWidget;
-
-  xitk_image_t           *skin;
-
-  int                     cursor_focus;
-
-  xitk_string_callback_t  callback;
-  void                   *userdata;
-
-  char                   *fontname;
-  char                   *normal_color;
-  char                   *focused_color;
-
-  int                     have_focus;
-
-  struct {
-    char                 *buf;
-    xitk_pixmap_t        *temp_pixmap;
-    GC                    temp_gc;
-    /* next 2 _without_ trailing 0. */
-    int                   size;
-    int                   used;
-    int                   draw_start;
-    int                   draw_stop;
-    int                   cursor_pos;
-    int                   dirty;
-    int                   box_start;
-    int                   box_width;
-    int                   shift;
-    int                   width;
-  } text;
-
-  int                     max_length;
-} inputtext_private_data_t;
-
 #endif
 
