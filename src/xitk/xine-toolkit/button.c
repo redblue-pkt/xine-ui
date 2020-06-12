@@ -47,8 +47,8 @@ typedef struct {
 static void _notify_destroy (_button_private_t *wp) {
   if (!wp->skin_element_name) {
     xitk_image_free_image (&wp->skin);
-    XITK_FREE (wp->skin_element_name);
   }
+  XITK_FREE (wp->skin_element_name);
 }
 
 /*
