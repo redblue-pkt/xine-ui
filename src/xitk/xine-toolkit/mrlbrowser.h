@@ -125,7 +125,6 @@ typedef struct {
 
   xitk_window_t             *xwin;
 
-  ImlibImage                *bg_image;
   xitk_widget_list_t        *widget_list; /* File browser widget list */
   
   xine_t                    *xine;
