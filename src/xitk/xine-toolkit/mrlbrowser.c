@@ -581,7 +581,6 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
     
     xitk_unregister_event_handler(&private_data->widget_key);
 
-    xitk_destroy_widgets(private_data->widget_list);
     xitk_button_list_delete (private_data->autodir_buttons);
 
     xitk_window_destroy_window(private_data->xwin);
@@ -590,15 +589,7 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
     Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
-    /* xitk_dlist_init (&private_data->widget_list->list); */
-    
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-    
-    XITK_WIDGET_LIST_FREE(private_data->widget_list);
-    
+
     {
       int i;
       
@@ -907,7 +898,6 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
  */
 xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
-  GC                          gc;
   XSizeHints                  hint;
   char                       *title = mb->window_title;
   xitk_widget_t              *mywidget;
@@ -995,18 +985,13 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
     xitk_window_set_window_icon(private_data->xwin, *mb->icon);
 
   XLOCK (im->x.x_lock_display, im->x.disp);
-  gc = XCreateGC(im->x.disp, private_data->xwin->window, 0, 0);
-  
-  Imlib_apply_image(im, 
+  Imlib_apply_image(im,
 		    private_data->bg_image, private_data->xwin->window);
 
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  private_data->widget_list                = xitk_widget_list_new(im);
-  xitk_dlist_init (&private_data->widget_list->list);
-  private_data->widget_list->win           = private_data->xwin->window;
-  private_data->widget_list->gc            = gc;
-  
+  private_data->widget_list = xitk_window_widget_list(private_data->xwin);
+
   lb.button_type       = CLICK_BUTTON;
   lb.align             = ALIGN_DEFAULT;
   lb.label             = mb->select.caption;
