@@ -582,7 +582,7 @@ int xitk_system(int dont_run_as_root, const char *command) {
     char *argv[4];
     argv[0] = "sh";
     argv[1] = "-c";
-    argv[2] = command;
+    argv[2] = (char*)command;
     argv[3] = 0;
     execve("/bin/sh", argv, environ);
     exit(127);
