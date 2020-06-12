@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -30,40 +30,7 @@
 #define XITK_HSLIDER 2
 /*  rotate button *slider* type */
 #define XITK_RSLIDER 3
-
-typedef struct {
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
-
-  xitk_widget_t          *sWidget;
-  int                     sType;
-  int                     bClicked;
-  int                     focus;
-
-  float                   angle;
-  float                   percentage;
-
-  float                   upper;
-  float                   value;
-  float                   lower;
-  int                     step;
-
-  int                     radius;
-
-  xitk_image_t           *paddle_skin;
-  xitk_image_t           *bg_skin;
-
-  xitk_state_callback_t   motion_callback;
-  void                   *motion_userdata;
-			  
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-
-  int                     button_width;
-  float                   ratio;
-
-  int                     paddle_cover_bg;
-
-} slider_private_data_t;
+/*  hor and/or vert slider type */
+#define XITK_HVSLIDER 4
 
 #endif
