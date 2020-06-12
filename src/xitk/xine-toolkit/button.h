@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -23,19 +23,5 @@
 #define HAVE_XITK_BUTTON_H
 
 #include "_xitk.h"
-
-typedef struct {
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
-  xitk_widget_t          *bWidget;
-  int                     bClicked;
-  int                     focus;
-  xitk_image_t            *skin;
-
-  /* callback function (active_widget, user_data) */
-  xitk_simple_callback_t  callback;
-  void                   *userdata;
-
-} button_private_data_t;
 
 #endif
