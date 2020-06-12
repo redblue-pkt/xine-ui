@@ -31,6 +31,15 @@
 
 #include "utils.h"
 
+typedef struct {
+  xitk_widget_t  w;
+
+  ImlibData     *imlibdata;
+  char          *skin_element_name;
+  xitk_widget_t *bWidget;
+  xitk_image_t  *skin;
+} _image_private_t;
+
 #define CHECK_IMAGE(p)                          \
   do {                                          \
     ABORT_IF_NULL((p));                         \
@@ -1208,6 +1217,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   ImlibData    *im;
   int           w;
   int           h;
+  XSegment      xs[8], *q;
 
   CHECK_IMAGE(p);
 
@@ -1223,46 +1233,62 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2) , h);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
-  if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w, 0);
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, 0, (h - 1));
+  /* +----+----       *      +----       *
+   * |    |           *      |           *
+   * |    |           *      |           */
+  q = xs;
+  if (style == STYLE_BEVEL) {
+    q->x1 = 0 * w; q->x2 = 1 * w; q->y1 = q->y2 = 0; q++;
+    q->x1 = q->x2 = 0 * w; q->y1 = 0; q->y2 = h - 1; q++;
   }
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2), 0);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, w, (h - 1));
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+  q->x1 = 1 * w; q->x2 = 2 * w; q->y1 = q->y2 = 0; q++;
+  q->x1 = q->x2 = 1 * w; q->y1 = 0; q->y2 = h - 1; q++;
   XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
-  if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 2), 2, (w - 2), (h - 3));
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 2, (h - 2), w-2, (h - 2));
-  }
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 2*w - 2,     2, 2*w - 2, h - 3);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,     w+2, h - 2, 2*w - 2, h - 2);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,   w * 2,     0,   w * 3,     0);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,   w * 2,     0,   w * 2, h - 1);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_white (im));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w * 2 , 0, (w - 1), (h - 1));
- 
-  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
-  if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 1), 0, (w - 1), (h - 1));
-    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, (h - 1), w-1, (h - 1));
+  /*     |    |+----  *          |+----  *
+   *     |    ||      *          ||      *
+   * ----+----+|      *      ----+|      */
+  q = xs;
+  if (style == STYLE_BEVEL) {
+    q->x1 = q->x2 = 1 * w - 2; q->y1 = 2; q->y2 = h - 3; q++;
+    q->x1 = 2; q->x2 = 1 * w - 2; q->y1 = q->y2 = h - 2; q++;
   }
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2)+1, 1, (w * 3)-1, 1);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2)+1, 1, (w * 2)+1, (h - 2));
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) - 1, 0, (w * 2) - 1, h);
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, (h - 1), (w * 2)-1, (h - 1));
+  q->x1 = q->x2 = 2 * w - 2; q->y1 = 2; q->y2 = h - 3; q++;
+  q->x1 = 1 * w + 2; q->x2 = 2 * w - 2; q->y1 = q->y2 = h - 2; q++;
+  q->x1 = 2 * w + 0; q->x2 = 3 * w + 0; q->y1 = q->y2 = 0; q++;
+  q->x1 = q->x2 = 2 * w + 0; q->y1 = 0; q->y2 = h - 1; q++;
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray (im));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
+  XFillRectangle (im->x.disp, p->image->pixmap, p->image->gc, 2 * w, 0, w - 1, h - 1);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
+  q = xs;
+  if (style == STYLE_BEVEL) {
+    q->x1 = q->x2 = 1 * w - 1; q->y1 = 0; q->y2 = h - 1; q++;
+    q->x1 = 0; q->x2 = 1 * w - 1; q->y1 = q->y2 = h - 1; q++;
+  }
+  q->x1 = 2 * w + 1; q->x2 = 3 * w - 1; q->y1 = q->y2 = 1; q++;
+  q->x1 = q->x2 = 2 * w + 1; q->y1 = 1; q->y2 = h - 2; q++;
+  q->x1 = q->x2 = 2 * w - 1; q->y1 = 0; q->y2 = h; q++;
+  q->x1 = 1 * w + 0; q->x2 = 2 * w - 1; q->y1 = q->y2 = h - 1; q++;
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_black (im));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  /*                | *
+   *                | *
+   *            ----+ */
+  q = xs;
+  q->x1 = q->x2 = 3 * w - 1; q->y1 = 1; q->y2 = h - 1; q++;
+  q->x1 = 2 * w + 1; q->x2 = 3 * w + 0; q->y1 = q->y2 = h - 1; q++;
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 3) - 1, 1, (w * 3) - 1, (h - 1));
-  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 1, (h - 1), (w * 3), (h - 1));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 
@@ -1395,83 +1421,118 @@ void draw_bevel_two_state(xitk_image_t *p) {
 /*
  *
  */
-static void _draw_paddle_three_state(xitk_image_t *p, int direction) {
-  int           w;
-  int           h;
+void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
+  int           w, h, gap, m, dir = 0;
   ImlibData    *im;
+  XSegment      xs[9];
+  XRectangle    xr[3];
 
   CHECK_IMAGE(p);
 
   im = p->image->imlibdata;
 
   w = p->width / 3;
-  h = p->height;
+  if (width <= 0)
+    width = w;
+  if (w > width)
+    w = width;
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
+  h = p->height;
+  if (height <= 0) {
+    height = h;
+    dir = 1;
+  }
+  if (h > height)
+    h = height;
+
+  gap = (w < 11) || (h < 11) ? 1 : 2;
+
+  /* ------------
+   * |  ||  ||  |
+   * ------------ */
   /* Draw mask */
-  XSetForeground(im->x.disp, p->mask->gc, 0);
-  /* Top */
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, (w - 1), 0);
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 1, (w - 1), 1);
-  /* Bottom */
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, (h - 1), (w - 1), (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, (h - 1) - 1, (w - 1), (h - 1) - 1);
-  /* Left */
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, 0, (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 1, 0, 1, (h - 1));
-  /* Right */
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1), 0, (w - 1), (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1) - 1, 0, (w - 1) - 1, (h - 1));
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->mask->gc, 0);
+  XFillRectangle (im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, p->width, p->height);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  xr[0].x = 0 * w + 1; xr[0].y = 1; xr[0].width = w - 2; xr[0].height = h - 2;
+  xr[1].x = 1 * w + 1; xr[1].y = 1; xr[1].width = w - 2; xr[1].height = h - 2;
+  xr[2].x = 2 * w + 1; xr[2].y = 1; xr[2].width = w - 2; xr[2].height = h - 2;
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->mask->gc, xitk_get_pixel_color_white (im));
+  XFillRectangles (im->x.disp, p->mask->pixmap, p->mask->gc, xr, 3);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  pixmap_fill_rectangle(p->image, 2, 2, w - 4, (h - 1) - 2, xitk_get_pixel_color_gray(im));
-  pixmap_fill_rectangle(p->image, w + 2, 2, (w * 2) - 4, (h - 1) - 2, xitk_get_pixel_color_lightgray(im));
-  pixmap_fill_rectangle(p->image, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2, xitk_get_pixel_color_darkgray(im));
-
-  _draw_rectangular_box_with_colors(p->image, 2, 2, (w-1)-4, (h-1)-4,
-				    xitk_get_pixel_color_white(im),
-				    xitk_get_pixel_color_black(im),
-				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(p->image, w+2, 2, (w-1)-4, (h-1)-4,
-				    xitk_get_pixel_color_white(im),
-				    xitk_get_pixel_color_black(im),
-				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(p->image, (w*2)+2, 2, (w-1)-4, (h-1)-4,
-				    xitk_get_pixel_color_white(im),
-				    xitk_get_pixel_color_black(im),
-				    DRAW_INNER);
-  
-  { /* Enlightening paddle */
-    int xx, yy, ww, hh;
-    int i, offset = 0;
-
-    if(direction == DIRECTION_UP) {
-      xx = 4; yy = ((h-1)>>1); ww = (w-1) - 8; hh = 1;
-    }
-    else if(direction == DIRECTION_LEFT) {
-      xx = ((w-1)>>1); yy = 4; ww = 1; hh = (h-1) - 8;
-    }
-    else {
-      XITK_WARNING("direction '%d' is unhandled.\n",direction);
-      return;
-    }
-
-    for(i = 0; i < 3; i++, offset += w) {
-      if(i == 2) { xx++; yy++; }
-      draw_rectangular_outter_box(p->image, xx + offset, yy, ww, hh);
-    }
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_gray (im));
+  XFillRectangle (im->x.disp, p->image->pixmap, p->image->gc, 0 * w, 0, w, h);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray (im));
+  XFillRectangle (im->x.disp, p->image->pixmap, p->image->gc, 1 * w, 0, w, h);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray (im));
+  XFillRectangle (im->x.disp, p->image->pixmap, p->image->gc, 2 * w, 0, w, h);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  /* +---+---
+   * |   |       |
+   *          ---+ */
+  xs[0].x1 = 0 * w + gap; xs[0].x2 = 1 * w - gap - 1; xs[0].y1 = xs[0].y2 = gap;
+  xs[1].x1 = 1 * w + gap; xs[1].x2 = 2 * w - gap - 1; xs[1].y1 = xs[1].y2 = gap;
+  xs[2].x1 = xs[2].x2 = 0 * w + gap;     xs[2].y1 = gap + 1; xs[2].y2 = h - gap - 2;
+  xs[3].x1 = xs[3].x2 = 1 * w + gap;     xs[3].y1 = gap + 1; xs[3].y2 = h - gap - 2;
+  xs[4].x1 = xs[4].x2 = 3 * w - gap - 2; xs[4].y1 = gap + 1; xs[4].y2 = h - gap - 2;
+  xs[5].x1 = 2 * w + gap; xs[5].x2 = 3 * w - gap - 1; xs[5].y1 = xs[5].y2 = h - gap - 1;
+  if (!dir) {
+    /*   -    -    -   */
+    m = (h - 1) >> 1;
+    xs[6].x1 = 0 * w + gap + 3; xs[6].x2 = 1 * w - gap - 4; xs[6].y1 = xs[6].y2 = m;
+    xs[7].x1 = 1 * w + gap + 3; xs[7].x2 = 2 * w - gap - 4; xs[7].y1 = xs[7].y2 = m;
+    xs[8].x1 = 2 * w + gap + 3; xs[8].x2 = 3 * w - gap - 4; xs[8].y1 = xs[8].y2 = m;
+  } else {
+    /*   |    |    |   */
+    m = (w - 1) >> 1;
+    xs[6].x1 = xs[6].x2 = 0 * w + m; xs[6].y1 = gap + 3; xs[6].y2 = h - gap - 4;
+    xs[7].x1 = xs[7].x2 = 1 * w + m; xs[7].y1 = gap + 3; xs[7].y2 = h - gap - 4;
+    xs[8].x1 = xs[8].x2 = 2 * w + m; xs[8].y1 = gap + 3; xs[8].y2 = h - gap - 4;
   }
-  
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_white (im));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, 9);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  /*         +---
+   *    |   ||
+   * ---+---+    */
+  xs[0].x1 = 2 * w + gap; xs[0].x2 = 3 * w - gap - 1; xs[0].y1 = xs[0].y2 = gap;
+  xs[1].x1 = xs[1].x2 = 1 * w - gap - 1; xs[1].y1 = gap + 1; xs[1].y2 = h - gap - 2;
+  xs[2].x1 = xs[2].x2 = 2 * w - gap - 1; xs[2].y1 = gap + 1; xs[2].y2 = h - gap - 2;
+  xs[3].x1 = xs[3].x2 = 2 * w + gap;     xs[3].y1 = gap + 1; xs[3].y2 = h - gap - 2;
+  xs[4].x1 = 0 * w + gap; xs[4].x2 = 1 * w - gap - 1; xs[4].y1 = xs[4].y2 = h - gap - 1;
+  xs[5].x1 = 1 * w + gap; xs[4].x2 = 2 * w - gap - 1; xs[4].y1 = xs[4].y2 = h - gap - 1;
+  if (!dir) {
+    /*   -    -    -   */
+    m = ((h - 1) >> 1) + 1;
+    xs[6].x1 = 0 * w + gap + 3; xs[6].x2 = 1 * w - gap - 4; xs[6].y1 = xs[6].y2 = m;
+    xs[7].x1 = 1 * w + gap + 3; xs[7].x2 = 2 * w - gap - 4; xs[7].y1 = xs[7].y2 = m;
+    xs[8].x1 = 2 * w + gap + 3; xs[8].x2 = 3 * w - gap - 4; xs[8].y1 = xs[8].y2 = m;
+  } else {
+    /*   |    |    |   */
+    m = ((w - 1) >> 1) + 1;
+    xs[6].x1 = xs[6].x2 = 0 * w + m; xs[6].y1 = gap + 3; xs[6].y2 = h - gap - 4;
+    xs[7].x1 = xs[7].x2 = 1 * w + m; xs[7].y1 = gap + 3; xs[7].y2 = h - gap - 4;
+    xs[8].x1 = xs[8].x2 = 2 * w + m; xs[8].y1 = gap + 3; xs[8].y2 = h - gap - 4;
+  }
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_black (im));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, 9);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 
 /*
  *
  */
 void draw_paddle_three_state_vertical(xitk_image_t *p) {
-  _draw_paddle_three_state(p, DIRECTION_UP);
+  draw_paddle_three_state (p, 0, p->height);
 }
 void draw_paddle_three_state_horizontal(xitk_image_t *p) {
-  _draw_paddle_three_state(p, DIRECTION_LEFT);
+  draw_paddle_three_state (p, p->width / 3, 0);
 }
 
 /*
@@ -1560,7 +1621,7 @@ static void _draw_frame(xitk_pixmap_t *p,
 	       titlewidth1 == titlewidth))
 	  titlelen--;
       }
-      if(titlelen > (sizeof(buf) - dotslen - 1)) /* Should never happen, */
+      if (titlelen > ((int)sizeof (buf) - dotslen - 1)) /* Should never happen, */
 	titlelen = (sizeof(buf) - dotslen - 1);  /* just to be sure ...  */
       strlcpy(buf, title, titlelen);
       strcat(buf, dots);
@@ -1912,55 +1973,45 @@ void xitk_image_draw_image (xitk_widget_list_t *wl, xitk_image_t *img,
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w) {
-  image_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
-    private_data = (image_private_data_t *) w->private_data;
-
-    if(!private_data->skin_element_name)
-      xitk_image_free_image(&(private_data->skin));
-
-    XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data);
+static void _notify_destroy (_image_private_t *wp) {
+  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+    if (!wp->skin_element_name)
+      xitk_image_free_image (&(wp->skin));
+    XITK_FREE (wp->skin_element_name);
   }
 }
 
 /*
  *
  */
-static int notify_inside(xitk_widget_t *w, int x, int y) {
+static int _notify_inside (_image_private_t *wp, int x, int y) {
+  (void)wp;
+  (void)x;
+  (void)y;
   return 0;
 }
 
 /*
  *
  */
-static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  image_private_data_t *private_data;
-  
-  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
-    private_data = (image_private_data_t *) w->private_data;
-    if(sk == BACKGROUND_SKIN && private_data->skin) {
-      return private_data->skin;
-    }
+static xitk_image_t *_get_skin (_image_private_t *wp, int sk) {
+  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+    if ((sk == BACKGROUND_SKIN) && wp->skin)
+      return wp->skin;
   }
-
   return NULL;
 }
 
 /*
  *
  */
-static void paint_image (xitk_widget_t *w, widget_event_t *event) {
+static void _paint_image (_image_private_t *wp, widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.image.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
-    image_private_data_t *private_data = (image_private_data_t *) w->private_data;
-
-    xitk_image_draw_image(w->wl, private_data->skin,
-        event->x - w->x, event->y - w->y,
+  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (wp->w.visible == 1)) {
+    xitk_image_draw_image (wp->w.wl, wp->skin,
+        event->x - wp->w.x, event->y - wp->w.y,
         event->width, event->height,
         event->x, event->y);
   }
@@ -1969,62 +2020,58 @@ static void paint_image (xitk_widget_t *w, widget_event_t *event) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  image_private_data_t *private_data;
-  
-  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && w->visible == 1)) {
-    private_data = (image_private_data_t *) w->private_data;
-
-    if(private_data->skin_element_name) {
+static void _notify_change_skin (_image_private_t *wp, xitk_skin_config_t *skonfig) {
+  if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (wp->w.visible == 1))) {
+    if (wp->skin_element_name) {
       
       xitk_skin_lock(skonfig);
 
-      private_data->skin = xitk_skin_get_image(skonfig,
-					       xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      wp->skin = xitk_skin_get_image (skonfig, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
       
-      w->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      w->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      w->width           = private_data->skin->width;
-      w->height          = private_data->skin->height;
+      wp->w.x       = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
+      wp->w.y       = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
+      wp->w.width   = wp->skin->width;
+      wp->w.height  = wp->skin->height;
 
       xitk_skin_unlock(skonfig);
       
-      xitk_set_widget_pos(w, w->x, w->y);
+      xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     }
   }
 }
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int _notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  _image_private_t *wp = (_image_private_t *)w;
   int retval = 0;
 
-  switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    event->x = w->x;
-    event->y = w->y;
-    event->width = w->width;
-    event->height = w->height;
-    /* fall through */
-  case WIDGET_EVENT_PARTIAL_PAINT:
-    paint_image (w, event);
-    break;
-  case WIDGET_EVENT_INSIDE:
-    result->value = notify_inside(w, event->x, event->y);
-    retval = 1;
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    notify_change_skin(w, event->skonfig);
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_GET_SKIN:
-    if(result) {
-      result->image = get_skin(w, event->skin_layer);
+  switch (event->type) {
+    case WIDGET_EVENT_PAINT:
+      event->x = wp->w.x;
+      event->y = wp->w.y;
+      event->width = wp->w.width;
+      event->height = wp->w.height;
+      /* fall through */
+    case WIDGET_EVENT_PARTIAL_PAINT:
+      _paint_image (wp, event);
+      break;
+    case WIDGET_EVENT_INSIDE:
+      result->value = _notify_inside (wp, event->x, event->y);
       retval = 1;
-    }
-    break;
+      break;
+    case WIDGET_EVENT_CHANGE_SKIN:
+      _notify_change_skin (wp, event->skonfig);
+      break;
+    case WIDGET_EVENT_DESTROY:
+      _notify_destroy (wp);
+      break;
+    case WIDGET_EVENT_GET_SKIN:
+      if (result) {
+        result->image = _get_skin (wp, event->skin_layer);
+        retval = 1;
+      }
+      break;
+    default: ;
   }
-  
   return retval;
 }
 
@@ -2037,40 +2084,39 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 					  int x, int y,
 					  const char *skin_element_name,
 					  xitk_image_t *skin) {
-  xitk_widget_t              *mywidget;
-  image_private_data_t       *private_data;
+  _image_private_t *wp;
 
   ABORT_IF_NULL(wl);
   ABORT_IF_NULL(wl->imlibdata);
 
-  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
+  wp = (_image_private_t *)xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
-  private_data = (image_private_data_t *) xitk_xmalloc (sizeof (image_private_data_t));
+  wp->imlibdata         = wl->imlibdata;
+  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup (im->skin_element_name);
 
-  private_data->imlibdata         = wl->imlibdata;
-  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(im->skin_element_name);
+  wp->bWidget           = &wp->w;
+  wp->skin              = skin;
 
-  private_data->bWidget           = mywidget;
-  private_data->skin              = skin;
+  wp->w.private_data    = &wp->w;
 
-  mywidget->private_data          = private_data;
+  wp->w.wl              = wl;
 
-  mywidget->wl                    = wl;
+  wp->w.enable          = 0;
+  wp->w.running         = 1;
+  wp->w.visible         = 0;
+  wp->w.have_focus      = FOCUS_LOST;
+  wp->w.x               = x;
+  wp->w.y               = y;
+  wp->w.width           = wp->skin->width;
+  wp->w.height          = wp->skin->height;
+  wp->w.type            = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event           = _notify_event;
+  wp->w.tips_timeout    = 0;
+  wp->w.tips_string     = NULL;
 
-  mywidget->enable                = 0;
-  mywidget->running               = 1;
-  mywidget->visible               = 0;
-  mywidget->have_focus            = FOCUS_LOST;
-  mywidget->x                     = x;
-  mywidget->y                     = y;
-  mywidget->width                 = private_data->skin->width;
-  mywidget->height                = private_data->skin->height;
-  mywidget->type                  = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
-  mywidget->event                 = notify_event;
-  mywidget->tips_timeout          = 0;
-  mywidget->tips_string           = NULL;
-
-  return mywidget;
+  return &wp->w;
 }
 
 xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,

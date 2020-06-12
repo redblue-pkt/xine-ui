@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -38,13 +38,7 @@
 
 #define TABULATION_SIZE 6 /* number of chars inserted in place of a tabulation */
 
-typedef struct {
-  ImlibData            *imlibdata;
-  char                 *skin_element_name;
-  xitk_widget_t        *bWidget;
-  xitk_image_t         *skin;
-} image_private_data_t;
+void draw_checkbox_check(xitk_image_t *p);
+void draw_paddle_three_state (xitk_image_t *p, int width, int height);
 
 #endif
-
-void draw_checkbox_check(xitk_image_t *p);
