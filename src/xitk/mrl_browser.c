@@ -324,7 +324,11 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   mb.mrl_filters                           = mrl_filters;
 
-  mrlb->w = xitk_mrlbrowser_create (NULL, mrlb->gui->skin_config, &mb);
+  {
+    xitk_widget_list_t *wl = xitk_widget_list_new (mrlb->gui->imlib_data);
+    mrlb->w = xitk_mrlbrowser_create (wl, mrlb->gui->skin_config, &mb);
+    xitk_widget_list_defferred_destroy (wl);
+  }
 
   video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
 
