@@ -586,10 +586,6 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
     xitk_window_destroy_window(private_data->xwin);
     private_data->xwin = NULL;
 
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
     {
       int i;
       
@@ -638,7 +634,7 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
  */
 
 void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  ImlibImage                *new_img, *old_img;
+  ImlibImage                *new_img;
   mrlbrowser_private_data_t *private_data;
   XSizeHints                 hint;
 
@@ -676,12 +672,9 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
       xitk_usec_sleep(10000);
     }
 
-    old_img = private_data->bg_image;
-    private_data->bg_image = new_img;
-
     XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    Imlib_destroy_image(private_data->imlibdata, old_img);
     Imlib_apply_image(private_data->imlibdata, new_img, private_data->xwin->window);
+    Imlib_destroy_image(private_data->imlibdata, new_img);
     XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
     xitk_skin_unlock(skonfig);
@@ -908,6 +901,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   xitk_label_widget_t         lbl;
   xitk_combo_widget_t         cmb;
   xitk_widget_t              *w;
+  ImlibImage                 *bg_image;
 
   ABORT_IF_NULL(im);
 
@@ -943,7 +937,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 
   XLOCK (im->x.x_lock_display, im->x.disp);
 
-  if(!(private_data->bg_image = Imlib_load_image(im, 
+  if(!(bg_image = Imlib_load_image(im,
 						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     
@@ -958,13 +952,13 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 
   hint.x      = mb->x;
   hint.y      = mb->y;
-  hint.width  = private_data->bg_image->rgb_width;
-  hint.height = private_data->bg_image->rgb_height;
+  hint.width  = bg_image->rgb_width;
+  hint.height = bg_image->rgb_height;
   hint.flags  = PPosition | PSize;
 
   private_data->xwin = xitk_window_create_window(im, mb->x, mb->y,
-                                                 private_data->bg_image->rgb_width,
-                                                 private_data->bg_image->rgb_height);
+                                                 bg_image->rgb_width,
+                                                 bg_image->rgb_height);
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   XmbSetWMProperties(im->x.disp, private_data->xwin->window, title, title,
@@ -985,9 +979,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
     xitk_window_set_window_icon(private_data->xwin, *mb->icon);
 
   XLOCK (im->x.x_lock_display, im->x.disp);
-  Imlib_apply_image(im,
-		    private_data->bg_image, private_data->xwin->window);
-
+  Imlib_apply_image(im, bg_image, private_data->xwin->window);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   private_data->widget_list = xitk_window_widget_list(private_data->xwin);
@@ -1107,12 +1099,16 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->x                  = mb->x;
   mywidget->y                  = mb->y;
-  mywidget->width              = private_data->bg_image->width;
-  mywidget->height             = private_data->bg_image->height;
+  mywidget->width              = bg_image->width;
+  mywidget->height             = bg_image->height;
   mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MRLBROWSER;
   mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  Imlib_destroy_image(private_data->imlibdata, bg_image);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   xitk_browser_update_list(private_data->mrlb_list, 
 			   (const char* const*)private_data->mc->mrls_disp, NULL,
