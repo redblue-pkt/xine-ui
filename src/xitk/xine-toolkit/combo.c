@@ -68,16 +68,8 @@ static void notify_destroy(xitk_widget_t *w) {
     if(private_data->visible)
       _combo_rollunroll(private_data->button_widget, (void *)w, 0);
 
-    xitk_destroy_widgets(private_data->widget_list);
-
     xitk_unregister_event_handler(&private_data->widget_key);
     xitk_window_destroy_window(private_data->xwin);
-
-    XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-    XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
-    XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
-    xitk_widget_list_defferred_destroy (private_data->widget_list);
 
     XITK_FREE(private_data->skin_element_name);
     free(private_data);
@@ -571,19 +563,13 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   XSetTransientForHint (wl->imlibdata->x.disp,
 			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
   
-  private_data->gc = XCreateGC(wl->imlibdata->x.disp, 
-			       (xitk_window_get_window(private_data->xwin)), None, None);
-
   XUNLOCK (wl->imlibdata->x.x_unlock_display, wl->imlibdata->x.disp);
 
   /* Change default classhint to new one. */
   xitk_window_set_window_class(private_data->xwin, "Xitk Combo", "Xitk");
 
-  private_data->widget_list                = xitk_widget_list_new(wl->imlibdata);
-  xitk_dlist_init (&private_data->widget_list->list);
-  private_data->widget_list->win           = (xitk_window_get_window(private_data->xwin));
-  private_data->widget_list->gc            = private_data->gc;
-  
+  private_data->widget_list                = xitk_window_widget_list(private_data->xwin);
+
   /* Browser */
   browser.arrow_up.skin_element_name    = NULL;
   browser.slider.skin_element_name      = NULL;
@@ -597,7 +583,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   browser.parent_wlist                  = private_data->widget_list;
   browser.userdata                      = (void*)mywidget;
   private_data->browser_widget = xitk_noskin_browser_create (private_data->widget_list, &browser,
-    private_data->gc, 1, 1, (itemw - slidw), itemh, slidw, DEFAULT_FONT_10);
+    XITK_WIDGET_LIST_GC(private_data->widget_list),
+    1, 1, (itemw - slidw), itemh, slidw, DEFAULT_FONT_10);
   xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->browser_widget->node);
   xitk_enable_and_show_widget(private_data->browser_widget);
   private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;

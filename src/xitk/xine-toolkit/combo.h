@@ -29,7 +29,6 @@ typedef struct {
   char                   *skin_element_name;
 
   xitk_window_t          *xwin;
-  GC                      gc;
 
   int                     win_x;
   int                     win_y;
