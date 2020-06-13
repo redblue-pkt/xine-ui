@@ -44,6 +44,25 @@
     _target_ptr = NULL; \
   }
 
+typedef struct xitk_dialog_s xitk_dialog_t;
+
+struct xitk_dialog_s {
+  ImlibData              *imlibdata;
+  xitk_window_t          *xwin;
+  xitk_widget_list_t     *widget_list;
+  xitk_register_key_t     key;
+  int                     type;
+
+  xitk_widget_t          *w1, *w2, *w3;
+  void                  (*done3cb)(void *userdata, int state);
+  void                   *done3data;
+
+  xitk_widget_t          *checkbox;
+  xitk_widget_t          *checkbox_label;
+
+  xitk_widget_t          *default_button;
+};
+
 /* NOTE: this will free (text). */
 static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
   const char *title, char *text, int *width, int *height, int align) {
