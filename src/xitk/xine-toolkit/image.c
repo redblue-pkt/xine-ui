@@ -999,15 +999,15 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
    * |              * -------------+ */
   q = xs;
   if (excstart < excstop) {
-    q->x1 = x; q->x2 = x + excstart;        q->y1 = q->y2 = y; q++;
-    q->x1 = x + excstop; q->x2 = x + width; q->y1 = q->y2 = y; q++;
+    q->x1 = x + 1; q->x2 = x + excstart;        q->y1 = q->y2 = y; q++;
+    q->x1 = x + excstop; q->x2 = x + width - 1; q->y1 = q->y2 = y; q++;
   } else {
-    q->x1 = x; q->x2 = x + width;           q->y1 = q->y2 = y; q++;
+    q->x1 = x; q->x2 = x + width + 1;           q->y1 = q->y2 = y; q++;
   }
-  q->x1 = q->x2 = x; q->y1 = y; q->y2 = y + height; q++;
+  q->x1 = q->x2 = x; q->y1 = y + 1; q->y2 = y + height - 1; q++;
   if (relief & DRAW_DOUBLE) {
-    q->x1 = q->x2 = x + width - 1;        q->y1 = y + 1; q->y2 = y + height - 1; q++;
-    q->x1 = x + 2; q->x2 = x + width - 1; q->y1 = q->y2 = y + height - 1; q++;
+    q->x1 = q->x2 = x + width - 1;        q->y1 = y + 2; q->y2 = y + height - 2; q++;
+    q->x1 = x + 2; q->x2 = x + width - 2; q->y1 = q->y2 = y + height - 1; q++;
   }
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground (im->x.disp, p->gc, color[0]);
@@ -1018,16 +1018,16 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
    *              | * |              *
    * -------------+ * |              */
   q = xs;
-  q->x1 = q->x2 = x + width;        q->y1 = y; q->y2 = y + height; q++;
-  q->x1 = x + 1; q->x2 = x + width; q->y1 = q->y2 = y + height;    q++;
+  q->x1 = q->x2 = x + width;            q->y1 = y + 1; q->y2 = y + height - 1; q++;
+  q->x1 = x + 1; q->x2 = x + width - 1; q->y1 = q->y2 = y + height;    q++;
   if (relief & DRAW_DOUBLE) {
     if (excstart < excstop) {
-      q->x1 = x + 1; q->x2 = x + excstart;        q->y1 = q->y2 = y + 1; q++;
-      q->x1 = x + excstop; q->x2 = x + width - 1; q->y1 = q->y2 = y + 1; q++;
+      q->x1 = x + 2; q->x2 = x + excstart;        q->y1 = q->y2 = y + 1; q++;
+      q->x1 = x + excstop; q->x2 = x + width - 2; q->y1 = q->y2 = y + 1; q++;
     } else {
-      q->x1 = x + 1; q->x2 = x + width - 1;       q->y1 = q->y2 = y + 1; q++;
+      q->x1 = x + 2; q->x2 = x + width - 2;       q->y1 = q->y2 = y + 1; q++;
     }
-    q->x1 = q->x2 = x + 1; q->y1 = y + 1; q->y2 = y + height - 1; q++;
+    q->x1 = q->x2 = x + 1; q->y1 = y + 2; q->y2 = y + height - 2; q++;
   }
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground (im->x.disp, p->gc, color[1]);
