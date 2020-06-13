@@ -1128,7 +1128,7 @@ void playlist_editor(void) {
     }
 
     playlist->autoplay_buttons = xitk_button_list_new (
-      gui->imlib_data, playlist->widget_list,
+      playlist->widget_list,
       gui->skin_config, "AutoPlayBG",
       playlist_scan_input, NULL,
       (char **)autoplay_plugins,

@@ -1071,7 +1071,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
     }
 
     private_data->autodir_buttons = xitk_button_list_new (
-      im, private_data->widget_list,
+      private_data->widget_list,
       skonfig, private_data->skin_element_name_ip,
       mrlbrowser_grab_mrls, private_data,
       (char **)mb->ip_availables,

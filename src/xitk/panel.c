@@ -1052,7 +1052,7 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
   }
 
   panel->autoplay_buttons = xitk_button_list_new (
-    panel->gui->imlib_data, panel->widget_list,
+    panel->widget_list,
     panel->gui->skin_config, "AutoPlayGUI",
     playlist_scan_input, NULL,
     (char **)autoplay_plugins,

@@ -28,7 +28,7 @@
 typedef struct xitk_button_list_st xitk_button_list_t;
 
 xitk_button_list_t *xitk_button_list_new (
-  ImlibData *imlib_data, xitk_widget_list_t *widget_list,
+  xitk_widget_list_t *widget_list,
   xitk_skin_config_t *skin_config, const char *skin_element_name,
   xitk_simple_callback_t callback, void *callback_data,
   char **names,
