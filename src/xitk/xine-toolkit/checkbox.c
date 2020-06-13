@@ -302,7 +302,6 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
   private_data = (checkbox_private_data_t *) 
     xitk_xmalloc (sizeof (checkbox_private_data_t));
 
-  private_data->imlibdata         = wl->imlibdata;
   private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(cb->skin_element_name);
 
   private_data->cWidget           = mywidget;

@@ -28,7 +28,6 @@
 
 typedef struct {
 
-  ImlibData              *imlibdata;
   char                   *skin_element_name;
 
   xitk_widget_t          *bWidget;
