@@ -536,7 +536,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   printf ("xitk.inputtext.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
   if (wp->w.enable && (!wp->cursor_focus)
-    && (xitk_is_mouse_over_widget (wp->imlibdata->x.disp, wp->w.wl->win, &wp->w)))
+    && (xitk_is_mouse_over_widget (&wp->w)))
       _cursor_focus (wp, wp->w.wl->win, 1);
 
   /* FIXME: what is this needed for? */
@@ -797,7 +797,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
       wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;
     
     if (wp->w.enable && (!wp->cursor_focus)
-       && (xitk_is_mouse_over_widget (wp->imlibdata->x.disp, wp->w.wl->win, &wp->w)))
+       && (xitk_is_mouse_over_widget (&wp->w)))
       _cursor_focus (wp, wp->w.wl->win, 1);
 
     {
