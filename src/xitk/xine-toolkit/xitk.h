@@ -1114,7 +1114,7 @@ void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout
 /**
  *
  */
-int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w);
+int xitk_is_mouse_over_widget(xitk_widget_t *w);
 
 /**
  *

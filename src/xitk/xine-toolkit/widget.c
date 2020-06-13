@@ -2123,41 +2123,24 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
   xitk_tips_set_timeout(w, timeout);
 }
 
-int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w) {
-  Bool            ret;
-  Window          root_window, child_window;
-  int             root_x, root_y, win_x, win_y;
-  unsigned int    mask;
-  int             retval = 0;
-  
+int xitk_is_mouse_over_widget(xitk_widget_t *w) {
+  int             win_x, win_y;
+  Display        *display = w->wl->imlibdata->x.disp;
+  Window          window = w->wl->win;
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return 0;
   }
-  if(window == None) {
-    XITK_WARNING("window is None\n");
-    return 0;
-  }
-  
-  XLOCK (xitk_x_lock_display, display);
-  ret = XQueryPointer(display, window, 
-		      &root_window, &child_window, &root_x, &root_y, &win_x, &win_y, &mask);
-  XUNLOCK (xitk_x_unlock_display, display);
-  
-  if((ret == False) ||
-     ((child_window == None) && (win_x == 0) && (win_y == 0))) {
-    retval = 0;
-  }
-  else {
-    
-    if(((win_x >= w->x) && (win_x < (w->x + w->width))) && 
+
+  if (xitk_get_mouse_coords(display, window, &win_x, &win_y, NULL, NULL)) {
+    if(((win_x >= w->x) && (win_x < (w->x + w->width))) &&
        ((win_y >= w->y) && (win_y < (w->y + w->height)))) {
-      retval = 1;
+      return 1;
     }
-    
   }
-  
-  return retval;
+
+  return 0;
 }
 
 int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry) {
