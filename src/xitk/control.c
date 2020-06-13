@@ -273,6 +273,7 @@ static void control_handle_event(XEvent *event, void *data) {
       xitk_window_get_window_position (vctrl->xwin, &wx, &wy, NULL, NULL);
       control_menu (vctrl->gui, vctrl->widget_list, bevent->x + wx, bevent->y + wy);
     }
+    break;
   }
 
   case KeyPress:
