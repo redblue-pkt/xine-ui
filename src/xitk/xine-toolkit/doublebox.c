@@ -272,7 +272,6 @@ static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
 					  doublebox_private_data_t *private_data,
 					  int visible, int enable) {
   
-  private_data->imlibdata                = wl->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   private_data->parent_wlist             = ib->parent_wlist;
   private_data->callback                 = ib->callback;

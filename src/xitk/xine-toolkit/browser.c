@@ -352,7 +352,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     private_data->labels_offset = 0;
 
     if(label_font) {
-      fs = xitk_font_load_font(private_data->imlibdata->x.disp, label_font);
+      fs = xitk_font_load_font(w->wl->imlibdata->x.disp, label_font);
       xitk_font_set_font(fs, private_data->parent_wlist->gc);
     }
 
@@ -1004,7 +1004,6 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   XITK_WIDGET_INIT(&sl);
 
   private_data->bWidget              = mywidget;
-  private_data->imlibdata            = wl->imlibdata;
   private_data->skin_element_name    = (skin_element_name == NULL) ? NULL : strdup(br->browser.skin_element_name);
   private_data->jumped               = -1;
   private_data->content              = (char **)br->browser.entries;

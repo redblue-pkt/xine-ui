@@ -29,7 +29,6 @@
 typedef struct {
   xitk_widget_t    w;
 
-  ImlibData       *imlibdata;
   char            *skin_element_name;
   xitk_widget_t   *bWidget;
   int              bClicked;
@@ -208,9 +207,7 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   wp = (_button_private_t *)xitk_xmalloc (sizeof (*wp));
   if (!wp)
     return NULL;
-  
-  wp->imlibdata         = wl->imlibdata;
-  
+
   wp->bWidget           = &wp->w;
   wp->bClicked          = 0;
   wp->focus             = FOCUS_LOST;

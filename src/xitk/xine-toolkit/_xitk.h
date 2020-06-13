@@ -340,7 +340,6 @@ struct xitk_window_s {
   xitk_pixmap_t            *background_mask;
   int                       width;
   int                       height;
-  xitk_dialog_t            *dialog;
 
   xitk_widget_list_t       *widget_list;
 };

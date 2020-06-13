@@ -79,7 +79,6 @@ static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
     free (wd);
     return NULL;
   }
-  wd->xwin->dialog = wd;
   wd->w1 = wd->w2 = wd->w3 = NULL;
   wd->default_button = NULL;
   wd->widget_list = NULL;
@@ -760,8 +759,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   xwin->background_mask = NULL;
   xwin->width           = width;
   xwin->height          = height;
-  xwin->dialog          = NULL;
-  
+
   memset(&hint, 0, sizeof(hint));
   hint.x               = x;
   hint.y               = y;
