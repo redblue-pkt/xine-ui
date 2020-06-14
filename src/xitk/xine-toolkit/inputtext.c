@@ -511,7 +511,6 @@ int xitk_window_grab_input(xitk_window_t *w, KeySym *keysym,
  * Paint the input text box.
  */
 static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *event) {
-  XWindowAttributes         attr;
   XColor                    xcolor;
   xitk_font_t              *fs = NULL;
   int                       xsize, ysize, state = 0;
@@ -538,11 +537,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   if (wp->w.enable && (!wp->cursor_focus)
     && (xitk_is_mouse_over_widget (&wp->w)))
       _cursor_focus (wp, wp->w.wl->win, 1);
-
-  /* FIXME: what is this needed for? */
-  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-  XGetWindowAttributes (wp->imlibdata->x.disp, wp->w.wl->win, &attr);
-  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
   if (!wp->text.temp_pixmap) {
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);

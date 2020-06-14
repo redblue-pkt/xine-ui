@@ -266,14 +266,8 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
   if (wp->w.visible == 1) {
     xitk_image_t *skin = wp->skin;
     xitk_pixmap_t *btn;
-    XWindowAttributes attr;
     GC lgc;
     int button_width, state = 0, mode;
-
-    /* FIXME: what is this good for? */
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XGetWindowAttributes (wp->imlibdata->x.disp, wp->w.wl->win, &attr);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     lgc = XCreateGC (wp->imlibdata->x.disp, wp->w.wl->win, None, None);
