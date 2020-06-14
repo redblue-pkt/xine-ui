@@ -34,7 +34,6 @@
 
 #include "common.h"
 
-
 #define OVL_PALETTE_SIZE 256
 
 #ifdef	__GNUC__
@@ -45,13 +44,13 @@
 
 static const union {         /* CLUT == Color LookUp Table */
   struct {
-    uint8_t cb    : 8;
-    uint8_t cr    : 8;
-    uint8_t y     : 8;
-    uint8_t foo   : 8;
+    uint8_t cb;
+    uint8_t cr;
+    uint8_t y;
+    uint8_t foo;
   } u8;
   uint32_t u32;
-} __attribute__ ((packed)) textpalettes_color[OVL_PALETTE_SIZE] = {
+} textpalettes_color[OVL_PALETTE_SIZE] = {
   /* white, no border, translucid */
     CLUT_Y_CR_CB_INIT(0x00, 0x00, 0x00), //0
     CLUT_Y_CR_CB_INIT(0x60, 0x80, 0x80), //1
@@ -77,6 +76,11 @@ static const union {         /* CLUT == Color LookUp Table */
     CLUT_Y_CR_CB_INIT(0xe0, 0x8a, 0x00), //9
     CLUT_Y_CR_CB_INIT(0xff, 0x90, 0x00), //10
 };
+
+#ifdef DEBUG
+/* check textpalettes_color is properly packed */
+typedef char _xitk_static_assertion_testpalettes_size[2*(!!(sizeof(textpalettes_color) == sizeof(uint32_t)*OVL_PALETTE_SIZE))-1];
+#endif
 
 static const uint8_t textpalettes_trans[OVL_PALETTE_SIZE] = {
   /* white, no border, translucid */
