@@ -307,7 +307,6 @@ struct xitk_pixmap_s {
   XImage                           *xim;
   Pixmap                            pixmap;
   GC                                gc;
-  XGCValues                         gcv;
   int                               width;
   int                               height;
   int                               shm;
