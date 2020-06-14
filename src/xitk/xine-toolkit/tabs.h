@@ -26,7 +26,6 @@
 #define MAX_TABS 256
 
 typedef struct {
-  ImlibData              *imlibdata;
   char                   *skin_element_name;
   xitk_widget_t          *widget;
   xitk_widget_t          *left;
