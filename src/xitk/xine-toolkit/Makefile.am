@@ -44,7 +44,8 @@ libxitk_a_SOURCES = \
 	tips.c \
 	widget.c \
 	window.c \
-	xitk.c
+	xitk.c \
+	xitk_x11.c
 
 # recode.h is added unconditionally to the sources because it contains
 # the no-op defines in case iconv is not used.
@@ -80,6 +81,7 @@ noinst_HEADERS = \
 	window.h \
 	widget.h \
 	xitk.h \
+	xitk_x11.h \
 	xitkintl.h
 
 test_SOURCES = test.c

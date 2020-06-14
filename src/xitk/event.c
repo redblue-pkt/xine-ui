@@ -39,7 +39,8 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <stdlib.h>
-#include <pthread.h>
+
+#include "xine-toolkit/xitk_x11.h"
 
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
@@ -1435,95 +1436,6 @@ void gui_playlist_start_next (gGui_t *gui) {
   gui_display_logo();
 }
 
-static void gui_find_visual (Visual **visual_return, int *depth_return) {
-  gGui_t *gui = gGui;
-  XWindowAttributes  attribs;
-  XVisualInfo	    *vinfo;
-  XVisualInfo	     vinfo_tmpl;
-  int		     num_visuals;
-  int		     depth = 0;
-  Visual	    *visual = NULL;
-  int                screen = DefaultScreen(gui->display);
-
-  if (gui->prefered_visual_id == None) {
-    /*
-     * List all available TrueColor visuals, pick the best one for xine.
-     * We prefer visuals of depth 15/16 (fast).  Depth 24/32 may be OK, 
-     * but could be slow.
-     */
-    vinfo_tmpl.screen = screen;
-    vinfo_tmpl.class  = (gui->prefered_visual_class != -1
-			 ? gui->prefered_visual_class : TrueColor);
-    vinfo = XGetVisualInfo(gui->display,
-			   VisualScreenMask | VisualClassMask,
-			   &vinfo_tmpl, &num_visuals);
-    if (vinfo != NULL) {
-      int i, pref;
-      int best_visual_index = -1;
-      int best_visual = -1;
-
-      for (i = 0; i < num_visuals; i++) {
-	if (vinfo[i].depth == 15 || vinfo[i].depth == 16)
-	  pref = 3;
-	else if (vinfo[i].depth > 16)
-	  pref = 2;
-	else
-	  pref = 1;
-	
-	if (pref > best_visual) {
-	  best_visual = pref;
-	  best_visual_index = i;
-	}  
-      }
-      
-      if (best_visual_index != -1) {
-	depth = vinfo[best_visual_index].depth;
-	visual = vinfo[best_visual_index].visual;
-      }
-      
-      XFree(vinfo);
-    }
-  } else {
-    /*
-     * Use the visual specified by the user.
-     */
-    vinfo_tmpl.visualid = gui->prefered_visual_id;
-    vinfo = XGetVisualInfo(gui->display,
-			   VisualIDMask, &vinfo_tmpl, 
-			   &num_visuals);
-    if (vinfo == NULL) {
-      printf(_("gui_main: selected visual %#lx does not exist, trying default visual\n"),
-	     (long) gui->prefered_visual_id);
-    } else {
-      depth = vinfo[0].depth;
-      visual = vinfo[0].visual;
-      XFree(vinfo);
-    }
-  }
-
-  if (depth == 0) {
-    XVisualInfo vinfo;
-
-    XGetWindowAttributes(gui->display, (DefaultRootWindow(gui->display)), &attribs);
-
-    depth = attribs.depth;
-  
-    if (XMatchVisualInfo(gui->display, screen, depth, TrueColor, &vinfo)) {
-      visual = vinfo.visual;
-    } else {
-      printf (_("gui_main: couldn't find true color visual.\n"));
-
-      depth = DefaultDepth (gui->display, screen);
-      visual = DefaultVisual (gui->display, screen);
-    }
-  }
-
-  if (depth_return != NULL)
-    *depth_return = depth;
-  if (visual_return != NULL)
-    *visual_return = visual;
-}
-
 void gui_deinit (gGui_t *gui) {
 #ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
   xine_config_unregister_callbacks (gui->xine, NULL, NULL, gui, sizeof (*gui));
@@ -1867,7 +1779,8 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
     dump_xfree_info(gui->display, DefaultScreen(gui->display), (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
   }
 
-  gui_find_visual(&visual, &depth);
+  xitk_x11_find_visual(gui->display, DefaultScreen(gui->display), gui->prefered_visual_id, gui->prefered_visual_class,
+                       &visual, &depth);
 
   gui_init_imlib (gui, visual);
 
