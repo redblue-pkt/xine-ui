@@ -113,36 +113,21 @@ static void tabs_arrange(xitk_widget_t *w) {
      */
     if((((private_data->width - 40) - private_data->gap_widthstart) * 3) > 0) {
       xitk_image_t *p;
-      GC            gc;
-      XGCValues     gcv;
-      
-      p = xitk_image_create_image(private_data->imlibdata, 
+
+      p = xitk_image_create_image(w->wl->imlibdata,
 				  ((private_data->width - 40) - private_data->gap_widthstart) * 3,
 				  private_data->bheight>>1);
       
       if(p) {
-	gcv.graphics_exposures = False;
-
         draw_flat(p->image, p->width, p->height);
-	
-        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	gc = XCreateGC(private_data->imlibdata->x.disp, 
-		       p->image->pixmap, GCGraphicsExposures, &gcv);
-	XCopyArea(private_data->imlibdata->x.disp, 
-                  p->image->pixmap, w->wl->win, gc,
-		  0, 0, p->width/3, p->height, 
-		  private_data->x + private_data->gap_widthstart, private_data->y);
-        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-	
+        xitk_image_draw_image(w->wl, p,
+                              0, 0, p->width/3, p->height,
+                              private_data->x + private_data->gap_widthstart, private_data->y);
+
         draw_tab(p);
-	
-        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	XCopyArea(private_data->imlibdata->x.disp, 
-                  p->image->pixmap, w->wl->win, gc,
-		  0, 0, p->width/3, p->height, 
-		  private_data->x + private_data->gap_widthstart, private_data->y + p->height);
-	XFreeGC(private_data->imlibdata->x.disp, gc);
-        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+        xitk_image_draw_image(w->wl, p,
+                              0, 0, p->width/3, p->height,
+                              private_data->x + private_data->gap_widthstart, private_data->y + p->height);
 
         xitk_image_free_image(&p);
       }
@@ -333,8 +318,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (tabs_private_data_t *) xitk_xmalloc(sizeof(tabs_private_data_t));
-  
-  private_data->imlibdata   = wl->imlibdata;
+
   private_data->widget      = mywidget;
 
   private_data->entries     = t->entries;
