@@ -166,7 +166,7 @@ static void _playlist_create_playlists(void) {
 /*
  *
  */
-static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selected) {
+static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selected, int modifier) {
   gGui_t *gui = gGui;
 
   if(playlist->playlist_mrls[selected] != NULL) {
@@ -209,7 +209,7 @@ void playlist_play_current(xitk_widget_t *w, void *data) {
 /*
  * Start to play the selected stream on double click event in playlist.
  */
-static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int selected) {
+static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int selected, int modifier) {
   gGui_t *gui = gGui;
   
   pthread_mutex_lock (&gui->mmk_mutex);

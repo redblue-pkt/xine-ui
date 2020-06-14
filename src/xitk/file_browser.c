@@ -735,7 +735,7 @@ static void fb_getdir(filebrowser_t *fb) {
 /*
  * ***************************** widget callbacks *******************************
  */
-static void fb_select(xitk_widget_t *w, void *data, int selected) {
+static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   if(w == fb->files_browser) {
@@ -763,7 +763,7 @@ static void fb_callback_button_cb(xitk_widget_t *w, void *data) {
 }
 
 
-static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
+static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
   if(w == fb->directories_browser) {
@@ -1071,11 +1071,13 @@ static void fb_handle_events(XEvent *event, void *data) {
     }
     else {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
-      
-      if(sel >= 0)
-	fb_select(fb->files_browser, (void *) fb, sel);
-      else
+      if(sel >= 0) {
+        int modifier = 0;
+        xitk_get_key_modifier(event, &modifier);
+        fb_select(fb->files_browser, (void *) fb, sel, modifier);
+      } else {
 	gui_handle_event(event, data);
+      }
     }
     break;
   }

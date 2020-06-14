@@ -1001,6 +1001,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       event.y              = y;
       event.button_pressed = LBUTTON_DOWN;
       event.button         = Button1;
+      event.modifier       = 0;
       (void) wl->widget_focused->event(wl->widget_focused, &event, &result);
     }
     return;
@@ -1074,6 +1075,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
 	event.y              = y;
 	event.button_pressed = LBUTTON_DOWN;
 	event.button         = Button1;
+        event.modifier       = 0;
 	(void) mywidget->event(mywidget, &event, &result);
       }
     }
@@ -1084,7 +1086,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
  * Call notify_focus (with FOCUS_[RECEIVED|LOST] as focus state), 
  * then call notify_click function, if exist, of widget at coords x/y.
  */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp) {
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier) {
   int                    bRepaint = 0;
   xitk_widget_t         *mywidget, *menu = NULL;
   widget_event_t         event;
@@ -1186,6 +1188,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.y              = y;
 	event.button_pressed = LBUTTON_DOWN;
 	event.button         = button;
+        event.modifier       = modifier;
 
 	if(mywidget->event(mywidget, &event, &result))
 	  bRepaint |= result.value;
@@ -1202,6 +1205,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.y              = y;
 	event.button_pressed = LBUTTON_UP;
 	event.button         = button;
+        event.modifier       = modifier;
 
 	if(wl->widget_pressed->event(wl->widget_pressed, &event, &result))
 	  bRepaint |= result.value;
@@ -1220,7 +1224,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 /*
  * Find the first focusable widget in wl, according to direction
  */
-void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
+void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier) {
   widget_event_t   event;
 
   if(!wl) {
@@ -1308,6 +1312,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
       event.y              = wl->widget_focused->y + 1;
       event.button_pressed = LBUTTON_DOWN;
       event.button         = AnyButton;
+      event.modifier       = modifier;
       (void)wl->widget_focused->event (wl->widget_focused, &event, &result);
       event.type = WIDGET_EVENT_PAINT;
         (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
@@ -1409,6 +1414,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 	event.y              = wl->widget_focused->y + 1;
 	event.button_pressed = LBUTTON_DOWN;
 	event.button         = AnyButton;
+        event.modifier       = 0;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, &result);
 	
 	event.type = WIDGET_EVENT_PAINT;
@@ -1424,7 +1430,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 /*
  * Call notify_keyevent, if exist, of specified plugin. This pass an X11 XEvent.
  */
-void xitk_send_key_event(xitk_widget_t *w, XEvent *xev) {
+void xitk_send_key_event(xitk_widget_t *w, XEvent *xev, int modifier) {
   widget_event_t event;
 
   if(!w) {
@@ -1434,7 +1440,8 @@ void xitk_send_key_event(xitk_widget_t *w, XEvent *xev) {
 
   event.type   = WIDGET_EVENT_KEY_EVENT;
   event.xevent = xev;
-  
+  event.modifier = modifier;
+
   (void) w->event(w, &event, NULL);
 }
 

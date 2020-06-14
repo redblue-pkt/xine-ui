@@ -324,7 +324,7 @@ static xitk_image_t *decode(gGui_t *gui, const void *buf, int size) {
   return i;
 }
 
-static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
+static void download_skin_preview(xitk_widget_t *w, void *data, int selected, int modifier) {
   xui_skdloader_t *skd = data;
   gGui_t          *gui = skd->gui;
   download_t       download;

@@ -1650,11 +1650,11 @@ static void _pplugin_enability(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   _pplugin_rewire(pp_wrapper);
 }
 
-static void _vpplugin_enability(xitk_widget_t *w, void *data, int state) {
+static void _vpplugin_enability(xitk_widget_t *w, void *data, int state, int modifier) {
   _pplugin_enability(&_vpp_wrapper.p, w, data, state);
 }
 
-static void _applugin_enability(xitk_widget_t *w, void *data, int state) {
+static void _applugin_enability(xitk_widget_t *w, void *data, int state, int modofier) {
   _pplugin_enability(&_app_wrapper.p, w, data, state);
 }
 

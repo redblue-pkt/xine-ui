@@ -751,7 +751,7 @@ static void browser_right(xitk_widget_t *w, void *data) {
 /**
  * Handle list selections
  */
-static void browser_select(xitk_widget_t *w, void *data, int state) {
+static void browser_select(xitk_widget_t *w, void *data, int state, int modifier) {
   browser_private_data_t *private_data;
   int                     i, btn_selected;
   
@@ -805,11 +805,12 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	gettimeofday(&private_data->click_time, 0);
 	
 	if(private_data->callback)
-	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, btn_selected);
+          private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, btn_selected, modifier);
 	if(cb2) {
 	  private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
 					   private_data->userdata, 
-					   private_data->current_button_clicked);
+                                           private_data->current_button_clicked,
+                                           modifier);
 	}
 	/*
 	  if(private_data->last_button_clicked == -1)
@@ -839,7 +840,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	  private_data->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
 	  if(private_data->dbl_click_callback)
 	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist, 
-					     private_data->userdata, cur_clicked);
+					     private_data->userdata, cur_clicked, modifier);
 	}
       }
       

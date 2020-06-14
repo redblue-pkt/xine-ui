@@ -48,7 +48,7 @@ typedef struct {
   xitk_image_t           *skin;
 
   xitk_simple_callback_t  callback;
-  xitk_state_callback_t   state_callback;
+  xitk_ext_state_callback_t   state_callback;
    
   void                   *userdata;
    
@@ -368,7 +368,7 @@ static void _paint_labelbutton (_lbutton_private_t *wp) {
 /*
  * Handle click events
  */
-static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bUp, int x, int y) {
+static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bUp, int x, int y, int modifier) {
   int ret = 0;
 
   (void)x;
@@ -382,7 +382,7 @@ static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bU
       _paint_labelbutton (wp);
       if (wp->bType == RADIO_BUTTON) {
         if (wp->state_callback)
-          wp->state_callback (wp->bWidget, wp->userdata, wp->bState);
+          wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
       } else if (wp->bType == CLICK_BUTTON) {
         if (wp->callback)
           wp->callback (wp->bWidget, wp->userdata);
@@ -516,7 +516,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
         break;
       case WIDGET_EVENT_CLICK:
         result->value = _notify_click_labelbutton (wp, event->button,
-          event->button_pressed, event->x, event->y);
+            event->button_pressed, event->x, event->y, event->modifier);
         retval = 1;
         break;
       case WIDGET_EVENT_FOCUS:
@@ -650,7 +650,7 @@ void xitk_labelbutton_callback_exec (xitk_widget_t *w) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     if (wp->bType == RADIO_BUTTON) {
       if (wp->state_callback)
-        wp->state_callback (wp->bWidget, wp->userdata, wp->bState);
+        wp->state_callback (wp->bWidget, wp->userdata, wp->bState, 0);
     } else if (wp->bType == CLICK_BUTTON) {
       if (wp->callback)
         wp->callback (wp->bWidget, wp->userdata);
