@@ -40,8 +40,6 @@ typedef struct {
   xitk_widget_t          *tabs[MAX_TABS];
   btnlist_t              *bt[MAX_TABS];
 
-  xitk_widget_list_t     *parent_wlist;
-
   int                     selected;
   int                     old_selected;
 

@@ -3355,7 +3355,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
-  ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.start = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
@@ -3371,7 +3370,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.skin_element_name = NULL;
   ib.value             = -1;
   ib.step              = 1;
-  ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.end = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
@@ -3387,7 +3385,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
-  ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.av_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
@@ -3403,7 +3400,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.skin_element_name = NULL;
   ib.value             = 0;
   ib.step              = 1;
-  ib.parent_wlist      = mmkeditor.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.spu_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,

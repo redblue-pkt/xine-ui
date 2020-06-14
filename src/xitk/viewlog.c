@@ -309,7 +309,6 @@ static void viewlog_create_tabs(void) {
   tab.skin_element_name = NULL;
   tab.num_entries       = log_section_count;
   tab.entries           = tab_sections;
-  tab.parent_wlist      = viewlog->widget_list;
   tab.callback          = viewlog_change_section;
   tab.userdata          = NULL;
   viewlog->tabs = xitk_noskin_tabs_create (viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);

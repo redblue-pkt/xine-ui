@@ -129,7 +129,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 	gc = XCreateGC(private_data->imlibdata->x.disp, 
 		       p->image->pixmap, GCGraphicsExposures, &gcv);
 	XCopyArea(private_data->imlibdata->x.disp, 
-		  p->image->pixmap, private_data->parent_wlist->win, gc, 
+                  p->image->pixmap, w->wl->win, gc,
 		  0, 0, p->width/3, p->height, 
 		  private_data->x + private_data->gap_widthstart, private_data->y);
         XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
@@ -138,7 +138,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 	
         XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
 	XCopyArea(private_data->imlibdata->x.disp, 
-		  p->image->pixmap, private_data->parent_wlist->win, gc, 
+                  p->image->pixmap, w->wl->win, gc,
 		  0, 0, p->width/3, p->height, 
 		  private_data->x + private_data->gap_widthstart, private_data->y + p->height);
 	XFreeGC(private_data->imlibdata->x.disp, gc);
@@ -340,8 +340,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   private_data->entries     = t->entries;
   private_data->num_entries = t->num_entries;
 
-  private_data->parent_wlist = t->parent_wlist;
-
   private_data->x           = x;
   private_data->y           = y;
   private_data->width       = width;
@@ -360,7 +358,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       
     fs = xitk_font_load_font(wl->imlibdata->x.disp, fontname);
 
-    xitk_font_set_font(fs, t->parent_wlist->gc);
+    xitk_font_set_font(fs, wl->gc);
     fheight = xitk_font_get_string_height(fs, " ");
 
     XITK_WIDGET_INIT(&lb);
@@ -383,9 +381,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;
       lb.userdata          = (void *) (private_data->bt[i]);
-      private_data->tabs[i] = xitk_noskin_labelbutton_create (t->parent_wlist, &lb, xx, y, fwidth + 20, 
+      private_data->tabs[i] = xitk_noskin_labelbutton_create (wl, &lb, xx, y, fwidth + 20,
         private_data->bheight, "Black", "Black", "Black", fontname);
-      xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->tabs[i]->node);
+      xitk_dlist_add_tail (&wl->list, &private_data->tabs[i]->node);
       private_data->tabs[i]->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       xx += fwidth + 20;
 
@@ -403,9 +401,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       b.skin_element_name = NULL;
       b.callback          = tabs_select_prev;
       b.userdata          = (void *)mywidget;
-      private_data->left = xitk_noskin_button_create (t->parent_wlist, &b, (private_data->x + width) - 40,
+      private_data->left = xitk_noskin_button_create (wl, &b, (private_data->x + width) - 40,
         (y-1) + (private_data->bheight - 20), 20, 20);
-      xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->left->node);
+      xitk_dlist_add_tail (&wl->list, &private_data->left->node);
       private_data->left->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
@@ -416,9 +414,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       b.skin_element_name = NULL;
       b.callback          = tabs_select_next;
       b.userdata          = (void *)mywidget;
-      private_data->right = xitk_noskin_button_create (t->parent_wlist, &b, (private_data->x + width) - 20,
+      private_data->right = xitk_noskin_button_create (wl, &b, (private_data->x + width) - 20,
         (y-1) + (private_data->bheight - 20), 20, 20);
-        xitk_dlist_add_tail (&t->parent_wlist->list, &private_data->right->node);
+        xitk_dlist_add_tail (&wl->list, &private_data->right->node);
       private_data->right->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);

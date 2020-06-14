@@ -771,7 +771,6 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             ib.skin_element_name = NULL;
             ib.value             = entry.num_value;
             ib.step              = 1;
-            ib.parent_wlist      = setup->widget_list;
             ib.callback          = numtype_update;
             ib.userdata          = wt;
             intbox = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, 60, 20, &wi, &wbu, &wbd);
@@ -983,7 +982,6 @@ static void setup_sections (xui_setup_t *setup) {
   tab.skin_element_name = NULL;
   tab.num_entries       = setup->num_sections;
   tab.entries           = setup->section_names;
-  tab.parent_wlist      = setup->widget_list;
   tab.callback          = setup_change_section;
   tab.userdata          = setup;
   setup->tabs = xitk_noskin_tabs_create (setup->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);

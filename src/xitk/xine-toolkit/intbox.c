@@ -270,7 +270,6 @@ static xitk_widget_t *_xitk_intbox_create(xitk_widget_list_t *wl,
 					  int visible, int enable) {
   
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
-  private_data->parent_wlist             = ib->parent_wlist;
   private_data->callback                 = ib->callback;
   private_data->userdata                 = ib->userdata;
   private_data->step                     = ib->step;
@@ -330,25 +329,25 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     inp.max_length        = 16;
     inp.callback          = intbox_change_value;
     inp.userdata          = (void *)mywidget;
-    private_data->input_widget = xitk_noskin_inputtext_create (ib->parent_wlist, &inp,
+    private_data->input_widget = xitk_noskin_inputtext_create (wl, &inp,
       x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
-    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->input_widget->node);
+    xitk_dlist_add_tail (&wl->list, &private_data->input_widget->node);
     private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
     
     b.skin_element_name = "XITK_NOSKIN_PLUS";
     b.callback          = intbox_stepup;
     b.userdata          = (void *)mywidget;
-    private_data->more_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
+    private_data->more_widget = xitk_noskin_button_create (wl, &b,
       (x + width) - (height>>1), y, (height>>1), (height>>1));
-    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->more_widget->node);
+    xitk_dlist_add_tail (&wl->list, &private_data->more_widget->node);
     private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
     b.skin_element_name = "XITK_NOSKIN_MINUS";
     b.callback          = intbox_stepdown;
     b.userdata          = (void *)mywidget;
-    private_data->less_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
+    private_data->less_widget = xitk_noskin_button_create (wl, &b,
       (x + width) - (height>>1), (y + (height>>1)), (height>>1), (height>>1));
-    xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->less_widget->node);
+    xitk_dlist_add_tail (&wl->list, &private_data->less_widget->node);
     private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
   }
 

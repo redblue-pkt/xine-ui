@@ -372,7 +372,6 @@ void help_panel(void) {
     tab.entries           = no_section;
   }
   tab.skin_element_name = NULL;
-  tab.parent_wlist      = help->widget_list;
   tab.callback          = help_change_section;
   tab.userdata          = NULL;
   help->tabs = xitk_noskin_tabs_create (help->widget_list,

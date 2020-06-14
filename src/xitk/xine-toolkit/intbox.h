@@ -34,8 +34,6 @@ typedef struct {
   int                      value;
   int                      force_value;
 
-  xitk_widget_list_t      *parent_wlist;
-
   xitk_state_callback_t    callback;
   void                    *userdata;
 
