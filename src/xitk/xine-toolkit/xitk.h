@@ -906,7 +906,7 @@ void *xitk_xmalloc(size_t);
 /**
  *
  */
-int xitk_is_cursor_out_mask(xitk_widget_t *w, Pixmap mask, int x, int y);
+int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y);
 
 /**
  *
