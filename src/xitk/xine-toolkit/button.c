@@ -67,7 +67,7 @@ static int _notify_inside (_button_private_t *wp, int x, int y) {
     xitk_image_t *skin = wp->skin;
 
     if (skin->mask)
-      return xitk_is_cursor_out_mask (&wp->w, skin->mask->pixmap, x, y);
+      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x, y);
     else 
       return 1;
   }

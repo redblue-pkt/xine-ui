@@ -895,7 +895,7 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
 /*
  * Return 1 if the mouse poiter is in the visible area of widget.
  */
-int xitk_is_cursor_out_mask(xitk_widget_t *w, Pixmap mask, int x, int y) {
+int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y) {
   ImlibData *im;
   XImage *xi;
   Pixel p;
@@ -914,7 +914,7 @@ int xitk_is_cursor_out_mask(xitk_widget_t *w, Pixmap mask, int x, int y) {
     if((yy = (y - w->y)) == w->height) yy--;
     
     XLOCK (im->x.x_lock_display, im->x.disp);
-    xi = XGetImage(im->x.disp, mask, xx, yy, 1, 1, AllPlanes, ZPixmap);
+    xi = XGetImage(im->x.disp, mask->pixmap, xx, yy, 1, 1, AllPlanes, ZPixmap);
     p = XGetPixel(xi, 0, 0);
     XDestroyImage(xi);
     XUNLOCK (im->x.x_unlock_display, im->x.disp);

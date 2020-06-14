@@ -303,7 +303,7 @@ static int _notify_inside (_slider_private_t *wp, int x, int y) {
         skin = wp->bg_skin;
 
       if(skin->mask)
-        return xitk_is_cursor_out_mask (&wp->w, skin->mask->pixmap, x, y);
+        return xitk_is_cursor_out_mask (&wp->w, skin->mask, x, y);
     }
     else
       return 0;
