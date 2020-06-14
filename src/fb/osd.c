@@ -45,13 +45,13 @@
 
 typedef union {         /* CLUT == Color LookUp Table */
   struct {
-    uint8_t cb    : 8;
-    uint8_t cr    : 8;
-    uint8_t y     : 8;
-    uint8_t foo   : 8;
+    uint8_t cb;
+    uint8_t cr;
+    uint8_t y;
+    uint8_t foo;
   } u8;
   uint32_t u32;
-} __attribute__ ((packed)) clut_t;
+} clut_t;
 
 static const clut_t textpalettes_color[OVL_PALETTE_SIZE] = {
   /* white, no border, translucid */
