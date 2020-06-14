@@ -1218,7 +1218,8 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
 
   im = w->imlibdata;
 
-  xitk_image_destroy_xitk_pixmap(w->background);
+  if (w->background)
+    xitk_image_destroy_xitk_pixmap(w->background);
   if(w->background_mask)
     xitk_image_destroy_xitk_pixmap(w->background_mask);
 
