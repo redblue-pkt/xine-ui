@@ -707,7 +707,6 @@ typedef struct {
   const char                      *skin_element_name;
   int                              num_entries;
   char                           **entries;
-  xitk_widget_list_t              *parent_wlist;
   xitk_state_callback_t            callback;
   void                            *userdata;
 } xitk_tabs_widget_t;
@@ -720,8 +719,6 @@ typedef struct {
   int                              value;
   int                              step;
 
-  xitk_widget_list_t              *parent_wlist;
-
   xitk_state_callback_t            callback;
   void                             *userdata;
 } xitk_intbox_widget_t;
@@ -733,8 +730,6 @@ typedef struct {
   
   double                           value;
   double                           step;
-
-  xitk_widget_list_t              *parent_wlist;
 
   xitk_state_double_callback_t      callback;
   void                             *userdata;

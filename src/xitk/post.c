@@ -655,7 +655,6 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  ib.skin_element_name = NULL;
 	  ib.value             = *(int *)(pobj->param_data + pobj->param->offset);
 	  ib.step              = 1;
-	  ib.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	  ib.callback          = _pplugin_set_param_int;
 	  ib.userdata          = pobj;
           pobj->value =  xitk_noskin_intbox_create (pp_wrapper->pplugin->widget_list, &ib,
@@ -673,7 +672,6 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	ib.skin_element_name = NULL;
 	ib.value             = *(double *)(pobj->param_data + pobj->param->offset);
 	ib.step              = .5;
-	ib.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	ib.callback          = _pplugin_set_param_double;
 	ib.userdata          = pobj;
         pobj->value =  xitk_noskin_doublebox_create (pp_wrapper->pplugin->widget_list, &ib,

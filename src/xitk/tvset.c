@@ -321,7 +321,6 @@ void tvset_panel(void) {
   ib.skin_element_name = NULL;
   ib.value             = 4;
   ib.step              = 1;
-  ib.parent_wlist      = tvset.widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   tvset.input = xitk_noskin_intbox_create (tvset.widget_list, &ib,
