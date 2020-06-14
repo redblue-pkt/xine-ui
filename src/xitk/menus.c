@@ -68,7 +68,7 @@ static char *menu_get_shortcut (gGui_t *gui, menu_text_buf_t *tbuf, const char *
     return NULL;
   }
 #ifdef DEBUG
-  if (sz == tbuf->end - tbuf->write) {
+  if (tbuf->write + sz == tbuf->end) {
     fprintf (stderr, "Shortcut for action '%s' was truncated\n", action);
   }
 #endif
