@@ -552,14 +552,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       XSync(wp->imlibdata->x.disp, False);
       XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
-      while (!xitk_window_is_window_visible(wp->xwin))
-	xitk_usec_sleep(5000);
-      
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XSetInputFocus(wp->imlibdata->x.disp, 
-		     (xitk_window_get_window(wp->xwin)), RevertToParent, CurrentTime);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-      
+      xitk_window_try_to_set_input_focus(wp->xwin);
+
       /* No widget focused, give focus to the first one */
       if (wp->widget_list->widget_focused == NULL)
         xitk_set_focus_to_next_widget(wp->widget_list, 0, 0);

@@ -1075,14 +1075,9 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 				mb->dndcallback,
 				private_data->widget_list,(void *) private_data);
 
-  while (!xitk_window_is_window_visible(private_data->xwin))
-    xitk_usec_sleep(5000);
-  
+  xitk_window_try_to_set_input_focus(private_data->xwin);
+
   xitk_mrlbrowser_change_skins(mywidget, skonfig);
-  
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XSetInputFocus(im->x.disp, private_data->xwin->window, RevertToParent, CurrentTime);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
   default_source = xitk_button_list_find (private_data->autodir_buttons, "file");
   if( default_source && !private_data->last_mrl_source ) {
