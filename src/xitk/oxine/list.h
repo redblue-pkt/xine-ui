@@ -177,8 +177,8 @@ g_list_t* g_list_last (g_list_t *list);
 g_list_t* g_list_first (g_list_t *list);
 unsigned int  g_list_length (g_list_t *list);
 void   g_list_foreach (g_list_t *list, list_func func, void* user_data);
-g_list_t* g_list_sort (g_list_t *list, list_compare compare_func);
-g_list_t* g_list_sort_with_data (g_list_t *list, list_compare compare_func, void* user_data);
+//g_list_t* g_list_sort (g_list_t *list, list_compare compare_func);
+//g_list_t* g_list_sort_with_data (g_list_t *list, list_compare compare_func, void* user_data);
 void* g_list_nth_data (g_list_t *list, unsigned int n);
 
 #define g_list_previous(list)	((list) ? (((g_list_t *)(list))->prev) : NULL)

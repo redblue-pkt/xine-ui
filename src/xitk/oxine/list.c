@@ -772,6 +772,7 @@ g_list_t* g_list_insert_sorted (g_list_t *list, void *data, list_compare func) {
     return list;
 }
 
+#if 0
 static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compare_func, 
     int use_data, void *user_data) {
   
@@ -810,7 +811,7 @@ static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compar
 
   return list.next;
 }
-
+ 
 static g_list_t* g_list_sort_real (g_list_t *list, list_func compare_func, 
     int use_data, void *user_data) {
   
@@ -847,6 +848,7 @@ g_list_t *g_list_sort (g_list_t *list, list_compare compare_func) {
 g_list_t * g_list_sort_with_data (g_list_t *list, list_compare compare_func, void *user_data) {
   return g_list_sort_real (list, (list_func) compare_func, 1, user_data);
 }
+#endif
 
 #if 0
 static g_list_t* g_list_sort2 (g_list_t *list, list_compare compare_func) {

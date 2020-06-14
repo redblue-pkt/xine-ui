@@ -628,7 +628,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
   int                  y = 0; /* Position will be defined when painting widgets */
   int                  cfg_err_result;
   _setup_section_t    *section;
-  int                  slidmax = 1;
+  /*int                  slidmax = 1;*/
   unsigned int         known_types;
   int                  tips_timeout = panel_get_tips_timeout (setup->gui->panel);
   xine_cfg_entry_t     entry;
@@ -834,12 +834,12 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
     si.v.step = 1;
     si.v.max = setup->num_wg;
     xitk_slider_hv_sync (setup->slider_wg, &si, XITK_SLIDER_SYNC_SET);
-    slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
+    /*slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;*/
     xitk_show_widget (setup->slider_wg);
     xitk_enable_widget (setup->slider_wg);
   }
-  else
-    slidmax = 1;
+  /*else
+    slidmax = 1;*/
 #if 0
   xitk_slider_set_max (setup->slider_wg, slidmax);
   xitk_slider_set_pos (setup->slider_wg, slidmax);
