@@ -63,6 +63,19 @@ struct xitk_font_cache_s {
   xitk_recode_t           *xr;         /* text recoding */
 };
 
+struct xitk_font_s {
+  Display       *display;
+#ifdef WITH_XFT
+  XftFont       *font;
+#else
+# ifdef WITH_XMB
+  XFontSet       fontset;
+# endif
+  XFontStruct   *font;
+#endif
+  char          *name;
+};
+
 #if defined(WITH_XMB) && !defined(WITH_XFT)
 /*
  * Guess if error occured, release missing charsets list.
