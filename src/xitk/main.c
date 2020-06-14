@@ -1326,7 +1326,10 @@ typedef struct {
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
         /* FIXME: duration handled correctly? */
-        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL, ref->start_time, ref->duration ? ref->start_time + ref->duration : -1, 0, 0);
+        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL,
+                               ref->start_time,
+                               ref->duration ? (int)(ref->start_time + ref->duration) : -1,
+                               0, 0);
       } else {
         /* FIXME: title? start? duration? */
         pthread_mutex_lock (&gui->mmk_mutex);
