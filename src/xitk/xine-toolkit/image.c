@@ -328,6 +328,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
  */
 xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth) {
   xitk_pixmap_t    *xpix;
+  XGCValues         gcv;
 #ifdef HAVE_SHM
   XShmSegmentInfo  *shminfo;
 #endif
@@ -413,8 +414,8 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width
     else {
       xpix->shm                    = 1;
       xpix->shminfo                = shminfo;
-      xpix->gcv.graphics_exposures = False;
-      xpix->gc                     = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
+      gcv.graphics_exposures = False;
+      xpix->gc                     = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &gcv);
       xitk_uninstall_x_error_handler();
     }
   }
@@ -430,8 +431,8 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width
 #endif
       xpix->pixmap  = XCreatePixmap(im->x.disp, im->x.base_window, width, height, depth);
 
-      xpix->gcv.graphics_exposures = False;
-      xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
+      gcv.graphics_exposures = False;
+      xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &gcv);
     }
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
