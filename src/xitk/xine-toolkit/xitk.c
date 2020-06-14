@@ -1857,7 +1857,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
 		   (mykey != XK_Tab) && (mykey != XK_KP_Tab) && (mykey != XK_ISO_Left_Tab))) {
 	    
-	    xitk_send_key_event(w, event);
+	    xitk_send_key_event(w, event, modifier);
 	    
 	    if((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
 	      widget_event_t  event;
@@ -1865,7 +1865,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      event.type = WIDGET_EVENT_PAINT;
 	      (void) w->event(w, &event, NULL);
 	      
-	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
+              xitk_set_focus_to_next_widget(fx->widget_list, 0, modifier);
 	    }
 
 	    FXUNLOCK(fx);
@@ -1886,7 +1886,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  else if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
 	    if(fx->widget_list) {
 	      handled = 1;
-	      xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT));
+              xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
 	    }
 	  }
 	  /* simulate click event on space/return/enter key event */
@@ -1910,6 +1910,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 		event.y              = w->y;
 		event.button_pressed = LBUTTON_DOWN;
 		event.button         = Button1;
+                event.modifier       = modifier;
 
 		(void) w->event(w, &event, &result);
 
@@ -1972,7 +1973,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 		/* next/previous menu item */
 		if(fx->widget_list)
 		  xitk_set_focus_to_next_widget(fx->widget_list,
-						((mykey == XK_Up) || (mykey == XK_Prior)));
+                                                ((mykey == XK_Up) || (mykey == XK_Prior)),
+                                                modifier);
 	      }
 	    }
 	  }
@@ -2030,7 +2032,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      event.type = WIDGET_EVENT_PAINT;
 	      (void) w->event(w, &event, NULL);
 	      
-	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
+              xitk_set_focus_to_next_widget(fx->widget_list, 0, modifier);
 	      
 	    }
 	  }
@@ -2167,11 +2169,14 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  }
 	  
 	  if(fx->widget_list) {
+            int modifier = 0;
+            xitk_get_key_modifier(event, &modifier);
 
 	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list, 
 							       event->xbutton.x, 
 							       event->xbutton.y, 
-							       event->xbutton.button, 0);
+							       event->xbutton.button, 0,
+                                                               modifier);
 	    if(event->xbutton.button != Button1) {
 	      xitk_widget_t *w = fx->widget_list->widget_focused;
 
@@ -2230,10 +2235,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
                 fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
 	  }
 	  else {
+            int modifier = 0;
+            xitk_get_key_modifier(event, &modifier);
 	    if(fx->widget_list) {
 	      xitk_click_notify_widget_list (fx->widget_list, 
 					     event->xbutton.x, event->xbutton.y,
-					     event->xbutton.button, 1);
+                                             event->xbutton.button, 1,
+                                             modifier);
 	    }
 	  }
 	  break;

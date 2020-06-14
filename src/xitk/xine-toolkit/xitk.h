@@ -97,6 +97,7 @@ typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
+typedef void (*xitk_ext_state_callback_t)(xitk_widget_t *, void *, int, int modifiers);
 typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, const char *);
 typedef void (*xitk_dnd_callback_t) (const char *filename);
@@ -516,7 +517,7 @@ typedef struct {
   int                               align;
   const char                       *label;
   xitk_simple_callback_t            callback;
-  xitk_state_callback_t             state_callback;
+  xitk_ext_state_callback_t         state_callback;
   void                             *userdata;
   const char                       *skin_element_name;
 } xitk_labelbutton_widget_t;
@@ -582,9 +583,9 @@ typedef struct {
     const char *const              *entries;
   } browser;
   
-  xitk_state_callback_t             dbl_click_callback;
+  xitk_ext_state_callback_t         dbl_click_callback;
 
-  xitk_state_callback_t             callback;
+  xitk_ext_state_callback_t         callback;
   void                             *userdata;
 
   xitk_widget_list_t               *parent_wlist;
@@ -941,6 +942,7 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
  */
 xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y);
 
+// XXX move next to widget.h ??? and rename _widget_ ... ? 
 /**
  * Notify widget (if enabled) if motion happend at x, y coords.
  */
@@ -949,12 +951,12 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
 /**
  * Notify widget (if enabled) if click event happend at x, y coords.
  */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp);
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier);
 
 /**
  *
  */
-void xitk_send_key_event(xitk_widget_t *, XEvent *);
+void xitk_send_key_event(xitk_widget_t *, XEvent *, int modifier);
 
 /**
  * Return the focused widget.

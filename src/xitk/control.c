@@ -76,7 +76,7 @@ struct xui_vctrl_st {
   xitk_widget_t         *combo;
 };
 
-static void control_select_new_skin (xitk_widget_t *w, void *data, int selected) {
+static void control_select_new_skin (xitk_widget_t *w, void *data, int selected, int modifier) {
   xui_vctrl_t *vctrl = data;
 
   (void)w;

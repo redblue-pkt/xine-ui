@@ -31,6 +31,8 @@
 
 #include "common.h"
 
+typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int, int);
+
 struct xui_mrlb_st {
   gGui_t *gui;
   xitk_widget_t *w;
@@ -345,15 +347,6 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 }
 
 /*
- *
- */
-static void mrl_handle_selection (xitk_widget_t *w, void *data, int selected) {
-  (void)w;
-  (void)data;
-  (void)selected;
-}
-
-/*
  * Callback called by mrlbrowser on add event.
  */
 static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
@@ -472,7 +465,7 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
   if (gui) {
-    mrl_browser (gui, mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
+    mrl_browser (gui, mrl_add, mrl_play, NULL, gui_dndcallback);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
   }
 }
@@ -481,7 +474,7 @@ void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
   if (gui) {
-    mrl_browser (gui, mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
+    mrl_browser (gui, mrl_add_noautoplay, mrl_play, NULL, gui_dndcallback);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
   }
 }

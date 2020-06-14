@@ -199,7 +199,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static void tabs_select(xitk_widget_t *w, void *data, int select) {
+static void tabs_select(xitk_widget_t *w, void *data, int select, int modifier) {
   tabs_private_data_t *private_data = (tabs_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
 
   if(select) {

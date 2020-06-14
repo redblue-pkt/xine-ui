@@ -693,7 +693,7 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void kbedit_sel(xitk_widget_t *w, void *data, int s) {
+static void kbedit_sel(xitk_widget_t *w, void *data, int s, int modifier) {
 
   if(s >= 0)
     kbedit_select(s);
@@ -702,7 +702,7 @@ static void kbedit_sel(xitk_widget_t *w, void *data, int s) {
 /*
  * Create an alias from the selected entry.
  */
-static void kbedit_alias(xitk_widget_t *w, void *data, int state) {
+static void kbedit_alias(xitk_widget_t *w, void *data, int state, int modifier) {
 
   xitk_labelbutton_set_state(kbedit->edit, 0);
 
@@ -719,7 +719,7 @@ static void kbedit_alias(xitk_widget_t *w, void *data, int state) {
 /*
  * Change shortcut, should take care about reduncancy.
  */
-static void kbedit_edit(xitk_widget_t *w, void *data, int state) {
+static void kbedit_edit(xitk_widget_t *w, void *data, int state, int modifier) {
 
   xitk_labelbutton_set_state(kbedit->alias, 0);
 

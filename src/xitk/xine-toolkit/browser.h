@@ -47,11 +47,11 @@ typedef struct {
   int                     list_length;
   int                     current_start;
 
-  xitk_state_callback_t   callback;
+  xitk_ext_state_callback_t   callback;
   void                   *userdata;
 
   int                     dbl_click_time;
-  xitk_state_callback_t   dbl_click_callback;
+  xitk_ext_state_callback_t   dbl_click_callback;
 
   int                     last_button_clicked;
   int                     current_button_clicked;

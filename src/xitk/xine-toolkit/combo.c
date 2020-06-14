@@ -126,7 +126,7 @@ void xitk_combo_callback_exec(xitk_widget_t *w) {
 /*
  * Called on select action.
  */
-static void combo_select(xitk_widget_t *w, void *data, int selected) {
+static void combo_select(xitk_widget_t *w, void *data, int selected, int modifier) {
 
   if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
     xitk_widget_t        *c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
@@ -165,10 +165,11 @@ static void _combo_handle_event(XEvent *event, void *data) {
      * move it back to right position (under label*
      */
     if(private_data && private_data->visible) { 
-      int  x, y;
+      int  x, y, modifier;
+      xitk_get_key_modifier(event, &modifier);
       xitk_window_get_window_position(private_data->xwin, &x, &y, NULL, NULL);
       if((x != private_data->win_x) || (y != private_data->win_y))
-	xitk_combo_update_pos(private_data->combo_widget);
+        xitk_combo_update_pos(private_data->combo_widget);
     }
     break;
   }    
@@ -429,7 +430,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       
       /* No widget focused, give focus to the first one */
       if(private_data->widget_list->widget_focused == NULL)
-	xitk_set_focus_to_next_widget(private_data->widget_list, 0);
+	xitk_set_focus_to_next_widget(private_data->widget_list, 0, 0);
 
     }
   }

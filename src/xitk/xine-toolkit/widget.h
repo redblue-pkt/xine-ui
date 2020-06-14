@@ -69,7 +69,7 @@ typedef struct {
   
   int                   button_pressed;
   int                   button;
-  
+  int                   modifier;   /* modifier key state (EVENT_CLICK, EVENT_KEY_EVENT) */
   int                   focus;
   
   unsigned long         tips_timeout;
@@ -198,7 +198,7 @@ static int displ;
 /**
  *
  */
-void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward);
+void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
 
 #endif
 

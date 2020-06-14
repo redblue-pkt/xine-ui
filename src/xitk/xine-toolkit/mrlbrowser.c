@@ -801,20 +801,12 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
 /*
  * Handle double click in labelbutton list.
  */
-static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
+static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int modifier) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
-  XEvent                     xev;
-  int                        modifier;
-  
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-  XPeekEvent(private_data->imlibdata->x.disp, &xev);
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-  
-  xitk_get_key_modifier(&xev, &modifier);
-  
-  if((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
+
+  if ((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
     mrlbrowser_select_mrl(private_data, selected, 1, 1);
-  else if(modifier & MODIFIER_CTRL)
+  else if (modifier & MODIFIER_CTRL)
     mrlbrowser_select_mrl(private_data, selected, 1, 0);
   else
     mrlbrowser_select_mrl(private_data, selected, 0, 1); 
