@@ -423,26 +423,8 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
   } while (mw->wl.node.prev && (mw != menu_window));
   /* Set focus to parent menu */
   if (xitk_window_is_window_visible(menu_window->xwin)) {
-    int    t = 5000;
-    Window focused_win;
 
-    do {
-      int revert;
-
-      XLOCK (menu_window->im->x.x_lock_display, menu_window->display);
-      XSetInputFocus(menu_window->display, (xitk_window_get_window(menu_window->xwin)),
-		     RevertToParent, CurrentTime);
-      XSync(menu_window->display, False);
-      XUNLOCK (menu_window->im->x.x_unlock_display, menu_window->display);
-
-      /* Retry 5/15/30/50/75/105/140ms until the WM was mercyful to give us the focus */
-      xitk_usec_sleep (t);
-      t += 5000;
-      XLOCK (menu_window->im->x.x_lock_display, menu_window->display);
-      XGetInputFocus(menu_window->display, &focused_win, &revert);
-      XUNLOCK (menu_window->im->x.x_unlock_display, menu_window->display);
-
-    } while ((focused_win != xitk_window_get_window (menu_window->xwin)) && (t <= 140000));
+    xitk_window_try_to_set_input_focus(menu_window->xwin);
   }
 }
 
@@ -1003,13 +985,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XSync(private_data->imlibdata->x.disp, False);
   XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
-  {
-    int t = 5000;
-    while (!xitk_window_is_window_visible (xwin) && (t <= 140000)) {
-      xitk_usec_sleep (t);
-      t += 5000;
-    }
-  }
+  xitk_window_try_to_set_input_focus(xwin);
 
   if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
@@ -1022,11 +998,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     /* This causes menus not to be shown under many several conditions.  */
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_DOCK);
-  
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-  XSetInputFocus(private_data->imlibdata->x.disp, 
-		 (xitk_window_get_window(xwin)), RevertToParent, CurrentTime);
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 
   btn = (xitk_widget_t *)menu_window->wl.list.head.next;
   if (btn) {
