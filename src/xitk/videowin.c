@@ -47,6 +47,8 @@
 #include <X11/extensions/scrnsaver.h>
 #endif
 
+#include "xine-toolkit/xitk_x11.h"
+
 #include "common.h"
 #include "oxine/oxine.h"
 
@@ -301,91 +303,10 @@ static __attribute__((noreturn)) void *second_display_loop (void *data) {
 }
 
 
-static void video_window_find_visual (xui_vwin_t *vwin, Visual **visual_return, int *depth_return) {
-  XWindowAttributes  attribs;
-  XVisualInfo	    *vinfo;
-  XVisualInfo	     vinfo_tmpl;
-  int		     num_visuals;
-  int		     depth = 0;
-  Visual	    *visual = NULL;
+static void video_window_find_visual (xui_vwin_t *vwin) {
 
-  if (vwin->gui->prefered_visual_id == None) {
-    /*
-     * List all available TrueColor visuals, pick the best one for xine.
-     * We prefer visuals of depth 15/16 (fast).  Depth 24/32 may be OK, 
-     * but could be slow.
-     */
-    vinfo_tmpl.screen = vwin->video_screen;
-    vinfo_tmpl.class  = (vwin->gui->prefered_visual_class != -1
-			 ? vwin->gui->prefered_visual_class : TrueColor);
-    vinfo = XGetVisualInfo (vwin->video_display,
-			   VisualScreenMask | VisualClassMask,
-			   &vinfo_tmpl, &num_visuals);
-    if (vinfo != NULL) {
-      int i, pref;
-      int best_visual_index = -1;
-      int best_visual = -1;
-
-      for (i = 0; i < num_visuals; i++) {
-	if (vinfo[i].depth == 15 || vinfo[i].depth == 16)
-	  pref = 3;
-	else if (vinfo[i].depth > 16)
-	  pref = 2;
-	else
-	  pref = 1;
-	
-	if (pref > best_visual) {
-	  best_visual = pref;
-	  best_visual_index = i;
-	}  
-      }
-      
-      if (best_visual_index != -1) {
-	depth = vinfo[best_visual_index].depth;
-	visual = vinfo[best_visual_index].visual;
-      }
-      
-      XFree(vinfo);
-    }
-  } else {
-    /*
-     * Use the visual specified by the user.
-     */
-    vinfo_tmpl.visualid = vwin->gui->prefered_visual_id;
-    vinfo = XGetVisualInfo (vwin->video_display,
-			   VisualIDMask, &vinfo_tmpl, 
-			   &num_visuals);
-    if (vinfo == NULL) {
-      printf(_("gui_main: selected visual %#lx does not exist, trying default visual\n"),
-	     (long) vwin->gui->prefered_visual_id);
-    } else {
-      depth = vinfo[0].depth;
-      visual = vinfo[0].visual;
-      XFree(vinfo);
-    }
-  }
-
-  if (depth == 0) {
-    XVisualInfo vinfo;
-
-    XGetWindowAttributes (vwin->video_display, (DefaultRootWindow (vwin->video_display)), &attribs);
-
-    depth = attribs.depth;
-  
-    if (XMatchVisualInfo (vwin->video_display, vwin->video_screen, depth, TrueColor, &vinfo)) {
-      visual = vinfo.visual;
-    } else {
-      printf (_("gui_main: couldn't find true color visual.\n"));
-
-      depth = DefaultDepth (vwin->video_display, vwin->video_screen);
-      visual = DefaultVisual (vwin->video_display, vwin->video_screen);
-    }
-  }
-
-  if (depth_return != NULL)
-    *depth_return = depth;
-  if (visual_return != NULL)
-    *visual_return = visual;
+  xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->gui->prefered_visual_id, vwin->gui->prefered_visual_class,
+                       &vwin->visual, &vwin->depth);
 }
 
 
@@ -409,9 +330,7 @@ void video_window_select_visual (xui_vwin_t *vwin) {
     }
     if (vwin->gui_visual != vwin->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui_visual->visualid);
-      vwin->gui->x_lock_display (vwin->gui->display);
       gui_init_imlib (vwin->gui, vwin->gui_visual);
-      vwin->gui->x_unlock_display (vwin->gui->display);
       pthread_mutex_lock (&vwin->mutex);
       video_window_adapt_size (vwin);
       pthread_mutex_unlock (&vwin->mutex);
@@ -481,7 +400,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->depth           = vwin->gui_depth;
 
       if (vwin->separate_display) {
-        video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
+        video_window_find_visual (vwin);
         colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
       } else {
         colormap = Imlib_get_colormap (vwin->gui->imlib_data);
@@ -783,7 +702,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->visual   = vwin->gui_visual;
     vwin->depth    = vwin->gui_depth;
     if (vwin->separate_display) {
-      video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
+      video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
       colormap = Imlib_get_colormap (vwin->gui->imlib_data);
@@ -885,7 +804,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->depth    = vwin->gui_depth;
 
     if (vwin->separate_display) {
-      video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
+      video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
       colormap = Imlib_get_colormap (vwin->gui->imlib_data);
@@ -1050,7 +969,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->depth             = vwin->gui_depth;
 
     if (vwin->separate_display) {
-      video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
+      video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
       colormap = Imlib_get_colormap (vwin->gui->imlib_data);
@@ -1679,7 +1598,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
   video_window_select_visual (vwin);
  
   if (vwin->separate_display) {
-    video_window_find_visual (vwin, &vwin->visual, &vwin->depth);
+    video_window_find_visual (vwin);
   }
   
   vwin->xwin               = window_attribute->x;
