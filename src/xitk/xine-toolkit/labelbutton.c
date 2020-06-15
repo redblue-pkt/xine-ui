@@ -47,8 +47,8 @@ typedef struct {
   int                     bOldState;
   xitk_image_t           *skin;
 
-  xitk_simple_callback_t  callback;
-  xitk_ext_state_callback_t   state_callback;
+  xitk_state_callback_t   callback;
+  xitk_ext_state_callback_t state_callback;
    
   void                   *userdata;
    
@@ -385,7 +385,7 @@ static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bU
           wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
       } else if (wp->bType == CLICK_BUTTON) {
         if (wp->callback)
-          wp->callback (wp->bWidget, wp->userdata);
+          wp->callback (wp->bWidget, wp->userdata, wp->bState);
       }
     } else {
       _paint_labelbutton (wp);
@@ -653,7 +653,7 @@ void xitk_labelbutton_callback_exec (xitk_widget_t *w) {
         wp->state_callback (wp->bWidget, wp->userdata, wp->bState, 0);
     } else if (wp->bType == CLICK_BUTTON) {
       if (wp->callback)
-        wp->callback (wp->bWidget, wp->userdata);
+        wp->callback (wp->bWidget, wp->userdata, wp->bState);
     }
   }
 }
