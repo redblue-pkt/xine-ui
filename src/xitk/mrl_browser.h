@@ -25,9 +25,6 @@
 #include "xitk.h"
 
 typedef struct xui_mrlb_st xui_mrlb_t;
-
-typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int, int);
-
 void open_mrlbrowser (xitk_widget_t *w, void *gui);
 void open_mrlbrowser_from_playlist (xitk_widget_t *w, void *gui);
 void destroy_mrl_browser (xui_mrlb_t *mrlb);
