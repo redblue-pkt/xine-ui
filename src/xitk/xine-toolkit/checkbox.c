@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -358,6 +358,16 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
 					   xitk_checkbox_widget_t *cb,
 					   int x, int y, int width, int height) {
+  static const char *noskin_names[] = {
+    "XITK_NOSKIN_LEFT",
+    "XITK_NOSKIN_RIGHT",
+    "XITK_NOSKIN_UP",
+    "XITK_NOSKIN_DOWN",
+    "XITK_NOSKIN_PLUS",
+    "XITK_NOSKIN_MINUS",
+    "XITK_NOSKIN_CHECK"
+  };
+  unsigned int u = sizeof (noskin_names) / sizeof (noskin_names[0]);
   xitk_image_t  *i;
   
   ABORT_IF_NULL(wl);
@@ -365,8 +375,51 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(cb);
 
-  i = xitk_image_create_image(wl->imlibdata, width * 3, height);
-  draw_checkbox_check(i);
+  if (cb->skin_element_name) {
+    for (u = 0; u < sizeof (noskin_names) / sizeof (noskin_names[0]); u++) {
+      if (!strcmp (cb->skin_element_name, noskin_names[u]))
+        break;
+    }
+    cb->skin_element_name = NULL;
+  }
+  if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
+    /* default is not shared, caller may want to paint it over. */
+    i = xitk_image_create_image (wl->imlibdata, width * 3, height);
+    draw_checkbox_check (i);
+  } else {
+    if (xitk_shared_image (wl, noskin_names[u], width * 3, height, &i) == 1) {
+      switch (u) {
+        case 0:
+          draw_bevel_three_state (i);
+          draw_arrow_left (i);
+          break;
+        case 1:
+          draw_bevel_three_state (i);
+          draw_arrow_right (i);
+          break;
+        case 2:
+          draw_bevel_three_state (i);
+          draw_arrow_up (i);
+          break;
+        case 3:
+          draw_bevel_three_state (i);
+          draw_arrow_down (i);
+          break;
+        case 4:
+          draw_bevel_three_state (i);
+          draw_button_plus (i);
+          break;
+        case 5:
+          draw_bevel_three_state (i);
+          draw_button_minus (i);
+          break;
+        case 6:
+          draw_checkbox_check (i);
+          break;
+        default: ;
+      }
+    }
+  }
   
   return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 0, 0);
 }
