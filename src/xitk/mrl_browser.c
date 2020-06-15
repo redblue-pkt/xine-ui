@@ -261,7 +261,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   XITK_WIDGET_INIT (&mb);
 
   mb.layer_above  = (is_layer_above ());
-  mb.icon         = &mrlb->gui->icon;
+  mb.icon         = mrlb->gui->icon;
   mb.set_wm_window_normal = !video_window_is_visible (mrlb->gui->vwin);
   mb.x = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_x",
     200, "gui mrl browser x coordinate",

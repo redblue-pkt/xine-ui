@@ -245,7 +245,7 @@ struct gGui_st {
   void                    (*x_lock_display) (Display *display);
   void                    (*x_unlock_display) (Display *display);
   Display                  *display;
-  Pixmap                    icon;
+  xitk_pixmap_t            *icon;
 
   VisualID	            prefered_visual_id;
   int		            prefered_visual_class;

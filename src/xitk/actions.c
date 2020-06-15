@@ -788,6 +788,8 @@ void gui_exit_2 (gGui_t *gui) {
   xitk_skin_unload_config(gui->skin_config);
 
   mediamark_free_mediamarks();
+
+  xitk_image_destroy_xitk_pixmap(gui->icon);
 }
 
 void gui_play (xitk_widget_t *w, void *data) {

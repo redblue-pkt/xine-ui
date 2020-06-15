@@ -323,6 +323,38 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
   XITK_FREE(xpix);
 }
 
+xitk_pixmap_t *xitk_pixmap_create_from_data(ImlibData *im, int width, int height, const char *data) {
+  xitk_pixmap_t    *xpix;
+  XGCValues         gcv;
+
+  xpix = xitk_xmalloc(sizeof(xitk_pixmap_t));
+  if (!xpix)
+    return NULL;
+
+  xpix->imlibdata = im;
+  xpix->destroy   = xitk_image_xitk_pixmap_destroyer;
+  xpix->width     = width;
+  xpix->height    = height;
+  xpix->xim       = NULL;
+  xpix->shm       = 0;
+#ifdef HAVE_SHM
+  xpix->shminfo = NULL;
+#endif
+
+  gcv.graphics_exposures = False;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  xpix->pixmap = XCreateBitmapFromData (im->x.disp, im->x.root, data, 40, 40);
+  xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &gcv);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  return xpix;
+}
+
+Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p) {
+  return p->pixmap;
+}
+
 /*
  *
  */

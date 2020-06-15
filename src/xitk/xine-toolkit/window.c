@@ -543,7 +543,7 @@ void xitk_window_set_window_title(xitk_window_t *w, const char *title) {
  *
  */
 
-void xitk_set_window_icon(Display *display, Window window, Pixmap icon) {
+static void xitk_set_window_icon(Display *display, Window window, Pixmap icon) {
 
   XWMHints *wmhints;
 
@@ -562,12 +562,12 @@ void xitk_set_window_icon(Display *display, Window window, Pixmap icon) {
   xitk_x_unlock_display (display);
 }
 
-void xitk_window_set_window_icon(xitk_window_t *w, Pixmap icon) {
+void xitk_window_set_window_icon(xitk_window_t *w, xitk_pixmap_t *icon) {
 
   if (w == NULL)
     return;
 
-  xitk_set_window_icon(w->imlibdata->x.disp, w->window, icon);
+  xitk_set_window_icon(w->imlibdata->x.disp, w->window, xitk_pixmap_get_pixmap(icon));
 }
 
 void xitk_window_set_layer_above(xitk_window_t *w) {

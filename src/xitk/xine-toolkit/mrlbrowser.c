@@ -933,7 +933,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
                                mb->resource_class ? mb->resource_class : "xitk");
 
   if (mb->icon)
-    xitk_window_set_window_icon(private_data->xwin, *mb->icon);
+    xitk_window_set_window_icon(private_data->xwin, mb->icon);
 
   xitk_window_change_background_with_image(private_data->xwin, bg_image, bg_image->width, bg_image->height);
 

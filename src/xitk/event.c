@@ -1941,10 +1941,8 @@ void gui_init_imlib (gGui_t *gui, Visual *vis) {
   /*
    * create an icon pixmap
    */
-  
-  gui->icon = XCreateBitmapFromData (gui->display, 
-				      gui->imlib_data->x.root,
-				      (const char *)icon_datas, 40, 40);
+
+  gui->icon = xitk_pixmap_create_from_data(gui->imlib_data, 40, 40, (const char *)icon_datas);
 }
 
 /*
