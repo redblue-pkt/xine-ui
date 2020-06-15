@@ -643,9 +643,6 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
   section = setup->sections + s;
   memset (&entry, 0, sizeof (entry));
 
-  setup->max_wg = (section->num_entries + 7) & ~7;
-  setup->wg = malloc (setup->max_wg * sizeof (*setup->wg));
-
   cfg_err_result = setup->wg ? xine_config_get_first_entry (setup->gui->xine, &entry) : 0;
     
   while (cfg_err_result) {
@@ -793,7 +790,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             xitk_widget_t *checkbox;
 
             XITK_WIDGET_INIT (&cb);
-            cb.skin_element_name = NULL;
+            cb.skin_element_name = "XITK_NOSKIN_CHECK";
             cb.callback          = numtype_update;
             cb.userdata          = wt;
             checkbox = xitk_noskin_checkbox_create (setup->widget_list, &cb, x, y, 12, 12);
@@ -856,8 +853,6 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   (void)wx;
   setup_set_cursor (setup, WAIT_CURS);
 
-  free (setup->wg);
-  setup->wg = NULL;
   setup->num_wg = 0;
   setup->first_displayed = 0;
 
@@ -968,6 +963,18 @@ static void setup_sections (xui_setup_t *setup) {
 #ifdef XINE_SARRAY_MODE_UNIQUE
   xine_sarray_delete (a);
 #endif
+
+  {
+    int max = 1, i;
+
+    for (i = 0; i < setup->num_sections; i++) {
+      if (max < setup->sections[i].num_entries)
+        max = setup->sections[i].num_entries;
+    }
+    setup->max_wg = (max + 7) & ~7;
+    free (setup->wg);
+    setup->wg = malloc (setup->max_wg * sizeof (*setup->wg));
+  }
 
   XITK_WIDGET_INIT (&tab);
 
@@ -1146,3 +1153,4 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
+
