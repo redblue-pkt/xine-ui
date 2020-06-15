@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -321,7 +321,6 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
   /* Create inputtext and buttons (not skinable) */
   {
     char          buf[256];
-    xitk_image_t *wimage;
 
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, sizeof(buf), "%d", ib->value);
@@ -336,7 +335,7 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->input_widget->node);
     private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
     
-    b.skin_element_name = NULL;
+    b.skin_element_name = "XITK_NOSKIN_PLUS";
     b.callback          = intbox_stepup;
     b.userdata          = (void *)mywidget;
     private_data->more_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
@@ -344,25 +343,13 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->more_widget->node);
     private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
-    b.skin_element_name = NULL;
+    b.skin_element_name = "XITK_NOSKIN_MINUS";
     b.callback          = intbox_stepdown;
     b.userdata          = (void *)mywidget;
     private_data->less_widget = xitk_noskin_button_create (ib->parent_wlist, &b,
       (x + width) - (height>>1), (y + (height>>1)), (height>>1), (height>>1));
     xitk_dlist_add_tail (&ib->parent_wlist->list, &private_data->less_widget->node);
     private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
-
-    /* Draw '+' and '-' in buttons */
-    wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
-    
-    if(wimage)
-      draw_button_plus(wimage);
-
-    wimage = xitk_get_widget_foreground_skin(private_data->less_widget);
-    
-    if(wimage)
-      draw_button_minus(wimage);
-
   }
 
   if(iw)
