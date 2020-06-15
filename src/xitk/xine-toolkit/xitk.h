@@ -171,6 +171,9 @@ typedef struct {
   /* image private */
   ImlibData                        *im;
   ImlibImage                       *raw;
+  xitk_widget_list_t               *wl;
+  int                               refs, max_refs;
+  char                              key[20];
 } xitk_image_t;
 
 typedef struct {

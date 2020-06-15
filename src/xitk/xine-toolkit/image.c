@@ -27,6 +27,8 @@
 #include <X11/Xlib.h>
 #include <errno.h>
 
+#include <xine/sorted_array.h>
+
 #include "_xitk.h"
 
 #include "utils.h"
@@ -240,26 +242,45 @@ static void _xitk_image_destroy_pix_font (xitk_pix_font_t **pix_font) {
  *
  */
 void xitk_image_free_image(xitk_image_t **src) {
+  xitk_image_t *image;
 
-  ABORT_IF_NULL(*src);
+  if (!src)
+    return;
+  image = *src;
+  if (!image)
+    return;
 
-  if ((*src)->raw) {
-    ImlibData *im = (*src)->im;
-    ABORT_IF_NULL(im);
-    XLOCK (im->x.x_lock_display, im->x.disp);
-    Imlib_destroy_image(im, (*src)->raw);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  image->refs -= 1;
+  if (image->refs > 0)
+    return;
+
+#ifdef XINE_SARRAY_MODE_UNIQUE
+  if (image->wl && image->wl->shared_images) {
+    xine_sarray_remove_ptr (image->wl->shared_images, image);
+#ifdef DEBUG_SHARED_IMAGE
+    printf ("xitk_shared_image: %d uses of %s (%d x %d).\n",
+      image->max_refs, image->key, image->width, image->height);
+#endif
   }
 
-  if((*src)->mask)
-    xitk_image_destroy_xitk_pixmap((*src)->mask);
+  if (image->raw) {
+    ImlibData *im = image->im;
+    ABORT_IF_NULL(im);
+    XLOCK (im->x.x_lock_display, im->x.disp);
+    Imlib_destroy_image (im, image->raw);
+    XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  }
+#endif
+
+  if (image->mask)
+    xitk_image_destroy_xitk_pixmap (image->mask);
   
-  if((*src)->image)
-    xitk_image_destroy_xitk_pixmap((*src)->image);
+  if (image->image)
+    xitk_image_destroy_xitk_pixmap (image->image);
 
-  _xitk_image_destroy_pix_font (&(*src)->pix_font);
+  _xitk_image_destroy_pix_font (&image->pix_font);
 
-  XITK_FREE((*src));
+  XITK_FREE (image);
   *src = NULL;
 }
 
@@ -502,13 +523,114 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
 
-  i         = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-  i->mask   = NULL;
-  i->image  = xitk_image_create_xitk_pixmap(im, width, height);
-  i->width  = width;
-  i->height = height;
+  i = (xitk_image_t *)xitk_xmalloc (sizeof (*i));
+  if (!i)
+    return NULL;
+
+  i->image    = xitk_image_create_xitk_pixmap(im, width, height);
+  if (!i->image) {
+    XITK_FREE (i);
+    return NULL;
+  }
+  i->mask     = NULL;
+  i->width    = width;
+  i->height   = height;
+  i->wl       = NULL;
+  i->max_refs =
+  i->refs     = 1;
+  i->key[0]   = 0;
 
   return i;
+}
+
+static int _xitk_shared_image_cmp (void *a, void *b) {
+  xitk_image_t *d = (xitk_image_t *)a;
+  xitk_image_t *e = (xitk_image_t *)b;
+
+  if (d->width < e->width)
+    return -1;
+  if (d->width > e->width)
+    return 1;
+  if (d->height < e->height)
+    return -1;
+  if (d->height > e->height)
+    return 1;
+  return strcmp (d->key, e->key);
+}
+
+int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int height, xitk_image_t **image) {
+  xitk_image_t *i;
+  size_t keylen;
+
+  ABORT_IF_NOT_COND (width > 0);
+  ABORT_IF_NOT_COND (height > 0);
+
+  if (!image)
+    return 0;
+  if (!wl || !key) {
+    *image = NULL;
+    return 0;
+  }
+  if (!wl->imlibdata) {
+    *image = NULL;
+    return 0;
+  }
+
+  keylen = strlen (key);
+  if (keylen > sizeof (i->key) - 1)
+    keylen = sizeof (i->key) - 1;
+  i = (xitk_image_t *)xitk_xmalloc (sizeof (*i) + keylen);
+  if (!i) {
+    *image = NULL;
+    return 0;
+  }
+  i->width = width;
+  i->height = height;
+  memcpy (i->key, key, keylen);
+  i->key[keylen] = 0;
+
+#ifdef XINE_SARRAY_MODE_UNIQUE
+  if (!wl->shared_images) {
+    wl->shared_images = xine_sarray_new (16, _xitk_shared_image_cmp);
+    xine_sarray_set_mode (wl->shared_images, XINE_SARRAY_MODE_UNIQUE);
+  }
+  if (wl->shared_images) {
+    int ai;
+
+    ai = xine_sarray_add (wl->shared_images, i);
+    if (ai < 0) {
+      XITK_FREE (i);
+      i = xine_sarray_get (wl->shared_images, ~ai);
+      i->refs += 1;
+      if (i->refs > i->max_refs)
+        i->max_refs = i->refs;
+      *image = i;
+      return i->refs;
+    }
+  }
+#endif
+  i->image = xitk_image_create_xitk_pixmap (wl->imlibdata, width, height);
+  if (!i->image) {
+    XITK_FREE (i);
+    return 0;
+  }
+  i->max_refs = i->refs = 1;
+  i->wl = wl;
+  i->mask = NULL;
+  *image = i;
+  return i->refs;
+}
+
+void xitk_shared_image_list_delete (xitk_widget_list_t *wl) {
+  if (wl && wl->shared_images) {
+    int i, max = xine_sarray_size (wl->shared_images);
+
+    for (i = 0; i < max; i++) {
+      xitk_image_t *image = xine_sarray_get (wl->shared_images, i);
+
+      image->wl = NULL;
+    }
+  }
 }
 
 /*
@@ -1836,6 +1958,10 @@ static xitk_image_t *_image_new(ImlibData *im, ImlibImage *img) {
   i->raw    = img;
   i->width  = img->rgb_width;
   i->height = img->rgb_height;
+  i->max_refs =
+  i->refs     = 1;
+  i->wl       = NULL;
+  i->key[0]   = 0;
   return i;
 }
 
