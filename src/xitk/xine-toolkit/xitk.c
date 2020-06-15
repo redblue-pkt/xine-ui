@@ -1380,6 +1380,7 @@ xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata) {
   l->gc                 = NULL;
   l->origin_gc          = NULL;
   l->temp_gc            = NULL;
+  l->shared_images      = NULL;
   l->widget_focused     = NULL;
   l->widget_under_mouse = NULL;
   l->widget_pressed     = NULL;
@@ -1597,6 +1598,7 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
       XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
       fx->widget_list->temp_gc = NULL;
     }
+    xitk_shared_image_list_delete (fx->widget_list);
     xitk_dnode_remove (&fx->widget_list->node);
     xitk_dlist_clear (&fx->widget_list->list);
     free(fx->widget_list);
@@ -1689,6 +1691,7 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
     XFreeGC (xitk->x.display, wl->temp_gc);
     XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
   }
+  xitk_shared_image_list_delete (wl);
 
   xitk_dnode_remove (&wl->node);
   xitk_dlist_clear (&wl->list);
