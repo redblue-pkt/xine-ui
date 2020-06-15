@@ -94,6 +94,7 @@ struct xitk_widget_s {
   xitk_dnode_t                    node;
 
   xitk_widget_list_t             *wl;
+  xitk_widget_t                  *parent;
 
   int                             x;
   int                             y;

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -22,36 +22,5 @@
 #define HAVE_XITK_COMBO_H
 
 #include "_xitk.h"
-
-typedef struct {
-
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
-
-  xitk_window_t          *xwin;
-
-  int                     win_x;
-  int                     win_y;
-
-  xitk_register_key_t    *parent_wkey;
-
-  xitk_widget_t          *combo_widget;
-  xitk_widget_t          *label_widget;
-  xitk_widget_t          *button_widget;
-  xitk_widget_t          *browser_widget;
-
-  const char     * const *entries;
-  int                     num_entries;
-  int                     selected;
-
-  xitk_register_key_t     widget_key;
-  xitk_widget_list_t     *widget_list;
-  xitk_widget_list_t     *parent_wlist;
-
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-  int                     visible;
-
-} combo_private_data_t;
 
 #endif

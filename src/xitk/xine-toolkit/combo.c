@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -29,193 +29,383 @@
 
 #include "_xitk.h"
 
-static void _combo_rollunroll(xitk_widget_t *w, void *data, int state);
+typedef struct {
+  xitk_widget_t           w;
 
-/*
- *
- */
-static void enability(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+  ImlibData              *imlibdata;
+  char                   *skin_element_name;
 
-    if(w->enable == WIDGET_ENABLE) {
-      xitk_enable_widget(private_data->label_widget);
-      xitk_enable_widget(private_data->button_widget);
-    }
-    else {
+  xitk_window_t          *xwin;
+  GC                      gc;
 
-      if(private_data->visible) {
-	xitk_checkbox_set_state(private_data->button_widget, 0);
-	_combo_rollunroll(private_data->button_widget, (void *)w, 0);
-      }
+  int                     win_x;
+  int                     win_y;
 
+  xitk_register_key_t    *parent_wkey;
 
-      xitk_disable_widget(private_data->label_widget);
-      xitk_disable_widget(private_data->button_widget);
-    }
+  xitk_widget_t          *combo_widget;
+  xitk_widget_t          *label_widget;
+  xitk_widget_t          *button_widget;
+  xitk_widget_t          *browser_widget;
 
+  char                  **entries;
+  int                     num_entries;
+  int                     selected;
+
+  xitk_register_key_t     widget_key;
+  xitk_widget_list_t     *widget_list;
+  xitk_widget_list_t     *parent_wlist;
+
+  xitk_state_callback_t   callback;
+  void                   *userdata;
+  int                     visible;
+  int                     tips_timeout;
+
+} _combo_private_t;
+
+static char **_combo_copy_string_list (const char * const *s, int *n) {
+  const char * const *p;
+  char **q, **r, *d;
+  size_t _n, _s;
+
+  if (!s)
+    return NULL;
+  _n = 0;
+  _s = 0;
+  p = s;
+  while (*p) {
+    _s += sizeof (*p) + strlen (*p) + 1;
+    _n += 1;
+    p++;
   }
-}
-
-static void notify_destroy(xitk_widget_t *w) {
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-    
-    if(private_data->visible)
-      _combo_rollunroll(private_data->button_widget, (void *)w, 0);
-
-    xitk_unregister_event_handler(&private_data->widget_key);
-    xitk_window_destroy_window(private_data->xwin);
-
-    XITK_FREE(private_data->skin_element_name);
-    free(private_data);
+  *n = _n;
+  r = malloc (_s + sizeof (*p));
+  if (!r)
+    return NULL;
+  p = s;
+  q = r;
+  d = (char *)(r + _n + 1);
+  while (_n--) {
+    size_t _l = strlen (*p) + 1;
+    *q = d;
+    memcpy (d, *p, _l);
+    d += _l;
+    p++;
+    q++;
   }
+  *q = NULL;
+  return r;
 }
-
-/*
- *
- */
-static void paint(xitk_widget_t *w) {
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-
-    if(private_data->visible == 1 && (w->visible < 1)) {
-      xitk_checkbox_set_state(private_data->button_widget, 0);
-      _combo_rollunroll(private_data->button_widget, (void *)w, 0);
-    }
-    if(w->visible == 1) {
-      int bx, lw;
-
-      lw = xitk_get_widget_width(private_data->label_widget);
-      xitk_set_widget_pos(private_data->label_widget, w->x, w->y);
-      bx = w->x + lw;
-      xitk_set_widget_pos(private_data->button_widget, bx, w->y);
-
-      xitk_show_widget(private_data->label_widget);
-      xitk_show_widget(private_data->button_widget);
-    }
-    else {
-      xitk_hide_widget(private_data->label_widget);
-      xitk_hide_widget(private_data->button_widget);
-    }
-  }
-}
-
-/*
- *
- */
-void xitk_combo_callback_exec(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *)w->private_data;
     
-    if(private_data->callback)
-      private_data->callback(private_data->combo_widget, 
-			     private_data->userdata, private_data->selected);
-
-  }
-}
-
-/*
- * Called on select action.
- */
-static void combo_select(xitk_widget_t *w, void *data, int selected, int modifier) {
-
-  if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
-    xitk_widget_t        *c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
-    combo_private_data_t *private_data = (combo_private_data_t *)c->private_data;
-    
-    private_data->selected = selected;
-    
-    xitk_label_change_label(private_data->label_widget, private_data->entries[selected]);
-    xitk_window_hide_window(private_data->xwin);
-    private_data->visible = 0;
-    
-    xitk_browser_release_all_buttons(private_data->browser_widget);
-    xitk_browser_update_list(private_data->browser_widget, 
-			     (const char* const*)private_data->entries, NULL,
-			     private_data->num_entries, 0);
-    
-    xitk_checkbox_set_state(private_data->button_widget, 0);
-
-    if(private_data->callback)
-      private_data->callback(private_data->combo_widget, private_data->userdata, selected);
-  
-  }
-}
-
 /*
  * Handle Xevents here.
  */
-static void _combo_handle_event(XEvent *event, void *data) {
-  combo_private_data_t *private_data = (combo_private_data_t *)data;
+static void _combo_handle_event (XEvent *event, void *data) {
+  _combo_private_t *wp = (_combo_private_t*)data;
 
-  switch(event->type) {
-    
-  case ButtonRelease:
-    /*
-     * If we try to move the combo window,
-     * move it back to right position (under label*
-     */
-    if(private_data && private_data->visible) { 
-      int  x, y, modifier;
-      xitk_get_key_modifier(event, &modifier);
-      xitk_window_get_window_position(private_data->xwin, &x, &y, NULL, NULL);
-      if((x != private_data->win_x) || (y != private_data->win_y))
-        xitk_combo_update_pos(private_data->combo_widget);
-    }
-    break;
+  switch (event->type) {
+    case ButtonRelease:
+      /* If we try to move the combo window,
+       * move it back to right position (under label). */
+      if (wp && wp->visible) {
+        int  x, y, modifier;
+        /* FIXME: what is this good for here? */
+        xitk_get_key_modifier (event, &modifier);
+        xitk_window_get_window_position (wp->xwin, &x, &y, NULL, NULL);
+        if ((x != wp->win_x) || (y != wp->win_y))
+          xitk_combo_update_pos (wp->combo_widget);
+      }
+      break;
   }    
+}
+
+static void _combo_close (_combo_private_t *wp) {
+  wp->visible = 0;
+  if (wp->xwin) {
+    xitk_unregister_event_handler (&wp->widget_key);
+    xitk_destroy_widgets (wp->widget_list);
+    xitk_window_destroy_window (wp->xwin);
+    wp->xwin = NULL;
+  }
+
+  if (wp->widget_list->gc) {
+    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    XFreeGC (wp->imlibdata->x.disp, wp->widget_list->gc);
+    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    wp->widget_list->gc = NULL;
+  }
+
+  if (wp->widget_list) {
+    xitk_widget_list_defferred_destroy (wp->widget_list);
+    wp->widget_list = NULL;
+  }
+}
+
+static void combo_select (xitk_widget_t *w, void *data, int selected, int modifier) {
+  _combo_private_t *wp = (_combo_private_t *)data;
+
+  if (wp && w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+
+    if (wp->xwin) {
+      wp->selected = selected;
+      _combo_close (wp);
+      xitk_label_change_label (wp->label_widget, wp->entries[selected]);
+      xitk_checkbox_set_state (wp->button_widget, 0);
+      if (wp->callback)
+        wp->callback (wp->combo_widget, wp->userdata, selected);
+    }
+  }
+}
+
+static void _combo_open (_combo_private_t *wp) {
+  Window win;
+  unsigned int itemw, itemh, slidw;
+
+  if (wp->xwin)
+    return;
+
+  itemh = 20;
+  slidw = 12;
+  itemw = xitk_get_widget_width (wp->label_widget);
+  itemw += xitk_get_widget_width (wp->button_widget);
+  itemw -= 2; /* space for border */
+
+  wp->xwin = xitk_window_create_simple_window (wp->w.wl->imlibdata,
+    0, 0, itemw + 2, itemh * 5 + slidw + 2);
+  if (!wp->xwin)
+    return;
+  win = xitk_window_get_window (wp->xwin);
+
+  XLOCK (wp->w.wl->imlibdata->x.x_lock_display, wp->w.wl->imlibdata->x.disp);
+  {
+    XSetWindowAttributes attr;
+    attr.override_redirect = True;
+    XChangeWindowAttributes (wp->w.wl->imlibdata->x.disp, win, CWOverrideRedirect, &attr);
+  }
+  XSetTransientForHint (wp->w.wl->imlibdata->x.disp, win, wp->parent_wlist->win);
+  wp->gc = XCreateGC (wp->w.wl->imlibdata->x.disp, win, None, None);
+  XUNLOCK (wp->w.wl->imlibdata->x.x_unlock_display, wp->w.wl->imlibdata->x.disp);
+
+  /* Change default classhint to new one. */
+  xitk_window_set_window_class (wp->xwin, "Xitk Combo", "Xitk");
+
+  wp->widget_list        = xitk_widget_list_new (wp->w.wl->imlibdata);
+  xitk_dlist_init (&wp->widget_list->list);
+  wp->widget_list->win   = win;
+  wp->widget_list->gc    = wp->gc;
+
+  {
+    xitk_browser_widget_t browser;
+    /* Browser */
+    XITK_WIDGET_INIT (&browser);
+    browser.arrow_up.skin_element_name    = NULL;
+    browser.slider.skin_element_name      = NULL;
+    browser.arrow_dn.skin_element_name    = NULL;
+    browser.browser.skin_element_name     = NULL;
+    browser.browser.max_displayed_entries = 5;
+    browser.browser.num_entries           = wp->num_entries;
+    browser.browser.entries               = (const char * const *)wp->entries;
+    browser.callback                      = combo_select;
+    browser.dbl_click_callback            = NULL;
+    browser.parent_wlist                  = wp->widget_list;
+    browser.userdata                      = (void *)wp;
+    wp->browser_widget = xitk_noskin_browser_create (wp->widget_list, &browser,
+      wp->gc, 1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
+    xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
+    xitk_enable_and_show_widget (wp->browser_widget);
+    wp->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  }
+  wp->browser_widget->tips_timeout = wp->browser_widget->tips_timeout;
+  
+  xitk_browser_update_list (wp->browser_widget, 
+    (const char * const *)wp->entries, NULL, wp->num_entries, 0);
+  
+  wp->widget_key = xitk_register_event_handler ("xitk combo", wp->xwin,
+    _combo_handle_event, NULL, NULL, wp->widget_list, (void *)wp);
+
+  wp->visible = 1;
 }
 
 /*
  *
  */
-static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
+  _combo_private_t *wp = (_combo_private_t *)data;
 
-    if(private_data->skin_element_name) {
-      int x, y;
+  if (!wp)
+    return;
 
-      xitk_skin_lock(skonfig);
-      
-      w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
-      
-      xitk_set_widget_pos(w, w->x, w->y);
-      xitk_get_widget_pos(private_data->label_widget, &x, &y);
-      
-      w->x = x;
-      w->y = y;
-
-      x += xitk_get_widget_width(private_data->label_widget);
-      
-      (void) xitk_set_widget_pos(private_data->button_widget, x, y);
-
-      xitk_skin_unlock(skonfig);
+  if (wp && w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+    if (state && wp->visible == 0) {
+      _combo_open (wp);
+      xitk_combo_update_pos (&wp->w);
+    } else {
+      _combo_close (wp);
     }
+  }      
+}
+
+static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
+  _combo_private_t *wp = (_combo_private_t *)data;
+
+  if (wp && w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
+    int state;
+    
+    state = !xitk_checkbox_get_state (wp->button_widget);
+    xitk_checkbox_set_state (wp->button_widget, state);
+
+    if (state && wp->visible == 0) {
+      wp->w.wl->widget_focused = wp->button_widget;
+      _combo_open (wp);
+      xitk_combo_update_pos (&wp->w);
+    } else {
+      _combo_close (wp);
+    }
+  }      
+}
+
+/*
+ *
+ */
+static void enability (xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
+  
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
+    return;
+
+  if (wp->w.enable == WIDGET_ENABLE) {
+    xitk_enable_widget (wp->label_widget);
+    xitk_enable_widget (wp->button_widget);
+  } else {
+    if (wp->visible) {
+      xitk_checkbox_set_state (wp->button_widget, 0);
+      _combo_rollunroll (wp->button_widget, (void *)wp, 0);
+    }
+    xitk_disable_widget (wp->label_widget);
+    xitk_disable_widget (wp->button_widget);
+  }
+}
+
+static void notify_destroy (xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
+
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
+    return;
+
+  if (wp->visible)
+    _combo_rollunroll (wp->button_widget, (void *)wp, 0);
+
+  if (wp->w.wl) {
+    xitk_widget_t *_w = (xitk_widget_t *)wp->w.wl->list.head.next;
+
+    while (_w->node.next) {
+      if ((_w == wp->label_widget) || (_w == wp->button_widget))
+        _w->parent = NULL;
+      _w = (xitk_widget_t *)_w->node.next;
+    }
+  }
+    
+  free (wp->entries);
+  wp->entries = NULL;
+  XITK_FREE (wp->skin_element_name);
+}
+
+/*
+ *
+ */
+static void paint (xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
+
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
+    return;
+
+  if (wp->visible == 1 && (wp->w.visible < 1)) {
+    xitk_checkbox_set_state (wp->button_widget, 0);
+    _combo_rollunroll (wp->button_widget, (void *)wp, 0);
+  }
+  if (wp->w.visible == 1) {
+    int bx, lw;
+
+    lw = xitk_get_widget_width (wp->label_widget);
+    xitk_set_widget_pos (wp->label_widget, wp->w.x, wp->w.y);
+    bx = wp->w.x + lw;
+    xitk_set_widget_pos (wp->button_widget, bx, wp->w.y);
+    xitk_show_widget (wp->label_widget);
+    xitk_show_widget (wp->button_widget);
+  } else {
+    xitk_hide_widget (wp->label_widget);
+    xitk_hide_widget (wp->button_widget);
+  }
+}
+
+/*
+ *
+ */
+void xitk_combo_callback_exec (xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
+  
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
+    return;
+
+  if (wp->callback)
+    wp->callback (wp->combo_widget, wp->userdata, wp->selected);
+}
+
+/*
+ *
+ */
+static void notify_change_skin (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  _combo_private_t *wp = (_combo_private_t *)w;
+  
+  if (wp->skin_element_name) {
+    int x, y;
+
+    xitk_skin_lock (skonfig);
+      
+    wp->w.visible = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1 : -1;
+    wp->w.enable  = xitk_skin_get_enability (skonfig, wp->skin_element_name);
+      
+    xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
+    xitk_get_widget_pos (wp->label_widget, &x, &y);
+      
+    wp->w.x = x;
+    wp->w.y = y;
+
+    x += xitk_get_widget_width (wp->label_widget);
+      
+    (void)xitk_set_widget_pos (wp->button_widget, x, y);
+
+    xitk_skin_unlock (skonfig);
   }
 }
 
 static void tips_timeout(xitk_widget_t *w, unsigned long timeout) {
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-    
-    private_data->combo_widget->tips_timeout = timeout;
-    private_data->label_widget->tips_timeout = timeout;
-    private_data->button_widget->tips_timeout = timeout;
-    private_data->browser_widget->tips_timeout = timeout;
+  _combo_private_t *wp = (_combo_private_t *)w;
+
+  if (!wp)
+    return;
+  
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    wp->tips_timeout = timeout;
+    wp->combo_widget->tips_timeout = timeout;
+    wp->label_widget->tips_timeout = timeout;
+    wp->button_widget->tips_timeout = timeout;
+    if (wp->xwin)
+      wp->browser_widget->tips_timeout = timeout;
   }
 }
 
@@ -246,120 +436,30 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static void _combo_rollunroll(xitk_widget_t *w, void *data, int state) {
-  xitk_widget_t        *combo = (xitk_widget_t *)data;
-  combo_private_data_t *private_data = (combo_private_data_t *)combo->private_data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
-    
-    if(state && private_data->visible == 0) {
-      private_data->visible = 1;
-      xitk_combo_update_pos(combo);
-    }
-    else {
-      private_data->visible = 0;
-      xitk_window_hide_window(private_data->xwin);
-    }
-  }      
-}
-
-/*
- *
- */
-static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
-  xitk_widget_t        *combo = (xitk_widget_t *)data;
-  combo_private_data_t *private_data = (combo_private_data_t *)combo->private_data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
-    int state;
-    
-    state = !xitk_checkbox_get_state(private_data->button_widget);
-    
-    xitk_checkbox_set_state(private_data->button_widget, state);
-
-    if(state && private_data->visible == 0) {
-      w->wl->widget_focused = private_data->button_widget;
-      private_data->visible = 1;
-      xitk_combo_update_pos(combo);
-    }
-    else {
-      private_data->visible = 0;
-      xitk_window_hide_window(private_data->xwin);
-    }
-    
-  }      
-}
 
 /*
  * ************************* END OF PRIVATES *******************************
  */
 
-int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2) {
-
-  if((w1 && w2) && ((w1->type & WIDGET_GROUP_COMBO) && (w1->type & WIDGET_GROUP_COMBO))) {
-    
-    if(w1 == w2)
-      return 1;
-    
-    if(w1->wl == w2->wl) {
-      xitk_widget_list_t  *wl = w1->wl;
-      xitk_widget_t       *w, *wt;
-      
-      w = (xitk_widget_t *)wl->list.head.next;
-      while (w->node.next && ((w != w1) && (w != w2))) {
-        w = (xitk_widget_t *)w->node.next;
-      }
-
-      if (w->node.next) {
-
-	wt = (w == w1) ? w2 : w1;
-	
-	if((w->type & WIDGET_GROUP_COMBO) && 
-	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-          w = (xitk_widget_t *)w->node.next;
-          if (w->node.next)
-            w = (xitk_widget_t *)w->node.next;
-	}
-	else if((w->type & WIDGET_GROUP_COMBO) && 
-		((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
-          w = (xitk_widget_t *)w->node.next;
-	}
-	
-        if (w->node.next && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET)) {
-	  combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-	
-	  if((wt == private_data->label_widget) || (wt == private_data->button_widget))
-	    return 1;
-	  
-	}
-
-      }
-    }
-  }
-  return 0;  
-}
-
 /*
  *
  */
 void xitk_combo_rollunroll(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO))) {
+  _combo_private_t *wp = (_combo_private_t *)w;
 
-    if((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX) {
-      int state = !xitk_checkbox_get_state(w);
-      xitk_checkbox_callback_exec(w);
-      xitk_checkbox_set_state(w, state);
-    }
-  }
-  else if(w->type & WIDGET_GROUP_WIDGET) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-    int state = !xitk_checkbox_get_state(private_data->button_widget);
-      xitk_checkbox_callback_exec(private_data->button_widget);
-      xitk_checkbox_set_state(private_data->button_widget, state);
+  if (!wp)
+    return;
+  
+  if ((wp->w.type & (WIDGET_GROUP_COMBO | WIDGET_TYPE_MASK)) == (WIDGET_GROUP_COMBO | WIDGET_TYPE_CHECKBOX)) {
+    int state = !xitk_checkbox_get_state (&wp->w);
+
+    xitk_checkbox_callback_exec (&wp->w);
+    xitk_checkbox_set_state (&wp->w, state);
+  } else if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    int state = !xitk_checkbox_get_state (wp->button_widget);
+
+    xitk_checkbox_callback_exec (wp->button_widget);
+    xitk_checkbox_set_state (wp->button_widget, state);
   }
 }
 
@@ -367,16 +467,16 @@ void xitk_combo_rollunroll(xitk_widget_t *w) {
    *
    */
 void xitk_combo_set_select(xitk_widget_t *w, int select) {
+  _combo_private_t *wp = (_combo_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *)w->private_data;
-    
-    if(private_data->entries && private_data->entries[select]) {
-      private_data->selected = select;
-      xitk_label_change_label(private_data->label_widget, private_data->entries[select]);
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    if (wp->entries && wp->entries[select]) {
+      wp->selected = select;
+      xitk_label_change_label (wp->label_widget, wp->entries[select]);
     }
-
   }
 }
 
@@ -384,54 +484,55 @@ void xitk_combo_set_select(xitk_widget_t *w, int select) {
  *
  */
 void xitk_combo_update_pos(xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t  *private_data = (combo_private_data_t *)w->private_data;
+  if (!wp)
+    return;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     int                    xx = 0, yy = 0;
     window_info_t          wi;
     XSizeHints             hint;
     
-    if(private_data->visible) {
-      if((xitk_get_window_info(*(private_data->parent_wkey), &wi))) {
-	private_data->win_x = wi.x;
-	private_data->win_y = wi.y;
+    if(wp->visible) {
+      if((xitk_get_window_info(*(wp->parent_wkey), &wi))) {
+	wp->win_x = wi.x;
+	wp->win_y = wi.y;
 	WINDOW_INFO_ZERO(&wi);
       }
       
-      xitk_get_widget_pos(private_data->label_widget, &xx, &yy);
+      xitk_get_widget_pos(wp->label_widget, &xx, &yy);
       
-      yy += xitk_get_widget_height(private_data->label_widget);
-      private_data->win_x += xx;
-      private_data->win_y += yy;
+      yy += xitk_get_widget_height(wp->label_widget);
+      wp->win_x += xx;
+      wp->win_y += yy;
       
-      hint.x = private_data->win_x;
-      hint.y = private_data->win_y;
+      hint.x = wp->win_x;
+      hint.y = wp->win_y;
       hint.flags = PPosition;
 
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetWMNormalHints (private_data->imlibdata->x.disp,
-			 xitk_window_get_window(private_data->xwin),
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XSetWMNormalHints (wp->imlibdata->x.disp,
+			 xitk_window_get_window(wp->xwin),
 			 &hint);
-      XMoveWindow(private_data->imlibdata->x.disp, 
-		  (xitk_window_get_window(private_data->xwin)), 
-		  private_data->win_x, private_data->win_y);
-      XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
-      XSync(private_data->imlibdata->x.disp, False);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+      XMoveWindow(wp->imlibdata->x.disp, 
+		  (xitk_window_get_window(wp->xwin)), 
+		  wp->win_x, wp->win_y);
+      XMapRaised(wp->imlibdata->x.disp, (xitk_window_get_window(wp->xwin)));
+      XSync(wp->imlibdata->x.disp, False);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
-      while (!xitk_window_is_window_visible(private_data->xwin))
+      while (!xitk_window_is_window_visible(wp->xwin))
 	xitk_usec_sleep(5000);
       
-      XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-      XSetInputFocus(private_data->imlibdata->x.disp, 
-		     (xitk_window_get_window(private_data->xwin)), RevertToParent, CurrentTime);
-      XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+      XSetInputFocus(wp->imlibdata->x.disp, 
+		     (xitk_window_get_window(wp->xwin)), RevertToParent, CurrentTime);
+      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
       
       /* No widget focused, give focus to the first one */
-      if(private_data->widget_list->widget_focused == NULL)
-	xitk_set_focus_to_next_widget(private_data->widget_list, 0, 0);
-
+      if (wp->widget_list->widget_focused == NULL)
+        xitk_set_focus_to_next_widget(wp->widget_list, 0, 0);
     }
   }
 }
@@ -440,14 +541,14 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
  *
  */
 int xitk_combo_get_current_selected(xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+  if (!wp)
+    return -1;
 
-    return private_data->selected;
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    return wp->selected;
   }
-
   return -1;    
 }
 
@@ -455,15 +556,15 @@ int xitk_combo_get_current_selected(xitk_widget_t *w) {
  * 
  */
 const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+  if (!wp)
+    return NULL;
 
-    if(private_data->entries && private_data->selected >= 0)
-      return(private_data->entries[private_data->selected]);
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    if (wp->entries && wp->selected >= 0)
+      return (wp->entries[wp->selected]);
   }
-
   return NULL;    
 }
 
@@ -471,18 +572,19 @@ const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
  *
  */
 void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int len) {
+  _combo_private_t *wp = (_combo_private_t *)w;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+  if (!wp)
+    return;
 
-    private_data->entries     = list;
-    private_data->num_entries = len;
-    private_data->selected    = -1;
-    
-    xitk_browser_update_list(private_data->browser_widget, 
-			     (const char* const*)private_data->entries, NULL,
-			     private_data->num_entries, 0);
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    free (wp->entries);
+    wp->entries     = _combo_copy_string_list (list, &wp->num_entries);
+    wp->selected    = -1;
+
+    if (wp->xwin)
+      xitk_browser_update_list (wp->browser_widget,
+        (const char* const*)wp->entries, NULL, wp->num_entries, 0);
   }
 }
 
@@ -490,29 +592,23 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
  *
  */
 xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w) {
+  _combo_private_t *wp = (_combo_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
-    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
-    
-    return private_data->label_widget;
+  if (!wp)
+    return NULL;
+
+  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
+    return wp->label_widget;
   }
-
   return NULL;
 }
 
 /*
  *
  */
-static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
-					 xitk_skin_config_t *skonfig,
-                                         xitk_combo_widget_t *c, const char *skin_element_name,
-					 xitk_widget_t *mywidget, 
-					 combo_private_data_t *private_data,
-					 int visible, int enable) {
-  const char                **entries = c->entries;
-  unsigned int                itemw, itemh = 20;
-  unsigned int                slidw = 12;
+static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig,
+  xitk_combo_widget_t *c, const char *skin_element_name, _combo_private_t *wp, int visible, int enable) {
+  const char * const *entries = c->entries;
   xitk_browser_widget_t       browser;
   
   ABORT_IF_NULL(wl);
@@ -520,105 +616,38 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 
   XITK_WIDGET_INIT(&browser);
 
-  itemw = xitk_get_widget_width(private_data->label_widget);
-  itemw += xitk_get_widget_width(private_data->button_widget);
-  itemw -= 2; /* space for border */
+  wp->xwin = NULL;
 
-  private_data->imlibdata                = wl->imlibdata;
-  private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
-  private_data->entries                  = c->entries;
-  private_data->combo_widget             = mywidget;
-  private_data->parent_wlist             = c->parent_wlist;
-  private_data->parent_wkey              = c->parent_wkey;
-  private_data->callback                 = c->callback;
-  private_data->userdata                 = c->userdata;
+  wp->imlibdata                = wl->imlibdata;
+  wp->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
+  wp->combo_widget             = &wp->w;
+  wp->parent_wlist             = c->parent_wlist;
+  wp->parent_wkey              = c->parent_wkey;
+  wp->callback                 = c->callback;
+  wp->userdata                 = c->userdata;
+  wp->entries                  = _combo_copy_string_list (c->entries, &wp->num_entries);
+  wp->selected                 = -1;
   
-  private_data->selected = -1;
-  {
-    int i = 0;
-    
-    while(entries[i] != NULL) {
-      i++;
-    }
-    
-    private_data->num_entries = i;
-  }
-  
-  if(private_data->num_entries) {
-    xitk_label_change_label(private_data->label_widget, entries[0]);
-    private_data->selected = 0;
-  }
-  
-  private_data->xwin = xitk_window_create_simple_window(wl->imlibdata, 0, 0,
-							(itemw + 2), (itemh * 5) + slidw + 2);
-  XLOCK (wl->imlibdata->x.x_lock_display, wl->imlibdata->x.disp);
-
-  {
-    XSetWindowAttributes attr;
-    attr.override_redirect = True;
-    XChangeWindowAttributes (wl->imlibdata->x.disp,
-			     (xitk_window_get_window(private_data->xwin)),
-			     CWOverrideRedirect, &attr);
+  if (wp->num_entries) {
+    xitk_label_change_label (wp->label_widget, entries[0]);
+    wp->selected = 0;
   }
 
-  XSetTransientForHint (wl->imlibdata->x.disp,
-			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
-  
-  XUNLOCK (wl->imlibdata->x.x_unlock_display, wl->imlibdata->x.disp);
+  wp->w.parent       = NULL;
+  wp->w.private_data = wp;
+  wp->w.wl           = wl;
+  wp->w.enable       = enable;
+  wp->w.running      = 1;
+  wp->w.visible      = visible;
+  wp->w.have_focus   = FOCUS_LOST;
 
-  /* Change default classhint to new one. */
-  xitk_window_set_window_class(private_data->xwin, "Xitk Combo", "Xitk");
+  //  wp->w.x = wp->w.y = wp->w.width = wp->w.height = 0;
+  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_COMBO;
+  wp->w.event        = notify_event;
+  wp->w.tips_timeout = 0;
+  wp->w.tips_string  = NULL;
 
-  private_data->widget_list                = xitk_window_widget_list(private_data->xwin);
-
-  /* Browser */
-  browser.arrow_up.skin_element_name    = NULL;
-  browser.slider.skin_element_name      = NULL;
-  browser.arrow_dn.skin_element_name    = NULL;
-  browser.browser.skin_element_name     = NULL;
-  browser.browser.max_displayed_entries = 5;
-  browser.browser.num_entries           = private_data->num_entries;
-  browser.browser.entries               = (const char* const*)private_data->entries;
-  browser.callback                      = combo_select;
-  browser.dbl_click_callback            = NULL;
-  browser.parent_wlist                  = private_data->widget_list;
-  browser.userdata                      = (void*)mywidget;
-  private_data->browser_widget = xitk_noskin_browser_create (private_data->widget_list, &browser,
-    XITK_WIDGET_LIST_GC(private_data->widget_list),
-    1, 1, (itemw - slidw), itemh, slidw, DEFAULT_FONT_10);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->browser_widget->node);
-  xitk_enable_and_show_widget(private_data->browser_widget);
-  private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
-  
-  xitk_browser_update_list(private_data->browser_widget, 
-			   (const char* const*)private_data->entries, NULL,
-			   private_data->num_entries, 0);
-  
-  private_data->widget_key = 
-    xitk_register_event_handler("xitk combo",
-                                private_data->xwin,
-				_combo_handle_event,
-				NULL,
-				NULL,
-				private_data->widget_list,
-				(void *) private_data);
-
-  private_data->visible  = 0;
-
-  mywidget->private_data = private_data;
-  mywidget->wl           = wl;
-  mywidget->enable       = enable;
-  mywidget->running      = 1;
-  mywidget->visible      = visible;
-  mywidget->have_focus   = FOCUS_LOST;
-
-  //  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->type         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-  mywidget->event        = notify_event;
-  mywidget->tips_timeout = 0;
-  mywidget->tips_string  = NULL;
-
-  return mywidget;
+  return &wp->w;
 }
 
 /*
@@ -627,56 +656,59 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
 				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
 				 xitk_widget_t **lw, xitk_widget_t **bw) {
-  xitk_widget_t              *mywidget;
-  combo_private_data_t       *private_data;
-  xitk_checkbox_widget_t      cb;
-  xitk_label_widget_t         lbl;
+  _combo_private_t        *wp;
+  xitk_checkbox_widget_t   cb;
+  xitk_label_widget_t      lbl;
   
   XITK_CHECK_CONSTITENCY(c);
-
-  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   XITK_WIDGET_INIT(&cb);
   XITK_WIDGET_INIT(&lbl);
 
-  private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
+  wp = (_combo_private_t *) xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
   /* Create label and button (skinable) */
   lbl.label             = "";
   lbl.skin_element_name = c->skin_element_name;
   lbl.callback          = _combo_rollunroll_from_lbl;
-  lbl.userdata          = (void *)mywidget;
-  private_data->label_widget = xitk_label_create (c->parent_wlist, skonfig, &lbl);
-  xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->label_widget->node);
-  private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  lbl.userdata          = (void *)wp;
+  if ((wp->label_widget = xitk_label_create (c->parent_wlist, skonfig, &lbl))) {
+    wp->label_widget->parent = &wp->w;
+    wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+    xitk_dlist_add_tail (&c->parent_wlist->list, &wp->label_widget->node);
+  }
 
   cb.skin_element_name = c->skin_element_name;
   cb.callback          = _combo_rollunroll;
-  cb.userdata          = (void *)mywidget;
-  private_data->button_widget = xitk_checkbox_create (c->parent_wlist, skonfig, &cb);
-  xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->button_widget->node);
-  private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  cb.userdata          = (void *)wp;
+  if ((wp->button_widget = xitk_checkbox_create (c->parent_wlist, skonfig, &cb))) {
+    wp->button_widget->parent = &wp->w;
+    wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+    xitk_dlist_add_tail (&c->parent_wlist->list, &wp->button_widget->node);
+  }
 
   if(lw)
-    *lw = private_data->label_widget;
+    *lw = wp->label_widget;
   if(bw)
-    *bw = private_data->button_widget;
+    *bw = wp->button_widget;
   
   {
     int x, y;
     
-    xitk_get_widget_pos(private_data->label_widget, &x, &y);
+    xitk_get_widget_pos(wp->label_widget, &x, &y);
 
-    mywidget->x = x;
-    mywidget->y = y;
+    wp->w.x = x;
+    wp->w.y = y;
 
-    x += xitk_get_widget_width(private_data->label_widget);
+    x += xitk_get_widget_width(wp->label_widget);
     
-    (void) xitk_set_widget_pos(private_data->button_widget, x, y);
+    (void) xitk_set_widget_pos(wp->button_widget, x, y);
   }
-  return _xitk_combo_create(wl, skonfig, c, c->skin_element_name, mywidget, private_data,
-			    (xitk_skin_get_visibility(skonfig, c->skin_element_name)) ? 1 : -1,
-			    xitk_skin_get_enability(skonfig, c->skin_element_name));
+  return _xitk_combo_create (wl, skonfig, c, c->skin_element_name, wp,
+    xitk_skin_get_visibility (skonfig, c->skin_element_name) ? 1 : -1,
+    xitk_skin_get_enability (skonfig, c->skin_element_name));
 }
 
 /*
@@ -686,22 +718,22 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
 					xitk_combo_widget_t *c,
 					int x, int y, int width, 
 					xitk_widget_t **lw, xitk_widget_t **bw) {
-  xitk_widget_t              *mywidget;
-  combo_private_data_t       *private_data;
-  xitk_checkbox_widget_t      cb;
-  xitk_label_widget_t         lbl;
+  _combo_private_t        *wp;
+  xitk_checkbox_widget_t   cb;
+  xitk_label_widget_t      lbl;
 
   ABORT_IF_NULL(wl);
   ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(c);
 
-  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
+  wp = (_combo_private_t *) xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
   XITK_WIDGET_INIT(&cb);
   XITK_WIDGET_INIT(&lbl);
 
-  private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
 
   /* Create label and button (skinable) */
   {
@@ -716,47 +748,43 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     lbl.skin_element_name = NULL;
     lbl.label             = "";
     lbl.callback          = _combo_rollunroll_from_lbl;
-    lbl.userdata          = (void *)mywidget;
-    private_data->label_widget = xitk_noskin_label_create (c->parent_wlist, &lbl,
-      x, y, (width - height), height, DEFAULT_FONT_10);
-    xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->label_widget->node);
-    private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+    lbl.userdata          = (void *)wp;
+    if ((wp->label_widget = xitk_noskin_label_create (c->parent_wlist, &lbl,
+      x, y, (width - height), height, DEFAULT_FONT_10))) {
+      wp->label_widget->parent = &wp->w;
+      wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+      xitk_dlist_add_tail (&c->parent_wlist->list, &wp->label_widget->node);
+    }
 
-    cb.skin_element_name = NULL;
+    cb.skin_element_name = "XITK_NOSKIN_DOWN";
     cb.callback          = _combo_rollunroll;
-    cb.userdata          = (void *)mywidget;
+    cb.userdata          = (void *)wp;
 
-    private_data->button_widget = xitk_noskin_checkbox_create (c->parent_wlist, &cb,
-      x + (width - height), y, height, height);
-    xitk_dlist_add_tail (&c->parent_wlist->list, &private_data->button_widget->node);
-    private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
-  
+    if ((wp->button_widget = xitk_noskin_checkbox_create (c->parent_wlist, &cb,
+      x + (width - height), y, height, height))) {
+      wp->button_widget->parent = &wp->w;
+      wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+      xitk_dlist_add_tail (&c->parent_wlist->list, &wp->button_widget->node);
+    }
+
     if(lw)
-      *lw = private_data->label_widget;
+      *lw = wp->label_widget;
     if(bw)
-      *bw = private_data->button_widget;
+      *bw = wp->button_widget;
     
-    mywidget->x = x;
-    mywidget->y = y;
-    mywidget->width = width;
-    mywidget->height = height;
+    wp->w.x = x;
+    wp->w.y = y;
+    wp->w.width = width;
+    wp->w.height = height;
     
     {
-      xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->label_widget);
+      xitk_image_t *wimage = xitk_get_widget_foreground_skin(wp->label_widget);
       
       if(wimage)
         draw_rectangular_inner_box(wimage->image, 0, 0, wimage->width - 1, wimage->height - 1);
-
-      wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
-      
-      if(wimage) {
-        draw_bevel_three_state(wimage);
-        draw_arrow_down(wimage);
-      }
-      
     }
 
   }
 
-  return _xitk_combo_create(wl, NULL, c, NULL, mywidget, private_data, 0, 0);
+  return _xitk_combo_create (wl, NULL, c, NULL, wp, 0, 0);
 }

@@ -1108,25 +1108,17 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
-	
+
 	if(wl->widget_focused && (wl->widget_focused->type & WIDGET_GROUP_MENU))
 	  menu = xitk_menu_get_menu(wl->widget_focused);
 
-	if((wl->widget_focused->type & WIDGET_GROUP_COMBO)) {
-	  if(((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)
-	     || ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-
-	    if((!(mywidget && 
-		  ((((mywidget->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) || 
-		    ((mywidget->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) &&
-		   (xitk_combo_is_same_parent(wl->widget_focused, mywidget) == 1)))) ||
-	       (!mywidget)) {
-
-	      if(xitk_checkbox_get_state(wl->widget_focused))
-		xitk_combo_rollunroll(wl->widget_focused);
-	      
-	    }
-	  }
+        if (wl->widget_focused->type & WIDGET_GROUP_COMBO) {
+          if (mywidget && (mywidget->type & WIDGET_GROUP_COMBO) && (wl->widget_focused->parent == mywidget->parent)) {
+            ;
+          } else {
+            if (xitk_checkbox_get_state (wl->widget_focused))
+              xitk_combo_rollunroll (wl->widget_focused);
+          }
 	}
 	else {
 	  event.type  = WIDGET_EVENT_FOCUS;

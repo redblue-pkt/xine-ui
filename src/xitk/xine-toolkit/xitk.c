@@ -2256,13 +2256,11 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           if (fx->widget_list) {
             xitk_widget_t *w = (xitk_widget_t *)fx->widget_list->list.head.next;
             while (w->node.next) {
-	      if(((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-		 (w->type & WIDGET_GROUP_WIDGET)) {
-		xitk_combo_update_pos(w);
-	      }
-	      w = (xitk_widget_t *)w->node.next;
-	    }
-	  }
+              if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
+                xitk_combo_update_pos (w);
+              w = (xitk_widget_t *)w->node.next;
+            }
+          }
 
 	  /* Inform application about window movement. */
 	  if(fx->newpos_callback) {

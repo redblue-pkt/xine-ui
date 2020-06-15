@@ -265,8 +265,16 @@ typedef struct {
 #define WIDGET_GROUP_DOUBLEBOX      0x00040000
 #define WIDGET_GROUP_MENU           0x00080000
 
-/* Real widgets. */
 #define WIDGET_TYPE_MASK            0x00001FFF
+/* Group leaders.. */
+#define WIDGET_TYPE_COMBO           0x00001001
+#define WIDGET_TYPE_DOUBLEBOX       0x00001002
+#define WIDGET_TYPE_INTBOX          0x00001003
+#define WIDGET_TYPE_BROWSER         0x00001004
+#define WIDGET_TYPE_MRLBROWSER      0x00001005
+#define WIDGET_TYPE_TABS            0x00001006
+#define WIDGET_TYPE_MENU            0x00001007
+/* Real widgets. */
 #define WIDGET_TYPE_BUTTON          0x00000001
 #define WIDGET_TYPE_LABELBUTTON     0x00000002
 #define WIDGET_TYPE_LABEL           0x00000003
@@ -1832,11 +1840,6 @@ void xitk_combo_update_pos(xitk_widget_t *w);
  *
  */
 void xitk_combo_rollunroll(xitk_widget_t *w);
-
-/**
- *
- */
-int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2);
 
 /**
  *
