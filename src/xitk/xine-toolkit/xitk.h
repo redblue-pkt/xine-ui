@@ -613,7 +613,7 @@ typedef struct {
   int                               magic;
   const char                       *skin_element_name;
   int                               layer_above;
-  Pixmap                           *icon;
+  xitk_pixmap_t                    *icon;
   int                               set_wm_window_normal;
 
   int                               x;
@@ -1898,6 +1898,9 @@ xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int 
 
 void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
 
+xitk_pixmap_t *xitk_pixmap_create_from_data(ImlibData *im, int width, int height, const char *data);
+Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p);
+
 /*
  *
  */
@@ -2156,8 +2159,7 @@ void xitk_window_set_window_title(xitk_window_t *w, const char *title);
 /*
  *
  */
-void xitk_set_window_icon(Display *display, Window window, Pixmap icon);
-void xitk_window_set_window_icon(xitk_window_t *w, Pixmap icon);
+void xitk_window_set_window_icon(xitk_window_t *w, xitk_pixmap_t *);
 
 /*
  *

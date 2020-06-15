@@ -1120,7 +1120,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->icon_pixmap = vwin->gui->icon;
+    wm_hint->icon_pixmap = xitk_pixmap_get_pixmap(vwin->gui->icon);
     wm_hint->flags = InputHint | StateHint | IconPixmapHint;
     XSetWMHints (vwin->video_display, vwin->video_window, wm_hint);
     XFree(wm_hint);
@@ -1865,7 +1865,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
 
   vwin->wm_hint->input         = True;
   vwin->wm_hint->initial_state = NormalState;
-  vwin->wm_hint->icon_pixmap   = vwin->gui->icon;
+  vwin->wm_hint->icon_pixmap   = xitk_pixmap_get_pixmap(vwin->gui->icon);
   vwin->wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
 
   vwin->gui->x_unlock_display (vwin->video_display);
