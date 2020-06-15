@@ -263,6 +263,15 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 					  xitk_button_widget_t *b,
 					  int x, int y, int width, int height) {
+  static const char *noskin_names[] = {
+    "XITK_NOSKIN_LEFT",
+    "XITK_NOSKIN_RIGHT",
+    "XITK_NOSKIN_UP",
+    "XITK_NOSKIN_DOWN",
+    "XITK_NOSKIN_PLUS",
+    "XITK_NOSKIN_MINUS"
+  };
+  unsigned int u = sizeof (noskin_names) / sizeof (noskin_names[0]);
   xitk_image_t *i;
 
   ABORT_IF_NULL(wl);
@@ -270,8 +279,42 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(b);
 
-  i = xitk_image_create_image(wl->imlibdata, width * 3, height);
-  draw_bevel_three_state(i);
+  if (b->skin_element_name) {
+    for (u = 0; u < sizeof (noskin_names) / sizeof (noskin_names[0]); u++) {
+      if (!strcmp (b->skin_element_name, noskin_names[u]))
+        break;
+    }
+    b->skin_element_name = NULL;
+  }
+  if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
+    i = xitk_image_create_image (wl->imlibdata, width * 3, height);
+    draw_bevel_three_state (i);
+  } else {
+    if (xitk_shared_image (wl, noskin_names[u], width * 3, height, &i) == 1) {
+      draw_bevel_three_state (i);
+      switch (u) {
+        case 0:
+          draw_arrow_left (i);
+          break;
+        case 1:
+          draw_arrow_right (i);
+          break;
+        case 2:
+          draw_arrow_up (i);
+          break;
+        case 3:
+          draw_arrow_down (i);
+          break;
+        case 4:
+          draw_button_plus (i);
+          break;
+        case 5:
+          draw_button_minus (i);
+          break;
+        default: ;
+      }
+    }
+  }
 
   return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 0, 0);
 }
