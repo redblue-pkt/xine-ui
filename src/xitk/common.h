@@ -389,8 +389,6 @@ struct gGui_st {
   int                        last_playback_speed;
 
   /* main.c */
-  char                     **video_driver_ids;
-  char                     **audio_driver_ids;
   window_attributes_t        window_attribute;
 };
 
