@@ -183,22 +183,6 @@ typedef struct {
   char                              colorname[20];
 } xitk_color_names_t;
 
-#define MWM_HINTS_DECORATIONS       (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS     5
-typedef struct _mwmhints {
-  unsigned long                     flags;
-  unsigned long                     functions;
-  unsigned long                     decorations;
-  long                              input_mode;
-  unsigned long                     status;
-} MWMHints;
-
-typedef struct {
-  int                               enabled;
-  int                               offset_x;
-  int                               offset_y;
-} xitk_move_t;
-
 typedef struct {
   xitk_window_t                    *xwin;
   char                             *name;
@@ -807,8 +791,10 @@ xitk_window_t *xitk_get_window(xitk_register_key_t key);
 /*
  * Initialization function, should be the first call to widget lib.
  */
-xitk_t *xitk_init(Display *display, void (*x_lock_display) (Display *display),
-  void (*x_unlock_display) (Display *display), int verbosity);
+xitk_t *xitk_init(const char *prefered_visual, int install_colormap,
+                  int use_x_lock_display, int use_synchronized_x, int verbosity);
+
+void xitk_free(xitk_t **);
 
 /*
  *

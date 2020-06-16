@@ -30,7 +30,56 @@
 
 #include <X11/Xlib.h>
 
-void xitk_x11_find_visual(Display *display, int screen, VisualID prefered_visual_id, int prefered_visual_class,
+/*
+ *
+ */
+
+#define MWM_HINTS_DECORATIONS       (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS     5
+typedef struct _mwmhints {
+  unsigned long                     flags;
+  unsigned long                     functions;
+  unsigned long                     decorations;
+  long                              input_mode;
+  unsigned long                     status;
+} MWMHints;
+
+/*
+ * X11 helpers
+ */
+
+void xitk_x11_find_visual(Display *display, int screen, const char *prefered_visual,
                           Visual **visual_out, int *depth_out);
+
+void xitk_x11_xrm_parse(const char *xrm_class_name,
+                        char **geometry, int *borderless,
+                        char **prefered_visual, int *install_colormap);
+
+int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h);
+
+Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity);
+
+/*
+ * access to xitk X11
+ */
+
+#include "xitk/Imlib-light/Imlib_types.h"
+
+#define xitk_t struct xitk_s
+#define ImlibData struct _ImlibData
+struct xitk_s;
+struct _ImlibData;
+
+void        xitk_x11_select_visual(xitk_t *, Visual *gui_visual);
+
+Display    *xitk_x11_get_display(xitk_t *);
+Visual     *xitk_x11_get_visual(xitk_t *);
+int         xitk_x11_get_depth(xitk_t *);
+Colormap    xitk_x11_get_colormap(xitk_t *);
+
+ImlibData  *xitk_x11_get_imlib_data(xitk_t *xitk);
+
+#undef xitk_t
+#undef ImlibData
 
 #endif /* _XITK_X11_H_ */

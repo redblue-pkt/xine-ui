@@ -61,6 +61,8 @@ struct xitk_s {
   void    (*x_lock_display) (Display *display);
   void    (*x_unlock_display) (Display *display);
 
+  ImlibData         *imlibdata;
+
   xitk_font_cache_t *font_cache;
 
   struct xitk_tips_s *tips;

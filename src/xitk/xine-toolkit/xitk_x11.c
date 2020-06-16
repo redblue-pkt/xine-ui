@@ -28,13 +28,167 @@
 #include "xitk_x11.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xresource.h>
+
+#include <xine/xineutils.h> /* xine_get_homedir() */
+
+#include "_xitk.h" /* xitk_get_bool_value */
 
 #include "xitkintl.h"
 
-void xitk_x11_find_visual(Display *display, int screen, VisualID prefered_visual_id, int prefered_visual_class,
+#include "../../common/dump.h"
+
+/*
+*
+*/
+
+int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h) {
+  int xoff, yoff, ret;
+  unsigned int width, height;
+
+  if ((ret = XParseGeometry(geomstr, &xoff, &yoff, &width, &height))) {
+
+    if ((ret & XValue) && x)
+      *x = xoff;
+    if ((ret & YValue) && y)
+      *y = yoff;
+    if ((ret & WidthValue) && w)
+      *w = width;
+    if ((ret & HeightValue) && h)
+      *h = height;
+
+    return 1;
+  }
+  return 0;
+}
+
+void xitk_x11_xrm_parse(const char *xrm_class_name,
+                        char **geometry, int *borderless,
+                        char **prefered_visual, int *install_colormap) {
+  Display      *display;
+  char         *environment_buf = NULL;
+  char         *wide_dbname;
+  const char   *environment;
+  char         *str_type;
+  XrmDatabase   rmdb, home_rmdb, server_rmdb;
+  XrmValue      value;
+
+  XrmInitialize();
+
+  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL)
+    return;
+
+  rmdb = home_rmdb = server_rmdb = NULL;
+
+  wide_dbname = xitk_asprintf("%s%s", "/usr/lib/X11/app-defaults/", xrm_class_name);
+  if (wide_dbname) {
+    XrmDatabase application_rmdb;
+    application_rmdb = XrmGetFileDatabase(wide_dbname);
+    free(wide_dbname);
+    if (application_rmdb)
+      XrmMergeDatabases(application_rmdb, &rmdb);
+  }
+
+
+  if(XResourceManagerString(display) != NULL) {
+    server_rmdb = XrmGetStringDatabase(XResourceManagerString(display));
+  } else {
+    char *user_dbname = xitk_asprintf("%s/.Xdefaults", xine_get_homedir());
+    if (user_dbname)
+      server_rmdb = XrmGetFileDatabase(user_dbname);
+  }
+
+  XrmMergeDatabases(server_rmdb, &rmdb);
+
+  if ((environment = getenv("XENVIRONMENT")) == NULL) {
+    char host[128] = "";
+
+    if (gethostname(host, sizeof(host)) < 0)
+      goto fail;
+    environment_buf = xitk_asprintf("%s/.Xdefaults-%s", xine_get_homedir(), host);
+    environment = environment_buf;
+  }
+
+  home_rmdb = XrmGetFileDatabase(environment);
+  free(environment_buf);
+
+  if (home_rmdb)
+    XrmMergeDatabases(home_rmdb, &rmdb);
+
+  if (geometry) {
+    if (XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", &str_type, &value) == True) {
+      *geometry = strdup((const char *)value.addr);
+    }
+  }
+
+  if (borderless) {
+    if (XrmGetResource(rmdb, "xine.border", "xine.Border", &str_type, &value) == True) {
+      *borderless = !xitk_get_bool_value((char *)value.addr);
+    }
+  }
+
+  if (prefered_visual) {
+    if (XrmGetResource(rmdb, "xine.visual", "xine.Visual", &str_type, &value) == True) {
+      *prefered_visual = strdup((const char *)value.addr);
+    }
+  }
+
+  if (install_colormap) {
+    if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", &str_type, &value) == True) {
+      *install_colormap = !xitk_get_bool_value((char *)value.addr);
+    }
+  }
+
+  XrmDestroyDatabase(rmdb);
+
+ fail:
+  XCloseDisplay(display);
+}
+
+static int parse_visual(VisualID *vid, int *vclass, const char *visual_str) {
+  int ret = 0;
+  unsigned int visual = 0;
+
+  if (sscanf(visual_str, "%x", &visual) == 1) {
+    *vid = visual;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "StaticGray") == 0) {
+    *vclass = StaticGray;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "GrayScale") == 0) {
+    *vclass = GrayScale;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "StaticColor") == 0) {
+    *vclass = StaticColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "PseudoColor") == 0) {
+    *vclass = PseudoColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "TrueColor") == 0) {
+    *vclass = TrueColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "DirectColor") == 0) {
+    *vclass = DirectColor;
+    ret = 1;
+  }
+
+  return ret;
+}
+
+void xitk_x11_find_visual(Display *display, int screen, const char *prefered_visual,
                           Visual **visual_out, int *depth_out)
 {
   XWindowAttributes  attribs;
@@ -43,6 +197,14 @@ void xitk_x11_find_visual(Display *display, int screen, VisualID prefered_visual
   int                num_visuals;
   int                depth = 0;
   Visual            *visual = NULL;
+  VisualID           prefered_visual_id = None;
+  int                prefered_visual_class = -1;
+
+  if (prefered_visual) {
+    if (!parse_visual(&prefered_visual_id, &prefered_visual_class, prefered_visual)) {
+      fprintf(stderr, "error parsing visual '%s'\n", prefered_visual);
+    }
+  }
 
   if (prefered_visual_id == None) {
     /*
@@ -119,3 +281,31 @@ void xitk_x11_find_visual(Display *display, int screen, VisualID prefered_visual
     *visual_out = visual;
 }
 
+Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity)
+{
+  Display *display;
+
+  if (!XInitThreads ()) {
+    printf (_("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n"));
+    exit(1);
+  }
+
+  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
+    fprintf(stderr, _("Cannot open display\n"));
+    exit(1);
+  }
+
+  if (use_synchronized_x) {
+    XSynchronize (display, True);
+    fprintf (stderr, _("Warning! Synchronized X activated - this is very slow...\n"));
+  }
+
+  /* Some infos */
+  if(verbosity) {
+    dump_host_info();
+    dump_cpu_infos();
+    dump_xfree_info(display, DefaultScreen(display), verbosity);
+  }
+
+  return display;
+}

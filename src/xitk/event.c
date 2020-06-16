@@ -1451,17 +1451,12 @@ void gui_deinit (gGui_t *gui) {
  * Initialize the GUI
  */
 
-static void gui_dummy_un_lock_display (Display *display) {
-  (void)display;
-}
-
-void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *window_attribute) {
+void gui_init (gGui_t *gui, gui_init_params_t *p) {
   int    i;
-  int    depth;
   char  *server;
-  const char *video_display_name;
   pthread_mutexattr_t attr;
-  Visual             *visual;
+  int    use_x_lock_display;
+  int    use_synchronized_x11;
 
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -1474,8 +1469,8 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   /*
    * init playlist
    */
-  for (i = 0; i < nfiles; i++) {
-    char *file = filenames[i];
+  for (i = 0; i < p->num_files; i++) {
+    char *file = p->filenames[i];
 
     /* grab recursively all files from dir */
     if(is_a_dir(file)) {
@@ -1520,56 +1515,22 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
    * X / imlib stuff
    */
 
-  if (xine_config_register_bool (gui->xine, "gui.use_XLockDisplay", 1,
+  use_x_lock_display =
+    xine_config_register_bool (gui->xine, "gui.use_XLockDisplay", 1,
         _("Enable extra XLib thread safety."),
         _("This is needed for some very old XLib/XCB versions.\n"
           "Otherwise, it may boost or brake performance - just try out."),
-        CONFIG_LEVEL_ADV, NULL, NULL)) {
-    gui->x_lock_display = XLockDisplay;
-    gui->x_unlock_display = XUnlockDisplay;
-  } else {
-    gui->x_lock_display =
-    gui->x_unlock_display = gui_dummy_un_lock_display;
-  }
+        CONFIG_LEVEL_ADV, NULL, NULL);
 
-  if (!XInitThreads ()) {
-    printf (_("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n"));
-    exit(1);
-  }
-  
-  if((gui->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
-    fprintf(stderr, _("Cannot open display\n"));
-    exit(1);
-  }
-
-  video_display_name = 
-    xine_config_register_string (gui->xine, "gui.video_display",
-					 "",
-					 _("Name of video display"),
-					 _("Use this setting to configure to which "
-                                           "display xine will show videos. When left blank, "
-                                           "the main display will be used. Setting this "                  "option to something like ':0.1' or ':1' makes "
-                                           "possible to display video and control on different "
-                                           "screens (very useful for TV presentations)."),
-					 CONFIG_LEVEL_ADV,
-					 NULL,
-					 CONFIG_NO_DATA);
-  
-
-  if (xine_config_register_bool (gui->xine, "gui.xsynchronize", 
+  use_synchronized_x11 =
+    xine_config_register_bool (gui->xine, "gui.xsynchronize", 
 				 0,
 				 _("Synchronized X protocol (debug)"), 
 				 _("Do X transactions in synchronous mode. "
 				   "Very slow, use only for debugging!"), 
 				 CONFIG_LEVEL_ADV,
 				 CONFIG_NO_CB,
-				 CONFIG_NO_DATA)) {
-
-    gui->x_lock_display (gui->display);
-    XSynchronize (gui->display, True);
-    gui->x_unlock_display (gui->display);
-    fprintf (stderr, _("Warning! Synchronized X activated - this is very slow...\n"));
-  }
+                                 CONFIG_NO_DATA);
 
   gui->layer_above = 
     xine_config_register_bool (gui->xine, "gui.layer_above", 0,
@@ -1770,30 +1731,25 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
   gui->alphanum.set = 0;
   gui->alphanum.arg = "";
 
-  gui->x_lock_display (gui->display);
-
-  /* Some infos */
-  if(__xineui_global_verbosity) {
-    dump_host_info();
-    dump_cpu_infos();
-    dump_xfree_info(gui->display, DefaultScreen(gui->display), (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) ? 1 : 0);
-  }
-
-  xitk_x11_find_visual(gui->display, DefaultScreen(gui->display), gui->prefered_visual_id, gui->prefered_visual_class,
-                       &visual, &depth);
-
-  gui_init_imlib (gui, visual);
-
-  gui->x_unlock_display (gui->display);
-
   /*
    * create and map panel and video window
    */
+
   xine_pid = getppid();
 
-  gui->xitk =
-  xitk_init (gui->display, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
-  
+  gui->xitk = xitk_init (p->prefered_visual, p->install_colormap,
+                         use_x_lock_display, use_synchronized_x11,
+                         (__xineui_global_verbosity) ? 1 : 0);
+
+  gui->imlib_data = xitk_x11_get_imlib_data(gui->xitk);
+
+  /*
+   * create an icon pixmap
+   */
+
+  gui->icon = xitk_pixmap_create_from_data(gui->imlib_data, 40, 40, (const char *)icon_datas);
+
+
   preinit_skins_support();
   
   if(gui->splash)
@@ -1803,9 +1759,10 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
 
   gui->on_quit = 0;
   gui->running = 1;
-  
-  video_window_init (gui, video_display_name, depth, window_attribute,
-    ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
+
+  video_window_init (gui, p->window_id, p->borderless, p->geometry,
+                     ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0),
+                     p->prefered_visual, use_x_lock_display);
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
    * when done before the video_window_init(). */
@@ -1815,48 +1772,6 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
 
   panel_init (gui);
   gui->event_reject = 0;
-}
-
-void gui_init_imlib (gGui_t *gui, Visual *vis) {
-  ImlibInitParams	imlib_init;
-
-  /*
-   * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
-   * However, we have to reinitialize Imlib if we have to change the visual.
-   * This will be a (small) memory leak.
-   */
-  imlib_init.flags = PARAMS_VISUALID;
-  imlib_init.visualid = vis->visualid;
-  if (gui->install_colormap && (vis->class & 1)) {
-      /*
-       * We're using a visual with changable colors / colormaps
-       * (According to the comment in X11/X.h, an odd display class
-       * has changable colors), and the user requested to install a
-       * private colormap for xine.  Allocate a fresh colormap for
-       * Imlib and Xine.
-       */
-      Colormap cm;
-      cm = XCreateColormap(gui->display, 
-                           RootWindow(gui->display, DefaultScreen(gui->display)),
-			   vis, AllocNone);
-
-      imlib_init.cmap = cm;
-      imlib_init.flags |= PARAMS_COLORMAP;
-  }
-  gui->imlib_data = Imlib_init_with_params (gui->display, &imlib_init);
-  if (gui->imlib_data == NULL) {
-    fprintf(stderr, _("Unable to initialize Imlib\n"));
-    exit(1);
-  }
-
-  gui->imlib_data->x.x_lock_display = gui->x_lock_display;
-  gui->imlib_data->x.x_unlock_display = gui->x_unlock_display;
-
-  /*
-   * create an icon pixmap
-   */
-
-  gui->icon = xitk_pixmap_create_from_data(gui->imlib_data, 40, 40, (const char *)icon_datas);
 }
 
 /*
@@ -1902,8 +1817,7 @@ static void on_stop (void *data) {
   gui_exit_2 (gui);
 }
 
-void gui_run(char **session_opts) {
-  gGui_t *gui = gGui;
+void gui_run(gGui_t *gui, char **session_opts) {
   _startup_t  startup;
   int         i, auto_start = 0;
   
@@ -2059,5 +1973,19 @@ void gui_run(char **session_opts) {
 
   kbindings_save_kbinding(gui->kbindings);
   kbindings_free_kbinding(&gui->kbindings);
+
+  /*
+   * Close X display before unloading modules linked against libGL.so
+   * https://www.xfree86.org/4.3.0/DRI11.html
+   *
+   * Do not close the library with dlclose() until after XCloseDisplay() has
+   * been called. When libGL.so initializes itself it registers several
+   * callbacks functions with Xlib. When XCloseDisplay() is called those
+   * callback functions are called. If libGL.so has already been unloaded
+   * with dlclose() this will cause a segmentation fault.
+   */
+  xitk_free(&gui->xitk);
+
+  gui->imlib_data = NULL;
 }
 

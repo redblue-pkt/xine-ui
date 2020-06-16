@@ -26,13 +26,24 @@
 
 #include "common.h"
 
+typedef struct {
+  int    num_files;
+  char **filenames;
+
+  /* X11 */
+  int            window_id;
+  int            borderless;
+  /*const*/char *geometry;
+  /*const*/char *prefered_visual;
+  int            install_colormap;
+} gui_init_params_t;
+
 int hidden_file_cb(int action, int value);
 void dummy_config_cb(void *data, xine_cfg_entry_t *cfg);
 int actions_on_start(action_id_t actions[], action_id_t a);
 void gui_deinit (gGui_t *gui);
-void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *window_attribute);
-void gui_init_imlib (gGui_t *gui, Visual *vis);
-void gui_run(char **session_opts);
+void gui_init (gGui_t *gui, gui_init_params_t *params);
+void gui_run (gGui_t *gui, char **session_opts);
 int gui_playlist_play (gGui_t *gui, int idx);
 void gui_playlist_start_next (gGui_t *gui);
 void gui_execute_action_id (gGui_t *gui, action_id_t id);
