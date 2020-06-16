@@ -255,40 +255,46 @@ static void xitk_font_unload_one(xitk_font_t *xtfs) {
 /*
  * init font cache subsystem
  */
-void xitk_font_cache_init (void) {
-  xitk_t *xitk = gXitk;
+xitk_font_cache_t *xitk_font_cache_init (void) {
+  xitk_font_cache_t *font_cache;
 
-  xitk->font_cache = malloc (sizeof (*xitk->font_cache));
+  font_cache = malloc (sizeof (*font_cache));
 
-  if (xitk->font_cache) {
-    xitk->font_cache->n    = 0;
-    xitk->font_cache->life = 0;
-    xitk_dlist_init (&xitk->font_cache->loaded);
-    pthread_mutex_init (&xitk->font_cache->mutex, NULL);
+  if (font_cache) {
+    font_cache->n    = 0;
+    font_cache->life = 0;
+    xitk_dlist_init (&font_cache->loaded);
+    pthread_mutex_init (&font_cache->mutex, NULL);
 #ifdef WITH_XFT
-    xitk->font_cache->xr = xitk_recode_init (NULL, "UTF-8", 1);
+    font_cache->xr = xitk_recode_init (NULL, "UTF-8", 1);
 #else
-    xitk->font_cache->xr = NULL;
+    font_cache->xr = NULL;
 #endif
   }
+
+  return font_cache;
 }
 
 /*
  * destroy font cache subsystem
  */
-void xitk_font_cache_done(void) {
-  xitk_t *xitk = gXitk;
+void xitk_font_cache_destroy(xitk_font_cache_t **p) {
+  xitk_font_cache_t *font_cache = *p;
   size_t       i;
   xitk_font_t *xtfs;
 
-  for (i = 0; i < xitk->font_cache->n; i++) {
-    xtfs = xitk->font_cache->items[i].font;
+  if (!font_cache)
+    return;
+  *p = NULL;
+
+  for (i = 0; i < font_cache->n; i++) {
+    xtfs = font_cache->items[i].font;
 
     xitk_font_unload_one(xtfs);
  
     free(xtfs);
   }
-  xitk->font_cache->n = 0;
+  font_cache->n = 0;
 
 #ifdef XITK_DEBUG
   {
@@ -303,13 +309,12 @@ void xitk_font_cache_done(void) {
   }
 #endif
 
-  xitk_dlist_clear (&xitk->font_cache->loaded);
-  pthread_mutex_destroy(&xitk->font_cache->mutex);
+  xitk_dlist_clear (&font_cache->loaded);
+  pthread_mutex_destroy(&font_cache->mutex);
 
-  xitk_recode_done(xitk->font_cache->xr);
+  xitk_recode_done(font_cache->xr);
 
-  free (xitk->font_cache);
-  xitk->font_cache = NULL;
+  free (font_cache);
 }
 
 /* 
