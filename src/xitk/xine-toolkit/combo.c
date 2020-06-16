@@ -32,7 +32,6 @@
 typedef struct {
   xitk_widget_t           w;
 
-  ImlibData              *imlibdata;
   char                   *skin_element_name;
 
   xitk_window_t          *xwin;
@@ -514,16 +513,16 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       hint.y = wp->win_y;
       hint.flags = PPosition;
 
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XSetWMNormalHints (wp->imlibdata->x.disp,
+      XLOCK (w->wl->imlibdata->x.x_lock_display, w->wl->imlibdata->x.disp);
+      XSetWMNormalHints (w->wl->imlibdata->x.disp,
 			 xitk_window_get_window(wp->xwin),
 			 &hint);
-      XMoveWindow(wp->imlibdata->x.disp, 
+      XMoveWindow(w->wl->imlibdata->x.disp,
 		  (xitk_window_get_window(wp->xwin)), 
 		  wp->win_x, wp->win_y);
-      XMapRaised(wp->imlibdata->x.disp, (xitk_window_get_window(wp->xwin)));
-      XSync(wp->imlibdata->x.disp, False);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+      XMapRaised(w->wl->imlibdata->x.disp, (xitk_window_get_window(wp->xwin)));
+      XSync(w->wl->imlibdata->x.disp, False);
+      XUNLOCK (w->wl->imlibdata->x.x_unlock_display, w->wl->imlibdata->x.disp);
 
       xitk_window_try_to_set_input_focus(wp->xwin);
 
@@ -615,7 +614,6 @@ static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_conf
 
   wp->xwin = NULL;
 
-  wp->imlibdata                = wl->imlibdata;
   wp->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   wp->combo_widget             = &wp->w;
   wp->parent_wlist             = wl;

@@ -34,7 +34,6 @@
 typedef struct {
   xitk_widget_t           w;
 
-  ImlibData              *imlibdata;
   char                   *skin_element_name;
 
   xitk_widget_t          *sWidget;
@@ -865,7 +864,6 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->imlibdata          = wl->imlibdata;
   wp->skin_element_name  = skin_element_name ? strdup (s->skin_element_name) : NULL;
 
   wp->sWidget            = &wp->w;
