@@ -614,7 +614,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 /*
  *
  */
-void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc, 
+void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
 			   int x, int y, const char *text, 
 			   size_t nbytes) {
 
@@ -628,7 +628,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
 #ifndef WITH_XFT
 # ifdef WITH_XMB
   if(xitk_get_xmb_enability())
-    XmbDrawString(xtfs->display, pix, xtfs->fontset, gc, x, y, text, nbytes);
+    XmbDrawString(xtfs->display, pixmap->pixmap, xtfs->fontset, gc, x, y, text, nbytes);
   else
 # endif
     XDrawString(xtfs->display, pix, gc, x, y, text, nbytes);
@@ -660,7 +660,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
     xr_color.green = paint_color.green;
     xr_color.blue  = paint_color.blue;
     xr_color.alpha = (short)-1;
-    xft_draw       = XftDrawCreate(xtfs->display, pix, visual, colormap);
+    xft_draw       = XftDrawCreate(xtfs->display, pixmap->pixmap, visual, colormap);
     XftColorAllocValue(xtfs->display, visual, colormap, &xr_color, &xcolor);
     XftDrawStringUtf8(xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
     XftColorFree(xtfs->display, visual, colormap, &xcolor);

@@ -142,7 +142,7 @@ static int _notify_inside (_lbutton_private_t *wp, int x, int y) {
  * Draw the string in pixmap pix, then return it
  */
 static void _create_labelofbutton (_lbutton_private_t *wp, Window win, GC gc,
-    Pixmap pix, int xsize, int ysize,
+    xitk_pixmap_t *pix, int xsize, int ysize,
     char *label, char *shortcut_label, int shortcut_pos, int state) {
   xitk_font_t             *fs = NULL;
   int                      lbear, rbear, width, asc, des;
@@ -329,7 +329,7 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
     }
       
     if (wp->label_visible) {
-      _create_labelofbutton (wp, wp->w.wl->win, wp->w.wl->gc, btn->pixmap,
+      _create_labelofbutton (wp, wp->w.wl->win, wp->w.wl->gc, btn,
         button_width, skin->height,
         wp->label, wp->shortcut_label, wp->shortcut_pos, state);
     }

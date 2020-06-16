@@ -312,7 +312,7 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
 		 0, 0, wp->font->width, wp->font->height, 0, 0);
       XSetForeground(wp->imlibdata->x.disp, font->image->gc, 
 		     xitk_get_pixel_color_black(wp->imlibdata));
-      xitk_font_draw_string(fs, bg->image->pixmap, font->image->gc,
+      xitk_font_draw_string(fs, bg->image, font->image->gc,
 		  2, ((wp->font->height + asc + des)>>1) - des,
 		  wp->label, wp->label_len);
       XCopyArea (wp->imlibdata->x.disp, bg->image->pixmap, wp->w.wl->win, font->image->gc,
