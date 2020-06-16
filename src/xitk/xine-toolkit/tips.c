@@ -130,7 +130,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       x += tips->widget->x;
       y += tips->widget->y;
       
-      fs = xitk_font_load_font(tips->display, DEFAULT_FONT_10);
+      fs = xitk_font_load_font(tips->widget->wl->xitk, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips->widget->wl->gc);
 
       xitk_font_unload_font(fs);

@@ -1715,7 +1715,7 @@ void xitk_skin_unlock(xitk_skin_config_t *);
 /*
  *
  */
-xitk_font_t *xitk_font_load_font(Display *display, const char *font);
+xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font);
 
 /*
  *

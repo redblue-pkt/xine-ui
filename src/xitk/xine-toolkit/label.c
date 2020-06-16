@@ -300,7 +300,7 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
       int            lbear, rbear, wid, asc, des;
       xitk_image_t  *bg;
 
-      fs = xitk_font_load_font(wp->imlibdata->x.disp, wp->fontname);
+      fs = xitk_font_load_font(wp->w.wl->xitk, wp->fontname);
       xitk_font_set_font(fs, wp->font->image->gc);
       xitk_font_string_extent (fs, wp->label, &lbear, &rbear, &wid, &asc, &des);
 

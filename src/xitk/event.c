@@ -1790,7 +1790,8 @@ void gui_init (gGui_t *gui, int nfiles, char *filenames[], window_attributes_t *
    * create and map panel and video window
    */
   xine_pid = getppid();
-  
+
+  gui->xitk =
   xitk_init (gui->display, gui->x_lock_display, gui->x_unlock_display, (__xineui_global_verbosity) ? 1 : 0);
   
   preinit_skins_support();

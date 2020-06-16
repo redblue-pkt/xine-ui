@@ -521,7 +521,6 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void kbedit_create_browser_entries(void) {
-  gGui_t *gui = gGui;
   int           i;
   
   if(kbedit->num_entries) {
@@ -1206,7 +1205,7 @@ void kbedit_window(void) {
   
   XITK_WIDGET_INIT(&l);
 
-  fs = xitk_font_load_font(gui->display, hboldfontname);
+  fs = xitk_font_load_font(gui->xitk, hboldfontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   fontheight = xitk_font_get_string_height(fs, " ");
   xitk_font_unload_font(fs);

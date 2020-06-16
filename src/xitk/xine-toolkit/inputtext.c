@@ -128,9 +128,9 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
   fs = font;
   if (!fs) {
     if (wp->fontname)
-      fs = xitk_font_load_font (wp->imlibdata->x.disp, wp->fontname);
+      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
     if (!fs)
-      fs = xitk_font_load_font (wp->imlibdata->x.disp, xitk_get_system_font ());
+      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
     if (!fs)
       return 0;
     xitk_font_set_font (fs, wp->iWidget->wl->gc);
@@ -565,9 +565,9 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   if (wp->text.buf && wp->text.buf[0]) {
     if (wp->fontname)
-      fs = xitk_font_load_font (wp->imlibdata->x.disp, wp->fontname);
+      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
     if (!fs) 
-      fs = xitk_font_load_font (wp->imlibdata->x.disp, xitk_get_system_font ());
+      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
     if (!fs)
       XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
     xitk_font_set_font (fs, wp->text.temp_gc);

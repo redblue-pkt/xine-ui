@@ -340,7 +340,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_button_widget_t       b;
     int                        xx = x;
       
-    fs = xitk_font_load_font(wl->imlibdata->x.disp, fontname);
+    fs = xitk_font_load_font(wl->xitk, fontname);
 
     xitk_font_set_font(fs, wl->gc);
     fheight = xitk_font_get_string_height(fs, " ");

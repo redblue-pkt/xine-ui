@@ -764,7 +764,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     xitk_font_t    *fs;
     int             height;
     
-    fs = xitk_font_load_font(wl->imlibdata->x.disp, DEFAULT_FONT_10);
+    fs = xitk_font_load_font(wl->xitk, DEFAULT_FONT_10);
     xitk_font_set_font(fs, wl->gc);
     height = xitk_font_get_string_height(fs, " ") + 4;
     xitk_font_unload_font(fs);

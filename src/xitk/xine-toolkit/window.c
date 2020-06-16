@@ -900,6 +900,7 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
  */
 xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title,
 						int x, int y, int width, int height) {
+  xitk_t *xitk = gXitk;
   xitk_window_t *xwin;
   xitk_pixmap_t  *bar, *pix_bg;
   unsigned int   colorblack, colorwhite, colorgray, colordgray;
@@ -917,7 +918,7 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title
   bar = xitk_image_create_xitk_pixmap(im, width, TITLE_BAR_HEIGHT);
   pix_bg = xitk_image_create_xitk_pixmap(im, width, height);
 
-  fs = xitk_font_load_font(im->x.disp, DEFAULT_BOLD_FONT_12);
+  fs = xitk_font_load_font(xitk, DEFAULT_BOLD_FONT_12);
   xitk_font_set_font(fs, bar->gc);
   xitk_font_string_extent(fs, (title && strlen(title)) ? title : "Window", &lbear, &rbear, &wid, &asc, &des);
 
