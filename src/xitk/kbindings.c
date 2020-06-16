@@ -522,7 +522,6 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 
 static void kbedit_create_browser_entries(void) {
   gGui_t *gui = gGui;
-  xitk_font_t  *fs;
   int           i;
   
   if(kbedit->num_entries) {
@@ -533,10 +532,7 @@ static void kbedit_create_browser_entries(void) {
     free((char **)kbedit->entries);
     free((char **)kbedit->shortcuts);
   }
-  
-  fs = xitk_font_load_font(gui->display, br_fontname);
-  xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-  
+
   kbedit->entries   = (char **) calloc(kbedit->kbt->num_entries, sizeof(char *));
   kbedit->shortcuts = (char **) calloc(kbedit->kbt->num_entries, sizeof(char *));
   kbedit->num_entries = kbedit->kbt->num_entries - 1;
@@ -559,8 +555,6 @@ static void kbedit_create_browser_entries(void) {
 
   kbedit->entries[i]   = NULL;
   kbedit->shortcuts[i] = NULL;
-
-  xitk_font_unload_font(fs);
 }
 
 static void kbedit_display_kbinding(const char *action, kbinding_entry_t *kbe) {
