@@ -599,7 +599,6 @@ typedef struct {
   xitk_ext_state_callback_t         callback;
   void                             *userdata;
 
-  xitk_widget_list_t               *parent_wlist;
 } xitk_browser_widget_t;
 
 #ifdef NEED_MRLBROWSER
@@ -694,7 +693,6 @@ typedef struct {
 typedef struct {
   int                               magic;
   const char                       *skin_element_name;
-  xitk_widget_list_t               *parent_wlist;
   const char                      **entries;
   int                              layer_above;
   xitk_state_callback_t            callback;
@@ -746,11 +744,7 @@ struct xitk_menu_entry_s {
 
 typedef struct {
   int                              magic;
-
   const char                      *skin_element_name;
-  
-  xitk_widget_list_t              *parent_wlist;
-
   xitk_menu_entry_t               *menu_tree; /* NULL terminated */
 
 } xitk_menu_widget_t;

@@ -1134,7 +1134,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   mywidget                   = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   private_data               = (menu_private_data_t *) xitk_xmalloc(sizeof(menu_private_data_t));
   private_data->imlibdata    = wl->imlibdata;
-  private_data->parent_wlist = m->parent_wlist;
+  private_data->parent_wlist = wl;
   private_data->widget       = mywidget;
   xitk_dlist_init (&private_data->menu_windows);
   private_data->x            = x;

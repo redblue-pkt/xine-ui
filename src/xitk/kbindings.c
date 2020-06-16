@@ -1111,7 +1111,6 @@ void kbedit_window(void) {
   br.browser.entries               = (const char* const*)kbedit->entries;
   br.callback                      = kbedit_sel;
   br.dbl_click_callback            = NULL;
-  br.parent_wlist                  = kbedit->widget_list;
   br.userdata                      = NULL;
   kbedit->browser = xitk_noskin_browser_create (kbedit->widget_list, &br,
     (XITK_WIDGET_LIST_GC(kbedit->widget_list)), x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);

@@ -978,7 +978,6 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   private_data->kill_userdata     = mb->kill.data;
   mb->browser.dbl_click_callback  = handle_dbl_click;
   mb->browser.userdata            = (void *)private_data;
-  mb->browser.parent_wlist        = private_data->widget_list;
   private_data->mrlb_list = xitk_browser_create (private_data->widget_list, skonfig, &mb->browser);
   xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->mrlb_list->node);
   private_data->mrlb_list->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
@@ -1036,7 +1035,6 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
 
   cmb.skin_element_name = mb->combo.skin_element_name;
   cmb.layer_above       = mb->layer_above;
-  cmb.parent_wlist      = private_data->widget_list;
   cmb.entries           = private_data->filters;
   cmb.parent_wkey       = &private_data->widget_key;
   cmb.callback          = combo_filter_select;

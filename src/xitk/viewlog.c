@@ -401,7 +401,6 @@ void viewlog_panel(void) {
   br.browser.entries               = viewlog->log;
   br.callback                      = NULL;
   br.dbl_click_callback            = NULL;
-  br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
   viewlog->browser_widget = xitk_noskin_browser_create (viewlog->widget_list, &br,
     (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + viewlog->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);

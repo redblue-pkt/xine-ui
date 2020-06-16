@@ -745,7 +745,6 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             XITK_WIDGET_INIT (&cmb);
             cmb.skin_element_name = NULL;
             cmb.layer_above       = (is_layer_above ());
-            cmb.parent_wlist      = setup->widget_list;
             cmb.entries           = (const char **)entry.enum_values;
             cmb.parent_wkey       = &setup->kreg;
             cmb.callback          = numtype_update;

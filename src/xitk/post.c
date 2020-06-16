@@ -638,7 +638,6 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
           XITK_WIDGET_INIT(&cmb);
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
-	  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	  cmb.entries           = (const char **)pobj->param->enum_values;
 	  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	  cmb.callback          = _pplugin_set_param_int;
@@ -704,7 +703,6 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
         XITK_WIDGET_INIT(&cmb);
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = (is_layer_above());
-	cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
 	cmb.entries           = (const char **)(pobj->param_data + pobj->param->offset);
 	cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	cmb.callback          = _pplugin_set_param_stringlist;
@@ -950,7 +948,6 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     br.browser.entries               = NULL;
     br.callback                      = NULL;
     br.dbl_click_callback            = NULL;
-    br.parent_wlist                  = pp_wrapper->pplugin->help_widget_list;
     br.userdata                      = NULL;
     pp_wrapper->pplugin->help_browser = xitk_noskin_browser_create (pp_wrapper->pplugin->help_widget_list,
       &br, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)), 15, 34,
@@ -1060,7 +1057,6 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     XITK_WIDGET_INIT(&cmb);
     cmb.skin_element_name = NULL;
     cmb.layer_above       = (is_layer_above());
-    cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
     cmb.entries           = (const char **)pobj->properties_names;
     cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
     cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_change_parameter : _applugin_change_parameter;
@@ -1279,7 +1275,6 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = pp_wrapper->pplugin->widget_list;
   cmb.entries           = (const char **)pp_wrapper->pplugin->plugin_names;
   cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
   cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_select_filter : _applugin_select_filter;

@@ -650,7 +650,6 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   video_window_get_mouse_coords(gui->vwin, &x, &y);
 
   menu.menu_tree         = &menu_entries[0];
-  menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
@@ -922,7 +921,6 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
-  menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
@@ -999,7 +997,6 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
-  menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
@@ -1095,8 +1092,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     menu_entries_nosel[0].menu = _("Playlist");
     menu.menu_tree             = &menu_entries_nosel[0];
   }
-  
-  menu.parent_wlist      = wl;
+
   menu.skin_element_name = NULL;
 
   w = xitk_noskin_menu_create(wl, &menu, x, y);
@@ -1126,7 +1122,6 @@ void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   
   menu_entries[0].menu   = _("Video Control");
   menu.menu_tree         = &menu_entries[0];
-  menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
 
   w = xitk_noskin_menu_create(wl, &menu, x, y);

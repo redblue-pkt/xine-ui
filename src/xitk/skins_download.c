@@ -606,7 +606,6 @@ void download_skin(gGui_t *gui, char *url) {
     br.browser.entries               = (const char *const *)skd->entries;
     br.callback                      = download_skin_preview;
     br.dbl_click_callback            = NULL;
-    br.parent_wlist                  = skd->widget_list;
     br.userdata                      = skd;
     skd->browser = xitk_noskin_browser_create (skd->widget_list, &br,
       (XITK_WIDGET_LIST_GC(skd->widget_list)), x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);

@@ -35,8 +35,6 @@ typedef struct {
 
   btnlist_t              *bt[BROWSER_MAX_ENTRIES];
 
-  xitk_widget_list_t     *parent_wlist;
-
   xitk_skin_config_t     *skonfig;
 
   int                     jumped;
