@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -544,7 +544,7 @@ static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
     
     _pplugin_update_parameter(pobj);
     
-    if(xitk_get_widget_type(w) & WIDGET_GROUP_COMBO)
+    if ((xitk_get_widget_type (w) & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
       xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
     else
       xitk_intbox_set_value(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));

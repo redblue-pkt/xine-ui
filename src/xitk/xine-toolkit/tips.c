@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -381,7 +381,7 @@ void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
       
       xitk_tips_set_tips(widget, str);
     }
-    else if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) {
+    else if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
       xitk_widget_t *widget = xitk_combo_get_label_widget(w);
       
       xitk_tips_set_tips(widget, str);
