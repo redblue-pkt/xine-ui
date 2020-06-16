@@ -96,8 +96,9 @@ void wait_for_window_visible(xitk_window_t *xwin) {
 }
 
 void raise_window(xitk_window_t *xwin, int visible, int running) {
+  gGui_t *gui = gGui;
   if (xwin && visible && running) {
-    reparent_window(xwin);
+    reparent_window(gui, xwin);
     layer_above_video(xwin);
   }
 }

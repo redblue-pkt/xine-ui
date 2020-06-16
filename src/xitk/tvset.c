@@ -259,7 +259,9 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
 
 
 void tvset_reparent(void) {
-    reparent_window(tvset.xwin);
+  gGui_t *gui = gGui;
+
+  reparent_window(gui, tvset.xwin);
 }
 
 void tvset_panel(void) {
@@ -294,7 +296,7 @@ void tvset_panel(void) {
 						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(tvset.xwin);
+  set_window_states_start(gGui, tvset.xwin);
 
   tvset.widget_list = xitk_window_widget_list(tvset.xwin);
 

@@ -320,7 +320,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
                                                  bg_image->width, bg_image->height);
   xitk_window_set_window_title(vctrl->xwin, _(title));
 
-  set_window_states_start(vctrl->xwin);
+  set_window_states_start(vctrl->gui, vctrl->xwin);
 
   if (is_layer_above ())
     xitk_window_set_layer_above (vctrl->xwin);
@@ -694,6 +694,6 @@ void control_deinit (xui_vctrl_t *vctrl) {
 
 void control_reparent (xui_vctrl_t *vctrl) {
   if (vctrl && vctrl->xwin)
-    reparent_window(vctrl->xwin);
+    reparent_window(vctrl->gui, vctrl->xwin);
 }
 

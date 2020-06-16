@@ -917,7 +917,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
                                                                     _("Plugin Help"), x, y,
                                                                     HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
 
-    set_window_states_start(pp_wrapper->pplugin->helpwin);
+    set_window_states_start(gui, pp_wrapper->pplugin->helpwin);
 
     pp_wrapper->pplugin->help_widget_list = xitk_window_widget_list(pp_wrapper->pplugin->helpwin);
 
@@ -1783,8 +1783,9 @@ static void pplugin_update_enable_button(_pp_wrapper_t *pp_wrapper) {
 }
 
 static void pplugin_reparent(_pp_wrapper_t *pp_wrapper) {
+  gGui_t *gui = gGui;
   if(pp_wrapper->pplugin)
-    reparent_window(pp_wrapper->pplugin->xwin);
+    reparent_window(gui, pp_wrapper->pplugin->xwin);
 }
 
 static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
@@ -1820,7 +1821,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 						   (pp_wrapper == &_vpp_wrapper.p) ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
                                                    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(pp_wrapper->pplugin->xwin);
+  set_window_states_start(gui, pp_wrapper->pplugin->xwin);
 
   pp_wrapper->pplugin->widget_list = xitk_window_widget_list(pp_wrapper->pplugin->xwin);
 

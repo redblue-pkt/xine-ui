@@ -587,7 +587,7 @@ void download_skin(gGui_t *gui, char *url) {
                                                   _("Choose a skin to download..."),
                                                   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    set_window_states_start(skd->xwin);
+    set_window_states_start(gui, skd->xwin);
     bg = xitk_window_get_background_pixmap (skd->xwin);
     skd->widget_list = xitk_window_widget_list(skd->xwin);
 

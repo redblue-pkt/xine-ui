@@ -348,8 +348,10 @@ static void viewlog_handle_event(XEvent *event, void *data) {
 }
 
 void viewlog_reparent(void) {
+  gGui_t *gui = gGui;
+
   if(viewlog)
-    reparent_window(viewlog->xwin);
+    reparent_window(gui, viewlog->xwin);
 }
 
 /*
@@ -384,7 +386,7 @@ void viewlog_panel(void) {
   viewlog->xwin = xitk_window_create_dialog_window (gui->imlib_data,
     _("xine Log Viewer"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(viewlog->xwin);
+  set_window_states_start(gui, viewlog->xwin);
 
   viewlog->widget_list = xitk_window_widget_list(viewlog->xwin);
 
