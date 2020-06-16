@@ -44,12 +44,14 @@
     _target_ptr = NULL; \
   }
 
+/*
+ * Dialog window
+ */
+
 typedef struct xitk_dialog_s xitk_dialog_t;
 
 struct xitk_dialog_s {
-  ImlibData              *imlibdata;
   xitk_window_t          *xwin;
-  xitk_widget_list_t     *widget_list;
   xitk_register_key_t     key;
   int                     type;
 
@@ -82,7 +84,6 @@ static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
     free (text);
     return NULL;
   }
-  wd->imlibdata = im;
 
   image = xitk_image_create_image_from_string (im, DEFAULT_FONT_12, *width - 40, align, text);
   free (text);
@@ -100,7 +101,6 @@ static xitk_dialog_t *_xitk_dialog_new (ImlibData *im,
   }
   wd->w1 = wd->w2 = wd->w3 = NULL;
   wd->default_button = NULL;
-  wd->widget_list = NULL;
 
   /* Draw text area */
   {
@@ -126,13 +126,6 @@ static void _xitk_window_dialog_3_destr (void *data) {
   xitk_dialog_t *wd = data;
 
   xitk_window_destroy_window (wd->xwin);
-  if (wd->widget_list) {
-    xitk_destroy_widgets (wd->widget_list);
-    XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
-    XFreeGC (wd->imlibdata->x.disp, wd->widget_list->gc);
-    XUNLOCK (wd->imlibdata->x.x_unlock_display, wd->imlibdata->x.disp);
-    XITK_WIDGET_LIST_FREE (wd->widget_list);
-  }
   XITK_FREE (wd);
 }
 
@@ -230,17 +223,18 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
 /*
  * Local XEvent handling.
  */
-static void _window_handle_event (XEvent *event, void *data) {
+static void _dialog_window_handle_event (XEvent *event, void *data) {
   xitk_dialog_t *wd = data;
   
   switch (event->type) {
 
     case Expose:
-      if (wd->widget_list) {
-        wd->widget_list->widget_focused = wd->default_button;
-        if ((wd->widget_list->widget_focused->type & WIDGET_FOCUSABLE) &&
-            (wd->widget_list->widget_focused->enable == WIDGET_ENABLE)) {
-          xitk_widget_t *w = wd->widget_list->widget_focused;
+      if (wd->xwin->widget_list) {
+        xitk_widget_list_t *widget_list = wd->xwin->widget_list;
+        widget_list->widget_focused = wd->default_button;
+        if ((widget_list->widget_focused->type & WIDGET_FOCUSABLE) &&
+            (widget_list->widget_focused->enable == WIDGET_ENABLE)) {
+          xitk_widget_t *w = widget_list->widget_focused;
           widget_event_t event;
           event.type = WIDGET_EVENT_FOCUS;
           event.focus = FOCUS_RECEIVED;
@@ -311,15 +305,8 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
   }
   wd->type = 33;
 
-  if (num_buttons || check_label) {
-    wd->widget_list = xitk_widget_list_new (im);
-    wd->widget_list->win = _xitk_window_get_window (wd->xwin);
-    XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
-    wd->widget_list->gc = XCreateGC (im->x.disp, _xitk_window_get_window (wd->xwin), None, None);
-    XUNLOCK (wd->imlibdata->x.x_unlock_display, wd->imlibdata->x.disp);
-  }
-
   if (check_label) {
+    xitk_widget_list_t *widget_list = xitk_window_widget_list (wd->xwin);
     int x = 25, y = winh - (num_buttons ? 50 : 0) - 50;
     xitk_checkbox_widget_t cb;
     xitk_label_widget_t lbl;
@@ -330,9 +317,9 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
     cb.skin_element_name = NULL;
     cb.callback          = NULL;
     cb.userdata          = NULL;
-    wd->checkbox = xitk_noskin_checkbox_create (wd->widget_list, &cb, x, y + 5, 10, 10);
+    wd->checkbox = xitk_noskin_checkbox_create (widget_list, &cb, x, y + 5, 10, 10);
     if (wd->checkbox) {
-      xitk_dlist_add_tail (&wd->widget_list->list, &wd->checkbox->node);
+      xitk_dlist_add_tail (&widget_list->list, &wd->checkbox->node);
       xitk_checkbox_set_state (wd->checkbox, checked);
     }
 
@@ -340,15 +327,16 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
     lbl.label             = check_label;
     lbl.callback          = _checkbox_label_click;
     lbl.userdata          = wd;
-    wd->checkbox_label = xitk_noskin_label_create (wd->widget_list, &lbl, x + 15, y, winw - x - 40, 20, DEFAULT_FONT_12);
+    wd->checkbox_label = xitk_noskin_label_create (widget_list, &lbl, x + 15, y, winw - x - 40, 20, DEFAULT_FONT_12);
     if (wd->checkbox_label)
-      xitk_dlist_add_tail (&wd->widget_list->list, &wd->checkbox_label->node);
+      xitk_dlist_add_tail (&widget_list->list, &wd->checkbox_label->node);
   }
 
   wd->done3cb = done_cb;
   wd->done3data = userdata;
 
   if (num_buttons) {
+    xitk_widget_list_t *widget_list = xitk_window_widget_list (wd->xwin);
     xitk_labelbutton_widget_t lb;
     int bx, bdx, by, bwidth = 150;
 
@@ -368,28 +356,28 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
 
     if (button1_label) {
       lb.label = _xitk_window_dialog_label (button1_label);
-      wd->w1 = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+      wd->w1 = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
       if (wd->w1)
-        xitk_dlist_add_tail (&wd->widget_list->list, &wd->w1->node);
+        xitk_dlist_add_tail (&widget_list->list, &wd->w1->node);
       bx += bdx;
     }
 
     if (button2_label) {
       lb.label = _xitk_window_dialog_label (button2_label);
-      wd->w2 = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+      wd->w2 = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
       if (wd->w2)
-        xitk_dlist_add_tail (&wd->widget_list->list, &wd->w2->node);
+        xitk_dlist_add_tail (&widget_list->list, &wd->w2->node);
       bx += bdx;
     }
 
     if (button3_label) {
       lb.label = _xitk_window_dialog_label (button3_label);
-      wd->w3 = xitk_noskin_labelbutton_create (wd->widget_list, &lb,
+      wd->w3 = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
       if (wd->w3)
-        xitk_dlist_add_tail (&wd->widget_list->list, &wd->w3->node);
+        xitk_dlist_add_tail (&widget_list->list, &wd->w3->node);
     }
   }
   wd->default_button = wd->w3;
@@ -427,7 +415,7 @@ xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transien
   {
     xitk_register_key_t key;
     wd->key = key = xitk_register_event_handler ("xitk_dialog_3", wd->xwin,
-      _window_handle_event, NULL, NULL, wd->widget_list, wd);
+      _dialog_window_handle_event, NULL, NULL, wd->xwin->widget_list, wd);
     xitk_register_eh_destructor (key, _xitk_window_dialog_3_destr, wd);
     return key;
   }
@@ -1317,33 +1305,6 @@ void xitk_window_destroy_window(xitk_window_t *w) {
   XITK_FREE(w);
 }
 
-/**
- *
- * @TODO Should be split on a different unit, as it's only used with TAR support
- *       enabled.
- */
-#if 0
-void xitk_window_dialog_destroy(xitk_window_t *w) {
-  xitk_dialog_t *wd = w->dialog;
-
-  if(wd) {
-    xitk_window_destroy_window(wd->xwin);
-    xitk_unregister_event_handler(&wd->key);
-    
-    if(wd->widget_list) {
-      xitk_destroy_widgets(wd->widget_list);
-      XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
-      XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
-      XUNLOCK (wd->imlibdata->x.x_unlock_display, wd->imlibdata->x.disp);
-      
-      /* xitk_dlist_init (&wd->widget_list->list); */
-     
-     XITK_WIDGET_LIST_FREE(wd->widget_list); 
-    }
-    XITK_FREE(wd);
-  }  
-}
-#endif
 void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent) {
   if(xwin)
     xwin->win_parent = parent;
