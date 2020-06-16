@@ -199,24 +199,17 @@ static void _combo_open (_combo_private_t *wp) {
   itemw += xitk_get_widget_width (wp->button_widget);
   itemw -= 2; /* space for border */
 
-  wp->xwin = xitk_window_create_simple_window (wp->w.wl->imlibdata,
-    0, 0, itemw + 2, itemh * 5 + slidw + 2);
+  wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->imlibdata,
+    0, 0, itemw + 2, itemh * 5 + slidw + 2,
+    NULL, "Xitk Combo", "Xitk", 1, 0, NULL);
   if (!wp->xwin)
     return;
   win = xitk_window_get_window (wp->xwin);
 
   XLOCK (wp->w.wl->imlibdata->x.x_lock_display, wp->w.wl->imlibdata->x.disp);
-  {
-    XSetWindowAttributes attr;
-    attr.override_redirect = True;
-    XChangeWindowAttributes (wp->w.wl->imlibdata->x.disp, win, CWOverrideRedirect, &attr);
-  }
   XSetTransientForHint (wp->w.wl->imlibdata->x.disp, win, wp->parent_wlist->win);
   wp->gc = XCreateGC (wp->w.wl->imlibdata->x.disp, win, None, None);
   XUNLOCK (wp->w.wl->imlibdata->x.x_unlock_display, wp->w.wl->imlibdata->x.disp);
-
-  /* Change default classhint to new one. */
-  xitk_window_set_window_class (wp->xwin, "Xitk Combo", "Xitk");
 
   wp->widget_list        = xitk_widget_list_new (wp->w.wl->imlibdata);
   xitk_dlist_init (&wp->widget_list->list);

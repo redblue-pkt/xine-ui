@@ -1197,13 +1197,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
 
-  panel->xwin = xitk_window_create_simple_window(gui->imlib_data, panel->x, panel->y,
-                                                 bg_image->width,
-                                                 bg_image->height);
-  xitk_window_set_window_title(panel->xwin, title);
-  xitk_window_set_window_class(panel->xwin, title, "xine");
-  xitk_window_set_window_icon(panel->xwin, gGui->icon);
-
+  panel->xwin = xitk_window_create_simple_window_ext(gui->imlib_data, panel->x, panel->y,
+                                                     bg_image->width, bg_image->height, title,
+                                                     title, "xine", 0, is_layer_above(), panel->gui->icon);
   /*
    * The following is more or less a hack to keep the panel window visible
    * with and without focus in windowed and fullscreen mode.
@@ -1220,9 +1216,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
       xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
   }
   
-  if(is_layer_above())
-    xitk_window_set_layer_above (panel->xwin);
-
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   /*

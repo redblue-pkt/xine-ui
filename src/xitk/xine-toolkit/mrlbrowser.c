@@ -916,24 +916,13 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   private_data->mrls_num        = 0;
   private_data->last_mrl_source = NULL;
 
-  private_data->xwin = xitk_window_create_window(im, mb->x, mb->y,
-                                                 bg_image->width,
-                                                 bg_image->height);
-
-  xitk_window_set_window_title(private_data->xwin, title);
+  private_data->xwin = xitk_window_create_window_ext(im, mb->x, mb->y, bg_image->width, bg_image->height,
+                                                     title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
 
   if(mb->set_wm_window_normal)
     xitk_window_set_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
   else
     xitk_window_unset_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
-
-  /* set xclass */
-  xitk_window_set_window_class(private_data->xwin,
-                               mb->resource_name ? mb->resource_name : "xitk mrl browser",
-                               mb->resource_class ? mb->resource_class : "xitk");
-
-  if (mb->icon)
-    xitk_window_set_window_icon(private_data->xwin, mb->icon);
 
   xitk_window_change_background_with_image(private_data->xwin, bg_image, bg_image->width, bg_image->height);
 

@@ -159,20 +159,8 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	/*                                           v                      */
         y -= (tips->widget->height + h + bottom_gap + 1);
       /* No further alternative to y-position the tips (just either below or above widget) */
-      xwin = xitk_window_create_simple_window(tips->widget->wl->imlibdata, x, y, w, h);
-      
-      /* WM should ignore tips windows */
-      {
-	XSetWindowAttributes tp_attr;
-	
-	tp_attr.override_redirect = True;
-	
-        XLOCK (xitk_x_lock_display, tips->display);
-        XChangeWindowAttributes(tips->display, (xitk_window_get_window(xwin)), CWOverrideRedirect, &tp_attr);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
-	
-      }
-      
+      xwin = xitk_window_create_simple_window_ext(tips->widget->wl->imlibdata, x, y, w, h,
+                                                  NULL, NULL, NULL, 1, 0, NULL);
       {
 	xitk_pixmap_t *bg;
 	int            width, height;
