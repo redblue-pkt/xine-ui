@@ -402,9 +402,11 @@ void event_sender_panel(void) {
   }
 
   /* Create window */
-  eventer->xwin = xitk_window_create_simple_window(gGui->imlib_data, eventer->x, eventer->y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  xitk_window_set_window_title(eventer->xwin, _("xine Event Sender"));
-  set_window_states_start(gGui, eventer->xwin);
+  eventer->xwin =
+    xitk_window_create_simple_window_ext(gGui->imlib_data, eventer->x, eventer->y,
+                                         WINDOW_WIDTH, WINDOW_HEIGHT, _("xine Event Sender"),
+                                         NULL, "xine", 0, 0, gGui->icon);
+  set_window_type_start(gGui, eventer->xwin);
 
   eventer->widget_list = xitk_window_widget_list(eventer->xwin);
 

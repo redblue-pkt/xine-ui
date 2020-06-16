@@ -35,8 +35,7 @@ static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, i
 
 static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) {
   menu_window_t *menu_window;
-  XSetWindowAttributes menu_attr;
-  
+
   menu_window          = (menu_window_t *) xitk_xmalloc(sizeof(menu_window_t));
   menu_window->display = im->x.disp;
   menu_window->im      = im;
@@ -55,10 +54,7 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   menu_window->wl.xitk = gXitk;
   menu_window->wl.imlibdata = im;
 
-  menu_attr.override_redirect = True;
-
   XLOCK (im->x.x_lock_display, im->x.disp);
-  XChangeWindowAttributes(im->x.disp, menu_window->wl.win, CWOverrideRedirect, &menu_attr);
   menu_window->wl.gc   = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
@@ -405,7 +401,7 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
 
   /* deferred free as widget list */
   xitk_dnode_remove (&(*mw)->wl.node);
-  XITK_WIDGET_LIST_FREE((xitk_widget_list_t *)(*mw));
+  XITK_WIDGET_LIST_FREE(&(*mw)->wl);
   (*mw) = NULL;
 }
 
@@ -815,8 +811,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
   }
 
-  xwin = xitk_window_create_simple_window(private_data->imlibdata, 
-					  x, y, wwidth + 2, wheight + 2);
+  xwin = xitk_window_create_simple_window_ext(private_data->imlibdata,
+                                              x, y, wwidth + 2, wheight + 2,
+                                              NULL, NULL, NULL, 1, 1, NULL);
 
   if(bsep || btitle) {
     bg = xitk_window_get_background_pixmap(xwin);
@@ -959,8 +956,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     xitk_window_set_background(xwin, bg);
   }
 
-  xitk_window_set_layer_above(xwin);
-
   XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
@@ -980,11 +975,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 						 &(menu_window->wl),
 						 (void *) menu_window);
 
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-  XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(xwin)));
-  XSync(private_data->imlibdata->x.disp, False);
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-
+  xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);
 
   if(!(xitk_get_wm_type() & WM_TYPE_KWIN))

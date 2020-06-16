@@ -756,9 +756,10 @@ void xitk_window_center_window(xitk_window_t *w) {
 /*
  * Create a simple (empty) window.
  */
-xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height) {
+xitk_window_t *xitk_window_create_window_ext(ImlibData *im, int x, int y, int width, int height,
+                                             const char *title, const char *res_name, const char *res_class,
+                                             int override_redirect, int layer_above, xitk_pixmap_t *icon) {
   xitk_window_t         *xwin;
-  const char             title[] = {"xiTK Window"};
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
@@ -770,6 +771,9 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
 
   if((im == NULL) || (width == 0 || height == 0))
     return NULL;
+
+  if (!title)
+    title = "xiTK Window";
 
   xwin                  = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
   xwin->imlibdata       = im;
@@ -797,7 +801,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
-  attr.override_redirect = False;
+  attr.override_redirect = override_redirect ? True : False;
   attr.background_pixel  = black.pixel;
   attr.border_pixel      = black.pixel;
   attr.colormap          = Imlib_get_colormap(im);
@@ -834,8 +838,8 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XSetWMProtocols(im->x.disp, xwin->window, &XA_DELETE_WINDOW, 1);
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = (char *)"Xine Window";
-    xclasshint->res_class = (char *)"Xitk";
+    xclasshint->res_name  = (char*)(res_name ? res_name : "Xine Window");
+    xclasshint->res_class = (char*)(res_class ? res_class : "Xitk");
     XSetClassHint(im->x.disp, xwin->window, xclasshint);
     XFree(xclasshint);
   }
@@ -849,21 +853,35 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
     XFree(wm_hint);
   }
 
+  if (icon)
+    xitk_window_set_window_icon(xwin, icon);
+
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
 
+  if (layer_above)
+    xitk_window_set_window_layer (xwin, layer_above);
+
   return xwin;
+}
+
+xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height) {
+  return xitk_window_create_window_ext(im, x, y, width, height,
+                                       NULL, NULL, NULL, 0, 0, NULL);
 }
 
 /*
  * Create a simple painted window.
  */
-xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int width, int height) {
+xitk_window_t *xitk_window_create_simple_window_ext(ImlibData *im, int x, int y, int width, int height,
+                                                    const char *title, const char *res_name, const char *res_class,
+                                                    int override_redirect, int layer_above, xitk_pixmap_t *icon) {
   xitk_window_t *xwin;
   
   if((im == NULL) || (width == 0 || height == 0))
     return NULL;
 
-  xwin = xitk_window_create_window(im, x, y, width, height);
+  xwin = xitk_window_create_window_ext(im, x, y, width, height, title,
+                                       res_name, res_class, override_redirect, layer_above, icon);
   xwin->width = width;
   xwin->height = height;
   
@@ -874,6 +892,9 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
   xitk_window_move_window(xwin, x, y);
 
   return xwin;
+}
+xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int width, int height) {
+  return xitk_window_create_simple_window_ext(im, x, y, width, height, NULL, NULL, NULL, 0, 0, NULL);
 }
 
 xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)

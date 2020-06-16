@@ -316,14 +316,11 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   y = xine_config_register_num (vctrl->gui->xine, "gui.control_y",
     100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
 
-  vctrl->xwin = xitk_window_create_simple_window(vctrl->gui->imlib_data, x + 100, y + 100,
-                                                 bg_image->width, bg_image->height);
-  xitk_window_set_window_title(vctrl->xwin, _(title));
-
-  set_window_states_start(vctrl->gui, vctrl->xwin);
-
-  if (is_layer_above ())
-    xitk_window_set_layer_above (vctrl->xwin);
+  vctrl->xwin =
+    xitk_window_create_simple_window_ext(vctrl->gui->imlib_data, x + 100, y + 100,
+                                         bg_image->width, bg_image->height, _(title),
+                                         NULL, "xine", 0, is_layer_above(), vctrl->gui->icon);
+  set_window_type_start(vctrl->gui, vctrl->xwin);
 
   xitk_window_change_background_with_image(vctrl->xwin, bg_image, bg_image->width, bg_image->height);
   xitk_image_free_image(&bg_image);

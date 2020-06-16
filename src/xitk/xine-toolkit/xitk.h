@@ -2044,11 +2044,19 @@ void menu_draw_arrow_branch(xitk_image_t *p);
  *
  */
 xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height);
+xitk_window_t *xitk_window_create_window_ext(ImlibData *im, int x, int y, int width, int height,
+                                             const char *title, const char *res_name, const char *res_class,
+                                             int override_redirect, int layer_above,
+                                             xitk_pixmap_t *icon);
 
 /**
  *
  */
 xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int width, int height);
+
+xitk_window_t *xitk_window_create_simple_window_ext(ImlibData *im, int x, int y, int width, int height,
+                                                    const char *title, const char *res_name, const char *res_class,
+                                                    int override_redirect, int layer_above, xitk_pixmap_t *icon);
 
 /**
  *

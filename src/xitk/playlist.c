@@ -990,15 +990,11 @@ void playlist_editor(void) {
 				     CONFIG_NO_CB,
 				     CONFIG_NO_DATA);
 
-  playlist->xwin = xitk_window_create_simple_window(gui->imlib_data, x, y,
-                                                    bg_image->width,
-                                                    bg_image->height);
-  xitk_window_set_window_title(playlist->xwin, title);
+  playlist->xwin = xitk_window_create_simple_window_ext(gui->imlib_data, x, y,
+                                                        bg_image->width, bg_image->height, title,
+                                                        NULL, "xine", 0, is_layer_above(), gui->icon);
 
-  set_window_states_start(gui, playlist->xwin);
-
-  if(is_layer_above())
-    xitk_window_set_layer_above(playlist->xwin);
+  set_window_type_start(gui, playlist->xwin);
 
   xitk_window_change_background_with_image(playlist->xwin, bg_image, bg_image->width, bg_image->height);
   xitk_image_free_image(&bg_image);
