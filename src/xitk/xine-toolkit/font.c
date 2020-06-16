@@ -64,6 +64,7 @@ struct xitk_font_cache_s {
 };
 
 struct xitk_font_s {
+  xitk_font_cache_t *font_cache;
   Display       *display;
 #ifdef WITH_XFT
   XftFont       *font;
@@ -561,6 +562,7 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
 
     xtfs->name = strdup(font);
     xtfs->display = display;
+    xtfs->font_cache = xitk->font_cache;
 
 #ifdef LOG
     printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", xtfs->name, xitk->font_cache->nlist, xitk->font_cache->n);
@@ -583,11 +585,11 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
  *
  */
 void xitk_font_unload_font(xitk_font_t *xtfs) {
-  xitk_t *xitk = gXitk;
   xitk_font_list_item_t *item;
   
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(xtfs->font_cache);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
   if(xitk_get_xmb_enability())
@@ -597,7 +599,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 #endif
     ABORT_IF_NULL(xtfs->font);
 
-  pthread_mutex_lock(&xitk->font_cache->mutex);
+  pthread_mutex_lock(&xtfs->font_cache->mutex);
   /* search the font in the list */
   item = cache_get_from_list(xtfs->display, xtfs->name);
   /* it must be there */
@@ -605,12 +607,12 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 
   if(--item->number == 0) {
     xitk_dnode_remove (&item->node);
-    xitk->font_cache->nlist--;
+    xtfs->font_cache->nlist--;
     xitk_cache_add_item(item->font);
     free(item);
   }
 
-  pthread_mutex_unlock(&xitk->font_cache->mutex);
+  pthread_mutex_unlock(&xtfs->font_cache->mutex);
 }
 
 /*
@@ -620,7 +622,6 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
 			   int x, int y, const char *text, 
 			   size_t nbytes) {
 
-  xitk_t *xitk = gXitk;
 #ifdef DEBUG
   if (nbytes > strlen(text) + 1) {
     XITK_WARNING("draw: %zu > %zu\n", nbytes, strlen(text));
@@ -654,7 +655,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
       rs.ssize = nbytes;
     rs.buf = buf;
     rs.bsize = sizeof (buf);
-    xitk_recode2_do (xitk->font_cache->xr, &rs);
+    xitk_recode2_do (xtfs->font_cache->xr, &rs);
 
     XGetGCValues(xtfs->display, gc, GCForeground, &gc_color);
     paint_color.pixel = gc_color.foreground;
@@ -669,7 +670,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
     XftColorFree(xtfs->display, visual, colormap, &xcolor);
     XftDrawDestroy(xft_draw);
 
-    xitk_recode2_done (xitk->font_cache->xr, &rs);
+    xitk_recode2_done (xtfs->font_cache->xr, &rs);
   }
 #endif
   XUNLOCK (xitk_x_unlock_display, xtfs->display);
@@ -872,7 +873,6 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, i
  */
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
-  xitk_t *xitk = gXitk;
 #ifndef WITH_XFT  
   XCharStruct ov;
   int         dir;
@@ -919,7 +919,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
       rs.ssize = nbytes;
     rs.buf = buf;
     rs.bsize = sizeof (buf);
-    xitk_recode2_do (xitk->font_cache->xr, &rs);
+    xitk_recode2_do (xtfs->font_cache->xr, &rs);
 
     /* FIXME: XftTextExtentsUtf8 () seems to be non reentrant - at least when called
      * with same font. We probably need to mutex it when XLockDisplay () is turned off. */
@@ -927,7 +927,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     XftTextExtentsUtf8 (xtfs->display, xtfs->font, (FcChar8 *)rs.res, rs.rsize, &xft_extents);
     XUNLOCK (xitk_x_unlock_display, xtfs->display);
 
-    xitk_recode2_done (xitk->font_cache->xr, &rs);
+    xitk_recode2_done (xtfs->font_cache->xr, &rs);
   }
 
   if (width) *width       = xft_extents.xOff;
