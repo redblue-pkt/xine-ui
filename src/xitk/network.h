@@ -25,7 +25,6 @@
 #define NETWORK_H
 
 #ifdef HAVE_READLINE
-int get_bool_value(const char *val);
 void start_remote_server(void);
 #endif
 
