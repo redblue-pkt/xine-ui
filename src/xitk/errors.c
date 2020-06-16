@@ -86,7 +86,7 @@ void xine_error (gGui_t *gui, const char *message, ...) {
   if (!buf)
     return;
 
-  if (gui->stdctl_enable || !gui->display) {
+  if (gui->stdctl_enable || !gui->xitk) {
     printf("%s\n", buf);
   }
   else {
