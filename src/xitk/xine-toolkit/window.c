@@ -253,16 +253,11 @@ static void _window_handle_event (XEvent *event, void *data) {
       break;
 
     case KeyPress: {
-      XKeyEvent  mykeyevent;
       KeySym     mykey;
       char       kbuf[256];
-    
-      mykeyevent = event->xkey;
-    
-      XLOCK (wd->imlibdata->x.x_lock_display, wd->imlibdata->x.disp);
-      XLookupString (&mykeyevent, kbuf, sizeof (kbuf), &mykey, NULL);
-      XUNLOCK (wd->imlibdata->x.x_unlock_display, wd->imlibdata->x.disp);
-    
+
+      xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
+
       switch (mykey) {
 
         case XK_Return:
