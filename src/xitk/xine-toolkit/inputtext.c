@@ -708,7 +708,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     XCopyArea (wp->imlibdata->x.disp, wp->skin->image->pixmap, wp->text.temp_pixmap->pixmap, wp->w.wl->gc,
       src_x, 0, xsize, ysize, ysize, 0);
     if (fs) {
-      xitk_font_draw_string (fs, wp->text.temp_pixmap->pixmap, wp->text.temp_gc,
+      xitk_font_draw_string (fs, wp->text.temp_pixmap, wp->text.temp_gc,
         ysize + wp->text.box_start + wp->text.shift,
         ((ysize + asc + des + yoff) >> 1) - des,
         wp->text.buf + wp->text.draw_start,

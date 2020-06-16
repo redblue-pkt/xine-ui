@@ -1731,7 +1731,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs);
 /*
  *
  */
-void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc, 
+void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
 			   int x, int y, const char *text, 
 			   size_t nbytes);
 
