@@ -156,9 +156,9 @@ static void _create_labelofbutton (_lbutton_private_t *wp, Window win, GC gc,
 
   /* Try to load font */
   if (wp->fontname)
-    fs = xitk_font_load_font (wp->imlibdata->x.disp, wp->fontname);
+    fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
   if (fs == NULL) 
-    fs = xitk_font_load_font (wp->imlibdata->x.disp, xitk_get_system_font ());
+    fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
 
   if (fs == NULL)
     XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
@@ -238,7 +238,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp, Window win, GC gc,
       xitk_font_t *short_font;
   
       if (wp->shortcut_font)
-        short_font = xitk_font_load_font (wp->imlibdata->x.disp, wp->shortcut_font);
+        short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font);
       else
         short_font = fs;
       xitk_font_draw_string (short_font, pix, gc,

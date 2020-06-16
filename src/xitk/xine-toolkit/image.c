@@ -674,6 +674,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
                                                               int width, int align, const char *str,
                                                               unsigned int foreground,
                                                               unsigned int background) {
+  xitk_t         *xitk = gXitk;
   xitk_image_t   *image;
   xitk_font_t    *fs;
   GC              gc;
@@ -702,7 +703,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   if(!*str)
     str = "   ";
 
-  fs = xitk_font_load_font(im->x.disp, fontname);
+  fs = xitk_font_load_font(xitk, fontname);
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, str, NULL, NULL, NULL, &ascent, &descent);
   height = ascent + descent;
@@ -1700,6 +1701,7 @@ void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
 static void _draw_frame(xitk_pixmap_t *p,
                         const char *title, const char *fontname,
                         int style, int x, int y, int w, int h) {
+  xitk_t        *xitk = gXitk;
   ImlibData     *im;
   xitk_font_t   *fs = NULL;
   int            yoff = 0, xstart = 0, xstop = 0;
@@ -1719,7 +1721,7 @@ static void _draw_frame(xitk_pixmap_t *p,
     titlelen = strlen(title);
     titlebuf = title;
 
-    fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
+    fs = xitk_font_load_font(xitk, (fontname ? fontname : DEFAULT_FONT_12));
     xitk_font_set_font(fs, p->gc);
     xitk_font_text_extent(fs, title, titlelen, &lbearing, &rbearing, NULL, &ascent, &descent);
 

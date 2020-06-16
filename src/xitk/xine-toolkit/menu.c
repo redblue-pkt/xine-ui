@@ -755,16 +755,16 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   maxnode  = _menu_get_wider_menuitem_node(branch);
   
   if(_menu_is_title(maxnode->menu_entry))
-    fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_14);
+    fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_14);
   else
-    fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_12);
+    fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_12);
 
   xitk_font_set_font(fs, private_data->widget->wl->gc);
   maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
 
   if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch)) {
     xitk_font_t *short_font;
-    short_font = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_FONT_12);
+    short_font = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_FONT_12);
     shortcutlen = xitk_font_get_string_length(short_font, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut);
     maxlen += shortcutlen + 15;
     xitk_font_unload_font(short_font);
@@ -877,7 +877,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 	unsigned int  cfg, cbg;
 	XColor        xcolorf, xcolorb;
   
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_14);
+        fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_14);
 	xitk_font_set_font(fs, private_data->widget->wl->gc);
 	
 	xitk_font_string_extent(fs, me->menu_entry->menu, &lbear, &rbear, &width, &asc, &des);

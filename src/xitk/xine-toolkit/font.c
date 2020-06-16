@@ -504,16 +504,19 @@ static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache,
 /*
  *
  */
-xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
-  xitk_t *xitk = gXitk;
+xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   xitk_font_t           *xtfs;
   xitk_font_list_item_t *list_item;
+  Display               *display;
   xitk_font_cache_t     *font_cache;
 
-  ABORT_IF_NULL(display);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->display);
   ABORT_IF_NULL(font);
 
+  display = xitk->display;
   font_cache = xitk->font_cache;
+
   pthread_mutex_lock(&font_cache->mutex);
   
   /* quick search in the cache of unloaded fonts */
@@ -545,7 +548,7 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
 	    xitk_font_t *xtfs_fallback;
 
 	    xitk_set_xmb_enability(0);
-	    if((xtfs_fallback = xitk_font_load_font(display, font)))
+	    if((xtfs_fallback = xitk_font_load_font(xitk, font)))
 	      XITK_WARNING("XMB support seems broken on your system, add \"font.xmb = 0\" in your ~/.xitkrc\n");
 	    
 	    return xtfs_fallback;

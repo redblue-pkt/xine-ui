@@ -46,7 +46,7 @@ void xitk_font_cache_done(void);
 /*
  * load font from font name. Return NULL on failure.
  */
-xitk_font_t *xitk_font_load_font(Display *display, const char *font);
+xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font);
 
 /*
  * Draw the string with given font.

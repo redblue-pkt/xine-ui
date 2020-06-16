@@ -241,6 +241,8 @@ struct gGui_st {
   action_id_t               actions_on_start[MAX_ACTIONS_ON_START+1];
   char                     *autoscan_plugin;
 
+  xitk_t                   *xitk;
+
   /* basic X11 stuff */
   void                    (*x_lock_display) (Display *display);
   void                    (*x_unlock_display) (Display *display);

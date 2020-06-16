@@ -1056,7 +1056,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
 
     setup->widget_list = xitk_window_widget_list(setup->xwin);
 
-    fs = xitk_font_load_font (setup->gui->display, fontname);
+    fs = xitk_font_load_font (setup->gui->xitk, fontname);
     xitk_font_set_font (fs, (XITK_WIDGET_LIST_GC (setup->widget_list)));
     setup->fh = xitk_font_get_string_height (fs, " ");
   }

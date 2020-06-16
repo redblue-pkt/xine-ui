@@ -352,7 +352,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     private_data->labels_offset = 0;
 
     if(label_font) {
-      fs = xitk_font_load_font(w->wl->imlibdata->x.disp, label_font);
+      fs = xitk_font_load_font(w->wl->xitk, label_font);
       xitk_font_set_font(fs, w->wl->gc);
     }
 
