@@ -54,6 +54,8 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
+#include "xitk_x11.h"
+
 #include "utils.h"
 #include "_xitk.h"
 #include "tips.h"
@@ -90,6 +92,12 @@ static int ml = 0;
 
 #define FXLOCK(_fx)       __gfx_lock(_fx)
 #define FXUNLOCK(_fx)     __gfx_unlock(_fx)
+
+typedef struct {
+  int                               enabled;
+  int                               offset_x;
+  int                               offset_y;
+} xitk_move_t;
 
 typedef struct {
   xitk_dnode_t                node;
@@ -173,6 +181,7 @@ typedef struct {
   xitk_dlist_t                wlists;
   xitk_dlist_t                gfxs;
   int                         use_xshm;
+  int                         install_colormap;
 
   uint32_t                    wm_type;
 
@@ -194,10 +203,13 @@ typedef struct {
 
   unsigned long               tips_timeout;
 
+#if 0
+  /* not used  ? */
   struct {
     Window                    window;
     int                       focus;
   } parent;
+#endif
 
   pid_t                       xitk_pid;
   
@@ -618,11 +630,13 @@ void xitk_usec_sleep(unsigned long usec) {
 #endif
 }
 
+#if 0
 static int _x_ignoring_error_handler(Display *display, XErrorEvent *xevent) {
   (void)display;
   (void)xevent;
   return 0;
 }
+#endif
 
 static int _x_error_handler(Display *display, XErrorEvent *xevent) {
   char buffer[2048];
@@ -2339,22 +2353,118 @@ void xitk_xevent_notify (XEvent *event) {
   MUTUNLOCK ();
 }
 
+Display *xitk_x11_get_display(xitk_t *xitk) {
+  return xitk->display;
+}
+
+/*
+ * Imlib
+ */
+
+Visual *xitk_x11_get_visual(xitk_t *xitk) {
+  return Imlib_get_visual(xitk->imlibdata);
+}
+
+int xitk_x11_get_depth(xitk_t *xitk) {
+  return xitk->imlibdata->x.depth;
+}
+
+Colormap xitk_x11_get_colormap(xitk_t *xitk) {
+  return Imlib_get_colormap(xitk->imlibdata);
+}
+
+ImlibData *xitk_x11_get_imlib_data(xitk_t *xitk) {
+  return xitk->imlibdata;
+}
+
+void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
+
+  int install_colormap = ((__xitk_t *)xitk)->install_colormap;
+  ImlibInitParams  imlib_init;
+
+  /*
+   * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
+   * However, we have to reinitialize Imlib if we have to change the visual.
+   * This will be a (small) memory leak.
+   */
+  imlib_init.flags = PARAMS_VISUALID;
+  imlib_init.visualid = gui_visual->visualid;
+
+  XLOCK(xitk->x_lock_display, xitk->display);
+
+  if (install_colormap && (gui_visual->class & 1)) {
+      /*
+       * We're using a visual with changable colors / colormaps
+       * (According to the comment in X11/X.h, an odd display class
+       * has changable colors), and the user requested to install a
+       * private colormap for xine.  Allocate a fresh colormap for
+       * Imlib and Xine.
+       */
+      Colormap cm;
+      cm = XCreateColormap(xitk->display,
+                           RootWindow(xitk->display, DefaultScreen(xitk->display)),
+                           gui_visual, AllocNone);
+
+      imlib_init.cmap = cm;
+      imlib_init.flags |= PARAMS_COLORMAP;
+  }
+
+  xitk->imlibdata = Imlib_init_with_params (xitk->display, &imlib_init);
+  if (xitk->imlibdata == NULL) {
+    fprintf(stderr, _("Unable to initialize Imlib\n"));
+    exit(1);
+  }
+
+  XUNLOCK(xitk->x_unlock_display, xitk->display);
+
+  xitk->imlibdata->x.x_lock_display = xitk->x_lock_display;
+  xitk->imlibdata->x.x_unlock_display = xitk->x_unlock_display;
+}
+
+static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install_colormap)
+{
+  Visual *visual = NULL;
+  char *xrm_prefered_visual = NULL;
+
+  if (!prefered_visual || !install_colormap)
+    xitk_x11_xrm_parse("xine", NULL, NULL,
+                       prefered_visual ? NULL : &xrm_prefered_visual,
+                       install_colormap  ? NULL : &install_colormap);
+  xitk->install_colormap = install_colormap;
+
+  xitk_x11_find_visual(xitk->x.display, DefaultScreen(xitk->x.display),
+                       prefered_visual ? prefered_visual : xrm_prefered_visual,
+                       &visual, NULL);
+  xitk_x11_select_visual(&xitk->x, visual);
+  free(xrm_prefered_visual);
+}
+
 /*
  * Initiatization of widget internals.
  */
 
-void (*xitk_x_lock_display) (Display *display);
-void (*xitk_x_unlock_display) (Display *display);
+static void xitk_dummy_un_lock_display (Display *display) {
+  (void)display;
+}
 
-xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
-  void (*x_unlock_display) (Display *display), int verbosity) {
+void (*xitk_x_lock_display) (Display *display) = xitk_dummy_un_lock_display;
+void (*xitk_x_unlock_display) (Display *display) = xitk_dummy_un_lock_display;
+
+xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
+                   int use_x_lock_display, int use_synchronized_x, int verbosity) {
+
   __xitk_t *xitk;
   char buffer[256];
   pthread_mutexattr_t attr;
+  Display *display;
 
-  /* Nasty (temporary) kludge. */
-  xitk_x_lock_display = x_lock_display;
-  xitk_x_unlock_display = x_unlock_display;
+  if (use_x_lock_display) {
+    /* Nasty (temporary) kludge. */
+    xitk_x_lock_display = XLockDisplay;
+    xitk_x_unlock_display = XUnlockDisplay;
+  }
+
+  display = xitk_x11_open_display(use_x_lock_display, use_synchronized_x, verbosity);
 
 #ifdef ENABLE_NLS
   bindtextdomain("xitk", XITK_LOCALE);
@@ -2365,8 +2475,8 @@ xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
 
   xitk->xitk_pid = getppid ();
 
-  xitk->x.x_lock_display   = x_lock_display;
-  xitk->x.x_unlock_display = x_unlock_display;
+  xitk->x.x_lock_display   = xitk_x_lock_display;
+  xitk->x.x_unlock_display = xitk_x_unlock_display;
 
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
@@ -2385,8 +2495,9 @@ xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
   xitk->ignore_keys[0]  = XKeysymToKeycode(display, XK_Shift_L);
   xitk->ignore_keys[1]  = XKeysymToKeycode(display, XK_Control_L);
   xitk->tips_timeout    = TIPS_TIMEOUT;
+#if 0
   XGetInputFocus(display, &(xitk->parent.window), &(xitk->parent.focus));
-
+#endif
   xitk->atoms.XA_WIN_LAYER = None;
   xitk->atoms.XA_STAYS_ON_TOP = None;
 
@@ -2482,6 +2593,9 @@ xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
 
   xitk->wm_type = xitk_check_wm(display);
   
+  /* imit imlib */
+  _init_imlib(xitk, prefered_visual, install_colormap);
+
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
 
@@ -2661,11 +2775,37 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
   xitk_tips_deinit(&xitk->x.tips);
 
   xitk_config_deinit (xitk->config);
+}
+
+void xitk_free(xitk_t **p) {
+
+  __xitk_t *xitk = (__xitk_t*) *p;
+
+  if (!xitk)
+    return;
+  *p = NULL;
+
+  /*
+   * Close X display before unloading modules linked against libGL.so
+   * https://www.xfree86.org/4.3.0/DRI11.html
+   *
+   * Do not close the library with dlclose() until after XCloseDisplay() has
+   * been called. When libGL.so initializes itself it registers several
+   * callbacks functions with Xlib. When XCloseDisplay() is called those
+   * callback functions are called. If libGL.so has already been unloaded
+   * with dlclose() this will cause a segmentation fault.
+   */
+  xitk->x.x_lock_display (xitk->x.display);
+  xitk->x.x_unlock_display (xitk->x.display);
+  XCloseDisplay(xitk->x.display);
+  xitk->x.display = NULL;
+  // XXX imlib does not support close / free
+  xitk->x.imlibdata = NULL;
+
   pthread_mutex_destroy (&xitk->mutex);
-  
+
   XITK_FREE (xitk);
   gXitk = NULL;
-
 }
 
 /*
@@ -2676,7 +2816,7 @@ void xitk_stop(void) {
   xitk_tips_stop(xitk->x.tips);
   xitk_cursors_deinit (xitk->x.display);
   xitk->running = 0;
-
+#if 0
   if (xitk->parent.window != None) {
     int (*previous_error_handler)(Display *, XErrorEvent *);
     XSync (xitk->x.display, False);
@@ -2686,6 +2826,7 @@ void xitk_stop(void) {
     XSync (xitk->x.display, False);
     XSetErrorHandler(previous_error_handler);
   }
+#endif
 }
  
 const char *xitk_get_system_font(void) {

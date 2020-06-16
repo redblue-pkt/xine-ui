@@ -46,10 +46,6 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xresource.h>
-
 #include <locale.h>
 
 #include <xine.h>
@@ -279,128 +275,6 @@ static void free_command_line_args(char ***argv, int argc) {
   }
   
   free(*(argv));
-}
-
-static int parse_geometry(window_attributes_t *window_attribute, char *geomstr) {
-  int xoff, yoff, ret;
-  unsigned int width, height;
-
-  if((ret = XParseGeometry(geomstr, &xoff, &yoff, &width, &height))) {
-    if(ret & XValue)
-      window_attribute->x      = xoff;
-    if(ret & YValue)
-      window_attribute->y      = yoff;
-    if(ret & WidthValue)
-      window_attribute->width  = width;
-    if(ret & HeightValue)
-      window_attribute->height = height;
-    
-    return 1;
-  }
-  return 0;
-}
-  
-static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
-  int ret = 0;
-  unsigned int visual = 0;
-
-  if(sscanf(visual_str, "%x", &visual) == 1) {
-    *vid = visual;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "StaticGray") == 0) {
-    *vclass = StaticGray;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "GrayScale") == 0) {
-    *vclass = GrayScale;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "StaticColor") == 0) {
-    *vclass = StaticColor;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "PseudoColor") == 0) {
-    *vclass = PseudoColor;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "TrueColor") == 0) {
-    *vclass = TrueColor;
-    ret = 1;
-  }
-  else if (strcasecmp(visual_str, "DirectColor") == 0) {
-    *vclass = DirectColor;
-    ret = 1;
-  }
-
-  return ret;
-}
-
-static void xrm_parse(void) {
-  gGui_t *gui = gGui;
-  Display      *display;
-  char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  const char   *environment;
-  const char   *classname = "xine";
-  char         *str_type;
-  XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
-  XrmValue      value;
-  
-  XrmInitialize();
-
-  rmdb = home_rmdb = server_rmdb = application_rmdb = NULL;
-
-  snprintf(wide_dbname, sizeof(wide_dbname), "%s%s", "/usr/lib/X11/app-defaults/", classname);
-  
-  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL)
-    return;
-  
-  application_rmdb = XrmGetFileDatabase(wide_dbname);
-  (void) XrmMergeDatabases(application_rmdb, &rmdb);
-  
-  if(XResourceManagerString(display) != NULL)
-    server_rmdb = XrmGetStringDatabase(XResourceManagerString(display));
-  else {
-    snprintf(user_dbname, sizeof(user_dbname), "%s%s", (xine_get_homedir()), "/.Xdefaults");
-    server_rmdb = XrmGetFileDatabase(user_dbname);
-  }
-  
-  (void) XrmMergeDatabases(server_rmdb, &rmdb);
-  
-  if((environment = getenv("XENVIRONMENT")) == NULL) {
-    int len;
-    
-    environment = environement_buf;
-    snprintf(environement_buf, sizeof(environement_buf), "%s%s", (xine_get_homedir()), "/.Xdefaults-");
-    len = strlen(environement_buf);
-    (void) gethostname(environement_buf + len, sizeof(environement_buf) - len);
-  }
-  
-  home_rmdb = XrmGetFileDatabase(environment);
-  (void) XrmMergeDatabases(home_rmdb, &rmdb);
-
-  if(XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", &str_type, &value) == True) {
-    if (!parse_geometry (&gui->window_attribute, (char *)value.addr))
-      printf(_("Bad geometry '%s'\n"), (char *)value.addr);
-  } 
-  if(XrmGetResource(rmdb, "xine.border", "xine.Border", &str_type, &value) == True) {
-    gui->window_attribute.borderless = !get_bool_value((char *) value.addr);
-  }
-  if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", &str_type, &value) == True) {
-    if(!parse_visual(&gui->prefered_visual_id, 
-		     &gui->prefered_visual_class, (char *)value.addr)) {
-      printf(_("Bad visual '%s'\n"), (char *)value.addr);
-    }
-  }
-  if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", &str_type, &value) == True) {
-    gui->install_colormap = !get_bool_value((char *) value.addr);
-  }
-  
-  XrmDestroyDatabase(rmdb);
-  
-  XCloseDisplay(display);
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -1375,7 +1249,6 @@ int main(int argc, char *argv[]) {
   int                     c = '?', aos    = 0;
   int                     option_index    = 0;
   int                     audio_channel   = -1;
-  int                     window_id       = 0;
   int                     spu_channel     = -1;
   char                   *audio_driver_id = NULL;
   char                   *video_driver_id = NULL;
@@ -1396,7 +1269,9 @@ int main(int argc, char *argv[]) {
   int                     session_argv_num = 0;
   int                     retval           = 0;
   pthread_mutexattr_t     mutexattr;
-  
+
+  gui_init_params_t       gui_params;
+
   /* Set stdout always line buffered to get every     */
   /* message line immediately, needed esp. for stdctl */
   setlinebuf(stdout);
@@ -1433,9 +1308,6 @@ int main(int argc, char *argv[]) {
   gui->debug_level            = 0;
 
   gui->autoscan_plugin        = NULL;
-  gui->prefered_visual_class  = -1;
-  gui->prefered_visual_id     = None;
-  gui->install_colormap       = 0;
   gui->cursor_grabbed         = 0;
   gui->network                = 0;
   gui->network_port           = 0;
@@ -1462,7 +1334,6 @@ int main(int argc, char *argv[]) {
   gui->ssaver_enabled         = 1;
   gui->no_gui                 = 0;
   gui->no_mouse               = 0;
-  gui->wid                    = 0;
   gui->nongui_error_msg       = NULL;
   gui->orig_stdout            = stdout;
   
@@ -1477,11 +1348,7 @@ int main(int argc, char *argv[]) {
 
   gui->last_playback_speed    = XINE_FINE_SPEED_NORMAL;
 
-  gui->window_attribute.x     =
-  gui->window_attribute.y     = -8192;
-  gui->window_attribute.width =
-  gui->window_attribute.height = -1;
-  gui->window_attribute.borderless = 0;
+  memset(&gui_params, 0, sizeof(gui_params));
 
   _argv = build_command_line_args(argc, argv, &_argc);
 #ifdef TRACE_RC
@@ -1497,11 +1364,6 @@ int main(int argc, char *argv[]) {
   }
 
   visual_anim_init();
-
-  /*
-   * Parse X Resource database
-   */
-  xrm_parse();
 
   /*
    * parse command line
@@ -1638,15 +1500,13 @@ int main(int argc, char *argv[]) {
        
     case OPTION_VISUAL:
       if(optarg != NULL) {
-	if(!parse_visual(&gui->prefered_visual_id, &gui->prefered_visual_class, optarg)) {
-	  show_usage();
-	  exit(1);
-	}
+        free(gui_params.prefered_visual);
+        gui_params.prefered_visual = strdup(optarg);
       }
       break;
 
     case OPTION_INSTALL_COLORMAP:
-      gui->install_colormap = 1;
+      gui_params.install_colormap = 1;
       break;
 
     case OPTION_DISPLAY_KEYMAP:
@@ -1697,15 +1557,13 @@ int main(int argc, char *argv[]) {
 
     case 'G': /* Set geometry */
       if(optarg != NULL) {
-        if (!parse_geometry (&gui->window_attribute, optarg)) {
-	  fprintf(stderr, _("Bad geometry '%s', see xine --help\n"), optarg);
-	  exit(1);
-	}
+        free(gui_params.geometry);
+        gui_params.geometry = strdup(optarg);
       }
       break;
 
     case 'B':
-      gui->window_attribute.borderless = 1;
+      gui_params.borderless = 1;
       break;
 
     case 'N':
@@ -1917,9 +1775,8 @@ int main(int argc, char *argv[]) {
       break;
     case 'W': /* Select wid */
       if(optarg != NULL) {
-        sscanf(optarg, "%i", &window_id);
-     	gui->wid = window_id;
-      } 
+        sscanf(optarg, "%i", &gui_params.window_id);
+      }
       else {
 	fprintf(stderr, _("window id required for -W option\n"));
 	exit(1);
@@ -1956,18 +1813,6 @@ int main(int argc, char *argv[]) {
     return retval;
   }
 
-  /* 
-   * Using root window mode don't allow
-   * window geometry, so, reset those params.
-   */
-  if(gui->use_root_window) {
-    gui->window_attribute.x =
-    gui->window_attribute.y = -8192;
-    gui->window_attribute.width =
-    gui->window_attribute.height = -1;
-    gui->window_attribute.borderless = 0;
-  }
-  
   show_banner();
   
 #ifndef DEBUG
@@ -2086,7 +1931,10 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
-  gui_init (gui, _argc - optind, &_argv[optind], &gui->window_attribute);
+
+  gui_params.num_files = _argc - optind;
+  gui_params.filenames = &_argv[optind];
+  gui_init (gui, &gui_params);
 
   pthread_mutex_init(&gui->download_mutex, NULL);
 
@@ -2296,21 +2144,7 @@ int main(int argc, char *argv[]) {
     applugin_rewire_posts();
   }
 
-  gui_run(session_argv);
-
-  /*
-   * Close X display before unloading modules linked against libGL.so
-   * https://www.xfree86.org/4.3.0/DRI11.html
-   *
-   * Do not close the library with dlclose() until after XCloseDisplay() has
-   * been called. When libGL.so initializes itself it registers several
-   * callbacks functions with Xlib. When XCloseDisplay() is called those
-   * callback functions are called. If libGL.so has already been unloaded
-   * with dlclose() this will cause a segmentation fault.
-   */
-  gui->x_lock_display (gui->display);
-  gui->x_unlock_display (gui->display);
-  XCloseDisplay(gui->display);
+  gui_run(gui, session_argv);
 
   xine_exit (gui->xine);
 
@@ -2325,6 +2159,9 @@ int main(int argc, char *argv[]) {
     
     free(session_argv);
   }
+
+  free(gui_params.geometry);
+  free(gui_params.prefered_visual);
 
   pthread_mutex_destroy(&gui->mmk_mutex);
   pthread_mutex_destroy (&gui->no_messages.mutex);

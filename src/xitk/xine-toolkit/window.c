@@ -32,6 +32,8 @@
 #include "_xitk.h"
 #include "xitk.h"
 
+#include "xitk_x11.h"
+
 #define TITLE_BAR_HEIGHT 20
 
 #define _XITK_VASPRINTF(_target_ptr,_fmt) \

@@ -244,14 +244,7 @@ struct gGui_st {
   xitk_t                   *xitk;
 
   /* basic X11 stuff */
-  void                    (*x_lock_display) (Display *display);
-  void                    (*x_unlock_display) (Display *display);
-  Display                  *display;
   xitk_pixmap_t            *icon;
-
-  VisualID	            prefered_visual_id;
-  int		            prefered_visual_class;
-  int		            install_colormap;
 
   xitk_skin_config_t       *skin_config;
   char                     *skin_server_url;
@@ -355,7 +348,6 @@ struct gGui_st {
   int                        no_gui;
   
   int                        no_mouse;
-  int                        wid;
 
   void                     (*nongui_error_msg)(const char *text);
 
@@ -387,9 +379,6 @@ struct gGui_st {
   filebrowser_t             *load_stream;
   filebrowser_t             *load_sub;
   int                        last_playback_speed;
-
-  /* main.c */
-  window_attributes_t        window_attribute;
 };
 
 extern gGui_t *gGui;

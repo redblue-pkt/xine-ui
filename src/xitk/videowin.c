@@ -62,6 +62,9 @@
 struct xui_vwin_st {
   gGui_t                *gui;
 
+  void                   (*x_lock_display) (Display *display);
+  void                   (*x_unlock_display) (Display *display);
+
   xitk_widget_list_t    *wl;
 
   char                   window_title[1024];
@@ -70,10 +73,12 @@ struct xui_vwin_st {
   int                    cursor_timer;
 
   int                    separate_display; /* gui and video window use different displays */
+  int                    wid; /* use this window */
   Display               *video_display;
   Window                 video_window;
   int                    gui_depth;
   Visual                *gui_visual;
+  char                  *prefered_visual;
   Visual	        *visual;          /* Visual for video window               */
   XClassHint            *xclasshint;
   XClassHint            *xclasshint_fullscreen;
@@ -185,9 +190,9 @@ void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
   if (vwin->gui->use_root_window || vwin->separate_display)
     return;
   pthread_mutex_lock (&vwin->mutex);
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   XSetTransientForHint (vwin->video_display, xitk_window_get_window(xwin), vwin->video_window);
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
   pthread_mutex_unlock (&vwin->mutex);
 }
 
@@ -202,7 +207,7 @@ void video_window_grab_input_focus(xui_vwin_t *vwin)
   int t;
   video_window_lock (vwin->gui->vwin, 1);
   want = vwin->video_window;
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   if (vwin->gui->cursor_grabbed) {
     XGrabPointer (vwin->video_display, want,
                   1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
@@ -211,31 +216,31 @@ void video_window_grab_input_focus(xui_vwin_t *vwin)
     /* Give focus to video output window */
     XSetInputFocus (vwin->video_display, want, RevertToParent, CurrentTime);
     XSync (vwin->video_display, False);
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     video_window_lock (vwin->gui->vwin, 0);
     /* check after 5/15/30/50/75/105/140 ms */
     for (t = 5000; t < 40000; t += 5000) {
       Window got;
       int revert;
       xine_usec_sleep (t);
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
       XGetInputFocus (vwin->video_display, &got, &revert);
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
       if (got == want)
         break;
     }
   } else {
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     video_window_lock (vwin->gui->vwin, 0);
   }
 }
 
 void video_window_grab_pointer(xui_vwin_t *vwin)
 {
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   XGrabPointer(vwin->video_display, vwin->video_window, 1, None,
                GrabModeAsync, GrabModeAsync, vwin->video_window, None, CurrentTime);
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
 }
 
 static void video_window_handle_event (XEvent *event, void *data);
@@ -258,9 +263,9 @@ static Bool have_xtestextention (xui_vwin_t *vwin) {
 #ifdef HAVE_XTESTEXTENSION
   int dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
   
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   xtestext = XTestQueryExtension (vwin->video_display, &dummy1, &dummy2, &dummy3, &dummy4);
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
 #else
   (void)vwin;
 #endif
@@ -286,11 +291,11 @@ static __attribute__((noreturn)) void *second_display_loop (void *data) {
     xine_usec_sleep(20000);
     
     do {
-        vwin->gui->x_lock_display (vwin->video_display);
+        vwin->x_lock_display (vwin->video_display);
         got_event = XPending (vwin->video_display);
         if( got_event )
           XNextEvent (vwin->video_display, &xevent);
-        vwin->gui->x_unlock_display (vwin->video_display);
+        vwin->x_unlock_display (vwin->video_display);
         
         if (got_event && vwin->gui->stream) {
           video_window_handle_event (&xevent, vwin);
@@ -302,13 +307,10 @@ static __attribute__((noreturn)) void *second_display_loop (void *data) {
   pthread_exit(NULL);
 }
 
-
 static void video_window_find_visual (xui_vwin_t *vwin) {
-
-  xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->gui->prefered_visual_id, vwin->gui->prefered_visual_class,
+  xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->prefered_visual,
                        &vwin->visual, &vwin->depth);
 }
-
 
 /*
  * Let the video driver override the selected visual
@@ -330,7 +332,9 @@ void video_window_select_visual (xui_vwin_t *vwin) {
     }
     if (vwin->gui_visual != vwin->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui_visual->visualid);
-      gui_init_imlib (vwin->gui, vwin->gui_visual);
+      xitk_x11_select_visual (vwin->gui->xitk, vwin->gui_visual);
+      vwin->gui->imlib_data = xitk_x11_get_imlib_data(vwin->gui->xitk);
+      vwin->gui_depth = xitk_x11_get_depth(vwin->gui->xitk);
       pthread_mutex_lock (&vwin->mutex);
       video_window_adapt_size (vwin);
       pthread_mutex_unlock (&vwin->mutex);
@@ -377,7 +381,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   Window                old_video_window = None;
   int                   border_width;
 
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
 
   if (vwin->gui->use_root_window) { /* Using root window, but not really */
 
@@ -403,7 +407,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         video_window_find_visual (vwin);
         colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
       } else {
-        colormap = Imlib_get_colormap (vwin->gui->imlib_data);
+        colormap = xitk_x11_get_colormap (vwin->gui->xitk);
       }
       
       XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
@@ -418,8 +422,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       
       border_width = 0;
 
-      if (vwin->gui->wid)
-        vwin->video_window = vwin->gui->wid;
+      if (vwin->wid)
+        vwin->video_window = vwin->wid;
       else
         vwin->video_window = XCreateWindow (vwin->video_display, rootwindow,
           0, 0, vwin->fullscreen_width, vwin->fullscreen_height, border_width,
@@ -429,9 +433,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *)vwin->video_window);
 
       if (vwin->gui->vo_port) {
-        vwin->gui->x_unlock_display (vwin->video_display);
+        vwin->x_unlock_display (vwin->video_display);
         xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-        vwin->gui->x_lock_display (vwin->video_display);
+        vwin->x_lock_display (vwin->video_display);
       }
 
       if (!(vwin->gui->no_mouse))
@@ -468,7 +472,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       vwin->old_widget_key = vwin->widget_key;
 
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
 
       if (!vwin->separate_display)
         vwin->widget_key = xitk_register_x_event_handler ("video_window",
@@ -478,7 +482,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       return;
     }
     
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     
     return;
   }
@@ -685,7 +689,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->output_height = vwin->visible_height;
         }
         vwin->fullscreen_mode = vwin->fullscreen_req;
-        vwin->gui->x_unlock_display (vwin->video_display);
+        vwin->x_unlock_display (vwin->video_display);
 
         return;
       }
@@ -705,7 +709,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
-      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
+      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
     }
     XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
 
@@ -718,8 +722,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     attr.colormap          = colormap;
 
     border_width           = 0;
-    if(vwin->gui->wid)
-      vwin->video_window = vwin->gui->wid;
+    if (vwin->wid)
+      vwin->video_window = vwin->wid;
     else
       vwin->video_window = XCreateWindow (vwin->video_display,
         DefaultRootWindow (vwin->video_display),
@@ -730,9 +734,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *)vwin->video_window);
 
     if (vwin->gui->vo_port) {
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
     }
 
     if (vwin->xclasshint_fullscreen != NULL)
@@ -786,7 +790,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	}
 //#endif
         vwin->fullscreen_mode = vwin->fullscreen_req;
-	vwin->gui->x_unlock_display (vwin->video_display);
+	vwin->x_unlock_display (vwin->video_display);
 
 	return;
       }
@@ -807,7 +811,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
-      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
+      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
     }
     XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
 
@@ -821,8 +825,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     border_width           = 0;
 
-    if (vwin->gui->wid)
-      vwin->video_window = vwin->gui->wid;
+    if (vwin->wid)
+      vwin->video_window = vwin->wid;
     else
       vwin->video_window = XCreateWindow (vwin->video_display,
         DefaultRootWindow(vwin->video_display),
@@ -834,9 +838,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *) vwin->video_window);
     
     if (vwin->gui->vo_port) {
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
     }
     
     if (vwin->xclasshint_fullscreen != NULL)
@@ -958,7 +962,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         XResizeWindow (vwin->video_display, vwin->video_window,
           vwin->win_width, vwin->win_height);
 
-        vwin->gui->x_unlock_display (vwin->video_display);
+        vwin->x_unlock_display (vwin->video_display);
 
 	return;	
       }
@@ -972,7 +976,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
-      colormap = Imlib_get_colormap (vwin->gui->imlib_data);
+      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
     }
     XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
     attr.background_pixel  = black.pixel;
@@ -984,8 +988,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     else
       border_width = 4;
 
-    if (vwin->gui->wid)
-      vwin->video_window = vwin->gui->wid;
+    if (vwin->wid)
+      vwin->video_window = vwin->wid;
     else
       vwin->video_window = XCreateWindow (vwin->video_display,
         DefaultRootWindow (vwin->video_display),
@@ -996,9 +1000,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *) vwin->video_window);
 
     if (vwin->gui->vo_port) {
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
     }
     
     if (vwin->borderless) {
@@ -1113,7 +1117,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         None, GrabModeAsync, GrabModeAsync, vwin->video_window, None, CurrentTime);
   }
 
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
 
   vwin->old_widget_key = vwin->widget_key;
 
@@ -1126,10 +1130,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   {
     Window tmp_win;
     
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     XTranslateCoordinates (vwin->video_display, vwin->video_window,
       DefaultRootWindow (vwin->video_display), 0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
   }
 
   oxine_adapt();
@@ -1471,7 +1475,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
      (vwin->win_width != vwin->old_win_width || vwin->win_height != vwin->old_win_height))
     video_window_adapt_size (vwin);
 
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   
   if (vwin->show == 1) {
 
@@ -1500,7 +1504,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
   else
     XUnmapWindow (vwin->video_display, vwin->video_window);
   
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
   
   /* User used '-H', now he want to show video window */
   if (vwin->hide_on_start == -1)
@@ -1533,13 +1537,19 @@ static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_n
   return 0;
 }
 
+static void vwin_dummy_un_lock_display (Display *display) {
+  (void)display;
+}
+
 /*
  *
  */
-xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
-                               int depth, window_attributes_t *window_attribute, int hide_on_start) {
+xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
+                               int borderless, const char *geometry, int hide_on_start,
+                               const char *prefered_visual, int use_x_lock_display) {
   xui_vwin_t           *vwin;
   int                   i;
+  const char           *video_display_name;
 #ifdef HAVE_XINERAMA
   int                   screens;
   int                   dummy_a, dummy_b;
@@ -1549,12 +1559,33 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
 #ifdef HAVE_XF86VIDMODE
   int                   dummy_query_event, dummy_query_error;
 #endif
+  int geometry_x = 0, geometry_y = 0, geometry_w = -8192, geometry_h = -8192;
+
+  video_display_name =
+    xine_config_register_string (gui->xine, "gui.video_display",
+                                 "",
+                                 _("Name of video display"),
+                                 _("Use this setting to configure to which "
+                                   "display xine will show videos. When left blank, "
+                                   "the main display will be used. Setting this "
+                                   "option to something like ':0.1' or ':1' makes "
+                                   "possible to display video and control on different "
+                                   "screens (very useful for TV presentations)."),
+                                 CONFIG_LEVEL_ADV, NULL, CONFIG_NO_DATA);
 
   if (!gui)
     return NULL;
   vwin = calloc (1, sizeof (*vwin));
   if (!vwin)
     return NULL;
+
+  if (use_x_lock_display) {
+    vwin->x_lock_display = XLockDisplay;
+    vwin->x_unlock_display = XUnlockDisplay;
+  } else {
+    vwin->x_lock_display =
+    vwin->x_unlock_display = vwin_dummy_un_lock_display;
+  }
 
   vwin->gui = gui;
   pthread_mutex_init (&vwin->mutex, NULL);
@@ -1568,19 +1599,47 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
   }
 
   if (vwin->video_display == NULL) {
-    vwin->video_display = gui->display;
+    vwin->video_display = xitk_x11_get_display(gui->xitk);
   }
 
-  gui->x_lock_display (vwin->video_display);
+  {
+    char *xrm_geometry = NULL;
+    if (prefered_visual)
+      vwin->prefered_visual = strdup(prefered_visual);
+    xitk_x11_xrm_parse("xine",
+                       geometry ? NULL : &xrm_geometry,
+                       borderless ? NULL : &borderless,
+                       vwin->prefered_visual ? NULL : &vwin->prefered_visual,
+                       NULL);
+    if (!gui->use_root_window) {
+      if (!geometry)
+        geometry = xrm_geometry;
+      if (geometry &&
+          !xitk_x11_parse_geometry (geometry, &geometry_x, &geometry_y, &geometry_w, &geometry_h))
+        printf(_("Bad geometry '%s'\n"), geometry);
+    }
+    free(xrm_geometry);
+  }
+  if (gui->use_root_window) {
+    /*
+     * Using root window mode don't allow
+     * window geometry, so, reset those params.
+     */
+    geometry = NULL;
+    borderless = 0;
+  }
+
+  vwin->x_lock_display (vwin->video_display);
   vwin->video_screen = DefaultScreen(vwin->video_display);
-  gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
 
   if (!vwin->separate_display) {
-    vwin->wl = xitk_widget_list_new (vwin->gui->imlib_data);
+    vwin->wl = xitk_widget_list_new (xitk_x11_get_imlib_data(vwin->gui->xitk));
   }
 
   vwin->video_window       = None;
-  vwin->gui_depth          = depth;
+  vwin->wid                = window_id;
+  vwin->gui_depth          = xitk_x11_get_depth(gui->xitk);
   vwin->fullscreen_req     = WINDOWED_MODE;
   vwin->fullscreen_mode    = WINDOWED_MODE;
   vwin->video_window  = None;
@@ -1588,23 +1647,25 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
   vwin->widget_key         = 
   vwin->old_widget_key     = 0;
   vwin->gc                 = None;
-  vwin->borderless         = window_attribute->borderless;
+  vwin->borderless         = (borderless > 0);
   vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
 
   vwin->depth              = vwin->gui_depth;
-  vwin->visual             = Imlib_get_visual(gui->imlib_data);
+  vwin->gui_visual         =
+  vwin->visual             = xitk_x11_get_visual(gui->xitk);
+
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual (vwin);
- 
+
   if (vwin->separate_display) {
     video_window_find_visual (vwin);
   }
   
-  vwin->xwin               = window_attribute->x;
-  vwin->ywin               = window_attribute->y;
+  vwin->xwin               = geometry_x;
+  vwin->ywin               = geometry_y;
 
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   vwin->desktopWidth       = DisplayWidth(vwin->video_display, vwin->video_screen);
   vwin->desktopHeight      = DisplayHeight(vwin->video_display, vwin->video_screen);
 
@@ -1787,7 +1848,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
   vwin->wm_hint->icon_pixmap   = xitk_pixmap_get_pixmap(vwin->gui->icon);
   vwin->wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
 
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
       
   vwin->stream_resize_window = xine_config_register_bool (vwin->gui->xine, "gui.stream_resize_window",
     1,
@@ -1799,9 +1860,9 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
     _("Double size for small streams (require stream_resize_window)"),
     CONFIG_NO_HELP, CONFIG_LEVEL_ADV, _video_window_zoom_small_cb, vwin);
   
-  if ((window_attribute->width > 0) && (window_attribute->height > 0)) {
-    vwin->video_width  = window_attribute->width;
-    vwin->video_height = window_attribute->height;
+  if ((geometry_w > 0) && (geometry_h > 0)) {
+    vwin->video_width  = geometry_w;
+    vwin->video_height = geometry_h;
     /* 
      * Force to keep window size.
      * I don't update the config file, i think this window geometry
@@ -1830,7 +1891,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
      */
     vwin->stream_resize_window = 1;
     
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     
     if (XF86VidModeQueryExtension (vwin->video_display, &dummy_query_event, &dummy_query_error)) {
       XF86VidModeModeInfo* XF86_modelines_swap;
@@ -1886,7 +1947,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
     } else {
       printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
     }
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
   }
   else
     vwin->XF86_modelines_count = 0;
@@ -1906,10 +1967,10 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
   if (vwin->video_window) {
     Window tmp_win;
     
-    vwin->gui->x_lock_display (vwin->video_display);
-    if((window_attribute->x > -8192) && (window_attribute->y > -8192)) {
-      vwin->xwin = vwin->old_xwin = window_attribute->x;
-      vwin->ywin = vwin->old_ywin = window_attribute->y;
+    vwin->x_lock_display (vwin->video_display);
+    if (geometry && (geometry_x > -8192) && (geometry_y > -8192)) {
+      vwin->xwin = vwin->old_xwin = geometry_x;;
+      vwin->ywin = vwin->old_ywin = geometry_y;
       
       XMoveResizeWindow (vwin->video_display, vwin->video_window, 
         vwin->xwin, vwin->ywin, vwin->video_width, vwin->video_height);
@@ -1920,7 +1981,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
       XTranslateCoordinates (vwin->video_display, vwin->video_window,
         DefaultRootWindow (vwin->video_display), 0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
     }
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
 
   }
   
@@ -1934,12 +1995,12 @@ xui_vwin_t *video_window_init (gGui_t *gui, const char *video_display_name,
     int    dummy_event, dummy_error;
 #endif
     double res_h, res_v;
-    gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     res_h                 = (DisplayWidth  (vwin->video_display, vwin->video_screen) * 1000
                              / DisplayWidthMM (vwin->video_display, vwin->video_screen));
     res_v                 = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
                              / DisplayHeightMM (vwin->video_display, vwin->video_screen));
-    gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     vwin->pixel_aspect    = res_v / res_h;
 
 #ifdef HAVE_XINERAMA
@@ -1980,10 +2041,10 @@ void video_window_exit (xui_vwin_t *vwin) {
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
   if (vwin->gui->XF86VidMode_fullscreen) {
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display), vwin->XF86_modelines[0]);
     XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
   }
 #endif
 
@@ -1994,7 +2055,7 @@ void video_window_exit (xui_vwin_t *vwin) {
       XEvent event;
     } event;
     
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     XClearWindow (vwin->video_display, vwin->video_window);
     event.expose.type       = Expose;
     event.expose.send_event = True;
@@ -2005,7 +2066,7 @@ void video_window_exit (xui_vwin_t *vwin) {
     event.expose.width      = vwin->video_width;
     event.expose.height     = vwin->video_height;
     XSendEvent (vwin->video_display, vwin->video_window, False, Expose, &event.event);
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
   }
     
   if (!vwin->separate_display) {
@@ -2034,11 +2095,12 @@ void video_window_exit (xui_vwin_t *vwin) {
 #endif
 
   if (vwin->separate_display) {
-    vwin->gui->x_lock_display (vwin->video_display);
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     XCloseDisplay(vwin->video_display);
   }
 
+  free(vwin->prefered_visual);
   free (vwin);
 }
 
@@ -2075,14 +2137,14 @@ static int video_window_translate_point (xui_vwin_t *vwin,
 
   pthread_mutex_lock (&vwin->mutex);
 
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   if (XGetGeometry (vwin->video_display, vwin->video_window, &rootwin,
     &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) == BadDrawable) {
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     pthread_mutex_unlock (&vwin->mutex);
     return 0;
   }
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
   
   /* Scale co-ordinate to image dimensions. */
   height_scale = (float)vwin->video_height / (float)hwin;
@@ -2373,10 +2435,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
       vwin->output_height = cev->height;
 
       if ((cev->x == 0) && (cev->y == 0)) {
-        vwin->gui->x_lock_display (cev->display);
+        vwin->x_lock_display (cev->display);
         XTranslateCoordinates(cev->display, cev->window, DefaultRootWindow(cev->display),
                               0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
-        vwin->gui->x_unlock_display (cev->display);
+        vwin->x_unlock_display (cev->display);
       }
       else {
         vwin->xwin = cev->x;
@@ -2409,14 +2471,14 @@ long int video_window_get_ssaver_idle (xui_vwin_t *vwin) {
   {
     long int ssaver_idle = -1;
     int dummy = 0;
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
     if (XScreenSaverQueryExtension (vwin->video_display, &dummy, &dummy)) {
       XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
       XScreenSaverQueryInfo (vwin->video_display, (DefaultRootWindow (vwin->video_display)), ssaverinfo);
       ssaver_idle = ssaverinfo->idle / 1000;
       XFree(ssaverinfo);
     }
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     if (ssaver_idle != -1)
       return ssaver_idle;
   }
@@ -2447,11 +2509,11 @@ long int video_window_reset_ssaver (xui_vwin_t *vwin) {
       if (vwin->fake_key_cur >= 2)
         vwin->fake_key_cur = 0;
 
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
       XTestFakeKeyEvent (vwin->video_display, vwin->fake_keys[vwin->fake_key_cur], True, CurrentTime);
       XTestFakeKeyEvent (vwin->video_display, vwin->fake_keys[vwin->fake_key_cur], False, CurrentTime);
       XSync (vwin->video_display, False);
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
     }
     else 
 #endif
@@ -2500,9 +2562,9 @@ long int video_window_reset_ssaver (xui_vwin_t *vwin) {
 	}
       }
 
-      vwin->gui->x_lock_display (vwin->video_display);
+      vwin->x_lock_display (vwin->video_display);
       XResetScreenSaver (vwin->video_display);
-      vwin->gui->x_unlock_display (vwin->video_display);
+      vwin->x_unlock_display (vwin->video_display);
     }
   }
   return idle;
@@ -2559,9 +2621,9 @@ void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
     return;
   memcpy (vwin->window_title, "xine: ", 6);
   strlcpy (vwin->window_title + 6, mrl, sizeof (vwin->window_title) - 6);
-  vwin->gui->x_lock_display (vwin->video_display);
+  vwin->x_lock_display (vwin->video_display);
   _set_window_title (vwin);
-  vwin->gui->x_unlock_display (vwin->video_display);
+  vwin->x_unlock_display (vwin->video_display);
 }
 
 void video_window_toggle_border (xui_vwin_t *vwin) {
@@ -2575,7 +2637,7 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     
     vwin->borderless = !vwin->borderless;
     
-    vwin->gui->x_lock_display (vwin->video_display);
+    vwin->x_lock_display (vwin->video_display);
 
     memset(&mwmhints, 0, sizeof(mwmhints));
     prop                 = XInternAtom (vwin->video_display, "_MOTIF_WM_HINTS", False);
@@ -2589,7 +2651,7 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     if(xclasshint != NULL)
       XSetClassHint (vwin->video_display, vwin->video_window, xclasshint);
     
-    vwin->gui->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
     
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }

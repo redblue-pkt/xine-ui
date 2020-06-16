@@ -2411,11 +2411,13 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
       }
 
       /* Flush event when xine !play */
+      /* Why ?
       if(flushing && ((xine_get_status(gui->stream) != XINE_STATUS_PLAY))) {
 	gui->x_lock_display (gui->display);
 	XSync(gui->display, False);
 	gui->x_unlock_display (gui->display);
       }
+      */
     }
   }
 }
