@@ -1094,7 +1094,6 @@ void playlist_editor(void) {
   br.browser.entries               = (const char **)playlist->playlist_mrls;
   br.callback                      = _playlist_handle_selection;
   br.dbl_click_callback            = _playlist_play_on_dbl_click;
-  br.parent_wlist                  = playlist->widget_list;
   playlist->playlist =  xitk_browser_create(playlist->widget_list, gui->skin_config, &br);
   xitk_add_widget (playlist->widget_list, playlist->playlist);
 

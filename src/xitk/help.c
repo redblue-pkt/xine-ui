@@ -397,7 +397,6 @@ void help_panel(void) {
   br.browser.entries               = NULL;
   br.callback                      = NULL;
   br.dbl_click_callback            = NULL;
-  br.parent_wlist                  = help->widget_list;
   br.userdata                      = NULL;
   help->browser = xitk_noskin_browser_create (help->widget_list, &br,
     (XITK_WIDGET_LIST_GC(help->widget_list)), 15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);

@@ -1260,7 +1260,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.browser.entries               = (const char *const *)fb->directories;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
-  br.parent_wlist                  = fb->widget_list;
   br.userdata                      = (void *)fb;
   fb->directories_browser = xitk_noskin_browser_create (fb->widget_list, &br,
     (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
@@ -1291,7 +1290,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.browser.entries               = (const char *const *)fb->files;
   br.callback                      = fb_select;
   br.dbl_click_callback            = fb_dbl_select;
-  br.parent_wlist                  = fb->widget_list;
   br.userdata                      = (void *)fb;
   fb->files_browser = xitk_noskin_browser_create (fb->widget_list, &br,
     (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
@@ -1421,7 +1419,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   cmb.skin_element_name = NULL;
   cmb.layer_above       = (is_layer_above());
-  cmb.parent_wlist      = fb->widget_list;
   cmb.entries           = fb->file_filters;
   cmb.parent_wkey       = &fb->widget_key;
   cmb.callback          = fb_select_file_filter;

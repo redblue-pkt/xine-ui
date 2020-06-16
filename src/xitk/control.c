@@ -410,7 +410,6 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   br.callback                      =
   br.dbl_click_callback            = control_select_new_skin;
   br.userdata                      = vctrl;
-  br.parent_wlist                  = vctrl->widget_list;
   vctrl->skinlist = xitk_browser_create (vctrl->widget_list, vctrl->gui->skin_config, &br);
   xitk_add_widget (vctrl->widget_list, vctrl->skinlist);
 

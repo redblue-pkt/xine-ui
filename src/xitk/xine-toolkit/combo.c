@@ -236,10 +236,9 @@ static void _combo_open (_combo_private_t *wp) {
     browser.browser.entries               = (const char * const *)wp->entries;
     browser.callback                      = combo_select;
     browser.dbl_click_callback            = NULL;
-    browser.parent_wlist                  = wp->widget_list;
     browser.userdata                      = (void *)wp;
     wp->browser_widget = xitk_noskin_browser_create (wp->widget_list, &browser,
-      wp->gc, 1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
+      wp->widget_list->gc, 1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
     xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
     xitk_enable_and_show_widget (wp->browser_widget);
     wp->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
@@ -652,7 +651,7 @@ static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_conf
   wp->imlibdata                = wl->imlibdata;
   wp->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   wp->combo_widget             = &wp->w;
-  wp->parent_wlist             = c->parent_wlist;
+  wp->parent_wlist             = wl;
   wp->parent_wkey              = c->parent_wkey;
   wp->callback                 = c->callback;
   wp->userdata                 = c->userdata;
@@ -705,19 +704,19 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   lbl.skin_element_name = c->skin_element_name;
   lbl.callback          = _combo_rollunroll_from_lbl;
   lbl.userdata          = (void *)wp;
-  if ((wp->label_widget = xitk_label_create (c->parent_wlist, skonfig, &lbl))) {
+  if ((wp->label_widget = xitk_label_create (wl, skonfig, &lbl))) {
     wp->label_widget->parent = &wp->w;
     wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-    xitk_dlist_add_tail (&c->parent_wlist->list, &wp->label_widget->node);
+    xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
   }
 
   cb.skin_element_name = c->skin_element_name;
   cb.callback          = _combo_rollunroll;
   cb.userdata          = (void *)wp;
-  if ((wp->button_widget = xitk_checkbox_create (c->parent_wlist, skonfig, &cb))) {
+  if ((wp->button_widget = xitk_checkbox_create (wl, skonfig, &cb))) {
     wp->button_widget->parent = &wp->w;
     wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-    xitk_dlist_add_tail (&c->parent_wlist->list, &wp->button_widget->node);
+    xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
   }
 
   if(lw)
@@ -772,7 +771,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     int             height;
     
     fs = xitk_font_load_font(wl->imlibdata->x.disp, DEFAULT_FONT_10);
-    xitk_font_set_font(fs, c->parent_wlist->gc);
+    xitk_font_set_font(fs, wl->gc);
     height = xitk_font_get_string_height(fs, " ") + 4;
     xitk_font_unload_font(fs);
 
@@ -780,22 +779,22 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     lbl.label             = "";
     lbl.callback          = _combo_rollunroll_from_lbl;
     lbl.userdata          = (void *)wp;
-    if ((wp->label_widget = xitk_noskin_label_create (c->parent_wlist, &lbl,
+    if ((wp->label_widget = xitk_noskin_label_create (wl, &lbl,
       x, y, (width - height), height, DEFAULT_FONT_10))) {
       wp->label_widget->parent = &wp->w;
       wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-      xitk_dlist_add_tail (&c->parent_wlist->list, &wp->label_widget->node);
+      xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
     }
 
     cb.skin_element_name = "XITK_NOSKIN_DOWN";
     cb.callback          = _combo_rollunroll;
     cb.userdata          = (void *)wp;
 
-    if ((wp->button_widget = xitk_noskin_checkbox_create (c->parent_wlist, &cb,
+    if ((wp->button_widget = xitk_noskin_checkbox_create (wl, &cb,
       x + (width - height), y, height, height))) {
       wp->button_widget->parent = &wp->w;
       wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-      xitk_dlist_add_tail (&c->parent_wlist->list, &wp->button_widget->node);
+      xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
     }
 
     if(lw)
