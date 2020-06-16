@@ -315,24 +315,23 @@ void xitk_font_cache_done(void) {
 /* 
  * get index of oldest item in the cache 
  */
-static size_t xitk_cache_get_oldest(void) {
-  xitk_t *xitk = gXitk;
+static size_t xitk_cache_get_oldest(xitk_font_cache_t *font_cache) {
   size_t          i, oldest;
   unsigned long   lru;
 
-  if(!xitk->font_cache->n) {
+  if (!font_cache->n) {
     fprintf(stderr, "%s(%d): cache.n == 0. Aborting.\n", __FUNCTION__, __LINE__);
     abort();
   }
   
   i      = 0;
   oldest = 0;
-  lru    = xitk->font_cache->items[0].lru;
+  lru    = font_cache->items[0].lru;
 
-  for(i = 1; i < xitk->font_cache->n; i++) {
-    if(xitk->font_cache->items[i].lru < lru) {
+  for (i = 1; i < font_cache->n; i++) {
+    if (font_cache->items[i].lru < lru) {
       oldest = i;
-      lru = xitk->font_cache->items[i].lru;
+      lru = font_cache->items[i].lru;
     }
   }
 
@@ -342,61 +341,58 @@ static size_t xitk_cache_get_oldest(void) {
 /* 
  * place item into cache and adjust all counters for LRU 
  */
-static void xitk_cache_insert_final(size_t pos, xitk_font_t *font) {
-  xitk_t *xitk = gXitk;
+static void xitk_cache_insert_final(xitk_font_cache_t *font_cache, size_t pos, xitk_font_t *font) {
   size_t i;
 
-  xitk->font_cache->items[pos].lru  = xitk->font_cache->life;
-  xitk->font_cache->items[pos].font = font;
+  font_cache->items[pos].lru  = font_cache->life;
+  font_cache->items[pos].font = font;
 
-  if(xitk->font_cache->life + 1 == 0) {
-    xitk->font_cache->life >>= 1;
-    for(i = 0; i < xitk->font_cache->n; i++) 
-      xitk->font_cache->items[i].lru >>= 1;
+  if (font_cache->life + 1 == 0) {
+    font_cache->life >>= 1;
+    for (i = 0; i < font_cache->n; i++)
+      font_cache->items[i].lru >>= 1;
   } 
   else 
-    xitk->font_cache->life++;
+    font_cache->life++;
 }
 
 /* 
  * insert item into sorted cache, it shifts part of cache to move gap
  */
-static void xitk_cache_insert_into(size_t gap, int step, xitk_font_t *font) {
-  xitk_t *xitk = gXitk;
+static void xitk_cache_insert_into(xitk_font_cache_t *font_cache, size_t gap, int step, xitk_font_t *font) {
   size_t i;
 
   i = gap;
-  while (((step == -1 && i > 0) || (step == 1 && i < xitk->font_cache->n - 1)) 
-	 && strcmp(font->name, xitk->font_cache->items[i + step].font->name) * step > 0) {
-    xitk->font_cache->items[i] = xitk->font_cache->items[i + step];
+  while (((step == -1 && i > 0) || (step == 1 && i < font_cache->n - 1))
+         && strcmp(font->name, font_cache->items[i + step].font->name) * step > 0) {
+    font_cache->items[i] = font_cache->items[i + step];
     i += step;
   }
-  xitk_cache_insert_final(i, font);
+  xitk_cache_insert_final(font_cache, i, font);
 }
 
 /* 
  * add new item into cache, if it's full the oldest item will be released
  */
-static void xitk_cache_add_item(xitk_font_t *font) {
-  xitk_t *xitk = gXitk;
+static void xitk_cache_add_item(xitk_font_cache_t *font_cache, xitk_font_t *font) {
   size_t       oldest;
   int          cmp;
   xitk_font_t *xtfs;
 	
-  if(xitk->font_cache->n < XITK_CACHE_SIZE) {
+  if (font_cache->n < XITK_CACHE_SIZE) {
     /* cache is not full */
-    xitk->font_cache->n++;
-    xitk_cache_insert_into(xitk->font_cache->n - 1, -1, font);
+    font_cache->n++;
+    xitk_cache_insert_into(font_cache, font_cache->n - 1, -1, font);
   } 
   else {
     /* cache is full */
     /* free the oldest item */
-    oldest = xitk_cache_get_oldest();
-    cmp    = strcmp(font->name, xitk->font_cache->items[oldest].font->name);
-    xtfs   = xitk->font_cache->items[oldest].font;
+    oldest = xitk_cache_get_oldest(font_cache);
+    cmp    = strcmp(font->name, font_cache->items[oldest].font->name);
+    xtfs   = font_cache->items[oldest].font;
 
 #ifdef LOG
-    printf("xiTK: dropped \"%s\", list: %zu, cache: %zu\n", xtfs->name, xitk->font_cache->nlist, xitk->font_cache->n);
+    printf("xiTK: dropped \"%s\", list: %zu, cache: %zu\n", xtfs->name, font_cache->nlist, font_cache->n);
 #endif
 
     xitk_font_unload_one(xtfs);
@@ -405,14 +401,14 @@ static void xitk_cache_add_item(xitk_font_t *font) {
 
     /* insert new item into sorted cache */
     if(cmp == 0)
-      xitk_cache_insert_final(oldest, font);
+      xitk_cache_insert_final(font_cache, oldest, font);
     else {
       if(cmp < 0) 
 	cmp = -1;
       else 
 	cmp = 1;
       
-      xitk_cache_insert_into(oldest, cmp, font);
+      xitk_cache_insert_into(font_cache, oldest, cmp, font);
     }
   }
 }
@@ -420,15 +416,14 @@ static void xitk_cache_add_item(xitk_font_t *font) {
 /* 
  * remove the item in 'pos' and returns its data
  */
-static xitk_font_t *xitk_cache_remove_item(size_t pos) {
-  xitk_t *xitk = gXitk;
+static xitk_font_t *xitk_cache_remove_item(xitk_font_cache_t *font_cache, size_t pos) {
   xitk_font_t *xtfs;
   size_t       i;
 
-  xtfs = xitk->font_cache->items[pos].font;
-  for (i = pos; i < xitk->font_cache->n - 1; i++)
-    xitk->font_cache->items[i] = xitk->font_cache->items[i + 1];
-  xitk->font_cache->n--;
+  xtfs = font_cache->items[pos].font;
+  for (i = pos; i < font_cache->n - 1; i++)
+    font_cache->items[i] = font_cache->items[i + 1];
+  font_cache->n--;
 
   return xtfs;
 }
@@ -436,22 +431,21 @@ static xitk_font_t *xitk_cache_remove_item(size_t pos) {
 /* 
  * search the font of given display in the cache, remove it from the cache
  */
-static xitk_font_t *xitk_cache_take_item(Display *display, const char *name) {
-  xitk_t *xitk = gXitk;
+static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, Display *display, const char *name) {
   int     left, right;
   size_t  i, j;
   int     cmp;
 
-  if(!xitk->font_cache->n)
+  if (!font_cache->n)
     return NULL;
 
   /* binary search in the cache */
   left  = 0;
-  right = xitk->font_cache->n - 1;
+  right = font_cache->n - 1;
 
   while(right >= left) {
     i = (left + right) >> 1;
-    cmp = strcmp(name, xitk->font_cache->items[i].font->name);
+    cmp = strcmp(name, font_cache->items[i].font->name);
 
     if(cmp < 0)
       right = i - 1;
@@ -462,25 +456,25 @@ static xitk_font_t *xitk_cache_take_item(Display *display, const char *name) {
       /* forward */
       j = i;
       while(1) {
-	if(xitk->font_cache->items[j].font->display == display)
-	  return xitk_cache_remove_item(j);
+        if (font_cache->items[j].font->display == display)
+          return xitk_cache_remove_item(font_cache, j);
 
 	if(!j) 
 	  break;
 
-	cmp = strcmp(name, xitk->font_cache->items[--j].font->name);
+        cmp = strcmp(name, font_cache->items[--j].font->name);
       }
       /* backward */
       j = i + 1;
 
-      while(j < xitk->font_cache->n) {
-	cmp = strcmp(name, xitk->font_cache->items[j].font->name);
+      while (j < font_cache->n) {
+        cmp = strcmp(name, font_cache->items[j].font->name);
 
 	if(cmp != 0)
 	  return NULL;
 
-	if(xitk->font_cache->items[j].font->display == display)
-	  return xitk_cache_remove_item(j);
+        if (font_cache->items[j].font->display == display)
+          return xitk_cache_remove_item(font_cache, j);
 
 	j++;
       }
@@ -497,9 +491,8 @@ static xitk_font_t *xitk_cache_take_item(Display *display, const char *name) {
 /*
  * search the font in the list of loaded fonts
  */
-static xitk_font_list_item_t *cache_get_from_list(Display *display, const char *name) {
-  xitk_t *xitk = gXitk;
-  xitk_font_list_item_t *item = (xitk_font_list_item_t *)xitk->font_cache->loaded.head.next;
+static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache, Display *display, const char *name) {
+  xitk_font_list_item_t *item = (xitk_font_list_item_t *)font_cache->loaded.head.next;
   while (item->node.next) {
     if ((strcmp(name, item->font->name) == 0) && (display == item->font->display))
       return item;
@@ -515,17 +508,20 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
   xitk_t *xitk = gXitk;
   xitk_font_t           *xtfs;
   xitk_font_list_item_t *list_item;
-  
+  xitk_font_cache_t     *font_cache;
+
   ABORT_IF_NULL(display);
   ABORT_IF_NULL(font);
-  pthread_mutex_lock(&xitk->font_cache->mutex);
+
+  font_cache = xitk->font_cache;
+  pthread_mutex_lock(&font_cache->mutex);
   
   /* quick search in the cache of unloaded fonts */
-  if((xtfs = xitk_cache_take_item(display, font)) == NULL) {
+  if ((xtfs = xitk_cache_take_item(font_cache, display, font)) == NULL) {
     /* search in the list of loaded fonts */
-    if((list_item = cache_get_from_list(display, font)) != NULL) {
+    if((list_item = cache_get_from_list(font_cache, display, font)) != NULL) {
       list_item->number++;
-      pthread_mutex_unlock(&xitk->font_cache->mutex);
+      pthread_mutex_unlock(&font_cache->mutex);
       return list_item->font;
     }
   }
@@ -542,7 +538,7 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
  	if(!xitk_font_load_one(display, fsname, xtfs)) {
 	  XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
 	  free(xtfs);
-	  pthread_mutex_unlock(&xitk->font_cache->mutex);
+          pthread_mutex_unlock(&font_cache->mutex);
 
 	  /* Maybe broken XMB support */
 	  if(xitk_get_xmb_enability()) {
@@ -562,10 +558,10 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
 
     xtfs->name = strdup(font);
     xtfs->display = display;
-    xtfs->font_cache = xitk->font_cache;
+    xtfs->font_cache = font_cache;
 
 #ifdef LOG
-    printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", xtfs->name, xitk->font_cache->nlist, xitk->font_cache->n);
+    printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", xtfs->name, font_cache->nlist, font_cache->n);
 #endif
   }
 
@@ -573,10 +569,10 @@ xitk_font_t *xitk_font_load_font(Display *display, const char *font) {
   list_item         = xitk_xmalloc(sizeof(xitk_font_list_item_t));
   list_item->font   = xtfs;
   list_item->number = 1;
-  xitk_dlist_add_tail (&xitk->font_cache->loaded, &list_item->node);
-  xitk->font_cache->nlist++;
+  xitk_dlist_add_tail (&font_cache->loaded, &list_item->node);
+  font_cache->nlist++;
 
-  pthread_mutex_unlock(&xitk->font_cache->mutex);
+  pthread_mutex_unlock(&font_cache->mutex);
 
   return xtfs;
 }
@@ -601,14 +597,14 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 
   pthread_mutex_lock(&xtfs->font_cache->mutex);
   /* search the font in the list */
-  item = cache_get_from_list(xtfs->display, xtfs->name);
+  item = cache_get_from_list(xtfs->font_cache, xtfs->display, xtfs->name);
   /* it must be there */
   ABORT_IF_NULL(item);
 
   if(--item->number == 0) {
     xitk_dnode_remove (&item->node);
     xtfs->font_cache->nlist--;
-    xitk_cache_add_item(item->font);
+    xitk_cache_add_item(xtfs->font_cache, item->font);
     free(item);
   }
 
