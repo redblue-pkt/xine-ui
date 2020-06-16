@@ -270,10 +270,12 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 	      continue;
 	    break;
 
+          case WIDGET_TYPE_COMBO:
+            numval = xitk_combo_get_current_selected (w);
+            break;
+
 	  default:
-	    if(type & WIDGET_GROUP_COMBO)
-	      numval = xitk_combo_get_current_selected(w);
-	    else if(type & WIDGET_GROUP_INTBOX) {
+            if (type & WIDGET_GROUP_INTBOX) {
 	      numval = xitk_intbox_get_value(w);
               if (numval == setup->wg[i].cfg.num_value)
 		continue;
