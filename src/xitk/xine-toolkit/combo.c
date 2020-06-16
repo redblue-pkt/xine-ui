@@ -119,9 +119,7 @@ static void _combo_handle_event (XEvent *event, void *data) {
           KeySym mykey;
           char kbuf[32];
 
-          XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-          XLookupString (&event->xkey, kbuf, sizeof (kbuf), &mykey, NULL);
-          XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+          xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
           if (mykey == XK_Escape) {
             _combo_close (wp);
             xitk_checkbox_set_state (wp->button_widget, 0);
