@@ -646,7 +646,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     xitk_skin_lock(skonfig);
     xitk_hide_widgets(private_data->widget_list);
 
-    bg_image = xitk_image_load_image (private_data->imlibdata,
+    bg_image = xitk_image_load_image (w->wl->imlibdata,
                                       xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
     if (!bg_image) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
@@ -899,7 +899,6 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   mywidget->private_data          = private_data;
 
   private_data->fbWidget          = mywidget;
-  private_data->imlibdata         = im;
   private_data->skin_element_name = strdup(mb->skin_element_name);
 
   private_data->xine              = mb->xine;
