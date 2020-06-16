@@ -2483,8 +2483,8 @@ xitk_t *xitk_init (Display *display, void (*x_lock_display) (Display *display),
   xitk->wm_type = xitk_check_wm(display);
   
   /* init font caching */
-  xitk_font_cache_init();
-  
+  xitk->x.font_cache = xitk_font_cache_init();
+
   xitk_cursors_init(display);
   xitk->x.tips = xitk_tips_init(display);
 
@@ -2656,10 +2656,10 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
   MUTUNLOCK ();
 
   /* destroy font caching */
-  xitk_font_cache_done();
+  xitk_font_cache_destroy(&xitk->x.font_cache);
 
   xitk_tips_deinit(&xitk->x.tips);
-  
+
   xitk_config_deinit (xitk->config);
   pthread_mutex_destroy (&xitk->mutex);
   

@@ -36,12 +36,12 @@
 /*
  * init font cache subsystem
  */
-void xitk_font_cache_init(void);
+xitk_font_cache_t *xitk_font_cache_init(void);
 
 /*
  * destroy font cache subsystem
  */
-void xitk_font_cache_done(void);
+void xitk_font_cache_destroy(xitk_font_cache_t **);
 
 /*
  * load font from font name. Return NULL on failure.
