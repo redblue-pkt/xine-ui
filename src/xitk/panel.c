@@ -1127,7 +1127,7 @@ void panel_reparent (xui_panel_t *panel) {
       xitk_window_reparent_window(panel->xwin, NULL, x, y);
     }
 
-    reparent_window (panel->xwin);
+    reparent_window (panel->gui, panel->xwin);
 
     if (video_window_is_visible (panel->gui->vwin)) {
       layer_above_video(panel->xwin);

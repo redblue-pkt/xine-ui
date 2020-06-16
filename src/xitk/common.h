@@ -394,36 +394,42 @@ struct gGui_st {
 
 extern gGui_t *gGui;
 
-void set_window_states_start(xitk_window_t *xwin);
-#define set_window_states_start(xwin)                                     \
+void set_window_type_start(gGui_t *gui, xitk_window_t *xwin);
+#define set_window_type_start(gui, xwin)                                  \
   do {                                                                    \
-    if(!video_window_is_visible(gGui->vwin))                              \
+    if(!video_window_is_visible((gui)->vwin))                             \
       xitk_window_set_wm_window_type((xwin), WINDOW_TYPE_NORMAL);         \
     else                                                                  \
       xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);       \
-    xitk_window_set_window_class((xwin), NULL, "xine"); \
-    xitk_window_set_window_icon((xwin), gGui->icon);    \
   } while(0)
 
-void reparent_window(xitk_window_t *xwin);
-#define reparent_window(xwin)                                                            \
+void set_window_states_start(gGui_t *gui, xitk_window_t *xwin);
+#define set_window_states_start(gui, xwin)                                \
+  do {                                                                    \
+    set_window_type_start((gui), (xwin));                                 \
+    xitk_window_set_window_class((xwin), NULL, "xine");                   \
+    xitk_window_set_window_icon((xwin), (gui)->icon);                     \
+  } while(0)
+
+void reparent_window(gGui_t *gui, xitk_window_t *xwin);
+#define reparent_window(gui, xwin)                                       \
   do {                                                                                   \
-    if((!(video_window_get_fullscreen_mode(gGui->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
+    if((!(video_window_get_fullscreen_mode((gui)->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
       /* Don't unmap this window, because on re-mapping, it will not be visible until    \
 	 its ancestor, the video window, is visible. That's not what's intended.         \
          XUnmapWindow(gGui->display, (window));                                          \
       */								                 \
-      if(!video_window_is_visible(gGui->vwin))                                           \
+      if(!video_window_is_visible((gui)->vwin))                                          \
         xitk_window_set_wm_window_type((xwin), WINDOW_TYPE_NORMAL);                      \
       else                                                                               \
         xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);                    \
       xitk_window_show_window((xwin), 1);                                                \
       xitk_window_try_to_set_input_focus((xwin));                                        \
-      video_window_set_transient_for(gGui->vwin, (xwin));                                \
+      video_window_set_transient_for((gui)->vwin, (xwin));                               \
     }                                                                                    \
     else {                                                                               \
       xitk_window_show_window((xwin), 1);                                                \
-      video_window_set_transient_for(gGui->vwin, (xwin));                                \
+      video_window_set_transient_for((gui)->vwin, (xwin));                               \
       layer_above_video((xwin));                                                         \
     }                                                                                    \
   } while(0)

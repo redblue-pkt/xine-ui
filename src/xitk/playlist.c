@@ -938,8 +938,9 @@ void playlist_deinit(void) {
 }
 
 void playlist_reparent(void) {
+  gGui_t *gui = gGui;
   if (playlist && playlist->xwin)
-    reparent_window(playlist->xwin);
+    reparent_window(gui, playlist->xwin);
 }
 
 /*
@@ -994,7 +995,7 @@ void playlist_editor(void) {
                                                     bg_image->height);
   xitk_window_set_window_title(playlist->xwin, title);
 
-  set_window_states_start(playlist->xwin);
+  set_window_states_start(gui, playlist->xwin);
 
   if(is_layer_above())
     xitk_window_set_layer_above(playlist->xwin);

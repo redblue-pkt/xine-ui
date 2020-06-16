@@ -907,7 +907,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 					    _("Event Receiver Window:  Press keyboard keys to bind..."),
 					    x, y, w, h);
 
-    set_window_states_start(xwin);
+    set_window_states_start(gui, xwin);
   }
 
   xitk_window_show_window(xwin, 1);
@@ -1014,8 +1014,9 @@ static void kbedit_handle_event(XEvent *event, void *data) {
 }
 
 void kbedit_reparent(void) {
+  gGui_t *gui = gGui;
   if(kbedit)
-    reparent_window(kbedit->xwin);
+    reparent_window(gui, kbedit->xwin);
 }
 
 /*
@@ -1056,7 +1057,7 @@ void kbedit_window(void) {
   kbedit->xwin          = xitk_window_create_dialog_window(gui->imlib_data,
 							   _("Key Binding Editor"),
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  set_window_states_start(kbedit->xwin);
+  set_window_states_start(gui, kbedit->xwin);
 
   kbedit->widget_list = xitk_window_widget_list(kbedit->xwin);
 

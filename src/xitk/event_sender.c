@@ -367,8 +367,9 @@ void event_sender_end(void) {
 }
 
 void event_sender_reparent(void) {
+  gGui_t *gui = gGui;
   if(eventer)
-    reparent_window(eventer->xwin);
+    reparent_window(gui, eventer->xwin);
 }
 
 void event_sender_panel(void) {
@@ -403,7 +404,7 @@ void event_sender_panel(void) {
   /* Create window */
   eventer->xwin = xitk_window_create_simple_window(gGui->imlib_data, eventer->x, eventer->y, WINDOW_WIDTH, WINDOW_HEIGHT);
   xitk_window_set_window_title(eventer->xwin, _("xine Event Sender"));
-  set_window_states_start(eventer->xwin);
+  set_window_states_start(gGui, eventer->xwin);
 
   eventer->widget_list = xitk_window_widget_list(eventer->xwin);
 

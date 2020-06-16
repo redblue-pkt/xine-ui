@@ -427,7 +427,8 @@ void stream_infos_update_infos(void) {
 }
 
 void stream_infos_reparent(void) {
-    reparent_window(sinfos.xwin);
+  gGui_t *gui = gGui;
+  reparent_window(gui, sinfos.xwin);
 }
 
 void stream_infos_panel(void) {
@@ -458,7 +459,7 @@ void stream_infos_panel(void) {
   sinfos.xwin = xitk_window_create_dialog_window(gui->imlib_data, _("Stream Information"), x, y,
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(sinfos.xwin);
+  set_window_states_start(gui, sinfos.xwin);
 
   sinfos.widget_list = xitk_window_widget_list(sinfos.xwin);
 

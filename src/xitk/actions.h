@@ -30,7 +30,6 @@
 #define GUI_PREV     2
 #define GUI_RESET    3
 
-void reparent_window(xitk_window_t *xwin);
 void reparent_all_windows(void);
 void raise_window(xitk_window_t *xwin, int visible, int running);
 void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running);

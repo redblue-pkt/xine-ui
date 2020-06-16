@@ -1023,7 +1023,7 @@ void setup_reparent (xui_setup_t *setup) {
   if (!setup)
     return;
   if (setup->running)
-    reparent_window (setup->xwin);
+    reparent_window (setup->gui, setup->xwin);
 }
 
 /*
@@ -1052,7 +1052,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     /* Create window */
     setup->xwin = xitk_window_create_dialog_window (setup->gui->imlib_data,
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-    set_window_states_start (setup->xwin);
+    set_window_states_start (setup->gui, setup->xwin);
 
     setup->widget_list = xitk_window_widget_list(setup->xwin);
 

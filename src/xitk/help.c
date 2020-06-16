@@ -317,8 +317,9 @@ void help_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 void help_reparent(void) {
+  gGui_t *gui = gGui;
   if(help)
-    reparent_window(help->xwin);
+    reparent_window(gui, help->xwin);
 }
 
 void help_panel(void) {
@@ -351,7 +352,7 @@ void help_panel(void) {
 						_("Help"), 
 						x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(help->xwin);
+  set_window_states_start(gGui, help->xwin);
 
   help->widget_list = xitk_window_widget_list(help->xwin);
 
