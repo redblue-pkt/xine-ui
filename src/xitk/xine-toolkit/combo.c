@@ -36,7 +36,6 @@ typedef struct {
   char                   *skin_element_name;
 
   xitk_window_t          *xwin;
-  GC                      gc;
 
   int                     win_x;
   int                     win_y;
@@ -102,21 +101,8 @@ static void _combo_close (_combo_private_t *wp) {
   wp->visible = 0;
   if (wp->xwin) {
     xitk_unregister_event_handler (&wp->widget_key);
-    xitk_destroy_widgets (wp->widget_list);
     xitk_window_destroy_window (wp->xwin);
     wp->xwin = NULL;
-  }
-
-  if (wp->widget_list->gc) {
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XFreeGC (wp->imlibdata->x.disp, wp->widget_list->gc);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-    wp->widget_list->gc = NULL;
-  }
-
-  if (wp->widget_list) {
-    xitk_widget_list_defferred_destroy (wp->widget_list);
-    wp->widget_list = NULL;
   }
 }
 
@@ -208,13 +194,9 @@ static void _combo_open (_combo_private_t *wp) {
 
   XLOCK (wp->w.wl->imlibdata->x.x_lock_display, wp->w.wl->imlibdata->x.disp);
   XSetTransientForHint (wp->w.wl->imlibdata->x.disp, win, wp->parent_wlist->win);
-  wp->gc = XCreateGC (wp->w.wl->imlibdata->x.disp, win, None, None);
   XUNLOCK (wp->w.wl->imlibdata->x.x_unlock_display, wp->w.wl->imlibdata->x.disp);
 
-  wp->widget_list        = xitk_widget_list_new (wp->w.wl->imlibdata);
-  xitk_dlist_init (&wp->widget_list->list);
-  wp->widget_list->win   = win;
-  wp->widget_list->gc    = wp->gc;
+  wp->widget_list        = xitk_window_widget_list(wp->xwin);
 
   {
     xitk_browser_widget_t browser;
