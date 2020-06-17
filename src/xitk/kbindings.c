@@ -1107,7 +1107,7 @@ void kbedit_window(void) {
   br.dbl_click_callback            = NULL;
   br.userdata                      = NULL;
   kbedit->browser = xitk_noskin_browser_create (kbedit->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(kbedit->widget_list)), x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
   xitk_add_widget (kbedit->widget_list, kbedit->browser);
   xitk_enable_and_show_widget(kbedit->browser);
 

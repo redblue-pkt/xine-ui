@@ -210,7 +210,7 @@ static void _combo_open (_combo_private_t *wp) {
     browser.dbl_click_callback            = NULL;
     browser.userdata                      = (void *)wp;
     wp->browser_widget = xitk_noskin_browser_create (wp->widget_list, &browser,
-      wp->widget_list->gc, 1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
+      1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
     xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
     xitk_enable_and_show_widget (wp->browser_widget);
     wp->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;

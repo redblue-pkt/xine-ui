@@ -608,7 +608,7 @@ void download_skin(gGui_t *gui, char *url) {
     br.dbl_click_callback            = NULL;
     br.userdata                      = skd;
     skd->browser = xitk_noskin_browser_create (skd->widget_list, &br,
-      (XITK_WIDGET_LIST_GC(skd->widget_list)), x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+      x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
     xitk_add_widget (skd->widget_list, skd->browser);
 
     xitk_browser_update_list(skd->browser,

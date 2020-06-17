@@ -1317,7 +1317,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
  *
  */
 xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
-					  xitk_browser_widget_t *br, GC gc, 
+                                          xitk_browser_widget_t *br,
 					  int x, int y, 
 					  int itemw, int itemh, int slidw, const char *fontname);
 

@@ -400,7 +400,7 @@ void help_panel(void) {
   br.dbl_click_callback            = NULL;
   br.userdata                      = NULL;
   help->browser = xitk_noskin_browser_create (help->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(help->widget_list)), 15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
   xitk_add_widget (help->widget_list, help->browser);
   xitk_enable_and_show_widget(help->browser);
 

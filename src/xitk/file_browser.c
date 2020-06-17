@@ -1265,7 +1265,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.dbl_click_callback            = fb_dbl_select;
   br.userdata                      = (void *)fb;
   fb->directories_browser = xitk_noskin_browser_create (fb->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
+    x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
   
@@ -1295,7 +1295,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   br.dbl_click_callback            = fb_dbl_select;
   br.userdata                      = (void *)fb;
   fb->files_browser = xitk_noskin_browser_create (fb->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(fb->widget_list)), x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
+    x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->files_browser);
   xitk_enable_and_show_widget(fb->files_browser);
 
