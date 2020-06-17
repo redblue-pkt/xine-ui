@@ -32,6 +32,7 @@
 #include <X11/Xlib.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 #include "tips.h"
 

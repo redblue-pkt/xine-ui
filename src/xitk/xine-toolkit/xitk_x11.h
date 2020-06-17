@@ -60,6 +60,24 @@ int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h)
 Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity);
 
 /*
+ *
+ */
+
+int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
+void xitk_try_to_set_input_focus(Display *display, Window window);
+void xitk_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
+int xitk_is_window_iconified(Display *display, Window window);
+int xitk_is_window_visible(Display *display, Window window);
+Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
+
+/*
+ *
+ */
+
+void xitk_cursors_define_window_cursor(Display *display, Window window, int/*xitk_cursors_t*/ cursor);
+void xitk_cursors_restore_window_cursor(Display *display, Window window);
+
+/*
  * access to xitk X11
  */
 

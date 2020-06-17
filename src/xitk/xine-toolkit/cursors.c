@@ -26,6 +26,7 @@
 #include <X11/cursorfont.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 #define MAX_CURSORS  xitk_cursor_num_glyphs
 
@@ -910,7 +911,7 @@ void xitk_cursors_deinit(Display *display) {
 }
 
 /* Public */
-void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor) {
+void xitk_cursors_define_window_cursor(Display *display, Window window, int/*xitk_cursors_t*/ cursor) {
   if(window != None) {
     XLOCK (xitk_x_lock_display, display);
     XDefineCursor(display, window, cursors[cursor].cursor);

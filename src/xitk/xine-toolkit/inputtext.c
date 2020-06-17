@@ -31,6 +31,7 @@
 #include <X11/keysym.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 #define NEW_CLIPBOARD
 

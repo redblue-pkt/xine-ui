@@ -1093,11 +1093,6 @@ int xitk_is_mouse_over_widget(xitk_widget_t *w);
 /**
  *
  */
-int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
-
-/**
- *
- */
 void xitk_enable_widget_tips(xitk_widget_t *w);
 
 /**
@@ -2083,7 +2078,6 @@ Window xitk_window_get_window(xitk_window_t *w);
 /*
  *
  */
-void xitk_try_to_set_input_focus(Display *display, Window window);
 void xitk_window_try_to_set_input_focus(xitk_window_t *w);
 
 
@@ -2129,18 +2123,7 @@ void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
 /*
  *
  */
-void xitk_get_window_position(Display *display, Window window, 
-			      int *x, int *y, int *width, int *height);
-
-/*
- *
- */
 void xitk_window_get_window_position(xitk_window_t *w, int *x, int *y, int *width, int *height);
-
-/*
- *
- */
-void xitk_set_window_title(Display *display, Window window, const char *title);
 
 /*
  *
@@ -2155,7 +2138,6 @@ void xitk_window_set_window_icon(xitk_window_t *w, xitk_pixmap_t *);
 /*
  *
  */
-void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class);
 void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const char *res_class);
 
 /*
@@ -2168,24 +2150,12 @@ void xitk_window_hide_window(xitk_window_t *w);
 /*
  *
  */
-int xitk_is_window_iconified(Display *display, Window window);
 void xitk_window_iconify_window(xitk_window_t *w);
 
 /*
  *
  */
-int xitk_is_window_visible(Display *display, Window window);
 int xitk_window_is_window_visible(xitk_window_t *w);
-
-/*
- *
- */
-Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
-
-/*
- *
- */
-int xitk_is_window_size(Display *display, Window window, int width, int height);
 
 /* done_cb status */
 #define XITK_WINDOW_DIALOG_BUTTONS_MASK 0x7fff
@@ -2247,10 +2217,6 @@ xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
 void xitk_menu_destroy_branch(xitk_widget_t *w);
 int xitk_menu_show_sub_branchs(xitk_widget_t *w);
-
-
-void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
-void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
 void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor);
 void xitk_window_restore_window_cursor(xitk_window_t *w);
