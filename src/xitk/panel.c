@@ -982,7 +982,7 @@ static void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
   case DestroyNotify:
-    if (xitk_window_get_window(panel->xwin) == event->xany.window)
+    //if (xitk_window_get_window(panel->xwin) == event->xany.window)
       gui_exit (NULL, panel->gui);
     break;
 

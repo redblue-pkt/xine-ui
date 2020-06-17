@@ -1356,16 +1356,6 @@ void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
   _set_wm_window_type(window, type, 1);
 }
 
-void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
-  if (w)
-    _set_wm_window_type(w->window, type, 0);
-}
-
-void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
-  if (w)
-    _set_wm_window_type(w->window, type, 1);
-}
-
 void xitk_ungrab_pointer(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
@@ -1435,17 +1425,19 @@ static void _xitk_reset_hull (xitk_hull_t *hull) {
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
  */
-static
-xitk_register_key_t _xitk_register_event_handler(const char *name,
-                                                 xitk_window_t *w,
-                                                 Window window,
-						widget_event_callback_t cb,
-						widget_newpos_callback_t pos_cb,
-						xitk_dnd_callback_t dnd_cb,
-						xitk_widget_list_t *wl, void *user_data) {
+
+xitk_register_key_t xitk_register_x_event_handler(const char *name,
+                                                  xitk_window_t *w,
+                                                  Window window,
+                                                  widget_event_callback_t cb,
+                                                  widget_newpos_callback_t pos_cb,
+                                                  xitk_dnd_callback_t dnd_cb,
+                                                  xitk_widget_list_t *wl, void *user_data) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   __gfx_t   *fx;
-  
+
+  ABORT_IF_NULL(w);
+
   //  printf("%s()\n", __FUNCTION__);
 
   fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
@@ -1543,24 +1535,6 @@ xitk_register_key_t _xitk_register_event_handler(const char *name,
   printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
 #endif
   return fx->key;
-}
-
-xitk_register_key_t xitk_register_x_event_handler(const char *name,
-                                                  Window window,
-                                                  widget_event_callback_t cb,
-                                                  widget_newpos_callback_t pos_cb,
-                                                  xitk_dnd_callback_t dnd_cb,
-                                                  xitk_widget_list_t *wl, void *user_data) {
-  return _xitk_register_event_handler(name, NULL, window, cb, pos_cb, dnd_cb, wl, user_data);
-}
-
-xitk_register_key_t xitk_register_event_handler(const char *name,
-                                                xitk_window_t *w,
-                                                widget_event_callback_t cb,
-                                                widget_newpos_callback_t pos_cb,
-                                                xitk_dnd_callback_t dnd_cb,
-                                                xitk_widget_list_t *wl, void *user_data) {
-  return _xitk_register_event_handler(name, w, w ? w->window : None, cb, pos_cb, dnd_cb, wl, user_data);
 }
 
 static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {

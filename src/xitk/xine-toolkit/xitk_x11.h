@@ -82,7 +82,9 @@ void xitk_cursors_restore_window_cursor(Display *display, Window window);
  */
 
 #define xitk_t struct xitk_s
+#define xitk_window_t struct xitk_window_s
 struct xitk_s;
+struct xitk_window_s;
 
 void        xitk_x11_select_visual(xitk_t *, Visual *gui_visual);
 
@@ -91,6 +93,10 @@ Visual     *xitk_x11_get_visual(xitk_t *);
 int         xitk_x11_get_depth(xitk_t *);
 Colormap    xitk_x11_get_colormap(xitk_t *);
 
+xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
+void xitk_x11_destroy_window_wrapper(xitk_window_t **);
+
 #undef xitk_t
+#undef xitk_window_t
 
 #endif /* _XITK_X11_H_ */

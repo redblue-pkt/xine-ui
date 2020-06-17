@@ -333,18 +333,6 @@ struct xitk_image_s {
   char                              key[20];
 };
 
-struct xitk_window_s {
-  xitk_t                   *xitk;
-  Window                    window;
-  xitk_window_t            *win_parent;
-  xitk_pixmap_t            *background;
-  xitk_pixmap_t            *background_mask;
-  int                       width;
-  int                       height;
-
-  xitk_widget_list_t       *widget_list;
-};
-
 Pixmap xitk_window_get_background(xitk_window_t *w);
 Pixmap xitk_window_get_background_mask(xitk_window_t *w);
 
@@ -360,5 +348,12 @@ void xitk_clipboard_unregister_window (Window win);
  * return -1: wait for WIDGET_EVENT_CLIP_READY, then try again. */
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
+xitk_register_key_t xitk_register_x_event_handler(const char *name,
+                                                  xitk_window_t *xwin,
+                                                  Window window,
+                                                  widget_event_callback_t cb,
+                                                  widget_newpos_callback_t pos_cb,
+                                                  xitk_dnd_callback_t dnd_cb,
+                                                  xitk_widget_list_t *wl, void *user_data);
 #endif
 

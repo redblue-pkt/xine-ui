@@ -436,8 +436,6 @@ typedef enum {
  * See xitk_widget_list_[set/get]()
  */
 #define WIDGET_LIST_GC              1
-#define WIDGET_LIST_WINDOW          2
-#define XITK_WIDGET_LIST_WINDOW(wl) (Window) xitk_widget_list_get(wl, WIDGET_LIST_WINDOW)
 #define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
 #define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)
 
@@ -754,12 +752,6 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
  * dnd_cb: callback for dnd event.
  * wl:     widget_list handled internaly for xevent reactions.
  */
-xitk_register_key_t xitk_register_x_event_handler(const char *name,
-                                                  Window window,
-                                                  widget_event_callback_t cb,
-                                                  widget_newpos_callback_t pos_cb,
-                                                  xitk_dnd_callback_t dnd_cb,
-                                                  xitk_widget_list_t *wl, void *user_data);
 xitk_register_key_t xitk_register_event_handler(const char *name,
                                                 xitk_window_t *w,
 						widget_event_callback_t cb,
