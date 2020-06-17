@@ -271,7 +271,7 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
 
 static void download_update_blank_preview(xui_skdloader_t *skd) {
 
-  xitk_image_t *p = xitk_image_create_image(skd->gui->imlib_data, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+  xitk_image_t *p = xitk_image_create_image(skd->gui->xitk, PREVIEW_WIDTH, PREVIEW_HEIGHT);
   pixmap_fill_rectangle(p->image, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
                         xitk_get_pixel_color_from_rgb(skd->gui->imlib_data, 52, 52, 52));
   xitk_image_draw_image (skd->widget_list, p,

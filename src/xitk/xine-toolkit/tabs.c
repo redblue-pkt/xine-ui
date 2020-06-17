@@ -114,7 +114,7 @@ static void tabs_arrange(xitk_widget_t *w) {
     if((((private_data->width - 40) - private_data->gap_widthstart) * 3) > 0) {
       xitk_image_t *p;
 
-      p = xitk_image_create_image(w->wl->imlibdata,
+      p = xitk_image_create_image(w->wl->xitk,
 				  ((private_data->width - 40) - private_data->gap_widthstart) * 3,
 				  private_data->bheight>>1);
       

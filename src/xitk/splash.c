@@ -57,7 +57,7 @@ void splash_create(void) {
 
   free(skin_path);
 
-  if((xim = xitk_image_load_image(gGui->imlib_data, splash_image))) {
+  if((xim = xitk_image_load_image(gGui->xitk, splash_image))) {
     int  x, y;
 
     x = (xitk_get_display_width() >> 1) - (xim->width >> 1);

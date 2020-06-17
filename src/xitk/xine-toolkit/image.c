@@ -549,10 +549,11 @@ void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, i
 /*
  *
  */
-xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
+xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height) {
   xitk_image_t *i;
 
-  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->imlibdata);
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
 
@@ -560,7 +561,7 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   if (!i)
     return NULL;
 
-  i->image    = xitk_image_create_xitk_pixmap(im, width, height);
+  i->image    = xitk_image_create_xitk_pixmap(xitk->imlibdata, width, height);
   if (!i->image) {
     XITK_FREE (i);
     return NULL;
@@ -669,12 +670,12 @@ void xitk_shared_image_list_delete (xitk_widget_list_t *wl) {
 /*
  *
  */
-xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
+xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
                                                               const char *fontname,
                                                               int width, int align, const char *str,
                                                               unsigned int foreground,
                                                               unsigned int background) {
-  xitk_t         *xitk = gXitk;
+  ImlibData      *im;
   xitk_image_t   *image;
   xitk_font_t    *fs;
   GC              gc;
@@ -688,10 +689,13 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 
   int             add_line_spc = 2;
 
-  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->imlibdata);
   ABORT_IF_NULL(fontname);
   ABORT_IF_NULL(str);
   ABORT_IF_NOT_COND(width > 0);
+
+  im = xitk->imlibdata;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
@@ -822,7 +826,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
     width = MIN(maxw, width);
   
-  image = xitk_image_create_image(im, width, (height + add_line_spc) * numlines - add_line_spc);
+  image = xitk_image_create_image(xitk, width, (height + add_line_spc) * numlines - add_line_spc);
   draw_flat_with_color(image->image, image->width, image->height, background);
   
   { /* Draw string in image */
@@ -857,13 +861,12 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 
   return image;
 }
-xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
+xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
                                                   const char *fontname,
                                                   int width, int align, const char *str) {
 
-  return xitk_image_create_image_with_colors_from_string(im,fontname, width, align, str,
-							 xitk_get_pixel_color_black(im),
-							 xitk_get_pixel_color_gray(im));
+  return xitk_image_create_image_with_colors_from_string(xitk, fontname, width, align, str,
+    xitk_get_pixel_color_black(xitk->imlibdata), xitk_get_pixel_color_gray(xitk->imlibdata));
 }
 /*
  *
@@ -2071,11 +2074,15 @@ int xitk_image_render(xitk_image_t *i, int width, int height) {
   return 0;
 }
 
-xitk_image_t *xitk_image_load_image(ImlibData *im, const char *image) {
+xitk_image_t *xitk_image_load_image(xitk_t *xitk, const char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
+  ImlibData     *im;
 
-  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->imlibdata);
+
+  im = xitk->imlibdata;
 
   if(image == NULL) {
     XITK_WARNING("image name is NULL\n");

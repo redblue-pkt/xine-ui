@@ -31,8 +31,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <X11/Xlib.h>
 #include <stdarg.h>
+
+#include <X11/Xlib.h>
+
 #include "xitk/Imlib-light/Imlib.h"
 
 #ifdef NEED_MRLBROWSER
@@ -1241,7 +1243,7 @@ const char *xitk_label_get_label(xitk_widget_t *w);
 /**
  * Load image and return a xitk_image_t data type.
  */
-xitk_image_t *xitk_image_load_image(ImlibData *idata, const char *image);
+xitk_image_t *xitk_image_load_image(xitk_t *xitk, const char *image);
 void xitk_image_set_pix_font (xitk_image_t *image, const char *format);
 
 xitk_image_t *xitk_image_decode_raw(ImlibData *im, const void *data, size_t size);
@@ -1938,15 +1940,15 @@ void draw_outter_frame(xitk_pixmap_t *p, const char *title, const char *fontname
 /**
  * xitk image
  */
-xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
+xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
                                                               const char *fontname,
                                                               int width, int align, const char *str,
 							      unsigned int foreground,
 							      unsigned int background);
-xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
+xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
                                                   const char *fontname,
                                                   int width, int align, const char *str);
-xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
+xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height);
 
 void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
 

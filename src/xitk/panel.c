@@ -234,7 +234,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_skin_lock (panel->gui->skin_config);
   xitk_hide_widgets(panel->widget_list);
 
-  if (!(bg_image = xitk_image_load_image (panel->gui->imlib_data,
+  if (!(bg_image = xitk_image_load_image (panel->gui->xitk,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
     xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
@@ -1172,7 +1172,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*
    * load bg image before opening window, so we can determine it's size
    */
-  if (!(bg_image = xitk_image_load_image (panel->gui->imlib_data,
+  if (!(bg_image = xitk_image_load_image (panel->gui->xitk,
     xitk_skin_get_skin_filename (panel->gui->skin_config, "BackGround")))) {
     xine_error (panel->gui, _("panel: couldn't find image for background\n"));
     exit(-1);
