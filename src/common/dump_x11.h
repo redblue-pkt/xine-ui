@@ -19,12 +19,15 @@
  *
  */
 
-#ifndef XINEUI_DUMP_H
-#define XINEUI_DUMP_H
+#ifndef XINEUI_DUMP_X11_H
+#define XINEUI_DUMP_X11_H
 
-void dump_host_info(void);
-void dump_cpu_infos(void);
-void dump_error(const char *msg);
-void dump_info(const char *msg);
+#ifdef HAVE_X11
+#include <X11/Xlib.h>
+#endif
+
+#ifdef HAVE_X11
+void dump_xfree_info(Display *display, int screen, int complete);
+#endif
 
 #endif
