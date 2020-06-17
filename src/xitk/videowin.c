@@ -66,6 +66,7 @@ struct xui_vwin_st {
   void                   (*x_unlock_display) (Display *display);
 
   xitk_widget_list_t    *wl;
+  xitk_window_t         *wrapped_window;
 
   char                   window_title[1024];
   int                    current_cursor;  /* arrow or hand */
@@ -83,7 +84,6 @@ struct xui_vwin_st {
   XClassHint            *xclasshint;
   XClassHint            *xclasshint_fullscreen;
   XClassHint            *xclasshint_borderless;
-  GC                     gc;
   int                    video_screen;
 
   int                    video_width;     /* size of currently displayed video     */
@@ -248,6 +248,16 @@ static void video_window_adapt_size (xui_vwin_t *vwin);
 static int  video_window_check_mag (xui_vwin_t *vwin);
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag);
 
+static void register_event_handler(xui_vwin_t *vwin) {
+
+  xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
+  vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
+
+  vwin->widget_key = xitk_register_event_handler ("video_window",
+      vwin->wrapped_window, video_window_handle_event, NULL, gui_dndcallback,
+      NULL, vwin);
+}
+
 static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
   xui_vwin_t *vwin = data;
   vwin->stream_resize_window = cfg->num_value;
@@ -376,7 +386,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   Atom                  prop;
   Atom                  wm_delete_window;
   MWMHints              mwmhints;
-  XGCValues             xgcv;
   Window                old_video_window = None;
   int                   border_width;
 
@@ -392,7 +401,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->visible_aspect  = vwin->pixel_aspect = 1.0;
 
     if (vwin->video_window == None) {
-      XGCValues   gcv;
       Window      wparent;
       Window      rootwindow = None;
       XColor      dummy, black;
@@ -428,9 +436,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           0, 0, vwin->fullscreen_width, vwin->fullscreen_height, border_width,
           CopyFromParent, CopyFromParent, CopyFromParent, CWBackPixel | CWOverrideRedirect, &attr);
       
-      if (!vwin->separate_display)
-        xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *)vwin->video_window);
-
       if (vwin->gui->vo_port) {
         vwin->x_unlock_display (vwin->video_display);
         xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
@@ -445,15 +450,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       
       _set_window_title (vwin);
       
-      gcv.foreground         = black.pixel;
-      gcv.background         = black.pixel;
-      gcv.graphics_exposures = False;
-      vwin->gc = XCreateGC (vwin->video_display, vwin->video_window,
-        GCForeground | GCBackground | GCGraphicsExposures, &gcv);
-
-      if (!vwin->separate_display)
-        xitk_widget_list_set (vwin->wl, WIDGET_LIST_GC, vwin->gc);
-
       hint.flags  = USSize | USPosition | PPosition | PSize;
       hint.x      = 0;
       hint.y      = 0;
@@ -474,10 +470,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->x_unlock_display (vwin->video_display);
 
       if (!vwin->separate_display)
-        vwin->widget_key = xitk_register_x_event_handler ("video_window",
-          vwin->video_window, video_window_handle_event,
-          NULL, gui_dndcallback, NULL, vwin);
-    
+        register_event_handler(vwin);
       return;
     }
     
@@ -729,9 +722,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         hint.x, hint.y, vwin->visible_width, vwin->visible_height,
         border_width, vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-    if (!vwin->separate_display)
-      xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *)vwin->video_window);
-
     if (vwin->gui->vo_port) {
       vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
@@ -833,9 +823,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         border_width, vwin->depth, InputOutput, vwin->visual,
         CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
-    if (!vwin->separate_display)
-      xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *) vwin->video_window);
-    
     if (vwin->gui->vo_port) {
       vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
@@ -995,9 +982,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         hint.x, hint.y, hint.width, hint.height, border_width,
         vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-    if (!vwin->separate_display)
-      xitk_widget_list_set (vwin->wl, WIDGET_LIST_WINDOW, (void *) vwin->video_window);
-
     if (vwin->gui->vo_port) {
       vwin->x_unlock_display (vwin->video_display);
       xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
@@ -1085,13 +1069,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   
   XSync (vwin->video_display, False);
 
-  if (vwin->gc != None)
-    XFreeGC (vwin->video_display, vwin->gc);
-
-  vwin->gc = XCreateGC (vwin->video_display, vwin->video_window, 0L, &xgcv);
-  if (!vwin->separate_display)
-    xitk_widget_list_set (vwin->wl, WIDGET_LIST_GC, vwin->gc);
-      
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))) {
     /* Waiting for visibility, avoid X error on some cases */
 
@@ -1121,10 +1098,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   vwin->old_widget_key = vwin->widget_key;
 
   if (!vwin->separate_display)
-    vwin->widget_key = xitk_register_x_event_handler ("video_window",
-      vwin->video_window, video_window_handle_event, NULL, gui_dndcallback,
-      NULL, vwin);
-  
+    register_event_handler(vwin);
+
   /* take care about window decoration/pos */
   {
     Window tmp_win;
@@ -1632,10 +1607,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->video_screen = DefaultScreen(vwin->video_display);
   vwin->x_unlock_display (vwin->video_display);
 
-  if (!vwin->separate_display) {
-    vwin->wl = xitk_widget_list_new (vwin->gui->xitk);
-  }
-
   vwin->video_window       = None;
   vwin->wid                = window_id;
   vwin->gui_depth          = xitk_x11_get_depth(gui->xitk);
@@ -1645,7 +1616,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->show               = 1;
   vwin->widget_key         = 
   vwin->old_widget_key     = 0;
-  vwin->gc                 = None;
   vwin->borderless         = (borderless > 0);
   vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
@@ -2070,8 +2040,7 @@ void video_window_exit (xui_vwin_t *vwin) {
     
   if (!vwin->separate_display) {
     xitk_unregister_event_handler (&vwin->widget_key);
-    XITK_WIDGET_LIST_FREE (vwin->wl);
-    vwin->wl = NULL;
+    xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
   } else
     pthread_join (vwin->second_display_thread, NULL);
 
@@ -2086,8 +2055,6 @@ void video_window_exit (xui_vwin_t *vwin) {
     XFree (vwin->xclasshint_borderless);
   if (vwin->wm_hint != NULL)
     XFree (vwin->wm_hint);
-  if (vwin->gc != None)
-    XFreeGC (vwin->video_display, vwin->gc);
 #ifdef HAVE_XINERAMA
   if (vwin->xinerama)
     XFree (vwin->xinerama);
@@ -2364,7 +2331,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
 
     if (bevent->button == Button3 && !vwin->separate_display)
-      video_window_menu (vwin->gui, vwin->wl);
+      video_window_menu (vwin->gui, xitk_window_widget_list(vwin->wrapped_window));
     else if (bevent->button == Button2)
       panel_toggle_visibility (NULL, vwin->gui->panel);
     else if (bevent->button == Button1) {

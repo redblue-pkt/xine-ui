@@ -2192,9 +2192,6 @@ int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data) {
   case WIDGET_LIST_GC:
     wl->gc = (GC) data;
     break;
-  case WIDGET_LIST_WINDOW:
-    wl->win = (Window) data;
-    break;
   default:
     XITK_WARNING("Unknown param %d\n", param);
     return 0;
@@ -2217,12 +2214,6 @@ void *xitk_widget_list_get(xitk_widget_list_t *wl, int param) {
       data = (void *) wl->gc;
     else
       XITK_WARNING("widget list GC unset\n");
-    break;
-  case WIDGET_LIST_WINDOW:
-    if(wl->win)
-      data = (void *) wl->win;
-    else
-      XITK_WARNING("widget list window unset\n");
     break;
   default:
     XITK_WARNING("Unknown param %d\n", param);

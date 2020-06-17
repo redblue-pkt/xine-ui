@@ -49,6 +49,18 @@
 #define X_LOCK(xitk)   XLOCK(xitk->x_lock_display, xitk->display)
 #define X_UNLOCK(xitk) XLOCK(xitk->x_unlock_display, xitk->display)
 
+struct xitk_window_s {
+  xitk_t                   *xitk;
+  Window                    window;
+  xitk_window_t            *win_parent;
+  xitk_pixmap_t            *background;
+  xitk_pixmap_t            *background_mask;
+  int                       width;
+  int                       height;
+
+  xitk_widget_list_t       *widget_list;
+};
+
 /*
  * Dialog window
  */
@@ -430,6 +442,101 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     xitk_register_eh_destructor (key, _xitk_window_dialog_3_destr, wd);
     return key;
   }
+}
+
+/*
+ *
+ */
+
+void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor) {
+  xitk_cursors_define_window_cursor (w->xitk->display, w->window, cursor);
+}
+
+void xitk_window_restore_window_cursor(xitk_window_t *w) {
+  xitk_cursors_restore_window_cursor (w->xitk->display, w->window);
+}
+
+void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
+  if (w)
+    xitk_unset_wm_window_type(w->window, type);
+}
+
+void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
+  if (w)
+    xitk_set_wm_window_type(w->window, type);
+}
+
+/*
+ *
+ */
+
+xitk_register_key_t xitk_register_event_handler(const char *name,
+                                                xitk_window_t *w,
+                                                widget_event_callback_t cb,
+                                                widget_newpos_callback_t pos_cb,
+                                                xitk_dnd_callback_t dnd_cb,
+                                                xitk_widget_list_t *wl, void *user_data) {
+  return xitk_register_x_event_handler(name, w, w ? w->window : None, cb, pos_cb, dnd_cb,
+                                       wl, user_data);
+}
+
+/*
+ *
+ */
+
+int xitk_window_grab_input(xitk_window_t *w, KeySym *keysym,
+                           unsigned int *keycode, int *modifier, int *button) {
+  XEvent xev;
+  long mask = 0;
+
+  if (!keysym && !keycode && !button)
+    return -1;
+  if (!w)
+    return -1;
+
+  if (button)
+    mask |= (ButtonPressMask | ButtonReleaseMask);
+  if (keysym || keycode)
+    mask |= (KeyPressMask | KeyReleaseMask);
+
+  if (keysym)
+    *keysym = XK_VoidSymbol;
+  if (keycode)
+    *keycode = 0;
+  if (modifier)
+    *modifier = MODIFIER_NOMOD;
+  if (button)
+    *button = -1;
+
+  do {
+    /* Although only release events are evaluated, we must also grab the corresponding press */
+    /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
+    XLOCK (w->xitk->x_lock_display, w->xitk->display);
+    XMaskEvent(w->xitk->display, mask, &xev);
+    XUNLOCK (w->xitk->x_unlock_display, w->xitk->display);
+    if (xev.xany.window != xitk_window_get_window(w))
+      return -1;
+  } while (xev.type != KeyRelease && xev.type != ButtonRelease);
+
+  switch (xev.type) {
+    case ButtonRelease:
+      if (modifier)
+        xitk_get_key_modifier(&xev, modifier);
+      if (button)
+        *button = xev.xbutton.button;
+      return 0;
+    case KeyRelease:
+      if (modifier)
+        xitk_get_key_modifier(&xev, modifier);
+      if (keysym)
+        *keysym = xitk_get_key_pressed(&xev);
+      if (keycode)
+        *keycode = xev.xkey.keycode;
+      return 0;
+    default:
+      break;
+  }
+  return -1;
 }
 
 /*
@@ -900,7 +1007,7 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
   gc = XCreateGC (w->xitk->display, w->window, None, None);
   X_UNLOCK (w->xitk);
 
-  xitk_widget_list_set(w->widget_list, WIDGET_LIST_WINDOW, (void *) w->window);
+  w->widget_list->win = w->window;
   xitk_widget_list_set(w->widget_list, WIDGET_LIST_GC, gc);
 
   return w->widget_list;
@@ -1251,20 +1358,21 @@ void xitk_window_dialog_set_modal(xitk_window_t *w) {
 }
 */
 
-void xitk_window_destroy_window(xitk_window_t *w) {
-
+static void _destroy_common(xitk_window_t *w, int destroy_window) {
   if (w->widget_list)
     xitk_destroy_widgets(w->widget_list);
 
   xitk_clipboard_unregister_window (w->window);
 
-  X_LOCK (w->xitk);
-  XUnmapWindow(w->xitk->display, w->window);
-  X_UNLOCK (w->xitk);
+  if (destroy_window) {
+    X_LOCK (w->xitk);
+    XUnmapWindow(w->xitk->display, w->window);
+    X_UNLOCK (w->xitk);
+  }
 
-  if(w->background)
+  if (w->background)
     xitk_image_destroy_xitk_pixmap(w->background);
-  if(w->background_mask)
+  if (w->background_mask)
     xitk_image_destroy_xitk_pixmap(w->background_mask);
 
   w->width = -1;
@@ -1272,19 +1380,53 @@ void xitk_window_destroy_window(xitk_window_t *w) {
 
   //xitk_unmodal_window(w->window);
 
-  X_LOCK (w->xitk);
-  XDestroyWindow(w->xitk->display, w->window);
+  if (destroy_window) {
+    X_LOCK (w->xitk);
+    XDestroyWindow(w->xitk->display, w->window);
 
-  if (w->win_parent && xitk_window_is_window_visible(w->win_parent))
-    XSetInputFocus(w->xitk->display, w->win_parent->window, RevertToParent, CurrentTime);
+    if (w->win_parent && xitk_window_is_window_visible(w->win_parent))
+      XSetInputFocus(w->xitk->display, w->win_parent->window, RevertToParent, CurrentTime);
+    X_UNLOCK (w->xitk);
+  }
 
-  if (w->widget_list)
+  if (w->widget_list) {
+    X_LOCK (w->xitk);
     XFreeGC (w->xitk->display, XITK_WIDGET_LIST_GC (w->widget_list));
+    X_UNLOCK (w->xitk);
 
-  X_UNLOCK (w->xitk);
-
-  if (w->widget_list)
     XITK_WIDGET_LIST_FREE(w->widget_list);
+  }
 
   XITK_FREE(w);
+}
+
+void xitk_window_destroy_window(xitk_window_t *w) {
+
+  _destroy_common(w, 1);
+}
+
+void xitk_x11_destroy_window_wrapper(xitk_window_t **p) {
+  xitk_window_t *w = *p;
+
+  if (!w)
+    return;
+  *p = NULL;
+
+  _destroy_common(w, 0);
+}
+
+xitk_window_t *xitk_x11_wrap_window(xitk_t *xitk, Window window) {
+  xitk_window_t *xwin;
+
+  xwin = calloc(1, sizeof(*xwin));
+  if (!xwin)
+    return NULL;
+
+  xwin->xitk   = xitk;
+  xwin->window = window;
+
+  xitk_get_window_position(xitk->display, window,
+                           NULL, NULL, &xwin->width, &xwin->height);
+
+  return xwin;
 }
