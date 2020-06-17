@@ -25,10 +25,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <pthread.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "common.h"
 #include "recode.h"
@@ -456,7 +456,7 @@ void stream_infos_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  sinfos.xwin = xitk_window_create_dialog_window(gui->imlib_data, _("Stream Information"), x, y,
+  sinfos.xwin = xitk_window_create_dialog_window(gui->xitk, _("Stream Information"), x, y,
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start(gui, sinfos.xwin);

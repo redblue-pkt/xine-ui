@@ -1197,7 +1197,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
 
-  panel->xwin = xitk_window_create_simple_window_ext(gui->imlib_data, panel->x, panel->y,
+  panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y,
                                                      bg_image->width, bg_image->height, title,
                                                      title, "xine", 0, is_layer_above(), panel->gui->icon);
   /*

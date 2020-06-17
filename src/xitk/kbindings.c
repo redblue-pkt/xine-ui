@@ -23,8 +23,8 @@
 #endif
 
 #include <stdio.h>
+
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -903,7 +903,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
     xitk_window_get_window_position(kbedit->xwin, &x, &y, &w, &h);
 
-    xwin = xitk_window_create_dialog_window(gui->imlib_data, 
+    xwin = xitk_window_create_dialog_window(gui->xitk,
 					    _("Event Receiver Window:  Press keyboard keys to bind..."),
 					    x, y, w, h);
 
@@ -941,7 +941,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     _kbindings_get_shortcut_from_kbe(kbe, shortcut, sizeof(shortcut));
     
     /* Ask if user wants to store new shortcut */
-    xitk_window_dialog_3 (gui->imlib_data,
+    xitk_window_dialog_3 (gui->xitk,
       kbedit->xwin,
       get_layer_above_video (gui), 400, _("Accept?"), _kbedit_accept_done, kbe,
       NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
@@ -1054,7 +1054,7 @@ void kbedit_window(void) {
 
   kbedit->kbt           = _kbindings_duplicate_kbindings(gui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;
-  kbedit->xwin          = xitk_window_create_dialog_window(gui->imlib_data,
+  kbedit->xwin          = xitk_window_create_dialog_window(gui->xitk,
 							   _("Key Binding Editor"),
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   set_window_states_start(gui, kbedit->xwin);

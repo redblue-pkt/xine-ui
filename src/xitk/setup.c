@@ -24,8 +24,8 @@
 #endif
 
 #include <stdio.h>
+
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -311,7 +311,7 @@ static void setup_apply (xitk_widget_t *w, void *data) {
 
 
     if(need_restart) {
-      setup->dialog = xitk_window_dialog_3 (setup->gui->imlib_data,
+      setup->dialog = xitk_window_dialog_3 (setup->gui->xitk,
         setup->xwin,
         get_layer_above_video (setup->gui), 400, _("Important Notice"), NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
@@ -1050,7 +1050,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     y = xine_config_register_num (setup->gui->xine, "gui.setup_y", 80,
       CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
     /* Create window */
-    setup->xwin = xitk_window_create_dialog_window (setup->gui->imlib_data,
+    setup->xwin = xitk_window_create_dialog_window (setup->gui->xitk,
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     set_window_states_start (setup->gui, setup->xwin);
 

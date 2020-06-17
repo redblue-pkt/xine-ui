@@ -26,8 +26,6 @@
 
 #include <stdio.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xmd.h>
 
 #include "common.h"
 
@@ -65,7 +63,7 @@ void splash_create(void) {
     x = (xitk_get_display_width() >> 1) - (xim->width >> 1);
     y = (xitk_get_display_height() >> 1) - (xim->height >> 1);
 
-    xwin = xitk_window_create_simple_window_ext(gGui->imlib_data, x, y, xim->width, xim->height,
+    xwin = xitk_window_create_simple_window_ext(gGui->xitk, x, y, xim->width, xim->height,
                                                 _("xine Splash"), NULL, "xine", 0, 1, gGui->icon);
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
 

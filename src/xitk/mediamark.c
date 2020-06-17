@@ -3272,7 +3272,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 			       CONFIG_NO_DATA);
   
   /* Create window */
-  mmkeditor.xwin = xitk_window_create_dialog_window(gui->imlib_data, _("Mediamark Editor"), x, y,
+  mmkeditor.xwin = xitk_window_create_dialog_window(gui->xitk, _("Mediamark Editor"), x, y,
 						     WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start(gui, mmkeditor.xwin);

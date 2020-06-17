@@ -797,7 +797,8 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
 /*
  * Alloc a xitk_skin_config_t* memory area, nullify pointers.
  */
-xitk_skin_config_t *xitk_skin_init_config(ImlibData *im) {
+xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
+  ImlibData *im = xitk->imlibdata;
   xitk_skin_config_t *skonfig;
   
   if((skonfig = (xitk_skin_config_t *) xitk_xmalloc(sizeof(xitk_skin_config_t))) == NULL) {

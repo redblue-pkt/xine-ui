@@ -25,7 +25,6 @@
 #include <stdio.h>
 
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -913,7 +912,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
   if( !pp_wrapper->pplugin->help_running ) {
     x = y = 80;
-    pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gui->imlib_data, 
+    pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gui->xitk,
                                                                     _("Plugin Help"), x, y,
                                                                     HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
 
@@ -1817,7 +1816,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   
-  pp_wrapper->pplugin->xwin = xitk_window_create_dialog_window(gui->imlib_data, 
+  pp_wrapper->pplugin->xwin = xitk_window_create_dialog_window(gui->xitk,
 						   (pp_wrapper == &_vpp_wrapper.p) ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
                                                    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   

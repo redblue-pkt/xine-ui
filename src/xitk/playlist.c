@@ -26,8 +26,8 @@
 
 #include <stdio.h>
 #include <errno.h>
+
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -64,8 +64,6 @@ typedef struct {
 
 static filebrowser_t   *load_fb = NULL, *save_fb = NULL;
 static _playlist_t     *playlist;
-
-void playlist_handle_event(XEvent *event, void *data);
 
 static void playlist_deactivate (void) {
   if (playlist) {
@@ -990,7 +988,7 @@ void playlist_editor(void) {
 				     CONFIG_NO_CB,
 				     CONFIG_NO_DATA);
 
-  playlist->xwin = xitk_window_create_simple_window_ext(gui->imlib_data, x, y,
+  playlist->xwin = xitk_window_create_simple_window_ext(gui->xitk, x, y,
                                                         bg_image->width, bg_image->height, title,
                                                         NULL, "xine", 0, is_layer_above(), gui->icon);
 

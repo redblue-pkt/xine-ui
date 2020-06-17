@@ -25,11 +25,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
-#include <X11/keysym.h>
 #include <pthread.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "common.h"
 #include <xine/video_out.h>
@@ -317,7 +316,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
 
   vctrl->xwin =
-    xitk_window_create_simple_window_ext(vctrl->gui->imlib_data, x + 100, y + 100,
+    xitk_window_create_simple_window_ext(vctrl->gui->xitk, x + 100, y + 100,
                                          bg_image->width, bg_image->height, _(title),
                                          NULL, "xine", 0, is_layer_above(), vctrl->gui->icon);
   set_window_type_start(vctrl->gui, vctrl->xwin);

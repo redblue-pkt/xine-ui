@@ -540,7 +540,7 @@ void download_skin(gGui_t *gui, char *url) {
     return;
   }
 
-  downloading_key = xitk_window_dialog_3 (gui->imlib_data,
+  downloading_key = xitk_window_dialog_3 (gui->xitk,
     NULL,
     get_layer_above_video (gui), 400, _("Be patient..."), NULL, NULL,
     NULL, NULL, NULL, NULL, 0, ALIGN_CENTER, _("Retrieving skin list from %s"), url);
@@ -583,7 +583,7 @@ void download_skin(gGui_t *gui, char *url) {
     x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
     y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
 
-    skd->xwin = xitk_window_create_dialog_window (gui->imlib_data,
+    skd->xwin = xitk_window_create_dialog_window (gui->xitk,
                                                   _("Choose a skin to download..."),
                                                   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
 
