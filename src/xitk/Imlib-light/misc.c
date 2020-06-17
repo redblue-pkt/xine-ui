@@ -66,6 +66,28 @@ Imlib_set_render_type(ImlibData * id, int rend_type)
     }
 }
 
+void Imlib_destroy(ImlibData **p)
+{
+  ImlibData *id = *p;
+
+  if (!id)
+    return;
+  *p = NULL;
+
+  clean_caches(id);
+
+  free(id->palette);
+  free(id->palette_orig);
+  free(id->fast_rgb);
+  free(id->fast_err);
+  free(id->fast_erg);
+  free(id->fast_erb);
+
+  // XXX probably not complete ...
+
+  free(id);
+}
+
 #ifdef HAVE_SHM
 int
                     XShmGetEventBase(Display * disp);
