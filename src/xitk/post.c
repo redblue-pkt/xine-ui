@@ -949,8 +949,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     br.dbl_click_callback            = NULL;
     br.userdata                      = NULL;
     pp_wrapper->pplugin->help_browser = xitk_noskin_browser_create (pp_wrapper->pplugin->help_widget_list,
-      &br, (XITK_WIDGET_LIST_GC(pp_wrapper->pplugin->help_widget_list)), 15, 34,
-      HELP_WINDOW_WIDTH - (30 + 16), 20, 16, br_fontname);
+      &br, 15, 34, HELP_WINDOW_WIDTH - (30 + 16), 20, 16, br_fontname);
     xitk_add_widget (pp_wrapper->pplugin->help_widget_list, pp_wrapper->pplugin->help_browser);
   }
 

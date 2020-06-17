@@ -821,8 +821,7 @@ static void create_browser(void) {
   xitk_add_widget (test->widget_list, 
 		    (test->browser = 
 		     xitk_noskin_browser_create(test->widget_list, &browser,
-						XITK_WIDGET_LIST_GC(test->widget_list), 20, 30, 
-						100, 20, 12, fontname)));
+                                                20, 30, 100, 20, 12, fontname)));
   xitk_enable_and_show_widget(test->browser);
   
   xitk_browser_update_list(test->browser, 

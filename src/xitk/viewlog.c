@@ -405,7 +405,7 @@ void viewlog_panel(void) {
   br.dbl_click_callback            = NULL;
   br.userdata                      = NULL;
   viewlog->browser_widget = xitk_noskin_browser_create (viewlog->widget_list, &br,
-    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 15 + 5, (24 + viewlog->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    15 + 5, (24 + viewlog->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
   xitk_add_widget (viewlog->widget_list, viewlog->browser_widget);
 
   xitk_enable_and_show_widget(viewlog->browser_widget);
