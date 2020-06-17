@@ -25,10 +25,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <pthread.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "common.h"
 
@@ -292,7 +292,7 @@ void tvset_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  tvset.xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+  tvset.xwin = xitk_window_create_dialog_window(gGui->xitk,
 						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   

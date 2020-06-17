@@ -109,6 +109,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
     tips->new_widget = NULL;
     
     if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && strlen(tips->widget->tips_string)) {
+      xitk_t              *xitk =tips->widget->wl->xitk;
       int                  x, y, w, h;
       xitk_window_t       *xwin;
       xitk_image_t        *image;
@@ -130,7 +131,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       x += tips->widget->x;
       y += tips->widget->y;
       
-      fs = xitk_font_load_font(tips->widget->wl->xitk, DEFAULT_FONT_10);
+      fs = xitk_font_load_font(xitk, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips->widget->wl->gc);
 
       xitk_font_unload_font(fs);
@@ -159,7 +160,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	/*                                           v                      */
         y -= (tips->widget->height + h + bottom_gap + 1);
       /* No further alternative to y-position the tips (just either below or above widget) */
-      xwin = xitk_window_create_simple_window_ext(tips->widget->wl->imlibdata, x, y, w, h,
+      xwin = xitk_window_create_simple_window_ext(xitk, x, y, w, h,
                                                   NULL, NULL, NULL, 1, 0, NULL);
       {
 	xitk_pixmap_t *bg;

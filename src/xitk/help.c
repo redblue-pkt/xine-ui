@@ -23,9 +23,6 @@
 #endif
 
 #include <stdio.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -33,6 +30,9 @@
 #include <dirent.h>
 #include <errno.h>
 #include <assert.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "xine-toolkit/recode.h"
 
@@ -348,7 +348,7 @@ void help_panel(void) {
 				CONFIG_NO_DATA);
 
   /* Create window */
-  help->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
+  help->xwin = xitk_window_create_dialog_window(gGui->xitk,
 						_("Help"), 
 						x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   

@@ -218,7 +218,7 @@ static int change_skin(skins_locations_t *sk) {
 
   old_skin = DEFAULT_SKIN;
   
-  nskin_config = xitk_skin_init_config(gui->imlib_data);
+  nskin_config = xitk_skin_init_config(gui->xitk);
 
  __reload_skin:
   snprintf(buf, sizeof(buf), "%s/%s", sks->pathname, sks->skin);
@@ -252,7 +252,7 @@ static int change_skin(skins_locations_t *sk) {
   /* Check skin version */
   if(xitk_skin_check_version(nskin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(nskin_config);
-    nskin_config = xitk_skin_init_config(gui->imlib_data);
+    nskin_config = xitk_skin_init_config(gui->xitk);
     xine_error (gui, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), buf, DEFAULT_SKIN);
     ret = get_skin_offset(DEFAULT_SKIN);
     sks = get_skin_location(DEFAULT_SKIN);
@@ -348,7 +348,7 @@ void preinit_skins_support(void) {
 
   change_config_entry = 0;
   
-  gGui->skin_config = xitk_skin_init_config(gGui->imlib_data);
+  gGui->skin_config = xitk_skin_init_config(gGui->xitk);
   
   looking_for_available_skins();
   
@@ -425,7 +425,7 @@ void init_skins_support(void) {
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(gGui->skin_config);
-    gGui->skin_config = xitk_skin_init_config(gGui->imlib_data);
+    gGui->skin_config = xitk_skin_init_config(gGui->xitk);
     fprintf(stderr, _("Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"), 
 	    buf, (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
     config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));

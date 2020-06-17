@@ -25,11 +25,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
-#include <X11/keysym.h>
 #include <pthread.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "common.h"
 
@@ -383,7 +382,7 @@ void viewlog_panel(void) {
 				CONFIG_NO_DATA);
 
   /* Create window */
-  viewlog->xwin = xitk_window_create_dialog_window (gui->imlib_data,
+  viewlog->xwin = xitk_window_create_dialog_window (gui->xitk,
     _("xine Log Viewer"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   set_window_states_start(gui, viewlog->xwin);

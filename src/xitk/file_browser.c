@@ -33,7 +33,6 @@
 #include <errno.h>
 
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -303,7 +302,7 @@ static void fb_create_input_window(char *title, char *text,
   fne->callback = cb;
   fne->fb = fb;
 
-  fne->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, title, x, y, width, height);
+  fne->xwin = xitk_window_create_dialog_window (fb->gui->xitk, title, x, y, width, height);
 
   xitk_window_set_wm_window_type(fne->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fne->xwin, NULL, "xine");
@@ -974,7 +973,7 @@ static void fb_delete_file (xitk_widget_t *w, void *data) {
 	     fb->norm_files[sel].name);
     
     fb_deactivate(fb);
-    fb->dialog = xitk_window_dialog_3 (fb->gui->imlib_data,
+    fb->dialog = xitk_window_dialog_3 (fb->gui->xitk,
       fb->xwin,
       get_layer_above_video (fb->gui), 400, _("Confirm deletion ?"), _fb_delete_file_done, fb,
       NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_DEFAULT, "%s", buf);
@@ -1185,7 +1184,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
 
   /* Create window */
-  fb->xwin = xitk_window_create_dialog_window (fb->gui->imlib_data, 
+  fb->xwin = xitk_window_create_dialog_window (fb->gui->xitk,
 					      (window_title) ? window_title : _("File Browser"), 
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   

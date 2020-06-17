@@ -26,11 +26,6 @@
 
 #include <stdio.h>
 #include <sys/time.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/Xmd.h>
-
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
@@ -39,6 +34,9 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <stdlib.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "xine-toolkit/xitk_x11.h"
 

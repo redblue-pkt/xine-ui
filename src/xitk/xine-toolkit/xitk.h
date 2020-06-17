@@ -1418,8 +1418,7 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
 /**
  *
  */
-xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
-				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
 
 /**
  *
@@ -1528,7 +1527,7 @@ void xitk_inputtext_change_text(xitk_widget_t *it, const char *text);
 /*
  * Alloc a xitk_skin_config_t* memory area, nullify pointers.
  */
-xitk_skin_config_t *xitk_skin_init_config(ImlibData *);
+xitk_skin_config_t *xitk_skin_init_config(xitk_t *);
 
 /*
  * Release all allocated memory of a xitk_skin_config_t* variable (element chained struct too).
@@ -2029,8 +2028,8 @@ void menu_draw_arrow_branch(xitk_image_t *p);
 /**
  *
  */
-xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height);
-xitk_window_t *xitk_window_create_window_ext(ImlibData *im, int x, int y, int width, int height,
+xitk_window_t *xitk_window_create_window(xitk_t *xitk, int x, int y, int width, int height);
+xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int width, int height,
                                              const char *title, const char *res_name, const char *res_class,
                                              int override_redirect, int layer_above,
                                              xitk_pixmap_t *icon);
@@ -2038,16 +2037,16 @@ xitk_window_t *xitk_window_create_window_ext(ImlibData *im, int x, int y, int wi
 /**
  *
  */
-xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int width, int height);
+xitk_window_t *xitk_window_create_simple_window(xitk_t *xitk, int x, int y, int width, int height);
 
-xitk_window_t *xitk_window_create_simple_window_ext(ImlibData *im, int x, int y, int width, int height,
+xitk_window_t *xitk_window_create_simple_window_ext(xitk_t *xitk, int x, int y, int width, int height,
                                                     const char *title, const char *res_name, const char *res_class,
                                                     int override_redirect, int layer_above, xitk_pixmap_t *icon);
 
 /**
  *
  */
-xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, const char *title, int x, int y, int width, int height);
+xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title, int x, int y, int width, int height);
 
 /*
  * Get widget list of window.
@@ -2197,7 +2196,7 @@ int xitk_is_window_size(Display *display, Window window, int width, int height);
 #define XITK_LABEL_YES    ((const char *)3)
 #define XITK_LABEL_CANCEL ((const char *)4)
 /* non NULL labels show 1-2-3, default preference is 3-1-2. */
-xitk_register_key_t xitk_window_dialog_3 (ImlibData *im, xitk_window_t *transient_for, int layer_above,
+xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient_for, int layer_above,
   int width, const char *title,
   void (*done_cb)(void *userdata, int state), void *userdata,
   const char *button1_label, const char *button2_label, const char *button3_label,

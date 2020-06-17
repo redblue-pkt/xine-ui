@@ -29,13 +29,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
-#include <X11/Xlib.h>
+
 #include <xine/xineutils.h>
-#include <pthread.h>
 
 #include "common.h"
 #include "oxine/oxine.h"
@@ -471,7 +471,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
       gui->play_data.running            = 1;
 
       xitk_register_key_t key =
-      xitk_window_dialog_3 (gui->imlib_data,
+      xitk_window_dialog_3 (gui->xitk,
         NULL,
         get_layer_above_video (gui), 400, _("Start Playback ?"), _start_anyway_done, gui,
         NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,

@@ -860,8 +860,7 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 /*
  * Create mrlbrowser window.
  */
-xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
-				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
+xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
   char                       *title = mb->window_title;
   xitk_widget_t              *mywidget;
   mrlbrowser_private_data_t  *private_data;
@@ -873,7 +872,8 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   xitk_widget_t              *w;
   xitk_image_t               *bg_image;
 
-  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->imlibdata);
 
   XITK_CHECK_CONSTITENCY(mb);
 
@@ -904,7 +904,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   private_data->xine              = mb->xine;
   private_data->running           = 1;
 
-  bg_image = xitk_image_load_image(im,
+  bg_image = xitk_image_load_image(xitk->imlibdata,
      xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
   if (!bg_image) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
@@ -915,7 +915,7 @@ xitk_widget_t *xitk_mrlbrowser_create(ImlibData *im,
   private_data->mrls_num        = 0;
   private_data->last_mrl_source = NULL;
 
-  private_data->xwin = xitk_window_create_window_ext(im, mb->x, mb->y, bg_image->width, bg_image->height,
+  private_data->xwin = xitk_window_create_window_ext(xitk, mb->x, mb->y, bg_image->width, bg_image->height,
                                                      title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
 
   if(mb->set_wm_window_normal)

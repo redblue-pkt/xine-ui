@@ -27,10 +27,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-
 #include "dump.h"
 
 #include "common.h"
@@ -65,7 +61,7 @@ static void errors_create_window (gGui_t *gui, char *title, char *message) {
     return;
   }
   xitk_register_key_t key =
-  xitk_window_dialog_3 (gui->imlib_data,
+  xitk_window_dialog_3 (gui->xitk,
     NULL,
     get_layer_above_video (gui), 400, title, _errors_display_log_3, gui,
     _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", message);
@@ -96,7 +92,7 @@ void xine_error (gGui_t *gui, const char *message, ...) {
       gui->nongui_error_msg (buf);
     } else {
       xitk_register_key_t key =
-      xitk_window_dialog_3 (gui->imlib_data,
+      xitk_window_dialog_3 (gui->xitk,
         NULL,
         get_layer_above_video (gui), 400, XITK_TITLE_ERROR, NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
@@ -157,7 +153,7 @@ void xine_info (gGui_t *gui, const char *message, ...) {
       gui->nongui_error_msg (buf);
     } else {
       xitk_register_key_t key =
-      xitk_window_dialog_3 (gui->imlib_data,
+      xitk_window_dialog_3 (gui->xitk,
         NULL,
         get_layer_above_video (gui), 400, XITK_TITLE_INFO, NULL, NULL,
         XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
@@ -273,7 +269,7 @@ void too_slow_window (gGui_t *gui) {
     return;
 
   xitk_register_key_t key =
-  xitk_window_dialog_3 (gui->imlib_data,
+  xitk_window_dialog_3 (gui->xitk,
     NULL,
     get_layer_above_video (gui), 500, XITK_TITLE_WARN, _too_slow_done, gui,
     _("Done"), _("Learn More..."), NULL, _("Disable this warning."), 0, ALIGN_CENTER, "%s", message);

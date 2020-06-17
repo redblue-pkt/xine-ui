@@ -182,7 +182,7 @@ static void _combo_open (_combo_private_t *wp) {
   itemw += xitk_get_widget_width (wp->button_widget);
   itemw -= 2; /* space for border */
 
-  wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->imlibdata,
+  wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->xitk,
     0, 0, itemw + 2, itemh * 5 + slidw + 2,
     NULL, "Xitk Combo", "Xitk", 1, 0, NULL);
   if (!wp->xwin)

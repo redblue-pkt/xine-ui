@@ -26,10 +26,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/time.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <pthread.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include <xine.h>
 #include <xine/xineutils.h>
@@ -403,7 +403,7 @@ void event_sender_panel(void) {
 
   /* Create window */
   eventer->xwin =
-    xitk_window_create_simple_window_ext(gGui->imlib_data, eventer->x, eventer->y,
+    xitk_window_create_simple_window_ext(gGui->xitk, eventer->x, eventer->y,
                                          WINDOW_WIDTH, WINDOW_HEIGHT, _("xine Event Sender"),
                                          NULL, "xine", 0, 0, gGui->icon);
   set_window_type_start(gGui, eventer->xwin);

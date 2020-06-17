@@ -811,7 +811,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
   }
 
-  xwin = xitk_window_create_simple_window_ext(private_data->imlibdata,
+  xwin = xitk_window_create_simple_window_ext(private_data->widget->wl->xitk,
                                               x, y, wwidth + 2, wheight + 2,
                                               NULL, NULL, NULL, 1, 1, NULL);
 

@@ -26,8 +26,6 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
 
 #include "common.h"
 
@@ -326,7 +324,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   mb.mrl_filters                           = mrl_filters;
 
-  mrlb->w = xitk_mrlbrowser_create (mrlb->gui->imlib_data, mrlb->gui->skin_config, &mb);
+  mrlb->w = xitk_mrlbrowser_create (mrlb->gui->xitk, mrlb->gui->skin_config, &mb);
 
   video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
 
