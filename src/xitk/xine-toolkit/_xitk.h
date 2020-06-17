@@ -220,7 +220,6 @@ extern int xitk_x_error;
 
 #ifndef _XITK_C_
 
-xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata);
 xitk_register_key_t xitk_register_event_handler(const char *name,
                                                 xitk_window_t *w,
                                                 //Window window,
@@ -319,6 +318,7 @@ struct xitk_pixmap_s {
 };
 
 struct xitk_window_s {
+  xitk_t                   *xitk;
   ImlibData                *imlibdata;
   Window                    window;
   Window                    win_parent;
