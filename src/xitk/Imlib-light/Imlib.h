@@ -42,7 +42,7 @@ extern              "C"
   Visual             *Imlib_get_visual(ImlibData * id);
   char               *Imlib_get_sysconfig(ImlibData * id);
 
-
+  void                Imlib_destroy(ImlibData **p);
 
 #ifdef __cplusplus
 }

@@ -2797,10 +2797,11 @@ void xitk_free(xitk_t **p) {
    */
   xitk->x.x_lock_display (xitk->x.display);
   xitk->x.x_unlock_display (xitk->x.display);
+
+  Imlib_destroy(&xitk->x.imlibdata);
+
   XCloseDisplay(xitk->x.display);
   xitk->x.display = NULL;
-  // XXX imlib does not support close / free
-  xitk->x.imlibdata = NULL;
 
   pthread_mutex_destroy (&xitk->mutex);
 
