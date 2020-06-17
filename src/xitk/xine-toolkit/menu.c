@@ -33,7 +33,7 @@
 
 static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, int);
 
-static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) {
+static menu_window_t *_menu_new_menu_window(xitk_t *xitk, ImlibData *im, xitk_window_t *xwin) {
   menu_window_t *menu_window;
 
   menu_window          = (menu_window_t *) xitk_xmalloc(sizeof(menu_window_t));
@@ -51,7 +51,7 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   /* HACK: embedded widget list - make sure it is not accidentally (un)listed. */
   xitk_dnode_init (&menu_window->wl.node);
   menu_window->wl.win  = xitk_window_get_window(xwin);
-  menu_window->wl.xitk = gXitk;
+  menu_window->wl.xitk = xitk;
   menu_window->wl.imlibdata = im;
 
   XLOCK (im->x.x_lock_display, im->x.disp);
@@ -819,7 +819,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     bg = xitk_window_get_background_pixmap(xwin);
   }
 
-  menu_window         = _menu_new_menu_window(private_data->imlibdata, xwin);
+  menu_window         = _menu_new_menu_window(private_data->widget->wl->xitk, private_data->imlibdata, xwin);
   menu_window->widget = w;
 
   menu_window->bevel_plain = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);

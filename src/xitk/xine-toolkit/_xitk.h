@@ -319,7 +319,6 @@ struct xitk_pixmap_s {
 
 struct xitk_window_s {
   xitk_t                   *xitk;
-  ImlibData                *imlibdata;
   Window                    window;
   Window                    win_parent;
   xitk_pixmap_t            *background;

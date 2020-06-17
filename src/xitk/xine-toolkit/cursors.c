@@ -929,10 +929,10 @@ void xitk_cursors_restore_window_cursor(Display *display, Window window) {
 }
 
 void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor) {
-  xitk_cursors_define_window_cursor (w->imlibdata->x.disp, w->window, cursor);
+  xitk_cursors_define_window_cursor (w->xitk->display, w->window, cursor);
 }
 
 void xitk_window_restore_window_cursor(xitk_window_t *w) {
-  xitk_cursors_restore_window_cursor (w->imlibdata->x.disp, w->window);
+  xitk_cursors_restore_window_cursor (w->xitk->display, w->window);
 }
 
