@@ -44,6 +44,7 @@
 #include "xitkintl.h"
 
 #include "../../common/dump.h"
+#include "../../common/dump_x11.h"
 
 /*
 *
