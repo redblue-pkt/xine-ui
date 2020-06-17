@@ -157,14 +157,14 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  */
 static void update_current_origin(mrlbrowser_private_data_t *private_data) {
 
-  if(private_data->mc->mrls[0] && private_data->mc->mrls[0]->origin)
-    strlcpy(private_data->current_origin, private_data->mc->mrls[0]->origin, sizeof(private_data->current_origin));
+  XITK_FREE (private_data->current_origin);
+  if (private_data->mc->mrls[0] && private_data->mc->mrls[0]->origin)
+    private_data->current_origin = strdup(private_data->mc->mrls[0]->origin);
   else
-    private_data->current_origin[0] = '\0';
-  
-  xitk_label_change_label (private_data->widget_origin, 
-			   private_data->current_origin);
-  
+    private_data->current_origin = strdup("");
+
+  xitk_label_change_label (private_data->widget_origin,
+                           private_data->current_origin);
 }
 
 /*
@@ -613,6 +613,7 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
     XITK_FREE(private_data->skin_element_name_ip);
     XITK_FREE(private_data->last_mrl_source);
     XITK_FREE(private_data->mc);
+    XITK_FREE(private_data->current_origin);
     XITK_FREE(private_data);
 
   }
@@ -673,46 +674,55 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 				  int j, int add_callback, int play_callback) {
   xine_mrl_t *ms = private_data->mc->filtered_mrls[j];
-  char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  
-  strlcpy(buf, ms->mrl, sizeof(buf));
-  
-  if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
-    char *filename = ms->mrl;
-    
-    if(ms->origin) {
-      filename += strlen(ms->origin);
-      
-      if(*filename == '/') 
-	filename++;
-    }
-    
-    /* Check if we want to re-read current dir or go in parent dir */
-    if((filename[strlen(filename) - 1] == '.') &&
-       (filename[strlen(filename) - 2] != '.')) {
 
-      strlcpy(buf, ms->origin, sizeof(buf));
+  if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
+    const char *buf;
+    char       *freeme = NULL;
+    const char *filename = ms->mrl;
+    size_t      len;
+
+    if (ms->origin) {
+      if (strlen(filename) < strlen(ms->origin))
+        filename += strlen(ms->origin);
+      else
+        filename = "";
+
+      if (*filename == '/')
+        filename++;
     }
-    else if((filename[strlen(filename) - 1] == '.') &&
-	    (filename[strlen(filename) - 2] == '.')) {
+
+    len = strlen(filename);
+
+    /* Check if we want to re-read current dir or go in parent dir */
+    if( len > 1 &&
+        (filename[len - 1] == '.') &&
+        (filename[len - 2] != '.')) {
+
+      buf = ms->origin;
+    }
+    else if (len > 1 &&
+             (filename[len - 1] == '.') &&
+             (filename[len - 2] == '.')) {
       char *p;
       
-      strlcpy(buf, ms->origin, sizeof(buf));
-      if(strlen(buf) > 1) { /* not '/' directory */
+      buf = freeme = strdup(ms->origin ? ms->origin : "");
+      if (buf[0] && buf[1]) { /* not '/' directory */
 	  
-	p = &buf[strlen(buf)-1];
-        while(*p && *p != '/' && p > buf) {
+        p = &freeme[strlen(buf)-1];
+        while(*p && *p != '/' && p > freeme) {
 	  *p = '\0';
 	    p--;
 	}
 	
 	/* Remove last '/' if current_dir isn't root */
-	if((strlen(buf) > 1) && *p == '/') 
+	if((strlen(freeme) > 1) && *p == '/') 
 	  *p = '\0';
 	  
       }
+    } else {
+      buf = ms->mrl;
     }
-    
+
     {
       int num_mrls;
       xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
@@ -722,7 +732,9 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
 
     }
-    
+
+    free(freeme);
+
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
@@ -976,10 +988,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   private_data->widget_origin = xitk_label_create (private_data->widget_list, skonfig, &lbl);
   xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->widget_origin->node);
   private_data->widget_origin->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-  
-  memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
-  if(mb->origin.cur_origin)
-    strlcpy(private_data->current_origin, mb->origin.cur_origin, sizeof(private_data->current_origin));
+
+  if (mb->origin.cur_origin)
+    private_data->current_origin = strdup(mb->origin.cur_origin);
+  else
+    private_data->current_origin = strdup("");
 
   if(mb->ip_name.label.label_str) {
 

@@ -134,7 +134,7 @@ typedef struct {
   char                      *last_mrl_source;
 
   xitk_widget_t             *widget_origin; /* Current directory widget */
-  char                       current_origin[XITK_PATH_MAX + 1]; /* Current directory */
+  char                      *current_origin; /* Current directory */
 
   int                        running; /* Boolean status */
   int                        visible; /* Boolean status */
