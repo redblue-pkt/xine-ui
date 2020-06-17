@@ -1378,11 +1378,12 @@ void xitk_ungrab_pointer(void) {
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.
  */
-xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
+  __xitk_t *xitk = (__xitk_t *)_xitk;
   xitk_widget_list_t *l;
 
-  ABORT_IF_NULL(imlibdata);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->x.imlibdata);
 
   l = (xitk_widget_list_t *)xitk_xmalloc (sizeof (xitk_widget_list_t));
   if (!l)
@@ -1399,7 +1400,7 @@ xitk_widget_list_t *xitk_widget_list_new (ImlibData *imlibdata) {
   l->widget_under_mouse = NULL;
   l->widget_pressed     = NULL;
   l->destroy            = 0;
-  l->imlibdata          = imlibdata;
+  l->imlibdata          = xitk->x.imlibdata;
 
   MUTLOCK();
   xitk_dlist_add_tail (&xitk->wlists, &l->node);

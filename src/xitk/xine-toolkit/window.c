@@ -764,6 +764,7 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
     title = "xiTK Window";
 
   xwin                  = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
+  xwin->xitk            = xitk;
   xwin->imlibdata       = xitk->imlibdata;
   xwin->win_parent      = None;
   xwin->background      = NULL;
@@ -892,7 +893,7 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
   if (w->widget_list)
     return w->widget_list;
 
-  w->widget_list = xitk_widget_list_new(w->imlibdata);
+  w->widget_list = xitk_widget_list_new(w->xitk);
 
   XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
   gc = XCreateGC (w->imlibdata->x.disp, w->window, None, None);

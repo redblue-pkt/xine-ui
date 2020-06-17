@@ -1634,7 +1634,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->x_unlock_display (vwin->video_display);
 
   if (!vwin->separate_display) {
-    vwin->wl = xitk_widget_list_new (xitk_x11_get_imlib_data(vwin->gui->xitk));
+    vwin->wl = xitk_widget_list_new (vwin->gui->xitk);
   }
 
   vwin->video_window       = None;
