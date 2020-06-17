@@ -2374,10 +2374,6 @@ Colormap xitk_x11_get_colormap(xitk_t *xitk) {
   return Imlib_get_colormap(xitk->imlibdata);
 }
 
-ImlibData *xitk_x11_get_imlib_data(xitk_t *xitk) {
-  return xitk->imlibdata;
-}
-
 void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
 
   int install_colormap = ((__xitk_t *)xitk)->install_colormap;

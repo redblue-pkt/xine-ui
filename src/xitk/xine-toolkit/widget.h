@@ -28,6 +28,8 @@
 
 #include <xine/sorted_array.h>
 
+#include "xitk/Imlib-light/Imlib.h"
+
 #define FOCUS_LOST      0
 #define FOCUS_RECEIVED  1
 #define FOCUS_MOUSE_IN  3

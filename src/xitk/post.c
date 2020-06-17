@@ -1240,29 +1240,21 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
 
   image = xitk_image_create_image(gui->xitk, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
-  pixmap_fill_rectangle(image->image,
-                        0, 0, image->width, image->height,
-                        xitk_get_pixel_color_gray(gui->imlib_data));
+  xitk_image_fill_rectangle(image,
+                            0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
+                            xitk_get_pixel_color_gray(gui->xitk));
 
   /* Some decorations */
-  draw_outter_frame(image->image, NULL, NULL,
-		    0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-  draw_rectangular_outter_box_light(image->image,
-		    27, 28, FRAME_WIDTH - 27 - 5, 1);
-  draw_rectangular_outter_box_light(image->image,
-		    26, 5, 1, FRAME_HEIGHT - 10);
-  draw_inner_frame(image->image, NULL, NULL,
-		    5, 5, 16, 16);
-  draw_rectangular_inner_box_light(image->image,
-		    5, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(image->image,
-		    10, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(image->image,
-		    15, 24, 1, FRAME_HEIGHT - 48);
-  draw_rectangular_inner_box_light(image->image,
-		    20, 24, 1, FRAME_HEIGHT - 48);
-  draw_inner_frame(image->image, NULL, NULL,
-		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
+  xitk_image_draw_outter_frame(image, NULL, NULL,
+                               0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+  xitk_image_draw_rectangular_outter_box_light(image, 27, 28, FRAME_WIDTH - 27 - 5, 1);
+  xitk_image_draw_rectangular_outter_box_light(image, 26, 5, 1, FRAME_HEIGHT - 10);
+  xitk_image_draw_inner_frame(image, NULL, NULL, 5, 5, 16, 16);
+  xitk_image_draw_rectangular_inner_box_light(image, 5, 24, 1, FRAME_HEIGHT - 48);
+  xitk_image_draw_rectangular_inner_box_light(image, 10, 24, 1, FRAME_HEIGHT - 48);
+  xitk_image_draw_rectangular_inner_box_light(image, 15, 24, 1, FRAME_HEIGHT - 48);
+  xitk_image_draw_rectangular_inner_box_light(image, 20, 24, 1, FRAME_HEIGHT - 48);
+  xitk_image_draw_inner_frame(image, NULL, NULL, 5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
   XITK_WIDGET_INIT(&im);
   im.skin_element_name = NULL;

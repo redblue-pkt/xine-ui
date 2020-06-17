@@ -869,7 +869,7 @@ xitk_window_t *xitk_window_create_simple_window_ext(xitk_t *xitk, int x, int y, 
   xwin->width = width;
   xwin->height = height;
   
-  xwin->background = xitk_image_create_xitk_pixmap(xitk->imlibdata, width, height);
+  xwin->background = xitk_image_create_xitk_pixmap(xitk, width, height);
   draw_outter(xwin->background, width, height);
   xitk_window_apply_background(xwin);
 
@@ -921,8 +921,8 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 
   xitk_window_set_window_title(xwin, title);
 
-  bar = xitk_image_create_xitk_pixmap(xitk->imlibdata, width, TITLE_BAR_HEIGHT);
-  pix_bg = xitk_image_create_xitk_pixmap(xitk->imlibdata, width, height);
+  bar = xitk_image_create_xitk_pixmap(xitk, width, TITLE_BAR_HEIGHT);
+  pix_bg = xitk_image_create_xitk_pixmap(xitk, width, height);
 
   fs = xitk_font_load_font(xitk, DEFAULT_BOLD_FONT_12);
   xitk_font_set_font(fs, bar->gc);
@@ -933,22 +933,22 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 	    0, 0, width, height, 0, 0);
   X_UNLOCK (xitk);
 
-  colorblack = xitk_get_pixel_color_black(xitk->imlibdata);
-  colorwhite = xitk_get_pixel_color_white(xitk->imlibdata);
-  colorgray = xitk_get_pixel_color_gray(xitk->imlibdata);
-  colordgray = xitk_get_pixel_color_darkgray(xitk->imlibdata);
+  colorblack = xitk_get_pixel_color_black(xitk);
+  colorwhite = xitk_get_pixel_color_white(xitk);
+  colorgray = xitk_get_pixel_color_gray(xitk);
+  colordgray = xitk_get_pixel_color_darkgray(xitk);
 
  /* Draw window title bar background */
   if(bar_style) {
     int s, bl = 255;
     unsigned int colorblue;
 
-    colorblue = xitk_get_pixel_color_from_rgb(xitk->imlibdata, 0, 0, bl);
+    colorblue = xitk_get_pixel_color_from_rgb(xitk, 0, 0, bl);
     X_LOCK (xitk);
     for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
       XSetForeground(xitk->display, bar->gc, colorblue);
       XDrawLine(xitk->display, bar->pixmap, bar->gc, 0, s, width, s);
-      colorblue = xitk_get_pixel_color_from_rgb(xitk->imlibdata, 0, 0, bl);
+      colorblue = xitk_get_pixel_color_from_rgb(xitk, 0, 0, bl);
     }
     X_UNLOCK (xitk);
   }
@@ -956,8 +956,8 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     int s;
     unsigned int c, cd;
 
-    cd = xitk_get_pixel_color_from_rgb(xitk->imlibdata, 115, 12, 206);
-    c = xitk_get_pixel_color_from_rgb(xitk->imlibdata, 135, 97, 168);
+    cd = xitk_get_pixel_color_from_rgb(xitk, 115, 12, 206);
+    c = xitk_get_pixel_color_from_rgb(xitk, 135, 97, 168);
 
     draw_flat_with_color(bar, width, TITLE_BAR_HEIGHT, colorgray);
     draw_rectangular_inner_box(bar, 2, 2, width - 6, (TITLE_BAR_HEIGHT - 1 - 4));
@@ -1006,7 +1006,7 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   if(bar_style)
     XSetForeground(xitk->display, bar->gc, colorwhite);
   else
-    XSetForeground(xitk->display, bar->gc, (xitk_get_pixel_color_from_rgb(xitk->imlibdata, 85, 12, 135)));
+    XSetForeground(xitk->display, bar->gc, (xitk_get_pixel_color_from_rgb(xitk, 85, 12, 135)));
   X_UNLOCK (xitk);
 
   xitk_font_draw_string(fs, bar, bar->gc,
@@ -1094,7 +1094,7 @@ xitk_pixmap_t *xitk_window_get_background_pixmap(xitk_window_t *w) {
     return None;
 
   xitk_window_get_window_size(w, &width, &height);
-  pixmap = xitk_image_create_xitk_pixmap(w->xitk->imlibdata, width, height);
+  pixmap = xitk_image_create_xitk_pixmap(w->xitk, width, height);
 
   X_LOCK (w->xitk);
   XCopyArea(w->xitk->display, xitk_window_get_background(w), pixmap->pixmap,
@@ -1149,7 +1149,7 @@ int xitk_window_change_background(xitk_window_t *w, Pixmap bg, int width, int he
   if ((w == NULL) || (bg == None) || (width == 0 || height == 0))
     return 0;
 
-  pixmap = xitk_image_create_xitk_pixmap(w->xitk->imlibdata, width, height);
+  pixmap = xitk_image_create_xitk_pixmap(w->xitk, width, height);
 
   X_LOCK (w->xitk);
   XCopyArea(w->xitk->display, bg, pixmap->pixmap, pixmap->gc, 0, 0, width, height, 0, 0);
@@ -1208,11 +1208,11 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
   if(w->background_mask)
     xitk_image_destroy_xitk_pixmap(w->background_mask);
 
-  w->background      = xitk_image_create_xitk_pixmap(w->xitk->imlibdata, width, height);
+  w->background      = xitk_image_create_xitk_pixmap(w->xitk, width, height);
   w->background_mask = NULL;
 
   if(img->mask)
-    w->background_mask = xitk_image_create_xitk_mask_pixmap(w->xitk->imlibdata, width, height);
+    w->background_mask = xitk_image_create_xitk_mask_pixmap(w->xitk, width, height);
 
   X_LOCK (w->xitk);
   if(XGetGeometry(w->xitk->display, w->window, &rootwin, 

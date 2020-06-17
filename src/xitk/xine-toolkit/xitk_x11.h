@@ -63,12 +63,8 @@ Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, i
  * access to xitk X11
  */
 
-#include "xitk/Imlib-light/Imlib_types.h"
-
 #define xitk_t struct xitk_s
-#define ImlibData struct _ImlibData
 struct xitk_s;
-struct _ImlibData;
 
 void        xitk_x11_select_visual(xitk_t *, Visual *gui_visual);
 
@@ -77,9 +73,6 @@ Visual     *xitk_x11_get_visual(xitk_t *);
 int         xitk_x11_get_depth(xitk_t *);
 Colormap    xitk_x11_get_colormap(xitk_t *);
 
-ImlibData  *xitk_x11_get_imlib_data(xitk_t *xitk);
-
 #undef xitk_t
-#undef ImlibData
 
 #endif /* _XITK_X11_H_ */

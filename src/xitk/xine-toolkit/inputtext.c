@@ -555,7 +555,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   xsize = wp->skin->width / 2;
   ysize = wp->skin->height;
   if (!wp->text.temp_pixmap)
-    wp->text.temp_pixmap = xitk_image_create_xitk_pixmap (wp->imlibdata, xsize + 2 * ysize, ysize);
+    wp->text.temp_pixmap = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, xsize + 2 * ysize, ysize);
       
   state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? FOCUS : NORMAL;
       

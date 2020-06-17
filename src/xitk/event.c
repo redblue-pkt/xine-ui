@@ -1510,7 +1510,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   /* gui->new_pos        = -1; */
 
   /*
-   * X / imlib stuff
+   *
    */
 
   use_x_lock_display =
@@ -1739,13 +1739,11 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
                          use_x_lock_display, use_synchronized_x11,
                          (__xineui_global_verbosity) ? 1 : 0);
 
-  gui->imlib_data = xitk_x11_get_imlib_data(gui->xitk);
-
   /*
    * create an icon pixmap
    */
 
-  gui->icon = xitk_pixmap_create_from_data(gui->imlib_data, 40, 40, (const char *)icon_datas);
+  gui->icon = xitk_pixmap_create_from_data(gui->xitk, 40, 40, (const char *)icon_datas);
 
 
   preinit_skins_support();
@@ -1983,7 +1981,5 @@ void gui_run(gGui_t *gui, char **session_opts) {
    * with dlclose() this will cause a segmentation fault.
    */
   xitk_free(&gui->xitk);
-
-  gui->imlib_data = NULL;
 }
 

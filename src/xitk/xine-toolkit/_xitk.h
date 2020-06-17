@@ -304,6 +304,7 @@ void menu_auto_pop(xitk_widget_t *w);
 int xitk_get_bool_value(const char *val);
 
 struct xitk_pixmap_s {
+  xitk_t                           *xitk;
   ImlibData                        *imlibdata;
   XImage                           *xim;
   Pixmap                            pixmap;
@@ -315,6 +316,21 @@ struct xitk_pixmap_s {
   XShmSegmentInfo                  *shminfo;
 #endif
   xitk_pixmap_destroyer_t           destroy;
+};
+
+struct xitk_image_s {
+  xitk_pixmap_t                    *image;
+  xitk_pixmap_t                    *mask;
+  xitk_pix_font_t                  *pix_font;
+  int                               width;
+  int                               height;
+
+  /* image private */
+  xitk_t                           *xitk;
+  ImlibImage                       *raw;
+  xitk_widget_list_t               *wl;
+  int                               refs, max_refs;
+  char                              key[20];
 };
 
 struct xitk_window_s {

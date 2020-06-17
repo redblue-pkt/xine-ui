@@ -831,16 +831,18 @@ static void fb_sort(xitk_widget_t *w, void *data) {
   (void)w;
   if(w == fb->directories_sort) {
     xitk_image_t *dsimage = xitk_get_widget_foreground_skin(fb->directories_sort);
-    
+    int width = xitk_image_width(dsimage);
+    int height = xitk_image_height(dsimage);
+
     fb->directories_sort_direction = (fb->directories_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
     
     xitk_hide_widget(fb->directories_sort);
 
     if(fb->directories_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image (fb->sort_skin_down, dsimage, dsimage->width, dsimage->height);
+      xitk_image_change_image (fb->sort_skin_down, dsimage, width, height);
     else
-      xitk_image_change_image (fb->sort_skin_up, dsimage, dsimage->width, dsimage->height);
+      xitk_image_change_image (fb->sort_skin_up, dsimage, width, height);
 
     xitk_show_widget(fb->directories_sort);
     
@@ -848,6 +850,8 @@ static void fb_sort(xitk_widget_t *w, void *data) {
   }
   else if(w == fb->files_sort) {
     xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->files_sort);
+    int width = xitk_image_width(fsimage);
+    int height = xitk_image_height(fsimage);
     
     fb->files_sort_direction = (fb->files_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
@@ -855,9 +859,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_hide_widget(fb->files_sort);
 
     if(fb->files_sort_direction == DEFAULT_SORT)
-      xitk_image_change_image (fb->sort_skin_down, fsimage, fsimage->width, fsimage->height);
+      xitk_image_change_image (fb->sort_skin_down, fsimage, width, height);
     else
-      xitk_image_change_image (fb->sort_skin_up, fsimage, fsimage->width, fsimage->height);
+      xitk_image_change_image (fb->sort_skin_up, fsimage, width, height);
 
     xitk_show_widget(fb->files_sort);
 
@@ -1316,16 +1320,18 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     int           i, j, w, offset;
     short         x1, x2, x3;
     short         y1, y2, y3;
+    int ds_width = xitk_image_width(dsimage);
+    int ds_height = xitk_image_height(dsimage);
+    int fs_width = xitk_image_width(fsimage);
+    int fs_height = xitk_image_height(fsimage);
+  
+    fb->sort_skin_up = xitk_image_create_image (fb->gui->xitk, ds_width, ds_height);
+    fb->sort_skin_down = xitk_image_create_image (fb->gui->xitk, ds_width, ds_height);
 
-    fb->sort_skin_up = xitk_image_create_image (fb->gui->xitk,
-					       dsimage->width, dsimage->height);
-    fb->sort_skin_down = xitk_image_create_image (fb->gui->xitk,
-						 dsimage->width, dsimage->height);
-    
     draw_bevel_three_state (fb->sort_skin_up);
     draw_bevel_three_state (fb->sort_skin_down);
 
-    w = dsimage->width / 3;
+    w = ds_width / 3;
 
     for(j = 0; j < 2; j++) {
       if(j == 0)
@@ -1335,18 +1341,12 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       
       offset = 0;
       for(i = 0; i < 2; i++) {
-        draw_rectangular_outter_box (image->image,
-				    5, 4 + offset, w - 45, 1);
-        draw_rectangular_outter_box (image->image,
-				    w - 20, 4 + offset, 10, 1);
-        draw_rectangular_outter_box (image->image,
-				    w + 5, 4 + offset, w - 45, 1);
-        draw_rectangular_outter_box (image->image,
-				    (w * 2) - 20, 4 + offset, 10, 1);
-        draw_rectangular_outter_box (image->image,
-				    (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
-        draw_rectangular_outter_box (image->image,
-				    ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
+        xitk_image_draw_rectangular_outter_box (image, 5, 4 + offset, w - 45, 1);
+        xitk_image_draw_rectangular_outter_box (image, w - 20, 4 + offset, 10, 1);
+        xitk_image_draw_rectangular_outter_box (image, w + 5, 4 + offset, w - 45, 1);
+        xitk_image_draw_rectangular_outter_box (image, (w * 2) - 20, 4 + offset, 10, 1);
+        xitk_image_draw_rectangular_outter_box (image, (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
+        xitk_image_draw_rectangular_outter_box (image, ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
 	offset += 4;
       }
       
@@ -1391,27 +1391,26 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	
 	offset += w;
 	
-        pixmap_fill_polygon (image->image, &points[0], 4,
-          xitk_get_pixel_color_lightgray (fb->gui->imlib_data));
+        xitk_image_fill_polygon (image, &points[0], 4, xitk_get_pixel_color_lightgray (fb->gui->xitk));
 
 	for(k = 0; k < 3; k++) {
           int color;
           if (k == 0)
-            color = xitk_get_pixel_color_black (fb->gui->imlib_data);
+            color = xitk_get_pixel_color_black (fb->gui->xitk);
 	  else if(k == 1)
-            color = xitk_get_pixel_color_darkgray (fb->gui->imlib_data);
+            color = xitk_get_pixel_color_darkgray (fb->gui->xitk);
 	  else
-            color = xitk_get_pixel_color_white (fb->gui->imlib_data);
+            color = xitk_get_pixel_color_white (fb->gui->xitk);
   
-          pixmap_draw_line(image->image,
-                           points[k].x, points[k].y, points[k+1].x, points[k+1].y,
-                           color);
+          xitk_image_draw_line(image,
+                               points[k].x, points[k].y, points[k+1].x, points[k+1].y,
+                               color);
 	}
       }
     }
 
-    xitk_image_change_image (fb->sort_skin_down, dsimage, dsimage->width, dsimage->height);
-    xitk_image_change_image (fb->sort_skin_down, fsimage, fsimage->width, fsimage->height);
+    xitk_image_change_image (fb->sort_skin_down, dsimage, ds_width, ds_height);
+    xitk_image_change_image (fb->sort_skin_down, fsimage, fs_width, fs_height);
   }
 
   y += xitk_get_widget_height(fb->files_browser) + 15 + 4 + 5;

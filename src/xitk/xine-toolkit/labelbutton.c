@@ -282,7 +282,7 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
     }
 
     button_width = skin->width / 3;
-    btn = xitk_image_create_xitk_pixmap (wp->imlibdata, button_width, skin->height);
+    btn = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, button_width, skin->height);
       
     mode = -1;
     if ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)) {

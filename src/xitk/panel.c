@@ -225,7 +225,7 @@ static void panel_exit (xitk_widget_t *w, void *data) {
  */
 void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_image_t *bg_image;
-  int           new_width;
+  int           new_width, new_height;
 
   (void)synthetic;
 
@@ -239,11 +239,11 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
     xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
-  new_width = bg_image->width;
+  new_width = xitk_image_width(bg_image);
+  new_height = xitk_image_height(bg_image);
 
-  xitk_window_resize_window (panel->xwin, bg_image->width, bg_image->height);
-  xitk_window_change_background_with_image(panel->xwin, bg_image,
-                                           bg_image->width, bg_image->height);
+  xitk_window_resize_window (panel->xwin, new_width, new_height);
+  xitk_window_change_background_with_image(panel->xwin, bg_image, new_width, new_height);
   xitk_image_free_image(&bg_image);
 
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
@@ -1147,6 +1147,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
   xitk_image_t             *bg_image;
+  int                       width, height;
 
   if (!gui)
     return NULL;
@@ -1177,6 +1178,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
     xine_error (panel->gui, _("panel: couldn't find image for background\n"));
     exit(-1);
   }
+  width = xitk_image_width(bg_image);
+  height = xitk_image_height(bg_image);
 
   /*
    * open the panel window
@@ -1197,8 +1200,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
 
-  panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y,
-                                                     bg_image->width, bg_image->height, title,
+  panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y, width, height, title,
                                                      title, "xine", 0, is_layer_above(), panel->gui->icon);
   /*
    * The following is more or less a hack to keep the panel window visible
@@ -1222,8 +1224,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * set background image
    */
 
-  xitk_window_change_background_with_image(panel->xwin, bg_image,
-                                           bg_image->width, bg_image->height);
+  xitk_window_change_background_with_image(panel->xwin, bg_image, width, height);
   xitk_image_free_image(&bg_image);
 
   /*

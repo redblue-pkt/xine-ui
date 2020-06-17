@@ -35,8 +35,6 @@
 
 #include <X11/Xlib.h>
 
-#include "xitk/Imlib-light/Imlib.h"
-
 #ifdef NEED_MRLBROWSER
 #include <xine.h>
 #endif
@@ -91,6 +89,7 @@ typedef struct xitk_widget_list_s xitk_widget_list_t;
 typedef struct xitk_skin_config_s xitk_skin_config_t;
 typedef struct xitk_font_s xitk_font_t;
 typedef struct xitk_pixmap_s xitk_pixmap_t;
+typedef struct xitk_image_s xitk_image_t;
 typedef struct xitk_window_s xitk_window_t;
 
 void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi);
@@ -162,21 +161,6 @@ typedef struct {
 #define XITK_MAX_UNICODE_RANGES 16
   xitk_range_t                      unicode_ranges[XITK_MAX_UNICODE_RANGES + 1];
 } xitk_pix_font_t;
-
-typedef struct {
-  xitk_pixmap_t                    *image;
-  xitk_pixmap_t                    *mask;
-  xitk_pix_font_t                  *pix_font;
-  int                               width;
-  int                               height;
-
-  /* image private */
-  ImlibData                        *im;
-  ImlibImage                       *raw;
-  xitk_widget_list_t               *wl;
-  int                               refs, max_refs;
-  char                              key[20];
-} xitk_image_t;
 
 typedef struct {
   int                               red;
@@ -1246,8 +1230,11 @@ const char *xitk_label_get_label(xitk_widget_t *w);
 xitk_image_t *xitk_image_load_image(xitk_t *xitk, const char *image);
 void xitk_image_set_pix_font (xitk_image_t *image, const char *format);
 
-xitk_image_t *xitk_image_decode_raw(ImlibData *im, const void *data, size_t size);
+xitk_image_t *xitk_image_decode_raw(xitk_t *xitk, const void *data, size_t size);
 int xitk_image_render(xitk_image_t *, int width, int height);
+
+int xitk_image_width(xitk_image_t *);
+int xitk_image_height(xitk_image_t *);
 
 /**
  * Create an image widget type.
@@ -1830,56 +1817,56 @@ xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w);
 /**
  *
  */
-unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
+unsigned int xitk_get_pixel_color_from_rgb(xitk_t *xitk, int r, int g, int b);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_black(ImlibData *im);
+unsigned int xitk_get_pixel_color_black(xitk_t *im);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_white(ImlibData *im);
+unsigned int xitk_get_pixel_color_white(xitk_t *im);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_lightgray(ImlibData *im);
+unsigned int xitk_get_pixel_color_lightgray(xitk_t *im);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_gray(ImlibData *im);
+unsigned int xitk_get_pixel_color_gray(xitk_t *xitk);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
+unsigned int xitk_get_pixel_color_darkgray(xitk_t *im);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im);
+unsigned int xitk_get_pixel_color_warning_foreground(xitk_t *im);
 
 /**
  *
  */
-unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
+unsigned int xitk_get_pixel_color_warning_background(xitk_t *im);
 
 /**
  * xitk pixmaps
  */
 
-xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth);
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int width, int height, int depth);
 
-xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
+xitk_pixmap_t *xitk_image_create_xitk_pixmap(xitk_t *xitk, int width, int height);
 
-xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
+xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(xitk_t *xitk, int width, int height);
 
 void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
 
-xitk_pixmap_t *xitk_pixmap_create_from_data(ImlibData *im, int width, int height, const char *data);
+xitk_pixmap_t *xitk_pixmap_create_from_data(xitk_t *xitk, int width, int height, const char *data);
 Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p);
 
 /*
@@ -1889,6 +1876,10 @@ Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p);
 void pixmap_draw_line(xitk_pixmap_t *p, int x0, int y0, int x1, int y1, unsigned color);
 void pixmap_fill_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned color);
 void pixmap_fill_polygon(xitk_pixmap_t *p, XPoint *points, int npoints, unsigned color);
+
+void xitk_image_draw_line(xitk_image_t *i, int x0, int y0, int x1, int y1, unsigned color);
+void xitk_image_fill_rectangle(xitk_image_t *i, int x, int y, int w, int h, unsigned color);
+void xitk_image_fill_polygon(xitk_image_t *i, XPoint *points, int npoints, unsigned color);
 
 /*
  *
@@ -1903,6 +1894,8 @@ void draw_inner_light(xitk_pixmap_t *p, int w, int h);
 void draw_outter(xitk_pixmap_t *p, int w, int h);
 void draw_outter_light(xitk_pixmap_t *p, int w, int h);
 
+void xitk_image_draw_outter(xitk_image_t *i, int w, int h);
+
 void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color);
 /**
  *
@@ -1913,21 +1906,25 @@ void draw_flat(xitk_pixmap_t *p, int w, int h);
  *
  */
 void draw_rectangular_inner_box(xitk_pixmap_t *p, int x, int y, int width, int height);
+void xitk_image_draw_rectangular_inner_box(xitk_image_t *i, int x, int y, int width, int height);
 
 /**
  *
  */
 void draw_rectangular_outter_box(xitk_pixmap_t *p, int x, int y, int width, int height);
+void xitk_image_draw_rectangular_outter_box(xitk_image_t *i, int x, int y, int width, int height);
 
 /**
  *
  */
 void draw_rectangular_inner_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
+void xitk_image_draw_rectangular_inner_box_light(xitk_image_t *i, int x, int y, int width, int height);
 
 /**
  *
  */
 void draw_rectangular_outter_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
+void xitk_image_draw_rectangular_outter_box_light(xitk_image_t *i, int x, int y, int width, int height);
 
 /**
  *
@@ -1936,6 +1933,11 @@ void draw_inner_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
                       int x, int y, int w, int h);
 void draw_outter_frame(xitk_pixmap_t *p, const char *title, const char *fontname,
                        int x, int y, int w, int h);
+
+void xitk_image_draw_inner_frame(xitk_image_t *i, const char *title, const char *fontname,
+                                 int x, int y, int w, int h);
+void xitk_image_draw_outter_frame(xitk_image_t *i, const char *title, const char *fontname,
+                                  int x, int y, int w, int h);
 
 /**
  * xitk image

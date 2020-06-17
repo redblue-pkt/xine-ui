@@ -340,12 +340,13 @@ static void setup_ok (xitk_widget_t *w, void *data) {
  */
 static void setup_clear_tab (xui_setup_t *setup) {
   xitk_image_t *im;
+  int width = (WINDOW_WIDTH - 30);
+  int height = (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30);
 
-  im = xitk_image_create_image (setup->gui->xitk, (WINDOW_WIDTH - 30),
-    (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30));
+  im = xitk_image_create_image (setup->gui->xitk, width, height);
 
-  draw_outter (im->image, im->width, im->height);
-  xitk_image_draw_image (setup->widget_list, im, 0, 0, im->width, im->height, 15, (24 + setup->th));
+  xitk_image_draw_outter (im, width, height);
+  xitk_image_draw_image (setup->widget_list, im, 0, 0, width, height, 15, (24 + setup->th));
   xitk_image_free_image (&im);
 }
 
@@ -676,10 +677,9 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
       image = xitk_image_create_image (setup->gui->xitk, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
-      pixmap_fill_rectangle (image->image,
-                             0, 0, image->width, image->height,
-                             xitk_get_pixel_color_gray (setup->gui->imlib_data));
-      draw_inner_frame (image->image, (char *)entry.description,
+      xitk_image_fill_rectangle (image, 0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
+                             xitk_get_pixel_color_gray (setup->gui->xitk));
+      xitk_image_draw_inner_frame (image, (char *)entry.description,
         boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
       XITK_WIDGET_INIT (&im);
       im.skin_element_name = NULL;

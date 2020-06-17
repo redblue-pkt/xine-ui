@@ -154,12 +154,13 @@ static void viewlog_paint_widgets(void) {
 static void viewlog_clear_tab(void) {
   gGui_t *gui = gGui;
   xitk_image_t *im;
+  int width = WINDOW_WIDTH - 30;
+  int height = MAX_DISP_ENTRIES * 20 + 16 + 10;
 
-  im = xitk_image_create_image (gui->xitk, (WINDOW_WIDTH - 30),
-    (MAX_DISP_ENTRIES * 20 + 16 + 10));
+  im = xitk_image_create_image (gui->xitk, width, height);
 
-  draw_outter (im->image, im->width, im->height);
-  xitk_image_draw_image (viewlog->widget_list, im, 0, 0, im->width, im->height, 15, (24 + viewlog->tabs_height));
+  xitk_image_draw_outter (im, width, height);
+  xitk_image_draw_image (viewlog->widget_list, im, 0, 0, width, height, 15, (24 + viewlog->tabs_height));
   xitk_image_free_image (&im);
 }
 

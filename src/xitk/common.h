@@ -31,8 +31,6 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "Imlib-light/Imlib.h"
-
 typedef struct gGui_st gGui_t;
 
 #include "xitk.h"
@@ -248,8 +246,6 @@ struct gGui_st {
 
   xitk_skin_config_t       *skin_config;
   char                     *skin_server_url;
-
-  ImlibData                *imlib_data;
 
   int                       cursor_visible;
   int                       cursor_grabbed;
