@@ -483,7 +483,7 @@ int xitk_window_is_window_visible(xitk_window_t *w) {
 /*
  * Is window is size match with given args
  */
-int xitk_is_window_size(Display *display, Window window, int width, int height) {
+static int xitk_is_window_size(Display *display, Window window, int width, int height) {
   XWindowAttributes  wattr;
   
   if((display == NULL) || (window == None))
@@ -506,7 +506,7 @@ int xitk_is_window_size(Display *display, Window window, int width, int height) 
 /*
  * Set/Change window title.
  */
-void xitk_set_window_title(Display *display, Window window, const char *title) {
+static void xitk_set_window_title(Display *display, Window window, const char *title) {
 
   if((display == NULL) || (window == None) || (title == NULL))
     return;
@@ -578,7 +578,7 @@ void xitk_window_set_window_layer(xitk_window_t *w, int layer) {
  *
  */
 
-void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class) {
+static void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class) {
 
   XClassHint xclasshint, new_xclasshint;
 
