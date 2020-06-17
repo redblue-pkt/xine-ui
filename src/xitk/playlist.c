@@ -891,6 +891,7 @@ void playlist_change_skins(int synthetic) {
 
   if(playlist_is_running()) {
     xitk_image_t *bg_image;
+    int width, height;
 
     xitk_skin_lock(gui->skin_config);
     xitk_hide_widgets(playlist->widget_list);
@@ -900,10 +901,11 @@ void playlist_change_skins(int synthetic) {
       xine_error (gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
+    width = xitk_image_width(bg_image);
+    height = xitk_image_height(bg_image);
 
-    xitk_window_resize_window (playlist->xwin, bg_image->width, bg_image->height);
-    xitk_window_change_background_with_image(playlist->xwin, bg_image,
-                                             bg_image->width, bg_image->height);
+    xitk_window_resize_window (playlist->xwin, width, height);
+    xitk_window_change_background_with_image(playlist->xwin, bg_image, width, height);
     xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (gui->vwin, playlist->xwin);
@@ -952,7 +954,7 @@ void playlist_editor(void) {
   xitk_label_widget_t        lbl;
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
-  int                        x, y;
+  int                        x, y, width, height;
   xitk_image_t              *bg_image;
 
   XITK_WIDGET_INIT(&br);
@@ -972,6 +974,8 @@ void playlist_editor(void) {
     xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
+  width = xitk_image_width(bg_image);
+  height = xitk_image_height(bg_image);
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
 				     200,
@@ -988,13 +992,12 @@ void playlist_editor(void) {
 				     CONFIG_NO_CB,
 				     CONFIG_NO_DATA);
 
-  playlist->xwin = xitk_window_create_simple_window_ext(gui->xitk, x, y,
-                                                        bg_image->width, bg_image->height, title,
+  playlist->xwin = xitk_window_create_simple_window_ext(gui->xitk, x, y, width, height, title,
                                                         NULL, "xine", 0, is_layer_above(), gui->icon);
 
   set_window_type_start(gui, playlist->xwin);
 
-  xitk_window_change_background_with_image(playlist->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_window_change_background_with_image(playlist->xwin, bg_image, width, height);
   xitk_image_free_image(&bg_image);
 
   /*

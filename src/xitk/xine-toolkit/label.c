@@ -153,7 +153,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
     }
   }
   if (!wp->labelpix) {
-    wp->labelpix = xitk_image_create_xitk_pixmap (wp->imlibdata, pixwidth,
+    wp->labelpix = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, pixwidth,
       pix_font->char_height);
 #if 0
     printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, pix_font->char_height,
@@ -311,7 +311,7 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
 		 font->image->gc,
 		 0, 0, wp->font->width, wp->font->height, 0, 0);
       XSetForeground(wp->imlibdata->x.disp, font->image->gc, 
-		     xitk_get_pixel_color_black(wp->imlibdata));
+		     xitk_get_pixel_color_black(wp->w.wl->xitk));
       xitk_font_draw_string(fs, bg->image, font->image->gc,
 		  2, ((wp->font->height + asc + des)>>1) - des,
 		  wp->label, wp->label_len);

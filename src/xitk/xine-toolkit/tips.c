@@ -136,11 +136,11 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 
       xitk_font_unload_font(fs);
       
-      cfore = xitk_get_pixel_color_black(tips->widget->wl->imlibdata);
-      cback = xitk_get_pixel_color_lightgray(tips->widget->wl->imlibdata);
+      cfore = xitk_get_pixel_color_black(xitk);
+      cback = xitk_get_pixel_color_lightgray(xitk);
       
       /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
-      image = xitk_image_create_image_with_colors_from_string(tips->widget->wl->xitk, DEFAULT_FONT_10,
+      image = xitk_image_create_image_with_colors_from_string(xitk, DEFAULT_FONT_10,
 							      (disp_w/3), ALIGN_LEFT, 
                                                               tips->widget->tips_string, cfore, cback);
       
@@ -168,7 +168,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
 	GC             gc;
 	
 	xitk_window_get_window_size(xwin, &width, &height);
-        bg = xitk_image_create_xitk_pixmap(tips->widget->wl->imlibdata, width, height);
+        bg = xitk_image_create_xitk_pixmap(xitk, width, height);
 	
         XLOCK (xitk_x_lock_display, tips->display);
         gc = XCreateGC(tips->display, tips->widget->wl->imlibdata->x.base_window, None, None);

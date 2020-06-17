@@ -272,23 +272,23 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
 static void download_update_blank_preview(xui_skdloader_t *skd) {
 
   xitk_image_t *p = xitk_image_create_image(skd->gui->xitk, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-  pixmap_fill_rectangle(p->image, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
-                        xitk_get_pixel_color_from_rgb(skd->gui->imlib_data, 52, 52, 52));
+  xitk_image_fill_rectangle(p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
+                            xitk_get_pixel_color_from_rgb(skd->gui->xitk, 52, 52, 52));
   xitk_image_draw_image (skd->widget_list, p,
                          0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34);
   xitk_image_free_image (&p);
 }
 
 static void download_update_preview(xui_skdloader_t *skd) {
-  xitk_image_t *p = skd->preview_image;
-
   download_update_blank_preview(skd);
 
-  if (skd->preview_image && skd->preview_image->image) {
+  if (skd->preview_image) {
+    int img_width = xitk_image_width(skd->preview_image);
+    int img_height = xitk_image_height(skd->preview_image);
     xitk_image_draw_image (skd->widget_list, skd->preview_image,
-                           0, 0, p->width, p->height,
-                           15 + ((PREVIEW_WIDTH - p->width) >> 1),
-                           34 + ((PREVIEW_HEIGHT - p->height) >> 1));
+                           0, 0, img_width, img_height,
+                           15 + ((PREVIEW_WIDTH - img_width) >> 1),
+                           34 + ((PREVIEW_HEIGHT - img_height) >> 1));
   }
 }
 
@@ -297,12 +297,12 @@ static xitk_image_t *decode(gGui_t *gui, const void *buf, int size) {
   float          ratio;
   xitk_image_t  *i;
 
-  i = xitk_image_decode_raw(gui->imlib_data, buf, size);
+  i = xitk_image_decode_raw(gui->xitk, buf, size);
   if (!i)
     return NULL;
 
-  preview_width  = i->width;
-  preview_height = i->height;
+  preview_width  = xitk_image_width(i);
+  preview_height = xitk_image_height(i);
   ratio = ((float)preview_width / (float)preview_height);
 
   if (ratio > PREVIEW_RATIO) {

@@ -333,7 +333,6 @@ void video_window_select_visual (xui_vwin_t *vwin) {
     if (vwin->gui_visual != vwin->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui_visual->visualid);
       xitk_x11_select_visual (vwin->gui->xitk, vwin->gui_visual);
-      vwin->gui->imlib_data = xitk_x11_get_imlib_data(vwin->gui->xitk);
       vwin->gui_depth = xitk_x11_get_depth(vwin->gui->xitk);
       pthread_mutex_lock (&vwin->mutex);
       video_window_adapt_size (vwin);

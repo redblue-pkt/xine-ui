@@ -297,7 +297,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
   xitk_image_t              *bg_image;
-  int x, y;
+  int x, y, width, height;
 
   XITK_WIDGET_INIT (&br);
   XITK_WIDGET_INIT (&lb);
@@ -314,14 +314,15 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     200, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
   y = xine_config_register_num (vctrl->gui->xine, "gui.control_y",
     100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  width = xitk_image_width(bg_image);
+  height = xitk_image_height(bg_image);
 
   vctrl->xwin =
-    xitk_window_create_simple_window_ext(vctrl->gui->xitk, x + 100, y + 100,
-                                         bg_image->width, bg_image->height, _(title),
+    xitk_window_create_simple_window_ext(vctrl->gui->xitk, x + 100, y + 100, width, height, _(title),
                                          NULL, "xine", 0, is_layer_above(), vctrl->gui->icon);
   set_window_type_start(vctrl->gui, vctrl->xwin);
 
-  xitk_window_change_background_with_image(vctrl->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_window_change_background_with_image(vctrl->xwin, bg_image, width, height);
   xitk_image_free_image(&bg_image);
 
   /*
@@ -635,6 +636,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
 
   if (vctrl->status >= 2) {
     xitk_image_t *bg_image;
+    int w, h;
 
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
@@ -644,10 +646,11 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
+    w = xitk_image_width(bg_image);
+    h = xitk_image_height(bg_image);
 
-    xitk_window_resize_window (vctrl->xwin, bg_image->width, bg_image->height);
-    xitk_window_change_background_with_image(vctrl->xwin, bg_image,
-                                             bg_image->width, bg_image->height);
+    xitk_window_resize_window (vctrl->xwin, w, h);
+    xitk_window_change_background_with_image(vctrl->xwin, bg_image, w, h);
     xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (vctrl->gui->vwin, vctrl->xwin);

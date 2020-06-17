@@ -790,7 +790,8 @@ void gui_exit_2 (gGui_t *gui) {
 
   mediamark_free_mediamarks();
 
-  xitk_image_destroy_xitk_pixmap(gui->icon);
+  if (gui->icon)
+    xitk_image_destroy_xitk_pixmap(gui->icon);
 }
 
 void gui_play (xitk_widget_t *w, void *data) {
