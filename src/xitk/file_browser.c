@@ -1317,9 +1317,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     short         x1, x2, x3;
     short         y1, y2, y3;
 
-    fb->sort_skin_up = xitk_image_create_image (fb->gui->imlib_data, 
+    fb->sort_skin_up = xitk_image_create_image (fb->gui->xitk,
 					       dsimage->width, dsimage->height);
-    fb->sort_skin_down = xitk_image_create_image (fb->gui->imlib_data, 
+    fb->sort_skin_down = xitk_image_create_image (fb->gui->xitk,
 						 dsimage->width, dsimage->height);
     
     draw_bevel_three_state (fb->sort_skin_up);

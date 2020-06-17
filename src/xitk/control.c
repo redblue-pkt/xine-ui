@@ -303,7 +303,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   XITK_WIDGET_INIT (&lb);
   XITK_WIDGET_INIT (&cmb);
 
-  bg_image = xitk_image_load_image(vctrl->gui->imlib_data,
+  bg_image = xitk_image_load_image(vctrl->gui->xitk,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
   if (!bg_image) {
     xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
@@ -639,7 +639,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
 
-    if (!(bg_image = xitk_image_load_image (vctrl->gui->imlib_data,
+    if (!(bg_image = xitk_image_load_image (vctrl->gui->xitk,
       xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);

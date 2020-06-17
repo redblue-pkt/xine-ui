@@ -1238,7 +1238,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   pobj->y = pp_wrapper->pplugin->y;
   pp_wrapper->pplugin->object_num++;
 
-  image = xitk_image_create_image(gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
+  image = xitk_image_create_image(gui->xitk, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
   pixmap_fill_rectangle(image->image,
                         0, 0, image->width, image->height,

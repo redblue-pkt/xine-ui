@@ -90,7 +90,7 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
     return NULL;
   }
 
-  image = xitk_image_create_image_from_string (xitk->imlibdata, DEFAULT_FONT_12, *width - 40, align, text);
+  image = xitk_image_create_image_from_string (xitk, DEFAULT_FONT_12, *width - 40, align, text);
   free (text);
   if (!image) {
     free (wd);

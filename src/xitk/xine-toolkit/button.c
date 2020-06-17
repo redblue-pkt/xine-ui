@@ -287,7 +287,7 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
     b->skin_element_name = NULL;
   }
   if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
-    i = xitk_image_create_image (wl->imlibdata, width * 3, height);
+    i = xitk_image_create_image (wl->xitk, width * 3, height);
     draw_bevel_three_state (i);
   } else {
     if (xitk_shared_image (wl, noskin_names[u], width * 3, height, &i) == 1) {

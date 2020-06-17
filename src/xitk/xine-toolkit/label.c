@@ -304,7 +304,7 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
       xitk_font_set_font(fs, wp->font->image->gc);
       xitk_font_string_extent (fs, wp->label, &lbear, &rbear, &wid, &asc, &des);
 
-      bg = xitk_image_create_image (wp->imlibdata, wp->w.width, wp->w.height);
+      bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
 
       XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
       XCopyArea (wp->imlibdata->x.disp, font->image->pixmap, bg->image->pixmap, 

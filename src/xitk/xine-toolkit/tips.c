@@ -140,7 +140,7 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
       cback = xitk_get_pixel_color_lightgray(tips->widget->wl->imlibdata);
       
       /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
-      image = xitk_image_create_image_with_colors_from_string(tips->widget->wl->imlibdata, DEFAULT_FONT_10,
+      image = xitk_image_create_image_with_colors_from_string(tips->widget->wl->xitk, DEFAULT_FONT_10,
 							      (disp_w/3), ALIGN_LEFT, 
                                                               tips->widget->tips_string, cfore, cback);
       

@@ -155,7 +155,7 @@ static void viewlog_clear_tab(void) {
   gGui_t *gui = gGui;
   xitk_image_t *im;
 
-  im = xitk_image_create_image (gui->imlib_data, (WINDOW_WIDTH - 30),
+  im = xitk_image_create_image (gui->xitk, (WINDOW_WIDTH - 30),
     (MAX_DISP_ENTRIES * 20 + 16 + 10));
 
   draw_outter (im->image, im->width, im->height);
@@ -247,7 +247,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   
 #if DEBUG_VIEWLOG
   if ((viewlog->log_entries == 0) || (log == NULL))
-    xitk_window_dialog_3 (gui->imlib_data,
+    xitk_window_dialog_3 (gui->xitk,
       viewlog->xwin,
       get_layer_above_video (gui), 400, _("log info"), NULL, NULL,
       XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,

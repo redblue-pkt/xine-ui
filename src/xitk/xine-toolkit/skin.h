@@ -32,7 +32,7 @@ typedef struct {
 } xitk_skin_element_t;
 
 struct xitk_skin_config_s {
-  ImlibData                    *im;
+  xitk_t                       *xitk;
   FILE                         *fd;
   char                         *path;
   char                         *skinfile;

@@ -978,29 +978,29 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   XITK_CHECK_CONSTITENCY(s);
   
   if (type == XITK_VSLIDER) {
-    p = xitk_image_create_image (wl->imlibdata, width * 3, height / 5);
+    p = xitk_image_create_image (wl->xitk, width * 3, height / 5);
     xitk_image_add_mask (p);
     draw_paddle_three_state_vertical (p);
   } else if (type == XITK_HSLIDER) {
-    p = xitk_image_create_image(wl->imlibdata, (width / 5) * 3, height);
+    p = xitk_image_create_image(wl->xitk, (width / 5) * 3, height);
     xitk_image_add_mask (p);
     draw_paddle_three_state_horizontal (p);
   } else if (type == XITK_RSLIDER) {
     int w;
     
     w = ((((width + height) >> 1) >> 1) / 10) * 3;
-    p = xitk_image_create_image(wl->imlibdata, (w * 3), w);
+    p = xitk_image_create_image(wl->xitk, (w * 3), w);
     xitk_image_add_mask (p);
     draw_paddle_rotate (p);
   } else if (type == XITK_HVSLIDER) {
-    p = xitk_image_create_image (wl->imlibdata, width * 3, height);
+    p = xitk_image_create_image (wl->xitk, width * 3, height);
     xitk_image_add_mask (p);
     /* defer init to xitk_slider_hv_sync (). */
   } else {
     XITK_DIE ("Slider type unhandled.\n");
   }
   
-  b = xitk_image_create_image(wl->imlibdata, width, height);
+  b = xitk_image_create_image(wl->xitk, width, height);
   xitk_image_add_mask(b);
   if ((type == XITK_HSLIDER) || (type == XITK_VSLIDER) || (type == XITK_HVSLIDER))
     draw_inner(b->image, width, height);

@@ -341,7 +341,7 @@ static void setup_ok (xitk_widget_t *w, void *data) {
 static void setup_clear_tab (xui_setup_t *setup) {
   xitk_image_t *im;
 
-  im = xitk_image_create_image (setup->gui->imlib_data, (WINDOW_WIDTH - 30),
+  im = xitk_image_create_image (setup->gui->xitk, (WINDOW_WIDTH - 30),
     (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30));
 
   draw_outter (im->image, im->width, im->height);
@@ -576,7 +576,7 @@ static void setup_add_nothing_available (xui_setup_t *setup, const char *title, 
   xitk_image_t            *image;
   xitk_image_widget_t      im;
   
-  image = xitk_image_create_image_from_string (setup->gui->imlib_data, tabsfontname,
+  image = xitk_image_create_image_from_string (setup->gui->xitk, tabsfontname,
     FRAME_WIDTH, ALIGN_CENTER, (char *)title);
   
   XITK_WIDGET_INIT (&im);
@@ -674,7 +674,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
       wt->cfg = entry;
       wt->changed = 0;
 
-      image = xitk_image_create_image (setup->gui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
+      image = xitk_image_create_image (setup->gui->xitk, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
       pixmap_fill_rectangle (image->image,
                              0, 0, image->width, image->height,

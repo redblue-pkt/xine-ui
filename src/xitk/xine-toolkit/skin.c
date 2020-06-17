@@ -79,7 +79,7 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, const char *pix
     nmem += sizeof (*nimg);
     memcpy (nmem, pixmap, nlen);
     nimg->name = nmem;
-    nimg->image = xitk_image_load_image (skonfig->im, nmem);
+    nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
     if (!nimg->image) {
       free (nimg);
       return NULL;
@@ -798,7 +798,6 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
  * Alloc a xitk_skin_config_t* memory area, nullify pointers.
  */
 xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
-  ImlibData *im = xitk->imlibdata;
   xitk_skin_config_t *skonfig;
   
   if((skonfig = (xitk_skin_config_t *) xitk_xmalloc(sizeof(xitk_skin_config_t))) == NULL) {
@@ -810,7 +809,7 @@ xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
   skonfig->elements = xine_sarray_new (128, (xine_sarray_comparator_t)strcasecmp);
   skonfig->imgs     = xine_sarray_new (128, xitk_simg_cmp);
 
-  skonfig->im       = im;
+  skonfig->xitk     = xitk;
   skonfig->version  = -1;
   skonfig->celement = NULL;
   skonfig->name     = skonfig->author 
