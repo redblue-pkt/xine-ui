@@ -479,9 +479,9 @@ int xitk_window_grab_input(xitk_window_t *w, KeySym *keysym,
   do {
     /* Although only release events are evaluated, we must also grab the corresponding press */
     /* events to hide them from the other GUI windows and prevent unexpected side effects.   */
-    XLOCK (w->imlibdata->x.x_lock_display, w->imlibdata->x.disp);
-    XMaskEvent(w->imlibdata->x.disp, mask, &xev);
-    XUNLOCK (w->imlibdata->x.x_unlock_display, w->imlibdata->x.disp);
+    XLOCK (w->xitk->x_lock_display, w->xitk->display);
+    XMaskEvent(w->xitk->display, mask, &xev);
+    XUNLOCK (w->xitk->x_unlock_display, w->xitk->display);
     if (xev.xany.window != xitk_window_get_window(w))
       return -1;
   } while (xev.type != KeyRelease && xev.type != ButtonRelease);
