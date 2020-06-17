@@ -286,6 +286,12 @@ static const char *_xitk_window_dialog_label (const char *label) {
   }
 }
 
+static void xitk_window_set_parent_window(xitk_window_t *xwin,
+                                          xitk_window_t *parent) {
+  if(xwin)
+    xwin->win_parent = parent;
+}
+
 xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient_for, int layer_above,
   int width, const char *title,
   void (*done_cb)(void *userdata, int state), void *userdata,
@@ -408,7 +414,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   }
 
   if (transient_for) {
-    xitk_window_set_parent_window (wd->xwin, transient_for->window);
+    xitk_window_set_parent_window (wd->xwin, transient_for);
     X_LOCK (xitk);
     XSetTransientForHint (xitk->display, _xitk_window_get_window (wd->xwin), transient_for->window);
     X_UNLOCK (xitk);
@@ -761,7 +767,7 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
 
   xwin                  = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
   xwin->xitk            = xitk;
-  xwin->win_parent      = None;
+  xwin->win_parent      = NULL;
   xwin->background      = NULL;
   xwin->background_mask = NULL;
   xwin->width           = width;
@@ -1269,8 +1275,8 @@ void xitk_window_destroy_window(xitk_window_t *w) {
   X_LOCK (w->xitk);
   XDestroyWindow(w->xitk->display, w->window);
 
-  if((w->win_parent != None) && xitk_is_window_visible(w->xitk->display, w->win_parent))
-    XSetInputFocus(w->xitk->display, w->win_parent, RevertToParent, CurrentTime);
+  if (w->win_parent && xitk_window_is_window_visible(w->win_parent))
+    XSetInputFocus(w->xitk->display, w->win_parent->window, RevertToParent, CurrentTime);
 
   if (w->widget_list)
     XFreeGC (w->xitk->display, XITK_WIDGET_LIST_GC (w->widget_list));
@@ -1281,9 +1287,4 @@ void xitk_window_destroy_window(xitk_window_t *w) {
     XITK_WIDGET_LIST_FREE(w->widget_list);
 
   XITK_FREE(w);
-}
-
-void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent) {
-  if(xwin)
-    xwin->win_parent = parent;
 }

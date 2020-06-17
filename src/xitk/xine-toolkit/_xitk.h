@@ -336,7 +336,7 @@ struct xitk_image_s {
 struct xitk_window_s {
   xitk_t                   *xitk;
   Window                    window;
-  Window                    win_parent;
+  xitk_window_t            *win_parent;
   xitk_pixmap_t            *background;
   xitk_pixmap_t            *background_mask;
   int                       width;

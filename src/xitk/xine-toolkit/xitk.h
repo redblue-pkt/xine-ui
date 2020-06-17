@@ -2177,8 +2177,6 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   const char *check_label, int checked,
   int text_align, const char *text_fmt, ...) __attribute__ ((format (printf, 14, 15)));
 
-void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent);
-
 //void xitk_window_set_modal(xitk_window_t *w);
 //void xitk_window_dialog_set_modal(xitk_window_t *w);
 
