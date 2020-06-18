@@ -46,7 +46,7 @@ static void paint(xitk_widget_t *w) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     int i;
     
     private_data = (browser_private_data_t *) w->private_data;
@@ -101,7 +101,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -140,7 +140,7 @@ static void notify_destroy(xitk_widget_t *w) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-           (w->type & WIDGET_GROUP_WIDGET))) {
+           (w->type & WIDGET_GROUP_MEMBER))) {
     int  i;
 
     private_data = (browser_private_data_t *) w->private_data;
@@ -157,7 +157,7 @@ static void enability(xitk_widget_t *w) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     int i;
     int max;
     
@@ -215,7 +215,7 @@ int xitk_browser_get_num_entries(xitk_widget_t *w) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (browser_private_data_t *) w->private_data;
     return private_data->max_length;
   }
@@ -230,7 +230,7 @@ int xitk_browser_get_current_start(xitk_widget_t *w) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (browser_private_data_t *) w->private_data;
     return private_data->current_start;
   }
@@ -246,7 +246,7 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
   int i;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -266,7 +266,7 @@ int xitk_browser_get_current_selected(xitk_widget_t *w) {
   int                     i;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -287,7 +287,7 @@ void xitk_browser_release_all_buttons(xitk_widget_t *w) {
   int                     i;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -304,7 +304,7 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -324,7 +324,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
   int                     i, j, max = 0;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     int           item_width;
     char         *label_font;
     xitk_font_t  *fs = NULL;
@@ -511,7 +511,7 @@ void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const c
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     private_data->content = (char **)list;
@@ -619,7 +619,7 @@ void xitk_browser_step_up(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (browser_private_data_t *) w->private_data;
     
     xitk_slider_make_backstep(private_data->item_tree[WSLID]);
@@ -632,7 +632,7 @@ void xitk_browser_page_up(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     int min, pos, npos, vis;
 
     private_data = (browser_private_data_t *) w->private_data;
@@ -655,7 +655,7 @@ void xitk_browser_page_down(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     int max, pos, npos, vis;
 
     private_data = (browser_private_data_t *) w->private_data;
@@ -682,7 +682,7 @@ void xitk_browser_step_down(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -700,7 +700,7 @@ void xitk_browser_step_left(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (browser_private_data_t *) w->private_data;
     
     xitk_slider_make_backstep(private_data->item_tree[WSLIDH]);
@@ -715,7 +715,7 @@ void xitk_browser_step_right(xitk_widget_t *w, void *data) {
   browser_private_data_t *private_data;
  
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -868,7 +868,7 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w) {
       widget = (xitk_widget_t *)widget->node.next;
     }
     while (widget->node.next && (!(((widget->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-		       (widget->type & WIDGET_GROUP_WIDGET)))) {
+		       (widget->type & WIDGET_GROUP_MEMBER)))) {
       widget = (xitk_widget_t *)widget->node.next;
     }
   }
@@ -883,7 +883,7 @@ void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier) {
   browser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (browser_private_data_t *) w->private_data;
     
@@ -1042,7 +1042,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   mywidget->y                          = y;
   mywidget->width                      = width;
   mywidget->height                     = height;
-  mywidget->type                       = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_BROWSER;
+  mywidget->type                       = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
   mywidget->event                      = notify_event;
   mywidget->tips_timeout               = 0;
   mywidget->tips_string                = NULL;

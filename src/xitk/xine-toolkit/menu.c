@@ -471,7 +471,7 @@ xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w) {
   
   if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
     
-    if(w->type & WIDGET_GROUP_WIDGET)
+    if(w->type & WIDGET_GROUP_MEMBER)
       widget = w;
     else {
       menu_window_t *mw = (menu_window_t *) w->wl;
@@ -485,7 +485,7 @@ xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w) {
 static void notify_destroy(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
     menu_window_t       *mw;
     
@@ -613,7 +613,7 @@ static menu_node_t *_menu_find_branch_by_name(menu_node_t *mnode, char *name) {
 void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
   
   if(w && me && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-		 (w->type & WIDGET_GROUP_WIDGET))) {
+		 (w->type & WIDGET_GROUP_MEMBER))) {
 #ifdef DEBUG_MENU
     printf("======== ENTER =========\n%s\n", me->menu);
 #endif
@@ -999,7 +999,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
     menu_node_t         *me = private_data->mtree->first;
 
@@ -1019,7 +1019,7 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
   int ret = 0;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
     
     if(private_data->curbranch && (private_data->curbranch != private_data->mtree->first))
@@ -1051,7 +1051,7 @@ void xitk_menu_destroy_branch(xitk_widget_t *w) {
 void menu_auto_pop(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) && 
-	   (w->type & WIDGET_TYPE_LABELBUTTON) && (!(w->type & WIDGET_GROUP_WIDGET)))) {
+	   (w->type & WIDGET_TYPE_LABELBUTTON) && (!(w->type & WIDGET_GROUP_MEMBER)))) {
     menu_window_t       *mw = (menu_window_t *) w->wl;
     menu_node_t         *me = labelbutton_get_user_data(w);    
     xitk_widget_t       *widget;
@@ -1074,7 +1074,7 @@ void menu_auto_pop(xitk_widget_t *w) {
 void xitk_menu_show_menu(xitk_widget_t *w) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
 
     w->visible = 1;
@@ -1111,7 +1111,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
 
   mywidget->private_data                 = private_data;
   mywidget->wl                           = wl;
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
   
   _menu_scissor(mywidget, private_data, m->menu_tree);
 

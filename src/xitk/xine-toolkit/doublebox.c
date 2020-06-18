@@ -30,7 +30,7 @@
 static void enability(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     if(w->enable == WIDGET_ENABLE) {
@@ -52,7 +52,7 @@ static void enability(xitk_widget_t *w) {
 static void notify_destroy(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     XITK_FREE(private_data->skin_element_name);
@@ -66,7 +66,7 @@ static void notify_destroy(xitk_widget_t *w) {
 static void paint(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     if(w->visible == 1) {
@@ -97,7 +97,7 @@ static void paint(xitk_widget_t *w) {
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
@@ -122,7 +122,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 
 static void tips_timeout(xitk_widget_t *w, unsigned long timeout) {
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     private_data->input_widget->tips_timeout = timeout;
@@ -162,7 +162,7 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, const char *str
   xitk_widget_t         *w = (xitk_widget_t *)data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
     char                      buf[256];
     
@@ -183,7 +183,7 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, const char *str
 void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     char                      buf[256];
 
@@ -201,7 +201,7 @@ void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
 double xitk_doublebox_get_value(xitk_widget_t *w) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
     const char               *strval;
 
@@ -220,7 +220,7 @@ static void doublebox_stepdown(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
 
     private_data->value -= private_data->step;
@@ -237,7 +237,7 @@ static void doublebox_stepup(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
 
     private_data->value += private_data->step;
@@ -253,7 +253,7 @@ static void doublebox_stepup(xitk_widget_t *x, void *data) {
 xitk_widget_t *xitk_doublebox_get_input_widget(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
     
     return private_data->input_widget;
@@ -288,7 +288,7 @@ static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
   mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
 
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_DOUBLEBOX;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;

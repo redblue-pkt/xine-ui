@@ -133,7 +133,7 @@ static void mrlbrowser_destroy(xitk_widget_t *w);
 static void notify_destroy(xitk_widget_t *w) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     
     mrlbrowser_destroy(w);
   }
@@ -456,7 +456,7 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
   mrlbrowser_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
@@ -474,7 +474,7 @@ xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-           (w->type & WIDGET_GROUP_WIDGET))) {
+           (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return private_data->xwin;
@@ -491,7 +491,7 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
@@ -508,7 +508,7 @@ int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
  
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->running);
@@ -524,7 +524,7 @@ int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->visible);
@@ -540,7 +540,7 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
 
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
@@ -559,7 +559,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
     private_data->visible = 1;
@@ -575,7 +575,7 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) && 
-	   (w->type & WIDGET_GROUP_WIDGET))) {
+	   (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     private_data->running = 0;
@@ -640,7 +640,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
   xitk_image_t *bg_image;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-           (w->type & WIDGET_GROUP_WIDGET))) {
+           (w->type & WIDGET_GROUP_MEMBER))) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     xitk_skin_lock(skonfig);
@@ -1042,7 +1042,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   mywidget->y                  = mb->y;
   mywidget->width              = bg_image->width;
   mywidget->height             = bg_image->height;
-  mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MRLBROWSER;
+  mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
   mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
