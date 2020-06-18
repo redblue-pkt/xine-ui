@@ -339,7 +339,7 @@ void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
     return;
   
   w->tips_timeout = timeout;
-  if(w->type & (WIDGET_GROUP | WIDGET_GROUP_WIDGET)) {
+  if(w->type & (WIDGET_GROUP | WIDGET_GROUP_MEMBER)) {
     widget_event_t  event;
     
     event.type         = WIDGET_EVENT_TIPS_TIMEOUT;
