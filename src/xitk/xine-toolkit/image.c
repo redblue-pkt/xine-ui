@@ -585,6 +585,7 @@ xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height) {
   return i;
 }
 
+#ifdef XINE_SARRAY_MODE_UNIQUE
 static int _xitk_shared_image_cmp (void *a, void *b) {
   xitk_image_t *d = (xitk_image_t *)a;
   xitk_image_t *e = (xitk_image_t *)b;
@@ -599,6 +600,7 @@ static int _xitk_shared_image_cmp (void *a, void *b) {
     return 1;
   return strcmp (d->key, e->key);
 }
+#endif
 
 int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int height, xitk_image_t **image) {
   xitk_image_t *i;
