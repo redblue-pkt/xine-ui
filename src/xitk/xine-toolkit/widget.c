@@ -700,7 +700,7 @@ static const xitk_color_names_t xitk_sorted_color_names[] = {
 void dump_widget_type(xitk_widget_t *w) {
   if(w->type & WIDGET_GROUP) {
     printf("WIDGET_TYPE_GROUP: ");
-    if(w->type & WIDGET_GROUP_WIDGET)
+    if(w->type & WIDGET_GROUP_MEMBER)
       printf("[THE_WIDGET] ");
     if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)
       printf("WIDGET_TYPE_BROWSER | ");
@@ -1317,7 +1317,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     if((widget == wl->widget_focused) ||
        (widget && wl->widget_focused && 
 	(((wl->widget_focused->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_MENU)
-	 && (wl->widget_focused->type & WIDGET_GROUP_WIDGET)))) {
+	 && (wl->widget_focused->type & WIDGET_GROUP_MEMBER)))) {
       xitk_widget_t *next_widget;
       
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&

@@ -215,7 +215,7 @@ typedef struct {
 /* Group of widgets widget */
 #define WIDGET_GROUP                0x80000000
 /* Grouped widget, itself */
-#define WIDGET_GROUP_WIDGET         0x40000000
+#define WIDGET_GROUP_MEMBER         0x40000000
 /* Is widget focusable */
 #define WIDGET_FOCUSABLE            0x20000000
 /* Is widget clickable */

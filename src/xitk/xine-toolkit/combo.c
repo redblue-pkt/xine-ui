@@ -671,7 +671,7 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   lbl.userdata          = (void *)wp;
   if ((wp->label_widget = xitk_label_create (wl, skonfig, &lbl))) {
     wp->label_widget->parent = &wp->w;
-    wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+    wp->label_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
     xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
   }
 
@@ -680,7 +680,7 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   cb.userdata          = (void *)wp;
   if ((wp->button_widget = xitk_checkbox_create (wl, skonfig, &cb))) {
     wp->button_widget->parent = &wp->w;
-    wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+    wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
     xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
   }
 
@@ -747,7 +747,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     if ((wp->label_widget = xitk_noskin_label_create (wl, &lbl,
       x, y, (width - height), height, DEFAULT_FONT_10))) {
       wp->label_widget->parent = &wp->w;
-      wp->label_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+      wp->label_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
       xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
     }
 
@@ -758,7 +758,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     if ((wp->button_widget = xitk_noskin_checkbox_create (wl, &cb,
       x + (width - height), y, height, height))) {
       wp->button_widget->parent = &wp->w;
-      wp->button_widget->type |= WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+      wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
       xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
     }
 
