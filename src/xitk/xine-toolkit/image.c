@@ -265,7 +265,7 @@ void xitk_image_free_image(xitk_image_t **src) {
   }
 
   if (image->raw) {
-    ImlibData *im = image->im;
+    ImlibData *im = image->xitk->imlibdata;
     ABORT_IF_NULL(im);
     XLOCK (im->x.x_lock_display, im->x.disp);
     Imlib_destroy_image (im, image->raw);
