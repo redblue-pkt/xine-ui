@@ -811,7 +811,6 @@ Makefile
 src/Makefile
 src/common/Makefile
 src/xitk/Makefile
-src/xitk/Imlib-light/Makefile
 src/xitk/xine-toolkit/Makefile
 src/xitk/xine-toolkit/po/Makefile.in
 src/aaui/Makefile
