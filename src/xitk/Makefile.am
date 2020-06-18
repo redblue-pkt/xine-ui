@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 include $(top_srcdir)/src/common/Makefile.common
 
-SUBDIRS = Imlib-light xine-toolkit .
+SUBDIRS = xine-toolkit .
 
 AM_CFLAGS = @X_CFLAGS@ @XINE_CFLAGS@ @LIBPNG_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
@@ -13,11 +13,14 @@ endif
 if HAVE_X11
 xine_ui = xine $(remote)
 oxine_lib = liboxine.a
+imlib_lib = libImlib-light.a
 endif
 
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
-noinst_LIBRARIES = $(oxine_lib)
+noinst_LIBRARIES = \
+	$(imlib_lib) \
+	$(oxine_lib)
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
 kbindings_man_LDADD = $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL) $(XINE_LIBS)
@@ -26,6 +29,18 @@ kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 EXTRA_DIST = \
 	$(skins_DATA) \
 	$(oxine_DATA)
+
+libImlib_light_a_CFLAGS = $(X_CFLAGS) $(LIBPNG_CFLAGS) $(JPEG_CFLAGS)
+libImlib_light_a_SOURCES = \
+	Imlib-light/Imlib.h \
+	Imlib-light/Imlib_private.h \
+	Imlib-light/Imlib_types.h \
+	Imlib-light/cache.c \
+	Imlib-light/colors.c \
+	Imlib-light/load.c \
+	Imlib-light/misc.c \
+	Imlib-light/rend.c \
+	Imlib-light/utils.c
 
 oxinedir = @XINE_OXINEDIR@
 oxine_DATA = \
@@ -98,7 +113,7 @@ endif
 
 xine_LDADD = \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
-	     $(top_builddir)/src/xitk/Imlib-light/libImlib-light.a \
+	     $(imlib_lib) \
 	     $(oxine_lib) \
 	     $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(XINE_LIBS) $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
