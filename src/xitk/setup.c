@@ -442,9 +442,10 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
     y += (FRAME_HEIGHT >> 1) + 3;
   }
 
-  /* Repaint everything else... */
-  xitk_paint_widget_list (setup->widget_list);
-  /* ...and our new ones just 1 time. */
+/* Repaint our new ones just 1 time. */
+
+  if (setup->num_wg > MAX_DISPLAY_WIDGETS)
+    xitk_enable_and_show_widget (setup->slider_wg);
   setup_triplets_enable_and_show (setup, setup->first_displayed, last, tips_timeout);
   setup_set_cursor (setup, NORMAL_CURS);
 }
@@ -833,8 +834,6 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
     si.v.max = setup->num_wg;
     xitk_slider_hv_sync (setup->slider_wg, &si, XITK_SLIDER_SYNC_SET);
     /*slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;*/
-    xitk_show_widget (setup->slider_wg);
-    xitk_enable_widget (setup->slider_wg);
   }
   /*else
     slidmax = 1;*/
@@ -1152,4 +1151,3 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
-
