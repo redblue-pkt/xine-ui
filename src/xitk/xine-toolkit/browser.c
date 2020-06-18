@@ -66,7 +66,7 @@ static void paint(xitk_widget_t *w) {
 	bh += xitk_get_widget_height(private_data->item_tree[WSLID]);
 	(void) xitk_set_widget_pos(private_data->item_tree[WBDN], x + itemw, y + bh);
 	if(private_data->need_h_slider) {
-#warning NEED
+//#warning NEED
 
 	}
 	
@@ -79,7 +79,7 @@ static void paint(xitk_widget_t *w) {
 	xitk_show_widget(private_data->item_tree[WBRT]);
 
 	if(private_data->need_h_slider) {
-#warning NEED
+//#warning NEED
 	}
 
 	for(i = WBSTART; i < (private_data->max_length+WBSTART); i++) {
