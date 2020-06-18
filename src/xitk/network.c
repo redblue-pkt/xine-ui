@@ -1,4 +1,3 @@
-#warning IMPLEMENT POST SUPPORT
 /*
  * Copyright (C) 2000-2019 the xine project
  * 
@@ -32,6 +31,8 @@
 #define _DEFAULT_SOURCE 1
 /* required to enable POSIX variant of getpwuid_r on solaris */
 #define _POSIX_PTHREAD_SEMANTICS 1
+
+//#warning IMPLEMENT POST SUPPORT
 
 #include "config.h"
 

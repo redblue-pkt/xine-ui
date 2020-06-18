@@ -149,7 +149,7 @@ static int _key_from_name (const char *name) {
 /*
  *
  */
-#warning FIXME
+//#warning FIXME
 static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   char *p;
   char *buf2 = NULL;
