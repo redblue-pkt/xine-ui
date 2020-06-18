@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -24,32 +24,5 @@
 #include "_xitk.h"
 
 #define MAX_TABS 256
-
-typedef struct {
-  char                   *skin_element_name;
-  xitk_widget_t          *widget;
-  xitk_widget_t          *left;
-  xitk_widget_t          *right;
-
-  int                     x, y, width;
-
-  int                     num_entries;
-  char                  **entries;
-
-  xitk_widget_t          *tabs[MAX_TABS];
-  btnlist_t              *bt[MAX_TABS];
-
-  int                     selected;
-  int                     old_selected;
-
-  int                     offset;
-  int                     old_offset;
-  int                     bheight;
-  int                     gap_widthstart;
-
-  xitk_state_callback_t  callback;
-  void                   *userdata;
-
-} tabs_private_data_t;
 
 #endif
