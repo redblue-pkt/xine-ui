@@ -1450,6 +1450,23 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(p->xitk));
   XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  /* +   ++   ++   + *
+   *                 *
+   * +   ++   ++   + */
+  q = xs;
+  q->x1 = q->x2 = 0 * w;            q->y1 = q->y2 = 0; q++;
+  q->x1 = 1 * w - 1; q->x2 = 1 * w; q->y1 = q->y2 = 0; q++;
+  q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = 0; q++;
+  q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = 0; q++;
+  q->x1 = q->x2 = 0 * w;            q->y1 = q->y2 = h - 1; q++;
+  q->x1 = 1 * w - 1; q->x2 = 1 * w; q->y1 = q->y2 = h - 1; q++;
+  q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = h - 1; q++;
+  q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = h - 1; q++;
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground (im->x.disp, p->image->gc, xitk_get_pixel_color_gray (p->xitk));
+  XDrawSegments (im->x.disp, p->image->pixmap, p->image->gc, xs, q - xs);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 
 /*
