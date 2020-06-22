@@ -107,6 +107,10 @@ typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #endif
 
+typedef struct {
+  int x, y, width, height;
+} xitk_rect_t;
+
 /*
  * Event callback function type.
  * Thefunction will be called on every xevent.
@@ -184,6 +188,7 @@ typedef struct {
   int visibility, enability;
   char *pixmap_name;
   xitk_image_t *pixmap_img;
+  xitk_rect_t pixmap_rect;
   /* button list */
   int max_buttons, direction;
   /* browser */
@@ -196,10 +201,12 @@ typedef struct {
   char *label_pixmap_font_name;
   char *label_pixmap_font_format;
   xitk_image_t *label_pixmap_font_img;
+  xitk_rect_t pixmap_font_rect;
   /* slider */
   int slider_type, slider_radius;
   char *slider_pixmap_pad_name;
   xitk_image_t *slider_pixmap_pad_img;
+  xitk_rect_t slider_pixmap_pad_rect;
 } xitk_skin_element_info_t;
 
 /*
@@ -1663,6 +1670,7 @@ int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
  *
  */
 xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *, const char *);
+xitk_image_t *xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_rect_t *rect, const char *str);
 
 /*
  *
