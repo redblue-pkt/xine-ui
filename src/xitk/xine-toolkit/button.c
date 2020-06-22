@@ -104,8 +104,8 @@ static void _notify_change_skin (_button_private_t *wp, xitk_skin_config_t *skon
     wp->skin        = xitk_skin_get_part_image (skonfig, &wp->skin_rect, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
     wp->w.x         = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
     wp->w.y         = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-    wp->w.width     = wp->skin->width / 3;
-    wp->w.height    = wp->skin->height;
+    wp->w.width     = wp->skin_rect.width / 3;
+    wp->w.height    = wp->skin_rect.height;
     wp->w.visible   = (xitk_skin_get_visibility (skonfig, wp->skin_element_name)) ? 1 : -1;
     wp->w.enable    = xitk_skin_get_enability (skonfig, wp->skin_element_name);
     xitk_skin_unlock (skonfig);
