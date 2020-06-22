@@ -169,18 +169,45 @@ skinsdir = $(datadir)/xine/skins/xinetic
 
 xinetic_dir = skins/xinetic
 skins_DATA = \
-	$(xinetic_dir)/MainBg.png         $(xinetic_dir)/MainPower.png      $(xinetic_dir)/PlBg.png          $(xinetic_dir)/SkItemBtn.png   \
-	$(xinetic_dir)/MainCam.png        $(xinetic_dir)/MainPrev.png       $(xinetic_dir)/PlBtn.png         $(xinetic_dir)/SkSlidBG.png    \
-	$(xinetic_dir)/BigArrowDown.png   $(xinetic_dir)/MainClose.png      $(xinetic_dir)/MainSetup.png     $(xinetic_dir)/PlDelete.png    \
-	$(xinetic_dir)/BigArrowUp.png     $(xinetic_dir)/MainDown.png       $(xinetic_dir)/MainStop.png      $(xinetic_dir)/PlDeleteAll.png $(xinetic_dir)/SliderHBg.png     \
-	$(xinetic_dir)/CtlBg.png          $(xinetic_dir)/MainEject.png      $(xinetic_dir)/MainUp.png        $(xinetic_dir)/PlDismiss.png   $(xinetic_dir)/SliderHPad.png    \
-	$(xinetic_dir)/CtlBtn.png         $(xinetic_dir)/MainFastB.png      $(xinetic_dir)/MainVolumeBg.png  $(xinetic_dir)/PlInputTxt.png  $(xinetic_dir)/SliderVBg.png     \
-	$(xinetic_dir)/CtlDismiss.png     $(xinetic_dir)/MainFastF.png      $(xinetic_dir)/MainVolumePad.png $(xinetic_dir)/PlItemBtn.png   $(xinetic_dir)/SliderVPad.png    \
-	$(xinetic_dir)/CtlDummy.png       $(xinetic_dir)/MainFullScreen.png $(xinetic_dir)/MrlBg.png         $(xinetic_dir)/PlMoveDn.png    $(xinetic_dir)/SmallArrowDown.png\
-	$(xinetic_dir)/CtlReset.png       $(xinetic_dir)/MainMute.png       $(xinetic_dir)/MrlBtn.png        $(xinetic_dir)/PlMoveUp.png    $(xinetic_dir)/SmallArrowUp.png  \
-	$(xinetic_dir)/CtlSave.png        $(xinetic_dir)/MainNext.png       $(xinetic_dir)/MrlDismiss.png    $(xinetic_dir)/PlPlay.png      $(xinetic_dir)/Letters.png       \
-	$(xinetic_dir)/MainPause.png      $(xinetic_dir)/MrlSelect.png      $(xinetic_dir)/Letters2.png      $(xinetic_dir)/MrlFlit.png     \
-	$(xinetic_dir)/MainAutoButton.png $(xinetic_dir)/MainPlay.png       $(xinetic_dir)/Onglet.png        $(xinetic_dir)/MainNav.png     \
-	$(xinetic_dir)/BigArrowLeft.png   $(xinetic_dir)/BigArrowRight.png  \
-	$(xinetic_dir)/PlSlidHBg.png      $(xinetic_dir)/SliderHPad.png     $(xinetic_dir)/SkSlidHBg.png     $(xinetic_dir)/SlidHPad.png    \
-	$(xinetic_dir)/SkSlidHPad.png     $(xinetic_dir)/skinconfig
+	$(xinetic_dir)/BigArrowDown.png \
+	$(xinetic_dir)/BigArrowLeft.png \
+	$(xinetic_dir)/BigArrowRight.png  \
+	$(xinetic_dir)/BigArrowUp.png \
+	$(xinetic_dir)/CtlBg.png \
+	$(xinetic_dir)/CtlDismiss.png \
+	$(xinetic_dir)/CtlDummy.png \
+	$(xinetic_dir)/CtlReset.png \
+	$(xinetic_dir)/CtlSave.png \
+	$(xinetic_dir)/Letters.png \
+	$(xinetic_dir)/Letters2.png \
+	$(xinetic_dir)/MainAutoButton.png \
+	$(xinetic_dir)/MainBg.png \
+	$(xinetic_dir)/MainBits1.png \
+	$(xinetic_dir)/MainBits2.png \
+	$(xinetic_dir)/MainVolumeBg.png \
+	$(xinetic_dir)/MainVolumePad.png \
+	$(xinetic_dir)/MrlBg.png \
+	$(xinetic_dir)/MrlDismiss.png \
+	$(xinetic_dir)/MrlFlit.png \
+	$(xinetic_dir)/MrlSelect.png \
+	$(xinetic_dir)/Onglet.png \
+	$(xinetic_dir)/PlBg.png \
+	$(xinetic_dir)/PlDelete.png \
+	$(xinetic_dir)/PlDeleteAll.png \
+	$(xinetic_dir)/PlDismiss.png \
+	$(xinetic_dir)/PlInputTxt.png \
+	$(xinetic_dir)/PlItemBtn.png \
+	$(xinetic_dir)/PlMoveDn.png \
+	$(xinetic_dir)/PlMoveUp.png \
+	$(xinetic_dir)/PlPlay.png \
+	$(xinetic_dir)/PlSlidHBg.png \
+	$(xinetic_dir)/SlidHPad.png \
+	$(xinetic_dir)/SliderHBg.png \
+	$(xinetic_dir)/SliderHPad.png \
+	$(xinetic_dir)/SliderVBg.png \
+	$(xinetic_dir)/SliderVPad.png \
+	$(xinetic_dir)/SkItemBtn.png \
+	$(xinetic_dir)/SkSlidHBg.png \
+	$(xinetic_dir)/SkSlidBG.png \
+	$(xinetic_dir)/SkSlidHPad.png \
+	$(xinetic_dir)/skinconfig
