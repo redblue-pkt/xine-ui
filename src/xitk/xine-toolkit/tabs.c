@@ -363,7 +363,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       fwidth = xitk_font_get_string_length(fs, t->entries[i]);
 
       lb.skin_element_name = NULL;
-      lb.button_type       = RADIO_BUTTON;
+      lb.button_type       = TAB_BUTTON;
       lb.align             = ALIGN_CENTER;
       lb.label             = t->entries[i];
       lb.callback          = NULL;
@@ -374,7 +374,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
         wp->tabs[i]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
         xitk_dlist_add_tail (&wl->list, &wp->tabs[i]->node);
         xitk_hide_widget (wp->tabs[i]);
-        draw_tab (xitk_get_widget_foreground_skin (wp->tabs[i]));
       }
       xx += fwidth + 20;
     }

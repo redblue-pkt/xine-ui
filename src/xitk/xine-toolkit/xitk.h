@@ -264,6 +264,8 @@ typedef struct {
  */
 #define CLICK_BUTTON                1
 #define RADIO_BUTTON                2
+#define TAB_BUTTON                  3
+
 
 /*
  * See xitk_get_modifier_key()
