@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -22,19 +22,5 @@
 #define HAVE_XITK_CHECKBOX_H
 
 #include "_xitk.h"
-
-typedef struct {
-
-  char                  *skin_element_name;
-  xitk_widget_t         *cWidget;
-  int                    cClicked;
-  int                    focus;
-  int                    cState;
-  xitk_image_t           *skin;
-
-  xitk_state_callback_t  callback;
-  void                  *userdata;
-
-} checkbox_private_data_t;
 
 #endif
