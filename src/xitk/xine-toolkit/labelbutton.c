@@ -793,7 +793,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
       draw_bevel_three_state (info.pixmap_img);
   }
   info.pixmap_rect.x     = 0;
-  info.pixmap_rect.x     = 0;
+  info.pixmap_rect.y     = 0;
   info.pixmap_rect.width = 0;
   info.pixmap_rect.height = 0;
   if (info.pixmap_img) {
