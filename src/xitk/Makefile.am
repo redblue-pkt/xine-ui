@@ -169,10 +169,6 @@ skinsdir = $(datadir)/xine/skins/xinetic
 
 xinetic_dir = skins/xinetic
 skins_DATA = \
-	$(xinetic_dir)/BigArrowDown.png \
-	$(xinetic_dir)/BigArrowLeft.png \
-	$(xinetic_dir)/BigArrowRight.png  \
-	$(xinetic_dir)/BigArrowUp.png \
 	$(xinetic_dir)/CtlBg.png \
 	$(xinetic_dir)/CtlDismiss.png \
 	$(xinetic_dir)/CtlDummy.png \
