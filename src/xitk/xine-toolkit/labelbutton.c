@@ -224,8 +224,15 @@ static void _create_labelofbutton (_lbutton_private_t *wp, Window win, GC gc,
   XSetForeground (wp->imlibdata->x.disp, gc, fg);
   XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
-  origin = ((ysize+asc+des+yoff)>>1)-des;
-  
+  if (wp->bType == TAB_BUTTON) {
+    /* The tab lift effect. */
+    origin = ((ysize - 3 + asc + des + yoff) >> 1) - des + 3;
+    if ((state == FOCUS) || (state == CLICK))
+      origin -= 3;
+  } else {
+    origin = ((ysize + asc + des + yoff) >> 1) - des;
+  }
+
   /*  Put text in the right place */
   if (wp->align == ALIGN_CENTER) {
     xitk_font_draw_string (fs, pix, gc,
@@ -294,7 +301,7 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
           mode = 1;
           state = FOCUS;
         } else {
-          if (wp->bType == RADIO_BUTTON) {
+          if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
             mode = 2;
             state = CLICK;
           } else {
@@ -306,7 +313,7 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
         }
       }
     } else {
-      if (wp->bState && (wp->bType == RADIO_BUTTON)) {
+      if (wp->bState && ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON))) {
         if ((wp->bOldState == 1) && (wp->bClicked == 1)) {
           mode = 0;
           state = NORMAL;
@@ -374,7 +381,7 @@ static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bU
     if (bUp && (wp->focus == FOCUS_RECEIVED)) {
       wp->bState = !wp->bState;
       _paint_labelbutton (wp);
-      if (wp->bType == RADIO_BUTTON) {
+      if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
         if (wp->state_callback)
           wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
       } else if (wp->bType == CLICK_BUTTON) {
@@ -544,7 +551,7 @@ int xitk_labelbutton_get_state (xitk_widget_t *w) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    if (wp->bType == RADIO_BUTTON)
+    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON))
       return wp->bState;
   }
   return -1;
@@ -611,7 +618,7 @@ void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     int clk, focus;
     
-    if (wp->bType == RADIO_BUTTON) {
+    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
       if (xitk_labelbutton_get_state (&wp->w) != state) {
         focus = wp->focus;
         clk = wp->bClicked;
@@ -642,7 +649,7 @@ void xitk_labelbutton_callback_exec (xitk_widget_t *w) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    if (wp->bType == RADIO_BUTTON) {
+    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
       if (wp->state_callback)
         wp->state_callback (wp->bWidget, wp->userdata, wp->bState, 0);
     } else if (wp->bType == CLICK_BUTTON) {
@@ -775,8 +782,12 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.label_color_click = (char *)ccolor;
   info.label_fontname    = (char *)fname;
   info.pixmap_name       = (char *)"\x01";
-  if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img) == 1)
-    draw_bevel_three_state (info.pixmap_img);
-
+  if (b->button_type == TAB_BUTTON) {
+    if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &info.pixmap_img) == 1)
+      draw_tab (info.pixmap_img);
+  } else {
+    if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img) == 1)
+      draw_bevel_three_state (info.pixmap_img);
+  }
   return xitk_info_labelbutton_create (wl, b, &info);
 }
