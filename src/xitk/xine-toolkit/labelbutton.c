@@ -46,6 +46,7 @@ typedef struct {
   int                     bState;
   int                     bOldState;
   xitk_image_t           *skin;
+  xitk_rect_t             skin_rect;
 
   xitk_state_callback_t   callback;
   xitk_ext_state_callback_t state_callback;
@@ -131,7 +132,7 @@ static int _notify_inside (_lbutton_private_t *wp, int x, int y) {
     xitk_image_t *skin = wp->skin;
 
     if (skin->mask)
-      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x, y);
+        return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin_rect.x, y + wp->skin_rect.y);
     else 
       return 1;
   }
@@ -288,8 +289,8 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
       XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     }
 
-    button_width = skin->width / 3;
-    btn = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, button_width, skin->height);
+    button_width = wp->skin_rect.width / 3;
+    btn = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, button_width, wp->skin_rect.height);
       
     mode = -1;
     if ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)) {
@@ -329,15 +330,15 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
     if (mode >= 0) {
       XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
       XCopyArea (wp->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, wp->w.wl->gc,
-        mode * button_width, 0,
-        button_width, skin->height,
+        wp->skin_rect.x + mode * button_width, wp->skin_rect.y,
+        button_width, wp->skin_rect.height,
         0, 0);
       XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
     }
       
     if (wp->label_visible) {
       _create_labelofbutton (wp, wp->w.wl->win, wp->w.wl->gc, btn,
-        button_width, skin->height,
+        button_width, wp->skin_rect.height,
         wp->label, wp->shortcut_label, wp->shortcut_pos, state);
     }
       
@@ -487,10 +488,11 @@ static void _notify_change_skin (_lbutton_private_t *wp, xitk_skin_config_t *sko
       wp->label_visible = info->label_printable;
       wp->label_static  = info->label_staticity;
       wp->align         = info->label_alignment;
+      wp->skin_rect     = info->pixmap_rect;
       wp->w.x      = info->x;
       wp->w.y      = info->y;
-      wp->w.width  = wp->skin->width / 3;
-      wp->w.height = wp->skin->height;
+      wp->w.width  = wp->skin_rect.width / 3;
+      wp->w.height = wp->skin_rect.height;
       wp->w.visible = info->visibility ? 1 : -1;
       wp->w.enable = info->enability;
     }
@@ -696,6 +698,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->label_static      = info->label_staticity;
 
   wp->skin              = info->pixmap_img;
+  wp->skin_rect         = info->pixmap_rect;
 
   if (info->pixmap_name && (info->pixmap_name[0] == '\x01') && (info->pixmap_name[1] == 0)) {
     wp->skin_element_name[0] = '\x01';
@@ -721,8 +724,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.x               = info->x;
   wp->w.y               = info->y;
-  wp->w.width           = wp->skin->width/3;
-  wp->w.height          = wp->skin->height;
+  wp->w.width           = wp->skin_rect.width / 3;
+  wp->w.height          = wp->skin_rect.height;
   wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
@@ -788,6 +791,14 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   } else {
     if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img) == 1)
       draw_bevel_three_state (info.pixmap_img);
+  }
+  info.pixmap_rect.x     = 0;
+  info.pixmap_rect.x     = 0;
+  info.pixmap_rect.width = 0;
+  info.pixmap_rect.height = 0;
+  if (info.pixmap_img) {
+    info.pixmap_rect.width = info.pixmap_img->width;
+    info.pixmap_rect.height = info.pixmap_img->height;
   }
   return xitk_info_labelbutton_create (wl, b, &info);
 }
