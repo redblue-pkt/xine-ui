@@ -1958,6 +1958,9 @@ xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
 xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height);
 
 void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
+void xitk_image_draw_skin (xitk_widget_list_t *wl, xitk_image_t *skin, xitk_rect_t *rect, xitk_image_t *image,
+  int src_x, int src_y, int width, int height, int dst_x, int dst_y);
+void xitk_image_copy_skin (xitk_widget_list_t *wl, xitk_image_t *skin, xitk_rect_t *rect, xitk_image_t *dest);
 
 /**
  * Free an image object.
