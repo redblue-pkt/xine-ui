@@ -114,7 +114,6 @@ typedef struct {
 
   /* help window stuff */
   xitk_window_t              *helpwin;
-  xitk_widget_list_t         *help_widget_list;
   char                      **help_text;
   xitk_register_key_t         help_widget_key;
   int                         help_running;
@@ -911,6 +910,8 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   /* create help window if needed */
 
   if( !pp_wrapper->pplugin->help_running ) {
+    xitk_widget_list_t *help_widget_list;
+
     x = y = 80;
     pp_wrapper->pplugin->helpwin = xitk_window_create_dialog_window(gui->xitk,
                                                                     _("Plugin Help"), x, y,
@@ -918,7 +919,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     set_window_states_start(gui, pp_wrapper->pplugin->helpwin);
 
-    pp_wrapper->pplugin->help_widget_list = xitk_window_widget_list(pp_wrapper->pplugin->helpwin);
+    help_widget_list = xitk_window_widget_list(pp_wrapper->pplugin->helpwin);
 
     bg = xitk_window_get_background_pixmap(pp_wrapper->pplugin->helpwin);
 
@@ -930,10 +931,10 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
-    w =  xitk_noskin_labelbutton_create (pp_wrapper->pplugin->help_widget_list,
+    w =  xitk_noskin_labelbutton_create (help_widget_list,
       &lb, HELP_WINDOW_WIDTH - (100 + 15), HELP_WINDOW_HEIGHT - (23 + 15), 100, 23,
       "Black", "Black", "White", btnfontname);
-    xitk_add_widget (pp_wrapper->pplugin->help_widget_list, w);
+    xitk_add_widget (help_widget_list, w);
     xitk_enable_and_show_widget(w);
   
   
@@ -948,9 +949,9 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     br.callback                      = NULL;
     br.dbl_click_callback            = NULL;
     br.userdata                      = NULL;
-    pp_wrapper->pplugin->help_browser = xitk_noskin_browser_create (pp_wrapper->pplugin->help_widget_list,
+    pp_wrapper->pplugin->help_browser = xitk_noskin_browser_create (help_widget_list,
       &br, 15, 34, HELP_WINDOW_WIDTH - (30 + 16), 20, 16, br_fontname);
-    xitk_add_widget (pp_wrapper->pplugin->help_widget_list, pp_wrapper->pplugin->help_browser);
+    xitk_add_widget (help_widget_list, pp_wrapper->pplugin->help_browser);
   }
 
   /* load text to the browser widget */
@@ -1027,7 +1028,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
                                                                        _pplugin_help_handle_event,
                                                                        NULL,
                                                                        NULL,
-                                                                       pp_wrapper->pplugin->help_widget_list,
+                                                                       xitk_window_widget_list(pp_wrapper->pplugin->helpwin),
                                                                        pp_wrapper);
   
     pp_wrapper->pplugin->help_running = 1;
@@ -1539,8 +1540,9 @@ static void applugin_exit(xitk_widget_t *w, void *data) {
   pplugin_exit(&_app_wrapper.p, w, data);
 }
 
-static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void *data) {
-  
+static void _pplugin_handle_event(XEvent *event, void *data) {
+  _pp_wrapper_t *pp_wrapper = data;
+
   switch(event->type) {
 
   case ButtonPress:
@@ -1612,14 +1614,6 @@ static void _pplugin_handle_event(_pp_wrapper_t *pp_wrapper, XEvent *event, void
     }
     break;
   }
-}
-
-static void _vpplugin_handle_event(XEvent *event, void *data) {
-  _pplugin_handle_event(&_vpp_wrapper.p, event, data);
-}
-
-static void _applugin_handle_event(XEvent *event, void *data) {
-  _pplugin_handle_event(&_app_wrapper.p, event, data);
 }
 
 static void _pplugin_enability(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int state) {
@@ -1893,11 +1887,11 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 
   pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &_vpp_wrapper.p) ? "vpplugin" : "applugin", 
                                                                 pp_wrapper->pplugin->xwin,
-						    (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_handle_event : _applugin_handle_event,
+                                                    _pplugin_handle_event,
 						    NULL,
 						    NULL,
 						    pp_wrapper->pplugin->widget_list,
-						    NULL);
+                                                    pp_wrapper);
   
   pp_wrapper->pplugin->visible = 1;
   pp_wrapper->pplugin->running = 1;
