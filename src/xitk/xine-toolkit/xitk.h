@@ -194,7 +194,7 @@ typedef struct {
   /* browser */
   int browser_entries;
   /* label */
-  int label_length, label_alignment, label_printable, label_staticity;
+  int label_length, label_alignment, label_y, label_printable, label_staticity;
   int label_animation, label_animation_step;
   unsigned long int label_animation_timer;
   char *label_color, *label_color_focus, *label_color_click, *label_fontname;
