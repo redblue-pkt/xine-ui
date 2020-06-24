@@ -179,8 +179,6 @@ skins_DATA = \
 	$(xinetic_dir)/MainBg.png \
 	$(xinetic_dir)/MainBits1.png \
 	$(xinetic_dir)/MainBits2.png \
-	$(xinetic_dir)/MainVolumeBg.png \
-	$(xinetic_dir)/MainVolumePad.png \
 	$(xinetic_dir)/MrlBg.png \
 	$(xinetic_dir)/MrlDismiss.png \
 	$(xinetic_dir)/MrlFlit.png \
@@ -194,7 +192,6 @@ skins_DATA = \
 	$(xinetic_dir)/PlSlidHBg.png \
 	$(xinetic_dir)/SlidHPad.png \
 	$(xinetic_dir)/SliderHBg.png \
-	$(xinetic_dir)/SliderHPad.png \
 	$(xinetic_dir)/SliderVBg.png \
 	$(xinetic_dir)/SliderVPad.png \
 	$(xinetic_dir)/SkItemBtn.png \
