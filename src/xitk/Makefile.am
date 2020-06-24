@@ -176,7 +176,6 @@ skins_DATA = \
 	$(xinetic_dir)/CtlSave.png \
 	$(xinetic_dir)/Letters.png \
 	$(xinetic_dir)/Letters2.png \
-	$(xinetic_dir)/MainAutoButton.png \
 	$(xinetic_dir)/MainBg.png \
 	$(xinetic_dir)/MainBits1.png \
 	$(xinetic_dir)/MainBits2.png \
@@ -188,14 +187,10 @@ skins_DATA = \
 	$(xinetic_dir)/MrlSelect.png \
 	$(xinetic_dir)/Onglet.png \
 	$(xinetic_dir)/PlBg.png \
-	$(xinetic_dir)/PlDelete.png \
-	$(xinetic_dir)/PlDeleteAll.png \
+	$(xinetic_dir)/PlBits2.png \
 	$(xinetic_dir)/PlDismiss.png \
 	$(xinetic_dir)/PlInputTxt.png \
 	$(xinetic_dir)/PlItemBtn.png \
-	$(xinetic_dir)/PlMoveDn.png \
-	$(xinetic_dir)/PlMoveUp.png \
-	$(xinetic_dir)/PlPlay.png \
 	$(xinetic_dir)/PlSlidHBg.png \
 	$(xinetic_dir)/SlidHPad.png \
 	$(xinetic_dir)/SliderHBg.png \

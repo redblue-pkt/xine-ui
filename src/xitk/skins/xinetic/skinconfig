@@ -41,7 +41,7 @@ skin.Nav {
 	  x = 492
 	  y = 54
 	}
-	pixmap = MainBits2.png|132,51,78,18
+	pixmap = MainBits2.png|0,163,78,18
 }
 
 skin.Exit {
@@ -57,7 +57,7 @@ skin.Setup {
 	  x = 4
 	  y = 56
 	}
-	pixmap = MainBits2.png|132,34,102,16
+	pixmap = MainBits2.png|0,146,102,16
 }
 
 skin.FullScreen {
@@ -103,7 +103,7 @@ skin.AudioNext {
 	  x = 189
 	  y = 37
 	}
-	pixmap = MainBits2.png|211,51,21,7
+	pixmap = MainBits2.png|79,163,21,7
 }
 
 skin.AudioPrev {
@@ -111,7 +111,7 @@ skin.AudioPrev {
 	  x = 189
 	  y = 45
 	}
-	pixmap = MainBits2.png|211,59,21,7
+	pixmap = MainBits2.png|79,171,21,7
 }
 
 skin.AudioLabel {
@@ -131,7 +131,7 @@ skin.SpuNext {
 	  x = 273
 	  y = 37
 	}
-	pixmap = MainBits2.png|211,51,21,7
+	pixmap = MainBits2.png|79,163,21,7
 }
 
 skin.SpuPrev {
@@ -139,7 +139,7 @@ skin.SpuPrev {
 	  x = 273
 	  y = 45
 	}
-	pixmap = MainBits2.png|211,59,21,7
+	pixmap = MainBits2.png|79,171,21,7
 }
 
 skin.SpuLabel {
@@ -242,14 +242,16 @@ skin.Snapshot {
 skin.AutoPlayGUI {
 	coords {
 	  x = 300
-	  y = 43
+	  y = 55
 	}
-	pixmap = MainAutoButton.png
+	pixmap = MainBits2.png|0,182,123,30
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
 	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+# Where the middle of label shall go, if not just height / 2.
+	  y = 9
 	}
 	max_buttons = 7
 }
@@ -259,7 +261,7 @@ skin.PlBtn {
 	  x = 4
 	  y = 18
 	}
-	pixmap = MainBits2.png|132,0,102,16
+	pixmap = MainBits2.png|0,112,102,16
 }
 
 skin.CtlBtn {
@@ -267,7 +269,7 @@ skin.CtlBtn {
 	  x = 4
 	  y = 37
 	}
-	pixmap = MainBits2.png|132,17,102,16
+	pixmap = MainBits2.png|0,129,102,16
 }
 
 skin.MrlBtn {
@@ -364,7 +366,7 @@ skin.PlPlay {
 	  x = 15
 	  y = 218
 	}
-	pixmap = PlPlay.png
+	pixmap = PlBits2.png|0,0,159,28
 }
 
 skin.PlDelete {
@@ -372,7 +374,7 @@ skin.PlDelete {
 	  x = 69
 	  y = 218
 	}
-	pixmap = PlDelete.png
+	pixmap = PlBits2.png|0,116,159,28
 }
 
 skin.PlDeleteAll {
@@ -380,7 +382,7 @@ skin.PlDeleteAll {
 	  x = 123
 	  y = 218
 	}
-	pixmap = PlDeleteAll.png
+	pixmap = PlBits2.png|0,87,159,28
 }
 
 skin.PlMoveUp {
@@ -388,7 +390,7 @@ skin.PlMoveUp {
 	  x = 177
 	  y = 218
 	}
-	pixmap = PlMoveUp.png
+	pixmap = PlBits2.png|0,29,159,28
 }
 
 skin.PlMoveDn {
@@ -396,7 +398,7 @@ skin.PlMoveDn {
 	  x = 231
 	  y = 218
 	}
-	pixmap = PlMoveDn.png
+	pixmap = PlBits2.png|0,58,159,28
 }
 
 skin.PlDismiss {
@@ -446,7 +448,7 @@ skin.PlLeft {
           x = 10
           y = 164
         }
-        pixmap = MainBits2.png|195,70,60,20
+        pixmap = MainBits2.png|61,91,60,20
 }
 
 skin.SliderHPl {
@@ -466,7 +468,7 @@ skin.PlRight {
           x = 273
           y = 164
         }
-        pixmap = MainBits2.png|134,70,60,20
+        pixmap = MainBits2.png|0,91,60,20
 }
 
 skin.AutoPlayLbl {
@@ -736,7 +738,7 @@ skin.CtlSkLeft {
           x = 332
           y = 163
         }
-        pixmap = MainBits2.png|195,70,60,20
+        pixmap = MainBits2.png|61,91,60,20
 }
 
 skin.SliderHCtlSk {
@@ -756,7 +758,7 @@ skin.CtlSkRight {
           x = 473
           y = 163
         }
-        pixmap = MainBits2.png|134,70,60,20
+        pixmap = MainBits2.png|0,91,60,20
 }
 
 skin.CtlSkItemBtn {
@@ -886,7 +888,7 @@ skin.MrlLeft {
           x = 10
           y = 164
         }
-        pixmap = MainBits2.png|195,70,60,20
+        pixmap = MainBits2.png|61,91,60,20
 }
 
 skin.SliderHMrl {
@@ -906,7 +908,7 @@ skin.MrlRight {
           x = 273
           y = 164
         }
-        pixmap = MainBits2.png|134,70,60,20
+        pixmap = MainBits2.png|0,91,60,20
 }
 
 skin.MrlCurOrigin {
