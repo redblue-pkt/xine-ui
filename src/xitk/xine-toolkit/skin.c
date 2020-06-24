@@ -564,6 +564,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
       skin_get_next_line(skonfig);
     }
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
+      skonfig->celement->info.label_y = 0;
       skonfig->celement->info.label_printable = 1;
       skonfig->celement->info.label_animation_step = 1;
       skonfig->celement->info.label_animation_timer = xitk_get_timer_label_animation();
@@ -637,6 +638,10 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_animation_step = strtol(p, &p, 10);
 	}
+        else if (!strncasecmp (skonfig->ln, "y", 1)) {
+          skin_set_pos_to_value (&p);
+          skonfig->celement->info.label_y = strtol (p, &p, 10);
+        }
 
       }
       skin_get_next_line(skonfig);

@@ -55,6 +55,7 @@ typedef struct {
   void                   *userdata;
    
   int                     align;
+  int                     label_dy;
   int                     label_offset;
   int                     label_visible;
   int                     label_static;
@@ -234,7 +235,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
     if ((state == FOCUS) || (state == CLICK))
       origin -= 3;
   } else {
-    origin = ((ysize + asc + des + yoff) >> 1) - des;
+    origin = ((ysize + asc + des + yoff) >> 1) - des + wp->label_dy;
   }
 
   /*  Put text in the right place */
@@ -694,6 +695,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
 
   wp->label_offset      = 0;
   wp->align             = info->label_alignment;
+  wp->label_dy          = (info->label_y > 0) && (info->label_y < wp->skin_rect.height)
+                        ? info->label_y - (wp->skin_rect.height >> 1) : 0;
 
   wp->w.private_data    = wp;
 
@@ -757,6 +760,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.x                 = x;
   info.y                 = y;
   info.label_alignment   = b->align;
+  info.label_y           = 0;
   info.label_printable   = 1;
   info.label_staticity   = 0;
   info.visibility        = 0;
@@ -779,3 +783,4 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.pixmap_rect.height = 0;
   return xitk_info_labelbutton_create (wl, b, &info);
 }
+
