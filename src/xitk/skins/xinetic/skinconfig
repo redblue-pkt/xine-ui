@@ -159,7 +159,7 @@ skin.PlayFast {
 	  x = 389
 	  y = 16
 	}
-	pixmap = MainBits1.png|0,30,69,29
+	pixmap = MainBits1.png|164,48,69,29
 }
 
 skin.PlaySlow {
@@ -167,7 +167,7 @@ skin.PlaySlow {
 	  x = 389
 	  y = 45
 	}
-	pixmap = MainBits1.png|0,0,72,29
+	pixmap = MainBits1.png|91,48,72,29
 }
 
 skin.Next {
@@ -223,9 +223,9 @@ skin.SliderVol {
 	  x = 347
 	  y = 22
 	}
-	pixmap = MainVolumeBg.png
+	pixmap = MainBits1.png|133,0,44,47
 	slider {
-	  pixmap = MainVolumePad.png
+	  pixmap = MainBits1.png|0,0,132,47
 	  type = vertical
 	}
 
@@ -277,7 +277,7 @@ skin.MrlBtn {
 	  x = 427
 	  y = 30
 	}
-	pixmap = MainBits1.png|0,60,90,30
+	pixmap = MainBits1.png|0,48,90,30
 }
 
 skin.SliderPlay {
@@ -287,7 +287,7 @@ skin.SliderPlay {
 	}
 	pixmap = SliderHBg.png
 	slider {
-	  pixmap = SliderHPad.png
+	  pixmap = MainBits1.png|178,37,51,10
 	  type = horizontal
 	}
 }
@@ -838,7 +838,7 @@ skin.MrlPlay {
 	  x = 15
 	  y = 213
 	}
-	pixmap = PlPlay.png
+	pixmap = PlBits2.png|0,0,159,28
 }
 
 skin.MrlDismiss {
