@@ -33,8 +33,7 @@ typedef struct {
   xitk_widget_t   *bWidget;
   int              bClicked;
   int              focus;
-  xitk_image_t    *skin;
-  xitk_rect_t      skin_rect;
+  xitk_part_image_t skin;
 
   /* callback function (active_widget, user_data) */
   xitk_simple_callback_t  callback;
@@ -45,9 +44,8 @@ typedef struct {
  *
  */
 static void _notify_destroy (_button_private_t *wp) {
-  if (!wp->skin_element_name) {
-    xitk_image_free_image (&wp->skin);
-  }
+  if (!wp->skin_element_name)
+    xitk_image_free_image (&wp->skin.image);
   XITK_FREE (wp->skin_element_name);
 }
 
@@ -55,8 +53,8 @@ static void _notify_destroy (_button_private_t *wp) {
  *
  */
 static xitk_image_t *_get_skin (_button_private_t *wp, int sk) {
-  if ((sk == FOREGROUND_SKIN) && wp->skin)
-    return wp->skin;
+  if ((sk == FOREGROUND_SKIN) && wp->skin.image)
+    return wp->skin.image;
   return NULL;
 }
 
@@ -65,10 +63,10 @@ static xitk_image_t *_get_skin (_button_private_t *wp, int sk) {
  */
 static int _notify_inside (_button_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
-    xitk_image_t *skin = wp->skin;
+    xitk_image_t *skin = wp->skin.image;
 
     if (skin->mask)
-      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin_rect.x, y + wp->skin_rect.y);
+      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
     else 
       return 1;
   }
@@ -88,8 +86,8 @@ static void _paint_button (_button_private_t *wp, widget_event_t *event) {
     mode = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
          ? (wp->bClicked ? 2 : 1)
          : 0;
-    xitk_image_draw_image (wp->w.wl, wp->skin,
-      wp->skin_rect.x + mode * wp->w.width + event->x - wp->w.x, wp->skin_rect.y + event->y - wp->w.y,
+    xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
+      mode * wp->w.width + event->x - wp->w.x, event->y - wp->w.y,
       event->width, event->height,
       event->x, event->y);
   }
@@ -101,11 +99,11 @@ static void _paint_button (_button_private_t *wp, widget_event_t *event) {
 static void _notify_change_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     xitk_skin_lock (skonfig);
-    wp->skin        = xitk_skin_get_part_image (skonfig, &wp->skin_rect, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
+    xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
     wp->w.x         = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
     wp->w.y         = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-    wp->w.width     = wp->skin_rect.width / 3;
-    wp->w.height    = wp->skin_rect.height;
+    wp->w.width     = wp->skin.width / 3;
+    wp->w.height    = wp->skin.height;
     wp->w.visible   = (xitk_skin_get_visibility (skonfig, wp->skin_element_name)) ? 1 : -1;
     wp->w.enable    = xitk_skin_get_enability (skonfig, wp->skin_element_name);
     xitk_skin_unlock (skonfig);
@@ -211,8 +209,8 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
 
   wp->w.running         = 1;
   wp->w.have_focus      = FOCUS_LOST;
-  wp->w.width           = wp->skin_rect.width / 3;
-  wp->w.height          = wp->skin_rect.height;
+  wp->w.width           = wp->skin.width / 3;
+  wp->w.height          = wp->skin.height;
   wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE
                         | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
@@ -236,7 +234,7 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
 
   wp->w.wl = wl;
   wp->skin_element_name = b->skin_element_name ? strdup (b->skin_element_name) : NULL;
-  wp->skin      = xitk_skin_get_part_image (skonfig, &wp->skin_rect, xitk_skin_get_skin_filename (skonfig, b->skin_element_name));
+  xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, b->skin_element_name));
   wp->w.x       = xitk_skin_get_coord_x (skonfig, b->skin_element_name);
   wp->w.y       = xitk_skin_get_coord_y (skonfig, b->skin_element_name);
   wp->w.enable  = xitk_skin_get_enability (skonfig, b->skin_element_name);
@@ -309,11 +307,11 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   wp->w.x = x;
   wp->w.y = y;
   wp->skin_element_name = b->skin_element_name ? strdup (b->skin_element_name) : NULL;
-  wp->skin = i;
-  wp->skin_rect.x        = 0;
-  wp->skin_rect.y        = 0;
-  wp->skin_rect.width    = i->width;
-  wp->skin_rect.height   = i->height;
+  wp->skin.image = i;
+  wp->skin.x        = 0;
+  wp->skin.y        = 0;
+  wp->skin.width    = i->width;
+  wp->skin.height   = i->height;
   wp->w.enable = 0;
   wp->w.visible = 0;
 

@@ -45,9 +45,8 @@ typedef struct {
 
   int                     bState;
   int                     bOldState;
-  xitk_image_t           *skin;
-  xitk_rect_t             skin_rect;
-  xitk_image_t           *temp_image;
+  xitk_part_image_t       skin;
+  xitk_part_image_t       temp_image;
 
   xitk_state_callback_t   callback;
   xitk_ext_state_callback_t state_callback;
@@ -107,10 +106,9 @@ static void _set_label (_lbutton_private_t *wp, const char *label) {
  *
  */
 static void _notify_destroy (_lbutton_private_t *wp) {
-  if (wp->temp_image)
-    xitk_image_free_image (&wp->temp_image);
+  xitk_image_free_image (&wp->temp_image.image);
   if (wp->skin_element_name[0] == '\x01')
-    xitk_image_free_image (&(wp->skin));
+    xitk_image_free_image (&wp->skin.image);
 
   if (wp->label != wp->lbuf)
     XITK_FREE (wp->label);
@@ -123,8 +121,8 @@ static void _notify_destroy (_lbutton_private_t *wp) {
  *
  */
 static xitk_image_t *_get_skin (_lbutton_private_t *wp, int sk) {
-  if ((sk == FOREGROUND_SKIN) && wp->skin)
-    return wp->skin;
+  if ((sk == FOREGROUND_SKIN) && wp->skin.image)
+    return wp->skin.image;
   return NULL;
 }
 
@@ -133,10 +131,10 @@ static xitk_image_t *_get_skin (_lbutton_private_t *wp, int sk) {
  */
 static int _notify_inside (_lbutton_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
-    xitk_image_t *skin = wp->skin;
+    xitk_image_t *skin = wp->skin.image;
 
     if (skin->mask)
-        return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin_rect.x, y + wp->skin_rect.y);
+        return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
     else 
       return 1;
   }
@@ -276,12 +274,8 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
   printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
   if (wp->w.visible == 1) {
-    xitk_rect_t rect;
     int state = 0, mode;
 
-    rect = wp->skin_rect;
-    rect.width /= 3;
-      
     mode = -1;
     if ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)) {
       if (wp->bClicked) {
@@ -317,17 +311,16 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
         state = NORMAL;
       }
     }
-    if (mode >= 0) {
-      rect.x += mode * rect.width;
-      xitk_image_copy_skin (wp->w.wl, wp->skin, &rect, wp->temp_image);
-    }
+    if (mode >= 0)
+      xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->temp_image,
+        mode * wp->skin.width / 3, 0, wp->skin.width / 3, wp->skin.height, 0, 0);
     if (wp->label_visible) {
-      _create_labelofbutton (wp, wp->w.wl->gc, wp->temp_image->image,
-        rect.width, wp->skin_rect.height,
+      _create_labelofbutton (wp, wp->w.wl->gc, wp->temp_image.image->image,
+        wp->skin.width / 3, wp->skin.height,
         wp->label, wp->shortcut_label, wp->shortcut_pos, state);
     }
 
-    xitk_image_draw_skin (wp->w.wl, wp->skin, &rect, wp->temp_image,
+    xitk_part_image_draw (wp->w.wl, &wp->skin, &wp->temp_image,
       event->x - wp->w.x, event->y - wp->w.y,
       event->width, event->height,
       event->x, event->y);
@@ -465,13 +458,18 @@ static void _notify_change_skin (_lbutton_private_t *wp, xitk_skin_config_t *sko
       wp->label_visible = info->label_printable;
       wp->label_static  = info->label_staticity;
       wp->align         = info->label_alignment;
-      wp->skin_rect     = info->pixmap_rect;
       wp->w.x      = info->x;
       wp->w.y      = info->y;
-      wp->w.width  = wp->skin_rect.width / 3;
-      wp->w.height = wp->skin_rect.height;
+      wp->w.width  = wp->skin.width / 3;
+      wp->w.height = wp->skin.height;
       wp->w.visible = info->visibility ? 1 : -1;
       wp->w.enable = info->enability;
+      xitk_image_free_image (&wp->temp_image.image);
+      xitk_shared_image (wp->w.wl, "xitk_lbutton_temp", wp->skin.width / 3, wp->skin.height, &wp->temp_image.image);
+      wp->temp_image.x = 0;
+      wp->temp_image.y = 0;
+      wp->temp_image.width = wp->skin.width / 3;
+      wp->temp_image.height = wp->skin.height;
     }
     xitk_skin_unlock (skonfig);
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
@@ -675,12 +673,15 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->label_static      = info->label_staticity;
 
   wp->skin              = info->pixmap_img;
-  wp->skin_rect         = info->pixmap_rect;
-  if (((wp->skin_rect.width <= 0) || (wp->skin_rect.height <= 0)) && wp->skin) {
-    wp->skin_rect.width = wp->skin->width;
-    wp->skin_rect.height = wp->skin->height;
+  if (((wp->skin.width <= 0) || (wp->skin.height <= 0)) && wp->skin.image) {
+    wp->skin.width = wp->skin.image->width;
+    wp->skin.height = wp->skin.image->height;
   }
-  xitk_shared_image (wl, "xitk_lbutton_temp", wp->skin_rect.width / 3, wp->skin_rect.height, &wp->temp_image);
+  xitk_shared_image (wl, "xitk_lbutton_temp", wp->skin.width / 3, wp->skin.height, &wp->temp_image.image);
+  wp->temp_image.x = 0;
+  wp->temp_image.y = 0;
+  wp->temp_image.width = wp->skin.width / 3;
+  wp->temp_image.height = wp->skin.height;
 
   if (info->pixmap_name && (info->pixmap_name[0] == '\x01') && (info->pixmap_name[1] == 0)) {
     wp->skin_element_name[0] = '\x01';
@@ -695,8 +696,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
 
   wp->label_offset      = 0;
   wp->align             = info->label_alignment;
-  wp->label_dy          = (info->label_y > 0) && (info->label_y < wp->skin_rect.height)
-                        ? info->label_y - (wp->skin_rect.height >> 1) : 0;
+  wp->label_dy          = (info->label_y > 0) && (info->label_y < wp->skin.height)
+                        ? info->label_y - (wp->skin.height >> 1) : 0;
 
   wp->w.private_data    = wp;
 
@@ -708,8 +709,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.x               = info->x;
   wp->w.y               = info->y;
-  wp->w.width           = wp->skin_rect.width / 3;
-  wp->w.height          = wp->skin_rect.height;
+  wp->w.width           = wp->skin.width / 3;
+  wp->w.height          = wp->skin.height;
   wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
@@ -771,16 +772,15 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   info.label_fontname    = (char *)fname;
   info.pixmap_name       = (char *)"\x01";
   if (b->button_type == TAB_BUTTON) {
-    if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &info.pixmap_img) == 1)
-      draw_tab (info.pixmap_img);
+    if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &info.pixmap_img.image) == 1)
+      draw_tab (info.pixmap_img.image);
   } else {
-    if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img) == 1)
-      draw_bevel_three_state (info.pixmap_img);
+    if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img.image) == 1)
+      draw_bevel_three_state (info.pixmap_img.image);
   }
-  info.pixmap_rect.x     = 0;
-  info.pixmap_rect.y     = 0;
-  info.pixmap_rect.width = 0;
-  info.pixmap_rect.height = 0;
+  info.pixmap_img.x     = 0;
+  info.pixmap_img.y     = 0;
+  info.pixmap_img.width = 0;
+  info.pixmap_img.height = 0;
   return xitk_info_labelbutton_create (wl, b, &info);
 }
-

@@ -34,8 +34,7 @@ typedef struct {
   int                    cClicked;
   int                    focus;
   int                    cState;
-  xitk_image_t          *skin;
-  xitk_rect_t            skin_rect;
+  xitk_part_image_t      skin;
 
   xitk_state_callback_t  callback;
   void                  *userdata;
@@ -47,7 +46,7 @@ typedef struct {
  */
 static void _notify_destroy (_checkbox_private_t *wp) {
   if (!wp->skin_element_name)
-    xitk_image_free_image (&wp->skin);
+    xitk_image_free_image (&wp->skin.image);
   XITK_FREE (wp->skin_element_name);
 }
 
@@ -55,8 +54,8 @@ static void _notify_destroy (_checkbox_private_t *wp) {
  *
  */
 static xitk_image_t *_get_skin (_checkbox_private_t *wp, int sk) {
-  if ((sk == FOREGROUND_SKIN) && wp->skin) {
-    return wp->skin;
+  if ((sk == FOREGROUND_SKIN) && wp->skin.image) {
+    return wp->skin.image;
   }
   return NULL;
 }
@@ -66,10 +65,10 @@ static xitk_image_t *_get_skin (_checkbox_private_t *wp, int sk) {
  */
 static int _notify_inside (_checkbox_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
-    xitk_image_t *skin = wp->skin;
+    xitk_image_t *skin = wp->skin.image;
       
     if(skin->mask)
-      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin_rect.x, y + wp->skin_rect.y);
+      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
   } else
     return 0;
   return 1;
@@ -80,25 +79,12 @@ static int _notify_inside (_checkbox_private_t *wp, int x, int y) {
  */
 static void _paint_checkbox (_checkbox_private_t *wp) {
   if (wp->w.visible == 1) {
-    int checkbox_width = wp->skin_rect.width / 3;
-
-    if ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)) {
-      if (wp->cClicked || wp->cState) { // focused, clicked or checked
-        xitk_image_draw_image (wp->w.wl, wp->skin,
-          wp->skin_rect.x + 2 * checkbox_width, wp->skin_rect.y, checkbox_width, wp->skin_rect.height, wp->w.x, wp->w.y);
-      } else { // focused, unchecked
-        xitk_image_draw_image (wp->w.wl, wp->skin,
-          wp->skin_rect.x + 1 * checkbox_width, wp->skin_rect.y, checkbox_width, wp->skin_rect.height, wp->w.x, wp->w.y);
-      }
-    } else {
-      if (wp->cState) { // unfocused, checked
-        xitk_image_draw_image (wp->w.wl, wp->skin,
-          wp->skin_rect.x + 2 * checkbox_width, wp->skin_rect.y, checkbox_width, wp->skin_rect.height, wp->w.x, wp->w.y);
-      } else { // unfocused, unchecked
-        xitk_image_draw_image (wp->w.wl, wp->skin,
-          wp->skin_rect.x + 0 * checkbox_width, wp->skin_rect.y, checkbox_width, wp->skin_rect.height, wp->w.x, wp->w.y);
-      }
-    }
+    int checkbox_width = wp->skin.width / 3;
+    int mode = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
+             ? (wp->cClicked || wp->cState ? 2 /* focused, clicked or checked */ : 1 /* focused, unchecked */)
+             : (wp->cState ? 2 /* unfocused, checked */ : 0 /* unfocused, unchecked */);
+    xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
+      mode * checkbox_width, 0, checkbox_width, wp->skin.height, wp->w.x, wp->w.y);
   }
 }
 
@@ -137,11 +123,11 @@ static int _notify_focus_checkbox (_checkbox_private_t *wp, int focus) {
 static void _notify_change_skin (_checkbox_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     xitk_skin_lock(skonfig);
-    wp->skin = xitk_skin_get_part_image (skonfig, &wp->skin_rect, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
+    xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
     wp->w.x        = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
     wp->w.y        = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-    wp->w.width    = wp->skin_rect.width / 3;
-    wp->w.height   = wp->skin_rect.height;
+    wp->w.width    = wp->skin.width / 3;
+    wp->w.height   = wp->skin.height;
     wp->w.visible  = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1: -1;
     wp->w.enable   = xitk_skin_get_enability (skonfig, wp->skin_element_name);
     xitk_skin_unlock(skonfig);
@@ -251,8 +237,8 @@ static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_check
 
   wp->w.private_data  = wp;
 
-  wp->w.width    = wp->skin_rect.width / 3;
-  wp->w.height   = wp->skin_rect.height;
+  wp->w.width    = wp->skin.width / 3;
+  wp->w.height   = wp->skin.height;
 
   wp->w.running       = 1;
   wp->w.have_focus    = FOCUS_LOST;
@@ -279,7 +265,7 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
 
   wp->w.wl       = wl;
   wp->skin_element_name = cb->skin_element_name == NULL ? NULL : strdup (cb->skin_element_name);
-  wp->skin = xitk_skin_get_part_image (skonfig, &wp->skin_rect, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
+  xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
   wp->w.x        = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
   wp->w.y        = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
   wp->w.visible  = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1: -1;
@@ -361,11 +347,11 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
 
   wp->w.wl       = wl;
   wp->skin_element_name = NULL;
-  wp->skin       = i;
-  wp->skin_rect.x        = 0;
-  wp->skin_rect.y        = 0;
-  wp->skin_rect.width    = i->width;
-  wp->skin_rect.height   = i->height;
+  wp->skin.image = i;
+  wp->skin.x        = 0;
+  wp->skin.y        = 0;
+  wp->skin.width    = i->width;
+  wp->skin.height   = i->height;
   wp->w.x        = x;
   wp->w.y        = y;
   wp->w.visible  = 0;

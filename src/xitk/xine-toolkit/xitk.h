@@ -183,12 +183,16 @@ typedef struct {
 } window_info_t;
 
 typedef struct {
+  xitk_image_t *image;
+  int x, y, width, height;
+} xitk_part_image_t;
+
+typedef struct {
   /* all */
   int x, y;
   int visibility, enability;
   char *pixmap_name;
-  xitk_image_t *pixmap_img;
-  xitk_rect_t pixmap_rect;
+  xitk_part_image_t pixmap_img;
   /* button list */
   int max_buttons, direction;
   /* browser */
@@ -201,12 +205,10 @@ typedef struct {
   char *label_pixmap_font_name;
   char *label_pixmap_font_format;
   xitk_image_t *label_pixmap_font_img;
-  xitk_rect_t pixmap_font_rect;
   /* slider */
   int slider_type, slider_radius;
   char *slider_pixmap_pad_name;
-  xitk_image_t *slider_pixmap_pad_img;
-  xitk_rect_t slider_pixmap_pad_rect;
+  xitk_part_image_t slider_pixmap_pad_img;
 } xitk_skin_element_info_t;
 
 /*
@@ -1670,7 +1672,7 @@ int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
  *
  */
 xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *, const char *);
-xitk_image_t *xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_rect_t *rect, const char *str);
+void xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *str);
 
 /*
  *
@@ -1958,9 +1960,10 @@ xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
 xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height);
 
 void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
-void xitk_image_draw_skin (xitk_widget_list_t *wl, xitk_image_t *skin, xitk_rect_t *rect, xitk_image_t *image,
+void xitk_part_image_draw (xitk_widget_list_t *wl, xitk_part_image_t *origin, xitk_part_image_t *copy,
   int src_x, int src_y, int width, int height, int dst_x, int dst_y);
-void xitk_image_copy_skin (xitk_widget_list_t *wl, xitk_image_t *skin, xitk_rect_t *rect, xitk_image_t *dest);
+void xitk_part_image_copy (xitk_widget_list_t *wl, xitk_part_image_t *from, xitk_part_image_t *to,
+  int src_x, int src_y, int width, int height, int dst_x, int dst_y);
 
 /**
  * Free an image object.
