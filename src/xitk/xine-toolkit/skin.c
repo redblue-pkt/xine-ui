@@ -51,19 +51,17 @@ static int xitk_simg_cmp (void *a, void *b) {
 /*
  *
  */
-static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, xitk_rect_t *rect, const char *pixmap, const char *format) {
+static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *pixmap, const char *format) {
   char b[1024];
   const char *name, *part;
-  xitk_image_t *image;
 
-  if (!skonfig || !pixmap)
-    return NULL;
+  if (!skonfig || !image || !pixmap)
+    return;
 
-  if (rect)
-    rect->x = rect->y = rect->width = rect->height = 0;
+  image->x = image->y = image->width = image->height = 0;
 
   part = strchr (pixmap, '|');
-  if (part && rect) {
+  if (part) {
     uint32_t v;
     uint8_t z;
     const uint8_t *p = (const uint8_t *)part + 1;
@@ -77,30 +75,30 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, xitk_rect_t *re
     v = 0;
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
-    rect->x = v;
+    image->x = v;
     if (*p == ',')
       p++;
     v = 0;
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
-    rect->y = v;
+    image->y = v;
     if (*p == ',')
       p++;
     v = 0;
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
-    rect->width = v;
+    image->width = v;
     v = 0;
     if (*p == ',')
       p++;
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
-    rect->height = v;
+    image->height = v;
   } else {
     name = pixmap;
   }
 
-  image = NULL;
+  image->image = NULL;
   {
     xitk_skin_img_t here;
     int pos;
@@ -110,16 +108,16 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, xitk_rect_t *re
       xitk_skin_img_t *si = xine_sarray_get (skonfig->imgs, pos);
       if (format && !si->image->pix_font)
         xitk_image_set_pix_font (si->image, format);
-      image = si->image;
+      image->image = si->image;
     }
   }
 
-  if (!image) {
+  if (!image->image) {
     xitk_skin_img_t *nimg;
     size_t nlen = strlen (name) + 1;
     char *nmem = malloc (sizeof (*nimg) + nlen);
     if (!nmem)
-      return NULL;
+      return;
     nimg = (xitk_skin_img_t *)nmem;
     nmem += sizeof (*nimg);
     memcpy (nmem, name, nlen);
@@ -127,25 +125,22 @@ static xitk_image_t *skin_load_img (xitk_skin_config_t *skonfig, xitk_rect_t *re
     nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
     if (!nimg->image) {
       free (nimg);
-      return NULL;
+      return;
     }
     if (format)
       xitk_image_set_pix_font (nimg->image, format);
     xine_sarray_add (skonfig->imgs, nimg);
-    image = nimg->image;
+    image->image = nimg->image;
   }
 
-  if (rect) {
-    if (rect->x < 0)
-      rect->x = 0;
-    if (rect->y < 0)
-      rect->x = 0;
-    if (rect->width <= 0)
-      rect->width = image->width;
-    if (rect->height <= 0)
-      rect->height = image->height;
-  }
-  return image;
+  if (image->x < 0)
+    image->x = 0;
+  if (image->y < 0)
+    image->x = 0;
+  if (image->width <= 0)
+    image->width = image->image->width;
+  if (image->height <= 0)
+    image->height = image->image->height;
 }
 
 static void skin_free_imgs (xitk_skin_config_t *skonfig) {
@@ -304,9 +299,9 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 static void _nullify_me(xitk_skin_element_t *s) {
   s->section[0]                  = 0;
   s->info.pixmap_name            = NULL;
-  s->info.pixmap_img             = NULL;
+  s->info.pixmap_img.image       = NULL;
   s->info.slider_pixmap_pad_name = NULL;
-  s->info.slider_pixmap_pad_img  = NULL;
+  s->info.slider_pixmap_pad_img.image = NULL;
   s->info.label_pixmap_font_name = NULL;
   s->info.label_pixmap_font_img  = NULL;
   s->info.label_color            = NULL;
@@ -538,8 +533,8 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.slider_pixmap_pad_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	  sprintf (skonfig->celement->info.slider_pixmap_pad_name, "%s/%s", skonfig->path, p);
-          skonfig->celement->info.slider_pixmap_pad_img = skin_load_img (skonfig,
-            &skonfig->celement->info.slider_pixmap_pad_rect, skonfig->celement->info.slider_pixmap_pad_name, NULL);
+          _skin_load_img (skonfig, &skonfig->celement->info.slider_pixmap_pad_img,
+            skonfig->celement->info.slider_pixmap_pad_name, NULL);
 	}
 	else if(!strncasecmp(skonfig->ln, "radius", 6)) {
 	  skin_set_pos_to_value(&p);
@@ -594,20 +589,25 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
           if (!skonfig->celement->info.label_pixmap_font_format) {
             skonfig->celement->info.label_pixmap_font_format = strdup (p);
-            if (skonfig->celement->info.label_pixmap_font_name)
-              skonfig->celement->info.label_pixmap_font_img = skin_load_img (skonfig, NULL,
+            if (skonfig->celement->info.label_pixmap_font_name) {
+              xitk_part_image_t image;
+              _skin_load_img (skonfig, &image,
                 skonfig->celement->info.label_pixmap_font_name,
                 skonfig->celement->info.label_pixmap_font_format);
+              skonfig->celement->info.label_pixmap_font_img = image.image;
+            }
           }
         }
 	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_pixmap_font_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
           if (skonfig->celement->info.label_pixmap_font_name) {
+            xitk_part_image_t image;
             sprintf (skonfig->celement->info.label_pixmap_font_name, "%s/%s", skonfig->path, p);
-            skonfig->celement->info.label_pixmap_font_img = skin_load_img (skonfig, NULL,
+            _skin_load_img (skonfig, &image,
               skonfig->celement->info.label_pixmap_font_name,
               skonfig->celement->info.label_pixmap_font_format);
+            skonfig->celement->info.label_pixmap_font_img = image.image;
           }
         }
 	else if(!strncasecmp(skonfig->ln, "static", 6)) {
@@ -710,8 +710,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	      skin_set_pos_to_value(&p);
 	      s->info.pixmap_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	      sprintf (s->info.pixmap_name, "%s/%s", skonfig->path, p);
-              s->info.pixmap_img = skin_load_img (skonfig,
-                &s->info.pixmap_rect, s->info.pixmap_name, NULL);
+              _skin_load_img (skonfig, &s->info.pixmap_img, s->info.pixmap_name, NULL);
 	    }
 	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
 	      skin_set_pos_to_value(&p);
@@ -1327,13 +1326,16 @@ int xitk_skin_get_browser_entries(xitk_skin_config_t *skonfig, const char *str) 
  *
  */
 xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_part_image_t image;
+
   ABORT_IF_NULL(skonfig);
-  return skin_load_img (skonfig, NULL, str, NULL);
+  _skin_load_img (skonfig, &image, str, NULL);
+  return image.image;
 }
 
-xitk_image_t *xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_rect_t *rect, const char *str) {
+void xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *str) {
   ABORT_IF_NULL(skonfig);
-  return skin_load_img (skonfig, rect, str, NULL);
+  return _skin_load_img (skonfig, image, str, NULL);
 }
 
 int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {

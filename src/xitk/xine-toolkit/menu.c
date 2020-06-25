@@ -849,7 +849,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   info.visibility        = 0;
   info.enability         = 0;
   info.pixmap_name       = NULL;
-  info.pixmap_img        = menu_window->bevel_plain;
+  info.pixmap_img.image  = menu_window->bevel_plain;
   info.label_alignment   = ALIGN_LEFT;
   info.label_printable   = 1;
   info.label_staticity   = 0;
@@ -928,11 +928,11 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
       info.y = yy;
       if (_menu_is_branch (me->menu_entry)) {
-        info.pixmap_img = menu_window->bevel_arrow;
+        info.pixmap_img.image = menu_window->bevel_arrow;
       } else if (_menu_is_check (me->menu_entry)) {
-        info.pixmap_img = _menu_is_checked (me->menu_entry) ? menu_window->bevel_checked : menu_window->bevel_unchecked;
+        info.pixmap_img.image = _menu_is_checked (me->menu_entry) ? menu_window->bevel_checked : menu_window->bevel_unchecked;
       } else {
-        info.pixmap_img = menu_window->bevel_plain;
+        info.pixmap_img.image = menu_window->bevel_plain;
       }
 
       btn = xitk_info_labelbutton_create (&menu_window->wl, &lb, &info);
