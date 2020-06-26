@@ -54,6 +54,7 @@ static int xitk_simg_cmp (void *a, void *b) {
 static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *pixmap, const char *format) {
   char b[1024];
   const char *name, *part;
+  int try;
 
   if (!skonfig || !image || !pixmap)
     return;
@@ -66,11 +67,11 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
     uint8_t z;
     const uint8_t *p = (const uint8_t *)part + 1;
 
-    if (part > pixmap + sizeof (b) - 1)
-      part = pixmap + sizeof (b) - 1;
-    memcpy (b, pixmap, part - pixmap);
-    b[part - pixmap] = 0;
-    name = b;
+    if (part > pixmap + sizeof (b) - 2 - 1)
+      part = pixmap + sizeof (b) - 2 - 1;
+    memcpy (b + 2, pixmap, part - pixmap);
+    b[2 + part - pixmap] = 0;
+    name = b + 2;
 
     v = 0;
     while ((z = *p ^ '0') < 10)
@@ -99,38 +100,59 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
   }
 
   image->image = NULL;
-  {
-    xitk_skin_img_t here;
-    int pos;
-    here.name = name;
-    pos = xine_sarray_binary_search (skonfig->imgs, &here);
-    if (pos >= 0) {
-      xitk_skin_img_t *si = xine_sarray_get (skonfig->imgs, pos);
-      if (format && !si->image->pix_font)
-        xitk_image_set_pix_font (si->image, format);
-      image->image = si->image;
+  for (try = 2; try > 0; try--) {
+    /* already loaded? */
+    {
+      xitk_skin_img_t here;
+      int pos;
+      here.name = name;
+      pos = xine_sarray_binary_search (skonfig->imgs, &here);
+      if (pos >= 0) {
+        xitk_skin_img_t *si = xine_sarray_get (skonfig->imgs, pos);
+        if (format && !si->image->pix_font)
+          xitk_image_set_pix_font (si->image, format);
+        image->image = si->image;
+        break;
+      }
     }
-  }
-
-  if (!image->image) {
-    xitk_skin_img_t *nimg;
-    size_t nlen = strlen (name) + 1;
-    char *nmem = malloc (sizeof (*nimg) + nlen);
-    if (!nmem)
-      return;
-    nimg = (xitk_skin_img_t *)nmem;
-    nmem += sizeof (*nimg);
-    memcpy (nmem, name, nlen);
-    nimg->name = nmem;
-    nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
-    if (!nimg->image) {
+    /* load now */
+    {
+      xitk_skin_img_t *nimg;
+      size_t nlen = strlen (name) + 1;
+      char *nmem = malloc (sizeof (*nimg) + nlen);
+      if (!nmem)
+        return;
+      nimg = (xitk_skin_img_t *)nmem;
+      nmem += sizeof (*nimg);
+      memcpy (nmem, name, nlen);
+      nimg->name = nmem;
+      nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
+      if (nimg->image) {
+        if (format)
+          xitk_image_set_pix_font (nimg->image, format);
+        xine_sarray_add (skonfig->imgs, nimg);
+        image->image = nimg->image;
+        break;
+      }
       free (nimg);
-      return;
+      if (try < 2)
+        return;
+      /* try fallback texture */
+      memcpy (b, "//", 2);
+      if (nlen > sizeof (b) - 2 - 12)
+        nlen = sizeof (b) - 2 - 12;
+      if (name != b + 2) {
+        memcpy (b + 2, name, nlen);
+        name = b + 2;
+      }
+      while (b[1 + (--nlen)] != '/') ;
+      while (b[1 + (--nlen)] != '/') ;
+      memcpy (b + 2 + nlen, "missing.png", 12);
+      image->x = 0;
+      image->y = 0;
+      image->width = 0;
+      image->height = 0;
     }
-    if (format)
-      xitk_image_set_pix_font (nimg->image, format);
-    xine_sarray_add (skonfig->imgs, nimg);
-    image->image = nimg->image;
   }
 
   if (image->x < 0)
@@ -141,6 +163,13 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
     image->width = image->image->width;
   if (image->height <= 0)
     image->height = image->image->height;
+  if  ((image->x + image->width > image->image->width)
+    || (image->y + image->height > image->image->height)) {
+    image->x = 0;
+    image->x = 0;
+    image->width = image->image->width;
+    image->height = image->image->height;
+  }
 }
 
 static void skin_free_imgs (xitk_skin_config_t *skonfig) {
