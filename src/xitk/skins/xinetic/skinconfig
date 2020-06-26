@@ -306,7 +306,7 @@ skin.PlAdd {
 	  x = 333
 	  y = 150
 	}
-	pixmap = Onglet.png
+	pixmap = PlBits2.png|0,150,159,16
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -320,7 +320,7 @@ skin.PlLoad {
 	  x = 333
 	  y = 167
 	}
-	pixmap = Onglet.png
+	pixmap = PlBits2.png|0,150,159,16
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -334,7 +334,7 @@ skin.PlSave {
 	  x = 333
 	  y = 184
 	}
-	pixmap = Onglet.png
+	pixmap = PlBits2.png|0,150,159,16
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -366,7 +366,7 @@ skin.PlPlay {
 	  x = 15
 	  y = 218
 	}
-	pixmap = PlBits2.png|0,0,159,28
+	pixmap = PlBits2.png|0,0,159,29
 }
 
 skin.PlDelete {
@@ -374,7 +374,7 @@ skin.PlDelete {
 	  x = 69
 	  y = 218
 	}
-	pixmap = PlBits2.png|0,116,159,28
+	pixmap = PlBits2.png|0,120,159,29
 }
 
 skin.PlDeleteAll {
@@ -382,7 +382,7 @@ skin.PlDeleteAll {
 	  x = 123
 	  y = 218
 	}
-	pixmap = PlBits2.png|0,87,159,28
+	pixmap = PlBits2.png|0,90,159,29
 }
 
 skin.PlMoveUp {
@@ -390,7 +390,7 @@ skin.PlMoveUp {
 	  x = 177
 	  y = 218
 	}
-	pixmap = PlBits2.png|0,29,159,28
+	pixmap = PlBits2.png|0,30,159,29
 }
 
 skin.PlMoveDn {
@@ -398,20 +398,21 @@ skin.PlMoveDn {
 	  x = 231
 	  y = 218
 	}
-	pixmap = PlBits2.png|0,58,159,28
+	pixmap = PlBits2.png|0,60,159,29
 }
 
 skin.PlDismiss {
 	coords {
 	  x = 333
-	  y = 207
+	  y = 218
 	}
-	pixmap = PlDismiss.png
+	pixmap = PlBits2.png|0,150,159,29
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
 	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
 	}
 }
 
@@ -490,7 +491,7 @@ skin.AutoPlayBG {
 	  x = 333
 	  y = 42
 	}
-	pixmap =  Onglet.png
+	pixmap = PlBits2.png|0,150,159,16
 	direction = down
 	label {
 	  color = #9fa4ad
@@ -781,14 +782,15 @@ skin.CtlSkItemBtn {
 skin.CtlDismiss {
 	coords {
 	  x = 465
-	  y = 182
+	  y = 195
 	}
-	pixmap = CtlDismiss.png
+	pixmap = PlBits2.png|0,150,159,29
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
 	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
 	}
 }
 
@@ -822,14 +824,15 @@ skin.MrlItemBtn {
 skin.MrlSelect {
 	coords {
 	  x = 69
-	  y = 202
+	  y = 213
 	}
-	pixmap = MrlSelect.png
+	pixmap = PlBits2.png|0,150,159,29
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
 	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
 	}
 }
 
@@ -838,20 +841,21 @@ skin.MrlPlay {
 	  x = 15
 	  y = 213
 	}
-	pixmap = PlBits2.png|0,0,159,28
+	pixmap = PlBits2.png|0,0,159,29
 }
 
 skin.MrlDismiss {
 	coords {
 	  x = 333
-	  y = 202
+	  y = 213
 	}
-	pixmap = MrlDismiss.png
+	pixmap = PlBits2.png|0,150,159,29
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
 	  font = *-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*
+	  y = 8
 	}
 }
 
@@ -929,7 +933,7 @@ skin.MrlPlugNameBG {
 	  x = 333
 	  y = 42
 	}
-	pixmap = Onglet.png
+	pixmap = PlBits2.png|0,150,159,16
 	direction = down
 	label {
 	  color = #9fa4ad

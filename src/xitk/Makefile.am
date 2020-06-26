@@ -170,7 +170,6 @@ skinsdir = $(datadir)/xine/skins/xinetic
 xinetic_dir = skins/xinetic
 skins_DATA = \
 	$(xinetic_dir)/CtlBg.png \
-	$(xinetic_dir)/CtlDismiss.png \
 	$(xinetic_dir)/CtlDummy.png \
 	$(xinetic_dir)/CtlReset.png \
 	$(xinetic_dir)/CtlSave.png \
@@ -180,13 +179,9 @@ skins_DATA = \
 	$(xinetic_dir)/MainBits1.png \
 	$(xinetic_dir)/MainBits2.png \
 	$(xinetic_dir)/MrlBg.png \
-	$(xinetic_dir)/MrlDismiss.png \
 	$(xinetic_dir)/MrlFlit.png \
-	$(xinetic_dir)/MrlSelect.png \
-	$(xinetic_dir)/Onglet.png \
 	$(xinetic_dir)/PlBg.png \
 	$(xinetic_dir)/PlBits2.png \
-	$(xinetic_dir)/PlDismiss.png \
 	$(xinetic_dir)/PlInputTxt.png \
 	$(xinetic_dir)/PlItemBtn.png \
 	$(xinetic_dir)/PlSlidHBg.png \
