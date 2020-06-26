@@ -28,6 +28,7 @@ kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
 
 EXTRA_DIST = \
 	$(skins_DATA) \
+	$(skin1_DATA) \
 	$(oxine_DATA)
 
 libImlib_light_a_CFLAGS = $(X_CFLAGS) $(LIBPNG_CFLAGS) $(JPEG_CFLAGS)
@@ -165,10 +166,12 @@ noinst_HEADERS = \
 	videowin.h \
 	viewlog.h
 
-skinsdir = $(datadir)/xine/skins/xinetic
+skinsdir = $(datadir)/xine/skins
+skins_DATA = skins/missing.png
 
+skin1dir = $(datadir)/xine/skins/xinetic
 xinetic_dir = skins/xinetic
-skins_DATA = \
+skin1_DATA = \
 	$(xinetic_dir)/CtlBg.png \
 	$(xinetic_dir)/CtlDummy.png \
 	$(xinetic_dir)/CtlReset.png \
