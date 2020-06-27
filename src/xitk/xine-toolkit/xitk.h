@@ -2090,6 +2090,7 @@ Window xitk_window_get_window(xitk_window_t *w);
 /*
  *
  */
+void xitk_window_set_input_focus(xitk_window_t *w);
 void xitk_window_try_to_set_input_focus(xitk_window_t *w);
 
 
@@ -2158,6 +2159,9 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
 void xitk_window_show_window(xitk_window_t *w, int raise);
 void xitk_window_raise_window(xitk_window_t *w);
 void xitk_window_hide_window(xitk_window_t *w);
+
+void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
+void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin);
 
 /*
  *

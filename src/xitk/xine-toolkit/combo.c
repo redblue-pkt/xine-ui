@@ -28,6 +28,7 @@
 #include <stdio.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 typedef struct {
   xitk_widget_t           w;
@@ -170,7 +171,6 @@ static void combo_select (xitk_widget_t *w, void *data, int selected, int modifi
 }
 
 static void _combo_open (_combo_private_t *wp) {
-  Window win;
   unsigned int itemw, itemh, slidw;
 
   if (wp->xwin)
@@ -187,11 +187,8 @@ static void _combo_open (_combo_private_t *wp) {
     NULL, "Xitk Combo", "Xitk", 1, 0, NULL);
   if (!wp->xwin)
     return;
-  win = xitk_window_get_window (wp->xwin);
 
-  XLOCK (wp->w.wl->imlibdata->x.x_lock_display, wp->w.wl->imlibdata->x.disp);
-  XSetTransientForHint (wp->w.wl->imlibdata->x.disp, win, wp->parent_wlist->win);
-  XUNLOCK (wp->w.wl->imlibdata->x.x_unlock_display, wp->w.wl->imlibdata->x.disp);
+  xitk_window_set_transient_for(wp->xwin, wp->parent_wlist->win);
 
   wp->widget_list        = xitk_window_widget_list(wp->xwin);
 
