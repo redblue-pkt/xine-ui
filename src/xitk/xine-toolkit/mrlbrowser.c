@@ -66,9 +66,6 @@ static const struct {
   { NULL                  , NULL           }
 };
 
-extern void gui_handle_event(XEvent *event, void *data);
-extern void *gGui;
-
 /*
  *
  */
@@ -818,54 +815,45 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
 /*
  * Handle here mrlbrowser events.
  */
-static void mrlbrowser_handle_event(XEvent *event, void *data) {
+static void _mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
-  
-  switch(event->type) {
 
-  case KeyPress: {
-    KeySym         mkey;
-    int            modifier;
+  if (ke->event != XITK_KEY_PRESS)
+    return;
 
-    xitk_get_key_modifier(event, &modifier);
-    mkey = xitk_get_key_pressed(event);
-    
-    switch (mkey) {
+  switch (ke->key_pressed) {
 
-    case XK_d: 
+    case XK_d:
     case XK_D:
 #ifdef DEBUG_MRLB
       /* This is for debugging purpose */
-      if(modifier & MODIFIER_CTRL)
-	mrlbrowser_dumpmrl(NULL, (void *)private_data);
+      if (ke->modifiers & MODIFIER_CTRL)
+        mrlbrowser_dumpmrl(NULL, (void *)private_data);
 #endif
       break;
 
     case XK_s:
     case XK_S:
-      if(modifier & MODIFIER_CTRL)
-	mrlbrowser_select(NULL, (void *)private_data);
+      if (ke->modifiers & MODIFIER_CTRL)
+        mrlbrowser_select(NULL, (void *)private_data);
       break;
 
     case XK_Return: {
       int selected;
-      
-      if((selected = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)
-	mrlbrowser_select_mrl(private_data, selected, 0, 1);
+
+      if ((selected = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)
+        mrlbrowser_select_mrl(private_data, selected, 0, 1);
     }
     break;
 
     case XK_Escape:
       xitk_mrlbrowser_exit(NULL, (void *)private_data->fbWidget);
       break;
-      
-    default:
-      gui_handle_event (event, gGui);
-      break;
-    }
-  }
-  break;
 
+    default:
+      if (private_data->key_cb)
+        private_data->key_cb(private_data->key_cb_data, ke);
+      break;
   }
 }
 
@@ -915,6 +903,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   private_data->xine              = mb->xine;
   private_data->running           = 1;
+
+  private_data->key_cb            = mb->key_cb;
+  private_data->key_cb_data       = mb->key_cb_data;
 
   bg_image = xitk_image_load_image(xitk,
      xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
@@ -1068,13 +1059,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   xitk_window_show_window(private_data->xwin, 1);
 
-  private_data->widget_key = 
-    xitk_register_event_handler("mrl browser",
-                                private_data->xwin,
-				mrlbrowser_handle_event,
-				NULL,
-				mb->dndcallback,
-				private_data->widget_list,(void *) private_data);
+  private_data->mrlbrowser_event_cbs.dnd_cb = mb->dndcallback;
+  private_data->mrlbrowser_event_cbs.key_cb  = _mrlbrowser_handle_key_event;
+
+  private_data->widget_key =
+    xitk_window_register_event_handler("mrl browser", private_data->xwin, &private_data->mrlbrowser_event_cbs, private_data);
 
   xitk_window_try_to_set_input_focus(private_data->xwin);
 

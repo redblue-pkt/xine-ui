@@ -367,47 +367,6 @@ static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
   return 1;
 }
 
-/*
- * Extract modifier keys.
- */
-int xitk_get_key_modifier(XEvent *xev, int *modifier) {
-  unsigned int state = 0;
-
-  *modifier = MODIFIER_NOMOD;
-
-  if(!xev)
-    return 0;
-
-  if((xev->type == ButtonPress) || (xev->type == ButtonRelease))
-    state = xev->xbutton.state;
-  else if ((xev->type == KeyPress) || (xev->type == KeyRelease))
-    state = xev->xkey.state;
-  else
-    state = xev->xkey.state;
-
-  if(state & XK_Multi_key)
-    state = (state | XK_Multi_key) & 0xFF;
-  
-  if(state & ShiftMask)
-    *modifier |= MODIFIER_SHIFT;
-  if(state & LockMask)
-    *modifier |= MODIFIER_LOCK;
-  if(state & ControlMask)
-    *modifier |= MODIFIER_CTRL;
-  if(state & Mod1Mask)
-    *modifier |= MODIFIER_META;
-  if(state & Mod2Mask)
-    *modifier |= MODIFIER_NUML;
-  if(state & Mod3Mask)
-    *modifier |= MODIFIER_MOD3;
-  if(state & Mod4Mask)
-    *modifier |= MODIFIER_MOD4;
-  if(state & Mod5Mask)
-    *modifier |= MODIFIER_MOD5;
-  
-  return (*modifier != MODIFIER_NOMOD);
-}
-
 int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen) {
   int len = 0;
   if(event) {

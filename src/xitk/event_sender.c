@@ -28,7 +28,6 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include <xine.h>
@@ -150,100 +149,91 @@ static void event_sender_send2 (xitk_widget_t *w, void *data) {
 
 static void event_sender_exit(xitk_widget_t *, void *);
 
-static void event_sender_handle_event(XEvent *event, void *data) {
-  xine_event_t  xine_event;
+static void event_sender_handle_button_event(void *data, const xitk_button_event_t *be) {
 
-  switch(event->type) {
-
-  case ButtonRelease:
+  if (be->event == XITK_BUTTON_RELEASE) {
     /*
      * If we tried to move sticky window, move it back to stored position.
      */
     if(eventer && gGui->eventer_sticky) {
       if (panel_is_visible (gGui->panel)) {
-	int  x, y;
+        int  x, y;
         xitk_window_get_window_position(eventer->xwin, &x, &y, NULL, NULL);
-	if((x != eventer->x) || (y != eventer->y))
+        if ((x != eventer->x) || (y != eventer->y))
           xitk_window_move_window(eventer->xwin, eventer->x, eventer->y);
       }
     }
+  }
+}
+
+static void event_sender_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xine_event_t  xine_event;
+
+  if (ke->event != XITK_KEY_PRESS)
     return;
 
-  case KeyPress:
-    {
-      KeySym         key = XK_VoidSymbol;
-      char           kbuf[256];
+  switch (ke->key_pressed) {
+    case XK_Up:
+      xine_event.type = XINE_EVENT_INPUT_UP;
+      break;
+    case XK_Down:
+      xine_event.type = XINE_EVENT_INPUT_DOWN;
+      break;
+    case XK_Left:
+      xine_event.type = XINE_EVENT_INPUT_LEFT;
+      break;
+    case XK_Right:
+      xine_event.type = XINE_EVENT_INPUT_RIGHT;
+      break;
 
-      xitk_get_keysym_and_buf(event, &key, kbuf, sizeof(kbuf));
+    case XK_Return:
+    case XK_KP_Enter:
+    case XK_ISO_Enter:
+      xine_event.type = XINE_EVENT_INPUT_SELECT;
+      break;
 
-      switch(key) {
-      case XK_Up:
-        xine_event.type = XINE_EVENT_INPUT_UP;
-	break;
-      case XK_Down:
-        xine_event.type = XINE_EVENT_INPUT_DOWN;
-	break;
-      case XK_Left:
-        xine_event.type = XINE_EVENT_INPUT_LEFT;
-	break;
-      case XK_Right:
-        xine_event.type = XINE_EVENT_INPUT_RIGHT;
-	break;
+    case XK_0:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_0;
+      break;
+    case XK_1:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_1;
+      break;
+    case XK_2:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_2;
+      break;
+    case XK_3:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_3;
+      break;
+    case XK_4:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_4;
+      break;
+    case XK_5:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_5;
+      break;
+    case XK_6:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_6;
+      break;
+    case XK_7:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_7;
+      break;
+    case XK_8:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_8;
+      break;
+    case XK_9:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_9;
+      break;
 
-      case XK_Return:
-      case XK_KP_Enter:
-      case XK_ISO_Enter:
-        xine_event.type = XINE_EVENT_INPUT_SELECT;
-	break;
-	
-      case XK_0:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_0;
-	break;
-      case XK_1:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_1;
-	break;
-      case XK_2:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_2;
-	break;
-      case XK_3:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_3;
-	break;
-      case XK_4:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_4;
-	break;
-      case XK_5:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_5;
-	break;
-      case XK_6:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_6;
-	break;
-      case XK_7:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_7;
-	break;
-      case XK_8:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_8;
-	break;
-      case XK_9:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_9;
-	break;
+    case XK_plus:
+    case XK_KP_Add:
+      xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD;
+      break;
 
-      case XK_plus:
-      case XK_KP_Add:
-        xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD;
-	break;
-
-      case XK_Escape:
-	event_sender_exit(NULL, NULL);
-	return;
-
-      default:
-        gui_handle_event (event, gGui);
-	return;
-      }
-    }
-    break;
+    case XK_Escape:
+      event_sender_exit(NULL, NULL);
+      return;
 
     default:
+      gui_handle_key_event (gGui, ke);
       return;
   }
 
@@ -253,6 +243,13 @@ static void event_sender_handle_event(XEvent *event, void *data) {
   gettimeofday(&xine_event.tv, NULL);
   xine_event_send (gGui->stream, &xine_event);
 }
+
+static const xitk_event_cbs_t event_sender_event_cbs = {
+  .key_cb            = event_sender_handle_key_event,
+  .btn_cb            = event_sender_handle_button_event,
+
+  .pos_cb            = event_sender_store_new_position,
+};
 
 void event_sender_update_menu_buttons(void) {
 
@@ -583,14 +580,7 @@ void event_sender_panel(void) {
   xitk_enable_and_show_widget(w);
   event_sender_show_tips (panel_get_tips_enable (gGui->panel), panel_get_tips_timeout (gGui->panel));
 
-  eventer->widget_key = xitk_register_event_handler("eventer",
-                                                    eventer->xwin,
-						    event_sender_handle_event,
-						    event_sender_store_new_position,
-						    NULL,
-						    eventer->widget_list,
-						    NULL);
-  
+  eventer->widget_key = xitk_window_register_event_handler("eventer", eventer->xwin, &event_sender_event_cbs, eventer);
 
   eventer->visible = 1;
   eventer->running = 1;

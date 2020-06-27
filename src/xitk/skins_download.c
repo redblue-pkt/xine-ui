@@ -501,25 +501,29 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   download_skin_exit(w, skd);
 }
 
-static void download_skin_handle_event(XEvent *event, void *data) {
+static void download_skin_handle_expose_event(void *data, const xitk_expose_event_t *ee) {
   xui_skdloader_t *skd = data;
 
-  switch(event->type) {
+  if (ee->expose_count == 0)
+    download_update_preview(skd);
+}
 
-  case Expose:
-    if(event->xexpose.count == 0)
-      download_update_preview(skd);
-    break;
+static void download_skin_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_skdloader_t *skd = data;
 
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       download_skin_exit(NULL, skd);
     else
-      gui_handle_event (event, skd->gui);
-    break;
-
+      gui_handle_key_event (skd->gui, ke);
   }
 }
+
+static const xitk_event_cbs_t download_skin_event_cbs = {
+  .key_cb            = download_skin_handle_key_event,
+  .expose_notify_cb  = download_skin_handle_expose_event,
+};
+
 
 void download_skin_end(xui_skdloader_t *skd) {
   if (skd)
@@ -650,13 +654,7 @@ void download_skin(gGui_t *gui, char *url) {
     xitk_add_widget (skd->widget_list, widget);
     xitk_enable_and_show_widget(widget);
 
-    skd->widget_key = xitk_register_event_handler("skdloader",
-                                                  skd->xwin,
-                                                  download_skin_handle_event,
-                                                  NULL,
-                                                  NULL,
-                                                  skd->widget_list,
-                                                  skd);
+    skd->widget_key = xitk_window_register_event_handler("skdloader", skd->xwin, &download_skin_event_cbs, skd);
 
     xitk_window_show_window(skd->xwin, 1);
     video_window_set_transient_for (gui->vwin, skd->xwin);

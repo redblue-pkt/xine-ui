@@ -556,16 +556,6 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
 #endif
 }
 
-static void _menu_handle_xevents(XEvent *event, void *data) {
-  /*
-  menu_window_t *me = (menu_window_t *) data;
-  menu_private_data_t  *private_data = (menu_private_data_t *) me->widget->private_data;
-   
-  switch(event->type) {
-  }
-  */
-}
-
 static void __menu_find_branch_by_name(menu_node_t *mnode, menu_node_t **fnode, char *name) {
   menu_node_t *m = mnode;
   
@@ -942,13 +932,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   else
     xitk_window_set_transient_for_win(xwin, branch->prev->menu_window->xwin);
 
-  menu_window->key = xitk_register_event_handler("xitk menu",
-                                                 menu_window->xwin,
-						 _menu_handle_xevents,
-						 NULL,
-						 NULL,
-						 &(menu_window->wl),
-						 (void *) menu_window);
+  menu_window->key = xitk_register_event_handler_ext("xitk menu", menu_window->xwin, NULL, menu_window, &(menu_window->wl));
 
   xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);

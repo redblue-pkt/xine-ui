@@ -156,7 +156,10 @@ typedef struct {
   void                      *kill_userdata;
   xitk_simple_callback_t     ip_callback;
   void                      *ip_userdata;
+  xitk_key_event_callback_t  key_cb;
+  void                      *key_cb_data;
 
+  xitk_event_cbs_t           mrlbrowser_event_cbs;
 } mrlbrowser_private_data_t;
 
 #endif

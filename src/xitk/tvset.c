@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -192,18 +191,19 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     video_window_set_input_focus(gGui->vwin);
 }
 
-static void tvset_handle_event(XEvent *event, void *data) {
-  
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+static void tvset_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       tvset_exit(NULL, NULL);
     else
-      gui_handle_event (event, gGui);
-    break;
-  }  
+      gui_handle_key_event (gGui, ke);
+  }
 }
+
+static const xitk_event_cbs_t tvset_event_cbs = {
+  .key_cb            = tvset_handle_key_event,
+};
 
 int tvset_is_visible(void) {
   
@@ -477,14 +477,8 @@ void tvset_panel(void) {
 
   xitk_window_set_background(tvset.xwin, bg);
 
-  tvset.widget_key = xitk_register_event_handler("tvset",
-                                                 tvset.xwin,
-						  tvset_handle_event,
-						  NULL,
-						  NULL,
-						  tvset.widget_list,
-						  NULL);
-  
+  tvset.widget_key = xitk_window_register_event_handler("tvset", tvset.xwin, &tvset_event_cbs, &tvset);
+
   tvset.visible = 1;
   tvset.running = 1;
   tvset_raise_window();

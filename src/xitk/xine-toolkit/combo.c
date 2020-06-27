@@ -109,49 +109,53 @@ static void _combo_close (_combo_private_t *wp) {
 /*
  * Handle Xevents here.
  */
-static void _combo_handle_event (XEvent *event, void *data) {
+
+static void _combo_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
   _combo_private_t *wp = (_combo_private_t*)data;
 
-  if (wp && wp->visible) {
-    switch (event->type) {
-      case KeyPress:
-        {
-          KeySym mykey;
-          char kbuf[32];
+    if (ke->key_pressed == XK_Escape)
 
-          xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
-          if (mykey == XK_Escape) {
-            _combo_close (wp);
-            xitk_checkbox_set_state (wp->button_widget, 0);
-            xitk_set_focus_to_widget (wp->button_widget);
-          }
+
+  if (wp && wp->visible) {
+    if (ke->event == XITK_KEY_PRESS) {
+      if (ke->key_pressed == XK_Escape) {
+        _combo_close (wp);
+        xitk_checkbox_set_state (wp->button_widget, 0);
+        xitk_set_focus_to_widget (wp->button_widget);
+      }
 #if 0
-          else if (mykey == XK_Up) {
-            if (wp->sel2 > 0)
-              xitk_browser_set_select (wp->browser_widget, --wp->sel2);
-          } else if (mykey == XK_Down) {
-            if (wp->sel2 < wp->num_entries)
-              xitk_browser_set_select (wp->browser_widget, ++wp->sel2);
-          }
+      else if (ke->key_pressed == XK_Up) {
+        if (wp->sel2 > 0)
+          xitk_browser_set_select (wp->browser_widget, --wp->sel2);
+      } else if (ke->key_pressed == XK_Down) {
+        if (wp->sel2 < wp->num_entries)
+          xitk_browser_set_select (wp->browser_widget, ++wp->sel2);
+      }
 #endif
-        }
-        break;
-      case ButtonRelease:
-        /* If we try to move the combo window,
-         * move it back to right position (under label). */
-        {
-          int  x, y, modifier;
-          /* FIXME: what is this good for here? */
-          xitk_get_key_modifier (event, &modifier);
-          xitk_window_get_window_position (wp->xwin, &x, &y, NULL, NULL);
-          if ((x != wp->win_x) || (y != wp->win_y))
-          xitk_combo_update_pos (wp->combo_widget);
-        }
-        break;
-      default: ;
     }
   }
 }
+
+static void _combo_handle_button_event(void *data, const xitk_button_event_t *be) {
+  _combo_private_t *wp = (_combo_private_t*)data;
+
+  if (wp && wp->visible) {
+    if (be->event == XITK_BUTTON_RELEASE) {
+      /* If we try to move the combo window,
+       * move it back to right position (under label). */
+      int  x, y;
+      xitk_window_get_window_position (wp->xwin, &x, &y, NULL, NULL);
+      if ((x != wp->win_x) || (y != wp->win_y))
+        xitk_combo_update_pos (wp->combo_widget);
+    }
+  }
+}
+
+static const xitk_event_cbs_t combo_event_cbs = {
+  .key_cb            = _combo_handle_key_event,
+  .btn_cb            = _combo_handle_button_event,
+};
 
 static void combo_select (xitk_widget_t *w, void *data, int selected, int modifier) {
   _combo_private_t *wp = (_combo_private_t *)data;
@@ -219,8 +223,7 @@ static void _combo_open (_combo_private_t *wp) {
   wp->sel2 = wp->selected;
   xitk_browser_set_select (wp->browser_widget, wp->selected);
 
-  wp->widget_key = xitk_register_event_handler ("xitk combo", wp->xwin,
-    _combo_handle_event, NULL, NULL, wp->widget_list, (void *)wp);
+  wp->widget_key = xitk_window_register_event_handler ("xitk combo", wp->xwin, &combo_event_cbs, wp);
 
   wp->visible = 1;
 }

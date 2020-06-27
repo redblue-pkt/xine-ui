@@ -74,17 +74,14 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
  *
  */
 
-void xitk_cursors_define_window_cursor(Display *display, Window window, int/*xitk_cursors_t*/ cursor);
+#include "xitk.h"
+
+void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
 void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
 /*
  * access to xitk X11
  */
-
-#define xitk_t struct xitk_s
-#define xitk_window_t struct xitk_window_s
-struct xitk_s;
-struct xitk_window_s;
 
 void        xitk_x11_select_visual(xitk_t *, Visual *gui_visual);
 
@@ -96,7 +93,6 @@ Colormap    xitk_x11_get_colormap(xitk_t *);
 xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 
-#undef xitk_t
-#undef xitk_window_t
+void xitk_x11_translate_xevent(XEvent *xev, const xitk_event_cbs_t *cbs, void *user_data);
 
 #endif /* _XITK_X11_H_ */

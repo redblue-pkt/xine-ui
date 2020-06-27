@@ -218,21 +218,9 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 
 extern int xitk_x_error;
 
-#ifndef _XITK_C_
-
-xitk_register_key_t xitk_register_event_handler(const char *name,
-                                                xitk_window_t *w,
-                                                //Window window,
-						widget_event_callback_t cb,
-						widget_newpos_callback_t pos_cb,
-						xitk_dnd_callback_t dnd_cb,
-						xitk_widget_list_t *wl,
-						void *user_data);
-void xitk_unregister_event_handler(xitk_register_key_t *key);
-int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
-void xitk_xevent_notify(XEvent *event);
-
-#endif
+xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
+                                                    const xitk_event_cbs_t *cbs, void *user_data,
+                                                    xitk_widget_list_t *wl);
 
 int xitk_install_x_error_handler(void);
 int xitk_uninstall_x_error_handler(void);
@@ -348,12 +336,5 @@ void xitk_clipboard_unregister_window (Window win);
  * return -1: wait for WIDGET_EVENT_CLIP_READY, then try again. */
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
-xitk_register_key_t xitk_register_x_event_handler(const char *name,
-                                                  xitk_window_t *xwin,
-                                                  Window window,
-                                                  widget_event_callback_t cb,
-                                                  widget_newpos_callback_t pos_cb,
-                                                  xitk_dnd_callback_t dnd_cb,
-                                                  xitk_widget_list_t *wl, void *user_data);
 #endif
 

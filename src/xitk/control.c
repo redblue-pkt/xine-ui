@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -259,32 +258,35 @@ xui_vctrl_t *control_init (gGui_t *gui) {
 /*
  * Handle X events here.
  */
-static void control_handle_event(XEvent *event, void *data) {
-  xui_vctrl_t *vctrl = data;
-  
-  switch(event->type) {
-  case ButtonPress: {
-    XButtonEvent *bevent = (XButtonEvent *) event;
-    
-    if(bevent->button == Button3) {
-      int wx, wy;
-      
-      xitk_window_get_window_position (vctrl->xwin, &wx, &wy, NULL, NULL);
-      control_menu (vctrl->gui, vctrl->widget_list, bevent->x + wx, bevent->y + wy);
-    }
-    break;
-  }
 
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+static void control_handle_button_event(void *data, const xitk_button_event_t *be) {
+  xui_vctrl_t *vctrl = data;
+
+  if (be->event == XITK_BUTTON_PRESS) {
+    if (be->button == Button3) {
+      int wx, wy;
+      xitk_window_get_window_position (vctrl->xwin, &wx, &wy, NULL, NULL);
+      control_menu (vctrl->gui, vctrl->widget_list, be->x + wx, be->y + wy);
+    }
+  }
+}
+static void control_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_vctrl_t *vctrl = data;
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       control_toggle_window (NULL, vctrl);
     else
-      gui_handle_event (event, vctrl->gui);
-    break;
-    
+      gui_handle_key_event (gGui, ke);
   }
-  
 }
+
+static const xitk_event_cbs_t control_event_cbs = {
+  .key_cb            = control_handle_key_event,
+  .btn_cb            = control_handle_button_event,
+
+  .dnd_cb            = gui_dndcallback,
+};
 
 /*
  * Create control panel window
@@ -425,10 +427,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   control_show_tips (vctrl, panel_get_tips_enable (vctrl->gui->panel), panel_get_tips_timeout (vctrl->gui->panel));
 
-  vctrl->widget_key = xitk_register_event_handler ("control",
-    vctrl->xwin, control_handle_event, NULL,
-    gui_dndcallback, vctrl->widget_list, vctrl);
-  
+  vctrl->widget_key = xitk_window_register_event_handler ("control", vctrl->xwin, &control_event_cbs, vctrl);
+
   vctrl->status = 3;
   control_raise_window (vctrl);
 

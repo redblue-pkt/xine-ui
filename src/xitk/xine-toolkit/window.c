@@ -246,53 +246,48 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
 /*
  * Local XEvent handling.
  */
-static void _dialog_window_handle_event (XEvent *event, void *data) {
+static void _dialog_window_handle_expose_event (void *data, const xitk_expose_event_t *ee) {
   xitk_dialog_t *wd = data;
-  
-  switch (event->type) {
 
-    case Expose:
-      if (wd->xwin->widget_list) {
-        xitk_widget_list_t *widget_list = wd->xwin->widget_list;
-        widget_list->widget_focused = wd->default_button;
-        if ((widget_list->widget_focused->type & WIDGET_FOCUSABLE) &&
-            (widget_list->widget_focused->enable == WIDGET_ENABLE)) {
-          xitk_widget_t *w = widget_list->widget_focused;
-          widget_event_t event;
-          event.type = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_RECEIVED;
-          w->event (w, &event, NULL);
-          w->have_focus = FOCUS_RECEIVED;
-          event.type = WIDGET_EVENT_PAINT;
-          w->event (w, &event, NULL);
-        }
-      }
-      break;
-
-    case KeyPress: {
-      KeySym     mykey;
-      char       kbuf[256];
-
-      xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
-
-      switch (mykey) {
-
-        case XK_Return:
-          if (wd->default_button)
-            _xitk_window_dialog_3_done (wd->default_button, wd);
-          break;
-      
-        case XK_Escape:
-          if (wd->default_button)
-            _xitk_window_dialog_3_done (wd->default_button, wd);
-          break;
-
-      }
-
+  if (wd->xwin->widget_list) {
+    xitk_widget_list_t *widget_list = wd->xwin->widget_list;
+    widget_list->widget_focused = wd->default_button;
+    if ((widget_list->widget_focused->type & WIDGET_FOCUSABLE) &&
+        (widget_list->widget_focused->enable == WIDGET_ENABLE)) {
+      xitk_widget_t *w = widget_list->widget_focused;
+      widget_event_t event;
+      event.type = WIDGET_EVENT_FOCUS;
+      event.focus = FOCUS_RECEIVED;
+      w->event (w, &event, NULL);
+      w->have_focus = FOCUS_RECEIVED;
+      event.type = WIDGET_EVENT_PAINT;
+      w->event (w, &event, NULL);
     }
-    break;
   }
 }
+
+static void _dialog_window_handle_key_event (void *data, const xitk_key_event_t *ke) {
+  xitk_dialog_t *wd = data;
+
+  if (ke->event == XITK_KEY_PRESS) {
+    switch (ke->key_pressed) {
+      case XK_Return:
+        if (wd->default_button)
+          _xitk_window_dialog_3_done (wd->default_button, wd);
+        break;
+
+      case XK_Escape:
+        if (wd->default_button)
+          _xitk_window_dialog_3_done (wd->default_button, wd);
+        break;
+    }
+  }
+}
+
+static const xitk_event_cbs_t _dialog_event_cbs = {
+  .key_cb           = _dialog_window_handle_key_event,
+  .expose_notify_cb = _dialog_window_handle_expose_event,
+};
 
 static const char *_xitk_window_dialog_label (const char *label) {
   switch ((uintptr_t)label) {
@@ -442,11 +437,9 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   _xitk_window_set_focus (xitk->display, _xitk_window_get_window (wd->xwin));
 
   {
-    xitk_register_key_t key;
-    wd->key = key = xitk_register_event_handler ("xitk_dialog_3", wd->xwin,
-      _dialog_window_handle_event, NULL, NULL, wd->xwin->widget_list, wd);
-    xitk_register_eh_destructor (key, _xitk_window_dialog_3_destr, wd);
-    return key;
+    wd->key = xitk_window_register_event_handler ("xitk_dialog_3", wd->xwin, &_dialog_event_cbs, wd);
+    xitk_register_eh_destructor (wd->key, _xitk_window_dialog_3_destr, wd);
+    return wd->key;
   }
 }
 
@@ -476,14 +469,9 @@ void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type
  *
  */
 
-xitk_register_key_t xitk_register_event_handler(const char *name,
-                                                xitk_window_t *w,
-                                                widget_event_callback_t cb,
-                                                widget_newpos_callback_t pos_cb,
-                                                xitk_dnd_callback_t dnd_cb,
-                                                xitk_widget_list_t *wl, void *user_data) {
-  return xitk_register_x_event_handler(name, w, w ? w->window : None, cb, pos_cb, dnd_cb,
-                                       wl, user_data);
+xitk_register_key_t xitk_window_register_event_handler(const char *name, xitk_window_t *w,
+                                                       const xitk_event_cbs_t *cbs, void *user_data) {
+  return xitk_register_event_handler_ext(name, w, cbs, user_data, w->widget_list);
 }
 
 /*
