@@ -112,15 +112,6 @@ typedef struct {
 } xitk_rect_t;
 
 /*
- * Event callback function type.
- * Thefunction will be called on every xevent.
- * If the window match with that one specified at
- * register time, only event for this window
- * will be send to this function.
- */
-typedef void (*widget_event_callback_t)(XEvent *event, void *data);
-
-/*
  * New positioning window callback function.
  * This callback will be called when the window
  * moving will be done (at button release time),
@@ -143,6 +134,71 @@ typedef void (*xitk_signal_callback_t)(int, void *);
  */
 typedef int xitk_register_key_t;
 
+/*
+ * event callbacks
+ */
+
+typedef struct {
+#define XITK_KEY_PRESS      1
+#define XITK_KEY_RELEASE    2
+  int           event;
+  unsigned long key_pressed;     /* KeySym */
+  int           modifiers;       /* modifier flags XITK_MODIFIER_* */
+  int           keycode;         /* hardware keycode if known */
+  const char   *keysym_str;      /* ASCII key name */
+  const char   *keycode_str;     /* ASCII key name */
+} xitk_key_event_t;
+
+typedef struct {
+#define XITK_BUTTON_PRESS   3
+#define XITK_BUTTON_RELEASE 4
+  int event;
+  int button;
+  int x, y;
+  int modifiers;
+} xitk_button_event_t;
+
+typedef struct {
+  int   expose_count;
+  void *orig_event;
+} xitk_expose_event_t;
+
+typedef struct {
+  int x, y;
+} xitk_motion_event_t;
+
+typedef struct {
+  int x, y;
+  int width, height;
+} xitk_configure_event_t;
+
+typedef void (*xitk_key_event_callback_t)(void *data, const xitk_key_event_t *);
+typedef void (*xitk_button_event_callback_t)(void *data, const xitk_button_event_t *);
+typedef void (*xitk_motion_event_callback_t)(void *data, const xitk_motion_event_t *);
+
+typedef void (*xitk_configure_notify_callback_t)(void *data, const xitk_configure_event_t *);
+typedef void (*xitk_map_notify_callback_t)(void *data);
+typedef void (*xitk_expose_notify_callback_t)(void *data, const xitk_expose_event_t *);
+typedef void (*xitk_destroy_notify_callback_t)(void *);
+
+typedef struct {
+  xitk_key_event_callback_t    key_cb;
+  xitk_button_event_callback_t btn_cb;
+  xitk_motion_event_callback_t motion_cb;
+
+  widget_newpos_callback_t     pos_cb;
+  xitk_dnd_callback_t          dnd_cb;
+
+  xitk_configure_notify_callback_t configure_notify_cb;
+  xitk_map_notify_callback_t       map_notify_cb;
+  xitk_expose_notify_callback_t    expose_notify_cb;
+  xitk_destroy_notify_callback_t   destroy_notify_cb;
+
+} xitk_event_cbs_t;
+
+/*
+ *
+ */
 
 typedef struct {
   int x, y;
@@ -604,9 +660,10 @@ typedef struct {
     char                           *cur_origin;
     const char                     *skin_element_name;
   } origin;
-  
+
+  xitk_key_event_callback_t         key_cb;
+  void                             *key_cb_data;
   xitk_dnd_callback_t               dndcallback;
-  void                             *dnddata;
 
   struct {
     char                           *caption;
@@ -746,18 +803,14 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
 /*
  * Register function:
  * name:   temporary name about debug stuff, can be NULL.
- * window: desired window for event callback calls, can be None.
- * cb:     callback for xevent, can be NULL.
- * pos_cb; callback for window moving.
- * dnd_cb: callback for dnd event.
- * wl:     widget_list handled internaly for xevent reactions.
+ * w:      desired window for event callback calls.
+ *         window widget list is handled internally for event reactions.
+ * cbs:    callback functions for events, can be NULL.
+ * user_data: passed to each callback.
  */
-xitk_register_key_t xitk_register_event_handler(const char *name,
-                                                xitk_window_t *w,
-						widget_event_callback_t cb,
-						widget_newpos_callback_t pos_cb,
-						xitk_dnd_callback_t dnd_cb,
-						xitk_widget_list_t *wl, void *user_data);
+
+xitk_register_key_t xitk_window_register_event_handler(const char *name, xitk_window_t *w,
+                                                       const xitk_event_cbs_t *cbs, void *user_data);
 
 /*
  * Remove widgetkey_t entry in internal table.
@@ -1758,6 +1811,7 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  *
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
+void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs);
 
 /**
  *

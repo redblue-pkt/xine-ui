@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -968,50 +967,46 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void kbedit_handle_event(XEvent *event, void *data) {
-  
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
-      kbedit_exit(NULL, NULL);
-    else
-      gui_handle_event (event, gGui);
-    break;
 
-  case KeyRelease: {
-    xitk_widget_t *w;
+static void _kbedit_unset(void) {
+  xitk_widget_t *w;
 
-    if(!kbedit || !kbedit->widget_list)
-      return;
-    
-    w = xitk_get_focused_widget(kbedit->widget_list);
+  if (!kbedit || !kbedit->widget_list)
+    return;
 
-    if((w && (w != kbedit->done) && (w != kbedit->save))
-       && (xitk_browser_get_current_selected(kbedit->browser) < 0)) {
-      kbedit_unset();
-    }
-  }
-  break;
+  w = xitk_get_focused_widget(kbedit->widget_list);
 
-  case ButtonRelease: {
-    xitk_widget_t *w;
-
-    if(!kbedit || !kbedit->widget_list)
-      return;
-
-    w = xitk_get_focused_widget(kbedit->widget_list);
-    
-    if((w && (w != kbedit->done) && (w != kbedit->save))
-       && (xitk_browser_get_current_selected(kbedit->browser) < 0)) {
-      kbedit_unset();
-    }
-
-  }
-  break;
-  
+  if ((w && (w != kbedit->done) && (w != kbedit->save))
+      && (xitk_browser_get_current_selected(kbedit->browser) < 0)) {
+    kbedit_unset();
   }
 }
+
+static void kbedit_handle_button_event(void *data, const xitk_button_event_t *be) {
+
+  if (be->event == XITK_BUTTON_RELEASE) {
+    _kbedit_unset();
+  }
+}
+
+static void kbedit_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
+      kbedit_exit(NULL, NULL);
+    else
+      gui_handle_key_event (gGui, ke);
+  }
+
+  if (ke->event == XITK_KEY_RELEASE) {
+    _kbedit_unset();
+  }
+}
+
+static const xitk_event_cbs_t kbedit_event_cbs = {
+  .key_cb            = kbedit_handle_key_event,
+  .btn_cb            = kbedit_handle_button_event,
+};
 
 void kbedit_reparent(void) {
   gGui_t *gui = gGui;
@@ -1207,7 +1202,7 @@ void kbedit_window(void) {
   XITK_WIDGET_INIT(&l);
 
   fs = xitk_font_load_font(gui->xitk, hboldfontname);
-  xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
+  xitk_widget_list_set_font(kbedit->widget_list, fs);
   fontheight = xitk_font_get_string_height(fs, " ");
   xitk_font_unload_font(fs);
   
@@ -1352,14 +1347,7 @@ void kbedit_window(void) {
 
   kbedit_unset();
   
-  kbedit->kreg = xitk_register_event_handler("kbedit",
-                                             kbedit->xwin,
-					     kbedit_handle_event,
-					     NULL,
-					     NULL,
-					     kbedit->widget_list,
-					     NULL);
-  
+  kbedit->kreg = xitk_window_register_event_handler("kbedit", kbedit->xwin, &kbedit_event_cbs, kbedit);
 
   gui->ssaver_enabled = 0;
   kbedit->visible      = 1;

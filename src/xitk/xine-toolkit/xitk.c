@@ -127,8 +127,7 @@ typedef struct {
 
   xitk_widget_list_t         *widget_list;
   char                       *name;
-  widget_event_callback_t     xevent_callback;
-  widget_newpos_callback_t    newpos_callback;
+  const xitk_event_cbs_t     *cbs;
   xitk_register_key_t         key;
   xitk_dnd_t                 *xdnd;
   void                       *user_data;
@@ -1426,13 +1425,9 @@ static void _xitk_reset_hull (xitk_hull_t *hull) {
  * for DND events, and widget list.
  */
 
-xitk_register_key_t xitk_register_x_event_handler(const char *name,
-                                                  xitk_window_t *w,
-                                                  Window window,
-                                                  widget_event_callback_t cb,
-                                                  widget_newpos_callback_t pos_cb,
-                                                  xitk_dnd_callback_t dnd_cb,
-                                                  xitk_widget_list_t *wl, void *user_data) {
+xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
+                                                    const xitk_event_cbs_t *cbs, void *user_data,
+                                                    xitk_widget_list_t *wl) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   __gfx_t   *fx;
 
@@ -1447,7 +1442,7 @@ xitk_register_key_t xitk_register_x_event_handler(const char *name,
   fx->name = name ? strdup(name) : strdup("NO_SET");
 
   fx->w         = w;
-  fx->window    = window;
+  fx->window    = w ? xitk_window_get_window(w) : None;
   fx->new_pos.x = 0;
   fx->new_pos.y = 0;
   fx->width     = 0;
@@ -1486,30 +1481,19 @@ xitk_register_key_t xitk_register_x_event_handler(const char *name,
     }
   }
 
-  if(cb)
-    fx->xevent_callback = cb;
-#if 0
-  else {
-    XITK_DIE("%s()@%d: Callback should be non NULL\n", __FUNCTION__, __LINE__);
-  }
-#endif
+  fx->cbs = cbs;
 
-  if(pos_cb && (fx->window != None))
-    fx->newpos_callback = pos_cb;
-  else
-    fx->newpos_callback = NULL;
-  
   if(wl)
     fx->widget_list = wl;
   else
     fx->widget_list = NULL;
 
-  if(dnd_cb && (fx->window != None)) {
+  if (cbs && cbs->dnd_cb && (fx->window != None)) {
     fx->xdnd = (xitk_dnd_t *) xitk_xmalloc(sizeof(xitk_dnd_t));
     
     xitk_init_dnd (&xitk->x, fx->xdnd);
     if(xitk_make_window_dnd_aware(fx->xdnd, fx->window))
-      xitk_set_dnd_callback(fx->xdnd, dnd_cb);
+      xitk_set_dnd_callback(fx->xdnd, cbs->dnd_cb);
   }
   else
     fx->xdnd = NULL;
@@ -1596,8 +1580,7 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
 #endif
   }
   
-  fx->xevent_callback = NULL;
-  fx->newpos_callback = NULL;
+  fx->cbs             = NULL;
   fx->user_data       = NULL;
 
   destructor = fx->destructor;
@@ -1642,8 +1625,7 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
     if (__gfx_safe_lock (fx)) {
       /* We already hold this, we are inside a callback. */
       /* NOTE: After return from this, application may free () fx->user_data. */
-      fx->xevent_callback = NULL;
-      fx->newpos_callback = NULL;
+      fx->cbs             = NULL;
       fx->user_data       = NULL;
       fx->destroy = 1;
     } else {
@@ -2012,9 +1994,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	    }
 	    
 	    if((w == NULL) || (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
-	      if(fx->xevent_callback) {
-		fx->xevent_callback(event, fx->user_data);
-	      }
+              if (fx->cbs) {
+                xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
+              }
 	    }
 	    
 	    if(((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter))
@@ -2222,8 +2204,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	    fx->move.enabled = 0;
 	    /* Inform application about window movement. */
 
-	    if(fx->newpos_callback)
-              fx->newpos_callback (fx->user_data,
+            if (fx->cbs && fx->cbs->pos_cb)
+              fx->cbs->pos_cb (fx->user_data,
                 fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
 	  }
 	  else {
@@ -2252,7 +2234,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           }
 
 	  /* Inform application about window movement. */
-	  if(fx->newpos_callback) {
+          if (fx->cbs && fx->cbs->pos_cb) {
 
             XLOCK (xitk->x.x_lock_display, xitk->x.display);
             err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
@@ -2262,7 +2244,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      fx->width = wattr.width;
 	      fx->height = wattr.height;
 	    }
-            fx->newpos_callback (fx->user_data,
+            fx->cbs->pos_cb (fx->user_data,
               event->xconfigure.x, event->xconfigure.y, fx->width, fx->height);
 	  }
 	}
@@ -2277,10 +2259,10 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	    xitk_process_client_dnd_message(fx->xdnd, event);
 	  break;
 	}
-	
-	if(fx->xevent_callback) {
-	  fx->xevent_callback(event, fx->user_data);
-	}
+
+        if (fx->cbs) {
+          xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
+        }
       }
     }
     
@@ -2300,8 +2282,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       while (fx->node.next && (fx->window != xitk->modalw)) {
 	FXLOCK(fx);
 	
-	if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
-	  fx->xevent_callback(event, fx->user_data);
+        if (fx->cbs && fx->window != None && event->type != KeyRelease)
+          xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
 	
 	fxd = fx;
 	fx = (__gfx_t *)fx->node.next;
@@ -2320,6 +2302,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
   }
 }
 
+#if 0
 void xitk_xevent_notify (XEvent *event) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   /* protect walking through gfx list */
@@ -2327,6 +2310,7 @@ void xitk_xevent_notify (XEvent *event) {
   xitk_xevent_notify_impl (xitk, event);
   MUTUNLOCK ();
 }
+#endif
 
 Display *xitk_x11_get_display(xitk_t *xitk) {
   return xitk->display;

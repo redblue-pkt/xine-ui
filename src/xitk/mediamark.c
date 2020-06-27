@@ -35,6 +35,7 @@
 #include <errno.h>
 
 #include <X11/keysym.h>
+
 #include "common.h"
 
 #define WINDOW_WIDTH            525
@@ -3071,16 +3072,19 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
   }
 }
 
-static void mmkeditor_handle_event(XEvent *event, void *data) {
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+static void mmkeditor_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       mmkeditor_exit(NULL, NULL);
     else
-      gui_handle_event (event, gGui);
+      gui_handle_key_event (gGui, ke);
   }
 }
+
+static const xitk_event_cbs_t mmkeditor_event_cbs = {
+  .key_cb            = mmkeditor_handle_key_event,
+};
 
 void mmk_editor_show_tips(int enabled, unsigned long timeout) {
   
@@ -3454,14 +3458,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   xitk_window_set_background(mmkeditor.xwin, bg);
 
-  mmkeditor.widget_key = xitk_register_event_handler("mmkeditor",
-                                                     mmkeditor.xwin,
-						      mmkeditor_handle_event,
-						      NULL,
-						      NULL,
-						      mmkeditor.widget_list,
-						      NULL);
-  
+  mmkeditor.widget_key = xitk_window_register_event_handler("mmkeditor", mmkeditor.xwin,
+                                                            &mmkeditor_event_cbs, &mmkeditor);
+
   mmkeditor.visible = 1;
   mmkeditor.running = 1;
 

@@ -24,10 +24,7 @@
 #endif
 
 #include <stdio.h>
-#include <errno.h>
-#include <pthread.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -334,18 +331,19 @@ void viewlog_end(void) {
   viewlog_exit(NULL, NULL);
 }
 
-static void viewlog_handle_event(XEvent *event, void *data) {
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+static void viewlog_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       viewlog_exit(NULL, NULL);
     else
-      gui_handle_event (event, gGui);
-    break;
-    
+      gui_handle_key_event (gGui, ke);
   }
 }
+
+static const xitk_event_cbs_t viewlog_event_cbs = {
+  .key_cb = viewlog_handle_key_event,
+};
 
 void viewlog_reparent(void) {
   gGui_t *gui = gGui;
@@ -446,13 +444,7 @@ void viewlog_panel(void) {
   xitk_add_widget (viewlog->widget_list, w);
   xitk_enable_and_show_widget(w);
 
-  viewlog->kreg = xitk_register_event_handler("viewlog",
-                                              viewlog->xwin,
-					      viewlog_handle_event,
-					      NULL,
-					      NULL,
-					      viewlog->widget_list,
-					      NULL);
+  viewlog->kreg = xitk_window_register_event_handler("viewlog", viewlog->xwin, &viewlog_event_cbs, viewlog);
 
   viewlog->visible = 1;
   viewlog->running = 1;

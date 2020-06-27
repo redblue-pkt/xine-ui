@@ -977,60 +977,70 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 /*
  * Handle X events here.
  */
-static void panel_handle_event(XEvent *event, void *data) {
+static void panel_handle_destroy_notify(void *data) {
   xui_panel_t *panel = data;
 
-  switch(event->type) {
-  case DestroyNotify:
-    //if (xitk_window_get_window(panel->xwin) == event->xany.window)
-      gui_exit (NULL, panel->gui);
-    break;
-
-  case ButtonPress:
-    {
-      XButtonEvent *bevent = (XButtonEvent *) event;
-
-      if(bevent->button == Button3)
-        video_window_menu (panel->gui, panel->widget_list);
-    }
-    break;
-    
-  case KeyPress:
-  case ButtonRelease:
-    gui_handle_event (event, panel->gui);
-    break;
-
-  case MapNotify:
-    /* When panel becomes visible by any means,               */
-    /* all other hidden GUI windows shall also become visible */
-    if(!playlist_is_visible())
-      playlist_toggle_visibility(NULL, NULL);
-    if (control_status (panel->gui->vctrl) == 2)
-      control_toggle_visibility (NULL, panel->gui->vctrl);
-    if (!mrl_browser_is_visible (panel->gui->mrlb))
-      mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
-    if (!setup_is_visible (panel->gui->setup))
-      setup_toggle_visibility (NULL, panel->gui->setup);
-    if(!viewlog_is_visible())
-      viewlog_toggle_visibility(NULL, NULL);
-    if(!kbedit_is_visible())
-      kbedit_toggle_visibility(NULL, NULL);
-    if(!event_sender_is_visible())
-      event_sender_toggle_visibility();
-    if(!stream_infos_is_visible())
-      stream_infos_toggle_visibility(NULL, NULL);
-    if(!tvset_is_visible())
-      tvset_toggle_visibility(NULL, NULL);
-    if(!vpplugin_is_visible())
-      vpplugin_toggle_visibility(NULL, NULL);
-    if(!applugin_is_visible())
-      applugin_toggle_visibility(NULL, NULL);
-    if(!help_is_visible())
-      help_toggle_visibility(NULL, NULL);
-    break;
-  }
-  
+  gui_exit (NULL, panel->gui);
 }
+
+static void panel_handle_map_notify(void *data) {
+  xui_panel_t *panel = data;
+
+  /* When panel becomes visible by any means,               */
+  /* all other hidden GUI windows shall also become visible */
+  if (!playlist_is_visible())
+    playlist_toggle_visibility(NULL, NULL);
+  if (control_status (panel->gui->vctrl) == 2)
+    control_toggle_visibility (NULL, panel->gui->vctrl);
+  if (!mrl_browser_is_visible (panel->gui->mrlb))
+    mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
+  if (!setup_is_visible (panel->gui->setup))
+    setup_toggle_visibility (NULL, panel->gui->setup);
+  if (!viewlog_is_visible())
+    viewlog_toggle_visibility(NULL, NULL);
+  if (!kbedit_is_visible())
+    kbedit_toggle_visibility(NULL, NULL);
+  if (!event_sender_is_visible())
+    event_sender_toggle_visibility();
+  if (!stream_infos_is_visible())
+    stream_infos_toggle_visibility(NULL, NULL);
+  if (!tvset_is_visible())
+    tvset_toggle_visibility(NULL, NULL);
+  if (!vpplugin_is_visible())
+    vpplugin_toggle_visibility(NULL, NULL);
+  if (!applugin_is_visible())
+    applugin_toggle_visibility(NULL, NULL);
+  if (!help_is_visible())
+    help_toggle_visibility(NULL, NULL);
+}
+
+static void panel_handle_button_event(void *data, const xitk_button_event_t *be) {
+  xui_panel_t *panel = data;
+
+  if (be->event == XITK_BUTTON_PRESS) {
+    if (be->button == Button3) {
+      video_window_menu (panel->gui, panel->widget_list);
+    }
+  }
+  if (be->event == XITK_BUTTON_RELEASE) {
+    gui_handle_button_event (panel->gui, be);
+  }
+}
+
+static void panel_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_panel_t *panel = data;
+  gui_handle_key_event (panel->gui, ke);
+}
+
+static const xitk_event_cbs_t panel_event_cbs = {
+  .key_cb            = panel_handle_key_event,
+  .btn_cb            = panel_handle_button_event,
+  .map_notify_cb     = panel_handle_destroy_notify,
+  .destroy_notify_cb = panel_handle_map_notify,
+
+  .pos_cb            = panel_store_new_position,
+  .dnd_cb            = gui_dndcallback,
+};
 
 /*
  * Create buttons from information if input plugins autoplay featured. 
@@ -1527,13 +1537,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     xitk_hide_widgets(panel->widget_list);
   
   
-  panel->widget_key = xitk_register_event_handler("panel",
-                                                  panel->xwin,
-						  panel_handle_event,
-						  panel_store_new_position,
-						  gui_dndcallback,
-						  panel->widget_list,
-						  panel);
+  panel->widget_key = xitk_window_register_event_handler("panel", panel->xwin, &panel_event_cbs, panel);
 
   panel->gui->cursor_visible = 1;
   video_window_set_cursor_visibility (panel->gui->vwin, panel->gui->cursor_visible);

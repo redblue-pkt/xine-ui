@@ -35,10 +35,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
-
-#include "xine-toolkit/xitk_x11.h"
 
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
@@ -1288,31 +1285,24 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 /*
  * top-level event handler
  */
-void gui_handle_event (XEvent *event, void *data) {
+
+void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
   gGui_t *gui = data;
-  int modifiers;
-  KeySym keysym;
 
-  switch(event->type) {
+  if (gui->stdctl_enable) {
+    stdctl_keypress(ke->keycode_str);
+  }
+  kbindings_handle_kbinding(gui->kbindings, ke->key_pressed, ke->keycode, ke->modifiers, -1);
+}
 
-  case KeyPress:
-    if (gui->stdctl_enable) {
-      char str[32];
-      if (xitk_keysym_to_string(xitk_keycode_to_keysym(event), str, sizeof(str)) > 0)
-        stdctl_keypress(str);
-    }
-    xitk_get_key_modifier(event, &modifiers);
-    keysym = xitk_get_key_pressed(event);
-    kbindings_handle_kbinding(gui->kbindings, keysym, event->xkey.keycode, modifiers, -1);
-    break;
+void gui_handle_button_event (void *data, const xitk_button_event_t *be) {
+  gGui_t *gui = data;
 
-  case ButtonRelease:
-    xitk_get_key_modifier(event, &modifiers);
-    kbindings_handle_kbinding(gui->kbindings, XK_VoidSymbol, 0, modifiers, event->xbutton.button);
-    break;
+  if (be->event == XITK_BUTTON_RELEASE) {
+    kbindings_handle_kbinding(gui->kbindings, XK_VoidSymbol, 0, be->modifiers, be->button);
   }
 }
-  
+
 /*
  * Start playback of an entry in playlist
  */

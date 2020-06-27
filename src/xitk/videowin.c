@@ -171,6 +171,8 @@ struct xui_vwin_st {
   x11_visual_t            xine_visual;
 };
 
+static void *second_display_loop (void *data);
+
 /* safe external actions */
 static void video_window_lock (xui_vwin_t *vwin, int lock_or_unlock) {
   if (!vwin)
@@ -243,20 +245,11 @@ void video_window_grab_pointer(xui_vwin_t *vwin)
   vwin->x_unlock_display (vwin->video_display);
 }
 
-static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (xui_vwin_t *vwin);
 static int  video_window_check_mag (xui_vwin_t *vwin);
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag);
 
-static void register_event_handler(xui_vwin_t *vwin) {
-
-  xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
-  vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
-
-  vwin->widget_key = xitk_register_event_handler ("video_window",
-      vwin->wrapped_window, video_window_handle_event, NULL, gui_dndcallback,
-      NULL, vwin);
-}
+static void register_event_handler(xui_vwin_t *vwin);
 
 static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
   xui_vwin_t *vwin = data;
@@ -286,35 +279,6 @@ static void _set_window_title (xui_vwin_t *vwin) {
   XmbSetWMProperties (vwin->video_display, vwin->video_window,
     vwin->window_title, vwin->window_title, NULL, 0, NULL, NULL, NULL);
   XSync (vwin->video_display, False);
-}
-
-/* 
- * very small X event loop for the second display
- */
-static __attribute__((noreturn)) void *second_display_loop (void *data) {
-  xui_vwin_t *vwin = data;
-  
-  while (vwin->second_display_running) {
-    XEvent   xevent;
-    int      got_event;
-
-    xine_usec_sleep(20000);
-    
-    do {
-        vwin->x_lock_display (vwin->video_display);
-        got_event = XPending (vwin->video_display);
-        if( got_event )
-          XNextEvent (vwin->video_display, &xevent);
-        vwin->x_unlock_display (vwin->video_display);
-        
-        if (got_event && vwin->gui->stream) {
-          video_window_handle_event (&xevent, vwin);
-        }
-    } while (got_event);
-
-  }
-  
-  pthread_exit(NULL);
 }
 
 static void video_window_find_visual (xui_vwin_t *vwin) {
@@ -2275,52 +2239,57 @@ void video_window_change_skins (xui_vwin_t *vwin, int synthetic) {
 /*
  *
  */
-static void video_window_handle_event (XEvent *event, void *data) {
+
+static void _vwin_handle_configure_notify (void *data, const xitk_configure_event_t *ce) {
+  xui_vwin_t *vwin = data;
+  Window      tmp_win;
+  int         h, w;
+
+  pthread_mutex_lock (&vwin->mutex);
+
+  h = vwin->output_height;
+  w = vwin->output_width;
+  vwin->output_width  = ce->width;
+  vwin->output_height = ce->height;
+
+  if ((ce->x == 0) && (ce->y == 0)) {
+    vwin->x_lock_display (vwin->video_display);
+    XTranslateCoordinates(vwin->video_display, vwin->video_window, DefaultRootWindow(vwin->video_display),
+                          0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
+    vwin->x_unlock_display (vwin->video_display);
+  }
+  else {
+    vwin->xwin = ce->x;
+    vwin->ywin = ce->y;
+  }
+
+  /* Keep geometry memory of windowed mode in sync. */
+  if (vwin->fullscreen_mode & WINDOWED_MODE) {
+    vwin->old_win_width  = vwin->win_width  = vwin->output_width;
+    vwin->old_win_height = vwin->win_height = vwin->output_height;
+  }
+
+  if ((h != vwin->output_height) || (w != vwin->output_width))
+    osd_update_osd();
+
+  oxine_adapt();
+
+  pthread_mutex_unlock (&vwin->mutex);
+}
+
+static void _vwin_handle_key_event (void *data, const xitk_key_event_t *ke) {
   xui_vwin_t *vwin = data;
 
-  switch(event->type) {
+  if (ke->event == XITK_KEY_PRESS)
+    gui_handle_key_event (vwin->gui, ke);
+}
 
-  case DestroyNotify:
-    if (vwin->video_window == event->xany.window)
-      gui_exit (NULL, vwin->gui);
-    break;
+static void _vwin_handle_button_event (void *data, const xitk_button_event_t *be) {
+  xui_vwin_t *vwin = data;
 
-  case KeyPress:
-    gui_handle_event (event, vwin->gui);
-    break;
-
-  case MotionNotify: {
-    XMotionEvent *mevent = (XMotionEvent *) event;
-    xine_event_t event;
-    xine_input_data_t input;
-    int x, y;
-
-    /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
-    
-    if (!vwin->gui->cursor_visible) {
-      vwin->gui->cursor_visible = !vwin->gui->cursor_visible;
-      video_window_set_cursor_visibility (vwin, vwin->gui->cursor_visible);
-    }
-
-    event.type            = XINE_EVENT_INPUT_MOUSE_MOVE;
-    if (!oxine_mouse_event(event.type, mevent->x, mevent->y) ) {
-      if (video_window_translate_point (vwin, mevent->x, mevent->y, &x, &y)) {
-        event.stream      = vwin->gui->stream;
-        event.data        = &input;
-        event.data_length = sizeof(input);
-        gettimeofday(&event.tv, NULL);
-        input.button      = 0; /*  No buttons, just motion. */
-        input.x           = x;
-        input.y           = y;
-
-        xine_event_send (vwin->gui->stream, &event);
-      }
-    }
-  }
-  break;
-
-  case ButtonPress: {
-    XButtonEvent       *bevent = (XButtonEvent *) event;
+  if (be->event == XITK_BUTTON_RELEASE)
+    gui_handle_button_event (vwin->gui, be);
+  if (be->event == XITK_BUTTON_PRESS) {
     xine_input_data_t   input;
     xine_event_t        event;
     int                 x, y;
@@ -2330,38 +2299,37 @@ static void video_window_handle_event (XEvent *event, void *data) {
       video_window_set_cursor_visibility (vwin, vwin->gui->cursor_visible);
     }
 
-    if (bevent->button == Button3 && !vwin->separate_display)
+    if (be->button == Button3 && !vwin->separate_display)
       video_window_menu (vwin->gui, xitk_window_widget_list(vwin->wrapped_window));
-    else if (bevent->button == Button2)
+    else if (be->button == Button2)
       panel_toggle_visibility (NULL, vwin->gui->panel);
-    else if (bevent->button == Button1) {
+    else if (be->button == Button1) {
       struct timeval  old_click_time, tm_diff;
       long int        click_diff;
-      
+
       timercpy (&vwin->click_time, &old_click_time);
       gettimeofday (&vwin->click_time, 0);
 
       timercpy (&old_click_time, &event.tv);
-      
+
       timersub (&vwin->click_time, &old_click_time, &tm_diff);
       click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
-      
+
       if (click_diff < (xitk_get_timer_dbl_click())) {
         gui_execute_action_id (vwin->gui, ACTID_TOGGLE_FULLSCREEN);
         vwin->click_time.tv_sec -= (xitk_get_timer_dbl_click() / 1000.0);
         vwin->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
       }
-      
     }
 
     event.type            = XINE_EVENT_INPUT_MOUSE_BUTTON;
-    if( bevent->button != Button1 ||
-        !oxine_mouse_event(event.type, bevent->x, bevent->y) ) {
-      if (video_window_translate_point (vwin, bevent->x, bevent->y, &x, &y)) {
+    if( be->button != Button1 ||
+        !oxine_mouse_event(event.type, be->x, be->y) ) {
+      if (video_window_translate_point (vwin, be->x, be->y, &x, &y)) {
         event.stream      = vwin->gui->stream;
         event.data        = &input;
         event.data_length = sizeof(input);
-        input.button      = bevent->button;
+        input.button      = be->button;
         input.x           = x;
         input.y           = y;
 
@@ -2369,65 +2337,130 @@ static void video_window_handle_event (XEvent *event, void *data) {
       }
     }
   }
-  break;
+}
 
-  case ButtonRelease:
-    gui_handle_event (event, vwin->gui);
-    break;
+static void _vwin_handle_motion_event (void *data, const xitk_motion_event_t *me) {
+  xui_vwin_t *vwin = data;
+  xine_event_t event;
+  xine_input_data_t input;
+  int x, y;
 
-  case Expose: {
-    XExposeEvent * xev = (XExposeEvent *) event;
+  /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
 
-    if (xev->count == 0) {
-
-      if (event->xany.window == vwin->video_window) {
-        xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_EXPOSE_EVENT, event);
-      }
-    }
+  if (!vwin->gui->cursor_visible) {
+    vwin->gui->cursor_visible = !vwin->gui->cursor_visible;
+    video_window_set_cursor_visibility (vwin, vwin->gui->cursor_visible);
   }
-  break;
 
-  case ConfigureNotify:
-    if (event->xany.window == vwin->video_window) {
-      XConfigureEvent *cev = (XConfigureEvent *) event;
-      Window           tmp_win;
-      int              h, w;
+  event.type            = XINE_EVENT_INPUT_MOUSE_MOVE;
+  if (!oxine_mouse_event(event.type, me->x, me->y) ) {
+    if (video_window_translate_point (vwin, me->x, me->y, &x, &y)) {
+      event.stream      = vwin->gui->stream;
+      event.data        = &input;
+      event.data_length = sizeof(input);
+      gettimeofday(&event.tv, NULL);
+      input.button      = 0; /*  No buttons, just motion. */
+      input.x           = x;
+      input.y           = y;
 
-      pthread_mutex_lock (&vwin->mutex);
-
-      h = vwin->output_height;
-      w = vwin->output_width;
-      vwin->output_width  = cev->width;
-      vwin->output_height = cev->height;
-
-      if ((cev->x == 0) && (cev->y == 0)) {
-        vwin->x_lock_display (cev->display);
-        XTranslateCoordinates(cev->display, cev->window, DefaultRootWindow(cev->display),
-                              0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
-        vwin->x_unlock_display (cev->display);
-      }
-      else {
-        vwin->xwin = cev->x;
-        vwin->ywin = cev->y;
-      }
-
-      /* Keep geometry memory of windowed mode in sync. */
-      if (vwin->fullscreen_mode & WINDOWED_MODE) {
-        vwin->old_win_width  = vwin->win_width  = vwin->output_width;
-        vwin->old_win_height = vwin->win_height = vwin->output_height;
-      }
-
-      if ((h != vwin->output_height) || (w != vwin->output_width))
-	osd_update_osd();
-
-      oxine_adapt();
-
-      pthread_mutex_unlock (&vwin->mutex);
+      xine_event_send (vwin->gui->stream, &event);
     }
-    break;
-    
   }
 }
+
+static void _vwin_handle_destroy_notify (void *data) {
+  xui_vwin_t *vwin = data;
+
+  /*if (vwin->video_window == event->xany.window)*/
+  gui_exit (NULL, vwin->gui);
+}
+
+static void _vwin_handle_expose_notify (void *data, const xitk_expose_event_t *ee) {
+  xui_vwin_t *vwin = data;
+
+  if (ee->expose_count == 0) {
+    /*if (event->xany.window == vwin->video_window)*/
+    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_EXPOSE_EVENT, ee->orig_event);
+  }
+}
+
+static const xitk_event_cbs_t vwin_event_cbs = {
+  .key_cb    = _vwin_handle_key_event,
+  .btn_cb    = _vwin_handle_button_event,
+  .motion_cb = _vwin_handle_motion_event,
+
+  .expose_notify_cb    = _vwin_handle_expose_notify,
+  .destroy_notify_cb   = _vwin_handle_destroy_notify,
+  .configure_notify_cb = _vwin_handle_configure_notify,
+
+  .dnd_cb              = gui_dndcallback,
+};
+
+static void register_event_handler(xui_vwin_t *vwin)
+{
+  xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
+  vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
+
+  vwin->widget_key = xitk_window_register_event_handler ("video_window", vwin->wrapped_window,
+                                                         &vwin_event_cbs, vwin);
+}
+
+/*
+ *
+ */
+
+static void video_window_handle_event (xui_vwin_t *vwin, XEvent *event) {
+
+  switch(event->type) {
+    case KeyPress:
+    case ButtonRelease:
+    case ButtonPress:
+    case MotionNotify:
+      xitk_x11_translate_xevent(event, &vwin_event_cbs, vwin);
+      break;
+
+    case DestroyNotify:
+    case ConfigureNotify:
+    case Expose:
+      if (event->xany.window == vwin->video_window) {
+        xitk_x11_translate_xevent(event, &vwin_event_cbs, vwin);
+      }
+      break;
+  }
+}
+
+/* 
+ * very small X event loop for the second display
+ */
+static __attribute__((noreturn)) void *second_display_loop (void *data) {
+  xui_vwin_t *vwin = data;
+  
+  while (vwin->second_display_running) {
+    XEvent   xevent;
+    int      got_event;
+
+    xine_usec_sleep(20000);
+    
+    do {
+        vwin->x_lock_display (vwin->video_display);
+        got_event = XPending (vwin->video_display);
+        if( got_event )
+          XNextEvent (vwin->video_display, &xevent);
+        vwin->x_unlock_display (vwin->video_display);
+        
+        if (got_event && vwin->gui->stream) {
+          video_window_handle_event (vwin, &xevent);
+        }
+    } while (got_event);
+
+  }
+  
+  pthread_exit(NULL);
+}
+
+/*
+ *
+ */
 
 long int video_window_get_ssaver_idle (xui_vwin_t *vwin) {
   if (!vwin)

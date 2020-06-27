@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "xine-toolkit/recode.h"
@@ -269,16 +268,13 @@ static void help_exit(xitk_widget_t *w, void *data) {
   }
 }
 
-static void help_handle_event(XEvent *event, void *data) {
+static void help_handle_key_event(void *data, const xitk_key_event_t *ke) {
 
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       help_exit(NULL, NULL);
     else
-      gui_handle_event (event, gGui);
-    break;
+      gui_handle_key_event (gGui, ke);
   }
 }
 
@@ -321,6 +317,10 @@ void help_reparent(void) {
   if(help)
     reparent_window(gui, help->xwin);
 }
+
+static const xitk_event_cbs_t  help_event_cbs = {
+  .key_cb = help_handle_key_event,
+};
 
 void help_panel(void) {
   xitk_labelbutton_widget_t  lb;
@@ -422,13 +422,7 @@ void help_panel(void) {
   xitk_add_widget (help->widget_list, w);
   xitk_enable_and_show_widget(w);
   
-  help->kreg = xitk_register_event_handler("help",
-                                           help->xwin,
-					   help_handle_event,
-					   NULL,
-					   NULL,
-					   help->widget_list,
-					   NULL);
+  help->kreg = xitk_window_register_event_handler("help", help->xwin, &help_event_cbs, help);
   
   help->visible = 1;
   help->running = 1;

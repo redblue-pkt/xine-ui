@@ -1423,6 +1423,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 /*
  * Call notify_keyevent, if exist, of specified plugin. This pass an X11 XEvent.
  */
+
 void xitk_send_key_event(xitk_widget_t *w, XEvent *xev, int modifier) {
   widget_event_t event;
 
@@ -2221,6 +2222,10 @@ void *xitk_widget_list_get(xitk_widget_list_t *wl, int param) {
   }
   
   return data;
+}
+
+void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs) {
+  xitk_font_set_font(xtfs, wl->gc);
 }
 
 void xitk_widget_keyable(xitk_widget_t *w, int keyable) {

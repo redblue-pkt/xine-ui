@@ -32,7 +32,6 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -273,17 +272,20 @@ static void fne_cancel_cb(xitk_widget_t *w, void *data) {
   fb_reactivate(fne->fb);
   fne_destroy(fne);
 }
-static void fne_handle_event(XEvent *event, void *data) {
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+
+static void _fne_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       fne_cancel_cb(NULL, data);
     else
-      gui_handle_event(event, gGui);
-    break;
+      gui_handle_key_event (gGui, ke);
   }
 }
+
+static const xitk_event_cbs_t fne_event_cbs = {
+  .key_cb            = _fne_handle_key_event,
+};
 
 static void fb_create_input_window(char *title, char *text,
 				   xitk_string_callback_t cb, filebrowser_t *fb) {
@@ -361,14 +363,8 @@ static void fb_create_input_window(char *title, char *text,
   {
     char buffer[256];
     snprintf(buffer, sizeof(buffer), "filenameed%u", (unsigned int) time(NULL));
-    
-    fne->widget_key = xitk_register_event_handler(buffer,
-                                                  fne->xwin,
-						  fne_handle_event,
-						  NULL,
-						  NULL,
-						  fne->widget_list,
-						  (void *)fne);
+
+    fne->widget_key = xitk_window_register_event_handler(buffer, fne->xwin, &fne_event_cbs, fne);
   }
 
   xitk_window_show_window(fne->xwin, 1);
@@ -1062,29 +1058,28 @@ static void fb_lbl_hidden_files(xitk_widget_t *w, void *data) {
   xitk_checkbox_callback_exec(fb->show_hidden);
 }
 
-static void fb_handle_events(XEvent *event, void *data) {
+static void _fb_handle_key_event(void *data, const xitk_key_event_t *ke) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
-  switch(event->type) {
 
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape) {
-      if(xitk_is_widget_enabled(fb->close)) /* Exit only if close button would exit */
-	_fb_exit(NULL, data);
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape) {
+      if (xitk_is_widget_enabled(fb->close)) /* Exit only if close button would exit */
+        _fb_exit(NULL, data);
     }
     else {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
-      if(sel >= 0) {
-        int modifier = 0;
-        xitk_get_key_modifier(event, &modifier);
-        fb_select(fb->files_browser, (void *) fb, sel, modifier);
+      if (sel >= 0) {
+        fb_select(fb->files_browser, (void *) fb, sel, ke->modifiers);
       } else {
-	gui_handle_event(event, data);
+        gui_handle_key_event (gGui, ke);
       }
     }
-    break;
   }
 }
+
+static const xitk_event_cbs_t fb_event_cbs = {
+  .key_cb            = _fb_handle_key_event,
+};
 
 void filebrowser_raise_window(filebrowser_t *fb) {
   if(fb != NULL)
@@ -1546,13 +1541,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   {
     char buffer[256];
     snprintf(buffer, sizeof(buffer), "filebrowser%u", (unsigned int) time(NULL));
-    fb->widget_key = xitk_register_event_handler(buffer,
-                                                 fb->xwin,
-						 fb_handle_events,
-						 NULL,
-						 NULL,
-						 fb->widget_list,
-						 (void *)fb);
+    fb->widget_key = xitk_window_register_event_handler(buffer, fb->xwin, &fb_event_cbs, fb);
   }
   fb->dialog = 0;
 

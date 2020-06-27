@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -867,16 +866,20 @@ static void _applugin_close_help(xitk_widget_t *w, void *data) {
   _pplugin_close_help(&_app_wrapper.p, w, data);
 }
 
-static void _pplugin_help_handle_event(XEvent *event, void *data) {
+static void _pplugin_help_handle_key_event(void *data, const xitk_key_event_t *ke) {
   _pp_wrapper_t *pp_wrapper = data;
 
-  if(event->type == KeyPress) {
-    if(xitk_get_key_pressed(event) == XK_Escape)
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       _pplugin_close_help(pp_wrapper, NULL, NULL);
     else
-      gui_handle_event (event, gGui);
+      gui_handle_key_event (gGui, ke);
   }
 }
+
+static const xitk_event_cbs_t pplugin_help_event_cbs = {
+  .key_cb            = _pplugin_help_handle_key_event,
+};
 
 static int __line_wrap(char *s, int pos, int line_size)
 {
@@ -1023,14 +1026,11 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
 
     xitk_window_set_background(pp_wrapper->pplugin->helpwin, bg);
 
-    pp_wrapper->pplugin->help_widget_key = xitk_register_event_handler((pp_wrapper == &_vpp_wrapper.p) ? "vpplugin_help" : "applugin_help", 
-                                                                       pp_wrapper->pplugin->helpwin,
-                                                                       _pplugin_help_handle_event,
-                                                                       NULL,
-                                                                       NULL,
-                                                                       xitk_window_widget_list(pp_wrapper->pplugin->helpwin),
-                                                                       pp_wrapper);
-  
+    pp_wrapper->pplugin->help_widget_key =
+      xitk_window_register_event_handler((pp_wrapper == &_vpp_wrapper.p) ? "vpplugin_help" : "applugin_help",
+                                         pp_wrapper->pplugin->helpwin,
+                                         &pplugin_help_event_cbs, pp_wrapper);
+
     pp_wrapper->pplugin->help_running = 1;
   }
 
@@ -1540,81 +1540,80 @@ static void applugin_exit(xitk_widget_t *w, void *data) {
   pplugin_exit(&_app_wrapper.p, w, data);
 }
 
-static void _pplugin_handle_event(XEvent *event, void *data) {
+static void _pplugin_handle_button_event(void *data, const xitk_button_event_t *be) {
   _pp_wrapper_t *pp_wrapper = data;
 
-  switch(event->type) {
-
-  case ButtonPress:
-    if(event->xbutton.button == Button4) {
+  if (be->event == XITK_BUTTON_PRESS) {
+    if (be->button == Button4) {
       xitk_slider_make_step(pp_wrapper->pplugin->slider);
       xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
     }
-    else if(event->xbutton.button == Button5) {
+    else if (be->button == Button5) {
       xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
       xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
     }
-    break;
-
-  case KeyPress:
-    {
-      KeySym         mkey;
-      int            modifier;
-      
-      xitk_get_key_modifier(event, &modifier);
-      mkey = xitk_get_key_pressed(event);
-
-      switch(mkey) {
-	
-      case XK_Up:
-	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
-	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-	  xitk_slider_make_step(pp_wrapper->pplugin->slider);
-	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-	  return;
-	}
-	break;
-	
-      case XK_Down:
-	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
-	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-	  xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
-	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-	  return;
-	}
-	break;
-	
-      case XK_Next:
-	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
-	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
-	  
-	  pos = max - (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
-	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos >= 0) ? pos : 0);
-	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-	  return;
-	}
-	break;
-	
-      case XK_Prior:
-	if(xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
-	  int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
-	  
-	  pos = max - (pp_wrapper->pplugin->first_displayed - MAX_DISPLAY_FILTERS);
-	  xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos <= max) ? pos : max);
-	  xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-	  return;
-	}
-	break;
-	
-      case XK_Escape:
-	pplugin_exit(pp_wrapper, NULL, NULL);
-	return;
-      }
-      gui_handle_event (event, gGui);
-    }
-    break;
   }
 }
+
+static void _pplugin_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  _pp_wrapper_t *pp_wrapper = data;
+
+  if (ke->event != XITK_KEY_PRESS)
+    return;
+
+  switch (ke->key_pressed) {
+    case XK_Up:
+      if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
+          (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+        xitk_slider_make_step(pp_wrapper->pplugin->slider);
+        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        return;
+      }
+      break;
+
+    case XK_Down:
+      if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
+          (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+        xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
+        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        return;
+      }
+      break;
+
+    case XK_Next:
+      if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
+        int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
+
+        pos = max - (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
+        xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos >= 0) ? pos : 0);
+        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        return;
+      }
+      break;
+
+    case XK_Prior:
+      if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
+        int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
+
+        pos = max - (pp_wrapper->pplugin->first_displayed - MAX_DISPLAY_FILTERS);
+        xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos <= max) ? pos : max);
+        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        return;
+      }
+      break;
+
+    case XK_Escape:
+      pplugin_exit(pp_wrapper, NULL, NULL);
+      return;
+  }
+
+  gui_handle_key_event (gGui, ke);
+}
+
+static const xitk_event_cbs_t pplugin_event_cbs = {
+  .key_cb            = _pplugin_handle_key_event,
+  .btn_cb            = _pplugin_handle_button_event,
+};
 
 static void _pplugin_enability(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int state) {
   gGui_t *gui = gGui;
@@ -1885,14 +1884,11 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
 
   xitk_window_set_background(pp_wrapper->pplugin->xwin, bg);
 
-  pp_wrapper->pplugin->widget_key = xitk_register_event_handler((pp_wrapper == &_vpp_wrapper.p) ? "vpplugin" : "applugin", 
-                                                                pp_wrapper->pplugin->xwin,
-                                                    _pplugin_handle_event,
-						    NULL,
-						    NULL,
-						    pp_wrapper->pplugin->widget_list,
-                                                    pp_wrapper);
-  
+  pp_wrapper->pplugin->widget_key =
+    xitk_window_register_event_handler((pp_wrapper == &_vpp_wrapper.p) ? "vpplugin" : "applugin",
+                                       pp_wrapper->pplugin->xwin,
+                                       &pplugin_event_cbs, pp_wrapper);
+
   pp_wrapper->pplugin->visible = 1;
   pp_wrapper->pplugin->running = 1;
 

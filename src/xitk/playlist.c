@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -454,96 +453,88 @@ static void _playlist_add_input(xitk_widget_t *w, void *data, const char *filena
 /*
  * Handle X events here.
  */
-static void _playlist_handle_event(XEvent *event, void *data) {
+
+static void _playlist_handle_button_event(void *data, const xitk_button_event_t *be) {
   gGui_t *gui = gGui;
 
-  switch(event->type) {
-
-  case ButtonPress: {
-    XButtonEvent *bevent = (XButtonEvent *) event;
-
-    if(bevent->button == Button3) {
+  if (be->event == XITK_BUTTON_PRESS) {
+    if (be->button == Button3) {
       xitk_widget_t *w = xitk_get_focused_widget(playlist->widget_list);
-      
-      if(w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
-	int wx, wy;
+
+      if (w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
+        int wx, wy;
 
         xitk_window_get_window_position(playlist->xwin, &wx, &wy, NULL, NULL);
 
         playlist_menu (gui, playlist->widget_list,
-		      bevent->x + wx, bevent->y + wy, 
-		      (xitk_browser_get_current_selected(playlist->playlist) >= 0));
+                       be->x + wx, be->y + wy,
+                       (xitk_browser_get_current_selected(playlist->playlist) >= 0));
       }
-
-    }
-    else if((bevent->button == Button4) || (bevent->button == Button5))
+    } else if (be->button == Button4 || be->button == Button5) {
       mmk_editor_end();
-
+    }
   }
-    break;
 
-  case ButtonRelease:
-    if(playlist && playlist->playlist) {
-      if(xitk_browser_get_current_selected(playlist->playlist) < 0)
-	mmk_editor_end();
+  if (be->event == XITK_BUTTON_RELEASE) {
+    if (playlist && playlist->playlist) {
+      if (xitk_browser_get_current_selected(playlist->playlist) < 0)
+        mmk_editor_end();
     }
 
-    gui_handle_event (event, gui);
-    break;
-
-  case KeyPress:
-    {
-      KeySym mkey;
-      
-      if(!playlist)
-	return;
-
-      mkey = xitk_get_key_pressed(event);
-
-      switch (mkey) {
-	
-      case XK_Down:
-      case XK_Next: {
-	xitk_widget_t *w;
-	
-	mmk_editor_end();
-	w = xitk_get_focused_widget(playlist->widget_list);
-	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	  if(mkey == XK_Down)
-	    xitk_browser_step_up(playlist->playlist, NULL);
-	  else
-	    xitk_browser_page_up(playlist->playlist, NULL);
-	}
-      }
-	break;
-	
-      case XK_Up:
-      case XK_Prior: {
-	xitk_widget_t *w;
-	
-	mmk_editor_end();
-	w = xitk_get_focused_widget(playlist->widget_list);
-	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	  if(mkey == XK_Up)
-	    xitk_browser_step_down(playlist->playlist, NULL);
-	  else
-	    xitk_browser_page_down(playlist->playlist, NULL);
-	}
-      }
-	break;
-
-      case XK_Escape:
-	playlist_exit(NULL, NULL);
-	break;
-
-      default:
-        gui_handle_event (event, gui);
-	break;
-      }
-    }
-    break;
+    gui_handle_button_event (gui, be);
   }
 }
+
+static void _playlist_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  gGui_t *gui = gGui;
+
+  if (!playlist)
+    return;
+
+  if (ke->event == XITK_KEY_PRESS) {
+    xitk_widget_t *w;
+
+    switch (ke->key_pressed) {
+      case XK_Down:
+      case XK_Next:
+        mmk_editor_end();
+        w = xitk_get_focused_widget(playlist->widget_list);
+        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+          if (ke->key_pressed == XK_Down)
+            xitk_browser_step_up(playlist->playlist, NULL);
+          else
+            xitk_browser_page_up(playlist->playlist, NULL);
+        }
+        break;
+
+      case XK_Up:
+      case XK_Prior:
+        mmk_editor_end();
+        w = xitk_get_focused_widget(playlist->widget_list);
+        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+          if (ke->key_pressed == XK_Up)
+            xitk_browser_step_down(playlist->playlist, NULL);
+          else
+            xitk_browser_page_down(playlist->playlist, NULL);
+        }
+        break;
+
+      case XK_Escape:
+        playlist_exit(NULL, NULL);
+        break;
+
+      default:
+        gui_handle_key_event (gui, ke);
+        break;
+    }
+  }
+}
+
+static const xitk_event_cbs_t playlist_event_cbs = {
+  .key_cb            = _playlist_handle_key_event,
+  .btn_cb            = _playlist_handle_button_event,
+  .dnd_cb            = gui_dndcallback,
+};
 
 static void _playlist_apply_cb(void *data) {
   playlist_mrlident_toggle();
@@ -1137,12 +1128,7 @@ void playlist_editor(void) {
   playlist_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
 
   playlist->widget_key = 
-    xitk_register_event_handler("playlist",
-                                playlist->xwin,
-				_playlist_handle_event,
-				NULL,
-				gui_dndcallback,
-				playlist->widget_list, (void*) playlist);
+    xitk_window_register_event_handler("playlist", playlist->xwin, &playlist_event_cbs, playlist);
 
   playlist->visible = 1;
   playlist->running = 1;

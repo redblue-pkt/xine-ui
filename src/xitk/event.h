@@ -22,9 +22,9 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <X11/Xlib.h>
-
 #include "common.h"
+
+#include "xitk.h"
 
 typedef struct {
   int    num_files;
@@ -47,7 +47,9 @@ void gui_run (gGui_t *gui, char **session_opts);
 int gui_playlist_play (gGui_t *gui, int idx);
 void gui_playlist_start_next (gGui_t *gui);
 void gui_execute_action_id (gGui_t *gui, action_id_t id);
-void gui_handle_event (XEvent *event, void *gui);
+
+void gui_handle_key_event (void *data, const xitk_key_event_t *ke);
+void gui_handle_button_event (void *data, const xitk_button_event_t *be);
 
 int wm_not_ewmh_only(void);
 #endif

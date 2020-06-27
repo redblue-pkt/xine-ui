@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -294,17 +293,19 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     video_window_set_input_focus(gui->vwin);
 }
 
-static void handle_event(XEvent *event, void *data) {
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
+static void stream_infos_handle_key_event(void *data, const xitk_key_event_t *ke) {
+
+  if (ke->event == XITK_KEY_PRESS) {
+    if (ke->key_pressed == XK_Escape)
       stream_infos_exit(NULL, NULL);
     else
-      gui_handle_event (event, gGui);
-    break;
+      gui_handle_key_event (gGui, ke);
   }
 }
+
+static const xitk_event_cbs_t stream_infos_event_cbs = {
+  .key_cb            = stream_infos_handle_key_event,
+};
 
 int stream_infos_is_visible(void) {
   gGui_t *gui = gGui;
@@ -834,13 +835,7 @@ void stream_infos_panel(void) {
 
   xitk_window_set_background(sinfos.xwin, bg);
 
-  sinfos.widget_key = xitk_register_event_handler("sinfos", 
-                                                  sinfos.xwin,
-						   handle_event,
-						   NULL,
-						   NULL,
-						   sinfos.widget_list,
-						   NULL);
+  sinfos.widget_key = xitk_window_register_event_handler("sinfos", sinfos.xwin, &stream_infos_event_cbs, &sinfos);
   
   stream_infos_update_infos();
 

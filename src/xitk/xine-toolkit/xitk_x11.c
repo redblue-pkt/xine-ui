@@ -310,3 +310,137 @@ Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, i
 
   return display;
 }
+
+/*
+ *
+ */
+
+void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void *user_data) {
+
+  switch (event->type) {
+
+  case DestroyNotify:
+    if (cbs->destroy_notify_cb) {
+      cbs->destroy_notify_cb(user_data);
+    }
+    break;
+  case MapNotify:
+    if (cbs->map_notify_cb) {
+      cbs->map_notify_cb(user_data);
+    }
+    break;
+  case Expose:
+    if (cbs->expose_notify_cb) {
+      xitk_expose_event_t ee = {
+        .expose_count = event->xexpose.count,
+        .orig_event = event,
+      };
+      cbs->expose_notify_cb(user_data, &ee);
+    }
+    break;
+  case KeyPress:
+  case KeyRelease:
+    if (cbs->key_cb) {
+      char keycode_str[256] = "", keysym_str[256] = "";
+      xitk_key_event_t ke = {
+        .event       = event->type == KeyPress ? XITK_KEY_PRESS : XITK_KEY_RELEASE,
+        .key_pressed = xitk_get_key_pressed(event),
+        .modifiers   = 0,
+        .keycode     = event->xkey.keycode,
+        .keysym_str  = keysym_str,
+        .keycode_str = keycode_str,
+      };
+      // ???????
+      xitk_get_key_modifier(event, &ke.modifiers);
+      // ????????
+      if (xitk_keysym_to_string(ke.key_pressed, keysym_str, sizeof(keysym_str)) <= 0)
+        ke.keysym_str = NULL;
+      if (xitk_keysym_to_string(xitk_keycode_to_keysym(event), keycode_str, sizeof(keycode_str)) <= 0)
+        ke.keycode_str = NULL;
+      cbs->key_cb(user_data, &ke);
+    }
+    break;
+
+  case ButtonPress:
+  case ButtonRelease:
+    if (cbs->btn_cb) {
+      xitk_button_event_t be = {
+        .event     = event->type == ButtonPress ? XITK_BUTTON_PRESS : XITK_BUTTON_RELEASE,
+        .button    = event->xbutton.button,
+        .x         = event->xbutton.x,
+        .y         = event->xbutton.y,
+        .modifiers = 0,
+      };
+      xitk_get_key_modifier(event, &be.modifiers);
+      cbs->btn_cb(user_data, &be);
+    }
+    break;
+
+  case MotionNotify:
+    if (cbs->motion_cb) {
+      xitk_motion_event_t me = {
+        .x         = event->xmotion.x,
+        .y         = event->xmotion.y,
+      };
+      cbs->motion_cb(user_data, &me);
+    }
+    break;
+
+  case ConfigureNotify:
+    if (cbs->configure_notify_cb) {
+      xitk_configure_event_t ce = {
+        .x         = event->xconfigure.x,
+        .y         = event->xconfigure.y,
+        .width     = event->xconfigure.width,
+        .height    = event->xconfigure.height,
+      };
+      cbs->configure_notify_cb(user_data, &ce);
+    }
+    break;
+  }
+}
+
+/*
+ *
+ */
+
+/*
+ * Extract modifier keys.
+ */
+int xitk_get_key_modifier(XEvent *xev, int *modifier) {
+  unsigned int state = 0;
+
+  *modifier = MODIFIER_NOMOD;
+
+  if(!xev)
+    return 0;
+
+  if((xev->type == ButtonPress) || (xev->type == ButtonRelease))
+    state = xev->xbutton.state;
+  else if ((xev->type == KeyPress) || (xev->type == KeyRelease))
+    state = xev->xkey.state;
+  else
+    state = xev->xkey.state;
+
+  if(state & XK_Multi_key)
+    state = (state | XK_Multi_key) & 0xFF;
+  
+  if(state & ShiftMask)
+    *modifier |= MODIFIER_SHIFT;
+  if(state & LockMask)
+    *modifier |= MODIFIER_LOCK;
+  if(state & ControlMask)
+    *modifier |= MODIFIER_CTRL;
+  if(state & Mod1Mask)
+    *modifier |= MODIFIER_META;
+  if(state & Mod2Mask)
+    *modifier |= MODIFIER_NUML;
+  if(state & Mod3Mask)
+    *modifier |= MODIFIER_MOD3;
+  if(state & Mod4Mask)
+    *modifier |= MODIFIER_MOD4;
+  if(state & Mod5Mask)
+    *modifier |= MODIFIER_MOD5;
+  
+  return (*modifier != MODIFIER_NOMOD);
+}

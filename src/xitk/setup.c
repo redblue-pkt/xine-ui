@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -453,49 +452,43 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
 /*
  * Handle X events here.
  */
-static void setup_handle_event(XEvent *event, void *data) {
+
+static void _setup_handle_button_event(void *data, const xitk_button_event_t *be) {
   xui_setup_t *setup = data;
-  
-  switch(event->type) {
-    
-  case ButtonPress:
-    if(event->xbutton.button == Button4) {
+
+  if (be->event == XITK_BUTTON_PRESS) {
+    if (be->button == Button4) {
       xitk_slider_make_step (setup->slider_wg);
       xitk_slider_callback_exec (setup->slider_wg);
     }
-    else if(event->xbutton.button == Button5) {
+    else if (be->button == Button5) {
       xitk_slider_make_backstep (setup->slider_wg);
       xitk_slider_callback_exec (setup->slider_wg);
     }
-    break;
+  }
+}
+static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_setup_t *setup = data;
 
-  case KeyPress:
-    {
-      KeySym         mkey;
-      int            modifier;
-      
-      xitk_get_key_modifier(event, &modifier);
-      mkey = xitk_get_key_pressed(event);
-      
-      switch(mkey) {
-
+  if (ke->event == XITK_KEY_PRESS) {
+    switch (ke->key_pressed) {
       case XK_Up:
         if (xitk_is_widget_enabled (setup->slider_wg) &&
-	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+            (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
           xitk_slider_make_step (setup->slider_wg);
           xitk_slider_callback_exec (setup->slider_wg);
-	  return;
-	}
-	break;
+          return;
+        }
+        break;
 
       case XK_Down:
         if (xitk_is_widget_enabled (setup->slider_wg) &&
-	   (modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+            (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
           xitk_slider_make_backstep (setup->slider_wg);
           xitk_slider_callback_exec (setup->slider_wg);
-	  return;
-	}
-	break;
+          return;
+        }
+        break;
 
       case XK_Next:
         if (xitk_is_widget_enabled(setup->slider_wg)) {
@@ -504,9 +497,9 @@ static void setup_handle_event(XEvent *event, void *data) {
           pos = max - (setup->first_displayed + MAX_DISPLAY_WIDGETS);
           xitk_slider_set_pos (setup->slider_wg, (pos >= 0) ? pos : 0);
           xitk_slider_callback_exec (setup->slider_wg);
-	  return;
-	}
-	break;
+          return;
+        }
+        break;
 
       case XK_Prior:
         if (xitk_is_widget_enabled(setup->slider_wg)) {
@@ -515,19 +508,23 @@ static void setup_handle_event(XEvent *event, void *data) {
           pos = max - (setup->first_displayed - MAX_DISPLAY_WIDGETS);
           xitk_slider_set_pos (setup->slider_wg, (pos <= max) ? pos : max);
           xitk_slider_callback_exec (setup->slider_wg);
-	  return;
-	}
-	break;
+          return;
+        }
+        break;
 
       case XK_Escape:
         setup_exit (NULL, setup);
-	return;
-      }
-      gui_handle_event (event, setup->gui);
+        return;
     }
-    break;
+
+    gui_handle_key_event (setup->gui, ke);
   }
 }
+
+static const xitk_event_cbs_t setup_event_cbs = {
+  .key_cb            = _setup_handle_key_event,
+  .btn_cb            = _setup_handle_button_event,
+};
 
 /*
  *
@@ -1056,7 +1053,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     setup->widget_list = xitk_window_widget_list(setup->xwin);
 
     fs = xitk_font_load_font (setup->gui->xitk, fontname);
-    xitk_font_set_font (fs, (XITK_WIDGET_LIST_GC (setup->widget_list)));
+    xitk_widget_list_set_font (setup->widget_list, fs);
     setup->fh = xitk_font_get_string_height (fs, " ");
   }
 
@@ -1136,12 +1133,8 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   }
   setup_show_tips (setup, panel_get_tips_enable (setup->gui->panel), panel_get_tips_timeout (setup->gui->panel));
 
-  setup->kreg = xitk_register_event_handler ("setup",
-    setup->xwin,
-    setup_handle_event, NULL, NULL,
-    setup->widget_list, setup);
-  setup->dialog = 0;
-  
+  setup->kreg = xitk_window_register_event_handler("setup", setup->xwin, &setup_event_cbs, setup);
+
   setup->visible = 1;
   setup->running = 1;
   setup_raise_window (setup);
