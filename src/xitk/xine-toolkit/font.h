@@ -119,4 +119,8 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 
+void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
+			   int x, int y, const char *text, 
+			   size_t nbytes);
+
 #endif

@@ -165,34 +165,15 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
                                                   NULL, NULL, NULL, 1, 0, NULL);
       {
 	xitk_pixmap_t *bg;
-	int            width, height;
-	GC             gc;
-	
-	xitk_window_get_window_size(xwin, &width, &height);
-        bg = xitk_image_create_xitk_pixmap(xitk, width, height);
-	
-        XLOCK (xitk_x_lock_display, tips->display);
-        gc = XCreateGC(tips->display, tips->widget->wl->imlibdata->x.base_window, None, None);
-        XCopyArea(tips->display, (xitk_window_get_background(xwin)), bg->pixmap, gc, 0, 0, width, height, 0, 0);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
 
-        XLOCK (xitk_x_lock_display, tips->display);
-        XSetForeground(tips->display, gc, cfore);
-        XDrawRectangle(tips->display, bg->pixmap, gc, 0, 0, width - 1, height - 1);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
+        bg = xitk_window_get_background_pixmap(xwin);
 
-        XLOCK (xitk_x_lock_display, tips->display);
-        XSetForeground(tips->display, gc, cback);
-        XFillRectangle(tips->display, bg->pixmap, gc, 1, 1, width - 2, height - 2);
-        XCopyArea(tips->display, image->image->pixmap, bg->pixmap,
-		  gc, 0, 0, image->width, image->height, (width - image->width)>>1, (height - image->height)>>1);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
+        pixmap_draw_rectangle(bg, 0, 0, bg->width - 1, bg->height - 1, cfore);
+        pixmap_fill_rectangle(bg, 1, 1, bg->width - 2, bg->height - 2, cback);
+        xitk_pixmap_copy_area(image->image, bg, 0, 0, image->width, image->height,
+                              (bg->width - image->width)>>1, (bg->height - image->height)>>1);
 
         xitk_window_set_background(xwin, bg);
-
-        XLOCK (xitk_x_lock_display, tips->display);
-        XFreeGC(tips->display, gc);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
 
         xitk_image_free_image(&image);
       }
