@@ -1807,20 +1807,14 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  break;
 
 	case KeyPress: {
-	  XKeyEvent      mykeyevent;
 	  KeySym         mykey;
 	  char           kbuf[256];
 	  int            modifier;
 	  int            handled = 0;
 	  xitk_widget_t *w = NULL;
 	  
-	  mykeyevent = event->xkey;
-
 	  xitk_get_key_modifier(event, &modifier);
-
-          XLOCK (xitk->x.x_lock_display, xitk->x.display);
-	  XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
 
           xitk_tips_hide_tips(xitk->x.tips);
 	  

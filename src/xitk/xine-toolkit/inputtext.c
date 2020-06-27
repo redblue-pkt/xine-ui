@@ -1025,19 +1025,16 @@ static void _inputtext_transpose_chars (_inputtext_private_t *wp) {
 /*
  * Handle keyboard event in input text box.
  */
-static void _notify_keyevent_inputtext (_inputtext_private_t *wp, XEvent *xev) {
+static void _notify_keyevent_inputtext (_inputtext_private_t *wp, int modifier, XEvent *xev) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     KeySym      key;
     char        buf[256];
     int         len;
-    int         modifier;
-    
+
     wp->have_focus = FOCUS_RECEIVED;
 
     len = xitk_get_keysym_and_buf(xev, &key, buf, sizeof(buf));
     buf[len] = '\0';
-
-    (void) xitk_get_key_modifier(xev, &modifier);
 
     /* One of modifier key is pressed, none of keylock or shift */
     if (buf[0] && !buf[1] && (modifier & MODIFIER_CTRL)) {
@@ -1180,7 +1177,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       _notify_focus_inputtext (wp, event->focus);
       break;
     case WIDGET_EVENT_KEY_EVENT:
-      _notify_keyevent_inputtext (wp, event->xevent);
+      _notify_keyevent_inputtext (wp, event->modifier, event->xevent);
       break;
     case WIDGET_EVENT_INSIDE:
       result->value = _notify_inside (wp, event->x, event->y);
