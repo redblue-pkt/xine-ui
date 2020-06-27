@@ -27,7 +27,7 @@
 #include "_xitk.h"
 
 
-typedef struct {
+typedef struct _tabs_private_s {
   xitk_widget_t           w;
 
   char                   *skin_element_name;
@@ -43,10 +43,9 @@ typedef struct {
   char                  **entries;
 
   xitk_widget_t          *tabs[MAX_TABS];
-  btnlist_t              *bt[MAX_TABS];
+  struct _tabs_private_s *ref[MAX_TABS];
 
   int                     selected;
-  int                     old_selected;
   int                     start, stop;
 
   int                     bheight;
@@ -86,10 +85,6 @@ static void _tabs_enability (_tabs_private_t *wp) {
 }
   
 static void _notify_destroy (_tabs_private_t *wp) {
-  int i;
-    
-  for (i = 0; i <= wp->num_entries; i++)
-    XITK_FREE (wp->bt[i]);
   if (wp->gap)
     xitk_image_free_image (&wp->gap);
   XITK_FREE (wp->skin_element_name);
@@ -230,15 +225,13 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  *
  */
 static void tabs_select(xitk_widget_t *w, void *data, int select, int modifier) {
-  _tabs_private_t *wp = (_tabs_private_t *)((btnlist_t*)data)->itemlist->private_data;
+  _tabs_private_t **ref = (_tabs_private_t **)data, *wp = *ref;
 
   (void)w;
   (void)modifier;
   if (select) {
-    wp->old_selected = wp->selected;
-    wp->selected = (int)((btnlist_t*)data)->sel;
-    xitk_labelbutton_set_state (wp->tabs[wp->old_selected], 0);
-    /* _tabs_arrange_item (wp, wp->selected); */
+    xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
+    wp->selected = ref - wp->ref;
     if (wp->callback)
       wp->callback (wp->widget, wp->userdata, wp->selected);
   } else {
@@ -274,9 +267,8 @@ void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
   
   if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS)) {
     if ((select >= 0) && (select < wp->num_entries)) {
-      wp->old_selected = wp->selected;
+      xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
       wp->selected = select;
-      xitk_labelbutton_set_state (wp->tabs[wp->old_selected], 0);
       _tabs_arrange_item (wp, wp->selected, wp->w.visible);
       xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
     }
@@ -356,9 +348,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
     for (i = 0; i < wp->num_entries; i++) {
 
-      wp->bt[i]           = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      wp->bt[i]->itemlist = &wp->w;
-      wp->bt[i]->sel      = i;
+      wp->ref[i]          = wp;
 
       fwidth = xitk_font_get_string_length(fs, t->entries[i]);
 
@@ -368,7 +358,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       lb.label             = t->entries[i];
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;
-      lb.userdata          = (void *)wp->bt[i];
+      lb.userdata          = (void *)&wp->ref[i];
       if ((wp->tabs[i] = xitk_noskin_labelbutton_create (wl, &lb,
         xx, y, fwidth + 20, wp->bheight, "Black", "Black", "Black", fontname))) {
         wp->tabs[i]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
@@ -415,7 +405,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       }
     }
 
-    wp->old_selected = wp->selected = 0;
+    wp->selected = 0;
     wp->start = -2;
     wp->stop = wp->num_entries;
     _tabs_arrange_left (wp, 0, 0);
