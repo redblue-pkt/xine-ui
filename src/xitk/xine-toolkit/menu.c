@@ -440,7 +440,7 @@ static void _menu_hide_menu(menu_private_data_t *private_data) {
   XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   mw = (menu_window_t *)private_data->menu_windows.tail.prev;
   while (mw->wl.node.prev) {
-    XUnmapWindow(private_data->imlibdata->x.disp, xitk_window_get_window(mw->xwin));
+    xitk_window_hide_window(mw->xwin);
     XSync(private_data->imlibdata->x.disp, False);
     mw = (menu_window_t *)mw->wl.node.prev;
   }
@@ -531,13 +531,8 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
 	_menu_create_menu_from_branch(me->branch, me->widget, x, y);
       }
       else {
-        XLOCK (me->branch->menu_window->im->x.x_lock_display, private_data->imlibdata->x.disp);
-	XRaiseWindow(me->branch->menu_window->display, 
-		     xitk_window_get_window(me->branch->menu_window->xwin));
-	XSetInputFocus(me->branch->menu_window->display, 
-		       (xitk_window_get_window(me->branch->menu_window->xwin)),
-		       RevertToParent, CurrentTime);
-        XUNLOCK (me->branch->menu_window->im->x.x_unlock_display, private_data->imlibdata->x.disp);
+        xitk_window_raise_window (me->branch->menu_window->xwin);
+        xitk_window_set_input_focus (me->branch->menu_window->xwin);
       }
     }
     else {
@@ -940,16 +935,12 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     xitk_window_set_background(xwin, bg);
   }
 
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
   if(branch == private_data->mtree->first)
-    XSetTransientForHint(private_data->imlibdata->x.disp,
-			 (xitk_window_get_window(xwin)), private_data->parent_wlist->win);
+    xitk_window_set_transient_for(xwin, private_data->parent_wlist->win);
   else
-    XSetTransientForHint(private_data->imlibdata->x.disp,
-			 (xitk_window_get_window(xwin)), (xitk_window_get_window(branch->prev->menu_window->xwin)));
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+    xitk_window_set_transient_for_win(xwin, branch->prev->menu_window->xwin);
 
   menu_window->key = xitk_register_event_handler("xitk menu",
                                                  menu_window->xwin,

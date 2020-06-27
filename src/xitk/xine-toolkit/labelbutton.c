@@ -152,10 +152,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
   int                      xoff = 0, yoff = 0, DefaultColor = -1;
   unsigned int             fg = 0;
   unsigned int             origin = 0;
-  XColor                   xcolor;
   xitk_color_names_t      *color = NULL;
-
-  xcolor.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
   if (wp->fontname)
@@ -208,19 +205,11 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
     }
     
     if(color == NULL || DefaultColor != -1) {
-      xcolor.red = xcolor.blue = xcolor.green = DefaultColor<<8;
+      fg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, DefaultColor, DefaultColor, DefaultColor);
     }
     else {
-      xcolor.red = color->red<<8; 
-      xcolor.blue = color->blue<<8;
-      xcolor.green = color->green<<8;
+      fg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, color->red, color->green, color->blue);
     }
-    
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XAllocColor (wp->imlibdata->x.disp, Imlib_get_colormap (wp->imlibdata), &xcolor);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-
-    fg = xcolor.pixel;
   }
   
   XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);

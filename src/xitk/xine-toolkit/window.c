@@ -177,6 +177,12 @@ static Window _xitk_window_get_window (xitk_window_t *w) {
   return w->window;
 }
 
+void xitk_window_set_input_focus (xitk_window_t *w) {
+  X_LOCK (w->xitk);
+  XSetInputFocus(w->xitk->display, w->window, RevertToParent, CurrentTime);
+  X_UNLOCK (w->xitk);
+}
+
 static int _xitk_window_set_focus (Display *display, Window window) {
   int t = 0;
 
@@ -717,6 +723,16 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
     return;
 
   xitk_set_window_class(w->xitk->display, w->window, res_name, res_class);
+}
+
+void xitk_window_set_transient_for(xitk_window_t *w, Window win) {
+  X_LOCK (w->xitk);
+  XSetTransientForHint(w->xitk->display, w->window, win);
+  X_UNLOCK (w->xitk);
+}
+
+void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin) {
+  xitk_window_set_transient_for(w, xwin->window);
 }
 
 void xitk_window_raise_window(xitk_window_t *w)
