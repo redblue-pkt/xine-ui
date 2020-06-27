@@ -2147,6 +2147,7 @@ Window xitk_window_get_window(xitk_window_t *w);
 void xitk_window_set_input_focus(xitk_window_t *w);
 void xitk_window_try_to_set_input_focus(xitk_window_t *w);
 
+void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent);
 
 /**
  * Return copy of current background pixmap

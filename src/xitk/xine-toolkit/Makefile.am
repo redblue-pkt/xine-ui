@@ -26,6 +26,7 @@ libxitk_a_SOURCES = \
 	combo.c \
 	config.c \
 	cursors.c \
+	dialog.c \
 	dnd.c \
 	doublebox.c \
 	font.c \
