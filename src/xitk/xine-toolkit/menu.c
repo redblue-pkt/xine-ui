@@ -872,37 +872,21 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       if(bg && (!got_title)) {
 	int           lbear, rbear, width, asc, des;
 	unsigned int  cfg, cbg;
-	XColor        xcolorf, xcolorb;
-  
+
         fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_14);
 	xitk_font_set_font(fs, private_data->widget->wl->gc);
 	
 	xitk_font_string_extent(fs, me->menu_entry->menu, &lbear, &rbear, &width, &asc, &des);
 
-	xcolorb.red = xcolorb.blue = xcolorb.green = 140<<8;
-	xcolorf.red = xcolorf.blue = xcolorf.green = 255<<8;
+        cbg = xitk_get_pixel_color_from_rgb(private_data->widget->wl->xitk, 140, 140, 140);
+        cfg = xitk_get_pixel_color_from_rgb(private_data->widget->wl->xitk, 255, 255, 255);
 
-        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	XAllocColor(private_data->imlibdata->x.disp,
-		    Imlib_get_colormap(private_data->imlibdata), &xcolorb);
-	XAllocColor(private_data->imlibdata->x.disp,
-		    Imlib_get_colormap(private_data->imlibdata), &xcolorf);
-        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
+        pixmap_fill_rectangle(bg, 1, 1, wwidth, 20, cbg);
 
-	cfg = xcolorf.pixel;
-	cbg = xcolorb.pixel;
+        xitk_pixmap_draw_string(bg, fs, 5, 1+ ((20+asc+des)>>1)-des,
+                                me->menu_entry->menu, strlen(me->menu_entry->menu),
+                                cfg);
 
-        XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
-	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cbg);
-	XFillRectangle(private_data->imlibdata->x.disp, bg->pixmap, private_data->widget->wl->gc, 
-		       1, 1, wwidth , 20);
-	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cfg);
-        xitk_font_draw_string(fs, bg,
-			      private_data->widget->wl->gc, 
-			      5, 1+ ((20+asc+des)>>1)-des, 
-			      me->menu_entry->menu, strlen(me->menu_entry->menu));
-        XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
-	
 	xitk_font_unload_font(fs);
 
 	yy += 20;

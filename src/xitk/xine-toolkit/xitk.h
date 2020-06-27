@@ -1698,9 +1698,9 @@ void xitk_font_unload_font(xitk_font_t *xtfs);
 /*
  *
  */
-void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
-			   int x, int y, const char *text, 
-			   size_t nbytes);
+void xitk_pixmap_draw_string(xitk_pixmap_t *pixmap, xitk_font_t *xtfs,
+                             int x, int y, const char *text,
+                             size_t nbytes, int color);
 
 /*
  *
@@ -1873,12 +1873,16 @@ Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p);
  */
 
 void pixmap_draw_line(xitk_pixmap_t *p, int x0, int y0, int x1, int y1, unsigned color);
+void pixmap_draw_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned color);
 void pixmap_fill_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned color);
 void pixmap_fill_polygon(xitk_pixmap_t *p, XPoint *points, int npoints, unsigned color);
 
 void xitk_image_draw_line(xitk_image_t *i, int x0, int y0, int x1, int y1, unsigned color);
 void xitk_image_fill_rectangle(xitk_image_t *i, int x, int y, int w, int h, unsigned color);
 void xitk_image_fill_polygon(xitk_image_t *i, XPoint *points, int npoints, unsigned color);
+
+void xitk_pixmap_copy_area(xitk_pixmap_t *src, xitk_pixmap_t *dst,
+                           int src_x, int src_y, int width, int height, int dst_x, int dst_y);
 
 /*
  *

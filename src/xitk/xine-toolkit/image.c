@@ -509,6 +509,22 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
 }
 #endif
 
+void xitk_pixmap_copy_area(xitk_pixmap_t *src, xitk_pixmap_t *dst,
+                           int src_x, int src_y, int width, int height, int dst_x, int dst_y) {
+  ImlibData *im;
+
+  ABORT_IF_NULL(src);
+  ABORT_IF_NULL(dst);
+  ABORT_IF_NULL(src->imlibdata);
+
+  im = src->imlibdata;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XCopyArea(im->x.disp, src->pixmap, dst->pixmap, dst->gc,
+            src_x, src_y, width, height, dst_x, dst_y);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+}
+
 /*
  *
  */
@@ -544,11 +560,8 @@ void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, i
   
   dest->image = xitk_image_create_xitk_pixmap(src->xitk, width, height);
 
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  XCopyArea(im->x.disp, src->image->pixmap, dest->image->pixmap, dest->image->gc,
-	    0, 0, width, height, 0, 0);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
-  
+  xitk_pixmap_copy_area(src->image, dest->image, 0, 0, width, height, 0, 0);
+
   dest->width = width;
   dest->height = height;
 }
@@ -1114,6 +1127,18 @@ void pixmap_draw_line(xitk_pixmap_t *p,
 void xitk_image_draw_line(xitk_image_t *i,
                       int x0, int y0, int x1, int y1, unsigned color) {
   pixmap_draw_line(i->image, x0, y0, x1, y1, color);
+}
+
+void pixmap_draw_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned int color) {
+  ImlibData *im = p->imlibdata;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  XSetForeground(im->x.disp, p->gc, color);
+  XDrawRectangle(im->x.disp, p->pixmap, p->gc, x, y, w, h);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
 }
 
 void pixmap_fill_rectangle(xitk_pixmap_t *p, int x, int y, int w, int h, unsigned int color) {
@@ -1758,8 +1783,7 @@ void draw_flat_with_color(xitk_pixmap_t *p, int w, int h, unsigned int color) {
 static void _draw_frame(xitk_pixmap_t *p,
                         const char *title, const char *fontname,
                         int style, int x, int y, int w, int h) {
-  xitk_t        *xitk = gXitk;
-  ImlibData     *im;
+  xitk_t        *xitk;
   xitk_font_t   *fs = NULL;
   int            yoff = 0, xstart = 0, xstop = 0;
   int            ascent = 0, descent = 0, lbearing = 0, rbearing = 0;
@@ -1768,9 +1792,9 @@ static void _draw_frame(xitk_pixmap_t *p,
   char           buf[BUFSIZ];
 
   ABORT_IF_NULL(p);
-  ABORT_IF_NULL(p->imlibdata);
+  ABORT_IF_NULL(p->xitk);
 
-  im = p->imlibdata;
+  xitk = p->xitk;
 
   if(title) {
     int maxinkwidth = (w - 12);
@@ -1822,16 +1846,29 @@ static void _draw_frame(xitk_pixmap_t *p,
   _draw_rectangular_box (p, x, (y + yoff), xstart, xstop, w, (h - yoff), style | DRAW_DOUBLE, 1);
   
   if(title) {
-    XLOCK (im->x.x_lock_display, im->x.disp);
-    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(p->xitk));
-    xitk_font_draw_string(fs, p, p->gc, (x - lbearing + 6), (y + ascent), titlebuf, titlelen);
-    XUNLOCK (im->x.x_unlock_display, im->x.disp);
-    
+    xitk_pixmap_draw_string(p, fs,  (x - lbearing + 6), (y + ascent), titlebuf, titlelen,
+                            xitk_get_pixel_color_black(p->xitk));
     xitk_font_unload_font(fs);
   }
 
 }
 
+void xitk_pixmap_draw_string(xitk_pixmap_t *p, xitk_font_t *xtfs,
+                             int x, int y, const char *text,
+                             size_t nbytes, int color) {
+  xitk_t *xitk;
+
+  ABORT_IF_NULL(p);
+  ABORT_IF_NULL(p->xitk);
+
+  xitk = p->xitk;
+
+  xitk_font_set_font(xtfs, p->gc);
+  XLOCK (xitk->x_lock_display, xitk->display);
+  XSetForeground(xitk->display, p->gc, color);
+  xitk_font_draw_string(xtfs, p, p->gc, x, y, text, nbytes);
+  XUNLOCK (xitk->x_unlock_display, xitk->display);
+}
 /*
  *
  */
