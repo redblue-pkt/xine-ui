@@ -148,7 +148,6 @@ struct xui_vwin_st {
   XWMHints              *wm_hint;
 
   xitk_register_key_t    widget_key;
-  xitk_register_key_t    old_widget_key;
 
 #ifdef HAVE_XF86VIDMODE
   /* XF86VidMode Extension stuff */
@@ -429,8 +428,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       
       XLowerWindow (vwin->video_display, vwin->video_window);
 
-      vwin->old_widget_key = vwin->widget_key;
-
       vwin->x_unlock_display (vwin->video_display);
 
       if (!vwin->separate_display)
@@ -653,8 +650,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_get_window_position (vwin->video_display, vwin->video_window,
         &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
 
-      if (!vwin->separate_display)
-        xitk_unregister_event_handler (&vwin->old_widget_key);
       old_video_window = vwin->video_window;
     }
 
@@ -751,8 +746,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_get_window_position (vwin->video_display, vwin->video_window,
         &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
       
-      if (!vwin->separate_display)
-        xitk_unregister_event_handler(&vwin->old_widget_key);
       old_video_window = vwin->video_window;
     }
 
@@ -900,8 +893,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	}
 #endif
 
-        if (!vwin->separate_display)
-          xitk_unregister_event_handler (&vwin->old_widget_key);
         old_video_window = vwin->video_window;
       }
       else {
@@ -1050,6 +1041,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   /* The old window should be destroyed now */
   if(old_video_window != None) {
+    if (!vwin->separate_display)
+      xitk_unregister_event_handler (&vwin->widget_key);
+
     XDestroyWindow (vwin->video_display, old_video_window);
      
     if (vwin->gui->cursor_grabbed)
@@ -1058,8 +1052,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   }
 
   vwin->x_unlock_display (vwin->video_display);
-
-  vwin->old_widget_key = vwin->widget_key;
 
   if (!vwin->separate_display)
     register_event_handler(vwin);
@@ -1578,8 +1570,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->fullscreen_mode    = WINDOWED_MODE;
   vwin->video_window  = None;
   vwin->show               = 1;
-  vwin->widget_key         = 
-  vwin->old_widget_key     = 0;
+  vwin->widget_key         = 0;
   vwin->borderless         = (borderless > 0);
   vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
@@ -2370,7 +2361,6 @@ static void _vwin_handle_motion_event (void *data, const xitk_motion_event_t *me
 
 static void _vwin_handle_destroy_notify (void *data) {
   xui_vwin_t *vwin = data;
-
   /*if (vwin->video_window == event->xany.window)*/
   gui_exit (NULL, vwin->gui);
 }
@@ -2398,6 +2388,9 @@ static const xitk_event_cbs_t vwin_event_cbs = {
 
 static void register_event_handler(xui_vwin_t *vwin)
 {
+  if (vwin->widget_key)
+    xitk_unregister_event_handler (&vwin->widget_key);
+
   xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
   vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
 
