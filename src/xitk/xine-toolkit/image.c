@@ -688,6 +688,9 @@ void xitk_shared_image_list_delete (xitk_widget_list_t *wl) {
 
       image->wl = NULL;
     }
+
+    xine_sarray_delete(wl->shared_images);
+    wl->shared_images = NULL;
   }
 }
 
