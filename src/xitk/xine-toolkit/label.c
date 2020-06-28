@@ -165,64 +165,51 @@ static void _create_label_pixmap (_label_private_t *wp) {
   /* [foo] */
   {
     const uint16_t *p = buf;
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     while (*p) {
       xitk_point_t pt;
       _find_pix_font_char (font->pix_font, &pt, *p);
       p++;
-      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-        wp->labelpix->pixmap, wp->labelpix->gc, pt.x, pt.y,
-        pix_font->char_width, pix_font->char_height, x_dest, 0);
+
+      xitk_pixmap_copy_area(font->image, wp->labelpix,
+        pt.x, pt.y, pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     }
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
   /* foo[ *** fo] */
   if (anim_add) {
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc,
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc,
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc,
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc,
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc,
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    XCopyArea (wp->imlibdata->x.disp, wp->labelpix->pixmap,
-      wp->labelpix->pixmap, wp->labelpix->gc, 0, 0,
-      pixwidth - x_dest, pix_font->char_height, x_dest, 0);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    xitk_pixmap_copy_area(font->image, wp->labelpix,
+      0, 0, pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     x_dest = pixwidth;
   }
   
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     do {
-      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap,
-        wp->labelpix->pixmap, wp->labelpix->gc,
+      xitk_pixmap_copy_area(font->image, wp->labelpix,
         pix_font->space.x, pix_font->space.y,
         pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     } while (x_dest < pixwidth);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
 }
 
@@ -306,10 +293,9 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
 
       bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
 
+      xitk_pixmap_copy_area(font->image, bg->image, 0, 0, wp->font->width, wp->font->height, 0, 0);
+
       XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XCopyArea (wp->imlibdata->x.disp, font->image->pixmap, bg->image->pixmap, 
-		 font->image->gc,
-		 0, 0, wp->font->width, wp->font->height, 0, 0);
       XSetForeground(wp->imlibdata->x.disp, font->image->gc, 
 		     xitk_get_pixel_color_black(wp->w.wl->xitk));
       xitk_font_draw_string(fs, bg->image, font->image->gc,
