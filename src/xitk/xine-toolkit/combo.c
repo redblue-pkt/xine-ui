@@ -22,10 +22,11 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+#include <string.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-
-#include <stdio.h>
 
 #include "_xitk.h"
 #include "xitk_x11.h"

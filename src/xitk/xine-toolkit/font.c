@@ -33,9 +33,15 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#ifdef WITH_XFT
+#include <ft2build.h>
+#include <X11/Xft/Xft.h>
+#endif
 
 #include "_xitk.h"
 #include "recode.h"
+
+#include "xitk_x11.h"
 
 #define XITK_CACHE_SIZE 10
 #define XITK_FONT_LENGTH_NAME 256

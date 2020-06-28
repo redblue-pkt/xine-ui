@@ -23,8 +23,10 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 #include "utils.h"
 
