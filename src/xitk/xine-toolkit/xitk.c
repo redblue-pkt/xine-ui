@@ -1548,6 +1548,27 @@ void xitk_register_eh_destructor (xitk_register_key_t key,
   MUTUNLOCK ();
 }
 
+static void _widget_list_destroy(xitk_widget_list_t **p) {
+  __xitk_t *xitk = (__xitk_t *)gXitk;
+  xitk_widget_list_t *wl = *p;
+
+  if (!wl)
+    return;
+
+  *p = NULL;
+
+  if (wl->temp_gc) {
+    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    XFreeGC (xitk->x.display, wl->temp_gc);
+    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+    wl->temp_gc = NULL;
+  }
+  xitk_shared_image_list_delete (wl);
+  xitk_dnode_remove (&wl->node);
+  xitk_dlist_clear (&wl->list);
+  free(wl);
+}
+
 static void __fx_destroy(__gfx_t *fx, int locked) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   void (*destructor)(void *userdata);
@@ -1565,16 +1586,7 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   }
 
   if (fx->widget_list && fx->widget_list->destroy) {
-    if (fx->widget_list->temp_gc) {
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
-      XFreeGC (xitk->x.display, fx->widget_list->temp_gc);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-      fx->widget_list->temp_gc = NULL;
-    }
-    xitk_shared_image_list_delete (fx->widget_list);
-    xitk_dnode_remove (&fx->widget_list->node);
-    xitk_dlist_clear (&fx->widget_list->list);
-    free(fx->widget_list);
+    _widget_list_destroy(&fx->widget_list);
 #ifdef XITK_DEBUG
     printf  ("xitk: deferredly killed wl @ %p.\n", (void *)fx->widget_list);
 #endif
@@ -1657,18 +1669,10 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
     fx = (__gfx_t *)fx->node.next;
   }
 
-  if (wl->temp_gc) {
-    XLOCK (xitk->x.x_lock_display, xitk->x.display);
-    XFreeGC (xitk->x.display, wl->temp_gc);
-    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-  }
-  xitk_shared_image_list_delete (wl);
+  _widget_list_destroy(&wl);
 
-  xitk_dnode_remove (&wl->node);
-  xitk_dlist_clear (&wl->list);
   MUTUNLOCK();
 
-  free(wl);
 #ifdef XITK_DEBUG
   printf  ("xitk: killed wl @ %p.\n", (void *)wl);
 #endif
