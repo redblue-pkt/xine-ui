@@ -23,7 +23,9 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
+
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
