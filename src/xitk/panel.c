@@ -1035,8 +1035,8 @@ static void panel_handle_key_event(void *data, const xitk_key_event_t *ke) {
 static const xitk_event_cbs_t panel_event_cbs = {
   .key_cb            = panel_handle_key_event,
   .btn_cb            = panel_handle_button_event,
-  .map_notify_cb     = panel_handle_destroy_notify,
-  .destroy_notify_cb = panel_handle_map_notify,
+  .map_notify_cb     = panel_handle_map_notify,
+  .destroy_notify_cb = panel_handle_destroy_notify,
 
   .pos_cb            = panel_store_new_position,
   .dnd_cb            = gui_dndcallback,
