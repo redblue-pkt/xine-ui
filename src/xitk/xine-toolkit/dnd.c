@@ -24,6 +24,8 @@
 #include "config.h"
 #endif
 
+#include "dnd.h"
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <X11/Xatom.h>
@@ -31,10 +33,46 @@
 #include <signal.h>
 
 #include "_xitk.h"
+#include "xitk_x11.h"  // xitk_x11_get_display
 
 #define XDND_VERSION 3
+#define MAX_SUPPORTED_TYPE 2
 
 #undef DEBUG_DND
+
+#define X_LOCK(xitk)   (xitk)->lock_display((xitk))
+#define X_UNLOCK(xitk) (xitk)->unlock_display((xitk))
+
+struct xitk_dnd_s {
+  xitk_t              *xitk;
+
+  Window               win;
+
+  xitk_dnd_callback_t  callback;
+
+  int                  x;
+  int                  y;
+  Window               dropper_toplevel;
+  Window               dropper_window;
+  Window               dragger_window;
+  Atom                *dragger_typelist;
+  Atom                 desired;
+  Time                 time;
+
+  Atom                 _XA_XdndAware;
+  Atom                 _XA_XdndEnter;
+  Atom                 _XA_XdndLeave;
+  Atom                 _XA_XdndDrop;
+  Atom                 _XA_XdndPosition;
+  Atom                 _XA_XdndStatus;
+  Atom                 _XA_XdndSelection;
+  Atom                 _XA_XdndFinished;
+  Atom                 _XA_XdndTypeList;
+  Atom                 _XA_XITK_PROTOCOL_ATOM;
+  Atom                 _XA_WM_DELETE_WINDOW;
+  Atom                 supported[MAX_SUPPORTED_TYPE];
+  Atom                 version;
+};
 
 /*
  * PRIVATES
@@ -64,15 +102,15 @@ static void _dnd_send_finished (xitk_dnd_t *xdnd, Window window, Window from) {
 
   memset(&xevent, 0, sizeof(xevent));
   xevent.xany.type                  = ClientMessage;
-  xevent.xany.display               = xdnd->xitk->display;
+  xevent.xany.display               = xitk_x11_get_display(xdnd->xitk);
   xevent.xclient.window             = window;
   xevent.xclient.message_type       = xdnd->_XA_XdndFinished;
   xevent.xclient.format             = 32;
   XDND_FINISHED_TARGET_WIN(&xevent) = from;
   
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-  XSendEvent (xdnd->xitk->display, window, 0, 0, &xevent);
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_LOCK(xdnd->xitk);
+  XSendEvent (xitk_x11_get_display(xdnd->xitk), window, 0, 0, &xevent);
+  X_UNLOCK(xdnd->xitk);
 }
 
 /*
@@ -83,7 +121,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
   long           nread;
   unsigned long  nitems;
   unsigned long  bytes_after;
-  
+
   nread = 0;
   
   do {
@@ -92,7 +130,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
     unsigned char *buf = NULL;
     char *pbuf;
 
-    if(XGetWindowProperty (xdnd->xitk->display, insert, prop, 
+    if (XGetWindowProperty (xitk_x11_get_display(xdnd->xitk), insert, prop,
 			  nread / (sizeof(unsigned char *)), 65536, delete_prop, AnyPropertyType, 
               &actual_type, &actual_fmt, &nitems, &bytes_after, &buf) != Success) {
       /* Note that per XGetWindowProperty man page, buf will always be NULL-terminated */
@@ -148,28 +186,29 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
   int             actual_fmt;
   unsigned long   nitems;
   unsigned char  *s = NULL;
+  Display        *display = xitk_x11_get_display(xdnd->xitk);
 
   if((xdnd == NULL) || (prop == None))
     return;
 
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-  if(XGetWindowProperty (xdnd->xitk->display, insert, prop, 0, 8, False, AnyPropertyType, 
+  X_LOCK (xdnd->xitk);
+  if(XGetWindowProperty (display, insert, prop, 0, 8, False, AnyPropertyType,
 			&actual_type, &actual_fmt, &nitems, &bytes_after, &s) != Success) {
     XFree(s);
-    XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+    X_UNLOCK (xdnd->xitk);
     return;
   }
   
   XFree(s);
   
-  if(actual_type != XInternAtom (xdnd->xitk->display, "INCR", False)) {
+  if(actual_type != XInternAtom (display, "INCR", False)) {
     
     (void) _dnd_paste_prop_internal(xdnd, from, insert, prop, True);
-    XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+    X_UNLOCK (xdnd->xitk);
     return;
   }
   
-  XDeleteProperty (xdnd->xitk->display, insert, prop);
+  XDeleteProperty (display, insert, prop);
   gettimeofday(&tv_start, 0);
 
   for(;;) {
@@ -177,7 +216,7 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
     fd_set  r;
     XEvent  xe;
 
-    if(XCheckMaskEvent (xdnd->xitk->display, PropertyChangeMask, &xe)) {
+    if(XCheckMaskEvent (display, PropertyChangeMask, &xe)) {
       if((xe.type == PropertyNotify) && (xe.xproperty.state == PropertyNewValue)) {
 
 	/* time between arrivals of data */
@@ -191,10 +230,10 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
       tv.tv_sec  = 0;
       tv.tv_usec = 10000;
       FD_ZERO(&r);
-      FD_SET (ConnectionNumber (xdnd->xitk->display), &r);
-      select (ConnectionNumber (xdnd->xitk->display) + 1, &r, 0, 0, &tv);
+      FD_SET (ConnectionNumber (display), &r);
+      select (ConnectionNumber (display) + 1, &r, 0, 0, &tv);
 
-      if (FD_ISSET (ConnectionNumber (xdnd->xitk->display), &r))
+      if (FD_ISSET (ConnectionNumber (display), &r))
 	continue;
     }
     gettimeofday(&tv, 0);
@@ -202,12 +241,12 @@ static void _dnd_get_selection (xitk_dnd_t *xdnd, Window from, Atom prop, Window
 
     /* No data for five seconds, so quit */
     if(t > 5000000L) {
-      XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+      X_UNLOCK (xdnd->xitk);
       return;
     }
   }
 
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
 }
 
 /*
@@ -224,17 +263,17 @@ static void _dnd_get_type_list (xitk_dnd_t *xdnd, Window window, Atom **typelist
   if((xdnd == NULL) || (window == None))
     return;
 
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-  XGetWindowProperty (xdnd->xitk->display, window, xdnd->_XA_XdndTypeList, 0, 0x8000000L, 
+  X_LOCK (xdnd->xitk);
+  XGetWindowProperty (xitk_x11_get_display(xdnd->xitk), window, xdnd->_XA_XdndTypeList, 0, 0x8000000L,
 		     False, XA_ATOM, &type, &format, &count, &remaining, &data);
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
 
   if((type != XA_ATOM) || (format != 32) || (count == 0) || (!data)) {
 
     if(data) {
-      XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
+      X_LOCK (xdnd->xitk);
       XFree(data);
-      XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+      X_UNLOCK (xdnd->xitk);
     }
 
     XITK_WARNING("%s@%d: XGetWindowProperty failed in xdnd_get_type_list - "
@@ -250,9 +289,9 @@ static void _dnd_get_type_list (xitk_dnd_t *xdnd, Window window, Atom **typelist
 
   (*typelist)[count] = 0;
   
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
+  X_LOCK (xdnd->xitk);
   XFree(data);
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
 }
 
 /*
@@ -276,7 +315,7 @@ static void _dnd_get_three_types (XEvent * xevent, Atom **typelist) {
 /*
  * Initialize Atoms, ...
  */
-void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *xdnd) {
+static void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *xdnd) {
 
   enum {
     XdndAware,
@@ -316,10 +355,10 @@ void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *xdnd) {
 
   xdnd->xitk = xitk;
 
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
+  X_LOCK (xdnd->xitk);
 
-  XInternAtoms (xdnd->xitk->display, (char**)prop_names, _XA_ATOMS_COUNT, False, props);
-  XInternAtoms (xdnd->xitk->display, (char**)mime_names, MAX_SUPPORTED_TYPE, False, xdnd->supported);
+  XInternAtoms (xitk_x11_get_display(xdnd->xitk), (char**)prop_names, _XA_ATOMS_COUNT, False, props);
+  XInternAtoms (xitk_x11_get_display(xdnd->xitk), (char**)mime_names, MAX_SUPPORTED_TYPE, False, xdnd->supported);
 
   xdnd->_XA_XdndAware             = props[XdndAware];
   xdnd->_XA_XdndEnter             = props[XdndEnter];
@@ -333,7 +372,7 @@ void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *xdnd) {
   xdnd->_XA_WM_DELETE_WINDOW      = props[WM_DELETE_WINDOW];
   xdnd->_XA_XITK_PROTOCOL_ATOM    = props[XiTkXselWindowProperty];
   
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
 
   xdnd->version                   = XDND_VERSION;
   xdnd->callback                  = NULL;
@@ -347,14 +386,15 @@ void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *xdnd) {
  */
 int xitk_make_window_dnd_aware(xitk_dnd_t *xdnd, Window window) {
   Status        status;
-  
-  if (!xdnd->xitk->display)
+  Display      *display = xitk_x11_get_display(xdnd->xitk);
+
+  if (!display)
     return 0;
   
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-  status = XChangeProperty (xdnd->xitk->display, window, xdnd->_XA_XdndAware, XA_ATOM,
+  X_LOCK (xdnd->xitk);
+  status = XChangeProperty (display, window, xdnd->_XA_XdndAware, XA_ATOM,
 			   32, PropModeReplace, (unsigned char *)&xdnd->version, 1);
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
   
   if((status == BadAlloc) || (status == BadAtom) || 
      (status == BadMatch) || (status == BadValue) || (status == BadWindow)) {
@@ -362,10 +402,10 @@ int xitk_make_window_dnd_aware(xitk_dnd_t *xdnd, Window window) {
     return 0;
   }
   
-  XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-  XChangeProperty (xdnd->xitk->display, window, xdnd->_XA_XdndTypeList, XA_ATOM, 32,
+  X_LOCK (xdnd->xitk);
+  XChangeProperty (display, window, xdnd->_XA_XdndTypeList, XA_ATOM, 32,
 		  PropModeAppend, (unsigned char *)&xdnd->supported, 1);
-  XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+  X_UNLOCK (xdnd->xitk);
   
   if((status == BadAlloc) || (status == BadAtom) || 
      (status == BadMatch) || (status == BadValue) || (status == BadWindow)) {
@@ -377,6 +417,17 @@ int xitk_make_window_dnd_aware(xitk_dnd_t *xdnd, Window window) {
 
   return 1;
 }
+
+xitk_dnd_t *xitk_dnd_new (xitk_t *xitk) {
+
+  xitk_dnd_t *xdnd = xitk_xmalloc(sizeof(xitk_dnd_t));
+
+  if (xdnd)
+    xitk_init_dnd (xitk, xdnd);
+
+  return xdnd;
+}
+
 
 /*
  * Set/Unset callback
@@ -401,10 +452,13 @@ void xitk_unset_dnd_callback(xitk_dnd_t *xdnd) {
  */
 int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
   int retval = 0;
-  
+  Display *display;
+
   if((xdnd == NULL) || (event == NULL))
     return 0;
-  
+
+  display = xitk_x11_get_display(xdnd->xitk);
+
   if(event->type == ClientMessage) {
 
     if((event->xclient.format == 32) && 
@@ -417,16 +471,16 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
     
       memset(&xevent, 0, sizeof(xevent));
       xevent.xany.type                 = DestroyNotify;
-      xevent.xany.display              = xdnd->xitk->display;
+      xevent.xany.display              = display;
       xevent.xdestroywindow.type       = DestroyNotify;
       xevent.xdestroywindow.send_event = True;
-      xevent.xdestroywindow.display    = xdnd->xitk->display;
+      xevent.xdestroywindow.display    = display;
       xevent.xdestroywindow.event      = xdnd->win;
       xevent.xdestroywindow.window     = xdnd->win;
       
-      XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-      XSendEvent (xdnd->xitk->display, xdnd->win, True, 0L, &xevent);
-      XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+      X_LOCK (xdnd->xitk);
+      XSendEvent (display, xdnd->win, True, 0L, &xevent);
+      X_UNLOCK (xdnd->xitk);
       
       retval = 1;
     } 
@@ -465,9 +519,9 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 	{
 	  int   i;
 	  for(i = 0; xdnd->dragger_typelist[i] != 0; i++) {
-            XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-	    printf("%d: '%s' ", i, XGetAtomName (xdnd->xitk->display, xdnd->dragger_typelist[i]));
-            XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+            X_LOCK (xdnd->xitk);
+            printf("%d: '%s' ", i, XGetAtomName (display, xdnd->dragger_typelist[i]));
+            X_UNLOCK (xdnd->xitk);
 	    printf("\n");
 	  }
 	}
@@ -519,16 +573,16 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 
 	  xdnd->time = XDND_DROP_TIME (event);
 	  
-          XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-	  if(!(win = XGetSelectionOwner (xdnd->xitk->display, xdnd->_XA_XdndSelection))) {
+          X_LOCK (xdnd->xitk);
+          if (!(win = XGetSelectionOwner (display, xdnd->_XA_XdndSelection))) {
 	    XITK_WARNING("%s@%d: XGetSelectionOwner() failed.\n", __FILE__, __LINE__);
-            XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+            X_UNLOCK (xdnd->xitk);
 	    return 0;
 	  }
 	  
-	  XConvertSelection (xdnd->xitk->display, xdnd->_XA_XdndSelection, xdnd->desired,
+          XConvertSelection (display, xdnd->_XA_XdndSelection, xdnd->desired,
 			    xdnd->_XA_XITK_PROTOCOL_ATOM, xdnd->dropper_window, xdnd->time);
-          XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+          X_UNLOCK (xdnd->xitk);
 	}
       }
       
@@ -544,16 +598,16 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
       printf("XdndPosition\n");
 #endif
       
-      XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
+      X_LOCK (xdnd->xitk);
       
-      parent   = DefaultRootWindow (xdnd->xitk->display);
+      parent   = DefaultRootWindow (display);
       child    = xdnd->dropper_toplevel;
       
       for(;;) {
 	int xd, yd;
 	
 	new_child = None;
-	if(!XTranslateCoordinates  (xdnd->xitk->display, parent, child, 
+        if (!XTranslateCoordinates (display, parent, child,
 				   XDND_POSITION_ROOT_X(event), XDND_POSITION_ROOT_Y(event),
 				   &xd, &yd, &new_child))
 	  break;
@@ -564,7 +618,7 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 	child = new_child;
       }
 
-      XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+      X_UNLOCK (xdnd->xitk);
       
       xdnd->dropper_window = event->xany.window = child;
       
@@ -574,7 +628,7 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
       
       memset (&xevent, 0, sizeof(xevent));
       xevent.xany.type            = ClientMessage;
-      xevent.xany.display         = xdnd->xitk->display;
+      xevent.xany.display         = display;
       xevent.xclient.window       = xdnd->dragger_window;
       xevent.xclient.message_type = xdnd->_XA_XdndStatus;
       xevent.xclient.format       = 32;
@@ -585,9 +639,9 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
       XDND_STATUS_RECT_SET(&xevent, xdnd->x, xdnd->y, 1, 1);
       XDND_STATUS_ACTION(&xevent) = XDND_POSITION_ACTION(event);
       
-      XLOCK (xdnd->xitk->x_lock_display, xdnd->xitk->display);
-      XSendEvent (xdnd->xitk->display, xdnd->dragger_window, 0, 0, &xevent);
-      XUNLOCK (xdnd->xitk->x_unlock_display, xdnd->xitk->display);
+      X_LOCK (xdnd->xitk);
+      XSendEvent (display, xdnd->dragger_window, 0, 0, &xevent);
+      X_UNLOCK (xdnd->xitk);
     }
 
     retval = 1;

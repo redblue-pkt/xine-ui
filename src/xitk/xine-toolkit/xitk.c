@@ -271,6 +271,26 @@ typedef struct {
   }                         clipboard;
 } __xitk_t;
 
+/*
+ *
+ */
+
+static void _xitk_lock_display (xitk_t *_xitk) {
+  __xitk_t *xitk = (__xitk_t *)_xitk;
+  XLockDisplay(xitk->x.display);
+}
+static void _xitk_unlock_display (xitk_t *_xitk) {
+  __xitk_t *xitk = (__xitk_t *)_xitk;
+  XUnlockDisplay(xitk->x.display);
+}
+
+static void _xitk_dummy_lock_display (xitk_t *_xitk) {
+}
+
+/*
+ *
+ */
+
 xitk_t *gXitk;
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
@@ -1489,10 +1509,8 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     fx->widget_list = NULL;
 
   if (cbs && cbs->dnd_cb && (fx->window != None)) {
-    fx->xdnd = (xitk_dnd_t *) xitk_xmalloc(sizeof(xitk_dnd_t));
-    
-    xitk_init_dnd (&xitk->x, fx->xdnd);
-    if(xitk_make_window_dnd_aware(fx->xdnd, fx->window))
+    fx->xdnd = xitk_dnd_new (&xitk->x);
+    if (fx->xdnd && xitk_make_window_dnd_aware(fx->xdnd, fx->window))
       xitk_set_dnd_callback(fx->xdnd, cbs->dnd_cb);
   }
   else
@@ -2430,6 +2448,13 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk->x.x_lock_display   = xitk_x_lock_display;
   xitk->x.x_unlock_display = xitk_x_unlock_display;
+  if (use_x_lock_display) {
+    xitk->x.lock_display   = _xitk_lock_display;
+    xitk->x.unlock_display = _xitk_unlock_display;
+  } else {
+    xitk->x.lock_display   = _xitk_dummy_lock_display;
+    xitk->x.unlock_display = _xitk_dummy_lock_display;
+  }
 
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
