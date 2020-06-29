@@ -1289,6 +1289,8 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
   gGui_t *gui = data;
 
+  if (ke->event != XITK_KEY_PRESS)
+    return;
   if (gui->stdctl_enable) {
     stdctl_keypress(ke->keycode_str);
   }
