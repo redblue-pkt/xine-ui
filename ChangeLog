@@ -1,3 +1,14 @@
+xine-ui (0.99.13)
+  * Massive code cleanup.
+  * Massive graphics optimizations.
+  * Drop mrl path length limit.
+  * Add utf8 and clipboard support for text input fields.
+  * Add skin shared pixmap and text position features.
+  * Many small fixes.
+  * Build fixes.
+  * Faster build.
+  * Separate xitk and X11 stuff pt 1.
+
 xine-ui (0.99.12)
   * Make XLockDisplay use user switchable.
   * Faster seek.
