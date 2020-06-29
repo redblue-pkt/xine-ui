@@ -26,39 +26,6 @@
 
 #include <X11/Xlib.h>
 
-#define MAX_SUPPORTED_TYPE 2
-
-typedef struct {
-  xitk_t              *xitk;
-
-  Window               win;
-
-  xitk_dnd_callback_t  callback;
-
-  int                  x;
-  int                  y;
-  Window               dropper_toplevel;
-  Window               dropper_window;
-  Window               dragger_window;
-  Atom                *dragger_typelist;
-  Atom                 desired;
-  Time                 time;
-
-  Atom                 _XA_XdndAware;
-  Atom                 _XA_XdndEnter;
-  Atom                 _XA_XdndLeave;
-  Atom                 _XA_XdndDrop;
-  Atom                 _XA_XdndPosition;
-  Atom                 _XA_XdndStatus;
-  Atom                 _XA_XdndSelection;
-  Atom                 _XA_XdndFinished;
-  Atom                 _XA_XdndTypeList;
-  Atom                 _XA_XITK_PROTOCOL_ATOM;
-  Atom                 _XA_WM_DELETE_WINDOW;
-  Atom                 supported[MAX_SUPPORTED_TYPE];
-  Atom                 version;
-} xitk_dnd_t;
-
 /* header was ripped from xdnd's example on its page */
 
 #define XDND_THREE 3
@@ -103,7 +70,10 @@ typedef struct {
 /*
  * *** DND
  */
-void xitk_init_dnd (xitk_t *xitk, xitk_dnd_t *);
+
+typedef struct xitk_dnd_s xitk_dnd_t;
+
+xitk_dnd_t *xitk_dnd_new (xitk_t *xitk);
 
 int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 

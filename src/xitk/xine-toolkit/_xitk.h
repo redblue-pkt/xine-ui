@@ -60,6 +60,8 @@ struct xitk_s {
   Display  *display;
   void    (*x_lock_display) (Display *display);
   void    (*x_unlock_display) (Display *display);
+  void    (*lock_display) (xitk_t *);
+  void    (*unlock_display) (xitk_t *);
 
   ImlibData         *imlibdata;
 
