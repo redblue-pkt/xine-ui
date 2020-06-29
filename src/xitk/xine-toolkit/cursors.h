@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2004-2009 the xine project
+ * Copyright (C) 2004-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 

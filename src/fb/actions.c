@@ -1,6 +1,6 @@
 /* 
  * Copyright (C) 2003 by Fredrik Noring
- * Copyright (C) 2003-2017 the xine project
+ * Copyright (C) 2003-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
