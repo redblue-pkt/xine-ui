@@ -431,7 +431,7 @@ skin.SliderPl {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -459,7 +459,7 @@ skin.SliderHPl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = MainBits1.png|197,16,24,20
           type = horizontal
         }
 }
@@ -532,7 +532,7 @@ skin.SliderCtlHue {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -556,7 +556,7 @@ skin.SliderCtlSat {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	type = vertical
 	}
 }
@@ -580,7 +580,7 @@ skin.SliderCtlBright {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -605,7 +605,7 @@ skin.SliderCtlCont {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -629,7 +629,7 @@ skin.SliderCtlGamma {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -653,7 +653,7 @@ skin.SliderCtlSharp {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -677,7 +677,7 @@ skin.SliderCtlNoise {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -721,7 +721,7 @@ skin.SliderCtlSk {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -749,7 +749,7 @@ skin.SliderHCtlSk {
         }
         pixmap = SkSlidHBg.png
         slider {
-          pixmap = SkSlidHPad.png
+          pixmap = MainBits1.png|178,16,18,20
           type = horizontal
         }
 }
@@ -874,7 +874,7 @@ skin.SliderMrl {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
+	  pixmap = MainBits1.png|178,0,63,9
 	  type = vertical
 	}
 }
@@ -902,7 +902,7 @@ skin.SliderHMrl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = MainBits1.png|197,16,24,20
           type = horizontal
         }
 }

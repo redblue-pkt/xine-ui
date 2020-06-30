@@ -1572,4 +1572,3 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
-
