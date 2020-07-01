@@ -11,6 +11,143 @@
 #define INT_MAX ((int)((unsigned int)(1 << (8 * sizeof(int) - 1)) - 1))
 #endif
 
+
+static const union {
+  uint32_t word;
+  uint8_t  little;
+} endian_is = {
+  .word = 1
+};
+
+/* NOTE: we mark transparent pixels with r=255 g=0 b=255. */
+static void _le_fix_trans (uint32_t *v, int *trans) {
+  if (*v & 0x80000000) {
+    *v &= 0x00ffffff;
+    if (*v == 0x00ff00ff)
+      *v = 0x00ff00fe;
+  } else {
+    *v = 0x00ff00ff;
+    *trans = 1;
+  }
+}
+
+static void _be_fix_trans (uint32_t *v, int *trans) {
+  if (*v & 0x00000080) {
+    *v >>= 8;
+    if (*v == 0x00ff00ff)
+      *v = 0x00fe00ff;
+  } else {
+    *v = 0x00ff00ff;
+    *trans = 1;
+  }
+}
+
+static int _rgba2rgb (const uint8_t *in, uint8_t **out, int n) {
+  int trans = 0;
+  uint32_t d = (uint32_t)(*out) & 3;
+  const uint32_t *p = (const uint32_t *)in;
+  uint32_t *q = (uint32_t *)(*out - d);
+  if (endian_is.little) {
+    uint32_t v;
+    if (d == 0)
+      goto _le0;
+    if (d == 1)
+      goto _le3;
+    if (d == 2)
+      goto _le2;
+    if (d == 3)
+      goto _le1;
+    while (1) {
+    _le0: /* RGB0 */
+      if (--n < 0) {
+        *out = (uint8_t *)q;
+        return trans;
+      }
+      v = *p++;
+      _le_fix_trans (&v, &trans);
+      q[0] = v;
+    _le1: /* rgbR GB00 */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 3;
+        return trans;
+      }
+      v = *p++;
+      _le_fix_trans (&v, &trans);
+      q[0] |= v << 24;
+      q[1] = v >> 8;
+      q++;
+    _le2: /* gbRG B000 */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 2;
+        return trans;
+      }
+      v = *p++;
+      _le_fix_trans (&v, &trans);
+      q[0] |= v << 16;
+      q[1] = v >> 16;
+      q++;
+    _le3: /* bRGB */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 1;
+        return trans;
+      }
+      v = *p++;
+      _le_fix_trans (&v, &trans);
+      q[0] |= v << 8;
+      q++;
+    }
+  } else {
+    uint32_t v;
+    if (d == 0)
+      goto _be0;
+    if (d == 1)
+      goto _be3;
+    if (d == 2)
+      goto _be2;
+    if (d == 3)
+      goto _be1;
+    while (1) {
+    _be0: /* RGB0 */
+      if (--n < 0) {
+        *out = (uint8_t *)q;
+        return trans;
+      }
+      v = *p++;
+      _be_fix_trans (&v, &trans);
+      q[0] = v << 8;
+    _be1: /* rgbR GB00 */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 3;
+        return trans;
+      }
+      v = *p++;
+      _be_fix_trans (&v, &trans);
+      q[0] |= v >> 16;
+      q[1] = v << 16;
+      q++;
+    _be2: /* gbRG B000 */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 2;
+        return trans;
+      }
+      v = *p++;
+      _be_fix_trans (&v, &trans);
+      q[0] |= v >> 8;
+      q[1] = v << 24;
+      q++;
+    _be3: /* bRGB */
+      if (--n < 0) {
+        *out = (uint8_t *)q + 1;
+        return trans;
+      }
+      v = *p++;
+      _be_fix_trans (&v, &trans);
+      q[0] |= v;
+      q++;
+    }
+  }
+}
+
 /*
  *      Split the ID - damages input
  */
@@ -53,8 +190,8 @@ static unsigned char *_LoadPNG(ImlibData * id,
                                int *w, int *h, int *t) {
   png_structp         png_ptr;
   png_infop           info_ptr;
-  unsigned char      *data, *ptr, **lines, *ptr2, r, g, b, a;
-  int                 i, x, y, transp, bit_depth, color_type, interlace_type;
+  unsigned char      *data, *ptr, **lines, *ptr2, r, a;
+  int                 x, y, transp, bit_depth, color_type, interlace_type;
   png_uint_32         ww, hh;
 
   if (!f && (!indata || !indata->p))
@@ -87,6 +224,36 @@ static unsigned char *_LoadPNG(ImlibData * id,
 	       NULL, NULL);
   *w = ww;
   *h = hh;
+
+  if ((*h <= 0) || (*w <= 0) || (*w > (INT_MAX / *h) / 3) || (*w > INT_MAX / 4)) {
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    return NULL;
+  }
+  data = malloc (*w * *h * 3 + 4);
+  if (!data) {
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    return NULL;
+  }
+  lines = malloc (*h * sizeof (*lines));
+  if (!lines) {
+    free (data);
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    return NULL;
+  }
+  {
+    size_t ls = (*w * 4 + 15) & ~15;
+    int i;
+    lines[0] = calloc (*h, ls);
+    if (!lines[0]) {
+      free (lines);
+      free (data);
+      png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+      return NULL;
+    }
+    for (i = 1; i < *h; i++)
+      lines[i] = lines[i - 1] + ls;
+  }
+
   /* Setup Translators */
   if (color_type == PNG_COLOR_TYPE_PALETTE)
     png_set_expand(png_ptr);
@@ -95,43 +262,11 @@ static unsigned char *_LoadPNG(ImlibData * id,
   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
     png_set_expand(png_ptr);
   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
-  if(*w > (INT_MAX / *h) / 3)
-    return NULL;
-  data = malloc(*w * *h * 3);
-  if (!data)
-    {
-      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-      return NULL;
-    }
-  lines = (unsigned char **)calloc(*h, sizeof(unsigned char *));
-
-  if (lines == NULL || *w > INT_MAX / 4)
-    {
-      free(lines);
-      free(data);
-      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-      return NULL;
-    }
-
-  for (i = 0; i < *h; i++)
-    {
-      if ((lines[i] = calloc(*w, (sizeof(unsigned char) * 4))) == NULL)
-	{
-	  int                 n;
-
-	  free(data);
-	  for (n = 0; n < i; n++)
-	    free(lines[n]);
-	  free(lines);
-	  png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	  return NULL;
-	}
-    }
 
   png_read_image(png_ptr, lines);
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
   ptr = data;
-  if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+  if ((color_type == PNG_COLOR_TYPE_GRAY_ALPHA) || (color_type == PNG_COLOR_TYPE_GRAY))
     {
       for (y = 0; y < *h; y++)
 	{
@@ -153,54 +288,15 @@ static unsigned char *_LoadPNG(ImlibData * id,
 		  *ptr++ = r;
 		  *ptr++ = r;
 		}
-	    }
-	}
-    }
-  else if (color_type == PNG_COLOR_TYPE_GRAY)
-    {
-      for (y = 0; y < *h; y++)
-	{
-	  ptr2 = lines[y];
-	  for (x = 0; x < *w; x++)
-	    {
-	      r = *ptr2++;
-	      *ptr++ = r;
-	      *ptr++ = r;
-	      *ptr++ = r;
 	    }
 	}
     }
   else
     {
       for (y = 0; y < *h; y++)
-	{
-	  ptr2 = lines[y];
-	  for (x = 0; x < *w; x++)
-	    {
-	      r = *ptr2++;
-	      g = *ptr2++;
-	      b = *ptr2++;
-	      a = *ptr2++;
-	      if (a < 128)
-		{
-		  *ptr++ = 255;
-		  *ptr++ = 0;
-		  *ptr++ = 255;
-		  transp = 1;
-		}
-	      else
-		{
-		  if ((r == 255) && (g == 0) && (b == 255))
-		    r = 254;
-		  *ptr++ = r;
-		  *ptr++ = g;
-		  *ptr++ = b;
-		}
-	    }
-	}
+        transp = _rgba2rgb (lines[y], &ptr, *w);
     }
-  for (i = 0; i < *h; i++)
-    free(lines[i]);
+  free (lines[0]);
   free(lines);
   *t = transp;
   return data;
