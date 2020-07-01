@@ -24,15 +24,8 @@
 #include "_xitk.h"
 #include "dlist.h"
 
-#include <X11/Xlib.h>
-
-#include "xitk/Imlib-light/Imlib.h"
-
 typedef struct {
-  /* HACK: embedded widget list, whose node links to menu_private_data_t.menu_windows below. */
-  xitk_widget_list_t      wl;
-  Display                *display;
-  ImlibData              *im;
+  xitk_dnode_t            node;
   xitk_window_t          *xwin;
   xitk_register_key_t     key;
   xitk_widget_t          *widget;
@@ -60,7 +53,6 @@ typedef struct {
 } menu_tree_t;
 
 typedef struct {
-  ImlibData              *imlibdata;
   xitk_widget_t          *widget;
   menu_tree_t            *mtree;
   menu_node_t            *curbranch;

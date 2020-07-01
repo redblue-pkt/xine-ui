@@ -2410,6 +2410,12 @@ static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install
   free(xrm_prefered_visual);
 }
 
+void xitk_sync(xitk_t *_xitk) {
+  XLOCK (_xitk->lock_display, _xitk);
+  XSync (_xitk->display, False);
+  XUNLOCK (_xitk->unlock_display, _xitk);
+}
+
 /*
  * Initiatization of widget internals.
  */

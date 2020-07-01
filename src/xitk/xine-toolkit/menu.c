@@ -22,10 +22,13 @@
 #include "config.h"
 #endif
 
+#include "menu.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include "_xitk.h"
+
 #include "xitk_x11.h"
 
 #include "utils.h"
@@ -35,12 +38,10 @@
 
 static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, int);
 
-static menu_window_t *_menu_new_menu_window(xitk_t *xitk, ImlibData *im, xitk_window_t *xwin) {
+static menu_window_t *_menu_new_menu_window(xitk_t *xitk, xitk_window_t *xwin) {
   menu_window_t *menu_window;
 
   menu_window          = (menu_window_t *) xitk_xmalloc(sizeof(menu_window_t));
-  menu_window->display = im->x.disp;
-  menu_window->im      = im;
   menu_window->xwin    = xwin;
 
   menu_window->bevel_plain     = NULL;
@@ -48,17 +49,7 @@ static menu_window_t *_menu_new_menu_window(xitk_t *xitk, ImlibData *im, xitk_wi
   menu_window->bevel_unchecked = NULL;
   menu_window->bevel_checked   = NULL;
 
-  xitk_dlist_init (&menu_window->wl.list);
-
-  /* HACK: embedded widget list - make sure it is not accidentally (un)listed. */
-  xitk_dnode_init (&menu_window->wl.node);
-  menu_window->wl.win  = xitk_window_get_window(xwin);
-  menu_window->wl.xitk = xitk;
-  menu_window->wl.imlibdata = im;
-
-  XLOCK (im->x.x_lock_display, im->x.disp);
-  menu_window->wl.gc   = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
-  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+  xitk_dnode_init (&menu_window->node);
 
   return menu_window;
 }
@@ -384,7 +375,6 @@ static menu_node_t *_menu_get_prev_branch_from_node(menu_node_t *node) {
 static void _menu_destroy_menu_window(menu_window_t **mw) {
 
   xitk_unregister_event_handler(&(*mw)->key);
-  xitk_destroy_widgets(&(*mw)->wl);
   if ((*mw)->bevel_plain)
     xitk_image_free_image (&(*mw)->bevel_plain);
   if ((*mw)->bevel_arrow)
@@ -395,30 +385,24 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
     xitk_image_free_image (&(*mw)->bevel_checked);
   xitk_window_destroy_window((*mw)->xwin);
   (*mw)->xwin = NULL;
-  /* xitk_dlist_init (&(*mw)->wl.list); */
 
-  XLOCK ((*mw)->im->x.x_lock_display, (*mw)->display);
-  XFreeGC((*mw)->display, (*mw)->wl.gc);
-  XUNLOCK ((*mw)->im->x.x_unlock_display, (*mw)->display);
-
-  /* deferred free as widget list */
-  xitk_dnode_remove (&(*mw)->wl.node);
-  XITK_WIDGET_LIST_FREE(&(*mw)->wl);
-  (*mw) = NULL;
+  xitk_dnode_remove (&(*mw)->node);
+  XITK_FREE(*mw);
+  *mw = NULL;
 }
 
 static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
   menu_window_t *mw;
   
   mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  if(!mw->wl.node.prev || (mw == menu_window))
+  if (!mw->node.prev || (mw == menu_window))
     /* Nothing to be done, save useless following efforts */
     return;
   do {
-    xitk_dnode_remove (&mw->wl.node);
+    xitk_dnode_remove (&mw->node);
     _menu_destroy_menu_window(&mw);
     mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  } while (mw->wl.node.prev && (mw != menu_window));
+  } while (mw->node.prev && (mw != menu_window));
   /* Set focus to parent menu */
   if (xitk_window_is_window_visible(menu_window->xwin)) {
 
@@ -430,7 +414,7 @@ static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *men
   menu_window_t *mw;
 
   mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  if (!mw->wl.node.prev)
+  if (!mw->node.prev)
     mw = NULL;
 
   return (mw != menu_window);
@@ -438,15 +422,13 @@ static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *men
 
 static void _menu_hide_menu(menu_private_data_t *private_data) {
   menu_window_t *mw;
-  
-  XLOCK (private_data->imlibdata->x.x_lock_display, private_data->imlibdata->x.disp);
+
   mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  while (mw->wl.node.prev) {
+  while (mw->node.prev) {
     xitk_window_hide_window(mw->xwin);
-    XSync(private_data->imlibdata->x.disp, False);
-    mw = (menu_window_t *)mw->wl.node.prev;
+    xitk_sync(private_data->widget->wl->xitk);
+    mw = (menu_window_t *)mw->node.prev;
   }
-  XUNLOCK (private_data->imlibdata->x.x_unlock_display, private_data->imlibdata->x.disp);
 }
 
 static void _menu_destroy_ntree(menu_node_t **mn) {
@@ -495,8 +477,8 @@ static void notify_destroy(xitk_widget_t *w) {
     xitk_unset_current_menu();
 
     mw = (menu_window_t *)private_data->menu_windows.head.next;
-    while (mw->wl.node.next) {
-      xitk_dnode_remove (&mw->wl.node);
+    while (mw->node.next) {
+      xitk_dnode_remove (&mw->node);
       _menu_destroy_menu_window(&mw);
       mw = (menu_window_t *)private_data->menu_windows.head.next;
     }
@@ -806,7 +788,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     bg = xitk_window_get_background_pixmap(xwin);
   }
 
-  menu_window         = _menu_new_menu_window(private_data->widget->wl->xitk, private_data->imlibdata, xwin);
+  menu_window         = _menu_new_menu_window(private_data->widget->wl->xitk, xwin);
   menu_window->widget = w;
 
   menu_window->bevel_plain = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);
@@ -845,7 +827,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   info.label_color_click = (char *)"White";
   info.label_fontname    = (char *)DEFAULT_BOLD_FONT_12;
 
-  xitk_dlist_add_tail (&private_data->menu_windows, &menu_window->wl.node);
+  xitk_dlist_add_tail (&private_data->menu_windows, &menu_window->node);
 
   me = branch;
   yy = 1;
@@ -889,6 +871,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       yy += 2;
     }
     else {
+      xitk_widget_list_t *wl = xitk_window_widget_list(xwin);
+;
       lb.button_type       = CLICK_BUTTON;
       lb.label             = me->menu_entry->menu;
       lb.align             = ALIGN_LEFT;
@@ -906,8 +890,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
         info.pixmap_img.image = menu_window->bevel_plain;
       }
 
-      btn = xitk_info_labelbutton_create (&menu_window->wl, &lb, &info);
-      xitk_dlist_add_tail (&menu_window->wl.list, &btn->node);
+      btn = xitk_info_labelbutton_create (wl, &lb, &info);
+      xitk_dlist_add_tail (&wl->list, &btn->node);
+
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
       me->button = btn;
       
@@ -933,8 +918,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     xitk_window_set_transient_for(xwin, private_data->parent_wlist->win);
   else
     xitk_window_set_transient_for_win(xwin, branch->prev->menu_window->xwin);
-
-  menu_window->key = xitk_register_event_handler_ext("xitk menu", menu_window->xwin, NULL, menu_window, &(menu_window->wl));
+  menu_window->key = xitk_window_register_event_handler("xitk menu", menu_window->xwin, NULL, menu_window);
 
   xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);
@@ -950,8 +934,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     /* This causes menus not to be shown under many several conditions.  */
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_DOCK);
-
-  btn = (xitk_widget_t *)menu_window->wl.list.head.next;
+  btn = (xitk_widget_t *) xitk_window_widget_list(xwin)->list.head.next;
   if (btn) {
     xitk_set_focus_to_widget(btn);
   }
@@ -1013,8 +996,8 @@ void menu_auto_pop(xitk_widget_t *w) {
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) && 
 	   (w->type & WIDGET_TYPE_LABELBUTTON) && (!(w->type & WIDGET_GROUP_MEMBER)))) {
-    menu_window_t       *mw = (menu_window_t *) w->wl;
-    menu_node_t         *me = labelbutton_get_user_data(w);    
+    menu_node_t         *me = labelbutton_get_user_data(w);
+    menu_window_t       *mw = me->menu_window;
     xitk_widget_t       *widget;
     menu_private_data_t *private_data;
     
@@ -1056,7 +1039,6 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   
   mywidget                   = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
   private_data               = (menu_private_data_t *) xitk_xmalloc(sizeof(menu_private_data_t));
-  private_data->imlibdata    = wl->imlibdata;
   private_data->parent_wlist = wl;
   private_data->widget       = mywidget;
   xitk_dlist_init (&private_data->menu_windows);
