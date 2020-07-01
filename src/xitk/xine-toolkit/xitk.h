@@ -838,6 +838,8 @@ xitk_t *xitk_init(const char *prefered_visual, int install_colormap,
 
 void xitk_free(xitk_t **);
 
+void xitk_sync(xitk_t *); /* XSync() wrapper */
+
 /*
  *
  */
