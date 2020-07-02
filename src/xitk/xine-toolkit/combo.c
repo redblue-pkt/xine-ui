@@ -495,7 +495,6 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     int                    xx = 0, yy = 0;
     window_info_t          wi;
-    XSizeHints             hint;
     
     if(wp->visible) {
       if((xitk_get_window_info(*(wp->parent_wkey), &wi))) {
@@ -509,21 +508,9 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       yy += xitk_get_widget_height(wp->label_widget);
       wp->win_x += xx;
       wp->win_y += yy;
-      
-      hint.x = wp->win_x;
-      hint.y = wp->win_y;
-      hint.flags = PPosition;
 
-      XLOCK (w->wl->imlibdata->x.x_lock_display, w->wl->imlibdata->x.disp);
-      XSetWMNormalHints (w->wl->imlibdata->x.disp,
-			 xitk_window_get_window(wp->xwin),
-			 &hint);
-      XMoveWindow(w->wl->imlibdata->x.disp,
-		  (xitk_window_get_window(wp->xwin)), 
-		  wp->win_x, wp->win_y);
-      XMapRaised(w->wl->imlibdata->x.disp, (xitk_window_get_window(wp->xwin)));
-      XSync(w->wl->imlibdata->x.disp, False);
-      XUNLOCK (w->wl->imlibdata->x.x_unlock_display, w->wl->imlibdata->x.disp);
+      xitk_window_move_window(wp->xwin, wp->win_x, wp->win_y);
+      xitk_window_show_window(wp->xwin, 1);
 
       xitk_window_try_to_set_input_focus(wp->xwin);
 
@@ -609,7 +596,6 @@ static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_conf
   xitk_browser_widget_t       browser;
   
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_WIDGET_INIT(&browser);
 
@@ -719,7 +705,6 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
   xitk_label_widget_t      lbl;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(c);
 
