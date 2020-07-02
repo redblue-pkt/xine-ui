@@ -1924,6 +1924,10 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
 xitk_pixmap_t *xitk_pixmap_create_from_data(xitk_t *xitk, int width, int height, const char *data);
 Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p);
 
+int xitk_pixmap_width(xitk_pixmap_t *);
+int xitk_pixmap_height(xitk_pixmap_t *);
+int xitk_pixmap_get_pixel(xitk_pixmap_t *, int x, int y); /* note: expensive */
+
 /*
  *
  */

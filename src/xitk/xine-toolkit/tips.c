@@ -165,13 +165,16 @@ static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
                                                   NULL, NULL, NULL, 1, 0, NULL);
       {
 	xitk_pixmap_t *bg;
+        int bg_width, bg_height;
 
         bg = xitk_window_get_background_pixmap(xwin);
+        bg_width = xitk_pixmap_width(bg);
+        bg_height = xitk_pixmap_height(bg);
 
-        pixmap_draw_rectangle(bg, 0, 0, bg->width - 1, bg->height - 1, cfore);
-        pixmap_fill_rectangle(bg, 1, 1, bg->width - 2, bg->height - 2, cback);
+        pixmap_draw_rectangle(bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
+        pixmap_fill_rectangle(bg, 1, 1, bg_width - 2, bg_height - 2, cback);
         xitk_pixmap_copy_area(image->image, bg, 0, 0, image->width, image->height,
-                              (bg->width - image->width)>>1, (bg->height - image->height)>>1);
+                              (bg_width - image->width)>>1, (bg_height - image->height)>>1);
 
         xitk_window_set_background(xwin, bg);
 

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
 #include <errno.h>
 
 #include <xine/sorted_array.h>
@@ -354,6 +355,30 @@ xitk_pixmap_t *xitk_pixmap_create_from_data(xitk_t *xitk, int width, int height,
 
 Pixmap xitk_pixmap_get_pixmap(xitk_pixmap_t *p) {
   return p->pixmap;
+}
+
+int xitk_pixmap_width(xitk_pixmap_t *p) {
+  return p->width;
+}
+
+int xitk_pixmap_height(xitk_pixmap_t *p) {
+  return p->height;
+}
+
+int xitk_pixmap_get_pixel(xitk_pixmap_t *p, int x, int y) {
+  ImlibData *im;
+  XImage *xi;
+  Pixel pixel;
+
+  im = p->imlibdata;
+
+  XLOCK (im->x.x_lock_display, im->x.disp);
+  xi = XGetImage(im->x.disp, p->pixmap, x, y, 1, 1, AllPlanes, ZPixmap);
+  pixel = XGetPixel(xi, 0, 0);
+  XDestroyImage(xi);
+  XUNLOCK (im->x.x_unlock_display, im->x.disp);
+
+  return (int) pixel;
 }
 
 /*
