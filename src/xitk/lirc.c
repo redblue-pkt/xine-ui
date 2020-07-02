@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 #ifdef HAVE_LIRC
 #include <lirc/lirc_client.h>
