@@ -35,8 +35,6 @@
 typedef struct {
   xitk_widget_t           w;
 
-  ImlibData		 *imlibdata;
-
   xitk_widget_t          *bWidget;
   int                     bType;
   int                     bClicked;
@@ -144,7 +142,7 @@ static int _notify_inside (_lbutton_private_t *wp, int x, int y) {
 /*
  * Draw the string in pixmap pix, then return it
  */
-static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
+static void _create_labelofbutton (_lbutton_private_t *wp,
     xitk_pixmap_t *pix, int xsize, int ysize,
     char *label, char *shortcut_label, int shortcut_pos, int state) {
   xitk_font_t             *fs = NULL;
@@ -153,6 +151,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
   unsigned int             fg = 0;
   unsigned int             origin = 0;
   xitk_color_names_t      *color = NULL;
+  GC gc = wp->w.wl->gc;
 
   /* Try to load font */
   if (wp->fontname)
@@ -211,10 +210,6 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
       fg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, color->red, color->green, color->blue);
     }
   }
-  
-  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-  XSetForeground (wp->imlibdata->x.disp, gc, fg);
-  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
 
   if (wp->bType == TAB_BUTTON) {
     /* The tab lift effect. */
@@ -227,11 +222,11 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
 
   /*  Put text in the right place */
   if (wp->align == ALIGN_CENTER) {
-    xitk_font_draw_string (fs, pix, gc,
-      ((xsize - (width + xoff)) >> 1) + wp->label_offset, origin, label, strlen(label));
+    xitk_pixmap_draw_string (pix, fs,
+      ((xsize - (width + xoff)) >> 1) + wp->label_offset, origin, label, strlen(label), fg);
   } else if (wp->align == ALIGN_LEFT) {
-    xitk_font_draw_string (fs, pix, gc,
-      (((state != CLICK) ? 1 : 5)) + wp->label_offset, origin, label, strlen(label));
+    xitk_pixmap_draw_string (pix, fs,
+      (((state != CLICK) ? 1 : 5)) + wp->label_offset, origin, label, strlen(label), fg);
     /* shortcut is only permited if alignement is set to left */
     if (shortcut_label[0] && (shortcut_pos >= 0)) {
       xitk_font_t *short_font;
@@ -240,14 +235,14 @@ static void _create_labelofbutton (_lbutton_private_t *wp, GC gc,
         short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font);
       else
         short_font = fs;
-      xitk_font_draw_string (short_font, pix, gc,
-        (((state != CLICK) ? 1 : 5)) + shortcut_pos, origin, shortcut_label, strlen (shortcut_label));
+      xitk_pixmap_draw_string (pix, short_font,
+        (((state != CLICK) ? 1 : 5)) + shortcut_pos, origin, shortcut_label, strlen (shortcut_label), fg);
       if (short_font != fs)
         xitk_font_unload_font (short_font);
     }
   } else if (wp->align == ALIGN_RIGHT) {
-    xitk_font_draw_string (fs, pix, gc,
-      (xsize - (width + ((state != CLICK) ? 5 : 1))) + wp->label_offset, origin, label, strlen(label));
+    xitk_pixmap_draw_string (pix, fs,
+      (xsize - (width + ((state != CLICK) ? 5 : 1))) + wp->label_offset, origin, label, strlen(label), fg);
   }
 
   xitk_font_unload_font (fs);
@@ -304,7 +299,7 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
       xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->temp_image,
         mode * wp->skin.width / 3, 0, wp->skin.width / 3, wp->skin.height, 0, 0);
     if (wp->label_visible) {
-      _create_labelofbutton (wp, wp->w.wl->gc, wp->temp_image.image->image,
+      _create_labelofbutton (wp, wp->temp_image.image->image,
         wp->skin.width / 3, wp->skin.height,
         wp->label, wp->shortcut_label, wp->shortcut_pos, state);
     }
@@ -638,8 +633,6 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp = (_lbutton_private_t *)xitk_xmalloc (sizeof (*wp));
   if (!wp)
     return NULL;
-
-  wp->imlibdata         = wl->imlibdata;
 
   wp->bWidget           = &wp->w;
   wp->bType             = b->button_type;
