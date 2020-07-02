@@ -1033,7 +1033,6 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   menu_private_data_t   *private_data;
   
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(m);
   

@@ -36,7 +36,6 @@
 typedef struct {
   xitk_widget_t  w;
 
-  ImlibData     *imlibdata;
   char          *skin_element_name;
   xitk_widget_t *bWidget;
   xitk_image_t  *skin;
@@ -2486,13 +2485,11 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   _image_private_t *wp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   wp = (_image_private_t *)xitk_xmalloc (sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->imlibdata         = wl->imlibdata;
   wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup (im->skin_element_name);
 
   wp->bWidget           = &wp->w;

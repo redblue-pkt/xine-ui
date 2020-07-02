@@ -309,7 +309,6 @@ xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
   xitk_inputtext_widget_t     inp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(ib);
 
