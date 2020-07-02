@@ -308,7 +308,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   _tabs_private_t *wp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(t);
   

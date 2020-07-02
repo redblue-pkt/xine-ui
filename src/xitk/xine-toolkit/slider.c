@@ -982,7 +982,6 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
   _slider_private_t *wp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(s);
 
@@ -1026,7 +1025,6 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   _slider_private_t *wp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(s);
   

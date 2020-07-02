@@ -997,7 +997,6 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   xitk_slider_widget_t           sl;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(br);
 
@@ -1063,7 +1062,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   xitk_slider_widget_t           sl;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(br);
 
@@ -1192,7 +1190,6 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
   int                         btnh = (itemh - (itemh /2)) < slidw ? slidw : (itemh - (itemh /2));
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(br);
   XITK_WIDGET_INIT(&b);

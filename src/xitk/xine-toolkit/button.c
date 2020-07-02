@@ -197,7 +197,6 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
 static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_widget_t *b) {
   
   ABORT_IF_NULL (wp->w.wl);
-  ABORT_IF_NULL (wp->w.wl->imlibdata);
 
   wp->bWidget           = &wp->w;
   wp->bClicked          = 0;

@@ -226,7 +226,6 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
  */
 static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_checkbox_widget_t *cb) {
   ABORT_IF_NULL (wp->w.wl);
-  ABORT_IF_NULL (wp->w.wl->imlibdata);
 
   wp->cWidget         = &wp->w;
   wp->cClicked        = 0;
