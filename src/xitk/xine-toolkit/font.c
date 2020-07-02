@@ -522,10 +522,11 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   xitk_font_cache_t     *font_cache;
 
   ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->display);
   ABORT_IF_NULL(font);
 
-  display = xitk->display;
+  display = xitk_x11_get_display(xitk);
+  ABORT_IF_NULL(display);
+
   font_cache = xitk->font_cache;
 
   pthread_mutex_lock(&font_cache->mutex);
