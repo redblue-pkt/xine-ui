@@ -44,7 +44,7 @@ static void _be_fix_trans (uint32_t *v, int *trans) {
 
 static int _rgba2rgb (const uint8_t *in, uint8_t **out, int n) {
   int trans = 0;
-  uint32_t d = (uint32_t)(*out) & 3;
+  uint32_t d = (uint32_t)((unsigned long)(*out) & 3);
   const uint32_t *p = (const uint32_t *)in;
   uint32_t *q = (uint32_t *)(*out - d);
   if (endian_is.little) {
