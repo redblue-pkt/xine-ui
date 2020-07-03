@@ -1383,31 +1383,6 @@ Imlib_get_image_border(ImlibData * id, ImlibImage * im, ImlibBorder * border)
     }
 }
 
-void
-Imlib_get_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color)
-{
-  if ((!im) || (!color))
-    return;
-
-  color->r = im->shape_color.r;
-  color->g = im->shape_color.g;
-  color->b = im->shape_color.b;
-}
-
-void
-Imlib_set_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color)
-{
-  if ((!im) || (!color))
-    return;
-  if ((im->shape_color.r != color->r) || (im->shape_color.g != color->g) || (im->shape_color.b != color->b))
-    {
-      im->shape_color.r = color->r;
-      im->shape_color.g = color->g;
-      im->shape_color.b = color->b;
-      dirty_pixmaps(id, im);
-    }
-}
-
 int
 Imlib_get_fallback(ImlibData * id)
 {

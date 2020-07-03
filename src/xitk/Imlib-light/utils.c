@@ -144,9 +144,6 @@ Imlib_clone_image(ImlibData * id, ImlibImage * im)
 
   im2->width = 0;
   im2->height = 0;
-  im2->shape_color.r = im->shape_color.r;
-  im2->shape_color.g = im->shape_color.g;
-  im2->shape_color.b = im->shape_color.b;
   im2->border.left = im->border.left;
   im2->border.right = im->border.right;
   im2->border.top = im->border.top;

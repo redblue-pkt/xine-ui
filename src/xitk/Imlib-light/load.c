@@ -12,142 +12,6 @@
 #endif
 
 
-static const union {
-  uint32_t word;
-  uint8_t  little;
-} endian_is = {
-  .word = 1
-};
-
-/* NOTE: we mark transparent pixels with r=255 g=0 b=255. */
-static void _le_fix_trans (uint32_t *v, int *trans) {
-  if (*v & 0x80000000) {
-    *v &= 0x00ffffff;
-    if (*v == 0x00ff00ff)
-      *v = 0x00ff00fe;
-  } else {
-    *v = 0x00ff00ff;
-    *trans = 1;
-  }
-}
-
-static void _be_fix_trans (uint32_t *v, int *trans) {
-  if (*v & 0x00000080) {
-    *v >>= 8;
-    if (*v == 0x00ff00ff)
-      *v = 0x00fe00ff;
-  } else {
-    *v = 0x00ff00ff;
-    *trans = 1;
-  }
-}
-
-static int _rgba2rgb (const uint8_t *in, uint8_t **out, int n) {
-  int trans = 0;
-  uint32_t d = (uint32_t)((unsigned long)(*out) & 3);
-  const uint32_t *p = (const uint32_t *)in;
-  uint32_t *q = (uint32_t *)(*out - d);
-  if (endian_is.little) {
-    uint32_t v;
-    if (d == 0)
-      goto _le0;
-    if (d == 1)
-      goto _le3;
-    if (d == 2)
-      goto _le2;
-    if (d == 3)
-      goto _le1;
-    while (1) {
-    _le0: /* RGB0 */
-      if (--n < 0) {
-        *out = (uint8_t *)q;
-        return trans;
-      }
-      v = *p++;
-      _le_fix_trans (&v, &trans);
-      q[0] = v;
-    _le1: /* rgbR GB00 */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 3;
-        return trans;
-      }
-      v = *p++;
-      _le_fix_trans (&v, &trans);
-      q[0] |= v << 24;
-      q[1] = v >> 8;
-      q++;
-    _le2: /* gbRG B000 */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 2;
-        return trans;
-      }
-      v = *p++;
-      _le_fix_trans (&v, &trans);
-      q[0] |= v << 16;
-      q[1] = v >> 16;
-      q++;
-    _le3: /* bRGB */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 1;
-        return trans;
-      }
-      v = *p++;
-      _le_fix_trans (&v, &trans);
-      q[0] |= v << 8;
-      q++;
-    }
-  } else {
-    uint32_t v;
-    if (d == 0)
-      goto _be0;
-    if (d == 1)
-      goto _be3;
-    if (d == 2)
-      goto _be2;
-    if (d == 3)
-      goto _be1;
-    while (1) {
-    _be0: /* RGB0 */
-      if (--n < 0) {
-        *out = (uint8_t *)q;
-        return trans;
-      }
-      v = *p++;
-      _be_fix_trans (&v, &trans);
-      q[0] = v << 8;
-    _be1: /* rgbR GB00 */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 3;
-        return trans;
-      }
-      v = *p++;
-      _be_fix_trans (&v, &trans);
-      q[0] |= v >> 16;
-      q[1] = v << 16;
-      q++;
-    _be2: /* gbRG B000 */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 2;
-        return trans;
-      }
-      v = *p++;
-      _be_fix_trans (&v, &trans);
-      q[0] |= v >> 8;
-      q[1] = v << 24;
-      q++;
-    _be3: /* bRGB */
-      if (--n < 0) {
-        *out = (uint8_t *)q + 1;
-        return trans;
-      }
-      v = *p++;
-      _be_fix_trans (&v, &trans);
-      q[0] |= v;
-      q++;
-    }
-  }
-}
-
 /*
  *      Split the ID - damages input
  */
@@ -181,24 +45,20 @@ static void _png_user_read(png_structp png, png_bytep data, png_size_t length)
   p->pos += length;
 }
 
-/** 
- *  * This error handling is broken beyond belief, but oh well it works
- *  **/
 static unsigned char *_LoadPNG(ImlibData * id,
                                FILE * f,
                                struct _png_data *indata,
                                int *w, int *h, int *t) {
   png_structp         png_ptr;
   png_infop           info_ptr;
-  unsigned char      *data, *ptr, **lines, *ptr2, r, a;
-  int                 x, y, transp, bit_depth, color_type, interlace_type;
+  unsigned char      *data, **lines;
+  int                 bit_depth, color_type, interlace_type, trans;
   png_uint_32         ww, hh;
 
   if (!f && (!indata || !indata->p))
     return NULL;
 
   /* Init PNG Reader */
-  transp = 0;
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png_ptr)
     return NULL;
@@ -229,7 +89,7 @@ static unsigned char *_LoadPNG(ImlibData * id,
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return NULL;
   }
-  data = malloc (*w * *h * 3 + 4);
+  data = malloc (*w * *h * 4 + 4);
   if (!data) {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return NULL;
@@ -240,16 +100,16 @@ static unsigned char *_LoadPNG(ImlibData * id,
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return NULL;
   }
-  {
-    size_t ls = (*w * 4 + 15) & ~15;
+  if ((color_type == PNG_COLOR_TYPE_GRAY_ALPHA) || (color_type == PNG_COLOR_TYPE_GRAY)) {
+    size_t ls = *w * 2;
     int i;
-    lines[0] = calloc (*h, ls);
-    if (!lines[0]) {
-      free (lines);
-      free (data);
-      png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
-      return NULL;
-    }
+    lines[0] = data + *w * *h * 2;
+    for (i = 1; i < *h; i++)
+      lines[i] = lines[i - 1] + ls;
+  } else {
+    size_t ls = *w * 4;
+    int i;
+    lines[0] = data;
     for (i = 1; i < *h; i++)
       lines[i] = lines[i - 1] + ls;
   }
@@ -265,40 +125,40 @@ static unsigned char *_LoadPNG(ImlibData * id,
 
   png_read_image(png_ptr, lines);
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-  ptr = data;
-  if ((color_type == PNG_COLOR_TYPE_GRAY_ALPHA) || (color_type == PNG_COLOR_TYPE_GRAY))
-    {
-      for (y = 0; y < *h; y++)
-	{
-	  ptr2 = lines[y];
-	  for (x = 0; x < *w; x++)
-	    {
-	      r = *ptr2++;
-	      a = *ptr2++;
-	      if (a < 128)
-		{
-		  *ptr++ = 255;
-		  *ptr++ = 0;
-		  *ptr++ = 255;
-		  transp = 1;
-		}
-	      else
-		{
-		  *ptr++ = r;
-		  *ptr++ = r;
-		  *ptr++ = r;
-		}
-	    }
-	}
+
+  trans = 1;
+  if ((color_type == PNG_COLOR_TYPE_GRAY_ALPHA) || (color_type == PNG_COLOR_TYPE_GRAY)) {
+    const uint8_t *p = (const uint8_t *)lines[0];
+    uint32_t *q = (uint32_t *)data;
+    int n;
+    trans = 0x80;
+    for (n = *w * *h; n > 0; n--) {
+      union {
+        uint8_t b[4];
+        uint32_t w;
+      } v;
+      v.b[0] = v.b[1] = v.b[2] = p[0];
+      v.b[3] = p[1];
+      trans &= p[1];
+      p += 2;
+      *q++ = v.w;
     }
-  else
-    {
-      for (y = 0; y < *h; y++)
-        transp = _rgba2rgb (lines[y], &ptr, *w);
-    }
-  free (lines[0]);
+  } else if (color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
+    int n;
+    const uint32_t *p = (const uint32_t *)data;
+    union {
+      uint8_t b[4];
+      uint32_t w;
+    } v;
+    v.b[0] = v.b[1] = v.b[2] = 0;
+    v.b[3] = 0x80;
+    for (n = *w * *h; n > 0; n--)
+      v.w &= *p++;
+    trans = v.w;
+  }
+
   free(lines);
-  *t = transp;
+  *t = trans == 0;
   return data;
 }
 
@@ -328,8 +188,7 @@ static unsigned char *_LoadJPEG(ImlibData * id,
   jpeg_read_header (&jpeg_ptr, TRUE);
   jpeg_start_decompress (&jpeg_ptr);
 
-  rowstride = jpeg_ptr.output_width * jpeg_ptr.output_components;
-  outptr = out = malloc (rowstride * jpeg_ptr.output_height);
+  outptr = out = malloc (4 * jpeg_ptr.output_width * jpeg_ptr.output_height);
 
   if (!buffer || !out)
   {
@@ -337,6 +196,11 @@ static unsigned char *_LoadJPEG(ImlibData * id,
     jpeg_destroy_decompress (&jpeg_ptr);
     return NULL;
   }
+
+  outptr = jpeg_ptr.output_components == 1
+         ? out + (4 - 1) * jpeg_ptr.output_width * jpeg_ptr.output_height
+         : out + (4 - 3) * jpeg_ptr.output_width * jpeg_ptr.output_height;
+  rowstride = jpeg_ptr.output_width * jpeg_ptr.output_components;
 
   while (jpeg_ptr.output_scanline < jpeg_ptr.output_height)
   {
@@ -350,6 +214,24 @@ static unsigned char *_LoadJPEG(ImlibData * id,
 
   jpeg_finish_decompress (&jpeg_ptr);
   jpeg_destroy_decompress (&jpeg_ptr);
+
+  if (jpeg_ptr.output_components == 1) {
+    const uint8_t *p = (const uint8_t *)out + (4 - 1) * *w * *h;
+    uint32_t *q = (uint32_t *)out;
+    int n;
+    for (n = *w * *h; n > 0; n--) {
+      union {
+        uint8_t b[4];
+        uint32_t w;
+      } v;
+      v.b[0] = v.b[1] = v.b[2] = p[0];
+      v.b[3] = 0xff;
+      p += 1;
+      *q++ = v.w;
+    }
+  } else {
+    /* FIXME: yuv -> rgb ?? */
+  }
 
   return out;
 }
@@ -370,15 +252,7 @@ static ImlibImage * new_image(ImlibData * id, unsigned char *data, int w, int h,
     return NULL;
 
   im->alpha_data = NULL;
-  if (trans) {
-    im->shape_color.r = 255;
-    im->shape_color.g = 0;
-    im->shape_color.b = 255;
-  } else {
-    im->shape_color.r = -1;
-    im->shape_color.g = -1;
-    im->shape_color.b = -1;
-  }
+  im->shape = trans;
   im->border.left = 0;
   im->border.right = 0;
   im->border.top = 0;

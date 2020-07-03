@@ -35,8 +35,6 @@ extern              "C"
   void                Imlib_set_render_type(ImlibData * id, int rend_type);
   void                Imlib_set_image_border(ImlibData * id, ImlibImage * im, ImlibBorder * border);
   void                Imlib_get_image_border(ImlibData * id, ImlibImage * im, ImlibBorder * border);
-  void                Imlib_get_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color);
-  void                Imlib_set_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color);
   int                 Imlib_get_fallback(ImlibData * id);
   void                Imlib_set_fallback(ImlibData * id, int fallback);
   Visual             *Imlib_get_visual(ImlibData * id);
@@ -49,4 +47,3 @@ extern              "C"
 #endif				/* __cplusplus */
 
 #endif
-

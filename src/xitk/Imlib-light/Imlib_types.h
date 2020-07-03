@@ -68,7 +68,7 @@ struct _ImlibImage
     char               *filename;
 /* the below information is private */
     int                 width, height;
-    ImlibColor          shape_color;
+    int                 shape;
     ImlibBorder         border;
     Pixmap              pixmap;
     Pixmap              shape_mask;
@@ -193,3 +193,4 @@ struct _ImlibInitParams
 #define RT_DITHER_TRUECOL      5
 
 #endif /* _XITK_IMLIB_TYPES_H */
+
