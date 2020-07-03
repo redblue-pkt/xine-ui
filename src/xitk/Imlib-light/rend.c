@@ -6,6 +6,13 @@
 #include "Imlib_types.h"
 #include "Imlib_private.h"
 
+static const union {
+  uint32_t word;
+  uint8_t  little;
+} endian_is = {
+  .word = 1
+};
+
 int
 Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b)
 {
@@ -220,12 +227,10 @@ render_shaped_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XIma
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -283,12 +288,10 @@ render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -432,12 +435,10 @@ render_shaped_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XIma
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -495,12 +496,10 @@ render_shaped_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -641,12 +640,10 @@ render_shaped_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      ex += 3;
@@ -714,12 +711,10 @@ render_shaped_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	    }
@@ -846,12 +841,10 @@ render_shaped_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      ex += 3;
@@ -903,12 +896,10 @@ render_shaped_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	    }
@@ -1033,12 +1024,10 @@ render_shaped_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -1098,12 +1087,10 @@ render_shaped_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -1169,12 +1156,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1197,12 +1182,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1225,12 +1208,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1253,12 +1234,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1281,12 +1260,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1309,12 +1286,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1340,12 +1315,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1368,12 +1341,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1396,12 +1367,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1424,12 +1393,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1452,12 +1419,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1480,12 +1445,10 @@ render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -1747,12 +1710,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -1774,12 +1735,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -1801,12 +1760,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -1828,12 +1785,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -1855,12 +1810,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -1882,12 +1835,10 @@ render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -2027,12 +1978,10 @@ render_shaped_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    XPutPixel(sxim, x, y, 0);
 	  else
 	    {
@@ -2079,12 +2028,10 @@ render_shaped_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    XPutPixel(sxim, x, y, 0);
 	  else
 	    {
@@ -2128,26 +2075,34 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 
   if (id->byte_order == BYTE_ORD_24_RGB)
     {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (r << 16) | (g << 8) | b;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
+      if (endian_is.little) {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* abgr */
+            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
+            if (v & 0x00000080) {
+              XPutPixel (xim, x, y, v >> 8);
+              XPutPixel (sxim, x, y, 1);
+            } else {
+              XPutPixel (sxim, x, y, 0);
+            }
+          }
+        }
+      } else {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* rgba */
+            if (v & 0x00000080) {
+              XPutPixel (xim, x, y, v >> 8);
+              XPutPixel (sxim, x, y, 1);
+            } else {
+              XPutPixel (sxim, x, y, 0);
+            }
+          }
+        }
+      }
     }
   else if (id->byte_order == BYTE_ORD_24_RBG)
     {
@@ -2156,12 +2111,10 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -2179,12 +2132,10 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -2197,26 +2148,34 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
     }
   else if (id->byte_order == BYTE_ORD_24_BGR)
     {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (b << 16) | (g << 8) | r;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
+      if (endian_is.little) {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* abgr */
+            if (v & 0x80000000) {
+              XPutPixel (xim, x, y, v & 0x00ffffff);
+              XPutPixel (sxim, x, y, 1);
+            } else {
+              XPutPixel (sxim, x, y, 0);
+            }
+          }
+        }
+      } else {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* rgba */
+            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
+            if (v & 0x80000000) {
+              XPutPixel (xim, x, y, v & 0x00ffffff);
+              XPutPixel (sxim, x, y, 1);
+            } else {
+              XPutPixel (sxim, x, y, 0);
+            }
+          }
+        }
+      }
     }
   else if (id->byte_order == BYTE_ORD_24_GRB)
     {
@@ -2225,12 +2184,10 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -2248,12 +2205,10 @@ render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -2276,18 +2231,24 @@ render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 
   if (id->byte_order == BYTE_ORD_24_RGB)
     {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (r << 16) | (g << 8) | b;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
+      if (endian_is.little) {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* abgr */
+            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
+            XPutPixel (xim, x, y, v >> 8);
+          }
+        }
+      } else {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* rgba */
+            XPutPixel (xim, x, y, v >> 8);
+          }
+        }
+      }
     }
   else if (id->byte_order == BYTE_ORD_24_RBG)
     {
@@ -2321,18 +2282,24 @@ render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
     }
   else if (id->byte_order == BYTE_ORD_24_BGR)
     {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (b << 16) | (g << 8) | r;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
+      if (endian_is.little) {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* abgr */
+            XPutPixel (xim, x, y, v & 0x00ffffff);
+          }
+        }
+      } else {
+        for (y = 0; y < h; y++) {
+          for (x = 0; x < w; x++) {
+            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+            uint32_t v = *p; /* rgba */
+            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
+            XPutPixel (xim, x, y, v & 0x00ffffff);
+          }
+        }
+      }
     }
   else if (id->byte_order == BYTE_ORD_24_GRB)
     {
@@ -2388,12 +2355,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img++;
@@ -2415,12 +2380,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    XPutPixel(sxim, x, y, 0);
 		  else
 		    {
@@ -2440,12 +2403,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img++;
@@ -2467,12 +2428,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    XPutPixel(sxim, x, y, 0);
 		  else
 		    {
@@ -2498,12 +2457,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      {
 			XPutPixel(sxim, x, y, 0);
@@ -2550,12 +2507,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      ex += 3;
@@ -2600,12 +2555,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      {
 			XPutPixel(sxim, x, y, 0);
@@ -2655,12 +2608,10 @@ render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      ex += 3;
@@ -3100,12 +3051,10 @@ render_shaped_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -3165,12 +3114,10 @@ render_shaped_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w,
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -3322,12 +3269,10 @@ render_shaped_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -3387,12 +3332,10 @@ render_shaped_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w,
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -3545,12 +3488,10 @@ render_shaped_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	    }
@@ -3645,12 +3586,10 @@ render_shaped_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	    }
@@ -3741,12 +3680,10 @@ render_shaped_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImag
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      ex += 3;
@@ -3856,12 +3793,10 @@ render_shaped_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImag
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      ex += 3;
@@ -3953,12 +3888,10 @@ render_shaped_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -4024,12 +3957,10 @@ render_shaped_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    {
 	      XPutPixel(sxim, x, y, 0);
 	      img++;
@@ -4101,12 +4032,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4132,12 +4061,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4163,12 +4090,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4194,12 +4119,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4225,12 +4148,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4256,12 +4177,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4290,12 +4209,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4321,12 +4238,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4352,12 +4267,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4383,12 +4296,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4414,12 +4325,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4445,12 +4354,10 @@ render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img += 3;
@@ -4752,12 +4659,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -4782,12 +4687,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -4812,12 +4715,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -4842,12 +4743,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -4872,12 +4771,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -4902,12 +4799,10 @@ render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		{
 		  XPutPixel(sxim, x, y, 0);
 		  img++;
@@ -5068,12 +4963,10 @@ render_shaped_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    XPutPixel(sxim, x, y, 0);
 	  else
 	    {
@@ -5126,12 +5019,10 @@ render_shaped_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
       for (x = 0; x < w; x++)
 	{
 	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  if ((r == im->shape_color.r) &&
-	      (g == im->shape_color.g) &&
-	      (b == im->shape_color.b))
+	  r = (int)ptr2[0];
+	  g = (int)ptr2[1];
+	  b = (int)ptr2[2];
+	  if (!(ptr2[3] & 0x80))
 	    XPutPixel(sxim, x, y, 0);
 	  else
 	    {
@@ -5186,12 +5077,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5212,12 +5101,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5238,12 +5125,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5264,12 +5149,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5290,12 +5173,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5316,12 +5197,10 @@ render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 	  for (x = 0; x < w; x++)
 	    {
 	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      if ((r == im->shape_color.r) &&
-		  (g == im->shape_color.g) &&
-		  (b == im->shape_color.b))
+	      r = (int)ptr2[0];
+	      g = (int)ptr2[1];
+	      b = (int)ptr2[2];
+	      if (!(ptr2[3] & 0x80))
 		XPutPixel(sxim, x, y, 0);
 	      else
 		{
@@ -5477,12 +5356,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img++;
@@ -5507,12 +5384,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    XPutPixel(sxim, x, y, 0);
 		  else
 		    {
@@ -5535,12 +5410,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      img++;
@@ -5565,12 +5438,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    XPutPixel(sxim, x, y, 0);
 		  else
 		    {
@@ -5599,12 +5470,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      {
 			XPutPixel(sxim, x, y, 0);
@@ -5654,12 +5523,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      ex += 3;
@@ -5707,12 +5574,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      {
 			XPutPixel(sxim, x, y, 0);
@@ -5765,12 +5630,10 @@ render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      for (x = 0; x < w; x++)
 		{
 		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  if ((r == im->shape_color.r) &&
-		      (g == im->shape_color.g) &&
-		      (b == im->shape_color.b))
+		  r = (int)ptr2[0];
+		  g = (int)ptr2[1];
+		  b = (int)ptr2[2];
+		  if (!(ptr2[3] & 0x80))
 		    {
 		      XPutPixel(sxim, x, y, 0);
 		      ex += 3;
@@ -6242,7 +6105,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   static GC           tgc = 0, stgc = 0;
   XGCValues           gcv;
   unsigned char      *tmp, *stmp, **yarray, *ptr22;
-  int                 w3, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp;
+  int                 w4, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp;
   Pixmap              pmap, mask;
 #ifdef HAVE_SHM
   int                 shared_pixmap, shared_image, ok, huge;
@@ -6334,7 +6197,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 /* setup pointers to point right */
   er1 = error;
   er2 = error + ((w + 2) * 3);
-  w3 = im->rgb_width * 3;
+  w4 = im->rgb_width * 4;
   ptr22 = im->rgb_data;
 
 /* setup coord-mapping array (specially for border scaling) */
@@ -6378,21 +6241,21 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     if (l)
       for (x = 0; x < l; x++)
 	{
-	  xarray[x] = (pos >> 16) + (pos >> 16) + (pos >> 16);
+	  xarray[x] = (pos >> 16) * 4;
 	  pos += 0x10000;
 	}
     if (m)
       {
 	for (x = l; x < l + m; x++)
 	  {
-	    xarray[x] = (pos >> 16) + (pos >> 16) + (pos >> 16);
+	    xarray[x] = (pos >> 16) * 4;
 	    pos += inc;
 	  }
       }
     pos = (im->rgb_width - r) << 16;
     for (x = w - r; x < w; x++)
       {
-	xarray[x] = (pos >> 16) + (pos >> 16) + (pos >> 16);
+	xarray[x] = (pos >> 16) * 4;
 	pos += 0x10000;
       }
 
@@ -6413,21 +6276,21 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     pos = 0;
     for (x = 0; x < l; x++)
       {
-	yarray[x] = ptr22 + ((pos >> 16) * w3);
+	yarray[x] = ptr22 + ((pos >> 16) * w4);
 	pos += 0x10000;
       }
     if (m)
       {
 	for (x = l; x < l + m; x++)
 	  {
-	    yarray[x] = ptr22 + ((pos >> 16) * w3);
+	    yarray[x] = ptr22 + ((pos >> 16) * w4);
 	    pos += inc;
 	  }
       }
     pos = (im->rgb_height - r) << 16;
     for (x = h - r; x < h; x++)
       {
-	yarray[x] = ptr22 + ((pos >> 16) * w3);
+	yarray[x] = ptr22 + ((pos >> 16) * w4);
 	pos += 0x10000;
       }
   }
@@ -6508,7 +6371,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 				      &id->x.last_shminfo, w, h, id->x.depth);
 		  if (!tgc)
 		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
-		  if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+		  if (im->shape)
 		    {
 		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
 		      if (!sxim)
@@ -6622,7 +6485,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 		  if (!tgc)
 		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
 		  im->pixmap = pmap;
-		  if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+		  if (im->shape)
 		    {
 		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
 		      if (!sxim)
@@ -6727,7 +6590,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
       im->pixmap = pmap;
       if (!tgc)
 	tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
-      if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+      if (im->shape)
 	{
 	  stmp = (unsigned char *)calloc(((w >> 3) + 8), h);
 	  if (!stmp)
@@ -6767,7 +6630,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	}
     }
 /* copy XImage to the pixmap, if not a shared pixmap */
-  if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+  if (im->shape)
     {
       if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
@@ -6920,3 +6783,4 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   add_pixmap(id, im, w, h, xim, sxim);
   return 1;
 }
+
