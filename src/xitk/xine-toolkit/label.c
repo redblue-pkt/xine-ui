@@ -197,7 +197,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (wp->labelpix, wp->labelpix,
       0, 0, pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     x_dest = pixwidth;
   }
