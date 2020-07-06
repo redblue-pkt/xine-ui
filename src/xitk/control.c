@@ -305,7 +305,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   XITK_WIDGET_INIT (&lb);
   XITK_WIDGET_INIT (&cmb);
 
-  bg_image = xitk_image_load_image(vctrl->gui->xitk,
+  bg_image = xitk_skin_get_image (vctrl->gui->skin_config,
     xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
   if (!bg_image) {
     xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
@@ -325,7 +325,6 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   set_window_type_start(vctrl->gui, vctrl->xwin);
 
   xitk_window_change_background_with_image(vctrl->xwin, bg_image, width, height);
-  xitk_image_free_image(&bg_image);
 
   /*
    * Widget-list
@@ -641,8 +640,9 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
 
-    if (!(bg_image = xitk_image_load_image (vctrl->gui->xitk,
-      xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG")))) {
+    bg_image = xitk_skin_get_image (vctrl->gui->skin_config,
+        xitk_skin_get_skin_filename (vctrl->gui->skin_config, "CtlBG"));
+    if (!bg_image) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
@@ -651,7 +651,6 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
 
     xitk_window_resize_window (vctrl->xwin, w, h);
     xitk_window_change_background_with_image(vctrl->xwin, bg_image, w, h);
-    xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (vctrl->gui->vwin, vctrl->xwin);
 

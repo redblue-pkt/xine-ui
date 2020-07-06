@@ -887,8 +887,9 @@ void playlist_change_skins(int synthetic) {
     xitk_skin_lock(gui->skin_config);
     xitk_hide_widgets(playlist->widget_list);
 
-    if(!(bg_image = xitk_image_load_image(gui->xitk,
-                                          xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
+    bg_image = xitk_skin_get_image (gui->skin_config,
+        xitk_skin_get_skin_filename (gui->skin_config, "PlBG"));
+    if (!bg_image) {
       xine_error (gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
@@ -897,7 +898,6 @@ void playlist_change_skins(int synthetic) {
 
     xitk_window_resize_window (playlist->xwin, width, height);
     xitk_window_change_background_with_image(playlist->xwin, bg_image, width, height);
-    xitk_image_free_image(&bg_image);
 
     video_window_set_transient_for (gui->vwin, playlist->xwin);
 
@@ -960,8 +960,9 @@ void playlist_editor(void) {
 
   _playlist_create_playlists();
 
-  if (!(bg_image = xitk_image_load_image(gui->xitk,
-                                         xitk_skin_get_skin_filename(gui->skin_config, "PlBG")))) {
+  bg_image = xitk_skin_get_image (gui->skin_config,
+    xitk_skin_get_skin_filename (gui->skin_config, "PlBG"));
+  if (!bg_image) {
     xine_error (gui, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
@@ -989,7 +990,6 @@ void playlist_editor(void) {
   set_window_type_start(gui, playlist->xwin);
 
   xitk_window_change_background_with_image(playlist->xwin, bg_image, width, height);
-  xitk_image_free_image(&bg_image);
 
   /*
    * Widget-list
