@@ -137,7 +137,8 @@ static void notify_destroy(xitk_widget_t *w) {
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
-  
+
+  (void)result;
   switch(event->type) {
   case WIDGET_EVENT_DESTROY:
     notify_destroy(w);
@@ -619,7 +620,8 @@ static void mrlbrowser_destroy(xitk_widget_t *w) {
  */
 static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
-  
+
+  (void)w;
   if(private_data->kill_callback)
     private_data->kill_callback (private_data->fbWidget, private_data->kill_userdata);
 
@@ -642,8 +644,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     xitk_skin_lock(skonfig);
     xitk_hide_widgets(private_data->widget_list);
 
-    bg_image = xitk_image_load_image (private_data->widget_list->xitk,
-                                      xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+    bg_image = xitk_skin_get_image (skonfig,
+      xitk_skin_get_skin_filename (skonfig, private_data->skin_element_name));
     if (!bg_image) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
@@ -652,8 +654,6 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 
     xitk_window_change_background_with_image(private_data->xwin, bg_image,
                                              bg_image->width, bg_image->height);
-    xitk_image_free_image(&bg_image);
-
     xitk_skin_unlock(skonfig);
 
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
@@ -765,6 +765,7 @@ static void mrlbrowser_select(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
 
+  (void)w;
   if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
     mrlbrowser_select_mrl(private_data, j, 1, 0);
   }
@@ -777,6 +778,7 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
   
+  (void)w;
   if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
     mrlbrowser_select_mrl(private_data, j, 0, 1);
   }
@@ -788,6 +790,7 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
 static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int modifier) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
+  (void)w;
   if ((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
     mrlbrowser_select_mrl(private_data, selected, 1, 1);
   else if (modifier & MODIFIER_CTRL)
@@ -803,6 +806,7 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int mod
 static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
+  (void)w;
   private_data->filter_selected = select;
   mrlbrowser_create_enlighted_entries(private_data);
   xitk_browser_update_list(private_data->mrlb_list, 
@@ -905,8 +909,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   private_data->key_cb            = mb->key_cb;
   private_data->key_cb_data       = mb->key_cb_data;
 
-  bg_image = xitk_image_load_image(xitk,
-     xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  bg_image = xitk_skin_get_image (skonfig,
+    xitk_skin_get_skin_filename (skonfig, private_data->skin_element_name));
   if (!bg_image) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     return NULL;
@@ -1049,8 +1053,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
 
-  xitk_image_free_image(&bg_image);
-
   xitk_browser_update_list(private_data->mrlb_list, 
 			   (const char* const*)private_data->mc->mrls_disp, NULL,
 			   private_data->mrls_num, 0);
@@ -1076,4 +1078,3 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 }
 
 #endif
-
