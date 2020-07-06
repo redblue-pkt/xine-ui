@@ -39,7 +39,7 @@
  ************************************************************************************/
 
 typedef struct {
-  const char *name;
+  const char *name, *format;
   xitk_image_t *image;
 } xitk_skin_img_t;
 
@@ -53,26 +53,35 @@ static int xitk_simg_cmp (void *a, void *b) {
  */
 static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *pixmap, const char *format) {
   char b[1024];
-  const char *name, *part;
+  const char *name;
   int try;
 
-  if (!skonfig || !image || !pixmap)
+  if (!skonfig || !pixmap)
     return;
 
-  image->x = image->y = image->width = image->height = 0;
+  if (image) {
+    image->x = image->y = image->width = image->height = 0;
+    image->image = NULL;
+  }
+  name = pixmap;
 
-  part = strchr (pixmap, '|');
-  if (part) {
+  do {
     uint32_t v;
     uint8_t z;
-    const uint8_t *p = (const uint8_t *)part + 1;
+    const uint8_t *p;
+    const char *part = strchr (pixmap, '|');
 
+    if (!part)
+      break;
     if (part > pixmap + sizeof (b) - 2 - 1)
       part = pixmap + sizeof (b) - 2 - 1;
     memcpy (b + 2, pixmap, part - pixmap);
     b[2 + part - pixmap] = 0;
     name = b + 2;
+    if (!image)
+      break;
 
+    p = (const uint8_t *)part + 1;
     v = 0;
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
@@ -95,11 +104,8 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
     while ((z = *p ^ '0') < 10)
       v = v * 10u + z, p++;
     image->height = v;
-  } else {
-    name = pixmap;
-  }
+  } while (0);
 
-  image->image = NULL;
   for (try = 2; try > 0; try--) {
     /* already loaded? */
     {
@@ -109,10 +115,19 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
       pos = xine_sarray_binary_search (skonfig->imgs, &here);
       if (pos >= 0) {
         xitk_skin_img_t *si = xine_sarray_get (skonfig->imgs, pos);
-        if (format && !si->image->pix_font)
-          xitk_image_set_pix_font (si->image, format);
-        image->image = si->image;
-        break;
+        if (format)
+          si->format = format;
+        if (!image)
+          return;
+        if (!si->image) {
+          si->image = xitk_image_load_image (skonfig->xitk, name);
+          if (si->image && si->format)
+            xitk_image_set_pix_font (si->image, si->format);
+        }
+        if (si->image) {
+          image->image = si->image;
+          break;
+        }
       }
     }
     /* load now */
@@ -126,15 +141,18 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
       nmem += sizeof (*nimg);
       memcpy (nmem, name, nlen);
       nimg->name = nmem;
+      nimg->format = format;
+      nimg->image = NULL;
+      xine_sarray_add (skonfig->imgs, nimg);
+      if (!image)
+        return;
       nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
       if (nimg->image) {
-        if (format)
-          xitk_image_set_pix_font (nimg->image, format);
-        xine_sarray_add (skonfig->imgs, nimg);
+        if (nimg->format)
+          xitk_image_set_pix_font (nimg->image, nimg->format);
         image->image = nimg->image;
         break;
       }
-      free (nimg);
       if (try < 2)
         return;
       /* try fallback texture */
@@ -152,6 +170,7 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
       image->y = 0;
       image->width = 0;
       image->height = 0;
+      format = NULL;
     }
   }
 
@@ -197,6 +216,7 @@ static int _key_from_name (const char *name) {
     "\x17""font",
     "\x09""horizontal",
     "\x0c""label",
+    "\x19""label_y",
     "\x10""length",
     "\x06""pixmap",
     "\x11""pixmap_format",
@@ -509,6 +529,21 @@ static void skin_set_pos_to_value(char **p) {
   while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
 }
 
+static int _skin_make_filename (xitk_skin_config_t *skonfig, const char *name, char **dest) {
+  size_t plen, nlen;
+  if (*dest)
+    return 0;
+  plen = strlen (skonfig->path);
+  nlen = strlen (name);
+  *dest = (char *)xitk_xmalloc (plen + nlen + 2);
+  if (!*dest)
+    return 0;
+  memcpy (*dest, skonfig->path, plen);
+  (*dest)[plen] = '/';
+  memcpy (*dest + plen + 1, name, nlen + 1);
+  return 1;
+}
+
 /*
  * Parse subsection of skin element (coords/label yet).
  */
@@ -560,10 +595,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	p = skonfig->ln;
 	if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.slider_pixmap_pad_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
-	  sprintf (skonfig->celement->info.slider_pixmap_pad_name, "%s/%s", skonfig->path, p);
-          _skin_load_img (skonfig, &skonfig->celement->info.slider_pixmap_pad_img,
-            skonfig->celement->info.slider_pixmap_pad_name, NULL);
+          _skin_make_filename (skonfig, p, &skonfig->celement->info.slider_pixmap_pad_name);
 	}
 	else if(!strncasecmp(skonfig->ln, "radius", 6)) {
 	  skin_set_pos_to_value(&p);
@@ -618,27 +650,18 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
           if (!skonfig->celement->info.label_pixmap_font_format) {
             skonfig->celement->info.label_pixmap_font_format = strdup (p);
-            if (skonfig->celement->info.label_pixmap_font_name) {
-              xitk_part_image_t image;
-              _skin_load_img (skonfig, &image,
-                skonfig->celement->info.label_pixmap_font_name,
-                skonfig->celement->info.label_pixmap_font_format);
-              skonfig->celement->info.label_pixmap_font_img = image.image;
-            }
+            _skin_load_img (skonfig, NULL,
+              skonfig->celement->info.label_pixmap_font_name,
+              skonfig->celement->info.label_pixmap_font_format);
           }
         }
 	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_pixmap_font_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
-          if (skonfig->celement->info.label_pixmap_font_name) {
-            xitk_part_image_t image;
-            sprintf (skonfig->celement->info.label_pixmap_font_name, "%s/%s", skonfig->path, p);
-            _skin_load_img (skonfig, &image,
+          if (_skin_make_filename (skonfig, p, &skonfig->celement->info.label_pixmap_font_name))
+            _skin_load_img (skonfig, NULL,
               skonfig->celement->info.label_pixmap_font_name,
               skonfig->celement->info.label_pixmap_font_format);
-            skonfig->celement->info.label_pixmap_font_img = image.image;
-          }
-        }
+	}
 	else if(!strncasecmp(skonfig->ln, "static", 6)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->info.label_staticity = xitk_get_bool_value(p);
@@ -737,9 +760,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    }
 	    else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	      skin_set_pos_to_value(&p);
-	      s->info.pixmap_name = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
-	      sprintf (s->info.pixmap_name, "%s/%s", skonfig->path, p);
-              _skin_load_img (skonfig, &s->info.pixmap_img, s->info.pixmap_name, NULL);
+              _skin_make_filename (skonfig, p, &s->info.pixmap_name);
 	    }
 	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
 	      skin_set_pos_to_value(&p);
@@ -879,6 +900,19 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
   if (r < 0)
     return NULL;
   s = xine_sarray_get (skonfig->elements, r);
+
+  if (!s->info.pixmap_img.image && s->info.pixmap_name) {
+    _skin_load_img (skonfig, &s->info.pixmap_img, s->info.pixmap_name, NULL);
+  }
+  if (!s->info.label_pixmap_font_img && s->info.label_pixmap_font_name) {
+    xitk_part_image_t image;
+    _skin_load_img (skonfig, &image, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
+    s->info.label_pixmap_font_img = image.image;
+  }
+  if (!s->info.slider_pixmap_pad_img.image && s->info.slider_pixmap_pad_name) {
+    _skin_load_img (skonfig, &s->info.slider_pixmap_pad_img, s->info.slider_pixmap_pad_name, NULL);
+  }
+
   return s;
 }
 
@@ -1134,147 +1168,6 @@ int xitk_skin_get_coord_y(xitk_skin_config_t *skonfig, const char *str) {
 /*
  *
  */
-const char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_color;
-
-  return NULL;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_color_focus;
-
-  return NULL;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_label_color_click(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_color_click;
-  
-  return NULL;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_length(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_length;
-
-  return 0;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_animation(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_animation;
-
-  return 0;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_animation_step(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_animation_step;
-
-  return 1;
-}
-
-unsigned long xitk_skin_get_label_animation_timer(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_animation_timer;
-  
-  return 0;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_fontname;
-  
-  return NULL;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_printable;
-  
-  return 1;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_staticity(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_staticity;
-  
-  return 0;
-}
-
-/*
- *
- */
-int xitk_skin_get_label_alignment(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_alignment;
-  
-  return ALIGN_CENTER;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_pixmap_font_name;
-  
-  return NULL;
-}
-
-/*
- *
- */
 const char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
@@ -1282,43 +1175,6 @@ const char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char 
     return s->info.pixmap_name;
 
   return NULL;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    if (s->info.slider_type)
-      return s->info.slider_pixmap_pad_name;
-  
-  return NULL;
-}
-
-/*
- *
- */
-int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return ((s->info.slider_type) ? s->info.slider_type : XITK_HSLIDER);
-
-  return 0;
-}
-
-/*
- *
- */
-int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.slider_radius;
-
-  return 0;
 }
 
 /*
@@ -1404,3 +1260,4 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
+

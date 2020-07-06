@@ -94,20 +94,27 @@ static void _paint_button (_button_private_t *wp, widget_event_t *event) {
   }
 }
 
+static void _xitk_button_get_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  if (s) {
+    wp->skin      = s->pixmap_img;
+    wp->w.x       = s->x;
+    wp->w.y       = s->y;
+    wp->w.enable  = s->enability;
+    wp->w.visible = s->visibility ? 1 : -1;
+  }
+}
+
 /*
  *
  */
 static void _notify_change_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     xitk_skin_lock (skonfig);
-    xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
-    wp->w.x         = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
-    wp->w.y         = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-    wp->w.width     = wp->skin.width / 3;
-    wp->w.height    = wp->skin.height;
-    wp->w.visible   = (xitk_skin_get_visibility (skonfig, wp->skin_element_name)) ? 1 : -1;
-    wp->w.enable    = xitk_skin_get_enability (skonfig, wp->skin_element_name);
+    _xitk_button_get_skin (wp, skonfig);
     xitk_skin_unlock (skonfig);
+    wp->w.width   = wp->skin.width / 3;
+    wp->w.height  = wp->skin.height;
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
   }
 }
@@ -234,11 +241,7 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
 
   wp->w.wl = wl;
   wp->skin_element_name = b->skin_element_name ? strdup (b->skin_element_name) : NULL;
-  xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, b->skin_element_name));
-  wp->w.x       = xitk_skin_get_coord_x (skonfig, b->skin_element_name);
-  wp->w.y       = xitk_skin_get_coord_y (skonfig, b->skin_element_name);
-  wp->w.enable  = xitk_skin_get_enability (skonfig, b->skin_element_name);
-  wp->w.visible = xitk_skin_get_visibility (skonfig, b->skin_element_name) ? 1 : -1;
+  _xitk_button_get_skin (wp, skonfig);
 
   return _xitk_button_create (wp, b);
 }

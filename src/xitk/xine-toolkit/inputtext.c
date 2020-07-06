@@ -720,22 +720,17 @@ static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
  *
  */
 static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {
-  const char *name;
-
-  wp->w.x = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
-  wp->w.y = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-
-  wp->w.enable = xitk_skin_get_enability (skonfig, wp->skin_element_name);
-  wp->w.visible = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1 : -1;
-
-  name = xitk_skin_get_label_fontname (skonfig, wp->skin_element_name);
-  wp->fontname = name ? strdup (name) : NULL;
-  name = xitk_skin_get_label_color (skonfig, wp->skin_element_name);
-  wp->normal_color  = name ? strdup (name) : NULL;
-  name = xitk_skin_get_label_color_focus (skonfig, wp->skin_element_name);
-  wp->focused_color = name ? strdup (name) : NULL;
-
-  xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  if (s) {
+    wp->w.x = s->x;
+    wp->w.y = s->y;
+    wp->w.enable = s->enability;
+    wp->w.visible = s->visibility ? 1 : -1;
+    wp->fontname = s->label_fontname ? strdup (s->label_fontname) : NULL;
+    wp->normal_color  = s->label_color ? strdup (s->label_color) : NULL;
+    wp->focused_color = s->label_color_focus ? strdup (s->label_color_focus) : NULL;
+    wp->skin = s->pixmap_img;
+  }
 }
 
 static void _notify_change_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {

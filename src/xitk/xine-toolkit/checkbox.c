@@ -121,17 +121,24 @@ static int _notify_focus_checkbox (_checkbox_private_t *wp, int focus) {
 /*
  *
  */
+static void _xitk_checkbox_get_skin (_checkbox_private_t *wp, xitk_skin_config_t *skonfig) {
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  if (s) {
+    wp->w.x        = s->x;
+    wp->w.y        = s->y;
+    wp->w.visible  = s->visibility ? 1 : -1;
+    wp->w.enable   = s->enability;
+    wp->skin       = s->pixmap_img;
+  }
+}
+
 static void _notify_change_skin (_checkbox_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     xitk_skin_lock(skonfig);
-    xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
-    wp->w.x        = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
-    wp->w.y        = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
+    _xitk_checkbox_get_skin (wp, skonfig);
+    xitk_skin_unlock(skonfig);
     wp->w.width    = wp->skin.width / 3;
     wp->w.height   = wp->skin.height;
-    wp->w.visible  = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1: -1;
-    wp->w.enable   = xitk_skin_get_enability (skonfig, wp->skin_element_name);
-    xitk_skin_unlock(skonfig);
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
   }
 }
@@ -265,11 +272,7 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
 
   wp->w.wl       = wl;
   wp->skin_element_name = cb->skin_element_name == NULL ? NULL : strdup (cb->skin_element_name);
-  xitk_skin_get_part_image (skonfig, &wp->skin, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
-  wp->w.x        = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
-  wp->w.y        = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-  wp->w.visible  = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1: -1;
-  wp->w.enable   = xitk_skin_get_enability (skonfig, wp->skin_element_name);
+  _xitk_checkbox_get_skin (wp, skonfig);
 
   return _xitk_checkbox_create (wp, cb);
 }
