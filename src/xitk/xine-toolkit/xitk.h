@@ -1628,77 +1628,7 @@ int xitk_skin_get_coord_y(xitk_skin_config_t *, const char *);
 /*
  *
  */
-const char *xitk_skin_get_label_color(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-const char *xitk_skin_get_label_color_focus(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-const char *xitk_skin_get_label_color_click(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_length(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_animation(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_animation_step(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-unsigned long xitk_skin_get_label_animation_timer(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_alignment(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-const char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_printable(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_label_staticity(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
 const char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-const char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_slider_type(xitk_skin_config_t *, const char *);
-
-/*
- *
- */
-int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 
 /*
  *
