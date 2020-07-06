@@ -204,62 +204,6 @@ index_best_color_match(ImlibData * id, int *r, int *g, int *b)
   return col;
 }
 
-static void
-render_shaped_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     XImage * sxim, int *er1, int *er2, int *xarray,
-			     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x07;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
 #if 0
 static void
 render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
@@ -320,7 +264,7 @@ render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
 
 static void
 render_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
+		      int *er1, int *er2, int *xarray,
 		      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -366,7 +310,7 @@ render_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 
 static void
 render_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			      XImage * sxim, int *er1, int *er2, int *xarray,
+			      int *er1, int *er2, int *xarray,
 			      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -407,62 +351,6 @@ render_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIm
 	    b += 8;
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_shaped_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     XImage * sxim, int *er1, int *er2, int *xarray,
-			     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x03;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      *img++ = val;
-	    }
 	}
       img += jmp;
     }
@@ -528,7 +416,7 @@ render_shaped_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
 
 static void
 render_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
+		      int *er1, int *er2, int *xarray,
 		      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -575,7 +463,7 @@ render_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 
 static void
 render_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			      XImage * sxim, int *er1, int *er2, int *xarray,
+			      int *er1, int *er2, int *xarray,
 			      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -618,72 +506,6 @@ render_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIm
 	  *img++ = val;
 	}
       img += jmp;
-    }
-}
-
-static void
-render_shaped_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			XImage * sxim, int *er1, int *er2, int *xarray,
-			unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x07;
-	      eb = eb & 0x07;
-	      if (er > 255)
-		er = 255;
-	      else if (er < 0)
-		er = 0;
-	      if (eg > 255)
-		eg = 255;
-	      else if (eg < 0)
-		eg = 0;
-	      if (eb > 255)
-		eb = 255;
-	      else if (eb < 0)
-		eb = 0;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
     }
 }
 
@@ -741,7 +563,7 @@ render_shaped_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
 
 static void
 render_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 XImage * sxim, int *er1, int *er2, int *xarray,
+		 int *er1, int *er2, int *xarray,
 		 unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -782,7 +604,7 @@ render_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 
 static void
 render_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			 XImage * sxim, int *er1, int *er2, int *xarray,
+			 int *er1, int *er2, int *xarray,
 			 unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -818,56 +640,6 @@ render_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage *
 	    b += 8;
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_shaped_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			XImage * sxim, int *er1, int *er2, int *xarray,
-			unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x03;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      XPutPixel(xim, x, y, val);
-	    }
 	}
     }
 }
@@ -926,7 +698,7 @@ render_shaped_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
 
 static void
 render_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 XImage * sxim, int *er1, int *er2, int *xarray,
+		 int *er1, int *er2, int *xarray,
 		 unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -967,7 +739,7 @@ render_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 
 static void
 render_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			 XImage * sxim, int *er1, int *er2, int *xarray,
+			 int *er1, int *er2, int *xarray,
 			 unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -1008,44 +780,8 @@ render_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage *
 }
 
 static void
-render_shaped_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
 render_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       XImage * sxim, int *er1, int *er2, int *xarray,
+	       int *er1, int *er2, int *xarray,
 	       unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -1065,42 +801,6 @@ render_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  b = (int)*ptr2;
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_shaped_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
 	}
       img += jmp;
     }
@@ -1108,7 +808,7 @@ render_shaped_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 
 static void
 render_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       XImage * sxim, int *er1, int *er2, int *xarray,
+	       int *er1, int *er2, int *xarray,
 	       unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -1135,341 +835,8 @@ render_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
-{
-  int                 x, y, r, g, b;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * 3;
-  img = (unsigned char *)xim->data;
-
-  if (id->x.byte_order == MSBFirst)
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = r;
-		      *img++ = g;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = r;
-		      *img++ = b;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = b;
-		      *img++ = r;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = b;
-		      *img++ = g;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = r;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = b;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-    }
-  else
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = b;
-		      *img++ = g;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = b;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = r;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = r;
-		      *img++ = g;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = b;
-		      *img++ = r;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = r;
-		      *img++ = b;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-    }
-}
-
-static void
 render_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       XImage * sxim, int *er1, int *er2, int *xarray,
+	       int *er1, int *er2, int *xarray,
 	       unsigned char **yarray)
 {
   int                 x, y, r, g, b;
@@ -1687,315 +1054,118 @@ render_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		}
 	      img += jmp;
 	    }
-	}
-    }
-}
-
-static void
-render_shaped_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      XImage * sxim, int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned int       *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 2) - w;
-  img = (unsigned int *)xim->data;
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (r << 16) | (g << 8) | b;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (r << 16) | (b << 8) | g;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (b << 16) | (r << 8) | g;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (b << 16) | (g << 8) | r;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (g << 16) | (r << 8) | b;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (g << 16) | (b << 8) | r;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
 	}
     }
 }
 
 static void
 render_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       XImage * sxim, int *er1, int *er2, int *xarray,
+	       int *er1, int *er2, int *xarray,
 	       unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned int       *img;
-  int                 jmp;
+  int            x, y, val, r, g, b;
+  unsigned char *ptr2;
+  uint32_t      *img;
+  int            jmp;
 
   jmp = (xim->bytes_per_line >> 2) - w;
-  img = (unsigned int *)xim->data;
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (r << 16) | (g << 8) | b;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  img = (uint32_t *)xim->data;
+  if (id->byte_order == BYTE_ORD_24_RGB) {
+    if (endian_is.little) {
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+          uint32_t v = *p; /* abgr */
+          v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
+          *img++ = v >> 8;
+        }
+        img += jmp;
+      }
+    } else {
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+          uint32_t v = *p; /* rgba */
+          *img++ = v >> 8;
+        }
+        img += jmp;
+      }
     }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (r << 16) | (b << 8) | g;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  } else if (id->byte_order == BYTE_ORD_24_RBG) {
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        ptr2 = yarray[y] + xarray[x];
+        r = (int)ptr2[0];
+        g = (int)ptr2[1];
+        b = (int)ptr2[2];
+        val = (r << 16) | (b << 8) | g;
+        *img++ = val;
+      }
+      img += jmp;
     }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (b << 16) | (r << 8) | g;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  } else if (id->byte_order == BYTE_ORD_24_BRG) {
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        ptr2 = yarray[y] + xarray[x];
+        r = (int)ptr2[0];
+        g = (int)ptr2[1];
+        b = (int)ptr2[2];
+        val = (b << 16) | (r << 8) | g;
+        *img++ = val;
+      }
+      img += jmp;
     }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (b << 16) | (g << 8) | r;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  } else if (id->byte_order == BYTE_ORD_24_BGR) {
+    if (endian_is.little) {
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+          uint32_t v = *p; /* abgr */
+          *img++ = v & 0x00ffffff;
+        }
+        img += jmp;
+      }
+    } else {
+      for (y = 0; y < h; y++) {
+        for (x = 0; x < w; x++) {
+          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
+          uint32_t v = *p; /* rgba */
+          v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
+          *img++ = v & 0x00ffffff;
+        }
+        img += jmp;
+      }
     }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (g << 16) | (r << 8) | b;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  } else if (id->byte_order == BYTE_ORD_24_GRB) {
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        ptr2 = yarray[y] + xarray[x];
+        r = (int)ptr2[0];
+        g = (int)ptr2[1];
+        b = (int)ptr2[2];
+        val = (g << 16) | (r << 8) | b;
+        *img++ = val;
+      }
+      img += jmp;
     }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (g << 16) | (b << 8) | r;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
+  } else if (id->byte_order == BYTE_ORD_24_GBR) {
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        ptr2 = yarray[y] + xarray[x];
+        r = (int)ptr2[0];
+        g = (int)ptr2[1];
+        b = (int)ptr2[2];
+        val = (g << 16) | (b << 8) | r;
+        *img++ = val;
+      }
+      img += jmp;
     }
-}
-
-static void
-render_shaped_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 XImage * sxim, int *er1, int *er2, int *xarray,
-		 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    XPutPixel(sxim, x, y, 0);
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
+  }
 }
 
 static void
 render_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  XImage * sxim, int *er1, int *er2, int *xarray,
+	  int *er1, int *er2, int *xarray,
 	  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -2016,36 +1186,8 @@ render_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 XImage * sxim, int *er1, int *er2, int *xarray,
-		 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    XPutPixel(sxim, x, y, 0);
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  XImage * sxim, int *er1, int *er2, int *xarray,
+	  int *er1, int *er2, int *xarray,
 	  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -2066,164 +1208,8 @@ render_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 XImage * sxim, int *er1, int *er2, int *xarray,
-		 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      if (endian_is.little) {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* abgr */
-            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
-            if (v & 0x00000080) {
-              XPutPixel (xim, x, y, v >> 8);
-              XPutPixel (sxim, x, y, 1);
-            } else {
-              XPutPixel (sxim, x, y, 0);
-            }
-          }
-        }
-      } else {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* rgba */
-            if (v & 0x00000080) {
-              XPutPixel (xim, x, y, v >> 8);
-              XPutPixel (sxim, x, y, 1);
-            } else {
-              XPutPixel (sxim, x, y, 0);
-            }
-          }
-        }
-      }
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (r << 16) | (b << 8) | g;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (b << 16) | (r << 8) | g;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      if (endian_is.little) {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* abgr */
-            if (v & 0x80000000) {
-              XPutPixel (xim, x, y, v & 0x00ffffff);
-              XPutPixel (sxim, x, y, 1);
-            } else {
-              XPutPixel (sxim, x, y, 0);
-            }
-          }
-        }
-      } else {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* rgba */
-            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
-            if (v & 0x80000000) {
-              XPutPixel (xim, x, y, v & 0x00ffffff);
-              XPutPixel (sxim, x, y, 1);
-            } else {
-              XPutPixel (sxim, x, y, 0);
-            }
-          }
-        }
-      }
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (g << 16) | (r << 8) | b;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  val = (g << 16) | (b << 8) | r;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-}
-
-static void
 render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  XImage * sxim, int *er1, int *er2, int *xarray,
+	  int *er1, int *er2, int *xarray,
 	  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -2334,381 +1320,8 @@ render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      XImage * sxim, int *er1, int *er2, int *xarray,
-	      unsigned char **yarray, int bpp)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * (bpp >> 3);
-  img = (unsigned char *)xim->data;
-  switch (id->render_type)
-    {
-    case RT_PLAIN_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img++;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      val = Imlib_best_color_match(id, &r, &g, &b);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    XPutPixel(sxim, x, y, 0);
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      val = Imlib_best_color_match(id, &r, &g, &b);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_PLAIN_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img++;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    XPutPixel(sxim, x, y, 0);
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      {
-			XPutPixel(sxim, x, y, 0);
-			img++;
-		      }
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = Imlib_best_color_match(id, &er, &eg, &eb);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = Imlib_best_color_match(id, &er, &eg, &eb);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      {
-			XPutPixel(sxim, x, y, 0);
-			img++;
-		      }
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		      er = ERROR_RED(er, val);
-		      eg = ERROR_GRN(eg, val);
-		      eb = ERROR_BLU(eb, val);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      *img++ = COLOR_INDEX(val);
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		      er = ERROR_RED(er, val);
-		      eg = ERROR_GRN(eg, val);
-		      eb = ERROR_BLU(eb, val);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      XPutPixel(xim, x, y, COLOR_INDEX(val));
-		    }
-		}
-	    }
-	}
-      break;
-    default:
-      if (id->fastrend)
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		render_shaped_15_fast_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_15_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		render_shaped_16_fast_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_16_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 24:
-	    case 32:
-	      if (xim->bits_per_pixel == 24)
-		render_shaped_24_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_32_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      else
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		render_shaped_15_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_15(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		render_shaped_16_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_16(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 24:
-	      render_shaped_24(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	    case 32:
-	      render_shaped_24(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      break;
-    }
-}
-
-static void
 render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-       XImage * sxim, int *er1, int *er2, int *xarray,
+       int *er1, int *er2, int *xarray,
        unsigned char **yarray, int bpp)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -2957,30 +1570,30 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_fast_dither_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_15_fast_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_fast_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_15_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_fast_dither_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_16_fast_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_fast_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_16_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 24:
 	    case 32:
 	      if (xim->bits_per_pixel == 24)
-		render_24_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_24_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      else
-		render_32_fast(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_32_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -2996,29 +1609,30 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_dither_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_15_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_15(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_dither_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_16_dither(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_16(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 24:
-	      render_24(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+	      render_24(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 32:
-	      render_24(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+              /* we do know what we are doing? */
+	      render_32_fast (id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -3029,126 +1643,8 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	      ex += 3;
-	    }
-	  else
-	    {
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      XPutPixel(sxim, x, y, 1);
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x07;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_shaped_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-					 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-		g += 8;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
 render_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
+			  int *er1, int *er2, int *xarray,
 			  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -3197,7 +1693,7 @@ render_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 
 static void
 render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
+			       int *er1, int *er2, int *xarray,
 				  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -3247,126 +1743,8 @@ render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 }
 
 static void
-render_shaped_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x03;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_shaped_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-					 unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x03;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-		g += 4;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
 render_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
+			  int *er1, int *er2, int *xarray,
 			  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -3416,7 +1794,7 @@ render_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 
 static void
 render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
+			       int *er1, int *er2, int *xarray,
 				  unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -3466,61 +1844,8 @@ render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 }
 
 static void
-render_shaped_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				    unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	    }
-	  else
-	    {
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-		g += 8;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     XImage * sxim, int *er1, int *er2, int *xarray,
+			     int *er1, int *er2, int *xarray,
 			     unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -3564,61 +1889,8 @@ render_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 }
 
 static void
-render_shaped_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				    unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	    }
-	  else
-	    {
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x03;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-		g += 4;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     XImage * sxim, int *er1, int *er2, int *xarray,
+			     int *er1, int *er2, int *xarray,
 			     unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
@@ -3662,77 +1934,8 @@ render_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 }
 
 static void
-render_shaped_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			    XImage * sxim, int *er1, int *er2, int *xarray,
-			    unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x07;
-	      eb = eb & 0x07;
-	      if (er > 255)
-		er = 255;
-	      else if (er < 0)
-		er = 0;
-	      if (eg > 255)
-		eg = 255;
-	      else if (eg < 0)
-		eg = 0;
-	      if (eb > 255)
-		eb = 255;
-	      else if (eb < 0)
-		eb = 0;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		     XImage * sxim, int *er1, int *er2, int *xarray,
+		     int *er1, int *er2, int *xarray,
 		     unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -3775,61 +1978,8 @@ render_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 }
 
 static void
-render_shaped_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			    XImage * sxim, int *er1, int *er2, int *xarray,
-			    unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      ex += 3;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      er = r + er1[ex++];
-	      eg = g + er1[ex++];
-	      eb = b + er1[ex++];
-	      if (er > 255)
-		er = 255;
-	      if (eg > 255)
-		eg = 255;
-	      if (eb > 255)
-		eb = 255;
-	      val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	      er = er & 0x07;
-	      eg = eg & 0x03;
-	      eb = eb & 0x07;
-	      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		     XImage * sxim, int *er1, int *er2, int *xarray,
+		     int *er1, int *er2, int *xarray,
 		     unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -3872,47 +2022,8 @@ render_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 }
 
 static void
-render_shaped_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-
-static void
 render_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   XImage * sxim, int *er1, int *er2, int *xarray,
+		   int *er1, int *er2, int *xarray,
 		   unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -3935,45 +2046,6 @@ render_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  b = im->bmap[b];
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_shaped_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
 	}
       img += jmp;
     }
@@ -3981,7 +2053,7 @@ render_shaped_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 
 static void
 render_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   XImage * sxim, int *er1, int *er2, int *xarray,
+		   int *er1, int *er2, int *xarray,
 		   unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -4011,377 +2083,8 @@ render_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, r, g, b;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * 3;
-  img = (unsigned char *)xim->data;
-
-  if (id->x.byte_order == MSBFirst)
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = r;
-		      *img++ = g;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = r;
-		      *img++ = b;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = b;
-		      *img++ = r;
-		      *img++ = g;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = b;
-		      *img++ = g;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = r;
-		      *img++ = b;
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = g;
-		      *img++ = b;
-		      *img++ = r;
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-    }
-  else
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = b;
-		      *img++ = g;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = g;
-		      *img++ = b;
-		      *img++ = r;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = g;
-		      *img++ = r;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      *img++ = r;
-		      *img++ = g;
-		      *img++ = b;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = b;
-		      *img++ = r;
-		      *img++ = g;
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      *img++ = r;
-		      *img++ = b;
-		      *img++ = g;
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-    }
-}
-
-static void
 render_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   XImage * sxim, int *er1, int *er2, int *xarray,
+		   int *er1, int *er2, int *xarray,
 		   unsigned char **yarray)
 {
   int                 x, y, r, g, b;
@@ -4641,190 +2344,8 @@ render_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			  XImage * sxim, int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned int       *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 2) - w;
-  img = (unsigned int *)xim->data;
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (r << 16) | (g << 8) | b;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (r << 16) | (b << 8) | g;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (b << 16) | (r << 8) | g;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (b << 16) | (g << 8) | r;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (g << 16) | (r << 8) | b;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		{
-		  XPutPixel(sxim, x, y, 0);
-		  img++;
-		}
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (g << 16) | (b << 8) | r;
-		  *img++ = val;
-		}
-	    }
-	  img += jmp;
-	}
-    }
-}
-
-static void
 render_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   XImage * sxim, int *er1, int *er2, int *xarray,
+		   int *er1, int *er2, int *xarray,
 		   unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -4951,39 +2472,8 @@ render_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		     XImage * sxim, int *er1, int *er2, int *xarray,
-		     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    XPutPixel(sxim, x, y, 0);
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      XImage * sxim, int *er1, int *er2, int *xarray,
+	      int *er1, int *er2, int *xarray,
 	      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -5007,39 +2497,8 @@ render_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		     XImage * sxim, int *er1, int *er2, int *xarray,
-		     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    XPutPixel(sxim, x, y, 0);
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-
-static void
 render_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      XImage * sxim, int *er1, int *er2, int *xarray,
+	      int *er1, int *er2, int *xarray,
 	      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -5062,163 +2521,10 @@ render_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
     }
 }
 
-static void
-render_shaped_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		     XImage * sxim, int *er1, int *er2, int *xarray,
-		     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (r << 16) | (g << 8) | b;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (r << 16) | (b << 8) | g;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (b << 16) | (r << 8) | g;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (b << 16) | (g << 8) | r;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (g << 16) | (r << 8) | b;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)ptr2[0];
-	      g = (int)ptr2[1];
-	      b = (int)ptr2[2];
-	      if (!(ptr2[3] & 0x80))
-		XPutPixel(sxim, x, y, 0);
-	      else
-		{
-		  XPutPixel(sxim, x, y, 1);
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = (g << 16) | (b << 8) | r;
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-    }
-}
 
 static void
 render_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      XImage * sxim, int *er1, int *er2, int *xarray,
+	      int *er1, int *er2, int *xarray,
 	      unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
@@ -5335,425 +2641,8 @@ render_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_shaped_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		  XImage * sxim, int *er1, int *er2, int *xarray,
-		  unsigned char **yarray, int bpp)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * (bpp >> 3);
-  img = (unsigned char *)xim->data;
-  switch (id->render_type)
-    {
-    case RT_PLAIN_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img++;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      val = Imlib_best_color_match(id, &r, &g, &b);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    XPutPixel(sxim, x, y, 0);
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      val = Imlib_best_color_match(id, &r, &g, &b);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_PLAIN_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      img++;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    XPutPixel(sxim, x, y, 0);
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      {
-			XPutPixel(sxim, x, y, 0);
-			img++;
-		      }
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = Imlib_best_color_match(id, &er, &eg, &eb);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      *img++ = val;
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = Imlib_best_color_match(id, &er, &eg, &eb);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      XPutPixel(xim, x, y, val);
-		    }
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      {
-			XPutPixel(sxim, x, y, 0);
-			img++;
-		      }
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		      er = ERROR_RED(er, val);
-		      eg = ERROR_GRN(eg, val);
-		      eb = ERROR_BLU(eb, val);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      *img++ = COLOR_INDEX(val);
-		    }
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)ptr2[0];
-		  g = (int)ptr2[1];
-		  b = (int)ptr2[2];
-		  if (!(ptr2[3] & 0x80))
-		    {
-		      XPutPixel(sxim, x, y, 0);
-		      ex += 3;
-		    }
-		  else
-		    {
-		      XPutPixel(sxim, x, y, 1);
-		      r = im->rmap[r];
-		      g = im->gmap[g];
-		      b = im->bmap[b];
-		      er = r + er1[ex++];
-		      eg = g + er1[ex++];
-		      eb = b + er1[ex++];
-		      if (er > 255)
-			er = 255;
-		      else if (er < 0)
-			er = 0;
-		      if (eg > 255)
-			eg = 255;
-		      else if (eg < 0)
-			eg = 0;
-		      if (eb > 255)
-			eb = 255;
-		      else if (eb < 0)
-			eb = 0;
-		      val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		      er = ERROR_RED(er, val);
-		      eg = ERROR_GRN(eg, val);
-		      eb = ERROR_BLU(eb, val);
-		      DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		      XPutPixel(xim, x, y, COLOR_INDEX(val));
-		    }
-		}
-	    }
-	}
-      break;
-    default:
-      if (id->fastrend)
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_shaped_15_fast_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		  else
-		    render_shaped_15_fast_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_shaped_15_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_shaped_16_fast_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		  else
-		    render_shaped_16_fast_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_shaped_16_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 24:
-	    case 32:
-	      if (xim->bits_per_pixel == 24)
-		render_shaped_24_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      else
-		render_shaped_32_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      else
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_shaped_15_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		  else
-		    render_shaped_15_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_shaped_15_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_shaped_16_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		  else
-		    render_shaped_16_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_shaped_16_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    case 24:
-	      render_shaped_24_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	    case 32:
-	      render_shaped_24_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      break;
-    }
-}
-
-static void
 render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	   XImage * sxim, int *er1, int *er2, int *xarray,
+	   int *er1, int *er2, int *xarray,
 	   unsigned char **yarray, int bpp)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
@@ -6026,30 +2915,30 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_fast_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_15_fast_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_15_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_fast_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_16_fast_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_16_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 24:
 	    case 32:
 	      if (xim->bits_per_pixel == 24)
-		render_24_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_24_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      else
-		render_32_fast_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_32_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -6065,29 +2954,29 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_15_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_15_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_15_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_dither_mod_ordered(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
 		  else
-		    render_16_dither_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		    render_16_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+		render_16_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 24:
-	      render_24_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+	      render_24_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    case 32:
-	      render_24_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray);
+	      render_24_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -6095,6 +2984,95 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	  break;
 	}
     }
+}
+
+
+static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask, int w, int h) {
+  int y;
+  if (!mask)
+    return;
+  if ((mask->format == 2) && (mask->bits_per_pixel == 1)) {
+    uint8_t *q = (uint8_t *)mask->data;
+    int skip = mask->bytes_per_line - ((w + 7) >> 3);
+    int stop = w & ~7;
+    if (mask->bitmap_bit_order == 0) {
+      for (y = 0; y < h; y++) {
+        const uint8_t *p = yarray[y] + 3;
+        int x;
+        for (x = 0; x < stop; x += 8) {
+          *q++ = ((p[xarray[x]    ] & 0x80) >> 7)
+               | ((p[xarray[x + 1]] & 0x80) >> 6)
+               | ((p[xarray[x + 2]] & 0x80) >> 5)
+               | ((p[xarray[x + 3]] & 0x80) >> 4)
+               | ((p[xarray[x + 4]] & 0x80) >> 3)
+               | ((p[xarray[x + 5]] & 0x80) >> 2)
+               | ((p[xarray[x + 6]] & 0x80) >> 1)
+               | ((p[xarray[x + 7]] & 0x80) >> 0);
+        }
+        if (x < w) {
+          do {
+            *q  = ((p[xarray[x]] & 0x80) >> 7);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 6);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 5);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 4);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 3);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 2);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 1);
+          } while (0);
+          q++;
+        }
+        q += skip;
+      }
+    } else {
+      for (y = 0; y < h; y++) {
+        const uint8_t *p = yarray[y] + 3;
+        int x;
+        for (x = 0; x < stop; x += 8) {
+          *q++ = ((p[xarray[x]    ] & 0x80) >> 0)
+               | ((p[xarray[x + 1]] & 0x80) >> 1)
+               | ((p[xarray[x + 2]] & 0x80) >> 2)
+               | ((p[xarray[x + 3]] & 0x80) >> 3)
+               | ((p[xarray[x + 4]] & 0x80) >> 4)
+               | ((p[xarray[x + 5]] & 0x80) >> 5)
+               | ((p[xarray[x + 6]] & 0x80) >> 6)
+               | ((p[xarray[x + 7]] & 0x80) >> 7);
+        }
+        if (x < w) {
+          do {
+            *q  = ((p[xarray[x]] & 0x80) >> 0);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 1);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 2);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 3);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 4);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 5);
+            if (++x >= w) break;
+            *q |= ((p[xarray[x]] & 0x80) >> 6);
+          } while (0);
+          q++;
+        }
+        q += skip;
+      }
+    }
+    return;
+  }
+  for (y = 0; y < h; y++) {
+    unsigned char *p = yarray[y];
+    int x;
+    for (x = 0; x < w; x++) {
+      XPutPixel (mask, x, y, p[xarray[x] + 3] >> 7);
+    }
+  }
 }
 
 int
@@ -6107,8 +3085,9 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   unsigned char      *tmp, *stmp, **yarray, *ptr22;
   int                 w4, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp;
   Pixmap              pmap, mask;
+  int                 shared_pixmap, shared_image;
 #ifdef HAVE_SHM
-  int                 shared_pixmap, shared_image, ok, huge;
+  int                 huge;
 #endif
 
   if (!pd)
@@ -6296,9 +3275,9 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   }
 
 /* work out if we should use shared pixmap. images etc */
-#ifdef HAVE_SHM
   shared_pixmap = 0;
   shared_image = 0;
+#ifdef HAVE_SHM
   if ((id->x.shmp) && (id->x.shm) && (!huge))
     {
 #if defined(__alpha__)
@@ -6323,332 +3302,255 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 
 /* init images and pixmaps */
 #ifdef HAVE_SHM
-  ok = 1;
-  if (shared_pixmap)
-    {
-      xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
-      if (!xim)
-	{
-	  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap Wrapper\n");
-	  fprintf(stderr, "             Falling back on Shared XImages\n");
-	  shared_pixmap = 0;
-	  shared_image = 1;
-	  ok = 0;
-	}
-      if (ok)
-	{
-	  id->x.last_shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
-	  if (id->x.last_shminfo.shmid == -1)
-	    {
-	      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap Wrapper\n");
-	      fprintf(stderr, "             Falling back on Shared XImages\n");
-	      XDestroyImage(xim);
-	      shared_pixmap = 0;
-	      shared_image = 1;
-	      ok = 0;
-	    }
-	  if (ok)
-	    {
-	      id->x.last_shminfo.shmaddr = xim->data = shmat(id->x.last_shminfo.shmid, 0, 0);
-	      if (xim->data == (char *)-1)
-		{
-		  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap Wrapper\n");
-		  fprintf(stderr, "             Falling back on Shared XImages\n");
-		  XDestroyImage(xim);
-		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
-		  shared_pixmap = 0;
-		  shared_image = 1;
-		  ok = 0;
-		}
-	      if (ok)
-		{
-		  id->x.last_shminfo.readOnly = False;
-		  XShmAttach(id->x.disp, &id->x.last_shminfo);
-		  tmp = (unsigned char *)xim->data;
-		  id->x.last_xim = xim;
-		  pmap = XShmCreatePixmap(id->x.disp, id->x.base_window,
-					  id->x.last_shminfo.shmaddr,
-				      &id->x.last_shminfo, w, h, id->x.depth);
-		  if (!tgc)
-		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
-		  if (im->shape)
-		    {
-		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
-		      if (!sxim)
-			{
-			  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap mask Wrapper\n");
-			  fprintf(stderr, "             Falling back on Shared XImages\n");
-			  XShmDetach(id->x.disp, &id->x.last_shminfo);
-			  XDestroyImage(xim);
-			  shmdt(id->x.last_shminfo.shmaddr);
-			  shared_pixmap = 0;
-			  shared_image = 1;
-			  ok = 0;
-			}
-		      if (ok)
-			{
-			  id->x.last_sshminfo.shmid = shmget(IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
-			  if (id->x.last_sshminfo.shmid == -1)
-			    {
-			      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap mask Wrapper\n");
-			      fprintf(stderr, "             Falling back on Shared XImages\n");
-			      XShmDetach(id->x.disp, &id->x.last_shminfo);
-			      XDestroyImage(xim);
-			      shmdt(xim->data);
-			      /* missing shmctl(RMID) */
-			      XDestroyImage(sxim);
-			      shared_pixmap = 0;
-			      shared_image = 1;
-			      ok = 0;
-			    }
-			  if (ok)
-			    {
-			      id->x.last_sshminfo.shmaddr = sxim->data = shmat(id->x.last_sshminfo.shmid, 0, 0);
-			      if (sxim->data == (char *)-1)
-				{
-				  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap mask Wrapper\n");
-				  fprintf(stderr, "             Falling back on Shared XImages\n");
-				  XShmDetach(id->x.disp, &id->x.last_shminfo);
-				  XDestroyImage(xim);
-				  shmdt(xim->data);
-				  /* missing shmctl(RMID) */
-				  XDestroyImage(sxim);
-				  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
-				  shared_pixmap = 0;
-				  shared_image = 1;
-				  ok = 0;
-				}
-			      if (ok)
-				{
-				  id->x.last_sshminfo.readOnly = False;
-				  XShmAttach(id->x.disp, &id->x.last_sshminfo);
-				  stmp = (unsigned char *)sxim->data;
-				  id->x.last_sxim = sxim;
-				  mask = XShmCreatePixmap(id->x.disp, id->x.base_window,
-						  id->x.last_sshminfo.shmaddr,
-					       &id->x.last_sshminfo, w, h, 1);
-				  if (!stgc)
-				    stgc = XCreateGC(id->x.disp, mask, GCGraphicsExposures, &gcv);
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
+  do {
+    if (!shared_pixmap)
+      break;
+    xim = XShmCreateImage (id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
+    if (!xim) {
+      fprintf (stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap Wrapper\n");
+      fprintf (stderr, "             Falling back on Shared XImages\n");
+      shared_pixmap = 0;
+      shared_image = 1;
+      break;
     }
-  ok = 1;
-  if (shared_image)
-    {
-      xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
-      if (!xim)
-	{
-	  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage\n");
-	  fprintf(stderr, "             Falling back on XImages\n");
-	  shared_pixmap = 0;
-	  shared_image = 0;
-	  ok = 0;
-	}
-      if (ok)
-	{
-	  id->x.last_shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
-	  if (id->x.last_shminfo.shmid == -1)
-	    {
-	      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared XImage\n");
-	      fprintf(stderr, "             Falling back on XImages\n");
-	      XDestroyImage(xim);
-	      shared_pixmap = 0;
-	      shared_image = 0;
-	      ok = 0;
-	    }
-	  if (ok)
-	    {
-	      id->x.last_shminfo.shmaddr = xim->data = shmat(id->x.last_shminfo.shmid, 0, 0);
-
-	      if (xim->data == (char *)-1)
-		{
-		  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared XImage\n");
-		  fprintf(stderr, "             Falling back on XImages\n");
-		  XDestroyImage(xim);
-		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
-		  shared_pixmap = 0;
-		  shared_image = 0;
-		  ok = 0;
-		}
-	      if (ok)
-		{
-		  id->x.last_shminfo.readOnly = False;
-		  XShmAttach(id->x.disp, &id->x.last_shminfo);
-		  tmp = (unsigned char *)xim->data;
-		  id->x.last_xim = xim;
-		  pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
-		  if (!tgc)
-		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
-		  im->pixmap = pmap;
-		  if (im->shape)
-		    {
-		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
-		      if (!sxim)
-			{
-			  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage mask\n");
-			  fprintf(stderr, "             Falling back on XImages\n");
-			  XShmDetach(id->x.disp, &id->x.last_shminfo);
-			  XDestroyImage(xim);
-			  shmdt(id->x.last_shminfo.shmaddr);
-			  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
-			  shared_pixmap = 0;
-			  shared_image = 0;
-			  ok = 0;
-			}
-		      if (ok)
-			{
-			  id->x.last_sshminfo.shmid = shmget(IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
-			  if (id->x.last_sshminfo.shmid == -1)
-			    {
-			      fprintf(stderr, "Imlib ERROR: SHM can't get SHM Identifier for Shared XImage mask\n");
-			      fprintf(stderr, "             Falling back on XImages\n");
-			      XShmDetach(id->x.disp, &id->x.last_shminfo);
-			      XDestroyImage(xim);
-			      shmdt(xim->data);
-			      /* missing shmctl(RMID) */
-			      XDestroyImage(sxim);
-			      shared_pixmap = 0;
-			      shared_image = 0;
-			      ok = 0;
-			    }
-			  if (ok)
-			    {
-			      id->x.last_sshminfo.shmaddr = sxim->data = shmat(id->x.last_sshminfo.shmid, 0, 0);
-			      if (sxim->data == (char *)-1)
-				{
-				  fprintf(stderr, "Imlib ERROR: SHM can't attach SHM Segment for Shared XImage mask\n");
-				  fprintf(stderr, "             Falling back on XImages\n");
-				  XShmDetach(id->x.disp, &id->x.last_shminfo);
-				  XDestroyImage(xim);
-				  shmdt(xim->data);
-				  /* missing shmctl(RMID) */
-				  XDestroyImage(sxim);
-				  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
-				  shared_pixmap = 0;
-				  shared_image = 0;
-				  ok = 0;
-				}
-
-			      if (ok)
-				{
-				  id->x.last_sshminfo.readOnly = False;
-				  XShmAttach(id->x.disp, &id->x.last_sshminfo);
-				  stmp = (unsigned char *)sxim->data;
-				  id->x.last_sxim = sxim;
-				  mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
-				  if (!stgc)
-				    stgc = XCreateGC(id->x.disp, mask, GCGraphicsExposures, &gcv);
-				  im->shape_mask = mask;
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
+    id->x.last_shminfo.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+    if (id->x.last_shminfo.shmid == -1) {
+      fprintf (stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap Wrapper\n");
+      fprintf (stderr, "             Falling back on Shared XImages\n");
+      XDestroyImage (xim);
+      shared_pixmap = 0;
+      shared_image = 1;
+      break;
     }
+    id->x.last_shminfo.shmaddr = xim->data = shmat (id->x.last_shminfo.shmid, 0, 0);
+    if (xim->data == (char *)-1) {
+      fprintf (stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap Wrapper\n");
+      fprintf (stderr, "             Falling back on Shared XImages\n");
+      shmctl (id->x.last_shminfo.shmid, IPC_RMID, 0);
+      XDestroyImage (xim);
+      shared_pixmap = 0;
+      shared_image = 1;
+      break;
+    }
+    id->x.last_shminfo.readOnly = False;
+    XShmAttach (id->x.disp, &id->x.last_shminfo);
+    tmp = (unsigned char *)xim->data;
+    id->x.last_xim = xim;
+    pmap = XShmCreatePixmap (id->x.disp, id->x.base_window,
+      id->x.last_shminfo.shmaddr, &id->x.last_shminfo, w, h, id->x.depth);
+    if (!tgc)
+      tgc = XCreateGC (id->x.disp, pmap, GCGraphicsExposures, &gcv);
+    if (im->shape) {
+      sxim = XShmCreateImage (id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
+      if (!sxim) {
+        fprintf (stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap mask Wrapper\n");
+        fprintf (stderr, "             Falling back on Shared XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (id->x.last_shminfo.shmaddr);
+        shared_pixmap = 0;
+        shared_image = 1;
+        break;
+      }
+      id->x.last_sshminfo.shmid = shmget (IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
+      if (id->x.last_sshminfo.shmid == -1) {
+        fprintf (stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap mask Wrapper\n");
+        fprintf (stderr, "             Falling back on Shared XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (xim->data);
+        /* missing shmctl(RMID) */
+        XDestroyImage (sxim);
+        shared_pixmap = 0;
+        shared_image = 1;
+        break;
+      }
+      id->x.last_sshminfo.shmaddr = sxim->data = shmat (id->x.last_sshminfo.shmid, 0, 0);
+      if (sxim->data == (char *)-1) {
+        fprintf (stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap mask Wrapper\n");
+        fprintf (stderr, "             Falling back on Shared XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (xim->data);
+        /* missing shmctl(RMID) */
+        XDestroyImage (sxim);
+        shmctl (id->x.last_shminfo.shmid, IPC_RMID, 0);
+        break;
+      }
+      id->x.last_sshminfo.readOnly = False;
+      XShmAttach (id->x.disp, &id->x.last_sshminfo);
+      stmp = (unsigned char *)sxim->data;
+      id->x.last_sxim = sxim;
+      mask = XShmCreatePixmap (id->x.disp, id->x.base_window,
+        id->x.last_sshminfo.shmaddr, &id->x.last_sshminfo, w, h, 1);
+      if (!stgc)
+        stgc = XCreateGC (id->x.disp, mask, GCGraphicsExposures, &gcv);
+    }
+  } while (0);
+
+  do {
+    if (!shared_image)
+      break;
+    xim = XShmCreateImage (id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
+    if (!xim) {
+      fprintf (stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage\n");
+      fprintf (stderr, "             Falling back on XImages\n");
+      shared_pixmap = 0;
+      shared_image = 0;
+      break;
+    }
+    id->x.last_shminfo.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+    if (id->x.last_shminfo.shmid == -1) {
+      fprintf (stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared XImage\n");
+      fprintf (stderr, "             Falling back on XImages\n");
+      XDestroyImage (xim);
+      shared_pixmap = 0;
+      shared_image = 0;
+      break;
+    }
+    id->x.last_shminfo.shmaddr = xim->data = shmat (id->x.last_shminfo.shmid, 0, 0);
+    if (xim->data == (char *)-1) {
+      fprintf (stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared XImage\n");
+      fprintf (stderr, "             Falling back on XImages\n");
+      XDestroyImage (xim);
+      shmctl (id->x.last_shminfo.shmid, IPC_RMID, 0);
+      shared_pixmap = 0;
+      shared_image = 0;
+      break;
+    }
+    id->x.last_shminfo.readOnly = False;
+    XShmAttach (id->x.disp, &id->x.last_shminfo);
+    tmp = (unsigned char *)xim->data;
+    id->x.last_xim = xim;
+    pmap = XCreatePixmap (id->x.disp, id->x.base_window, w, h, id->x.depth);
+    if (!tgc)
+      tgc = XCreateGC (id->x.disp, pmap, GCGraphicsExposures, &gcv);
+    im->pixmap = pmap;
+    if (im->shape) {
+      sxim = XShmCreateImage (id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
+      if (!sxim) {
+        fprintf (stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage mask\n");
+        fprintf (stderr, "             Falling back on XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (id->x.last_shminfo.shmaddr);
+        shmctl (id->x.last_shminfo.shmid, IPC_RMID, 0);
+        shared_pixmap = 0;
+        shared_image = 0;
+        break;
+      }
+      id->x.last_sshminfo.shmid = shmget (IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
+      if (id->x.last_sshminfo.shmid == -1) {
+        fprintf (stderr, "Imlib ERROR: SHM can't get SHM Identifier for Shared XImage mask\n");
+        fprintf (stderr, "             Falling back on XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (xim->data);
+        /* missing shmctl(RMID) */
+        XDestroyImage (sxim);
+        shared_pixmap = 0;
+        shared_image = 0;
+        break;
+      }
+      id->x.last_sshminfo.shmaddr = sxim->data = shmat (id->x.last_sshminfo.shmid, 0, 0);
+      if (sxim->data == (char *)-1) {
+        fprintf (stderr, "Imlib ERROR: SHM can't attach SHM Segment for Shared XImage mask\n");
+        fprintf (stderr, "             Falling back on XImages\n");
+        XShmDetach (id->x.disp, &id->x.last_shminfo);
+        XDestroyImage (xim);
+        shmdt (xim->data);
+        /* missing shmctl(RMID) */
+        XDestroyImage (sxim);
+        shmctl (id->x.last_shminfo.shmid, IPC_RMID, 0);
+        shared_pixmap = 0;
+        shared_image = 0;
+        break;
+      }
+      id->x.last_sshminfo.readOnly = False;
+      XShmAttach (id->x.disp, &id->x.last_sshminfo);
+      stmp = (unsigned char *)sxim->data;
+      id->x.last_sxim = sxim;
+      mask = XCreatePixmap (id->x.disp, id->x.base_window, w, h, 1);
+      if (!stgc)
+        stgc = XCreateGC (id->x.disp, mask, GCGraphicsExposures, &gcv);
+      im->shape_mask = mask;
+    }
+  } while (0);
   ok = 1;
-  if ((!shared_pixmap) && (!shared_image))
+#else
+  shared_pixmap = 0;
+  shared_image = 0;
 #endif /* HAVE_SHM */
-    {
-      tmp = (unsigned char *)malloc(w * h * bpp);
-      if (!tmp)
-	{
-	  fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for XImage data\n");
-	  free(xarray);
-	  free(yarray);
-	  free(error);
-	  return 0;
-	}
-      xim = XCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, 0, (char *)tmp, w, h, 8, 0);
-      if (!xim)
-	{
-	  fprintf(stderr, "IMLIB ERROR: Cannot allocate XImage buffer\n");
-	  free(xarray);
-	  free(yarray);
-	  free(error);
-	  free(tmp);
-	  return 0;
-	}
-      if (xim->bytes_per_line != bpp * w)
-	xim->data = realloc(xim->data, xim->bytes_per_line * xim->height);
-      pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
-      if (!pmap)
-	{
-	  fprintf(stderr, "IMLIB ERROR: Cannot create pixmap\n");
-	  free(xarray);
-	  free(yarray);
-	  free(error);
-	  XDestroyImage(xim);
-	  return 0;
-	}
-      im->pixmap = pmap;
-      if (!tgc)
-	tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
-      if (im->shape)
-	{
-	  stmp = (unsigned char *)calloc(((w >> 3) + 8), h);
-	  if (!stmp)
-	    {
-	      fprintf(stderr, "IMLIB ERROR: Cannot allocate RAM for shape XImage data\n");
-	      free(xarray);
-	      free(yarray);
-	      free(error);
-	      XDestroyImage(xim);
-	      return 0;
-	    }
-	  sxim = XCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, 0, (char *)stmp, w, h, 8, 0);
-	  if (!sxim)
-	    {
-	      fprintf(stderr, "IMLIB ERROR: Cannot allocate XImage shape buffer\n");
-	      free(xarray);
-	      free(yarray);
-	      free(error);
-	      free(stmp);
-	      XDestroyImage(xim);
-	      return 0;
-	    }
-	  mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
-	  if (!mask)
-	    {
-	      fprintf(stderr, "IMLIB ERROR: Cannot create shape pixmap\n");
-	      free(xarray);
-	      free(yarray);
-	      free(error);
-	      XDestroyImage(sxim);
-	      XDestroyImage(xim);
-	      return 0;
-	    }
-	  im->shape_mask = mask;
-	  if (!stgc)
-	    stgc = XCreateGC(id->x.disp, mask, GCGraphicsExposures, &gcv);
-	}
+
+  do {
+    if (shared_pixmap || shared_image)
+      break;
+    /* client side: make without data for now, lets see xim->bits_per_pixel first. */
+    xim = XCreateImage (id->x.disp, id->x.visual, id->x.depth, ZPixmap, 0, NULL, w, h, 8, 0);
+    if (xim) {
+      xim->data = malloc (xim->bytes_per_line * xim->height);
+      if (xim->data) {
+        /* server side */
+        pmap = XCreatePixmap (id->x.disp, id->x.base_window, w, h, id->x.depth);
+        if (pmap) {
+          im->pixmap = pmap;
+          if (!im->shape)
+            break;
+          /* same game again for transparency mask */
+          sxim = XCreateImage (id->x.disp, id->x.visual, 1, ZPixmap, 0, NULL, w, h, 8, 0);
+          if (sxim) {
+            sxim->data = malloc (sxim->bytes_per_line * sxim->height);
+            if (sxim->data) {
+              mask = XCreatePixmap (id->x.disp, id->x.base_window, w, h, 1);
+              if (mask) {
+                im->shape_mask = mask;
+                break;
+              } else {
+                fprintf (stderr, "IMLIB ERROR: Cannot create shape pixmap\n");
+              }
+            } else {
+              fprintf (stderr, "IMLIB ERROR: Cannot allocate RAM for shape XImage data\n");
+            }
+            XDestroyImage (sxim);
+          } else {
+            fprintf (stderr, "IMLIB ERROR: Cannot allocate XImage shape buffer\n");
+          }
+        } else {
+          fprintf (stderr, "IMLIB ERROR: Cannot create pixmap\n");
+        }
+      } else {
+        fprintf (stderr, "IMLIB ERROR: Cannot allocate RAM for XImage data\n");
+      }
+      XDestroyImage (xim);
+    } else {
+      fprintf (stderr, "IMLIB ERROR: Cannot allocate XImage buffer\n");
     }
-/* copy XImage to the pixmap, if not a shared pixmap */
+    free (xarray);
+    free (yarray);
+    free (error);
+    return 0;
+  } while (0);
+
+  if (!tgc)
+    tgc = XCreateGC (id->x.disp, pmap, GCGraphicsExposures, &gcv);
+  if (!stgc && im->shape)
+    stgc = XCreateGC (id->x.disp, mask, GCGraphicsExposures, &gcv);
+
+  bpp = id->x.depth <= 8 ? 8
+    : id->x.render_depth == 24 ? xim->bits_per_pixel
+    : id->x.render_depth;
+
+  /* copy XImage to the pixmap, if not a shared pixmap */
   if (im->shape)
     {
+      _imlib_fill_mask (yarray, xarray, sxim, w, h);
       if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
 	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
 	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-	{
-	  if (id->x.depth <= 8)
-	    render_shaped(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, 8);
-	  else
-	    render_shaped(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
-	}
+        render (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
       else
-	{
-	  if (id->x.depth <= 8)
-	    render_shaped_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, 8);
-	  else
-	    render_shaped_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
-	}
+        render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
       if (shared_image)
 	{
@@ -6717,19 +3619,9 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
 	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
 	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-	{
-	  if (id->x.depth <= 8)
-	    render(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, 8);
-	  else
-	    render(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
-	}
+        render (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
       else
-	{
-	  if (id->x.depth <= 8)
-	    render_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, 8);
-	  else
-	    render_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
-	}
+        render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
       if (shared_image)
 	{
