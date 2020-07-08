@@ -96,6 +96,7 @@ xitk_button_list_t *xitk_button_list_new (
 
   xitk_labelbutton_widget_t lb;
   xitk_button_list_t *bl;
+  const xitk_skin_element_info_t *info;
   int x = 0, y = 0, lastx = 0, lasty = 0, dir, i, max, vis;
 
   for (i = 0; names[i]; i++) ;
@@ -111,7 +112,8 @@ xitk_button_list_t *xitk_button_list_new (
   _strlcpy (bl->skin_element_name, skin_element_name, sizeof (bl->skin_element_name));
   bl->flags = 1;
 
-  max = xitk_skin_get_max_buttons (skin_config, skin_element_name);
+  info = xitk_skin_get_info (skin_config, skin_element_name);
+  max = info ? info->max_buttons : 0;
   if (max <= 0)
     max = 10000;
   if (max == 1) {
@@ -135,7 +137,7 @@ xitk_button_list_t *xitk_button_list_new (
   lb.userdata          = callback_data;
   lb.state_callback    = NULL;
 
-  dir = xitk_skin_get_direction (skin_config, skin_element_name);
+  dir = info ? info->direction : DIRECTION_LEFT;
 
   for (i = 0; i < bl->num; i++) {
 
@@ -144,8 +146,8 @@ xitk_button_list_t *xitk_button_list_new (
     if (vis == 0) {
       lastx = x;
       lasty = y;
-      x = xitk_skin_get_coord_x (skin_config, skin_element_name);
-      y = xitk_skin_get_coord_y (skin_config, skin_element_name);
+      x = info ? info->x : 0;
+      y = info ? info->y : 0;
       vis = bl->visible - 1;
     } else {
       vis--;
@@ -228,13 +230,15 @@ xitk_button_list_t *xitk_button_list_new (
 }
 
 void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config) {
+  const xitk_skin_element_info_t *info;
   int x = 0, y = 0, lastx = 0, lasty = 0, dir, i, max, vis;
 
   if (!bl)
     return;
 
   bl->skin_config = skin_config;
-  max = xitk_skin_get_max_buttons (bl->skin_config, bl->skin_element_name);
+  info = xitk_skin_get_info (bl->skin_config, bl->skin_element_name);
+  max = info ? info->max_buttons : 0;
   if (max <= 0)
     max = 10000;
   if (bl->num > max) {
@@ -247,15 +251,15 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
   bl->dx = 99999999;
   vis = 0;
   
-  dir = xitk_skin_get_direction (bl->skin_config, bl->skin_element_name);
+  dir = info ? info->direction : DIRECTION_LEFT;
 
   for (i = 0; i < bl->num; i++) {
 
     if (vis == 0) {
       lastx = x;
       lasty = y;
-      x = xitk_skin_get_coord_x (bl->skin_config, bl->skin_element_name);
-      y = xitk_skin_get_coord_y (bl->skin_config, bl->skin_element_name);
+      x = info ? info->x : 0;
+      y = info ? info->y : 0;
       vis = bl->visible - 1;
     } else {
       vis--;
@@ -359,3 +363,4 @@ void xitk_button_list_able (xitk_button_list_t *bl, int enable) {
 void xitk_button_list_delete (xitk_button_list_t *bl) {
   free (bl);
 }
+

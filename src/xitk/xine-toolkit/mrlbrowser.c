@@ -644,8 +644,10 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     xitk_skin_lock(skonfig);
     xitk_hide_widgets(private_data->widget_list);
 
-    bg_image = xitk_skin_get_image (skonfig,
-      xitk_skin_get_skin_filename (skonfig, private_data->skin_element_name));
+    {
+      const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
+      bg_image = info ? info->pixmap_img.image : NULL;
+    }
     if (!bg_image) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
@@ -909,8 +911,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   private_data->key_cb            = mb->key_cb;
   private_data->key_cb_data       = mb->key_cb_data;
 
-  bg_image = xitk_skin_get_image (skonfig,
-    xitk_skin_get_skin_filename (skonfig, private_data->skin_element_name));
+  {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
+    bg_image = info ? info->pixmap_img.image : NULL;
+  }
   if (!bg_image) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     return NULL;

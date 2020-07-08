@@ -107,17 +107,17 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
     private_data = (browser_private_data_t *) w->private_data;
     
     if(private_data->skin_element_name) {
+      const xitk_skin_element_info_t *info;
       int x, y, i = 0;
 
       xitk_skin_lock(skonfig);
-     
-      x          = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      y          = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+      info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
+      x          = info ? info->x : 0;
+      y          = info ? info->y : 0;
+      w->visible = info ? (info->visibility ? 1 : -1) : 0;
+      w->enable  = info ? info->enability : 0;
 
-      private_data->max_length = xitk_skin_get_browser_entries(skonfig, 
-							       private_data->skin_element_name);
+      private_data->max_length = info ? info->browser_entries : 0;
       
       for(i = WBSTART; i < (EXTRA_BTNS + WBSTART); i++) {
 	xitk_disable_widget(private_data->item_tree[i]);
@@ -1061,6 +1061,8 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   xitk_labelbutton_widget_t      lb;
   xitk_slider_widget_t           sl;
 
+  const xitk_skin_element_info_t *info;
+
   ABORT_IF_NULL(wl);
 
   XITK_CHECK_CONSTITENCY(br);
@@ -1073,16 +1075,16 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
   private_data->skonfig = skonfig;
 
-  
-  br->browser.max_displayed_entries = xitk_skin_get_browser_entries(skonfig, 
-								    br->browser.skin_element_name);
+  info = xitk_skin_get_info (skonfig, br->browser.skin_element_name);
+
+  br->browser.max_displayed_entries = info ? info->browser_entries : 0;
   
   {
 
     int x, y, i;
     
-    x = xitk_skin_get_coord_x(skonfig, br->browser.skin_element_name);
-    y = xitk_skin_get_coord_y(skonfig, br->browser.skin_element_name);
+    x = info ? info->x : 0;
+    y = info ? info->y : 0;
     
     for(i = WBSTART; i < (EXTRA_BTNS + WBSTART); i++) {
       
@@ -1170,10 +1172,9 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   xitk_dlist_add_tail (&wl->list, &private_data->item_tree[WBRT]->node);
   private_data->item_tree[WBRT]->type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
 
-  return _xitk_browser_create(wl, skonfig, br, 
-			      0, 0, 0, 0, br->browser.skin_element_name, mywidget, private_data,
-			      (xitk_skin_get_visibility(skonfig, br->browser.skin_element_name)) ? 1 : -1,
-			      xitk_skin_get_enability(skonfig, br->browser.skin_element_name));
+  return _xitk_browser_create (wl, skonfig, br, 0, 0, 0, 0,
+    br->browser.skin_element_name, mywidget, private_data,
+    info ? (info->visibility ? 1 : -1) : 0, info ? info->enability : 0);
 }
 
 /*

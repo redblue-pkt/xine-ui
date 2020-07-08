@@ -375,12 +375,13 @@ static void notify_change_skin (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   _combo_private_t *wp = (_combo_private_t *)w;
   
   if (wp->skin_element_name) {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
     int x, y;
 
     xitk_skin_lock (skonfig);
       
-    wp->w.visible = xitk_skin_get_visibility (skonfig, wp->skin_element_name) ? 1 : -1;
-    wp->w.enable  = xitk_skin_get_enability (skonfig, wp->skin_element_name);
+    wp->w.visible = info ? (info->visibility ? 1 : -1) : 0;
+    wp->w.enable  = info ? info->enability : 0;
       
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     xitk_get_widget_pos (wp->label_widget, &x, &y);
@@ -688,9 +689,11 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
     
     (void) xitk_set_widget_pos(wp->button_widget, x, y);
   }
-  return _xitk_combo_create (wl, skonfig, c, c->skin_element_name, wp,
-    xitk_skin_get_visibility (skonfig, c->skin_element_name) ? 1 : -1,
-    xitk_skin_get_enability (skonfig, c->skin_element_name));
+  {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, c->skin_element_name);
+    return _xitk_combo_create (wl, skonfig, c, c->skin_element_name, wp,
+      info ? (info->visibility ? 1 : -1) : 0, info ? info->enability : 0);
+  }
 }
 
 /*

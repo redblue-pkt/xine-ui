@@ -2446,16 +2446,17 @@ static void _paint_image (_image_private_t *wp, widget_event_t *event) {
 static void _notify_change_skin (_image_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (wp->w.visible == 1))) {
     if (wp->skin_element_name) {
-      
+      const xitk_skin_element_info_t *info;
+
       xitk_skin_lock(skonfig);
-
-      wp->skin = xitk_skin_get_image (skonfig, xitk_skin_get_skin_filename (skonfig, wp->skin_element_name));
-      
-      wp->w.x       = xitk_skin_get_coord_x (skonfig, wp->skin_element_name);
-      wp->w.y       = xitk_skin_get_coord_y (skonfig, wp->skin_element_name);
-      wp->w.width   = wp->skin->width;
-      wp->w.height  = wp->skin->height;
-
+      info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+      if (info) {
+        wp->skin = info->pixmap_img.image;
+        wp->w.x       = info->x;
+        wp->w.y       = info->y;
+        wp->w.width   = wp->skin->width;
+        wp->w.height  = wp->skin->height;
+      }
       xitk_skin_unlock(skonfig);
       
       xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
@@ -2542,15 +2543,14 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
 xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
 				  xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+  const xitk_skin_element_info_t *info;
 
   XITK_CHECK_CONSTITENCY(im);
 
-  return _xitk_image_create(wl, skonfig, im, 
-			    (xitk_skin_get_coord_x(skonfig, im->skin_element_name)),
-			    (xitk_skin_get_coord_y(skonfig, im->skin_element_name)),
-			    im->skin_element_name,
-			    (xitk_skin_get_image(skonfig,
-						 xitk_skin_get_skin_filename(skonfig, im->skin_element_name))));
+  info = xitk_skin_get_info (skonfig, im->skin_element_name);
+  if (!info)
+    return NULL;
+  return _xitk_image_create (wl, skonfig, im, info->x, info->y, im->skin_element_name, info->pixmap_img.image);
 }
 
 /*
@@ -2563,3 +2563,5 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
 
   return _xitk_image_create(wl, NULL, im, x, y, NULL, image);
 }
+
+

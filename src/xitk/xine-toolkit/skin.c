@@ -1095,91 +1095,6 @@ int xitk_skin_check_version(xitk_skin_config_t *skonfig, int min_version) {
 /*
  *
  */
-int xitk_skin_get_direction(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.direction;
-
-  return DIRECTION_LEFT; /* Compatibility */
-}
-
-/*
- *
- */
-int xitk_skin_get_visibility(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.visibility;
-
-  return 1;
-}
-
-/*
- *
- */
-int xitk_skin_get_printability(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.label_printable;
-
-  return 1;
-}
-
-
-/*
- *
- */
-int xitk_skin_get_enability(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.enability;
-
-  return 1;
-}
-
-/*
- *
- */
-int xitk_skin_get_coord_x(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.x;
-
-  return 0;
-}
-
-/*
- *
- */
-int xitk_skin_get_coord_y(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.y;
-
-  return 0;
-}
-
-/*
- *
- */
-const char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.pixmap_name;
-
-  return NULL;
-}
-
-/*
- *
- */
 const char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   
@@ -1193,43 +1108,6 @@ const char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   
   return skonfig->logo;
-}
-
-/*
- *
- */
-int xitk_skin_get_browser_entries(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.browser_entries;
-  
-  return -1;
-}
-
-/*
- *
- */
-xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_part_image_t image;
-
-  ABORT_IF_NULL(skonfig);
-  _skin_load_img (skonfig, &image, str, NULL);
-  return image.image;
-}
-
-void xitk_skin_get_part_image (xitk_skin_config_t *skonfig, xitk_part_image_t *image, const char *str) {
-  ABORT_IF_NULL(skonfig);
-  return _skin_load_img (skonfig, image, str, NULL);
-}
-
-int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {
-  xitk_skin_element_t *s;
-  
-  if((s = skin_lookup_section(skonfig, str)) != NULL)
-    return s->info.max_buttons;
-  
-  return 0;
 }
 
 const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name) {
@@ -1260,4 +1138,3 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
-
