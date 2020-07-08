@@ -80,8 +80,6 @@ typedef struct {
   int               sel;
 } btnlist_t;
 
-const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name);
-
 #include "_config.h"
 #include "browser.h"
 #include "button.h"
@@ -262,16 +260,8 @@ void xitk_set_tips_timeout(unsigned long timeout);
 
 int xitk_is_running(void);
 
-int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
-int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
-int xitk_skin_get_printability(xitk_skin_config_t *, const char *);
-int xitk_skin_get_enability(xitk_skin_config_t *, const char *);
-int xitk_skin_get_coord_x(xitk_skin_config_t *, const char *);
-int xitk_skin_get_coord_y(xitk_skin_config_t *, const char *);
-const char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 const char *xitk_skin_get_logo(xitk_skin_config_t *);
 const char *xitk_skin_get_animation(xitk_skin_config_t *);
-int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
 void xitk_skin_lock(xitk_skin_config_t *);
 void xitk_skin_unlock(xitk_skin_config_t *);
 
