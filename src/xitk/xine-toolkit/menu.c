@@ -74,7 +74,7 @@ struct _menu_node_s {
   
 struct _menu_private_s {
   xitk_widget_t        w;
-  _menu_node_t         root, *curbranch;
+  _menu_node_t         root;
   int                  x, y, num_open;
   _menu_window_t       open_windows[_MENU_MAX_OPEN];
 };
@@ -261,7 +261,6 @@ static void _menu_exit (_menu_private_t *wp) {
    * dont destroy again through xitk_set_current_menu (NULL). */
   xitk_unset_current_menu ();
   _menu_close_subs_in (wp, NULL);
-  wp->curbranch = NULL;
   _menu_tree_free (&wp->root);
 }
 
@@ -292,7 +291,6 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
     } else {
       if (_menu_show_subs (wp, me)) {
         _menu_close_subs_ex (wp, me);
-        wp->curbranch = me->parent;
       }
     }
   } else if (!(me->type & (_MENU_NODE_TITLE | _MENU_NODE_SEP))) {
@@ -330,7 +328,6 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     if (node->parent != NULL)
       return;
   }
-  wp->curbranch = node;
 
   XITK_WIDGET_INIT(&lb);
   
@@ -635,7 +632,7 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
     return 0;
-  if (wp->curbranch && wp->curbranch->parent)
+  if (wp->num_open > 1)
     return 1;
   return 0;
 }
@@ -649,7 +646,6 @@ void xitk_menu_destroy_sub_branchs (xitk_widget_t *w) {
   if (wp->num_open < 2)
     return;
   _menu_close_subs_ex (wp, &wp->root);
-  wp->curbranch = &wp->root;
 }
 
 void xitk_menu_destroy_branch (xitk_widget_t *w) {
@@ -665,7 +661,6 @@ void xitk_menu_destroy_branch (xitk_widget_t *w) {
     return;
   if (_menu_show_subs (me->wp, me->parent)) {
     _menu_close_subs_in (me->wp, me->parent);
-    me->wp->curbranch = me->parent;
   }
 }
 
@@ -681,10 +676,7 @@ void menu_auto_pop (xitk_widget_t *w) {
   if (me->type & _MENU_NODE_BRANCH) {
     xitk_labelbutton_callback_exec (w);
   } else {
-    if (_menu_show_subs (me->wp, me->parent)) {
-      _menu_close_subs_ex (me->wp, me->parent);
-      me->wp->curbranch = me->parent;
-    }
+    _menu_close_subs_ex (me->wp, me->parent);
   }
 }
 
@@ -729,8 +721,6 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   wp->root.menu_window = NULL;
   wp->root.wp          = wp;
   wp->root.button      = NULL;
-
-  wp->curbranch        = NULL;
 
   if (!m->menu_tree) {
     printf ("Empty menu entries. You will not .\n");
