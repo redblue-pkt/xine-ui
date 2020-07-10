@@ -24,42 +24,4 @@
 #include "_xitk.h"
 #include "dlist.h"
 
-typedef struct {
-  xitk_dnode_t            node;
-  xitk_window_t          *xwin;
-  xitk_register_key_t     key;
-  xitk_widget_t          *widget;
-  xitk_image_t           *bevel_plain;
-  xitk_image_t           *bevel_arrow;
-  xitk_image_t           *bevel_unchecked;
-  xitk_image_t           *bevel_checked;
-} menu_window_t;
-
-typedef struct menu_node_s menu_node_t;
-struct menu_node_s {
-  menu_node_t            *prev;
-  xitk_menu_entry_t      *menu_entry;
-  xitk_widget_t          *widget;
-  menu_window_t          *menu_window;
-  xitk_widget_t          *button;
-  menu_node_t            *branch;
-  menu_node_t            *next;
-};
-
-typedef struct {
-  menu_node_t            *first;
-  menu_node_t            *cur;
-  menu_node_t            *last;
-} menu_tree_t;
-
-typedef struct {
-  xitk_widget_t          *widget;
-  menu_tree_t            *mtree;
-  menu_node_t            *curbranch;
-  xitk_dlist_t            menu_windows;
-  xitk_widget_list_t     *parent_wlist;
-  int                     x, y;
-} menu_private_data_t;
-
 #endif
-

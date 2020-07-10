@@ -36,710 +36,354 @@
 #undef DEBUG_MENU
 #undef DUMP_MENU
 
-static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, int);
+#define _MENU_MAX_OPEN 5 /* xine needs just 3. */
 
-static menu_window_t *_menu_new_menu_window(xitk_t *xitk, xitk_window_t *xwin) {
-  menu_window_t *menu_window;
+typedef struct _menu_node_s _menu_node_t;
+typedef struct _menu_private_s _menu_private_t;
 
-  menu_window          = (menu_window_t *) xitk_xmalloc(sizeof(menu_window_t));
-  menu_window->xwin    = xwin;
+typedef struct {
+  xitk_window_t        *xwin;
+  xitk_register_key_t   key;
+  _menu_private_t      *wp;
+  _menu_node_t         *node;
+  xitk_image_t         *bevel_plain;
+  xitk_image_t         *bevel_arrow;
+  xitk_image_t         *bevel_unchecked;
+  xitk_image_t         *bevel_checked;
+} _menu_window_t;
 
-  menu_window->bevel_plain     = NULL;
-  menu_window->bevel_arrow     = NULL;
-  menu_window->bevel_unchecked = NULL;
-  menu_window->bevel_checked   = NULL;
+#define _MENU_NODE_SEP 1
+#define _MENU_NODE_BRANCH 2
+#define _MENU_NODE_CHECK 4
+#define _MENU_NODE_CHECKED 8
+#define _MENU_NODE_TITLE 16
+#define _MENU_NODE_SHORTCUT 32
+#define _MENU_NODE_HAS 8
 
-  xitk_dnode_init (&menu_window->node);
-
-  return menu_window;
-}
-
-static menu_node_t *_menu_new_node(xitk_widget_t *w) {
-  menu_node_t  *node;
-
-  node             = (menu_node_t *) xitk_xmalloc(sizeof(menu_node_t));
-  node->prev       = NULL;
-  node->menu_entry = NULL;
-  node->widget     = w;
-  node->branch     = NULL;
-  node->next       = NULL;
-
-  return node;
-}
-static xitk_menu_entry_t *_menu_build_menu_entry(xitk_menu_entry_t *me, char *name) {
-  xitk_menu_entry_t  *mentry;
-  char                buffer[name ? (strlen(name) + 3) : 1];
+struct _menu_node_s {
+  xitk_dnode_t         node;
+  _menu_node_t        *parent;
+  xitk_dlist_t         branches;
+  _menu_private_t     *wp;
+  _menu_window_t      *menu_window;
+  xitk_widget_t       *button;
+  int                  num;
+  unsigned int         type;
+  xitk_menu_entry_t    menu_entry;
+};
   
-  if(name) {
-    char *s = name;
-    char *d = buffer;
+struct _menu_private_s {
+  xitk_widget_t        w;
+  _menu_node_t         root, *curbranch;
+  int                  x, y, num_open;
+  _menu_window_t       open_windows[_MENU_MAX_OPEN];
+};
 
-    while(*s) {
-      
-      switch(*s) {
-      case '\\':
-	*d = *(++s);
-	break;
-	
-      default:
-	*d = *s;
-	break;
-      }
-
-      d++;
-      s++;
-    }
-    *d = '\0';
-  }
-
-  mentry            = (xitk_menu_entry_t *) xitk_xmalloc(sizeof(xitk_menu_entry_t));
-  mentry->menu      = strdup((name) ? buffer : me->menu);
-  mentry->shortcut  = (me->shortcut) ? strdup(me->shortcut) : NULL;
-  mentry->type      = (me->type) ? strdup(me->type) : NULL;
-  mentry->cb        = me->cb;
-  mentry->user_data = me->user_data;
-  mentry->user_id   = me->user_id;
-
-  return mentry;
-}
-static menu_node_t *_menu_add_to_node_branch(xitk_widget_t *w, menu_node_t **mnode, 
-					     xitk_menu_entry_t *me, char *name) {
-  menu_node_t        *node = _menu_new_node(w);
-
-  node->menu_entry  = _menu_build_menu_entry(me, name);
-  node->prev        = (*mnode);
-  (*mnode)->branch  = node;
-  
-  return node;
-}
-static menu_node_t *_menu_append_to_node(xitk_widget_t *w, 
-					 menu_node_t **mnode, xitk_menu_entry_t *me, char *name) {
-  menu_node_t *node = _menu_new_node(w);
-  
-  node->menu_entry = _menu_build_menu_entry(me, name);
-  node->prev       = (*mnode);
-  
-  if((*mnode))
-    (*mnode)->next = node;
-
-  return node;
-}
-
-static int _menu_is_separator(xitk_menu_entry_t *me) {
-  if(me && me->type && ((strncasecmp(me->type, "<separator>", 11) == 0)))
-    return 1;
-  return 0;
-}
-static int _menu_is_branch(xitk_menu_entry_t *me) {
-  if(me && me->type && ((strncasecmp(me->type, "<branch>", 8) == 0)))
-    return 1;
-  return 0;
-}
-static int _menu_is_check(xitk_menu_entry_t *me) {
-  if(me && me->type && ((strncasecmp(me->type, "<check", 6) == 0)))
-    return 1;
-  return 0;
-}
-static int _menu_is_checked(xitk_menu_entry_t *me) {
-  if(me && me->type && ((strncasecmp(me->type, "<checked>", 9) == 0)))
-    return 1;
-  return 0;
-}
-static int _menu_is_title(xitk_menu_entry_t *me) {
-  if(me && me->type && ((strncasecmp(me->type, "<title>", 7) == 0)))
-    return 1;
-  return 0;
-}
-static int _menu_branch_have_check(menu_node_t *branch) {
-  while(branch) {
-    if(_menu_is_check(branch->menu_entry) || _menu_is_checked(branch->menu_entry))
-      return 1;
-    
-    branch = branch->next;
-  }
-  return 0;
-}
-static int _menu_branch_have_branch(menu_node_t *branch) {
-  while(branch) {
-    if(_menu_is_branch(branch->menu_entry))
-      return 1;
-    
-    branch = branch->next;
-  }
-  return 0;
-}
-static int _menu_branch_is_in_curbranch(menu_node_t *branch) {
-  menu_private_data_t  *private_data = (menu_private_data_t *) branch->widget->private_data;
-  menu_node_t          *me = private_data->curbranch;
-
-  if(!me)
-    return 0;
-
-  while(branch != me) {
-    if(!me->prev)
-      return 0;
-
-    while(me->prev) {
-      me = me->prev;
-      if(me->prev && me->prev->branch == me)
-	break;
-    }
-  }
-  return 1;
-}
-
-#ifdef DUMP_MENU
-#ifdef	__GNUC__
-#define prints(fmt, args...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(fmt, ##args); } while(0)
-#else
-#define prints(...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(__VA_ARGS__); } while(0)
-#endif
-static int i = 0;
-static void _menu_dump_branch(menu_node_t *branch) {
-  
-  while(branch) {
-    prints("[%s]\n", branch->menu_entry->menu);
-
-    if(branch->branch) {
-      i += 3;
-      _menu_dump_branch(branch->branch);
-    }
-    
-    branch = branch->next;
-  }
-  i -= 3;
-}
-static void _menu_dump(menu_private_data_t *private_data) {
-  menu_tree_t *mtree = private_data->mtree;
-  menu_node_t *me;
-  
-  printf("\n");
-  me = mtree->first;
-  while(me) {
-    xitk_menu_entry_t *entry = me->menu_entry;
-    menu_node_t *branch = me->branch;
-    
-    if(_menu_is_separator(entry))
-      prints("===================\n");
-    else
-      prints("[%s]\n", entry->menu);
-    
-    if(branch) {
-      i += 3;
-      _menu_dump_branch(branch);
-      branch = branch->next;
-    }
-    
-    me = me->next;
+static void _menu_tree_free (_menu_node_t *root) {
+  _menu_node_t *this = (_menu_node_t *)root->branches.tail.prev;
+  while (this->node.prev) {
+    _menu_node_t *prev = (_menu_node_t *)this->node.prev;
+    xitk_dnode_remove (&this->node);
+    _menu_tree_free (this);
+    free (this);
+    this = prev;
   }
 }
-#endif
 
-static void notify_destroy(xitk_widget_t *w);
+static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me, const char *name, size_t lname) {
+  _menu_node_t *node;
+  size_t lshort = (me->shortcut ? strlen (me->shortcut) : 0) + 1;
+  size_t ltype = (me->type ? strlen (me->type) : 0) + 1;
+  char *s;
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  int retval = 0;
-
-  switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    break;
-  case WIDGET_EVENT_CLICK:
-    retval = 1;
-    break;
-  case WIDGET_EVENT_FOCUS:
-    break;
-  case WIDGET_EVENT_INSIDE:
-    retval = 1;
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_GET_SKIN:
-    break;
-  }
-
-  return retval;
-}
-
-static int _menu_count_entry_from_branch(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  int           ret = 0;
-  
-  while(me) {
-    if(me->menu_entry)
-      ret++;
-    me = me->next;
-  }
-
-  return ret;
-}
-static int _menu_count_separator_from_branch(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  int           ret = 0;
-  
-  while(me) {
-    if(_menu_is_separator(me->menu_entry))
-      ret++;
-    me = me->next;
-  }
-
-  return ret;
-}
-static int _menu_is_title_in_branch(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  int           ret = 0;
-  
-  while(me) {
-    if(_menu_is_title(me->menu_entry)) {
-      ret = 1;
-      break;
-    }
-    me = me->next;
-  }
-  
-  return ret;
-}
-static menu_node_t *_menu_get_wider_menuitem_node(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  menu_node_t  *max = NULL;
-  size_t        len = 0;
-  
-  while(me) {
-    if((!_menu_is_separator(me->menu_entry)) && 
-       (me->menu_entry->menu && 
-	((strlen(me->menu_entry->menu) > len)))) {
-      len = strlen(me->menu_entry->menu);
-      max = me;
-    }
-    
-    me = me->next;
-  }
-
-  return max;
-}
-static int _menu_branch_have_shortcut(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  
-  while(me) {
-    if((!_menu_is_separator(me->menu_entry)) && me->menu_entry->shortcut)
-      return 1;
-    me = me->next;
-  }
-  
-  return 0;
-}
-static menu_node_t *_menu_get_wider_shortcut_node(menu_node_t *branch) {
-  menu_node_t  *me = branch;
-  menu_node_t  *max = NULL;
-  size_t        len = 0;
-  
-  while(me) {
-    if((!_menu_is_separator(me->menu_entry)) && 
-       (me->menu_entry->shortcut && 
-	((strlen(me->menu_entry->shortcut) > len)))) {
-      len = strlen(me->menu_entry->shortcut);
-      max = me;
-    }
-    
-    me = me->next;
-  }
-
-  return max;
-}
-
-static menu_node_t *_menu_get_branch_from_node(menu_node_t *node) {
-  menu_node_t          *me = node;
-  menu_private_data_t  *private_data = (menu_private_data_t *) me->widget->private_data;
-
-  while(me->prev) {
-    if(me->prev->branch == me)
-      return me;
-    me = me->prev;
-  }
-
-  return private_data->mtree->first;
-}
-
-static menu_node_t *_menu_get_prev_branch_from_node(menu_node_t *node) {
-  menu_node_t          *me;
-
-  me = _menu_get_branch_from_node(node);
-  if(me->prev)
-    return _menu_get_branch_from_node(me->prev);
-  else
+  lname += 1;
+  s = (char *)xitk_xmalloc (sizeof (_menu_node_t) + lname + lshort + ltype);
+  if (!s)
     return NULL;
+  node = (_menu_node_t *)s;
+  s += sizeof (*node);
+
+  node->menu_entry.menu = s;
+  memcpy (s, name, lname);
+  s += lname;
+
+  if (me->type) {
+    node->menu_entry.type = s;
+    memcpy (s, me->type, ltype);
+    if (!strcasecmp (s, "<separator>")) {
+      node->type = _MENU_NODE_SEP;
+    } else if (!strcasecmp (s, "<branch>")) {
+      node->type = _MENU_NODE_BRANCH;
+    } else if (!strncasecmp (s, "<check", 6)) {
+      node->type = _MENU_NODE_CHECK;
+      if (!strcasecmp (s + 6, "ed>"))
+        node->type |= _MENU_NODE_CHECKED;
+    } else if (!strcasecmp (s, "<title>")) {
+      node->type = _MENU_NODE_TITLE;
+    }
+    s += ltype;
+  } else {
+    node->menu_entry.type = NULL;
+    node->type = 0;
+  }
+
+  if (me->shortcut) {
+    node->menu_entry.shortcut = s;
+    memcpy (s, me->shortcut, lshort);
+    s += lshort;
+    node->type |= _MENU_NODE_SHORTCUT;
+  } else {
+    node->menu_entry.shortcut = NULL;
+  }
+
+  node->menu_entry.cb        = me->cb;
+  node->menu_entry.user_data = me->user_data;
+  node->menu_entry.user_id   = me->user_id;
+
+  node->node.next = NULL;
+  node->node.prev = NULL;
+  node->parent = NULL;
+  xitk_dlist_init (&node->branches);
+  node->menu_window = NULL;
+  node->button = NULL;
+  node->wp = wp;
+  node->num = 0;
+  return node;
 }
 
-static void _menu_destroy_menu_window(menu_window_t **mw) {
+void xitk_menu_add_entry (xitk_widget_t *w, xitk_menu_entry_t *me) {
+  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_node_t *here;
+  char buf[400], *e = buf + sizeof (buf) - 1;
+  const char *p;
 
-  xitk_unregister_event_handler(&(*mw)->key);
-  if ((*mw)->bevel_plain)
-    xitk_image_free_image (&(*mw)->bevel_plain);
-  if ((*mw)->bevel_arrow)
-    xitk_image_free_image (&(*mw)->bevel_arrow);
-  if ((*mw)->bevel_unchecked)
-    xitk_image_free_image (&(*mw)->bevel_unchecked);
-  if ((*mw)->bevel_checked)
-    xitk_image_free_image (&(*mw)->bevel_checked);
-  xitk_window_destroy_window((*mw)->xwin);
-  (*mw)->xwin = NULL;
-
-  xitk_dnode_remove (&(*mw)->node);
-  XITK_FREE(*mw);
-  *mw = NULL;
-}
-
-static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
-  menu_window_t *mw;
-  
-  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  if (!mw->node.prev || (mw == menu_window))
-    /* Nothing to be done, save useless following efforts */
+  if (!w || !me)
     return;
-  do {
-    xitk_dnode_remove (&mw->node);
-    _menu_destroy_menu_window(&mw);
-    mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  } while (mw->node.prev && (mw != menu_window));
-  /* Set focus to parent menu */
-  if (xitk_window_is_window_visible(menu_window->xwin)) {
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
+    return;
 
-    xitk_window_try_to_set_input_focus(menu_window->xwin);
-  }
-}
+  here = &wp->root;
+  p = me->menu ? me->menu : "";
 
-static int _menu_show_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
-  menu_window_t *mw;
+  while (p[0]) {
+    _menu_node_t *scan;
+    char *q = buf;
+    int found;
 
-  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  if (!mw->node.prev)
-    mw = NULL;
-
-  return (mw != menu_window);
-}
-
-static void _menu_hide_menu(menu_private_data_t *private_data) {
-  menu_window_t *mw;
-
-  mw = (menu_window_t *)private_data->menu_windows.tail.prev;
-  while (mw->node.prev) {
-    xitk_window_hide_window(mw->xwin);
-    xitk_sync(private_data->widget->wl->xitk);
-    mw = (menu_window_t *)mw->node.prev;
-  }
-}
-
-static void _menu_destroy_ntree(menu_node_t **mn) {
-
-  if((*mn)->branch)
-    _menu_destroy_ntree(&((*mn)->branch));
-  
-  if((*mn)->next)
-    _menu_destroy_ntree(&((*mn)->next));
-
-  if((*mn)->menu_entry) {
-    free((*mn)->menu_entry->menu);
-    free((*mn)->menu_entry->shortcut);
-    free((*mn)->menu_entry->type);
-    free((*mn)->menu_entry);
-  }
-
-  free((*mn));
-  (*mn) = NULL;
-}
-
-xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w) {
-  xitk_widget_t   *widget = NULL;
-  
-  if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
-    
-    if(w->type & WIDGET_GROUP_MEMBER)
-      widget = w;
-    else {
-      menu_window_t *mw = (menu_window_t *) w->wl;
-      widget = mw->widget;
+    while ((q < e) && p[0] && (p[0] != '/')) {
+      if ((p[0] == '\\') && p[1])
+        *q++ = p[1], p += 2;
+      else
+        *q++ = p[0], p += 1;
     }
-  }
-  
-  return widget;
-}
+    *q = 0;
+    while (p[0] && (p[0] != '/'))
+      p += 1;
 
-static void notify_destroy(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
-    menu_window_t       *mw;
-    
-    private_data->curbranch = NULL;
-    xitk_unset_current_menu();
-
-    mw = (menu_window_t *)private_data->menu_windows.head.next;
-    while (mw->node.next) {
-      xitk_dnode_remove (&mw->node);
-      _menu_destroy_menu_window(&mw);
-      mw = (menu_window_t *)private_data->menu_windows.head.next;
+    found = 0;
+    if (p[0] == '/') {
+      /* merge branchhes */
+      for (scan = (_menu_node_t *)here->branches.tail.prev; scan->node.prev; scan = (_menu_node_t *)scan->node.prev) {
+        if (!strcmp (scan->menu_entry.menu, buf))
+          break;
+      }
+      if (scan->node.prev)
+        found = 1;
     }
-    
-    xitk_dlist_clear (&private_data->menu_windows);
-    _menu_destroy_ntree(&private_data->mtree->first);
-
-    XITK_FREE(private_data->mtree);
-
-    XITK_FREE(private_data);
+    if (found) {
+      here = scan;
+    } else { /* new */
+      _menu_node_t *add = _menu_node_new (wp, me, buf, q - buf);
+      if (!add)
+        break;
+      add->parent = here;
+      xitk_dlist_add_tail (&here->branches, &add->node);
+      here->num += 1;
+      here->type |= (add->type << _MENU_NODE_HAS) | _MENU_NODE_BRANCH;
+      here = add;
+    }
+    if (p[0] == '/')
+      p += 1;
   }
 }
+
+static void _menu_close_1 (_menu_private_t *wp) {
+  _menu_window_t *mw;
+
+  if (wp->num_open <= 0)
+    return;
+  wp->num_open -= 1;
+  mw = wp->open_windows + wp->num_open;
+  xitk_unregister_event_handler (&mw->key);
+  xitk_image_free_image (&mw->bevel_plain);
+  xitk_image_free_image (&mw->bevel_arrow);
+  xitk_image_free_image (&mw->bevel_unchecked);
+  xitk_image_free_image (&mw->bevel_checked);
+  xitk_window_destroy_window (mw->xwin);
+  mw->xwin = NULL;
+  mw->node->menu_window = NULL;
+  if ((wp->num_open > 0) && xitk_window_is_window_visible (mw[-1].xwin))
+    xitk_window_try_to_set_input_focus (mw[-1].xwin);
+}
+
+static void _menu_close_subs_in (_menu_private_t *wp, _menu_node_t *node) {
+  if (!node)
+    node = &wp->root;
+  while (wp->num_open > 0) {
+    _menu_close_1 (wp);
+    if (wp->open_windows[wp->num_open].node == node)
+      break;
+  }
+}
+
+static void _menu_close_subs_ex (_menu_private_t *wp, _menu_node_t *node) {
+  if (!node)
+    node = &wp->root;
+  while (wp->num_open > 0) {
+    if (wp->open_windows[wp->num_open - 1].node == node)
+      break;
+    _menu_close_1 (wp);
+  }
+}
+
+static int _menu_show_subs (_menu_private_t *wp, _menu_node_t *node) {
+  int i;
+
+  for (i = 1; i < wp->num_open; i++) {
+    if (wp->open_windows[i].node == node)
+      return 1;
+  }
+  return 0;
+}
+
+static void _menu_exit (_menu_private_t *wp) {
+  /* 핵: this runs inside xitk_destroy_widget ().
+   * dont destroy again through xitk_set_current_menu (NULL). */
+  xitk_unset_current_menu ();
+  _menu_close_subs_in (wp, NULL);
+  wp->curbranch = NULL;
+  _menu_tree_free (&wp->root);
+}
+
+static void _menu_open (_menu_node_t *branch, int x, int y);
 
 static void _menu_click_cb(xitk_widget_t *w, void *data) {
-  menu_node_t          *me = (menu_node_t *) data;
-  xitk_widget_t        *widget = me->widget;
-  menu_private_data_t  *private_data = (menu_private_data_t *) widget->private_data;
-  
-  if(_menu_is_branch(me->menu_entry)) {
-    
-    if(me->branch) {
+  _menu_node_t *me = (_menu_node_t *)data;
+  _menu_private_t *wp = me->wp;
 
-      if(!_menu_branch_is_in_curbranch(me->branch)) {
-	int   wx = 0, wy = 0, x = 0, y = 0;
-	
-        xitk_window_get_window_position(me->menu_window->xwin, &wx, &wy, NULL, NULL);
-	xitk_get_widget_pos(me->button, &x, &y);
-	
-	x += (xitk_get_widget_width(me->button)) + wx;
-	y += wy;
-	
-	_menu_destroy_subs(private_data, me->menu_window);
-	  
-	_menu_create_menu_from_branch(me->branch, me->widget, x, y);
+  (void)w;
+  if (me->type & _MENU_NODE_BRANCH) {
+    if (me->num > 0) {
+      if (!me->menu_window) {
+        int wx = 0, wy = 0, x = 0, y = 0;
+
+        xitk_window_get_window_position (me->parent->menu_window->xwin, &wx, &wy, NULL, NULL);
+        xitk_get_widget_pos (me->button, &x, &y);
+
+        x += xitk_get_widget_width (me->button) + wx;
+        y += wy;
+
+        _menu_close_subs_ex (wp, me->parent);
+        _menu_open (me, x, y);
+      } else {
+        xitk_window_raise_window (me->menu_window->xwin);
+        xitk_window_set_input_focus (me->menu_window->xwin);
       }
-      else {
-        xitk_window_raise_window (me->branch->menu_window->xwin);
-        xitk_window_set_input_focus (me->branch->menu_window->xwin);
-      }
-    }
-    else {
-      if(_menu_show_subs(private_data, me->menu_window)) {
-	_menu_destroy_subs(private_data, me->menu_window);
-	private_data->curbranch = _menu_get_branch_from_node(me);
+    } else {
+      if (_menu_show_subs (wp, me)) {
+        _menu_close_subs_ex (wp, me);
+        wp->curbranch = me->parent;
       }
     }
-  }
-  else if(!_menu_is_title(me->menu_entry) && !_menu_is_separator(me->menu_entry)) {
-    _menu_hide_menu(private_data);
-
-    if(me->menu_entry->cb)
-      me->menu_entry->cb(widget, me->menu_entry, me->menu_entry->user_data);
-    
-    xitk_destroy_widget(widget);
-  }
-#ifdef DEBUG_MENU
-  if(_menu_is_separator(me->menu_entry))
-    printf("SEPARATOR\n");
-#endif
-}
-
-static void __menu_find_branch_by_name(menu_node_t *mnode, menu_node_t **fnode, char *name) {
-  menu_node_t *m = mnode;
-  
-  if((*fnode))
-    return;
-  
-  if(m->branch) {
-    if(!strcmp(m->menu_entry->menu, name)) {
-      (*fnode) = m;
-      return;
-    }
-    __menu_find_branch_by_name(m->branch, fnode, name);
-  }
-  
-  if((*fnode))
-    return;
-  
-  if(m->next) {
-    if(!strcmp(m->menu_entry->menu, name)) {
-      (*fnode) = m;
-      return;
-    }
-    __menu_find_branch_by_name(m->next, fnode, name);
-  }
-  else {
-    if(!strcmp(m->menu_entry->menu, name)) {
-      (*fnode) = m;
-    }
-  }
-  
-}
-
-static menu_node_t *_menu_find_branch_by_name(menu_node_t *mnode, char *name) {
-  menu_node_t *m = NULL;
-  
-  if (mnode) __menu_find_branch_by_name(mnode, &m, name);
-
-  return m;
-}
-void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
-  
-  if(w && me && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-		 (w->type & WIDGET_GROUP_MEMBER))) {
-#ifdef DEBUG_MENU
-    printf("======== ENTER =========\n%s\n", me->menu);
-#endif
-    
-    if(me->menu) {
-      menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
-      char                *o, *c, *new_entry;
-      char                 buffer[strlen(me->menu) + 1];
-      menu_node_t         *branch = NULL;
-      int                  in_trunk = 1;
-
-      strlcpy(buffer, me->menu, sizeof(buffer));
-      
-      o = c = new_entry = buffer;
-
-      if(!(branch = private_data->mtree->first)) {
-#ifdef DEBUG_MENU
-	printf("FIRST ENTRY OF MENU\n");
-#endif
-	private_data->mtree->last = private_data->mtree->cur = private_data->mtree->first = 
-	  _menu_append_to_node(w, &(private_data->mtree->first), me, new_entry);
-	return;
-      }
-
-      while( (c = strchr(c, '/')) && (c && (*(c - 1) != '\\'))/*  && branch */) {
-	*c = '\0';
-	
-	in_trunk = 0;
-	
-#ifdef DEBUG_MENU
-	printf("LOOKING FOR '%s': ", o);
-#endif	
-	
-	/* Try to find branch */
-	branch = _menu_find_branch_by_name(branch, o);
-
-#ifdef DEBUG_MENU
-	if(branch) {
-	  printf(" FOUND %s\n", branch->menu_entry->menu);
-	}
-	else
-	  printf("NOT FOUND\n");
-#endif
-
-	c++;
-	o = new_entry = c;
-      }
-
-      if(branch) {
-#ifdef DEBUG_MENU
-	printf("ADD NEW ENTRY '%s' ", new_entry);
-#endif	
-	if(_menu_is_branch(branch->menu_entry)) {
-#ifdef DEBUG_MENU
-	  printf("[IS BRANCH], ");
-#endif
-	  if(branch->branch == NULL) {
-#ifdef DEBUG_MENU
-	    printf(" NEW BRANCH [%s]\n", branch->menu_entry->menu);
-#endif
-	    _menu_add_to_node_branch(w, &branch, me, new_entry);
-	    goto __done;
-	  }
-	  else {
-	    branch = branch->branch;
-#ifdef DEBUG_MENU
-	    printf(" IN BRANCH [%s] ", branch->menu_entry->menu);
-#endif
-	  }
-	}
-	
-	while(branch->next)
-	  branch = branch->next;
-	
-#ifdef DEBUG_MENU
-	printf("AFTER '%s'\n", branch->menu_entry->menu);
-#endif
-	branch = _menu_append_to_node(w, &branch, me, new_entry);
-	if(in_trunk)
-	  private_data->mtree->last = branch;
-      }
-    __done: ;
-#ifdef DEBUG_MENU
-      printf("******* BYE ************\n");
-#endif
-#ifdef DUMP_MENU
-      _menu_dump(private_data);
-#endif
-    }
+  } else if (!(me->type & (_MENU_NODE_TITLE | _MENU_NODE_SEP))) {
+    _menu_close_subs_in (wp, NULL);
+    /* 핵: detach from parent window. it may go away in user callback,
+     * eg when switching fullscreen mode. */
+    xitk_dnode_remove (&wp->w.node);
+    wp->w.wl = NULL;
+    if (me->menu_entry.cb)
+      me->menu_entry.cb (&wp->w, &me->menu_entry, me->menu_entry.user_data);
+    xitk_destroy_widget (&wp->w);
   }
 }
 
-static void _menu_scissor(xitk_widget_t *w,
-			  menu_private_data_t *private_data, xitk_menu_entry_t *me) {
-  menu_tree_t  *mtree;
-  
-  mtree        = (menu_tree_t *) xitk_xmalloc(sizeof(menu_tree_t));
-  mtree->first = NULL;
-  mtree->cur   = NULL;
-  mtree->last  = NULL;
-  
-  private_data->mtree = mtree;  
-  
-  while(me->menu) {
-    xitk_menu_add_entry(w, me);
-    me++;
-  }
-  
-}
-
-static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w, int x, int y) {
+static void _menu_open (_menu_node_t *node, int x, int y) {
+  _menu_private_t *wp = node->wp;
   xitk_skin_element_info_t    info;
-  menu_private_data_t        *private_data;
+  xitk_labelbutton_widget_t   lb;
   int                         bentries, bsep, btitle, rentries;
-  menu_node_t                *maxnode, *me;
+  _menu_node_t               *maxnode, *me;
   int                         maxlen, wwidth, wheight, swidth, sheight, shortcutlen = 0, shortcutpos = 0;
   xitk_font_t                *fs;
   static xitk_window_t       *xwin;
-  menu_window_t              *menu_window;
-  xitk_labelbutton_widget_t   lb;
+  _menu_window_t             *mw;
   xitk_widget_t              *btn;
   xitk_pixmap_t              *bg = NULL;
   int                         yy = 0, got_title = 0;
 
-  private_data = (menu_private_data_t *) w->private_data;
-  
-  private_data->curbranch = branch;
+  if (wp->num_open >= _MENU_MAX_OPEN)
+    return;
+  if (wp->num_open > 0) {
+    if (node->parent != wp->open_windows[wp->num_open - 1].node)
+      return;
+  } else {
+    if (node->parent != NULL)
+      return;
+  }
+  wp->curbranch = node;
 
   XITK_WIDGET_INIT(&lb);
   
-  bentries = _menu_count_entry_from_branch(branch);
-  bsep     = _menu_count_separator_from_branch(branch);
-  btitle   = _menu_is_title_in_branch(branch);
-  rentries = bentries - bsep;
-  maxnode  = _menu_get_wider_menuitem_node(branch);
-  
-  if(_menu_is_title(maxnode->menu_entry))
-    fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_14);
-  else
-    fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_12);
-
-  xitk_font_set_font(fs, private_data->widget->wl->gc);
-  maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
-
-  if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch)) {
-    xitk_font_t *short_font;
-    short_font = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_FONT_12);
-    shortcutlen = xitk_font_get_string_length(short_font, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut);
-    maxlen += shortcutlen + 15;
-    xitk_font_unload_font(short_font);
+  bentries = node->num;
+  bsep = 0;
+  maxlen = 0;
+  for (maxnode = me = (_menu_node_t *)node->branches.head.next; me->node.next; me = (_menu_node_t *)me->node.next) {
+    if (me->type & _MENU_NODE_SEP) {
+      bsep += 1;
+    } else {
+      /* FIXME: non fixed width font? */
+      int len = strlen (me->menu_entry.menu);
+      if (len > maxlen) {
+        maxlen = len;
+        maxnode = me;
+      }
+    }
   }
+  btitle   = !!(node->type & (_MENU_NODE_TITLE << _MENU_NODE_HAS));
+  rentries = bentries - bsep;
+  
+  if (maxnode->type & _MENU_NODE_TITLE)
+    fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
+  else
+    fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_12);
 
+  xitk_font_set_font (fs, wp->w.wl->gc);
+  maxlen = xitk_font_get_string_length (fs, maxnode->menu_entry.menu);
   xitk_font_unload_font(fs);
+
+  shortcutlen = 0;
+  if (xitk_get_menu_shortcuts_enability () && (node->type & (_MENU_NODE_SHORTCUT << _MENU_NODE_HAS))) {
+    xitk_font_t *short_font;
+    _menu_node_t *smaxnode;
+    for (smaxnode = me = (_menu_node_t *)node->branches.head.next; me->node.next; me = (_menu_node_t *)me->node.next) {
+      if (me->menu_entry.shortcut) {
+        /* FIXME: non fixed width font? */
+        int len = strlen (me->menu_entry.shortcut);
+        if (len > shortcutlen) {
+          shortcutlen = len;
+          smaxnode = me;
+        }
+      }
+    }
+    short_font = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_FONT_12);
+    shortcutlen = xitk_font_get_string_length (short_font, smaxnode->menu_entry.shortcut);
+    xitk_font_unload_font(short_font);
+    maxlen += shortcutlen + 15;
+  }
 
   wwidth = maxlen + 40;
 
-  if(_menu_branch_have_check(branch) || _menu_branch_have_branch(branch))
+  if (node->type & ((_MENU_NODE_CHECK | _MENU_NODE_BRANCH) << _MENU_NODE_HAS))
     wwidth += 20;
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
 
@@ -748,7 +392,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   swidth = xitk_get_display_width();
   sheight = xitk_get_display_height();
 
-  if(branch != private_data->mtree->first) {
+  if (node->parent) {
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
     y -= 1; /* Top item of submenu in line with parent item */
   }
@@ -760,9 +404,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   /* that it doesn't obscure the parent menu or get under the mouse pointer */
 
   if((x + (wwidth + 2)) > swidth) { /* Exceeds right edge of screen */
-    if(branch != private_data->mtree->first) {
+    if (node->parent) {
       /* Align right edge of submenu to left edge of parent item */
-      x -= xitk_get_widget_width(branch->prev->button) + (wwidth + 2) - 4;
+      x -= xitk_get_widget_width (node->parent->button) + (wwidth + 2) - 4;
     }
     else {
       /* Align right edge of top level menu to right edge of screen */
@@ -770,9 +414,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
   }
   if((y + (wheight + 2)) > sheight) { /* Exceeds bottom edge of screen */
-    if(branch != private_data->mtree->first) {
+    if (node->parent) {
       /* Align bottom edge of submenu for bottom item in line with parent item */
-      y -= wheight - xitk_get_widget_height(branch->prev->button);
+      y -= wheight - xitk_get_widget_height (node->parent->button);
     }
     else {
       /* Align bottom edge of top level menu to requested (i.e. pointer) pos */
@@ -780,7 +424,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
   }
 
-  xwin = xitk_window_create_simple_window_ext(private_data->widget->wl->xitk,
+  xwin = xitk_window_create_simple_window_ext(wp->w.wl->xitk,
                                               x, y, wwidth + 2, wheight + 2,
                                               NULL, NULL, NULL, 1, 1, NULL);
 
@@ -788,29 +432,34 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     bg = xitk_window_get_background_pixmap(xwin);
   }
 
-  menu_window         = _menu_new_menu_window(private_data->widget->wl->xitk, xwin);
-  menu_window->widget = w;
+  mw = wp->open_windows + wp->num_open;
+  wp->num_open += 1;
 
-  menu_window->bevel_plain = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);
-  if (menu_window->bevel_plain)
-    draw_flat_three_state (menu_window->bevel_plain);
+  mw->xwin = xwin;
+  mw->wp = wp;
+  mw->node = node;
+  node->menu_window = mw;
 
-  menu_window->bevel_arrow = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);
-  if (menu_window->bevel_arrow) {
-    draw_flat_three_state (menu_window->bevel_arrow);
-    menu_draw_arrow_branch (menu_window->bevel_arrow);
+  mw->bevel_plain = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+  if (mw->bevel_plain)
+    draw_flat_three_state (mw->bevel_plain);
+
+  mw->bevel_arrow = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+  if (mw->bevel_arrow) {
+    draw_flat_three_state (mw->bevel_arrow);
+    menu_draw_arrow_branch (mw->bevel_arrow);
   }
 
-  menu_window->bevel_unchecked = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);
-  if (menu_window->bevel_unchecked) {
-    draw_flat_three_state (menu_window->bevel_unchecked);
-    menu_draw_check (menu_window->bevel_unchecked, 0);
+  mw->bevel_unchecked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+  if (mw->bevel_unchecked) {
+    draw_flat_three_state (mw->bevel_unchecked);
+    menu_draw_check (mw->bevel_unchecked, 0);
   }
 
-  menu_window->bevel_checked = xitk_image_create_image (private_data->widget->wl->xitk, wwidth * 3, 20);
-  if (menu_window->bevel_checked) {
-    draw_flat_three_state (menu_window->bevel_checked);
-    menu_draw_check (menu_window->bevel_checked, 1);
+  mw->bevel_checked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+  if (mw->bevel_checked) {
+    draw_flat_three_state (mw->bevel_checked);
+    menu_draw_check (mw->bevel_checked, 1);
   }
 
   memset (&info, 0, sizeof (info));
@@ -818,7 +467,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   info.visibility        = 0;
   info.enability         = 0;
   info.pixmap_name       = NULL;
-  info.pixmap_img.image  = menu_window->bevel_plain;
+  info.pixmap_img.image  = mw->bevel_plain;
   info.label_alignment   = ALIGN_LEFT;
   info.label_printable   = 1;
   info.label_staticity   = 0;
@@ -827,34 +476,30 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   info.label_color_click = (char *)"White";
   info.label_fontname    = (char *)DEFAULT_BOLD_FONT_12;
 
-  xitk_dlist_add_tail (&private_data->menu_windows, &menu_window->node);
-
-  me = branch;
   yy = 1;
-  while(me) {
+  for (me = (_menu_node_t *)node->branches.head.next; me->node.next; me = (_menu_node_t *)me->node.next) {
 
-    me->menu_window      = menu_window;
-    me->button           = NULL;
+    me->wp = wp;
+    me->button = NULL;
     
-    if(_menu_is_title(me->menu_entry)) {
+    if (me->type & _MENU_NODE_TITLE) {
 
       if(bg && (!got_title)) {
 	int           lbear, rbear, width, asc, des;
 	unsigned int  cfg, cbg;
 
-        fs = xitk_font_load_font(private_data->widget->wl->xitk, DEFAULT_BOLD_FONT_14);
-	xitk_font_set_font(fs, private_data->widget->wl->gc);
+        fs = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
+	xitk_font_set_font(fs, wp->w.wl->gc);
 	
-	xitk_font_string_extent(fs, me->menu_entry->menu, &lbear, &rbear, &width, &asc, &des);
+	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
-        cbg = xitk_get_pixel_color_from_rgb(private_data->widget->wl->xitk, 140, 140, 140);
-        cfg = xitk_get_pixel_color_from_rgb(private_data->widget->wl->xitk, 255, 255, 255);
+        cbg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, 140, 140, 140);
+        cfg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, 255, 255, 255);
 
         pixmap_fill_rectangle(bg, 1, 1, wwidth, 20, cbg);
 
-        xitk_pixmap_draw_string(bg, fs, 5, 1+ ((20+asc+des)>>1)-des,
-                                me->menu_entry->menu, strlen(me->menu_entry->menu),
-                                cfg);
+        xitk_pixmap_draw_string (bg, fs, 5, 1 + ((20 + asc + des) >> 1) - des,
+          me->menu_entry.menu, strlen (me->menu_entry.menu), cfg);
 
 	xitk_font_unload_font(fs);
 
@@ -864,7 +509,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 	goto __sep;
       }
     }
-    else if(_menu_is_separator(me->menu_entry)) {
+    else if (me->type & _MENU_NODE_SEP) {
     __sep:
       if(bg)
         draw_rectangular_inner_box_light(bg, 3, yy, wwidth - 6, 1);
@@ -872,9 +517,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
     else {
       xitk_widget_list_t *wl = xitk_window_widget_list(xwin);
-;
+
       lb.button_type       = CLICK_BUTTON;
-      lb.label             = me->menu_entry->menu;
+      lb.label             = me->menu_entry.menu;
       lb.align             = ALIGN_LEFT;
       lb.callback          = _menu_click_cb;
       lb.state_callback    = NULL;
@@ -882,30 +527,28 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       lb.skin_element_name = NULL;
 
       info.y = yy;
-      if (_menu_is_branch (me->menu_entry)) {
-        info.pixmap_img.image = menu_window->bevel_arrow;
-      } else if (_menu_is_check (me->menu_entry)) {
-        info.pixmap_img.image = _menu_is_checked (me->menu_entry) ? menu_window->bevel_checked : menu_window->bevel_unchecked;
+      if (me->type & _MENU_NODE_BRANCH) {
+        info.pixmap_img.image = mw->bevel_arrow;
+      } else if (me->type & _MENU_NODE_CHECK) {
+        info.pixmap_img.image = (me->type & _MENU_NODE_CHECKED) ? mw->bevel_checked : mw->bevel_unchecked;
       } else {
-        info.pixmap_img.image = menu_window->bevel_plain;
+        info.pixmap_img.image = mw->bevel_plain;
       }
 
       btn = xitk_info_labelbutton_create (wl, &lb, &info);
       xitk_dlist_add_tail (&wl->list, &btn->node);
 
-      btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
+      btn->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU;
       me->button = btn;
       
-      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut)
-	xitk_labelbutton_change_shortcut_label(btn, me->menu_entry->shortcut, shortcutpos, DEFAULT_FONT_12);
+      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry.shortcut)
+	xitk_labelbutton_change_shortcut_label (btn, me->menu_entry.shortcut, shortcutpos, DEFAULT_FONT_12);
       
       xitk_labelbutton_set_label_offset(btn, 20);
       xitk_enable_and_show_widget(btn);
 
       yy += 20;
     }
-    
-    me = me->next;
   }
   
   if(bg) {
@@ -914,11 +557,11 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
-  if(branch == private_data->mtree->first)
-    xitk_window_set_transient_for(xwin, private_data->parent_wlist->win);
+  if (!node->parent)
+    xitk_window_set_transient_for (xwin, wp->w.wl->win);
   else
-    xitk_window_set_transient_for_win(xwin, branch->prev->menu_window->xwin);
-  menu_window->key = xitk_window_register_event_handler("xitk menu", menu_window->xwin, NULL, menu_window);
+    xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
+  mw->key = xitk_window_register_event_handler("xitk menu", mw->xwin, NULL, mw);
 
   xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);
@@ -940,134 +583,177 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   }
 }
 
-void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
-    menu_node_t         *me = private_data->mtree->first;
+#ifdef DUMP_MENU
+#ifdef	__GNUC__
+#define prints(fmt, args...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(fmt, ##args); } while(0)
+#else
+#define prints(...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(__VA_ARGS__); } while(0)
+#endif
+#endif
 
-    if (me) {
-      if (me->next)
-        me = me->next;
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  _menu_private_t *wp = (_menu_private_t *)w;
 
-      if (me)
-        _menu_destroy_subs(private_data, me->menu_window);
-    }
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
+    return 0;
+  (void)result;
 
-    private_data->curbranch = private_data->mtree->first;
+  switch (event->type) {
+    case WIDGET_EVENT_PAINT:
+    case WIDGET_EVENT_FOCUS:
+    case WIDGET_EVENT_CHANGE_SKIN:
+    case WIDGET_EVENT_GET_SKIN:
+      return 0;
+    case WIDGET_EVENT_CLICK:
+    case WIDGET_EVENT_INSIDE:
+      return 1;
+    case WIDGET_EVENT_DESTROY:
+      _menu_exit (wp);
+      return 1;
   }
+  return 0;
+}
+
+xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w) {
+  if (!w)
+    return NULL;
+  if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_MENU)
+    return w;
+  if ((w->type & (WIDGET_GROUP_MENU | WIDGET_TYPE_MASK)) == (WIDGET_GROUP_MENU | WIDGET_TYPE_LABELBUTTON)) {
+    _menu_node_t *me = (_menu_node_t *)labelbutton_get_user_data (w);
+    if (me)
+      return &me->wp->w;
+  }
+  return NULL;
 }
 
 int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
-  int ret = 0;
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
-    
-    if(private_data->curbranch && (private_data->curbranch != private_data->mtree->first))
-      ret = 1;
-  }
-
-  return ret;
+  _menu_private_t *wp = (_menu_private_t *)w;
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
+    return 0;
+  if (wp->curbranch && wp->curbranch->parent)
+    return 1;
+  return 0;
 }
 
-void xitk_menu_destroy_branch(xitk_widget_t *w) {
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) && 
-	   (w->type & WIDGET_TYPE_LABELBUTTON))) {
-    menu_node_t         *me = labelbutton_get_user_data(w);    
-
-    me = _menu_get_prev_branch_from_node(me);
-    if(me) {
-      menu_private_data_t *private_data = (menu_private_data_t *) me->widget->private_data;
-
-      _menu_destroy_subs(private_data, me->menu_window);
-      private_data->curbranch = me;
-    }
-    else {
-      xitk_destroy_widget(xitk_menu_get_menu(w));
-    }
-  }
+void xitk_menu_destroy_sub_branchs (xitk_widget_t *w) {
+  _menu_private_t *wp = (_menu_private_t *)w;
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
+    return;
+  if (wp->num_open < 2)
+    return;
+  _menu_close_subs_ex (wp, &wp->root);
+  wp->curbranch = &wp->root;
 }
 
-void menu_auto_pop(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) && 
-	   (w->type & WIDGET_TYPE_LABELBUTTON) && (!(w->type & WIDGET_GROUP_MEMBER)))) {
-    menu_node_t         *me = labelbutton_get_user_data(w);
-    menu_window_t       *mw = me->menu_window;
-    xitk_widget_t       *widget;
-    menu_private_data_t *private_data;
-    
-    widget = mw->widget;
-    private_data = (menu_private_data_t *) widget->private_data;
+void xitk_menu_destroy_branch (xitk_widget_t *w) {
+  _menu_node_t *me;
 
-    if(_menu_is_branch(me->menu_entry))
-      xitk_labelbutton_callback_exec(w);
-    else {
-      if(_menu_show_subs(private_data, me->menu_window)) {
-	_menu_destroy_subs(private_data, me->menu_window);
-	private_data->curbranch = _menu_get_branch_from_node(me);
-      }
-    }
+  if (!w)
+    return;
+  if ((w->type & (WIDGET_GROUP_MENU | WIDGET_TYPE_MASK)) != (WIDGET_GROUP_MENU | WIDGET_TYPE_LABELBUTTON))
+    return;
+
+  me = labelbutton_get_user_data (w);
+  if (!me->parent)
+    return;
+  if (_menu_show_subs (me->wp, me->parent)) {
+    _menu_close_subs_in (me->wp, me->parent);
+    me->wp->curbranch = me->parent;
   }
 }
 
-void xitk_menu_show_menu(xitk_widget_t *w) {
+void menu_auto_pop (xitk_widget_t *w) {
+  _menu_node_t *me;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
+  if (!w)
+    return;
+  if ((w->type & (WIDGET_GROUP_MENU | WIDGET_TYPE_MASK)) != (WIDGET_GROUP_MENU | WIDGET_TYPE_LABELBUTTON))
+    return;
 
-    w->visible = 1;
-    _menu_create_menu_from_branch(private_data->mtree->first, w, private_data->x, private_data->y);
-    xitk_set_current_menu(w);
+  me = labelbutton_get_user_data (w);
+  if (me->type & _MENU_NODE_BRANCH) {
+    xitk_labelbutton_callback_exec (w);
+  } else {
+    if (_menu_show_subs (me->wp, me->parent)) {
+      _menu_close_subs_ex (me->wp, me->parent);
+      me->wp->curbranch = me->parent;
+    }
   }
+}
+
+void xitk_menu_show_menu (xitk_widget_t *w) {
+  _menu_private_t *wp = (_menu_private_t *)w;
+
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
+    return;
+
+  wp->w.visible = 1;
+  _menu_open (&wp->root, wp->x, wp->y);
+  xitk_set_current_menu (&wp->w);
 }
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y) {
-  xitk_widget_t         *mywidget;
-  menu_private_data_t   *private_data;
+  _menu_private_t *wp;
   
   ABORT_IF_NULL(wl);
-
   XITK_CHECK_CONSTITENCY(m);
   
-  mywidget                   = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
-  private_data               = (menu_private_data_t *) xitk_xmalloc(sizeof(menu_private_data_t));
-  private_data->parent_wlist = wl;
-  private_data->widget       = mywidget;
-  xitk_dlist_init (&private_data->menu_windows);
-  private_data->x            = x;
-  private_data->y            = y;
-  private_data->curbranch    = NULL;
+  wp = (_menu_private_t *)xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
+  wp->w.private_data = wp;
+  wp->w.wl           = wl;
+  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_MENU | WIDGET_FOCUSABLE;
 
-  if(!m->menu_tree) {
-    printf("Empty menu entries. You will not .\n");
-    abort();
+  wp->x              = x;
+  wp->y              = y;
+  wp->num_open       = 0;
+
+  wp->root.node.next   = NULL;
+  wp->root.node.prev   = NULL;
+  wp->root.parent      = NULL;
+  wp->root.num         = 0;
+  wp->root.type        = 0;
+  xitk_dlist_init (&wp->root.branches);
+  wp->root.menu_window = NULL;
+  wp->root.wp          = wp;
+  wp->root.button      = NULL;
+
+  wp->curbranch        = NULL;
+
+  if (!m->menu_tree) {
+    printf ("Empty menu entries. You will not .\n");
+    abort ();
   }
 
-  mywidget->private_data                 = private_data;
-  mywidget->wl                           = wl;
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
-  
-  _menu_scissor(mywidget, private_data, m->menu_tree);
+  {
+    xitk_menu_entry_t *me;
+    for (me = m->menu_tree; me->menu; me++)
+      xitk_menu_add_entry (&wp->w, me);
+  }
 
-#ifdef DEBUG_DUMP
-  _menu_dump(private_data);
-#endif
+  wp->w.enable        = 1;
+  wp->w.running       = 1;
+  wp->w.visible       = 0;
+  wp->w.have_focus    = FOCUS_RECEIVED;
+  wp->w.x             = 0;
+  wp->w.y             = 0;
+  wp->w.width         = 0;
+  wp->w.height        = 0;
+  wp->w.event         = notify_event;
+  wp->w.tips_timeout  = 0;
+  wp->w.tips_string   = NULL;
 
-  mywidget->enable                       = 1;
-  mywidget->running                      = 1;
-  mywidget->visible                      = 0;
-  mywidget->have_focus                   = FOCUS_RECEIVED;
-  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->event                        = notify_event;
-  mywidget->tips_timeout                 = 0;
-  mywidget->tips_string                  = NULL;
-  return mywidget;
+  return &wp->w;
 }
