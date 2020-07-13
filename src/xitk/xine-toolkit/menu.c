@@ -52,12 +52,13 @@ typedef struct {
   xitk_image_t         *bevel_checked;
 } _menu_window_t;
 
-#define _MENU_NODE_SEP 1
-#define _MENU_NODE_BRANCH 2
-#define _MENU_NODE_CHECK 4
-#define _MENU_NODE_CHECKED 8
-#define _MENU_NODE_TITLE 16
-#define _MENU_NODE_SHORTCUT 32
+#define _MENU_NODE_PLAIN 1
+#define _MENU_NODE_SEP 2
+#define _MENU_NODE_BRANCH 4
+#define _MENU_NODE_CHECK 8
+#define _MENU_NODE_CHECKED 16
+#define _MENU_NODE_TITLE 32
+#define _MENU_NODE_SHORTCUT 64
 #define _MENU_NODE_HAS 8
 
 struct _menu_node_s {
@@ -107,6 +108,8 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
   memcpy (s, name, lname);
   s += lname;
 
+  node->type = _MENU_NODE_PLAIN;
+  node->menu_entry.type = NULL;
   if (me->type) {
     node->menu_entry.type = s;
     memcpy (s, me->type, ltype);
@@ -114,17 +117,14 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
       node->type = _MENU_NODE_SEP;
     } else if (!strcasecmp (s, "<branch>")) {
       node->type = _MENU_NODE_BRANCH;
-    } else if (!strncasecmp (s, "<check", 6)) {
+    } else if (!strcasecmp (s, "<check>")) {
       node->type = _MENU_NODE_CHECK;
-      if (!strcasecmp (s + 6, "ed>"))
-        node->type |= _MENU_NODE_CHECKED;
+    } else if (!strcasecmp (s, "<checked>")) {
+      node->type = _MENU_NODE_CHECKED;
     } else if (!strcasecmp (s, "<title>")) {
       node->type = _MENU_NODE_TITLE;
     }
     s += ltype;
-  } else {
-    node->menu_entry.type = NULL;
-    node->type = 0;
   }
 
   if (me->shortcut) {
@@ -380,7 +380,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
   wwidth = maxlen + 40;
 
-  if (node->type & ((_MENU_NODE_CHECK | _MENU_NODE_BRANCH) << _MENU_NODE_HAS))
+  if (node->type & ((_MENU_NODE_CHECK | _MENU_NODE_CHECKED | _MENU_NODE_BRANCH) << _MENU_NODE_HAS))
     wwidth += 20;
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
 
@@ -437,26 +437,39 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   mw->node = node;
   node->menu_window = mw;
 
-  mw->bevel_plain = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
-  if (mw->bevel_plain)
-    draw_flat_three_state (mw->bevel_plain);
+  mw->bevel_plain = NULL;
+  mw->bevel_arrow = NULL;
+  mw->bevel_unchecked = NULL;
+  mw->bevel_checked = NULL;
 
-  mw->bevel_arrow = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
-  if (mw->bevel_arrow) {
-    draw_flat_three_state (mw->bevel_arrow);
-    menu_draw_arrow_branch (mw->bevel_arrow);
+  if (node->type & (_MENU_NODE_PLAIN << _MENU_NODE_HAS)) {
+    mw->bevel_plain = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    if (mw->bevel_plain)
+      draw_flat_three_state (mw->bevel_plain);
   }
 
-  mw->bevel_unchecked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
-  if (mw->bevel_unchecked) {
-    draw_flat_three_state (mw->bevel_unchecked);
-    menu_draw_check (mw->bevel_unchecked, 0);
+  if (node->type & (_MENU_NODE_BRANCH << _MENU_NODE_HAS)) {
+    mw->bevel_arrow = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    if (mw->bevel_arrow) {
+      draw_flat_three_state (mw->bevel_arrow);
+      menu_draw_arrow_branch (mw->bevel_arrow);
+    }
   }
 
-  mw->bevel_checked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
-  if (mw->bevel_checked) {
-    draw_flat_three_state (mw->bevel_checked);
-    menu_draw_check (mw->bevel_checked, 1);
+  if (node->type & (_MENU_NODE_CHECK << _MENU_NODE_HAS)) {
+    mw->bevel_unchecked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    if (mw->bevel_unchecked) {
+      draw_flat_three_state (mw->bevel_unchecked);
+      menu_draw_check (mw->bevel_unchecked, 0);
+    }
+  }
+
+  if (node->type & (_MENU_NODE_CHECKED << _MENU_NODE_HAS)) {
+    mw->bevel_checked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    if (mw->bevel_checked) {
+      draw_flat_three_state (mw->bevel_checked);
+      menu_draw_check (mw->bevel_checked, 1);
+    }
   }
 
   memset (&info, 0, sizeof (info));
@@ -524,13 +537,10 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
       lb.skin_element_name = NULL;
 
       info.y = yy;
-      if (me->type & _MENU_NODE_BRANCH) {
-        info.pixmap_img.image = mw->bevel_arrow;
-      } else if (me->type & _MENU_NODE_CHECK) {
-        info.pixmap_img.image = (me->type & _MENU_NODE_CHECKED) ? mw->bevel_checked : mw->bevel_unchecked;
-      } else {
-        info.pixmap_img.image = mw->bevel_plain;
-      }
+      info.pixmap_img.image = (me->type & _MENU_NODE_BRANCH)  ? mw->bevel_arrow
+                            : (me->type & _MENU_NODE_CHECK)   ? mw->bevel_unchecked
+                            : (me->type & _MENU_NODE_CHECKED) ? mw->bevel_checked
+                            : mw->bevel_plain;
 
       btn = xitk_info_labelbutton_create (wl, &lb, &info);
       xitk_dlist_add_tail (&wl->list, &btn->node);
