@@ -13,6 +13,70 @@ static const union {
   .word = 1
 };
 
+static const uint8_t _tab_8_to_5[260] = {
+  /* ((index - 2) * 31 + 127) / (255 + 3) */
+   0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+   2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4,
+   4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5,
+   6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7,
+   8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
+   9,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,
+  11,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,
+  13,13,14,14,14,14,14,14,14,14,15,15,15,15,15,15,
+  15,15,16,16,16,16,16,16,16,16,17,17,17,17,17,17,
+  17,17,18,18,18,18,18,18,18,18,18,19,19,19,19,19,
+  19,19,19,20,20,20,20,20,20,20,20,21,21,21,21,21,
+  21,21,21,22,22,22,22,22,22,22,22,22,23,23,23,23,
+  23,23,23,23,24,24,24,24,24,24,24,24,25,25,25,25,
+  25,25,25,25,26,26,26,26,26,26,26,26,27,27,27,27,
+  27,27,27,27,27,28,28,28,28,28,28,28,28,29,29,29,
+  29,29,29,29,29,30,30,30,30,30,30,30,30,31,31,31,
+  31,31,31,31
+};
+
+static const uint8_t _tab_8_to_6[260] = {
+  /* ((index - 2) * 63 + 127) / 255 */
+   0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3,
+   3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7,
+   7, 8, 8, 8, 8, 9, 9, 9, 9,10,10,10,10,11,11,11,
+  11,12,12,12,12,13,13,13,13,14,14,14,14,15,15,15,
+  15,16,16,16,16,17,17,17,17,18,18,18,18,19,19,19,
+  19,20,20,20,20,21,21,21,21,21,22,22,22,22,23,23,
+  23,23,24,24,24,24,25,25,25,25,26,26,26,26,27,27,
+  27,27,28,28,28,28,29,29,29,29,30,30,30,30,31,31,
+  31,31,32,32,32,32,33,33,33,33,34,34,34,34,35,35,
+  35,35,36,36,36,36,37,37,37,37,38,38,38,38,39,39,
+  39,39,40,40,40,40,41,41,41,41,42,42,42,42,42,43,
+  43,43,43,44,44,44,44,45,45,45,45,46,46,46,46,47,
+  47,47,47,48,48,48,48,49,49,49,49,50,50,50,50,51,
+  51,51,51,52,52,52,52,53,53,53,53,54,54,54,54,55,
+  55,55,55,56,56,56,56,57,57,57,57,58,58,58,58,59,
+  59,59,59,60,60,60,60,61,61,61,61,62,62,62,62,63,
+  63,63,63,63
+};
+
+static int _best_color_match_8 (ImlibData * id, int *r, int *g, int *b) {
+  int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
+  for (i = 0; i < id->num_colors; i++) {
+    int d1, d2;
+    d1 = *r - id->palette[i].r;
+    d2 = d1 * d1;
+    d1 = *g - id->palette[i].g;
+    d2 += d1 * d1;
+    d1 = *b - id->palette[i].b;
+    d2 += d1 * d1;
+    if (d2 < db) {
+      db = d2;
+      col = i;
+    }
+  }
+  *r -= id->palette[col].r;
+  *g -= id->palette[col].g;
+  *b -= id->palette[col].b;
+  col = id->palette[col].pixel;
+  return col;
+}
+
 int
 Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b)
 {
@@ -204,68 +268,22 @@ index_best_color_match(ImlibData * id, int *r, int *g, int *b)
   return col;
 }
 
-#if 0
-static void
-render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
+static const unsigned char _dmat1[4][4] = {
+  {0, 4, 1, 5},
+  {6, 2, 7, 3},
+  {1, 5, 0, 4},
+  {7, 3, 6, 2}
+};
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 1, 5},
-    {6, 2, 7, 3},
-    {1, 5, 0, 4},
-    {7, 3, 6, 2}
-  };
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-		g += 8;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-#endif
+static const unsigned char _dmat2[4][4] = {
+  {0, 4, 6, 5},
+  {6, 2, 7, 3},
+  {2, 6, 1, 5},
+  {7, 4, 7, 3}
+};
 
 static void
-render_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
+render_15_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
   unsigned char      *ptr2;
@@ -309,115 +327,86 @@ render_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 }
 
 static void
-render_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			      int *er1, int *er2, int *xarray,
-			      unsigned char **yarray)
+render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
+  int y, val;
   unsigned short     *img;
   int                 jmp;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 1, 5},
-    {6, 2, 7, 3},
-    {1, 5, 0, 4},
-    {7, 3, 6, 2}
-  };
-  int                 dithy, dithx;
-
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r & 0x07;
-	  eg = g & 0x07;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-	    g += 8;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
+  for (y = 0; y < h - 1; y += 2) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      *img++ = val;
     }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+    }
+    img += jmp;
+    ptr2 = yarray[y + 1];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 1] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
+      *img++ = val;
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      *img++ = val;
+    }
+    img += jmp;
+  }
+  if (y < h) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      *img++ = val;
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+    }
+  }
 }
 
-#if 0
 static void
-render_shaped_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       XImage * sxim, int *er1, int *er2, int *xarray,
-				     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 1, 5},
-    {6, 2, 7, 3},
-    {1, 5, 0, 4},
-    {7, 3, 6, 2}
-  };
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	      img++;
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x03;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-		g += 4;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      *img++ = val;
-	    }
-	}
-      img += jmp;
-    }
-}
-#endif
-
-static void
-render_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		      int *er1, int *er2, int *xarray,
-		      unsigned char **yarray)
+render_16_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
   unsigned char      *ptr2;
@@ -462,109 +451,86 @@ render_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xi
 }
 
 static void
-render_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			      int *er1, int *er2, int *xarray,
-			      unsigned char **yarray)
+render_16_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
+  int y, val;
   unsigned short     *img;
   int                 jmp;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 1, 5},
-    {6, 2, 7, 3},
-    {1, 5, 0, 4},
-    {7, 3, 6, 2}
-  };
-  int                 dithy, dithx;
-
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r & 0x07;
-	  eg = g & 0x03;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-	    g += 4;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
+  for (y = 0; y < h - 1; y += 2) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      *img++ = val;
     }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+    }
+    img += jmp;
+    ptr2 = yarray[y + 1];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
+      *img++ = val;
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      *img++ = val;
+    }
+    img += jmp;
+  }
+  if (y < h) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      *img++ = val;
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      *img++ = val;
+    }
+  }
 }
 
-#if 0
 static void
-render_shaped_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-				XImage * sxim, int *er1, int *er2, int *xarray,
-				unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x07;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-		g += 8;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-#endif
-
-static void
-render_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 int *er1, int *er2, int *xarray,
-		 unsigned char **yarray)
+render_15_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
   unsigned char      *ptr2;
@@ -603,103 +569,80 @@ render_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			 int *er1, int *er2, int *xarray,
-			 unsigned char **yarray)
+render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
+  int y, val;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r & 0x07;
-	  eg = g & 0x07;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
-	    g += 8;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
+  for (y = 0; y < h - 1; y += 2) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      XPutPixel (xim, x + 1, y, val);
     }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+    }
+    ptr2 = yarray[y + 1];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      XPutPixel (xim, x, y + 1, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 1] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
+      XPutPixel (xim, x + 1, y + 1, val);
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      XPutPixel (xim, x, y + 1, val);
+    }
+  }
+  if (y < h) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      XPutPixel (xim, x + 1, y, val);
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+    }
+  }
 }
 
-#if 0
 static void
-render_shaped_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-				XImage * sxim, int *er1, int *er2, int *xarray,
-				unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)ptr2[0];
-	  g = (int)ptr2[1];
-	  b = (int)ptr2[2];
-	  if (!(ptr2[3] & 0x80))
-	    {
-	      XPutPixel(sxim, x, y, 0);
-	    }
-	  else
-	    {
-	      XPutPixel(sxim, x, y, 1);
-	      er = r & 0x07;
-	      eg = g & 0x03;
-	      eb = b & 0x07;
-	      dithx = x & 0x3;
-	      if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-		r += 8;
-	      if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-		g += 4;
-	      if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-		b += 8;
-	      val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-}
-#endif
-
-static void
-render_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		 int *er1, int *er2, int *xarray,
-		 unsigned char **yarray)
+render_16_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
   unsigned char      *ptr2;
@@ -738,51 +681,80 @@ render_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			 int *er1, int *er2, int *xarray,
-			 unsigned char **yarray)
+render_16_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
+  int y, val;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r & 0x07;
-	  eg = g & 0x03;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-	    g += 4;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
+  for (y = 0; y < h - 1; y += 2) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      XPutPixel (xim, x + 1, y, val);
     }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+    }
+    ptr2 = yarray[y + 1];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      XPutPixel (xim, x, y + 1, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
+      XPutPixel (xim, x + 1, y + 1, val);
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      XPutPixel (xim, x, y + 1, val);
+    }
+  }
+  if (y < h) {
+    int x;
+    uint8_t *ptr2 = yarray[y];
+    for (x = 0; x < w - 1; x += 2) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+      ptr = ptr2 + xarray[x + 1];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      XPutPixel (xim, x + 1, y, val);
+    }
+    if (x < w) {
+      uint8_t *ptr = ptr2 + xarray[x];
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      XPutPixel (xim, x, y, val);
+    }
+  }
 }
 
 static void
-render_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       int *er1, int *er2, int *xarray,
-	       unsigned char **yarray)
+render_15_fast (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -807,9 +779,7 @@ render_15_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       int *er1, int *er2, int *xarray,
-	       unsigned char **yarray)
+render_16_fast (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -835,9 +805,7 @@ render_16_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       int *er1, int *er2, int *xarray,
-	       unsigned char **yarray)
+render_24_fast (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, r, g, b;
   unsigned char      *ptr2;
@@ -1059,9 +1027,7 @@ render_24_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	       int *er1, int *er2, int *xarray,
-	       unsigned char **yarray)
+render_32_fast (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int            x, y, val, r, g, b;
   unsigned char *ptr2;
@@ -1164,9 +1130,7 @@ render_32_fast(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  int *er1, int *er2, int *xarray,
-	  unsigned char **yarray)
+render_15 (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -1186,9 +1150,7 @@ render_15(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  int *er1, int *er2, int *xarray,
-	  unsigned char **yarray)
+render_16 (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -1208,9 +1170,7 @@ render_16(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	  int *er1, int *er2, int *xarray,
-	  unsigned char **yarray)
+render_24 (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -1320,9 +1280,7 @@ render_24(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-       int *er1, int *er2, int *xarray,
-       unsigned char **yarray, int bpp)
+render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarray, unsigned char **yarray, int bpp)
 {
   int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
   unsigned char      *ptr2;
@@ -1344,7 +1302,7 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  r = (int)*ptr2++;
 		  g = (int)*ptr2++;
 		  b = (int)*ptr2;
-		  val = Imlib_best_color_match(id, &r, &g, &b);
+		  val = _best_color_match_8 (id, &r, &g, &b);
 		  *img++ = val;
 		}
 	      img += jmp;
@@ -1360,7 +1318,7 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  r = (int)*ptr2++;
 		  g = (int)*ptr2++;
 		  b = (int)*ptr2;
-		  val = Imlib_best_color_match(id, &r, &g, &b);
+		  val = _best_color_match_8 (id, &r, &g, &b);
 		  XPutPixel(xim, x, y, val);
 		}
 	    }
@@ -1431,7 +1389,7 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		    eb = 255;
 		  else if (eb < 0)
 		    eb = 0;
-		  val = Imlib_best_color_match(id, &er, &eg, &eb);
+		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  *img++ = val;
 		}
@@ -1469,7 +1427,7 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		    eb = 255;
 		  else if (eb < 0)
 		    eb = 0;
-		  val = Imlib_best_color_match(id, &er, &eg, &eb);
+		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  XPutPixel(xim, x, y, val);
 		}
@@ -1570,30 +1528,30 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_fast_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_ordered (w, h, xim, xarray, yarray);
 		  else
-		    render_15_fast_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_fast_dither (w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_15_fast (w, h, xim, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_fast_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_ordered (w, h, xim, xarray, yarray);
 		  else
-		    render_16_fast_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_fast_dither (w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_16_fast (w, h, xim, xarray, yarray);
 	      break;
 	    case 24:
 	    case 32:
 	      if (xim->bits_per_pixel == 24)
-		render_24_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_24_fast (id, w, h, xim, xarray, yarray);
 	      else
-		render_32_fast(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_32_fast (id, w, h, xim, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -1609,30 +1567,30 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_dither_ordered (w, h, xim, xarray, yarray);
 		  else
-		    render_15_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_dither (w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_15 (w, h, xim, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_dither_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_dither_ordered (w, h, xim, xarray, yarray);
 		  else
-		    render_16_dither(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_dither (w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_16 (w, h, xim, xarray, yarray);
 	      break;
 	    case 24:
-	      render_24(id, im, w, h, xim, er1, er2, xarray, yarray);
+	      render_24 (id, w, h, xim, xarray, yarray);
 	      break;
 	    case 32:
               /* we do know what we are doing? */
-	      render_32_fast (id, im, w, h, xim, er1, er2, xarray, yarray);
+	      render_32_fast (id, w, h, xim, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -1643,7 +1601,7 @@ render(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
+render_15_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 			  int *er1, int *er2, int *xarray,
 			  unsigned char **yarray)
 {
@@ -1692,9 +1650,7 @@ render_15_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 }
 
 static void
-render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       int *er1, int *er2, int *xarray,
-				  unsigned char **yarray)
+render_15_fast_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
   unsigned char      *ptr2;
@@ -1702,13 +1658,6 @@ render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
   unsigned short     *img;
   int                 jmp;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
   int                 dithy, dithx;
 
   jmp = (xim->bytes_per_line >> 1) - w;
@@ -1729,11 +1678,11 @@ render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 	  eg = g & 0x07;
 	  eb = b & 0x07;
 	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
 	    r += 8;
-	  if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eg) && (g < (256 - 8)))
 	    g += 8;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
 	    b += 8;
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  *img++ = val;
@@ -1743,7 +1692,7 @@ render_15_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 }
 
 static void
-render_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
+render_16_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 			  int *er1, int *er2, int *xarray,
 			  unsigned char **yarray)
 {
@@ -1793,9 +1742,7 @@ render_16_fast_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage 
 }
 
 static void
-render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			       int *er1, int *er2, int *xarray,
-				  unsigned char **yarray)
+render_16_fast_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
   unsigned char      *ptr2;
@@ -1803,13 +1750,6 @@ render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
   unsigned short     *img;
   int                 jmp;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
   int                 dithy, dithx;
 
   jmp = (xim->bytes_per_line >> 1) - w;
@@ -1830,11 +1770,11 @@ render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 	  eg = g & 0x03;
 	  eb = b & 0x07;
 	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
 	    r += 8;
-	  if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
+	  if ((_dmat2[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
 	    g += 4;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
 	    b += 8;
 	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
 	  *img++ = val;
@@ -1844,20 +1784,11 @@ render_16_fast_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h,
 }
 
 static void
-render_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     int *er1, int *er2, int *xarray,
-			     unsigned char **yarray)
+render_15_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
   unsigned char      *ptr2;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
   int                 dithy, dithx;
 
   for (y = 0; y < h; y++)
@@ -1876,11 +1807,11 @@ render_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 	  eg = g & 0x07;
 	  eb = b & 0x07;
 	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
 	    r += 8;
-	  if ((dither[dithy][dithx] < eg) && (g < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eg) && (g < (256 - 8)))
 	    g += 8;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
 	    b += 8;
 	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
 	  XPutPixel(xim, x, y, val);
@@ -1889,20 +1820,11 @@ render_15_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 }
 
 static void
-render_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-			     int *er1, int *er2, int *xarray,
-			     unsigned char **yarray)
+render_16_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b, er, eg, eb;
   unsigned char      *ptr2;
 
-  unsigned char       dither[4][4] =
-  {
-    {0, 4, 6, 5},
-    {6, 2, 7, 3},
-    {2, 6, 1, 5},
-    {7, 4, 7, 3}
-  };
   int                 dithy, dithx;
 
   for (y = 0; y < h; y++)
@@ -1921,11 +1843,11 @@ render_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 	  eg = g & 0x03;
 	  eb = b & 0x07;
 	  dithx = x & 0x3;
-	  if ((dither[dithy][dithx] < er) && (r < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
 	    r += 8;
-	  if ((dither[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
+	  if ((_dmat2[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
 	    g += 4;
-	  if ((dither[dithy][dithx] < eb) && (b < (256 - 8)))
+	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
 	    b += 8;
 	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
 	  XPutPixel(xim, x, y, val);
@@ -1934,7 +1856,7 @@ render_16_dither_mod_ordered(ImlibData * id, ImlibImage * im, int w, int h, XIma
 }
 
 static void
-render_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
+render_15_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 		     int *er1, int *er2, int *xarray,
 		     unsigned char **yarray)
 {
@@ -1978,7 +1900,7 @@ render_15_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 }
 
 static void
-render_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
+render_16_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 		     int *er1, int *er2, int *xarray,
 		     unsigned char **yarray)
 {
@@ -2022,9 +1944,7 @@ render_16_dither_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim
 }
 
 static void
-render_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   int *er1, int *er2, int *xarray,
-		   unsigned char **yarray)
+render_15_fast_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2052,9 +1972,7 @@ render_15_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   int *er1, int *er2, int *xarray,
-		   unsigned char **yarray)
+render_16_fast_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2083,9 +2001,7 @@ render_16_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   int *er1, int *er2, int *xarray,
-		   unsigned char **yarray)
+render_24_fast_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, r, g, b;
   unsigned char      *ptr2;
@@ -2344,9 +2260,7 @@ render_24_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-		   int *er1, int *er2, int *xarray,
-		   unsigned char **yarray)
+render_32_fast_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2472,9 +2386,7 @@ render_32_fast_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      int *er1, int *er2, int *xarray,
-	      unsigned char **yarray)
+render_15_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2497,9 +2409,7 @@ render_15_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 }
 
 static void
-render_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      int *er1, int *er2, int *xarray,
-	      unsigned char **yarray)
+render_16_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2523,9 +2433,7 @@ render_16_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 
 
 static void
-render_24_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	      int *er1, int *er2, int *xarray,
-	      unsigned char **yarray)
+render_24_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
 {
   int                 x, y, val, r, g, b;
   unsigned char      *ptr2;
@@ -2668,7 +2576,7 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  r = im->rmap[r];
 		  g = im->gmap[g];
 		  b = im->bmap[b];
-		  val = Imlib_best_color_match(id, &r, &g, &b);
+		  val = _best_color_match_8 (id, &r, &g, &b);
 		  *img++ = val;
 		}
 	      img += jmp;
@@ -2687,7 +2595,7 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  r = im->rmap[r];
 		  g = im->gmap[g];
 		  b = im->bmap[b];
-		  val = Imlib_best_color_match(id, &r, &g, &b);
+		  val = _best_color_match_8 (id, &r, &g, &b);
 		  XPutPixel(xim, x, y, val);
 		}
 	    }
@@ -2767,7 +2675,7 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		    eb = 255;
 		  else if (eb < 0)
 		    eb = 0;
-		  val = Imlib_best_color_match(id, &er, &eg, &eb);
+		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  *img++ = val;
 		}
@@ -2808,7 +2716,7 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		    eb = 255;
 		  else if (eb < 0)
 		    eb = 0;
-		  val = Imlib_best_color_match(id, &er, &eg, &eb);
+		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  XPutPixel(xim, x, y, val);
 		}
@@ -2915,30 +2823,30 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_fast_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_mod_ordered (im, w, h, xim, xarray, yarray);
 		  else
-		    render_15_fast_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_fast_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_15_fast_mod (im, w, h, xim, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_fast_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_mod_ordered (im, w, h, xim, xarray, yarray);
 		  else
-		    render_16_fast_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_fast_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_16_fast_mod (im, w, h, xim, xarray, yarray);
 	      break;
 	    case 24:
 	    case 32:
 	      if (xim->bits_per_pixel == 24)
-		render_24_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_24_fast_mod (id, im, w, h, xim, xarray, yarray);
 	      else
-		render_32_fast_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_32_fast_mod (id, im, w, h, xim, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -2954,29 +2862,29 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_15_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_dither_mod_ordered (im, w, h, xim, xarray, yarray);
 		  else
-		    render_15_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_15_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_15_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_15_mod (im, w, h, xim, xarray, yarray);
 	      break;
 	    case 16:
 	      if (id->render_type == RT_DITHER_TRUECOL)
 		{
 		  if (id->ordered_dither)
-		    render_16_dither_mod_ordered(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_dither_mod_ordered (im, w, h, xim, xarray, yarray);
 		  else
-		    render_16_dither_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		    render_16_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
 		}
 	      else
-		render_16_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+		render_16_mod (im, w, h, xim, xarray, yarray);
 	      break;
 	    case 24:
-	      render_24_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+	      render_24_mod (id, im, w, h, xim, xarray, yarray);
 	      break;
 	    case 32:
-	      render_24_mod(id, im, w, h, xim, er1, er2, xarray, yarray);
+	      render_24_mod (id, im, w, h, xim, xarray, yarray);
 	      break;
 	    default:
 	      break;
@@ -3548,7 +3456,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
 	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
 	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-        render (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
+        render (id, w, h, xim, er1, er2, xarray, yarray, bpp);
       else
         render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
@@ -3619,7 +3527,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
 	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
 	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-        render (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
+        render (id, w, h, xim, er1, er2, xarray, yarray, bpp);
       else
         render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
