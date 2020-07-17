@@ -13,25 +13,36 @@ static const union {
   .word = 1
 };
 
-static const uint8_t _tab_8_to_5[260] = {
-  /* ((index - 2) * 31 + 127) / (255 + 3) */
-   0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-   2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4,
-   4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5,
-   6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7,
-   8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
-   9,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,
-  11,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,
-  13,13,14,14,14,14,14,14,14,14,15,15,15,15,15,15,
-  15,15,16,16,16,16,16,16,16,16,17,17,17,17,17,17,
-  17,17,18,18,18,18,18,18,18,18,18,19,19,19,19,19,
-  19,19,19,20,20,20,20,20,20,20,20,21,21,21,21,21,
-  21,21,21,22,22,22,22,22,22,22,22,22,23,23,23,23,
-  23,23,23,23,24,24,24,24,24,24,24,24,25,25,25,25,
-  25,25,25,25,26,26,26,26,26,26,26,26,27,27,27,27,
-  27,27,27,27,27,28,28,28,28,28,28,28,28,29,29,29,
-  29,29,29,29,29,30,30,30,30,30,30,30,30,31,31,31,
-  31,31,31,31
+typedef union {
+  uint32_t w;
+  struct {
+    uint8_t r, g, b, a;
+  } b;
+} _rgba_t;
+
+static const _rgba_t _rgb_mask = { .b = { .r = 255, .g = 255, .b = 255, .a = 0 }};
+static const _rgba_t _rgb15_err_mask = { .b = { .r = 7, .g = 7, .b = 7, .a = 0 }};
+static const _rgba_t _rgb16_err_mask = { .b = { .r = 7, .g = 3, .b = 7, .a = 0 }};
+
+static const uint8_t _tab_8_to_5[268] = {
+  /* ((index - 4) * 31 + 127) / 255 */
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+   1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3,
+   3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5,
+   5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7,
+   7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9,
+   9, 9, 9,10,10,10,10,10,10,10,10,11,11,11,11,11,
+  11,11,11,12,12,12,12,12,12,12,12,13,13,13,13,13,
+  13,13,13,13,14,14,14,14,14,14,14,14,15,15,15,15,
+  15,15,15,15,16,16,16,16,16,16,16,16,17,17,17,17,
+  17,17,17,17,18,18,18,18,18,18,18,18,18,19,19,19,
+  19,19,19,19,19,20,20,20,20,20,20,20,20,21,21,21,
+  21,21,21,21,21,22,22,22,22,22,22,22,22,22,23,23,
+  23,23,23,23,23,23,24,24,24,24,24,24,24,24,25,25,
+  25,25,25,25,25,25,26,26,26,26,26,26,26,26,27,27,
+  27,27,27,27,27,27,27,28,28,28,28,28,28,28,28,29,
+  29,29,29,29,29,29,29,30,30,30,30,30,30,30,30,31,
+  31,31,31,31,31,31,31,31
 };
 
 static const uint8_t _tab_8_to_6[260] = {
@@ -54,6 +65,20 @@ static const uint8_t _tab_8_to_6[260] = {
   59,59,59,60,60,60,60,61,61,61,61,62,62,62,62,63,
   63,63,63,63
 };
+
+static uint32_t _add_4_uint8_sat (uint32_t large, uint32_t small) {
+  uint32_t res, hi, over;
+  hi = large & 0x80808080;
+  res = (large & 0x7f7f7f7f) + small;
+  over = res & hi;
+  res |= hi;
+  over |= over >> 1;
+  over |= over >> 2;
+  over |= over >> 4;
+  return res | over;
+}
+  
+#define CLIP_UINT8(_v) do { if (_v & ~0xff) _v = ~(_v >> (sizeof (_v) * 8 - 1)) & 0xff; } while (0)
 
 static int _best_color_match_8 (ImlibData * id, int *r, int *g, int *b) {
   int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
@@ -285,45 +310,60 @@ static const unsigned char _dmat2[4][4] = {
 static void
 render_15_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
+  int y;
+  unsigned short *img;
+  int jmp;
+  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
-	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x07;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  *img++ = val;
-	}
-      img += jmp;
+  /* Floyd-Steinberg, pendulum style for less top row artifacts.
+   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+  for (y = 0; y < w + 2; y++)
+    right[y].w = left[y].w = 0;
+
+  y = 0;
+  while (y < h) {
+    int x;
+
+    for (x = 0; x < w; x++) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+      right[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb15_err_mask.w) * 3;
+      left[x + 0].w += t.w;
+      left[x + 2].w += t.w;
+      t.w = (v.w & _rgb15_err_mask.w) * 5;
+      right[x + 2].w += t.w;
+      left[x + 1].w  += t.w;
+      *img+= ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
     }
+    img += jmp;
+    y += 1;
+
+    if (y >= h)
+      break;
+    for (x = w - 1; x >= 0; x--) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+      left[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb15_err_mask.w) * 3;
+      right[x + 0].w += t.w;
+      right[x + 2].w += t.w;
+      t.w = (v.w & _rgb15_err_mask.w) * 5;
+      left[x + 0].w += t.w;
+      right[x + 1].w  += t.w;
+      *img+= ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
+    }
+    img += jmp;
+    y += 1;
+  }
 }
 
 static void
@@ -335,7 +375,8 @@ render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
 
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h - 1; y += 2) {
+  y = 0;
+  while (y < h) {
     int x;
     uint8_t *ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
@@ -345,9 +386,9 @@ render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       *img++ = val;
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 4] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
       *img++ = val;
     }
     if (x < w) {
@@ -358,36 +399,15 @@ render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
       *img++ = val;
     }
     img += jmp;
-    ptr2 = yarray[y + 1];
+    y += 1;
+    if (y >= h)
+      break;
+    ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-  }
-  if (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       *img++ = val;
       ptr = ptr2 + xarray[x + 1];
       val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
@@ -397,57 +417,73 @@ render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
     }
     if (x < w) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       *img++ = val;
     }
+    img += jmp;
+    y += 1;
   }
 }
 
 static void
 render_16_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
+  int y;
+  unsigned short *img;
+  int jmp;
+  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
-	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x03;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  *img++ = val;
-	}
-      img += jmp;
+  /* Floyd-Steinberg, pendulum style for less top row artifacts.
+   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+  for (y = 0; y < w + 2; y++)
+    right[y].w = left[y].w = 0;
+
+  y = 0;
+  while (y < h) {
+    int x;
+
+    for (x = 0; x < w; x++) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+      right[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb16_err_mask.w) * 3;
+      left[x + 0].w += t.w;
+      left[x + 2].w += t.w;
+      t.w = (v.w & _rgb16_err_mask.w) * 5;
+      right[x + 2].w += t.w;
+      left[x + 1].w  += t.w;
+      *img+= ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
     }
+    img += jmp;
+    y += 1;
+
+    if (y >= h)
+      break;
+    for (x = w - 1; x >= 0; x--) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+      left[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb16_err_mask.w) * 3;
+      right[x + 0].w += t.w;
+      right[x + 2].w += t.w;
+      t.w = (v.w & _rgb16_err_mask.w) * 5;
+      left[x + 0].w += t.w;
+      right[x + 1].w  += t.w;
+      *img+= ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
+    }
+    img += jmp;
+    y += 1;
+  }
 }
 
 static void
@@ -459,7 +495,8 @@ render_16_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
 
   jmp = (xim->bytes_per_line >> 1) - w;
   img = (unsigned short *)xim->data;
-  for (y = 0; y < h - 1; y += 2) {
+  y = 0;
+  while (y < h) {
     int x;
     uint8_t *ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
@@ -469,9 +506,9 @@ render_16_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       *img++ = val;
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
       *img++ = val;
     }
     if (x < w) {
@@ -482,90 +519,85 @@ render_16_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned
       *img++ = val;
     }
     img += jmp;
-    ptr2 = yarray[y + 1];
+    y += 1;
+    if (y >= h)
+      break;
+    ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       *img++ = val;
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-  }
-  if (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
       val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
       *img++ = val;
     }
     if (x < w) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       *img++ = val;
     }
+    img += jmp;
+    y += 1;
   }
 }
 
 static void
 render_15_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
+  int y;
+  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
-	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x07;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  XPutPixel(xim, x, y, val);
-	}
+  /* Floyd-Steinberg, pendulum style for less top row artifacts.
+   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+  for (y = 0; y < w + 2; y++)
+    right[y].w = left[y].w = 0;
+
+  y = 0;
+  while (y < h) {
+    int x;
+
+    for (x = 0; x < w; x++) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+      right[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb15_err_mask.w) * 3;
+      left[x + 0].w += t.w;
+      left[x + 2].w += t.w;
+      t.w = (v.w & _rgb15_err_mask.w) * 5;
+      right[x + 2].w += t.w;
+      left[x + 1].w  += t.w;
+      XPutPixel (xim, x, y, (v.b.r >> 3 << 10) | (v.b.g >> 3 << 5) | (v.b.b >> 3));
     }
+    y += 1;
+
+    if (y >= h)
+      break;
+    for (x = w - 1; x >= 0; x--) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+      left[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb15_err_mask.w) * 3;
+      right[x + 0].w += t.w;
+      right[x + 2].w += t.w;
+      t.w = (v.w & _rgb15_err_mask.w) * 5;
+      left[x + 0].w += t.w;
+      right[x + 1].w  += t.w;
+      XPutPixel (xim, x, y, (v.b.r >> 3 << 10) | (v.b.g >> 3 << 5) | (v.b.b >> 3));
+    }
+    y += 1;
+  }
 }
 
 static void
@@ -573,7 +605,8 @@ render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
 {
   int y, val;
 
-  for (y = 0; y < h - 1; y += 2) {
+  y = 0;
+  while (y < h) {
     int x;
     uint8_t *ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
@@ -583,9 +616,9 @@ render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       XPutPixel (xim, x, y, val);
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 4] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
       XPutPixel (xim, x + 1, y, val);
     }
     if (x < w) {
@@ -595,35 +628,15 @@ render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       XPutPixel (xim, x, y, val);
     }
-    ptr2 = yarray[y + 1];
+    y += 1;
+    if (y >= h)
+      break;
+    ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      XPutPixel (xim, x, y + 1, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
-      XPutPixel (xim, x + 1, y + 1, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      XPutPixel (xim, x, y + 1, val);
-    }
-  }
-  if (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       XPutPixel (xim, x, y, val);
       ptr = ptr2 + xarray[x + 1];
       val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
@@ -633,51 +646,66 @@ render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
     }
     if (x < w) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
+      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       XPutPixel (xim, x, y, val);
     }
+    y += 1;
   }
 }
 
 static void
 render_16_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
 {
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
+  int y;
+  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
-	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x03;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  XPutPixel(xim, x, y, val);
-	}
+  /* Floyd-Steinberg, pendulum style for less top row artifacts.
+   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+  for (y = 0; y < w + 2; y++)
+    right[y].w = left[y].w = 0;
+
+  y = 0;
+  while (y < h) {
+    int x;
+
+    for (x = 0; x < w; x++) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+      right[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb16_err_mask.w) * 3;
+      left[x + 0].w += t.w;
+      left[x + 2].w += t.w;
+      t.w = (v.w & _rgb16_err_mask.w) * 5;
+      right[x + 2].w += t.w;
+      left[x + 1].w  += t.w;
+      XPutPixel (xim, x, y, (v.b.r >> 3 << 11) | (v.b.g >> 2 << 5) | (v.b.b >> 3));
     }
+    y += 1;
+
+    if (y >= h)
+      break;
+    for (x = w - 1; x >= 0; x--) {
+      _rgba_t *p, v, t;
+
+      p = (_rgba_t *)(yarray[y] + xarray[x]);
+      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+      left[x + 1].w = 0;
+      v.w = _add_4_uint8_sat (p[0].w, v.w);
+      t.w = (v.w & _rgb16_err_mask.w) * 3;
+      right[x + 0].w += t.w;
+      right[x + 2].w += t.w;
+      t.w = (v.w & _rgb16_err_mask.w) * 5;
+      left[x + 0].w += t.w;
+      right[x + 1].w  += t.w;
+      XPutPixel (xim, x, y, (v.b.r >> 3 << 11) | (v.b.g >> 2 << 5) | (v.b.b >> 3));
+    }
+    y += 1;
+  }
 }
 
 static void
@@ -685,7 +713,8 @@ render_16_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
 {
   int y, val;
 
-  for (y = 0; y < h - 1; y += 2) {
+  y = 0;
+  while (y < h) {
     int x;
     uint8_t *ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
@@ -695,9 +724,9 @@ render_16_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       XPutPixel (xim, x, y, val);
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
       XPutPixel (xim, x + 1, y, val);
     }
     if (x < w) {
@@ -707,49 +736,30 @@ render_16_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char
       val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
       XPutPixel (xim, x, y, val);
     }
-    ptr2 = yarray[y + 1];
+    y += 1;
+    if (y >= h)
+      break;
+    ptr2 = yarray[y];
     for (x = 0; x < w - 1; x += 2) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      XPutPixel (xim, x, y + 1, val);
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
+      XPutPixel (xim, x, y, val);
       ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 1] << 11;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
       val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 1] <<  0;
-      XPutPixel (xim, x + 1, y + 1, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 3] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 3] <<  0;
-      XPutPixel (xim, x, y + 1, val);
-    }
-  }
-  if (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      XPutPixel (xim, x, y, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
       val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
       XPutPixel (xim, x + 1, y, val);
     }
     if (x < w) {
       uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
+      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
+      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
+      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
       XPutPixel (xim, x, y, val);
     }
+    y += 1;
   }
 }
 
@@ -1377,18 +1387,9 @@ render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarr
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  *img++ = val;
@@ -1415,18 +1416,9 @@ render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarr
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  XPutPixel(xim, x, y, val);
@@ -1454,18 +1446,9 @@ render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarr
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
 		  er = ERROR_RED(er, val);
 		  eg = ERROR_GRN(eg, val);
@@ -1495,18 +1478,9 @@ render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarr
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
 		  er = ERROR_RED(er, val);
 		  eg = ERROR_GRN(eg, val);
@@ -1632,12 +1606,9 @@ render_15_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 	  er = r + er1[ex++];
 	  eg = g + er1[ex++];
 	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
+          CLIP_UINT8 (er);
+          CLIP_UINT8 (eg);
+          CLIP_UINT8 (eb);
 	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
 	  er = er & 0x07;
 	  eg = eg & 0x07;
@@ -1724,12 +1695,9 @@ render_16_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 	  er = r + er1[ex++];
 	  eg = g + er1[ex++];
 	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
+          CLIP_UINT8 (er);
+          CLIP_UINT8 (eg);
+          CLIP_UINT8 (eb);
 	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
 	  er = er & 0x07;
 	  eg = eg & 0x03;
@@ -1883,12 +1851,9 @@ render_15_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 	  er = r + er1[ex++];
 	  eg = g + er1[ex++];
 	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
+          CLIP_UINT8 (er);
+          CLIP_UINT8 (eg);
+          CLIP_UINT8 (eb);
 	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
 	  er = er & 0x07;
 	  eg = eg & 0x07;
@@ -1927,12 +1892,9 @@ render_16_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
 	  er = r + er1[ex++];
 	  eg = g + er1[ex++];
 	  eb = b + er1[ex++];
-	  if (er > 255)
-	    er = 255;
-	  if (eg > 255)
-	    eg = 255;
-	  if (eb > 255)
-	    eb = 255;
+          CLIP_UINT8 (er);
+          CLIP_UINT8 (eg);
+          CLIP_UINT8 (eb);
 	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
 	  er = er & 0x07;
 	  eg = eg & 0x03;
@@ -2663,18 +2625,9 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  *img++ = val;
@@ -2704,18 +2657,9 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = _best_color_match_8 (id, &er, &eg, &eb);
 		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
 		  XPutPixel(xim, x, y, val);
@@ -2746,18 +2690,9 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
 		  er = ERROR_RED(er, val);
 		  eg = ERROR_GRN(eg, val);
@@ -2790,18 +2725,9 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 		  er = r + er1[ex++];
 		  eg = g + er1[ex++];
 		  eb = b + er1[ex++];
-		  if (er > 255)
-		    er = 255;
-		  else if (er < 0)
-		    er = 0;
-		  if (eg > 255)
-		    eg = 255;
-		  else if (eg < 0)
-		    eg = 0;
-		  if (eb > 255)
-		    eb = 255;
-		  else if (eb < 0)
-		    eb = 0;
+                  CLIP_UINT8 (er);
+                  CLIP_UINT8 (eg);
+                  CLIP_UINT8 (eb);
 		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
 		  er = ERROR_RED(er, val);
 		  eg = ERROR_GRN(eg, val);
@@ -3073,7 +2999,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   im->height = h;
 
 /* dithering array */
-  error = (int *)calloc((w + 2), sizeof(int) * 2 * 3);
+  error = (int *)calloc((w + 2), sizeof(int) * 2 * 4);
 
   if (!error)
     {
@@ -3083,7 +3009,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 
 /* setup pointers to point right */
   er1 = error;
-  er2 = error + ((w + 2) * 3);
+  er2 = error + ((w + 2) * 4);
   w4 = im->rgb_width * 4;
   ptr22 = im->rgb_data;
 
@@ -3583,4 +3509,3 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   add_pixmap(id, im, w, h, xim, sxim);
   return 1;
 }
-
