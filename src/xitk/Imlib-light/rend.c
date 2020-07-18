@@ -315,51 +315,51 @@ render_15_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarr
   int jmp;
   _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
-  jmp = (xim->bytes_per_line >> 1) - w;
+  jmp = xim->bytes_per_line >> 1;
   img = (unsigned short *)xim->data;
   /* Floyd-Steinberg, pendulum style for less top row artifacts.
    * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
   for (y = 0; y < w + 2; y++)
-    right[y].w = left[y].w = 0;
+    right[y].w = 0;
 
   y = 0;
   while (y < h) {
     int x;
 
+    left[1].w = 0;
     for (x = 0; x < w; x++) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      right[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb15_err_mask.w) * 3;
       left[x + 0].w += t.w;
-      left[x + 2].w += t.w;
+      left[x + 2].w  = t.w;
       t.w = (v.w & _rgb15_err_mask.w) * 5;
       right[x + 2].w += t.w;
       left[x + 1].w  += t.w;
-      *img+= ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
+      *img++ = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
     }
     img += jmp;
     y += 1;
-
     if (y >= h)
       break;
+
+    right[w].w = 0;
     for (x = w - 1; x >= 0; x--) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      left[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb15_err_mask.w) * 3;
-      right[x + 0].w += t.w;
+      right[x + 0].w  = t.w;
       right[x + 2].w += t.w;
       t.w = (v.w & _rgb15_err_mask.w) * 5;
       left[x + 0].w += t.w;
       right[x + 1].w  += t.w;
-      *img+= ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
+      *--img = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
     }
     img += jmp;
     y += 1;
@@ -435,51 +435,51 @@ render_16_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarr
   int jmp;
   _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
 
-  jmp = (xim->bytes_per_line >> 1) - w;
+  jmp = xim->bytes_per_line >> 1;
   img = (unsigned short *)xim->data;
   /* Floyd-Steinberg, pendulum style for less top row artifacts.
    * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
   for (y = 0; y < w + 2; y++)
-    right[y].w = left[y].w = 0;
+    right[y].w = 0;
 
   y = 0;
   while (y < h) {
     int x;
 
+    left[1].w = 0;
     for (x = 0; x < w; x++) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      right[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb16_err_mask.w) * 3;
       left[x + 0].w += t.w;
-      left[x + 2].w += t.w;
+      left[x + 2].w  = t.w;
       t.w = (v.w & _rgb16_err_mask.w) * 5;
       right[x + 2].w += t.w;
       left[x + 1].w  += t.w;
-      *img+= ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
+      *img++ = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
     }
     img += jmp;
     y += 1;
-
     if (y >= h)
       break;
+
+    right[w].w = 0;
     for (x = w - 1; x >= 0; x--) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      left[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb16_err_mask.w) * 3;
-      right[x + 0].w += t.w;
+      right[x + 0].w  = t.w;
       right[x + 2].w += t.w;
       t.w = (v.w & _rgb16_err_mask.w) * 5;
       left[x + 0].w += t.w;
       right[x + 1].w  += t.w;
-      *img+= ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
+      *--img = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
     }
     img += jmp;
     y += 1;
@@ -556,40 +556,40 @@ render_15_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, u
   /* Floyd-Steinberg, pendulum style for less top row artifacts.
    * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
   for (y = 0; y < w + 2; y++)
-    right[y].w = left[y].w = 0;
+    right[y].w = 0;
 
   y = 0;
   while (y < h) {
     int x;
 
+    left[1].w = 0;
     for (x = 0; x < w; x++) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      right[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb15_err_mask.w) * 3;
       left[x + 0].w += t.w;
-      left[x + 2].w += t.w;
+      left[x + 2].w  = t.w;
       t.w = (v.w & _rgb15_err_mask.w) * 5;
       right[x + 2].w += t.w;
       left[x + 1].w  += t.w;
       XPutPixel (xim, x, y, (v.b.r >> 3 << 10) | (v.b.g >> 3 << 5) | (v.b.b >> 3));
     }
     y += 1;
-
     if (y >= h)
       break;
+
+    right[w].w = 0;
     for (x = w - 1; x >= 0; x--) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      left[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb15_err_mask.w) * 3;
-      right[x + 0].w += t.w;
+      right[x + 0].w  = t.w;
       right[x + 2].w += t.w;
       t.w = (v.w & _rgb15_err_mask.w) * 5;
       left[x + 0].w += t.w;
@@ -664,22 +664,22 @@ render_16_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, u
   /* Floyd-Steinberg, pendulum style for less top row artifacts.
    * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
   for (y = 0; y < w + 2; y++)
-    right[y].w = left[y].w = 0;
+    right[y].w = 0;
 
   y = 0;
   while (y < h) {
     int x;
 
+    left[1].w = 0;
     for (x = 0; x < w; x++) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      right[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb16_err_mask.w) * 3;
       left[x + 0].w += t.w;
-      left[x + 2].w += t.w;
+      left[x + 2].w  = t.w;
       t.w = (v.w & _rgb16_err_mask.w) * 5;
       right[x + 2].w += t.w;
       left[x + 1].w  += t.w;
@@ -689,15 +689,16 @@ render_16_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, u
 
     if (y >= h)
       break;
+
+    right[w].w = 0;
     for (x = w - 1; x >= 0; x--) {
       _rgba_t *p, v, t;
 
       p = (_rgba_t *)(yarray[y] + xarray[x]);
       v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      left[x + 1].w = 0;
       v.w = _add_4_uint8_sat (p[0].w, v.w);
       t.w = (v.w & _rgb16_err_mask.w) * 3;
-      right[x + 0].w += t.w;
+      right[x + 0].w  = t.w;
       right[x + 2].w += t.w;
       t.w = (v.w & _rgb16_err_mask.w) * 5;
       left[x + 0].w += t.w;
