@@ -123,11 +123,11 @@ Imlib_clone_image(ImlibData * id, ImlibImage * im)
 
   im2->rgb_width = im->rgb_width;
   im2->rgb_height = im->rgb_height;
-  im2->rgb_data = malloc(im2->rgb_width * im2->rgb_height * 3);
+  im2->rgb_data = malloc(im2->rgb_width * im2->rgb_height * 4);
   if (!im2->rgb_data)
     goto fail;
 
-  memcpy(im2->rgb_data, im->rgb_data, im2->rgb_width * im2->rgb_height * 3);
+  memcpy(im2->rgb_data, im->rgb_data, im2->rgb_width * im2->rgb_height * 4);
   if (im->alpha_data)
     {
       im2->alpha_data = malloc(im2->rgb_width * im2->rgb_height);
