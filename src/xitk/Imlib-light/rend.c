@@ -20,7 +20,91 @@ typedef union {
   } b;
 } _rgba_t;
 
-static const _rgba_t _rgb_mask = { .b = { .r = 255, .g = 255, .b = 255, .a = 0 }};
+typedef struct _rend_s {
+  _rgba_t  *(*get_row) (struct _rend_s *r, int y), *row;
+  XImage   *xim;
+  int       w, h, qual, fast;
+  _rgba_t **yarray;
+  int      *xarray;
+  void     *err1, *err2;
+  uint8_t  *mod_r, *mod_g, *mod_b;
+} _rend_t;
+
+static _rgba_t *_get_row_plain (_rend_t *r, int y) {
+  return r->yarray[y];
+}
+
+static _rgba_t *_get_row_scale (_rend_t *r, int y) {
+  _rgba_t *b = r->yarray[y], *q = r->row;
+  int x;
+  for (x = 0; x < r->w; x++) {
+    _rgba_t *p = b + r->xarray[x];
+    *q++ = *p;
+  }
+  return r->row;
+}
+
+static _rgba_t *_get_row_mod (_rend_t *r, int y) {
+  _rgba_t *b = r->yarray[y], *q = r->row;
+  int x;
+  for (x = 0; x < r->w; x++) {
+    _rgba_t *p = b + x;
+    q->b.r = r->mod_r[p->b.r];
+    q->b.g = r->mod_g[p->b.g];
+    q->b.b = r->mod_b[p->b.b];
+    q->b.a = 0;
+    q += 1;
+  }
+  return r->row;
+}
+
+static _rgba_t *_get_row_scale_mod (_rend_t *r, int y) {
+  _rgba_t *b = r->yarray[y], *q = r->row;
+  int x;
+  for (x = 0; x < r->w; x++) {
+    _rgba_t *p = b + r->xarray[x];
+    q->b.r = r->mod_r[p->b.r];
+    q->b.g = r->mod_g[p->b.g];
+    q->b.b = r->mod_b[p->b.b];
+    q->b.a = 0;
+    q += 1;
+  }
+  return r->row;
+}
+
+static _rend_t *_rend_new (int w, int h) {
+  size_t yarrsize = h * sizeof (_rgba_t *);
+  size_t xarrsize = w * sizeof (int);
+  size_t rowsize = w * sizeof (_rgba_t);
+  size_t errsize = (w + 2) * 3 * sizeof (int);
+  _rend_t *r;
+  uint8_t *m = malloc (sizeof (*r) + yarrsize + xarrsize + rowsize + 2 * errsize);
+  if (!m)
+    return NULL;
+  r = (_rend_t *)m;
+  m += sizeof (*r);
+  r->yarray = (_rgba_t **)m;
+  m += yarrsize;
+  r->xarray = (int *)m;
+  m += xarrsize;
+  r->row = (_rgba_t *)m;
+  m += rowsize;
+  r->err1 = (void *)m;
+  m += errsize;
+  r->err2 = (void *)m;
+  r->get_row = NULL;
+  r->xim = NULL;
+  r->w = w;
+  r->h = h;
+  r->qual = 2;
+  r->fast = 0;
+  r->mod_r = NULL;
+  r->mod_g = NULL;
+  r->mod_b = NULL;
+  return r;
+}
+  
+/* static const _rgba_t _rgb_mask = { .b = { .r = 255, .g = 255, .b = 255, .a = 0 }}; */
 static const _rgba_t _rgb15_err_mask = { .b = { .r = 7, .g = 7, .b = 7, .a = 0 }};
 static const _rgba_t _rgb16_err_mask = { .b = { .r = 7, .g = 3, .b = 7, .a = 0 }};
 
@@ -293,1001 +377,647 @@ index_best_color_match(ImlibData * id, int *r, int *g, int *b)
   return col;
 }
 
-static const unsigned char _dmat1[4][4] = {
-  {0, 4, 1, 5},
-  {6, 2, 7, 3},
-  {1, 5, 0, 4},
-  {7, 3, 6, 2}
-};
+static void _rend_15 (_rend_t *r) {
+  if (r->xim->bits_per_pixel != 16)
+    r->fast = 0;
+  switch ((r->qual << 1) | !!r->fast) {
+    case 5: {
+      int y, jmp;
+      unsigned short *img;
+      _rgba_t *left = r->err1, *right = r->err2;
 
-static const unsigned char _dmat2[4][4] = {
-  {0, 4, 6, 5},
-  {6, 2, 7, 3},
-  {2, 6, 1, 5},
-  {7, 4, 7, 3}
-};
+      jmp = r->xim->bytes_per_line >> 1;
+      img = (unsigned short *)r->xim->data;
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 2; y++)
+        right[y].w = 0;
 
-static void
-render_15_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
-{
-  int y;
-  unsigned short *img;
-  int jmp;
-  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
 
-  jmp = xim->bytes_per_line >> 1;
-  img = (unsigned short *)xim->data;
-  /* Floyd-Steinberg, pendulum style for less top row artifacts.
-   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-  for (y = 0; y < w + 2; y++)
-    right[y].w = 0;
+        left[1].w = 0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          _rgba_t v, t;
 
-  y = 0;
-  while (y < h) {
-    int x;
-
-    left[1].w = 0;
-    for (x = 0; x < w; x++) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb15_err_mask.w) * 3;
-      left[x + 0].w += t.w;
-      left[x + 2].w  = t.w;
-      t.w = (v.w & _rgb15_err_mask.w) * 5;
-      right[x + 2].w += t.w;
-      left[x + 1].w  += t.w;
-      *img++ = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
-    }
-    img += jmp;
-    y += 1;
-    if (y >= h)
-      break;
-
-    right[w].w = 0;
-    for (x = w - 1; x >= 0; x--) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb15_err_mask.w) * 3;
-      right[x + 0].w  = t.w;
-      right[x + 2].w += t.w;
-      t.w = (v.w & _rgb15_err_mask.w) * 5;
-      left[x + 0].w += t.w;
-      right[x + 1].w  += t.w;
-      *--img = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
-    }
-    img += jmp;
-    y += 1;
-  }
-}
-
-static void
-render_15_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int y, val;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  y = 0;
-  while (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 4] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-    y += 1;
-    if (y >= h)
-      break;
-    ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-    y += 1;
-  }
-}
-
-static void
-render_16_fast_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
-{
-  int y;
-  unsigned short *img;
-  int jmp;
-  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
-
-  jmp = xim->bytes_per_line >> 1;
-  img = (unsigned short *)xim->data;
-  /* Floyd-Steinberg, pendulum style for less top row artifacts.
-   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-  for (y = 0; y < w + 2; y++)
-    right[y].w = 0;
-
-  y = 0;
-  while (y < h) {
-    int x;
-
-    left[1].w = 0;
-    for (x = 0; x < w; x++) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb16_err_mask.w) * 3;
-      left[x + 0].w += t.w;
-      left[x + 2].w  = t.w;
-      t.w = (v.w & _rgb16_err_mask.w) * 5;
-      right[x + 2].w += t.w;
-      left[x + 1].w  += t.w;
-      *img++ = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
-    }
-    img += jmp;
-    y += 1;
-    if (y >= h)
-      break;
-
-    right[w].w = 0;
-    for (x = w - 1; x >= 0; x--) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb16_err_mask.w) * 3;
-      right[x + 0].w  = t.w;
-      right[x + 2].w += t.w;
-      t.w = (v.w & _rgb16_err_mask.w) * 5;
-      left[x + 0].w += t.w;
-      right[x + 1].w  += t.w;
-      *--img = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
-    }
-    img += jmp;
-    y += 1;
-  }
-}
-
-static void
-render_16_fast_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int y, val;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  y = 0;
-  while (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-    y += 1;
-    if (y >= h)
-      break;
-    ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      *img++ = val;
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
-      *img++ = val;
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      *img++ = val;
-    }
-    img += jmp;
-    y += 1;
-  }
-}
-
-static void
-render_15_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
-{
-  int y;
-  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
-
-  /* Floyd-Steinberg, pendulum style for less top row artifacts.
-   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-  for (y = 0; y < w + 2; y++)
-    right[y].w = 0;
-
-  y = 0;
-  while (y < h) {
-    int x;
-
-    left[1].w = 0;
-    for (x = 0; x < w; x++) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb15_err_mask.w) * 3;
-      left[x + 0].w += t.w;
-      left[x + 2].w  = t.w;
-      t.w = (v.w & _rgb15_err_mask.w) * 5;
-      right[x + 2].w += t.w;
-      left[x + 1].w  += t.w;
-      XPutPixel (xim, x, y, (v.b.r >> 3 << 10) | (v.b.g >> 3 << 5) | (v.b.b >> 3));
-    }
-    y += 1;
-    if (y >= h)
-      break;
-
-    right[w].w = 0;
-    for (x = w - 1; x >= 0; x--) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb15_err_mask.w) * 3;
-      right[x + 0].w  = t.w;
-      right[x + 2].w += t.w;
-      t.w = (v.w & _rgb15_err_mask.w) * 5;
-      left[x + 0].w += t.w;
-      right[x + 1].w  += t.w;
-      XPutPixel (xim, x, y, (v.b.r >> 3 << 10) | (v.b.g >> 3 << 5) | (v.b.b >> 3));
-    }
-    y += 1;
-  }
-}
-
-static void
-render_15_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int y, val;
-
-  y = 0;
-  while (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      XPutPixel (xim, x, y, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 4] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
-      XPutPixel (xim, x + 1, y, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      XPutPixel (xim, x, y, val);
-    }
-    y += 1;
-    if (y >= h)
-      break;
-    ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      XPutPixel (xim, x, y, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
-      XPutPixel (xim, x + 1, y, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 10;
-      val += (uint32_t)_tab_8_to_5[ptr[1] + 6] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      XPutPixel (xim, x, y, val);
-    }
-    y += 1;
-  }
-}
-
-static void
-render_16_dither (int w, int h, XImage * xim, int *er1, int *er2, int *xarray, unsigned char **yarray)
-{
-  int y;
-  _rgba_t *left = (_rgba_t *)er1, *right = (_rgba_t *)er2;
-
-  /* Floyd-Steinberg, pendulum style for less top row artifacts.
-   * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-  for (y = 0; y < w + 2; y++)
-    right[y].w = 0;
-
-  y = 0;
-  while (y < h) {
-    int x;
-
-    left[1].w = 0;
-    for (x = 0; x < w; x++) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb16_err_mask.w) * 3;
-      left[x + 0].w += t.w;
-      left[x + 2].w  = t.w;
-      t.w = (v.w & _rgb16_err_mask.w) * 5;
-      right[x + 2].w += t.w;
-      left[x + 1].w  += t.w;
-      XPutPixel (xim, x, y, (v.b.r >> 3 << 11) | (v.b.g >> 2 << 5) | (v.b.b >> 3));
-    }
-    y += 1;
-
-    if (y >= h)
-      break;
-
-    right[w].w = 0;
-    for (x = w - 1; x >= 0; x--) {
-      _rgba_t *p, v, t;
-
-      p = (_rgba_t *)(yarray[y] + xarray[x]);
-      v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
-      v.w = _add_4_uint8_sat (p[0].w, v.w);
-      t.w = (v.w & _rgb16_err_mask.w) * 3;
-      right[x + 0].w  = t.w;
-      right[x + 2].w += t.w;
-      t.w = (v.w & _rgb16_err_mask.w) * 5;
-      left[x + 0].w += t.w;
-      right[x + 1].w  += t.w;
-      XPutPixel (xim, x, y, (v.b.r >> 3 << 11) | (v.b.g >> 2 << 5) | (v.b.b >> 3));
-    }
-    y += 1;
-  }
-}
-
-static void
-render_16_dither_ordered (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int y, val;
-
-  y = 0;
-  while (y < h) {
-    int x;
-    uint8_t *ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      XPutPixel (xim, x, y, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 4] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 2] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 4] <<  0;
-      XPutPixel (xim, x + 1, y, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 0] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 0] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 0] <<  0;
-      XPutPixel (xim, x, y, val);
-    }
-    y += 1;
-    if (y >= h)
-      break;
-    ptr2 = yarray[y];
-    for (x = 0; x < w - 1; x += 2) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      XPutPixel (xim, x, y, val);
-      ptr = ptr2 + xarray[x + 1];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 2] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 1] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 2] <<  0;
-      XPutPixel (xim, x + 1, y, val);
-    }
-    if (x < w) {
-      uint8_t *ptr = ptr2 + xarray[x];
-      val  = (uint32_t)_tab_8_to_5[ptr[0] + 6] << 11;
-      val += (uint32_t)_tab_8_to_6[ptr[1] + 3] <<  5;
-      val += (uint32_t)_tab_8_to_5[ptr[2] + 6] <<  0;
-      XPutPixel (xim, x, y, val);
-    }
-    y += 1;
-  }
-}
-
-static void
-render_15_fast (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_16_fast (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_24_fast (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, r, g, b;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * 3;
-  img = (unsigned char *)xim->data;
-  if (id->x.byte_order == MSBFirst)
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = r;
-		  *img++ = g;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = r;
-		  *img++ = b;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = b;
-		  *img++ = r;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = b;
-		  *img++ = g;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = g;
-		  *img++ = r;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = g;
-		  *img++ = b;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-    }
-  else
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = b;
-		  *img++ = g;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = g;
-		  *img++ = b;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = g;
-		  *img++ = r;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = r;
-		  *img++ = g;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = b;
-		  *img++ = r;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  *img++ = r;
-		  *img++ = b;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-    }
-}
-
-static void
-render_32_fast (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int            x, y, val, r, g, b;
-  unsigned char *ptr2;
-  uint32_t      *img;
-  int            jmp;
-
-  jmp = (xim->bytes_per_line >> 2) - w;
-  img = (uint32_t *)xim->data;
-  if (id->byte_order == BYTE_ORD_24_RGB) {
-    if (endian_is.little) {
-      for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
-          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-          uint32_t v = *p; /* abgr */
-          v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
-          *img++ = v >> 8;
+          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          p += 1;
+          t.w = (v.w & _rgb15_err_mask.w) * 3;
+          left[x + 0].w += t.w;
+          left[x + 2].w  = t.w;
+          t.w = (v.w & _rgb15_err_mask.w) * 5;
+          right[x + 2].w += t.w;
+          left[x + 1].w  += t.w;
+          *img++ = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
         }
         img += jmp;
-      }
-    } else {
-      for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
-          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-          uint32_t v = *p; /* rgba */
-          *img++ = v >> 8;
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        right[r->w].w = 0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          _rgba_t v, t;
+
+          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          p -= 1;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          t.w = (v.w & _rgb15_err_mask.w) * 3;
+          right[x + 0].w  = t.w;
+          right[x + 2].w += t.w;
+          t.w = (v.w & _rgb15_err_mask.w) * 5;
+          left[x + 0].w += t.w;
+          right[x + 1].w  += t.w;
+          *--img = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
         }
+        img += jmp;
+        y += 1;
+      }
+    }
+    break;
+    case 3: {
+      int y, val, jmp;
+      unsigned short *img;
+
+      jmp = (r->xim->bytes_per_line >> 1) - r->w;
+      img = (unsigned short *)r->xim->data;
+      /* Beyer matrix 2x2. */
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          *img++ = val;
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 4] << 10;
+          val += (uint32_t)_tab_8_to_5[p[1].b.g + 4] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 4] <<  0;
+          *img++ = val;
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          *img++ = val;
+        }
+        img += jmp;
+        y += 1;
+        if (y >= r->h)
+          break;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 6] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          *img++ = val;
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 2] << 10;
+          val += (uint32_t)_tab_8_to_5[p[1].b.g + 2] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 2] <<  0;
+          *img++ = val;
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 6] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          *img++ = val;
+        }
+        img += jmp;
+        y += 1;
+      }
+    }
+    break;
+    case 1: {
+      int y, jmp;
+      unsigned short *img;
+
+      jmp = (r->xim->bytes_per_line >> 1) - r->w;
+      img = (unsigned short *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          *img++ = ((uint32_t)p[0].b.r >> 3 << 10) | ((uint32_t)p[0].b.g >> 3 << 5) | (p[0].b.b >> 3);
         img += jmp;
       }
     }
-  } else if (id->byte_order == BYTE_ORD_24_RBG) {
-    for (y = 0; y < h; y++) {
-      for (x = 0; x < w; x++) {
-        ptr2 = yarray[y] + xarray[x];
-        r = (int)ptr2[0];
-        g = (int)ptr2[1];
-        b = (int)ptr2[2];
-        val = (r << 16) | (b << 8) | g;
-        *img++ = val;
-      }
-      img += jmp;
-    }
-  } else if (id->byte_order == BYTE_ORD_24_BRG) {
-    for (y = 0; y < h; y++) {
-      for (x = 0; x < w; x++) {
-        ptr2 = yarray[y] + xarray[x];
-        r = (int)ptr2[0];
-        g = (int)ptr2[1];
-        b = (int)ptr2[2];
-        val = (b << 16) | (r << 8) | g;
-        *img++ = val;
-      }
-      img += jmp;
-    }
-  } else if (id->byte_order == BYTE_ORD_24_BGR) {
-    if (endian_is.little) {
-      for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
-          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-          uint32_t v = *p; /* abgr */
-          *img++ = v & 0x00ffffff;
+    break;
+    case 4: {
+      int y;
+      _rgba_t *left = r->err1, *right = r->err2;
+
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 2; y++)
+        right[y].w = 0;
+
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
+
+        left[1].w = 0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          _rgba_t v, t;
+
+          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          p += 1;
+          t.w = (v.w & _rgb15_err_mask.w) * 3;
+          left[x + 0].w += t.w;
+          left[x + 2].w  = t.w;
+          t.w = (v.w & _rgb15_err_mask.w) * 5;
+          right[x + 2].w += t.w;
+          left[x + 1].w  += t.w;
+          XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3));
         }
-        img += jmp;
-      }
-    } else {
-      for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
-          uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-          uint32_t v = *p; /* rgba */
-          v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
-          *img++ = v & 0x00ffffff;
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        right[r->w].w = 0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          _rgba_t v, t;
+
+          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          p -= 1;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          t.w = (v.w & _rgb15_err_mask.w) * 3;
+          right[x + 0].w  = t.w;
+          right[x + 2].w += t.w;
+          t.w = (v.w & _rgb15_err_mask.w) * 5;
+          left[x + 0].w += t.w;
+          right[x + 1].w  += t.w;
+          XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3));
         }
-        img += jmp;
+        y += 1;
       }
     }
-  } else if (id->byte_order == BYTE_ORD_24_GRB) {
-    for (y = 0; y < h; y++) {
-      for (x = 0; x < w; x++) {
-        ptr2 = yarray[y] + xarray[x];
-        r = (int)ptr2[0];
-        g = (int)ptr2[1];
-        b = (int)ptr2[2];
-        val = (g << 16) | (r << 8) | b;
-        *img++ = val;
+    break;
+    case 2: {
+      int y, val;
+      /* Beyer matrix 2x2. */
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          XPutPixel (r->xim, x, y, val);
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 4] << 10;
+          val += (uint32_t)_tab_8_to_5[p[1].b.g + 4] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 4] <<  0;
+          XPutPixel (r->xim, x + 1, y, val);
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          XPutPixel (r->xim, x, y, val);
+        }
+        y += 1;
+        if (y >= r->h)
+          break;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 6] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          XPutPixel (r->xim, x, y, val);
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 2] << 10;
+          val += (uint32_t)_tab_8_to_5[p[1].b.g + 2] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 2] <<  0;
+          XPutPixel (r->xim, x + 1, y, val);
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 10;
+          val += (uint32_t)_tab_8_to_5[p[0].b.g + 6] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          XPutPixel (r->xim, x, y, val);
+        }
+        y += 1;
       }
-      img += jmp;
     }
-  } else if (id->byte_order == BYTE_ORD_24_GBR) {
-    for (y = 0; y < h; y++) {
-      for (x = 0; x < w; x++) {
-        ptr2 = yarray[y] + xarray[x];
-        r = (int)ptr2[0];
-        g = (int)ptr2[1];
-        b = (int)ptr2[2];
-        val = (g << 16) | (b << 8) | r;
-        *img++ = val;
+    break;
+    default: {
+      int y;
+
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.r >> 3 << 10) | ((uint32_t)p[0].b.g >> 3 <<  5) | (p[0].b.b >> 3));
       }
-      img += jmp;
     }
   }
 }
 
-static void
-render_15 (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
+static void _rend_16 (_rend_t *r) {
+  if (r->xim->bits_per_pixel != 16)
+    r->fast = 0;
+  switch ((r->qual << 1) | !!r->fast) {
+    case 5: {
+      int y, jmp;
+      unsigned short *img;
+      _rgba_t *left = r->err1, *right = r->err2;
 
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
+      jmp = r->xim->bytes_per_line >> 1;
+      img = (unsigned short *)r->xim->data;
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 2; y++)
+        right[y].w = 0;
 
-static void
-render_16 (int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
 
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
+        left[1].w = 0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          _rgba_t v, t;
 
-static void
-render_24 (ImlibData * id, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      if (endian_is.little) {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* abgr */
-            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* rgba */
-            XPutPixel (xim, x, y, v >> 8);
-          }
+          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          p += 1;
+          t.w = (v.w & _rgb16_err_mask.w) * 3;
+          left[x + 0].w += t.w;
+          left[x + 2].w  = t.w;
+          t.w = (v.w & _rgb16_err_mask.w) * 5;
+          right[x + 2].w += t.w;
+          left[x + 1].w  += t.w;
+          *img++ = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
         }
-      } else {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* rgba */
-            XPutPixel (xim, x, y, v >> 8);
-          }
+        img += jmp;
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        right[r->w].w = 0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          _rgba_t v, t;
+
+          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          p -= 1;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          t.w = (v.w & _rgb16_err_mask.w) * 3;
+          right[x + 0].w  = t.w;
+          right[x + 2].w += t.w;
+          t.w = (v.w & _rgb16_err_mask.w) * 5;
+          left[x + 0].w += t.w;
+          right[x + 1].w  += t.w;
+          *--img = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
         }
+        img += jmp;
+        y += 1;
       }
     }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (r << 16) | (b << 8) | g;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (b << 16) | (r << 8) | g;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      if (endian_is.little) {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* abgr */
-            XPutPixel (xim, x, y, v & 0x00ffffff);
-          }
+    break;
+    case 3: {
+      int y, val, jmp;
+      unsigned short *img;
+
+      jmp = (r->xim->bytes_per_line >> 1) - r->w;
+      img = (unsigned short *)r->xim->data;
+      /* Beyer matrix 2x2. */
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          *img++ = val;
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 4] << 11;
+          val += (uint32_t)_tab_8_to_6[p[1].b.g + 2] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 4] <<  0;
+          *img++ = val;
+          p += 2;
         }
-      } else {
-        for (y = 0; y < h; y++) {
-          for (x = 0; x < w; x++) {
-            uint32_t *p = (uint32_t *)(yarray[y] + xarray[x]);
-            uint32_t v = *p; /* rgba */
-            v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24); /* abgr */
-            XPutPixel (xim, x, y, v & 0x00ffffff);
-          }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          *img++ = val;
         }
+        img += jmp;
+        y += 1;
+        if (y >= r->h)
+          break;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 3] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          *img++ = val;
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 2] << 11;
+          val += (uint32_t)_tab_8_to_6[p[1].b.g + 1] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 2] <<  0;
+          *img++ = val;
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 3] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          *img++ = val;
+        }
+        img += jmp;
+        y += 1;
       }
     }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (g << 16) | (r << 8) | b;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
+    break;
+    case 1: {
+      int y, jmp;
+      unsigned short *img;
+
+      jmp = (r->xim->bytes_per_line >> 1) - r->w;
+      img = (unsigned short *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          *img++ = ((uint32_t)p[0].b.r >> 3 << 11) | ((uint32_t)p[0].b.g >> 2 << 5) | (p[0].b.b >> 3);
+        img += jmp;
+      }
     }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      val = (g << 16) | (b << 8) | r;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
+    break;
+    case 4: {
+      int y;
+      _rgba_t *left = r->err1, *right = r->err2;
+
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 2; y++)
+        right[y].w = 0;
+
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
+
+        left[1].w = 0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          _rgba_t v, t;
+
+          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          p += 1;
+          t.w = (v.w & _rgb16_err_mask.w) * 3;
+          left[x + 0].w += t.w;
+          left[x + 2].w  = t.w;
+          t.w = (v.w & _rgb16_err_mask.w) * 5;
+          right[x + 2].w += t.w;
+          left[x + 1].w  += t.w;
+          XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3));
+        }
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        right[r->w].w = 0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          _rgba_t v, t;
+
+          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          p -= 1;
+          v.w = _add_4_uint8_sat (p[0].w, v.w);
+          t.w = (v.w & _rgb16_err_mask.w) * 3;
+          right[x + 0].w  = t.w;
+          right[x + 2].w += t.w;
+          t.w = (v.w & _rgb16_err_mask.w) * 5;
+          left[x + 0].w += t.w;
+          right[x + 1].w  += t.w;
+          XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3));
+        }
+        y += 1;
+      }
     }
+    break;
+    case 2: {
+      int y, val;
+      /* Beyer matrix 2x2. */
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          XPutPixel (r->xim, x, y, val);
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 4] << 11;
+          val += (uint32_t)_tab_8_to_6[p[1].b.g + 2] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 4] <<  0;
+          XPutPixel (r->xim, x + 1, y, val);
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 0] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 0] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 0] <<  0;
+          XPutPixel (r->xim, x, y, val);
+        }
+        y += 1;
+        if (y >= r->h)
+          break;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w - 1; x += 2) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 3] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          XPutPixel (r->xim, x, y, val);
+          val  = (uint32_t)_tab_8_to_5[p[1].b.r + 2] << 11;
+          val += (uint32_t)_tab_8_to_6[p[1].b.g + 1] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[1].b.b + 2] <<  0;
+          XPutPixel (r->xim, x + 1, y, val);
+          p += 2;
+        }
+        if (x < r->w) {
+          val  = (uint32_t)_tab_8_to_5[p[0].b.r + 6] << 11;
+          val += (uint32_t)_tab_8_to_6[p[0].b.g + 3] <<  5;
+          val += (uint32_t)_tab_8_to_5[p[0].b.b + 6] <<  0;
+          XPutPixel (r->xim, x, y, val);
+        }
+        y += 1;
+      }
+    }
+    break;
+    default: {
+      int y;
+
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.r >> 3 << 11) | ((uint32_t)p[0].b.g >> 2 <<  5) | (p[0].b.b >> 3));
+      }
+    }
+  }
+}
+
+static void _rend_24 (_rend_t *r) {
+  /* OK folks. Probe the behaviour of XPutPixel (), then auto fast the few coommon modes. */
+  uint32_t mode1 = (0x11111111 & r->xim->red_mask)
+                 | (0x22222222 & r->xim->green_mask)
+                 | (0x33333333 & r->xim->blue_mask);
+  uint32_t mode2 = (0x44444444 & r->xim->red_mask)
+                 | (0x55555555 & r->xim->green_mask)
+                 | (0x66666666 & r->xim->blue_mask);
+  memset (r->xim->data, 0, 8);
+  XPutPixel (r->xim, 0, 0, mode1);
+  XPutPixel (r->xim, 1, 0, mode2);
+  if (r->xim->bits_per_pixel == 32) {
+    static const _rgba_t testf = {.b = {.r = 0, .g = 0x11, .b = 0x22, .a = 0x33}};
+    static const _rgba_t testr = {.b = {.r = 0x33, .g = 0x22, .b = 0x11, .a = 0}};
+    _rgba_t *p = (_rgba_t *)r->xim->data;
+    mode2 = p[0].w;
+    if (mode2 == testf.w) {
+      int y, jmp = (r->xim->bytes_per_line >> 2) - r->w;
+      uint32_t *q = (uint32_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        int x;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          q[0] = p[0].w >> 8;
+          p += 1;
+          q += 1;
+        }
+        q += jmp;
+      }
+      return;
+    } else if (mode2 == testr.w) {
+      int y, jmp = (r->xim->bytes_per_line >> 2) - r->w;
+      uint32_t *q = (uint32_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        int x;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          uint32_t v = p[0].w;
+          v = (v >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | (v << 24);
+          q[0] = v >> 8;
+          p += 1;
+          q += 1;
+        }
+        q += jmp;
+      }
+      return;
+    }
+  } else if (r->xim->bits_per_pixel == 24) {
+    if (!memcmp (r->xim->data, "\x11\x22\x33\x44", 4)) {
+      int y, jmp = r->xim->bytes_per_line - 3 * r->w;
+      uint8_t *q = (uint8_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        int x;
+        _rgba_t *p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          q[0] = p[0].b.r;
+          q[1] = p[0].b.g;
+          q[2] = p[0].b.b;
+          p += 1;
+          q += 3;
+        }
+        q += jmp;
+      }
+      return;
+    } else if (!memcmp (r->xim->data, "\x33\x22\x11\x66", 4)) {
+      int y, jmp = r->xim->bytes_per_line - 3 * r->w;
+      uint8_t *q = (uint8_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        int x;
+        _rgba_t *p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          q[0] = p[0].b.b;
+          q[1] = p[0].b.g;
+          q[2] = p[0].b.r;
+          p += 1;
+          q += 3;
+        }
+        q += jmp;
+      }
+      return;
+    }
+  }
+  if (mode1 == 0x112233) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.r << 16) | ((uint32_t)p[0].b.g << 8) | p[0].b.b);
+        p += 1;
+      }
+    }
+  } else if (mode1 == 0x332211) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.b << 16) | ((uint32_t)p[0].b.g << 8) | p[0].b.r);
+        p += 1;
+      }
+    }
+  } else if (mode1 == 0x331122) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.b << 16) | ((uint32_t)p[0].b.r << 8) | p[0].b.g);
+        p += 1;
+      }
+    }
+  } else if (mode1 == 0x113322) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.r << 16) | ((uint32_t)p[0].b.b << 8) | p[0].b.g);
+        p += 1;
+      }
+    }
+  } else if (mode1 == 0x221133) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.g << 16) | ((uint32_t)p[0].b.r << 8) | p[0].b.b);
+        p += 1;
+      }
+    }
+  } else if (mode1 == 0x223311) {
+    int y;
+    for (y = 0; y < r->h; y++) {
+      int x;
+      _rgba_t *p = r->get_row (r, y);
+      for (x = 0; x < r->w; x++) {
+        XPutPixel (r->xim, x, y, ((uint32_t)p[0].b.g << 16) | ((uint32_t)p[0].b.b << 8) | p[0].b.r);
+        p += 1;
+      }
+    }
+  }
 }
 
 static void
@@ -1492,1022 +1222,7 @@ render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarr
 	    }
 	}
       break;
-    default:
-      if (id->fastrend)
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_15_fast_dither_ordered (w, h, xim, xarray, yarray);
-		  else
-		    render_15_fast_dither (w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_15_fast (w, h, xim, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_16_fast_dither_ordered (w, h, xim, xarray, yarray);
-		  else
-		    render_16_fast_dither (w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_16_fast (w, h, xim, xarray, yarray);
-	      break;
-	    case 24:
-	    case 32:
-	      if (xim->bits_per_pixel == 24)
-		render_24_fast (id, w, h, xim, xarray, yarray);
-	      else
-		render_32_fast (id, w, h, xim, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      else
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_15_dither_ordered (w, h, xim, xarray, yarray);
-		  else
-		    render_15_dither (w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_15 (w, h, xim, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_16_dither_ordered (w, h, xim, xarray, yarray);
-		  else
-		    render_16_dither (w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_16 (w, h, xim, xarray, yarray);
-	      break;
-	    case 24:
-	      render_24 (id, w, h, xim, xarray, yarray);
-	      break;
-	    case 32:
-              /* we do know what we are doing? */
-	      render_32_fast (id, w, h, xim, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	  break;
-	}
-    }
-}
-
-static void
-render_15_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
-			  int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-          CLIP_UINT8 (er);
-          CLIP_UINT8 (eg);
-          CLIP_UINT8 (eb);
-	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x07;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_15_fast_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
-
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r & 0x07;
-	  eg = g & 0x07;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((_dmat2[dithy][dithx] < eg) && (g < (256 - 8)))
-	    g += 8;
-	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_16_fast_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
-			  int *er1, int *er2, int *xarray,
-			  unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-          CLIP_UINT8 (er);
-          CLIP_UINT8 (eg);
-          CLIP_UINT8 (eb);
-	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x03;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_16_fast_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
-
-  int                 dithy, dithx;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r & 0x07;
-	  eg = g & 0x03;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((_dmat2[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-	    g += 4;
-	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_15_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r & 0x07;
-	  eg = g & 0x07;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((_dmat2[dithy][dithx] < eg) && (g < (256 - 8)))
-	    g += 8;
-	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_16_dither_mod_ordered (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, er, eg, eb;
-  unsigned char      *ptr2;
-
-  int                 dithy, dithx;
-
-  for (y = 0; y < h; y++)
-    {
-      dithy = y & 0x3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r & 0x07;
-	  eg = g & 0x03;
-	  eb = b & 0x07;
-	  dithx = x & 0x3;
-	  if ((_dmat2[dithy][dithx] < er) && (r < (256 - 8)))
-	    r += 8;
-	  if ((_dmat2[dithy][dithx] < (eg << 1)) && (g < (256 - 4)))
-	    g += 4;
-	  if ((_dmat2[dithy][dithx] < eb) && (b < (256 - 8)))
-	    b += 8;
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_15_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
-		     int *er1, int *er2, int *xarray,
-		     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-          CLIP_UINT8 (er);
-          CLIP_UINT8 (eg);
-          CLIP_UINT8 (eb);
-	  val = ((er & 0xf8) << 7) | ((eg & 0xf8) << 2) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x07;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_16_dither_mod (ImlibImage * im, int w, int h, XImage * xim,
-		     int *er1, int *er2, int *xarray,
-		     unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      ter = er1;
-      er1 = er2;
-      er2 = ter;
-      for (ex = 0; ex < (w + 2) * 3; ex++)
-	er2[ex] = 0;
-      ex = 3;
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  er = r + er1[ex++];
-	  eg = g + er1[ex++];
-	  eb = b + er1[ex++];
-          CLIP_UINT8 (er);
-          CLIP_UINT8 (eg);
-          CLIP_UINT8 (eb);
-	  val = ((er & 0xf8) << 8) | ((eg & 0xfc) << 3) | ((eb & 0xf8) >> 3);
-	  er = er & 0x07;
-	  eg = eg & 0x03;
-	  eb = eb & 0x07;
-	  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_15_fast_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_16_fast_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  unsigned short     *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 1) - w;
-  img = (unsigned short *)xim->data;
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  *img++ = val;
-	}
-      img += jmp;
-    }
-}
-
-static void
-render_24_fast_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, r, g, b;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * 3;
-  img = (unsigned char *)xim->data;
-
-  if (id->x.byte_order == MSBFirst)
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = r;
-		  *img++ = g;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = r;
-		  *img++ = b;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = b;
-		  *img++ = r;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = b;
-		  *img++ = g;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = g;
-		  *img++ = r;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = g;
-		  *img++ = b;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-    }
-  else
-    {
-      if (id->byte_order == BYTE_ORD_24_RGB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = b;
-		  *img++ = g;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_RBG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = g;
-		  *img++ = b;
-		  *img++ = r;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BRG)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = g;
-		  *img++ = r;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_BGR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = r;
-		  *img++ = g;
-		  *img++ = b;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GRB)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = b;
-		  *img++ = r;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-      else if (id->byte_order == BYTE_ORD_24_GBR)
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  *img++ = r;
-		  *img++ = b;
-		  *img++ = g;
-		}
-	      img += jmp;
-	    }
-	}
-    }
-}
-
-static void
-render_32_fast_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-  unsigned int       *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line >> 2) - w;
-  img = (unsigned int *)xim->data;
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (r << 16) | (g << 8) | b;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (r << 16) | (b << 8) | g;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (b << 16) | (r << 8) | g;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (b << 16) | (g << 8) | r;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (g << 16) | (r << 8) | b;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (g << 16) | (b << 8) | r;
-	      *img++ = val;
-	    }
-	  img += jmp;
-	}
-    }
-}
-
-static void
-render_15_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  val = ((r & 0xf8) << 7) | ((g & 0xf8) << 2) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-static void
-render_16_mod (ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  for (y = 0; y < h; y++)
-    {
-      for (x = 0; x < w; x++)
-	{
-	  ptr2 = yarray[y] + xarray[x];
-	  r = (int)*ptr2++;
-	  g = (int)*ptr2++;
-	  b = (int)*ptr2;
-	  r = im->rmap[r];
-	  g = im->gmap[g];
-	  b = im->bmap[b];
-	  val = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3);
-	  XPutPixel(xim, x, y, val);
-	}
-    }
-}
-
-
-static void
-render_24_mod (ImlibData * id, ImlibImage * im, int w, int h, XImage * xim, int *xarray, unsigned char **yarray)
-{
-  int                 x, y, val, r, g, b;
-  unsigned char      *ptr2;
-
-  if (id->byte_order == BYTE_ORD_24_RGB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (r << 16) | (g << 8) | b;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_RBG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (r << 16) | (b << 8) | g;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BRG)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (b << 16) | (r << 8) | g;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_BGR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (b << 16) | (g << 8) | r;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GRB)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (g << 16) | (r << 8) | b;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
-    }
-  else if (id->byte_order == BYTE_ORD_24_GBR)
-    {
-      for (y = 0; y < h; y++)
-	{
-	  for (x = 0; x < w; x++)
-	    {
-	      ptr2 = yarray[y] + xarray[x];
-	      r = (int)*ptr2++;
-	      g = (int)*ptr2++;
-	      b = (int)*ptr2;
-	      r = im->rmap[r];
-	      g = im->gmap[g];
-	      b = im->bmap[b];
-	      val = (g << 16) | (b << 8) | r;
-	      XPutPixel(xim, x, y, val);
-	    }
-	}
+    default: ;
     }
 }
 
@@ -2739,85 +1454,7 @@ render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 	    }
 	}
       break;
-    default:
-      if (id->fastrend)
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_15_fast_dither_mod_ordered (im, w, h, xim, xarray, yarray);
-		  else
-		    render_15_fast_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_15_fast_mod (im, w, h, xim, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_16_fast_dither_mod_ordered (im, w, h, xim, xarray, yarray);
-		  else
-		    render_16_fast_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_16_fast_mod (im, w, h, xim, xarray, yarray);
-	      break;
-	    case 24:
-	    case 32:
-	      if (xim->bits_per_pixel == 24)
-		render_24_fast_mod (id, im, w, h, xim, xarray, yarray);
-	      else
-		render_32_fast_mod (id, im, w, h, xim, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      else
-	{
-	  switch (bpp)
-	    {
-	    case 8:
-	      break;
-	    case 15:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_15_dither_mod_ordered (im, w, h, xim, xarray, yarray);
-		  else
-		    render_15_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_15_mod (im, w, h, xim, xarray, yarray);
-	      break;
-	    case 16:
-	      if (id->render_type == RT_DITHER_TRUECOL)
-		{
-		  if (id->ordered_dither)
-		    render_16_dither_mod_ordered (im, w, h, xim, xarray, yarray);
-		  else
-		    render_16_dither_mod (im, w, h, xim, er1, er2, xarray, yarray);
-		}
-	      else
-		render_16_mod (im, w, h, xim, xarray, yarray);
-	      break;
-	    case 24:
-	      render_24_mod (id, im, w, h, xim, xarray, yarray);
-	      break;
-	    case 32:
-	      render_24_mod (id, im, w, h, xim, xarray, yarray);
-	      break;
-	    default:
-	      break;
-	    }
-	  break;
-	}
+    default: ;
     }
 }
 
@@ -2913,12 +1550,13 @@ static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask,
 int
 Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 {
+  _rend_t            *r;
   XImage             *xim, *sxim;
   static              Display *pd = NULL;
   static GC           tgc = 0, stgc = 0;
   XGCValues           gcv;
   unsigned char      *tmp, *stmp, **yarray, *ptr22;
-  int                 w4, x, inc, pos, *error, *er1, *er2, *xarray, ex, bpp;
+  int                 w4, x, inc, pos, *er1, *er2, *xarray, bpp;
   Pixmap              pmap, mask;
   int                 shared_pixmap, shared_image;
 #ifdef HAVE_SHM
@@ -2981,6 +1619,28 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     free_pixmappmap(id, im->pixmap);
   im->pixmap = 0;
   im->shape_mask = 0;
+
+  r = _rend_new (w, h);
+  if (!r)
+    return 0;
+  er1 = (int *)r->err1;
+  er2 = (int *)r->err2;
+  xarray = r->xarray;
+  yarray = (uint8_t **)r->yarray;
+  if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
+    (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
+    (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
+    (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256)) {
+    r->get_row = im->rgb_width == w ? _get_row_plain : _get_row_scale;
+  } else {
+    r->get_row = im->rgb_width == w ? _get_row_mod : _get_row_scale_mod;
+  }
+  r->mod_r = im->rmap;
+  r->mod_g = im->gmap;
+  r->mod_b = im->bmap;
+  r->qual = id->hiq ? (id->ordered_dither ? 1 : 2) : 0;
+  r->fast = id->fastrend;
+
 /* setup stuff */
   if (id->x.depth <= 8)
     bpp = 1;
@@ -2999,41 +1659,11 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   im->width = w;
   im->height = h;
 
-/* dithering array */
-  error = (int *)calloc((w + 2), sizeof(int) * 2 * 4);
-
-  if (!error)
-    {
-      fprintf(stderr, "ERROR: Cannot allocate RAM for image dither buffer\n");
-      return 0;
-    }
-
 /* setup pointers to point right */
-  er1 = error;
-  er2 = error + ((w + 2) * 4);
   w4 = im->rgb_width * 4;
   ptr22 = im->rgb_data;
 
 /* setup coord-mapping array (specially for border scaling) */
-  xarray = calloc(w, sizeof(int));
-
-  if (!xarray)
-    {
-      fprintf(stderr, "ERROR: Cannot allocate X co-ord buffer\n");
-      free(error);
-      return 0;
-    }
-  yarray = calloc(h, sizeof(unsigned char *));
-
-  if (!yarray)
-    {
-      fprintf(stderr, "ERROR: Cannot allocate Y co-ord buffer\n");
-      free(xarray);
-      free(error);
-      return 0;
-    }
-  for (ex = 0; ex < ((w + 2) * 3 * 2); ex++)
-    error[ex] = 0;
   {
     int                 l, r, m;
 
@@ -3360,9 +1990,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     } else {
       fprintf (stderr, "IMLIB ERROR: Cannot allocate XImage buffer\n");
     }
-    free (xarray);
-    free (yarray);
-    free (error);
+    free (r);
     return 0;
   } while (0);
 
@@ -3371,9 +1999,15 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   if (!stgc && im->shape)
     stgc = XCreateGC (id->x.disp, mask, GCGraphicsExposures, &gcv);
 
-  bpp = id->x.depth <= 8 ? 8
-    : id->x.render_depth == 24 ? xim->bits_per_pixel
-    : id->x.render_depth;
+  bpp = id->x.depth <= 8 ? 8 : id->x.render_depth;
+
+  r->xim = xim;
+  if (bpp == 15)
+    _rend_15 (r);
+  else if (bpp == 16)
+    _rend_16 (r);
+  else if ((bpp == 24) || (bpp == 32))
+    _rend_24 (r);
 
   /* copy XImage to the pixmap, if not a shared pixmap */
   if (im->shape)
@@ -3502,9 +2136,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 
 /* cleanup */
 /*  XSync(id->x.disp, False);*/
-  free(error);
-  free(xarray);
-  free(yarray);
+  free (r);
 
 /* add this pixmap to the cache */
   add_pixmap(id, im, w, h, xim, sxim);
