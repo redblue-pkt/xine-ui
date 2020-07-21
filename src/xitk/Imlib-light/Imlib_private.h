@@ -67,7 +67,6 @@ struct pixmap_cache
   };
 
 
-int                 index_best_color_match(ImlibData * id, int *r, int *g, int *b);
 void                dirty_pixmaps(ImlibData * id, ImlibImage * im);
 void                dirty_images(ImlibData * id, ImlibImage * im);
 void                find_pixmap(ImlibData * id, ImlibImage * im, int width, int height, Pixmap * pmap, Pixmap * mask);
@@ -81,6 +80,7 @@ void                clean_caches(ImlibData * id);
 void                nullify_image(ImlibData * id, ImlibImage * im);
 
 void                calc_map_tables(ImlibData * id, ImlibImage * im);
+void                _fill_rgb_fast_tab (ImlibData *id);
 
 void                _PaletteAlloc(ImlibData * id, int num, const int *cols);
 
@@ -90,24 +90,3 @@ int                 close_helper(FILE *);
 #define INDEX_RGB(r,g,b)  id->fast_rgb[(r<<10)|(g<<5)|(b)]
 #define COLOR_INDEX(i)    id->palette[i].pixel
 #define COLOR_RGB(r,g,b)  id->palette[INDEX_RGB(r,g,b)].pixel
-#define ERROR_RED(rr,i)   rr-id->palette[i].r
-#define ERROR_GRN(gg,i)   gg-id->palette[i].g
-#define ERROR_BLU(bb,i)   bb-id->palette[i].b
-
-#define DITHER_ERROR(Der1,Der2,Dex,Der,Deg,Deb) \
-  do {\
-     ter=&(Der1[Dex]);\
-     (*ter)+=(Der*7)>>4;ter++;\
-     (*ter)+=(Deg*7)>>4;ter++;\
-     (*ter)+=(Deb*7)>>4;\
-     ter=&(Der2[Dex-6]);\
-     (*ter)+=(Der*3)>>4;ter++;\
-     (*ter)+=(Deg*3)>>4;ter++;\
-     (*ter)+=(Deb*3)>>4;ter++;\
-     (*ter)+=(Der*5)>>4;ter++;\
-     (*ter)+=(Deg*5)>>4;ter++;\
-     (*ter)+=(Deb*5)>>4;ter++;\
-     (*ter)+=Der>>4;ter++;\
-     (*ter)+=Deg>>4;ter++;\
-     (*ter)+=Deb>>4; \
-  } while (0)
