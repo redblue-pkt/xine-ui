@@ -97,7 +97,7 @@ PaletteLUTSet(ImlibData *id)
       prop[j++] = (unsigned char)id->palette[i].b;
       prop[j++] = (unsigned char)id->palette[i].pixel;
     }
-  memcpy(&prop[j], &(id->fast_rgb[i]), (32*32*32));
+  memcpy (&prop[j], id->fast_rgb, (32*32*32));
   j += (32*32*32);
   XChangeProperty(id->x.disp, id->x.root, to_set, XA_CARDINAL, 8, 
 		  PropModeReplace, (unsigned char *)prop, j);
@@ -164,7 +164,6 @@ Imlib_load_colors(ImlibData * id, const char *file)
   int                 i;
   int                 pal[768];
   unsigned int        r, g, b;
-  int                 rr, gg, bb;
 
 #ifndef __EMX__
   f = fopen(file, "r");
@@ -206,20 +205,7 @@ Imlib_load_colors(ImlibData * id, const char *file)
     {
       free(id->fast_rgb);
       id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);
-      
-      for (r = 0; r < 32; r++)
-	{
-	  for (g = 0; g < 32; g++)
-	    {
-	      for (b = 0; b < 32; b++)
-		{
-		  rr = (r << 3) | (r >> 2);
-		  gg = (g << 3) | (g >> 2);
-		  bb = (b << 3) | (b >> 2);
-		  INDEX_RGB(r, g, b) = index_best_color_match(id, &rr, &gg, &bb);
-		}
-	    }
-	}
+      _fill_rgb_fast_tab (id);
       PaletteLUTSet(id);
     }
   XUngrabServer(id->x.disp);
@@ -466,8 +452,6 @@ Imlib_load_default_colors(ImlibData * id)
 {
   int                 i;
   const int          *pal = default_pal;
-  int                 r,g,b;
-  int                 rr, gg, bb;
 #ifdef DEBUG
   /*
    * WARNING: you cannot single step into the
@@ -485,20 +469,7 @@ Imlib_load_default_colors(ImlibData * id)
     {
       free(id->fast_rgb);
       id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);
-      
-      for (r = 0; r < 32; r++)
-	{
-	  for (g = 0; g < 32; g++)
-	    {
-	      for (b = 0; b < 32; b++)
-		{
-		  rr = (r << 3) | (r >> 2);
-		  gg = (g << 3) | (g >> 2);
-		  bb = (b << 3) | (b >> 2);
-		  INDEX_RGB(r, g, b) = index_best_color_match(id, &rr, &gg, &bb);
-		}
-	    }
-	}
+      _fill_rgb_fast_tab (id);
       PaletteLUTSet(id);
     }
   XUngrabServer(id->x.disp);

@@ -24,9 +24,12 @@ typedef struct _rend_s {
   _rgba_t  *(*get_row) (struct _rend_s *r, int y), *row;
   XImage   *xim;
   int       w, h, qual, fast;
+  ImlibColor *pal;
+  uint8_t  *tab_15_8;
+  int       num_pal_entries;
   _rgba_t **yarray;
   int      *xarray;
-  void     *err1, *err2;
+  void     *err;
   uint8_t  *mod_r, *mod_g, *mod_b;
 } _rend_t;
 
@@ -72,13 +75,17 @@ static _rgba_t *_get_row_scale_mod (_rend_t *r, int y) {
   return r->row;
 }
 
+typedef struct {
+  int16_t r, g, b, dummy;
+} _rgb_t;
+
 static _rend_t *_rend_new (int w, int h) {
   size_t yarrsize = h * sizeof (_rgba_t *);
   size_t xarrsize = w * sizeof (int);
   size_t rowsize = w * sizeof (_rgba_t);
-  size_t errsize = (w + 2) * 3 * sizeof (int);
+  size_t errsize = (w + 4) * sizeof (_rgb_t);
   _rend_t *r;
-  uint8_t *m = malloc (sizeof (*r) + yarrsize + xarrsize + rowsize + 2 * errsize);
+  uint8_t *m = malloc (sizeof (*r) + yarrsize + xarrsize + rowsize + errsize);
   if (!m)
     return NULL;
   r = (_rend_t *)m;
@@ -89,15 +96,16 @@ static _rend_t *_rend_new (int w, int h) {
   m += xarrsize;
   r->row = (_rgba_t *)m;
   m += rowsize;
-  r->err1 = (void *)m;
-  m += errsize;
-  r->err2 = (void *)m;
+  r->err = (void *)m;
   r->get_row = NULL;
   r->xim = NULL;
   r->w = w;
   r->h = h;
   r->qual = 2;
   r->fast = 0;
+  r->pal = NULL;
+  r->num_pal_entries = 0;
+  r->tab_15_8 = NULL;
   r->mod_r = NULL;
   r->mod_g = NULL;
   r->mod_b = NULL;
@@ -107,6 +115,262 @@ static _rend_t *_rend_new (int w, int h) {
 /* static const _rgba_t _rgb_mask = { .b = { .r = 255, .g = 255, .b = 255, .a = 0 }}; */
 static const _rgba_t _rgb15_err_mask = { .b = { .r = 7, .g = 7, .b = 7, .a = 0 }};
 static const _rgba_t _rgb16_err_mask = { .b = { .r = 7, .g = 3, .b = 7, .a = 0 }};
+
+static void _rgba_to_rgb (_rgba_t *rgba, _rgb_t *rgb) {
+  rgb->r = rgba->b.r;
+  rgb->g = rgba->b.g;
+  rgb->b = rgba->b.b;
+}
+
+static void _rgb_mul (_rgb_t *to, int m) {
+  to->r *= m;
+  to->g *= m;
+  to->b *= m;
+}
+
+static void _rgb_rsh (_rgb_t *to, int shift) {
+  to->r >>= shift;
+  to->g >>= shift;
+  to->b >>= shift;
+}
+
+static void _rgb_add (_rgb_t *to, _rgb_t *from) {
+  to->r += from->r;
+  to->g += from->g;
+  to->b += from->b;
+}
+
+static void _rgb_sat_uint8 (_rgb_t *rgb) {
+  if (rgb->r & ~0xff)
+    rgb->r = ~(rgb->r >> (sizeof (rgb->r) * 8 - 1)) & 0xff;
+  if (rgb->g & ~0xff)
+    rgb->g = ~(rgb->g >> (sizeof (rgb->r) * 8 - 1)) & 0xff;
+  if (rgb->b & ~0xff)
+    rgb->b = ~(rgb->b >> (sizeof (rgb->r) * 8 - 1)) & 0xff;
+}
+
+static int _rgb_color_match_8 (_rend_t *r, _rgb_t *rgb) {
+  int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
+  for (i = 0; i < r->num_pal_entries; i++) {
+    int d1, d2;
+    d1 = rgb->r - r->pal[i].r;
+    d2 = d1 * d1;
+    d1 = rgb->g - r->pal[i].g;
+    d2 += d1 * d1;
+    d1 = rgb->b - r->pal[i].b;
+    d2 += d1 * d1;
+    if (d2 < db) {
+      db = d2;
+      col = i;
+    }
+  }
+  rgb->r -= r->pal[col].r;
+  rgb->g -= r->pal[col].g;
+  rgb->b -= r->pal[col].b;
+  return r->pal[col].pixel;
+}
+
+
+static void _rend_8 (_rend_t *r) {
+  static const _rgb_t rgb_0 = {.r = 0, .g = 0, .b = 0, .dummy = 0};
+  if (r->xim->bits_per_pixel != 8)
+    r->fast = 0;
+  switch ((r->qual << 1) | !!r->fast) {
+    case 5: {
+      int y, jmp = r->xim->bytes_per_line;
+      uint8_t *img = (uint8_t *)r->xim->data;
+      _rgb_t *err = r->err;
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.3
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 4; y++)
+        err[y] = rgb_0;
+
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
+
+        err[1] = rgb_0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          int indx;
+          _rgb_t v, t;
+
+          v = err[x + 3];
+          _rgb_rsh (&v, 4);
+          _rgba_to_rgb (p, &t);
+          p += 1;
+          _rgb_add (&v, &t);
+          _rgb_sat_uint8 (&v);
+          indx = _rgb_color_match_8 (r, &v);
+          t = v;
+          _rgb_mul (&t, 3);
+          _rgb_add (err + x + 0, &t);
+          err[x + 2] = t;
+          t = v;
+          _rgb_mul (&t, 5);
+          _rgb_add (err + x + 4, &t);
+          _rgb_add (err + x + 1, &t);
+          *img++ = indx;
+        }
+        img += jmp;
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        err[r->w + 2] = rgb_0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          int indx;
+          _rgb_t v, t;
+
+          v = err[x + 1];
+          _rgb_rsh (&v, 4);
+          p -= 1;
+          _rgba_to_rgb (p, &t);
+          _rgb_add (&v, &t);
+          _rgb_sat_uint8 (&v);
+          indx = _rgb_color_match_8 (r, &v);
+          t = v;
+          _rgb_mul (&t, 3);
+          err[x + 2] = t;
+          _rgb_add (err + x + 4, &t);
+          t = v;
+          _rgb_mul (&t, 5);
+          _rgb_add (err + x + 0, &t);
+          _rgb_add (err + x + 3, &t);
+          *--img = indx;
+        }
+        img += jmp;
+        y += 1;
+      }
+    }
+    break;
+    case 3: {
+      int y, jmp = r->xim->bytes_per_line - r->w;
+      uint8_t *img = (uint8_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++) {
+          int indx;
+          _rgb_t v;
+          _rgba_to_rgb (p, &v);
+          indx = _rgb_color_match_8 (r, &v);
+          *img++ = indx;
+        }
+        img += jmp;
+      }
+    }
+    break;
+    case 1: {
+      int y, jmp = r->xim->bytes_per_line - r->w;
+      uint8_t *img = (uint8_t *)r->xim->data;
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          *img++ = r->tab_15_8[((uint32_t)p[0].b.r >> 3 << 10) | ((uint32_t)p[0].b.g >> 3 << 5) | (p[0].b.b >> 3)];
+        img += jmp;
+      }
+    }
+    break;
+    case 4: {
+      int y;
+      _rgb_t *err = r->err;
+
+      /* Floyd-Steinberg, pendulum style for less top row artifacts.
+       * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
+      for (y = 0; y < r->w + 4; y++)
+        err[y] = rgb_0;
+
+      y = 0;
+      while (y < r->h) {
+        _rgba_t *p;
+        int x;
+
+        err[1] = rgb_0;
+        p = r->get_row (r, y);
+        for (x = 0; x < r->w; x++) {
+          int indx;
+          _rgb_t v, t;
+
+          v = err[x + 3];
+          _rgb_rsh (&v, 4);
+          _rgba_to_rgb (p, &t);
+          p += 1;
+          _rgb_add (&v, &t);
+          _rgb_sat_uint8 (&v);
+          indx = _rgb_color_match_8 (r, &v);
+          t = v;
+          _rgb_mul (&t, 3);
+          _rgb_add (err + x + 0, &t);
+          err[x + 2] = t;
+          t = v;
+          _rgb_mul (&t, 5);
+          _rgb_add (err + x + 4, &t);
+          _rgb_add (err + x + 1, &t);
+          XPutPixel (r->xim, x, y, indx);
+        }
+        y += 1;
+        if (y >= r->h)
+          break;
+
+        err[r->w + 2] = rgb_0;
+        p = r->get_row (r, y) + r->w;
+        for (x = r->w - 1; x >= 0; x--) {
+          int indx;
+          _rgb_t v, t;
+
+          v = err[x + 1];
+          _rgb_rsh (&v, 4);
+          p -= 1;
+          _rgba_to_rgb (p, &t);
+          _rgb_add (&v, &t);
+          _rgb_sat_uint8 (&v);
+          indx = _rgb_color_match_8 (r, &v);
+          t = v;
+          _rgb_mul (&t, 3);
+          err[x + 2] = t;
+          _rgb_add (err + x + 4, &t);
+          t = v;
+          _rgb_mul (&t, 5);
+          _rgb_add (err + x + 0, &t);
+          _rgb_add (err + x + 3, &t);
+          XPutPixel (r->xim, x, y, indx);
+        }
+        y += 1;
+      }
+    }
+    break;
+    case 2: {
+      int y;
+
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++) {
+          int indx;
+          _rgb_t v;
+          _rgba_to_rgb (p, &v);
+          indx = _rgb_color_match_8 (r, &v);
+          XPutPixel (r->xim, x, y, indx);
+        }
+      }
+    }
+    break;
+    default: {
+      int y;
+      for (y = 0; y < r->h; y++) {
+        _rgba_t *p = r->get_row (r, y);
+        int x;
+        for (x = 0; x < r->w; p++, x++)
+          XPutPixel (r->xim, x, y,
+            r->tab_15_8[((uint32_t)p[0].b.r >> 3 << 10) | ((uint32_t)p[0].b.g >> 3 << 5) | (p[0].b.b >> 3)]);
+      }
+    }
+  }
+}
 
 static const uint8_t _tab_8_to_5[268] = {
   /* ((index - 4) * 31 + 127) / 255 */
@@ -164,36 +428,11 @@ static uint32_t _add_4_uint8_sat (uint32_t large, uint32_t small) {
   
 #define CLIP_UINT8(_v) do { if (_v & ~0xff) _v = ~(_v >> (sizeof (_v) * 8 - 1)) & 0xff; } while (0)
 
-static int _best_color_match_8 (ImlibData * id, int *r, int *g, int *b) {
-  int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
-  for (i = 0; i < id->num_colors; i++) {
-    int d1, d2;
-    d1 = *r - id->palette[i].r;
-    d2 = d1 * d1;
-    d1 = *g - id->palette[i].g;
-    d2 += d1 * d1;
-    d1 = *b - id->palette[i].b;
-    d2 += d1 * d1;
-    if (d2 < db) {
-      db = d2;
-      col = i;
-    }
-  }
-  *r -= id->palette[col].r;
-  *g -= id->palette[col].g;
-  *b -= id->palette[col].b;
-  col = id->palette[col].pixel;
-  return col;
-}
-
 int
 Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b)
 {
-  int                 i;
-  int                 dif;
   int                 dr, dg, db;
   int                 col;
-  int                 mindif = 0x7fffffff;
 
   col = 0;
   if (!id)
@@ -257,124 +496,61 @@ Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b)
 	}
       return 0;
     }
-  for (i = 0; i < id->num_colors; i++)
-    {
-      dr = *r - id->palette[i].r;
-      if (dr < 0)
-	dr = -dr;
-      dg = *g - id->palette[i].g;
-      if (dg < 0)
-	dg = -dg;
-      db = *b - id->palette[i].b;
-      if (db < 0)
-	db = -db;
-      dif = dr + dg + db;
-      if (dif < mindif)
-	{
-	  mindif = dif;
-	  col = i;
-	}
+  {
+    int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
+    for (i = 0; i < id->num_colors; i++) {
+      int d1, d2;
+      d1 = *r - id->palette[i].r;
+      d2 = d1 * d1;
+      d1 = *g - id->palette[i].g;
+      d2 += d1 * d1;
+      d1 = *b - id->palette[i].b;
+      d2 += d1 * d1;
+      if (d2 < db) {
+        db = d2;
+        col = i;
+      }
     }
-  *r -= id->palette[col].r;
-  *g -= id->palette[col].g;
-  *b -= id->palette[col].b;
-  col = id->palette[col].pixel;
-  return col;
+    *r -= id->palette[col].r;
+    *g -= id->palette[col].g;
+    *b -= id->palette[col].b;
+    col = id->palette[col].pixel;
+    return col;
+  }
 }
 
-int
-index_best_color_match(ImlibData * id, int *r, int *g, int *b)
-{
-  int                 i;
-  int                 dif;
-  int                 dr, dg, db;
-  int                 col;
-  int                 mindif = 0x7fffffff;
-
-  col = 0;
-  if (!id)
-    {
-      fprintf(stderr, "ImLib ERROR: No ImlibData initialised\n");
-      return -1;
+void _fill_rgb_fast_tab (ImlibData *id) {
+  uint8_t *q;
+  uint32_t r;
+  if ((id->x.depth > 8) || id->hiq || !id->fast_rgb)
+    return;
+  q = id->fast_rgb;
+  for (r = 0; r < 256; r += 8) {
+    uint32_t g;
+    r = (r & 248) | (r >> 5);
+    for (g = 0; g < 256; g += 8) {
+      uint32_t b;
+      g = (g & 248) | (g >> 5);
+      for (b = 0; b < 256; b += 8) {
+        int i, col = 0, db = 1 << (sizeof (db) * 8 - 2);
+        b = (b & 248) | (b >> 5);
+        for (i = 0; i < id->num_colors; i++) {
+          int d1, d2;
+          d1 = r - id->palette[i].r;
+          d2 = d1 * d1;
+          d1 = g - id->palette[i].g;
+          d2 += d1 * d1;
+          d1 = b - id->palette[i].b;
+          d2 += d1 * d1;
+          if (d2 < db) {
+            db = d2;
+            col = i;
+          }
+        }
+        *q++ = id->palette[col].pixel;
+      }
     }
-  if ((id->render_type == RT_PLAIN_TRUECOL) ||
-      (id->render_type == RT_DITHER_TRUECOL))
-    {
-      dr = *r;
-      dg = *g;
-      db = *b;
-      switch (id->x.depth)
-	{
-	case 15:
-	  *r = dr - (dr & 0xf8);
-	  *g = dg - (dg & 0xf8);
-	  *b = db - (db & 0xf8);
-	  return ((dr & 0xf8) << 7) | ((dg & 0xf8) << 2) | ((db & 0xf8) >> 3);
-	  break;
-	case 16:
-	  *r = dr - (dr & 0xf8);
-	  *g = dg - (dg & 0xfc);
-	  *b = db - (db & 0xf8);
-	  return ((dr & 0xf8) << 8) | ((dg & 0xfc) << 3) | ((db & 0xf8) >> 3);
-	  break;
-	case 24:
-	case 32:
-	  *r = 0;
-	  *g = 0;
-	  *b = 0;
-	  switch (id->byte_order)
-	    {
-	    case BYTE_ORD_24_RGB:
-	      return ((dr & 0xff) << 16) | ((dg & 0xff) << 8) | (db & 0xff);
-	      break;
-	    case BYTE_ORD_24_RBG:
-	      return ((dr & 0xff) << 16) | ((db & 0xff) << 8) | (dg & 0xff);
-	      break;
-	    case BYTE_ORD_24_BRG:
-	      return ((db & 0xff) << 16) | ((dr & 0xff) << 8) | (dg & 0xff);
-	      break;
-	    case BYTE_ORD_24_BGR:
-	      return ((db & 0xff) << 16) | ((dg & 0xff) << 8) | (dr & 0xff);
-	      break;
-	    case BYTE_ORD_24_GRB:
-	      return ((dg & 0xff) << 16) | ((dr & 0xff) << 8) | (db & 0xff);
-	      break;
-	    case BYTE_ORD_24_GBR:
-	      return ((dg & 0xff) << 16) | ((db & 0xff) << 8) | (dr & 0xff);
-	      break;
-	    default:
-	      return 0;
-	      break;
-	    }
-	  break;
-	default:
-	  return 0;
-	  break;
-	}
-      return 0;
-    }
-  for (i = 0; i < id->num_colors; i++)
-    {
-      dr = *r - id->palette[i].r;
-      if (dr < 0)
-	dr = -dr;
-      dg = *g - id->palette[i].g;
-      if (dg < 0)
-	dg = -dg;
-      db = *b - id->palette[i].b;
-      if (db < 0)
-	db = -db;
-      dif = dr + dg + db;
-      if (dif < mindif)
-	{
-	  mindif = dif;
-	  col = i;
-	}
-    }
-  *r -= id->palette[col].r;
-  *g -= id->palette[col].g;
-  *b -= id->palette[col].b;
-  return col;
+  }
 }
 
 static void _rend_15 (_rend_t *r) {
@@ -384,34 +560,34 @@ static void _rend_15 (_rend_t *r) {
     case 5: {
       int y, jmp;
       unsigned short *img;
-      _rgba_t *left = r->err1, *right = r->err2;
+      _rgba_t *err = r->err;
 
       jmp = r->xim->bytes_per_line >> 1;
       img = (unsigned short *)r->xim->data;
       /* Floyd-Steinberg, pendulum style for less top row artifacts.
        * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-      for (y = 0; y < r->w + 2; y++)
-        right[y].w = 0;
+      for (y = 0; y < r->w + 4; y++)
+        err[y].w = 0;
 
       y = 0;
       while (y < r->h) {
         _rgba_t *p;
         int x;
 
-        left[1].w = 0;
+        err[1].w = 0;
         p = r->get_row (r, y);
         for (x = 0; x < r->w; x++) {
           _rgba_t v, t;
 
-          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 3].w >> 4) & 0x0f0f0f0f;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           p += 1;
           t.w = (v.w & _rgb15_err_mask.w) * 3;
-          left[x + 0].w += t.w;
-          left[x + 2].w  = t.w;
+          err[x + 0].w += t.w;
+          err[x + 2].w  = t.w;
           t.w = (v.w & _rgb15_err_mask.w) * 5;
-          right[x + 2].w += t.w;
-          left[x + 1].w  += t.w;
+          err[x + 4].w += t.w;
+          err[x + 1].w  += t.w;
           *img++ = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
         }
         img += jmp;
@@ -419,20 +595,20 @@ static void _rend_15 (_rend_t *r) {
         if (y >= r->h)
           break;
 
-        right[r->w].w = 0;
+        err[r->w + 2].w = 0;
         p = r->get_row (r, y) + r->w;
         for (x = r->w - 1; x >= 0; x--) {
           _rgba_t v, t;
 
-          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 1].w >> 4) & 0x0f0f0f0f;
           p -= 1;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           t.w = (v.w & _rgb15_err_mask.w) * 3;
-          right[x + 0].w  = t.w;
-          right[x + 2].w += t.w;
+          err[x + 2].w  = t.w;
+          err[x + 4].w += t.w;
           t.w = (v.w & _rgb15_err_mask.w) * 5;
-          left[x + 0].w += t.w;
-          right[x + 1].w  += t.w;
+          err[x + 0].w += t.w;
+          err[x + 3].w  += t.w;
           *--img = ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3);
         }
         img += jmp;
@@ -512,52 +688,52 @@ static void _rend_15 (_rend_t *r) {
     break;
     case 4: {
       int y;
-      _rgba_t *left = r->err1, *right = r->err2;
+      _rgba_t *err = r->err;
 
       /* Floyd-Steinberg, pendulum style for less top row artifacts.
        * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-      for (y = 0; y < r->w + 2; y++)
-        right[y].w = 0;
+      for (y = 0; y < r->w + 4; y++)
+        err[y].w = 0;
 
       y = 0;
       while (y < r->h) {
         _rgba_t *p;
         int x;
 
-        left[1].w = 0;
+        err[1].w = 0;
         p = r->get_row (r, y);
         for (x = 0; x < r->w; x++) {
           _rgba_t v, t;
 
-          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 3].w >> 4) & 0x0f0f0f0f;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           p += 1;
           t.w = (v.w & _rgb15_err_mask.w) * 3;
-          left[x + 0].w += t.w;
-          left[x + 2].w  = t.w;
+          err[x + 0].w += t.w;
+          err[x + 2].w  = t.w;
           t.w = (v.w & _rgb15_err_mask.w) * 5;
-          right[x + 2].w += t.w;
-          left[x + 1].w  += t.w;
+          err[x + 4].w += t.w;
+          err[x + 1].w  += t.w;
           XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3));
         }
         y += 1;
         if (y >= r->h)
           break;
 
-        right[r->w].w = 0;
+        err[r->w + 2].w = 0;
         p = r->get_row (r, y) + r->w;
         for (x = r->w - 1; x >= 0; x--) {
           _rgba_t v, t;
 
-          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 1].w >> 4) & 0x0f0f0f0f;
           p -= 1;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           t.w = (v.w & _rgb15_err_mask.w) * 3;
-          right[x + 0].w  = t.w;
-          right[x + 2].w += t.w;
+          err[x + 2].w  = t.w;
+          err[x + 4].w += t.w;
           t.w = (v.w & _rgb15_err_mask.w) * 5;
-          left[x + 0].w += t.w;
-          right[x + 1].w  += t.w;
+          err[x + 0].w += t.w;
+          err[x + 3].w  += t.w;
           XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 10) | ((uint32_t)v.b.g >> 3 << 5) | (v.b.b >> 3));
         }
         y += 1;
@@ -633,34 +809,34 @@ static void _rend_16 (_rend_t *r) {
     case 5: {
       int y, jmp;
       unsigned short *img;
-      _rgba_t *left = r->err1, *right = r->err2;
+      _rgba_t *err = r->err;
 
       jmp = r->xim->bytes_per_line >> 1;
       img = (unsigned short *)r->xim->data;
       /* Floyd-Steinberg, pendulum style for less top row artifacts.
        * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-      for (y = 0; y < r->w + 2; y++)
-        right[y].w = 0;
+      for (y = 0; y < r->w + 4; y++)
+        err[y].w = 0;
 
       y = 0;
       while (y < r->h) {
         _rgba_t *p;
         int x;
 
-        left[1].w = 0;
+        err[1].w = 0;
         p = r->get_row (r, y);
         for (x = 0; x < r->w; x++) {
           _rgba_t v, t;
 
-          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 3].w >> 4) & 0x0f0f0f0f;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           p += 1;
           t.w = (v.w & _rgb16_err_mask.w) * 3;
-          left[x + 0].w += t.w;
-          left[x + 2].w  = t.w;
+          err[x + 0].w += t.w;
+          err[x + 2].w  = t.w;
           t.w = (v.w & _rgb16_err_mask.w) * 5;
-          right[x + 2].w += t.w;
-          left[x + 1].w  += t.w;
+          err[x + 4].w += t.w;
+          err[x + 1].w  += t.w;
           *img++ = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
         }
         img += jmp;
@@ -668,20 +844,20 @@ static void _rend_16 (_rend_t *r) {
         if (y >= r->h)
           break;
 
-        right[r->w].w = 0;
+        err[r->w + 2].w = 0;
         p = r->get_row (r, y) + r->w;
         for (x = r->w - 1; x >= 0; x--) {
           _rgba_t v, t;
 
-          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 1].w >> 4) & 0x0f0f0f0f;
           p -= 1;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           t.w = (v.w & _rgb16_err_mask.w) * 3;
-          right[x + 0].w  = t.w;
-          right[x + 2].w += t.w;
+          err[x + 2].w  = t.w;
+          err[x + 4].w += t.w;
           t.w = (v.w & _rgb16_err_mask.w) * 5;
-          left[x + 0].w += t.w;
-          right[x + 1].w  += t.w;
+          err[x + 0].w += t.w;
+          err[x + 3].w  += t.w;
           *--img = ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3);
         }
         img += jmp;
@@ -761,52 +937,52 @@ static void _rend_16 (_rend_t *r) {
     break;
     case 4: {
       int y;
-      _rgba_t *left = r->err1, *right = r->err2;
+      _rgba_t *err = r->err;
 
       /* Floyd-Steinberg, pendulum style for less top row artifacts.
        * error components are 0 <= e < 16 * 7 and can thus be vectorized. */
-      for (y = 0; y < r->w + 2; y++)
-        right[y].w = 0;
+      for (y = 0; y < r->w + 4; y++)
+        err[y].w = 0;
 
       y = 0;
       while (y < r->h) {
         _rgba_t *p;
         int x;
 
-        left[1].w = 0;
+        err[1].w = 0;
         p = r->get_row (r, y);
         for (x = 0; x < r->w; x++) {
           _rgba_t v, t;
 
-          v.w = (right[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 3].w >> 4) & 0x0f0f0f0f;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           p += 1;
           t.w = (v.w & _rgb16_err_mask.w) * 3;
-          left[x + 0].w += t.w;
-          left[x + 2].w  = t.w;
+          err[x + 0].w += t.w;
+          err[x + 2].w  = t.w;
           t.w = (v.w & _rgb16_err_mask.w) * 5;
-          right[x + 2].w += t.w;
-          left[x + 1].w  += t.w;
+          err[x + 4].w += t.w;
+          err[x + 1].w  += t.w;
           XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3));
         }
         y += 1;
         if (y >= r->h)
           break;
 
-        right[r->w].w = 0;
+        err[r->w + 2].w = 0;
         p = r->get_row (r, y) + r->w;
         for (x = r->w - 1; x >= 0; x--) {
           _rgba_t v, t;
 
-          v.w = (left[x + 1].w >> 4) & 0x0f0f0f0f;
+          v.w = (err[x + 1].w >> 4) & 0x0f0f0f0f;
           p -= 1;
           v.w = _add_4_uint8_sat (p[0].w, v.w);
           t.w = (v.w & _rgb16_err_mask.w) * 3;
-          right[x + 0].w  = t.w;
-          right[x + 2].w += t.w;
+          err[x + 2].w  = t.w;
+          err[x + 4].w += t.w;
           t.w = (v.w & _rgb16_err_mask.w) * 5;
-          left[x + 0].w += t.w;
-          right[x + 1].w  += t.w;
+          err[x + 0].w += t.w;
+          err[x + 3].w  += t.w;
           XPutPixel (r->xim, x, y, ((uint32_t)v.b.r >> 3 << 11) | ((uint32_t)v.b.g >> 2 << 5) | (v.b.b >> 3));
         }
         y += 1;
@@ -1020,445 +1196,6 @@ static void _rend_24 (_rend_t *r) {
   }
 }
 
-static void
-render (ImlibData * id, int w, int h, XImage *xim, int *er1, int *er2, int *xarray, unsigned char **yarray, int bpp)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * (bpp >> 3);
-  img = (unsigned char *)xim->data;
-  switch (id->render_type)
-    {
-    case RT_PLAIN_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  val = _best_color_match_8 (id, &r, &g, &b);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  val = _best_color_match_8 (id, &r, &g, &b);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_PLAIN_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = _best_color_match_8 (id, &er, &eg, &eb);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = _best_color_match_8 (id, &er, &eg, &eb);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		  er = ERROR_RED(er, val);
-		  eg = ERROR_GRN(eg, val);
-		  eb = ERROR_BLU(eb, val);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  *img++ = COLOR_INDEX(val);
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		  er = ERROR_RED(er, val);
-		  eg = ERROR_GRN(eg, val);
-		  eb = ERROR_BLU(eb, val);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  XPutPixel(xim, x, y, COLOR_INDEX(val));
-		}
-	    }
-	}
-      break;
-    default: ;
-    }
-}
-
-static void
-render_mod(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
-	   int *er1, int *er2, int *xarray,
-	   unsigned char **yarray, int bpp)
-{
-  int                 x, y, val, r, g, b, *ter, ex, er, eg, eb;
-  unsigned char      *ptr2;
-  unsigned char      *img;
-  int                 jmp;
-
-  jmp = (xim->bytes_per_line) - w * (bpp >> 3);
-  img = (unsigned char *)xim->data;
-  switch (id->render_type)
-    {
-    case RT_PLAIN_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = _best_color_match_8 (id, &r, &g, &b);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = _best_color_match_8 (id, &r, &g, &b);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_PLAIN_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  val = COLOR_RGB(r >> 3, g >> 3, b >> 3);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = _best_color_match_8 (id, &er, &eg, &eb);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  *img++ = val;
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = _best_color_match_8 (id, &er, &eg, &eb);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  XPutPixel(xim, x, y, val);
-		}
-	    }
-	}
-      break;
-    case RT_DITHER_PALETTE_FAST:
-      if ((id->fastrend) && (xim->bits_per_pixel == 8))
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		  er = ERROR_RED(er, val);
-		  eg = ERROR_GRN(eg, val);
-		  eb = ERROR_BLU(eb, val);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  *img++ = COLOR_INDEX(val);
-		}
-	      img += jmp;
-	    }
-	}
-      else
-	{
-	  for (y = 0; y < h; y++)
-	    {
-	      ter = er1;
-	      er1 = er2;
-	      er2 = ter;
-	      for (ex = 0; ex < (w + 2) * 3; ex++)
-		er2[ex] = 0;
-	      ex = 3;
-	      for (x = 0; x < w; x++)
-		{
-		  ptr2 = yarray[y] + xarray[x];
-		  r = (int)*ptr2++;
-		  g = (int)*ptr2++;
-		  b = (int)*ptr2;
-		  r = im->rmap[r];
-		  g = im->gmap[g];
-		  b = im->bmap[b];
-		  er = r + er1[ex++];
-		  eg = g + er1[ex++];
-		  eb = b + er1[ex++];
-                  CLIP_UINT8 (er);
-                  CLIP_UINT8 (eg);
-                  CLIP_UINT8 (eb);
-		  val = INDEX_RGB(er >> 3, eg >> 3, eb >> 3);
-		  er = ERROR_RED(er, val);
-		  eg = ERROR_GRN(eg, val);
-		  eb = ERROR_BLU(eb, val);
-		  DITHER_ERROR(er1, er2, ex, er, eg, eb);
-		  XPutPixel(xim, x, y, COLOR_INDEX(val));
-		}
-	    }
-	}
-      break;
-    default: ;
-    }
-}
-
-
 static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask, int w, int h) {
   int y;
   if (!mask)
@@ -1556,7 +1293,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   static GC           tgc = 0, stgc = 0;
   XGCValues           gcv;
   unsigned char      *tmp, *stmp, **yarray, *ptr22;
-  int                 w4, x, inc, pos, *er1, *er2, *xarray, bpp;
+  int                 w4, x, inc, pos, *xarray, bpp;
   Pixmap              pmap, mask;
   int                 shared_pixmap, shared_image;
 #ifdef HAVE_SHM
@@ -1623,8 +1360,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   r = _rend_new (w, h);
   if (!r)
     return 0;
-  er1 = (int *)r->err1;
-  er2 = (int *)r->err2;
   xarray = r->xarray;
   yarray = (uint8_t **)r->yarray;
   if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
@@ -1638,6 +1373,9 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   r->mod_r = im->rmap;
   r->mod_g = im->gmap;
   r->mod_b = im->bmap;
+  r->pal = id->palette;
+  r->num_pal_entries = id->num_colors;
+  r->tab_15_8 = id->fast_rgb;
   r->qual = id->hiq ? (id->ordered_dither ? 1 : 2) : 0;
   r->fast = id->fastrend;
 
@@ -2008,18 +1746,13 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     _rend_16 (r);
   else if ((bpp == 24) || (bpp == 32))
     _rend_24 (r);
+  else if (bpp == 8)
+    _rend_8 (r);
 
   /* copy XImage to the pixmap, if not a shared pixmap */
   if (im->shape)
     {
       _imlib_fill_mask (yarray, xarray, sxim, w, h);
-      if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
-	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
-	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
-	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-        render (id, w, h, xim, er1, er2, xarray, yarray, bpp);
-      else
-        render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
       if (shared_image)
 	{
@@ -2084,13 +1817,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     }
   else
     {
-      if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
-	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
-	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
-	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
-        render (id, w, h, xim, er1, er2, xarray, yarray, bpp);
-      else
-        render_mod (id, im, w, h, xim, er1, er2, xarray, yarray, bpp);
 #ifdef HAVE_SHM
       if (shared_image)
 	{
@@ -2142,3 +1868,4 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   add_pixmap(id, im, w, h, xim, sxim);
   return 1;
 }
+
