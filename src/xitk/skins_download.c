@@ -380,119 +380,94 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
   download_set_cursor_state(skd, WAIT_CURS);
 
-  if((network_download(skd->slxs[selected]->skin.href, &download))) {
+  do {
+    char skindir[2048], *skinname, *skinend, *end = skindir + sizeof (skindir) - 8;
     char *filename;
+    struct stat  st;
 
-    filename = strrchr(skd->slxs[selected]->skin.href, '/');
+    if (!network_download (skd->slxs[selected]->skin.href, &download)) {
+      xine_error (gui, _("Unable to download '%s': %s"), skd->slxs[selected]->skin.href, download.error);
+      break;
+    }
 
-    if(filename)
+    filename = strrchr (skd->slxs[selected]->skin.href, '/');
+    if (filename)
       filename++;
     else
       filename = skd->slxs[selected]->skin.href;
+    if (!filename[0])
+      break;
+    if (strlen (filename) <= strlen (".tar.gz"))
+      break;
 
-    if(filename[0] && (strlen(filename) > strlen(".tar.gz"))) {
-      struct stat  st;
-      char         skindir[XITK_PATH_MAX + 1];
-
-      snprintf(skindir, sizeof(skindir), "%s%s", xine_get_homedir(), "/.xine/skins");
-
-      /*
-       * Make sure to have the directory
-       */
-      if(stat(skindir, &st) < 0)
-        (void) mkdir_safe(skindir);
-
-      if(stat(skindir, &st) < 0) {
+    skinname = skindir + strlcpy (skindir, xine_get_homedir (), end - skindir);
+    if (skinname >= end)
+      skinname = end;
+    skinname += strlcpy (skinname, "/.xine/skins", end - skinname);
+    if (skinname >= end)
+      skinname = end;
+    /* Make sure to have the directory */
+    if (stat (skindir, &st) < 0) {
+      (void)mkdir_safe (skindir);
+      if (stat (skindir, &st) < 0) {
         xine_error (gui, _("Unable to create '%s' directory: %s."), skindir, strerror(errno));
-      }
-      else {
-        char   tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-        FILE  *fd;
-
-        snprintf(tmpskin, sizeof(tmpskin), "%s%u%s", "/tmp/", (unsigned int)time(NULL), filename);
-
-        if((fd = fopen(tmpskin, "w+b")) != NULL) {
-          char      buffer[2048];
-          char     *cmd;
-          char     *fskin_path;
-          int       i, skin_found = -1, len;
-
-          fwrite(download.buf, download.size, 1, fd);
-          fflush(fd);
-          fclose(fd);
-
-          cmd = xitk_asprintf("%s %s %s %s %s", "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
-          if (cmd)
-            xine_system(0, cmd);
-          free(cmd);
-          unlink(tmpskin);
-
-          len = strlen(filename) - strlen(".tar.gz");
-          if (len > (int)sizeof(buffer) - 1) len = sizeof(buffer) - 1;
-          memcpy(buffer, filename, len);
-          buffer[len] = '\0';
-
-          fskin_path = xitk_asprintf("%s/%s/%s", skindir, buffer, "doinst.sh");
-          if (fskin_path && is_a_file(fskin_path)) {
-            char *doinst;
-
-            doinst = xitk_asprintf("%s %s/%s %s", "cd", skindir, buffer, "&& ./doinst.sh");
-            if (doinst)
-              xine_system(0, doinst);
-            free(doinst);
-          }
-          free(fskin_path);
-
-          for(i = 0; i < skins_avail_num; i++) {
-            if((!strcmp(skins_avail[i]->pathname, skindir))
-               && (!strcmp(skins_avail[i]->skin, buffer))) {
-              skin_found = i;
-              break;
-            }
-          }
-
-          if(skin_found == -1) {
-            skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
-            skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
-
-            skins_avail[skins_avail_num] = (skins_locations_t *) calloc(1, sizeof(skins_locations_t));
-            skins_avail[skins_avail_num]->pathname = strdup(skindir);
-            skins_avail[skins_avail_num]->skin = strdup(buffer);
-            skins_avail[skins_avail_num]->number = skins_avail_num;
-
-            skin_names[skins_avail_num] = strdup(skins_avail[skins_avail_num]->skin);
-
-            skins_avail_num++;
-
-            skins_avail[skins_avail_num] = NULL;
-            skin_names[skins_avail_num] = NULL;
-
-            /* Re-register skin enum config, a new one has been added */
-            (void) xine_config_register_enum (__xineui_global_xine_instance, "gui.skin",
-                                              (get_skin_offset(DEFAULT_SKIN)),
-                                              skin_names,
-                                              _("gui skin theme"),
-                                              CONFIG_NO_HELP,
-                                              CONFIG_LEVEL_EXP,
-                                              skin_change_cb,
-                                              CONFIG_NO_DATA);
-          }
-          else
-            xine_info (gui, _("Skin %s correctly installed"), buffer);
-
-          /* Okay, load this skin */
-          select_new_skin((skin_found >= 0) ? skin_found : skins_avail_num - 1);
-        }
-        else
-          xine_error (gui, _("Unable to create '%s'."), tmpskin);
-
+        break;
       }
     }
-  }
-  else
-    xine_error (gui, _("Unable to download '%s': %s"),
-      skd->slxs[selected]->skin.href, download.error);
 
+    {
+      char  tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 2], *cmd;
+      FILE *fd;
+      snprintf (tmpskin, sizeof (tmpskin), "%s%u%s", "/tmp/", (unsigned int)time (NULL), filename);
+      if (!(fd = fopen (tmpskin, "w+b"))) {
+        xine_error (gui, _("Unable to create '%s'."), tmpskin);
+        break;
+      }
+      fwrite (download.buf, download.size, 1, fd);
+      fflush (fd);
+      fclose (fd);
+      cmd = xitk_asprintf ("%s %s %s %s %s",
+        "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
+      if (cmd) {
+        xine_system (0, cmd);
+        free (cmd);
+      }
+      unlink (tmpskin);
+    }
+
+    *skinname++ = '/';
+    {
+      size_t len = strlen (filename) - strlen (".tar.gz");
+      if (len > (size_t)(end - skinname))
+        len = end - skinname;
+      memcpy (skinname, filename, len);
+      skinend = skinname + len;
+      *skinend = 0;
+    }
+
+    {
+      char *doinst;
+      strlcpy (skinend, "/doinst.sh", end - skinend);
+      if (!is_a_file (skindir))
+        break;
+      *skinend = 0;
+      doinst = xitk_asprintf ("cd %s && ./doinst.sh", skindir);
+      if (doinst) {
+        xine_system (0, doinst);
+        free (doinst);
+      }
+    }
+
+    {
+      int r = skin_add_1 (gui, skindir, skinname, skinend);
+      if (r >= 0) {
+        xine_info (gui, _("Skin %s correctly installed"), skinname);
+        /* Okay, load this skin */
+        skin_select (gui, r);
+      }
+    }
+  } while (0);
+    
   download_set_cursor_state(skd, NORMAL_CURS);
 
   free(download.buf);
@@ -525,12 +500,12 @@ static const xitk_event_cbs_t download_skin_event_cbs = {
 };
 
 
-void download_skin_end(xui_skdloader_t *skd) {
+void skin_download_end (xui_skdloader_t *skd) {
   if (skd)
     download_skin_exit(NULL, skd);
 }
 
-void download_skin(gGui_t *gui, char *url) {
+void skin_download (gGui_t *gui, char *url) {
   slx_entry_t         **slxs;
   xitk_pixmap_t        *bg;
   xitk_widget_t        *widget;

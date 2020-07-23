@@ -996,7 +996,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
 #ifdef HAVE_TAR
   case ACTID_SKINDOWNLOAD:
-    download_skin(gui, gui->skin_server_url);
+    skin_download (gui, gui->skin_server_url);
     break;
 #endif
 
@@ -1435,6 +1435,7 @@ void gui_deinit (gGui_t *gui) {
   while (gui->event_pending > 0)
     pthread_cond_wait (&gui->event_safe, &gui->event_mutex);
   pthread_mutex_unlock (&gui->event_mutex);
+  skin_deinit (gui);
 }
 
 /*
@@ -1738,12 +1739,12 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   gui->icon = xitk_pixmap_create_from_data(gui->xitk, 40, 40, (const char *)icon_datas);
 
 
-  preinit_skins_support();
+  skin_preinit (gui);
   
   if(gui->splash)
     splash_create();
 
-  init_skins_support();
+  skin_init (gui);
 
   gui->on_quit = 0;
   gui->running = 1;

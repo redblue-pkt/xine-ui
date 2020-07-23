@@ -32,10 +32,11 @@
 static xitk_window_t     *xwin = NULL;
 
 void splash_create(void) {
+  gGui_t *gui = gGui;
   xitk_image_t *xim;
   const char   *splash_image = XINE_SPLASH;
   char         *skin_splash_image = NULL;
-  char         *skin_path = skin_get_current_skin_dir();
+  char         *skin_path = skin_get_current_skin_dir (gui);
   
   if(skin_path && is_a_dir((char *) skin_path)) {
     static const char types[][4] = { "png", "jpg" };

@@ -30,6 +30,7 @@
 
 #include <xine.h>
 #include <xine/xineutils.h>
+#include <xine/sorted_array.h>
 
 typedef struct gGui_st gGui_t;
 
@@ -158,6 +159,8 @@ typedef struct gGui_st gGui_t;
 #define XUI_W_TOGGLE NULL
 #define XUI_W_ON ((xitk_widget_t *)1)
 #define XUI_W_OFF ((xitk_widget_t *)2)
+
+typedef struct skins_locations_s skins_locations_t;
 
 struct gGui_st {
   xine_t                   *xine;
@@ -375,6 +378,15 @@ struct gGui_st {
   filebrowser_t             *load_stream;
   filebrowser_t             *load_sub;
   int                        last_playback_speed;
+
+  struct {
+    int                      (*get_names)(gGui_t *gui, const char **names, int max);
+    xine_sarray_t           *avail;
+    skins_locations_t       *default_skin;
+    skins_locations_t       *current_skin;
+    int                      num;
+    int                      change_config_entry;
+  } skins;
 };
 
 extern gGui_t *gGui;
