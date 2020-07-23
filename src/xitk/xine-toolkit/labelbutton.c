@@ -446,6 +446,8 @@ static void _notify_change_skin (_lbutton_private_t *wp, xitk_skin_config_t *sko
       wp->w.y      = info->y;
       wp->w.width  = wp->skin.width / 3;
       wp->w.height = wp->skin.height;
+      wp->label_dy = (info->label_y > 0) && (info->label_y < wp->skin.height)
+                   ? info->label_y - (wp->skin.height >> 1) : 0;
       wp->w.visible = info->visibility ? 1 : -1;
       wp->w.enable = info->enability;
       xitk_image_free_image (&wp->temp_image.image);
