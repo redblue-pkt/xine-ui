@@ -14,6 +14,8 @@ extern              "C"
 
   ImlibData          *Imlib_init(Display * disp);
   ImlibData	     *Imlib_init_with_params(Display * disp, ImlibInitParams * p);
+  /* -2: return max; -1: return current; 0..max: return redraw_needed. */
+  int                 Imlib_gfx_quality (ImlibData *im, int qual);
   ImlibImage         *Imlib_load_image(ImlibData * id, const char *file);
   ImlibImage         *Imlib_decode_image(ImlibData * id, const void *data, size_t size);
   void                Imlib_apply_image(ImlibData * id, ImlibImage * im, Window p);

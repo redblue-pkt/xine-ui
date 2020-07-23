@@ -2564,4 +2564,6 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
   return _xitk_image_create(wl, NULL, im, x, y, NULL, image);
 }
 
-
+int xitk_image_quality (xitk_t *xitk, int qual) {
+  return Imlib_gfx_quality (xitk->imlibdata, qual);
+}

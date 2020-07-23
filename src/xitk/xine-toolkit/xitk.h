@@ -1278,6 +1278,11 @@ const char *xitk_label_get_label(xitk_widget_t *w);
  */
 
 /**
+ * -2: return max; -1: return current; 0..max: return redraw_needed.
+ */
+int xitk_image_quality (xitk_t *xitk, int qual);
+
+/**
  * Load image and return a xitk_image_t data type.
  */
 xitk_image_t *xitk_image_load_image(xitk_t *xitk, const char *image);

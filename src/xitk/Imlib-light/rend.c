@@ -1869,3 +1869,22 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   return 1;
 }
 
+int Imlib_gfx_quality (ImlibData *im, int qual) {
+  int old;
+  if (!im)
+    return 0;
+  if (qual == -2)
+    return 2;
+  old = im->hiq ? (im->ordered_dither ? 1 : 2) : 0;
+  if (qual == -1)
+    return old;
+  if (qual < 0)
+    qual = 0;
+  else if (qual > 2)
+    qual = 2;
+  if (old == qual)
+    return 0;
+  im->hiq = (qual > 0);
+  im->ordered_dither = (qual == 1);
+  return im->x.depth < 24;
+}
