@@ -1196,7 +1196,7 @@ static void _rend_24 (_rend_t *r) {
   }
 }
 
-static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask, int w, int h) {
+static void _imlib_fill_mask (_rgba_t **yarray, int *xarray, XImage *mask, int w, int h) {
   int y;
   if (!mask)
     return;
@@ -1206,33 +1206,33 @@ static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask,
     int stop = w & ~7;
     if (mask->bitmap_bit_order == 0) {
       for (y = 0; y < h; y++) {
-        const uint8_t *p = yarray[y] + 3;
+        const _rgba_t *p = yarray[y];
         int x;
         for (x = 0; x < stop; x += 8) {
-          *q++ = ((p[xarray[x]    ] & 0x80) >> 7)
-               | ((p[xarray[x + 1]] & 0x80) >> 6)
-               | ((p[xarray[x + 2]] & 0x80) >> 5)
-               | ((p[xarray[x + 3]] & 0x80) >> 4)
-               | ((p[xarray[x + 4]] & 0x80) >> 3)
-               | ((p[xarray[x + 5]] & 0x80) >> 2)
-               | ((p[xarray[x + 6]] & 0x80) >> 1)
-               | ((p[xarray[x + 7]] & 0x80) >> 0);
+          *q++ = ((p[xarray[x]    ].b.a & 0x80) >> 7)
+               | ((p[xarray[x + 1]].b.a & 0x80) >> 6)
+               | ((p[xarray[x + 2]].b.a & 0x80) >> 5)
+               | ((p[xarray[x + 3]].b.a & 0x80) >> 4)
+               | ((p[xarray[x + 4]].b.a & 0x80) >> 3)
+               | ((p[xarray[x + 5]].b.a & 0x80) >> 2)
+               | ((p[xarray[x + 6]].b.a & 0x80) >> 1)
+               | ((p[xarray[x + 7]].b.a & 0x80) >> 0);
         }
         if (x < w) {
           do {
-            *q  = ((p[xarray[x]] & 0x80) >> 7);
+            *q  = ((p[xarray[x]].b.a & 0x80) >> 7);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 6);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 6);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 5);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 5);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 4);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 4);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 3);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 3);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 2);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 2);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 1);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 1);
           } while (0);
           q++;
         }
@@ -1240,33 +1240,33 @@ static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask,
       }
     } else {
       for (y = 0; y < h; y++) {
-        const uint8_t *p = yarray[y] + 3;
+        const _rgba_t *p = yarray[y];
         int x;
         for (x = 0; x < stop; x += 8) {
-          *q++ = ((p[xarray[x]    ] & 0x80) >> 0)
-               | ((p[xarray[x + 1]] & 0x80) >> 1)
-               | ((p[xarray[x + 2]] & 0x80) >> 2)
-               | ((p[xarray[x + 3]] & 0x80) >> 3)
-               | ((p[xarray[x + 4]] & 0x80) >> 4)
-               | ((p[xarray[x + 5]] & 0x80) >> 5)
-               | ((p[xarray[x + 6]] & 0x80) >> 6)
-               | ((p[xarray[x + 7]] & 0x80) >> 7);
+          *q++ = ((p[xarray[x]    ].b.a & 0x80) >> 0)
+               | ((p[xarray[x + 1]].b.a & 0x80) >> 1)
+               | ((p[xarray[x + 2]].b.a & 0x80) >> 2)
+               | ((p[xarray[x + 3]].b.a & 0x80) >> 3)
+               | ((p[xarray[x + 4]].b.a & 0x80) >> 4)
+               | ((p[xarray[x + 5]].b.a & 0x80) >> 5)
+               | ((p[xarray[x + 6]].b.a & 0x80) >> 6)
+               | ((p[xarray[x + 7]].b.a & 0x80) >> 7);
         }
         if (x < w) {
           do {
-            *q  = ((p[xarray[x]] & 0x80) >> 0);
+            *q  = ((p[xarray[x]].b.a & 0x80) >> 0);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 1);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 1);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 2);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 2);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 3);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 3);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 4);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 4);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 5);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 5);
             if (++x >= w) break;
-            *q |= ((p[xarray[x]] & 0x80) >> 6);
+            *q |= ((p[xarray[x]].b.a & 0x80) >> 6);
           } while (0);
           q++;
         }
@@ -1276,10 +1276,10 @@ static void _imlib_fill_mask (unsigned char **yarray, int *xarray, XImage *mask,
     return;
   }
   for (y = 0; y < h; y++) {
-    unsigned char *p = yarray[y];
+    const _rgba_t *p = yarray[y];
     int x;
     for (x = 0; x < w; x++) {
-      XPutPixel (mask, x, y, p[xarray[x] + 3] >> 7);
+      XPutPixel (mask, x, y, p[xarray[x]].b.a >> 7);
     }
   }
 }
@@ -1423,21 +1423,21 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
     if (l)
       for (x = 0; x < l; x++)
 	{
-	  xarray[x] = (pos >> 16) * 4;
+	  xarray[x] = pos >> 16;
 	  pos += 0x10000;
 	}
     if (m)
       {
 	for (x = l; x < l + m; x++)
 	  {
-	    xarray[x] = (pos >> 16) * 4;
+	    xarray[x] = pos >> 16;
 	    pos += inc;
 	  }
       }
     pos = (im->rgb_width - r) << 16;
     for (x = w - r; x < w; x++)
       {
-	xarray[x] = (pos >> 16) * 4;
+	xarray[x] = pos >> 16;
 	pos += 0x10000;
       }
 
@@ -1752,7 +1752,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   /* copy XImage to the pixmap, if not a shared pixmap */
   if (im->shape)
     {
-      _imlib_fill_mask (yarray, xarray, sxim, w, h);
+      _imlib_fill_mask (r->yarray, r->xarray, sxim, w, h);
 #ifdef HAVE_SHM
       if (shared_image)
 	{
