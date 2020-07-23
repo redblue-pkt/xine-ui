@@ -298,6 +298,8 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
     }
   }
 
+  bl->fillx = x;
+  bl->filly = y;
   xitk_set_widget_pos (bl->widgets[i], x, y);
   xitk_disable_and_hide_widget (bl->widgets[i]);
   i++;
