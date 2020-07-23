@@ -22,24 +22,20 @@
 #ifndef SKINS_H
 #define SKINS_H
 
-typedef struct {
-  const char *pathname;
-  const char *skin;
-  int         number;
-} skins_locations_t;
-
-skins_locations_t **get_available_skins(void);
-int get_available_skins_num(void);
-void preinit_skins_support(void);
-void init_skins_support(void);
-void select_new_skin(int selected);
-char *skin_get_current_skin_dir(void);
+int skin_get_names (gGui_t *gui, const char **names, int max);
+int skin_add_1 (gGui_t *gui, const char *fullname, const char *name, const char *end);
+const char *skin_get_name (gGui_t *gui, int index);
+void skin_preinit (gGui_t *gui);
+void skin_init (gGui_t *gui);
+void skin_deinit (gGui_t *gui);
+void skin_select (gGui_t *gui, int selected);
+char *skin_get_current_skin_dir (gGui_t *gui);
 
 typedef struct xui_skdloader_s xui_skdloader_t;
 
 #ifdef HAVE_TAR
-void download_skin(gGui_t *gui, char *url);
-void download_skin_end(xui_skdloader_t *skd);
+void skin_download (gGui_t *gui, char *url);
+void skin_download_end (xui_skdloader_t *skd);
 #endif
 
 #endif

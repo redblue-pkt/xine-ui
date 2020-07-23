@@ -27,10 +27,6 @@
 
 #undef SKIN_DEBUG
 
-extern skins_locations_t **skins_avail;
-extern int                 skins_avail_num;
-extern char               **skin_names;
-
 int get_skin_offset(const char *skin);
 void skin_change_cb(void *data, xine_cfg_entry_t *cfg);
 

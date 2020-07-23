@@ -80,7 +80,7 @@ static void control_select_new_skin (xitk_widget_t *w, void *data, int selected,
   (void)w;
   if (vctrl) {
     xitk_browser_release_all_buttons (vctrl->skinlist);
-    select_new_skin (selected);
+    skin_select (vctrl->gui, selected);
   }
 }
 
@@ -384,14 +384,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     }
   }
 
-  {
-    skins_locations_t **sks = get_available_skins ();
-    int i;
-
-    vctrl->skins_num = get_available_skins_num ();
-    for (i = 0; i < vctrl->skins_num; i++)
-      vctrl->skins[i] = strdup (sks[i]->skin);
-  }
+  vctrl->skins_num = skin_get_names (vctrl->gui, vctrl->skins, sizeof (vctrl->skins) / sizeof (vctrl->skins[0]));
   
   lbl.skin_element_name = "CtlSkLbl";
   /* TRANSLATORS: only ASCII characters (skin) */
@@ -456,9 +449,6 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
     vctrl->xwin = NULL;
 
     /* xitk_dlist_init (&control->widget_list->list); */
-
-    for (i = 0; i < vctrl->skins_num; i++)
-      free ((char *)vctrl->skins[i]);
 
     for (i = 0; i < NUM_SLIDERS; i++)
       vctrl->items[0].w = NULL;
