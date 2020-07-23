@@ -445,17 +445,17 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
       *skinend = 0;
     }
 
-    {
+    strlcpy (skinend, "/doinst.sh", end - skinend);
+    if (is_a_file (skindir)) {
       char *doinst;
-      strlcpy (skinend, "/doinst.sh", end - skinend);
-      if (!is_a_file (skindir))
-        break;
       *skinend = 0;
       doinst = xitk_asprintf ("cd %s && ./doinst.sh", skindir);
       if (doinst) {
         xine_system (0, doinst);
         free (doinst);
       }
+    } else {
+      *skinend = 0;
     }
 
     {

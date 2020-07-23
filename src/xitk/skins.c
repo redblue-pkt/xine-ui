@@ -88,13 +88,17 @@ int skin_add_1 (gGui_t *gui, const char *fullname, const char *name, const char 
   if (!gui || !fullname || !name || !end)
     return -1;
   if (_skin_add_1 (gui, &index, fullname, name, end)) {
-    /* Attempt to update the existing config entry */
-    const char *names[64];
-    skin_get_names (gui, names, sizeof (names) / sizeof (names[0]));
-    xine_config_register_enum (__xineui_global_xine_instance, "gui.skin",
-      _skin_name_index (gui, DEFAULT_SKIN), (char **)names,
-      _("gui skin theme"),
-      CONFIG_NO_HELP, CONFIG_LEVEL_BEG, skin_change_cb, gui);
+    /* Attempt to update the existing config entry. Works with libxine 2020-07-23 (1.2.10hg).
+     * Kills callback with old libxine. */
+    int v1, v2, v3;
+    xine_get_version (&v1, &v2, &v3);
+    if (((v1 << 16) | (v2 << 8) | v3) >= 0x01020a) {
+      const char *names[64];
+      skin_get_names (gui, names, sizeof (names) / sizeof (names[0]));
+      xine_config_register_enum (__xineui_global_xine_instance, "gui.skin",
+        _skin_name_index (gui, DEFAULT_SKIN), (char **)names,
+        _("gui skin theme"), CONFIG_NO_HELP, CONFIG_LEVEL_BEG, NULL, NULL);
+    }
   }
   return index;
 }
@@ -203,7 +207,7 @@ static void _skin_add_dir (gGui_t *gui, const char *path) {
       fprintf (stderr, "skinconfig file '%s' is missing: skin skipped.\n", b);
       continue;
     }
-    *dend = 0;
+    *--dend = 0;
     s = _skin_add_1 (gui, &index, b, pend, dend);
 #ifdef SKIN_DEBUG
     if (s)
@@ -326,8 +330,9 @@ static int _skin_alter (gGui_t *gui, int index) {
 static void gfx_quality_cb (void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   if (xitk_image_quality (gui->xitk, cfg->num_value)) {
-    /* redraw skin */
-    ;
+    /* redraw skin. yes this does not need a full reload but this is rare,
+     * and we dont want to add a whole new redraw API ;-) */
+    _skin_alter (gui, _skin_name_index (gui, NULL));
   }
 }
 
@@ -338,8 +343,10 @@ void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   int index, retval;
   
-  if (!gui->skins.avail || !gui->skins.change_config_entry)
+  if (!gui->skins.avail || gui->skins.change_config_entry)
     return;
+  /* no recursion, please. */
+  gui->skins.change_config_entry += 1;
   /* First, try to see if the skin exist somewhere */
   index = cfg->num_value;
 /*
@@ -359,6 +366,7 @@ void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
     else
       cfg->num_value = _skin_name_index (gui, DEFAULT_SKIN);
   }
+  gui->skins.change_config_entry -= 1;
 }
 
 /*
@@ -391,7 +399,7 @@ char *skin_get_current_skin_dir (gGui_t *gui) {
  * Initialize skin support.
  */
 void skin_preinit (gGui_t *gui) {
-  gui->skins.change_config_entry = 0;
+  gui->skins.change_config_entry = 1;
   
   gui->skin_config = xitk_skin_init_config (gui->xitk);
   
@@ -482,7 +490,7 @@ void skin_init (gGui_t *gui) {
   }
 
   gui->skins.current_skin = sk;
-  gui->skins.change_config_entry = 1;
+  gui->skins.change_config_entry = 0;
 
   if((skin_anim = xitk_skin_get_animation (gui->skin_config)) != NULL) {
     gui->visual_anim.mrls[gui->visual_anim.num_mrls++] = strdup(skin_anim);
