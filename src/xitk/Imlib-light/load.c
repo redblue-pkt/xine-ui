@@ -115,19 +115,23 @@ static unsigned char *_LoadPNG(ImlibData * id,
   }
 
   /* Setup Translators */
-  if (color_type == PNG_COLOR_TYPE_PALETTE)
+  /* Long term libpng BUG: palette images are always reported without alpha :-/ */
+  if (png_get_valid (png_ptr, info_ptr, PNG_INFO_tRNS))
+    color_type |= PNG_COLOR_MASK_ALPHA;
+#ifndef PNG_COLOR_TYPE_PALETTE_ALPHA
+#  define PNG_COLOR_TYPE_PALETTE_ALPHA (PNG_COLOR_MASK_PALETTE | PNG_COLOR_MASK_ALPHA)
+#endif
+  if (color_type & PNG_COLOR_MASK_PALETTE)
     png_set_expand(png_ptr);
   png_set_strip_16(png_ptr);
   png_set_packing(png_ptr);
-  if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-    png_set_expand(png_ptr);
   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
   png_read_image(png_ptr, lines);
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
   trans = 1;
-  if ((color_type == PNG_COLOR_TYPE_GRAY_ALPHA) || (color_type == PNG_COLOR_TYPE_GRAY)) {
+  if (!(color_type & PNG_COLOR_MASK_COLOR)) {
     const uint8_t *p = (const uint8_t *)lines[0];
     uint32_t *q = (uint32_t *)data;
     int n;
@@ -143,7 +147,7 @@ static unsigned char *_LoadPNG(ImlibData * id,
       p += 2;
       *q++ = v.w;
     }
-  } else if (color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
+  } else if (color_type & PNG_COLOR_MASK_ALPHA) {
     int n;
     const uint32_t *p = (const uint32_t *)data;
     union {
