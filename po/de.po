@@ -6,14 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-12-06 14:19+0200\n"
+"POT-Creation-Date: 2020-07-25 13:52+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 
 #, c-format
 msgid ""
@@ -157,10 +157,6 @@ msgstr "Audio Nach-Plugin: %s."
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV-Modus: %d"
-
-#, c-format
-msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
 
 msgid "Select"
 msgstr "Auswählen"
@@ -398,9 +394,6 @@ msgstr ""
 msgid "Opening mozilla web browser, this might take a while..."
 msgstr "Öffne Mozilla Web-Browser, was ein wenig dauern kann..."
 
-msgid "Warning"
-msgstr "Warnung"
-
 msgid ""
 "The amount of dropped frame is too high, your system might be slow, not "
 "properly optimized or just too loaded.\n"
@@ -477,16 +470,6 @@ msgstr "Stopp"
 msgid "Continue"
 msgstr "Weiter"
 
-#, c-format
-msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
-msgstr ""
-"gui_main: Ausgewähltes Visual %#lx existiert nicht, versuche Standard-"
-"Visual\n"
-
-#, c-format
-msgid "gui_main: couldn't find true color visual.\n"
-msgstr "gui_main: Konnte Echtfarb-Visual nicht finden.\n"
-
 msgid "Enable extra XLib thread safety."
 msgstr "Zusätzlicher XLib-Fehlerschutz."
 
@@ -498,38 +481,6 @@ msgstr ""
 "Ansonsten kann es die Arbeitsgeschwindigkeit beeinflussen - einfach "
 "ausprobieren."
 
-#, c-format
-msgid ""
-"\n"
-"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-msgstr ""
-"\n"
-"XInitThreads Fehler - Ihre xlib ist anscheinend nicht threadsicher.\n"
-
-#, c-format
-msgid "Cannot open display\n"
-msgstr "Kann Display nicht öffnen\n"
-
-msgid "Name of video display"
-msgstr "Name des Video-Bildschirms"
-
-msgid ""
-"Use this setting to configure to which display xine will show videos. When "
-"left blank, the main display will be used. Setting this option to something "
-"like ':0.1' or ':1' makes possible to display video and control on different "
-"screens (very useful for TV presentations)."
-msgstr ""
-"Diese Einstellung gibt an, auf welchem Bildschirm xine Videos anzeigt. Wenn "
-"leer gelassen wird der Hauptbildschirm benutzt. Einstellungen wie ':0.1' "
-"oder ':1' machen es möglich, das Video auf einem anderen Bildschirm als das "
-"Steuerfeld anzuzeigen (sehr nützlich für TV-Presentationen)."
-
-#, c-format
-msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
-msgstr ""
-"Kann Bildschirm '%s' nicht für Video öffnen. Falle zurück auf "
-"Hauptbildschirm.\n"
-
 msgid "Synchronized X protocol (debug)"
 msgstr "Synchrones X-Protokoll (Fehlersuche)"
 
@@ -537,10 +488,6 @@ msgid ""
 "Do X transactions in synchronous mode. Very slow, use only for debugging!"
 msgstr ""
 "X11 Transaktionen synchron ausführen. Sehr langsam, nur für Fehlersuche!"
-
-#, c-format
-msgid "Warning! Synchronized X activated - this is very slow...\n"
-msgstr "Warnung! Synchrones X aktiviert - das wird sehr langsam...\n"
 
 msgid "Windows stacking"
 msgstr "Fensterüberlagerung"
@@ -696,10 +643,6 @@ msgstr "Menu Tastenkürzelstil"
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Tastenkürzeldarstellung im Menu, 'Strg Alt' oder 'C,M'."
 
-#, c-format
-msgid "Unable to initialize Imlib\n"
-msgstr "Kann Imlib nicht initialisieren\n"
-
 msgid "Menu toggle"
 msgstr "Menü"
 
@@ -741,6 +684,21 @@ msgstr "Menü 6"
 
 msgid "Menu 7"
 msgstr "Menü 7"
+
+msgid "Menu"
+msgstr "Menü"
+
+msgid "Red"
+msgstr "Rot"
+
+msgid "Green"
+msgstr "Grün"
+
+msgid "Yellow"
+msgstr "Gelb"
+
+msgid "Blue"
+msgstr "Blau"
 
 msgid "Menu 1"
 msgstr "Menü 1"
@@ -961,24 +919,16 @@ msgid "Unknown"
 msgstr "Unkekannt"
 
 #, c-format
-msgid "Bad geometry '%s'\n"
-msgstr "Fehlerhafte Geometrie '%s'\n"
-
-#, c-format
-msgid "Bad visual '%s'\n"
-msgstr "Fehlerhaftes visual '%s'\n"
-
-#, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
-#, fuzzy, c-format
+#, c-format
 msgid ""
 ".\n"
 "(c) %s The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2014 Das xine Team.\n"
+"(c) %s Das xine Team.\n"
 
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
@@ -1592,10 +1542,6 @@ msgid "Bad port number: %d\n"
 msgstr "Fehlerhafte Portnummer: %d\n"
 
 #, c-format
-msgid "Bad geometry '%s', see xine --help\n"
-msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
-
-#, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Fehlerhafter Wiederholmodus '%s', siehe xine --help\n"
 
@@ -1770,10 +1716,10 @@ msgid "Playback/Previous MRL"
 msgstr "Wiedergabe/Vorherige MRL"
 
 msgid "Playback/Increase Speed"
-msgstr "Wiedergabe/Geschwindikgeit erhöhen"
+msgstr "Wiedergabe/Schneller"
 
 msgid "Playback/Decrease Speed"
-msgstr "Wiedergabe/Geschwindigkeit verlangsamen"
+msgstr "Wiedergabe/Langsamer"
 
 msgid "Playlist"
 msgstr "Playliste"
@@ -2269,6 +2215,9 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr ""
 "(*)  xine muß neu gestartet werden, damit diese EInstellung wirksam wird"
 
+msgid "gui skin theme"
+msgstr "gui skin Thema"
+
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
 msgstr "Fehler beim Laden von %s/%s. Falle auf Skin '%s' zurück.\n"
@@ -2282,15 +2231,14 @@ msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr "Fehler beim Laden von %s, falsche Version. Lade sicheren Skin '%s'.\n"
 
 #, c-format
-msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Aua, Skin nicht gefunden, benutze sicheren '%s'.\n"
-
-#, c-format
 msgid "No available skin found. Say goodbye.\n"
 msgstr "Keinen verfügbaren Skin gefunden. Tschüss.\n"
 
-msgid "gui skin theme"
-msgstr "gui skin Thema"
+msgid "Grapics quality"
+msgstr "Grafikqualität"
+
+msgid "Trade speed for quality with some screen modes."
+msgstr "Tausche Geschwindigkeit gegen Qualität, für einige Bildschirmmodi."
 
 #, c-format
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
@@ -2329,12 +2277,12 @@ msgid "Unable to create '%s' directory: %s."
 msgstr "Kann Verzeichnis '%s' nicht anlegen: %s."
 
 #, c-format
-msgid "Skin %s correctly installed"
-msgstr "Skin %s korrekt installiert"
-
-#, c-format
 msgid "Unable to create '%s'."
 msgstr "Kann '%s' nicht erzeichen."
+
+#, c-format
+msgid "Skin %s correctly installed"
+msgstr "Skin %s korrekt installiert"
 
 msgid "Be patient..."
 msgstr "Habe Geduld..."
@@ -2348,6 +2296,9 @@ msgstr "Wähle einen Skin zum Herunterladen..."
 
 msgid "Error: "
 msgstr "Fehler: "
+
+msgid "PNG Parsing failed\n"
+msgstr "PNG Lesen fehlgeschlagen\n"
 
 msgid "xine_grab_video_frame.grab () failed\n"
 msgstr "xine_grab_video_frame.grab () fehlgeschlagen\n"
@@ -2369,9 +2320,6 @@ msgstr "png_create_write_struct() fehlgeschlagen\n"
 
 msgid "png_create_info_struct() failed\n"
 msgstr "png_create_info_struct() fehlgeschlagen\n"
-
-msgid "PNG Parsing failed\n"
-msgstr "PNG Lesen fehlgeschlagen\n"
 
 msgid "File written: "
 msgstr "Datei geschrieben: "
@@ -2542,11 +2490,35 @@ msgstr "videowin: Ausgabetreiber kann kein funktionierendes Visual auswählen\n"
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
-"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x"
-"%lx\n"
+"videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
+"lx\n"
 
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
+
+msgid "Name of video display"
+msgstr "Name des Video-Bildschirms"
+
+msgid ""
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
+msgstr ""
+"Diese Einstellung gibt an, auf welchem Bildschirm xine Videos anzeigt. Wenn "
+"leer gelassen wird der Hauptbildschirm benutzt. Einstellungen wie ':0.1' "
+"oder ':1' machen es möglich, das Video auf einem anderen Bildschirm als das "
+"Steuerfeld anzuzeigen (sehr nützlich für TV-Presentationen)."
+
+#, c-format
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr ""
+"Kann Bildschirm '%s' nicht für Video öffnen. Falle zurück auf "
+"Hauptbildschirm.\n"
+
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "Fehlerhafte Geometrie '%s'\n"
 
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
@@ -2631,6 +2603,46 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
+#~ msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
+
+#~ msgid "Warning"
+#~ msgstr "Warnung"
+
+#~ msgid ""
+#~ "gui_main: selected visual %#lx does not exist, trying default visual\n"
+#~ msgstr ""
+#~ "gui_main: Ausgewähltes Visual %#lx existiert nicht, versuche Standard-"
+#~ "Visual\n"
+
+#~ msgid "gui_main: couldn't find true color visual.\n"
+#~ msgstr "gui_main: Konnte Echtfarb-Visual nicht finden.\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "XInitThreads Fehler - Ihre xlib ist anscheinend nicht threadsicher.\n"
+
+#~ msgid "Cannot open display\n"
+#~ msgstr "Kann Display nicht öffnen\n"
+
+#~ msgid "Warning! Synchronized X activated - this is very slow...\n"
+#~ msgstr "Warnung! Synchrones X aktiviert - das wird sehr langsam...\n"
+
+#~ msgid "Unable to initialize Imlib\n"
+#~ msgstr "Kann Imlib nicht initialisieren\n"
+
+#~ msgid "Bad visual '%s'\n"
+#~ msgstr "Fehlerhaftes visual '%s'\n"
+
+#~ msgid "Bad geometry '%s', see xine --help\n"
+#~ msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
+
+#~ msgid "Ooch, skin not found, use fallback '%s'.\n"
+#~ msgstr "Aua, Skin nicht gefunden, benutze sicheren '%s'.\n"
 
 #~ msgid "Noise reduction"
 #~ msgstr "Rauschfilter"
