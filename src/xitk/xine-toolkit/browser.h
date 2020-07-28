@@ -24,40 +24,4 @@
 
 #include "_xitk.h"
 
-#define BROWSER_MAX_ENTRIES 65535
-
-typedef struct {
-
-  char                   *skin_element_name;
-
-  xitk_widget_t          *bWidget;
-  xitk_widget_t          *item_tree[BROWSER_MAX_ENTRIES];
-
-  btnlist_t              *bt[BROWSER_MAX_ENTRIES];
-
-  xitk_skin_config_t     *skonfig;
-
-  int                     jumped;
-
-  char                  **content;
-  char                  **shortcuts_content;
-  int                     max_length;
-  int                     list_length;
-  int                     current_start;
-
-  xitk_ext_state_callback_t   callback;
-  void                   *userdata;
-
-  int                     dbl_click_time;
-  xitk_ext_state_callback_t   dbl_click_callback;
-
-  int                     last_button_clicked;
-  int                     current_button_clicked;
-  struct timeval          click_time;
-
-  int                     need_h_slider;
-  int                     labels_offset;
-
-} browser_private_data_t;
-
 #endif

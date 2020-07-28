@@ -161,7 +161,7 @@ static const xitk_event_cbs_t combo_event_cbs = {
 static void combo_select (xitk_widget_t *w, void *data, int selected, int modifier) {
   _combo_private_t *wp = (_combo_private_t *)data;
 
-  if (wp && w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+  if (wp && w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BROWSER)) {
 
     if (wp->xwin) {
       wp->selected = selected;
