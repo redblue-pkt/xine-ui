@@ -235,6 +235,8 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
         short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font);
       else
         short_font = fs;
+      if (shortcut_pos == 0)
+        shortcut_pos = xsize - 5 - xitk_font_get_string_length (short_font, shortcut_label);
       xitk_pixmap_draw_string (pix, short_font,
         (((state != CLICK) ? 1 : 5)) + shortcut_pos, origin, shortcut_label, strlen (shortcut_label), fg);
       if (short_font != fs)
