@@ -679,7 +679,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     size_t      len;
 
     if (ms->origin) {
-      if (strlen(filename) < strlen(ms->origin))
+      if (strlen(filename) > strlen(ms->origin))
         filename += strlen(ms->origin);
       else
         filename = "";
