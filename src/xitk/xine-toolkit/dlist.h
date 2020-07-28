@@ -63,6 +63,24 @@ static inline void xitk_dlist_add_tail (xitk_dlist_t *list, xitk_dnode_t *node) 
   node->next = &list->tail;
 }
 
+static inline void xitk_dnode_insert_after (xitk_dnode_t *here, xitk_dnode_t *node) {
+  xitk_dnode_t *next;
+#ifdef XITK_DEBUG
+  if (node->next)
+    printf ("xitk_dnode_insert_after: node %p already added (next = %p, prev = %p).\n",
+        (void *)node, (void *)node->next, (void *)node->prev);
+  if (!here->next) {
+    printf ("xitk_dnode_insert: node %p not in a list.\n", (void *)here);
+    return;
+  }
+#endif
+  next = here->next;
+  node->next = next;
+  node->prev = here;
+  here->next = node;
+  next->prev = node;
+}
+
 static inline int xitk_dlist_clear (xitk_dlist_t *list) {
   int n = 0;
   xitk_dnode_t *node = list->head.next;
