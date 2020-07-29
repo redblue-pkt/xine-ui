@@ -242,9 +242,9 @@ static int _browser_visible_2_item (_browser_private_t *wp, int visible) {
 }
 
 static void _browser_over (_browser_private_t *wp, int item, int paint) {
-#if 0
   if (item == wp->items.over)
     return;
+#if 0
   if (paint) {
     int v = _browser_item_2_visible (wp, wp->items.over);
     if (v >= 0)
@@ -253,12 +253,10 @@ static void _browser_over (_browser_private_t *wp, int item, int paint) {
     if ((v >= 0) && (item != wp->items.selected))
       xitk_labelbutton_set_state (wp->visible.btns[v + WBSTART], 1);
   }
-  wp->items.over = item;
 #else
-  (void)wp;
-  (void)item;
   (void)paint;
 #endif
+  wp->items.over = item;
 }
   
 static int _browser_select (_browser_private_t *wp, int item) {
@@ -852,7 +850,16 @@ xitk_widget_t *xitk_browser_get_browser (xitk_widget_t *w) {
   return w->parent;
 }
 
-static void _browser_refocus (_browser_private_t *wp, int visible) {
+static int _browser_get_focus (_browser_private_t *wp) {
+  int i;
+  for (i = 0; i < wp->visible.num; i++) {
+    if (wp->visible.btns[i + WBSTART] == wp->w.wl->widget_focused)
+      return i;
+  }
+  return -1;
+}
+
+static void _browser_set_focus (_browser_private_t *wp, int visible) {
   if (wp->w.wl->widget_focused != wp->visible.btns[visible + WBSTART]) {
     widget_event_t event;
     if (wp->w.wl->widget_focused) {
@@ -886,30 +893,52 @@ static void _browser_refocus (_browser_private_t *wp, int visible) {
  */
 void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier) {
   _browser_private_t *wp = (_browser_private_t *)w;
+  int i, v;
 
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return;
 
-  if (((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) || (modifier & MODIFIER_SHIFT)) {
+  v = _browser_visible_2_item (wp, _browser_get_focus (wp));
+  if (v < 0)
+    v = wp->visible.start;
+  
+  if ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
     size_t klen = strlen (key);
-    int i, start = wp->items.over >= 0 ? wp->items.over : 0;
-    for (i = start + 1; i < wp->items.num; i++) {
+    for (i = v + 1; i < wp->items.num; i++) {
       if (!strncasecmp (wp->items.names[i], key, klen))
         break;
     }
     if (i >= wp->items.num) {
-      for (i = 0; i < start; i++) {
+      for (i = 0; i < v; i++) {
         if (!strncasecmp (wp->items.names[i], key, klen))
           break;
       }
-      if (i >= start)
+      if (i >= v)
         return;
     }
-    _browser_refocus (wp, i);
-    _browser_over (wp, i, 1);
+  } else if (modifier & MODIFIER_SHIFT) {
+    size_t klen = strlen (key);
+    for (i = v - 1; i >= 0; i--) {
+      if (!strncasecmp (wp->items.names[i], key, klen))
+        break;
+    }
+    if (i < 0) {
+      for (i = wp->items.num - 1; i > v; i--) {
+        if (!strncasecmp (wp->items.names[i], key, klen))
+          break;
+      }
+      if (i <= v)
+        return;
+    }
+  } else {
+    return;
   }
+  _browser_move (wp, i - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_sliders (wp);
+  v = _browser_item_2_visible (wp, i);
+  _browser_set_focus (wp, v);
 }
 
 /**
