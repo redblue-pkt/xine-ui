@@ -1652,7 +1652,7 @@ void draw_bevel_two_state(xitk_image_t *p) {
  *
  */
 void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
-  int           w, h, gap, m, dir = 0;
+  int           w, h, gap, m, dir;
   ImlibData    *im;
   XSegment      xs[9];
   XRectangle    xr[3];
@@ -1661,18 +1661,12 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
 
   im = p->image->imlibdata;
 
+  dir = width > height;
   w = p->width / 3;
-  if (width <= 0)
-    width = w;
-  if (w > width)
+  if ((width > 0) && (width <= w))
     w = width;
-
   h = p->height;
-  if (height <= 0) {
-    height = h;
-    dir = 1;
-  }
-  if (h > height)
+  if ((height > 0) && (height <= h))
     h = height;
 
   gap = (w < 11) || (h < 11) ? 1 : 2;
