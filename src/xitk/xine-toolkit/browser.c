@@ -129,8 +129,8 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
 
 static void _browser_set_hslider (_browser_private_t *wp, int reset) {
   int dw;
-  wp->visible.width = xitk_get_widget_width (wp->visible.btns[WBSTART]);
-  dw = wp->items.width - wp->visible.width + 2;
+  wp->visible.width = xitk_get_widget_width (wp->visible.btns[WBSTART]) - 4;
+  dw = wp->items.width - wp->visible.width;
 
   if (dw > 0) {
     int pos, align = xitk_labelbutton_get_alignment (wp->visible.btns[WBSTART]);
