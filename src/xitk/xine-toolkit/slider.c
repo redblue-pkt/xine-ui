@@ -574,16 +574,14 @@ static int _notify_click_slider (_slider_private_t *wp, int button, int bUp, int
       if (wp->focus == FOCUS_RECEIVED) {
         if (wp->sType == XITK_HVSLIDER) {
           /* if this thing really moves x and y, use xitk_slider_hv_sync (). */
-          int new_value = _slider_report_xy (wp, x, y)
-                        ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
-                        : -1;
-
+          int moved = _slider_report_xy (wp, x, y);
+          int new_value = wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos;
           if (wp->bClicked == bUp)
             wp->bClicked = !bUp;
           if (bUp == 0) {
             _paint_slider (wp, NULL);
             /* Exec motion callback function (if available) */
-            if ((new_value >= 0) && wp->motion_callback)
+            if (moved && wp->motion_callback)
               wp->motion_callback (wp->sWidget, wp->motion_userdata, new_value);
           } else if (bUp == 1) {
             wp->bClicked = 0;
@@ -683,8 +681,11 @@ void xitk_slider_make_step(xitk_widget_t *w) {
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (!wp->bClicked) {
-      if (((xitk_slider_get_pos (&wp->w)) + wp->step) <= xitk_slider_get_max (&wp->w))
-        xitk_slider_set_pos (&wp->w, xitk_slider_get_pos (&wp->w) + wp->step);
+      int v = xitk_slider_get_pos (&wp->w), m = xitk_slider_get_max (&wp->w);
+      if (v < m) {
+        v += wp->step;
+        xitk_slider_set_pos (&wp->w, v > m ? m : v);
+      }
     }
   } 
 }
@@ -697,8 +698,11 @@ void xitk_slider_make_backstep(xitk_widget_t *w) {
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (!wp->bClicked) {
-      if (xitk_slider_get_pos (&wp->w) - wp->step >= xitk_slider_get_min (&wp->w))
-        xitk_slider_set_pos (&wp->w, xitk_slider_get_pos (&wp->w) - wp->step);
+      int v = xitk_slider_get_pos (&wp->w), m = xitk_slider_get_min (&wp->w);
+      if (v > m) {
+        v -= wp->step;
+        xitk_slider_set_pos (&wp->w, v < m ? m : v);
+      }
     }
   } 
 }
@@ -861,7 +865,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
       if ((info->h.visible >= info->h.max) || (info->h.max <= 0)) {
         hv_w = wp->w.width;
       } else {
-        hv_w = wp->w.width * info->v.visible / info->v.max;
+        hv_w = wp->w.width * info->h.visible / info->h.max;
         if (hv_w < 10) {
           hv_w = 10;
           if (hv_w > wp->w.width)
@@ -892,7 +896,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
     wp->lower = 0;
     wp->upper = wp->hv_max_y > 0
               ? (wp->hv_info.v.visible >= wp->hv_info.v.max ? 0 : wp->hv_info.v.max - wp->hv_info.v.visible)
-              : (wp->hv_info.h.visible >= wp->hv_info.h.max ? 0 : wp->hv_info.h.max - wp->hv_info.h.visible);
+              : (wp->hv_info.h.visible >= wp->hv_info.h.max ? wp->hv_info.h.max : wp->hv_info.h.visible);
     wp->step = wp->hv_max_y > 0 ? wp->hv_info.v.step : wp->hv_info.h.step;
     if (mode == XITK_SLIDER_SYNC_SET_AND_PAINT)
       _paint_slider (wp, NULL);
