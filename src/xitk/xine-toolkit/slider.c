@@ -861,23 +861,27 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
       ((info->h.visible != wp->hv_info.h.visible) || (info->h.max != wp->hv_info.h.max) ||
        (info->v.visible != wp->hv_info.v.visible) || (info->v.max != wp->hv_info.v.max))) {
       int hv_w, hv_h;
+      int no_h = (info->h.visible >= info->h.max) || (info->h.max <= 0);
+      int no_v = (info->v.visible >= info->v.max) || (info->v.max <= 0);
 
-      if ((info->h.visible >= info->h.max) || (info->h.max <= 0)) {
+      if (no_h) {
         hv_w = wp->w.width;
       } else {
+        int minw = no_v ? (wp->w.height * 5) >> 2 : 10;
         hv_w = wp->w.width * info->h.visible / info->h.max;
-        if (hv_w < 10) {
-          hv_w = 10;
+        if (hv_w < minw) {
+          hv_w = minw;
           if (hv_w > wp->w.width)
             hv_w = wp->w.width;
         }
       }
-      if ((info->v.visible >= info->v.max) || (info->v.max <= 0)) {
+      if (no_v) {
         hv_h = wp->w.height;
       } else {
+        int minh = no_h ? (wp->w.width * 5) >> 2 : 10;
         hv_h = wp->w.height * info->v.visible / info->v.max;
-        if (hv_h < 10) {
-          hv_h = 10;
+        if (hv_h < minh) {
+          hv_h = minh;
           if (hv_h > wp->w.height)
             hv_h = wp->w.height;
         }
@@ -896,7 +900,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
     wp->lower = 0;
     wp->upper = wp->hv_max_y > 0
               ? (wp->hv_info.v.visible >= wp->hv_info.v.max ? 0 : wp->hv_info.v.max - wp->hv_info.v.visible)
-              : (wp->hv_info.h.visible >= wp->hv_info.h.max ? wp->hv_info.h.max : wp->hv_info.h.visible);
+              : (wp->hv_info.h.visible >= wp->hv_info.h.max ? 0 : wp->hv_info.h.max - wp->hv_info.h.visible);
     wp->step = wp->hv_max_y > 0 ? wp->hv_info.v.step : wp->hv_info.h.step;
     if (mode == XITK_SLIDER_SYNC_SET_AND_PAINT)
       _paint_slider (wp, NULL);
