@@ -26,6 +26,8 @@
 #include <string.h>
 
 #include "_xitk.h"
+#include "button.h"
+#include "inputtext.h"
 
 static void enability(xitk_widget_t *w) {
   

@@ -21,8 +21,26 @@
 #ifndef HAVE_XITK_TABS_H
 #define HAVE_XITK_TABS_H
 
-#include "_xitk.h"
-
 #define MAX_TABS 256
 
+typedef struct {
+  int                              magic;
+  const char                      *skin_element_name;
+  int                              num_entries;
+  char                           **entries;
+  xitk_state_callback_t            callback;
+  void                            *userdata;
+} xitk_tabs_widget_t;
+
+/** */
+xitk_widget_t *xitk_noskin_tabs_create (xitk_widget_list_t *wl,
+  xitk_tabs_widget_t *t, int x, int y, int width, const char *font_name);
+/** */
+int xitk_tabs_get_current_selected (xitk_widget_t *w);
+/** */
+const char *xitk_tabs_get_current_tab_selected (xitk_widget_t *w);
+/** */
+void xitk_tabs_set_current_selected (xitk_widget_t *w, int select);
+
 #endif
+

@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "_xitk.h"
+#include "labelbutton.h"
 
 #define CLICK     1
 #define FOCUS     2

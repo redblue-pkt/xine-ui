@@ -28,6 +28,8 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/tabs.h"
+#include "xine-toolkit/labelbutton.h"
 
 /*
 #define DEBUG_VIEWLOG

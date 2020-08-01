@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "_xitk.h"
+#include "slider.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -1072,3 +1073,4 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
 
   return _xitk_slider_create (wp, s);
 }
+

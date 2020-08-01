@@ -34,6 +34,7 @@
 #include <xine/xineutils.h>
 
 #include "common.h"
+#include "xine-toolkit/labelbutton.h"
 
 #define WINDOW_WIDTH    250
 #define WINDOW_HEIGHT   221

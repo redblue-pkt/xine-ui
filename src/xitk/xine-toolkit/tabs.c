@@ -26,7 +26,9 @@
 #include <string.h>
 
 #include "_xitk.h"
-
+#include "tabs.h"
+#include "labelbutton.h"
+#include "button.h"
 
 typedef struct _tabs_private_s {
   xitk_widget_t           w;

@@ -81,26 +81,17 @@ typedef struct {
 } btnlist_t;
 
 #include "_config.h"
-#include "browser.h"
-#include "button.h"
 #include "checkbox.h"
-#include "combo.h"
 #include "cursors.h"
 #include "dnd.h"
 #include "doublebox.h"
 #include "font.h"
 #include "image.h"
-#include "inputtext.h"
 #include "intbox.h"
-#include "labelbutton.h"
-#include "label.h"
 #include "mrlbrowser.h"
 #include "skin.h"
-#include "slider.h"
-#include "tabs.h"
 #include "widget.h"
 #include "window.h"
-#include "menu.h"
 #include "xitkintl.h"
 
 #if !defined(__GNUC__) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)

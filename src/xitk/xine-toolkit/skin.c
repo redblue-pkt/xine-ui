@@ -31,6 +31,7 @@
 
 #include "utils.h"
 #include "_xitk.h"
+#include "slider.h"
 
 #undef DEBUG_SKIN
 

@@ -29,6 +29,9 @@
 #include <X11/Xutil.h>
 
 #include "_xitk.h"
+#include "combo.h"
+#include "button.h"
+#include "label.h"
 #include "xitk_x11.h"
 
 typedef struct {

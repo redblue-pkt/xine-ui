@@ -30,6 +30,10 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/combo.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/inputtext.h"
 
 #include "frequencies.h"
 	

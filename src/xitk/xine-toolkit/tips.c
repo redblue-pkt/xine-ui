@@ -35,6 +35,7 @@
 #include "xitk_x11.h"
 
 #include "tips.h"
+#include "combo.h"
 
 struct xitk_tips_s {
   Display             *display;

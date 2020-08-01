@@ -21,7 +21,34 @@
 #ifndef HAVE_XITK_MENU_H
 #define HAVE_XITK_MENU_H
 
-#include "_xitk.h"
 #include "dlist.h"
+
+typedef struct xitk_menu_entry_s xitk_menu_entry_t;
+typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
+
+struct xitk_menu_entry_s {
+  char                             *menu;
+  char                             *shortcut; /* displayed (can be NULL) */
+  char                             *type;     /* NULL, <separator>, <branch>, <check>, <checked> */
+  xitk_menu_callback_t              cb;
+  void                             *user_data;
+  int                               user_id;
+};
+
+typedef struct {
+  int                              magic;
+  const char                      *skin_element_name;
+  xitk_menu_entry_t               *menu_tree; /* NULL terminated */
+
+} xitk_menu_widget_t;
+
+int xitk_get_menu_shortcuts_enability (void);
+xitk_widget_t *xitk_noskin_menu_create (xitk_widget_list_t *wl, xitk_menu_widget_t *m, int x, int y);
+void xitk_menu_show_menu (xitk_widget_t *w);
+void xitk_menu_add_entry (xitk_widget_t *w, xitk_menu_entry_t *me);
+xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w);
+void xitk_menu_destroy_sub_branchs (xitk_widget_t *w);
+void xitk_menu_destroy_branch (xitk_widget_t *w);
+int xitk_menu_show_sub_branchs (xitk_widget_t *w);
 
 #endif

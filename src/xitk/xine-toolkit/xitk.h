@@ -84,7 +84,6 @@
 typedef struct xitk_s xitk_t;
 
 typedef struct xitk_widget_s xitk_widget_t;
-typedef struct xitk_menu_entry_s xitk_menu_entry_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
 typedef struct xitk_skin_config_s xitk_skin_config_t;
 typedef struct xitk_font_s xitk_font_t;
@@ -96,7 +95,6 @@ void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi);
 
 typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
-typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_ext_state_callback_t)(xitk_widget_t *, void *, int, int modifiers);
 typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
@@ -325,14 +323,6 @@ typedef struct {
 #define ALIGN_DEFAULT               (ALIGN_LEFT)
 
 /*
- * Label button type
- */
-#define CLICK_BUTTON                1
-#define RADIO_BUTTON                2
-#define TAB_BUTTON                  3
-
-
-/*
  * See xitk_get_modifier_key()
  */
 #define MODIFIER_NOMOD              0x00000000
@@ -503,79 +493,6 @@ typedef enum {
  *  Widget struct
  */
 
-/* Slider type */
-#define XITK_VSLIDER                1
-#define XITK_HSLIDER                2
-#define XITK_RSLIDER                3
-#define XITK_HVSLIDER               4
-typedef struct {
-  int                               magic;
-  int                               min;
-  int                               max;
-  int                               step;
-  const char                       *skin_element_name;
-  xitk_state_callback_t             callback;
-  void                             *userdata;
-  xitk_state_callback_t             motion_callback;
-  void                             *motion_userdata;
-} xitk_slider_widget_t;
-typedef struct {
-  struct {
-    int pos, step, visible, max;
-  } h, v;
-} xitk_slider_hv_t;
-typedef enum {
-  XITK_SLIDER_SYNC_GET = 0,
-  XITK_SLIDER_SYNC_SET,
-  XITK_SLIDER_SYNC_SET_AND_PAINT
-} xitk_slider_sync_t;
-void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_sync_t mode);
-/** Create a slider */
-xitk_widget_t *xitk_slider_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
-xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl, xitk_slider_widget_t *s,
-  int x, int y, int width, int height, int type);
-/** * Get current position of paddle. */
-int xitk_slider_get_pos (xitk_widget_t *);
-/** Set position of paddle. */
-void xitk_slider_set_pos (xitk_widget_t *, int);
-/** * Set min value of slider. */
-void xitk_slider_set_min (xitk_widget_t *, int);
-/** Set max value of slider. */
-void xitk_slider_set_max (xitk_widget_t *, int);
-/** * Get min value of slider. */
-int xitk_slider_get_min (xitk_widget_t *);
-/** Get max value of slider. */
-int xitk_slider_get_max (xitk_widget_t *);
-/** Set position to 0 and redraw the widget. */
-void xitk_slider_reset (xitk_widget_t *);
-/** Set position to max and redraw the widget. */
-void xitk_slider_set_to_max (xitk_widget_t *);
-/** Increment by step the paddle position */
-void xitk_slider_make_step (xitk_widget_t *);
-/** Decrement by step the paddle position. */
-void xitk_slider_make_backstep (xitk_widget_t *);
-/** Call callback for current position */
-void xitk_slider_callback_exec (xitk_widget_t *);
-
-typedef struct {
-  int                               magic;
-  int                               button_type;
-  int                               align;
-  const char                       *label;
-  xitk_simple_callback_t            callback;
-  xitk_ext_state_callback_t         state_callback;
-  void                             *userdata;
-  const char                       *skin_element_name;
-} xitk_labelbutton_widget_t;
-
-typedef struct {
-  int                               magic;
-  const char                       *label;
-  const char                       *skin_element_name;
-  xitk_simple_callback_t            callback;
-  void                             *userdata;
-} xitk_label_widget_t;
-
 typedef struct {
   int                               magic;
   const char                       *skin_element_name;
@@ -588,55 +505,9 @@ typedef struct {
   const char                       *skin_element_name;
 } xitk_checkbox_widget_t;
 
-typedef struct {
-  int                               magic;
-  const char                       *skin_element_name;
-  xitk_simple_callback_t            callback;
-  void                             *userdata;
-} xitk_button_widget_t;
-
-typedef struct {
-  int                               magic;
-
-  struct {
-    const char                     *skin_element_name;
-  } arrow_up;
-  
-  struct {
-    const char                     *skin_element_name;
-  } slider;
-
-  struct {
-    const char                     *skin_element_name;
-  } arrow_dn;
-
-  struct {
-    const char                     *skin_element_name;
-  } arrow_left;
-  
-  struct {
-    const char                     *skin_element_name;
-  } slider_h;
-
-  struct {
-    const char                     *skin_element_name;
-  } arrow_right;
-
-  struct {
-    const char                     *skin_element_name;
-    int                             max_displayed_entries;
-    int                             num_entries;
-    const char *const              *entries;
-  } browser;
-  
-  xitk_ext_state_callback_t         dbl_click_callback;
-
-  xitk_ext_state_callback_t         callback;
-  void                             *userdata;
-
-} xitk_browser_widget_t;
-
 #ifdef NEED_MRLBROWSER
+
+#include "browser.h"
 
 typedef struct {
   char                             *name;
@@ -718,34 +589,6 @@ typedef struct {
 #endif
 
 typedef struct {
-  int                               magic;
-  char                             *text;
-  int                               max_length;
-  xitk_string_callback_t            callback;
-  void                             *userdata;
-  const char                       *skin_element_name;
-} xitk_inputtext_widget_t;
-
-typedef struct {
-  int                               magic;
-  const char                       *skin_element_name;
-  const char                      **entries;
-  int                              layer_above;
-  xitk_state_callback_t            callback;
-  void                            *userdata;
-  xitk_register_key_t             *parent_wkey;
-} xitk_combo_widget_t;
-
-typedef struct {
-  int                              magic;
-  const char                      *skin_element_name;
-  int                              num_entries;
-  char                           **entries;
-  xitk_state_callback_t            callback;
-  void                            *userdata;
-} xitk_tabs_widget_t;
-
-typedef struct {
   int                              magic;
 
   const char                      *skin_element_name;
@@ -768,22 +611,6 @@ typedef struct {
   xitk_state_double_callback_t      callback;
   void                             *userdata;
 } xitk_doublebox_widget_t;
-
-struct xitk_menu_entry_s {
-  char                             *menu;
-  char                             *shortcut; /* displayed (can be NULL) */
-  char                             *type;     /* NULL, <separator>, <branch>, <check>, <checked> */
-  xitk_menu_callback_t              cb;
-  void                             *user_data;
-  int                               user_id;
-};
-
-typedef struct {
-  int                              magic;
-  const char                      *skin_element_name;
-  xitk_menu_entry_t               *menu_tree; /* NULL terminated */
-
-} xitk_menu_widget_t;
 
 
 /* *******
@@ -915,7 +742,6 @@ long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
-int xitk_get_menu_shortcuts_enability(void);
 
 
 /*
@@ -1179,101 +1005,6 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
 void xitk_xevent_notify(XEvent *event);
 
 /*
- * *** Label Buttons
- */
-/**
- * Create a labeled button.
- */
-xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
-  xitk_skin_config_t *skonfig, const xitk_labelbutton_widget_t *b);
-
-/**
- *
- */
-xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
-  const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
-  const xitk_labelbutton_widget_t *b,
-  int x, int y, int width, int height,
-  const char *ncolor, const char *fcolor, const char *ccolor,
-  const char *fname);
-
-/**
- * Change label of button 'widget'.
- */
-int xitk_labelbutton_change_label (xitk_widget_t *, const char *new_label);
-int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, const char *, int, const char *);
-
-/**
- * Return label of button 'widget'.
- */
-const char *xitk_labelbutton_get_label(xitk_widget_t *);
-const char *xitk_labelbutton_get_shortcut_label(xitk_widget_t *);
-
-/**
- * Get state of button 'widget'.
- */
-int xitk_labelbutton_get_state(xitk_widget_t *);
-
-/**
- * Set state of button 'widget'.
- */
-void xitk_labelbutton_set_state(xitk_widget_t *, int);
-
-/*
- * Return used font name
- */
-char *xitk_labelbutton_get_fontname(xitk_widget_t *);
-
-/**
- * Set label button alignment
- */
-void xitk_labelbutton_set_alignment(xitk_widget_t *, int);
-
-/**
- * Get label button alignment
- */
-int xitk_labelbutton_get_alignment(xitk_widget_t *);
-
-/**
- *
- */
-void xitk_labelbutton_set_label_offset(xitk_widget_t *, int);
-int xitk_labelbutton_get_label_offset(xitk_widget_t *);
-
-void xitk_labelbutton_callback_exec(xitk_widget_t *w);
-
-/*
- * *** Labels
- */
-/**
- * Create a label widget.
- */
-xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl,
-  xitk_skin_config_t *skonfig, const xitk_label_widget_t *l);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
-  const xitk_label_widget_t *l, int x, int y, int width, int height,
-  const char *fontname);
-
-/**
- * Change label of widget 'widget'.
- */
-int xitk_label_change_label(xitk_widget_t *l, const char *newlabel);
-
-/**
- * Get label.
- */
-const char *xitk_label_get_label(xitk_widget_t *w);
-
-/*
  * *** Image
  */
 
@@ -1343,123 +1074,6 @@ void xitk_checkbox_set_state(xitk_widget_t *, int);
  * Call callback
  */
 void xitk_checkbox_callback_exec(xitk_widget_t *w);
-
-/*
- * ** Buttons
- */
-/**
- * Create a button
- */
-/**
- *
- */
-xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
-				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
-					  xitk_button_widget_t *b,
-					  int x, int y, int width, int height);
-
-
-/*
- * *** Browser
- */
-/**
- * Create the list browser
- */
-/**
- *
- */
-xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
-				   xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
-                                          xitk_browser_widget_t *br,
-					  int x, int y, 
-					  int itemw, int itemh, int slidw, const char *fontname);
-
-/**
- * Redraw buttons/slider
- */
-void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
-
-/**
- * Update the list, and rebuild button list
- */
-void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start);
-
-/**
- * slide up.
- */
-void xitk_browser_step_up(xitk_widget_t *w, void *data);
-
-/**
- * slide Down.
- */
-void xitk_browser_step_down(xitk_widget_t *w, void *data);
-
-/**
- * slide left.
- */
-void xitk_browser_step_left(xitk_widget_t *w, void *data);
-
-/**
- * slide right.
- */
-void xitk_browser_step_right(xitk_widget_t *w, void *data);
-
-/**
- * Page Up.
- */
-void xitk_browser_page_up(xitk_widget_t *w, void *data);
-
-/**
- * Page Down.
- */
-void xitk_browser_page_down(xitk_widget_t *w, void *data);
-
-/**
- * Return the current selected button (if not, return -1)
- */
-int xitk_browser_get_current_selected(xitk_widget_t *w);
-
-/**
- * Select the item 'select' in list
- */
-void xitk_browser_set_select(xitk_widget_t *w, int select);
-
-/**
- * Release all enabled buttons
- */
-void xitk_browser_release_all_buttons(xitk_widget_t *w);
-
-/**
- * Return the number of displayed entries
- */
-int xitk_browser_get_num_entries(xitk_widget_t *w);
-
-/**
- * Return the real number of first displayed in list
- */
-int xitk_browser_get_current_start(xitk_widget_t *w);
-
-/**
- * Change browser labels alignment
- */
-void xitk_browser_set_alignment(xitk_widget_t *w, int align);
-
-/*
- * Jump to entry in list which match with the alphanum char key.
- */
-void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier);
-
-xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
 
 #ifdef NEED_MRLBROWSER
 /**
@@ -1542,30 +1156,6 @@ int xitk_window_grab_input(xitk_window_t *w,
  * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
  */
 int xitk_get_key_modifier(XEvent *xev, int *modifier);
-
-/**
- * Create an input text box.
- */
-xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
-				      xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
-					     xitk_inputtext_widget_t *it,
-					     int x, int y, int width, int height,
-					     const char *ncolor, const char *fcolor, const char *fontname);
-/**
- * Return the text of widget.
- */
-char *xitk_inputtext_get_text(xitk_widget_t *it);
-
-/**
- * Change and redisplay the text of widget.
- */
-void xitk_inputtext_change_text(xitk_widget_t *it, const char *text);
-
 
 /*
  *  *** skin
@@ -1701,60 +1291,6 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs);
-
-/**
- *
- */
-xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
-				 xitk_widget_t **lw, xitk_widget_t **bw);
-
-/**
- *
- */
-xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
-					xitk_combo_widget_t *c, int x, int y, int width,
-					xitk_widget_t **lw, xitk_widget_t **bw);
-
-/**
- *
- */
-int xitk_combo_get_current_selected(xitk_widget_t *w);
-
-/**
- *
- */
-const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_combo_set_select(xitk_widget_t *w, int select);
-
-/**
- *
- */
-void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int len);
-
-/**
- *
- */
-void xitk_combo_update_pos(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_combo_rollunroll(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_combo_callback_exec(xitk_widget_t *w);
-
-/**
- *
- */
-xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w);
 
 /**
  *
@@ -2144,13 +1680,6 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 //void xitk_window_set_modal(xitk_window_t *w);
 //void xitk_window_dialog_set_modal(xitk_window_t *w);
 
-xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
-				       xitk_tabs_widget_t *t, 
-                                       int x, int y, int width, const char *fontname);
-int xitk_tabs_get_current_selected(xitk_widget_t *w);
-const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
-void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);
-
 xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
 					 xitk_intbox_widget_t *ib,
 					 int x, int y, int width, int height, 
@@ -2171,18 +1700,10 @@ int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
 void xitk_widget_keyable(xitk_widget_t *w, int keyable);
 
-xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
-				       xitk_menu_widget_t *m, int x, int y);
-void xitk_menu_show_menu(xitk_widget_t *w);
-void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me);
-xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
-void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
-void xitk_menu_destroy_branch(xitk_widget_t *w);
-int xitk_menu_show_sub_branchs(xitk_widget_t *w);
-
 void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor);
 void xitk_window_restore_window_cursor(xitk_window_t *w);
 
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+

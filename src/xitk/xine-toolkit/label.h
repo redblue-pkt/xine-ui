@@ -22,9 +22,25 @@
 #ifndef HAVE_XITK_LABEL_H
 #define HAVE_XITK_LABEL_H
 
-#include "_xitk.h"
+typedef struct {
+  int                     magic;
+  const char             *label;
+  const char             *skin_element_name;
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
+} xitk_label_widget_t;
 
-#include <pthread.h>
+/** * Create a label widget. */
+xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, const xitk_label_widget_t *l);
+/** */
+xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
+  const xitk_label_widget_t *l, int x, int y, int width, int height,
+  const char *font_name);
+/** Change label of widget 'widget'. */
+int xitk_label_change_label (xitk_widget_t *w, const char *newlabel);
+/** Get label. */
+const char *xitk_label_get_label (xitk_widget_t *w);
 
 #endif
 

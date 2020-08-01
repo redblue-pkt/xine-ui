@@ -31,6 +31,9 @@
 #include <sys/time.h>
 
 #include "common.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/slider.h"
+#include "xine-toolkit/button.h"
 #include "xine-toolkit/button_list.h"
 
 struct xui_panel_st {
