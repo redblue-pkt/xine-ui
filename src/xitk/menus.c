@@ -27,6 +27,7 @@
 #include "lang.h"
 
 #include "common.h"
+#include "xine-toolkit/menu.h"
 
 #define PLAYL_LOAD              10
 #define PLAYL_SAVE              11

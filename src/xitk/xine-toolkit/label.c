@@ -29,6 +29,7 @@
 #include <unistd.h>
 
 #include "_xitk.h"
+#include "label.h"
 
 typedef struct {
   xitk_widget_t           w;

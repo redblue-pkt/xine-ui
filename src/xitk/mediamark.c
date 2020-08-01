@@ -37,6 +37,9 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/inputtext.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/label.h"
 
 #define WINDOW_WIDTH            525
 #define WINDOW_HEIGHT           270

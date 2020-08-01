@@ -36,6 +36,8 @@
 #include "xine-toolkit/recode.h"
 
 #include "common.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/tabs.h"
 
 #include "lang.h"
 

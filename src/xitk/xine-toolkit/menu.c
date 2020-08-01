@@ -22,12 +22,12 @@
 #include "config.h"
 #endif
 
-#include "menu.h"
-
 #include <stdio.h>
 #include <string.h>
 
 #include "_xitk.h"
+#include "menu.h"
+#include "labelbutton.h"
 
 #include "xitk_x11.h"
 

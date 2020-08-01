@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "xitkintl.h"
 #include "button_list.h"
 #include "widget.h"
 #include "labelbutton.h"

@@ -27,6 +27,12 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/combo.h"
+#include "xine-toolkit/slider.h"
+#include "xine-toolkit/inputtext.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/button.h"
 
 #define VFREE(vfp) do {memset (vfp, 0x55, sizeof (*(vfp))); free (vfp); } while (0)
 

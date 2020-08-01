@@ -22,6 +22,17 @@
 #ifndef HAVE_XITK_BUTTON_H
 #define HAVE_XITK_BUTTON_H
 
-#include "_xitk.h"
+typedef struct {
+  int                               magic;
+  const char                       *skin_element_name;
+  xitk_simple_callback_t            callback;
+  void                             *userdata;
+} xitk_button_widget_t;
+
+/** Create a button */
+xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
+/** */
+xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl, xitk_button_widget_t *b,
+  int x, int y, int width, int height);
 
 #endif

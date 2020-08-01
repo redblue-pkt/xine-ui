@@ -35,6 +35,11 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/inputtext.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/button.h"
+#include "xine-toolkit/combo.h"
 
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       390

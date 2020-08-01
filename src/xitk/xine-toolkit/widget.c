@@ -34,6 +34,8 @@
 
 #include "_xitk.h"
 #include "tips.h"
+#include "menu.h"
+#include "combo.h"
 #include "xitk_x11.h"
 
 static const xitk_color_names_t xitk_sorted_color_names[] = {

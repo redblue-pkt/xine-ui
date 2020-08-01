@@ -59,6 +59,9 @@
 #include "utils.h"
 #include "_xitk.h"
 #include "tips.h"
+#include "menu.h"
+#include "slider.h"
+#include "combo.h"
 
 #define _XITK_CLIPBOARD_DEBUG
 

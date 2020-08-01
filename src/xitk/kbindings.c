@@ -27,6 +27,8 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/labelbutton.h"
 #include "kbindings_common.h"
 
 

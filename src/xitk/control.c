@@ -30,6 +30,10 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "xine-toolkit/slider.h"
+#include "xine-toolkit/label.h"
+#include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/combo.h"
 #include <xine/video_out.h>
 
 #define CONTROL_MIN     0
@@ -688,4 +692,3 @@ void control_reparent (xui_vctrl_t *vctrl) {
   if (vctrl && vctrl->xwin)
     reparent_window(vctrl->gui, vctrl->xwin);
 }
-

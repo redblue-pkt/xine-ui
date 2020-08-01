@@ -28,6 +28,10 @@
 #include <unistd.h>
 
 #include "_xitk.h"
+#include "browser.h"
+#include "labelbutton.h"
+#include "button.h"
+#include "slider.h"
 
 #define WBUP    0  /*  Position of button up in item_tree  */
 #define WSLID   1  /*  Position of slider in item_tree  */

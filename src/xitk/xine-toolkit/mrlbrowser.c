@@ -37,6 +37,11 @@
 
 #include "_xitk.h"
 #include "mrlbrowser.h"
+#include "browser.h"
+#include "label.h"
+#include "labelbutton.h"
+#include "button.h"
+#include "combo.h"
 
 #include "utils.h"
 
