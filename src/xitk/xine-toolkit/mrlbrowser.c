@@ -1042,7 +1042,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   cmb.parent_wkey       = &private_data->widget_key;
   cmb.callback          = combo_filter_select;
   cmb.userdata          = (void *)private_data;
-  private_data->combo_filter = xitk_combo_create (private_data->widget_list, skonfig, &cmb, NULL, NULL);
+  private_data->combo_filter = xitk_combo_create (private_data->widget_list, skonfig, &cmb);
   xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->combo_filter->node);
 
   private_data->visible        = 1;

@@ -1652,11 +1652,27 @@ void xitk_destroy_widget(xitk_widget_t *w) {
  * Destroy widgets from widget list.
  */
 void xitk_destroy_widgets(xitk_widget_list_t *wl) {
+  int again;
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
-  
+
+  /* do group leaders first, just in case they want to delete their members as well. */
+  do {
+    xitk_widget_t *w = (xitk_widget_t *)wl->list.tail.prev;
+    again = 0;
+    while (w->node.prev) {
+      if (w->type & WIDGET_GROUP) {
+        xitk_destroy_widget (w);
+        again = 1;
+        break;
+      }
+      w = (xitk_widget_t *)w->node.prev;
+    }
+  } while (again);
+
   while (1) {
     xitk_widget_t *mywidget = (xitk_widget_t *)wl->list.tail.prev;
     if (!mywidget->node.prev)

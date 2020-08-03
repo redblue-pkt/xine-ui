@@ -33,11 +33,10 @@ typedef struct {
 
 /** */
 xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
-  xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
-  xitk_widget_t **lw, xitk_widget_t **bw);
+  xitk_skin_config_t *skonfig, xitk_combo_widget_t *c);
 /** */
 xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
-  xitk_combo_widget_t *c, int x, int y, int width, xitk_widget_t **lw, xitk_widget_t **bw);
+  xitk_combo_widget_t *c, int x, int y, int width);
 /** */
 int xitk_combo_get_current_selected (xitk_widget_t *w);
 /** */
@@ -52,7 +51,4 @@ void xitk_combo_update_pos (xitk_widget_t *w);
 void xitk_combo_rollunroll (xitk_widget_t *w);
 /** */
 void xitk_combo_callback_exec (xitk_widget_t *w);
-/** */
-xitk_widget_t *xitk_combo_get_label_widget (xitk_widget_t *w);
-
 #endif

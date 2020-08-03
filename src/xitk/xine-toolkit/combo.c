@@ -275,15 +275,7 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void enability (xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
-  if (!wp)
-    return;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
-    return;
-
+static void _cmb_enability (_combo_private_t *wp) {
   if (wp->w.enable == WIDGET_ENABLE) {
     xitk_enable_widget (wp->label_widget);
     xitk_enable_widget (wp->button_widget);
@@ -297,45 +289,25 @@ static void enability (xitk_widget_t *w) {
   }
 }
 
-static void notify_destroy (xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-
-  if (!wp)
-    return;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
-    return;
-
+static void _cmb_destroy (_combo_private_t *wp) {
   if (wp->visible)
     _combo_rollunroll (wp->button_widget, (void *)wp, 0);
-
-  if (wp->w.wl) {
-    xitk_widget_t *_w = (xitk_widget_t *)wp->w.wl->list.head.next;
-
-    while (_w->node.next) {
-      if ((_w == wp->label_widget) || (_w == wp->button_widget))
-        _w->parent = NULL;
-      _w = (xitk_widget_t *)_w->node.next;
-    }
+  if (wp->label_widget) {
+    xitk_destroy_widget (wp->label_widget);
+    wp->label_widget = NULL;
   }
-    
-  free (wp->entries);
-  wp->entries = NULL;
+  if (wp->button_widget) {
+    xitk_destroy_widget (wp->button_widget);
+    wp->button_widget = NULL;
+  }
+  XITK_FREE (wp->entries);
   XITK_FREE (wp->skin_element_name);
 }
 
 /*
  *
  */
-static void paint (xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-
-  if (!wp)
-    return;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
-    return;
-
+static void _cmb_paint (_combo_private_t *wp) {
   if (wp->visible == 1 && (wp->w.visible < 1)) {
     xitk_checkbox_set_state (wp->button_widget, 0);
     _combo_rollunroll (wp->button_widget, (void *)wp, 0);
@@ -363,7 +335,6 @@ void xitk_combo_callback_exec (xitk_widget_t *w) {
   
   if (!wp)
     return;
-
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
     return;
 
@@ -374,9 +345,7 @@ void xitk_combo_callback_exec (xitk_widget_t *w) {
 /*
  *
  */
-static void notify_change_skin (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
+static void _cmb_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
     int x, y;
@@ -400,44 +369,39 @@ static void notify_change_skin (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   }
 }
 
-static void tips_timeout(xitk_widget_t *w, unsigned long timeout) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-
-  if (!wp)
-    return;
-  
-  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-    wp->tips_timeout = timeout;
-    wp->combo_widget->tips_timeout = timeout;
-    wp->label_widget->tips_timeout = timeout;
-    wp->button_widget->tips_timeout = timeout;
-    if (wp->xwin)
-      wp->browser_widget->tips_timeout = timeout;
-  }
+static void _cmb_tips_timeout (_combo_private_t *wp, unsigned long timeout) {
+  if (wp->label_widget)
+    xitk_set_widget_tips_and_timeout (wp->label_widget, wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  int retval = 0;
+  _combo_private_t *wp = (_combo_private_t *)w;
   
-  switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    paint(w);
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    notify_change_skin(w, event->skonfig);
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_ENABLE:
-    enability(w);
-    break;
-  case WIDGET_EVENT_TIPS_TIMEOUT:
-    tips_timeout(w, event->tips_timeout);
-    break;
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
+    return 0;
+
+  (void)result;
+  switch (event->type) {
+    case WIDGET_EVENT_PAINT:
+      _cmb_paint (wp);
+      break;
+    case WIDGET_EVENT_CHANGE_SKIN:
+      _cmb_new_skin (wp, event->skonfig);
+      break;
+    case WIDGET_EVENT_DESTROY:
+      _cmb_destroy (wp);
+      break;
+    case WIDGET_EVENT_ENABLE:
+      _cmb_enability (wp);
+      break;
+    case WIDGET_EVENT_TIPS_TIMEOUT:
+      _cmb_tips_timeout (wp, event->tips_timeout);
+      break;
+    default: ;
   }
-  
-  return retval;
+  return 0;
 }
 
 /*
@@ -579,21 +543,6 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
 /*
  *
  */
-xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-
-  if (!wp)
-    return NULL;
-
-  if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-    return wp->label_widget;
-  }
-  return NULL;
-}
-
-/*
- *
- */
 static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig,
   xitk_combo_widget_t *c, const char *skin_element_name, _combo_private_t *wp, int visible, int enable) {
   const char * const *entries = c->entries;
@@ -639,9 +588,8 @@ static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_conf
 /*
  *
  */
-xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
-				 xitk_widget_t **lw, xitk_widget_t **bw) {
+xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, xitk_combo_widget_t *c) {
   _combo_private_t        *wp;
   xitk_checkbox_widget_t   cb;
   xitk_label_widget_t      lbl;
@@ -675,11 +623,6 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
   }
 
-  if(lw)
-    *lw = wp->label_widget;
-  if(bw)
-    *bw = wp->button_widget;
-  
   {
     int x, y;
     
@@ -702,10 +645,8 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
 /*
  *  ******************************************************************************
  */
-xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
-					xitk_combo_widget_t *c,
-					int x, int y, int width, 
-					xitk_widget_t **lw, xitk_widget_t **bw) {
+xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
+  xitk_combo_widget_t *c, int x, int y, int width) {
   _combo_private_t        *wp;
   xitk_checkbox_widget_t   cb;
   xitk_label_widget_t      lbl;
@@ -729,7 +670,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
     
     fs = xitk_font_load_font(wl->xitk, DEFAULT_FONT_10);
     xitk_font_set_font(fs, wl->gc);
-    height = xitk_font_get_string_height(fs, " ") + 4;
+    height = xitk_font_get_string_height(fs, " ") + 6;
     xitk_font_unload_font(fs);
 
     lbl.skin_element_name = NULL;
@@ -754,11 +695,6 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
       xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
     }
 
-    if(lw)
-      *lw = wp->label_widget;
-    if(bw)
-      *bw = wp->button_widget;
-    
     wp->w.x = x;
     wp->w.y = y;
     wp->w.width = width;
