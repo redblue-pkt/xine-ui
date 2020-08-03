@@ -33,6 +33,8 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/button.h"
+#include "xine-toolkit/doublebox.h"
+#include "xine-toolkit/intbox.h"
 
 #define VFREE(vfp) do {memset (vfp, 0x55, sizeof (*(vfp))); free (vfp); } while (0)
 
@@ -645,8 +647,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	  cmb.callback          = _pplugin_set_param_int;
 	  cmb.userdata          = pobj;
-          pobj->value = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb,
-            0, 0, 365, NULL, NULL);
+          pobj->value = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb, 0, 0, 365);
           xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->value);
 	  xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
 	}
@@ -654,13 +655,16 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	  xitk_intbox_widget_t      ib;
 	  
           XITK_WIDGET_INIT(&ib);
+          ib.fmt               = INTBOX_FMT_DECIMAL;
+          ib.min               = 0;
+          ib.max               = 0;
 	  ib.skin_element_name = NULL;
 	  ib.value             = *(int *)(pobj->param_data + pobj->param->offset);
 	  ib.step              = 1;
 	  ib.callback          = _pplugin_set_param_int;
 	  ib.userdata          = pobj;
           pobj->value =  xitk_noskin_intbox_create (pp_wrapper->pplugin->widget_list, &ib,
-            0, 0, 50, 20, NULL, NULL, NULL);
+            0, 0, 50, 20);
           xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->value);
 	}
       }
@@ -677,7 +681,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	ib.callback          = _pplugin_set_param_double;
 	ib.userdata          = pobj;
         pobj->value =  xitk_noskin_doublebox_create (pp_wrapper->pplugin->widget_list, &ib,
-          0, 0, 100, 20, NULL, NULL, NULL);
+          0, 0, 100, 20);
         xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->value);
       }
       break;
@@ -710,8 +714,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	cmb.callback          = _pplugin_set_param_stringlist;
 	cmb.userdata          = pobj;
-        pobj->value = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb,
-          0, 0, 365, NULL, NULL);
+        pobj->value = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb, 0, 0, 365);
         xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->value);
 	xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
       }
@@ -1066,8 +1069,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
     cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_change_parameter : _applugin_change_parameter;
     cmb.userdata          = pobj;
-    pobj->properties = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list,
-      &cmb, 0, 0, 175, NULL, NULL);
+    pobj->properties = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb, 0, 0, 175);
     xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->properties);
     xitk_combo_set_select(pobj->properties, 0);
     xitk_combo_callback_exec(pobj->properties);
@@ -1276,8 +1278,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
   cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_select_filter : _applugin_select_filter;
   cmb.userdata          = pobj;
-  pobj->plugins = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list,
-    &cmb, 0, 0, 175, NULL, NULL);
+  pobj->plugins = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb, 0, 0, 175);
   xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->plugins);
   DISABLE_ME(pobj->plugins);
   xitk_combo_set_select(pobj->plugins, 0);
@@ -2318,3 +2319,4 @@ void applugin_reparent(void)
 {
   pplugin_reparent(&_app_wrapper.p);
 }
+

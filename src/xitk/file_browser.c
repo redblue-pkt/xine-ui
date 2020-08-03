@@ -1421,7 +1421,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   cmb.parent_wkey       = &fb->widget_key;
   cmb.callback          = fb_select_file_filter;
   cmb.userdata          = (void *)fb;
-  fb->filters = xitk_noskin_combo_create (fb->widget_list, &cmb, x, y, w, NULL, NULL);
+  fb->filters = xitk_noskin_combo_create (fb->widget_list, &cmb, x, y, w);
   xitk_add_widget (fb->widget_list, fb->filters);
   xitk_combo_set_select(fb->filters, fb->filter_selected);
   xitk_enable_and_show_widget(fb->filters);

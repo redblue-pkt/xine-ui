@@ -588,31 +588,6 @@ typedef struct {
 
 #endif
 
-typedef struct {
-  int                              magic;
-
-  const char                      *skin_element_name;
-  
-  int                              value;
-  int                              step;
-
-  xitk_state_callback_t            callback;
-  void                             *userdata;
-} xitk_intbox_widget_t;
-
-typedef struct {
-  int                              magic;
-
-  const char                      *skin_element_name;
-  
-  double                           value;
-  double                           step;
-
-  xitk_state_double_callback_t      callback;
-  void                             *userdata;
-} xitk_doublebox_widget_t;
-
-
 /* *******
  * INIT: widget lib initialization and friends
  */
@@ -1679,22 +1654,6 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 
 //void xitk_window_set_modal(xitk_window_t *w);
 //void xitk_window_dialog_set_modal(xitk_window_t *w);
-
-xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
-					 xitk_intbox_widget_t *ib,
-					 int x, int y, int width, int height, 
-					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
-void xitk_intbox_set_value(xitk_widget_t *, int);
-int xitk_intbox_get_value(xitk_widget_t *);
-xitk_widget_t *xitk_intbox_get_input_widget(xitk_widget_t *w);
-
-xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
-					    xitk_doublebox_widget_t *ib,
-					    int x, int y, int width, int height, 
-					    xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
-void xitk_doublebox_set_value(xitk_widget_t *, double);
-double xitk_doublebox_get_value(xitk_widget_t *);
-xitk_widget_t *xitk_doublebox_get_input_widget(xitk_widget_t *w);
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);

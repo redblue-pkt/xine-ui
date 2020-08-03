@@ -34,6 +34,7 @@
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/combo.h"
+#include "xine-toolkit/intbox.h"
 
 #include <xine/list.h>
 #ifdef HAVE_XINE_LIST_NEXT_VALUE
@@ -279,14 +280,10 @@ static void setup_apply (xitk_widget_t *w, void *data) {
             numval = xitk_combo_get_current_selected (w);
             break;
 
-	  default:
-            if (type & WIDGET_GROUP_INTBOX) {
-	      numval = xitk_intbox_get_value(w);
-              if (numval == setup->wg[i].cfg.num_value)
-		continue;
-	    }
-
-	    break;
+          case WIDGET_TYPE_INTBOX:
+            numval = xitk_intbox_get_value (w);
+            break;
+          default: ;
 	  }
 
           switch (setup->wg[i].cfg.type) {
@@ -698,24 +695,31 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
         case XINE_CONFIG_TYPE_RANGE: /* slider */
           {
-            xitk_slider_widget_t sl;
-            xitk_widget_t *slider;
+            xitk_intbox_widget_t ib;
+            xitk_widget_t *intbox;
+            int ib_width;
 
-            XITK_WIDGET_INIT (&sl);
-            sl.min                      = entry.range_min;
-            sl.max                      = entry.range_max;
-            sl.step                     = 1;
-            sl.skin_element_name        = NULL;
-            sl.callback                 = NULL;
-            sl.userdata                 = NULL;
-            sl.motion_callback          = numtype_update;
-            sl.motion_userdata          = wt;
-            slider = xitk_noskin_slider_create (setup->widget_list, &sl, x, y, 150, 16, XITK_HSLIDER);
-            xitk_add_widget (setup->widget_list, slider);
-            xitk_slider_set_pos (slider, entry.num_value);
-            ADD_LABEL (slider, NULL, NULL);
-            add_widget_to_list (setup, slider);
-            wt->widget = slider;
+            XITK_WIDGET_INIT (&ib);
+            /* HACK for stuff like the xv color key. */
+            if ((entry.range_min == 0) && (entry.range_max > 0x7fffffff / 260)) {
+              ib.fmt = INTBOX_FMT_HASH;
+              ib_width = 100;
+            } else {
+              ib.fmt = INTBOX_FMT_DECIMAL;
+              ib_width = 260;
+            }
+            ib.skin_element_name = NULL;
+            ib.min               = entry.range_min;
+            ib.max               = entry.range_max;
+            ib.value             = entry.num_value;
+            ib.step              = 1;
+            ib.callback          = numtype_update;
+            ib.userdata          = wt;
+            intbox = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, ib_width, 20);
+            xitk_add_widget (setup->widget_list, intbox);
+            ADD_LABEL (intbox, NULL, NULL);
+            add_widget_to_list (setup, intbox);
+            wt->widget = intbox;
           };
           _SET_HELP;
           break;
@@ -744,7 +748,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         case XINE_CONFIG_TYPE_ENUM:
           {
             xitk_combo_widget_t cmb;
-            xitk_widget_t *combo, *lw, *bw;
+            xitk_widget_t *combo;
 
             XITK_WIDGET_INIT (&cmb);
             cmb.skin_element_name = NULL;
@@ -753,13 +757,11 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             cmb.parent_wkey       = &setup->kreg;
             cmb.callback          = numtype_update;
             cmb.userdata          = wt;
-            combo = xitk_noskin_combo_create (setup->widget_list, &cmb, x, y, 260, &lw, &bw);
+            combo = xitk_noskin_combo_create (setup->widget_list, &cmb, x, y, 260);
             xitk_add_widget (setup->widget_list, combo);
             xitk_combo_set_select (combo, entry.num_value);
             ADD_LABEL (combo, NULL, NULL);
             add_widget_to_list (setup, combo);
-            add_widget_to_list (setup, lw);
-            add_widget_to_list (setup, bw);
             wt->widget = combo;
           }
           _SET_HELP;
@@ -768,21 +770,21 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         case XINE_CONFIG_TYPE_NUM:
           {
             xitk_intbox_widget_t ib;
-            xitk_widget_t *intbox, *wi, *wbu, *wbd;
+            xitk_widget_t *intbox;
 
             XITK_WIDGET_INIT (&ib);
             ib.skin_element_name = NULL;
+            ib.fmt               = INTBOX_FMT_DECIMAL;
+            ib.min               = 0;
+            ib.max               = 0;
             ib.value             = entry.num_value;
             ib.step              = 1;
             ib.callback          = numtype_update;
             ib.userdata          = wt;
-            intbox = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, 60, 20, &wi, &wbu, &wbd);
+            intbox = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, 60, 20);
             xitk_add_widget (setup->widget_list, intbox);
             ADD_LABEL (intbox, NULL, NULL);
             add_widget_to_list (setup, intbox);
-            add_widget_to_list (setup, wi);
-            add_widget_to_list (setup, wbu);
-            add_widget_to_list (setup, wbd);
             wt->widget = intbox;
           }
           _SET_HELP;
@@ -797,7 +799,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             cb.skin_element_name = "XITK_NOSKIN_CHECK";
             cb.callback          = numtype_update;
             cb.userdata          = wt;
-            checkbox = xitk_noskin_checkbox_create (setup->widget_list, &cb, x, y, 12, 12);
+            checkbox = xitk_noskin_checkbox_create (setup->widget_list, &cb, x, y, 13, 13);
             xitk_add_widget (setup->widget_list, checkbox);
             xitk_checkbox_set_state (checkbox, entry.num_value);
             ADD_LABEL (checkbox, label_cb, (void *)checkbox);

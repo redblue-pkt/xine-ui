@@ -34,6 +34,7 @@
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/inputtext.h"
+#include "xine-toolkit/intbox.h"
 
 #include "frequencies.h"
 	
@@ -325,12 +326,15 @@ void tvset_panel(void) {
 		   x, y, w, (20 + 22));
   XITK_WIDGET_INIT(&ib);
   ib.skin_element_name = NULL;
+  ib.fmt               = INTBOX_FMT_DECIMAL;
+  ib.min               = 0;
+  ib.max               = 0;
   ib.value             = 4;
   ib.step              = 1;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   tvset.input = xitk_noskin_intbox_create (tvset.widget_list, &ib,
-    x + 10, y + 15, w - 20 + 1, 20, NULL, NULL, NULL);
+    x + 10, y + 15, w - 20 + 1, 20);
   xitk_add_widget (tvset.widget_list, tvset.input);
   xitk_enable_and_show_widget(tvset.input);
 
@@ -356,7 +360,7 @@ void tvset_panel(void) {
   cmb.callback          = system_combo_select;
   cmb.userdata          = NULL;
   tvset.system = xitk_noskin_combo_create (tvset.widget_list, &cmb,
-    x + 10, y + 15, w - 20 + 1, NULL, NULL);
+    x + 10, y + 15, w - 20 + 1);
   xitk_add_widget (tvset.widget_list, tvset.system);
   xitk_set_widget_pos(tvset.system, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.system)) / 2);
   xitk_enable_and_show_widget(tvset.system);
@@ -377,7 +381,7 @@ void tvset_panel(void) {
   cmb.callback          = NULL;
   cmb.userdata          = NULL;
   tvset.chann = xitk_noskin_combo_create (tvset.widget_list, &cmb,
-    x + 10, y + 15, w - 20 + 1, NULL, NULL);
+    x + 10, y + 15, w - 20 + 1);
   xitk_add_widget (tvset.widget_list, tvset.chann);
   xitk_set_widget_pos(tvset.chann, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.chann)) / 2);
   xitk_enable_and_show_widget(tvset.chann);
@@ -425,7 +429,7 @@ void tvset_panel(void) {
   cmb.callback          = NULL;
   cmb.userdata          = NULL;
   tvset.vidstd = xitk_noskin_combo_create (tvset.widget_list, &cmb,
-    x + 10, y + 15, w - 20 + 1, NULL, NULL);
+    x + 10, y + 15, w - 20 + 1);
   xitk_add_widget (tvset.widget_list, tvset.vidstd);
   xitk_enable_and_show_widget(tvset.vidstd);
 
@@ -489,3 +493,4 @@ void tvset_panel(void) {
 
   xitk_window_try_to_set_input_focus(tvset.xwin);
 }
+

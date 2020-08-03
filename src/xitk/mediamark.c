@@ -40,6 +40,7 @@
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"
+#include "xine-toolkit/intbox.h"
 
 #define WINDOW_WIDTH            525
 #define WINDOW_HEIGHT           270
@@ -3360,12 +3361,15 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 		    x, y, w, 45);
 
   ib.skin_element_name = NULL;
+  ib.fmt               = INTBOX_FMT_DECIMAL;
+  ib.min               = 0;
+  ib.max               = 0;
   ib.value             = 0;
   ib.step              = 1;
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.start = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+    x + 30, y + 16, w - 60, 20);
   xitk_add_widget (mmkeditor.widget_list, mmkeditor.start);
   xitk_set_widget_tips_default(mmkeditor.start, _("Mediamark start time (secs)."));
   xitk_enable_and_show_widget(mmkeditor.start);
@@ -3380,7 +3384,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.end = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+    x + 30, y + 16, w - 60, 20);
   xitk_add_widget (mmkeditor.widget_list, mmkeditor.end);
   xitk_set_widget_tips_default(mmkeditor.end, _("Mediamark end time (secs)."));
   xitk_enable_and_show_widget(mmkeditor.end);
@@ -3395,7 +3399,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.av_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+    x + 30, y + 16, w - 60, 20);
   xitk_add_widget (mmkeditor.widget_list, mmkeditor.av_offset);
   xitk_set_widget_tips_default(mmkeditor.av_offset, _("Offset of Audio and Video."));
   xitk_enable_and_show_widget(mmkeditor.av_offset);
@@ -3410,7 +3414,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.callback          = NULL;
   ib.userdata          = NULL;
   mmkeditor.spu_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20, NULL, NULL, NULL);
+    x + 30, y + 16, w - 60, 20);
   xitk_add_widget (mmkeditor.widget_list, mmkeditor.spu_offset);
   xitk_set_widget_tips_default(mmkeditor.spu_offset, _("Subpicture offset."));
   xitk_enable_and_show_widget(mmkeditor.spu_offset);
@@ -3472,4 +3476,3 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   xitk_window_try_to_set_input_focus(mmkeditor.xwin);
 }
-

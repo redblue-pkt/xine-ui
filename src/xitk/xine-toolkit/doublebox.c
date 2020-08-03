@@ -26,191 +26,131 @@
 #include <string.h>
 
 #include "_xitk.h"
+#include "doublebox.h"
 #include "inputtext.h"
 #include "button.h"
 
-static void enability(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-    
-    if(w->enable == WIDGET_ENABLE) {
-      xitk_enable_widget(private_data->input_widget);
-      xitk_enable_widget(private_data->more_widget);
-      xitk_enable_widget(private_data->less_widget);
-    }
-    else {
-      xitk_disable_widget(private_data->input_widget);
-      xitk_disable_widget(private_data->more_widget);
-      xitk_disable_widget(private_data->less_widget);
-    }
+typedef struct {
+  xitk_widget_t                   w;
+
+  char                           *skin_element_name;
+
+  xitk_widget_t                  *input_widget;
+  xitk_widget_t                  *more_widget;
+  xitk_widget_t                  *less_widget;
+
+  double                          step;
+  double                          value;
+
+  xitk_state_double_callback_t    callback;
+  void                           *userdata;
+} _doublebox_private_t;
+
+static void _db_enability (_doublebox_private_t *wp) {
+  if (wp->w.enable == WIDGET_ENABLE) {
+    xitk_enable_widget (wp->input_widget);
+    xitk_enable_widget (wp->more_widget);
+    xitk_enable_widget (wp->less_widget);
+  } else {
+    xitk_disable_widget (wp->input_widget);
+    xitk_disable_widget (wp->more_widget);
+    xitk_disable_widget (wp->less_widget);
   }
 }
 
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-    
-    XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data);
+static void _db_destroy (_doublebox_private_t *wp) {
+  if (wp->input_widget) {
+    xitk_destroy_widget (wp->input_widget);
+    wp->input_widget = NULL;
+  }
+  if (wp->more_widget) {
+    xitk_destroy_widget (wp->more_widget);
+    wp->more_widget = NULL;
+  }
+  if (wp->less_widget) {
+    xitk_destroy_widget (wp->less_widget);
+    wp->less_widget = NULL;
+  }
+  XITK_FREE (wp->skin_element_name);
+}
+
+/*
+ *
+ */
+static void _db_paint (_doublebox_private_t *wp) {
+  if (wp->w.visible == 1) {
+    int bx, ih, iw;
+    iw = xitk_get_widget_width (wp->input_widget);
+    ih = xitk_get_widget_height (wp->input_widget);
+    xitk_set_widget_pos (wp->input_widget, wp->w.x, wp->w.y);
+    bx = wp->w.x + iw;
+    xitk_set_widget_pos (wp->more_widget, bx, wp->w.y);
+    xitk_set_widget_pos (wp->less_widget, bx, wp->w.y + (ih >> 1));
+    xitk_show_widget (wp->input_widget);
+    xitk_show_widget (wp->more_widget);
+    xitk_show_widget (wp->less_widget);
+  } else {
+    xitk_hide_widget (wp->input_widget);
+    xitk_hide_widget (wp->more_widget);
+    xitk_hide_widget (wp->less_widget);
   }
 }
 
 /*
  *
  */
-static void paint(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-    
-    if(w->visible == 1) {
-      int bx, ih, iw;
-
-      iw = xitk_get_widget_width(private_data->input_widget);
-      ih = xitk_get_widget_height(private_data->input_widget);
-      xitk_set_widget_pos(private_data->input_widget, w->x, w->y);
-      bx = w->x + iw;
-      xitk_set_widget_pos(private_data->more_widget, bx, w->y);
-      xitk_set_widget_pos(private_data->less_widget, bx, (w->y + (ih>>1)));
-
-      xitk_show_widget(private_data->input_widget);
-      xitk_show_widget(private_data->more_widget);
-      xitk_show_widget(private_data->less_widget);
-    }
-    else {
-      xitk_hide_widget(private_data->input_widget);
-      xitk_hide_widget(private_data->more_widget);
-      xitk_hide_widget(private_data->less_widget);
-    }
+static void _db_new_skin (_doublebox_private_t *wp, xitk_skin_config_t *skonfig) {
+  if (wp->skin_element_name) {
+#if 0
+    int x, y;
+    xitk_skin_lock (skonfig);
+    /* visibility && enability */
+    xitk_set_widget_pos (c, c->x, c->y);
+    xitk_get_widget_pos (wp->label_widget, &x, &y);
+    x += xitk_get_widget_width (wp->label_widget);
+    xitk_set_widget_pos (wp->button_widget, x, y);
+    xitk_skin_unlock (skonfig);
+#else
+    (void)wp;
+    (void)skonfig;
+#endif
   }
 }
 
-/*
- *
- */
-static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-
-    if(private_data->skin_element_name) {
-      /*      
-      int x, y;
-
-      xitk_skin_lock(skonfig);
-
-      // visibility && enability
-
-      xitk_set_widget_pos(c, c->x, c->y);
-      xitk_get_widget_pos(private_data->label_widget, &x, &y);
-      x += xitk_get_widget_width(private_data->label_widget);
-      
-      (void) xitk_set_widget_pos(private_data->button_widget, x, y);
-
-      xitk_skin_unlock(skonfig);
-      */
-    }
-  }
-}
-
-static void tips_timeout(xitk_widget_t *w, unsigned long timeout) {
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-    
-    private_data->input_widget->tips_timeout = timeout;
-    private_data->more_widget->tips_timeout = timeout;
-    private_data->less_widget->tips_timeout = timeout;
-  }
+static void _db_tips_timeout (_doublebox_private_t *wp, unsigned long timeout) {
+  if (wp->input_widget)
+    xitk_set_widget_tips_and_timeout (wp->input_widget, wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  int retval = 0;
+  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return 0;
+  (void)result;
   
-  switch(event->type) {
-  case WIDGET_EVENT_PAINT:
-    paint(w);
-    break;
-  case WIDGET_EVENT_CHANGE_SKIN:
-    notify_change_skin(w, event->skonfig);
-    break;
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
-  case WIDGET_EVENT_ENABLE:
-    enability(w);
-    break;
-  case WIDGET_EVENT_TIPS_TIMEOUT:
-    tips_timeout(w, event->tips_timeout);
-    break;
-  }
-  
-  return retval;
-}
-
-/*
- *
- */
-static void doublebox_change_value(xitk_widget_t *x, void *data, const char *string) {
-  xitk_widget_t         *w = (xitk_widget_t *)data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
-    char                      buf[256];
-    
-    private_data->value = strtod(string, NULL);
-    
-    memset(&buf, 0, sizeof(buf));
-    snprintf(buf, sizeof(buf), "%e", private_data->value);
-    xitk_inputtext_change_text(private_data->input_widget, buf);
-    if(private_data->force_value == 0)
-      if(private_data->callback)
-	private_data->callback(w, private_data->userdata, private_data->value);
-  }
-}
-
-/*
- *
- */
-void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
-    char                      buf[256];
-
-    memset(&buf, 0, sizeof(buf));
-    snprintf(buf, sizeof(buf), "%e", value);
-    private_data->force_value = 1;
-    doublebox_change_value(NULL, (void*)w, buf);
-    private_data->force_value = 0;
-  }
-}
-
-/*
- *
- */
-double xitk_doublebox_get_value(xitk_widget_t *w) {
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
-    const char               *strval;
-
-    strval = xitk_inputtext_get_text(private_data->input_widget);
-    private_data->value = strtod(strval, NULL);
-    
-    return private_data->value;
+  switch (event->type) {
+    case WIDGET_EVENT_PAINT:
+      _db_paint (wp);
+      break;
+    case WIDGET_EVENT_CHANGE_SKIN:
+      _db_new_skin (wp, event->skonfig);
+      break;
+    case WIDGET_EVENT_DESTROY:
+      _db_destroy (wp);
+      break;
+    case WIDGET_EVENT_ENABLE:
+      _db_enability (wp);
+      break;
+    case WIDGET_EVENT_TIPS_TIMEOUT:
+      _db_tips_timeout (wp, event->tips_timeout);
+      break;
+    default: ;
   }
   return 0;
 }
@@ -218,167 +158,177 @@ double xitk_doublebox_get_value(xitk_widget_t *w) {
 /*
  *
  */
-static void doublebox_stepdown(xitk_widget_t *x, void *data) {
-  xitk_widget_t *w = (xitk_widget_t *) data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
+static void doublebox_change_value(xitk_widget_t *x, void *data, const char *string) {
+  _doublebox_private_t *wp = (_doublebox_private_t *)data;
+  char buf[256];
 
-    private_data->value -= private_data->step;
-    xitk_doublebox_set_value(w, private_data->value);
-    if(private_data->callback)
-      private_data->callback(w, private_data->userdata, private_data->value);
-  }
+  if (!wp || !string)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return;
+
+  (void)x;
+  wp->value = strtod (string, NULL);
+  memset (&buf, 0, sizeof (buf));
+  snprintf (buf, sizeof (buf), "%lf", wp->value);
+  xitk_inputtext_change_text (wp->input_widget, buf);
+  if (wp->callback)
+    wp->callback (&wp->w, wp->userdata, wp->value);
 }
 
 /*
  *
  */
-static void doublebox_stepup(xitk_widget_t *x, void *data) {
-  xitk_widget_t *w = (xitk_widget_t *) data;
+void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
+  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+  char buf[256];
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return;
 
-    private_data->value += private_data->step;
-    xitk_doublebox_set_value(w, private_data->value);
-    if(private_data->callback)
-      private_data->callback(w, private_data->userdata, private_data->value);
-  }
+  wp->value = value;
+  memset (&buf, 0, sizeof (buf));
+  snprintf (buf, sizeof (buf), "%lf", wp->value);
+  xitk_inputtext_change_text (wp->input_widget, buf);
 }
 
 /*
  *
  */
-xitk_widget_t *xitk_doublebox_get_input_widget(xitk_widget_t *w) {
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    doublebox_private_data_t *private_data = (doublebox_private_data_t *)w->private_data;
-    
-    return private_data->input_widget;
-  }
+double xitk_doublebox_get_value(xitk_widget_t *w) {
+  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+  const char *strval;
 
-  return NULL;
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return 0;
+
+  strval = xitk_inputtext_get_text (wp->input_widget);
+  wp->value = strtod (strval, NULL);
+  return wp->value;
 }
 
 /*
  *
  */
-static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
-					  xitk_skin_config_t *skonfig,
-					  xitk_doublebox_widget_t *ib, char *skin_element_name,
-					  xitk_widget_t *mywidget, 
-					  doublebox_private_data_t *private_data,
-					  int visible, int enable) {
+static void doublebox_minus(xitk_widget_t *x, void *data) {
+  _doublebox_private_t *wp = (_doublebox_private_t *)data;
+  char buf[256];
   
-  private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
-  private_data->callback                 = ib->callback;
-  private_data->userdata                 = ib->userdata;
-  private_data->step                     = ib->step;
-  private_data->value                    = ib->value;
-  private_data->force_value              = 0;
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return;
 
-  mywidget->private_data                 = private_data;
-
-  mywidget->wl                           = wl;
-
-  mywidget->enable                       = enable;
-  mywidget->running                      = 1;
-  mywidget->visible                      = visible;
-  mywidget->have_focus                   = FOCUS_LOST;
-
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
-  mywidget->event                        = notify_event;
-  mywidget->tips_timeout                 = 0;
-  mywidget->tips_string                  = NULL;
-
-  return mywidget;
+  (void)x;
+  wp->value -= wp->step;
+  memset (&buf, 0, sizeof (buf));
+  snprintf (buf, sizeof (buf), "%lf", wp->value);
+  xitk_inputtext_change_text (wp->input_widget, buf);
+  if (wp->callback)
+    wp->callback (&wp->w, wp->userdata, wp->value);
 }
 
 /*
  *
  */
-xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
-					 xitk_doublebox_widget_t *ib,
-					 int x, int y, int width, int height, 
-					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw) {
-  xitk_widget_t              *mywidget;
-  doublebox_private_data_t      *private_data;
-  xitk_button_widget_t        b;
-  xitk_inputtext_widget_t     inp;
+static void doublebox_plus(xitk_widget_t *x, void *data) {
+  _doublebox_private_t *wp = (_doublebox_private_t *)data;
+  char buf[256];
+  
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
+    return;
+
+  (void)x;
+  wp->value += wp->step;
+  memset (&buf, 0, sizeof (buf));
+  snprintf (buf, sizeof (buf), "%lf", wp->value);
+  xitk_inputtext_change_text (wp->input_widget, buf);
+  if (wp->callback)
+    wp->callback (&wp->w, wp->userdata, wp->value);
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
+  xitk_doublebox_widget_t *ib, int x, int y, int width, int height) {
+  _doublebox_private_t *wp;
+  xitk_button_widget_t  b;
+  xitk_inputtext_widget_t inp;
+  char buf[256];
 
   ABORT_IF_NULL(wl);
-
   XITK_CHECK_CONSTITENCY(ib);
 
-  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
+  wp = (_doublebox_private_t *)xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
   XITK_WIDGET_INIT(&b);
   XITK_WIDGET_INIT(&inp);
 
-  private_data = (doublebox_private_data_t *) xitk_xmalloc(sizeof(doublebox_private_data_t));
-  
+  wp->w.x          = x;
+  wp->w.y          = y;
+  wp->w.width      = width;
+  wp->w.height     = height;
+  wp->w.enable     = 0;
+  wp->w.running    = 1;
+  wp->w.visible    = 0;
+  wp->w.have_focus = FOCUS_LOST;
+  wp->w.wl         = wl;
+  wp->w.private_data = wp;
+  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_DOUBLEBOX;
+  wp->w.event        = notify_event;
+  wp->w.tips_timeout = 0;
+  wp->w.tips_string  = NULL;
+
+  wp->skin_element_name = NULL;
+  wp->callback          = ib->callback;
+  wp->userdata          = ib->userdata;
+  wp->step              = ib->step;
+  wp->value             = ib->value;
   /* Create inputtext and buttons (not skinable) */
-  {
-    char          buf[256];
-    xitk_image_t *wimage;
 
-    memset(&buf, 0, sizeof(buf));
-    snprintf(buf, sizeof(buf), "%e", ib->value);
+  memset (&buf, 0, sizeof (buf));
+  snprintf (buf, sizeof (buf), "%lf", ib->value);
 
-    inp.skin_element_name = NULL;
-    inp.text              = buf; 
-    inp.max_length        = 16;
-    inp.callback          = doublebox_change_value;
-    inp.userdata          = (void *)mywidget;
-    private_data->input_widget = xitk_noskin_inputtext_create (wl, &inp,
-      x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
-    xitk_dlist_add_tail (&wl->list, &private_data->input_widget->node);
-    private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
-    
-    b.skin_element_name = NULL;
-    b.callback          = doublebox_stepup;
-    b.userdata          = (void *)mywidget;
-    private_data->more_widget = xitk_noskin_button_create (wl, &b,
-      (x + width) - (height>>1), y, (height>>1), (height>>1));
-    xitk_dlist_add_tail (&wl->list, &private_data->more_widget->node);
-    private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
-
-    b.skin_element_name = NULL;
-    b.callback          = doublebox_stepdown;
-    b.userdata          = (void *)mywidget;
-    private_data->less_widget = xitk_noskin_button_create (wl, &b,
-      (x + width) - (height>>1), (y + (height>>1)), (height>>1), (height>>1));
-    xitk_dlist_add_tail (&wl->list, &private_data->less_widget->node);
-    private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
-
-    /* Draw '+' and '-' in buttons */
-    wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
-    
-    if(wimage)
-      draw_button_plus(wimage);
-
-    wimage = xitk_get_widget_foreground_skin(private_data->less_widget);
-    
-    if(wimage)
-      draw_button_minus(wimage);
-
+  inp.skin_element_name = NULL;
+  inp.text              = buf;
+  inp.max_length        = 16;
+  inp.callback          = doublebox_change_value;
+  inp.userdata          = (void *)wp;
+  wp->input_widget = xitk_noskin_inputtext_create (wl, &inp,
+    x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
+  if (wp->input_widget) {
+    xitk_dlist_add_tail (&wl->list, &wp->input_widget->node);
+    wp->input_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   }
 
-  if(iw)
-    *iw = private_data->input_widget;
-  if(mw)
-    *mw = private_data->more_widget;
-  if(lw)
-    *lw = private_data->less_widget;
-  
-  mywidget->x = x;
-  mywidget->y = y;
-  mywidget->width = width;
-  mywidget->height = height;
-  
-  return _xitk_doublebox_create(wl, NULL, ib, NULL, mywidget, private_data, 0, 0);
+  b.skin_element_name = "XITK_NOSKIN_PLUS";
+  b.callback          = doublebox_plus;
+  b.userdata          = (void *)wp;
+  wp->more_widget = xitk_noskin_button_create (wl, &b,
+    x + width - (height >> 1), y, height >> 1, height >> 1);
+  if (wp->more_widget) {
+    xitk_dlist_add_tail (&wl->list, &wp->more_widget->node);
+    wp->more_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
+  }
+
+  b.skin_element_name = "XITK_NOSKIN_MINUS";
+  b.callback          = doublebox_minus;
+  b.userdata          = (void *)wp;
+  wp->less_widget = xitk_noskin_button_create (wl, &b,
+    x + width - (height >> 1), y + (height >> 1), height >> 1, height >> 1);
+  if (wp->less_widget) {
+    xitk_dlist_add_tail (&wl->list, &wp->less_widget->node);
+    wp->less_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
+  }
+
+  return &wp->w;
 }

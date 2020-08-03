@@ -338,34 +338,16 @@ void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
  */
 void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
 
-  if((w == NULL) || (str == NULL))
+  if (w == NULL)
     return;
   
   XITK_FREE(w->tips_string);
+  if (str == NULL)
+    return;
   w->tips_string = strdup(str);
 
-  /* Special GROUP widget case */
-  if(w->type & WIDGET_GROUP) {
-    if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) {
-      xitk_widget_t *widget = xitk_intbox_get_input_widget(w);
-
-      xitk_tips_set_tips(widget, str);
-    }
-    else if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) {
-      xitk_widget_t *widget = xitk_doublebox_get_input_widget(w);
-      
-      xitk_tips_set_tips(widget, str);
-    }
-    else if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
-      xitk_widget_t *widget = xitk_combo_get_label_widget(w);
-      
-      xitk_tips_set_tips(widget, str);
-    }
-  }
-  
   /* No timeout, set it to default */
   if(!w->tips_timeout)
     xitk_tips_set_timeout(w, xitk_get_tips_timeout());
-
 }
 

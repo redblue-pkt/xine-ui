@@ -21,22 +21,21 @@
 #ifndef HAVE_XITK_DOUBLEBOX_H
 #define HAVE_XITK_DOUBLEBOX_H
 
-#include "_xitk.h"
-
 typedef struct {
-  char                           *skin_element_name;
+  int                              magic;
 
-  xitk_widget_t                  *input_widget;
-  xitk_widget_t                  *more_widget;
-  xitk_widget_t                  *less_widget;
+  const char                      *skin_element_name;
+  
+  double                           value;
+  double                           step;
 
-  double                          step;
-  double                          value;
-  int                             force_value;
+  xitk_state_double_callback_t      callback;
+  void                             *userdata;
+} xitk_doublebox_widget_t;
 
-  xitk_state_double_callback_t    callback;
-  void                           *userdata;
-
-} doublebox_private_data_t;
+xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
+  xitk_doublebox_widget_t *ib, int x, int y, int width, int height);
+void xitk_doublebox_set_value (xitk_widget_t *w, double value);
+double xitk_doublebox_get_value (xitk_widget_t *w);
 
 #endif

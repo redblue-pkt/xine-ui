@@ -21,22 +21,24 @@
 #ifndef HAVE_XITK_INTBOX_H
 #define HAVE_XITK_INTBOX_H
 
-#include "_xitk.h"
-
 typedef struct {
-  char                    *skin_element_name;
+  int                    magic;
 
-  xitk_widget_t           *input_widget;
-  xitk_widget_t           *more_widget;
-  xitk_widget_t           *less_widget;
+  const char            *skin_element_name;
+  
+  int                    min, max, step, value;
+  enum {
+    INTBOX_FMT_DECIMAL,
+    INTBOX_FMT_0x,
+    INTBOX_FMT_HASH
+  }                      fmt;
 
-  int                      step;
-  int                      value;
-  int                      force_value;
+  xitk_state_callback_t  callback;
+  void                  *userdata;
+} xitk_intbox_widget_t;
 
-  xitk_state_callback_t    callback;
-  void                    *userdata;
-
-} intbox_private_data_t;
-
+xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
+  xitk_intbox_widget_t *ib, int x, int y, int width, int height);
+void xitk_intbox_set_value(xitk_widget_t *, int);
+int xitk_intbox_get_value(xitk_widget_t *);
 #endif
