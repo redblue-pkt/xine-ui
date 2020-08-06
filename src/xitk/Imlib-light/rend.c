@@ -6,13 +6,6 @@
 #include "Imlib_types.h"
 #include "Imlib_private.h"
 
-static const union {
-  uint32_t word;
-  uint8_t  little;
-} endian_is = {
-  .word = 1
-};
-
 typedef union {
   uint32_t w;
   struct {
@@ -432,9 +425,7 @@ int
 Imlib_best_color_match(ImlibData * id, int *r, int *g, int *b)
 {
   int                 dr, dg, db;
-  int                 col;
 
-  col = 0;
   if (!id)
     {
       fprintf(stderr, "ImLib ERROR: No ImlibData initialised\n");
@@ -1292,7 +1283,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   static              Display *pd = NULL;
   static GC           tgc = 0, stgc = 0;
   XGCValues           gcv;
-  unsigned char      *tmp, *stmp, **yarray, *ptr22;
+  unsigned char     **yarray, *ptr22;
   int                 w4, x, inc, pos, *xarray, bpp;
   Pixmap              pmap, mask;
   int                 shared_pixmap, shared_image;
@@ -1322,8 +1313,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   
   sxim = NULL;
   xim = NULL;
-  tmp = NULL;
-  stmp = NULL;
   pmap = 0;
   mask = 0;
   inc = 0;
@@ -1582,7 +1571,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
       }
       id->x.last_sshminfo.readOnly = False;
       XShmAttach (id->x.disp, &id->x.last_sshminfo);
-      stmp = (unsigned char *)sxim->data;
       id->x.last_sxim = sxim;
       mask = XShmCreatePixmap (id->x.disp, id->x.base_window,
         id->x.last_sshminfo.shmaddr, &id->x.last_sshminfo, w, h, 1);
@@ -1671,7 +1659,6 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
       }
       id->x.last_sshminfo.readOnly = False;
       XShmAttach (id->x.disp, &id->x.last_sshminfo);
-      stmp = (unsigned char *)sxim->data;
       id->x.last_sxim = sxim;
       mask = XCreatePixmap (id->x.disp, id->x.base_window, w, h, 1);
       if (!stgc)
