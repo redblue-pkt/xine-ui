@@ -289,6 +289,7 @@ static void _xitk_unlock_display (xitk_t *_xitk) {
 }
 
 static void _xitk_dummy_lock_display (xitk_t *_xitk) {
+  (void)_xitk;
 }
 
 /*
@@ -793,9 +794,12 @@ static int xitk_check_xshm(Display *display) {
       }
     }
   }
+#else
+  (void)display;
 #endif
   return 0;
 }
+
 int xitk_is_use_xshm(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
