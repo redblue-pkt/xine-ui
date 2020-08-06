@@ -41,6 +41,7 @@
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/intbox.h"
+#include "xine-toolkit/checkbox.h"
 
 #define WINDOW_WIDTH            525
 #define WINDOW_HEIGHT           270

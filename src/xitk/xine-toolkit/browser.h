@@ -70,7 +70,7 @@ xitk_widget_t *xitk_browser_create (xitk_widget_list_t *wl,
 /** */
 xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
   xitk_browser_widget_t *br,
-  int x, int y, int itemw, int itemh, int slidw, const char *fontname);
+  int x, int y, int itemw, int itemh, int slidw, const char *font_name);
 /** Redraw buttons/slider */
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
 /** Update the list, and rebuild button list */

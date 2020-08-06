@@ -32,12 +32,9 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #include <X11/Xlib.h>
-
-#ifdef NEED_MRLBROWSER
-#include <xine.h>
-#endif
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
@@ -101,9 +98,6 @@ typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, const char *);
 typedef void (*xitk_dnd_callback_t) (const char *filename);
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
-#ifdef NEED_MRLBROWSER
-typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
-#endif
 
 typedef struct {
   int x, y, width, height;
@@ -497,96 +491,6 @@ typedef struct {
   int                               magic;
   const char                       *skin_element_name;
 } xitk_image_widget_t;
-
-typedef struct {
-  int                               magic;
-  xitk_state_callback_t             callback;
-  void                             *userdata;
-  const char                       *skin_element_name;
-} xitk_checkbox_widget_t;
-
-#ifdef NEED_MRLBROWSER
-
-#include "browser.h"
-
-typedef struct {
-  char                             *name;
-  char                             *ending;
-} xitk_mrlbrowser_filter_t;
-
-typedef struct {
-  int                               magic;
-  const char                       *skin_element_name;
-  int                               layer_above;
-  xitk_pixmap_t                    *icon;
-  int                               set_wm_window_normal;
-
-  int                               x;
-  int                               y;
-  char                             *window_title;
-  char                             *resource_name;
-  char                             *resource_class;
-
-  struct {
-    char                           *cur_origin;
-    const char                     *skin_element_name;
-  } origin;
-
-  xitk_key_event_callback_t         key_cb;
-  void                             *key_cb_data;
-  xitk_dnd_callback_t               dndcallback;
-
-  struct {
-    char                           *caption;
-    const char                     *skin_element_name;
-    xitk_mrl_callback_t             callback;
-    void                           *data;
-  } select;
-
-  struct {
-    const char                     *skin_element_name;
-    xitk_mrl_callback_t             callback;
-    void                           *data;
-  } play;
-
-  struct {
-    char                           *caption;
-    const char                     *skin_element_name;
-  } dismiss;
-
-  struct {
-    xitk_simple_callback_t          callback;
-    void                           *data;
-  } kill;
-
-  const char *const                *ip_availables;
-  
-  struct {
-
-    struct {
-      const char                   *skin_element_name;
-    } button;
-
-    struct {
-      const char                   *label_str;
-      const char                   *skin_element_name;
-    } label;
-
-  } ip_name;
-  
-  xine_t                           *xine;
-
-  xitk_browser_widget_t             browser;
-  
-  xitk_mrlbrowser_filter_t        **mrl_filters;
-
-  struct {
-    const char                     *skin_element_name;
-  } combo;
-
-} xitk_mrlbrowser_widget_t;
-
-#endif
 
 /* *******
  * INIT: widget lib initialization and friends
@@ -1017,86 +921,6 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
  *
  */
 void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, int height);
-
-/*
- * *** Checkbox
- */
-/**
- * Create a checkbox.
- */
-xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
-				     xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cp);
-
-/*
- * Same as above, without skinable feature.
- */
-xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
-					   xitk_checkbox_widget_t *cb,
-					   int x, int y, int width, int height);
-
-
-/**
- * get state of checkbox "widget".
- */
-int xitk_checkbox_get_state(xitk_widget_t *);
-
-/**
- * Set state of checkbox .
- */
-void xitk_checkbox_set_state(xitk_widget_t *, int);
-
-/**
- * Call callback
- */
-void xitk_checkbox_callback_exec(xitk_widget_t *w);
-
-#ifdef NEED_MRLBROWSER
-/**
- *
- */
-xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
-
-/**
- *
- */
-void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig);
-
-/**
- *
- */
-int xitk_mrlbrowser_is_running(xitk_widget_t *w);
-
-/**
- *
- */
-int xitk_mrlbrowser_is_visible(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_mrlbrowser_hide(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_mrlbrowser_show(xitk_widget_t *w);
-
-/**
- *
- */
-int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
-
-/**
- *
- */
-xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout);
-
-#endif
 
 /*
  * return len of keystring (stored in kbuf)

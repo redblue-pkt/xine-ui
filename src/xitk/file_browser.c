@@ -40,6 +40,9 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/combo.h"
+#include "xine-toolkit/checkbox.h"
+#include "xine-toolkit/browser.h"
+
 
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       390

@@ -34,6 +34,7 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/combo.h"
+#include "xine-toolkit/browser.h"
 #include <xine/video_out.h>
 
 #define CONTROL_MIN     0
@@ -42,6 +43,7 @@
 #define STEP_SIZE       256     /* action event step */
 
 #define TEST_VO_VALUE(val)  (val < CONTROL_MAX/3 || val > CONTROL_MAX*2/3) ? (CONTROL_MAX - val) : 0
+
 
 typedef struct {
   xui_vctrl_t   *vctrl;

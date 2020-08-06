@@ -81,12 +81,10 @@ typedef struct {
 } btnlist_t;
 
 #include "_config.h"
-#include "checkbox.h"
 #include "cursors.h"
 #include "dnd.h"
 #include "font.h"
 #include "image.h"
-#include "mrlbrowser.h"
 #include "skin.h"
 #include "widget.h"
 #include "window.h"

@@ -21,6 +21,24 @@
 #ifndef HAVE_XITK_CHECKBOX_H
 #define HAVE_XITK_CHECKBOX_H
 
-#include "_xitk.h"
+typedef struct {
+  int                               magic;
+  xitk_state_callback_t             callback;
+  void                             *userdata;
+  const char                       *skin_element_name;
+} xitk_checkbox_widget_t;
+
+/** Create a checkbox. */
+xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cp);
+/** Same as above, without skinable feature. */
+xitk_widget_t *xitk_noskin_checkbox_create (xitk_widget_list_t *wl,
+    xitk_checkbox_widget_t *cb, int x, int y, int width, int height);
+/** get state of checkbox "widget". */
+int xitk_checkbox_get_state (xitk_widget_t *w);
+/** Set state of checkbox. */
+void xitk_checkbox_set_state (xitk_widget_t *w, int state);
+/** Call callback */
+void xitk_checkbox_callback_exec (xitk_widget_t *w);
 
 #endif

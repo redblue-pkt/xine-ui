@@ -273,7 +273,6 @@ void tvset_panel(void) {
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_intbox_widget_t        ib;
-  xitk_checkbox_widget_t      cb;
   xitk_combo_widget_t         cmb;
   xitk_inputtext_widget_t     inp;
   xitk_pixmap_t              *bg;
@@ -307,7 +306,6 @@ void tvset_panel(void) {
 
   XITK_WIDGET_INIT(&lb);
   XITK_WIDGET_INIT(&lbl);
-  XITK_WIDGET_INIT(&cb);
 
   bg = xitk_window_get_background_pixmap(tvset.xwin);
 

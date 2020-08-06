@@ -32,7 +32,10 @@
 #include "combo.h"
 #include "button.h"
 #include "label.h"
+#include "checkbox.h"
+#include "browser.h"
 #include "xitk_x11.h"
+
 
 typedef struct {
   xitk_widget_t           w;

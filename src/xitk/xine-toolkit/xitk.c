@@ -62,6 +62,7 @@
 #include "menu.h"
 #include "slider.h"
 #include "combo.h"
+#include "browser.h"
 
 #define _XITK_CLIPBOARD_DEBUG
 
@@ -3051,4 +3052,3 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
-

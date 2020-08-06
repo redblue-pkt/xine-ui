@@ -35,6 +35,7 @@
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/button_list.h"
+#include "xine-toolkit/browser.h"
 
 
 typedef struct {

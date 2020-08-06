@@ -30,6 +30,8 @@
 
 #include "common.h"
 #include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/browser.h"
+
 #include "skins_internal.h"
 
 
