@@ -38,6 +38,7 @@
 #include "common.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/tabs.h"
+#include "xine-toolkit/browser.h"
 
 #include "lang.h"
 
@@ -432,4 +433,3 @@ void help_panel(void) {
 
   xitk_window_try_to_set_input_focus(help->xwin);
 }
-

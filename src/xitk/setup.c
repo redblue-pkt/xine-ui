@@ -35,6 +35,7 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/intbox.h"
+#include "xine-toolkit/checkbox.h"
 
 #include <xine/sorted_array.h>
 

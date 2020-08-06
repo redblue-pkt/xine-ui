@@ -35,6 +35,8 @@
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/doublebox.h"
 #include "xine-toolkit/intbox.h"
+#include "xine-toolkit/checkbox.h"
+#include "xine-toolkit/browser.h"
 
 #define VFREE(vfp) do {memset (vfp, 0x55, sizeof (*(vfp))); free (vfp); } while (0)
 

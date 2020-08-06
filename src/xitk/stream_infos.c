@@ -438,7 +438,6 @@ void stream_infos_panel(void) {
   gGui_t *gui = gGui;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
-  xitk_checkbox_widget_t      cb;
   xitk_pixmap_t              *bg;
   int                         x, y, w;
   xitk_widget_t              *widget;
@@ -471,7 +470,6 @@ void stream_infos_panel(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  XITK_WIDGET_INIT(&cb);
 
   bg = xitk_window_get_background_pixmap(sinfos.xwin);
 

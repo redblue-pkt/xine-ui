@@ -22,147 +22,107 @@
 #ifndef HAVE_XITK_MRLBROWSER_H
 #define HAVE_XITK_MRLBROWSER_H
 
-#ifdef NEED_MRLBROWSER
+#include <xine.h>
 
-#include "_xitk.h"
-#include "button_list.h"
+#include "browser.h"
 
-#define MAXFILES      65535
-
-/*
- * Freeing/zeroing all of entries of given mrl.
- */
-
-#define MRL_ZERO(m) {                                                         \
-  if((m)) {                                                                   \
-    free((m)->origin);                                                        \
-    free((m)->mrl);                                                           \
-    free((m)->link);                                                          \
-    (m)->origin = NULL;                                                       \
-    (m)->mrl    = NULL;                                                       \
-    (m)->link   = NULL;                                                       \
-    (m)->type   = 0;                                                          \
-    (m)->size   = (off_t) 0;                                                  \
-  }                                                                           \
-}
-
-/*
- * Duplicate two mrls entries (s = source, d = destination).
- */
-#define MRL_DUPLICATE(s, d) {                                                 \
-  ABORT_IF_NULL(s);                                                           \
-  ABORT_IF_NULL(d);                                                           \
-                                                                              \
-  if((s)->origin) {                                                           \
-    if((d)->origin) {                                                         \
-      (d)->origin = (char *) realloc((d)->origin, strlen((s)->origin) + 1);   \
-      strcpy((d)->origin, (s)->origin);                                	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->origin = strdup((s)->origin);                                      \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->origin));                                                 \
-                                                                              \
-  if((s)->mrl) {                                                              \
-    if((d)->mrl) {                                                            \
-      (d)->mrl = (char *) realloc((d)->mrl, strlen((s)->mrl) + 1);            \
-      strcpy((d)->mrl, (s)->mrl);                                      	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->mrl = strdup((s)->mrl);                                            \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->mrl));                                                    \
-                                                                              \
-  if((s)->link) {                                                             \
-    if((d)->link) {                                                           \
-      (d)->link = (char *) realloc((d)->link, strlen((s)->link) + 1);         \
-      strcpy((d)->link, (s)->link);                                    	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->link = strdup((s)->link);                                          \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->link));                                                   \
-                                                                              \
-  (d)->type = (s)->type;                                                      \
-  (d)->size = (s)->size;                                                      \
-}
-
-/**
- * Duplicate two arrays of mrls (s = source, d = destination).
- */
-#define MRLS_DUPLICATE(s, d) {                                                \
-  int i = 0;                                                                  \
-                                                                              \
-  ABORT_IF_NULL(s);                                                           \
-  ABORT_IF_NULL(d);                                                           \
-                                                                              \
-  while((s) != NULL) {                                                        \
-    d[i] = (xine_mrl_t *) malloc(sizeof(xine_mrl_t));                         \
-    MRL_DUPLICATE(s[i], d[i]);                                                \
-    i++;                                                                      \
-  }                                                                           \
-}
+typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 
 typedef struct {
-  xine_mrl_t                *mrls[MAXFILES];
-  xine_mrl_t                *filtered_mrls[MAXFILES];
-  char                      *mrls_disp[MAXFILES];
-  int                        mrls_to_disp;
-} mrl_contents_t;
+  char                             *name;
+  char                             *ending;
+} xitk_mrlbrowser_filter_t;
 
 typedef struct {
+  int                               magic;
+  const char                       *skin_element_name;
+  int                               layer_above;
+  xitk_pixmap_t                    *icon;
+  int                               set_wm_window_normal;
 
-  xitk_widget_t             *fbWidget; /*  My widget */
+  int                               x;
+  int                               y;
+  char                             *window_title;
+  char                             *resource_name;
+  char                             *resource_class;
 
-  char                      *skin_element_name;
-  char                      *skin_element_name_ip;
+  struct {
+    char                           *cur_origin;
+    const char                     *skin_element_name;
+  } origin;
 
-  xitk_register_key_t        widget_key;
+  xitk_key_event_callback_t         key_cb;
+  void                             *key_cb_data;
+  xitk_dnd_callback_t               dndcallback;
 
-  xitk_window_t             *xwin;
+  struct {
+    char                           *caption;
+    const char                     *skin_element_name;
+    xitk_mrl_callback_t             callback;
+    void                           *data;
+  } select;
 
-  xitk_widget_list_t        *widget_list; /* File browser widget list */
+  struct {
+    const char                     *skin_element_name;
+    xitk_mrl_callback_t             callback;
+    void                           *data;
+  } play;
+
+  struct {
+    char                           *caption;
+    const char                     *skin_element_name;
+  } dismiss;
+
+  struct {
+    xitk_simple_callback_t          callback;
+    void                           *data;
+  } kill;
+
+  const char *const                *ip_availables;
   
-  xine_t                    *xine;
+  struct {
 
-  mrl_contents_t            *mc;
-  int                        mrls_num;
+    struct {
+      const char                   *skin_element_name;
+    } button;
 
-  char                      *last_mrl_source;
+    struct {
+      const char                   *label_str;
+      const char                   *skin_element_name;
+    } label;
 
-  xitk_widget_t             *widget_origin; /* Current directory widget */
-  char                      *current_origin; /* Current directory */
+  } ip_name;
+  
+  xine_t                           *xine;
 
-  int                        running; /* Boolean status */
-  int                        visible; /* Boolean status */
+  xitk_browser_widget_t             browser;
+  
+  xitk_mrlbrowser_filter_t        **mrl_filters;
 
-  xitk_widget_t             *mrlb_list; /*  Browser list widget */
-  xitk_button_list_t        *autodir_buttons;
+  struct {
+    const char                     *skin_element_name;
+  } combo;
 
-  xitk_widget_t             *combo_filter;
-  const char               **filters;
-  int                        filters_num;
-  xitk_mrlbrowser_filter_t **mrl_filters;
-  int                        filter_selected;
+} xitk_mrlbrowser_widget_t;
 
-  xitk_mrl_callback_t        add_callback;
-  void                      *add_userdata;
-  xitk_mrl_callback_t        play_callback;
-  void                      *play_userdata;
-  xitk_simple_callback_t     kill_callback;
-  void                      *kill_userdata;
-  xitk_simple_callback_t     ip_callback;
-  void                      *ip_userdata;
-  xitk_key_event_callback_t  key_cb;
-  void                      *key_cb_data;
 
-  xitk_event_cbs_t           mrlbrowser_event_cbs;
-} mrlbrowser_private_data_t;
+/** */
+xitk_widget_t *xitk_mrlbrowser_create (xitk_t *xitk, xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+/** */
+void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig);
+/** */
+int xitk_mrlbrowser_is_running (xitk_widget_t *w);
+/** */
+int xitk_mrlbrowser_is_visible (xitk_widget_t *w);
+/** */
+void xitk_mrlbrowser_hide (xitk_widget_t *w);
+/** */
+void xitk_mrlbrowser_show (xitk_widget_t *w);
+/** */
+int xitk_mrlbrowser_get_window_info (xitk_widget_t *w, window_info_t *inf);
+/** */
+xitk_window_t *xitk_mrlbrowser_get_window (xitk_widget_t *w);
+/** */
+void xitk_mrlbrowser_set_tips_timeout (xitk_widget_t *w, int enabled, unsigned long timeout);
 
 #endif
-
-#endif
-

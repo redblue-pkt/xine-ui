@@ -29,6 +29,8 @@
 #include "common.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
+#include "xine-toolkit/checkbox.h"
+#include "xine-toolkit/browser.h"
 #include "kbindings_common.h"
 
 

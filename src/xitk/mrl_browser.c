@@ -28,6 +28,7 @@
 #include <errno.h>
 
 #include "common.h"
+#include "xine-toolkit/mrlbrowser.h"
 
 typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int, int);
 
