@@ -759,8 +759,11 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   if (b->button_type == TAB_BUTTON) {
     if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &info.pixmap_img.image) == 1)
       draw_tab (info.pixmap_img.image);
+  } else if (b->skin_element_name && !strcmp (b->skin_element_name, "XITK_NOSKIN_FLAT")) {
+    if (xitk_shared_image (wl, "xitk_labelbutton_f", width * 3, height, &info.pixmap_img.image) == 1)
+      draw_flat_three_state (info.pixmap_img.image);
   } else {
-    if (xitk_shared_image (wl, "xitk_labelbutton", width * 3, height, &info.pixmap_img.image) == 1)
+    if (xitk_shared_image (wl, "xitk_labelbutton_b", width * 3, height, &info.pixmap_img.image) == 1)
       draw_bevel_three_state (info.pixmap_img.image);
   }
   info.pixmap_img.x     = 0;

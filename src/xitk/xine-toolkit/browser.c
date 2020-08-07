@@ -1194,7 +1194,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
   {
     int ix = x, iy = y, i;
     for (i = 0; i < wp->visible.max; i++) {
-      xitk_image_t  *wimage;
       wp->visible.blist[i] = wp;
       lb.button_type       = RADIO_BUTTON;
       lb.label             = i < wp->items.num ? wp->items.names[i] : "";
@@ -1202,7 +1201,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
       lb.userdata          = wp->visible.blist + i;
-      lb.skin_element_name = NULL;
+      lb.skin_element_name = "XITK_NOSKIN_FLAT";
       wp->visible.btns[i + WBSTART] = xitk_noskin_labelbutton_create (wl, &lb,
         ix, iy, itemw, itemh, "Black", "Black", "White", fontname);
       if (!wp->visible.btns[i + WBSTART])
@@ -1212,9 +1211,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
       wp->visible.btns[i + WBSTART]->parent = &wp->w;
       if (i >= wp->visible.num)
         xitk_disable_widget (wp->visible.btns[i + WBSTART]);
-      wimage = xitk_get_widget_foreground_skin (wp->visible.btns[i + WBSTART]);
-      if (wimage)
-        draw_flat_three_state (wimage);
       xitk_set_widget_pos (wp->visible.btns[i + WBSTART], ix, iy);
       if (wp->items.shortcuts)
         xitk_labelbutton_change_shortcut_label (wp->visible.btns[i + WBSTART],

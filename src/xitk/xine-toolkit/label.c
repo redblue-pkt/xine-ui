@@ -583,7 +583,7 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
 
   wp->font = info->label_pixmap_font_img;
 
-  if (info->label_pixmap_font_name && (info->label_pixmap_font_name[0] == '\x01') && (info->label_pixmap_font_name[0] == 0)) {
+  if (info->label_pixmap_font_name && (info->label_pixmap_font_name[0] == '\x01') && (info->label_pixmap_font_name[1] == 0)) {
     wp->skin_element_name[0] = '\x01';
     wp->skin_element_name[1] = 0;
   } else {
@@ -696,8 +696,15 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   info.enability         = 0;
   info.label_fontname    = (char *)fontname;
   info.label_pixmap_font_name  = (char *)"\x01";
-  if (xitk_shared_image (wl, "xitk_label", width, height, &info.label_pixmap_font_img) == 1)
-    draw_flat (info.label_pixmap_font_img->image, width, height);
+  if (l->skin_element_name && !strcmp (l->skin_element_name, "XITK_NOSKIN_INNER")) {
+    if (xitk_shared_image (wl, "xitk_label_i", width, height, &info.label_pixmap_font_img) == 1) {
+      draw_flat (info.label_pixmap_font_img->image, width, height);
+      draw_rectangular_inner_box (info.label_pixmap_font_img->image, 0, 0, width - 1, height - 1);
+    }
+  } else {
+    if (xitk_shared_image (wl, "xitk_label_f", width, height, &info.label_pixmap_font_img) == 1)
+      draw_flat (info.label_pixmap_font_img->image, width, height);
+  }
 
   return _xitk_label_create (wl, l, &info);
 }

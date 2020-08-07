@@ -676,7 +676,7 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
     height = xitk_font_get_string_height(fs, " ") + 6;
     xitk_font_unload_font(fs);
 
-    lbl.skin_element_name = NULL;
+    lbl.skin_element_name = "XITK_NOSKIN_INNER";
     lbl.label             = "";
     lbl.callback          = _combo_rollunroll_from_lbl;
     lbl.userdata          = (void *)wp;
@@ -702,14 +702,6 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
     wp->w.y = y;
     wp->w.width = width;
     wp->w.height = height;
-    
-    {
-      xitk_image_t *wimage = xitk_get_widget_foreground_skin(wp->label_widget);
-      
-      if(wimage)
-        draw_rectangular_inner_box(wimage->image, 0, 0, wimage->width - 1, wimage->height - 1);
-    }
-
   }
 
   return _xitk_combo_create (wl, NULL, c, NULL, wp, 0, 0);

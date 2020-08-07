@@ -284,7 +284,7 @@ struct xitk_image_s {
   ImlibImage                       *raw;
   xitk_widget_list_t               *wl;
   int                               refs, max_refs;
-  char                              key[20];
+  char                              key[32];
 };
 
 Pixmap xitk_window_get_background(xitk_window_t *w);
