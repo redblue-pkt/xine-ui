@@ -1285,31 +1285,21 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   DISABLE_ME(pobj->plugins);
   xitk_combo_set_select(pobj->plugins, 0);
 
-  {
-    xitk_image_t *bimage;
+  XITK_WIDGET_INIT(&b);
+  b.skin_element_name = "XITK_NOSKIN_UP";
+  b.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_move_up : _applugin_move_up;
+  b.userdata          = pobj;
+  pobj->up = xitk_noskin_button_create (pp_wrapper->pplugin->widget_list, &b, 0, 0, 17, 17);
+  xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->up);
+  DISABLE_ME(pobj->up);
 
-    XITK_WIDGET_INIT(&b);
-    b.skin_element_name = NULL;
-    b.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_move_up : _applugin_move_up;
-    b.userdata          = pobj;
-    pobj->up = xitk_noskin_button_create (pp_wrapper->pplugin->widget_list, &b, 0, 0, 17, 17);
-    xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->up);
-    DISABLE_ME(pobj->up);
+  b.skin_element_name = "XITK_NOSKIN_DOWN";
+  b.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_move_down : _applugin_move_down;
+  b.userdata          = pobj;
+  pobj->down = xitk_noskin_button_create (pp_wrapper->pplugin->widget_list, &b, 0, 0, 17, 17);
+  xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->down);
+  DISABLE_ME(pobj->down);
 
-    if((bimage = xitk_get_widget_foreground_skin(pobj->up)) != NULL)
-      draw_arrow_up(bimage);
-    
-    b.skin_element_name = NULL;
-    b.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_move_down : _applugin_move_down;
-    b.userdata          = pobj;
-    pobj->down = xitk_noskin_button_create (pp_wrapper->pplugin->widget_list, &b, 0, 0, 17, 17);
-    xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->down);
-    DISABLE_ME(pobj->down);
-
-    if((bimage = xitk_get_widget_foreground_skin(pobj->down)) != NULL)
-      draw_arrow_down(bimage);
-
-  }
   return pobj;
 }
 
