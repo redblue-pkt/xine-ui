@@ -949,20 +949,37 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
  * Return widget present at specified coords.
  */
 xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
-  xitk_widget_t *mywidget;
+  xitk_widget_t *w;
 
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
 
-  mywidget = (xitk_widget_t *)wl->list.head.next;
-  while (mywidget->node.next) {
-    if ((xitk_is_inside_widget (mywidget, x, y))
-	&& (mywidget->enable == WIDGET_ENABLE) && mywidget->visible)
-      return mywidget;
+  for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
+    widget_event_t        event;
+    widget_event_result_t result;
+    int d;
 
-    mywidget = (xitk_widget_t *)mywidget->node.next;
+    if (w->enable != WIDGET_ENABLE)
+      continue;
+    if (!w->visible)
+      continue;
+    d = x - w->x;
+    if ((d < 0) || (d >= w->width))
+      continue;
+    d = y - w->y;
+    if ((d < 0) || (d >= w->height))
+      continue;
+
+    event.type = WIDGET_EVENT_INSIDE;
+    event.x    = x;
+    event.y    = y;
+    result.value = 1;
+    if (!w->event (w, &event, &result))
+      return w;
+    if (result.value)
+      return w;
   }
   return NULL;
 }
@@ -972,7 +989,7 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
  * function in right widget (the one who get, and the one who lose focus).
  */
 void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsigned int state) { 
-  xitk_widget_t *mywidget;
+  xitk_widget_t *w;
   widget_event_t event;
   
   if(!wl) {
@@ -980,9 +997,10 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     return;
   }
  
-  /* Slider still pressed, mouse pointer outside widget */
-  if(wl->widget_pressed && wl->widget_focused && (wl->widget_pressed == wl->widget_focused) &&
-     ((wl->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  /* Convenience: while holding the slider, user need not stay within its
+   * graphical bounds. Just move to closest possible. */
+  if (wl->widget_pressed && (wl->widget_pressed == wl->widget_focused) &&
+    ((wl->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     widget_event_result_t   result;
     
     //    printf("slider already clicked -> send event\n");
@@ -999,77 +1017,93 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     return;
   }
 
-  mywidget = xitk_get_widget_at (wl, x, y);
+  w = NULL;
+  do {
+    int d;
+    widget_event_result_t result;
+    xitk_widget_t *lw = wl->widget_under_mouse;
+    /* Still over same widget? */
+    if (!lw)
+      break;
+    if (lw->enable != WIDGET_ENABLE)
+      break;
+    if (!lw->visible)
+      break;
+    d = x - lw->x;
+    if ((d < 0) || (d >= lw->width))
+      break;
+    d = y - lw->y;
+    if ((d < 0) || (d >= lw->height))
+      break;
+    /* Yes, but for group leader recheck its members. */
+    if (lw->type & WIDGET_GROUP)
+      break;
+
+    event.type = WIDGET_EVENT_INSIDE;
+    event.x    = x;
+    event.y    = y;
+    result.value = 1;
+    w = lw;
+    if (!lw->event (lw, &event, &result))
+      break;
+    if (result.value)
+      break;
+    w = NULL;
+  } while (0);
+  if (!w)
+    w = xitk_get_widget_at (wl, x, y);
   
-  if (mywidget != wl->widget_under_mouse) {
-    
-    if (wl->widget_under_mouse) {
-      
+  if (w != wl->widget_under_mouse) {
+    int keep_focus = 0;
+    if (wl->widget_focused) {
+      if (wl->widget_focused->type & WIDGET_GROUP_BROWSER)
+        keep_focus = 1;
+      if ((wl->widget_focused->type & (WIDGET_KEYABLE | WIDGET_TYPE_MASK)) == (WIDGET_KEYABLE | WIDGET_TYPE_SLIDER))
+        keep_focus = 1;
+    }
+
+    do {
+      if (!wl->widget_under_mouse)
+        break;
       /* Kill (hide) tips */
       xitk_tips_hide_tips(wl->xitk->tips);
-      
-      if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
-	   (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
-	    ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
-	     (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
-	 (wl->widget_under_mouse->type & WIDGET_FOCUSABLE) &&
-	 wl->widget_under_mouse->enable == WIDGET_ENABLE) {
-	
-	event.type  = WIDGET_EVENT_FOCUS;
-	event.focus = FOCUS_MOUSE_OUT;
-	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
-
-	event.type = WIDGET_EVENT_PAINT;
-	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
-      }
-    }
+      if (!(wl->widget_under_mouse->type & WIDGET_FOCUSABLE))
+        break;
+      if (wl->widget_under_mouse->enable != WIDGET_ENABLE)
+        break;
+      if ((wl->widget_focused == wl->widget_under_mouse) && keep_focus)
+        break;
+      event.type  = WIDGET_EVENT_FOCUS;
+      event.focus = FOCUS_MOUSE_OUT;
+      wl->widget_under_mouse->event (wl->widget_under_mouse, &event, NULL);
+      event.type = WIDGET_EVENT_PAINT;
+      wl->widget_under_mouse->event (wl->widget_under_mouse, &event, NULL);
+    } while (0);
     
-    wl->widget_under_mouse = mywidget;
+    wl->widget_under_mouse = w;
     
-    if (mywidget && (mywidget->enable == WIDGET_ENABLE) && mywidget->visible) {
-      
+    if (w) {
 #if 0
       dump_widget_type(mywidget);
 #endif
-      
       /* Only give focus and paint when tips are accepted, otherwise associated window is invisible. */
       /* This call may occur from MotionNotify directly after iconifying window.                     */
-      if(xitk_tips_show_widget_tips(wl->xitk->tips, mywidget)) {
-      
-	if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
-	     (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
-	      ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
-	       (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
-	   (mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
-	  event.type  = WIDGET_EVENT_FOCUS;
-	  /* If widget still marked pressed or focus received, it shall receive the focus again. */
-	  event.focus = (mywidget == wl->widget_pressed || mywidget == wl->widget_focused) ?
-			FOCUS_RECEIVED : FOCUS_MOUSE_IN;
-	  (void) mywidget->event(mywidget, &event, NULL);
-
-	  event.type  = WIDGET_EVENT_PAINT;
-	  (void) mywidget->event(mywidget, &event, NULL);
-
-	  if(mywidget->type & WIDGET_GROUP_MENU)
-	    menu_auto_pop(mywidget);
-	}
-      }
-    }
-  }
-  else {
-    /* Can the following happen here at all ? */
-    if(mywidget && (mywidget->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) {
-      widget_event_result_t   result;
-      
-      if(state & Button1Mask) {
-	event.type           = WIDGET_EVENT_CLICK;
-	event.x              = x;
-	event.y              = y;
-	event.button_pressed = LBUTTON_DOWN;
-	event.button         = Button1;
-        event.modifier       = 0;
-	(void) mywidget->event(mywidget, &event, &result);
-      }
+      do {
+        if (!xitk_tips_show_widget_tips (wl->xitk->tips, w))
+          break;
+        if (!(w->type & WIDGET_FOCUSABLE))
+          break;
+        if (keep_focus && (wl->widget_focused == w))
+          break;
+        event.type  = WIDGET_EVENT_FOCUS;
+        /* If widget still marked pressed or focus received, it shall receive the focus again. */
+        event.focus = (w == wl->widget_pressed) || (w == wl->widget_focused) ? FOCUS_RECEIVED : FOCUS_MOUSE_IN;
+        w->event (w, &event, NULL);
+        event.type  = WIDGET_EVENT_PAINT;
+        w->event (w, &event, NULL);
+        if (w->type & WIDGET_GROUP_MENU)
+          menu_auto_pop (w);
+      } while (0);
     }
   }
 }
