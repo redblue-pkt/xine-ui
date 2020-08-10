@@ -133,8 +133,7 @@ typedef struct {
 } mrl_contents_t;
 
 typedef struct {
-
-  xitk_widget_t             *fbWidget; /*  My widget */
+  xitk_widget_t              w;
 
   char                      *skin_element_name;
   char                      *skin_element_name_ip;
@@ -179,7 +178,7 @@ typedef struct {
   void                      *key_cb_data;
 
   xitk_event_cbs_t           mrlbrowser_event_cbs;
-} mrlbrowser_private_data_t;
+} _mrlbrowser_private_t;
 
 
 #undef DEBUG_MRLB
@@ -209,100 +208,129 @@ static const struct {
 /*
  *
  */
-static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data, 
-				   xitk_mrlbrowser_filter_t **mrl_f) {
+static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_filter_t **mrl_f) {
   xitk_mrlbrowser_filter_t **mrl_filters = mrl_f;
   size_t                     i = 0;
   
-  private_data->filters_num = 0;
+  wp->filters_num = 0;
 
   if(mrl_f == NULL) {
     static const size_t len = sizeof(__mrl_filters) / sizeof(__mrl_filters[0]);
 
-    private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+    wp->mrl_filters = (xitk_mrlbrowser_filter_t **) 
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * len);
 
     for(i = 0; i < (len - 1); i++) {
       
-      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+      wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
 	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-      private_data->mrl_filters[i]->name   = strdup(__mrl_filters[i].name);
-      private_data->mrl_filters[i]->ending = strdup(__mrl_filters[i].ending);
+      wp->mrl_filters[i]->name   = strdup(__mrl_filters[i].name);
+      wp->mrl_filters[i]->ending = strdup(__mrl_filters[i].ending);
 
     }
   }
   else {
     
-    private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+    wp->mrl_filters = (xitk_mrlbrowser_filter_t **) 
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *));
     
     for(i = 0; 
 	mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
 
-      private_data->mrl_filters            = (xitk_mrlbrowser_filter_t **) realloc(private_data->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
-      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-      private_data->mrl_filters[i]->name   = strdup(mrl_filters[i]->name);
-      private_data->mrl_filters[i]->ending = strdup(mrl_filters[i]->ending);
+      wp->mrl_filters            = (xitk_mrlbrowser_filter_t **) realloc(wp->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
+      wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+      wp->mrl_filters[i]->name   = strdup(mrl_filters[i]->name);
+      wp->mrl_filters[i]->ending = strdup(mrl_filters[i]->ending);
     }
   }
   
-  private_data->filters_num            = i;
-  private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+  wp->filters_num            = i;
+  wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-  private_data->mrl_filters[i]->name   = NULL;
-  private_data->mrl_filters[i]->ending = NULL;
+  wp->mrl_filters[i]->name   = NULL;
+  wp->mrl_filters[i]->ending = NULL;
   
-  private_data->filters = (const char **) calloc((private_data->filters_num + 1), sizeof(char *));
+  wp->filters = (const char **) calloc((wp->filters_num + 1), sizeof(char *));
   
-  for(i = 0; private_data->mrl_filters[i]->name != NULL; i++)
-    private_data->filters[i] = private_data->mrl_filters[i]->name;
+  for(i = 0; wp->mrl_filters[i]->name != NULL; i++)
+    wp->filters[i] = wp->mrl_filters[i]->name;
   
-  private_data->filters[i] = NULL;
-  private_data->filter_selected = 0;
+  wp->filters[i] = NULL;
+  wp->filter_selected = 0;
 }
 
 /*
- *
+ * Destroy the mrlbrowser.
  */
+static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
+  wp->running = 0;
+  wp->visible = 0;
 
-static void mrlbrowser_destroy(xitk_widget_t *w);
+  xitk_unregister_event_handler (&wp->widget_key);
 
-static void notify_destroy(xitk_widget_t *w) {
+  xitk_button_list_delete (wp->autodir_buttons);
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    
-    mrlbrowser_destroy(w);
+  xitk_window_destroy_window (wp->xwin);
+  wp->xwin = NULL;
+
+  {
+    int i;
+
+    for (i = 0; i <= wp->filters_num; i++) {
+      XITK_FREE (wp->mrl_filters[i]->name);
+      XITK_FREE (wp->mrl_filters[i]->ending);
+      XITK_FREE (wp->mrl_filters[i]);
+    }
+    XITK_FREE (wp->mrl_filters);
+
+    for (i = 0; i < wp->mrls_num; i++) {
+      MRL_ZERO (wp->mc->mrls[i]);
+      XITK_FREE (wp->mc->mrls[i]);
+      MRL_ZERO (wp->mc->filtered_mrls[i]);
+      XITK_FREE (wp->mc->filtered_mrls[i]);
+      XITK_FREE (wp->mc->mrls_disp[i]);
+    }
+    free (wp->filters);
   }
+    
+  XITK_FREE (wp->skin_element_name);
+  XITK_FREE (wp->skin_element_name_ip);
+  XITK_FREE (wp->last_mrl_source);
+  XITK_FREE (wp->mc);
+  XITK_FREE (wp->current_origin);
 }
 
-
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  int retval = 0;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return 0;
 
   (void)result;
-  switch(event->type) {
-  case WIDGET_EVENT_DESTROY:
-    notify_destroy(w);
-    break;
+  switch (event->type) {
+    case WIDGET_EVENT_DESTROY:
+      _mrlbrowser_destroy (wp);
+      break;
+    default: ;
   }
-  
-  return retval;
+  return 0;
 }
 
 /*
  * Redisplay the displayed current origin (useful for file plugin).
  */
-static void update_current_origin(mrlbrowser_private_data_t *private_data) {
+static void _update_current_origin (_mrlbrowser_private_t *wp) {
 
-  XITK_FREE (private_data->current_origin);
-  if (private_data->mc->mrls[0] && private_data->mc->mrls[0]->origin)
-    private_data->current_origin = strdup(private_data->mc->mrls[0]->origin);
+  XITK_FREE (wp->current_origin);
+  if (wp->mc->mrls[0] && wp->mc->mrls[0]->origin)
+    wp->current_origin = strdup(wp->mc->mrls[0]->origin);
   else
-    private_data->current_origin = strdup("");
+    wp->current_origin = strdup("");
 
-  xitk_label_change_label (private_data->widget_origin,
-                           private_data->current_origin);
+  xitk_label_change_label (wp->widget_origin,
+                           wp->current_origin);
 }
 
 /*
@@ -329,43 +357,43 @@ static int get_mrl_marker(xine_mrl_t *mrl) {
 /*
  *
  */
-static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
+static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
   int i;
-  int old_filtered_mrls_num = private_data->mc->mrls_to_disp;
+  int old_filtered_mrls_num = wp->mc->mrls_to_disp;
 
   /* filtering is enabled */
-  if(private_data->filter_selected) {
+  if(wp->filter_selected) {
     char *filter_ends;
-    const char *const selected_ending = private_data->mrl_filters[private_data->filter_selected]->ending;
+    const char *const selected_ending = wp->mrl_filters[wp->filter_selected]->ending;
 
-    private_data->mc->mrls_to_disp = 0;
+    wp->mc->mrls_to_disp = 0;
 
     filter_ends = strdup(selected_ending);
 
-    for(i = 0; i < private_data->mrls_num; i++) {
+    for(i = 0; i < wp->mrls_num; i++) {
 
-      if(private_data->mc->mrls[i]->type & XINE_MRL_TYPE_file_directory) {
+      if(wp->mc->mrls[i]->type & XINE_MRL_TYPE_file_directory) {
 
-	if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
-	  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
+	if(wp->mc->filtered_mrls[wp->mc->mrls_to_disp] == NULL)
+	  wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 
-	MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
-	private_data->mc->mrls_to_disp++;
+	MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[wp->mc->mrls_to_disp]);
+	wp->mc->mrls_to_disp++;
       }
       else {
 	char *ending, *m, *pfilter_ends;
 
-	if((ending = strrchr(private_data->mc->mrls[i]->mrl, '.'))) {
+	if((ending = strrchr(wp->mc->mrls[i]->mrl, '.'))) {
 
           pfilter_ends = filter_ends;
 	  while((m = strsep(&pfilter_ends, ",")) != NULL) {
 	    
 	    if(!strcasecmp((ending + 1), m)) {
-	      if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
-		private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
+	      if(wp->mc->filtered_mrls[wp->mc->mrls_to_disp] == NULL)
+		wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 	      
-	      MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
-	      private_data->mc->mrls_to_disp++;
+	      MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[wp->mc->mrls_to_disp]);
+	      wp->mc->mrls_to_disp++;
 	    }
 	  }
 	  free(filter_ends);
@@ -379,62 +407,52 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
   }
   else { /* no filtering */
 
-    for(i = 0; i < private_data->mrls_num; i++) {
+    for(i = 0; i < wp->mrls_num; i++) {
       
-      if(private_data->mc->filtered_mrls[i] == NULL)
-	private_data->mc->filtered_mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
+      if(wp->mc->filtered_mrls[i] == NULL)
+	wp->mc->filtered_mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
       
-      MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[i]);
+      MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[i]);
     }
-    private_data->mc->mrls_to_disp = i;
+    wp->mc->mrls_to_disp = i;
   }
   
   /* free unused mrls */
-  while(old_filtered_mrls_num > private_data->mc->mrls_to_disp) {
-    MRL_ZERO(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
-    XITK_FREE(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
-    private_data->mc->filtered_mrls[old_filtered_mrls_num - 1] = NULL;
-    XITK_FREE(private_data->mc->mrls_disp[old_filtered_mrls_num - 1]);
+  while(old_filtered_mrls_num > wp->mc->mrls_to_disp) {
+    MRL_ZERO(wp->mc->filtered_mrls[old_filtered_mrls_num - 1]);
+    XITK_FREE(wp->mc->filtered_mrls[old_filtered_mrls_num - 1]);
+    wp->mc->filtered_mrls[old_filtered_mrls_num - 1] = NULL;
+    XITK_FREE(wp->mc->mrls_disp[old_filtered_mrls_num - 1]);
     old_filtered_mrls_num--;
   }
 
-  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = NULL;
+  wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = NULL;
 }
 
 /*
  * Create *eye candy* entries in browser.
  */
-static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *private_data) {
+static void _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
   int i = 0;
   
-  mrlbrowser_filter_mrls(private_data);
+  _mrlbrowser_filter_mrls (wp);
 
-  while(private_data->mc->filtered_mrls[i]) {
-    char *p = private_data->mc->filtered_mrls[i]->mrl;
+  while (wp->mc->filtered_mrls[i]) {
+    char *p = wp->mc->filtered_mrls[i]->mrl;
 
-    if(private_data->mc->filtered_mrls[i]->origin) {
-
-      p += strlen(private_data->mc->filtered_mrls[i]->origin);
-      
-      if(*p == '/') 
-	p++;
+    if (wp->mc->filtered_mrls[i]->origin) {
+      p += strlen (wp->mc->filtered_mrls[i]->origin);
+      if (*p == '/') 
+        p++;
     }
     
-    if(private_data->mc->filtered_mrls[i]->type & XINE_MRL_TYPE_file_symlink) {
-
-      private_data->mc->mrls_disp[i] = (char *) realloc(private_data->mc->mrls_disp[i], 
-							strlen(p) + 4 + strlen(private_data->mc->filtered_mrls[i]->link) + 2);
-      
-      sprintf(private_data->mc->mrls_disp[i], "%s%c -> %s", 
-	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]), 
-	      private_data->mc->filtered_mrls[i]->link);
-
+    if (wp->mc->filtered_mrls[i]->type & XINE_MRL_TYPE_file_symlink) {
+      wp->mc->mrls_disp[i] = (char *)realloc (wp->mc->mrls_disp[i], strlen (p) + 4 + strlen (wp->mc->filtered_mrls[i]->link) + 2);
+      sprintf (wp->mc->mrls_disp[i], "%s%c -> %s", p, get_mrl_marker (wp->mc->filtered_mrls[i]), wp->mc->filtered_mrls[i]->link);
     }
     else {
-      private_data->mc->mrls_disp[i] = (char *) realloc(private_data->mc->mrls_disp[i], strlen(p) + 2);
-      
-      sprintf(private_data->mc->mrls_disp[i], "%s%c", 
-	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]));
+      wp->mc->mrls_disp[i] = (char *)realloc (wp->mc->mrls_disp[i], strlen (p) + 2);
+      sprintf (wp->mc->mrls_disp[i], "%s%c", p, get_mrl_marker (wp->mc->filtered_mrls[i]));
     }
 
     i++;
@@ -445,71 +463,62 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
  * Duplicate mrls from xine-engine's returned. We shouldn't play
  * directly with these ones.
  */
-static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
-				      xine_mrl_t **mtmp, int num_mrls) {
+static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **mtmp, int num_mrls) {
   int i;
-  int old_mrls_num = private_data->mrls_num;
+  int old_mrls_num = wp->mrls_num;
 
-  const int max_mrls = sizeof(private_data->mc->mrls) / sizeof(private_data->mc->mrls[0]) - 1;
+  const int max_mrls = sizeof (wp->mc->mrls) / sizeof (wp->mc->mrls[0]) - 1;
   if (num_mrls >= max_mrls)
     num_mrls = max_mrls;
 
   for (i = 0; i < num_mrls; i++) {
-    if(private_data->mc->mrls[i] == NULL)
-      private_data->mc->mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
-
-    MRL_DUPLICATE(mtmp[i], private_data->mc->mrls[i]);
+    if (wp->mc->mrls[i] == NULL)
+      wp->mc->mrls[i] = (xine_mrl_t *)xitk_xmalloc (sizeof (xine_mrl_t));
+    MRL_DUPLICATE (mtmp[i], wp->mc->mrls[i]);
   }
 
-  private_data->mrls_num = i;
+  wp->mrls_num = i;
 
-  while(old_mrls_num > private_data->mrls_num) {
-    MRL_ZERO(private_data->mc->mrls[old_mrls_num-1]);
-    XITK_FREE(private_data->mc->mrls[old_mrls_num-1]);
-    private_data->mc->mrls[old_mrls_num-1] = NULL;
+  while (old_mrls_num > wp->mrls_num) {
+    MRL_ZERO (wp->mc->mrls[old_mrls_num - 1]);
+    XITK_FREE (wp->mc->mrls[old_mrls_num - 1]);
     old_mrls_num--;
   }
 
-  private_data->mc->mrls[private_data->mrls_num] = NULL;
-
+  wp->mc->mrls [wp->mrls_num] = NULL;
 }
 
 /*
  * Grab mrls from xine-engine.
  */
 static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
   char *lbl = (char *) xitk_labelbutton_get_label(w);
   char *old_old_src;
 
   if(lbl) {
     
-    old_old_src = private_data->last_mrl_source;
-    private_data->last_mrl_source = strdup(lbl);
+    old_old_src = wp->last_mrl_source;
+    wp->last_mrl_source = strdup (lbl);
 
     {
       int num_mrls;
-      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
-					       private_data->last_mrl_source, 
-					       NULL, &num_mrls);
+      xine_mrl_t **mtmp = xine_get_browse_mrls (wp->xine, wp->last_mrl_source, NULL, &num_mrls);
 #if 0
-      
       if(!mtmp) {
-        free(private_data->last_mrl_source);
-        private_data->last_mrl_source = old_old_src;
+        free (wp->last_mrl_source);
+        wp->last_mrl_source = old_old_src;
 	return;
       }
 #endif
-      mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
+      _mrlbrowser_duplicate_mrls (wp, mtmp, num_mrls);
     }
 
     free(old_old_src);
     
-    update_current_origin(private_data);
-    mrlbrowser_create_enlighted_entries(private_data);
-    xitk_browser_update_list(private_data->mrlb_list, 
-			     (const char* const*)private_data->mc->mrls_disp, NULL,
-			     private_data->mc->mrls_to_disp, 0);
+    _update_current_origin (wp);
+    _mrlbrowser_create_enlighted_entries (wp);
+    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
   }
 }
 
@@ -518,11 +527,11 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
  * Dump informations, on terminal, about selected mrl.
  */
 static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
   
-  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    xine_mrl_t *ms = private_data->mc->mrls[j];
+  if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0) {
+    xine_mrl_t *ms = wp->mc->mrls[j];
     
     printf("mrl '%s'\n\t+", ms->mrl);
 
@@ -591,34 +600,31 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
  * Enable/Disable tips.
  */
 void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout) {
-  mrlbrowser_private_data_t *private_data;
-  
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    
-    if(enabled)
-      xitk_set_widgets_tips_timeout(private_data->widget_list, timeout);
-    else
-      xitk_disable_widgets_tips(private_data->widget_list);
-  }
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return;
+
+  if (enabled)
+    xitk_set_widgets_tips_timeout (wp->widget_list, timeout);
+  else
+    xitk_disable_widgets_tips (wp->widget_list);
 }
 
 /*
  * Return window of widget.
  */
 xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-           (w->type & WIDGET_GROUP_MEMBER))) {
+  if (!wp)
+    return NULL;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return NULL;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    return private_data->xwin;
-  }
-
-  return NULL;
+  return wp->xwin;
 }
 
 
@@ -626,67 +632,59 @@ xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
  * Fill window information struct of given widget.
  */
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
-  mrlbrowser_private_data_t *private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return 0;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    
-    return((xitk_get_window_info(private_data->widget_key, inf))); 
-  }
-  return 0;
-  
+  return xitk_get_window_info (wp->widget_key, inf);
 }
 
 /*
  * Boolean about running state.
  */
 int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
- 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    return (private_data->running);
-  }
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return 0;
 
-  return 0;
+  return wp->running;
 }
 
 /*
  * Boolean about visible state.
  */
 int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return 0;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    return (private_data->visible);
-  }
-
-  return 0;
+  return wp->visible;
 }
 
 /*
  * Hide mrlbrowser.
  */
 void xitk_mrlbrowser_hide(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return;
 
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-
-    if(private_data->visible) {
-      private_data->visible = 0;
-      xitk_hide_widgets(private_data->widget_list);
-      xitk_window_hide_window(private_data->xwin);
-    }
+  if (wp->visible) {
+    wp->visible = 0;
+    xitk_hide_widgets (wp->widget_list);
+    xitk_window_hide_window (wp->xwin);
   }
 }
 
@@ -694,80 +692,34 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
  * Show mrlbrowser.
  */
 void xitk_mrlbrowser_show(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-    
-    private_data->visible = 1;
-    xitk_show_widgets(private_data->widget_list);
-    xitk_window_show_window(private_data->xwin, 1);
-  }
-}
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return;
 
-/*
- * Destroy the mrlbrowser.
- */
-static void mrlbrowser_destroy(xitk_widget_t *w) {
-  mrlbrowser_private_data_t *private_data;
-
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) && 
-	   (w->type & WIDGET_GROUP_MEMBER))) {
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
-
-    private_data->running = 0;
-    private_data->visible = 0;
-    
-    xitk_unregister_event_handler(&private_data->widget_key);
-
-    xitk_button_list_delete (private_data->autodir_buttons);
-
-    xitk_window_destroy_window(private_data->xwin);
-    private_data->xwin = NULL;
-
-    {
-      int i;
-      
-      for(i = 0; i <= private_data->filters_num; i++) {
-	XITK_FREE(private_data->mrl_filters[i]->name);
-	XITK_FREE(private_data->mrl_filters[i]->ending);
-	XITK_FREE(private_data->mrl_filters[i]);
-      }
-      XITK_FREE(private_data->mrl_filters);
-      
-      for(i = 0; i < private_data->mrls_num; i++) {
-	MRL_ZERO(private_data->mc->mrls[i]);
-	XITK_FREE(private_data->mc->mrls[i]);
-	MRL_ZERO(private_data->mc->filtered_mrls[i]);
-	XITK_FREE(private_data->mc->filtered_mrls[i]);
-	XITK_FREE(private_data->mc->mrls_disp[i]);
-      }
-      
-      free(private_data->filters);
-    }
-    
-    XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data->skin_element_name_ip);
-    XITK_FREE(private_data->last_mrl_source);
-    XITK_FREE(private_data->mc);
-    XITK_FREE(private_data->current_origin);
-    XITK_FREE(private_data);
-
-  }
+  wp->visible = 1;
+  xitk_show_widgets (wp->widget_list);
+  xitk_window_show_window (wp->xwin, 1);
 }
 
 /*
  * Leaving mrlbrowser.
  */
 static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
+
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return;
 
   (void)w;
-  if(private_data->kill_callback)
-    private_data->kill_callback (private_data->fbWidget, private_data->kill_userdata);
+  if (wp->kill_callback)
+    wp->kill_callback (&wp->w, wp->kill_userdata);
 
-  xitk_destroy_widget(private_data->fbWidget);
+  xitk_destroy_widget (&wp->w);
 }
 
 
@@ -775,44 +727,41 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
  *
  */
 
-void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  mrlbrowser_private_data_t *private_data;
+void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
   xitk_image_t *bg_image;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
-           (w->type & WIDGET_GROUP_MEMBER))) {
-    private_data = (mrlbrowser_private_data_t *)w->private_data;
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
+    return;
 
-    xitk_skin_lock(skonfig);
-    xitk_hide_widgets(private_data->widget_list);
+  xitk_skin_lock (skonfig);
+  xitk_hide_widgets (wp->widget_list);
 
-    {
-      const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
-      bg_image = info ? info->pixmap_img.image : NULL;
-    }
-    if (!bg_image) {
-      XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
-    }
-
-    xitk_window_resize_window(private_data->xwin, bg_image->width, bg_image->height);
-
-    xitk_window_change_background_with_image(private_data->xwin, bg_image,
-                                             bg_image->width, bg_image->height);
-    xitk_skin_unlock(skonfig);
-
-    xitk_change_skins_widget_list(private_data->widget_list, skonfig);
-    xitk_button_list_new_skin (private_data->autodir_buttons, skonfig);
-
-    xitk_paint_widget_list(private_data->widget_list);
+  {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+    bg_image = info ? info->pixmap_img.image : NULL;
   }
+  if (!bg_image)
+    XITK_DIE ("%s(): couldn't find image for background\n", __FUNCTION__);
+
+  xitk_window_resize_window (wp->xwin, bg_image->width, bg_image->height);
+
+  xitk_window_change_background_with_image (wp->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_skin_unlock (skonfig);
+
+  xitk_change_skins_widget_list (wp->widget_list, skonfig);
+  xitk_button_list_new_skin (wp->autodir_buttons, skonfig);
+
+  xitk_paint_widget_list (wp->widget_list);
 }
 
 /*
  * 
  */
-static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
-				  int j, int add_callback, int play_callback) {
-  xine_mrl_t *ms = private_data->mc->filtered_mrls[j];
+static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_callback, int play_callback) {
+  xine_mrl_t *ms = wp->mc->filtered_mrls[j];
 
   if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
     const char *buf;
@@ -864,40 +813,34 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 
     {
       int num_mrls;
-      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
-					       private_data->last_mrl_source, 
-					       buf, &num_mrls);
-
-      mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
-
+      xine_mrl_t **mtmp = xine_get_browse_mrls (wp->xine, wp->last_mrl_source, buf, &num_mrls);
+      _mrlbrowser_duplicate_mrls (wp, mtmp, num_mrls);
     }
 
     free(freeme);
 
-    update_current_origin(private_data);
-    mrlbrowser_create_enlighted_entries(private_data);
-    xitk_browser_update_list(private_data->mrlb_list, 
-			     (const char* const*)private_data->mc->mrls_disp, NULL,
-			     private_data->mc->mrls_to_disp, 0);
+    _update_current_origin (wp);
+    _mrlbrowser_create_enlighted_entries (wp);
+    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
     
   }
   else {
     
-    xitk_browser_release_all_buttons(private_data->mrlb_list);
+    xitk_browser_release_all_buttons (wp->mrlb_list);
 
-    if (add_callback && private_data->add_callback) {
+    if (add_callback && wp->add_callback) {
       /* legacy HACK: give selected index for unset user data. */
-      void *userdata = private_data->add_userdata;
+      void *userdata = wp->add_userdata;
       if (!userdata)
         userdata = (void *)(uintptr_t)j;
-      private_data->add_callback (private_data->fbWidget, userdata, private_data->mc->filtered_mrls[j]);
+      wp->add_callback (&wp->w, userdata, wp->mc->filtered_mrls[j]);
     }
 
-    if (play_callback && private_data->play_callback) {
-      void *userdata = private_data->play_userdata;
+    if (play_callback && wp->play_callback) {
+      void *userdata = wp->play_userdata;
       if (!userdata)
         userdata = (void *)(uintptr_t)j;
-      private_data->play_callback (private_data->fbWidget, userdata, private_data->mc->filtered_mrls[j]);
+      wp->play_callback (&wp->w, userdata, wp->mc->filtered_mrls[j]);
     }
   }
 }
@@ -906,41 +849,39 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
  * Handle selection in mrlbrowser.
  */
 static void mrlbrowser_select(xitk_widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
 
   (void)w;
-  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    mrlbrowser_select_mrl(private_data, j, 1, 0);
-  }
+  if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
+    _mrlbrowser_select_mrl (wp, j, 1, 0);
 }
 
 /*
  * Handle selection in mrlbrowser, then 
  */
 static void mrlbrowser_play(xitk_widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
   
   (void)w;
-  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    mrlbrowser_select_mrl(private_data, j, 0, 1);
-  }
+  if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
+    _mrlbrowser_select_mrl (wp, j, 0, 1);
 }
 
 /*
  * Handle double click in labelbutton list.
  */
 static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int modifier) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
 
   (void)w;
   if ((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
-    mrlbrowser_select_mrl(private_data, selected, 1, 1);
+    _mrlbrowser_select_mrl (wp, selected, 1, 1);
   else if (modifier & MODIFIER_CTRL)
-    mrlbrowser_select_mrl(private_data, selected, 1, 0);
+    _mrlbrowser_select_mrl (wp, selected, 1, 0);
   else
-    mrlbrowser_select_mrl(private_data, selected, 0, 1); 
+    _mrlbrowser_select_mrl (wp, selected, 0, 1);
 
 }
 
@@ -948,21 +889,19 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int mod
  * Refresh filtered list
  */
 static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
 
   (void)w;
-  private_data->filter_selected = select;
-  mrlbrowser_create_enlighted_entries(private_data);
-  xitk_browser_update_list(private_data->mrlb_list, 
-			   (const char* const*) private_data->mc->mrls_disp, NULL,
-  			   private_data->mc->mrls_to_disp, 0);
+  wp->filter_selected = select;
+  _mrlbrowser_create_enlighted_entries (wp);
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
 }
 
 /*
  * Handle here mrlbrowser events.
  */
-static void _mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+static void mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
 
   if (ke->event != XITK_KEY_PRESS)
     return;
@@ -974,31 +913,31 @@ static void _mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke)
 #ifdef DEBUG_MRLB
       /* This is for debugging purpose */
       if (ke->modifiers & MODIFIER_CTRL)
-        mrlbrowser_dumpmrl(NULL, (void *)private_data);
+        mrlbrowser_dumpmrl (NULL, (void *)wp);
 #endif
       break;
 
     case XK_s:
     case XK_S:
       if (ke->modifiers & MODIFIER_CTRL)
-        mrlbrowser_select(NULL, (void *)private_data);
+        mrlbrowser_select (NULL, (void *)wp);
       break;
 
     case XK_Return: {
       int selected;
 
-      if ((selected = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)
-        mrlbrowser_select_mrl(private_data, selected, 0, 1);
+      if ((selected = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
+        _mrlbrowser_select_mrl (wp, selected, 0, 1);
     }
     break;
 
     case XK_Escape:
-      xitk_mrlbrowser_exit(NULL, (void *)private_data->fbWidget);
+      xitk_mrlbrowser_exit (NULL, (void *)wp);
       break;
 
     default:
-      if (private_data->key_cb)
-        private_data->key_cb(private_data->key_cb_data, ke);
+      if (wp->key_cb)
+        wp->key_cb (wp->key_cb_data, ke);
       break;
   }
 }
@@ -1008,14 +947,8 @@ static void _mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke)
  */
 xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
   char                       *title = mb->window_title;
-  xitk_widget_t              *mywidget;
-  mrlbrowser_private_data_t  *private_data;
-  xitk_labelbutton_widget_t   lb;
-  xitk_widget_t               *default_source = NULL;
-  xitk_button_widget_t        pb;
-  xitk_label_widget_t         lbl;
-  xitk_combo_widget_t         cmb;
-  xitk_widget_t              *w;
+  _mrlbrowser_private_t      *wp;
+  xitk_widget_t              *default_source = NULL, *w;
   xitk_image_t               *bg_image;
 
   ABORT_IF_NULL(xitk);
@@ -1032,122 +965,140 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     XITK_DIE("Xine engine should be initialized first !!\nExiting.\n");
   }
 
-  XITK_WIDGET_INIT(&lb);
-  XITK_WIDGET_INIT(&pb);
-  XITK_WIDGET_INIT(&lbl);
-  XITK_WIDGET_INIT(&mb->browser);
-  XITK_WIDGET_INIT(&cmb);
-  
-  mywidget                        = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
-  
-  private_data                    = (mrlbrowser_private_data_t *) xitk_xmalloc(sizeof(mrlbrowser_private_data_t));
+  wp = (_mrlbrowser_private_t *)xitk_xmalloc (sizeof (*wp));
+  if (!wp)
+    return NULL;
 
-  mywidget->private_data          = private_data;
+  wp->w.private_data    = wp;
 
-  private_data->fbWidget          = mywidget;
-  private_data->skin_element_name = strdup(mb->skin_element_name);
-
-  private_data->xine              = mb->xine;
-  private_data->running           = 1;
-
-  private_data->key_cb            = mb->key_cb;
-  private_data->key_cb_data       = mb->key_cb_data;
+  wp->visible           = 1;
+  wp->running           = 1;
+  wp->skin_element_name = mb->skin_element_name ? strdup (mb->skin_element_name) : NULL;
+  wp->xine              = mb->xine;
+  wp->key_cb            = mb->key_cb;
+  wp->key_cb_data       = mb->key_cb_data;
 
   {
-    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, private_data->skin_element_name);
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
+    XITK_FREE (wp);
     return NULL;
   }
 
-  private_data->mc              = (mrl_contents_t *) xitk_xmalloc(sizeof(mrl_contents_t));
-  private_data->mrls_num        = 0;
-  private_data->last_mrl_source = NULL;
+  wp->mc              = (mrl_contents_t *)xitk_xmalloc (sizeof (mrl_contents_t));
+  wp->mrls_num        = 0;
+  wp->last_mrl_source = NULL;
 
-  private_data->xwin = xitk_window_create_window_ext(xitk, mb->x, mb->y, bg_image->width, bg_image->height,
-                                                     title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
+  wp->xwin = xitk_window_create_window_ext (xitk, mb->x, mb->y, bg_image->width, bg_image->height,
+    title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
 
-  if(mb->set_wm_window_normal)
-    xitk_window_set_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
+  if (mb->set_wm_window_normal)
+    xitk_window_set_wm_window_type (wp->xwin, WINDOW_TYPE_NORMAL);
   else
-    xitk_window_unset_wm_window_type(private_data->xwin, WINDOW_TYPE_NORMAL);
+    xitk_window_unset_wm_window_type (wp->xwin, WINDOW_TYPE_NORMAL);
 
-  xitk_window_change_background_with_image(private_data->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_window_change_background_with_image (wp->xwin, bg_image, bg_image->width, bg_image->height);
 
-  private_data->widget_list = xitk_window_widget_list(private_data->xwin);
+  wp->widget_list = xitk_window_widget_list (wp->xwin);
 
-  lb.button_type       = CLICK_BUTTON;
-  lb.align             = ALIGN_DEFAULT;
-  lb.label             = mb->select.caption;
-  lb.callback          = mrlbrowser_select;
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)private_data;
-  lb.skin_element_name = mb->select.skin_element_name;
-  w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &w->node);
-  w->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-  xitk_set_widget_tips(w, _("Select current entry"));
-  
-  pb.skin_element_name = mb->play.skin_element_name;
-  pb.callback          = mrlbrowser_play;
-  pb.userdata          = (void *)private_data;
-  w = xitk_button_create (private_data->widget_list, skonfig, &pb);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &w->node);
-  w->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-  xitk_set_widget_tips(w, _("Play selected entry"));
+  {
+    xitk_labelbutton_widget_t lb;
 
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = mb->dismiss.caption;
-  lb.callback          = xitk_mrlbrowser_exit;
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)mywidget;
-  lb.skin_element_name = mb->dismiss.skin_element_name;
-  w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &w->node);
-  w->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-  xitk_set_widget_tips(w, _("Close MRL browser window"));
-  
-  private_data->add_callback      = mb->select.callback;
-  private_data->add_userdata      = mb->select.data;
-  private_data->play_callback     = mb->play.callback;
-  private_data->play_userdata     = mb->play.data;
-  private_data->kill_callback     = mb->kill.callback;
-  private_data->kill_userdata     = mb->kill.data;
+    XITK_WIDGET_INIT (&lb);
+    lb.button_type       = CLICK_BUTTON;
+    lb.align             = ALIGN_DEFAULT;
+    lb.state_callback    = NULL;
+    lb.userdata          = (void *)wp;
+
+    lb.label             = mb->select.caption;
+    lb.callback          = mrlbrowser_select;
+    lb.skin_element_name = mb->select.skin_element_name;
+    w = xitk_labelbutton_create (wp->widget_list, skonfig, &lb);
+    if (w) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &w->node);
+      w->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+      xitk_set_widget_tips (w, _("Select current entry"));
+    }
+
+    lb.label             = mb->dismiss.caption;
+    lb.callback          = xitk_mrlbrowser_exit;
+    lb.skin_element_name = mb->dismiss.skin_element_name;
+    w = xitk_labelbutton_create (wp->widget_list, skonfig, &lb);
+    if (w) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &w->node);
+      w->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+      xitk_set_widget_tips (w, _("Close MRL browser window"));
+    }
+  }
+
+  {
+    xitk_button_widget_t pb;
+    XITK_WIDGET_INIT (&pb);
+    pb.skin_element_name = mb->play.skin_element_name;
+    pb.callback          = mrlbrowser_play;
+    pb.userdata          = (void *)wp;
+    w = xitk_button_create (wp->widget_list, skonfig, &pb);
+    if (w) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &w->node);
+      w->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+      xitk_set_widget_tips (w, _("Play selected entry"));
+    }
+  }
+
+  wp->add_callback  = mb->select.callback;
+  wp->add_userdata  = mb->select.data;
+  wp->play_callback = mb->play.callback;
+  wp->play_userdata = mb->play.data;
+  wp->kill_callback = mb->kill.callback;
+  wp->kill_userdata = mb->kill.data;
+
+  XITK_WIDGET_INIT (&mb->browser);
   mb->browser.dbl_click_callback  = handle_dbl_click;
-  mb->browser.userdata            = (void *)private_data;
-  private_data->mrlb_list = xitk_browser_create (private_data->widget_list, skonfig, &mb->browser);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->mrlb_list->node);
-  private_data->mrlb_list->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
+  mb->browser.userdata            = (void *)wp;
+  wp->mrlb_list = xitk_browser_create (wp->widget_list, skonfig, &mb->browser);
+  if (wp->mrlb_list) {
+    xitk_dlist_add_tail (&wp->widget_list->list, &wp->mrlb_list->node);
+    wp->mrlb_list->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+  }
 
-  lbl.label             = "";
-  lbl.skin_element_name = mb->origin.skin_element_name;
-  lbl.callback          = NULL;
-  private_data->widget_origin = xitk_label_create (private_data->widget_list, skonfig, &lbl);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->widget_origin->node);
-  private_data->widget_origin->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
+  {
+    xitk_label_widget_t lbl;
+
+    XITK_WIDGET_INIT (&lbl);
+    lbl.callback          = NULL;
+    lbl.userdata          = NULL;
+
+    lbl.label             = "";
+    lbl.skin_element_name = mb->origin.skin_element_name;
+    wp->widget_origin = xitk_label_create (wp->widget_list, skonfig, &lbl);
+    if (wp->widget_origin) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &wp->widget_origin->node);
+      wp->widget_origin->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+    }
+
+    if (mb->ip_name.label.label_str) {
+      lbl.label             = mb->ip_name.label.label_str;
+      lbl.skin_element_name = mb->ip_name.label.skin_element_name;
+      w = xitk_label_create (wp->widget_list, skonfig, &lbl);
+      if (w) {
+        xitk_dlist_add_tail (&wp->widget_list->list, &w->node);
+        w->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+      }
+    }
+  }
 
   if (mb->origin.cur_origin)
-    private_data->current_origin = strdup(mb->origin.cur_origin);
+    wp->current_origin = strdup (mb->origin.cur_origin);
   else
-    private_data->current_origin = strdup("");
-
-  if(mb->ip_name.label.label_str) {
-
-    lbl.label             = mb->ip_name.label.label_str;
-    lbl.skin_element_name = mb->ip_name.label.skin_element_name;
-    lbl.callback          = NULL;
-    w = xitk_label_create (private_data->widget_list, skonfig, &lbl);
-    xitk_dlist_add_tail (&private_data->widget_list->list, &w->node);
-    w->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
-
-  }
+    wp->current_origin = strdup ("");
 
   /*
    * Create buttons with input plugins names.
    */
-  private_data->skin_element_name_ip = strdup (mb->ip_name.button.skin_element_name);
+  wp->skin_element_name_ip = strdup (mb->ip_name.button.skin_element_name);
   do {
     char *tips[64];
     const char * const *autodir_plugins = mb->ip_availables;
@@ -1159,66 +1110,62 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     for (i = 0; autodir_plugins[i]; i++) {
       if (i >= sizeof (tips) / sizeof (tips[0]))
         break;
-      tips[i] = (char *)xine_get_input_plugin_description (private_data->xine, autodir_plugins[i]);
+      tips[i] = (char *)xine_get_input_plugin_description (wp->xine, autodir_plugins[i]);
     }
 
-    private_data->autodir_buttons = xitk_button_list_new (
-      private_data->widget_list,
-      skonfig, private_data->skin_element_name_ip,
-      mrlbrowser_grab_mrls, private_data,
-      (char **)mb->ip_availables,
-      tips, 5000,
-      WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER);
+    wp->autodir_buttons = xitk_button_list_new (wp->widget_list, skonfig, wp->skin_element_name_ip,
+      mrlbrowser_grab_mrls, wp, (char **)mb->ip_availables, tips, 5000, WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER);
   } while (0);
 
-  _duplicate_mrl_filters(private_data, mb->mrl_filters);
+  _duplicate_mrl_filters (wp, mb->mrl_filters);
 
-  cmb.skin_element_name = mb->combo.skin_element_name;
-  cmb.layer_above       = mb->layer_above;
-  cmb.entries           = private_data->filters;
-  cmb.parent_wkey       = &private_data->widget_key;
-  cmb.callback          = combo_filter_select;
-  cmb.userdata          = (void *)private_data;
-  private_data->combo_filter = xitk_combo_create (private_data->widget_list, skonfig, &cmb);
-  xitk_dlist_add_tail (&private_data->widget_list->list, &private_data->combo_filter->node);
-
-  private_data->visible        = 1;
-  
-  mywidget->wl                 = NULL;
-
-  mywidget->enable             = 1;
-  mywidget->running            = 1;
-  mywidget->visible            = 1;
-  mywidget->have_focus         = FOCUS_LOST;
-  mywidget->x                  = mb->x;
-  mywidget->y                  = mb->y;
-  mywidget->width              = bg_image->width;
-  mywidget->height             = bg_image->height;
-  mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
-  mywidget->event              = notify_event;
-  mywidget->tips_timeout       = 0;
-  mywidget->tips_string        = NULL;
-
-  xitk_browser_update_list(private_data->mrlb_list, 
-			   (const char* const*)private_data->mc->mrls_disp, NULL,
-			   private_data->mrls_num, 0);
-
-  xitk_window_show_window(private_data->xwin, 1);
-
-  private_data->mrlbrowser_event_cbs.dnd_cb = mb->dndcallback;
-  private_data->mrlbrowser_event_cbs.key_cb  = _mrlbrowser_handle_key_event;
-
-  private_data->widget_key =
-    xitk_window_register_event_handler("mrl browser", private_data->xwin, &private_data->mrlbrowser_event_cbs, private_data);
-
-  xitk_window_try_to_set_input_focus(private_data->xwin);
-
-  xitk_mrlbrowser_change_skins(mywidget, skonfig);
-
-  default_source = xitk_button_list_find (private_data->autodir_buttons, "file");
-  if( default_source && !private_data->last_mrl_source ) {
-    mrlbrowser_grab_mrls(default_source, private_data);
+  {
+    xitk_combo_widget_t cmb;
+    XITK_WIDGET_INIT (&cmb);
+    cmb.skin_element_name = mb->combo.skin_element_name;
+    cmb.layer_above       = mb->layer_above;
+    cmb.entries           = wp->filters;
+    cmb.parent_wkey       = &wp->widget_key;
+    cmb.callback          = combo_filter_select;
+    cmb.userdata          = (void *)wp;
+    wp->combo_filter = xitk_combo_create (wp->widget_list, skonfig, &cmb);
+    if (wp->combo_filter) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &wp->combo_filter->node);
+      wp->combo_filter->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+    }
   }
 
-  return mywidget;
+  wp->w.wl           = NULL;
+  wp->w.enable       = 1;
+  wp->w.running      = 1;
+  wp->w.visible      = 1;
+  wp->w.have_focus   = FOCUS_LOST;
+  wp->w.x            = mb->x;
+  wp->w.y            = mb->y;
+  wp->w.width        = bg_image->width;
+  wp->w.height       = bg_image->height;
+  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_MRLBROWSER;
+  wp->w.event        = notify_event;
+  wp->w.tips_timeout = 0;
+  wp->w.tips_string  = NULL;
+
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->mc->mrls_disp, NULL, wp->mrls_num, 0);
+
+  xitk_window_show_window (wp->xwin, 1);
+
+  wp->mrlbrowser_event_cbs.dnd_cb = mb->dndcallback;
+  wp->mrlbrowser_event_cbs.key_cb  = mrlbrowser_handle_key_event;
+
+  wp->widget_key =
+    xitk_window_register_event_handler ("mrl browser", wp->xwin, &wp->mrlbrowser_event_cbs, wp);
+
+  xitk_window_try_to_set_input_focus (wp->xwin);
+
+  /* xitk_mrlbrowser_change_skins (&wp->w, skonfig); */
+
+  default_source = xitk_button_list_find (wp->autodir_buttons, "file");
+  if (default_source && !wp->last_mrl_source)
+    mrlbrowser_grab_mrls (default_source, wp);
+
+  return &wp->w;
 }
