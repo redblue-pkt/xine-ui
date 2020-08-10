@@ -1872,7 +1872,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  
 	  /* close menu */
 	  if(mykey == XK_Escape) {
-	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
+            if (w && (w->type & WIDGET_GROUP_MENU)) {
 	      xitk_widget_t *m = xitk_menu_get_menu(w);
 	      
               xitk_destroy_widget(m);
@@ -1927,7 +1927,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
 		  && ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD)) {
 	    
-	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+            if (w && (w->type & WIDGET_GROUP_BROWSER)) {
 	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
 	      if(b) {
@@ -1957,7 +1957,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      }
 	      xitk_slider_callback_exec(w);
 	    }
-	    else if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
+            else if (w && (w->type & WIDGET_GROUP_MENU)) {
 	      handled = 1;
 	      if(mykey == XK_Left) {
 		/* close menu branch */
@@ -1995,7 +1995,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 		  (mykey == XK_y) || (mykey == XK_Y) || (mykey == XK_z) || (mykey == XK_Z)) {
 
 	    
-	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+            if (w && (w->type & WIDGET_GROUP_BROWSER)) {
 	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
 	      if(b) {
@@ -2011,7 +2011,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             if (xitk->menu && 
 	       ((fx->widget_list && 
 		 ((!fx->widget_list->widget_focused) || 
-		  (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
+                 (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
 		(!fx->widget_list)))  {
 	      
 	      xitk_set_current_menu(NULL);
@@ -2180,7 +2180,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
 	      fx->move.enabled = 0;
 	      
-	      if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+              if (w && (w->type & WIDGET_GROUP_BROWSER)) {
 		xitk_widget_t *b = xitk_browser_get_browser(w);
 		
 		if(b) {
