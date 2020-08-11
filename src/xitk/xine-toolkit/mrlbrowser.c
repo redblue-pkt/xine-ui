@@ -46,91 +46,10 @@
 #include "_xitk.h"
 #include "button_list.h"
 
-#define MAXFILES      65535
-
-/*
- * Freeing/zeroing all of entries of given mrl.
- */
-
-#define MRL_ZERO(m) {                                                         \
-  if((m)) {                                                                   \
-    free((m)->origin);                                                        \
-    free((m)->mrl);                                                           \
-    free((m)->link);                                                          \
-    (m)->origin = NULL;                                                       \
-    (m)->mrl    = NULL;                                                       \
-    (m)->link   = NULL;                                                       \
-    (m)->type   = 0;                                                          \
-    (m)->size   = (off_t) 0;                                                  \
-  }                                                                           \
-}
-
-/*
- * Duplicate two mrls entries (s = source, d = destination).
- */
-#define MRL_DUPLICATE(s, d) {                                                 \
-  ABORT_IF_NULL(s);                                                           \
-  ABORT_IF_NULL(d);                                                           \
-                                                                              \
-  if((s)->origin) {                                                           \
-    if((d)->origin) {                                                         \
-      (d)->origin = (char *) realloc((d)->origin, strlen((s)->origin) + 1);   \
-      strcpy((d)->origin, (s)->origin);                                	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->origin = strdup((s)->origin);                                      \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->origin));                                                 \
-                                                                              \
-  if((s)->mrl) {                                                              \
-    if((d)->mrl) {                                                            \
-      (d)->mrl = (char *) realloc((d)->mrl, strlen((s)->mrl) + 1);            \
-      strcpy((d)->mrl, (s)->mrl);                                      	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->mrl = strdup((s)->mrl);                                            \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->mrl));                                                    \
-                                                                              \
-  if((s)->link) {                                                             \
-    if((d)->link) {                                                           \
-      (d)->link = (char *) realloc((d)->link, strlen((s)->link) + 1);         \
-      strcpy((d)->link, (s)->link);                                    	      \
-    }                                                                         \
-    else                                                                      \
-      (d)->link = strdup((s)->link);                                          \
-  }                                                                           \
-  else                                                                        \
-    XITK_FREE(((d)->link));                                                   \
-                                                                              \
-  (d)->type = (s)->type;                                                      \
-  (d)->size = (s)->size;                                                      \
-}
-
-/**
- * Duplicate two arrays of mrls (s = source, d = destination).
- */
-#define MRLS_DUPLICATE(s, d) {                                                \
-  int i = 0;                                                                  \
-                                                                              \
-  ABORT_IF_NULL(s);                                                           \
-  ABORT_IF_NULL(d);                                                           \
-                                                                              \
-  while((s) != NULL) {                                                        \
-    d[i] = (xine_mrl_t *) malloc(sizeof(xine_mrl_t));                         \
-    MRL_DUPLICATE(s[i], d[i]);                                                \
-    i++;                                                                      \
-  }                                                                           \
-}
-
 typedef struct {
-  xine_mrl_t                *mrls[MAXFILES];
-  xine_mrl_t                *filtered_mrls[MAXFILES];
-  char                      *mrls_disp[MAXFILES];
-  int                        mrls_to_disp;
-} mrl_contents_t;
+  xine_mrl_t                 xmrl;
+  char                      *disp, ext[8];
+} _mrlb_item_t;
 
 typedef struct {
   xitk_widget_t              w;
@@ -146,7 +65,6 @@ typedef struct {
   
   xine_t                    *xine;
 
-  mrl_contents_t            *mc;
   int                        mrls_num;
 
   char                      *last_mrl_source;
@@ -156,6 +74,10 @@ typedef struct {
 
   int                        running; /* Boolean status */
   int                        visible; /* Boolean status */
+
+  _mrlb_item_t              *items;
+  char                     **f_list;
+  int                       *f_indx, f_num, i_num;
 
   xitk_widget_t             *mrlb_list; /*  Browser list widget */
   xitk_button_list_t        *autodir_buttons;
@@ -273,6 +195,15 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
   xitk_window_destroy_window (wp->xwin);
   wp->xwin = NULL;
 
+  free (wp->items);
+  wp->items = NULL;
+  wp->i_num = 0;
+  free (wp->f_list);
+  wp->f_list = NULL;
+  free (wp->f_indx);
+  wp->f_indx = NULL;
+  wp->f_num = 0;
+
   {
     int i;
 
@@ -283,20 +214,12 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
     }
     XITK_FREE (wp->mrl_filters);
 
-    for (i = 0; i < wp->mrls_num; i++) {
-      MRL_ZERO (wp->mc->mrls[i]);
-      XITK_FREE (wp->mc->mrls[i]);
-      MRL_ZERO (wp->mc->filtered_mrls[i]);
-      XITK_FREE (wp->mc->filtered_mrls[i]);
-      XITK_FREE (wp->mc->mrls_disp[i]);
-    }
     free (wp->filters);
   }
     
   XITK_FREE (wp->skin_element_name);
   XITK_FREE (wp->skin_element_name_ip);
   XITK_FREE (wp->last_mrl_source);
-  XITK_FREE (wp->mc);
   XITK_FREE (wp->current_origin);
 }
 
@@ -322,141 +245,66 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  * Redisplay the displayed current origin (useful for file plugin).
  */
 static void _update_current_origin (_mrlbrowser_private_t *wp) {
-
   XITK_FREE (wp->current_origin);
-  if (wp->mc->mrls[0] && wp->mc->mrls[0]->origin)
-    wp->current_origin = strdup(wp->mc->mrls[0]->origin);
+  if (wp->i_num && wp->items[0].xmrl.origin)
+    wp->current_origin = strdup (wp->items[0].xmrl.origin);
   else
-    wp->current_origin = strdup("");
-
-  xitk_label_change_label (wp->widget_origin,
-                           wp->current_origin);
-}
-
-/*
- * Return the *marker* of a given file *fully named*
- */
-static int get_mrl_marker(xine_mrl_t *mrl) {
-  
-  if(mrl->type & XINE_MRL_TYPE_file_symlink)
-    return '@';
-  else if(mrl->type & XINE_MRL_TYPE_file_directory)
-    return '/';
-  else if(mrl->type & XINE_MRL_TYPE_file_fifo)
-    return '|';
-  else if(mrl->type & XINE_MRL_TYPE_file_sock)
-    return '=';
-  else if(mrl->type & XINE_MRL_TYPE_file_normal) {
-    if(mrl->type & XINE_MRL_TYPE_file_exec)
-      return '*';
-  }
-
-  return '\0';
+    wp->current_origin = strdup ("");
+  xitk_label_change_label (wp->widget_origin, wp->current_origin);
 }
 
 /*
  *
  */
 static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
-  int i;
-  int old_filtered_mrls_num = wp->mc->mrls_to_disp;
-
-  /* filtering is enabled */
-  if(wp->filter_selected) {
-    char *filter_ends;
-    const char *const selected_ending = wp->mrl_filters[wp->filter_selected]->ending;
-
-    wp->mc->mrls_to_disp = 0;
-
-    filter_ends = strdup(selected_ending);
-
-    for(i = 0; i < wp->mrls_num; i++) {
-
-      if(wp->mc->mrls[i]->type & XINE_MRL_TYPE_file_directory) {
-
-	if(wp->mc->filtered_mrls[wp->mc->mrls_to_disp] == NULL)
-	  wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
-
-	MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[wp->mc->mrls_to_disp]);
-	wp->mc->mrls_to_disp++;
-      }
-      else {
-	char *ending, *m, *pfilter_ends;
-
-	if((ending = strrchr(wp->mc->mrls[i]->mrl, '.'))) {
-
+  if (wp->filter_selected) { /* filtering is enabled */
+    int i, j;
+    size_t elen = strlen (wp->mrl_filters [wp->filter_selected]->ending) + 1;
+    char *filter_ends = malloc (elen);
+    if (filter_ends) {
+      for (i = j = 0; i < wp->i_num; i++) {
+        int keep = 1;
+        if (!(wp->items[i].xmrl.type & XINE_MRL_TYPE_file_directory)) {
+          char *m, *pfilter_ends;
+          keep = 0;
+          memcpy (filter_ends, wp->mrl_filters[wp->filter_selected]->ending, elen);
           pfilter_ends = filter_ends;
-	  while((m = strsep(&pfilter_ends, ",")) != NULL) {
-	    
-	    if(!strcasecmp((ending + 1), m)) {
-	      if(wp->mc->filtered_mrls[wp->mc->mrls_to_disp] == NULL)
-		wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
-	      
-	      MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[wp->mc->mrls_to_disp]);
-	      wp->mc->mrls_to_disp++;
-	    }
-	  }
-	  free(filter_ends);
-	  filter_ends = strdup(selected_ending);
-	}
-      }    
+          while ((m = strsep (&pfilter_ends, ",")) != NULL) {
+            if (!strcmp (wp->items[i].ext, m)) {
+              keep = 1;
+              break;
+            }
+          }
+        }
+        if (keep) {
+          wp->f_list[j] = wp->items[i].disp;
+          wp->f_indx[j] = i;
+          j++;
+        }
+      }
+      wp->f_list[j] = NULL;
+      wp->f_num = j;
+      free (filter_ends);
+    } else {
+      wp->f_list[0] = NULL;
+      wp->f_num = 0;
     }
-    
-    free(filter_ends);
-    
-  }
-  else { /* no filtering */
-
-    for(i = 0; i < wp->mrls_num; i++) {
-      
-      if(wp->mc->filtered_mrls[i] == NULL)
-	wp->mc->filtered_mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
-      
-      MRL_DUPLICATE(wp->mc->mrls[i], wp->mc->filtered_mrls[i]);
+  } else { /* no filtering */
+    int i;
+    for (i = 0; i < wp->i_num; i++) {
+      wp->f_list[i] = wp->items[i].disp;
+      wp->f_indx[i] = i;
     }
-    wp->mc->mrls_to_disp = i;
+    wp->f_list[i] = NULL;
+    wp->f_num = i;
   }
-  
-  /* free unused mrls */
-  while(old_filtered_mrls_num > wp->mc->mrls_to_disp) {
-    MRL_ZERO(wp->mc->filtered_mrls[old_filtered_mrls_num - 1]);
-    XITK_FREE(wp->mc->filtered_mrls[old_filtered_mrls_num - 1]);
-    wp->mc->filtered_mrls[old_filtered_mrls_num - 1] = NULL;
-    XITK_FREE(wp->mc->mrls_disp[old_filtered_mrls_num - 1]);
-    old_filtered_mrls_num--;
-  }
-
-  wp->mc->filtered_mrls[wp->mc->mrls_to_disp] = NULL;
 }
 
 /*
  * Create *eye candy* entries in browser.
  */
 static void _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
-  int i = 0;
-  
   _mrlbrowser_filter_mrls (wp);
-
-  while (wp->mc->filtered_mrls[i]) {
-    char *p = wp->mc->filtered_mrls[i]->mrl;
-
-    if (wp->mc->filtered_mrls[i]->origin) {
-      p += strlen (wp->mc->filtered_mrls[i]->origin);
-      if (*p == '/') 
-        p++;
-    }
-    
-    if (wp->mc->filtered_mrls[i]->type & XINE_MRL_TYPE_file_symlink) {
-      wp->mc->mrls_disp[i] = (char *)realloc (wp->mc->mrls_disp[i], strlen (p) + 4 + strlen (wp->mc->filtered_mrls[i]->link) + 2);
-      sprintf (wp->mc->mrls_disp[i], "%s%c -> %s", p, get_mrl_marker (wp->mc->filtered_mrls[i]), wp->mc->filtered_mrls[i]->link);
-    }
-    else {
-      wp->mc->mrls_disp[i] = (char *)realloc (wp->mc->mrls_disp[i], strlen (p) + 2);
-      sprintf (wp->mc->mrls_disp[i], "%s%c", p, get_mrl_marker (wp->mc->filtered_mrls[i]));
-    }
-
-    i++;
-  }
 }
 
 /*
@@ -464,28 +312,137 @@ static void _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
  * directly with these ones.
  */
 static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **mtmp, int num_mrls) {
-  int i;
-  int old_mrls_num = wp->mrls_num;
+  char *mem, *g_orig;
+  size_t slen, g_olen;
+  int i, g_onum;
 
-  const int max_mrls = sizeof (wp->mc->mrls) / sizeof (wp->mc->mrls[0]) - 1;
-  if (num_mrls >= max_mrls)
-    num_mrls = max_mrls;
+  free (wp->items);
+  wp->items = NULL;
+  wp->i_num = 0;
+  free (wp->f_list);
+  wp->f_list = NULL;
+  free (wp->f_indx);
+  wp->f_indx = NULL;
+  wp->f_num = 0;
+
+  if (!mtmp)
+    return;
+
+  wp->f_list = malloc ((num_mrls + 1) * sizeof (*wp->f_list));
+  wp->f_indx = malloc (num_mrls * sizeof (*wp->f_indx));
+
+  /* origin usually is the same for all items. */
+  g_orig = (num_mrls > 0) ? mtmp[0]->origin : NULL;
+  g_olen = g_orig ? strlen (g_orig) + 1 : 0;
+  g_onum = 0;
+  slen = 0;
+  for (i = 0; i < num_mrls; i++) {
+    xine_mrl_t *m = mtmp[i];
+    size_t olen = (m->origin ? strlen (m->origin) : 0) + 1;
+    size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
+    size_t llen = (m->link ? strlen (m->link) : 0) + 1;
+    size_t dlen = (mlen > olen ? mlen - olen + 1 : mlen) + ((m->type & XINE_MRL_TYPE_file_symlink) ? 5 : 1);
+    slen += olen + mlen + llen + dlen;
+    if ((olen == g_olen) && !memcmp (m->origin, g_orig, g_olen))
+      g_onum += 1;
+  }
+  if (g_onum != num_mrls)
+    g_orig = NULL;
+  if (g_orig)
+    slen -= (g_onum - 1) * g_olen;
+
+  mem = malloc (num_mrls * sizeof (_mrlb_item_t) + slen);
+  if (!mem || !wp->f_list || !wp->f_indx) {
+    free (mem);
+    free (wp->f_list);
+    wp->f_list = NULL;
+    free (wp->f_indx);
+    wp->f_indx = NULL;
+    return;
+  }
+  wp->i_num = num_mrls;
+  wp->items = (_mrlb_item_t *)mem;
+  mem += num_mrls * sizeof (_mrlb_item_t);
+
+  if (g_orig) {
+    memcpy (mem, g_orig, g_olen);
+    g_orig = mem;
+    mem += g_olen;
+  }
 
   for (i = 0; i < num_mrls; i++) {
-    if (wp->mc->mrls[i] == NULL)
-      wp->mc->mrls[i] = (xine_mrl_t *)xitk_xmalloc (sizeof (xine_mrl_t));
-    MRL_DUPLICATE (mtmp[i], wp->mc->mrls[i]);
+    xine_mrl_t *m = mtmp[i];
+    _mrlb_item_t *item = wp->items + i;
+    size_t olen;
+    size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
+    size_t llen = (m->link ? strlen (m->link) : 0) + 1;
+    char *p, *q, *r;
+
+    if (g_orig) {
+      olen = g_olen;
+      item->xmrl.origin = g_orig;
+    } else {
+      olen = (m->origin ? strlen (m->origin) : 0) + 1;
+      item->xmrl.origin = mem;
+      memcpy (mem, m->origin ? m->origin : "", olen);
+      mem += olen;
+    }
+    item->xmrl.mrl = mem;
+    memcpy (mem, m->mrl ? m->mrl : "", mlen);
+    mem += mlen;
+    item->xmrl.link = mem;
+    memcpy (mem, m->link ? m->link : "", llen);
+    mem += llen;
+    item->xmrl.type = m->type;
+    item->xmrl.size = m->size;
+
+    item->disp = mem;
+    if (mlen > olen) {
+      memcpy (mem, m->mrl + olen, mlen - olen - 1);
+      mem += mlen - olen - 1;
+    } else {
+      memcpy (mem, m->mrl, mlen - 1);
+      mem += mlen - 1;
+    }
+    if (m->type & XINE_MRL_TYPE_file_symlink) {
+      memcpy (mem, "@ -> ", 5);
+      mem += 5;
+      memcpy (mem, m->link ? m->link : "", llen);
+      mem += llen;
+    } else if (m->type & XINE_MRL_TYPE_file_directory) {
+      memcpy (mem, "/", 2);
+      mem += 2;
+    } else if (m->type & XINE_MRL_TYPE_file_fifo) {
+      memcpy (mem, "|", 2);
+      mem += 2;
+    } else if (m->type & XINE_MRL_TYPE_file_sock) {
+      memcpy (mem, "=", 2);
+      mem += 2;
+    } else if (m->type & XINE_MRL_TYPE_file_exec) {
+      memcpy (mem, "*", 2);
+      mem += 2;
+    } else {
+      *mem++ = 0;
+    }
+    p = mlen > olen ? m->mrl + mlen - olen : m->mrl;
+    q = NULL;
+    while (p[0] && (p[0] != '?') && (p[0] != '#')) {
+      if (p[0] == '.') {
+        q = p + 1;
+      } else if (p[0] == '/') {
+        q = NULL;
+      }
+      p += 1;
+    }
+    if (!q)
+      q = p;
+    if (p > q + sizeof (item->ext) - 1)
+      p = q + sizeof (item->ext) - 1;
+    r = item->ext;
+    while (q < p)
+      *r++ = *q++ | 0x20;
+    *r = 0;
   }
-
-  wp->mrls_num = i;
-
-  while (old_mrls_num > wp->mrls_num) {
-    MRL_ZERO (wp->mc->mrls[old_mrls_num - 1]);
-    XITK_FREE (wp->mc->mrls[old_mrls_num - 1]);
-    old_mrls_num--;
-  }
-
-  wp->mc->mrls [wp->mrls_num] = NULL;
 }
 
 /*
@@ -518,7 +475,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
-    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
+    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->f_list, NULL, wp->f_num, 0);
   }
 }
 
@@ -761,39 +718,42 @@ void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig
  * 
  */
 static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_callback, int play_callback) {
-  xine_mrl_t *ms = wp->mc->filtered_mrls[j];
+  _mrlb_item_t *item;
 
-  if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
+  if ((j < 0) || (j >= wp->f_num))
+    return;
+  item = wp->items + wp->f_indx[j];
+
+  if ((item->xmrl.type & (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory))
+    == (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory)) {
     const char *buf;
     char       *freeme = NULL;
-    const char *filename = ms->mrl;
+    const char *filename = item->xmrl.mrl;
     size_t      len;
 
-    if (ms->origin) {
-      if (strlen(filename) > strlen(ms->origin))
-        filename += strlen(ms->origin);
+    if (item->xmrl.origin[0]) {
+      if (strlen (filename) > strlen (item->xmrl.origin))
+        filename += strlen (item->xmrl.origin);
       else
         filename = "";
-
       if (*filename == '/')
         filename++;
     }
-
-    len = strlen(filename);
+    len = strlen (filename);
 
     /* Check if we want to re-read current dir or go in parent dir */
     if( len > 1 &&
         (filename[len - 1] == '.') &&
         (filename[len - 2] != '.')) {
 
-      buf = ms->origin;
+      buf = item->xmrl.origin;
     }
     else if (len > 1 &&
              (filename[len - 1] == '.') &&
              (filename[len - 2] == '.')) {
       char *p;
       
-      buf = freeme = strdup(ms->origin ? ms->origin : "");
+      buf = freeme = strdup (item->xmrl.origin);
       if (buf[0] && buf[1]) { /* not '/' directory */
 	  
         p = &freeme[strlen(buf)-1];
@@ -808,7 +768,7 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
 	  
       }
     } else {
-      buf = ms->mrl;
+      buf = item->xmrl.mrl;
     }
 
     {
@@ -821,7 +781,7 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
 
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
-    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
+    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->f_list, NULL, wp->f_num, 0);
     
   }
   else {
@@ -833,14 +793,14 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
       void *userdata = wp->add_userdata;
       if (!userdata)
         userdata = (void *)(uintptr_t)j;
-      wp->add_callback (&wp->w, userdata, wp->mc->filtered_mrls[j]);
+      wp->add_callback (&wp->w, userdata, &item->xmrl);
     }
 
     if (play_callback && wp->play_callback) {
       void *userdata = wp->play_userdata;
       if (!userdata)
         userdata = (void *)(uintptr_t)j;
-      wp->play_callback (&wp->w, userdata, wp->mc->filtered_mrls[j]);
+      wp->play_callback (&wp->w, userdata, &item->xmrl);
     }
   }
 }
@@ -894,7 +854,7 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   (void)w;
   wp->filter_selected = select;
   _mrlbrowser_create_enlighted_entries (wp);
-  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->mc->mrls_disp, NULL, wp->mc->mrls_to_disp, 0);
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->f_list, NULL, wp->f_num, 0);
 }
 
 /*
@@ -988,8 +948,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     return NULL;
   }
 
-  wp->mc              = (mrl_contents_t *)xitk_xmalloc (sizeof (mrl_contents_t));
-  wp->mrls_num        = 0;
+  wp->items = NULL;
+  wp->i_num = 0;
+  wp->f_list = NULL;
+  wp->f_indx = NULL;
+  wp->f_num = 0;
+
   wp->last_mrl_source = NULL;
 
   wp->xwin = xitk_window_create_window_ext (xitk, mb->x, mb->y, bg_image->width, bg_image->height,
@@ -1149,7 +1113,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->w.tips_timeout = 0;
   wp->w.tips_string  = NULL;
 
-  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->mc->mrls_disp, NULL, wp->mrls_num, 0);
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->f_list, NULL, wp->f_num, 0);
 
   xitk_window_show_window (wp->xwin, 1);
 
@@ -1169,3 +1133,4 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   return &wp->w;
 }
+
