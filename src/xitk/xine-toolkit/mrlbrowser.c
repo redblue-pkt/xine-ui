@@ -52,6 +52,12 @@ typedef struct {
 } _mrlb_item_t;
 
 typedef struct {
+  _mrlb_item_t              *items;
+  char                     **f_list;
+  int                       *f_indx, f_num, i_num;
+} _mrlb_items_t;
+
+typedef struct {
   xitk_widget_t              w;
 
   char                      *skin_element_name;
@@ -75,9 +81,7 @@ typedef struct {
   int                        running; /* Boolean status */
   int                        visible; /* Boolean status */
 
-  _mrlb_item_t              *items;
-  char                     **f_list;
-  int                       *f_indx, f_num, i_num;
+  _mrlb_items_t              items;
 
   xitk_widget_t             *mrlb_list; /*  Browser list widget */
   xitk_button_list_t        *autodir_buttons;
@@ -181,6 +185,17 @@ static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_f
   wp->filter_selected = 0;
 }
 
+static void _mrlb_items_free (_mrlb_items_t *items) {
+  free (items->items);
+  items->items = NULL;
+  items->i_num = 0;
+  free (items->f_list);
+  items->f_list = NULL;
+  free (items->f_indx);
+  items->f_indx = NULL;
+  items->f_num = 0;
+}
+
 /*
  * Destroy the mrlbrowser.
  */
@@ -195,14 +210,7 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
   xitk_window_destroy_window (wp->xwin);
   wp->xwin = NULL;
 
-  free (wp->items);
-  wp->items = NULL;
-  wp->i_num = 0;
-  free (wp->f_list);
-  wp->f_list = NULL;
-  free (wp->f_indx);
-  wp->f_indx = NULL;
-  wp->f_num = 0;
+  _mrlb_items_free (&wp->items);
 
   {
     int i;
@@ -246,8 +254,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  */
 static void _update_current_origin (_mrlbrowser_private_t *wp) {
   XITK_FREE (wp->current_origin);
-  if (wp->i_num && wp->items[0].xmrl.origin)
-    wp->current_origin = strdup (wp->items[0].xmrl.origin);
+  if (wp->items.i_num && wp->items.items[0].xmrl.origin)
+    wp->current_origin = strdup (wp->items.items[0].xmrl.origin);
   else
     wp->current_origin = strdup ("");
   xitk_label_change_label (wp->widget_origin, wp->current_origin);
@@ -262,41 +270,41 @@ static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
     size_t elen = strlen (wp->mrl_filters [wp->filter_selected]->ending) + 1;
     char *filter_ends = malloc (elen);
     if (filter_ends) {
-      for (i = j = 0; i < wp->i_num; i++) {
+      for (i = j = 0; i < wp->items.i_num; i++) {
         int keep = 1;
-        if (!(wp->items[i].xmrl.type & XINE_MRL_TYPE_file_directory)) {
+        if (!(wp->items.items[i].xmrl.type & XINE_MRL_TYPE_file_directory)) {
           char *m, *pfilter_ends;
           keep = 0;
           memcpy (filter_ends, wp->mrl_filters[wp->filter_selected]->ending, elen);
           pfilter_ends = filter_ends;
           while ((m = strsep (&pfilter_ends, ",")) != NULL) {
-            if (!strcmp (wp->items[i].ext, m)) {
+            if (!strcmp (wp->items.items[i].ext, m)) {
               keep = 1;
               break;
             }
           }
         }
         if (keep) {
-          wp->f_list[j] = wp->items[i].disp;
-          wp->f_indx[j] = i;
+          wp->items.f_list[j] = wp->items.items[i].disp;
+          wp->items.f_indx[j] = i;
           j++;
         }
       }
-      wp->f_list[j] = NULL;
-      wp->f_num = j;
+      wp->items.f_list[j] = NULL;
+      wp->items.f_num = j;
       free (filter_ends);
     } else {
-      wp->f_list[0] = NULL;
-      wp->f_num = 0;
+      wp->items.f_list[0] = NULL;
+      wp->items.f_num = 0;
     }
   } else { /* no filtering */
     int i;
-    for (i = 0; i < wp->i_num; i++) {
-      wp->f_list[i] = wp->items[i].disp;
-      wp->f_indx[i] = i;
+    for (i = 0; i < wp->items.i_num; i++) {
+      wp->items.f_list[i] = wp->items.items[i].disp;
+      wp->items.f_indx[i] = i;
     }
-    wp->f_list[i] = NULL;
-    wp->f_num = i;
+    wp->items.f_list[i] = NULL;
+    wp->items.f_num = i;
   }
 }
 
@@ -311,25 +319,22 @@ static void _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
  * Duplicate mrls from xine-engine's returned. We shouldn't play
  * directly with these ones.
  */
-static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **mtmp, int num_mrls) {
+static void _mrlbrowser_duplicate_mrls (_mrlb_items_t *items, xine_mrl_t **mtmp, int num_mrls) {
   char *mem, *g_orig;
   size_t slen, g_olen;
   int i, g_onum;
 
-  free (wp->items);
-  wp->items = NULL;
-  wp->i_num = 0;
-  free (wp->f_list);
-  wp->f_list = NULL;
-  free (wp->f_indx);
-  wp->f_indx = NULL;
-  wp->f_num = 0;
+  items->items = NULL;
+  items->i_num = 0;
+  items->f_list = NULL;
+  items->f_indx = NULL;
+  items->f_num = 0;
 
   if (!mtmp)
     return;
 
-  wp->f_list = malloc ((num_mrls + 1) * sizeof (*wp->f_list));
-  wp->f_indx = malloc (num_mrls * sizeof (*wp->f_indx));
+  items->f_list = malloc ((num_mrls + 1) * sizeof (*items->f_list));
+  items->f_indx = malloc (num_mrls * sizeof (*items->f_indx));
 
   /* origin usually is the same for all items. */
   g_orig = (num_mrls > 0) ? mtmp[0]->origin : NULL;
@@ -341,7 +346,7 @@ static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **
     size_t olen = (m->origin ? strlen (m->origin) : 0) + 1;
     size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
     size_t llen = (m->link ? strlen (m->link) : 0) + 1;
-    size_t dlen = (mlen > olen ? mlen - olen + 1 : mlen) + ((m->type & XINE_MRL_TYPE_file_symlink) ? 5 : 1);
+    size_t dlen = (mlen > olen ? mlen - olen + 1 : mlen) + ((m->type & XINE_MRL_TYPE_file_symlink) ? llen + 5 : 1);
     slen += olen + mlen + llen + dlen;
     if ((olen == g_olen) && !memcmp (m->origin, g_orig, g_olen))
       g_onum += 1;
@@ -352,16 +357,16 @@ static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **
     slen -= (g_onum - 1) * g_olen;
 
   mem = malloc (num_mrls * sizeof (_mrlb_item_t) + slen);
-  if (!mem || !wp->f_list || !wp->f_indx) {
+  if (!mem || !items->f_list || !items->f_indx) {
     free (mem);
-    free (wp->f_list);
-    wp->f_list = NULL;
-    free (wp->f_indx);
-    wp->f_indx = NULL;
+    free (items->f_list);
+    items->f_list = NULL;
+    free (items->f_indx);
+    items->f_indx = NULL;
     return;
   }
-  wp->i_num = num_mrls;
-  wp->items = (_mrlb_item_t *)mem;
+  items->i_num = num_mrls;
+  items->items = (_mrlb_item_t *)mem;
   mem += num_mrls * sizeof (_mrlb_item_t);
 
   if (g_orig) {
@@ -372,7 +377,7 @@ static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **
 
   for (i = 0; i < num_mrls; i++) {
     xine_mrl_t *m = mtmp[i];
-    _mrlb_item_t *item = wp->items + i;
+    _mrlb_item_t *item = items->items + i;
     size_t olen;
     size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
     size_t llen = (m->link ? strlen (m->link) : 0) + 1;
@@ -398,9 +403,11 @@ static void _mrlbrowser_duplicate_mrls (_mrlbrowser_private_t *wp, xine_mrl_t **
 
     item->disp = mem;
     if (mlen > olen) {
+      if (m->mrl[olen - 1] != '/')
+        olen -= 1;
       memcpy (mem, m->mrl + olen, mlen - olen - 1);
       mem += mlen - olen - 1;
-    } else {
+    } else if (m->mrl) {
       memcpy (mem, m->mrl, mlen - 1);
       mem += mlen - 1;
     }
@@ -454,6 +461,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
   char *old_old_src;
 
   if(lbl) {
+    _mrlb_items_t items = wp->items;
     
     old_old_src = wp->last_mrl_source;
     wp->last_mrl_source = strdup (lbl);
@@ -468,14 +476,15 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 	return;
       }
 #endif
-      _mrlbrowser_duplicate_mrls (wp, mtmp, num_mrls);
+      _mrlbrowser_duplicate_mrls (&wp->items, mtmp, num_mrls);
     }
 
     free(old_old_src);
     
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
-    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->f_list, NULL, wp->f_num, 0);
+    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->items.f_list, NULL, wp->items.f_num, 0);
+    _mrlb_items_free (&items);
   }
 }
 
@@ -720,9 +729,9 @@ void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig
 static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_callback, int play_callback) {
   _mrlb_item_t *item;
 
-  if ((j < 0) || (j >= wp->f_num))
+  if ((j < 0) || (j >= wp->items.f_num))
     return;
-  item = wp->items + wp->f_indx[j];
+  item = wp->items.items + wp->items.f_indx[j];
 
   if ((item->xmrl.type & (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory))
     == (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory)) {
@@ -730,6 +739,7 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
     char       *freeme = NULL;
     const char *filename = item->xmrl.mrl;
     size_t      len;
+    _mrlb_items_t items = wp->items;
 
     if (item->xmrl.origin[0]) {
       if (strlen (filename) > strlen (item->xmrl.origin))
@@ -774,14 +784,15 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
     {
       int num_mrls;
       xine_mrl_t **mtmp = xine_get_browse_mrls (wp->xine, wp->last_mrl_source, buf, &num_mrls);
-      _mrlbrowser_duplicate_mrls (wp, mtmp, num_mrls);
+      _mrlbrowser_duplicate_mrls (&wp->items, mtmp, num_mrls);
     }
 
     free(freeme);
 
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
-    xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->f_list, NULL, wp->f_num, 0);
+    xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
+    _mrlb_items_free (&items);
     
   }
   else {
@@ -854,7 +865,7 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   (void)w;
   wp->filter_selected = select;
   _mrlbrowser_create_enlighted_entries (wp);
-  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->f_list, NULL, wp->f_num, 0);
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 }
 
 /*
@@ -948,11 +959,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     return NULL;
   }
 
-  wp->items = NULL;
-  wp->i_num = 0;
-  wp->f_list = NULL;
-  wp->f_indx = NULL;
-  wp->f_num = 0;
+  wp->items.items = NULL;
+  wp->items.i_num = 0;
+  wp->items.f_list = NULL;
+  wp->items.f_indx = NULL;
+  wp->items.f_num = 0;
 
   wp->last_mrl_source = NULL;
 
@@ -1113,7 +1124,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->w.tips_timeout = 0;
   wp->w.tips_string  = NULL;
 
-  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->f_list, NULL, wp->f_num, 0);
+  xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 
   xitk_window_show_window (wp->xwin, 1);
 
