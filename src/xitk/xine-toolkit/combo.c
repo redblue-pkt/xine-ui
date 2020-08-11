@@ -65,7 +65,6 @@ typedef struct {
 
   xitk_state_callback_t   callback;
   void                   *userdata;
-  int                     visible;
   int                     tips_timeout;
 
 } _combo_private_t;
@@ -80,7 +79,7 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
   _n = 0;
   _s = 0;
   p = s;
-  while (*p) {
+  while ((--*n >= 0) && *p) {
     _s += sizeof (*p) + strlen (*p) + 1;
     _n += 1;
     p++;
@@ -105,8 +104,8 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
 }
     
 static void _combo_close (_combo_private_t *wp) {
-  wp->visible = 0;
   if (wp->xwin) {
+    wp->browser_widget = NULL;
     xitk_unregister_event_handler (&wp->widget_key);
     xitk_window_destroy_window (wp->xwin);
     wp->xwin = NULL;
@@ -124,7 +123,7 @@ static void _combo_handle_key_event(void *data, const xitk_key_event_t *ke) {
     if (ke->key_pressed == XK_Escape)
 
 
-  if (wp && wp->visible) {
+  if (wp && wp->xwin) {
     if (ke->event == XITK_KEY_PRESS) {
       if (ke->key_pressed == XK_Escape) {
         _combo_close (wp);
@@ -147,7 +146,7 @@ static void _combo_handle_key_event(void *data, const xitk_key_event_t *ke) {
 static void _combo_handle_button_event(void *data, const xitk_button_event_t *be) {
   _combo_private_t *wp = (_combo_private_t*)data;
 
-  if (wp && wp->visible) {
+  if (wp && wp->xwin) {
     if (be->event == XITK_BUTTON_RELEASE) {
       /* If we try to move the combo window,
        * move it back to right position (under label). */
@@ -221,9 +220,8 @@ static void _combo_open (_combo_private_t *wp) {
       1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
     xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
     xitk_enable_and_show_widget (wp->browser_widget);
-    wp->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+    wp->browser_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
   }
-  wp->browser_widget->tips_timeout = wp->browser_widget->tips_timeout;
   
   xitk_browser_update_list (wp->browser_widget, 
     (const char * const *)wp->entries, NULL, wp->num_entries, 0);
@@ -231,8 +229,6 @@ static void _combo_open (_combo_private_t *wp) {
   xitk_browser_set_select (wp->browser_widget, wp->selected);
 
   wp->widget_key = xitk_window_register_event_handler ("xitk combo", wp->xwin, &combo_event_cbs, wp);
-
-  wp->visible = 1;
 }
 
 /*
@@ -246,7 +242,7 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
 
   if (wp && w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
     ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
-    if (state && wp->visible == 0) {
+    if (state && !wp->xwin) {
       _combo_open (wp);
       xitk_combo_update_pos (&wp->w);
     } else {
@@ -265,7 +261,7 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
     state = !xitk_checkbox_get_state (wp->button_widget);
     xitk_checkbox_set_state (wp->button_widget, state);
 
-    if (state && wp->visible == 0) {
+    if (state && !wp->xwin) {
       wp->w.wl->widget_focused = wp->button_widget;
       _combo_open (wp);
       xitk_combo_update_pos (&wp->w);
@@ -283,7 +279,7 @@ static void _cmb_enability (_combo_private_t *wp) {
     xitk_enable_widget (wp->label_widget);
     xitk_enable_widget (wp->button_widget);
   } else {
-    if (wp->visible) {
+    if (wp->xwin) {
       xitk_checkbox_set_state (wp->button_widget, 0);
       _combo_rollunroll (wp->button_widget, (void *)wp, 0);
     }
@@ -293,7 +289,7 @@ static void _cmb_enability (_combo_private_t *wp) {
 }
 
 static void _cmb_destroy (_combo_private_t *wp) {
-  if (wp->visible)
+  if (wp->xwin)
     _combo_rollunroll (wp->button_widget, (void *)wp, 0);
   if (wp->label_widget) {
     xitk_destroy_widget (wp->label_widget);
@@ -311,7 +307,7 @@ static void _cmb_destroy (_combo_private_t *wp) {
  *
  */
 static void _cmb_paint (_combo_private_t *wp) {
-  if (wp->visible == 1 && (wp->w.visible < 1)) {
+  if (wp->xwin && (wp->w.visible < 1)) {
     xitk_checkbox_set_state (wp->button_widget, 0);
     _combo_rollunroll (wp->button_widget, (void *)wp, 0);
   }
@@ -467,7 +463,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
     int                    xx = 0, yy = 0;
     window_info_t          wi;
     
-    if(wp->visible) {
+    if (wp->xwin) {
       if((xitk_get_window_info(*(wp->parent_wkey), &wi))) {
 	wp->win_x = wi.x;
 	wp->win_y = wi.y;
@@ -534,6 +530,7 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
 
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     free (wp->entries);
+    wp->num_entries = len;
     wp->entries     = _combo_copy_string_list (list, &wp->num_entries);
     wp->selected    = -1;
 
@@ -546,25 +543,23 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
 /*
  *
  */
-static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_skin_config_t *skonfig,
-  xitk_combo_widget_t *c, const char *skin_element_name, _combo_private_t *wp, int visible, int enable) {
+static xitk_widget_t *_xitk_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t *c,
+  const char *skin_element_name, _combo_private_t *wp, int visible, int enable) {
   const char * const *entries = c->entries;
-  xitk_browser_widget_t       browser;
   
   ABORT_IF_NULL(wl);
 
-  XITK_WIDGET_INIT(&browser);
-
   wp->xwin = NULL;
 
-  wp->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
-  wp->combo_widget             = &wp->w;
-  wp->parent_wlist             = wl;
-  wp->parent_wkey              = c->parent_wkey;
-  wp->callback                 = c->callback;
-  wp->userdata                 = c->userdata;
-  wp->entries                  = _combo_copy_string_list (c->entries, &wp->num_entries);
-  wp->selected                 = -1;
+  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
+  wp->combo_widget      = &wp->w;
+  wp->parent_wlist      = wl;
+  wp->parent_wkey       = c->parent_wkey;
+  wp->callback          = c->callback;
+  wp->userdata          = c->userdata;
+  wp->num_entries       = 0x7fffffff;
+  wp->entries           = _combo_copy_string_list (c->entries, &wp->num_entries);
+  wp->selected          = -1;
   
   if (wp->num_entries) {
     xitk_label_change_label (wp->label_widget, entries[0]);
@@ -640,7 +635,7 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
   }
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, c->skin_element_name);
-    return _xitk_combo_create (wl, skonfig, c, c->skin_element_name, wp,
+    return _xitk_combo_create (wl, c, c->skin_element_name, wp,
       info ? (info->visibility ? 1 : -1) : 0, info ? info->enability : 0);
   }
 }
@@ -704,5 +699,5 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
     wp->w.height = height;
   }
 
-  return _xitk_combo_create (wl, NULL, c, NULL, wp, 0, 0);
+  return _xitk_combo_create (wl, c, NULL, wp, 0, 0);
 }
