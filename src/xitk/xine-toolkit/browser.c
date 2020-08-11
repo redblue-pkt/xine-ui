@@ -820,7 +820,6 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
   if (num < 0)
     return;
   {
-    int done = 0;
     struct timeval tv;
     gettimeofday (&tv, NULL);
     if (num == wp->items.selected) {
@@ -828,15 +827,17 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
       difftime += (tv.tv_usec - wp->click_time.tv_usec) / 1000;
       if (difftime < wp->dbl_click_time) {
         if (wp->dbl_click_callback) {
+          wp->click_time = tv;
+          _browser_select (wp, state ? num : -1);
           wp->dbl_click_callback (&wp->w, wp->userdata, num, modifier);
-          done = 1;
+          return;
         }
       }
     }
-    _browser_select (wp, state ? num : -1);
-    if (!done && state && wp->callback)
-      wp->callback (&wp->w, wp->userdata, num, modifier);
     wp->click_time = tv;
+    _browser_select (wp, state ? num : -1);
+    if (state && wp->callback)
+      wp->callback (&wp->w, wp->userdata, num, modifier);
   }
 }
 
