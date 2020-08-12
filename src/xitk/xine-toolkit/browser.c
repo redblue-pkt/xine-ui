@@ -258,6 +258,7 @@ static void _browser_set_btns (_browser_private_t *wp) {
       xitk_disable_and_hide_widget (wp->visible.btns[n + WBSTART]);
       xitk_labelbutton_change_label (wp->visible.btns[n + WBSTART], "");
       xitk_labelbutton_change_shortcut_label (wp->visible.btns[n + WBSTART], "", -1, NULL);
+      xitk_labelbutton_set_state (wp->visible.btns[n + WBSTART], 0);
       xitk_show_widget (wp->visible.btns[n + WBSTART]);
     }
   }
@@ -608,8 +609,8 @@ void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const c
   _browser_set_items (wp, list, shortcut, len);
   _browser_set_hslider (wp, 1);
   _browser_set_btns (wp);
-  wp->visible.start = start;
-  _browser_move (wp, 0);
+  wp->visible.start = -MAX_VISIBLE;
+  _browser_move (wp, start);
   _browser_set_vslider (wp);
 }
 
