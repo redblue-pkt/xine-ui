@@ -265,6 +265,8 @@ static void _update_current_origin (_mrlbrowser_private_t *wp) {
  *
  */
 static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
+  if (!wp->items.f_list)
+    return;
   if (wp->filter_selected) { /* filtering is enabled */
     int i, j;
     size_t elen = strlen (wp->mrl_filters [wp->filter_selected]->ending) + 1;
@@ -735,59 +737,40 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
 
   if ((item->xmrl.type & (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory))
     == (XINE_MRL_TYPE_file | XINE_MRL_TYPE_file_directory)) {
-    const char *buf;
-    char       *freeme = NULL;
-    const char *filename = item->xmrl.mrl;
-    size_t      len;
+    char *new_dir = item->xmrl.mrl, *temp = NULL;
     _mrlb_items_t items = wp->items;
 
-    if (item->xmrl.origin[0]) {
-      if (strlen (filename) > strlen (item->xmrl.origin))
-        filename += strlen (item->xmrl.origin);
-      else
-        filename = "";
-      if (*filename == '/')
-        filename++;
-    }
-    len = strlen (filename);
-
-    /* Check if we want to re-read current dir or go in parent dir */
-    if( len > 1 &&
-        (filename[len - 1] == '.') &&
-        (filename[len - 2] != '.')) {
-
-      buf = item->xmrl.origin;
-    }
-    else if (len > 1 &&
-             (filename[len - 1] == '.') &&
-             (filename[len - 2] == '.')) {
-      char *p;
-      
-      buf = freeme = strdup (item->xmrl.origin);
-      if (buf[0] && buf[1]) { /* not '/' directory */
-	  
-        p = &freeme[strlen(buf)-1];
-        while(*p && *p != '/' && p > freeme) {
-	  *p = '\0';
-	    p--;
-	}
-	
-	/* Remove last '/' if current_dir isn't root */
-	if((strlen(freeme) > 1) && *p == '/') 
-	  *p = '\0';
-	  
+    if (item->disp[0] == '.') {
+      if (item->disp[1] == '/') { /* reload */
+        new_dir = item->xmrl.origin;
+      } else if ((item->disp[1] == '.') && (item->disp[2] == '/')) { /* parent */
+        size_t l = strlen (item->xmrl.origin);
+        new_dir = item->xmrl.origin;
+        temp = malloc (l + 2);
+        if (temp) {
+          temp[0] = '/';
+          memcpy (temp + 1, item->xmrl.origin, l + 1);
+          new_dir = temp + 1 + l;
+          if ((new_dir > temp + 1) && (new_dir[-1] == '/'))
+            new_dir -= 1;
+          do new_dir -= 1; while (new_dir[0] != '/');
+          if (new_dir <= temp)
+            new_dir = temp + 1;
+          if ((new_dir == temp + 1) && (new_dir[0] == '/'))
+            new_dir += 1;
+          new_dir[0] = 0;
+          new_dir = temp + 1;
+        }
       }
-    } else {
-      buf = item->xmrl.mrl;
     }
 
     {
       int num_mrls;
-      xine_mrl_t **mtmp = xine_get_browse_mrls (wp->xine, wp->last_mrl_source, buf, &num_mrls);
+      xine_mrl_t **mtmp = xine_get_browse_mrls (wp->xine, wp->last_mrl_source, new_dir, &num_mrls);
       _mrlbrowser_duplicate_mrls (&wp->items, mtmp, num_mrls);
     }
 
-    free(freeme);
+    free (temp);
 
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
