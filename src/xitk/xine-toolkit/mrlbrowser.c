@@ -264,9 +264,19 @@ static void _update_current_origin (_mrlbrowser_private_t *wp) {
 /*
  *
  */
-static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
+static int _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
+  int sel, nsel;
+
   if (!wp->items.f_list)
-    return;
+    return -1;
+
+  sel = xitk_browser_get_current_selected (wp->mrlb_list);
+  if ((sel >= 0) && (sel < wp->items.f_num))
+    sel = wp->items.f_indx[sel];
+  else
+    sel = -1;
+  nsel = -1;
+
   if (wp->filter_selected) { /* filtering is enabled */
     int i, j;
     size_t elen = strlen (wp->mrl_filters [wp->filter_selected]->ending) + 1;
@@ -289,6 +299,8 @@ static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
         if (keep) {
           wp->items.f_list[j] = wp->items.items[i].disp;
           wp->items.f_indx[j] = i;
+          if (sel == i)
+            nsel = j;
           j++;
         }
       }
@@ -307,14 +319,16 @@ static void _mrlbrowser_filter_mrls (_mrlbrowser_private_t *wp) {
     }
     wp->items.f_list[i] = NULL;
     wp->items.f_num = i;
+    nsel = sel;
   }
+  return nsel;
 }
 
 /*
  * Create *eye candy* entries in browser.
  */
-static void _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
-  _mrlbrowser_filter_mrls (wp);
+static int _mrlbrowser_create_enlighted_entries (_mrlbrowser_private_t *wp) {
+  return _mrlbrowser_filter_mrls (wp);
 }
 
 /*
@@ -844,11 +858,14 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected, int mod
  */
 static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
+  int nsel;
 
   (void)w;
   wp->filter_selected = select;
-  _mrlbrowser_create_enlighted_entries (wp);
+  /* Keep item selection across filter switch, if possible. */
+  nsel = _mrlbrowser_create_enlighted_entries (wp);
   xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
+  xitk_browser_set_select (wp->mrlb_list, nsel);
 }
 
 /*
