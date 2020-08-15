@@ -266,11 +266,12 @@ static void _menu_exit (_menu_private_t *wp) {
 
 static void _menu_open (_menu_node_t *branch, int x, int y);
 
-static void _menu_click_cb(xitk_widget_t *w, void *data) {
+static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
   _menu_node_t *me = (_menu_node_t *)data;
   _menu_private_t *wp = me->wp;
 
   (void)w;
+  (void)state;
   if (me->type & _MENU_NODE_BRANCH) {
     if (me->num > 0) {
       if (!me->menu_window) {

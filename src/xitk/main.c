@@ -896,7 +896,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
         pthread_mutex_unlock (&gui->mmk_mutex);
 	
         video_window_set_mrl (gui->vwin, uevent->str);
-	playlist_mrlident_toggle();
+        playlist_mrlident_toggle (gui);
         panel_update_mrl_display (gui->panel);
       } else {
         pthread_mutex_unlock (&gui->mmk_mutex);
@@ -1342,6 +1342,10 @@ int main(int argc, char *argv[]) {
   gui->setup                  = NULL;
   gui->mrlb                   = NULL;
   gui->vctrl                  = NULL;
+
+  gui->plwin                  = NULL;
+  gui->pl_load                = NULL;
+  gui->pl_save                = NULL;
 
   gui->load_stream            = NULL;
   gui->load_sub               = NULL;

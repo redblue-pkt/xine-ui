@@ -356,12 +356,12 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   if (mrlb && mrl) {
     int num = mrlb->gui->playlist.num;
     
-    if(!playlist_is_running()) {
-      playlist_editor();
+    if (!playlist_is_running (mrlb->gui)) {
+      playlist_editor (mrlb->gui);
     }
     else {
-      if(!playlist_is_visible())
-	playlist_toggle_visibility(NULL, NULL);
+      if (!playlist_is_visible (mrlb->gui))
+        playlist_toggle_visibility (mrlb->gui);
     }
     
     mediamark_append_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
@@ -371,7 +371,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       gui_set_current_mmk(mediamark_get_current_mmk());
     }   
     
-    playlist_update_playlist();
+    playlist_update_playlist (mrlb->gui);
     
     if ((!is_playback_widgets_enabled (mrlb->gui->panel)) && mrlb->gui->playlist.num)
       enable_playback_controls (mrlb->gui->panel, 1);
@@ -384,12 +384,12 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   (void)w;
   if (mrlb && mrl) {
     
-    if(!playlist_is_running()) {
-      playlist_editor();
+    if (!playlist_is_running (mrlb->gui)) {
+      playlist_editor (mrlb->gui);
     }
     else {
-      if(!playlist_is_visible())
-	playlist_toggle_visibility(NULL, NULL);
+      if (!playlist_is_visible (mrlb->gui))
+        playlist_toggle_visibility (mrlb->gui);
     }
     
     gui_dndcallback((char *)mrl->mrl);
@@ -420,7 +420,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       if(mediamark_concat_mediamarks(_mrl)) {
 	gui_set_current_mmk(mediamark_get_current_mmk());
 	_mrl = (char *) mediamark_get_current_mrl();
-	playlist_update_playlist();
+        playlist_update_playlist (mrlb->gui);
       }
     }
     

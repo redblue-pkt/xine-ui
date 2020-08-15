@@ -61,7 +61,6 @@ void reparent_all_windows(void) {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { playlist_is_visible,      playlist_reparent },
     { viewlog_is_visible,       viewlog_reparent },
     { kbedit_is_visible,        kbedit_reparent },
     { event_sender_is_visible,  event_sender_reparent },
@@ -73,6 +72,8 @@ void reparent_all_windows(void) {
     { NULL,                     NULL}
   };
   
+  if (playlist_is_visible (gui))
+    playlist_reparent (gui);
   if (panel_is_visible (gui->panel))
     panel_reparent (gui->panel);
   if (setup_is_visible (gui->setup))
@@ -285,7 +286,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
         pthread_mutex_unlock (&gui->mmk_mutex);
 	
         video_window_set_mrl (gui->vwin, ident);
-	playlist_mrlident_toggle();
+        playlist_mrlident_toggle (gui);
 	panel_update_mrl_display (gui->panel);
 	free(ident);
       }
@@ -382,7 +383,7 @@ static void mmk_set_update(void) {
   video_window_set_mrl (gui->vwin, gui->mmk.ident);
   event_sender_update_menu_buttons();
   panel_update_mrl_display (gui->panel);
-  playlist_update_focused_entry();
+  playlist_update_focused_entry (gui);
   
   gui->playlist.ref_append = gui->playlist.cur;
 }
@@ -572,7 +573,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       start_time = gui->mmk.start;
       av_offset  = gui->mmk.av_offset;
       spu_offset = gui->mmk.spu_offset;
-      playlist_update_playlist();
+      playlist_update_playlist (gui);
     }
   }
 
@@ -699,7 +700,7 @@ void gui_exit_2 (gGui_t *gui) {
 
   gui_deinit (gui);
 
-  playlist_deinit();
+  playlist_deinit (gui);
   
   setup_end (gui->setup);
   viewlog_end();
@@ -1017,7 +1018,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
     }
     
     gui_set_current_mmk(mediamark_get_current_mmk());
-    playlist_update_playlist();
+    playlist_update_playlist (gui);
   }
   else {
     /* Remove current mrl */
@@ -1065,7 +1066,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
   int panel        = panel_is_visible (gui->panel);
   int mrl_browser  = mrl_browser_is_visible (gui->mrlb);
-  int playlist     = playlist_is_visible();
+  int playlist     = playlist_is_visible (gui);
   int control      = control_status (gui->vctrl) == 3;
   int setup        = setup_is_visible (gui->setup);
   int viewlog      = viewlog_is_visible();
@@ -1086,7 +1087,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(mrl_browser)
       mrl_browser_toggle_visibility (NULL, gui->mrlb);
     if(playlist)
-      playlist_toggle_visibility(NULL, NULL);
+      playlist_toggle_visibility (gui);
     if(control)
       control_toggle_visibility (NULL, gui->vctrl);
     if(setup)
@@ -1121,7 +1122,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(mrl_browser)
       mrl_browser_toggle_visibility (NULL, gui->mrlb);
     if(playlist)
-      playlist_toggle_visibility(NULL, NULL);
+      playlist_toggle_visibility (gui);
     if(control)
       control_toggle_visibility (NULL, gui->vctrl);
     if(setup)
@@ -1550,7 +1551,7 @@ void gui_dndcallback(const char *filename) {
     
   __do_play:
 
-    playlist_update_playlist();
+    playlist_update_playlist (gui);
 
     if(!(gui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
 
@@ -1727,17 +1728,17 @@ void gui_nextprev(xitk_widget_t *w, void *data) {
 void gui_playlist_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = gGui;
 
-  if(!playlist_is_running()) {
-    playlist_editor();
+  if(!playlist_is_running (gui)) {
+    playlist_editor (gui);
   }
   else {
-    if(playlist_is_visible())
+    if (playlist_is_visible (gui))
       if(gui->use_root_window)
-	playlist_toggle_visibility(NULL, NULL);
+        playlist_toggle_visibility (gui);
       else
-	playlist_exit(NULL, NULL);
+        playlist_exit (gui);
     else
-      playlist_toggle_visibility(NULL, NULL);
+      playlist_toggle_visibility (gui);
   }
 
 }
@@ -2092,13 +2093,13 @@ void gui_add_mediamark(void) {
       
       mediamark_append_entry(gui->mmk.mrl, gui->mmk.ident, 
 			     gui->mmk.sub, secs, -1, gui->mmk.av_offset, gui->mmk.spu_offset);
-      playlist_update_playlist();
+      playlist_update_playlist (gui);
     }
   }
 }
 
-static void fileselector_cancel_callback(filebrowser_t *fb) {
-  gGui_t *gui = gGui;
+static void fileselector_cancel_callback (filebrowser_t *fb, void *userdata) {
+  gGui_t *gui = userdata;
   char *cur_dir = filebrowser_get_current_dir(fb);
 
   if (fb == gui->load_stream) {
@@ -2117,8 +2118,8 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
 
 /* Callback function for file select button or double-click in file browser.
    Append selected file to the current playlist */
-static void fileselector_callback(filebrowser_t *fb) {
-  gGui_t *gui = gGui;
+static void fileselector_callback (filebrowser_t *fb, void *userdata) {
+  gGui_t *gui = userdata;
   char *file;
   char *cur_dir = filebrowser_get_current_dir(fb);
   
@@ -2146,7 +2147,7 @@ static void fileselector_callback(filebrowser_t *fb) {
     else
       mediamark_append_entry(file, ident, NULL, 0, -1, 0, 0);
 
-    playlist_update_playlist();
+    playlist_update_playlist (gui);
     free(ident);
 
     /* Enable controls on display */
@@ -2172,8 +2173,8 @@ static void fileselector_callback(filebrowser_t *fb) {
 
 /* Callback function for "Select All" button in file browser. Append all files in the
    currently selected directory to the current playlist. */
-static void fileselector_all_callback(filebrowser_t *fb) {
-  gGui_t *gui = gGui;
+static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
+  gGui_t *gui = userdata;
   char **files;
   char  *path = filebrowser_get_current_dir(fb);
   
@@ -2215,7 +2216,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
         i++;
       } /* End while */
       
-      playlist_update_playlist();
+      playlist_update_playlist (gui);
 
       /* Enable playback controls on display */
       if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
@@ -2256,18 +2257,21 @@ void gui_file_selector(void) {
   else {
     cbb[0].label = _("Select");
     cbb[0].callback = fileselector_callback;
+    cbb[0].userdata = gui;
     cbb[0].need_a_file = 0;
     cbb[1].label = _("Select all");
     cbb[1].callback = fileselector_all_callback;
+    cbb[1].userdata = gui;
     cbb[1].need_a_file = 0;
     cbb[2].callback = fileselector_cancel_callback;
+    cbb[2].userdata = gui;
     cbb[2].need_a_file = 0;
     gui->load_stream = create_filebrowser(_("Stream(s) Loading"), gui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
   }
 }
 
-static void subselector_callback(filebrowser_t *fb) {
-  gGui_t *gui = gGui;
+static void subselector_callback (filebrowser_t *fb, void *userdata) {
+  gGui_t *gui = userdata;
   char *file;
   int ret;
 
@@ -2283,7 +2287,7 @@ static void subselector_callback(filebrowser_t *fb) {
 	mmk = mediamark_get_current_mmk();
 	gui_set_current_mmk(mmk);
 	
-	playlist_mrlident_toggle();
+        playlist_mrlident_toggle (gui);
 	
 	if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
 	  int curpos;
@@ -2326,8 +2330,10 @@ void gui_select_sub(void) {
 	
 	cbb[0].label = _("Select");
 	cbb[0].callback = subselector_callback;
+        cbb[0].userdata = gui;
 	cbb[0].need_a_file = 1;
 	cbb[1].callback = fileselector_cancel_callback;
+        cbb[1].userdata = gui;
 	cbb[1].need_a_file = 0;
     	
 	path = mmk->sub ? mmk->sub : mmk->mrl;

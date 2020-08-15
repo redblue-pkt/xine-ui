@@ -233,9 +233,11 @@ static void download_set_cursor_state(xui_skdloader_t *skd, int state) {
     xitk_window_restore_window_cursor(skd->xwin);
 }
 
-static void download_skin_exit(xitk_widget_t *w, void *data) {
+static void download_skin_exit (xitk_widget_t *w, void *data, int state) {
   xui_skdloader_t *skd = data;
 
+  (void)w;
+  (void)state;
   if (skd) {
     gGui_t *gui = skd->gui;
     int i;
@@ -332,6 +334,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
   gGui_t          *gui = skd->gui;
   download_t       download;
 
+  (void)w;
+  (void)modifier;
   if(skd->slxs[selected]->skin.preview == NULL)
     return;
 
@@ -367,12 +371,13 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
   free(download.error);
 }
 
-static void download_skin_select(xitk_widget_t *w, void *data) {
+static void download_skin_select (xitk_widget_t *w, void *data, int state) {
   xui_skdloader_t *skd = data;
   gGui_t      *gui = skd->gui;
   int          selected = xitk_browser_get_current_selected(skd->browser);
   download_t   download;
 
+  (void)state;
   if(selected < 0)
     return;
 
@@ -476,7 +481,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   free(download.buf);
   free(download.error);
 
-  download_skin_exit(w, skd);
+  download_skin_exit (w, skd, 0);
 }
 
 static void download_skin_handle_expose_event(void *data, const xitk_expose_event_t *ee) {
@@ -491,7 +496,7 @@ static void download_skin_handle_key_event(void *data, const xitk_key_event_t *k
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      download_skin_exit(NULL, skd);
+      download_skin_exit (NULL, skd, 0);
     else
       gui_handle_key_event (skd->gui, ke);
   }
@@ -505,7 +510,7 @@ static const xitk_event_cbs_t download_skin_event_cbs = {
 
 void skin_download_end (xui_skdloader_t *skd) {
   if (skd)
-    download_skin_exit(NULL, skd);
+    download_skin_exit (NULL, skd, 0);
 }
 
 void skin_download (gGui_t *gui, char *url) {

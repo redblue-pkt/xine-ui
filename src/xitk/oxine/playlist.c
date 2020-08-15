@@ -147,7 +147,7 @@ static void playlist_play_cb(void *data, void *entry) {
     } /* else play_error(oxine); */
   }
   if (session->action == PL_ACTION_REMOVE) {
-    playlist_delete_entry(n);
+    playlist_delete_entry (gGui, n);
     playlist_reentry_cb(session);
   }
 }
@@ -156,7 +156,7 @@ static void playlist_clear_cb (void *data) {
 
   /* pl_session_t *session = (pl_session_t*) data; */
 
-  playlist_delete_all(NULL, NULL);
+  playlist_delete_all (gGui);
 
   playlist_reentry_cb(data);
 }

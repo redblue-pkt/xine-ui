@@ -102,11 +102,12 @@ static void setup_change_section (xitk_widget_t *, void *, int);
 /*
  * Leaving setup panel, release memory.
  */
-static void setup_exit (xitk_widget_t *w, void *data) {
+static void setup_exit (xitk_widget_t *w, void *data, int state) {
   xui_setup_t *setup = data;
   window_info_t wi;
 
   (void)w;
+  (void)state;
   if (!setup)
     return;
   /*
@@ -200,11 +201,12 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
     toggle_window (setup->xwin, setup->widget_list, &setup->visible, setup->running);
 }
 
-static void setup_apply (xitk_widget_t *w, void *data) {
+static void setup_apply (xitk_widget_t *w, void *data, int state) {
   xui_setup_t *setup = data;
   int need_restart = 0;
 
   (void)w;
+  (void)state;
   if (setup->num_wg > 0) {
     int i;
 
@@ -297,9 +299,9 @@ static void setup_set_cursor (xui_setup_t *setup, int state) {
   }
 }
 
-static void setup_ok (xitk_widget_t *w, void *data) {
-  setup_apply(w, data);
-  setup_exit(w, data);
+static void setup_ok (xitk_widget_t *w, void *data, int state) {
+  setup_apply (w, data, state);
+  setup_exit (w, data, state);
 }
 
 /*
@@ -481,7 +483,7 @@ static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
         break;
 
       case XK_Escape:
-        setup_exit (NULL, setup);
+        setup_exit (NULL, setup, 0);
         return;
     }
 
@@ -957,7 +959,7 @@ static void setup_sections (xui_setup_t *setup) {
  *
  */
 void setup_end (xui_setup_t *setup) {
-  setup_exit (NULL, setup);
+  setup_exit (NULL, setup, 0);
 }
 
 /*
@@ -1074,7 +1076,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     xitk_enable_and_show_widget(setup->ok);
 
     lb.label             = _("Apply");
-    lb.callback          = setup_apply; 
+    lb.callback          = setup_apply;
     w = xitk_noskin_labelbutton_create (setup->widget_list, &lb,
       (WINDOW_WIDTH - 100) >> 1, WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
     xitk_add_widget (setup->widget_list, w);

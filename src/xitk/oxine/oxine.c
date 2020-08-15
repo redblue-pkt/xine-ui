@@ -307,7 +307,7 @@ static void autoplay_cb (void *data) {
                   &num_mrls);
 
   if(autoplay_mrls) {
-    playlist_delete_all(NULL, NULL);
+    playlist_delete_all (gGui);
 
     for (j = 0; j < num_mrls; j++)
       mediamark_append_entry((const char *)autoplay_mrls[j],

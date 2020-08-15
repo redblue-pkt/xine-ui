@@ -262,10 +262,11 @@ static void fne_destroy(filename_editor_t *fne) {
     free(fne);
   }
 }
-static void fne_apply_cb(xitk_widget_t *w, void *data) {
+static void fne_apply_cb (xitk_widget_t *w, void *data, int state) {
   filename_editor_t *fne = (filename_editor_t *) data;
   
   (void)w;
+  (void)state;
   if(fne->callback)
     fne->callback(NULL, (void *)fne->fb, (xitk_inputtext_get_text(fne->input)));
 
@@ -273,21 +274,23 @@ static void fne_apply_cb(xitk_widget_t *w, void *data) {
   fne_destroy(fne);
 }
 
-static void fne_cancel_cb(xitk_widget_t *w, void *data) {
+static void fne_exit_cb (xitk_widget_t *w, void *data, int state) {
   filename_editor_t *fne = (filename_editor_t *) data;
 
   (void)w;
+  (void)state;
   fb_reactivate(fne->fb);
   fne_destroy(fne);
 }
 
-static void _fne_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static void _fne_handle_key_event (void *data, const xitk_key_event_t *ke) {
+  filename_editor_t *fne = data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      fne_cancel_cb(NULL, data);
+      fne_exit_cb (NULL, fne, 0);
     else
-      gui_handle_key_event (gGui, ke);
+      gui_handle_key_event (fne->fb->gui, ke);
   }
 }
 
@@ -316,7 +319,7 @@ static void fb_create_input_window(char *title, char *text,
 
   xitk_window_set_wm_window_type(fne->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fne->xwin, NULL, "xine");
-  xitk_window_set_window_icon(fne->xwin, gGui->icon);
+  xitk_window_set_window_icon (fne->xwin, fne->fb->gui->icon);
 
   fne->widget_list                = xitk_window_widget_list(fne->xwin);
 
@@ -359,7 +362,7 @@ static void fb_create_input_window(char *title, char *text,
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Cancel");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = fne_cancel_cb;
+  lb.callback          = fne_exit_cb;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fne;
   lb.skin_element_name = NULL;
@@ -747,19 +750,20 @@ static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) 
   }
 }
 
-static void fb_callback_button_cb(xitk_widget_t *w, void *data) {
+static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   (void)w;
+  (void)state;
   if(w == fb->cb_buttons[0]) {
     if(fb->cbb[0].need_a_file && (!strlen(fb->filename)))
       return;
-    fb->cbb[0].callback(fb);
+    fb->cbb[0].callback (fb, fb->cbb[0].userdata);
   }
   else if(w == fb->cb_buttons[1]) {
     if(fb->cbb[1].need_a_file && (!strlen(fb->filename)))
       return;
-    fb->cbb[1].callback(fb);
+    fb->cbb[1].callback (fb, fb->cbb[1].userdata);
   }
   
   fb_exit(NULL, (void *)fb);
@@ -815,7 +819,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
   }
   else if(w == fb->files_browser) {
     strlcpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename));
-    fb_callback_button_cb(fb->cb_buttons[0], (void *)data);
+    fb_callback_button_cb (fb->cb_buttons[0], (void *)data, 0);
   }
 
 }
@@ -940,12 +944,13 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb = NULL;
   }
 }
-static void _fb_exit(xitk_widget_t *w, void *data) {
+static void _fb_exit (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
   (void)w;
-  if(fb->cbb[2].callback)
-    fb->cbb[2].callback(fb);
+  (void)state;
+  if (fb->cbb[2].callback)
+    fb->cbb[2].callback (fb, fb->cbb[2].userdata);
   fb_exit(NULL, (void *)fb);
 }
 
@@ -968,11 +973,12 @@ static void _fb_delete_file_done (void *data, int state) {
   fb_reactivate (fb);
 }
 
-static void fb_delete_file (xitk_widget_t *w, void *data) {
+static void fb_delete_file (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   int            sel;
   
   (void)w;
+  (void)state;
   if ((sel = xitk_browser_get_current_selected (fb->files_browser)) >= 0) {
     char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
@@ -1004,11 +1010,12 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname)
     fb_getdir(fb);
 
 }
-static void fb_rename_file(xitk_widget_t *w, void *data) {
+static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   int            sel;
   
   (void)w;
+  (void)state;
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
@@ -1030,11 +1037,12 @@ static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *new
   else
     fb_getdir(fb);
 }
-static void fb_create_directory(xitk_widget_t *w, void *data) {
+static void fb_create_directory(xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   
   (void)w;
+  (void)state;
   snprintf(buf, sizeof(buf), "%s%s",
 	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""));
       
@@ -1072,14 +1080,14 @@ static void _fb_handle_key_event(void *data, const xitk_key_event_t *ke) {
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape) {
       if (xitk_is_widget_enabled(fb->close)) /* Exit only if close button would exit */
-        _fb_exit(NULL, data);
+        _fb_exit (NULL, data, 0);
     }
     else {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
       if (sel >= 0) {
         fb_select(fb->files_browser, (void *) fb, sel, ke->modifiers);
       } else {
-        gui_handle_key_event (gGui, ke);
+        gui_handle_key_event (fb->gui, ke);
       }
     }
   }
@@ -1166,10 +1174,12 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
     fb->cbb[0].label = strdup(cbb1->label);
     fb->cbb[0].callback = cbb1->callback;
+    fb->cbb[0].userdata = cbb1->userdata;
     fb->cbb[0].need_a_file = cbb1->need_a_file;
     if(cbb2 && (strlen(cbb2->label) && cbb2->callback)) {
       fb->cbb[1].label = strdup(cbb2->label);
       fb->cbb[1].callback = cbb2->callback;
+      fb->cbb[1].userdata = cbb2->userdata;
       fb->cbb[1].need_a_file = cbb2->need_a_file;
   }
     else {
@@ -1184,8 +1194,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     fb->cbb[1].callback = NULL;
   }
 
-  if(cbb_close)
+  if (cbb_close) {
     fb->cbb[2].callback = cbb_close->callback;
+    fb->cbb[2].userdata = cbb_close->userdata;
+  }
 
   x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
   y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
@@ -1197,7 +1209,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   
   xitk_window_set_wm_window_type(fb->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fb->xwin, NULL, "xine");
-  xitk_window_set_window_icon(fb->xwin, gGui->icon);
+  xitk_window_set_window_icon (fb->xwin, fb->gui->icon);
 
   fb->directories                = NULL;
   fb->directories_num            = 0;
@@ -1467,7 +1479,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = fb_delete_file; 
+  lb.callback          = fb_delete_file;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
@@ -1532,7 +1544,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = _fb_exit; 
+  lb.callback          = _fb_exit;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;
@@ -1564,3 +1576,4 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   return fb;
 }
+

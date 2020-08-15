@@ -30,7 +30,7 @@ typedef struct xitk_button_list_st xitk_button_list_t;
 xitk_button_list_t *xitk_button_list_new (
   xitk_widget_list_t *widget_list,
   xitk_skin_config_t *skin_config, const char *skin_element_name,
-  xitk_simple_callback_t callback, void *callback_data,
+  xitk_state_callback_t callback, void *callback_data,
   char **names,
   char **tips, int tips_timeout, uint32_t widget_type_flags);
 void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config);

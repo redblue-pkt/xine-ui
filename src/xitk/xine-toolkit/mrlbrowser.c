@@ -471,11 +471,12 @@ static void _mrlbrowser_duplicate_mrls (_mrlb_items_t *items, xine_mrl_t **mtmp,
 /*
  * Grab mrls from xine-engine.
  */
-static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
+static void mrlbrowser_grab_mrls (xitk_widget_t *w, void *data, int state) {
   _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
   char *lbl = (char *) xitk_labelbutton_get_label(w);
   char *old_old_src;
 
+  (void)state;
   if(lbl) {
     _mrlb_items_t items = wp->items;
     
@@ -689,7 +690,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
 /*
  * Leaving mrlbrowser.
  */
-static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
+static void xitk_mrlbrowser_exit (xitk_widget_t *w, void *data, int state) {
   _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
 
   if (!wp)
@@ -698,6 +699,7 @@ static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
     return;
 
   (void)w;
+  (void)state;
   if (wp->kill_callback)
     wp->kill_callback (&wp->w, wp->kill_userdata);
 
@@ -816,11 +818,12 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
 /*
  * Handle selection in mrlbrowser.
  */
-static void mrlbrowser_select(xitk_widget_t *w, void *data) {
+static void mrlbrowser_select (xitk_widget_t *w, void *data, int state) {
   _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
 
   (void)w;
+  (void)state;
   if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
     _mrlbrowser_select_mrl (wp, j, 1, 0);
 }
@@ -891,7 +894,7 @@ static void mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) 
     case XK_s:
     case XK_S:
       if (ke->modifiers & MODIFIER_CTRL)
-        mrlbrowser_select (NULL, (void *)wp);
+        mrlbrowser_select (NULL, (void *)wp, 0);
       break;
 
     case XK_Return: {
@@ -903,7 +906,7 @@ static void mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) 
     break;
 
     case XK_Escape:
-      xitk_mrlbrowser_exit (NULL, (void *)wp);
+      xitk_mrlbrowser_exit (NULL, (void *)wp, 0);
       break;
 
     default:
@@ -1140,8 +1143,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   default_source = xitk_button_list_find (wp->autodir_buttons, "file");
   if (default_source && !wp->last_mrl_source)
-    mrlbrowser_grab_mrls (default_source, wp);
+    mrlbrowser_grab_mrls (default_source, wp, 0);
 
   return &wp->w;
 }
-

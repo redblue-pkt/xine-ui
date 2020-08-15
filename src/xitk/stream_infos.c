@@ -93,7 +93,8 @@ struct {
 
 } sinfos;
 
-static void stream_infos_update(xitk_widget_t *w, void *data) {
+static void stream_infos_update (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   stream_infos_update_infos();
 }
 
@@ -270,11 +271,11 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   return ident;
 }
 
-static void stream_infos_exit(xitk_widget_t *w, void *data) {
+static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
   gGui_t *gui = gGui;
-
   window_info_t wi;
-    
+
+  (void)state;
   if ( ! sinfos.running ) return;
 
     sinfos.running = 0;
@@ -299,7 +300,7 @@ static void stream_infos_handle_key_event(void *data, const xitk_key_event_t *ke
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      stream_infos_exit(NULL, NULL);
+      stream_infos_exit (NULL, NULL, 0);
     else
       gui_handle_key_event (gGui, ke);
   }
@@ -344,7 +345,7 @@ void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
 }
 
 void stream_infos_end(void) {
-  stream_infos_exit(NULL, NULL);
+  stream_infos_exit (NULL, NULL, 0);
 }
 
 static void stream_info_update_undefined(void) {
@@ -807,7 +808,7 @@ void stream_infos_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Update");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = stream_infos_update; 
+  lb.callback          = stream_infos_update;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
@@ -824,7 +825,7 @@ void stream_infos_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = stream_infos_exit; 
+  lb.callback          = stream_infos_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

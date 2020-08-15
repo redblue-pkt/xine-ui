@@ -136,10 +136,11 @@ void event_sender_send (int event) {
   xine_event_send (gGui->stream, &xine_event);
 }
 
-static void event_sender_send2 (xitk_widget_t *w, void *data) {
+static void event_sender_send2 (xitk_widget_t *w, void *data, int state) {
   int event = (long int)data;
   xine_event_t   xine_event;
 
+  (void)state;
   xine_event.type        = event;
   xine_event.data_length = 0;
   xine_event.data        = NULL;
@@ -148,7 +149,7 @@ static void event_sender_send2 (xitk_widget_t *w, void *data) {
   xine_event_send (gGui->stream, &xine_event);
 }
 
-static void event_sender_exit(xitk_widget_t *, void *);
+static void event_sender_exit (xitk_widget_t *w, void *data, int state);
 
 static void event_sender_handle_button_event(void *data, const xitk_button_event_t *be) {
 
@@ -230,7 +231,7 @@ static void event_sender_handle_key_event(void *data, const xitk_key_event_t *ke
       break;
 
     case XK_Escape:
-      event_sender_exit(NULL, NULL);
+      event_sender_exit (NULL, NULL, 0);
       return;
 
     default:
@@ -293,8 +294,8 @@ void event_sender_update_menu_buttons(void) {
   }
 }
 
-static void event_sender_exit(xitk_widget_t *w, void *data) {
-
+static void event_sender_exit (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   if(eventer) {
     window_info_t wi;
     
@@ -361,7 +362,7 @@ void event_sender_move(int x, int y) {
 }
 
 void event_sender_end(void) {
-  event_sender_exit(NULL, NULL);
+  event_sender_exit (NULL, NULL, 0);
 }
 
 void event_sender_reparent(void) {

@@ -320,7 +320,7 @@ static int _skin_alter (gGui_t *gui, int index) {
   control_change_skins (gui->vctrl, 1);
   mrl_browser_change_skins (gui->mrlb, 1);
 
-  playlist_change_skins (1);
+  playlist_change_skins (gui, 1);
 
   xitk_skin_unload_config(oskin_config);
 

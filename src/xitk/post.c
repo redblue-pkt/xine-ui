@@ -869,11 +869,13 @@ static void _pplugin_close_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, voi
   /* xitk_dlist_init (&pp_wrapper->pplugin->help_widget_list->list); */
 }
 
-static void _vpplugin_close_help(xitk_widget_t *w, void *data) {
+static void _vpplugin_close_help (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   _pplugin_close_help(&_vpp_wrapper.p, w, data);
 }
 
-static void _applugin_close_help(xitk_widget_t *w, void *data) {
+static void _applugin_close_help (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   _pplugin_close_help(&_app_wrapper.p, w, data);
 }
 
@@ -1050,11 +1052,13 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
   xitk_window_try_to_set_input_focus(pp_wrapper->pplugin->helpwin);
 }
 
-static void _vpplugin_show_help(xitk_widget_t *w, void *data) {
+static void _vpplugin_show_help (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   _pplugin_show_help(&_vpp_wrapper.p, w, data);
 }
 
-static void _applugin_show_help(xitk_widget_t *w, void *data) {
+static void _applugin_show_help (xitk_widget_t *w, void *data, int state) {
+  (void)state;
   _pplugin_show_help(&_app_wrapper.p, w, data);
 }
 
@@ -1531,11 +1535,13 @@ static void pplugin_exit(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data
   }
 }
 
-static void vpplugin_exit(xitk_widget_t *w, void *data) {
+static void vpplugin_exit(xitk_widget_t *w, void *data, int state) {
+  (void)state;
   pplugin_exit(&_vpp_wrapper.p, w, data);
 }
 
-static void applugin_exit(xitk_widget_t *w, void *data) {
+static void applugin_exit(xitk_widget_t *w, void *data, int state) {
+  (void)state;
   pplugin_exit(&_app_wrapper.p, w, data);
 }
 
@@ -1865,7 +1871,7 @@ static void pplugin_panel(_pp_wrapper_t *pp_wrapper) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("OK");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? vpplugin_exit : applugin_exit; 
+  lb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? vpplugin_exit : applugin_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

@@ -91,25 +91,49 @@ static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *
 }
 
 static void menu_scan_infos(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_scan_for_infos();
+  (void)w;
+  (void)me;
+  playlist_scan_for_infos (data);
 }
 static void menu_scan_infos_selected(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_scan_for_infos_selected();
+  (void)w;
+  (void)me;
+  playlist_scan_for_infos_selected (data);
 }
 static void menu_playlist_mmk_editor(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_mmk_editor();
+  (void)w;
+  (void)me;
+  playlist_mmk_editor (data);
 }
-static void menu_playlist_delete_all(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_delete_all(w, data);
+static void menu_playlist_delete_all (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  (void)me;
+  playlist_delete_all (gui);
 }
-static void menu_playlist_delete_current(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_delete_current(w, data);
+static void menu_playlist_delete_current (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  (void)me;
+  playlist_delete_current (gui);
 }
-static void menu_playlist_play_current(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_play_current(w, data);
+static void menu_playlist_play_current (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  (void)me;
+  playlist_play_current (gui);
 }
-static void menu_playlist_move_updown(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  playlist_move_current_updown(w, data);
+static void menu_playlist_move_up (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  (void)me;
+  playlist_move_current_up (gui);
+}
+static void menu_playlist_move_down (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
+  (void)w;
+  (void)me;
+  playlist_move_current_down (gui);
 }
 
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
@@ -131,11 +155,11 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   switch(ctrl) {
 
   case PLAYL_LOAD:
-    playlist_load_playlist(NULL, NULL);
+    playlist_load_playlist (gui);
     break;
     
   case PLAYL_SAVE:
-    playlist_save_playlist(NULL, NULL);
+    playlist_save_playlist (gui);
     break;
 
   case PLAYL_EDIT:
@@ -189,7 +213,7 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
     /* Flush playlist in newbie mode */
     if(gui->smart_mode) {
       mediamark_free_mediamarks();
-      playlist_update_playlist();
+      playlist_update_playlist (gui);
     }
     
     for (j = 0; j < num_mrls; j++)
@@ -1063,23 +1087,23 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL,                    0 },
     { _("Scan"),       menu_get_shortcut (gui, &tbuf, "ScanPlaylistInfo"),
-                                      NULL,          menu_scan_infos,              NULL,                    0 },
+                                      NULL,          menu_scan_infos,              gui,                     0 },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
     { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
   xitk_menu_entry_t    menu_entries_sel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL,                    0 },
-    { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL,                    0 },
+    { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   gui,                     0 },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL,                    0 },
-    { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL,                    0 },
+    { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     gui,                     0 },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         gui,                     0 },
     { _("Edit"),       menu_get_shortcut (gui, &tbuf, "MediamarkEditor"),
-                                      NULL,          menu_playlist_mmk_editor,     NULL,                    0 },
-    { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL,                    0 },
-    { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     NULL,                    0 },
+                                      NULL,          menu_playlist_mmk_editor,     gui,                     0 },
+    { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, gui,                     0 },
+    { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     gui,                     0 },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL,                    0 },
-    { _("Move Up"),    NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_UP,   0 },
-    { _("Move Down"),  NULL,          NULL,          menu_playlist_move_updown,    (void *) DIRECTION_DOWN, 0 },
+    { _("Move Up"),    NULL,          NULL,          menu_playlist_move_up,        gui,                     0 },
+    { _("Move Down"),  NULL,          NULL,          menu_playlist_move_down,      gui,                     0 },
     { NULL,            NULL,          NULL,          NULL,                         NULL,                    0 }
   };
 
@@ -1104,6 +1128,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Delete All");
     menu_entry.cb        = menu_playlist_delete_all;
+    menu_entry.user_data = gui;
     xitk_menu_add_entry(w, &menu_entry);
   }
 

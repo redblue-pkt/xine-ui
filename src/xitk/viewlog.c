@@ -41,6 +41,8 @@
 #define MAX_DISP_ENTRIES    17
         
 typedef struct {
+  gGui_t               *gui;
+
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
@@ -65,35 +67,37 @@ static _viewlog_t    *viewlog = NULL;
 /*
  * Leaving setup panel, release memory.
  */
-static void viewlog_exit(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
+static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
+  _viewlog_t *vl = data;
 
-  if(viewlog) {
+  (void)w;
+  (void)state;
+  if (vl) {
     window_info_t wi;
     int           i;
     
-    viewlog->running = 0;
-    viewlog->visible = 0;
+    vl->running = 0;
+    vl->visible = 0;
     
-    if((xitk_get_window_info(viewlog->kreg, &wi))) {
+    if ((xitk_get_window_info (vl->kreg, &wi))) {
       config_update_num ("gui.viewlog_x", wi.x);
       config_update_num ("gui.viewlog_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     
-    xitk_unregister_event_handler(&viewlog->kreg);
-    xitk_window_destroy_window (viewlog->xwin);
-    viewlog->xwin = NULL;
-    /* xitk_dlist_init (&viewlog->widget_list->list); */
+    xitk_unregister_event_handler (&vl->kreg);
+    xitk_window_destroy_window (vl->xwin);
+    vl->xwin = NULL;
+    /* xitk_dlist_init (&vl->widget_list->list); */
 
-    for(i = 0; i < viewlog->log_entries; i++)
-      free((char *)viewlog->log[i]);
-    free(viewlog->log);
+    for (i = 0; i < vl->log_entries; i++)
+      free ((char *)vl->log[i]);
+    free (vl->log);
 
-    free(viewlog);
+    free (vl);
     viewlog = NULL;
 
-    video_window_set_input_focus (gui->vwin);
+    video_window_set_input_focus (vl->gui->vwin);
   }
 }
 
@@ -111,14 +115,14 @@ int viewlog_is_running(void) {
 /*
  * Return 1 if viewlog window is visible
  */
-int viewlog_is_visible(void) {
-  gGui_t *gui = gGui;
+int viewlog_is_visible (void) {
+  _viewlog_t *vl = viewlog;
 
-  if(viewlog != NULL) {
-    if (gui->use_root_window)
-      return xitk_window_is_window_visible (viewlog->xwin);
+  if (vl) {
+    if (vl->gui->use_root_window)
+      return xitk_window_is_window_visible (vl->xwin);
     else
-      return viewlog->visible && xitk_window_is_window_visible (viewlog->xwin);
+      return vl->visible && xitk_window_is_window_visible (vl->xwin);
   }
 
   return 0;
@@ -127,61 +131,63 @@ int viewlog_is_visible(void) {
 /*
  * Raise viewlog->xwin
  */
-void viewlog_raise_window(void) {
-  if (viewlog != NULL)
-    raise_window(viewlog->xwin, viewlog->visible, viewlog->running);
+void viewlog_raise_window (void) {
+  _viewlog_t *vl = viewlog;
+  if (vl)
+    raise_window (vl->xwin, vl->visible, vl->running);
 }
 /*
  * Hide/show the viewlog window.
  */
 void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
-  if(viewlog != NULL)
-    toggle_window(viewlog->xwin, viewlog->widget_list, &viewlog->visible, viewlog->running);
+  _viewlog_t *vl = viewlog;
+  (void)w;
+  (void)data;
+  if (vl)
+    toggle_window (vl->xwin, vl->widget_list, &vl->visible, vl->running);
 }
 
 /*
  *
  */
-static void viewlog_paint_widgets(void) {
+static void viewlog_paint_widgets (_viewlog_t *vl) {
 
   /* Repaint widgets now */
-  xitk_paint_widget_list (viewlog->widget_list); 
+  xitk_paint_widget_list (vl->widget_list); 
 }
 
 /*
  *
  */
-static void viewlog_clear_tab(void) {
-  gGui_t *gui = gGui;
+static void viewlog_clear_tab (_viewlog_t *vl) {
   xitk_image_t *im;
   int width = WINDOW_WIDTH - 30;
   int height = MAX_DISP_ENTRIES * 20 + 16 + 10;
 
-  im = xitk_image_create_image (gui->xitk, width, height);
+  im = xitk_image_create_image (vl->gui->xitk, width, height);
 
   xitk_image_draw_outter (im, width, height);
-  xitk_image_draw_image (viewlog->widget_list, im, 0, 0, width, height, 15, (24 + viewlog->tabs_height));
+  xitk_image_draw_image (vl->widget_list, im, 0, 0, width, height, 15, (24 + vl->tabs_height));
   xitk_image_free_image (&im);
 }
 
 /*
  *
  */
-static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
-#if DEBUG_VIEWLOG
-  gGui_t *gui = gGui;
-#endif
+static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) {
+  _viewlog_t *vl = data;
   int    i, j, k;
   const char *const *log = (const char * const *)xine_get_log(__xineui_global_xine_instance, section);
   char   buf[2048];
   const char *p;
-  
+
+  (void)wx;
   /* Freeing entries */
-  for(i = 0; i < viewlog->log_entries; i++)
-    free((char *)viewlog->log[i]);
+  for(i = 0; i < vl->log_entries; i++)
+    free ((char *)vl->log[i]);
   
   /* Compute log entries */
-  viewlog->real_num_entries = j = k = 0;
+  vl->real_num_entries = j = k = 0;
   
   if(log) {
     
@@ -211,9 +217,9 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    
 	  case '\n':
 	    if(buflen > 0) {
-	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
-	      viewlog->log[j++] = strdup(buf);
-	      viewlog->real_num_entries++;
+	      vl->log = (const char **) realloc (vl->log, sizeof(char *) * ((j + 1) + 1));
+	      vl->log[j++] = strdup(buf);
+	      vl->real_num_entries++;
 	    }
 	    buf[0] = '\0'; buflen = 0;
 	    break;
@@ -228,32 +234,32 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 
 	/* Remaining chars */
 	if(buflen > 0) {
-	  viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
-	  viewlog->log[j++] = strdup(buf);
+	  vl->log = (const char **) realloc (vl->log, sizeof(char *) * ((j + 1) + 1));
+	  vl->log[j++] = strdup(buf);
 	}
 	
       }
       else {
 	/* Empty log entry line */
-	viewlog->log = (const char **) realloc(viewlog->log, sizeof(char *) * ((j + 1) + 1));
-	viewlog->log[j++] = strdup(" ");
+	vl->log = (const char **) realloc (vl->log, sizeof(char *) * ((j + 1) + 1));
+	vl->log[j++] = strdup(" ");
       }
     }
     
   }
 
   /* I like null terminated arrays ;-) */
-  viewlog->log[j]      = NULL;
-  viewlog->log_entries = j;
+  vl->log[j]      = NULL;
+  vl->log_entries = j;
   
 #if DEBUG_VIEWLOG
-  if ((viewlog->log_entries == 0) || (log == NULL))
-    xitk_window_dialog_3 (gui->xitk,
-      viewlog->xwin,
-      get_layer_above_video (gui), 400, _("log info"), NULL, NULL,
+  if ((vl->log_entries == 0) || (log == NULL))
+    xitk_window_dialog_3 (vl->gui->xitk,
+      vl->xwin,
+      get_layer_above_video (vl->gui), 400, _("log info"), NULL, NULL,
       XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER,
       _("There is no log entry for logging section '%s'.\n"),
-      xitk_tabs_get_current_tab_selected (viewlog->tabs));
+      xitk_tabs_get_current_tab_selected (vl->tabs));
 #endif
 
   if(__xineui_global_verbosity) {
@@ -261,34 +267,37 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 
     printf("\nLOG SECTION [%s]\n", log_sections[section]);
     i = 0;
-    while(viewlog->log[i]) {
-      if((strlen(viewlog->log[i]) > 1) || (viewlog->log[i][0] != ' '))
-	printf(" '%s'\n", viewlog->log[i]);
+    while (vl->log[i]) {
+      if ((strlen (vl->log[i]) > 1) || (vl->log[i][0] != ' '))
+	printf(" '%s'\n", vl->log[i]);
       i++;
     }
     printf("-----------------------------------\n\n");
   }
   
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, NULL, viewlog->real_num_entries, 0);
+  xitk_browser_update_list (vl->browser_widget, vl->log, NULL, vl->real_num_entries, 0);
   
-  viewlog_clear_tab();
-  viewlog_paint_widgets();
+  viewlog_clear_tab (vl);
+  viewlog_paint_widgets (vl);
 }
 
 /*
  * Refresh current displayed log.
  */
-static void viewlog_refresh(xitk_widget_t *w, void *data) {
-  int section =  xitk_tabs_get_current_selected(viewlog->tabs);
+static void viewlog_refresh (xitk_widget_t *w, void *data, int state) {
+  _viewlog_t *vl = data;
+  int section =  xitk_tabs_get_current_selected (vl->tabs);
+  (void)w;
+  (void)state;
   if (section >= 0) {
-    viewlog_change_section(NULL, NULL, section);
+    viewlog_change_section (NULL, vl, section);
   }
 }
 
 /* 
  * collect config categories, viewlog tab widget
  */
-static void viewlog_create_tabs(void) {
+static void viewlog_create_tabs (_viewlog_t *vl) {
   xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
   const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
@@ -310,37 +319,36 @@ static void viewlog_create_tabs(void) {
   tab.num_entries       = log_section_count;
   tab.entries           = tab_sections;
   tab.callback          = viewlog_change_section;
-  tab.userdata          = NULL;
-  viewlog->tabs = xitk_noskin_tabs_create (viewlog->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
-  xitk_add_widget (viewlog->widget_list, viewlog->tabs);
+  tab.userdata          = vl;
+  vl->tabs = xitk_noskin_tabs_create (vl->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
+  if (vl->tabs) {
+    xitk_add_widget (vl->widget_list, vl->tabs);
+    vl->tabs_height = xitk_get_widget_height (vl->tabs) - 1;
+    xitk_enable_and_show_widget (vl->tabs);
+    bg = xitk_window_get_background_pixmap (vl->xwin);
+    draw_rectangular_outter_box (bg, 15, (24 + vl->tabs_height),
+      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
+    xitk_window_set_background (vl->xwin, bg);
+  }
 
-  viewlog->tabs_height = xitk_get_widget_height(viewlog->tabs) - 1;
-
-  xitk_enable_and_show_widget(viewlog->tabs);
-
-  bg = xitk_window_get_background_pixmap (viewlog->xwin);
-
-  draw_rectangular_outter_box (bg, 15, (24 + viewlog->tabs_height),
-    (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-  xitk_window_set_background (viewlog->xwin, bg);
-
-  viewlog_change_section(NULL, NULL, 0);
+  viewlog_change_section (NULL, vl, 0);
 }
 
 /*
  * Leave viewlog window.
  */
 void viewlog_end(void) {
-  viewlog_exit(NULL, NULL);
+  viewlog_exit (NULL, viewlog, 0);
 }
 
 static void viewlog_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  _viewlog_t *vl = data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      viewlog_exit(NULL, NULL);
+      viewlog_exit (NULL, vl, 0);
     else
-      gui_handle_key_event (gGui, ke);
+      gui_handle_key_event (vl->gui, ke);
   }
 }
 
@@ -348,25 +356,27 @@ static const xitk_event_cbs_t viewlog_event_cbs = {
   .key_cb = viewlog_handle_key_event,
 };
 
-void viewlog_reparent(void) {
-  gGui_t *gui = gGui;
+void viewlog_reparent (void) {
+  _viewlog_t *vl = viewlog;
 
-  if(viewlog)
-    reparent_window(gui, viewlog->xwin);
+  if (vl)
+    reparent_window (vl->gui, vl->xwin);
 }
 
 /*
  * Create viewlog window
  */
 void viewlog_panel(void) {
-  gGui_t *gui = gGui;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
   int                        x, y;
   xitk_widget_t             *w;
+  _viewlog_t                *vl;
   
-  viewlog = (_viewlog_t *) calloc(1, sizeof(_viewlog_t));
-  viewlog->log = (const char **) calloc(1, sizeof(char *));
+  viewlog = vl = (_viewlog_t *) calloc(1, sizeof(_viewlog_t));
+  vl->log = (const char **) calloc(1, sizeof(char *));
+
+  vl->gui = gGui;
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_x", 
 				80,
@@ -384,14 +394,14 @@ void viewlog_panel(void) {
 				CONFIG_NO_DATA);
 
   /* Create window */
-  viewlog->xwin = xitk_window_create_dialog_window (gui->xitk,
+  vl->xwin = xitk_window_create_dialog_window (vl->gui->xitk,
     _("xine Log Viewer"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(gui, viewlog->xwin);
+  set_window_states_start (vl->gui, vl->xwin);
 
-  viewlog->widget_list = xitk_window_widget_list(viewlog->xwin);
+  vl->widget_list = xitk_window_widget_list (vl->xwin);
 
-  viewlog_create_tabs();
+  viewlog_create_tabs (vl);
 
   XITK_WIDGET_INIT (&br);
 
@@ -400,21 +410,21 @@ void viewlog_panel(void) {
   br.arrow_dn.skin_element_name    = NULL;
   br.browser.skin_element_name     = NULL;
   br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
-  br.browser.num_entries           = viewlog->log_entries;
-  br.browser.entries               = viewlog->log;
+  br.browser.num_entries           = vl->log_entries;
+  br.browser.entries               = vl->log;
   br.callback                      = NULL;
   br.dbl_click_callback            = NULL;
   br.userdata                      = NULL;
-  viewlog->browser_widget = xitk_noskin_browser_create (viewlog->widget_list, &br,
-    15 + 5, (24 + viewlog->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
-  xitk_add_widget (viewlog->widget_list, viewlog->browser_widget);
+  vl->browser_widget = xitk_noskin_browser_create (vl->widget_list, &br,
+    15 + 5, (24 + vl->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+  xitk_add_widget (vl->widget_list, vl->browser_widget);
 
-  xitk_enable_and_show_widget(viewlog->browser_widget);
+  xitk_enable_and_show_widget (vl->browser_widget);
 
-  xitk_browser_set_alignment(viewlog->browser_widget, ALIGN_LEFT);
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, NULL, viewlog->real_num_entries, 0);
+  xitk_browser_set_alignment (vl->browser_widget, ALIGN_LEFT);
+  xitk_browser_update_list (vl->browser_widget, vl->log, NULL, vl->real_num_entries, 0);
   
-  viewlog_paint_widgets();
+  viewlog_paint_widgets (vl);
   
   XITK_WIDGET_INIT (&lb);
 
@@ -424,14 +434,16 @@ void viewlog_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Refresh");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = viewlog_refresh; 
+  lb.callback          = viewlog_refresh;
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = vl;
   lb.skin_element_name = NULL;
-  w =  xitk_noskin_labelbutton_create (viewlog->widget_list, &lb,
+  w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
     x, y, 100, 23, "Black", "Black", "White", tabsfontname);
-  xitk_add_widget (viewlog->widget_list, w);
-  xitk_enable_and_show_widget(w);
+  if (w) {
+    xitk_add_widget (vl->widget_list, w);
+    xitk_enable_and_show_widget (w);
+  }
 
   x = WINDOW_WIDTH - (100 + 15);
 
@@ -440,18 +452,20 @@ void viewlog_panel(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = viewlog_exit; 
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = vl;
   lb.skin_element_name = NULL;
-  w =  xitk_noskin_labelbutton_create (viewlog->widget_list, &lb,
+  w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
     x, y, 100, 23, "Black", "Black", "White", tabsfontname);
-  xitk_add_widget (viewlog->widget_list, w);
-  xitk_enable_and_show_widget(w);
+  if (w) {
+    xitk_add_widget (vl->widget_list, w);
+    xitk_enable_and_show_widget (w);
+  }
 
-  viewlog->kreg = xitk_window_register_event_handler("viewlog", viewlog->xwin, &viewlog_event_cbs, viewlog);
+  vl->kreg = xitk_window_register_event_handler ("viewlog", vl->xwin, &viewlog_event_cbs, vl);
 
-  viewlog->visible = 1;
-  viewlog->running = 1;
+  vl->visible = 1;
+  vl->running = 1;
   viewlog_raise_window();
 
-  xitk_window_try_to_set_input_focus(viewlog->xwin);
+  xitk_window_try_to_set_input_focus (vl->xwin);
 }

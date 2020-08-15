@@ -301,7 +301,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_FLUSH:
-      playlist_delete_all(NULL, NULL);
+      playlist_delete_all (gui);
       send_ack(shdr);
       break;
       
@@ -323,7 +323,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
     case CMD_PLAYLIST_LOAD:
       mediamark_load_mediamarks((const char *)shdr->data);
       gui_set_current_mmk(mediamark_get_current_mmk());
-      playlist_update_playlist();
+      playlist_update_playlist (gui);
       if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
         enable_playback_controls (gui->panel, 1);
       send_ack(shdr);

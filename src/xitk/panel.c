@@ -131,7 +131,7 @@ void panel_show_tips (xui_panel_t *panel) {
   else
     xitk_disable_widgets_tips(panel->widget_list);
 
-  playlist_show_tips(panel->tips.enable, panel->tips.timeout);
+  playlist_show_tips (panel->gui, panel->tips.enable, panel->tips.timeout);
   control_show_tips (panel->gui->vctrl, panel->tips.enable, panel->tips.timeout);
   mrl_browser_show_tips (panel->gui->mrlb, panel->tips.enable, panel->tips.timeout);
   event_sender_show_tips(panel->tips.enable, panel->tips.timeout);
@@ -465,7 +465,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
               panel->gui->playlist.mmk[panel->gui->playlist.cur]->ident = strdup (ident);
               pthread_mutex_unlock (&panel->gui->mmk_mutex);
               video_window_set_mrl (panel->gui->vwin, ident);
-              playlist_mrlident_toggle ();
+              playlist_mrlident_toggle (panel->gui);
               panel_update_mrl_display (panel);
             } else {
               pthread_mutex_unlock (&panel->gui->mmk_mutex);
@@ -578,9 +578,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
   (void)w;
 
-  v = !!playlist_is_visible ();
+  v = !!playlist_is_visible (panel->gui);
   if (lut[v])
-    playlist_toggle_visibility(NULL, NULL);
+    playlist_toggle_visibility (panel->gui);
 
   v = control_status (panel->gui->vctrl) - 2;
   if ((v >= 0) && (lut[v]))
@@ -760,7 +760,7 @@ static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
   (void)w;
   panel->gui->is_display_mrl = !panel->gui->is_display_mrl;
   panel_update_mrl_display (panel);
-  playlist_mrlident_toggle();
+  playlist_mrlident_toggle (panel->gui);
 }
 
 static void _panel_change_time_label(xitk_widget_t *w, void *data) {
@@ -994,8 +994,8 @@ static void panel_handle_map_notify(void *data) {
 
   /* When panel becomes visible by any means,               */
   /* all other hidden GUI windows shall also become visible */
-  if (!playlist_is_visible())
-    playlist_toggle_visibility(NULL, NULL);
+  if (!playlist_is_visible (panel->gui))
+    playlist_toggle_visibility (panel->gui);
   if (control_status (panel->gui->vctrl) == 2)
     control_toggle_visibility (NULL, panel->gui->vctrl);
   if (!mrl_browser_is_visible (panel->gui->mrlb))
@@ -1070,7 +1070,7 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
   panel->autoplay_buttons = xitk_button_list_new (
     panel->widget_list,
     panel->gui->skin_config, "AutoPlayGUI",
-    playlist_scan_input, NULL,
+    playlist_scan_input, panel->gui,
     (char **)autoplay_plugins,
     tips, panel->tips.timeout, 0);
 }

@@ -50,11 +50,12 @@ struct xitk_button_list_st {
   xitk_widget_t      *widgets[64];
 };
 
-static void xitk_button_list_swap (xitk_widget_t *w, void *ip) {
+static void xitk_button_list_swap (xitk_widget_t *w, void *ip, int state) {
   xitk_button_list_t *bl = (xitk_button_list_t *)ip;
   int i, e;
 
   (void)w;
+  (void)state;
 
   e = bl->first + bl->visible;
   if (e > bl->num)
@@ -91,7 +92,7 @@ static void xitk_button_list_swap (xitk_widget_t *w, void *ip) {
 xitk_button_list_t *xitk_button_list_new (
   xitk_widget_list_t *widget_list,
   xitk_skin_config_t *skin_config, const char *skin_element_name,
-  xitk_simple_callback_t callback, void *callback_data,
+  xitk_state_callback_t callback, void *callback_data,
   char **names,
   char **tips, int tips_timeout, uint32_t widget_type_flags) {
 
@@ -366,4 +367,3 @@ void xitk_button_list_able (xitk_button_list_t *bl, int enable) {
 void xitk_button_list_delete (xitk_button_list_t *bl) {
   free (bl);
 }
-
