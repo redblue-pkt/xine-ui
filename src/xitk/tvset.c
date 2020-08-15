@@ -128,11 +128,12 @@ static const struct {
 };
 
 
-static void tvset_update(xitk_widget_t *w, void *data) {
+static void tvset_update (xitk_widget_t *w, void *data, int state) {
   xine_event_t          xine_event;
   xine_set_v4l2_data_t *ev_data;
   int current_system, current_chan, current_std;
 
+  (void)state;
   current_system = xitk_combo_get_current_selected(tvset.system);
   current_chan   = xitk_combo_get_current_selected(tvset.chann);
   current_std    = xitk_combo_get_current_selected(tvset.vidstd);
@@ -166,7 +167,7 @@ static void tvset_update(xitk_widget_t *w, void *data) {
 }
 
 
-static void tvset_exit(xitk_widget_t *w, void *data) {
+static void tvset_exit (xitk_widget_t *w, void *data, int state) {
   window_info_t wi;
 
   if ( ! tvset.running ) return;
@@ -200,7 +201,7 @@ static void tvset_handle_key_event(void *data, const xitk_key_event_t *ke) {
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      tvset_exit(NULL, NULL);
+      tvset_exit (NULL, NULL, 0);
     else
       gui_handle_key_event (gGui, ke);
   }
@@ -231,7 +232,7 @@ void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
 }
 
 void tvset_end(void) {
-  tvset_exit(NULL, NULL);
+  tvset_exit (NULL, NULL, 0);
 }
 
 
@@ -472,7 +473,7 @@ void tvset_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = tvset_exit; 
+  lb.callback          = tvset_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
@@ -491,4 +492,3 @@ void tvset_panel(void) {
 
   xitk_window_try_to_set_input_focus(tvset.xwin);
 }
-

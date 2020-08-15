@@ -366,6 +366,9 @@ struct gGui_st {
   xui_mrlb_t                *mrlb;
   xui_vctrl_t               *vctrl;
   xui_skdloader_t           *skdloader;
+  xui_playlist_t            *plwin;
+  filebrowser_t             *pl_load;
+  filebrowser_t             *pl_save;
 
   /* actions.c */
   struct {

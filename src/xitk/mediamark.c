@@ -3073,7 +3073,7 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     mmkeditor.xwin = NULL;
     /* xitk_dlist_init (&mmkeditor.widget_list.list); */
 
-    playlist_get_input_focus();
+    playlist_get_input_focus (gGui);
   }
 }
 

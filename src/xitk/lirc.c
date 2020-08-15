@@ -71,7 +71,7 @@ static void lirc_get_playlist(char *from) {
 	
 	gGui->playlist.cur = 0;
 	gui_set_current_mmk(mediamark_get_current_mmk());
-	playlist_update_playlist();
+        playlist_update_playlist (gGui);
       }    
     }
   }

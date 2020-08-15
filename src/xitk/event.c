@@ -947,15 +947,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_MRLIDENTTOGGLE:
     gui->is_display_mrl = !gui->is_display_mrl;
     panel_update_mrl_display (gui->panel);
-    playlist_mrlident_toggle();
+    playlist_mrlident_toggle (gui);
     break;
     
   case ACTID_SCANPLAYLIST:
-    playlist_scan_for_infos();
+    playlist_scan_for_infos (gui);
     break;
 
   case ACTID_MMKEDITOR:
-    playlist_mmk_editor();
+    playlist_mmk_editor (gui);
     break;
 
   case ACTID_SUBSELECT:
@@ -1264,7 +1264,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     if (sarg) {
         mediamark_load_mediamarks (sarg);
         gui_set_current_mmk(mediamark_get_current_mmk());
-        playlist_update_playlist();
+        playlist_update_playlist (gui);
         if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
           enable_playback_controls (gui->panel, 1);
     }

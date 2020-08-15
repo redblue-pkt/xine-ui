@@ -127,9 +127,11 @@ static void _xitk_window_dialog_3_destr (void *data) {
   XITK_FREE (wd);
 }
 
-static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data) {
+static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state) {
   xitk_dialog_t *wd = data;
   xitk_register_key_t key;
+
+  (void)state;
 
   if (wd->done3cb) {
     int state = !w ? 0
@@ -184,12 +186,12 @@ static void _dialog_window_handle_key_event (void *data, const xitk_key_event_t 
     switch (ke->key_pressed) {
       case XK_Return:
         if (wd->default_button)
-          _xitk_window_dialog_3_done (wd->default_button, wd);
+          _xitk_window_dialog_3_done (wd->default_button, wd, 0);
         break;
 
       case XK_Escape:
         if (wd->default_button)
-          _xitk_window_dialog_3_done (wd->default_button, wd);
+          _xitk_window_dialog_3_done (wd->default_button, wd, 0);
         break;
     }
   }

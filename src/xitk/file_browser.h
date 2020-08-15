@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2020 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -24,12 +24,13 @@
 
 typedef struct filebrowser_s filebrowser_t;
 
-typedef void (*filebrowser_callback_t)(filebrowser_t *);
+typedef void (*filebrowser_callback_t) (filebrowser_t *fb, void *userdata);
 typedef int (*hidden_file_toggle_t)(int action, int value);
 
 typedef struct {
   char                     *label;
   filebrowser_callback_t    callback;
+  void                     *userdata;
   int                       need_a_file;
 } filebrowser_callback_button_t;
 		

@@ -31,7 +31,7 @@ typedef struct {
   int                        button_type;
   int                        align;
   const char                *label;
-  xitk_simple_callback_t     callback;
+  xitk_state_callback_t      callback;
   xitk_ext_state_callback_t  state_callback;
   void                      *userdata;
   const char                *skin_element_name;
