@@ -186,11 +186,9 @@ skin1_DATA = \
 	$(xinetic_dir)/PlInputTxt.png \
 	$(xinetic_dir)/PlItemBtn.png \
 	$(xinetic_dir)/PlSlidHBg.png \
-	$(xinetic_dir)/SliderHBg.png \
 	$(xinetic_dir)/SliderVBg.png \
 	$(xinetic_dir)/SkItemBtn.png \
 	$(xinetic_dir)/SkSlidHBg.png \
 	$(xinetic_dir)/SkSlidBG.png \
 	$(xinetic_dir)/skinconfig \
 	$(xinetic_dir)/unused.png
-
