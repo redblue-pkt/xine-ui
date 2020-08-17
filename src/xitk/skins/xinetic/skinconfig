@@ -221,12 +221,12 @@ skin.Mute {
 
 skin.SliderVol {
 	coords {
-	  x = 347
+	  x = 348
 	  y = 22
 	}
-	pixmap = MainBits1.png|133,0,44,47
+	pixmap = MainBits1.png|127,0,42,47
 	slider {
-	  pixmap = MainBits1.png|0,0,132,47
+	  pixmap = MainBits1.png|0,0,126,47
 	  type = vertical
 	}
 
@@ -286,9 +286,9 @@ skin.SliderPlay {
 	  x = 36
 	  y = 3
 	}
-	pixmap = SliderHBg.png
+	pixmap = MainBg.png|35,3,342,10
 	slider {
-	  pixmap = MainBits1.png|178,37,51,10
+	  pixmap = MainBits1.png|170,37,51,10
 	  type = horizontal
 	}
 }
@@ -432,7 +432,7 @@ skin.SliderPl {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -460,7 +460,7 @@ skin.SliderHPl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = MainBits1.png|197,16,24,20
+          pixmap = MainBits1.png|189,16,24,20
           type = horizontal
         }
 }
@@ -533,7 +533,7 @@ skin.SliderCtlHue {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -557,7 +557,7 @@ skin.SliderCtlSat {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	type = vertical
 	}
 }
@@ -581,7 +581,7 @@ skin.SliderCtlBright {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -606,7 +606,7 @@ skin.SliderCtlCont {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -630,7 +630,7 @@ skin.SliderCtlGamma {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -654,7 +654,7 @@ skin.SliderCtlSharp {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -678,7 +678,7 @@ skin.SliderCtlNoise {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -722,7 +722,7 @@ skin.SliderCtlSk {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -750,7 +750,7 @@ skin.SliderHCtlSk {
         }
         pixmap = SkSlidHBg.png
         slider {
-          pixmap = MainBits1.png|178,16,18,20
+          pixmap = MainBits1.png|170,16,18,20
           type = horizontal
         }
 }
@@ -875,7 +875,7 @@ skin.SliderMrl {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = MainBits1.png|178,0,63,9
+	  pixmap = MainBits1.png|170,0,63,9
 	  type = vertical
 	}
 }
@@ -903,7 +903,7 @@ skin.SliderHMrl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = MainBits1.png|197,16,24,20
+          pixmap = MainBits1.png|189,16,24,20
           type = horizontal
         }
 }
