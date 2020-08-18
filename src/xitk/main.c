@@ -1303,7 +1303,11 @@ int main(int argc, char *argv[]) {
 
   gGui = (gGui_t *) calloc(1, sizeof(gGui_t));
   gui = gGui;
-  
+
+  gui->nextprev[0]            =
+  gui->nextprev[1]            =
+  gui->nextprev[2]            = gui;
+
   gui->stream                 = NULL;
   gui->debug_level            = 0;
 
@@ -2184,4 +2188,3 @@ int main(int argc, char *argv[]) {
 
   return retval;
 }
-

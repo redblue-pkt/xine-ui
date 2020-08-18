@@ -524,20 +524,20 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_SPU_NEXT:
     if (narg < 0)
-      gui_change_spu_channel(NULL, (void*)GUI_NEXT);
+      gui_nextprev_spu_channel (NULL, GUI_NEXT (gui));
     else
-      gui_direct_change_spu_channel (NULL, (void*)GUI_NEXT, narg);
+      gui_direct_change_spu_channel (NULL, gui, narg);
     break;
     
   case ACTID_SPU_PRIOR:
     if (narg < 0)
-      gui_change_spu_channel(NULL, (void*)GUI_PREV);
+      gui_nextprev_spu_channel (NULL, GUI_PREV (gui));
     else
-      gui_direct_change_spu_channel (NULL, (void*)GUI_PREV, narg);
+      gui_direct_change_spu_channel (NULL, gui, narg);
     break;
     
   case ACTID_CONTROLSHOW:
-    gui_control_show (NULL, gui->vctrl);
+    gui_control_show (NULL, gui);
     break;
     
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
@@ -550,14 +550,14 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_AUDIOCHAN_NEXT:
     if (narg < 0)
-      gui_change_audio_channel(NULL, (void*)GUI_NEXT);
+      gui_nextprev_audio_channel (NULL, GUI_NEXT (gui));
     else
       gui_direct_change_audio_channel (NULL, gui, narg);
     break;
     
   case ACTID_AUDIOCHAN_PRIOR:
     if (narg < 0)
-      gui_change_audio_channel(NULL, (void*)GUI_PREV);
+      gui_nextprev_audio_channel (NULL, GUI_PREV (gui));
     else
       gui_direct_change_audio_channel (NULL, gui, narg);
     break;
@@ -567,7 +567,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_PLAYLIST:
-    gui_playlist_show(NULL, NULL);
+    gui_playlist_show (NULL, gui);
     break;
       
   case ACTID_TOGGLE_VISIBLITY:
@@ -590,18 +590,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 #endif
 
   case ACTID_TOGGLE_ASPECT_RATIO:
-    if (narg < 0)
-      gui_toggle_aspect(-1);
-    else
-      gui_toggle_aspect (narg);
+    gui_toggle_aspect (gui, narg < 0 ? -1 : narg);
     break;
 
   case ACTID_STREAM_INFOS:
-    gui_stream_infos_show(NULL, NULL);
+    gui_stream_infos_show (NULL, gui);
     break;
 
   case ACTID_TOGGLE_INTERLEAVE:
-    gui_toggle_interlaced();
+    gui_toggle_interlaced (gui);
     break;
 
   case ACTID_QUIT:
@@ -626,21 +623,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_EVENT_SENDER:
-    gui_event_sender_show(NULL, NULL);
+    gui_event_sender_show (NULL, gui);
     break;
     
   case ACTID_MRL_NEXT:
-    if (narg < 0)
-      gui_nextprev(NULL, (void*)GUI_NEXT);
-    else
-      gui_direct_nextprev (NULL, (void*)GUI_NEXT, narg);
+    gui_step_mrl (gui, narg < 0 ? 1 : narg);
     break;
     
   case ACTID_MRL_PRIOR:
-    if (narg < 0)
-      gui_nextprev(NULL, (void*)GUI_PREV);
-    else
-      gui_direct_nextprev (NULL, (void*)GUI_PREV, narg);
+    gui_step_mrl (gui, narg < 0 ? -1 : -narg);
     break;
 
   case ACTID_MRL_SELECT:
@@ -651,7 +642,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
       
   case ACTID_SETUP:
-    gui_setup_show(NULL, NULL);
+    gui_setup_show (NULL, gui);
     break;
 
   case ACTID_EJECT:
@@ -755,7 +746,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_MRLBROWSER:
-    gui_mrlbrowser_show(NULL, NULL);
+    gui_mrlbrowser_show (NULL, gui);
     break;
     
   case ACTID_MUTE:
@@ -832,15 +823,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SPEED_FAST:
-    gui_change_speed_playback(NULL, (void*)GUI_PREV);
+    gui_nextprev_speed (NULL, GUI_NEXT (gui));
     break;
     
   case ACTID_SPEED_SLOW:
-    gui_change_speed_playback(NULL, (void*)GUI_NEXT);
+    gui_nextprev_speed (NULL, GUI_PREV (gui));
     break;
 
   case ACTID_SPEED_RESET:
-    gui_change_speed_playback(NULL, (void*)GUI_RESET);
+    gui_nextprev_speed (NULL, GUI_RESET (gui));
     break;
 
   case ACTID_pVOLUME:
@@ -852,11 +843,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_APP:
-    gui_app_show(NULL, NULL);
+    gui_app_show (NULL, gui);
     break;
 
   case ACTID_APP_ENABLE:
-    gui_app_enable();
+    gui_app_enable (gui);
     break;
 
   case ACTID_pAMP:
@@ -922,15 +913,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_TVANALOG:
-    gui_tvset_show(NULL, NULL);
+    gui_tvset_show (NULL, gui);
     break;
 
   case ACTID_VIEWLOG:
-    gui_viewlog_show(NULL, NULL);
+    gui_viewlog_show (NULL, gui);
     break;
 
   case ACTID_KBEDIT:
-    gui_kbedit_show(NULL, NULL);
+    gui_kbedit_show (NULL, gui);
     break;
 
   case ACTID_KBENABLE:
@@ -1082,15 +1073,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_VPP:
-    gui_vpp_show(NULL, NULL);
+    gui_vpp_show (NULL, gui);
     break;
 
   case ACTID_VPP_ENABLE:
-    gui_vpp_enable();
+    gui_vpp_enable (gui);
     break;
 
   case ACTID_HELP_SHOW:
-    gui_help_show(NULL, NULL);
+    gui_help_show (NULL, gui);
     break;
 
   case ACTID_PLAYLIST_STOP:
@@ -1343,14 +1334,14 @@ void gui_playlist_start_next (gGui_t *gui) {
   if(gui->playlist.control & PLAYLIST_CONTROL_STOP) {
     if(!(gui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST))
       gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
-    gui_display_logo();
+    gui_display_logo (gui);
     return;
   }
 
   if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num)) {
     gui_set_current_mmk(NULL);
     enable_playback_controls (gui->panel, 0);
-    gui_display_logo();
+    gui_display_logo (gui);
     return;
   }
   
@@ -1368,7 +1359,7 @@ void gui_playlist_start_next (gGui_t *gui) {
 	if(gui->actions_on_start[0] == ACTID_QUIT)
           gui_exit (NULL, gui);
 	else
-	  gui_display_logo();
+          gui_display_logo (gui);
 	return;
       }
       else if(gui->playlist.loop == PLAYLIST_LOOP_LOOP) {
@@ -1395,7 +1386,7 @@ void gui_playlist_start_next (gGui_t *gui) {
       else if(gui->actions_on_start[0] == ACTID_QUIT)
         gui_exit (NULL, gui);
       else
-	gui_display_logo();
+        gui_display_logo (gui);
       return;    
     }
     break;
@@ -1423,7 +1414,7 @@ void gui_playlist_start_next (gGui_t *gui) {
       goto __shuffle_restart;
     break;
   }
-  gui_display_logo();
+  gui_display_logo (gui);
 }
 
 void gui_deinit (gGui_t *gui) {
@@ -1779,7 +1770,7 @@ static void on_start(void *data) {
 
   if(!startup->start) {
     
-    gui_display_logo();
+    gui_display_logo (gui);
     
     do {
       xine_usec_sleep(5000);
@@ -1926,7 +1917,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
     }
 
     if(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_INTERLEAVE))
-      gui_toggle_interlaced();
+      gui_toggle_interlaced (gui);
     
     /*  The user request "play on start" */
     if(actions_on_start(gui->actions_on_start, ACTID_PLAY)) {
@@ -1975,4 +1966,3 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
-

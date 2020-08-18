@@ -121,17 +121,19 @@ static const struct {
 static pthread_mutex_t osd_mutex;
 
 static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
-  if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
+  gGui_t *gui = gGui;
+  if (gui->osd.use_unscaled && gui->osd.unscaled_available)
     xine_osd_show_unscaled(osd, vpts);
   else
     xine_osd_show(osd, vpts);
 }
 
 static void _osd_get_output_size(int *w, int *h) {
-  if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
-    video_window_get_output_size (gGui->vwin, w, h);
+  gGui_t *gui = gGui;
+  if (gui->osd.use_unscaled && gui->osd.unscaled_available)
+    video_window_get_output_size (gui->vwin, w, h);
   else
-    video_window_get_frame_size (gGui->vwin, w, h);
+    video_window_get_frame_size (gui->vwin, w, h);
 }
 
 static const char *_osd_get_speed_sym(int speed) {
@@ -156,74 +158,79 @@ static const char *_osd_get_status_sym(int status) {
 }
 
 void osd_init(void) {
+  gGui_t *gui = gGui;
   int fonth = FONT_SIZE;
 
-  gGui->osd.sinfo.osd[0] = xine_osd_new(gGui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
-  xine_osd_set_font(gGui->osd.sinfo.osd[0], "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.sinfo.osd[0], 
+  gui->osd.sinfo.osd[0] = xine_osd_new (gui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
+  xine_osd_set_font (gui->osd.sinfo.osd[0], "sans", fonth);
+  xine_osd_set_text_palette (gui->osd.sinfo.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  gGui->osd.bar.osd[0] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
+  gui->osd.bar.osd[0] = xine_osd_new (gui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
   
-  xine_osd_set_palette(gGui->osd.bar.osd[0], &textpalettes_color[0].u32, textpalettes_trans);
+  xine_osd_set_palette (gui->osd.bar.osd[0], &textpalettes_color[0].u32, textpalettes_trans);
 
-  gGui->osd.bar.osd[1] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_font(gGui->osd.bar.osd[1], "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.bar.osd[1], 
+  gui->osd.bar.osd[1] = xine_osd_new (gui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
+  xine_osd_set_font (gui->osd.bar.osd[1], "sans", fonth);
+  xine_osd_set_text_palette (gui->osd.bar.osd[1], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
   
-  gGui->osd.status.osd[0] = xine_osd_new(gGui->stream, 0, 0, 300, 2 * fonth);
-  xine_osd_set_text_palette(gGui->osd.status.osd[0], 
+  gui->osd.status.osd[0] = xine_osd_new (gui->stream, 0, 0, 300, 2 * fonth);
+  xine_osd_set_text_palette (gui->osd.status.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  gGui->osd.info.osd[0] = xine_osd_new(gGui->stream, 0, 0, 2048, fonth + (fonth >> 1));
-  xine_osd_set_font(gGui->osd.info.osd[0], "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.info.osd[0], 
+  gui->osd.info.osd[0] = xine_osd_new (gui->stream, 0, 0, 2048, fonth + (fonth >> 1));
+  xine_osd_set_font (gui->osd.info.osd[0], "sans", fonth);
+  xine_osd_set_text_palette (gui->osd.info.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  gGui->osd.unscaled_available =
-    (xine_osd_get_capabilities(gGui->osd.status.osd[0]) & XINE_OSD_CAP_UNSCALED );
+  gui->osd.unscaled_available =
+    (xine_osd_get_capabilities (gui->osd.status.osd[0]) & XINE_OSD_CAP_UNSCALED );
 
   pthread_mutex_init(&osd_mutex, NULL);
 }
 
 void osd_hide_sinfo(void) {
+  gGui_t *gui = gGui;
 
   pthread_mutex_lock(&osd_mutex);
-  if(gGui->osd.sinfo.visible) {
-    gGui->osd.sinfo.visible = 0;
-    xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
+  if (gui->osd.sinfo.visible) {
+    gui->osd.sinfo.visible = 0;
+    xine_osd_hide (gui->osd.sinfo.osd[0], 0);
   }
   pthread_mutex_unlock(&osd_mutex);
 }
 
 void osd_hide_bar(void) {
+  gGui_t *gui = gGui;
 
   pthread_mutex_lock(&osd_mutex);
-  if(gGui->osd.bar.visible) {
-    gGui->osd.bar.visible = 0;
-    xine_osd_hide(gGui->osd.bar.osd[0], 0);
-    xine_osd_hide(gGui->osd.bar.osd[1], 0);
+  if (gui->osd.bar.visible) {
+    gui->osd.bar.visible = 0;
+    xine_osd_hide (gui->osd.bar.osd[0], 0);
+    xine_osd_hide (gui->osd.bar.osd[1], 0);
   } 
   pthread_mutex_unlock(&osd_mutex);
 }
 
 void osd_hide_status(void) {
+  gGui_t *gui = gGui;
 
   pthread_mutex_lock(&osd_mutex);
-  if(gGui->osd.status.visible) {
-    gGui->osd.status.visible = 0;
-    xine_osd_hide(gGui->osd.status.osd[0], 0);
+  if (gui->osd.status.visible) {
+    gui->osd.status.visible = 0;
+    xine_osd_hide (gui->osd.status.osd[0], 0);
   } 
   pthread_mutex_unlock(&osd_mutex);
 }
 
 void osd_hide_info(void) {
+  gGui_t *gui = gGui;
 
   pthread_mutex_lock(&osd_mutex);
-  if(gGui->osd.info.visible) {
-    gGui->osd.info.visible = 0;
-    xine_osd_hide(gGui->osd.info.osd[0], 0);
+  if (gui->osd.info.visible) {
+    gui->osd.info.visible = 0;
+    xine_osd_hide (gui->osd.info.osd[0], 0);
   } 
   pthread_mutex_unlock(&osd_mutex);
 }
@@ -237,48 +244,50 @@ void osd_hide(void) {
 }
 
 void osd_deinit(void) {
+  gGui_t *gui = gGui;
 
   osd_hide();
 
-  xine_osd_free(gGui->osd.sinfo.osd[0]);
-  xine_osd_free(gGui->osd.bar.osd[0]);
-  xine_osd_free(gGui->osd.bar.osd[1]);
-  xine_osd_free(gGui->osd.status.osd[0]);
-  xine_osd_free(gGui->osd.info.osd[0]);
+  xine_osd_free (gui->osd.sinfo.osd[0]);
+  xine_osd_free (gui->osd.bar.osd[0]);
+  xine_osd_free (gui->osd.bar.osd[1]);
+  xine_osd_free (gui->osd.status.osd[0]);
+  xine_osd_free (gui->osd.info.osd[0]);
 
   pthread_mutex_destroy(&osd_mutex);
 }
 
 void osd_update(void) {
+  gGui_t *gui = gGui;
 
   pthread_mutex_lock(&osd_mutex);
 
-  if(gGui->osd.sinfo.visible) {
-    gGui->osd.sinfo.visible--;
-    if(!gGui->osd.sinfo.visible) {
-      xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
+  if (gui->osd.sinfo.visible) {
+    gui->osd.sinfo.visible--;
+    if (!gui->osd.sinfo.visible) {
+      xine_osd_hide (gui->osd.sinfo.osd[0], 0);
     }
   }
 
-  if(gGui->osd.bar.visible) {
-    gGui->osd.bar.visible--;
-    if(!gGui->osd.bar.visible) {
-      xine_osd_hide(gGui->osd.bar.osd[0], 0);
-      xine_osd_hide(gGui->osd.bar.osd[1], 0);
+  if (gui->osd.bar.visible) {
+    gui->osd.bar.visible--;
+    if (!gui->osd.bar.visible) {
+      xine_osd_hide (gui->osd.bar.osd[0], 0);
+      xine_osd_hide (gui->osd.bar.osd[1], 0);
     }
   }
 
-  if(gGui->osd.status.visible) {
-    gGui->osd.status.visible--;
-    if(!gGui->osd.status.visible) {
-      xine_osd_hide(gGui->osd.status.osd[0], 0);
+  if (gui->osd.status.visible) {
+    gui->osd.status.visible--;
+    if (!gui->osd.status.visible) {
+      xine_osd_hide (gui->osd.status.osd[0], 0);
     }
   }
 
-  if(gGui->osd.info.visible) {
-    gGui->osd.info.visible--;
-    if(!gGui->osd.info.visible) {
-      xine_osd_hide(gGui->osd.info.osd[0], 0);
+  if (gui->osd.info.visible) {
+    gui->osd.info.visible--;
+    if (!gui->osd.info.visible) {
+      xine_osd_hide (gui->osd.info.osd[0], 0);
     }
   }
 
@@ -286,8 +295,9 @@ void osd_update(void) {
 }
 
 void osd_stream_infos(void) {
+  gGui_t *gui = gGui;
 
-  if(gGui->osd.enabled) {
+  if (gui->osd.enabled) {
     int         vwidth, vheight, asrate;
     int         wwidth, wheight;
     const char *vcodec, *acodec;
@@ -297,37 +307,37 @@ void osd_stream_infos(void) {
     int         playedtime, playeddays, totaltime, pos;
     int         audiochannel, spuchannel, len;
 
-    vcodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC);
-    acodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_AUDIOCODEC);
-    vwidth       = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-    vheight      = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-    asrate       = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
-    audiochannel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
-    spuchannel   = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+    vcodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_VIDEOCODEC);
+    acodec       = xine_get_meta_info (gui->stream, XINE_META_INFO_AUDIOCODEC);
+    vwidth       = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    vheight      = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    asrate       = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
+    audiochannel = xine_get_param (gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+    spuchannel   = xine_get_param (gui->stream, XINE_PARAM_SPU_CHANNEL);
 
-    if(!gui_xine_get_pos_length(gGui->stream, &pos, &playedtime, &totaltime))
+    if (!gui_xine_get_pos_length (gui, gui->stream, &pos, &playedtime, &totaltime))
       return;
     
     playedtime /= 1000;
     totaltime  /= 1000;
 
-    xine_osd_clear(gGui->osd.sinfo.osd[0]);
+    xine_osd_clear (gui->osd.sinfo.osd[0]);
 
     /* We're in visual animation mode */
     if((vwidth == 0) && (vheight == 0)) {
-      if(gGui->visual_anim.running) {
-	if(gGui->visual_anim.enabled == 1) {
-          video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
+      if (gui->visual_anim.running) {
+        if (gui->visual_anim.enabled == 1) {
+          video_window_get_frame_size (gui->vwin, &vwidth, &vheight);
 	  vcodec = _("post animation");
 	}
-	else if(gGui->visual_anim.enabled == 2) {
-	  vcodec  = xine_get_meta_info(gGui->visual_anim.stream, XINE_META_INFO_VIDEOCODEC);
-	  vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-	  vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+        else if (gui->visual_anim.enabled == 2) {
+          vcodec  = xine_get_meta_info (gui->visual_anim.stream, XINE_META_INFO_VIDEOCODEC);
+          vwidth  = xine_get_stream_info (gui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+          vheight = xine_get_stream_info (gui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
 	}
       }
       else {
-        video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
+        video_window_get_frame_size (gui->vwin, &vwidth, &vheight);
 	vcodec = _("unknown");
       }
     }
@@ -336,26 +346,26 @@ void osd_stream_infos(void) {
 
     y = x = 0;
 
-    pthread_mutex_lock (&gGui->mmk_mutex);
-    strlcpy(buffer, (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident, sizeof(buffer));
-    pthread_mutex_unlock (&gGui->mmk_mutex);
-    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &osdw, &h);
+    pthread_mutex_lock (&gui->mmk_mutex);
+    strlcpy (buffer, (gui->is_display_mrl) ? gui->mmk.mrl : gui->mmk.ident, sizeof (buffer));
+    pthread_mutex_unlock (&gui->mmk_mutex);
+    xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {
       *(p++) = '\0';
       *(p)   = '.';
       *(p+1) = '.';
       *(p+2) = '.';
-      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], p, &osdw, &h);
+      xine_osd_get_text_size (gui->osd.sinfo.osd[0], p, &osdw, &h);
     }
-    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, p, XINE_OSD_TEXT1);
+    xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, p, XINE_OSD_TEXT1);
     
     y += h;
     
     if(vcodec && vwidth && vheight) {
       snprintf(buffer, sizeof(buffer), "%s: %dX%d", vcodec, vwidth, vheight);
-      xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
-      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
+      xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &w, &h);
       if(w > osdw)
 	osdw = w;
       y += h;
@@ -363,8 +373,8 @@ void osd_stream_infos(void) {
 
     if(acodec && asrate) {
       snprintf(buffer, sizeof(buffer), "%s: %d%s", acodec, asrate, "Hz");
-      xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
-      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
+      xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &w, &h);
       if(w > osdw)
 	osdw = w;
       y += h;
@@ -377,11 +387,11 @@ void osd_stream_infos(void) {
       strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
-      if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
+      if(!xine_get_audio_lang (gui->stream, audiochannel, &buffer[len]))
 	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
-      if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
+      if(!xine_get_audio_lang (gui->stream, audiochannel, &buffer[len]))
 	snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", audiochannel);
       break;
     }
@@ -393,17 +403,17 @@ void osd_stream_infos(void) {
       strlcat(buffer, "off", sizeof(buffer));
       break;
     case -1:
-      if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
+      if (!xine_get_spu_lang (gui->stream, spuchannel, &buffer[len]))
 	strlcat(buffer, "auto", sizeof(buffer));
       break;
     default:
-      if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
+      if(!xine_get_spu_lang (gui->stream, spuchannel, &buffer[len]))
         snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "%3d", spuchannel);
       break;
     }
     strlcat(buffer, ".", sizeof(buffer));
-    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
+    xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)
       osdw = w;
     
@@ -428,29 +438,30 @@ void osd_stream_infos(void) {
 	sprintf(buffer+strlen(buffer), "%d:%02d:%02d", totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
     }
     
-    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
+    xine_osd_draw_text (gui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size (gui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)
       osdw = w;
     
     osd_stream_position(pos);
     
     x = (wwidth - osdw) - 40;
-    xine_osd_set_position(gGui->osd.sinfo.osd[0], (x >= 0) ? x : 0, 15);
-    gGui->osd.sinfo.x = (x >= 0) ? x : 0;
-    gGui->osd.sinfo.y = 15;
-    gGui->osd.sinfo.w = osdw;
+    xine_osd_set_position (gui->osd.sinfo.osd[0], (x >= 0) ? x : 0, 15);
+    gui->osd.sinfo.x = (x >= 0) ? x : 0;
+    gui->osd.sinfo.y = 15;
+    gui->osd.sinfo.w = osdw;
 
     pthread_mutex_lock(&osd_mutex);
-    _xine_osd_show(gGui->osd.sinfo.osd[0], 0);
-    gGui->osd.sinfo.visible = gGui->osd.timeout;
+    _xine_osd_show (gui->osd.sinfo.osd[0], 0);
+    gui->osd.sinfo.visible = gui->osd.timeout;
     pthread_mutex_unlock(&osd_mutex);
   }
 }
 
 void osd_draw_bar(const char *title, int min, int max, int val, int type) {
+  gGui_t *gui = gGui;
 
-  if(gGui->osd.enabled) {
+  if (gui->osd.enabled) {
     int      wwidth, wheight;
     int      bar_color[40];
     int      i, x;
@@ -472,8 +483,8 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
     
     _osd_get_output_size(&wwidth, &wheight);
 
-    xine_osd_clear(gGui->osd.bar.osd[0]);
-    xine_osd_clear(gGui->osd.bar.osd[1]);
+    xine_osd_clear (gui->osd.bar.osd[0]);
+    xine_osd_clear (gui->osd.bar.osd[1]);
     
     memset(&bar_color, (XINE_OSD_TEXT1 + 7), sizeof(int) * 40);
     
@@ -492,32 +503,32 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
     
     if((type == OSD_BAR_PROGRESS) || (type == OSD_BAR_POS)) {
       x = 3;
-      xine_osd_draw_rect(gGui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+      xine_osd_draw_rect (gui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
       x += 8;
       
       for(i = 0; i < 40; i++, x += 8) {
-	xine_osd_draw_rect(gGui->osd.bar.osd[0],
+        xine_osd_draw_rect (gui->osd.bar.osd[0],
 			   x, 6, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
       }
       
-      xine_osd_draw_rect(gGui->osd.bar.osd[0],
+      xine_osd_draw_rect (gui->osd.bar.osd[0],
 			 x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
     }
     else if(type == OSD_BAR_POS2) {
       x = 3;
-      xine_osd_draw_rect(gGui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+      xine_osd_draw_rect (gui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
       x += 8;
       
       for(i = 0; i < 40; i++, x += 8) {
 	if(i == (pos - 1))
-	  xine_osd_draw_rect(gGui->osd.bar.osd[0],
+          xine_osd_draw_rect (gui->osd.bar.osd[0],
 			     x, 2, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
 	else
-	  xine_osd_draw_rect(gGui->osd.bar.osd[0],
+          xine_osd_draw_rect (gui->osd.bar.osd[0],
 			     x, 6, x + 3, BAR_HEIGHT - 6, bar_color[i], 1);
       }
       
-      xine_osd_draw_rect(gGui->osd.bar.osd[0],
+      xine_osd_draw_rect (gui->osd.bar.osd[0],
 			 x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
     }
     else if(type == OSD_BAR_STEPPER) {
@@ -527,7 +538,7 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
       x = 11;
       
       for(i = 0; i < 40; i++, x += 8) {
-	xine_osd_draw_rect(gGui->osd.bar.osd[0],
+        xine_osd_draw_rect (gui->osd.bar.osd[0],
 			   x, y, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
 	
 	if(!(i % 2))
@@ -539,27 +550,27 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
     if(title) {
       int  tw, th;
       
-      gGui->osd.bar.have_text = 1;
+      gui->osd.bar.have_text = 1;
       
-      xine_osd_get_text_size(gGui->osd.bar.osd[1], title, &tw, &th);
-      xine_osd_draw_text(gGui->osd.bar.osd[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
+      xine_osd_get_text_size (gui->osd.bar.osd[1], title, &tw, &th);
+      xine_osd_draw_text (gui->osd.bar.osd[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
     }
     else
-      gGui->osd.bar.have_text = 0;
+      gui->osd.bar.have_text = 0;
     
     x = (wwidth - BAR_WIDTH) >> 1;
-    xine_osd_set_position(gGui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
+    xine_osd_set_position (gui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position (gui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
     
     /* don't even bother drawing osd over those small streams.
      * it would look pretty bad.
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
       pthread_mutex_lock(&osd_mutex);
-      _xine_osd_show(gGui->osd.bar.osd[0], 0);
+      _xine_osd_show (gui->osd.bar.osd[0], 0);
       if(title)
-        _xine_osd_show(gGui->osd.bar.osd[1], 0);
-      gGui->osd.bar.visible = gGui->osd.timeout;
+        _xine_osd_show (gui->osd.bar.osd[1], 0);
+      gui->osd.bar.visible = gui->osd.timeout;
       pthread_mutex_unlock(&osd_mutex);
     }
   }
@@ -570,8 +581,9 @@ void osd_stream_position(int pos) {
 }
 
 void osd_display_info(const char *info, ...) {
+  gGui_t *gui = gGui;
 
-  if(gGui->osd.enabled && !gGui->on_quit) {
+  if (gui->osd.enabled && !gui->on_quit) {
     va_list   args;
     char     *buf;
 
@@ -582,14 +594,14 @@ void osd_display_info(const char *info, ...) {
     if (!buf)
       return;
 
-    xine_osd_clear(gGui->osd.info.osd[0]);
+    xine_osd_clear (gui->osd.info.osd[0]);
 
-    xine_osd_draw_text(gGui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
-    xine_osd_set_position(gGui->osd.info.osd[0], 20, 10 + 30);
+    xine_osd_draw_text (gui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
+    xine_osd_set_position (gui->osd.info.osd[0], 20, 10 + 30);
 
     pthread_mutex_lock(&osd_mutex);
-    _xine_osd_show(gGui->osd.info.osd[0], 0);
-    gGui->osd.info.visible = gGui->osd.timeout;
+    _xine_osd_show (gui->osd.info.osd[0], 0);
+    gui->osd.info.visible = gui->osd.timeout;
     pthread_mutex_unlock(&osd_mutex);
 
     free(buf);
@@ -597,15 +609,16 @@ void osd_display_info(const char *info, ...) {
 }
 
 void osd_update_status(void) {
+  gGui_t *gui = gGui;
 
-  if(gGui->osd.enabled) {
+  if (gui->osd.enabled) {
     int  status;
     char buffer[256];
     int wwidth, wheight;
 
-    status = xine_get_status(gGui->stream);
+    status = xine_get_status (gui->stream);
     
-    xine_osd_clear(gGui->osd.status.osd[0]);
+    xine_osd_clear (gui->osd.status.osd[0]);
     
     /*
       { : eject
@@ -629,10 +642,10 @@ void osd_update_status(void) {
       
     case XINE_STATUS_PLAY:
       {
-	int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+        int speed = xine_get_param (gui->stream, XINE_PARAM_SPEED);
 	int secs;
 
-	if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
+        if (gui_xine_get_pos_length (gui, gui->stream, NULL, &secs, NULL)) {
 	  secs /= 1000;
 	  
 	  snprintf(buffer, sizeof(buffer), "%s %02d:%02d:%02d", (_osd_get_speed_sym(speed)), 
@@ -649,18 +662,18 @@ void osd_update_status(void) {
       break;
     }
 
-    if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
-      xine_osd_set_font(gGui->osd.status.osd[0], "cetus", UNSCALED_FONT_SIZE);
+    if (gui->osd.use_unscaled && gui->osd.unscaled_available)
+      xine_osd_set_font (gui->osd.status.osd[0], "cetus", UNSCALED_FONT_SIZE);
     else
-      xine_osd_set_font(gGui->osd.status.osd[0], "cetus", FONT_SIZE);
+      xine_osd_set_font (gui->osd.status.osd[0], "cetus", FONT_SIZE);
 
     /* set latin1 encoding (NULL) for status text with special characters,
      * then switch back to locale encoding ("") 
      */
-    xine_osd_set_encoding(gGui->osd.status.osd[0], NULL);
-    xine_osd_draw_text(gGui->osd.status.osd[0], 0, 0, buffer, XINE_OSD_TEXT1);
-    xine_osd_set_encoding(gGui->osd.status.osd[0], "");
-    xine_osd_set_position(gGui->osd.status.osd[0], 20, 10);
+    xine_osd_set_encoding (gui->osd.status.osd[0], NULL);
+    xine_osd_draw_text (gui->osd.status.osd[0], 0, 0, buffer, XINE_OSD_TEXT1);
+    xine_osd_set_encoding (gui->osd.status.osd[0], "");
+    xine_osd_set_position (gui->osd.status.osd[0], 20, 10);
 
     _osd_get_output_size(&wwidth, &wheight);
 
@@ -669,33 +682,34 @@ void osd_update_status(void) {
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
       pthread_mutex_lock(&osd_mutex);
-      _xine_osd_show(gGui->osd.status.osd[0], 0);
-      gGui->osd.status.visible = gGui->osd.timeout;
+      _xine_osd_show (gui->osd.status.osd[0], 0);
+      gui->osd.status.visible = gui->osd.timeout;
       pthread_mutex_unlock(&osd_mutex);
     }
   }
 }
 
 void osd_display_spu_lang(void) {
+  gGui_t *gui = gGui;
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
   int    channel;
   const char *lang = NULL;
   
-  channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+  channel = xine_get_param (gui->stream, XINE_PARAM_SPU_CHANNEL);
 
   switch(channel) {
   case -2:
     lang = "off";
     break;
   case -1:
-    if(!xine_get_spu_lang(gGui->stream, channel, &lang_buffer[0]))
+    if(!xine_get_spu_lang (gui->stream, channel, &lang_buffer[0]))
       lang = "auto";
     else
       lang = lang_buffer;
     break;
   default:
-    if(!xine_get_spu_lang(gGui->stream, channel, &lang_buffer[0]))
+    if(!xine_get_spu_lang (gui->stream, channel, &lang_buffer[0]))
       snprintf(lang_buffer, sizeof(lang_buffer), "%3d", channel);
     lang = lang_buffer;
     break;
@@ -706,25 +720,26 @@ void osd_display_spu_lang(void) {
 }
 
 void osd_display_audio_lang(void) {
+  gGui_t *gui = gGui;
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
   int    channel;
   const char *lang = NULL;
 
-  channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+  channel = xine_get_param (gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
 
   switch(channel) {
   case -2:
     lang = "off";
     break;
   case -1:
-    if(!xine_get_audio_lang(gGui->stream, channel, &lang_buffer[0]))
+    if(!xine_get_audio_lang (gui->stream, channel, &lang_buffer[0]))
       lang = "auto";
     else
       lang = lang_buffer;
     break;
   default:
-    if(!xine_get_audio_lang(gGui->stream, channel, &lang_buffer[0]))
+    if(!xine_get_audio_lang (gui->stream, channel, &lang_buffer[0]))
       snprintf(lang_buffer, sizeof(lang_buffer), "%3d", channel);
     lang = lang_buffer;
     break;
@@ -735,24 +750,25 @@ void osd_display_audio_lang(void) {
 }
 
 void osd_update_osd(void) {
+  gGui_t *gui = gGui;
   int vwidth, vheight, wwidth, wheight;
   int x;
 
-  if(!gGui->osd.sinfo.visible && !gGui->osd.bar.visible)
+  if (!gui->osd.sinfo.visible && !gui->osd.bar.visible)
     return;
   
-  vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-  vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+  vwidth  = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+  vheight = xine_get_stream_info (gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
   
   if((vwidth == 0) && (vheight == 0)) {
-    if(gGui->visual_anim.running) {
-      if(gGui->visual_anim.enabled == 1)
-        video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
-      else if(gGui->visual_anim.enabled == 2)
-	vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    if (gui->visual_anim.running) {
+      if (gui->visual_anim.enabled == 1)
+        video_window_get_frame_size (gui->vwin, &vwidth, &vheight);
+      else if (gui->visual_anim.enabled == 2)
+	vwidth  = xine_get_stream_info (gui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
     }
     else
-      video_window_get_frame_size (gGui->vwin, &vwidth, &vheight);
+      video_window_get_frame_size (gui->vwin, &vwidth, &vheight);
     
   }
   
@@ -760,30 +776,30 @@ void osd_update_osd(void) {
   
   pthread_mutex_lock(&osd_mutex);
 
-  if(gGui->osd.sinfo.visible) {
-    xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
+  if (gui->osd.sinfo.visible) {
+    xine_osd_hide (gui->osd.sinfo.osd[0], 0);
     
-    x = (wwidth - gGui->osd.sinfo.w) - 40;
-    xine_osd_set_position(gGui->osd.sinfo.osd[0], (x >= 0) ? x : 0,  gGui->osd.sinfo.y);
-    _xine_osd_show(gGui->osd.sinfo.osd[0], 0);
+    x = (wwidth - gui->osd.sinfo.w) - 40;
+    xine_osd_set_position (gui->osd.sinfo.osd[0], (x >= 0) ? x : 0,  gui->osd.sinfo.y);
+    _xine_osd_show (gui->osd.sinfo.osd[0], 0);
   }
 
-  if(gGui->osd.bar.visible) {
-    xine_osd_hide(gGui->osd.bar.osd[0], 0);
-    xine_osd_hide(gGui->osd.bar.osd[1], 0);
+  if (gui->osd.bar.visible) {
+    xine_osd_hide (gui->osd.bar.osd[0], 0);
+    xine_osd_hide (gui->osd.bar.osd[1], 0);
     
     x = (wwidth - BAR_WIDTH) >> 1;
-    xine_osd_set_position(gGui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
+    xine_osd_set_position (gui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position (gui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
     
     /* don't even bother drawing osd over those small streams.
      * it would look pretty bad.
      */
     if(wwidth > MINIMUM_WIN_WIDTH) {
-      _xine_osd_show(gGui->osd.bar.osd[0], 0);
+      _xine_osd_show (gui->osd.bar.osd[0], 0);
 
-      if(gGui->osd.bar.have_text)
-	_xine_osd_show(gGui->osd.bar.osd[1], 0);
+      if (gui->osd.bar.have_text)
+	_xine_osd_show (gui->osd.bar.osd[1], 0);
     }
 
   }
