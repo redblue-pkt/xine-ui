@@ -257,22 +257,22 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_AUDIO_NEXT:
-      gui_change_audio_channel(NULL, (void *) GUI_NEXT);
+      gui_nextprev_audio_channel (NULL, GUI_NEXT (gui));
       send_ack(shdr);
       break;
 
     case CMD_AUDIO_PREV:
-      gui_change_audio_channel(NULL, (void *) GUI_PREV);
+      gui_nextprev_audio_channel (NULL, GUI_PREV (gui));
       send_ack(shdr);
       break;
 
     case CMD_SPU_NEXT:
-      gui_change_spu_channel(NULL, (void *) GUI_NEXT);
+      gui_nextprev_spu_channel (NULL, GUI_NEXT (gui));
       send_ack(shdr);
       break;
 
     case CMD_SPU_PREV:
-      gui_change_spu_channel(NULL, (void *) GUI_PREV);
+      gui_nextprev_spu_channel (NULL, GUI_PREV (gui));
       send_ack(shdr);
       break;
 	
@@ -311,12 +311,12 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
       
     case CMD_PLAYLIST_NEXT:
-      gui_direct_nextprev(NULL, (void *) GUI_NEXT, 1);
+      gui_step_mrl (gui, 1);
       send_ack(shdr);
       break;
 
     case CMD_PLAYLIST_PREV:
-      gui_direct_nextprev(NULL, (void *) GUI_PREV, 1);
+      gui_step_mrl (gui, -1);
       send_ack(shdr);
       break;
 

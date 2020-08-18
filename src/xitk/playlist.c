@@ -176,7 +176,7 @@ static void _playlist_xine_play (xui_playlist_t *pl) {
     if (mediamark_all_played () && (pl->gui->actions_on_start[0] == ACTID_QUIT))
       gui_exit (NULL, pl->gui);
     else
-      gui_display_logo();
+      gui_display_logo (pl->gui);
   }
 }
 /*

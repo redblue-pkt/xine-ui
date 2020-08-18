@@ -1877,7 +1877,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	} 
 	else {
 	  gui->playlist.cur = 0;
-	  gui_display_logo();
+          gui_display_logo (gui);
 	}
 	gui->ignore_next = 0;
       }
@@ -1905,7 +1905,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	if(!(xine_open(gui->stream, gui->mmk.mrl) 
 	     && xine_play (gui->stream, 0, gui->mmk.start))) {
 	  handle_xine_error(client_info);
-	  gui_display_logo();
+          gui_display_logo (gui);
 	}
 	else
 	  gui->logo_mode = 0;
@@ -2053,7 +2053,7 @@ static void do_play(const commands_t *cmd, client_info_t *client_info) {
     pthread_mutex_lock (&gui->mmk_mutex);
     if(!(xine_open(gui->stream, gui->mmk.mrl) && xine_play (gui->stream, 0, gui->mmk.start))) {
       handle_xine_error(client_info);
-      gui_display_logo();
+      gui_display_logo (gui);
     }
     else
       gui->logo_mode = 0;
@@ -2070,7 +2070,7 @@ static void do_stop(const commands_t *cmd, client_info_t *client_info) {
   gui->ignore_next = 1;
   xine_stop(gui->stream);
   gui->ignore_next = 0; 
-  gui_display_logo();
+  gui_display_logo (gui);
 }
 
 static void do_pause(const commands_t *cmd, client_info_t *client_info) {
@@ -2379,35 +2379,35 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "playlist")) {
-	gui_playlist_show(NULL, NULL);
+        gui_playlist_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "control")) {
-	gui_control_show(NULL, NULL);
+        gui_control_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "mrl")) {
-	gui_mrlbrowser_show(NULL, NULL);
+        gui_mrlbrowser_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "setup")) {
-	gui_setup_show(NULL, NULL);
+        gui_setup_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "vpost")) {
-	gui_vpp_show(NULL, NULL);
+        gui_vpp_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "apost")) {
-	gui_app_show(NULL, NULL);
+        gui_app_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "help")) {
-	gui_help_show(NULL, NULL);
+        gui_help_show (NULL, gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "log")) {
-	gui_viewlog_show(NULL, NULL);
+        gui_viewlog_show (NULL, gui);
 	flushing++;
       }
 
@@ -2528,7 +2528,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 	gui->ignore_next = 1;
 	if(!xine_play(gui->stream, ((int) (655.35 * pos)), 0)) {
           gui_handle_xine_error (gui, gui->stream, NULL);
-	  gui_display_logo();
+          gui_display_logo (gui);
 	}
 	else
 	  gui->logo_mode = 0;
@@ -2545,7 +2545,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 	
 	if(((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1]))) {
 
-	  if(gui_xine_get_pos_length(gui->stream, NULL, &msec, NULL)) {
+          if (gui_xine_get_pos_length (gui, gui->stream, NULL, &msec, NULL)) {
 	    msec /= 1000;
 	    
 	    if((msec + pos) < 0) 
@@ -2561,7 +2561,7 @@ static void do_seek(const commands_t *cmd, client_info_t *client_info) {
 	  gui->ignore_next = 1;
 	  if(!xine_play(gui->stream, 0, msec)) {
             gui_handle_xine_error (gui, gui->stream, NULL);
-	    gui_display_logo();
+            gui_display_logo (gui);
 	  }
 	  else
 	    gui->logo_mode = 0;

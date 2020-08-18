@@ -149,7 +149,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
       }
     }
 
-    if (gui_xine_get_pos_length (gui->stream, NULL, &secs, NULL)) {
+    if (gui_xine_get_pos_length (gui, gui->stream, NULL, &secs, NULL)) {
 
       secs /= 1000;
 

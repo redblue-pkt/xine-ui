@@ -315,7 +315,7 @@ void panel_update_runtime_display (xui_panel_t *panel) {
   if (!panel_is_visible (panel))
     return;
 
-  if (!gui_xine_get_pos_length (panel->gui->stream, &pos, &seconds, &length)) {
+  if (!gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, &seconds, &length)) {
 
     if ((panel->gui->stream_length.pos || panel->gui->stream_length.time) && panel->gui->stream_length.length) {
       pos     = panel->gui->stream_length.pos;
@@ -404,7 +404,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
         pthread_mutex_lock (&panel->gui->seek_mutex);
         seeking = panel->gui->seek_running;
         pthread_mutex_unlock (&panel->gui->seek_mutex);
-        if (!seeking && gui_xine_get_pos_length (panel->gui->stream, &pos, &msecs, NULL)) {
+        if (!seeking && gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, &msecs, NULL)) {
 
           /* pthread_mutex_lock (&panel->gui->xe_mutex); */
 
@@ -703,7 +703,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       int pos;
       
       if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-        if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
+        if (gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
         panel_update_runtime_display (panel);
       }
@@ -961,7 +961,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
         } else {
           /*
           int pos;
-          if (gui_xine_get_pos_length (panel->gui->stream, &pos, NULL, NULL))
+          if (gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, NULL, NULL))
             xitk_slider_set_pos (panel->playback_widgets.slider_play, pos); */
           panel_update_runtime_display (panel);
         }
@@ -1253,8 +1253,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   /* Prev button */
   b.skin_element_name = "Prev";
-  b.callback          = gui_nextprev;
-  b.userdata          = (void *)GUI_PREV;
+  b.callback          = gui_nextprev_mrl;
+  b.userdata          = GUI_PREV (panel->gui);
   panel->playback_widgets.prev =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.prev);
 
@@ -1284,8 +1284,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
   
   /*  Next button */
   b.skin_element_name = "Next";
-  b.callback          = gui_nextprev;
-  b.userdata          = (void *)GUI_NEXT;
+  b.callback          = gui_nextprev_mrl;
+  b.userdata          = GUI_NEXT (panel->gui);
   panel->playback_widgets.next =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, panel->playback_widgets.next);
 
@@ -1308,7 +1308,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Setup button */
   b.skin_element_name = "Setup";
   b.callback          = gui_setup_show;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Setup window"));
@@ -1316,7 +1316,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Event sender button */
   b.skin_element_name = "Nav";
   b.callback          = gui_event_sender_show;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Navigator"));
@@ -1339,32 +1339,32 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   /*  Next audio channel */
   b.skin_element_name = "AudioNext";
-  b.callback          = gui_change_audio_channel;
-  b.userdata          = (void *)GUI_NEXT;
+  b.callback          = gui_nextprev_audio_channel;
+  b.userdata          = GUI_NEXT (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Next audio channel"));
 
   /*  Prev audio channel */
   b.skin_element_name = "AudioPrev";
-  b.callback          = gui_change_audio_channel;
-  b.userdata          = (void *)GUI_PREV;
+  b.callback          = gui_nextprev_audio_channel;
+  b.userdata          = GUI_PREV (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Previous audio channel"));
 
   /*  Prev spuid */
   b.skin_element_name = "SpuNext";
-  b.callback          = gui_change_spu_channel;
-  b.userdata          = (void *)GUI_NEXT;
+  b.callback          = gui_nextprev_spu_channel;
+  b.userdata          = GUI_NEXT (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Next SPU channel"));
 
   /*  Next spuid */
   b.skin_element_name = "SpuPrev";
-  b.callback          = gui_change_spu_channel;
-  b.userdata          = (void *)GUI_PREV;
+  b.callback          = gui_nextprev_spu_channel;
+  b.userdata          = GUI_PREV (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Previous SPU channel"));
@@ -1457,16 +1457,16 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   /*  Playback speed slow */
   b.skin_element_name = "PlaySlow";
-  b.callback          = gui_change_speed_playback;
-  b.userdata          = (void *)GUI_NEXT;
+  b.callback          = gui_nextprev_speed;
+  b.userdata          = GUI_PREV (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Slow motion"));
 
   /*  Playback speed fast */
   b.skin_element_name = "PlayFast";
-  b.callback          = gui_change_speed_playback;
-  b.userdata          = (void *)GUI_PREV;
+  b.callback          = gui_nextprev_speed;
+  b.userdata          = GUI_NEXT (panel->gui);
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Fast motion"));
@@ -1474,7 +1474,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Playlist button */
   b.skin_element_name = "PlBtn";
   b.callback          = gui_playlist_show;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Playlist"));
@@ -1482,7 +1482,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Control button */
   b.skin_element_name = "CtlBtn";
   b.callback          = gui_control_show;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Control"));
@@ -1490,7 +1490,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /*  Mrl button */
   b.skin_element_name = "MrlBtn";
   b.callback          = gui_mrlbrowser_show;
-  b.userdata          = NULL;
+  b.userdata          = panel->gui;
   w =  xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
   xitk_add_widget (panel->widget_list, w);
   xitk_set_widget_tips(w, _("Open Location"));

@@ -429,13 +429,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if (!xine_open (mrlb->gui->stream, (const char *) _mrl)) {
       gui_handle_xine_error (mrlb->gui, mrlb->gui->stream, _mrl);
       enable_playback_controls (mrlb->gui->panel, 0);
-      gui_display_logo();
+      gui_display_logo (mrlb->gui);
       return;
     }
 
     if (!gui_xine_play (mrlb->gui, mrlb->gui->stream, 0, 0, 0)) {
       enable_playback_controls (mrlb->gui->panel, 0);
-      gui_display_logo();
+      gui_display_logo (mrlb->gui);
       return;
     }
     

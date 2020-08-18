@@ -304,17 +304,18 @@ static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
   gui_direct_change_audio_channel (NULL, gui, channel);
 }
 
-static void menu_spu_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  int channel = (int)(intptr_t) data;
+static void menu_spu_chan (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
 
-  gui_direct_change_spu_channel(NULL, NULL, channel);
+  (void)w;
+  gui_direct_change_spu_channel (NULL, gui, me->user_id);
 }
-static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+static void menu_aspect (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
   int aspect = me->user_id;
 
   (void)w;
-  (void)data;
-  gui_toggle_aspect (aspect);
+  gui_toggle_aspect (gui, aspect);
 }
 
 void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
@@ -819,14 +820,15 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.menu      = _("Subtitle/Channel/Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_spu_chan;
-    menu_entry.user_data = (void *) -2;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
     
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Subtitle/Channel/Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
-    menu_entry.cb        = menu_spu_chan;
-    menu_entry.user_data = (void *) -1;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
@@ -843,7 +845,8 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
-	    menu_entry.user_data = (void *)(intptr_t) i;
+            menu_entry.user_data = gui;
+            menu_entry.user_id   = i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -856,7 +859,8 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
-      menu_entry.user_data = (void *)(intptr_t) i;
+      menu_entry.user_data = gui;
+      menu_entry.user_id   = i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -1036,13 +1040,15 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     menu_entry.menu      = _("Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_spu_chan;
-    menu_entry.user_data = (void *) -2;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
     
     menu_entry.menu      = _("Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_spu_chan;
-    menu_entry.user_data = (void *) -1;
+    menu_entry.user_data = gui;
+    menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
@@ -1059,7 +1065,8 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
-	    menu_entry.user_data = (void *)(intptr_t) i;
+            menu_entry.user_data = gui;
+            menu_entry.user_id   = i;
 	    xitk_menu_add_entry(w, &menu_entry);
 	  }
 	}
@@ -1071,7 +1078,8 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
-      menu_entry.user_data = (void *)(intptr_t) i;
+      menu_entry.user_data = gui;
+      menu_entry.user_id   = i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
@@ -1154,4 +1162,3 @@ void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   
   xitk_menu_show_menu(w);
 }
-

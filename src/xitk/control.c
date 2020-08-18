@@ -84,6 +84,7 @@ static void control_select_new_skin (xitk_widget_t *w, void *data, int selected,
   xui_vctrl_t *vctrl = data;
 
   (void)w;
+  (void)modifier;
   if (vctrl) {
     xitk_browser_release_all_buttons (vctrl->skinlist);
     skin_select (vctrl->gui, selected);
@@ -294,6 +295,11 @@ static const xitk_event_cbs_t control_event_cbs = {
   .dnd_cb            = gui_dndcallback,
 };
 
+static void _control_toggle_window (xitk_widget_t *w, void *data, int state) {
+  (void)state;
+  control_toggle_window (w, data);
+}
+
 /*
  * Create control panel window
  */
@@ -418,7 +424,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   lb.button_type       = CLICK_BUTTON;
   lb.align             = ALIGN_DEFAULT;
   lb.label             = _("Dismiss");
-  lb.callback          = control_toggle_window;
+  lb.callback          = _control_toggle_window;
   lb.state_callback    = NULL;
   lb.userdata          = vctrl;
   w = xitk_labelbutton_create (vctrl->widget_list, vctrl->gui->skin_config, &lb);
@@ -694,3 +700,4 @@ void control_reparent (xui_vctrl_t *vctrl) {
   if (vctrl && vctrl->xwin)
     reparent_window(vctrl->gui, vctrl->xwin);
 }
+

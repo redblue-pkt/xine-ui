@@ -163,6 +163,8 @@ typedef struct gGui_st gGui_t;
 typedef struct skins_locations_s skins_locations_t;
 
 struct gGui_st {
+  struct gGui_st           *nextprev[3];
+
   xine_t                   *xine;
   xine_video_port_t        *vo_port;
   xine_video_port_t        *vo_none;
