@@ -998,7 +998,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     /* Map window. */
 
     if ((vwin->gui->always_layer_above || 
-      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above())) && !wm_not_ewmh_only()) {
+      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && !wm_not_ewmh_only()) {
       xitk_set_layer_above (vwin->video_window);
     }
         
@@ -1009,7 +1009,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xine_usec_sleep(5000);
 
     if ((vwin->gui->always_layer_above || 
-      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above())) && wm_not_ewmh_only()) {
+      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && wm_not_ewmh_only()) {
       xitk_set_layer_above (vwin->video_window);
     }
     
@@ -1410,7 +1410,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
   if (vwin->show == 1) {
 
     if ((vwin->gui->always_layer_above || 
-      (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above()) && 
+      (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) && 
       (vwin->hide_on_start == 0))) && (!wm_not_ewmh_only())) {
       xitk_set_layer_above (vwin->video_window);
     }
@@ -1419,7 +1419,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
     XMapWindow (vwin->video_display, vwin->video_window);
     
     if ((vwin->gui->always_layer_above || 
-      (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above()) &&
+      (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
       (vwin->hide_on_start == 0))) && (wm_not_ewmh_only())) {
       xitk_set_layer_above(vwin->video_window);
     }

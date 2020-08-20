@@ -381,7 +381,7 @@ static void fb_create_input_window(char *title, char *text,
   xitk_window_show_window(fne->xwin, 1);
 
   video_window_set_transient_for (fb->gui->vwin, fne->xwin);
-  layer_above_video(fne->xwin);
+  layer_above_video (fb->gui, fne->xwin);
 
   xitk_window_try_to_set_input_focus(fne->xwin);
 }
@@ -1099,7 +1099,7 @@ static const xitk_event_cbs_t fb_event_cbs = {
 
 void filebrowser_raise_window(filebrowser_t *fb) {
   if(fb != NULL)
-    raise_window(fb->xwin, fb->visible, fb->running);
+    raise_window (fb->gui, fb->xwin, fb->visible, fb->running);
 }
 
 void filebrowser_end(filebrowser_t *fb) {
@@ -1431,7 +1431,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   y += xitk_get_widget_height(fb->files_browser) + 15 + 4 + 5;
 
   cmb.skin_element_name = NULL;
-  cmb.layer_above       = (is_layer_above());
+  cmb.layer_above       = is_layer_above (fb->gui);
   cmb.entries           = fb->file_filters;
   cmb.parent_wkey       = &fb->widget_key;
   cmb.callback          = fb_select_file_filter;
@@ -1571,7 +1571,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     
   fb_getdir(fb);
 
-  layer_above_video(fb->xwin);
+  layer_above_video (fb->gui, fb->xwin);
   xitk_window_try_to_set_input_focus(fb->xwin);
 
   return fb;

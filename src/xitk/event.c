@@ -289,6 +289,7 @@ static void dummy_sighandler(int dummy) {
 
 static void gui_signal_handler (int sig, void *data) {
   pid_t     cur_pid = getppid();
+  gGui_t *gui = gGui;
 
   (void)data;
   switch (sig) {
@@ -296,8 +297,8 @@ static void gui_signal_handler (int sig, void *data) {
   case SIGHUP:
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
-      xine_config_reset (gGui->xine);
-      xine_config_load (gGui->xine, __xineui_global_config_file);
+      xine_config_reset (gui->xine);
+      xine_config_load (gui->xine, __xineui_global_config_file);
     }
     break;
 
@@ -318,7 +319,7 @@ static void gui_signal_handler (int sig, void *data) {
     if(cur_pid == xine_pid) {
       struct sigaction action;
 
-      xine_config_save (gGui->xine, __xineui_global_config_file);
+      xine_config_save (gui->xine, __xineui_global_config_file);
       
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
@@ -1521,7 +1522,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				 "except for the video window in non-fullscreen mode."), 
 			       CONFIG_LEVEL_ADV,
 			       layer_above_cb,
-			       gGui);
+			       gui);
 
   gui->always_layer_above = 
     xine_config_register_bool (gui->xine, "gui.always_layer_above", 0,
@@ -1530,7 +1531,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				 "for all windows (surpasses the 'layer_above' setting)."), 
 			       CONFIG_LEVEL_ADV,
 			       always_layer_above_cb,
-			       gGui);
+			       gui);
 
   gui->snapshot_location = 
     (char *)xine_config_register_string (gui->xine, "gui.snapshotdir", 
@@ -1539,7 +1540,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 					 _("Where snapshots will be saved."),
 					 CONFIG_LEVEL_BEG,
 					 snapshot_loc_cb,
-					 gGui);
+					 gui);
   
   gui->ssaver_timeout =
     xine_config_register_num (gui->xine, "gui.screensaver_timeout", 10,
@@ -1547,7 +1548,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Time, in seconds, between two faked events to keep a screensaver quiet, 0 to disable."),
 			      CONFIG_LEVEL_ADV,
 			      ssaver_timeout_cb,
-			      gGui);
+			      gui);
   
   gui->skip_by_chapter = 
     xine_config_register_bool (gui->xine, "gui.skip_by_chapter", 1,
@@ -1555,7 +1556,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
 			       CONFIG_LEVEL_ADV,
 			       skip_by_chapter_cb, 
-			       gGui);
+			       gui);
   
   gui->auto_vo_visibility = 
     xine_config_register_bool (gui->xine, "gui.auto_video_output_visibility", 0,
@@ -1563,7 +1564,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			       _("Hide video output window if there is no video in the stream"), 
 			       CONFIG_LEVEL_ADV,
 			       auto_vo_visibility_cb, 
-			       gGui);
+			       gui);
 
   gui->auto_panel_visibility = 
     xine_config_register_bool (gui->xine, "gui.auto_panel_visibility", 0,
@@ -1571,7 +1572,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			       _("Automatically show/hide panel window, according to auto_video_output_visibility"), 
 			       CONFIG_LEVEL_ADV,
 			       auto_panel_visibility_cb,
-			       gGui); 
+			       gui); 
  
   gui->eventer_sticky = 
     xine_config_register_bool (gui->xine, "gui.eventer_sticky", 
@@ -1580,7 +1581,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Event sender window stick to main panel"), 
 			      CONFIG_LEVEL_ADV,
 			      event_sender_sticky_cb,
-			      gGui);
+			      gui);
 
   gui->visual_anim.enabled = 
     xine_config_register_enum (gui->xine, "gui.visual_anim", 
@@ -1591,7 +1592,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				"current stream is audio only (eg: mp3)."), 
 			      CONFIG_LEVEL_BEG,
 			      visual_anim_cb,
-			      gGui);
+			      gui);
 
   gui->stream_info_auto_update = 
     xine_config_register_bool (gui->xine, "gui.sinfo_auto_update", 
@@ -1601,7 +1602,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				"each half seconds."), 
 			      CONFIG_LEVEL_ADV,
 			      stream_info_auto_update_cb,
-			      gGui);
+			      gui);
   
 
   server = 
@@ -1611,7 +1612,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 					 _("From where we can get skins."),
 					 CONFIG_LEVEL_ADV,
 					 skin_server_url_cb,
-					 gGui);
+					 gui);
   
   config_update_string("gui.skin_server_url", 
 		       gui->skin_server_url ? gui->skin_server_url : server);
@@ -1624,7 +1625,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				"in output window."), 
 			      CONFIG_LEVEL_BEG,
 			      osd_enabled_cb,
-			      gGui);
+			      gui);
 
   gui->osd.use_unscaled = 
     xine_config_register_bool (gui->xine, "gui.osd_use_unscaled", 
@@ -1633,7 +1634,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Use unscaled (full screen resolution) OSD if possible"), 
 			      CONFIG_LEVEL_ADV,
 			      osd_use_unscaled_cb,
-			      gGui);
+			      gui);
 
   gui->osd.timeout = 
     xine_config_register_num (gui->xine, "gui.osd_timeout", 
@@ -1642,7 +1643,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Persistence time of OSD visual, in seconds."),
 			      CONFIG_LEVEL_BEG,
 			      osd_timeout_cb,
-			      gGui);
+			      gui);
 
   gui->smart_mode = 
     xine_config_register_bool (gui->xine, "gui.smart_mode", 
@@ -1651,7 +1652,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("In this mode, xine take some decisions to simplify user's life."),
 			      CONFIG_LEVEL_BEG,
 			      smart_mode_cb,
-			      gGui);
+			      gui);
 
   gui->play_anyway = 
     xine_config_register_bool (gui->xine, "gui.play_anyway", 
@@ -1661,7 +1662,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				"the user will be asked if the stream should be played or not"), 
 			      CONFIG_LEVEL_BEG,
 			      play_anyway_cb,
-			      gGui);
+			      gui);
 
   gui->experience_level =
     (xine_config_register_enum (gui->xine, "gui.experience_level", 
@@ -1671,7 +1672,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 				 "configuration options."), 
 			       CONFIG_LEVEL_BEG,
 			       exp_level_cb, 
-			       gGui)) * 10;
+			       gui)) * 10;
 
   gui->mixer.amp_level = xine_config_register_range (gui->xine, "gui.amp_level", 
 						     100, 0, 200,
@@ -1679,7 +1680,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 						     NULL,
 						     CONFIG_LEVEL_DEB,
 						     dummy_config_cb, 
-						     gGui);
+						     gui);
 
   gui->splash = 
     gui->splash ? (xine_config_register_bool (gui->xine, "gui.splash", 
@@ -1688,7 +1689,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 					      _("If enabled, xine will display its splash screen"), 
 					      CONFIG_LEVEL_BEG,
 					      dummy_config_cb,
-					      gGui)) : 0;
+					      gui)) : 0;
   
   gui->mixer.method = 
     xine_config_register_enum (gui->xine, "gui.audio_mixer_method", 
@@ -1697,7 +1698,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Which method used to control audio volume."), 
 			      CONFIG_LEVEL_ADV,
 			      audio_mixer_method_cb,
-			      gGui);
+			      gui);
 
   gui->shortcut_style = 
     xine_config_register_enum (gui->xine, "gui.shortcut_style", 
@@ -1706,7 +1707,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."), 
 			      CONFIG_LEVEL_ADV,
 			      shortcut_style_cb,
-			      gGui);
+			      gui);
 
   gui->numeric.set = 0;
   gui->numeric.arg = 0;

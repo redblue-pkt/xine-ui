@@ -1347,6 +1347,8 @@ int main(int argc, char *argv[]) {
   gui->mrlb                   = NULL;
   gui->vctrl                  = NULL;
 
+  gui->eventer                = NULL;
+
   gui->plwin                  = NULL;
   gui->pl_load                = NULL;
   gui->pl_save                = NULL;

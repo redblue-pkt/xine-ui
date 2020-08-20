@@ -41,6 +41,8 @@
 #define  KBEDIT_EDITING        2
 
 typedef struct {
+  gGui_t               *gui;
+
   kbinding_t           *kbt;
 
   xitk_window_t        *xwin;
@@ -512,7 +514,7 @@ int kbedit_is_visible(void) {
 void kbedit_raise_window(void) {
   
   if(kbedit != NULL)
-    raise_window(kbedit->xwin, kbedit->visible, kbedit->running);
+    raise_window (kbedit->gui, kbedit->xwin, kbedit->visible, kbedit->running);
 }
 
 /*
@@ -520,7 +522,7 @@ void kbedit_raise_window(void) {
  */
 void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
   if(kbedit != NULL)
-    toggle_window(kbedit->xwin, kbedit->widget_list, &kbedit->visible, kbedit->running);
+    toggle_window (kbedit->gui, kbedit->xwin, kbedit->widget_list, &kbedit->visible, kbedit->running);
 }
 
 static void kbedit_create_browser_entries(void) {
@@ -1050,6 +1052,9 @@ void kbedit_window(void) {
 			       CONFIG_NO_DATA);
   
   kbedit = (_kbedit_t *) calloc(1, sizeof(_kbedit_t));
+  if (!kbedit)
+    return;
+  kbedit->gui = gui;
 
   kbedit->kbt           = _kbindings_duplicate_kbindings(gui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;

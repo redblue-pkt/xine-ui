@@ -22,18 +22,19 @@
 #ifndef EVENT_SENDER_H
 #define EVENT_SENDER_H
 
-void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg);
-void event_sender_panel(void);
-void event_sender_end(void);
-void event_sender_move(int x, int y);
-int event_sender_is_visible(void);
-int event_sender_is_running(void);
-void event_sender_toggle_visibility(void);
-void event_sender_raise_window(void);
-void event_sender_update_menu_buttons(void);
-void event_sender_send(int event);
-void event_sender_reparent(void);
-void event_sender_show_tips(int enabled, unsigned long timeout);
-//void event_sender_update_tips_timeout(unsigned long timeout);
+typedef struct xui_event_sender_st xui_event_sender_t;
+
+void event_sender_sticky_cb (void *gui, xine_cfg_entry_t *cfg);
+void event_sender_panel (gGui_t *gui);
+void event_sender_end (gGui_t *gui);
+void event_sender_move (gGui_t *gui, int x, int y);
+int event_sender_is_visible (gGui_t *gui);
+int event_sender_is_running (gGui_t *gui);
+void event_sender_toggle_visibility (gGui_t *gui);
+void event_sender_update_menu_buttons (gGui_t *gui);
+void event_sender_send (gGui_t *gui, int event);
+void event_sender_reparent (gGui_t *gui);
+void event_sender_show_tips (gGui_t *gui, unsigned long timeout);
+//void event_sender_update_tips_timeout (gGui_t *gui, unsigned long timeout);
 
 #endif

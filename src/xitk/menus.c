@@ -137,9 +137,9 @@ static void menu_playlist_move_down (xitk_widget_t *w, xitk_menu_entry_t *me, vo
 }
 
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gGui_t *gui = data;
   (void)w;
-  (void)data;
-  event_sender_send (me->user_id);
+  event_sender_send (gui, me->user_id);
 }
 
 static void menu_gui_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {

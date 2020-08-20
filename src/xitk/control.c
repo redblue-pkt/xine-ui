@@ -335,7 +335,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   vctrl->xwin =
     xitk_window_create_simple_window_ext(vctrl->gui->xitk, x + 100, y + 100, width, height, _(title),
-                                         NULL, "xine", 0, is_layer_above(), vctrl->gui->icon);
+                                         NULL, "xine", 0, is_layer_above (vctrl->gui), vctrl->gui->icon);
   set_window_type_start(vctrl->gui, vctrl->xwin);
 
   xitk_window_change_background_with_image(vctrl->xwin, bg_image, width, height);
@@ -577,7 +577,7 @@ void control_raise_window (xui_vctrl_t *vctrl) {
   if (vctrl && (vctrl->status >= 2)) {
     int visible = vctrl->status - 2;
 
-    raise_window (vctrl->xwin, visible, 1);
+    raise_window (vctrl->gui, vctrl->xwin, visible, 1);
   }
 }
 
@@ -598,7 +598,7 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
         return;
     }
     visible = vctrl->status - 2;
-    toggle_window (vctrl->xwin, vctrl->widget_list, &visible, 1);
+    toggle_window (vctrl->gui, vctrl->xwin, vctrl->widget_list, &visible, 1);
     vctrl->status = visible + 2;
   }
 }
@@ -623,7 +623,7 @@ void control_toggle_window (xitk_widget_t *w, void *data) {
         vctrl_open_window (vctrl);
       } else {
         int visible = 0;
-        toggle_window (vctrl->xwin, vctrl->widget_list, &visible, 1);
+        toggle_window (vctrl->gui, vctrl->xwin, vctrl->widget_list, &visible, 1);
         vctrl->status = visible + 2;
       }
     } else {

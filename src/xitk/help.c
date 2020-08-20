@@ -64,6 +64,8 @@ typedef struct {
 } help_section_t;
 
 typedef struct {
+  gGui_t               *gui;
+
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
@@ -267,7 +269,7 @@ static void help_exit(xitk_widget_t *w, void *data) {
 
     SAFE_FREE(help);
 
-    video_window_set_input_focus(gGui->vwin);
+    video_window_set_input_focus(help->gui->vwin);
   }
 }
 
@@ -283,7 +285,7 @@ static void help_handle_key_event(void *data, const xitk_key_event_t *ke) {
 
 void help_raise_window(void) {
   if(help != NULL)
-    raise_window(help->xwin, help->visible, help->running);
+    raise_window (help->gui, help->xwin, help->visible, help->running);
 }
 
 void help_end(void) {
@@ -312,7 +314,7 @@ int help_is_visible(void) {
 
 void help_toggle_visibility (xitk_widget_t *w, void *data) {
   if(help != NULL)
-    toggle_window(help->xwin, help->widget_list, &help->visible, help->running);
+    toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, help->running);
 }
 
 void help_reparent(void) {
@@ -334,6 +336,9 @@ void help_panel(void) {
   xitk_widget_t             *w;
 
   help = (_help_t *) calloc(1, sizeof(_help_t));
+  if (!help)
+    return;
+  help->gui = gGui;
 
   x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 
 				80,

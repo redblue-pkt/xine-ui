@@ -64,7 +64,7 @@ void mrl_browser_change_skins (xui_mrlb_t *mrlb, int synthetic) {
     xitk_mrlbrowser_change_skins (mrlb->w, mrlb->gui->skin_config);
     video_window_set_transient_for(mrlb->gui->vwin, xwin);
     if (mrl_browser_is_visible (mrlb))
-      raise_window (xwin, 1, 1);
+      raise_window (mrlb->gui, xwin, 1, 1);
   }
 }
 
@@ -94,7 +94,7 @@ void show_mrl_browser (xui_mrlb_t *mrlb) {
     mrlb->gui->nongui_error_msg = NULL;
     xitk_mrlbrowser_show (mrlb->w);
     video_window_set_transient_for(mrlb->gui->vwin, xitk_mrlbrowser_get_window(mrlb->w));
-    layer_above_video ((xitk_mrlbrowser_get_window (mrlb->w)));
+    layer_above_video (mrlb->gui, xitk_mrlbrowser_get_window (mrlb->w));
   }
 }
 
@@ -259,7 +259,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   XITK_WIDGET_INIT (&mb);
 
-  mb.layer_above  = (is_layer_above ());
+  mb.layer_above  = is_layer_above (mrlb->gui);
   mb.icon         = mrlb->gui->icon;
   mb.set_wm_window_normal = !video_window_is_visible (mrlb->gui->vwin);
   mb.x = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_x",

@@ -644,7 +644,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 
           XITK_WIDGET_INIT(&cmb);
 	  cmb.skin_element_name = NULL;
-	  cmb.layer_above       = (is_layer_above());
+	  cmb.layer_above       = is_layer_above (gGui);
 	  cmb.entries           = (const char **)pobj->param->enum_values;
 	  cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	  cmb.callback          = _pplugin_set_param_int;
@@ -711,7 +711,7 @@ static void _pplugin_add_parameter_widget(_pp_wrapper_t *pp_wrapper, post_object
 	
         XITK_WIDGET_INIT(&cmb);
 	cmb.skin_element_name = NULL;
-	cmb.layer_above       = (is_layer_above());
+	cmb.layer_above       = is_layer_above (gGui);
 	cmb.entries           = (const char **)(pobj->param_data + pobj->param->offset);
 	cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
 	cmb.callback          = _pplugin_set_param_stringlist;
@@ -1047,7 +1047,7 @@ static void _pplugin_show_help(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void
     pp_wrapper->pplugin->help_running = 1;
   }
 
-  raise_window(pp_wrapper->pplugin->helpwin, 1, pp_wrapper->pplugin->help_running);
+  raise_window (gGui, pp_wrapper->pplugin->helpwin, 1, pp_wrapper->pplugin->help_running);
 
   xitk_window_try_to_set_input_focus(pp_wrapper->pplugin->helpwin);
 }
@@ -1070,7 +1070,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     
     XITK_WIDGET_INIT(&cmb);
     cmb.skin_element_name = NULL;
-    cmb.layer_above       = (is_layer_above());
+    cmb.layer_above       = is_layer_above (gGui);
     cmb.entries           = (const char **)pobj->properties_names;
     cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
     cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_change_parameter : _applugin_change_parameter;
@@ -1279,7 +1279,7 @@ static post_object_t *_pplugin_create_filter_object (_pp_wrapper_t *pp_wrapper) 
   
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
-  cmb.layer_above       = (is_layer_above());
+  cmb.layer_above       = is_layer_above (gGui);
   cmb.entries           = (const char **)pp_wrapper->pplugin->plugin_names;
   cmb.parent_wkey       = &pp_wrapper->pplugin->widget_key;
   cmb.callback          = (pp_wrapper == &_vpp_wrapper.p) ? _vpplugin_select_filter : _applugin_select_filter;
@@ -1754,13 +1754,13 @@ static int pplugin_is_running(_pp_wrapper_t *pp_wrapper) {
 
 static void pplugin_raise_window(_pp_wrapper_t *pp_wrapper) {
   if(pp_wrapper->pplugin != NULL)
-    raise_window(pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
+    raise_window (gGui, pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
 
 static void pplugin_toggle_visibility(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data) {
   if(pp_wrapper->pplugin != NULL)
-    toggle_window(pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->widget_list,
+    toggle_window (gGui, pp_wrapper->pplugin->xwin, pp_wrapper->pplugin->widget_list,
 		  &pp_wrapper->pplugin->visible, pp_wrapper->pplugin->running);
 }
 
