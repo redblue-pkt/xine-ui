@@ -188,7 +188,7 @@ int setup_is_visible (xui_setup_t *setup) {
  */
 void setup_raise_window (xui_setup_t *setup) {
   if (setup && setup->running)
-    raise_window (setup->xwin, setup->visible, setup->running);
+    raise_window (setup->gui, setup->xwin, setup->visible, setup->running);
 }
 
 /*
@@ -198,7 +198,7 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_setup_t *setup = data;
   (void)w;
   if (setup && setup->running)
-    toggle_window (setup->xwin, setup->widget_list, &setup->visible, setup->running);
+    toggle_window (setup->gui, setup->xwin, setup->widget_list, &setup->visible, setup->running);
 }
 
 static void setup_apply (xitk_widget_t *w, void *data, int state) {
@@ -675,7 +675,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
             XITK_WIDGET_INIT (&cmb);
             cmb.skin_element_name = NULL;
-            cmb.layer_above       = (is_layer_above ());
+            cmb.layer_above       = is_layer_above (setup->gui);
             cmb.entries           = (const char **)entry.enum_values;
             cmb.parent_wkey       = &setup->kreg;
             cmb.callback          = numtype_update;

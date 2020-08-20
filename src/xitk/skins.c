@@ -456,7 +456,7 @@ void skin_init (gGui_t *gui) {
   
  __reload_skin:
   
-  if (!xitk_skin_load_config (gGui->skin_config, sk->fullname, "skinconfig")) {
+  if (!xitk_skin_load_config (gui->skin_config, sk->fullname, "skinconfig")) {
     if(!twice_load) {
       twice_load++;
       fprintf (stderr, _("Failed to load %s/%s. Load fallback skin %s\n"),

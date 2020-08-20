@@ -3121,12 +3121,12 @@ int mmk_editor_is_running(void) {
 
 void mmk_editor_raise_window(void) {
   if(mmkeditor.running)
-    raise_window(mmkeditor.xwin, mmkeditor.visible, mmkeditor.running);
+    raise_window (gGui, mmkeditor.xwin, mmkeditor.visible, mmkeditor.running);
 }
 
 void mmk_editor_toggle_visibility(void) {
   if(mmkeditor.running)
-    toggle_window(mmkeditor.xwin, mmkeditor.widget_list, &mmkeditor.visible, mmkeditor.running);
+    toggle_window (gGui, mmkeditor.xwin, mmkeditor.widget_list, &mmkeditor.visible, mmkeditor.running);
 }
 
 void mmk_editor_end(void) {

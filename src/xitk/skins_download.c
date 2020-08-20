@@ -641,7 +641,7 @@ void skin_download (gGui_t *gui, char *url) {
 
     xitk_window_show_window(skd->xwin, 1);
     video_window_set_transient_for (gui->vwin, skd->xwin);
-    layer_above_video(skd->xwin);
+    layer_above_video (skd->gui, skd->xwin);
 
     xitk_window_try_to_set_input_focus(skd->xwin);
     download_update_blank_preview(skd);

@@ -73,7 +73,6 @@ void gui_reparent_all_windows (gGui_t *gui) {
   } _reparent[] = {
     { viewlog_is_visible,       viewlog_reparent },
     { kbedit_is_visible,        kbedit_reparent },
-    { event_sender_is_visible,  event_sender_reparent },
     { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
     { vpplugin_is_visible,      vpplugin_reparent },
@@ -90,6 +89,8 @@ void gui_reparent_all_windows (gGui_t *gui) {
     setup_reparent (gui->setup);
   if (mrl_browser_is_visible (gui->mrlb))
     mrl_browser_reparent (gui->mrlb);
+  if (event_sender_is_visible (gui))
+    event_sender_reparent (gui);
   control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
@@ -106,18 +107,15 @@ void wait_for_window_visible(xitk_window_t *xwin) {
     xine_usec_sleep(5000);
 }
 
-void raise_window(xitk_window_t *xwin, int visible, int running) {
-  gGui_t *gui = gGui;
-  if (xwin && visible && running) {
+void raise_window (gGui_t *gui, xitk_window_t *xwin, int visible, int running) {
+  if (gui && xwin && visible && running) {
     reparent_window(gui, xwin);
-    layer_above_video(xwin);
+    layer_above_video (gui, xwin);
   }
 }
 
-void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running) {
-  gGui_t *gui = gGui;
-
-  if (!xwin)
+void toggle_window (gGui_t *gui, xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running) {
+  if (!gui || !xwin)
     return;
 
   if((*visible) && running) {
@@ -146,7 +144,7 @@ void toggle_window(xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *vi
       video_window_set_transient_for (gui->vwin, xwin);
 
       wait_for_window_visible(xwin);
-      layer_above_video(xwin);
+      layer_above_video (gui, xwin);
     }
   }
 }
@@ -388,7 +386,7 @@ static void mmk_set_update(void) {
   gGui_t *gui = gGui;
 
   video_window_set_mrl (gui->vwin, gui->mmk.ident);
-  event_sender_update_menu_buttons();
+  event_sender_update_menu_buttons (gui);
   panel_update_mrl_display (gui->panel);
   playlist_update_focused_entry (gui);
   
@@ -713,7 +711,7 @@ void gui_exit_2 (gGui_t *gui) {
   setup_end (gui->setup);
   viewlog_end();
   kbedit_end();
-  event_sender_end();
+  event_sender_end (gui);
   stream_infos_end();
   tvset_end();
   vpplugin_end();
@@ -1087,7 +1085,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int setup        = setup_is_visible (gui->setup);
   int viewlog      = viewlog_is_visible();
   int kbedit       = kbedit_is_visible();
-  int event_sender = event_sender_is_visible();
+  int event_sender = event_sender_is_visible (gui);
   int stream_infos = stream_infos_is_visible();
   int tvset        = tvset_is_visible();
   int vpplugin     = vpplugin_is_visible();
@@ -1113,7 +1111,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
-      event_sender_toggle_visibility();
+      event_sender_toggle_visibility (gui);
     if(stream_infos)
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
@@ -1148,7 +1146,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
-      event_sender_toggle_visibility();
+      event_sender_toggle_visibility (gui);
     if(stream_infos)
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
@@ -1835,15 +1833,15 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if (event_sender_is_running() && !event_sender_is_visible())
-    event_sender_toggle_visibility();
-  else if(!event_sender_is_running())
-    event_sender_panel();
+  if (event_sender_is_running (gui) && !event_sender_is_visible (gui))
+    event_sender_toggle_visibility (gui);
+  else if (!event_sender_is_running (gui))
+    event_sender_panel (gui);
   else {
     if(gui->use_root_window)
-      event_sender_toggle_visibility();
+      event_sender_toggle_visibility (gui);
     else
-      event_sender_end();
+      event_sender_end (gui);
   }
 }
 
@@ -1972,29 +1970,29 @@ void gui_help_show(xitk_widget_t *w, void *data) {
 /*
  * Return 1 if layer should be set
  */
-int is_layer_above(void) {
-  gGui_t *gui = gGui;
-  
+int is_layer_above (gGui_t *gui) {
+  if (!gui)
+    return 0;
   return (gui->always_layer_above || gui->layer_above) ? 1 : 0;
 }
 /*
  * set window layer property to something above GNOME (and KDE?) panel
  * (reset to normal if do_raise == 0)
  */
-void layer_above_video(xitk_window_t *xwin) {
+void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
   int layer = 10;
   
-  if(!(is_layer_above()))
+  if (!gui || !is_layer_above (gui))
     return;
   
-  if ((!(video_window_get_fullscreen_mode (gGui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gGui->vwin)) {
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin)) {
     layer = xitk_get_layer_level();
   }
   else {
-    if(is_layer_above())
+    if (is_layer_above (gui))
       layer = xitk_get_layer_level();
     else
-      layer = 4;
+      /* FIXME: never happens? */ layer = 4;
   }
   
   xitk_window_set_window_layer(xwin, layer);
@@ -2003,7 +2001,7 @@ void layer_above_video(xitk_window_t *xwin) {
 int get_layer_above_video (gGui_t *gui) {
   if (!(gui->always_layer_above || gui->layer_above))
     return 0;
-  if ((!(video_window_get_fullscreen_mode (gGui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gGui->vwin))
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin))
     return xitk_get_layer_level ();
   if (gui->always_layer_above || gui->layer_above)
     return xitk_get_layer_level ();

@@ -134,7 +134,7 @@ int viewlog_is_visible (void) {
 void viewlog_raise_window (void) {
   _viewlog_t *vl = viewlog;
   if (vl)
-    raise_window (vl->xwin, vl->visible, vl->running);
+    raise_window (vl->gui, vl->xwin, vl->visible, vl->running);
 }
 /*
  * Hide/show the viewlog window.
@@ -144,7 +144,7 @@ void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
   (void)w;
   (void)data;
   if (vl)
-    toggle_window (vl->xwin, vl->widget_list, &vl->visible, vl->running);
+    toggle_window (vl->gui, vl->xwin, vl->widget_list, &vl->visible, vl->running);
 }
 
 /*

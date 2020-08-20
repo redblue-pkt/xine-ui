@@ -918,7 +918,7 @@ void playlist_raise_window (gGui_t *gui) {
   pl = gui->plwin;
   
   if (pl) {
-    raise_window (pl->xwin, pl->visible, pl->running);
+    raise_window (pl->gui, pl->xwin, pl->visible, pl->running);
     mmk_editor_raise_window();
   }
 }
@@ -933,7 +933,7 @@ void playlist_toggle_visibility (gGui_t *gui) {
     return;
   pl = gui->plwin;
   if (pl) {
-    toggle_window (pl->xwin, pl->widget_list, &pl->visible, pl->running);
+    toggle_window (pl->gui, pl->xwin, pl->widget_list, &pl->visible, pl->running);
     mmk_editor_toggle_visibility();
   }
 }
@@ -1109,7 +1109,7 @@ void playlist_editor (gGui_t *gui) {
 				     CONFIG_NO_DATA);
 
   pl->xwin = xitk_window_create_simple_window_ext (pl->gui->xitk, x, y, width, height,
-    title, NULL, "xine", 0, is_layer_above(), pl->gui->icon);
+    title, NULL, "xine", 0, is_layer_above (pl->gui), pl->gui->icon);
 
   set_window_type_start (pl->gui, pl->xwin);
   xitk_window_change_background_with_image (pl->xwin, bg_image, width, height);

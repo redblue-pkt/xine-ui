@@ -134,7 +134,7 @@ void panel_show_tips (xui_panel_t *panel) {
   playlist_show_tips (panel->gui, panel->tips.enable, panel->tips.timeout);
   control_show_tips (panel->gui->vctrl, panel->tips.enable, panel->tips.timeout);
   mrl_browser_show_tips (panel->gui->mrlb, panel->tips.enable, panel->tips.timeout);
-  event_sender_show_tips(panel->tips.enable, panel->tips.timeout);
+  event_sender_show_tips (panel->gui, panel->tips.enable ? panel->tips.timeout : 0);
   mmk_editor_show_tips(panel->tips.enable, panel->tips.timeout);
   setup_show_tips (panel->gui->setup, panel->tips.enable, panel->tips.timeout);
 }
@@ -178,9 +178,8 @@ static void panel_store_new_position (void *data, int x, int y, int w, int h) {
     config_update_num ("gui.panel_x", x); 
     config_update_num ("gui.panel_y", y);
     
-    if(event_sender_is_running())
-      event_sender_move(x+w, y);
-
+    if (event_sender_is_running (panel->gui))
+      event_sender_move (panel->gui, x + w, y);
   }
   else
     panel->skin_on_change--;
@@ -255,7 +254,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   if (panel_is_visible (panel))
-    raise_window (panel->xwin, 1, 1);
+    raise_window (panel->gui, panel->xwin, 1, 1);
 
   xitk_skin_unlock (panel->gui->skin_config);
   
@@ -269,7 +268,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   enable_playback_controls (panel, panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
 
-  event_sender_move(panel->x + new_width, panel->y);
+  event_sender_move (panel->gui, panel->x + new_width, panel->y);
 }
 
 /*
@@ -602,9 +601,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if (lut[v])
     kbedit_toggle_visibility(NULL, NULL);
 
-  v = !!event_sender_is_visible ();
+  v = !!event_sender_is_visible (panel->gui);
   if (lut[v])
-    event_sender_toggle_visibility();
+    event_sender_toggle_visibility (panel->gui);
 
   v = !!stream_infos_is_visible ();
   if (lut[v])
@@ -660,7 +659,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
     wait_for_window_visible (panel->xwin);
-    layer_above_video (panel->xwin);
+    layer_above_video (panel->gui, panel->xwin);
      
     if (panel->gui->cursor_grabbed) {
       xitk_ungrab_pointer();
@@ -1006,8 +1005,8 @@ static void panel_handle_map_notify(void *data) {
     viewlog_toggle_visibility(NULL, NULL);
   if (!kbedit_is_visible())
     kbedit_toggle_visibility(NULL, NULL);
-  if (!event_sender_is_visible())
-    event_sender_toggle_visibility();
+  if (!event_sender_is_visible (panel->gui))
+    event_sender_toggle_visibility (panel->gui);
   if (!stream_infos_is_visible())
     stream_infos_toggle_visibility(NULL, NULL);
   if (!tvset_is_visible())
@@ -1146,7 +1145,7 @@ void panel_reparent (xui_panel_t *panel) {
     reparent_window (panel->gui, panel->xwin);
 
     if (video_window_is_visible (panel->gui->vwin)) {
-      layer_above_video(panel->xwin);
+      layer_above_video (panel->gui, panel->xwin);
     }
   }
 }
@@ -1220,7 +1219,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 						CONFIG_NO_DATA);
 
   panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y, width, height, title,
-                                                     title, "xine", 0, is_layer_above(), panel->gui->icon);
+    title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon);
   /*
    * The following is more or less a hack to keep the panel window visible
    * with and without focus in windowed and fullscreen mode.

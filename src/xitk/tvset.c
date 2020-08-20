@@ -224,11 +224,11 @@ int tvset_is_running(void) {
 }
 
 void tvset_raise_window(void) {
-    raise_window(tvset.xwin, tvset.visible, tvset.running);
+    raise_window (gGui, tvset.xwin, tvset.visible, tvset.running);
 }
 
 void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
-    toggle_window(tvset.xwin, tvset.widget_list, &tvset.visible, tvset.running);
+    toggle_window (gGui, tvset.xwin, tvset.widget_list, &tvset.visible, tvset.running);
 }
 
 void tvset_end(void) {
@@ -353,7 +353,7 @@ void tvset_panel(void) {
 
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
-  cmb.layer_above       = (is_layer_above());
+  cmb.layer_above       = is_layer_above (gGui);
   cmb.entries           = tvset.system_entries;
   cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = system_combo_select;
@@ -374,7 +374,7 @@ void tvset_panel(void) {
 
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
-  cmb.layer_above       = (is_layer_above());
+  cmb.layer_above       = is_layer_above (gGui);
   cmb.entries           = tvset.chann_entries;
   cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = NULL;
@@ -422,7 +422,7 @@ void tvset_panel(void) {
 
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
-  cmb.layer_above       = (is_layer_above());
+  cmb.layer_above       = is_layer_above (gGui);
   cmb.entries           = tvset.vidstd_entries;
   cmb.parent_wkey       = &tvset.widget_key;
   cmb.callback          = NULL;

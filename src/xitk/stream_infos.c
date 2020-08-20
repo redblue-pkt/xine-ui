@@ -337,11 +337,11 @@ void stream_infos_toggle_auto_update(void) {
 }
 
 void stream_infos_raise_window(void) {
-    raise_window(sinfos.xwin, sinfos.visible, sinfos.running);
+    raise_window (gGui, sinfos.xwin, sinfos.visible, sinfos.running);
 }
 
 void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
-    toggle_window(sinfos.xwin, sinfos.widget_list, &sinfos.visible, sinfos.running);
+    toggle_window (gGui, sinfos.xwin, sinfos.widget_list, &sinfos.visible, sinfos.running);
 }
 
 void stream_infos_end(void) {

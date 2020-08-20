@@ -367,6 +367,7 @@ struct gGui_st {
   xui_setup_t               *setup;
   xui_mrlb_t                *mrlb;
   xui_vctrl_t               *vctrl;
+  xui_event_sender_t        *eventer;
   xui_skdloader_t           *skdloader;
   xui_playlist_t            *plwin;
   filebrowser_t             *pl_load;
@@ -432,7 +433,7 @@ void reparent_window(gGui_t *gui, xitk_window_t *xwin);
     else {                                                                               \
       xitk_window_show_window((xwin), 1);                                                \
       video_window_set_transient_for((gui)->vwin, (xwin));                               \
-      layer_above_video((xwin));                                                         \
+      layer_above_video ((gui), (xwin));                                                 \
     }                                                                                    \
   } while(0)
 
