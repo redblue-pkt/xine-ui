@@ -46,7 +46,7 @@ struct xui_playlist_st {
 
   xitk_widget_t        *playlist;
   xitk_widget_t        *winput;
-  xitk_button_list_t   *autoplay_buttons;
+  xitk_widget_t        *autoplay_buttons;
 
   xitk_widget_t        *move_up;
   xitk_widget_t        *move_down;
@@ -793,8 +793,6 @@ void playlist_exit (gGui_t *gui) {
 
     xitk_unregister_event_handler (&pl->widget_key);
 
-    xitk_button_list_delete (pl->autoplay_buttons);
-
     xitk_window_destroy_window (pl->xwin);
     pl->xwin = NULL;
 
@@ -1025,7 +1023,6 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
   xitk_skin_unlock (pl->gui->skin_config);
     
   xitk_change_skins_widget_list (pl->widget_list, pl->gui->skin_config);
-  xitk_button_list_new_skin (pl->autoplay_buttons, pl->gui->skin_config);
   xitk_paint_widget_list (pl->widget_list);
 }
 
@@ -1275,7 +1272,7 @@ void playlist_editor (gGui_t *gui) {
   }
 
   do {
-    char *tips[64];
+    const char *tips[64];
     const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (__xineui_global_xine_instance);
     unsigned int i;
 
@@ -1285,11 +1282,13 @@ void playlist_editor (gGui_t *gui) {
     for (i = 0; autoplay_plugins[i]; i++) {
       if (i >= sizeof (tips) / sizeof (tips[0]))
         break;
-      tips[i] = (char *)xine_get_input_plugin_description (__xineui_global_xine_instance, autoplay_plugins[i]);
+      tips[i] = xine_get_input_plugin_description (__xineui_global_xine_instance, autoplay_plugins[i]);
     }
 
     pl->autoplay_buttons = xitk_button_list_new (pl->widget_list, pl->gui->skin_config, "AutoPlayBG",
-      playlist_scan_input, pl->gui, (char **)autoplay_plugins, tips, 5000, 0);
+      playlist_scan_input, pl->gui, autoplay_plugins, tips, 5000, 0);
+    if (pl->autoplay_buttons)
+      xitk_add_widget (pl->widget_list, pl->autoplay_buttons);
   } while (0);
 
   _playlist_update_browser_list (pl, 0);

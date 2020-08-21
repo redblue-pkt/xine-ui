@@ -291,6 +291,7 @@ typedef struct {
 #define WIDGET_GROUP_INTBOX         0x00020000
 #define WIDGET_GROUP_DOUBLEBOX      0x00040000
 #define WIDGET_GROUP_MENU           0x00080000
+#define WIDGET_GROUP_BUTTON_LIST    0x00100000
 
 #define WIDGET_TYPE_MASK            0x00001FFF
 /* Group leaders.. */
@@ -301,6 +302,7 @@ typedef struct {
 #define WIDGET_TYPE_MRLBROWSER      0x00001005
 #define WIDGET_TYPE_TABS            0x00001006
 #define WIDGET_TYPE_MENU            0x00001007
+#define WIDGET_TYPE_BUTTON_LIST     0x00001008
 /* Real widgets. */
 #define WIDGET_TYPE_BUTTON          0x00000001
 #define WIDGET_TYPE_LABELBUTTON     0x00000002

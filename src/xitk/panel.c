@@ -76,7 +76,7 @@ struct xui_panel_st {
   int                   visible;
   char                  runtime[20];
   xitk_widget_t        *audiochan_label;
-  xitk_button_list_t   *autoplay_buttons;
+  xitk_widget_t        *autoplay_buttons;
   xitk_widget_t        *spuid_label;
   xitk_register_key_t   widget_key;
   pthread_t             slider_thread;
@@ -211,7 +211,6 @@ static void panel_exit (xitk_widget_t *w, void *data) {
     pthread_join(panel->slider_thread, NULL);
 
     panel->title_label = NULL;
-    xitk_button_list_delete (panel->autoplay_buttons);
 
     xitk_window_destroy_window(panel->xwin);
     panel->xwin = NULL;
@@ -259,11 +258,6 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_skin_unlock (panel->gui->skin_config);
   
   xitk_change_skins_widget_list (panel->widget_list, panel->gui->skin_config);
-
-  /*
-   * Update position of dynamic buttons.
-   */
-  xitk_button_list_new_skin (panel->autoplay_buttons, panel->gui->skin_config);
 
   enable_playback_controls (panel, panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
@@ -1053,7 +1047,7 @@ static const xitk_event_cbs_t panel_event_cbs = {
  * called before xine engine initialization.
  */
 void panel_add_autoplay_buttons (xui_panel_t *panel) {
-  char *tips[64];
+  const char *tips[64];
   const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (panel->gui->xine);
   unsigned int i;
 
@@ -1063,15 +1057,17 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
   for (i = 0; autoplay_plugins[i]; i++) {
     if (i >= sizeof (tips) / sizeof (tips[0]))
       break;
-    tips[i] = (char *)xine_get_input_plugin_description (panel->gui->xine, autoplay_plugins[i]);
+    tips[i] = xine_get_input_plugin_description (panel->gui->xine, autoplay_plugins[i]);
   }
 
   panel->autoplay_buttons = xitk_button_list_new (
     panel->widget_list,
     panel->gui->skin_config, "AutoPlayGUI",
     playlist_scan_input, panel->gui,
-    (char **)autoplay_plugins,
+    autoplay_plugins,
     tips, panel->tips.timeout, 0);
+  if (panel->autoplay_buttons)
+    xitk_add_widget (panel->widget_list, panel->autoplay_buttons);
 }
 
 /*

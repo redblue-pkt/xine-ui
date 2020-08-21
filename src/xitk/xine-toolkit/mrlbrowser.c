@@ -84,7 +84,7 @@ typedef struct {
   _mrlb_items_t              items;
 
   xitk_widget_t             *mrlb_list; /*  Browser list widget */
-  xitk_button_list_t        *autodir_buttons;
+  xitk_widget_t             *autodir_buttons;
 
   xitk_widget_t             *combo_filter;
   const char               **filters;
@@ -204,8 +204,6 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
   wp->visible = 0;
 
   xitk_unregister_event_handler (&wp->widget_key);
-
-  xitk_button_list_delete (wp->autodir_buttons);
 
   xitk_window_destroy_window (wp->xwin);
   wp->xwin = NULL;
@@ -736,7 +734,6 @@ void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig
   xitk_skin_unlock (skonfig);
 
   xitk_change_skins_widget_list (wp->widget_list, skonfig);
-  xitk_button_list_new_skin (wp->autodir_buttons, skonfig);
 
   xitk_paint_widget_list (wp->widget_list);
 }
@@ -1078,7 +1075,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
    */
   wp->skin_element_name_ip = strdup (mb->ip_name.button.skin_element_name);
   do {
-    char *tips[64];
+    const char *tips[64];
     const char * const *autodir_plugins = mb->ip_availables;
     unsigned int i;
 
@@ -1088,11 +1085,16 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     for (i = 0; autodir_plugins[i]; i++) {
       if (i >= sizeof (tips) / sizeof (tips[0]))
         break;
-      tips[i] = (char *)xine_get_input_plugin_description (wp->xine, autodir_plugins[i]);
+      tips[i] = xine_get_input_plugin_description (wp->xine, autodir_plugins[i]);
     }
 
     wp->autodir_buttons = xitk_button_list_new (wp->widget_list, skonfig, wp->skin_element_name_ip,
-      mrlbrowser_grab_mrls, wp, (char **)mb->ip_availables, tips, 5000, WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER);
+      mrlbrowser_grab_mrls, wp, mb->ip_availables,
+      tips, 5000, WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER);
+    if (wp->autodir_buttons) {
+      xitk_dlist_add_tail (&wp->widget_list->list, &wp->autodir_buttons->node);
+      wp->autodir_buttons->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MRLBROWSER;
+    }
   } while (0);
 
   _duplicate_mrl_filters (wp, mb->mrl_filters);

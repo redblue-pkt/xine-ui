@@ -54,7 +54,8 @@ static size_t _strlcpy (char *t, const char *s, size_t l) {
  * 0 = first   num = last
  * [101] [102]            (...) */
 
-struct xitk_button_list_st {
+typedef struct {
+  xitk_widget_t       w;
   xitk_skin_config_t *skin_config;
   xitk_widget_list_t *widget_list;
   char                skin_element_name[64];
@@ -62,7 +63,7 @@ struct xitk_button_list_st {
   int                 x, y, dx, dy;
   uint32_t            widget_type_flags;
   xitk_widget_t      *add_here, *swap, *widgets[64];
-};
+} xitk_button_list_t;
 
 static void xitk_button_list_remove (xitk_button_list_t *bl) {
   int i = bl->first, e;
@@ -136,155 +137,25 @@ static void xitk_button_list_swap (xitk_widget_t *w, void *ip, int state) {
   xitk_button_list_add (bl);
 }
 
-xitk_button_list_t *xitk_button_list_new (
-  xitk_widget_list_t *widget_list,
-  xitk_skin_config_t *skin_config, const char *skin_element_name,
-  xitk_state_callback_t callback, void *callback_data,
-  char **names,
-  char **tips, int tips_timeout, uint32_t widget_type_flags) {
+static void xitk_button_list_delete (xitk_button_list_t *bl) {
+  int i;
 
-  xitk_labelbutton_widget_t lb;
-  xitk_button_list_t *bl;
-  const xitk_skin_element_info_t *info;
-  int dir, i, max;
-
-  for (i = 0; names[i]; i++) ;
-  if (i == 0)
-    return NULL;
-  if (i > (int)sizeof (bl->widgets) / (int)sizeof (bl->widgets[0]))
-    i = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
-
-  bl = malloc (sizeof (*bl));
-  if (!bl)
-    return NULL;
-  bl->skin_config = skin_config;
-  _strlcpy (bl->skin_element_name, skin_element_name, sizeof (bl->skin_element_name));
-  bl->flags = 1;
-
-  bl->widget_type_flags = widget_type_flags;
-  bl->widget_list = widget_list;
-
-  info = xitk_skin_get_info (skin_config, skin_element_name);
-  max = info ? info->max_buttons : 0;
-  if (max <= 0)
-    max = 10000;
-  if (max == 1) {
-    i = 1;
-  } else if (i > max) {
-    max -= 1;
-  } else {
-    max = i;
+  for (i = 0; i < bl->first; i++) {
+    xitk_destroy_widget (bl->widgets[i]);
+    bl->widgets[i] = NULL;
   }
-  bl->num = i;
-  bl->visible = max;
-
-  bl->last = (bl->num + bl->visible - 1) / bl->visible * bl->visible;
-  if (bl->last > (int)(sizeof (bl->widgets) / sizeof (bl->widgets[0])))
-    bl->last = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
-
-  bl->first = 0;
-  bl->x = info ? info->x : 0;
-  bl->y = info ? info->y : 0;
-
-  bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;
-  
-  XITK_WIDGET_INIT (&lb);
-  lb.skin_element_name = bl->skin_element_name;
-  lb.button_type       = CLICK_BUTTON;
-  lb.align             = ALIGN_DEFAULT;
-  lb.callback          = callback;
-  lb.userdata          = callback_data;
-  lb.state_callback    = NULL;
-
-  /* "101" */
-  lb.label = names[0];
-  bl->widgets[0] = xitk_labelbutton_create (widget_list, skin_config, &lb);
-  if (!bl->widgets[0]) {
-    free (bl);
-    return NULL;
+  for (i = bl->first + bl->visible; i < bl->last; i++) {
+    xitk_destroy_widget (bl->widgets[i]);
+    bl->widgets[i] = NULL;
   }
-  xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[0]->node);
-  if (tips[0])
-    xitk_set_widget_tips_and_timeout (bl->widgets[0], tips[0], tips_timeout);
-  xitk_disable_and_hide_widget (bl->widgets[0]);
-  xitk_dnode_remove (&bl->widgets[0]->node);
-
-  dir = info ? info->direction : DIRECTION_LEFT;
-  switch (dir) {
-    case DIRECTION_UP:
-      bl->dx = 0;
-      bl->dy = - xitk_get_widget_height (bl->widgets[0]) - 1;
-      break;
-    case DIRECTION_DOWN:
-      bl->dx = 0;
-      bl->dy = xitk_get_widget_height (bl->widgets[0]) + 1;
-      break;
-    case DIRECTION_LEFT:
-    default:
-      bl->dx = -xitk_get_widget_width (bl->widgets[0]) - 1;
-      bl->dy = 0;
-      break;
-    case DIRECTION_RIGHT:
-      bl->dx = xitk_get_widget_width (bl->widgets[0]) + 1;
-      bl->dy = 0;
-      break;
-  }
-
-  /* "102" */
-  for (i = 1; i < bl->num; i++) {
-    lb.label       = names[i];
-    bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
-    if (!bl->widgets[i])
-      break;
-    bl->widgets[i]->type |= widget_type_flags;
-    xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
-    if (tips[i])
-      xitk_set_widget_tips_and_timeout (bl->widgets[i], tips[i], tips_timeout);
-    xitk_disable_and_hide_widget (bl->widgets[i]);
-    xitk_dnode_remove (&bl->widgets[i]->node);
-  }
-  bl->num = i;
-
-  /* "   " */
-  lb.label = "";
-  lb.callback = NULL;
-  lb.userdata = NULL;
-  for (; i < bl->last; i++) {
-    bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
-    if (!bl->widgets[i])
-      break;
-    bl->widgets[i]->type |= widget_type_flags;
-    xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
-    xitk_disable_and_hide_widget (bl->widgets[i]);
-    xitk_dnode_remove (&bl->widgets[i]->node);
-  }
-  bl->last = i;
-
-  /* "..." */
-  lb.callback = xitk_button_list_swap;
-  lb.label    = _("...");
-  lb.userdata = bl;
-  bl->swap    = xitk_labelbutton_create (widget_list, skin_config, &lb);
-  if (bl->swap) {
-    bl->swap->type |= widget_type_flags;
-    xitk_dnode_insert_after (&bl->add_here->node, &bl->swap->node);
-    xitk_set_widget_tips_and_timeout (bl->swap, _("More sources..."), tips_timeout);
-    xitk_disable_and_hide_widget (bl->swap);
-    xitk_dnode_remove (&bl->swap->node);
-  }
-
-  bl->first = 0;
-  xitk_button_list_add (bl);
-
-  return bl;
+  if (bl->swap && (bl->num <= bl->visible))
+    xitk_destroy_widget (bl->swap);
+  bl->swap = NULL;
 }
 
-void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config) {
+static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config) {
   const xitk_skin_element_info_t *info;
   int dir, i, max;
-
-  if (!bl)
-    return;
 
   xitk_button_list_remove (bl);
   /* relay new skin to hidden ones */
@@ -345,6 +216,7 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
       if (!bl->widgets[i])
         break;
       bl->widgets[i]->type |= bl->widget_type_flags;
+      bl->widgets[i]->parent = &bl->w;
       xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
       xitk_disable_and_hide_widget (bl->widgets[i]);
       xitk_dnode_remove (&bl->widgets[i]->node);
@@ -359,8 +231,8 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
     bl->last = max;
   }
 
-  bl->x = info ? info->x : 0;
-  bl->y = info ? info->y : 0;
+  bl->w.x = bl->x = info ? info->x : 0;
+  bl->w.y = bl->y = info ? info->y : 0;
   dir = info ? info->direction : DIRECTION_LEFT;
   switch (dir) {
     case DIRECTION_UP:
@@ -388,9 +260,189 @@ void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin
   bl->flags |= 1;
 }
 
-xitk_widget_t *xitk_button_list_find (xitk_button_list_t *bl, const char *name) {
+static int xitk_button_list_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  xitk_button_list_t *bl = (xitk_button_list_t *)w;
+
+  (void)result;
+  if (event && bl && ((bl->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON_LIST)) {
+    switch (event->type) {
+      case WIDGET_EVENT_CHANGE_SKIN:
+        xitk_button_list_new_skin (bl, event->skonfig);
+        return 0;
+      case WIDGET_EVENT_DESTROY:
+        xitk_button_list_delete (bl);
+        return 0;
+      default: ;
+    }
+  }
+  return 0;
+}
+
+xitk_widget_t *xitk_button_list_new (
+  xitk_widget_list_t *widget_list,
+  xitk_skin_config_t *skin_config, const char *skin_element_name,
+  xitk_state_callback_t callback, void *callback_data,
+  const char * const *names,
+  const char * const *tips, int tips_timeout, uint32_t widget_type_flags) {
+
+  xitk_labelbutton_widget_t lb;
+  xitk_button_list_t *bl;
+  const xitk_skin_element_info_t *info;
+  int dir, i, max;
+
+  for (i = 0; names[i]; i++) ;
+  if (i == 0)
+    return NULL;
+  if (i > (int)sizeof (bl->widgets) / (int)sizeof (bl->widgets[0]))
+    i = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
+
+  bl = calloc (1, sizeof (*bl));
+  if (!bl)
+    return NULL;
+  bl->skin_config = skin_config;
+  _strlcpy (bl->skin_element_name, skin_element_name, sizeof (bl->skin_element_name));
+  bl->flags = 1;
+
+  bl->widget_type_flags = widget_type_flags | WIDGET_GROUP_BUTTON_LIST;
+  bl->w.wl = bl->widget_list = widget_list;
+  bl->w.private_data = bl;
+
+  info = xitk_skin_get_info (skin_config, skin_element_name);
+  max = info ? info->max_buttons : 0;
+  if (max <= 0)
+    max = 10000;
+  if (max == 1) {
+    i = 1;
+  } else if (i > max) {
+    max -= 1;
+  } else {
+    max = i;
+  }
+  bl->num = i;
+  bl->visible = max;
+
+  bl->last = (bl->num + bl->visible - 1) / bl->visible * bl->visible;
+  if (bl->last > (int)(sizeof (bl->widgets) / sizeof (bl->widgets[0])))
+    bl->last = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
+
+  bl->first = 0;
+  bl->w.x = bl->x = info ? info->x : 0;
+  bl->w.y = bl->y = info ? info->y : 0;
+  bl->w.width = 0;
+  bl->w.height = 0;
+  bl->w.type = WIDGET_GROUP | WIDGET_TYPE_BUTTON_LIST;
+  bl->w.enable = info ? info->enability : 1;
+  bl->w.running = 1;
+  bl->w.visible = info ? info->visibility : 1;
+  bl->w.have_focus = FOCUS_LOST;
+  bl->w.event = xitk_button_list_event;
+  bl->w.tips_timeout = 0;
+  bl->w.tips_string = NULL;
+
+  bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;
+  
+  XITK_WIDGET_INIT (&lb);
+  lb.skin_element_name = bl->skin_element_name;
+  lb.button_type       = CLICK_BUTTON;
+  lb.align             = ALIGN_DEFAULT;
+  lb.callback          = callback;
+  lb.userdata          = callback_data;
+  lb.state_callback    = NULL;
+
+  /* "101" */
+  lb.label = names[0];
+  bl->widgets[0] = xitk_labelbutton_create (widget_list, skin_config, &lb);
+  if (!bl->widgets[0]) {
+    free (bl);
+    return NULL;
+  }
+  bl->widgets[0]->type |= bl->widget_type_flags;
+  bl->widgets[0]->parent = &bl->w;
+  xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[0]->node);
+  if (tips[0])
+    xitk_set_widget_tips_and_timeout (bl->widgets[0], tips[0], tips_timeout);
+  xitk_disable_and_hide_widget (bl->widgets[0]);
+  xitk_dnode_remove (&bl->widgets[0]->node);
+
+  dir = info ? info->direction : DIRECTION_LEFT;
+  switch (dir) {
+    case DIRECTION_UP:
+      bl->dx = 0;
+      bl->dy = - xitk_get_widget_height (bl->widgets[0]) - 1;
+      break;
+    case DIRECTION_DOWN:
+      bl->dx = 0;
+      bl->dy = xitk_get_widget_height (bl->widgets[0]) + 1;
+      break;
+    case DIRECTION_LEFT:
+    default:
+      bl->dx = -xitk_get_widget_width (bl->widgets[0]) - 1;
+      bl->dy = 0;
+      break;
+    case DIRECTION_RIGHT:
+      bl->dx = xitk_get_widget_width (bl->widgets[0]) + 1;
+      bl->dy = 0;
+      break;
+  }
+
+  /* "102" */
+  for (i = 1; i < bl->num; i++) {
+    lb.label       = names[i];
+    bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
+    if (!bl->widgets[i])
+      break;
+    bl->widgets[i]->type |= bl->widget_type_flags;
+    bl->widgets[i]->parent = &bl->w;
+    xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
+    if (tips[i])
+      xitk_set_widget_tips_and_timeout (bl->widgets[i], tips[i], tips_timeout);
+    xitk_disable_and_hide_widget (bl->widgets[i]);
+    xitk_dnode_remove (&bl->widgets[i]->node);
+  }
+  bl->num = i;
+
+  /* "   " */
+  lb.label = "";
+  lb.callback = NULL;
+  lb.userdata = NULL;
+  for (; i < bl->last; i++) {
+    bl->widgets[i] = xitk_labelbutton_create (widget_list, skin_config, &lb);
+    if (!bl->widgets[i])
+      break;
+    bl->widgets[i]->type |= bl->widget_type_flags;
+    bl->widgets[i]->parent = &bl->w;
+    xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
+    xitk_disable_and_hide_widget (bl->widgets[i]);
+    xitk_dnode_remove (&bl->widgets[i]->node);
+  }
+  bl->last = i;
+
+  /* "..." */
+  lb.callback = xitk_button_list_swap;
+  lb.label    = _("...");
+  lb.userdata = bl;
+  bl->swap    = xitk_labelbutton_create (widget_list, skin_config, &lb);
+  if (bl->swap) {
+    bl->swap->type |= bl->widget_type_flags;
+    bl->swap->parent = &bl->w;
+    xitk_dnode_insert_after (&bl->add_here->node, &bl->swap->node);
+    xitk_set_widget_tips_and_timeout (bl->swap, _("More sources..."), tips_timeout);
+    xitk_disable_and_hide_widget (bl->swap);
+    xitk_dnode_remove (&bl->swap->node);
+  }
+
+  bl->first = 0;
+  xitk_button_list_add (bl);
+
+  return &bl->w;
+}
+
+xitk_widget_t *xitk_button_list_find (xitk_widget_t *w, const char *name) {
+  xitk_button_list_t *bl = (xitk_button_list_t *)w;
   int i;
   if (!bl || !name)
+    return NULL;
+  if ((bl->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BUTTON_LIST)
     return NULL;
   for (i = 0; i < bl->num; i++) {
     const char *p = xitk_labelbutton_get_label (bl->widgets[i]);
@@ -400,8 +452,11 @@ xitk_widget_t *xitk_button_list_find (xitk_button_list_t *bl, const char *name) 
   return NULL;
 }
 
-void xitk_button_list_able (xitk_button_list_t *bl, int enable) {
+void xitk_button_list_able (xitk_widget_t *w, int enable) {
+  xitk_button_list_t *bl = (xitk_button_list_t *)w;
   if (!bl)
+    return;
+  if ((bl->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BUTTON_LIST)
     return;
   if (enable) {
     int a, b;
@@ -431,16 +486,3 @@ void xitk_button_list_able (xitk_button_list_t *bl, int enable) {
     bl->flags &= ~1;
   }
 }
-
-void xitk_button_list_delete (xitk_button_list_t *bl) {
-  int i;
-
-  for (i = 0; i < bl->first; i++)
-    xitk_destroy_widget (bl->widgets[i]);
-  for (i = bl->first + bl->visible; i < bl->last; i++)
-    xitk_destroy_widget (bl->widgets[i]);
-  if (bl->swap && (bl->num <= bl->visible))
-    xitk_destroy_widget (bl->swap);
-  free (bl);
-}
-
