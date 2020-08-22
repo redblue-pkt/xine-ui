@@ -2648,4 +2648,3 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }
 }
-

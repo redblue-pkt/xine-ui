@@ -230,6 +230,11 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *
 }
 
 
+static void mrl_browser_rpwin (void *data, xitk_window_t *xwin) {
+  gGui_t *gui = data;
+  reparent_window (gui, xwin);
+}
+
 /*
  *
  */
@@ -259,9 +264,11 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
 
   XITK_WIDGET_INIT (&mb);
 
+  mb.reparent_window = mrl_browser_rpwin;
+  mb.rw_data = mrlb->gui;
   mb.layer_above  = is_layer_above (mrlb->gui);
   mb.icon         = mrlb->gui->icon;
-  mb.set_wm_window_normal = !video_window_is_visible (mrlb->gui->vwin);
+
   mb.x = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_x",
     200, "gui mrl browser x coordinate",
     CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
@@ -464,6 +471,7 @@ void mrl_browser_reparent (xui_mrlb_t *mrlb) {
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
+  (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add, mrl_play, NULL, gui_dndcallback);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
@@ -473,6 +481,7 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
 void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
+  (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add_noautoplay, mrl_play, NULL, gui_dndcallback);
     mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));

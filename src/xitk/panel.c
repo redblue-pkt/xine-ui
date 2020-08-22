@@ -654,6 +654,12 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
     wait_for_window_visible (panel->xwin);
     layer_above_video (panel->gui, panel->xwin);
+    /* FIXME: when switching to fullscreen with old kwin, compositor off,
+     * panel stays hidden  50% of cases. It reappears after a mouse click
+     * anywhere. Other open xine windows seem not to have this issue.
+     * And no, video window _does_ report viewable. Waiting half a second
+     * after switch does help, and so does this HACK. */
+    xitk_window_raise_window (panel->xwin);
      
     if (panel->gui->cursor_grabbed) {
       xitk_ungrab_pointer();
@@ -1564,6 +1570,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     pthread_attr_destroy (&pth_attrs);
   }
 
+  reparent_window (panel->gui, panel->xwin);
   if (panel->visible)
     xitk_window_try_to_set_input_focus(panel->xwin);
 

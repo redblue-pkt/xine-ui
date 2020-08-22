@@ -107,6 +107,26 @@ void wait_for_window_visible(xitk_window_t *xwin) {
     xine_usec_sleep(5000);
 }
 
+void reparent_window (gGui_t *gui, xitk_window_t *xwin) {
+  if (!gui || !xwin)
+    return;
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only ()) {
+    /* Don't unmap this window, because on re-mapping, it will not be visible until
+     * its ancestor, the video window, is visible. That's not what's intended. */
+    if (!video_window_is_visible (gui->vwin))
+      xitk_window_set_wm_window_type( (xwin), WINDOW_TYPE_NORMAL);
+    else
+      xitk_window_unset_wm_window_type (xwin, WINDOW_TYPE_NORMAL);
+    xitk_window_show_window (xwin, 1);
+    xitk_window_try_to_set_input_focus (xwin);
+    video_window_set_transient_for (gui->vwin, xwin);
+  } else {
+    xitk_window_show_window (xwin, 1);
+    video_window_set_transient_for (gui->vwin, xwin);
+    layer_above_video (gui, xwin);
+  }
+}
+
 void raise_window (gGui_t *gui, xitk_window_t *xwin, int visible, int running) {
   if (gui && xwin && visible && running) {
     reparent_window(gui, xwin);

@@ -970,11 +970,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->xwin = xitk_window_create_window_ext (xitk, mb->x, mb->y, bg_image->width, bg_image->height,
     title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
 
-  if (mb->set_wm_window_normal)
-    xitk_window_set_wm_window_type (wp->xwin, WINDOW_TYPE_NORMAL);
-  else
-    xitk_window_unset_wm_window_type (wp->xwin, WINDOW_TYPE_NORMAL);
-
   xitk_window_change_background_with_image (wp->xwin, bg_image, bg_image->width, bg_image->height);
 
   wp->widget_list = xitk_window_widget_list (wp->xwin);
@@ -1131,13 +1126,15 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 
-  xitk_window_show_window (wp->xwin, 1);
-
   wp->mrlbrowser_event_cbs.dnd_cb = mb->dndcallback;
   wp->mrlbrowser_event_cbs.key_cb  = mrlbrowser_handle_key_event;
 
-  wp->widget_key =
-    xitk_window_register_event_handler ("mrl browser", wp->xwin, &wp->mrlbrowser_event_cbs, wp);
+  wp->widget_key = xitk_window_register_event_handler ("mrl browser", wp->xwin, &wp->mrlbrowser_event_cbs, wp);
+
+  if (mb->reparent_window)
+    mb->reparent_window (mb->rw_data, wp->xwin);
+  else
+    xitk_window_show_window (wp->xwin, 1);
 
   xitk_window_try_to_set_input_focus (wp->xwin);
 
