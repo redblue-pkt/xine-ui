@@ -587,9 +587,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if (lut[v])
     setup_toggle_visibility (NULL, panel->gui->setup);
 
-  v = !!viewlog_is_visible ();
+  v = !!viewlog_is_visible (panel->gui->viewlog);
   if (lut[v])
-    viewlog_toggle_visibility(NULL, NULL);
+    viewlog_toggle_visibility (NULL, panel->gui->viewlog);
 
   v = !!kbedit_is_visible ();
   if (lut[v])
@@ -615,9 +615,9 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if (lut[v])
     applugin_toggle_visibility(NULL, NULL);
 
-  v = !!help_is_visible ();
+  v = !!help_is_visible (panel->gui->help);
   if (lut[v])
-    help_toggle_visibility(NULL, NULL);
+    help_toggle_visibility (NULL, panel->gui->help);
 
   if (panel->visible && !video_window_is_separate_display(panel->gui->vwin)) {
     
@@ -1001,8 +1001,8 @@ static void panel_handle_map_notify(void *data) {
     mrl_browser_toggle_visibility (NULL, panel->gui->mrlb);
   if (!setup_is_visible (panel->gui->setup))
     setup_toggle_visibility (NULL, panel->gui->setup);
-  if (!viewlog_is_visible())
-    viewlog_toggle_visibility(NULL, NULL);
+  if (!viewlog_is_visible (panel->gui->viewlog))
+    viewlog_toggle_visibility (NULL, panel->gui->viewlog);
   if (!kbedit_is_visible())
     kbedit_toggle_visibility(NULL, NULL);
   if (!event_sender_is_visible (panel->gui))
@@ -1015,8 +1015,8 @@ static void panel_handle_map_notify(void *data) {
     vpplugin_toggle_visibility(NULL, NULL);
   if (!applugin_is_visible())
     applugin_toggle_visibility(NULL, NULL);
-  if (!help_is_visible())
-    help_toggle_visibility(NULL, NULL);
+  if (!help_is_visible (panel->gui->help))
+    help_toggle_visibility (NULL, panel->gui->help);
 }
 
 static void panel_handle_button_event(void *data, const xitk_button_event_t *be) {

@@ -71,13 +71,11 @@ void gui_reparent_all_windows (gGui_t *gui) {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { viewlog_is_visible,       viewlog_reparent },
     { kbedit_is_visible,        kbedit_reparent },
     { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
     { vpplugin_is_visible,      vpplugin_reparent },
     { applugin_is_visible,      applugin_reparent },
-    { help_is_visible,          help_reparent },
     { NULL,                     NULL}
   };
   
@@ -91,6 +89,10 @@ void gui_reparent_all_windows (gGui_t *gui) {
     mrl_browser_reparent (gui->mrlb);
   if (event_sender_is_visible (gui))
     event_sender_reparent (gui);
+  if (help_is_visible (gui->help))
+    help_reparent (gui->help);
+  if (viewlog_is_visible (gui->viewlog))
+    viewlog_reparent (gui->viewlog);
   control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
@@ -729,14 +731,14 @@ void gui_exit_2 (gGui_t *gui) {
   playlist_deinit (gui);
   
   setup_end (gui->setup);
-  viewlog_end();
+  viewlog_end (gui->viewlog);
   kbedit_end();
   event_sender_end (gui);
   stream_infos_end();
   tvset_end();
   vpplugin_end();
   applugin_end();
-  help_end();
+  help_end (gui->help);
 #ifdef HAVE_TAR
   skin_download_end (gui->skdloader);
 #endif
@@ -1103,14 +1105,14 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int playlist     = playlist_is_visible (gui);
   int control      = control_status (gui->vctrl) == 3;
   int setup        = setup_is_visible (gui->setup);
-  int viewlog      = viewlog_is_visible();
+  int viewlog      = viewlog_is_visible (gui->viewlog);
   int kbedit       = kbedit_is_visible();
   int event_sender = event_sender_is_visible (gui);
   int stream_infos = stream_infos_is_visible();
   int tvset        = tvset_is_visible();
   int vpplugin     = vpplugin_is_visible();
   int applugin     = applugin_is_visible();
-  int help         = help_is_visible();
+  int help         = help_is_visible (gui->help);
 
   if ((!(video_window_is_visible (gui->vwin))) || gui->use_root_window)
     return;
@@ -1127,7 +1129,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(setup)
       setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
-      viewlog_toggle_visibility(NULL, NULL);
+      viewlog_toggle_visibility (NULL, gui->viewlog);
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
@@ -1141,7 +1143,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(applugin)
       applugin_toggle_visibility(NULL, NULL);
     if(help)
-      help_toggle_visibility(NULL, NULL);
+      help_toggle_visibility (NULL, gui->help);
   }
   
   video_window_set_fullscreen_mode (gui->vwin, fullscreen_mode);
@@ -1162,7 +1164,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(setup)
       setup_toggle_visibility (NULL, gui->setup);
     if(viewlog)
-      viewlog_toggle_visibility(NULL, NULL);
+      viewlog_toggle_visibility (NULL, gui->viewlog);
     if(kbedit)
       kbedit_toggle_visibility(NULL, NULL);
     if(event_sender)
@@ -1176,7 +1178,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     if(applugin)
       applugin_toggle_visibility(NULL, NULL);
     if(help)
-      help_toggle_visibility(NULL, NULL);
+      help_toggle_visibility (NULL, gui->help);
   }
 
 }
@@ -1939,16 +1941,12 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (viewlog_is_running() && !viewlog_is_visible())
-    viewlog_toggle_visibility(NULL, NULL);
-  else if(!viewlog_is_running())
-    viewlog_panel();
-  else {
-    if(gui->use_root_window)
-      viewlog_toggle_visibility(NULL, NULL);
-    else
-      viewlog_end();
-  }
+  if (!viewlog_is_running (gui->viewlog))
+    viewlog_panel (gui);
+  else if (!viewlog_is_visible (gui->viewlog) || gui->use_root_window)
+    viewlog_toggle_visibility (NULL, gui->viewlog);
+  else
+    viewlog_end (gui->viewlog);
 }
 
 void gui_kbedit_show(xitk_widget_t *w, void *data) {
@@ -1975,15 +1973,12 @@ void gui_help_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (help_is_running() && !help_is_visible())
-    help_toggle_visibility(NULL, NULL);
-  else if(!help_is_running())
-    help_panel();
-  else {
-    if(gui->use_root_window)
-      help_toggle_visibility(NULL, NULL);
-    else
-      help_end();
+  if (!help_is_running (gui->help)) {
+    help_panel (gui);
+  } else if (!help_is_visible (gui->help) || gui->use_root_window) {
+    help_toggle_visibility (NULL, gui->help);
+  } else {
+    help_end (gui->help);
   }
 }
 
@@ -2488,3 +2483,4 @@ void visual_anim_stop(void) {
     gui->visual_anim.running = 0;
   }
 }
+

@@ -63,7 +63,7 @@ typedef struct {
   int                   order_num;
 } help_section_t;
 
-typedef struct {
+struct xui_help_s {
   gGui_t               *gui;
 
   xitk_window_t        *xwin;
@@ -80,23 +80,23 @@ typedef struct {
   
   help_section_t       *sections[MAX_SECTIONS + 1];
   int                   num_sections;
+  int                   tabs_height;
 
   xitk_register_key_t   kreg;
 
-} _help_t;
+};
 
-static _help_t    *help = NULL;
+static void help_change_section (xitk_widget_t *w, void *data, int section) {
+  xui_help_t *help = data;
 
-static int         th; /* Tabs height */
-
-static void help_change_section(xitk_widget_t *wx, void *data, int section) {
-  if(section < help->num_sections)
-    xitk_browser_update_list(help->browser, help->sections[section]->content, NULL,
-			     help->sections[section]->line_num, 0);
+  (void)w;
+  if (section < help->num_sections)
+    xitk_browser_update_list (help->browser, help->sections[section]->content, NULL,
+      help->sections[section]->line_num, 0);
 }
 
-static void help_add_section(const char *filename, const char *doc_encoding, 
-                             int order_num, char *section_name) {
+static void help_add_section (xui_help_t *help, const char *filename, const char *doc_encoding,
+  int order_num, char *section_name) {
   struct stat  st;
   xitk_recode_t *xr;
   
@@ -155,12 +155,12 @@ static void help_add_section(const char *filename, const char *doc_encoding,
   }
 }
 
-static void help_sections(void) {
+static void help_sections (xui_help_t *help) {
   DIR                 *dir;
   int                  i;
 
   if ((dir = opendir(XINE_DOCDIR)) == NULL) {
-    xine_error (gGui, "Cannot open help files: %s", strerror(errno));
+    xine_error (help->gui, "Cannot open help files: %s", strerror(errno));
   }
   else {
     struct dirent       *dir_entry;
@@ -185,10 +185,10 @@ static void help_sections(void) {
 	snprintf(default_readme, sizeof(default_readme), "%s/%s", XINE_DOCDIR, dir_entry->d_name);
 
 	if ((strcmp(locale_file, dir_entry->d_name)) && is_a_file(locale_readme)) {
-	  help_add_section(locale_readme, lang->doc_encoding, order_num, section_name);
+          help_add_section (help, locale_readme, lang->doc_encoding, order_num, section_name);
 	}
 	else {
-	  help_add_section(default_readme, "ISO-8859-1", order_num, section_name);
+          help_add_section (help, default_readme, "ISO-8859-1", order_num, section_name);
 	}
       }
     }
@@ -228,8 +228,11 @@ static void help_sections(void) {
   }
 }
 
-static void help_exit(xitk_widget_t *w, void *data) {
+static void help_exit (xitk_widget_t *w, void *data, int state) {
+  xui_help_t *help = data;
 
+  (void)w;
+  (void)state;
   if(help) {
     window_info_t wi;
     
@@ -267,174 +270,172 @@ static void help_exit(xitk_widget_t *w, void *data) {
       }
     }
 
-    SAFE_FREE(help);
-
     video_window_set_input_focus(help->gui->vwin);
+
+    help->gui->help = NULL;
+    SAFE_FREE (help);
   }
 }
 
 static void help_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_help_t *help = data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      help_exit(NULL, NULL);
+      help_exit (NULL, help, 0);
     else
-      gui_handle_key_event (gGui, ke);
+      gui_handle_key_event (help->gui, ke);
   }
 }
 
-void help_raise_window(void) {
-  if(help != NULL)
+void help_raise_window (xui_help_t *help) {
+  if (help)
     raise_window (help->gui, help->xwin, help->visible, help->running);
 }
 
-void help_end(void) {
-  help_exit(NULL, NULL);
+void help_end (xui_help_t *help) {
+  help_exit (NULL, help, 0);
 }
 
-int help_is_running(void) {
-
-  if(help != NULL)
-    return help->running;
-
-  return 0;
+int help_is_running (xui_help_t *help) {
+  return help ? help->running : 0;
 }
 
-int help_is_visible(void) {
-  
-  if(help != NULL) {
-    if(gGui->use_root_window)
-      return xitk_window_is_window_visible(help->xwin);
-    else
-      return help->visible && xitk_window_is_window_visible(help->xwin);
-  }
-
-  return 0;
+int help_is_visible (xui_help_t *help) {
+  return help ? (help->gui->use_root_window ?
+                 xitk_window_is_window_visible (help->xwin) :
+                 (help->visible && xitk_window_is_window_visible (help->xwin)))
+              : 0;
 }
 
 void help_toggle_visibility (xitk_widget_t *w, void *data) {
-  if(help != NULL)
+  xui_help_t *help = data;
+  (void)w;
+  if (help)
     toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, help->running);
 }
 
-void help_reparent(void) {
-  gGui_t *gui = gGui;
-  if(help)
-    reparent_window(gui, help->xwin);
+void help_reparent (xui_help_t *help) {
+  if (help)
+    reparent_window (help->gui, help->xwin);
 }
 
 static const xitk_event_cbs_t  help_event_cbs = {
   .key_cb = help_handle_key_event,
 };
 
-void help_panel(void) {
-  xitk_labelbutton_widget_t  lb;
-  xitk_browser_widget_t      br;
-  xitk_tabs_widget_t         tab;
-  xitk_pixmap_t             *bg;
+void help_panel (gGui_t *gui) {
+  xui_help_t *help;
   int                        x, y;
-  xitk_widget_t             *w;
 
-  help = (_help_t *) calloc(1, sizeof(_help_t));
+  if (!gui)
+    return;
+  if (gui->help)
+    return;
+  help = (xui_help_t *)calloc (1, sizeof (*help));
   if (!help)
     return;
-  help->gui = gGui;
+  help->gui = gui;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 
-				80,
-				CONFIG_NO_DESC,
-				CONFIG_NO_HELP,
-				CONFIG_LEVEL_DEB,
-				CONFIG_NO_CB,
-				CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.help_y", 
-				80,
-				CONFIG_NO_DESC,
-				CONFIG_NO_HELP,
-				CONFIG_LEVEL_DEB,
-				CONFIG_NO_CB,
-				CONFIG_NO_DATA);
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 80,
+    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  y = xine_config_register_num (__xineui_global_xine_instance, "gui.help_y", 80,
+    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
 
   /* Create window */
-  help->xwin = xitk_window_create_dialog_window(gGui->xitk,
-						_("Help"), 
-						x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  set_window_states_start(gGui, help->xwin);
+  help->xwin = xitk_window_create_dialog_window (help->gui->xitk, _("Help"),
+    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+  set_window_states_start (help->gui, help->xwin);
+  help->widget_list = xitk_window_widget_list (help->xwin);
 
-  help->widget_list = xitk_window_widget_list(help->xwin);
+  help_sections (help);
 
-  help_sections();
+  {
+    xitk_tabs_widget_t tab;
+    XITK_WIDGET_INIT (&tab);
 
-  XITK_WIDGET_INIT(&tab);
-  
-  if(help->num_sections) {
-    tab.num_entries       = help->num_sections;
-    tab.entries           = help->tab_sections;
+    if (help->num_sections) {
+      tab.num_entries = help->num_sections;
+      tab.entries     = help->tab_sections;
+    } else {
+      static const char *no_section[2];
+
+      no_section[0] = _("No Help Section Available");
+      no_section[1] = NULL;
+      tab.num_entries = 1;
+      tab.entries     = (char **)no_section;
+    }
+    tab.skin_element_name = NULL;
+    tab.callback          = help_change_section;
+    tab.userdata          = help;
+    help->tabs = xitk_noskin_tabs_create (help->widget_list, &tab,
+      15, 24, WINDOW_WIDTH - 30, tabsfontname);
+    if (help->tabs) {
+      xitk_add_widget (help->widget_list, help->tabs);
+      help->tabs_height = xitk_get_widget_height (help->tabs) - 1;
+      xitk_enable_and_show_widget (help->tabs);
+    }
   }
-  else {
-    static char *no_section[] = { NULL, NULL };
-    
-    no_section[0] = _("No Help Section Available");
-    
-    tab.num_entries       = 1;
-    tab.entries           = no_section;
+
+  {
+    xitk_pixmap_t *bg = xitk_window_get_background_pixmap (help->xwin);
+    if (bg) {
+      draw_rectangular_outter_box (bg, 15, 24 + help->tabs_height,
+        WINDOW_WIDTH - 30 - 1, MAX_DISP_ENTRIES * 20 + 16 + 10 - 1);
+      xitk_window_set_background (help->xwin, bg);
+    }
   }
-  tab.skin_element_name = NULL;
-  tab.callback          = help_change_section;
-  tab.userdata          = NULL;
-  help->tabs = xitk_noskin_tabs_create (help->widget_list,
-    &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
-  xitk_add_widget (help->widget_list, help->tabs);
-  th = xitk_get_widget_height(help->tabs) - 1;
-  xitk_enable_and_show_widget(help->tabs);
 
-  bg = xitk_window_get_background_pixmap(help->xwin);
+  {
+    xitk_browser_widget_t br;
+    XITK_WIDGET_INIT (&br);
 
-  draw_rectangular_outter_box(bg, 15, (24 + th),
-			      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
-  xitk_window_set_background(help->xwin, bg);
+    br.arrow_up.skin_element_name    = NULL;
+    br.slider.skin_element_name      = NULL;
+    br.arrow_dn.skin_element_name    = NULL;
+    br.browser.skin_element_name     = NULL;
+    br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
+    br.browser.num_entries           = 0;
+    br.browser.entries               = NULL;
+    br.callback                      = NULL;
+    br.dbl_click_callback            = NULL;
+    br.userdata                      = NULL;
+    help->browser = xitk_noskin_browser_create (help->widget_list, &br,
+      15 + 5, 24 + help->tabs_height + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
+    if (help->browser) {
+      xitk_add_widget (help->widget_list, help->browser);
+      xitk_enable_and_show_widget (help->browser);
+    }
+  }
+  xitk_browser_set_alignment (help->browser, ALIGN_LEFT);
+  help_change_section (NULL, help, 0);
 
-  XITK_WIDGET_INIT(&br);
+  {
+    xitk_widget_t *w;
+    xitk_labelbutton_widget_t lb;
+    XITK_WIDGET_INIT (&lb);
 
-  br.arrow_up.skin_element_name    = NULL;
-  br.slider.skin_element_name      = NULL;
-  br.arrow_dn.skin_element_name    = NULL;
-  br.browser.skin_element_name     = NULL;
-  br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
-  br.browser.num_entries           = 0;
-  br.browser.entries               = NULL;
-  br.callback                      = NULL;
-  br.dbl_click_callback            = NULL;
-  br.userdata                      = NULL;
-  help->browser = xitk_noskin_browser_create (help->widget_list, &br,
-    15 + 5, (24 + th) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
-  xitk_add_widget (help->widget_list, help->browser);
-  xitk_enable_and_show_widget(help->browser);
-
-  xitk_browser_set_alignment(help->browser, ALIGN_LEFT);
-  help_change_section(NULL, NULL, 0);
+    lb.button_type       = CLICK_BUTTON;
+    lb.label             = _("Close");
+    lb.align             = ALIGN_CENTER;
+    lb.callback          = help_exit; 
+    lb.state_callback    = NULL;
+    lb.userdata          = help;
+    lb.skin_element_name = NULL;
+    w = xitk_noskin_labelbutton_create (help->widget_list, &lb,
+      WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+    if (w) {
+      xitk_add_widget (help->widget_list, w);
+      xitk_enable_and_show_widget (w);
+    }
+  }
   
-  XITK_WIDGET_INIT(&lb);
-
-  
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Close");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = help_exit; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  w = xitk_noskin_labelbutton_create (help->widget_list, &lb,
-    WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
-  xitk_add_widget (help->widget_list, w);
-  xitk_enable_and_show_widget(w);
-  
-  help->kreg = xitk_window_register_event_handler("help", help->xwin, &help_event_cbs, help);
+  help->kreg = xitk_window_register_event_handler ("help", help->xwin, &help_event_cbs, help);
   
   help->visible = 1;
   help->running = 1;
-  help_raise_window();
+  help_raise_window (help);
 
-  xitk_window_try_to_set_input_focus(help->xwin);
+  xitk_window_try_to_set_input_focus (help->xwin);
+  help->gui->help = help;
 }

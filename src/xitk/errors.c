@@ -39,10 +39,10 @@ static void _errors_display_log_3 (void *data, int state) {
 
   (void)gui;
   if (state == 2) {
-    if (viewlog_is_visible ())
-      viewlog_raise_window ();
+    if (viewlog_is_visible (gui->viewlog))
+      viewlog_raise_window (gui->viewlog);
     else
-      viewlog_panel ();
+      viewlog_panel (gui);
   }
 }
 
