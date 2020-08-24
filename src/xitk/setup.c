@@ -70,7 +70,6 @@ struct xui_setup_st {
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
-  int                   running;
   int                   visible;
 
   xitk_widget_t        *tabs;
@@ -110,11 +109,7 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
   (void)state;
   if (!setup)
     return;
-  /*
-  if (!setup->running)
-    return;
-  */
-  setup->running = 0;
+
   setup->visible = 0;
 
   if (setup->dialog)
@@ -144,29 +139,19 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
 void setup_show_tips (xui_setup_t *setup, int enabled, unsigned long timeout) {
   if (!setup)
     return;
-  if (setup->running) {
-    if (enabled)
-      xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
-    else
-      xitk_disable_widgets_tips (setup->widget_list);
-  }
+  if (enabled)
+    xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
+  else
+    xitk_disable_widgets_tips (setup->widget_list);
 }
 
 /*
 void setup_update_tips_timeout (xui_setup_t *setup, unsigned long timeout) {
   if (!setup)
     return;
-  if (setup->running)
-    xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
+  xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
 }
 */
-
-/*
- * return 1 if setup panel is ON
- */
-int setup_is_running (xui_setup_t *setup) {
-  return setup ? setup->running : 0;
-}
 
 /*
  * Return 1 if setup panel is visible
@@ -174,31 +159,26 @@ int setup_is_running (xui_setup_t *setup) {
 int setup_is_visible (xui_setup_t *setup) {
   if (!setup)
     return 0;
-  if (setup->running) {
-    if (setup->gui->use_root_window)
-      return xitk_window_is_window_visible (setup->xwin);
-    else
-      return setup->visible && xitk_window_is_window_visible (setup->xwin);
-  }
-  return 0;
+  if (setup->gui->use_root_window)
+    return xitk_window_is_window_visible (setup->xwin);
+  else
+    return setup->visible && xitk_window_is_window_visible (setup->xwin);
 }
 
 /*
  * Raise setup->xwin
  */
 void setup_raise_window (xui_setup_t *setup) {
-  if (setup && setup->running)
-    raise_window (setup->gui, setup->xwin, setup->visible, setup->running);
+  if (setup)
+    raise_window (setup->gui, setup->xwin, setup->visible, 1);
 }
 
 /*
  * Hide/show the setup panel
  */
-void setup_toggle_visibility (xitk_widget_t *w, void *data) {
-  xui_setup_t *setup = data;
-  (void)w;
-  if (setup && setup->running)
-    toggle_window (setup->gui, setup->xwin, setup->widget_list, &setup->visible, setup->running);
+void setup_toggle_visibility (xui_setup_t *setup) {
+  if (setup)
+    toggle_window (setup->gui, setup->xwin, setup->widget_list, &setup->visible, 1);
 }
 
 static void setup_apply (xitk_widget_t *w, void *data, int state) {
@@ -291,12 +271,10 @@ static void setup_apply (xitk_widget_t *w, void *data, int state) {
 }
 
 static void setup_set_cursor (xui_setup_t *setup, int state) {
-  if (setup->running) {
-    if(state == WAIT_CURS)
-      xitk_window_define_window_cursor (setup->xwin, xitk_cursor_watch);
-    else
-      xitk_window_restore_window_cursor (setup->xwin);
-  }
+  if (state == WAIT_CURS)
+    xitk_window_define_window_cursor (setup->xwin, xitk_cursor_watch);
+  else
+    xitk_window_restore_window_cursor (setup->xwin);
 }
 
 static void setup_ok (xitk_widget_t *w, void *data, int state) {
@@ -976,8 +954,7 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
 void setup_reparent (xui_setup_t *setup) {
   if (!setup)
     return;
-  if (setup->running)
-    reparent_window (setup->gui, setup->xwin);
+  reparent_window (setup->gui, setup->xwin);
 }
 
 /*
@@ -1094,7 +1071,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->kreg = xitk_window_register_event_handler("setup", setup->xwin, &setup_event_cbs, setup);
 
   setup->visible = 1;
-  setup->running = 1;
   setup_raise_window (setup);
 
   xitk_window_try_to_set_input_focus(setup->xwin);

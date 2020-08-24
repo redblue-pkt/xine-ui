@@ -69,7 +69,6 @@ struct xui_help_s {
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
-  int                   running;
   int                   visible;
 
   xitk_widget_t        *tabs;
@@ -236,7 +235,6 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
   if(help) {
     window_info_t wi;
     
-    help->running = 0;
     help->visible = 0;
     
     if((xitk_get_window_info(help->kreg, &wi))) {
@@ -290,15 +288,11 @@ static void help_handle_key_event(void *data, const xitk_key_event_t *ke) {
 
 void help_raise_window (xui_help_t *help) {
   if (help)
-    raise_window (help->gui, help->xwin, help->visible, help->running);
+    raise_window (help->gui, help->xwin, help->visible, 1);
 }
 
 void help_end (xui_help_t *help) {
   help_exit (NULL, help, 0);
-}
-
-int help_is_running (xui_help_t *help) {
-  return help ? help->running : 0;
 }
 
 int help_is_visible (xui_help_t *help) {
@@ -308,11 +302,9 @@ int help_is_visible (xui_help_t *help) {
               : 0;
 }
 
-void help_toggle_visibility (xitk_widget_t *w, void *data) {
-  xui_help_t *help = data;
-  (void)w;
+void help_toggle_visibility (xui_help_t *help) {
   if (help)
-    toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, help->running);
+    toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, 1);
 }
 
 void help_reparent (xui_help_t *help) {
@@ -433,7 +425,6 @@ void help_panel (gGui_t *gui) {
   help->kreg = xitk_window_register_event_handler ("help", help->xwin, &help_event_cbs, help);
   
   help->visible = 1;
-  help->running = 1;
   help_raise_window (help);
 
   xitk_window_try_to_set_input_focus (help->xwin);

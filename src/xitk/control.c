@@ -584,19 +584,10 @@ void control_raise_window (xui_vctrl_t *vctrl) {
 /*
  * Hide/show the control panel
  */
-void control_toggle_visibility (xitk_widget_t *w, void *data) {
-  xui_vctrl_t *vctrl = data;
-
+void control_toggle_visibility (xui_vctrl_t *vctrl) {
   if (vctrl && (vctrl->status >= 2)) {
     int visible;
 
-    if (w == XUI_W_ON) {
-      if (vctrl->status == 3)
-        return;
-    } else if (w == XUI_W_OFF) {
-      if (vctrl->status == 2)
-        return;
-    }
     visible = vctrl->status - 2;
     toggle_window (vctrl->gui, vctrl->xwin, vctrl->widget_list, &visible, 1);
     vctrl->status = visible + 2;

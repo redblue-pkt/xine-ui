@@ -58,7 +58,6 @@ struct xui_playlist_st {
   xitk_widget_t        *save;
   xitk_widget_t        *close;
 
-  int                   running;
   int                   visible;
   xitk_register_key_t   widget_key;
 
@@ -782,7 +781,6 @@ void playlist_exit (gGui_t *gui) {
     
     mmk_editor_end();
 
-    pl->running = 0;
     pl->visible = 0;
 
     if ((xitk_get_window_info (pl->widget_key, &wi))) {
@@ -811,13 +809,6 @@ static void _playlist_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   playlist_exit (gui);
-}
-
-/*
- * return 1 if playlist editor is ON
- */
-int playlist_is_running (gGui_t *gui) {
-  return gui ? (gui->plwin ? gui->plwin->running : 0) : 0;
 }
 
 /*
@@ -916,7 +907,7 @@ void playlist_raise_window (gGui_t *gui) {
   pl = gui->plwin;
   
   if (pl) {
-    raise_window (pl->gui, pl->xwin, pl->visible, pl->running);
+    raise_window (pl->gui, pl->xwin, pl->visible, 1);
     mmk_editor_raise_window();
   }
 }
@@ -931,7 +922,7 @@ void playlist_toggle_visibility (gGui_t *gui) {
     return;
   pl = gui->plwin;
   if (pl) {
-    toggle_window (pl->gui, pl->xwin, pl->widget_list, &pl->visible, pl->running);
+    toggle_window (pl->gui, pl->xwin, pl->widget_list, &pl->visible, 1);
     mmk_editor_toggle_visibility();
   }
 }
@@ -952,8 +943,6 @@ void playlist_update_focused_entry (gGui_t *gui) {
   if (!pl->xwin)
     return;
   if (!pl->visible)
-    return;
-  if (!pl->running)
     return;
   if (pl->playlist_len <= 0)
     return;
@@ -999,8 +988,6 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
     return;
   pl = gui->plwin;
   if (!pl)
-    return;
-  if (!pl->running)
     return;
 
   xitk_skin_lock (pl->gui->skin_config);
@@ -1298,7 +1285,6 @@ void playlist_editor (gGui_t *gui) {
   pl->widget_key = xitk_window_register_event_handler ("playlist", pl->xwin, &playlist_event_cbs, pl);
 
   pl->visible = 1;
-  pl->running = 1;
 
   playlist_update_focused_entry (pl->gui);
   playlist_raise_window (pl->gui);

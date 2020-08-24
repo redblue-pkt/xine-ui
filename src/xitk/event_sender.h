@@ -29,7 +29,6 @@ void event_sender_panel (gGui_t *gui);
 void event_sender_end (gGui_t *gui);
 void event_sender_move (gGui_t *gui, int x, int y);
 int event_sender_is_visible (gGui_t *gui);
-int event_sender_is_running (gGui_t *gui);
 void event_sender_toggle_visibility (gGui_t *gui);
 void event_sender_update_menu_buttons (gGui_t *gui);
 void event_sender_send (gGui_t *gui, int event);

@@ -28,8 +28,7 @@ typedef struct xui_viewlog_s xui_viewlog_t;
 
 void viewlog_panel (gGui_t *gui);
 int viewlog_is_visible (xui_viewlog_t *vl);
-int viewlog_is_running (xui_viewlog_t *vl);
-void viewlog_toggle_visibility (xitk_widget_t *w, void *vl);
+void viewlog_toggle_visibility (xui_viewlog_t *vl);
 void viewlog_raise_window (xui_viewlog_t *vl);
 void viewlog_reparent (xui_viewlog_t *vl);
 void viewlog_end (xui_viewlog_t *vl);

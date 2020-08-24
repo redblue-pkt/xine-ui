@@ -363,7 +363,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   if (mrlb && mrl) {
     int num = mrlb->gui->playlist.num;
     
-    if (!playlist_is_running (mrlb->gui)) {
+    if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
     }
     else {
@@ -391,7 +391,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   (void)w;
   if (mrlb && mrl) {
     
-    if (!playlist_is_running (mrlb->gui)) {
+    if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
     }
     else {
