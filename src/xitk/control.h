@@ -29,13 +29,13 @@ void control_deinit (xui_vctrl_t *vctrl);
 
 /* supports XUI_W_* */
 void control_toggle_window (xitk_widget_t *w, void *vctrl);
-void control_toggle_visibility (xitk_widget_t *w, void *vctrl);
 
 /* off (0), keyboard only (1), hidden window (2), visible window (3= */
 int control_status (xui_vctrl_t *vctrl);
 
 void control_reset (xui_vctrl_t *vctrl);
 
+void control_toggle_visibility (xui_vctrl_t *vctrl);
 void control_change_skins (xui_vctrl_t *vctrl, int);
 void control_raise_window (xui_vctrl_t *vctrl);
 void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout);

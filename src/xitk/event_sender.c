@@ -85,7 +85,6 @@ struct xui_event_sender_st {
 
   xitk_widget_t        *wdgts[sizeof (_es_event_types) / sizeof (_es_event_types[0])];
 
-  int                   running;
   int                   visible;
   xitk_register_key_t   widget_key;
 
@@ -320,7 +319,6 @@ static void event_sender_exit (xitk_widget_t *w, void *data, int state) {
   if (es) {
     window_info_t wi;
     
-    es->running = 0;
     es->visible = 0;
     
     if ((xitk_get_window_info (es->widget_key, &wi))) {
@@ -347,18 +345,14 @@ int event_sender_is_visible (gGui_t *gui) {
                               : (gui->eventer->visible && xitk_window_is_window_visible (gui->eventer->xwin));
 }
 
-int event_sender_is_running (gGui_t *gui) {
-  return (gui && gui->eventer) ? gui->eventer->running : 0;
-}
-
 static void _event_sender_raise_window (gGui_t *gui) {
   if (gui && gui->eventer)
-    raise_window (gui, gui->eventer->xwin, gui->eventer->visible, gui->eventer->running);
+    raise_window (gui, gui->eventer->xwin, gui->eventer->visible, 1);
 }
 
 void event_sender_toggle_visibility (gGui_t *gui) {
   if (gui && gui->eventer)
-    toggle_window (gui, gui->eventer->xwin, gui->eventer->widget_list, &gui->eventer->visible, gui->eventer->running);
+    toggle_window (gui, gui->eventer->xwin, gui->eventer->widget_list, &gui->eventer->visible, 1);
 }
 
 void event_sender_move (gGui_t *gui, int x, int y) {
@@ -481,7 +475,6 @@ void event_sender_panel (gGui_t *gui) {
   es->widget_key = xitk_window_register_event_handler ("eventer", es->xwin, &event_sender_event_cbs, es);
 
   es->visible = 1;
-  es->running = 1;
   _event_sender_raise_window (es->gui);
   xitk_window_try_to_set_input_focus (es->xwin);
 }

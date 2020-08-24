@@ -1098,89 +1098,78 @@ void gui_toggle_border (xitk_widget_t *w, void *data) {
   video_window_toggle_border (gui->vwin);
 }
 
+int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
+  int v, s;
+
+  if (!gui)
+    return 0;
+
+  v = (panel_is_visible (gui->panel) != 0) << 0;
+  s = (v ^ flags_visible) & flags_mask;
+  if (s & (1 << 0)) {
+    /* this will call us again on the remaining windows, ... */
+    panel_toggle_visibility (NULL, gui->panel);
+    /* ... so stop right here. */
+    return v;
+  }
+
+  v |= (mrl_browser_is_visible (gui->mrlb) != 0) << 1;
+  v |= (playlist_is_visible (gui) != 0) << 2;
+  v |= (control_status (gui->vctrl) == 3) << 3;
+  v |= (setup_is_visible (gui->setup) != 0) << 4;
+  v |= (viewlog_is_visible (gui->viewlog) != 0) << 5;
+  v |= (kbedit_is_visible () != 0) << 6;
+  v |= (event_sender_is_visible (gui) != 0) << 7;
+  v |= (stream_infos_is_visible () != 0) << 8;
+  v |= (tvset_is_visible () != 0) << 9;
+  v |= (vpplugin_is_visible () != 0) << 10;
+  v |= (applugin_is_visible () != 0) << 11;
+  v |= (help_is_visible (gui->help) != 0) << 12;
+
+  s = (v ^ flags_visible) & flags_mask;
+  if (s & (1 << 1))
+    mrl_browser_toggle_visibility (NULL, gui->mrlb);
+  if (s & (1 << 2))
+    playlist_toggle_visibility (gui);
+  if (s & (1 << 3))
+    control_toggle_visibility (gui->vctrl);
+  if (s & (1 << 4))
+    setup_toggle_visibility (gui->setup);
+  if (s & (1 << 5))
+    viewlog_toggle_visibility (gui->viewlog);
+  if (s & (1 << 6))
+    kbedit_toggle_visibility (NULL, NULL);
+  if (s & (1 << 7))
+    event_sender_toggle_visibility (gui);
+  if (s & (1 << 8))
+    stream_infos_toggle_visibility (NULL, NULL);
+  if (s & (1 << 9))
+    tvset_toggle_visibility (NULL, NULL);
+  if (s & (1 << 10))
+    vpplugin_toggle_visibility (NULL, NULL);
+  if (s & (1 << 11))
+    applugin_toggle_visibility (NULL, NULL);
+  if (s & (1 << 12))
+    help_toggle_visibility (gui->help);
+
+  return v;
+}
+
 static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
-  int panel        = panel_is_visible (gui->panel);
-  int mrl_browser  = mrl_browser_is_visible (gui->mrlb);
-  int playlist     = playlist_is_visible (gui);
-  int control      = control_status (gui->vctrl) == 3;
-  int setup        = setup_is_visible (gui->setup);
-  int viewlog      = viewlog_is_visible (gui->viewlog);
-  int kbedit       = kbedit_is_visible();
-  int event_sender = event_sender_is_visible (gui);
-  int stream_infos = stream_infos_is_visible();
-  int tvset        = tvset_is_visible();
-  int vpplugin     = vpplugin_is_visible();
-  int applugin     = applugin_is_visible();
-  int help         = help_is_visible (gui->help);
+  int flags;
 
   if ((!(video_window_is_visible (gui->vwin))) || gui->use_root_window)
     return;
 
-  if(panel)
-    panel_toggle_visibility (NULL, gui->panel);
-  else {
-    if(mrl_browser)
-      mrl_browser_toggle_visibility (NULL, gui->mrlb);
-    if(playlist)
-      playlist_toggle_visibility (gui);
-    if(control)
-      control_toggle_visibility (NULL, gui->vctrl);
-    if(setup)
-      setup_toggle_visibility (NULL, gui->setup);
-    if(viewlog)
-      viewlog_toggle_visibility (NULL, gui->viewlog);
-    if(kbedit)
-      kbedit_toggle_visibility(NULL, NULL);
-    if(event_sender)
-      event_sender_toggle_visibility (gui);
-    if(stream_infos)
-      stream_infos_toggle_visibility(NULL, NULL);
-    if(tvset)
-      tvset_toggle_visibility(NULL, NULL);
-    if(vpplugin)
-      vpplugin_toggle_visibility(NULL, NULL);
-    if(applugin)
-      applugin_toggle_visibility(NULL, NULL);
-    if(help)
-      help_toggle_visibility (NULL, gui->help);
-  }
-  
+  flags = gui_hide_show_all (gui, ~0, 0);
+
   video_window_set_fullscreen_mode (gui->vwin, fullscreen_mode);
-  
   /* Drawable has changed, update cursor visiblity */
   if(!gui->cursor_visible)
     video_window_set_cursor_visibility (gui->vwin, gui->cursor_visible);
   
-  if(panel)
-    panel_toggle_visibility (NULL, gui->panel);
-  else {
-    if(mrl_browser)
-      mrl_browser_toggle_visibility (NULL, gui->mrlb);
-    if(playlist)
-      playlist_toggle_visibility (gui);
-    if(control)
-      control_toggle_visibility (NULL, gui->vctrl);
-    if(setup)
-      setup_toggle_visibility (NULL, gui->setup);
-    if(viewlog)
-      viewlog_toggle_visibility (NULL, gui->viewlog);
-    if(kbedit)
-      kbedit_toggle_visibility(NULL, NULL);
-    if(event_sender)
-      event_sender_toggle_visibility (gui);
-    if(stream_infos)
-      stream_infos_toggle_visibility(NULL, NULL);
-    if(tvset)
-      tvset_toggle_visibility(NULL, NULL);
-    if(vpplugin)
-      vpplugin_toggle_visibility(NULL, NULL);
-    if(applugin)
-      applugin_toggle_visibility(NULL, NULL);
-    if(help)
-      help_toggle_visibility (NULL, gui->help);
-  }
-
+  gui_hide_show_all (gui, flags, ~0);
 }
 
 void gui_set_fullscreen_mode (xitk_widget_t *w, void *data) {
@@ -1761,19 +1750,12 @@ void gui_playlist_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if(!playlist_is_running (gui)) {
+  if (!gui->plwin)
     playlist_editor (gui);
-  }
-  else {
-    if (playlist_is_visible (gui))
-      if(gui->use_root_window)
-        playlist_toggle_visibility (gui);
-      else
-        playlist_exit (gui);
-    else
-      playlist_toggle_visibility (gui);
-  }
-
+  else if (!playlist_is_visible (gui) || gui->use_root_window)
+    playlist_toggle_visibility (gui);
+  else
+    playlist_exit (gui);
 }
 
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
@@ -1826,7 +1808,6 @@ void gui_set_current_mmk_by_index(int idx) {
 
 void gui_control_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
-  (void)w;
   if (gui)
     control_toggle_window (w, gui->vctrl);
 }
@@ -1837,16 +1818,12 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if (setup_is_running (gui->setup) && !setup_is_visible (gui->setup))
-    setup_toggle_visibility (NULL, gui->setup);
-  else if (!setup_is_running (gui->setup))
+  if (!gui->setup)
     setup_panel (gui);
-  else {
-    if(gui->use_root_window)
-      setup_toggle_visibility (NULL, gui->setup);
-    else
-      setup_end (gui->setup);
-  }
+  else if (!setup_is_visible (gui->setup) || gui->use_root_window)
+    setup_toggle_visibility (gui->setup);
+  else
+    setup_end (gui->setup);
 }
 
 void gui_event_sender_show(xitk_widget_t *w, void *data) {
@@ -1855,16 +1832,12 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if (event_sender_is_running (gui) && !event_sender_is_visible (gui))
-    event_sender_toggle_visibility (gui);
-  else if (!event_sender_is_running (gui))
+  if (!gui->eventer)
     event_sender_panel (gui);
-  else {
-    if(gui->use_root_window)
-      event_sender_toggle_visibility (gui);
-    else
-      event_sender_end (gui);
-  }
+  else if (!event_sender_is_visible (gui) || gui->use_root_window)
+    event_sender_toggle_visibility (gui);
+  else
+    event_sender_end (gui);
 }
 
 void gui_stream_infos_show(xitk_widget_t *w, void *data) {
@@ -1941,10 +1914,10 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (!viewlog_is_running (gui->viewlog))
+  if (!gui->viewlog)
     viewlog_panel (gui);
   else if (!viewlog_is_visible (gui->viewlog) || gui->use_root_window)
-    viewlog_toggle_visibility (NULL, gui->viewlog);
+    viewlog_toggle_visibility (gui->viewlog);
   else
     viewlog_end (gui->viewlog);
 }
@@ -1973,10 +1946,10 @@ void gui_help_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (!help_is_running (gui->help)) {
+  if (!gui->help) {
     help_panel (gui);
   } else if (!help_is_visible (gui->help) || gui->use_root_window) {
-    help_toggle_visibility (NULL, gui->help);
+    help_toggle_visibility (gui->help);
   } else {
     help_end (gui->help);
   }

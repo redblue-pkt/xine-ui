@@ -2025,9 +2025,8 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
             pthread_mutex_unlock (&gui->mmk_mutex);
 	  }
 	}
-	
-        if (playlist_is_running (gui))
-          playlist_update_playlist (gui);
+
+        playlist_update_playlist (gui);
 
 	if(gui->playlist.num)
 	  gui_set_current_mmk(mediamark_get_current_mmk());

@@ -418,6 +418,9 @@ void set_window_states_start(gGui_t *gui, xitk_window_t *xwin);
 
 void reparent_window(gGui_t *gui, xitk_window_t *xwin);
 
+/* panel has bit 0. return the windows that were visible before. */
+int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible);
+
 #ifdef HAVE_XML_PARSER_REENTRANT
 # define xml_parser_init_R(X,D,L,M) X = xml_parser_init_r ((D), (L), (M))
 # define xml_parser_build_tree_R(X,T) xml_parser_build_tree_r ((X), (T))

@@ -46,11 +46,10 @@ struct xui_viewlog_s {
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
 
-  int                   running;
   int                   visible;
 
-  xitk_widget_t        *tabs;
   int                   tabs_height;
+  xitk_widget_t        *tabs;
 
   const char          **log;
   int                   log_entries;
@@ -73,7 +72,6 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
     window_info_t wi;
     int           i;
     
-    vl->running = 0;
     vl->visible = 0;
     
     if ((xitk_get_window_info (vl->kreg, &wi))) {
@@ -99,13 +97,6 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
 }
 
 /*
- * return 1 if viewlog window is ON
- */
-int viewlog_is_running (xui_viewlog_t *vl) {
-  return vl ? vl->running : 0;
-}
-
-/*
  * Return 1 if viewlog window is visible
  */
 int viewlog_is_visible (xui_viewlog_t *vl) {
@@ -118,16 +109,14 @@ int viewlog_is_visible (xui_viewlog_t *vl) {
  */
 void viewlog_raise_window (xui_viewlog_t *vl) {
   if (vl)
-    raise_window (vl->gui, vl->xwin, vl->visible, vl->running);
+    raise_window (vl->gui, vl->xwin, vl->visible, 1);
 }
 /*
  * Hide/show the viewlog window.
  */
-void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
-  xui_viewlog_t *vl = data;
-  (void)w;
+void viewlog_toggle_visibility (xui_viewlog_t *vl) {
   if (vl)
-    toggle_window (vl->gui, vl->xwin, vl->widget_list, &vl->visible, vl->running);
+    toggle_window (vl->gui, vl->xwin, vl->widget_list, &vl->visible, 1);
 }
 
 /*
@@ -450,7 +439,6 @@ void viewlog_panel (gGui_t *gui) {
   vl->kreg = xitk_window_register_event_handler ("viewlog", vl->xwin, &viewlog_event_cbs, vl);
 
   vl->visible = 1;
-  vl->running = 1;
   viewlog_raise_window (vl);
   xitk_window_try_to_set_input_focus (vl->xwin);
 
