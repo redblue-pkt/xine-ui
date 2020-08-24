@@ -32,6 +32,8 @@
 
 #include <X11/Xlib.h>
 
+#include <xine/sorted_array.h>
+
 #include "_xitk.h"
 #include "tips.h"
 #include "menu.h"
@@ -1242,8 +1244,60 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 /*
  * Find the first focusable widget in wl, according to direction
  */
+
+static int xitk_widget_pos_cmp (void *a, void *b) {
+  xitk_widget_t *d = (xitk_widget_t *)a;
+  xitk_widget_t *e = (xitk_widget_t *)b;
+  int gd = d->parent ? ((uint32_t)d->parent->y << 16) + (uint32_t)d->parent->x : 0;
+  int ge = e->parent ? ((uint32_t)e->parent->y << 16) + (uint32_t)e->parent->x : 0;
+  int diff = gd - ge;
+  if (diff)
+    return diff;
+  gd = ((uint32_t)(d->y + (d->height >> 1)) << 16) + d->x + (d->width >> 1);
+  ge = ((uint32_t)(e->y + (e->height >> 1)) << 16) + e->x + (e->width >> 1);
+  return gd - ge;
+}
+
+static xitk_widget_t *xitk_find_nextprev_focus (xitk_widget_list_t *wl, int backward) {
+  int i, n;
+  xitk_widget_t *w;
+  xine_sarray_t *a = xine_sarray_new (128, xitk_widget_pos_cmp);
+
+  if (!a)
+    return NULL;
+  n = 0;
+  for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
+    if (!(w->type & WIDGET_FOCUSABLE) || !w->enable || !w->visible || !w->width || !w->height)
+      continue;
+    xine_sarray_add (a, w);
+    n += 1;
+  }
+  if (!n) {
+    xine_sarray_delete (a);
+    return NULL;
+  }
+
+  i = backward ? 0 : n - 1;
+  w = wl->widget_focused;
+  if (w) {
+    int j = xine_sarray_binary_search (a, w);
+    if (j >= 0)
+      i = j;
+  }
+
+  if (backward) {
+    i = i > 0 ? i - 1 : n - 1;
+  } else {
+    i = i < n - 1 ? i + 1 : 0;
+  }
+  w = xine_sarray_get (a, i);
+  xine_sarray_delete (a);
+  return w;
+}
+
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier) {
-  widget_event_t   event;
+  widget_event_t event;
+  xitk_widget_t *w;
 
   if(!wl) {
     XITK_WARNING("widget list is NULL.\n");
@@ -1252,50 +1306,11 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
   if (!wl->win || !wl->gc)
     return;
 
-  if (!wl->widget_focused) {
+  w = xitk_find_nextprev_focus (wl, backward);
+  if (!w || (w == wl->widget_focused))
+    return;
 
-    xitk_widget_t *w;
-    if (backward) {
-      for (w = (xitk_widget_t *)wl->list.tail.prev;
-        w->node.prev && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-        w = (xitk_widget_t *)w->node.prev) ;
-      if (!w->node.prev)
-        return;
-    } else {
-      for (w = (xitk_widget_t *)wl->list.head.next;
-        w->node.next && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-        w = (xitk_widget_t *)w->node.next) ;
-      if (!w->node.next)
-        return;
-    }
-    wl->widget_focused = w;
-
-  } else {
-
-    xitk_widget_t *w;
-    if (backward) {
-      for (w = (xitk_widget_t *)wl->widget_focused->node.prev;
-        w->node.prev && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-        w = (xitk_widget_t *)w->node.prev) ;
-      if (!w->node.prev) {
-        for (w = (xitk_widget_t *)wl->list.tail.prev;
-          (w != wl->widget_focused) && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-          w = (xitk_widget_t *)w->node.prev) ;
-        if (w == wl->widget_focused)
-          return;
-      }
-    } else {
-      for (w = (xitk_widget_t *)wl->widget_focused->node.next;
-        w->node.next && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-        w = (xitk_widget_t *)w->node.next) ;
-      if (!w->node.next) {
-        for (w = (xitk_widget_t *)wl->list.head.next;
-          (w != wl->widget_focused) && !((w->type & WIDGET_FOCUSABLE) && w->enable && w->visible);
-          w = (xitk_widget_t *)w->node.next) ;
-        if (w == wl->widget_focused)
-          return;
-      }
-    }
+  if (wl->widget_focused) {
     if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
         (wl->widget_focused->enable == WIDGET_ENABLE)) {
       event.type  = WIDGET_EVENT_FOCUS;
@@ -1305,9 +1320,8 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
       event.type = WIDGET_EVENT_PAINT;
       (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
     }
-    wl->widget_focused = w;
-
   }
+  wl->widget_focused = w;
         
   xitk_tips_hide_tips (wl->xitk->tips);
 
