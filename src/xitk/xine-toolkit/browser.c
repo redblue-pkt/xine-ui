@@ -690,11 +690,50 @@ static void browser_down(xitk_widget_t *w, void *data) {
   _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
 }
 
+static int _browser_get_focus (_browser_private_t *wp) {
+  int i;
+  for (i = 0; i < wp->visible.num; i++) {
+    if (wp->visible.btns[i + WBSTART] == wp->w.wl->widget_focused)
+      return i;
+  }
+  return -1;
+}
+
+static void _browser_set_focus (_browser_private_t *wp, int visible) {
+  if (wp->w.wl->widget_focused != wp->visible.btns[visible + WBSTART]) {
+    widget_event_t event;
+    if (wp->w.wl->widget_focused) {
+      if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
+        (wp->w.wl->widget_focused->enable == WIDGET_ENABLE)) {
+        event.type = WIDGET_EVENT_FOCUS;
+        event.focus = FOCUS_LOST;
+        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
+        wp->w.wl->widget_focused->have_focus = FOCUS_LOST;
+      }
+      event.type = WIDGET_EVENT_PAINT;
+      wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
+    }
+    wp->w.wl->widget_focused = wp->visible.btns[visible + WBSTART];
+    if (wp->w.wl->widget_focused) {
+      if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
+        (wp->w.wl->widget_focused->enable == WIDGET_ENABLE)) {
+        event.type = WIDGET_EVENT_FOCUS;
+        event.focus = FOCUS_RECEIVED;
+        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
+        wp->w.wl->widget_focused->have_focus = FOCUS_RECEIVED;
+      }
+      event.type = WIDGET_EVENT_PAINT;
+      wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
+    }
+  }
+}
+
 /**
  * slide up (extern).
  */
 void xitk_browser_step_up(xitk_widget_t *w, void *data) {
   _browser_private_t *wp = (_browser_private_t *)w;
+  int v;
 
   (void)data;
   if (!wp)
@@ -702,32 +741,38 @@ void xitk_browser_step_up(xitk_widget_t *w, void *data) {
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return;
 
-  xitk_slider_make_backstep (wp->visible.btns[WSLID]);
-  _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
+  v = _browser_visible_2_item (wp, _browser_get_focus (wp)) + 1;
+  if (v >= wp->items.num) {
+    v = wp->items.num - 1;
+    if (v < 0)
+      v = 0;
+  }
+  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_vslider (wp);
+  v = _browser_item_2_visible (wp, v);
+  _browser_set_focus (wp, v);
 }
 
 void xitk_browser_page_up(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)data;
- 
-  if (!w || !wp)
+  _browser_private_t *wp = (_browser_private_t *)w;
+  int v;
+
+  (void)data;
+  if (!wp)
     return;
-  if (!(w->type & WIDGET_GROUP_BROWSER))
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return;
 
-  _browser_move (wp, -wp->visible.max);
+  v = _browser_visible_2_item (wp, _browser_get_focus (wp)) + wp->visible.num;
+  if (v >= wp->items.num) {
+    v = wp->items.num - 1;
+    if (v < 0)
+      v = 0;
+  }
+  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
   _browser_set_vslider (wp);
-}
-
-void xitk_browser_page_down(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)data;
- 
-  if (!w || !wp)
-    return;
-  if (!(w->type & WIDGET_GROUP_BROWSER))
-    return;
-
-  _browser_move (wp, -wp->visible.max);
-  _browser_set_vslider (wp);
+  v = _browser_item_2_visible (wp, v);
+  _browser_set_focus (wp, v);
 }
 
 /**
@@ -735,6 +780,7 @@ void xitk_browser_page_down(xitk_widget_t *w, void *data) {
  */
 void xitk_browser_step_down(xitk_widget_t *w, void *data) {
   _browser_private_t *wp = (_browser_private_t *)w;
+  int v;
 
   (void)data;
   if (!wp)
@@ -742,10 +788,33 @@ void xitk_browser_step_down(xitk_widget_t *w, void *data) {
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return;
     
-  xitk_slider_make_step (wp->visible.btns[WSLID]);
-  _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
+  v = _browser_visible_2_item (wp, _browser_get_focus (wp)) - 1;
+  if (v < 0)
+    v = wp->visible.start;
+  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_vslider (wp);
+  v = _browser_item_2_visible (wp, v);
+  _browser_set_focus (wp, v);
 }
 
+void xitk_browser_page_down(xitk_widget_t *w, void *data) {
+  _browser_private_t *wp = (_browser_private_t *)w;
+  int v;
+
+  (void)data;
+  if (!wp)
+    return;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
+    return;
+    
+  v = _browser_visible_2_item (wp, _browser_get_focus (wp)) - wp->visible.num;
+  if (v < 0)
+    v = wp->visible.start;
+  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_vslider (wp);
+  v = _browser_item_2_visible (wp, v);
+  _browser_set_focus (wp, v);
+}
 
 /**
  * slide left (extern).
@@ -851,44 +920,6 @@ xitk_widget_t *xitk_browser_get_browser (xitk_widget_t *w) {
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return NULL;
   return w->parent;
-}
-
-static int _browser_get_focus (_browser_private_t *wp) {
-  int i;
-  for (i = 0; i < wp->visible.num; i++) {
-    if (wp->visible.btns[i + WBSTART] == wp->w.wl->widget_focused)
-      return i;
-  }
-  return -1;
-}
-
-static void _browser_set_focus (_browser_private_t *wp, int visible) {
-  if (wp->w.wl->widget_focused != wp->visible.btns[visible + WBSTART]) {
-    widget_event_t event;
-    if (wp->w.wl->widget_focused) {
-      if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
-        (wp->w.wl->widget_focused->enable == WIDGET_ENABLE)) {
-        event.type = WIDGET_EVENT_FOCUS;
-        event.focus = FOCUS_LOST;
-        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-        wp->w.wl->widget_focused->have_focus = FOCUS_LOST;
-      }
-      event.type = WIDGET_EVENT_PAINT;
-      wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-    }
-    wp->w.wl->widget_focused = wp->visible.btns[visible + WBSTART];
-    if (wp->w.wl->widget_focused) {
-      if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
-        (wp->w.wl->widget_focused->enable == WIDGET_ENABLE)) {
-        event.type = WIDGET_EVENT_FOCUS;
-        event.focus = FOCUS_RECEIVED;
-        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-        wp->w.wl->widget_focused->have_focus = FOCUS_RECEIVED;
-      }
-      event.type = WIDGET_EVENT_PAINT;
-      wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-    }
-  }
 }
 
 /*
