@@ -406,7 +406,7 @@ KeySym xitk_keycode_to_keysym(XEvent *event) {
 
   if (event) {
     XLOCK (xitk_x_lock_display, event->xany.display);
-    pkey = XKeycodeToKeysym(event->xany.display, event->xkey.keycode, 0);
+    pkey = XLookupKeysym (&event->xkey, 0);
     XUNLOCK (xitk_x_unlock_display, event->xany.display);
   }
   return pkey;
@@ -1352,4 +1352,3 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   return _xitk_inputtext_create (wp, it);
 }
-
