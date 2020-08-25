@@ -219,7 +219,7 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.width           = wp->skin.width / 3;
   wp->w.height          = wp->skin.height;
-  wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE
+  wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
   wp->w.tips_timeout    = 0;

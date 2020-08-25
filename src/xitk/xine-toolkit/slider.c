@@ -969,7 +969,7 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
   wp->w.have_focus       = FOCUS_LOST;
   wp->w.width            = wp->bg_skin.width;
   wp->w.height           = wp->bg_skin.height;
-  wp->w.type             = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_CLICKABLE
+  wp->w.type             = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_CLICKABLE
                          | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event            = notify_event;
   wp->w.tips_timeout     = 0;

@@ -697,7 +697,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->w.y               = info->y;
   wp->w.width           = wp->skin.width / 3;
   wp->w.height          = wp->skin.height;
-  wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE
+  wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
   wp->w.tips_timeout    = 0;
