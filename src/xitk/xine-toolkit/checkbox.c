@@ -36,6 +36,7 @@ typedef struct {
   int                    cClicked;
   int                    focus;
   int                    cState;
+  int                    num_gfx;
   xitk_part_image_t      skin;
 
   xitk_state_callback_t  callback;
@@ -81,12 +82,13 @@ static int _notify_inside (_checkbox_private_t *wp, int x, int y) {
  */
 static void _paint_checkbox (_checkbox_private_t *wp) {
   if (wp->w.visible == 1) {
-    int checkbox_width = wp->skin.width / 3;
-    int mode = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
-             ? (wp->cClicked || wp->cState ? 2 /* focused, clicked or checked */ : 1 /* focused, unchecked */)
-             : (wp->cState ? 2 /* unfocused, checked */ : 0 /* unfocused, unchecked */);
+    static const uint8_t i[] = {0, 2, 0, 2, 1, 2, 2, 2,  0, 1, 0, 1, 2, 3, 2, 3};
+    int checkbox_width = wp->skin.width / wp->num_gfx;
+    int mode = (wp->num_gfx == 4 ? 8 : 0)
+             + ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN) ? 4 : 0)
+             + (wp->cClicked ? 2 : 0) + (wp->cState ? 1 : 0);
     xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
-      mode * checkbox_width, 0, checkbox_width, wp->skin.height, wp->w.x, wp->w.y);
+      i[mode] * checkbox_width, 0, checkbox_width, wp->skin.height, wp->w.x, wp->w.y);
   }
 }
 
@@ -274,6 +276,7 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
   wp->w.wl       = wl;
   wp->skin_element_name = cb->skin_element_name == NULL ? NULL : strdup (cb->skin_element_name);
   _xitk_checkbox_get_skin (wp, skonfig);
+  wp->num_gfx = 3;
 
   return _xitk_checkbox_create (wp, cb);
 }
@@ -312,10 +315,12 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
   }
   if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
     /* default is not shared, caller may want to paint it over. */
+    wp->num_gfx = 3;
     i = xitk_image_create_image (wl->xitk, width * 3, height);
     draw_checkbox_check (i);
   } else {
-    if (xitk_shared_image (wl, noskin_names[u], width * 3, height, &i) == 1) {
+    wp->num_gfx = u == 6 ? 4 : 3;
+    if (xitk_shared_image (wl, noskin_names[u], width * wp->num_gfx, height, &i) == 1) {
       switch (u) {
         case 0:
           draw_bevel_three_state (i);

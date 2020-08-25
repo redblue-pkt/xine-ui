@@ -1332,7 +1332,8 @@ static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked)
   ImlibData     *im = p->image->imlibdata;
 
   /* background */
-  pixmap_fill_rectangle(p->image, x, y, d, d, xitk_get_pixel_color_lightgray(p->xitk));
+  pixmap_fill_rectangle (p->image, x, y, d, d,
+    (checked & 2) ? xitk_get_pixel_color_white (p->xitk) : xitk_get_pixel_color_lightgray (p->xitk));
   /* */
   XLOCK (im->x.x_lock_display, im->x.disp);
   XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(p->xitk));
@@ -1346,7 +1347,7 @@ static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked)
   XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + d, y, x + d, y + d);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
   
-  if(checked) {
+  if (checked & 1) {
     XLOCK (im->x.x_lock_display, im->x.disp);
     XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(p->xitk));
     XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + (d / 5), (y + ((d / 3) * 2)) - 2, x + (d / 2), y + d - 2);
@@ -1599,10 +1600,14 @@ void draw_checkbox_check(xitk_image_t *p) {
   switch(style) {
     
   case CHECK_STYLE_CHECK:
-    {
-      int w;
-      
-      w = p->width / 3;
+    if (p->width == p->height * 4) {
+      int w = p->width / 4;
+      _draw_check_check (p, w * 0, 0, p->height, 0);
+      _draw_check_check (p, w * 1, 0, p->height, 1);
+      _draw_check_check (p, w * 2, 0, p->height, 2);
+      _draw_check_check (p, w * 3, 0, p->height, 3);
+    } else {
+      int w = p->width / 3;
       _draw_check_check(p, 0, 0, p->height, 0);
       _draw_check_check(p, w, 0, p->height, 0);
       _draw_check_check(p, w * 2, 0, p->height, 1);
