@@ -1280,7 +1280,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
 
   wp->w.running         = 1;
   wp->w.have_focus      = FOCUS_LOST;
-  wp->w.type            = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE
+  wp->w.type            = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
   wp->w.tips_timeout    = 0;

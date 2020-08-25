@@ -250,7 +250,7 @@ static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_check
 
   wp->w.running       = 1;
   wp->w.have_focus    = FOCUS_LOST;
-  wp->w.type          = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;
+  wp->w.type          = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_KEYABLE;
   wp->w.event         = notify_event;
   wp->w.tips_timeout  = 0;
   wp->w.tips_string   = NULL;

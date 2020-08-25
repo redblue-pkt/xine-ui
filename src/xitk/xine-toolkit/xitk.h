@@ -270,9 +270,11 @@ typedef struct {
  *                     1111111111111 <widget> <13 types>
 */
 /* Group of widgets widget */
-#define WIDGET_GROUP                0x80000000
+#define WIDGET_GROUP                0x00001000
 /* Grouped widget, itself */
-#define WIDGET_GROUP_MEMBER         0x40000000
+#define WIDGET_GROUP_MEMBER         0x80000000
+/* Does widget take part in tab cycle */
+#define WIDGET_TABABLE              0x40000000
 /* Is widget focusable */
 #define WIDGET_FOCUSABLE            0x20000000
 /* Is widget clickable */

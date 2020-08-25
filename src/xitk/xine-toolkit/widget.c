@@ -967,6 +967,8 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
       continue;
     if (!w->visible)
       continue;
+    if (w->type & WIDGET_GROUP)
+      continue;
     d = x - w->x;
     if ((d < 0) || (d >= w->width))
       continue;
@@ -1267,7 +1269,7 @@ static xitk_widget_t *xitk_find_nextprev_focus (xitk_widget_list_t *wl, int back
     return NULL;
   n = 0;
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
-    if (!(w->type & WIDGET_FOCUSABLE) || !w->enable || !w->visible || !w->width || !w->height)
+    if (!(w->type & WIDGET_TABABLE) || !w->enable || !w->visible || !w->width || !w->height)
       continue;
     xine_sarray_add (a, w);
     n += 1;
@@ -1280,7 +1282,10 @@ static xitk_widget_t *xitk_find_nextprev_focus (xitk_widget_list_t *wl, int back
   i = backward ? 0 : n - 1;
   w = wl->widget_focused;
   if (w) {
-    int j = xine_sarray_binary_search (a, w);
+    int j;
+    if (!(w->type & WIDGET_TABABLE) && w->parent && (w->parent->type & WIDGET_TABABLE))
+      w = w->parent;
+    j = xine_sarray_binary_search (a, w);
     if (j >= 0)
       i = j;
   }
@@ -1311,7 +1316,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     return;
 
   if (wl->widget_focused) {
-    if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
+    if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
         (wl->widget_focused->enable == WIDGET_ENABLE)) {
       event.type  = WIDGET_EVENT_FOCUS;
       event.focus = FOCUS_LOST;
@@ -1325,8 +1330,9 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
         
   xitk_tips_hide_tips (wl->xitk->tips);
 
-  if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
+  if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
       (wl->widget_focused->enable == WIDGET_ENABLE)) {
+    /* NOTE: this may redirect focus to a group member. rereaad wl->widget_focused. */
     event.type  = WIDGET_EVENT_FOCUS;
     event.focus = FOCUS_RECEIVED;
     (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
