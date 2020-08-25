@@ -1250,11 +1250,14 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 static int xitk_widget_pos_cmp (void *a, void *b) {
   xitk_widget_t *d = (xitk_widget_t *)a;
   xitk_widget_t *e = (xitk_widget_t *)b;
-  int gd = d->parent ? ((uint32_t)d->parent->y << 16) + (uint32_t)d->parent->x : 0;
-  int ge = e->parent ? ((uint32_t)e->parent->y << 16) + (uint32_t)e->parent->x : 0;
-  int diff = gd - ge;
-  if (diff)
-    return diff;
+  int gd, ge;
+  /* sort widgets by center top down then left right. keep groups together. */
+  if (d->parent != e->parent) {
+    if (d->parent)
+      d = d->parent;
+    if (e->parent)
+      e = e->parent;
+  }
   gd = ((uint32_t)(d->y + (d->height >> 1)) << 16) + d->x + (d->width >> 1);
   ge = ((uint32_t)(e->y + (e->height >> 1)) << 16) + e->x + (e->width >> 1);
   return gd - ge;
