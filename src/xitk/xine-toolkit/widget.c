@@ -1339,6 +1339,8 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     event.type  = WIDGET_EVENT_FOCUS;
     event.focus = FOCUS_RECEIVED;
     (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
+    if (!wl->widget_focused)
+      return;
     wl->widget_focused->have_focus = FOCUS_RECEIVED;
     event.type = WIDGET_EVENT_PAINT;
     (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
