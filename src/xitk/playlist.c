@@ -565,6 +565,13 @@ static void _playlist_handle_button_event (void *data, const xitk_button_event_t
 }
 
 static void _playlist_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  static const char t[4][3] = {
+    {XITK_CTRL_KEY_PREFIX, XITK_KEY_UP, 0},
+    {XITK_CTRL_KEY_PREFIX, XITK_KEY_DOWN, 0},
+    {XITK_CTRL_KEY_PREFIX, XITK_KEY_PREV, 0},
+    {XITK_CTRL_KEY_PREFIX, XITK_KEY_NEXT, 0}
+  };
+  const char *s;
   xui_playlist_t *pl = data;
 
   if (!pl)
@@ -574,28 +581,21 @@ static void _playlist_handle_key_event(void *data, const xitk_key_event_t *ke) {
     xitk_widget_t *w;
 
     switch (ke->key_pressed) {
-      case XK_Down:
-      case XK_Next:
-        mmk_editor_end();
-        w = xitk_get_focused_widget (pl->widget_list);
-        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-          if (ke->key_pressed == XK_Down)
-            xitk_browser_step_up (pl->playlist, NULL);
-          else
-            xitk_browser_page_up (pl->playlist, NULL);
-        }
-        break;
-
       case XK_Up:
+        s = t[0];
+      case XK_Down:
+        s = t[1];
+        goto _move_browser;
       case XK_Prior:
+        s = t[2];
+        goto _move_browser;
+      case XK_Next:
+        s = t[3];
+      _move_browser:
         mmk_editor_end();
         w = xitk_get_focused_widget (pl->widget_list);
-        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-          if (ke->key_pressed == XK_Up)
-            xitk_browser_step_down (pl->playlist, NULL);
-          else
-            xitk_browser_page_down (pl->playlist, NULL);
-        }
+        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER))))
+          xitk_widget_key_event (pl->playlist, s, ke->modifiers);
         break;
 
       case XK_Escape:

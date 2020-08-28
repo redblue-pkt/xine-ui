@@ -2310,3 +2310,26 @@ void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi) {
   if (wl && wi)
     xitk_dlist_add_tail (&wl->list, &wi->node);
 }
+
+int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
+  widget_event_t event;
+  int handled;
+
+  if (!w || !string)
+    return 0;
+  if (!string[0])
+    return 0;
+
+  event.type = WIDGET_EVENT_NEW_KEY;
+  event.string = string;
+  event.modifier = modifier;
+  handled = 0;
+
+  if (w->type & WIDGET_NEW_KEYABLE)
+    handled = w->event (w, &event, NULL);
+
+  if (!handled && w->parent && (w->parent->type & WIDGET_NEW_KEYABLE))
+    handled = w->parent->event (w->parent, &event, NULL);
+
+  return handled;
+}

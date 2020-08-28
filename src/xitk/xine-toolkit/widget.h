@@ -66,6 +66,7 @@ typedef struct {
 #define WIDGET_EVENT_TIPS_TIMEOUT   10
 #define WIDGET_EVENT_CLIP_READY     11
 #define WIDGET_EVENT_PARTIAL_PAINT  12
+#define WIDGET_EVENT_NEW_KEY        13
 
 typedef struct {
   int                   type; /* See WIDGET_EVENT_x */
@@ -77,6 +78,8 @@ typedef struct {
   int                   focus;
   
   unsigned long         tips_timeout;
+
+  const char           *string;
 
   XEvent               *xevent;
 
@@ -207,4 +210,3 @@ static int displ;
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
 
 #endif
-
