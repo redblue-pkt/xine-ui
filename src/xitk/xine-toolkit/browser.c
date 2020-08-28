@@ -625,10 +625,160 @@ static void _browser_enability (_browser_private_t *wp) {
   }
 }
 
+/*
+ * Jump to entry in list which match with the alphanum char key.
+ */
+static int _browser_warp_jump (_browser_private_t *wp, const char *key, int modifier) {
+  int i, v;
+  size_t klen;
+
+  if ((modifier & ~MODIFIER_NUML) == MODIFIER_NOMOD) {
+    v = _browser_get_current_item (wp, &i);
+    klen = strlen (key);
+    for (i = v + 1; i < wp->items.num; i++) {
+      if (!strncasecmp (wp->items.names[i], key, klen))
+        break;
+    }
+    if (i >= wp->items.num) {
+      for (i = 0; i < v; i++) {
+        if (!strncasecmp (wp->items.names[i], key, klen))
+          break;
+      }
+      if (i >= v)
+        return 1;
+    }
+  } else if ((modifier & ~MODIFIER_NUML) == MODIFIER_SHIFT) {
+    v = _browser_get_current_item (wp, &i);
+    klen = strlen (key);
+    for (i = v - 1; i >= 0; i--) {
+      if (!strncasecmp (wp->items.names[i], key, klen))
+        break;
+    }
+    if (i < 0) {
+      for (i = wp->items.num - 1; i > v; i--) {
+        if (!strncasecmp (wp->items.names[i], key, klen))
+          break;
+      }
+      if (i <= v)
+        return 1;
+    }
+  } else {
+    return 0;
+  }
+
+  _browser_move (wp, i - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_vslider (wp);
+  wp->items.last_over = i;
+  v = _browser_item_2_visible (wp, i);
+  _browser_set_focus (wp, v);
+
+  return 1;
+}
+
+static void _browser_hslidmove (_browser_private_t *wp, int pos) {
+  if (wp->visible.xmax) {
+    if (pos != wp->visible.dx) {
+      int i;
+      wp->visible.dx = pos;
+      for (i = 0; i < wp->visible.num; i++) {
+        xitk_hide_widget (wp->visible.btns[i + WBSTART]);
+        xitk_labelbutton_set_label_offset (wp->visible.btns[i + WBSTART], -pos);
+        xitk_show_widget (wp->visible.btns[i + WBSTART]);
+      }
+    }
+  } else {
+    xitk_slider_reset (wp->visible.btns[WSLIDH]);
+  }
+}
+
+
+static int _browser_key (_browser_private_t *wp, const char *string, int modifier) {
+  if ((wp->w.enable != WIDGET_ENABLE) || !string)
+    return 0;
+
+  if (string[0] != XITK_CTRL_KEY_PREFIX)
+    return _browser_warp_jump (wp, string, modifier);
+
+  if ((modifier & ~MODIFIER_NUML) != MODIFIER_NOMOD)
+    return 0;
+
+  switch (string[1]) {
+    int v, f;
+    case XITK_KEY_LEFT:
+      xitk_slider_make_backstep (wp->visible.btns[WSLIDH]);
+      _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+      return 1;
+    case XITK_KEY_RIGHT:
+      xitk_slider_make_step (wp->visible.btns[WSLIDH]);
+      _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+      return 1;
+
+    case XITK_KEY_HOME:
+      _browser_get_current_item (wp, &f);
+      v = 0;
+      goto _key_move;
+    case XITK_KEY_END:
+      _browser_get_current_item (wp, &f);
+      v = wp->items.num - 1;
+      if (v < 0)
+        v = 0;
+      goto _key_move;
+
+    case XITK_KEY_PREV:
+      v = _browser_get_current_item (wp, &f) - wp->visible.num;
+      if (v < 0)
+        v = wp->visible.start;
+      goto _key_move;
+    case XITK_KEY_NEXT:
+      v = _browser_get_current_item (wp, &f) + wp->visible.num;
+      if (v >= wp->items.num) {
+        v = wp->items.num - 1;
+        if (v < 0)
+          v = 0;
+      }
+      goto _key_move;
+
+    case XITK_KEY_UP:
+      v = _browser_get_current_item (wp, &f) - 1;
+      if (v < 0)
+        v = wp->visible.start;
+      goto _key_move;
+    case XITK_KEY_DOWN:
+      v = _browser_get_current_item (wp, &f) + 1;
+      if (v >= wp->items.num) {
+        v = wp->items.num - 1;
+        if (v < 0)
+          v = 0;
+      }
+    _key_move:
+      _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
+      _browser_set_vslider (wp);
+      wp->items.last_over = v;
+      v = _browser_item_2_visible (wp, v);
+      if (f)
+        _browser_set_focus (wp, v);
+      return 1;
+
+    case XITK_MOUSE_WHEEL_UP:
+      v = -1;
+      goto _mouse_move;
+    case XITK_MOUSE_WHEEL_DOWN:
+      v = 1;
+    _mouse_move:
+      _browser_move (wp, v);
+      _browser_set_vslider (wp);
+      wp->items.last_over = -1;
+      return 1;
+
+    default: ;
+  }
+  return 0;
+}
+
 static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _browser_private_t *wp = (_browser_private_t *)w;
 
-  if (!wp)
+  if (!wp || !event)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
     return 0;
@@ -637,6 +787,8 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
     case WIDGET_EVENT_PAINT:
       _browser_paint (wp);
       break;
+    case WIDGET_EVENT_NEW_KEY:
+      return _browser_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_FOCUS:
       _browser_focus (wp, event->focus);
       break;
@@ -804,21 +956,6 @@ static void browser_slidmove(xitk_widget_t *w, void *data, int pos) {
   _browser_slidmove (wp, pos);
 }
 
-static void _browser_hslidmove (_browser_private_t *wp, int pos) {
-  if (wp->visible.xmax) {
-    if (pos != wp->visible.dx) {
-      int i;
-      wp->visible.dx = pos;
-      for (i = 0; i < wp->visible.num; i++) {
-        xitk_hide_widget (wp->visible.btns[i + WBSTART]);
-        xitk_labelbutton_set_label_offset (wp->visible.btns[i + WBSTART], -pos);
-        xitk_show_widget (wp->visible.btns[i + WBSTART]);
-      }
-    }
-  } else {
-    xitk_slider_reset (wp->visible.btns[WSLIDH]);
-  }
-}
 static void browser_hslidmove(xitk_widget_t *w, void *data, int pos) {
   _browser_private_t *wp = (_browser_private_t *)data;
     
@@ -859,134 +996,6 @@ static void browser_down(xitk_widget_t *w, void *data) {
   _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
 }
 
-/**
- * slide up (extern).
- */
-void xitk_browser_step_up(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  int v, f;
-
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-
-  v = _browser_get_current_item (wp, &f) + 1;
-  if (v >= wp->items.num) {
-    v = wp->items.num - 1;
-    if (v < 0)
-      v = 0;
-  }
-  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
-  wp->items.last_over = v;
-  v = _browser_item_2_visible (wp, v);
-  if (f)
-    _browser_set_focus (wp, v);
-}
-
-void xitk_browser_page_up(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  int v, f;
-
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-
-  v = _browser_get_current_item (wp, &f) + wp->visible.num;
-  if (v >= wp->items.num) {
-    v = wp->items.num - 1;
-    if (v < 0)
-      v = 0;
-  }
-  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
-  wp->items.last_over = v;
-  v = _browser_item_2_visible (wp, v);
-  if (f)
-    _browser_set_focus (wp, v);
-}
-
-/**
- * slide Down (extern).
- */
-void xitk_browser_step_down(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  int v, f;
-
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-    
-  v = _browser_get_current_item (wp, &f) - 1;
-  if (v < 0)
-    v = wp->visible.start;
-  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
-  wp->items.last_over = v;
-  v = _browser_item_2_visible (wp, v);
-  if (f)
-    _browser_set_focus (wp, v);
-}
-
-void xitk_browser_page_down(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  int v, f;
-
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-    
-  v = _browser_get_current_item (wp, &f) - wp->visible.num;
-  if (v < 0)
-    v = wp->visible.start;
-  _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
-  wp->items.last_over = v;
-  v = _browser_item_2_visible (wp, v);
-  if (f)
-    _browser_set_focus (wp, v);
-}
-
-/**
- * slide left (extern).
- */
-void xitk_browser_step_left(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-    
-  xitk_slider_make_backstep (wp->visible.btns[WSLIDH]);
-  _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
-}
-
-/**
- * slide right (extern).
- */
-void xitk_browser_step_right(xitk_widget_t *w, void *data) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
-  (void)data;
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-    
-  xitk_slider_make_step (wp->visible.btns[WSLIDH]);
-  _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
-}
-
 static void browser_left(xitk_widget_t *w, void *data) {
   _browser_private_t *wp = (_browser_private_t *)data;
  
@@ -1009,69 +1018,6 @@ static void browser_right(xitk_widget_t *w, void *data) {
   
   xitk_slider_make_step (wp->visible.btns[WSLIDH]);
   _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
-}
-
-/*
- *
- */
-xitk_widget_t *xitk_browser_get_browser (xitk_widget_t *w) {
-  if (!w)
-    return NULL;
-  if (!(w->type & WIDGET_GROUP_BROWSER))
-    return NULL;
-  return w->parent;
-}
-
-/*
- * Jump to entry in list which match with the alphanum char key.
- */
-void xitk_browser_warp_jump(xitk_widget_t *w, const char *key, int modifier) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  int i, v;
-
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
-    return;
-
-  v = _browser_get_current_item (wp, &i);
-  
-  if ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-    size_t klen = strlen (key);
-    for (i = v + 1; i < wp->items.num; i++) {
-      if (!strncasecmp (wp->items.names[i], key, klen))
-        break;
-    }
-    if (i >= wp->items.num) {
-      for (i = 0; i < v; i++) {
-        if (!strncasecmp (wp->items.names[i], key, klen))
-          break;
-      }
-      if (i >= v)
-        return;
-    }
-  } else if (modifier & MODIFIER_SHIFT) {
-    size_t klen = strlen (key);
-    for (i = v - 1; i >= 0; i--) {
-      if (!strncasecmp (wp->items.names[i], key, klen))
-        break;
-    }
-    if (i < 0) {
-      for (i = wp->items.num - 1; i > v; i--) {
-        if (!strncasecmp (wp->items.names[i], key, klen))
-          break;
-      }
-      if (i <= v)
-        return;
-    }
-  } else {
-    return;
-  }
-  _browser_move (wp, i - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
-  wp->items.last_over = i;
-  v = _browser_item_2_visible (wp, i);
-  _browser_set_focus (wp, v);
 }
 
 /**
@@ -1099,7 +1045,7 @@ static xitk_widget_t *_xitk_browser_create (_browser_private_t *wp, xitk_browser
   wp->w.running = 1;
   wp->w.have_focus = FOCUS_LOST;
 
-  wp->w.type = WIDGET_TABABLE /* | WIDGET_KEYABLE */ | WIDGET_GROUP | WIDGET_TYPE_BROWSER;
+  wp->w.type = WIDGET_TABABLE | WIDGET_NEW_KEYABLE | WIDGET_GROUP | WIDGET_TYPE_BROWSER;
   wp->w.event = browser_notify_event;
   wp->w.tips_timeout = 0;
   wp->w.tips_string = NULL;

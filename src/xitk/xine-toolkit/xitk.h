@@ -126,6 +126,55 @@ typedef void (*xitk_signal_callback_t)(int, void *);
  */
 typedef int xitk_register_key_t;
 
+#define XITK_CTRL_KEY_PREFIX 1
+typedef enum {
+  XITK_KEY_ESCAPE = 1,
+  XITK_KEY_RETURN,
+  XITK_KEY_NUMPAD_ENTER,
+  XITK_KEY_ISO_ENTER,
+  XITK_KEY_LEFT,
+  XITK_KEY_RIGHT,
+  XITK_KEY_UP,
+  XITK_KEY_DOWN,
+  XITK_KEY_HOME,
+  XITK_KEY_END,
+  XITK_KEY_PAGE_UP,
+  XITK_KEY_PAGE_DOWN,
+  XITK_KEY_TAB,
+  XITK_KEY_KP_TAB,
+  XITK_KEY_ISO_LEFT_TAB,
+  XITK_KEY_INSERT,
+  XITK_KEY_DELETE,
+  XITK_KEY_BACKSPACE,
+  XITK_KEY_PRINT,
+  XITK_KEY_ROLL,
+  XITK_KEY_PAUSE,
+  XITK_KEY_F1,
+  XITK_KEY_F2,
+  XITK_KEY_F3,
+  XITK_KEY_F4,
+  XITK_KEY_F5,
+  XITK_KEY_F6,
+  XITK_KEY_F7,
+  XITK_KEY_F8,
+  XITK_KEY_F9,
+  XITK_KEY_F10,
+  XITK_KEY_F11,
+  XITK_KEY_F12,
+  XITK_KEY_PREV,
+  XITK_KEY_NEXT,
+  XITK_KEY_ABORT,
+  XITK_KEY_MENU,
+  XITK_KEY_HELP,
+
+  XITK_MOUSE_WHEEL_UP,
+  XITK_MOUSE_WHEEL_DOWN,
+
+  XITK_KEY_LASTCODE
+} xitk_ctrl_key_t;
+
+int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier);
+
 /*
  * event callbacks
  */
@@ -259,18 +308,8 @@ typedef struct {
   xitk_part_image_t slider_pixmap_pad_img;
 } xitk_skin_element_info_t;
 
-/*
- *  1 <widget group >
- *   1 <The groupped widget>
- *    1 <focusable>
- *     1 <clickable>
- *      1 <support key events>
- *       1 <support for partial repaint>
- *        1111111111111 <group types>         <13 types>
- *                     1111111111111 <widget> <13 types>
-*/
 /* Group of widgets widget */
-#define WIDGET_GROUP                0x00001000
+#define WIDGET_GROUP                0x00000800
 /* Grouped widget, itself */
 #define WIDGET_GROUP_MEMBER         0x80000000
 /* Does widget take part in tab cycle */
@@ -281,30 +320,31 @@ typedef struct {
 #define WIDGET_CLICKABLE            0x10000000
 /* Widget support key events */
 #define WIDGET_KEYABLE              0x08000000
+#define WIDGET_NEW_KEYABLE          0x04000000
 /* Widget support partial repaint */
-#define WIDGET_PARTIAL_PAINTABLE    0x04000000
+#define WIDGET_PARTIAL_PAINTABLE    0x02000000
 
 /* Grouped widgets */
-#define WIDGET_GROUP_MASK           0x03FFE000
-#define WIDGET_GROUP_BROWSER        0x00002000
-#define WIDGET_GROUP_MRLBROWSER     0x00004000
-#define WIDGET_GROUP_COMBO          0x00008000
-#define WIDGET_GROUP_TABS           0x00010000
-#define WIDGET_GROUP_INTBOX         0x00020000
-#define WIDGET_GROUP_DOUBLEBOX      0x00040000
-#define WIDGET_GROUP_MENU           0x00080000
-#define WIDGET_GROUP_BUTTON_LIST    0x00100000
+#define WIDGET_GROUP_MASK           0x01fff000
+#define WIDGET_GROUP_BROWSER        0x00001000
+#define WIDGET_GROUP_MRLBROWSER     0x00002000
+#define WIDGET_GROUP_COMBO          0x00004000
+#define WIDGET_GROUP_TABS           0x00008000
+#define WIDGET_GROUP_INTBOX         0x00010000
+#define WIDGET_GROUP_DOUBLEBOX      0x00020000
+#define WIDGET_GROUP_MENU           0x00040000
+#define WIDGET_GROUP_BUTTON_LIST    0x00080000
 
-#define WIDGET_TYPE_MASK            0x00001FFF
+#define WIDGET_TYPE_MASK            0x00000fff
 /* Group leaders.. */
-#define WIDGET_TYPE_COMBO           0x00001001
-#define WIDGET_TYPE_DOUBLEBOX       0x00001002
-#define WIDGET_TYPE_INTBOX          0x00001003
-#define WIDGET_TYPE_BROWSER         0x00001004
-#define WIDGET_TYPE_MRLBROWSER      0x00001005
-#define WIDGET_TYPE_TABS            0x00001006
-#define WIDGET_TYPE_MENU            0x00001007
-#define WIDGET_TYPE_BUTTON_LIST     0x00001008
+#define WIDGET_TYPE_COMBO           0x00000801
+#define WIDGET_TYPE_DOUBLEBOX       0x00000802
+#define WIDGET_TYPE_INTBOX          0x00000803
+#define WIDGET_TYPE_BROWSER         0x00000804
+#define WIDGET_TYPE_MRLBROWSER      0x00000805
+#define WIDGET_TYPE_TABS            0x00000806
+#define WIDGET_TYPE_MENU            0x00000807
+#define WIDGET_TYPE_BUTTON_LIST     0x00000808
 /* Real widgets. */
 #define WIDGET_TYPE_BUTTON          0x00000001
 #define WIDGET_TYPE_LABELBUTTON     0x00000002

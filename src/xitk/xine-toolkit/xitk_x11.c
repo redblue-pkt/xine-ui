@@ -33,11 +33,15 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include <stdint.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xresource.h>
+#include <X11/keysym.h>
 
 #include <xine/xineutils.h> /* xine_get_homedir() */
+#include <xine/sorted_array.h>
 
 #include "_xitk.h" /* xitk_get_bool_value */
 
@@ -45,6 +49,11 @@
 
 #include "../../common/dump.h"
 #include "../../common/dump_x11.h"
+
+struct xitk_x11_s {
+  xine_sarray_t *ctrl_keysyms1;
+  uint8_t ctrl_keysyms2[XITK_KEY_LASTCODE];
+};
 
 /*
 *
@@ -444,3 +453,116 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
   
   return (*modifier != MODIFIER_NOMOD);
 }
+
+static int _xitk_x11_ctrl_keysyms_cmp (void *a, void *b) {
+  const unsigned int d = (const unsigned int)(uintptr_t)a;
+  const unsigned int e = (const unsigned int)(uintptr_t)b;
+  return d < e ? -1 : d > e ? 1 : 0;
+}
+
+xitk_x11_t *xitk_x11_new (void) {
+  static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
+    0,
+    XK_Escape,
+    XK_Return,
+    XK_KP_Enter,
+    XK_ISO_Enter,
+    XK_Left,
+    XK_Right,
+    XK_Up,
+    XK_Down,
+    XK_Home,
+    XK_End,
+    XK_Page_Up,
+    XK_Page_Down,
+    XK_Tab,
+    XK_KP_Tab,
+    XK_ISO_Left_Tab,
+    XK_Insert,
+    XK_Delete,
+    XK_BackSpace,
+    XK_Print,
+    XK_Scroll_Lock,
+    XK_Pause,
+    XK_F1,
+    XK_F2,
+    XK_F3,
+    XK_F4,
+    XK_F5,
+    XK_F6,
+    XK_F7,
+    XK_F8,
+    XK_F9,
+    XK_F10,
+    XK_F11,
+    XK_F12,
+    XK_Prior,
+    XK_Next,
+    XK_Cancel,
+    XK_Menu,
+    XK_Help,
+    0xffffffff,
+    0xffffffff
+  };
+  xitk_x11_t *xitk_x11 = malloc (sizeof (*xitk_x11));
+
+  if (!xitk_x11)
+    return NULL;
+
+  xitk_x11->ctrl_keysyms1 = xine_sarray_new (XITK_KEY_LASTCODE, _xitk_x11_ctrl_keysyms_cmp);
+  if (xitk_x11->ctrl_keysyms1) {
+    int i;
+    for (i = 0; i < XITK_KEY_LASTCODE; i++)
+      xine_sarray_add (xitk_x11->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[i]);
+    for (i = 0; i < XITK_KEY_LASTCODE; i++) {
+      int j = xine_sarray_binary_search (xitk_x11->ctrl_keysyms1, (void *)(uintptr_t)ctrl_syms[i]);
+      if (j)
+        xitk_x11->ctrl_keysyms2[j] = i;
+    }
+  }
+
+  return xitk_x11;
+}
+
+void xitk_x11_delete (xitk_x11_t *xitk_x11) {
+  if (!xitk_x11)
+    return;
+
+  xine_sarray_delete (xitk_x11->ctrl_keysyms1);
+  xitk_x11->ctrl_keysyms1 = NULL;
+
+  free (xitk_x11);
+}
+
+int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksym, int *modifier, char *buf, int bsize) {
+  int i, len;
+  KeySym _ksym;
+
+  if (!xitk_x11 || !event || !buf || (bsize < 3))
+    return 0;
+  if (!ksym)
+    ksym = &_ksym;
+
+  if (modifier)
+    xitk_get_key_modifier (event, modifier);
+
+  *ksym = XK_VoidSymbol;
+  XLOCK (xitk_x_lock_display, event->xany.display);
+  /* ksym = XLookupKeysym (&event->xkey, 0); */
+  len = XLookupString (&event->xkey, buf, bsize - 1, ksym, NULL);
+  XUNLOCK (xitk_x_unlock_display, event->xany.display);
+
+  i = xine_sarray_binary_search (xitk_x11->ctrl_keysyms1, (void *)(uintptr_t)(*ksym));
+  if (i >= 0) {
+    buf[0] = XITK_CTRL_KEY_PREFIX;
+    buf[1] = xitk_x11->ctrl_keysyms2[i];
+    len = 2;
+  }
+
+  if (len < 0)
+    len = 0;
+  buf[len] = 0;
+
+  return len;
+}
+

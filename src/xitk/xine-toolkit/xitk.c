@@ -60,9 +60,7 @@
 #include "_xitk.h"
 #include "tips.h"
 #include "menu.h"
-#include "slider.h"
 #include "combo.h"
-#include "browser.h"
 
 #define _XITK_CLIPBOARD_DEBUG
 
@@ -177,6 +175,8 @@ static int __gfx_safe_lock (__gfx_t *fx) {
 
 typedef struct {
   xitk_t                      x;
+
+  xitk_x11_t                 *xitk_x11;
 
   int                         display_width;
   int                         display_height;
@@ -736,6 +736,8 @@ static void xitk_signal_handler(int sig) {
       xitk_dlist_clear (&xitk->wlists);
       xitk_dlist_clear (&xitk->gfxs);
       xitk_config_deinit (xitk->config);
+      xitk_x11_delete (xitk->xitk_x11);
+      xitk->xitk_x11 = NULL;
       XITK_FREE (xitk);
       gXitk = NULL;
       exit(1);
@@ -1812,6 +1814,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
   */
 
   while (fx->node.next) {
+    int handled = 0;
 
     if(event->type == KeyRelease)
       gettimeofday (&xitk->keypress, 0);
@@ -1840,29 +1843,34 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  KeySym         mykey;
 	  char           kbuf[256];
 	  int            modifier;
-	  int            handled = 0;
-	  xitk_widget_t *w = NULL;
-	  
-	  xitk_get_key_modifier(event, &modifier);
-          xitk_get_keysym_and_buf(event, &mykey, kbuf, sizeof(kbuf));
+          xitk_widget_t *w;
 
           xitk_tips_hide_tips(xitk->x.tips);
-	  
-	  if(fx->widget_list && fx->widget_list->widget_focused) {
-	    w = fx->widget_list->widget_focused;
-	  }
 
-	  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
-		   (mykey != XK_Tab) && (mykey != XK_KP_Tab) && (mykey != XK_ISO_Left_Tab))) {
-	    
+          w = fx->widget_list && fx->widget_list->widget_focused ? fx->widget_list->widget_focused : NULL;
+
+          xitk_x11_keyevent_2_string (xitk->xitk_x11, event, &mykey, &modifier, kbuf, sizeof (kbuf));
+          handled = xitk_widget_key_event (w, kbuf, modifier);
+
+          if (!handled && (kbuf[0] == XITK_CTRL_KEY_PREFIX)) {
+            if ((kbuf[1] == XITK_KEY_TAB) || (kbuf[1] == XITK_KEY_KP_TAB) || (kbuf[1] == XITK_KEY_ISO_LEFT_TAB)) {
+              if (fx->widget_list) {
+                handled = 1;
+                xitk_set_focus_to_next_widget (fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
+              }
+            }
+          }
+
+          if (!handled && w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
+
 	    xitk_send_key_event(w, event, modifier);
-	    
+
 	    if((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
 	      widget_event_t  event;
-	      
+
 	      event.type = WIDGET_EVENT_PAINT;
 	      (void) w->event(w, &event, NULL);
-	      
+
               xitk_set_focus_to_next_widget(fx->widget_list, 0, modifier);
 	    }
 
@@ -1878,13 +1886,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
               xitk_destroy_widget(m);
 	      FXUNLOCK(fx);
 	      return;
-	    }
-	  }
-	  /* set focus to next widget */
-	  else if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
-	    if(fx->widget_list) {
-	      handled = 1;
-              xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
 	    }
 	  }
 	  /* simulate click event on space/return/enter key event */
@@ -1921,43 +1922,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      }
 	    }
 	  }
-	  /* move sliders, handle menu items */
+          /* handle menu items */
 	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
 		   || (mykey == XK_Up) || (mykey == XK_Down)
 		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
-		  && ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD)) {
-	    
-            if (w && (w->type & WIDGET_GROUP_BROWSER)) {
-	      xitk_widget_t *b = xitk_browser_get_browser(w);
-	      
-	      if(b) {
-		handled = 1;
-		if(mykey == XK_Up)
-		  xitk_browser_step_down(b, NULL);
-		else if(mykey == XK_Down)
-		  xitk_browser_step_up(b, NULL);
-		else if(mykey == XK_Left)
-		  xitk_browser_step_left(b, NULL);
-		else if(mykey == XK_Right)
-		  xitk_browser_step_right(b, NULL);
-		else if(mykey == XK_Prior)
-		  xitk_browser_page_down(b, NULL);
-		else if(mykey == XK_Next)
-		  xitk_browser_page_up(b, NULL);
-	      }
-	    }
-	    else if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) 
-			  && (w->type & WIDGET_KEYABLE))) {
-	      handled = 1;
-	      if((mykey == XK_Left) || (mykey == XK_Down) || (mykey == XK_Next)) {
-		xitk_slider_make_backstep(w);
-	      }
-	      else {
-		xitk_slider_make_step(w);
-	      }
-	      xitk_slider_callback_exec(w);
-	    }
-            else if (w && (w->type & WIDGET_GROUP_MENU)) {
+		  && ((modifier & ~MODIFIER_NUML) == MODIFIER_NOMOD)) {
+
+            if (w && (w->type & WIDGET_GROUP_MENU)) {
 	      handled = 1;
 	      if(mykey == XK_Left) {
 		/* close menu branch */
@@ -1974,35 +1945,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
                                                 ((mykey == XK_Up) || (mykey == XK_Prior)),
                                                 modifier);
 	      }
-	    }
-	  }
-	  else if((mykey == XK_0) || (mykey == XK_1) || (mykey == XK_2) || (mykey == XK_3) || 
-		  (mykey == XK_4) || (mykey == XK_5) || (mykey == XK_6) || (mykey == XK_7) || 
-		  (mykey == XK_8) || (mykey == XK_9) || 
-		  (mykey == XK_underscore) ||
-		  (mykey == XK_a) || (mykey == XK_A) || (mykey == XK_b) || (mykey == XK_B) ||
-		  (mykey == XK_c) || (mykey == XK_C) || (mykey == XK_d) || (mykey == XK_D) ||
-		  (mykey == XK_e) || (mykey == XK_E) || (mykey == XK_f) || (mykey == XK_F) ||
-		  (mykey == XK_g) || (mykey == XK_G) || (mykey == XK_h) || (mykey == XK_H) ||
-		  (mykey == XK_i) || (mykey == XK_I) || (mykey == XK_j) || (mykey == XK_J) ||
-		  (mykey == XK_k) || (mykey == XK_K) || (mykey == XK_l) || (mykey == XK_L) ||
-		  (mykey == XK_m) || (mykey == XK_M) || (mykey == XK_n) || (mykey == XK_N) ||
-		  (mykey == XK_o) || (mykey == XK_O) || (mykey == XK_p) || (mykey == XK_P) ||
-		  (mykey == XK_q) || (mykey == XK_Q) || (mykey == XK_r) || (mykey == XK_R) ||
-		  (mykey == XK_s) || (mykey == XK_S) || (mykey == XK_t) || (mykey == XK_T) ||
-		  (mykey == XK_u) || (mykey == XK_U) || (mykey == XK_v) || (mykey == XK_V) ||
-		  (mykey == XK_w) || (mykey == XK_W) || (mykey == XK_x) || (mykey == XK_X) ||
-		  (mykey == XK_y) || (mykey == XK_Y) || (mykey == XK_z) || (mykey == XK_Z)) {
-
-	    
-            if (w && (w->type & WIDGET_GROUP_BROWSER)) {
-	      xitk_widget_t *b = xitk_browser_get_browser(w);
-	      
-	      if(b) {
-		handled = 1;
-		xitk_browser_warp_jump(b, kbuf, modifier);
-	      }
-
 	    }
 	  }
 
@@ -2175,25 +2117,16 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 							       event->xbutton.y, 
 							       event->xbutton.button, 0,
                                                                modifier);
-	    if(event->xbutton.button != Button1) {
-	      xitk_widget_t *w = fx->widget_list->widget_focused;
+            if (event->xbutton.button != Button1)
+              fx->move.enabled = 0;
 
-	      fx->move.enabled = 0;
-	      
-              if (w && (w->type & WIDGET_GROUP_BROWSER)) {
-		xitk_widget_t *b = xitk_browser_get_browser(w);
-		
-		if(b) {
-		  
-		  if(event->xbutton.button == Button4) {
-		    xitk_browser_step_down(b, NULL);
-		  }
-		  else if(event->xbutton.button == Button5) {
-		    xitk_browser_step_up(b, NULL);
-		  }
-		  
-		}
-	      }
+            if ((event->xbutton.button == Button4) || (event->xbutton.button == Button5)) {
+              if (fx->widget_list && fx->widget_list->widget_focused) {
+                xitk_widget_t *w = fx->widget_list->widget_focused;
+                const char sup[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0};
+                const char sdown[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0};
+                handled = xitk_widget_key_event (w, event->xbutton.button == Button4 ? sup : sdown, modifier);
+              }
 	    }
 
 	    if(fx->move.enabled) {
@@ -2284,7 +2217,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  break;
 	}
 
-        if (fx->cbs) {
+        if (!handled && fx->cbs) {
           xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
         }
       }
@@ -2469,6 +2402,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     xitk->x.lock_display   = _xitk_dummy_lock_display;
     xitk->x.unlock_display = _xitk_dummy_lock_display;
   }
+
+  xitk->xitk_x11 = xitk_x11_new ();
 
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
@@ -2796,6 +2731,9 @@ void xitk_free(xitk_t **p) {
   xitk->x.display = NULL;
 
   pthread_mutex_destroy (&xitk->mutex);
+
+  xitk_x11_delete (xitk->xitk_x11);
+  xitk->xitk_x11 = NULL;
 
   XITK_FREE (xitk);
   gXitk = NULL;

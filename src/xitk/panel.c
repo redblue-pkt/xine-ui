@@ -1335,10 +1335,10 @@ xui_panel_t *panel_init (gGui_t *gui) {
     sl.callback          = NULL;
     sl.userdata          = NULL;
     sl.min               = 0;
-    sl.step              = 1;
 
     sl.skin_element_name = "SliderPlay";
     sl.max               = 65535;
+    sl.step              = sl.max / 50;
     sl.motion_callback   = panel_slider_cb;
     panel->playback_widgets.slider_play = xitk_slider_create (panel->widget_list, panel->gui->skin_config, &sl);
     xitk_add_widget (panel->widget_list, panel->playback_widgets.slider_play);
@@ -1350,6 +1350,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
     sl.skin_element_name = "SliderVol";
     sl.max               = (panel->gui->mixer.method == SOUND_CARD_MIXER) ? 100 : 200;
+    sl.step              = sl.max / 20;
     sl.motion_callback   = panel_slider_cb;
     panel->mixer.slider = xitk_slider_create (panel->widget_list, panel->gui->skin_config, &sl);
     xitk_add_widget (panel->widget_list, panel->mixer.slider);
