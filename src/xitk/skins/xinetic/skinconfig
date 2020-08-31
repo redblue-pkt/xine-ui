@@ -95,6 +95,7 @@ skin.TimeLabel {
 	  length = 12
 	  animation = False
 	  pixmap = LettersA.png
+	  pixmap_focus = LettersHLA.png
           pixmap_format = (32!32-127!160-255)
 	}
 }
@@ -124,6 +125,7 @@ skin.AudioLabel {
 	  length = 6
 	  animation = False
 	  pixmap = LettersA.png
+	  pixmap_focus = LettersHLA.png
 	}
 }
 
@@ -151,7 +153,8 @@ skin.SpuLabel {
 	label {
 	  length = 5
 	  animation = False
-	pixmap = LettersA.png
+	  pixmap = LettersA.png
+	  pixmap_focus = LettersHLA.png
 	}
 }
 

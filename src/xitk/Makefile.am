@@ -174,8 +174,9 @@ xinetic_dir = skins/xinetic
 skin1_DATA = \
 	$(xinetic_dir)/CtlBg.png \
 	$(xinetic_dir)/Letters.png \
-	$(xinetic_dir)/LettersA.png \
 	$(xinetic_dir)/Letters2.png \
+	$(xinetic_dir)/LettersA.png \
+	$(xinetic_dir)/LettersHLA.png \
 	$(xinetic_dir)/MainBg.png \
 	$(xinetic_dir)/MainBits1.png \
 	$(xinetic_dir)/MainBits2.png \
@@ -192,3 +193,4 @@ skin1_DATA = \
 	$(xinetic_dir)/SkSlidBG.png \
 	$(xinetic_dir)/skinconfig \
 	$(xinetic_dir)/unused.png
+
