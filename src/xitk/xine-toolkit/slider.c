@@ -759,7 +759,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     case WIDGET_EVENT_PARTIAL_PAINT:
       _paint_slider (wp, event);
       break;
-    case WIDGET_EVENT_NEW_KEY:
+    case WIDGET_EVENT_KEY:
       return _slider_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_CLICK:
       result->value = _notify_click_slider (wp, event->button, event->button_pressed, event->x, event->y);
@@ -1083,7 +1083,7 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
   wp->w.width            = wp->bg_skin.width;
   wp->w.height           = wp->bg_skin.height;
   wp->w.type             = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_CLICKABLE
-                         | WIDGET_NEW_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+                         | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event            = notify_event;
   wp->w.tips_timeout     = 0;
   wp->w.tips_string      = NULL;

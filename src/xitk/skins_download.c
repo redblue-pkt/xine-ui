@@ -279,8 +279,7 @@ static void download_update_blank_preview(xui_skdloader_t *skd) {
   xitk_image_t *p = xitk_image_create_image(skd->gui->xitk, PREVIEW_WIDTH, PREVIEW_HEIGHT);
   xitk_image_fill_rectangle(p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
                             xitk_get_pixel_color_from_rgb(skd->gui->xitk, 52, 52, 52));
-  xitk_image_draw_image (skd->widget_list, p,
-                         0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34);
+  xitk_image_draw_image (skd->widget_list, p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34, 0);
   xitk_image_free_image (&p);
 }
 
@@ -291,9 +290,8 @@ static void download_update_preview(xui_skdloader_t *skd) {
     int img_width = xitk_image_width(skd->preview_image);
     int img_height = xitk_image_height(skd->preview_image);
     xitk_image_draw_image (skd->widget_list, skd->preview_image,
-                           0, 0, img_width, img_height,
-                           15 + ((PREVIEW_WIDTH - img_width) >> 1),
-                           34 + ((PREVIEW_HEIGHT - img_height) >> 1));
+        0, 0, img_width, img_height,
+        15 + ((PREVIEW_WIDTH - img_width) >> 1), 34 + ((PREVIEW_HEIGHT - img_height) >> 1), 0);
   }
 }
 

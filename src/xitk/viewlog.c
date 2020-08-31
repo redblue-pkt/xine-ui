@@ -138,7 +138,7 @@ static void viewlog_clear_tab (xui_viewlog_t *vl) {
   im = xitk_image_create_image (vl->gui->xitk, width, height);
 
   xitk_image_draw_outter (im, width, height);
-  xitk_image_draw_image (vl->widget_list, im, 0, 0, width, height, 15, (24 + vl->tabs_height));
+  xitk_image_draw_image (vl->widget_list, im, 0, 0, width, height, 15, (24 + vl->tabs_height), 0);
   xitk_image_free_image (&im);
 }
 

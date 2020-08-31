@@ -281,11 +281,11 @@ typedef struct {
 
 static void _xitk_lock_display (xitk_t *_xitk) {
   __xitk_t *xitk = (__xitk_t *)_xitk;
-  XLockDisplay(xitk->x.display);
+  XLockDisplay (xitk->x.display);
 }
 static void _xitk_unlock_display (xitk_t *_xitk) {
   __xitk_t *xitk = (__xitk_t *)_xitk;
-  XUnlockDisplay(xitk->x.display);
+  XUnlockDisplay (xitk->x.display);
 }
 
 static void _xitk_dummy_lock_display (xitk_t *_xitk) {
@@ -297,6 +297,27 @@ static void _xitk_dummy_lock_display (xitk_t *_xitk) {
  */
 
 xitk_t *gXitk;
+
+void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
+  __xitk_t *xitk;
+  __gfx_t *fx;
+  if (!wl)
+    return;
+  if (!wl->xitk)
+    return;
+  xitk = (__xitk_t *)wl->xitk;
+  MUTLOCK ();
+  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
+    if (fx->widget_list == wl) {
+      xitk->x.lock_display (&xitk->x);
+      XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
+      xitk->x.unlock_display (&xitk->x);
+      break;
+    }
+  }
+  MUTUNLOCK ();
+}
+
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
@@ -1840,8 +1861,22 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  break;
 
 	case KeyPress: {
+          static const uint8_t t[XITK_KEY_LASTCODE + 1] = {
+            [XITK_KEY_ESCAPE] = 32,
+            [XITK_KEY_TAB] = 1,
+            [XITK_KEY_KP_TAB] = 1,
+            [XITK_KEY_ISO_LEFT_TAB] = 1,
+            [XITK_KEY_RETURN] = 2,
+            [XITK_KEY_NUMPAD_ENTER] = 2,
+            [XITK_KEY_ISO_ENTER] = 2,
+            [XITK_KEY_UP] = 8,
+            [XITK_KEY_DOWN] = 16,
+            [XITK_KEY_PREV] = 8,
+            [XITK_KEY_NEXT] = 16,
+            [XITK_KEY_LASTCODE] = 4
+          };
 	  KeySym         mykey;
-	  char           kbuf[256];
+          uint8_t        kbuf[256];
 	  int            modifier;
           xitk_widget_t *w;
 
@@ -1849,132 +1884,68 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
           w = fx->widget_list && fx->widget_list->widget_focused ? fx->widget_list->widget_focused : NULL;
 
-          xitk_x11_keyevent_2_string (xitk->xitk_x11, event, &mykey, &modifier, kbuf, sizeof (kbuf));
-          handled = xitk_widget_key_event (w, kbuf, modifier);
+          xitk_x11_keyevent_2_string (xitk->xitk_x11, event, &mykey, &modifier, (char *)kbuf, sizeof (kbuf));
+          handled = xitk_widget_key_event (w, (char *)kbuf, modifier);
 
-          if (!handled && (kbuf[0] == XITK_CTRL_KEY_PREFIX)) {
-            if ((kbuf[1] == XITK_KEY_TAB) || (kbuf[1] == XITK_KEY_KP_TAB) || (kbuf[1] == XITK_KEY_ISO_LEFT_TAB)) {
-              if (fx->widget_list) {
+          if (!handled) {
+            if (kbuf[0] == ' ')
+              kbuf[0] = XITK_CTRL_KEY_PREFIX, kbuf[1] = XITK_KEY_LASTCODE;
+            if (kbuf[0] == XITK_CTRL_KEY_PREFIX) {
+              if ((t[kbuf[1]] == 1) || (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (t[kbuf[1]] & 34))) {
+                if (fx->widget_list) {
+                  handled = 1;
+                  xitk_set_focus_to_next_widget (fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
+                }
+              } else if (kbuf[1] == XITK_KEY_ESCAPE) {
+                if (w && (w->type & WIDGET_GROUP_MENU)) {
+                  /* close menu */
+                  handled = 1;
+                  xitk_destroy_widget (xitk_menu_get_menu (w));
+                }
+              } else if ((t[kbuf[1]] & 6) || ((kbuf[1] == XITK_KEY_RIGHT) && w && (w->type & WIDGET_GROUP_MENU))) {
+                /* simulate click event on space/return/enter key event */
+                if (w && (((w->type & WIDGET_CLICKABLE) && (w->type & WIDGET_KEYABLE)) && w->visible && w->enable)) {
+                  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
+                    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
+                    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+                    widget_event_t         event;
+                    widget_event_result_t  result;
+
+                    handled = 1;
+                    event.type           = WIDGET_EVENT_CLICK;
+                    event.x              = w->x;
+                    event.y              = w->y;
+                    event.button_pressed = LBUTTON_DOWN;
+                    event.button         = Button1;
+                    event.modifier       = modifier;
+                    w->event (w, &event, &result);
+                    event.button_pressed = LBUTTON_UP;
+                    w->event (w, &event, &result);
+                  }
+                }
+              } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
+                /* close menu branch */
                 handled = 1;
-                xitk_set_focus_to_next_widget (fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
+                xitk_menu_destroy_branch (w);
+              } else if ((t[kbuf[1]] & 24) && w && (w->type & WIDGET_GROUP_MENU)) {
+                /* next/previous menu item */
+                handled = 1;
+                if (fx->widget_list)
+                  xitk_set_focus_to_next_widget (fx->widget_list, (t[kbuf[1]] & 8), modifier);
               }
             }
           }
 
-          if (!handled && w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
-
-	    xitk_send_key_event(w, event, modifier);
-
-	    if((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
-	      widget_event_t  event;
-
-	      event.type = WIDGET_EVENT_PAINT;
-	      (void) w->event(w, &event, NULL);
-
-              xitk_set_focus_to_next_widget(fx->widget_list, 0, modifier);
-	    }
-
-	    FXUNLOCK(fx);
-	    return;
-	  }
-	  
-	  /* close menu */
-	  if(mykey == XK_Escape) {
-            if (w && (w->type & WIDGET_GROUP_MENU)) {
-	      xitk_widget_t *m = xitk_menu_get_menu(w);
-	      
-              xitk_destroy_widget(m);
-	      FXUNLOCK(fx);
-	      return;
-	    }
-	  }
-	  /* simulate click event on space/return/enter key event */
-	  else if((mykey == XK_space) || (mykey == XK_Return) || 
-		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter)) {
-	    if(w && (((w->type & WIDGET_CLICKABLE) && (w->type & WIDGET_KEYABLE))
-		     && w->visible && w->enable)) {
-
-	    __menu_sim_click:
-
-	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
-		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
-		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
-		widget_event_t         event;
-		widget_event_result_t  result;
-
-		handled = 1;
-
-		event.type           = WIDGET_EVENT_CLICK;
-		event.x              = w->x;
-		event.y              = w->y;
-		event.button_pressed = LBUTTON_DOWN;
-		event.button         = Button1;
-                event.modifier       = modifier;
-
-		(void) w->event(w, &event, &result);
-
-		event.button_pressed = LBUTTON_UP;
-
-		(void) w->event(w, &event, &result);
-
-		//		if(fx->xevent_callback)
-		//		  fx->xevent_callback(event, fx->user_data);
-	      }
-	    }
-	  }
-          /* handle menu items */
-	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
-		   || (mykey == XK_Up) || (mykey == XK_Down)
-		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
-		  && ((modifier & ~MODIFIER_NUML) == MODIFIER_NOMOD)) {
-
-            if (w && (w->type & WIDGET_GROUP_MENU)) {
-	      handled = 1;
-	      if(mykey == XK_Left) {
-		/* close menu branch */
-		xitk_menu_destroy_branch(w);
-	      }
-	      else if(mykey == XK_Right) {
-		/* simulate click event: trigger action of menu item (e.g. open submenu) */
-		goto __menu_sim_click; // (goto is bad but simple ...)
-	      }
-	      else {
-		/* next/previous menu item */
-		if(fx->widget_list)
-		  xitk_set_focus_to_next_widget(fx->widget_list,
-                                                ((mykey == XK_Up) || (mykey == XK_Prior)),
-                                                modifier);
-	      }
-	    }
-	  }
-
 	  if(!handled) {
 
-            if (xitk->menu && 
-	       ((fx->widget_list && 
-		 ((!fx->widget_list->widget_focused) || 
-                 (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
-		(!fx->widget_list)))  {
-	      
-	      xitk_set_current_menu(NULL);
+            if (xitk->menu) {
+              if (!(fx->widget_list && fx->widget_list->widget_focused
+                && (fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))
+                xitk_set_current_menu (NULL);
 	    }
-	    
-	    if((w == NULL) || (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
-              if (fx->cbs) {
-                xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
-              }
-	    }
-	    
-	    if(((mykey == XK_Return) || (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter))
-               && w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-	      widget_event_t  event;
-	      
-	      event.type = WIDGET_EVENT_PAINT;
-	      (void) w->event(w, &event, NULL);
-	      
-              xitk_set_focus_to_next_widget(fx->widget_list, 0, modifier);
-	      
-	    }
+
+            if (fx->cbs)
+              xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
 	  }
 	  
 	  if(fx->destroy)
@@ -2025,8 +1996,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  fx->old_event = event;
 	  if(fx->move.enabled) {
 
-	    if(fx->widget_list->widget_focused && 
-	       (fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)) {
+            if (fx->widget_list && fx->widget_list->widget_under_mouse
+              && (fx->widget_list->widget_under_mouse->type & WIDGET_GROUP_MENU)) {
 	      xitk_widget_t *menu = xitk_menu_get_menu(fx->widget_list->widget_focused);
 
 	      if(xitk_menu_show_sub_branchs(menu))
@@ -2095,19 +2066,18 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
 	  }
           XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
-	  
-          if (xitk->menu && 
-	     ((fx->widget_list && 
-	       ((!fx->widget_list->widget_focused) || 
-		(!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
-	      (!fx->widget_list)))  {
 
-	    xitk_set_current_menu(NULL);
+          /* A click anywhere outside an open menu shall close it with no further action.
+           * FIXME: this currently works only if the click goes into one of our windows. */
+          if (xitk->menu) {
+            if (!(fx->widget_list && fx->widget_list->widget_under_mouse
+              && (fx->widget_list->widget_under_mouse->type & WIDGET_GROUP_MENU))) {
+              xitk_set_current_menu (NULL);
+              FXUNLOCK (fx);
+              return;
+            }
+          }
 
-	    FXUNLOCK(fx);
-	    return;
-	  }
-	  
 	  if(fx->widget_list) {
             int modifier = 0;
             xitk_get_key_modifier(event, &modifier);

@@ -30,10 +30,12 @@
 
 #include "xitk/Imlib-light/Imlib.h"
 
-#define FOCUS_LOST      0
-#define FOCUS_RECEIVED  1
-#define FOCUS_MOUSE_IN  3
-#define FOCUS_MOUSE_OUT 4
+typedef enum {
+  FOCUS_LOST = 0,
+  FOCUS_RECEIVED,
+  FOCUS_MOUSE_IN,
+  FOCUS_MOUSE_OUT
+} widget_focus_t;
 
 #define LBUTTON_DOWN   0
 #define LBUTTON_UP     1
@@ -57,7 +59,7 @@ typedef struct {
 #define WIDGET_EVENT_PAINT           1
 #define WIDGET_EVENT_CLICK           2
 #define WIDGET_EVENT_FOCUS           3
-#define WIDGET_EVENT_KEY_EVENT       4
+#define WIDGET_EVENT_KEY             4
 #define WIDGET_EVENT_INSIDE          5
 #define WIDGET_EVENT_CHANGE_SKIN     6
 #define WIDGET_EVENT_ENABLE          7
@@ -66,7 +68,6 @@ typedef struct {
 #define WIDGET_EVENT_TIPS_TIMEOUT   10
 #define WIDGET_EVENT_CLIP_READY     11
 #define WIDGET_EVENT_PARTIAL_PAINT  12
-#define WIDGET_EVENT_NEW_KEY        13
 
 typedef struct {
   int                   type; /* See WIDGET_EVENT_x */
@@ -75,7 +76,7 @@ typedef struct {
   int                   button_pressed;
   int                   button;
   int                   modifier;   /* modifier key state (EVENT_CLICK, EVENT_KEY_EVENT) */
-  int                   focus;
+  widget_focus_t        focus;
   
   unsigned long         tips_timeout;
 
@@ -107,9 +108,9 @@ struct xitk_widget_s {
   int                             height;
 
   int                             enable;
-  int                             have_focus;
   int                             running;
   int                             visible;
+  widget_focus_t                  have_focus;
 
   widget_event_notify_t           event;
 
@@ -208,5 +209,6 @@ static int displ;
  *
  */
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
+void xitk_set_focus_to_wl (xitk_widget_list_t *wl);
 
 #endif

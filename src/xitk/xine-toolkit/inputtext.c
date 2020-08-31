@@ -1021,182 +1021,156 @@ static void _inputtext_transpose_chars (_inputtext_private_t *wp) {
 /*
  * Handle keyboard event in input text box.
  */
-static void _notify_keyevent_inputtext (_inputtext_private_t *wp, int modifier, XEvent *xev) {
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    KeySym      key;
-    char        buf[256];
-    int         len;
+static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier) {
+  wp->have_focus = FOCUS_RECEIVED;
 
-    wp->have_focus = FOCUS_RECEIVED;
+  if (!s)
+    return 0;
+  if (!s[0])
+    return 0;
 
-    len = xitk_get_keysym_and_buf(xev, &key, buf, sizeof(buf));
-    buf[len] = '\0';
-
-    /* One of modifier key is pressed, none of keylock or shift */
-    if (buf[0] && !buf[1] && (modifier & MODIFIER_CTRL)) {
-      switch (key) {
-        /* Beginning of line */
-        case XK_a:
-        case XK_A:
-          _inputtext_move_bol (wp);
-          break;
-        /* Backward */
-        case XK_b:
-        case XK_B:
-          _inputtext_move_left (wp);
-          break;
-        /* Copy */
-        case XK_c:
-        case XK_C:
-          _inputtext_copy (wp);
-          break;
-        /* Delete current char */
-        case XK_d:
-        case XK_D:
-          _inputtext_erase_with_delete (wp);
-          break;
-        /* End of line */
-        case XK_e:
-        case XK_E:
-          _inputtext_move_eol (wp);
-          break;
-        /* Forward */
-        case XK_f:
-        case XK_F:
-          _inputtext_move_right (wp);
-          break;
-        /* Kill line (from cursor) */
-        case XK_k:
-        case XK_K:
-          _inputtext_kill_line (wp);
-          break;
-        /* Return */
-        case XK_m:
-        case XK_M:
-          _inputtext_exec_return (wp);
-          break;
-        /* Transpose chars */
-        case XK_t:
-        case XK_T:
-          _inputtext_transpose_chars (wp);
-          break;
-        /* Paste */
-        case XK_v:
-        case XK_V:
-          _inputtext_paste (wp);
-          break;
-        /* Cut */
-        case XK_x:
-        case XK_X:
-          _inputtext_cut (wp);
-          break;
-        case XK_question:
-          _inputtext_erase_with_backspace (wp);
-          break;
-        default: ;
-      }
-    } else if (modifier & (MODIFIER_CTRL | MODIFIER_META)) {
-      ;
-    } else {
-      switch (key) {
-        case XK_Tab:
-          return;
-        case XK_Delete:
-          _inputtext_erase_with_delete (wp);
-          break;
-        case XK_BackSpace:
-          _inputtext_erase_with_backspace (wp);
-          break;
-        case XK_Left:
-          _inputtext_move_left (wp);
-          break;
-        case XK_Right:
-          _inputtext_move_right (wp);
-          break;
-        case XK_Home:
-          _inputtext_move_bol (wp);
-          break;
-        case XK_End:
-          _inputtext_move_eol (wp);
-          break;
-        case XK_Return:
-        case XK_KP_Enter:
-          _inputtext_exec_return (wp);
-          break;
-        case XK_Escape:
-/*      case XK_Tab: */
-          _inputtext_exec_escape (wp);
-          break;
-        default:
-          if (buf[0] && (wp->text.used < wp->max_length)) {
-            char *newtext = _inputtext_sbuf_set (wp, wp->text.used + len);
-
-            if (newtext) {
-              int pos = wp->text.cursor_pos, rest;
-
-              if (pos > wp->text.used)
-                pos = wp->text.used;
-              rest = wp->text.used - pos;
-              if (rest > 0)
-                memmove (newtext + pos + len, newtext + pos, rest);
-              for (rest = 0; rest < len; rest++)
-                newtext[pos + rest] = buf[rest];
-              wp->text.used += len;
-              newtext[wp->text.used] = 0;
-              wp->text.cursor_pos = pos + len;
-              wp->text.dirty |= DIRTY_BEFORE;
-              _paint_inputtext (wp);
-            }
-          }
-      }
+  if (s[0] && !(s[0] & 0xe0) && !s[1]) {
+    switch (s[0]) {
+      /* Beginning of line */
+      case 'a' & 0x1f: _inputtext_move_bol (wp); return 1;
+      /* Backward */
+      case 'b' & 0x1f: _inputtext_move_left (wp); return 1;
+      /* Copy */
+      case 'c' & 0x1f: _inputtext_copy (wp); return 1;
+      /* Delete current char */
+      case 'd' & 0x1f: _inputtext_erase_with_delete (wp); return 1;
+      /* End of line */
+      case 'e' & 0x1f: _inputtext_move_eol (wp); return 1;
+      /* Forward */
+      case 'f' & 0x1f: _inputtext_move_right (wp); return 1;
+      /* Kill line (from cursor) */
+      case 'k' & 0x1f: _inputtext_kill_line (wp); return 1;
+      /* Return */
+      case 'm' & 0x1f: _inputtext_exec_return (wp); return 1;
+      /* Transpose chars */
+      case 't' & 0x1f: _inputtext_transpose_chars (wp); return 1;
+      /* Paste */
+      case 'v' & 0x1f: _inputtext_paste (wp); return 1;
+      /* Cut */
+      case 'x' & 0x1f: _inputtext_cut (wp); return 1;
+      case '?' & 0x1f: _inputtext_erase_with_backspace (wp); return 1;
+      default: return 0;
     }
   }
+
+  if (modifier & (MODIFIER_CTRL | MODIFIER_META))
+    return 0;
+
+  if (s[0] == XITK_CTRL_KEY_PREFIX) {
+    switch (s[1]) {
+      case XITK_KEY_DELETE:
+        _inputtext_erase_with_delete (wp);
+        return 1;
+      case XITK_KEY_BACKSPACE:
+        _inputtext_erase_with_backspace (wp);
+        return 1;
+      case XITK_KEY_LEFT:
+        _inputtext_move_left (wp);
+        return 1;
+      case XITK_KEY_RIGHT:
+        _inputtext_move_right (wp);
+        return 1;
+      case XITK_KEY_HOME:
+        _inputtext_move_bol (wp);
+        return 1;
+      case XITK_KEY_END:
+        _inputtext_move_eol (wp);
+        return 1;
+      case XITK_KEY_RETURN:
+      case XITK_KEY_NUMPAD_ENTER:
+      case XITK_KEY_ISO_ENTER:
+        _inputtext_exec_return (wp);
+        return 0;
+      case XITK_KEY_ESCAPE:
+        _inputtext_exec_escape (wp);
+        return 0;
+      default:
+        return 0;
+    }
+  }
+
+  if (s[0] && (wp->text.used < wp->max_length)) {
+    int len = strlen (s);
+    char *newtext = _inputtext_sbuf_set (wp, wp->text.used + len);
+
+    if (newtext) {
+      int pos = wp->text.cursor_pos, rest;
+
+      if (pos > wp->text.used)
+        pos = wp->text.used;
+      rest = wp->text.used - pos;
+      if (rest > 0)
+        memmove (newtext + pos + len, newtext + pos, rest);
+      for (rest = 0; rest < len; rest++)
+        newtext[pos + rest] = s[rest];
+      wp->text.used += len;
+      newtext[wp->text.used] = 0;
+      wp->text.cursor_pos = pos + len;
+      wp->text.dirty |= DIRTY_BEFORE;
+      _paint_inputtext (wp);
+    }
+  }
+  return 1;
 }
 
 static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _inputtext_private_t *wp = (_inputtext_private_t *)w;
-  int retval = 0;
+
+  if (!wp || !event)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INPUTTEXT)
+    return 0;
 
   switch (event->type) {
     case WIDGET_EVENT_PARTIAL_PAINT:
       _paint_partial_inputtext (wp, event);
-      break;
+      return 0;
     case WIDGET_EVENT_PAINT:
       _paint_inputtext (wp);
-      break;
+      return 0;
     case WIDGET_EVENT_CLICK:
-      result->value = _notify_click_inputtext (wp, event->button,
-        event->button_pressed, event->x, event->y);
-      retval = 1;
-      break;
+      {
+        int r = _notify_click_inputtext (wp, event->button,
+          event->button_pressed, event->x, event->y);
+        if (result)
+          result->value = r;
+        return 1;
+      }
     case WIDGET_EVENT_FOCUS:
       _notify_focus_inputtext (wp, event->focus);
-      break;
-    case WIDGET_EVENT_KEY_EVENT:
-      _notify_keyevent_inputtext (wp, event->modifier, event->xevent);
-      break;
+      return 1;
+    case WIDGET_EVENT_KEY:
+      return _inputtext_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_INSIDE:
-      result->value = _notify_inside (wp, event->x, event->y);
-      retval = 1;
-      break;
+      {
+        int r = _notify_inside (wp, event->x, event->y);
+        if (result)
+          result->value = r;
+        return 1;
+      }
     case WIDGET_EVENT_CHANGE_SKIN:
       _notify_change_skin (wp, event->skonfig);
-      break;
+      return 0;
     case WIDGET_EVENT_DESTROY:
       _notify_destroy (wp);
-      break;
+      return 0;
     case WIDGET_EVENT_GET_SKIN:
       if (result) {
         result->image = _get_skin (wp, event->skin_layer);
-        retval = 1;
+        return 1;
       }
-      break;
+      return 0;
     case WIDGET_EVENT_CLIP_READY:
       _inputtext_paste (wp);
-      break;
+      return 0;
     default: ;
   }
-  return retval;
+  return 0;
 }
 
 /*
@@ -1281,7 +1255,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   wp->w.running         = 1;
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.type            = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE
-                        | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+                        | WIDGET_CLICKABLE | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = notify_event;
   wp->w.tips_timeout    = 0;
   wp->w.tips_string     = NULL;

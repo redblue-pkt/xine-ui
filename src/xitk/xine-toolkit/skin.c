@@ -220,6 +220,7 @@ static int _key_from_name (const char *name) {
     "\x19""label_y",
     "\x10""length",
     "\x06""pixmap",
+    "\x1b""pixmap_focus",
     "\x11""pixmap_format",
     "\x15""print",
     "\x07""radius",
@@ -354,6 +355,8 @@ static void _nullify_me(xitk_skin_element_t *s) {
   s->info.slider_pixmap_pad_img.image = NULL;
   s->info.label_pixmap_font_name = NULL;
   s->info.label_pixmap_font_img  = NULL;
+  s->info.label_pixmap_highlight_font_name = NULL;
+  s->info.label_pixmap_highlight_font_img = NULL;
   s->info.label_color            = NULL;
   s->info.label_color_focus      = NULL;
   s->info.label_color_click      = NULL;
@@ -656,6 +659,13 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
               skonfig->celement->info.label_pixmap_font_format);
           }
         }
+	else if(!strncasecmp(skonfig->ln, "pixmap_focus", 12)) {
+	  skin_set_pos_to_value(&p);
+          if (_skin_make_filename (skonfig, p, &skonfig->celement->info.label_pixmap_highlight_font_name))
+            _skin_load_img (skonfig, NULL,
+              skonfig->celement->info.label_pixmap_highlight_font_name,
+              skonfig->celement->info.label_pixmap_font_format);
+	}
 	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	  skin_set_pos_to_value(&p);
           if (_skin_make_filename (skonfig, p, &skonfig->celement->info.label_pixmap_font_name))
@@ -881,6 +891,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color focus = '%s'\n", s->info.label_color_focus);
       printf("  color click = '%s'\n", s->info.label_color_click);
       printf("  pixmap font = '%s'\n", s->info.label_pixmap_font_name);
+      printf("  pixmap highlight_font = '%s'\n", s->info.label_pixmap_highlight_font_name);
       printf("  pixmap fmt  = '%s'\n", s->info.label_pixmap_font_format);
       printf("  font        = '%s'\n", s->info.label_fontname);
       printf("  max_buttons = %d\n", s->info.max_buttons);
@@ -909,6 +920,11 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
     xitk_part_image_t image;
     _skin_load_img (skonfig, &image, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
     s->info.label_pixmap_font_img = image.image;
+  }
+  if (!s->info.label_pixmap_highlight_font_img && s->info.label_pixmap_highlight_font_name) {
+    xitk_part_image_t image;
+    _skin_load_img (skonfig, &image, s->info.label_pixmap_highlight_font_name, s->info.label_pixmap_font_format);
+    s->info.label_pixmap_highlight_font_img = image.image;
   }
   if (!s->info.slider_pixmap_pad_img.image && s->info.slider_pixmap_pad_name) {
     _skin_load_img (skonfig, &s->info.slider_pixmap_pad_img, s->info.slider_pixmap_pad_name, NULL);

@@ -787,7 +787,7 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
     case WIDGET_EVENT_PAINT:
       _browser_paint (wp);
       break;
-    case WIDGET_EVENT_NEW_KEY:
+    case WIDGET_EVENT_KEY:
       return _browser_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_FOCUS:
       _browser_focus (wp, event->focus);
@@ -1045,7 +1045,7 @@ static xitk_widget_t *_xitk_browser_create (_browser_private_t *wp, xitk_browser
   wp->w.running = 1;
   wp->w.have_focus = FOCUS_LOST;
 
-  wp->w.type = WIDGET_TABABLE | WIDGET_NEW_KEYABLE | WIDGET_GROUP | WIDGET_TYPE_BROWSER;
+  wp->w.type = WIDGET_TABABLE | WIDGET_KEYABLE | WIDGET_GROUP | WIDGET_TYPE_BROWSER;
   wp->w.event = browser_notify_event;
   wp->w.tips_timeout = 0;
   wp->w.tips_string = NULL;

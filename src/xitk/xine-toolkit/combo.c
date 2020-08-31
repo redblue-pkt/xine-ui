@@ -109,6 +109,8 @@ static void _combo_close (_combo_private_t *wp) {
     xitk_unregister_event_handler (&wp->widget_key);
     xitk_window_destroy_window (wp->xwin);
     wp->xwin = NULL;
+    xitk_set_focus_to_widget (wp->button_widget);
+    xitk_set_focus_to_wl (wp->parent_wlist);
   }
 }
 
@@ -701,3 +703,5 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
 
   return _xitk_combo_create (wl, c, NULL, wp, 0, 0);
 }
+
+
