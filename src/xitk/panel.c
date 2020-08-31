@@ -1342,7 +1342,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     sl.motion_callback   = panel_slider_cb;
     panel->playback_widgets.slider_play = xitk_slider_create (panel->widget_list, panel->gui->skin_config, &sl);
     xitk_add_widget (panel->widget_list, panel->playback_widgets.slider_play);
-    xitk_widget_keyable (panel->playback_widgets.slider_play, 0);
+    xitk_widget_mode (panel->playback_widgets.slider_play, WIDGET_KEEP_FOCUS, 0);
     xitk_set_widget_tips (panel->playback_widgets.slider_play, _("Stream playback position slider"));
     xitk_slider_reset (panel->playback_widgets.slider_play);
     if (!panel->gui->playlist.num)

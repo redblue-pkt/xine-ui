@@ -103,3 +103,4 @@ void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 void xitk_x11_translate_xevent(XEvent *xev, const xitk_event_cbs_t *cbs, void *user_data);
 
 #endif /* _XITK_X11_H_ */
+

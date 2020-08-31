@@ -299,9 +299,9 @@ typedef struct {
   int label_animation, label_animation_step;
   unsigned long int label_animation_timer;
   char *label_color, *label_color_focus, *label_color_click, *label_fontname;
-  char *label_pixmap_font_name;
+  char *label_pixmap_font_name, *label_pixmap_highlight_font_name;
   char *label_pixmap_font_format;
-  xitk_image_t *label_pixmap_font_img;
+  xitk_image_t *label_pixmap_font_img, *label_pixmap_highlight_font_img;
   /* slider */
   int slider_type, slider_radius;
   char *slider_pixmap_pad_name;
@@ -318,9 +318,10 @@ typedef struct {
 #define WIDGET_FOCUSABLE            0x20000000
 /* Is widget clickable */
 #define WIDGET_CLICKABLE            0x10000000
+/* Widget keeps focus after tab/click */
+#define WIDGET_KEEP_FOCUS           0x08000000
 /* Widget support key events */
-#define WIDGET_KEYABLE              0x08000000
-#define WIDGET_NEW_KEYABLE          0x04000000
+#define WIDGET_KEYABLE              0x04000000
 /* Widget support partial repaint */
 #define WIDGET_PARTIAL_PAINTABLE    0x02000000
 
@@ -731,11 +732,6 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
  * Notify widget (if enabled) if click event happend at x, y coords.
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier);
-
-/**
- *
- */
-void xitk_send_key_event(xitk_widget_t *, XEvent *, int modifier);
 
 /**
  * Return the focused widget.
@@ -1281,7 +1277,8 @@ xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
                                                   int width, int align, const char *str);
 xitk_image_t *xitk_image_create_image(xitk_t *xitk, int width, int height);
 
-void xitk_image_draw_image(xitk_widget_list_t *wl, xitk_image_t *im, int src_x, int src_y, int width, int height, int dst_x, int dst_y);
+void xitk_image_draw_image (xitk_widget_list_t *wl, xitk_image_t *im,
+  int src_x, int src_y, int width, int height, int dst_x, int dst_y, int sync);
 void xitk_part_image_draw (xitk_widget_list_t *wl, xitk_part_image_t *origin, xitk_part_image_t *copy,
   int src_x, int src_y, int width, int height, int dst_x, int dst_y);
 void xitk_part_image_copy (xitk_widget_list_t *wl, xitk_part_image_t *from, xitk_part_image_t *to,
@@ -1525,7 +1522,8 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
-void xitk_widget_keyable(xitk_widget_t *w, int keyable);
+/* change WIDGET_TABABLE, WIDGET_FOCUSABLE, WIDGET_CLICKABLE, WIDGET_KEEP_FOCUS, WIDGET_KEYABLE */
+int xitk_widget_mode (xitk_widget_t *w, int mask, int mode);
 
 void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor);
 void xitk_window_restore_window_cursor(xitk_window_t *w);

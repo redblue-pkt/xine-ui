@@ -31,6 +31,7 @@
 #include "_xitk.h"
 #include "label.h"
 
+
 typedef struct {
   xitk_widget_t           w;
 
@@ -39,12 +40,14 @@ typedef struct {
 
   xitk_widget_t          *lWidget;
 
-  xitk_pixmap_t          *labelpix;
+  xitk_image_t           *labelpix;
 
   xitk_pix_font_t        *pix_font;
 
+  widget_focus_t          have_focus;
+
   int                     length;      /* length in char */
-  xitk_image_t           *font;
+  xitk_image_t           *font, *highlight_font;
   char                   *fontname;
   char                   *label;
   size_t                  label_len;
@@ -96,14 +99,19 @@ static int _find_pix_font_char (xitk_pix_font_t *pf, xitk_point_t *found, int th
   return 1;
 }
 
+static int _label_is_hili (int have_focus) {
+  return (have_focus == FOCUS_MOUSE_IN) | (have_focus == FOCUS_RECEIVED);
+}
+
 static void _create_label_pixmap (_label_private_t *wp) {
-  xitk_image_t          *font         = (xitk_image_t *) wp->font;
+  xitk_image_t          *font;
   xitk_pix_font_t       *pix_font;
   int                    pixwidth;
   int                    x_dest;
   int                    len, anim_add = 0;
   uint16_t               buf[2048];
   
+  font = _label_is_hili (wp->have_focus) && wp->highlight_font ? wp->highlight_font : wp->font;
   wp->anim_offset = 0;
 
   if (!font->pix_font) {
@@ -147,19 +155,17 @@ static void _create_label_pixmap (_label_private_t *wp) {
     pixwidth = 1;
   pixwidth *= pix_font->char_width;
   if (wp->labelpix) {
-    if ((wp->labelpix->width != pixwidth)
-      || (wp->labelpix->height != pix_font->char_height)) {
-      xitk_image_destroy_xitk_pixmap (wp->labelpix);
-      wp->labelpix = NULL;
-    }
+    if ((wp->labelpix->width != pixwidth) || (wp->labelpix->height != pix_font->char_height))
+      xitk_image_free_image (&wp->labelpix);
   }
   if (!wp->labelpix) {
-    wp->labelpix = xitk_image_create_xitk_pixmap (wp->w.wl->xitk, pixwidth,
-      pix_font->char_height);
+    wp->labelpix = xitk_image_create_image (wp->w.wl->xitk, pixwidth, pix_font->char_height);
 #if 0
     printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, pix_font->char_height,
       wp->labelpix->width, wp->labelpix->height, wp->label);
 #endif
+    if (!wp->labelpix)
+      return;
   }
   x_dest = 0;
 
@@ -171,34 +177,34 @@ static void _create_label_pixmap (_label_private_t *wp) {
       _find_pix_font_char (font->pix_font, &pt, *p);
       p++;
 
-      xitk_pixmap_copy_area(font->image, wp->labelpix,
+      xitk_pixmap_copy_area (font->image, wp->labelpix->image,
         pt.x, pt.y, pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     }
   }
   /* foo[ *** fo] */
   if (anim_add) {
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area(font->image, wp->labelpix,
+    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (wp->labelpix, wp->labelpix,
+    xitk_pixmap_copy_area (wp->labelpix->image, wp->labelpix->image,
       0, 0, pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     x_dest = pixwidth;
   }
@@ -206,7 +212,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
     do {
-      xitk_pixmap_copy_area(font->image, wp->labelpix,
+      xitk_pixmap_copy_area (font->image, wp->labelpix->image,
         pix_font->space.x, pix_font->space.y,
         pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
@@ -217,7 +223,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
 /*
  *
  */
-static void _notify_destroy (_label_private_t *wp) {
+static void _label_destroy (_label_private_t *wp) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     pthread_mutex_lock (&wp->change_mutex);
     
@@ -230,13 +236,12 @@ static void _notify_destroy (_label_private_t *wp) {
       pthread_mutex_lock (&wp->change_mutex);
     }
     
-    if (wp->labelpix) {
-      xitk_image_destroy_xitk_pixmap (wp->labelpix);
-      wp->labelpix = NULL;
-    }
+    xitk_image_free_image (&(wp->labelpix));
     
-    if (!(wp->skin_element_name[0] & ~1))
+    if (!(wp->skin_element_name[0] & ~1)) {
       xitk_image_free_image (&(wp->font));
+      xitk_image_free_image (&(wp->highlight_font));
+    }
 
     XITK_FREE (wp->label);
     XITK_FREE (wp->fontname);
@@ -249,7 +254,7 @@ static void _notify_destroy (_label_private_t *wp) {
 /*
  *
  */
-static xitk_image_t *_get_skin (_label_private_t *wp, int sk) {
+static xitk_image_t *_label_get_skin (_label_private_t *wp, int sk) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     if (sk == FOREGROUND_SKIN && wp->font) {
       return wp->font;
@@ -272,11 +277,11 @@ const char *xitk_label_get_label (xitk_widget_t *w) {
 /*
  *
  */
-static void _paint_label (_label_private_t *wp, widget_event_t *event) {
+static void _label_paint (_label_private_t *wp, widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
     printf ("xitk.label.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && (wp->w.visible == 1))) {
+  if (wp->w.visible) {
     xitk_image_t *font = (xitk_image_t *) wp->font;
     
     if(!wp->label_visible)
@@ -284,43 +289,39 @@ static void _paint_label (_label_private_t *wp, widget_event_t *event) {
     
     /* non skinable widget */
     if (!(wp->skin_element_name[0] & ~1)) {
-      xitk_font_t   *fs = NULL;
-      int            lbear, rbear, wid, asc, des;
-      xitk_image_t  *bg;
+      xitk_font_t *fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
+      xitk_image_t *bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
+    
+      if (fs && bg) {
+        int lbear, rbear, wid, asc, des;
 
-      fs = xitk_font_load_font(wp->w.wl->xitk, wp->fontname);
-      xitk_font_set_font(fs, wp->font->image->gc);
-      xitk_font_string_extent (fs, wp->label, &lbear, &rbear, &wid, &asc, &des);
+        xitk_font_set_font (fs, wp->font->image->gc);
+        xitk_font_string_extent (fs, wp->label, &lbear, &rbear, &wid, &asc, &des);
 
-      bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
-
-      xitk_pixmap_copy_area(font->image, bg->image, 0, 0, wp->font->width, wp->font->height, 0, 0);
-
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XSetForeground(wp->imlibdata->x.disp, font->image->gc, 
-		     xitk_get_pixel_color_black(wp->w.wl->xitk));
-      xitk_font_draw_string(fs, bg->image, font->image->gc,
-		  2, ((wp->font->height + asc + des)>>1) - des,
-		  wp->label, wp->label_len);
-      XCopyArea (wp->imlibdata->x.disp, bg->image->pixmap, wp->w.wl->win, font->image->gc,
-        event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-
-      xitk_image_free_image(&bg);
-      
-      xitk_font_unload_font(fs);
+        xitk_pixmap_copy_area (font->image, bg->image, 0, 0, wp->font->width, wp->font->height, 0, 0);
+        xitk_pixmap_draw_string (bg->image, fs,
+          2, ((wp->font->height + asc + des) >> 1) - des,
+          wp->label, wp->label_len, xitk_get_pixel_color_black (wp->w.wl->xitk));
+        xitk_image_draw_image (wp->w.wl, bg,
+          event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y, 0);
+      }
+      xitk_image_free_image (&bg);
+      xitk_font_unload_font (fs);
       return;
     }
     else if (wp->pix_font) {
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XCopyArea (wp->imlibdata->x.disp,
-        wp->labelpix->pixmap, wp->w.wl->win, font->image->gc,
+      if (wp->w.have_focus != wp->have_focus) {
+        if ((_label_is_hili (wp->w.have_focus) ^ _label_is_hili (wp->have_focus)) && wp->highlight_font) {
+          wp->have_focus = wp->w.have_focus;
+          _create_label_pixmap (wp);
+        } else {
+          wp->have_focus = wp->w.have_focus;
+        }
+      }
+      xitk_image_draw_image (wp->w.wl, wp->labelpix,
         wp->anim_offset + event->x - wp->w.x, event->y - wp->w.y,
         event->width, event->height,
-        event->x, event->y);
-      if (wp->anim_running)
-        XSync (wp->imlibdata->x.disp, False);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+        event->x, event->y, wp->anim_running);
     }
   }
 }
@@ -348,7 +349,7 @@ static void *xitk_label_animation_loop (void *data) {
       wp->anim_offset += wp->anim_step;
       if (wp->anim_offset >= (wp->pix_font->char_width * ((int)wp->label_len + 5)))
         wp->anim_offset = 0;
-      _paint_label (wp, &event);
+      _label_paint (wp, &event);
     }
     t_anim = wp->anim_timer;
     pthread_mutex_unlock (&wp->change_mutex);
@@ -393,10 +394,7 @@ static void _label_setup_label (_label_private_t *wp, const char *new_label, int
   if (wp->skin_element_name[0] & ~1) {
     _create_label_pixmap (wp);
   } else {
-    if (wp->labelpix) {
-      xitk_image_destroy_xitk_pixmap (wp->labelpix);
-      wp->labelpix = NULL;
-    }
+    xitk_image_free_image (&(wp->labelpix));
     wp->anim_offset = 0;
   }
 
@@ -437,7 +435,7 @@ static void _label_setup_label (_label_private_t *wp, const char *new_label, int
     event.y = wp->w.y;
     event.width = wp->w.width;
     event.height = wp->w.height;
-    _paint_label (wp, &event);
+    _label_paint (wp, &event);
   }
   pthread_mutex_unlock (&wp->change_mutex);
 }
@@ -445,7 +443,7 @@ static void _label_setup_label (_label_private_t *wp, const char *new_label, int
 /*
  *
  */
-static void _notify_change_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) {
+static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     if (wp->skin_element_name[0] & ~1) {
       const xitk_skin_element_info_t *info;
@@ -454,6 +452,7 @@ static void _notify_change_skin (_label_private_t *wp, xitk_skin_config_t *skonf
       info = xitk_skin_get_info (skonfig, wp->skin_element_name);
       if (info) {
         wp->font          = info->label_pixmap_font_img;
+        wp->highlight_font = info->label_pixmap_highlight_font_img;
         wp->pix_font      = wp->font->pix_font;
         if (!wp->pix_font) {
           xitk_image_set_pix_font (wp->font, "");
@@ -478,6 +477,10 @@ static void _notify_change_skin (_label_private_t *wp, xitk_skin_config_t *skonf
       }
       
       xitk_skin_unlock(skonfig);
+      if (wp->highlight_font && wp->callback)
+        wp->w.type |= WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;
+      else
+        wp->w.type &= ~(WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE);
       xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     }
   }
@@ -501,7 +504,7 @@ int xitk_label_change_label(xitk_widget_t *w, const char *newlabel) {
 /*
  *
  */
-static int _notify_click_label (_label_private_t *wp, int button, int bUp, int x, int y) {
+static int _label_click (_label_private_t *wp, int button, int bUp, int x, int y) {
   int  ret = 0;
 
   (void)x;
@@ -520,12 +523,15 @@ static int _notify_click_label (_label_private_t *wp, int button, int bUp, int x
 
 static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _label_private_t *wp = (_label_private_t *)w;
-  int retval = 0;
 
   if (!wp)
     return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_LABEL)
+    return 0;
+  if (!event)
+    return 0;
 
-  switch(event->type) {
+  switch (event->type) {
     case WIDGET_EVENT_PAINT:
       event->x = wp->w.x;
       event->y = wp->w.y;
@@ -533,38 +539,41 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       event->height = wp->w.height;
       /* fall through */
     case WIDGET_EVENT_PARTIAL_PAINT:
-      if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) {
-        if (!pthread_mutex_trylock (&wp->change_mutex)) {
-          _paint_label (wp, event);
-          pthread_mutex_unlock (&wp->change_mutex);
-        }
+      if (!pthread_mutex_trylock (&wp->change_mutex)) {
+        _label_paint (wp, event);
+        pthread_mutex_unlock (&wp->change_mutex);
       }
       break;
+    case WIDGET_EVENT_FOCUS:
+      wp->w.have_focus = event->focus;
+      return 1;
     case WIDGET_EVENT_CLICK:
-      result->value = _notify_click_label (wp, event->button,
-        event->button_pressed, event->x, event->y);
-      retval = 1;
-      break;
+      {
+        int r = _label_click (wp, event->button, event->button_pressed, event->x, event->y);
+        if (result)
+          result->value = r;
+        return 1;
+      }
     case WIDGET_EVENT_CHANGE_SKIN:
-      _notify_change_skin (wp, event->skonfig);
+      _label_new_skin (wp, event->skonfig);
       break;
     case WIDGET_EVENT_DESTROY:
-      _notify_destroy (wp);
+      _label_destroy (wp);
       break;
     case WIDGET_EVENT_GET_SKIN:
       if (result) {
-        result->image = _get_skin (wp, event->skin_layer);
-        retval = 1;
+        result->image = _label_get_skin (wp, event->skin_layer);
+        return 1;
       }
       break;
   }
-  return retval;
+  return 0;
 }
 
 /*
  *
  */
-static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_label_widget_t *l,
+static xitk_widget_t *_label_create (xitk_widget_list_t *wl, const xitk_label_widget_t *l,
   const xitk_skin_element_info_t *info) {
   _label_private_t *wp;
   
@@ -582,6 +591,7 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
   wp->lWidget = &wp->w;
 
   wp->font = info->label_pixmap_font_img;
+  wp->highlight_font = info->label_pixmap_highlight_font_img;
 
   if (info->label_pixmap_font_name && (info->label_pixmap_font_name[0] == '\x01') && (info->label_pixmap_font_name[1] == 0)) {
     wp->skin_element_name[0] = '\x01';
@@ -637,13 +647,18 @@ static xitk_widget_t *_xitk_label_create (xitk_widget_list_t *wl, const xitk_lab
   wp->w.visible            = info->visibility;
   wp->w.x                  = info->x;
   wp->w.y                  = info->y;
-  wp->w.have_focus         = FOCUS_LOST;
+  wp->w.have_focus         = wp->have_focus = FOCUS_LOST;
   wp->w.running            = 1;
 
-  wp->w.type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event              = notify_event;
   wp->w.tips_timeout       = 0;
   wp->w.tips_string        = NULL;
+
+  if (wp->highlight_font && wp->callback)
+    wp->w.type |= WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;
+  else
+    wp->w.type &= ~(WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE);
 
   _label_setup_label (wp, l->label, 0);
 
@@ -672,7 +687,7 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
     pinfo = &info;
   }
 
-  return _xitk_label_create (wl, l, pinfo);
+  return _label_create (wl, l, pinfo);
 }
 
 /*
@@ -705,6 +720,8 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
     if (xitk_shared_image (wl, "xitk_label_f", width, height, &info.label_pixmap_font_img) == 1)
       draw_flat (info.label_pixmap_font_img->image, width, height);
   }
+  info.label_pixmap_highlight_font_name = NULL;
+  info.label_pixmap_highlight_font_img = NULL;
 
-  return _xitk_label_create (wl, l, &info);
+  return _label_create (wl, l, &info);
 }

@@ -293,7 +293,7 @@ static void setup_clear_tab (xui_setup_t *setup) {
   im = xitk_image_create_image (setup->gui->xitk, width, height);
 
   xitk_image_draw_outter (im, width, height);
-  xitk_image_draw_image (setup->widget_list, im, 0, 0, width, height, 15, (24 + setup->th));
+  xitk_image_draw_image (setup->widget_list, im, 0, 0, width, height, 15, (24 + setup->th), 0);
   xitk_image_free_image (&im);
 }
 
