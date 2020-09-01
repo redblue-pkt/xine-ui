@@ -47,9 +47,8 @@
 #include <X11/extensions/scrnsaver.h>
 #endif
 
-#include "xine-toolkit/xitk_x11.h"
-
 #include "common.h"
+#include "xine-toolkit/xitk_x11.h"
 #include "oxine/oxine.h"
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */

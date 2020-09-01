@@ -25,6 +25,7 @@
 #include "config.h"
 #endif
 
+#include "xitk.h"
 #include "xitk_x11.h"
 
 #include <stdio.h>
@@ -51,8 +52,9 @@
 #include "../../common/dump_x11.h"
 
 struct xitk_x11_s {
+  xitk_t        *xitk;
   xine_sarray_t *ctrl_keysyms1;
-  uint8_t ctrl_keysyms2[XITK_KEY_LASTCODE];
+  uint8_t        ctrl_keysyms2[XITK_KEY_LASTCODE];
 };
 
 /*
@@ -460,7 +462,7 @@ static int _xitk_x11_ctrl_keysyms_cmp (void *a, void *b) {
   return d < e ? -1 : d > e ? 1 : 0;
 }
 
-xitk_x11_t *xitk_x11_new (void) {
+xitk_x11_t *xitk_x11_new (xitk_t *xitk) {
   static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
     0,
     XK_Escape,
@@ -504,11 +506,15 @@ xitk_x11_t *xitk_x11_new (void) {
     0xffffffff,
     0xffffffff
   };
-  xitk_x11_t *xitk_x11 = malloc (sizeof (*xitk_x11));
+  xitk_x11_t *xitk_x11;
 
+  if (!xitk)
+    return NULL;
+  xitk_x11 = malloc (sizeof (*xitk_x11));
   if (!xitk_x11)
     return NULL;
 
+  xitk_x11->xitk = xitk;
   xitk_x11->ctrl_keysyms1 = xine_sarray_new (XITK_KEY_LASTCODE, _xitk_x11_ctrl_keysyms_cmp);
   if (xitk_x11->ctrl_keysyms1) {
     int i;
@@ -547,10 +553,10 @@ int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksy
     xitk_get_key_modifier (event, modifier);
 
   *ksym = XK_VoidSymbol;
-  XLOCK (xitk_x_lock_display, event->xany.display);
+  xitk_lock_display (xitk_x11->xitk);
   /* ksym = XLookupKeysym (&event->xkey, 0); */
   len = XLookupString (&event->xkey, buf, bsize - 1, ksym, NULL);
-  XUNLOCK (xitk_x_unlock_display, event->xany.display);
+  xitk_unlock_display (xitk_x11->xitk);
 
   i = xine_sarray_binary_search (xitk_x11->ctrl_keysyms1, (void *)(uintptr_t)(*ksym));
   if (i >= 0) {
