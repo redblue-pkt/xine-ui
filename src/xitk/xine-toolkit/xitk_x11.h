@@ -32,7 +32,7 @@
 
 typedef struct xitk_x11_s xitk_x11_t;
 
-xitk_x11_t *xitk_x11_new (void);
+xitk_x11_t *xitk_x11_new (xitk_t *xitk);
 void xitk_x11_delete (xitk_x11_t *xitk_x11);
 
 int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksym, int *modifier, char *buf, int bsize);

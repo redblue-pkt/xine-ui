@@ -71,6 +71,7 @@ struct xitk_font_cache_s {
 
 struct xitk_font_s {
   xitk_font_cache_t *font_cache;
+  xitk_t        *xitk;
   Display       *display;
 #ifdef WITH_XFT
   XftFont       *font;
@@ -199,7 +200,7 @@ static char *xitk_font_right_name(const char *name) {
 /*
  * load the font and returns status
  */
-static int xitk_font_load_one(Display *display, const char *font, xitk_font_t *xtfs) {
+static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
   int    ok;
 #ifdef WITH_XFT
 #else
@@ -211,10 +212,10 @@ static int xitk_font_load_one(Display *display, const char *font, xitk_font_t *x
 
   if(xitk_get_xmb_enability()) {
     right_name = xitk_font_right_name(font);
-    XLOCK (xitk_x_lock_display, display);
-    xtfs->fontset = XCreateFontSet(display, right_name, &missing, &count, &def);
+    xitk_lock_display (xtfs->xitk);
+    xtfs->fontset = XCreateFontSet (xtfs->xitk->display, right_name, &missing, &count, &def);
     ok = !xitk_font_guess_error(xtfs->fontset, right_name, missing, count);
-    XUNLOCK (xitk_x_unlock_display, display);
+    xitk_unlock_display (xtfs->xitk);
     free(right_name);
   }
   else
@@ -222,19 +223,19 @@ static int xitk_font_load_one(Display *display, const char *font, xitk_font_t *x
 #endif
   {
     char new_name[255];
-    XLOCK (xitk_x_lock_display, display);
+    xitk_lock_display (xtfs->xitk);
 #ifdef WITH_XFT
-    xtfs->font = XftFontOpenName( display, DefaultScreen(display),
+    xtfs->font = XftFontOpenName (xtfs->xitk->display, DefaultScreen (xtfs->xitk->display),
                                   xitk_font_core_string_to_xft(new_name, sizeof(new_name), font));
 #else
-    xtfs->font = XLoadQueryFont(display, font);
+    xtfs->font = XLoadQueryFont (xtfs->xitk->display, font);
 #endif
-    XUNLOCK (xitk_x_unlock_display, display);
+    xitk_unlock_display (xtfs->xitk);
     ok = (xtfs->font != NULL);
   }
 
   if(ok)
-    xtfs->display = display;
+    xtfs->display = xtfs->xitk->display;
 
   return ok;
 }
@@ -243,18 +244,18 @@ static int xitk_font_load_one(Display *display, const char *font, xitk_font_t *x
  * unload the font
  */
 static void xitk_font_unload_one(xitk_font_t *xtfs) {
-  XLOCK (xitk_x_lock_display, xtfs->display);
+  xitk_lock_display (xtfs->xitk);
 #ifndef WITH_XFT 
 #ifdef WITH_XMB
   if(xitk_get_xmb_enability())
-    XFreeFontSet(xtfs->display, xtfs->fontset);
+    XFreeFontSet (xtfs->display, xtfs->fontset);
   else
 #endif
-    XFreeFont(xtfs->display, xtfs->font);
+    XFreeFont (xtfs->display, xtfs->font);
 #else
-    XftFontClose( xtfs->display, xtfs->font );
+    XftFontClose (xtfs->display, xtfs->font);
 #endif
-  XUNLOCK (xitk_x_unlock_display, xtfs->display);
+  xitk_unlock_display (xtfs->xitk);
   free(xtfs->name);
 }
 
@@ -524,7 +525,7 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(font);
 
-  display = xitk_x11_get_display(xitk);
+  display = xitk->display;
   ABORT_IF_NULL(display);
 
   font_cache = xitk->font_cache;
@@ -544,13 +545,16 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   if(!xtfs) {
     /* font not found, load it */ 
     xtfs = (xitk_font_t *) xitk_xmalloc(sizeof(xitk_font_t));
+    if (!xtfs)
+      return NULL;
+    xtfs->xitk = xitk;
 
-    if(!xitk_font_load_one(display, font, xtfs)) {
+    if (!xitk_font_load_one (xtfs, font)) {
       const char *fdname = xitk_get_default_font();
 
-      if(!fdname || !xitk_font_load_one(display, fdname, xtfs)) {
+      if (!fdname || !xitk_font_load_one (xtfs, fdname)) {
         const char *fsname = xitk_get_system_font();
- 	if(!xitk_font_load_one(display, fsname, xtfs)) {
+        if (!xitk_font_load_one (xtfs, fsname)) {
 	  XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
 	  free(xtfs);
           pthread_mutex_unlock(&font_cache->mutex);
@@ -639,7 +643,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
   }
 #endif
   
-  XLOCK (xitk_x_lock_display, xtfs->display);
+  xitk_lock_display (xtfs->xitk);
 #ifndef WITH_XFT
 # ifdef WITH_XMB
   if(xitk_get_xmb_enability())
@@ -684,7 +688,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
     xitk_recode2_done (xtfs->font_cache->xr, &rs);
   }
 #endif
-  XUNLOCK (xitk_x_unlock_display, xtfs->display);
+  xitk_unlock_display (xtfs->xitk);
 }
 
 #ifndef WITH_XFT
@@ -748,14 +752,14 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
     {
       ABORT_IF_NULL(xtfs->font);
       
-      XLOCK (xitk_x_lock_display, xtfs->display);
+      xitk_lock_display (xtfs->xitk);
       
       if(xitk_font_is_font_8(xtfs))
 	width = XTextWidth (xtfs->font, c, nbytes);
       else
 	width = XTextWidth16 (xtfs->font, (XChar2b *)c, nbytes);
       
-      XUNLOCK (xitk_x_unlock_display, xtfs->display);
+      xitk_unlock_display (xtfs->xitk);
     }
 #endif
  
@@ -934,9 +938,9 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 
     /* FIXME: XftTextExtentsUtf8 () seems to be non reentrant - at least when called
      * with same font. We probably need to mutex it when XLockDisplay () is turned off. */
-    XLOCK (xitk_x_lock_display, xtfs->display);
+    xitk_lock_display (xtfs->xitk);
     XftTextExtentsUtf8 (xtfs->display, xtfs->font, (FcChar8 *)rs.res, rs.rsize, &xft_extents);
-    XUNLOCK (xitk_x_unlock_display, xtfs->display);
+    xitk_unlock_display (xtfs->xitk);
 
     xitk_recode2_done (xtfs->font_cache->xr, &rs);
   }
@@ -958,9 +962,9 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     ABORT_IF_NULL(xtfs->fontset);
     ABORT_IF_NULL(c);
     
-    XLOCK (xitk_x_lock_display, xtfs->display);
+    xitk_lock_display (xtfs->xitk);
     XmbTextExtents(xtfs->fontset, c, nbytes, &ink, &logic);
-    XUNLOCK (xitk_x_unlock_display, xtfs->display);
+    xitk_unlock_display (xtfs->xitk);
     if (!logic.width || !logic.height) {
       /* XmbTextExtents() has problems, try char-per-char counting */
       mbstate_t state;
@@ -969,7 +973,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
       
       memset(&state, '\0', sizeof(mbstate_t));
       
-      XLOCK (xitk_x_lock_display, xtfs->display);
+      xitk_lock_display (xtfs->xitk);
       while (i < nbytes) {
 	n = mbrtowc(NULL, c + i, nbytes - i, &state);
 	if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
@@ -981,7 +985,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 	i += n;
       }
       rb = width - logic.width + ink.x + ink.width; /* right bearing of string */
-      XUNLOCK (xitk_x_unlock_display, xtfs->display);
+      xitk_unlock_display (xtfs->xitk);
       
       if (!height || !width) {
 	/* char-per-char counting fails too */
@@ -1011,12 +1015,12 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
       ABORT_IF_NULL(xtfs->display);
       ABORT_IF_NULL(c);
       
-      XLOCK (xitk_x_lock_display, xtfs->display);
+      xitk_lock_display (xtfs->xitk);
       if(xitk_font_is_font_8(xtfs))
 	XTextExtents(xtfs->font, c, nbytes, &dir, &fascent, &fdescent, &ov);
       else
 	XTextExtents16(xtfs->font, (XChar2b *)c, (nbytes / 2), &dir, &fascent, &fdescent, &ov);
-      XUNLOCK (xitk_x_unlock_display, xtfs->display);
+      xitk_unlock_display (xtfs->xitk);
       
       if(lbearing)
 	*lbearing = ov.lbearing;
@@ -1107,9 +1111,9 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
   else
 # endif
     {
-      XLOCK (xitk_x_lock_display, xtfs->display);
+      xitk_lock_display (xtfs->xitk);
       XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
-      XUNLOCK (xitk_x_unlock_display, xtfs->display);
+      xitk_unlock_display (xtfs->xitk);
     }
 #else
   (void)gc;

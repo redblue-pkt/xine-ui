@@ -107,6 +107,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
+#include "xitk.h"
 #include "xitk_x11.h"
 
 /* Time to throw up. Here is a kludgey function that recursively calls

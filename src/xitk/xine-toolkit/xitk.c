@@ -54,11 +54,11 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
-#include "xitk_x11.h"
-
 #include "utils.h"
 #include "_xitk.h"
+#include "xitk_x11.h"
 #include "tips.h"
+#include "widget.h"
 #include "menu.h"
 #include "combo.h"
 
@@ -309,9 +309,9 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   MUTLOCK ();
   for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
     if (fx->widget_list == wl) {
-      xitk->x.lock_display (&xitk->x);
+      xitk_lock_display (&xitk->x);
       XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
-      xitk->x.unlock_display (&xitk->x);
+      xitk_unlock_display (&xitk->x);
       break;
     }
   }
@@ -346,12 +346,12 @@ static void _xitk_clipboard_init (__xitk_t *xitk) {
   xitk->clipboard.window_out = None;
   xitk->clipboard.own_time = CurrentTime;
 
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  xitk_lock_display (&xitk->x);
   XInternAtoms (xitk->x.display,
     (char **)atom_names, sizeof (atom_names) / sizeof (atom_names[0]), True,
     xitk->clipboard.atoms.a);
   xitk->clipboard.dummy = XInternAtom (xitk->x.display, "_XITK_CLIP", False);
-  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+  xitk_unlock_display (&xitk->x);
 #ifdef _XITK_CLIPBOARD_DEBUG
   printf ("xitk.window.clipboard: "
     "null=%d atom=%d timestamp=%d integer=%d c_string=%d string=%d utf8_string=%d text=%d "
@@ -390,9 +390,9 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
         printf ("xitk.clipboard: set #2: own clipboard @ time=%ld.\n", (long int)event->xproperty.time);
 #endif
         xitk->clipboard.own_time = event->xproperty.time;
-        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        xitk_lock_display (&xitk->x);
         XSetSelectionOwner (xitk->x.display, xitk->clipboard.atoms.n.clipboard, xitk->clipboard.window_out, xitk->clipboard.own_time);
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
       } else if (event->xproperty.window == xitk->clipboard.window_in) {
         /* get #2. */
 #ifdef _XITK_CLIPBOARD_DEBUG
@@ -405,7 +405,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
             unsigned long nitems, bytes_after;
             unsigned char *prop;
 
-            XLOCK (xitk->x.x_lock_display, xitk->x.display);
+            xitk_lock_display (&xitk->x);
             XGetWindowProperty (xitk->x.display, xitk->clipboard.window_in,
               xitk->clipboard.dummy, 0, 0, False, xitk->clipboard.atoms.n.utf8_string,
               &actual_type, &actual_format, &nitems, &bytes_after, &prop);
@@ -426,7 +426,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
             XFree (prop);
             xitk->clipboard.text[xitk->clipboard.text_len] = 0;
           } while (0);
-          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          xitk_unlock_display (&xitk->x);
           if (xitk->clipboard.widget_in && (xitk->clipboard.text_len > 0)) {
             widget_event_t  event;
 
@@ -453,10 +453,10 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
      && (event->xselectionrequest.selection == xitk->clipboard.atoms.n.clipboard)) {
 #ifdef _XITK_CLIPBOARD_DEBUG
       char *tname, *pname;
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       tname = XGetAtomName (xitk->x.display, event->xselectionrequest.target);
       pname = XGetAtomName (xitk->x.display, event->xselectionrequest.property);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
       printf ("xitk.clipboard: serve #1 requestor=%d target=%d (%s) property=%d (%s).\n",
         (int)event->xselectionrequest.requestor,
         (int)event->xselectionrequest.target, tname,
@@ -478,11 +478,11 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
           (int)xitk->clipboard.atoms.n.string, (int)xitk->clipboard.atoms.n.utf8_string,
           (int)xitk->clipboard.atoms.n.length, (int)xitk->clipboard.atoms.n.timestamp);
 #endif
-        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        xitk_lock_display (&xitk->x);
         r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
           xitk->clipboard.atoms.n.atom, 32, PropModeReplace,
           (const unsigned char *)atoms, sizeof (atoms) / sizeof (atoms[0]));
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
         if (r) {
 #ifdef _XITK_CLIPBOARD_DEBUG
           printf ("xitk.clipboard: serve #2: reporting OK.\n");
@@ -494,11 +494,11 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
 #ifdef _XITK_CLIPBOARD_DEBUG
         printf ("xitk.clipboard: serve #3: sending %d bytes.\n", xitk->clipboard.text_len + 1);
 #endif
-        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        xitk_lock_display (&xitk->x);
         r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
           xitk->clipboard.atoms.n.utf8_string, 8, PropModeReplace,
           (const unsigned char *)xitk->clipboard.text, xitk->clipboard.text_len + 1);
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
         if (r) {
 #ifdef _XITK_CLIPBOARD_DEBUG
           printf ("xitk.clipboard: serve #3 len=%d OK.\n", xitk->clipboard.text_len);
@@ -512,9 +512,9 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
         event2.xselection.target = event->xselectionrequest.target;
         event2.xselection.property = event->xselectionrequest.property;
         event2.xselection.time = event->xselectionrequest.time;
-        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        xitk_lock_display (&xitk->x);
         XSendEvent (xitk->x.display, event->xselectionrequest.requestor, False, 0, &event2);
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
       }
       return 1;
     }
@@ -542,11 +542,11 @@ int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
   printf ("xitk.clipboard: set #1.\n");
 #endif
   xitk->clipboard.window_out = win;
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  xitk_lock_display (&xitk->x);
   /* set #1: HACK: get current server time. */
   XChangeProperty (xitk->x.display, win,
     xitk->clipboard.dummy, xitk->clipboard.atoms.n.utf8_string, 8, PropModeAppend, NULL, 0);
-  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+  xitk_unlock_display (&xitk->x);
 
   return text_len;
 }
@@ -568,10 +568,10 @@ int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
 #ifdef _XITK_CLIPBOARD_DEBUG
       printf ("xitk.clipboard: get #1.\n");
 #endif
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       XConvertSelection (xitk->x.display, xitk->clipboard.atoms.n.clipboard,
         xitk->clipboard.atoms.n.utf8_string, xitk->clipboard.dummy, win, CurrentTime);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
       return -1;
     }
 #ifdef _XITK_CLIPBOARD_DEBUG
@@ -1390,10 +1390,10 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
     }
     
     if(atom) {
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WM_WINDOW_TYPE, XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
       XRaiseWindow (xitk->x.display, window);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
     }
   }
 }
@@ -1409,9 +1409,9 @@ void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
 void xitk_ungrab_pointer(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  xitk_lock_display (&xitk->x);
   XUngrabPointer(xitk->x.display, CurrentTime);
-  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+  xitk_unlock_display (&xitk->x);
 }
 
 /*
@@ -1511,17 +1511,17 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     XWindowAttributes wattr;
     Status            err;
     
-    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    xitk_lock_display (&xitk->x);
     err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+    xitk_unlock_display (&xitk->x);
     
     if(err != BadDrawable && err != BadWindow) {
       Window c;
       
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       XTranslateCoordinates (xitk->x.display, fx->window, wattr.root, 
 			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
       
       /*
 	fx->new_pos.x = wattr.x;
@@ -1549,11 +1549,11 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
 
   if(fx->window) {
 
-    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    xitk_lock_display (&xitk->x);
     fx->XA_XITK = XInternAtom (xitk->x.display, "_XITK_EVENT", False);
     XChangeProperty (xitk->x.display, fx->window, fx->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
-    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+    xitk_unlock_display (&xitk->x);
 
   }
   else
@@ -1607,9 +1607,9 @@ static void _widget_list_destroy(xitk_widget_list_t **p) {
   *p = NULL;
 
   if (wl->temp_gc) {
-    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    xitk_lock_display (&xitk->x);
     XFreeGC (xitk->x.display, wl->temp_gc);
-    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+    xitk_unlock_display (&xitk->x);
     wl->temp_gc = NULL;
   }
   xitk_shared_image_list_delete (wl);
@@ -1748,10 +1748,10 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
       if(fx->name)
 	winf->name = strdup(fx->name);
       
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       XTranslateCoordinates (xitk->x.display, fx->window, DefaultRootWindow (xitk->x.display), 
 			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
       
       
       winf->x      = fx->new_pos.x;
@@ -1855,9 +1855,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           break;
 
 	case MappingNotify:
-          XLOCK (xitk->x.x_lock_display, xitk->x.display);
+          xitk_lock_display (&xitk->x);
 	  XRefreshKeyboardMapping((XMappingEvent *) event);
-          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          xitk_unlock_display (&xitk->x);
 	  break;
 
 	case KeyPress: {
@@ -1969,9 +1969,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
                 fx->expose.y1 = event->xexpose.y;
               if (event->xexpose.y + event->xexpose.height > fx->expose.y2)
                 fx->expose.y2 = event->xexpose.y + event->xexpose.height;
-              XLOCK (xitk->x.x_lock_display, xitk->x.display);
+              xitk_lock_display (&xitk->x);
               r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, event);
-              XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+              xitk_unlock_display (&xitk->x);
             } while (r == True);
             if (event->xexpose.count == 0) {
 #ifdef XITK_PAINT_DEBUG
@@ -1989,9 +1989,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	case MotionNotify: {
 	  XWindowAttributes wattr;
 
-          XLOCK (xitk->x.x_lock_display, xitk->x.display);
+          xitk_lock_display (&xitk->x);
           while (XCheckMaskEvent (xitk->x.display, ButtonMotionMask, event) == True);
-          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          xitk_unlock_display (&xitk->x);
 
 	  fx->old_event = event;
 	  if(fx->move.enabled) {
@@ -2015,13 +2015,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root) 
 	      - fx->move.offset_y;
 	    
-            XLOCK (xitk->x.x_lock_display, xitk->x.display);
+            xitk_lock_display (&xitk->x);
 
             XMoveWindow (xitk->x.display, fx->window,
 			fx->new_pos.x, fx->new_pos.y);
             XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
 
-            XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+            xitk_unlock_display (&xitk->x);
 
 	  }
 	  else {
@@ -2054,7 +2054,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
           xitk_tips_hide_tips(xitk->x.tips);
 	  
-          XLOCK (xitk->x.x_lock_display, xitk->x.display);
+          xitk_lock_display (&xitk->x);
           status = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
 	  /* 
 	   * Give focus (and raise) to window after click
@@ -2065,7 +2065,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             XRaiseWindow (xitk->x.display, fx->window);
             XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
 	  }
-          XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+          xitk_unlock_display (&xitk->x);
 
           /* A click anywhere outside an open menu shall close it with no further action.
            * FIXME: this currently works only if the click goes into one of our windows. */
@@ -2103,9 +2103,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	      XWindowAttributes wattr;
 	      Status            err;
 
-              XLOCK (xitk->x.x_lock_display, xitk->x.display);
+              xitk_lock_display (&xitk->x);
               err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-              XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+              xitk_unlock_display (&xitk->x);
 
 	      if(err != BadDrawable && err != BadWindow) {
 		
@@ -2163,9 +2163,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  /* Inform application about window movement. */
           if (fx->cbs && fx->cbs->pos_cb) {
 
-            XLOCK (xitk->x.x_lock_display, xitk->x.display);
+            xitk_lock_display (&xitk->x);
             err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-            XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+            xitk_unlock_display (&xitk->x);
 
 	    if(err != BadDrawable && err != BadWindow) {
 	      fx->width = wattr.width;
@@ -2272,7 +2272,7 @@ void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
   imlib_init.flags = PARAMS_VISUALID;
   imlib_init.visualid = gui_visual->visualid;
 
-  XLOCK(xitk->x_lock_display, xitk->display);
+  xitk_lock_display (xitk);
 
   if (install_colormap && (gui_visual->class & 1)) {
       /*
@@ -2292,12 +2292,11 @@ void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
   }
 
   xitk->imlibdata = Imlib_init_with_params (xitk->display, &imlib_init);
+  xitk_unlock_display (xitk);
   if (xitk->imlibdata == NULL) {
     fprintf(stderr, _("Unable to initialize Imlib\n"));
     exit(1);
   }
-
-  XUNLOCK(xitk->x_unlock_display, xitk->display);
 
   xitk->imlibdata->x.x_lock_display = xitk->x_lock_display;
   xitk->imlibdata->x.x_unlock_display = xitk->x_unlock_display;
@@ -2322,9 +2321,9 @@ static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install
 }
 
 void xitk_sync(xitk_t *_xitk) {
-  XLOCK (_xitk->lock_display, _xitk);
+  xitk_lock_display (_xitk);
   XSync (_xitk->display, False);
-  XUNLOCK (_xitk->unlock_display, _xitk);
+  xitk_unlock_display (_xitk);
 }
 
 /*
@@ -2360,6 +2359,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk = xitk_xmalloc (sizeof (*xitk));
   gXitk = &xitk->x;
+  if (!xitk)
+    return NULL;
 
   xitk->xitk_pid = getppid ();
 
@@ -2372,8 +2373,12 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     xitk->x.lock_display   = _xitk_dummy_lock_display;
     xitk->x.unlock_display = _xitk_dummy_lock_display;
   }
+#ifdef DEBUG_LOCKDISPLAY
+  pthread_mutex_init (&xitk->x.debug_mutex, NULL);
+  xitk->x.debug_level = 0;
+#endif
 
-  xitk->xitk_x11 = xitk_x11_new ();
+  xitk->xitk_x11 = xitk_x11_new (&xitk->x);
 
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
@@ -2568,9 +2573,9 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
   xitk->running = 1;
   
-  XLOCK (xitk->x.x_lock_display, xitk->x.display);
+  xitk_lock_display (&xitk->x);
   XSync (xitk->x.display, True); /* Flushing the toilets */
-  XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+  xitk_unlock_display (&xitk->x);
 
   /*
    * Force to repain the widget list if it exist
@@ -2593,11 +2598,11 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
         xexp.xexpose.window     = fx->window;
         xexp.xexpose.count      = 0;
       
-        XLOCK (xitk->x.x_lock_display, xitk->x.display);
+        xitk_lock_display (&xitk->x);
         if (!XSendEvent (xitk->x.display, fx->window, False, ExposureMask, &xexp)) {
           XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
         }
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
       }
 
       FXUNLOCK (fx);
@@ -2612,23 +2617,23 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
   {
     int xconnection;
 
-    XLOCK (xitk->x.x_lock_display, xitk->x.display);
+    xitk_lock_display (&xitk->x);
     xconnection = ConnectionNumber (xitk->x.display);
-    XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+    xitk_unlock_display (&xitk->x);
 
     /* Now, wait for a new xevent */
     while (xitk->running) {
       XEvent myevent;
       int have_events;
     
-      XLOCK (xitk->x.x_lock_display, xitk->x.display);
+      xitk_lock_display (&xitk->x);
       have_events = XPending (xitk->x.display);
 
       if (have_events <= 0) {
         fd_set fdset;
         struct timeval tv;
 
-        XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+        xitk_unlock_display (&xitk->x);
         FD_ZERO (&fdset);
         FD_SET (xconnection, &fdset);
         tv.tv_sec  = 0;
@@ -2638,7 +2643,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
       }
 
       XNextEvent (xitk->x.display, &myevent);
-      XUNLOCK (xitk->x.x_unlock_display, xitk->x.display);
+      xitk_unlock_display (&xitk->x);
       
       MUTLOCK ();
       xitk_xevent_notify_impl (xitk, &myevent);
@@ -2692,14 +2697,18 @@ void xitk_free(xitk_t **p) {
    * callback functions are called. If libGL.so has already been unloaded
    * with dlclose() this will cause a segmentation fault.
    */
-  xitk->x.x_lock_display (xitk->x.display);
-  xitk->x.x_unlock_display (xitk->x.display);
+  xitk_lock_display (&xitk->x);
+  xitk_unlock_display (&xitk->x);
 
   Imlib_destroy(&xitk->x.imlibdata);
 
   XCloseDisplay(xitk->x.display);
   xitk->x.display = NULL;
 
+#ifdef DEBUG_LOCKDISPLAY
+  pthread_mutex_destroy (&xitk->x.debug_mutex);
+  printf ("%s:%d %s (): final display lock level: #%d.\n", __FILE__, __LINE__, __FUNCTION__, xitk->x.debug_level);
+#endif
   pthread_mutex_destroy (&xitk->mutex);
 
   xitk_x11_delete (xitk->xitk_x11);
@@ -2964,3 +2973,5 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
+
+
