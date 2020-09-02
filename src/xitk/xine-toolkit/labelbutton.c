@@ -85,7 +85,7 @@ static size_t _strlcpy (char *d, const char *s, size_t l) {
   return n;
 }
 
-static void _set_label (_lbutton_private_t *wp, const char *label) {
+static void _labelbutton_set_label (_lbutton_private_t *wp, const char *label) {
   size_t n;
 
   if (wp->label != wp->lbuf)
@@ -104,7 +104,7 @@ static void _set_label (_lbutton_private_t *wp, const char *label) {
 /*
  *
  */
-static void _notify_destroy (_lbutton_private_t *wp) {
+static void _labelbutton_destroy (_lbutton_private_t *wp) {
   xitk_image_free_image (&wp->temp_image.image);
   if (wp->skin_element_name[0] == '\x01')
     xitk_image_free_image (&wp->skin.image);
@@ -119,7 +119,7 @@ static void _notify_destroy (_lbutton_private_t *wp) {
 /*
  *
  */
-static xitk_image_t *_get_skin (_lbutton_private_t *wp, int sk) {
+static xitk_image_t *_labelbutton_get_skin (_lbutton_private_t *wp, int sk) {
   if ((sk == FOREGROUND_SKIN) && wp->skin.image)
     return wp->skin.image;
   return NULL;
@@ -128,7 +128,7 @@ static xitk_image_t *_get_skin (_lbutton_private_t *wp, int sk) {
 /*
  *
  */
-static int _notify_inside (_lbutton_private_t *wp, int x, int y) {
+static int _labelbutton_inside (_lbutton_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
     xitk_image_t *skin = wp->skin.image;
 
@@ -256,7 +256,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
 /*
  * Paint the button with correct background pixmap
  */
-static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *event) {
+static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
@@ -314,20 +314,20 @@ static void _paint_partial_labelbutton (_lbutton_private_t *wp, widget_event_t *
   }
 }
 
-static void _paint_labelbutton (_lbutton_private_t *wp) {
+static void _labelbutton_paint (_lbutton_private_t *wp) {
   widget_event_t event;
 
   event.x = wp->w.x;
   event.y = wp->w.y;
   event.width = wp->w.width;
   event.height = wp->w.height;
-  _paint_partial_labelbutton (wp, &event);
+  _labelbutton_partial_paint (wp, &event);
 }
 
 /*
  * Handle click events
  */
-static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bUp, int x, int y, int modifier) {
+static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int x, int y, int modifier) {
   int ret = 0;
 
   (void)x;
@@ -338,7 +338,7 @@ static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bU
 
     if (bUp && (wp->focus == FOCUS_RECEIVED)) {
       wp->bState = !wp->bState;
-      _paint_labelbutton (wp);
+      _labelbutton_paint (wp);
       if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
         if (wp->state_callback)
           wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
@@ -347,11 +347,54 @@ static int _notify_click_labelbutton (_lbutton_private_t *wp, int button, int bU
           wp->callback (wp->bWidget, wp->userdata, wp->bState);
       }
     } else {
-      _paint_labelbutton (wp);
+      _labelbutton_paint (wp);
     }
     ret = 1;
   }
   return ret;
+}
+
+static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier) {
+  static const char k[] = {
+    XITK_CTRL_KEY_PREFIX, XITK_KEY_RIGHT,
+    XITK_CTRL_KEY_PREFIX, XITK_KEY_RETURN,
+    XITK_CTRL_KEY_PREFIX, XITK_KEY_NUMPAD_ENTER,
+    XITK_CTRL_KEY_PREFIX, XITK_KEY_ISO_ENTER,
+    ' ', 0
+  };
+  int i, n = sizeof (k) / sizeof (k[0]);
+
+  if (wp->focus != FOCUS_RECEIVED)
+    return 0;
+  if (!s)
+    return 0;
+
+  if (modifier & ~(MODIFIER_SHIFT | MODIFIER_NUML))
+    return 0;
+
+  for (i = (wp->w.type & WIDGET_GROUP_MENU) ? 0 : 2; i < n; i += 2) {
+    if (!memcmp (s, k + i, 2))
+      break;
+  }
+  if (i >= n)
+    return 0;
+
+  wp->bClicked = 0;
+  wp->bOldState = wp->bState;
+  if (wp->focus == FOCUS_RECEIVED) {
+    wp->bState = !wp->bState;
+    _labelbutton_paint (wp);
+    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
+      if (wp->state_callback)
+        wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
+    } else if (wp->bType == CLICK_BUTTON) {
+      if (wp->callback)
+        wp->callback (wp->bWidget, wp->userdata, wp->bState);
+    }
+  } else {
+    _labelbutton_paint (wp);
+  }
+  return 1;
 }
 
 /*
@@ -361,8 +404,8 @@ int xitk_labelbutton_change_label (xitk_widget_t *w, const char *newlabel) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    _set_label (wp, newlabel);
-    _paint_labelbutton (wp);
+    _labelbutton_set_label (wp, newlabel);
+    _labelbutton_paint (wp);
     return 1;
   }
   return 0;
@@ -398,7 +441,7 @@ int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *newlab
       else
         wp->shortcut_pos = -1;
     }
-    _paint_labelbutton (wp);
+    _labelbutton_paint (wp);
     return 1;
   }
   return 0;
@@ -421,7 +464,7 @@ const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
 /*
  * Handle focus on button
  */
-static int _notify_focus_labelbutton (_lbutton_private_t *wp, int focus) {
+static int _labelbutton_focus (_lbutton_private_t *wp, int focus) {
   wp->focus = focus;
   return 1;
 }
@@ -429,7 +472,7 @@ static int _notify_focus_labelbutton (_lbutton_private_t *wp, int focus) {
 /*
  *
  */
-static void _notify_change_skin (_lbutton_private_t *wp, xitk_skin_config_t *skonfig) {
+static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name[0] & ~1) {
     const xitk_skin_element_info_t *info;
 
@@ -466,48 +509,59 @@ static void _notify_change_skin (_lbutton_private_t *wp, xitk_skin_config_t *sko
 }
 
 
-static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  int retval = 0;
-  
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    switch (event->type) {
-      case WIDGET_EVENT_PAINT:
-        event->x = wp->w.x;
-        event->y = wp->w.y;
-        event->width = wp->w.width;
-        event->height = wp->w.height;
-        /* fall through */
-      case WIDGET_EVENT_PARTIAL_PAINT:
-        _paint_partial_labelbutton (wp, event);
-        break;
-      case WIDGET_EVENT_CLICK:
-        result->value = _notify_click_labelbutton (wp, event->button,
-            event->button_pressed, event->x, event->y, event->modifier);
-        retval = 1;
-        break;
-      case WIDGET_EVENT_FOCUS:
-        _notify_focus_labelbutton (wp, event->focus);
-        break;
-      case WIDGET_EVENT_INSIDE:
-        result->value = _notify_inside (wp, event->x, event->y);
-        retval = 1;
-        break;
-      case WIDGET_EVENT_CHANGE_SKIN:
-        _notify_change_skin (wp, event->skonfig);
-        break;
-      case WIDGET_EVENT_DESTROY:
-        _notify_destroy (wp);
-        break;
-      case WIDGET_EVENT_GET_SKIN:
-        if (result) {
-          result->image = _get_skin (wp, event->skin_layer);
-          retval = 1;
-        }
-        break;
+
+  if (!event || !wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_LABELBUTTON)
+    return 0;
+
+  switch (event->type) {
+    case WIDGET_EVENT_PAINT:
+      event->x = wp->w.x;
+      event->y = wp->w.y;
+      event->width = wp->w.width;
+      event->height = wp->w.height;
+      /* fall through */
+    case WIDGET_EVENT_PARTIAL_PAINT:
+      _labelbutton_partial_paint (wp, event);
+      break;
+    case WIDGET_EVENT_CLICK: {
+      int r = _labelbutton_click (wp, event->button,
+        event->button_pressed, event->x, event->y, event->modifier);
+      if (result) {
+        result->value = r;
+        return 1;
+      }
+      break;
     }
+    case WIDGET_EVENT_KEY:
+      return _labelbutton_key (wp, event->string, event->modifier);
+    case WIDGET_EVENT_FOCUS:
+      _labelbutton_focus (wp, event->focus);
+      break;
+    case WIDGET_EVENT_INSIDE:
+      if (result) {
+        result->value = _labelbutton_inside (wp, event->x, event->y);
+        return 1;
+      }
+      break;
+    case WIDGET_EVENT_CHANGE_SKIN:
+      _labelbutton_new_skin (wp, event->skonfig);
+      break;
+    case WIDGET_EVENT_DESTROY:
+      _labelbutton_destroy (wp);
+      break;
+    case WIDGET_EVENT_GET_SKIN:
+      if (result) {
+        result->image = _labelbutton_get_skin (wp, event->skin_layer);
+        return 1;
+      }
+      break;
+    default: ;
   }
-  return retval;
+  return 0;
 }
 
 /*
@@ -593,11 +647,11 @@ void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
         wp->bClicked = 1;
         wp->bOldState = wp->bState;
         wp->bState = state;
-        _paint_labelbutton (wp);
+        _labelbutton_paint (wp);
 
         wp->focus = focus;
         wp->bClicked = clk;
-        _paint_labelbutton (wp);
+        _labelbutton_paint (wp);
       }
     }
   }
@@ -650,7 +704,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->userdata          = b->userdata;
 
   wp->label = wp->lbuf;
-  _set_label (wp, b->label);
+  _labelbutton_set_label (wp, b->label);
 
   wp->shortcut_label    = strdup ("");
   wp->shortcut_font     = strdup (info->label_fontname);
@@ -699,7 +753,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->w.height          = wp->skin.height;
   wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
-  wp->w.event           = notify_event;
+  wp->w.event           = labelbutton_event;
   wp->w.tips_timeout    = 0;
   wp->w.tips_string     = NULL;
 
