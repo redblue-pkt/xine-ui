@@ -1902,27 +1902,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
                   handled = 1;
                   xitk_destroy_widget (xitk_menu_get_menu (w));
                 }
-              } else if ((t[kbuf[1]] & 6) || ((kbuf[1] == XITK_KEY_RIGHT) && w && (w->type & WIDGET_GROUP_MENU))) {
-                /* simulate click event on space/return/enter key event */
-                if (w && (((w->type & WIDGET_CLICKABLE) && (w->type & WIDGET_KEYABLE)) && w->visible && w->enable)) {
-                  if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
-                    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
-                    ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
-                    widget_event_t         event;
-                    widget_event_result_t  result;
-
-                    handled = 1;
-                    event.type           = WIDGET_EVENT_CLICK;
-                    event.x              = w->x;
-                    event.y              = w->y;
-                    event.button_pressed = LBUTTON_DOWN;
-                    event.button         = Button1;
-                    event.modifier       = modifier;
-                    w->event (w, &event, &result);
-                    event.button_pressed = LBUTTON_UP;
-                    w->event (w, &event, &result);
-                  }
-                }
               } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
                 /* close menu branch */
                 handled = 1;
