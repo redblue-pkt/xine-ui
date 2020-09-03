@@ -684,19 +684,18 @@ xitk_window_t *xitk_window_create_simple_window(xitk_t *xitk, int x, int y, int 
 
 xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
 {
-  GC gc;
-
   if (w->widget_list)
     return w->widget_list;
 
-  w->widget_list = xitk_widget_list_new(w->xitk);
+  w->widget_list = xitk_widget_list_new (w->xitk);
+  if (!w->widget_list)
+    return NULL;
 
   xitk_lock_display (w->xitk);
-  gc = XCreateGC (w->xitk->display, w->window, None, None);
+  w->widget_list->gc = XCreateGC (w->xitk->display, w->window, None, None);
   xitk_unlock_display (w->xitk);
 
   w->widget_list->win = w->window;
-  xitk_widget_list_set(w->widget_list, WIDGET_LIST_GC, gc);
 
   return w->widget_list;
 }
@@ -908,6 +907,7 @@ xitk_pixmap_t *xitk_window_get_background_pixmap(xitk_window_t *w) {
 /*
  * Return window background pixmap.
  */
+#ifdef YET_UNUSED
 Pixmap xitk_window_get_background_mask(xitk_window_t *w) {
 
   if(w == NULL)
@@ -918,6 +918,7 @@ Pixmap xitk_window_get_background_mask(xitk_window_t *w) {
   
   return w->background->pixmap;
 }
+#endif
 
 /*
  * Apply (draw) window background.
@@ -1036,7 +1037,7 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
   return 1;
 }
 
-/*
+#ifdef YET_UNUSED
 void xitk_window_set_modal(xitk_window_t *w) {
   xitk_modal_window(w->window);  
 }
@@ -1044,7 +1045,7 @@ void xitk_window_dialog_set_modal(xitk_window_t *w) {
   xitk_dialog_t *wd = w->dialog;
   xitk_window_set_modal(wd->xwin);
 }
-*/
+#endif
 
 static void _destroy_common(xitk_window_t *w, int destroy_window) {
   if (w->widget_list)
@@ -1077,13 +1078,8 @@ static void _destroy_common(xitk_window_t *w, int destroy_window) {
     xitk_unlock_display (w->xitk);
   }
 
-  if (w->widget_list) {
-    xitk_lock_display (w->xitk);
-    XFreeGC (w->xitk->display, XITK_WIDGET_LIST_GC (w->widget_list));
-    xitk_unlock_display (w->xitk);
-
+  if (w->widget_list)
     XITK_WIDGET_LIST_FREE(w->widget_list);
-  }
 
   XITK_FREE(w);
 }

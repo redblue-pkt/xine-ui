@@ -922,6 +922,7 @@ int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y)
 /*
  * Return 1 if mouse pointer is in widget area.
  */
+#ifdef YET_UNUSED
 int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
   int inside = 0;
   
@@ -946,6 +947,7 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
 
   return inside;
 }
+#endif
 
 /*
  * Return widget present at specified coords.
@@ -1652,7 +1654,7 @@ void xitk_disable_widget(xitk_widget_t *w) {
 /*
  *
  */
-void xitk_free_widget(xitk_widget_t *w) {
+static void xitk_free_widget(xitk_widget_t *w) {
   widget_event_t event;
   if(!w) {
     XITK_WARNING("widget is NULL\n");
@@ -1844,6 +1846,7 @@ void xitk_start_widget(xitk_widget_t *w) {
 /*
  * Stop widgets from widget list.
  */
+#ifdef YET_UNUSED
 void xitk_stop_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
@@ -1861,6 +1864,7 @@ void xitk_stop_widgets(xitk_widget_list_t *wl) {
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
+#endif
 
 /*
  * Show a widget.
@@ -2000,6 +2004,7 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w) {
 /*
  *
  */
+#ifdef YET_UNUSED
 xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
   widget_event_t         event;
   widget_event_result_t  result;
@@ -2018,6 +2023,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
 
   return image;
 }
+#endif
 
 /*
  *
@@ -2089,6 +2095,7 @@ void xitk_disable_widget_tips(xitk_widget_t *w) {
 /*
  *
  */
+#ifdef YET_UNUSED
 void xitk_enable_widget_tips(xitk_widget_t *w) {
   
   if(!w) {
@@ -2098,6 +2105,7 @@ void xitk_enable_widget_tips(xitk_widget_t *w) {
   
   xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 }
+#endif
 
 /*
  *
@@ -2123,6 +2131,7 @@ void xitk_disable_widgets_tips(xitk_widget_list_t *wl) {
 /*
  *
  */
+#ifdef YET_UNUSED
 void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
@@ -2141,6 +2150,7 @@ void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
+#endif
 
 /*
  *
@@ -2237,48 +2247,6 @@ int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *
   return retval;
 }
 
-int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data) {
-
-  if(!wl) {
-    XITK_WARNING("List is NULL\n");
-    return 0;
-  }
-
-  switch(param) {
-  case WIDGET_LIST_GC:
-    wl->gc = (GC) data;
-    break;
-  default:
-    XITK_WARNING("Unknown param %d\n", param);
-    return 0;
-    break;
-  }
-  return 1;
-}
-
-void *xitk_widget_list_get(xitk_widget_list_t *wl, int param) {
-  void *data = NULL;
-
-  if(!wl) {
-    XITK_WARNING("List is NULL\n");
-    return NULL;
-  }
-
-  switch(param) {
-  case WIDGET_LIST_GC:
-    if(wl->gc)
-      data = (void *) wl->gc;
-    else
-      XITK_WARNING("widget list GC unset\n");
-    break;
-  default:
-    XITK_WARNING("Unknown param %d\n", param);
-    break;
-  }
-  
-  return data;
-}
-
 void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs) {
   xitk_font_set_font(xtfs, wl->gc);
 }
@@ -2319,3 +2287,4 @@ int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
 
   return handled;
 }
+

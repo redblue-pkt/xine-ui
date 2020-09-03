@@ -276,8 +276,6 @@ void xitk_unset_current_menu(void);
 unsigned long xitk_get_tips_timeout(void);
 void xitk_set_tips_timeout(unsigned long timeout);
 
-int xitk_is_running(void);
-
 const char *xitk_skin_get_logo(xitk_skin_config_t *);
 const char *xitk_skin_get_animation(xitk_skin_config_t *);
 void xitk_skin_lock(xitk_skin_config_t *);
@@ -319,7 +317,9 @@ struct xitk_image_s {
 };
 
 Pixmap xitk_window_get_background(xitk_window_t *w);
+#ifdef YET_UNUSED
 Pixmap xitk_window_get_background_mask(xitk_window_t *w);
+#endif
 
 
 void xitk_register_eh_destructor (xitk_register_key_t key,
