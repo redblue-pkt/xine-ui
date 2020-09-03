@@ -1606,10 +1606,14 @@ static void _widget_list_destroy(xitk_widget_list_t **p) {
 
   *p = NULL;
 
-  if (wl->temp_gc) {
+  if (wl->temp_gc || wl->gc) {
     xitk_lock_display (&xitk->x);
-    XFreeGC (xitk->x.display, wl->temp_gc);
+    if (wl->temp_gc)
+      XFreeGC (xitk->x.display, wl->temp_gc);
+    if (wl->gc)
+      XFreeGC (xitk->x.display, wl->gc);
     xitk_unlock_display (&xitk->x);
+    wl->gc = NULL;
     wl->temp_gc = NULL;
   }
   xitk_shared_image_list_delete (wl);
@@ -2299,11 +2303,13 @@ static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install
   free(xrm_prefered_visual);
 }
 
+#ifdef YET_UNUSED
 void xitk_sync(xitk_t *_xitk) {
   xitk_lock_display (_xitk);
   XSync (_xitk->display, False);
   xitk_unlock_display (_xitk);
 }
+#endif
 
 /*
  * Initiatization of widget internals.

@@ -381,7 +381,7 @@ int xitk_pixmap_get_pixel(xitk_pixmap_t *p, int x, int y) {
 /*
  *
  */
-xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int width, int height, int depth) {
+static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int width, int height, int depth) {
   xitk_pixmap_t    *xpix;
   XGCValues         gcv;
 #ifdef HAVE_SHM
@@ -1728,9 +1728,11 @@ void draw_paddle_three_state_horizontal(xitk_image_t *p) {
 void draw_inner(xitk_pixmap_t *p, int w, int h) {
   _draw_relief(p, w, h, DRAW_INNER, 0);
 }
+#ifdef YET_UNUSED
 void draw_inner_light(xitk_pixmap_t *p, int w, int h) {
   _draw_relief(p, w, h, DRAW_INNER, 1);
 }
+#endif
 
 /*
  *
@@ -1738,9 +1740,11 @@ void draw_inner_light(xitk_pixmap_t *p, int w, int h) {
 void draw_outter(xitk_pixmap_t *p, int w, int h) {
   _draw_relief(p, w, h, DRAW_OUTTER, 0);
 }
+#ifdef YET_UNUSED
 void draw_outter_light(xitk_pixmap_t *p, int w, int h) {
   _draw_relief(p, w, h, DRAW_OUTTER, 1);
 }
+#endif
 
 void xitk_image_draw_outter(xitk_image_t *i, int w, int h) {
   _draw_relief(i->image, w, h, DRAW_OUTTER, 0);

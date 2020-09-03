@@ -776,6 +776,7 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
+#ifdef YET_UNUSED
 int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes) {
 #ifndef WITH_XFT
   unsigned int  ch = (*c & 0xff);
@@ -838,11 +839,12 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, in
   ABORT_IF_NULL(c);
   return xitk_font_get_text_width(xtfs, c, 1);
 }
+#endif
 
 /*
  *
  */
-int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
+static int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
   int ascent, descent;
   
   xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, NULL, &ascent, &descent);
@@ -861,6 +863,7 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
+#ifdef YET_UNUSED
 int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes) {
 # ifdef WITH_XMB
   mbstate_t state;
@@ -882,6 +885,7 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, i
 #endif
     return (xitk_font_get_text_height(xtfs, c, 1));
 }
+#endif
 
 /*
  *
@@ -1054,6 +1058,7 @@ void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 /*
  *
  */
+#ifdef YET_UNUSED
 int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
   int ascent;
   
@@ -1073,10 +1078,12 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
 
   return ascent;
 }
+#endif
 
 /*
  *
  */
+#ifdef YET_UNUSED
 int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
   int descent;
  
@@ -1096,6 +1103,7 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
 
   return descent;
 }
+#endif
 
 /*
  *

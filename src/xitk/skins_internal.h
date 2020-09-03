@@ -27,7 +27,6 @@
 
 #undef SKIN_DEBUG
 
-int get_skin_offset(const char *skin);
 void skin_change_cb(void *data, xine_cfg_entry_t *cfg);
 
 #endif

@@ -517,11 +517,6 @@ typedef enum {
   xitk_cursor_num_glyphs
 } xitk_cursors_t;
 
-/* 
- * See xitk_widget_list_[set/get]()
- */
-#define WIDGET_LIST_GC              1
-#define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
 #define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)
 
 #define XITK_WIDGET_INIT(X)         do {                              \
@@ -589,7 +584,9 @@ xitk_t *xitk_init(const char *prefered_visual, int install_colormap,
 
 void xitk_free(xitk_t **);
 
+#ifdef YET_UNUSED
 void xitk_sync(xitk_t *); /* XSync() wrapper */
+#endif
 
 /*
  *
@@ -690,7 +687,9 @@ xitk_color_names_t *xitk_get_color_name(const char *color);
 /**
  * return pointer to the xitk_color_names struct.
  */
+#ifdef YET_UNUSED
 xitk_color_names_t *xitk_get_color_names(void);
+#endif
 
 /**
  * Free color object.
@@ -715,7 +714,9 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
 /**
  * Boolean function, if x and y coords is in widget.
  */
+#ifdef YET_UNUSED
 int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
+#endif
 
 /**
  * Return widget from widget list 'wl' localted at x,y coords.
@@ -794,11 +795,6 @@ void xitk_enable_widget(xitk_widget_t *);
 void xitk_disable_widget(xitk_widget_t *);
 
 /**
- *
- */
-void xitk_free_widget(xitk_widget_t *w);
-
-/**
  * Destroy and free widget.
  */
 void xitk_destroy_widget(xitk_widget_t *w);
@@ -816,7 +812,9 @@ void xitk_stop_widget(xitk_widget_t *w);
 /**
  * Stop each (if widget handle it) widgets of widget list.
  */
+#ifdef YET_UNUSED
 void xitk_stop_widgets(xitk_widget_list_t *wl);
+#endif
 
 /**
  * Start widget.
@@ -861,7 +859,9 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
 /**
  *
  */
+#ifdef YET_UNUSED
 xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
+#endif
 
 /**
  *
@@ -896,7 +896,9 @@ int xitk_is_mouse_over_widget(xitk_widget_t *w);
 /**
  *
  */
+#ifdef YET_UNUSED
 void xitk_enable_widget_tips(xitk_widget_t *w);
+#endif
 
 /**
  *
@@ -911,7 +913,9 @@ void xitk_disable_widgets_tips(xitk_widget_list_t *wl);
 /**
  *
  */
+#ifdef YET_UNUSED
 void xitk_enable_widgets_tips(xitk_widget_list_t *wl);
+#endif
 
 /**
  *
@@ -1086,22 +1090,18 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
+#ifdef YET_UNUSED
 int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
-
-/*
- *
- */
 int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes);
+int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c);
+int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
+int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
+#endif
 
 /*
  *
  */
 int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
-
-/*
- *
- */
-int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
 
 /*
  *
@@ -1114,16 +1114,6 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
  */
 void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 			    int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
-
-/*
- *
- */
-int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c);
-
-/*
- *
- */
-int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
 
 /*
  *
@@ -1175,7 +1165,9 @@ unsigned int xitk_get_pixel_color_warning_background(xitk_t *im);
  * xitk pixmaps
  */
 
+#ifdef YET_UNUSED
 xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int width, int height, int depth);
+#endif
 
 xitk_pixmap_t *xitk_image_create_xitk_pixmap(xitk_t *xitk, int width, int height);
 
@@ -1211,13 +1203,17 @@ void xitk_pixmap_copy_area(xitk_pixmap_t *src, xitk_pixmap_t *dst,
  */
 
 void draw_inner(xitk_pixmap_t *p, int w, int h);
+#ifdef YET_UNUSED
 void draw_inner_light(xitk_pixmap_t *p, int w, int h);
+#endif
 
 /**
  *
  */
 void draw_outter(xitk_pixmap_t *p, int w, int h);
+#ifdef YET_UNUSED
 void draw_outter_light(xitk_pixmap_t *p, int w, int h);
+#endif
 
 void xitk_image_draw_outter(xitk_image_t *i, int w, int h);
 
@@ -1312,9 +1308,6 @@ void draw_bevel_three_state(xitk_image_t *p);
  *
  */
 void draw_bevel_two_state(xitk_image_t *p);
-
-void draw_three_state_round_style(xitk_image_t *p, int x, int y, int d, int w, int checked);
-void draw_three_state_check_style(xitk_image_t *p, int x, int y, int d, int w, int checked);
 
 
 void draw_paddle_three_state_vertical(xitk_image_t *p);
@@ -1517,11 +1510,11 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   const char *check_label, int checked,
   int text_align, const char *text_fmt, ...) __attribute__ ((format (printf, 14, 15)));
 
-//void xitk_window_set_modal(xitk_window_t *w);
-//void xitk_window_dialog_set_modal(xitk_window_t *w);
+#ifdef YET_UNUSED
+void xitk_window_set_modal(xitk_window_t *w);
+void xitk_window_dialog_set_modal(xitk_window_t *w);
+#endif
 
-int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
-void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
 /* change WIDGET_TABABLE, WIDGET_FOCUSABLE, WIDGET_CLICKABLE, WIDGET_KEEP_FOCUS, WIDGET_KEYABLE */
 int xitk_widget_mode (xitk_widget_t *w, int mask, int mode);
 
@@ -1531,4 +1524,3 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
-
