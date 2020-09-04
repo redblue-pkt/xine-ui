@@ -1042,6 +1042,8 @@ static xitk_widget_t *_xitk_browser_create (_browser_private_t *wp, xitk_browser
   _browser_set_hslider (wp, 1);
   _browser_set_vslider (wp);
 
+  wp->w.parent = NULL;
+  wp->w.focus_redirect = NULL;
   wp->w.running = 1;
   wp->w.have_focus = FOCUS_LOST;
 

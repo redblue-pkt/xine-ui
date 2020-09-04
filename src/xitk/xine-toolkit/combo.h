@@ -48,7 +48,5 @@ void xitk_combo_update_list (xitk_widget_t *w, const char *const *const list, in
 /** */
 void xitk_combo_update_pos (xitk_widget_t *w);
 /** */
-void xitk_combo_rollunroll (xitk_widget_t *w);
-/** */
 void xitk_combo_callback_exec (xitk_widget_t *w);
 #endif

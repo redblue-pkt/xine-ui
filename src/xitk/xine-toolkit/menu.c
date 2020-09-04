@@ -744,6 +744,8 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
       xitk_menu_add_entry (&wp->w, me);
   }
 
+  wp->w.parent         = NULL;
+  wp->w.focus_redirect = NULL;
   wp->w.enable        = 1;
   wp->w.running       = 1;
   wp->w.visible       = 0;

@@ -326,6 +326,8 @@ xitk_widget_t *xitk_button_list_new (
     bl->last = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
 
   bl->first = 0;
+  bl->w.parent = NULL;
+  bl->w.focus_redirect = NULL;
   bl->w.x = bl->x = info ? info->x : 0;
   bl->w.y = bl->y = info ? info->y : 0;
   bl->w.width = 0;

@@ -393,6 +393,8 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   wp->w.event        = notify_event;
   wp->w.tips_timeout = 0;
   wp->w.tips_string  = NULL;
+  wp->w.parent         = NULL;
+  wp->w.focus_redirect = NULL;
 
   {
     xitk_font_t               *fs;

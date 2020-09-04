@@ -154,8 +154,14 @@ static int _checkbox_key (_checkbox_private_t *wp, const char *s, int modifier) 
 /*
  *
  */
-static int _checkbox_focus (_checkbox_private_t *wp, int focus) {
+static int _checkbox_focus (_checkbox_private_t *wp, widget_focus_t focus) {
   wp->focus = focus;
+  if ((wp->w.type & WIDGET_GROUP_COMBO) && (focus == FOCUS_LOST)) {
+    wp->cClicked = 0;
+    wp->cState = 0;
+    if (wp->callback)
+      wp->callback (wp->cWidget, wp->userdata, wp->cState);
+  }
   return 1;
 }
 
@@ -260,11 +266,8 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
   _checkbox_private_t *wp = (_checkbox_private_t *)w;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
-    int clk, focus;
-
-    if (xitk_checkbox_get_state (&wp->w) != state) {
-      focus = wp->focus;
-      clk = wp->cClicked;
+    if (wp->cState != state) {
+      int focus = wp->focus, clk = wp->cClicked;
       
       wp->focus = FOCUS_RECEIVED;
       wp->cClicked = 1;
@@ -299,6 +302,8 @@ static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_check
   wp->w.width    = wp->skin.width / 3;
   wp->w.height   = wp->skin.height;
 
+  wp->w.parent          = NULL;
+  wp->w.focus_redirect  = NULL;
   wp->w.running       = 1;
   wp->w.have_focus    = FOCUS_LOST;
   wp->w.type          = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_KEYABLE;

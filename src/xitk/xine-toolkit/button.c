@@ -265,6 +265,8 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
   
   wp->w.private_data    = wp;
 
+  wp->w.parent          = NULL;
+  wp->w.focus_redirect  = NULL;
   wp->w.running         = 1;
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.width           = wp->skin.width / 3;
@@ -371,3 +373,4 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 
   return _xitk_button_create (wp, b);
 }
+

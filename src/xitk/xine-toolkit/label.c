@@ -643,6 +643,8 @@ static xitk_widget_t *_label_create (xitk_widget_list_t *wl, const xitk_label_wi
 
   wp->w.wl                 = wl;
 
+  wp->w.parent             = NULL;
+  wp->w.focus_redirect     = NULL;
   wp->w.enable             = info->enability;
   wp->w.visible            = info->visibility;
   wp->w.x                  = info->x;
