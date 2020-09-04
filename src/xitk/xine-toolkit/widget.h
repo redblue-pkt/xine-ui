@@ -101,12 +101,14 @@ struct xitk_widget_s {
 
   xitk_widget_list_t             *wl;
   xitk_widget_t                  *parent;
+  xitk_widget_t                  *focus_redirect;
 
   int                             x;
   int                             y;
   int                             width;
   int                             height;
 
+  uint32_t                        type;
   int                             enable;
   int                             running;
   int                             visible;
@@ -118,7 +120,6 @@ struct xitk_widget_s {
   char                           *tips_string;
 
   void                           *private_data;
-  uint32_t                        type;
 };
 
 struct xitk_widget_list_s {
@@ -212,3 +213,4 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
 void xitk_set_focus_to_wl (xitk_widget_list_t *wl);
 
 #endif
+

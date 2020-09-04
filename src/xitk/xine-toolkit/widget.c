@@ -1058,6 +1058,8 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
   } while (0);
   if (!w)
     w = xitk_get_widget_at (wl, x, y);
+  if (w && w->focus_redirect)
+    w = w->focus_redirect;
   
   do {
     int f;
@@ -1080,7 +1082,8 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     if (wl->widget_under_mouse->enable != WIDGET_ENABLE)
       break;
     if (f && (wl->widget_under_mouse->type & WIDGET_KEEP_FOCUS)) {
-      if ((wl->widget_under_mouse->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
+      if (((wl->widget_under_mouse->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
+        || (wl->widget_under_mouse->type & WIDGET_GROUP_COMBO))
         break;
       if (!w)
         break;
@@ -1093,7 +1096,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     if (f)
       wl->widget_focused = NULL;
   } while (0);
-    
+
   wl->widget_under_mouse = w;
     
   if (w) {
@@ -1135,6 +1138,8 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   }
   
   mywidget = xitk_get_widget_at (wl, x, y);
+  if (mywidget && mywidget->focus_redirect)
+    mywidget = mywidget->focus_redirect;
 
   if(mywidget != wl->widget_focused && !bUp) {
 
@@ -1146,29 +1151,19 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
 
-	if(wl->widget_focused && (wl->widget_focused->type & WIDGET_GROUP_MENU))
+        if (wl->widget_focused->type & WIDGET_GROUP_MENU)
 	  menu = xitk_menu_get_menu(wl->widget_focused);
 
-        if (wl->widget_focused->type & WIDGET_GROUP_COMBO) {
-          if (mywidget && (mywidget->type & WIDGET_GROUP_COMBO) && (wl->widget_focused->parent == mywidget->parent)) {
-            ;
-          } else {
-            if (xitk_checkbox_get_state (wl->widget_focused))
-              xitk_combo_rollunroll (wl->widget_focused);
-          }
-	}
-	else {
-	  event.type  = WIDGET_EVENT_FOCUS;
-	  event.focus = FOCUS_LOST;
-	  (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-	  wl->widget_focused->have_focus = FOCUS_LOST;
-	}
+        event.type  = WIDGET_EVENT_FOCUS;
+        event.focus = FOCUS_LOST;
+        wl->widget_focused->event (wl->widget_focused, &event, NULL);
+        wl->widget_focused->have_focus = FOCUS_LOST;
       }
       
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
     }
-    
+
     wl->widget_focused = mywidget;
     
     if (mywidget) {
@@ -2287,4 +2282,3 @@ int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
 
   return handled;
 }
-

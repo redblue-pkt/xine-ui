@@ -1110,6 +1110,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     }
   }
 
+  wp->w.parent         = NULL;
+  wp->w.focus_redirect = NULL;
   wp->w.wl           = NULL;
   wp->w.enable       = 1;
   wp->w.running      = 1;

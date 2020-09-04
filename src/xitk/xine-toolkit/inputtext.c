@@ -1252,6 +1252,8 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   
   wp->w.private_data    = wp;
 
+  wp->w.parent          = NULL;
+  wp->w.focus_redirect  = NULL;
   wp->w.running         = 1;
   wp->w.have_focus      = FOCUS_LOST;
   wp->w.type            = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE

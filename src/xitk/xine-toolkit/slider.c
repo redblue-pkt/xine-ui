@@ -1078,6 +1078,8 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
 
   wp->w.private_data     = wp;
 
+  wp->w.parent           = NULL;
+  wp->w.focus_redirect   = NULL;
   wp->w.running          = 1;
   wp->w.have_focus       = FOCUS_LOST;
   wp->w.width            = wp->bg_skin.width;

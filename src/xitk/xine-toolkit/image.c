@@ -2463,6 +2463,8 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
   wp->w.wl              = wl;
 
+  wp->w.parent          = NULL;
+  wp->w.focus_redirect  = NULL;
   wp->w.enable          = 0;
   wp->w.running         = 1;
   wp->w.visible         = 0;

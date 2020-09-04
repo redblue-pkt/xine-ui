@@ -446,6 +446,8 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
   wp->w.event        = notify_event;
   wp->w.tips_timeout = 0;
   wp->w.tips_string  = NULL;
+  wp->w.parent         = NULL;
+  wp->w.focus_redirect = NULL;
 
   wp->info = *ib;
   wp->skin_element_name = wp->info.skin_element_name ? strdup (wp->info.skin_element_name) : NULL;
