@@ -518,14 +518,6 @@ static void setup_add_nothing_available (xui_setup_t *setup, const char *title, 
   setup->num_wg = 1;
 }
 
-static void label_cb(xitk_widget_t *w, void *data) {
-  _widget_triplet_t *wt = (_widget_triplet_t *)data;
-
-  (void)w;
-  xitk_checkbox_set_state (wt->widget, !(xitk_checkbox_get_state (wt->widget)));
-  wt->changed = 1;
-}
-
 /*
  *
  */
@@ -698,8 +690,6 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
               xitk_add_widget (setup->widget_list, wt->widget);
               xitk_checkbox_set_state (wt->widget, entry.num_value);
             }
-            lb.callback          = label_cb;
-            lb.userdata          = wt;
           }
           break;
       }
@@ -717,6 +707,8 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         }
         lx = x + 20 + xitk_get_widget_width (wt->widget);
         wt->label = xitk_noskin_label_create (setup->widget_list, &lb, lx, y, FRAME_WIDTH - lx - 15, setup->fh, fontname);
+        if (entry.type == XINE_CONFIG_TYPE_BOOL)
+          xitk_widget_set_focus_redirect (wt->label, wt->widget);
         if (wt->label)
           xitk_add_widget (setup->widget_list, wt->label);
       }

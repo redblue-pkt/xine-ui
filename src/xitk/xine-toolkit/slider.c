@@ -1076,19 +1076,11 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
   wp->callback           = s->callback;
   wp->userdata           = s->userdata;
 
-  wp->w.private_data     = wp;
-
-  wp->w.parent           = NULL;
-  wp->w.focus_redirect   = NULL;
-  wp->w.running          = 1;
-  wp->w.have_focus       = FOCUS_LOST;
   wp->w.width            = wp->bg_skin.width;
   wp->w.height           = wp->bg_skin.height;
   wp->w.type             = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_CLICKABLE
                          | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event            = notify_event;
-  wp->w.tips_timeout     = 0;
-  wp->w.tips_string      = NULL;
 
   return &wp->w;
 }
@@ -1104,11 +1096,10 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(s);
 
-  wp = (_slider_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_slider_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->w.wl               = wl;
   wp->skin_element_name  = s->skin_element_name ? strdup (s->skin_element_name) : NULL;
   _xitk_slider_get_skin (wp, skonfig);
   if (!wp->bg_skin.image || !wp->paddle_skin.image) {
@@ -1132,11 +1123,10 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(s);
   
-  wp = (_slider_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_slider_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->w.wl               = wl;
   wp->skin_element_name = NULL;
 
   if (type == XITK_VSLIDER) {

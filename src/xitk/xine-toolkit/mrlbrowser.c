@@ -936,7 +936,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     XITK_DIE("Xine engine should be initialized first !!\nExiting.\n");
   }
 
-  wp = (_mrlbrowser_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_mrlbrowser_private_t *) xitk_widget_new (NULL, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -1110,21 +1110,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     }
   }
 
-  wp->w.parent         = NULL;
-  wp->w.focus_redirect = NULL;
-  wp->w.wl           = NULL;
-  wp->w.enable       = 1;
-  wp->w.running      = 1;
-  wp->w.visible      = 1;
-  wp->w.have_focus   = FOCUS_LOST;
   wp->w.x            = mb->x;
   wp->w.y            = mb->y;
   wp->w.width        = bg_image->width;
   wp->w.height       = bg_image->height;
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_MRLBROWSER;
   wp->w.event        = notify_event;
-  wp->w.tips_timeout = 0;
-  wp->w.tips_string  = NULL;
 
   xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 

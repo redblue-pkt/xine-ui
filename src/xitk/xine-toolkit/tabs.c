@@ -366,7 +366,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   if((t->entries == NULL) || (t->num_entries == 0))
     XITK_DIE("%s(): entries should be non NULL.\n", __FUNCTION__);
 
-  wp = (_tabs_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_tabs_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
   
@@ -380,21 +380,13 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   wp->userdata    = t->userdata;
   wp->skin_element_name = (t->skin_element_name == NULL) ? NULL : strdup (t->skin_element_name);
 
-  wp->w.private_data = wp;
-  wp->w.wl           = wl;
-  wp->w.enable       = 1;
-  wp->w.running      = 0;
-  wp->w.visible      = 0;
-  wp->w.have_focus   = FOCUS_LOST; 
-  wp->w.x            = x;
-  wp->w.y            = y;
-  wp->w.width        = wp->width;
-  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_TABS | WIDGET_PARTIAL_PAINTABLE;
-  wp->w.event        = notify_event;
-  wp->w.tips_timeout = 0;
-  wp->w.tips_string  = NULL;
-  wp->w.parent         = NULL;
-  wp->w.focus_redirect = NULL;
+  wp->w.running   = 0;
+  wp->w.visible   = 0;
+  wp->w.x         = x;
+  wp->w.y         = y;
+  wp->w.width     = wp->width;
+  wp->w.type      = WIDGET_GROUP | WIDGET_TYPE_TABS | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event     = notify_event;
 
   {
     xitk_font_t               *fs;

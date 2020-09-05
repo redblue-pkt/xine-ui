@@ -266,7 +266,7 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
   XITK_CHECK_CONSTITENCY(ib);
 
-  wp = (_doublebox_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_doublebox_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -278,17 +278,9 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
   wp->w.width      = width;
   wp->w.height     = height;
   wp->w.enable     = 0;
-  wp->w.running    = 1;
   wp->w.visible    = 0;
-  wp->w.have_focus = FOCUS_LOST;
-  wp->w.wl         = wl;
-  wp->w.private_data = wp;
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_DOUBLEBOX;
   wp->w.event        = notify_event;
-  wp->w.tips_timeout = 0;
-  wp->w.tips_string  = NULL;
-  wp->w.parent         = NULL;
-  wp->w.focus_redirect = NULL;
 
   wp->skin_element_name = NULL;
   wp->callback          = ib->callback;

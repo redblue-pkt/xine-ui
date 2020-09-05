@@ -426,28 +426,20 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
   XITK_CHECK_CONSTITENCY(ib);
 
-  wp = (_intbox_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_intbox_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
   XITK_WIDGET_INIT(&inp);
 
-  wp->w.x          = x;
-  wp->w.y          = y;
-  wp->w.width      = width;
-  wp->w.height     = height;
-  wp->w.enable     = 0;
-  wp->w.running    = 1;
-  wp->w.visible    = 0;
-  wp->w.have_focus = FOCUS_LOST;
-  wp->w.wl         = wl;
-  wp->w.private_data = wp;
-  wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_INTBOX;
-  wp->w.event        = notify_event;
-  wp->w.tips_timeout = 0;
-  wp->w.tips_string  = NULL;
-  wp->w.parent         = NULL;
-  wp->w.focus_redirect = NULL;
+  wp->w.x        = x;
+  wp->w.y        = y;
+  wp->w.width    = width;
+  wp->w.height   = height;
+  wp->w.enable   = 0;
+  wp->w.visible  = 0;
+  wp->w.type     = WIDGET_GROUP | WIDGET_TYPE_INTBOX;
+  wp->w.event    = notify_event;
 
   wp->info = *ib;
   wp->skin_element_name = wp->info.skin_element_name ? strdup (wp->info.skin_element_name) : NULL;

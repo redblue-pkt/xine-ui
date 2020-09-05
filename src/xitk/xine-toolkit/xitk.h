@@ -740,6 +740,11 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
 
 /**
+ * Target mouse and tab focus to another widget.
+ */
+void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redirect);
+
+/**
  * Force the focus to given widget.
  */
 void xitk_set_focus_to_widget(xitk_widget_t *);
