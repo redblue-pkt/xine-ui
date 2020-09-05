@@ -97,29 +97,30 @@ typedef struct {
 typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_event_result_t *);
 
 struct xitk_widget_s {
-  xitk_dnode_t                    node;
+  xitk_dnode_t           node;
 
-  xitk_widget_list_t             *wl;
-  xitk_widget_t                  *parent;
-  xitk_widget_t                  *focus_redirect;
+  xitk_widget_list_t    *wl;
+  xitk_widget_t         *parent;
+  xitk_widget_t         *focus_redirect;
+  int                    refs;
 
-  int                             x;
-  int                             y;
-  int                             width;
-  int                             height;
+  int                    x;
+  int                    y;
+  int                    width;
+  int                    height;
 
-  uint32_t                        type;
-  int                             enable;
-  int                             running;
-  int                             visible;
-  widget_focus_t                  have_focus;
+  uint32_t               type;
+  int                    enable;
+  int                    running;
+  int                    visible;
+  widget_focus_t         have_focus;
 
-  widget_event_notify_t           event;
+  widget_event_notify_t  event;
 
-  unsigned long                   tips_timeout;
-  char                           *tips_string;
+  unsigned long          tips_timeout;
+  char                  *tips_string;
 
-  void                           *private_data;
+  void                  *private_data;
 };
 
 struct xitk_widget_list_s {
@@ -139,6 +140,9 @@ struct xitk_widget_list_s {
   GC                          gc, origin_gc, temp_gc;
   int                         destroy;
 };
+
+xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size);
+void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent);
 
 /* ****************************************************************** */
 

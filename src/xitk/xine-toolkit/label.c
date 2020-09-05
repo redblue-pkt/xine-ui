@@ -580,7 +580,7 @@ static xitk_widget_t *_label_create (xitk_widget_list_t *wl, const xitk_label_wi
   ABORT_IF_NULL(wl);
   ABORT_IF_NULL(wl->imlibdata);
 
-  wp = (_label_private_t *) xitk_xmalloc (sizeof (*wp));
+  wp = (_label_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
   
@@ -636,26 +636,17 @@ static xitk_widget_t *_label_create (xitk_widget_list_t *wl, const xitk_label_wi
   wp->anim_running  = 0;
   wp->label         = NULL;
   wp->labelpix      = NULL;
+  wp->have_focus    = FOCUS_LOST;
 
   pthread_mutex_init (&wp->change_mutex, NULL);
 
-  wp->w.private_data       = wp;
+  wp->w.enable      = info->enability;
+  wp->w.visible     = info->visibility;
+  wp->w.x           = info->x;
+  wp->w.y           = info->y;
 
-  wp->w.wl                 = wl;
-
-  wp->w.parent             = NULL;
-  wp->w.focus_redirect     = NULL;
-  wp->w.enable             = info->enability;
-  wp->w.visible            = info->visibility;
-  wp->w.x                  = info->x;
-  wp->w.y                  = info->y;
-  wp->w.have_focus         = wp->have_focus = FOCUS_LOST;
-  wp->w.running            = 1;
-
-  wp->w.type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_PARTIAL_PAINTABLE;
-  wp->w.event              = notify_event;
-  wp->w.tips_timeout       = 0;
-  wp->w.tips_string        = NULL;
+  wp->w.type        = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event       = notify_event;
 
   if (wp->highlight_font && wp->callback)
     wp->w.type |= WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;

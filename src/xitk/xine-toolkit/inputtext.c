@@ -1243,24 +1243,16 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   wp->text.temp_img.y = 0;
   wp->text.temp_img.width = wp->w.width;
   wp->text.temp_img.height = wp->w.height;
-  wp->text.temp_gc      = None;
+  wp->text.temp_gc    = None;
 
-  wp->cursor_focus      = 0;
+  wp->cursor_focus    = 0;
 
-  wp->callback          = it->callback;
-  wp->userdata          = it->userdata;
+  wp->callback        = it->callback;
+  wp->userdata        = it->userdata;
   
-  wp->w.private_data    = wp;
-
-  wp->w.parent          = NULL;
-  wp->w.focus_redirect  = NULL;
-  wp->w.running         = 1;
-  wp->w.have_focus      = FOCUS_LOST;
-  wp->w.type            = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE
-                        | WIDGET_CLICKABLE | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
-  wp->w.event           = notify_event;
-  wp->w.tips_timeout    = 0;
-  wp->w.tips_string     = NULL;
+  wp->w.type          = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE
+                      | WIDGET_CLICKABLE | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event         = notify_event;
 
   return &wp->w;
 }
@@ -1274,11 +1266,9 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
   ABORT_IF_NULL(wl->imlibdata);
 
-  wp = (_inputtext_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_inputtext_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-
-  wp->w.wl = wl;
 
   name = it->skin_element_name;
   wp->skin_element_name = name ? strdup (name) : NULL;
@@ -1302,11 +1292,9 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(it);
 
-  wp = (_inputtext_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_inputtext_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-
-  wp->w.wl = wl;
 
   wp->w.x = x;
   wp->w.y = y;

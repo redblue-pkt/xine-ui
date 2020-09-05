@@ -555,7 +555,7 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
     xitk_dnode_insert_after (prev, &wp->visible.btns[i + WBSTART]->node);
     wp->visible.btns[i + WBSTART]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[i + WBSTART]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[i + WBSTART]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[i + WBSTART], &wp->w);
     if (i >= wp->visible.num)
       xitk_disable_widget (wp->visible.btns[i + WBSTART]);
     xitk_set_widget_pos (wp->visible.btns[i + WBSTART], x, y);
@@ -1042,15 +1042,8 @@ static xitk_widget_t *_xitk_browser_create (_browser_private_t *wp, xitk_browser
   _browser_set_hslider (wp, 1);
   _browser_set_vslider (wp);
 
-  wp->w.parent = NULL;
-  wp->w.focus_redirect = NULL;
-  wp->w.running = 1;
-  wp->w.have_focus = FOCUS_LOST;
-
   wp->w.type = WIDGET_TABABLE | WIDGET_KEYABLE | WIDGET_GROUP | WIDGET_TYPE_BROWSER;
   wp->w.event = browser_notify_event;
-  wp->w.tips_timeout = 0;
-  wp->w.tips_string = NULL;
   _browser_show (wp);
 
   return &wp->w;
@@ -1069,7 +1062,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
   XITK_CHECK_CONSTITENCY(br);
 
-  wp = calloc (1, sizeof (*wp));
+  wp = (_browser_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -1078,7 +1071,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
 
   wp->w.width = 0;
   wp->w.height = 0;
-  wp->w.wl = wl;
 
   wp->skin_element_name = br->browser.skin_element_name ? strdup (br->browser.skin_element_name) : NULL;
   info = xitk_skin_get_info (skonfig, wp->skin_element_name);
@@ -1096,7 +1088,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBUP]->node);
     wp->visible.btns[WBUP]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBUP]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBUP]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBUP], &wp->w);
   }
   
   sl.min                      = 0;
@@ -1112,7 +1104,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WSLID]->node);
     wp->visible.btns[WSLID]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WSLID]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WSLID]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WSLID], &wp->w);
     xitk_slider_set_to_max (wp->visible.btns[WSLID]);
   }
 
@@ -1124,7 +1116,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBDN]->node);
     wp->visible.btns[WBDN]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBDN]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBDN]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBDN], &wp->w);
   }
   
   b.skin_element_name = br->arrow_left.skin_element_name;
@@ -1135,7 +1127,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBLF]->node);
     wp->visible.btns[WBLF]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBLF]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBLF]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBLF], &wp->w);
   }
   
   sl.min                      = 0;
@@ -1151,7 +1143,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WSLIDH]->node);
     wp->visible.btns[WSLIDH]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WSLIDH]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WSLIDH]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WSLIDH], &wp->w);
     xitk_slider_reset (wp->visible.btns[WSLIDH]);
   }
 
@@ -1163,7 +1155,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBRT]->node);
     wp->visible.btns[WBRT]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBRT]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBRT]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBRT], &wp->w);
   }
 
   _browser_hull (wp);
@@ -1187,7 +1179,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
   XITK_CHECK_CONSTITENCY(br);
 
-  wp = calloc (1, sizeof (*wp));
+  wp = (_browser_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -1197,7 +1189,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   wp->w.x = wp->visible.x = x;
   wp->w.y = wp->visible.y = y;
-  wp->w.wl = wl;
   wp->skin_element_name = NULL;
   wp->visible.fontname = fontname ? strdup (fontname) : NULL;
   _browser_set_items (wp, br->browser.entries, NULL, br->browser.num_entries);
@@ -1225,7 +1216,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
       xitk_dlist_add_tail (&wl->list, &wp->visible.btns[i + WBSTART]->node);
       wp->visible.btns[i + WBSTART]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
       wp->visible.btns[i + WBSTART]->type &= ~WIDGET_TABABLE;
-      wp->visible.btns[i + WBSTART]->parent = &wp->w;
+      xitk_widget_set_parent (wp->visible.btns[i + WBSTART], &wp->w);
       if (i >= wp->visible.num)
         xitk_disable_widget (wp->visible.btns[i + WBSTART]);
       xitk_set_widget_pos (wp->visible.btns[i + WBSTART], ix, iy);
@@ -1245,7 +1236,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBUP]->node);
     wp->visible.btns[WBUP]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBUP]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBUP]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBUP], &wp->w);
   }
 
   sl.min                  = 0;
@@ -1262,7 +1253,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WSLID]->node);
     wp->visible.btns[WSLID]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WSLID]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WSLID]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WSLID], &wp->w);
     xitk_slider_set_to_max (wp->visible.btns[WSLID]);
   }
   
@@ -1275,7 +1266,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBDN]->node);
     wp->visible.btns[WBDN]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBDN]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBDN]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBDN], &wp->w);
   }
 
   b.skin_element_name = "XITK_NOSKIN_LEFT";
@@ -1287,7 +1278,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBLF]->node);
     wp->visible.btns[WBLF]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBLF]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBLF]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBLF], &wp->w);
   }
 
   sl.min                      = 0;
@@ -1304,7 +1295,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WSLIDH]->node);
     wp->visible.btns[WSLIDH]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WSLIDH]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WSLIDH]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WSLIDH], &wp->w);
     xitk_slider_reset (wp->visible.btns[WSLIDH]);
   }
   
@@ -1317,7 +1308,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBRT]->node);
     wp->visible.btns[WBRT]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_BROWSER;
     wp->visible.btns[WBRT]->type &= ~WIDGET_TABABLE;
-    wp->visible.btns[WBRT]->parent = &wp->w;
+    xitk_widget_set_parent (wp->visible.btns[WBRT], &wp->w);
   }
 
   wp->w.visible = 0;

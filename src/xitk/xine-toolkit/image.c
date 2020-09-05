@@ -2450,7 +2450,7 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
   ABORT_IF_NULL(wl);
 
-  wp = (_image_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_image_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -2459,24 +2459,14 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   wp->bWidget           = &wp->w;
   wp->skin              = skin;
 
-  wp->w.private_data    = &wp->w;
-
-  wp->w.wl              = wl;
-
-  wp->w.parent          = NULL;
-  wp->w.focus_redirect  = NULL;
   wp->w.enable          = 0;
-  wp->w.running         = 1;
   wp->w.visible         = 0;
-  wp->w.have_focus      = FOCUS_LOST;
   wp->w.x               = x;
   wp->w.y               = y;
   wp->w.width           = wp->skin->width;
   wp->w.height          = wp->skin->height;
   wp->w.type            = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = _notify_event;
-  wp->w.tips_timeout    = 0;
-  wp->w.tips_string     = NULL;
 
   return &wp->w;
 }

@@ -216,7 +216,7 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
       if (!bl->widgets[i])
         break;
       bl->widgets[i]->type |= bl->widget_type_flags;
-      bl->widgets[i]->parent = &bl->w;
+      xitk_widget_set_parent (bl->widgets[i], &bl->w);
       xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
       xitk_disable_and_hide_widget (bl->widgets[i]);
       xitk_dnode_remove (&bl->widgets[i]->node);
@@ -296,7 +296,7 @@ xitk_widget_t *xitk_button_list_new (
   if (i > (int)sizeof (bl->widgets) / (int)sizeof (bl->widgets[0]))
     i = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
 
-  bl = calloc (1, sizeof (*bl));
+  bl = (xitk_button_list_t *)xitk_widget_new (widget_list, sizeof (*bl));
   if (!bl)
     return NULL;
   bl->skin_config = skin_config;
@@ -304,8 +304,7 @@ xitk_widget_t *xitk_button_list_new (
   bl->flags = 1;
 
   bl->widget_type_flags = widget_type_flags | WIDGET_GROUP_BUTTON_LIST;
-  bl->w.wl = bl->widget_list = widget_list;
-  bl->w.private_data = bl;
+  bl->widget_list = widget_list;
 
   info = xitk_skin_get_info (skin_config, skin_element_name);
   max = info ? info->max_buttons : 0;
@@ -326,20 +325,12 @@ xitk_widget_t *xitk_button_list_new (
     bl->last = sizeof (bl->widgets) / sizeof (bl->widgets[0]);
 
   bl->first = 0;
-  bl->w.parent = NULL;
-  bl->w.focus_redirect = NULL;
   bl->w.x = bl->x = info ? info->x : 0;
   bl->w.y = bl->y = info ? info->y : 0;
-  bl->w.width = 0;
-  bl->w.height = 0;
   bl->w.type = WIDGET_GROUP | WIDGET_TYPE_BUTTON_LIST;
   bl->w.enable = info ? info->enability : 1;
-  bl->w.running = 1;
   bl->w.visible = info ? info->visibility : 1;
-  bl->w.have_focus = FOCUS_LOST;
   bl->w.event = xitk_button_list_event;
-  bl->w.tips_timeout = 0;
-  bl->w.tips_string = NULL;
 
   bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;
   
@@ -359,7 +350,7 @@ xitk_widget_t *xitk_button_list_new (
     return NULL;
   }
   bl->widgets[0]->type |= bl->widget_type_flags;
-  bl->widgets[0]->parent = &bl->w;
+  xitk_widget_set_parent (bl->widgets[0], &bl->w);
   xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[0]->node);
   if (tips[0])
     xitk_set_widget_tips_and_timeout (bl->widgets[0], tips[0], tips_timeout);
@@ -394,7 +385,7 @@ xitk_widget_t *xitk_button_list_new (
     if (!bl->widgets[i])
       break;
     bl->widgets[i]->type |= bl->widget_type_flags;
-    bl->widgets[i]->parent = &bl->w;
+    xitk_widget_set_parent (bl->widgets[i], &bl->w);
     xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
     if (tips[i])
       xitk_set_widget_tips_and_timeout (bl->widgets[i], tips[i], tips_timeout);
@@ -412,7 +403,7 @@ xitk_widget_t *xitk_button_list_new (
     if (!bl->widgets[i])
       break;
     bl->widgets[i]->type |= bl->widget_type_flags;
-    bl->widgets[i]->parent = &bl->w;
+    xitk_widget_set_parent (bl->widgets[i], &bl->w);
     xitk_dnode_insert_after (&bl->add_here->node, &bl->widgets[i]->node);
     xitk_disable_and_hide_widget (bl->widgets[i]);
     xitk_dnode_remove (&bl->widgets[i]->node);
@@ -426,7 +417,7 @@ xitk_widget_t *xitk_button_list_new (
   bl->swap    = xitk_labelbutton_create (widget_list, skin_config, &lb);
   if (bl->swap) {
     bl->swap->type |= bl->widget_type_flags;
-    bl->swap->parent = &bl->w;
+    xitk_widget_set_parent (bl->swap, &bl->w);
     xitk_dnode_insert_after (&bl->add_here->node, &bl->swap->node);
     xitk_set_widget_tips_and_timeout (bl->swap, _("More sources..."), tips_timeout);
     xitk_disable_and_hide_widget (bl->swap);
@@ -488,3 +479,5 @@ void xitk_button_list_able (xitk_widget_t *w, int enable) {
     bl->flags &= ~1;
   }
 }
+
+

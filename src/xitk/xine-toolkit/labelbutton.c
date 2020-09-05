@@ -688,7 +688,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   
   ABORT_IF_NULL(wl);
 
-  wp = (_lbutton_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_lbutton_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -739,16 +739,8 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->label_dy          = (info->label_y > 0) && (info->label_y < wp->skin.height)
                         ? info->label_y - (wp->skin.height >> 1) : 0;
 
-  wp->w.private_data    = wp;
-
-  wp->w.wl              = wl;
-
-  wp->w.parent          = NULL;
-  wp->w.focus_redirect  = NULL;
   wp->w.enable          = info->enability;
-  wp->w.running         = 1;
   wp->w.visible         = info->visibility;
-  wp->w.have_focus      = FOCUS_LOST;
   wp->w.x               = info->x;
   wp->w.y               = info->y;
   wp->w.width           = wp->skin.width / 3;
@@ -756,8 +748,6 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = labelbutton_event;
-  wp->w.tips_timeout    = 0;
-  wp->w.tips_string     = NULL;
 
   return &wp->w;
 }

@@ -1649,37 +1649,45 @@ void xitk_disable_widget(xitk_widget_t *w) {
 /*
  *
  */
-static void xitk_free_widget(xitk_widget_t *w) {
-  widget_event_t event;
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
+static void xitk_widget_unref (xitk_widget_t *w) {
+  if (--w->refs != 0)
     return;
-  }
-  
-  event.type = WIDGET_EVENT_DESTROY;
-  (void) w->event(w, &event, NULL);
+  XITK_FREE (w);
+}
 
-  if (w->wl != NULL)
-    xitk_tips_hide_tips(w->wl->xitk->tips);
+static int xitk_widget_zombie_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int type = event ? event->type : -1;
+  int refs = w ? w->refs : 0;
 
-  XITK_FREE(w->tips_string);
-  XITK_FREE(w);
-  w = NULL;
-  
+  (void)result;
+  printf ("XITK WARNING: event %d to zombie widget %p (%d refs).\n", type, (void *)w, refs);
+  return 0;
 }
 
 /*
  * Destroy a widget.
  */
 void xitk_destroy_widget(xitk_widget_t *w) {
+  widget_event_t event;
 
   if (!w)
     return;
 
+  /* NOTE: kill the widget now as thats what the user wants.
+   * keep the zombie for clearing refs if needed. */
   xitk_clipboard_unregister_widget (w);
   xitk_hide_widget(w);
   xitk_stop_widget(w);
   xitk_disable_widget(w);
+
+  if (w->parent) {
+    xitk_widget_unref (w->parent);
+    w->parent = NULL;
+  }
+  if (w->focus_redirect) {
+    xitk_widget_unref (w->focus_redirect);
+    w->focus_redirect = NULL;
+  }
 
   if (w->wl) {
     if (w == w->wl->widget_focused)
@@ -1688,10 +1696,21 @@ void xitk_destroy_widget(xitk_widget_t *w) {
       w->wl->widget_under_mouse = NULL;
     if (w == w->wl->widget_pressed)
       w->wl->widget_pressed = NULL;
+    xitk_tips_hide_tips (w->wl->xitk->tips);
   }
 
   xitk_dnode_remove (&w->node);
-  xitk_free_widget(w);
+
+  event.type = WIDGET_EVENT_DESTROY;
+  w->event (w, &event, NULL);
+
+  XITK_FREE (w->tips_string);
+
+  w->enable = 0;
+  w->visible = 0;
+  w->event = xitk_widget_zombie_event;
+
+  xitk_widget_unref (w);
 }
 
 /*
@@ -2282,3 +2301,66 @@ int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier) {
 
   return handled;
 }
+
+
+xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size) {
+  xitk_widget_t *w;
+
+  if (size < sizeof (*w))
+    size = sizeof (*w);
+  w = xitk_xmalloc (size);
+  if (!w)
+    return NULL;
+
+  w->node.next = w->node.prev = NULL;
+
+  w->wl = wl;
+  w->parent = NULL;
+  w->focus_redirect = NULL;
+  w->refs = 1;
+
+  w->x = w->y = w->width = w->height = 0;
+
+  w->type = 0;
+  w->enable = w->running = w->visible = 1;
+  w->have_focus = FOCUS_LOST;
+
+  w->event = NULL;
+
+  w->tips_timeout = 0;
+  w->tips_string = NULL;
+
+  w->private_data = size > sizeof (*w) ? w : NULL;
+  return w;
+};
+
+void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent) {
+  if (!w)
+    return;
+  if (w->parent == parent)
+    return;
+  if (w->parent) {
+    xitk_widget_unref (w->parent);
+    w->parent = NULL;
+  }
+  if (parent) {
+    parent->refs += 1;
+    w->parent = parent;
+  }
+}
+
+void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redirect) {
+  if (!w)
+    return;
+  if (w->focus_redirect == focus_redirect)
+    return;
+  if (w->focus_redirect) {
+    xitk_widget_unref (w->focus_redirect);
+    w->focus_redirect = NULL;
+  }
+  if (focus_redirect && (focus_redirect->wl == w->wl)) {
+    focus_redirect->refs += 1;
+    w->focus_redirect = focus_redirect;
+  }
+}
+

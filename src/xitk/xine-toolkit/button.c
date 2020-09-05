@@ -263,19 +263,11 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
   wp->callback          = b->callback;
   wp->userdata          = b->userdata;
   
-  wp->w.private_data    = wp;
-
-  wp->w.parent          = NULL;
-  wp->w.focus_redirect  = NULL;
-  wp->w.running         = 1;
-  wp->w.have_focus      = FOCUS_LOST;
   wp->w.width           = wp->skin.width / 3;
   wp->w.height          = wp->skin.height;
   wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = button_event;
-  wp->w.tips_timeout    = 0;
-  wp->w.tips_string     = NULL;
 
   return &wp->w;
 }
@@ -288,11 +280,10 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
   _button_private_t *wp;
   
   XITK_CHECK_CONSTITENCY(b);
-  wp = (_button_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_button_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->w.wl = wl;
   wp->skin_element_name = b->skin_element_name ? strdup (b->skin_element_name) : NULL;
   _button_read_skin (wp, skonfig);
 
@@ -318,7 +309,7 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   xitk_image_t *i;
 
   XITK_CHECK_CONSTITENCY(b);
-  wp = (_button_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_button_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -359,7 +350,6 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
     }
   }
 
-  wp->w.wl = wl;
   wp->w.x = x;
   wp->w.y = y;
   wp->skin_element_name = b->skin_element_name ? strdup (b->skin_element_name) : NULL;

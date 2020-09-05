@@ -289,27 +289,19 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
 static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_checkbox_widget_t *cb) {
   ABORT_IF_NULL (wp->w.wl);
 
-  wp->cWidget         = &wp->w;
-  wp->cClicked        = 0;
-  wp->cState          = 0;
-  wp->focus           = FOCUS_LOST;
+  wp->cWidget   = &wp->w;
+  wp->cClicked  = 0;
+  wp->cState    = 0;
+  wp->focus     = FOCUS_LOST;
 
-  wp->callback        = cb->callback;
-  wp->userdata        = cb->userdata;
+  wp->callback  = cb->callback;
+  wp->userdata  = cb->userdata;
 
-  wp->w.private_data  = wp;
+  wp->w.width   = wp->skin.width / 3;
+  wp->w.height  = wp->skin.height;
 
-  wp->w.width    = wp->skin.width / 3;
-  wp->w.height   = wp->skin.height;
-
-  wp->w.parent          = NULL;
-  wp->w.focus_redirect  = NULL;
-  wp->w.running       = 1;
-  wp->w.have_focus    = FOCUS_LOST;
-  wp->w.type          = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_KEYABLE;
-  wp->w.event         = checkbox_event;
-  wp->w.tips_timeout  = 0;
-  wp->w.tips_string   = NULL;
+  wp->w.type    = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_KEYABLE;
+  wp->w.event   = checkbox_event;
   
   return &wp->w;
 }
@@ -323,11 +315,10 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
   
   XITK_CHECK_CONSTITENCY(cb);
 
-  wp = (_checkbox_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_checkbox_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->w.wl       = wl;
   wp->skin_element_name = cb->skin_element_name == NULL ? NULL : strdup (cb->skin_element_name);
   _checkbox_read_skin (wp, skonfig);
   wp->num_gfx = 3;
@@ -356,7 +347,7 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
   
   XITK_CHECK_CONSTITENCY(cb);
 
-  wp = (_checkbox_private_t *)xitk_xmalloc (sizeof (*wp));
+  wp = (_checkbox_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
@@ -408,7 +399,6 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
     }
   }
 
-  wp->w.wl       = wl;
   wp->skin_element_name = NULL;
   wp->skin.image = i;
   wp->skin.x        = 0;
