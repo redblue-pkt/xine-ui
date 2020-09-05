@@ -360,7 +360,7 @@ static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) 
 
 static void _combo_tips_timeout (_combo_private_t *wp, unsigned long timeout) {
   if (wp->label_widget)
-    xitk_set_widget_tips_and_timeout (wp->label_widget, wp->w.tips_string, timeout);
+    xitk_set_widget_tips_and_timeout (wp->button_widget, wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
