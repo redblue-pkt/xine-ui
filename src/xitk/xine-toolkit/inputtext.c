@@ -674,9 +674,10 @@ static void _paint_inputtext (_inputtext_private_t *wp) {
  * Handle click events.
  */
 static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bUp, int x, int y) {
-  (void)button;
-  (void)bUp;
   (void)y;
+  if ((button != Button1) || bUp)
+    return 0;
+
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     if (wp->w.have_focus == FOCUS_LOST)
       wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;

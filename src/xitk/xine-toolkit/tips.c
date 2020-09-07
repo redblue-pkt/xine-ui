@@ -37,233 +37,242 @@
 #include "tips.h"
 #include "combo.h"
 
+typedef enum {
+  TIPS_IDLE = 0,
+  TIPS_DELAY,
+  TIPS_SHOW,
+  TIPS_WAIT,
+  TIPS_HIDE,
+  TIPS_QUIT,
+  TIPS_LAST
+} _tips_state_t;
+
+static const _tips_state_t _tips_next[TIPS_LAST] = {
+  [TIPS_IDLE] = TIPS_IDLE,
+  [TIPS_DELAY] = TIPS_SHOW,
+  [TIPS_SHOW] = TIPS_WAIT,
+  [TIPS_WAIT] = TIPS_HIDE,
+  [TIPS_HIDE] = TIPS_IDLE,
+  [TIPS_QUIT] = TIPS_QUIT
+};
+
+static const int _tips_wait[TIPS_LAST] = {
+  [TIPS_IDLE] = 8000,
+  [TIPS_DELAY] = 500,
+  [TIPS_SHOW] = 0,
+  [TIPS_WAIT] = -1,
+  [TIPS_HIDE] = 0,
+  [TIPS_QUIT] = 0
+};
+
 struct xitk_tips_s {
   Display             *display;
 
   xitk_widget_t       *widget, *new_widget;
-  int                  visible;
-  int                  running;
-  int                  prewait;
+  _tips_state_t        state;
+  int                  num_waiters;
 
   pthread_t            thread;
   pthread_mutex_t      mutex;
-  pthread_cond_t       cond;
+  pthread_cond_t       in, out;
 };
 
-static struct timespec _compute_interval(unsigned int millisecs) {
-  struct timespec ts;
+static void _compute_interval (struct timespec *ts, unsigned int millisecs) {
 #if _POSIX_TIMERS > 0
-  clock_gettime(CLOCK_REALTIME, &ts);
-  uint64_t ttimer = (uint64_t)ts.tv_sec*1000 + ts.tv_nsec/1000000 + millisecs;
-  ts.tv_sec = ttimer/1000;
-  ts.tv_nsec = (ttimer%1000)*1000000;
+  clock_gettime (CLOCK_REALTIME, ts);
 #else
   struct timeval tv;
-  gettimeofday(&tv, NULL);
-  uint64_t ttimer = (uint64_t)tv.tv_sec*1000 + tv.tv_usec/1000 + millisecs;
-  ts.tv_sec = ttimer/1000;
-  ts.tv_nsec = (ttimer%1000)*1000000;
+  gettimeofday (&tv, NULL);
+  ts->tv_sec = tv.tv_sec;
+  ts->tv_nsec = tv.tv_usec * 1000;
 #endif
-  return ts;
+  ts->tv_sec += millisecs / 1000;
+  ts->tv_nsec += (millisecs % 1000) * 1000000;
+  if (ts->tv_nsec >= 1000000000) {
+    ts->tv_nsec -= 1000000000;
+    ts->tv_sec += 1;
+  }
 }
 
-
-static __attribute__((noreturn)) void *_tips_loop_thread(void *data) {
-
+static void *_tips_loop_thread (void *data) {
   xitk_tips_t *tips = data;
+  xitk_t *xitk = NULL;
+  xitk_window_t *xwin = NULL;
+  _tips_state_t state = TIPS_IDLE;
 
-  tips->running = 1;
-  pthread_mutex_lock(&tips->mutex);
+  pthread_mutex_lock (&tips->mutex);
   
-  while (tips->running) {
-    struct timespec      ts;
+  while (state != TIPS_QUIT) {
+    int wait;
 
-    /* Wait for a new tip to show */
-    if (!tips->new_widget) {
-      while (tips->running) {
-	ts = _compute_interval(1000);
-        if (pthread_cond_timedwait(&tips->cond, &tips->mutex, &ts) != ETIMEDOUT)
-	  break;
-      }
+    tips->state = state;
+    wait = _tips_wait[state];
+    if (wait < 0)
+      wait = tips->widget ? tips->widget->tips_timeout : 0;
+    if (wait > 0) {
+      struct timespec ts;
+      _compute_interval (&ts, wait);
+      pthread_cond_timedwait (&tips->in, &tips->mutex, &ts);
+    }
+    if (tips->num_waiters > 0) {
+      tips->num_waiters &= 0xffff;
+      state = (state == TIPS_WAIT) || (state == TIPS_HIDE) ? TIPS_HIDE : TIPS_IDLE;
     }
 
-    /* Exit if we're quitting */
-    if (!tips->running)
-      break;
+    switch (state) {
+      case TIPS_SHOW:
+        if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && tips->widget->tips_string[0]) {
+          int x, y, w, h;
+          xitk_image_t *image;
+          xitk_font_t *fs;
+          unsigned int cfore, cback;
+          int disp_w = xitk_get_display_width ();
+          int disp_h = xitk_get_display_height ();
+          int x_margin = 12, y_margin = 6;
+          int bottom_gap = 16; /* To avoid mouse cursor overlaying tips on bottom of widget */
 
-    /* Start over if nothing */
-    if (!tips->new_widget)
-      continue;
-    
-    tips->prewait = 1;
+          xitk = tips->widget->wl->xitk;
 
-    ts = _compute_interval(500);
-    
-    pthread_cond_timedwait (&tips->cond, &tips->mutex, &ts);
-    
-    /* Start over if interrupted */
-    if (!tips->prewait)
-      continue;
-
-    tips->prewait = 0;
-
-    tips->widget = tips->new_widget;
-    tips->new_widget = NULL;
-    
-    if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && strlen(tips->widget->tips_string)) {
-      xitk_t              *xitk =tips->widget->wl->xitk;
-      int                  x, y, w, h;
-      xitk_window_t       *xwin;
-      xitk_image_t        *image;
-      xitk_font_t         *fs;
-      unsigned int         cfore, cback;
-      struct timespec      ts;
-
-      int                  disp_w = xitk_get_display_width();
-      int                  disp_h = xitk_get_display_height();
-
-      int                  x_margin = 12, y_margin = 6;
-      int                  bottom_gap = 16; /* To avoid mouse cursor overlaying tips on bottom of widget */
-
-      tips->visible = 1;
-
-      /* Get parent window position */
-      xitk_get_window_position(tips->display, tips->widget->wl->win, &x, &y, NULL, NULL);
+          /* Get parent window position */
+          xitk_get_window_position (tips->display, tips->widget->wl->win, &x, &y, NULL, NULL);
       
-      x += tips->widget->x;
-      y += tips->widget->y;
+          x += tips->widget->x;
+          y += tips->widget->y;
       
-      fs = xitk_font_load_font(xitk, DEFAULT_FONT_10);
-      xitk_font_set_font(fs, tips->widget->wl->gc);
+          fs = xitk_font_load_font (xitk, DEFAULT_FONT_10);
+          xitk_font_set_font (fs, tips->widget->wl->gc);
 
-      xitk_font_unload_font(fs);
+          xitk_font_unload_font (fs);
       
-      cfore = xitk_get_pixel_color_black(xitk);
-      cback = xitk_get_pixel_color_lightgray(xitk);
+          cfore = xitk_get_pixel_color_black (xitk);
+          cback = xitk_get_pixel_color_lightgray (xitk);
       
-      /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
-      image = xitk_image_create_image_with_colors_from_string(xitk, DEFAULT_FONT_10,
-							      (disp_w/3), ALIGN_LEFT, 
-                                                              tips->widget->tips_string, cfore, cback);
-      
-      /* Create the tips window, horizontally centered from parent widget */
-      /* If necessary, adjust position to display it fully on screen      */
-      w = image->width + x_margin;
-      h = image->height + y_margin;
-      x -= ((w - tips->widget->width) >> 1);
-      y += (tips->widget->height + bottom_gap);
-      if(x > disp_w - w)
-	x = disp_w - w;
-      else if(x < 0)
-	x = 0;
-      if(y > disp_h - h)
-	/* 1 px dist to widget prevents odd behavior of mouse pointer when  */
-	/* pointer is moved slowly from widget to tips, at least under FVWM */
-	/*                                           v                      */
-        y -= (tips->widget->height + h + bottom_gap + 1);
-      /* No further alternative to y-position the tips (just either below or above widget) */
-      xwin = xitk_window_create_simple_window_ext(xitk, x, y, w, h,
-                                                  NULL, NULL, NULL, 1, 0, NULL);
-      {
-	xitk_pixmap_t *bg;
-        int bg_width, bg_height;
+          /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
+          image = xitk_image_create_image_with_colors_from_string (xitk,
+            DEFAULT_FONT_10, disp_w / 3, ALIGN_LEFT, tips->widget->tips_string, cfore, cback);
 
-        bg = xitk_window_get_background_pixmap(xwin);
-        bg_width = xitk_pixmap_width(bg);
-        bg_height = xitk_pixmap_height(bg);
+          /* Create the tips window, horizontally centered from parent widget */
+          /* If necessary, adjust position to display it fully on screen      */
+          w = image->width + x_margin;
+          h = image->height + y_margin;
+          x -= (w - tips->widget->width) >> 1;
+          y += tips->widget->height + bottom_gap;
+          if (x > disp_w - w)
+            x = disp_w - w;
+          else if (x < 0)
+            x = 0;
+          if (y > disp_h - h)
+            /* 1 px dist to widget prevents odd behavior of mouse pointer when  */
+            /* pointer is moved slowly from widget to tips, at least under FVWM */
+            /*                                           v                      */
+            y -= tips->widget->height + h + bottom_gap + 1;
+          /* No further alternative to y-position the tips (just either below or above widget) */
+          xwin = xitk_window_create_simple_window_ext (xitk, x, y, w, h, NULL, NULL, NULL, 1, 0, NULL);
+          {
+            xitk_pixmap_t *bg;
+            int bg_width, bg_height;
 
-        pixmap_draw_rectangle(bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
-        pixmap_fill_rectangle(bg, 1, 1, bg_width - 2, bg_height - 2, cback);
-        xitk_pixmap_copy_area(image->image, bg, 0, 0, image->width, image->height,
-                              (bg_width - image->width)>>1, (bg_height - image->height)>>1);
+            bg = xitk_window_get_background_pixmap (xwin);
+            bg_width = xitk_pixmap_width (bg);
+            bg_height = xitk_pixmap_height (bg);
 
-        xitk_window_set_background(xwin, bg);
+            pixmap_draw_rectangle (bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
+            pixmap_fill_rectangle (bg, 1, 1, bg_width - 2, bg_height - 2, cback);
+            xitk_pixmap_copy_area (image->image, bg, 0, 0, image->width, image->height,
+              (bg_width - image->width) >> 1, (bg_height - image->height) >> 1);
 
-        xitk_image_free_image(&image);
-      }
+            xitk_window_set_background (xwin, bg);
 
-      xitk_window_show_window(xwin, 1);
+            xitk_image_free_image (&image);
+          }
+          xitk_window_show_window (xwin, 1);
+          state = TIPS_WAIT;
+        } else {
+          state = TIPS_IDLE;
+          tips->widget = tips->new_widget = NULL;
+        }
+        break;
 
-      ts = _compute_interval(tips->widget->tips_timeout);
+      case TIPS_HIDE:
+        xitk_window_destroy_window (xwin);
+        /* We are flushing here, otherwise tips window will stay displayed */
+        XLOCK (xitk_x_lock_display, tips->display);
+        XSync (tips->display, False);
+        XUNLOCK (xitk_x_unlock_display, tips->display);
+        xwin = NULL;
+        state = TIPS_IDLE;
+        /* fall through */
+      case TIPS_IDLE:
+        tips->widget = NULL;
+        if (tips->new_widget == (xitk_widget_t *)-1) {
+          state = TIPS_QUIT;
+        } else if (tips->new_widget) {
+          state = TIPS_DELAY;
+          tips->widget = tips->new_widget;
+          tips->new_widget = NULL;
+        }
+        break;
 
-      pthread_cond_timedwait(&tips->cond, &tips->mutex, &ts);
-
-      xitk_window_destroy_window(xwin);
-      
-      /* We are flushing here, otherwise tips window will stay displayed */
-      XLOCK (xitk_x_lock_display, tips->display);
-      XSync(tips->display, False);
-      XUNLOCK (xitk_x_unlock_display, tips->display);
-
-      tips->visible = 0;
+      default:
+        state = _tips_next[state];
     }
-
+    if (tips->num_waiters > 0)
+      pthread_cond_broadcast (&tips->out);
   }
 
-  pthread_mutex_unlock(&tips->mutex);
+  tips->state = TIPS_QUIT;
+  tips->widget = tips->new_widget = NULL;
+  pthread_mutex_unlock (&tips->mutex);
 
-  pthread_exit(NULL);
+  return NULL;
 }
 
 /*
  *
  */
-xitk_tips_t *xitk_tips_init(Display *disp) {
+xitk_tips_t *xitk_tips_new (Display *disp) {
+  xitk_tips_t *tips;
 
-  xitk_tips_t *tips = xitk_xmalloc(sizeof(*tips));
+  tips = xitk_xmalloc (sizeof (*tips));
+  if (!tips)
+    return NULL;
 
+  tips->display    = disp;
+  tips->state      = TIPS_IDLE;
+  tips->num_waiters = 0;
+  tips->widget     = NULL;
+  tips->new_widget = NULL;
+
+  pthread_mutex_init (&tips->mutex, NULL);
+  pthread_cond_init (&tips->in, NULL);
+  pthread_cond_init (&tips->out, NULL);
+
+  {
     pthread_attr_t       pth_attrs;
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
     struct sched_param   pth_params;
 #endif
-
-    tips->visible    = 0;
-    tips->display    = disp;
-    tips->widget     = NULL;
-    tips->new_widget = NULL;
-    tips->prewait    = 0;
-
-    pthread_mutex_init(&tips->mutex, NULL);
-    pthread_cond_init(&tips->cond, NULL);
-
-    pthread_attr_init(&pth_attrs);
-
+    int r;
+    pthread_attr_init (&pth_attrs);
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
-    pthread_attr_getschedparam(&pth_attrs, &pth_params);
-    pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
-    pthread_attr_setschedparam(&pth_attrs, &pth_params);
+    pthread_attr_getschedparam (&pth_attrs, &pth_params);
+    pth_params.sched_priority = sched_get_priority_min (SCHED_OTHER);
+    pthread_attr_setschedparam (&pth_attrs, &pth_params);
 #endif
-  
-    pthread_create(&tips->thread, &pth_attrs, _tips_loop_thread, tips);
+    r = pthread_create (&tips->thread, &pth_attrs, _tips_loop_thread, tips);
+    pthread_attr_destroy (&pth_attrs);
+    if (!r)
+      return tips;
+  }
 
-  return tips;
+  pthread_cond_destroy (&tips->out);
+  pthread_cond_destroy (&tips->in);
+  pthread_mutex_destroy (&tips->mutex);
+  free (tips);
+  return NULL;
 }
 
-/*
- *
- */
-void xitk_tips_stop(xitk_tips_t *tips) {
-
-  if (!tips)
-    return;
-
-  tips->running = 0;
-  
-  pthread_mutex_lock(&tips->mutex);
-  tips->new_widget = NULL;
-  tips->prewait = 0;
-  pthread_cond_signal(&tips->cond);
-  pthread_mutex_unlock(&tips->mutex);
-
-  /* Wait until tips are hidden to avoid a race condition causing a segfault when */
-  /* the parent widget is already destroyed before it's referenced during hiding. */
-  while (tips->visible)
-    xitk_usec_sleep(5000);
-
-  pthread_join(tips->thread, NULL);
-}
-
-void xitk_tips_deinit(xitk_tips_t **ptips) {
+void xitk_tips_delete (xitk_tips_t **ptips) {
   xitk_tips_t *tips = *ptips;
 
   if (!tips)
@@ -271,83 +280,77 @@ void xitk_tips_deinit(xitk_tips_t **ptips) {
 
   *ptips = NULL;
 
-  pthread_mutex_destroy(&tips->mutex);
-  pthread_cond_destroy(&tips->cond);
+  pthread_mutex_lock (&tips->mutex);
+  tips->num_waiters += 0x10000;
+  tips->new_widget = (xitk_widget_t *)-1;
+  pthread_cond_signal (&tips->in);
+  pthread_mutex_unlock (&tips->mutex);
 
-  free(tips);
+  pthread_join (tips->thread, NULL);
+
+  pthread_cond_destroy (&tips->out);
+  pthread_cond_destroy (&tips->in);
+  pthread_mutex_destroy (&tips->mutex);
+
+  free (tips);
 }
 
-static void _tips_update_widget(xitk_tips_t *tips, xitk_widget_t *w)
-{
-  pthread_mutex_lock(&tips->mutex);
-  if (tips->running) {
-    tips->new_widget = w;
-    tips->prewait = 0;
-    pthread_cond_signal(&tips->cond);
-  }
-  pthread_mutex_unlock(&tips->mutex);
-}
+int xitk_tips_show_widget_tips (xitk_tips_t *tips, xitk_widget_t *w) {
+  xitk_widget_t *v = NULL;
 
-/*
- *
- */
-void xitk_tips_hide_tips(xitk_tips_t *tips) {
-
-  _tips_update_widget(tips, NULL);
-
-  /* Wait until tips are hidden to avoid a race condition causing a segfault when */
-  /* the parent widget is already destroyed before it's referenced during hiding. */
-  while (tips->visible)
-    xitk_usec_sleep(5000);
-}
-
-/*
- *
- */
-int xitk_tips_show_widget_tips(xitk_tips_t *tips, xitk_widget_t *w) {
-
+  if (!tips)
+    return 1;
   /* Don't show when window invisible. This call may occur directly after iconifying window. */
-  if(!xitk_is_window_visible(w->wl->imlibdata->x.disp, w->wl->win))
+  if (w && !xitk_is_window_visible (w->wl->imlibdata->x.disp, w->wl->win))
     return 0;
 
-  _tips_update_widget(tips, w);
-
+  do {
+    if (!w)
+      break;
+    if ((w->tips_timeout <= 0) || !w->tips_string)
+      break;
+    if (!w->tips_string[0])
+      break;
+    v = w;
+  } while (0);
+  pthread_mutex_lock (&tips->mutex);
+  if ((tips->state != TIPS_QUIT) && (v != tips->widget)) {
+    tips->new_widget = v;
+    tips->num_waiters += 0x10001;
+    pthread_cond_signal (&tips->in);
+    /* Wait until tips are hidden to avoid a race condition causing a segfault when */
+    /* the parent widget is already destroyed before it's referenced during hiding. */
+    while (tips->state == TIPS_WAIT)
+      pthread_cond_wait (&tips->out, &tips->mutex);
+    tips->num_waiters -= 1;
+  }
+  pthread_mutex_unlock (&tips->mutex);
   return 1;
 }
 
-/*
- *
- */
 void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
-
-  if(w == NULL)
+  if (!w)
     return;
-  
   w->tips_timeout = timeout;
-  if(w->type & (WIDGET_GROUP | WIDGET_GROUP_MEMBER)) {
+  if (w->type & (WIDGET_GROUP | WIDGET_GROUP_MEMBER)) {
     widget_event_t  event;
     
     event.type         = WIDGET_EVENT_TIPS_TIMEOUT;
     event.tips_timeout = timeout;
-    (void) w->event(w, &event, NULL);
+    w->event (w, &event, NULL);
   }
 }
 
-/*
- *
- */
 void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
-
-  if (w == NULL)
+  if (!w)
     return;
-  
-  XITK_FREE(w->tips_string);
-  if (str == NULL)
+  XITK_FREE (w->tips_string);
+  if (!str)
     return;
-  w->tips_string = strdup(str);
-
+  if (!str[0])
+    return;
+  w->tips_string = strdup (str);
   /* No timeout, set it to default */
-  if(!w->tips_timeout)
-    xitk_tips_set_timeout(w, xitk_get_tips_timeout());
+  if (!w->tips_timeout)
+    xitk_tips_set_timeout (w, xitk_get_tips_timeout ());
 }
-

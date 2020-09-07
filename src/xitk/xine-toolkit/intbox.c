@@ -524,5 +524,7 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
     _ib_set_slider (wp);
   }
 
+  xitk_widget_set_focus_redirect (&wp->w, wp->input_widget);
+
   return &wp->w;
 }
