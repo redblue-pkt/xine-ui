@@ -93,6 +93,13 @@ typedef struct {
   xitk_image_t         *image;
 } widget_event_result_t;
 
+typedef struct xitk_widget_rel_s {
+  xitk_dnode_t node;
+  xitk_dlist_t list;
+  struct xitk_widget_rel_s *group;
+  xitk_widget_t *w;
+} xitk_widget_rel_t;
+
 /* return 1 if event_result is filled, otherwise 0 */
 typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_event_result_t *);
 
@@ -100,9 +107,7 @@ struct xitk_widget_s {
   xitk_dnode_t           node;
 
   xitk_widget_list_t    *wl;
-  xitk_widget_t         *parent;
-  xitk_widget_t         *focus_redirect;
-  int                    refs;
+  xitk_widget_rel_t      parent, focus_redirect;
 
   int                    x;
   int                    y;
@@ -121,6 +126,12 @@ struct xitk_widget_s {
   char                  *tips_string;
 
   void                  *private_data;
+
+  struct {
+    int                  enable;
+    int                  visible;
+    int                  running;
+  }                      state;
 };
 
 struct xitk_widget_list_s {
@@ -217,4 +228,3 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
 void xitk_set_focus_to_wl (xitk_widget_list_t *wl);
 
 #endif
-

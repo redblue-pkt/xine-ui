@@ -536,6 +536,7 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->w.event        = notify_event;
 
   xitk_widget_set_focus_redirect (wp->label_widget, wp->button_widget);
+  xitk_widget_set_focus_redirect (&wp->w, wp->button_widget);
 
   return &wp->w;
 }

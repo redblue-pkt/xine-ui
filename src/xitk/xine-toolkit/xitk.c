@@ -2487,7 +2487,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->x.font_cache = xitk_font_cache_init();
 
   xitk_cursors_init(display);
-  xitk->x.tips = xitk_tips_init(display);
+  xitk->x.tips = xitk_tips_new (display);
 
   return &xitk->x;
 }
@@ -2641,6 +2641,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
   xitk_set_current_menu(NULL);
 
+  xitk_tips_delete (&xitk->x.tips);
   _xitk_clipboard_deinit (xitk);
 
   /* pending destroys of the event handlers */
@@ -2658,8 +2659,6 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
   /* destroy font caching */
   xitk_font_cache_destroy(&xitk->x.font_cache);
-
-  xitk_tips_deinit(&xitk->x.tips);
 
   xitk_config_deinit (xitk->config);
 }
@@ -2708,7 +2707,7 @@ void xitk_free(xitk_t **p) {
  */
 void xitk_stop(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
-  xitk_tips_stop(xitk->x.tips);
+  xitk_tips_delete (&xitk->x.tips);
   xitk_cursors_deinit (xitk->x.display);
   xitk->running = 0;
 #if 0
@@ -2958,5 +2957,3 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
-
-

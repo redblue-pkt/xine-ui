@@ -26,12 +26,11 @@
 
 typedef struct xitk_tips_s xitk_tips_t;
 
-xitk_tips_t *xitk_tips_init(Display *display);
-void xitk_tips_stop(xitk_tips_t *);
-void xitk_tips_deinit(xitk_tips_t **);
-void xitk_tips_hide_tips(xitk_tips_t *);
+xitk_tips_t *xitk_tips_new (Display *display);
+void xitk_tips_delete (xitk_tips_t **ptips);
 
-int xitk_tips_show_widget_tips(xitk_tips_t *, xitk_widget_t *w);
+#define xitk_tips_hide_tips(_tips) xitk_tips_show_widget_tips (_tips, NULL)
+int xitk_tips_show_widget_tips(xitk_tips_t *tips, xitk_widget_t *w);
 
 void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout);
 void xitk_tips_set_tips(xitk_widget_t *w, const char *str);
