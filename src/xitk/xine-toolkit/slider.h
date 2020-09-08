@@ -77,10 +77,8 @@ void xitk_slider_reset (xitk_widget_t *);
 /** Set position to max and redraw the widget. */
 void xitk_slider_set_to_max (xitk_widget_t *);
 /** Increment by step the paddle position */
-void xitk_slider_make_step (xitk_widget_t *);
+int xitk_slider_make_step (xitk_widget_t *);
 /** Decrement by step the paddle position. */
-void xitk_slider_make_backstep (xitk_widget_t *);
-/** Call callback for current position */
-void xitk_slider_callback_exec (xitk_widget_t *);
+int xitk_slider_make_backstep (xitk_widget_t *);
 
 #endif

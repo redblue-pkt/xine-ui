@@ -705,12 +705,10 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
   switch (string[1]) {
     int v, f;
     case XITK_KEY_LEFT:
-      xitk_slider_make_backstep (wp->visible.btns[WSLIDH]);
-      _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+      _browser_hslidmove (wp, xitk_slider_make_backstep (wp->visible.btns[WSLIDH]) - wp->visible.x0);
       return 1;
     case XITK_KEY_RIGHT:
-      xitk_slider_make_step (wp->visible.btns[WSLIDH]);
-      _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+      _browser_hslidmove (wp, xitk_slider_make_step (wp->visible.btns[WSLIDH]) - wp->visible.x0);
       return 1;
 
     case XITK_KEY_HOME:
@@ -977,8 +975,7 @@ static void browser_up(xitk_widget_t *w, void *data) {
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
 
-  xitk_slider_make_step (wp->visible.btns[WSLID]);
-  _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
+  _browser_slidmove (wp, xitk_slider_make_step (wp->visible.btns[WSLID]));
 }
 
 /**
@@ -992,8 +989,7 @@ static void browser_down(xitk_widget_t *w, void *data) {
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
 
-  xitk_slider_make_backstep (wp->visible.btns[WSLID]);
-  _browser_slidmove (wp, xitk_slider_get_pos(wp->visible.btns[WSLID]));
+  _browser_slidmove (wp, xitk_slider_make_backstep (wp->visible.btns[WSLID]));
 }
 
 static void browser_left(xitk_widget_t *w, void *data) {
@@ -1004,8 +1000,7 @@ static void browser_left(xitk_widget_t *w, void *data) {
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
   
-  xitk_slider_make_backstep (wp->visible.btns[WSLIDH]);
-  _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+  _browser_hslidmove (wp, xitk_slider_make_backstep (wp->visible.btns[WSLIDH]) - wp->visible.x0);
 }
 
 static void browser_right(xitk_widget_t *w, void *data) {
@@ -1016,8 +1011,7 @@ static void browser_right(xitk_widget_t *w, void *data) {
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
   
-  xitk_slider_make_step (wp->visible.btns[WSLIDH]);
-  _browser_hslidmove (wp, xitk_slider_get_pos (wp->visible.btns[WSLIDH]) - wp->visible.x0);
+  _browser_hslidmove (wp, xitk_slider_make_step (wp->visible.btns[WSLIDH]) - wp->visible.x0);
 }
 
 /**

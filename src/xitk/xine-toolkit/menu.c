@@ -685,7 +685,7 @@ void menu_auto_pop (xitk_widget_t *w) {
 
   me = labelbutton_get_user_data (w);
   if (me->type & _MENU_NODE_BRANCH) {
-    xitk_labelbutton_callback_exec (w);
+    _menu_click_cb (w, me, 0);
   } else {
     _menu_close_subs_ex (me->wp, me->parent);
   }

@@ -38,7 +38,5 @@ xitk_widget_t *xitk_noskin_checkbox_create (xitk_widget_list_t *wl,
 int xitk_checkbox_get_state (xitk_widget_t *w);
 /** Set state of checkbox. */
 void xitk_checkbox_set_state (xitk_widget_t *w, int state);
-/** Call callback */
-void xitk_checkbox_callback_exec (xitk_widget_t *w);
 
 #endif

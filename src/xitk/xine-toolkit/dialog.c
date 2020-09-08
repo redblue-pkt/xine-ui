@@ -148,14 +148,6 @@ static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state)
   xitk_unregister_event_handler (&key);
 }
 
-static void _checkbox_label_click (xitk_widget_t *w, void *data) {
-  xitk_dialog_t *wd = (xitk_dialog_t *) data;
-
-  (void)w;
-  xitk_checkbox_set_state (wd->checkbox, !xitk_checkbox_get_state (wd->checkbox));
-  xitk_checkbox_callback_exec (wd->checkbox);
-}
-
 /*
  * Local XEvent handling.
  */
@@ -246,7 +238,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     XITK_WIDGET_INIT(&cb);
     XITK_WIDGET_INIT(&lbl);
   
-    cb.skin_element_name = NULL;
+    cb.skin_element_name = "XITK_NOSKIN_CHECK";
     cb.callback          = NULL;
     cb.userdata          = NULL;
     wd->checkbox = xitk_noskin_checkbox_create (widget_list, &cb, x, y + 5, 10, 10);
@@ -257,11 +249,12 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 
     lbl.skin_element_name = NULL;
     lbl.label             = check_label;
-    lbl.callback          = _checkbox_label_click;
-    lbl.userdata          = wd;
+    lbl.callback          = NULL;
+    lbl.userdata          = NULL;
     wd->checkbox_label = xitk_noskin_label_create (widget_list, &lbl, x + 15, y, winw - x - 40, 20, DEFAULT_FONT_12);
     if (wd->checkbox_label)
       xitk_dlist_add_tail (&widget_list->list, &wd->checkbox_label->node);
+    xitk_widget_set_focus_redirect (wd->checkbox_label, wd->checkbox);
   }
 
   wd->done3cb = done_cb;

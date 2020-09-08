@@ -397,6 +397,23 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
   setup_set_cursor (setup, NORMAL_CURS);
 }
 
+static void setup_list_step (xui_setup_t *setup, int step) {
+  int max, newpos;
+
+  max = setup->num_wg - MAX_DISPLAY_WIDGETS;
+  if (max < 0)
+    max = 0;
+  newpos = setup->first_displayed + step;
+  if (newpos > max)
+    newpos = max;
+  if (newpos < 0)
+    newpos = 0;
+  if (setup->first_displayed == newpos)
+    return;
+  xitk_slider_set_pos (setup->slider_wg, max - newpos);
+  setup_paint_widgets (setup, newpos);
+}
+
 /*
  * Handle X events here.
  */
@@ -405,16 +422,13 @@ static void _setup_handle_button_event(void *data, const xitk_button_event_t *be
   xui_setup_t *setup = data;
 
   if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button4) {
-      xitk_slider_make_step (setup->slider_wg);
-      xitk_slider_callback_exec (setup->slider_wg);
-    }
-    else if (be->button == Button5) {
-      xitk_slider_make_backstep (setup->slider_wg);
-      xitk_slider_callback_exec (setup->slider_wg);
-    }
+    if (be->button == Button4)
+      setup_list_step (setup, -1);
+    else if (be->button == Button5)
+      setup_list_step (setup, 1);
   }
 }
+
 static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
   xui_setup_t *setup = data;
 
@@ -423,8 +437,7 @@ static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
       case XK_Up:
         if (xitk_is_widget_enabled (setup->slider_wg) &&
             (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-          xitk_slider_make_step (setup->slider_wg);
-          xitk_slider_callback_exec (setup->slider_wg);
+          setup_list_step (setup, -1);
           return;
         }
         break;
@@ -432,30 +445,21 @@ static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
       case XK_Down:
         if (xitk_is_widget_enabled (setup->slider_wg) &&
             (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-          xitk_slider_make_backstep (setup->slider_wg);
-          xitk_slider_callback_exec (setup->slider_wg);
+          setup_list_step (setup, 1);
           return;
         }
         break;
 
       case XK_Next:
         if (xitk_is_widget_enabled(setup->slider_wg)) {
-          int pos, max = xitk_slider_get_max (setup->slider_wg);
-
-          pos = max - (setup->first_displayed + MAX_DISPLAY_WIDGETS);
-          xitk_slider_set_pos (setup->slider_wg, (pos >= 0) ? pos : 0);
-          xitk_slider_callback_exec (setup->slider_wg);
+          setup_list_step (setup, MAX_DISPLAY_WIDGETS);
           return;
         }
         break;
 
       case XK_Prior:
         if (xitk_is_widget_enabled(setup->slider_wg)) {
-          int pos, max = xitk_slider_get_max (setup->slider_wg);
-
-          pos = max - (setup->first_displayed - MAX_DISPLAY_WIDGETS);
-          xitk_slider_set_pos (setup->slider_wg, (pos <= max) ? pos : max);
-          xitk_slider_callback_exec (setup->slider_wg);
+          setup_list_step (setup, -MAX_DISPLAY_WIDGETS);
           return;
         }
         break;
@@ -1069,3 +1073,4 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
+

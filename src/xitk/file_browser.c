@@ -1066,13 +1066,6 @@ static void fb_hidden_files(xitk_widget_t *w, void *data, int state) {
   fb->hidden_cb(1, state);
   fb_getdir(fb);
 }
-static void fb_lbl_hidden_files(xitk_widget_t *w, void *data) {
-  filebrowser_t *fb = (filebrowser_t *) data;
-  
-  (void)w;
-  xitk_checkbox_set_state(fb->show_hidden, (!xitk_checkbox_get_state(fb->show_hidden)));
-  xitk_checkbox_callback_exec(fb->show_hidden);
-}
 
 static void _fb_handle_key_event(void *data, const xitk_key_event_t *ke) {
   filebrowser_t *fb = (filebrowser_t *) data;
@@ -1443,7 +1436,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   x = 15;
 
-  cb.skin_element_name = NULL;
+  cb.skin_element_name = "XITK_NOSKIN_CHECK";
   cb.callback          = fb_hidden_files;
   cb.userdata          = (void *) fb;
   fb->show_hidden = xitk_noskin_checkbox_create (fb->widget_list, &cb, x, y+5, 10, 10);
@@ -1453,11 +1446,12 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   lbl.skin_element_name = NULL;
   lbl.label             = _("Show hidden file");
-  lbl.callback          = fb_lbl_hidden_files;
-  lbl.userdata          = (void *) fb;
+  lbl.callback          = NULL;
+  lbl.userdata          = NULL;
   widget = xitk_noskin_label_create (fb->widget_list, &lbl, x + 15, y, w - 15, 20, fontname);
   xitk_add_widget (fb->widget_list, widget);
   xitk_enable_and_show_widget(widget);
+  xitk_widget_set_focus_redirect (widget, fb->show_hidden);
   
   y = WINDOW_HEIGHT - (23 + 15) - (23 + 8);
   w = (WINDOW_WIDTH - (4 * 15)) / 3;

@@ -1078,7 +1078,7 @@ static void _pplugin_retrieve_parameters(_pp_wrapper_t *pp_wrapper, post_object_
     pobj->properties = xitk_noskin_combo_create (pp_wrapper->pplugin->widget_list, &cmb, 0, 0, 175);
     xitk_add_widget (pp_wrapper->pplugin->widget_list, pobj->properties);
     xitk_combo_set_select(pobj->properties, 0);
-    xitk_combo_callback_exec(pobj->properties);
+    cmb.callback (pobj->properties, pobj, 0);
 
     if(pobj->api && pobj->api->get_help) {
 
@@ -1458,12 +1458,29 @@ static void _pplugin_save_chain(_pp_wrapper_t *pp_wrapper) {
   }
 }
 
+static void _pplugin_list_step (_pp_wrapper_t *pp_wrapper, int step) {
+  int max, newpos;
+
+  max = pp_wrapper->pplugin->object_num - MAX_DISPLAY_FILTERS;
+  if (max < 0)
+    max = 0;
+  newpos = pp_wrapper->pplugin->first_displayed + step;
+  if (newpos > max)
+    newpos = max;
+  if (newpos < 0)
+    newpos = 0;
+  if (newpos == pp_wrapper->pplugin->first_displayed)
+    return;
+  pp_wrapper->pplugin->first_displayed = newpos;
+  _pplugin_paint_widgets (pp_wrapper);
+}
+
 static void _pplugin_nextprev(_pp_wrapper_t *pp_wrapper, xitk_widget_t *w, void *data, int pos) {
   int rpos = (xitk_slider_get_max(pp_wrapper->pplugin->slider)) - pos;
 
   if(rpos != pp_wrapper->pplugin->first_displayed) {
     pp_wrapper->pplugin->first_displayed = rpos;
-    _pplugin_paint_widgets(pp_wrapper);
+    _pplugin_paint_widgets (pp_wrapper);
   }
 }
 
@@ -1549,14 +1566,10 @@ static void _pplugin_handle_button_event(void *data, const xitk_button_event_t *
   _pp_wrapper_t *pp_wrapper = data;
 
   if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button4) {
-      xitk_slider_make_step(pp_wrapper->pplugin->slider);
-      xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-    }
-    else if (be->button == Button5) {
-      xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
-      xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
-    }
+    if (be->button == Button4)
+      _pplugin_list_step (pp_wrapper, -1);
+    else if (be->button == Button5)
+      _pplugin_list_step (pp_wrapper, 1);
   }
 }
 
@@ -1570,8 +1583,7 @@ static void _pplugin_handle_key_event(void *data, const xitk_key_event_t *ke) {
     case XK_Up:
       if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
           (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-        xitk_slider_make_step(pp_wrapper->pplugin->slider);
-        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        _pplugin_list_step (pp_wrapper, -1);
         return;
       }
       break;
@@ -1579,30 +1591,21 @@ static void _pplugin_handle_key_event(void *data, const xitk_key_event_t *ke) {
     case XK_Down:
       if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider) &&
           (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-        xitk_slider_make_backstep(pp_wrapper->pplugin->slider);
-        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        _pplugin_list_step (pp_wrapper, 1);
         return;
       }
       break;
 
     case XK_Next:
       if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
-        int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
-
-        pos = max - (pp_wrapper->pplugin->first_displayed + MAX_DISPLAY_FILTERS);
-        xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos >= 0) ? pos : 0);
-        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        _pplugin_list_step (pp_wrapper, MAX_DISPLAY_FILTERS);
         return;
       }
       break;
 
     case XK_Prior:
       if (xitk_is_widget_enabled(pp_wrapper->pplugin->slider)) {
-        int pos, max = xitk_slider_get_max(pp_wrapper->pplugin->slider);
-
-        pos = max - (pp_wrapper->pplugin->first_displayed - MAX_DISPLAY_FILTERS);
-        xitk_slider_set_pos(pp_wrapper->pplugin->slider, (pos <= max) ? pos : max);
-        xitk_slider_callback_exec(pp_wrapper->pplugin->slider);
+        _pplugin_list_step (pp_wrapper, -MAX_DISPLAY_FILTERS);
         return;
       }
       break;

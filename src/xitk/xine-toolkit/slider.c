@@ -792,35 +792,45 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  * Increment position
  */
-void xitk_slider_make_step(xitk_widget_t *w) {
+int xitk_slider_make_step(xitk_widget_t *w) {
   _slider_private_t *wp = (_slider_private_t *)w;
+  int v = 0;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+    v = xitk_slider_get_pos (&wp->w);
     if (!wp->bClicked) {
-      int v = xitk_slider_get_pos (&wp->w), m = xitk_slider_get_max (&wp->w);
+      int m = xitk_slider_get_max (&wp->w);
       if (v < m) {
         v += wp->step;
-        xitk_slider_set_pos (&wp->w, v > m ? m : v);
+        if (v > m)
+          v = m;
+        xitk_slider_set_pos (&wp->w, v);
       }
     }
-  } 
+  }
+  return v;
 }
 
 /*
  * Decrement position
  */
-void xitk_slider_make_backstep(xitk_widget_t *w) {
+int xitk_slider_make_backstep(xitk_widget_t *w) {
   _slider_private_t *wp = (_slider_private_t *)w;
+  int v = 0;
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+    v = xitk_slider_get_pos (&wp->w);
     if (!wp->bClicked) {
-      int v = xitk_slider_get_pos (&wp->w), m = xitk_slider_get_min (&wp->w);
+      int m = xitk_slider_get_min (&wp->w);
       if (v > m) {
         v -= wp->step;
-        xitk_slider_set_pos (&wp->w, v < m ? m : v);
+        if (v < m)
+          v = m;
+        xitk_slider_set_pos (&wp->w, v);
       }
     }
-  } 
+  }
+  return v;
 }
 
 /*
@@ -939,24 +949,6 @@ void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
         }
       }
     }
-  }
-}
-
-/*
- * Call callback for current position
- */
-void xitk_slider_callback_exec (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    int value = wp->sType == XITK_HVSLIDER
-              ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
-              : wp->value;
-
-    if (wp->callback)
-      wp->callback (&wp->w, wp->userdata, value);
-    else if (wp->motion_callback)
-        wp->motion_callback (&wp->w, wp->motion_userdata, value);
   }
 }
 

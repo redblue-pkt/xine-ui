@@ -47,6 +47,5 @@ void xitk_combo_set_select (xitk_widget_t *w, int select);
 void xitk_combo_update_list (xitk_widget_t *w, const char *const *const list, int len);
 /** */
 void xitk_combo_update_pos (xitk_widget_t *w);
-/** */
-void xitk_combo_callback_exec (xitk_widget_t *w);
+
 #endif
