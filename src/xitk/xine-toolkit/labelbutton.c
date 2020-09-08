@@ -665,20 +665,6 @@ void *labelbutton_get_user_data (xitk_widget_t *w) {
   return NULL;
 }
 
-void xitk_labelbutton_callback_exec (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      if (wp->state_callback)
-        wp->state_callback (wp->bWidget, wp->userdata, wp->bState, 0);
-    } else if (wp->bType == CLICK_BUTTON) {
-      if (wp->callback)
-        wp->callback (wp->bWidget, wp->userdata, wp->bState);
-    }
-  }
-}
-
 /*
  * Create the labeled button
  */

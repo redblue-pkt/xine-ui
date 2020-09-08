@@ -238,15 +238,6 @@ static int checkbox_event (xitk_widget_t *w, widget_event_t *event, widget_event
   return 0;
 }
 
-void xitk_checkbox_callback_exec(xitk_widget_t *w) {
-  _checkbox_private_t *wp = (_checkbox_private_t *)w;
-
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
-    if (wp->callback)
-      wp->callback (wp->cWidget, wp->userdata, wp->cState);
-  }
-}
-
 /*
  *
  */

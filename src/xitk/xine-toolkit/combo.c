@@ -319,21 +319,6 @@ static void _combo_paint (_combo_private_t *wp) {
 /*
  *
  */
-void xitk_combo_callback_exec (xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
-  if (!wp)
-    return;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
-    return;
-
-  if (wp->callback)
-    wp->callback (wp->combo_widget, wp->userdata, wp->selected);
-}
-
-/*
- *
- */
 static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp->skin_element_name) {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
