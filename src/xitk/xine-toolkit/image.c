@@ -980,11 +980,8 @@ static void _draw_arrow(xitk_image_t *p, int direction) {
   int            i, s;
   int            x1, x2, dx;
   int            y1, y2, dy;
-  ImlibData     *im;
 
   CHECK_IMAGE(p);
-
-  im = p->image->imlibdata;
 
   w = p->width / 3;
   h = p->height;
@@ -2441,7 +2438,6 @@ static int _notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_
  *
  */
 static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
-					  xitk_skin_config_t *skonfig, 
 					  xitk_image_widget_t *im,
 					  int x, int y,
 					  const char *skin_element_name,
@@ -2480,7 +2476,7 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
   info = xitk_skin_get_info (skonfig, im->skin_element_name);
   if (!info)
     return NULL;
-  return _xitk_image_create (wl, skonfig, im, info->x, info->y, im->skin_element_name, info->pixmap_img.image);
+  return _xitk_image_create (wl, im, info->x, info->y, im->skin_element_name, info->pixmap_img.image);
 }
 
 /*
@@ -2491,9 +2487,10 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
 					 xitk_image_t *image, int x, int y) {
   XITK_CHECK_CONSTITENCY(im);
 
-  return _xitk_image_create(wl, NULL, im, x, y, NULL, image);
+  return _xitk_image_create (wl, im, x, y, NULL, image);
 }
 
 int xitk_image_quality (xitk_t *xitk, int qual) {
   return Imlib_gfx_quality (xitk->imlibdata, qual);
 }
+
