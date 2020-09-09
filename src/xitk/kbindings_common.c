@@ -840,7 +840,7 @@ static void _kbinding_done (void *data, int state) {
   if (state == 1)
     kbindings_reset_kbinding (kbt);
   else if (state == 2)
-    kbedit_window ();
+    kbedit_window (gGui);
 }
 #endif
 

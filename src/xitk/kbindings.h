@@ -24,6 +24,7 @@
 #include "xitk.h"
 
 /* Opaque structure */
+typedef struct xui_keyedit_s xui_keyedit_t;
 typedef struct kbinding_s kbinding_t;
 typedef struct kbinding_entry_s kbinding_entry_t;
 
@@ -257,12 +258,12 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *);
  */
 size_t kbindings_get_shortcut(kbinding_t *, const char *, char *buf, size_t buf_size);
 
-void kbedit_window(void);
-void kbedit_end(void);
-int kbedit_is_visible(void);
-int kbedit_is_running(void);
-void kbedit_toggle_visibility(xitk_widget_t *, void *);
-void kbedit_raise_window(void);
-void kbedit_reparent(void);
+void kbedit_window (gGui_t *gui);
+void kbedit_end (xui_keyedit_t *kbedit);
+int kbedit_is_visible (xui_keyedit_t *kbedit);
+int kbedit_is_running (xui_keyedit_t *kbedit);
+void kbedit_toggle_visibility (xitk_widget_t *w, void *kbedit);
+void kbedit_raise_window (xui_keyedit_t *kbedit);
+void kbedit_reparent (xui_keyedit_t *kbedit);
 
 #endif

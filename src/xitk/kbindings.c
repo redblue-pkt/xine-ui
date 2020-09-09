@@ -40,7 +40,7 @@
 #define  KBEDIT_ALIASING       1
 #define  KBEDIT_EDITING        2
 
-typedef struct {
+struct xui_keyedit_s {
   gGui_t               *gui;
 
   kbinding_t           *kbt;
@@ -75,11 +75,11 @@ typedef struct {
 
   int                   grabbing;
   int                   action_wanted; /* See KBEDIT_ defines */
+  kbinding_entry_t     *confirm_this;
+  xitk_register_key_t   req;
 
   xitk_register_key_t   kreg;
-} _kbedit_t;
-
-static _kbedit_t    *kbedit = NULL;
+};
 
 #define WINDOW_WIDTH        530
 #define WINDOW_HEIGHT       456
@@ -484,35 +484,27 @@ void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int 
 /*
  * return 1 if key binding editor is ON
  */
-int kbedit_is_running(void) {
-
-  if(kbedit != NULL)
-    return kbedit->running;
-
-  return 0;
+int kbedit_is_running (xui_keyedit_t *kbedit) {
+  return kbedit ? kbedit->running : 0;
 }
 
 /*
  * Return 1 if setup panel is visible
  */
-int kbedit_is_visible(void) {
-  gGui_t *gui = gGui;
-
-  if(kbedit != NULL) {
-    if(gui->use_root_window)
-      return xitk_window_is_window_visible(kbedit->xwin);
+int kbedit_is_visible (xui_keyedit_t *kbedit) {
+  if (kbedit) {
+    if (kbedit->gui->use_root_window)
+      return xitk_window_is_window_visible (kbedit->xwin);
     else
-      return kbedit->visible && xitk_window_is_window_visible(kbedit->xwin);
+      return kbedit->visible && xitk_window_is_window_visible (kbedit->xwin);
   }
-
   return 0;
 }
 
 /*
  * Raise kbedit->xwin
  */
-void kbedit_raise_window(void) {
-  
+void kbedit_raise_window (xui_keyedit_t *kbedit) {
   if(kbedit != NULL)
     raise_window (kbedit->gui, kbedit->xwin, kbedit->visible, kbedit->running);
 }
@@ -521,11 +513,13 @@ void kbedit_raise_window(void) {
  * Hide/show the kbedit panel
  */
 void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
-  if(kbedit != NULL)
+  xui_keyedit_t *kbedit = data;
+  (void)w;
+  if (kbedit)
     toggle_window (kbedit->gui, kbedit->xwin, kbedit->widget_list, &kbedit->visible, kbedit->running);
 }
 
-static void kbedit_create_browser_entries(void) {
+static void kbedit_create_browser_entries (xui_keyedit_t *kbedit) {
   int           i;
   
   if(kbedit->num_entries) {
@@ -561,7 +555,7 @@ static void kbedit_create_browser_entries(void) {
   kbedit->shortcuts[i] = NULL;
 }
 
-static void kbedit_display_kbinding(const char *action, kbinding_entry_t *kbe) {
+static void kbedit_display_kbinding (xui_keyedit_t *kbedit, const char *action, kbinding_entry_t *kbe) {
 
   if(action && kbe) {
 
@@ -579,20 +573,20 @@ static void kbedit_display_kbinding(const char *action, kbinding_entry_t *kbe) {
 /*
  *
  */
-static void kbedit_select(int s) {
+static void kbedit_select (xui_keyedit_t *kbedit, int s) {
 
   xitk_enable_and_show_widget(kbedit->alias);
   xitk_enable_and_show_widget(kbedit->edit);
   xitk_enable_and_show_widget(kbedit->delete);
   
   kbedit->ksel = kbedit->kbt->entry[s];
-  kbedit_display_kbinding(kbedit->entries[s], kbedit->kbt->entry[s]);
+  kbedit_display_kbinding (kbedit, kbedit->entries[s], kbedit->kbt->entry[s]);
 }
 
 /*
  *
  */
-static void kbedit_unset(void) {
+static void kbedit_unset (xui_keyedit_t *kbedit) {
 
   if(xitk_labelbutton_get_state(kbedit->alias))
     xitk_labelbutton_set_state(kbedit->alias, 0);
@@ -645,12 +639,15 @@ static int bkedit_check_redundancy(const kbinding_t *kbt, kbinding_entry_t *kbe)
 /*
  *
  */
-static void kbedit_exit(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
+static void kbedit_exit (xitk_widget_t *w, void *data, int state) {
+  xui_keyedit_t *kbedit = data;
 
+  (void)w;
+  (void)state;
   if(kbedit) {
     window_info_t wi;
     
+    xitk_unregister_event_handler (&kbedit->req);
     kbedit->running = 0;
     kbedit->visible = 0;
     
@@ -680,11 +677,12 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     
     kbindings_free_kbinding(&kbedit->kbt);
 
-    free(kbedit);
-    kbedit = NULL;
-    gui->ssaver_enabled = 1;
+    kbedit->gui->ssaver_enabled = 1;
 
-    video_window_set_input_focus(gui->vwin);
+    video_window_set_input_focus (kbedit->gui->vwin);
+
+    kbedit->gui->keyedit = NULL;
+    free (kbedit);
   }
 }
 
@@ -692,16 +690,24 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
  *
  */
 static void kbedit_sel(xitk_widget_t *w, void *data, int s, int modifier) {
+  xui_keyedit_t *kbedit = data;
 
+  (void)w;
+  (void)modifier;
+  xitk_unregister_event_handler (&kbedit->req);
   if(s >= 0)
-    kbedit_select(s);
+    kbedit_select (kbedit, s);
 }
 
 /*
  * Create an alias from the selected entry.
  */
 static void kbedit_alias(xitk_widget_t *w, void *data, int state, int modifier) {
+  xui_keyedit_t *kbedit = data;
 
+  (void)w;
+  (void)modifier;
+  xitk_unregister_event_handler (&kbedit->req);
   xitk_labelbutton_set_state(kbedit->edit, 0);
 
   if(state) {
@@ -718,7 +724,11 @@ static void kbedit_alias(xitk_widget_t *w, void *data, int state, int modifier) 
  * Change shortcut, should take care about reduncancy.
  */
 static void kbedit_edit(xitk_widget_t *w, void *data, int state, int modifier) {
+  xui_keyedit_t *kbedit = data;
 
+  (void)w;
+  (void)modifier;
+  xitk_unregister_event_handler (&kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
 
   if(state) {
@@ -735,9 +745,13 @@ static void kbedit_edit(xitk_widget_t *w, void *data, int state, int modifier) {
 /*
  * Remove selected entry, but alias ones only.
  */
-static void kbedit_delete(xitk_widget_t *w, void *data) {
+static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
+  xui_keyedit_t *kbedit = data;
   int s = xitk_browser_get_current_selected(kbedit->browser);
 
+  (void)w;
+  (void)state;
+  xitk_unregister_event_handler (&kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
@@ -763,7 +777,7 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       
       kbedit->kbt->num_entries--;
       
-      kbedit_create_browser_entries();
+      kbedit_create_browser_entries (kbedit);
       
       xitk_browser_update_list(kbedit->browser, 
 			       (const char* const*) kbedit->entries, 
@@ -778,42 +792,50 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
 /*
  * Reset to xine's default table.
  */
-static void kbedit_reset(xitk_widget_t *w, void *data) {
+static void kbedit_reset (xitk_widget_t *w, void *data, int state) {
+  xui_keyedit_t *kbedit = data;
 
+  (void)w;
+  (void)state;
+  xitk_unregister_event_handler (&kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
 
   kbindings_reset_kbinding(kbedit->kbt);
-  kbedit_create_browser_entries();
-  xitk_browser_update_list(kbedit->browser, 
-			   (const char* const*) kbedit->entries, 
-			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
+  kbedit_create_browser_entries (kbedit);
+  xitk_browser_update_list (kbedit->browser, (const char * const *) kbedit->entries,
+    (const char * const *)kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
 }
 
 /*
  * Save keymap file, then set global table to hacked one 
  */
-static void kbedit_save(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
+static void kbedit_save (xitk_widget_t *w, void *data, int state) {
+  xui_keyedit_t *kbedit = data;
+
+  (void)w;
+  (void)state;
+  xitk_unregister_event_handler (&kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
   
-  kbindings_free_kbinding(&gui->kbindings);
-  gui->kbindings = _kbindings_duplicate_kbindings(kbedit->kbt);
-  kbindings_save_kbinding(gui->kbindings);
+  kbindings_free_kbinding (&kbedit->gui->kbindings);
+  kbedit->gui->kbindings = _kbindings_duplicate_kbindings (kbedit->kbt);
+  kbindings_save_kbinding (kbedit->gui->kbindings);
 }
 
 /*
  * Forget and dismiss kbeditor 
  */
-void kbedit_end(void) {
-  kbedit_exit(NULL, NULL);
+void kbedit_end (xui_keyedit_t *kbedit) {
+  kbedit_exit (NULL, kbedit, 0);
 }
 
 static void _kbedit_accept_done (void *data, int state) {
-  kbinding_entry_t *kbe = (kbinding_entry_t *) data;
+  xui_keyedit_t *kbedit = data;
+  kbinding_entry_t *kbe = kbedit->confirm_this;
 
   if (state == 2) {
   
@@ -839,7 +861,7 @@ static void _kbedit_accept_done (void *data, int state) {
         kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias  = 0;
         kbedit->kbt->entry[kbedit->kbt->num_entries]->is_gui    = 0;
         kbedit->kbt->num_entries++;
-        kbedit_create_browser_entries ();
+        kbedit_create_browser_entries (kbedit);
         xitk_browser_update_list (kbedit->browser,
           (const char* const*) kbedit->entries,
           (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
@@ -848,7 +870,7 @@ static void _kbedit_accept_done (void *data, int state) {
         kbedit->ksel->key = realloc (kbedit->ksel->key, sizeof (char) * (strlen (kbe->key) + 1));
         strcpy (kbedit->ksel->key, kbe->key);
         kbedit->ksel->modifier = kbe->modifier;
-        kbedit_create_browser_entries ();
+        kbedit_create_browser_entries (kbedit);
         xitk_browser_update_list (kbedit->browser,
           (const char* const*) kbedit->entries,
           (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
@@ -859,7 +881,7 @@ static void _kbedit_accept_done (void *data, int state) {
     SAFE_FREE (kbe->action);
     SAFE_FREE (kbe->key);
     SAFE_FREE (kbe);
-    kbedit_unset ();
+    kbedit_unset (kbedit);
 
   } else if (state == 3) {
 
@@ -871,7 +893,7 @@ static void _kbedit_accept_done (void *data, int state) {
     SAFE_FREE (kbe->action);
     SAFE_FREE (kbe->key);
     SAFE_FREE (kbe);
-    kbedit_unset ();
+    kbedit_unset (kbedit);
 
   }
 }
@@ -879,13 +901,20 @@ static void _kbedit_accept_done (void *data, int state) {
 /*
  * Grab key binding.
  */
-static void kbedit_grab(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
+static void kbedit_grab (xitk_widget_t *w, void *data, int state) {
+  xui_keyedit_t *kbedit = data;
+  gGui_t            *gui;
   char              *olbl;
   xitk_window_t     *xwin;
   kbinding_entry_t  *kbe;
   int                redundant;
-  
+
+  (void)w;
+  (void)state;
+  if (!kbedit)
+    return;
+  gui = kbedit->gui;
+  xitk_unregister_event_handler (&kbedit->req);
   /* We are already grabbing keybinding */
   if(kbedit->grabbing)
     return;
@@ -941,14 +970,14 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
     char shortcut[32];
     
-    kbedit_display_kbinding(xitk_label_get_label(kbedit->comment), kbe);
+    kbedit_display_kbinding (kbedit, xitk_label_get_label(kbedit->comment), kbe);
     
     _kbindings_get_shortcut_from_kbe(kbe, shortcut, sizeof(shortcut));
     
     /* Ask if user wants to store new shortcut */
-    xitk_window_dialog_3 (gui->xitk,
-      kbedit->xwin,
-      get_layer_above_video (gui), 400, _("Accept?"), _kbedit_accept_done, kbe,
+    kbedit->confirm_this = kbe;
+    kbedit->req = xitk_window_dialog_3 (gui->xitk, kbedit->xwin,
+      get_layer_above_video (gui), 400, _("Accept?"), _kbedit_accept_done, kbedit,
       NULL, XITK_LABEL_YES, XITK_LABEL_NO, NULL, 0, ALIGN_CENTER,
       _("Store %s as\n'%s' key binding ?"), shortcut, kbedit->ksel->comment);
   }
@@ -974,7 +1003,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
  *
  */
 
-static void _kbedit_unset(void) {
+static void _kbedit_unset (xui_keyedit_t *kbedit) {
   xitk_widget_t *w;
 
   if (!kbedit || !kbedit->widget_list)
@@ -984,28 +1013,30 @@ static void _kbedit_unset(void) {
 
   if ((w && (w != kbedit->done) && (w != kbedit->save))
       && (xitk_browser_get_current_selected(kbedit->browser) < 0)) {
-    kbedit_unset();
+    kbedit_unset (kbedit);
   }
 }
 
 static void kbedit_handle_button_event(void *data, const xitk_button_event_t *be) {
+  xui_keyedit_t *kbedit = data;
 
   if (be->event == XITK_BUTTON_RELEASE) {
-    _kbedit_unset();
+    _kbedit_unset (kbedit);
   }
 }
 
 static void kbedit_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_keyedit_t *kbedit = data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      kbedit_exit(NULL, NULL);
+      kbedit_exit (NULL, kbedit, 0);
     else
       gui_handle_key_event (gGui, ke);
   }
 
   if (ke->event == XITK_KEY_RELEASE) {
-    _kbedit_unset();
+    _kbedit_unset (kbedit);
   }
 }
 
@@ -1014,17 +1045,15 @@ static const xitk_event_cbs_t kbedit_event_cbs = {
   .btn_cb            = kbedit_handle_button_event,
 };
 
-void kbedit_reparent(void) {
-  gGui_t *gui = gGui;
-  if(kbedit)
-    reparent_window(gui, kbedit->xwin);
+void kbedit_reparent (xui_keyedit_t *kbedit) {
+  if (kbedit)
+    reparent_window (kbedit->gui, kbedit->xwin);
 }
 
 /*
  *
  */
-void kbedit_window(void) {
-  gGui_t *gui = gGui;
+void kbedit_window (gGui_t *gui) {
   int                        x, y, y1;
   xitk_pixmap_t             *bg;
   xitk_labelbutton_widget_t  lb;
@@ -1035,7 +1064,11 @@ void kbedit_window(void) {
   int                        fontheight;
   xitk_font_t               *fs;
   xitk_widget_t             *w;
-  
+  xui_keyedit_t             *kbedit;
+
+  if (!gui)
+    return;
+
   x = xine_config_register_num(__xineui_global_xine_instance, "gui.kbedit_x", 
 			       80,
 			       CONFIG_NO_DESC,
@@ -1051,10 +1084,11 @@ void kbedit_window(void) {
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   
-  kbedit = (_kbedit_t *) calloc(1, sizeof(_kbedit_t));
+  kbedit = (xui_keyedit_t *)calloc (1, sizeof (*kbedit));
   if (!kbedit)
     return;
   kbedit->gui = gui;
+  kbedit->gui->keyedit = kbedit;
 
   kbedit->kbt           = _kbindings_duplicate_kbindings(gui->kbindings);
   kbedit->action_wanted = KBEDIT_NOOP;
@@ -1094,7 +1128,7 @@ void kbedit_window(void) {
 
   xitk_window_set_background(kbedit->xwin, bg);
 
-  kbedit_create_browser_entries();
+  kbedit_create_browser_entries (kbedit);
 
   y = 34;
 
@@ -1109,7 +1143,7 @@ void kbedit_window(void) {
   br.browser.entries               = (const char* const*)kbedit->entries;
   br.callback                      = kbedit_sel;
   br.dbl_click_callback            = NULL;
-  br.userdata                      = NULL;
+  br.userdata                      = kbedit;
   kbedit->browser = xitk_noskin_browser_create (kbedit->widget_list, &br,
     x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
   xitk_add_widget (kbedit->widget_list, kbedit->browser);
@@ -1129,7 +1163,7 @@ void kbedit_window(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
   lb.state_callback    = kbedit_alias;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->alias = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1143,7 +1177,7 @@ void kbedit_window(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = NULL;
   lb.state_callback    = kbedit_edit;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->edit = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1155,9 +1189,9 @@ void kbedit_window(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Delete");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = kbedit_delete; 
+  lb.callback          = kbedit_delete;
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->delete = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1171,7 +1205,7 @@ void kbedit_window(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_save; 
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->save = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1185,7 +1219,7 @@ void kbedit_window(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_reset; 
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   w =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1199,7 +1233,7 @@ void kbedit_window(void) {
   lb.align             = ALIGN_CENTER;
   lb.callback          = kbedit_exit; 
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->done = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
@@ -1345,24 +1379,24 @@ void kbedit_window(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Grab");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = kbedit_grab; 
+  lb.callback          = kbedit_grab;
   lb.state_callback    = NULL;
-  lb.userdata          = NULL;
+  lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->grab = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, WINDOW_WIDTH - 30, 23,
     "Black", "Black", "White", hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->grab);
   xitk_enable_and_show_widget(kbedit->grab);
 
-  kbedit_unset();
+  kbedit_unset (kbedit);
   
   kbedit->kreg = xitk_window_register_event_handler("kbedit", kbedit->xwin, &kbedit_event_cbs, kbedit);
 
   gui->ssaver_enabled = 0;
   kbedit->visible      = 1;
   kbedit->running      = 1;
-  kbedit_raise_window();
+  kbedit_raise_window (kbedit);
 
-  xitk_window_try_to_set_input_focus(kbedit->xwin);
+  xitk_window_try_to_set_input_focus (kbedit->xwin);
+  kbedit->req = 0;
 }
-

@@ -71,7 +71,6 @@ void gui_reparent_all_windows (gGui_t *gui) {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { kbedit_is_visible,        kbedit_reparent },
     { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
     { vpplugin_is_visible,      vpplugin_reparent },
@@ -93,6 +92,8 @@ void gui_reparent_all_windows (gGui_t *gui) {
     help_reparent (gui->help);
   if (viewlog_is_visible (gui->viewlog))
     viewlog_reparent (gui->viewlog);
+  if (kbedit_is_visible (gui->keyedit))
+    kbedit_reparent (gui->keyedit);
   control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
@@ -732,7 +733,7 @@ void gui_exit_2 (gGui_t *gui) {
   
   setup_end (gui->setup);
   viewlog_end (gui->viewlog);
-  kbedit_end();
+  kbedit_end (gui->keyedit);
   event_sender_end (gui);
   stream_infos_end();
   tvset_end();
@@ -1118,7 +1119,7 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   v |= (control_status (gui->vctrl) == 3) << 3;
   v |= (setup_is_visible (gui->setup) != 0) << 4;
   v |= (viewlog_is_visible (gui->viewlog) != 0) << 5;
-  v |= (kbedit_is_visible () != 0) << 6;
+  v |= (kbedit_is_visible (gui->keyedit) != 0) << 6;
   v |= (event_sender_is_visible (gui) != 0) << 7;
   v |= (stream_infos_is_visible () != 0) << 8;
   v |= (tvset_is_visible () != 0) << 9;
@@ -1138,7 +1139,7 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   if (s & (1 << 5))
     viewlog_toggle_visibility (gui->viewlog);
   if (s & (1 << 6))
-    kbedit_toggle_visibility (NULL, NULL);
+    kbedit_toggle_visibility (NULL, gui->keyedit);
   if (s & (1 << 7))
     event_sender_toggle_visibility (gui);
   if (s & (1 << 8))
@@ -1928,16 +1929,12 @@ void gui_kbedit_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (kbedit_is_running() && !kbedit_is_visible())
-    kbedit_toggle_visibility(NULL, NULL);
-  else if(!kbedit_is_running())
-    kbedit_window();
-  else {
-    if(gui->use_root_window)
-      kbedit_toggle_visibility(NULL, NULL);
-    else
-      kbedit_end();
-  }
+  if (!gui->keyedit)
+    kbedit_window (gui);
+  else if (!kbedit_is_visible (gui->keyedit) || gui->use_root_window)
+    kbedit_toggle_visibility (NULL, gui->keyedit);
+  else
+    kbedit_end (gui->keyedit);
 }
 
 void gui_help_show(xitk_widget_t *w, void *data) {

@@ -371,6 +371,7 @@ struct gGui_st {
   xui_skdloader_t           *skdloader;
   xui_help_t                *help;
   xui_viewlog_t             *viewlog;
+  xui_keyedit_t             *keyedit;
   xui_playlist_t            *plwin;
   filebrowser_t             *pl_load;
   filebrowser_t             *pl_save;
