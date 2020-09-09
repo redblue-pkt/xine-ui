@@ -743,7 +743,8 @@ static void fb_getdir(filebrowser_t *fb) {
  */
 static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
+
+  (void)modifier;
   if(w == fb->files_browser) {
     strlcpy(fb->filename, fb->norm_files[selected].name, sizeof(fb->filename));
     fb_update_origin(fb);
@@ -773,6 +774,7 @@ static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
 static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifier) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
+  (void)modifier;
   if(w == fb->directories_browser) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     
@@ -1570,4 +1572,3 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   return fb;
 }
-
