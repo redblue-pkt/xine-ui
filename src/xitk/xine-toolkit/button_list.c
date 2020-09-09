@@ -153,6 +153,24 @@ static void xitk_button_list_delete (xitk_button_list_t *bl) {
   bl->swap = NULL;
 }
 
+static void xitk_button_list_hull (xitk_button_list_t *bl) {
+  int d, n = bl->num > bl->visible ? bl->visible + 1 : bl->num;
+  bl->w.x = bl->x;
+  d = bl->dx;
+  if (d < 0) {
+    d = -d;
+    bl->w.x -= (n - 1) * d;
+  }
+  bl->w.width = n * d - 1;
+  bl->w.y = bl->y;
+  d = bl->dy;
+  if (d < 0) {
+    d = -d;
+    bl->w.y -= (n - 1) * d;
+  }
+  bl->w.height = n * d - 1;
+}
+
 static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_t *skin_config) {
   const xitk_skin_element_info_t *info;
   int dir, i, max;
@@ -256,6 +274,8 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
 
   bl->first = 0;
   xitk_button_list_add (bl);
+
+  xitk_button_list_hull (bl);
 
   bl->flags |= 1;
 }
@@ -427,6 +447,8 @@ xitk_widget_t *xitk_button_list_new (
   bl->first = 0;
   xitk_button_list_add (bl);
 
+  xitk_button_list_hull (bl);
+
   return &bl->w;
 }
 
@@ -479,5 +501,4 @@ void xitk_button_list_able (xitk_widget_t *w, int enable) {
     bl->flags &= ~1;
   }
 }
-
 
