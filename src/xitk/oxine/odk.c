@@ -34,6 +34,8 @@
 
 #include "common.h"
 #include "globals.h"
+#include "../videowin.h"
+#include "../actions.h"
 
 #include "odk.h"
 #include "utils.h"

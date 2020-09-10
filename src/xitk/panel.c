@@ -31,6 +31,19 @@
 #include <sys/time.h>
 
 #include "common.h"
+#include "panel.h"
+#include "control.h"
+#include "event_sender.h"
+#include "menus.h"
+#include "mrl_browser.h"
+#include "playlist.h"
+#include "setup.h"
+#include "snapshot.h"
+#include "stream_infos.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/button.h"
@@ -1450,3 +1463,4 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
+

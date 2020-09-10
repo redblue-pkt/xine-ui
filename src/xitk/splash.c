@@ -28,6 +28,8 @@
 #include <X11/Xlib.h>
 
 #include "common.h"
+#include "splash.h"
+#include "skins.h"
 
 static xitk_window_t     *xwin = NULL;
 

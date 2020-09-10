@@ -29,6 +29,13 @@
 #include <string.h>
 
 #include "common.h"
+#include "skins.h"
+#include "control.h"
+#include "mrl_browser.h"
+#include "panel.h"
+#include "playlist.h"
+#include "videowin.h"
+#include "errors.h"
 #include "skins_internal.h"
 
 struct skins_locations_s {
@@ -496,3 +503,4 @@ void skin_init (gGui_t *gui) {
     gui->visual_anim.mrls[gui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
 }
+

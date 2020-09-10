@@ -23,8 +23,6 @@
 #ifndef VIDEOWIN_H
 #define VIDEOWIN_H
 
-typedef struct xui_vwin_st xui_vwin_t;
-
 typedef struct {
   int   x;
   int   y;

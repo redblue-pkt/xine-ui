@@ -22,8 +22,6 @@
 #ifndef HELP_H
 #define HELP_H
 
-typedef struct xui_help_s xui_help_t;
-
 void help_panel (gGui_t *gui);
 void help_end (xui_help_t *help);
 int help_is_visible (xui_help_t *help);

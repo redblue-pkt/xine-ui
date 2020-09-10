@@ -30,6 +30,10 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "stream_infos.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "recode.h"

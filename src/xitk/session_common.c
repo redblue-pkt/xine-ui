@@ -41,6 +41,7 @@
 #include <errno.h>
 
 #include "common.h"
+#include "session.h"
 #include "session_internal.h"
 
 #ifndef S_ISSOCK

@@ -35,6 +35,11 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "file_browser.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"

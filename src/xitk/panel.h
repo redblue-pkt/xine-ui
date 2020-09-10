@@ -26,8 +26,6 @@
 
 #include "xitk.h"
 
-typedef struct xui_panel_st xui_panel_t;
-
 void panel_update_nextprev_tips (xui_panel_t *panel);
 int is_playback_widgets_enabled (xui_panel_t *panel);
 void enable_playback_controls (xui_panel_t *panel, int enable);

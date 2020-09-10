@@ -24,8 +24,6 @@
 
 #include "xitk.h"
 
-typedef struct xui_setup_st xui_setup_t;
-
 xui_setup_t *setup_panel (gGui_t *gui);
 int setup_is_visible (xui_setup_t *setup);
 void setup_toggle_visibility (xui_setup_t *setup);

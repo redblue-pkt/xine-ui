@@ -36,39 +36,29 @@ typedef struct gGui_st gGui_t;
 
 #include "xitk.h"
 
-#include "kbindings.h"
-#include "videowin.h"
-#include "mediamark.h"
-#include "actions.h"
+typedef struct xui_keyedit_s xui_keyedit_t;
+typedef struct xui_vwin_st xui_vwin_t;
+typedef struct xui_vctrl_st xui_vctrl_t;
+typedef struct xui_event_sender_st xui_event_sender_t;
+typedef struct xui_help_s xui_help_t;
+typedef struct xui_mrlb_st xui_mrlb_t;
+typedef struct xui_panel_st xui_panel_t;
+typedef struct xui_playlist_st xui_playlist_t;
+typedef struct xui_setup_st xui_setup_t;
+typedef struct xui_viewlog_s xui_viewlog_t;
+typedef struct filebrowser_s filebrowser_t;
+typedef struct tvout_s tvout_t;
+typedef struct xui_skdloader_s xui_skdloader_t;
+
 #include "config_wrapper.h"
-#include "control.h"
-#include "errors.h"
-#include "event.h"
-#include "event_sender.h"
-#include "help.h"
 #include "i18n.h"
 #ifdef HAVE_LIRC
 #include "lirc.h"
 #endif
-#include "stdctl.h"
-#include "menus.h"
-#include "mrl_browser.h"
-#include "network.h"
-#include "panel.h"
-#include "playlist.h"
-#include "session.h"
-#include "setup.h"
-#include "skins.h"
-#include "snapshot.h"
-#include "splash.h"
-#include "stream_infos.h"
-#include "tvset.h"
-#include "viewlog.h"
-#include "download.h"
-#include "osd.h"
-#include "file_browser.h"
 #include "post.h"
-#include "tvout.h"
+#include "osd.h"
+#include "kbindings.h"
+#include "mediamark.h"
 
 #include "libcommon.h"
 #include "globals.h"
@@ -433,3 +423,4 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible);
 #endif
 
 #endif
+

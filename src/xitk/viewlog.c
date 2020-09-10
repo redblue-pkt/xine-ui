@@ -28,6 +28,10 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "viewlog.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
 #include "xine-toolkit/tabs.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/browser.h"

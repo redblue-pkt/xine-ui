@@ -27,6 +27,9 @@
 
 #include "common.h"
 #include "kbindings_common.h"
+#include "kbindings.h"
+#include "videowin.h"
+#include "actions.h"
 
 /* 
  * Default key mapping table.

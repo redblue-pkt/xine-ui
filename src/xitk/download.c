@@ -31,7 +31,8 @@
 #endif
 
 #include "common.h"
-
+#include "download.h"
+#include "panel.h"
 
 #ifdef HAVE_CURL
 

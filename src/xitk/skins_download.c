@@ -29,6 +29,12 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "skins.h"
+#include "download.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/browser.h"
 
@@ -647,3 +653,4 @@ void skin_download (gGui_t *gui, char *url) {
     gui->skdloader = skd;
   }
 }
+

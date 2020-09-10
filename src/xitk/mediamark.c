@@ -37,6 +37,15 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "mediamark.h"
+#include "download.h"
+#include "file_browser.h"
+#include "panel.h"
+#include "playlist.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"

@@ -22,8 +22,6 @@
 #ifndef TVOUT_H
 #define TVOUT_H
 
-typedef struct tvout_s tvout_t;
-
 tvout_t *tvout_init(char *backend);
 int tvout_setup(tvout_t *tvout);
 void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *pix_aspect);

@@ -28,6 +28,13 @@
 #include <errno.h>
 
 #include "common.h"
+#include "mrl_browser.h"
+#include "panel.h"
+#include "playlist.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/mrlbrowser.h"
 
 typedef void (*select_cb_t) (xitk_widget_t *w, void *mrlb, int, int);

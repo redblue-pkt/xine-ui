@@ -24,8 +24,6 @@
 
 #include "xitk.h"
 
-typedef struct xui_viewlog_s xui_viewlog_t;
-
 void viewlog_panel (gGui_t *gui);
 int viewlog_is_visible (xui_viewlog_t *vl);
 void viewlog_toggle_visibility (xui_viewlog_t *vl);

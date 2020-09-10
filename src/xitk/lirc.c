@@ -37,6 +37,10 @@
 #endif
 
 #include "common.h"
+#include "kbindings.h"
+#include "panel.h"
+#include "actions.h"
+#include "event.h"
 
 #ifdef DEBUG
 #define LIRC_VERBOSE 1

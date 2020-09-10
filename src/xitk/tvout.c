@@ -26,6 +26,7 @@
 #include <strings.h>
 
 #include "common.h"
+#include "tvout.h"
 
 #define TVOUT_DEBUG 1
 

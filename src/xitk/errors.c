@@ -30,6 +30,10 @@
 #include "dump.h"
 
 #include "common.h"
+#include "actions.h"
+#include "errors.h"
+#include "viewlog.h"
+#include "videowin.h"
 
 /*
  * Callback used to display the viewlog window.

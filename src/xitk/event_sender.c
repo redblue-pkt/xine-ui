@@ -35,6 +35,11 @@
 #include <xine/xineutils.h>
 
 #include "common.h"
+#include "event_sender.h"
+#include "panel.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
 #include "xine-toolkit/labelbutton.h"
 
 #define WINDOW_WIDTH    250

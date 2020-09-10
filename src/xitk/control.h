@@ -22,8 +22,6 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-typedef struct xui_vctrl_st xui_vctrl_t;
-
 xui_vctrl_t *control_init (gGui_t *gui);
 void control_deinit (xui_vctrl_t *vctrl);
 
@@ -45,3 +43,4 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);
 void control_reparent (xui_vctrl_t *vctrl);
 
 #endif
+
