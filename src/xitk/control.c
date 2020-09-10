@@ -30,6 +30,14 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "actions.h"
+#include "event.h"
+#include "control.h"
+#include "skins.h"
+#include "menus.h"
+#include "videowin.h"
+#include "panel.h"
+#include "errors.h"
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"

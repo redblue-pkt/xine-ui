@@ -22,8 +22,6 @@
 #ifndef __FILE_BROWSER_H__
 #define __FILE_BROWSER_H__
 
-typedef struct filebrowser_s filebrowser_t;
-
 typedef void (*filebrowser_callback_t) (filebrowser_t *fb, void *userdata);
 typedef int (*hidden_file_toggle_t)(int action, int value);
 

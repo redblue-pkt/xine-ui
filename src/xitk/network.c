@@ -70,6 +70,13 @@
 #include <history.h>
 
 #include "common.h"
+#include "network.h"
+#include "panel.h"
+#include "playlist.h"
+#include "snapshot.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 
 #ifndef	MSG_NOSIGNAL
 #define	MSG_NOSIGNAL	     0
@@ -3076,3 +3083,4 @@ void start_remote_server(void) {
 #endif
 
 #endif  /* HAVE_READLINE */
+

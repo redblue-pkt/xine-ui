@@ -22,8 +22,6 @@
 #ifndef EVENT_SENDER_H
 #define EVENT_SENDER_H
 
-typedef struct xui_event_sender_st xui_event_sender_t;
-
 void event_sender_sticky_cb (void *gui, xine_cfg_entry_t *cfg);
 void event_sender_panel (gGui_t *gui);
 void event_sender_end (gGui_t *gui);

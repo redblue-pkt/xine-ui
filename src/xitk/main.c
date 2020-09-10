@@ -52,6 +52,15 @@
 #include <xine/xineutils.h>
 
 #include "common.h" 
+#include "panel.h"
+#include "playlist.h"
+#include "tvout.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "stdctl.h"
+#include "session.h"
+#include "errors.h"
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>

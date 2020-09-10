@@ -24,8 +24,6 @@
 
 #include "xitk.h"
 
-typedef struct xui_playlist_st xui_playlist_t;
-
 void playlist_editor (gGui_t *gui);
 void playlist_change_skins (gGui_t *gui, int synth);
 void playlist_reparent (gGui_t *gui);

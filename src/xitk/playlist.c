@@ -30,6 +30,16 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "playlist.h"
+#include "file_browser.h"
+#include "menus.h"
+#include "mrl_browser.h"
+#include "panel.h"
+#include "stream_infos.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/button.h"

@@ -33,6 +33,9 @@
 #include "lang.h"
 
 #include "common.h"
+#include "osd.h"
+#include "videowin.h"
+#include "actions.h"
 
 #define OVL_PALETTE_SIZE 256
 

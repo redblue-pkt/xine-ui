@@ -43,6 +43,20 @@
 #include "dump.h"
 
 #include "common.h"
+#include "event.h"
+#include "actions.h"
+#include "panel.h"
+#include "stream_infos.h"
+#include "videowin.h"
+#include "playlist.h"
+#include "skins.h"
+#include "control.h"
+#include "event_sender.h"
+#include "splash.h"
+#include "session.h"
+#include "network.h"
+#include "tvout.h"
+#include "stdctl.h"
 #include "oxine/oxine.h"
 
 /*

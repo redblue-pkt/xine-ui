@@ -42,6 +42,10 @@
 #include <errno.h>
 
 #include "common.h"
+#include "session.h"
+#include "panel.h"
+#include "playlist.h"
+#include "actions.h"
 #include "session_internal.h"
 
 

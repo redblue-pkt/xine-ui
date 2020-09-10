@@ -48,6 +48,13 @@
 #endif
 
 #include "common.h"
+#include "videowin.h"
+#include "menus.h"
+#include "panel.h"
+#include "tvout.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/xitk_x11.h"
 #include "oxine/oxine.h"
 

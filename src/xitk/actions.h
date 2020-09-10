@@ -24,7 +24,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-#include "common.h"
+#include "mediamark.h"
 
 /* see gui_nextprev below. */
 #define GUI_NEXT(gui)  ((gui)->nextprev + 2)

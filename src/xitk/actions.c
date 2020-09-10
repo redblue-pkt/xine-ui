@@ -38,6 +38,25 @@
 #include <xine/xineutils.h>
 
 #include "common.h"
+#include "actions.h"
+#include "event.h"
+#include "stream_infos.h"
+#include "tvset.h"
+#include "playlist.h"
+#include "panel.h"
+#include "setup.h"
+#include "mrl_browser.h"
+#include "event_sender.h"
+#include "help.h"
+#include "viewlog.h"
+#include "control.h"
+#include "videowin.h"
+#include "file_browser.h"
+#include "skins.h"
+#include "tvout.h"
+#include "stdctl.h"
+#include "download.h"
+#include "errors.h"
 #include "oxine/oxine.h"
 
 static gGui_t *_gui_get_nextprev (void *data, int *value) {
@@ -2453,4 +2472,3 @@ void visual_anim_stop(void) {
     gui->visual_anim.running = 0;
   }
 }
-

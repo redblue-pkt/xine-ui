@@ -27,6 +27,8 @@
 #include <string.h>
 
 #include "common.h"
+#include "../actions.h"
+#include "../playlist.h"
 
 #include "oxine.h"
 #include "otk.h"

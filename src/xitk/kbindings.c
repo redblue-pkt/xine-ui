@@ -27,6 +27,11 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "kbindings.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/checkbox.h"
@@ -47,7 +52,6 @@ struct xui_keyedit_s {
 
   xitk_window_t        *xwin;
   xitk_widget_list_t   *widget_list;
-  int                   running;
   int                   visible;
 
   xitk_widget_t        *browser;
@@ -482,13 +486,6 @@ void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int 
  * ***** Key Binding Editor ******
  */
 /*
- * return 1 if key binding editor is ON
- */
-int kbedit_is_running (xui_keyedit_t *kbedit) {
-  return kbedit ? kbedit->running : 0;
-}
-
-/*
  * Return 1 if setup panel is visible
  */
 int kbedit_is_visible (xui_keyedit_t *kbedit) {
@@ -506,7 +503,7 @@ int kbedit_is_visible (xui_keyedit_t *kbedit) {
  */
 void kbedit_raise_window (xui_keyedit_t *kbedit) {
   if(kbedit != NULL)
-    raise_window (kbedit->gui, kbedit->xwin, kbedit->visible, kbedit->running);
+    raise_window (kbedit->gui, kbedit->xwin, kbedit->visible, 1);
 }
 
 /*
@@ -516,7 +513,7 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_keyedit_t *kbedit = data;
   (void)w;
   if (kbedit)
-    toggle_window (kbedit->gui, kbedit->xwin, kbedit->widget_list, &kbedit->visible, kbedit->running);
+    toggle_window (kbedit->gui, kbedit->xwin, kbedit->widget_list, &kbedit->visible, 1);
 }
 
 static void kbedit_create_browser_entries (xui_keyedit_t *kbedit) {
@@ -648,7 +645,6 @@ static void kbedit_exit (xitk_widget_t *w, void *data, int state) {
     window_info_t wi;
     
     xitk_unregister_event_handler (&kbedit->req);
-    kbedit->running = 0;
     kbedit->visible = 0;
     
     if((xitk_get_window_info(kbedit->kreg, &wi))) {
@@ -1394,7 +1390,6 @@ void kbedit_window (gGui_t *gui) {
 
   gui->ssaver_enabled = 0;
   kbedit->visible      = 1;
-  kbedit->running      = 1;
   kbedit_raise_window (kbedit);
 
   xitk_window_try_to_set_input_focus (kbedit->xwin);

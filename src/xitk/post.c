@@ -27,6 +27,11 @@
 #include <X11/keysym.h>
 
 #include "common.h"
+#include "post.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
+#include "errors.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/inputtext.h"

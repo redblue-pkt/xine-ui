@@ -27,6 +27,15 @@
 #include "lang.h"
 
 #include "common.h"
+#include "menus.h"
+#include "control.h"
+#include "event_sender.h"
+#include "mrl_browser.h"
+#include "panel.h"
+#include "playlist.h"
+#include "videowin.h"
+#include "actions.h"
+#include "event.h"
 #include "xine-toolkit/menu.h"
 
 #define PLAYL_LOAD              10

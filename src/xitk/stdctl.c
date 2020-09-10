@@ -32,6 +32,10 @@
 #include <string.h>
 
 #include "common.h"
+#include "stdctl.h"
+#include "panel.h"
+#include "actions.h"
+#include "event.h"
 
 #define DEBUG_STDCTL 0
 

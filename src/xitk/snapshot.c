@@ -63,6 +63,7 @@
 #include <png.h>
 
 #include "common.h"
+#include "snapshot.h"
 
 #define PIXSZ 3
 #define BIT_DEPTH 8

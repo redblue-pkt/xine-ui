@@ -48,6 +48,10 @@
 #include "utils.h"
 #include "mediamarks.h"
 #include "playlist.h"
+#include "../actions.h"
+#include "../event.h"
+#include "../videowin.h"
+#include "../playlist.h"
 
 static oxine_t *oxine_instance_get(void);
 static void oxine_instance_unget(oxine_t *oxine);
