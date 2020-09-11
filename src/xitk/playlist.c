@@ -172,6 +172,7 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
   xui_playlist_t *pl = data;
 
   (void)w;
+  (void)modifier;
   if (pl->playlist_mrls[selected] != NULL) {
     xitk_inputtext_change_text (pl->winput, pl->playlist_mrls[selected]);
     pthread_mutex_lock (&pl->gui->mmk_mutex);
@@ -223,6 +224,7 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
   xui_playlist_t *pl = data;
 
   (void)w;
+  (void)modifier;
   pthread_mutex_lock (&pl->gui->mmk_mutex);
   if (pl->gui->playlist.mmk[selected]->mrl != NULL) {
     pl->gui->playlist.cur = selected;
@@ -593,6 +595,7 @@ static void _playlist_handle_key_event(void *data, const xitk_key_event_t *ke) {
     switch (ke->key_pressed) {
       case XK_Up:
         s = t[0];
+        goto _move_browser;
       case XK_Down:
         s = t[1];
         goto _move_browser;
@@ -1000,6 +1003,7 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
   if (!pl)
     return;
 
+  (void)synthetic;
   xitk_skin_lock (pl->gui->skin_config);
   xitk_hide_widgets (pl->widget_list);
   {

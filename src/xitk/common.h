@@ -207,6 +207,8 @@ struct gGui_st {
     int                     post_changed;
     post_element_t          post_output_element;    
   } visual_anim;
+
+  post_info_t               post_audio, post_video;
   
   struct {
     int                     enabled;
@@ -423,4 +425,3 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible);
 #endif
 
 #endif
-

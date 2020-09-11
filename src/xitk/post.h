@@ -29,40 +29,54 @@ typedef struct {
   char           *name;
 } post_element_t;
 
-const char **post_get_audio_plugins_names(void);
-void post_init(void);
-void post_rewire_visual_anim(void);
-int post_rewire_audio_port_to_stream(xine_stream_t *stream);
-int post_rewire_audio_post_to_stream(xine_stream_t *stream);
-void post_deinit (void);
+typedef struct post_win_s post_win_t;
 
-void vpplugin_end(void);
-int vpplugin_is_visible(void);
-int vpplugin_is_running(void);
-void vpplugin_toggle_visibility(xitk_widget_t *w, void *data);
-void vpplugin_raise_window(void);
-void vpplugin_update_enable_button(void);
-void vpplugin_panel(void);
-void vpplugin_parse_and_store_post(const char *post);
-void vpplugin_rewire_from_posts_window(void);
-void vpplugin_rewire_posts(void);
-int vpplugin_is_post_selected(void);
-void vpplugin_reparent(void);
+typedef enum {
+  POST_AUDIO = 0,
+  POST_VIDEO
+} post_type_t;
 
-void applugin_end(void);
-int applugin_is_visible(void);
-int applugin_is_running(void);
-void applugin_toggle_visibility(xitk_widget_t *w, void *data);
-void applugin_raise_window(void);
-void applugin_update_enable_button(void);
-void applugin_panel(void);
-void applugin_parse_and_store_post(const char *post);
-void applugin_rewire_from_posts_window(void);
-void applugin_rewire_posts(void);
-int applugin_is_post_selected(void);
-void applugin_reparent(void);
+typedef struct {
+  gGui_t              *gui;
+  xine_stream_t       *stream;
+  post_win_t          *win;
+  post_element_t     **elements;
+  int                  num_elements;
+  post_type_t          type;
+  union {
+    struct {
+      char           **audio_vis_plugins;
+      int              ignore_visual_anim;
+    }                  audio;
+    struct {
+      const char      *deinterlace_plugin;
+      post_element_t **deinterlace_elements;
+      int              num_deinterlace_elements;
+    }                  video;
+  }                    info;
+} post_info_t;
 
-void post_deinterlace_init(const char *deinterlace_post);
-void post_deinterlace(void);
+const char * const *post_get_audio_plugins_names (gGui_t *gui);
+void post_init (gGui_t *gui);
+void post_rewire_visual_anim (gGui_t *gui);
+int post_rewire_audio_port_to_stream (gGui_t *gui, xine_stream_t *stream);
+int post_rewire_audio_post_to_stream (gGui_t *gui, xine_stream_t *stream);
+void post_deinit (gGui_t *gui);
+
+void pplugin_end (post_info_t *info);
+int pplugin_is_visible (post_info_t *info);
+int pplugin_is_running (post_info_t *info);
+void pplugin_toggle_visibility (xitk_widget_t *w, void *info);
+void pplugin_raise_window (post_info_t *info);
+void pplugin_update_enable_button (post_info_t *info);
+void pplugin_panel (post_info_t *info);
+void pplugin_parse_and_store_post (post_info_t *info, const char *post);
+void pplugin_rewire_from_posts_window (post_info_t *info);
+void pplugin_rewire_posts (post_info_t *info);
+int pplugin_is_post_selected (post_info_t *info);
+void pplugin_reparent (post_info_t *info);
+
+void post_deinterlace_init (gGui_t *gui, const char *deinterlace_post);
+void post_deinterlace (gGui_t *gui);
 
 #endif

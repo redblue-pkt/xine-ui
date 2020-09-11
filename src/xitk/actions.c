@@ -92,8 +92,6 @@ void gui_reparent_all_windows (gGui_t *gui) {
   } _reparent[] = {
     { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
-    { vpplugin_is_visible,      vpplugin_reparent },
-    { applugin_is_visible,      applugin_reparent },
     { NULL,                     NULL}
   };
   
@@ -113,6 +111,10 @@ void gui_reparent_all_windows (gGui_t *gui) {
     viewlog_reparent (gui->viewlog);
   if (kbedit_is_visible (gui->keyedit))
     kbedit_reparent (gui->keyedit);
+  if (pplugin_is_visible (&gui->post_audio))
+    pplugin_reparent (&gui->post_audio);
+  if (pplugin_is_visible (&gui->post_video))
+    pplugin_reparent (&gui->post_video);
   control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
@@ -287,7 +289,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   int      already_playing = (gui->logo_mode == 0);
   
   if(gui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
-    post_rewire_visual_anim();
+    post_rewire_visual_anim (gui);
     gui->visual_anim.post_changed = 0;
   }
   
@@ -297,13 +299,13 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
 
   if((has_video && gui->visual_anim.enabled == 1) && gui->visual_anim.running) {
 
-    if(post_rewire_audio_port_to_stream(stream))
+    if (post_rewire_audio_port_to_stream (gui, stream))
       gui->visual_anim.running = 0;
 
   } else if (!has_video && (gui->visual_anim.enabled == 1) && 
 	     (gui->visual_anim.running == 0) && gui->visual_anim.post_output_element.post) {
 
-    if(post_rewire_audio_post_to_stream(stream))
+    if (post_rewire_audio_post_to_stream (gui, stream))
       gui->visual_anim.running = 1;
 
   }
@@ -756,8 +758,8 @@ void gui_exit_2 (gGui_t *gui) {
   event_sender_end (gui);
   stream_infos_end();
   tvset_end();
-  vpplugin_end();
-  applugin_end();
+  pplugin_end (&gui->post_audio);
+  pplugin_end (&gui->post_video);
   help_end (gui->help);
 #ifdef HAVE_TAR
   skin_download_end (gui->skdloader);
@@ -806,7 +808,7 @@ void gui_exit_2 (gGui_t *gui) {
   gui->visual_anim.post_output_element.post = NULL;
 
   /* unwire post plugins before closing streams */
-  post_deinit ();
+  post_deinit (gui);
 
   xine_dispose(gui->stream);
   xine_dispose(gui->visual_anim.stream);
@@ -1142,8 +1144,8 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   v |= (event_sender_is_visible (gui) != 0) << 7;
   v |= (stream_infos_is_visible () != 0) << 8;
   v |= (tvset_is_visible () != 0) << 9;
-  v |= (vpplugin_is_visible () != 0) << 10;
-  v |= (applugin_is_visible () != 0) << 11;
+  v |= (pplugin_is_visible (&gui->post_video) != 0) << 10;
+  v |= (pplugin_is_visible (&gui->post_audio) != 0) << 11;
   v |= (help_is_visible (gui->help) != 0) << 12;
 
   s = (v ^ flags_visible) & flags_mask;
@@ -1166,9 +1168,9 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   if (s & (1 << 9))
     tvset_toggle_visibility (NULL, NULL);
   if (s & (1 << 10))
-    vpplugin_toggle_visibility (NULL, NULL);
+    pplugin_toggle_visibility (NULL, &gui->post_video);
   if (s & (1 << 11))
-    applugin_toggle_visibility (NULL, NULL);
+    pplugin_toggle_visibility (NULL, &gui->post_audio);
   if (s & (1 << 12))
     help_toggle_visibility (gui->help);
 
@@ -1232,7 +1234,7 @@ void gui_toggle_interlaced (gGui_t *gui) {
     return;
   gui->deinterlace_enable = !gui->deinterlace_enable;
   osd_display_info(_("Deinterlace: %s"), (gui->deinterlace_enable) ? _("enabled") : _("disabled"));
-  post_deinterlace();
+  post_deinterlace (gui);
   panel_raise_window(gui->panel);
 }
 
@@ -1902,29 +1904,25 @@ void gui_vpp_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if (vpplugin_is_running() && !vpplugin_is_visible())
-    vpplugin_toggle_visibility(NULL, NULL);
-  else if(!vpplugin_is_running())
-    vpplugin_panel();
-  else {
-    if(gui->use_root_window)
-      vpplugin_toggle_visibility(NULL, NULL);
-    else
-      vpplugin_end();
-  }
+  if (!pplugin_is_running (&gui->post_video))
+    pplugin_panel (&gui->post_video);
+  else if (!pplugin_is_visible (&gui->post_video) || gui->use_root_window)
+    pplugin_toggle_visibility (NULL, &gui->post_video);
+  else
+    pplugin_end (&gui->post_video);
 }
 
 void gui_vpp_enable (gGui_t *gui) {
   if (!gui)
     return;
-  if(vpplugin_is_post_selected()) {
+  if (pplugin_is_post_selected (&gui->post_video)) {
     gui->post_video_enable = !gui->post_video_enable;
     osd_display_info(_("Video post plugins: %s."), (gui->post_video_enable) ? _("enabled") : _("disabled"));
-    vpplugin_update_enable_button();
-    if(vpplugin_is_visible())
-      vpplugin_rewire_from_posts_window();
+    pplugin_update_enable_button (&gui->post_video);
+    if (pplugin_is_visible (&gui->post_video))
+      pplugin_rewire_from_posts_window (&gui->post_video);
     else
-      vpplugin_rewire_posts();
+      pplugin_rewire_posts (&gui->post_video);
   }
 }
 
@@ -2067,29 +2065,25 @@ void gui_app_show(xitk_widget_t *w, void *data) {
   if (!gui)
     return;
   (void)w;
-  if (applugin_is_running() && !applugin_is_visible())
-    applugin_toggle_visibility(NULL, NULL);
-  else if(!applugin_is_running())
-    applugin_panel();
-  else {
-    if(gui->use_root_window)
-      applugin_toggle_visibility(NULL, NULL);
-    else
-      applugin_end();
-  }
+  if (!pplugin_is_running (&gui->post_audio))
+    pplugin_panel (&gui->post_audio);
+  else if (!pplugin_is_visible (&gui->post_audio) || gui->use_root_window)
+    pplugin_toggle_visibility (NULL, &gui->post_audio);
+  else
+    pplugin_end (&gui->post_audio);
 }
 
 void gui_app_enable (gGui_t *gui) {
   if (!gui)
     return;
-  if(applugin_is_post_selected()) {
+  if (pplugin_is_post_selected (&gui->post_audio)) {
     gui->post_audio_enable = !gui->post_audio_enable;
-    osd_display_info(_("Audio post plugins: %s."), (gui->post_audio_enable) ? _("enabled") : _("disabled"));
-    applugin_update_enable_button();
-    if(applugin_is_visible())
-      applugin_rewire_from_posts_window();
+    osd_display_info (_("Audio post plugins: %s."), (gui->post_audio_enable) ? _("enabled") : _("disabled"));
+    pplugin_update_enable_button (&gui->post_audio);
+    if (pplugin_is_visible (&gui->post_audio))
+      pplugin_rewire_from_posts_window (&gui->post_audio);
     else
-      applugin_rewire_posts();
+      pplugin_rewire_posts (&gui->post_audio);
   }
 }
 
