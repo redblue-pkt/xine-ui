@@ -2085,8 +2085,8 @@ int main(int argc, char *argv[]) {
   }
   SAFE_FREE(audio_driver_id);
 
-  post_deinterlace_init(pdeinterlace);
-  post_init();
+  post_init (gui);
+  post_deinterlace_init (gui, pdeinterlace);
 
   gui->stream = xine_stream_new (gui->xine, gui->ao_port, gui->vo_port);
 #ifdef XINE_PARAM_EARLY_FINISHED_EVENT
@@ -2156,13 +2156,13 @@ int main(int argc, char *argv[]) {
     char             **plugin = pplugins;
     
     while(*plugin) {
-      vpplugin_parse_and_store_post((const char *) *plugin);
-      applugin_parse_and_store_post((const char *) *plugin);
+      pplugin_parse_and_store_post (&gui->post_video, (const char *) *plugin);
+      pplugin_parse_and_store_post (&gui->post_audio, (const char *) *plugin);
       plugin++;
     }
     
-    vpplugin_rewire_posts();
-    applugin_rewire_posts();
+    pplugin_rewire_posts (&gui->post_video);
+    pplugin_rewire_posts (&gui->post_audio);
   }
 
   gui_run(gui, session_argv);

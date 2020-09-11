@@ -161,54 +161,45 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   gGui_t *gui = data;
   int ctrl = me->user_id;
 
-  switch(ctrl) {
-
-  case PLAYL_LOAD:
-    playlist_load_playlist (gui);
-    break;
-    
-  case PLAYL_SAVE:
-    playlist_save_playlist (gui);
-    break;
-
-  case PLAYL_EDIT:
-    gui_execute_action_id (gui, ACTID_PLAYLIST);
-    break;
-
-  case PLAYL_NO_LOOP:
-    gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
-    osd_display_info(_("Playlist: no loop."));
-    break;
-
-  case PLAYL_LOOP:
-    gui->playlist.loop = PLAYLIST_LOOP_LOOP;
-    osd_display_info(_("Playlist: loop."));
-    break;
-
-  case PLAYL_REPEAT:
-    gui->playlist.loop = PLAYLIST_LOOP_REPEAT;
-    osd_display_info(_("Playlist: entry repeat."));
-    break;
-
-  case PLAYL_SHUFFLE:
-    gui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
-    osd_display_info(_("Playlist: shuffle."));
-    break;
-
-  case PLAYL_SHUF_PLUS:
-    gui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
-    osd_display_info(_("Playlist: shuffle forever."));
-    break;
-
-  case PLAYL_CTRL_STOP:
-    gui_execute_action_id (gui, ACTID_PLAYLIST_STOP);
-    break;
-
-  default:
-    printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
-    break;
+  (void)w;
+  switch (ctrl) {
+    case PLAYL_LOAD:
+      playlist_load_playlist (gui);
+      break;
+    case PLAYL_SAVE:
+      playlist_save_playlist (gui);
+      break;
+    case PLAYL_EDIT:
+      gui_execute_action_id (gui, ACTID_PLAYLIST);
+      break;
+    case PLAYL_NO_LOOP:
+      gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
+      osd_display_info (_("Playlist: no loop."));
+      break;
+    case PLAYL_LOOP:
+      gui->playlist.loop = PLAYLIST_LOOP_LOOP;
+      osd_display_info (_("Playlist: loop."));
+      break;
+    case PLAYL_REPEAT:
+      gui->playlist.loop = PLAYLIST_LOOP_REPEAT;
+      osd_display_info (_("Playlist: entry repeat."));
+      break;
+    case PLAYL_SHUFFLE:
+      gui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
+      osd_display_info (_("Playlist: shuffle."));
+      break;
+    case PLAYL_SHUF_PLUS:
+      gui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
+      osd_display_info (_("Playlist: shuffle forever."));
+      break;
+    case PLAYL_CTRL_STOP:
+      gui_execute_action_id (gui, ACTID_PLAYLIST_STOP);
+      break;
+    default:
+      printf ("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
   }
 }
+
 static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gGui_t *gui = data;
   int       num_mrls;
@@ -301,7 +292,9 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 
 static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int viz = (int)(intptr_t) data;
-  
+
+  (void)w;
+  (void)me;
   config_update_num("gui.post_audio_plugin", viz);
 }
 
@@ -733,7 +726,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 
   { /* Audio Viz */
     xitk_menu_entry_t   menu_entry;
-    const char        **viz_names = post_get_audio_plugins_names();
+    const char        **viz_names = post_get_audio_plugins_names (gui);
 
     if(viz_names && *viz_names) {
       int                 i = 0;

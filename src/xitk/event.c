@@ -165,7 +165,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
   
   if(gui->visual_anim.enabled && gui->visual_anim.running) {
     if((gui->visual_anim.enabled == 1) && (cfg->num_value != 1)) {
-      if(post_rewire_audio_port_to_stream(gui->stream))
+      if (post_rewire_audio_port_to_stream (gui, gui->stream))
 	gui->visual_anim.running = 0;
     }
     if((gui->visual_anim.enabled == 2) && (cfg->num_value != 2)) {
@@ -185,7 +185,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
     if(!has_video && !gui->visual_anim.running) {
       if(gui->visual_anim.enabled == 1) {
 	if(gui->visual_anim.post_output_element.post) {
-	  if(post_rewire_audio_post_to_stream(gui->stream))
+            if (post_rewire_audio_post_to_stream (gui, gui->stream))
 	    gui->visual_anim.running = 1;
 	}
       }

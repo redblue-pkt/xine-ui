@@ -1064,6 +1064,8 @@ void kbedit_window (gGui_t *gui) {
 
   if (!gui)
     return;
+  if (gui->keyedit)
+    return;
 
   x = xine_config_register_num(__xineui_global_xine_instance, "gui.kbedit_x", 
 			       80,
