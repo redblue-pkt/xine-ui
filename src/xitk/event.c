@@ -200,7 +200,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
 static void stream_info_auto_update_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   gui->stream_info_auto_update = cfg->num_value;
-  stream_infos_toggle_auto_update();
+  stream_infos_toggle_auto_update (gui->streaminfo);
 }
 
 /*

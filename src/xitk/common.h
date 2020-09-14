@@ -49,6 +49,7 @@ typedef struct xui_viewlog_s xui_viewlog_t;
 typedef struct filebrowser_s filebrowser_t;
 typedef struct tvout_s tvout_t;
 typedef struct xui_skdloader_s xui_skdloader_t;
+typedef struct xui_sinfo_s xui_sinfo_t;
 
 #include "config_wrapper.h"
 #include "i18n.h"
@@ -365,6 +366,7 @@ struct gGui_st {
   xui_viewlog_t             *viewlog;
   xui_keyedit_t             *keyedit;
   xui_playlist_t            *plwin;
+  xui_sinfo_t               *streaminfo;
   filebrowser_t             *pl_load;
   filebrowser_t             *pl_save;
 

@@ -527,8 +527,8 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 
 	  }
 
-          if (stream_infos_is_visible() && panel->gui->stream_info_auto_update)
-	    stream_infos_update_infos();
+          if (stream_infos_is_visible (panel->gui->streaminfo) && panel->gui->stream_info_auto_update)
+            stream_infos_update_infos (panel->gui->streaminfo);
 
 	}
       }
