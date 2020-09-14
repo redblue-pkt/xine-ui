@@ -90,7 +90,6 @@ void gui_reparent_all_windows (gGui_t *gui) {
     int                 (*visible)(void);
     void                (*reparent)(void);
   } _reparent[] = {
-    { stream_infos_is_visible,  stream_infos_reparent },
     { tvset_is_visible,         tvset_reparent },
     { NULL,                     NULL}
   };
@@ -115,6 +114,8 @@ void gui_reparent_all_windows (gGui_t *gui) {
     pplugin_reparent (&gui->post_audio);
   if (pplugin_is_visible (&gui->post_video))
     pplugin_reparent (&gui->post_video);
+  if (stream_infos_is_visible (gui->streaminfo))
+    stream_infos_reparent (gui->streaminfo);
   control_reparent (gui->vctrl);
 
   for(i = 0; _reparent[i].visible; i++) {
@@ -277,8 +278,8 @@ void gui_display_logo (gGui_t *gui) {
   gui->logo_mode = 1;
   
   panel_reset_slider (gui->panel);
-  if(stream_infos_is_visible())
-    stream_infos_update_infos();
+  if (stream_infos_is_visible (gui->streaminfo))
+    stream_infos_update_infos (gui->streaminfo);
   
   pthread_mutex_unlock(&gui->logo_mutex);
 }
@@ -322,8 +323,8 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
     
     if(gui->logo_mode == 0) {
      
-      if(stream_infos_is_visible())
-	stream_infos_update_infos();
+      if (stream_infos_is_visible (gui->streaminfo))
+	stream_infos_update_infos (gui->streaminfo);
       
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
         pthread_mutex_lock (&gui->mmk_mutex);
@@ -484,7 +485,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
     if(v_unhandled) {
       const char *minfo;
       uint32_t    vfcc;
-      char        tmp[8];
+      char        tmp[32];
 
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
@@ -496,7 +497,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
     if(a_unhandled) {
       const char *minfo;
       uint32_t    afcc;
-      char        tmp[8];
+      char        tmp[32];
 
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
@@ -756,7 +757,7 @@ void gui_exit_2 (gGui_t *gui) {
   viewlog_end (gui->viewlog);
   kbedit_end (gui->keyedit);
   event_sender_end (gui);
-  stream_infos_end();
+  stream_infos_end (gui->streaminfo);
   tvset_end();
   pplugin_end (&gui->post_audio);
   pplugin_end (&gui->post_video);
@@ -1142,7 +1143,7 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   v |= (viewlog_is_visible (gui->viewlog) != 0) << 5;
   v |= (kbedit_is_visible (gui->keyedit) != 0) << 6;
   v |= (event_sender_is_visible (gui) != 0) << 7;
-  v |= (stream_infos_is_visible () != 0) << 8;
+  v |= (stream_infos_is_visible (gui->streaminfo) != 0) << 8;
   v |= (tvset_is_visible () != 0) << 9;
   v |= (pplugin_is_visible (&gui->post_video) != 0) << 10;
   v |= (pplugin_is_visible (&gui->post_audio) != 0) << 11;
@@ -1164,7 +1165,7 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   if (s & (1 << 7))
     event_sender_toggle_visibility (gui);
   if (s & (1 << 8))
-    stream_infos_toggle_visibility (NULL, NULL);
+    stream_infos_toggle_visibility (NULL, gui->streaminfo);
   if (s & (1 << 9))
     tvset_toggle_visibility (NULL, NULL);
   if (s & (1 << 10))
@@ -1868,16 +1869,12 @@ void gui_stream_infos_show(xitk_widget_t *w, void *data) {
   (void)w;
   if (!gui)
     return;
-  if (stream_infos_is_running() && !stream_infos_is_visible())
-    stream_infos_toggle_visibility(NULL, NULL);
-  else if(!stream_infos_is_running())
-    stream_infos_panel();
-  else {
-    if(gui->use_root_window)
-      stream_infos_toggle_visibility(NULL, NULL);
-    else
-      stream_infos_end();
-  }
+  if (!gui->streaminfo)
+    stream_infos_panel (gui);
+  else if (gui->use_root_window || !stream_infos_is_visible (gui->streaminfo))
+    stream_infos_toggle_visibility (NULL, gui->streaminfo);
+  else
+    stream_infos_end (gui->streaminfo);
 }
 
 void gui_tvset_show(xitk_widget_t *w, void *data) {
@@ -2466,3 +2463,4 @@ void visual_anim_stop(void) {
     gui->visual_anim.running = 0;
   }
 }
+

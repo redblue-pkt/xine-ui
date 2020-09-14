@@ -37,157 +37,300 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "recode.h"
-	
+
 #define WINDOW_WIDTH        570
 #define WINDOW_HEIGHT       616
 
 #define METAINFO_CHARSET    "UTF-8"
 
+typedef enum {
+  SINF_STRING = 0,
+  SINF_title = SINF_STRING,
+  SINF_comment,
+  SINF_artist,
+  SINF_genre,
+  SINF_album,
+  SINF_year,
+  SINF_vcodec,
+  SINF_acodec,
+  SINF_systemlayer,
+  SINF_input_plugin,
+  SINF_BOOL,
+  SINF_seekable = SINF_BOOL,
+  SINF_has_chapters,
+  SINF_has_still,
+  SINF_has_audio,
+  SINF_ignore_audio,
+  SINF_audio_handled,
+  SINF_has_video,
+  SINF_ignore_video,
+  SINF_video_handled,
+  SINF_ignore_spu,
+  SINF_INT,
+  SINF_bitrate = SINF_INT,
+  SINF_video_ratio,
+  SINF_video_channels,
+  SINF_video_streams,
+  SINF_video_bitrate,
+  SINF_frame_duration,
+  SINF_audio_channels,
+  SINF_audio_bits,
+  SINF_audio_samplerate,
+  SINF_audio_bitrate,
+  SINF_FOURCC,
+  SINF_video_fourcc = SINF_FOURCC,
+  SINF_audio_fourcc,
+  SINF_END
+} sinf_index_t;
 
-struct {
+static const int sinf_xine_type[SINF_END] = {
+  [SINF_title]            = XINE_META_INFO_TITLE,
+  [SINF_comment]          = XINE_META_INFO_COMMENT,
+  [SINF_artist]           = XINE_META_INFO_ARTIST,
+  [SINF_genre]            = XINE_META_INFO_GENRE,
+  [SINF_album]            = XINE_META_INFO_ALBUM,
+  [SINF_year]             = XINE_META_INFO_YEAR,
+  [SINF_vcodec]           = XINE_META_INFO_VIDEOCODEC,
+  [SINF_acodec]           = XINE_META_INFO_AUDIOCODEC,
+  [SINF_systemlayer]      = XINE_META_INFO_SYSTEMLAYER,
+  [SINF_input_plugin]     = XINE_META_INFO_INPUT_PLUGIN,
+  [SINF_bitrate]          = XINE_STREAM_INFO_BITRATE,
+  [SINF_seekable]         = XINE_STREAM_INFO_SEEKABLE,
+  [SINF_video_ratio]      = XINE_STREAM_INFO_VIDEO_RATIO,
+  [SINF_video_channels]   = XINE_STREAM_INFO_VIDEO_CHANNELS,
+  [SINF_video_streams]    = XINE_STREAM_INFO_VIDEO_STREAMS,
+  [SINF_video_bitrate]    = XINE_STREAM_INFO_VIDEO_BITRATE,
+  [SINF_video_fourcc]     = XINE_STREAM_INFO_VIDEO_FOURCC,
+  [SINF_video_handled]    = XINE_STREAM_INFO_VIDEO_HANDLED,
+  [SINF_frame_duration]   = XINE_STREAM_INFO_FRAME_DURATION,
+  [SINF_audio_channels]   = XINE_STREAM_INFO_AUDIO_CHANNELS,
+  [SINF_audio_bits]       = XINE_STREAM_INFO_AUDIO_BITS,
+  [SINF_audio_samplerate] = XINE_STREAM_INFO_AUDIO_SAMPLERATE,
+  [SINF_audio_bitrate]    = XINE_STREAM_INFO_AUDIO_BITRATE,
+  [SINF_audio_fourcc]     = XINE_STREAM_INFO_AUDIO_FOURCC,
+  [SINF_audio_handled]    = XINE_STREAM_INFO_AUDIO_HANDLED,
+  [SINF_has_chapters]     = XINE_STREAM_INFO_HAS_CHAPTERS,
+  [SINF_has_video]        = XINE_STREAM_INFO_HAS_VIDEO,
+  [SINF_has_audio]        = XINE_STREAM_INFO_HAS_AUDIO,
+  [SINF_ignore_video]     = XINE_STREAM_INFO_IGNORE_VIDEO,
+  [SINF_ignore_audio]     = XINE_STREAM_INFO_IGNORE_AUDIO,
+  [SINF_ignore_spu]       = XINE_STREAM_INFO_IGNORE_SPU,
+  [SINF_has_still]        = XINE_STREAM_INFO_VIDEO_HAS_STILL
+};
+
+static const struct {
+  uint16_t x, y, w, h;
+  const char *title;
+} sinf_f_defs[] = {
+  {  15,  28, 540, 199, N_("General")},
+  {  15, 230, 540, 109, N_("Misc")},
+  {  15, 342, 540, 109, N_("Video")},
+  {  15, 454, 540, 109, N_("Audio")},
+  {   0,   0,   0,   0, NULL},
+  {  20,  43, 529,  42, N_("Title: ")},
+  {  20,  88, 529,  42, N_("Comment: ")},
+  {  20, 133, 262,  42, N_("Artist: ")},
+  { 287, 133, 129,  42, N_("Genre: ")},
+  { 421, 133, 128,  42, N_("Year: ")},
+  {  20, 178, 262,  42, N_("Album: ")},
+  {  20, 245, 128,  42, N_("Input Plugin: ")},
+  { 153, 245, 129,  42, N_("System Layer: ")},
+  { 287, 245, 129,  42, N_("Bitrate: ")},
+  { 421, 245, 128,  42, N_("Frame Duration: ")},
+  {  20, 290, 128,  42, N_("Is Seekable: ")},
+  { 153, 290, 129,  42, N_("Has Chapters: ")},
+  { 287, 290, 129,  42, N_("Ignore Spu: ")},
+  { 421, 290, 128,  42, N_("Has Still: ")},
+  {  20, 357, 102,  42, N_("Has: ")},
+  { 127, 357, 102,  42, N_("Handled: ")},
+  { 234, 357, 101,  42, N_("Ignore: ")},
+  { 340, 357, 209,  42, N_("Codec: ")},
+  {  20, 402,  84,  42, N_("FourCC: ")},
+  { 109, 402,  84,  42, N_("Channel(s): ")},
+  { 198, 402,  84,  42, N_("Bitrate: ")},
+  { 287, 402,  84,  42, N_("Resolution: ")},
+  { 376, 402,  84,  42, N_("Ratio: ")},
+  { 465, 402,  84,  42, N_("Stream(s): ")},
+  {  20, 469, 102,  42, N_("Has: ")},
+  { 127, 469, 102,  42, N_("Handled: ")},
+  { 234, 469, 101,  42, N_("Ignore: ")},
+  { 340, 469, 209,  42, N_("Codec: ")},
+  {  20, 514, 102,  42, N_("FourCC: ")},
+  { 127, 514, 102,  42, N_("Channel(s): ")},
+  { 234, 514, 101,  42, N_("Bitrate: ")},
+  { 340, 514, 102,  42, N_("Bits: ")},
+  { 447, 514, 102,  42, N_("Samplerate: ")},
+  {   0,   0,   0,   0, NULL}
+};
+
+static const struct {
+  uint16_t x, y, w, h;
+} sinf_w_defs[SINF_END + 1] = {
+  [SINF_title]            = {  25,  58, 519, 20},
+  [SINF_comment]          = {  25, 103, 519, 20},
+  [SINF_artist]           = {  25, 148, 252, 20},
+  [SINF_genre]            = { 292, 148, 119, 20},
+  [SINF_year]             = { 426, 148, 118, 20},
+  [SINF_album]            = {  25, 193, 252, 20},
+  [SINF_input_plugin]     = {  25, 260, 118, 20},
+  [SINF_systemlayer]      = { 158, 260, 119, 20},
+  [SINF_vcodec]           = { 345, 372, 199, 20},
+  [SINF_acodec]           = { 345, 484, 199, 20},
+  [SINF_seekable]         = {  25, 305, 118, 20},
+  [SINF_has_chapters]     = { 158, 305, 119, 20},
+  [SINF_ignore_spu]       = { 292, 305, 119, 20},
+  [SINF_has_still]        = { 426, 305, 118, 20},
+  [SINF_has_video]        = {  25, 372,  92, 20},
+  [SINF_video_handled]    = { 132, 372,  92, 20},
+  [SINF_ignore_video]     = { 239, 372,  92, 20},
+  [SINF_has_audio]        = {  25, 484,  92, 20},
+  [SINF_audio_handled]    = { 132, 484,  92, 20},
+  [SINF_ignore_audio]     = { 239, 484,  92, 20},
+  [SINF_bitrate]          = { 292, 260, 119, 20},
+  [SINF_frame_duration]   = { 426, 260, 118, 20},
+  [SINF_video_channels]   = { 114, 417,  74, 20},
+  [SINF_video_bitrate]    = { 203, 417,  74, 20},
+  [SINF_END]              = { 292, 417,  74, 20},
+  [SINF_video_ratio]      = { 381, 417,  74, 20},
+  [SINF_video_streams]    = { 470, 417,  74, 20},
+  [SINF_audio_channels]   = { 132, 529,  92, 20},
+  [SINF_audio_bitrate]    = { 239, 529,  92, 20},
+  [SINF_audio_bits]       = { 345, 529,  92, 20},
+  [SINF_audio_samplerate] = { 452, 529,  92, 20},
+  [SINF_video_fourcc]     = {  25, 417,  74, 20},
+  [SINF_audio_fourcc]     = {  25, 529,  92, 20}
+};
+
+struct xui_sinfo_s {
+  gGui_t               *gui;
+
   xitk_window_t        *xwin;
-
   xitk_widget_list_t   *widget_list;
-
   xitk_widget_t        *close;
   xitk_widget_t        *update;
 
-  struct {
-    xitk_widget_t      *title;
-    xitk_widget_t      *comment;
-    xitk_widget_t      *artist;
-    xitk_widget_t      *genre;
-    xitk_widget_t      *album;
-    xitk_widget_t      *year;
-    xitk_widget_t      *videocodec;
-    xitk_widget_t      *audiocodec;
-    xitk_widget_t      *systemlayer;
-    xitk_widget_t      *input_plugin;
-  } meta_infos;
+  xitk_widget_t        *w[SINF_END];
+  xitk_widget_t        *video_resolution;
 
-  struct {
-    xitk_widget_t      *bitrate;
-    xitk_widget_t      *seekable;
-    xitk_widget_t      *video_resolution;
-    xitk_widget_t      *video_ratio;
-    xitk_widget_t      *video_channels;
-    xitk_widget_t      *video_streams;
-    xitk_widget_t      *video_bitrate;
-    xitk_widget_t      *video_fourcc;
-    xitk_widget_t      *video_handled;
-    xitk_widget_t      *frame_duration;
-    xitk_widget_t      *audio_channels;
-    xitk_widget_t      *audio_bits;
-    xitk_widget_t      *audio_samplerate;
-    xitk_widget_t      *audio_bitrate;
-    xitk_widget_t      *audio_fourcc;
-    xitk_widget_t      *audio_handled;
-    xitk_widget_t      *has_chapters;
-    xitk_widget_t      *has_video;
-    xitk_widget_t      *has_audio;
-    xitk_widget_t      *ignore_video;
-    xitk_widget_t      *ignore_audio;
-    xitk_widget_t      *ignore_spu;
-    xitk_widget_t      *has_still;
-  } infos;
+  xitk_recode_t        *xr;
 
-  int                   running;
   int                   visible;
   xitk_register_key_t   widget_key;
 
-} sinfos;
+  const char            *yes, *no, *unavail;
+  char                  *temp, buf[32];
+};
+
+static const char *sinf_get_string (xui_sinfo_t *sinfo, sinf_index_t type) {
+  const char *s = xine_get_meta_info (sinfo->gui->stream, sinf_xine_type[type]);
+  if (!s)
+    return sinfo->unavail;
+  free (sinfo->temp);
+  sinfo->temp = xitk_recode (sinfo->xr, s);
+  return sinfo->temp;
+}
+
+static const char *sinf_get_int (xui_sinfo_t *sinfo, sinf_index_t type) {
+  int v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+  unsigned int u;
+  char *q = sinfo->buf + sizeof (sinfo->buf);
+
+  u = v < 0 ? -v : v;
+  *--q = 0;
+  do {
+    *--q = u % 10u + '0';
+    u /= 10u;
+  } while (u);
+  if (v < 0)
+    *--q = '-';
+
+  return q;
+}
+
+static const char *sinf_get_res (xui_sinfo_t *sinfo) {
+  int v;
+  unsigned int u;
+  char *q = sinfo->buf + sizeof (sinfo->buf);
+
+  v = xine_get_stream_info (sinfo->gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+  u = v < 0 ? -v : v;
+  *--q = 0;
+  do {
+    *--q = u % 10u + '0';
+    u /= 10u;
+  } while (u);
+  if (v < 0)
+    *--q = '-';
+
+  *--q = ' ';
+  *--q = 'X';
+  *--q = ' ';
+
+  v = xine_get_stream_info (sinfo->gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+  u = v < 0 ? -v : v;
+  do {
+    *--q = u % 10u + '0';
+    u /= 10u;
+  } while (u);
+  if (v < 0)
+    *--q = '-';
+
+  return q;
+}
+
+static const char *sinf_get_bool (xui_sinfo_t *sinfo, sinf_index_t type) {
+  int v = xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]);
+
+  return v ? sinfo->yes : sinfo->no;
+}
+
+const char *get_fourcc_string (char *dst, size_t dst_size, uint32_t f) {
+  static const char tab_hex[16] = "0123456789abcdef";
+  union {
+    uint32_t u;
+    char z[4];
+  } v;
+  char *q;
+  int i;
+
+  if (!dst || (dst_size < 17))
+    return NULL;
+
+  v.u = f;
+  q = dst + dst_size;
+  *--q = 0;
+  if (f < 0x10000) {
+    do {
+      *--q = tab_hex[f & 15];
+      f >>= 4;
+    } while (f);
+    *--q = 'x';
+    *--q = '0';
+  } else {
+    for (i = 3; i >= 0; i--) {
+      if ((v.z[i] >= ' ') && (v.z[i] < 127)) {
+        *--q = v.z[i];
+      } else {
+        *--q = tab_hex[v.z[i] & 15];
+        *--q = tab_hex[v.z[i] >> 4];
+        *--q = 'x';
+        *--q = '\\';
+      }
+    }
+  }
+  return q;
+}
+
+static const char *sinf_get_4cc (xui_sinfo_t *sinfo, sinf_index_t type) {
+  return get_fourcc_string (sinfo->buf, sizeof (sinfo->buf), xine_get_stream_info (sinfo->gui->stream, sinf_xine_type[type]));
+}
 
 static void stream_infos_update (xitk_widget_t *w, void *data, int state) {
+  xui_sinfo_t *sinfo = (xui_sinfo_t *)data;
+
+  (void)w;
   (void)state;
-  stream_infos_update_infos();
-}
-
-static void set_label(xitk_widget_t *w, const char *label) {
-  xitk_label_change_label(w, label);
-}
-
-static const char *get_yesno_string(uint32_t val) {
-  static const char yesno[][4] =  { "No", "Yes" };
-
-  return ((val > 0) ? yesno[1] : yesno[0]);
-}
-
-char *get_fourcc_string(char *fcc, size_t fcc_size, uint32_t f) {
-
-  if (fcc_size < 5) {
-    *fcc = 0;
-    return fcc;
-  }
-
-  /* Should we take care about endianess ? */
-  fcc[0] = f     | 0xFFFFFF00;
-  fcc[1] = f>>8  | 0xFFFFFF00;
-  fcc[2] = f>>16 | 0xFFFFFF00;
-  fcc[3] = f>>24 | 0xFFFFFF00;
-  fcc[4] = 0;
-  
-  if(f <= 0xFFFF)
-    snprintf(fcc, fcc_size, "0x%x", f);
-  
-  if(memcmp(fcc, "ms\0\x55", 4) == 0) {
-    strcpy(fcc, "3pm."); /* Force to '.mp3' */
-  }
-  
-  return fcc;
-}
-
-static void get_meta_info(xitk_widget_t *w, int meta) {
-  gGui_t *gui = gGui;
-  char *minfo;
-  xitk_recode_t *xr;
-  
-  xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
-  
-  minfo = (char *)xine_get_meta_info(gui->stream, meta);
-  if(minfo)
-    minfo = xitk_recode(xr, minfo);
-  set_label(w, (minfo) ? (char *) minfo : _("Unavailable"));
-  
-  free(minfo);
-  xitk_recode_done(xr);
-}
-
-static void get_stream_info(xitk_widget_t *w, int info) {
-  gGui_t *gui = gGui;
-  char tmp[32];
-
-  snprintf(tmp, sizeof(tmp), "%d", xine_get_stream_info(gui->stream, info));
-
-  set_label(w, tmp);
-}
-      
-static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
-  gGui_t *gui = gGui;
-  uint32_t   iinfo;
-  char       tmp[8];
-
-  iinfo = xine_get_stream_info(gui->stream, info);
-  set_label(w, (get_fourcc_string(tmp, sizeof(tmp), iinfo)));
-}
-      
-static void get_stream_yesno_info(xitk_widget_t *w, int info) {
-  gGui_t *gui = gGui;
-  uint32_t   iinfo;
-  
-  iinfo = xine_get_stream_info(gui->stream, info);
-  set_label(w, (get_yesno_string(iinfo)));
-}
-
-static void get_stream_video_resolution_info(void) {
-  gGui_t *gui = gGui;
-  uint32_t    video_w, video_h;
-  char        buffer[1024];
-
-  video_w = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-  video_h = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-
-  snprintf(buffer, sizeof(buffer), "%d X %d", video_w, video_h);
-  set_label(sinfos.infos.video_resolution, buffer);
+  stream_infos_update_infos (sinfo);
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
@@ -276,37 +419,45 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
 }
 
 static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
-  gGui_t *gui = gGui;
+  xui_sinfo_t *sinfo = data;
   window_info_t wi;
 
+  if (!sinfo)
+    return;
+  (void)w;
   (void)state;
-  if ( ! sinfos.running ) return;
-
-    sinfos.running = 0;
-    sinfos.visible = 0;
+  sinfo->visible = 0;
     
-    if((xitk_get_window_info(sinfos.widget_key, &wi))) {
-      config_update_num ("gui.sinfos_x", wi.x);
-      config_update_num ("gui.sinfos_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+  if ((xitk_get_window_info (sinfo->widget_key, &wi))) {
+    config_update_num ("gui.sinfos_x", wi.x);
+    config_update_num ("gui.sinfos_y", wi.y);
+    WINDOW_INFO_ZERO (&wi);
+  }
     
-    xitk_unregister_event_handler(&sinfos.widget_key);
+  xitk_unregister_event_handler (&sinfo->widget_key);
 
-    xitk_window_destroy_window(sinfos.xwin);
-    sinfos.xwin = NULL;
-    /* xitk_dlist_init (&sinfos.widget_list.list); */
+  xitk_window_destroy_window (sinfo->xwin);
+  sinfo->xwin = NULL;
+  /* xitk_dlist_init (&sinfo->widget_list.list); */
 
-    video_window_set_input_focus(gui->vwin);
+  xitk_recode_done (sinfo->xr);
+  sinfo->xr = NULL;
+  free (sinfo->temp);
+  sinfo->temp = NULL;
+
+  video_window_set_input_focus (sinfo->gui->vwin);
+  sinfo->gui->streaminfo = NULL;
+  free (sinfo);
 }
 
 static void stream_infos_handle_key_event(void *data, const xitk_key_event_t *ke) {
+  xui_sinfo_t *sinfo = (xui_sinfo_t *)data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      stream_infos_exit (NULL, NULL, 0);
+      stream_infos_exit (NULL, sinfo, 0);
     else
-      gui_handle_key_event (gGui, ke);
+      gui_handle_key_event (sinfo->gui, ke);
   }
 }
 
@@ -314,539 +465,207 @@ static const xitk_event_cbs_t stream_infos_event_cbs = {
   .key_cb            = stream_infos_handle_key_event,
 };
 
-int stream_infos_is_visible(void) {
-  gGui_t *gui = gGui;
-  
-    if(gui->use_root_window)
-      return xitk_window_is_window_visible(sinfos.xwin);
+int stream_infos_is_visible (xui_sinfo_t *sinfo) {
+  if (sinfo) {
+    if (sinfo->gui->use_root_window)
+      return xitk_window_is_window_visible (sinfo->xwin);
     else
-      return sinfos.visible && xitk_window_is_window_visible(sinfos.xwin);
-  
+      return sinfo->visible && xitk_window_is_window_visible (sinfo->xwin);
+  }
   return 0;
 }
 
-int stream_infos_is_running(void) {
-  return sinfos.running;
-}
-
-void stream_infos_toggle_auto_update(void) {
-  gGui_t *gui = gGui;
-    if(gui->stream_info_auto_update) {
-      xitk_hide_widget(sinfos.update);
-      xitk_window_clear_window(sinfos.xwin);
-      xitk_paint_widget_list(sinfos.widget_list);
+void stream_infos_toggle_auto_update (xui_sinfo_t *sinfo) {
+  if (sinfo) {
+    if (sinfo->gui->stream_info_auto_update) {
+      xitk_hide_widget (sinfo->update);
+      xitk_window_clear_window (sinfo->xwin);
+      xitk_paint_widget_list (sinfo->widget_list);
+    } else {
+      xitk_show_widget (sinfo->update);
     }
-    else
-      xitk_show_widget(sinfos.update);
+  }
 }
 
-void stream_infos_raise_window(void) {
-    raise_window (gGui, sinfos.xwin, sinfos.visible, sinfos.running);
+void stream_infos_raise_window (xui_sinfo_t *sinfo) {
+  if (sinfo)
+    raise_window (sinfo->gui, sinfo->xwin, sinfo->visible, 1);
 }
 
 void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
-    toggle_window (gGui, sinfos.xwin, sinfos.widget_list, &sinfos.visible, sinfos.running);
+  xui_sinfo_t *sinfo = (xui_sinfo_t *)data;
+  (void)w;
+  if (sinfo)
+    toggle_window (sinfo->gui, sinfo->xwin, sinfo->widget_list, &sinfo->visible, 1);
 }
 
-void stream_infos_end(void) {
-  stream_infos_exit (NULL, NULL, 0);
+void stream_infos_end (xui_sinfo_t *sinfo) {
+  stream_infos_exit (NULL, sinfo, 0);
 }
 
-static void stream_info_update_undefined(void) {
-  const char *const unavail = _("Unavailable");
+void stream_infos_update_infos (xui_sinfo_t *sinfo) {
+  if (!sinfo)
+    return;
+  if (!sinfo->gui->logo_mode) {
+    sinf_index_t i;
 
-  set_label(sinfos.meta_infos.title, unavail);
-  set_label(sinfos.meta_infos.comment, unavail);
-  set_label(sinfos.meta_infos.artist, unavail);
-  set_label(sinfos.meta_infos.genre, unavail);
-  set_label(sinfos.meta_infos.album, unavail);
-  set_label(sinfos.meta_infos.year, "19__");
-  set_label(sinfos.meta_infos.videocodec, unavail);
-  set_label(sinfos.meta_infos.audiocodec, unavail);
-  set_label(sinfos.meta_infos.systemlayer, unavail);
-  set_label(sinfos.meta_infos.input_plugin, unavail);
-  /* */
-  set_label(sinfos.infos.bitrate, "---");
-  set_label(sinfos.infos.seekable, "---");
-  set_label(sinfos.infos.video_resolution, "--- X ---");
-  set_label(sinfos.infos.video_ratio, "---");
-  set_label(sinfos.infos.video_channels, "---");
-  set_label(sinfos.infos.video_streams, "---");
-  set_label(sinfos.infos.video_bitrate, "---");
-  set_label(sinfos.infos.video_fourcc, "---");
-  set_label(sinfos.infos.video_handled, "---");
-  set_label(sinfos.infos.frame_duration, "---");
-  set_label(sinfos.infos.audio_channels, "---");
-  set_label(sinfos.infos.audio_bits, "---");
-  set_label(sinfos.infos.audio_samplerate, "---");
-  set_label(sinfos.infos.audio_bitrate, "---");
-  set_label(sinfos.infos.audio_fourcc, "---");
-  set_label(sinfos.infos.audio_handled, "---");
-  set_label(sinfos.infos.has_chapters, "---");
-  set_label(sinfos.infos.has_video, "---");
-  set_label(sinfos.infos.has_audio, "---");
-  set_label(sinfos.infos.ignore_video, "---");
-  set_label(sinfos.infos.ignore_audio, "---");
-  set_label(sinfos.infos.ignore_spu, "---");
-  set_label(sinfos.infos.has_still, "---");
+    for (i = SINF_STRING; i < SINF_BOOL; i++)
+      xitk_label_change_label (sinfo->w[i], sinf_get_string (sinfo, i));
+    for (; i < SINF_INT; i++)
+      xitk_label_change_label (sinfo->w[i], sinf_get_bool (sinfo, i));
+    for (; i < SINF_FOURCC; i++)
+      xitk_label_change_label (sinfo->w[i], sinf_get_int (sinfo, i));
+    for (; i < SINF_END; i++)
+      xitk_label_change_label (sinfo->w[i], sinf_get_4cc (sinfo, i));
+    xitk_label_change_label (sinfo->video_resolution, sinf_get_res (sinfo));
+  } else {
+    sinf_index_t i;
+
+    for (i = SINF_STRING; i < SINF_BOOL; i++)
+      xitk_label_change_label (sinfo->w[i], sinfo->unavail);
+    for (; i < SINF_END; i++)
+      xitk_label_change_label (sinfo->w[i], "---");
+    xitk_label_change_label (sinfo->video_resolution, "--- X ---");
+  }
 }
 
-void stream_infos_update_infos(void) {
-  gGui_t *gui = gGui;
-    if(!gui->logo_mode) {
-      
-      get_meta_info(sinfos.meta_infos.title, XINE_META_INFO_TITLE);
-      get_meta_info(sinfos.meta_infos.comment, XINE_META_INFO_COMMENT);
-      get_meta_info(sinfos.meta_infos.artist, XINE_META_INFO_ARTIST);
-      get_meta_info(sinfos.meta_infos.genre, XINE_META_INFO_GENRE);
-      get_meta_info(sinfos.meta_infos.album, XINE_META_INFO_ALBUM);
-      get_meta_info(sinfos.meta_infos.year, XINE_META_INFO_YEAR);
-      get_meta_info(sinfos.meta_infos.videocodec, XINE_META_INFO_VIDEOCODEC);
-      get_meta_info(sinfos.meta_infos.audiocodec, XINE_META_INFO_AUDIOCODEC);
-      get_meta_info(sinfos.meta_infos.systemlayer, XINE_META_INFO_SYSTEMLAYER);
-      get_meta_info(sinfos.meta_infos.input_plugin, XINE_META_INFO_INPUT_PLUGIN);
-      
-      get_stream_info(sinfos.infos.bitrate, XINE_STREAM_INFO_BITRATE);
-      get_stream_yesno_info(sinfos.infos.seekable, XINE_STREAM_INFO_SEEKABLE);
-      get_stream_video_resolution_info();
-      get_stream_info(sinfos.infos.video_ratio, XINE_STREAM_INFO_VIDEO_RATIO);
-      get_stream_info(sinfos.infos.video_channels, XINE_STREAM_INFO_VIDEO_CHANNELS);
-      get_stream_info(sinfos.infos.video_streams, XINE_STREAM_INFO_VIDEO_STREAMS);
-      get_stream_info(sinfos.infos.video_bitrate, XINE_STREAM_INFO_VIDEO_BITRATE);
-      get_stream_fourcc_info(sinfos.infos.video_fourcc, XINE_STREAM_INFO_VIDEO_FOURCC);
-      get_stream_yesno_info(sinfos.infos.video_handled, XINE_STREAM_INFO_VIDEO_HANDLED);
-      get_stream_info(sinfos.infos.frame_duration, XINE_STREAM_INFO_FRAME_DURATION);
-      get_stream_info(sinfos.infos.audio_channels, XINE_STREAM_INFO_AUDIO_CHANNELS);
-      get_stream_info(sinfos.infos.audio_bits, XINE_STREAM_INFO_AUDIO_BITS);
-      get_stream_info(sinfos.infos.audio_samplerate, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
-      get_stream_info(sinfos.infos.audio_bitrate, XINE_STREAM_INFO_AUDIO_BITRATE);
-      get_stream_fourcc_info(sinfos.infos.audio_fourcc, XINE_STREAM_INFO_AUDIO_FOURCC);
-      get_stream_yesno_info(sinfos.infos.audio_handled, XINE_STREAM_INFO_AUDIO_HANDLED);
-      get_stream_yesno_info(sinfos.infos.has_chapters, XINE_STREAM_INFO_HAS_CHAPTERS);
-      get_stream_yesno_info(sinfos.infos.has_video, XINE_STREAM_INFO_HAS_VIDEO);
-      get_stream_yesno_info(sinfos.infos.has_audio, XINE_STREAM_INFO_HAS_AUDIO);
-      get_stream_yesno_info(sinfos.infos.ignore_video, XINE_STREAM_INFO_IGNORE_VIDEO);
-      get_stream_yesno_info(sinfos.infos.ignore_audio, XINE_STREAM_INFO_IGNORE_AUDIO);
-      get_stream_yesno_info(sinfos.infos.ignore_spu, XINE_STREAM_INFO_IGNORE_SPU);
-      get_stream_yesno_info(sinfos.infos.has_still, XINE_STREAM_INFO_VIDEO_HAS_STILL);
-    }
-    else
-      stream_info_update_undefined();
+void stream_infos_reparent (xui_sinfo_t *sinfo) {
+  if (sinfo)
+    reparent_window (sinfo->gui, sinfo->xwin);
 }
 
-void stream_infos_reparent(void) {
-  gGui_t *gui = gGui;
-  reparent_window(gui, sinfos.xwin);
-}
+void stream_infos_panel (gGui_t *gui) {
+  int         x, y;
+  xui_sinfo_t *sinfo;
 
-void stream_infos_panel(void) {
-  gGui_t *gui = gGui;
-  xitk_labelbutton_widget_t   lb;
-  xitk_label_widget_t         lbl;
-  xitk_pixmap_t              *bg;
-  int                         x, y, w;
-  xitk_widget_t              *widget;
+  if (!gui)
+    return;
+  if (gui->streaminfo)
+    return;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.sinfos_x", 
-				80,
-				CONFIG_NO_DESC,
-				CONFIG_NO_HELP,
-				CONFIG_LEVEL_DEB,
-				CONFIG_NO_CB,
-				CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.sinfos_y",
-				80,
-				CONFIG_NO_DESC,
-				CONFIG_NO_HELP,
-				CONFIG_LEVEL_DEB,
-				CONFIG_NO_CB,
-				CONFIG_NO_DATA);
+  sinfo = (xui_sinfo_t *)xitk_xmalloc (sizeof (*sinfo));
+  if (!sinfo)
+    return;
+  sinfo->gui = gui;
+
+  x = xine_config_register_num (sinfo->gui->xine, "gui.sinfos_x", 80,
+    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  y = xine_config_register_num (sinfo->gui->xine, "gui.sinfos_y", 80,
+    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
   
   /* Create window */
-  sinfos.xwin = xitk_window_create_dialog_window(gui->xitk, _("Stream Information"), x, y,
-						  WINDOW_WIDTH, WINDOW_HEIGHT);
+  sinfo->xwin = xitk_window_create_dialog_window (sinfo->gui->xitk, _("Stream Information"),
+    x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+  if (!sinfo->xwin) {
+    free (sinfo);
+    return;
+  }
+  sinfo->gui->streaminfo = sinfo;
+  set_window_states_start (sinfo->gui, sinfo->xwin);
+  sinfo->widget_list = xitk_window_widget_list (sinfo->xwin);
+
+  sinfo->xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
+  sinfo->temp = NULL;
+  sinfo->yes = _("Yes");
+  sinfo->no = _("No");
+  sinfo->unavail = _("Unavailable");
   
-  set_window_states_start(gui, sinfos.xwin);
+  {
+    xitk_pixmap_t *bg = xitk_window_get_background_pixmap (sinfo->xwin);
+    int i;
+    for (i = 0; sinf_f_defs[i].y; i++)
+      draw_outter_frame (bg, gettext (sinf_f_defs[i].title), btnfontname,
+        sinf_f_defs[i].x, sinf_f_defs[i].y, sinf_f_defs[i].w, sinf_f_defs[i].h);
+    for (i += 1; sinf_f_defs[i].y; i++)
+      draw_inner_frame (bg, gettext (sinf_f_defs[i].title), lfontname,
+        sinf_f_defs[i].x, sinf_f_defs[i].y, sinf_f_defs[i].w, sinf_f_defs[i].h);
+    xitk_window_set_background (sinfo->xwin, bg);
+  }
 
-  sinfos.widget_list = xitk_window_widget_list(sinfos.xwin);
+  {
+    sinf_index_t i;
+    xitk_label_widget_t lbl;
 
-  XITK_WIDGET_INIT(&lb);
-  XITK_WIDGET_INIT(&lbl);
-  lbl.skin_element_name = NULL;
-  lbl.label             = "";
-  lbl.callback          = NULL;
+    XITK_WIDGET_INIT (&lbl);
+    lbl.skin_element_name = NULL;
+    lbl.callback          = NULL;
+    lbl.userdata          = NULL;
 
-  bg = xitk_window_get_background_pixmap(sinfos.xwin);
+    for (i = SINF_STRING; i < SINF_BOOL; i++) {
+      lbl.label = sinf_get_string (sinfo, i);
+      sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
+        sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
+      xitk_enable_and_show_widget (sinfo->w[i]);
+    }
 
-  x = 15;
-  y = 34 - 6;
-  
-  draw_outter_frame(bg, _("General"), btnfontname,
-		    x, y, WINDOW_WIDTH - 30, (4 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
+    for (; i < SINF_INT; i++) {
+      lbl.label = sinf_get_bool (sinfo, i);
+      sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
+        sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
+      xitk_enable_and_show_widget (sinfo->w[i]);
+    }
 
-  /* First Line */
-  x = 20;
-  y += 15;
-  w = WINDOW_WIDTH - 40 - 1;
-  draw_inner_frame(bg, _("Title: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.title = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.title);
-  xitk_enable_and_show_widget(sinfos.meta_infos.title);
+    for (; i < SINF_FOURCC; i++) {
+      lbl.label = sinf_get_int (sinfo, i);
+      sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
+        sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
+      xitk_enable_and_show_widget (sinfo->w[i]);
+    }
 
-  /* New Line */
-  y += (20 + 22) + 3;
-  draw_inner_frame(bg, _("Comment: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.comment = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.comment);
-  xitk_enable_and_show_widget(sinfos.meta_infos.comment);
+    for (; i < SINF_END; i++) {
+      lbl.label = sinf_get_4cc (sinfo, i);
+      sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
+        sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
+      xitk_enable_and_show_widget (sinfo->w[i]);
+    }
 
-  /* New Line */
-  y += (20 + 22) + 3;
-  w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(bg, _("Artist: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.artist = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.artist);
-  xitk_enable_and_show_widget(sinfos.meta_infos.artist);
+    lbl.label = sinf_get_res (sinfo);
+    sinfo->video_resolution = xitk_noskin_label_create (sinfo->widget_list, &lbl,
+      sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
+    xitk_add_widget (sinfo->widget_list, sinfo->video_resolution);
+    xitk_enable_and_show_widget (sinfo->video_resolution);
+  }
 
-  x += w + 5;
-  w = ((WINDOW_WIDTH - 40 - 3 * 5) / 4) + 1;
-  draw_inner_frame(bg, _("Genre: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.genre = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.genre);
-  xitk_enable_and_show_widget(sinfos.meta_infos.genre);
+  free (sinfo->temp);
+  sinfo->temp = NULL;
 
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Year: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.year = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.year);
-  xitk_enable_and_show_widget(sinfos.meta_infos.year);
+  {
+    xitk_labelbutton_widget_t lb;
 
-  /* New Line */
-  x = 20;
-  y += (20 + 22) + 3;
-  w = (((WINDOW_WIDTH - 40 - 3 * 5) / 4) * 2) + 5 + 1;
-  draw_inner_frame(bg, _("Album: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.album = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.album);
-  xitk_enable_and_show_widget(sinfos.meta_infos.album);
+    XITK_WIDGET_INIT (&lb);
+    lb.button_type       = CLICK_BUTTON;
+    lb.align             = ALIGN_CENTER;
+    lb.skin_element_name = NULL;
+    lb.state_callback    = NULL;
+    lb.userdata          = sinfo;
+    y = WINDOW_HEIGHT - (23 + 15);
 
-  /* frame space */
-  x = 15;
-  y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("Misc"), btnfontname,
-		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
-  /* New Line */
-  x = 20;
-  y += 15;
-  w = (WINDOW_WIDTH - 40 - 3 * 5) / 4;
-  draw_inner_frame(bg, _("Input Plugin: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.input_plugin = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.input_plugin);
-  xitk_enable_and_show_widget(sinfos.meta_infos.input_plugin);
+    x = 15;
+    lb.label    = _("Update");
+    lb.callback = stream_infos_update;
+    sinfo->update = xitk_noskin_labelbutton_create (sinfo->widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (sinfo->widget_list, sinfo->update);
+    xitk_enable_and_show_widget (sinfo->update);
 
-  x += w + 5;
-  w += 1;
-  draw_inner_frame(bg, _("System Layer: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.systemlayer = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.systemlayer);
-  xitk_enable_and_show_widget(sinfos.meta_infos.systemlayer);
+    if (gui->stream_info_auto_update)
+      xitk_hide_widget (sinfo->update);
 
-  x += w + 5;
-  draw_inner_frame(bg, _("Bitrate: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.bitrate);
-  xitk_enable_and_show_widget(sinfos.infos.bitrate);
+    x = WINDOW_WIDTH - (100 + 15);
+    lb.label    = _("Close");
+    lb.callback = stream_infos_exit;
+    sinfo->close = xitk_noskin_labelbutton_create (sinfo->widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (sinfo->widget_list, sinfo->close);
+    xitk_enable_and_show_widget (sinfo->close);
+  }
 
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Frame Duration: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.frame_duration = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.frame_duration);
-  xitk_enable_and_show_widget(sinfos.infos.frame_duration);
-
-  /* New Line */
-  x = 20;
-  y += (20 + 22) + 3;
-  draw_inner_frame(bg, _("Is Seekable: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.seekable = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.seekable);
-  xitk_enable_and_show_widget(sinfos.infos.seekable);
-
-  x += w + 5;
-  w += 1;
-  draw_inner_frame(bg, _("Has Chapters: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.has_chapters = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_chapters);
-  xitk_enable_and_show_widget(sinfos.infos.has_chapters);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Ignore Spu: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.ignore_spu = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_spu);
-  xitk_enable_and_show_widget(sinfos.infos.ignore_spu);
-
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Has Still: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.has_still = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_still);
-  xitk_enable_and_show_widget(sinfos.infos.has_still);
-
-  /* video frame */
-  x = 15;
-  y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("Video"), btnfontname,
-		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
-
-  /* New Line */
-  x = 20;
-  y += 15;
-  w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(bg, _("Has: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.has_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_video);
-  xitk_enable_and_show_widget(sinfos.infos.has_video);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Handled: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_handled);
-  xitk_enable_and_show_widget(sinfos.infos.video_handled);
-
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Ignore: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.ignore_video = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_video);
-  xitk_enable_and_show_widget(sinfos.infos.ignore_video);
-
-  x += w + 5;
-  w += 1;
-  w = (w * 2) + 5;
-  draw_inner_frame(bg, _("Codec: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.videocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.videocodec);
-  xitk_enable_and_show_widget(sinfos.meta_infos.videocodec);
-
-  /* New Line */
-  x = 20;
-  y += (20 + 22) + 3;
-  w = (WINDOW_WIDTH - 40 - 5 * 5) / 6;
-  draw_inner_frame(bg, _("FourCC: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_fourcc);
-  xitk_enable_and_show_widget(sinfos.infos.video_fourcc);
-  
-  x += w + 5;
-  draw_inner_frame(bg, _("Channel(s): "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_channels);
-  xitk_enable_and_show_widget(sinfos.infos.video_channels);
-  
-  x += w + 5;
-  draw_inner_frame(bg, _("Bitrate: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_bitrate);
-  xitk_enable_and_show_widget(sinfos.infos.video_bitrate);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Resolution: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_resolution = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_resolution);
-  xitk_enable_and_show_widget(sinfos.infos.video_resolution);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Ratio: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_ratio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_ratio);
-  xitk_enable_and_show_widget(sinfos.infos.video_ratio);
-  
-  x += w + 5;
-  draw_inner_frame(bg, _("Stream(s): "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.video_streams = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.video_streams);
-  xitk_enable_and_show_widget(sinfos.infos.video_streams);
-
-  /* Audio Frame */
-  x = 15;
-  y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("Audio"), btnfontname,
-		    x, y, WINDOW_WIDTH - 30, (2 * ((20 + 22) + 3) - 3 + 5 + 2) + 15);
-
-  /* New Line */
-  x = 20;
-  y += 15;
-  w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(bg, _("Has: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.has_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.has_audio);
-  xitk_enable_and_show_widget(sinfos.infos.has_audio);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Handled: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_handled = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_handled);
-  xitk_enable_and_show_widget(sinfos.infos.audio_handled);
-
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Ignore: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.ignore_audio = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.ignore_audio);
-  xitk_enable_and_show_widget(sinfos.infos.ignore_audio);
-
-  x += w + 5;
-  w += 1;
-  w = (w * 2) + 5;
-  draw_inner_frame(bg, _("Codec: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.meta_infos.audiocodec = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.meta_infos.audiocodec);
-  xitk_enable_and_show_widget(sinfos.meta_infos.audiocodec);
-  
-  /* New Line */
-  x = 20;
-  y += (20 + 22) + 3;
-  w = (WINDOW_WIDTH - 40 - 4 * 5) / 5;
-  draw_inner_frame(bg, _("FourCC: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_fourcc = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_fourcc);
-  xitk_enable_and_show_widget(sinfos.infos.audio_fourcc);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Channel(s): "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_channels = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_channels);
-  xitk_enable_and_show_widget(sinfos.infos.audio_channels);
-
-  x += w + 5;
-  w -= 1;
-  draw_inner_frame(bg, _("Bitrate: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_bitrate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_bitrate);
-  xitk_enable_and_show_widget(sinfos.infos.audio_bitrate);
-
-  x += w + 5;
-  w += 1;
-  draw_inner_frame(bg, _("Bits: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_bits = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_bits);
-  xitk_enable_and_show_widget(sinfos.infos.audio_bits);
-
-  x += w + 5;
-  draw_inner_frame(bg, _("Samplerate: "), lfontname,
-		   x, y, w, (20 + 22));
-  sinfos.infos.audio_samplerate = xitk_noskin_label_create (sinfos.widget_list, &lbl,
-    x + 5, y + 15, w - 10, 20, fontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.infos.audio_samplerate);
-  xitk_enable_and_show_widget(sinfos.infos.audio_samplerate);
-
-  /*  */
-  y = WINDOW_HEIGHT - (23 + 15);
-  x = 15;
-
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Update");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = stream_infos_update;
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  sinfos.update = xitk_noskin_labelbutton_create (sinfos.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (sinfos.widget_list, sinfos.update);
-  xitk_enable_and_show_widget(sinfos.update);
-
-  if(gui->stream_info_auto_update)
-    xitk_hide_widget(sinfos.update);
-  
-  x = WINDOW_WIDTH - (100 + 15);
-  
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Close");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = stream_infos_exit;
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  widget =  xitk_noskin_labelbutton_create (sinfos.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (sinfos.widget_list, widget);
-  xitk_enable_and_show_widget(widget);
-
-  xitk_window_set_background(sinfos.xwin, bg);
-
-  sinfos.widget_key = xitk_window_register_event_handler("sinfos", sinfos.xwin, &stream_infos_event_cbs, &sinfos);
-  
-  stream_infos_update_infos();
-
-  sinfos.visible = 1;
-  sinfos.running = 1;
-  stream_infos_raise_window();
-
-  xitk_window_try_to_set_input_focus(sinfos.xwin);
+  sinfo->widget_key = xitk_window_register_event_handler ("sinfos", sinfo->xwin, &stream_infos_event_cbs, sinfo);
+  sinfo->visible = 1;
+  stream_infos_raise_window (sinfo);
+  xitk_window_try_to_set_input_focus (sinfo->xwin);
 }

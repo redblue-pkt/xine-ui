@@ -1359,6 +1359,7 @@ int main(int argc, char *argv[]) {
   gui->help                   = NULL;
   gui->eventer                = NULL;
   gui->keyedit                = NULL;
+  gui->streaminfo             = NULL;
 
   gui->plwin                  = NULL;
   gui->pl_load                = NULL;
