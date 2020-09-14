@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-07-25 13:52+0200\n"
+"POT-Creation-Date: 2020-09-14 00:49+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -100,14 +100,14 @@ msgstr ""
 
 #, c-format
 msgid "Video Codec: %s (%s)\n"
-msgstr ""
+msgstr "Bildformat: %s (%s)\n"
 
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
 #, c-format
 msgid "Audio Codec: %s (%s)\n"
-msgstr ""
+msgstr "Tonformat: %s (%s)\n"
 
 msgid "Start Playback ?"
 msgstr "Wiedergabe starten ?"
@@ -643,6 +643,24 @@ msgstr "Menu Tastenkürzelstil"
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
 msgstr "Tastenkürzeldarstellung im Menu, 'Strg Alt' oder 'C,M'."
 
+msgid "Up"
+msgstr "Hoch"
+
+msgid "Left"
+msgstr "Links"
+
+msgid "Right"
+msgstr "Rechts"
+
+msgid "Down"
+msgstr "Runter"
+
+msgid "Angle +"
+msgstr "Winkel +"
+
+msgid "Angle -"
+msgstr "Winkel -"
+
 msgid "Menu toggle"
 msgstr "Menü"
 
@@ -708,24 +726,6 @@ msgstr "Menü 2"
 
 msgid "xine Event Sender"
 msgstr "xine Ereignissender"
-
-msgid "Up"
-msgstr "Hoch"
-
-msgid "Left"
-msgstr "Links"
-
-msgid "Right"
-msgstr "Rechts"
-
-msgid "Down"
-msgstr "Runter"
-
-msgid "Angle +"
-msgstr "Winkel +"
-
-msgid "Angle -"
-msgstr "Winkel -"
 
 msgid "Close"
 msgstr "Schließen"
@@ -2011,14 +2011,29 @@ msgstr "xine Bedienfeld"
 msgid "panel: couldn't find image for background\n"
 msgstr "panel: Kann Hintergrundbild nicht finden\n"
 
+msgid "Previous audio channel"
+msgstr "Vorherigen Audio-Kanal"
+
+msgid "Previous SPU channel"
+msgstr "Vorherigen Untertitel-Kanal"
+
+msgid "Slow motion"
+msgstr "Zeitlupe"
+
+msgid "Next audio channel"
+msgstr "Nächsten Audio-Kanal"
+
+msgid "Next SPU channel"
+msgstr "Nächsten Untertitel-Kanal"
+
+msgid "Fast motion"
+msgstr "Schneller abspielen"
+
 msgid "Stop playback"
 msgstr "Stopp (Abspielen Beenden)"
 
 msgid "Play selected entry"
 msgstr "Spiele ausgewählten Eintrag"
-
-msgid "Pause/Resume playback"
-msgstr "Pause/weiter abspielen"
 
 msgid "Eject current medium"
 msgstr "Momentanes Medium auswerfen"
@@ -2029,23 +2044,20 @@ msgstr "Fenster-Einstellungen"
 msgid "Navigator"
 msgstr "Navigator"
 
-msgid "Hide GUI"
-msgstr "Verstecke GUI"
-
 msgid "Fullscreen/Window mode"
 msgstr "Vollbild/Fenster-Modus"
 
-msgid "Next audio channel"
-msgstr "Nächsten Audio-Kanal"
+msgid "Control"
+msgstr "Steuerung"
 
-msgid "Previous audio channel"
-msgstr "Vorherigen Audio-Kanal"
+msgid "Open Location"
+msgstr "Objekt öffnen"
 
-msgid "Next SPU channel"
-msgstr "Nächsten Untertitel-Kanal"
+msgid "Hide GUI"
+msgstr "Verstecke GUI"
 
-msgid "Previous SPU channel"
-msgstr "Vorherigen Untertitel-Kanal"
+msgid "Take a snapshot"
+msgstr "Mache einen Schnappschuss"
 
 msgid "Total time: --:--:--"
 msgstr "Gesamtzeit: --:--:--"
@@ -2054,20 +2066,8 @@ msgstr "Gesamtzeit: --:--:--"
 msgid "Stream playback position slider"
 msgstr "Wiedergabepositionsschieber"
 
-msgid "Take a snapshot"
-msgstr "Mache einen Schnappschuss"
-
-msgid "Slow motion"
-msgstr "Zeitlupe"
-
-msgid "Fast motion"
-msgstr "Schneller abspielen"
-
-msgid "Control"
-msgstr "Steuerung"
-
-msgid "Open Location"
-msgstr "Objekt öffnen"
+msgid "Pause/Resume playback"
+msgstr "Pause/weiter abspielen"
 
 msgid "gui tips visibility"
 msgstr "gui Hinweise sichtbar"
@@ -2345,11 +2345,11 @@ msgstr "XAllocWMHints() fehlgeschlagen\n"
 msgid "xine Splash"
 msgstr "xine Startbild"
 
-msgid "Stream Information"
-msgstr "Datenstrominformationen"
-
 msgid "General"
 msgstr "Allgemein"
+
+msgid "Misc"
+msgstr "Verschiedenes"
 
 msgid "Title: "
 msgstr "Titel: "
@@ -2368,9 +2368,6 @@ msgstr "Jahr: "
 
 msgid "Album: "
 msgstr "Album: "
-
-msgid "Misc"
-msgstr "Verschiedenes"
 
 msgid "Input Plugin: "
 msgstr "Eingabeplugin: "
@@ -2428,6 +2425,15 @@ msgstr "Bits: "
 
 msgid "Samplerate: "
 msgstr "Samplerate: "
+
+msgid "Stream Information"
+msgstr "Datenstrominformationen"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
 
 msgid "Update"
 msgstr "Aktualisieren"
