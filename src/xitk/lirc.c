@@ -41,6 +41,7 @@
 #include "panel.h"
 #include "actions.h"
 #include "event.h"
+#include "playlist.h"
 
 #ifdef DEBUG
 #define LIRC_VERBOSE 1
