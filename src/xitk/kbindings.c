@@ -1102,7 +1102,7 @@ void kbedit_window (gGui_t *gui) {
   x = 15;
   y = 34;
   
-  draw_rectangular_inner_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10);
+  draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
 
   y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
   y1 = y; /* remember for later */

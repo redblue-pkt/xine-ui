@@ -301,8 +301,8 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
     vl->tabs_height = xitk_get_widget_height (vl->tabs) - 1;
     xitk_enable_and_show_widget (vl->tabs);
     bg = xitk_window_get_background_pixmap (vl->xwin);
-    draw_rectangular_outter_box (bg, 15, (24 + vl->tabs_height),
-      WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10);
+    draw_rectangular_box (bg, 15, 24 + vl->tabs_height,
+      WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_OUTTER);
     xitk_window_set_background (vl->xwin, bg);
   }
 

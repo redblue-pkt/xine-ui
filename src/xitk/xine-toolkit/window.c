@@ -760,7 +760,7 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     c = xitk_get_pixel_color_from_rgb(xitk, 135, 97, 168);
 
     draw_flat_with_color(bar, width, TITLE_BAR_HEIGHT, colorgray);
-    draw_rectangular_inner_box(bar, 2, 2, width - 5, TITLE_BAR_HEIGHT - 4);
+    draw_rectangular_box (bar, 2, 2, width - 5, TITLE_BAR_HEIGHT - 4, DRAW_INNER);
     
     xitk_lock_display (xitk);
     for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {
