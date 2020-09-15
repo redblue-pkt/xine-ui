@@ -1180,15 +1180,17 @@ void xitk_image_fill_polygon(xitk_image_t *i,
  *
  */
 static void _draw_rectangular_box (xitk_pixmap_t *p,
-  int x, int y, int excstart, int excstop, int width, int height, int relief, int light) {
+  int x, int y, int excstart, int excstop, int width, int height, int type) {
   unsigned int color[2];
   XSegment xs[5], *q;
 
   ABORT_IF_NULL(p);
   ABORT_IF_NULL(p->xitk);
 
-  color[(relief & ~DRAW_DOUBLE) != DRAW_OUTTER] = xitk_get_pixel_color_white (p->xitk);
-  color[(relief & ~DRAW_DOUBLE) == DRAW_OUTTER] = light ? xitk_get_pixel_color_darkgray (p->xitk) : xitk_get_pixel_color_black (p->xitk);
+  color[(type & DRAW_FLATTER) != DRAW_OUTTER] = xitk_get_pixel_color_white (p->xitk);
+  color[(type & DRAW_FLATTER) == DRAW_OUTTER] = (type & DRAW_LIGHT)
+                                              ? xitk_get_pixel_color_darkgray (p->xitk)
+                                              : xitk_get_pixel_color_black (p->xitk);
 
   /* +---     ----- *              | *
    * |              *              | *
@@ -1201,7 +1203,7 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
     q->x1 = x + 1; q->x2 = x + width - 2;       q->y1 = q->y2 = y; q++;
   }
   q->x1 = q->x2 = x; q->y1 = y + 1; q->y2 = y + height - 2; q++;
-  if (relief & DRAW_DOUBLE) {
+  if (type & DRAW_DOUBLE) {
     q->x1 = q->x2 = x + width - 2;        q->y1 = y + 2; q->y2 = y + height - 3; q++;
     q->x1 = x + 2; q->x2 = x + width - 3; q->y1 = q->y2 = y + height - 2; q++;
   }
@@ -1216,7 +1218,7 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
   q = xs;
   q->x1 = q->x2 = x + width - 1;        q->y1 = y + 1; q->y2 = y + height - 2; q++;
   q->x1 = x + 1; q->x2 = x + width - 2; q->y1 = q->y2 = y + height - 1;        q++;
-  if (relief & DRAW_DOUBLE) {
+  if (type & DRAW_DOUBLE) {
     if (excstart < excstop) {
       q->x1 = x + 2; q->x2 = x + excstart;        q->y1 = q->y2 = y + 1; q++;
       q->x1 = x + excstop; q->x2 = x + width - 3; q->y1 = q->y2 = y + 1; q++;
@@ -1234,38 +1236,11 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
 /*
  *
  */
-void draw_rectangular_inner_box(xitk_pixmap_t *p,
-				int x, int y, int width, int height) {
-  _draw_rectangular_box (p, x, y, 0, 0, width, height, DRAW_INNER, 0);
+void draw_rectangular_box (xitk_pixmap_t *p, int x, int y, int width, int height, int type) {
+  _draw_rectangular_box (p, x, y, 0, 0, width, height, type);
 }
-void draw_rectangular_outter_box(xitk_pixmap_t *p,
-				 int x, int y, int width, int height) {
-  _draw_rectangular_box (p, x, y, 0, 0, width, height, DRAW_OUTTER, 0);
-}
-void draw_rectangular_inner_box_light(xitk_pixmap_t *p,
-				      int x, int y, int width, int height) {
-  _draw_rectangular_box (p, x, y, 0, 0, width, height, DRAW_INNER, 1);
-}
-void draw_rectangular_outter_box_light(xitk_pixmap_t *p,
-				       int x, int y, int width, int height) {
-  _draw_rectangular_box (p, x, y, 0, 0, width, height, DRAW_OUTTER, 1);
-}
-
-void xitk_image_draw_rectangular_inner_box(xitk_image_t *i,
-                                           int x, int y, int width, int height) {
-  _draw_rectangular_box (i->image, x, y, 0, 0, width, height, DRAW_INNER, 0);
-}
-void xitk_image_draw_rectangular_outter_box(xitk_image_t *i,
-                                            int x, int y, int width, int height) {
-  _draw_rectangular_box (i->image, x, y, 0, 0, width, height, DRAW_OUTTER, 0);
-}
-void xitk_image_draw_rectangular_inner_box_light(xitk_image_t *i,
-                                                 int x, int y, int width, int height) {
-  _draw_rectangular_box (i->image, x, y, 0, 0, width, height, DRAW_INNER, 1);
-}
-void xitk_image_draw_rectangular_outter_box_light(xitk_image_t *i,
-                                                  int x, int y, int width, int height) {
-  _draw_rectangular_box (i->image, x, y, 0, 0, width, height, DRAW_OUTTER, 1);
+void xitk_image_draw_rectangular_box (xitk_image_t *i, int x, int y, int width, int height, int type) {
+  _draw_rectangular_box (i->image, x, y, 0, 0, width, height, type);
 }
 
 static void _draw_check_round(xitk_image_t *p, int x, int y, int d, int checked) {
@@ -1376,9 +1351,9 @@ void menu_draw_check(xitk_image_t *p, int checked) {
       
       w = p->width / 3;
       h = p->height - 12;
-      _draw_rectangular_box (p->image, 4,               6,     0, 0, 12, h, relief, 0);
-      _draw_rectangular_box (p->image, w + 4,           6,     0, 0, 12, h, relief, 0);
-      _draw_rectangular_box (p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief, 0);
+      _draw_rectangular_box (p->image, 4,               6,     0, 0, 12, h, relief);
+      _draw_rectangular_box (p->image, w + 4,           6,     0, 0, 12, h, relief);
+      _draw_rectangular_box (p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
     }
     break;
   }
@@ -1536,15 +1511,15 @@ static void _draw_two_state(xitk_image_t *p, int style) {
 /*
  *
  */
-static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) {
+static void _draw_relief(xitk_pixmap_t *p, int w, int h, int type) {
 
   ABORT_IF_NULL(p);
   ABORT_IF_NULL(p->imlibdata);
 
   pixmap_fill_rectangle(p, 0, 0, w, h, xitk_get_pixel_color_gray(p->xitk));
 
-  if ((relief == DRAW_OUTTER) || (relief == DRAW_INNER))
-    _draw_rectangular_box (p, 0, 0, 0, 0, w, h, relief, light);
+  if (((type & DRAW_FLATTER) == DRAW_OUTTER) || ((type & DRAW_FLATTER) == DRAW_INNER))
+    _draw_rectangular_box (p, 0, 0, 0, 0, w, h, type);
 }
 
 void draw_checkbox_check(xitk_image_t *p) {
@@ -1720,11 +1695,11 @@ void draw_paddle_three_state_horizontal(xitk_image_t *p) {
  *
  */
 void draw_inner(xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(p, w, h, DRAW_INNER, 0);
+  _draw_relief(p, w, h, DRAW_INNER);
 }
 #ifdef YET_UNUSED
 void draw_inner_light(xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(p, w, h, DRAW_INNER, 1);
+  _draw_relief(p, w, h, DRAW_INNER | DRAW_LIGHT);
 }
 #endif
 
@@ -1732,23 +1707,23 @@ void draw_inner_light(xitk_pixmap_t *p, int w, int h) {
  *
  */
 void draw_outter(xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(p, w, h, DRAW_OUTTER, 0);
+  _draw_relief(p, w, h, DRAW_OUTTER);
 }
 #ifdef YET_UNUSED
 void draw_outter_light(xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(p, w, h, DRAW_OUTTER, 1);
+  _draw_relief(p, w, h, DRAW_OUTTER | DRAW_LIGHT);
 }
 #endif
 
 void xitk_image_draw_outter(xitk_image_t *i, int w, int h) {
-  _draw_relief(i->image, w, h, DRAW_OUTTER, 0);
+  _draw_relief(i->image, w, h, DRAW_OUTTER);
 }
 
 /*
  *
  */
 void draw_flat(xitk_pixmap_t *p, int w, int h) {
-  _draw_relief(p, w, h, DRAW_FLATTER, 1);
+  _draw_relief(p, w, h, DRAW_FLATTER | DRAW_LIGHT);
 }
 
 /*
@@ -1825,7 +1800,7 @@ static void _draw_frame(xitk_pixmap_t *p,
     xstop = (rbearing - lbearing) + 8;
   }
 
-  _draw_rectangular_box (p, x, y + yoff, xstart, xstop, w, h - yoff, style | DRAW_DOUBLE, 1);
+  _draw_rectangular_box (p, x, y + yoff, xstart, xstop, w, h - yoff, style | DRAW_DOUBLE | DRAW_LIGHT);
   
   if(title) {
     xitk_pixmap_draw_string(p, fs,  (x - lbearing + 6), (y + ascent), titlebuf, titlelen,

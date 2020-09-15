@@ -27,12 +27,6 @@
 #define STYLE_FLAT     1
 #define STYLE_BEVEL    2
 
-#define DRAW_INNER     1
-#define DRAW_OUTTER    2
-#define DRAW_FLATTER   3
-/* with DRAW_INNER/DRAW_OUTTER */
-#define DRAW_DOUBLE    8
-
 #define ALIGN_LEFT    1
 #define ALIGN_CENTER  2
 #define ALIGN_RIGHT   3

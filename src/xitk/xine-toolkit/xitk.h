@@ -1231,26 +1231,14 @@ void draw_flat(xitk_pixmap_t *p, int w, int h);
 /**
  *
  */
-void draw_rectangular_inner_box(xitk_pixmap_t *p, int x, int y, int width, int height);
-void xitk_image_draw_rectangular_inner_box(xitk_image_t *i, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_outter_box(xitk_pixmap_t *p, int x, int y, int width, int height);
-void xitk_image_draw_rectangular_outter_box(xitk_image_t *i, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_inner_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
-void xitk_image_draw_rectangular_inner_box_light(xitk_image_t *i, int x, int y, int width, int height);
-
-/**
- *
- */
-void draw_rectangular_outter_box_light(xitk_pixmap_t *p, int x, int y, int width, int height);
-void xitk_image_draw_rectangular_outter_box_light(xitk_image_t *i, int x, int y, int width, int height);
+#define DRAW_INNER     1
+#define DRAW_OUTTER    2
+#define DRAW_FLATTER   3
+/* with DRAW_INNER/DRAW_OUTTER */
+#define DRAW_DOUBLE    8
+#define DRAW_LIGHT    16
+void draw_rectangular_box (xitk_pixmap_t *p, int x, int y, int width, int height, int type);
+void xitk_image_draw_rectangular_box (xitk_image_t *i, int x, int y, int width, int height, int type);
 
 /**
  *
