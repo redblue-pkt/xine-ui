@@ -926,7 +926,7 @@ static void setup_sections (xui_setup_t *setup) {
 
   bg = xitk_window_get_background_pixmap (setup->xwin);
   draw_rectangular_outter_box (bg, 15, (24 + setup->th),
-    (WINDOW_WIDTH - 30 - 1), (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30 - 1));
+    WINDOW_WIDTH - 30, MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30);
   xitk_window_set_background (setup->xwin, bg);
 
   setup->num_wg = 0;

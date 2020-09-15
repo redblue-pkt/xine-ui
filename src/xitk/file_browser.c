@@ -1284,8 +1284,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
   
-  draw_rectangular_inner_box (bg, x, y,
-			     w - 1, xitk_get_widget_height(fb->directories_browser) + 4 - 1);
+  draw_rectangular_inner_box (bg, x, y, w, xitk_get_widget_height (fb->directories_browser) + 4);
   
   y -= 15;
   
@@ -1314,8 +1313,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, fb->files_browser);
   xitk_enable_and_show_widget(fb->files_browser);
 
-  draw_rectangular_inner_box (bg, x, y,
-			     w - 1, xitk_get_widget_height(fb->files_browser) + 4 - 1);
+  draw_rectangular_inner_box (bg, x, y, w, xitk_get_widget_height (fb->files_browser) + 4);
 
   y -= 15;
 
@@ -1356,12 +1354,12 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
       
       offset = 0;
       for(i = 0; i < 2; i++) {
-        xitk_image_draw_rectangular_outter_box (image, 5, 4 + offset, w - 45, 1);
-        xitk_image_draw_rectangular_outter_box (image, w - 20, 4 + offset, 10, 1);
-        xitk_image_draw_rectangular_outter_box (image, w + 5, 4 + offset, w - 45, 1);
-        xitk_image_draw_rectangular_outter_box (image, (w * 2) - 20, 4 + offset, 10, 1);
-        xitk_image_draw_rectangular_outter_box (image, (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
-        xitk_image_draw_rectangular_outter_box (image, ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
+        xitk_image_draw_rectangular_outter_box (image, 5, 4 + offset, w - 44, 2);
+        xitk_image_draw_rectangular_outter_box (image, w - 20, 4 + offset, 11, 2);
+        xitk_image_draw_rectangular_outter_box (image, w + 5, 4 + offset, w - 44, 2);
+        xitk_image_draw_rectangular_outter_box (image, (w * 2) - 20, 4 + offset, 11, 2);
+        xitk_image_draw_rectangular_outter_box (image, (w * 2) + 5 + 1, 4 + 1 + offset, w - 44, 2);
+        xitk_image_draw_rectangular_outter_box (image, ((w * 3) - 20) + 1, 4 + 1 + offset, 11 + 1, 2);
 	offset += 4;
       }
       

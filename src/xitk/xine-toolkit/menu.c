@@ -523,7 +523,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     else if (me->type & _MENU_NODE_SEP) {
     __sep:
       if(bg)
-        draw_rectangular_inner_box_light(bg, 3, yy, wwidth - 6, 1);
+        draw_rectangular_inner_box_light (bg, 3, yy, wwidth - 5, 2);
       yy += 2;
     }
     else {

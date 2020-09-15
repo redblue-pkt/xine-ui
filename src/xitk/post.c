@@ -1510,13 +1510,13 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
   /* Some decorations */
   xitk_image_draw_outter_frame(image, NULL, NULL,
                                0, 0, FRAME_WIDTH, FRAME_HEIGHT);
-  xitk_image_draw_rectangular_outter_box_light(image, 27, 28, FRAME_WIDTH - 27 - 5, 1);
-  xitk_image_draw_rectangular_outter_box_light(image, 26, 5, 1, FRAME_HEIGHT - 10);
+  xitk_image_draw_rectangular_outter_box_light (image, 27, 28, FRAME_WIDTH - 27 - 4, 2);
+  xitk_image_draw_rectangular_outter_box_light (image, 26, 5, 2, FRAME_HEIGHT - 9);
   xitk_image_draw_inner_frame(image, NULL, NULL, 5, 5, 16, 16);
-  xitk_image_draw_rectangular_inner_box_light(image, 5, 24, 1, FRAME_HEIGHT - 48);
-  xitk_image_draw_rectangular_inner_box_light(image, 10, 24, 1, FRAME_HEIGHT - 48);
-  xitk_image_draw_rectangular_inner_box_light(image, 15, 24, 1, FRAME_HEIGHT - 48);
-  xitk_image_draw_rectangular_inner_box_light(image, 20, 24, 1, FRAME_HEIGHT - 48);
+  xitk_image_draw_rectangular_inner_box_light (image, 5, 24, 2, FRAME_HEIGHT - 47);
+  xitk_image_draw_rectangular_inner_box_light (image, 10, 24, 2, FRAME_HEIGHT - 47);
+  xitk_image_draw_rectangular_inner_box_light (image, 15, 24, 2, FRAME_HEIGHT - 47);
+  xitk_image_draw_rectangular_inner_box_light (image, 20, 24, 2, FRAME_HEIGHT - 47);
   xitk_image_draw_inner_frame(image, NULL, NULL, 5, FRAME_HEIGHT - 16 - 5, 16, 16);
 
   XITK_WIDGET_INIT(&im);
