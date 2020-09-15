@@ -1190,23 +1190,20 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
   color[(relief & ~DRAW_DOUBLE) != DRAW_OUTTER] = xitk_get_pixel_color_white (p->xitk);
   color[(relief & ~DRAW_DOUBLE) == DRAW_OUTTER] = light ? xitk_get_pixel_color_darkgray (p->xitk) : xitk_get_pixel_color_black (p->xitk);
 
-  /* NOTE: this actually draws (width + 1) x (height + 1),
-   * but gui relies on that. */
-
   /* +---     ----- *              | *
    * |              *              | *
    * |              * -------------+ */
   q = xs;
   if (excstart < excstop) {
     q->x1 = x + 1; q->x2 = x + excstart;        q->y1 = q->y2 = y; q++;
-    q->x1 = x + excstop; q->x2 = x + width - 1; q->y1 = q->y2 = y; q++;
+    q->x1 = x + excstop; q->x2 = x + width - 2; q->y1 = q->y2 = y; q++;
   } else {
-    q->x1 = x; q->x2 = x + width + 1;           q->y1 = q->y2 = y; q++;
+    q->x1 = x + 1; q->x2 = x + width - 2;       q->y1 = q->y2 = y; q++;
   }
-  q->x1 = q->x2 = x; q->y1 = y + 1; q->y2 = y + height - 1; q++;
+  q->x1 = q->x2 = x; q->y1 = y + 1; q->y2 = y + height - 2; q++;
   if (relief & DRAW_DOUBLE) {
-    q->x1 = q->x2 = x + width - 1;        q->y1 = y + 2; q->y2 = y + height - 2; q++;
-    q->x1 = x + 2; q->x2 = x + width - 2; q->y1 = q->y2 = y + height - 1; q++;
+    q->x1 = q->x2 = x + width - 2;        q->y1 = y + 2; q->y2 = y + height - 3; q++;
+    q->x1 = x + 2; q->x2 = x + width - 3; q->y1 = q->y2 = y + height - 2; q++;
   }
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->gc, color[0]);
@@ -1217,16 +1214,16 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
    *              | * |              *
    * -------------+ * |              */
   q = xs;
-  q->x1 = q->x2 = x + width;            q->y1 = y + 1; q->y2 = y + height - 1; q++;
-  q->x1 = x + 1; q->x2 = x + width - 1; q->y1 = q->y2 = y + height;    q++;
+  q->x1 = q->x2 = x + width - 1;        q->y1 = y + 1; q->y2 = y + height - 2; q++;
+  q->x1 = x + 1; q->x2 = x + width - 2; q->y1 = q->y2 = y + height - 1;        q++;
   if (relief & DRAW_DOUBLE) {
     if (excstart < excstop) {
       q->x1 = x + 2; q->x2 = x + excstart;        q->y1 = q->y2 = y + 1; q++;
-      q->x1 = x + excstop; q->x2 = x + width - 2; q->y1 = q->y2 = y + 1; q++;
+      q->x1 = x + excstop; q->x2 = x + width - 3; q->y1 = q->y2 = y + 1; q++;
     } else {
-      q->x1 = x + 2; q->x2 = x + width - 2;       q->y1 = q->y2 = y + 1; q++;
+      q->x1 = x + 2; q->x2 = x + width - 3;       q->y1 = q->y2 = y + 1; q++;
     }
-    q->x1 = q->x2 = x + 1; q->y1 = y + 2; q->y2 = y + height - 2; q++;
+    q->x1 = q->x2 = x + 1; q->y1 = y + 2; q->y2 = y + height - 3; q++;
   }
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->gc, color[1]);
@@ -1547,7 +1544,7 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int relief, int light) 
   pixmap_fill_rectangle(p, 0, 0, w, h, xitk_get_pixel_color_gray(p->xitk));
 
   if ((relief == DRAW_OUTTER) || (relief == DRAW_INNER))
-    _draw_rectangular_box (p, 0, 0, 0, 0, w - 1, h - 1, relief, light);
+    _draw_rectangular_box (p, 0, 0, 0, 0, w, h, relief, light);
 }
 
 void draw_checkbox_check(xitk_image_t *p) {
@@ -1643,7 +1640,7 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
   xr[1].x = 1 * w + 1; xr[1].y = 1; xr[1].width = w - 2; xr[1].height = h - 2;
   xr[2].x = 2 * w + 1; xr[2].y = 1; xr[2].width = w - 2; xr[2].height = h - 2;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->mask->gc, xitk_get_pixel_color_white (p->xitk));
+  XSetForeground (p->xitk->display, p->mask->gc, 1);
   XFillRectangles (p->xitk->display, p->mask->pixmap, p->mask->gc, xr, 3);
   xitk_unlock_display (p->xitk);
 
@@ -1658,12 +1655,12 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
   /* +---+---
    * |   |       |
    *          ---+ */
-  xs[0].x1 = 0 * w + gap; xs[0].x2 = 1 * w - gap - 1; xs[0].y1 = xs[0].y2 = gap;
-  xs[1].x1 = 1 * w + gap; xs[1].x2 = 2 * w - gap - 1; xs[1].y1 = xs[1].y2 = gap;
+  xs[0].x1 = 0 * w + gap + 1; xs[0].x2 = 1 * w - gap - 2; xs[0].y1 = xs[0].y2 = gap;
+  xs[1].x1 = 1 * w + gap + 1; xs[1].x2 = 2 * w - gap - 2; xs[1].y1 = xs[1].y2 = gap;
   xs[2].x1 = xs[2].x2 = 0 * w + gap;     xs[2].y1 = gap + 1; xs[2].y2 = h - gap - 2;
   xs[3].x1 = xs[3].x2 = 1 * w + gap;     xs[3].y1 = gap + 1; xs[3].y2 = h - gap - 2;
-  xs[4].x1 = xs[4].x2 = 3 * w - gap - 2; xs[4].y1 = gap + 1; xs[4].y2 = h - gap - 2;
-  xs[5].x1 = 2 * w + gap; xs[5].x2 = 3 * w - gap - 1; xs[5].y1 = xs[5].y2 = h - gap - 1;
+  xs[4].x1 = xs[4].x2 = 3 * w - gap - 1; xs[4].y1 = gap + 1; xs[4].y2 = h - gap - 2;
+  xs[5].x1 = 2 * w + gap + 1; xs[5].x2 = 3 * w - gap - 2; xs[5].y1 = xs[5].y2 = h - gap - 1;
   if (!dir) {
     /*   -    -    -   */
     m = (h - 1) >> 1;
@@ -1684,12 +1681,12 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
   /*         +---
    *    |   ||
    * ---+---+    */
-  xs[0].x1 = 2 * w + gap; xs[0].x2 = 3 * w - gap - 1; xs[0].y1 = xs[0].y2 = gap;
+  xs[0].x1 = 2 * w + gap + 1; xs[0].x2 = 3 * w - gap - 2; xs[0].y1 = xs[0].y2 = gap;
   xs[1].x1 = xs[1].x2 = 1 * w - gap - 1; xs[1].y1 = gap + 1; xs[1].y2 = h - gap - 2;
   xs[2].x1 = xs[2].x2 = 2 * w - gap - 1; xs[2].y1 = gap + 1; xs[2].y2 = h - gap - 2;
   xs[3].x1 = xs[3].x2 = 2 * w + gap;     xs[3].y1 = gap + 1; xs[3].y2 = h - gap - 2;
-  xs[4].x1 = 0 * w + gap; xs[4].x2 = 1 * w - gap - 1; xs[4].y1 = xs[4].y2 = h - gap - 1;
-  xs[5].x1 = 1 * w + gap; xs[4].x2 = 2 * w - gap - 1; xs[4].y1 = xs[4].y2 = h - gap - 1;
+  xs[4].x1 = 0 * w + gap + 1; xs[4].x2 = 1 * w - gap - 2; xs[4].y1 = xs[4].y2 = h - gap - 1;
+  xs[5].x1 = 1 * w + gap + 1; xs[5].x2 = 2 * w - gap - 2; xs[5].y1 = xs[5].y2 = h - gap - 1;
   if (!dir) {
     /*   -    -    -   */
     m = ((h - 1) >> 1) + 1;
@@ -1828,7 +1825,7 @@ static void _draw_frame(xitk_pixmap_t *p,
     xstop = (rbearing - lbearing) + 8;
   }
 
-  _draw_rectangular_box (p, x, (y + yoff), xstart, xstop, w, (h - yoff), style | DRAW_DOUBLE, 1);
+  _draw_rectangular_box (p, x, y + yoff, xstart, xstop, w, h - yoff, style | DRAW_DOUBLE, 1);
   
   if(title) {
     xitk_pixmap_draw_string(p, fs,  (x - lbearing + 6), (y + ascent), titlebuf, titlelen,

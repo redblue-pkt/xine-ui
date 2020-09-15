@@ -467,7 +467,7 @@ static void create_tabs(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
   
-  draw_rectangular_outter_box(bg, x, y+20, (w-1), 60);
+  draw_rectangular_outter_box(bg, x, y+20, w, 61);
   xitk_window_change_background(test->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
   
@@ -562,7 +562,7 @@ static void create_label(void) {
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
     
     if(wimage) {
-      draw_rectangular_inner_box(wimage->image, 0, 0, wimage->width-1, wimage->height-1);
+      draw_rectangular_inner_box(wimage->image, 0, 0, wimage->width, wimage->height);
     }
   }
 }
@@ -731,7 +731,7 @@ static void create_combo(void) {
   //height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
   xitk_font_unload_font(fs);
   /*
-  draw_rectangular_inner_box(test->imlibdata, bg, (x - 4), (y - 4), (width + 8), (height + 7));
+  draw_rectangular_inner_box(test->imlibdata, bg, (x - 4), (y - 4), (width + 5), (height + 8));
   xitk_window_change_background(test->xwin, bg, wwidth, wheight);
   
   XFreePixmap(test->display, bg);

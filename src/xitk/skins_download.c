@@ -607,8 +607,7 @@ void skin_download (gGui_t *gui, char *url) {
 
     xitk_enable_and_show_widget(skd->browser);
 
-    draw_rectangular_inner_box (bg, x, y,
-      (WINDOW_WIDTH - 30 - 1), (MAX_DISP_ENTRIES * 20 + 16 + 10 - 1));
+    draw_rectangular_inner_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10);
 
     xitk_window_set_background (skd->xwin, bg);
 

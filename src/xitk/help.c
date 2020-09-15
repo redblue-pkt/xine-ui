@@ -378,7 +378,7 @@ void help_panel (gGui_t *gui) {
     xitk_pixmap_t *bg = xitk_window_get_background_pixmap (help->xwin);
     if (bg) {
       draw_rectangular_outter_box (bg, 15, 24 + help->tabs_height,
-        WINDOW_WIDTH - 30 - 1, MAX_DISP_ENTRIES * 20 + 16 + 10 - 1);
+        WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10);
       xitk_window_set_background (help->xwin, bg);
     }
   }
