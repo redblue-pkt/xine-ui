@@ -264,7 +264,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
 
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
-  if (panel_is_visible (panel))
+  if (panel_is_visible (panel) > 1)
     raise_window (panel->gui, panel->xwin, 1, 1);
 
   xitk_skin_unlock (panel->gui->skin_config);
@@ -317,7 +317,7 @@ void panel_update_runtime_display (xui_panel_t *panel) {
   int seconds, pos, length;
   char timestr[16];
 
-  if (!panel_is_visible (panel))
+  if (panel_is_visible (panel) < 2)
     return;
 
   if (!gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, &seconds, &length)) {
@@ -495,7 +495,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 
         if (panel->gui->logo_mode == 0) {
 
-          if (panel_is_visible (panel)) {
+          if (panel_is_visible (panel) > 1) {
 
             panel_update_runtime_display (panel);
 
@@ -556,57 +556,44 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
   pthread_exit(NULL);
 }
 
+static int _panel_get_visibility (xui_panel_t *panel) {
+  static const uint8_t map[6] = {0, 1, 0, 2, 2, 2};
+
+  panel->visible = map[(xitk_window_is_window_visible (panel->xwin) ? 3 : 0) + panel->visible];
+  return panel->visible;
+}
+  
 /*
  * Boolean about panel visibility.
  */
 int panel_is_visible (xui_panel_t *panel) {
-
-  if(panel) {
-    if (panel->gui->use_root_window)
-      return xitk_window_is_window_visible (panel->xwin);
-    else
-      return panel->visible && xitk_window_is_window_visible (panel->xwin);
-  }
-
-  return 0;
+  if (!panel)
+    return 0;
+  return _panel_get_visibility (panel);
 }
 
 /*
  * Show/Hide panel window.
  */
-static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
-  xui_panel_t *panel = data;
-  int visible = xitk_window_is_window_visible (panel->xwin);
+static void _panel_toggle_visibility (xui_panel_t *panel) {
 
-  (void)w;
-
-  if (panel->visible && !video_window_is_separate_display(panel->gui->vwin)) {
+  _panel_get_visibility (panel);
+  if ((panel->visible > 1) && !video_window_is_separate_display (panel->gui->vwin)) {
+    int vv = video_window_is_visible (panel->gui->vwin);
     
-    if (video_window_is_visible (panel->gui->vwin)) {
-      if (panel->gui->use_root_window) { /* Using root window */
-        if (visible)
-          xitk_window_iconify_window(panel->xwin);
-        else
-          xitk_window_show_window(panel->xwin, 0);
-      }
-      else {
-	panel->visible = 0;
-        xitk_window_hide_window(panel->xwin);
-	xitk_hide_widgets(panel->widget_list);
-      }
+    if ((vv > 0) && !panel->gui->use_root_window) {
+      panel->visible = 0;
+      xitk_window_hide_window (panel->xwin);
+      xitk_hide_widgets (panel->widget_list);
+    } else {
+      panel->visible = 1;
+      xitk_window_iconify_window (panel->xwin);
     }
-    else {
-      if(visible)
-        xitk_window_iconify_window(panel->xwin);
-      else
-        xitk_window_show_window(panel->xwin, 0);
-    }
-
     video_window_grab_input_focus(panel->gui->vwin);
-  }
-  else {
 
-    panel->visible = 1;
+  } else {
+
+    panel->visible = 2;
     panel->gui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
 
@@ -673,18 +660,22 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
   }
 
-  gui_hide_show_all (panel->gui, ~1, panel->visible ? ~0 : 0);
+  gui_hide_show_all (panel->gui, ~1, panel->visible > 1 ? ~0 : 0);
 }
 
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
-  _panel_toggle_visibility(w, data);
-  config_update_num ("gui.panel_visible", panel->visible);
+
+  (void)w;
+  if (!panel)
+    return;
+  _panel_toggle_visibility (panel);
+  config_update_num ("gui.panel_visible", panel->visible > 1);
 }
 
 void panel_raise_window(xui_panel_t *panel)
 {
-  if (panel_is_visible (panel))  {
+  if (panel_is_visible (panel) > 1)  {
     xitk_window_raise_window(panel->xwin);
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
   }
@@ -993,27 +984,59 @@ static const xitk_event_cbs_t panel_event_cbs = {
  * called before xine engine initialization.
  */
 void panel_add_autoplay_buttons (xui_panel_t *panel) {
-  const char *tips[64];
   const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (panel->gui->xine);
-  unsigned int i;
 
-  if (!autoplay_plugins)
-    return;
+  if (autoplay_plugins) {
+    const char *tips[64];
+    unsigned int i;
 
-  for (i = 0; autoplay_plugins[i]; i++) {
-    if (i >= sizeof (tips) / sizeof (tips[0]))
-      break;
-    tips[i] = xine_get_input_plugin_description (panel->gui->xine, autoplay_plugins[i]);
+    for (i = 0; autoplay_plugins[i]; i++) {
+      if (i >= sizeof (tips) / sizeof (tips[0]))
+        break;
+      tips[i] = xine_get_input_plugin_description (panel->gui->xine, autoplay_plugins[i]);
+    }
+    panel->autoplay_buttons = xitk_button_list_new (
+      panel->widget_list,
+      panel->gui->skin_config, "AutoPlayGUI",
+      playlist_scan_input, panel->gui,
+      autoplay_plugins,
+      tips, panel->tips.timeout, 0);
+    if (panel->autoplay_buttons)
+      xitk_add_widget (panel->widget_list, panel->autoplay_buttons);
   }
 
-  panel->autoplay_buttons = xitk_button_list_new (
-    panel->widget_list,
-    panel->gui->skin_config, "AutoPlayGUI",
-    playlist_scan_input, panel->gui,
-    autoplay_plugins,
-    tips, panel->tips.timeout, 0);
-  if (panel->autoplay_buttons)
-    xitk_add_widget (panel->widget_list, panel->autoplay_buttons);
+  /* show panel (see panel_init ()) */
+  {
+    int visible = xine_config_register_bool (panel->gui->xine, "gui.panel_visible", 1,
+      _("gui panel visibility"),
+      CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+
+    panel->visible = (!panel->gui->no_gui) ? visible : 0;
+  }
+  /*  The user don't want panel on startup */
+  if (panel->visible && (actions_on_start (panel->gui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
+    panel->visible = 0;
+    config_update_num ("gui.panel_visible", 0);
+  }
+  if (panel->gui->use_root_window || video_window_is_separate_display (panel->gui->vwin))
+    panel->visible = 1;
+  if (panel->visible) {
+    panel->visible = 2;
+    reparent_window (panel->gui, panel->xwin);
+    /* already called by reparent_window ()
+    xitk_window_show_window (panel->xwin, 1);
+    xitk_window_try_to_set_input_focus (panel->xwin);
+    */
+  } else {
+    if ((video_window_is_visible (panel->gui->vwin) > 0) && !panel->gui->use_root_window) {
+      xitk_window_hide_window (panel->xwin);
+      xitk_hide_widgets (panel->widget_list);
+    } else {
+      xitk_window_iconify_window (panel->xwin);
+    }
+  }
+  panel->gui->cursor_visible = 1;
+  video_window_set_cursor_visibility (panel->gui->vwin, 1);
 }
 
 /*
@@ -1064,20 +1087,26 @@ void panel_add_mixer_control (xui_panel_t *panel) {
 }
 
 void panel_deinit (xui_panel_t *panel) {
-  if (panel_is_visible (panel))
-    _panel_toggle_visibility (NULL, panel);
+  if (!panel)
+    return;
+
+  if (panel_is_visible (panel) > 1) {
+    panel->visible = 0;
+    xitk_window_hide_window (panel->xwin);
+    xitk_hide_widgets (panel->widget_list);
+  }
   panel_exit (NULL, panel);
 }
 
 void panel_paint (xui_panel_t *panel) {
-  if (panel_is_visible (panel))
+  if (panel_is_visible (panel) > 1)
     xitk_paint_widget_list (panel->widget_list);
 }
 
 void panel_reparent (xui_panel_t *panel) {
   if (panel) {
 
-    if (!video_window_is_visible (panel->gui->vwin)) { /* Show the panel in taskbar */
+    if (video_window_is_visible (panel->gui->vwin) < 2) { /* Show the panel in taskbar */
       int x = 0, y = 0;
 
       panel_get_window_position(panel, &x, &y, NULL, NULL);
@@ -1086,7 +1115,7 @@ void panel_reparent (xui_panel_t *panel) {
 
     reparent_window (panel->gui, panel->xwin);
 
-    if (video_window_is_visible (panel->gui->vwin)) {
+    if (video_window_is_visible (panel->gui->vwin) > 1) {
       layer_above_video (panel->gui, panel->xwin);
     }
   }
@@ -1148,7 +1177,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * Different WMs and even different versions behave different.
    * There is no guarantee that it works with all WMs/versions.
    */
-  if (!video_window_is_visible (panel->gui->vwin)) {
+  if (video_window_is_visible (panel->gui->vwin) < 2) {
     if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
       xitk_window_unset_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
     xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_NORMAL);
@@ -1402,36 +1431,13 @@ xui_panel_t *panel_init (gGui_t *gui) {
   panel_update_mrl_display (panel);
   panel_update_nextprev_tips (panel);
 
-  /* 
-   * show panel 
-   */
-  {
-    int visible = xine_config_register_bool (panel->gui->xine, "gui.panel_visible", 1,
-      _("gui panel visibility"),
-      CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-
-    panel->visible = (!panel->gui->no_gui) ? visible : 0;
-  }
-  
-  /*  The user don't want panel on startup */
-  if (panel->visible && (actions_on_start (panel->gui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
-    panel->visible = 0;
-    config_update_num ("gui.panel_visible", 0);
-  }
-
-  if ((panel->gui->use_root_window || video_window_is_separate_display(panel->gui->vwin)) && (!panel->visible))
-    panel->visible = 1;
-  
-  if (panel->visible)
-    xitk_window_show_window (panel->xwin, 1);
-  else
-    xitk_hide_widgets (panel->widget_list);
-  
+  /* NOTE: panel and video window follow a complex visibility logic.
+   * defer this to panel_add_autoplay_buttons () when video win is stable. */
+  panel->visible = 0;
+  /* NOTE: do this _before_ xitk_window_show_window (), and make sure to get that initial expose event
+   * handled in xitk.c - otherwise some widgets may not show until focused. */
   panel->widget_key = xitk_window_register_event_handler ("panel", panel->xwin, &panel_event_cbs, panel);
 
-  panel->gui->cursor_visible = 1;
-  video_window_set_cursor_visibility (panel->gui->vwin, 1);
-  
   {
     pthread_attr_t       pth_attrs;
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
@@ -1450,10 +1456,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
     pthread_create (&panel->slider_thread, &pth_attrs, slider_loop, panel);
     pthread_attr_destroy (&pth_attrs);
   }
-
-  reparent_window (panel->gui, panel->xwin);
-  if (panel->visible)
-    xitk_window_try_to_set_input_focus(panel->xwin);
 
   panel->gui->panel = panel;
   return panel;

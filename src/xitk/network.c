@@ -2371,7 +2371,7 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
       int flushing = 0;
       
       if(is_arg_contain(client_info, 1, "hide")) {
-        if (panel_is_visible (gui->panel)) {
+        if (panel_is_visible (gui->panel) > 1) {
           panel_toggle_visibility (NULL, gui->panel);
 	  flushing++;
 	}

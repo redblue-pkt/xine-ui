@@ -1404,16 +1404,16 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
   
   pthread_mutex_lock (&vwin->mutex);
 
-  vwin->show = show_window;
+  vwin->show = show_window ? 2 : (panel_is_visible (vwin->gui->panel) > 0 ? 0 : 1);
  
   /* Switching to visible: If new window size requested meanwhile, adapt window */
-  if ((vwin->show) && (vwin->fullscreen_mode & WINDOWED_MODE) &&
+  if ((vwin->show > 1) && (vwin->fullscreen_mode & WINDOWED_MODE) &&
      (vwin->win_width != vwin->old_win_width || vwin->win_height != vwin->old_win_height))
     video_window_adapt_size (vwin);
 
   vwin->x_lock_display (vwin->video_display);
   
-  if (vwin->show == 1) {
+  if (vwin->show > 1) {
 
     if ((vwin->gui->always_layer_above || 
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) && 
@@ -1436,9 +1436,11 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
      && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
      && wm_not_ewmh_only())
       xitk_set_ewmh_fullscreen (vwin->video_window);
-  }
-  else
+  } else if (vwin->show == 1) {
+    XIconifyWindow (vwin->video_display, vwin->video_window, vwin->video_screen);
+  } else {
     XUnmapWindow (vwin->video_display, vwin->video_window);
+  }
   
   vwin->x_unlock_display (vwin->video_display);
   
@@ -1575,7 +1577,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->fullscreen_req     = WINDOWED_MODE;
   vwin->fullscreen_mode    = WINDOWED_MODE;
   vwin->video_window  = None;
-  vwin->show               = 1;
+  vwin->show               = 2;
   vwin->widget_key         = 0;
   vwin->borderless         = (borderless > 0);
   vwin->have_xtest         = have_xtestextention (vwin);

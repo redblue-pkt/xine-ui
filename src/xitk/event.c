@@ -911,7 +911,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     
   case ACTID_GRAB_POINTER:
     if(!gui->cursor_grabbed) {
-      if (!panel_is_visible (gui->panel)) {
+      if (panel_is_visible (gui->panel) < 2) {
         video_window_grab_pointer(gui->vwin);
       }
       
@@ -1897,11 +1897,11 @@ void gui_run(gGui_t *gui, char **session_opts) {
     
     /*  The user wants to hide video window  */
     if(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
-      if (!panel_is_visible (gui->panel))
+      if (panel_is_visible (gui->panel) < 2)
         gui_execute_action_id (gui, ACTID_TOGGLE_VISIBLITY);
       
       /* DXR3 case */
-      if (video_window_is_visible (gui->vwin))
+      if (video_window_is_visible (gui->vwin) > 1)
         video_window_set_visibility (gui->vwin, 0);
       else
 	xine_port_send_gui_data(gui->vo_port,

@@ -126,7 +126,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
 	}
       }
       
-      if(panel_is_visible(gGui->panel)) {
+      if (panel_is_visible (gGui->panel) > 1) {
         panel_paint(gGui->panel);
       }
       

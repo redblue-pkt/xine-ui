@@ -64,6 +64,7 @@ void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y);
 
 /* hide/show video window */
 void video_window_set_visibility (xui_vwin_t *vwin, int show_window);
+/* NOTE: return 0 (unmapped), 1 (iconified), 2 (visible) */
 int video_window_is_visible (xui_vwin_t *vwin);
 int video_window_is_separate_display(xui_vwin_t *vwin);
 

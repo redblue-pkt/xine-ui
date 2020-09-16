@@ -434,6 +434,7 @@ void xitk_window_hide_window(xitk_window_t *w)
 {
   xitk_lock_display (w->xitk);
   XUnmapWindow(w->xitk->display, w->window);
+  XSync (w->xitk->display, False);
   xitk_unlock_display (w->xitk);
 }
 
