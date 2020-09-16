@@ -40,6 +40,8 @@ void panel_deinit (xui_panel_t *panel);
 xui_panel_t *panel_init (gGui_t *gui);
 
 void panel_paint (xui_panel_t *panel);
+
+/* NOTE: return 0 (unmapped), 1 (iconified), 2 (visible) */
 int panel_is_visible (xui_panel_t *panel);
 
 void panel_change_skins (xui_panel_t *panel, int synthetic);

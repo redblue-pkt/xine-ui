@@ -180,7 +180,7 @@ static void event_sender_handle_button_event(void *data, const xitk_button_event
      * If we tried to move sticky window, move it back to stored position.
      */
     if (es->gui->eventer_sticky) {
-      if (panel_is_visible (es->gui->panel)) {
+      if (panel_is_visible (es->gui->panel) > 1) {
         int  x, y;
         xitk_window_get_window_position (es->xwin, &x, &y, NULL, NULL);
         if ((x != es->x) || (y != es->y))
@@ -405,7 +405,7 @@ void event_sender_panel (gGui_t *gui) {
   es->y = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_y", 80,
     CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
   
-  if (es->gui->eventer_sticky && panel_is_visible (es->gui->panel)) {
+  if (es->gui->eventer_sticky && panel_is_visible (es->gui->panel) > 1) {
     int  px, py, pw;
     panel_get_window_position (es->gui->panel, &px, &py, &pw, NULL);
     es->x = px + pw;

@@ -96,7 +96,7 @@ void gui_reparent_all_windows (gGui_t *gui) {
   
   if (playlist_is_visible (gui))
     playlist_reparent (gui);
-  if (panel_is_visible (gui->panel))
+  if (panel_is_visible (gui->panel) > 1)
     panel_reparent (gui->panel);
   if (setup_is_visible (gui->setup))
     setup_reparent (gui->setup);
@@ -138,7 +138,7 @@ void reparent_window (gGui_t *gui, xitk_window_t *xwin) {
   if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only ()) {
     /* Don't unmap this window, because on re-mapping, it will not be visible until
      * its ancestor, the video window, is visible. That's not what's intended. */
-    if (!video_window_is_visible (gui->vwin))
+    if (video_window_is_visible (gui->vwin) < 2)
       xitk_window_set_wm_window_type( (xwin), WINDOW_TYPE_NORMAL);
     else
       xitk_window_unset_wm_window_type (xwin, WINDOW_TYPE_NORMAL);
@@ -348,13 +348,13 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
 	
 	if(gui->auto_vo_visibility) {
 	  
-          if (!video_window_is_visible (gui->vwin))
+          if (video_window_is_visible (gui->vwin) < 2)
             video_window_set_visibility (gui->vwin, 1);
 	  
 	}
 
-        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) &&
-          panel_is_visible (gui->panel))
+        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) > 1 &&
+          panel_is_visible (gui->panel) > 1)
           panel_toggle_visibility (NULL, gui->panel);
 	
       }
@@ -362,19 +362,19 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
 	
 	if(gui->auto_vo_visibility) {
 	  
-          if (!panel_is_visible (gui->panel))
+          if (panel_is_visible (gui->panel) < 2)
             panel_toggle_visibility (NULL, gui->panel);
 
-          if (video_window_is_visible (gui->vwin))
+          if (video_window_is_visible (gui->vwin) > 1)
             video_window_set_visibility (gui->vwin, 0);
 	    
 	}
 
-        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) && 
-          !panel_is_visible (gui->panel))
+        if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) > 1 &&
+          panel_is_visible (gui->panel) < 2)
           panel_toggle_visibility (NULL, gui->panel);
 	  
-        if (video_window_is_visible (gui->vwin)) {
+        if (video_window_is_visible (gui->vwin) > 1) {
 	  if(!gui->visual_anim.running)
 	    visual_anim_play();
 	}
@@ -775,7 +775,7 @@ void gui_exit_2 (gGui_t *gui) {
     gui->load_sub = NULL;
   }
 
-  if (video_window_is_visible (gui->vwin))
+  if (video_window_is_visible (gui->vwin) > 1)
     video_window_set_visibility (gui->vwin, 0);
   
   tvout_deinit(gui->tvout);
@@ -1092,8 +1092,8 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
 
   (void)w;
-  if (panel_is_visible (gui->panel) && (!gui->use_root_window)) {
-    int visible = !video_window_is_visible (gui->vwin);
+  if (!gui->use_root_window) {
+    int visible = video_window_is_visible (gui->vwin) < 2;
 
     video_window_set_visibility (gui->vwin, visible);
 
@@ -1101,7 +1101,7 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
     gui_reparent_all_windows (gui);
 
     /* (re)start/stop visual animation */
-    if (video_window_is_visible (gui->vwin)) {
+    if (video_window_is_visible (gui->vwin) > 1) {
       if(gui->visual_anim.enabled && (gui->visual_anim.running == 2))
 	visual_anim_play();
     }
@@ -1127,7 +1127,7 @@ int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
   if (!gui)
     return 0;
 
-  v = (panel_is_visible (gui->panel) != 0) << 0;
+  v = (panel_is_visible (gui->panel) > 1) << 0;
   s = (v ^ flags_visible) & flags_mask;
   if (s & (1 << 0)) {
     /* this will call us again on the remaining windows, ... */
@@ -1182,7 +1182,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
   int flags;
 
-  if ((!(video_window_is_visible (gui->vwin))) || gui->use_root_window)
+  if ((video_window_is_visible (gui->vwin) < 2) || gui->use_root_window)
     return;
 
   flags = gui_hide_show_all (gui, ~0, 0);
@@ -1984,7 +1984,7 @@ void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
   if (!gui || !is_layer_above (gui))
     return;
   
-  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin)) {
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin) > 1) {
     layer = xitk_get_layer_level();
   }
   else {
@@ -2000,7 +2000,7 @@ void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
 int get_layer_above_video (gGui_t *gui) {
   if (!(gui->always_layer_above || gui->layer_above))
     return 0;
-  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin))
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin) > 1)
     return xitk_get_layer_level ();
   if (gui->always_layer_above || gui->layer_above)
     return xitk_get_layer_level ();
