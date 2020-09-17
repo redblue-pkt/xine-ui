@@ -185,41 +185,6 @@ typedef struct {
       XITK_DIE("%s(%d): widget consistency failed.!\n", __FUNCTION__, __LINE__); \
   } while(0)
 
-/*
- * timeradd/timersub is missing on solaris' sys/time.h, provide
- * some fallback macros
- */
-#ifndef	timeradd
-#define timeradd(a, b, result)                                                \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
-    if ((result)->tv_usec >= 1000000)                                         \
-      {                                                                       \
-        ++(result)->tv_sec;                                                   \
-        (result)->tv_usec -= 1000000;                                         \
-      }                                                                       \
-  } while (0)
-#endif
-
-#ifndef timersub
-#define timersub(a, b, result)                                                \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                     \
-      (result)->tv_usec += 1000000;                                           \
-    }                                                                         \
-  } while (0)
-#endif
-
-/* Duplicate s to d timeval values */
-#define timercpy(s, d) do {                                                   \
-      (d)->tv_sec = (s)->tv_sec;                                              \
-      (d)->tv_usec = (s)->tv_usec;                                            \
-} while(0)
-
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
                       StructureNotifyMask | PropertyChangeMask |              \
@@ -261,7 +226,6 @@ uint32_t xitk_get_wm_type(void);
 
 char *xitk_filter_filename(const char *name);
 unsigned long xitk_get_timer_label_animation(void);
-long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
 int xitk_get_checkstyle_feature(void);
 int xitk_get_cursors_feature(void);

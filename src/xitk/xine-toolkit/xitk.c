@@ -2795,10 +2795,15 @@ unsigned long xitk_get_warning_background(void) {
   return xitk_config_get_warning_background (xitk->config);
 }
 
-long int xitk_get_timer_dbl_click(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2) {
+  __xitk_t *_xitk = (__xitk_t *)xitk;
+  struct timeval td;
 
-  return xitk_config_get_timer_dbl_click (xitk->config);
+  td.tv_usec = xitk_config_get_timer_dbl_click (_xitk->config);
+  td.tv_sec  = t2->tv_sec - t1->tv_sec;
+  if (td.tv_sec > td.tv_usec / 1000 + 1)
+    return 0;
+  return td.tv_sec * 1000 + (t2->tv_usec - t1->tv_usec) / 1000 < td.tv_usec;
 }
 
 int xitk_get_barstyle_feature(void) {
@@ -2925,13 +2930,14 @@ const char *xitk_set_locale(void) {
 /*
  *
  */
-long int xitk_get_last_keypressed_time(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
-  struct timeval tm, tm_diff;
+long int xitk_get_last_keypressed_time (xitk_t *xitk) {
+  __xitk_t *_xitk = (__xitk_t *)xitk;
+  struct timeval tm;
   
-  gettimeofday(&tm, NULL);
-  timersub (&tm, &xitk->keypress, &tm_diff);
-  return tm_diff.tv_sec;
+  gettimeofday (&tm, NULL);
+  tm.tv_sec -= _xitk->keypress.tv_sec;
+  tm.tv_usec -= _xitk->keypress.tv_usec;
+  return tm.tv_usec < 0 ? tm.tv_sec - 1 : tm.tv_sec;
 }
 
 /*
@@ -2957,3 +2963,4 @@ int xitk_get_bool_value(const char *val) {
 
   return 0;
 }
+
