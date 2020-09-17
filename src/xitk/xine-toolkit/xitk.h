@@ -596,7 +596,7 @@ const char *xitk_set_locale(void);
 /*
  *
  */
-long int xitk_get_last_keypressed_time(void);
+long int xitk_get_last_keypressed_time (xitk_t *xitk);
 
 void xitk_ungrab_pointer(void);
 
@@ -659,7 +659,7 @@ int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
 char *xitk_filter_filename(const char *name);
 unsigned long xitk_get_timer_label_animation(void);
-long int xitk_get_timer_dbl_click(void);
+int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2);
 int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);

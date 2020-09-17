@@ -483,7 +483,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
         free (ident);
 
         {
-          if (!video_window_is_window_iconified (panel->gui->vwin)) {
+          if (video_window_is_visible (panel->gui->vwin) > 1) {
             if (panel->gui->ssaver_timeout) {
               if (!(i % 2))
                 screensaver_timer++;

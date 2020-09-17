@@ -71,7 +71,6 @@ typedef struct _browser_private_s {
   xitk_ext_state_callback_t   callback;
   void                   *userdata;
 
-  int                     dbl_click_time;
   xitk_ext_state_callback_t   dbl_click_callback;
 
   struct timeval          click_time;
@@ -314,9 +313,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
     struct timeval tv;
     gettimeofday (&tv, NULL);
     if (num == wp->items.selected) {
-      int difftime = (tv.tv_sec - wp->click_time.tv_sec) * 1000;
-      difftime += (tv.tv_usec - wp->click_time.tv_usec) / 1000;
-      if (difftime < wp->dbl_click_time) {
+      if (xitk_is_dbl_click (wp->w.wl->xitk, &wp->click_time, &tv)) {
         if (wp->dbl_click_callback) {
           wp->click_time = tv;
           _browser_select (wp, state ? num : -1);
@@ -1018,7 +1015,6 @@ static void browser_right(xitk_widget_t *w, void *data) {
  * Create the list browser
  */
 static xitk_widget_t *_xitk_browser_create (_browser_private_t *wp, xitk_browser_widget_t *br) {
-  wp->dbl_click_time = xitk_get_timer_dbl_click ();
   gettimeofday (&wp->click_time, NULL);
 
   wp->dbl_click_callback = br->dbl_click_callback;
