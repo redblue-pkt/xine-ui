@@ -1643,6 +1643,7 @@ static void xitk_widget_show_hide (xitk_widget_t *w, int visible) {
 }
 
 static void xitk_widget_able (xitk_widget_t *w, int enable) {
+  w->enable = enable;
   if (w->state.enable != enable) {
     w->state.enable = enable;
     if (!enable) {
@@ -1674,10 +1675,8 @@ static void xitk_widget_able (xitk_widget_t *w, int enable) {
 }
 
 static void xitk_widget_run (xitk_widget_t *w, int start) {
-  if (w->state.running != start) {
-    w->state.running = start;
-    w->running = start;
-  }
+  w->running = start;
+  w->state.running = start;
 }
 
 
