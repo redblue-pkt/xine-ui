@@ -690,7 +690,7 @@ void playlist_scan_for_infos_selected (gGui_t *gui) {
 
     if (selected < 0)
       return;
-    stream = xine_stream_new (__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
+    stream = xine_stream_new (gui->xine, gui->ao_none, gui->vo_none);
     _scan_for_playlist_infos (gui, stream, selected);
     xine_dispose (stream);
     playlist_mrlident_toggle (gui);
@@ -709,7 +709,7 @@ void playlist_scan_for_infos (gGui_t *gui) {
     int                 i;
     xine_stream_t      *stream;
     
-    stream = xine_stream_new (__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
+    stream = xine_stream_new (gui->xine, gui->ao_none, gui->vo_none);
     for (i = 0; i < gui->playlist.num; i++)
       _scan_for_playlist_infos (gui, stream, i);
     xine_dispose (stream);
@@ -790,17 +790,11 @@ void playlist_exit (gGui_t *gui) {
     filebrowser_end (gui->pl_save);
 
   if (pl) {
-    window_info_t wi;
-    
     mmk_editor_end();
 
     pl->visible = 0;
 
-    if ((xitk_get_window_info (pl->widget_key, &wi))) {
-      config_update_num ("gui.playlist_x", wi.x);
-      config_update_num ("gui.playlist_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+    gui_save_window_pos (pl->gui, "playlist", pl->widget_key);
 
     xitk_unregister_event_handler (&pl->widget_key);
 
@@ -858,7 +852,7 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
     return;
   pl = gui->plwin;
   name = xitk_labelbutton_get_label (w);
-  autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance, name, &num_mrls);
+  autoplay_mrls = xine_get_autoplay_mrls (gui->xine, name, &num_mrls);
 
   if (autoplay_mrls) {
     xine_stream_t *stream;
@@ -875,7 +869,7 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
         xitk_inputtext_change_text (pl->winput, NULL);
     }
 
-    stream = xine_stream_new (__xineui_global_xine_instance, gui->ao_none, gui->vo_none);
+    stream = xine_stream_new (gui->xine, gui->ao_none, gui->vo_none);
     for (j = 0; j < num_mrls; j++) {
       char *ident = NULL;
 
@@ -1091,20 +1085,8 @@ void playlist_editor (gGui_t *gui) {
   width = xitk_image_width(bg_image);
   height = xitk_image_height(bg_image);
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_x",
-				     200,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_DEB,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.playlist_y",
-				     200,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_DEB,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
+  x = y = 200;
+  gui_load_window_pos (pl->gui, "playlist", &x, &y);
 
   pl->xwin = xitk_window_create_simple_window_ext (pl->gui->xitk, x, y, width, height,
     title, NULL, "xine", 0, is_layer_above (pl->gui), pl->gui->icon);
@@ -1274,7 +1256,7 @@ void playlist_editor (gGui_t *gui) {
 
   do {
     const char *tips[64];
-    const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (__xineui_global_xine_instance);
+    const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (pl->gui->xine);
     unsigned int i;
 
     if (!autoplay_plugins)
@@ -1283,7 +1265,7 @@ void playlist_editor (gGui_t *gui) {
     for (i = 0; autoplay_plugins[i]; i++) {
       if (i >= sizeof (tips) / sizeof (tips[0]))
         break;
-      tips[i] = xine_get_input_plugin_description (__xineui_global_xine_instance, autoplay_plugins[i]);
+      tips[i] = xine_get_input_plugin_description (pl->gui->xine, autoplay_plugins[i]);
     }
 
     pl->autoplay_buttons = xitk_button_list_new (pl->widget_list, pl->gui->skin_config, "AutoPlayBG",

@@ -322,15 +322,9 @@ static void event_sender_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if (es) {
-    window_info_t wi;
-    
     es->visible = 0;
-    
-    if ((xitk_get_window_info (es->widget_key, &wi))) {
-      config_update_num ("gui.eventer_x", wi.x);
-      config_update_num ("gui.eventer_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (es->gui, "eventer", es->widget_key);
     
     xitk_unregister_event_handler (&es->widget_key);
     xitk_window_destroy_window (es->xwin);
@@ -400,10 +394,8 @@ void event_sender_panel (gGui_t *gui) {
   for (i = 0; i < (int)(sizeof (es->self) / sizeof (es->self[0])); i++)
     es->self[i] = es;
 
-  es->x = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_x", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  es->y = xine_config_register_num (__xineui_global_xine_instance, "gui.eventer_y", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  es->x = es->y = 80;
+  gui_load_window_pos (es->gui, "eventer", &es->x, &es->y);
   
   if (es->gui->eventer_sticky && panel_is_visible (es->gui->panel) > 1) {
     int  px, py, pw;

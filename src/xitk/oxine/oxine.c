@@ -294,6 +294,7 @@ static void mrl_cb (void *data) {
 }
 
 static void autoplay_cb (void *data) {
+  gGui_t *gui = gGui;
   char *parameter = (char *) data;
   oxine_t *oxine = oxine_instance_get();
   int    num_mrls, j;
@@ -306,12 +307,10 @@ static void autoplay_cb (void *data) {
   if (!oxine)
     return;
 
-  autoplay_mrls = xine_get_autoplay_mrls (__xineui_global_xine_instance,
-                  parameter,
-                  &num_mrls);
+  autoplay_mrls = xine_get_autoplay_mrls (gui->xine, parameter, &num_mrls);
 
-  if(autoplay_mrls) {
-    playlist_delete_all (gGui);
+  if (autoplay_mrls) {
+    playlist_delete_all (gui);
 
     for (j = 0; j < num_mrls; j++)
       mediamark_append_entry((const char *)autoplay_mrls[j],
@@ -322,11 +321,11 @@ static void autoplay_cb (void *data) {
     otk_clear(oxine->otk);
     oxine->mode = OXINE_MODE_NORMAL;
 
-    gGui->playlist.cur = 0;
+    gui->playlist.cur = 0;
     gui_set_current_mmk(mediamark_get_current_mmk());
 
-    gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
-                           gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0);
+    gui_xine_open_and_play (gui->mmk.mrl, gui->mmk.sub, 0,
+                           gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 0);
   }
 
   oxine_instance_unget(oxine);
@@ -705,7 +704,7 @@ static void oxine_error_msg(const char *text)
  */
  
 static oxine_t *create_oxine(void) {
-  
+  gGui_t *gui = gGui;
   oxine_t *oxine;
   xine_cfg_entry_t centry;
   
@@ -713,7 +712,7 @@ static oxine_t *create_oxine(void) {
     
   oxine->main_menu_cb = main_menu_cb;
 
-  oxine->xine = __xineui_global_xine_instance;
+  oxine->xine = gui->xine;
   
   oxine->cd_mountpoint = 
   xine_config_register_string (oxine->xine,
@@ -731,8 +730,8 @@ static oxine_t *create_oxine(void) {
 
   start_scheduler();
   
-  oxine->odk = odk_init(gGui);
-    
+  oxine->odk = odk_init (gui);
+   
   oxine->otk = otk_init(oxine->odk);
     
   oxine->mode = OXINE_MODE_NORMAL;

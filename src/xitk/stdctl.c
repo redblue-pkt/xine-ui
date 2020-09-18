@@ -39,13 +39,8 @@
 
 #define DEBUG_STDCTL 0
 
-static struct {
-  int                   fd;
-  pthread_t             thread;
-  FILE                 *fbk;
-} stdctl;
-
-static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
+static __attribute__((noreturn)) void *xine_stdctl_loop (void *data) {
+  gGui_t           *gui = data;
   char              buf[256], *c, *c1;
   int               len, selrt;
   kbinding_entry_t *k;
@@ -53,7 +48,6 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   struct timeval    tv;
   int               secs, last_secs;
   char             *params;
-  gGui_t           *gui = gGui;
 
   last_secs = -1;
   params = NULL;
@@ -61,16 +55,16 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   while (gui->running) {
 
     FD_ZERO(&set);
-    FD_SET(stdctl.fd, &set);
+    FD_SET(gui->stdctl.fd, &set);
 
     tv.tv_sec  = 0;
     tv.tv_usec = 500000;
 
-    selrt = select(stdctl.fd + 1, &set, NULL, NULL, &tv);
+    selrt = select(gui->stdctl.fd + 1, &set, NULL, NULL, &tv);
 
-    if(selrt > 0 && FD_ISSET(stdctl.fd, &set)) {
+    if(selrt > 0 && FD_ISSET(gui->stdctl.fd, &set)) {
 
-      len = read(stdctl.fd, &buf, sizeof(buf) - 1);
+      len = read(gui->stdctl.fd, &buf, sizeof(buf) - 1);
 
       if(len > 0) {
 
@@ -158,7 +152,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
       secs /= 1000;
 
       if (secs != last_secs) {
-	fprintf(stdctl.fbk, "time: %d\n", secs);
+	fprintf(gui->stdctl.fbk, "time: %d\n", secs);
 	last_secs = secs;
       }
     }
@@ -168,19 +162,23 @@ static __attribute__((noreturn)) void *xine_stdctl_loop(void *dummy) {
   pthread_exit(NULL);
 }
 
-void stdctl_start(void) {
+void stdctl_start (gGui_t *gui) {
   int err;
 
-  stdctl.fd = STDIN_FILENO;
-  stdctl.fbk = gGui->orig_stdout;
+  if (!gui)
+    return;
+  gui->stdctl.fd = STDIN_FILENO;
+  gui->stdctl.fbk = gui->orig_stdout;
   
-  if((err = pthread_create(&(stdctl.thread), NULL, xine_stdctl_loop, NULL)) != 0) {
+  if ((err = pthread_create (&(gui->stdctl.thread), NULL, xine_stdctl_loop, gui)) != 0) {
     fprintf(stderr, _("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    gGui->stdctl_enable = 0;
+    gui->stdctl_enable = 0;
   }
 }
 
-void stdctl_stop(void) {
+void stdctl_stop (gGui_t *gui) {
+  if (!gui)
+    return;
   /*
    * We print the exit feedback here, not on exit of the stdctl thread.
    * Otherwise, if ACTID_QUIT (bringing us to this point) was triggered
@@ -189,26 +187,30 @@ void stdctl_stop(void) {
    * wait but returns immediately with EDEADLK as stdctl tries to join
    * itself and termination continues asynchronously.
    */
-  fprintf(stdctl.fbk, "Exiting\n");
-  pthread_join(stdctl.thread, NULL);
+  fprintf (gui->stdctl.fbk, "Exiting\n");
+  pthread_join (gui->stdctl.thread, NULL);
 }
 
-void stdctl_event(const xine_event_t *event)
-{
-  switch(event->type) {
-  case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    fprintf(stdctl.fbk, "PlaybackFinished\n");
-    break;
+void stdctl_event (gGui_t *gui, const xine_event_t *event) {
+  if (!gui)
+    return;
+  switch (event->type) {
+    case XINE_EVENT_UI_PLAYBACK_FINISHED:
+      fprintf (gui->stdctl.fbk, "PlaybackFinished\n");
+      break;
+    default: ;
   }
 }
 
-void stdctl_keypress(const char *str)
-{
-    fprintf(stdctl.fbk, "KeyPress$%s\n", str);
+void stdctl_keypress (gGui_t *gui, const char *str) {
+  if (!gui)
+    return;
+  fprintf (gui->stdctl.fbk, "KeyPress$%s\n", str);
 }
 
-void stdctl_playing(const char *mrl)
-{
-    fprintf(stdctl.fbk, "PlaybackStart$%s\n", mrl);
-    fprintf(stdctl.fbk, "PlaylistPos#%i\n", gGui->playlist.cur);
+void stdctl_playing (gGui_t *gui, const char *mrl) {
+  if (!gui)
+    return;
+  fprintf (gui->stdctl.fbk, "PlaybackStart$%s\n", mrl);
+  fprintf (gui->stdctl.fbk, "PlaylistPos#%i\n", gui->playlist.cur);
 }

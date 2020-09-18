@@ -334,10 +334,9 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     exit(-1);
   }
 
-  x = xine_config_register_num (vctrl->gui->xine, "gui.control_x",
-    200, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  y = xine_config_register_num (vctrl->gui->xine, "gui.control_y",
-    100, CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  x = 200;
+  y = 100;
+  gui_load_window_pos (vctrl->gui, "control", &x, &y);
   width = xitk_image_width(bg_image);
   height = xitk_image_height(bg_image);
 
@@ -454,14 +453,9 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
   vctrl->status = 1;
 
   if (vctrl->xwin) {
-    window_info_t wi;
     int           i;
-    
-    if ((xitk_get_window_info (vctrl->widget_key, &wi))) {
-      config_update_num ("gui.control_x", wi.x);
-      config_update_num ("gui.control_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (vctrl->gui, "control", vctrl->widget_key);
 
     xitk_unregister_event_handler (&vctrl->widget_key);
 

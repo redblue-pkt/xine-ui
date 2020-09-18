@@ -3063,16 +3063,10 @@ void mediamark_collect_from_directory(char *filepathname) {
 static void mmkeditor_exit(xitk_widget_t *w, void *data) {
 
   if(mmkeditor.running) {
-    window_info_t wi;
-
     mmkeditor.running = 0;
     mmkeditor.visible = 0;
-    
-    if((xitk_get_window_info(mmkeditor.widget_key, &wi))) {
-      config_update_num ("gui.mmk_editor_x", wi.x);
-      config_update_num ("gui.mmk_editor_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (gGui, "mmk_editor", mmkeditor.widget_key);
 
     mmkeditor.mmk = NULL;
     
@@ -3274,21 +3268,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor.callback = callback;
   mmkeditor.user_data = data;
 
-  x = xine_config_register_num(__xineui_global_xine_instance, "gui.mmk_editor_x", 
-			       80,
-			       CONFIG_NO_DESC,
-			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_DEB,
-			       CONFIG_NO_CB,
-			       CONFIG_NO_DATA);
-  y = xine_config_register_num(__xineui_global_xine_instance, "gui.mmk_editor_y",
-			       80,
-			       CONFIG_NO_DESC,
-			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_DEB,
-			       CONFIG_NO_CB,
-			       CONFIG_NO_DATA);
-  
+  x = y = 80;
+  gui_load_window_pos (gui, "mmk_editor", &x, &y);
+
   /* Create window */
   mmkeditor.xwin = xitk_window_create_dialog_window(gui->xitk, _("Mediamark Editor"), x, y,
 						     WINDOW_WIDTH, WINDOW_HEIGHT);

@@ -573,7 +573,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
     _vpplugin_unwire (gui);
   
   for(i = 0; i < vinfo->info.video.num_deinterlace_elements; i++) {
-    xine_post_dispose(__xineui_global_xine_instance, vinfo->info.video.deinterlace_elements[i]->post);
+    xine_post_dispose (gui->xine, vinfo->info.video.deinterlace_elements[i]->post);
     free(vinfo->info.video.deinterlace_elements[i]->name);
     VFREE(vinfo->info.video.deinterlace_elements[i]);
   }
@@ -1389,7 +1389,7 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
     if (p[n]) {
       _pplugin_destroy_only_obj (info, pobj);
       if (pobj->post) {
-        xine_post_dispose (__xineui_global_xine_instance, pobj->post);
+        xine_post_dispose (gui->xine, pobj->post);
         pobj->post = NULL;
       }
       n++;
@@ -1397,7 +1397,7 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
       while (p[n]) {
         _pplugin_destroy_only_obj (info, p[n]);
         if (p[n]->post) {
-          xine_post_dispose (__xineui_global_xine_instance, p[n]->post);
+          xine_post_dispose (gui->xine, p[n]->post);
           p[n]->post = NULL;
         }
         _pplugin_destroy_widget (&p[n]->plugins);
@@ -1422,10 +1422,10 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
     /* Some filter has been selected. Kill old one and set new. */
     _pplugin_destroy_only_obj (info, pobj);
     if (pobj->post) {
-      xine_post_dispose (__xineui_global_xine_instance, pobj->post);
+      xine_post_dispose (gui->xine, pobj->post);
       pobj->post = NULL;
     }
-    pobj->post = xine_post_init (__xineui_global_xine_instance,
+    pobj->post = xine_post_init (gui->xine,
       xitk_combo_get_current_entry_selected (w), 0, &gui->ao_port, &gui->vo_port);
     _pplugin_retrieve_parameters (info, pobj);
     /* If this is the last filter, add a new "No filter" thereafter. */
@@ -1626,7 +1626,6 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if (info->win) {
-    window_info_t wi;
     int           i;
     
     if (info->win->help_running)
@@ -1643,12 +1642,8 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
 
     info->win->running = 0;
     info->win->visible = 0;
-    
-    if((xitk_get_window_info(info->win->widget_key, &wi))) {
-      config_update_num (info->type == POST_VIDEO ? "gui.vpplugin_x" : "gui.applugin_x", wi.x);
-      config_update_num (info->type == POST_VIDEO ? "gui.vpplugin_y" : "gui.applugin_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (info->gui, info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->widget_key);
     
     {
       post_object_t **p = info->win->post_objects;
@@ -1851,11 +1846,9 @@ void pplugin_panel (post_info_t *info) {
   info->win = (post_win_t *) calloc(1, sizeof (*info->win));
   info->win->first_displayed = 0;
   info->win->help_text       = NULL;
-  
-  x = xine_config_register_num (gui->xine, info->type == POST_VIDEO ? "gui.vpplugin_x" : "gui.applugin_x", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  y = xine_config_register_num (gui->xine, info->type == POST_VIDEO ? "gui.vpplugin_y" : "gui.applugin_y", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+
+  x = y = 80;
+  gui_load_window_pos (gui, info->type == POST_VIDEO ? "vpplugin" : "applugin", &x, &y);
   
   info->win->xwin = xitk_window_create_dialog_window (gui->xitk,
     info->type == POST_VIDEO ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
@@ -1992,7 +1985,7 @@ static void _pplugin_deinit (post_info_t *info) {
   int i;
 #if 0
   /* requires <xine/xine_internal.h> */
-  __xineui_global_xine_instance->config->unregister_callback (__xineui_global_xine_instance, "gui.deinterlace_plugin");
+  info->gui->xine->config->unregister_callback (info->gui->xine, "gui.deinterlace_plugin");
 #endif
   for (i = 0; i < info->num_elements; i++) {
     xine_post_dispose (info->gui->xine, info->elements[i]->post);
@@ -2064,7 +2057,7 @@ void post_deinterlace_init (gGui_t *gui, const char *deinterlace_post) {
   deinterlace_default = _pplugin_get_default_deinterlacer();
   
   vinfo->info.video.deinterlace_plugin = 
-    (char *) xine_config_register_string (__xineui_global_xine_instance, "gui.deinterlace_plugin", 
+    (char *) xine_config_register_string (gui->xine, "gui.deinterlace_plugin", 
 					  deinterlace_default,
 					  _("Deinterlace plugin."),
 					  _("Plugin (with optional parameters) to use "

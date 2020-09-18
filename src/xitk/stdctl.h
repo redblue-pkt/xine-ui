@@ -26,10 +26,10 @@
 
 #include <xine.h>
 
-void stdctl_start(void);
-void stdctl_stop(void);
-void stdctl_event(const xine_event_t *event);
-void stdctl_keypress(const char *str);
-void stdctl_playing(const char *mrl);
+void stdctl_start (gGui_t *gui);
+void stdctl_stop (gGui_t *gui);
+void stdctl_event (gGui_t *gui, const xine_event_t *event);
+void stdctl_keypress (gGui_t *gui, const char *str);
+void stdctl_playing (gGui_t *gui, const char *mrl);
 
 #endif

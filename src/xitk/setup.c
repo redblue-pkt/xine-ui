@@ -108,7 +108,6 @@ static void setup_change_section (xitk_widget_t *, void *, int);
  */
 static void setup_exit (xitk_widget_t *w, void *data, int state) {
   xui_setup_t *setup = data;
-  window_info_t wi;
 
   (void)w;
   (void)state;
@@ -119,12 +118,8 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
 
   if (setup->dialog)
     xitk_unregister_event_handler (&setup->dialog);
-    
-  if ((xitk_get_window_info (setup->kreg, &wi))) {
-    config_update_num ("gui.setup_x", wi.x);
-    config_update_num ("gui.setup_y", wi.y);
-    WINDOW_INFO_ZERO (&wi);
-  }
+
+  gui_save_window_pos (setup->gui, "setup", setup->kreg);
     
   xitk_unregister_event_handler (&setup->kreg);
 
@@ -254,7 +249,7 @@ static void setup_apply (xitk_widget_t *w, void *data, int state) {
 	}
       }
     }
-    xine_config_save (setup->gui->xine, __xineui_global_config_file);
+    xine_config_save (setup->gui->xine, setup->gui->cfg_file);
 
     if(w != setup->ok) {
       int section = xitk_tabs_get_current_selected (setup->tabs);
@@ -974,12 +969,9 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui = gui;
 
   {
-    int x, y;
+    int x = 80, y = 80;
 
-    x = xine_config_register_num (setup->gui->xine, "gui.setup_x", 80,
-      CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-    y = xine_config_register_num (setup->gui->xine, "gui.setup_y", 80,
-      CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+    gui_load_window_pos (setup->gui, "setup", &x, &y);
     /* Create window */
     setup->xwin = xitk_window_create_dialog_window (setup->gui->xitk,
       _("xine Setup"), x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -1078,4 +1070,3 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
-

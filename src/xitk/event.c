@@ -1298,7 +1298,7 @@ void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
   if (ke->event != XITK_KEY_PRESS)
     return;
   if (gui->stdctl_enable) {
-    stdctl_keypress(ke->keycode_str);
+    stdctl_keypress (gui, ke->keycode_str);
   }
   kbindings_handle_kbinding(gui->kbindings, ke->key_pressed, ke->keycode, ke->modifiers, -1);
 }
@@ -1736,7 +1736,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   gui->xitk = xitk_init (p->prefered_visual, p->install_colormap,
                          use_x_lock_display, use_synchronized_x11,
-                         (__xineui_global_verbosity) ? 1 : 0);
+                         gui->verbosity ? 1 : 0);
 
   /*
    * create an icon pixmap
@@ -1871,8 +1871,8 @@ void gui_run(gGui_t *gui, char **session_opts) {
     lirc_start();
 #endif
   
-  if(gui->stdctl_enable)
-    stdctl_start();
+  if (gui->stdctl_enable)
+    stdctl_start (gui);
 
 #ifdef HAVE_READLINE
   start_remote_server();

@@ -551,7 +551,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   char *mrl = _mrl;
   int ret;
   
-  if(__xineui_global_verbosity)
+  if (gui->verbosity)
     printf("%s():\n\tmrl: '%s',\n\tsub '%s',\n\tstart_pos %d, start_time %d, av_offset %d, spu_offset %d.\n",
 	   __func__, _mrl, (_sub) ? _sub : "NONE", start_pos, start_time, av_offset, spu_offset);
   
@@ -672,7 +672,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   gui_xine_get_pos_length (gui, gui->stream, NULL, NULL, NULL);
   
   if (gui->stdctl_enable)
-    stdctl_playing(mrl);
+    stdctl_playing (gui, mrl);
 
   return 1;
 }
@@ -703,7 +703,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * Do not wait for threads that try to use xitk here -- see gui_exit_2 () below. */
   (void)w;
 
-  if (__xineui_global_verbosity)
+  if (gui->verbosity)
     printf ("xine_ui: gui_exit ().\n");
 
   oxine_exit();
@@ -736,7 +736,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
 void gui_exit_2 (gGui_t *gui) {
 
-  if (__xineui_global_verbosity)
+  if (gui->verbosity)
     printf ("xine_ui: gui_exit_2 ().\n");
 
   /* shut down event queue threads */
@@ -835,8 +835,8 @@ void gui_exit_2 (gGui_t *gui) {
     lirc_stop();
 #endif
   
-  if(gui->stdctl_enable) 
-    stdctl_stop();
+  if (gui->stdctl_enable) 
+    stdctl_stop (gui);
 
   xitk_skin_unload_config(gui->skin_config);
 
