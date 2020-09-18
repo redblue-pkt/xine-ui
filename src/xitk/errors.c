@@ -258,7 +258,7 @@ void too_slow_window (gGui_t *gui) {
   
   dump_error(message);
 
-  display_warning = xine_config_register_bool (__xineui_global_xine_instance, "gui.dropped_frames_warning", 
+  display_warning = xine_config_register_bool (gui->xine, "gui.dropped_frames_warning", 
 		     1,
 		     _("Warn user when too much frames are dropped."),
 		     CONFIG_NO_HELP,

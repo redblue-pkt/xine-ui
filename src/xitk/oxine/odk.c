@@ -241,7 +241,7 @@ odk_t *odk_init(gGui_t *gui) {
   odk->hscale = 0;
   odk->vscale = 0;
 
-  odk->xine = __xineui_global_xine_instance;
+  odk->xine = gui->xine;
   odk->stream = odk->gui->stream;
 
   /* test unscaled osd support */

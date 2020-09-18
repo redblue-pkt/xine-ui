@@ -420,19 +420,14 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
 
 static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
   xui_sinfo_t *sinfo = data;
-  window_info_t wi;
 
   if (!sinfo)
     return;
   (void)w;
   (void)state;
   sinfo->visible = 0;
-    
-  if ((xitk_get_window_info (sinfo->widget_key, &wi))) {
-    config_update_num ("gui.sinfos_x", wi.x);
-    config_update_num ("gui.sinfos_y", wi.y);
-    WINDOW_INFO_ZERO (&wi);
-  }
+
+  gui_save_window_pos (sinfo->gui, "sinfos", sinfo->widget_key);
     
   xitk_unregister_event_handler (&sinfo->widget_key);
 
@@ -548,10 +543,8 @@ void stream_infos_panel (gGui_t *gui) {
     return;
   sinfo->gui = gui;
 
-  x = xine_config_register_num (sinfo->gui->xine, "gui.sinfos_x", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  y = xine_config_register_num (sinfo->gui->xine, "gui.sinfos_y", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  x = y = 80;
+  gui_load_window_pos (sinfo->gui, "sinfos", &x, &y);
   
   /* Create window */
   sinfo->xwin = xitk_window_create_dialog_window (sinfo->gui->xitk, _("Stream Information"),

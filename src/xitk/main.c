@@ -1,4 +1,4 @@
-/** Copyright (C) 2000-2019 the xine project
+/** Copyright (C) 2000-2020 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -310,20 +310,18 @@ static void show_version(void) {
 /*
  *
  */
-static void show_banner(void) {
-  int major, minor, sub;
-  
-  show_version();
+static void show_banner (gGui_t *gui) {
+  show_version ();
 
-  if(__xineui_global_verbosity)
-    printf(_("Built with xine library %d.%d.%d (%s)\n"),
-	    XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
-  
-  xine_get_version (&major, &minor, &sub);
+  if (gui->verbosity) {
+    int major, minor, sub;
 
-  if(__xineui_global_verbosity)
-    printf(_("Found xine library version: %d.%d.%d (%s).\n"), 
-	    major, minor, sub, xine_get_version_string());
+    printf (_("Built with xine library %d.%d.%d (%s)\n"),
+      XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
+    xine_get_version (&major, &minor, &sub);
+    printf (_("Found xine library version: %d.%d.%d (%s).\n"),
+      major, minor, sub, xine_get_version_string ());
+  }
 }
 
 static void print_formatted(char *title, const char *const *plugins) {
@@ -355,8 +353,7 @@ static void print_formatted(char *title, const char *const *plugins) {
   printf("%s.\n\n", buffer);
 }
 
-static char *_config_file()
-{
+static char *_config_file (void) {
   const char *home       = xine_get_homedir();
   const char *cfgdir     = CONFIGDIR;
   const char *cfgfile    = CONFIGFILE;
@@ -383,7 +380,7 @@ static char *_config_file()
 
 static void _config_load(xine_t *xine)
 {
-  char *configfile = _config_file();
+  char *configfile = _config_file ();
   if (configfile) {
     xine_config_load(xine, configfile);
     free(configfile);
@@ -685,7 +682,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
 
     while (driver_ids[i]) {
       
-      if(__xineui_global_verbosity)
+      if (gui->verbosity)
 	printf (_("main: probing <%s> video output plugin\n"), driver_ids[i]);
       
       video_port = xine_open_video_driver (gui->xine, 
@@ -764,7 +761,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
       
       /* don't want to load an audio driver ? */
       if (!strncasecmp (audio_driver_ids[driver_num], "NULL", 4)) {
-	if(__xineui_global_verbosity)
+        if (gui->verbosity)
 	  printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
@@ -783,11 +780,11 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
     while (driver_ids[i]) {
       
       if(strcmp(driver_ids[i], "none")) {
-	if(__xineui_global_verbosity)
+        if (gui->verbosity)
 	  printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
       }
       else {
-	if(__xineui_global_verbosity)
+        if (gui->verbosity)
 	  printf(_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
 	i++;
         continue;
@@ -810,7 +807,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
     /* don't want to load an audio driver ? */
     if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
 
-      if(__xineui_global_verbosity)
+      if (gui->verbosity)
 	printf(_("main: not using any audio driver (as requested).\n"));
 
       /* calling -A null is useful to developers, but we should not save it at
@@ -859,8 +856,8 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     return;
   }
   
-  if(gui->stdctl_enable)
-    stdctl_event(event);
+  if (gui->stdctl_enable)
+    stdctl_event (gui, event);
 
   switch(event->type) { 
     
@@ -1083,7 +1080,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	break;
       }
       
-      if(__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG) {
+      if (gui->verbosity >= XINE_VERBOSITY_DEBUG) {
 	strlcat(buffer, "\n\n[", sizeof(buffer));
 	
 	if(data->explanation)
@@ -1099,7 +1096,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
         pthread_mutex_unlock (&gui->no_messages.mutex);
         if ((event->tv.tv_sec < tv.tv_sec)
           || ((event->tv.tv_sec == tv.tv_sec) && (event->tv.tv_usec < tv.tv_usec))) {
-          if (__xineui_global_verbosity >= XINE_VERBOSITY_DEBUG)
+          if (gui->verbosity >= XINE_VERBOSITY_DEBUG)
             printf ("xine-ui: suppressed message:\n%s\n", buffer);
         } else {
           report (gui, "%s", buffer);
@@ -1163,7 +1160,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     if(!mrl_ext && (event->stream == gui->stream) && gui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
-      if(__xineui_global_verbosity)
+      if (gui->verbosity)
 	printf("XINE_EVENT_MRL_REFERENCE got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
 
@@ -1201,7 +1198,7 @@ typedef struct {
 #if XINE_VERSION_CODE < 10200
       mrl_ext = 1; /* use this to ignore MRL_REFERENCE events */
 #endif
-      if(__xineui_global_verbosity)
+      if (gui->verbosity)
 	printf("XINE_EVENT_MRL_REFERENCE_EXT got mrl [%s] (alternative=%d)\n",
                ref->mrl, ref->alternative);
 
@@ -1310,8 +1307,9 @@ int main(int argc, char *argv[]) {
   if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL))
     fprintf (stderr, "sigprocmask() failed.\n");
 
-  gGui = (gGui_t *) calloc(1, sizeof(gGui_t));
-  gui = gGui;
+  gGui = gui = (gGui_t *)calloc (1, sizeof (*gui));
+  if (!gui)
+    return 1;
 
   gui->nextprev[0]            =
   gui->nextprev[1]            =
@@ -1333,7 +1331,7 @@ int main(int argc, char *argv[]) {
   gui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gui->playlist.control       = 0;
   gui->skin_server_url        = NULL;
-  __xineui_global_verbosity              = 0;
+  gui->verbosity              = __xineui_global_verbosity = 0;
   gui->broadcast_port         = 0;
   gui->display_logo           = 1;
   gui->post_video_enable      = 1;
@@ -1646,10 +1644,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_VERBOSE:
-      if(optarg != NULL)
-	__xineui_global_verbosity = strtol(optarg, &optarg, 10);
-      else
-	__xineui_global_verbosity = 1;
+      gui->verbosity = __xineui_global_verbosity = optarg ? strtol (optarg, &optarg, 10) : 1;
       break;
 
 #ifdef XINE_PARAM_BROADCASTER_PORT    
@@ -1689,7 +1684,7 @@ int main(int argc, char *argv[]) {
       {
         if (optarg) {
           char *cfg = xine_chomp(optarg);
-          __xineui_global_config_file = xitk_filter_filename (cfg);
+          gui->cfg_file = __xineui_global_config_file = xitk_filter_filename (cfg);
         }
       }
       break;
@@ -1773,7 +1768,7 @@ int main(int argc, char *argv[]) {
 	  }
 
 	  gui->report = f;
-	  __xineui_global_verbosity = 0xff;
+          gui->verbosity = __xineui_global_verbosity = 0xff;
 	}
 	
 	if(optarg) {
@@ -1835,11 +1830,11 @@ int main(int argc, char *argv[]) {
     return retval;
   }
 
-  show_banner();
+  show_banner (gui);
   
 #ifndef DEBUG
   /* Make non-verbose stdout really quiet but keep a copy for special use, e.g. stdctl feedback */
-  if(!__xineui_global_verbosity) {
+  if (!gui->verbosity) {
     int   guiout_fd, stdout_fd;
     FILE *guiout_fp;
     
@@ -1869,12 +1864,12 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize config
    */
-  if(__xineui_global_config_file == NULL) {
+  if (!gui->cfg_file) {
     struct stat st;
-    __xineui_global_config_file = _config_file();
+    gui->cfg_file = __xineui_global_config_file = _config_file ();
 
     /* Popup setup window if there is no config file */
-    if(!__xineui_global_config_file || stat(__xineui_global_config_file, &st) < 0) {
+    if (!gui->cfg_file || stat (gui->cfg_file, &st) < 0) {
       if(aos < MAX_ACTIONS_ON_START)
 	gui->actions_on_start[aos++] = ACTID_SETUP;
     }
@@ -1902,9 +1897,9 @@ int main(int argc, char *argv[]) {
   gui->no_messages.level = 0;
 
   __xineui_global_xine_instance = gui->xine = xine_new ();
-  if (__xineui_global_config_file)
-    xine_config_load (gui->xine, __xineui_global_config_file);
-  xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, __xineui_global_verbosity);
+  if (gui->cfg_file)
+    xine_config_load (gui->xine, gui->cfg_file);
+  xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, gui->verbosity);
   
   /* 
    * Playlist auto reload 
@@ -2198,7 +2193,39 @@ int main(int argc, char *argv[]) {
 
   free_command_line_args(&_argv, _argc);
 
-  free (__xineui_global_config_file);
+  free (gui->cfg_file);
+  __xineui_global_config_file = NULL;
 
+  free (gui);
   return retval;
+}
+
+void gui_load_window_pos (gGui_t *gui, const char *name, int *x, int *y) {
+  char buf[80], *e;
+
+  memcpy (buf, "gui.", 4);
+  for (e = buf + 4; *name; name++)
+    *e++ = *name;
+  memcpy (e, "_x", 3);
+  *x = xine_config_register_num (gui->xine, buf, *x, NULL, NULL, CONFIG_LEVEL_DEB, NULL, NULL);
+  e[1] = 'y';
+  *y = xine_config_register_num (gui->xine, buf, *y, NULL, NULL, CONFIG_LEVEL_DEB, NULL, NULL);
+}
+
+void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key) {
+  window_info_t wi;
+
+  (void)gui;
+  if ((xitk_get_window_info (key, &wi))) {
+    char buf[80], *e;
+
+    memcpy (buf, "gui.", 4);
+    for (e = buf + 4; *name; name++)
+      *e++ = *name;
+    memcpy (e, "_x", 3);
+    config_update_num (buf, wi.x);
+    e[1] = 'y';
+    config_update_num (buf, wi.y);
+    WINDOW_INFO_ZERO (&wi);
+  }
 }

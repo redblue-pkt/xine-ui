@@ -57,14 +57,15 @@ static struct {
 } lirc;
 
 static void lirc_get_playlist(char *from) {
+  gGui_t *gui = gGui;
   int    i;
-  char **autoscan_plugins = (char **)xine_get_autoplay_input_plugin_ids(__xineui_global_xine_instance);
+  char **autoscan_plugins = (char **)xine_get_autoplay_input_plugin_ids (gui->xine);
 
   for(i = 0; autoscan_plugins[i] != NULL; ++i) {
     if(!strcasecmp(autoscan_plugins[i], from)) {
       int    num_mrls;
       int    j;
-      char **autoplay_mrls = (char **)xine_get_autoplay_mrls (__xineui_global_xine_instance, from, &num_mrls);
+      char **autoplay_mrls = (char **)xine_get_autoplay_mrls (gui->xine, from, &num_mrls);
       if(autoplay_mrls) {
 
 	/* First, free existing playlist */
@@ -74,22 +75,23 @@ static void lirc_get_playlist(char *from) {
 	  mediamark_append_entry((const char *)autoplay_mrls[j], 
 				 (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
 	
-	gGui->playlist.cur = 0;
+        gui->playlist.cur = 0;
 	gui_set_current_mmk(mediamark_get_current_mmk());
-        playlist_update_playlist (gGui);
+        playlist_update_playlist (gui);
       }    
     }
   }
 }
 
-static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
+static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
+  gGui_t *gui = data;
   char             *code, *c;
   int               ret;
   kbinding_entry_t *k;
   fd_set            set;
   struct timeval    tv;
 
-  while(gGui->running) {
+  while (gui->running) {
 
     FD_ZERO(&set);
     FD_SET(lirc.fd, &set);
@@ -110,10 +112,10 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
 	fprintf(stdout, "Command Received = '%s'\n", c);
 #endif
 	
-	k = kbindings_lookup_action(gGui->kbindings, c);
+	k = kbindings_lookup_action (gui->kbindings, c);
 	
 	if(k) {
-          gui_execute_action_id (gGui, (kbindings_get_action_id(k)));
+          gui_execute_action_id (gui, (kbindings_get_action_id(k)));
 	}
 	else {
 	  char from[256];
@@ -126,8 +128,8 @@ static __attribute__((noreturn)) void *xine_lirc_loop(void *dummy) {
 	}
       }
       
-      if (panel_is_visible (gGui->panel) > 1) {
-        panel_paint(gGui->panel);
+      if (panel_is_visible (gui->panel) > 1) {
+        panel_paint (gui->panel);
       }
       
       free(code);
@@ -164,7 +166,7 @@ void lirc_start(void) {
     return;
   }
 
-  if((err = pthread_create(&(lirc.thread), NULL, xine_lirc_loop, NULL)) != 0) {
+  if ((err = pthread_create (&(lirc.thread), NULL, xine_lirc_loop, gGui)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     lirc_freeconfig(lirc.config);
     lirc_deinit();

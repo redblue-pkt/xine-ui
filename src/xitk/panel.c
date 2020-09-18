@@ -204,19 +204,13 @@ static void panel_exit (xitk_widget_t *w, void *data) {
   (void)w;
 
   if(panel) {
-    window_info_t wi;
-    
     panel->visible = 0;
 
 #ifdef HAVE_XINE_CONFIG_UNREGISTER_CALLBACKS
     xine_config_unregister_callbacks (panel->gui->xine, NULL, NULL, panel, sizeof (*panel));
 #endif
 
-    if((xitk_get_window_info(panel->widget_key, &wi))) {
-      config_update_num ("gui.panel_x", wi.x);
-      config_update_num ("gui.panel_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+    gui_save_window_pos (panel->gui, "panel", panel->widget_key);
 
     xitk_unregister_event_handler(&panel->widget_key);
 
@@ -1164,10 +1158,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * open the panel window
    */
 
-  panel->x = xine_config_register_num (panel->gui->xine, "gui.panel_x", 200,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  panel->y = xine_config_register_num (panel->gui->xine, "gui.panel_y", 100,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  panel->x = 200;
+  panel->y = 100;
+  gui_load_window_pos (panel->gui, "panel", &panel->x, &panel->y);
 
   panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y, width, height, title,
     title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon);
@@ -1465,4 +1458,3 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
-

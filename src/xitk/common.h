@@ -137,6 +137,7 @@ typedef struct skins_locations_s skins_locations_t;
 struct gGui_st {
   struct gGui_st           *nextprev[3];
 
+  char                     *cfg_file;
   xine_t                   *xine;
   xine_video_port_t        *vo_port;
   xine_video_port_t        *vo_none;
@@ -144,6 +145,7 @@ struct gGui_st {
 
   tvout_t                  *tvout;
 
+  int                       verbosity;
   int                       post_video_enable;
   int                       post_audio_enable;
   int                       deinterlace_enable;
@@ -371,6 +373,12 @@ struct gGui_st {
     int                      num;
     int                      change_config_entry;
   } skins;
+
+  struct {
+    int                      fd;
+    pthread_t                thread;
+    FILE                    *fbk;
+  } stdctl;
 };
 
 extern gGui_t *gGui;
@@ -396,6 +404,9 @@ void reparent_window(gGui_t *gui, xitk_window_t *xwin);
 
 /* panel has bit 0. return the windows that were visible before. */
 int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible);
+
+void gui_load_window_pos (gGui_t *gui, const char *name, int *x, int *y);
+void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key);
 
 #ifdef HAVE_XML_PARSER_REENTRANT
 # define xml_parser_init_R(X,D,L,M) X = xml_parser_init_r ((D), (L), (M))

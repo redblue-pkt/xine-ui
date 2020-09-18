@@ -642,16 +642,10 @@ static void kbedit_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if(kbedit) {
-    window_info_t wi;
-    
     xitk_unregister_event_handler (&kbedit->req);
     kbedit->visible = 0;
-    
-    if((xitk_get_window_info(kbedit->kreg, &wi))) {
-      config_update_num("gui.kbedit_x", wi.x);
-      config_update_num("gui.kbedit_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (kbedit->gui, "kbedit", kbedit->kreg);
     
     xitk_unregister_event_handler(&kbedit->kreg);
 
@@ -1067,21 +1061,9 @@ void kbedit_window (gGui_t *gui) {
   if (gui->keyedit)
     return;
 
-  x = xine_config_register_num(__xineui_global_xine_instance, "gui.kbedit_x", 
-			       80,
-			       CONFIG_NO_DESC,
-			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_DEB,
-			       CONFIG_NO_CB,
-			       CONFIG_NO_DATA);
-  y = xine_config_register_num(__xineui_global_xine_instance, "gui.kbedit_y",
-			       80,
-			       CONFIG_NO_DESC,
-			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_DEB,
-			       CONFIG_NO_CB,
-			       CONFIG_NO_DATA);
-  
+  x = y = 80;
+  gui_load_window_pos (gui, "kbedit", &x, &y);
+
   kbedit = (xui_keyedit_t *)calloc (1, sizeof (*kbedit));
   if (!kbedit)
     return;

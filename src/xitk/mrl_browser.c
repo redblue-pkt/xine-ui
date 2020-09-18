@@ -276,12 +276,9 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   mb.layer_above  = is_layer_above (mrlb->gui);
   mb.icon         = mrlb->gui->icon;
 
-  mb.x = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_x",
-    200, "gui mrl browser x coordinate",
-    CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  mb.y = xine_config_register_num (mrlb->gui->xine, "gui.mrl_browser_y",
-    100, "gui mrl browser y coordinate",
-    CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  mb.x = 200;
+  mb.y = 100;
+  gui_load_window_pos (mrlb->gui, "mrl_browser", &mb.x, &mb.y);
   mb.window_title = _("xine MRL Browser");
 
   mb.skin_element_name        = "MrlBG";

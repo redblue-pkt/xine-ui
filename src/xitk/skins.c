@@ -102,7 +102,7 @@ int skin_add_1 (gGui_t *gui, const char *fullname, const char *name, const char 
     if (((v1 << 16) | (v2 << 8) | v3) >= 0x01020a) {
       const char *names[64];
       skin_get_names (gui, names, sizeof (names) / sizeof (names[0]));
-      xine_config_register_enum (__xineui_global_xine_instance, "gui.skin",
+      xine_config_register_enum (gui->xine, "gui.skin",
         _skin_name_index (gui, DEFAULT_SKIN), (char **)names,
         _("gui skin theme"), CONFIG_NO_HELP, CONFIG_LEVEL_BEG, NULL, NULL);
     }
@@ -397,7 +397,7 @@ char *skin_get_current_skin_dir (gGui_t *gui) {
   }
   
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  (void) xine_config_lookup_entry(__xineui_global_xine_instance, "gui.skin", &entry);
+  xine_config_lookup_entry (gui->xine, "gui.skin", &entry);
   fullname = _skin_get_fullname (gui, entry.num_value);
   return strdup (fullname);
 }
@@ -420,14 +420,14 @@ void skin_preinit (gGui_t *gui) {
   {
     const char *names[64];
     skin_get_names (gui, names, sizeof (names) / sizeof (names[0]));
-    xine_config_register_enum (__xineui_global_xine_instance, "gui.skin",
+    xine_config_register_enum (gui->xine, "gui.skin",
       _skin_name_index (gui, DEFAULT_SKIN), (char **)names,
       _("gui skin theme"),
       CONFIG_NO_HELP, CONFIG_LEVEL_BEG, skin_change_cb, gui);
   }
   {
     int qmax = xitk_image_quality (gui->xitk, -2), v;
-    v = xine_config_register_range (__xineui_global_xine_instance, "gui.gfx_quality", qmax, 0, qmax,
+    v = xine_config_register_range (gui->xine, "gui.gfx_quality", qmax, 0, qmax,
       _("Grapics quality"),
       _("Trade speed for quality with some screen modes."),
       20, gfx_quality_cb, gui);
@@ -443,7 +443,7 @@ void skin_init (gGui_t *gui) {
   xine_cfg_entry_t     entry;
 
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  if(xine_config_lookup_entry(__xineui_global_xine_instance, "gui.skin", &entry))
+  if (xine_config_lookup_entry (gui->xine, "gui.skin", &entry))
     skin_num = entry.num_value;
   else {
     fprintf(stderr, _("Ooch, gui.skin config entry isn't registered. Say goodbye.\n"));

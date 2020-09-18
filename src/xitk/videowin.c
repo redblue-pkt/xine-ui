@@ -1751,7 +1751,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 #endif
   {
     /* no Xinerama */
-    if (__xineui_global_verbosity) 
+    if (vwin->gui->verbosity) 
       printf ("Display is not using Xinerama.\n");
     vwin->fullscreen_width  = DisplayWidth (vwin->video_display, vwin->video_screen);
     vwin->fullscreen_height = DisplayHeight (vwin->video_display, vwin->video_screen);

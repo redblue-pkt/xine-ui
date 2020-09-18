@@ -73,16 +73,11 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if (vl) {
-    window_info_t wi;
     int           i;
     
     vl->visible = 0;
-    
-    if ((xitk_get_window_info (vl->kreg, &wi))) {
-      config_update_num ("gui.viewlog_x", wi.x);
-      config_update_num ("gui.viewlog_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (vl->gui, "viewlog", vl->kreg);
     
     xitk_unregister_event_handler (&vl->kreg);
     xitk_window_destroy_window (vl->xwin);
@@ -152,7 +147,7 @@ static void viewlog_clear_tab (xui_viewlog_t *vl) {
 static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) {
   xui_viewlog_t *vl = data;
   int    i, j, k;
-  const char *const *log = (const char * const *)xine_get_log(__xineui_global_xine_instance, section);
+  const char *const *log = (const char * const *)xine_get_log(vl->gui->xine, section);
   char   buf[2048];
   const char *p;
 
@@ -237,8 +232,8 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
       xitk_tabs_get_current_tab_selected (vl->tabs));
 #endif
 
-  if(__xineui_global_verbosity) {
-    const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
+  if (vl->gui->verbosity) {
+    const char   *const *log_sections = xine_get_log_names(vl->gui->xine);
 
     printf("\nLOG SECTION [%s]\n", log_sections[section]);
     i = 0;
@@ -275,8 +270,8 @@ static void viewlog_refresh (xitk_widget_t *w, void *data, int state) {
 static void viewlog_create_tabs (xui_viewlog_t *vl) {
   xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
-  const char   *const *log_sections = xine_get_log_names(__xineui_global_xine_instance);
-  unsigned int         log_section_count = xine_get_log_section_count(__xineui_global_xine_instance);
+  const char   *const *log_sections = xine_get_log_names(vl->gui->xine);
+  unsigned int         log_section_count = xine_get_log_section_count(vl->gui->xine);
   char                *tab_sections[log_section_count + 1];
   unsigned int         i;
 
@@ -358,10 +353,8 @@ void viewlog_panel (gGui_t *gui) {
 
   vl->gui = gui;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_x", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.viewlog_y", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  x = y = 80;
+  gui_load_window_pos (vl->gui, "viewlog", &x, &y);
 
   /* Create window */
   vl->xwin = xitk_window_create_dialog_window (vl->gui->xitk,

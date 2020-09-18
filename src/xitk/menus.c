@@ -726,7 +726,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 
   { /* Audio Viz */
     xitk_menu_entry_t   menu_entry;
-    const char        **viz_names = post_get_audio_plugins_names (gui);
+    const char * const *viz_names = post_get_audio_plugins_names (gui);
 
     if(viz_names && *viz_names) {
       int                 i = 0;

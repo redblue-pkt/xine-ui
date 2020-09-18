@@ -238,15 +238,9 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if(help) {
-    window_info_t wi;
-    
     help->visible = 0;
-    
-    if((xitk_get_window_info(help->kreg, &wi))) {
-      config_update_num("gui.help_x", wi.x);
-      config_update_num("gui.help_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
-    }
+
+    gui_save_window_pos (help->gui, "help", help->kreg);
     
     xitk_unregister_event_handler(&help->kreg);
     xitk_window_destroy_window(help->xwin);
@@ -334,10 +328,8 @@ void help_panel (gGui_t *gui) {
     return;
   help->gui = gui;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.help_x", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
-  y = xine_config_register_num (__xineui_global_xine_instance, "gui.help_y", 80,
-    CONFIG_NO_DESC, CONFIG_NO_HELP, CONFIG_LEVEL_DEB, CONFIG_NO_CB, CONFIG_NO_DATA);
+  x = y = 80;
+  gui_load_window_pos (gui, "help", &x, &y);
 
   /* Create window */
   help->xwin = xitk_window_create_dialog_window (help->gui->xitk, _("Help"),
