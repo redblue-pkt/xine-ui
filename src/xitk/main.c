@@ -1359,6 +1359,7 @@ int main(int argc, char *argv[]) {
   gui->keyedit                = NULL;
   gui->streaminfo             = NULL;
 
+  gui->mmkedit                = NULL;
   gui->plwin                  = NULL;
   gui->pl_load                = NULL;
   gui->pl_save                = NULL;

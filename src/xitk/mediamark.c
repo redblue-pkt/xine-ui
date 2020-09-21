@@ -55,7 +55,9 @@
 #define WINDOW_WIDTH            525
 #define WINDOW_HEIGHT           270
 
-static struct {
+struct xui_mmkedit_s {
+  gGui_t                       *gui;
+
   apply_callback_t              callback;
   void                         *user_data;
 
@@ -73,55 +75,153 @@ static struct {
 
   mediamark_t                 **mmk;
 
-  int                           running;
   int                           visible;
   xitk_register_key_t           widget_key;
-} mmkeditor;
-
+};
 
 typedef struct {
-  char                         *data;
-  char                        **lines;
-  int                           numl;
-  
-  int                           entries;
-  char                         *type;
-} playlist_t;
+  char *buf1, *buf2, ext[8], **lines;
+  const char *filename, *type;
+  size_t size, num_lines, num_words, num_entries;
+} _lf_t;
 
-typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
-typedef mediamark_t **(*playlist_xml_guess_func_t)(playlist_t *, const char *, char *xml_content, xml_node_t *);
+static _lf_t *_lf_new (size_t size) {
+  _lf_t *lf;
+  uint32_t *w;
+  size_t num_words = (size + 4) & ~4;
+  char *m = malloc (sizeof (*lf) + 2 * num_words);
 
-static char *_download_file(const char *filename, int *size) {
-  download_t  *download;
-  char        *buf = NULL;
-  
-  if((!filename) || (!strlen(filename))) {
-    fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
+  if (!m) {
+    fprintf(stderr, "%s(): malloc() failed.\n", __XINE_FUNCTION__);
     return NULL;
   }
-  
-  download = (download_t *) calloc(1, sizeof(download_t));
-  download->buf    = NULL;
-  download->error  = NULL;
-  download->size   = 0;
-  download->status = 0; 
-  
-  if((network_download(filename, download))) {
-    *size = download->size;
-    buf = (char *) malloc(*size + 1);
-    if (buf) {
-      memcpy(buf, download->buf, *size);
-      buf[*size] = 0;
+
+  lf = (_lf_t *)m;
+  lf->ext[0] = 0;
+  lf->filename = "";
+  lf->type = "";
+  lf->num_entries = 0;
+  lf->lines = NULL;
+  lf->size = size;
+  lf->num_words = num_words >> 2;
+  m += sizeof (*lf);
+  lf->buf1 = m;
+  w = (uint32_t *)m;
+  w[lf->num_words - 1] = 0;
+  m += num_words;
+  lf->buf2 = m;
+  w = (uint32_t *)m;
+  w[lf->num_words - 1] = 0;
+  return lf;
+}
+
+static char *_lf_dup (_lf_t *lf) {
+  free (lf->lines);
+  lf->lines = NULL;
+  memcpy (lf->buf2, lf->buf1, lf->size + 1);
+  return lf->buf2;
+}
+
+static int _lf_split_lines (_lf_t *lf) {
+  if (lf->lines)
+    return lf->num_lines;
+
+  {
+    uint32_t *w = (uint32_t *)lf->buf2;
+    size_t n1 = lf->num_words;
+
+    memcpy (lf->buf2, lf->buf1, lf->num_words << 2);
+    lf->num_lines = 0;
+    while (n1) {
+      uint32_t v = 0;
+      size_t n2 = n1 > 255 ? 255 : n1;
+
+      n1 -= n2;
+      lf->num_lines += 4 * n2;
+      while (n2) {
+        uint32_t t = *w++;
+
+        t ^= 0x0a0a0a0a;
+        t |= t >> 4;
+        t |= t >> 2;
+        t |= t >> 1;
+        t &= 0x01010101;
+        v += t;
+        n2 -= 1;
+      }
+      lf->num_lines -= (v & 255) + ((v >> 8) & 255) + ((v >> 16) & 255) + (v >> 24);
     }
   }
-  else
-    xine_error (gGui, "Unable to download '%s': %s", filename, download->error);
+  if (lf->size && (lf->buf2[lf->size - 1] != '\n'))
+    lf->num_lines += 1;
 
-  SAFE_FREE(download->buf);
-  SAFE_FREE(download->error);
-  free(download);
+  lf->lines = malloc ((lf->num_lines + 1) * sizeof (*lf->lines));
+  if (lf->lines) {
+    char **lb = lf->lines, *p1 = lf->buf2;
+
+    while (1) {
+      char *p2 = strchr (p1, '\n');
+
+      if (!p2)
+        break;
+      *lb++ = p1;
+      p2[0] = 0;
+      if ((p2 > p1) && (p2[-1] == '\r'))
+        p2[-1] = 0;
+      p1 = p2 + 1;
+    }
+    {
+      char *p2 = lf->buf2 + lf->size;
+
+      if ((p2 > p1) && (p2[-1] == '\r'))
+        *--p2 = 0;
+      if (p1 < p2)
+        *lb++ = p1;
+    }
+    *lb = NULL;
+    return lf->num_lines;
+  }
+  return 0;
+}
+
+static void _lf_delete (_lf_t *lf) {
+  lf->buf1 = NULL;
+  lf->buf2 = NULL;
+  lf->type = NULL;
+  free (lf->lines);
+  lf->lines = NULL;
+  free (lf);
+}
+
+typedef mediamark_t **(*playlist_guess_func_t) (_lf_t *lf);
+typedef mediamark_t **(*playlist_xml_guess_func_t) (_lf_t *lf, xml_node_t *);
+
+static _lf_t *_download_file (gGui_t *gui, const char *filename) {
+  _lf_t *lf;
+  download_t  download;
   
-  return buf;
+  if ((!filename) || (!filename[0])) {
+    fprintf (stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
+    return NULL;
+  }
+
+  download.buf    = NULL;
+  download.error  = NULL;
+  download.size   = 0;
+  download.status = 0; 
+  
+  if (!network_download (filename, &download)) {
+    xine_error (gui, "Unable to download '%s': %s", filename, download.error);
+    lf = NULL;
+  } else {
+    lf = _lf_new (download.size);
+    if (lf)
+      memcpy (lf->buf1, download.buf, lf->size);
+  }
+
+  SAFE_FREE (download.buf);
+  SAFE_FREE (download.error);
+  return lf;
 }
 
 #if 0
@@ -158,52 +258,73 @@ int mrl_look_like_playlist (const char *mrl) {
   return 0;
 }
  
-static char *_read_file(const char *filename, int *size) {
-  struct stat  st;
-  char        *buf = NULL;
-  int          fd, bytes_read;
+static _lf_t *_read_file (gGui_t *gui, const char *filename) {
+  struct stat st;
+  _lf_t *lf;
+  int fd, bytes_read;
+  size_t size;
 
-  if((!filename) || (!strlen(filename))) {
-    fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
+  if ((!filename) || (!filename[0])) {
+    fprintf (stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
     return NULL;
   }
 
   if (mrl_look_like_playlist (filename) && is_downloadable ((char *)filename))
-    return _download_file(filename, size);
+    return _download_file (gui, filename);
   
-  if(stat(filename, &st) < 0) {
-    fprintf(stderr, "%s(): Unable to stat() '%s' file: %s.\n",
-	    __XINE_FUNCTION__, filename, strerror(errno));
+  if (stat (filename, &st) < 0) {
+    fprintf (stderr, "%s(): Unable to stat() '%s' file: %s.\n", __XINE_FUNCTION__, filename, strerror (errno));
     return NULL;
   }
 
-  if((*size = st.st_size) == 0) {
+  if ((size = st.st_size) == 0) {
     fprintf(stderr, "%s(): File '%s' is empty.\n", __XINE_FUNCTION__, filename);
     return NULL;
   }
 
-  if((fd = xine_open_cloexec(filename, O_RDONLY)) == -1) {
-    fprintf(stderr, "%s(): open(%s) failed: %s.\n", __XINE_FUNCTION__, filename, strerror(errno));
+  if ((fd = xine_open_cloexec (filename, O_RDONLY)) == -1) {
+    fprintf (stderr, "%s(): open(%s) failed: %s.\n", __XINE_FUNCTION__, filename, strerror (errno));
     return NULL;
   }
   
-  if((buf = (char *) malloc(*size + 1)) == NULL) {
-    fprintf(stderr, "%s(): malloc() failed.\n", __XINE_FUNCTION__);
-    close(fd);
+  lf = _lf_new (size);
+  if (!lf) {
+    close (fd);
     return NULL;
   }
   
-  if((bytes_read = read(fd, buf, *size)) != *size) {
-    fprintf(stderr, "%s(): read() return wrong size (%d / %d): %s.\n",
-	    __XINE_FUNCTION__, bytes_read, *size, strerror(errno));
-    *size = bytes_read;
+  if ((bytes_read = read (fd, lf->buf1, size)) != (int)size) {
+    fprintf (stderr, "%s(): read() return wrong size (%d / %d): %s.\n",
+      __XINE_FUNCTION__, bytes_read, (int)size, strerror (errno));
+    lf->size = bytes_read;
   }
 
-  close(fd);
+  close (fd);
 
-  buf[*size] = '\0';
+  return lf;
+}
 
-  return buf;
+static void _lf_ext (_lf_t *lf, const char *filename)  {
+  const char *p = filename, *eb = NULL;
+
+  lf->filename = filename;
+  while (p[0]) {
+    if ((p[0] == '?') || (p[0] == '#'))
+      break;
+    if (p[0] == '/')
+      eb =  NULL;
+    else if (p[0] == '.')
+      eb = p + 1;
+    p += 1;
+  }
+  if (eb) {
+    size_t el = p - eb;
+
+    if (el > sizeof (lf->ext) - 1)
+      el = sizeof (lf->ext) - 1;
+    memcpy (lf->ext, eb, el);
+    lf->ext[el] = 0;
+  }
 }
 
 int mediamark_have_alternates(mediamark_t *mmk) {
@@ -370,46 +491,6 @@ int mediamark_free_mmk(mediamark_t **mmk) {
   return 0;
 }
 
-/*
- * Split lines from playlist->data
- */
-static int playlist_split_data(playlist_t *playlist) {
-  
-  if(playlist->data) {
-    char *buf, *pbuf, *p;
-
-    /* strsep modify original string, avoid its corruption */
-    buf = strdup(playlist->data);
-    playlist->numl = 0;
-
-    pbuf = buf;
-    while((p = xine_strsep(&pbuf, "\n")) != NULL) {
-      if(p && (p <= pbuf) && (strlen(p))) {
-
-	playlist->lines = (char **) realloc(playlist->lines, sizeof(char *) * (playlist->numl + 2));
-	
-	while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
-	  *(p + strlen(p) - 1) = '\0';
-
-	playlist->lines[playlist->numl++] = strdup(p);
-	playlist->lines[playlist->numl] = NULL;
-      }
-    }
-    
-    free(buf);
-  }
-  
-  return (playlist->numl > 0);
-}
-
-static void set_pos_to_value(char **p) {
-
-  ABORT_IF_NULL(*p);
-
-  while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
-  while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
-}
-
 static char *get_basedir(const char *filename) {
   char *path;
   char *origin = NULL;
@@ -449,602 +530,355 @@ static const char *concat_basedir(char *buffer, size_t size, const char *origin,
 /*
  * Playlists guessing
  */
-static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_pls_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
-  char         *extension;
 
-  if(filename) {
-    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
-      
-      extension = strrchr(filename, '.');
-      
-      if((extension) && (!strncasecmp(extension, ".pls", 4))) {
-	char *pls_content;
-	int   size;
-	
-	if((pls_content = _read_file(filename, &size)) != NULL) {
-	  
-	  playlist->data = pls_content;
-	  
-	  if(playlist_split_data(playlist)) {
-	    int   valid_pls     = 0;
-	    int   entries_pls   = 0;
-	    int   found_nument  = 0;
-	    int   stored_nument = 0;
-	    int   pl_line       = 0;
-	    int   linen         = 0;
-	    int   count         = 0;
-	    char *ln, *origin;
-	    const char *store_mrl;
-	    char  buffer[_PATH_MAX + _NAME_MAX + 2];
+  if (!strcasecmp (lf->ext, "pls")) {
+    if (_lf_split_lines (lf)) {
+      int   valid_pls     = 0;
+      int   entries_pls   = 0;
+      int   found_nument  = 0;
+      int   stored_nument = 0;
+      int   pl_line       = 0;
+      int   linen         = 0;
+      int   count         = 0;
+      char *origin;
+      const char *store_mrl, *ln;
+      char  buffer[_PATH_MAX + _NAME_MAX + 2];
 
-	    origin = get_basedir(filename);
-	    do {
-	      
-	      while((ln = playlist->lines[linen++]) != NULL) {
-		if(ln) {
+      origin = get_basedir (lf->filename);
+      do {
+        while ((ln = lf->lines[linen++]) != NULL) {
+          if (valid_pls) {
+            if (entries_pls) {
+              int entry;
 
-		  if(valid_pls) {
-		    
-		    if(entries_pls) {
-		      int   entry;
-		      
-		      if((!strncasecmp(ln, "file", 4)) && ((sscanf(ln + 4, "%d=", &entry)) == 1)) {
-			char *mrl = strchr(ln, '=');
-			
-			if(mrl)
-			  mrl++;
-			
-			if((entry && mrl) && 
-			   ((entry) <= entries_pls) && 
-			   (mmk && (!mmk[(entry - 1)]))) {
-			  stored_nument++;
-			  store_mrl = concat_basedir(buffer, sizeof(buffer), origin, mrl);
-			  mediamark_store_mmk(&mmk[(entry - 1)], store_mrl, NULL, NULL, 0, -1, 0, 0);
-			}
-			
-		      }
-		      
-		    }
-		    else {
-		      if((!strncasecmp(ln, "numberofentries", 15))
-			 && ((sscanf(ln + 15, "=%d", &entries_pls)) == 1)) {
-			
-			if(!found_nument) {
-			  if(entries_pls) {
-			    playlist->entries = entries_pls;
-			    mmk = (mediamark_t **) calloc((entries_pls + 1), sizeof(mediamark_t *));
-			    found_nument = 1;
-			  }
-			}
+              if ((!strncasecmp (ln, "file", 4)) && (( sscanf(ln + 4, "%d=", &entry)) == 1)) {
+                char *mrl = strchr (ln, '=');
 
-		      }
-		    }
-		    
-		  }
-		  else if((!strcasecmp(ln, "[playlist]"))) {
-		    if(!valid_pls) {
-		      valid_pls = 1;
-		      pl_line = linen;
-		    }
-		  }
-		  
-		}
-	      }
-	      
-	      count++;
-	      linen = pl_line;
+                if (mrl)
+                  mrl++;
+                if ((entry && mrl) && ((entry) <= entries_pls) && (mmk && (!mmk[entry - 1]))) {
+                  stored_nument++;
+                  store_mrl = concat_basedir (buffer, sizeof (buffer), origin, mrl);
+                  mediamark_store_mmk (&mmk[(entry - 1)], store_mrl, NULL, NULL, 0, -1, 0, 0);
+                }
+              }
+            } else {
+              if ((!strncasecmp (ln, "numberofentries", 15)) && ((sscanf (ln + 15, "=%d", &entries_pls)) == 1)) {
+                if (!found_nument) {
+                  if (entries_pls) {
+                    lf->num_entries = entries_pls;
+                    mmk = (mediamark_t **) calloc ((entries_pls + 1), sizeof (mediamark_t *));
+                    found_nument = 1;
+                  }
+                }
+              }
+            }
+          } else if ((!strcasecmp (ln, "[playlist]"))) {
+            if (!valid_pls) {
+              valid_pls = 1;
+              pl_line = linen;
+            }
+          }
+        }
+        count++;
+        linen = pl_line;
+      } while ((lf->num_entries && !stored_nument) && (count < 2));
+      free (origin);
 
-	    } while((playlist->entries && !stored_nument) && (count < 2));
-	    free(origin);
-	    
-	    if(mmk && valid_pls && entries_pls) {
-	      int i;
-	      
-	      mmk[entries_pls] = NULL;
+      if (mmk && valid_pls && entries_pls) {
+        int i;
 
-	      /* Fill missing entries */
-	      for(i = 0; i < entries_pls; i++) {
-		if(!mmk[i])
-		  mediamark_store_mmk(&mmk[i], _("!!Invalid entry!!"), NULL, NULL, 0, -1, 0, 0);
-	      }
-	      playlist->type = strdup("PLS");
-	    }
-
-	    while(playlist->numl) {
-	      free(playlist->lines[playlist->numl - 1]);
-	      playlist->numl--;
-	    }
-
-	    if(valid_pls && entries_pls) {
-	      SAFE_FREE(playlist->lines);
-	      free(pls_content);
-	      return mmk;
-	    }
-	  }
-	  SAFE_FREE(playlist->lines);
-	  free(pls_content);
-	}
+        mmk[entries_pls] = NULL;
+        /* Fill missing entries */
+        for (i = 0; i < entries_pls; i++) {
+          if (!mmk[i])
+            mediamark_store_mmk (&mmk[i], _("!!Invalid entry!!"), NULL, NULL, 0, -1, 0, 0);
+        }
+        lf->type = "PLS";
       }
+
+      if (valid_pls && entries_pls)
+        return mmk;
     }
   }
-  
   return NULL;
 }
 
-static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_m3u_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
   
-  if(filename) {
-    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
-      char *m3u_content;
-      int   size;
-      
-      if((m3u_content = _read_file(filename, &size)) != NULL) {
-	
-	playlist->data = m3u_content;
-	
-	if(playlist_split_data(playlist)) {
-	  int   valid_m3u   = 0;
-	  int   entries_m3u = 0;
-	  char *title       = NULL;
-	  char *origin;
-	  int   linen = 0;
-	  char *ln;
+  if (_lf_split_lines (lf)) {
+    int   valid_m3u   = 0;
+    int   entries_m3u = 0;
+    char *title       = NULL;
+    char *origin;
+    int   linen = 0;
+    const char *ln;
 
-	  origin = get_basedir(filename);	  
-	  
-	  while((ln = playlist->lines[linen++]) != NULL) {
-	    if(ln) {
-	      
-	      if(valid_m3u) {
-		
-		if(!strncmp(ln, "#EXTINF", 7)) {
-                  char *ptitle;
-		  if((ptitle = strchr(ln, ',')) != NULL) {
-		    ptitle++;
+    origin = get_basedir (lf->filename);
+    while ((ln = lf->lines[linen++]) != NULL) {
+      if (valid_m3u) {
+        if (!strncmp (ln, "#EXTINF", 7)) {
+          char *ptitle;
 
-		    SAFE_FREE(title);
+          if ((ptitle = strchr (ln, ',')) != NULL) {
+            ptitle++;
+            SAFE_FREE (title);
+            if (ptitle[0])
+              title = strdup (ptitle);
+          }
+        } else if (ln[0] != '#') {
+          char  buffer[_PATH_MAX + _NAME_MAX + 2];
+          const char *entry;
 
-		    if(strlen(ptitle))
-		      title = strdup(ptitle);
-		  }
-		}
-		else if (ln[0] != '#') {
-		  char  buffer[_PATH_MAX + _NAME_MAX + 2];
-		  const char *entry;
-		  
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
-		  entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
+          mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
+          entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
 
-		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0, 0);
-		  playlist->entries = ++entries_m3u;
+          mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0, 0);
+          lf->num_entries = ++entries_m3u;
 
-		  SAFE_FREE(title);
-		}
-		
-	      }
-	      else if((!strcasecmp(ln, "#EXTM3U")))
-		valid_m3u = 1;
-	    }
-	  }
-	  
-	  if(valid_m3u && entries_m3u) {
-	    mmk[entries_m3u] = NULL;
-	    playlist->type = strdup("M3U");
-	  }
-
-	  free(origin);
-          free(title);
-
-	  while(playlist->numl) {
-	    free(playlist->lines[playlist->numl - 1]);
-	    playlist->numl--;
-	  }
-	}
-	SAFE_FREE(playlist->lines);
-	
-	free(m3u_content);
-      }
+          SAFE_FREE (title);
+        }
+      } else if ((!strcasecmp (ln, "#EXTM3U")))
+        valid_m3u = 1;
     }
+    if (valid_m3u && entries_m3u) {
+      mmk[entries_m3u] = NULL;
+      lf->type = "M3U";
+    }
+    free (origin);
+    free (title);
   }
   
   return mmk;
 }
 
-static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_sfv_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
-      char  *extension;
-  
-      extension = strrchr(filename, '.');
-      
-      if((extension) && (!strncasecmp(extension, ".sfv", 4))) {
-	char *sfv_content;
-	int   size;
-	
-	if((sfv_content = _read_file(filename, &size)) != NULL) {
-	  
-	  playlist->data = sfv_content;
+  if (!strcasecmp (lf->ext, "sfv")) {
+    if (_lf_split_lines (lf)) {
+      int    valid_sfv = 0;
+      int    entries_sfv = 0;
+      char  *origin;
+      int    linen = 0;
+      char  *ln;
 
-	  if(playlist_split_data(playlist)) {
-	    int    valid_sfv = 0;
-	    int    entries_sfv = 0;
-	    char  *origin;
-	    int    linen = 0;
-	    char  *ln;
+      origin = get_basedir (lf->filename);
+      while ((ln = lf->lines[linen++]) != NULL) {
+        if (valid_sfv) {
+          if (strncmp (ln, ";", 1)) {
+            char            buffer[_PATH_MAX + _NAME_MAX + 2];
+            const char     *entry;
 
-	    origin = get_basedir(filename);
-	    
-	    while((ln = playlist->lines[linen++]) != NULL) {
-	      
-	      if(ln) {
-		
-		if(valid_sfv) {
-		  
-		  if(strncmp(ln, ";", 1)) {
-		    char            buffer[_PATH_MAX + _NAME_MAX + 2];
-		    const char     *entry;
-		    long long int   crc = 0;
-		    char           *p;
+            if (ln[0]) {
+              long long int crc = 0;
+              char *p = ln + strlen (ln) - 1, *q = NULL;
 
-		    p = ln + strlen(ln) - 1;
-		    if(p) {
+              while ((p > ln) && (*p != ' '))
+                p--;
+              if (p > ln) {
+                q = p;
+                *p = '\0';
+                p++;
+              }
+              if (p[0]) {
+                errno = 0;
+                crc = strtoll (p, &p, 16);
+                if ((errno == ERANGE) || (errno == EINVAL))
+                  crc = 0;
+              }
+              if (crc > 0) {
+                mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
+                entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
+                mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
+                lf->num_entries = ++entries_sfv;
+              }
+              if (q)
+                *q = ' ';
+            }
+          }
+        } else if (strlen(ln) > 1) {
+          long int   size;
+          int        h, m, s;
+          int        Y, M, D;
+          char       fn[2];
+          char       mon[4];
 
-		      while(p && (p > ln) && (*p != ' '))
-			p--;
-		      
-		      if(p > ln) {
-			*p = '\0';
-			p++;
-		      }
-
-		      if(p && strlen(p)) {
-			crc = strtoll(p, &p, 16);
-
-			if((errno == ERANGE) || (errno == EINVAL))
-			  crc = 0;
-
-		      }
-
-		      if(crc > 0) {
-			
-			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
-			
-		  	entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
-			mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
-			playlist->entries = ++entries_sfv;
-		      }
-		    }
-		  }
-		}
-		else if(strlen(ln) > 1) {
-		  long int   size;
-		  int        h, m, s;
-		  int        Y, M, D;
-		  char       fn[2];
-		  char       mon[4];
-		  
-		  if(((sscanf(ln, ";%ld %d:%d.%d %d-%d-%d %1s", &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) ||
-		     ((sscanf(ln, ";%ld %3s %d %d:%d:%d %d %1s", &size, &mon[0], &D, &h, &m, &s, &Y, &fn[0])) == 8))
-		    valid_sfv = 1;
-
-		}		
-	      }
-	    }
-
-	    if(valid_sfv && entries_sfv) {
-	      mmk[entries_sfv] = NULL;
-	      playlist->type = strdup("SFV");
-	    }
-	    
-	    free(origin);
-
-	    while(playlist->numl) {
-	      free(playlist->lines[playlist->numl - 1]);
-	      playlist->numl--;
-	    }
-	  }
-	  SAFE_FREE(playlist->lines);
-	  free(sfv_content);
-	}
+          if (((sscanf (ln, ";%ld %d:%d.%d %d-%d-%d %1s", &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) ||
+              ((sscanf (ln, ";%ld %3s %d %d:%d:%d %d %1s", &size, &mon[0], &D, &h, &m, &s, &Y, &fn[0])) == 8))
+            valid_sfv = 1;
+        }
       }
+
+      if (valid_sfv && entries_sfv) {
+        mmk[entries_sfv] = NULL;
+        lf->type = "SFV";
+      }
+      free (origin);
     }
   }
 
   return mmk;
 }
 
-static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_raw_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
-      char *raw_content;
-      int   size;
+  if (_lf_split_lines (lf)) {
+    char *origin;
+    int   entries_raw = 0;
+    int   linen = 0;
+    const char *ln;
 
-      if((raw_content = _read_file(filename, &size)) != NULL) {
-	
-	playlist->data = raw_content;
-	
-	if(playlist_split_data(playlist)) {
-	  char *origin;
-	  int   entries_raw = 0;
-	  int   linen = 0;
-	  char *ln;
-	  
-	  origin = get_basedir(filename);
+    origin = get_basedir (lf->filename);
+    while ((ln = lf->lines[linen++]) != NULL) {
+      if ((strncmp (ln, ";", 1)) && (strncmp (ln, "#", 1))) {
+        char        buffer[_PATH_MAX + _NAME_MAX + 2];
+        const char *entry;
 
-	  while((ln = playlist->lines[linen++]) != NULL) {
-	    if(ln) {
-	      
-	      if((strncmp(ln, ";", 1)) && (strncmp(ln, "#", 1))) {
-		char        buffer[_PATH_MAX + _NAME_MAX + 2];
-		const char *entry;
-		
-		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
-		
-	  	entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
-
-		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1, 0, 0);
-		playlist->entries = ++entries_raw;
-	      }
-	    }
-	  }
-	  
-	  if(entries_raw) {
-	    mmk[entries_raw] = NULL;
-	    playlist->type = strdup("RAW");
-	  }
-
-	  free(origin);
-
-	  while(playlist->numl) {
-	    free(playlist->lines[playlist->numl - 1]);
-	    playlist->numl--;
-	  }
-	}
-	SAFE_FREE(playlist->lines);
-	free(raw_content);
+        mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
+        entry = concat_basedir(buffer, sizeof(buffer), origin, ln);
+        mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1, 0, 0);
+        lf->num_entries = ++entries_raw;
       }
     }
+
+    if (entries_raw) {
+      mmk[entries_raw] = NULL;
+      lf->type = "RAW";
+    }
+    free (origin);
   }
   
   return mmk;
 }
 
-static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_toxine_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
-  
-  if(filename) {
-    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
-      int   entries_tox = 0;
-      char *tox_content;
-      int   size;
-      
-      if((tox_content = _read_file(filename, &size)) != NULL) {
-	
-	playlist->data = tox_content;
-	
-	if(playlist_split_data(playlist)) {
-	  char    buffer[32768], path[_PATH_MAX + _NAME_MAX + 2];
-	  char   *p, *pp, *origin;
-	  int     start = 0;
-	  int     linen = 0;
-	  char   *ln;
-	  
-	  memset(&buffer, 0, sizeof(buffer));
-	  p = buffer;
-	  origin = get_basedir(filename);
+  char *origin;
+  int entries_tox = 0;
 
-	  while((ln = playlist->lines[linen++]) != NULL) {
-	    
-	    if(!start) {
-	      memset(&buffer, 0, sizeof(buffer));
-	      p = buffer;
-	    }
+  {
+    char *text = _lf_dup (lf);
+    xitk_cfg_parse_t *tree = xitk_cfg_parse (text, XITK_CFG_PARSE_DEBUG);
+    origin = get_basedir (lf->filename);
 
-	    if((ln) && (strlen(ln))) {
-	      
-	      if(strncmp(ln, "#", 1)) {
-		
-		pp = ln;
-		
-		while(*pp != '\0') {
+    if (tree && origin) {
+      xitk_cfg_parse_t *entry;
+      int num_entries = 0;
 
-		  if(!strncasecmp(pp, "entry {", 7)) {
-		    if(!start) {
-		      start = 1;
-		      pp += 7;
-		      memset(&buffer, 0, sizeof(buffer));
-		      p = buffer;
-		    }
-		    else {
-		      memset(&buffer, 0, sizeof(buffer));
-		      p = buffer;
-		      goto __discard;
-		    }
-		  }
-		  if((*pp == '}') && (*(pp + 1) == ';')) {
-		    if(start) {
-		      start = 0;
-		      pp += 2;
-		      
-		      { /* OKAY, check found string */
-			mediamark_t   mmkf;
-			int           mmkf_members[7];
-			char         *line, *pline;
-			char         *m;
-			
-			mmkf.ident      = NULL;
-			mmkf.sub        = NULL;
-			mmkf.start      = 0;
-			mmkf.end        = -1;
-			mmkf.av_offset  = 0;
-			mmkf.spu_offset = 0;
-			mmkf.mrl        = NULL;
+      for (entry = tree->first_child ? tree + tree->first_child : NULL;
+        entry; entry = entry->next ? tree + entry->next : NULL)
+        if ((entry->key >= 0) && !strcmp (text + entry->key, "entry"))
+          num_entries += 1;
+      mmk = malloc (sizeof (*mmk) * (num_entries + 2));
 
-			mmkf_members[0] = 0;  /* ident */
-			mmkf_members[1] = -1; /* mrl */
-			mmkf_members[2] = 0;  /* start */
-			mmkf_members[3] = 0;  /* end */
-			mmkf_members[4] = 0;  /* av offset */
-			mmkf_members[5] = 0;  /* spu offset */
-			mmkf_members[6] = 0;  /* sub */
-			
-			line = strdup(atoa(buffer));
-			
-			pline = line;
-			while((m = xine_strsep(&pline, ";")) != NULL) {
-			  char *key;
-			  const char *entry;
-			  
-			  key = atoa(m);
-			  if(strlen(key)) {
-			    
-			    if(!strncasecmp(key, "identifier", 10)) {
-			      if(mmkf_members[0] == 0) {
-				mmkf_members[0] = 1;
-				set_pos_to_value(&key);
-				mmkf.ident = strdup(key);
-			      }
-			    }
-			    else if(!strncasecmp(key, "subtitle", 8)) {
-			      if(mmkf_members[6] == 0) {
-				set_pos_to_value(&key);
-				/* Workaround old toxine playlist version bug */
-				if(strcmp(key, "(null)")) {
-				  mmkf_members[6] = 1;
-				  entry = concat_basedir(path, sizeof(path), origin, key);
-				  mmkf.sub = strdup(entry);
-				}
-			      }
-			    }
-			    else if(!strncasecmp(key, "spu_offset", 10)) {
-			      if(mmkf_members[5] == 0) {
-				mmkf_members[5] = 1;
-				set_pos_to_value(&key);
-				mmkf.spu_offset = strtol(key, &key, 10);
-			      }
-			    }
-			    else if(!strncasecmp(key, "av_offset", 9)) {
-			      if(mmkf_members[4] == 0) {
-				mmkf_members[4] = 1;
-				set_pos_to_value(&key);
-				mmkf.av_offset = strtol(key, &key, 10);
-			      }
-			    }
-			    else if(!strncasecmp(key, "start", 5)) {
-			      if(mmkf_members[2] == 0) {
-				mmkf_members[2] = 1;
-				set_pos_to_value(&key);
-				mmkf.start = strtol(key, &key, 10);
-			      }
-			    }
-			    else if(!strncasecmp(key, "end", 3)) {
-			      if(mmkf_members[3] == 0) {
-				mmkf_members[3] = 1;
-				set_pos_to_value(&key);
-				mmkf.end = strtol(key, &key, 10);
-			      }
-			    }
-			    else if(!strncasecmp(key, "mrl", 3)) {
-			      if(mmkf_members[1] == -1) {
-				mmkf_members[1] = 1;
-				set_pos_to_value(&key);
-				entry = concat_basedir(path, sizeof(path), origin, key);
-				mmkf.mrl = strdup(entry);
-			      }
-			    }
-			  }
-			}
-			
-			if((mmkf_members[1] == 0) || (mmkf_members[1] == -1)) {
-			  /*  printf("wow, no mrl found\n"); */
-			  goto __discard;
-			}
-			
-			if(mmkf_members[0] == 0)
-			  mmkf.ident = mmkf.mrl;
-			
-			/*
-			  STORE new mmk;
-			*/
+      for (entry = tree->first_child ? tree + tree->first_child : NULL;
+        entry; entry = entry->next ? tree + entry->next : NULL) {
+        if ((entry->key >= 0) && !strcmp (text + entry->key, "entry")) {
+          xitk_cfg_parse_t *elem;
+          char path[_PATH_MAX + _NAME_MAX + 2];
+          mediamark_t   mmkf;
+          int           mmkf_members;
+
+          mmkf.ident      = NULL;
+          mmkf.sub        = NULL;
+          mmkf.start      = 0;
+          mmkf.end        = -1;
+          mmkf.av_offset  = 0;
+          mmkf.spu_offset = 0;
+          mmkf.mrl        = NULL;
+          mmkf_members    = 0;  /* ident, mrl, start, end, av offset, spu offset, sub */
+
+          for (elem = entry->first_child ? tree + entry->first_child : NULL;
+            elem; elem = elem->next ? tree + elem->next : NULL) {
+            const char *key = elem->key >= 0 ? text + elem->key : "";
+            char *val = elem->value >= 0 ? text + elem->value : path;
+
+            path[0] = 0;
+            if (!strcmp (key, "identifier")) {
+              if (!(mmkf_members & 0x01)) {
+                mmkf_members |= 0x01;
+                mmkf.ident = strdup (val);
+              }
+            } else if (!strcmp (key, "subtitle")) {
+              if (!(mmkf_members & 0x40)) {
+                /* Workaround old toxine playlist version bug */
+                if (strcmp (val, "(null)")) {
+                  mmkf_members |= 0x40;
+                  mmkf.sub = strdup (concat_basedir (path, sizeof (path), origin, val));
+                }
+              }
+            } else if (!strcmp (key, "spu_offset")) {
+              if (!(mmkf_members & 0x20)) {
+                mmkf_members |= 0x20;
+                mmkf.spu_offset = strtol (val, &val, 10);
+              }
+            } else if (!strcmp (key, "av_offset")) {
+              if (!(mmkf_members & 0x10)) {
+                mmkf_members |= 0x10;
+                mmkf.av_offset = strtol (val, &val, 10);
+              }
+            } else if (!strcmp (key, "start")) {
+              if (!(mmkf_members & 0x04)) {
+                mmkf_members |= 0x04;
+                mmkf.start = strtol (val, &val, 10);
+              }
+            } else if (!strcmp (key, "end")) {
+              if (!(mmkf_members & 0x08)) {
+                mmkf_members |= 0x08;
+                mmkf.end = strtol (val, &val, 10);
+              }
+            } else if (!strcmp (key, "mrl")) {
+              if (!(mmkf_members & 0x02)) {
+                mmkf_members |= 0x02;
+                mmkf.mrl = strdup (concat_basedir (path, sizeof (path), origin, val));
+              }
+            }
+          }
 #if 0
-			printf("DUMP mediamark entry:\n");
-			printf("ident:     '%s'\n", mmkf.ident);
-			printf("mrl:       '%s'\n", mmkf.mrl);
-			printf("sub:       '%s'\n", mmkf.sub);
-			printf("start:      %d\n", mmkf.start);
-			printf("end:        %d\n", mmkf.end);
-			printf("av_offset:  %d\n", mmkf.av_offset);
-			printf("spu_offset: %d\n", mmkf.spu_offset);
+          printf ("DUMP mediamark entry:\n");
+          printf ("ident:     '%s'\n", mmkf.ident);
+          printf ("mrl:       '%s'\n", mmkf.mrl);
+          printf ("sub:       '%s'\n", mmkf.sub);
+          printf ("start:      %d\n", mmkf.start);
+          printf ("end:        %d\n", mmkf.end);
+          printf ("av_offset:  %d\n", mmkf.av_offset);
+          printf ("spu_offset: %d\n", mmkf.spu_offset);
 #endif
-			
-			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
-			
-			mediamark_store_mmk(&mmk[entries_tox], 
-					    mmkf.mrl, mmkf.ident, mmkf.sub, 
-					    mmkf.start, mmkf.end, mmkf.av_offset, mmkf.spu_offset);
-			playlist->entries = ++entries_tox;
-
-			free(line);
-			
-			if(mmkf_members[0])
-			  free(mmkf.ident);
-
-			SAFE_FREE(mmkf.sub);
-
-			free(mmkf.mrl);
-		      }
-		      
-		    }
-		    else {
-		      memset(&buffer, 0, sizeof(buffer));
-		      p = buffer;
-		      goto __discard;
-		    }
-		  }
-		  
-		  if(*pp != '\0') {
-		    /* buffer full? don't copy */
-                    if (p < buffer + sizeof (buffer) - 1)
-		      *p++ = *pp;
-		    pp++;
-		  }
-		}
-		
-	      }
-	    }
-	  __discard: ;
-	  }
-
-	  free(origin);
-	  
-	  if(entries_tox) {
-	    mmk[entries_tox] = NULL;
-	    playlist->type = strdup("TOX");
-	  }
-
-	  while(playlist->numl) {
-	    free(playlist->lines[playlist->numl - 1]);
-	    playlist->numl--;
-	  }
-	}
-	SAFE_FREE(playlist->lines);
-	free(tox_content);
+          if ((mmkf_members & 0x02) && mmk) {
+            if (!(mmkf_members & 0x01))
+              mmkf.ident = mmkf.mrl;
+            mediamark_store_mmk (&mmk[entries_tox], mmkf.mrl, mmkf.ident, mmkf.sub,
+              mmkf.start, mmkf.end, mmkf.av_offset, mmkf.spu_offset);
+            lf->num_entries = ++entries_tox;
+          }
+          if (mmkf_members & 0x01)
+            free (mmkf.ident);
+          free (mmkf.sub);
+          free (mmkf.mrl);
+        }
       }
     }
+    free (origin);
+    xitk_cfg_unparse (tree);
   }
-  return mmk;
+  if (mmk && entries_tox) {
+    mmk[entries_tox] = NULL;
+    lf->type = "TOX";
+    return mmk;
+  }
+  free (mmk);
+  return NULL;
 }
 
 /*
  * XML based playlists
  */
-static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_asx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -1148,7 +982,7 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		  
 		mediamark_store_mmk(&mmk[entries_asx], href, real_title, sub, 0, -1, 0, 0);
-		playlist->entries = ++entries_asx;
+		lf->num_entries = ++entries_asx;
 
 		SAFE_FREE(real_title);
 		SAFE_FREE(atitle_orig);
@@ -1177,37 +1011,29 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 #endif
       
     /* Maybe it's 'ASF <url> */
-    if(entries_asx == 0) {
-      
-      playlist->data = xml_content;
-      
-      if(playlist_split_data(playlist)) {
-	int    linen = 0;
-	char  *ln;
-	
-	while((ln = playlist->lines[linen++]) != NULL) {
-	  
-	  if(!strncasecmp("ASF", ln, 3)) {
-	    char *p = ln + 3;
-	    
-	    while(p && ((*p == ' ') || (*p == '\t')))
-	      p++;
-	    
-	    if(p && strlen(p)) {
-	      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
-	      
-	      mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
-	      playlist->entries = ++entries_asx;
-	    }
-	  }
-	}
-      }
-      SAFE_FREE(playlist->lines);
-    }
+    if (entries_asx == 0) {
+      if (_lf_split_lines (lf)) {
+        int    linen = 0;
+        const char *ln;
 
-    if(entries_asx) {
+        while ((ln = lf->lines[linen++]) != NULL) {
+          if (!strncasecmp ("ASF", ln, 3)) {
+            const char *p = ln + 3;
+
+            while (p && ((*p == ' ') || (*p == '\t')))
+              p++;
+            if (p && p[0]) {
+              mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
+              mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
+              lf->num_entries = ++entries_asx;
+            }
+          }
+        }
+      }
+    }
+    if (entries_asx) {
       mmk[entries_asx] = NULL;
-      playlist->type = strdup("ASX3");
+      lf->type = "ASX3";
       return mmk;
     }
   }
@@ -1215,14 +1041,14 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
   return NULL;
 }
 
-static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entries, xml_node_t *entry) {
+static void __gx_get_entries (_lf_t *lf, mediamark_t ***mmk, int *entries, xml_node_t *entry) {
   xml_property_t  *prop;
   xml_node_t      *ref;
   xml_node_t      *node = entry;  
   
   while(node) {
     if(!strcasecmp(node->name, "SUB"))
-      __gx_get_entries(playlist, mmk, entries, node->child);
+      __gx_get_entries (lf, mmk, entries, node->child);
     else if(!strcasecmp(node->name, "ENTRY")) {
       char *title  = NULL;
       char *href   = NULL;
@@ -1276,7 +1102,7 @@ static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entr
 	(*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
 	
 	mediamark_store_mmk(&(*mmk)[*entries], href, (atitle && strlen(atitle)) ? atitle : NULL, NULL, start, -1, 0, 0);
-	playlist->entries = ++(*entries);
+	lf->num_entries = ++(*entries);
 	
 	free(atitle);
       }
@@ -1288,7 +1114,7 @@ static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entr
     node = node->next;
   }
 }
-static mediamark_t **xml_gx_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_gx_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -1312,10 +1138,10 @@ static mediamark_t **xml_gx_playlist(playlist_t *playlist, const char *filename,
 	  while(gx_entry) {
 
 	    if(!strcasecmp(gx_entry->name, "SUB")) {
-	      __gx_get_entries(playlist, &mmk, &entries_gx, gx_entry->child);
+	      __gx_get_entries (lf, &mmk, &entries_gx, gx_entry->child);
 	    }
 	    else if(!strcasecmp(gx_entry->name, "ENTRY"))
-	      __gx_get_entries(playlist, &mmk, &entries_gx, gx_entry);
+	      __gx_get_entries (lf, &mmk, &entries_gx, gx_entry);
 
 	    gx_entry = gx_entry->next;
 	  }
@@ -1333,7 +1159,7 @@ static mediamark_t **xml_gx_playlist(playlist_t *playlist, const char *filename,
     
     if(entries_gx) {
       mmk[entries_gx] = NULL;
-      playlist->type = strdup("GXMM");
+      lf->type = "GXMM";
       return mmk;
     }
   }
@@ -1341,7 +1167,7 @@ static mediamark_t **xml_gx_playlist(playlist_t *playlist, const char *filename,
   return NULL;
 }
 
-static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_noatun_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -1407,17 +1233,17 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
                 else
                   real_title = strdup(title);
 	      }
-	      
+
 	      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
-	      
+
 	      mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
-	      playlist->entries = ++entries_noa;
-	      
+              lf->num_entries = ++entries_noa;
+
 	      free(real_title);
 	      
 	    }
 	  }
-	  
+
 	  noa_entry = noa_entry->next;
 	}
       }
@@ -1429,7 +1255,7 @@ static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filen
     
     if(entries_noa) {
       mmk[entries_noa] = NULL;
-      playlist->type = strdup("NOATUN");
+      lf->type = "NOATUN";
       return mmk;
     }
   }
@@ -2222,7 +2048,7 @@ static void smil_free_smil(smil_t *smil) {
   SAFE_FREE(smil->base);
 }
 
-static mediamark_t **xml_smil_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_smil_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -2356,10 +2182,10 @@ static mediamark_t **xml_smil_playlist(playlist_t *playlist, const char *filenam
       fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
 #endif    
     
-    if(entries_smil) {
+    if (entries_smil) {
       mmk[entries_smil] = NULL;
-      playlist->entries = entries_smil;
-      playlist->type    = strdup("SMIL");
+      lf->num_entries = entries_smil;
+      lf->type    = "SMIL";
       return mmk;
     }
   }
@@ -2370,7 +2196,7 @@ static mediamark_t **xml_smil_playlist(playlist_t *playlist, const char *filenam
  * ********************************** SMIL END ***********************************
  */
 
-static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_freevo_playlist (_lf_t *lf, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -2384,7 +2210,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
       char *sub    = NULL;
       char *title  = NULL;
 
-      origin = get_basedir(filename);
+      origin = get_basedir (lf->filename);
 	  
       fvo_entry = xml_tree->child;
       
@@ -2436,7 +2262,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_fvo + 2));
 		  
 		  mediamark_store_mmk(&mmk[entries_fvo], url, title, sub, 0, -1, 0, 0);
-		  playlist->entries = ++entries_fvo;
+		  lf->num_entries = ++entries_fvo;
 		  
 		  free(url);
 		  url = NULL;
@@ -2465,7 +2291,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
     
     if(entries_fvo) {
       mmk[entries_fvo] = NULL;
-      playlist->type = strdup("FREEVO");
+      lf->type = "FREEVO";
       return mmk;
     }
   }
@@ -2473,44 +2299,38 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
   return NULL;
 }
 
-static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_xml_based_playlist (_lf_t *lf) {
   mediamark_t **mmk = NULL;
-
-  if(filename) {
-    char            *xml_content;
-    int              size;
-    int              result;
-    xml_node_t      *xml_tree, *top_xml_tree;
+  char            *xml_content;
+  int              result;
+  xml_node_t      *xml_tree, *top_xml_tree;
     
-    if((xml_content = _read_file(filename, &size)) != NULL) {
-      int                         i;
-      playlist_xml_guess_func_t   guess_functions[] = {
-	xml_asx_playlist,
-	xml_gx_playlist,
-	xml_noatun_playlist,
-	xml_smil_playlist,
-	xml_freevo_playlist,
-	NULL
-      };
+  if ((xml_content = _lf_dup (lf)) != NULL) {
+    int                         i;
+    playlist_xml_guess_func_t guess_functions[] = {
+      xml_asx_playlist,
+      xml_gx_playlist,
+      xml_noatun_playlist,
+      xml_smil_playlist,
+      xml_freevo_playlist,
+      NULL
+    };
 
-      xml_parser_init_R(xml_parser_t *xml, xml_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree_R(xml, &xml_tree)) != XML_PARSER_OK)
-	goto __failure;
+    xml_parser_init_R (xml_parser_t *xml, xml_content, lf->size, XML_PARSER_CASE_INSENSITIVE);
+    if ((result = xml_parser_build_tree_R (xml, &xml_tree)) != XML_PARSER_OK)
+      goto __failure;
       
-      top_xml_tree = xml_tree;
+    top_xml_tree = xml_tree;
 
-      /* Check all playlists */
-      for(i = 0; guess_functions[i]; i++) {
-	if((mmk = guess_functions[i](playlist, filename, xml_content, xml_tree)))
-	  break;
-      }
-      
-      xml_parser_free_tree(top_xml_tree);
-    __failure:
-      
-      xml_parser_finalize_R(xml);
-      free(xml_content);
+    /* Check all playlists */
+    for (i = 0; guess_functions[i]; i++) {
+      if ((mmk = guess_functions[i] (lf, xml_tree)))
+        break;
     }
+      
+    xml_parser_free_tree (top_xml_tree);
+    __failure:
+    xml_parser_finalize_R (xml);
   }
   
   return mmk;
@@ -2806,13 +2626,28 @@ void mediamark_delete_entry(int offset) {
   }
 }
 
-int mediamark_concat_mediamarks(const char *_filename) {
+static _lf_t *_lf_get (gGui_t *gui, const char *_filename) {
+  _lf_t *lf;
+  const char *filename = _filename;
+
+  if(_filename) {
+    if(!strncasecmp("file:/", _filename, 6))
+      filename = (_filename + 6);
+  }
+
+  lf = _read_file (gui, filename);
+  if (!lf)
+    return NULL;
+  _lf_ext (lf, filename);
+  return lf;
+}
+
+int mediamark_concat_mediamarks(const char *filename) {
   gGui_t *gui = gGui;
-  playlist_t             *playlist;
-  int                     i;
-  mediamark_t           **mmk = NULL;
-  const char             *filename = _filename;
-  playlist_guess_func_t   guess_functions[] = {
+  _lf_t *lf;
+  size_t i;
+  mediamark_t **mmk = NULL;
+  static const playlist_guess_func_t guess_functions[] = {
     guess_xml_based_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
@@ -2822,15 +2657,12 @@ int mediamark_concat_mediamarks(const char *_filename) {
     NULL
   };
 
-  if(_filename) {
-    if(!strncasecmp("file:/", _filename, 6))
-      filename = (_filename + 6);
-  }
+  lf = _lf_get (gui, filename);
+  if (!lf)
+    return 0;
 
-  playlist = (playlist_t *) calloc(1, sizeof(playlist_t));
-
-  for(i = 0; guess_functions[i]; i++) {
-    if((mmk = guess_functions[i](playlist, filename)))
+  for (i = 0; guess_functions[i]; i++) {
+    if ((mmk = guess_functions[i] (lf)))
       break;
   }
   
@@ -2841,34 +2673,30 @@ int mediamark_concat_mediamarks(const char *_filename) {
   }
   else {
     fprintf(stderr, _("Playlist file (%s) is invalid.\n"), filename);
-    SAFE_FREE(playlist);
+    _lf_delete (lf);
     return 0;
   }
 
   gui->playlist.cur = gui->playlist.num;
 
-  for(i = 0; i < playlist->entries; i++)
+  for (i = 0; i < lf->num_entries; i++)
     mediamark_append_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, 
 			   mmk[i]->start, mmk[i]->end, mmk[i]->av_offset, mmk[i]->spu_offset);
   
-  for(i = 0; i < playlist->entries; i++)
+  for (i = 0; i < lf->num_entries; i++)
     (void) mediamark_free_mmk(&mmk[i]);
   
-  SAFE_FREE(mmk);
-  SAFE_FREE(playlist->type);
-  SAFE_FREE(playlist);
-
+  SAFE_FREE (mmk);
+  _lf_delete (lf);
   return 1;
 }
 
-void mediamark_load_mediamarks(const char *_filename) {
+void mediamark_load_mediamarks(const char *filename) {
   gGui_t *gui = gGui;
-  playlist_t             *playlist;
-  int                     i, onum;
-  mediamark_t           **mmk = NULL;
-  mediamark_t           **ommk;
-  const char             *filename = _filename;
-  playlist_guess_func_t   guess_functions[] = {
+  _lf_t *lf;
+  int i, onum;
+  mediamark_t **mmk = NULL, **ommk;
+  static const playlist_guess_func_t guess_functions[] = {
     guess_xml_based_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
@@ -2878,15 +2706,12 @@ void mediamark_load_mediamarks(const char *_filename) {
     NULL
   };
 
-  if(_filename) {
-    if(!strncasecmp("file:/", _filename, 6))
-      filename = (_filename + 6);
-  }
+  lf = _lf_get (gui, filename);
+  if (!lf)
+    return;
 
-  playlist = (playlist_t *) calloc(1, sizeof(playlist_t));
-
-  for(i = 0; guess_functions[i]; i++) {
-    if((mmk = guess_functions[i](playlist, filename)))
+  for (i = 0; guess_functions[i]; i++) {
+    if ((mmk = guess_functions[i] (lf)))
       break;
   }
   
@@ -2897,7 +2722,7 @@ void mediamark_load_mediamarks(const char *_filename) {
   }
   else {
     fprintf(stderr, _("Playlist file (%s) is invalid.\n"), filename);
-    SAFE_FREE(playlist);
+    _lf_delete (lf);
     return;
   }
 
@@ -2905,7 +2730,7 @@ void mediamark_load_mediamarks(const char *_filename) {
   onum = gui->playlist.num;
   
   gui->playlist.mmk = mmk;
-  gui->playlist.num = playlist->entries;
+  gui->playlist.num = lf->num_entries;
 
   if(gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE)
     gui->playlist.cur = mediamark_get_shuffle_next();
@@ -2917,8 +2742,7 @@ void mediamark_load_mediamarks(const char *_filename) {
   
   SAFE_FREE(ommk);
 
-  SAFE_FREE(playlist->type);
-  SAFE_FREE(playlist);
+  _lf_delete (lf);
 }
 
 void mediamark_save_mediamarks(const char *filename) {
@@ -3060,171 +2884,162 @@ void mediamark_collect_from_directory(char *filepathname) {
 /*
  *  EDITOR
  */
-static void mmkeditor_exit(xitk_widget_t *w, void *data) {
+static void _mmkedit_exit (xitk_widget_t *w, void *data, int state) {
+  xui_mmkedit_t *mmkedit = data;
 
-  if(mmkeditor.running) {
-    mmkeditor.running = 0;
-    mmkeditor.visible = 0;
-
-    gui_save_window_pos (gGui, "mmk_editor", mmkeditor.widget_key);
-
-    mmkeditor.mmk = NULL;
-    
-    xitk_unregister_event_handler(&mmkeditor.widget_key);
-
-    xitk_window_destroy_window(mmkeditor.xwin);
-    mmkeditor.xwin = NULL;
-    /* xitk_dlist_init (&mmkeditor.widget_list.list); */
-
-    playlist_get_input_focus (gGui);
-  }
+  (void)w;
+  (void)state;
+  mmkedit->visible = 0;
+  gui_save_window_pos (mmkedit->gui, "mmk_editor", mmkedit->widget_key);
+  mmkedit->mmk = NULL;
+  xitk_unregister_event_handler (&mmkedit->widget_key);
+  xitk_window_destroy_window (mmkedit->xwin);
+  mmkedit->xwin = NULL;
+  /* xitk_dlist_init (&mmkedit->widget_list.list); */
+  playlist_get_input_focus (mmkedit->gui);
+  mmkedit->gui->mmkedit = NULL;
+  free (mmkedit);
 }
 
-static void mmkeditor_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static void _mmkedit_handle_key_event (void *data, const xitk_key_event_t *ke) {
+  xui_mmkedit_t *mmkedit = (xui_mmkedit_t *)data;
 
   if (ke->event == XITK_KEY_PRESS) {
     if (ke->key_pressed == XK_Escape)
-      mmkeditor_exit(NULL, NULL);
+      _mmkedit_exit (NULL, mmkedit, 0);
     else
-      gui_handle_key_event (gGui, ke);
+      gui_handle_key_event (mmkedit->gui, ke);
   }
 }
 
-static const xitk_event_cbs_t mmkeditor_event_cbs = {
-  .key_cb            = mmkeditor_handle_key_event,
+static const xitk_event_cbs_t mmkedit_event_cbs = {
+  .key_cb = _mmkedit_handle_key_event
 };
 
-void mmk_editor_show_tips(int enabled, unsigned long timeout) {
-  
-  if(mmkeditor.running) {
-    if(enabled)
-      xitk_set_widgets_tips_timeout(mmkeditor.widget_list, timeout);
+void mmk_editor_show_tips (gGui_t *gui, int enabled, unsigned long timeout) {
+  if (gui && gui->mmkedit) {
+    if (enabled)
+      xitk_set_widgets_tips_timeout (gui->mmkedit->widget_list, timeout);
     else
-      xitk_disable_widgets_tips(mmkeditor.widget_list);
+      xitk_disable_widgets_tips (gui->mmkedit->widget_list);
   }
 }
 
-/*
-void mmk_editor_update_tips_timeout(unsigned long timeout) {
-  if(mmkeditor.running)
-    xitk_set_widgets_tips_timeout(mmkeditor.widget_list, timeout);
-}
-*/
-
-int mmk_editor_is_visible(void) {
-  if(mmkeditor.running)
-    return mmkeditor.visible;
-  
-  return 0;
+void mmk_editor_raise_window (gGui_t *gui) {
+  if (gui && gui->mmkedit)
+    raise_window (gui, gui->mmkedit->xwin, gui->mmkedit->visible, 1);
 }
 
-int mmk_editor_is_running(void) {
-  return mmkeditor.running;
+void mmk_editor_toggle_visibility (gGui_t *gui) {
+  if (gui && gui->mmkedit)
+    toggle_window (gui, gui->mmkedit->xwin, gui->mmkedit->widget_list, &gui->mmkedit->visible, 1);
 }
 
-void mmk_editor_raise_window(void) {
-  if(mmkeditor.running)
-    raise_window (gGui, mmkeditor.xwin, mmkeditor.visible, mmkeditor.running);
+void mmk_editor_end (gGui_t *gui) {
+  if (gui && gui->mmkedit)
+    _mmkedit_exit (NULL, gui->mmkedit, 0);
 }
 
-void mmk_editor_toggle_visibility(void) {
-  if(mmkeditor.running)
-    toggle_window (gGui, mmkeditor.xwin, mmkeditor.widget_list, &mmkeditor.visible, mmkeditor.running);
+static void _mmkedit_set_mmk (xui_mmkedit_t *mmkedit, mediamark_t **mmk) {
+  mmkedit->mmk = mmk;
+  xitk_inputtext_change_text (mmkedit->mrl, (*mmk)->mrl);
+  xitk_inputtext_change_text (mmkedit->ident, (*mmk)->ident);
+  xitk_inputtext_change_text (mmkedit->sub, (*mmk)->sub);
+  xitk_intbox_set_value (mmkedit->start, (*mmk)->start);
+  xitk_intbox_set_value (mmkedit->end, (*mmk)->end);
+  xitk_intbox_set_value (mmkedit->av_offset, (*mmk)->av_offset);
+  xitk_intbox_set_value (mmkedit->spu_offset, (*mmk)->spu_offset);
 }
 
-void mmk_editor_end(void) {
-  mmkeditor_exit(NULL, NULL);
+void mmk_editor_set_mmk (gGui_t *gui, mediamark_t **mmk) {
+  if (gui && gui->mmkedit)
+    _mmkedit_set_mmk (gui->mmkedit, mmk);
 }
 
-void mmkeditor_set_mmk(mediamark_t **mmk) {
-  
-  if(mmkeditor.running) {
-    mmkeditor.mmk = mmk;
-    
-    xitk_inputtext_change_text(mmkeditor.mrl, (*mmk)->mrl);
-    xitk_inputtext_change_text(mmkeditor.ident, (*mmk)->ident);
-    xitk_inputtext_change_text(mmkeditor.sub, (*mmk)->sub);
-    xitk_intbox_set_value(mmkeditor.start, (*mmk)->start);
-    xitk_intbox_set_value(mmkeditor.end, (*mmk)->end);
-    xitk_intbox_set_value(mmkeditor.av_offset, (*mmk)->av_offset);
-    xitk_intbox_set_value(mmkeditor.spu_offset, (*mmk)->spu_offset);
-  }
-}
-
-static void mmkeditor_apply(xitk_widget_t *w, void *data) {
+static void _mmkedit_apply (xitk_widget_t *w, void *data, int state) {
+  xui_mmkedit_t *mmkedit = data;
   const char *sub;
   char       *ident, *mrl;
   int         start, end, av_offset, spu_offset;
 
-  if(mmkeditor.mmk) {
+  (void)w;
+  (void)state;
+  if (mmkedit->mmk) {
     
-    mrl = atoa(xitk_inputtext_get_text(mmkeditor.mrl));
+    mrl = atoa (xitk_inputtext_get_text (mmkedit->mrl));
     if (!mrl[0])
-      mrl = strdup((*mmkeditor.mmk)->mrl);
+      mrl = strdup ((*mmkedit->mmk)->mrl);
     else
-      mrl = strdup(mrl);
+      mrl = strdup (mrl);
     
-    ident = atoa(xitk_inputtext_get_text(mmkeditor.ident));
+    ident = atoa (xitk_inputtext_get_text (mmkedit->ident));
     if (!ident[0])
-      ident = strdup(mrl);
+      ident = strdup (mrl);
     else
-      ident = strdup(ident);
+      ident = strdup (ident);
 
-    sub = xitk_inputtext_get_text(mmkeditor.sub);
-    if(sub && (!strlen(sub)))
+    sub = xitk_inputtext_get_text (mmkedit->sub);
+    if (sub && (!sub[0]))
       sub = NULL;
     
-    if((start = xitk_intbox_get_value(mmkeditor.start)) < 0)
+    if ((start = xitk_intbox_get_value (mmkedit->start)) < 0)
       start = 0;
 
-    if((end = xitk_intbox_get_value(mmkeditor.end)) <= -1)
+    if ((end = xitk_intbox_get_value (mmkedit->end)) <= -1)
       end = -1;
     else if (end < start)
       end = start + 1;
     
-    av_offset  = xitk_intbox_get_value(mmkeditor.av_offset);
-    spu_offset = xitk_intbox_get_value(mmkeditor.spu_offset);
+    av_offset  = xitk_intbox_get_value (mmkedit->av_offset);
+    spu_offset = xitk_intbox_get_value (mmkedit->spu_offset);
     
-    mediamark_replace_entry(mmkeditor.mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
-    if(mmkeditor.callback)
-      mmkeditor.callback(mmkeditor.user_data);
+    mediamark_replace_entry (mmkedit->mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
+    if (mmkedit->callback)
+      mmkedit->callback (mmkedit->user_data);
 
-    free(mrl);
-    free(ident);
+    free (mrl);
+    free (ident);
   }  
 }
 
-static void mmkeditor_ok(xitk_widget_t *w, void *data) {
-  mmkeditor_apply(NULL, NULL);
-  mmkeditor_exit(NULL, NULL);
+static void _mmkedit_ok (xitk_widget_t *w, void *data, int state) {
+  xui_mmkedit_t *mmkedit = (xui_mmkedit_t *)data;
+
+  (void)w;
+  _mmkedit_apply (NULL, mmkedit, state);
+  _mmkedit_exit (NULL, mmkedit, state);
 }
 
-static void mmk_fileselector_callback(filebrowser_t *fb) {
-  gGui_t *gui = gGui;
+static void mmk_fileselector_callback (filebrowser_t *fb, void *data) {
+  xui_mmkedit_t *mmkedit = data;
   char *file, *dir;
 
-  if ((dir = filebrowser_get_current_dir(fb)) != NULL) {
-    strlcpy(gui->curdir, dir, sizeof(gui->curdir));
-    free(dir);
+  if ((dir = filebrowser_get_current_dir (fb)) != NULL) {
+    strlcpy (mmkedit->gui->curdir, dir, sizeof (mmkedit->gui->curdir));
+    free (dir);
   }
 
-  if((file = filebrowser_get_full_filename(fb)) != NULL) {
-    if(file)
-      xitk_inputtext_change_text(mmkeditor.sub, file);
-    free(file);
+  if ((file = filebrowser_get_full_filename (fb)) != NULL) {
+    if (file)
+      xitk_inputtext_change_text (mmkedit->sub, file);
+    free (file);
   }
   
 }
-static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
-  gGui_t *gui = gGui;
+
+static void _mmkedit_select_sub (xitk_widget_t *w, void *data, int state) {
+  xui_mmkedit_t *mmkedit = data;
   filebrowser_callback_button_t  cbb;
   char                           *path, *open_path;
-  
+
+  (void)w;
+  (void)state;
   cbb.label = _("Select");
   cbb.callback = mmk_fileselector_callback;
+  cbb.userdata = mmkedit;
   cbb.need_a_file = 1;
   
-  path = (*mmkeditor.mmk)->sub ? (*mmkeditor.mmk)->sub : (*mmkeditor.mmk)->mrl;
+  path = (*mmkedit->mmk)->sub ? (*mmkedit->mmk)->sub : (*mmkedit->mmk)->mrl;
   
   if(mrl_look_like_file(path)) {
     char *p;
@@ -3239,232 +3054,206 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
       *p = '\0';
   }
   else
-    open_path = strdup(gui->curdir);
+    open_path = strdup (mmkedit->gui->curdir);
   
   create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
 
   free(open_path);
 }
 
-void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {
-  gGui_t *gui = gGui;
-  xitk_labelbutton_widget_t   lb;
-  xitk_label_widget_t         lbl;
-  xitk_checkbox_widget_t      cb;
-  xitk_inputtext_widget_t     inp;
-  xitk_intbox_widget_t        ib;
-  xitk_pixmap_t              *bg;
+void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callback, void *data) {
+  xui_mmkedit_t *mmkedit;
   xitk_widget_t              *b;
   int                         x, y, w;
 
-  if(mmkeditor.running) {
-    if(!mmkeditor.visible)
-      mmkeditor.visible = !mmkeditor.visible;
-    mmk_editor_raise_window();
-    mmkeditor_set_mmk(mmk);
+  if (!gui)
+    return;
+
+  mmkedit = gui->mmkedit;
+  if (mmkedit) {
+    mmkedit->visible = 1;
+    raise_window (mmkedit->gui, mmkedit->xwin, mmkedit->visible, 1);
+    _mmkedit_set_mmk (mmkedit, mmk);
     return;
   }
 
-  mmkeditor.callback = callback;
-  mmkeditor.user_data = data;
+  mmkedit = (xui_mmkedit_t *)xitk_xmalloc (sizeof (*mmkedit));
+  if (!mmkedit)
+    return;
+
+  mmkedit->gui = gui;
+  gui->mmkedit = mmkedit;
+
+  mmkedit->callback = callback;
+  mmkedit->user_data = data;
 
   x = y = 80;
   gui_load_window_pos (gui, "mmk_editor", &x, &y);
 
   /* Create window */
-  mmkeditor.xwin = xitk_window_create_dialog_window(gui->xitk, _("Mediamark Editor"), x, y,
-						     WINDOW_WIDTH, WINDOW_HEIGHT);
+  mmkedit->xwin = xitk_window_create_dialog_window (mmkedit->gui->xitk, _("Mediamark Editor"), x, y,
+    WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  set_window_states_start(gui, mmkeditor.xwin);
+  set_window_states_start (mmkedit->gui, mmkedit->xwin);
 
-  mmkeditor.widget_list = xitk_window_widget_list(mmkeditor.xwin);
+  mmkedit->widget_list = xitk_window_widget_list (mmkedit->xwin);
 
-  XITK_WIDGET_INIT(&lb);
-  XITK_WIDGET_INIT(&lbl);
-  XITK_WIDGET_INIT(&cb);
-  XITK_WIDGET_INIT(&inp);
-  XITK_WIDGET_INIT(&ib);
 
-  bg = xitk_window_get_background_pixmap(mmkeditor.xwin);
+  {
+    xitk_pixmap_t *bg = xitk_window_get_background_pixmap (mmkedit->xwin);
 
-  x = 15;
-  y = 34 - 6;
-  w = WINDOW_WIDTH - 30;
-  draw_outter_frame(bg, _("Identifier"), btnfontname,
-		    x, y, w, 45);
+    x = 15;
+    y = 34 - 6;
+    w = WINDOW_WIDTH - 30;
+    draw_outter_frame (bg, _("Identifier"), btnfontname, x, y, w, 45);
+    y += 45 + 3;
+    draw_outter_frame (bg, _("Mrl"), btnfontname, x, y, w, 45);
+    y += 45 + 3;
+    draw_outter_frame (bg, _("Subtitle"), btnfontname, x, y, w, 45);
+    y += 45 + 3;
+    w = 120;
+    draw_outter_frame (bg, _("Start at"), btnfontname, x, y, w, 45);
+    x += w + 5;
+    draw_outter_frame (bg, _("End at"), btnfontname, x, y, w, 45);
+    x += w + 5;
+    draw_outter_frame (bg, _("A/V offset"), btnfontname, x, y, w, 45);
+    x += w + 5;
+    draw_outter_frame (bg, _("SPU offset"), btnfontname, x, y, w, 45);
+    xitk_window_set_background (mmkedit->xwin, bg);
+  }
 
-  inp.skin_element_name = NULL;
-  inp.text              = NULL;
-  inp.max_length        = 2048;
-  inp.callback          = NULL;
-  inp.userdata          = NULL;
-  mmkeditor.ident = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
-    x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.ident);
-  xitk_set_widget_tips_default(mmkeditor.ident, _("Mediamark Identifier"));
-  xitk_enable_and_show_widget(mmkeditor.ident);
+  {
+    xitk_inputtext_widget_t inp;
 
-  y += 45 + 3;
-  draw_outter_frame(bg, _("Mrl"), btnfontname,
-		    x, y, w, 45);
+    XITK_WIDGET_INIT (&inp);
+    inp.skin_element_name = NULL;
+    inp.text              = NULL;
+    inp.max_length        = 2048;
+    inp.callback          = NULL;
+    inp.userdata          = NULL;
 
-  inp.skin_element_name = NULL;
-  inp.text              = NULL;
-  inp.max_length        = 2048;
-  inp.callback          = NULL;
-  inp.userdata          = NULL;
-  mmkeditor.mrl = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
-    x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.mrl);
-  xitk_set_widget_tips_default(mmkeditor.mrl, _("Mediamark Mrl"));
-  xitk_enable_and_show_widget(mmkeditor.mrl);
+    x = 15;
+    y = 34 - 6;
+    w = WINDOW_WIDTH - 30;
+    mmkedit->ident = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
+      x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->ident);
+    xitk_set_widget_tips_default (mmkedit->ident, _("Mediamark Identifier"));
+    xitk_enable_and_show_widget (mmkedit->ident);
 
-  y += 45 + 3;
-  draw_outter_frame(bg, _("Subtitle"), btnfontname,
-		    x, y, w, 45);
 
-  inp.skin_element_name = NULL;
-  inp.text              = NULL;
-  inp.max_length        = 2048;
-  inp.callback          = NULL;
-  inp.userdata          = NULL;
-  mmkeditor.sub = xitk_noskin_inputtext_create (mmkeditor.widget_list, &inp,
-    x + 10, y + 16, w - 20 - 100 - 10, 20, "Black", "Black", fontname);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.sub);
-  xitk_set_widget_tips_default(mmkeditor.sub, _("Subtitle File"));
-  xitk_enable_and_show_widget(mmkeditor.sub);
+    y += 45 + 3;
+    mmkedit->mrl = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
+      x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->mrl);
+    xitk_set_widget_tips_default (mmkedit->mrl, _("Mediamark Mrl"));
+    xitk_enable_and_show_widget (mmkedit->mrl);
 
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Sub File");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = mmkeditor_select_sub; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list, &lb,
-    x + 10 + w - 20 - 100, y + 16, 100, 20, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (mmkeditor.widget_list, b);
-  xitk_set_widget_tips_default(b, _("Select a subtitle file to use together with the mrl."));
-  xitk_enable_and_show_widget(b);
+    y += 45 + 3;
+    mmkedit->sub = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
+      x + 10, y + 16, w - 20 - 100 - 10, 20, "Black", "Black", fontname);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->sub);
+    xitk_set_widget_tips_default (mmkedit->sub, _("Subtitle File"));
+    xitk_enable_and_show_widget (mmkedit->sub);
+  }
 
-  y += 45 + 3;
-  w = 120;
-  draw_outter_frame(bg, _("Start at"), btnfontname,
-		    x, y, w, 45);
+  {
+    xitk_labelbutton_widget_t lb;
+    xitk_intbox_widget_t ib;
 
-  ib.skin_element_name = NULL;
-  ib.fmt               = INTBOX_FMT_DECIMAL;
-  ib.min               = 0;
-  ib.max               = 0;
-  ib.value             = 0;
-  ib.step              = 1;
-  ib.callback          = NULL;
-  ib.userdata          = NULL;
-  mmkeditor.start = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.start);
-  xitk_set_widget_tips_default(mmkeditor.start, _("Mediamark start time (secs)."));
-  xitk_enable_and_show_widget(mmkeditor.start);
+    XITK_WIDGET_INIT (&lb);
+    lb.skin_element_name = NULL;
+    lb.button_type       = CLICK_BUTTON;
+    lb.align             = ALIGN_CENTER;
+    lb.state_callback    = NULL;
+    lb.userdata          = mmkedit;
+    XITK_WIDGET_INIT (&ib);
+    ib.skin_element_name = NULL;
+    ib.fmt               = INTBOX_FMT_DECIMAL;
+    ib.callback          = NULL;
+    ib.userdata          = NULL;
+    ib.step              = 1;
 
-  x += w + 5;
-  draw_outter_frame(bg, _("End at"), btnfontname,
-		    x, y, w, 45);
+    lb.label             = _("Sub File");
+    lb.callback          = _mmkedit_select_sub;
+    b =  xitk_noskin_labelbutton_create (mmkedit->widget_list, &lb,
+      x + 10 + w - 20 - 100, y + 16, 100, 20, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (mmkedit->widget_list, b);
+    xitk_set_widget_tips_default (b, _("Select a subtitle file to use together with the mrl."));
+    xitk_enable_and_show_widget (b);
 
-  ib.skin_element_name = NULL;
-  ib.value             = -1;
-  ib.step              = 1;
-  ib.callback          = NULL;
-  ib.userdata          = NULL;
-  mmkeditor.end = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.end);
-  xitk_set_widget_tips_default(mmkeditor.end, _("Mediamark end time (secs)."));
-  xitk_enable_and_show_widget(mmkeditor.end);
+    y += 45 + 3;
+    w = 120;
+    ib.min               = 0;
+    ib.max               = 0;
+    ib.value             = 0;
+    mmkedit->start = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
+      x + 30, y + 16, w - 60, 20);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->start);
+    xitk_set_widget_tips_default (mmkedit->start, _("Mediamark start time (secs)."));
+    xitk_enable_and_show_widget (mmkedit->start);
 
-  x += w + 5;
-  draw_outter_frame(bg, _("A/V offset"), btnfontname,
-		    x, y, w, 45);
+    x += w + 5;
+    ib.value             = -1;
+    mmkedit->end = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
+      x + 30, y + 16, w - 60, 20);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->end);
+    xitk_set_widget_tips_default (mmkedit->end, _("Mediamark end time (secs)."));
+    xitk_enable_and_show_widget (mmkedit->end);
 
-  ib.skin_element_name = NULL;
-  ib.value             = 0;
-  ib.step              = 1;
-  ib.callback          = NULL;
-  ib.userdata          = NULL;
-  mmkeditor.av_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.av_offset);
-  xitk_set_widget_tips_default(mmkeditor.av_offset, _("Offset of Audio and Video."));
-  xitk_enable_and_show_widget(mmkeditor.av_offset);
+    x += w + 5;
+    ib.value             = 0;
+    mmkedit->av_offset = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
+      x + 30, y + 16, w - 60, 20);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->av_offset);
+    xitk_set_widget_tips_default (mmkedit->av_offset, _("Offset of Audio and Video."));
+    xitk_enable_and_show_widget (mmkedit->av_offset);
 
-  x += w + 5;
-  draw_outter_frame(bg, _("SPU offset"), btnfontname,
-		    x, y, w, 45);
+    x += w + 5;
+    ib.value             = 0;
+    mmkedit->spu_offset = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
+      x + 30, y + 16, w - 60, 20);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->spu_offset);
+    xitk_set_widget_tips_default (mmkedit->spu_offset, _("Subpicture offset."));
+    xitk_enable_and_show_widget (mmkedit->spu_offset);
 
-  ib.skin_element_name = NULL;
-  ib.value             = 0;
-  ib.step              = 1;
-  ib.callback          = NULL;
-  ib.userdata          = NULL;
-  mmkeditor.spu_offset = xitk_noskin_intbox_create (mmkeditor.widget_list, &ib,
-    x + 30, y + 16, w - 60, 20);
-  xitk_add_widget (mmkeditor.widget_list, mmkeditor.spu_offset);
-  xitk_set_widget_tips_default(mmkeditor.spu_offset, _("Subpicture offset."));
-  xitk_enable_and_show_widget(mmkeditor.spu_offset);
+    y = WINDOW_HEIGHT - (23 + 15);
+    x = 15;
+    lb.label             = _("OK");
+    lb.callback          = _mmkedit_ok;
+    b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (mmkedit->widget_list, b);
+    xitk_set_widget_tips_default (b, _("Apply the changes and close the window."));
+    xitk_enable_and_show_widget (b);
 
-  y = WINDOW_HEIGHT - (23 + 15);
-  x = 15;
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("OK");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = mmkeditor_ok; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (mmkeditor.widget_list, b);
-  xitk_set_widget_tips_default(b, _("Apply the changes and close the window."));
-  xitk_enable_and_show_widget(b);
+    x = (WINDOW_WIDTH - 100) / 2;
+    lb.label             = _("Apply");
+    lb.callback          = _mmkedit_apply; 
+    b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (mmkedit->widget_list, b);
+    xitk_set_widget_tips_default (b, _("Apply the changes to the playlist."));
+    xitk_enable_and_show_widget (b);
 
-  x = (WINDOW_WIDTH - 100) / 2;
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Apply");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = mmkeditor_apply; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (mmkeditor.widget_list, b);
-  xitk_set_widget_tips_default(b, _("Apply the changes to the playlist."));
-  xitk_enable_and_show_widget(b);
+    x = WINDOW_WIDTH - (100 + 15);
+    lb.label             = _("Close");
+    lb.callback          = _mmkedit_exit;
+    b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
+      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    xitk_add_widget (mmkedit->widget_list, b);
+    xitk_set_widget_tips_default (b, _("Discard changes and dismiss the window."));
+    xitk_enable_and_show_widget (b);
+  }
 
-  x = WINDOW_WIDTH - (100 + 15);
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Close");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = mmkeditor_exit; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  b =  xitk_noskin_labelbutton_create (mmkeditor.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (mmkeditor.widget_list, b);
-  xitk_set_widget_tips_default(b, _("Discard changes and dismiss the window."));
-  xitk_enable_and_show_widget(b);
-  mmk_editor_show_tips (panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
+  mmk_editor_show_tips (mmkedit->gui, panel_get_tips_enable (mmkedit->gui->panel), panel_get_tips_timeout (mmkedit->gui->panel));
 
-  xitk_window_set_background(mmkeditor.xwin, bg);
+  mmkedit->widget_key = xitk_window_register_event_handler ("gui->mmkedit", mmkedit->xwin,
+    &mmkedit_event_cbs, mmkedit);
 
-  mmkeditor.widget_key = xitk_window_register_event_handler("mmkeditor", mmkeditor.xwin,
-                                                            &mmkeditor_event_cbs, &mmkeditor);
+  mmkedit->visible = 1;
 
-  mmkeditor.visible = 1;
-  mmkeditor.running = 1;
-
-  mmkeditor_set_mmk(mmk);
-  mmk_editor_raise_window();
-
-  xitk_window_try_to_set_input_focus(mmkeditor.xwin);
+  _mmkedit_set_mmk (mmkedit, mmk);
+  raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
+  xitk_window_try_to_set_input_focus (mmkedit->xwin);
 }

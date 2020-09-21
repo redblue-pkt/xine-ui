@@ -43,6 +43,7 @@ typedef struct xui_event_sender_st xui_event_sender_t;
 typedef struct xui_help_s xui_help_t;
 typedef struct xui_mrlb_st xui_mrlb_t;
 typedef struct xui_panel_st xui_panel_t;
+typedef struct xui_mmkedit_s xui_mmkedit_t;
 typedef struct xui_playlist_st xui_playlist_t;
 typedef struct xui_setup_st xui_setup_t;
 typedef struct xui_viewlog_s xui_viewlog_t;
@@ -349,6 +350,7 @@ struct gGui_st {
   xui_viewlog_t             *viewlog;
   xui_keyedit_t             *keyedit;
   xui_playlist_t            *plwin;
+  xui_mmkedit_t             *mmkedit;
   xui_sinfo_t               *streaminfo;
   filebrowser_t             *pl_load;
   filebrowser_t             *pl_save;
