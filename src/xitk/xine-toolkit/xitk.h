@@ -78,6 +78,21 @@
                                       (w)->width  = 0;    \
                                     } while(0)
 
+typedef struct {
+  int level;
+  /* array index. */
+  int next, prev, parent, first_child, last_child;
+  /* offset into contents, converted to lowercase, or -1. */
+  int key;
+  /* offset into contents, or -1. */
+  int value;
+} xitk_cfg_parse_t;
+
+#define XITK_CFG_PARSE_DEBUG 1 /* show extra info */
+#define XITK_CFG_PARSE_CASE 2 /* dont lowercase keys */
+xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags);
+void xitk_cfg_unparse (xitk_cfg_parse_t *tree);
+
 typedef struct xitk_s xitk_t;
 
 typedef struct xitk_widget_s xitk_widget_t;

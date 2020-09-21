@@ -2964,3 +2964,237 @@ int xitk_get_bool_value(const char *val) {
   return 0;
 }
 
+static const uint8_t tab_tolower[256] = {
+    0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+   48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+   64,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+  'p','q','r','s','t','u','v','w','x','y','z', 91, 92, 93, 94, 95,
+   96,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
+  'p','q','r','s','t','u','v','w','x','y','z',123,124,125,126,127,
+  128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,
+  144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,
+  160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,
+  176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,
+  192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,
+  208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,
+  224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,
+  240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
+};
+
+/* 0x01 (end), 0x02 (hash), 0x04 (start), 0x08 (stop), 0x10 (space), 0x20 (value_sep), 0x40 (lf), 0x80 (;) */
+static const uint8_t tab_cfg_parse[256] = {
+  [0] = 0x01, ['#'] = 0x02, ['{'] = 0x04, ['}'] = 0x08,
+  [' '] = 0x10, ['\t'] = 0x10, ['\n'] = 0x40, ['\r'] = 0x40,
+  [':'] = 0x20, ['='] = 0x20, [';'] = 0x80
+};
+
+xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
+  xitk_cfg_parse_t *tree, *box, *item;
+  int size, used;
+  enum {
+    XCP_FIND_KEY = 0,
+    XCP_READ_KEY,
+    XCP_FIND_VALUE,
+    XCP_READ_VALUE,
+    XCP_LINE,
+    XCP_DOWN,
+    XCP_UP,
+    XCP_NEW_NODE,
+    XCP_AUTO,
+    XCP_DONE
+  } state, oldstate;
+  uint8_t *start = (uint8_t *)contents, *p = start, *e = NULL, z;
+
+  if (!start)
+    return NULL;
+  size = 32;
+  tree = malloc (size * sizeof (*tree));
+  if (!tree)
+    return NULL;
+
+  box = tree;
+  box->level = 0;
+  box->next = box->prev = box->parent = box->first_child = box->last_child = 0;
+  box->key = box->value = -1;
+  used = 1;
+
+  item = NULL;
+  z = 0;
+
+  oldstate = XCP_FIND_KEY;
+  state = XCP_LINE;
+  while (state != XCP_DONE) {
+    switch (state) {
+
+      case XCP_AUTO:
+        state = (z & 0x01) ? XCP_DONE
+              : (z & 0x04) ? XCP_DOWN
+              : (z & 0x08) ? XCP_UP
+              : (z & 0x42) ? XCP_LINE
+              : (z & 0x80) ? XCP_FIND_KEY
+              : oldstate;
+        break;
+
+      case XCP_LINE:
+        while (1) {
+          while ((z = tab_cfg_parse[*p]) & 0x50)
+            p++;
+          if (z & 0x02) {
+            while (!((z = tab_cfg_parse[*p]) & 0x41))
+              p++;
+          }
+          if (!(z & 0x40))
+            break;
+          p++;
+        }
+        state = oldstate;
+        break;
+
+      case XCP_FIND_KEY:
+        while ((z = tab_cfg_parse[*p]) & 0xd0)
+          p++;
+        oldstate = (z & 0x02) ? XCP_FIND_KEY : XCP_READ_KEY;
+        state = XCP_AUTO;
+        break;
+
+      case XCP_READ_KEY:
+        if (!item) {
+          oldstate = state;
+          state = XCP_NEW_NODE;
+        } else {
+          item->key = p - start;
+          item = NULL;
+          if (flags & XITK_CFG_PARSE_CASE) {
+            while (!((z = tab_cfg_parse[*p]) & 0xdd))
+              p++;
+          } else {
+            while (!((z = tab_cfg_parse[*p]) & 0xdd)) {
+              *p = tab_tolower[*p];
+              p++;
+            }
+          }
+          if (e) {
+            *e = 0;
+            e = NULL;
+          }
+          e = p;
+          oldstate = XCP_FIND_VALUE;
+          state = XCP_AUTO;
+        }
+        break;
+
+      case XCP_FIND_VALUE:
+        while ((z = tab_cfg_parse[*p]) & 0x30)
+          p++;
+        /* value may contain '#'. */
+        z &= ~0x02;
+        oldstate = XCP_READ_VALUE;
+        state = XCP_AUTO;
+        break;
+
+      case XCP_READ_VALUE:
+        item = tree + box->last_child;
+        item->value = p - start;
+        item = NULL;
+        /* value may contain '# \t'. */
+        while (!((z = tab_cfg_parse[*p]) & 0xcd))
+          p++;
+        /* defer string end write to when we dont read it anymore. */
+        if (e) {
+          *e = 0;
+          e = NULL;
+        }
+        e = p;
+        /* remove trailing space. */
+        while (tab_cfg_parse[e[-1]] & 0x10)
+          e--;
+        oldstate = XCP_FIND_KEY;
+        state = XCP_AUTO;
+        break;
+
+      case XCP_UP:
+        z = tab_cfg_parse[*++p];
+        box = tree + box->parent;
+        oldstate = XCP_FIND_KEY;
+        state = XCP_AUTO;
+        break;
+
+      case XCP_DOWN:
+        if (!item) {
+          z = tab_cfg_parse[*++p];
+          if ((oldstate == XCP_FIND_VALUE) || (oldstate == XCP_READ_VALUE)) {
+            /* want a value? guess this bramch _is_ the value :-) */
+            box = tree + box->last_child;
+            oldstate = XCP_FIND_KEY;
+            state = XCP_AUTO;
+          } else {
+            oldstate = state;
+            state = XCP_NEW_NODE;
+          }
+        } else {
+          box = item;
+          item = NULL;
+          oldstate = XCP_FIND_KEY;
+          state = XCP_AUTO;
+        }
+        break;
+
+      case XCP_NEW_NODE:
+        if (used + 1 > size) {
+          size_t add = size < 1024 ? size : 1024;
+          xitk_cfg_parse_t *ntree = realloc (tree, (size + add) * sizeof (*tree));
+
+          if (!ntree) {
+            state = XCP_DONE;
+            break;
+          }
+          box = ntree + (box - tree);
+          tree = ntree;
+          size += add;
+        }
+        if (box->last_child) {
+          item = tree + box->last_child;
+          item->next = used;
+        }
+        item = tree + used;
+        item->level = box->level + 1;
+        item->parent = box - tree;
+        item->next = 0;
+        item->prev = box->last_child;
+        box->last_child = item - tree;
+        if (!box->first_child)
+          box->first_child = box->last_child;
+        item->first_child = item->last_child = 0;
+        item->key = item->value = -1;
+        used++;
+        state = oldstate;
+        break;
+
+      default: ;
+    }
+  }
+  if (e) {
+    *e = 0;
+    e = NULL;
+  }
+
+  if (flags & XITK_CFG_PARSE_DEBUG) {
+    int i;
+
+    for (i = 0; i < used; i++) {
+      item = tree + i;
+      printf ("xitk_cfg_parse: level (%d), parent (%d), key (%s), value (%s).\n",
+        item->level, item->parent,
+        item->key >= 0 ? contents + item->key : "", item->value >= 0 ? contents + item->value : "");
+    }
+  }
+
+  return tree;
+}
+  
+void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
+  free (tree);
+}
+
