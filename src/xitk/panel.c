@@ -148,7 +148,7 @@ void panel_show_tips (xui_panel_t *panel) {
   control_show_tips (panel->gui->vctrl, panel->tips.enable, panel->tips.timeout);
   mrl_browser_show_tips (panel->gui->mrlb, panel->tips.enable, panel->tips.timeout);
   event_sender_show_tips (panel->gui, panel->tips.enable ? panel->tips.timeout : 0);
-  mmk_editor_show_tips(panel->tips.enable, panel->tips.timeout);
+  mmk_editor_show_tips (panel->gui, panel->tips.enable, panel->tips.timeout);
   setup_show_tips (panel->gui->setup, panel->tips.enable, panel->tips.timeout);
 }
 
