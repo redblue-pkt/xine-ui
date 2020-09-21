@@ -203,52 +203,6 @@ static void skin_free_imgs (xitk_skin_config_t *skonfig) {
   xine_sarray_clear (skonfig->imgs);
 }
 
-#if 0
-static int _key_from_name (const char *name) {
-  static const char * const names[] = {
-    "\x13""align",
-    "\x0f""animation",
-    "\x00""browser",
-    "\x14""color",
-    "\x0e""color_click",
-    "\x0d""color_focus",
-    "\x02""coords",
-    "\x01""entries",
-    "\x17""font",
-    "\x09""horizontal",
-    "\x0c""label",
-    "\x19""label_y",
-    "\x10""length",
-    "\x06""pixmap",
-    "\x1b""pixmap_focus",
-    "\x11""pixmap_format",
-    "\x15""print",
-    "\x07""radius",
-    "\x0b""rotate",
-    "\x05""slider",
-    "\x12""static",
-    "\x18""step",
-    "\x16""timer",
-    "\x08""type",
-    "\x0a""vertical",
-    "\x03""x",
-    "\x04""y",
-  };
-  int b = 0, e = sizeof (names) / sizeof (names[0]), m = e >> 1;
-  do {
-    int d = strcasecmp (name, names[m] + 1);
-    if (d == 0)
-      return names[m][0];
-    if (d < 0)
-      e = m;
-    else
-      b = m + 1;
-    m = (b + e) >> 1;
-  } while (b != e);
-  return -1;
-}
-#endif
-
 /*
  *
  */
@@ -367,110 +321,6 @@ static void _nullify_me(xitk_skin_element_t *s) {
 }
 
 /*
- * Return position in str of char 'c'. -1 if not found
- */
-static int _is_there_char(const char *str, int c) {
-  char *p;
-
-  if(str)
-    if((p = strrchr(str, c)) != NULL) {
-      return (p - str);
-    }
-  
-  return -1;
-}
-
-/*
- * Return >= 0 if it's begin of section, otherwise -1
- */
-static int skin_begin_section(xitk_skin_config_t *skonfig) {
-
-  ABORT_IF_NULL(skonfig);
-
-  return _is_there_char(skonfig->ln, '{');
-}
-
-/*
- * Return >= 0 if it's end of section, otherwise -1
- */
-static int skin_end_section(xitk_skin_config_t *skonfig) {
-
-  ABORT_IF_NULL(skonfig);
-
-  return _is_there_char(skonfig->ln, '}');
-}
-
-static int istriplet(char *c) {
-  unsigned int dummy1, dummy2, dummy3;
-
-  if((strncasecmp(c, "#", 1) <= 0) && (strlen(c) >= 7)) {
-
-    if(((isalnum(*(c+1))) && (isalnum(*(c+2))) && (isalnum(*(c+3))) 
-       && (isalnum(*(c+4))) && (isalnum(*(c+5))) && (isalnum(*(c+6)))
-       && ((*(c+7) == '\0') || (*(c+7) == '\n') || (*(c+7) == '\r') || (*(c+7) == ' ')))
-       && (sscanf(c, "#%2x%2x%2x", &dummy1, &dummy2, &dummy3) == 3)) {
-      return 1;
-    }
-  }
-
-  return 0;
-}
-/*
- * Cleanup the EOL ('\n','\r',' ')
- */
-static void skin_clean_eol(xitk_skin_config_t *skonfig) {
-  char *p;
-
-  ABORT_IF_NULL(skonfig);
-
-  p = skonfig->ln;
-
-  if(p) {
-    while(*p != '\0') {
-      if(*p == '\n' || *p == '\r' || (*p == '#' && (istriplet(p) == 0)) || *p == ';' 
-	 || (*p == '/' && *(p+1) == '*')) {
-	*p = '\0';
-	break;
-      }
-
-      p++;
-    }
-
-    while(p > skonfig->ln) {
-      --p;
-      
-      if(*p == ' ') 
-	*p = '\0';
-      else
-	break;
-    }
-  }
-}
-
-/*
- * Read from file, store in skonfig->buf, char pointer skonfig->ln point
- * to buf. Cleanup the BOL/EOL. It also ignore comments lines.
- */
-static void skin_get_next_line(xitk_skin_config_t *skonfig) {
-
-  ABORT_IF_NULL(skonfig);
-  ABORT_IF_NULL(skonfig->fd);
-  
-  do {
-    skonfig->ln = fgets(skonfig->buf, 255, skonfig->fd);
-    
-    while(skonfig->ln && (*skonfig->ln == ' ' || *skonfig->ln == '\t')) ++skonfig->ln;
-
-  } while(skonfig->ln && 
-	  (!strncmp(skonfig->ln, "//", 2) ||
-	   !strncmp(skonfig->ln, "/*", 2) || /* */
-	   !strncmp(skonfig->ln, ";", 1) ||
-	   !strncmp(skonfig->ln, "#", 1)));
-
-  skin_clean_eol(skonfig);
-}
-
-/*
  * Return alignement value.
  */
 static int skin_get_align_value(const char *val) {
@@ -521,18 +371,6 @@ static int skin_get_direction(const char *val) {
   return DIRECTION_LEFT;
 }
 
-/*
- * Set char pointer to first char of value. Delimiter of 
- * value is '=' or ':', e.g: "mykey = myvalue".
- */
-static void skin_set_pos_to_value(char **p) {
-  
-  ABORT_IF_NULL(*p);
-
-  while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
-  while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
-}
-
 static int _skin_make_filename (xitk_skin_config_t *skonfig, const char *name, char **dest) {
   size_t plen, nlen;
   if (*dest)
@@ -546,298 +384,6 @@ static int _skin_make_filename (xitk_skin_config_t *skonfig, const char *name, c
   (*dest)[plen] = '/';
   memcpy (*dest + plen + 1, name, nlen + 1);
   return 1;
-}
-
-/*
- * Parse subsection of skin element (coords/label yet).
- */
-static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
-  char *p;
-  int  brace_offset;
-
-  ABORT_IF_NULL(skonfig);
-
-  if((brace_offset = skin_begin_section(skonfig)) >= 0) {
-    *(skonfig->ln + brace_offset) = '\0';
-    skin_clean_eol(skonfig);
-
-    if(!strncasecmp(skonfig->ln, "browser", 7)) {
-
-      while(skin_end_section(skonfig) < 0) {
-	skin_get_next_line(skonfig);
-	p = skonfig->ln;
-
-	if(!strncasecmp(skonfig->ln, "entries", 7)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.browser_entries = strtol(p, &p, 10);
-	}
-
-      }
-      skin_get_next_line(skonfig);
-    }
-    else if(!strncasecmp(skonfig->ln, "coords", 6)) {
-
-      while(skin_end_section(skonfig) < 0) {
-	skin_get_next_line(skonfig);
-	p = skonfig->ln;
-	if(!strncasecmp(skonfig->ln, "x", 1)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.x = strtol(p, &p, 10);
-	}
-	else if(!strncasecmp(skonfig->ln, "y", 1)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.y = strtol(p, &p, 10);
-	}
-
-      }
-      skin_get_next_line(skonfig);
-    }
-    else if(!strncasecmp(skonfig->ln, "slider", 6)) {
-      
-      while(skin_end_section(skonfig) < 0) {
-	skin_get_next_line(skonfig);
-	p = skonfig->ln;
-	if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
-	  skin_set_pos_to_value(&p);
-          _skin_make_filename (skonfig, p, &skonfig->celement->info.slider_pixmap_pad_name);
-	}
-	else if(!strncasecmp(skonfig->ln, "radius", 6)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.slider_radius = strtol(p, &p, 10);
-	}
-	else if(!strncasecmp(skonfig->ln, "type", 4)) {
-	  skin_set_pos_to_value(&p);
-	  if(!strncasecmp("horizontal", p, strlen(p))) {
-	    skonfig->celement->info.slider_type = XITK_HSLIDER;
-	  }
-	  else if(!strncasecmp("vertical", p, strlen(p))) {
-	    skonfig->celement->info.slider_type = XITK_VSLIDER;
-	  }
-	  else if(!strncasecmp("rotate", p, strlen(p))) {
-	    skonfig->celement->info.slider_type = XITK_RSLIDER;
-	  }
-	  else
-	    skonfig->celement->info.slider_type = XITK_HSLIDER;
-	}
-	
-      }
-      skin_get_next_line(skonfig);
-    }
-    else if(!strncasecmp(skonfig->ln, "label", 5)) {
-      skonfig->celement->info.label_y = 0;
-      skonfig->celement->info.label_printable = 1;
-      skonfig->celement->info.label_animation_step = 1;
-      skonfig->celement->info.label_animation_timer = xitk_get_timer_label_animation();
-      skonfig->celement->info.label_alignment = ALIGN_CENTER;
-
-      while(skin_end_section(skonfig) < 0) {
-	skin_get_next_line(skonfig);
-	p = skonfig->ln;
-
-	if(!strncasecmp(skonfig->ln, "color_focus", 11)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_color_focus = strdup(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "color_click", 11)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_color_click = strdup(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "animation", 9)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_animation = xitk_get_bool_value(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "length", 6)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_length = strtol(p, &p, 10);
-	}
-	else if(!strncasecmp(skonfig->ln, "pixmap_format", 13)) {
-	  skin_set_pos_to_value(&p);
-          if (!skonfig->celement->info.label_pixmap_font_format) {
-            skonfig->celement->info.label_pixmap_font_format = strdup (p);
-            _skin_load_img (skonfig, NULL,
-              skonfig->celement->info.label_pixmap_font_name,
-              skonfig->celement->info.label_pixmap_font_format);
-          }
-        }
-	else if(!strncasecmp(skonfig->ln, "pixmap_focus", 12)) {
-	  skin_set_pos_to_value(&p);
-          if (_skin_make_filename (skonfig, p, &skonfig->celement->info.label_pixmap_highlight_font_name))
-            _skin_load_img (skonfig, NULL,
-              skonfig->celement->info.label_pixmap_highlight_font_name,
-              skonfig->celement->info.label_pixmap_font_format);
-	}
-	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
-	  skin_set_pos_to_value(&p);
-          if (_skin_make_filename (skonfig, p, &skonfig->celement->info.label_pixmap_font_name))
-            _skin_load_img (skonfig, NULL,
-              skonfig->celement->info.label_pixmap_font_name,
-              skonfig->celement->info.label_pixmap_font_format);
-	}
-	else if(!strncasecmp(skonfig->ln, "static", 6)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_staticity = xitk_get_bool_value(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "align", 5)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_alignment = skin_get_align_value(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "color", 5)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_color = strdup(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "print", 5)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_printable = xitk_get_bool_value(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "timer", 5)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_animation_timer = strtol(p, &p, 10);
-	}
-	else if(!strncasecmp(skonfig->ln, "font", 4)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_fontname = strdup(p);
-	}
-	else if(!strncasecmp(skonfig->ln, "step", 4)) {
-	  skin_set_pos_to_value(&p);
-	  skonfig->celement->info.label_animation_step = strtol(p, &p, 10);
-	}
-        else if (!strncasecmp (skonfig->ln, "y", 1)) {
-          skin_set_pos_to_value (&p);
-          skonfig->celement->info.label_y = strtol (p, &p, 10);
-        }
-
-      }
-      skin_get_next_line(skonfig);
-    }
-
-  }
-    
-}
-
-/*
- * Parse skin element section.
- */
-static void skin_parse_section(xitk_skin_config_t *skonfig) {
-  char section[256];
-  char *p;
-  
-  ABORT_IF_NULL(skonfig);
-
-  while(skonfig->ln != NULL) {
-
-    p = skonfig->ln;
-    
-    if(sscanf(skonfig->ln, "skin.%s", &section[0]) == 1) {
-
-      while(skonfig->ln != NULL) {
-	
-	if(skin_begin_section(skonfig) >= 0) {
-	  xitk_skin_element_t *s;
-	  
-	  s = (xitk_skin_element_t *) xitk_xmalloc(sizeof(xitk_skin_element_t));
-	  _nullify_me(s);
-	  
-          skonfig->celement = s;
-
-          strlcpy (s->section, section, sizeof (s->section));
-	  s->info.visibility = s->info.enability = 1;
-          xine_sarray_add (skonfig->elements, s);
-
-	  skin_get_next_line(skonfig);
-
-	__next_subsection:
-	  
-	  if(skin_begin_section(skonfig) >= 0) {
-	    skin_parse_subsection(skonfig);
-	    
-	    if(skin_end_section(skonfig) >= 0) {
-	      return;
-	    }
-	    else
-	     goto  __next_subsection;
-	  }
-	  else {
-	    if(!strncasecmp(skonfig->ln, "max_buttons", 11)) {
-	      skin_set_pos_to_value(&p);
-	      s->info.max_buttons = strtol(p, &p, 10);
-	    }
-	    else if(!strncasecmp(skonfig->ln, "direction", 9)) {
-	      skin_set_pos_to_value(&p);
-	      s->info.direction = skin_get_direction(p);
-	    }
-	    else if(!strncasecmp(skonfig->ln, "visible", 7)) {
-	      skin_set_pos_to_value(&p);
-	      s->info.visibility = xitk_get_bool_value(p);
-	    }
-	    else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
-	      skin_set_pos_to_value(&p);
-              _skin_make_filename (skonfig, p, &s->info.pixmap_name);
-	    }
-	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
-	      skin_set_pos_to_value(&p);
-	      s->info.enability = xitk_get_bool_value(p);
-	    }
-	    
-	  }
-
-	  skin_get_next_line(skonfig);
-	  p = skonfig->ln;
-
-	  if(skin_end_section(skonfig) >= 0) {
-	    return;
-	  }
-	  
-	  goto __next_subsection;
-
-	}
-	else {
-	  skin_set_pos_to_value(&p);
-
-	  if(!strncasecmp(section, "unload_command", 14)) {
-	    skonfig->unload_command = _expanded(skonfig, p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "load_command", 12)) {
-	    skonfig->load_command = _expanded(skonfig, p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "animation", 9)) {
-	    skonfig->animation = strdup(p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "version", 7)) {
-	    skonfig->version = strtol(p, &p, 10);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "author", 6)) {
-	    skonfig->author = strdup(p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "name", 4)) {
-	    skonfig->name = strdup(p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "date", 4)) {
-	    skonfig->date = strdup(p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "logo", 4)) {
-	    skonfig->logo = _expanded(skonfig, p);
-	    return;
-	  }
-	  else if(!strncasecmp(section, "url", 3)) {
-	    skonfig->url = strdup(p);
-	    return;
-	  }
-	  else {
-	    XITK_WARNING("wrong section entry found: '%s'\n", section);
-	    return;
-	  }
-	}
-	skin_get_next_line(skonfig);
-      }
-    }
-  }
 }
 
 #ifdef DEBUG_SKIN
@@ -1014,6 +560,248 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig);
 }
 
+static int _skin_string_index (const char * const *list, size_t size, const char *s) {
+  uint32_t b = 0, e = size;
+
+  do {
+    uint32_t m = (b + e) >> 1;
+    int d = strcmp (s, list[m]);
+
+    if (d < 0)
+      e = m;
+    else if (d > 0)
+      b = m + 1;
+    else
+      return m;
+  } while (b != e);
+  return -1;
+}
+
+static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *sub) {
+  char dummy[8] = {[0] = 0}, *key = sub->key >= 0 ? text + sub->key : dummy;
+  char *val = sub->value >= 0 ? text + sub->value : dummy;
+  xitk_skin_element_t *s = skonfig->celement;
+  static const char * const list1[] = {
+    "browser",
+    "coords",
+    "direction",
+    "enable",
+    "label",
+    "max_buttons",
+    "pixmap",
+    "slider",
+    "visible"
+  };
+  int n = _skin_string_index (list1, sizeof (list1) / sizeof (list1[0]), key);
+
+  switch (n) {
+    case 0: { /* browser */
+        xitk_cfg_parse_t *sub2;
+
+        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
+          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+
+          if (!strcmp (key2, "entries"))
+            s->info.browser_entries = strtol (val2, &val2, 10);
+        }
+      }
+      break;
+    case 1: { /* coords */
+        xitk_cfg_parse_t *sub2;
+
+        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
+          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+
+          if (!strcmp (key2, "x"))
+            s->info.x = strtol (val2, &val2, 10);
+          else if (!strcmp (key2, "y"))
+            s->info.y = strtol (val2, &val2, 10);
+        }
+      }
+      break;
+    case 2: /* direction */
+      s->info.direction = skin_get_direction (val);
+      break;
+    case 3: /* enable */
+      s->info.enability = xitk_get_bool_value (val);
+      break;
+    case 4: { /* label */
+        xitk_cfg_parse_t *sub2;
+        static const char * const list2[] = {
+          "align",
+          "animation",
+          "color",
+          "color_click",
+          "color_focus",
+          "font",
+          "length",
+          "pixmap",
+          "pixmap_focus",
+          "pixmap_format",
+          "print",
+          "static",
+          "step",
+          "timer",
+          "y"
+        };
+
+        s->info.label_y = 0;
+        s->info.label_printable = 1;
+        s->info.label_animation_step = 1;
+        s->info.label_animation_timer = xitk_get_timer_label_animation ();
+        s->info.label_alignment = ALIGN_CENTER;
+
+        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
+          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+
+          n = _skin_string_index (list2, sizeof (list2) / sizeof (list2[0]), key2);
+          switch (n) {
+            case 0: /* align */
+              s->info.label_alignment = skin_get_align_value (val2);
+              break;
+            case 1: /* animation */
+              s->info.label_animation = xitk_get_bool_value (val2);
+              break;
+            case 2: /* color */
+              s->info.label_color = strdup (val2);
+              break;
+            case 3: /* color_click */
+              s->info.label_color_click = strdup (val2);
+              break;
+            case 4: /* color_focus */
+              s->info.label_color_focus = strdup (val2);
+              break;
+            case 5: /* font */
+              s->info.label_fontname = strdup (val2);
+              break;
+            case 6: /* length */
+              s->info.label_length = strtol (val2, &val2, 10);
+              break;
+            case 7: /* pixmap */
+              if (_skin_make_filename (skonfig, val2, &s->info.label_pixmap_font_name))
+                _skin_load_img (skonfig, NULL, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
+              break;
+            case 8: /* pixmap_focus */
+              if (_skin_make_filename (skonfig, val2, &s->info.label_pixmap_highlight_font_name))
+                _skin_load_img (skonfig, NULL, s->info.label_pixmap_highlight_font_name, s->info.label_pixmap_font_format);
+              break;
+            case 9: /* pixmap_format */
+              if (!s->info.label_pixmap_font_format) {
+                s->info.label_pixmap_font_format = strdup (val2);
+                _skin_load_img (skonfig, NULL, s->info.label_pixmap_font_name, s->info.label_pixmap_font_format);
+              }
+              break;
+            case 10: /* print */
+              s->info.label_printable = xitk_get_bool_value (val2);
+              break;
+            case 11: /* static */
+              s->info.label_staticity = xitk_get_bool_value (val2);
+              break;
+            case 12: /* step */
+              s->info.label_animation_step = strtol (val2, &val2, 10);
+              break;
+            case 13: /* timer */
+              s->info.label_animation_timer = strtol (val2, &val2, 10);
+              break;
+            case 14: /* y */
+              s->info.label_y = strtol (val2, &val2, 10);
+              break;
+          }
+        }
+      }
+      break;
+    case 5: /* max_buttons */
+      s->info.max_buttons = strtol (val, &val, 10);
+      break;
+    case 6: /* pixmap */
+      _skin_make_filename (skonfig, val, &s->info.pixmap_name);
+      break;
+    case 7: { /* slider */
+        xitk_cfg_parse_t *sub2;
+
+        for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
+          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+      
+          if (!strcmp (key2, "pixmap")) {
+            _skin_make_filename (skonfig, val2, &skonfig->celement->info.slider_pixmap_pad_name);
+          } else if (!strcmp (key2, "radius")) {
+            skonfig->celement->info.slider_radius = strtol (val2, &val2, 10);
+          } else if (!strcmp (key2, "type")) {
+            if (!strcmp ("horizontal", val2)) {
+              s->info.slider_type = XITK_HSLIDER;
+            } else if (!strcmp ("vertical", val2)) {
+              s->info.slider_type = XITK_VSLIDER;
+            } else if (!strcmp ("rotate", val2)) {
+              s->info.slider_type = XITK_RSLIDER;
+            } else {
+              s->info.slider_type = XITK_HSLIDER;
+            }
+          }
+        }
+      }
+      break;
+    case 8: /* visible */
+      s->info.visibility = xitk_get_bool_value (val);
+      break;
+  }
+}
+
+static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *entry) {
+  char dummy[8] = {[0] = 0}, *key = text + entry->key, *val = entry->value >= 0 ? text + entry->value : dummy;
+
+  if (entry->first_child) {
+    xitk_skin_element_t *s = xitk_xmalloc (sizeof (*s));
+
+    if (s) {
+      xitk_cfg_parse_t *sub;
+
+      _nullify_me (s);
+      skonfig->celement = s;
+      strlcpy (s->section, key, sizeof (s->section));
+      s->info.visibility = s->info.enability = 1;
+      xine_sarray_add (skonfig->elements, s);
+
+      for (sub = tree + entry->first_child; sub; sub = sub->next ? tree + sub->next : NULL) {
+        _skin_parse_2 (skonfig, text, tree, sub);
+      }
+    }
+  } else if (!strcmp (key, "unload_command")) {
+    skonfig->unload_command = _expanded (skonfig, val);
+  } else if (!strcmp (key, "load_command")) {
+    skonfig->load_command = _expanded (skonfig, val);
+  } else if (!strcmp (key, "animation")) {
+    skonfig->animation = strdup (val);
+  } else if (!strcmp (key, "version")) {
+    skonfig->version = strtol (val, &val, 10);
+  } else if (!strcmp (key, "author")) {
+    skonfig->author = strdup (val);
+  } else if (!strcmp (key, "name")) {
+    skonfig->name = strdup (val);
+  } else if (!strcmp (key, "date")) {
+    skonfig->date = strdup (val);
+  } else if (!strcmp (key, "logo")) {
+    skonfig->logo = _expanded (skonfig, val);
+  } else if (!strcmp (key, "url")) {
+    skonfig->url = strdup (val);
+  } else {
+    XITK_WARNING ("wrong section entry found: '%s'\n", key);
+  }
+}
+
+static void _skin_parse_0 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree) {
+  xitk_cfg_parse_t *entry;
+
+  for (entry = tree->first_child ? tree + tree->first_child : NULL; entry;
+    entry = entry->next ? tree + entry->next : NULL) {
+    char buf[1] = {0}, *key = entry->key >= 0 ? text + entry->key : buf;
+
+    if (!strncmp (key, "skin.", 5)) {
+      entry->key += 5;
+      _skin_parse_1 (skonfig, text, tree, entry);
+    }
+  }
+}
+
 /*
  * Load the skin configfile.
  */
@@ -1032,16 +820,30 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const c
   snprintf(buf, sizeof(buf), "%s/%s", skonfig->path, skonfig->skinfile);
 
   if((skonfig->fd = fopen(buf, "r")) != NULL) {
-    
-    skin_get_next_line(skonfig);
+    {
+      size_t size;
+      char *text;
+      xitk_cfg_parse_t *tree;
 
-    while(skonfig->ln != NULL) {
+      fseek (skonfig->fd, 0, SEEK_END);
+      size = ftell (skonfig->fd);
+      fseek (skonfig->fd, 0, SEEK_SET);
+      if (size > (1 << 20) - 1)
+        size = (1 << 20) - 1;
+      text = malloc (size + 1);
+      if (text) {
+        int r = fread (text, 1, size, skonfig->fd);
 
-      if(!strncasecmp(skonfig->ln, "skin.", 5)) {
-	skin_parse_section(skonfig);
+        if (r > 0) {
+          size = r;
+          text[size] = 0;
+          tree = xitk_cfg_parse (text, /* XITK_CFG_PARSE_DEBUG */ 0);
+          _skin_parse_0 (skonfig, text, tree);
+          xitk_cfg_unparse (tree);
+        }
+        free (text);
       }
-      
-      skin_get_next_line(skonfig);
+      fseek (skonfig->fd, 0, SEEK_SET);
     }
     fclose(skonfig->fd);
   }
