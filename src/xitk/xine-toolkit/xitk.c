@@ -3005,7 +3005,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
     XCP_AUTO,
     XCP_DONE
   } state, oldstate;
-  uint8_t *start = (uint8_t *)contents, *p = start, *e = NULL, z;
+  uint8_t *start = (uint8_t *)contents, *p = start, z, dummy, *e = &dummy;
 
   if (!start)
     return NULL;
@@ -3075,10 +3075,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
               p++;
             }
           }
-          if (e) {
-            *e = 0;
-            e = NULL;
-          }
+          *e = 0;
           e = p;
           oldstate = XCP_FIND_VALUE;
           state = XCP_AUTO;
@@ -3102,10 +3099,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
         while (!((z = tab_cfg_parse[*p]) & 0xcd))
           p++;
         /* defer string end write to when we dont read it anymore. */
-        if (e) {
-          *e = 0;
-          e = NULL;
-        }
+        *e = 0;
         e = p;
         /* remove trailing space. */
         while (tab_cfg_parse[e[-1]] & 0x10)
@@ -3163,9 +3157,9 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
         item->parent = box - tree;
         item->next = 0;
         item->prev = box->last_child;
-        box->last_child = item - tree;
+        box->last_child = used;
         if (!box->first_child)
-          box->first_child = box->last_child;
+          box->first_child = used;
         item->first_child = item->last_child = 0;
         item->key = item->value = -1;
         used++;
@@ -3175,10 +3169,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
       default: ;
     }
   }
-  if (e) {
-    *e = 0;
-    e = NULL;
-  }
+  *e = 0;
 
   if (flags & XITK_CFG_PARSE_DEBUG) {
     int i;
@@ -3197,4 +3188,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-
