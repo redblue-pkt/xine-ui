@@ -3067,10 +3067,10 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
           item->key = p - start;
           item = NULL;
           if (flags & XITK_CFG_PARSE_CASE) {
-            while (!((z = tab_cfg_parse[*p]) & 0xdd))
+            while (!((z = tab_cfg_parse[*p]) & 0xfd))
               p++;
           } else {
-            while (!((z = tab_cfg_parse[*p]) & 0xdd)) {
+            while (!((z = tab_cfg_parse[*p]) & 0xfd)) {
               *p = tab_tolower[*p];
               p++;
             }
