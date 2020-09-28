@@ -79,6 +79,24 @@
                                     } while(0)
 
 typedef struct {
+  char *s, buf[64];
+} xitk_short_string_t;
+static inline void xitk_short_string_init (xitk_short_string_t *s) {
+  s->s = s->buf;
+  s->buf[0] = 0;
+}
+/* return strlen (v), or (size_t)-1 if string is unchanged. */
+size_t xitk_short_string_set (xitk_short_string_t *s, const char *v);
+static inline void xitk_short_string_deinit (xitk_short_string_t *s) {
+  if (s->s != s->buf) {
+    free (s->s);
+    s->s = NULL;
+  }
+}
+
+size_t xitk_strlcpy (char *d, const char *s, size_t len);
+
+typedef struct {
   int level;
   /* array index. */
   int next, prev, parent, first_child, last_child;
