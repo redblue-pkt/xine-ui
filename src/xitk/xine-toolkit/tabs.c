@@ -33,8 +33,6 @@
 typedef struct _tabs_private_s {
   xitk_widget_t           w;
 
-  char                   *skin_element_name;
-  xitk_widget_t          *widget;
   xitk_widget_t          *left;
   xitk_widget_t          *right;
 
@@ -68,7 +66,7 @@ static int _tabs_max (int a, int b) {
 }
 
 static void _notify_destroy (_tabs_private_t *wp) {
-  XITK_FREE (wp->skin_element_name);
+  (void)wp;
 }
 
 static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
@@ -270,7 +268,7 @@ static void tabs_select(xitk_widget_t *w, void *data, int select, int modifier) 
     xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
     wp->selected = ref - wp->ref;
     if (wp->callback)
-      wp->callback (wp->widget, wp->userdata, wp->selected);
+      wp->callback (&wp->w, wp->userdata, wp->selected);
   } else {
     xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
   }
@@ -370,7 +368,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
   
-  wp->widget      = &wp->w;
   wp->entries     = t->entries;
   wp->num_entries = t->num_entries;
   wp->x           = x;
@@ -378,7 +375,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   wp->width       = width;
   wp->callback    = t->callback;
   wp->userdata    = t->userdata;
-  wp->skin_element_name = (t->skin_element_name == NULL) ? NULL : strdup (t->skin_element_name);
 
   wp->w.running   = 0;
   wp->w.visible   = 0;

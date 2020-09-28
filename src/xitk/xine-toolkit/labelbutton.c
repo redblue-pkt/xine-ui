@@ -39,7 +39,6 @@ typedef enum {
 typedef struct {
   xitk_widget_t           w;
 
-  xitk_widget_t          *bWidget;
   int                     bType;
   int                     bClicked;
 
@@ -60,43 +59,37 @@ typedef struct {
   int                     label_offset;
   int                     label_visible;
   int                     label_static;
-
-  struct _lbutton_str_s {
-    char                 *s, buf[64];
-  }                       label, shortcut_label, font, shortcut_font;
-
   int                     shortcut_pos;
 
-  char                    skin_element_name[64];
+  xitk_short_string_t     label, shortcut_label, font, shortcut_font, skin_element_name;
   char                    color[_LB_END][32];
 } _lbutton_private_t;
 
-static size_t _strlcpy (char *d, const char *s, size_t l) {
+size_t xitk_strlcpy (char *d, const char *s, size_t len) {
   size_t n;
   if (!s)
     s = "";
   n = strlen (s);
-  if (l > n + 1)
-    l = n + 1;
-  memcpy (d, s, l);
-  d[l - 1] = 0;
+  if (len > n + 1)
+    len = n + 1;
+  memcpy (d, s, len);
+  d[len - 1] = 0;
   return n;
 }
 
-static void _labelbutton_init_str (struct _lbutton_str_s *s) {
-  s->s = s->buf;
-}
-
-static void _labelbutton_set_str (struct _lbutton_str_s *s, const char *label) {
+size_t xitk_short_string_set (xitk_short_string_t *s, const char *v) {
   size_t n;
+
+  if (!v)
+    v = "";
+  if (!strcmp (s->s, v))
+    return (size_t)-1;
 
   if (s->s != s->buf) {
     free (s->s);
     s->s = s->buf;
   }
-  if (!label)
-    label = "";
-  n = strlen (label) + 1;
+  n = strlen (v) + 1;
   if (n > sizeof (s->buf)) {
     char *d = malloc (n);
     if (d) {
@@ -106,12 +99,8 @@ static void _labelbutton_set_str (struct _lbutton_str_s *s, const char *label) {
       s->buf[sizeof (s->buf) - 1] = 0;
     }
   }
-  memcpy (s->s, label, n);
-}
-
-static void _labelbutton_deinit_str (struct _lbutton_str_s *s) {
-  if (s->s != s->buf)
-    XITK_FREE (s->s);
+  memcpy (s->s, v, n);
+  return n - 1;
 }
 
 /*
@@ -119,13 +108,14 @@ static void _labelbutton_deinit_str (struct _lbutton_str_s *s) {
  */
 static void _labelbutton_destroy (_lbutton_private_t *wp) {
   xitk_image_free_image (&wp->temp_image.image);
-  if (wp->skin_element_name[0] == '\x01')
+  if (!wp->skin_element_name.s)
     xitk_image_free_image (&wp->skin.image);
 
-  _labelbutton_deinit_str (&wp->label);
-  _labelbutton_deinit_str (&wp->shortcut_label);
-  _labelbutton_deinit_str (&wp->font);
-  _labelbutton_deinit_str (&wp->shortcut_font);
+  xitk_short_string_deinit (&wp->skin_element_name);
+  xitk_short_string_deinit (&wp->label);
+  xitk_short_string_deinit (&wp->shortcut_label);
+  xitk_short_string_deinit (&wp->font);
+  xitk_short_string_deinit (&wp->shortcut_font);
 }
 
 /*
@@ -183,8 +173,8 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
     &lbear, &rbear, &width, &asc, &des);
 
   /*  Some colors configurations */
-  if ((wp->skin_element_name[0] & ~1)
-    || (!(wp->skin_element_name[0] & ~1) && ((fg = xitk_get_black_color ()) == (unsigned int)-1))) {
+  if (wp->skin_element_name.s
+    || (!wp->skin_element_name.s && ((fg = xitk_get_black_color ()) == (unsigned int)-1))) {
     xitk_color_names_t *color = NULL;
     static const int DefaultColor[_LB_END] = {0, 0, 255};
 
@@ -324,10 +314,10 @@ static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int 
       _labelbutton_paint (wp);
       if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
         if (wp->state_callback)
-          wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
+          wp->state_callback (&wp->w, wp->userdata, wp->bState, modifier);
       } else if (wp->bType == CLICK_BUTTON) {
         if (wp->callback)
-          wp->callback (wp->bWidget, wp->userdata, wp->bState);
+          wp->callback (&wp->w, wp->userdata, wp->bState);
       }
     } else {
       _labelbutton_paint (wp);
@@ -369,10 +359,10 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
     _labelbutton_paint (wp);
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
       if (wp->state_callback)
-        wp->state_callback (wp->bWidget, wp->userdata, wp->bState, modifier);
+        wp->state_callback (&wp->w, wp->userdata, wp->bState, modifier);
     } else if (wp->bType == CLICK_BUTTON) {
       if (wp->callback)
-        wp->callback (wp->bWidget, wp->userdata, wp->bState);
+        wp->callback (&wp->w, wp->userdata, wp->bState);
     }
   } else {
     _labelbutton_paint (wp);
@@ -387,7 +377,7 @@ int xitk_labelbutton_change_label (xitk_widget_t *w, const char *newlabel) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    _labelbutton_set_str (&wp->label, newlabel);
+    xitk_short_string_set (&wp->label, newlabel);
     _labelbutton_paint (wp);
     return 1;
   }
@@ -414,9 +404,9 @@ int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *newlab
   if (wp
     && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)
     && (wp->w.type & (WIDGET_GROUP_MENU | WIDGET_GROUP_BROWSER))) {
-    _labelbutton_set_str (&wp->shortcut_label, newlabel);
+    xitk_short_string_set (&wp->shortcut_label, newlabel);
     if (newfont)
-      _labelbutton_set_str (&wp->shortcut_font, !strcmp (newfont, wp->font.s) ? "" : newfont);
+      xitk_short_string_set (&wp->shortcut_font, !strcmp (newfont, wp->font.s) ? "" : newfont);
     if (wp->shortcut_label.s[0]) {
       if (pos >= 0)
         wp->shortcut_pos = pos;
@@ -454,17 +444,17 @@ static int _labelbutton_focus (_lbutton_private_t *wp, int focus) {
  *
  */
 static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name[0] & ~1) {
+  if (wp->skin_element_name.s) {
     const xitk_skin_element_info_t *info;
 
     xitk_skin_lock (skonfig);
-    info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+    info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
     if (info) {
       wp->skin = info->pixmap_img;
-      _strlcpy (wp->color[_LB_NORMAL], info->label_color, sizeof (wp->color[_LB_NORMAL]));
-      _strlcpy (wp->color[_LB_FOCUS],  info->label_color_focus, sizeof (wp->color[_LB_FOCUS]));
-      _strlcpy (wp->color[_LB_CLICK],  info->label_color_click, sizeof (wp->color[_LB_CLICK]));
-      _labelbutton_set_str (&wp->font, info->label_fontname);
+      xitk_strlcpy (wp->color[_LB_NORMAL], info->label_color, sizeof (wp->color[_LB_NORMAL]));
+      xitk_strlcpy (wp->color[_LB_FOCUS],  info->label_color_focus, sizeof (wp->color[_LB_FOCUS]));
+      xitk_strlcpy (wp->color[_LB_CLICK],  info->label_color_click, sizeof (wp->color[_LB_CLICK]));
+      xitk_short_string_set (&wp->font, info->label_fontname);
       wp->label_visible = info->label_printable;
       wp->label_static  = info->label_staticity;
       wp->align         = info->label_alignment;
@@ -614,12 +604,10 @@ void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
   _lbutton_private_t *wp = (_lbutton_private_t *)w;
   
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    int clk, focus;
-    
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
       if (xitk_labelbutton_get_state (&wp->w) != state) {
-        focus = wp->focus;
-        clk = wp->bClicked;
+#if 0 /* FIXME: user will hardly ever see this flash?? */
+        int focus = wp->focus, clk = wp->bClicked;
 
         wp->focus = FOCUS_RECEIVED;
         wp->bClicked = 1;
@@ -630,6 +618,11 @@ void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
         wp->focus = focus;
         wp->bClicked = clk;
         _labelbutton_paint (wp);
+#else
+        wp->bOldState = wp->bState;
+        wp->bState = state;
+        _labelbutton_paint (wp);
+#endif
       }
     }
   }
@@ -644,7 +637,9 @@ void *labelbutton_get_user_data (xitk_widget_t *w) {
 }
 
 /*
- * Create the labeled button
+ * Create the labeled button.
+ * NOTE: menu calls this with b->skin_element_name == NULL, info->pixmap_name == NULL,
+ * and info->pixmap_img to be used but not to be freed like a regular skin.
  */
 xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info) {
@@ -656,7 +651,6 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->bWidget           = &wp->w;
   wp->bType             = b->button_type;
   wp->bClicked          = 0;
   wp->focus             = FOCUS_LOST;
@@ -667,17 +661,15 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->state_callback    = b->state_callback;
   wp->userdata          = b->userdata;
 
-  _labelbutton_init_str (&wp->label);
-  _labelbutton_set_str (&wp->label, b->label);
+  xitk_short_string_init (&wp->label);
+  xitk_short_string_set (&wp->label, b->label);
 
-  _labelbutton_init_str (&wp->shortcut_label);
-  _labelbutton_set_str (&wp->shortcut_label, "");
+  xitk_short_string_init (&wp->shortcut_label);
 
-  _labelbutton_init_str (&wp->shortcut_font);
-  _labelbutton_set_str (&wp->shortcut_font, "");
+  xitk_short_string_init (&wp->shortcut_font);
 
-  _labelbutton_init_str (&wp->font);
-  _labelbutton_set_str (&wp->font, info->label_fontname);
+  xitk_short_string_init (&wp->font);
+  xitk_short_string_set (&wp->font, info->label_fontname);
 
   wp->shortcut_pos      = -1;
   wp->label_visible     = info->label_printable;
@@ -694,15 +686,12 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   wp->temp_image.width = wp->skin.width / 3;
   wp->temp_image.height = wp->skin.height;
 
-  if (info->pixmap_name && (info->pixmap_name[0] == '\x01') && (info->pixmap_name[1] == 0)) {
-    wp->skin_element_name[0] = '\x01';
-    wp->skin_element_name[1] = 0;
-  } else {
-    _strlcpy (wp->skin_element_name, b->skin_element_name, sizeof (wp->skin_element_name));
-  }
-  _strlcpy (wp->color[_LB_NORMAL], info->label_color, sizeof (wp->color[_LB_NORMAL]));
-  _strlcpy (wp->color[_LB_FOCUS],  info->label_color_focus, sizeof (wp->color[_LB_FOCUS]));
-  _strlcpy (wp->color[_LB_CLICK],  info->label_color_click, sizeof (wp->color[_LB_CLICK]));
+  xitk_short_string_init (&wp->skin_element_name);
+  xitk_short_string_set (&wp->skin_element_name, b->skin_element_name);
+
+  xitk_strlcpy (wp->color[_LB_NORMAL], info->label_color, sizeof (wp->color[_LB_NORMAL]));
+  xitk_strlcpy (wp->color[_LB_FOCUS],  info->label_color_focus, sizeof (wp->color[_LB_FOCUS]));
+  xitk_strlcpy (wp->color[_LB_CLICK],  info->label_color_click, sizeof (wp->color[_LB_CLICK]));
 
   wp->label_offset      = 0;
   wp->align             = info->label_alignment;
@@ -754,38 +743,82 @@ xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, int x, int y, int width, int height,
   const char *ncolor, const char *fcolor, const char *ccolor, const char *fname) {
-  xitk_skin_element_info_t info;
+  _lbutton_private_t *wp;
+  
+  ABORT_IF_NULL (wl);
+  XITK_CHECK_CONSTITENCY (b);
 
-  ABORT_IF_NULL(wl);
+  wp = (_lbutton_private_t *)xitk_widget_new (wl, sizeof (*wp));
+  if (!wp)
+    return NULL;
 
-  XITK_CHECK_CONSTITENCY(b);
-  info.x                 = x;
-  info.y                 = y;
-  info.label_alignment   = b->align;
-  info.label_y           = 0;
-  info.label_printable   = 1;
-  info.label_staticity   = 0;
-  info.visibility        = 0;
-  info.enability         = 0;
-  /* will not be written to. */
-  info.label_color       = (char *)ncolor;
-  info.label_color_focus = (char *)fcolor;
-  info.label_color_click = (char *)ccolor;
-  info.label_fontname    = (char *)fname;
-  info.pixmap_name       = (char *)"\x01";
+  wp->bType             = b->button_type;
+  wp->bClicked          = 0;
+  wp->focus             = FOCUS_LOST;
+  wp->bState            = 0;
+  wp->bOldState         = 0;
+
+  wp->callback          = b->callback;
+  wp->state_callback    = b->state_callback;
+  wp->userdata          = b->userdata;
+
+  xitk_short_string_init (&wp->label);
+  xitk_short_string_set (&wp->label, b->label);
+
+  xitk_short_string_init (&wp->shortcut_label);
+
+  xitk_short_string_init (&wp->shortcut_font);
+
+  xitk_short_string_init (&wp->font);
+  xitk_short_string_set (&wp->font, fname);
+
+  wp->shortcut_pos      = -1;
+  wp->label_visible     = 1;
+  wp->label_static      = 0;
+
   if (b->button_type == TAB_BUTTON) {
-    if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &info.pixmap_img.image) == 1)
-      draw_tab (info.pixmap_img.image);
+    if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &wp->skin.image) == 1)
+      draw_tab (wp->skin.image);
   } else if (b->skin_element_name && !strcmp (b->skin_element_name, "XITK_NOSKIN_FLAT")) {
-    if (xitk_shared_image (wl, "xitk_labelbutton_f", width * 3, height, &info.pixmap_img.image) == 1)
-      draw_flat_three_state (info.pixmap_img.image);
+    if (xitk_shared_image (wl, "xitk_labelbutton_f", width * 3, height, &wp->skin.image) == 1)
+      draw_flat_three_state (wp->skin.image);
   } else {
-    if (xitk_shared_image (wl, "xitk_labelbutton_b", width * 3, height, &info.pixmap_img.image) == 1)
-      draw_bevel_three_state (info.pixmap_img.image);
+    if (xitk_shared_image (wl, "xitk_labelbutton_b", width * 3, height, &wp->skin.image) == 1)
+      draw_bevel_three_state (wp->skin.image);
   }
-  info.pixmap_img.x     = 0;
-  info.pixmap_img.y     = 0;
-  info.pixmap_img.width = 0;
-  info.pixmap_img.height = 0;
-  return xitk_info_labelbutton_create (wl, b, &info);
+  wp->skin.x     = 0;
+  wp->skin.y     = 0;
+  wp->skin.width = 0;
+  wp->skin.height = 0;
+  if (wp->skin.image) {
+    wp->skin.width = wp->skin.image->width;
+    wp->skin.height = wp->skin.image->height;
+  }
+
+  xitk_shared_image (wl, "xitk_lbutton_temp", wp->skin.width / 3, wp->skin.height, &wp->temp_image.image);
+  wp->temp_image.x = 0;
+  wp->temp_image.y = 0;
+  wp->temp_image.width = wp->skin.width / 3;
+  wp->temp_image.height = wp->skin.height;
+
+  wp->skin_element_name.s = NULL;
+  xitk_strlcpy (wp->color[_LB_NORMAL], ncolor, sizeof (wp->color[_LB_NORMAL]));
+  xitk_strlcpy (wp->color[_LB_FOCUS],  fcolor, sizeof (wp->color[_LB_FOCUS]));
+  xitk_strlcpy (wp->color[_LB_CLICK],  ccolor, sizeof (wp->color[_LB_CLICK]));
+
+  wp->label_offset      = 0;
+  wp->align             = b->align;
+  wp->label_dy          = 0;
+
+  wp->w.enable          = 0;
+  wp->w.visible         = 0;
+  wp->w.x               = x;
+  wp->w.y               = y;
+  wp->w.width           = wp->skin.width / 3;
+  wp->w.height          = wp->skin.height;
+  wp->w.type            = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_TABABLE
+                        | WIDGET_CLICKABLE | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event           = labelbutton_event;
+
+  return &wp->w;
 }
