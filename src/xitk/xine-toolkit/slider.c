@@ -36,9 +36,8 @@
 typedef struct {
   xitk_widget_t           w;
 
-  char                   *skin_element_name;
+  xitk_short_string_t     skin_element_name;
 
-  xitk_widget_t          *sWidget;
   int                     sType;
   int                     bClicked;
   int                     focus;
@@ -283,11 +282,11 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
  */
 static void _notify_destroy (_slider_private_t *wp) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if (!wp->skin_element_name) {
+    if (!wp->skin_element_name.s) {
       xitk_image_free_image (&(wp->paddle_skin.image));
       xitk_image_free_image (&(wp->bg_skin.image));
     }
-    XITK_FREE (wp->skin_element_name);
+    xitk_short_string_deinit (&wp->skin_element_name);
   }
 }
 
@@ -522,7 +521,7 @@ static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
 }
 
 static void _xitk_slider_get_skin (_slider_private_t *wp, xitk_skin_config_t *skonfig) {
-  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
   if (s) {
     wp->w.x         = s->x;
     wp->w.y         = s->y;
@@ -540,7 +539,7 @@ static void _xitk_slider_get_skin (_slider_private_t *wp, xitk_skin_config_t *sk
  */
 static void _notify_change_skin (_slider_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if (wp->skin_element_name) {
+    if (wp->skin_element_name.s) {
       xitk_skin_lock (skonfig);
       _xitk_slider_get_skin (wp, skonfig);
       xitk_skin_unlock (skonfig);
@@ -965,7 +964,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
   if (mode == XITK_SLIDER_SYNC_GET) {
     *info = wp->hv_info;
   } else if ((mode == XITK_SLIDER_SYNC_SET) || (mode == XITK_SLIDER_SYNC_SET_AND_PAINT)) {
-    if (!wp->skin_element_name &&
+    if (!wp->skin_element_name.s &&
       ((info->h.visible != wp->hv_info.h.visible) || (info->h.max != wp->hv_info.h.max) ||
        (info->v.visible != wp->hv_info.v.visible) || (info->v.max != wp->hv_info.v.max))) {
       int hv_w, hv_h;
@@ -1042,7 +1041,7 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
     if (wp->paddle_skin.height == wp->bg_skin.height)
       wp->paddle_cover_bg = 1;
   } else if (wp->sType == XITK_HVSLIDER) {
-    if (wp->skin_element_name) {
+    if (wp->skin_element_name.s) {
       wp->hv_w = wp->paddle_skin.width / 3;
       wp->hv_h = wp->paddle_skin.height;
       _slider_update_skin (wp);
@@ -1085,17 +1084,17 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
   _slider_private_t *wp;
 
   ABORT_IF_NULL(wl);
-
   XITK_CHECK_CONSTITENCY(s);
 
   wp = (_slider_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->skin_element_name  = s->skin_element_name ? strdup (s->skin_element_name) : NULL;
+  xitk_short_string_init (&wp->skin_element_name);
+  xitk_short_string_set (&wp->skin_element_name, s->skin_element_name);
   _xitk_slider_get_skin (wp, skonfig);
   if (!wp->bg_skin.image || !wp->paddle_skin.image) {
-    free (wp->skin_element_name);
+    xitk_short_string_deinit (&wp->skin_element_name);
     free (wp);
     return NULL;
   }
@@ -1119,7 +1118,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->skin_element_name = NULL;
+  wp->skin_element_name.s = NULL;
 
   if (type == XITK_VSLIDER) {
     wp->paddle_skin.image = xitk_image_create_image (wl->xitk, width * 3, height / 5);

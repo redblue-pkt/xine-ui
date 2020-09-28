@@ -46,7 +46,7 @@
 typedef struct _browser_private_s {
   xitk_widget_t           w;
   xitk_skin_config_t     *skonfig;
-  char                   *skin_element_name;
+  xitk_short_string_t     skin_element_name;
   struct {
     const char * const   *names;
     const char * const   *shortcuts;
@@ -63,7 +63,7 @@ typedef struct _browser_private_s {
     int                   ymax;
     uint8_t               i2v[MAX_VISIBLE];
     uint8_t               v2i[MAX_VISIBLE];
-    char                 *fontname;
+    xitk_short_string_t   fontname;
     xitk_widget_t        *btns[WBSTART + MAX_VISIBLE];
     struct _browser_private_s *blist[MAX_VISIBLE];
   }                       visible;
@@ -118,9 +118,9 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
     wp->items.shortcuts = shortcuts;
 
     wp->items.width = 0;
-    if (!wp->visible.fontname)
+    if (!wp->visible.fontname.s[0])
       break;
-    fs = xitk_font_load_font (wp->w.wl->xitk, wp->visible.fontname);
+    fs = xitk_font_load_font (wp->w.wl->xitk, wp->visible.fontname.s);
     if (!fs)
       break;
     xitk_font_set_font (fs, wp->w.wl->gc);
@@ -150,7 +150,7 @@ static void _browser_set_hslider (_browser_private_t *wp, int reset) {
                    : 0;
 
     pos = reset ? wp->visible.x0 : xitk_slider_get_pos (wp->visible.btns[WSLIDH]);
-    if (wp->skin_element_name) {
+    if (wp->skin_element_name.s) {
       xitk_slider_set_min (wp->visible.btns[WSLIDH], 0);
       xitk_slider_set_max (wp->visible.btns[WSLIDH], dw);
       if (pos > dw)
@@ -188,7 +188,7 @@ static void _browser_set_hslider (_browser_private_t *wp, int reset) {
 static void _browser_set_vslider (_browser_private_t *wp) {
   wp->visible.ymax = wp->items.num - wp->visible.max;
 
-  if (wp->skin_element_name) {
+  if (wp->skin_element_name.s) {
     xitk_slider_set_min (wp->visible.btns[WSLID], 0);
     if (wp->visible.ymax <= 0) {
       wp->visible.ymax = 0;
@@ -202,8 +202,7 @@ static void _browser_set_vslider (_browser_private_t *wp) {
       xitk_enable_widget (wp->visible.btns[WSLID]);
       xitk_enable_widget (wp->visible.btns[WBDN]);
     }
-    if (wp->skin_element_name)
-      xitk_slider_set_pos (wp->visible.btns[WSLID], wp->visible.ymax- wp->visible.start);
+    xitk_slider_set_pos (wp->visible.btns[WSLID], wp->visible.ymax - wp->visible.start);
   } else {
     xitk_slider_hv_t si;
     if (wp->visible.ymax > 0) {
@@ -330,7 +329,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
 }
 
 static void _browser_hide_set_pos (_browser_private_t *wp) {
-  int h = xitk_get_widget_height (wp->visible.btns[WBSTART]) + (wp->skin_element_name ? 1 : 0);
+  int h = xitk_get_widget_height (wp->visible.btns[WBSTART]) + (wp->skin_element_name.s ? 1 : 0);
   int i, y = wp->visible.y;
   for (i = 0; i < wp->visible.max; i++) {
     int v = wp->visible.i2v[i];
@@ -545,7 +544,7 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
     lb.callback          = NULL;
     lb.state_callback    = browser_select;
     lb.userdata          = wp->visible.blist + i;
-    lb.skin_element_name = wp->skin_element_name;
+    lb.skin_element_name = wp->skin_element_name.s;
     wp->visible.btns[i + WBSTART] = xitk_labelbutton_create (wp->w.wl, wp->skonfig, &lb);
     if (!wp->visible.btns[i + WBSTART])
       break;
@@ -571,18 +570,17 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
 }
 
 static void _browser_new_skin (_browser_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name) {
+  if (wp->skin_element_name.s) {
     const xitk_skin_element_info_t *info;
 
     xitk_skin_lock (skonfig);
-    info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+    info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
 
     wp->skonfig = skonfig;
     wp->w.visible = info ? (info->visibility ? 1 : -1) : 0;
     wp->w.enable  = info ? info->enability : 0;
 
-    free (wp->visible.fontname);
-    wp->visible.fontname = info && info->label_fontname ? strdup (info->label_fontname) : NULL;
+    xitk_short_string_set (&wp->visible.fontname, info ? info->label_fontname : NULL);
     _browser_item_btns (wp, info);
     xitk_skin_unlock (skonfig);
 
@@ -596,8 +594,8 @@ static void _browser_new_skin (_browser_private_t *wp, xitk_skin_config_t *skonf
 }
 
 static void _browser_notify_destroy (_browser_private_t *wp) {
-  XITK_FREE (wp->visible.fontname);
-  XITK_FREE (wp->skin_element_name);
+  xitk_short_string_deinit (&wp->visible.fontname);
+  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 static void _browser_enability (_browser_private_t *wp) {
@@ -1062,9 +1060,11 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   wp->w.width = 0;
   wp->w.height = 0;
 
-  wp->skin_element_name = br->browser.skin_element_name ? strdup (br->browser.skin_element_name) : NULL;
-  info = xitk_skin_get_info (skonfig, wp->skin_element_name);
-  wp->visible.fontname = info && info->label_fontname ? strdup (info->label_fontname) : NULL;
+  xitk_short_string_init (&wp->skin_element_name);
+  xitk_short_string_set (&wp->skin_element_name, br->browser.skin_element_name);
+  info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+  xitk_short_string_init (&wp->visible.fontname);
+  xitk_short_string_set (&wp->visible.fontname, info ? info->label_fontname : NULL);
   _browser_set_items (wp, br->browser.entries, NULL, br->browser.num_entries);
   wp->skonfig = skonfig;
   wp->visible.max = 0;
@@ -1179,8 +1179,9 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   wp->w.x = wp->visible.x = x;
   wp->w.y = wp->visible.y = y;
-  wp->skin_element_name = NULL;
-  wp->visible.fontname = fontname ? strdup (fontname) : NULL;
+  wp->skin_element_name.s = NULL;
+  xitk_short_string_init (&wp->visible.fontname);
+  xitk_short_string_set (&wp->visible.fontname, fontname);
   _browser_set_items (wp, br->browser.entries, NULL, br->browser.num_entries);
   wp->visible.max = br->browser.max_displayed_entries <= MAX_VISIBLE ? br->browser.max_displayed_entries : MAX_VISIBLE;
   wp->visible.start = 0;
@@ -1303,7 +1304,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   wp->w.visible = 0;
   wp->w.enable = 0;
-  wp->skin_element_name = NULL;
+  wp->skin_element_name.s = NULL;
   wp->skonfig = NULL;
   return _xitk_browser_create (wp, br);
 }

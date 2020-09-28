@@ -36,9 +36,6 @@
 
 #define NEW_CLIPBOARD
 
-#define NORMAL 1
-#define FOCUS  2
-
 #define DIRTY_BEFORE     1
 #define DIRTY_AFTER      2
 #define DIRTY_MOVE_LEFT  4
@@ -47,13 +44,18 @@
 #define SBUF_PAD 4
 #define SBUF_MASK 127
 
+typedef enum {
+  _IT_NORMAL = 0,
+  _IT_FOCUS,
+  _IT_END
+} _it_state_t;
+
 typedef struct {
   xitk_widget_t           w;
 
   ImlibData              *imlibdata;
-  char                   *skin_element_name;
-
-  xitk_widget_t          *iWidget;
+  xitk_short_string_t     skin_element_name, fontname;
+  char                    color[_IT_END][32];
 
   xitk_part_image_t       skin;
 
@@ -61,10 +63,6 @@ typedef struct {
 
   xitk_string_callback_t  callback;
   void                   *userdata;
-
-  char                   *fontname;
-  char                   *normal_color;
-  char                   *focused_color;
 
   int                     have_focus;
 
@@ -129,13 +127,13 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
 
   fs = font;
   if (!fs) {
-    if (wp->fontname)
-      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
+    if (wp->fontname.s[0])
+      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
     if (!fs)
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
     if (!fs)
       return 0;
-    xitk_font_set_font (fs, wp->iWidget->wl->gc);
+    xitk_font_set_font (fs, wp->w.wl->gc);
   }
 
   tries = 12;
@@ -329,14 +327,12 @@ static void _notify_destroy (_inputtext_private_t *wp) {
       wp->text.temp_gc = None;
     }
     xitk_image_free_image (&wp->text.temp_img.image);
-    if (!wp->skin_element_name)
+    if (!wp->skin_element_name.s)
       xitk_image_free_image (&wp->skin.image);
     
-    XITK_FREE (wp->skin_element_name);
+    xitk_short_string_deinit (&wp->skin_element_name);
     _inputtext_sbuf_unset (wp);
-    XITK_FREE (wp->normal_color);
-    XITK_FREE (wp->focused_color);
-    XITK_FREE (wp->fontname);
+    xitk_short_string_deinit (&wp->fontname);
   }
 }
 
@@ -416,14 +412,12 @@ KeySym xitk_keycode_to_keysym(XEvent *event) {
  * Paint the input text box.
  */
 static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *event) {
-  XColor                    xcolor;
-  xitk_font_t              *fs = NULL;
-  int                       xsize, ysize, state = 0;
-  int                       lbear, rbear, width, asc, des;
-  int                       cursor_x;
-  int                       yoff = 0, DefaultColor = -1;
-  unsigned int              fg = 0;
-  xitk_color_names_t       *color = NULL;
+  XColor               xcolor;
+  xitk_font_t         *fs = NULL;
+  int                  xsize, ysize, lbear, rbear, width, asc, des;
+  int                  cursor_x, yoff = 0;
+  unsigned int         fg = 0;
+  _it_state_t          state;
 
   if (!wp)
     return;
@@ -453,15 +447,15 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
       
-  state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? FOCUS : NORMAL;
+  state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? _IT_FOCUS : _IT_NORMAL;
       
   xcolor.flags = DoRed | DoBlue | DoGreen;
 
   /* Try to load font */
 
   if (wp->text.buf && wp->text.buf[0]) {
-    if (wp->fontname)
-      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname);
+    if (wp->fontname.s[0])
+      fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
     if (!fs) 
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
     if (!fs)
@@ -470,23 +464,15 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
   
-  if (wp->skin_element_name || (!wp->skin_element_name && (fg = xitk_get_black_color ()) == (unsigned int)-1)) {
+  if (wp->skin_element_name.s || (!wp->skin_element_name.s && (fg = xitk_get_black_color ()) == (unsigned int)-1)) {
     /*  Some colors configurations */
-    switch (state) {
-      case NORMAL:
-        if (!strcasecmp (wp->normal_color, "Default"))
-          DefaultColor = 0;
-        else
-          color = xitk_get_color_name (wp->normal_color);
-        break;
-      case FOCUS:
-        if (!strcasecmp (wp->focused_color, "Default"))
-          DefaultColor = 0;
-        else
-          color = xitk_get_color_name (wp->focused_color);
-        break;
-      default: ;
-    }
+    int DefaultColor = -1;
+    xitk_color_names_t *color = NULL;
+
+    if (!strcasecmp (wp->color[state], "Default"))
+      DefaultColor = 0;
+    else
+      color = xitk_get_color_name (wp->color[state]);
     if (!color || (DefaultColor != -1)) {
       xcolor.red = xcolor.blue = xcolor.green = DefaultColor << 8;
     } else {
@@ -494,6 +480,8 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
       xcolor.blue = color->blue << 8;
       xcolor.green = color->green << 8;
     }
+    if (color)
+      xitk_free_color_name (color);
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     XAllocColor (wp->imlibdata->x.disp, Imlib_get_colormap (wp->imlibdata), &xcolor);
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
@@ -598,7 +586,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   
   /*  Put text in the right place */
   {
-    int src_x = state == FOCUS ? xsize : 0;
+    int src_x = state == _IT_FOCUS ? xsize : 0;
 
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->text.temp_img,
       src_x, 0, xsize, ysize, 0, 0);
@@ -646,13 +634,10 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   if (fs)
     xitk_font_unload_font (fs);
   
-  if (color)
-    xitk_free_color_name (color);
-      
   xitk_part_image_draw (wp->w.wl, &wp->skin, &wp->text.temp_img,
     event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y);
 
-  if (state != FOCUS) {
+  if (state != _IT_FOCUS) {
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
     XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
@@ -722,15 +707,15 @@ static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
  *
  */
 static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {
-  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
   if (s) {
     wp->w.x = s->x;
     wp->w.y = s->y;
     wp->w.enable = s->enability;
     wp->w.visible = s->visibility ? 1 : -1;
-    wp->fontname = s->label_fontname ? strdup (s->label_fontname) : NULL;
-    wp->normal_color  = s->label_color ? strdup (s->label_color) : NULL;
-    wp->focused_color = s->label_color_focus ? strdup (s->label_color_focus) : NULL;
+    xitk_short_string_set (&wp->fontname, s->label_fontname);
+    xitk_strlcpy (wp->color[_IT_NORMAL], s->label_color, sizeof (wp->color[_IT_NORMAL]));
+    xitk_strlcpy (wp->color[_IT_FOCUS], s->label_color_focus, sizeof (wp->color[_IT_FOCUS]));
     wp->skin = s->pixmap_img;
   }
 }
@@ -744,10 +729,7 @@ static void _notify_change_skin (_inputtext_private_t *wp, xitk_skin_config_t *s
       wp->text.temp_gc = None;
     }
 
-    if (wp->skin_element_name) {
-      XITK_FREE (wp->fontname);
-      XITK_FREE (wp->normal_color);
-      XITK_FREE (wp->focused_color);
+    if (wp->skin_element_name.s) {
       xitk_image_free_image (&wp->text.temp_img.image);
 
       xitk_skin_lock(skonfig);
@@ -1223,7 +1205,6 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   ABORT_IF_NULL (wp->w.wl->imlibdata);
 
   wp->imlibdata         = wp->w.wl->imlibdata;
-  wp->iWidget           = &wp->w;
 
   wp->w.width           = wp->skin.width / 2;
   wp->w.height          = wp->skin.height;
@@ -1234,7 +1215,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
 
   wp->text.box_width    = wp->w.width - 2 * 2;
   wp->text.box_start    = 2;
-  if (!wp->skin_element_name) {
+  if (!wp->skin_element_name.s) {
     wp->text.box_width -= 2 * 1;
     wp->text.box_start += 1;
   }
@@ -1261,7 +1242,6 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
 xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 				      xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it) {
   _inputtext_private_t *wp;
-  const char *name;
 
   XITK_CHECK_CONSTITENCY(it);
   ABORT_IF_NULL(wl);
@@ -1271,8 +1251,9 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  name = it->skin_element_name;
-  wp->skin_element_name = name ? strdup (name) : NULL;
+  xitk_short_string_init (&wp->skin_element_name);
+  xitk_short_string_set (&wp->skin_element_name, it->skin_element_name);
+  xitk_short_string_init (&wp->fontname);
 
   _xitk_inputtext_apply_skin (wp, skonfig);
 
@@ -1303,11 +1284,13 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   wp->w.enable   = 0;
   wp->w.visible  = 0;
 
-  wp->fontname = fontname ? strdup (fontname) : NULL;
-  wp->normal_color  = ncolor ? strdup (ncolor) : NULL;
-  wp->focused_color = fcolor ? strdup (fcolor) : NULL;
+  xitk_short_string_init (&wp->fontname);
+  xitk_short_string_set (&wp->fontname, fontname);
 
-  wp->skin_element_name = NULL;
+  xitk_strlcpy (wp->color[_IT_NORMAL], ncolor, sizeof (wp->color[_IT_NORMAL]));
+  xitk_strlcpy (wp->color[_IT_FOCUS], fcolor, sizeof (wp->color[_IT_FOCUS]));
+
+  wp->skin_element_name.s = NULL;
   if (xitk_shared_image (wl, "xitk_inputtext", width * 2, height, &wp->skin.image) == 1)
     draw_bevel_two_state (wp->skin.image);
   wp->skin.x = 0;
@@ -1317,3 +1300,4 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   return _xitk_inputtext_create (wp, it);
 }
+

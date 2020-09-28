@@ -40,7 +40,7 @@
 typedef struct {
   xitk_widget_t           w;
 
-  char                   *skin_element_name;
+  xitk_short_string_t     skin_element_name;
 
   xitk_window_t          *xwin;
 
@@ -290,7 +290,7 @@ static void _combo_destroy (_combo_private_t *wp) {
     wp->button_widget = NULL;
   }
   XITK_FREE (wp->entries);
-  XITK_FREE (wp->skin_element_name);
+  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 /*
@@ -320,8 +320,8 @@ static void _combo_paint (_combo_private_t *wp) {
  *
  */
 static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name) {
-    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  if (wp->skin_element_name.s) {
+    const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
     int x, y;
 
     xitk_skin_lock (skonfig);
@@ -498,7 +498,12 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
 
   wp->xwin = NULL;
 
-  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
+  if (skin_element_name) {
+    xitk_short_string_init (&wp->skin_element_name);
+    xitk_short_string_set (&wp->skin_element_name, skin_element_name);
+  } else {
+    wp->skin_element_name.s = NULL;
+  }
   wp->combo_widget      = &wp->w;
   wp->parent_wlist      = wl;
   wp->parent_wkey       = c->parent_wkey;
@@ -578,7 +583,7 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
   }
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, c->skin_element_name);
-    return _combo_create (wl, c, c->skin_element_name, wp,
+    return _combo_create (wl, c, c->skin_element_name ? c->skin_element_name : "", wp,
       info ? (info->visibility ? 1 : -1) : 0, info ? info->enability : 0);
   }
 }

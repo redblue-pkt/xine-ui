@@ -31,8 +31,7 @@
 typedef struct {
   xitk_widget_t          w;
 
-  char                  *skin_element_name;
-  xitk_widget_t         *cWidget;
+  xitk_short_string_t    skin_element_name;
   int                    cClicked;
   int                    focus;
   int                    cState;
@@ -48,9 +47,9 @@ typedef struct {
  *
  */
 static void _checkbox_destroy (_checkbox_private_t *wp) {
-  if (!wp->skin_element_name)
+  if (!wp->skin_element_name.s)
     xitk_image_free_image (&wp->skin.image);
-  XITK_FREE (wp->skin_element_name);
+  xitk_short_string_deinit (&wp->skin_element_name);
 }
 
 /*
@@ -106,7 +105,7 @@ static int _checkbox_click (_checkbox_private_t *wp, int button, int cUp, int x,
       wp->cState = !wp->cState;
       _checkbox_paint (wp);
       if (wp->callback)
-        wp->callback (wp->cWidget, wp->userdata, wp->cState);
+        wp->callback (&wp->w, wp->userdata, wp->cState);
     } else {
       _checkbox_paint (wp);
     }
@@ -144,7 +143,7 @@ static int _checkbox_key (_checkbox_private_t *wp, const char *s, int modifier) 
     wp->cState = !wp->cState;
     _checkbox_paint (wp);
     if (wp->callback)
-      wp->callback (wp->cWidget, wp->userdata, wp->cState);
+      wp->callback (&wp->w, wp->userdata, wp->cState);
   } else {
     _checkbox_paint (wp);
   }
@@ -160,7 +159,7 @@ static int _checkbox_focus (_checkbox_private_t *wp, widget_focus_t focus) {
     wp->cClicked = 0;
     wp->cState = 0;
     if (wp->callback)
-      wp->callback (wp->cWidget, wp->userdata, wp->cState);
+      wp->callback (&wp->w, wp->userdata, wp->cState);
   }
   return 1;
 }
@@ -169,7 +168,7 @@ static int _checkbox_focus (_checkbox_private_t *wp, widget_focus_t focus) {
  *
  */
 static void _checkbox_read_skin (_checkbox_private_t *wp, xitk_skin_config_t *skonfig) {
-  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name);
+  const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
   if (s) {
     wp->w.x        = s->x;
     wp->w.y        = s->y;
@@ -180,10 +179,10 @@ static void _checkbox_read_skin (_checkbox_private_t *wp, xitk_skin_config_t *sk
 }
 
 static void _checkbox_new_skin (_checkbox_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp->skin_element_name) {
-    xitk_skin_lock(skonfig);
+  if (wp->skin_element_name.s) {
+    xitk_skin_lock (skonfig);
     _checkbox_read_skin (wp, skonfig);
-    xitk_skin_unlock(skonfig);
+    xitk_skin_unlock (skonfig);
     wp->w.width    = wp->skin.width / 3;
     wp->w.height   = wp->skin.height;
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
@@ -280,7 +279,6 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
 static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_checkbox_widget_t *cb) {
   ABORT_IF_NULL (wp->w.wl);
 
-  wp->cWidget   = &wp->w;
   wp->cClicked  = 0;
   wp->cState    = 0;
   wp->focus     = FOCUS_LOST;
@@ -310,7 +308,8 @@ xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  wp->skin_element_name = cb->skin_element_name == NULL ? NULL : strdup (cb->skin_element_name);
+  xitk_short_string_init (&wp->skin_element_name);
+  xitk_short_string_set (&wp->skin_element_name, cb->skin_element_name);
   _checkbox_read_skin (wp, skonfig);
   wp->num_gfx = 3;
 
@@ -390,7 +389,7 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
     }
   }
 
-  wp->skin_element_name = NULL;
+  wp->skin_element_name.s = NULL;
   wp->skin.image = i;
   wp->skin.x        = 0;
   wp->skin.y        = 0;

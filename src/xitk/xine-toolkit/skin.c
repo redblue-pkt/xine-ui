@@ -932,9 +932,6 @@ const char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
 const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name) {
   xitk_skin_element_t *s;
 
-  if (!skin || !element_name)
-    return NULL;
-
   s = skin_lookup_section (skin, element_name);
   if (!s)
     return NULL;

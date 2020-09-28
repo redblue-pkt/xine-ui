@@ -38,7 +38,6 @@ typedef struct {
   xitk_widget_t  w;
 
   char          *skin_element_name;
-  xitk_widget_t *bWidget;
   xitk_image_t  *skin;
 } _image_private_t;
 
@@ -2424,7 +2423,6 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
   wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup (im->skin_element_name);
 
-  wp->bWidget           = &wp->w;
   wp->skin              = skin;
 
   wp->w.enable          = 0;
