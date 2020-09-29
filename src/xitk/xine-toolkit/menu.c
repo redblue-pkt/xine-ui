@@ -72,7 +72,7 @@ struct _menu_node_s {
   unsigned int         type;
   xitk_menu_entry_t    menu_entry;
 };
-  
+
 struct _menu_private_s {
   xitk_widget_t        w;
   _menu_node_t         root;
@@ -331,7 +331,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   }
 
   XITK_WIDGET_INIT(&lb);
-  
+
   bentries = node->num;
   bsep = 0;
   maxlen = 0;
@@ -349,7 +349,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   }
   btitle   = !!(node->type & (_MENU_NODE_TITLE << _MENU_NODE_HAS));
   rentries = bentries - bsep;
-  
+
   if (maxnode->type & _MENU_NODE_TITLE)
     fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
   else
@@ -558,7 +558,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
       yy += 20;
     }
   }
-  
+
   if(bg) {
     xitk_window_set_background(xwin, bg);
   }
@@ -707,10 +707,10 @@ void xitk_menu_show_menu (xitk_widget_t *w) {
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y) {
   _menu_private_t *wp;
-  
+
   ABORT_IF_NULL(wl);
   XITK_CHECK_CONSTITENCY(m);
-  
+
   wp = (_menu_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;

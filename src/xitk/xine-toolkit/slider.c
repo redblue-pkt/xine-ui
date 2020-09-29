@@ -135,7 +135,7 @@ static void _slider_update_value (_slider_private_t *wp, float value) {
     wp->value = value;
 
   range = wp->upper - wp->lower;
-  
+
   wp->percentage = (wp->value - wp->lower) / range;
   wp->angle = 7.0 * M_PI / 6.0 - (wp->value - wp->lower) * 4.0 * M_PI / 3.0 / (wp->upper - wp->lower);
 }
@@ -148,7 +148,7 @@ static void _slider_update_minmax (_slider_private_t *wp, float min, float max) 
     XITK_WARNING("%s@%d: slider min value > max value !\n", __FILE__, __LINE__);
     return;
   }
-  
+
   wp->upper = (min == max) ? max + 1 : max;
   wp->lower = min;
   _slider_update_value (wp, wp->value);
@@ -329,7 +329,7 @@ static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
   int                     button_width, button_height;	
   xitk_image_t           *bg;
   xitk_image_t           *paddle;
-  
+
   if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (wp->w.visible == 1))) {
     int    x, y, srcx1, src_w, destx1, srcy1, src_h, desty1;
     int    xcenter, ycenter;
@@ -1113,7 +1113,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
 
   XITK_CHECK_CONSTITENCY(s);
-  
+
   wp = (_slider_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
@@ -1146,7 +1146,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   wp->paddle_skin.y = 0;
   wp->paddle_skin.width = wp->paddle_skin.image->width;
   wp->paddle_skin.height = wp->paddle_skin.image->height;
-  
+
   wp->bg_skin.image = xitk_image_create_image (wl->xitk, width, height);
   xitk_image_add_mask (wp->bg_skin.image);
   if ((type == XITK_HSLIDER) || (type == XITK_VSLIDER) || (type == XITK_HVSLIDER))
@@ -1158,7 +1158,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   wp->bg_skin.y = 0;
   wp->bg_skin.width = wp->bg_skin.image->width;
   wp->bg_skin.height = wp->bg_skin.image->height;
-  
+
   wp->radius = (wp->bg_skin.height >> 1) - (wp->paddle_skin.height);
 
   wp->sType = type;

@@ -270,7 +270,7 @@ static int _browser_item_2_visible (_browser_private_t *wp, int item) {
     return -1;
   return wp->visible.i2v[item];
 }
-  
+
 static int _browser_visible_2_item (_browser_private_t *wp, int visible) {
   if ((visible < 0) || (visible >= wp->visible.max))
     return -1;
@@ -1005,7 +1005,7 @@ static void browser_right(xitk_widget_t *w, void *data) {
     return;
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
-  
+
   _browser_hslidmove (wp, xitk_slider_make_step (wp->visible.btns[WSLIDH]) - wp->visible.x0);
 }
 
@@ -1069,7 +1069,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   wp->skonfig = skonfig;
   wp->visible.max = 0;
   _browser_item_btns (wp, info);
-  
+
   b.skin_element_name = br->arrow_up.skin_element_name;
   b.callback          = browser_up;
   b.userdata          = wp;
@@ -1080,7 +1080,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     wp->visible.btns[WBUP]->type &= ~WIDGET_TABABLE;
     xitk_widget_set_parent (wp->visible.btns[WBUP], &wp->w);
   }
-  
+
   sl.min                      = 0;
   sl.max                      = 1;
   sl.step                     = 1;
@@ -1108,7 +1108,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     wp->visible.btns[WBDN]->type &= ~WIDGET_TABABLE;
     xitk_widget_set_parent (wp->visible.btns[WBDN], &wp->w);
   }
-  
+
   b.skin_element_name = br->arrow_left.skin_element_name;
   b.callback          = browser_left;
   b.userdata          = wp;
@@ -1119,7 +1119,7 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     wp->visible.btns[WBLF]->type &= ~WIDGET_TABABLE;
     xitk_widget_set_parent (wp->visible.btns[WBLF], &wp->w);
   }
-  
+
   sl.min                      = 0;
   sl.max                      = 1;
   sl.step                     = 1;
@@ -1247,7 +1247,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_widget_set_parent (wp->visible.btns[WSLID], &wp->w);
     xitk_slider_set_to_max (wp->visible.btns[WSLID]);
   }
-  
+
   b.skin_element_name = "XITK_NOSKIN_DOWN";
   b.callback          = browser_down;
   b.userdata          = wp;
@@ -1289,7 +1289,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     xitk_widget_set_parent (wp->visible.btns[WSLIDH], &wp->w);
     xitk_slider_reset (wp->visible.btns[WSLIDH]);
   }
-  
+
   b.skin_element_name = "XITK_NOSKIN_RIGHT";
   b.callback          = browser_right;
   b.userdata          = wp;

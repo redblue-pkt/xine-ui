@@ -217,7 +217,7 @@ double xitk_doublebox_get_value(xitk_widget_t *w) {
 static void doublebox_minus(xitk_widget_t *x, void *data) {
   _doublebox_private_t *wp = (_doublebox_private_t *)data;
   char buf[256];
-  
+
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
@@ -238,7 +238,7 @@ static void doublebox_minus(xitk_widget_t *x, void *data) {
 static void doublebox_plus(xitk_widget_t *x, void *data) {
   _doublebox_private_t *wp = (_doublebox_private_t *)data;
   char buf[256];
-  
+
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)

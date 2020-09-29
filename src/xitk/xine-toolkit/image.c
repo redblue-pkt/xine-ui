@@ -59,9 +59,9 @@ unsigned int xitk_get_pixel_color_from_rgb(xitk_t *xitk, int r, int g, int b) {
 
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(xitk->imlibdata);
-  
+
   xcolor.flags = DoRed | DoBlue | DoGreen;
-  
+
   xcolor.red   = r<<8;
   xcolor.green = g<<8;
   xcolor.blue  = b<<8;
@@ -274,7 +274,7 @@ void xitk_image_free_image(xitk_image_t **src) {
 
   if (image->mask)
     xitk_image_destroy_xitk_pixmap (image->mask);
-  
+
   if (image->image)
     xitk_image_destroy_xitk_pixmap (image->image);
 
@@ -291,10 +291,10 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
   ABORT_IF_NULL(xpix);
 
   xitk_lock_display (xpix->xitk);
-  
+
   if(xpix->pixmap != None)
     XFreePixmap(xpix->imlibdata->x.disp, xpix->pixmap);
-  
+
   XFreeGC(xpix->imlibdata->x.disp, xpix->gc);
   XSync(xpix->imlibdata->x.disp, False);
 
@@ -317,9 +317,9 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
     free(shminfo);
   }
 #endif
-  
+
   xitk_unlock_display (xpix->xitk);
-  
+
   XITK_FREE(xpix);
 }
 
@@ -403,7 +403,7 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
   xpix->height    = height;
   xpix->xim       = NULL;
   xpix->shm       = 0;
-  
+
   xitk_lock_display (xpix->xitk);
 
 #ifdef HAVE_SHM
@@ -516,11 +516,11 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p) {
  */
 Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
-  
+
   ABORT_IF_NULL(im);
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
-  
+
   xitk_lock_display (p->xitk);
   p = XCreatePixmap (p->xitk->display, im->x.base_window, width, height, 1);
   xitk_unlock_display (p->xitk);
@@ -551,7 +551,7 @@ void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, i
 
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
-  
+
   if(src->mask) {
     xitk_image_destroy_xitk_pixmap(src->mask);
 
@@ -565,10 +565,10 @@ void xitk_image_change_image(xitk_image_t *src, xitk_image_t *dest, int width, i
   }
   else
     dest->mask = NULL;
-  
+
   if(dest->image)
     xitk_image_destroy_xitk_pixmap(dest->image);
-  
+
   dest->image = xitk_image_create_xitk_pixmap(src->xitk, width, height);
 
   xitk_pixmap_copy_area(src->image, dest->image, 0, 0, width, height, 0, 0);
@@ -738,7 +738,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   xitk_lock_display (xitk);
   gc = XCreateGC (xitk->display, im->x.base_window, None, None);
   xitk_unlock_display (xitk);
-  
+
   /* Creating an image from an empty string would cause an abort with failed */
   /* condition "width > 0". So we substitute some spaces (one single space   */
   /* may not be enough!). Should only happen in case of error.               */
@@ -852,21 +852,21 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
     
     p++;
   }
-  
+
   if(linel) { /* In case last chars aren't stored */
     lines[numlines++] = bp;
     
     if(linew > maxw)
       maxw = linew;
   }
-  
+
   /* If default resp. left aligned, we may shrink the image */
   if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
     width = MIN(maxw, width);
-  
+
   image = xitk_image_create_image(xitk, width, (height + add_line_spc) * numlines - add_line_spc);
   draw_flat_with_color(image->image, image->width, image->height, background);
-  
+
   { /* Draw string in image */
     int i, y, x = 0;
     
@@ -933,7 +933,7 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
 
   w = p->width / 3;
   h = p->height;
-  
+
   x1 = (w - 5);
   y1 = (h / 2); 
 
@@ -1247,17 +1247,17 @@ static void _draw_check_round(xitk_image_t *p, int x, int y, int d, int checked)
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, y, d, d, (30 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
-  
+
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray(p->xitk));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, y, d, d, (210 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
-  
+
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white(p->xitk));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x + 2, y + 2, d - 4, d - 4, (0 * 64), (360 * 64));
   xitk_unlock_display (p->xitk);
-  
+
   if(checked) {
     xitk_lock_display (p->xitk);
     XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
@@ -1275,13 +1275,13 @@ static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked)
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y, x + d, y);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y, x, y + d);
   xitk_unlock_display (p->xitk);
-  
+
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray(p->xitk));
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y + d, x + d, y + d);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + d, y, x + d, y + d);
   xitk_unlock_display (p->xitk);
-  
+
   if (checked & 1) {
     xitk_lock_display (p->xitk);
     XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
@@ -1291,7 +1291,7 @@ static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked)
     XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + (d / 2) + 1, y + d - 2, x + d - 1, y+1);
     xitk_unlock_display (p->xitk);
   }
-  
+
 }
 
 static void draw_check_three_state_round_style(xitk_image_t *p, int x, int y, int d, int w, int checked) {
@@ -1800,7 +1800,7 @@ static void _draw_frame(xitk_pixmap_t *p,
   }
 
   _draw_rectangular_box (p, x, y + yoff, xstart, xstop, w, h - yoff, style | DRAW_DOUBLE | DRAW_LIGHT);
-  
+
   if(title) {
     xitk_pixmap_draw_string(p, fs,  (x - lbearing + 6), (y + ascent), titlebuf, titlelen,
                             xitk_get_pixel_color_black(p->xitk));
@@ -1922,7 +1922,7 @@ void draw_paddle_rotate(xitk_image_t *p) {
   ncolor = xitk_get_pixel_color_darkgray(p->xitk);
   fcolor = xitk_get_pixel_color_warning_background(p->xitk);
   ccolor = xitk_get_pixel_color_lightgray(p->xitk);
-  
+
   {
     int x, i;
     unsigned int bg_colors[3] = { ncolor, fcolor, ccolor };
@@ -1966,11 +1966,11 @@ void draw_rotate_button(xitk_image_t *p) {
   /* Draw mask */
   XSetForeground (p->xitk->display, p->mask->gc, 0);
   XFillRectangle (p->xitk->display, p->mask->pixmap, p->mask->gc, 0, 0, w , h);
-  
+
   XSetForeground (p->xitk->display, p->mask->gc, 1);
   XFillArc (p->xitk->display, p->mask->pixmap, p->mask->gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
   xitk_unlock_display (p->xitk);
-  
+
   /* */
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray(p->xitk));
@@ -1996,10 +1996,10 @@ void draw_button_plus(xitk_image_t *p) {
   CHECK_IMAGE(p);
 
   draw_button_minus(p);
-  
+
   w = p->width / 3;
   h = p->height;
-  
+
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
  
@@ -2020,14 +2020,14 @@ void draw_button_minus(xitk_image_t *p) {
 
   w = p->width / 3;
   h = p->height;
-  
+
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
  
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, 2, (h >> 1) - 1, w - 4, (h >> 1) - 1);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, w + 2, (h >> 1) - 1, (w * 2) - 4, (h >> 1) - 1);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, (w * 2) + 3, h >> 1, (w * 3) - 3, h >> 1);
-  
+
   xitk_unlock_display (p->xitk);
 }
 

@@ -291,7 +291,7 @@ static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_check
 
   wp->w.type    = WIDGET_TYPE_CHECKBOX | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE | WIDGET_KEYABLE;
   wp->w.event   = checkbox_event;
-  
+
   return &wp->w;
 }
 
@@ -301,7 +301,7 @@ static xitk_widget_t *_xitk_checkbox_create (_checkbox_private_t *wp, xitk_check
 xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
 				     xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
   _checkbox_private_t *wp;
-  
+
   XITK_CHECK_CONSTITENCY(cb);
 
   wp = (_checkbox_private_t *)xitk_widget_new (wl, sizeof (*wp));
@@ -334,7 +334,7 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
   _checkbox_private_t *wp;
   unsigned int u = sizeof (noskin_names) / sizeof (noskin_names[0]);
   xitk_image_t  *i;
-  
+
   XITK_CHECK_CONSTITENCY(cb);
 
   wp = (_checkbox_private_t *)xitk_widget_new (wl, sizeof (*wp));

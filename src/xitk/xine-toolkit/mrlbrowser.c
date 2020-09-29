@@ -68,7 +68,7 @@ typedef struct {
   xitk_window_t             *xwin;
 
   xitk_widget_list_t        *widget_list; /* File browser widget list */
-  
+
   xine_t                    *xine;
 
   int                        mrls_num;
@@ -137,7 +137,7 @@ static const struct {
 static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_filter_t **mrl_f) {
   xitk_mrlbrowser_filter_t **mrl_filters = mrl_f;
   size_t                     i = 0;
-  
+
   wp->filters_num = 0;
 
   if(mrl_f == NULL) {
@@ -169,18 +169,18 @@ static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_f
       wp->mrl_filters[i]->ending = strdup(mrl_filters[i]->ending);
     }
   }
-  
+
   wp->filters_num            = i;
   wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
   wp->mrl_filters[i]->name   = NULL;
   wp->mrl_filters[i]->ending = NULL;
-  
+
   wp->filters = (const char **) calloc((wp->filters_num + 1), sizeof(char *));
-  
+
   for(i = 0; wp->mrl_filters[i]->name != NULL; i++)
     wp->filters[i] = wp->mrl_filters[i]->name;
-  
+
   wp->filters[i] = NULL;
   wp->filter_selected = 0;
 }
@@ -510,7 +510,7 @@ static void mrlbrowser_grab_mrls (xitk_widget_t *w, void *data, int state) {
 static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
   _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
-  
+
   if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0) {
     xine_mrl_t *ms = wp->mc->mrls[j];
     
@@ -831,7 +831,7 @@ static void mrlbrowser_select (xitk_widget_t *w, void *data, int state) {
 static void mrlbrowser_play(xitk_widget_t *w, void *data) {
   _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
   int j = -1;
-  
+
   (void)w;
   if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
     _mrlbrowser_select_mrl (wp, j, 0, 1);
