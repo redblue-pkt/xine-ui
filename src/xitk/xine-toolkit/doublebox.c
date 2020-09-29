@@ -126,14 +126,15 @@ static void _db_tips_timeout (_doublebox_private_t *wp, unsigned long timeout) {
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+  _doublebox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
     return 0;
   (void)result;
-  
+
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       _db_paint (wp);
@@ -180,9 +181,10 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, const char *str
  *
  */
 void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
-  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+  _doublebox_private_t *wp;
   char buf[256];
-  
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
@@ -198,9 +200,10 @@ void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
  *
  */
 double xitk_doublebox_get_value(xitk_widget_t *w) {
-  _doublebox_private_t *wp = (_doublebox_private_t *)w;
+  _doublebox_private_t *wp;
   const char *strval;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)

@@ -745,9 +745,10 @@ static int _slider_key (_slider_private_t *wp, const char *string, int modifier)
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _slider_private_t *wp = (_slider_private_t *)w;
+  _slider_private_t *wp;
   int retval = 0;
 
+  xitk_container (wp, w, w);
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       event->x = wp->w.x;
@@ -792,9 +793,10 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  * Increment position
  */
 int xitk_slider_make_step(xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
+  _slider_private_t *wp;
   int v = 0;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     v = xitk_slider_get_pos (&wp->w);
     if (!wp->bClicked) {
@@ -814,9 +816,10 @@ int xitk_slider_make_step(xitk_widget_t *w) {
  * Decrement position
  */
 int xitk_slider_make_backstep(xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
+  _slider_private_t *wp;
   int v = 0;
-  
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     v = xitk_slider_get_pos (&wp->w);
     if (!wp->bClicked) {
@@ -836,8 +839,9 @@ int xitk_slider_make_backstep(xitk_widget_t *w) {
  * Set value MIN.
  */
 void xitk_slider_set_min (xitk_widget_t *w, int min) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
     _slider_update_minmax (wp, (float)((min == wp->upper) ? min - 1 : min), wp->upper);
 }
@@ -846,8 +850,9 @@ void xitk_slider_set_min (xitk_widget_t *w, int min) {
  * Return the MIN value
  */
 int xitk_slider_get_min (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)
     return (int)wp->lower;
   return -1;
@@ -857,8 +862,9 @@ int xitk_slider_get_min (xitk_widget_t *w) {
  * Return the MAX value
  */
 int xitk_slider_get_max (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
     return (int)wp->upper;
   return -1;
@@ -868,8 +874,9 @@ int xitk_slider_get_max (xitk_widget_t *w) {
  * Set value MAX
  */
 void xitk_slider_set_max (xitk_widget_t *w, int max) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
     _slider_update_minmax (wp, wp->lower, (float)((max == wp->lower) ? max + 1 : max));
 }
@@ -878,8 +885,9 @@ void xitk_slider_set_max (xitk_widget_t *w, int max) {
  * Set pos to 0 and redraw the widget.
  */
 void xitk_slider_reset (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     _slider_update_value (wp, 0.0);
     wp->bClicked = 0;
@@ -891,8 +899,9 @@ void xitk_slider_reset (xitk_widget_t *w) {
  * Set pos to max and redraw the widget.
  */
 void xitk_slider_set_to_max (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (!wp->bClicked) {
       _slider_update_value (wp, wp->upper);
@@ -905,8 +914,9 @@ void xitk_slider_set_to_max (xitk_widget_t *w) {
  * Return current position.
  */
 int xitk_slider_get_pos (xitk_widget_t *w) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     int value = wp->sType == XITK_HVSLIDER
               ? (wp->hv_max_y > 0 ? (int)wp->upper - wp->hv_info.v.pos : wp->hv_info.h.pos)
@@ -920,8 +930,9 @@ int xitk_slider_get_pos (xitk_widget_t *w) {
  * Set position.
  */
 void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
-  _slider_private_t *wp = (_slider_private_t *)w;
-  
+  _slider_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (!wp->bClicked) {
       if (wp->sType == XITK_HVSLIDER) {
@@ -952,8 +963,9 @@ void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
 }
 
 void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_sync_t mode) {
-  _slider_private_t *wp = (_slider_private_t *)w;
+  _slider_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp || !info)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_SLIDER)

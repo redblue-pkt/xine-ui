@@ -194,8 +194,9 @@ static int _button_focus (_button_private_t *wp, int focus) {
 }
 
 static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _button_private_t *wp = (_button_private_t *)w;
+  _button_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp || ! event)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BUTTON)

@@ -152,11 +152,12 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
 }
 
 void xitk_menu_add_entry (xitk_widget_t *w, xitk_menu_entry_t *me) {
-  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_private_t *wp;
   _menu_node_t *here;
   char buf[400], *e = buf + sizeof (buf) - 1;
   const char *p;
 
+  xitk_container (wp, w, w);
   if (!w || !me)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
@@ -600,8 +601,9 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 #endif
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
@@ -638,7 +640,9 @@ xitk_widget_t *xitk_menu_get_menu (xitk_widget_t *w) {
 }
 
 int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
-  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
@@ -649,7 +653,9 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
 }
 
 void xitk_menu_destroy_sub_branchs (xitk_widget_t *w) {
-  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
@@ -692,8 +698,9 @@ void menu_auto_pop (xitk_widget_t *w) {
 }
 
 void xitk_menu_show_menu (xitk_widget_t *w) {
-  _menu_private_t *wp = (_menu_private_t *)w;
+  _menu_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)

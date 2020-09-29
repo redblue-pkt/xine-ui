@@ -249,14 +249,15 @@ static void _ib_tips_timeout (_intbox_private_t *wp, unsigned long timeout) {
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _intbox_private_t *wp = (_intbox_private_t *)w;
+  _intbox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)
     return 0;
   (void)result;
-  
+
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       _ib_paint (wp);
@@ -311,8 +312,9 @@ static void intbox_it (xitk_widget_t *x, void *data, const char *string) {
  *
  */
 void xitk_intbox_set_value (xitk_widget_t *w, int value) {
-  _intbox_private_t *wp = (_intbox_private_t *)w;
-  
+  _intbox_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)
@@ -333,8 +335,9 @@ void xitk_intbox_set_value (xitk_widget_t *w, int value) {
  *
  */
 int xitk_intbox_get_value(xitk_widget_t *w) {
-  _intbox_private_t *wp = (_intbox_private_t *)w;
+  _intbox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)

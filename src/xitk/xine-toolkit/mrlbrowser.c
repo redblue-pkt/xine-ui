@@ -230,8 +230,9 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -581,8 +582,9 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
  * Enable/Disable tips.
  */
 void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -598,8 +600,9 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
  * Return window of widget.
  */
 xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return NULL;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -613,8 +616,9 @@ xitk_window_t *xitk_mrlbrowser_get_window(xitk_widget_t *w) {
  * Fill window information struct of given widget.
  */
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -627,8 +631,9 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
  * Boolean about running state.
  */
 int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -641,8 +646,9 @@ int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
  * Boolean about visible state.
  */
 int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -655,8 +661,9 @@ int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
  * Hide mrlbrowser.
  */
 void xitk_mrlbrowser_hide(xitk_widget_t *w) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -673,8 +680,9 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
  * Show mrlbrowser.
  */
 void xitk_mrlbrowser_show(xitk_widget_t *w) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
@@ -710,9 +718,10 @@ static void xitk_mrlbrowser_exit (xitk_widget_t *w, void *data, int state) {
  */
 
 void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)w;
+  _mrlbrowser_private_t *wp;
   xitk_image_t *bg_image;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)

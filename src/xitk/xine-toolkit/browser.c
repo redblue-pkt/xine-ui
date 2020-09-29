@@ -769,8 +769,9 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
 }
 
 static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _browser_private_t *wp = (_browser_private_t *)w;
+  _browser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp || !event)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -803,8 +804,9 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
  * Return the number of displayed entries
  */
 int xitk_browser_get_num_entries(xitk_widget_t *w) {
-  _browser_private_t *wp = (_browser_private_t *)w;
+  _browser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -816,8 +818,9 @@ int xitk_browser_get_num_entries(xitk_widget_t *w) {
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w) {
-  _browser_private_t *wp = (_browser_private_t *)w;
+  _browser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -829,9 +832,10 @@ int xitk_browser_get_current_start(xitk_widget_t *w) {
  * Change browser labels alignment
  */
 void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
-  _browser_private_t *wp = (_browser_private_t *)w;
+  _browser_private_t *wp;
   int i;
-  
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -850,8 +854,9 @@ static int _xitk_browser_get_current_selected (_browser_private_t *wp) {
   return wp->items.selected;
 }
 int xitk_browser_get_current_selected(xitk_widget_t *w) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
+  _browser_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return -1;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -864,14 +869,15 @@ int xitk_browser_get_current_selected(xitk_widget_t *w) {
  */
 static void _xitk_browser_release_all_buttons (_browser_private_t *wp) {
   int i;
-  
+
   for (i = 0; i < wp->visible.max; i++)
     xitk_labelbutton_set_state (wp->visible.btns[i + WBSTART], 0);
 }
 
 void xitk_browser_release_all_buttons(xitk_widget_t *w) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
+  _browser_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -883,8 +889,9 @@ void xitk_browser_release_all_buttons(xitk_widget_t *w) {
  * Select the item 'select' in list
  */
 void xitk_browser_set_select(xitk_widget_t *w, int item) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
+  _browser_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -898,8 +905,9 @@ void xitk_browser_set_select(xitk_widget_t *w, int item) {
  * Redraw buttons/slider
  */
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
-  _browser_private_t *wp = (_browser_private_t *)w;
+  _browser_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -913,8 +921,9 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
  * Update the list, and rebuild button list
  */
 void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start) {
-  _browser_private_t *wp = (_browser_private_t *)w;
-  
+  _browser_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BROWSER)
@@ -994,7 +1003,7 @@ static void browser_left(xitk_widget_t *w, void *data) {
     return;
   if (!(w->type & WIDGET_GROUP_BROWSER))
     return;
-  
+
   _browser_hslidmove (wp, xitk_slider_make_backstep (wp->visible.btns[WSLIDH]) - wp->visible.x0);
 }
 
