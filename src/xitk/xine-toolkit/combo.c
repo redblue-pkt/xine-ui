@@ -349,8 +349,9 @@ static void _combo_tips_timeout (_combo_private_t *wp, unsigned long timeout) {
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
+  _combo_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp || !event)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_COMBO)
@@ -384,8 +385,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  *
  */
 void xitk_combo_set_select(xitk_widget_t *w, int select) {
-  _combo_private_t *wp = (_combo_private_t *)w;
+  _combo_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
 
@@ -401,8 +403,9 @@ void xitk_combo_set_select(xitk_widget_t *w, int select) {
  *
  */
 void xitk_combo_update_pos(xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
+  _combo_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return;
 
@@ -439,8 +442,9 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
  *
  */
 int xitk_combo_get_current_selected(xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
+  _combo_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return -1;
 
@@ -454,8 +458,9 @@ int xitk_combo_get_current_selected(xitk_widget_t *w) {
  * 
  */
 const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
+  _combo_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return NULL;
 
@@ -470,8 +475,9 @@ const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
  *
  */
 void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int len) {
-  _combo_private_t *wp = (_combo_private_t *)w;
-  
+  _combo_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (!wp)
     return;
 

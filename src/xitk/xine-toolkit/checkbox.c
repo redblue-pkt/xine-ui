@@ -190,8 +190,9 @@ static void _checkbox_new_skin (_checkbox_private_t *wp, xitk_skin_config_t *sko
 }
 
 static int checkbox_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _checkbox_private_t *wp = (_checkbox_private_t *)w;
+  _checkbox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!event || !wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_CHECKBOX)
@@ -241,8 +242,9 @@ static int checkbox_event (xitk_widget_t *w, widget_event_t *event, widget_event
  *
  */
 int xitk_checkbox_get_state(xitk_widget_t *w) {
-  _checkbox_private_t *wp = (_checkbox_private_t *)w;
+  _checkbox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
     return wp->cState;
   }
@@ -253,8 +255,9 @@ int xitk_checkbox_get_state(xitk_widget_t *w) {
  *
  */
 void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
-  _checkbox_private_t *wp = (_checkbox_private_t *)w;
+  _checkbox_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
     if (wp->cState != state) {
       int focus = wp->focus, clk = wp->cClicked;

@@ -224,11 +224,12 @@ static void _tabs_enability (_tabs_private_t *wp) {
       xitk_disable_widget (wp->tabs[i]);
   }
 }
-  
+
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _tabs_private_t *wp = (_tabs_private_t *)w;
+  _tabs_private_t *wp;
   int retval = 0;
 
+  xitk_container (wp, w, w);
   (void)result;
   if (!wp || !event)
     return 0;
@@ -314,8 +315,9 @@ static void _tabs_shift_right (xitk_widget_t *w, void *data) {
  *
  */
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
-  _tabs_private_t *wp = (_tabs_private_t *)w;
-  
+  _tabs_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS)) {
     if ((select >= 0) && (select < wp->num_entries)) {
       xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
@@ -330,8 +332,9 @@ void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
  *
  */
 int xitk_tabs_get_current_selected(xitk_widget_t *w) {
-  _tabs_private_t *wp = (_tabs_private_t *)w;
-  
+  _tabs_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS))
     return wp->selected;
   return -1;
@@ -341,8 +344,9 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w) {
  *
  */
 const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
-  _tabs_private_t *wp = (_tabs_private_t *)w;
-  
+  _tabs_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_TABS))
     return xitk_labelbutton_get_label (wp->tabs[wp->selected]);
   return NULL;

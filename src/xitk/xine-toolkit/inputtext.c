@@ -1102,8 +1102,9 @@ static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier
 }
 
 static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _inputtext_private_t *wp = (_inputtext_private_t *)w;
+  _inputtext_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp || !event)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INPUTTEXT)
@@ -1188,8 +1189,9 @@ static void _xitk_inputtext_set_text (_inputtext_private_t *wp, const char *text
  * Change and redisplay the text of widget.
  */
 void xitk_inputtext_change_text (xitk_widget_t *w, const char *text) {
-  _inputtext_private_t *wp = (_inputtext_private_t *)w;
-  
+  _inputtext_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     _inputtext_sbuf_unset (wp);
     _xitk_inputtext_set_text (wp, text);

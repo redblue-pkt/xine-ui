@@ -252,8 +252,9 @@ static xitk_image_t *_label_get_skin (_label_private_t *wp, int sk) {
  *
  */
 const char *xitk_label_get_label (xitk_widget_t *w) {
-  _label_private_t *wp = (_label_private_t *)w;
+  _label_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))
     return wp->label.s;
   return NULL;
@@ -454,8 +455,9 @@ static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) 
  *
  */
 int xitk_label_change_label(xitk_widget_t *w, const char *newlabel) {
-  _label_private_t *wp = (_label_private_t *)w;
+  _label_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     size_t s = xitk_short_string_set (&wp->label, newlabel);
     if (s != (size_t)-1) {
@@ -488,8 +490,9 @@ static int _label_click (_label_private_t *wp, int button, int bUp, int x, int y
 }
 
 static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _label_private_t *wp = (_label_private_t *)w;
+  _label_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_LABEL)

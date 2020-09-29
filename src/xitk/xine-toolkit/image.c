@@ -2371,9 +2371,10 @@ static void _notify_change_skin (_image_private_t *wp, xitk_skin_config_t *skonf
 }
 
 static int _notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _image_private_t *wp = (_image_private_t *)w;
+  _image_private_t *wp;
   int retval = 0;
 
+  xitk_container (wp, w, w);
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
       event->x = wp->w.x;

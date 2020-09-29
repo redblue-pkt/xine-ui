@@ -78,6 +78,13 @@
                                       (w)->width  = 0;    \
                                     } while(0)
 
+/* paranoia #1: error if *cont_ptr does not have an element elem_name.
+ * paranoia #2: warn if it has wrong type. */
+#define xitk_container(cont_ptr,elem_ptr,elem_name) do { \
+  const typeof (elem_ptr) const xc_dummy = &((const typeof (cont_ptr))0)->elem_name; \
+  cont_ptr = (elem_ptr) ? (typeof (cont_ptr))(void *)((uint8_t *)(elem_ptr) - (uintptr_t)xc_dummy) : NULL; \
+} while (0)
+
 typedef struct {
   char *s, buf[64];
 } xitk_short_string_t;

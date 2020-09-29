@@ -374,8 +374,9 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
  * Changing button caption
  */
 int xitk_labelbutton_change_label (xitk_widget_t *w, const char *newlabel) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     xitk_short_string_set (&wp->label, newlabel);
     _labelbutton_paint (wp);
@@ -388,8 +389,9 @@ int xitk_labelbutton_change_label (xitk_widget_t *w, const char *newlabel) {
  * Return the current button label
  */
 const char *xitk_labelbutton_get_label (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     return wp->label.s;
   return NULL;
@@ -399,8 +401,9 @@ const char *xitk_labelbutton_get_label (xitk_widget_t *w) {
  * Changing button caption
  */
 int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *newlabel, int pos, const char *newfont) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp
     && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)
     && (wp->w.type & (WIDGET_GROUP_MENU | WIDGET_GROUP_BROWSER))) {
@@ -423,8 +426,9 @@ int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *newlab
  * Return the current button label
  */
 const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp
     && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)
     && (wp->w.type & (WIDGET_GROUP_MENU | WIDGET_GROUP_BROWSER)))
@@ -480,8 +484,9 @@ static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *s
 
 
 static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (!event || !wp)
     return 0;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_LABELBUTTON)
@@ -538,8 +543,9 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
  * Return state (ON/OFF) if button is radio button, otherwise -1
  */
 int xitk_labelbutton_get_state (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON))
       return wp->bState;
@@ -551,8 +557,9 @@ int xitk_labelbutton_get_state (xitk_widget_t *w) {
  * Set label button alignment
  */
 void xitk_labelbutton_set_alignment (xitk_widget_t *w, int align) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     wp->align = align;
 }
@@ -561,8 +568,9 @@ void xitk_labelbutton_set_alignment (xitk_widget_t *w, int align) {
  * Get label button alignment
  */
 int xitk_labelbutton_get_alignment (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     return wp->align;
   return -1;
@@ -572,8 +580,9 @@ int xitk_labelbutton_get_alignment (xitk_widget_t *w) {
  * Return used font name
  */
 char *xitk_labelbutton_get_fontname (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     return strdup (wp->font.s);
   return NULL;
@@ -583,15 +592,17 @@ char *xitk_labelbutton_get_fontname (xitk_widget_t *w) {
  *
  */
 void xitk_labelbutton_set_label_offset (xitk_widget_t *w, int offset) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     wp->label_offset = offset;
 }
 
 int xitk_labelbutton_get_label_offset (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     return wp->label_offset;
   return 0;
@@ -601,8 +612,9 @@ int xitk_labelbutton_get_label_offset (xitk_widget_t *w) {
  * Set radio button to state 'state'
  */
 void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
-  
+  _lbutton_private_t *wp;
+
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
       if (xitk_labelbutton_get_state (&wp->w) != state) {
@@ -629,8 +641,9 @@ void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
 }
 
 void *labelbutton_get_user_data (xitk_widget_t *w) {
-  _lbutton_private_t *wp = (_lbutton_private_t *)w;
+  _lbutton_private_t *wp;
 
+  xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON))
     return wp->userdata;
   return NULL;
