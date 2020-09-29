@@ -194,7 +194,7 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
       xitk_dnode_remove (&bl->swap->node);
     }
   }
-  
+
   bl->skin_config = skin_config;
   info = xitk_skin_get_info (bl->skin_config, bl->skin_element_name.s);
   max = info ? info->max_buttons : 0;
@@ -346,7 +346,7 @@ xitk_widget_t *xitk_button_list_new (
   bl->w.event = xitk_button_list_event;
 
   bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;
-  
+
   XITK_WIDGET_INIT (&lb);
   lb.skin_element_name = bl->skin_element_name.s;
   lb.button_type       = CLICK_BUTTON;

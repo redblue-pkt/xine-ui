@@ -217,7 +217,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
            
   if (mode & 1) {
     xitk_font_t *short_font = NULL;
-  
+
     slen = strlen (wp->shortcut_label.s);
     if (wp->shortcut_font.s[0])
       short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font.s);
@@ -644,7 +644,7 @@ void *labelbutton_get_user_data (xitk_widget_t *w) {
 xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, const xitk_skin_element_info_t *info) {
   _lbutton_private_t *wp;
-  
+
   ABORT_IF_NULL(wl);
 
   wp = (_lbutton_private_t *)xitk_widget_new (wl, sizeof (*wp));
@@ -744,7 +744,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, int x, int y, int width, int height,
   const char *ncolor, const char *fcolor, const char *ccolor, const char *fname) {
   _lbutton_private_t *wp;
-  
+
   ABORT_IF_NULL (wl);
   XITK_CHECK_CONSTITENCY (b);
 

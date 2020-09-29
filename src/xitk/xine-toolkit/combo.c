@@ -229,7 +229,7 @@ static void _combo_open (_combo_private_t *wp) {
     xitk_enable_and_show_widget (wp->browser_widget);
     wp->browser_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
   }
-  
+
   xitk_browser_update_list (wp->browser_widget, 
     (const char * const *)wp->entries, NULL, wp->num_entries, 0);
   wp->sel2 = wp->selected;
@@ -493,7 +493,7 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
 static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t *c,
   const char *skin_element_name, _combo_private_t *wp, int visible, int enable) {
   const char * const *entries = c->entries;
-  
+
   ABORT_IF_NULL(wl);
 
   wp->xwin = NULL;
@@ -512,7 +512,7 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->num_entries       = 0x7fffffff;
   wp->entries           = _combo_copy_string_list (c->entries, &wp->num_entries);
   wp->selected          = -1;
-  
+
   if (wp->num_entries) {
     xitk_label_change_label (wp->label_widget, entries[0]);
     wp->selected = 0;
@@ -539,7 +539,7 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
   _combo_private_t        *wp;
   xitk_checkbox_widget_t   cb;
   xitk_label_widget_t      lbl;
-  
+
   XITK_CHECK_CONSTITENCY(c);
 
   XITK_WIDGET_INIT(&cb);

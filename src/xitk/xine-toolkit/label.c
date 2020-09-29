@@ -94,7 +94,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
   int                    x_dest;
   int                    len, anim_add = 0;
   uint16_t               buf[2048];
-  
+
   font = _label_is_hili (wp->have_focus) && wp->highlight_font ? wp->highlight_font : wp->font;
   wp->anim_offset = 0;
 
@@ -192,7 +192,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
       0, 0, pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     x_dest = pixwidth;
   }
-  
+
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
     do {
@@ -318,7 +318,7 @@ static void *xitk_label_animation_loop (void *data) {
   _label_private_t *wp = (_label_private_t *)data;
 
   pthread_mutex_lock (&wp->change_mutex);
-  
+
   while (1) {
     unsigned long t_anim;
 
@@ -343,7 +343,7 @@ static void *xitk_label_animation_loop (void *data) {
   }
   wp->anim_running = 0;
   pthread_mutex_unlock (&wp->change_mutex);
-  
+
   return NULL;
 }
 
@@ -542,7 +542,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
 static xitk_widget_t *_label_create (_label_private_t *wp, const xitk_label_widget_t *l) {
   wp->callback = l->callback;
   wp->userdata = l->userdata;
-  
+
   wp->anim_running = 0;
   wp->have_focus   = FOCUS_LOST;
 
@@ -586,7 +586,7 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
   wp = (_label_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-  
+
   wp->imlibdata = wl->imlibdata;
   xitk_short_string_init (&wp->skin_element_name);
   xitk_short_string_set (&wp->skin_element_name, l->skin_element_name);

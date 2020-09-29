@@ -349,7 +349,7 @@ int xitk_intbox_get_value(xitk_widget_t *w) {
 static void intbox_minus(xitk_widget_t *x, void *data) {
   _intbox_private_t *wp = (_intbox_private_t *)data;
   int v;
-  
+
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)
@@ -374,7 +374,7 @@ static void intbox_minus(xitk_widget_t *x, void *data) {
 static void intbox_plus(xitk_widget_t *x, void *data) {
   _intbox_private_t *wp = (_intbox_private_t *)data;
   int v;
-  
+
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)
@@ -396,7 +396,7 @@ static void intbox_plus(xitk_widget_t *x, void *data) {
 static void intbox_sl (xitk_widget_t *x, void *data, int pos) {
   _intbox_private_t *wp = (_intbox_private_t *)data;
   int v;
-  
+
   if (!wp)
     return;
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INTBOX)

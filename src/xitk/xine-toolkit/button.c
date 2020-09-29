@@ -258,7 +258,7 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
 
   wp->callback          = b->callback;
   wp->userdata          = b->userdata;
-  
+
   wp->w.width           = wp->skin.width / 3;
   wp->w.height          = wp->skin.height;
   wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE
@@ -274,7 +274,7 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
 xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
 				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b) {
   _button_private_t *wp;
-  
+
   XITK_CHECK_CONSTITENCY(b);
   wp = (_button_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)

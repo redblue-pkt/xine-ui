@@ -381,7 +381,7 @@ int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen)
  */
 KeySym xitk_get_key_pressed(XEvent *event) {
   KeySym   pkey = XK_VoidSymbol;
-  
+
   if(event) {
     char  buf[256];
     (void) xitk_get_keysym_and_buf(event, &pkey, buf, sizeof(buf));
@@ -463,7 +463,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xitk_font_set_font (fs, wp->text.temp_gc);
     xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
-  
+
   if (wp->skin_element_name.s || (!wp->skin_element_name.s && (fg = xitk_get_black_color ()) == (unsigned int)-1)) {
     /*  Some colors configurations */
     int DefaultColor = -1;
@@ -583,7 +583,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
   XSetForeground (wp->imlibdata->x.disp, wp->text.temp_gc, fg);
   XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-  
+
   /*  Put text in the right place */
   {
     int src_x = state == _IT_FOCUS ? xsize : 0;
@@ -633,7 +633,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   if (fs)
     xitk_font_unload_font (fs);
-  
+
   xitk_part_image_draw (wp->w.wl, &wp->skin, &wp->text.temp_img,
     event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y);
 
@@ -694,7 +694,7 @@ static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     if ((wp->have_focus = focus) == FOCUS_LOST)
       wp->text.cursor_pos = -1;
-  
+
     if ((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
       _cursor_focus (wp, wp->w.wl->win, 0);
     else if (wp->w.enable && (focus == FOCUS_MOUSE_IN))
@@ -871,7 +871,7 @@ static void _inputtext_paste (_inputtext_private_t *wp) {
   else if (pos > olen)
     pos = olen;
   olen -= pos;
-  
+
 #ifndef NEW_CLIPBOARD
   XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
   insert = XFetchBytes (wp->imlibdata->x.disp, &ilen);
@@ -939,7 +939,7 @@ static void _inputtext_exec_return (_inputtext_private_t *wp) {
   //  wl->widget_focused = NULL;
   _cursor_focus (wp, wp->w.wl->win, 0);
   _paint_inputtext (wp);
-  
+
   if (wp->text.buf && wp->text.buf[0]) {
     if (wp->callback)
       wp->callback (&wp->w, wp->userdata, wp->text.buf);
@@ -1231,7 +1231,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
 
   wp->callback        = it->callback;
   wp->userdata        = it->userdata;
-  
+
   wp->w.type          = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_TABABLE
                       | WIDGET_CLICKABLE | WIDGET_KEEP_FOCUS | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event         = notify_event;

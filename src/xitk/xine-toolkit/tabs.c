@@ -139,7 +139,7 @@ static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
       xitk_set_widget_pos (wp->tabs[wp->stop], x, wp->y);
   }
 }
-  
+
 static void _tabs_arrange_item (_tabs_private_t *wp, int item, int paint) {
   if ((item < 0) || (item >= wp->num_entries))
     return;
@@ -360,14 +360,14 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   ABORT_IF_NULL(wl);
 
   XITK_CHECK_CONSTITENCY(t);
-  
+
   if((t->entries == NULL) || (t->num_entries == 0))
     XITK_DIE("%s(): entries should be non NULL.\n", __FUNCTION__);
 
   wp = (_tabs_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
-  
+
   wp->entries     = t->entries;
   wp->num_entries = t->num_entries;
   wp->x           = x;
