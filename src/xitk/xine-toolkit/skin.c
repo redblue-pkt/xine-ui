@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -211,7 +211,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   char *p;
   char *buf2 = NULL;
   char  buf[BUFSIZ], var[BUFSIZ];
-  
+
   ABORT_IF_NULL(skonfig);
 
   if( ! ( cmd && strchr(cmd, '$') ) ) return NULL;
@@ -221,7 +221,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   strlcpy(buf, cmd, sizeof(buf));
 
   buf2[0] = 0;
-      
+
   p = buf;
 
   while(*p != '\0') {
@@ -243,7 +243,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 	  if(skonfig->path) {
 	    char *ppath;
 	    char *z;
-		
+
 	    ppath = strdup(skonfig->path);
 	    if((z = strrchr(ppath, '/')) != NULL) {
 	      *z = '\0';
@@ -283,7 +283,7 @@ static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
 	/* else ignore */
       }
       break;
-	  
+
     default:
       {
 	const size_t buf2_len = strlen(buf2);
@@ -328,15 +328,15 @@ static int skin_get_align_value(const char *val) {
     const char *str;
     int value;
   } aligns[] = {
-    { "left",   ALIGN_LEFT   }, 
-    { "center", ALIGN_CENTER }, 
+    { "left",   ALIGN_LEFT   },
+    { "center", ALIGN_CENTER },
     { "right",  ALIGN_RIGHT  },
     { NULL,     0 }
   };
   int i;
-  
+
   ABORT_IF_NULL(val);
-  
+
   for(i = 0; aligns[i].str != NULL; i++) {
     if(!(strcasecmp(aligns[i].str, val)))
       return aligns[i].value;
@@ -353,8 +353,8 @@ static int skin_get_direction(const char *val) {
     const char *str;
     int         value;
   } directions[] = {
-    { "left",   DIRECTION_LEFT   }, 
-    { "right",  DIRECTION_RIGHT  }, 
+    { "left",   DIRECTION_LEFT   },
+    { "right",  DIRECTION_RIGHT  },
     { "up",     DIRECTION_UP     },
     { "down",   DIRECTION_DOWN   },
     { NULL,     0 }
@@ -362,7 +362,7 @@ static int skin_get_direction(const char *val) {
   int   i;
 
   ABORT_IF_NULL(val);
-  
+
   for(i = 0; directions[i].str != NULL; i++) {
     if(!(strcasecmp(directions[i].str, val)))
       return directions[i].value;
@@ -394,7 +394,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
   int n;
 
   ABORT_IF_NULL(skonfig);
-  
+
   n = xine_sarray_size (skonfig->elements);
   if (n) {
     int i;
@@ -427,7 +427,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 
       if (s->info.browser_entries > -1)
 	printf("  browser entries = %d\n", s->info.browser_entries);
-      
+
       printf("  animation   = %d\n", s->info.label_animation);
       printf("  step        = %d\n", s->info.label_animation_step);
       printf("  print       = %d\n", s->info.label_printable);
@@ -488,7 +488,7 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
  */
 xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
   xitk_skin_config_t *skonfig;
-  
+
   if((skonfig = (xitk_skin_config_t *) xitk_xmalloc(sizeof(xitk_skin_config_t))) == NULL) {
     XITK_DIE("xitk_xmalloc() failed: %s\n", strerror(errno));
   }
@@ -501,18 +501,18 @@ xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
   skonfig->xitk     = xitk;
   skonfig->version  = -1;
   skonfig->celement = NULL;
-  skonfig->name     = skonfig->author 
-                    = skonfig->date 
+  skonfig->name     = skonfig->author
+                    = skonfig->date
                     = skonfig->url
-                    = skonfig->load_command 
-                    = skonfig->unload_command 
-                    = skonfig->logo 
-                    = skonfig->animation 
+                    = skonfig->load_command
+                    = skonfig->unload_command
+                    = skonfig->logo
+                    = skonfig->animation
                     = NULL;
   skonfig->skinfile = skonfig->path = NULL;
 
   skonfig->ln = skonfig->buf;
-  
+
   return skonfig;
 }
 
@@ -542,7 +542,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
 
   skin_free_imgs (skonfig);
   xine_sarray_delete (skonfig->imgs);
-  
+
   XITK_FREE(skonfig->name);
   XITK_FREE(skonfig->author);
   XITK_FREE(skonfig->date);
@@ -721,7 +721,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
           char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
-      
+
           if (!strcmp (key2, "pixmap")) {
             _skin_make_filename (skonfig, val2, &skonfig->celement->info.slider_pixmap_pad_name);
           } else if (!strcmp (key2, "radius")) {
@@ -916,7 +916,7 @@ int xitk_skin_check_version(xitk_skin_config_t *skonfig, int min_version) {
  */
 const char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
-  
+
   return skonfig->animation;
 }
 
@@ -925,7 +925,7 @@ const char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
  */
 const char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
-  
+
   return skonfig->logo;
 }
 

@@ -15,12 +15,12 @@ void
 dirty_pixmaps(ImlibData * id, ImlibImage * im)
 {
   struct pixmap_cache *ptr;
-  
+
   ptr = id->cache.pixmap;
   while (ptr)
     {
       if ((ptr->im == im) &&
-	  ((!ptr->file) || ((ptr->file) && (im->filename) && 
+	  ((!ptr->file) || ((ptr->file) && (im->filename) &&
 			    (!strcmp(im->filename, ptr->file)))))
 	ptr->dirty = 1;
       ptr = ptr->next;
@@ -54,8 +54,8 @@ find_pixmap(ImlibData * id, ImlibImage * im, int width, int height, Pixmap * pma
   ptr = id->cache.pixmap;
   while (ptr)
     {
-      if ((ptr->im == im) && 
-	  (ptr->width == width) && 
+      if ((ptr->im == im) &&
+	  (ptr->width == width) &&
 	  (ptr->height == height) &&
 	  ((!ptr->file) || ((ptr->file) && (im->filename) &&
 			    (!strcmp(im->filename, ptr->file)))) &&
@@ -158,7 +158,7 @@ free_pixmappmap(ImlibData * id, Pixmap pmap)
 		{
 		  id->cache.num_pixmap--;
 		  if (ptr->pmap)
-		    id->cache.used_pixmap += ptr->width * ptr->height * 
+		    id->cache.used_pixmap += ptr->width * ptr->height *
 		      id->x.depth;
 		  if (ptr->shape_mask)
 		    id->cache.used_pixmap += ptr->width * ptr->height;
@@ -320,7 +320,7 @@ clean_caches(ImlibData * id)
     fprintf(stderr, "Accounting Data:\n");
     fprintf(stderr, "*** total images in cache %i with %i images\n",
 	    total, num);
-    fprintf(stderr, 
+    fprintf(stderr,
 	    "*** total unref images in cache %i with %i images\n\n",
 	    total2, num2);
 #endif
@@ -341,7 +341,7 @@ clean_caches(ImlibData * id)
 	  {
 	    if (!ptr->im->cache)
 	      {
-		id->cache.used_image -= ptr->im->rgb_width * 
+		id->cache.used_image -= ptr->im->rgb_width *
 		  ptr->im->rgb_height * 3;
 		nullify_image(id, ptr->im);
 		if (ptr->prev)
@@ -392,7 +392,7 @@ clean_caches(ImlibData * id)
 	  {
 	    if (ptr->refnum <= 0)
 	      {
-		id->cache.used_image -= ptr->im->rgb_width 
+		id->cache.used_image -= ptr->im->rgb_width
 		  * ptr->im->rgb_height * 3;
 		nullify_image(id, ptr->im);
 		if (ptr->prev)
@@ -457,7 +457,7 @@ clean_caches(ImlibData * id)
     fprintf(stderr, "Accounting Data:\n");
     fprintf(stderr, "*** total pixmaps in cache %i with %i pixmaps\n",
 	    total, num);
-    fprintf(stderr, 
+    fprintf(stderr,
 	    "*** total unref pixmaps in cache %i with %i pixmaps\n\n",
 	    total2, num2);
 #endif
@@ -485,7 +485,7 @@ clean_caches(ImlibData * id)
 	      id->cache.pixmap = ptr->next;
 	    if (ptr->next)
 	      ptr->next->prev = ptr->prev;
-	    free(ptr->file);         
+	    free(ptr->file);
 	    free(ptr);
 	  }
 	ptr = last;

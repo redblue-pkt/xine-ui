@@ -400,7 +400,7 @@ Imlib_init(Display * disp)
     }
   setlocale(LC_NUMERIC, old_locale);
   free(old_locale);
-  
+
   /* list all visuals for the default screen */
   xvi.screen = id->x.screen;
   xvir = XGetVisualInfo(disp, VisualScreenMask, &xvi, &num);
@@ -461,7 +461,7 @@ Imlib_init(Display * disp)
 		{
 		  if (xvir[i].depth == id->x.depth)
 		    {
-		      if ((xvir[i].class > clas) && 
+		      if ((xvir[i].class > clas) &&
 			  (xvir[i].class != DirectColor))
 			{
 			  maxn = i;
@@ -781,7 +781,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
       f = fopen(__XOS2RedirRoot(SYSTEM_IMRC), "rt");
 #endif
     }
-  
+
   if (f)
     {
       size_t length;
@@ -956,7 +956,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
     }
   setlocale(LC_NUMERIC, old_locale);
   free(old_locale);
-  
+
   if (p)
     {
       if (p->flags & PARAMS_VISUALID)

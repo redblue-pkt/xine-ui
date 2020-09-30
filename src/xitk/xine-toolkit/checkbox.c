@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -68,7 +68,7 @@ static xitk_image_t *_checkbox_get_skin (_checkbox_private_t *wp, int sk) {
 static int _checkbox_inside (_checkbox_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
     xitk_image_t *skin = wp->skin.image;
-      
+
     if(skin->mask)
       return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
   } else
@@ -261,7 +261,7 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
     if (wp->cState != state) {
       int focus = wp->focus, clk = wp->cClicked;
-      
+
       wp->focus = FOCUS_RECEIVED;
       wp->cClicked = 1;
       wp->cState = state;

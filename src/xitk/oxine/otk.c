@@ -65,7 +65,7 @@ typedef struct otk_layout_s otk_layout_t;
 struct otk_widget_s {
 
   int            widget_type;
-  
+
   int             x, y, w, h;
   int             focus;
   int             selectable;
@@ -142,7 +142,7 @@ struct otk_listentry_s {
   int              number;
   int              visible;
   int              isfirst, islast;
-  
+
   void            *data;
 };
 
@@ -230,7 +230,7 @@ static void check_text_width(odk_t *odk, char *text, int width) {
     int i=strlen(text)-4;
 
     if (i<0) return;
- 
+
     text[i]=text[i+1]=text[i+2]='.';text[i+3]=0;
 
     odk_get_text_size(odk, text, &textwidth, &num);
@@ -244,7 +244,7 @@ static void check_text_width(odk_t *odk, char *text, int width) {
 }
 
 static int is_correct_widget(otk_widget_t *widget, int expected) {
- 
+
   if (!widget) {
 #ifdef LOG
     printf("otk: got widget NULL\n");
@@ -271,7 +271,7 @@ static void remove_widget_from_win(otk_widget_t *widget) {
 
   }else if (is_correct_widget(widget->win, OTK_WIDGET_LAYOUT)) {
     otk_window_t *parent = (otk_window_t *) lay->widget.win;
-    
+
     lay->subs = g_list_remove(lay->subs, widget);
     parent->subs = g_list_remove(parent->subs, widget);
   }
@@ -293,13 +293,13 @@ static otk_widget_t *find_widget_xy (otk_t *otk, int x, int y) {
 
     cur2 = g_list_first (win->subs);
     while (cur2 && cur2->data) {
-    
+
       otk_widget_t *widget = cur2->data;
 
       if ( (widget->x<=x) && (widget->y <= y)
 	   && ((widget->x + widget->w) >= x)
 	   && ((widget->y + widget->h) >= y)
-	   && (widget->selectable) ) 
+	   && (widget->selectable) )
 	return widget;
 
       cur2 = g_list_next (cur2);
@@ -319,7 +319,7 @@ static int get_distance(otk_widget_t *base, otk_widget_t *target) {
   int x2 = (target->x+target->w/2)/10;
   int y2 = (target->y+target->h/2)/10;
   int dist = (int) sqrt (pow((x1-x2),2) + pow((y1-y2),2));
-  
+
 #ifdef LOG
   printf("distance: returning: %i\n ", dist);
 #endif
@@ -377,7 +377,7 @@ static double get_horizontal_angle(otk_widget_t *base, otk_widget_t *target) {
 #define RIGHT 4
 
 static otk_widget_t *find_neighbour (otk_t *otk, int direction) {
-  
+
   otk_widget_t *neighbour = NULL;
   int neighbour_ratio = 0;
   int x = otk->focus_ptr->x+otk->focus_ptr->w/2;
@@ -391,12 +391,12 @@ static otk_widget_t *find_neighbour (otk_t *otk, int direction) {
     otk_window_t *win = cur->data;
 
     cur2 = g_list_first (win->subs);
-    
+
     while (cur2 && cur2->data) {
       otk_widget_t *widget = cur2->data;
 
       if ( (widget != otk->focus_ptr) && (widget->selectable) ) {
-	
+
         int ratio = 0;
 	int nx = widget->x+widget->w/2;
 	int ny = widget->y+widget->h/2;
@@ -404,22 +404,22 @@ static otk_widget_t *find_neighbour (otk_t *otk, int direction) {
 	switch(direction) {
 	  case UP:
 	    if ((y-ny)<0) break;
-	    ratio = get_distance(otk->focus_ptr, widget) 
+	    ratio = get_distance(otk->focus_ptr, widget)
 	      * get_horizontal_angle(otk->focus_ptr, widget);
 	    break;
 	  case DOWN:
 	    if ((ny-y)<0) break;
-	    ratio = get_distance(otk->focus_ptr, widget) 
+	    ratio = get_distance(otk->focus_ptr, widget)
 	      * get_horizontal_angle(otk->focus_ptr, widget);
 	    break;
 	  case LEFT:
 	    if ((x-nx)<0) break;
-	    ratio = get_distance(otk->focus_ptr, widget) 
+	    ratio = get_distance(otk->focus_ptr, widget)
 	      * get_vertical_angle(otk->focus_ptr, widget);
 	    break;
           case RIGHT:
 	    if ((nx-x)<0) break;
-	    ratio = get_distance(otk->focus_ptr, widget) 
+	    ratio = get_distance(otk->focus_ptr, widget)
 	      * get_vertical_angle(otk->focus_ptr, widget);
 	    break;
 	}
@@ -433,7 +433,7 @@ static otk_widget_t *find_neighbour (otk_t *otk, int direction) {
 	  if((ratio<neighbour_ratio) || !neighbour_ratio ) {
 	    neighbour_ratio = ratio;
 	    neighbour = widget;
-	} 
+	}
       }
       cur2 = g_list_next (cur2);
     }
@@ -455,7 +455,7 @@ static void motion_handler (otk_t *otk, oxine_event_t *ev) {
   otk_widget_t *b;
 
   b = find_widget_xy (otk, ev->x, ev->y);
-  
+
   if (!b)
     return;
 
@@ -463,7 +463,7 @@ static void motion_handler (otk_t *otk, oxine_event_t *ev) {
     return;
 
   otk_set_focus(b);
-  
+
   otk_draw_all (otk);
 }
 
@@ -490,7 +490,7 @@ static void button_handler (otk_t *otk, oxine_event_t *ev) {
       b->select_cb (b);
     break;
   case OXINE_BUTTON4:
-    if( otk->focus_ptr) {    
+    if( otk->focus_ptr) {
       if( otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY){
 	otk_listentry_t *entry = (otk_listentry_t*) otk->focus_ptr;
 	list_pgup(entry->list);
@@ -499,7 +499,7 @@ static void button_handler (otk_t *otk, oxine_event_t *ev) {
     }
     break;
   case OXINE_BUTTON5:
-    if( otk->focus_ptr) {    
+    if( otk->focus_ptr) {
       if( otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY){
 	otk_listentry_t *entry = (otk_listentry_t*) otk->focus_ptr;
 	list_pgdown(entry->list);
@@ -513,7 +513,7 @@ static void button_handler (otk_t *otk, oxine_event_t *ev) {
 static void key_handler (otk_t *otk, oxine_event_t *ev) {
 
   otk_widget_t *new = NULL;
-  
+
   if (otk->event_handler) {
     otk->event_handler(otk->event_handler_data, ev);
   }
@@ -524,10 +524,10 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
   }
 
   /* we only handle key events if we have a focus */
-  if(!otk->focus_ptr) {    
+  if(!otk->focus_ptr) {
     return;
   }
-  
+
   switch(ev->key) {
     case OXINE_KEY_UP:
       if (otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY) {
@@ -580,7 +580,7 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
       return;
       break;
     case OXINE_KEY_PRIOR:
-    if( otk->focus_ptr) {    
+    if( otk->focus_ptr) {
       if( otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY){
 	otk_listentry_t *entry = (otk_listentry_t*) otk->focus_ptr;
 	list_pgup(entry->list);
@@ -589,7 +589,7 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
     }
     break;
     case OXINE_KEY_NEXT:
-    if( otk->focus_ptr) {    
+    if( otk->focus_ptr) {
       if( otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY){
 	otk_listentry_t *entry = (otk_listentry_t*) otk->focus_ptr;
 	list_pgdown(entry->list);
@@ -597,7 +597,7 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
       }
     }
     break;
- 
+
     case OXINE_KEY_1:
       printf("got key 1\n");
       break;
@@ -606,7 +606,7 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
       break;
     case OXINE_KEY_3:
       printf("got key 3\n");
-      break;      
+      break;
   }
   if (new && (new != otk->focus_ptr)) {
     otk_set_focus(new);
@@ -662,30 +662,30 @@ static void button_draw(otk_widget_t *this) {
   case OTK_BUTTON_TEXT:
     odk_set_font(this->odk, this->otk->button_font, this->otk->button_font_size);
     displayed_text = strdup(button->text);
-    check_text_width(this->odk, displayed_text, button->widget.w); 
+    check_text_width(this->odk, displayed_text, button->widget.w);
 
     if (this->focus) {
-      odk_draw_rect (this->odk, this->x, this->y, 
-		     this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1); 
+      odk_draw_rect (this->odk, this->x, this->y,
+		     this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1);
 
-      odk_draw_text (this->odk, this->x+this->w/2, 
-		     this->y+this->h/2, 
+      odk_draw_text (this->odk, this->x+this->w/2,
+		     this->y+this->h/2,
 		     displayed_text, ODK_ALIGN_CENTER | ODK_ALIGN_VCENTER,
 		     this->otk->textcolor_but);
     } else
 
-      odk_draw_text (this->odk, this->x+this->w/2, 
-		     this->y+this->h/2, 
+      odk_draw_text (this->odk, this->x+this->w/2,
+		     this->y+this->h/2,
 		     displayed_text, ODK_ALIGN_CENTER | ODK_ALIGN_VCENTER,
 		     this->otk->textcolor_win);
     free(displayed_text);
     break;
   case OTK_BUTTON_PIXMAP:
     printf("OTK_BUTTON_PIXMAP..\n");
-    
+
     if (this->focus) {
-      odk_draw_rect (this->odk, this->x, this->y, 
-		     this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1); 
+      odk_draw_rect (this->odk, this->x, this->y,
+		     this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1);
 
 
       odk_draw_bitmap(this->odk, button->pixmap, this->x - this->w*2, this->y - this->h*2, 10, 10, NULL);
@@ -695,7 +695,7 @@ static void button_draw(otk_widget_t *this) {
       odk_draw_bitmap(this->odk, button->pixmap, this->x - this->w*2, this->y - this->h*2, 10, 10, NULL);
 
     break;
-  default: 
+  default:
     printf("OTK_BUTTON_TYPE : %d not supported\n", button->type);
     break;
   }
@@ -715,23 +715,23 @@ static void slider_draw_graphic(otk_widget_t *this) {
   value = (value*this->w-20)/100;
 
   if (this->focus) {
-    odk_draw_rect (this->odk, this->x, this->y, 
-		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1); 
+    odk_draw_rect (this->odk, this->x, this->y,
+		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1);
 
-    odk_draw_rect (this->odk, this->x, this->y+(this->h)/2-5, 
+    odk_draw_rect (this->odk, this->x, this->y+(this->h)/2-5,
 		   this->x+this->w , this->y+(this->h)/2+5 , 1, this->otk->col_sl1f);
 
-    odk_draw_rect (this->odk, this->x+value+5, this->y+(this->h)/2-15, 
+    odk_draw_rect (this->odk, this->x+value+5, this->y+(this->h)/2-15,
 		   this->x+value+15 , this->y+(this->h)/2+15 , 1, this->otk->col_sl2f);
 
   } else {
-    odk_draw_rect (this->odk, this->x, this->y, 
-		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_win+1); 
+    odk_draw_rect (this->odk, this->x, this->y,
+		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_win+1);
 
-    odk_draw_rect (this->odk, this->x, this->y+(this->h)/2-5, 
+    odk_draw_rect (this->odk, this->x, this->y+(this->h)/2-5,
 		   this->x+this->w , this->y+(this->h)/2+5, 1, this->otk->col_sl1);
 
-    odk_draw_rect (this->odk, this->x+value+5, this->y+(this->h)/2-15, 
+    odk_draw_rect (this->odk, this->x+value+5, this->y+(this->h)/2-15,
 		   this->x+value+15 , this->y+(this->h)/2+15 , 1, this->otk->col_sl2);
   }
 }
@@ -765,7 +765,7 @@ static void scrollbar_draw(otk_widget_t *this) {
     color[1] = this->otk->col_sl1;
     color[2] = this->otk->col_sl2;
   }
-    
+
   odk_draw_rect (this->odk, this->x, this->y,
                  this->x+this->w, this->y+this->h, 1, color[0]);
 
@@ -793,7 +793,7 @@ static void button_destroy(otk_widget_t *this) {
 
   if (!is_correct_widget(this, OTK_WIDGET_BUTTON)) return;
 
-  if(button->type == OTK_BUTTON_PIXMAP) 
+  if(button->type == OTK_BUTTON_PIXMAP)
     free(button->pixmap);
 
   remove_widget_from_win(this);
@@ -869,7 +869,7 @@ otk_widget_t *otk_button_grid_new (const char *text,
   button->cb                 = cb;
   button->cb_data            = cb_data;
   button->uc                 = NULL;
- 
+
   return (otk_widget_t*) button;
 }
 
@@ -903,7 +903,7 @@ otk_widget_t *otk_button_new (otk_widget_t *win, int x, int y,
   button->cb                 = cb;
   button->cb_data            = cb_data;
   button->uc                 = NULL;
- 
+
   window->subs = g_list_append (window->subs, button);
 
   return (otk_widget_t*) button;
@@ -913,7 +913,7 @@ otk_widget_t *otk_scrollbar_new (otk_widget_t *win, int x, int y,
 			        int w, int h,
 			        otk_button_cb_t cb_up, otk_button_cb_t cb_down,
 			        void *user_data) {
-                                
+
   otk_scrollbar_t *scrollbar;
   otk_window_t *window = (otk_window_t*) win;
 
@@ -940,7 +940,7 @@ otk_widget_t *otk_scrollbar_new (otk_widget_t *win, int x, int y,
   scrollbar->cb_data            = user_data;
   scrollbar->pos_start          = 0;
   scrollbar->pos_end            = 100;
-  
+
   window->subs = g_list_append (window->subs, scrollbar);
 
   return (otk_widget_t*) scrollbar;
@@ -963,13 +963,13 @@ void otk_scrollbar_set(otk_widget_t *this, int pos_start, int pos_end)
 
 void otk_button_uc_set(otk_widget_t *this, otk_button_cb_t uc, void *uc_data) {
   otk_button_t *button = (otk_button_t *)this;
-  
+
   if (!is_correct_widget(this, OTK_WIDGET_BUTTON)) return;
 
   button->uc = uc;
   button->widget.needupdate = 1;
   button->uc_data = uc_data;
- 
+
 }
 
 /*
@@ -982,31 +982,31 @@ static void listentry_draw (otk_widget_t *this) {
   char *displayed_text;
 
   if (!is_correct_widget(this, OTK_WIDGET_LISTENTRY)) return;
-  
+
 #ifdef LOG
   printf("otk: draw listentry\n");
 #endif
 
   if (!listentry->visible) return;
-  
+
   odk_set_font(this->odk, listentry->list->font, listentry->list->font_size);
   displayed_text = strdup(listentry->text);
-  check_text_width(listentry->widget.odk, displayed_text, listentry->widget.w); 
+  check_text_width(listentry->widget.odk, displayed_text, listentry->widget.w);
 
   /* printf("%d %d\n", this->x, this->y+this->h/2); */
 
   if (this->focus) {
-    odk_draw_rect (this->odk, this->x, this->y, 
-		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1); 
+    odk_draw_rect (this->odk, this->x, this->y,
+		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1);
 
-    odk_draw_text (this->odk, this->x, 
-	           this->y+this->h/2, 
+    odk_draw_text (this->odk, this->x,
+	           this->y+this->h/2,
 		   displayed_text, ODK_ALIGN_LEFT | ODK_ALIGN_VCENTER,
 		   this->otk->textcolor_but);
   } else
 
-    odk_draw_text (this->odk, this->x, 
-		   this->y+this->h/2, 
+    odk_draw_text (this->odk, this->x,
+		   this->y+this->h/2,
 		   displayed_text, ODK_ALIGN_LEFT | ODK_ALIGN_VCENTER,
 		   this->otk->textcolor_win);
   free(displayed_text);
@@ -1051,11 +1051,11 @@ static void otk_listentry_set_pos (otk_listentry_t *entry, int pos) {
   entry->pos = pos;
   entry->isfirst = 0;
   entry->islast = 0;
-  
+
   entry->widget.y = entry->list->widget.y + entry->list->entry_height*(pos-1);
   entry->visible = 1;
   entry->widget.selectable = 1;
- 
+
   /* we grab focus if nothing is selected */
   if (pos == 1) {
     entry->isfirst = 1;
@@ -1068,14 +1068,14 @@ static void otk_listentry_set_pos (otk_listentry_t *entry, int pos) {
 }
 
 static void list_adapt_entries(otk_list_t *list) {
-  
+
   int i=1;
   g_list_t *cur;
-  
+
   cur = g_list_first (list->entries);
   while (cur && cur->data) {
     otk_listentry_t *entry = cur->data;
-    
+
     entry->number = i;
     otk_listentry_set_pos (entry, i-list->position);
     cur = g_list_next (cur);
@@ -1120,7 +1120,7 @@ void otk_add_listentry(otk_widget_t *this, const char *text, void *data, int pos
   entry->text               = ho_strdup(text);
   entry->data               = data;
 
-    
+
   odk_set_font(entry->widget.odk, entry->list->font, entry->list->font_size);
   win = (otk_window_t *)list->widget.win;
   win->subs = g_list_append (win->subs, entry);
@@ -1159,7 +1159,7 @@ void otk_add_listentry(otk_widget_t *this, const char *text, void *data, int pos
 }
 
 void otk_remove_listentries(otk_widget_t *this) {
-  
+
   otk_list_t *list = (otk_list_t*) this;
   g_list_t *cur;
 
@@ -1168,7 +1168,7 @@ void otk_remove_listentries(otk_widget_t *this) {
   cur = g_list_first (list->entries);
   while (cur && cur->data) {
     otk_listentry_t *entry = cur->data;
-    
+
     entry->widget.destroy((otk_widget_t*)entry);
     list->entries = g_list_remove_link(list->entries, cur);
     cur = g_list_first (list->entries);
@@ -1192,7 +1192,7 @@ static void list_scroll_up (void *this) {
 }
 
 static void list_pgdown (otk_list_t *list) {
-  
+
   int newpos;
   g_list_t *cur;
 
@@ -1206,7 +1206,7 @@ static void list_pgdown (otk_list_t *list) {
   list->position = newpos;
 
   list_adapt_entries(list);
-  
+
   /* set focus to first entry if we lost it */
   if (list->widget.otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY) {
     otk_listentry_t *e = (otk_listentry_t*) list->widget.otk->focus_ptr;
@@ -1228,12 +1228,12 @@ static void list_pgdown (otk_list_t *list) {
 }
 
 static void list_pgup (otk_list_t *list) {
-  
+
   int newpos;
   g_list_t *cur;
 
   newpos = list->position - list->entries_visible / 2;
-  
+
   if (newpos < 0) newpos = 0;
 
   list->position = newpos;
@@ -1290,7 +1290,7 @@ int otk_list_get_pos(otk_widget_t *this) {
   otk_list_t *list = (otk_list_t *) this;
 
   if (!is_correct_widget(this, OTK_WIDGET_LIST)) return -1;
-  
+
   return list->position;
 }
 
@@ -1298,17 +1298,17 @@ static void list_draw (otk_widget_t *this) {
 
   otk_list_t *list = (otk_list_t*) this;
   g_list_t   *cur;
-  
+
   if (!is_correct_widget(this, OTK_WIDGET_LIST)) return;
 
 #ifdef LOG
   printf("otk: draw list\n");
 #endif
-  
+
   cur = g_list_first (list->entries);
   while (cur && cur->data) {
     otk_listentry_t *entry = cur->data;
-    
+
     entry->widget.draw((otk_widget_t*)entry);
     cur = g_list_next (cur);
   }
@@ -1324,7 +1324,7 @@ static void list_destroy(otk_widget_t *this) {
   /*otk_remove_listentries(this);*/
 
   g_list_free(list->entries);
-    
+
   remove_widget_from_win(this);
   ho_free(list);
 }
@@ -1361,7 +1361,7 @@ otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h,
   list->font_size          = 30;
   list->num_entries        = 0;
   list->entry_height       = 32;
- 
+
   list->entries_visible = list->widget.h / list->entry_height;
   list->widget.h = list->entries_visible * list->entry_height;
 
@@ -1393,7 +1393,7 @@ static void label_draw (otk_widget_t *this) {
   odk_set_font (this->odk, this->otk->label_font,
                 (label->font_size) ? label->font_size : this->otk->label_font_size);
   check_text_width(this->odk, displayed_text, this->win->w );
-  odk_draw_text (this->odk, this->x, this->y, displayed_text, label->alignment, 
+  odk_draw_text (this->odk, this->x, this->y, displayed_text, label->alignment,
       this->otk->label_color);
 
   free(displayed_text);
@@ -1411,7 +1411,7 @@ static void label_destroy (otk_widget_t *this) {
 }
 
 otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, const char *text) {
- 
+
   otk_label_t *label;
   otk_window_t *window = (otk_window_t*) win;
 
@@ -1432,7 +1432,7 @@ otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, con
   label->alignment          = alignment;
   label->text               = ho_strdup(text);
   label->font_size          = 0; /* use default */
- 
+
   window->subs = g_list_append (window->subs, label);
 
   return (otk_widget_t*) label;
@@ -1447,7 +1447,7 @@ void otk_label_set_font_size(otk_widget_t *this, int font_size)
 
 /*
  * layout widget
- */ 
+ */
 
 static void layout_draw (otk_widget_t *this) {
 
@@ -1460,9 +1460,9 @@ static void layout_draw (otk_widget_t *this) {
 
   sizey = lay->widget.h / lay->rows;
   sizex = lay->widget.w / lay->columns;
- 
+
   cur = g_list_first (lay->subs);
-  while (cur && cur->data) {   
+  while (cur && cur->data) {
     widget = cur->data;
     if(widget->needcalc) {
       widget->x = lay->widget.x + widget->x * sizex;
@@ -1506,7 +1506,7 @@ void otk_layout_add_widget(otk_widget_t *layout, otk_widget_t *widget, int x, in
     widget->y = y;
     widget->w = w;
     widget->h = h;
-    widget->win = layout;  
+    widget->win = layout;
     widget->otk = lay->widget.otk;
     widget->odk = lay->widget.odk;
 
@@ -1517,7 +1517,7 @@ void otk_layout_add_widget(otk_widget_t *layout, otk_widget_t *widget, int x, in
     widget->x = win->widget.x + x;
     widget->y = win->widget.y + y;
     widget->w = w;
-    widget->h = h;  
+    widget->h = h;
     widget->win = (otk_widget_t*) win;
     widget->otk = win->widget.otk;
     widget->odk = win->widget.odk;
@@ -1562,7 +1562,7 @@ otk_widget_t *otk_layout_new(otk_widget_t *win, int x, int y, int w, int h, int 
  */
 
 static void selector_draw (otk_widget_t *this) {
-  
+
   otk_selector_t *selector = (otk_selector_t*) this;
   char *text;
   g_list_t *cur;
@@ -1575,17 +1575,17 @@ static void selector_draw (otk_widget_t *this) {
   odk_set_font(this->odk, this->otk->button_font, this->otk->button_font_size);
 
   if (this->focus) {
-    odk_draw_rect (this->odk, this->x, this->y, 
-		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1); 
+    odk_draw_rect (this->odk, this->x, this->y,
+		   this->x+this->w, this->y+this->h, 1, this->otk->textcolor_but+1);
 
-    odk_draw_text (this->odk, this->x+this->w/2, 
-		   this->y+this->h/2, 
+    odk_draw_text (this->odk, this->x+this->w/2,
+		   this->y+this->h/2,
 		   text, ODK_ALIGN_CENTER | ODK_ALIGN_VCENTER,
 		   this->otk->textcolor_but);
   } else
 
-    odk_draw_text (this->odk, this->x+this->w/2, 
-		   this->y+this->h/2, 
+    odk_draw_text (this->odk, this->x+this->w/2,
+		   this->y+this->h/2,
 		   text, ODK_ALIGN_CENTER | ODK_ALIGN_VCENTER,
 		   this->otk->textcolor_win);
 
@@ -1611,12 +1611,12 @@ static void selector_destroy (otk_widget_t *this) {
     cur = g_list_next(cur);
   }
   g_list_free(selector->items);
-  
+
   ho_free(selector);
 }
 
 static void selector_selected (otk_widget_t *this) {
-  
+
   otk_selector_t *selector = (otk_selector_t*) this;
  /* char *i; */
 
@@ -1657,11 +1657,11 @@ otk_widget_t *otk_selector_grid_new (const char *const *items, int num,
     selector->items = g_list_append(selector->items, strdup(items[i]));
 
   selector->pos = 1;
- 
+
   return (otk_widget_t*) selector;
 }
 
-otk_widget_t *otk_selector_new(otk_widget_t *win,int x, int y, 
+otk_widget_t *otk_selector_new(otk_widget_t *win,int x, int y,
                            int w, int h, const char *const *items, int num,
 			   otk_selector_cb_t cb,
 			   void *cb_data) {
@@ -1695,7 +1695,7 @@ otk_widget_t *otk_selector_new(otk_widget_t *win,int x, int y,
     selector->items = g_list_append(selector->items, strdup(items[i]));
 
   selector->pos = 1;
- 
+
   window->subs = g_list_append (window->subs, selector);
 
   return (otk_widget_t*) selector;
@@ -1703,9 +1703,9 @@ otk_widget_t *otk_selector_new(otk_widget_t *win,int x, int y,
 }
 
 void otk_selector_set(otk_widget_t *this, int pos) {
-  
+
   otk_selector_t *selector = (otk_selector_t*) this;
-  
+
   if (!is_correct_widget(this, OTK_WIDGET_SELECTOR)) return;
 
   if (pos < 1 ) pos = 1;
@@ -1724,14 +1724,14 @@ static void window_draw (otk_widget_t *this) {
 
   if (!is_correct_widget(this, OTK_WIDGET_WINDOW)) return;
 
-  odk_draw_rect (this->odk, this->x, this->y, 
-		 this->x+this->w, this->y+this->h, 1, 
+  odk_draw_rect (this->odk, this->x, this->y,
+		 this->x+this->w, this->y+this->h, 1,
 		 win->fill_color);
 
   cur = g_list_first (win->subs);
   while (cur && cur->data) {
     otk_widget_t *widget = cur->data;
-    
+
     if(!widget->major) widget->draw(widget);
     cur = g_list_next (cur);
   }
@@ -1751,7 +1751,7 @@ static void window_destroy(otk_widget_t *this) {
     cur = g_list_first (win->subs);
   }
   g_list_free(win->subs);
-    
+
   win->widget.otk->windows = g_list_remove(win->widget.otk->windows, win);
   ho_free(win);
 }
@@ -1793,7 +1793,7 @@ void otk_draw_all (otk_t *otk) {
   g_list_t *cur;
 
   pthread_mutex_lock(&otk->draw_mutex);
-  
+
   odk_clear (otk->odk);
   cur = g_list_first (otk->windows);
 
@@ -1805,7 +1805,7 @@ void otk_draw_all (otk_t *otk) {
 
   while (cur && cur->data) {
     otk_window_t *win = cur->data;
-    
+
     win->widget.draw((otk_widget_t*)win);
     cur = g_list_next (cur);
   }
@@ -1828,7 +1828,7 @@ void otk_clear(otk_t *otk) {
   cur = g_list_first (otk->windows);
   while (cur && cur->data) {
     otk_window_t *win = cur->data;
-    
+
     win->widget.destroy((otk_widget_t*)win);
     cur = g_list_first (otk->windows);
   }
@@ -1877,15 +1877,15 @@ static void otk_update_job(void *data) {
   cur = g_list_first (otk->windows);
   while (cur && cur->data) {
     otk_window_t *win = cur->data;
-    
+
     cur2 = g_list_first (win->subs);
     while (cur2 && cur2->data) {
       otk_widget_t *widget = cur2->data;
-      
+
       if(widget->needupdate) {
 	changed = 1;
 	switch (widget->widget_type) {
-	case OTK_WIDGET_SLIDER: 
+	case OTK_WIDGET_SLIDER:
 	  {
 	    otk_slider_t *slider = (otk_slider_t *) widget;
 	    if(slider->get_value) {
@@ -1926,7 +1926,7 @@ otk_t *otk_init (odk_t *odk) {
   otk = ho_new_tagged(otk_t,"otk object");
 
   otk->odk = odk;
-  
+
   otk->windows      = NULL; //g_list_new ();
 
   odk_set_event_handler(odk, otk_event_handler, otk);
@@ -1980,7 +1980,7 @@ otk_t *otk_init (odk_t *odk) {
 #else
   otk->update_job = 0;
 #endif
-  
+
   return otk;
 }
 
@@ -1990,9 +1990,9 @@ void otk_free (otk_t *otk) {
   if(otk->update_job)
     cancel_job(otk->update_job);
   unlock_job_mutex();
-  
+
   otk_clear(otk);
-  
+
   g_list_free(otk->windows);
 
   if (otk->title_font) free(otk->title_font);

@@ -1,4 +1,4 @@
-/* 
+/*
    This file is copied from the xawtv sources, which are released
    under the terms of the GNU GPL. This licence header added for clarity
    by Malte Starotik <malte@kde.org>
@@ -7,12 +7,12 @@
    modify it under the terms of the GNU General Public
    License as published by the Free Software Foundation; either
    version 2 of the License, or (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
- 
+
    You should have received a copy of the GNU General Public License
    along with this program; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
@@ -24,7 +24,7 @@
  *
  * Nathan Laredo (laredo@broked.net)
  *
- * Frequencies are given in kHz 
+ * Frequencies are given in kHz
  */
 #define NTSC_AUDIO_CARRIER	4500
 #define PAL_AUDIO_CARRIER_I	6000
@@ -37,7 +37,7 @@
    containing 8 bits frame sync, 5 bits control, 11 bits additional data, and
    704 bits audio data.  The bit rate is reduced by transmitting only 10 bits
    plus parity of each 14 bit sample, the largest sample in a frame determines
-   which 10 bits are transmitted.  The parity bits for audio samples also 
+   which 10 bits are transmitted.  The parity bits for audio samples also
    specify the scaling factor used for that channel during that frame.  The
    companeded audio data is interleaved to reduce the influence of dropouts
    and the whole frame except for sync bits is scrambled for spectrum shaping.

@@ -109,7 +109,7 @@ static list_t *bpop (list_t *list) {
 
 /*
  * implements case insensitive lengthlexicographic order
- * 
+ *
  * returns 1  if a <= b
  *         0  otherwise.
  */
@@ -126,7 +126,7 @@ static int in_cill_order(playitem_t *ita, playitem_t *itb, int type) {
 
   ap = a; bp = b;
 
-  /* printf("%s %s\n", a, b); 
+  /* printf("%s %s\n", a, b);
   stat(ita->mrl, &filestat1);
   stat(itb->mrl, &filestat2);*/
 
@@ -163,7 +163,7 @@ static void playitem_sort_into(playitem_t *item, list_t *list, int type) {
   i = list_first_content(list);
 
   while(i) {
-    if (in_cill_order(item, i, type)) {      
+    if (in_cill_order(item, i, type)) {
       list_insert_content(list, item);
       return;
     }
@@ -181,7 +181,7 @@ static void playitem_append(playitem_t *item, list_t *list) {
 static playitem_t *playitem_new(int type, const char *title, const char *mrl, list_t *sub) {
 
   playitem_t *item = ho_new(playitem_t);
-      
+
   item->type = type;
   item->sub = sub;
   if (title) item->title = ho_strdup(title);
@@ -193,19 +193,19 @@ static playitem_t *playitem_new(int type, const char *title, const char *mrl, li
 static void free_subtree(list_t *list, int i) {
 
   playitem_t *item;
- 
+
   if (!list) return;
-  
+
   item = list_first_content(list);
   while (item) {
     if (item->title) ho_free(item->title);
     if (item->mrl) ho_free(item->mrl);
-    if(item->type != TYPE_UP) free_subtree(item->sub, 1);    
+    if(item->type != TYPE_UP) free_subtree(item->sub, 1);
     list_delete_current(list);
     ho_free(item);
     item = list_first_content(list);
   }
-  
+
   if(i) list_free(list);
 }
 
@@ -225,7 +225,7 @@ static void free_subtree(list_t *list, int i) {
     }
     list_free(item->sub);
   }
-      
+
   ho_free(item);
   }*/
 
@@ -254,7 +254,7 @@ static playitem_t *playitem_load (xml_node_t *node) {
       } else {
 	filestat.st_mode = 0;
 	stat(play_item->mrl, &filestat);
-	
+
 	if(S_ISDIR(filestat.st_mode)) {
 	  play_item->sub = list_new();
 	  play_item->type = TYPE_RDIR;
@@ -263,12 +263,12 @@ static playitem_t *playitem_load (xml_node_t *node) {
 	  if(file_is_m3u(play_item->mrl)) play_item->type = TYPE_M3U;
 	}
       }
-    
+
 #ifdef LOG
       printf ("mediamarks: mrl   = %s\n", play_item->mrl);
 #endif
       } else if (!strcasecmp (node->name, "time")) {
-    } else 
+    } else
       printf ("mediamarks: error while loading mediamarks file, unknown node '%s'\n", node->name);
 
     node = node->next;
@@ -288,7 +288,7 @@ static int parse_multiple(oxine_t *oxine, const char *mrl, list_t *list) {
 
   str = xine_get_autoplay_mrls (oxine->xine, mrl, &num);
   if (num<=0) return 0;
- 
+
   free_subtree(list, 0);
 
   while(i < num) {
@@ -301,7 +301,7 @@ static int parse_multiple(oxine_t *oxine, const char *mrl, list_t *list) {
 }
 
 static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
-  
+
   DIR *dirp;
   struct dirent *entp;
   playitem_t *item;
@@ -321,7 +321,7 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
       char *mrl;
       char *title = NULL;
       int type = 0;
-      
+
       if((!strcmp(entp->d_name, "."))||(!strcmp(entp->d_name, "..")))
         continue;
 
@@ -368,7 +368,7 @@ static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
   }
   else
     printf ("mediamarks: Couldn't open the directory.\n");
-  
+
   return ret;
 }
 
@@ -430,7 +430,7 @@ static int file_is_m3u(const char *mrl) {
     ho_free(line);
     return 0;
   }
-  if(!strncmp(*line, "#EXTM3U", 7)) { 
+  if(!strncmp(*line, "#EXTM3U", 7)) {
     ho_free(n);
     ho_free(line);
     return 1;
@@ -490,20 +490,20 @@ static void parse_m3u(const char *mrl, list_t *items) {
 static void read_subs(xml_node_t *node, list_t *items) {
 
   playitem_t *item = NULL;
-  
+
   while (node) {
 
     if (!strcasecmp (node->name, "entry")) {
-      
+
       item = playitem_load (node->child);
-      
+
     } else if(!strcasecmp (node->name, "sub")) {
       char title[256];
-      
+
       snprintf(title, 255, "[%s]", xml_parser_get_property (node, "name"));
       item = playitem_new (TYPE_DIR, title, NULL, list_new());
       read_subs(node->child, item->sub);
-    } 
+    }
     playitem_append(item, items);
     node=node->next;
   }
@@ -524,7 +524,7 @@ static int read_mediamarks(list_t *list, const char *mrl) {
     xml_parser_finalize_R (xml);
     return 0;
   }
-  
+
   if (strcasecmp (node->name, "oxinemm")) {
     printf ("mediamarks: error, root node must be OXINEMM\n");
     xml_parser_finalize_R (xml);
@@ -553,7 +553,7 @@ static void changelist (otk_widget_t *list, list_t *backpath) {
     back = playitem_new(TYPE_UP, "[..]", NULL, parent);
     list_insert_content(current, back);
     //otk_add_listentry(list, back->title, back, -1);
-  } 
+  }
   item = list_first_content(current);
   while (item) {
     /*printf("item : %s\n" ,item->title);*/
@@ -574,7 +574,7 @@ static void action_changed (void *data, int pos) {
 
 static void set_ilabel(mm_session_t *session) {
   int n;
-  
+
   n = gGui->playlist.num;
   sprintf(session->ilabel, "Selected: %3d", n);
 }
@@ -606,7 +606,7 @@ static void mediamarks_play_cb(void *data, void *entry) {
     changelist(session->list, session->backpath);
     otk_draw_all(oxine->otk);
   } else if (session->action == MM_ACTION_PLAY) {
-    if ((item->type == TYPE_REG)||(item->type == TYPE_RREG)) {      
+    if ((item->type == TYPE_REG)||(item->type == TYPE_RREG)) {
       printf("mediamarks: playing %s\n", item->mrl);
 /*      if (is_movie(item->mrl)) {
         oxine->main_window = NULL;
@@ -625,8 +625,8 @@ static void mediamarks_play_cb(void *data, void *entry) {
       } /* else play_error(oxine); */
       set_ilabel(session);
     } else if (item->type == TYPE_M3U) {
-      parse_m3u(item->mrl, item->sub);  
-      bpush(session->backpath, item->sub);    
+      parse_m3u(item->mrl, item->sub);
+      bpush(session->backpath, item->sub);
       changelist(session->list, session->backpath);
       otk_draw_all(oxine->otk);
     } else if (item->type == TYPE_MULTIPLE) {
@@ -652,7 +652,7 @@ static void mediamarks_leavetoplaylist_cb (void *data) {
 
   session->oxine->reentry = NULL;
   session->oxine->reentry_data = NULL;
-  
+
   playlist_cb(session->oxine);
 
 }
@@ -681,7 +681,7 @@ static void mediamarks_leave_cb (void *data) {
   session->oxine->reentry_data = NULL;
 
   mediamarks_freeall(session);
-  
+
   session->oxine->main_menu_cb(session->oxine);
   ho_free(session);
 }
@@ -691,7 +691,7 @@ static void mediamarks_reentry_cb (void *data) {
   mm_session_t *session = (mm_session_t*) data;
   oxine_t      *oxine = session->oxine;
   otk_widget_t *b, *list_window;
-  
+
   lock_job_mutex();
   if (oxine->info_window && oxine->media_info_close_cb) {
     oxine->media_info_close_cb(oxine);
@@ -713,10 +713,10 @@ static void mediamarks_reentry_cb (void *data) {
 
   list_window = otk_window_new (oxine->otk, NULL, 245, 130, 535, 420);
 
-  session->list = otk_list_new(list_window, 10, 15, 523, 390, mediamarks_play_cb, session); 
+  session->list = otk_list_new(list_window, 10, 15, 523, 390, mediamarks_play_cb, session);
   changelist(session->list, session->backpath);
   otk_list_set_pos(session->list, session->listpos);
-  
+
   otk_draw_all(oxine->otk);
 }
 

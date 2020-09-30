@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -76,25 +76,25 @@ typedef struct {
 /* ===== NVTV ===== */
 static int nvtv_tvout_init(void **data) {
   int             ret;
-  
+
   if((ret = nvtv_simple_init())) {
     static const char *const tv_systems[] = { "PAL", "NTSC", NULL };
 
     nvtv_private_t *private = (nvtv_private_t *) calloc(1, sizeof(nvtv_private_t));
 
     *data = private;
-    
-    private->tv_system = (int) 
-      xine_config_register_enum(__xineui_global_xine_instance, "gui.tvout_nvtv_tv_system", 
+
+    private->tv_system = (int)
+      xine_config_register_enum(__xineui_global_xine_instance, "gui.tvout_nvtv_tv_system",
 				0,
 				tv_systems,
 				_("nvtv TV output system"),
-				_("Select which TV output system supported by your TV."), 
+				_("Select which TV output system supported by your TV."),
 				CONFIG_LEVEL_BEG,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-    private->xrandr = 
-      xine_config_register_bool(__xineui_global_xine_instance, "gui.tvout_nvtv_xrandr", 
+    private->xrandr =
+      xine_config_register_bool(__xineui_global_xine_instance, "gui.tvout_nvtv_xrandr",
 				1,
 				_("Enable XRandr extension"),
 				_("Enable the use of xrandr to autofit the screen "
@@ -115,20 +115,20 @@ static int nvtv_tvout_setup(void *data) {
 
   if(private->xrandr)
     (void) nvtv_enable_autoresize(1);
-  
+
   nvtv_simple_set_tvsystem((nvtv_simple_tvsystem) private->tv_system);
 
   /* Retrieve MAX width/height */
   (void) nvtv_simple_switch(NVTV_SIMPLE_TV_ON, 0, 0);
   nvtv_simple_size(&(private->fw), &(private->fh), &(private->pa), &fps);
   (void) nvtv_simple_switch(NVTV_SIMPLE_TV_OFF, 0, 0);
-  
+
   return 1;
 }
 
 static void nvtv_get_size_and_aspect(int *width, int *height, double *pixaspect, void *data) {
   nvtv_private_t *private = (nvtv_private_t *) data;
-  
+
   if(width)
     *width = private->fw;
   if(height)
@@ -144,11 +144,11 @@ static int nvtv_tvout_set_fullscreen_mode(int fullscreen, int width, int height,
     width = private->fw;
     height = private->fh;
   }
-  
+
   (void) nvtv_simple_switch(fullscreen ?
-			    NVTV_SIMPLE_TV_ON : NVTV_SIMPLE_TV_OFF, 
+			    NVTV_SIMPLE_TV_ON : NVTV_SIMPLE_TV_OFF,
 			    width, height);
-  
+
   return 1;
 }
 
@@ -172,7 +172,7 @@ static void nvtv_tvout_deinit(void *data) {
 
 static tvout_t *nvtv_backend(void) {
   static tvout_t tvout;
-  
+
   tvout.init                = nvtv_tvout_init;
   tvout.setup               = nvtv_tvout_setup;
   tvout.get_size_and_aspect = nvtv_get_size_and_aspect;
@@ -193,11 +193,11 @@ typedef struct {
 
 static int ati_tvout_init(void **data) {
   ati_private_t *private = (ati_private_t *) calloc(1, sizeof(ati_private_t));
-  
+
   *data = private;
-  
-  private->atitvout_cmds[0] = (char *) 
-    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_off", 
+
+  private->atitvout_cmds[0] = (char *)
+    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_off",
 				 "sudo /usr/local/sbin/atitvout c",
 				 _("Command to turn off TV out"),
 				 _("atitvout command line used to turn on TV output."),
@@ -205,17 +205,17 @@ static int ati_tvout_init(void **data) {
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA);
 
-  private->atitvout_cmds[1] = (char *) 
-    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_on", 
+  private->atitvout_cmds[1] = (char *)
+    xine_config_register_string (__xineui_global_xine_instance, "gui.tvout_ati_cmd_on",
 				 "sudo /usr/local/sbin/atitvout pal ct",
 				 _("Command to turn on TV out"),
 				 _("atitvout command line used to turn on TV output."),
 				 CONFIG_LEVEL_BEG,
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA);
-  
+
   private->fullscreen = 0;
-  
+
   return 1;
 }
 
@@ -231,20 +231,20 @@ static int ati_tvout_set_fullscreen_mode(int fullscreen, int width, int height, 
 
   if(private->atitvout_cmds[fullscreen] && strlen(private->atitvout_cmds[fullscreen])) {
     int err;
-    
+
     if((err = xine_system(0, private->atitvout_cmds[fullscreen])))
-      fprintf(stderr, "command: '%s' failed with error code %d.\n", 
+      fprintf(stderr, "command: '%s' failed with error code %d.\n",
 	      private->atitvout_cmds[fullscreen], err);
   }
-    
+
   private->fullscreen = fullscreen;
-  
+
   return 1;
 }
 
 static int ati_tvout_get_fullscreen_mode(void *data) {
   ati_private_t *private = (ati_private_t *) data;
-  
+
   return (private->fullscreen);
 }
 
@@ -253,12 +253,12 @@ static void ati_tvout_deinit(void *data) {
 
   if(private->fullscreen && private->atitvout_cmds[0] && strlen(private->atitvout_cmds[0])) {
     int err;
-    
+
     if((err = xine_system(0, private->atitvout_cmds[0])))
-      fprintf(stderr, "command: '%s' failed with error code %d.\n", 
+      fprintf(stderr, "command: '%s' failed with error code %d.\n",
 	      private->atitvout_cmds[0], err);
   }
-    
+
   free(private);
 }
 
@@ -272,7 +272,7 @@ static tvout_t *ati_backend(void) {
   tvout.get_fullscreen      = ati_tvout_get_fullscreen_mode;
   tvout.deinit              = ati_tvout_deinit;
   tvout.private             = NULL;
-  
+
   return &tvout;
 }
 /* ===== ATI END ===== */
@@ -282,15 +282,15 @@ static tvout_t *ati_backend(void) {
 tvout_t *tvout_init(char *backend) {
   if(backend) {
     int i;
-    
+
 #ifdef TVOUT_DEBUG
     printf("Looking for %s tvout backend\n", backend);
 #endif
-    
+
     for(i = 0; backends[i].init; i++) {
       if(!strcasecmp(backends[i].name, backend)) {
 	tvout_t *tvout = backends[i].init();
-	
+
 	if(tvout) {
 	  if(!tvout->init(&(tvout->private)))
 	    tvout = NULL;
@@ -299,7 +299,7 @@ tvout_t *tvout_init(char *backend) {
 	    printf(" ***Initialized\n");
 #endif
 	}
-	
+
 	return tvout;
       }
     }
@@ -311,7 +311,7 @@ tvout_t *tvout_init(char *backend) {
 int tvout_setup(tvout_t *tvout) {
   if(tvout)
     return (tvout->setup(tvout->private));
-  
+
   return 0;
 }
 
@@ -323,14 +323,14 @@ void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *
 int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height) {
   if(tvout)
     return (tvout->set_fullscreen(fullscreen, width, height, tvout->private));
-  
+
   return 0;
 }
 
 int tvout_get_fullscreen_mode(tvout_t *tvout) {
   if(tvout)
     return (tvout->get_fullscreen(tvout->private));
-  
+
   return 0;
 }
 
@@ -342,13 +342,13 @@ void tvout_deinit(tvout_t *tvout) {
 const char **tvout_get_backend_names(void) {
   static const char *bckends[(sizeof(backends) / sizeof(backends[0]))];
   int i = 0;
-  
+
   while(backends[i].init) {
     bckends[i] = backends[i].name;
     i++;
   }
-  
+
   bckends[i] = NULL;
-  
+
   return bckends;
 }

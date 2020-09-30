@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -180,8 +180,8 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *
   xitk_mrlbrowser_filter_t **filters = NULL;
   int                        num_endings = 0;
   char                      *mrl_exts, *pmrl_exts, *p, *pp;
-  
-  filters                      = (xitk_mrlbrowser_filter_t **) 
+
+  filters                      = (xitk_mrlbrowser_filter_t **)
     calloc((num_endings + 2), sizeof(xitk_mrlbrowser_filter_t *));
   filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
@@ -192,39 +192,39 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *
   if(mrl_exts) {
     char  patterns[2048];
     char *e;
-    
+
     p = strdup(mrl_exts);
 
     num_endings++;
-    
+
     pp = p;
     while(*p != '\0') {
       if(*p == ' ')
 	*p = ',';
       p++;
     }
-    
+
     filters[num_endings]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
     filters[num_endings]->name   = strdup(_("All extensions"));
     filters[num_endings]->ending = pp;
 
     pmrl_exts = mrl_exts;
     while((e = xine_strsep(&pmrl_exts, " ")) != NULL) {
-      
+
       snprintf(patterns, sizeof(patterns), "*.%s", e);
 
       num_endings++;
-      
-      filters                      = (xitk_mrlbrowser_filter_t **) 
+
+      filters                      = (xitk_mrlbrowser_filter_t **)
 	realloc(filters, sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
-      
+
       filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
 	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
 
       filters[num_endings]->name   = strdup(patterns);
       filters[num_endings]->ending = strdup(e);
     }
-    
+
     free(mrl_exts);
   }
 
@@ -232,7 +232,7 @@ static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending (xui_mrlb_t *
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
   filters[num_endings + 1]->name   = NULL;
   filters[num_endings + 1]->ending = NULL;
-  
+
   return filters;
 }
 
@@ -284,7 +284,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   mb.skin_element_name        = "MrlBG";
   mb.resource_name            = mb.window_title;
   mb.resource_class           = "xine";
-  
+
   mb.origin.skin_element_name = "MrlCurOrigin";
   mb.origin.cur_origin        = NULL;
 
@@ -366,7 +366,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   (void)w;
   if (mrlb && mrl) {
     int num = mrlb->gui->playlist.num;
-    
+
     if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
     }
@@ -374,16 +374,16 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       if (!playlist_is_visible (mrlb->gui))
         playlist_toggle_visibility (mrlb->gui);
     }
-    
+
     mediamark_append_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
-    
+
     if ((!num) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
       mrlb->gui->playlist.cur = mrlb->gui->playlist.num - 1;
       gui_set_current_mmk(mediamark_get_current_mmk());
-    }   
-    
+    }
+
     playlist_update_playlist (mrlb->gui);
-    
+
     if ((!is_playback_widgets_enabled (mrlb->gui->panel)) && mrlb->gui->playlist.num)
       enable_playback_controls (mrlb->gui->panel, 1);
   }
@@ -394,7 +394,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   (void)w;
   if (mrlb && mrl) {
-    
+
     if (!mrlb->gui->plwin) {
       playlist_editor (mrlb->gui);
     }
@@ -402,7 +402,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       if (!playlist_is_visible (mrlb->gui))
         playlist_toggle_visibility (mrlb->gui);
     }
-    
+
     gui_dndcallback((char *)mrl->mrl);
   }
 }
@@ -417,13 +417,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   if (mrlb && mrl) {
     mediamark_t mmk;
     char        *_mrl = mrl->mrl;
-    
+
     if ((xine_get_status (mrlb->gui->stream) != XINE_STATUS_STOP)) {
       mrlb->gui->ignore_next = 1;
       xine_stop (mrlb->gui->stream);
       mrlb->gui->ignore_next = 0;
     }
-    
+
     if (!is_playback_widgets_enabled (mrlb->gui->panel))
       enable_playback_controls (mrlb->gui->panel, 1);
 
@@ -434,7 +434,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
         playlist_update_playlist (mrlb->gui);
       }
     }
-    
+
     osd_hide();
 
     if (!xine_open (mrlb->gui->stream, (const char *) _mrl)) {
@@ -449,7 +449,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       gui_display_logo (mrlb->gui);
       return;
     }
-    
+
     mmk.mrl           = _mrl;
     mmk.ident         = NULL;
     mmk.sub           = NULL;

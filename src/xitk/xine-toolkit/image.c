@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -303,16 +303,16 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
     XShmSegmentInfo *shminfo = xpix->shminfo;
 
     XShmDetach(xpix->imlibdata->x.disp, shminfo);
-    
+
     if(xpix->xim)
       XDestroyImage(xpix->xim);
-    
+
     if(shmdt(shminfo->shmaddr) < 0)
       XITK_WARNING("shmdt() failed: '%s'\n", strerror(errno));
 
     if(shmctl(shminfo->shmid, IPC_RMID, 0) < 0)
       XITK_WARNING("shmctl() failed: '%s'\n", strerror(errno));
-    
+
 
     free(shminfo);
   }
@@ -409,12 +409,12 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
 #ifdef HAVE_SHM
   if(xitk_is_use_xshm() == 2) {
     XImage   *xim;
-    
+
     shminfo = (XShmSegmentInfo *) xitk_xmalloc(sizeof(XShmSegmentInfo));
-    
+
     xitk_x_error = 0;
     xitk_install_x_error_handler();
-    
+
     xim = XShmCreateImage (p->xitk->display, im->x.visual, depth, ZPixmap, NULL, shminfo, width, height);
     if(!xim) {
       XITK_WARNING("XShmCreateImage() failed.\n");
@@ -422,7 +422,7 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
-    
+
     shminfo->shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
     if(shminfo->shmid < 0) {
       XITK_WARNING("shmget() failed.\n");
@@ -431,7 +431,7 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
-    
+
     shminfo->shmaddr  = xim->data = shmat(shminfo->shmid, 0, 0);
     if(xim->data == (char *) -1) {
       XITK_WARNING("shmmat() failed.\n");
@@ -441,11 +441,11 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
-    
+
     shminfo->readOnly = False;
     XShmAttach (p->xitk->display, shminfo);
     XSync (p->xitk->display, False);
-    
+
     if(xitk_x_error) {
       XITK_WARNING("XShmAttach() failed.\n");
       XDestroyImage(xim);
@@ -457,9 +457,9 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
     }
 
     xpix->xim    = xim;
-    xpix->pixmap = XShmCreatePixmap (p->xitk->display, im->x.base_window, 
+    xpix->pixmap = XShmCreatePixmap (p->xitk->display, im->x.base_window,
 				    shminfo->shmaddr, shminfo, width, height, depth);
-    
+
     if(!xpix->pixmap) {
       XITK_WARNING("XShmCreatePixmap() failed.\n");
       XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
@@ -760,20 +760,20 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
    */
 
   while((*p!='\0') && (bp + linel) < (buf + BUFSIZ - TABULATION_SIZE - 2)) {
-    
+
     switch(*p) {
-      
+
     case '\t':
       {
 	int a;
-	
+
 	if((linel == 0) || (bp[linel - 1] != ' ')) {
 	  lastws = linel;
 	  wlinew = linew; /* width if wrapped */
 	}
-	
+
 	a = TABULATION_SIZE - (linel % TABULATION_SIZE);
-	
+
         while(a--)
           bp[linel++] = ' ';
       }
@@ -785,17 +785,17 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
       case '\r':
       case '\v':
         break; /* Ignore those */
-	
+
     case '\n':
       lines[numlines++] = bp;
       bp                = bp + linel + 1;
-      
+
       wlinew = lastws = linel = 0;
-      
+
       if(linew > maxw)
 	maxw = linew;
       break;
-      
+
     case ' ':
       if((linel == 0) || (bp[linel-1] != ' ')) {
 	lastws = linel;
@@ -813,9 +813,9 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
 
     bp[linel] = '\0'; /* terminate the string for reading with xitk_font_string_extent or strlen */
 
-    xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL); 
+    xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL);
     if((linew = rbearing - lbearing) > width) {
-      
+
       if(lastws == 0) { /* if we haven't found a whitespace */
         bp[linel]         = bp[linel-1]; /* Move that last character down */
         bp[linel-1]       = 0;
@@ -827,35 +827,35 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
       else {
         char *nextword = (bp + lastws);
         int   wordlen;
-	
+
         while(*nextword == ' ')
           nextword++;
-	
+
         wordlen           = (bp + linel) - nextword;
         bp[lastws]        = '\0';
         lines[numlines++] = bp;
         bp                = bp + lastws + 1;
-	
+
         if(bp != nextword)
           memmove(bp, nextword, wordlen + 1);
-	
+
         linel = wordlen;
         lastws = 0;
       }
-      
+
       if(wlinew > maxw)
         maxw = wlinew;
-      
-      xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL); 
+
+      xitk_font_string_extent(fs, bp, &lbearing, &rbearing, NULL, NULL, NULL);
       linew = rbearing - lbearing;
     }
-    
+
     p++;
   }
 
   if(linel) { /* In case last chars aren't stored */
     lines[numlines++] = bp;
-    
+
     if(linew > maxw)
       maxw = linew;
   }
@@ -869,13 +869,13 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
 
   { /* Draw string in image */
     int i, y, x = 0;
-    
+
     xitk_lock_display (xitk);
     XSetForeground (xitk->display, gc, foreground);
     xitk_unlock_display (xitk);
-    
+
     for(y = ascent, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
-      xitk_font_string_extent(fs, lines[i], &lbearing, &rbearing, NULL, NULL, NULL); 
+      xitk_font_string_extent(fs, lines[i], &lbearing, &rbearing, NULL, NULL, NULL);
       length = rbearing - lbearing;
 
       if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
@@ -884,7 +884,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
         x = (width - length) >> 1;
       else if(align == ALIGN_RIGHT)
         x = (width - length);
-      
+
       xitk_font_draw_string(fs, image->image, gc,
 			    (x - lbearing), y, lines[i], strlen(lines[i]));
 			    /*   ^^^^^^^^ Adjust to start of ink */
@@ -935,7 +935,7 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
   h = p->height;
 
   x1 = (w - 5);
-  y1 = (h / 2); 
+  y1 = (h / 2);
 
   x2 = (w - 10);
   y2 = ((h / 2) + 5);
@@ -944,12 +944,12 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
   y3 = ((h / 2) - 5);
 
   for(i = 0; i < 3; i++) {
-    
+
     if(i == 2) {
       x1++; x2++; x3++;
       y1++; y2++; y3++;
     }
-    
+
     points[0].x = x1;
     points[0].y = y1;
     points[1].x = x2;
@@ -1077,14 +1077,14 @@ static void _draw_arrow(xitk_image_t *p, int direction) {
   xitk_unlock_display (p->xitk);
 
   for(i = 0; i < 3; i++) {
-    
+
     if(i == 2) {
       for(s = 0; s < nsegments; s++) {
 	segments[s].x1++; segments[s].y1++;
 	segments[s].x2++; segments[s].y2++;
       }
     }
-    
+
     xitk_lock_display (p->xitk);
     XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, &segments[0], nsegments);
     xitk_unlock_display (p->xitk);
@@ -1332,22 +1332,22 @@ void menu_draw_check(xitk_image_t *p, int checked) {
   CHECK_IMAGE(p);
 
   switch(style) {
-    
+
   case CHECK_STYLE_CHECK:
     draw_check_three_state_check_style(p, 4, 4, p->height - 8, p->width / 3, checked);
     break;
-    
+
   case CHECK_STYLE_ROUND:
     draw_check_three_state_round_style(p, 4, 4, p->height - 8, p->width / 3, checked);
     break;
-    
+
   case CHECK_STYLE_OLD:
-  default: 
+  default:
     {
       int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
       int      nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
       int      w, h;
-      
+
       w = p->width / 3;
       h = p->height - 12;
       _draw_rectangular_box (p->image, 4,               6,     0, 0, 12, h, relief);
@@ -1527,7 +1527,7 @@ void draw_checkbox_check(xitk_image_t *p) {
   pixmap_fill_rectangle(p->image, 0, 0, p->width, p->height, xitk_get_pixel_color_gray(p->xitk));
 
   switch(style) {
-    
+
   case CHECK_STYLE_CHECK:
     if (p->width == p->height * 4) {
       int w = p->width / 4;
@@ -1542,20 +1542,20 @@ void draw_checkbox_check(xitk_image_t *p) {
       _draw_check_check(p, w * 2, 0, p->height, 1);
     }
     break;
-    
+
   case CHECK_STYLE_ROUND:
     {
       int w;
-      
+
       w = p->width / 3;
       _draw_check_round(p, 0, 0, p->height, 0);
       _draw_check_round(p, w, 0, p->height, 0);
       _draw_check_round(p, w * 2, 0, p->height, 1);
     }
     break;
-    
+
   case CHECK_STYLE_OLD:
-  default: 
+  default:
     _draw_three_state(p, STYLE_BEVEL);
     break;
   }
@@ -1935,7 +1935,7 @@ void draw_paddle_rotate(xitk_image_t *p) {
       XFillArc (p->xitk->display, p->mask->pixmap, p->mask->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
       XDrawArc (p->xitk->display, p->mask->pixmap, p->mask->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
       xitk_unlock_display (p->xitk);
-      
+
       xitk_lock_display (p->xitk);
       XSetForeground (p->xitk->display, p->image->gc, bg_colors[i]);
       XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
@@ -2002,7 +2002,7 @@ void draw_button_plus(xitk_image_t *p) {
 
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
- 
+
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, (w >> 1) - 1, 2, (w >> 1) - 1, h - 4);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, w + (w >> 1) - 1, 2, w + (w >> 1) - 1, h - 4);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, (w * 2) + (w >> 1), 3, (w * 2) + (w >> 1), h - 3);
@@ -2023,7 +2023,7 @@ void draw_button_minus(xitk_image_t *p) {
 
   xitk_lock_display (p->xitk);
   XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
- 
+
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, 2, (h >> 1) - 1, w - 4, (h >> 1) - 1);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, w + 2, (h >> 1) - 1, (w * 2) - 4, (h >> 1) - 1);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, (w * 2) + 3, h >> 1, (w * 3) - 3, h >> 1);
@@ -2364,7 +2364,7 @@ static void _notify_change_skin (_image_private_t *wp, xitk_skin_config_t *skonf
         wp->w.height  = wp->skin->height;
       }
       xitk_skin_unlock(skonfig);
-      
+
       xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     }
   }
@@ -2454,7 +2454,7 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
  *
  */
 xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
-					 xitk_image_widget_t *im, 
+					 xitk_image_widget_t *im,
 					 xitk_image_t *image, int x, int y) {
   XITK_CHECK_CONSTITENCY(im);
 

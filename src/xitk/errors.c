@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -57,7 +57,7 @@ static void errors_create_window (gGui_t *gui, char *title, char *message) {
 
   if((title == NULL) || (message == NULL))
     return;
-  
+
   dump_error(message);
 
   if (gui->nongui_error_msg) {
@@ -129,7 +129,7 @@ void xine_error_with_more (gGui_t *gui, const char *message, ...) {
   else {
     errors_create_window (gui, _("Error"), buf);
   }
-  
+
   free(buf);
 }
 
@@ -186,7 +186,7 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
     dump_error("got XINE_ERROR_NONE.");
     /* noop */
     break;
-    
+
   case XINE_ERROR_NO_INPUT_PLUGIN:
     dump_error("got XINE_ERROR_NO_INPUT_PLUGIN.");
     xine_error_with_more (gui,
@@ -194,7 +194,7 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
         "There is no input plugin available to handle '%s'.\n"
         "Maybe MRL syntax is wrong or file/stream source doesn't exist."), _mrl);
     break;
-    
+
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     dump_error("got XINE_ERROR_NO_DEMUX_PLUGIN.");
     xine_error_with_more (gui,
@@ -202,14 +202,14 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
         "There is no demuxer plugin available to handle '%s'.\n"
         "Usually this means that the file format was not recognized."), _mrl);
     break;
-    
+
   case XINE_ERROR_DEMUX_FAILED:
     dump_error("got XINE_ERROR_DEMUX_FAILED.");
     xine_error_with_more (gui,
       _("- xine engine error -\n\n"
         "Demuxer failed. Maybe '%s' is a broken file?\n"), _mrl);
     break;
-    
+
   case XINE_ERROR_MALFORMED_MRL:
     dump_error("got XINE_ERROR_MALFORMED_MRL.");
     xine_error_with_more (gui,
@@ -223,13 +223,13 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
       _("- xine engine error -\n\n"
         "Input plugin failed to open mrl '%s'\n"), _mrl);
     break;
-    
+
   default:
     dump_error("got unhandle error.");
     xine_error_with_more (gui, _("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }
-  
+
   /* gui->new_pos = -1; */
 }
 
@@ -253,12 +253,12 @@ static void _too_slow_done (void *data, int state) {
 void too_slow_window (gGui_t *gui) {
   char *message;
   int display_warning;
-    
+
   message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://www.xine-project.org/faq#SPEEDUP");
-  
+
   dump_error(message);
 
-  display_warning = xine_config_register_bool (gui->xine, "gui.dropped_frames_warning", 
+  display_warning = xine_config_register_bool (gui->xine, "gui.dropped_frames_warning",
 		     1,
 		     _("Warn user when too much frames are dropped."),
 		     CONFIG_NO_HELP,

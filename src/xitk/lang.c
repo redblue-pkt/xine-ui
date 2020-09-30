@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -280,7 +280,7 @@ static const langs_t _langs[] = {
   /* The ultimate solution */
   { "",                 ENGLISH,            "en",    "UTF-8" }
 };
-  
+
 /* ISO 639-1 */
 static const struct {
   char   two_letters[4];
@@ -481,20 +481,20 @@ const char *get_language_from_iso639_1(const char *two_letters) {
 
   if(two_letters) {
     const char *tl = two_letters;
-    
+
     while((*tl == ' ') && (*tl != '\0'))
       tl++;
-    
+
     if(strlen(tl) == 2) {
       int   i;
-      
+
       for(i = 0; *(iso639_1[i].two_letters); i++) {
 	if(!strcmp(iso639_1[i].two_letters, tl))
 	  return iso639_1[i].language;
       }
     }
   }
-  
+
   return two_letters ? two_letters : _("Unknown");
 }
 
@@ -503,7 +503,7 @@ const char *get_language_from_iso639_1(const char *two_letters) {
  */
 const langs_t *get_lang(void) {
   const char *lcmsg = setlocale(LC_MESSAGES, NULL);
-  
+
   if(lcmsg) {
     const langs_t *l;
     for(l = _langs; l->lang[0]; l++) {
@@ -512,6 +512,6 @@ const langs_t *get_lang(void) {
       }
     }
   }
-  
+
   return &_langs[0];
 }

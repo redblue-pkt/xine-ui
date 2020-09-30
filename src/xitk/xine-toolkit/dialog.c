@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -116,7 +116,7 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
   xitk_image_free_image (&image);
 
   xitk_window_center_window (wd->xwin);
-  
+
   return wd;
 }
 
@@ -234,10 +234,10 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     int x = 25, y = winh - (num_buttons ? 50 : 0) - 50;
     xitk_checkbox_widget_t cb;
     xitk_label_widget_t lbl;
-  
+
     XITK_WIDGET_INIT(&cb);
     XITK_WIDGET_INIT(&lbl);
-  
+
     cb.skin_element_name = "XITK_NOSKIN_CHECK";
     cb.callback          = NULL;
     cb.userdata          = NULL;

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -76,7 +76,7 @@
       if(widget)                                                                                \
         xitk_enable_and_show_widget(widget);                                                    \
     } while(0)
- 
+
 typedef struct {
   post_info_t                 *info;
 
@@ -118,7 +118,7 @@ struct post_win_s {
   xitk_widget_t              *slider, *enable, *exit;
 
   int                         x, y;
-  
+
   int                         running, visible;
 
   xitk_register_key_t         widget_key;
@@ -173,7 +173,7 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
   if (*post_elements_num == 0)
     return NULL;
 
-  post_elements = (post_element_t **) 
+  post_elements = (post_element_t **)
     calloc((*post_elements_num), sizeof(post_element_t *));
 
   for( i = 0; gui->deinterlace_enable && i < vinfo->info.video.num_deinterlace_elements; i++ ) {
@@ -183,7 +183,7 @@ static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_el
   for (j = 0; gui->post_video_enable && j < vinfo->num_elements; j++ ) {
     post_elements[i+j] = vinfo->elements[j];
   }
-  
+
   return post_elements;
 }
 
@@ -195,31 +195,31 @@ static void _pplugin_save_chain (post_info_t *info) {
     int *_post_elements_num = &info->num_elements;
     int i = 0;
     int post_num = info->win->object_num;
-    
+
     if(!xitk_combo_get_current_selected(info->win->post_objects[post_num - 1]->plugins))
       post_num--;
-    
+
     if(post_num) {
       if(!*_post_elements) {
-	*_post_elements = (post_element_t **) 
+	*_post_elements = (post_element_t **)
 	  calloc((post_num + 1), sizeof(post_element_t *));
       }
       else {
 	int j;
-	
+
 	for(j = 0; j < *_post_elements_num; j++) {
 	  free((*_post_elements)[j]->name);
 	  VFREE((*_post_elements)[j]);
 	}
-	
+
 	*_post_elements = (post_element_t **) realloc(*_post_elements, sizeof(post_element_t *) * (post_num + 1));
-	
+
       }
-	
+
       for(i = 0; i < post_num; i++) {
 	(*_post_elements)[i] = (post_element_t *) calloc(1, sizeof(post_element_t));
 	(*_post_elements)[i]->post = info->win->post_objects[i]->post;
-	(*_post_elements)[i]->name = 
+	(*_post_elements)[i]->name =
 	  strdup(xitk_combo_get_current_entry_selected(info->win->post_objects[i]->plugins));
       }
 
@@ -229,12 +229,12 @@ static void _pplugin_save_chain (post_info_t *info) {
     else {
       if(*_post_elements_num) {
 	int j;
-	
+
 	for(j = 0; j < *_post_elements_num; j++) {
 	  free((*_post_elements)[j]->name);
 	  VFREE((*_post_elements)[j]);
 	}
-	
+
 	/* free((*_post_elements)[j]); */
 	free(*_post_elements);
 
@@ -248,14 +248,14 @@ static void _pplugin_save_chain (post_info_t *info) {
 static void _vpplugin_rewire (post_info_t *vinfo) {
   static post_element_t **post_elements;
   int post_elements_num;
-  
+
   _pplugin_save_chain (vinfo);
 
   post_elements = _pplugin_join_deinterlace_and_post_elements (&post_elements_num, vinfo);
   if (post_elements && post_elements_num) {
     xine_post_out_t   *vo_source;
     int                i = 0;
-    
+
     for (i = (post_elements_num - 1); i >= 0; i--) {
       /* use the first output from plugin */
       const char * const *outs = xine_post_list_outputs (post_elements[i]->post);
@@ -303,9 +303,9 @@ static post_element_t **_pplugin_join_visualization_and_post_elements(int *post_
   if (*post_elements_num == 0)
     return NULL;
 
-  post_elements = (post_element_t **) 
+  post_elements = (post_element_t **)
     calloc((*post_elements_num), sizeof(post_element_t *));
-  
+
   for (j = 0; gui->post_audio_enable && j < info->num_elements; j++ ) {
     post_elements[i+j] = info->elements[j];
   }
@@ -328,7 +328,7 @@ static void _applugin_rewire (post_info_t *info) {
   if (post_elements && post_elements_num) {
     xine_post_out_t   *ao_source;
     int                i = 0;
-    
+
     for (i = (post_elements_num - 1); i >= 0; i--) {
       /* use the first output from plugin */
       const char *const *outs = xine_post_list_outputs (post_elements[i]->post);
@@ -354,35 +354,35 @@ static void _applugin_rewire (post_info_t *info) {
 
 static int __pplugin_retrieve_parameters(post_object_t *pobj) {
   xine_post_in_t             *input_api;
-  
+
   if((input_api = (xine_post_in_t *) xine_post_input(pobj->post, "parameters"))) {
     const xine_post_api_t            *post_api;
     const xine_post_api_descr_t      *api_descr;
     const xine_post_api_parameter_t  *parm;
     int                         pnum = 0;
-    
+
     post_api = (const xine_post_api_t *) input_api->data;
-    
+
     api_descr = post_api->get_param_descr();
-    
+
     parm = api_descr->parameter;
     pobj->param_data = malloc(api_descr->struct_size);
     post_api->get_parameters(pobj->post, pobj->param_data);
-    
+
     while(parm->type != POST_PARAM_TYPE_LAST) {
-      
+
       pobj->properties_names = (char **) realloc(pobj->properties_names, sizeof(char *) * (pnum + 2));
-      
+
       pobj->properties_names[pnum]     = strdup(parm->name);
       pobj->properties_names[pnum + 1] = NULL;
       pnum++;
       parm++;
     }
-    
+
     pobj->api      = post_api;
     pobj->descr    = api_descr;
     pobj->param    = api_descr->parameter;
-    
+
     return 1;
   }
 
@@ -401,30 +401,30 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
   post_element_t **post_elements = NULL;
 
   *post_elements_num = 0;
-  
+
   if(pchain && strlen(pchain)) {
     char *p, *post_chain, *ppost_chain;
-    
+
     post_chain = strdup(pchain);
 
     ppost_chain = post_chain;
     while((p = xine_strsep(&ppost_chain, ";"))) {
-      
+
       if(strlen(p)) {
 	char          *plugin, *args = NULL;
 	xine_post_t   *post;
-	
+
 	while(*p == ' ')
 	  p++;
-	
+
 	plugin = strdup(p);
-	
+
 	if((p = strchr(plugin, ':')))
 	  *p++ = '\0';
-	
+
 	if(p && (strlen(p) > 1))
 	  args = p;
-	
+
 	post = xine_post_init (gui->xine, plugin, 0, &gui->ao_port, &gui->vo_port);
 
         if (post && info) {
@@ -432,58 +432,58 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
             xine_post_dispose (gui->xine, post);
             post = NULL;
           }
-        }              
-        
+        }
+
 	if(post) {
 	  post_object_t  pobj;
-	 
+
 	  post_elements = (post_element_t **) realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
-	  
-	  post_elements[(*post_elements_num)] = (post_element_t *) 
+
+	  post_elements[(*post_elements_num)] = (post_element_t *)
 	    calloc(1, sizeof(post_element_t));
 	  post_elements[(*post_elements_num)]->post = post;
 	  post_elements[(*post_elements_num)]->name = strdup(plugin);
 	  (*post_elements_num)++;
 	  post_elements[(*post_elements_num)] = NULL;
-	  
+
 	  memset(&pobj, 0, sizeof(post_object_t));
 	  pobj.post = post;
-	  
+
 	  if(__pplugin_retrieve_parameters(&pobj)) {
 	    int   i;
-	    
+
 	    if(pobj.properties_names && args) {
 	      char *param;
-	      
+
 	      while((param = xine_strsep(&args, ",")) != NULL) {
-		
+
 		p = param;
-		
+
 		while((*p != '\0') && (*p != '='))
 		  p++;
-		
+
 		if(strlen(p)) {
 		  int param_num = 0;
-		  
+
 		  *p++ = '\0';
-		  
+
 		  while(pobj.properties_names[param_num]
 			&& strcasecmp(pobj.properties_names[param_num], param))
 		    param_num++;
-		  
+
 		  if(pobj.properties_names[param_num]) {
-		    
+
 		    pobj.param    = pobj.descr->parameter;
 		    pobj.param    += param_num;
 		    pobj.readonly = pobj.param->readonly;
-		    
+
 		    switch(pobj.param->type) {
 		    case POST_PARAM_TYPE_INT:
 		      if(!pobj.readonly) {
 			if(pobj.param->enum_values) {
 			  char **values = pobj.param->enum_values;
 			  int    i = 0;
-	  
+
 			  while(values[i]) {
 			    if(!strcasecmp(values[i], p)) {
 			      *(int *)(pobj.param_data + pobj.param->offset) = i;
@@ -492,7 +492,7 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
 			    i++;
 			  }
 
-			  if( !values[i] ) 
+			  if( !values[i] )
 			    *(int *)(pobj.param_data + pobj.param->offset) = (int) strtol(p, &p, 10);
 			} else {
 			  *(int *)(pobj.param_data + pobj.param->offset) = (int) strtol(p, &p, 10);
@@ -500,20 +500,20 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
 			_pplugin_update_parameter(&pobj);
 		      }
 		      break;
-		      
+
 		    case POST_PARAM_TYPE_DOUBLE:
 		      if(!pobj.readonly) {
 			*(double *)(pobj.param_data + pobj.param->offset) = strtod(p, &p);
 			_pplugin_update_parameter(&pobj);
 		      }
 		      break;
-		      
+
 		    case POST_PARAM_TYPE_CHAR:
 		    case POST_PARAM_TYPE_STRING:
 		      if(!pobj.readonly) {
 			if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
 			  int maxlen = pobj.param->size / sizeof(char);
-			  
+
 			  strlcpy((char *)(pobj.param_data + pobj.param->offset), p, maxlen);
 			  _pplugin_update_parameter(&pobj);
 			}
@@ -521,12 +521,12 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
 			  fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING not supported yet.\n");
 		      }
 		      break;
-		      
+
 		    case POST_PARAM_TYPE_STRINGLIST: /* unsupported */
 		      if(!pobj.readonly)
 			fprintf(stderr, "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n");
 		      break;
-		      
+
 		    case POST_PARAM_TYPE_BOOL:
 		      if(!pobj.readonly) {
 			*(int *)(pobj.param_data + pobj.param->offset) = ((int) strtol(p, &p, 10)) ? 1 : 0;
@@ -536,22 +536,22 @@ static post_element_t **pplugin_parse_and_load (post_info_t *info, const char *p
 		    }
 		  }
 		}
-	      } 
-	      
+	      }
+
 	      i = 0;
-	      
+
 	      while(pobj.properties_names[i]) {
 		free(pobj.properties_names[i]);
 		i++;
 	      }
-	      
+
 	      free(pobj.properties_names);
 	    }
-	    
+
 	    VFREE(pobj.param_data);
 	  }
 	}
-	
+
 	VFREE(plugin);
       }
     }
@@ -568,19 +568,19 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   post_info_t *vinfo = &gui->post_video;
 
   vinfo->info.video.deinterlace_plugin = cfg->str_value;
-  
+
   if(gui->deinterlace_enable)
     _vpplugin_unwire (gui);
-  
+
   for(i = 0; i < vinfo->info.video.num_deinterlace_elements; i++) {
     xine_post_dispose (gui->xine, vinfo->info.video.deinterlace_elements[i]->post);
     free(vinfo->info.video.deinterlace_elements[i]->name);
     VFREE(vinfo->info.video.deinterlace_elements[i]);
   }
-  
+
   SAFE_FREE(vinfo->info.video.deinterlace_elements);
   vinfo->info.video.num_deinterlace_elements = 0;
-  
+
   if ((posts = pplugin_parse_and_load (vinfo, vinfo->info.video.deinterlace_plugin, &num))) {
     vinfo->info.video.deinterlace_elements     = posts;
     vinfo->info.video.num_deinterlace_elements = num;
@@ -592,7 +592,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
-  gui->visual_anim.post_plugin_num = cfg->num_value;  
+  gui->visual_anim.post_plugin_num = cfg->num_value;
   post_rewire_visual_anim (gui);
 }
 
@@ -663,9 +663,9 @@ int post_rewire_audio_port_to_stream (gGui_t *gui, xine_stream_t *stream) {
   gui->post_audio.info.audio.ignore_visual_anim = 1;
   gui->post_audio.stream = stream;
   _applugin_rewire (&gui->post_audio);
-/*  
+/*
   xine_post_out_t * audio_source;
-  
+
   audio_source = xine_get_audio_source(stream);
   return xine_post_wire_audio_port(audio_source, gui->ao_port);
 */
@@ -713,29 +713,29 @@ static int _pplugin_get_object_offset(post_info_t *info, post_object_t *pobj) {
     if (info->win->post_objects[i] == pobj)
       return i;
   }
-  
+
   return 0;
 }
 
 static int _pplugin_is_first_filter(post_info_t *info, post_object_t *pobj) {
   if (info->win)
     return (pobj == *info->win->post_objects);
-  
+
   return 0;
 }
 
 static int _pplugin_is_last_filter(post_info_t *info, post_object_t *pobj) {
-  
+
   if(info->win) {
     post_object_t **po = info->win->post_objects;
-    
+
     while(*po && (*po != pobj))
       po++;
-    
+
     if(*(po + 1) == NULL)
       return 1;
   }
-  
+
   return 0;
 }
 
@@ -758,19 +758,19 @@ static void _pplugin_show_obj(post_info_t *info, post_object_t *pobj) {
 
     if(pobj->frame)
       xitk_set_widget_pos(pobj->frame, pobj->x, pobj->y);
-    
+
     if(pobj->plugins)
       xitk_set_widget_pos(pobj->plugins, pobj->x + 26 + 6, pobj->y + 5 + (20 - xitk_get_widget_height(pobj->plugins)) / 2);
-    
+
     if(pobj->properties)
       xitk_set_widget_pos(pobj->properties, pobj->x + 26 + 196, pobj->y + 5 + (20 - xitk_get_widget_height(pobj->properties)) / 2);
-    
+
     if(pobj->help)
       xitk_set_widget_pos(pobj->help, pobj->x + 26 + 386, pobj->y + 5);
 
     if(pobj->comment)
       xitk_set_widget_pos(pobj->comment, pobj->x + 26 + 6, pobj->y + 28 + 4);
-    
+
     if(pobj->value)
       xitk_set_widget_pos(pobj->value, pobj->x + 26 + 6, pobj->y + (FRAME_HEIGHT - 5 + 1) - (20 + xitk_get_widget_height(pobj->value)) / 2);
 
@@ -779,21 +779,21 @@ static void _pplugin_show_obj(post_info_t *info, post_object_t *pobj) {
 
     if(pobj->down)
       xitk_set_widget_pos(pobj->down, pobj->x + 5, pobj->y + (FRAME_HEIGHT - 16 - 5));
-    
+
     ENABLE_ME(pobj->frame);
     ENABLE_ME(pobj->plugins);
     ENABLE_ME(pobj->properties);
     ENABLE_ME(pobj->value);
     ENABLE_ME(pobj->comment);
     ENABLE_ME(pobj->help);
-    
+
     if((!_pplugin_is_first_filter(info, pobj)) && (xitk_combo_get_current_selected(pobj->plugins)))
       ENABLE_ME(pobj->up);
-    
-    if((!_pplugin_is_last_filter(info, pobj) && (xitk_combo_get_current_selected(pobj->plugins))) && 
-       (_pplugin_is_last_filter(info, pobj) 
-	|| (!_pplugin_is_last_filter(info, pobj) 
-	    && info->win->post_objects[_pplugin_get_object_offset(info, pobj) + 1] 
+
+    if((!_pplugin_is_last_filter(info, pobj) && (xitk_combo_get_current_selected(pobj->plugins))) &&
+       (_pplugin_is_last_filter(info, pobj)
+	|| (!_pplugin_is_last_filter(info, pobj)
+	    && info->win->post_objects[_pplugin_get_object_offset(info, pobj) + 1]
 	    && xitk_combo_get_current_selected(info->win->post_objects[_pplugin_get_object_offset(info, pobj) + 1]->plugins))))
       ENABLE_ME(pobj->down);
 
@@ -805,23 +805,23 @@ static void _pplugin_paint_widgets(post_info_t *info) {
     int   i, x, y;
     int   last;
     int   slidmax, slidpos;
-    
+
     last = info->win->object_num <= (info->win->first_displayed + MAX_DISPLAY_FILTERS)
       ? info->win->object_num : (info->win->first_displayed + MAX_DISPLAY_FILTERS);
-    
+
     for(i = 0; i < info->win->object_num; i++)
       _pplugin_hide_obj(info->win->post_objects[i]);
-    
+
     x = 15;
     y = 34 - (FRAME_HEIGHT + 4);
-    
+
     for(i = info->win->first_displayed; i < last; i++) {
       y += FRAME_HEIGHT + 4;
       info->win->post_objects[i]->x = x;
       info->win->post_objects[i]->y = y;
       _pplugin_show_obj(info, info->win->post_objects[i]);
     }
-    
+
     if(info->win->object_num > MAX_DISPLAY_FILTERS) {
       slidmax = info->win->object_num - MAX_DISPLAY_FILTERS;
       slidpos = slidmax - info->win->first_displayed;
@@ -830,11 +830,11 @@ static void _pplugin_paint_widgets(post_info_t *info) {
     else {
       slidmax = 1;
       slidpos = slidmax;
-      
+
       if(!info->win->first_displayed)
 	xitk_disable_and_hide_widget(info->win->slider);
     }
-    
+
     xitk_slider_set_max(info->win->slider, slidmax);
     xitk_slider_set_pos(info->win->slider, slidpos);
   }
@@ -847,23 +847,23 @@ static void _pplugin_destroy_widget (xitk_widget_t **w) {
 
 static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
   post_object_t *pobj = (post_object_t *) data;
-  
+
   if(pobj->readonly)
     return;
-  
+
   //can be int[]:
   //int num_of_int = pobj->param->size / sizeof(char);
-  
-  if(pobj->param->range_min && pobj->param->range_max && 
+
+  if(pobj->param->range_min && pobj->param->range_max &&
      (value < (int)pobj->param->range_min || value > (int)pobj->param->range_max)) {
     xine_error (pobj->info->gui, _("Entered value is out of bounds (%d>%d<%d)."),
 	       (int)pobj->param->range_min, value, (int)pobj->param->range_max);
   }
   else {
     *(int *)(pobj->param_data + pobj->param->offset) = value;
-    
+
     _pplugin_update_parameter(pobj);
-    
+
     if ((xitk_get_widget_type (w) & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
       xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
     else
@@ -878,7 +878,7 @@ static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value
   if(pobj->readonly)
     return;
 
-  if(pobj->param->range_min && pobj->param->range_max && 
+  if(pobj->param->range_min && pobj->param->range_max &&
      (value < pobj->param->range_min || value > pobj->param->range_max)) {
     xine_error (pobj->info->gui, _("Entered value is out of bounds (%e>%e<%e)."),
 	       pobj->param->range_min, value, pobj->param->range_max);
@@ -898,12 +898,12 @@ static void _pplugin_set_param_char(xitk_widget_t *w, void *data, const char *te
   (void)w;
   if(pobj->readonly)
     return;
-  
+
   // SUPPORT CHAR but no STRING yet
   if(pobj->param->type == POST_PARAM_TYPE_CHAR) {
     char *v;
     int maxlen = pobj->param->size / sizeof(char);
-    
+
     v = (char *)(pobj->param_data + pobj->param->offset);
     strlcpy (v, text, maxlen);
     _pplugin_update_parameter (pobj);
@@ -916,19 +916,19 @@ static void _pplugin_set_param_char(xitk_widget_t *w, void *data, const char *te
 
 static void _pplugin_set_param_stringlist(xitk_widget_t *w, void *data, int value) {
   post_object_t *pobj = (post_object_t *) data;
-  
+
   (void)w;
   (void)value;
   if(pobj->readonly)
     return;
-  
+
   xine_error (pobj->info->gui, _("parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"));
 }
 
 static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {
   post_object_t *pobj = (post_object_t *) data;
   int *v;
-  
+
   (void)w;
   if(pobj->readonly)
     return;
@@ -946,7 +946,7 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
     xitk_label_widget_t   lb;
     char                  buffer[2048];
 
-    snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description) 
+    snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description)
 	     ? pobj->param->description : _("No description available"));
 
     XITK_WIDGET_INIT(&lb);
@@ -977,7 +977,7 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
 	}
 	else {
 	  xitk_intbox_widget_t      ib;
-	  
+
           XITK_WIDGET_INIT(&ib);
           ib.fmt               = INTBOX_FMT_DECIMAL;
           ib.min               = 0;
@@ -993,11 +993,11 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
 	}
       }
       break;
-      
+
     case POST_PARAM_TYPE_DOUBLE:
       {
 	xitk_doublebox_widget_t      ib;
-	
+
         XITK_WIDGET_INIT(&ib);
 	ib.skin_element_name = NULL;
 	ib.value             = *(double *)(pobj->param_data + pobj->param->offset);
@@ -1009,12 +1009,12 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
         xitk_add_widget (info->win->widget_list, pobj->value);
       }
       break;
-      
+
     case POST_PARAM_TYPE_CHAR:
     case POST_PARAM_TYPE_STRING:
       {
 	xitk_inputtext_widget_t  inp;
-	
+
         XITK_WIDGET_INIT(&inp);
 	inp.skin_element_name = NULL;
 	inp.text              = (char *)(pobj->param_data + pobj->param->offset);
@@ -1026,11 +1026,11 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
         xitk_add_widget (info->win->widget_list, pobj->value);
       }
       break;
-      
+
     case POST_PARAM_TYPE_STRINGLIST:
       {
 	xitk_combo_widget_t         cmb;
-	
+
         XITK_WIDGET_INIT(&cmb);
 	cmb.skin_element_name = NULL;
 	cmb.layer_above       = is_layer_above (info->gui);
@@ -1043,19 +1043,19 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
 	xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
       }
       break;
-      
+
     case POST_PARAM_TYPE_BOOL:
       {
 	xitk_checkbox_widget_t    cb;
-	
+
         XITK_WIDGET_INIT(&cb);
 	cb.skin_element_name = NULL;
 	cb.callback          = _pplugin_set_param_bool;
 	cb.userdata          = pobj;
         pobj->value =  xitk_noskin_checkbox_create (info->win->widget_list, &cb, 0, 0, 12, 12);
         xitk_add_widget (info->win->widget_list, pobj->value);
-	xitk_checkbox_set_state(pobj->value, 
-				(*(int *)(pobj->param_data + pobj->param->offset)));  
+	xitk_checkbox_set_state(pobj->value,
+				(*(int *)(pobj->param_data + pobj->param->offset)));
       }
       break;
     }
@@ -1117,25 +1117,25 @@ static void _pplugin_destroy_only_obj(post_info_t *info, post_object_t *pobj) {
   if(pobj) {
 
     if(pobj->properties) {
-      
+
       _pplugin_destroy_widget (&pobj->properties);
-      
+
       VFREE(pobj->param_data);
       pobj->param_data = NULL;
-      
+
       if(pobj->properties_names) {
 	int pnum = 0;
-	
+
 	while(pobj->properties_names[pnum]) {
 	  free(pobj->properties_names[pnum]);
 	  pnum++;
 	}
-	
+
 	free(pobj->properties_names);
 	pobj->properties_names = NULL;
       }
     }
-    
+
     _pplugin_destroy_widget (&pobj->comment);
     _pplugin_destroy_widget (&pobj->value);
 
@@ -1144,7 +1144,7 @@ static void _pplugin_destroy_only_obj(post_info_t *info, post_object_t *pobj) {
         _pplugin_close_help (NULL, info, 0);
       _pplugin_destroy_widget (&pobj->help);
     }
-    
+
   }
 }
 
@@ -1173,7 +1173,7 @@ static int __line_wrap(char *s, int pos, int line_size)
   }
 
   if( word_size >= line_size )
-    return pos > line_size; 
+    return pos > line_size;
 
   return word_size + pos > line_size;
 }
@@ -1194,7 +1194,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
       _pplugin_close_help (NULL, info, 0);
     return;
   }
-  
+
   /* create help window if needed */
 
   if( !info->win->help_running ) {
@@ -1224,8 +1224,8 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
       "Black", "Black", "White", btnfontname);
     xitk_add_widget (help_widget_list, w);
     xitk_enable_and_show_widget(w);
-  
-  
+
+
     XITK_WIDGET_INIT(&br);
     br.arrow_up.skin_element_name    = NULL;
     br.slider.skin_element_name      = NULL;
@@ -1246,9 +1246,9 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
   {
     char  *p, **hbuf = NULL;
     int    lines = 0, i;
-    
+
     p = pobj->api->get_help();
-    
+
     do {
       char c, *old_p = p, *new_p;
       int w;
@@ -1287,7 +1287,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
       lines++;
     } while( *p );
-    
+
     if(lines) {
       char **ohbuf = info->win->help_text;
       int    i = 0;
@@ -1295,7 +1295,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
       info->win->help_text = hbuf;
       xitk_browser_update_list(info->win->help_browser, (const char **)info->win->help_text,
                                NULL, lines, 0);
-      
+
       if(ohbuf) {
 	while(ohbuf[i++])
 	  free(ohbuf[i]);
@@ -1326,9 +1326,9 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 static void _pplugin_retrieve_parameters(post_info_t *info, post_object_t *pobj) {
   xitk_combo_widget_t         cmb;
   xitk_labelbutton_widget_t   lb;
-  
+
   if(__pplugin_retrieve_parameters(pobj)) {
-    
+
     XITK_WIDGET_INIT(&cmb);
     cmb.skin_element_name = NULL;
     cmb.layer_above       = is_layer_above (pobj->info->gui);
@@ -1347,7 +1347,7 @@ static void _pplugin_retrieve_parameters(post_info_t *info, post_object_t *pobj)
       lb.button_type       = CLICK_BUTTON;
       lb.label             = _("Help");
       lb.align             = ALIGN_CENTER;
-      lb.callback          = _pplugin_show_help; 
+      lb.callback          = _pplugin_show_help;
       lb.state_callback    = NULL;
       lb.userdata          = pobj;
       lb.skin_element_name = NULL;
@@ -1358,7 +1358,7 @@ static void _pplugin_retrieve_parameters(post_info_t *info, post_object_t *pobj)
   }
   else {
     xitk_label_widget_t   lb;
-    
+
     XITK_WIDGET_INIT(&lb);
     lb.skin_element_name   = NULL;
     lb.label               = _("There is no parameter available for this plugin.");
@@ -1433,7 +1433,7 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
       _pplugin_create_filter_object (info);
     }
   }
-  
+
   if(info->win->help_running)
     _pplugin_show_help (NULL, pobj, 0);
 
@@ -1451,10 +1451,10 @@ static void _pplugin_move_up (xitk_widget_t *w, void *data) {
 
   while(*ppobj != pobj)
     ppobj++;
-  
+
   *ppobj       = *(ppobj - 1);
   *(ppobj - 1) = pobj;
-  
+
   _pplugin_rewire (info);
   _pplugin_paint_widgets(info);
 }
@@ -1469,10 +1469,10 @@ static void _pplugin_move_down (xitk_widget_t *w, void *data) {
 
   while(*ppobj != pobj)
     ppobj++;
-  
+
   *ppobj       = *(ppobj + 1);
   *(ppobj + 1) = pobj;
-  
+
   _pplugin_rewire (info);
   _pplugin_paint_widgets(info);
 }
@@ -1495,7 +1495,7 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
 
   info->win->x = 15;
   info->win->y += FRAME_HEIGHT + 4;
-  
+
   info->win->post_objects[info->win->object_num] = pobj;
   pobj->x = info->win->x;
   pobj->y = info->win->y;
@@ -1525,7 +1525,7 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
   xitk_add_widget (info->win->widget_list, pobj->frame);
 
   DISABLE_ME(pobj->frame);
-  
+
   XITK_WIDGET_INIT(&cmb);
   cmb.skin_element_name = NULL;
   cmb.layer_above       = is_layer_above (info->gui);
@@ -1560,32 +1560,32 @@ static int _pplugin_rebuild_filters(post_info_t *info) {
   post_element_t  **pelem = info->elements;
   int plugin_type = info->type == POST_VIDEO ? XINE_POST_TYPE_VIDEO_FILTER : XINE_POST_TYPE_AUDIO_FILTER;
   int num_filters = 0;
-  
+
   while(pelem && *pelem) {
     int i = 0;
 
     if ((*pelem)->post->type == plugin_type) {
       num_filters++;
-      
+
       if (!_pplugin_create_filter_object (info))
         break;
       info->win->post_objects[info->win->object_num - 1]->post = (*pelem)->post;
-      
+
       while(info->win->plugin_names[i] && strcasecmp(info->win->plugin_names[i], (*pelem)->name))
         i++;
-      
+
       if(info->win->plugin_names[i]) {
         xitk_combo_set_select(info->win->post_objects[info->win->object_num - 1]->plugins, i);
-        
+
         _pplugin_retrieve_parameters(info, info->win->post_objects[info->win->object_num - 1]);
       }
     }
-    
+
     pelem++;
   }
   /* Always have 1 "No filter" at the end for later extension. */
   _pplugin_create_filter_object (info);
-  
+
   _pplugin_paint_widgets(info);
 
   return num_filters;
@@ -1627,7 +1627,7 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
   (void)state;
   if (info->win) {
     int           i;
-    
+
     if (info->win->help_running)
      _pplugin_close_help (NULL, info, 0);
 
@@ -1637,14 +1637,14 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
 	free(info->win->help_text[i]);
       free(info->win->help_text);
     }
-    
+
     _pplugin_save_chain (info);
 
     info->win->running = 0;
     info->win->visible = 0;
 
     gui_save_window_pos (info->gui, info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->widget_key);
-    
+
     {
       post_object_t **p = info->win->post_objects;
       while (*p) {
@@ -1662,9 +1662,9 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
 
     for(i = 0; info->win->plugin_names[i]; i++)
       free(info->win->plugin_names[i]);
-    
+
     free(info->win->plugin_names);
-    
+
     xitk_unregister_event_handler(&info->win->widget_key);
 
     xitk_window_destroy_window(info->win->xwin);
@@ -1748,7 +1748,7 @@ static void _pplugin_enability (xitk_widget_t *w, void *data, int state, int mod
     gui->post_video_enable = state;
   else
     gui->post_audio_enable = state;
-  
+
   _pplugin_unwire(info);
   _pplugin_rewire (info);
 }
@@ -1759,13 +1759,13 @@ int pplugin_is_post_selected (post_info_t *info) {
 
   if(info->win) {
     int post_num = info->win->object_num;
-    
+
     if(!xitk_combo_get_current_selected(info->win->post_objects[post_num - 1]->plugins))
       post_num--;
 
     return (post_num > 0);
   }
-  
+
   return info->num_elements;
 }
 
@@ -1849,11 +1849,11 @@ void pplugin_panel (post_info_t *info) {
 
   x = y = 80;
   gui_load_window_pos (gui, info->type == POST_VIDEO ? "vpplugin" : "applugin", &x, &y);
-  
+
   info->win->xwin = xitk_window_create_dialog_window (gui->xitk,
     info->type == POST_VIDEO ? _("Video Chain Reaction") : _("Audio Chain Reaction"),
     x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
+
   set_window_states_start (gui, info->win->xwin);
 
   info->win->widget_list = xitk_window_widget_list (info->win->xwin);
@@ -1865,7 +1865,7 @@ void pplugin_panel (post_info_t *info) {
   bg = xitk_window_get_background_pixmap(info->win->xwin);
 
   XITK_WIDGET_INIT(&sl);
-  
+
   sl.min                      = 0;
   sl.max                      = 1;
   sl.step                     = 1;
@@ -1912,7 +1912,7 @@ void pplugin_panel (post_info_t *info) {
   */
 
   x = WINDOW_WIDTH - (100 + 15);
-  
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("OK");
   lb.align             = ALIGN_CENTER;
@@ -1926,10 +1926,10 @@ void pplugin_panel (post_info_t *info) {
   xitk_enable_and_show_widget (info->win->exit);
 
   _pplugin_get_plugins(info);
-  
+
   info->win->x = 15;
   info->win->y = 34 - (FRAME_HEIGHT + 4);
-  
+
   _pplugin_rebuild_filters (info);
 
   xitk_window_set_background(info->win->xwin, bg);
@@ -1964,7 +1964,7 @@ void pplugin_parse_and_store_post (post_info_t *info, const char *post_chain) {
     if(*_post_elements_num) {
       int i;
       int ptot = *_post_elements_num + num;
-      
+
       *_post_elements = (post_element_t **) realloc(*_post_elements, sizeof(post_element_t *) * (ptot + 1));
       for(i = *_post_elements_num; i <  ptot; i++)
 	(*_post_elements)[i] = posts[i - *_post_elements_num];
@@ -2055,9 +2055,9 @@ void post_deinterlace_init (gGui_t *gui, const char *deinterlace_post) {
   vinfo = &gui->post_video;
 
   deinterlace_default = _pplugin_get_default_deinterlacer();
-  
-  vinfo->info.video.deinterlace_plugin = 
-    (char *) xine_config_register_string (gui->xine, "gui.deinterlace_plugin", 
+
+  vinfo->info.video.deinterlace_plugin =
+    (char *) xine_config_register_string (gui->xine, "gui.deinterlace_plugin",
 					  deinterlace_default,
 					  _("Deinterlace plugin."),
 					  _("Plugin (with optional parameters) to use "
@@ -2070,7 +2070,7 @@ void post_deinterlace_init (gGui_t *gui, const char *deinterlace_post) {
     vinfo->info.video.deinterlace_elements     = posts;
     vinfo->info.video.num_deinterlace_elements = num;
   }
-  
+
 }
 
 void post_deinterlace (gGui_t *gui) {

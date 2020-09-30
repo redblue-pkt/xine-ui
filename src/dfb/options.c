@@ -1,23 +1,23 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  *
- * DirectFB UI command line handling 
+ * DirectFB UI command line handling
  * Rich Wareham <richwareham@users.sourceforge.net>
  *
  */
@@ -59,7 +59,7 @@ static void show_banner(void) {
   int major, minor, sub;
 
   show_version();
-  printf("Built with xine library %d.%d.%d..\n", 
+  printf("Built with xine library %d.%d.%d..\n",
 	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION);
   xine_get_version (&major, &minor, &sub);
   printf("Found xine library version: %d.%d.%d.\n", major, minor, sub);
@@ -116,7 +116,7 @@ static void print_usage (void) {
   printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
   printf("  VCD:   'vcd://<track number>'\n");
   printf("\n");
-  
+
   xine_exit(xine);
 }
 
@@ -124,12 +124,12 @@ int do_command_line(int argc, char **argv) {
   int            c = '?';
   int            option_index    = 0;
 
-  
+
   /*
    * parse command line
    */
   opterr = 0;
-  while((c = getopt_long(argc, argv, short_options, 
+  while((c = getopt_long(argc, argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
@@ -140,7 +140,7 @@ int do_command_line(int argc, char **argv) {
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &(dfbxine.audio_channel));
       break;
-      
+
     case 'q': /* Automatic quit option */
       dfbxine.auto_quit = 1;
       break;
@@ -162,7 +162,7 @@ int do_command_line(int argc, char **argv) {
 	exit (1);
       }
       break;
-      
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -173,7 +173,7 @@ int do_command_line(int argc, char **argv) {
       print_usage();
       exit(1);
       break;
-      
+
     default:
       print_usage();
       fprintf (stderr, "invalid argument %d => exit\n",c);
@@ -187,12 +187,12 @@ int do_command_line(int argc, char **argv) {
   }
   else
     extract_mrls((argc - optind), &argv[optind]);
- 
- 
+
+
   /*
    * Initialize DirectFB and parse command line.
    */
-  DFBCHECK (DirectFBInit (&argc, &argv));    
+  DFBCHECK (DirectFBInit (&argc, &argv));
 
   show_banner();
   return 1;

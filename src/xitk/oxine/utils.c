@@ -48,14 +48,14 @@ typedef struct {
   pthread_cond_t jobs_reorganize;
   int job_id;
   int keep_going;
-  
+
 } ox_scheduler_t;
 
 
 /*
  * GLOBAL scheduler instance
  */
- 
+
 static ox_scheduler_t *ox_scheduler = NULL;
 
 
@@ -78,17 +78,17 @@ static __attribute__((noreturn)) void *scheduler_thread(void *data) {
 #ifdef LOG
   printf("utils: scheduler thread created\n");
 #endif
- 
+
   if (!ox_scheduler) {
     pthread_exit(NULL);
   }
   pthread_mutex_lock(&ox_scheduler->wait_mutex);
 
   while (ox_scheduler->keep_going) {
-    
+
     pthread_mutex_lock(&ox_scheduler->jobs_mutex);
     job = xine_list_last_content(ox_scheduler->jobs);
-    
+
     if (!job) { /* no jobs for me */
       pthread_mutex_unlock(&ox_scheduler->jobs_mutex);
 #ifdef LOG
@@ -101,7 +101,7 @@ static __attribute__((noreturn)) void *scheduler_thread(void *data) {
 #ifdef LOG
     printf("utils: sleeping until next job\n");
 #endif
-    ret = pthread_cond_timedwait(&ox_scheduler->jobs_reorganize, 
+    ret = pthread_cond_timedwait(&ox_scheduler->jobs_reorganize,
 	                         &ox_scheduler->wait_mutex, &job->ts);
 
     if (ret == ETIMEDOUT) {
@@ -124,7 +124,7 @@ static __attribute__((noreturn)) void *scheduler_thread(void *data) {
       if (cb) cb(cb_data);
 
       pthread_mutex_unlock(&ox_scheduler->job_execution_mutex);
-      
+
     } else {
 #ifdef LOG
       printf("utils: reorganizing queue\n");
@@ -141,7 +141,7 @@ void start_scheduler(void) {
   struct timezone tz;
 
   ox_scheduler = malloc(sizeof(ox_scheduler_t));
-  
+
   gettimeofday(&tv, &tz);
   ox_scheduler->start_time = tv.tv_sec;
 
@@ -163,14 +163,14 @@ void stop_scheduler(void) {
 
   job_t *job;
   void *ret = NULL;
-  
+
   if (!ox_scheduler) return;
-  
+
   ox_scheduler->keep_going = 0;
   pthread_cond_signal(&ox_scheduler->jobs_reorganize);
 
   pthread_join(ox_scheduler->scheduler_thread, ret);
-  
+
   job = xine_list_first_content(ox_scheduler->jobs);
 
   while(job) {
@@ -190,19 +190,19 @@ void stop_scheduler(void) {
 }
 
 int schedule_job(int delay, void (*cb)(void *data), void *data) {
-  
+
   struct timeval tv;
   struct timezone tz;
   job_t *job;
   int msec;
   int priority;
-  
+
   if (!ox_scheduler) return -1;
 
   job = malloc(sizeof(job_t));
 
   gettimeofday(&tv, &tz);
-  
+
   job->ts.tv_sec = (delay / 1000) + tv.tv_sec;
   msec = delay % 1000;
   if ((msec + tv.tv_usec/1000)>=1000) job->ts.tv_sec++;
@@ -212,13 +212,13 @@ int schedule_job(int delay, void (*cb)(void *data), void *data) {
   job->cb = cb;
   job->data = data;
   job->id = ++ox_scheduler->job_id;
-  
+
   priority = (job->ts.tv_sec - ox_scheduler->start_time) * 1000 + msec;
 
   pthread_mutex_lock(&ox_scheduler->jobs_mutex);
   xine_list_append_priority_content(ox_scheduler->jobs, job, priority);
   pthread_mutex_unlock(&ox_scheduler->jobs_mutex);
-  
+
   pthread_cond_signal(&ox_scheduler->jobs_reorganize);
 
   return ox_scheduler->job_id;
@@ -227,7 +227,7 @@ int schedule_job(int delay, void (*cb)(void *data), void *data) {
 void cancel_job(int job_id) {
 
   job_t *job;
-  
+
   if (!ox_scheduler) return;
 
   pthread_mutex_lock(&ox_scheduler->jobs_mutex);
@@ -306,9 +306,9 @@ static void RenderDesc           ( prefix_tag_t*, char* );
 
 
 void *_gen_malloc(size_t wSize, const char* tag, const char* lpFile, int nLine) {
-  
+
   prefix_tag_t* prefix;
-  
+
   wSize = DOALIGN(wSize);
   prefix=(prefix_tag_t*)malloc(sizeof(prefix_tag_t)+wSize+sizeof(postfix_tag_t));
   if (prefix) {
@@ -327,18 +327,18 @@ void *_gen_malloc(size_t wSize, const char* tag, const char* lpFile, int nLine) 
     printf("utils: failed to alloc memory\n");
     abort();
   }
-  
+
   return(prefix ? prefix+1 : NULL);
 }
 
 
 void *_gen_free(void* content) {
-  
+
   if (ho_verify(content)) {
-    
+
     prefix_tag_t* prefix=(prefix_tag_t*)content-1;
     size_t        wSize=(char*)(prefix->postfix+1)-(char*)prefix;
-    
+
     RemoveFromLinkedList( prefix );
     free(prefix->tag);
     memset( prefix, 0, wSize );
@@ -350,12 +350,12 @@ void *_gen_free(void* content) {
 
 
 void *_gen_strdup(const char* lpS, const char* lpFile, int nLine) {
-  
+
   void* lpReturn=NULL;
 
   if (lpS) {
     size_t wSize = (size_t)(strlen(lpS)+1);
-    
+
     lpReturn = _gen_malloc( wSize, "strdup'ed string", lpFile, nLine );
     if (lpReturn) {
       memcpy( lpReturn, lpS, wSize );
@@ -413,15 +413,15 @@ void *_gen_realloc(void* lpOld, size_t wSize, const char* lpFile, int nLine) {
 
 
 void heapstat(void) {
- 
+
   unsigned long total = 0;
   unsigned long chunks = 0;
   if (heap_head) {
     prefix_tag_t* lpCur=heap_head;
-    
+
     while (ho_verify(&lpCur[1])) {
       char buffer[100];
-      
+
       RenderDesc( lpCur, buffer );
       /*--- print out buffer ---*/
       printf( "heapstat: %s\n", buffer );
@@ -432,7 +432,7 @@ void heapstat(void) {
         break;
       }
     }
-    if (total) 
+    if (total)
       printf("heapstat: memory usage: %lu words in %lu chunks\n", total, chunks);
   }
 }
@@ -465,7 +465,7 @@ static void RemoveFromLinkedList(prefix_tag_t* lpRemove) {
 
     /*--- Possibly correct head pointer ---*/
     if (lpRemove==heap_head) {
-        heap_head = ((lpRemove->next==lpRemove) ? NULL : 
+        heap_head = ((lpRemove->next==lpRemove) ? NULL :
             lpRemove->next);
         }
 }

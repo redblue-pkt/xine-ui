@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (C) 2003 by Fredrik Noring
  * Copyright (C) 2003-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -42,7 +42,7 @@
 #define GUI_NEXT     1
 #define GUI_PREV     2
 #define GUI_RESET    3
- 
+
 parameter_t gParameter =
 {
 	{ 0, 0    },
@@ -76,14 +76,14 @@ static const struct
 		  "OSDStreamInfos", ACTID_OSD_SINFOS },
 	{ "Display information using OSD.",
 		  "OSDWriteText", ACTID_OSD_WTEXT },
-	
+
 	{ "Interlaced mode toggle.",
 		  "ToggleInterleave", ACTID_TOGGLE_INTERLEAVE },
 	{ "Quit the program.",
 		  "Quit", ACTID_QUIT },
 	{ "Start playback.",
 		  "Play", ACTID_PLAY },
-	
+
 	{ "Visibility toggle of the setup window.",
 		  "SetupShow", ACTID_SETUP },
 	{ "Stop playback.",
@@ -98,7 +98,7 @@ static const struct
 		  "MediamarkEditor", ACTID_MMKEDITOR },
 	{ "Eject the current medium.",
 		  "Eject", ACTID_EJECT },
-	
+
 	{ "Set position to numeric-argument%% of current stream.",
 		  "SetPosition%", ACTID_SET_CURPOS },
 	{ "Set position to beginning of current stream.",
@@ -144,15 +144,15 @@ static const struct
 	{ "Add 10 to the next entered number.",
 		  "Number10add", ACTID_EVENT_NUMBER_10_ADD },
 	{ "Set position back by numeric argument in current stream.",
-		  "SeekRelative-", ACTID_SEEK_REL_m }, 
+		  "SeekRelative-", ACTID_SEEK_REL_m },
 	{ "Set position to -60 seconds in current stream.",
-		  "SeekRelative-60", ACTID_SEEK_REL_m60 }, 
+		  "SeekRelative-60", ACTID_SEEK_REL_m60 },
 	{ "Set position forward by numeric argument in current stream.",
-		  "SeekRelative+", ACTID_SEEK_REL_p }, 
+		  "SeekRelative+", ACTID_SEEK_REL_p },
 	{ "Set position to +60 seconds in current stream.",
 		  "SeekRelative+60", ACTID_SEEK_REL_p60 },
 	{ "Set position to -30 seconds in current stream.",
-		  "SeekRelative-30", ACTID_SEEK_REL_m30 }, 
+		  "SeekRelative-30", ACTID_SEEK_REL_m30 },
 	{ "Set position to +30 seconds in current stream.",
 		  "SeekRelative+30", ACTID_SEEK_REL_p30 },
 	{ "Set position to -15 seconds in current stream.",
@@ -160,10 +160,10 @@ static const struct
 	{ "Set position to +15 seconds in current stream.",
 		  "SeekRelative+15", ACTID_SEEK_REL_p15 },
 	{ "Set position to -7 seconds in current stream.",
-		  "SeekRelative-7", ACTID_SEEK_REL_m7 }, 
+		  "SeekRelative-7", ACTID_SEEK_REL_m7 },
 	{ "Set position to +7 seconds in current stream.",
 		  "SeekRelative+7", ACTID_SEEK_REL_p7 },
-	
+
 	{ "Audio muting toggle.",
 		  "Mute", ACTID_MUTE },
 	{ "Change audio syncing.",
@@ -184,7 +184,7 @@ static const struct
 		  "Volume-", ACTID_mVOLUME },
 	{ "Take a snapshot (Internal image fetch and save).",
 		  "Snapshot", ACTID_SNAPSHOT },
-		
+
 	{ "Jump to Menu.",
 		  "Menu", ACTID_EVENT_MENU1 },
 	{ "Jump to Title Menu.",
@@ -217,7 +217,7 @@ static const struct
 		  "EventAngleNext", ACTID_EVENT_ANGLE_NEXT },
 	{ "Select event.",
 		  "EventSelect", ACTID_EVENT_SELECT },
-		
+
 	{ "Zoom in.",
 		  "ZoomIn", ACTID_ZOOM_IN },
 	{ "Zoom out.",
@@ -227,7 +227,7 @@ static const struct
 
 	{ "Loop mode toggle.",
 		  "ToggleLoopMode", ACTID_LOOPMODE },
-		
+
 #ifdef ENABLE_VDR_KEYS
 	{ "VDR Red button",
 	  "VDRButtonRed",           ACTID_EVENT_VDR_RED },
@@ -264,35 +264,35 @@ static const struct
 	{ "VDR Recordings menu",
 	  "VDRRecordings",          ACTID_EVENT_VDR_RECORDINGS },
 	{ "VDR Setup menu",
-	  "VDRSetup",               ACTID_EVENT_VDR_SETUP },   
+	  "VDRSetup",               ACTID_EVENT_VDR_SETUP },
 	{ "VDR Command menu",
 	  "VDRCommands",            ACTID_EVENT_VDR_COMMANDS },
 	{ "VDR Command back",
-	  "VDRBack",                ACTID_EVENT_VDR_BACK },    
+	  "VDRBack",                ACTID_EVENT_VDR_BACK },
 #ifdef XINE_EVENT_VDR_USER0 /* #ifdef is precaution for backward compatibility at the moment */
 	{ "VDR User command 0",
-	  "VDRUser0",               ACTID_EVENT_VDR_USER0 },   
+	  "VDRUser0",               ACTID_EVENT_VDR_USER0 },
 #endif
 	{ "VDR User command 1",
-	  "VDRUser1",               ACTID_EVENT_VDR_USER1 },   
+	  "VDRUser1",               ACTID_EVENT_VDR_USER1 },
 	{ "VDR User command 2",
-	  "VDRUser2",               ACTID_EVENT_VDR_USER2 },   
+	  "VDRUser2",               ACTID_EVENT_VDR_USER2 },
 	{ "VDR User command 3",
-	  "VDRUser3",               ACTID_EVENT_VDR_USER3 },   
+	  "VDRUser3",               ACTID_EVENT_VDR_USER3 },
 	{ "VDR User command 4",
-	  "VDRUser4",               ACTID_EVENT_VDR_USER4 },   
+	  "VDRUser4",               ACTID_EVENT_VDR_USER4 },
 	{ "VDR User command 5",
-	  "VDRUser5",               ACTID_EVENT_VDR_USER5 },   
+	  "VDRUser5",               ACTID_EVENT_VDR_USER5 },
 	{ "VDR User command 6",
-	  "VDRUser6",               ACTID_EVENT_VDR_USER6 },   
+	  "VDRUser6",               ACTID_EVENT_VDR_USER6 },
 	{ "VDR User command 7",
-	  "VDRUser7",               ACTID_EVENT_VDR_USER7 },   
+	  "VDRUser7",               ACTID_EVENT_VDR_USER7 },
 	{ "VDR User command 8",
-	  "VDRUser8",               ACTID_EVENT_VDR_USER8 },   
+	  "VDRUser8",               ACTID_EVENT_VDR_USER8 },
 	{ "VDR User command 9",
-	  "VDRUser9",               ACTID_EVENT_VDR_USER9 },   
+	  "VDRUser9",               ACTID_EVENT_VDR_USER9 },
 	{ "VDR Volume +",
-	  "VDRVolumePlus",          ACTID_EVENT_VDR_VOLPLUS }, 
+	  "VDRVolumePlus",          ACTID_EVENT_VDR_VOLPLUS },
 	{ "VDR Volume -",
 	  "VDRVolumeMinus",         ACTID_EVENT_VDR_VOLMINUS },
 	{ "VDR Mute audio",
@@ -345,11 +345,11 @@ int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length)
 				break;
 			xine_usec_sleep(100000); /* wait before trying again */
 		}
-	
+
 	return ret;
 }
 
-static int play(xine_stream_t *stream, 
+static int play(xine_stream_t *stream,
                 int start_pos, int start_time_in_secs)
 {
 	return xine_play(stream, start_pos, start_time_in_secs * 1000);
@@ -363,22 +363,22 @@ static void action_play(void)
 static __attribute__((noreturn)) void *seek_relative_thread(void *data)
 {
 	int sec, off_sec = (int)(intptr_t)data;
-	
+
 	pthread_detach(pthread_self());
-	
+
 	if(get_pos_length(fbxine.stream, 0, &sec, 0))
 	{
 		sec /= 1000;
-		
+
 		if(sec + off_sec < 0)
 			sec = 0;
 		else
 			sec += off_sec;
-		
+
                 play(fbxine.stream, 0, sec);
 		osd_stream_position();
 	}
-	
+
 	fbxine.ignore_next = 0;
 	pthread_exit(0);
 }
@@ -387,12 +387,12 @@ static void action_seek_relative(int off_sec)
 {
 	static pthread_t seek_thread;
 	int err;
-	
+
 	if(fbxine.ignore_next ||
 	   !xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_SEEKABLE) ||
 	   xine_get_status(fbxine.stream) != XINE_STATUS_PLAY)
 		return;
-    
+
 	fbxine.ignore_next = 1;
 
 	err = pthread_create(&seek_thread, 0, seek_relative_thread,
@@ -405,38 +405,38 @@ static void action_seek_relative(int off_sec)
 }
 
 
-static void change_audio_channel(void *data) 
+static void change_audio_channel(void *data)
 {
         int dir = (int)(intptr_t)data;
 	int channel;
-  
+
 	channel = xine_get_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
-  
+
 	if(dir == GUI_NEXT)
 	     channel++;
 	else if(dir == GUI_PREV)
 	     channel--;
 	else if(dir == GUI_RESET)
 	     channel = -1;
-  
+
         xine_set_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, channel);
 	osd_display_audio_lang();
 }
 
-static void change_spu(void *data) 
+static void change_spu(void *data)
 {
         int dir = (int)(intptr_t)data;
 	int channel;
-  
+
 	channel = xine_get_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL);
-  
+
 	if(dir == GUI_NEXT)
 	     channel++;
 	else if(dir == GUI_PREV)
 	     channel--;
 	else if(dir == GUI_RESET)
 	     channel = -1;
-  
+
         xine_set_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL, channel);
 	osd_display_spu_lang();
 }
@@ -466,29 +466,29 @@ void do_action(int action)
 	if(action & ACTID_IS_INPUT_EVENT)
 	{
 		xine_event_t xine_event;
-		
+
 		xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
 		xine_event.data_length = 0;
 		xine_event.data = 0;
 		xine_event.stream = fbxine.stream;
 		gettimeofday(&xine_event.tv, NULL);
-		
+
 		xine_event_send(fbxine.stream, &xine_event);
 		return;
 	}
-	
+
 	switch(action)
 	{
 		case ACTID_SEEK_REL_m600:
 			action_seek_relative(-600);
-			break;			
+			break;
 		case ACTID_SEEK_REL_p600:
 			action_seek_relative(600);
 			break;
 
 		case ACTID_SEEK_REL_m60:
 			action_seek_relative(-60);
-			break;			
+			break;
 		case ACTID_SEEK_REL_p60:
 			action_seek_relative(60);
 			break;
@@ -532,7 +532,7 @@ void do_action(int action)
 	        case ACTID_AUDIOCHAN_DEFAULT:
 		        change_audio_channel((void*)GUI_RESET);
 			break;
-			
+
 	        case ACTID_SPU_NEXT:
 		        change_spu((void*)GUI_NEXT);
 			break;
@@ -544,7 +544,7 @@ void do_action(int action)
 	        case ACTID_SPU_DEFAULT:
 		        change_spu((void*)GUI_RESET);
 			break;
-			
+
 	        case ACTID_OSD_SINFOS:
 		        osd_stream_infos();
 		        break;
@@ -560,7 +560,7 @@ void do_action(int action)
 		case ACTID_PAUSE:
 			action_pause();
 			break;
-			
+
 		case ACTID_PLAY:
 			action_play();
 			break;
@@ -581,7 +581,7 @@ void do_action(int action)
 
 	        case ACTID_TOGGLE_INTERLEAVE:
 		        fbxine.deinterlace_enable = !fbxine.deinterlace_enable;
-			osd_display_info("Deinterlace: %s", (fbxine.deinterlace_enable) ? 
+			osd_display_info("Deinterlace: %s", (fbxine.deinterlace_enable) ?
 					 "enabled" : "disabled");
 			post_deinterlace();
 		        break;

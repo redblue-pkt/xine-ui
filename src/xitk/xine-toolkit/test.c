@@ -1,20 +1,20 @@
 /*
 ** Copyright (C) 2001-2008 Daniel Caujolle-Bert <segfault@club-internet.fr>
-**  
+**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
-**  
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-**  
+**
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA.
-**  
+**
 */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -107,23 +107,23 @@ static int init_test(void) {
   int                screen;
   Visual	    *visual = NULL;
   XColor             black, dummy;
-  
+
   if(!XInitThreads ()) {
     printf ("XInitThreads() failed.\n");
     return 0;
-  } 
+  }
 
   test = (test_t *) xitk_xmalloc(sizeof(test_t));
-  
+
   if((test->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, "Cannot open display\n");
     return 0;
   }
-  
+
   XLOCK (XLockDisplay, test->display);
-  
+
   screen = DefaultScreen(test->display);
-  visual = DefaultVisual(test->display, screen); 
+  visual = DefaultVisual(test->display, screen);
 
   imlib_init.flags = PARAMS_VISUALID;
   imlib_init.visualid = visual->visualid;
@@ -181,9 +181,9 @@ static void test_handle_event(XEvent *event, void *data) {
   XKeyEvent      mykeyevent;
   KeySym         mykey;
   char           kbuf[256];
-  
+
   switch(event->type) {
-    
+
   case EnterNotify:
     XLOCK (XLockDisplay, test->display);
     XRaiseWindow(test->display, xitk_window_get_window(test->xwin));
@@ -193,7 +193,7 @@ static void test_handle_event(XEvent *event, void *data) {
   case ButtonPress:
     {
       XButtonEvent *bevent = (XButtonEvent *) event;
-      
+
       if(bevent->button == Button3)
 	create_menu();
     }
@@ -201,33 +201,33 @@ static void test_handle_event(XEvent *event, void *data) {
 
   case KeyPress: {
     int modifier;
-    
+
     (void) xitk_get_key_modifier(event, &modifier);
-    
+
     mykeyevent = event->xkey;
-    
+
     XLOCK (XLockDisplay, test->display);
     XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     XUNLOCK (XUnlockDisplay, test->display);
-    
+
     switch (mykey) {
-      
+
     case XK_q:
     case XK_Q:
       if(modifier & MODIFIER_CTRL)
 	test_end(NULL, NULL);
       break;
-      
-    }   
+
+    }
   }
   break;
-  
+
   case MappingNotify:
     XLOCK (XLockDisplay, test->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUNLOCK (XUnlockDisplay, test->display);
     break;
-    
+
     //  case ConfigureNotify:
     //    xitk_combo_update_pos(test->combo);
     //    break;
@@ -278,7 +278,7 @@ static void change_label(xitk_widget_t *w, void *data) {
   xitk_label_change_label(test->label, labels[nlab]);
 
   xitk_browser_set_alignment(test->browser, align);
-  
+
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", NULL, NULL, 500, ALIGN_LEFT, "premier \n\n\nnum %d\n", nlab);
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "License information", NULL, NULL, 500, ALIGN_CENTER, "** This program is free software; you can redistribute it and/or modify** it under the terms of the GNU General Public License as published by** the Free Software Foundation; either version 2 of the License, or** (at your option) any later version.");
   //xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "** This program is free software; you can redistribute it and/or modify\n** it under the terms of the GNU General Public License as published by\n** the Free Software Foundation; either version 2 of the License, or\n** (at your option) any later version.");
@@ -330,7 +330,7 @@ static void intchange_cb (void *data, int btn) {
   case 1:
     test->oldintvalue = xitk_intbox_get_value(test->intbox);
     break;
-    
+
   case 2:
   case 3:
     xitk_intbox_set_value(test->intbox, test->oldintvalue);
@@ -364,7 +364,7 @@ static void create_intbox(void) {
   ib.callback          = notify_intbox_change;
   ib.userdata          = NULL;
   xitk_add_widget (test->widget_list,
-	    (test->intbox = 
+	    (test->intbox =
 	     xitk_noskin_intbox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(test->intbox);
   xitk_set_widget_tips_default(test->intbox, "This is a intbox");
@@ -379,7 +379,7 @@ static void doublechange_cb (void *data, int btn) {
   case 1:
     test->olddoublevalue = xitk_doublebox_get_value(test->doublebox);
     break;
-    
+
   case 2:
   case 3:
     xitk_doublebox_set_value(test->doublebox, test->olddoublevalue);
@@ -413,7 +413,7 @@ static void create_doublebox(void) {
   ib.callback          = notify_doublebox_change;
   ib.userdata          = NULL;
   xitk_add_widget (test->widget_list,
-	    (test->doublebox = 
+	    (test->doublebox =
 	     xitk_noskin_doublebox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
   xitk_enable_and_show_widget(test->doublebox);
   xitk_set_widget_tips_default(test->doublebox, "This is a doublebox");
@@ -438,7 +438,7 @@ static void create_checkbox(void) {
   cb.callback          = checkbox_cb;
   cb.userdata          = NULL;
   xitk_add_widget (test->widget_list,
-		    (test->checkbox = 
+		    (test->checkbox =
 		     xitk_noskin_checkbox_create(test->widget_list, &cb, x, y, 20, 20)));
   xitk_enable_and_show_widget(test->checkbox);
 
@@ -466,11 +466,11 @@ static void create_tabs(void) {
   bg = xitk_image_create_xitk_pixmap(test->imlibdata, width, height);
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  
+
   draw_rectangular_box (bg, x, y+20, w, 61, DRAW_OUTTER);
   xitk_window_change_background(test->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
-  
+
   t.skin_element_name = NULL;
   t.num_entries       = 9;
   t.entries           = tabs_labels;
@@ -478,7 +478,7 @@ static void create_tabs(void) {
   t.callback          = NULL;
   t.userdata          = NULL;
   xitk_add_widget (test->widget_list,
-		    (test->tabs = 
+		    (test->tabs =
 		     xitk_noskin_tabs_create(test->widget_list, &t, x, y, w, fontname)));
   xitk_enable_and_show_widget(test->tabs);
 
@@ -492,15 +492,15 @@ static void create_frame(void) {
   int             width, height;
   char           *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int              x = 350, y = 50, w = 200, h = 150;
-  
+
   xitk_window_get_window_size(test->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(test->imlibdata, width, height);
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-  
+
   draw_outter_frame(bg, "My Frame", fontname, x, y, w, h);
   draw_inner_frame(bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
-  
+
   xitk_window_change_background(test->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 }
@@ -520,7 +520,7 @@ static void create_inputtext(void) {
   inp.callback          = change_browser_entry;
   inp.userdata          = NULL;
   xitk_add_widget (test->widget_list,
-	   (test->input = 
+	   (test->input =
 	    xitk_noskin_inputtext_create(test->widget_list, &inp,
 					 150, 150, 150, 20,
 					 "Black", "Black", fontname)));
@@ -550,8 +550,8 @@ static void create_label(void) {
   lbl.skin_element_name = NULL;
   lbl.label             = label;
   lbl.callback          = NULL;
-  xitk_add_widget (test->widget_list, 
-	   (test->label = 
+  xitk_add_widget (test->widget_list,
+	   (test->label =
 	    xitk_noskin_label_create(test->widget_list, &lbl,
 				     x, y, len, (asc+des)*2, fontname)));
   xitk_enable_and_show_widget(test->label);
@@ -560,7 +560,7 @@ static void create_label(void) {
 
   {
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
-    
+
     if(wimage) {
       draw_rectangular_box (wimage->image, 0, 0, wimage->width, wimage->height, DRAW_INNER);
     }
@@ -579,8 +579,8 @@ static void create_button(void) {
   b.skin_element_name = NULL;
   b.callback          = change_label;
   b.userdata          = NULL;
-  xitk_add_widget (test->widget_list, 
-	   (test->button = 
+  xitk_add_widget (test->widget_list,
+	   (test->button =
 	    xitk_noskin_button_create(test->widget_list, &b,
 				      x, y, width, height)));
   xitk_enable_and_show_widget(test->button);
@@ -603,34 +603,34 @@ static void create_button(void) {
       XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
       XSetBackground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
       XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
-	       10, (height >> 1) - 13, 26, 26, 
+	       10, (height >> 1) - 13, 26, 26,
 	       (0 * 64), (360 * 64));
       XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
-	       (width) + 10, (height >> 1) - 13, 26, 26, 
+	       (width) + 10, (height >> 1) - 13, 26, 26,
 	       (0 * 64), (360 * 64));
       XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
-	       ((width*2) + 10) + 1, ((height >> 1) - 13) + 1, 26, 26, 
+	       ((width*2) + 10) + 1, ((height >> 1) - 13) + 1, 26, 26,
 	       (0 * 64), (360 * 64));
 
 
       fs = xitk_font_load_font(test->display, fontname);
       xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
       xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
-      
+
       col = xitk_get_pixel_color_black(test->imlibdata);
 
       XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
-      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
 		  50, ((height+asc+des) >> 1) - des, label, strlen(label));
-      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
 		  (width) + 50, ((height+asc+des) >> 1) - des, label, strlen(label));
-      
+
       {
 	char *nlabel = "!BOOM!";
 
       xitk_font_string_extent(fs, nlabel, &lbear, &rbear, &wid, &asc, &des);
-      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
-		  ((width * 2) + 50) + 1, (((height+asc+des) >> 1) - des) + 1, 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
+		  ((width * 2) + 50) + 1, (((height+asc+des) >> 1) - des) + 1,
 		  nlabel, strlen(nlabel));
       }
 
@@ -698,7 +698,7 @@ static void create_sliders(void) {
 							      XITK_RSLIDER)));
   xitk_enable_and_show_widget(test->rslider);
   xitk_slider_set_pos(test->rslider, 0);
-  
+
   xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
 
 }
@@ -733,7 +733,7 @@ static void create_combo(void) {
   /*
   draw_rectangular_box (test->imlibdata, bg, (x - 4), (y - 4), (width + 5), (height + 8), DRAW_INNER);
   xitk_window_change_background(test->xwin, bg, wwidth, wheight);
-  
+
   XFreePixmap(test->display, bg);
   */
 
@@ -744,8 +744,8 @@ static void create_combo(void) {
   cmb.parent_wkey       = &test->kreg;
   cmb.callback          = combo_select;
   cmb.userdata          = NULL;
-  xitk_add_widget (test->widget_list, 
-		   (test->combo = 
+  xitk_add_widget (test->widget_list,
+		   (test->combo =
 		    xitk_noskin_combo_create(test->widget_list, &cmb,
 					     x, y, width, NULL, NULL)));
   xitk_set_widget_tips_default(test->combo, "This is a combo box.");
@@ -758,11 +758,11 @@ static void create_combo(void) {
 
 static Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
-  
+
   ABORT_IF_NULL(im);
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
-  
+
   XLOCK (im->x.x_lock_display, im->x.disp);
   p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, im->x.depth);
   XUNLOCK (im->x.x_unlock_display, im->x.disp);
@@ -786,7 +786,7 @@ static void create_browser(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, XITK_WIDGET_LIST_GC(test->widget_list),
 	    0, 0, width, height, 0, 0);
 
-  XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), 
+  XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list),
 		 xitk_get_pixel_color_black(test->imlibdata));
   XDrawRectangle(test->display, bg, XITK_WIDGET_LIST_GC(test->widget_list), 17, 27, 117, 176);
 
@@ -796,13 +796,13 @@ static void create_browser(void) {
   {
     int i;
     char buf[64];
-    
+
     for(i = 0; i < 25; i++) {
       memset(&buf, 0, sizeof(buf));
       snprintf(buf, sizeof(buf), "Entry %d", i);
       test->entries[i] = strdup(buf);
     }
-    
+
     test->entries[i] = NULL;
     test->num_entries = i;
   }
@@ -818,13 +818,13 @@ static void create_browser(void) {
   browser.dbl_click_callback            = change_inputtext_dbl_click;
   browser.parent_wlist                  = test->widget_list;
   browser.userdata                      = NULL;
-  xitk_add_widget (test->widget_list, 
-		    (test->browser = 
+  xitk_add_widget (test->widget_list,
+		    (test->browser =
 		     xitk_noskin_browser_create(test->widget_list, &browser,
                                                 20, 30, 100, 20, 12, fontname)));
   xitk_enable_and_show_widget(test->browser);
-  
-  xitk_browser_update_list(test->browser, 
+
+  xitk_browser_update_list(test->browser,
 			   (const char *const *)test->entries, NULL, test->num_entries, 0);
 
 }
@@ -889,16 +889,16 @@ static void create_menu(void) {
     { "Quit",                            "C-q",    NULL,            menu_test_end, NULL },
     { NULL,                              NULL,     NULL,            NULL,     NULL }
   };
-  
+
   XITK_WIDGET_INIT(&menu);
 
-  (void) xitk_get_mouse_coords(test->display, 
+  (void) xitk_get_mouse_coords(test->display,
 			       (xitk_window_get_window(test->xwin)), NULL, NULL, &x, &y);
-  
+
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = test->widget_list;
   menu.skin_element_name = NULL;
-  
+
   test->menu = xitk_noskin_menu_create(test->widget_list, &menu, x, y);
 
   {
@@ -908,7 +908,7 @@ static void create_menu(void) {
     menu_entry.menu      = "Playlist/Loop/Extra/errrr?";
     xitk_menu_add_entry(test->menu, &menu_entry);
   }
-  
+
 
   xitk_menu_show_menu(test->menu);
 }
@@ -926,7 +926,7 @@ int main(int argc, char **argv) {
   char                       *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int                         windoww = 600, windowh = 400;
   xitk_widget_t              *w;
-  
+
   if(!init_test()) {
     printf("init_test() failed\n");
     exit(1);
@@ -936,15 +936,15 @@ int main(int argc, char **argv) {
   xitk_set_locale();
   printf("locale: %s\n", setlocale (LC_ALL, ""));
 #endif
-  
+
   printf("bindtextdomain: %s\n", bindtextdomain("xitk", XITK_LOCALE));
   textdomain("xitk");
 
   /* Create window */
   test->xwin = xitk_window_create_dialog_window(test->imlibdata,
-						"My Test Window", 
+						"My Test Window",
 						100, 100, windoww, windowh);
-  
+
   XLOCK (XLockDisplay, test->display);
 
 #undef DUMP_ATOMS
@@ -963,14 +963,14 @@ int main(int argc, char **argv) {
 #endif
 
 
-  gc = XCreateGC(test->display, 
+  gc = XCreateGC(test->display,
 		 (xitk_window_get_window(test->xwin)), None, None);
 
   test->widget_list  = xitk_widget_list_new(test->imlibdata);
-  xitk_widget_list_set(test->widget_list, 
+  xitk_widget_list_set(test->widget_list,
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(test->xwin)));
   xitk_widget_list_set(test->widget_list, WIDGET_LIST_GC, gc);
-  
+
   XITK_WIDGET_INIT(&lb);
 
   lb.button_type       = CLICK_BUTTON;
@@ -999,8 +999,8 @@ int main(int argc, char **argv) {
   create_intbox();
   create_doublebox();
   create_checkbox();
-  
-  test->kreg = xitk_register_event_handler("test", 
+
+  test->kreg = xitk_register_event_handler("test",
                                            test->xwin,
 					   test_handle_event,
 					   NULL,

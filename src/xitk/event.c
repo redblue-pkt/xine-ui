@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -92,7 +92,7 @@ static const char *const exp_levels[] = {
   "Master of the known universe",
 #ifdef DEBUG
   "Debugger",
-#else  
+#else
   NULL,
 #endif
   NULL
@@ -120,7 +120,7 @@ static const char *const shortcut_style[] = {
 int hidden_file_cb(int action, int value) {
   xine_cfg_entry_t  cfg_entry;
   int               retval = 0;
-  
+
   if(xine_config_lookup_entry (gGui->xine, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
       config_update_bool("media.files.show_hidden_files", value);
@@ -156,13 +156,13 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 
 static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
-  
+
   if(gui->visual_anim.enabled == cfg->num_value)
     return;
 
   if((gui->visual_anim.enabled) && (cfg->num_value == 0) && gui->visual_anim.running)
     visual_anim_stop();
-  
+
   if(gui->visual_anim.enabled && gui->visual_anim.running) {
     if((gui->visual_anim.enabled == 1) && (cfg->num_value != 1)) {
       if (post_rewire_audio_port_to_stream (gui, gui->stream))
@@ -173,15 +173,15 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
       gui->visual_anim.running = 0;
     }
   }
-  
+
   gui->visual_anim.enabled = cfg->num_value;
-  
+
   if(gui->visual_anim.enabled) {
     int  has_video = xine_get_stream_info(gui->stream, XINE_STREAM_INFO_HAS_VIDEO);
-    
+
     if(has_video)
       has_video = !xine_get_stream_info(gui->stream, XINE_STREAM_INFO_IGNORE_VIDEO);
-    
+
     if(!has_video && !gui->visual_anim.running) {
       if(gui->visual_anim.enabled == 1) {
 	if(gui->visual_anim.post_output_element.post) {
@@ -275,12 +275,12 @@ static void shortcut_style_cb(void *data, xine_cfg_entry_t *cfg) {
 
 int wm_not_ewmh_only(void) {
   int wm_type = xitk_get_wm_type();
-  
+
   if((wm_type & WM_TYPE_GNOME_COMP) && !(wm_type & WM_TYPE_EWMH_COMP))
     return 0;
   else if(wm_type & WM_TYPE_EWMH_COMP)
     return 1;
-  
+
   return 0;
 }
 
@@ -334,7 +334,7 @@ static void gui_signal_handler (int sig, void *data) {
       struct sigaction action;
 
       xine_config_save (gui->xine, __xineui_global_config_file);
-      
+
       action.sa_handler = dummy_sighandler;
       sigemptyset(&(action.sa_mask));
       action.sa_flags = 0;
@@ -342,7 +342,7 @@ static void gui_signal_handler (int sig, void *data) {
 	fprintf(stderr, "sigaction(SIGALRM) failed: %s\n", strerror(errno));
       }
       alarm(5);
-      
+
       /* We should call xine_stop() here, but since the */
       /* xine functions are not signal-safe, we cant.   */
 
@@ -397,7 +397,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   }
 
   gui->event_pending++;
-  
+
   if(action & ACTID_IS_INPUT_EVENT) {
 
     /* Note: In the following overflow checks, we must test against INT_MAX */
@@ -419,7 +419,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       else
         fprintf (stderr, "xine-ui: Input number overflow, using %d\n", gui->numeric.arg);
 
-    } 
+    }
     else if(action == ACTID_EVENT_NUMBER_10_ADD) {
 
       if (!gui->numeric.set) {
@@ -448,14 +448,14 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       pthread_mutex_unlock (&gui->event_mutex);
       return;
     }
-    
+
     /* events for advanced input plugins. */
     xine_event.type        = action & ~ACTID_IS_INPUT_EVENT;
     xine_event.data_length = 0;
     xine_event.data        = NULL;
     xine_event.stream      = gui->stream;
     gettimeofday(&xine_event.tv, NULL);
-    
+
     xine_event_send(gui->stream, &xine_event);
     pthread_mutex_lock (&gui->event_mutex);
     gui->event_pending--;
@@ -480,7 +480,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   pthread_mutex_unlock (&gui->event_mutex);
 
   switch(action) {
-    
+
   case ACTID_WINDOWREDUCE:
     {
       int output_width = 0, output_height = 0;
@@ -543,22 +543,22 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     else
       gui_direct_change_spu_channel (NULL, gui, narg);
     break;
-    
+
   case ACTID_SPU_PRIOR:
     if (narg < 0)
       gui_nextprev_spu_channel (NULL, GUI_PREV (gui));
     else
       gui_direct_change_spu_channel (NULL, gui, narg);
     break;
-    
+
   case ACTID_CONTROLSHOW:
     gui_control_show (NULL, gui);
     break;
-    
+
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
     gui_toggle_visibility (NULL, gui);
     break;
-    
+
   case ACTID_TOGGLE_WINOUT_BORDER:
     gui_toggle_border (NULL, gui);
     break;
@@ -569,14 +569,14 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     else
       gui_direct_change_audio_channel (NULL, gui, narg);
     break;
-    
+
   case ACTID_AUDIOCHAN_PRIOR:
     if (narg < 0)
       gui_nextprev_audio_channel (NULL, GUI_PREV (gui));
     else
       gui_direct_change_audio_channel (NULL, gui, narg);
     break;
-    
+
   case ACTID_PAUSE:
     gui_pause (NULL, gui, 0);
     break;
@@ -584,7 +584,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_PLAYLIST:
     gui_playlist_show (NULL, gui);
     break;
-      
+
   case ACTID_TOGGLE_VISIBLITY:
     panel_toggle_visibility (NULL, gui->panel);
     break;
@@ -640,11 +640,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_EVENT_SENDER:
     gui_event_sender_show (NULL, gui);
     break;
-    
+
   case ACTID_MRL_NEXT:
     gui_step_mrl (gui, narg < 0 ? 1 : narg);
     break;
-    
+
   case ACTID_MRL_PRIOR:
     gui_step_mrl (gui, narg < 0 ? -1 : -narg);
     break;
@@ -655,7 +655,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     else
       gui_playlist_play (gui, narg);
     break;
-      
+
   case ACTID_SETUP:
     gui_setup_show (NULL, gui);
     break;
@@ -696,7 +696,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SET_CURPOS_50:
     gui_set_current_position (32767);
     break;
-    
+
   case ACTID_SET_CURPOS_60:
     gui_set_current_position (39321);
     break;
@@ -704,11 +704,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SET_CURPOS_70:
     gui_set_current_position (45874);
     break;
-    
+
   case ACTID_SET_CURPOS_80:
     gui_set_current_position (52428);
     break;
-    
+
   case ACTID_SET_CURPOS_90:
     gui_set_current_position (58981);
     break;
@@ -739,23 +739,23 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SEEK_REL_p60:
     gui_seek_relative (60);
     break;
-    
+
   case ACTID_SEEK_REL_p15:
     gui_seek_relative (15);
     break;
-    
+
   case ACTID_SEEK_REL_m30:
     gui_seek_relative (-30);
     break;
-    
+
   case ACTID_SEEK_REL_m7:
     gui_seek_relative (-7);
     break;
-    
+
   case ACTID_SEEK_REL_p30:
     gui_seek_relative (30);
     break;
-    
+
   case ACTID_SEEK_REL_p7:
     gui_seek_relative (7);
     break;
@@ -763,11 +763,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_MRLBROWSER:
     gui_mrlbrowser_show (NULL, gui);
     break;
-    
+
   case ACTID_MUTE:
     panel_toggle_audio_mute (NULL, gui->panel, !gui->mixer.mute);
     break;
-    
+
   case ACTID_AV_SYNC_m3600:
     {
       int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) - 3600);
@@ -783,11 +783,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
     }
     break;
-    
+
   case ACTID_AV_SYNC_p3600:
     {
       int av_offset = (xine_get_param(gui->stream, XINE_PARAM_AV_OFFSET) + 3600);
-      
+
       pthread_mutex_lock (&gui->event_mutex);
       gui->mmk.av_offset = av_offset;
       if (gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
@@ -815,9 +815,9 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SV_SYNC_p:
     {
       int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
-      
+
       xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-      
+
       osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
     break;
@@ -825,13 +825,13 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SV_SYNC_m:
     {
       int spu_offset = xine_get_param(gui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
-      
+
       xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-      
+
       osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
     break;
-    
+
   case ACTID_SV_SYNC_RESET:
     xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, 0);
     osd_display_info(_("SPU Offset: reset."));
@@ -840,7 +840,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SPEED_FAST:
     gui_nextprev_speed (NULL, GUI_NEXT (gui));
     break;
-    
+
   case ACTID_SPEED_SLOW:
     gui_nextprev_speed (NULL, GUI_PREV (gui));
     break;
@@ -880,7 +880,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_SNAPSHOT:
     panel_snapshot (NULL, gui->panel);
     break;
-    
+
   case ACTID_ZOOM_IN:
     gui_change_zoom(1,1);
     break;
@@ -892,7 +892,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_ZOOM_X_IN:
     gui_change_zoom(1,0);
     break;
-  
+
   case ACTID_ZOOM_X_OUT:
     gui_change_zoom(-1,0);
     break;
@@ -900,21 +900,21 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_ZOOM_Y_IN:
     gui_change_zoom(0,1);
     break;
-  
+
   case ACTID_ZOOM_Y_OUT:
     gui_change_zoom(0,-1);
     break;
-  
+
   case ACTID_ZOOM_RESET:
     gui_reset_zoom();
     break;
-    
+
   case ACTID_GRAB_POINTER:
     if(!gui->cursor_grabbed) {
       if (panel_is_visible (gui->panel) < 2) {
         video_window_grab_pointer(gui->vwin);
       }
-      
+
       gui->cursor_grabbed = 1;
     }
     else {
@@ -922,7 +922,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       gui->cursor_grabbed = 0;
     }
     break;
-    
+
   case ACTID_TOGGLE_TVMODE:
     gui_toggle_tvmode();
     break;
@@ -955,7 +955,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     panel_update_mrl_display (gui->panel);
     playlist_mrlident_toggle (gui);
     break;
-    
+
   case ACTID_SCANPLAYLIST:
     playlist_scan_for_infos (gui);
     break;
@@ -976,7 +976,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     if(gui->playlist.loop >= PLAYLIST_LOOP_MODES_NUM ||
        gui->playlist.loop <  PLAYLIST_LOOP_NO_LOOP)
       gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
-    
+
     switch(gui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
       osd_display_info(_("Playlist: no loop."));
@@ -995,7 +995,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       break;
     }
     break;
-    
+
   case ACTID_ADDMEDIAMARK:
     gui_add_mediamark();
     break;
@@ -1111,7 +1111,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 	gui->playlist.control |= PLAYLIST_CONTROL_STOP;
       gui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
     }
-    osd_display_info(_("Playlist: %s"), 
+    osd_display_info(_("Playlist: %s"),
 		     (gui->playlist.control & PLAYLIST_CONTROL_STOP) ?
 		     (gui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST) ?
 		     _("Stop (persistent)") :
@@ -1359,13 +1359,13 @@ void gui_playlist_start_next (gGui_t *gui) {
     gui_display_logo (gui);
     return;
   }
-  
+
   switch(gui->playlist.loop) {
 
   case PLAYLIST_LOOP_NO_LOOP:
   case PLAYLIST_LOOP_LOOP:
     gui->playlist.cur++;
-    
+
     if(gui->playlist.cur >= gui->playlist.num) {
       if(gui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) {
 	gui->playlist.cur--;
@@ -1382,14 +1382,14 @@ void gui_playlist_start_next (gGui_t *gui) {
       }
     }
     break;
-    
+
   case PLAYLIST_LOOP_REPEAT:
     break;
 
   case PLAYLIST_LOOP_SHUFFLE:
   case PLAYLIST_LOOP_SHUF_PLUS:
     if(!mediamark_all_played()) {
-      
+
     __shuffle_restart:
       gui->playlist.cur = mediamark_get_shuffle_next();
     }
@@ -1402,7 +1402,7 @@ void gui_playlist_start_next (gGui_t *gui) {
         gui_exit (NULL, gui);
       else
         gui_display_logo (gui);
-      return;    
+      return;
     }
     break;
   }
@@ -1422,7 +1422,7 @@ void gui_playlist_start_next (gGui_t *gui) {
   case PLAYLIST_LOOP_LOOP:
   case PLAYLIST_LOOP_REPEAT:
     break;
-    
+
   case PLAYLIST_LOOP_SHUFFLE:
   case PLAYLIST_LOOP_SHUF_PLUS:
     if(!mediamark_all_played())
@@ -1471,9 +1471,9 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
     /* grab recursively all files from dir */
     if(is_a_dir(file)) {
-      
+
       if(file[strlen(file) - 1] == '/')
-	file[strlen(file) - 1] = '\0'; 
+	file[strlen(file) - 1] = '\0';
 
       mediamark_collect_from_directory(file);
     }
@@ -1492,18 +1492,18 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 	    sub += 2;
 	  }
 	}
-	
+
 	mediamark_append_entry((const char *)file, (const char *)file, sub, 0, -1, 0, 0);
       }
     }
   }
 
   gui->playlist.cur = gui->playlist.num ? 0 : -1;
-  
-  if((gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) || 
+
+  if((gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) ||
      (gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS))
     gui->playlist.cur = mediamark_get_shuffle_next();
-  
+
   gui->is_display_mrl = 0;
   gui->mrl_overrided  = 0;
   /* gui->new_pos        = -1; */
@@ -1520,42 +1520,42 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
         CONFIG_LEVEL_ADV, NULL, NULL);
 
   use_synchronized_x11 =
-    xine_config_register_bool (gui->xine, "gui.xsynchronize", 
+    xine_config_register_bool (gui->xine, "gui.xsynchronize",
 				 0,
-				 _("Synchronized X protocol (debug)"), 
+				 _("Synchronized X protocol (debug)"),
 				 _("Do X transactions in synchronous mode. "
-				   "Very slow, use only for debugging!"), 
+				   "Very slow, use only for debugging!"),
 				 CONFIG_LEVEL_ADV,
 				 CONFIG_NO_CB,
                                  CONFIG_NO_DATA);
 
-  gui->layer_above = 
+  gui->layer_above =
     xine_config_register_bool (gui->xine, "gui.layer_above", 0,
 			       _("Windows stacking"),
 			       _("Use WM layer property to place windows on top\n"
-				 "except for the video window in non-fullscreen mode."), 
+				 "except for the video window in non-fullscreen mode."),
 			       CONFIG_LEVEL_ADV,
 			       layer_above_cb,
 			       gui);
 
-  gui->always_layer_above = 
+  gui->always_layer_above =
     xine_config_register_bool (gui->xine, "gui.always_layer_above", 0,
 			       _("Windows stacking (more)"),
 			       _("Use WM layer property to place windows on top\n"
-				 "for all windows (surpasses the 'layer_above' setting)."), 
+				 "for all windows (surpasses the 'layer_above' setting)."),
 			       CONFIG_LEVEL_ADV,
 			       always_layer_above_cb,
 			       gui);
 
-  gui->snapshot_location = 
-    (char *)xine_config_register_string (gui->xine, "gui.snapshotdir", 
+  gui->snapshot_location =
+    (char *)xine_config_register_string (gui->xine, "gui.snapshotdir",
 					 (char *) (xine_get_homedir()),
 					 _("Snapshot location"),
 					 _("Where snapshots will be saved."),
 					 CONFIG_LEVEL_BEG,
 					 snapshot_loc_cb,
 					 gui);
-  
+
   gui->ssaver_timeout =
     xine_config_register_num (gui->xine, "gui.screensaver_timeout", 10,
 			      _("Screensaver reset interval (s)"),
@@ -1563,95 +1563,95 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      CONFIG_LEVEL_ADV,
 			      ssaver_timeout_cb,
 			      gui);
-  
-  gui->skip_by_chapter = 
+
+  gui->skip_by_chapter =
     xine_config_register_bool (gui->xine, "gui.skip_by_chapter", 1,
 			       _("Chapter hopping"),
-			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
+			       _("Play next|previous chapter instead of mrl (dvdnav)"),
 			       CONFIG_LEVEL_ADV,
-			       skip_by_chapter_cb, 
-			       gui);
-  
-  gui->auto_vo_visibility = 
-    xine_config_register_bool (gui->xine, "gui.auto_video_output_visibility", 0,
-			       _("Visibility behavior of output window"),
-			       _("Hide video output window if there is no video in the stream"), 
-			       CONFIG_LEVEL_ADV,
-			       auto_vo_visibility_cb, 
+			       skip_by_chapter_cb,
 			       gui);
 
-  gui->auto_panel_visibility = 
+  gui->auto_vo_visibility =
+    xine_config_register_bool (gui->xine, "gui.auto_video_output_visibility", 0,
+			       _("Visibility behavior of output window"),
+			       _("Hide video output window if there is no video in the stream"),
+			       CONFIG_LEVEL_ADV,
+			       auto_vo_visibility_cb,
+			       gui);
+
+  gui->auto_panel_visibility =
     xine_config_register_bool (gui->xine, "gui.auto_panel_visibility", 0,
 			       _("Visiblility behavior of panel"),
-			       _("Automatically show/hide panel window, according to auto_video_output_visibility"), 
+			       _("Automatically show/hide panel window, according to auto_video_output_visibility"),
 			       CONFIG_LEVEL_ADV,
 			       auto_panel_visibility_cb,
-			       gui); 
- 
-  gui->eventer_sticky = 
-    xine_config_register_bool (gui->xine, "gui.eventer_sticky", 
+			       gui);
+
+  gui->eventer_sticky =
+    xine_config_register_bool (gui->xine, "gui.eventer_sticky",
 			      1,
 			      _("Event sender behavior"),
-			      _("Event sender window stick to main panel"), 
+			      _("Event sender window stick to main panel"),
 			      CONFIG_LEVEL_ADV,
 			      event_sender_sticky_cb,
 			      gui);
 
-  gui->visual_anim.enabled = 
-    xine_config_register_enum (gui->xine, "gui.visual_anim", 
+  gui->visual_anim.enabled =
+    xine_config_register_enum (gui->xine, "gui.visual_anim",
 			      1, /* Post plugin */
 			      (char**)visual_anim_style,
 			      _("Visual animation style"),
 			      _("Display some video animations when "
-				"current stream is audio only (eg: mp3)."), 
+				"current stream is audio only (eg: mp3)."),
 			      CONFIG_LEVEL_BEG,
 			      visual_anim_cb,
 			      gui);
 
-  gui->stream_info_auto_update = 
-    xine_config_register_bool (gui->xine, "gui.sinfo_auto_update", 
+  gui->stream_info_auto_update =
+    xine_config_register_bool (gui->xine, "gui.sinfo_auto_update",
 			      0,
 			      _("Stream information"),
 			      _("Update stream information (in stream info window) "
-				"each half seconds."), 
+				"each half seconds."),
 			      CONFIG_LEVEL_ADV,
 			      stream_info_auto_update_cb,
 			      gui);
-  
 
-  server = 
-    (char *)xine_config_register_string (gui->xine, "gui.skin_server_url", 
+
+  server =
+    (char *)xine_config_register_string (gui->xine, "gui.skin_server_url",
 					 SKIN_SERVER_URL,
 					 _("Skin Server Url"),
 					 _("From where we can get skins."),
 					 CONFIG_LEVEL_ADV,
 					 skin_server_url_cb,
 					 gui);
-  
-  config_update_string("gui.skin_server_url", 
+
+  config_update_string("gui.skin_server_url",
 		       gui->skin_server_url ? gui->skin_server_url : server);
-  
-  gui->osd.enabled = 
-    xine_config_register_bool (gui->xine, "gui.osd_enabled", 
+
+  gui->osd.enabled =
+    xine_config_register_bool (gui->xine, "gui.osd_enabled",
 			      1,
 			      _("Enable OSD support"),
 			      _("Enabling OSD permit to display some status/informations "
-				"in output window."), 
+				"in output window."),
 			      CONFIG_LEVEL_BEG,
 			      osd_enabled_cb,
 			      gui);
 
-  gui->osd.use_unscaled = 
-    xine_config_register_bool (gui->xine, "gui.osd_use_unscaled", 
+  gui->osd.use_unscaled =
+    xine_config_register_bool (gui->xine, "gui.osd_use_unscaled",
 			      1,
 			      _("Use unscaled OSD"),
-			      _("Use unscaled (full screen resolution) OSD if possible"), 
+			      _("Use unscaled (full screen resolution) OSD if possible"),
 			      CONFIG_LEVEL_ADV,
 			      osd_use_unscaled_cb,
 			      gui);
 
-  gui->osd.timeout = 
-    xine_config_register_num (gui->xine, "gui.osd_timeout", 
+  gui->osd.timeout =
+    xine_config_register_num (gui->xine, "gui.osd_timeout",
 			      3,
 			      _("Dismiss OSD time (s)"),
 			      _("Persistence time of OSD visual, in seconds."),
@@ -1659,66 +1659,66 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 			      osd_timeout_cb,
 			      gui);
 
-  gui->smart_mode = 
-    xine_config_register_bool (gui->xine, "gui.smart_mode", 
+  gui->smart_mode =
+    xine_config_register_bool (gui->xine, "gui.smart_mode",
 			      1,
-			      _("Change xine's behavior for unexperienced user"), 
+			      _("Change xine's behavior for unexperienced user"),
 			      _("In this mode, xine take some decisions to simplify user's life."),
 			      CONFIG_LEVEL_BEG,
 			      smart_mode_cb,
 			      gui);
 
-  gui->play_anyway = 
-    xine_config_register_bool (gui->xine, "gui.play_anyway", 
+  gui->play_anyway =
+    xine_config_register_bool (gui->xine, "gui.play_anyway",
 			      0,
 			      _("Ask user for playback with unsupported codec"),
 			      _("If xine don't support audio or video codec of current stream "
-				"the user will be asked if the stream should be played or not"), 
+				"the user will be asked if the stream should be played or not"),
 			      CONFIG_LEVEL_BEG,
 			      play_anyway_cb,
 			      gui);
 
   gui->experience_level =
-    (xine_config_register_enum (gui->xine, "gui.experience_level", 
+    (xine_config_register_enum (gui->xine, "gui.experience_level",
 			       0, (char**)exp_levels,
 			       _("Configuration experience level"),
 			       _("Level of user's experience, this will show more or less "
-				 "configuration options."), 
+				 "configuration options."),
 			       CONFIG_LEVEL_BEG,
-			       exp_level_cb, 
+			       exp_level_cb,
 			       gui)) * 10;
 
-  gui->mixer.amp_level = xine_config_register_range (gui->xine, "gui.amp_level", 
+  gui->mixer.amp_level = xine_config_register_range (gui->xine, "gui.amp_level",
 						     100, 0, 200,
 						     _("Amplification level"),
 						     NULL,
 						     CONFIG_LEVEL_DEB,
-						     dummy_config_cb, 
+						     dummy_config_cb,
 						     gui);
 
-  gui->splash = 
-    gui->splash ? (xine_config_register_bool (gui->xine, "gui.splash", 
+  gui->splash =
+    gui->splash ? (xine_config_register_bool (gui->xine, "gui.splash",
 					      1,
 					      _("Display splash screen"),
-					      _("If enabled, xine will display its splash screen"), 
+					      _("If enabled, xine will display its splash screen"),
 					      CONFIG_LEVEL_BEG,
 					      dummy_config_cb,
 					      gui)) : 0;
-  
-  gui->mixer.method = 
-    xine_config_register_enum (gui->xine, "gui.audio_mixer_method", 
+
+  gui->mixer.method =
+    xine_config_register_enum (gui->xine, "gui.audio_mixer_method",
 			      SOUND_CARD_MIXER, (char**)mixer_control_method,
 			      _("Audio mixer control method"),
-			      _("Which method used to control audio volume."), 
+			      _("Which method used to control audio volume."),
 			      CONFIG_LEVEL_ADV,
 			      audio_mixer_method_cb,
 			      gui);
 
-  gui->shortcut_style = 
-    xine_config_register_enum (gui->xine, "gui.shortcut_style", 
+  gui->shortcut_style =
+    xine_config_register_enum (gui->xine, "gui.shortcut_style",
 			      0, (char**)shortcut_style,
 			      _("Menu shortcut style"),
-			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."), 
+			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."),
 			      CONFIG_LEVEL_ADV,
 			      shortcut_style_cb,
 			      gui);
@@ -1746,7 +1746,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
 
   skin_preinit (gui);
-  
+
   if(gui->splash)
     splash_create();
 
@@ -1784,9 +1784,9 @@ static void on_start(void *data) {
   splash_destroy();
 
   if(!startup->start) {
-    
+
     gui_display_logo (gui);
-    
+
     do {
       xine_usec_sleep(5000);
     } while(gui->logo_mode != 1);
@@ -1796,15 +1796,15 @@ static void on_start(void *data) {
   if(startup->session_opts) {
     int i = 0;
     int dummy_session;
-    
+
     while(startup->session_opts[i])
       (void) session_handle_subopt(startup->session_opts[i++], NULL, &dummy_session);
-    
+
   }
-  
+
   if(startup->start)
     gui_execute_action_id (gui, ACTID_PLAY);
-  
+
 }
 
 static void on_stop (void *data) {
@@ -1815,7 +1815,7 @@ static void on_stop (void *data) {
 void gui_run(gGui_t *gui, char **session_opts) {
   _startup_t  startup;
   int         i, auto_start = 0;
-  
+
   video_window_change_skins (gui->vwin, 0);
   panel_add_autoplay_buttons (gui->panel);
   panel_show_tips (gui->panel);
@@ -1841,20 +1841,20 @@ void gui_run(gGui_t *gui, char **session_opts) {
 	  const char * const *autoplay_mrls = xine_get_autoplay_mrls (gui->xine,
 							 gui->autoscan_plugin,
 							 &num_mrls);
-	  
+
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)
 	      mediamark_append_entry(autoplay_mrls[j],
 				     autoplay_mrls[j], NULL, 0, -1, 0, 0);
-	   
+
 	    gui->playlist.cur = 0;
 	    gui_set_current_mmk(mediamark_get_current_mmk());
 	  }
-	}    
+	}
       }
     }
-  }  
-  
+  }
+
   enable_playback_controls (gui->panel, (gui->playlist.num > 0));
 
   /* We can't handle signals here, xitk handle this, so
@@ -1870,7 +1870,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   if(__xineui_global_lirc_enable)
     lirc_start();
 #endif
-  
+
   if (gui->stdctl_enable)
     stdctl_start (gui);
 
@@ -1881,12 +1881,12 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
   if(gui->tvout) {
     int w, h;
-    
+
     video_window_get_visible_size (gui->vwin, &w, &h);
-    tvout_set_fullscreen_mode (gui->tvout, 
+    tvout_set_fullscreen_mode (gui->tvout,
       ((video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE) ? 0 : 1), w, h);
   }
-  
+
   if(gui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */
@@ -1894,12 +1894,12 @@ void gui_run(gGui_t *gui, char **session_opts) {
       xine_config_save (gui->xine, __xineui_global_config_file);
       gui_execute_action_id (gui, ACTID_SETUP);
     }
-    
+
     /*  The user wants to hide video window  */
     if(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
       if (panel_is_visible (gui->panel) < 2)
         gui_execute_action_id (gui, ACTID_TOGGLE_VISIBLITY);
-      
+
       /* DXR3 case */
       if (video_window_is_visible (gui->vwin) > 1)
         video_window_set_visibility (gui->vwin, 0);
@@ -1907,7 +1907,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 	xine_port_send_gui_data(gui->vo_port,
 			      XINE_GUI_SEND_VIDEOWIN_VISIBLE,
 			      (int *)0);
-      
+
     }
 
     /* The user wants to see in fullscreen mode  */
@@ -1933,7 +1933,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
     if(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_INTERLEAVE))
       gui_toggle_interlaced (gui);
-    
+
     /*  The user request "play on start" */
     if(actions_on_start(gui->actions_on_start, ACTID_PLAY)) {
       if((mediamark_get_current_mrl()) != NULL) {
@@ -1952,13 +1952,13 @@ void gui_run(gGui_t *gui, char **session_opts) {
   startup.session_opts = session_opts;
 
   oxine_init();
-  
+
   xitk_run (on_start, &startup, on_stop, gui);
 
   /* save playlist */
   if(gui->playlist.mmk && gui->playlist.num) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-    
+
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_save_mediamarks(buffer);
   }

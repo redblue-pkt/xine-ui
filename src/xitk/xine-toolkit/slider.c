@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -57,7 +57,7 @@ typedef struct {
 
   xitk_state_callback_t   motion_callback;
   void                   *motion_userdata;
-			  
+
   xitk_state_callback_t   callback;
   void                   *userdata;
 
@@ -162,35 +162,35 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
   if (wp->sType == XITK_RSLIDER) {
     int   xc, yc;
     float old_value;
-    
+
     xc = wp->bg_skin.width / 2;
     yc = wp->bg_skin.height / 2;
-    
+
     old_value = wp->value;
     wp->angle = atan2 (yc - y, x - xc);
-    
+
     if (wp->angle < -M_PI / 2.)
       wp->angle += 2 * M_PI;
-    
+
     if (wp->angle < -M_PI / 6)
       wp->angle = -M_PI / 6;
-    
+
     if (wp->angle > 7. * M_PI / 6.)
       wp->angle = 7. * M_PI / 6.;
-    
+
     wp->value = wp->lower + (7. * M_PI / 6 - wp->angle) * (wp->upper - wp->lower) / (4. * M_PI / 3.);
-    
+
     if (wp->value != old_value) {
       float new_value = wp->value;
-      
+
       if (new_value < wp->lower)
         new_value = wp->lower;
-      
+
       if (new_value > wp->upper)
         new_value = wp->upper;
-      
+
       _slider_update_value (wp, new_value);
-      
+
     }
   }
   else {
@@ -201,7 +201,7 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
 
     width = (float)wp->bg_skin.width;
     height = (float)wp->bg_skin.height;
-    
+
     if (wp->paddle_cover_bg == 1) {
 
       if(x < 0)
@@ -213,7 +213,7 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
 	y = 0;
       if(y > height)
 	y = height;
-      
+
       if (wp->sType == XITK_HSLIDER)
 	new_value = (x * .01) / (width * .01);
       else if (wp->sType == XITK_VSLIDER)
@@ -222,33 +222,33 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
     }
     else {
       int pwidth, pheight;
-    
+
       pwidth = wp->button_width;
       pheight = wp->paddle_skin.height;
-      
+
       if (wp->sType == XITK_HSLIDER) {
 	x -= pwidth >> 1;
-	
+
 	if(x < 0)
 	  x = 0;
 	if(x > (width - pwidth))
 	  x = width - pwidth;
-	
+
 	if(y < 0)
 	  y = 0;
 	if(y > height)
 	  y = height;
-	
+
       }
       else { /* XITK_VSLIDER */
-	
+
 	if(x < 0)
 	  x = 0;
 	if(x > width)
 	  x = width;
-	
+
 	y += pheight >> 1;
-	
+
 	if(y < 0)
 	  y = 0;
 	if(y > (height + pheight))
@@ -260,18 +260,18 @@ static void _slider_update (_slider_private_t *wp, int x, int y) {
       else if (wp->sType == XITK_VSLIDER)
 	new_value = ((height - y) * .01) / ((height - pheight) * .01);
     }
-    
+
     wp->value = wp->lower + (new_value * (wp->upper - wp->lower));
-    
+
     if (wp->value != old_value) {
       float new_value = wp->value;
-      
+
       if (new_value < wp->lower)
         new_value = wp->lower;
-      
+
       if (new_value > wp->upper)
         new_value = wp->upper;
-      
+
       _slider_update_value (wp, new_value);
     }
   }
@@ -326,7 +326,7 @@ static int _notify_inside (_slider_private_t *wp, int x, int y) {
  * Draw widget
  */
 static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
-  int                     button_width, button_height;	
+  int                     button_width, button_height;
   xitk_image_t           *bg;
   xitk_image_t           *paddle;
 
@@ -336,7 +336,7 @@ static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
     int    paddle_width;
     int    paddle_height;
     double angle;
-    
+
     bg = wp->bg_skin.image;
     paddle = wp->paddle_skin.image;
     if (!paddle || !bg)
@@ -1142,7 +1142,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
     draw_paddle_three_state_horizontal (wp->paddle_skin.image);
   } else if (type == XITK_RSLIDER) {
     int w;
-    
+
     w = ((((width + height) >> 1) >> 1) / 10) * 3;
     wp->paddle_skin.image = xitk_image_create_image (wl->xitk, (w * 3), w);
     xitk_image_add_mask (wp->paddle_skin.image);

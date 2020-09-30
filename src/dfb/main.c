@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2009 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -40,17 +40,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <directfb.h>       
+#include <directfb.h>
 
 #include <xine.h>
 #include <xine/xineglobals.h>
 
-#include "dfb.h" 
+#include "dfb.h"
 #include "globals.h"
 
 dfbxine_t dfbxine;
 
-static void config_update(xine_cfg_entry_t *entry, 
+static void config_update(xine_cfg_entry_t *entry,
 			  int type, int min, int max, int value, char *string) {
 
   switch(type) {
@@ -65,10 +65,10 @@ static void config_update(xine_cfg_entry_t *entry,
     entry->range_max = max;
     break;
 
-  case XINE_CONFIG_TYPE_STRING: 
+  case XINE_CONFIG_TYPE_STRING:
     entry->str_value = string;
     break;
-    
+
   case XINE_CONFIG_TYPE_ENUM:
   case XINE_CONFIG_TYPE_NUM:
   case XINE_CONFIG_TYPE_BOOL:
@@ -80,13 +80,13 @@ static void config_update(xine_cfg_entry_t *entry,
     return;
     break;
   }
-  
+
   xine_config_update_entry(__xineui_global_xine_instance, entry);
 }
 
 void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
-  
+
   if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
@@ -95,7 +95,7 @@ void config_update_range(char *key, int min, int max) {
 
 void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
-  
+
   if((xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry)) && string)
     config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
@@ -108,7 +108,7 @@ void config_update_string(char *key, char *string) {
 
 void config_update_enum(char *key, int value) {
   xine_cfg_entry_t entry;
-  
+
   if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
@@ -140,10 +140,10 @@ static void gui_status_callback (int nStatus) {
 
   if (dfbxine.ignore_status)
     return;
-  
+
   if(nStatus == XINE_STATUS_STOP) {
     dfbxine.current_mrl++;
-   
+
     if (dfbxine.current_mrl < dfbxine.num_mrls) {
       if(xine_open(__xineui_global_xine_instance, dfbxine.mrl[dfbxine.current_mrl]))
 	xine_play (__xineui_global_xine_instance, 0, 0 );
@@ -163,9 +163,9 @@ static void gui_status_callback (int nStatus) {
  */
 static char *gui_next_mrl_callback (void ) {
 
-  if(dfbxine.current_mrl >= (dfbxine.num_mrls - 1)) 
+  if(dfbxine.current_mrl >= (dfbxine.num_mrls - 1))
     return NULL;
-  
+
   return dfbxine.mrl[dfbxine.current_mrl + 1];
 }
 
@@ -220,16 +220,16 @@ int main(int argc, char *argv[]) {
   int                   endy = 0;
 
   /*
-   * Check xine library version 
+   * Check xine library version
    */
   if(!xine_check_version(0, 9, 14)) {
     int major, minor, sub;
-    
+
     xine_get_version (&major, &minor, &sub);
     fprintf(stderr, "require xine library version 0.9.14, found %d.%d.%d.\n", major, minor, sub);
     goto failure;
   }
-  
+
   dfbxine.num_mrls = 0;
   dfbxine.current_mrl = 0;
   dfbxine.auto_quit = 0; /* default: loop forever */
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
   dfbxine.primary = NULL;
   dfbxine.audio_driver_id = dfbxine.video_driver_id = NULL;
   dfbxine.audio_channel = 0;
-   
+
   if(!do_command_line(argc,argv)) {
     goto failure;
   }
@@ -259,30 +259,30 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Error initialising DirectFB\n");
     goto failure;
   }
-  
+
   __xineui_global_xine_instance = (xine_t *) xine_new();
   xine_config_load (dfb.xine, __xineui_global_config_file);
-  
+
   xine_init (__xineui_global_xine_instance,  dfbxine.ao_driver, dfbxine.vo_driver);
-  
+
   if(!__xineui_global_xine_instance) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
   }
-  
+
   /*
    * init video output driver
    */
   if(!dfbxine.video_driver_id)
     dfbxine.video_driver_id = "directfb";
-  
+
   visual_info.dfb = dfbxine.dfb;
   visual_info.layer = dfbxine.video_layer;
-  dfbxine.vo_driver = xine_open_video_driver(__xineui_global_xine_instance, 
+  dfbxine.vo_driver = xine_open_video_driver(__xineui_global_xine_instance,
 					     dfbxine.video_driver_id,
-					     XINE_VISUAL_TYPE_DFB, 
+					     XINE_VISUAL_TYPE_DFB,
 					     (void *)(&visual_info));
-  
+
   if (!dfbxine.vo_driver) {
     printf ("main: video driver failed\n");
     goto failure;
@@ -291,26 +291,26 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
-  driver_name = (char *) xine_config_register_string(__xineui_global_xine_instance, 
-						     "audio.driver", 
+  driver_name = (char *) xine_config_register_string(__xineui_global_xine_instance,
+						     "audio.driver",
 						     "oss",
 						     "audio driver to use",
 						     NULL,
 						     20,
 						     NULL,
 						     NULL);
-  
+
   if(!dfbxine.audio_driver_id)
     dfbxine.audio_driver_id = driver_name;
   else
     config_update_string (__xineui_global_xine_instance, "audio.driver", dfbxine.audio_driver_id);
-  
+
   dfbxine.ao_driver = xine_open_audio_driver(__xineui_global_xine_instance, dfbxine.audio_driver_id, NULL);
-  
+
   if (!dfbxine.ao_driver) {
     printf ("main: audio driver %s failed\n", dfbxine.audio_driver_id);
   }
-  
+
   /*
    * xine init
    */
@@ -324,57 +324,57 @@ int main(int argc, char *argv[]) {
     dfbxine.mixer.caps |= XINE_PARAM_AO_PCM_VOL;
   if(xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AO_MUTE))
     dfbxine.mixer.caps |= XINE_PARAM_AO_MUTE;
-  
-  if(dfbxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+
+  if(dfbxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) {
     dfbxine.mixer.enable = 1;
     dfbxine.mixer.volume_level = xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_VOLUME);
   }
-  
+
   if(dfbxine.mixer.caps & XINE_PARAM_AO_MUTE)
     dfbxine.mixer.mute = xine_get_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_MUTE);
-  
+
   /* Select audio channel */
   xine_set_param(__xineui_global_xine_instance, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, dfbxine.audio_channel);
-  
+
   /*
    * ui loop
    */
 
   if(xine_open(__xineui_global_xine_instance, dfbxine.mrl[dfbxine.current_mrl]))
     xine_play (__xineui_global_xine_instance, 0, 0);
-  
+
   dfbxine.running = 1;
-  
+
   DFBCHECK(dfbxine.dfb->GetInputDevice (dfbxine.dfb,
 					DIDID_KEYBOARD, &keyboard));
   DFBCHECK(keyboard->CreateEventBuffer (keyboard, &input_buf));
   DFBCHECK(dfbxine.main_window->AttachEventBuffer(dfbxine.main_window,
 						  input_buf));
-  
+
   while (dfbxine.running) {
     DFBWindowEvent win_event;
     DFBInputEvent input_event;
     DFBEvent event;
 
     input_buf->WaitForEventWithTimeout(input_buf, 0, 10000000);
-    
+
     while (input_buf->GetEvent(input_buf, &event) == DFB_OK) {
       if(event.clazz == DFEC_WINDOW) {
 	win_event = event.window;
 	switch (win_event.type) {
-	 case DWET_BUTTONDOWN: 
+	 case DWET_BUTTONDOWN:
 	  if(!window_grabbed && win_event.button == DIBI_LEFT) {
 	    window_grabbed = 1;
 	    dfbxine.layer->GetCursorPosition(dfbxine.layer, &startx,
-				  	     &starty);
+					     &starty);
 	    dfbxine.main_window->GrabPointer(dfbxine.main_window);
 	  }
 	  if(!window_size && win_event.button == DIBI_MIDDLE) {
 	    int w,h;
-	    
+
 	    window_size = 1;
 	    dfbxine.layer->GetCursorPosition(dfbxine.layer, &startx,
-		  			     &starty);
+					     &starty);
 	    dfbxine.main_window->GrabPointer(dfbxine.main_window);
 	    dfbxine.main_window->GetSize(dfbxine.main_window, &w, &h);
 	    startx -= w;
@@ -399,17 +399,17 @@ int main(int argc, char *argv[]) {
 	  break;
 	}
       }
-      
+
       if(window_grabbed) {
 	dfbxine.main_window->Move(dfbxine.main_window,
 				  endx-startx, endy-starty);
-  	startx = endx;
-    	starty = endy; 
+	startx = endx;
+	starty = endy;
       }
-      
+
       if(window_size) {
 	dfbxine.main_window->Resize(dfbxine.main_window,
-	    			    endx-startx, endy-starty);
+				    endx-startx, endy-starty);
       }
 
       if(event.clazz == DFEC_INPUT) {
@@ -419,17 +419,17 @@ int main(int argc, char *argv[]) {
 	  dfbxine.running = 0;
 	}
       }
-    } 
+    }
   }
-  
+
 failure:
-    
-  if(__xineui_global_xine_instance) 
-    xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
- 
+
   if(__xineui_global_xine_instance)
-   xine_exit(__xineui_global_xine_instance); 
- 
+    xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
+
+  if(__xineui_global_xine_instance)
+   xine_exit(__xineui_global_xine_instance);
+
   if(dfbxine.video_layer)
    DFBCHECK(dfbxine.video_layer->Release(dfbxine.video_layer));
   if(dfbxine.main_surface)
@@ -442,7 +442,7 @@ failure:
    DFBCHECK(dfbxine.pointer->Release(dfbxine.pointer));
   if(dfbxine.layer)
    DFBCHECK(dfbxine.layer->Release(dfbxine.layer));
-  if(dfbxine.dfb) 
+  if(dfbxine.dfb)
    DFBCHECK(dfbxine.dfb->Release(dfbxine.dfb));
 
   return 0;

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -65,7 +65,7 @@ static int _xitk_window_set_focus (Display *display, Window window) {
 
   while ((!xitk_is_window_visible (display, window)) && (++t < 3))
     xitk_usec_sleep (5000);
-  
+
   if (xitk_is_window_visible (display, window)) {
     xitk_x_lock_display (display);
     XSetInputFocus (display, window, RevertToParent, CurrentTime);
@@ -226,19 +226,19 @@ int xitk_is_window_iconified(Display *display, Window window) {
   int            format_return;
   Atom           type_return, atom;
   int            retval = 0;
-  
+
   xitk_x_lock_display (display);
   atom = XInternAtom(display, "WM_STATE", False);
   XGetWindowProperty (display, window, atom, 0, 0x7fffffff, False,
 		      atom, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return);
-  
+
   if(prop_return) {
     if (prop_return[0] == IconicState)
       retval = 1;
     XFree(prop_return);
   }
   xitk_x_unlock_display (display);
- 
+
   return retval;
 }
 
@@ -248,17 +248,17 @@ int xitk_is_window_iconified(Display *display, Window window) {
 int xitk_is_window_visible(Display *display, Window window) {
   XWindowAttributes  wattr;
   Status             status;
-  
+
   if((display == NULL) || (window == None))
     return -1;
-  
+
   xitk_x_lock_display (display);
   status = XGetWindowAttributes(display, window, &wattr);
   xitk_x_unlock_display (display);
-  
+
   if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
     return 1;
-  
+
   return 0;
 }
 
@@ -275,10 +275,10 @@ int xitk_window_is_window_visible(xitk_window_t *w) {
  */
 static int xitk_is_window_size(Display *display, Window window, int width, int height) {
   XWindowAttributes  wattr;
-  
+
   if((display == NULL) || (window == None))
     return -1;
-  
+
   xitk_x_lock_display (display);
   if(!XGetWindowAttributes(display, window, &wattr)) {
     XITK_WARNING("XGetWindowAttributes() failed.n");
@@ -286,10 +286,10 @@ static int xitk_is_window_size(Display *display, Window window, int width, int h
     return -1;
   }
   xitk_x_unlock_display (display);
-  
+
   if((wattr.width == width) && (wattr.height == height))
     return 1;
-  
+
   return 0;
 }
 
@@ -456,7 +456,7 @@ void xitk_window_reparent_window(xitk_window_t *w, xitk_window_t *parent, int x,
 /*
  * Get (safely) window pos.
  */
-void xitk_get_window_position(Display *display, Window window, 
+void xitk_get_window_position(Display *display, Window window,
 			      int *x, int *y, int *width, int *height) {
   XWindowAttributes  wattr;
   Window             wdummy;
@@ -469,17 +469,17 @@ void xitk_get_window_position(Display *display, Window window,
   if(!XGetWindowAttributes(display, window, &wattr)) {
     XITK_WARNING("XGetWindowAttributes() failed.n");
     wattr.width = wattr.height = 0;
-    goto __failure;    
+    goto __failure;
   }
-  
-  (void) XTranslateCoordinates (display, window, wattr.root, 
+
+  (void) XTranslateCoordinates (display, window, wattr.root,
 				-wattr.border_width, -wattr.border_width,
                                 &xx, &yy, &wdummy);
-  
+
  __failure:
-  
+
   xitk_x_unlock_display (display);
-  
+
   if(x)
     *x = xx;
   if(y)
@@ -582,7 +582,7 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
   hint.max_height      = height;
   hint.win_gravity     = NorthWestGravity;
   hint.flags           = PWinGravity | PBaseSize | PMinSize | PMaxSize | USSize | USPosition;
-  
+
   xitk_lock_display (xitk);
   XAllocNamedColor(xitk->display, Imlib_get_colormap(xitk->imlibdata), "black", &black, &dummy);
   xitk_unlock_display (xitk);
@@ -599,13 +599,13 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
 			       CWBackPixel | CWBorderPixel | CWColormap
 			       | CWOverrideRedirect | CWWinGravity ,
 			       &attr);
-  
+
   XmbSetWMProperties(xitk->display, xwin->window, title, title, NULL, 0, &hint, NULL, NULL);
 
   XSelectInput(xitk->display, xwin->window, INPUT_MOTION | KeymapStateMask);
 
   XA_WIN_LAYER = XInternAtom(xitk->display, "_WIN_LAYER", False);
-  
+
   data[0] = 10;
   XChangeProperty(xitk->display, xwin->window, XA_WIN_LAYER,
 		  XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
@@ -615,11 +615,11 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
   prop = XInternAtom(xitk->display, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
-  
+
   XChangeProperty(xitk->display, xwin->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
-  
+
   XA_DELETE_WINDOW = XInternAtom(xitk->display, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(xitk->display, xwin->window, &XA_DELETE_WINDOW, 1);
 
@@ -629,7 +629,7 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
     XSetClassHint(xitk->display, xwin->window, xclasshint);
     XFree(xclasshint);
   }
-  
+
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input         = True;
@@ -670,7 +670,7 @@ xitk_window_t *xitk_window_create_simple_window_ext(xitk_t *xitk, int x, int y, 
 
   xwin->width = width;
   xwin->height = height;
-  
+
   xwin->background = xitk_image_create_xitk_pixmap(xitk, width, height);
   draw_outter(xwin->background, width, height);
   xitk_window_apply_background(xwin);
@@ -762,7 +762,7 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 
     draw_flat_with_color(bar, width, TITLE_BAR_HEIGHT, colorgray);
     draw_rectangular_box (bar, 2, 2, width - 5, TITLE_BAR_HEIGHT - 4, DRAW_INNER);
-    
+
     xitk_lock_display (xitk);
     for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {
       XSetForeground(xitk->display, bar->gc, c);
@@ -770,14 +770,14 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
       XSetForeground(xitk->display, bar->gc, cd);
       XDrawLine(xitk->display, bar->pixmap, bar->gc, 5, s+1, (width - 8), s+1);
     }
-    
+
     XSetForeground(xitk->display, bar->gc, colorgray);
     XFillRectangle(xitk->display, bar->pixmap, bar->gc,
-		   ((width - wid) - TITLE_BAR_HEIGHT) - 10, 6, 
+		   ((width - wid) - TITLE_BAR_HEIGHT) - 10, 6,
 		   wid + 20, TITLE_BAR_HEIGHT - 1 - 8);
     xitk_unlock_display (xitk);
   }
-  
+
   xitk_lock_display (xitk);
   XSetForeground(xitk->display, bar->gc, colorwhite);
   XDrawLine(xitk->display, bar->pixmap, bar->gc, 0, 0, width, 0);
@@ -818,9 +818,9 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   xitk_lock_display (xitk);
   XCopyArea(xitk->display, bar->pixmap, pix_bg->pixmap, bar->gc, 0, 0, width, TITLE_BAR_HEIGHT, 0, 0);
   xitk_unlock_display (xitk);
-  
+
   xitk_window_change_background(xwin, pix_bg->pixmap, width, height);
-  
+
   xitk_image_destroy_xitk_pixmap(bar);
   xitk_image_destroy_xitk_pixmap(pix_bg);
 
@@ -916,7 +916,7 @@ Pixmap xitk_window_get_background_mask(xitk_window_t *w) {
 
   if(w->background_mask == NULL)
     return None;
-  
+
   return w->background->pixmap;
 }
 #endif
@@ -1018,16 +1018,16 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
     w->background_mask = xitk_image_create_xitk_mask_pixmap(w->xitk, width, height);
 
   xitk_lock_display (w->xitk);
-  if(XGetGeometry(w->xitk->display, w->window, &rootwin, 
+  if(XGetGeometry(w->xitk->display, w->window, &rootwin,
 		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
-    
+
     XResizeWindow (w->xitk->display, w->window, wwin, hwin);
   }
   else {
     xitk_unlock_display (w->xitk);
     return 0;
   }
- 
+
   XCopyArea(w->xitk->display, img->image->pixmap, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
   if(w->background_mask)
     XCopyArea(w->xitk->display, img->mask->pixmap, w->background_mask->pixmap, w->background_mask->gc, 0, 0, width, height, 0, 0);
@@ -1040,7 +1040,7 @@ int xitk_window_change_background_with_image(xitk_window_t *w, xitk_image_t *img
 
 #ifdef YET_UNUSED
 void xitk_window_set_modal(xitk_window_t *w) {
-  xitk_modal_window(w->window);  
+  xitk_modal_window(w->window);
 }
 void xitk_window_dialog_set_modal(xitk_window_t *w) {
   xitk_dialog_t *wd = w->dialog;

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -27,9 +27,9 @@
 typedef struct kbinding_s kbinding_t;
 typedef struct kbinding_entry_s kbinding_entry_t;
 
-/* 
- * This bit is turned on in the enum below to indicate there is 
- * a corresponding definition xine-lib's events.h 
+/*
+ * This bit is turned on in the enum below to indicate there is
+ * a corresponding definition xine-lib's events.h
  */
 #define ACTID_IS_INPUT_EVENT 0x400
 
@@ -160,7 +160,7 @@ typedef enum {
   ACTID_PLAYLIST_OPEN,
 
   /*
-   * The below events map one-to-one with definitions in xine-lib's events.h 
+   * The below events map one-to-one with definitions in xine-lib's events.h
    */
   ACTID_EVENT_MENU1         = XINE_EVENT_INPUT_MENU1          | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_MENU2         = XINE_EVENT_INPUT_MENU2          | ACTID_IS_INPUT_EVENT,
@@ -178,7 +178,7 @@ typedef enum {
   ACTID_EVENT_ANGLE_NEXT    = XINE_EVENT_INPUT_ANGLE_NEXT     | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_ANGLE_PRIOR   = XINE_EVENT_INPUT_ANGLE_PREVIOUS | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_SELECT        = XINE_EVENT_INPUT_SELECT         | ACTID_IS_INPUT_EVENT,
-  ACTID_EVENT_NUMBER_0      = XINE_EVENT_INPUT_NUMBER_0       | ACTID_IS_INPUT_EVENT,  
+  ACTID_EVENT_NUMBER_0      = XINE_EVENT_INPUT_NUMBER_0       | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_NUMBER_1      = XINE_EVENT_INPUT_NUMBER_1       | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_NUMBER_2      = XINE_EVENT_INPUT_NUMBER_2       | ACTID_IS_INPUT_EVENT,
   ACTID_EVENT_NUMBER_3      = XINE_EVENT_INPUT_NUMBER_3       | ACTID_IS_INPUT_EVENT,
@@ -239,7 +239,7 @@ typedef enum {
    * End of numeric mapping.
    */
 } action_id_t;
-  
+
 kbinding_t *kbindings_init_kbinding(void);
 void kbindings_save_kbinding(kbinding_t *);
 void kbindings_reset_kbinding(kbinding_t *);

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
-#include <unistd.h>                                                      
+#include <unistd.h>
 
 #include <X11/keysym.h>
 
@@ -143,12 +143,12 @@ static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_f
   if(mrl_f == NULL) {
     static const size_t len = sizeof(__mrl_filters) / sizeof(__mrl_filters[0]);
 
-    wp->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+    wp->mrl_filters = (xitk_mrlbrowser_filter_t **)
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * len);
 
     for(i = 0; i < (len - 1); i++) {
-      
-      wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+
+      wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *)
 	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
       wp->mrl_filters[i]->name   = strdup(__mrl_filters[i].name);
       wp->mrl_filters[i]->ending = strdup(__mrl_filters[i].ending);
@@ -156,11 +156,11 @@ static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_f
     }
   }
   else {
-    
-    wp->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+
+    wp->mrl_filters = (xitk_mrlbrowser_filter_t **)
       xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *));
-    
-    for(i = 0; 
+
+    for(i = 0;
 	mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
 
       wp->mrl_filters            = (xitk_mrlbrowser_filter_t **) realloc(wp->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
@@ -171,7 +171,7 @@ static void _duplicate_mrl_filters (_mrlbrowser_private_t *wp, xitk_mrlbrowser_f
   }
 
   wp->filters_num            = i;
-  wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+  wp->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *)
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
   wp->mrl_filters[i]->name   = NULL;
   wp->mrl_filters[i]->ending = NULL;
@@ -222,7 +222,7 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
 
     free (wp->filters);
   }
-    
+
   XITK_FREE (wp->skin_element_name);
   XITK_FREE (wp->skin_element_name_ip);
   XITK_FREE (wp->last_mrl_source);
@@ -478,7 +478,7 @@ static void mrlbrowser_grab_mrls (xitk_widget_t *w, void *data, int state) {
   (void)state;
   if(lbl) {
     _mrlb_items_t items = wp->items;
-    
+
     old_old_src = wp->last_mrl_source;
     wp->last_mrl_source = strdup (lbl);
 
@@ -496,7 +496,7 @@ static void mrlbrowser_grab_mrls (xitk_widget_t *w, void *data, int state) {
     }
 
     free(old_old_src);
-    
+
     _update_current_origin (wp);
     _mrlbrowser_create_enlighted_entries (wp);
     xitk_browser_update_list (wp->mrlb_list, (const char* const *)wp->items.f_list, NULL, wp->items.f_num, 0);
@@ -514,7 +514,7 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
 
   if ((j = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0) {
     xine_mrl_t *ms = wp->mc->mrls[j];
-    
+
     printf("mrl '%s'\n\t+", ms->mrl);
 
     if(ms->type & XINE_MRL_TYPE_file_symlink)
@@ -524,52 +524,52 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
 
     if(ms->type & XINE_MRL_TYPE_unknown)
       printf(" unknown ");
-    
+
       if(ms->type & XINE_MRL_TYPE_dvd)
 	printf(" dvd ");
-      
+
       if(ms->type & XINE_MRL_TYPE_vcd)
 	    printf(" vcd ");
-      
+
       if(ms->type & XINE_MRL_TYPE_net)
 	printf(" net ");
-      
+
       if(ms->type & XINE_MRL_TYPE_rtp)
 	printf(" rtp ");
-      
+
       if(ms->type & XINE_MRL_TYPE_stdin)
 	printf(" stdin ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file)
 	printf(" file ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_fifo)
 	printf(" fifo ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_chardev)
 	printf(" chardev ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_directory)
 	printf(" directory ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_blockdev)
 	printf(" blockdev ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_normal)
 	printf(" normal ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_sock)
 	printf(" sock ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_exec)
 	printf(" exec ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_backup)
 	printf(" backup ");
-      
+
       if(ms->type & XINE_MRL_TYPE_file_hidden)
 	printf(" hidden ");
-      
+
       printf("] (%Ld byte%c)\n", ms->size, (ms->size > 0) ?'s':'\0');
   }
 }
@@ -748,7 +748,7 @@ void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig
 }
 
 /*
- * 
+ *
  */
 static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_callback, int play_callback) {
   _mrlb_item_t *item;
@@ -798,10 +798,10 @@ static void _mrlbrowser_select_mrl (_mrlbrowser_private_t *wp, int j, int add_ca
     _mrlbrowser_create_enlighted_entries (wp);
     xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
     _mrlb_items_free (&items);
-    
+
   }
   else {
-    
+
     xitk_browser_release_all_buttons (wp->mrlb_list);
 
     if (add_callback && wp->add_callback) {
@@ -835,7 +835,7 @@ static void mrlbrowser_select (xitk_widget_t *w, void *data, int state) {
 }
 
 /*
- * Handle selection in mrlbrowser, then 
+ * Handle selection in mrlbrowser, then
  */
 static void mrlbrowser_play(xitk_widget_t *w, void *data) {
   _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;

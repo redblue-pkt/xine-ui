@@ -76,7 +76,7 @@ struct oxine_s {
   int                 info_window_job;
   void (*media_info_close_cb)(void *data);
 
-      
+
 };
 
 void oxine_init(void);

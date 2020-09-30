@@ -2,17 +2,17 @@
  * Copyright (C) 2000-2020 the xine project
  *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -41,7 +41,7 @@
  *  James Courtier-Dutton <James@superbug.demon.co.uk> for educating the author
  *    in the details of YUV style data formats.
  *
- *  Thomas Östreich 
+ *  Thomas Östreich
  *    for the yuy2toyv12() function (see below)
  *
  */
@@ -83,14 +83,14 @@ static char *snap_build_filename(const char *mrl) {
 
   if(p && (strlen(p) > 1)) {
     char *ext;
-    
+
     p++;
-    
+
     strlcpy(basename, p, sizeof(basename));
-    
+
     if((ext = strrchr(basename, '.')) != NULL)
       *ext = '\0';
-    
+
   }
 
   for(i = 1;; i++) {
@@ -99,7 +99,7 @@ static char *snap_build_filename(const char *mrl) {
       break;
     free(buffer);
   }
-  
+
   return buffer;
 }
 
@@ -343,7 +343,7 @@ struct prvt_image_s {
  *  Copyright (C) Thomas Östreich - June 2001
  *
  *  Thanks Thomas
- *      
+ *
  */
 static void yuy2toyv12( struct prvt_image_s *image )
 {
@@ -356,7 +356,7 @@ static void yuy2toyv12( struct prvt_image_s *image )
     uint8_t *v = image->v;
 
     uint8_t *input = image->yuy2;
-    
+
     int width  = image->width;
     int height = image->height;
 
@@ -364,16 +364,16 @@ static void yuy2toyv12( struct prvt_image_s *image )
 
     for (i=0; i<height; i+=2) {
       for (j=0; j<w2; j++) {
-	
+
 	/* packed YUV 422 is: Y[i] U[i] Y[i+1] V[i] */
 	*(y++) = *(input++);
 	*(u++) = *(input++);
 	*(y++) = *(input++);
 	*(v++) = *(input++);
       }
-      
+
       /* down sampling */
-      
+
       for (j=0; j<w2; j++) {
 	/* skip every second line for U and V */
 	*(y++) = *(input++);
@@ -816,7 +816,7 @@ static int scale_image( struct prvt_image_s *image )
   image->u_width = nu_width;
   image->v_width = nv_width;
 
-#ifdef DEBUG 
+#ifdef DEBUG
   fprintf(stderr, "  Post scaled\n    Width %d %d %d\n    Height %d %d %d\n",
     image->width, image->u_width, image->v_width,
     image->height, image->u_height, image->v_height );
@@ -907,10 +907,10 @@ static void rgb_free( struct prvt_image_s *image )
 static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
 {
   *image = (struct prvt_image_s*) calloc(1, sizeof( struct prvt_image_s ) );
-  
-  if (*image == NULL) 
+
+  if (*image == NULL)
     return 0;
-    
+
   (*image)->img = malloc( imgsize );
   if ((*image)->img == NULL) {
     free(*image);
@@ -918,7 +918,7 @@ static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
   }
   (*image)->scale_image_y = (*image)->scale_image_u = (*image)->scale_image_v = NULL;
   (*image)->yuy2_fudge_y = (*image)->yuy2_fudge_u = (*image)->yuy2_fudge_v = NULL;
-  
+
   return( 1 );
 }
 
@@ -929,7 +929,7 @@ static void prvt_image_free( struct prvt_image_s **image )
   free(image_p->file_name);
 
   free(image_p->img);
-   
+
   rgb_free ( image_p );
 
   png_free( image_p->struct_ptr, image_p->scale_image_y );
@@ -987,7 +987,7 @@ static void yv12_2_rgb( struct prvt_image_s *image )
 
 /***************************************************
  *
- *  Colour conversion from 
+ *  Colour conversion from
  *    http://www.inforamp.net/~poynton/notes/colour_and_gamma/ColorFAQ.html#RTFToC30
  *
  *  Thanks to Billy Biggs <vektor@dumbterm.net>
@@ -1036,7 +1036,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   int width, height, ratio_code, format;
   double aspect, destaspect, scale;
   msg_cb_t cbs = { error_mcb, info_mcb, mcb_data };
-  
+
 #ifdef DEBUG
   static int	   prof_scale_image = -1;
   static int	   prof_yuv2rgb     = -1;
@@ -1051,7 +1051,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 #endif /* DEBUG */
 
   err = xine_get_current_frame(gGui->stream, &width, &height, &ratio_code, &format, NULL);
-  
+
   if (err == 0) {
     error_mcb(mcb_data, _("xine_get_current_frame() failed\n"));
     return;
@@ -1060,7 +1060,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   if((!width) || (!height)) {
     if(error_mcb) {
       char *umessage;
-      
+
       umessage = xitk_asprintf("%s%dx%d%s\n", _("Wrong image size: "), width, height, _(". Snapshot aborted."));
       if (umessage) {
         error_mcb(mcb_data, umessage);
@@ -1069,11 +1069,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     }
     return;
   }
-  
+
 #ifdef DEBUG
   printf("%s:allocating space for a %d x %d image\n", __FILE__, width, height);
 #endif
-  
+
   if ( ! prvt_image_alloc( &image, width*height*2 ) )
   {
     error_mcb(mcb_data, _("prvt_image_alloc failed\n"));
@@ -1083,7 +1083,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   err = xine_get_current_frame(gGui->stream,
 			       &image->width, &image->height, &image->ratio_code,
 			       &image->format, image->img);
-  
+
   if (err == 0) {
     error_mcb(mcb_data, _("Framegrabber failed\n"));
     prvt_image_free( &image );
@@ -1111,20 +1111,20 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     case XINE_VO_ASPECT_4_3:
       destaspect = 4 / 3.0;
       break;
-    case XINE_VO_ASPECT_ANAMORPHIC: 
+    case XINE_VO_ASPECT_ANAMORPHIC:
       destaspect = 16 / 9.0;
       break;
-    case XINE_VO_ASPECT_DVB:      
+    case XINE_VO_ASPECT_DVB:
       destaspect = 2.11;
       break;
 #ifdef XINE_VO_ASPECT_DONT_TOUCH
     case XINE_VO_ASPECT_DONT_TOUCH:
-#endif 
-    default: 
+#endif
+    default:
       destaspect = 0;
       scale = 1;
 #ifdef DEBUG
-      printf( "Warning: unknown aspect ratio. will assume 1:1\n" ); 
+      printf( "Warning: unknown aspect ratio. will assume 1:1\n" );
 #endif
   }
 
@@ -1136,7 +1136,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   fprintf(stderr, "  input aspect: %g  output aspect: %g  pixel aspect: %g ",
 	 aspect, destaspect, scale);
 #endif
-      
+
   if (scale > 0.99 && scale < 1.01) {
       image->scale_factor = 0x8000;
       image->scale_line = scale_line_1_1;
@@ -1159,7 +1159,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   switch ( image->format ) {
     case XINE_IMGFMT_YV12:
 #ifdef DEBUG
-      printf( "XINE_IMGFMT_YV12\n" ); 
+      printf( "XINE_IMGFMT_YV12\n" );
 #endif
       image->y        = image->img;
       image->u        = image->img + (image->width*image->height);
@@ -1170,7 +1170,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
       image->v_height = ((image->height+1)/2);
       break;
 
-    case XINE_IMGFMT_YUY2: 
+    case XINE_IMGFMT_YUY2:
 #ifdef DEBUG
       printf( "XINE_IMGFMT_YUY2\n" );
 #endif
@@ -1181,9 +1181,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
       image->v_height = ((image->height+1)/2);
       break;
 
-    default:                
+    default:
 #ifdef DEBUG
-      printf( "Unknown\nError: Format Code %d Unknown\n", image->format ); 
+      printf( "Unknown\nError: Format Code %d Unknown\n", image->format );
       printf( "  ** Please report this error to andrew@anvil.org **\n" );
 #endif
       prvt_image_free( &image );
@@ -1193,12 +1193,12 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /**/
 
   image->file_name = snap_build_filename(mrl);
-  
+
   if ( !image->file_name || (image->fp = fopen(image->file_name, "wb")) == NULL ) {
-    
+
     if(error_mcb) {
       char *umessage;
-      
+
       umessage = xitk_asprintf("%s (%s)\n", _("File open failed"), image->file_name);
       if (umessage) {
         error_mcb(mcb_data, umessage);
@@ -1340,7 +1340,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   printf("  png_init_io\n" );
 #endif
   png_init_io(image->struct_ptr, image->fp);
-  
+
 #ifdef DEBUG
   printf("  png_set_write_status_fn\n" );
 #endif
@@ -1351,15 +1351,15 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 #ifdef DEBUG
   printf("  png_set_IHDR\n" );
 #endif
-  png_set_IHDR( 
-    image->struct_ptr, 
-    image->info_ptr, 
-    image->width, 
+  png_set_IHDR(
+    image->struct_ptr,
+    image->info_ptr,
+    image->width,
     image->height,
-    BIT_DEPTH, 
-    PNG_COLOR_TYPE_RGB, 
+    BIT_DEPTH,
+    PNG_COLOR_TYPE_RGB,
     PNG_INTERLACE_NONE,
-    PNG_COMPRESSION_TYPE_DEFAULT, 
+    PNG_COMPRESSION_TYPE_DEFAULT,
     PNG_FILTER_TYPE_DEFAULT);
 
   /**/

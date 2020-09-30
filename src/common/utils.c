@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -44,8 +44,8 @@ extern char **environ;
  */
 int xine_system(int dont_run_as_root, const char *command) {
   int pid, status;
-  
-  /* 
+
+  /*
    * Don't permit run as root
    */
   if(dont_run_as_root) {
@@ -60,7 +60,7 @@ int xine_system(int dont_run_as_root, const char *command) {
 
   if(pid == -1)
     return -1;
-  
+
   if(pid == 0) {
     char *argv[4];
     argv[0] = (char *)"sh";
@@ -75,12 +75,12 @@ int xine_system(int dont_run_as_root, const char *command) {
     if(waitpid(pid, &status, 0) == -1) {
       if (errno != EINTR)
 	return -1;
-    } 
+    }
     else {
       return WEXITSTATUS(status);
     }
   } while(1);
-  
+
   return -1;
 }
 
@@ -92,20 +92,20 @@ char *atoa(char *str) {
   int   quote = 0, dblquote = 0;
 
   pbuf = str;
-  
-  while(*pbuf == ' ') 
+
+  while(*pbuf == ' ')
     pbuf++;
 
   if(*pbuf == '\'')
     quote = 1;
   else if(*pbuf == '"')
     dblquote = 1;
-  
+
   pbuf = str;
 
   while(*pbuf != '\0')
     pbuf++;
-  
+
   if(pbuf > str)
     pbuf--;
 
@@ -118,20 +118,20 @@ char *atoa(char *str) {
     *pbuf = '\0';
     pbuf--;
   }
-  
+
   if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"'))) {
     *pbuf = '\0';
     pbuf--;
   }
-  
+
   pbuf = str;
 
   while(*pbuf == ' ' || *pbuf == '\t')
     pbuf++;
-  
+
   if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"')))
     pbuf++;
-  
+
   return pbuf;
 }
 
@@ -140,10 +140,10 @@ char *atoa(char *str) {
  */
 static int _mkdir_safe(const char *path) {
   struct stat  pstat;
-  
+
   if(path == NULL)
     return 0;
-  
+
   if((stat(path, &pstat)) < 0) {
     /* file or directory no exist, create it */
     if(mkdir(path, 0755) < 0) {
@@ -170,13 +170,13 @@ int mkdir_safe(const char *path) {
   char *p, *pp;
   char  buf[_PATH_MAX + _NAME_MAX + 1];
   char  buf2[_PATH_MAX + _NAME_MAX + 1];
-  
+
   if(path == NULL)
     return 0;
-  
+
   memset(&buf, 0, sizeof(buf));
   memset(&buf2, 0, sizeof(buf2));
-  
+
   strlcpy(buf, path, sizeof(buf));
   pp = buf;
   while((p = xine_strsep(&pp, "/")) != NULL) {
@@ -206,7 +206,7 @@ int get_bool_value(const char *val) {
 	return bools[i].value;
     }
   }
-  
+
   return 0;
 }
 
@@ -220,7 +220,7 @@ const char *get_last_double_semicolon(const char *str) {
 
       if((*p == ':') && (*(p - 1) == ':'))
 	return (p - 1);
-      
+
       p--;
     }
   }
@@ -229,7 +229,7 @@ const char *get_last_double_semicolon(const char *str) {
 }
 
 int is_ipv6_last_double_semicolon(const char *str) {
-  
+
   if(str && strlen(str)) {
     const char *d_semic = get_last_double_semicolon(str);
 
@@ -237,14 +237,14 @@ int is_ipv6_last_double_semicolon(const char *str) {
       const char *bracketl = NULL;
       const char *bracketr = NULL;
       const char *p        = d_semic + 2;
-      
+
       while(*p && !bracketr) {
 	if(*p == ']')
 	  bracketr = p;
 
 	p++;
       }
-      
+
       if(bracketr) {
 	p = d_semic;
 
@@ -254,7 +254,7 @@ int is_ipv6_last_double_semicolon(const char *str) {
 
 	  p--;
 	}
-	
+
 	if(bracketl) {
 
 	  /* Look like an IPv6 address, check it */
@@ -270,12 +270,12 @@ int is_ipv6_last_double_semicolon(const char *str) {
 
 	      /* now go back to '[' */
 	      p = d_semic;
-	      
+
 	      while(p >= str) {
 		switch(*p) {
 		case ':':
 		  break;
-		  
+
 		case '.': /* This couldn't happen */
 		  return 0;
 		  break;
@@ -283,7 +283,7 @@ int is_ipv6_last_double_semicolon(const char *str) {
 		case '[': /* We reach the beginning, it's a valid IPv6 */
 		  return 1;
 		  break;
-		  
+
 		default:
 		  if(!isxdigit(*p))
 		    return 0;
@@ -313,7 +313,7 @@ int is_ipv6_last_double_semicolon(const char *str) {
 }
 
 int is_downloadable(const char *filename) {
-  if(filename && 
+  if(filename &&
      ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
     return 1;
   return 0;
@@ -321,19 +321,19 @@ int is_downloadable(const char *filename) {
 
 int is_a_dir(const char *filename) {
   struct stat  pstat;
-  
+
   if((stat(filename, &pstat)) < 0)
     return 0;
-  
+
   return (S_ISDIR(pstat.st_mode));
 }
 
 int is_a_file(const char *filename) {
   struct stat  pstat;
-  
+
   if((stat(filename, &pstat)) < 0)
     return 0;
-  
+
   return (S_ISREG(pstat.st_mode));
 }
 

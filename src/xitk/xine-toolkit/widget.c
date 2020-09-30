@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -772,11 +772,11 @@ static void xitk_widget_rel_deinit (xitk_widget_rel_t *r) {
  */
 void *xitk_xmalloc(size_t size) {
   void *ptrmalloc;
-  
+
   /* prevent xitk_xmalloc(0) of possibly returning NULL */
   if(!size)
     size++;
-  
+
   if((ptrmalloc = calloc(1, size)) == NULL) {
     XITK_DIE("%s(): calloc() failed: %s\n", __FUNCTION__, strerror(errno));
   }
@@ -936,13 +936,13 @@ int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y)
 
   if(mask) {
     int xx, yy;
-    
+
     if((xx = (x - w->x)) == w->width) xx--;
     if((yy = (y - w->y)) == w->height) yy--;
 
     return xitk_pixmap_get_pixel(mask, xx, yy);
   }
-  
+
   return 1;
 }
 
@@ -952,13 +952,13 @@ int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y)
 #ifdef YET_UNUSED
 int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
   int inside = 0;
-  
+
   if(!widget) {
     XITK_WARNING("widget was NULL.\n");
     return 0;
   }
 
-  if(((x >= widget->x) && (x < (widget->x + widget->width))) && 
+  if(((x >= widget->x) && (x < (widget->x + widget->width))) &&
      ((y >= widget->y) && (y < (widget->y + widget->height)))) {
     widget_event_t        event;
     widget_event_result_t result;
@@ -1030,24 +1030,24 @@ static void xitk_widget_apply_focus_redirect (xitk_widget_t **w) {
 }
 
 /*
- * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state), 
+ * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state),
  * function in right widget (the one who get, and the one who lose focus).
  */
-void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsigned int state) { 
+void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsigned int state) {
   xitk_widget_t *w;
   widget_event_t event;
-  
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
- 
+
   /* Convenience: while holding the slider, user need not stay within its
    * graphical bounds. Just move to closest possible. */
   if (wl->widget_pressed && (wl->widget_pressed == wl->widget_focused) &&
     ((wl->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     widget_event_result_t   result;
-    
+
     //    printf("slider already clicked -> send event\n");
 
     if(state & Button1Mask) {
@@ -1098,7 +1098,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
   if (!w)
     w = xitk_get_widget_at (wl, x, y);
   xitk_widget_apply_focus_redirect (&w);
-  
+
   do {
     int f;
     if (!wl->widget_under_mouse) {
@@ -1139,7 +1139,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
    * Also, xitk_tips_show_widget_tips (tips, NULL) now saves us xitk_tips_hide_tips (tips). */
   if (!xitk_tips_show_widget_tips (wl->xitk->tips, w))
     return;
-    
+
   if (w && (w->type & WIDGET_FOCUSABLE)) {
 #if 0
     dump_widget_type(mywidget);
@@ -1156,7 +1156,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
 }
 
 /*
- * Call notify_focus (with FOCUS_[RECEIVED|LOST] as focus state), 
+ * Call notify_focus (with FOCUS_[RECEIVED|LOST] as focus state),
  * then call notify_click function, if exist, of widget at coords x/y.
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp, int modifier) {
@@ -1169,7 +1169,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
-  
+
   w = xitk_get_widget_at (wl, x, y);
   xitk_widget_apply_focus_redirect (&w);
   if (w) {
@@ -1186,9 +1186,9 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   if(w != wl->widget_focused && !bUp) {
 
     if (wl->widget_focused) {
-      
+
       xitk_tips_hide_tips(wl->xitk->tips);
-      
+
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
 
@@ -1200,15 +1200,15 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
         wl->widget_focused->event (wl->widget_focused, &event, NULL);
         wl->widget_focused->have_focus = FOCUS_LOST;
       }
-      
+
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
     }
 
     wl->widget_focused = w;
-    
+
     if (w) {
-      
+
       if ((w->type & WIDGET_FOCUSABLE) && w->enable == WIDGET_ENABLE) {
 	event.type = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_RECEIVED;
@@ -1217,11 +1217,11 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       }
       else
 	wl->widget_focused = NULL;
-      
+
       event.type = WIDGET_EVENT_PAINT;
       (void) w->event(w, &event, NULL);
     }
-    
+
   }
   else if (!bUp) {
 
@@ -1233,19 +1233,19 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	w->have_focus = FOCUS_RECEIVED;
       }
     }
-    
+
   }
-  
+
   if (!bUp) {
-    
+
     wl->widget_pressed = w;
-    
+
     if (w) {
       widget_event_result_t result;
 
       xitk_tips_hide_tips(wl->xitk->tips);
-      
-      if((w->type & WIDGET_CLICKABLE) && 
+
+      if((w->type & WIDGET_CLICKABLE) &&
 	 w->enable == WIDGET_ENABLE && w->running) {
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = x;
@@ -1256,7 +1256,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 
 	if(w->event(w, &event, &result))
 	  bRepaint |= result.value;
-      }      
+      }
     }
   }
   else {
@@ -1278,7 +1278,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       wl->widget_pressed = NULL;
     }
   }
-  
+
   if(!(wl->widget_focused) && menu)
     wl->widget_focused = menu;
 
@@ -1370,7 +1370,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     }
   }
   wl->widget_focused = w;
-        
+
   xitk_tips_hide_tips (wl->xitk->tips);
 
   if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
@@ -1385,7 +1385,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     event.type = WIDGET_EVENT_PAINT;
     (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
   }
-      
+
   if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
     if ((wl->widget_focused->type & WIDGET_CLICKABLE) &&
         (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
@@ -1405,30 +1405,30 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
 #if 0
     /* next widget will be focused */
     if((widget == wl->widget_focused) ||
-       (widget && wl->widget_focused && 
+       (widget && wl->widget_focused &&
 	(((wl->widget_focused->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_MENU)
 	 && (wl->widget_focused->type & WIDGET_GROUP_MEMBER)))) {
       xitk_widget_t *next_widget;
-      
+
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
-	
+
 	event.type  = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_LOST;
 
 	wl->widget_focused->have_focus = FOCUS_LOST;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-	
+
 	event.type = WIDGET_EVENT_PAINT;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-	
+
       }
-      
+
       next_widget = get_next_focusable_widget(wl, backward);
-      
+
       if(next_widget == NULL)
 	next_widget = first_widget;
-      
+
       wl->widget_focused = next_widget;
 
       goto __focus_the_widget;
@@ -1458,28 +1458,28 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
   widget = (xitk_widget_t *)wl->list.head.next;
   while (widget->node.next && (widget != w))
     widget = (xitk_widget_t *)widget->node.next;
-  
+
   if (widget->node.next) {
-    
+
     if(wl->widget_focused) {
-      
+
       /* Kill (hide) tips */
       xitk_tips_hide_tips(wl->xitk->tips);
-      
-      if ((wl->widget_focused->type & WIDGET_FOCUSABLE) && 
+
+      if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
 	event.type = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_LOST;
 	wl->widget_focused->have_focus = FOCUS_LOST;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-	
+
 	event.type = WIDGET_EVENT_PAINT;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
       }
     }
-    
+
     wl->widget_focused = widget;
-    
+
     if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	(wl->widget_focused->enable == WIDGET_ENABLE)) {
       event.type = WIDGET_EVENT_FOCUS;
@@ -1490,13 +1490,13 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
     }
-    
+
     if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
 
       if((wl->widget_focused->type & WIDGET_CLICKABLE) &&
 	 (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
 	widget_event_result_t  result;
-	
+
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = wl->widget_focused->x + 1;
 	event.y              = wl->widget_focused->y + 1;
@@ -1504,11 +1504,11 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 	event.button         = AnyButton;
         event.modifier       = 0;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, &result);
-	
+
 	event.type = WIDGET_EVENT_PAINT;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
       }
-      
+
     }
   }
   else
@@ -1523,7 +1523,7 @@ xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *wl) {
   if(wl) {
     return wl->widget_focused;
   }
-  
+
   XITK_WARNING("widget list is NULL\n");
   return NULL;
 }
@@ -1535,7 +1535,7 @@ xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *wl) {
 
   if(wl)
     return wl->widget_pressed;
-  
+
   XITK_WARNING("widget list is NULL\n");
   return NULL;
 }
@@ -1544,24 +1544,24 @@ xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *wl) {
  * Return widget width.
  */
 int xitk_get_widget_width(xitk_widget_t *w) {
- 
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return -1;
   }
-  return w->width;  
+  return w->width;
 }
 
 /*
  * Return widget height.
  */
 int xitk_get_widget_height(xitk_widget_t *w) {
-  
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return -1;
   }
-  return w->height;  
+  return w->height;
 }
 
 /*
@@ -1812,7 +1812,7 @@ xitk_color_names_t *xitk_get_color_name(const char *color) {
     }
     strlcpy (cn->colorname, color, sizeof (cn->colorname));
     return cn;
-  } 
+  }
   {
     unsigned int b = 0, m, e = sizeof (xitk_sorted_color_names) / sizeof (xitk_sorted_color_names[0]);
     int d;
@@ -1879,18 +1879,18 @@ void xitk_start_widget(xitk_widget_t *w) {
 #ifdef YET_UNUSED
 void xitk_stop_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
-  
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
-    
+
   mywidget = (xitk_widget_t *)wl->list.head.next;
 
   while (mywidget->node.next) {
-    
+
     xitk_stop_widget(mywidget);
-    
+
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
@@ -1912,7 +1912,7 @@ void xitk_show_widget (xitk_widget_t *w) {
  */
 void xitk_show_widgets (xitk_widget_list_t *wl) {
   xitk_widget_t *w;
-  
+
   if (!wl) {
     XITK_WARNING ("widget list was NULL.\n");
     return;
@@ -1949,12 +1949,12 @@ void xitk_hide_widget (xitk_widget_t *w) {
  */
 void xitk_hide_widgets (xitk_widget_list_t *wl) {
   xitk_widget_t *w;
-  
+
   if (!wl) {
     XITK_WARNING ("widget list was NULL.\n");
     return;
   }
-    
+
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
     if (w->visible == 0) {
         w->visible = -1;
@@ -1983,10 +1983,10 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return NULL;
   }
-  
+
   event.type = WIDGET_EVENT_GET_SKIN;
   event.skin_layer = FOREGROUND_SKIN;
-  
+
   if(w->event(w, &event, &result))
     image = result.image;
 
@@ -2009,7 +2009,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
 
   event.type = WIDGET_EVENT_GET_SKIN;
   event.skin_layer = BACKGROUND_SKIN;
-  
+
   if(w->event(w, &event, &result))
     image = result.image;
 
@@ -2067,7 +2067,7 @@ unsigned long xitk_get_widget_tips_timeout(xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return 0;
   }
-  
+
   return w->tips_timeout;
 }
 
@@ -2075,12 +2075,12 @@ unsigned long xitk_get_widget_tips_timeout(xitk_widget_t *w) {
  *
  */
 void xitk_disable_widget_tips(xitk_widget_t *w) {
-  
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
-  
+
   xitk_tips_set_timeout(w, 0);
 }
 
@@ -2089,12 +2089,12 @@ void xitk_disable_widget_tips(xitk_widget_t *w) {
  */
 #ifdef YET_UNUSED
 void xitk_enable_widget_tips(xitk_widget_t *w) {
-  
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
-  
+
   xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 }
 #endif
@@ -2104,18 +2104,18 @@ void xitk_enable_widget_tips(xitk_widget_t *w) {
  */
 void xitk_disable_widgets_tips(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
-  
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
-  
+
   mywidget = (xitk_widget_t *)wl->list.head.next;
 
   while (mywidget->node.next) {
-    
+
     xitk_disable_widget_tips(mywidget);
-    
+
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
@@ -2126,19 +2126,19 @@ void xitk_disable_widgets_tips(xitk_widget_list_t *wl) {
 #ifdef YET_UNUSED
 void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
-  
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
-  
+
   mywidget = (xitk_widget_t *)wl->list.head.next;
 
   while (mywidget->node.next) {
-    
+
     if(mywidget->tips_string)
       xitk_enable_widget_tips(mywidget);
-    
+
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
@@ -2163,7 +2163,7 @@ void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout
 
     if(mywidget->tips_string)
       xitk_tips_set_timeout(mywidget, timeout);
-    
+
     mywidget = (xitk_widget_t *)mywidget->node.next;
   }
 }
@@ -2212,12 +2212,12 @@ int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *
     XITK_WARNING("window is None\n");
     return 0;
   }
-  
+
   XLOCK (xitk_x_lock_display, display);
-  ret = XQueryPointer(display, window, 
+  ret = XQueryPointer(display, window,
 		      &root_window, &child_window, &root_x, &root_y, &win_x, &win_y, &mask);
   XUNLOCK (xitk_x_unlock_display, display);
-  
+
   if((ret == False) ||
      ((child_window == None) && (win_x == 0) && (win_y == 0))) {
     retval = 0;
@@ -2232,10 +2232,10 @@ int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *
       *rx = root_x;
     if(ry)
       *ry = root_y;
-    
+
     retval = 1;
   }
-  
+
   return retval;
 }
 

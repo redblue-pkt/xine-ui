@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2004-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -122,8 +122,8 @@ static struct cursors_s {
   { xitk_cursor_num_glyphs,             XC_num_glyphs,          X_CURSOR,      None,  None,  None  }
 };
 
-static const unsigned char no_data[] = { 
-  0,0,0,0, 0,0,0,0 
+static const unsigned char no_data[] = {
+  0,0,0,0, 0,0,0,0
 };
 
 static const unsigned char bottom_left_corner_mask_bits[] = {
@@ -676,14 +676,14 @@ static const unsigned char xterm_bits[] = {
 
 static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
   XColor  bg, fg;
-  
+
   bg.red   = 255 << 8;
   bg.green = 255 << 8;
   bg.blue  = 255 << 8;
   fg.red   = 0;
   fg.green = 0;
   fg.blue  = 0;
-  
+
   XLOCK (xitk_x_lock_display, display);
   switch(cursor->xitk_shape) {
 
@@ -707,7 +707,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
     cursor->mask    = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)bottom_left_corner_mask_bits, 24, 24);
     cursor->cursor  = XCreatePixmapCursor(display, cursor->p, cursor->mask, &fg, &bg, 0, 0);
     break;
-    
+
   case xitk_cursor_bottom_right_corner:
     cursor->p       = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)bottom_right_corner_bits, 24, 24);
     cursor->mask    = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)bottom_right_corner_mask_bits, 24, 24);
@@ -755,13 +755,13 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
     cursor->mask    = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)draped_box_mask_bits, 38, 36);
     cursor->cursor  = XCreatePixmapCursor(display, cursor->p, cursor->mask, &fg, &bg, 0, 0);
     break;
-  
+
   case xitk_cursor_fleur:
     cursor->p       = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)fleur_bits, 25, 25);
     cursor->mask    = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)fleur_mask_bits, 25, 25);
     cursor->cursor  = XCreatePixmapCursor(display, cursor->p, cursor->mask, &fg, &bg, 0, 0);
     break;
-    
+
   case xitk_cursor_sb_h_double_arrow:
     cursor->p       = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)sb_h_double_arrow_bits, 25, 25);
     cursor->mask    = XCreateBitmapFromData(display, DefaultRootWindow(display), (char *)sb_h_double_arrow_mask_bits, 25, 25);
@@ -872,9 +872,9 @@ void xitk_cursors_init(Display *display) {
 
   /* Transparent cursor isn't a valid X cursor */
   _cursors_create_cursor(display, &cursors[0]);
-  
+
   for(i = 1; i < MAX_CURSORS; i++) {
-    
+
     if(xitk_cursors) {
       if(cursors[i].embedded == X_CURSOR) {
         XLOCK (xitk_x_lock_display, display);
@@ -894,11 +894,11 @@ void xitk_cursors_init(Display *display) {
 
 void xitk_cursors_deinit(Display *display) {
   int i;
-  
+
   XLOCK (xitk_x_lock_display, display);
   for(i = 0; i < MAX_CURSORS; i++) {
     XFreeCursor(display, cursors[i].cursor);
-    
+
     if(cursors[i].embedded == XITK_CURSOR) {
       if(cursors[i].p != None)
 	XFreePixmap(display, cursors[i].p);

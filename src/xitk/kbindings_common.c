@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -31,7 +31,7 @@
 #include "videowin.h"
 #include "actions.h"
 
-/* 
+/*
  * Default key mapping table.
  */
 static const struct {
@@ -72,11 +72,11 @@ static const struct {
   { "edit selected mediamark",
     "MediamarkEditor",        ACTID_MMKEDITOR               , "e",        KEYMOD_CONTROL , 0 , 1},
   { "set position to -60 seconds in current stream",
-    "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 , 0}, 
+    "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 , 0},
   { "set position to +60 seconds in current stream",
     "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 , 0},
   { "set position to -30 seconds in current stream",
-    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 , 0}, 
+    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 , 0},
   { "set position to +30 seconds in current stream",
     "SeekRelative+30",        ACTID_SEEK_REL_p30            , "Right",    KEYMOD_META    , 0 , 0},
   { "set position to -15 seconds in current stream",
@@ -84,7 +84,7 @@ static const struct {
   { "set position to +15 seconds in current stream",
     "SeekRelative+15",        ACTID_SEEK_REL_p15            , "Right",    KEYMOD_CONTROL , 0 , 0},
   { "set position to -7 seconds in current stream",
-    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 , 0}, 
+    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 , 0},
   { "set position to +7 seconds in current stream",
     "SeekRelative+7",         ACTID_SEEK_REL_p7             , "Right",    KEYMOD_MOD3    , 0 , 0},
   { "set position to beginning of current stream",
@@ -173,7 +173,7 @@ static const struct {
     "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 , 0},
 #ifdef HAVE_XINERAMA
   { "Xinerama fullscreen toggle",
-    "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCREEN 
+    "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCREEN
                                                             , "F",        KEYMOD_NOMOD   , 0 , 0},
 #endif
   { "jump to media Menu",
@@ -283,9 +283,9 @@ static const struct {
   { "set position in current stream to numeric percentage",
     "SetPosition%",           ACTID_SET_CURPOS              , "slash",    KEYMOD_NOMOD   , 0 , 0},
   { "set position forward by numeric argument in current stream",
-    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 , 0}, 
+    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 , 0},
   { "set position back by numeric argument in current stream",
-    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 , 0}, 
+    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 , 0},
   { "change audio video syncing (delay video)",
     "AudioVideoDecay+",       ACTID_AV_SYNC_p3600           , "m",        KEYMOD_NOMOD   , 0 , 0},
   { "change audio video syncing (delay audio)",
@@ -433,7 +433,7 @@ static const struct {
 
 static int _kbinding_get_is_gui_from_default(const char *action) {
   int i;
-  
+
   for(i = 0; default_binding_table[i].action != NULL; i++) {
     if(!strcmp(default_binding_table[i].action, action))
       return default_binding_table[i].is_gui;
@@ -484,7 +484,7 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
 
 kbinding_t *_kbindings_init_to_default(void) {
   kbinding_t  *kbt;
- 
+
   kbt = (kbinding_t *) malloc(sizeof(kbinding_t));
   _kbindings_init_to_default_no_kbt(kbt);
 
@@ -512,8 +512,8 @@ static void _kbindings_clean_eol(kbinding_file_t *kbdf) {
 
     while(p > kbdf->ln) {
       --p;
-      
-      if(*p == ' ' || *p == '\t') 
+
+      if(*p == ' ' || *p == '\t')
 	*p = '\0';
       else
 	break;
@@ -528,7 +528,7 @@ static void _kbindings_get_next_line(kbinding_file_t *kbdf) {
 
   ABORT_IF_NULL(kbdf);
   ABORT_IF_NULL(kbdf->fd);
-  
+
  __get_next_line:
 
   kbdf->ln = fgets(kbdf->buf, 255, kbdf->fd);
@@ -559,7 +559,7 @@ static int _is_there_char(const char *str, int c) {
     if((p = strrchr(str, c)) != NULL) {
       return (p - str);
     }
-  
+
   return -1;
 }
 
@@ -597,7 +597,7 @@ static void _kbindings_set_pos_to_next_char(char **p) {
  * Position p pointer to value.
  */
 static void _kbindings_set_pos_to_value(char **p) {
-  
+
   ABORT_IF_NULL(*p);
 
   while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
@@ -623,21 +623,21 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 
   k = kbindings_lookup_action(kbt, ukb->alias);
   if(k) {
-    
+
     modifier = k->modifier;
-    
+
     if(ukb->modifier) {
       char *p, *ukb_modifier_ptr;
-      
+
       modifier = KEYMOD_NOMOD;
 
       ukb_modifier_ptr = ukb->modifier;
       while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
-	
+
 	_kbindings_set_pos_to_next_char(&p);
-	
+
 	if(p) {
-	  
+
 	  if(!strcasecmp(p, "none"))
 	    modifier = KEYMOD_NOMOD;
 	  else if(!strcasecmp(p, "control"))
@@ -668,7 +668,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     kbt->entry[kbt->num_entries - 1]->action_id = k->action_id;
     kbt->entry[kbt->num_entries - 1]->key       = strdup(ukb->key);
     kbt->entry[kbt->num_entries - 1]->modifier  = modifier;
-    
+
     /*
      * NULL terminate array.
      */
@@ -680,7 +680,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     kbt->entry[kbt->num_entries]->action_id = 0;
     kbt->entry[kbt->num_entries]->key       = NULL;
     kbt->entry[kbt->num_entries]->modifier  = 0;
-  
+
     kbt->num_entries++;
   }
 }
@@ -699,7 +699,7 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     if(!strcmp(kbt->entry[i]->action, ukb->action)) {
       SAFE_FREE(kbt->entry[i]->key);
       kbt->entry[i]->key = strdup(ukb->key);
-      
+
       kbt->entry[i]->is_gui = _kbinding_get_is_gui_from_default(ukb->action);
 
       if(ukb->modifier) {
@@ -710,9 +710,9 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 	while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
 
 	  _kbindings_set_pos_to_next_char(&p);
-	  
+
 	  if(p) {
-	    
+
 	    if(!strcasecmp(p, "none"))
 	      modifier = KEYMOD_NOMOD;
 	    else if(!strcasecmp(p, "control"))
@@ -731,7 +731,7 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 	      modifier |= KEYMOD_MOD5;
 	  }
 	}
-	kbt->entry[i]->modifier = modifier;	
+	kbt->entry[i]->modifier = modifier;
       }
       return;
     }
@@ -745,27 +745,27 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
   int               brace_offset;
   user_kbinding_t   ukb;
   char              *p;
-  
+
   ABORT_IF_NULL(kbt);
   ABORT_IF_NULL(kbdf);
 
   if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
     int found = 0;
-    
+
     memset(&ukb, 0, sizeof(ukb));
     found = 1;
-  
+
     p = kbdf->ln;
-    
+
     if((brace_offset = _kbindings_begin_section(kbdf)) >= 0) {
       *(kbdf->ln + brace_offset) = '\0';
       _kbindings_clean_eol(kbdf);
-      
+
       ukb.action   = strdup(kbdf->ln);
       ukb.is_alias = 0;
 
       while(_kbindings_end_section(kbdf) < 0) {
-	
+
 	_kbindings_get_next_line(kbdf);
 	p = kbdf->ln;
 	if(kbdf->ln != NULL) {
@@ -780,7 +780,7 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 	  else if(!strncasecmp(kbdf->ln, "key", 3)) {
 	    _kbindings_set_pos_to_value(&p);
 	    ukb.key = strdup(p);
-	  }	  
+	  }
 	}
 	else
 	  break;
@@ -792,7 +792,7 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
       else if(found && ukb.action && ukb.key) {
 	_kbindings_replace_entry(kbt, &ukb);
       }
-      
+
     }
 
     SAFE_FREE(ukb.alias);
@@ -807,7 +807,7 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
  */
 static void _kbinding_load_config(kbinding_t *kbt, char *file) {
   kbinding_file_t *kbdf;
-  
+
   ABORT_IF_NULL(kbt);
   ABORT_IF_NULL(file);
 
@@ -815,7 +815,7 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
   kbdf->bindingfile = strdup(file);
 
   if((kbdf->fd = fopen(kbdf->bindingfile, "r")) != NULL) {
-    
+
     _kbindings_get_next_line(kbdf);
 
     while(kbdf->ln != NULL) {
@@ -823,7 +823,7 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
       if(_kbindings_begin_section(kbdf)) {
 	_kbindings_parse_section(kbt, kbdf);
       }
-      
+
       _kbindings_get_next_line(kbdf);
     }
     fclose(kbdf->fd);
@@ -851,21 +851,21 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
   gGui_t *gui = gGui;
   int            i, j, found = 0;
   char          *kmsg = NULL;
-      
+
   if(kbt == NULL)
     return;
-  
+
   for(i = 0; kbt->entry[i]->action != NULL; i++) {
     for(j = 0; kbt->entry[j]->action != NULL; j++) {
       if(i != j && j != found) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
-	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) && 
+	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) &&
 	   (strcasecmp(kbt->entry[i]->key, "void"))) {
 	  char *action1, *action2;
 	  char *dna = _("and");
-	  
+
 	  found++;
-	  
+
 	  action1 = kbt->entry[i]->action;
 	  action2 = kbt->entry[j]->action;
 
@@ -886,7 +886,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 #ifndef KBINDINGS_MAN
   if(found) {
     char          *footer = _(".\n\nWhat do you want to do ?\n");
-    
+
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
     strlcat(kmsg, footer, strlen(kmsg) + strlen(footer) + 1);
 
@@ -913,9 +913,9 @@ kbinding_t *kbindings_init_kbinding(void) {
   kbinding_t *kbt = NULL;
 
   kbt = _kbindings_init_to_default();
-  
+
   _kbinding_load_config(kbt, gui->keymap_file);
-  
+
   /* Just to check is there redundant entries, and inform user */
   _kbindings_check_redundancy(kbt);
 
@@ -929,13 +929,13 @@ kbinding_t *kbindings_init_kbinding(void) {
  */
 void _kbindings_free_bindings_no_kbt(kbinding_t *kbt) {
   kbinding_entry_t **k;
-  
+
   if(kbt == NULL)
     return;
-  
+
   if((k = kbt->entry)) {
     int i = kbt->num_entries - 1;
-    
+
     if(i && (i < MAX_ENTRIES)) {
       for(; i >= 0; i--) {
 	SAFE_FREE(k[i]->comment);
@@ -980,7 +980,7 @@ kbinding_entry_t *kbindings_lookup_action(kbinding_t *kbt, const char *action) {
       break;
     }
   }
-  
+
   /* Unknown action */
   return kret;
 }

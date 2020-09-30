@@ -22,11 +22,11 @@ PaletteLUTGet(ImlibData *id)
   int                 format_ret;
   long                length;
   Atom                to_get;
-  
+
   retval = NULL;
   length = 0x7fffffff;
   to_get = XInternAtom(id->x.disp, "_IMLIB_COLORMAP", False);
-  XGetWindowProperty(id->x.disp, id->x.root, to_get, 0, length, False, 
+  XGetWindowProperty(id->x.disp, id->x.root, to_get, 0, length, False,
 		     XA_CARDINAL, &type_ret, &format_ret, &num_ret,
 		     &bytes_after, &retval);
   if ((retval) && (num_ret > 0) && (format_ret > 0))
@@ -35,7 +35,7 @@ PaletteLUTGet(ImlibData *id)
 	{
 	  int i, pnum;
 	  unsigned long j;
-	  
+
 	  pnum = (int)(retval[0]);
 	  j = 1;
 	  if (pnum != id->num_colors)
@@ -67,7 +67,7 @@ PaletteLUTGet(ImlibData *id)
 		}
 	    }
 	  free(id->fast_rgb);
-	  id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);	  
+	  id->fast_rgb = malloc(sizeof(unsigned char) * 32 * 32 * 32);
 	  for (i = 0; (i < (32 * 32 * 32)) && (j < num_ret); i++)
 	    id->fast_rgb[i] = retval[j++];
 	  XFree(retval);
@@ -85,7 +85,7 @@ PaletteLUTSet(ImlibData *id)
   Atom                to_set;
   unsigned char       *prop;
   int                 i, j;
-  
+
   to_set = XInternAtom(id->x.disp, "_IMLIB_COLORMAP", False);
   prop = malloc((id->num_colors * 4) + 1 + (32 * 32 * 32));
   prop[0] = id->num_colors;
@@ -99,7 +99,7 @@ PaletteLUTSet(ImlibData *id)
     }
   memcpy (&prop[j], id->fast_rgb, (32*32*32));
   j += (32*32*32);
-  XChangeProperty(id->x.disp, id->x.root, to_set, XA_CARDINAL, 8, 
+  XChangeProperty(id->x.disp, id->x.root, to_set, XA_CARDINAL, 8,
 		  PropModeReplace, (unsigned char *)prop, j);
   free(prop);
 }
@@ -483,7 +483,7 @@ Imlib_load_default_colors(ImlibData * id)
 #endif
   return 1;
 }
- 
+
 void
 Imlib_free_colors(ImlibData * id)
 {

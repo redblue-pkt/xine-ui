@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -493,7 +493,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
     me->wp = wp;
     me->button = NULL;
-    
+
     if (me->type & _MENU_NODE_TITLE) {
 
       if(bg && (!got_title)) {
@@ -502,7 +502,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
         fs = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
 	xitk_font_set_font(fs, wp->w.wl->gc);
-	
+
 	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
         cbg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, 140, 140, 140);
@@ -549,10 +549,10 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
       btn->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU;
       me->button = btn;
-      
+
       if(xitk_get_menu_shortcuts_enability()  && me->menu_entry.shortcut)
 	xitk_labelbutton_change_shortcut_label (btn, me->menu_entry.shortcut, shortcutpos, DEFAULT_FONT_12);
-      
+
       xitk_labelbutton_set_label_offset(btn, 20);
       xitk_enable_and_show_widget(btn);
 
@@ -711,7 +711,7 @@ void xitk_menu_show_menu (xitk_widget_t *w) {
   xitk_set_current_menu (&wp->w);
 }
 
-xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
+xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
 				       xitk_menu_widget_t *m, int x, int y) {
   _menu_private_t *wp;
 

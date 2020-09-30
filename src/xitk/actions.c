@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -69,7 +69,7 @@ static gGui_t *_gui_get_nextprev (void *data, int *value) {
   *value = p - gui->nextprev - 1;
   return gui;
 }
-  
+
 static void gui_messages_off (gGui_t *gui) {
   pthread_mutex_lock (&gui->no_messages.mutex);
   ++gui->no_messages.level;
@@ -93,7 +93,7 @@ void gui_reparent_all_windows (gGui_t *gui) {
     { tvset_is_visible,         tvset_reparent },
     { NULL,                     NULL}
   };
-  
+
   if (playlist_is_visible (gui))
     playlist_reparent (gui);
   if (panel_is_visible (gui->panel) > 1)
@@ -256,13 +256,13 @@ int gui_xine_get_pos_length (gGui_t *gui, xine_stream_t *stream, int *ppos, int 
  */
 void gui_display_logo (gGui_t *gui) {
   pthread_mutex_lock(&gui->logo_mutex);
-  
+
   gui->logo_mode = 2;
-  
+
   if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
     gui->ignore_next = 1;
     xine_stop(gui->stream);
-    gui->ignore_next = 0; 
+    gui->ignore_next = 0;
   }
 
   if(gui->visual_anim.running)
@@ -276,11 +276,11 @@ void gui_display_logo (gGui_t *gui) {
     (void) gui_xine_open_and_play((char *)gui->logo_mrl, NULL, 0, 0, 0, 0, 1);
 
   gui->logo_mode = 1;
-  
+
   panel_reset_slider (gui->panel);
   if (stream_infos_is_visible (gui->streaminfo))
     stream_infos_update_infos (gui->streaminfo);
-  
+
   pthread_mutex_unlock(&gui->logo_mutex);
 }
 
@@ -288,12 +288,12 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   int      ret;
   int      has_video;
   int      already_playing = (gui->logo_mode == 0);
-  
+
   if(gui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
     post_rewire_visual_anim (gui);
     gui->visual_anim.post_changed = 0;
   }
-  
+
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   if (has_video)
     has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
@@ -303,7 +303,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
     if (post_rewire_audio_port_to_stream (gui, stream))
       gui->visual_anim.running = 0;
 
-  } else if (!has_video && (gui->visual_anim.enabled == 1) && 
+  } else if (!has_video && (gui->visual_anim.enabled == 1) &&
 	     (gui->visual_anim.running == 0) && gui->visual_anim.post_output_element.post) {
 
     if (post_rewire_audio_post_to_stream (gui, stream))
@@ -320,21 +320,21 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
     if(gui->logo_mode != 2)
       gui->logo_mode = 0;
     pthread_mutex_unlock(&gui->logo_mutex);
-    
+
     if(gui->logo_mode == 0) {
-     
+
       if (stream_infos_is_visible (gui->streaminfo))
 	stream_infos_update_infos (gui->streaminfo);
-      
+
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
         pthread_mutex_lock (&gui->mmk_mutex);
 	free(gui->mmk.ident);
 	free(gui->playlist.mmk[gui->playlist.cur]->ident);
-	
+
 	gui->mmk.ident = strdup(ident);
 	gui->playlist.mmk[gui->playlist.cur]->ident = strdup(ident);
         pthread_mutex_unlock (&gui->mmk_mutex);
-	
+
         video_window_set_mrl (gui->vwin, ident);
         playlist_mrlident_toggle (gui);
 	panel_update_mrl_display (gui->panel);
@@ -342,38 +342,38 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
       }
 
       if(has_video) {
-	
+
 	if((gui->visual_anim.enabled == 2) && gui->visual_anim.running)
 	  visual_anim_stop();
-	
+
 	if(gui->auto_vo_visibility) {
-	  
+
           if (video_window_is_visible (gui->vwin) < 2)
             video_window_set_visibility (gui->vwin, 1);
-	  
+
 	}
 
         if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) > 1 &&
           panel_is_visible (gui->panel) > 1)
           panel_toggle_visibility (NULL, gui->panel);
-	
+
       }
       else {
-	
+
 	if(gui->auto_vo_visibility) {
-	  
+
           if (panel_is_visible (gui->panel) < 2)
             panel_toggle_visibility (NULL, gui->panel);
 
           if (video_window_is_visible (gui->vwin) > 1)
             video_window_set_visibility (gui->vwin, 0);
-	    
+
 	}
 
         if (gui->auto_panel_visibility && video_window_is_visible (gui->vwin) > 1 &&
           panel_is_visible (gui->panel) < 2)
           panel_toggle_visibility (NULL, gui->panel);
-	  
+
         if (video_window_is_visible (gui->vwin) > 1) {
 	  if(!gui->visual_anim.running)
 	    visual_anim_play();
@@ -381,26 +381,26 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
 	else
 	  gui->visual_anim.running = 2;
       }
-      
+
       xine_usec_sleep(100);
       if(!already_playing)
 	osd_update_status();
     }
   }
-  
+
   return ret;
 }
 
 static void set_mmk(mediamark_t *mmk) {
   gGui_t *gui = gGui;
-  
+
   pthread_mutex_lock (&gui->mmk_mutex);
   free(gui->mmk.mrl);
   free(gui->mmk.ident);
   free(gui->mmk.sub);
   if(mediamark_have_alternates(&(gui->mmk)))
     mediamark_free_alternates(&(gui->mmk));
-  
+
   if(mmk) {
     gui->mmk.mrl           = strdup(mmk->mrl);
     gui->mmk.ident         = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
@@ -434,7 +434,7 @@ static void mmk_set_update(void) {
   event_sender_update_menu_buttons (gui);
   panel_update_mrl_display (gui->panel);
   playlist_update_focused_entry (gui);
-  
+
   gui->playlist.ref_append = gui->playlist.cur;
 }
 
@@ -452,7 +452,7 @@ static void _start_anyway_done (void *data, int state) {
 int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
   int has_video, has_audio, v_unhandled = 0, a_unhandled = 0;
   uint32_t video_handled, audio_handled;
-  
+
   if (gui->play_data.running)
     return 0;
 
@@ -460,7 +460,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
   video_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_HANDLED);
   has_audio     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_AUDIO);
   audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
-  
+
   if (has_video)
     has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
   if (has_audio)
@@ -472,7 +472,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
     char *buffer = NULL;
     char *v_info = NULL;
     char *a_info = NULL;
-    
+
     if(v_unhandled && a_unhandled) {
       buffer = xitk_asprintf(_("The stream '%s' isn't supported by xine:\n\n"),
                              (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
@@ -481,7 +481,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
       buffer = xitk_asprintf(_("The stream '%s' uses an unsupported codec:\n\n"),
                              (stream == gui->stream) ? gui->mmk.mrl : gui->visual_anim.mrls[gui->visual_anim.current]);
     }
-    
+
     if(v_unhandled) {
       const char *minfo;
       uint32_t    vfcc;
@@ -493,7 +493,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
                              (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"),
                              (get_fourcc_string(tmp, sizeof(tmp), vfcc)));
     }
-    
+
     if(a_unhandled) {
       const char *minfo;
       uint32_t    afcc;
@@ -505,7 +505,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
                              (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"),
                              (get_fourcc_string(tmp, sizeof(tmp), afcc)));
     }
-    
+
 
     if(v_unhandled && a_unhandled) {
       xine_error (gui, "%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
@@ -531,11 +531,11 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
 
       video_window_set_transient_for(gui->vwin, xitk_get_window(key));
 
-      /* Doesn't work so well yet 
+      /* Doesn't work so well yet
          use gui->play_data.running hack for a while
          xitk_window_dialog_set_modal(xw);
       */
-      
+
       return 1;
     }
 
@@ -545,16 +545,16 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
   return _gui_xine_play (gui, stream, start_pos, start_time_in_secs * 1000, update_mmk);
 }
 
-int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, 
+int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 			   int start_time, int av_offset, int spu_offset, int report_error) {
   gGui_t *gui = gGui;
   char *mrl = _mrl;
   int ret;
-  
+
   if (gui->verbosity)
     printf("%s():\n\tmrl: '%s',\n\tsub '%s',\n\tstart_pos %d, start_time %d, av_offset %d, spu_offset %d.\n",
 	   __func__, _mrl, (_sub) ? _sub : "NONE", start_pos, start_time, av_offset, spu_offset);
-  
+
   if(!strncasecmp(mrl, "cfg:/", 5)) {
     config_mrl(mrl);
     gui_playlist_start_next (gui);
@@ -563,42 +563,42 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   else if(/*(!strncasecmp(mrl, "ftp://", 6)) ||*/ (!strncasecmp(mrl, "dload:/", 7)))  {
     char        *url = mrl;
     download_t   download;
-    
+
     if(!strncasecmp(mrl, "dload:/", 7))
       url = _mrl + 7;
-    
+
     download.buf    = NULL;
     download.error  = NULL;
     download.size   = 0;
-    download.status = 0; 
-    
+    download.status = 0;
+
     if((network_download(url, &download))) {
       char *filename;
-      
+
       filename = strrchr(url, '/');
       if(filename && filename[1]) { /* we have a filename */
 	char  fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 	FILE *fd;
-	
+
 	filename++;
 	snprintf(fullfilename, sizeof(fullfilename), "%s/%s", xine_get_homedir(), filename);
-	
+
 	if((fd = fopen(fullfilename, "w+b")) != NULL) {
 	  char  *sub = NULL;
 	  int    start, end;
-	  
+
 	  char *newmrl = strdup(fullfilename);
 	  char *ident = strdup(gui->playlist.mmk[gui->playlist.cur]->ident);
 	  if(gui->playlist.mmk[gui->playlist.cur]->sub)
 	    sub = strdup(gui->playlist.mmk[gui->playlist.cur]->sub);
 	  start = gui->playlist.mmk[gui->playlist.cur]->start;
 	  end = gui->playlist.mmk[gui->playlist.cur]->end;
-	  
+
 	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
 
-	  mediamark_replace_entry(&gui->playlist.mmk[gui->playlist.cur], 
+	  mediamark_replace_entry(&gui->playlist.mmk[gui->playlist.cur],
 				  newmrl, ident, sub, start, end, 0, 0);
 	  gui_set_current_mmk(mediamark_get_current_mmk());
 	  mrl = gui->mmk.mrl;
@@ -639,27 +639,27 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 
     if(!strcmp(mrl, gui->mmk.mrl))
       gui->playlist.mmk[gui->playlist.cur]->played = 1;
-    
+
     if(report_error)
       gui_handle_xine_error (gui, gui->stream, mrl);
     return 0;
   }
-  
+
   if(_sub) {
-    
+
     gui_messages_off (gui);
     ret = xine_open(gui->spu_stream, _sub);
     gui_messages_on (gui);
     if (ret)
-      xine_stream_master_slave(gui->stream, 
+      xine_stream_master_slave(gui->stream,
 			       gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
   }
   else
     xine_close (gui->spu_stream);
-  
+
   xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
   xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-  
+
   if (!gui_xine_play (gui, gui->stream, start_pos, start_time, 1)) {
     if(!strcmp(mrl, gui->mmk.mrl))
       gui->playlist.mmk[gui->playlist.cur]->played = 1;
@@ -670,7 +670,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
     gui->playlist.mmk[gui->playlist.cur]->played = 1;
 
   gui_xine_get_pos_length (gui, gui->stream, NULL, NULL, NULL);
-  
+
   if (gui->stdctl_enable)
     stdctl_playing (gui, mrl);
 
@@ -680,10 +680,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub) {
   gGui_t *gui = gGui;
   char *alt;
-  
+
   if(!(alt = mediamark_get_current_alternate_mrl(mmk)))
     alt = mediamark_get_first_alternate_mrl(mmk);
-  
+
   do {
 
     if(gui_xine_open_and_play(alt, gui->mmk.sub, 0, 0, 0, 0, 0))
@@ -717,19 +717,19 @@ void gui_exit (xitk_widget_t *w, void *data) {
       xine_stop(gui->visual_anim.stream);
 
       while(xine_get_status(gui->visual_anim.stream) == XINE_STATUS_PLAY)
-      	xine_usec_sleep(50000);
-      
+	xine_usec_sleep(50000);
+
       audio_source = xine_get_audio_source(gui->stream);
       (void) xine_post_wire_audio_port(audio_source, gui->ao_port);
     }
-    
+
     xine_stop (gui->stream);
     while(xine_get_status(gui->stream) == XINE_STATUS_PLAY)
       xine_usec_sleep(50000);
 
     gui->ignore_next = 0;
   }
-  
+
   gui->on_quit = 1;
   xitk_stop ();
 }
@@ -752,7 +752,7 @@ void gui_exit_2 (gGui_t *gui) {
   gui_deinit (gui);
 
   playlist_deinit (gui);
-  
+
   setup_end (gui->setup);
   viewlog_end (gui->viewlog);
   kbedit_end (gui->keyedit);
@@ -765,7 +765,7 @@ void gui_exit_2 (gGui_t *gui) {
 #ifdef HAVE_TAR
   skin_download_end (gui->skdloader);
 #endif
-  
+
   if (gui->load_stream) {
     filebrowser_end (gui->load_stream);
     gui->load_stream = NULL;
@@ -777,7 +777,7 @@ void gui_exit_2 (gGui_t *gui) {
 
   if (video_window_is_visible (gui->vwin) > 1)
     video_window_set_visibility (gui->vwin, 0);
-  
+
   tvout_deinit(gui->tvout);
 
 #ifdef HAVE_XF86VIDMODE
@@ -789,17 +789,17 @@ void gui_exit_2 (gGui_t *gui) {
     video_window_set_fullscreen_mode (gui->vwin, WINDOWED_MODE);
   //     gui_set_fullscreen_mode (NULL, gui);
 #endif
-   
+
   osd_deinit();
 
   config_update_num("gui.amp_level", gui->mixer.amp_level);
   xine_config_save (gui->xine, __xineui_global_config_file);
-  
+
   xine_close(gui->stream);
   xine_close(gui->visual_anim.stream);
   xine_close (gui->spu_stream);
 
-  /* we are going to dispose this stream, so make sure slider_loop 
+  /* we are going to dispose this stream, so make sure slider_loop
    * won't use it anymore (otherwise -> segfault on exit).
    */
   gui->running = 0;
@@ -834,8 +834,8 @@ void gui_exit_2 (gGui_t *gui) {
   if(__xineui_global_lirc_enable)
     lirc_stop();
 #endif
-  
-  if (gui->stdctl_enable) 
+
+  if (gui->stdctl_enable)
     stdctl_stop (gui);
 
   xitk_skin_unload_config(gui->skin_config);
@@ -854,29 +854,29 @@ void gui_play (xitk_widget_t *w, void *data) {
     return;
 
   video_window_reset_ssaver (gui->vwin);
-  
+
   if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
     if(gui->logo_mode != 0) {
       gui->ignore_next = 1;
       xine_stop(gui->stream);
-      gui->ignore_next = 0; 
+      gui->ignore_next = 0;
     }
   }
 
   if(xine_get_status(gui->stream) != XINE_STATUS_PLAY) {
-    
+
     if (!strncmp (gui->mmk.ident, "xine-ui version", 15)) {
       xine_error (gui, _("No MRL (input stream) specified"));
       return;
     }
-    
-    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0, 
+
+    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
 			       gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset,
 			       !mediamark_have_alternates(&(gui->mmk)))) {
 
       if(!mediamark_have_alternates(&(gui->mmk)) ||
 	 !gui_open_and_play_alternates(&(gui->mmk), gui->mmk.sub)) {
-	
+
 	if(mediamark_all_played() && (gui->actions_on_start[0] == ACTID_QUIT)) {
           gui_exit (NULL, gui);
 	  return;
@@ -892,7 +892,7 @@ void gui_play (xitk_widget_t *w, void *data) {
     if(oldspeed != XINE_SPEED_NORMAL)
       osd_update_status();
   }
-  
+
   panel_check_pause (gui->panel);
 }
 
@@ -908,7 +908,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
     gui->playlist.control &= ~PLAYLIST_CONTROL_STOP;
 
   gui->stream_length.pos = gui->stream_length.time = gui->stream_length.length = 0;
-  
+
   mediamark_reset_played_state();
   if(gui->visual_anim.running) {
     xine_stop(gui->visual_anim.stream);
@@ -993,7 +993,7 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
     xine_set_param (gui->stream, XINE_PARAM_SPEED, gui->last_playback_speed);
     video_window_reset_ssaver (gui->vwin);
   }
-  
+
   panel_check_pause (gui->panel);
   /* Give xine engine some time before updating OSD, otherwise the */
   /* time disp may be empty when switching to XINE_SPEED_PAUSE.    */
@@ -1008,7 +1008,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
   (void)w;
   if(xine_get_status(gui->stream) == XINE_STATUS_PLAY)
     gui_stop (NULL, gui);
-  
+
   if(xine_eject(gui->stream)) {
 
     if(gui->playlist.num) {
@@ -1025,19 +1025,19 @@ void gui_eject (xitk_widget_t *w, void *data) {
 	tok_len = (mrl - cur_mrl) + 2;
 
       if(tok_len != 0) {
-	/* 
+	/*
 	 * Store all of not maching entries
 	 */
 	for(i = 0; i < gui->playlist.num; i++) {
 	  if(strncasecmp(gui->playlist.mmk[i]->mrl, cur_mrl, tok_len)) {
-	    
+
 	    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (new_num + 2));
-	    
-	    (void) mediamark_store_mmk(&mmk[new_num], 
+
+	    (void) mediamark_store_mmk(&mmk[new_num],
 				       gui->playlist.mmk[i]->mrl,
 				       gui->playlist.mmk[i]->ident,
 				       gui->playlist.mmk[i]->sub,
-				       gui->playlist.mmk[i]->start, 
+				       gui->playlist.mmk[i]->start,
 				       gui->playlist.mmk[i]->end,
 				       gui->playlist.mmk[i]->av_offset,
 				       gui->playlist.mmk[i]->spu_offset);
@@ -1051,7 +1051,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
 	mediamark_free_mediamarks();
 	if(mmk)
 	  gui->playlist.mmk = mmk;
-	
+
 	if(!(gui->playlist.num = new_num))
 	  gui->playlist.cur = -1;
 	else if(new_num)
@@ -1073,7 +1073,7 @@ void gui_eject (xitk_widget_t *w, void *data) {
         enable_playback_controls (gui->panel, 0);
 
     }
-    
+
     gui_set_current_mmk(mediamark_get_current_mmk());
     playlist_update_playlist (gui);
   }
@@ -1191,7 +1191,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   /* Drawable has changed, update cursor visiblity */
   if(!gui->cursor_visible)
     video_window_set_cursor_visibility (gui->vwin, gui->cursor_visible);
-  
+
   gui_hide_show_all (gui, flags, ~0);
 }
 
@@ -1221,10 +1221,10 @@ void gui_toggle_aspect (gGui_t *gui, int aspect) {
     return;
   if(aspect == -1)
     aspect = xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO) + 1;
-  
+
   xine_set_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect);
-  
-  osd_display_info(_("Aspect ratio: %s"), 
+
+  osd_display_info(_("Aspect ratio: %s"),
 		   ratios[xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
 
   panel_raise_window(gui->panel);
@@ -1281,7 +1281,7 @@ void gui_nextprev_spu_channel (xitk_widget_t *w, void *data) {
   if (xine_get_status(gui->spu_stream) != XINE_STATUS_IDLE) /* if we have a slave SPU channel, take it into account */
     maxchannel += xine_get_stream_info(gui->spu_stream, XINE_STREAM_INFO_MAX_SPU_CHANNEL);
 
-  /* XINE_STREAM_INFO_MAX_SPU_CHANNEL actually returns the number of available spu channels, i.e. 
+  /* XINE_STREAM_INFO_MAX_SPU_CHANNEL actually returns the number of available spu channels, i.e.
    * 0 means no SPUs, 1 means 1 SPU channel, etc. */
   --maxchannel;
 
@@ -1338,7 +1338,7 @@ void gui_nextprev_speed (xitk_widget_t *w, void *data) {
 static void *gui_seek_thread (void *data) {
   gGui_t *gui = data;
   int update_mmk = 0, ret;
-  
+
   pthread_detach (pthread_self ());
 
   do {
@@ -1357,7 +1357,7 @@ static void *gui_seek_thread (void *data) {
 
     if (!xine_get_stream_info (gui->stream, XINE_STREAM_INFO_SEEKABLE) || (gui->ignore_next == 1))
       break;
-    
+
     if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
       gui_messages_off (gui);
       xine_open (gui->stream, gui->mmk.mrl);
@@ -1373,9 +1373,9 @@ static void *gui_seek_thread (void *data) {
         xine_close (gui->spu_stream);
       }
     }
-  
+
     gui->ignore_next = 1;
-  
+
     if ( gui->playlist.num &&
         (gui->playlist.cur >= 0) &&
          gui->playlist.mmk &&
@@ -1426,7 +1426,7 @@ static void *gui_seek_thread (void *data) {
             }
             gui->ignore_next = 0;
           }
-  
+
         }
       }
     }
@@ -1514,12 +1514,12 @@ void gui_dndcallback(const char *filename) {
 
     pthread_mutex_lock(&gui->mmk_mutex);
 
-    if((strlen(mrl) > 6) && 
+    if((strlen(mrl) > 6) &&
        (!strncmp(mrl, "file:", 5))) {
-      
+
       if((p = strstr(mrl, ":/")) != NULL) {
 	struct stat pstat;
-	
+
 	p += 2;
 
 	if(*(p + 1) == '/')
@@ -1530,8 +1530,8 @@ void gui_dndcallback(const char *filename) {
 	if((stat(p, &pstat)) == 0) {
 	  if(is_a_dir(p)) {
 	    if(*(p + (strlen(p) - 1)) == '/')
-	      *(p + (strlen(p) - 1)) = '\0'; 
-	    
+	      *(p + (strlen(p) - 1)) = '\0';
+
 	    mediamark_collect_from_directory(p);
 	    more_than_one = gui->playlist.cur;
 	    goto __do_play;
@@ -1541,16 +1541,16 @@ void gui_dndcallback(const char *filename) {
 	}
 	else {
 	  snprintf(buffer2, sizeof(buffer2), "/%s", p);
-	  
+
 	  /* file don't exist, add it anyway */
 	  if((stat(buffer2, &pstat)) == -1)
 	    strlcpy(buffer, mrl, sizeof(buffer));
 	  else {
 	    if(is_a_dir(buffer2)) {
-	      
+
 	      if(buffer2[strlen(buffer2) - 1] == '/')
-		buffer2[strlen(buffer2) - 1] = '\0'; 
-	      
+		buffer2[strlen(buffer2) - 1] = '\0';
+
 	      mediamark_collect_from_directory(buffer2);
 	      more_than_one = gui->playlist.cur;
 	      goto __do_play;
@@ -1558,7 +1558,7 @@ void gui_dndcallback(const char *filename) {
 	    else
 	      snprintf(buffer, sizeof(buffer), "file:/%s", buffer2);
 	  }
-	  
+
 	}
       }
       else {
@@ -1568,11 +1568,11 @@ void gui_dndcallback(const char *filename) {
     }
     else
       strlcpy(buffer, mrl, sizeof(buffer));
-    
+
     if(is_a_dir(buffer)) {
       if(buffer[strlen(buffer) - 1] == '/')
-	buffer[strlen(buffer) - 1] = '\0'; 
-      
+	buffer[strlen(buffer) - 1] = '\0';
+
       mediamark_collect_from_directory(buffer);
       more_than_one = gui->playlist.cur;
     }
@@ -1584,10 +1584,10 @@ void gui_dndcallback(const char *filename) {
 	ident++;
       else
 	ident = buffer;
-      
+
       if(mrl_look_like_playlist(buffer)) {
 	int cur = gui->playlist.cur;
-	
+
 	more_than_one = (gui->playlist.cur - 1);
 	if(mediamark_concat_mediamarks(buffer))
 	  gui->playlist.cur = cur;
@@ -1598,7 +1598,7 @@ void gui_dndcallback(const char *filename) {
 	mediamark_append_entry(buffer, ident, NULL, 0, -1, 0, 0);
 
     }
-    
+
   __do_play:
 
     playlist_update_playlist (gui);
@@ -1618,7 +1618,7 @@ void gui_dndcallback(const char *filename) {
 
       }
     }
-    
+
     if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
       enable_playback_controls (gui->panel, 1);
 
@@ -1637,7 +1637,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
   mmk = mediamark_get_current_mmk ();
   by_chapter = (gui->skip_by_chapter &&
 		(xine_get_stream_info(gui->stream, XINE_STREAM_INFO_HAS_CHAPTERS))) ? 1 : 0;
-  
+
   if(mmk && mediamark_got_alternate(mmk))
     mediamark_unset_got_alternate(mmk);
 
@@ -1654,7 +1654,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
     else {
 
       switch(gui->playlist.loop) {
-      
+
       case PLAYLIST_LOOP_SHUFFLE:
       case PLAYLIST_LOOP_SHUF_PLUS:
 	gui->ignore_next = 0;
@@ -1673,11 +1673,11 @@ void gui_step_mrl (gGui_t *gui, int by) {
       case PLAYLIST_LOOP_LOOP:
         if ((gui->playlist.cur + by) > gui->playlist.num) {
 	  int newcur = by - (gui->playlist.num - gui->playlist.cur);
-	  
+
 	  gui->ignore_next = 1;
 	  gui->playlist.cur = newcur;
 	  gui_set_current_mmk(mediamark_get_current_mmk());
-	  if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0, 
+	  if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
 				     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
             gui_display_logo (gui);
 
@@ -1715,7 +1715,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
           gui->playlist.cur -= by;
 	  if((gui->playlist.cur < gui->playlist.num)) {
 	    gui_set_current_mmk(mediamark_get_current_mmk());
-	    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0, 
+	    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
 				       gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
               gui_display_logo (gui);
 	  }
@@ -1732,20 +1732,20 @@ void gui_step_mrl (gGui_t *gui, int by) {
           gui->playlist.cur -= by;
 	  if((gui->playlist.cur < gui->playlist.num)) {
 	    gui_set_current_mmk(mediamark_get_current_mmk());
-	    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0, 
+	    if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
 				       gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
               gui_display_logo (gui);
 	  }
 	  else
 	    gui->playlist.cur = 0;
-	  
+
 	}
 	else {
           int newcur = (gui->playlist.cur - by) + gui->playlist.num;
 
 	  gui->playlist.cur = newcur;
 	  gui_set_current_mmk(mediamark_get_current_mmk());
-	  if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0, 
+	  if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
 				     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1))
             gui_display_logo (gui);
 	}
@@ -1758,7 +1758,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
 
   panel_check_pause (gui->panel);
 }
-  
+
 void gui_nextprev_mrl (xitk_widget_t *w, void *data) {
   int by;
   gGui_t *gui = _gui_get_nextprev (data, &by);
@@ -1980,10 +1980,10 @@ int is_layer_above (gGui_t *gui) {
  */
 void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
   int layer = 10;
-  
+
   if (!gui || !is_layer_above (gui))
     return;
-  
+
   if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin) > 1) {
     layer = xitk_get_layer_level();
   }
@@ -1993,7 +1993,7 @@ void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
     else
       /* FIXME: never happens? */ layer = 4;
   }
-  
+
   xitk_window_set_window_layer(xwin, layer);
 }
 
@@ -2107,7 +2107,7 @@ void gui_reset_zoom(void) {
   panel_raise_window(gui->panel);
 }
 
-/* 
+/*
  * Toggle TV Modes on the dxr3
  */
 void gui_toggle_tvmode(void) {
@@ -2121,14 +2121,14 @@ void gui_toggle_tvmode(void) {
 
 void gui_add_mediamark(void) {
   gGui_t *gui = gGui;
-  
+
   if((gui->logo_mode == 0) && (xine_get_status(gui->stream) == XINE_STATUS_PLAY)) {
     int secs;
 
     if (gui_xine_get_pos_length (gui, gui->stream, NULL, &secs, NULL)) {
       secs /= 1000;
-      
-      mediamark_append_entry(gui->mmk.mrl, gui->mmk.ident, 
+
+      mediamark_append_entry(gui->mmk.mrl, gui->mmk.ident,
 			     gui->mmk.sub, secs, -1, gui->mmk.av_offset, gui->mmk.spu_offset);
       playlist_update_playlist (gui);
     }
@@ -2159,14 +2159,14 @@ static void fileselector_callback (filebrowser_t *fb, void *userdata) {
   gGui_t *gui = userdata;
   char *file;
   char *cur_dir = filebrowser_get_current_dir(fb);
-  
+
   /* Upate configuration with the selected directory path */
   if(cur_dir && strlen(cur_dir)) {
     strlcpy(gui->curdir, cur_dir, sizeof(gui->curdir));
     config_update_string("media.files.origin_path", gui->curdir);
   }
   free(cur_dir);
-  
+
   /* Get the file path/name */
   if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
     int first  = gui->playlist.num;
@@ -2214,13 +2214,13 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
   gGui_t *gui = userdata;
   char **files;
   char  *path = filebrowser_get_current_dir(fb);
-  
+
   /* Update the configuration with the current path */
   if(path && strlen(path)) {
     strlcpy(gui->curdir, path, sizeof(gui->curdir));
     config_update_string("media.files.origin_path", gui->curdir);
   }
-  
+
   /* Get all of the file names in the current directory as an array of pointers to strings */
   if((files = filebrowser_get_all_files(fb)) != NULL) {
     int i = 0;
@@ -2236,7 +2236,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
         snprintf(pathname, sizeof(pathname), "%s/", path);
       else
 	strlcpy(pathname, path, sizeof(pathname));
-      
+
       /* For each file, concatenate the path with the name and append it to the playlist */
       while(files[i]) {
         snprintf(fullfilename, sizeof(fullfilename), "%s%s", pathname, files[i]);
@@ -2252,7 +2252,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
 
         i++;
       } /* End while */
-      
+
       playlist_update_playlist (gui);
 
       /* Enable playback controls on display */
@@ -2273,7 +2273,7 @@ static void fileselector_all_callback (filebrowser_t *fb, void *userdata) {
     i = 0;
     while(files[i])
       free(files[i++]);
-    
+
     free(files);
   } /* If valid file list */
 
@@ -2315,17 +2315,17 @@ static void subselector_callback (filebrowser_t *fb, void *userdata) {
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file) {
       mediamark_t *mmk = mediamark_clone_mmk(mediamark_get_current_mmk());
-      
+
       if(mmk) {
-	mediamark_replace_entry(&gui->playlist.mmk[gui->playlist.cur], mmk->mrl, mmk->ident, 
+	mediamark_replace_entry(&gui->playlist.mmk[gui->playlist.cur], mmk->mrl, mmk->ident,
 				file, mmk->start, mmk->end, mmk->av_offset, mmk->spu_offset);
 	mediamark_free_mmk(&mmk);
 
 	mmk = mediamark_get_current_mmk();
 	gui_set_current_mmk(mmk);
-	
+
         playlist_mrlident_toggle (gui);
-	
+
 	if(xine_get_status(gui->stream) == XINE_STATUS_PLAY) {
 	  int curpos;
 	  xine_close (gui->spu_stream);
@@ -2334,9 +2334,9 @@ static void subselector_callback (filebrowser_t *fb, void *userdata) {
 	  ret = xine_open(gui->spu_stream, mmk->sub);
 	  gui_messages_on (gui);
 	  if (ret)
-	    xine_stream_master_slave(gui->stream, 
+	    xine_stream_master_slave(gui->stream,
 				     gui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
-	  
+
           if (gui_xine_get_pos_length (gui, gui->stream, &curpos, NULL, NULL)) {
 	    xine_stop(gui->stream);
 	    gui_set_current_position(curpos);
@@ -2352,19 +2352,19 @@ static void subselector_callback (filebrowser_t *fb, void *userdata) {
 
 void gui_select_sub(void) {
   gGui_t *gui = gGui;
-  
+
   if(gui->playlist.num) {
     if (gui->load_sub)
       filebrowser_raise_window (gui->load_sub);
     else {
       filebrowser_callback_button_t  cbb[2];
       mediamark_t *mmk;
-      
+
       mmk = mediamark_get_current_mmk();
-      
+
       if(mmk) {
 	char *path, *open_path;
-	
+
 	cbb[0].label = _("Select");
 	cbb[0].callback = subselector_callback;
         cbb[0].userdata = gui;
@@ -2372,24 +2372,24 @@ void gui_select_sub(void) {
 	cbb[1].callback = fileselector_cancel_callback;
         cbb[1].userdata = gui;
 	cbb[1].need_a_file = 0;
-    	
+
 	path = mmk->sub ? mmk->sub : mmk->mrl;
-	
+
 	if(mrl_look_like_file(path)) {
 	  char *p;
-	  
+
 	  open_path = strdup(path);
-	  
+
 	  if(!strncasecmp(path, "file:", 5))
 	    path += 5;
-	  
+
 	  p = strrchr(open_path, '/');
 	  if (p && strlen(p))
 	    *p = '\0';
 	}
 	else
 	  open_path = strdup(gui->curdir);
-	
+
         gui->load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
 	free(open_path);
       }
@@ -2424,9 +2424,9 @@ void visual_anim_done(void) {
 }
 void visual_anim_add_animation(char *mrl) {
   gGui_t *gui = gGui;
-  gui->visual_anim.mrls = (char **) realloc(gui->visual_anim.mrls, sizeof(char *) * 
+  gui->visual_anim.mrls = (char **) realloc(gui->visual_anim.mrls, sizeof(char *) *
 					     ((gui->visual_anim.num_mrls + 1) + 2));
-  
+
   gui->visual_anim.mrls[gui->visual_anim.num_mrls++]   = strdup(mrl);
   gui->visual_anim.mrls[gui->visual_anim.num_mrls]     = NULL;
   gui->visual_anim.mrls[gui->visual_anim.num_mrls + 1] = NULL;
