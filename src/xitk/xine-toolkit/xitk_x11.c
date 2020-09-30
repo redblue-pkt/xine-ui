@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -435,7 +435,7 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
 
   if(state & XK_Multi_key)
     state = (state | XK_Multi_key) & 0xFF;
-  
+
   if(state & ShiftMask)
     *modifier |= MODIFIER_SHIFT;
   if(state & LockMask)
@@ -452,7 +452,7 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
     *modifier |= MODIFIER_MOD4;
   if(state & Mod5Mask)
     *modifier |= MODIFIER_MOD5;
-  
+
   return (*modifier != MODIFIER_NOMOD);
 }
 

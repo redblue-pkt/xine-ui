@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -356,7 +356,7 @@ const char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
  *
  */
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
-				       xitk_tabs_widget_t *t, 
+				       xitk_tabs_widget_t *t,
                                        int x, int y, int width,
                                        const char *fontname) {
   _tabs_private_t *wp;
@@ -394,7 +394,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_labelbutton_widget_t  lb;
     xitk_button_widget_t       b;
     int                        xx = x;
-      
+
     fs = xitk_font_load_font(wl->xitk, fontname);
 
     xitk_font_set_font(fs, wl->gc);
@@ -427,8 +427,8 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     }
     wp->all_width = xx - x;
 
-    /* 
-       Add left/rigth arrows 
+    /*
+       Add left/rigth arrows
     */
     if (wp->all_width > wp->w.width) {
       b.skin_element_name = "XITK_NOSKIN_LEFT";
@@ -458,9 +458,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     wp->start = -2;
     wp->stop = wp->num_entries;
     _tabs_arrange (wp, 0, 0);
-    
+
     xitk_font_unload_font(fs);
-  }  
+  }
 
   xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
 

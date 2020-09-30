@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -210,18 +210,18 @@ static void _create_label_pixmap (_label_private_t *wp) {
 static void _label_destroy (_label_private_t *wp) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     pthread_mutex_lock (&wp->change_mutex);
-    
+
     if (wp->anim_running) {
       void *dummy;
-      
+
       wp->anim_running = 0;
       pthread_mutex_unlock (&wp->change_mutex);
       pthread_join (wp->anim_thread, &dummy);
       pthread_mutex_lock (&wp->change_mutex);
     }
-    
+
     xitk_image_free_image (&(wp->labelpix));
-    
+
     if (!wp->skin_element_name.s) {
       xitk_image_free_image (&(wp->font));
       xitk_image_free_image (&(wp->highlight_font));
@@ -269,15 +269,15 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
 #endif
   if (wp->w.visible) {
     xitk_image_t *font = (xitk_image_t *) wp->font;
-    
+
     if(!wp->label_visible)
       return;
-    
+
     /* non skinable widget */
     if (!(wp->skin_element_name.s)) {
       xitk_font_t *fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
       xitk_image_t *bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
-    
+
       if (fs && bg) {
         int lbear, rbear, wid, asc, des;
 
@@ -369,7 +369,7 @@ static void _label_setup_label (_label_private_t *wp, int paint) {
       struct sched_param   pth_params;
 #endif
       int r;
-      
+
       wp->anim_running = 1;
       pthread_attr_init (&pth_attrs);
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
@@ -440,7 +440,7 @@ static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) 
         wp->w.enable      = info->enability;
         _label_setup_label (wp, 1);
       }
-      
+
       xitk_skin_unlock(skonfig);
       if (wp->highlight_font && wp->callback)
         wp->w.type |= WIDGET_TABABLE | WIDGET_FOCUSABLE | WIDGET_KEYABLE;

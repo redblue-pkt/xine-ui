@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -102,7 +102,7 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
   *q = NULL;
   return r;
 }
-    
+
 static void _combo_close (_combo_private_t *wp, int focus) {
   if (wp->xwin) {
     wp->browser_widget = NULL;
@@ -230,7 +230,7 @@ static void _combo_open (_combo_private_t *wp) {
     wp->browser_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
   }
 
-  xitk_browser_update_list (wp->browser_widget, 
+  xitk_browser_update_list (wp->browser_widget,
     (const char * const *)wp->entries, NULL, wp->num_entries, 0);
   wp->sel2 = wp->selected;
   xitk_browser_set_select (wp->browser_widget, wp->selected);
@@ -258,7 +258,7 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
     } else {
       _combo_close (wp, 0);
     }
-  }      
+  }
 }
 
 /*
@@ -325,18 +325,18 @@ static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) 
     int x, y;
 
     xitk_skin_lock (skonfig);
-      
+
     wp->w.visible = info ? (info->visibility ? 1 : -1) : 0;
     wp->w.enable  = info ? info->enability : 0;
-      
+
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     xitk_get_widget_pos (wp->label_widget, &x, &y);
-      
+
     wp->w.x = x;
     wp->w.y = y;
 
     x += xitk_get_widget_width (wp->label_widget);
-      
+
     (void)xitk_set_widget_pos (wp->button_widget, x, y);
 
     xitk_skin_unlock (skonfig);
@@ -412,16 +412,16 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     int                    xx = 0, yy = 0;
     window_info_t          wi;
-    
+
     if (wp->xwin) {
       if((xitk_get_window_info(*(wp->parent_wkey), &wi))) {
 	wp->win_x = wi.x;
 	wp->win_y = wi.y;
 	WINDOW_INFO_ZERO(&wi);
       }
-      
+
       xitk_get_widget_pos(wp->label_widget, &xx, &yy);
-      
+
       yy += xitk_get_widget_height(wp->label_widget);
       wp->win_x += xx;
       wp->win_y += yy;
@@ -451,11 +451,11 @@ int xitk_combo_get_current_selected(xitk_widget_t *w) {
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     return wp->selected;
   }
-  return -1;    
+  return -1;
 }
 
 /*
- * 
+ *
  */
 const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
   _combo_private_t *wp;
@@ -468,7 +468,7 @@ const char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
     if (wp->entries && wp->selected >= 0)
       return (wp->entries[wp->selected]);
   }
-  return NULL;    
+  return NULL;
 }
 
 /*
@@ -577,14 +577,14 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
 
   {
     int x, y;
-    
+
     xitk_get_widget_pos(wp->label_widget, &x, &y);
 
     wp->w.x = x;
     wp->w.y = y;
 
     x += xitk_get_widget_width(wp->label_widget);
-    
+
     (void) xitk_set_widget_pos(wp->button_widget, x, y);
   }
   {
@@ -619,7 +619,7 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
   {
     xitk_font_t    *fs;
     int             height;
-    
+
     fs = xitk_font_load_font(wl->xitk, DEFAULT_FONT_10);
     xitk_font_set_font(fs, wl->gc);
     height = xitk_font_get_string_height(fs, " ") + 6;

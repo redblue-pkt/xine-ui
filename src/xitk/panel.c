@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -102,13 +102,13 @@ struct xui_panel_st {
 
 void panel_update_nextprev_tips (xui_panel_t *panel) {
 
-  if (panel->gui->skip_by_chapter) { 
-    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous chapter or mrl")); 
-    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next chapter or mrl")); 
+  if (panel->gui->skip_by_chapter) {
+    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous chapter or mrl"));
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next chapter or mrl"));
   }
   else {
     xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
-    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist"));
   }
 }
 
@@ -118,14 +118,14 @@ int is_playback_widgets_enabled (xui_panel_t *panel) {
 
 void enable_playback_controls (xui_panel_t *panel, int enable) {
   void (*enability)(xitk_widget_t *) = NULL;
-  
+
   panel->playback_widgets.enabled = enable;
-  
+
   if(enable)
     enability = xitk_enable_widget;
   else
     enability = xitk_disable_widget;
-  
+
   enability(panel->playback_widgets.prev);
   enability(panel->playback_widgets.stop);
   enability(panel->playback_widgets.play);
@@ -138,7 +138,7 @@ void enable_playback_controls (xui_panel_t *panel, int enable) {
  *
  */
 void panel_show_tips (xui_panel_t *panel) {
-  
+
   if(panel->tips.enable)
     xitk_set_widgets_tips_timeout(panel->widget_list, panel->tips.timeout);
   else
@@ -184,13 +184,13 @@ static void panel_store_new_position (void *data, int x, int y, int w, int h) {
   (void)h;
 
   if(panel->skin_on_change == 0) {
-    
+
     panel->x = x;
     panel->y = y;
-    
-    config_update_num ("gui.panel_x", x); 
+
+    config_update_num ("gui.panel_x", x);
     config_update_num ("gui.panel_y", y);
-    
+
     event_sender_move (panel->gui, x + w, y);
   }
   else
@@ -262,7 +262,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
     raise_window (panel->gui, panel->xwin, 1, 1);
 
   xitk_skin_unlock (panel->gui->skin_config);
-  
+
   xitk_change_skins_widget_list (panel->widget_list, panel->gui->skin_config);
 
   enable_playback_controls (panel, panel->playback_widgets.enabled);
@@ -360,7 +360,7 @@ void panel_update_runtime_display (xui_panel_t *panel) {
     timestr[9] = (msecs / 10u) + '0';
     timestr[8] = '.';
   } while (0);
-  
+
   if ((unsigned int)length != panel->shown_length) {
     char buffer[256];
     const char *ts = _("Total time: ");
@@ -388,14 +388,14 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
   int screensaver_timer = 0;
   int lastmsecs = -1;
   int i = 0;
-  
+
   while (panel->gui->on_quit == 0) {
 
     if (panel->gui->stream) {
-      
+
       int status = xine_get_status (panel->gui->stream);
       int speed  = xine_get_param (panel->gui->stream, XINE_PARAM_SPEED);
-      
+
       int pos = 0, msecs = 0;
 
       if(status == XINE_STATUS_PLAY) {
@@ -416,7 +416,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 	      goto __next_iteration;
 	    }
 	  }
-	  
+
           if (panel->gui->playlist.num) {
             if ((xine_get_stream_info (panel->gui->stream, XINE_STREAM_INFO_SEEKABLE))) {
 	      if(!xitk_is_widget_enabled(panel->playback_widgets.slider_play))
@@ -434,19 +434,19 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 	}
 	else
 	  pos = -1;
-	
+
       }
-      
+
       if(!(i % 2)) {
 	osd_update();
-	
+
         if (panel->gui->mrl_overrided) {
           panel->gui->mrl_overrided--;
           if (panel->gui->mrl_overrided == 0)
             panel_update_mrl_display (panel);
 	}
       }
-      
+
       if ((status == XINE_STATUS_PLAY) &&
         ((speed != XINE_SPEED_PAUSE) || (msecs != lastmsecs))) {
         char *ident = stream_infos_get_ident_from_stream (panel->gui->stream);
@@ -500,16 +500,16 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 
 	    if(!(i % 20)) {
 	      int level = 0;
-      
+
               panel_update_channel_display (panel);
 
               if ((panel->gui->mixer.method == SOUND_CARD_MIXER) &&
                 (panel->gui->mixer.caps & MIXER_CAP_VOL)) {
-                level = panel->gui->mixer.volume_level = 
+                level = panel->gui->mixer.volume_level =
                   xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_VOLUME);
 	      }
               else if (panel->gui->mixer.method == SOFTWARE_MIXER) {
-                level = panel->gui->mixer.amp_level = 
+                level = panel->gui->mixer.amp_level =
                   xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
 	      }
 
@@ -528,20 +528,20 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
       }
       lastmsecs = msecs;
     }
-    
+
     if (panel->gui->cursor_visible) {
       if(!(i % 2))
 	video_window_set_cursor_timer (panel->gui->vwin, video_window_get_cursor_timer (panel->gui->vwin) + 1);
-      
+
       if (video_window_get_cursor_timer (panel->gui->vwin) >= 5) {
         panel->gui->cursor_visible = !panel->gui->cursor_visible;
         video_window_set_cursor_visibility (panel->gui->vwin, panel->gui->cursor_visible);
       }
     }
-    
+
     if (panel->gui->logo_has_changed)
       video_window_update_logo (panel->gui->vwin);
-    
+
   __next_iteration:
     xine_usec_sleep(500000.0);
     i++;
@@ -556,7 +556,7 @@ static int _panel_get_visibility (xui_panel_t *panel) {
   panel->visible = map[(xitk_window_is_window_visible (panel->xwin) ? 3 : 0) + panel->visible];
   return panel->visible;
 }
-  
+
 /*
  * Boolean about panel visibility.
  */
@@ -574,7 +574,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
   _panel_get_visibility (panel);
   if ((panel->visible > 1) && !video_window_is_separate_display (panel->gui->vwin)) {
     int vv = video_window_is_visible (panel->gui->vwin);
-    
+
     if ((vv > 0) && !panel->gui->use_root_window) {
       panel->visible = 0;
       xitk_window_hide_window (panel->xwin);
@@ -602,11 +602,11 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
      * And no, video window _does_ report viewable. Waiting half a second
      * after switch does help, and so does this HACK. */
     xitk_window_raise_window (panel->xwin);
-     
+
     if (panel->gui->cursor_grabbed) {
       xitk_ungrab_pointer();
     }
-    
+
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
     if(
 #ifdef HAVE_XINERAMA
@@ -621,7 +621,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 #endif
        ) {
       int x, y, w, h, desktopw, desktoph;
-      
+
       xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
 
       desktopw = xitk_get_display_width();
@@ -629,7 +629,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
       if(((x + w) <= 0) || ((y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
 	int newx, newy;
-	
+
 	newx = (desktopw - w) >> 1;
 	newy = (desktoph - h) >> 1;
 
@@ -639,10 +639,10 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
       }
     }
 #endif
-    
+
     if (panel->gui->logo_mode == 0) {
       int pos;
-      
+
       if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
         if (gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
@@ -651,7 +651,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
       panel_update_mrl_display (panel);
     }
-    
+
   }
 
   gui_hide_show_all (panel->gui, ~1, panel->visible > 1 ? ~0 : 0);
@@ -688,17 +688,17 @@ void panel_check_mute (xui_panel_t *panel) {
  * Check and set the correct state of pause button.
  */
 void panel_check_pause (xui_panel_t *panel) {
-  
-  xitk_checkbox_set_state(panel->playback_widgets.pause, 
-    (((xine_get_status (panel->gui->stream) == XINE_STATUS_PLAY) && 
+
+  xitk_checkbox_set_state(panel->playback_widgets.pause,
+    (((xine_get_status (panel->gui->stream) == XINE_STATUS_PLAY) &&
       (xine_get_param (panel->gui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0));
 }
 
 void panel_reset_runtime_label (xui_panel_t *panel) {
   if(panel->runtime_mode == 0)
-    xitk_label_change_label (panel->runtime_label, "00:00:00"); 
+    xitk_label_change_label (panel->runtime_label, "00:00:00");
   else
-    xitk_label_change_label (panel->runtime_label, "..:..:.."); 
+    xitk_label_change_label (panel->runtime_label, "..:..:..");
 }
 
 static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
@@ -921,9 +921,9 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       change_audio_vol(pos);
     else if (panel->gui->mixer.method == SOFTWARE_MIXER)
       change_amp_vol(pos);
-    
+
   }
-  
+
   panel_check_pause (panel);
 }
 
@@ -973,7 +973,7 @@ static const xitk_event_cbs_t panel_event_cbs = {
 };
 
 /*
- * Create buttons from information if input plugins autoplay featured. 
+ * Create buttons from information if input plugins autoplay featured.
  * We couldn't do this into panel_init(), this function is
  * called before xine engine initialization.
  */
@@ -1037,7 +1037,7 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
  * Check if there a mixer control available,
  */
 void panel_add_mixer_control (xui_panel_t *panel) {
-  
+
   panel->gui->mixer.caps = MIXER_CAP_NOTHING;
 
   if (panel->gui->ao_port) {
@@ -1046,18 +1046,18 @@ void panel_add_mixer_control (xui_panel_t *panel) {
     if ((xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_MUTE)) != -1)
       panel->gui->mixer.caps |= MIXER_CAP_MUTE;
   }
-  
+
   if (((panel->gui->mixer.method == SOUND_CARD_MIXER) && panel->gui->mixer.caps & MIXER_CAP_VOL) ||
      (panel->gui->mixer.method == SOFTWARE_MIXER)) {
     int level = 0;
 
     xitk_enable_widget(panel->mixer.slider);
-    
+
     if (panel->gui->mixer.method == SOUND_CARD_MIXER)
       level = panel->gui->mixer.volume_level = xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_VOLUME);
     else if (panel->gui->mixer.method == SOFTWARE_MIXER)
       level = panel->gui->mixer.amp_level = xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
-    
+
     xitk_slider_set_pos(panel->mixer.slider, level);
   }
 
@@ -1126,7 +1126,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   if (!gui)
     return NULL;
-  
+
   panel = calloc (1, sizeof (*panel));
   if (!panel)
     return NULL;
@@ -1179,7 +1179,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
       xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
   }
-  
+
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   /*
@@ -1326,7 +1326,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     xitk_set_widget_tips (w, _("Take a snapshot"));
   }
 
-  /* 
+  /*
    * Init to default, otherwise if panel is hide
    * at startup, label is empty 'till it's updated
    */
@@ -1436,7 +1436,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING > 0)
     struct sched_param   pth_params;
 #endif
-    
+
     pthread_attr_init(&pth_attrs);
 
     /* this won't work on linux, freebsd 5.0 */
@@ -1445,7 +1445,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
 #endif
-    
+
     pthread_create (&panel->slider_thread, &pth_attrs, slider_loop, panel);
     pthread_attr_destroy (&pth_attrs);
   }

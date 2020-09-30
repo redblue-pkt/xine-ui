@@ -104,7 +104,7 @@ static _rend_t *_rend_new (int w, int h) {
   r->mod_b = NULL;
   return r;
 }
-  
+
 /* static const _rgba_t _rgb_mask = { .b = { .r = 255, .g = 255, .b = 255, .a = 0 }}; */
 static const _rgba_t _rgb15_err_mask = { .b = { .r = 7, .g = 7, .b = 7, .a = 0 }};
 static const _rgba_t _rgb16_err_mask = { .b = { .r = 7, .g = 3, .b = 7, .a = 0 }};
@@ -418,7 +418,7 @@ static uint32_t _add_4_uint8_sat (uint32_t large, uint32_t small) {
   over |= over >> 4;
   return res | over;
 }
-  
+
 #define CLIP_UINT8(_v) do { if (_v & ~0xff) _v = ~(_v >> (sizeof (_v) * 8 - 1)) & 0xff; } while (0)
 
 int
@@ -1310,7 +1310,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	}
     }
   pd = id->x.disp;
-  
+
   sxim = NULL;
   xim = NULL;
   pmap = 0;

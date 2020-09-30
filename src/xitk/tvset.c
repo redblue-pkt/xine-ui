@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -41,7 +41,7 @@
 #include "xine-toolkit/intbox.h"
 
 #include "frequencies.h"
-	
+
 #define WINDOW_WIDTH    500
 #define WINDOW_HEIGHT   346
 
@@ -158,15 +158,15 @@ static void tvset_update (xitk_widget_t *w, void *data, int state) {
 
   ev_data->input     = xitk_intbox_get_value(tvset.input);
   ev_data->frequency = (chanlists[current_system].list[current_chan].freq * 16) / 1000;
-  
+
   ev_data->standard_id = std_list[current_std].std;
-  
+
   xine_event.type        = XINE_EVENT_SET_V4L2;
   xine_event.data_length = sizeof(xine_set_v4l2_data_t);
   xine_event.data        = ev_data;
   xine_event.stream      = gGui->stream;
   gettimeofday(&xine_event.tv, NULL);
-  
+
   xine_event_send(gGui->stream, &xine_event);
 }
 
@@ -178,13 +178,13 @@ static void tvset_exit (xitk_widget_t *w, void *data, int state) {
 
     tvset.running = 0;
     tvset.visible = 0;
-    
+
     if((xitk_get_window_info(tvset.widget_key, &wi))) {
       config_update_num ("gui.tvset_x", wi.x);
       config_update_num ("gui.tvset_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
-    
+
     xitk_unregister_event_handler(&tvset.widget_key);
 
     xitk_window_destroy_window(tvset.xwin);
@@ -216,7 +216,7 @@ static const xitk_event_cbs_t tvset_event_cbs = {
 };
 
 int tvset_is_visible(void) {
-  
+
     if(gGui->use_root_window)
       return xitk_window_is_window_visible(tvset.xwin);
     else
@@ -244,11 +244,11 @@ static int update_chann_entries(int system_entry) {
   int               i;
   const struct CHANLIST *list = chanlists[system_entry].list;
   int               len  = chanlists[system_entry].count;
-  
+
   free(tvset.chann_entries);
 
   tvset.chann_entries = (const char **) calloc((len+1), sizeof(const char *));
-  
+
   for(i = 0; i < len; i++)
     tvset.chann_entries[i] = list[i].name;
 
@@ -258,7 +258,7 @@ static int update_chann_entries(int system_entry) {
 
 static void system_combo_select(xitk_widget_t *w, void *data, int select) {
   int len;
-  
+
   len = update_chann_entries(select);
 
   if( tvset.chann ) {
@@ -285,7 +285,7 @@ void tvset_panel(void) {
   int                         x, y, w;
   xitk_widget_t              *widget;
 
-  x = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_x", 
+  x = xine_config_register_num (__xineui_global_xine_instance, "gui.tvset_x",
 				80,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
@@ -299,12 +299,12 @@ void tvset_panel(void) {
 				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
-  
+
   /* Create window */
   tvset.xwin = xitk_window_create_dialog_window(gGui->xitk,
 						 _("TV Analog Video Parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
-  
+
   set_window_states_start(gGui, tvset.xwin);
 
   tvset.widget_list = xitk_window_widget_list(tvset.xwin);
@@ -316,7 +316,7 @@ void tvset_panel(void) {
 
   x = 15;
   y = 34 - 6;
-  
+
   draw_outter_frame(bg, _("General"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
@@ -344,7 +344,7 @@ void tvset_panel(void) {
   {
     static const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
     tvset.system_entries = (const char **) calloc((chanlists_count+1), sizeof(const char *));
-  
+
     for(i = 0; i < chanlists_count; i++)
       tvset.system_entries[i] = chanlists[i].name;
     tvset.system_entries[i] = NULL;
@@ -412,9 +412,9 @@ void tvset_panel(void) {
   xitk_add_widget (tvset.widget_list, tvset.framerate);
   xitk_enable_and_show_widget(tvset.framerate);
 
-  tvset.vidstd_entries = (const char **) malloc(sizeof(const char *) * 
+  tvset.vidstd_entries = (const char **) malloc(sizeof(const char *) *
                           (sizeof(std_list)/sizeof(std_list[0])+1));
-  
+
   for(i = 0; i < (sizeof(std_list)/sizeof(std_list[0])); i++)
     tvset.vidstd_entries[i] = std_list[i].name;
   tvset.vidstd_entries[i] = NULL;
@@ -463,7 +463,7 @@ void tvset_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Update");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = tvset_update; 
+  lb.callback          = tvset_update;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
@@ -471,9 +471,9 @@ void tvset_panel(void) {
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
   xitk_add_widget (tvset.widget_list, tvset.update);
   xitk_enable_and_show_widget(tvset.update);
- 
+
   x = WINDOW_WIDTH - (100 + 15);
-  
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;

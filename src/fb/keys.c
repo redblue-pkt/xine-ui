@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -49,7 +49,7 @@ static int do_getc(void)
 {
 	unsigned char c[4];
 	int           n, i, k;
-	
+
 	n = read(fbxine.tty_fd, c, 4 );
 	for (k = 0, i = 0; i < n; i++)
 		k |= c[i] << (i << 3);
@@ -71,7 +71,7 @@ static int default_key_action(int key)
 		case K_ENTER: return ACTID_PLAY;
 
 		case '\033': /* ESC */
-		case 'q': 
+		case 'q':
 		case 'Q': return ACTID_QUIT;
 
 		case 'm': return ACTID_MUTE;
@@ -80,14 +80,14 @@ static int default_key_action(int key)
 
 		case 'j': return ACTID_SUBSELECT;
 
-		case 'p': 
+		case 'p':
 		case ' ': return ACTID_PAUSE;
 
 		case 's': return ACTID_STOP;
 
 		case '/': return ACTID_mVOLUME;
 		case '*': return ACTID_pVOLUME;
-			
+
 		case 'K': return ACTID_EVENT_UP;
 		case 'J': return ACTID_EVENT_DOWN;
 		case 'H': return ACTID_EVENT_LEFT;
@@ -100,7 +100,7 @@ static int default_key_action(int key)
 		case 'Z':     return ACTID_ZOOM_OUT;
 		case K_CTRLZ: return ACTID_ZOOM_RESET; /* This is ^Z */
 	}
-	
+
 	return 0;
 }
 
@@ -135,7 +135,7 @@ static void exit_keyboard(void)
 int fbxine_init_keyboard(void)
 {
 	static struct fbxine_callback exit_callback;
-	
+
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_keyboard);
 	fbxine_register_abort(&exit_callback,(fbxine_callback_t)exit_keyboard);
 
@@ -164,8 +164,8 @@ int fbxine_init_keyboard(void)
 	fbxine.ti_cur.c_iflag    &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
 							INLCR  | IGNCR  | ICRNL  | IXON);
 	fbxine.ti_cur.c_lflag    &= ~(ECHO | ECHONL | ISIG | ICANON);
-	
-	if (tcsetattr(fbxine.tty_fd, TCSAFLUSH, &fbxine.ti_cur) == -1) 
+
+	if (tcsetattr(fbxine.tty_fd, TCSAFLUSH, &fbxine.ti_cur) == -1)
 	{
 		perror("Failed to change terminal attributes");
 		close(fbxine.tty_fd);

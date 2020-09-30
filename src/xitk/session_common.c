@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -50,14 +50,14 @@
 
 int connect_to_session(int session) {
   int fd;
-  
+
   if((fd = xine_socket_cloexec(AF_UNIX, SOCK_STREAM, 0)) != -1) {
     union {
       struct sockaddr_un un;
       struct sockaddr sa;
     } saddr;
     uid_t                stored_uid, euid;
-    
+
     saddr.un.sun_family = AF_UNIX;
     stored_uid       = getuid();
     euid             = geteuid();
@@ -80,7 +80,7 @@ int connect_to_session(int session) {
 
 void *read_packet(int fd, ctrl_header_packet_t *hdr) {
   void *data = NULL;
-  
+
   if((read(fd, hdr, sizeof(ctrl_header_packet_t))) == sizeof(ctrl_header_packet_t)) {
     if(hdr->data_length) {
       data = malloc(hdr->data_length);
@@ -97,7 +97,7 @@ void *read_packet(int fd, ctrl_header_packet_t *hdr) {
 void read_ack(int fd) {
   ctrl_header_packet_t  hdr;
   void                 *data;
-  
+
   data = read_packet(fd, &hdr);
   SAFE_FREE(data);
 }
@@ -153,7 +153,7 @@ int _send_packet(int fd, const void *data, ctrl_header_packet_t *hdr) {
 
 int send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
-  
+
   hdr.version     = CTRL_PROTO_VERSION;
   hdr.command     = command;
   hdr.data_length = data_length;
@@ -163,7 +163,7 @@ int send_packet(int fd, ctrl_commands_t command, const void *data, uint32_t data
 
 int send_string(int session, ctrl_commands_t command, const char *string) {
   int fd;
-  
+
   if((fd = connect_to_session(session)) == -1)
     return -1;
   if (send_packet(fd, command, string, string ? strlen(string) + 1 : 0) < 0) {
@@ -179,7 +179,7 @@ int send_string(int session, ctrl_commands_t command, const char *string) {
 
 static int _remote_cmd(int session, ctrl_commands_t command, int timeout) {
   int fd;
-  
+
   if((fd = connect_to_session(session)) == -1)
     return 0;
 
@@ -195,7 +195,7 @@ static int _remote_cmd(int session, ctrl_commands_t command, int timeout) {
 
   read_ack(fd);
   close(fd);
-  
+
   return 1;
 }
 

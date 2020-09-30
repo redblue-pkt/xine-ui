@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -51,9 +51,9 @@ typedef struct {
 
   xitk_state_callback_t   callback;
   xitk_ext_state_callback_t state_callback;
-   
+
   void                   *userdata;
-   
+
   int                     align;
   int                     label_dy;
   int                     label_offset;
@@ -136,7 +136,7 @@ static int _labelbutton_inside (_lbutton_private_t *wp, int x, int y) {
 
     if (skin->mask)
         return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
-    else 
+    else
       return 1;
   }
   return 0;
@@ -214,7 +214,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
            : /* wp->align == ALIGN_LEFT */ (state != _LB_CLICK ? 1 : 5);
     xitk_pixmap_draw_string (pix, fs, xx + wp->label_offset, origin, wp->label.s, slen, fg);
   }
-           
+
   if (mode & 1) {
     xitk_font_t *short_font = NULL;
 

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2019 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -45,7 +45,7 @@ struct xitk_recode_s {
   int use_mutex;
   pthread_mutex_t mutex;
 };
-  
+
 static const lang_locale_t lang_locales[] = {
   { "af_ZA",    "iso88591"   },
   { "ar_AE",    "iso88596"   },
@@ -233,7 +233,7 @@ static const lang_locale_t *_get_first_lang_locale(char *lcal) {
 
 static char *xitk_get_system_encoding(void) {
   char *lang, *codeset = NULL;
-  
+
 #ifdef HAVE_LANGINFO_CODESET
   codeset = nl_langinfo(CODESET);
 #endif
@@ -279,7 +279,7 @@ static char *xitk_get_system_encoding(void) {
 xitk_recode_t *xitk_recode_init (const char *src_encoding, const char *dst_encoding, int threadsafe) {
   xitk_recode_t *xrt = NULL;
   char *src_enc, *dst_enc;
-  
+
   src_enc = src_encoding ? (char *)src_encoding : xitk_get_system_encoding ();
   dst_enc = dst_encoding ? (char *)dst_encoding : xitk_get_system_encoding ();
 

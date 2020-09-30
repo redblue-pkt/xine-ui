@@ -6,7 +6,7 @@
  * the above copyright notice appear in all copies and that both that
  * copyright notice and this permission notice appear in supporting
  * documentation.  No representations are made about the suitability of this
- * software for any purpose.  It is provided "as is" without express or 
+ * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *
  *
@@ -231,7 +231,7 @@ send_xscreensaver_command (Display *dpy, Atom command, long arg,
                   fprintf (stderr, "bad status format on root window.\n");
                   return -1;
                 }
-                  
+
               blanked = (Atom) data[0];
               tt = (time_t) data[1];
 
@@ -454,7 +454,7 @@ xscreensaver_command_response (Display *dpy, Window window,
 
                       if (error_ret)
                         *error_ret = strdup (err);
-                      else  
+                      else
                         fprintf (stderr, "%s: %s\n", PACKAGE, err);
 
 		      if (msg) XFree (msg);
@@ -641,7 +641,7 @@ int xscreensaver_kill_server(Display *dpy) {
  */
 void xscreensaver_start_server(void) {
   int err;
-  
+
   /*
    * when playing file from user unmountable device, don't start the
    * screensaver there, because mount dir stays in use, so first cd to $HOME

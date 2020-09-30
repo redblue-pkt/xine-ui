@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -209,22 +209,22 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   (void)me;
   if(autoplay_mrls) {
     int j;
-    
+
     /* Flush playlist in newbie mode */
     if(gui->smart_mode) {
       mediamark_free_mediamarks();
       playlist_update_playlist (gui);
     }
-    
+
     for (j = 0; j < num_mrls; j++)
       mediamark_append_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
-    
+
     gui->playlist.cur = gui->playlist.num ? 0 : -1;
-    
+
     if(gui->playlist.cur == 0)
       gui_set_current_mmk(mediamark_get_current_mmk());
-    
-    /* 
+
+    /*
      * If we're in newbie mode, start playback immediately
      * (even ignoring if we're currently playing something
      */
@@ -250,12 +250,12 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 
   case AUDIO_INCRE_VOL:
     if((gui->mixer.caps & MIXER_CAP_VOL) && (gui->mixer.volume_level < 100)) {
-      
+
       gui->mixer.volume_level += 10;
-      
+
       if(gui->mixer.volume_level > 100)
 	gui->mixer.volume_level = 100;
-      
+
       xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
       panel_update_mixer_display (gui->panel);
       osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
@@ -264,9 +264,9 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
 
   case AUDIO_DECRE_VOL:
     if((gui->mixer.caps & MIXER_CAP_VOL) && (gui->mixer.volume_level > 0)) {
-      
+
       gui->mixer.volume_level -= 10;
-      
+
       if(gui->mixer.volume_level < 0)
 	gui->mixer.volume_level = 0;
 
@@ -336,11 +336,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,
       NULL,
-      "<title>",      
+      "<title>",
       NULL, NULL, 0},
     { _("Show controls"),
       menu_get_shortcut (gui, &tbuf, "ToggleVisibility"),
-      panel_is_visible (gui->panel) > 1 ? "<checked>" : "<check>",  
+      panel_is_visible (gui->panel) > 1 ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_TOGGLE_VISIBLITY},
     { _("Show video window"),
       menu_get_shortcut (gui, &tbuf, "ToggleWindowVisibility"),
@@ -350,13 +350,13 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_get_shortcut (gui, &tbuf, "ToggleFullscreen"),
       (video_window_get_fullscreen_mode (gui->vwin) & fullscr_mode) ? "<checked>" : "<check>",
       menu_gui_action, gui, ACTID_TOGGLE_FULLSCREEN },
-    { "SEP",  
+    { "SEP",
       NULL,
-      "<separator>",  
+      "<separator>",
       NULL, NULL, 0},
     { _("Open"),
       NULL,
-      "<branch>",   
+      "<branch>",
       NULL, NULL, 0},
     { _("Open/File..."),
       menu_get_shortcut (gui, &tbuf, "FileSelector"),
@@ -388,7 +388,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_gui_action, gui, ACTID_PAUSE },
     { _("Playback/SEP"),
       NULL,
-      "<separator>",  
+      "<separator>",
       NULL,  NULL, 0},
     { _("Playback/Next MRL"),
       menu_get_shortcut (gui, &tbuf, "NextMrl"),
@@ -400,7 +400,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_gui_action, gui, ACTID_MRL_PRIOR },
     { _("Playback/SEP"),
       NULL,
-      "<separator>",  
+      "<separator>",
       NULL,  NULL, 0},
     { _("Playback/Increase Speed"),
       menu_get_shortcut (gui, &tbuf, "SpeedFaster"),
@@ -426,9 +426,9 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_get_shortcut (gui, &tbuf, "PlaylistEditor"),
       NULL,
       menu_playlist_ctrl, gui, PLAYL_EDIT },
-    { _("Playlist/SEP"),  
+    { _("Playlist/SEP"),
       NULL,
-      "<separator>",  
+      "<separator>",
       NULL, NULL, 0},
     { _("Playlist/Loop modes"),
       NULL,
@@ -458,7 +458,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_get_shortcut (gui, &tbuf, "PlaylistStop"),
       (gui->playlist.control & PLAYLIST_CONTROL_STOP) ? "<check>" : "<checked>",
       menu_playlist_ctrl, gui, PLAYL_CTRL_STOP },
-    { "SEP",  
+    { "SEP",
       NULL,
       "<separator>",
       NULL, NULL, 0},
@@ -470,11 +470,11 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_get_shortcut (gui, &tbuf, "EventSenderShow"),
       NULL,
       menu_gui_action, gui, ACTID_EVENT_SENDER},
-    { _("Menus/SEP"),  
+    { _("Menus/SEP"),
       NULL,
       "<separator>",
       NULL, NULL, 0},
-    { "SEP",  
+    { "SEP",
       NULL,
       "<separator>",
       NULL, NULL, 0},
@@ -609,7 +609,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       NULL,
       "<branch>",
       NULL, NULL, 0},
-    { "SEP",  
+    { "SEP",
       NULL,
       "<separator>",
       NULL, NULL, 0},
@@ -669,23 +669,23 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     return;
 
   gui->nongui_error_msg = NULL;
-  
+
   snprintf(buffer, sizeof(buffer), _("xine %s"), VERSION);
   menu_entries[0].menu = buffer;
 
   XITK_WIDGET_INIT(&menu);
-  
+
   video_window_get_mouse_coords(gui->vwin, &x, &y);
 
   menu.menu_tree         = &menu_entries[0];
   menu.skin_element_name = NULL;
-  
+
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
   /* Subtitle loader */
   if(gui->playlist.num) {
     xitk_menu_entry_t   menu_entry;
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Open/Subtitle...");
     menu_entry.cb        = menu_gui_action;
@@ -700,26 +700,26 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.user_id   = PLAYL_SAVE;
     xitk_menu_add_entry(w, &menu_entry);
   }
-  
+
   { /* Autoplay plugins */
     xitk_menu_entry_t   menu_entry;
     char                buffer[2048];
     char               *location = _("Playlist/Get from");
     const char *const  *plug_ids = xine_get_autoplay_input_plugin_ids (gui->xine);
     const char         *plug_id;
-    
+
     plug_id = *plug_ids++;
     while(plug_id) {
 
       memset(&buffer, 0, sizeof(buffer));
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       snprintf(buffer, sizeof(buffer), "%s/%s", location, plug_id);
-      
+
       menu_entry.menu      = buffer;
       menu_entry.cb        = menu_playlist_from;
       menu_entry.user_data = gui;
       xitk_menu_add_entry(w, &menu_entry);
-      
+
       plug_id = *plug_ids++;
     }
   }
@@ -750,7 +750,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
       menu_entry.menu      = _("Audio/Visualization/None");
       xitk_menu_add_entry(w, &menu_entry);
     }
-    
+
   }
 
   { /* Audio channels */
@@ -759,7 +759,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     char               *location = _("Audio/Channel");
     char                buffer[2048];
     int                 channel = xine_get_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Audio/Channel/Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
@@ -767,7 +767,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Audio/Channel/Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
@@ -775,12 +775,12 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     for(i = 0; i < 32; i++) {
       char   langbuf[XINE_LANG_MAX];
-      
+
       memset(&langbuf, 0, sizeof(langbuf));
-      
+
       if(!xine_get_audio_lang(gui->stream, i, &langbuf[0])) {
 
 	if(i == 0) {
@@ -798,7 +798,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 
 	break;
       }
-      
+
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       snprintf(buffer, sizeof(buffer), "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
@@ -817,7 +817,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     char               *location = _("Subtitle/Channel");
     char                buffer[2048];
     int                 channel = xine_get_param(gui->stream, XINE_PARAM_SPU_CHANNEL);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Subtitle/Channel/Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
@@ -825,21 +825,21 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Subtitle/Channel/Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.user_data = gui;
     menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     for(i = 0; i < 32; i++) {
       char   langbuf[XINE_LANG_MAX];
-      
+
       memset(&langbuf, 0, sizeof(langbuf));
-      
+
       if(!xine_get_spu_lang(gui->stream, i, &langbuf[0])) {
-	
+
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
@@ -855,7 +855,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
 
 	break;
       }
-      
+
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       snprintf(buffer, sizeof(buffer), "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
@@ -867,7 +867,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     }
 
   }
-  
+
   { /* Menus access */
     static const char menu_entries[21][16] = {
       /* Default menu */
@@ -921,7 +921,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
     menu_entry.menu      = _("Playback/SEP");
     menu_entry.type      = "<separator>";
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
 
     menu_entry.menu = xitk_asprintf("%s/%s", _("Playback"), _("Add Mediamark"));
@@ -948,12 +948,12 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   };
 
   menu_entries[0].menu = _("Audio");
-  
+
   XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
   menu.skin_element_name = NULL;
-  
+
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
   { /* Audio channels */
@@ -961,7 +961,7 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     int                 i;
     char                buffer[2048];
     int                 channel = xine_get_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
@@ -969,7 +969,7 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
@@ -977,12 +977,12 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     for(i = 0; i < 32; i++) {
       char  langbuf[XINE_LANG_MAX];
-      
+
       memset(&langbuf, 0, sizeof(langbuf));
-      
+
       if(!xine_get_audio_lang(gui->stream, i, &langbuf[0])) {
 
 	if(i == 0) {
@@ -1000,7 +1000,7 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 
 	break;
       }
-      
+
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
@@ -1024,12 +1024,12 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   };
 
   menu_entries[0].menu = _("Subtitle");
-  
+
   XITK_WIDGET_INIT(&menu);
 
   menu.menu_tree         = &menu_entries[0];
   menu.skin_element_name = NULL;
-  
+
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
   { /* SPU channels */
@@ -1037,7 +1037,7 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     int                 i;
     char                buffer[2048];
     int                 channel = xine_get_param(gui->stream, XINE_PARAM_SPU_CHANNEL);
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Off");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
@@ -1045,21 +1045,21 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     menu_entry.user_data = gui;
     menu_entry.user_id   = -2;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     menu_entry.menu      = _("Auto");
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_spu_chan;
     menu_entry.user_data = gui;
     menu_entry.user_id   = -1;
     xitk_menu_add_entry(w, &menu_entry);
-    
+
     for(i = 0; i < 32; i++) {
       char   langbuf[XINE_LANG_MAX];
-      
+
       memset(&langbuf, 0, sizeof(langbuf));
-      
+
       if(!xine_get_spu_lang(gui->stream, i, &langbuf[0])) {
-	
+
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
@@ -1075,7 +1075,7 @@ void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 
 	break;
       }
-      
+
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
@@ -1118,7 +1118,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
   };
 
   XITK_WIDGET_INIT(&menu);
-  
+
   if(selected) {
     menu_entries_sel[0].menu = _("Playlist");
     menu.menu_tree           = &menu_entries_sel[0];
@@ -1134,7 +1134,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
 
   if(!selected && gui->playlist.num) {
     xitk_menu_entry_t   menu_entry;
-    
+
     memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = _("Delete All");
     menu_entry.cb        = menu_playlist_delete_all;
@@ -1153,14 +1153,14 @@ void control_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     { _("Reset video settings"), NULL, NULL,      menu_control_reset, gui->vctrl, 0},
     { NULL,                      NULL, NULL,      NULL,               NULL, 0      }
   };
-  
+
   XITK_WIDGET_INIT(&menu);
-  
+
   menu_entries[0].menu   = _("Video Control");
   menu.menu_tree         = &menu_entries[0];
   menu.skin_element_name = NULL;
 
   w = xitk_noskin_menu_create(wl, &menu, x, y);
-  
+
   xitk_menu_show_menu(w);
 }

@@ -75,16 +75,16 @@ otk_widget_t *otk_button_grid_new (const char *text,
 			      otk_button_cb_t cb,
 			      void *user_data);
 
-otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, 
+otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment,
                              const char *text);
 
-otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h, 
+otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h,
 			  otk_list_cb_t cb,
 			  void *user_data);
 otk_widget_t *otk_slider_new (otk_widget_t *win, int x, int y, int w, int h, otk_slider_cb_t cb);
 otk_widget_t *otk_slider_grid_new (otk_slider_cb_t cb);
 
-otk_widget_t *otk_selector_new(otk_widget_t *win, int x, int y, 
+otk_widget_t *otk_selector_new(otk_widget_t *win, int x, int y,
                            int w, int h, const char *const *items, int num,
 			   otk_selector_cb_t cb,
 			   void *cb_data);

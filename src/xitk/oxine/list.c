@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (C) 2003-2009 the oxine project
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -44,7 +44,7 @@ typedef struct node_s {
   struct node_s    *next, *prev;
   void             *content;
   int              priority;
-  
+
 } node_t;
 
 
@@ -104,23 +104,23 @@ void list_free(list_t *l) {
     printf ("list: tried to free empty list\n");
     abort();
   }
- 
+
   if (!l->first) {
-  
+
     ho_free(l);
 
     return;
   }
 
   node = l->first;
-  
+
   while(node) {
     node_t *n = node;
-    
+
     node = n->next;
     ho_free(n);
   }
-  
+
   ho_free(l);
 }
 
@@ -128,7 +128,7 @@ void *list_first_content (list_t *l) {
 
   l->cur = l->first;
 
-  if (l->first) 
+  if (l->first)
     return l->first->content;
   else
     return NULL;
@@ -140,25 +140,25 @@ void *list_next_content (list_t *l) {
     if (l->cur->next) {
       l->cur = l->cur->next;
       return l->cur->content;
-    } 
+    }
     else
       return NULL;
-    
+
   } else {
     printf ("list: next_content - passed end of list\n");
     abort ();
-  }    
+  }
 }
 
 void *list_current_content (list_t *l) {
   if (l->cur) {
 
     return l->cur->content;
-    
+
   } else {
     printf ("list: next_content - passed end of list\n");
     abort ();
-  }    
+  }
 }
 
 int list_is_empty (list_t *l) {
@@ -175,7 +175,7 @@ void *list_last_content (list_t *l) {
   if (l->last) {
     l->cur = l->last;
     return l->last->content;
-  } else 
+  } else
     return NULL;
 }
 
@@ -185,18 +185,18 @@ void *list_prev_content (list_t *l) {
     if (l->cur->prev) {
       l->cur = l->cur->prev;
       return l->cur->content;
-    } 
+    }
     else
       return NULL;
   } else {
     printf ("list: passed begin of list\n");
     abort ();
-  }    
+  }
 }
 
 void list_append_priority_content (list_t *l, void *content, int priority) {
   node_t *node;
-  
+
 #ifdef DEBUG
   char tag[TAG_SIZE + 12];
 
@@ -205,7 +205,7 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
 #else
   node = ho_new(node_t);
 #endif
-  
+
   node->content = content;
   node->priority = priority;
 
@@ -238,10 +238,10 @@ void list_append_priority_content (list_t *l, void *content, int priority) {
         l->last = node;
         break;
       }
-     
+
       cur = cur->next;
     }
-  } 
+  }
   else {
     l->first = l->last = l->cur = node;
     node->prev = node->next = NULL;
@@ -259,7 +259,7 @@ void _list_append_content(list_t *l, void *content, const char *file, int line) 
 #else
 void list_append_content (list_t *l, void *content) {
   node_t *node;
-  
+
   node = ho_new(node_t);
 #endif
   node->content = content;
@@ -270,7 +270,7 @@ void list_append_content (list_t *l, void *content) {
     l->last->next = node;
     l->last = node;
     l->cur = node;
-  } 
+  }
   else {
     l->first = l->last = l->cur = node;
     node->prev = node->next = NULL;
@@ -279,7 +279,7 @@ void list_append_content (list_t *l, void *content) {
 
 void list_insert_content (list_t *l, void *content) {
   node_t *nodecur, *nodenew, *nodeprev;
-  
+
 #ifdef DEBUG
   char tag[TAG_SIZE + 12];
 
@@ -295,7 +295,7 @@ void list_insert_content (list_t *l, void *content) {
     list_append_content(l, content);
     return;
   }
-  
+
   nodeprev = nodecur->prev;
   nodecur->prev = nodenew;
   nodenew->next = nodecur;
@@ -315,11 +315,11 @@ void list_delete_current (list_t *l) {
 
   if(node_cur->prev) {
     node_cur->prev->next = node_cur->next;
-  } 
+  }
   else { /* First entry */
     l->first = node_cur->next;
   }
-  
+
   if(node_cur->next) {
     node_cur->next->prev = node_cur->prev;
     l->cur = node_cur->next;
@@ -338,15 +338,15 @@ void list_delete_current (list_t *l) {
 #define _g_list_new g_list_new
 g_list_t* g_list_new (void) {
   g_list_t *list;
-  
+
   list = ho_new(g_list_t);
-  
+
   return list;
 }
 
 void g_list_free (g_list_t *list) {
   g_list_t *last;
-  
+
   while (list)
   {
     last = list;
@@ -363,10 +363,10 @@ void g_list_free_1 (g_list_t *list) {
 g_list_t* g_list_append (g_list_t *list, void* data) {
   g_list_t *new_list;
   g_list_t *last;
-  
+
   new_list = _g_list_new ();
   new_list->data = data;
-  
+
   if (list)
   {
     last = g_list_last (list);
@@ -381,10 +381,10 @@ g_list_t* g_list_append (g_list_t *list, void* data) {
 
 g_list_t* g_list_prepend (g_list_t *list, void* data) {
   g_list_t *new_list;
-  
+
   new_list = _g_list_new ();
   new_list->data = data;
-  
+
   if (list)
   {
     if (list->prev)
@@ -395,26 +395,26 @@ g_list_t* g_list_prepend (g_list_t *list, void* data) {
     list->prev = new_list;
     new_list->next = list;
   }
-  
+
   return new_list;
 }
 
 g_list_t* g_list_insert (g_list_t *list, void* data, int position) {
   g_list_t *new_list;
   g_list_t *tmp_list;
-  
+
   if (position < 0)
     return g_list_append (list, data);
   else if (position == 0)
     return g_list_prepend (list, data);
-  
+
   tmp_list = g_list_nth (list, position);
   if (!tmp_list)
     return g_list_append (list, data);
-  
+
   new_list = _g_list_new ();
   new_list->data = data;
-  
+
   if (tmp_list->prev)
   {
     tmp_list->prev->next = new_list;
@@ -422,7 +422,7 @@ g_list_t* g_list_insert (g_list_t *list, void* data, int position) {
   }
   new_list->next = tmp_list;
   tmp_list->prev = new_list;
-  
+
   if (tmp_list == list)
     return new_list;
   else
@@ -475,7 +475,7 @@ g_list_t* g_list_insert_before (g_list_t *list, g_list_t *sibling, void* data) {
 
 g_list_t * g_list_concat (g_list_t *list1, g_list_t *list2) {
   g_list_t *tmp_list;
-  
+
   if (list2)
   {
     tmp_list = g_list_last (list1);
@@ -485,13 +485,13 @@ g_list_t * g_list_concat (g_list_t *list1, g_list_t *list2) {
       list1 = list2;
     list2->prev = tmp_list;
   }
-  
+
   return list1;
 }
 
 g_list_t* g_list_remove (g_list_t *list, const void *data) {
   g_list_t *tmp;
-  
+
   tmp = list;
   while (tmp)
   {
@@ -503,12 +503,12 @@ g_list_t* g_list_remove (g_list_t *list, const void *data) {
 	tmp->prev->next = tmp->next;
       if (tmp->next)
 	tmp->next->prev = tmp->prev;
-      
+
       if (list == tmp)
 	list = list->next;
-      
+
       _g_list_free_1 (tmp);
-      
+
       break;
     }
   }
@@ -547,14 +547,14 @@ static inline g_list_t* _g_list_remove_link (g_list_t *list, g_list_t *link) {
       link->prev->next = link->next;
     if (link->next)
       link->next->prev = link->prev;
-    
+
     if (link == list)
       list = list->next;
-    
+
     link->next = NULL;
     link->prev = NULL;
   }
-  
+
   return list;
 }
 
@@ -595,7 +595,7 @@ g_list_t* g_list_copy (g_list_t *list) {
 
 g_list_t* g_list_reverse (g_list_t *list) {
   g_list_t *last;
-  
+
   last = NULL;
   while (list)
     {
@@ -604,28 +604,28 @@ g_list_t* g_list_reverse (g_list_t *list) {
       last->next = last->prev;
       last->prev = list;
     }
-  
+
   return last;
 }
 
 g_list_t* g_list_nth (g_list_t *list, unsigned int  n) {
   while ((n-- > 0) && list)
     list = list->next;
-  
+
   return list;
 }
 
 g_list_t* g_list_nth_prev (g_list_t *list, unsigned int n) {
   while ((n-- > 0) && list)
     list = list->prev;
-  
+
   return list;
 }
 
 void* g_list_nth_data (g_list_t *list, unsigned int n) {
   while ((n-- > 0) && list)
     list = list->next;
-  
+
   return list ? list->data : NULL;
 }
 
@@ -636,7 +636,7 @@ g_list_t* g_list_find (g_list_t *list, const void *data) {
       break;
     list = list->next;
   }
-  
+
   return list;
 }
 
@@ -689,7 +689,7 @@ g_list_t* g_list_last (g_list_t *list) {
     while (list->next)
       list = list->next;
   }
-  
+
   return list;
 }
 
@@ -699,20 +699,20 @@ g_list_t* g_list_first (g_list_t *list) {
     while (list->prev)
       list = list->prev;
   }
-  
+
   return list;
 }
 
 unsigned int g_list_length (g_list_t *list) {
   unsigned int length;
-  
+
   length = 0;
   while (list)
   {
     length++;
     list = list->next;
   }
-  
+
   return length;
 }
 
@@ -732,16 +732,16 @@ g_list_t* g_list_insert_sorted (g_list_t *list, void *data, list_compare func) {
   int cmp;
 
   if (!func) return list;
-  
-  if (!list) 
+
+  if (!list)
   {
     new_list = _g_list_new ();
     new_list->data = data;
     return new_list;
   }
-  
+
   cmp = (*func) (data, tmp_list->data);
-  
+
   while ((tmp_list->next) && (cmp > 0))
   {
     tmp_list = tmp_list->next;
@@ -757,7 +757,7 @@ g_list_t* g_list_insert_sorted (g_list_t *list, void *data, list_compare func) {
     new_list->prev = tmp_list;
     return list;
   }
-   
+
   if (tmp_list->prev)
   {
     tmp_list->prev->next = new_list;
@@ -765,7 +765,7 @@ g_list_t* g_list_insert_sorted (g_list_t *list, void *data, list_compare func) {
   }
   new_list->next = tmp_list;
   tmp_list->prev = new_list;
- 
+
   if (tmp_list == list)
     return new_list;
   else
@@ -773,13 +773,13 @@ g_list_t* g_list_insert_sorted (g_list_t *list, void *data, list_compare func) {
 }
 
 #if 0
-static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compare_func, 
+static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compare_func,
     int use_data, void *user_data) {
-  
+
   g_list_t list, *l, *lprev;
   int cmp;
 
-  l = &list; 
+  l = &list;
   lprev = NULL;
 
   while (l1 && l2)
@@ -793,15 +793,15 @@ static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compar
     {
       l->next = l1;
       l = l->next;
-      l->prev = lprev; 
+      l->prev = lprev;
       lprev = l;
       l1 = l1->next;
-    } 
-    else 
+    }
+    else
     {
       l->next = l2;
       l = l->next;
-      l->prev = lprev; 
+      l->prev = lprev;
       lprev = l;
       l2 = l2->next;
     }
@@ -811,28 +811,28 @@ static g_list_t *g_list_sort_merge (g_list_t *l1, g_list_t *l2, list_func compar
 
   return list.next;
 }
- 
-static g_list_t* g_list_sort_real (g_list_t *list, list_func compare_func, 
+
+static g_list_t* g_list_sort_real (g_list_t *list, list_func compare_func,
     int use_data, void *user_data) {
-  
+
   g_list_t *l1, *l2;
-  
-  if (!list) 
+
+  if (!list)
     return NULL;
-  if (!list->next) 
+  if (!list->next)
     return list;
-  
-  l1 = list; 
+
+  l1 = list;
   l2 = list->next;
 
   while ((l2 = l2->next) != NULL)
   {
-    if ((l2 = l2->next) == NULL) 
+    if ((l2 = l2->next) == NULL)
       break;
     l1 = l1->next;
   }
-  l2 = l1->next; 
-  l1->next = NULL; 
+  l2 = l1->next;
+  l1->next = NULL;
 
   return g_list_sort_merge (g_list_sort_real (list, compare_func, use_data, user_data),
 			    g_list_sort_real (l2, compare_func, use_data, user_data),
@@ -871,7 +871,7 @@ static g_list_t* g_list_sort2 (g_list_t *list, list_compare compare_func) {
     tmp2->next = NULL;
   }
   /* Now: runs = [[12],[2,4,11],[2,4,6],[1,1,12]].  */
-  
+
   while (runs->next)
   {
     /* We have more than one run.  Merge pairwise.  */

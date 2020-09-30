@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -116,7 +116,7 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
   xitk_font_t *fs;
   _inputtext_pos_t want, ref, try, best;
   int tries;
-      
+
   if (!wp->text.buf)
     return 0;
   if ((pos->bytes == 0) || (pos->pixels == 0)) {
@@ -329,7 +329,7 @@ static void _notify_destroy (_inputtext_private_t *wp) {
     xitk_image_free_image (&wp->text.temp_img.image);
     if (!wp->skin_element_name.s)
       xitk_image_free_image (&wp->skin.image);
-    
+
     xitk_short_string_deinit (&wp->skin_element_name);
     _inputtext_sbuf_unset (wp);
     xitk_short_string_deinit (&wp->fontname);
@@ -354,7 +354,7 @@ static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     if (wp->w.visible == 1) {
       xitk_image_t *skin = wp->skin.image;
-      
+
       if (skin->mask)
         return xitk_is_cursor_out_mask (&wp->w, skin->mask, wp->skin.x + x, wp->skin.y + y);
     } else {
@@ -368,7 +368,7 @@ int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen)
   int len = 0;
   if(event) {
     XKeyEvent  pkeyev = event->xkey;
-    
+
     XLOCK (xitk_x_lock_display, pkeyev.display);
     len = XLookupString(&pkeyev, kbuf, kblen, ksym, NULL);
     XUNLOCK (xitk_x_unlock_display, pkeyev.display);
@@ -446,9 +446,9 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
-      
+
   state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? _IT_FOCUS : _IT_NORMAL;
-      
+
   xcolor.flags = DoRed | DoBlue | DoGreen;
 
   /* Try to load font */
@@ -456,7 +456,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   if (wp->text.buf && wp->text.buf[0]) {
     if (wp->fontname.s[0])
       fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
-    if (!fs) 
+    if (!fs)
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
     if (!fs)
       XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
@@ -666,7 +666,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     if (wp->w.have_focus == FOCUS_LOST)
       wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;
-    
+
     if (wp->w.enable && (!wp->cursor_focus)
        && (xitk_is_mouse_over_widget (&wp->w)))
       _cursor_focus (wp, wp->w.wl->win, 1);
@@ -680,7 +680,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
       if (_inputtext_find_text_pos (wp, wp->text.buf + wp->text.draw_start, &pos, NULL, 0))
         wp->text.cursor_pos = pos.bytes + wp->text.draw_start;
     }
-    
+
     _paint_inputtext (wp);
   }
 
@@ -735,11 +735,11 @@ static void _notify_change_skin (_inputtext_private_t *wp, xitk_skin_config_t *s
       xitk_skin_lock(skonfig);
       _xitk_inputtext_apply_skin (wp, skonfig);
       xitk_skin_unlock(skonfig);
-      
+
       wp->w.width    = wp->skin.width / 2;
       wp->w.height   = wp->skin.height;
       wp->text.box_width = wp->w.width - 2 * 2;
-      
+
       xitk_shared_image (wp->w.wl, "xitk_inputtext_temp",
         wp->w.width + 2 * wp->w.height, wp->w.height, &wp->text.temp_img.image);
       wp->text.temp_img.x = wp->w.height;
@@ -1212,7 +1212,7 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   wp->w.height          = wp->skin.height;
 
   _xitk_inputtext_set_text (wp, it->text);
-    
+
   wp->max_length        = it->max_length;
 
   wp->text.box_width    = wp->w.width - 2 * 2;

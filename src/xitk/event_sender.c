@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -98,7 +98,7 @@ struct xui_event_sender_st {
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   int old_sticky_value = gui->eventer_sticky;
-  
+
   gui->eventer_sticky = cfg->num_value;
   if (gui->eventer) {
     if ((!old_sticky_value) && gui->eventer_sticky) {
@@ -325,7 +325,7 @@ static void event_sender_exit (xitk_widget_t *w, void *data, int state) {
     es->visible = 0;
 
     gui_save_window_pos (es->gui, "eventer", es->widget_key);
-    
+
     xitk_unregister_event_handler (&es->widget_key);
     xitk_window_destroy_window (es->xwin);
     es->xwin = NULL;
@@ -396,7 +396,7 @@ void event_sender_panel (gGui_t *gui) {
 
   es->x = es->y = 80;
   gui_load_window_pos (es->gui, "eventer", &es->x, &es->y);
-  
+
   if (es->gui->eventer_sticky && panel_is_visible (es->gui->panel) > 1) {
     int  px, py, pw;
     panel_get_window_position (es->gui->panel, &px, &py, &pw, NULL);

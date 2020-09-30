@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (C) 2003 by Fredrik Noring
  * Copyright (C) 2003-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -71,7 +71,7 @@ static void load_config(void)
 	if(!__xineui_global_config_file)
 	{
 		__xineui_global_config_file = malloc(strlen(xine_get_homedir())
-						 + strlen(XINE_CONFIG_DIR) 
+						 + strlen(XINE_CONFIG_DIR)
 						 + strlen(XINE_CONFIG_FILE)
 						 + 3);
 		sprintf(__xineui_global_config_file, "%s/%s", xine_get_homedir(),
@@ -80,7 +80,7 @@ static void load_config(void)
                         fprintf(stderr, "Error creating %s: %d (%s)\n",
                                 __xineui_global_config_file, errno, strerror(errno));
                 }
-                
+
 		sprintf(__xineui_global_config_file + strlen(__xineui_global_config_file), "/%s",
 			XINE_CONFIG_FILE);
 	}
@@ -91,7 +91,7 @@ static void load_config(void)
 static int check_version(void)
 {
 	int major, minor, sub;
-	
+
 	if(xine_check_version(1, 0, 0))
 		return 1;
 
@@ -119,7 +119,7 @@ static void event_listener(void *user_data, const xine_event_t *event)
 static int open_and_play(const char *mrl)
 {
 
-        if(!strncasecmp(mrl, "cfg:/", 5)) 
+        if(!strncasecmp(mrl, "cfg:/", 5))
 	{
 		config_mrl(mrl);
 		return 0;
@@ -146,7 +146,7 @@ static int init_video(void)
 	static struct fbxine_callback exit_callback;
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_video);
-	
+
 	if (!strcmp(fbxine.video_port_id, "dxr3"))
 	    fbxine.video_port =
 	        xine_open_video_driver(__xineui_global_xine_instance, fbxine.video_port_id,
@@ -164,7 +164,7 @@ static int init_video(void)
 	    fprintf(stderr, "Video port failed.\n");
 	    return 0;
 	}
-	
+
 
 	return 1;
 }
@@ -182,7 +182,7 @@ static int init_audio(void)
 
 	if(!fbxine.audio_port_id)
 		fbxine.audio_port_id =
-			xine_config_register_string(__xineui_global_xine_instance, 
+			xine_config_register_string(__xineui_global_xine_instance,
 						    "audio.driver", "oss",
 						    "audio driver to use",
 						    0, 20, 0, 0);
@@ -193,7 +193,7 @@ static int init_audio(void)
 		fprintf(stderr, "Audio port failed.\n");
 		return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -214,9 +214,9 @@ static int init_stream(void)
 					fbxine.video_port);
 	xine_set_param(fbxine.stream, XINE_PARAM_VERBOSITY, __xineui_global_verbosity);
 
-	fbxine.event_queue = xine_event_new_queue(fbxine.stream);  
-  
-	xine_event_create_listener_thread(fbxine.event_queue, 
+	fbxine.event_queue = xine_event_new_queue(fbxine.stream);
+
+	xine_event_create_listener_thread(fbxine.event_queue,
 	                                  event_listener, NULL);
 
 	return 1;
@@ -232,7 +232,7 @@ static int init_xine(void)
 	static struct fbxine_callback exit_callback;
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_xine);
-	
+
 	__xineui_global_xine_instance = xine_new();
 	if(!__xineui_global_xine_instance)
 	{
@@ -273,7 +273,7 @@ static int fbxine_init(int argc, char **argv)
 
 	if (stdctl)
 	        fbxine_init_stdctl();
-	else 
+	else
 	        if(!fbxine_init_keyboard())
 		        return 0;;
 	if(!init_video())
@@ -290,15 +290,15 @@ static int fbxine_init(int argc, char **argv)
 	/* Initialize posts, if required */
 	if(pplugins_num) {
 	  char             **plugin = pplugins;
-	  
+
 	  while(*plugin) {
 	    vpplugin_parse_and_store_post((const char *) *plugin);
 	    applugin_parse_and_store_post((const char *) *plugin);
 	    printf("1\n");
-	    
+
 	    plugin++;
 	  }
-    
+
 	  vpplugin_rewire_posts();
 	  applugin_rewire_posts();
 	}
@@ -325,7 +325,7 @@ static void install_abort(void)
 #endif
 	};
 	size_t i;
-	
+
 	for(i = 0; i < sizeof(trapped)/sizeof(int); i++)
 		signal(trapped[i], (void(*)(int))fbxine_do_abort);
 }
@@ -333,13 +333,13 @@ static void install_abort(void)
 int main(int argc, char *argv[])
 {
 	int exit_code = 1;
-	
+
 	install_abort();
-	
+
 	pthread_mutex_lock(&fbxine.mutex);
 	if(fbxine_init(argc, argv))
 	{
-		while(fbxine.current_mrl < fbxine.num_mrls) 
+		while(fbxine.current_mrl < fbxine.num_mrls)
 		{
 			if(open_and_play(fbxine.mrl[fbxine.current_mrl]))
 			{
@@ -352,6 +352,6 @@ int main(int argc, char *argv[])
 	}
 	fbxine_do_exit();
 	pthread_mutex_unlock(&fbxine.mutex);
-	
+
 	return exit_code;
 }

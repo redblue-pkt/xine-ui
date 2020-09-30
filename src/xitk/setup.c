@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -84,7 +84,7 @@ struct xui_setup_st {
   _setup_section_t      sections[SETUP_MAX_SECTIONS + 1];
   char                 *section_names[SETUP_MAX_SECTIONS];
   int                   num_sections;
-  
+
   xitk_widget_t        *slider_wg;
 
   _widget_triplet_t    *wg;
@@ -120,7 +120,7 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
     xitk_unregister_event_handler (&setup->dialog);
 
   gui_save_window_pos (setup->gui, "setup", setup->kreg);
-    
+
   xitk_unregister_event_handler (&setup->kreg);
 
   xitk_window_destroy_window (setup->xwin);
@@ -132,7 +132,7 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
   setup->gui->setup = NULL;
 
   free (setup->wg);
-      
+
   free (setup);
 }
 
@@ -505,10 +505,10 @@ static void setup_add_nothing_available (xui_setup_t *setup, const char *title, 
   xitk_widget_t           *frame = NULL;
   xitk_image_t            *image;
   xitk_image_widget_t      im;
-  
+
   image = xitk_image_create_image_from_string (setup->gui->xitk, tabsfontname,
     FRAME_WIDTH, ALIGN_CENTER, (char *)title);
-  
+
   XITK_WIDGET_INIT (&im);
   im.skin_element_name = NULL;
   wt->frame =  xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
@@ -541,14 +541,14 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
   xitk_disable_widget (setup->slider_wg);
   xitk_hide_widget (setup->slider_wg);
-  
+
   section = setup->sections + s;
   memset (&entry, 0, sizeof (entry));
 
   cfg_err_result = setup->wg ? xine_config_get_first_entry (setup->gui->xine, &entry) : 0;
-    
+
   while (cfg_err_result) {
-      
+
     if ((entry.exp_level <= setup->gui->experience_level)
       && !strncmp (entry.key, section->name, section->nlen)
       && entry.description
@@ -697,7 +697,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
           }
           break;
       }
-      
+
       {
         int lx;
         char b[200], *p = b, *e = b + sizeof (b);
@@ -732,7 +732,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         }
       }
     }
-      
+
     memset (&entry, 0, sizeof (entry));
     cfg_err_result = xine_config_get_next_entry (setup->gui->xine, &entry);
   }
@@ -799,12 +799,12 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   setup->first_displayed = 0;
 
   setup_section_widgets (setup, section);
-  
+
   setup_clear_tab (setup);
   setup_paint_widgets (setup, 0);
 }
 
-/* 
+/*
  * collect config categories, setup tab widget
  */
 #ifdef XINE_SARRAY_MODE_UNIQUE
@@ -884,8 +884,8 @@ static void setup_sections (xui_setup_t *setup) {
         s->num_entries = 1;
         setup->num_sections++;
       }
-    }      
-    
+    }
+
     cfg_err_result = xine_config_get_next_entry (setup->gui->xine, &entry);
   }
 
@@ -916,7 +916,7 @@ static void setup_sections (xui_setup_t *setup) {
   xitk_add_widget (setup->widget_list, setup->tabs);
 
   setup->th = xitk_get_widget_height (setup->tabs) - 1;
-  
+
   xitk_enable_and_show_widget (setup->tabs);
 
   bg = xitk_window_get_background_pixmap (setup->xwin);
@@ -1011,9 +1011,9 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     xitk_label_widget_t lbl;
     char *label = _("(*)  you need to restart xine for this setting to take effect");
     int           len;
-    
+
     len = xitk_font_get_string_length (fs, label);
-    
+
     XITK_WIDGET_INIT(&lbl);
     lbl.skin_element_name   = NULL;
     lbl.label               = label;

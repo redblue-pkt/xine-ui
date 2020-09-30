@@ -79,7 +79,7 @@ const char *playpause_strings[] = { "<", ">" };
 
 static void media_pause_cb(void *data, int i) {
   oxine_t *oxine = (oxine_t*) data;
- 
+
   switch(i) {
     case 1:
       odk_set_speed(oxine->odk, ODK_SPEED_NORMAL);
@@ -117,7 +117,7 @@ static void media_tracks_quit(void *data) {
   oxine->mode = OXINE_MODE_NORMAL;
   printf("%d\n", oxine->mode);
   oxine->pauseplay = NULL;
-  otk_clear(oxine->otk); 
+  otk_clear(oxine->otk);
 }
 
 static void media_tracks_cb(void *data) {
@@ -138,7 +138,7 @@ static void media_tracks_cb(void *data) {
     /* printf("%d %s\n", i, str[i]); */
     otk_add_listentry(list, str[i], str[i], -1);
     i++;
-  } 
+  }
   otk_list_set_pos(list, 0);
   otk_set_focus(list);
   otk_draw_all(oxine->otk);
@@ -147,13 +147,13 @@ static void media_tracks_cb(void *data) {
 static void info_button_time(void *data) {
   oxine_t *oxine = (oxine_t *)data;
   int ret, pos_time, length;
-  
-  ret = odk_get_pos_length_high(oxine->odk, NULL, &pos_time, &length);  
+
+  ret = odk_get_pos_length_high(oxine->odk, NULL, &pos_time, &length);
   /* oxine->time = malloc(sizeof(char)*255); */
   if(ret) {
     pos_time /= 1000;
     length /= 1000;
-    sprintf(oxine->time, "(%d:%02d:%02d / %d:%02d:%02d)", pos_time/3600, (pos_time%3600)/60, ((pos_time%3600)%60), 
+    sprintf(oxine->time, "(%d:%02d:%02d / %d:%02d:%02d)", pos_time/3600, (pos_time%3600)/60, ((pos_time%3600)%60),
 	    length/3600, (length%3600)/60, ((length%3600)%60));
   }
   else sprintf(oxine->time, "N/A");
@@ -164,7 +164,7 @@ static void media_info_close_cb(void *data) {
   oxine_t *oxine = (oxine_t*) data;
 
   if (!oxine->info_window) return;
-  
+
   otk_destroy_widget(oxine->info_window);
   oxine->info_window = NULL;
   otk_draw_all(oxine->otk);
@@ -203,7 +203,7 @@ static void media_info_cb(void *data) {
   if (oxine->lines[0]) ho_free(oxine->lines[0]);
   if (oxine->lines[1]) ho_free(oxine->lines[1]);
   if (oxine->lines[2]) ho_free(oxine->lines[2]);
-  
+
   oxine->lines[0] = odk_get_meta_info(oxine->odk, XINE_META_INFO_TITLE);
   if(!oxine->lines[0] && buf2) oxine->lines[0] = ho_strdup(buf2);
   if(oxine->lines[0]) cline++;
@@ -224,7 +224,7 @@ static void media_info_cb(void *data) {
   oxine->year = odk_get_meta_info(oxine->odk, XINE_META_INFO_YEAR);
   if(!oxine->year) oxine->year = ho_strdup("Year N/A");
 */
-  ret = odk_get_pos_length_high(oxine->odk, NULL, &pos_time, &length);  
+  ret = odk_get_pos_length_high(oxine->odk, NULL, &pos_time, &length);
 
   if(ret && (length > 0)) {
     oxine->lines[cline] = ho_newstring(255);
@@ -237,37 +237,37 @@ static void media_info_cb(void *data) {
 
   if (oxine->lines[0])
   otk_label_new(oxine->info_window, 5, 40, OTK_ALIGN_LEFT|OTK_ALIGN_VCENTER, oxine->lines[0]);
-  
+
   if (oxine->lines[1])
   otk_label_new(oxine->info_window, 5, 110, OTK_ALIGN_LEFT|OTK_ALIGN_VCENTER, oxine->lines[1]);
-  
+
   if (oxine->lines[2])
   otk_label_new(oxine->info_window, 5, 180, OTK_ALIGN_LEFT|OTK_ALIGN_VCENTER, oxine->lines[2]);
-  
+
   /*
   layout = otk_layout_new(oxine->info_window, 10, 10, 680, 480, 6, 1);
 
-  b = otk_button_grid_new(oxine->title, media_freeandreturnto_cb, oxine);  
+  b = otk_button_grid_new(oxine->title, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 0, 1, 1);
   otk_set_focus(b);
- 
-  b = otk_button_grid_new(oxine->artist, media_freeandreturnto_cb, oxine);  
+
+  b = otk_button_grid_new(oxine->artist, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 1, 1, 1);
 
-  b = otk_button_grid_new(oxine->genre, media_freeandreturnto_cb, oxine);  
+  b = otk_button_grid_new(oxine->genre, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 2, 1, 1);
-   
-  b = otk_button_grid_new(oxine->album, media_freeandreturnto_cb, oxine);  
+
+  b = otk_button_grid_new(oxine->album, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 3, 1, 1);
- 
-  b = otk_button_grid_new(oxine->year, media_freeandreturnto_cb, oxine);  
+
+  b = otk_button_grid_new(oxine->year, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 4, 1, 1);
-  
-  b = otk_button_grid_new(oxine->time, media_freeandreturnto_cb, oxine);  
+
+  b = otk_button_grid_new(oxine->time, media_freeandreturnto_cb, oxine);
   otk_layout_add_widget(layout, b, 0, 5, 1, 1);
   otk_button_uc_set(b, info_button_time, oxine);
  */
-  
+
   otk_draw_all(oxine->otk);
 
   schedule_job(5000, media_info_close_cb, oxine);
@@ -329,7 +329,7 @@ static void autoplay_cb (void *data) {
   }
 
   oxine_instance_unget(oxine);
-}  
+}
 
 
 #if 0
@@ -349,14 +349,14 @@ static void playing_menu_cb(void *data) {
    otk_widget_t *b, *l;
    otk_widget_t *layout;
    int pos_time, length;
- 
+
    oxine->pauseplay = NULL;
    if (oxine->main_window) {
      otk_destroy_widget(oxine->main_window);
      oxine->main_window = NULL;
      otk_draw_all(oxine->otk);
    }
-   
+
    /* otk_clear(oxine->otk); */
 
    if(oxine->mode == OXINE_MODE_PLAY_MENU) {
@@ -366,18 +366,18 @@ static void playing_menu_cb(void *data) {
    oxine->mode = OXINE_MODE_PLAY_MENU;
 
    oxine->main_window = otk_window_new (oxine->otk, NULL, 50, 400, 700, 150);
-   layout = otk_layout_new(oxine->main_window, 10, 10, 680, 130, 2, 6); 
-   oxine->pauseplay = otk_selector_grid_new (playpause_strings, 2, media_pause_cb, oxine);   
+   layout = otk_layout_new(oxine->main_window, 10, 10, 680, 130, 2, 6);
+   oxine->pauseplay = otk_selector_grid_new (playpause_strings, 2, media_pause_cb, oxine);
    otk_layout_add_widget(layout, oxine->pauseplay, 0, 0, 1, 1);
    otk_set_focus(oxine->pauseplay);
    if (odk_get_speed(oxine->odk) == ODK_SPEED_PAUSE) otk_selector_set(oxine->pauseplay, 2);
-   
-   b = otk_button_grid_new ("}", media_stop_cb, oxine);  
+
+   b = otk_button_grid_new ("}", media_stop_cb, oxine);
    otk_layout_add_widget(layout, b, 1, 0, 1, 1);
-   
+
 /*   b = otk_button_grid_new ("Volume", NULL, NULL);
    otk_layout_add_widget(layout, b, 0, 1, 1, 1);
- 
+
    b = otk_slider_grid_new (odk_get_volume);
    otk_layout_add_widget(layout, b, 1, 1, 1, 1);
 
@@ -388,25 +388,25 @@ static void playing_menu_cb(void *data) {
      b = otk_button_grid_new ("T", media_tracks_cb, oxine);
      otk_layout_add_widget(layout, b, 0, 2, 1, 1);
    }*/
-   
+
    if(oxine->cd_in_use) {
      b = otk_button_grid_new ("T", media_tracks_cb, oxine);
      otk_layout_add_widget(layout, b, 3, 0, 1, 1);
    }
-   
+
    b = otk_slider_grid_new (odk_get_seek);
    otk_layout_add_widget(layout, b, 2, 1, 4, 1);
    otk_set_update(b,1);
 
    b = otk_button_grid_new ("i", media_info_cb, oxine);
    otk_layout_add_widget(layout, b, 2, 0, 1, 1);
-   
+
    if (!oxine->pos_str) oxine->pos_str = ho_newstring(64);
    if (odk_get_pos_length_high(oxine->odk, NULL, &pos_time, &length)) {
      pos_time /= 1000;
      format_time(oxine->pos_str, pos_time);
    }
-   
+
    l = otk_label_new (oxine->main_window,  110, 100, OTK_ALIGN_CENTER|OTK_ALIGN_VCENTER, oxine->pos_str);
    otk_set_update(l,1);
    otk_button_uc_set(b, playing_menu_update, oxine);
@@ -449,7 +449,7 @@ static char *read_entire_file (const char *mrl, int *file_size) {
 }
 
 static menuitem_t *menuitem_load(xml_node_t *node) {
-  
+
   menuitem_t *item = ho_new(menuitem_t);
 
   item->x = atoi(xml_parser_get_property(node, "x"));
@@ -538,7 +538,7 @@ static int read_main_menu(oxine_t *oxine, list_t *list, const char *mrl) {
 
     node=node->next;
   }
-  
+
   xml_parser_free_tree(node);
   xml_parser_finalize_R (xml);
   ho_free(file);
@@ -551,7 +551,7 @@ static void main_menu_init(oxine_t *oxine)
   char         mmpath[XITK_NAME_MAX];
 
   oxine->main_menu_items = list_new();
-  
+
   memset(mmpath,0,sizeof(mmpath));
   snprintf(mmpath,sizeof(mmpath),"%s/.xine/oxine/mainmenu", xine_get_homedir());
   if (!read_main_menu(oxine, oxine->main_menu_items, mmpath)) {
@@ -587,7 +587,7 @@ static void main_menu_free(list_t *list) {
 }
 
 static void main_menu_cb(void *data) {
-  
+
   oxine_t *oxine = (oxine_t*) data;
   menuitem_t *item;
   otk_widget_t *b;
@@ -610,15 +610,15 @@ static void main_menu_cb(void *data) {
   b = otk_button_new (oxine->main_window, 50, 45, 290, 60, "Play Disc", disc_cb, oxine);
   otk_set_focus(b);
   */
-  
+
   b = otk_button_new (oxine->main_window, 360, 45, 290, 60, "Mediamarks", mediamarks_cb, oxine);
   otk_set_focus(b);
-    
+
   /*
   b = otk_button_new (oxine->main_window, 50, 150, 290, 60, "Analogue TV", tv_cb, oxine);
   otk_set_focus(b);
   */
-  
+
   otk_button_new (oxine->main_window, 360, 150, 290, 60, "Playlist", playlist_cb, oxine);
 
   /*
@@ -672,7 +672,7 @@ static void oxine_error_msg(const char *text)
     return;
 
   s = text2 = strdup(text);
-  
+
   otk_clear(oxine->otk);
   oxine->main_window = otk_window_new (oxine->otk, NULL, 100, 150, 600, 300);
 
@@ -683,12 +683,12 @@ static void oxine_error_msg(const char *text)
     if( (s = strchr(s,'\n')) ) {
       *s++ = '\0';
     }
-    
+
     label = otk_label_new(oxine->main_window, 300, 30 + l*25,
                           OTK_ALIGN_CENTER|OTK_ALIGN_VCENTER, line);
     otk_label_set_font_size(label, 20);
   }
-  
+
   b = otk_button_new(oxine->main_window, 260, 240, 80, 50, "OK", return_cb, oxine);
   otk_set_focus(b);
   oxine->mode = OXINE_MODE_MAINMENU;
@@ -702,19 +702,19 @@ static void oxine_error_msg(const char *text)
 /*
  * initialisation
  */
- 
+
 static oxine_t *create_oxine(void) {
   gGui_t *gui = gGui;
   oxine_t *oxine;
   xine_cfg_entry_t centry;
-  
+
   oxine = ho_new(oxine_t);
-    
+
   oxine->main_menu_cb = main_menu_cb;
 
   oxine->xine = gui->xine;
-  
-  oxine->cd_mountpoint = 
+
+  oxine->cd_mountpoint =
   xine_config_register_string (oxine->xine,
 				"gui.osdmenu.dvd_mountpoint",
 				"/dvd",
@@ -723,31 +723,31 @@ static oxine_t *create_oxine(void) {
 				10,
 				NULL,
 				NULL);
- 
+
   if (xine_config_lookup_entry (oxine->xine, "input.dvd_device", &centry)) {
     oxine->cd_device = centry.str_value;
   }
 
   start_scheduler();
-  
+
   oxine->odk = odk_init (gui);
-   
+
   oxine->otk = otk_init(oxine->odk);
-    
+
   oxine->mode = OXINE_MODE_NORMAL;
-   
+
   return oxine;
 }
 
 static void destroy_oxine(oxine_t *oxine) {
-  
+
   if (oxine->otk) otk_free(oxine->otk);
   if (oxine->odk) odk_free(oxine->odk);
 
   main_menu_free(oxine->main_menu_items);
-  
+
   ho_free(oxine);
-  
+
   stop_scheduler();
 
 #ifdef DEBUG
@@ -772,7 +772,7 @@ void oxine_menu(void)
   }
 
   oxine_adapt();
-      
+
   if( oxine->mode != OXINE_MODE_MAINMENU ) {
     video_window_reset_ssaver (gGui->vwin);
     gGui->nongui_error_msg = oxine_error_msg;
@@ -804,7 +804,7 @@ int oxine_action_event(int xine_event_type)
   }
 
   ev.type = OXINE_EVENT_KEY;
-  
+
   switch( xine_event_type ) {
   default:
     oxine_instance_unget(oxine);
@@ -826,7 +826,7 @@ int oxine_action_event(int xine_event_type)
     ev.key = OXINE_KEY_SELECT;
     break;
   }
-  
+
   video_window_reset_ssaver (gGui->vwin);
   otk_send_event(oxine->otk, &ev);
   oxine_instance_unget(oxine);
@@ -848,7 +848,7 @@ int oxine_mouse_event(int xine_event_type, int x, int y) {
 
   ev.x = x;
   ev.y = y;
-    
+
   switch( xine_event_type ) {
   default:
     oxine_instance_unget(oxine);
@@ -876,7 +876,7 @@ void oxine_adapt(void)
 
   if( !oxine )
     return;
-  
+
   ev.type = OXINE_EVENT_FORMAT_CHANGED;
   otk_send_event(oxine->otk, &ev);
   oxine_instance_unget(oxine);
@@ -892,7 +892,7 @@ oxine_t *oxine_instance_get(void)
   oxine_t *oxine;
 
   pthread_mutex_lock(&oxine_instance_mutex);
-  
+
   oxine = oxine_instance;
   if (oxine)
     oxine_instance_locks++;
@@ -930,10 +930,10 @@ void oxine_exit(void)
 
   oxine_instance = NULL;
   oxine_instance_locks--;
-  
+
   while (oxine_instance_locks > 0)
     pthread_cond_wait(&oxine_instance_unlocked, &oxine_instance_mutex);
- 
+
   destroy_oxine(oxine);
 
   pthread_mutex_unlock(&oxine_instance_mutex);

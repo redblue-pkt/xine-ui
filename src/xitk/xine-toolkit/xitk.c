@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -124,7 +124,7 @@ typedef struct {
   int                         height;
 
   xitk_hull_t                 expose;
-    
+
   XEvent                     *old_event;
 
   xitk_widget_list_t         *widget_list;
@@ -199,7 +199,7 @@ typedef struct {
 
   //Window                      modalw;
   xitk_widget_t              *menu;
-  
+
   struct timeval              keypress;
 
   KeyCode                     ignore_keys[2];
@@ -215,7 +215,7 @@ typedef struct {
 #endif
 
   pid_t                       xitk_pid;
-  
+
   struct {
     Atom                      XA_WIN_LAYER;
     Atom                      XA_STAYS_ON_TOP;
@@ -521,7 +521,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
   }
   return 0;
 }
-  
+
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   Window win = w->wl->win;
@@ -618,23 +618,23 @@ void xitk_unmodal_window(Window w) {
  */
 int xitk_system(int dont_run_as_root, const char *command) {
   int pid, status;
-  
-  /* 
+
+  /*
    * Don't permit run as root
    */
   if(dont_run_as_root) {
     if(getuid() == 0)
       return -1;
   }
-  
+
   if(command == NULL)
     return 1;
-  
+
   pid = fork();
-  
+
   if(pid == -1)
     return -1;
-  
+
   if(pid == 0) {
     char *argv[4];
     argv[0] = "sh";
@@ -644,17 +644,17 @@ int xitk_system(int dont_run_as_root, const char *command) {
     execve("/bin/sh", argv, environ);
     exit(127);
   }
-  
+
   do {
     if(waitpid(pid, &status, 0) == -1) {
       if (errno != EINTR)
 	return -1;
-    } 
+    }
     else {
       return WEXITSTATUS(status);
     }
   } while(1);
-  
+
   return -1;
 }
 
@@ -665,7 +665,7 @@ void xitk_usec_sleep(unsigned long usec) {
 #ifdef HAVE_NANOSLEEP
   /* nanosleep is prefered on solaris, because it's mt-safe */
   struct timespec ts, remaining;
-  
+
   ts.tv_sec =   usec / 1000000;
   ts.tv_nsec = (usec % 1000000) * 1000;
   while (nanosleep (&ts, &remaining) == -1 && errno == EINTR)
@@ -685,14 +685,14 @@ static int _x_ignoring_error_handler(Display *display, XErrorEvent *xevent) {
 
 static int _x_error_handler(Display *display, XErrorEvent *xevent) {
   char buffer[2048];
-  
+
   XGetErrorText(display, xevent->error_code, &buffer[0], 1023);
-  
+
   XITK_WARNING("X error received: '%s'\n", buffer);
-  
+
   xitk_x_error = 1;
   return 0;
-  
+
 }
 
 void xitk_set_current_menu(xitk_widget_t *menu) {
@@ -749,7 +749,7 @@ static void xitk_signal_handler(int sig) {
   }
 
   switch (sig) {
-    
+
   case SIGINT:
   case SIGTERM:
   case SIGQUIT:
@@ -774,15 +774,15 @@ static void xitk_signal_handler(int sig) {
       void    *backtrace_array[255];
       char   **backtrace_strings;
       int      entries, i;
-      
+
       if((entries = backtrace(backtrace_array, 255))) {
 	if((backtrace_strings = backtrace_symbols(backtrace_array, entries))) {
 	  printf("Backtrace:\n");
-	  
+
 	  for(i = 0; i < entries; i++) {
 	    printf("  [%d] %s\n", i, backtrace_strings[i]);
 	  }
-	  
+
 	  free(backtrace_strings);
 	  printf("--\n");
 	}
@@ -795,7 +795,7 @@ static void xitk_signal_handler(int sig) {
   }
 }
 
-/* 
+/*
  * Desc: query the server for support for the MIT_SHM extension
  * Return:  0 = not available
  *          1 = shared XImage support available
@@ -807,7 +807,7 @@ static int xitk_check_xshm(Display *display) {
   if(XShmQueryExtension(display)) {
     int major, minor, ignore;
     Bool pixmaps;
-    
+
     if(XQueryExtension(display, "MIT-SHM", &ignore, &ignore, &ignore)) {
       if(XShmQueryVersion(display, &major, &minor, &pixmaps ) == True) {
 	if((pixmaps == True) && ((XShmPixmapFormat(display)) == ZPixmap))
@@ -833,33 +833,33 @@ static char *get_wm_name(Display *display, Window win, const char *atom_name) {
   char *wm_name = NULL;
   Atom  atom;
 
-  /* Extract WM Name */	
+  /* Extract WM Name */
   if((atom = XInternAtom(display, atom_name, True)) != None) {
     unsigned char   *prop_return = NULL;
     unsigned long    nitems_return;
     unsigned long    bytes_after_return;
     Atom             type_return, type_utf8;
     int              format_return;
-    
+
     if((XGetWindowProperty(display, win, atom, 0, 4, False, XA_STRING,
 			   &type_return, &format_return, &nitems_return,
 			   &bytes_after_return, &prop_return)) == Success) {
-      
+
       if(type_return != None) {
 	if(type_return != XA_STRING) {
 	  type_utf8 = XInternAtom(display, "UTF8_STRING", True);
 	  if(type_utf8 != None) {
-	    
+
 	    if(type_return == type_utf8) {
-	      
+
 	      if(prop_return)
 		XFree(prop_return);
 	      prop_return = NULL;
-	      
+
 	      if((XGetWindowProperty(display, win, atom, 0, 4, False, type_utf8,
 				     &type_return, &format_return, &nitems_return,
 				     &bytes_after_return, &prop_return)) == Success) {
-		
+
 		if(format_return == 8)
 		  wm_name = strdup((char *)prop_return);
 
@@ -874,12 +874,12 @@ static char *get_wm_name(Display *display, Window win, const char *atom_name) {
 	  wm_name = strdup((char *)prop_return);
 
       }
-      
+
       if(prop_return)
 	XFree(prop_return);
     }
   }
-  
+
   return wm_name;
 }
 static uint32_t xitk_check_wm(Display *display) {
@@ -887,7 +887,7 @@ static uint32_t xitk_check_wm(Display *display) {
   Atom      atom;
   uint32_t  type = WM_TYPE_UNKNOWN;
   char     *wm_name = NULL;
-  
+
   xitk->x.x_lock_display (display);
 
   if((atom = XInternAtom(display, "XFWM_FLAGS", True)) != None) {
@@ -934,7 +934,7 @@ static uint32_t xitk_check_wm(Display *display) {
     Atom             type_return;
     int              format_return;
     Status           status;
-    
+
     /* Check for Gnome Compliant WM */
     if((XGetWindowProperty(display, (XDefaultRootWindow(display)), atom, 0,
 			   1, False, XA_CARDINAL,
@@ -945,17 +945,17 @@ static uint32_t xitk_check_wm(Display *display) {
 	 ((format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0))) {
 	unsigned char   *prop_return2 = NULL;
 	Window           win_id;
-	
+
 	win_id = *(unsigned long *)prop_return;
-	
+
 	status = XGetWindowProperty(display, win_id, atom, 0,
 				    1, False, XA_CARDINAL,
 				    &type_return, &format_return, &nitems_return,
 				    &bytes_after_return, &prop_return2);
-	
+
 	if((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
-	  
-	  if((format_return == 32) && (nitems_return == 1) 
+
+	  if((format_return == 32) && (nitems_return == 1)
 	     && (bytes_after_return == 0) && (win_id == *(unsigned long *)prop_return2)) {
 	    type |= WM_TYPE_GNOME_COMP;
 	  }
@@ -966,20 +966,20 @@ static uint32_t xitk_check_wm(Display *display) {
 
 	if((wm_name = get_wm_name(display, win_id, "_NET_WM_NAME")) == NULL) {
 	  /*
-	   * Enlightenment is Gnome compliant, but don't set 
-	   * the _NET_WM_NAME atom property 
+	   * Enlightenment is Gnome compliant, but don't set
+	   * the _NET_WM_NAME atom property
 	   */
 	  wm_name = get_wm_name(display, (XDefaultRootWindow(display)), "_WIN_WM_NAME");
 	}
       }
-      
+
       if(prop_return)
 	XFree(prop_return);
     }
   }
-  
+
   /* Check for Extended Window Manager Hints (EWMH) Compliant */
-  if(((atom = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", True)) != None) && 
+  if(((atom = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", True)) != None) &&
      (XInternAtom(display, "_NET_WORKAREA", True) != None)) {
     unsigned char   *prop_return = NULL;
     unsigned long    nitems_return;
@@ -987,26 +987,26 @@ static uint32_t xitk_check_wm(Display *display) {
     Atom             type_return;
     int              format_return;
     Status           status;
-    
+
     if((XGetWindowProperty(display, (XDefaultRootWindow(display)), atom, 0, 1, False, XA_WINDOW,
 			   &type_return, &format_return, &nitems_return,
 			   &bytes_after_return, &prop_return)) == Success) {
-      
-      if((type_return != None) && (type_return == XA_WINDOW) && 
+
+      if((type_return != None) && (type_return == XA_WINDOW) &&
 	 (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
 	unsigned char   *prop_return2 = NULL;
 	Window           win_id;
-	
+
 	win_id = *(unsigned long *)prop_return;
-	
+
 	status = XGetWindowProperty(display, win_id, atom, 0,
 				    1, False, XA_WINDOW,
 				    &type_return, &format_return, &nitems_return,
 				    &bytes_after_return, &prop_return2);
-	
+
 	if((status == Success) && (type_return != None) && (type_return == XA_WINDOW) &&
 	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
-	  
+
 	  if(win_id == *(unsigned long *)prop_return) {
 	    free(wm_name);
 	    wm_name = get_wm_name(display, win_id, "_NET_WM_NAME");
@@ -1046,7 +1046,7 @@ static uint32_t xitk_check_wm(Display *display) {
     xitk->atoms.XA_WM_WINDOW_TYPE_DND           = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DND", False);
     xitk->atoms.XA_WM_WINDOW_TYPE_NORMAL        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
   }
-  
+
   switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KWIN:
     if (xitk->atoms.XA_NET_WM_STATE == None)
@@ -1074,15 +1074,15 @@ static uint32_t xitk_check_wm(Display *display) {
   }
 
   xitk->x.x_unlock_display (display);
-  
+
   if(xitk->verbosity) {
     printf("[ WM type: ");
-    
+
     if(type & WM_TYPE_GNOME_COMP)
       printf("(GnomeCompliant) ");
     if(type & WM_TYPE_EWMH_COMP)
       printf("(EWMH) ");
-    
+
     switch(type & WM_TYPE_COMP_MASK) {
     case WM_TYPE_UNKNOWN:
       printf("Unknown");
@@ -1124,16 +1124,16 @@ static uint32_t xitk_check_wm(Display *display) {
       printf("dtwm");
       break;
     }
-    
+
     if(wm_name)
       printf(" {%s}", wm_name);
-    
+
     printf(" ]-\n");
   }
-  
+
   if(wm_name)
     free(wm_name);
-  
+
   return type;
 }
 uint32_t xitk_get_wm_type(void) {
@@ -1145,10 +1145,10 @@ uint32_t xitk_get_wm_type(void) {
 int xitk_get_layer_level(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   int level = 10;
-  
+
   if ((xitk->wm_type & WM_TYPE_GNOME_COMP) || (xitk->wm_type & WM_TYPE_EWMH_COMP))
     level = 10;
-  
+
   switch (xitk->wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_UNKNOWN:
   case WM_TYPE_KWIN:
@@ -1171,7 +1171,7 @@ int xitk_get_layer_level(void) {
     level = 0;
     break;
   }
-  return level;     
+  return level;
 }
 
 void xitk_set_layer_above(Window window) {
@@ -1179,7 +1179,7 @@ void xitk_set_layer_above(Window window) {
 
   if ((xitk->wm_type & WM_TYPE_GNOME_COMP) && !(xitk->wm_type & WM_TYPE_EWMH_COMP)) {
     long propvalue[1];
-    
+
     propvalue[0] = xitk_get_layer_level();
 
     xitk->x.x_lock_display (xitk->x.display);
@@ -1189,7 +1189,7 @@ void xitk_set_layer_above(Window window) {
     xitk->x.x_unlock_display (xitk->x.display);
     return;
   }
-  
+
 
   if (xitk->wm_type & WM_TYPE_EWMH_COMP) {
     XEvent xev;
@@ -1207,7 +1207,7 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.data.l[2]    = 0l;
       xev.xclient.data.l[3]    = 0l;
       xev.xclient.data.l[4]    = 0l;
-      
+
       XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display), True, SubstructureRedirectMask, &xev);
     }
     else {
@@ -1221,28 +1221,28 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.data.l[0]    = (long) 1;
       xev.xclient.data.l[1]    = (long) xitk->atoms.XA_NET_WM_STATE_ABOVE;
       xev.xclient.data.l[2]    = (long) None;
-      
-      XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display), 
+
+      XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display),
 		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
-      
+
     }
     xitk->x.x_unlock_display (xitk->x.display);
-    
+
     return;
   }
-  
+
   switch (xitk->wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_MOTIF:
   case WM_TYPE_LARSWM:
     break;
-    
+
   case WM_TYPE_KWIN:
     xitk->x.x_lock_display (xitk->x.display);
     XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WIN_LAYER,
 		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&xitk->atoms.XA_STAYS_ON_TOP, 1);
     xitk->x.x_unlock_display (xitk->x.display);
     break;
-    
+
   case WM_TYPE_UNKNOWN:
   case WM_TYPE_WINDOWMAKER:
   case WM_TYPE_ICE:
@@ -1255,9 +1255,9 @@ void xitk_set_layer_above(Window window) {
   case WM_TYPE_DTWM:
     {
       long propvalue[1];
-      
+
       propvalue[0] = xitk_get_layer_level();
-      
+
       xitk->x.x_lock_display (xitk->x.display);
       XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WIN_LAYER,
 		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
@@ -1289,7 +1289,7 @@ void xitk_set_window_layer(Window window, int layer) {
   xev.xclient.data.l[3]    = (long) 0;
 
   xitk->x.x_lock_display (xitk->x.display);
-  XSendEvent (xitk->x.display, RootWindow (xitk->x.display, (XDefaultScreen (xitk->x.display))), 
+  XSendEvent (xitk->x.display, RootWindow (xitk->x.display, (XDefaultScreen (xitk->x.display))),
 	     False, SubstructureNotifyMask, (XEvent*) &xev);
   xitk->x.x_unlock_display (xitk->x.display);
 }
@@ -1297,7 +1297,7 @@ void xitk_set_window_layer(Window window, int layer) {
 static void _set_ewmh_state(Window window, Atom atom, int enable) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
   XEvent xev;
-  
+
   if((window == None) || (atom == None))
     return;
 
@@ -1320,20 +1320,20 @@ static void _set_ewmh_state(Window window, Atom atom, int enable) {
 
 void xitk_set_ewmh_fullscreen(Window window) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
-  
+
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
-  
+
   _set_ewmh_state (window, xitk->atoms.XA_NET_WM_STATE_FULLSCREEN, 1);
   _set_ewmh_state (window, xitk->atoms.XA_STAYS_ON_TOP, 1);
 }
 
 void xitk_unset_ewmh_fullscreen(Window window) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
-  
+
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
-  
+
   _set_ewmh_state (window, xitk->atoms.XA_NET_WM_STATE_FULLSCREEN, 0);
   _set_ewmh_state (window, xitk->atoms.XA_STAYS_ON_TOP, 0);
 }
@@ -1343,7 +1343,7 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
 
   if (window && (xitk->wm_type & WM_TYPE_EWMH_COMP)) {
     Atom *atom = NULL;
-    
+
     switch(type) {
     case WINDOW_TYPE_DESKTOP:
       atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DESKTOP;
@@ -1388,7 +1388,7 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
       atom = &xitk->atoms.XA_WM_WINDOW_TYPE_NORMAL;
       break;
     }
-    
+
     if(atom) {
       xitk_lock_display (&xitk->x);
       XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WM_WINDOW_TYPE, XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
@@ -1506,23 +1506,23 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   fx->destr_data = NULL;
   pthread_mutex_init(&fx->mutex, NULL);
   fx->owning_thread = (pthread_t)0;
-  
+
   if (fx->window != None) {
     XWindowAttributes wattr;
     Status            err;
-    
+
     xitk_lock_display (&xitk->x);
     err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
     xitk_unlock_display (&xitk->x);
-    
+
     if(err != BadDrawable && err != BadWindow) {
       Window c;
-      
+
       xitk_lock_display (&xitk->x);
-      XTranslateCoordinates (xitk->x.display, fx->window, wattr.root, 
+      XTranslateCoordinates (xitk->x.display, fx->window, wattr.root,
 			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
       xitk_unlock_display (&xitk->x);
-      
+
       /*
 	fx->new_pos.x = wattr.x;
 	fx->new_pos.y = wattr.y;
@@ -1629,10 +1629,10 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
 
   if(!fx)
     return;
-  
+
   if(!locked)
     MUTLOCK();
-  
+
   if(fx->xdnd) {
     xitk_unset_dnd_callback(fx->xdnd);
     free(fx->xdnd);
@@ -1644,7 +1644,7 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
     printf  ("xitk: deferredly killed wl @ %p.\n", (void *)fx->widget_list);
 #endif
   }
-  
+
   fx->cbs             = NULL;
   fx->user_data       = NULL;
 
@@ -1656,12 +1656,12 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   free(fx->name);
 
   xitk_dnode_remove (&fx->node);
-  
+
   FXUNLOCK(fx);
   pthread_mutex_destroy(&fx->mutex);
 
   free(fx);
-  
+
   if(!locked)
     MUTUNLOCK();
 
@@ -1743,26 +1743,26 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   fx = __fx_from_key (xitk, key);
   if (fx) {
       Window c;
-      
+
     int already_locked = __gfx_safe_lock (fx);
 
     if (fx->window != None) {
       winf->xwin = fx->w;
-      
+
       if(fx->name)
 	winf->name = strdup(fx->name);
-      
+
       xitk_lock_display (&xitk->x);
-      XTranslateCoordinates (xitk->x.display, fx->window, DefaultRootWindow (xitk->x.display), 
+      XTranslateCoordinates (xitk->x.display, fx->window, DefaultRootWindow (xitk->x.display),
 			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
       xitk_unlock_display (&xitk->x);
-      
-      
+
+
       winf->x      = fx->new_pos.x;
       winf->y      = fx->new_pos.y;
       winf->height = fx->height;
       winf->width  = fx->width;
-      
+
       if (!already_locked)
         __gfx_unlock (fx);
 
@@ -1823,16 +1823,16 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       if(event->xkey.keycode == xitk->ignore_keys[i])
 	return;
   }
-  
+
   FXLOCK(fx);
 
   /*
   if (xitk->modalw != None) {
     while (fx->node.next && (fx->window != xitk->modalw)) {
-      
+
       if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	fx->xevent_callback(event, fx->user_data);
-      
+
       fx = (__gfx_t *)fx->node.next;
     }
   }
@@ -1843,9 +1843,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
     if(event->type == KeyRelease)
       gettimeofday (&xitk->keypress, 0);
-    
+
     if(fx->window != None) {
-      
+
       //printf("event %d\n", event->type);
 
       if(fx->window == event->xany.window) {
@@ -1930,7 +1930,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             if (fx->cbs)
               xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
 	  }
-	  
+
 	  if(fx->destroy)
 	    __fx_destroy(fx, 0);
 	  else
@@ -1968,7 +1968,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             }
 	  }
 	  break;
-	  
+
 	case MotionNotify: {
 	  XWindowAttributes wattr;
 
@@ -1991,13 +1991,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	    fx->old_pos.x = fx->new_pos.x;
 	    fx->old_pos.y = fx->new_pos.y;
 
-	    fx->new_pos.x = (event->xmotion.x_root) 
-	      + (event->xmotion.x_root - fx->old_event->xmotion.x_root) 
+	    fx->new_pos.x = (event->xmotion.x_root)
+	      + (event->xmotion.x_root - fx->old_event->xmotion.x_root)
 	      - fx->move.offset_x;
-	    fx->new_pos.y = (event->xmotion.y_root) 
-	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root) 
+	    fx->new_pos.y = (event->xmotion.y_root)
+	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root)
 	      - fx->move.offset_y;
-	    
+
             xitk_lock_display (&xitk->x);
 
             XMoveWindow (xitk->x.display, fx->window,
@@ -2010,13 +2010,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  else {
 	    if(fx->widget_list) {
 	      xitk_motion_notify_widget_list (fx->widget_list,
-					      event->xmotion.x, 
+					      event->xmotion.x,
 					      event->xmotion.y, event->xmotion.state);
 	    }
 	  }
 	}
 	  break;
-	  
+
 	case LeaveNotify:
 	  if(!(fx->widget_list && fx->widget_list->widget_pressed &&
 	       (fx->widget_list->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
@@ -2030,20 +2030,20 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 					      event->xcrossing.x,
 					      event->xcrossing.y, event->xcrossing.state);
 	  break;
-	  
+
 	case ButtonPress: {
 	  XWindowAttributes   wattr;
 	  Status              status;
 
           xitk_tips_hide_tips(xitk->x.tips);
-	  
+
           xitk_lock_display (&xitk->x);
           status = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-	  /* 
+	  /*
 	   * Give focus (and raise) to window after click
 	   * if it's viewable (e.g. not iconified).
 	   */
-	  if((status != BadDrawable) && (status != BadWindow) 
+	  if((status != BadDrawable) && (status != BadWindow)
 	     && (wattr.map_state == IsViewable)) {
             XRaiseWindow (xitk->x.display, fx->window);
             XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
@@ -2065,9 +2065,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             int modifier = 0;
             xitk_get_key_modifier(event, &modifier);
 
-	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list, 
-							       event->xbutton.x, 
-							       event->xbutton.y, 
+	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list,
+							       event->xbutton.x,
+							       event->xbutton.y,
 							       event->xbutton.button, 0,
                                                                modifier);
             if (event->xbutton.button != Button1)
@@ -2091,12 +2091,12 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
               xitk_unlock_display (&xitk->x);
 
 	      if(err != BadDrawable && err != BadWindow) {
-		
+
 		fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
 		fx->old_pos.y = event->xmotion.y_root - event->xbutton.y;
 
 	      }
-	      
+
 	      fx->move.offset_x = event->xbutton.x;
 	      fx->move.offset_y = event->xbutton.y;
 
@@ -2104,11 +2104,11 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	  }
 	}
 	break;
-	  
+
 	case ButtonRelease:
 
           xitk_tips_hide_tips(xitk->x.tips);
-	  
+
 	  if(fx->move.enabled) {
 
 	    fx->move.enabled = 0;
@@ -2122,14 +2122,14 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             int modifier = 0;
             xitk_get_key_modifier(event, &modifier);
 	    if(fx->widget_list) {
-	      xitk_click_notify_widget_list (fx->widget_list, 
+	      xitk_click_notify_widget_list (fx->widget_list,
 					     event->xbutton.x, event->xbutton.y,
                                              event->xbutton.button, 1,
                                              modifier);
 	    }
 	  }
 	  break;
-	  
+
 	case ConfigureNotify: {
 	  XWindowAttributes wattr;
 	  Status            err;
@@ -2175,7 +2175,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         }
       }
     }
-    
+
     fxd = fx;
     fx = (__gfx_t *)fx->node.next;
 
@@ -2183,7 +2183,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       __fx_destroy(fxd, 0);
     else
       FXUNLOCK(fxd);
-    
+
 #if 0
 #warning FIXME
     if (xitk->modalw != None) {
@@ -2191,10 +2191,10 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       /* Flush remain fxs */
       while (fx->node.next && (fx->window != xitk->modalw)) {
 	FXLOCK(fx);
-	
+
         if (fx->cbs && fx->window != None && event->type != KeyRelease)
           xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
-	
+
 	fxd = fx;
 	fx = (__gfx_t *)fx->node.next;
 
@@ -2340,7 +2340,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
 #ifdef ENABLE_NLS
   bindtextdomain("xitk", XITK_LOCALE);
-#endif  
+#endif
 
   xitk = xitk_xmalloc (sizeof (*xitk));
   gXitk = &xitk->x;
@@ -2413,17 +2413,17 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
   pthread_mutex_init (&xitk->mutex, &attr);
-  
+
   snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
-  
+
   /* Check if SHM is working */
 #ifdef HAVE_SHM
   if(xitk->use_xshm) {
     XImage             *xim;
     XShmSegmentInfo     shminfo;
-    
-    xim = XShmCreateImage(display, 
-			  (DefaultVisual(display, (DefaultScreen(display)))), 
+
+    xim = XShmCreateImage(display,
+			  (DefaultVisual(display, (DefaultScreen(display)))),
 			  (DefaultDepth(display, (DefaultScreen(display)))),
 			  ZPixmap, NULL, &shminfo, 10, 10);
     if(!xim)
@@ -2442,10 +2442,10 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 	}
 	else {
 	  shminfo.readOnly = False;
-	  
+
 	  xitk_x_error = 0;
 	  xitk_install_x_error_handler();
-	  
+
 	  XShmAttach(display, &shminfo);
 	  XSync(display, False);
 	  if(xitk_x_error)
@@ -2454,7 +2454,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 	    XShmDetach(display, &shminfo);
 	    strlcat(buffer, "[XShm]", sizeof(buffer));
 	  }
-	  
+
 	  XDestroyImage(xim);
 	  shmdt(shminfo.shmaddr);
 
@@ -2472,14 +2472,14 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 #elif defined(WITH_XMB)
   strlcat(buffer, "[XMB]", sizeof(buffer));
 #endif
-  
+
   strlcat(buffer, " ]-", sizeof(buffer));
 
   if(verbosity)
     printf("%s", buffer);
 
   xitk->wm_type = xitk_check_wm(display);
-  
+
   /* imit imlib */
   _init_imlib(xitk, prefered_visual, install_colormap);
 
@@ -2557,7 +2557,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
   _xitk_clipboard_init (xitk);
 
   xitk->running = 1;
-  
+
   xitk_lock_display (&xitk->x);
   XSync (xitk->x.display, True); /* Flushing the toilets */
   xitk_unlock_display (&xitk->x);
@@ -2571,7 +2571,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
     MUTLOCK ();
     for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
       FXLOCK (fx);
-   
+
       if ((fx->window != None) && fx->widget_list) {
         XEvent xexp;
 
@@ -2582,7 +2582,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
         xexp.xexpose.display    = xitk->x.display;
         xexp.xexpose.window     = fx->window;
         xexp.xexpose.count      = 0;
-      
+
         xitk_lock_display (&xitk->x);
         if (!XSendEvent (xitk->x.display, fx->window, False, ExposureMask, &xexp)) {
           XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
@@ -2610,7 +2610,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
     while (xitk->running) {
       XEvent myevent;
       int have_events;
-    
+
       xitk_lock_display (&xitk->x);
       have_events = XPending (xitk->x.display);
 
@@ -2629,7 +2629,7 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
       XNextEvent (xitk->x.display, &myevent);
       xitk_unlock_display (&xitk->x);
-      
+
       MUTLOCK ();
       xitk_xevent_notify_impl (xitk, &myevent);
       MUTUNLOCK ();
@@ -2722,7 +2722,7 @@ void xitk_stop(void) {
   }
 #endif
 }
- 
+
 const char *xitk_get_system_font(void) {
   __xitk_t *xitk = (__xitk_t *)gXitk;
 
@@ -2913,16 +2913,16 @@ char *xitk_filter_filename(const char *name) {
  */
 const char *xitk_set_locale(void) {
   const char *cur_locale = NULL;
-  
+
 #ifdef ENABLE_NLS
   if(setlocale (LC_ALL,"") == NULL) {
     XITK_WARNING("locale not supported by C library\n");
     return NULL;
   }
-  
+
   cur_locale = setlocale(LC_ALL, NULL);
 #endif
-  
+
   return cur_locale;
 }
 
@@ -2933,7 +2933,7 @@ const char *xitk_set_locale(void) {
 long int xitk_get_last_keypressed_time (xitk_t *xitk) {
   __xitk_t *_xitk = (__xitk_t *)xitk;
   struct timeval tm;
-  
+
   gettimeofday (&tm, NULL);
   tm.tv_sec -= _xitk->keypress.tv_sec;
   tm.tv_usec -= _xitk->keypress.tv_usec;
@@ -2941,7 +2941,7 @@ long int xitk_get_last_keypressed_time (xitk_t *xitk) {
 }
 
 /*
- * Return 0/1 from char value (valids are 1/0, true/false, 
+ * Return 0/1 from char value (valids are 1/0, true/false,
  * yes/no, on/off. Case isn't checked.
  */
 int xitk_get_bool_value(const char *val) {
@@ -2953,7 +2953,7 @@ int xitk_get_bool_value(const char *val) {
     { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 }
   };
   size_t i;
-  
+
   ABORT_IF_NULL(val);
 
   for(i = 0; i < sizeof(bools)/sizeof(bools[0]); i++) {
@@ -3184,7 +3184,7 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 
   return tree;
 }
-  
+
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }

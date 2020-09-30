@@ -25,7 +25,7 @@
  * - color palette management and generation of text palettes
  * - text alignments
  */
- 
+
 #ifndef HAVE_ODK_H
 #define HAVE_ODK_H
 
@@ -96,7 +96,7 @@ void odk_clear(odk_t *odk);
 
 /*
  * simple pixmaps
- */ 
+ */
 
 uint8_t *odk_get_pixmap(int type);
 void odk_draw_bitmap(odk_t *odk, uint8_t *bitmap, int x1, int y1, int width, int height,
@@ -165,7 +165,7 @@ void odk_eject(odk_t *odk);
 
 /*
  * Stream info
- */ 
+ */
 
 char *odk_get_meta_info(odk_t *odk, int info);
 int odk_get_seek(odk_t *odk);    /* 1..100 */

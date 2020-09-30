@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -129,7 +129,7 @@ int skin_get_names (gGui_t *gui, const char **names, int max) {
   *q = NULL;
   return q - names;
 }
-    
+
 const char *skin_get_name (gGui_t *gui, int index) {
   skins_locations_t *s;
   if (!gui)
@@ -141,7 +141,7 @@ const char *skin_get_name (gGui_t *gui, int index) {
     return NULL;
   return s->name;
 }
-    
+
 static const char *_skin_get_fullname (gGui_t *gui, int index) {
   skins_locations_t *s;
   if (!gui)
@@ -153,7 +153,7 @@ static const char *_skin_get_fullname (gGui_t *gui, int index) {
     return NULL;
   return s->fullname;
 }
-    
+
 static void _skin_start (gGui_t *gui) {
   gui->skins.get_names = skin_get_names;
   gui->skins.avail = xine_sarray_new (64, _skin_name_cmp);
@@ -180,7 +180,7 @@ void skin_deinit (gGui_t *gui) {
 
 /*
  * Fill **skins_avail with available skins from path.
- */ 
+ */
 static void _skin_add_dir (gGui_t *gui, const char *path) {
   char b[2048], *e = b + sizeof (b) - 1, *pend;
   DIR             *pdir;
@@ -281,7 +281,7 @@ static int _skin_alter (gGui_t *gui, int index) {
     return old_index;
   osks = gui->skins.current_skin;
   old_skin = osks ? osks->name : DEFAULT_SKIN;
-  
+
   nskin_config = xitk_skin_init_config (gui->xitk);
   if (!nskin_config)
     return old_index;
@@ -309,7 +309,7 @@ static int _skin_alter (gGui_t *gui, int index) {
     return old_index;
   }
   gui->skins.current_skin = sks;
-  
+
   if(gui->visual_anim.mrls[gui->visual_anim.num_mrls]) {
     free(gui->visual_anim.mrls[gui->visual_anim.num_mrls]);
     gui->visual_anim.mrls[gui->visual_anim.num_mrls--] = NULL;
@@ -317,7 +317,7 @@ static int _skin_alter (gGui_t *gui, int index) {
   if((skin_anim = xitk_skin_get_animation(nskin_config)) != NULL) {
     gui->visual_anim.mrls[gui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
-  
+
   oskin_config = gui->skin_config;
   gui->skin_config = nskin_config;
 
@@ -349,7 +349,7 @@ static void gfx_quality_cb (void *data, xine_cfg_entry_t *cfg) {
 void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   int index, retval;
-  
+
   if (!gui->skins.avail || gui->skins.change_config_entry)
     return;
   /* no recursion, please. */
@@ -364,9 +364,9 @@ void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
     index = _skin_name_index (gui, DEFAULT_SKIN);
   }
 */
-  
+
   retval = _skin_alter (gui, index);
-  
+
   if (retval != index) {
     if (retval >= 0)
       cfg->num_value = retval;
@@ -395,8 +395,8 @@ char *skin_get_current_skin_dir (gGui_t *gui) {
     fprintf(stderr, _("No available skin found. Say goodbye.\n"));
     exit(-1);
   }
-  
-  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+
+  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   xine_config_lookup_entry (gui->xine, "gui.skin", &entry);
   fullname = _skin_get_fullname (gui, entry.num_value);
   return strdup (fullname);
@@ -407,11 +407,11 @@ char *skin_get_current_skin_dir (gGui_t *gui) {
  */
 void skin_preinit (gGui_t *gui) {
   gui->skins.change_config_entry = 1;
-  
+
   gui->skin_config = xitk_skin_init_config (gui->xitk);
-  
+
   _looking_for_available_skins (gui);
-  
+
   if ((gui->skins.avail == NULL) || (gui->skins.num == 0)) {
     fprintf(stderr, _("No available skin found. Say goodbye.\n"));
     exit(-1);
@@ -442,14 +442,14 @@ void skin_init (gGui_t *gui) {
   const char          *skin_anim;
   xine_cfg_entry_t     entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   if (xine_config_lookup_entry (gui->xine, "gui.skin", &entry))
     skin_num = entry.num_value;
   else {
     fprintf(stderr, _("Ooch, gui.skin config entry isn't registered. Say goodbye.\n"));
     exit(-1);
   }
-  
+
   sk = _skin_index_location (gui, skin_num);
   if (!sk) {
     xine_error (gui, _("Ooch, skin '%s' not found, use fallback '%s'.\n"), "", DEFAULT_SKIN);
@@ -459,10 +459,10 @@ void skin_init (gGui_t *gui) {
       fprintf(stderr, _("Failed to load fallback skin. Check your installed skins. Exiting.\n"));
       exit(-1);
     }
-  } 
-  
+  }
+
  __reload_skin:
-  
+
   if (!xitk_skin_load_config (gui->skin_config, sk->fullname, "skinconfig")) {
     if(!twice_load) {
       twice_load++;

@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -142,7 +142,7 @@ struct filebrowser_s {
   gGui_t                         *gui;
 
   xitk_window_t                  *xwin;
-  
+
   xitk_widget_list_t             *widget_list;
 
   xitk_widget_t                  *origin;
@@ -182,14 +182,14 @@ struct filebrowser_s {
 
   int                             running;
   int                             visible;
-  
+
   xitk_widget_t                  *close;
 
   hidden_file_toggle_t            hidden_cb;
 
   filebrowser_callback_button_t   cbb[3];
   xitk_widget_t                  *cb_buttons[2];
-  
+
   xitk_register_key_t             widget_key;
   xitk_register_key_t             dialog;
 };
@@ -202,7 +202,7 @@ typedef struct {
 
   xitk_string_callback_t    callback;
   filebrowser_t            *fb;
-  
+
   xitk_widget_t            *button_apply;
   xitk_widget_t            *button_cancel;
 
@@ -214,7 +214,7 @@ typedef struct {
  */
 static void _fb_enability(filebrowser_t *fb, int enable) {
   void (*enability)(xitk_widget_t *) = (enable == 1) ? xitk_enable_widget : xitk_disable_widget;
-  
+
   enability(fb->origin);
   enability(fb->directories_browser);
   enability(fb->directories_sort);
@@ -269,7 +269,7 @@ static void fne_destroy(filename_editor_t *fne) {
 }
 static void fne_apply_cb (xitk_widget_t *w, void *data, int state) {
   filename_editor_t *fne = (filename_editor_t *) data;
-  
+
   (void)w;
   (void)state;
   if(fne->callback)
@@ -316,7 +316,7 @@ static void fb_create_input_window(char *title, char *text,
   y = (xitk_get_display_height() >> 1) - (height >> 1);
 
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
-  
+
   fne->callback = cb;
   fne->fb = fb;
 
@@ -334,7 +334,7 @@ static void fb_create_input_window(char *title, char *text,
   x = 15;
   y = 30;
   w = width - 30;
-  
+
   inp.skin_element_name = NULL;
   inp.text              = text;
   inp.max_length        = XITK_PATH_MAX + XITK_NAME_MAX + 1;
@@ -411,7 +411,7 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
     if((ending = strrchr(file, '.'))) {
       char  ext[strlen(ending) + 2];
       char *p;
-      
+
       sprintf(ext, "%s ", ending);
 
       p = ext;
@@ -419,10 +419,10 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
 	*p = tolower(*p);
 	p++;
       }
-	
+
       if(strstr(__fb_filters[fb->filter_selected].ending, ext))
 	return 1;
-      
+
     }
   }
   return 0;
@@ -430,13 +430,13 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
 
 static void fb_update_origin(filebrowser_t *fb) {
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  
+
   if(strcmp(fb->current_dir, "/"))
     snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->filename);
   else
     snprintf(buf, sizeof(buf), "/%s", fb->filename);
-  
-  xitk_inputtext_change_text(fb->origin, buf); 
+
+  xitk_inputtext_change_text(fb->origin, buf);
 }
 
 static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname) {
@@ -445,10 +445,10 @@ static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname
     char *filename = NULL;
     char  _filepathname[XITK_PATH_MAX + XITK_NAME_MAX + 2];
     char *p;
-    
+
     if((*filepathname == '~') && (*(filepathname + 1) == '/' || *(filepathname + 1) == '\0')) {
       const char *homedir = xine_get_homedir();
-      
+
       snprintf(_filepathname, sizeof(_filepathname), "%s%s", homedir, (filepathname + 1));
     }
     else {
@@ -469,7 +469,7 @@ static void fb_extract_path_and_file(filebrowser_t *fb, const char *filepathname
     }
     else {
       filename = strrchr(_filepathname, '/');
-    
+
       if(!filename) {				/* Whole name treated as file name */
 	filename = _filepathname;
       }
@@ -547,20 +547,20 @@ static int my_strverscmp(const char *s1, const char *s2) {
     c2 = *p2++;
     state |= (c1 == '0') + (ISDIGIT(c1) != 0);
   }
-  
+
   state = result_type[state << 2 | ((c2 == '0') + (ISDIGIT(c2) != 0))];
-  
+
   switch(state) {
   case CMP:
     return diff;
-    
+
   case LEN:
     while(ISDIGIT(*p1++))
       if(!ISDIGIT(*p2++))
 	return 1;
-    
+
     return ISDIGIT(*p2) ? -1 : diff;
-    
+
   default:
     return state;
   }
@@ -581,23 +581,23 @@ static void sort_files(filebrowser_t *fb) {
 
   if(fb->files) {
     int i = 0;
-    
+
     while(fb->files[i]) {
       SAFE_FREE(fb->files[i]);
       i++;
     }
   }
-  
+
   if(fb->files_num) {
     int i;
-    
+
     if(fb->files_sort_direction == REVERSE_SORT)
       func = _sortfiles_reverse;
     else /*if(fb->files_sort_direction == DEFAULT_SORT)*/
       func = _sortfiles_default;
-    
+
     qsort(fb->norm_files, fb->files_num, sizeof(fileinfo_t), func);
-    
+
     fb->files = (char **) realloc(fb->files, sizeof(char *) * (fb->files_num + 2));
 
     for(i = 0; i < fb->files_num; i++)
@@ -605,7 +605,7 @@ static void sort_files(filebrowser_t *fb) {
 
     fb->files[i] = NULL;
   }
-  
+
   xitk_browser_update_list(fb->files_browser, (const char *const *)fb->files, NULL, fb->files_num, 0);
 }
 
@@ -623,14 +623,14 @@ static void sort_directories(filebrowser_t *fb) {
 
   if(fb->directories_num) {
     int i;
-    
+
     if(fb->directories_sort_direction == REVERSE_SORT)
       func = _sortfiles_reverse;
     else /*if(fb->directories_sort_direction == DEFAULT_SORT)*/
       func = _sortfiles_default;
-    
+
     qsort(fb->dir_files, fb->directories_num, sizeof(fileinfo_t), func);
-    
+
     fb->directories = (char **) realloc(fb->directories, sizeof(char *) * (fb->directories_num + 2));
     for(i = 0; i < fb->directories_num; i++) {
       fb->directories[i] = xitk_asprintf("%s%c", fb->dir_files[i].name, '/');
@@ -639,7 +639,7 @@ static void sort_directories(filebrowser_t *fb) {
     fb->directories[i] = NULL;
   }
 
-  xitk_browser_update_list(fb->directories_browser, 
+  xitk_browser_update_list(fb->directories_browser,
 			   (const char *const *)fb->directories, NULL, fb->directories_num, 0);
 }
 
@@ -666,14 +666,14 @@ static void fb_getdir(filebrowser_t *fb) {
       fb->directories_num--;
     }
   }
-  
+
   /* Following code relies on the fact that fb->current_dir has no trailing '/' */
   if((pdir = opendir(fb->current_dir)) == NULL) {
     char *p = strrchr(fb->current_dir, '/');
-    
+
     xine_error (fb->gui, _("Unable to open directory '%s': %s."),
 	       (p && *(p + 1)) ? p + 1 : fb->current_dir, strerror(errno));
-    
+
     /* One step back if dir has a subdir component */
     if(p && *(p + 1)) {
       if(p == fb->current_dir) /* we are in the root dir */
@@ -688,13 +688,13 @@ static void fb_getdir(filebrowser_t *fb) {
   }
 
   while((pdirent = readdir(pdir)) != NULL) {
-    
+
     snprintf(fullfilename, sizeof(fullfilename), "%s/%s", fb->current_dir, pdirent->d_name);
-    
+
     if(is_a_dir(fullfilename)) {
-      
+
       /* if user don't want to see hidden files, ignore them */
-      if(fb->show_hidden_files == 0 && 
+      if(fb->show_hidden_files == 0 &&
 	 ((strlen(pdirent->d_name) > 1)
 	  && (pdirent->d_name[0] == '.' &&  pdirent->d_name[1] != '.'))) {
 	;
@@ -703,11 +703,11 @@ static void fb_getdir(filebrowser_t *fb) {
 	fb->dir_files[num_dir_files].name = strdup(pdirent->d_name);
 	num_dir_files++;
       }
-      
+
     } /* Hmmmm, an hidden file ? */
     else if((strlen(pdirent->d_name) > 1)
 	    && (pdirent->d_name[0] == '.' &&  pdirent->d_name[1] != '.')) {
-      
+
       /* if user don't want to see hidden files, ignore them */
       if(fb->show_hidden_files) {
 	if(is_file_match_to_filter(fb, pdirent->d_name)) {
@@ -723,12 +723,12 @@ static void fb_getdir(filebrowser_t *fb) {
 	num_norm_files++;
       }
     }
-    
+
     num_files++;
   }
-  
+
   closedir(pdir);
-  
+
   /*
    * Sort arrays
    */
@@ -758,7 +758,7 @@ static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) 
 
 static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
+
   (void)w;
   (void)state;
   if(w == fb->cb_buttons[0]) {
@@ -771,7 +771,7 @@ static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
       return;
     fb->cbb[1].callback (fb, fb->cbb[1].userdata);
   }
-  
+
   fb_exit(NULL, (void *)fb);
 }
 
@@ -782,32 +782,32 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
   (void)modifier;
   if(w == fb->directories_browser) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    
+
     /* Want to re-read current dir */
     if(!strcasecmp(fb->dir_files[selected].name, ".")) {
       /* NOOP */
     }
     else if(!strcasecmp(fb->dir_files[selected].name, "..")) {
       char *p;
-      
+
       strlcpy(buf, fb->current_dir, sizeof(buf));
       if(strlen(buf) > 1) { /* not '/' directory */
-	
+
 	p = &buf[strlen(buf)-1];
 	while(*p && *p != '/') {
 	  *p = '\0';
 	  p--;
 	}
-	
+
 	/* Remove last '/' if current_dir isn't root */
-	if((strlen(buf) > 1) && *p == '/') 
+	if((strlen(buf) > 1) && *p == '/')
 	  *p = '\0';
-	
+
 	strlcpy(fb->current_dir, buf, sizeof(fb->current_dir));
       }
     }
     else {
-      
+
       /* not '/' directory */
       if(strcasecmp(fb->current_dir, "/")) {
 	snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->dir_files[selected].name);
@@ -815,12 +815,12 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected, int modifi
       else {
 	snprintf(buf, sizeof(buf), "/%s", fb->dir_files[selected].name);
       }
-      
+
       if(is_a_dir(buf))
 	strlcpy(fb->current_dir, buf, sizeof(fb->current_dir));
 
     }
-    
+
     fb_update_origin(fb);
     fb_getdir(fb);
   }
@@ -849,9 +849,9 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     int width = xitk_image_width(dsimage);
     int height = xitk_image_height(dsimage);
 
-    fb->directories_sort_direction = (fb->directories_sort_direction == DEFAULT_SORT) ? 
+    fb->directories_sort_direction = (fb->directories_sort_direction == DEFAULT_SORT) ?
       REVERSE_SORT : DEFAULT_SORT;
-    
+
     xitk_hide_widget(fb->directories_sort);
 
     if(fb->directories_sort_direction == DEFAULT_SORT)
@@ -860,17 +860,17 @@ static void fb_sort(xitk_widget_t *w, void *data) {
       xitk_image_change_image (fb->sort_skin_up, dsimage, width, height);
 
     xitk_show_widget(fb->directories_sort);
-    
+
     sort_directories(fb);
   }
   else if(w == fb->files_sort) {
     xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->files_sort);
     int width = xitk_image_width(fsimage);
     int height = xitk_image_height(fsimage);
-    
-    fb->files_sort_direction = (fb->files_sort_direction == DEFAULT_SORT) ? 
+
+    fb->files_sort_direction = (fb->files_sort_direction == DEFAULT_SORT) ?
       REVERSE_SORT : DEFAULT_SORT;
-    
+
     xitk_hide_widget(fb->files_sort);
 
     if(fb->files_sort_direction == DEFAULT_SORT)
@@ -881,7 +881,7 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     xitk_show_widget(fb->files_sort);
 
     sort_files(fb);
-  }    
+  }
 }
 
 static void fb_exit(xitk_widget_t *w, void *data) {
@@ -896,7 +896,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
 
     if (fb->dialog)
       xitk_unregister_event_handler (&fb->dialog);
-    
+
     xitk_unregister_event_handler(&fb->widget_key);
 
     xitk_window_destroy_window (fb->xwin);
@@ -910,7 +910,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
       }
     }
     SAFE_FREE(fb->norm_files);
-    
+
     if(fb->dir_files) {
       while(fb->directories_num) {
 	free(fb->dir_files[fb->directories_num - 1].name);
@@ -918,10 +918,10 @@ static void fb_exit(xitk_widget_t *w, void *data) {
       }
     }
     SAFE_FREE(fb->dir_files);
-    
+
     if(fb->files) {
       i = 0;
-      
+
       while(fb->files[i]) {
 	free(fb->files[i]);
 	i++;
@@ -931,7 +931,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
 
     if(fb->directories) {
       i = 0;
-      
+
       while(fb->directories[i]) {
 	free(fb->directories[i]);
 	i++;
@@ -940,10 +940,10 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     }
 
     free(fb->file_filters);
-    
+
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
-    
+
     xitk_image_free_image (&fb->sort_skin_up);
     xitk_image_free_image (&fb->sort_skin_down);
 
@@ -971,7 +971,7 @@ static void _fb_delete_file_done (void *data, int state) {
     snprintf (buf, sizeof(buf), "%s%s%s",
       fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
       fb->norm_files[sel].name);
-      
+
     if ((unlink (buf)) == -1)
       xine_error (fb->gui, _("Unable to delete file '%s': %s."), buf, strerror (errno));
     else
@@ -983,7 +983,7 @@ static void _fb_delete_file_done (void *data, int state) {
 static void fb_delete_file (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   int            sel;
-  
+
   (void)w;
   (void)state;
   if ((sel = xitk_browser_get_current_selected (fb->files_browser)) >= 0) {
@@ -992,7 +992,7 @@ static void fb_delete_file (xitk_widget_t *w, void *data, int state) {
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file '%s%s%s' ?"),
 	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	     fb->norm_files[sel].name);
-    
+
     fb_deactivate(fb);
     fb->dialog = xitk_window_dialog_3 (fb->gui->xitk,
       fb->xwin,
@@ -1010,7 +1010,7 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname)
   snprintf(buf, sizeof(buf), "%s%s%s",
 	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	   fb->norm_files[sel].name);
-      
+
   if((rename(buf, newname)) == -1)
     xine_error (fb->gui, _("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
   else
@@ -1020,16 +1020,16 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname)
 static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   int            sel;
-  
+
   (void)w;
   (void)state;
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    
+
     snprintf(buf, sizeof(buf), "%s%s%s",
 	     fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""),
 	     fb->norm_files[sel].name);
-      
+
     fb_deactivate(fb);
     fb_create_input_window(_("Rename file"), buf, fb_rename_file_cb, fb);
   }
@@ -1037,7 +1037,7 @@ static void fb_rename_file (xitk_widget_t *w, void *data, int state) {
 
 static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *newdir) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
+
   (void)w;
   if(!mkdir_safe(newdir))
     xine_error (fb->gui, _("Unable to create the directory '%s': %s."), newdir, strerror(errno));
@@ -1047,19 +1047,19 @@ static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *new
 static void fb_create_directory(xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-  
+
   (void)w;
   (void)state;
   snprintf(buf, sizeof(buf), "%s%s",
 	   fb->current_dir, ((fb->current_dir[0] && strcmp(fb->current_dir, "/")) ? "/" : ""));
-      
+
   fb_deactivate(fb);
   fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);
 }
 
 static void fb_select_file_filter(xitk_widget_t *w, void *data, int selected) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
+
   (void)w;
   fb->filter_selected = selected;
   fb_getdir(fb);
@@ -1067,7 +1067,7 @@ static void fb_select_file_filter(xitk_widget_t *w, void *data, int selected) {
 
 static void fb_hidden_files(xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
-  
+
   (void)w;
   fb->show_hidden_files = state;
   fb->hidden_cb(1, state);
@@ -1112,16 +1112,16 @@ char *filebrowser_get_current_dir(filebrowser_t *fb) {
 
   if(fb)
     current_dir = strdup(fb->current_dir);
-  
+
   return current_dir;
 }
 
 char *filebrowser_get_current_filename(filebrowser_t *fb) {
   char *filename = NULL;
-  
+
   if(fb && strlen(fb->filename))
     filename = strdup(fb->filename);
-  
+
   return filename;
 }
 
@@ -1140,12 +1140,12 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
   if(fb && fb->files_num) {
     int i;
     files = (char **) calloc((fb->files_num + 2), sizeof(char *));
-    
+
     for(i = 0; i < fb->files_num; i++)
       files[i] = strdup(fb->norm_files[i].name);
     files[i] = NULL;
   }
-  
+
   return files;
 }
 
@@ -1170,7 +1170,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     return NULL;
 
   fb->gui = gGui;
-  
+
   if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
     fb->cbb[0].label = strdup(cbb1->label);
     fb->cbb[0].callback = cbb1->callback;
@@ -1204,9 +1204,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   /* Create window */
   fb->xwin = xitk_window_create_dialog_window (fb->gui->xitk,
-					      (window_title) ? window_title : _("File Browser"), 
+					      (window_title) ? window_title : _("File Browser"),
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
+
   xitk_window_set_wm_window_type(fb->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fb->xwin, NULL, "xine");
   xitk_window_set_window_icon (fb->xwin, fb->gui->icon);
@@ -1229,9 +1229,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   fb->files = (char **) calloc(2, sizeof(char *));
   fb->directories = (char **) calloc(2, sizeof(char *));
-  
+
   fb->file_filters = (const char **) malloc(sizeof(filebrowser_filter_t) * ((sizeof(__fb_filters) / sizeof(__fb_filters[0])) + 1));
-  
+
   for(i = 0; __fb_filters[i].ending; i++)
     fb->file_filters[i] = _(__fb_filters[i].name);
 
@@ -1283,11 +1283,11 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     x + 2, y + 2, w - 4 - 12, 20, 12, fontname);
   xitk_add_widget (fb->widget_list, fb->directories_browser);
   xitk_enable_and_show_widget(fb->directories_browser);
-  
+
   draw_rectangular_box (bg, x, y, w, xitk_get_widget_height (fb->directories_browser) + 4, DRAW_INNER);
-  
+
   y -= 15;
-  
+
   b.skin_element_name = NULL;
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
@@ -1337,7 +1337,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     int ds_height = xitk_image_height(dsimage);
     int fs_width = xitk_image_width(fsimage);
     int fs_height = xitk_image_height(fsimage);
-  
+
     fb->sort_skin_up = xitk_image_create_image (fb->gui->xitk, ds_width, ds_height);
     fb->sort_skin_down = xitk_image_create_image (fb->gui->xitk, ds_width, ds_height);
 
@@ -1351,7 +1351,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	image = fb->sort_skin_up;
       else
 	image = fb->sort_skin_down;
-      
+
       offset = 0;
       for(i = 0; i < 2; i++) {
         xitk_image_draw_rectangular_box (image, 5, 4 + offset, w - 44, 2, DRAW_OUTTER);
@@ -1362,7 +1362,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
         xitk_image_draw_rectangular_box (image, ((w * 3) - 20) + 1, 4 + 1 + offset, 11 + 1, 2, DRAW_OUTTER);
 	offset += 4;
       }
-      
+
       offset = 0;
       for(i = 0; i < 3; i++) {
 	int k;
@@ -1370,29 +1370,29 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	if(j == 0) {
 	  x1 = (w - 30) + offset;
 	  y1 = (2);
-	  
+
 	  x2 = (w - 30) - 7 + offset;
 	  y2 = (2 + 8);
-	  
+
 	  x3 = (w - 30) + 7 + offset;
 	  y3 = (2 + 8);
 	}
 	else {
 	  x1 = (w - 30) + offset;
 	  y1 = (2 + 8);
-	  
+
 	  x2 = (w - 30) - 6 + offset;
 	  y2 = (3);
-	  
+
 	  x3 = (w - 30) + 6 + offset;
 	  y3 = (3);
 	}
-	
+
 	if(i == 2) {
 	  x1++; x2++; x3++;
 	  y1++; y2++; y3++;
 	}
-	
+
 	points[0].x = x1;
 	points[0].y = y1;
 	points[1].x = x2;
@@ -1401,9 +1401,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 	points[2].y = y3;
 	points[3].x = x1;
 	points[3].y = y1;
-	
+
 	offset += w;
-	
+
         xitk_image_fill_polygon (image, &points[0], 4, xitk_get_pixel_color_lightgray (fb->gui->xitk));
 
 	for(k = 0; k < 3; k++) {
@@ -1414,7 +1414,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
             color = xitk_get_pixel_color_darkgray (fb->gui->xitk);
 	  else
             color = xitk_get_pixel_color_white (fb->gui->xitk);
-  
+
           xitk_image_draw_line(image,
                                points[k].x, points[k].y, points[k+1].x, points[k+1].y,
                                color);
@@ -1457,7 +1457,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_add_widget (fb->widget_list, widget);
   xitk_enable_and_show_widget(widget);
   xitk_widget_set_focus_redirect (widget, fb->show_hidden);
-  
+
   y = WINDOW_HEIGHT - (23 + 15) - (23 + 8);
   w = (WINDOW_WIDTH - (4 * 15)) / 3;
 
@@ -1486,7 +1486,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     &lb, x, y, w, 23, "Black", "Black", "White", btnfontname);
   xitk_add_widget (fb->widget_list, fb->delete);
   xitk_enable_and_show_widget(fb->delete);
-  
+
   x = WINDOW_WIDTH - (w + 15);
 
   lb.button_type       = CLICK_BUTTON;
@@ -1507,7 +1507,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   if(fb->cbb[0].label) {
     x = 15;
-    
+
     lb.button_type       = CLICK_BUTTON;
     lb.label             = fb->cbb[0].label;
     lb.align             = ALIGN_CENTER;
@@ -1523,7 +1523,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
     if(fb->cbb[1].label) {
       x = (WINDOW_WIDTH - w) / 2;
-      
+
       lb.button_type       = CLICK_BUTTON;
       lb.label             = fb->cbb[1].label;
       lb.align             = ALIGN_CENTER;
@@ -1539,7 +1539,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   }
 
   x = WINDOW_WIDTH - (w + 15);
-  
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
@@ -1567,7 +1567,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->visible = 1;
   fb->running = 1;
   filebrowser_raise_window(fb);
-    
+
   fb_getdir(fb);
 
   layer_above_video (fb->gui, fb->xwin);

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -70,15 +70,15 @@ static void lirc_get_playlist(char *from) {
 
 	/* First, free existing playlist */
 	mediamark_free_mediamarks();
-	
+
 	for (j = 0; j < num_mrls; j++)
-	  mediamark_append_entry((const char *)autoplay_mrls[j], 
+	  mediamark_append_entry((const char *)autoplay_mrls[j],
 				 (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
-	
+
         gui->playlist.cur = 0;
 	gui_set_current_mmk(mediamark_get_current_mmk());
         playlist_update_playlist (gui);
-      }    
+      }
     }
   }
 }
@@ -95,60 +95,60 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
 
     FD_ZERO(&set);
     FD_SET(lirc.fd, &set);
-    
+
     tv.tv_sec  = 0;
     tv.tv_usec = 500000;
 
     select(lirc.fd + 1, &set, NULL, NULL, &tv);
-    
+
     while((ret = lirc_nextcode(&code)) == 0) {
 
-      if(code == NULL) 
+      if(code == NULL)
 	break;
-      
-      while((ret = lirc_code2char(lirc.config, code, &c)) == 0 
+
+      while((ret = lirc_code2char(lirc.config, code, &c)) == 0
 	    && c != NULL) {
 #if 0
 	fprintf(stdout, "Command Received = '%s'\n", c);
 #endif
-	
+
 	k = kbindings_lookup_action (gui->kbindings, c);
-	
+
 	if(k) {
           gui_execute_action_id (gui, (kbindings_get_action_id(k)));
 	}
 	else {
 	  char from[256];
-	  
+
 	  memset(&from, 0, sizeof(from));
           if(sscanf(c, "PlaylistFrom:%255s", &from[0]) == 1) {
 	    if(strlen(from))
-	      lirc_get_playlist(from);   
+	      lirc_get_playlist(from);
 	  }
 	}
       }
-      
+
       if (panel_is_visible (gui->panel) > 1) {
         panel_paint (gui->panel);
       }
-      
+
       free(code);
-      
-      if(ret == -1) 
+
+      if(ret == -1)
 	break;
 
     }
-    if(ret == -1) 
+    if(ret == -1)
       break;
   }
-  
+
   pthread_exit(NULL);
 }
 
 void lirc_start(void) {
   int flags;
   int err;
-  
+
   if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
     __xineui_global_lirc_enable = 0;
     return;
@@ -159,7 +159,7 @@ void lirc_start(void) {
   flags = fcntl(lirc.fd, F_GETFL, 0);
   if(flags != -1)
     fcntl(lirc.fd, F_SETFL, flags|O_NONBLOCK);
-  
+
   if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
     __xineui_global_lirc_enable = 0;
     lirc_deinit();

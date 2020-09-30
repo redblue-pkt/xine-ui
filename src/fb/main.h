@@ -1,19 +1,19 @@
-/* 
+/*
  * Copyright (C) 2003 by Fredrik Noring
  * Copyright (C) 2003-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -65,7 +65,7 @@ struct fbxine
 	const char               *audio_port_id;
 	const char               *video_port_id;
 	int                      audio_channel;
-	
+
 	int                      screen_width;
 	int                      screen_height;
 
@@ -76,7 +76,7 @@ struct fbxine
         post_element_t          **post_video_elements;
         int                       post_video_elements_num;
         int                       post_video_enable;
-        
+
         post_element_t          **post_audio_elements;
         int                       post_audio_elements_num;
         int                       post_audio_enable;
@@ -85,8 +85,8 @@ struct fbxine
         post_element_t          **deinterlace_elements;
         int                       deinterlace_elements_num;
         int                       deinterlace_enable;
-  
-  
+
+
 #ifdef HAVE_LIRC
 	struct
 	{
@@ -95,7 +95,7 @@ struct fbxine
 		pthread_t          thread;
 	} lirc;
 #endif /* HAVE_LIRC */
-	
+
 	pthread_mutex_t mutex;
 	pthread_cond_t exit_cond;
 

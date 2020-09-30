@@ -21,7 +21,7 @@
 /*
 #define LOG
 */
- 
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -52,7 +52,7 @@ struct  odk_s {
   gGui_t     *gui;
   xine_t     *xine;
   xine_stream_t *stream;
-  
+
   xine_osd_t *osd;
   double vscale, hscale;
 
@@ -79,7 +79,7 @@ static void palette_transition(odk_t *odk, int from_index, int to_index,
   double cr_step, cb_step, y_step;
   uint8_t cr_from, cb_from, y_from;
   uint8_t cr_to, cb_to, y_to;
-  
+
   double trans_step;
   int num;
 
@@ -103,7 +103,7 @@ static void palette_transition(odk_t *odk, int from_index, int to_index,
     uint8_t cb_cur = cb_from + (int8_t)(cb_step * (num-from_index));
     uint8_t cr_cur = cr_from + (int8_t)(cr_step * (num-from_index));
     uint8_t y_cur  =  y_from + (int8_t)( y_step * (num-from_index));
-    
+
     odk->color[num] = cb_cur + (cr_cur<<8) + (y_cur<<16);
     odk->trans[num] = from_trans + trans_step * (num-from_index);
     /* printf("writing: color %x trans %u to %u\n", odk->color[num], odk->trans[num], num); */
@@ -142,15 +142,15 @@ int odk_alloc_text_palette(odk_t *odk, uint32_t fg_color, uint8_t fg_trans,
   odk->trans[odk->palette_fill]=bg_trans;
 
   /* background (1) to border (6) transition */
-  palette_transition(odk, odk->palette_fill+1, odk->palette_fill+6, 
+  palette_transition(odk, odk->palette_fill+1, odk->palette_fill+6,
       bg_color, bg_trans, bo_color, bo_trans);
 
   /* border (6) to foreground (10) transition */
-  palette_transition(odk, odk->palette_fill+6, odk->palette_fill+10, 
+  palette_transition(odk, odk->palette_fill+6, odk->palette_fill+10,
       bo_color, bo_trans, fg_color, fg_trans);
 
   odk->palette_fill += 11;
-  
+
   xine_osd_set_palette(odk->osd, odk->color, odk->trans);
 
   return odk->palette_fill-11;
@@ -414,7 +414,7 @@ int odk_send_event(odk_t *odk, oxine_event_t *event) {
     case OXINE_EVENT_FORMAT_CHANGED:
       odk_adapt(odk);
       break;
-    
+
     case OXINE_EVENT_BUTTON:
     case OXINE_EVENT_MOTION:
       if( !odk->unscaled_osd ) {
@@ -438,7 +438,7 @@ int odk_send_event(odk_t *odk, oxine_event_t *event) {
       if ((event->x < 0) || (event->x > V_WIDTH)) return 0;
       if ((event->y < 0) || (event->y > V_HEIGHT)) return 0;
   }
-  
+
   if (odk->event_handler)
     return odk->event_handler(odk->event_handler_data, event);
 

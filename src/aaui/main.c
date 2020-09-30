@@ -1,25 +1,25 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  *
  * xine main for aalib and caca
  *
- * Changes: 
+ * Changes:
  * - first working version (guenter)
  * - autoquit patch from Jens Viebig (siggi)
  * - more using of aalib, many changes, new api port (daniel)
@@ -161,7 +161,7 @@ static void post_plugin_cb(void *data, xine_cfg_entry_t *entry) {
 /*
  * Some config wrapper functions, because it's too much work for updating one entry.
  */
-static void config_update(xine_cfg_entry_t *entry, 
+static void config_update(xine_cfg_entry_t *entry,
 			  int type, int min, int max, int value, char *string) {
 
   switch(type) {
@@ -176,10 +176,10 @@ static void config_update(xine_cfg_entry_t *entry,
     entry->range_max = max;
     break;
 
-  case XINE_CONFIG_TYPE_STRING: 
+  case XINE_CONFIG_TYPE_STRING:
     entry->str_value = string;
     break;
-    
+
   case XINE_CONFIG_TYPE_ENUM:
   case XINE_CONFIG_TYPE_NUM:
   case XINE_CONFIG_TYPE_BOOL:
@@ -191,13 +191,13 @@ static void config_update(xine_cfg_entry_t *entry,
     return;
     break;
   }
-  
+
   xine_config_update_entry(__xineui_global_xine_instance, entry);
 }
 
 static void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
-  
+
   if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
@@ -205,7 +205,7 @@ static void config_update_range(char *key, int min, int max) {
 }
 static void config_update_enum(char *key, int value) {
   xine_cfg_entry_t entry;
-  
+
   if(xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry))
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
@@ -232,7 +232,7 @@ static void config_update_num(char *key, int value) {
 
 static void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
-  
+
   memset(&entry, 0, sizeof(entry));
   if (xine_config_lookup_entry(__xineui_global_xine_instance, key, &entry) && string)
     config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
@@ -264,14 +264,14 @@ static void show_version(void) {
  */
 static void show_banner(void) {
   int major, minor, sub;
-  
+
   show_version();
-  
-  printf("Built with xine library %d.%d.%d (%s).\n", 
+
+  printf("Built with xine library %d.%d.%d (%s).\n",
 	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
 
   xine_get_version (&major, &minor, &sub);
-  printf("Found xine library version: %d.%d.%d (%s).\n", 
+  printf("Found xine library version: %d.%d.%d (%s).\n",
 	 major, minor, sub, xine_get_version_string());
 }
 
@@ -290,7 +290,7 @@ static void print_usage (void) {
 
   if(!(configfile = getenv("XINERC"))) {
     configfile = (char *) malloc(strlen(xine_get_homedir())
-				       + strlen(cfgdir) 
+				       + strlen(cfgdir)
 				       + strlen(cfgfile)
 				       + 3);
     if (configfile) {
@@ -301,7 +301,7 @@ static void print_usage (void) {
       sprintf(configfile + strlen(configfile), "/%s", cfgfile);
     }
   }
-  
+
   xine = xine_new();
   if (configfile)
     xine_config_load(xine, configfile);
@@ -367,7 +367,7 @@ static void print_usage (void) {
 
 static void aaxine_handle_xine_error(xine_stream_t *stream) {
   int err;
-  
+
   err = xine_get_error(stream);
 
   switch(err) {
@@ -375,33 +375,33 @@ static void aaxine_handle_xine_error(xine_stream_t *stream) {
   case XINE_ERROR_NONE:
     /* noop */
     break;
-    
+
   case XINE_ERROR_NO_INPUT_PLUGIN:
     fprintf(stderr, "- xine engine error -\n"
 	    "There is no input plugin available to handle '%s'.\n"
 	    "Maybe MRL syntax is wrong or file/stream source doesn't exist.\n",
 	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
     break;
-    
+
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     fprintf(stderr, "- xine engine error -\n"
 	    "There is no demuxer plugin available to handle '%s'.\n"
-	    "Usually this means that the file format was not recognized.\n", 
+	    "Usually this means that the file format was not recognized.\n",
 	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
     break;
-    
+
   case XINE_ERROR_DEMUX_FAILED:
     fprintf(stderr, "- xine engine error -\n"
-	    "Demuxer failed. Maybe '%s' is a broken file?\n", 
+	    "Demuxer failed. Maybe '%s' is a broken file?\n",
 	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
     break;
-    
+
   case XINE_ERROR_MALFORMED_MRL:
     fprintf(stderr, "- xine engine error -\n"
-	    "Malformed mrl. Mrl '%s' seems malformed/invalid.\n", 
+	    "Malformed mrl. Mrl '%s' seems malformed/invalid.\n",
 	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
     break;
-    
+
   default:
     fprintf(stderr, "- xine engine error -\n!! Unhandled error !!\n");
     break;
@@ -412,7 +412,7 @@ static void aaxine_handle_xine_error(xine_stream_t *stream) {
 static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
   int ret;
   int has_video;
-  
+
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
 
@@ -423,33 +423,33 @@ static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time
 
   if(has_video && aaxine.post_running) {
     xine_post_out_t * audio_source;
-    
+
     audio_source = xine_get_audio_source(stream);
     if(xine_post_wire_audio_port(audio_source, aaxine.ao_port))
       aaxine.post_running = 0;
-    
+
   }
   else if((!has_video) && (!aaxine.no_post) && (!aaxine.post_running)) {
     xine_post_out_t * audio_source;
-    
+
     audio_source = xine_get_audio_source(stream);
     if(xine_post_wire_audio_port(audio_source, aaxine.post_plugin->audio_input[0]))
       aaxine.post_running = 1;
-    
+
   }
-  
+
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0)
     aaxine_handle_xine_error(stream);
   else {
     if(aaxine.logo_mode != 2)
       aaxine.logo_mode = 0;
   }
- 
+
   return ret;
 }
 
 static int aaxine_xine_open_and_play(const char *mrl, int start_pos, int start_time) {
-  
+
 
   if(!xine_open(aaxine.stream, mrl)) {
     aaxine_handle_xine_error(aaxine.stream);
@@ -475,9 +475,9 @@ static void aaxine_play_logo(void) {
   if(xine_get_status(aaxine.stream) == XINE_STATUS_PLAY) {
     aaxine.ignore_next = 1;
     xine_stop(aaxine.stream);
-    aaxine.ignore_next = 0; 
+    aaxine.ignore_next = 0;
   }
-  
+
   aaxine_xine_open_and_play(XINE_LOGO_MRL, 0, 0);
   aaxine.logo_mode = 1;
 }
@@ -489,9 +489,9 @@ static void aaxine_start_next(void) {
 
   if(aaxine.ignore_next)
     return;
-  
+
   aaxine.current_mrl++;
-  
+
   if (aaxine.current_mrl < aaxine.num_mrls) {
     if(!aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0))
       aaxine_play_logo();
@@ -512,28 +512,28 @@ static void aaxine_event_listener(void *user_data, const xine_event_t *event) {
 
   if(aaxine.logo_mode)
     return;
-  
+
   gettimeofday (&tv, NULL);
-  
+
   if((tv.tv_sec - event->tv.tv_sec) > 3) {
     printf("Event too old, discarding\n");
     return;
   }
-  
-  switch(event->type) { 
-    
+
+  switch(event->type) {
+
     /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     aaxine_start_next();
     break;
-    
+
   case XINE_EVENT_QUIT:
     break;
-    
+
   case XINE_EVENT_PROGRESS:
     {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
-      
+
       fprintf(stderr, "XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
     }
     break;
@@ -572,7 +572,7 @@ static void xinit_thread(void) {
 
    dlerror();
    if((xlib_handle = dlopen("libX11.so", RTLD_LAZY)) != NULL) {
-     
+
      if((x_init_threads = dlsym(xlib_handle, "XInitThreads")) != NULL)
        x_init_threads();
      else
@@ -623,22 +623,22 @@ int main(int argc, char *argv[]) {
   char                    *post_plugin_name = NULL;
 
   /*
-   * Check xine library version 
+   * Check xine library version
    */
   if(!xine_check_version(1, 0, 0)) {
     int major, minor, sub;
-    
+
     xine_get_version (&major, &minor, &sub);
     fprintf(stderr, "require xine library version 1.0.0, found %d.%d.%d.\n", major, minor, sub);
     goto failure;
   }
-  
+
   aaxine.num_mrls = 0;
   aaxine.current_mrl = 0;
 
   aaxine.auto_quit = 0; /* default: loop forever */
   aaxine.debug_messages = 0;
-  aaxine.ignore_next = 0; 
+  aaxine.ignore_next = 0;
   aaxine.no_post = 0;
   aaxine.post_running = 0;
   aaxine.post_plugin_name = NULL;
@@ -648,7 +648,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef AA
-  /* 
+  /*
    * AALib help and option-parsing
    */
   if (!aa_parseoptions(NULL, NULL, &argc, argv)) {
@@ -661,14 +661,14 @@ int main(int argc, char *argv[]) {
    * parse command line
    */
   opterr = 0;
-  while((c = getopt_long(argc, argv, short_options, 
+  while((c = getopt_long(argc, argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
     case 'd': /* Enable debug messages */
       if(optarg != NULL) {
 	char *p = xine_chomp(optarg);
-	
+
 	if(p && strlen(p))
 	  aaxine.debug_messages = strtol(p, &p, 10);
 
@@ -676,13 +676,13 @@ int main(int argc, char *argv[]) {
       else
 	aaxine.debug_messages = 1;
       break;
-      
+
     case 'a': /* Select audio channel */
       if (optarg) {
         sscanf(optarg, "%i", &audio_channel);
       }
       break;
-      
+
     case 'q': /* Automatic quit option */
       aaxine.auto_quit = 1;
       break;
@@ -704,7 +704,7 @@ int main(int argc, char *argv[]) {
 	exit (1);
       }
       break;
-      
+
     case 'P':
       if(!post_plugin_name && optarg)
 	post_plugin_name = strdup(optarg);
@@ -713,7 +713,7 @@ int main(int argc, char *argv[]) {
     case 'N':
       aaxine.no_post = 1;
       break;
-      
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -724,7 +724,7 @@ int main(int argc, char *argv[]) {
       print_usage();
       exit(1);
       break;
-      
+
     default:
       print_usage();
       fprintf (stderr, "invalid argument %d => exit\n",c);
@@ -738,7 +738,7 @@ int main(int argc, char *argv[]) {
   }
   else
     extract_mrls((argc - optind), &argv[optind]);
-  
+
   show_banner();
 
   /*
@@ -747,10 +747,10 @@ int main(int argc, char *argv[]) {
   {
     const char *cfgdir = ".xine";
     const char *cfgfile = CONFIGFILE;
-    
+
     if (!(__xineui_global_config_file = getenv ("XINERC"))) {
       __xineui_global_config_file = (char *) malloc(strlen(xine_get_homedir())
-						+ strlen(cfgdir) 
+						+ strlen(cfgdir)
 						+ strlen(cfgfile)
 						+ 3);
       if (__xineui_global_config_file) {
@@ -767,12 +767,12 @@ int main(int argc, char *argv[]) {
   if (__xineui_global_config_file)
     xine_config_load (__xineui_global_xine_instance, __xineui_global_config_file);
   xine_engine_set_param(__xineui_global_xine_instance, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
-  
+
   /*
    * xine init
    */
   xine_init (__xineui_global_xine_instance);
-  
+
   if(!__xineui_global_xine_instance) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
@@ -804,7 +804,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "aa_autoinitkdb() failed.\n");
     goto failure;
   }
-  
+
   aa_hidecursor(aaxine.context);
   aa_resizehandler(aaxine.context, aaxine_resize_handler);
   /*
@@ -812,10 +812,10 @@ int main(int argc, char *argv[]) {
    */
   if(!video_driver_id)
     video_driver_id = "aa";
-  
+
   aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					  video_driver_id,
-					  XINE_VISUAL_TYPE_AA, 
+					  XINE_VISUAL_TYPE_AA,
 					  (void *)aaxine.context);
 #endif
 
@@ -825,7 +825,7 @@ int main(int argc, char *argv[]) {
    */
   if(!video_driver_id)
     video_driver_id = "caca";
-  
+
   aaxine.canvas = cucul_create_canvas(0, 0);
   aaxine.display = caca_create_display(aaxine.canvas);
   aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
@@ -835,11 +835,11 @@ int main(int argc, char *argv[]) {
 #endif
 
   if (!aaxine.vo_port) {
-    aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance, 
+    aaxine.vo_port = xine_open_video_driver(__xineui_global_xine_instance,
 					    video_driver_id,
-					    XINE_VISUAL_TYPE_FB, 
+					    XINE_VISUAL_TYPE_FB,
 					    NULL);
-  }  
+  }
   if (!aaxine.vo_port) {
     printf ("main: video driver %s failed\n", video_driver_id);
     goto failure;
@@ -848,7 +848,7 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
-  driver_name = (char *)xine_config_register_string (__xineui_global_xine_instance, 
+  driver_name = (char *)xine_config_register_string (__xineui_global_xine_instance,
 						     "audio.driver",
 						     "oss",
 						     "audio driver to use",
@@ -856,43 +856,43 @@ int main(int argc, char *argv[]) {
 						     20,
 						     NULL,
 						     NULL);
-  
+
   if(!audio_driver_id)
     audio_driver_id = driver_name;
   else
     config_update_string ("audio.driver", audio_driver_id);
-  
+
   aaxine.ao_port = xine_open_audio_driver(__xineui_global_xine_instance, audio_driver_id, NULL);
-  
+
   if(!aaxine.ao_port) {
     printf ("main: audio driver %s failed\n", audio_driver_id);
     aaxine.no_post = 1;
   }
-  
+
   /* Init post plugin, if desired */
   if(!aaxine.no_post) {
-    
+
     if(aaxine.ao_port) {
-      const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance, 
+      const char *const *pol = xine_list_post_plugins_typed(__xineui_global_xine_instance,
 							    XINE_POST_TYPE_AUDIO_VISUALIZATION);
-      
+
       if(pol) {
-	aaxine.post_plugin_name = 
-	  (char *) xine_config_register_string (__xineui_global_xine_instance, "aaxine.post_plugin", 
+	aaxine.post_plugin_name =
+	  (char *) xine_config_register_string (__xineui_global_xine_instance, "aaxine.post_plugin",
 						pol[0],
 						"Post plugin name",
 						NULL, 0, post_plugin_cb, NULL);
-	
+
 	if(post_plugin_name) {
-	  if((aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, post_plugin_name, 
+	  if((aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, post_plugin_name,
 						  0, &aaxine.ao_port, &aaxine.vo_port)) != NULL) {
 	    config_update_string("aaxine.post_plugin", post_plugin_name);
 	  }
 	}
 	else
-	  aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, aaxine.post_plugin_name, 
+	  aaxine.post_plugin = xine_post_init(__xineui_global_xine_instance, aaxine.post_plugin_name,
 					      0, &aaxine.ao_port, &aaxine.vo_port);
-	
+
 	if(aaxine.post_plugin == NULL) {
 	  printf("failed to initialize post plugins '%s'\n", aaxine.post_plugin_name);
 	  aaxine.no_post = 1;
@@ -910,11 +910,11 @@ int main(int argc, char *argv[]) {
   }
 
   aaxine.stream = xine_stream_new(__xineui_global_xine_instance, aaxine.ao_port, aaxine.vo_port);
-  
+
   /* Init mixer control */
   aaxine.mixer.enable = 0;
   aaxine.mixer.caps = MIXER_CAP_NOTHING;
-  
+
   if(aaxine.ao_port) {
     if((xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME)) != -1)
       aaxine.mixer.caps |= MIXER_CAP_VOL;
@@ -922,14 +922,14 @@ int main(int argc, char *argv[]) {
       aaxine.mixer.caps |= MIXER_CAP_MUTE;
   }
 
-  if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
+  if(aaxine.mixer.caps & MIXER_CAP_VOL) {
     aaxine.mixer.enable = 1;
     aaxine.mixer.volume_level = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME);
   }
-  
+
   if(aaxine.mixer.caps & MIXER_CAP_MUTE)
     aaxine.mixer.mute = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE);
-  
+
   /* Select audio channel */
   xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
 
@@ -939,7 +939,7 @@ int main(int argc, char *argv[]) {
      && ((!strcasecmp(aaxine.context->driver->shortname, "linux"))
          || (!strcasecmp(aaxine.context->driver->shortname, "X11")))) {
     int error_fd;
-    
+
     if ((error_fd = open("/dev/null", O_WRONLY)) < 0)
          printf("cannot open /dev/null");
     else {
@@ -951,7 +951,7 @@ int main(int argc, char *argv[]) {
     }
   }
 #endif
-  
+
   aaxine.event_queue = xine_event_new_queue(aaxine.stream);
   xine_event_create_listener_thread(aaxine.event_queue, aaxine_event_listener, NULL);
 
@@ -994,36 +994,36 @@ int main(int argc, char *argv[]) {
 
     case KEY_LEFT:
       if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-        xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
+        xine_set_param(aaxine.stream, XINE_PARAM_SPEED,
 		       (xine_get_param(aaxine.stream, XINE_PARAM_SPEED)) / 2);
       break;
-      
+
     case KEY_RIGHT:
       if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
         if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-          xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
+          xine_set_param(aaxine.stream, XINE_PARAM_SPEED,
 			 (xine_get_param(aaxine.stream, XINE_PARAM_SPEED)) * 2);
         else
           xine_set_param(aaxine.stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       }
       break;
-      
+
     case '+':
       xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL,
 		     (xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) + 1);
       break;
-      
+
     case '-':
       if(xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL))
-	xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, 
+	xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL,
 		       (xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) - 1);
       break;
-      
+
     case 'q':
     case 'Q':
       aaxine.running = 0;
       break;
-      
+
     case 13:
     case 'r':
     case 'R':
@@ -1048,7 +1048,7 @@ int main(int argc, char *argv[]) {
 
     case 'V':
       if(aaxine.mixer.enable) {
-	if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
+	if(aaxine.mixer.caps & MIXER_CAP_VOL) {
 	  if(aaxine.mixer.volume_level < 100) {
 	    aaxine.mixer.volume_level++;
 	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
@@ -1056,10 +1056,10 @@ int main(int argc, char *argv[]) {
 	}
       }
       break;
-      
+
     case 'v':
       if(aaxine.mixer.enable) {
-	if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
+	if(aaxine.mixer.caps & MIXER_CAP_VOL) {
 	  if(aaxine.mixer.volume_level > 0) {
 	    aaxine.mixer.volume_level--;
 	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
@@ -1067,7 +1067,7 @@ int main(int argc, char *argv[]) {
 	}
       }
       break;
-      
+
     case 'm':
     case 'M':
       if(aaxine.mixer.enable) {
@@ -1111,12 +1111,12 @@ int main(int argc, char *argv[]) {
 
     }
   }
-  
+
  failure:
-  
+
   if(__xineui_global_xine_instance && __xineui_global_config_file)
     xine_config_save(__xineui_global_xine_instance, __xineui_global_config_file);
-  
+
   if(aaxine.stream) {
     xine_close(aaxine.stream);
     xine_event_dispose_queue(aaxine.event_queue);
@@ -1125,12 +1125,12 @@ int main(int argc, char *argv[]) {
 
   if(aaxine.vo_port)
     xine_close_video_driver(__xineui_global_xine_instance, aaxine.vo_port);
-  
+
   if(aaxine.ao_port)
     xine_close_audio_driver(__xineui_global_xine_instance, aaxine.ao_port);
-  
+
   if(__xineui_global_xine_instance)
-    xine_exit(__xineui_global_xine_instance); 
+    xine_exit(__xineui_global_xine_instance);
 
 #ifdef AA
   if(aaxine.context) {
@@ -1142,11 +1142,11 @@ int main(int argc, char *argv[]) {
 
 #ifdef CACA
   if(aaxine.display) {
-    caca_free_display(aaxine.display); 
+    caca_free_display(aaxine.display);
     cucul_free_canvas(aaxine.canvas);
   }
 #endif
-  
+
   if(xlib_handle)
     dlclose(xlib_handle);
 

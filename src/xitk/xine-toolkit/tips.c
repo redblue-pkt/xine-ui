@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -101,7 +101,7 @@ static void *_tips_loop_thread (void *data) {
   _tips_state_t state = TIPS_IDLE;
 
   pthread_mutex_lock (&tips->mutex);
-  
+
   while (state != TIPS_QUIT) {
     int wait;
 
@@ -135,18 +135,18 @@ static void *_tips_loop_thread (void *data) {
 
           /* Get parent window position */
           xitk_get_window_position (tips->display, tips->widget->wl->win, &x, &y, NULL, NULL);
-      
+
           x += tips->widget->x;
           y += tips->widget->y;
-      
+
           fs = xitk_font_load_font (xitk, DEFAULT_FONT_10);
           xitk_font_set_font (fs, tips->widget->wl->gc);
 
           xitk_font_unload_font (fs);
-      
+
           cfore = xitk_get_pixel_color_black (xitk);
           cback = xitk_get_pixel_color_lightgray (xitk);
-      
+
           /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
           image = xitk_image_create_image_with_colors_from_string (xitk,
             DEFAULT_FONT_10, disp_w / 3, ALIGN_LEFT, tips->widget->tips_string, cfore, cback);
@@ -334,7 +334,7 @@ void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
   w->tips_timeout = timeout;
   if (w->type & (WIDGET_GROUP | WIDGET_GROUP_MEMBER)) {
     widget_event_t  event;
-    
+
     event.type         = WIDGET_EVENT_TIPS_TIMEOUT;
     event.tips_timeout = timeout;
     w->event (w, &event, NULL);

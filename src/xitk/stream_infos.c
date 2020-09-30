@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -339,17 +339,17 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   char        *album   = NULL;
   char        *aartist = NULL;
   char        *artist  = NULL;
-  char        *aalbum  = NULL; 
+  char        *aalbum  = NULL;
   char        *ident   = NULL;
   xitk_recode_t *xr;
-  
+
   if(!stream)
     return NULL;
-  
+
   title = (char *)xine_get_meta_info(stream, XINE_META_INFO_TITLE);
   artist = (char *)xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
   album = (char *)xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
-  
+
   xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
   if(title)
     title = xitk_recode(xr, title);
@@ -358,7 +358,7 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   if(album)
     album = xitk_recode(xr, album);
   xitk_recode_done(xr);
-  
+
   /*
    * Since meta info can be corrupted/wrong/ugly
    * we need to clean and check them before using.
@@ -391,15 +391,15 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
 
   if(atitle) {
     int len = strlen(atitle) + 1;
-    
+
     if(aartist && strlen(aartist))
       len += strlen(aartist) + 3;
     if(aalbum && strlen(aalbum))
       len += strlen(aalbum) + 3;
-    
+
     ident = (char *) malloc(len + 1);
     strcpy(ident, atitle);
-    
+
     if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {
       strlcat(ident, " (", len);
       if(aartist && strlen(aartist))
@@ -428,7 +428,7 @@ static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
   sinfo->visible = 0;
 
   gui_save_window_pos (sinfo->gui, "sinfos", sinfo->widget_key);
-    
+
   xitk_unregister_event_handler (&sinfo->widget_key);
 
   xitk_window_destroy_window (sinfo->xwin);
@@ -545,7 +545,7 @@ void stream_infos_panel (gGui_t *gui) {
 
   x = y = 80;
   gui_load_window_pos (sinfo->gui, "sinfos", &x, &y);
-  
+
   /* Create window */
   sinfo->xwin = xitk_window_create_dialog_window (sinfo->gui->xitk, _("Stream Information"),
     x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -562,7 +562,7 @@ void stream_infos_panel (gGui_t *gui) {
   sinfo->yes = _("Yes");
   sinfo->no = _("No");
   sinfo->unavail = _("Unavailable");
-  
+
   {
     xitk_pixmap_t *bg = xitk_window_get_background_pixmap (sinfo->xwin);
     int i;

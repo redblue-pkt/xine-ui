@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -65,7 +65,7 @@ typedef struct xui_sinfo_s xui_sinfo_t;
 #include "libcommon.h"
 #include "globals.h"
 
-#ifdef HAVE_ORBIT 
+#ifdef HAVE_ORBIT
 #include "../corba/xine-server.h"
 #endif
 
@@ -184,17 +184,17 @@ struct gGui_st {
     int                     running;
     int                     current;
     int                     enabled; /* 0, 1:vpost, 2:vanim */
-    
+
     int                     num_mrls;
     char                  **mrls;
-    
+
     int                     post_plugin_num;
     int                     post_changed;
-    post_element_t          post_output_element;    
+    post_element_t          post_output_element;
   } visual_anim;
 
   post_info_t               post_audio, post_video;
-  
+
   struct {
     int                     enabled;
     int                     use_unscaled;
@@ -242,11 +242,11 @@ struct gGui_st {
   mediamark_t               mmk;
   /* Recursive mutex, protecting .mmk and .playlist. */
   pthread_mutex_t           mmk_mutex;
-  
+
   /* playlist */
   struct {
     mediamark_t           **mmk;
-    
+
     int                     num;                   /* number of entries in playlist */
     int                     cur;                   /* current entry in playlist */
     int                     ref_append;            /* append mrl reference entry to this position */
@@ -260,7 +260,7 @@ struct gGui_st {
   int                       ignore_next;
 
   int                       stdctl_enable;
-  
+
 #ifdef HAVE_XF86VIDMODE
   int                       XF86VidMode_fullscreen;
 #endif
@@ -275,10 +275,10 @@ struct gGui_st {
 
   int                       layer_above;
   int                       always_layer_above;
-  
+
   int                       network;
   int                       network_port;
-  
+
   int                       use_root_window;
 
   int                       ssaver_enabled;
@@ -290,7 +290,7 @@ struct gGui_st {
   int                       auto_panel_visibility;
 
   const char               *snapshot_location;
-  
+
   char                      *keymap_file;
   kbinding_t                *kbindings;
   int                        shortcut_style;
@@ -324,7 +324,7 @@ struct gGui_st {
   FILE                      *report;
 
   int                        no_gui;
-  
+
   int                        no_mouse;
 
   void                     (*nongui_error_msg)(const char *text);

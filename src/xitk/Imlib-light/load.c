@@ -21,7 +21,7 @@ static void _SplitID(char *file) {
 #else
   char *p = strrchr(file, ';');
 #endif
- 
+
   if (p) {
     *p++ = 0;
   }
@@ -408,16 +408,16 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   }
 
   if (p) {
-    if (p != stdin) 
+    if (p != stdin)
       fclose(p);
   }
-  
+
   if (!data)
     {
       fprintf(stderr, "IMLIB ERROR: Cannot load image: %s\nAll fallbacks failed.\n", fil);
       goto error;
     }
-    
+
   if (!w || !h)
     {
       fprintf(stderr, "IMLIB ERROR: zero image\n" );

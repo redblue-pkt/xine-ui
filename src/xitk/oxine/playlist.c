@@ -116,7 +116,7 @@ static void changelist (otk_widget_t *list) {
       pretty_name_free = pretty_name = get_basename(gGui->playlist.mmk[i]->mrl);
     else
       pretty_name = gGui->playlist.mmk[i]->ident;
-    
+
     snprintf(tmp, 511, "%s %s",  ( i == gGui->playlist.cur ) ? "->" : "  ", pretty_name);
     otk_add_listentry(list, tmp, NULL, -1);
     free(pretty_name_free);
@@ -169,7 +169,7 @@ static void playlist_leave_cb (void *data) {
 
   session->oxine->reentry = NULL;
   session->oxine->reentry_data = NULL;
-  
+
   session->oxine->main_menu_cb(session->oxine);
 }
 
@@ -201,7 +201,7 @@ static void playlist_reentry_cb (void *data) {
   b = otk_selector_new (oxine->main_window, 10, 80, 195, 60, pl_action_strings, 2, action_changed, session);
   otk_set_focus(b);
   otk_selector_set(b, session->action);
-  
+
   /*
   otk_button_new (oxine->main_window, 10, 150, 195, 60, "load", playlist_load_cb, session);
   otk_button_new (oxine->main_window, 10, 210, 195, 60, "Save", playlist_save_cb, session);
@@ -214,7 +214,7 @@ static void playlist_reentry_cb (void *data) {
   session->list = otk_list_new(list_window, 10, 15, 523, 390, playlist_play_cb, session);
   changelist(session->list);
   otk_list_set_pos(session->list, session->listpos);
-  
+
   otk_draw_all(oxine->otk);
 }
 

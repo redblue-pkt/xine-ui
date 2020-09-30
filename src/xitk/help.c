@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -81,7 +81,7 @@ struct xui_help_s {
   xitk_widget_t        *browser;
 
   char                 *tab_sections[MAX_SECTIONS + 1];
-  
+
   help_section_t       *sections[MAX_SECTIONS + 1];
   int                   num_sections;
   int                   tabs_height;
@@ -103,7 +103,7 @@ static void help_add_section (xui_help_t *help, const char *filename, const char
   int order_num, char *section_name) {
   struct stat  st;
   xitk_recode_t *xr;
-  
+
   /* ensure that the file is not empty */
   if(help->num_sections < MAX_SECTIONS) {
     if((stat(filename, &st) == 0) && (st.st_size)) {
@@ -120,31 +120,31 @@ static void help_add_section (xui_help_t *help, const char *filename, const char
 	  if((bytes_read = read(fd, buf, st.st_size)) == st.st_size) {
 	    char  *p, **hbuf = NULL;
 	    int    lines = 0;
-	    
+
 	    buf[st.st_size] = '\0';
 
 	    pbuf = buf;
 	    while((p = xine_strsep(&pbuf, "\n")) != NULL) {
 	      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
-	      
+
 	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
 		*(p + strlen(p) - 1) = '\0';
 
               hbuf[lines] = xitk_recode(xr, p);
 	      hbuf[++lines]   = NULL;
 	    }
-	    
+
 	    if(lines) {
 	      help_section_t  *section;
 
 	      section = (help_section_t *) calloc(1, sizeof(help_section_t));
 
-	      section->name      = strdup((section_name && strlen(section_name)) ? 
+	      section->name      = strdup((section_name && strlen(section_name)) ?
 					  section_name : _("Undefined"));
 	      section->content   = (const char **)hbuf;
 	      section->line_num  = lines;
 	      section->order_num = order_num;
-	      
+
 	      help->sections[help->num_sections++] = section;
 	      help->sections[help->num_sections]   = NULL;
 	    }
@@ -180,7 +180,7 @@ static void help_sections (xui_help_t *help) {
 
       memset(&ending, 0, sizeof(ending));
       memset(&section_name, 0, sizeof(section_name));
-      
+
       if ((sscanf(dir_entry->d_name, "README.en.%d.%255s", &order_num, &section_name[0])) == 2) {
         sscanf(dir_entry->d_name, "README.en.%255s", &ending[0]);
 
@@ -212,23 +212,23 @@ static void help_sections (xui_help_t *help) {
 	  }
 	}
       }
-      
+
       /* create tabs section names */
       for(i = 0; i < help->num_sections; i++) {
 	char *p;
-	
+
 	p = help->tab_sections[i] = strdup(help->sections[i]->name);
-	
+
 	/* substitute underscores by spaces (nicer) */
 	while(*p) {
 	  if(*p == '_')
 	    *p = ' ';
 	  p++;
 	}
-	
+
 	help->tab_sections[i + 1] = NULL;
       }
-    } 
+    }
   }
 }
 
@@ -241,27 +241,27 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
     help->visible = 0;
 
     gui_save_window_pos (help->gui, "help", help->kreg);
-    
+
     xitk_unregister_event_handler(&help->kreg);
     xitk_window_destroy_window(help->xwin);
     help->xwin = NULL;
     /* xitk_dlist_init (&help->widget_list->list); */
-    
+
     if(help->num_sections) {
       int i;
 
       for(i = 0; i < help->num_sections; i++) {
 	int j = 0;
-	
+
 	free(help->tab_sections[i]);
-	
+
 	free(help->sections[i]->name);
-	
+
 	while(help->sections[i]->content[j]) {
 	  free((char *) help->sections[i]->content[j]);
 	  j++;
 	}
-	
+
 	free(help->sections[i]->content);
 	free(help->sections[i]);
       }
@@ -407,7 +407,7 @@ void help_panel (gGui_t *gui) {
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Close");
     lb.align             = ALIGN_CENTER;
-    lb.callback          = help_exit; 
+    lb.callback          = help_exit;
     lb.state_callback    = NULL;
     lb.userdata          = help;
     lb.skin_element_name = NULL;
@@ -418,9 +418,9 @@ void help_panel (gGui_t *gui) {
       xitk_enable_and_show_widget (w);
     }
   }
-  
+
   help->kreg = xitk_window_register_event_handler ("help", help->xwin, &help_event_cbs, help);
-  
+
   help->visible = 1;
   help_raise_window (help);
 

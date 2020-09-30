@@ -1,17 +1,17 @@
 /** Copyright (C) 2000-2020 the xine project
  *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -51,7 +51,7 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "common.h" 
+#include "common.h"
 #include "panel.h"
 #include "playlist.h"
 #include "tvout.h"
@@ -180,7 +180,7 @@ static const struct option long_options[] = {
 #ifdef TRACE_RC
 static void _rc_file_check_args(int argc, char **argv) {
   int i;
-  
+
   printf("%s(): argc %d\n", __XINE_FUNCTION__, argc);
 
   for(i = 0; i < argc; i++)
@@ -198,14 +198,14 @@ static void _rc_file_clean_eol(file_info_t *rcfile) {
 	*p = '\0';
 	break;
       }
-      
+
       p++;
     }
-    
+
     while(p > rcfile->ln) {
       --p;
-      
-      if(*p == ' ') 
+
+      if(*p == ' ')
 	*p = '\0';
       else
 	break;
@@ -216,24 +216,24 @@ static int _rc_file_get_next_line(file_info_t *rcfile) {
 
  __get_next_line:
   rcfile->ln = fgets(rcfile->buf, 255, rcfile->fd);
-  
+
   while(rcfile->ln && (*rcfile->ln == ' ' || *rcfile->ln == '\t')) ++rcfile->ln;
-  
+
   if(rcfile->ln) {
     if(!strncmp(rcfile->ln, "#", 1))
       goto __get_next_line;
   }
-  
+
   _rc_file_clean_eol(rcfile);
-  
+
   if(rcfile->ln && !strlen(rcfile->ln))
     goto __get_next_line;
 
   return((rcfile->ln != NULL));
 }
 /*
- * This function duplicate argv[] to an char** array,, 
- * try to open and parse a "~/.xine/xinerc" rc file, 
+ * This function duplicate argv[] to an char** array,,
+ * try to open and parse a "~/.xine/xinerc" rc file,
  * and concatenate found entries to the char **array.
  * This allow user to always specify a command line argument.
  */
@@ -243,32 +243,32 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   const char    *xinerc = "xinerc";
   file_info_t   *rcfile;
   char        **_argv = NULL;
-  
+
   _argv  = (char **) calloc((argc + 1), sizeof(char *));
   (*_argc) = argc;
 
   _argv[0] = strdup(argv[0]);
-  
+
   rcfile           = (file_info_t *) calloc(1, sizeof(file_info_t));
   rcfile->filename = xitk_asprintf("%s/%s/%s", (xine_get_homedir()), cfgdir, xinerc);
-  
+
   if((rcfile->fd = fopen(rcfile->filename, "r")) != NULL) {
-    
+
     while(_rc_file_get_next_line(rcfile)) {
       _argv = (char **) realloc(_argv, sizeof(char **) * ((*_argc) + 2));
       _argv[i] = strdup(rcfile->ln);
       i++;
       (*_argc)++;
     }
-    
+
     fclose(rcfile->fd);
   }
-  
+
   for(j = 1; i < (*_argc); i++, j++)
     _argv[i] = strdup(argv[j]);
 
   _argv[(*_argc)] = NULL;
-  
+
   free(rcfile->filename);
   free(rcfile);
 
@@ -277,12 +277,12 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
 
 static void free_command_line_args(char ***argv, int argc) {
   int _argc = argc - 1;
-  
+
   while(_argc >= 0) {
     free((*argv)[_argc]);
     _argc--;
   }
-  
+
   free(*(argv));
 }
 
@@ -299,7 +299,7 @@ static void sub_autoload_cb(void *data, xine_cfg_entry_t *cfg) {
  *
  */
 static void show_version(void) {
-  
+
   printf(_("This is xine (X11 gui) - a free video player v%s"), VERSION);
 #ifdef DEBUG
   printf("-[DEBUG]");
@@ -331,14 +331,14 @@ static void print_formatted(char *title, const char *const *plugins) {
   static const char blanks[] = "     ";
 
   printf("%s", title);
-  
+
   strcpy(buffer, blanks);
   plugin = *plugins++;
-  
+
   while(plugin) {
-    
+
     len = strlen(buffer);
-    
+
     if((len + (strlen(plugin) + 3)) < 80) {
       snprintf(buffer+len, sizeof(buffer)-len, "%s%s", (len == sizeof(blanks)-1) ? "" : ", ", plugin);
     }
@@ -346,10 +346,10 @@ static void print_formatted(char *title, const char *const *plugins) {
       printf("%s,\n", buffer);
       snprintf(buffer, sizeof(buffer), "%s%s", blanks, plugin);
     }
-    
+
     plugin = *plugins++;
   }
-  
+
   printf("%s.\n\n", buffer);
 }
 
@@ -406,7 +406,7 @@ static void list_plugins(char *type) {
     { xine_list_video_decoder_plugins, N_("   -Video decoder:\n"),   "video_decoder" },
     { NULL,                            "",                           ""              }
   };
-    
+
 
   xine = xine_new();
   _config_load(xine);
@@ -416,9 +416,9 @@ static void list_plugins(char *type) {
 
   if(type && strlen(type)) {
     i = 0;
-    
+
     while(list_functions[i].func) {
-      
+
       if(!strncasecmp(type, list_functions[i].type, strlen(type))) {
 	if((plugins = list_functions[i].func(xine))) {
 	  printf(_("\n Available xine's plugins:\n"));
@@ -435,14 +435,14 @@ static void list_plugins(char *type) {
   }
   else {
     printf(_("\n Available xine's plugins:\n"));
-    
+
     i = 0;
-    
+
     while(list_functions[i].func) {
 
       if((plugins = list_functions[i].func(xine)))
 	print_formatted(gettext(list_functions[i].name), plugins);
-      
+
       i++;
     }
   }
@@ -458,11 +458,11 @@ static void show_usage (void) {
   const char   *driver_id;
   xine_t       *xine;
   const char  **backends, *backend;
-  
+
   xine = xine_new();
   _config_load(xine);
   xine_init(xine);
-  
+
   printf("\n");
   printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
   printf("\n");
@@ -624,48 +624,48 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
   void                   *vis;
   int                     driver_num;
 
-  driver_num = 
+  driver_num =
     xine_config_register_enum (gui->xine, "video.driver", 0, video_driver_ids,
 			      _("video driver to use"),
 			      _("Choose video driver. "
 				"NOTE: you may restart xine to use the new driver"),
 			      CONFIG_LEVEL_ADV,
-			      CONFIG_NO_CB, 
+			      CONFIG_NO_CB,
 			      CONFIG_NO_DATA);
-  
+
   vis = video_window_get_xine_visual(gui->vwin);
 
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
    */
-  driver_num = 
+  driver_num =
     xine_config_register_enum (gui->xine, "video.driver", 0, video_driver_ids,
 			      _("video driver to use"),
 			      _("Choose video driver. "
 				"NOTE: you may restart xine to use the new driver"),
 			      CONFIG_LEVEL_ADV,
-			      CONFIG_NO_CB, 
+			      CONFIG_NO_CB,
 			      CONFIG_NO_DATA);
-  
+
   if (driver_number < 0) {
     /* video output driver auto-probing */
     const char *const *driver_ids;
     int                i;
-    
+
     if ((!strcasecmp (video_driver_ids[driver_num], "none")) ||
         (!strcasecmp (video_driver_ids[driver_num], "null"))) {
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_num],
         XINE_VISUAL_TYPE_NONE, NULL);
       if (video_port)
 	return video_port;
-      
+
     }
     else if (!strcasecmp (video_driver_ids[driver_num], "fb")) {
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_num],
         XINE_VISUAL_TYPE_FB, NULL);
       if (video_port)
 	return video_port;
-      
+
     }
     else if (strcasecmp (video_driver_ids[driver_num], "auto")) {
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_num],
@@ -673,7 +673,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
       if (video_port)
 	return video_port;
     }
-    
+
     /* note: xine-lib can do auto-probing for us if we want.
      *       but doing it here should do no harm.
      */
@@ -681,35 +681,35 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
     driver_ids = xine_list_video_output_plugins (gui->xine);
 
     while (driver_ids[i]) {
-      
+
       if (gui->verbosity)
 	printf (_("main: probing <%s> video output plugin\n"), driver_ids[i]);
-      
-      video_port = xine_open_video_driver (gui->xine, 
+
+      video_port = xine_open_video_driver (gui->xine,
 					  driver_ids[i],
-					  XINE_VISUAL_TYPE_X11, 
+					  XINE_VISUAL_TYPE_X11,
                                            vis);
       if (video_port) {
 	return video_port;
       }
-     
+
       i++;
     }
-      
+
     if (!video_port) {
       printf (_("main: all available video drivers failed.\n"));
       exit (1);
     }
-    
+
   }
   else {
-    
+
     /* 'none' plugin is a special case, just change the visual type */
     if ((!strcasecmp (video_driver_ids[driver_number], "none"))
       || (!strcasecmp (video_driver_ids[driver_number], "null"))) {
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_number],
         XINE_VISUAL_TYPE_NONE, NULL);
-      
+
       /* do not save on config, otherwise user would never see images again... */
     }
     else if (!strcasecmp (video_driver_ids[driver_number], "fb")) {
@@ -721,12 +721,12 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_number],
         XINE_VISUAL_TYPE_X11, vis);
     }
-    
+
     if(!video_port) {
       printf (_("main: video driver <%s> failed\n"), video_driver_ids[driver_number]);
       exit (1);
     }
-    
+
   }
 
   return video_port;
@@ -739,38 +739,38 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
   gGui_t                 *gui = gGui;
   xine_audio_port_t      *audio_port = NULL;
   int                     driver_num;
-  
+
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
    */
 
-  driver_num = 
+  driver_num =
     xine_config_register_enum (gui->xine, "audio.driver", 0, audio_driver_ids,
 			      _("audio driver to use"),
 			      _("Choose audio driver. "
 				"NOTE: you may restart xine to use the new driver"),
 			      CONFIG_LEVEL_ADV,
-			      CONFIG_NO_CB, 
+			      CONFIG_NO_CB,
 			      CONFIG_NO_DATA);
-  
+
   if (driver_number < 0) {
     const char *const *driver_ids;
     int    i;
-    
+
     if (strcasecmp (audio_driver_ids[driver_num], "auto")) {
-      
+
       /* don't want to load an audio driver ? */
       if (!strncasecmp (audio_driver_ids[driver_num], "NULL", 4)) {
         if (gui->verbosity)
 	  printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
-      
+
       audio_port = xine_open_audio_driver (gui->xine, audio_driver_ids[driver_num], NULL);
       if (audio_port)
 	return audio_port;
     }
-    
+
     /* note: xine-lib can do auto-probing for us if we want.
      *       but doing it here should do no harm.
      */
@@ -778,7 +778,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
     driver_ids = xine_list_audio_output_plugins (gui->xine);
 
     while (driver_ids[i]) {
-      
+
       if(strcmp(driver_ids[i], "none")) {
         if (gui->verbosity)
 	  printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
@@ -789,21 +789,21 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
 	i++;
         continue;
       }
-      
-      audio_port = xine_open_audio_driver (gui->xine, 
+
+      audio_port = xine_open_audio_driver (gui->xine,
 					  driver_ids[i],
 					  NULL);
       if (audio_port) {
 	return audio_port;
       }
-     
+
       i++;
     }
-      
+
     printf(_("main: audio driver probing failed => no audio output\n"));
   }
   else {
-    
+
     /* don't want to load an audio driver ? */
     if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
 
@@ -814,19 +814,19 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_
        * config. if user doesn't have a sound card he may go to setup screen
        * changing audio.driver to NULL in order to make xine start a bit faster.
        */
-    
+
     }
     else {
-    
+
       audio_port = xine_open_audio_driver (gui->xine, audio_driver_ids[driver_number], NULL);
 
       if (!audio_port) {
         printf (_("main: audio driver <%s> failed\n"), audio_driver_ids[driver_number]);
         exit(1);
       }
-    
+
     }
-  
+
   }
 
   return audio_port;
@@ -839,7 +839,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
   gGui_t *gui = user_data;
   struct timeval tv;
 #if XINE_VERSION_CODE < 10200
-  static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */ 
+  static int mrl_ext = 0; /* set if we get an MRL_REFERENCE_EXT */
 #endif
 
   /*
@@ -848,19 +848,19 @@ static void event_listener (void *user_data, const xine_event_t *event) {
    */
   if(gui->logo_mode && (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED))
     return;
-  
+
   gettimeofday (&tv, NULL);
-  
+
   if(labs(tv.tv_sec - event->tv.tv_sec) > 3) {
     fprintf(stderr, "Event too old, discarding\n");
     return;
   }
-  
+
   if (gui->stdctl_enable)
     stdctl_event (gui, event);
 
-  switch(event->type) { 
-    
+  switch(event->type) {
+
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     if(event->stream == gui->stream) {
@@ -875,32 +875,32 @@ static void event_listener (void *user_data, const xine_event_t *event) {
       visual_anim_play_next();
     }
     break;
-    
+
     /* inform ui that new channel info is available */
   case XINE_EVENT_UI_CHANNELS_CHANGED:
     if(event->stream == gui->stream)
       panel_update_channel_display (gui->panel);
     break;
-    
+
     /* request title display change in ui */
   case XINE_EVENT_UI_SET_TITLE:
     if(event->stream == gui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
-      
+
       pthread_mutex_lock (&gui->mmk_mutex);
       if(strcmp(gui->mmk.ident, uevent->str)) {
-	
+
 	free(gui->mmk.ident);
 	if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
 	   gui->playlist.mmk[gui->playlist.cur]) {
-	  
+
 	  free(gui->playlist.mmk[gui->playlist.cur]->ident);
-	  
+
 	  gui->playlist.mmk[gui->playlist.cur]->ident = strdup(uevent->str);
 	}
 	gui->mmk.ident = strdup(uevent->str);
         pthread_mutex_unlock (&gui->mmk_mutex);
-	
+
         video_window_set_mrl (gui->vwin, uevent->str);
         playlist_mrlident_toggle (gui);
         panel_update_mrl_display (gui->panel);
@@ -909,9 +909,9 @@ static void event_listener (void *user_data, const xine_event_t *event) {
       }
     }
     break;
-    
+
     /* message (dialog) for the ui to display */
-  case XINE_EVENT_UI_MESSAGE: 
+  case XINE_EVENT_UI_MESSAGE:
     if(event->stream == gui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
       char                    buffer[8192];
@@ -920,18 +920,18 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 				__attribute__ ((format (printf, 2, 3)))
 #endif
       ;
-      
+
       report = xine_error_with_more;
 
       memset(&buffer, 0, sizeof(buffer));
-      
+
       switch(data->type) {
 
 	/* (messages to UI) */
       case XINE_MSG_NO_ERROR:
 	{ /* copy strings, and replace '\0' separators by '\n' */
 	  char *s, *d;
-	    
+
 	  report = xine_info;
 
 	  s = data->messages;
@@ -943,12 +943,12 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	    case '\0':
 	      *d = '\n';
 	      break;
-	      
+
 	    default:
 	      *d = *s;
 	      break;
 	    }
-	    
+
 	    s++;
 	    d++;
 	  }
@@ -967,7 +967,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s %s", (char *) data + data->explanation, (char *) data + data->parameters);
 	else
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s", _("No information available."));
-	  
+
 	break;
 
         /* (host name) */
@@ -977,7 +977,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
-	
+
 	/* (device name) */
       case XINE_MSG_UNKNOWN_DEVICE:
 	strlcpy(buffer, _("The device name you specified seems invalid."), sizeof(buffer));
@@ -1015,7 +1015,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
 	break;
-	
+
 	/* (library/decoder) */
       case XINE_MSG_LIBRARY_LOAD_ERROR:
 	strlcpy(buffer, _("A problem occurred while loading a library or a decoder"), sizeof(buffer));
@@ -1079,16 +1079,16 @@ static void event_listener (void *user_data, const xine_event_t *event) {
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s %s)", (char *) data + data->explanation, (char *) data + data->parameters);
 	break;
       }
-      
+
       if (gui->verbosity >= XINE_VERBOSITY_DEBUG) {
 	strlcat(buffer, "\n\n[", sizeof(buffer));
-	
+
 	if(data->explanation)
 	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "'%s' '%s'", (char *) data + data->explanation, (char *) data + data->parameters);
-	
+
 	strlcat(buffer, "]", sizeof(buffer));
       }
-      
+
       if (buffer[0]) {
         struct timeval tv;
         pthread_mutex_lock (&gui->no_messages.mutex);
@@ -1102,10 +1102,10 @@ static void event_listener (void *user_data, const xine_event_t *event) {
           report (gui, "%s", buffer);
         }
       }
-      
+
     }
     break;
-    
+
     /* e.g. aspect ratio change during dvd playback */
   case XINE_EVENT_FRAME_FORMAT_CHANGE:
     break;
@@ -1141,13 +1141,13 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     /* last event sent when stream is disposed */
   case XINE_EVENT_QUIT:
     break;
-    
+
     /* index creation/network connections */
   case XINE_EVENT_PROGRESS:
     if(event->stream == gui->stream) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
-      
+
       snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
       gui->mrl_overrided = 3;
       panel_set_title (gui->panel, buffer);
@@ -1170,7 +1170,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
       } else {
         pthread_mutex_lock (&gui->mmk_mutex);
 	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
-	
+
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
@@ -1229,7 +1229,7 @@ typedef struct {
   case XINE_EVENT_SPU_BUTTON:
     {
       xine_spu_button_t *spubtn = (xine_spu_button_t *) event->data;
-      
+
       if(spubtn->direction)
         video_window_set_cursor (gui->vwin, CURSOR_HAND);
       else
@@ -1245,7 +1245,7 @@ typedef struct {
 
   }
 }
-  
+
 /*
  *
  */
@@ -1291,11 +1291,11 @@ int main(int argc, char *argv[]) {
 
   bindtextdomain(PACKAGE, XITK_LOCALE);
   textdomain(PACKAGE);
-  
+
   /* Check xine library version */
   if(!xine_check_version(1, 0, 0)) {
     int major, minor, sub;
-    
+
     xine_get_version (&major, &minor, &sub);
     fprintf(stderr, _("Require xine library version 1.0.0, found %d.%d.%d.\n"),
 	    major, minor,sub);
@@ -1347,7 +1347,7 @@ int main(int argc, char *argv[]) {
   gui->no_mouse               = 0;
   gui->nongui_error_msg       = NULL;
   gui->orig_stdout            = stdout;
-  
+
   gui->panel                  = NULL;
   gui->vwin                   = NULL;
   gui->setup                  = NULL;
@@ -1493,11 +1493,11 @@ int main(int argc, char *argv[]) {
 	}
       }
       break;
-      
+
     case 'r':
       if(optarg != NULL) {
 	char *p = xine_chomp(optarg);
-	
+
 	if(!strcasecmp(p, "auto"))
 	  aspect_ratio = XINE_VO_ASPECT_AUTO;
 	else if(!strcasecmp(p, "square"))
@@ -1518,7 +1518,7 @@ int main(int argc, char *argv[]) {
     case 's': /* autoscan on start */
       gui->autoscan_plugin = xine_chomp(optarg);
       break;
-       
+
     case OPTION_VISUAL:
       if(optarg != NULL) {
         free(gui_params.prefered_visual);
@@ -1542,7 +1542,7 @@ int main(int argc, char *argv[]) {
 	  kbindings_display_current_bindings((kbindings_init_kbinding()));
 	else if(!strncasecmp(p, "file:", 5)) {
 	  char  *keymap_file = p + 5;
-	  
+
 	  if((gui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
 	    gui->keymap_file = xitk_filter_filename (keymap_file);
 	    continue;
@@ -1559,7 +1559,7 @@ int main(int argc, char *argv[]) {
     case 'n': /* Enable remote control server */
       gui->network = 1;
       break;
-      
+
     case OPTION_NETWORK_PORT:
       if(optarg) {
 	int port = strtol(optarg, &optarg, 10);
@@ -1636,7 +1636,7 @@ int main(int argc, char *argv[]) {
         gui->skin_server_url = strdup(optarg);
       }
       break;
-      
+
     case OPTION_ENQUEUE:
       if(is_remote_running(((session >= 0) ? session : 0))) {
 	if(session < 0)
@@ -1648,13 +1648,13 @@ int main(int argc, char *argv[]) {
       gui->verbosity = __xineui_global_verbosity = optarg ? strtol (optarg, &optarg, 10) : 1;
       break;
 
-#ifdef XINE_PARAM_BROADCASTER_PORT    
+#ifdef XINE_PARAM_BROADCASTER_PORT
     case OPTION_BROADCAST_PORT:
       if(optarg != NULL)
 	gui->broadcast_port = strtol(optarg, &optarg, 10);
       break;
 #endif
-      
+
     case OPTION_NO_LOGO:
       gui->display_logo = 0;
       break;
@@ -1662,13 +1662,13 @@ int main(int argc, char *argv[]) {
     case OPTION_NO_MOUSE:
       gui->no_mouse = 1;
       break;
-      
+
     case 'S':
       if (optarg) {
       if(is_remote_running(((session >= 0) ? session : 0)))
 	retval = session_handle_subopt(optarg, NULL, &session);
       else {
-	
+
 	session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 
 	session_argv[session_argv_num++] = strdup(optarg);
@@ -1697,7 +1697,7 @@ int main(int argc, char *argv[]) {
     case OPTION_POST:
       if (optarg) {
         pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
-      
+
         pplugins[pplugins_num++] = optarg;
         pplugins[pplugins_num] = NULL;
       }
@@ -1730,14 +1730,14 @@ int main(int argc, char *argv[]) {
     case 'T':
       tvout = optarg;
       break;
-      
+
     case OPTION_LIST_PLUGINS:
       {
 	char *p = NULL;
-	
+
 	if(optarg)
 	  p = xine_chomp(optarg);
-	
+
 	list_plugins(p);
 	exit(1);
       }
@@ -1750,7 +1750,7 @@ int main(int argc, char *argv[]) {
 	if(!(f = fopen("BUG-REPORT.TXT", "w+")))
 	  fprintf(stderr, "fopen(%s) failed: %s.\n", "BUG-REPORT.TXT", strerror(errno));
 	else {
-	  
+
 	  printf(_("*** NOTE ***\n"));
 	  printf(_(" Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"));
 
@@ -1771,12 +1771,12 @@ int main(int argc, char *argv[]) {
 	  gui->report = f;
           gui->verbosity = __xineui_global_verbosity = 0xff;
 	}
-	
+
 	if(optarg) {
 	  char *p = xine_chomp(optarg);
 
 	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
-	  
+
           session_argv[session_argv_num] = xitk_asprintf("mrl=%s", p);
 	  session_argv[++session_argv_num]   = NULL;
 
@@ -1800,14 +1800,14 @@ int main(int argc, char *argv[]) {
 	exit(1);
       }
       break;
-      
+
     default:
       show_usage();
       fprintf(stderr, _("invalid argument %d => exit\n"), c);
       exit(1);
     }
   }
-  
+
   if(session >= 0) {
     /* Session feature was used, say good bye */
     if(is_remote_running(session) && (_argc - optind)) {
@@ -1832,13 +1832,13 @@ int main(int argc, char *argv[]) {
   }
 
   show_banner (gui);
-  
+
 #ifndef DEBUG
   /* Make non-verbose stdout really quiet but keep a copy for special use, e.g. stdctl feedback */
   if (!gui->verbosity) {
     int   guiout_fd, stdout_fd;
     FILE *guiout_fp;
-    
+
     if((guiout_fd = dup(STDOUT_FILENO)) < 0)
       fprintf(stderr, "cannot dup STDOUT_FILENO: %s.\n", strerror(errno));
     else if((guiout_fp = fdopen(guiout_fd, "w")) == NULL)
@@ -1874,9 +1874,9 @@ int main(int argc, char *argv[]) {
       if(aos < MAX_ACTIONS_ON_START)
 	gui->actions_on_start[aos++] = ACTID_SETUP;
     }
-    
+
   }
-  
+
   /*
    * Initialize keymap
    */
@@ -1886,7 +1886,7 @@ int main(int argc, char *argv[]) {
 
     gui->keymap_file = xitk_asprintf("%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
   }
-  
+
   pthread_mutex_init (&gui->seek_mutex, NULL);
   gui->seek_running = 0;
   gui->seek_pos = -1;
@@ -1901,31 +1901,31 @@ int main(int argc, char *argv[]) {
   if (gui->cfg_file)
     xine_config_load (gui->xine, gui->cfg_file);
   xine_engine_set_param (gui->xine, XINE_ENGINE_PARAM_VERBOSITY, gui->verbosity);
-  
-  /* 
-   * Playlist auto reload 
+
+  /*
+   * Playlist auto reload
    */
-  old_playlist_cfg = 
-    xine_config_register_bool (gui->xine, "gui.playlist_auto_reload", 
+  old_playlist_cfg =
+    xine_config_register_bool (gui->xine, "gui.playlist_auto_reload",
 			      0,
 			      _("Automatically reload old playlist"),
 			      _("If it's enabled and if you don't specify any MRL in command "
-				"line, xine will automatically load previous playlist."), 
+				"line, xine will automatically load previous playlist."),
 			      CONFIG_LEVEL_BEG,
 			      dummy_config_cb,
 			      gGui);
 
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
-    
+
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_load_mediamarks(buffer);
   }
 
-  gui->subtitle_autoload = 
+  gui->subtitle_autoload =
     xine_config_register_bool (gui->xine, "gui.subtitle_autoload", 1,
 			      _("Subtitle autoloading"),
-			      _("Automatically load subtitles if they exist."), 
+			      _("Automatically load subtitles if they exist."),
 			      CONFIG_LEVEL_BEG,
 			      sub_autoload_cb,
 			      gGui);
@@ -1936,7 +1936,7 @@ int main(int argc, char *argv[]) {
 			      _("Enable deinterlacing by default"),
 			      _("Deinterlace plugin will be enabled on "
 			        "startup. Progressive streams are automatically "
-			        "detected with no performance penalty."), 
+			        "detected with no performance penalty."),
 			        CONFIG_LEVEL_BEG,
 			        NULL,
 			        CONFIG_NO_DATA);
@@ -1962,13 +1962,13 @@ int main(int argc, char *argv[]) {
   pthread_mutexattr_destroy(&mutexattr);
 
   /* Automatically start playback if new_mode is enabled and playlist is filled */
-  if((gui->smart_mode && 
+  if((gui->smart_mode &&
       (gui->playlist.num || actions_on_start(gui->actions_on_start, ACTID_PLAYLIST)) &&
       (!(actions_on_start(gui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0)) {
     if(aos < MAX_ACTIONS_ON_START)
       gui->actions_on_start[aos++] = ACTID_PLAY;
   }
-  
+
   /*
    * xine init
    */
@@ -1977,7 +1977,7 @@ int main(int argc, char *argv[]) {
   /* Get old working path from input plugin */
   {
     xine_cfg_entry_t  cfg_entry;
-    
+
     if(xine_config_lookup_entry (gui->xine, "media.files.origin_path", &cfg_entry))
       strlcpy(gui->curdir, cfg_entry.str_value, sizeof(gui->curdir));
     else
@@ -1995,9 +1995,9 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_vo_entry;
     const char *const *vids = xine_list_video_output_plugins (gui->xine);
     int                i = 0;
-    
+
     while(vids[i++]);
-    
+
     video_driver_ids = (char **)calloc ((i + 1), sizeof (char *));
     i = 0;
     video_driver_ids[i] = strdup ("auto");
@@ -2005,9 +2005,9 @@ int main(int argc, char *argv[]) {
       video_driver_ids[i + 1] = strdup (vids[i]);
       i++;
     }
-    
+
     video_driver_ids[i + 1] = NULL;
-    
+
     if(video_driver_id) {
       for (i = 0; video_driver_ids[i] != NULL; i++) {
         if (!strcasecmp (video_driver_id, video_driver_ids[i])) {
@@ -2022,10 +2022,10 @@ int main(int argc, char *argv[]) {
 
       if (!strcasecmp (video_driver_ids[cfg_vo_entry.num_value], "dxr3")) {
 	xine_cfg_entry_t  cfg_entry;
-	
+
 	if(xine_config_lookup_entry (gui->xine, "dxr3.output.mode", &cfg_entry)) {
 	  if(((!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "letterboxed tv")) ||
-	      (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) && 
+	      (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) &&
 	     (!(actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
 	    if(aos < MAX_ACTIONS_ON_START)
 	      gui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
@@ -2052,9 +2052,9 @@ int main(int argc, char *argv[]) {
     char **audio_driver_ids;
     const char *const *aids = xine_list_audio_output_plugins (gui->xine);
     int                i = 0;
-    
+
     while(aids[i++]);
-    
+
     audio_driver_ids = (char **)calloc ((i + 2), sizeof (char *));
     i = 0;
     audio_driver_ids[i] = strdup ("auto");
@@ -2063,9 +2063,9 @@ int main(int argc, char *argv[]) {
       audio_driver_ids[i + 2] = strdup (aids[i]);
       i++;
     }
-    
+
     audio_driver_ids[i + 2] = NULL;
-    
+
     if(audio_driver_id) {
       for (i = 0; audio_driver_ids[i] != NULL; i++) {
         if (!strcasecmp (audio_driver_id, audio_driver_ids[i])) {
@@ -2142,22 +2142,22 @@ int main(int argc, char *argv[]) {
   video_window_select_visual (gui->vwin);
 
   xine_set_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
-        
+
   /*
    * hand control over to gui
    */
   gui->actions_on_start[aos] = ACTID_NOKEY;
-  
+
   /* Initialize posts, if required */
   if(pplugins_num) {
     char             **plugin = pplugins;
-    
+
     while(*plugin) {
       pplugin_parse_and_store_post (&gui->post_video, (const char *) *plugin);
       pplugin_parse_and_store_post (&gui->post_audio, (const char *) *plugin);
       plugin++;
     }
-    
+
     pplugin_rewire_posts (&gui->post_video);
     pplugin_rewire_posts (&gui->post_audio);
   }
@@ -2171,10 +2171,10 @@ int main(int argc, char *argv[]) {
 
   if(session_argv_num) {
     int i = 0;
-    
+
     while(session_argv[i])
       free(session_argv[i++]);
-    
+
     free(session_argv);
   }
 

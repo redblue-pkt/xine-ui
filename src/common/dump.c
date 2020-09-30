@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2017 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -71,10 +71,10 @@ void dump_cpu_infos(void) {
   size_t got;
 
   if((stream = fopen("/proc/cpuinfo", "r"))) {
-    
+
     printf("   CPU information:\n");
     printf("   ---------------\n");
-    
+
     memset(&buffer, 0, sizeof(buffer));
     while((got = fread(&buffer, 1, 2047, stream)) > 0) {
       char *p, *pp;
@@ -83,19 +83,19 @@ void dump_cpu_infos(void) {
       while((p = strsep(&pp, "\n"))) {
 	if(p && strlen(p))
 	  printf("\t%s\n", p);
-      } 
-      
+      }
+
       memset(&buffer, 0, sizeof(buffer));
     }
-    
+
     printf("   -------\n");
     fclose(stream);
   }
   else
     printf("   Unable to open '/proc/cpuinfo': '%s'.\n", strerror(errno));
-  
+
 #else
-  printf("   CPU information unavailable.\n"); 
+  printf("   CPU information unavailable.\n");
 #endif
 }
 
@@ -103,7 +103,7 @@ void dump_error(const char *msg) {
   if(!__xineui_global_verbosity) return;
 
   fprintf(stderr, "%s", "\n---------------------- (ERROR) ----------------------\n");
-  fputs(msg, stderr); 
+  fputs(msg, stderr);
   fprintf(stderr, "%s","\n------------------ (END OF ERROR) -------------------\n\n");
 }
 

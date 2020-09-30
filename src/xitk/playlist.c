@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -135,7 +135,7 @@ static void _playlist_free_playlists (xui_playlist_t *pl) {
       free (pl->playlist_idents[pl->playlist_len]);
       pl->playlist_len--;
     }
-    
+
     SAFE_FREE (pl->playlist_mrls);
     SAFE_FREE (pl->playlist_idents);
     pl->playlist_len = 0;
@@ -344,7 +344,7 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
     if ((dir == -1) && (j > 0)) {
       pthread_mutex_lock (&pl->gui->mmk_mutex);
       mmk = pl->gui->playlist.mmk[j - 1];
-      
+
       if (j == pl->gui->playlist.cur)
         pl->gui->playlist.cur--;
 
@@ -356,7 +356,7 @@ static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
     else if ((dir == 1) && (j < (pl->gui->playlist.num - 1))) {
       pthread_mutex_lock (&pl->gui->mmk_mutex);
       mmk = pl->gui->playlist.mmk[j + 1];
-      
+
       if (j == pl->gui->playlist.cur)
         pl->gui->playlist.cur++;
 
@@ -461,7 +461,7 @@ void playlist_load_playlist (gGui_t *gui) {
     cbb[0].need_a_file = 1;
     cbb[1].callback = _playlist_exit_callback;
     cbb[1].userdata = gui;
-    
+
     playlist_deactivate (gui->plwin);
     gui->pl_load = create_filebrowser (_("Load a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
     free (buffer);
@@ -656,9 +656,9 @@ static void _scan_for_playlist_infos (gGui_t *gui, xine_stream_t *stream, int n)
   pthread_mutex_lock (&gui->mmk_mutex);
   if (xine_open (stream, gui->playlist.mmk[n]->mrl)) {
     char  *ident;
-    
+
     if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
-      
+
       free (gui->playlist.mmk[n]->ident);
       gui->playlist.mmk[n]->ident = strdup (ident);
       if (n == gui->playlist.cur) {
@@ -705,7 +705,7 @@ void playlist_scan_for_infos (gGui_t *gui) {
   if (gui->playlist.num) {
     int                 i;
     xine_stream_t      *stream;
-    
+
     stream = xine_stream_new (gui->xine, gui->ao_none, gui->vo_none);
     for (i = 0; i < gui->playlist.num; i++)
       _scan_for_playlist_infos (gui, stream, i);
@@ -719,7 +719,7 @@ void playlist_show_tips (gGui_t *gui, int enabled, unsigned long timeout) {
   if (!gui)
     return;
   pl = gui->plwin;
-  
+
   if (pl) {
     if(enabled)
       xitk_set_widgets_tips_timeout (pl->widget_list, timeout);
@@ -743,7 +743,7 @@ void playlist_mrlident_toggle (gGui_t *gui) {
 
   if (pl && pl->visible) {
     int start = xitk_browser_get_current_start (pl->playlist);
-    
+
     _playlist_create_playlists (pl);
     _playlist_update_browser_list (pl, start);
 
@@ -761,7 +761,7 @@ void playlist_update_playlist (gGui_t *gui) {
   if (!gui)
     return;
   pl = gui->plwin;
-  
+
   if (pl) {
     _playlist_create_playlists (pl);
     if (playlist_is_visible (gui)) {
@@ -891,12 +891,12 @@ void playlist_scan_input (xitk_widget_t *w, void *data, int state) {
         gui_stop (NULL, gui);
       gui_play (NULL, gui);
     }
-    
+
     if (pl) {
       _playlist_create_playlists (pl);
       _playlist_update_browser_list (pl, 0);
     }
-    
+
     enable_playback_controls (gui->panel, (gui->playlist.num > 0));
   }
 }
@@ -909,7 +909,7 @@ void playlist_raise_window (gGui_t *gui) {
   if (!gui)
     return;
   pl = gui->plwin;
-  
+
   if (pl) {
     raise_window (pl->gui, pl->xwin, pl->visible, 1);
     mmk_editor_raise_window (pl->gui);
@@ -1013,7 +1013,7 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
   if (playlist_is_visible (gui))
     playlist_raise_window (gui);
   xitk_skin_unlock (pl->gui->skin_config);
-    
+
   xitk_change_skins_widget_list (pl->widget_list, pl->gui->skin_config);
   xitk_paint_widget_list (pl->widget_list);
 }

@@ -1,18 +1,18 @@
-/* 
+/*
  * Copyright (C) 2000-2020 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * xine is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
@@ -43,7 +43,7 @@
 #define WINDOW_WIDTH        630
 #define WINDOW_HEIGHT       473
 #define MAX_DISP_ENTRIES    17
-        
+
 struct xui_viewlog_s {
   gGui_t               *gui;
 
@@ -74,11 +74,11 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
   (void)state;
   if (vl) {
     int           i;
-    
+
     vl->visible = 0;
 
     gui_save_window_pos (vl->gui, "viewlog", vl->kreg);
-    
+
     xitk_unregister_event_handler (&vl->kreg);
     xitk_window_destroy_window (vl->xwin);
     vl->xwin = NULL;
@@ -123,7 +123,7 @@ void viewlog_toggle_visibility (xui_viewlog_t *vl) {
  */
 static void viewlog_paint_widgets (xui_viewlog_t *vl) {
   /* Repaint widgets now */
-  xitk_paint_widget_list (vl->widget_list); 
+  xitk_paint_widget_list (vl->widget_list);
 }
 
 /*
@@ -155,12 +155,12 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
   /* Freeing entries */
   for(i = 0; i < vl->log_entries; i++)
     free ((char *)vl->log[i]);
-  
+
   /* Compute log entries */
   vl->real_num_entries = j = k = 0;
-  
+
   if(log) {
-    
+
     /* Look for entries number */
     while(log[k] != NULL) k++;
 
@@ -168,14 +168,14 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
       int buflen;
 
       buf[0] = '\0'; buflen = 0;
-      
+
       p = &log[i][0];
-      
+
       if(strlen(log[i]) > 0) {
 	while(*p != '\0') {
-	  
+
 	  switch(*p) {
-	  
+
 	    /* Ignore */
 	  case '\t':
 	  case '\a':
@@ -184,7 +184,7 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
 	  case '\r':
 	  case '\v':
 	    break;
-	    
+
 	  case '\n':
 	    if(buflen > 0) {
 	      vl->log = (const char **) realloc (vl->log, sizeof(char *) * ((j + 1) + 1));
@@ -193,12 +193,12 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
 	    }
 	    buf[0] = '\0'; buflen = 0;
 	    break;
-	    
+
 	  default:
 	    buf[buflen++] = *p; buf[buflen] = '\0';
 	    break;
 	  }
-	  
+
 	  p++;
 	}
 
@@ -207,7 +207,7 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
 	  vl->log = (const char **) realloc (vl->log, sizeof(char *) * ((j + 1) + 1));
 	  vl->log[j++] = strdup(buf);
 	}
-	
+
       }
       else {
 	/* Empty log entry line */
@@ -215,13 +215,13 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
 	vl->log[j++] = strdup(" ");
       }
     }
-    
+
   }
 
   /* I like null terminated arrays ;-) */
   vl->log[j]      = NULL;
   vl->log_entries = j;
-  
+
 #if DEBUG_VIEWLOG
   if ((vl->log_entries == 0) || (log == NULL))
     xitk_window_dialog_3 (vl->gui->xitk,
@@ -244,9 +244,9 @@ static void viewlog_change_section (xitk_widget_t *wx, void *data, int section) 
     }
     printf("-----------------------------------\n\n");
   }
-  
+
   xitk_browser_update_list (vl->browser_widget, vl->log, NULL, vl->real_num_entries, 0);
-  
+
   viewlog_clear_tab (vl);
   viewlog_paint_widgets (vl);
 }
@@ -264,7 +264,7 @@ static void viewlog_refresh (xitk_widget_t *w, void *data, int state) {
   }
 }
 
-/* 
+/*
  * collect config categories, viewlog tab widget
  */
 static void viewlog_create_tabs (xui_viewlog_t *vl) {
@@ -275,7 +275,7 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
   char                *tab_sections[log_section_count + 1];
   unsigned int         i;
 
-  /* 
+  /*
    * create log sections
    */
   for(i = 0; i < log_section_count; i++) {
@@ -284,7 +284,7 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
   tab_sections[i] = NULL;
 
   XITK_WIDGET_INIT (&tab);
-  
+
   tab.skin_element_name = NULL;
   tab.num_entries       = log_section_count;
   tab.entries           = tab_sections;
@@ -393,7 +393,7 @@ void viewlog_panel (gGui_t *gui) {
     }
   }
   viewlog_paint_widgets (vl);
-  
+
   {
     xitk_widget_t *w;
     xitk_labelbutton_widget_t lb;
@@ -421,7 +421,7 @@ void viewlog_panel (gGui_t *gui) {
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Close");
     lb.align             = ALIGN_CENTER;
-    lb.callback          = viewlog_exit; 
+    lb.callback          = viewlog_exit;
     lb.state_callback    = NULL;
     lb.userdata          = vl;
     lb.skin_element_name = NULL;

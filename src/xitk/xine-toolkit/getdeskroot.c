@@ -1,10 +1,10 @@
 /*
  * Stolen from XPenguins (http://xpenguins.seul.org/)
- * 
+ *
  * Some coding style/indentation changes.
  *
  * Copyright (C) 2003 Daniel Caujolle-Bert <segfault@club-internet.fr>
- * 
+ *
  */
 
 /* toon_root.c - finding the correct background window / virtual root
@@ -34,7 +34,7 @@
  * 2) The parent window of the toplevel client windows; this is used
  *    by ToonLocateWindows() to build up a map of the space that the
  *    toons can occupy.
- * 
+ *
  * In simple (sensible?) window managers (e.g. blackbox, sawfish, fvwm
  * and countless others), both of these are the root window. The other
  * more complex scenarios that ToonGetRootWindow() attempts to cope
@@ -122,10 +122,10 @@
  * 1   -> window with no name
  * 2     -> window with name="KDE Desktop" & _NET_WM_WINDOW_TYPE_DESKTOP
  * 3       -> window with no name and width >= width of screen
- * 
+ *
  * The last window in the hierarchy is the one to draw to.  The
  * numbers show the value of the `depth' argument.  */
-static Window __GetKDEDesktop(Display *display, int screen, 
+static Window __GetKDEDesktop(Display *display, int screen,
                               Window window, Atom atom,
                               const char *atomname, int depth) {
   char         *name = NULL;
@@ -143,10 +143,10 @@ static Window __GetKDEDesktop(Display *display, int screen,
       /* Presumably either at depth 0 or 2 */
       if ((XGetWindowProperty(display, window, atom, 0, 1,
 			      False, XA_ATOM, &actual_type, &actual_format,
-			      &nitems, &bytesafter, 
+			      &nitems, &bytesafter,
                               &wintype)) == Success && wintype) {
         char *tmpatomname = XGetAtomName(display, *(Atom *)wintype);
-	
+
 	if (tmpatomname) {
 	  if ((strcmp(atomname, tmpatomname) == 0) && depth == 2) {
 	    /* OK, at depth 2 */
@@ -171,7 +171,7 @@ static Window __GetKDEDesktop(Display *display, int screen,
   /* If go_deeper is 1 then there is a possibility that the background
    * window is a descendant of the current window; otherwise we're
    * barking up the wrong tree. */
-  if (go_deeper && (XQueryTree(display, window, 
+  if (go_deeper && (XQueryTree(display, window,
 			       &rootReturn, &parentReturn, &children, &nChildren))) {
     unsigned int i;
 
@@ -188,7 +188,7 @@ static Window __GetKDEDesktop(Display *display, int screen,
 	  }
 	}
       }
-      else if ((winreturn = __GetKDEDesktop(display, screen, 
+      else if ((winreturn = __GetKDEDesktop(display, screen,
 					    children[i], atom, atomname, depth+1))) {
 	break;
       }
@@ -217,12 +217,12 @@ static Window __GetNautilusDesktop(Display *display, int screen, Window window, 
       XWindowAttributes attributes;
 
       if (XGetWindowAttributes(display, children[i], &attributes)) {
-	if ((attributes.width == DisplayWidth(display, screen)) && 
+	if ((attributes.width == DisplayWidth(display, screen)) &&
 	    (attributes.height == DisplayHeight(display, screen))) {
 	  /* Found a possible desktop window */
 	  winreturn = __GetNautilusDesktop(display, screen, children[i], depth+1);
 	}
-      }  
+      }
     }
     XFree((char *) children);
   }
@@ -230,7 +230,7 @@ static Window __GetNautilusDesktop(Display *display, int screen, Window window, 
 }
 
 
-/* 
+/*
  * Returns the window ID of the `background' window on to which the
  * toons should be drawn. Also returned (in clientparent) is the ID of
  * the parent of all the client windows, since this may not be the
@@ -257,8 +257,8 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
   *clientparent = root;
 
   if ((XGetWindowProperty(display, root, NAUTILUS_DESKTOP_WINDOW_ID,
-			  0, 1, False, XA_WINDOW, &actual_type, 
-			  &actual_format, &nitems, &bytesafter, 
+			  0, 1, False, XA_WINDOW, &actual_type,
+			  &actual_format, &nitems, &bytesafter,
                           &toplevel) == Success) && toplevel) {
     /* Nautilus is running */
     background = __GetNautilusDesktop(display, screen, *(Window *)toplevel, 0);
@@ -270,7 +270,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
       && (XQueryTree(display, root, &rootReturn, &parentReturn, &children, &nChildren))) {
     Atom  _NET_WM_WINDOW_TYPE, __SWM_VROOT;
     unsigned int   i;
-      
+
     _NET_WM_WINDOW_TYPE = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
     __SWM_VROOT = XInternAtom(display, "__SWM_VROOT", False);
 
@@ -279,7 +279,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 
       if ((XGetWindowProperty(display, children[i],
 			      __SWM_VROOT, 0, 1, False, XA_WINDOW,
-			      &actual_type, &actual_format, &nitems, &bytesafter, 
+			      &actual_type, &actual_format, &nitems, &bytesafter,
                               &newroot) == Success) && newroot) {
 	/* Found a window with a __SWM_VROOT property that contains
 	 * the window ID of the virtual root. Now we must check
@@ -289,12 +289,12 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 	 * property then we assume it is KDE. */
         Atom  _NET_SUPPORTED;
         unsigned char *tmpatom = NULL;
-	
+
 	_NET_SUPPORTED = XInternAtom(display, "_NET_SUPPORTED", False);
-	
+
 	if ((XGetWindowProperty(display, root,
-				_NET_SUPPORTED, 0, 1, False, XA_ATOM, 
-				&actual_type, &actual_format, &nitems, &bytesafter, 
+				_NET_SUPPORTED, 0, 1, False, XA_ATOM,
+				&actual_type, &actual_format, &nitems, &bytesafter,
                                 &tmpatom) == Success) && tmpatom) {
           unsigned char *tmpwindow = NULL;
 	  Atom    _NET_VIRTUAL_ROOTS;
@@ -304,7 +304,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 	  XFree((char *) tmpatom);
 
 	  if ((XGetWindowProperty(display, root,
-				  _NET_VIRTUAL_ROOTS, 0, 1, False, XA_WINDOW, &actual_type, 
+				  _NET_VIRTUAL_ROOTS, 0, 1, False, XA_WINDOW, &actual_type,
 				  &actual_format, &nitems, &bytesafter,
                                   &tmpwindow) != Success) || !tmpwindow) {
 	    /* Must be KDE 2.1+ */
@@ -315,7 +315,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 	  }
 	}
 
-	if (background == None) {  
+	if (background == None) {
 	  /* Not KDE: assume windows are reparented */
           background = *clientparent = *(Window *)newroot;
 	}
@@ -334,9 +334,9 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
   if (background == None) {
     /* Look for a _WIN_WORKSPACE property, used by Enlightenment */
     Atom _WIN_WORKSPACE;
-    
+
     _WIN_WORKSPACE = XInternAtom(display, "_WIN_WORKSPACE", False);
-    
+
     if ((XGetWindowProperty(display, root, _WIN_WORKSPACE, 0, 1, False, XA_CARDINAL,
 			    &actual_type, &actual_format, &nitems, &bytesafter,
                             &workspace) == Success) && workspace) {
@@ -346,14 +346,14 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
        * ENLIGHTENMENT_DESKTOP atom with a value equal to the root window's
        * _WIN_WORKSPACE atom. */
       Atom  ENLIGHTENMENT_DESKTOP;
-      
+
       ENLIGHTENMENT_DESKTOP = XInternAtom(display, "ENLIGHTENMENT_DESKTOP", False);
-      
+
       /* First check to see if the root window is the current desktop... */
       if ((XGetWindowProperty(display, root,
 			      ENLIGHTENMENT_DESKTOP, 0, 1, False, XA_CARDINAL,
 			      &actual_type, &actual_format, &nitems, &bytesafter,
-                              &desktop) == Success) && 
+                              &desktop) == Success) &&
           desktop && (*(unsigned long *)desktop == *(unsigned long *)workspace)) {
 	/* The root window is the current Enlightenment desktop */
 	background = root;
@@ -370,7 +370,7 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 				  &actual_type, &actual_format, &nitems, &bytesafter,
                                   &desktop) == Success)
 	      && desktop && *(unsigned long *)desktop == *(unsigned long *)workspace) {
-	    
+
 	    /* Found current Enlightenment desktop */
 	    background = *clientparent = children[i];
 	    XFree((char *) desktop);
@@ -384,6 +384,6 @@ Window xitk_get_desktop_root_window(Display *display, int screen, Window *client
 
   if (background != None)
     return background;
-  
+
   return root;
 }
