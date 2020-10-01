@@ -3019,22 +3019,16 @@ long int xitk_get_last_keypressed_time (xitk_t *xitk) {
  * yes/no, on/off. Case isn't checked.
  */
 int xitk_get_bool_value(const char *val) {
-  static const struct {
-    char str[7];
-    uint8_t value;
-  } bools[] = {
-    { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
-    { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 }
-  };
-  size_t i;
-
-  ABORT_IF_NULL(val);
-
-  for(i = 0; i < sizeof(bools)/sizeof(bools[0]); i++) {
-    if(!(strcasecmp(bools[i].str, val)))
-      return bools[i].value;
-  }
-
+  if (!val)
+    return 0;
+  if ((*val >= '1') && (*val <= '9'))
+    return 1;
+  if (!strcasecmp (val, "true"))
+    return 1;
+  if (!strcasecmp (val, "yes"))
+    return 1;
+  if (!strcasecmp (val, "on"))
+    return 1;
   return 0;
 }
 
