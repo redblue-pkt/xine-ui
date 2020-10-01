@@ -280,11 +280,15 @@ typedef struct {
  */
 
 static void _xitk_lock_display (xitk_t *_xitk) {
-  __xitk_t *xitk = (__xitk_t *)_xitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, _xitk, x);
   XLockDisplay (xitk->x.display);
 }
 static void _xitk_unlock_display (xitk_t *_xitk) {
-  __xitk_t *xitk = (__xitk_t *)_xitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, _xitk, x);
   XUnlockDisplay (xitk->x.display);
 }
 
@@ -301,11 +305,12 @@ xitk_t *gXitk;
 void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   __xitk_t *xitk;
   __gfx_t *fx;
+
   if (!wl)
     return;
   if (!wl->xitk)
     return;
-  xitk = (__xitk_t *)wl->xitk;
+  xitk_container (xitk, wl->xitk, x);
   MUTLOCK ();
   for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
     if (fx->widget_list == wl) {
@@ -320,7 +325,9 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
 
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   if (xitk->clipboard.widget_in == w) {
     xitk->clipboard.widget_in = NULL;
     xitk->clipboard.window_in = None;
@@ -328,13 +335,15 @@ void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
 }
 
 void xitk_clipboard_unregister_window (Window win) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   if (xitk->clipboard.window_out == win)
     xitk->clipboard.window_out = None;
 }
 
 static void _xitk_clipboard_init (__xitk_t *xitk) {
-  static const char *atom_names[] = {
+  static const char * const atom_names[] = {
     "NULL", "ATOM", "TIMESTAMP", "INTEGER", "C_STRING", "STRING", "UTF8_STRING", "TEXT",
     "FILENAME", "NET_ADDRESS", "WINDOW", "CLIPBOARD", "LENGTH", "TARGETS", "MULTIPLE"
   };
@@ -523,9 +532,11 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
 }
 
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   Window win = w->wl->win;
 
+
+  xitk_container (xitk, gXitk, x);
   free (xitk->clipboard.text);
   xitk->clipboard.text = NULL;
   xitk->clipboard.text_len = 0;
@@ -552,10 +563,11 @@ int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
 }
 
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   Window win = w->wl->win;
   int l;
 
+  xitk_container (xitk, gXitk, x);
   if (xitk->clipboard.widget_in != w) {
 
     if (xitk->clipboard.window_out == None) {
@@ -603,11 +615,15 @@ void widget_stop(void);
 
 /*
 void xitk_modal_window(Window w) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   xitk->modalw = w;
 }
 void xitk_unmodal_window(Window w) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   if (w == xitk->modalw)
     xitk->modalw = None;
 }
@@ -696,22 +712,25 @@ static int _x_error_handler(Display *display, XErrorEvent *xevent) {
 }
 
 void xitk_set_current_menu(xitk_widget_t *menu) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (xitk->menu)
     xitk_destroy_widget (xitk->menu);
   xitk->menu = menu;
 }
 
 void xitk_unset_current_menu(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   xitk->menu = NULL;
 }
 
 int xitk_install_x_error_handler(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (xitk->x_error_handler == NULL) {
     xitk->x_error_handler = XSetErrorHandler (_x_error_handler);
     XSync (xitk->x.display, False);
@@ -721,8 +740,9 @@ int xitk_install_x_error_handler(void) {
 }
 
 int xitk_uninstall_x_error_handler(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (xitk->x_error_handler != NULL) {
     XSetErrorHandler (xitk->x_error_handler);
     xitk->x_error_handler = NULL;
@@ -736,9 +756,11 @@ int xitk_uninstall_x_error_handler(void) {
  *
  */
 static void xitk_signal_handler(int sig) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   pid_t cur_pid = getppid();
 
+
+  xitk_container (xitk, gXitk, x);
   if (xitk) {
     /* First, call registered handler */
     if (cur_pid == xitk->xitk_pid) {
@@ -824,8 +846,9 @@ static int xitk_check_xshm(Display *display) {
 }
 
 int xitk_is_use_xshm(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk->use_xshm;
 }
 
@@ -883,11 +906,12 @@ static char *get_wm_name(Display *display, Window win, const char *atom_name) {
   return wm_name;
 }
 static uint32_t xitk_check_wm(Display *display) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   Atom      atom;
   uint32_t  type = WM_TYPE_UNKNOWN;
   char     *wm_name = NULL;
 
+  xitk_container (xitk, gXitk, x);
   xitk->x.x_lock_display (display);
 
   if((atom = XInternAtom(display, "XFWM_FLAGS", True)) != None) {
@@ -1137,15 +1161,17 @@ static uint32_t xitk_check_wm(Display *display) {
   return type;
 }
 uint32_t xitk_get_wm_type(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk->wm_type;
 }
 
 int xitk_get_layer_level(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   int level = 10;
 
+  xitk_container (xitk, gXitk, x);
   if ((xitk->wm_type & WM_TYPE_GNOME_COMP) || (xitk->wm_type & WM_TYPE_EWMH_COMP))
     level = 10;
 
@@ -1175,8 +1201,9 @@ int xitk_get_layer_level(void) {
 }
 
 void xitk_set_layer_above(Window window) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if ((xitk->wm_type & WM_TYPE_GNOME_COMP) && !(xitk->wm_type & WM_TYPE_EWMH_COMP)) {
     long propvalue[1];
 
@@ -1269,9 +1296,10 @@ void xitk_set_layer_above(Window window) {
 }
 
 void xitk_set_window_layer(Window window, int layer) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   XEvent xev;
 
+  xitk_container (xitk, gXitk, x);
   if (((xitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
       ((xitk->wm_type & WM_TYPE_EWMH_COMP) && !(xitk->wm_type & WM_TYPE_GNOME_COMP))) {
     return;
@@ -1295,9 +1323,10 @@ void xitk_set_window_layer(Window window, int layer) {
 }
 
 static void _set_ewmh_state(Window window, Atom atom, int enable) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   XEvent xev;
 
+  xitk_container (xitk, gXitk, x);
   if((window == None) || (atom == None))
     return;
 
@@ -1319,8 +1348,9 @@ static void _set_ewmh_state(Window window, Atom atom, int enable) {
 }
 
 void xitk_set_ewmh_fullscreen(Window window) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
@@ -1329,8 +1359,9 @@ void xitk_set_ewmh_fullscreen(Window window) {
 }
 
 void xitk_unset_ewmh_fullscreen(Window window) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
@@ -1339,8 +1370,9 @@ void xitk_unset_ewmh_fullscreen(Window window) {
 }
 
 static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int value) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (window && (xitk->wm_type & WM_TYPE_EWMH_COMP)) {
     Atom *atom = NULL;
 
@@ -1407,8 +1439,9 @@ void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
 }
 
 void xitk_ungrab_pointer(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   xitk_lock_display (&xitk->x);
   XUngrabPointer(xitk->x.display, CurrentTime);
   xitk_unlock_display (&xitk->x);
@@ -1419,9 +1452,10 @@ void xitk_ungrab_pointer(void) {
  * list of xitk_widget_list_t, then return the widget_list pointer.
  */
 xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
-  __xitk_t *xitk = (__xitk_t *)_xitk;
+  __xitk_t *xitk;
   xitk_widget_list_t *l;
 
+  xitk_container (xitk, _xitk, x);
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(xitk->x.imlibdata);
 
@@ -1456,8 +1490,9 @@ xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
  * Register a callback function called when a signal happen.
  */
 void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   if (sigcb) {
     xitk->sig_callback = sigcb;
     xitk->sig_data     = user_data;
@@ -1479,9 +1514,10 @@ static void _xitk_reset_hull (xitk_hull_t *hull) {
 xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
                                                     const xitk_event_cbs_t *cbs, void *user_data,
                                                     xitk_widget_list_t *wl) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t   *fx;
 
+  xitk_container (xitk, gXitk, x);
   ABORT_IF_NULL(w);
 
   //  printf("%s()\n", __FUNCTION__);
@@ -1583,9 +1619,10 @@ static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
 
 void xitk_register_eh_destructor (xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t *fx;
 
+  xitk_container (xitk, gXitk, x);
   MUTLOCK ();
   fx = __fx_from_key (xitk, key);
   if (fx) {
@@ -1598,9 +1635,10 @@ void xitk_register_eh_destructor (xitk_register_key_t key,
 }
 
 static void _widget_list_destroy(xitk_widget_list_t **p) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   xitk_widget_list_t *wl = *p;
 
+  xitk_container (xitk, gXitk, x);
   if (!wl)
     return;
 
@@ -1623,10 +1661,11 @@ static void _widget_list_destroy(xitk_widget_list_t **p) {
 }
 
 static void __fx_destroy(__gfx_t *fx, int locked) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   void (*destructor)(void *userdata);
   void *destr_data;
 
+  xitk_container (xitk, gXitk, x);
   if(!fx)
     return;
 
@@ -1678,11 +1717,12 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
  * specified by the key.
  */
 void xitk_unregister_event_handler(xitk_register_key_t *key) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t  *fx;
 
   //  printf("%s()\n", __FUNCTION__);
 
+  xitk_container (xitk, gXitk, x);
   MUTLOCK ();
   fx = __fx_from_key (xitk, *key);
   if (fx) {
@@ -1701,9 +1741,10 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 }
 
 void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t  *fx;
 
+  xitk_container (xitk, gXitk, x);
   MUTLOCK();
   fx = (__gfx_t *)xitk->gfxs.head.next;
   while (fx->node.next) {
@@ -1735,9 +1776,10 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
  * Copy window information matching with key in passed window_info_t struct.
  */
 int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t  *fx;
 
+  xitk_container (xitk, gXitk, x);
   MUTLOCK();
 
   fx = __fx_from_key (xitk, key);
@@ -1779,10 +1821,11 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 }
 
 xitk_window_t *xitk_get_window(xitk_register_key_t key) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
   __gfx_t  *fx;
   xitk_window_t *w = NULL;
 
+  xitk_container (xitk, gXitk, x);
   MUTLOCK();
 
   fx = __fx_from_key (xitk, key);
@@ -2214,7 +2257,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
 #if 0
 void xitk_xevent_notify (XEvent *event) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   /* protect walking through gfx list */
   MUTLOCK ();
   xitk_xevent_notify_impl (xitk, event);
@@ -2243,9 +2288,12 @@ Colormap xitk_x11_get_colormap(xitk_t *xitk) {
 }
 
 void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
-
-  int install_colormap = ((__xitk_t *)xitk)->install_colormap;
+  __xitk_t *_xitk;
+  int install_colormap;
   ImlibInitParams  imlib_init;
+
+  xitk_container (_xitk, xitk, x);
+  install_colormap = _xitk->install_colormap;
 
   /*
    * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
@@ -2498,8 +2546,9 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
  */
 void xitk_run (void (* start_cb)(void *data), void *start_data,
   void (* stop_cb)(void *data), void *stop_data) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   {
     struct sigaction  action;
 
@@ -2665,8 +2714,9 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
 
 void xitk_free(xitk_t **p) {
 
-  __xitk_t *xitk = (__xitk_t*) *p;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, *p, x);
   if (!xitk)
     return;
   *p = NULL;
@@ -2706,7 +2756,9 @@ void xitk_free(xitk_t **p) {
  * Stop the wait xevent loop
  */
 void xitk_stop(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
+
+  xitk_container (xitk, gXitk, x);
   xitk_tips_delete (&xitk->x.tips);
   xitk_cursors_deinit (xitk->x.display);
   xitk->running = 0;
@@ -2724,81 +2776,94 @@ void xitk_stop(void) {
 }
 
 const char *xitk_get_system_font(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_system_font (xitk->config);
 }
 
 const char *xitk_get_default_font(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_default_font (xitk->config);
 }
 
 int xitk_get_xmb_enability(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_xmb_enability (xitk->config);
 }
 
 void xitk_set_xmb_enability(int value) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   xitk_config_set_xmb_enability (xitk->config, value);
 }
 
 int xitk_get_black_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_black_color (xitk->config);
 }
 
 int xitk_get_white_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_white_color (xitk->config);
 }
 
 int xitk_get_background_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_background_color (xitk->config);
 }
 
 int xitk_get_focus_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_focus_color (xitk->config);
 }
 
 int xitk_get_select_color(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_select_color (xitk->config);
 }
 
 unsigned long xitk_get_timer_label_animation(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_timer_label_animation (xitk->config);
 }
 
 unsigned long xitk_get_warning_foreground(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_warning_foreground (xitk->config);
 }
 
 unsigned long xitk_get_warning_background(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_warning_background (xitk->config);
 }
 
 int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2) {
-  __xitk_t *_xitk = (__xitk_t *)xitk;
+  __xitk_t *_xitk;
   struct timeval td;
 
+  xitk_container (_xitk, xitk, x);
   td.tv_usec = xitk_config_get_timer_dbl_click (_xitk->config);
   td.tv_sec  = t2->tv_sec - t1->tv_sec;
   if (td.tv_sec > td.tv_usec / 1000 + 1)
@@ -2807,50 +2872,58 @@ int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct time
 }
 
 int xitk_get_barstyle_feature(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_barstyle_feature (xitk->config);
 }
 
 int xitk_get_checkstyle_feature(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_checkstyle_feature (xitk->config);
 }
 
 int xitk_get_cursors_feature(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_cursors_feature (xitk->config);
 }
 
 int xitk_get_menu_shortcuts_enability(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk_config_get_menu_shortcuts_enability (xitk->config);
 }
 
 int xitk_get_display_width(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk->display_width;
 }
 
 int xitk_get_display_height(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk->display_height;
 }
 
 unsigned long xitk_get_tips_timeout(void) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   return xitk->tips_timeout;
 }
 
 void xitk_set_tips_timeout(unsigned long timeout) {
-  __xitk_t *xitk = (__xitk_t *)gXitk;
+  __xitk_t *xitk;
 
+  xitk_container (xitk, gXitk, x);
   xitk->tips_timeout = timeout;
 }
 
@@ -2931,9 +3004,10 @@ const char *xitk_set_locale(void) {
  *
  */
 long int xitk_get_last_keypressed_time (xitk_t *xitk) {
-  __xitk_t *_xitk = (__xitk_t *)xitk;
+  __xitk_t *_xitk;
   struct timeval tm;
 
+  xitk_container (_xitk, xitk, x);
   gettimeofday (&tm, NULL);
   tm.tv_sec -= _xitk->keypress.tv_sec;
   tm.tv_usec -= _xitk->keypress.tv_usec;
