@@ -173,6 +173,49 @@ static int __gfx_safe_lock (__gfx_t *fx) {
   return 2;
 }
 
+typedef enum {
+  XITK_A_WIN_LAYER = 0,
+  XITK_A_STAYS_ON_TOP,
+  XITK_A_NET_WM_STATE,
+  XITK_A_NET_WM_STATE_ABOVE,
+  XITK_A_NET_WM_STATE_FULLSCREEN,
+  XITK_A_WM_WINDOW_TYPE,
+  XITK_A_WM_WINDOW_TYPE_DESKTOP,
+  XITK_A_WM_WINDOW_TYPE_DOCK,
+  XITK_A_WM_WINDOW_TYPE_TOOLBAR,
+  XITK_A_WM_WINDOW_TYPE_MENU,
+  XITK_A_WM_WINDOW_TYPE_UTILITY,
+  XITK_A_WM_WINDOW_TYPE_SPLASH,
+  XITK_A_WM_WINDOW_TYPE_DIALOG,
+  XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU,
+  XITK_A_WM_WINDOW_TYPE_POPUP_MENU,
+  XITK_A_WM_WINDOW_TYPE_TOOLTIP,
+  XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
+  XITK_A_WM_WINDOW_TYPE_COMBO,
+  XITK_A_WM_WINDOW_TYPE_DND,
+  XITK_A_WM_WINDOW_TYPE_NORMAL,
+  XITK_A_END
+} xitk_atom_t;
+
+typedef enum {
+  XITK_A_null = 0,
+  XITK_A_atom,
+  XITK_A_timestamp,
+  XITK_A_integer,
+  XITK_A_c_string,
+  XITK_A_string,
+  XITK_A_utf8_string,
+  XITK_A_text,
+  XITK_A_filename,
+  XITK_A_net_address,
+  XITK_A_window,
+  XITK_A_clipboard,
+  XITK_A_length,
+  XITK_A_targets,
+  XITK_A_multiple,
+  XITK_A_clip_end
+} xitk_clip_atom_t;
+
 typedef struct {
   xitk_t                      x;
 
@@ -216,30 +259,7 @@ typedef struct {
 
   pid_t                       xitk_pid;
 
-  struct {
-    Atom                      XA_WIN_LAYER;
-    Atom                      XA_STAYS_ON_TOP;
-
-    Atom                      XA_NET_WM_STATE;
-    Atom                      XA_NET_WM_STATE_ABOVE;
-    Atom                      XA_NET_WM_STATE_FULLSCREEN;
-
-    Atom                      XA_WM_WINDOW_TYPE;
-    Atom                      XA_WM_WINDOW_TYPE_DESKTOP;
-    Atom                      XA_WM_WINDOW_TYPE_DOCK;
-    Atom                      XA_WM_WINDOW_TYPE_TOOLBAR;
-    Atom                      XA_WM_WINDOW_TYPE_MENU;
-    Atom                      XA_WM_WINDOW_TYPE_UTILITY;
-    Atom                      XA_WM_WINDOW_TYPE_SPLASH;
-    Atom                      XA_WM_WINDOW_TYPE_DIALOG;
-    Atom                      XA_WM_WINDOW_TYPE_DROPDOWN_MENU;
-    Atom                      XA_WM_WINDOW_TYPE_POPUP_MENU;
-    Atom                      XA_WM_WINDOW_TYPE_TOOLTIP;
-    Atom                      XA_WM_WINDOW_TYPE_NOTIFICATION;
-    Atom                      XA_WM_WINDOW_TYPE_COMBO;
-    Atom                      XA_WM_WINDOW_TYPE_DND;
-    Atom                      XA_WM_WINDOW_TYPE_NORMAL;
-  } atoms;
+  Atom                        atoms[XITK_A_END];
 
   struct {
     char                   *text;
@@ -252,26 +272,7 @@ typedef struct {
     Atom                    target;
     Atom                    dummy;
     Time                    own_time;
-    union {
-      Atom                  a[15];
-      struct {
-        Atom                null;
-        Atom                atom;
-        Atom                timestamp;
-        Atom                integer;
-        Atom                c_string;
-        Atom                string;
-        Atom                utf8_string;
-        Atom                text;
-        Atom                filename;
-        Atom                net_address;
-        Atom                window;
-        Atom                clipboard;
-        Atom                length;
-        Atom                targets;
-        Atom                multiple;
-      }                     n;
-    }                       atoms;
+    Atom                    atoms[XITK_A_clip_end];
   }                         clipboard;
 } __xitk_t;
 
@@ -343,9 +344,22 @@ void xitk_clipboard_unregister_window (Window win) {
 }
 
 static void _xitk_clipboard_init (__xitk_t *xitk) {
-  static const char * const atom_names[] = {
-    "NULL", "ATOM", "TIMESTAMP", "INTEGER", "C_STRING", "STRING", "UTF8_STRING", "TEXT",
-    "FILENAME", "NET_ADDRESS", "WINDOW", "CLIPBOARD", "LENGTH", "TARGETS", "MULTIPLE"
+  static const char * const atom_names[XITK_A_clip_end] = {
+    [XITK_A_null]        = "NULL",
+    [XITK_A_atom]        = "ATOM",
+    [XITK_A_timestamp]   = "TIMESTAMP",
+    [XITK_A_integer]     = "INTEGER",
+    [XITK_A_c_string]    = "C_STRING",
+    [XITK_A_string]      = "STRING",
+    [XITK_A_utf8_string] = "UTF8_STRING",
+    [XITK_A_text]        = "TEXT",
+    [XITK_A_filename]    = "FILENAME",
+    [XITK_A_net_address] = "NET_ADDRESS",
+    [XITK_A_window]      = "WINDOW",
+    [XITK_A_clipboard]   = "CLIPBOARD",
+    [XITK_A_length]      = "LENGTH",
+    [XITK_A_targets]     = "TARGETS",
+    [XITK_A_multiple]    = "MULTIPLE"
   };
 
   xitk->clipboard.text = NULL;
@@ -356,30 +370,28 @@ static void _xitk_clipboard_init (__xitk_t *xitk) {
   xitk->clipboard.own_time = CurrentTime;
 
   xitk_lock_display (&xitk->x);
-  XInternAtoms (xitk->x.display,
-    (char **)atom_names, sizeof (atom_names) / sizeof (atom_names[0]), True,
-    xitk->clipboard.atoms.a);
+  XInternAtoms (xitk->x.display, (char **)atom_names, XITK_A_clip_end, True, xitk->clipboard.atoms);
   xitk->clipboard.dummy = XInternAtom (xitk->x.display, "_XITK_CLIP", False);
   xitk_unlock_display (&xitk->x);
 #ifdef _XITK_CLIPBOARD_DEBUG
   printf ("xitk.window.clipboard: "
     "null=%d atom=%d timestamp=%d integer=%d c_string=%d string=%d utf8_string=%d text=%d "
     "filename=%d net_address=%d window=%d clipboard=%d length=%d targets=%d multiple=%d dummy=%d.\n",
-    (int)xitk->clipboard.atoms.n.null,
-    (int)xitk->clipboard.atoms.n.atom,
-    (int)xitk->clipboard.atoms.n.timestamp,
-    (int)xitk->clipboard.atoms.n.integer,
-    (int)xitk->clipboard.atoms.n.c_string,
-    (int)xitk->clipboard.atoms.n.string,
-    (int)xitk->clipboard.atoms.n.utf8_string,
-    (int)xitk->clipboard.atoms.n.text,
-    (int)xitk->clipboard.atoms.n.filename,
-    (int)xitk->clipboard.atoms.n.net_address,
-    (int)xitk->clipboard.atoms.n.window,
-    (int)xitk->clipboard.atoms.n.clipboard,
-    (int)xitk->clipboard.atoms.n.length,
-    (int)xitk->clipboard.atoms.n.targets,
-    (int)xitk->clipboard.atoms.n.multiple,
+    (int)xitk->clipboard.atoms[XITK_A_null],
+    (int)xitk->clipboard.atoms[XITK_A_atom],
+    (int)xitk->clipboard.atoms[XITK_A_timestamp],
+    (int)xitk->clipboard.atoms[XITK_A_integer],
+    (int)xitk->clipboard.atoms[XITK_A_c_string],
+    (int)xitk->clipboard.atoms[XITK_A_string],
+    (int)xitk->clipboard.atoms[XITK_A_utf8_string],
+    (int)xitk->clipboard.atoms[XITK_A_text],
+    (int)xitk->clipboard.atoms[XITK_A_filename],
+    (int)xitk->clipboard.atoms[XITK_A_net_address],
+    (int)xitk->clipboard.atoms[XITK_A_window],
+    (int)xitk->clipboard.atoms[XITK_A_clipboard],
+    (int)xitk->clipboard.atoms[XITK_A_length],
+    (int)xitk->clipboard.atoms[XITK_A_targets],
+    (int)xitk->clipboard.atoms[XITK_A_multiple],
     (int)xitk->clipboard.dummy);
 #endif
 }
@@ -400,7 +412,8 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
 #endif
         xitk->clipboard.own_time = event->xproperty.time;
         xitk_lock_display (&xitk->x);
-        XSetSelectionOwner (xitk->x.display, xitk->clipboard.atoms.n.clipboard, xitk->clipboard.window_out, xitk->clipboard.own_time);
+        XSetSelectionOwner (xitk->x.display, xitk->clipboard.atoms[XITK_A_clipboard],
+          xitk->clipboard.window_out, xitk->clipboard.own_time);
         xitk_unlock_display (&xitk->x);
       } else if (event->xproperty.window == xitk->clipboard.window_in) {
         /* get #2. */
@@ -416,10 +429,10 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
 
             xitk_lock_display (&xitk->x);
             XGetWindowProperty (xitk->x.display, xitk->clipboard.window_in,
-              xitk->clipboard.dummy, 0, 0, False, xitk->clipboard.atoms.n.utf8_string,
+              xitk->clipboard.dummy, 0, 0, False, xitk->clipboard.atoms[XITK_A_utf8_string],
               &actual_type, &actual_format, &nitems, &bytes_after, &prop);
             XFree (prop);
-            if ((actual_type != xitk->clipboard.atoms.n.utf8_string) || (actual_format != 8))
+            if ((actual_type != xitk->clipboard.atoms[XITK_A_utf8_string]) || (actual_format != 8))
               break;
             xitk->clipboard.text = malloc ((bytes_after + 1 + 3) & ~3);
             if (!xitk->clipboard.text)
@@ -427,7 +440,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
             xitk->clipboard.text_len = bytes_after;
             XGetWindowProperty (xitk->x.display, xitk->clipboard.window_in,
               xitk->clipboard.dummy, 0, (xitk->clipboard.text_len + 3) >> 2,
-              True, xitk->clipboard.atoms.n.utf8_string,
+              True, xitk->clipboard.atoms[XITK_A_utf8_string],
               &actual_type, &actual_format, &nitems, &bytes_after, &prop);
             if (!prop)
               break;
@@ -450,7 +463,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
     }
   } else if (event->type == SelectionClear) {
     if ((event->xselectionclear.window == xitk->clipboard.window_out)
-     && (event->xselectionclear.selection == xitk->clipboard.atoms.n.clipboard))
+     && (event->xselectionclear.selection == xitk->clipboard.atoms[XITK_A_clipboard]))
 #ifdef _XITK_CLIPBOARD_DEBUG
       printf ("xitk.clipboard: lost.\n");
 #endif
@@ -459,7 +472,7 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
   } else if (event->type == SelectionNotify) {
   } else if (event->type == SelectionRequest) {
     if ((event->xselectionrequest.owner == xitk->clipboard.window_out)
-     && (event->xselectionrequest.selection == xitk->clipboard.atoms.n.clipboard)) {
+     && (event->xselectionrequest.selection == xitk->clipboard.atoms[XITK_A_clipboard])) {
 #ifdef _XITK_CLIPBOARD_DEBUG
       char *tname, *pname;
       xitk_lock_display (&xitk->x);
@@ -476,20 +489,20 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
       xitk->clipboard.req    = event->xselectionrequest.requestor;
       xitk->clipboard.target = event->xselectionrequest.target;
       xitk->clipboard.prop   = event->xselectionrequest.property;
-      if (xitk->clipboard.target == xitk->clipboard.atoms.n.targets) {
+      if (xitk->clipboard.target == xitk->clipboard.atoms[XITK_A_targets]) {
         int r;
         Atom atoms[] = {
-          xitk->clipboard.atoms.n.string, xitk->clipboard.atoms.n.utf8_string,
-          xitk->clipboard.atoms.n.length, xitk->clipboard.atoms.n.timestamp
+          xitk->clipboard.atoms[XITK_A_string], xitk->clipboard.atoms[XITK_A_utf8_string],
+          xitk->clipboard.atoms[XITK_A_length], xitk->clipboard.atoms[XITK_A_timestamp]
         };
 #ifdef _XITK_CLIPBOARD_DEBUG
         printf ("xitk.clipboard: serve #2: reporting %d (STRING) %d (UTF8_STRING) %d (LENGTH) %d (TIMESTAMP).\n",
-          (int)xitk->clipboard.atoms.n.string, (int)xitk->clipboard.atoms.n.utf8_string,
-          (int)xitk->clipboard.atoms.n.length, (int)xitk->clipboard.atoms.n.timestamp);
+          (int)xitk->clipboard.atoms[XITK_A_string], (int)xitk->clipboard.atoms[XITK_A_utf8_string],
+          (int)xitk->clipboard.atoms[XITK_A_length], (int)xitk->clipboard.atoms[XITK_A_timestamp]);
 #endif
         xitk_lock_display (&xitk->x);
         r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
-          xitk->clipboard.atoms.n.atom, 32, PropModeReplace,
+          xitk->clipboard.atoms[XITK_A_atom], 32, PropModeReplace,
           (const unsigned char *)atoms, sizeof (atoms) / sizeof (atoms[0]));
         xitk_unlock_display (&xitk->x);
         if (r) {
@@ -497,15 +510,15 @@ static int _xitk_clipboard_event (__xitk_t *xitk, XEvent *event) {
           printf ("xitk.clipboard: serve #2: reporting OK.\n");
 #endif
         }
-      } else if ((xitk->clipboard.target == xitk->clipboard.atoms.n.string)
-        || (xitk->clipboard.target == xitk->clipboard.atoms.n.utf8_string)) {
+      } else if ((xitk->clipboard.target == xitk->clipboard.atoms[XITK_A_string])
+        || (xitk->clipboard.target == xitk->clipboard.atoms[XITK_A_utf8_string])) {
         int r;
 #ifdef _XITK_CLIPBOARD_DEBUG
         printf ("xitk.clipboard: serve #3: sending %d bytes.\n", xitk->clipboard.text_len + 1);
 #endif
         xitk_lock_display (&xitk->x);
         r = XChangeProperty (xitk->x.display, xitk->clipboard.req, xitk->clipboard.prop,
-          xitk->clipboard.atoms.n.utf8_string, 8, PropModeReplace,
+          xitk->clipboard.atoms[XITK_A_utf8_string], 8, PropModeReplace,
           (const unsigned char *)xitk->clipboard.text, xitk->clipboard.text_len + 1);
         xitk_unlock_display (&xitk->x);
         if (r) {
@@ -556,7 +569,7 @@ int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
   xitk_lock_display (&xitk->x);
   /* set #1: HACK: get current server time. */
   XChangeProperty (xitk->x.display, win,
-    xitk->clipboard.dummy, xitk->clipboard.atoms.n.utf8_string, 8, PropModeAppend, NULL, 0);
+    xitk->clipboard.dummy, xitk->clipboard.atoms[XITK_A_utf8_string], 8, PropModeAppend, NULL, 0);
   xitk_unlock_display (&xitk->x);
 
   return text_len;
@@ -581,8 +594,8 @@ int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
       printf ("xitk.clipboard: get #1.\n");
 #endif
       xitk_lock_display (&xitk->x);
-      XConvertSelection (xitk->x.display, xitk->clipboard.atoms.n.clipboard,
-        xitk->clipboard.atoms.n.utf8_string, xitk->clipboard.dummy, win, CurrentTime);
+      XConvertSelection (xitk->x.display, xitk->clipboard.atoms[XITK_A_clipboard],
+        xitk->clipboard.atoms[XITK_A_utf8_string], xitk->clipboard.dummy, win, CurrentTime);
       xitk_unlock_display (&xitk->x);
       return -1;
     }
@@ -1048,35 +1061,37 @@ static uint32_t xitk_check_wm(Display *display) {
   xitk_uninstall_x_error_handler();
 
   if (type & WM_TYPE_EWMH_COMP) {
-    xitk->atoms.XA_WIN_LAYER               = XInternAtom(display, "_NET_WM_STATE", False);
-    xitk->atoms.XA_STAYS_ON_TOP            = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
-    xitk->atoms.XA_NET_WM_STATE            = XInternAtom(display, "_NET_WM_STATE", False);
-    xitk->atoms.XA_NET_WM_STATE_ABOVE      = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
-    xitk->atoms.XA_NET_WM_STATE_FULLSCREEN = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
-
-    xitk->atoms.XA_WM_WINDOW_TYPE               = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_DESKTOP       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DESKTOP", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_DOCK          = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_TOOLBAR       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLBAR", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_MENU          = XInternAtom(display, "_NET_WM_WINDOW_TYPE_MENU", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_UTILITY       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_SPLASH        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_DIALOG        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_DROPDOWN_MENU = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_POPUP_MENU    = XInternAtom(display, "_NET_WM_WINDOW_TYPE_POPUP_MENU", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_TOOLTIP       = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLTIP", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_NOTIFICATION  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NOTIFICATION", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_COMBO         = XInternAtom(display, "_NET_WM_WINDOW_TYPE_COMBO", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_DND           = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DND", False);
-    xitk->atoms.XA_WM_WINDOW_TYPE_NORMAL        = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+    static const char * const atom_names[XITK_A_END] = {
+        [XITK_A_WIN_LAYER]                    = "_NET_WM_STATE",
+        [XITK_A_STAYS_ON_TOP]                 = "_NET_WM_STATE_STAYS_ON_TOP",
+        [XITK_A_NET_WM_STATE]                 = "_NET_WM_STATE",
+        [XITK_A_NET_WM_STATE_ABOVE]           = "_NET_WM_STATE_ABOVE",
+        [XITK_A_NET_WM_STATE_FULLSCREEN]      = "_NET_WM_STATE_FULLSCREEN",
+        [XITK_A_WM_WINDOW_TYPE]               = "_NET_WM_WINDOW_TYPE",
+        [XITK_A_WM_WINDOW_TYPE_DESKTOP]       = "_NET_WM_WINDOW_TYPE_DESKTOP",
+        [XITK_A_WM_WINDOW_TYPE_DOCK]          = "_NET_WM_WINDOW_TYPE_DOCK",
+        [XITK_A_WM_WINDOW_TYPE_TOOLBAR]       = "_NET_WM_WINDOW_TYPE_TOOLBAR",
+        [XITK_A_WM_WINDOW_TYPE_MENU]          = "_NET_WM_WINDOW_TYPE_MENU",
+        [XITK_A_WM_WINDOW_TYPE_UTILITY]       = "_NET_WM_WINDOW_TYPE_UTILITY",
+        [XITK_A_WM_WINDOW_TYPE_SPLASH]        = "_NET_WM_WINDOW_TYPE_SPLASH",
+        [XITK_A_WM_WINDOW_TYPE_DIALOG]        = "_NET_WM_WINDOW_TYPE_DIALOG",
+        [XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU] = "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU",
+        [XITK_A_WM_WINDOW_TYPE_POPUP_MENU]    = "_NET_WM_WINDOW_TYPE_POPUP_MENU",
+        [XITK_A_WM_WINDOW_TYPE_TOOLTIP]       = "_NET_WM_WINDOW_TYPE_TOOLTIP",
+        [XITK_A_WM_WINDOW_TYPE_NOTIFICATION]  = "_NET_WM_WINDOW_TYPE_NOTIFICATION",
+        [XITK_A_WM_WINDOW_TYPE_COMBO]         = "_NET_WM_WINDOW_TYPE_COMBO",
+        [XITK_A_WM_WINDOW_TYPE_DND]           = "_NET_WM_WINDOW_TYPE_DND",
+        [XITK_A_WM_WINDOW_TYPE_NORMAL]        = "_NET_WM_WINDOW_TYPE_NORMAL"
+    };
+    XInternAtoms (xitk->x.display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
   }
 
   switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KWIN:
-    if (xitk->atoms.XA_NET_WM_STATE == None)
-      xitk->atoms.XA_NET_WM_STATE    = XInternAtom(display, "_NET_WM_STATE", False);
-    if (xitk->atoms.XA_STAYS_ON_TOP == None)
-      xitk->atoms.XA_STAYS_ON_TOP = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
+    if (xitk->atoms[XITK_A_NET_WM_STATE] == None)
+      xitk->atoms[XITK_A_NET_WM_STATE] = XInternAtom(display, "_NET_WM_STATE", False);
+    if (xitk->atoms[XITK_A_STAYS_ON_TOP] == None)
+      xitk->atoms[XITK_A_STAYS_ON_TOP] = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
     break;
 
   case WM_TYPE_MOTIF:
@@ -1093,7 +1108,7 @@ static uint32_t xitk_check_wm(Display *display) {
   case WM_TYPE_AFTERSTEP:
   case WM_TYPE_BLACKBOX:
   case WM_TYPE_DTWM:
-    xitk->atoms.XA_WIN_LAYER = XInternAtom(display, "_WIN_LAYER", False);
+    xitk->atoms[XITK_A_WIN_LAYER] = XInternAtom(display, "_WIN_LAYER", False);
     break;
   }
 
@@ -1210,7 +1225,7 @@ void xitk_set_layer_above(Window window) {
     propvalue[0] = xitk_get_layer_level();
 
     xitk->x.x_lock_display (xitk->x.display);
-    XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WIN_LAYER,
+    XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		    1);
     xitk->x.x_unlock_display (xitk->x.display);
@@ -1227,10 +1242,10 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.type         = ClientMessage;
       xev.xclient.display      = xitk->x.display;
       xev.xclient.window       = window;
-      xev.xclient.message_type = xitk->atoms.XA_NET_WM_STATE;
+      xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
       xev.xclient.format       = 32;
       xev.xclient.data.l[0]    = 1;
-      xev.xclient.data.l[1]    = xitk->atoms.XA_STAYS_ON_TOP;
+      xev.xclient.data.l[1]    = xitk->atoms[XITK_A_STAYS_ON_TOP];
       xev.xclient.data.l[2]    = 0l;
       xev.xclient.data.l[3]    = 0l;
       xev.xclient.data.l[4]    = 0l;
@@ -1243,10 +1258,10 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.send_event   = True;
       xev.xclient.display      = xitk->x.display;
       xev.xclient.window       = window;
-      xev.xclient.message_type = xitk->atoms.XA_NET_WM_STATE;
+      xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
       xev.xclient.format       = 32;
       xev.xclient.data.l[0]    = (long) 1;
-      xev.xclient.data.l[1]    = (long) xitk->atoms.XA_NET_WM_STATE_ABOVE;
+      xev.xclient.data.l[1]    = (long) xitk->atoms[XITK_A_NET_WM_STATE_ABOVE];
       xev.xclient.data.l[2]    = (long) None;
 
       XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display),
@@ -1265,8 +1280,8 @@ void xitk_set_layer_above(Window window) {
 
   case WM_TYPE_KWIN:
     xitk->x.x_lock_display (xitk->x.display);
-    XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WIN_LAYER,
-		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&xitk->atoms.XA_STAYS_ON_TOP, 1);
+    XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
+		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
     xitk->x.x_unlock_display (xitk->x.display);
     break;
 
@@ -1286,7 +1301,7 @@ void xitk_set_layer_above(Window window) {
       propvalue[0] = xitk_get_layer_level();
 
       xitk->x.x_lock_display (xitk->x.display);
-      XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WIN_LAYER,
+      XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		      1);
       xitk->x.x_unlock_display (xitk->x.display);
@@ -1309,7 +1324,7 @@ void xitk_set_window_layer(Window window, int layer) {
   xev.type                 = ClientMessage;
   xev.xclient.type         = ClientMessage;
   xev.xclient.window       = window;
-  xev.xclient.message_type = xitk->atoms.XA_WIN_LAYER;
+  xev.xclient.message_type = xitk->atoms[XITK_A_WIN_LAYER];
   xev.xclient.format       = 32;
   xev.xclient.data.l[0]    = (long) layer;
   xev.xclient.data.l[1]    = (long) 0;
@@ -1332,7 +1347,7 @@ static void _set_ewmh_state(Window window, Atom atom, int enable) {
 
   memset(&xev, 0, sizeof(xev));
   xev.xclient.type         = ClientMessage;
-  xev.xclient.message_type = xitk->atoms.XA_NET_WM_STATE;
+  xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
   xev.xclient.display      = xitk->x.display;
   xev.xclient.window       = window;
   xev.xclient.format       = 32;
@@ -1354,8 +1369,8 @@ void xitk_set_ewmh_fullscreen(Window window) {
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
-  _set_ewmh_state (window, xitk->atoms.XA_NET_WM_STATE_FULLSCREEN, 1);
-  _set_ewmh_state (window, xitk->atoms.XA_STAYS_ON_TOP, 1);
+  _set_ewmh_state (window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 1);
+  _set_ewmh_state (window, xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
 }
 
 void xitk_unset_ewmh_fullscreen(Window window) {
@@ -1365,8 +1380,8 @@ void xitk_unset_ewmh_fullscreen(Window window) {
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
-  _set_ewmh_state (window, xitk->atoms.XA_NET_WM_STATE_FULLSCREEN, 0);
-  _set_ewmh_state (window, xitk->atoms.XA_STAYS_ON_TOP, 0);
+  _set_ewmh_state (window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 0);
+  _set_ewmh_state (window, xitk->atoms[XITK_A_STAYS_ON_TOP], 0);
 }
 
 static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int value) {
@@ -1378,52 +1393,53 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
 
     switch(type) {
     case WINDOW_TYPE_DESKTOP:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DESKTOP;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DESKTOP];
       break;
     case WINDOW_TYPE_DOCK:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DOCK;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DOCK];
       break;
     case WINDOW_TYPE_TOOLBAR:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_TOOLBAR;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_TOOLBAR];
       break;
     case WINDOW_TYPE_MENU:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_MENU;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_MENU];
       break;
     case WINDOW_TYPE_UTILITY:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_UTILITY;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_UTILITY];
       break;
     case WINDOW_TYPE_SPLASH:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_SPLASH;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_SPLASH];
       break;
     case WINDOW_TYPE_DIALOG:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DIALOG;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DIALOG];
       break;
     case WINDOW_TYPE_DROPDOWN_MENU:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DROPDOWN_MENU;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU];
       break;
     case WINDOW_TYPE_POPUP_MENU:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_POPUP_MENU;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_POPUP_MENU];
       break;
     case WINDOW_TYPE_TOOLTIP:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_TOOLTIP;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_TOOLTIP];
       break;
     case WINDOW_TYPE_NOTIFICATION:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_NOTIFICATION;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_NOTIFICATION];
       break;
     case WINDOW_TYPE_COMBO:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_COMBO;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_COMBO];
       break;
     case WINDOW_TYPE_DND:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_DND;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DND];
       break;
     case WINDOW_TYPE_NORMAL:
-      atom = &xitk->atoms.XA_WM_WINDOW_TYPE_NORMAL;
+      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_NORMAL];
       break;
     }
 
     if(atom) {
       xitk_lock_display (&xitk->x);
-      XChangeProperty (xitk->x.display, window, xitk->atoms.XA_WM_WINDOW_TYPE, XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
+      XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WM_WINDOW_TYPE],
+        XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
       XRaiseWindow (xitk->x.display, window);
       xitk_unlock_display (&xitk->x);
     }
@@ -2433,28 +2449,11 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 #if 0
   XGetInputFocus(display, &(xitk->parent.window), &(xitk->parent.focus));
 #endif
-  xitk->atoms.XA_WIN_LAYER = None;
-  xitk->atoms.XA_STAYS_ON_TOP = None;
-
-  xitk->atoms.XA_NET_WM_STATE = None;
-  xitk->atoms.XA_NET_WM_STATE_ABOVE = None;
-  xitk->atoms.XA_NET_WM_STATE_FULLSCREEN = None;
-
-  xitk->atoms.XA_WM_WINDOW_TYPE = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_DESKTOP = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_DOCK = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_TOOLBAR = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_MENU = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_UTILITY = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_SPLASH = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_DIALOG = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_DROPDOWN_MENU = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_POPUP_MENU = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_TOOLTIP = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_NOTIFICATION = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_COMBO = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_DND = None;
-  xitk->atoms.XA_WM_WINDOW_TYPE_NORMAL = None;
+  {
+    unsigned int u;
+    for (u = 0; u < XITK_A_END; u++)
+      xitk->atoms[u] = None;
+  }
 
   memset(&xitk->keypress, 0, sizeof(xitk->keypress));
 
@@ -2899,18 +2898,16 @@ int xitk_get_menu_shortcuts_enability(void) {
   return xitk_config_get_menu_shortcuts_enability (xitk->config);
 }
 
-int xitk_get_display_width(void) {
-  __xitk_t *xitk;
+void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
+  __xitk_t *_xitk;
 
-  xitk_container (xitk, gXitk, x);
-  return xitk->display_width;
-}
-
-int xitk_get_display_height(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk->display_height;
+  xitk_container (_xitk, xitk, x);
+  if (_xitk) {
+    if (w)
+      *w = _xitk->display_width;
+    if (h)
+      *h = _xitk->display_height;
+  }
 }
 
 unsigned long xitk_get_tips_timeout(void) {
@@ -3256,3 +3253,4 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
+

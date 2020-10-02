@@ -624,8 +624,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
       xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
 
-      desktopw = xitk_get_display_width();
-      desktoph = xitk_get_display_height();
+      xitk_get_display_size (panel->gui->xitk, &desktopw, &desktoph);
 
       if(((x + w) <= 0) || ((y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
 	int newx, newy;

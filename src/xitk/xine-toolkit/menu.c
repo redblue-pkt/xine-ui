@@ -388,8 +388,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
   shortcutpos = (wwidth - shortcutlen) - 15;
 
-  swidth = xitk_get_display_width();
-  sheight = xitk_get_display_height();
+  xitk_get_display_size (wp->w.wl->xitk, &swidth, &sheight);
 
   if (node->parent) {
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
@@ -754,3 +753,4 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+
