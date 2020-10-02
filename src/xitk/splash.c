@@ -66,8 +66,9 @@ void splash_create(void) {
     width = xitk_image_width(xim);
     height = xitk_image_height(xim);
 
-    x = (xitk_get_display_width() >> 1) - (width >> 1);
-    y = (xitk_get_display_height() >> 1) - (height >> 1);
+    xitk_get_display_size (gui->xitk, &x, &y);
+    x = (x >> 1) - (width >> 1);
+    y = (y >> 1) - (height >> 1);
 
     xwin = xitk_window_create_simple_window_ext(gGui->xitk, x, y, width, height,
                                                 _("xine Splash"), NULL, "xine", 0, 1, gGui->icon);

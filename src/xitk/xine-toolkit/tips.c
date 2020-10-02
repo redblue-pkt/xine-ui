@@ -126,12 +126,12 @@ static void *_tips_loop_thread (void *data) {
           xitk_image_t *image;
           xitk_font_t *fs;
           unsigned int cfore, cback;
-          int disp_w = xitk_get_display_width ();
-          int disp_h = xitk_get_display_height ();
+          int disp_w, disp_h;
           int x_margin = 12, y_margin = 6;
           int bottom_gap = 16; /* To avoid mouse cursor overlaying tips on bottom of widget */
 
           xitk = tips->widget->wl->xitk;
+          xitk_get_display_size (xitk, &disp_w, &disp_h);
 
           /* Get parent window position */
           xitk_get_window_position (tips->display, tips->widget->wl->win, &x, &y, NULL, NULL);

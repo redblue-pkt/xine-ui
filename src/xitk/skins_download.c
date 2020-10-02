@@ -571,8 +571,9 @@ void skin_download (gGui_t *gui, char *url) {
     }
 #endif
 
-    x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
-    y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
+    xitk_get_display_size (skd->gui->xitk, &x, &y);
+    x = (x >> 1) - (WINDOW_WIDTH >> 1);
+    y = (y >> 1) - (WINDOW_HEIGHT >> 1);
 
     skd->xwin = xitk_window_create_dialog_window (gui->xitk,
                                                   _("Choose a skin to download..."),

@@ -312,8 +312,9 @@ static void fb_create_input_window(char *title, char *text,
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
 
-  x = (xitk_get_display_width()  >> 1) - (width >> 1);
-  y = (xitk_get_display_height() >> 1) - (height >> 1);
+  xitk_get_display_size (fb->gui->xitk, &x, &y);
+  x = (x >> 1) - (width >> 1);
+  y = (y >> 1) - (height >> 1);
 
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
 
@@ -1199,8 +1200,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     fb->cbb[2].userdata = cbb_close->userdata;
   }
 
-  x = (xitk_get_display_width()  >> 1) - (WINDOW_WIDTH >> 1);
-  y = (xitk_get_display_height() >> 1) - (WINDOW_HEIGHT >> 1);
+  xitk_get_display_size (fb->gui->xitk, &x, &y);
+  x = (x >> 1) - (WINDOW_WIDTH >> 1);
+  y = (y >> 1) - (WINDOW_HEIGHT >> 1);
 
   /* Create window */
   fb->xwin = xitk_window_create_dialog_window (fb->gui->xitk,
