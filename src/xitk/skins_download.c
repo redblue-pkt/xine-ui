@@ -283,8 +283,8 @@ static void download_skin_exit (xitk_widget_t *w, void *data, int state) {
 static void download_update_blank_preview(xui_skdloader_t *skd) {
 
   xitk_image_t *p = xitk_image_create_image(skd->gui->xitk, PREVIEW_WIDTH, PREVIEW_HEIGHT);
-  xitk_image_fill_rectangle(p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
-                            xitk_get_pixel_color_from_rgb(skd->gui->xitk, 52, 52, 52));
+  xitk_image_fill_rectangle (p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
+    xitk_color_db_get (skd->gui->xitk, (52 << 16) + (52 << 8) + 52));
   xitk_image_draw_image (skd->widget_list, p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34, 0);
   xitk_image_free_image (&p);
 }
@@ -653,3 +653,4 @@ void skin_download (gGui_t *gui, char *url) {
     gui->skdloader = skd;
   }
 }
+

@@ -176,6 +176,10 @@ struct xui_vwin_st {
   x11_visual_t            xine_visual;
 };
 
+static int _vwin_is_ewmh (xui_vwin_t *vwin) {
+  return (xitk_get_wm_type (vwin->gui->xitk) & WM_TYPE_EWMH_COMP) ? 1 : 0;
+}
+
 static void *second_display_loop (void *data);
 
 /* safe external actions */
@@ -1024,7 +1028,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     /* Map window. */
 
     if ((vwin->gui->always_layer_above ||
-      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && !wm_not_ewmh_only()) {
+      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && !_vwin_is_ewmh (vwin)) {
       xitk_set_layer_above (vwin->video_window);
     }
 
@@ -1035,7 +1039,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xine_usec_sleep(5000);
 
     if ((vwin->gui->always_layer_above ||
-      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && wm_not_ewmh_only()) {
+      ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && _vwin_is_ewmh (vwin)) {
       xitk_set_layer_above (vwin->video_window);
     }
 
@@ -1043,7 +1047,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
        otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
     if (!(vwin->fullscreen_mode & WINDOWED_MODE)
      && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
-     && wm_not_ewmh_only())
+     && _vwin_is_ewmh (vwin))
       xitk_set_ewmh_fullscreen (vwin->video_window);
 
   }
@@ -1435,7 +1439,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
 
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
-      (vwin->hide_on_start == 0))) && (!wm_not_ewmh_only())) {
+      (vwin->hide_on_start == 0))) && (!_vwin_is_ewmh (vwin))) {
       xitk_set_layer_above (vwin->video_window);
     }
 
@@ -1444,7 +1448,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
 
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
-      (vwin->hide_on_start == 0))) && (wm_not_ewmh_only())) {
+      (vwin->hide_on_start == 0))) && (_vwin_is_ewmh (vwin))) {
       xitk_set_layer_above(vwin->video_window);
     }
 
@@ -1452,7 +1456,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
        otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
     if (!(vwin->fullscreen_mode & WINDOWED_MODE)
      && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
-     && wm_not_ewmh_only())
+     && _vwin_is_ewmh (vwin))
       xitk_set_ewmh_fullscreen (vwin->video_window);
   } else if (vwin->show == 1) {
     XIconifyWindow (vwin->video_display, vwin->video_window, vwin->video_screen);
@@ -2669,3 +2673,4 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }
 }
+

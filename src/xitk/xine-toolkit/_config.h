@@ -26,6 +26,8 @@
 #include <stdio.h>
 
 typedef struct {
+  xitk_t           *xitk;
+
   FILE             *fd;
   char             *cfgfilename;
   char             *ln;
@@ -48,6 +50,16 @@ typedef struct {
   } colors;
 
   struct {
+    int             black;
+    int             white;
+    int             background;
+    int             focus;
+    int             select;
+    int             warn_foreground;
+    int             warn_background;
+  } color_vals;
+
+  struct {
     unsigned long   label_anim;
     long int        dbl_click;
   } timers;
@@ -66,25 +78,10 @@ typedef struct {
 } xitk_config_t;
 
 
-xitk_config_t *xitk_config_init(void);
+xitk_config_t *xitk_config_init (xitk_t *xitk);
 void xitk_config_deinit(xitk_config_t *xtcf);
-int xitk_config_get_barstyle_feature(xitk_config_t *xtcf);
-int xitk_config_get_checkstyle_feature(xitk_config_t *xtcf);
-int xitk_config_get_shm_feature(xitk_config_t *xtcf);
-int xitk_config_get_cursors_feature(xitk_config_t *xtcf);
-const char *xitk_config_get_system_font(xitk_config_t *xtcf);
-const char *xitk_config_get_default_font(xitk_config_t *xtcf);
-int xitk_config_get_xmb_enability(xitk_config_t *xtcf);
-void xitk_config_set_xmb_enability(xitk_config_t *xtcf, int value);
-int xitk_config_get_black_color(xitk_config_t *xtcf);
-int xitk_config_get_white_color(xitk_config_t *xtcf);
-int xitk_config_get_background_color(xitk_config_t *xtcf);
-int xitk_config_get_focus_color(xitk_config_t *xtcf);
-int xitk_config_get_select_color(xitk_config_t *xtcf);
-unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf);
-long xitk_config_get_timer_dbl_click(xitk_config_t *xtcf);
-unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf);
-unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf);
-int xitk_config_get_menu_shortcuts_enability(xitk_config_t *xtcf);
+const char *xitk_config_get_string (xitk_config_t *xtcf, xitk_cfg_item_t item);
+int xitk_config_get_num (xitk_config_t *xtcf, xitk_cfg_item_t item);
+void xitk_config_set_xmb_enability (xitk_config_t *xtcf, int value);
 
 #endif

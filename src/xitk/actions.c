@@ -135,13 +135,10 @@ void wait_for_window_visible(xitk_window_t *xwin) {
 void reparent_window (gGui_t *gui, xitk_window_t *xwin) {
   if (!gui || !xwin)
     return;
-  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && !wm_not_ewmh_only ()) {
+  if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && !(xitk_get_wm_type (gui->xitk) & WM_TYPE_EWMH_COMP)) {
     /* Don't unmap this window, because on re-mapping, it will not be visible until
      * its ancestor, the video window, is visible. That's not what's intended. */
-    if (video_window_is_visible (gui->vwin) < 2)
-      xitk_window_set_wm_window_type( (xwin), WINDOW_TYPE_NORMAL);
-    else
-      xitk_window_unset_wm_window_type (xwin, WINDOW_TYPE_NORMAL);
+    xitk_window_set_wm_window_type (xwin, video_window_is_visible (gui->vwin) < 2 ? WINDOW_TYPE_NORMAL : WINDOW_TYPE_NONE);
     xitk_window_show_window (xwin, 1);
     xitk_window_try_to_set_input_focus (xwin);
     video_window_set_transient_for (gui->vwin, xwin);
@@ -731,7 +728,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   }
 
   gui->on_quit = 1;
-  xitk_stop ();
+  xitk_stop (gui->xitk);
 }
 
 void gui_exit_2 (gGui_t *gui) {

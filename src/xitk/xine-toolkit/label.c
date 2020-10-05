@@ -287,7 +287,7 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
         xitk_pixmap_copy_area (font->image, bg->image, 0, 0, wp->font->width, wp->font->height, 0, 0);
         xitk_pixmap_draw_string (bg->image, fs,
           2, ((wp->font->height + asc + des) >> 1) - des,
-          wp->label.s, wp->label_len, xitk_get_pixel_color_black (wp->w.wl->xitk));
+          wp->label.s, wp->label_len, xitk_get_cfg_num (wp->w.wl->xitk, XITK_BLACK_COLOR));
         xitk_image_draw_image (wp->w.wl, bg,
           event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y, 0);
       }
@@ -428,7 +428,7 @@ static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) 
         wp->anim_step     = info->label_animation_step;
         wp->anim_timer    = info->label_animation_timer;
         if (wp->anim_timer <= 0)
-          wp->anim_timer = xitk_get_timer_label_animation ();
+          wp->anim_timer = xitk_get_cfg_num (wp->w.wl->xitk, XITK_TIMER_LABEL_ANIM);
         wp->label_visible = info->label_printable;
         wp->w.x           = info->x;
         wp->w.y           = info->y;
@@ -607,7 +607,7 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
   wp->anim_step     = info->label_animation_step;
   wp->anim_timer    = info->label_animation_timer;
   if (wp->anim_timer <= 0)
-    wp->anim_timer = xitk_get_timer_label_animation ();
+    wp->anim_timer = xitk_get_cfg_num (wp->w.wl->xitk, XITK_TIMER_LABEL_ANIM);
   wp->label_visible = info->label_printable;
   if (wp->pix_font) {
     wp->w.width  = wp->pix_font->char_width * wp->length;
@@ -649,7 +649,7 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   wp->pix_font  = NULL;
   wp->animation = 0;
   wp->anim_step = 1;
-  wp->anim_timer = xitk_get_timer_label_animation ();
+  wp->anim_timer = xitk_get_cfg_num (wp->w.wl->xitk, XITK_TIMER_LABEL_ANIM);
   wp->label_visible = 1;
 
   xitk_short_string_init (&wp->fontname);

@@ -361,7 +361,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   xitk_font_unload_font(fs);
 
   shortcutlen = 0;
-  if (xitk_get_menu_shortcuts_enability () && (node->type & (_MENU_NODE_SHORTCUT << _MENU_NODE_HAS))) {
+  if (xitk_get_cfg_num (wp->w.wl->xitk, XITK_MENU_SHORTCUTS_ENABLE) && (node->type & (_MENU_NODE_SHORTCUT << _MENU_NODE_HAS))) {
     xitk_font_t *short_font;
     _menu_node_t *smaxnode;
     for (smaxnode = me = (_menu_node_t *)node->branches.head.next; me->node.next; me = (_menu_node_t *)me->node.next) {
@@ -504,8 +504,8 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
 	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
-        cbg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, 140, 140, 140);
-        cfg = xitk_get_pixel_color_from_rgb(wp->w.wl->xitk, 255, 255, 255);
+        cbg = xitk_color_db_get (wp->w.wl->xitk, (140 << 16) + (140 << 8) + 140);
+        cfg = xitk_color_db_get (wp->w.wl->xitk, (255 << 16) + (255 << 8) + 255);
 
         pixmap_fill_rectangle(bg, 1, 1, wwidth, 20, cbg);
 
@@ -549,7 +549,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
       btn->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU;
       me->button = btn;
 
-      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry.shortcut)
+      if (xitk_get_cfg_num (wp->w.wl->xitk, XITK_MENU_SHORTCUTS_ENABLE) && me->menu_entry.shortcut)
 	xitk_labelbutton_change_shortcut_label (btn, me->menu_entry.shortcut, shortcutpos, DEFAULT_FONT_12);
 
       xitk_labelbutton_set_label_offset(btn, 20);
@@ -574,9 +574,9 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   xitk_window_show_window(xwin, 1);
   xitk_window_try_to_set_input_focus(xwin);
 
-  if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
+  if (!(xitk_get_wm_type (wp->w.wl->xitk) & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
-    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_MENU);
+    xitk_window_set_wm_window_type (xwin, WINDOW_TYPE_MENU);
   else
     /* However, KWin has unacceptable behaviour for WINDOW_TYPE_MENU in  */
     /* our transient-for scheme: The transient-for window must be mapped */
@@ -584,7 +584,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     /* the menu itself) must have focus, otherwise it unmaps the menu.   */
     /* This causes menus not to be shown under many several conditions.  */
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
-    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_DOCK);
+    xitk_window_set_wm_window_type (xwin, WINDOW_TYPE_DOCK);
   btn = (xitk_widget_t *) xitk_window_widget_list(xwin)->list.head.next;
   if (btn) {
     xitk_set_focus_to_widget(btn);

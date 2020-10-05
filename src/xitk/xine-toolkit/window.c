@@ -50,6 +50,10 @@ struct xitk_window_s {
   xitk_widget_list_t       *widget_list;
 };
 
+xitk_t *xitk_window_get_xitk (xitk_window_t *w) {
+  return w ? w->xitk : NULL;
+}
+
 static Window _xitk_window_get_window (xitk_window_t *w) {
   return w->window;
 }
@@ -136,16 +140,6 @@ void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor) {
 
 void xitk_window_restore_window_cursor(xitk_window_t *w) {
   xitk_cursors_restore_window_cursor (w->xitk->display, w->window);
-}
-
-void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
-  if (w)
-    xitk_unset_wm_window_type(w->window, type);
-}
-
-void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type) {
-  if (w)
-    xitk_set_wm_window_type(w->window, type);
 }
 
 /*
@@ -394,6 +388,11 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
     return;
 
   xitk_set_window_class(w->xitk->display, w->window, res_name, res_class);
+}
+
+void xitk_window_set_wm_window_type (xitk_window_t *w, xitk_wm_window_type_t type) {
+  if (w)
+    xitk_set_wm_window_type (w->xitk, w->window, type);
 }
 
 void xitk_window_set_transient_for(xitk_window_t *w, Window win) {
@@ -711,7 +710,7 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   unsigned int   colorblack, colorwhite, colorgray, colordgray;
   xitk_font_t   *fs = NULL;
   int            lbear, rbear, wid, asc, des;
-  int            bar_style = xitk_get_barstyle_feature();
+  int            bar_style = xitk_get_cfg_num (xitk, XITK_BAR_STYLE);
 
   if (title == NULL)
     return NULL;
@@ -744,12 +743,12 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     int s, bl = 255;
     unsigned int colorblue;
 
-    colorblue = xitk_get_pixel_color_from_rgb(xitk, 0, 0, bl);
+    colorblue = xitk_color_db_get (xitk, bl);
     xitk_lock_display (xitk);
     for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
       XSetForeground(xitk->display, bar->gc, colorblue);
       XDrawLine(xitk->display, bar->pixmap, bar->gc, 0, s, width, s);
-      colorblue = xitk_get_pixel_color_from_rgb(xitk, 0, 0, bl);
+      colorblue = xitk_color_db_get (xitk, bl);
     }
     xitk_unlock_display (xitk);
   }
@@ -757,8 +756,8 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     int s;
     unsigned int c, cd;
 
-    cd = xitk_get_pixel_color_from_rgb(xitk, 115, 12, 206);
-    c = xitk_get_pixel_color_from_rgb(xitk, 135, 97, 168);
+    cd = xitk_color_db_get (xitk, (115 << 16) + (12 << 8) + 206);
+    c = xitk_color_db_get (xitk, (135 << 16) + (97 << 8) + 168);
 
     draw_flat_with_color(bar, width, TITLE_BAR_HEIGHT, colorgray);
     draw_rectangular_box (bar, 2, 2, width - 5, TITLE_BAR_HEIGHT - 4, DRAW_INNER);
@@ -807,7 +806,7 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   if(bar_style)
     XSetForeground(xitk->display, bar->gc, colorwhite);
   else
-    XSetForeground(xitk->display, bar->gc, (xitk_get_pixel_color_from_rgb(xitk, 85, 12, 135)));
+    XSetForeground(xitk->display, bar->gc, (xitk_color_db_get (xitk, (85 << 16) + (12 << 8) + 135)));
   xitk_unlock_display (xitk);
 
   xitk_font_draw_string(fs, bar, bar->gc,

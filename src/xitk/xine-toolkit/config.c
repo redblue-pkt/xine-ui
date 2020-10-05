@@ -31,6 +31,9 @@
 /*
  * Extract color values
  */
+
+#define XITK_RGB_INT(r,g,b) (((uint32_t)(r) << 16) + ((uint32_t)(g) << 8) + (b))
+
 static void xitk_config_colors(xitk_config_t *xtcf) {
   char  *p = NULL;
   char  *c = NULL;
@@ -50,18 +53,14 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
     while(*c == ' ' || *c == '\t') c++;
 
     if((strchr(c, '#')) || (isalpha(*c))) {
-      xitk_color_names_t *color;
+      xitk_color_names_t color;
 
-      if((color = xitk_get_color_name(c)) != NULL) {
+      if (xitk_get_color_name (&color, c)) {
 	/*
 	 * We can't use xitk_get_pixel_from_rgb() here,
 	 * 'cause we didn't have any ImlibData object.
 	 */
-	pixel = ((color->red & 0xf8) << 8) |
-	  ((color->green & 0xf8) << 3) |
-	  ((color->blue & 0xf8) >> 3);
-
-	xitk_free_color_name(color);
+        pixel = XITK_RGB_INT (color.red, color.green, color.blue);
       }
       else {
 	XITK_WARNING("%s@%d: wrong color name: '%s'\n", __FUNCTION__, __LINE__, c);
@@ -319,13 +318,20 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
 #else
   xtcf->fonts.xmb              = 0;
 #endif
-  xtcf->colors.black           = -1;
-  xtcf->colors.white           = -1;
-  xtcf->colors.background      = -1;
-  xtcf->colors.focus           = -1;
-  xtcf->colors.select          = -1;
-  xtcf->colors.warn_foreground = -1;
-  xtcf->colors.warn_background = -1;
+  xtcf->colors.black           = XITK_RGB_INT (0, 0, 0);
+  xtcf->colors.white           = XITK_RGB_INT (255, 255, 255);
+  xtcf->colors.background      = XITK_RGB_INT (190, 190, 190);
+  xtcf->colors.focus           = XITK_RGB_INT (224, 224, 224);
+  xtcf->colors.select          = XITK_RGB_INT (128, 128, 128);
+  xtcf->colors.warn_foreground = XITK_RGB_INT (0, 0, 0);
+  xtcf->colors.warn_background = XITK_RGB_INT (255, 255, 0);
+  xtcf->color_vals.black       = -1;
+  xtcf->color_vals.white       = -1;
+  xtcf->color_vals.background  = -1;
+  xtcf->color_vals.focus       = -1;
+  xtcf->color_vals.select      = -1;
+  xtcf->color_vals.warn_foreground = -1;
+  xtcf->color_vals.warn_background = -1;
   xtcf->timers.label_anim      = 50000;
   xtcf->timers.dbl_click       = 400;
 #ifdef DISABLE_SHM_DEFAULT
@@ -342,142 +348,66 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
 /*
  * Get stored values.
  */
-int xitk_config_get_barstyle_feature(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return (xtcf->features.oldbarstyle > 0) ? 1 : 0;
-}
-int xitk_config_get_checkstyle_feature(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->features.checkstyle;
-}
-int xitk_config_get_shm_feature(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return (xtcf->features.shm > 0) ? 1 : 0;
-}
-int xitk_config_get_cursors_feature(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return (xtcf->features.cursors > 0) ? 1 : 0;
-}
-const char *xitk_config_get_system_font(xitk_config_t *xtcf) {
-
-  if(!xtcf)
+const char *xitk_config_get_string (xitk_config_t *xtcf, xitk_cfg_item_t item) {
+  if (!xtcf)
     return NULL;
-
-  return xtcf->fonts.system;
+  switch (item) {
+    case XITK_SYSTEM_FONT:  return xtcf->fonts.system;
+    case XITK_DEFAULT_FONT: return xtcf->fonts.fallback;
+    default: ;
+  }
+  return NULL;
 }
-const char *xitk_config_get_default_font(xitk_config_t *xtcf) {
 
-  if(!xtcf)
-    return NULL;
+#define XITK_COLOR_VAL(_xtcf,_name) do { \
+  if (_xtcf->color_vals._name < 0) \
+    _xtcf->color_vals._name = xitk_color_get_value (_xtcf->xitk, _xtcf->colors._name); \
+  return _xtcf->color_vals._name; \
+} while (0)
 
-  return xtcf->fonts.fallback;
-}
-int xitk_config_get_xmb_enability(xitk_config_t *xtcf) {
-
-  if(!xtcf)
+int xitk_config_get_num (xitk_config_t *xtcf, xitk_cfg_item_t item) {
+  if (!xtcf)
     return -1;
-
-  return xtcf->fonts.xmb;
+  switch (item) {
+    case XITK_XMB_ENABLE:    return xtcf->fonts.xmb;
+    case XITK_SHM_ENABLE:    return (xtcf->features.shm > 0) ? 1 : 0;
+    case XITK_MENU_SHORTCUTS_ENABLE: return xtcf->menus.shortcuts;
+    case XITK_BLACK_COLOR:   XITK_COLOR_VAL (xtcf, black);
+    case XITK_WHITE_COLOR:   XITK_COLOR_VAL (xtcf, white);
+    case XITK_BG_COLOR:      XITK_COLOR_VAL (xtcf, background);
+    case XITK_FOCUS_COLOR:   XITK_COLOR_VAL (xtcf, focus);
+    case XITK_SELECT_COLOR:  XITK_COLOR_VAL (xtcf, select);
+    case XITK_WARN_BG_COLOR: XITK_COLOR_VAL (xtcf, warn_background);
+    case XITK_WARN_FG_COLOR: XITK_COLOR_VAL (xtcf, warn_foreground);
+    case XITK_BAR_STYLE:     return (xtcf->features.oldbarstyle > 0) ? 1 : 0;
+    case XITK_CHECK_STYLE:   return xtcf->features.checkstyle;
+    case XITK_CURSORS_FEATURE: return (xtcf->features.cursors > 0) ? 1 : 0;
+    case XITK_TIMER_LABEL_ANIM: return xtcf->timers.label_anim;
+    case XITK_DBL_CLICK_TIME: return xtcf->timers.dbl_click;
+    default: ;
+  }
+  return -1;
 }
-void xitk_config_set_xmb_enability(xitk_config_t *xtcf, int value) {
 
-  if(xtcf)
-    xtcf->fonts.xmb = (value >= 1) ? 1 : 0;
-}
-int xitk_config_get_black_color(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.black;
-}
-int xitk_config_get_white_color(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.white;
-}
-int xitk_config_get_background_color(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.background;
-}
-int xitk_config_get_focus_color(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.focus;
-}
-int xitk_config_get_select_color(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.select;
-}
-unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return 5000;
-
-  return xtcf->timers.label_anim;
-}
-long xitk_config_get_timer_dbl_click(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return 200;
-
-  return xtcf->timers.dbl_click;
-}
-unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.warn_foreground;
-}
-unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->colors.warn_background;
-}
-int xitk_config_get_menu_shortcuts_enability(xitk_config_t *xtcf) {
-
-  if(!xtcf)
-    return -1;
-
-  return xtcf->menus.shortcuts;
+void xitk_config_set_xmb_enability (xitk_config_t *xtcf, int value) {
+  if (xtcf)
+    xtcf->fonts.xmb = value;
 }
 
 #define SYSTEM_RC  "/etc/xitkrc"
 /*
  * Initialize config stuff.
  */
-xitk_config_t *xitk_config_init(void) {
+xitk_config_t *xitk_config_init (xitk_t *xitk) {
   xitk_config_t *xtcf;
   char          *rcfile;
   const char    *user_rc = "xitkrc";
 
-  xtcf = (xitk_config_t *) xitk_xmalloc(sizeof(xitk_config_t));
+  xtcf = (xitk_config_t *)xitk_xmalloc (sizeof (*xtcf));
+  if (!xtcf)
+    return NULL;
 
+  xtcf->xitk = xitk;
   rcfile = (char *) xitk_xmalloc(strlen(xine_get_homedir()) + strlen(user_rc) + 3);
   sprintf(rcfile, "%s/.%s", xine_get_homedir(), user_rc);
 
@@ -507,10 +437,23 @@ xitk_config_t *xitk_config_init(void) {
 /*
  * Release memory from config object.
  */
+#define XITK_COLOR_FREE(_xtcf,_name) do { \
+  if (_xtcf->color_vals._name >= 0) \
+    xitk_color_free_value (_xtcf->xitk, _xtcf->color_vals._name); \
+} while (0)
+
 void xitk_config_deinit(xitk_config_t *xtcf) {
 
   if(!xtcf)
     return;
+
+  XITK_COLOR_FREE (xtcf, black);
+  XITK_COLOR_FREE (xtcf, white);
+  XITK_COLOR_FREE (xtcf, background);
+  XITK_COLOR_FREE (xtcf, focus);
+  XITK_COLOR_FREE (xtcf, select);
+  XITK_COLOR_FREE (xtcf, warn_background);
+  XITK_COLOR_FREE (xtcf, warn_foreground);
 
   XITK_FREE(xtcf->cfgfilename);
   XITK_FREE(xtcf->fonts.fallback);

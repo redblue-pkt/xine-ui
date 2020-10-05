@@ -868,7 +868,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
 
 void xitk_cursors_init(Display *display) {
   int   i;
-  int   xitk_cursors = xitk_get_cursors_feature();
+  int   xitk_cursors = xitk_get_cfg_num (gXitk, XITK_CURSORS_FEATURE);
 
   /* Transparent cursor isn't a valid X cursor */
   _cursors_create_cursor(display, &cursors[0]);

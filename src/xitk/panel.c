@@ -1169,16 +1169,10 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * Different WMs and even different versions behave different.
    * There is no guarantee that it works with all WMs/versions.
    */
-  if (video_window_is_visible (panel->gui->vwin) < 2) {
-    if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
-      xitk_window_unset_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
-    xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_NORMAL);
-  } else {
-    xitk_window_unset_wm_window_type (panel->xwin, WINDOW_TYPE_NORMAL);
-    if(!(xitk_get_wm_type() & WM_TYPE_KWIN))
-      xitk_window_set_wm_window_type (panel->xwin, WINDOW_TYPE_TOOLBAR);
-  }
-
+  xitk_window_set_wm_window_type (panel->xwin,
+    video_window_is_visible (panel->gui->vwin) < 2 ? WINDOW_TYPE_NORMAL
+    : !(xitk_get_wm_type (panel->gui->xitk) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR
+    : WINDOW_TYPE_NONE);
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
   /*
