@@ -53,72 +53,55 @@ int xitk_x_error = 0;
 /*
  * Get a pixel color from rgb values.
  */
-unsigned int xitk_get_pixel_color_from_rgb(xitk_t *xitk, int r, int g, int b) {
-  XColor       xcolor;
-  unsigned int pixcol;
-
-  ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->imlibdata);
+int xitk_color_get_value (xitk_t *xitk, uint32_t rgb) {
+  XColor xcolor;
+  uint32_t v;
 
   xcolor.flags = DoRed | DoBlue | DoGreen;
+  v = rgb >> 16;
+  xcolor.red   = (v << 8) + v;
+  v = (rgb >> 8) & 0xff;
+  xcolor.green = (v << 8) + v;
+  v = rgb & 0xff;
+  xcolor.blue  = (v << 8) + v;
+  xitk_lock_display (xitk);
+  XAllocColor (xitk->display, Imlib_get_colormap (xitk->imlibdata), &xcolor);
+  xitk_unlock_display (xitk);
+  printf ("%s (0x%0x) = 0x%0x.\n", __FUNCTION__, (unsigned int)rgb, (unsigned int)xcolor.pixel);
+  return xcolor.pixel;
+}
 
-  xcolor.red   = r<<8;
-  xcolor.green = g<<8;
-  xcolor.blue  = b<<8;
+void xitk_color_free_value (xitk_t *xitk, uint32_t value) {
+  unsigned long v = value;
 
   xitk_lock_display (xitk);
-  XAllocColor(xitk->display, Imlib_get_colormap(xitk->imlibdata), &xcolor);
+  XFreeColors (xitk->display, Imlib_get_colormap (xitk->imlibdata), &v, 1, 0);
   xitk_unlock_display (xitk);
-
-  pixcol = xcolor.pixel;
-
-  return pixcol;
 }
 
 /*
  * Some default pixel colors.
  */
 unsigned int xitk_get_pixel_color_black(xitk_t *xitk) {
-  int user_color = xitk_get_black_color();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 0, 0, 0);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
 }
 unsigned int xitk_get_pixel_color_white(xitk_t *xitk) {
-  int user_color = xitk_get_white_color();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 255, 255, 255);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WHITE_COLOR);
 }
 unsigned int xitk_get_pixel_color_lightgray(xitk_t *xitk) {
-  int user_color = xitk_get_focus_color();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 224, 224, 224);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_FOCUS_COLOR);
 }
 unsigned int xitk_get_pixel_color_gray(xitk_t *xitk) {
-  int user_color = xitk_get_background_color();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 190, 190, 190);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_BG_COLOR);
 }
 unsigned int xitk_get_pixel_color_darkgray(xitk_t *xitk) {
-  int user_color = xitk_get_select_color();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 128, 128, 128);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_SELECT_COLOR);
 }
 unsigned int xitk_get_pixel_color_warning_foreground(xitk_t *xitk) {
-  int user_color = xitk_get_warning_foreground();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_black(xitk);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WARN_FG_COLOR);
 }
 unsigned int xitk_get_pixel_color_warning_background(xitk_t *xitk) {
-  int user_color = xitk_get_warning_background();
-  if(user_color >= 0)
-    return (unsigned int) user_color;
-  return xitk_get_pixel_color_from_rgb(xitk, 255, 255, 0);
+  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WARN_BG_COLOR);
 }
 
 static int _xitk_pix_font_find_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
@@ -407,19 +390,19 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
   xitk_lock_display (xpix->xitk);
 
 #ifdef HAVE_SHM
-  if(xitk_is_use_xshm() == 2) {
+  if (xitk_is_use_xshm (xpix->xitk) == 2) {
     XImage   *xim;
 
     shminfo = (XShmSegmentInfo *) xitk_xmalloc(sizeof(XShmSegmentInfo));
 
     xitk_x_error = 0;
-    xitk_install_x_error_handler();
+    xitk_install_x_error_handler (xpix->xitk);
 
-    xim = XShmCreateImage (p->xitk->display, im->x.visual, depth, ZPixmap, NULL, shminfo, width, height);
+    xim = XShmCreateImage (xpix->xitk->display, im->x.visual, depth, ZPixmap, NULL, shminfo, width, height);
     if(!xim) {
       XITK_WARNING("XShmCreateImage() failed.\n");
       free(shminfo);
-      xitk_uninstall_x_error_handler();
+      xitk_uninstall_x_error_handler (xpix->xitk);
       goto __noxshm_pixmap;
     }
 
@@ -428,7 +411,7 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       XITK_WARNING("shmget() failed.\n");
       XDestroyImage(xim);
       free(shminfo);
-      xitk_uninstall_x_error_handler();
+      xitk_uninstall_x_error_handler (xpix->xitk);
       goto __noxshm_pixmap;
     }
 
@@ -438,13 +421,13 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       XDestroyImage(xim);
       shmctl(shminfo->shmid, IPC_RMID, 0);
       free(shminfo);
-      xitk_uninstall_x_error_handler();
+      xitk_uninstall_x_error_handler (xpix->xitk);
       goto __noxshm_pixmap;
     }
 
     shminfo->readOnly = False;
-    XShmAttach (p->xitk->display, shminfo);
-    XSync (p->xitk->display, False);
+    XShmAttach (xpix->xitk->display, shminfo);
+    XSync (xpix->xitk->display, False);
 
     if(xitk_x_error) {
       XITK_WARNING("XShmAttach() failed.\n");
@@ -452,12 +435,12 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       shmdt(shminfo->shmaddr);
       shmctl(shminfo->shmid, IPC_RMID, 0);
       free(shminfo);
-      xitk_uninstall_x_error_handler();
+      xitk_uninstall_x_error_handler (xpix->xitk);
       goto __noxshm_pixmap;
     }
 
     xpix->xim    = xim;
-    xpix->pixmap = XShmCreatePixmap (p->xitk->display, im->x.base_window,
+    xpix->pixmap = XShmCreatePixmap (xpix->xitk->display, im->x.base_window,
 				    shminfo->shmaddr, shminfo, width, height, depth);
 
     if(!xpix->pixmap) {
@@ -467,15 +450,15 @@ static xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(xitk_t *xitk, int
       shmdt(shminfo->shmaddr);
       shmctl(shminfo->shmid, IPC_RMID, 0);
       free(shminfo);
-      xitk_uninstall_x_error_handler();
+      xitk_uninstall_x_error_handler (xpix->xitk);
       goto __noxshm_pixmap;
     }
     else {
       xpix->shm                    = 1;
       xpix->shminfo                = shminfo;
       gcv.graphics_exposures = False;
-      xpix->gc                     = XCreateGC (p->xitk->display, xpix->pixmap, GCGraphicsExposures, &gcv);
-      xitk_uninstall_x_error_handler();
+      xpix->gc                     = XCreateGC (xpix->xitk->display, xpix->pixmap, GCGraphicsExposures, &gcv);
+      xitk_uninstall_x_error_handler (xpix->xitk);
     }
   }
   else
@@ -1327,9 +1310,10 @@ static void draw_check_three_state_check_style(xitk_image_t *p, int x, int y, in
 }
 
 void menu_draw_check(xitk_image_t *p, int checked) {
-  int  style = xitk_get_checkstyle_feature();
+  int  style;
 
   CHECK_IMAGE(p);
+  style = xitk_get_cfg_num (p->xitk, XITK_CHECK_STYLE);
 
   switch(style) {
 
@@ -1522,7 +1506,7 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int type) {
 }
 
 void draw_checkbox_check(xitk_image_t *p) {
-  int  style = xitk_get_checkstyle_feature();
+  int  style = xitk_get_cfg_num (p->xitk, XITK_CHECK_STYLE);
 
   pixmap_fill_rectangle(p->image, 0, 0, p->width, p->height, xitk_get_pixel_color_gray(p->xitk));
 
@@ -2464,4 +2448,3 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
 int xitk_image_quality (xitk_t *xitk, int qual) {
   return Imlib_gfx_quality (xitk->imlibdata, qual);
 }
-

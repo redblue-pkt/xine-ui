@@ -648,7 +648,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         s->info.label_y = 0;
         s->info.label_printable = 1;
         s->info.label_animation_step = 1;
-        s->info.label_animation_timer = xitk_get_timer_label_animation ();
+        s->info.label_animation_timer = xitk_get_cfg_num (skonfig->xitk, XITK_TIMER_LABEL_ANIM);
         s->info.label_alignment = ALIGN_CENTER;
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {

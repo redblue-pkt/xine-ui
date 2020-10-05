@@ -1781,8 +1781,7 @@ xitk_color_names_t *gui_get_color_names(void) {
 /*
  * Return a xitk_color_name_t type from a string color.
  */
-xitk_color_names_t *xitk_get_color_name(const char *color) {
-  xitk_color_names_t *cn = NULL;
+xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *color) {
   char lname[128];
   size_t nlen;
 
@@ -1805,7 +1804,11 @@ xitk_color_names_t *xitk_get_color_name(const char *color) {
 
   /* Hexa X triplet */
   if ((lname[0] == '#') && (nlen == 7)) {
-    cn = (xitk_color_names_t *)xitk_xmalloc (sizeof (xitk_color_names_t));
+    if (!cn) {
+      cn = (xitk_color_names_t *)xitk_xmalloc (sizeof (*cn));
+      if (!cn)
+        return NULL;
+    }
     if ((sscanf (lname + 1, "%2x%2x%2x", &cn->red, &cn->green, &cn->blue)) != 3) {
       XITK_WARNING ("sscanf () failed: %s\n", strerror (errno));
       cn->red = cn->green = cn->blue = 0;
@@ -1827,7 +1830,8 @@ xitk_color_names_t *xitk_get_color_name(const char *color) {
         b = m + 1;
     } while (b != e);
     if (d == 0) {
-      cn = (xitk_color_names_t *)xitk_xmalloc (sizeof (xitk_color_names_t));
+      if (!cn)
+        cn = (xitk_color_names_t *)xitk_xmalloc (sizeof (xitk_color_names_t));
       if (cn) {
         *cn = xitk_sorted_color_names[m];
         return cn;
@@ -2041,7 +2045,7 @@ void xitk_set_widget_tips_default(xitk_widget_t *w, const char *str) {
   }
 
   xitk_tips_set_tips(w, str);
-  xitk_tips_set_timeout(w, xitk_get_tips_timeout());
+  xitk_tips_set_timeout (w, xitk_get_cfg_num (w->wl->xitk, XITK_TIPS_TIMEOUT));
 }
 
 /*
@@ -2095,7 +2099,7 @@ void xitk_enable_widget_tips(xitk_widget_t *w) {
     return;
   }
 
-  xitk_tips_set_timeout(w, xitk_get_tips_timeout());
+  xitk_tips_set_timeout (w, xitk_get_cfg_num (w->wl->xitk, XITK_TIPS_TIMEOUT));
 }
 #endif
 

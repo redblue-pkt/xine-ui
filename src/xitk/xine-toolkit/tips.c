@@ -352,5 +352,5 @@ void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
   w->tips_string = strdup (str);
   /* No timeout, set it to default */
   if (!w->tips_timeout)
-    xitk_tips_set_timeout (w, xitk_get_tips_timeout ());
+    xitk_tips_set_timeout (w, xitk_get_cfg_num (w->wl->xitk, XITK_TIPS_TIMEOUT));
 }

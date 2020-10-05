@@ -273,17 +273,6 @@ static void shortcut_style_cb(void *data, xine_cfg_entry_t *cfg) {
   gui->shortcut_style = cfg->num_value;
 }
 
-int wm_not_ewmh_only(void) {
-  int wm_type = xitk_get_wm_type();
-
-  if((wm_type & WM_TYPE_GNOME_COMP) && !(wm_type & WM_TYPE_EWMH_COMP))
-    return 0;
-  else if(wm_type & WM_TYPE_EWMH_COMP)
-    return 1;
-
-  return 0;
-}
-
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
@@ -1773,13 +1762,14 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
  *
  */
 typedef struct {
-  int      start;
+  gGui_t  *gui;
   char   **session_opts;
+  int      start;
 } _startup_t;
 
 static void on_start(void *data) {
-  gGui_t *gui = gGui;
   _startup_t *startup = (_startup_t *) data;
+  gGui_t *gui = startup->gui;
 
   splash_destroy();
 
@@ -1813,7 +1803,6 @@ static void on_stop (void *data) {
 }
 
 void gui_run(gGui_t *gui, char **session_opts) {
-  _startup_t  startup;
   int         i, auto_start = 0;
 
   video_window_change_skins (gui->vwin, 0);
@@ -1948,12 +1937,16 @@ void gui_run(gGui_t *gui, char **session_opts) {
     }
   }
 
-  startup.start        = auto_start;
-  startup.session_opts = session_opts;
-
   oxine_init();
 
-  xitk_run (on_start, &startup, on_stop, gui);
+  {
+    _startup_t  startup;
+
+    startup.gui          = gui;
+    startup.session_opts = session_opts;
+    startup.start        = auto_start;
+    xitk_run (gui->xitk, on_start, &startup, on_stop, gui);
+  }
 
   /* save playlist */
   if(gui->playlist.mmk && gui->playlist.num) {

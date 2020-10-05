@@ -205,37 +205,19 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
                                                     const xitk_event_cbs_t *cbs, void *user_data,
                                                     xitk_widget_list_t *wl);
 
-int xitk_install_x_error_handler(void);
-int xitk_uninstall_x_error_handler(void);
+int xitk_install_x_error_handler (xitk_t *xitk);
+int xitk_uninstall_x_error_handler (xitk_t *xitk);
 
 const char *xine_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, const char *command);
-int xitk_is_use_xshm(void);
-
-const char *xitk_get_system_font(void);
-const char *xitk_get_default_font(void);
-
-int xitk_get_black_color(void);
-int xitk_get_white_color(void);
-int xitk_get_background_color(void);
-int xitk_get_focus_color(void);
-int xitk_get_select_color(void);
-
-uint32_t xitk_get_wm_type(void);
+int xitk_is_use_xshm (xitk_t *xitk);
 
 char *xitk_filter_filename(const char *name);
-unsigned long xitk_get_timer_label_animation(void);
-int xitk_get_barstyle_feature(void);
-int xitk_get_checkstyle_feature(void);
-int xitk_get_cursors_feature(void);
-unsigned long xitk_get_warning_foreground(void);
-unsigned long xitk_get_warning_background(void);
 void xitk_modal_window(Window w);
 void xitk_unmodal_window(Window w);
 void xitk_set_current_menu(xitk_widget_t *menu);
 void xitk_unset_current_menu(void);
-unsigned long xitk_get_tips_timeout(void);
 void xitk_set_tips_timeout(unsigned long timeout);
 
 const char *xitk_skin_get_logo(xitk_skin_config_t *);
@@ -278,6 +260,8 @@ struct xitk_image_s {
   char                              key[32];
 };
 
+xitk_t *xitk_window_get_xitk (xitk_window_t *w);
+
 Pixmap xitk_window_get_background(xitk_window_t *w);
 #ifdef YET_UNUSED
 Pixmap xitk_window_get_background_mask(xitk_window_t *w);
@@ -286,6 +270,8 @@ Pixmap xitk_window_get_background_mask(xitk_window_t *w);
 
 void xitk_register_eh_destructor (xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
+
+void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 void xitk_clipboard_unregister_window (Window win);

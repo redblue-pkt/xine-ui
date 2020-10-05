@@ -51,5 +51,4 @@ void gui_execute_action_id (gGui_t *gui, action_id_t id);
 void gui_handle_key_event (void *data, const xitk_key_event_t *ke);
 void gui_handle_button_event (void *data, const xitk_button_event_t *be);
 
-int wm_not_ewmh_only(void);
 #endif

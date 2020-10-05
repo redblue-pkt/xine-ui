@@ -452,7 +452,8 @@ typedef struct {
 #define WM_TYPE_DTWM                0x0000000C
 
 typedef enum {
-  WINDOW_TYPE_DESKTOP = 1,
+  WINDOW_TYPE_NONE = 0,
+  WINDOW_TYPE_DESKTOP,
   WINDOW_TYPE_DOCK,
   WINDOW_TYPE_TOOLBAR,
   WINDOW_TYPE_MENU,
@@ -465,15 +466,11 @@ typedef enum {
   WINDOW_TYPE_NOTIFICATION,
   WINDOW_TYPE_COMBO,
   WINDOW_TYPE_DND,
-  WINDOW_TYPE_NORMAL
+  WINDOW_TYPE_NORMAL,
+  WINDOW_TYPE_END
 } xitk_wm_window_type_t;
 
-void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type);
-void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type);
-
-void xitk_window_set_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type);
-void xitk_window_unset_wm_window_type(xitk_window_t *w, xitk_wm_window_type_t type);
-
+void xitk_window_set_wm_window_type (xitk_window_t *w, xitk_wm_window_type_t type);
 
 typedef enum {
   xitk_cursor_invisible,
@@ -650,7 +647,7 @@ int xitk_get_layer_level(void);
 /*
  * Return WM_TYPE_*
  */
-uint32_t xitk_get_wm_type(void);
+uint32_t xitk_get_wm_type (xitk_t *xitk);
 
 /*
  *
@@ -674,7 +671,7 @@ void xitk_unset_ewmh_fullscreen(Window window);
  * This function start the widget live. It's a block function,
  * it will only return after a widget_stop() call.
  */
-void xitk_run (void (* start_cb)(void *data), void *start_data,
+void xitk_run (xitk_t *xitk, void (* start_cb)(void *data), void *start_data,
   void (* stop_cb)(void *data), void *stop_data);
 
 /*
@@ -682,26 +679,39 @@ void xitk_run (void (* start_cb)(void *data), void *start_data,
  * Other functions of the lib shouldn't be called after this
  * one.
  */
-void xitk_stop(void);
+void xitk_stop (xitk_t *xitk);
 
 /*
  * Some user settings values.
  */
-const char *xitk_get_system_font(void);
-const char *xitk_get_default_font(void);
-int xitk_get_xmb_enability(void);
+typedef enum {
+  XITK_SYSTEM_FONT = 1,
+  XITK_DEFAULT_FONT,
+  XITK_XMB_ENABLE,
+  XITK_SHM_ENABLE,
+  XITK_MENU_SHORTCUTS_ENABLE,
+  XITK_BLACK_COLOR,
+  XITK_WHITE_COLOR,
+  XITK_BG_COLOR,
+  XITK_FOCUS_COLOR,
+  XITK_SELECT_COLOR,
+  XITK_WARN_BG_COLOR,
+  XITK_WARN_FG_COLOR,
+  XITK_BAR_STYLE,
+  XITK_CHECK_STYLE,
+  XITK_CURSORS_FEATURE,
+  XITK_TIPS_TIMEOUT,
+  XITK_TIMER_LABEL_ANIM,
+  XITK_DBL_CLICK_TIME,
+  XITK_CFG_END
+} xitk_cfg_item_t;
+
+const char *xitk_get_cfg_string (xitk_t *xitk, xitk_cfg_item_t item);
+int xitk_get_cfg_num (xitk_t *xitk, xitk_cfg_item_t item);
+
 void xitk_set_xmb_enability(int value);
-int xitk_get_black_color(void);
-int xitk_get_white_color(void);
-int xitk_get_background_color(void);
-int xitk_get_focus_color(void);
-int xitk_get_select_color(void);
 char *xitk_filter_filename(const char *name);
-unsigned long xitk_get_timer_label_animation(void);
 int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2);
-int xitk_get_barstyle_feature(void);
-unsigned long xitk_get_warning_foreground(void);
-unsigned long xitk_get_warning_background(void);
 
 
 /*
@@ -721,7 +731,7 @@ int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y)
 /**
  *
  */
-xitk_color_names_t *xitk_get_color_name(const char *color);
+xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *color);
 
 /**
  * return pointer to the xitk_color_names struct.
@@ -1168,7 +1178,10 @@ void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs);
 /**
  *
  */
-unsigned int xitk_get_pixel_color_from_rgb(xitk_t *xitk, int r, int g, int b);
+int xitk_color_get_value (xitk_t *xitk, uint32_t rgb);
+void xitk_color_free_value (xitk_t *xitk, uint32_t value);
+uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb);
+void xitk_color_db_flush (xitk_t *_xitk);
 
 /**
  *

@@ -130,7 +130,7 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
     if (wp->fontname.s[0])
       fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
     if (!fs)
-      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
+      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       return 0;
     xitk_font_set_font (fs, wp->w.wl->gc);
@@ -412,7 +412,6 @@ KeySym xitk_keycode_to_keysym(XEvent *event) {
  * Paint the input text box.
  */
 static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *event) {
-  XColor               xcolor;
   xitk_font_t         *fs = NULL;
   int                  xsize, ysize, lbear, rbear, width, asc, des;
   int                  cursor_x, yoff = 0;
@@ -449,43 +448,30 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? _IT_FOCUS : _IT_NORMAL;
 
-  xcolor.flags = DoRed | DoBlue | DoGreen;
-
   /* Try to load font */
 
   if (wp->text.buf && wp->text.buf[0]) {
     if (wp->fontname.s[0])
       fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
     if (!fs)
-      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_system_font ());
+      fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
     xitk_font_set_font (fs, wp->text.temp_gc);
     xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
 
-  if (wp->skin_element_name.s || (!wp->skin_element_name.s && (fg = xitk_get_black_color ()) == (unsigned int)-1)) {
-    /*  Some colors configurations */
-    int DefaultColor = -1;
-    xitk_color_names_t *color = NULL;
+  /*  Some colors configurations */
+  {
+    xitk_color_names_t color, *have_cn = NULL;
 
-    if (!strcasecmp (wp->color[state], "Default"))
-      DefaultColor = 0;
-    else
-      color = xitk_get_color_name (wp->color[state]);
-    if (!color || (DefaultColor != -1)) {
-      xcolor.red = xcolor.blue = xcolor.green = DefaultColor << 8;
+    if (strcasecmp (wp->color[state], "Default"))
+      have_cn = xitk_get_color_name (&color, wp->color[state]);
+    if (have_cn) {
+      fg = xitk_color_db_get (wp->w.wl->xitk, (color.red << 16) + (color.green << 8) +  color.blue);
     } else {
-      xcolor.red = color->red << 8;
-      xcolor.blue = color->blue << 8;
-      xcolor.green = color->green << 8;
+      fg = xitk_get_cfg_num (wp->w.wl->xitk, XITK_BLACK_COLOR);
     }
-    if (color)
-      xitk_free_color_name (color);
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XAllocColor (wp->imlibdata->x.disp, Imlib_get_colormap (wp->imlibdata), &xcolor);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-    fg = xcolor.pixel;
   }
 
   cursor_x = 0;

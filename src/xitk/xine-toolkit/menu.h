@@ -42,7 +42,6 @@ typedef struct {
 
 } xitk_menu_widget_t;
 
-int xitk_get_menu_shortcuts_enability (void);
 xitk_widget_t *xitk_noskin_menu_create (xitk_widget_list_t *wl, xitk_menu_widget_t *m, int x, int y);
 void xitk_menu_show_menu (xitk_widget_t *w);
 void xitk_menu_add_entry (xitk_widget_t *w, xitk_menu_entry_t *me);

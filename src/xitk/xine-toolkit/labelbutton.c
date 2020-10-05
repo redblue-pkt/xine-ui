@@ -163,7 +163,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
 
   gc = wp->w.wl->gc;
   /* Try to load font */
-  fs = xitk_font_load_font (wp->w.wl->xitk, wp->font.s[0] ? wp->font.s : xitk_get_system_font ());
+  fs = xitk_font_load_font (wp->w.wl->xitk, wp->font.s[0] ? wp->font.s : xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
   if (!fs)
     XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
 
@@ -173,20 +173,18 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
     &lbear, &rbear, &width, &asc, &des);
 
   /*  Some colors configurations */
-  if (wp->skin_element_name.s
-    || (!wp->skin_element_name.s && ((fg = xitk_get_black_color ()) == (unsigned int)-1))) {
-    xitk_color_names_t *color = NULL;
-    static const int DefaultColor[_LB_END] = {0, 0, 255};
+  {
+    xitk_color_names_t color, *have_cn = NULL;
+    static const xitk_cfg_item_t idx[_LB_END] = {XITK_BLACK_COLOR, XITK_BLACK_COLOR, XITK_WHITE_COLOR};
 
     if (state >= _LB_END)
       state = _LB_NORMAL;
     if (strcasecmp (wp->color[state], "Default"))
-      color = xitk_get_color_name (wp->color[state]);
-    if (!color) {
-      fg = xitk_get_pixel_color_from_rgb (wp->w.wl->xitk, DefaultColor[state], DefaultColor[state], DefaultColor[state]);
+      have_cn = xitk_get_color_name (&color, wp->color[state]);
+    if (have_cn) {
+      fg = xitk_color_db_get (wp->w.wl->xitk, (color.red << 16) + (color.green << 8) + color.blue);
     } else {
-      fg = xitk_get_pixel_color_from_rgb (wp->w.wl->xitk, color->red, color->green, color->blue);
-      xitk_free_color_name (color);
+      fg = xitk_get_cfg_num (wp->w.wl->xitk, idx[state]);
     }
   }
 
@@ -835,3 +833,4 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+

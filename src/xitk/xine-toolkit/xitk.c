@@ -101,9 +101,12 @@ typedef struct {
   int                               offset_y;
 } xitk_move_t;
 
+typedef struct __xitk_s __xitk_t;
+
 typedef struct {
   xitk_dnode_t                node;
 
+  __xitk_t                   *xitk;
   xitk_window_t              *w;
   Window                      window;
   Atom                        XA_XITK;
@@ -216,7 +219,7 @@ typedef enum {
   XITK_A_clip_end
 } xitk_clip_atom_t;
 
-typedef struct {
+struct __xitk_s {
   xitk_t                      x;
 
   xitk_x11_t                 *xitk_x11;
@@ -228,6 +231,13 @@ typedef struct {
   xitk_dlist_t                gfxs;
   int                         use_xshm;
   int                         install_colormap;
+
+  struct {
+    struct {
+      uint32_t                rgb, value;
+    }                        *a;
+    uint32_t                  used, size;
+  }                           color_db;
 
   uint32_t                    wm_type;
 
@@ -274,7 +284,7 @@ typedef struct {
     Time                    own_time;
     Atom                    atoms[XITK_A_clip_end];
   }                         clipboard;
-} __xitk_t;
+};
 
 /*
  *
@@ -324,14 +334,72 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   MUTUNLOCK ();
 }
 
+static void xitk_color_db_init (__xitk_t *xitk) {
+  xitk->color_db.a = NULL;
+  xitk->color_db.used = 0;
+  xitk->color_db.size = 0;
+}
+
+void xitk_color_db_flush (xitk_t *_xitk) {
+  __xitk_t *xitk;
+  uint32_t u;
+
+  xitk_container (xitk, _xitk, x);
+  for (u = xitk->color_db.used; u > 0; u--)
+    xitk_color_free_value (&xitk->x, xitk->color_db.a[u - 1].value);
+  xitk->color_db.used = 0;
+}
+
+static void xitk_color_db_deinit (__xitk_t *xitk) {
+  free (xitk->color_db.a);
+  xitk->color_db.a = NULL;
+  xitk->color_db.used = 0;
+  xitk->color_db.size = 0;
+}
+
+uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb) {
+  __xitk_t *xitk;
+  uint32_t b, m, e;
+  
+  xitk_container (xitk, _xitk, x);
+  b = 0;
+  e = xitk->color_db.used;
+  if (e) {
+    do {
+      m = (b + e) >> 1;
+      if (rgb == xitk->color_db.a[m].rgb)
+        return xitk->color_db.a[m].value;
+      if (rgb < xitk->color_db.a[m].rgb)
+        e = m;
+      else
+        b = m + 1;
+    } while (b != e);
+  }
+  if (xitk->color_db.used >= xitk->color_db.size) {
+    void *n = realloc (xitk->color_db.a, (xitk->color_db.size + 32) * sizeof (xitk->color_db.a[0]));
+
+    if (!n)
+      return 0;
+    xitk->color_db.a = n;
+    xitk->color_db.size += 32;
+  }
+  for (e = xitk->color_db.used; e > b; e--)
+    xitk->color_db.a[e] = xitk->color_db.a[e - 1];
+  xitk->color_db.used += 1;
+  xitk->color_db.a[b].rgb = rgb;
+  xitk->color_db.a[b].value = xitk_color_get_value (&xitk->x, rgb);
+  return xitk->color_db.a[b].value;
+}
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
-  __xitk_t *xitk;
+  if (w && w->wl && w->wl->xitk) {
+    __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
-  if (xitk->clipboard.widget_in == w) {
-    xitk->clipboard.widget_in = NULL;
-    xitk->clipboard.window_in = None;
+    xitk_container (xitk, w->wl->xitk, x);
+    if (xitk->clipboard.widget_in == w) {
+      xitk->clipboard.widget_in = NULL;
+      xitk->clipboard.window_in = None;
+    }
   }
 }
 
@@ -549,7 +617,7 @@ int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len) {
   Window win = w->wl->win;
 
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, w->wl->xitk, x);
   free (xitk->clipboard.text);
   xitk->clipboard.text = NULL;
   xitk->clipboard.text_len = 0;
@@ -580,7 +648,7 @@ int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
   Window win = w->wl->win;
   int l;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, w->wl->xitk, x);
   if (xitk->clipboard.widget_in != w) {
 
     if (xitk->clipboard.window_out == None) {
@@ -740,10 +808,10 @@ void xitk_unset_current_menu(void) {
   xitk->menu = NULL;
 }
 
-int xitk_install_x_error_handler(void) {
+int xitk_install_x_error_handler (xitk_t *_xitk) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   if (xitk->x_error_handler == NULL) {
     xitk->x_error_handler = XSetErrorHandler (_x_error_handler);
     XSync (xitk->x.display, False);
@@ -752,10 +820,10 @@ int xitk_install_x_error_handler(void) {
   return 0;
 }
 
-int xitk_uninstall_x_error_handler(void) {
+int xitk_uninstall_x_error_handler (xitk_t *_xitk) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   if (xitk->x_error_handler != NULL) {
     XSetErrorHandler (xitk->x_error_handler);
     xitk->x_error_handler = NULL;
@@ -858,10 +926,10 @@ static int xitk_check_xshm(Display *display) {
   return 0;
 }
 
-int xitk_is_use_xshm(void) {
+int xitk_is_use_xshm (xitk_t *_xitk) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   return xitk->use_xshm;
 }
 
@@ -918,13 +986,11 @@ static char *get_wm_name(Display *display, Window win, const char *atom_name) {
 
   return wm_name;
 }
-static uint32_t xitk_check_wm(Display *display) {
-  __xitk_t *xitk;
+static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
   Atom      atom;
   uint32_t  type = WM_TYPE_UNKNOWN;
   char     *wm_name = NULL;
 
-  xitk_container (xitk, gXitk, x);
   xitk->x.x_lock_display (display);
 
   if((atom = XInternAtom(display, "XFWM_FLAGS", True)) != None) {
@@ -962,7 +1028,7 @@ static uint32_t xitk_check_wm(Display *display) {
     type |= WM_TYPE_DTWM;
   }
 
-  xitk_install_x_error_handler();
+  xitk_install_x_error_handler (&xitk->x);
 
   if((atom = XInternAtom(display, "_WIN_SUPPORTING_WM_CHECK", True)) != None) {
     unsigned char   *prop_return = NULL;
@@ -1058,7 +1124,7 @@ static uint32_t xitk_check_wm(Display *display) {
     }
   }
 
-  xitk_uninstall_x_error_handler();
+  xitk_uninstall_x_error_handler (&xitk->x);
 
   if (type & WM_TYPE_EWMH_COMP) {
     static const char * const atom_names[XITK_A_END] = {
@@ -1115,59 +1181,30 @@ static uint32_t xitk_check_wm(Display *display) {
   xitk->x.x_unlock_display (display);
 
   if(xitk->verbosity) {
-    printf("[ WM type: ");
+    static const char * const names[] = {
+        [WM_TYPE_UNKNOWN]     = "Unknown",
+        [WM_TYPE_KWIN]        = "KWIN",
+        [WM_TYPE_E]           = "Enlightenment",
+        [WM_TYPE_ICE]         = "Ice",
+        [WM_TYPE_WINDOWMAKER] = "WindowMaker",
+        [WM_TYPE_MOTIF]       = "Motif(like?)",
+        [WM_TYPE_XFCE]        = "XFce",
+        [WM_TYPE_SAWFISH]     = "Sawfish",
+        [WM_TYPE_METACITY]    = "Metacity",
+        [WM_TYPE_AFTERSTEP]   = "Afterstep",
+        [WM_TYPE_BLACKBOX]    = "Blackbox",
+        [WM_TYPE_LARSWM]      = "LarsWM",
+        [WM_TYPE_DTWM]        = "dtwm"
+    };
+    uint32_t t = type & WM_TYPE_COMP_MASK;
+    const char *name = (t < sizeof (names) / sizeof (names[0])) ? names[t] : NULL;
 
-    if(type & WM_TYPE_GNOME_COMP)
-      printf("(GnomeCompliant) ");
-    if(type & WM_TYPE_EWMH_COMP)
-      printf("(EWMH) ");
-
-    switch(type & WM_TYPE_COMP_MASK) {
-    case WM_TYPE_UNKNOWN:
-      printf("Unknown");
-      break;
-    case WM_TYPE_KWIN:
-      printf("KWIN");
-      break;
-    case WM_TYPE_E:
-      printf("Enlightenment");
-      break;
-    case WM_TYPE_ICE:
-      printf("Ice");
-      break;
-    case WM_TYPE_WINDOWMAKER:
-      printf("WindowMaker");
-      break;
-    case WM_TYPE_MOTIF:
-      printf("Motif(like?)");
-      break;
-    case WM_TYPE_XFCE:
-      printf("XFce");
-      break;
-    case WM_TYPE_SAWFISH:
-      printf("Sawfish");
-      break;
-    case WM_TYPE_METACITY:
-      printf("Metacity");
-      break;
-    case WM_TYPE_AFTERSTEP:
-      printf("Afterstep");
-      break;
-    case WM_TYPE_BLACKBOX:
-      printf("Blackbox");
-      break;
-    case WM_TYPE_LARSWM:
-      printf("LarsWM");
-      break;
-    case WM_TYPE_DTWM:
-      printf("dtwm");
-      break;
-    }
-
-    if(wm_name)
-      printf(" {%s}", wm_name);
-
-    printf(" ]-\n");
+    if (!name)
+      name = names[WM_TYPE_UNKNOWN];
+    printf ("[ WM type: %s%s%s {%s} ]-\n",
+      (type & WM_TYPE_GNOME_COMP) ? "(GnomeCompliant) " : "",
+      (type & WM_TYPE_EWMH_COMP) ? "(EWMH) " : "",
+      name, wm_name ? wm_name : "");
   }
 
   if(wm_name)
@@ -1175,11 +1212,11 @@ static uint32_t xitk_check_wm(Display *display) {
 
   return type;
 }
-uint32_t xitk_get_wm_type(void) {
-  __xitk_t *xitk;
+uint32_t xitk_get_wm_type (xitk_t *xitk) {
+  __xitk_t *_xitk;
 
-  xitk_container (xitk, gXitk, x);
-  return xitk->wm_type;
+  xitk_container (_xitk, xitk, x);
+  return _xitk->wm_type;
 }
 
 int xitk_get_layer_level(void) {
@@ -1337,11 +1374,9 @@ void xitk_set_window_layer(Window window, int layer) {
   xitk->x.x_unlock_display (xitk->x.display);
 }
 
-static void _set_ewmh_state(Window window, Atom atom, int enable) {
-  __xitk_t *xitk;
+static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enable) {
   XEvent xev;
 
-  xitk_container (xitk, gXitk, x);
   if((window == None) || (atom == None))
     return;
 
@@ -1369,8 +1404,8 @@ void xitk_set_ewmh_fullscreen(Window window) {
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
-  _set_ewmh_state (window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 1);
-  _set_ewmh_state (window, xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
+  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 1);
+  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
 }
 
 void xitk_unset_ewmh_fullscreen(Window window) {
@@ -1380,78 +1415,46 @@ void xitk_unset_ewmh_fullscreen(Window window) {
   if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
 
-  _set_ewmh_state (window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 0);
-  _set_ewmh_state (window, xitk->atoms[XITK_A_STAYS_ON_TOP], 0);
+  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 0);
+  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_STAYS_ON_TOP], 0);
 }
 
-static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int value) {
-  __xitk_t *xitk;
+void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type) {
+  __xitk_t *_xitk;
 
-  xitk_container (xitk, gXitk, x);
-  if (window && (xitk->wm_type & WM_TYPE_EWMH_COMP)) {
-    Atom *atom = NULL;
+  if (!xitk)
+    return;
+  xitk_container (_xitk, xitk, x);
+  if (_xitk->wm_type & WM_TYPE_EWMH_COMP) {
+    if (type == WINDOW_TYPE_NONE) {
+      xitk_lock_display (&_xitk->x);
+      XDeleteProperty (_xitk->x.display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE]);
+      xitk_unlock_display (&_xitk->x);
+    } else if ((type >= 1) && (type < WINDOW_TYPE_END)) {
+      static const xitk_atom_t ai[WINDOW_TYPE_END] = {
+        [WINDOW_TYPE_DESKTOP]       = XITK_A_WM_WINDOW_TYPE_DESKTOP,
+        [WINDOW_TYPE_DOCK]          = XITK_A_WM_WINDOW_TYPE_DOCK,
+        [WINDOW_TYPE_TOOLBAR]       = XITK_A_WM_WINDOW_TYPE_TOOLBAR,
+        [WINDOW_TYPE_MENU]          = XITK_A_WM_WINDOW_TYPE_MENU,
+        [WINDOW_TYPE_UTILITY]       = XITK_A_WM_WINDOW_TYPE_UTILITY,
+        [WINDOW_TYPE_SPLASH]        = XITK_A_WM_WINDOW_TYPE_SPLASH,
+        [WINDOW_TYPE_DIALOG]        = XITK_A_WM_WINDOW_TYPE_DIALOG,
+        [WINDOW_TYPE_DROPDOWN_MENU] = XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU,
+        [WINDOW_TYPE_POPUP_MENU]    = XITK_A_WM_WINDOW_TYPE_POPUP_MENU,
+        [WINDOW_TYPE_TOOLTIP]       = XITK_A_WM_WINDOW_TYPE_TOOLTIP,
+        [WINDOW_TYPE_NOTIFICATION]  = XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
+        [WINDOW_TYPE_COMBO]         = XITK_A_WM_WINDOW_TYPE_COMBO,
+        [WINDOW_TYPE_DND]           = XITK_A_WM_WINDOW_TYPE_DND,
+        [WINDOW_TYPE_NORMAL]        = XITK_A_WM_WINDOW_TYPE_NORMAL
+      };
 
-    switch(type) {
-    case WINDOW_TYPE_DESKTOP:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DESKTOP];
-      break;
-    case WINDOW_TYPE_DOCK:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DOCK];
-      break;
-    case WINDOW_TYPE_TOOLBAR:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_TOOLBAR];
-      break;
-    case WINDOW_TYPE_MENU:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_MENU];
-      break;
-    case WINDOW_TYPE_UTILITY:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_UTILITY];
-      break;
-    case WINDOW_TYPE_SPLASH:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_SPLASH];
-      break;
-    case WINDOW_TYPE_DIALOG:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DIALOG];
-      break;
-    case WINDOW_TYPE_DROPDOWN_MENU:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU];
-      break;
-    case WINDOW_TYPE_POPUP_MENU:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_POPUP_MENU];
-      break;
-    case WINDOW_TYPE_TOOLTIP:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_TOOLTIP];
-      break;
-    case WINDOW_TYPE_NOTIFICATION:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_NOTIFICATION];
-      break;
-    case WINDOW_TYPE_COMBO:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_COMBO];
-      break;
-    case WINDOW_TYPE_DND:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_DND];
-      break;
-    case WINDOW_TYPE_NORMAL:
-      atom = &xitk->atoms[XITK_A_WM_WINDOW_TYPE_NORMAL];
-      break;
-    }
-
-    if(atom) {
-      xitk_lock_display (&xitk->x);
-      XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WM_WINDOW_TYPE],
-        XA_ATOM, 32, PropModeReplace, (unsigned char *)atom, 1);
-      XRaiseWindow (xitk->x.display, window);
-      xitk_unlock_display (&xitk->x);
+      xitk_lock_display (&_xitk->x);
+      XChangeProperty (_xitk->x.display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE],
+        XA_ATOM, 32, PropModeReplace, (unsigned char *)&_xitk->atoms[ai[type]], 1);
+      XRaiseWindow (_xitk->x.display, window);
+      xitk_unlock_display (&_xitk->x);
     }
   }
-}
-
-void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type) {
-  _set_wm_window_type(window, type, 0);
-}
-
-void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
-  _set_wm_window_type(window, type, 1);
 }
 
 void xitk_ungrab_pointer(void) {
@@ -1532,20 +1535,26 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
                                                     xitk_widget_list_t *wl) {
   __xitk_t *xitk;
   __gfx_t   *fx;
+  xitk_t *_xitk;
 
-  xitk_container (xitk, gXitk, x);
-  ABORT_IF_NULL(w);
+  ABORT_IF_NULL (w);
+  _xitk = xitk_window_get_xitk (w);
+  if (!_xitk && wl)
+    _xitk = wl->xitk;
+  if (!_xitk)
+    return -1;
+  xitk_container (xitk, _xitk, x);
 
   //  printf("%s()\n", __FUNCTION__);
 
-  fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
+  fx = (__gfx_t *)xitk_xmalloc (sizeof (*fx));
   if (!fx)
     return -1;
 
-  fx->name = name ? strdup(name) : strdup("NO_SET");
-
+  fx->xitk      = xitk;
+  fx->name      = strdup (name ? name : "NO_SET");
   fx->w         = w;
-  fx->window    = w ? xitk_window_get_window(w) : None;
+  fx->window    = xitk_window_get_window (w);
   fx->new_pos.x = 0;
   fx->new_pos.y = 0;
   fx->width     = 0;
@@ -1654,9 +1663,9 @@ static void _widget_list_destroy(xitk_widget_list_t **p) {
   __xitk_t *xitk;
   xitk_widget_list_t *wl = *p;
 
-  xitk_container (xitk, gXitk, x);
   if (!wl)
     return;
+  xitk_container (xitk, wl->xitk, x);
 
   *p = NULL;
 
@@ -1681,9 +1690,9 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   void (*destructor)(void *userdata);
   void *destr_data;
 
-  xitk_container (xitk, gXitk, x);
-  if(!fx)
+  if (!fx)
     return;
+  xitk = fx->xitk;
 
   if(!locked)
     MUTLOCK();
@@ -1760,7 +1769,11 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
   __xitk_t *xitk;
   __gfx_t  *fx;
 
-  xitk_container (xitk, gXitk, x);
+  if (!wl)
+    return;
+  if (!wl->xitk)
+    return;
+  xitk_container (xitk, wl->xitk, x);
   MUTLOCK();
   fx = (__gfx_t *)xitk->gfxs.head.next;
   while (fx->node.next) {
@@ -2429,6 +2442,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk->xitk_x11 = xitk_x11_new (&xitk->x);
 
+  xitk_color_db_init (xitk);
+
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   xitk->verbosity       = verbosity;
@@ -2438,8 +2453,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->key             = 0;
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
-  xitk->config          = xitk_config_init();
-  xitk->use_xshm        = (xitk_config_get_shm_feature(xitk->config)) ? (xitk_check_xshm(display)) : 0;
+  xitk->config          = xitk_config_init (&xitk->x);
+  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (display) : 0;
   xitk_x_error           = 0;
   xitk->x_error_handler = NULL;
   //xitk->modalw          = None;
@@ -2525,7 +2540,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   if(verbosity)
     printf("%s", buffer);
 
-  xitk->wm_type = xitk_check_wm(display);
+  xitk->wm_type = xitk_check_wm (xitk, display);
 
   /* imit imlib */
   _init_imlib(xitk, prefered_visual, install_colormap);
@@ -2543,11 +2558,13 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
  * Start widget event handling.
  * It will block till widget_stop() call
  */
-void xitk_run (void (* start_cb)(void *data), void *start_data,
+void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   void (* stop_cb)(void *data), void *stop_data) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  if (!_xitk)
+    return;
+  xitk_container (xitk, _xitk, x);
   {
     struct sigaction  action;
 
@@ -2720,6 +2737,9 @@ void xitk_free(xitk_t **p) {
     return;
   *p = NULL;
 
+  xitk_color_db_flush (&xitk->x);
+  xitk_color_db_deinit (xitk);
+
   /*
    * Close X display before unloading modules linked against libGL.so
    * https://www.xfree86.org/4.3.0/DRI11.html
@@ -2754,10 +2774,12 @@ void xitk_free(xitk_t **p) {
 /*
  * Stop the wait xevent loop
  */
-void xitk_stop(void) {
+void xitk_stop (xitk_t *_xitk) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  if (!_xitk)
+    return;
+  xitk_container (xitk, _xitk, x);
   xitk_tips_delete (&xitk->x.tips);
   xitk_cursors_deinit (xitk->x.display);
   xitk->running = 0;
@@ -2774,27 +2796,6 @@ void xitk_stop(void) {
 #endif
 }
 
-const char *xitk_get_system_font(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_system_font (xitk->config);
-}
-
-const char *xitk_get_default_font(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_default_font (xitk->config);
-}
-
-int xitk_get_xmb_enability(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_xmb_enability (xitk->config);
-}
-
 void xitk_set_xmb_enability(int value) {
   __xitk_t *xitk;
 
@@ -2802,100 +2803,37 @@ void xitk_set_xmb_enability(int value) {
   xitk_config_set_xmb_enability (xitk->config, value);
 }
 
-int xitk_get_black_color(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_black_color (xitk->config);
-}
-
-int xitk_get_white_color(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_white_color (xitk->config);
-}
-
-int xitk_get_background_color(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_background_color (xitk->config);
-}
-
-int xitk_get_focus_color(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_focus_color (xitk->config);
-}
-
-int xitk_get_select_color(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_select_color (xitk->config);
-}
-
-unsigned long xitk_get_timer_label_animation(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_timer_label_animation (xitk->config);
-}
-
-unsigned long xitk_get_warning_foreground(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_warning_foreground (xitk->config);
-}
-
-unsigned long xitk_get_warning_background(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_warning_background (xitk->config);
-}
-
 int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2) {
   __xitk_t *_xitk;
   struct timeval td;
 
   xitk_container (_xitk, xitk, x);
-  td.tv_usec = xitk_config_get_timer_dbl_click (_xitk->config);
+  td.tv_usec = xitk_config_get_num (_xitk->config, XITK_DBL_CLICK_TIME);
   td.tv_sec  = t2->tv_sec - t1->tv_sec;
   if (td.tv_sec > td.tv_usec / 1000 + 1)
     return 0;
   return td.tv_sec * 1000 + (t2->tv_usec - t1->tv_usec) / 1000 < td.tv_usec;
 }
 
-int xitk_get_barstyle_feature(void) {
+const char *xitk_get_cfg_string (xitk_t *_xitk, xitk_cfg_item_t item) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_barstyle_feature (xitk->config);
+  if (!_xitk)
+    return NULL;
+  xitk_container (xitk, _xitk, x);
+  return xitk_config_get_string (xitk->config, item);
 }
 
-int xitk_get_checkstyle_feature(void) {
+int xitk_get_cfg_num (xitk_t *_xitk, xitk_cfg_item_t item) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_checkstyle_feature (xitk->config);
-}
-
-int xitk_get_cursors_feature(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_cursors_feature (xitk->config);
-}
-
-int xitk_get_menu_shortcuts_enability(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk_config_get_menu_shortcuts_enability (xitk->config);
+  if (!_xitk)
+    return 0;
+  xitk_container (xitk, _xitk, x);
+  switch (item) {
+    case XITK_TIPS_TIMEOUT: return xitk->tips_timeout;
+    default: return xitk_config_get_num (xitk->config, item);
+  }
 }
 
 void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
@@ -2908,13 +2846,6 @@ void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
     if (h)
       *h = _xitk->display_height;
   }
-}
-
-unsigned long xitk_get_tips_timeout(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  return xitk->tips_timeout;
 }
 
 void xitk_set_tips_timeout(unsigned long timeout) {
@@ -3253,4 +3184,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-

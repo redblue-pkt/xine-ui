@@ -550,17 +550,18 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
     xtfs->xitk = xitk;
 
     if (!xitk_font_load_one (xtfs, font)) {
-      const char *fdname = xitk_get_default_font();
+      const char *fdname = xitk_get_cfg_string (xitk, XITK_DEFAULT_FONT);
 
       if (!fdname || !xitk_font_load_one (xtfs, fdname)) {
-        const char *fsname = xitk_get_system_font();
+        const char *fsname = xitk_get_cfg_string (xitk, XITK_SYSTEM_FONT);
+
         if (!xitk_font_load_one (xtfs, fsname)) {
 	  XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
 	  free(xtfs);
           pthread_mutex_unlock(&font_cache->mutex);
 
 	  /* Maybe broken XMB support */
-	  if(xitk_get_xmb_enability()) {
+          if (xitk_get_cfg_num (xitk, XITK_XMB_ENABLE)) {
 	    xitk_font_t *xtfs_fallback;
 
 	    xitk_set_xmb_enability(0);

@@ -386,13 +386,8 @@ struct gGui_st {
 extern gGui_t *gGui;
 
 void set_window_type_start(gGui_t *gui, xitk_window_t *xwin);
-#define set_window_type_start(gui, xwin)                                  \
-  do {                                                                    \
-    if(!video_window_is_visible((gui)->vwin))                             \
-      xitk_window_set_wm_window_type((xwin), WINDOW_TYPE_NORMAL);         \
-    else                                                                  \
-      xitk_window_unset_wm_window_type((xwin), WINDOW_TYPE_NORMAL);       \
-  } while(0)
+#define set_window_type_start(gui, xwin) \
+  xitk_window_set_wm_window_type (xwin, video_window_is_visible ((gui)->vwin) < 2 ? WINDOW_TYPE_NORMAL : WINDOW_TYPE_NONE)
 
 void set_window_states_start(gGui_t *gui, xitk_window_t *xwin);
 #define set_window_states_start(gui, xwin)                                \
