@@ -53,22 +53,29 @@ int xitk_x_error = 0;
 /*
  * Get a pixel color from rgb values.
  */
-int xitk_color_get_value (xitk_t *xitk, uint32_t rgb) {
+void xitk_color_want_alloc (xitk_t *xitk, xitk_color_info_t *info) {
   XColor xcolor;
   uint32_t v;
 
   xcolor.flags = DoRed | DoBlue | DoGreen;
-  v = rgb >> 16;
+  v = info->want >> 16;
   xcolor.red   = (v << 8) + v;
-  v = (rgb >> 8) & 0xff;
+  v = (info->want >> 8) & 0xff;
   xcolor.green = (v << 8) + v;
-  v = rgb & 0xff;
+  v = info->want & 0xff;
   xcolor.blue  = (v << 8) + v;
+
   xitk_lock_display (xitk);
   XAllocColor (xitk->display, Imlib_get_colormap (xitk->imlibdata), &xcolor);
   xitk_unlock_display (xitk);
-  printf ("%s (0x%0x) = 0x%0x.\n", __FUNCTION__, (unsigned int)rgb, (unsigned int)xcolor.pixel);
-  return xcolor.pixel;
+
+  info->value = xcolor.pixel;
+  info->r = xcolor.red;
+  info->g = xcolor.green;
+  info->b = xcolor.blue;
+  info->a = ~0;
+
+  printf ("%s (0x%0x) = 0x%0x.\n", __FUNCTION__, (unsigned int)info->want, (unsigned int)xcolor.pixel);
 }
 
 void xitk_color_free_value (xitk_t *xitk, uint32_t value) {
