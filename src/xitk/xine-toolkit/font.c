@@ -658,8 +658,7 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
     Visual       *visual   = DefaultVisual( xtfs->display, screen );
     Colormap      colormap = DefaultColormap( xtfs->display, screen );
     XGCValues     gc_color;
-    XColor        paint_color;
-    XRenderColor  xr_color;
+    xitk_color_info_t info;
     XftColor      xcolor;
     XftDraw      *xft_draw;
     char          buf[2048];
@@ -674,16 +673,32 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
     xitk_recode2_do (xtfs->font_cache->xr, &rs);
 
     XGetGCValues(xtfs->display, gc, GCForeground, &gc_color);
-    paint_color.pixel = gc_color.foreground;
-    XQueryColor(xtfs->display, colormap, &paint_color);
-    xr_color.red   = paint_color.red;
-    xr_color.green = paint_color.green;
-    xr_color.blue  = paint_color.blue;
-    xr_color.alpha = (short)-1;
-    xft_draw       = XftDrawCreate(xtfs->display, pixmap->pixmap, visual, colormap);
-    XftColorAllocValue(xtfs->display, visual, colormap, &xr_color, &xcolor);
-    XftDrawStringUtf8(xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
-    XftColorFree(xtfs->display, visual, colormap, &xcolor);
+    info.value = gc_color.foreground;
+    xitk_color_db_query_value (xtfs->xitk, &info);
+    xft_draw       = XftDrawCreate (xtfs->display, pixmap->pixmap, visual, colormap);
+#define XITK_FONT_TEMPTED
+#ifdef XITK_FONT_TEMPTED
+    /* we are tempted to fill in a XftColor directly here.
+     * however, xft will need a few more colors for smoothing internally ?? */
+    xcolor.pixel       = info.value;
+    xcolor.color.red   = info.r;
+    xcolor.color.green = info.g;
+    xcolor.color.blue  = info.b;
+    xcolor.color.alpha = info.a;
+    XftDrawStringUtf8 (xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
+#else
+    {
+      XRenderColor  xr_color;
+
+      xr_color.red   = info.r;
+      xr_color.green = info.g;
+      xr_color.blue  = info.b;
+      xr_color.alpha = info.a;
+      XftColorAllocValue (xtfs->display, visual, colormap, &xr_color, &xcolor);
+      XftDrawStringUtf8 (xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
+      XftColorFree (xtfs->display, visual, colormap, &xcolor);
+    }
+#endif
     XftDrawDestroy(xft_draw);
 
     xitk_recode2_done (xtfs->font_cache->xr, &rs);
@@ -1128,3 +1143,4 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
   (void)gc;
 #endif
 }
+

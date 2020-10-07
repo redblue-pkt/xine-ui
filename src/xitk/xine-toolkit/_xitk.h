@@ -107,6 +107,15 @@ extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 
 typedef struct {
+  uint32_t want, value;
+  uint16_t r, g, b, a;
+} xitk_color_info_t;
+
+void xitk_color_want_alloc (xitk_t *xitk, xitk_color_info_t *info);
+int xitk_color_db_query_value (xitk_t *xitk, xitk_color_info_t *info);
+void xitk_color_free_value (xitk_t *xitk, uint32_t value);
+
+typedef struct {
   xitk_widget_t    *itemlist;
   int               sel;
 } btnlist_t;

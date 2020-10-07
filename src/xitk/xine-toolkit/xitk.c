@@ -238,6 +238,10 @@ struct __xitk_s {
     }                        *a;
     uint32_t                  used, size;
   }                           color_db;
+  struct {
+    xitk_color_info_t        *a;
+    uint32_t                  used, size;
+  }                           color_query;
 
   uint32_t                    wm_type;
 
@@ -334,10 +338,19 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   MUTUNLOCK ();
 }
 
+
+/* The color cache database.
+ * XAllocColor () is slow - not because it is much work for the server,
+ * but because we need to wait for the result. */
+
 static void xitk_color_db_init (__xitk_t *xitk) {
   xitk->color_db.a = NULL;
   xitk->color_db.used = 0;
   xitk->color_db.size = 0;
+
+  xitk->color_query.a = NULL;
+  xitk->color_query.used = 0;
+  xitk->color_query.size = 0;
 }
 
 void xitk_color_db_flush (xitk_t *_xitk) {
@@ -348,6 +361,7 @@ void xitk_color_db_flush (xitk_t *_xitk) {
   for (u = xitk->color_db.used; u > 0; u--)
     xitk_color_free_value (&xitk->x, xitk->color_db.a[u - 1].value);
   xitk->color_db.used = 0;
+  xitk->color_query.used = 0;
 }
 
 static void xitk_color_db_deinit (__xitk_t *xitk) {
@@ -355,13 +369,20 @@ static void xitk_color_db_deinit (__xitk_t *xitk) {
   xitk->color_db.a = NULL;
   xitk->color_db.used = 0;
   xitk->color_db.size = 0;
+
+  free (xitk->color_query.a);
+  xitk->color_query.a = NULL;
+  xitk->color_query.used = 0;
+  xitk->color_query.size = 0;
 }
 
 uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb) {
   __xitk_t *xitk;
+  xitk_color_info_t info;
   uint32_t b, m, e;
   
   xitk_container (xitk, _xitk, x);
+
   b = 0;
   e = xitk->color_db.used;
   if (e) {
@@ -375,6 +396,7 @@ uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb) {
         b = m + 1;
     } while (b != e);
   }
+
   if (xitk->color_db.used >= xitk->color_db.size) {
     void *n = realloc (xitk->color_db.a, (xitk->color_db.size + 32) * sizeof (xitk->color_db.a[0]));
 
@@ -385,11 +407,68 @@ uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb) {
   }
   for (e = xitk->color_db.used; e > b; e--)
     xitk->color_db.a[e] = xitk->color_db.a[e - 1];
+
   xitk->color_db.used += 1;
   xitk->color_db.a[b].rgb = rgb;
-  xitk->color_db.a[b].value = xitk_color_get_value (&xitk->x, rgb);
-  return xitk->color_db.a[b].value;
+  info.want = rgb;
+  xitk_color_want_alloc (&xitk->x, &info);
+  xitk->color_db.a[b].value = info.value;
+
+  b = 0;
+  e = xitk->color_query.used;
+  if (e) {
+    do {
+      m = (b + e) >> 1;
+      if (info.value == xitk->color_query.a[m].value)
+        return info.value;
+      if (info.value < xitk->color_query.a[m].value)
+        e = m;
+      else
+        b = m + 1;
+    } while (b != e);
+  }
+
+  if (xitk->color_query.used >= xitk->color_query.size) {
+    void *n = realloc (xitk->color_query.a, (xitk->color_query.size + 32) * sizeof (xitk->color_query.a[0]));
+
+    if (!n)
+      return info.value;
+    xitk->color_query.a = n;
+    xitk->color_query.size += 32;
+  }
+  for (e = xitk->color_query.used; e > b; e--)
+    xitk->color_query.a[e] = xitk->color_query.a[e - 1];
+
+  xitk->color_query.used += 1;
+  xitk->color_query.a[b] = info;
+
+  return info.value;
 }
+
+int xitk_color_db_query_value (xitk_t *_xitk, xitk_color_info_t *info) {
+  __xitk_t *xitk;
+  uint32_t b, m, e;
+  
+  xitk_container (xitk, _xitk, x);
+
+  b = 0;
+  e = xitk->color_query.used;
+  if (e) {
+    do {
+      m = (b + e) >> 1;
+      if (info->value == xitk->color_query.a[m].value) {
+        *info = xitk->color_query.a[m];
+        return 1;
+      }
+      if (info->value < xitk->color_query.a[m].value)
+        e = m;
+      else
+        b = m + 1;
+    } while (b != e);
+  }
+  return 0;
+}
+
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
   if (w && w->wl && w->wl->xitk) {
@@ -3184,3 +3263,4 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
+

@@ -361,7 +361,7 @@ const char *xitk_config_get_string (xitk_config_t *xtcf, xitk_cfg_item_t item) {
 
 #define XITK_COLOR_VAL(_xtcf,_name) do { \
   if (_xtcf->color_vals._name < 0) \
-    _xtcf->color_vals._name = xitk_color_get_value (_xtcf->xitk, _xtcf->colors._name); \
+    _xtcf->color_vals._name = xitk_color_db_get (_xtcf->xitk, _xtcf->colors._name); \
   return _xtcf->color_vals._name; \
 } while (0)
 
@@ -437,23 +437,10 @@ xitk_config_t *xitk_config_init (xitk_t *xitk) {
 /*
  * Release memory from config object.
  */
-#define XITK_COLOR_FREE(_xtcf,_name) do { \
-  if (_xtcf->color_vals._name >= 0) \
-    xitk_color_free_value (_xtcf->xitk, _xtcf->color_vals._name); \
-} while (0)
-
 void xitk_config_deinit(xitk_config_t *xtcf) {
 
   if(!xtcf)
     return;
-
-  XITK_COLOR_FREE (xtcf, black);
-  XITK_COLOR_FREE (xtcf, white);
-  XITK_COLOR_FREE (xtcf, background);
-  XITK_COLOR_FREE (xtcf, focus);
-  XITK_COLOR_FREE (xtcf, select);
-  XITK_COLOR_FREE (xtcf, warn_background);
-  XITK_COLOR_FREE (xtcf, warn_foreground);
 
   XITK_FREE(xtcf->cfgfilename);
   XITK_FREE(xtcf->fonts.fallback);

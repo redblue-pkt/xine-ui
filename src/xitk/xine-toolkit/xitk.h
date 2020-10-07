@@ -1178,8 +1178,6 @@ void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs);
 /**
  *
  */
-int xitk_color_get_value (xitk_t *xitk, uint32_t rgb);
-void xitk_color_free_value (xitk_t *xitk, uint32_t value);
 uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb);
 void xitk_color_db_flush (xitk_t *_xitk);
 
