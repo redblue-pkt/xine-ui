@@ -2094,6 +2094,7 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 	case Expose:
 	  if (fx->widget_list) {
             int r;
+
             do {
               if (event->xexpose.x < fx->expose.x1)
                 fx->expose.x1 = event->xexpose.x;
@@ -2111,9 +2112,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 #ifdef XITK_PAINT_DEBUG
               printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
 #endif
-              /* initial panel open yields this?? */
-              if ((fx->expose.x1 | fx->expose.x2 | fx->expose.y1 | fx->expose.y2) == 0)
-                fx->expose.x2 = fx->expose.y2 = 0x7fffffff;
               xitk_partial_paint_widget_list (fx->widget_list, &fx->expose);
               _xitk_reset_hull (&fx->expose);
             }
@@ -2701,43 +2699,6 @@ void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   _xitk_clipboard_init (xitk);
 
   xitk->running = 1;
-
-  xitk_lock_display (&xitk->x);
-  XSync (xitk->x.display, True); /* Flushing the toilets */
-  xitk_unlock_display (&xitk->x);
-
-  /*
-   * Force to repain the widget list if it exist
-   */
-  {
-    __gfx_t *fx;
-
-    MUTLOCK ();
-    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
-      FXLOCK (fx);
-
-      if ((fx->window != None) && fx->widget_list) {
-        XEvent xexp;
-
-        memset(&xexp, 0, sizeof xexp);
-        xexp.xany.type          = Expose;
-        xexp.xexpose.type       = Expose;
-        xexp.xexpose.send_event = True;
-        xexp.xexpose.display    = xitk->x.display;
-        xexp.xexpose.window     = fx->window;
-        xexp.xexpose.count      = 0;
-
-        xitk_lock_display (&xitk->x);
-        if (!XSendEvent (xitk->x.display, fx->window, False, ExposureMask, &xexp)) {
-          XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
-        }
-        xitk_unlock_display (&xitk->x);
-      }
-
-      FXUNLOCK (fx);
-    }
-    MUTUNLOCK ();
-  }
 
   /* We're ready to handle anything */
   if (start_cb)
