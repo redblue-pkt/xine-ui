@@ -144,8 +144,8 @@ static void *_tips_loop_thread (void *data) {
 
           xitk_font_unload_font (fs);
 
-          cfore = xitk_get_pixel_color_black (xitk);
-          cback = xitk_get_pixel_color_lightgray (xitk);
+          cfore = xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
+          cback = xitk_get_cfg_num (xitk, XITK_FOCUS_COLOR);
 
           /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
           image = xitk_image_create_image_with_colors_from_string (xitk,

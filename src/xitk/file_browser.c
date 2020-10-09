@@ -1406,16 +1406,16 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
 	offset += w;
 
-        xitk_image_fill_polygon (image, &points[0], 4, xitk_get_pixel_color_lightgray (fb->gui->xitk));
+        xitk_image_fill_polygon (image, &points[0], 4, xitk_get_cfg_num (fb->gui->xitk, XITK_FOCUS_COLOR));
 
 	for(k = 0; k < 3; k++) {
           int color;
           if (k == 0)
-            color = xitk_get_pixel_color_black (fb->gui->xitk);
+            color = xitk_get_cfg_num (fb->gui->xitk, XITK_BLACK_COLOR);
 	  else if(k == 1)
-            color = xitk_get_pixel_color_darkgray (fb->gui->xitk);
+            color = xitk_get_cfg_num (fb->gui->xitk, XITK_SELECT_COLOR);
 	  else
-            color = xitk_get_pixel_color_white (fb->gui->xitk);
+            color = xitk_get_cfg_num (fb->gui->xitk, XITK_WHITE_COLOR);
 
           xitk_image_draw_line(image,
                                points[k].x, points[k].y, points[k+1].x, points[k+1].y,

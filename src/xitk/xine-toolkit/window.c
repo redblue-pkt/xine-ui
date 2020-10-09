@@ -549,7 +549,6 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
   Atom                   prop, XA_WIN_LAYER, XA_DELETE_WINDOW;
-  XColor                 black, dummy;
   MWMHints               mwmhints;
   XClassHint            *xclasshint;
   long                   data[1];
@@ -582,13 +581,9 @@ xitk_window_t *xitk_window_create_window_ext(xitk_t *xitk, int x, int y, int wid
   hint.win_gravity     = NorthWestGravity;
   hint.flags           = PWinGravity | PBaseSize | PMinSize | PMaxSize | USSize | USPosition;
 
-  xitk_lock_display (xitk);
-  XAllocNamedColor(xitk->display, Imlib_get_colormap(xitk->imlibdata), "black", &black, &dummy);
-  xitk_unlock_display (xitk);
-
   attr.override_redirect = override_redirect ? True : False;
-  attr.background_pixel  = black.pixel;
-  attr.border_pixel      = black.pixel;
+  attr.background_pixel  =
+  attr.border_pixel      = xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
   attr.colormap          = Imlib_get_colormap(xitk->imlibdata);
   attr.win_gravity       = NorthWestGravity;
 
@@ -733,10 +728,10 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 	    0, 0, width, height, 0, 0);
   xitk_unlock_display (xitk);
 
-  colorblack = xitk_get_pixel_color_black(xitk);
-  colorwhite = xitk_get_pixel_color_white(xitk);
-  colorgray = xitk_get_pixel_color_gray(xitk);
-  colordgray = xitk_get_pixel_color_darkgray(xitk);
+  colorblack = xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
+  colorwhite = xitk_get_cfg_num (xitk, XITK_WHITE_COLOR);
+  colorgray = xitk_get_cfg_num (xitk, XITK_BG_COLOR);
+  colordgray = xitk_get_cfg_num (xitk, XITK_SELECT_COLOR);
 
  /* Draw window title bar background */
   if(bar_style) {

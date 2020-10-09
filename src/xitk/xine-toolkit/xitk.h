@@ -1182,41 +1182,6 @@ uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb);
 void xitk_color_db_flush (xitk_t *_xitk);
 
 /**
- *
- */
-unsigned int xitk_get_pixel_color_black(xitk_t *im);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_white(xitk_t *im);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_lightgray(xitk_t *im);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_gray(xitk_t *xitk);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_darkgray(xitk_t *im);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_warning_foreground(xitk_t *im);
-
-/**
- *
- */
-unsigned int xitk_get_pixel_color_warning_background(xitk_t *im);
-
-/**
  * xitk pixmaps
  */
 
