@@ -86,31 +86,6 @@ void xitk_color_free_value (xitk_t *xitk, uint32_t value) {
   xitk_unlock_display (xitk);
 }
 
-/*
- * Some default pixel colors.
- */
-unsigned int xitk_get_pixel_color_black(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
-}
-unsigned int xitk_get_pixel_color_white(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WHITE_COLOR);
-}
-unsigned int xitk_get_pixel_color_lightgray(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_FOCUS_COLOR);
-}
-unsigned int xitk_get_pixel_color_gray(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_BG_COLOR);
-}
-unsigned int xitk_get_pixel_color_darkgray(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_SELECT_COLOR);
-}
-unsigned int xitk_get_pixel_color_warning_foreground(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WARN_FG_COLOR);
-}
-unsigned int xitk_get_pixel_color_warning_background(xitk_t *xitk) {
-  return (unsigned int)xitk_get_cfg_num (xitk, XITK_WARN_BG_COLOR);
-}
-
 static int _xitk_pix_font_find_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
   int range, n = 0;
 
@@ -894,7 +869,7 @@ xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
                                                   int width, int align, const char *str) {
 
   return xitk_image_create_image_with_colors_from_string(xitk, fontname, width, align, str,
-    xitk_get_pixel_color_black(xitk), xitk_get_pixel_color_gray(xitk));
+    xitk_get_cfg_num (xitk, XITK_BLACK_COLOR), xitk_get_cfg_num (xitk, XITK_BG_COLOR));
 }
 /*
  *
@@ -949,7 +924,7 @@ void menu_draw_arrow_branch(xitk_image_t *p) {
     points[3].x = x1;
     points[3].y = y1;
 
-    pixmap_fill_polygon(p->image, &points[0], 4, xitk_get_pixel_color_black(p->xitk));
+    pixmap_fill_polygon(p->image, &points[0], 4, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
 
     x1 += w;
     x2 += w;
@@ -1063,7 +1038,7 @@ static void _draw_arrow(xitk_image_t *p, int direction) {
   }
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   xitk_unlock_display (p->xitk);
 
   for(i = 0; i < 3; i++) {
@@ -1176,10 +1151,10 @@ static void _draw_rectangular_box (xitk_pixmap_t *p,
   ABORT_IF_NULL(p);
   ABORT_IF_NULL(p->xitk);
 
-  color[(type & DRAW_FLATTER) != DRAW_OUTTER] = xitk_get_pixel_color_white (p->xitk);
+  color[(type & DRAW_FLATTER) != DRAW_OUTTER] = xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR);
   color[(type & DRAW_FLATTER) == DRAW_OUTTER] = (type & DRAW_LIGHT)
-                                              ? xitk_get_pixel_color_darkgray (p->xitk)
-                                              : xitk_get_pixel_color_black (p->xitk);
+                                              ? xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR)
+                                              : xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR);
 
   /* +---     ----- *              | *
    * |              *              | *
@@ -1234,23 +1209,23 @@ void xitk_image_draw_rectangular_box (xitk_image_t *i, int x, int y, int width, 
 
 static void _draw_check_round(xitk_image_t *p, int x, int y, int d, int checked) {
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, y, d, d, (30 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, y, d, d, (210 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x + 2, y + 2, d - 4, d - 4, (0 * 64), (360 * 64));
   xitk_unlock_display (p->xitk);
 
   if(checked) {
     xitk_lock_display (p->xitk);
-    XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+    XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
     XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x + 4, y + 4, d - 8, d - 8, (0 * 64), (360 * 64));
     xitk_unlock_display (p->xitk);
   }
@@ -1258,23 +1233,23 @@ static void _draw_check_round(xitk_image_t *p, int x, int y, int d, int checked)
 static void _draw_check_check(xitk_image_t *p, int x, int y, int d, int checked) {
   /* background */
   pixmap_fill_rectangle (p->image, x, y, d, d,
-    (checked & 2) ? xitk_get_pixel_color_white (p->xitk) : xitk_get_pixel_color_lightgray (p->xitk));
+    (checked & 2) ? xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR) : xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR));
   /* */
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y, x + d, y);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y, x, y + d);
   xitk_unlock_display (p->xitk);
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR));
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x, y + d, x + d, y + d);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + d, y, x + d, y + d);
   xitk_unlock_display (p->xitk);
 
   if (checked & 1) {
     xitk_lock_display (p->xitk);
-    XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+    XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
     XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + (d / 5), (y + ((d / 3) * 2)) - 2, x + (d / 2), y + d - 2);
     XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + (d / 5)+1, (y + ((d / 3) * 2)) - 2, x + (d / 2) + 1, y + d - 2);
     XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, x + (d / 2), y + d - 2, x + d - 2, y+1);
@@ -1363,9 +1338,9 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   h = p->height;
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 0, 0, w , h);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_lightgray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, w, 0, (w * 2) , h);
   xitk_unlock_display (p->xitk);
 
@@ -1380,7 +1355,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   q->x1 = 1 * w; q->x2 = 2 * w; q->y1 = q->y2 = 0; q++;
   q->x1 = q->x2 = 1 * w; q->y1 = 0; q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 
@@ -1397,7 +1372,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   q->x1 = 2 * w + 0; q->x2 = 3 * w + 0; q->y1 = q->y2 = 0; q++;
   q->x1 = q->x2 = 2 * w + 0; q->y1 = 0; q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 2 * w, 0, w - 1, h - 1);
   xitk_unlock_display (p->xitk);
@@ -1412,7 +1387,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   q->x1 = q->x2 = 2 * w - 1; q->y1 = 0; q->y2 = h; q++;
   q->x1 = 1 * w + 0; q->x2 = 2 * w - 1; q->y1 = q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 
@@ -1423,7 +1398,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   q->x1 = q->x2 = 3 * w - 1; q->y1 = 1; q->y2 = h - 1; q++;
   q->x1 = 2 * w + 1; q->x2 = 3 * w + 0; q->y1 = q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 
@@ -1440,7 +1415,7 @@ static void _draw_three_state(xitk_image_t *p, int style) {
   q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = h - 1; q++;
   q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 }
@@ -1459,9 +1434,9 @@ static void _draw_two_state(xitk_image_t *p, int style) {
   h = p->height;
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 0, 0, w - 1, h - 1);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_lightgray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, w, 0, (w * 2) - 1 , h - 1);
   xitk_unlock_display (p->xitk);
 
@@ -1477,7 +1452,7 @@ static void _draw_two_state(xitk_image_t *p, int style) {
   }
   q->x1 = q->x2 = w; q->y1 = 0; q->y2 = h - 1; q++;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 
@@ -1493,7 +1468,7 @@ static void _draw_two_state(xitk_image_t *p, int style) {
     q->x1 = 1 * w; q->x2 = 2 * w - 1; q->y1 = q->y2 = h - 1; q++;
   }
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, q - xs);
   xitk_unlock_display (p->xitk);
 }
@@ -1506,7 +1481,7 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int type) {
   ABORT_IF_NULL(p);
   ABORT_IF_NULL(p->imlibdata);
 
-  pixmap_fill_rectangle(p, 0, 0, w, h, xitk_get_pixel_color_gray(p->xitk));
+  pixmap_fill_rectangle(p, 0, 0, w, h, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
 
   if (((type & DRAW_FLATTER) == DRAW_OUTTER) || ((type & DRAW_FLATTER) == DRAW_INNER))
     _draw_rectangular_box (p, 0, 0, 0, 0, w, h, type);
@@ -1515,7 +1490,7 @@ static void _draw_relief(xitk_pixmap_t *p, int w, int h, int type) {
 void draw_checkbox_check(xitk_image_t *p) {
   int  style = xitk_get_cfg_num (p->xitk, XITK_CHECK_STYLE);
 
-  pixmap_fill_rectangle(p->image, 0, 0, p->width, p->height, xitk_get_pixel_color_gray(p->xitk));
+  pixmap_fill_rectangle(p->image, 0, 0, p->width, p->height, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
 
   switch(style) {
 
@@ -1610,11 +1585,11 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
   xitk_unlock_display (p->xitk);
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 0 * w, 0, w, h);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_lightgray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 1 * w, 0, w, h);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR));
   XFillRectangle (p->xitk->display, p->image->pixmap, p->image->gc, 2 * w, 0, w, h);
   xitk_unlock_display (p->xitk);
   /* +---+---
@@ -1640,7 +1615,7 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
     xs[8].x1 = xs[8].x2 = 2 * w + m; xs[8].y1 = gap + 3; xs[8].y2 = h - gap - 4;
   }
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, 9);
   xitk_unlock_display (p->xitk);
   /*         +---
@@ -1666,7 +1641,7 @@ void draw_paddle_three_state (xitk_image_t *p, int width, int height) {
     xs[8].x1 = xs[8].x2 = 2 * w + m; xs[8].y1 = gap + 3; xs[8].y2 = h - gap - 4;
   }
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, 9);
   xitk_unlock_display (p->xitk);
 }
@@ -1794,7 +1769,7 @@ static void _draw_frame(xitk_pixmap_t *p,
 
   if(title) {
     xitk_pixmap_draw_string(p, fs,  (x - lbearing + 6), (y + ascent), titlebuf, titlelen,
-                            xitk_get_pixel_color_black(p->xitk));
+                            xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
     xitk_font_unload_font(fs);
   }
 
@@ -1855,14 +1830,14 @@ void draw_tab(xitk_image_t *p) {
   xr[0].x = 0 * w; xr[0].width = 2 * w; xr[0].y = 0; xr[0].height = 5;
   xr[1].x = 2 * w; xr[1].width = 1 * w; xr[1].y = 0; xr[1].height = h;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XFillRectangles (p->xitk->display, p->image->pixmap, p->image->gc, xr, 2);
   xitk_unlock_display (p->xitk);
 
   xr[0].x = 0 * w + 1; xr[0].width = w - 2; xr[0].y = 4; xr[0].height = h - 4;
   xr[1].x = 1 * w + 1; xr[1].width = w - 2; xr[1].y = 0; xr[1].height = h;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_lightgray (p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR));
   XFillRectangles (p->xitk->display, p->image->pixmap, p->image->gc, xr, 2);
   xitk_unlock_display (p->xitk);
 
@@ -1881,7 +1856,7 @@ void draw_tab(xitk_image_t *p) {
   xs[8].x1 = xs[8].x2 = 2 * w;                xs[8].y1 = 2; xs[8].y2 = h - 1;
   xs[9].x1 = 0 * w;     xs[9].x2 = 2 * w - 1; xs[9].y1 = xs[9].y2 = h - 1;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, 10);
   xitk_unlock_display (p->xitk);
 
@@ -1893,7 +1868,7 @@ void draw_tab(xitk_image_t *p) {
   xs[1].x1 = xs[1].x2 = 2 * w - 1;            xs[1].y1 = 2; xs[1].y2 = h - 1;
   xs[2].x1 = xs[2].x2 = 3 * w - 1;            xs[2].y1 = 2; xs[2].y2 = h - 1;
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
   XDrawSegments (p->xitk->display, p->image->pixmap, p->image->gc, xs, 3);
   xitk_unlock_display (p->xitk);
 }
@@ -1910,9 +1885,9 @@ void draw_paddle_rotate(xitk_image_t *p) {
 
   w = p->width/3;
   h = p->height;
-  ncolor = xitk_get_pixel_color_darkgray(p->xitk);
-  fcolor = xitk_get_pixel_color_warning_background(p->xitk);
-  ccolor = xitk_get_pixel_color_lightgray(p->xitk);
+  ncolor = xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR);
+  fcolor = xitk_get_cfg_num (p->xitk, XITK_WARN_BG_COLOR);
+  ccolor = xitk_get_cfg_num (p->xitk, XITK_FOCUS_COLOR);
 
   {
     int x, i;
@@ -1931,7 +1906,7 @@ void draw_paddle_rotate(xitk_image_t *p) {
       XSetForeground (p->xitk->display, p->image->gc, bg_colors[i]);
       XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
       XDrawArc (p->xitk->display, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
-      XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+      XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
       XDrawArc (p->xitk->display, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
       xitk_unlock_display (p->xitk);
 
@@ -1964,16 +1939,16 @@ void draw_rotate_button(xitk_image_t *p) {
 
   /* */
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_gray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BG_COLOR));
   XFillArc (p->xitk->display, p->image->pixmap, p->image->gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
 
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_white(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_WHITE_COLOR));
   //  XDrawArc (p->xitk->display, p->image, p->image->gc, 0, 0, w-1, h-1, (30 * 64), (180 * 64));
   XDrawArc (p->xitk->display, p->image->pixmap, p->image->gc, 1, 1, w-2, h-2, (30 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_darkgray(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_SELECT_COLOR));
   //  XDrawArc (p->xitk->display, p->image, p->image->gc, 0, 0, w-1, h-1, (210 * 64), (180 * 64));
   XDrawArc (p->xitk->display, p->image->pixmap, p->image->gc, 1, 1, w-3, h-3, (210 * 64), (180 * 64));
   xitk_unlock_display (p->xitk);
@@ -1992,7 +1967,7 @@ void draw_button_plus(xitk_image_t *p) {
   h = p->height;
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
 
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, (w >> 1) - 1, 2, (w >> 1) - 1, h - 4);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, w + (w >> 1) - 1, 2, w + (w >> 1) - 1, h - 4);
@@ -2013,7 +1988,7 @@ void draw_button_minus(xitk_image_t *p) {
   h = p->height;
 
   xitk_lock_display (p->xitk);
-  XSetForeground (p->xitk->display, p->image->gc, xitk_get_pixel_color_black(p->xitk));
+  XSetForeground (p->xitk->display, p->image->gc, xitk_get_cfg_num (p->xitk, XITK_BLACK_COLOR));
 
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, 2, (h >> 1) - 1, w - 4, (h >> 1) - 1);
   XDrawLine (p->xitk->display, p->image->pixmap, p->image->gc, w + 2, (h >> 1) - 1, (w * 2) - 4, (h >> 1) - 1);

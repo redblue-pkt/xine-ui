@@ -1505,7 +1505,7 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
 
   xitk_image_fill_rectangle(image,
                             0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
-                            xitk_get_pixel_color_gray(gui->xitk));
+                            xitk_get_cfg_num (gui->xitk, XITK_BG_COLOR));
 
   /* Some decorations */
   xitk_image_draw_outter_frame(image, NULL, NULL,

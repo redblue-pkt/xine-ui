@@ -617,7 +617,7 @@ static void create_button(void) {
       xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
       xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
 
-      col = xitk_get_pixel_color_black(test->imlibdata);
+      col = xitk_get_cfg_num (test->imlibdata, XITK_BLACK_COLOR);
 
       XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
       xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
@@ -787,7 +787,7 @@ static void create_browser(void) {
 	    0, 0, width, height, 0, 0);
 
   XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list),
-		 xitk_get_pixel_color_black(test->imlibdata));
+		 xitk_get_cfg_num (test->imlibdata, XITK_BLACK_COLOR));
   XDrawRectangle(test->display, bg, XITK_WIDGET_LIST_GC(test->widget_list), 17, 27, 117, 176);
 
   xitk_window_change_background(test->xwin, bg, width, height);

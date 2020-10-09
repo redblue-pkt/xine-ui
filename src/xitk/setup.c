@@ -578,7 +578,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
         if (image) {
           xitk_image_fill_rectangle (image, 0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
-            xitk_get_pixel_color_gray (setup->gui->xitk));
+            xitk_get_cfg_num (setup->gui->xitk, XITK_BG_COLOR));
           xitk_image_draw_inner_frame (image, (char *)entry.description,
             boldfontname, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
         }
