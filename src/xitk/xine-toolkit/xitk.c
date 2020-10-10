@@ -250,6 +250,12 @@ struct __xitk_s {
   pthread_mutex_t             mutex;
   int                         running;
   xitk_register_key_t         key;
+
+  struct {
+    pthread_t                 thread;
+    int                       running;
+  }                           event_bridge;
+
   xitk_config_t              *config;
   xitk_signal_callback_t      sig_callback;
   void                       *sig_data;
@@ -334,6 +340,121 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
       xitk_unlock_display (&xitk->x);
       break;
     }
+  }
+  MUTUNLOCK ();
+}
+
+
+static void _xitk_reset_hull (xitk_hull_t *hull) {
+  hull->x1 = 0x7fffffff;
+  hull->x2 = 0;
+  hull->y1 = 0x7fffffff;
+  hull->y2 = 0;
+}
+
+
+static void *xitk_event_bridge_thread (void *data) {
+  __xitk_t *xitk = data;
+  int xconnection;
+
+  xitk_lock_display (&xitk->x);
+  xconnection = ConnectionNumber (xitk->x.display);
+  xitk_unlock_display (&xitk->x);
+
+  while (1) {
+    XEvent event;
+    __gfx_t  *fx;
+
+    xitk_lock_display (&xitk->x);
+    if (XCheckTypedEvent (xitk->x.display, Expose, &event) == False) {
+      fd_set fdset;
+      struct timeval tv;
+
+      xitk_unlock_display (&xitk->x);
+      MUTLOCK ();
+      if (!xitk->event_bridge.running) {
+        MUTUNLOCK ();
+        break;
+      }
+      MUTUNLOCK ();
+      FD_ZERO (&fdset);
+      FD_SET (xconnection, &fdset);
+      tv.tv_sec  = 0;
+      tv.tv_usec = 33000;
+      select (xconnection + 1, &fdset, 0, 0, &tv);
+      continue;
+    }
+
+    xitk_unlock_display (&xitk->x);
+    if (event.xany.type != Expose)
+      continue;
+    if (event.xexpose.window == None)
+      continue;
+
+    MUTLOCK ();
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
+      FXLOCK (fx);
+      if (event.xexpose.window == fx->window) {
+        if (fx->widget_list) {
+          int r;
+
+          do {
+            if (event.xexpose.x < fx->expose.x1)
+              fx->expose.x1 = event.xexpose.x;
+            if (event.xexpose.x + event.xexpose.width > fx->expose.x2)
+              fx->expose.x2 = event.xexpose.x + event.xexpose.width;
+            if (event.xexpose.y < fx->expose.y1)
+              fx->expose.y1 = event.xexpose.y;
+            if (event.xexpose.y + event.xexpose.height > fx->expose.y2)
+              fx->expose.y2 = event.xexpose.y + event.xexpose.height;
+            xitk_lock_display (&xitk->x);
+            r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, &event);
+            xitk_unlock_display (&xitk->x);
+          } while (r == True);
+          if (event.xexpose.count == 0) {
+#ifdef XITK_PAINT_DEBUG
+            printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
+#endif
+            xitk_partial_paint_widget_list (fx->widget_list, &fx->expose);
+            _xitk_reset_hull (&fx->expose);
+          }
+        }
+        FXUNLOCK (fx);
+        break;
+      }
+      FXUNLOCK (fx);
+    }
+    if (!xitk->event_bridge.running) {
+      MUTUNLOCK ();
+      break;
+    }
+    MUTUNLOCK ();
+  }
+
+  return NULL;
+}
+
+static void xitk_event_bridge_start (__xitk_t *xitk) {
+  pthread_attr_t pth_attrs;
+
+  pthread_attr_init (&pth_attrs);
+  MUTLOCK ();
+  xitk->event_bridge.running = 1;
+  if (pthread_create (&xitk->event_bridge.thread, &pth_attrs, xitk_event_bridge_thread, xitk))
+    xitk->event_bridge.running = 0;
+  MUTUNLOCK ();
+  pthread_attr_destroy (&pth_attrs);
+}
+
+static void xitk_event_bridge_stop (__xitk_t *xitk) {
+  MUTLOCK ();
+  if (xitk->event_bridge.running) {
+    void *dummy;
+
+    xitk->event_bridge.running = 0;
+    MUTUNLOCK ();
+    pthread_join (xitk->event_bridge.thread, &dummy);
+    return;
   }
   MUTUNLOCK ();
 }
@@ -1597,13 +1718,6 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
   }
 }
 
-static void _xitk_reset_hull (xitk_hull_t *hull) {
-  hull->x1 = 0x7fffffff;
-  hull->x2 = 0;
-  hull->y1 = 0x7fffffff;
-  hull->y2 = 0;
-}
-
 /*
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
@@ -2519,6 +2633,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk->xitk_x11 = xitk_x11_new (&xitk->x);
 
+  xitk->event_bridge.running = 0;
+
   xitk_color_db_init (xitk);
 
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
@@ -2701,8 +2817,11 @@ void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   xitk->running = 1;
 
   /* We're ready to handle anything */
-  if (start_cb)
+  if (start_cb) {
+    xitk_event_bridge_start (xitk);
     start_cb (start_data);
+    xitk_event_bridge_stop (xitk);
+  }
 
   {
     int xconnection;
