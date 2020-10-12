@@ -63,7 +63,7 @@ void panel_reset_slider (xui_panel_t *panel);
 
 void panel_update_slider (xui_panel_t *panel, int pos);
 void panel_update_channel_display (xui_panel_t *panel);
-void panel_update_runtime_display (xui_panel_t *panel);
+int panel_update_runtime_display (xui_panel_t *panel);
 void panel_update_mrl_display (xui_panel_t *panel);
 void panel_update_mixer_display (xui_panel_t *panel);
 

@@ -307,12 +307,14 @@ static void secs2str (char *s, unsigned int secs) {
     s[0] = (secs / 10u) + '0';
   }
 }
-void panel_update_runtime_display (xui_panel_t *panel) {
+
+int panel_update_runtime_display (xui_panel_t *panel) {
   int seconds, pos, length;
+  int step = 500;
   char timestr[16];
 
   if (panel_is_visible (panel) < 2)
-    return;
+    return step;
 
   if (!gui_xine_get_pos_length (panel->gui, panel->gui->stream, &pos, &seconds, &length)) {
 
@@ -322,11 +324,12 @@ void panel_update_runtime_display (xui_panel_t *panel) {
       length  = panel->gui->stream_length.length;
     }
     else
-      return;
+      return step;
 
   }
 
   do {
+    int speed;
     unsigned int msecs = seconds, secs;
     if (!(pos || msecs)) { /* are you sure there is something to play? */
       panel->shown_time = ~3;
@@ -346,19 +349,35 @@ void panel_update_runtime_display (xui_panel_t *panel) {
       break;
     }
     panel->shown_time = msecs;
-    secs   = msecs / 1000u;
-    msecs %= 1000u;
-    secs2str (timestr, secs);
-    if (xine_get_param (panel->gui->stream, XINE_PARAM_SPEED) > XINE_SPEED_NORMAL / 2)
-      break;
-    /* millisecond information is useful when editing. since we only update */
-    /* twice a second, show this in slow mode only. */
-    timestr[12] = 0;
-    timestr[11] = (msecs % 10u) + '0';
-    msecs /= 10u;
-    timestr[10] = (msecs % 10u) + '0';
-    timestr[9] = (msecs / 10u) + '0';
-    timestr[8] = '.';
+    speed = xine_get_param (panel->gui->stream, XINE_PARAM_FINE_SPEED);
+    if (speed > XINE_FINE_SPEED_NORMAL * 3 / 4) {
+      /* how many ms of stream play in 0.5s of real time? */
+      step = speed / (XINE_FINE_SPEED_NORMAL / 500);
+      /* round to half seconds. */
+      step = (step + 250) / 500 * 500;
+      /* preferred next stop time. */
+      step = panel->runtime_mode
+           ? msecs - ((int)msecs - step + (step >> 1)) / step * step
+           : ((int)msecs + step + (step >> 1)) / step * step - msecs;
+      /* and in real time, with overrun paranoia. */
+      step = step * XINE_FINE_SPEED_NORMAL / speed;
+      step &= 1023;
+      /* round time pos. */
+      secs = (msecs + 100u) / 1000u;
+      secs2str (timestr, secs);
+    } else {
+      secs   = msecs / 1000u;
+      msecs %= 1000u;
+      secs2str (timestr, secs);
+      /* millisecond information is useful when editing. since we only update */
+      /* twice a second, show this in slow mode only. */
+      timestr[12] = 0;
+      timestr[11] = (msecs % 10u) + '0';
+      msecs /= 10u;
+      timestr[10] = (msecs % 10u) + '0';
+      timestr[9] = (msecs / 10u) + '0';
+      timestr[8] = '.';
+    }
   } while (0);
 
   if ((unsigned int)length != panel->shown_length) {
@@ -378,6 +397,8 @@ void panel_update_runtime_display (xui_panel_t *panel) {
 
   if (timestr[0])
     xitk_label_change_label (panel->runtime_label, timestr);
+
+  return step;
 }
 
 /*
@@ -388,6 +409,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
   int screensaver_timer = 0;
   int lastmsecs = -1;
   int i = 0;
+  int step = 500;
 
   while (panel->gui->on_quit == 0) {
 
@@ -491,7 +513,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 
           if (panel_is_visible (panel) > 1) {
 
-            panel_update_runtime_display (panel);
+            step = panel_update_runtime_display (panel);
 
 	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
 	      if(pos >= 0)
@@ -543,7 +565,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
       video_window_update_logo (panel->gui->vwin);
 
   __next_iteration:
-    xine_usec_sleep(500000.0);
+    xine_usec_sleep (step * 1000);
     i++;
   }
 
@@ -1451,3 +1473,4 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
+
