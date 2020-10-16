@@ -212,6 +212,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   const char *check_label, int checked,
   int text_align, const char *text_fmt, ...) {
   xitk_dialog_t *wd;
+  xitk_widget_list_t *widget_list;
   int num_buttons = !!button1_label + !!button2_label +!!button3_label;
   int winw = width, winh = TITLE_BAR_HEIGHT + 40;
 
@@ -260,8 +261,8 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   wd->done3cb = done_cb;
   wd->done3data = userdata;
 
+  widget_list = xitk_window_widget_list (wd->xwin);
   if (num_buttons) {
-    xitk_widget_list_t *widget_list = xitk_window_widget_list (wd->xwin);
     xitk_labelbutton_widget_t lb;
     int bx, bdx, by, bwidth = 150;
 
@@ -335,5 +336,8 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 
   wd->key = xitk_window_register_event_handler ("xitk_dialog_3", wd->xwin, &_dialog_event_cbs, wd);
   xitk_register_eh_destructor (wd->key, _xitk_window_dialog_3_destr, wd);
+  xitk_widget_list_defferred_destroy (widget_list);
   return wd->key;
 }
+
+

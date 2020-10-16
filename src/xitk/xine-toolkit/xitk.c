@@ -92,9 +92,6 @@ static int ml = 0;
 #define MUTUNLOCK() pthread_mutex_unlock (&xitk->mutex)
 #endif
 
-#define FXLOCK(_fx)       __gfx_lock(_fx)
-#define FXUNLOCK(_fx)     __gfx_unlock(_fx)
-
 typedef struct {
   int                               enabled;
   int                               offset_x;
@@ -104,9 +101,11 @@ typedef struct {
 typedef struct __xitk_s __xitk_t;
 
 typedef struct {
-  xitk_dnode_t                node;
+  xitk_widget_list_t          wl;
 
   __xitk_t                   *xitk;
+  int                         refs;
+
   xitk_window_t              *w;
   Window                      window;
   Atom                        XA_XITK;
@@ -130,51 +129,16 @@ typedef struct {
 
   XEvent                     *old_event;
 
-  xitk_widget_list_t         *widget_list;
   char                       *name;
   const xitk_event_cbs_t     *cbs;
   xitk_register_key_t         key;
   xitk_dnd_t                 *xdnd;
   void                       *user_data;
 
-  pthread_mutex_t             mutex;
-  int                         destroy;
-  pthread_t                   owning_thread;
-
   void                      (*destructor)(void *userdata);
   void                       *destr_data;
 } __gfx_t;
 
-
-static int __gfx_lock(__gfx_t *fx)
-{
-  int retval = pthread_mutex_lock(&fx->mutex);
-  if (0 == retval)
-    fx->owning_thread = pthread_self();
-
-  return retval;
-}
-
-static int __gfx_unlock(__gfx_t *fx)
-{
-  fx->owning_thread = (pthread_t)0;
-  return pthread_mutex_unlock(&fx->mutex);
-}
-
-static int __gfx_safe_lock (__gfx_t *fx) {
-  pthread_t self = pthread_self ();
-  if (!pthread_mutex_trylock (&fx->mutex)) {
-    fx->owning_thread = self;
-    return 0;
-  }
-  if (pthread_equal (self, fx->owning_thread))
-    return 1;
-  if (!pthread_mutex_lock (&fx->mutex)) {
-    fx->owning_thread = self;
-    return 0;
-  }
-  return 2;
-}
 
 typedef enum {
   XITK_A_WIN_LAYER = 0,
@@ -227,7 +191,6 @@ struct __xitk_s {
   int                         display_width;
   int                         display_height;
   int                         verbosity;
-  xitk_dlist_t                wlists;
   xitk_dlist_t                gfxs;
   int                         use_xshm;
   int                         install_colormap;
@@ -333,8 +296,8 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
     return;
   xitk_container (xitk, wl->xitk, x);
   MUTLOCK ();
-  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
-    if (fx->widget_list == wl) {
+  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+    if (&fx->wl == wl) {
       xitk_lock_display (&xitk->x);
       XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
       xitk_unlock_display (&xitk->x);
@@ -392,37 +355,32 @@ static void *xitk_event_bridge_thread (void *data) {
       continue;
 
     MUTLOCK ();
-    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
-      FXLOCK (fx);
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
       if (event.xexpose.window == fx->window) {
-        if (fx->widget_list) {
-          int r;
+        int r;
 
-          do {
-            if (event.xexpose.x < fx->expose.x1)
-              fx->expose.x1 = event.xexpose.x;
-            if (event.xexpose.x + event.xexpose.width > fx->expose.x2)
-              fx->expose.x2 = event.xexpose.x + event.xexpose.width;
-            if (event.xexpose.y < fx->expose.y1)
-              fx->expose.y1 = event.xexpose.y;
-            if (event.xexpose.y + event.xexpose.height > fx->expose.y2)
-              fx->expose.y2 = event.xexpose.y + event.xexpose.height;
-            xitk_lock_display (&xitk->x);
-            r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, &event);
-            xitk_unlock_display (&xitk->x);
-          } while (r == True);
-          if (event.xexpose.count == 0) {
+        do {
+          if (event.xexpose.x < fx->expose.x1)
+            fx->expose.x1 = event.xexpose.x;
+          if (event.xexpose.x + event.xexpose.width > fx->expose.x2)
+            fx->expose.x2 = event.xexpose.x + event.xexpose.width;
+          if (event.xexpose.y < fx->expose.y1)
+            fx->expose.y1 = event.xexpose.y;
+          if (event.xexpose.y + event.xexpose.height > fx->expose.y2)
+            fx->expose.y2 = event.xexpose.y + event.xexpose.height;
+          xitk_lock_display (&xitk->x);
+          r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, &event);
+          xitk_unlock_display (&xitk->x);
+        } while (r == True);
+        if (event.xexpose.count == 0) {
 #ifdef XITK_PAINT_DEBUG
-            printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
+          printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
 #endif
-            xitk_partial_paint_widget_list (fx->widget_list, &fx->expose);
-            _xitk_reset_hull (&fx->expose);
-          }
+          xitk_partial_paint_widget_list (&fx->wl, &fx->expose);
+          _xitk_reset_hull (&fx->expose);
         }
-        FXUNLOCK (fx);
         break;
       }
-      FXUNLOCK (fx);
     }
     if (!xitk->event_bridge.running) {
       MUTUNLOCK ();
@@ -892,8 +850,6 @@ int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
   return l;
 }
 
-void widget_stop(void);
-
 /*
 void xitk_modal_window(Window w) {
   __xitk_t *xitk;
@@ -1057,7 +1013,6 @@ static void xitk_signal_handler(int sig) {
   case SIGTERM:
   case SIGQUIT:
     if (xitk && (cur_pid == xitk->xitk_pid)) {
-      xitk_dlist_clear (&xitk->wlists);
       xitk_dlist_clear (&xitk->gfxs);
       xitk_config_deinit (xitk->config);
       xitk_x11_delete (xitk->xitk_x11);
@@ -1672,37 +1627,54 @@ void xitk_ungrab_pointer(void) {
  */
 xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
   __xitk_t *xitk;
-  xitk_widget_list_t *l;
+  __gfx_t *fx;
 
   xitk_container (xitk, _xitk, x);
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(xitk->x.imlibdata);
 
-  l = (xitk_widget_list_t *)xitk_xmalloc (sizeof (xitk_widget_list_t));
-  if (!l)
+  fx = (__gfx_t *)xitk_xmalloc (sizeof (*fx));
+  if (!fx)
     return NULL;
 
-  l->xitk               = &xitk->x;
-  xitk_dlist_init (&l->list);
-  l->win                = None;
-  l->gc                 = NULL;
-  l->origin_gc          = NULL;
-  l->temp_gc            = NULL;
-  l->shared_images      = NULL;
-  l->widget_focused     = NULL;
-  l->widget_under_mouse = NULL;
-  l->widget_pressed     = NULL;
-  l->destroy            = 0;
-  l->imlibdata          = xitk->x.imlibdata;
+  xitk_dnode_init (&fx->wl.node);
+  xitk_dlist_init (&fx->wl.list);
+  fx->wl.xitk               = &xitk->x;
+  fx->wl.win                = None;
+  fx->wl.gc                 = NULL;
+  fx->wl.origin_gc          = NULL;
+  fx->wl.temp_gc            = NULL;
+  fx->wl.shared_images      = NULL;
+  fx->wl.widget_focused     = NULL;
+  fx->wl.widget_under_mouse = NULL;
+  fx->wl.widget_pressed     = NULL;
+  fx->wl.imlibdata          = xitk->x.imlibdata;
+
+  fx->xitk                  = xitk;
+  fx->refs                  = 1;
+  fx->name                  = strdup ("XITK_WL_ONLY");
+  fx->w                     = NULL;
+  fx->window                = None;
+  fx->new_pos.x             = 0;
+  fx->new_pos.y             = 0;
+  fx->width                 = 0;
+  fx->height                = 0;
+  _xitk_reset_hull (&fx->expose);
+  fx->user_data             = NULL;
+  fx->destructor            = NULL;
+  fx->destr_data            = NULL;
+  fx->cbs                   = NULL;
+  fx->xdnd                  = NULL;
+  fx->XA_XITK               = None;
 
   MUTLOCK();
-  xitk_dlist_add_tail (&xitk->wlists, &l->node);
-  MUTUNLOCK();
-
+  fx->key = ++xitk->key;
+  xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
+  MUTUNLOCK ();
 #ifdef XITK_DEBUG
-  printf  ("xitk: new wl @ %p.\n", (void *)l);
+  printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
 #endif
-  return l;
+  return &fx->wl;
 }
 
 /*
@@ -1726,9 +1698,11 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
 xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
                                                     const xitk_event_cbs_t *cbs, void *user_data,
                                                     xitk_widget_list_t *wl) {
+  xitk_t *_xitk;
   __xitk_t *xitk;
   __gfx_t   *fx;
-  xitk_t *_xitk;
+
+  //  printf("%s()\n", __FUNCTION__);
 
   ABORT_IF_NULL (w);
   _xitk = xitk_window_get_xitk (w);
@@ -1736,30 +1710,26 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     _xitk = wl->xitk;
   if (!_xitk)
     return -1;
-  xitk_container (xitk, _xitk, x);
+  if (!wl) {
+    wl = xitk_widget_list_new (_xitk);
+    if (!wl)
+      return -1;
+    xitk_container (fx, wl, wl);
+  } else {
+    xitk_container (fx, wl, wl);
+    fx->refs += 1;
+  }
+  xitk = fx->xitk;
 
-  //  printf("%s()\n", __FUNCTION__);
+  MUTLOCK ();
+  xitk_dnode_remove (&fx->wl.node);
+  MUTUNLOCK ();
 
-  fx = (__gfx_t *)xitk_xmalloc (sizeof (*fx));
-  if (!fx)
-    return -1;
-
-  fx->xitk      = xitk;
+  free (fx->name);
   fx->name      = strdup (name ? name : "NO_SET");
+  fx->user_data = user_data;
   fx->w         = w;
   fx->window    = xitk_window_get_window (w);
-  fx->new_pos.x = 0;
-  fx->new_pos.y = 0;
-  fx->width     = 0;
-  fx->height    = 0;
-
-  _xitk_reset_hull (&fx->expose);
-
-  fx->user_data = user_data;
-  fx->destructor = NULL;
-  fx->destr_data = NULL;
-  pthread_mutex_init(&fx->mutex, NULL);
-  fx->owning_thread = (pthread_t)0;
 
   if (fx->window != None) {
     XWindowAttributes wattr;
@@ -1788,36 +1758,23 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
 
   fx->cbs = cbs;
 
-  if(wl)
-    fx->widget_list = wl;
-  else
-    fx->widget_list = NULL;
-
   if (cbs && cbs->dnd_cb && (fx->window != None)) {
     fx->xdnd = xitk_dnd_new (&xitk->x);
     if (fx->xdnd && xitk_make_window_dnd_aware(fx->xdnd, fx->window))
       xitk_set_dnd_callback(fx->xdnd, cbs->dnd_cb);
   }
-  else
-    fx->xdnd = NULL;
 
   if(fx->window) {
-
     xitk_lock_display (&xitk->x);
     fx->XA_XITK = XInternAtom (xitk->x.display, "_XITK_EVENT", False);
     XChangeProperty (xitk->x.display, fx->window, fx->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
     xitk_unlock_display (&xitk->x);
-
   }
-  else
-    fx->XA_XITK = None;
 
-  MUTLOCK();
-  fx->key = ++xitk->key;
-  xitk_dlist_add_tail (&xitk->gfxs, &fx->node);
-  MUTUNLOCK();
-
+  MUTLOCK ();
+  xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
+  MUTUNLOCK ();
 #ifdef XITK_DEBUG
   printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
 #endif
@@ -1828,7 +1785,7 @@ static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
   /* fx->key is set uniquely in xitk_register_event_handler, then never changed.
    * MUTLOCK () is enough. */
   __gfx_t *fx;
-  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->node.next; fx = (__gfx_t *)fx->node.next) {
+  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
     if (fx->key == key)
       return fx;
   }
@@ -1844,62 +1801,28 @@ void xitk_register_eh_destructor (xitk_register_key_t key,
   MUTLOCK ();
   fx = __fx_from_key (xitk, key);
   if (fx) {
-    FXLOCK (fx);
     fx->destructor = destructor;
     fx->destr_data = destr_data;
-    FXUNLOCK (fx);
   }
   MUTUNLOCK ();
 }
 
-static void _widget_list_destroy(xitk_widget_list_t **p) {
-  __xitk_t *xitk;
-  xitk_widget_list_t *wl = *p;
-
-  if (!wl)
-    return;
-  xitk_container (xitk, wl->xitk, x);
-
-  *p = NULL;
-
-  if (wl->temp_gc || wl->gc) {
-    xitk_lock_display (&xitk->x);
-    if (wl->temp_gc)
-      XFreeGC (xitk->x.display, wl->temp_gc);
-    if (wl->gc)
-      XFreeGC (xitk->x.display, wl->gc);
-    xitk_unlock_display (&xitk->x);
-    wl->gc = NULL;
-    wl->temp_gc = NULL;
-  }
-  xitk_shared_image_list_delete (wl);
-  xitk_dnode_remove (&wl->node);
-  xitk_dlist_clear (&wl->list);
-  free(wl);
+static void __fx_ref (__gfx_t *fx) {
+  fx->refs++;
 }
 
-static void __fx_destroy(__gfx_t *fx, int locked) {
+static void __fx_unref (__gfx_t *fx) {
   __xitk_t *xitk;
   void (*destructor)(void *userdata);
   void *destr_data;
 
-  if (!fx)
+  if (--fx->refs != 0)
     return;
   xitk = fx->xitk;
 
-  if(!locked)
-    MUTLOCK();
-
-  if(fx->xdnd) {
-    xitk_unset_dnd_callback(fx->xdnd);
-    free(fx->xdnd);
-  }
-
-  if (fx->widget_list && fx->widget_list->destroy) {
-    _widget_list_destroy(&fx->widget_list);
-#ifdef XITK_DEBUG
-    printf  ("xitk: deferredly killed wl @ %p.\n", (void *)fx->widget_list);
-#endif
+  if (fx->xdnd) {
+    xitk_unset_dnd_callback (fx->xdnd);
+    free (fx->xdnd);
   }
 
   fx->cbs             = NULL;
@@ -1910,17 +1833,24 @@ static void __fx_destroy(__gfx_t *fx, int locked) {
   fx->destructor = NULL;
   fx->destr_data = NULL;
 
-  free(fx->name);
+  xitk_dnode_remove (&fx->wl.node);
 
-  xitk_dnode_remove (&fx->node);
+  free (fx->name);
 
-  FXUNLOCK(fx);
-  pthread_mutex_destroy(&fx->mutex);
+  if (fx->wl.temp_gc || fx->wl.gc) {
+    xitk_lock_display (&xitk->x);
+    if (fx->wl.temp_gc)
+      XFreeGC (xitk->x.display, fx->wl.temp_gc);
+    if (fx->wl.gc)
+      XFreeGC (xitk->x.display, fx->wl.gc);
+    xitk_unlock_display (&xitk->x);
+    fx->wl.gc = NULL;
+    fx->wl.temp_gc = NULL;
+  }
+  xitk_shared_image_list_delete (&fx->wl);
+  xitk_dlist_clear (&fx->wl.list);
 
-  free(fx);
-
-  if(!locked)
-    MUTUNLOCK();
+  free (fx);
 
   if (destructor)
     destructor (destr_data);
@@ -1945,15 +1875,10 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   fx = __fx_from_key (xitk, *key);
   if (fx) {
     *key = 0;
-    if (__gfx_safe_lock (fx)) {
-      /* We already hold this, we are inside a callback. */
-      /* NOTE: After return from this, application may free () fx->user_data. */
-      fx->cbs             = NULL;
-      fx->user_data       = NULL;
-      fx->destroy = 1;
-    } else {
-      __fx_destroy (fx, 1);
-    }
+    /* NOTE: After return from this, application may free () fx->user_data. */
+    fx->cbs             = NULL;
+    fx->user_data       = NULL;
+    __fx_unref (fx);
   }
   MUTUNLOCK ();
 }
@@ -1964,34 +1889,14 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
 
   if (!wl)
     return;
-  if (!wl->xitk)
+  xitk_container (fx, wl, wl);
+  xitk = fx->xitk;
+  if (!xitk)
     return;
-  xitk_container (xitk, wl->xitk, x);
-  MUTLOCK();
-  fx = (__gfx_t *)xitk->gfxs.head.next;
-  while (fx->node.next) {
-    if (fx->widget_list && fx->widget_list == wl) {
-      if (fx->destroy) {
-      /* there was pending destroy, widget list needed */
-        fx->widget_list->destroy = 1;
-        MUTUNLOCK();
-        return;
-      } else {
-	fx->widget_list = NULL;
-	break;
-      }
-    }
 
-    fx = (__gfx_t *)fx->node.next;
-  }
-
-  _widget_list_destroy(&wl);
-
-  MUTUNLOCK();
-
-#ifdef XITK_DEBUG
-  printf  ("xitk: killed wl @ %p.\n", (void *)wl);
-#endif
+  MUTLOCK ();
+  __fx_unref (fx);
+  MUTUNLOCK ();
 }
 
 /*
@@ -2006,9 +1911,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
 
   fx = __fx_from_key (xitk, key);
   if (fx) {
-      Window c;
-
-    int already_locked = __gfx_safe_lock (fx);
+    Window c;
 
     if (fx->window != None) {
       winf->xwin = fx->w;
@@ -2027,15 +1930,10 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
       winf->height = fx->height;
       winf->width  = fx->width;
 
-      if (!already_locked)
-        __gfx_unlock (fx);
-
       MUTUNLOCK();
       return 1;
 
     }
-    if (!already_locked)
-      __gfx_unlock (fx);
   }
 
   MUTUNLOCK();
@@ -2051,14 +1949,8 @@ xitk_window_t *xitk_get_window(xitk_register_key_t key) {
   MUTLOCK();
 
   fx = __fx_from_key (xitk, key);
-  if (fx) {
-    int already_locked = __gfx_safe_lock (fx);
-
+  if (fx)
     w = fx->w;
-
-    if (!already_locked)
-      __gfx_unlock (fx);
-  }
 
   MUTUNLOCK();
   return w;
@@ -2070,396 +1962,369 @@ xitk_window_t *xitk_get_window(xitk_register_key_t key) {
  * at register time, it will be called.
  */
 static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
-  __gfx_t  *fx, *fxd;
+  __gfx_t  *fx;
+  int handled;
 
-  fx = (__gfx_t *)xitk->gfxs.head.next;
-  if (!fx->node.next)
-    return;
-
-  if(event->type == KeyPress || event->type == KeyRelease) {
-
-    /* Filter keys that dont't need to be handled by xine  */
-    /* and could be used by our screen saver reset "ping". */
-    /* So they will not kill tips and menus.               */
-
-    size_t i;
-
-    for (i = 0; i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0]); ++i)
-      if(event->xkey.keycode == xitk->ignore_keys[i])
-	return;
-  }
-
-  FXLOCK(fx);
-
-  /*
-  if (xitk->modalw != None) {
-    while (fx->node.next && (fx->window != xitk->modalw)) {
-
-      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
-	fx->xevent_callback(event, fx->user_data);
-
-      fx = (__gfx_t *)fx->node.next;
+  if (event->xany.window != None) {
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+      if (fx->window == event->xany.window) {
+        __fx_ref (fx);
+        break;
+      }
     }
+    if (!fx->wl.node.next)
+      fx = NULL;
+  } else {
+    fx = NULL;
   }
-  */
 
-  while (fx->node.next) {
-    int handled = 0;
+  handled = 0;
+  switch (event->type) {
 
-    if(event->type == KeyRelease)
+    case SelectionNotify:
+      if (_xitk_clipboard_event (xitk, event))
+        break;
+      /* fall through */
+    case ClientMessage:
+      if (fx->xdnd)
+        xitk_process_client_dnd_message (fx->xdnd, event);
+      break;
+
+    case PropertyNotify:
+    case SelectionClear:
+    case SelectionRequest:
+      _xitk_clipboard_event (xitk, event);
+      handled = 1;
+      break;
+
+    case MappingNotify:
+      xitk_lock_display (&xitk->x);
+      XRefreshKeyboardMapping (&event->xmapping);
+      xitk_unlock_display (&xitk->x);
+      handled = 1;
+      break;
+
+    case KeyRelease:
+      {
+        size_t i;
+
+        /* Filter keys that dont't need to be handled by xine
+         * and could be used by our screen saver reset "ping".
+         * So they will not kill tips and menus. */
+        for (i = 0; i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0]); ++i)
+          if (event->xkey.keycode == xitk->ignore_keys[i])
+            break;
+        if (i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0])) {
+          handled = 1;
+          break;
+        }
+      }
       gettimeofday (&xitk->keypress, 0);
+      break;
 
-    if(fx->window != None) {
+    case KeyPress:
+      {
+        size_t i;
 
-      //printf("event %d\n", event->type);
+        /* Filter keys that dont't need to be handled by xine
+         * and could be used by our screen saver reset "ping".
+         * So they will not kill tips and menus. */
+        for (i = 0; i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0]); ++i)
+          if (event->xkey.keycode == xitk->ignore_keys[i])
+            break;
+        if (i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0])) {
+          handled = 1;
+          break;
+        }
+      }
+      if (fx) {
+        static const uint8_t t[XITK_KEY_LASTCODE + 1] = {
+          [XITK_KEY_ESCAPE] = 32,
+          [XITK_KEY_TAB] = 1,
+          [XITK_KEY_KP_TAB] = 1,
+          [XITK_KEY_ISO_LEFT_TAB] = 1,
+          [XITK_KEY_RETURN] = 2,
+          [XITK_KEY_NUMPAD_ENTER] = 2,
+          [XITK_KEY_ISO_ENTER] = 2,
+          [XITK_KEY_UP] = 8,
+          [XITK_KEY_DOWN] = 16,
+          [XITK_KEY_PREV] = 8,
+          [XITK_KEY_NEXT] = 16,
+          [XITK_KEY_LASTCODE] = 4
+        };
+        KeySym         mykey;
+        uint8_t        kbuf[256];
+        int            modifier;
+        xitk_widget_t *w;
 
-      if(fx->window == event->xany.window) {
+        xitk_tips_hide_tips (xitk->x.tips);
 
-	switch(event->type) {
+        w = fx->wl.widget_focused ? fx->wl.widget_focused : NULL;
 
-        case PropertyNotify:
-        case SelectionClear:
-        case SelectionRequest:
-          _xitk_clipboard_event (xitk, event);
+        xitk_x11_keyevent_2_string (xitk->xitk_x11, event, &mykey, &modifier, (char *)kbuf, sizeof (kbuf));
+        handled = xitk_widget_key_event (w, (char *)kbuf, modifier);
+
+        if (!handled) {
+          if (kbuf[0] == ' ')
+            kbuf[0] = XITK_CTRL_KEY_PREFIX, kbuf[1] = XITK_KEY_LASTCODE;
+          if (kbuf[0] == XITK_CTRL_KEY_PREFIX) {
+            if ((t[kbuf[1]] == 1) || (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (t[kbuf[1]] & 34))) {
+              handled = 1;
+              xitk_set_focus_to_next_widget (&fx->wl, (modifier & MODIFIER_SHIFT), modifier);
+            } else if (kbuf[1] == XITK_KEY_ESCAPE) {
+              if (w && (w->type & WIDGET_GROUP_MENU)) {
+                /* close menu */
+                handled = 1;
+                xitk_destroy_widget (xitk_menu_get_menu (w));
+              }
+            } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
+              /* close menu branch */
+              handled = 1;
+              xitk_menu_destroy_branch (w);
+            } else if ((t[kbuf[1]] & 24) && w && (w->type & WIDGET_GROUP_MENU)) {
+              /* next/previous menu item */
+              handled = 1;
+              xitk_set_focus_to_next_widget (&fx->wl, (t[kbuf[1]] & 8), modifier);
+            }
+          }
+        }
+
+        if (!handled) {
+          if (xitk->menu) {
+            if (!(fx->wl.widget_focused && (fx->wl.widget_focused->type & WIDGET_GROUP_MENU)))
+              xitk_set_current_menu (NULL);
+          }
+        }
+      }
+      break;
+
+      case Expose:
+        if (fx) {
+          int r;
+
+          do {
+            if (event->xexpose.x < fx->expose.x1)
+              fx->expose.x1 = event->xexpose.x;
+            if (event->xexpose.x + event->xexpose.width > fx->expose.x2)
+              fx->expose.x2 = event->xexpose.x + event->xexpose.width;
+            if (event->xexpose.y < fx->expose.y1)
+              fx->expose.y1 = event->xexpose.y;
+            if (event->xexpose.y + event->xexpose.height > fx->expose.y2)
+              fx->expose.y2 = event->xexpose.y + event->xexpose.height;
+            xitk_lock_display (&xitk->x);
+            r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, event);
+            xitk_unlock_display (&xitk->x);
+          } while (r == True);
+          if (event->xexpose.count == 0) {
+#ifdef XITK_PAINT_DEBUG
+            printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
+#endif
+            xitk_partial_paint_widget_list (&fx->wl, &fx->expose);
+            _xitk_reset_hull (&fx->expose);
+          }
+          /* not handled = 1; here, window event cb may want to see this too. */
+        }
+        break;
+
+      case MotionNotify: {
+        XWindowAttributes wattr;
+
+        xitk_lock_display (&xitk->x);
+        while (XCheckMaskEvent (xitk->x.display, ButtonMotionMask, event) == True);
+        xitk_unlock_display (&xitk->x);
+
+        if (!fx)
           break;
 
-	case MappingNotify:
+        fx->old_event = event;
+        if (fx->move.enabled) {
+
+          if (fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU)) {
+            xitk_widget_t *menu = xitk_menu_get_menu(fx->wl.widget_focused);
+            if (xitk_menu_show_sub_branchs (menu))
+              xitk_menu_destroy_sub_branchs (menu);
+          }
+
+          fx->old_pos.x = fx->new_pos.x;
+          fx->old_pos.y = fx->new_pos.y;
+
+          fx->new_pos.x = (event->xmotion.x_root)
+            + (event->xmotion.x_root - fx->old_event->xmotion.x_root)
+            - fx->move.offset_x;
+          fx->new_pos.y = (event->xmotion.y_root)
+            + (event->xmotion.y_root - fx->old_event->xmotion.y_root)
+            - fx->move.offset_y;
+
           xitk_lock_display (&xitk->x);
-	  XRefreshKeyboardMapping((XMappingEvent *) event);
+          XMoveWindow (xitk->x.display, fx->window, fx->new_pos.x, fx->new_pos.y);
+          XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
           xitk_unlock_display (&xitk->x);
-	  break;
 
-	case KeyPress: {
-          static const uint8_t t[XITK_KEY_LASTCODE + 1] = {
-            [XITK_KEY_ESCAPE] = 32,
-            [XITK_KEY_TAB] = 1,
-            [XITK_KEY_KP_TAB] = 1,
-            [XITK_KEY_ISO_LEFT_TAB] = 1,
-            [XITK_KEY_RETURN] = 2,
-            [XITK_KEY_NUMPAD_ENTER] = 2,
-            [XITK_KEY_ISO_ENTER] = 2,
-            [XITK_KEY_UP] = 8,
-            [XITK_KEY_DOWN] = 16,
-            [XITK_KEY_PREV] = 8,
-            [XITK_KEY_NEXT] = 16,
-            [XITK_KEY_LASTCODE] = 4
-          };
-	  KeySym         mykey;
-          uint8_t        kbuf[256];
-	  int            modifier;
-          xitk_widget_t *w;
+        } else {
+          xitk_motion_notify_widget_list (&fx->wl,
+            event->xmotion.x, event->xmotion.y, event->xmotion.state);
+        }
+      }
+      break;
 
-          xitk_tips_hide_tips(xitk->x.tips);
+      case LeaveNotify:
+        if (!(fx && fx->wl.widget_pressed &&
+          (fx->wl.widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
+          event->xcrossing.x = event->xcrossing.y = -1; /* Simulate moving out of any widget */
+          /* but leave the actual coords for an active slider, otherwise the slider may jump */
+        /* fall through */
+      case EnterNotify:
+        if (fx)
+          if (event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
+            xitk_motion_notify_widget_list (&fx->wl,
+              event->xcrossing.x, event->xcrossing.y, event->xcrossing.state);
+        break;
 
-          w = fx->widget_list && fx->widget_list->widget_focused ? fx->widget_list->widget_focused : NULL;
+    case ButtonPress:
+      if (!fx) {
+        /* A click anywhere outside an open menu shall close it with no further action. */
+        if (xitk->menu)
+          xitk_set_current_menu (NULL);
+      } else {
+        XWindowAttributes   wattr;
+        Status              status;
 
-          xitk_x11_keyevent_2_string (xitk->xitk_x11, event, &mykey, &modifier, (char *)kbuf, sizeof (kbuf));
-          handled = xitk_widget_key_event (w, (char *)kbuf, modifier);
+        xitk_tips_hide_tips(xitk->x.tips);
 
-          if (!handled) {
-            if (kbuf[0] == ' ')
-              kbuf[0] = XITK_CTRL_KEY_PREFIX, kbuf[1] = XITK_KEY_LASTCODE;
-            if (kbuf[0] == XITK_CTRL_KEY_PREFIX) {
-              if ((t[kbuf[1]] == 1) || (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (t[kbuf[1]] & 34))) {
-                if (fx->widget_list) {
-                  handled = 1;
-                  xitk_set_focus_to_next_widget (fx->widget_list, (modifier & MODIFIER_SHIFT), modifier);
-                }
-              } else if (kbuf[1] == XITK_KEY_ESCAPE) {
-                if (w && (w->type & WIDGET_GROUP_MENU)) {
-                  /* close menu */
-                  handled = 1;
-                  xitk_destroy_widget (xitk_menu_get_menu (w));
-                }
-              } else if ((kbuf[1] == XITK_KEY_LEFT) && w && (w->type & WIDGET_GROUP_MENU)) {
-                /* close menu branch */
-                handled = 1;
-                xitk_menu_destroy_branch (w);
-              } else if ((t[kbuf[1]] & 24) && w && (w->type & WIDGET_GROUP_MENU)) {
-                /* next/previous menu item */
-                handled = 1;
-                if (fx->widget_list)
-                  xitk_set_focus_to_next_widget (fx->widget_list, (t[kbuf[1]] & 8), modifier);
-              }
+        xitk_lock_display (&xitk->x);
+        status = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
+        /* Give focus (and raise) to window after click
+         * if it's viewable (e.g. not iconified). */
+        if ((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable)) {
+          XRaiseWindow (xitk->x.display, fx->window);
+          XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
+        }
+        xitk_unlock_display (&xitk->x);
+
+        /* A click anywhere outside an open menu shall close it with no further action.
+         * FIXME: this currently works only if the click goes into one of our windows. */
+        if (xitk->menu) {
+          if (!(fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU))) {
+            xitk_set_current_menu (NULL);
+            break;
+          }
+        }
+
+        {
+          int modifier = 0;
+          xitk_get_key_modifier (event, &modifier);
+
+          fx->move.enabled = !xitk_click_notify_widget_list (&fx->wl,
+            event->xbutton.x, event->xbutton.y, event->xbutton.button, 0, modifier);
+          if (event->xbutton.button != Button1)
+            fx->move.enabled = 0;
+
+          if ((event->xbutton.button == Button4) || (event->xbutton.button == Button5)) {
+            if (fx->wl.widget_focused) {
+              xitk_widget_t *w = fx->wl.widget_focused;
+              const char sup[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0};
+              const char sdown[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0};
+              handled = xitk_widget_key_event (w, event->xbutton.button == Button4 ? sup : sdown, modifier);
             }
           }
 
-	  if(!handled) {
-
-            if (xitk->menu) {
-              if (!(fx->widget_list && fx->widget_list->widget_focused
-                && (fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))
-                xitk_set_current_menu (NULL);
-	    }
-
-            if (fx->cbs)
-              xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
-	  }
-
-	  if(fx->destroy)
-	    __fx_destroy(fx, 0);
-	  else
-	    FXUNLOCK(fx);
-
-	  return;
-	}
-	break;
-
-	case Expose:
-	  if (fx->widget_list) {
-            int r;
-
-            do {
-              if (event->xexpose.x < fx->expose.x1)
-                fx->expose.x1 = event->xexpose.x;
-              if (event->xexpose.x + event->xexpose.width > fx->expose.x2)
-                fx->expose.x2 = event->xexpose.x + event->xexpose.width;
-              if (event->xexpose.y < fx->expose.y1)
-                fx->expose.y1 = event->xexpose.y;
-              if (event->xexpose.y + event->xexpose.height > fx->expose.y2)
-                fx->expose.y2 = event->xexpose.y + event->xexpose.height;
-              xitk_lock_display (&xitk->x);
-              r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, event);
-              xitk_unlock_display (&xitk->x);
-            } while (r == True);
-            if (event->xexpose.count == 0) {
-#ifdef XITK_PAINT_DEBUG
-              printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
-#endif
-              xitk_partial_paint_widget_list (fx->widget_list, &fx->expose);
-              _xitk_reset_hull (&fx->expose);
-            }
-	  }
-	  break;
-
-	case MotionNotify: {
-	  XWindowAttributes wattr;
-
-          xitk_lock_display (&xitk->x);
-          while (XCheckMaskEvent (xitk->x.display, ButtonMotionMask, event) == True);
-          xitk_unlock_display (&xitk->x);
-
-	  fx->old_event = event;
-	  if(fx->move.enabled) {
-
-            if (fx->widget_list && fx->widget_list->widget_under_mouse
-              && (fx->widget_list->widget_under_mouse->type & WIDGET_GROUP_MENU)) {
-	      xitk_widget_t *menu = xitk_menu_get_menu(fx->widget_list->widget_focused);
-
-	      if(xitk_menu_show_sub_branchs(menu))
-		xitk_menu_destroy_sub_branchs(menu);
-
-	    }
-
-	    fx->old_pos.x = fx->new_pos.x;
-	    fx->old_pos.y = fx->new_pos.y;
-
-	    fx->new_pos.x = (event->xmotion.x_root)
-	      + (event->xmotion.x_root - fx->old_event->xmotion.x_root)
-	      - fx->move.offset_x;
-	    fx->new_pos.y = (event->xmotion.y_root)
-	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root)
-	      - fx->move.offset_y;
-
-            xitk_lock_display (&xitk->x);
-
-            XMoveWindow (xitk->x.display, fx->window,
-			fx->new_pos.x, fx->new_pos.y);
-            XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-
-            xitk_unlock_display (&xitk->x);
-
-	  }
-	  else {
-	    if(fx->widget_list) {
-	      xitk_motion_notify_widget_list (fx->widget_list,
-					      event->xmotion.x,
-					      event->xmotion.y, event->xmotion.state);
-	    }
-	  }
-	}
-	  break;
-
-	case LeaveNotify:
-	  if(!(fx->widget_list && fx->widget_list->widget_pressed &&
-	       (fx->widget_list->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER))
-	    event->xcrossing.x = event->xcrossing.y = -1; /* Simulate moving out of any widget */
-	    /* but leave the actual coords for an active slider, otherwise the slider may jump */
-	  /* fall through */
-	case EnterNotify:
-	  if(fx->widget_list)
-	    if(event->xcrossing.mode == NotifyNormal) /* Ptr. moved rel. to win., not (un)grab */
-	      xitk_motion_notify_widget_list (fx->widget_list,
-					      event->xcrossing.x,
-					      event->xcrossing.y, event->xcrossing.state);
-	  break;
-
-	case ButtonPress: {
-	  XWindowAttributes   wattr;
-	  Status              status;
-
-          xitk_tips_hide_tips(xitk->x.tips);
-
-          xitk_lock_display (&xitk->x);
-          status = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-	  /*
-	   * Give focus (and raise) to window after click
-	   * if it's viewable (e.g. not iconified).
-	   */
-	  if((status != BadDrawable) && (status != BadWindow)
-	     && (wattr.map_state == IsViewable)) {
-            XRaiseWindow (xitk->x.display, fx->window);
-            XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
-	  }
-          xitk_unlock_display (&xitk->x);
-
-          /* A click anywhere outside an open menu shall close it with no further action.
-           * FIXME: this currently works only if the click goes into one of our windows. */
-          if (xitk->menu) {
-            if (!(fx->widget_list && fx->widget_list->widget_under_mouse
-              && (fx->widget_list->widget_under_mouse->type & WIDGET_GROUP_MENU))) {
-              xitk_set_current_menu (NULL);
-              FXUNLOCK (fx);
-              return;
-            }
-          }
-
-	  if(fx->widget_list) {
-            int modifier = 0;
-            xitk_get_key_modifier(event, &modifier);
-
-	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list,
-							       event->xbutton.x,
-							       event->xbutton.y,
-							       event->xbutton.button, 0,
-                                                               modifier);
-            if (event->xbutton.button != Button1)
-              fx->move.enabled = 0;
-
-            if ((event->xbutton.button == Button4) || (event->xbutton.button == Button5)) {
-              if (fx->widget_list && fx->widget_list->widget_focused) {
-                xitk_widget_t *w = fx->widget_list->widget_focused;
-                const char sup[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_UP, 0};
-                const char sdown[3] = {XITK_CTRL_KEY_PREFIX, XITK_MOUSE_WHEEL_DOWN, 0};
-                handled = xitk_widget_key_event (w, event->xbutton.button == Button4 ? sup : sdown, modifier);
-              }
-	    }
-
-	    if(fx->move.enabled) {
-	      XWindowAttributes wattr;
-	      Status            err;
-
-              xitk_lock_display (&xitk->x);
-              err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-              xitk_unlock_display (&xitk->x);
-
-	      if(err != BadDrawable && err != BadWindow) {
-
-		fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
-		fx->old_pos.y = event->xmotion.y_root - event->xbutton.y;
-
-	      }
-
-	      fx->move.offset_x = event->xbutton.x;
-	      fx->move.offset_y = event->xbutton.y;
-
-	    }
-	  }
-	}
-	break;
-
-	case ButtonRelease:
-
-          xitk_tips_hide_tips(xitk->x.tips);
-
-	  if(fx->move.enabled) {
-
-	    fx->move.enabled = 0;
-	    /* Inform application about window movement. */
-
-            if (fx->cbs && fx->cbs->pos_cb)
-              fx->cbs->pos_cb (fx->user_data,
-                fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
-	  }
-	  else {
-            int modifier = 0;
-            xitk_get_key_modifier(event, &modifier);
-	    if(fx->widget_list) {
-	      xitk_click_notify_widget_list (fx->widget_list,
-					     event->xbutton.x, event->xbutton.y,
-                                             event->xbutton.button, 1,
-                                             modifier);
-	    }
-	  }
-	  break;
-
-	case ConfigureNotify: {
-	  XWindowAttributes wattr;
-	  Status            err;
-
-          if (fx->widget_list) {
-            xitk_widget_t *w = (xitk_widget_t *)fx->widget_list->list.head.next;
-            while (w->node.next) {
-              if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
-                xitk_combo_update_pos (w);
-              w = (xitk_widget_t *)w->node.next;
-            }
-          }
-
-	  /* Inform application about window movement. */
-          if (fx->cbs && fx->cbs->pos_cb) {
+          if (fx->move.enabled) {
+            XWindowAttributes wattr;
+            Status            err;
 
             xitk_lock_display (&xitk->x);
             err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
             xitk_unlock_display (&xitk->x);
-
-	    if(err != BadDrawable && err != BadWindow) {
-	      fx->width = wattr.width;
-	      fx->height = wattr.height;
-	    }
-            fx->cbs->pos_cb (fx->user_data,
-              event->xconfigure.x, event->xconfigure.y, fx->width, fx->height);
-	  }
-	}
-	break;
-
-	case SelectionNotify:
-          if (_xitk_clipboard_event (xitk, event))
-            break;
-          /* fall through */
-	case ClientMessage:
-	  if(fx->xdnd)
-	    xitk_process_client_dnd_message(fx->xdnd, event);
-	  break;
-	}
-
-        if (!handled && fx->cbs) {
-          xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
+            if (err != BadDrawable && err != BadWindow) {
+              fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
+              fx->old_pos.y = event->xmotion.y_root - event->xbutton.y;
+            }
+            fx->move.offset_x = event->xbutton.x;
+            fx->move.offset_y = event->xbutton.y;
+          }
         }
       }
-    }
+      break;
 
-    fxd = fx;
-    fx = (__gfx_t *)fx->node.next;
+    case ButtonRelease:
+      if (!fx)
+        break;
+      xitk_tips_hide_tips (xitk->x.tips);
+      if (fx->move.enabled) {
+        fx->move.enabled = 0;
+        /* Inform application about window movement. */
+        if (fx->cbs && fx->cbs->pos_cb)
+          fx->cbs->pos_cb (fx->user_data, fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
+      } else {
+        int modifier = 0;
+        xitk_get_key_modifier (event, &modifier);
+        xitk_click_notify_widget_list (&fx->wl,
+          event->xbutton.x, event->xbutton.y, event->xbutton.button, 1, modifier);
+      }
+      break;
 
-    if(fxd->destroy)
-      __fx_destroy(fxd, 0);
-    else
-      FXUNLOCK(fxd);
+    case ConfigureNotify:
+      if (fx) {
+        XWindowAttributes wattr;
+        Status            err;
+
+        {
+          xitk_widget_t *w = (xitk_widget_t *)fx->wl.list.head.next;
+          while (w->node.next) {
+            if ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO)
+              xitk_combo_update_pos (w);
+            w = (xitk_widget_t *)w->node.next;
+          }
+        }
+
+        /* Inform application about window movement. */
+        if (fx->cbs && fx->cbs->pos_cb) {
+          xitk_lock_display (&xitk->x);
+          err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
+          xitk_unlock_display (&xitk->x);
+          if (err != BadDrawable && err != BadWindow) {
+            fx->width = wattr.width;
+            fx->height = wattr.height;
+          }
+          fx->cbs->pos_cb (fx->user_data, event->xconfigure.x, event->xconfigure.y, fx->width, fx->height);
+        }
+      }
+      break;
+
+  }
+
+  if (!handled && fx && fx->cbs)
+    xitk_x11_translate_xevent (event, fx->cbs, fx->user_data);
+
+  if (fx)
+    __fx_unref (fx);
+}
 
 #if 0
+  /*
+  if (xitk->modalw != None) {
+    while (fx->wl.node.next && (fx->window != xitk->modalw)) {
+
+      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
+	fx->xevent_callback(event, fx->user_data);
+
+      fx = (__gfx_t *)fx->wl.node.next;
+    }
+  }
+  */
+
 #warning FIXME
     if (xitk->modalw != None) {
 
       /* Flush remain fxs */
-      while (fx->node.next && (fx->window != xitk->modalw)) {
+      while (fx->wl.node.next && (fx->window != xitk->modalw)) {
 	FXLOCK(fx);
 
         if (fx->cbs && fx->window != None && event->type != KeyRelease)
           xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
 
 	fxd = fx;
-	fx = (__gfx_t *)fx->node.next;
+	fx = (__gfx_t *)fx->wl.node.next;
 
 	if(fxd->destroy)
 	  __fx_destroy(fxd, 0);
@@ -2470,10 +2335,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
     }
 #endif
 
-    if (fx->node.next)
-      FXLOCK(fx);
-  }
-}
 
 #if 0
 void xitk_xevent_notify (XEvent *event) {
@@ -2640,7 +2501,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   xitk->verbosity       = verbosity;
-  xitk_dlist_init (&xitk->wlists);
   xitk_dlist_init (&xitk->gfxs);
   xitk->x.display       = display;
   xitk->key             = 0;
@@ -2749,7 +2609,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
 /*
  * Start widget event handling.
- * It will block till widget_stop() call
+ * It will block till xitk_stop () call
  */
 void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   void (* stop_cb)(void *data), void *stop_data) {
@@ -2872,13 +2732,11 @@ void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   MUTLOCK ();
   while (1) {
     __gfx_t *fx = (__gfx_t *)xitk->gfxs.head.next;
-    if (!fx->node.next)
+    if (!fx->wl.node.next)
       break;
-    FXLOCK (fx);
-    __fx_destroy(fx, 1);
+    __fx_unref (fx);
   }
   xitk_dlist_clear (&xitk->gfxs);
-  xitk_dlist_clear (&xitk->wlists);
   MUTUNLOCK ();
 
   /* destroy font caching */
