@@ -149,7 +149,6 @@ struct xitk_widget_list_s {
   xine_sarray_t              *shared_images;
   Window                      win;
   GC                          gc, origin_gc, temp_gc;
-  int                         destroy;
 };
 
 xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size);
