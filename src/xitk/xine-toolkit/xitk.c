@@ -1625,13 +1625,8 @@ void xitk_ungrab_pointer(void) {
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.
  */
-xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
-  __xitk_t *xitk;
+static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   __gfx_t *fx;
-
-  xitk_container (xitk, _xitk, x);
-  ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->x.imlibdata);
 
   fx = (__gfx_t *)xitk_xmalloc (sizeof (*fx));
   if (!fx)
@@ -1666,11 +1661,27 @@ xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
   fx->cbs                   = NULL;
   fx->xdnd                  = NULL;
   fx->XA_XITK               = None;
+  fx->key                   = 0;
+
+  return fx;
+}
+
+xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
+  __xitk_t *xitk;
+  __gfx_t *fx;
+
+  xitk_container (xitk, _xitk, x);
+  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xitk->x.imlibdata);
+
+  fx = _xitk_gfx_new (xitk);
+  if (!fx)
+    return NULL;
 
   MUTLOCK();
-  fx->key = ++xitk->key;
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
   MUTUNLOCK ();
+
 #ifdef XITK_DEBUG
   printf  ("xitk: new fx #%d \"%s\" @ %p.\n", fx->key, fx->name, (void *)fx);
 #endif
@@ -1710,20 +1721,20 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     _xitk = wl->xitk;
   if (!_xitk)
     return -1;
+
   if (!wl) {
-    wl = xitk_widget_list_new (_xitk);
-    if (!wl)
+    xitk_container (xitk, _xitk, x);
+    fx = _xitk_gfx_new (xitk);
+    if (!fx)
       return -1;
-    xitk_container (fx, wl, wl);
   } else {
     xitk_container (fx, wl, wl);
+    xitk = fx->xitk;
+    MUTLOCK ();
+    xitk_dnode_remove (&fx->wl.node);
     fx->refs += 1;
+    MUTUNLOCK ();
   }
-  xitk = fx->xitk;
-
-  MUTLOCK ();
-  xitk_dnode_remove (&fx->wl.node);
-  MUTUNLOCK ();
 
   free (fx->name);
   fx->name      = strdup (name ? name : "NO_SET");
@@ -1773,6 +1784,7 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   }
 
   MUTLOCK ();
+  fx->key = ++xitk->key;
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
   MUTUNLOCK ();
 #ifdef XITK_DEBUG
@@ -1811,31 +1823,33 @@ static void __fx_ref (__gfx_t *fx) {
   fx->refs++;
 }
 
-static void __fx_unref (__gfx_t *fx) {
-  __xitk_t *xitk;
-  void (*destructor)(void *userdata);
-  void *destr_data;
+static void __fx_delete (__gfx_t *fx) {
+  __xitk_t *xitk = fx->xitk;
 
-  if (--fx->refs != 0)
-    return;
-  xitk = fx->xitk;
+  xitk_dnode_remove (&fx->wl.node);
 
   if (fx->xdnd) {
     xitk_unset_dnd_callback (fx->xdnd);
     free (fx->xdnd);
+    fx->xdnd = NULL;
   }
 
-  fx->cbs             = NULL;
-  fx->user_data       = NULL;
+  fx->cbs       = NULL;
+  fx->user_data = NULL;
 
-  destructor = fx->destructor;
-  destr_data = fx->destr_data;
+  /* dialog.c uses this to clean out by either widget callback
+   * or xitk_unregister_event_handler () from outside.
+   * that includes another xitk_widget_list_defferred_destroy (),
+   * which does not harm here because
+   * a) widget list is still there, and
+   * b) fx->refs == -1 prevents recursion. */
+  if (fx->destructor)
+    fx->destructor (fx->destr_data);
   fx->destructor = NULL;
   fx->destr_data = NULL;
 
-  xitk_dnode_remove (&fx->wl.node);
-
   free (fx->name);
+  fx->name = NULL;
 
   if (fx->wl.temp_gc || fx->wl.gc) {
     xitk_lock_display (&xitk->x);
@@ -1852,12 +1866,14 @@ static void __fx_unref (__gfx_t *fx) {
 
   free (fx);
 
-  if (destructor)
-    destructor (destr_data);
-
 #ifdef XITK_DEBUG
   printf  ("xitk: killed fx @ %p.\n", (void *)fx);
 #endif
+}
+
+static void __fx_unref (__gfx_t *fx) {
+  if (--fx->refs == 0)
+    __fx_delete (fx);
 }
 
 /*
