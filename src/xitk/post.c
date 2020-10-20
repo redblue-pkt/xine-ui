@@ -1107,7 +1107,7 @@ static void _pplugin_close_help (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   info->win->help_running = 0;
-  xitk_unregister_event_handler (&info->win->help_widget_key);
+  xitk_unregister_event_handler (info->gui->xitk, &info->win->help_widget_key);
   xitk_window_destroy_window (info->win->helpwin);
   info->win->helpwin = NULL;
   /* xitk_dlist_init (&info->win->help_widget_list->list); */
@@ -1665,7 +1665,7 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
 
     free(info->win->plugin_names);
 
-    xitk_unregister_event_handler(&info->win->widget_key);
+    xitk_unregister_event_handler (info->gui->xitk, &info->win->widget_key);
 
     xitk_window_destroy_window(info->win->xwin);
     /* xitk_dlist_init (&info->win->widget_list->list); */

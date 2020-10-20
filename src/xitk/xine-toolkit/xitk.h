@@ -37,9 +37,9 @@
 #include <X11/Xlib.h>
 
 #define XITK_MAJOR_VERSION          (0)
-#define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (7)
-#define XITK_VERSION                "0.10.7"
+#define XITK_MINOR_VERSION          (11)
+#define XITK_SUB_VERSION            (0)
+#define XITK_VERSION                "0.11.0"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -67,16 +67,6 @@
                                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |   \
                                      StructureNotifyMask | PropertyChangeMask |           \
                                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
-
-#define WINDOW_INFO_ZERO(w)         do {                  \
-	                              free((w)->name);    \
-                                      (w)->xwin   = NULL; \
-                                      (w)->name   = NULL; \
-                                      (w)->x      = 0;    \
-                                      (w)->y      = 0;    \
-                                      (w)->height = 0;    \
-                                      (w)->width  = 0;    \
-                                    } while(0)
 
 /* paranoia #1: error if *cont_ptr does not have an element elem_name.
  * paranoia #2: warn if it has wrong type. */
@@ -312,11 +302,11 @@ typedef struct {
 
 typedef struct {
   xitk_window_t                    *xwin;
-  char                             *name;
   int                               x;
   int                               y;
   int                               height;
   int                               width;
+  char                              name[64];
 } window_info_t;
 
 typedef struct {
@@ -598,7 +588,7 @@ xitk_register_key_t xitk_window_register_event_handler(const char *name, xitk_wi
 /*
  * Remove widgetkey_t entry in internal table.
  */
-void xitk_unregister_event_handler(xitk_register_key_t *key);
+void xitk_unregister_event_handler (xitk_t *xitk, xitk_register_key_t *key);
 
 /*
  * Helper function to free widget list inside callbacks.
@@ -609,9 +599,9 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
  * Copy window information matching with key in passed window_info_t struct.
  */
 
-int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
+int xitk_get_window_info (xitk_t *xitk, xitk_register_key_t key, window_info_t *winf);
 
-xitk_window_t *xitk_get_window(xitk_register_key_t key);
+xitk_window_t *xitk_get_window (xitk_t *xitk, xitk_register_key_t key);
 
 /*
  * Initialization function, should be the first call to widget lib.

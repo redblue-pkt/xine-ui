@@ -1725,7 +1725,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   gui->xitk = xitk_init (p->prefered_visual, p->install_colormap,
                          use_x_lock_display, use_synchronized_x11,
-                         gui->verbosity ? 1 : 0);
+                         gui->verbosity);
 
   /*
    * create an icon pixmap

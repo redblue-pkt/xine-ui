@@ -52,6 +52,7 @@
 typedef struct xitk_dialog_s xitk_dialog_t;
 
 struct xitk_dialog_s {
+  xitk_t                 *xitk;
   xitk_window_t          *xwin;
   xitk_register_key_t     key;
   int                     type;
@@ -85,6 +86,8 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
     free (text);
     return NULL;
   }
+
+  wd->xitk = xitk;
 
   image = xitk_image_create_image_from_string (xitk, DEFAULT_FONT_12, *width - 40, align, text);
   free (text);
@@ -145,7 +148,7 @@ static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state)
 
   /* this will _xitk_window_dialog_3_destr (wd). */
   key = wd->key;
-  xitk_unregister_event_handler (&key);
+  xitk_unregister_event_handler (wd->xitk, &key);
 }
 
 /*
@@ -335,7 +338,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   xitk_window_try_to_set_input_focus (wd->xwin);
 
   wd->key = xitk_window_register_event_handler ("xitk_dialog_3", wd->xwin, &_dialog_event_cbs, wd);
-  xitk_register_eh_destructor (wd->key, _xitk_window_dialog_3_destr, wd);
+  xitk_register_eh_destructor (wd->xitk, wd->key, _xitk_window_dialog_3_destr, wd);
   xitk_widget_list_defferred_destroy (widget_list);
   return wd->key;
 }

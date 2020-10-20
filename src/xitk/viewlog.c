@@ -79,7 +79,7 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
 
     gui_save_window_pos (vl->gui, "viewlog", vl->kreg);
 
-    xitk_unregister_event_handler (&vl->kreg);
+    xitk_unregister_event_handler (vl->gui->xitk, &vl->kreg);
     xitk_window_destroy_window (vl->xwin);
     vl->xwin = NULL;
     /* xitk_dlist_init (&vl->widget_list->list); */

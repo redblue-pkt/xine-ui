@@ -2892,7 +2892,7 @@ static void _mmkedit_exit (xitk_widget_t *w, void *data, int state) {
   mmkedit->visible = 0;
   gui_save_window_pos (mmkedit->gui, "mmk_editor", mmkedit->widget_key);
   mmkedit->mmk = NULL;
-  xitk_unregister_event_handler (&mmkedit->widget_key);
+  xitk_unregister_event_handler (mmkedit->gui->xitk, &mmkedit->widget_key);
   xitk_window_destroy_window (mmkedit->xwin);
   mmkedit->xwin = NULL;
   /* xitk_dlist_init (&mmkedit->widget_list.list); */

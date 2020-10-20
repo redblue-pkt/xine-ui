@@ -258,7 +258,7 @@ static void fb_exit(xitk_widget_t *, void *);
 static void fne_destroy(filename_editor_t *fne) {
   if(fne) {
 
-    xitk_unregister_event_handler(&fne->widget_key);
+    xitk_unregister_event_handler (fne->fb->gui->xitk, &fne->widget_key);
 
     xitk_window_destroy_window(fne->xwin);
     fne->xwin = NULL;
@@ -896,9 +896,9 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb->visible = 0;
 
     if (fb->dialog)
-      xitk_unregister_event_handler (&fb->dialog);
+      xitk_unregister_event_handler (fb->gui->xitk, &fb->dialog);
 
-    xitk_unregister_event_handler(&fb->widget_key);
+    xitk_unregister_event_handler (fb->gui->xitk, &fb->widget_key);
 
     xitk_window_destroy_window (fb->xwin);
     fb->xwin = NULL;

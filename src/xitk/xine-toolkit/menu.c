@@ -215,7 +215,7 @@ static void _menu_close_1 (_menu_private_t *wp) {
     return;
   wp->num_open -= 1;
   mw = wp->open_windows + wp->num_open;
-  xitk_unregister_event_handler (&mw->key);
+  xitk_unregister_event_handler (mw->wp->w.wl->xitk, &mw->key);
   xitk_image_free_image (&mw->bevel_plain);
   xitk_image_free_image (&mw->bevel_arrow);
   xitk_image_free_image (&mw->bevel_unchecked);

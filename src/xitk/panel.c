@@ -212,7 +212,7 @@ static void panel_exit (xitk_widget_t *w, void *data) {
 
     gui_save_window_pos (panel->gui, "panel", panel->widget_key);
 
-    xitk_unregister_event_handler(&panel->widget_key);
+    xitk_unregister_event_handler (panel->gui->xitk, &panel->widget_key);
 
     pthread_join(panel->slider_thread, NULL);
 

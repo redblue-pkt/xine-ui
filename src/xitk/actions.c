@@ -526,7 +526,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
         "%s%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "", _("\nStart playback anyway ?\n"));
       free(buffer); free(v_info); free(a_info);
 
-      video_window_set_transient_for(gui->vwin, xitk_get_window(key));
+      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
 
       /* Doesn't work so well yet
          use gui->play_data.running hack for a while

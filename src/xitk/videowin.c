@@ -1072,7 +1072,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   /* The old window should be destroyed now */
   if(old_video_window != None) {
     if (!vwin->separate_display)
-      xitk_unregister_event_handler (&vwin->widget_key);
+      xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
 
     XDestroyWindow (vwin->video_display, old_video_window);
 
@@ -2018,7 +2018,7 @@ void video_window_exit (xui_vwin_t *vwin) {
   }
 
   if (!vwin->separate_display) {
-    xitk_unregister_event_handler (&vwin->widget_key);
+    xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
     xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
   } else
     pthread_join (vwin->second_display_thread, NULL);
@@ -2412,8 +2412,7 @@ static const xitk_event_cbs_t vwin_event_cbs = {
 
 static void register_event_handler(xui_vwin_t *vwin)
 {
-  if (vwin->widget_key)
-    xitk_unregister_event_handler (&vwin->widget_key);
+  xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
 
   xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
   vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
@@ -2673,4 +2672,3 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }
 }
-
