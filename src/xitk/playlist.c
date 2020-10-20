@@ -787,13 +787,13 @@ void playlist_exit (gGui_t *gui) {
     filebrowser_end (gui->pl_save);
 
   if (pl) {
-    mmk_editor_end (pl->gui);
+    mmk_editor_end (gui);
 
     pl->visible = 0;
 
     gui_save_window_pos (pl->gui, "playlist", pl->widget_key);
 
-    xitk_unregister_event_handler (&pl->widget_key);
+    xitk_unregister_event_handler (gui->xitk, &pl->widget_key);
 
     xitk_window_destroy_window (pl->xwin);
     pl->xwin = NULL;

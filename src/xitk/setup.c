@@ -116,12 +116,11 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
 
   setup->visible = 0;
 
-  if (setup->dialog)
-    xitk_unregister_event_handler (&setup->dialog);
+  xitk_unregister_event_handler (setup->gui->xitk, &setup->dialog);
 
   gui_save_window_pos (setup->gui, "setup", setup->kreg);
 
-  xitk_unregister_event_handler (&setup->kreg);
+  xitk_unregister_event_handler (setup->gui->xitk, &setup->kreg);
 
   xitk_window_destroy_window (setup->xwin);
   setup->xwin = NULL;

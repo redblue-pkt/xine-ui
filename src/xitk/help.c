@@ -242,7 +242,7 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
 
     gui_save_window_pos (help->gui, "help", help->kreg);
 
-    xitk_unregister_event_handler(&help->kreg);
+    xitk_unregister_event_handler (help->gui->xitk, &help->kreg);
     xitk_window_destroy_window(help->xwin);
     help->xwin = NULL;
     /* xitk_dlist_init (&help->widget_list->list); */

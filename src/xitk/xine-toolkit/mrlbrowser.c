@@ -63,6 +63,7 @@ typedef struct {
   char                      *skin_element_name;
   char                      *skin_element_name_ip;
 
+  xitk_t                    *xitk;
   xitk_register_key_t        widget_key;
 
   xitk_window_t             *xwin;
@@ -203,7 +204,7 @@ static void _mrlbrowser_destroy (_mrlbrowser_private_t *wp) {
   wp->running = 0;
   wp->visible = 0;
 
-  xitk_unregister_event_handler (&wp->widget_key);
+  xitk_unregister_event_handler (wp->xitk, &wp->widget_key);
 
   xitk_window_destroy_window (wp->xwin);
   wp->xwin = NULL;
@@ -624,7 +625,7 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
     return 0;
 
-  return xitk_get_window_info (wp->widget_key, inf);
+  return xitk_get_window_info (wp->xitk, wp->widget_key, inf);
 }
 
 /*
@@ -951,6 +952,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   wp->w.private_data    = wp;
 
+  wp->xitk              = xitk;
   wp->visible           = 1;
   wp->running           = 1;
   wp->skin_element_name = mb->skin_element_name ? strdup (mb->skin_element_name) : NULL;

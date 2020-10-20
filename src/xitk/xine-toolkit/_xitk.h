@@ -277,7 +277,8 @@ Pixmap xitk_window_get_background_mask(xitk_window_t *w);
 #endif
 
 
-void xitk_register_eh_destructor (xitk_register_key_t key,
+xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, Window win);
+void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
 
 void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);

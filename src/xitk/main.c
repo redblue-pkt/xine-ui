@@ -2217,7 +2217,7 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
   window_info_t wi;
 
   (void)gui;
-  if ((xitk_get_window_info (key, &wi))) {
+  if ((xitk_get_window_info (gui->xitk, key, &wi))) {
     char buf[80], *e;
 
     memcpy (buf, "gui.", 4);
@@ -2227,6 +2227,5 @@ void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key
     config_update_num (buf, wi.x);
     e[1] = 'y';
     config_update_num (buf, wi.y);
-    WINDOW_INFO_ZERO (&wi);
   }
 }

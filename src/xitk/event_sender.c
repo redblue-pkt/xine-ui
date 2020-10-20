@@ -326,7 +326,7 @@ static void event_sender_exit (xitk_widget_t *w, void *data, int state) {
 
     gui_save_window_pos (es->gui, "eventer", es->widget_key);
 
-    xitk_unregister_event_handler (&es->widget_key);
+    xitk_unregister_event_handler (es->gui->xitk, &es->widget_key);
     xitk_window_destroy_window (es->xwin);
     es->xwin = NULL;
     es->gui->eventer = NULL;

@@ -250,7 +250,7 @@ static void download_skin_exit (xitk_widget_t *w, void *data, int state) {
 
     gui->skdloader = NULL;
 
-    xitk_unregister_event_handler(&skd->widget_key);
+    xitk_unregister_event_handler (gui->xitk, &skd->widget_key);
 
     if(skd->preview_image)
       xitk_image_free_image(&skd->preview_image);
@@ -535,11 +535,11 @@ void skin_download (gGui_t *gui, char *url) {
     NULL,
     get_layer_above_video (gui), 400, _("Be patient..."), NULL, NULL,
     NULL, NULL, NULL, NULL, 0, ALIGN_CENTER, _("Retrieving skin list from %s"), url);
-  video_window_set_transient_for(gui->vwin, xitk_get_window(downloading_key));
+  video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, downloading_key));
 
   slxs = skins_get_slx_entries(gui, url);
 
-  xitk_unregister_event_handler (&downloading_key);
+  xitk_unregister_event_handler (gui->xitk, &downloading_key);
 
   if (slxs) {
     int                        i;

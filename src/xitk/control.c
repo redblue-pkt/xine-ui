@@ -457,7 +457,7 @@ static void vctrl_close_window (xui_vctrl_t *vctrl) {
 
     gui_save_window_pos (vctrl->gui, "control", vctrl->widget_key);
 
-    xitk_unregister_event_handler (&vctrl->widget_key);
+    xitk_unregister_event_handler (vctrl->gui->xitk, &vctrl->widget_key);
 
     xitk_window_destroy_window(vctrl->xwin);
     vctrl->xwin = NULL;

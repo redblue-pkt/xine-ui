@@ -106,7 +106,7 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
 static void _combo_close (_combo_private_t *wp, int focus) {
   if (wp->xwin) {
     wp->browser_widget = NULL;
-    xitk_unregister_event_handler (&wp->widget_key);
+    xitk_unregister_event_handler (wp->w.wl->xitk, &wp->widget_key);
     xitk_window_destroy_window (wp->xwin);
     wp->xwin = NULL;
     if (focus) {
@@ -414,10 +414,9 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
     window_info_t          wi;
 
     if (wp->xwin) {
-      if((xitk_get_window_info(*(wp->parent_wkey), &wi))) {
+      if ((xitk_get_window_info (wp->w.wl->xitk, *(wp->parent_wkey), &wi))) {
 	wp->win_x = wi.x;
 	wp->win_y = wi.y;
-	WINDOW_INFO_ZERO(&wi);
       }
 
       xitk_get_widget_pos(wp->label_widget, &xx, &yy);

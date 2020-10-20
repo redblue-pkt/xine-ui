@@ -682,15 +682,13 @@ xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *w)
   if (w->widget_list)
     return w->widget_list;
 
-  w->widget_list = xitk_widget_list_new (w->xitk);
+  w->widget_list = xitk_widget_list_get (w->xitk, w->window);
   if (!w->widget_list)
     return NULL;
 
   xitk_lock_display (w->xitk);
   w->widget_list->gc = XCreateGC (w->xitk->display, w->window, None, None);
   xitk_unlock_display (w->xitk);
-
-  w->widget_list->win = w->window;
 
   return w->widget_list;
 }

@@ -642,12 +642,12 @@ static void kbedit_exit (xitk_widget_t *w, void *data, int state) {
   (void)w;
   (void)state;
   if(kbedit) {
-    xitk_unregister_event_handler (&kbedit->req);
+    xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
     kbedit->visible = 0;
 
     gui_save_window_pos (kbedit->gui, "kbedit", kbedit->kreg);
 
-    xitk_unregister_event_handler(&kbedit->kreg);
+    xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->kreg);
 
     xitk_window_destroy_window(kbedit->xwin);
     kbedit->xwin = NULL;
@@ -684,7 +684,7 @@ static void kbedit_sel(xitk_widget_t *w, void *data, int s, int modifier) {
 
   (void)w;
   (void)modifier;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   if(s >= 0)
     kbedit_select (kbedit, s);
 }
@@ -697,7 +697,7 @@ static void kbedit_alias(xitk_widget_t *w, void *data, int state, int modifier) 
 
   (void)w;
   (void)modifier;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   xitk_labelbutton_set_state(kbedit->edit, 0);
 
   if(state) {
@@ -718,7 +718,7 @@ static void kbedit_edit(xitk_widget_t *w, void *data, int state, int modifier) {
 
   (void)w;
   (void)modifier;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
 
   if(state) {
@@ -741,7 +741,7 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
 
   (void)w;
   (void)state;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
@@ -787,7 +787,7 @@ static void kbedit_reset (xitk_widget_t *w, void *data, int state) {
 
   (void)w;
   (void)state;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
@@ -806,7 +806,7 @@ static void kbedit_save (xitk_widget_t *w, void *data, int state) {
 
   (void)w;
   (void)state;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   xitk_labelbutton_set_state(kbedit->alias, 0);
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
@@ -904,7 +904,7 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state) {
   if (!kbedit)
     return;
   gui = kbedit->gui;
-  xitk_unregister_event_handler (&kbedit->req);
+  xitk_unregister_event_handler (kbedit->gui->xitk, &kbedit->req);
   /* We are already grabbing keybinding */
   if(kbedit->grabbing)
     return;

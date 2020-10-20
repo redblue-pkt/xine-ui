@@ -429,7 +429,7 @@ static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
 
   gui_save_window_pos (sinfo->gui, "sinfos", sinfo->widget_key);
 
-  xitk_unregister_event_handler (&sinfo->widget_key);
+  xitk_unregister_event_handler (sinfo->gui->xitk, &sinfo->widget_key);
 
   xitk_window_destroy_window (sinfo->xwin);
   sinfo->xwin = NULL;

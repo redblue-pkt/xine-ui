@@ -179,13 +179,12 @@ static void tvset_exit (xitk_widget_t *w, void *data, int state) {
     tvset.running = 0;
     tvset.visible = 0;
 
-    if((xitk_get_window_info(tvset.widget_key, &wi))) {
+    if ((xitk_get_window_info (gGui->xitk, tvset.widget_key, &wi))) {
       config_update_num ("gui.tvset_x", wi.x);
       config_update_num ("gui.tvset_y", wi.y);
-      WINDOW_INFO_ZERO(&wi);
     }
 
-    xitk_unregister_event_handler(&tvset.widget_key);
+    xitk_unregister_event_handler (gGui->xitk, &tvset.widget_key);
 
     xitk_window_destroy_window(tvset.xwin);
     tvset.xwin = NULL;
