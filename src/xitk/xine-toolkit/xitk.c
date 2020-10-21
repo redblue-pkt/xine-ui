@@ -110,21 +110,13 @@ typedef struct {
   xitk_move_t                 move;
 
   struct {
-    int                       x;
-    int                       y;
-  } old_pos;
-
-  struct {
-    int                       x;
-    int                       y;
-  } new_pos;
+    int                       x, y;
+  }                           border_size, old_pos, new_pos;
 
   int                         width;
   int                         height;
 
   xitk_hull_t                 expose;
-
-  XEvent                     *old_event;
 
   char                        name[64];
   const xitk_event_cbs_t     *cbs;
@@ -1637,6 +1629,13 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->name[0]               = 0;
   fx->w                     = NULL;
   fx->window                = None;
+  fx->move.enabled          = 0;
+  fx->move.offset_x         = 0;
+  fx->move.offset_y         = 0;
+  fx->border_size.y         = 0;
+  fx->border_size.x         = 0;
+  fx->old_pos.x             = 0;
+  fx->old_pos.y             = 0;
   fx->new_pos.x             = 0;
   fx->new_pos.y             = 0;
   fx->width                 = 0;
@@ -1826,6 +1825,22 @@ static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
       return fx;
   }
   return NULL;
+}
+
+void xitk_window_set_border_size (xitk_t *_xitk, xitk_register_key_t key, int left, int top) {
+  __xitk_t *xitk;
+  __gfx_t  *fx;
+
+  xitk_container (xitk, _xitk, x);
+  if (!xitk || !key)
+    return;
+  MUTLOCK ();
+  fx = __fx_from_key (xitk, key);
+  if (fx) {
+    fx->border_size.y = top;
+    fx->border_size.x = left;
+  }
+  MUTUNLOCK ();
 }
 
 void xitk_register_eh_destructor (xitk_t *_xitk, xitk_register_key_t key,
@@ -2169,8 +2184,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         break;
 
       case MotionNotify: {
-        XWindowAttributes wattr;
-
         xitk_lock_display (&xitk->x);
         while (XCheckMaskEvent (xitk->x.display, ButtonMotionMask, event) == True);
         xitk_unlock_display (&xitk->x);
@@ -2178,7 +2191,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         if (!fx)
           break;
 
-        fx->old_event = event;
         if (fx->move.enabled) {
 
           if (fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU)) {
@@ -2187,19 +2199,13 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
               xitk_menu_destroy_sub_branchs (menu);
           }
 
-          fx->old_pos.x = fx->new_pos.x;
-          fx->old_pos.y = fx->new_pos.y;
-
-          fx->new_pos.x = (event->xmotion.x_root)
-            + (event->xmotion.x_root - fx->old_event->xmotion.x_root)
-            - fx->move.offset_x;
-          fx->new_pos.y = (event->xmotion.y_root)
-            + (event->xmotion.y_root - fx->old_event->xmotion.y_root)
-            - fx->move.offset_y;
+          fx->new_pos.x = fx->old_pos.x + event->xmotion.x_root - fx->move.offset_x;
+          fx->new_pos.y = fx->old_pos.y + event->xmotion.y_root - fx->move.offset_y;
 
           xitk_lock_display (&xitk->x);
-          XMoveWindow (xitk->x.display, fx->window, fx->new_pos.x, fx->new_pos.y);
-          XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
+          XMoveWindow (xitk->x.display, fx->window, fx->new_pos.x - fx->border_size.x,
+            fx->new_pos.y - fx->border_size.y);
+          XSync (xitk->x.display, False);
           xitk_unlock_display (&xitk->x);
 
         } else {
@@ -2271,18 +2277,12 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           }
 
           if (fx->move.enabled) {
-            XWindowAttributes wattr;
-            Status            err;
-
-            xitk_lock_display (&xitk->x);
-            err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-            xitk_unlock_display (&xitk->x);
-            if (err != BadDrawable && err != BadWindow) {
-              fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
-              fx->old_pos.y = event->xmotion.y_root - event->xbutton.y;
-            }
-            fx->move.offset_x = event->xbutton.x;
-            fx->move.offset_y = event->xbutton.y;
+            /* BTW. for some reason, XGetWindowAttributes () _always_ returns
+             * wattr.x == wattr.y == wattr.border_width == 0. */
+            fx->old_pos.x = event->xbutton.x_root - event->xbutton.x;
+            fx->old_pos.y = event->xbutton.y_root - event->xbutton.y;
+            fx->move.offset_x = event->xbutton.x_root;
+            fx->move.offset_y = event->xbutton.y_root;
           }
         }
       }
@@ -2307,8 +2307,10 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
     case ConfigureNotify:
       if (fx) {
-        XWindowAttributes wattr;
-        Status            err;
+        fx->new_pos.x = event->xconfigure.x;
+        fx->new_pos.y = event->xconfigure.y;
+        fx->width = event->xconfigure.width;
+        fx->height = event->xconfigure.height;
 
         {
           xitk_widget_t *w = (xitk_widget_t *)fx->wl.list.head.next;
@@ -2320,16 +2322,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         }
 
         /* Inform application about window movement. */
-        if (fx->cbs && fx->cbs->pos_cb) {
-          xitk_lock_display (&xitk->x);
-          err = XGetWindowAttributes (xitk->x.display, fx->window, &wattr);
-          xitk_unlock_display (&xitk->x);
-          if (err != BadDrawable && err != BadWindow) {
-            fx->width = wattr.width;
-            fx->height = wattr.height;
-          }
-          fx->cbs->pos_cb (fx->user_data, event->xconfigure.x, event->xconfigure.y, fx->width, fx->height);
-        }
+        if (fx->cbs && fx->cbs->pos_cb)
+          fx->cbs->pos_cb (fx->user_data, fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
+        handled = 1;
       }
       break;
 
