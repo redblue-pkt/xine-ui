@@ -2324,7 +2324,6 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         /* Inform application about window movement. */
         if (fx->cbs && fx->cbs->pos_cb)
           fx->cbs->pos_cb (fx->user_data, fx->new_pos.x, fx->new_pos.y, fx->width, fx->height);
-        handled = 1;
       }
       break;
 
