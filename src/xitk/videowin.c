@@ -73,6 +73,8 @@ struct xui_vwin_st {
 
   xitk_widget_list_t    *wl;
   xitk_window_t         *wrapped_window;
+  int                    border_left;
+  int                    border_top;
 
   char                   window_title[1024];
   int                    current_cursor;  /* arrow or hand */
@@ -1089,11 +1091,26 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   /* take care about window decoration/pos */
   {
     Window tmp_win;
+    int x = vwin->xwin < 0 ? 0 : vwin->xwin;
+    int y = vwin->ywin < 0 ? 0 : vwin->ywin;
 
     vwin->x_lock_display (vwin->video_display);
     XTranslateCoordinates (vwin->video_display, vwin->video_window,
       DefaultRootWindow (vwin->video_display), 0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
     vwin->x_unlock_display (vwin->video_display);
+    x = vwin->xwin - x;
+    y = vwin->ywin - y;
+    if ((x < 0) || (x > 32))
+      x = 0;
+    if ((y < 0) || (y > 80))
+      y = 0;
+    if (x > 0)
+      vwin->border_left = x;
+    if (y > 0)
+      vwin->border_top  = y;
+    xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
+      vwin->borderless ? 0 : vwin->border_left,
+      vwin->borderless ? 0 : vwin->border_top);
   }
 
   oxine_adapt();
@@ -1596,6 +1613,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->show               = 2;
   vwin->widget_key         = 0;
   vwin->borderless         = (borderless > 0);
+  vwin->border_left        = 0;
+  vwin->border_top         = 0;
   vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
 
@@ -2668,6 +2687,10 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     if (xclasshint)
       XSetClassHint (vwin->video_display, vwin->video_window, xclasshint);
     vwin->x_unlock_display (vwin->video_display);
+
+    xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
+      vwin->borderless ? 0 : vwin->border_left,
+      vwin->borderless ? 0 : vwin->border_top);
 
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }

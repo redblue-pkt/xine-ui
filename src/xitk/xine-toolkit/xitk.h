@@ -1380,6 +1380,8 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
  */
 xitk_widget_list_t *xitk_window_widget_list(xitk_window_t *);
 
+void xitk_window_set_border_size (xitk_t *_xitk, xitk_register_key_t key, int left, int top);
+
 /**
  *
  */
