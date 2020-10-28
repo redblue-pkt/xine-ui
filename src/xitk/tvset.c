@@ -279,7 +279,7 @@ void tvset_panel(void) {
   xitk_intbox_widget_t        ib;
   xitk_combo_widget_t         cmb;
   xitk_inputtext_widget_t     inp;
-  xitk_pixmap_t              *bg;
+  xitk_image_t               *bg;
   size_t                      i;
   int                         x, y, w;
   xitk_widget_t              *widget;
@@ -311,12 +311,12 @@ void tvset_panel(void) {
   XITK_WIDGET_INIT(&lb);
   XITK_WIDGET_INIT(&lbl);
 
-  bg = xitk_window_get_background_pixmap(tvset.xwin);
+  bg = xitk_window_get_background_image (tvset.xwin);
 
   x = 15;
   y = 34 - 6;
 
-  draw_outter_frame(bg, _("General"), btnfontname,
+  xitk_image_draw_outter_frame (bg, _("General"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
@@ -324,7 +324,7 @@ void tvset_panel(void) {
   x = 20;
   y += 15;
   w = 139;
-  draw_inner_frame(bg, _("Input: "), lfontname,
+  xitk_image_draw_inner_frame (bg, _("Input: "), lfontname,
 		   x, y, w, (20 + 22));
   XITK_WIDGET_INIT(&ib);
   ib.skin_element_name = NULL;
@@ -351,7 +351,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(bg, _("Broadcast System: "), lfontname,
+  xitk_image_draw_inner_frame (bg, _("Broadcast System: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb);
@@ -372,7 +372,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(bg, _("Channel: "), lfontname,
+  xitk_image_draw_inner_frame (bg, _("Channel: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb);
@@ -390,14 +390,14 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("Standard"), btnfontname,
+  xitk_image_draw_outter_frame (bg, _("Standard"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
   x = 20;
   y += 15;
   w = 139;
-  draw_inner_frame(bg, _("Frame Rate: "), lfontname,
+  xitk_image_draw_inner_frame (bg, _("Frame Rate: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&inp);
@@ -420,7 +420,7 @@ void tvset_panel(void) {
 
   x += w + 5;
   w = 155;
-  draw_inner_frame(bg, _("Analog Standard: "), lfontname,
+  xitk_image_draw_inner_frame(bg, _("Analog Standard: "), lfontname,
 		   x, y, w, (20 + 22));
 
   XITK_WIDGET_INIT(&cmb);
@@ -437,7 +437,7 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("Frame Size"), btnfontname,
+  xitk_image_draw_outter_frame (bg, _("Frame Size"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
@@ -447,7 +447,7 @@ void tvset_panel(void) {
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
-  draw_outter_frame(bg, _("MPEG2"), btnfontname,
+  xitk_image_draw_outter_frame (bg, _("MPEG2"), btnfontname,
 		    x, y, WINDOW_WIDTH - 30, ((20 + 22) + 5 + 2) + 15);
 
 
@@ -485,7 +485,7 @@ void tvset_panel(void) {
   xitk_add_widget (tvset.widget_list, widget);
   xitk_enable_and_show_widget(widget);
 
-  xitk_window_set_background(tvset.xwin, bg);
+  xitk_window_set_background_image (tvset.xwin, bg);
 
   tvset.widget_key = xitk_window_register_event_handler("tvset", tvset.xwin, &tvset_event_cbs, &tvset);
 

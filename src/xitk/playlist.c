@@ -986,7 +986,6 @@ void playlist_update_focused_entry (gGui_t *gui) {
 void playlist_change_skins (gGui_t *gui, int synthetic) {
   xui_playlist_t *pl;
   xitk_image_t *bg_image;
-  int width, height;
 
   if (!gui)
     return;
@@ -1005,10 +1004,7 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
     xine_error (pl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
-  width = xitk_image_width (bg_image);
-  height = xitk_image_height (bg_image);
-  xitk_window_resize_window (pl->xwin, width, height);
-  xitk_window_change_background_with_image (pl->xwin, bg_image, width, height);
+  xitk_window_set_background_image (pl->xwin, bg_image);
   video_window_set_transient_for (pl->gui->vwin, pl->xwin);
   if (playlist_is_visible (gui))
     playlist_raise_window (gui);
@@ -1089,11 +1085,10 @@ void playlist_editor (gGui_t *gui) {
   x = y = 200;
   gui_load_window_pos (pl->gui, "playlist", &x, &y);
 
-  pl->xwin = xitk_window_create_simple_window_ext (pl->gui->xitk, x, y, width, height,
-    title, NULL, "xine", 0, is_layer_above (pl->gui), pl->gui->icon);
+  pl->xwin = xitk_window_create_window_ext (pl->gui->xitk, x, y, width, height,
+    title, NULL, "xine", 0, is_layer_above (pl->gui), pl->gui->icon, bg_image);
 
   set_window_type_start (pl->gui, pl->xwin);
-  xitk_window_change_background_with_image (pl->xwin, bg_image, width, height);
 
   /*
    * Widget-list

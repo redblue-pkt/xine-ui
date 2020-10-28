@@ -1045,7 +1045,7 @@ void kbedit_reparent (xui_keyedit_t *kbedit) {
  */
 void kbedit_window (gGui_t *gui) {
   int                        x, y, y1;
-  xitk_pixmap_t             *bg;
+  xitk_image_t              *bg;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        l;
   xitk_browser_widget_t      br;
@@ -1079,33 +1079,33 @@ void kbedit_window (gGui_t *gui) {
 
   kbedit->widget_list = xitk_window_widget_list(kbedit->xwin);
 
-  bg = xitk_window_get_background_pixmap(kbedit->xwin);
+  bg = xitk_window_get_background_image (kbedit->xwin);
 
   x = 15;
   y = 34;
 
-  draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
+  xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
 
   y += MAX_DISP_ENTRIES * 20 + 16 + 10 + 30;
   y1 = y; /* remember for later */
-  draw_outter_frame(bg,
+  xitk_image_draw_outter_frame (bg,
 		    _("Binding Action"), hboldfontname,
 		    x, y,
 		    (WINDOW_WIDTH - 30), 45);
 
   y += 45 + 3;
-  draw_outter_frame(bg,
+  xitk_image_draw_outter_frame (bg,
 		    _("Key"), hboldfontname,
 		    x, y,
 		    120, 45);
 
-  draw_outter_frame(bg,
+  xitk_image_draw_outter_frame (bg,
 		    _("Modifiers"), hboldfontname,
 		    x + 130, y,
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
 
-  xitk_window_set_background(kbedit->xwin, bg);
+  xitk_window_set_background_image (kbedit->xwin, bg);
 
   kbedit_create_browser_entries (kbedit);
 
@@ -1224,8 +1224,9 @@ void kbedit_window (gGui_t *gui) {
   XITK_WIDGET_INIT(&l);
 
   fs = xitk_font_load_font(gui->xitk, hboldfontname);
-  xitk_widget_list_set_font(kbedit->widget_list, fs);
+  xitk_image_set_font (bg, fs);
   fontheight = xitk_font_get_string_height(fs, " ");
+  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   y = y1 + (45 / 2);                /* Checkbox                     */

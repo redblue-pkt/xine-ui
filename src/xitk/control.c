@@ -340,12 +340,9 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   width = xitk_image_width(bg_image);
   height = xitk_image_height(bg_image);
 
-  vctrl->xwin =
-    xitk_window_create_simple_window_ext(vctrl->gui->xitk, x + 100, y + 100, width, height, _(title),
-                                         NULL, "xine", 0, is_layer_above (vctrl->gui), vctrl->gui->icon);
+  vctrl->xwin = xitk_window_create_window_ext (vctrl->gui->xitk, x + 100, y + 100, width, height,
+    _(title), NULL, "xine", 0, is_layer_above (vctrl->gui), vctrl->gui->icon, bg_image);
   set_window_type_start(vctrl->gui, vctrl->xwin);
-
-  xitk_window_change_background_with_image(vctrl->xwin, bg_image, width, height);
 
   /*
    * Widget-list
@@ -632,7 +629,6 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
 
   if (vctrl->status >= 2) {
     xitk_image_t *bg_image;
-    int w, h;
 
     xitk_skin_lock (vctrl->gui->skin_config);
     xitk_hide_widgets (vctrl->widget_list);
@@ -645,11 +641,8 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
       xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    w = xitk_image_width(bg_image);
-    h = xitk_image_height(bg_image);
 
-    xitk_window_resize_window (vctrl->xwin, w, h);
-    xitk_window_change_background_with_image(vctrl->xwin, bg_image, w, h);
+    xitk_window_set_background_image (vctrl->xwin, bg_image);
 
     video_window_set_transient_for (vctrl->gui->vwin, vctrl->xwin);
 

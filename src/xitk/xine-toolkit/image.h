@@ -34,8 +34,6 @@
 
 #define TABULATION_SIZE 6 /* number of chars inserted in place of a tabulation */
 
-void draw_checkbox_check(xitk_image_t *p);
-void draw_paddle_three_state (xitk_image_t *p, int width, int height);
 int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int height, xitk_image_t **image);
 void xitk_shared_image_list_delete (xitk_widget_list_t *wl);
 

@@ -36,7 +36,7 @@ typedef struct {
 typedef struct {
   int                               magic;
   const char                       *skin_element_name;
-  xitk_pixmap_t                    *icon;
+  xitk_image_t                     *icon;
   void                            (*reparent_window) (void *rw_data, xitk_window_t *xwin);
   void                             *rw_data;
   int                               layer_above;

@@ -134,7 +134,7 @@ static void viewlog_clear_tab (xui_viewlog_t *vl) {
   int width = WINDOW_WIDTH - 30;
   int height = MAX_DISP_ENTRIES * 20 + 16 + 10;
 
-  im = xitk_image_create_image (vl->gui->xitk, width, height);
+  im = xitk_image_new (vl->gui->xitk, NULL, 0, width, height);
 
   xitk_image_draw_outter (im, width, height);
   xitk_image_draw_image (vl->widget_list, im, 0, 0, width, height, 15, (24 + vl->tabs_height), 0);
@@ -268,7 +268,7 @@ static void viewlog_refresh (xitk_widget_t *w, void *data, int state) {
  * collect config categories, viewlog tab widget
  */
 static void viewlog_create_tabs (xui_viewlog_t *vl) {
-  xitk_pixmap_t       *bg;
+  xitk_image_t        *bg;
   xitk_tabs_widget_t   tab;
   const char   *const *log_sections = xine_get_log_names(vl->gui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(vl->gui->xine);
@@ -295,10 +295,10 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
     xitk_add_widget (vl->widget_list, vl->tabs);
     vl->tabs_height = xitk_get_widget_height (vl->tabs) - 1;
     xitk_enable_and_show_widget (vl->tabs);
-    bg = xitk_window_get_background_pixmap (vl->xwin);
-    draw_rectangular_box (bg, 15, 24 + vl->tabs_height,
+    bg = xitk_window_get_background_image (vl->xwin);
+    xitk_image_draw_rectangular_box (bg, 15, 24 + vl->tabs_height,
       WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_OUTTER);
-    xitk_window_set_background (vl->xwin, bg);
+    xitk_window_set_background_image (vl->xwin, bg);
   }
 
   viewlog_change_section (NULL, vl, 0);

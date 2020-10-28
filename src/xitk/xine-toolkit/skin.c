@@ -121,7 +121,7 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
         if (!image)
           return;
         if (!si->image) {
-          si->image = xitk_image_load_image (skonfig->xitk, name);
+          si->image = xitk_image_new (skonfig->xitk, name, 0, 0, 0);
           if (si->image && si->format)
             xitk_image_set_pix_font (si->image, si->format);
         }
@@ -147,7 +147,7 @@ static void _skin_load_img (xitk_skin_config_t *skonfig, xitk_part_image_t *imag
       xine_sarray_add (skonfig->imgs, nimg);
       if (!image)
         return;
-      nimg->image = xitk_image_load_image (skonfig->xitk, nmem);
+      nimg->image = xitk_image_new (skonfig->xitk, nmem, 0, 0, 0);
       if (nimg->image) {
         if (nimg->format)
           xitk_image_set_pix_font (nimg->image, nimg->format);

@@ -143,7 +143,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
       xitk_image_free_image (&wp->labelpix);
   }
   if (!wp->labelpix) {
-    wp->labelpix = xitk_image_create_image (wp->w.wl->xitk, pixwidth, pix_font->char_height);
+    wp->labelpix = xitk_image_new (wp->w.wl->xitk, NULL, 0, pixwidth, pix_font->char_height);
 #if 0
     printf ("xine.label: new pixmap %d:%d -> %d:%d for \"%s\"\n", pixwidth, pix_font->char_height,
       wp->labelpix->width, wp->labelpix->height, wp->label);
@@ -161,34 +161,34 @@ static void _create_label_pixmap (_label_private_t *wp) {
       _find_pix_font_char (font->pix_font, &pt, *p);
       p++;
 
-      xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+      xitk_image_copy_rect (font, wp->labelpix,
         pt.x, pt.y, pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
     }
   }
   /* foo[ *** fo] */
   if (anim_add) {
-    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+    xitk_image_copy_rect (font, wp->labelpix,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+    xitk_image_copy_rect (font, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+    xitk_image_copy_rect (font, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+    xitk_image_copy_rect (font, wp->labelpix,
       pix_font->asterisk.x, pix_font->asterisk.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+    xitk_image_copy_rect (font, wp->labelpix,
       pix_font->space.x, pix_font->space.y,
       pix_font->char_width, pix_font->char_height, x_dest, 0);
     x_dest += pix_font->char_width;
-    xitk_pixmap_copy_area (wp->labelpix->image, wp->labelpix->image,
+    xitk_image_copy_rect (wp->labelpix, wp->labelpix,
       0, 0, pixwidth - x_dest, pix_font->char_height, x_dest, 0);
     x_dest = pixwidth;
   }
@@ -196,7 +196,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
   /* fill gap with spaces */
   if (x_dest < pixwidth) {
     do {
-      xitk_pixmap_copy_area (font->image, wp->labelpix->image,
+      xitk_image_copy_rect (font, wp->labelpix,
         pix_font->space.x, pix_font->space.y,
         pix_font->char_width, pix_font->char_height, x_dest, 0);
       x_dest += pix_font->char_width;
@@ -276,20 +276,21 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
     /* non skinable widget */
     if (!(wp->skin_element_name.s)) {
       xitk_font_t *fs = xitk_font_load_font (wp->w.wl->xitk, wp->fontname.s);
-      xitk_image_t *bg = xitk_image_create_image (wp->w.wl->xitk, wp->w.width, wp->w.height);
+      xitk_image_t *bg = xitk_image_new (wp->w.wl->xitk, NULL, 0, wp->w.width, wp->w.height);
 
       if (fs && bg) {
         int lbear, rbear, wid, asc, des;
 
-        xitk_font_set_font (fs, wp->font->image->gc);
+        xitk_image_set_font (bg, fs);
         xitk_font_string_extent (fs, wp->label.s, &lbear, &rbear, &wid, &asc, &des);
 
-        xitk_pixmap_copy_area (font->image, bg->image, 0, 0, wp->font->width, wp->font->height, 0, 0);
-        xitk_pixmap_draw_string (bg->image, fs,
-          2, ((wp->font->height + asc + des) >> 1) - des,
+        xitk_image_copy_rect (font, bg, 0, 0, wp->font->width, wp->font->height, 0, 0);
+        xitk_image_draw_string (bg, 2, ((wp->font->height + asc + des) >> 1) - des,
           wp->label.s, wp->label_len, xitk_get_cfg_num (wp->w.wl->xitk, XITK_BLACK_COLOR));
         xitk_image_draw_image (wp->w.wl, bg,
           event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y, 0);
+
+        xitk_image_set_font (bg, NULL);
       }
       xitk_image_free_image (&bg);
       xitk_font_unload_font (fs);
@@ -657,12 +658,12 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
 
   if (l->skin_element_name && !strcmp (l->skin_element_name, "XITK_NOSKIN_INNER")) {
     if (xitk_shared_image (wl, "xitk_label_i", width, height, &wp->font) == 1) {
-      draw_flat (wp->font->image, width, height);
-      draw_rectangular_box (wp->font->image, 0, 0, width, height, DRAW_INNER);
+      xitk_image_draw_flat (wp->font, width, height);
+      xitk_image_draw_rectangular_box (wp->font, 0, 0, width, height, DRAW_INNER);
     }
   } else {
     if (xitk_shared_image (wl, "xitk_label_f", width, height, &wp->font) == 1)
-      draw_flat (wp->font->image, width, height);
+      xitk_image_draw_flat (wp->font, width, height);
   }
 
   wp->highlight_font = NULL;

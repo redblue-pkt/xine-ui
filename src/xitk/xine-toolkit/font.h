@@ -51,9 +51,8 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font);
 /*
  * Draw the string with given font.
  */
-void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
-			   int x, int y, const char *text,
-			   size_t nbytes);
+void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
+    int x, int y, const char *text, size_t nbytes);
 
 /*
  * Unload (free memory) font.
@@ -128,9 +127,5 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  * Set font to GC.
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
-
-void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
-			   int x, int y, const char *text,
-			   size_t nbytes);
 
 #endif

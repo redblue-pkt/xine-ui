@@ -69,7 +69,6 @@ typedef struct {
   struct {
     char                 *buf;
     xitk_part_image_t     temp_img;
-    GC                    temp_gc;
     /* next 2 _without_ trailing 0. */
     int                   size;
     int                   used;
@@ -133,7 +132,7 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       return 0;
-    xitk_font_set_font (fs, wp->w.wl->gc);
+    xitk_image_set_font (wp->text.temp_img.image, fs);
   }
 
   tries = 12;
@@ -320,12 +319,6 @@ static void _cursor_focus (_inputtext_private_t *wp, Window win, int focus) {
  */
 static void _notify_destroy (_inputtext_private_t *wp) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->text.temp_gc != None) {
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-      wp->text.temp_gc = None;
-    }
     xitk_image_free_image (&wp->text.temp_img.image);
     if (!wp->skin_element_name.s)
       xitk_image_free_image (&wp->skin.image);
@@ -355,11 +348,9 @@ static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
     if (wp->w.visible == 1) {
       xitk_image_t *skin = wp->skin.image;
 
-      if (skin->mask)
-        return xitk_is_cursor_out_mask (&wp->w, skin->mask, wp->skin.x + x, wp->skin.y + y);
-    } else {
-      return 0;
+      return xitk_image_inside (skin, wp->skin.x + x - wp->w.x, wp->skin.y + y - wp->w.y);
     }
+    return 0;
   }
   return 1;
 }
@@ -436,13 +427,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     && (xitk_is_mouse_over_widget (&wp->w)))
       _cursor_focus (wp, wp->w.wl->win, 1);
 
-  if (wp->text.temp_gc == None) {
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    wp->text.temp_gc = XCreateGC (wp->imlibdata->x.disp, wp->w.wl->win, None, None);
-    XCopyGC (wp->imlibdata->x.disp, wp->w.wl->gc, (1 << GCLastBit) - 1, wp->text.temp_gc);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-  }
-
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
 
@@ -457,7 +441,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-    xitk_font_set_font (fs, wp->text.temp_gc);
+    xitk_image_set_font (wp->text.temp_img.image, fs);
     xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
 
@@ -566,10 +550,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     wp->text.dirty = 0;
   }
 
-  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-  XSetForeground (wp->imlibdata->x.disp, wp->text.temp_gc, fg);
-  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-
   /*  Put text in the right place */
   {
     int src_x = state == _IT_FOCUS ? xsize : 0;
@@ -577,13 +557,12 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->text.temp_img,
       src_x, 0, xsize, ysize, 0, 0);
     if (fs) {
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      xitk_font_draw_string (fs, wp->text.temp_img.image->image, wp->text.temp_gc,
+      xitk_image_set_font (wp->text.temp_img.image, fs);
+      xitk_image_draw_string (wp->text.temp_img.image,
         ysize + wp->text.box_start + wp->text.shift,
         ((ysize + asc + des + yoff) >> 1) - des,
         wp->text.buf + wp->text.draw_start,
-        wp->text.draw_stop - wp->text.draw_start);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+        wp->text.draw_stop - wp->text.draw_start, fg);
       /* with 1 partial char left and/or right, fix borders. */
       if (wp->text.shift < 0)
         xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->text.temp_img,
@@ -598,7 +577,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   /* Draw cursor pointer */
   if (wp->text.cursor_pos >= 0) {
-    XSegment xs[3];
+    xitk_be_line_t xs[3];
     width = cursor_x >= 0
           ? cursor_x
           : xitk_font_get_text_width (fs,
@@ -613,22 +592,17 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xs[1].x1 = width - 1; xs[1].x2 = width + 1; xs[1].y1 = xs[1].y2 = ysize - 3;
     xs[2].x1 = xs[2].x2 = width; xs[2].y1 = 3; xs[2].y2 = ysize - 4;
     XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XDrawSegments (wp->imlibdata->x.disp, wp->text.temp_img.image->image->pixmap, wp->text.temp_gc, xs, 3);
+    wp->text.temp_img.image->beimg->draw_lines (wp->text.temp_img.image->beimg, xs, 3, fg, 0);
     XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
   }
 
-  if (fs)
+  if (fs) {
+    xitk_image_set_font (wp->text.temp_img.image, NULL);
     xitk_font_unload_font (fs);
+  }
 
   xitk_part_image_draw (wp->w.wl, &wp->skin, &wp->text.temp_img,
     event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y);
-
-  if (state != _IT_FOCUS) {
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-    wp->text.temp_gc = None;
-  }
 }
 
 static void _paint_inputtext (_inputtext_private_t *wp) {
@@ -708,13 +682,6 @@ static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_conf
 
 static void _notify_change_skin (_inputtext_private_t *wp, xitk_skin_config_t *skonfig) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->text.temp_gc != None) {
-      XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-      XFreeGC (wp->imlibdata->x.disp, wp->text.temp_gc);
-      XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
-      wp->text.temp_gc = None;
-    }
-
     if (wp->skin_element_name.s) {
       xitk_image_free_image (&wp->text.temp_img.image);
 
@@ -1213,7 +1180,6 @@ static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inp
   wp->text.temp_img.y = 0;
   wp->text.temp_img.width = wp->w.width;
   wp->text.temp_img.height = wp->w.height;
-  wp->text.temp_gc    = None;
 
   wp->cursor_focus    = 0;
 
@@ -1280,7 +1246,7 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   wp->skin_element_name.s = NULL;
   if (xitk_shared_image (wl, "xitk_inputtext", width * 2, height, &wp->skin.image) == 1)
-    draw_bevel_two_state (wp->skin.image);
+    xitk_image_draw_bevel_two_state (wp->skin.image);
   wp->skin.x = 0;
   wp->skin.y = 0;
   wp->skin.width = width * 2;
@@ -1288,4 +1254,3 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 
   return _xitk_inputtext_create (wp, it);
 }
-

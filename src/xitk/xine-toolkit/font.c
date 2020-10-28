@@ -634,9 +634,8 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 /*
  *
  */
-void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
-			   int x, int y, const char *text,
-			   size_t nbytes) {
+void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
+    int x, int y, const char *text, size_t nbytes) {
 
 #ifdef DEBUG
   if (nbytes > strlen(text) + 1) {
@@ -647,11 +646,11 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
   xitk_lock_display (xtfs->xitk);
 #ifndef WITH_XFT
 # ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
-    XmbDrawString(xtfs->display, pixmap->pixmap, xtfs->fontset, gc, x, y, text, nbytes);
+  if (xitk_get_xmb_enability ())
+    XmbDrawString (xtfs->display, (Pixmap)img->beimg->id1, xtfs->fontset, gc, x, y, text, nbytes);
   else
 # endif
-    XDrawString(xtfs->display, pix, gc, x, y, text, nbytes);
+    XDrawString (xtfs->display, (Pixmap)img->beimg->id1, gc, x, y, text, nbytes);
 #else
   {
     int           screen   = DefaultScreen( xtfs->display );
@@ -672,10 +671,10 @@ void xitk_font_draw_string(xitk_font_t *xtfs, xitk_pixmap_t *pixmap, GC gc,
     rs.bsize = sizeof (buf);
     xitk_recode2_do (xtfs->font_cache->xr, &rs);
 
-    XGetGCValues(xtfs->display, gc, GCForeground, &gc_color);
+    XGetGCValues (xtfs->display, gc, GCForeground, &gc_color);
     info.value = gc_color.foreground;
     xitk_color_db_query_value (xtfs->xitk, &info);
-    xft_draw       = XftDrawCreate (xtfs->display, pixmap->pixmap, visual, colormap);
+    xft_draw       = XftDrawCreate (xtfs->display, (Pixmap)img->beimg->id1, visual, colormap);
 #define XITK_FONT_TEMPTED
 #ifdef XITK_FONT_TEMPTED
     /* we are tempted to fill in a XftColor directly here.
@@ -1143,4 +1142,3 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
   (void)gc;
 #endif
 }
-

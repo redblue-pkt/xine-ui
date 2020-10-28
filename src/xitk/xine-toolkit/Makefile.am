@@ -19,6 +19,8 @@ noinst_LIBRARIES = $(xitk_lib)
 
 libxitk_a_CFLAGS = $(AM_CFLAGS)
 libxitk_a_SOURCES = \
+	backend.h \
+	backend_x11.c \
 	browser.c \
 	button.c \
 	button_list.c \

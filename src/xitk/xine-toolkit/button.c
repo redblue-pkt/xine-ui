@@ -65,10 +65,7 @@ static int _button_inside (_button_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
     xitk_image_t *skin = wp->skin.image;
 
-    if (skin->mask)
-      return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
-    else
-      return 1;
+    return xitk_image_inside (skin, x + wp->skin.x - wp->w.x, y + wp->skin.y - wp->w.y);
   }
   return 0;
 }
@@ -319,29 +316,29 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
     b->skin_element_name = NULL;
   }
   if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
-    i = xitk_image_create_image (wl->xitk, width * 3, height);
-    draw_bevel_three_state (i);
+    i = xitk_image_new (wl->xitk, NULL, 0, width * 3, height);
+    xitk_image_draw_bevel_three_state (i);
   } else {
     if (xitk_shared_image (wl, noskin_names[u], width * 3, height, &i) == 1) {
-      draw_bevel_three_state (i);
+      xitk_image_draw_bevel_three_state (i);
       switch (u) {
         case 0:
-          draw_arrow_left (i);
+          xitk_image_draw_arrow_left (i);
           break;
         case 1:
-          draw_arrow_right (i);
+          xitk_image_draw_arrow_right (i);
           break;
         case 2:
-          draw_arrow_up (i);
+          xitk_image_draw_arrow_up (i);
           break;
         case 3:
-          draw_arrow_down (i);
+          xitk_image_draw_arrow_down (i);
           break;
         case 4:
-          draw_button_plus (i);
+          xitk_image_draw_button_plus (i);
           break;
         case 5:
-          draw_button_minus (i);
+          xitk_image_draw_button_minus (i);
           break;
         default: ;
       }
@@ -361,4 +358,3 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 
   return _xitk_button_create (wp, b);
 }
-

@@ -134,10 +134,7 @@ static int _labelbutton_inside (_lbutton_private_t *wp, int x, int y) {
   if (wp->w.visible == 1) {
     xitk_image_t *skin = wp->skin.image;
 
-    if (skin->mask)
-        return xitk_is_cursor_out_mask (&wp->w, skin->mask, x + wp->skin.x, y + wp->skin.y);
-    else
-      return 1;
+    return xitk_image_inside (skin, x + wp->skin.x - wp->w.x, y + wp->skin.y - wp->w.y);
   }
   return 0;
 }
@@ -146,14 +143,13 @@ static int _labelbutton_inside (_lbutton_private_t *wp, int x, int y) {
  * Draw the string in pixmap pix, then return it
  */
 static void _create_labelofbutton (_lbutton_private_t *wp,
-    xitk_pixmap_t *pix, int xsize, int ysize,
+    xitk_image_t *pix, int xsize, int ysize,
     int shortcut_pos, _lb_state_t state) {
-  xitk_font_t             *fs;
+  xitk_font_t             *fs, *short_font;
   size_t                   slen;
   int                      lbear, rbear, width, asc, des, xoff, yoff, mode;
   unsigned int             fg = 0;
   unsigned int             origin = 0;
-  GC gc;
 
   /* shortcut is only permited if alignement is set to left */
   mode = (wp->label.s[0] ? 2 : 0)
@@ -161,14 +157,13 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
   if (!mode)
     return;
 
-  gc = wp->w.wl->gc;
   /* Try to load font */
   fs = xitk_font_load_font (wp->w.wl->xitk, wp->font.s[0] ? wp->font.s : xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
   if (!fs)
     XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
+  xitk_image_set_font (pix, fs);
 
   slen = strlen (wp->label.s);
-  xitk_font_set_font (fs, gc);
   xitk_font_text_extent (fs, wp->label.s[0] ? wp->label.s : "Button", wp->label.s[0] ? slen : 6,
     &lbear, &rbear, &width, &asc, &des);
 
@@ -210,12 +205,11 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
     int xx = wp->align == ALIGN_CENTER ? ((xsize - width - xoff) >> 1)
            : wp->align == ALIGN_RIGHT  ? (xsize - width - (state != _LB_CLICK ? 5 : 1))
            : /* wp->align == ALIGN_LEFT */ (state != _LB_CLICK ? 1 : 5);
-    xitk_pixmap_draw_string (pix, fs, xx + wp->label_offset, origin, wp->label.s, slen, fg);
+    xitk_image_draw_string (pix, xx + wp->label_offset, origin, wp->label.s, slen, fg);
   }
 
+  short_font = fs;
   if (mode & 1) {
-    xitk_font_t *short_font = NULL;
-
     slen = strlen (wp->shortcut_label.s);
     if (wp->shortcut_font.s[0])
       short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font.s);
@@ -225,12 +219,12 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
       xitk_font_text_extent (short_font, wp->shortcut_label.s, slen, &lbear, &rbear, &width, &asc, &des);
       shortcut_pos = xsize - 5 - width;
     }
-    xitk_pixmap_draw_string (pix, short_font,
-      (((state != _LB_CLICK) ? 1 : 5)) + shortcut_pos, origin, wp->shortcut_label.s, slen, fg);
-    if (short_font != fs)
-      xitk_font_unload_font (short_font);
+    xitk_image_draw_string (pix, (((state != _LB_CLICK) ? 1 : 5)) + shortcut_pos, origin, wp->shortcut_label.s, slen, fg);
   }
 
+  xitk_image_set_font (pix, NULL);
+  if (short_font != fs)
+    xitk_font_unload_font (short_font);
   xitk_font_unload_font (fs);
 }
 
@@ -274,7 +268,7 @@ static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->temp_image,
       (int)state * wp->skin.width / 3, 0, wp->skin.width / 3, wp->skin.height, 0, 0);
     if (wp->label_visible) {
-      _create_labelofbutton (wp, wp->temp_image.image->image,
+      _create_labelofbutton (wp, wp->temp_image.image,
         wp->skin.width / 3, wp->skin.height, wp->shortcut_pos, state);
     }
 
@@ -789,13 +783,13 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 
   if (b->button_type == TAB_BUTTON) {
     if (xitk_shared_image (wl, "xitk_tabbutton", width * 3, height, &wp->skin.image) == 1)
-      draw_tab (wp->skin.image);
+      xitk_image_draw_tab (wp->skin.image);
   } else if (b->skin_element_name && !strcmp (b->skin_element_name, "XITK_NOSKIN_FLAT")) {
     if (xitk_shared_image (wl, "xitk_labelbutton_f", width * 3, height, &wp->skin.image) == 1)
-      draw_flat_three_state (wp->skin.image);
+      xitk_image_draw_flat_three_state (wp->skin.image);
   } else {
     if (xitk_shared_image (wl, "xitk_labelbutton_b", width * 3, height, &wp->skin.image) == 1)
-      draw_bevel_three_state (wp->skin.image);
+      xitk_image_draw_bevel_three_state (wp->skin.image);
   }
   wp->skin.x     = 0;
   wp->skin.y     = 0;
@@ -833,4 +827,3 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 
   return &wp->w;
 }
-

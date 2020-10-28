@@ -564,15 +564,15 @@ void stream_infos_panel (gGui_t *gui) {
   sinfo->unavail = _("Unavailable");
 
   {
-    xitk_pixmap_t *bg = xitk_window_get_background_pixmap (sinfo->xwin);
+    xitk_image_t *bg = xitk_window_get_background_image (sinfo->xwin);
     int i;
     for (i = 0; sinf_f_defs[i].y; i++)
-      draw_outter_frame (bg, gettext (sinf_f_defs[i].title), btnfontname,
+      xitk_image_draw_outter_frame (bg, gettext (sinf_f_defs[i].title), btnfontname,
         sinf_f_defs[i].x, sinf_f_defs[i].y, sinf_f_defs[i].w, sinf_f_defs[i].h);
     for (i += 1; sinf_f_defs[i].y; i++)
-      draw_inner_frame (bg, gettext (sinf_f_defs[i].title), lfontname,
+      xitk_image_draw_inner_frame (bg, gettext (sinf_f_defs[i].title), lfontname,
         sinf_f_defs[i].x, sinf_f_defs[i].y, sinf_f_defs[i].w, sinf_f_defs[i].h);
-    xitk_window_set_background (sinfo->xwin, bg);
+    xitk_window_set_background_image (sinfo->xwin, bg);
   }
 
   {

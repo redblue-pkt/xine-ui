@@ -51,7 +51,6 @@
 
 #define PREVIEW_WIDTH     (WINDOW_WIDTH - 30)
 #define PREVIEW_HEIGHT    220
-#define PREVIEW_RATIO     ((float)PREVIEW_WIDTH / (float)PREVIEW_HEIGHT)
 
 typedef struct {
   char      *name;
@@ -282,7 +281,7 @@ static void download_skin_exit (xitk_widget_t *w, void *data, int state) {
 
 static void download_update_blank_preview(xui_skdloader_t *skd) {
 
-  xitk_image_t *p = xitk_image_create_image(skd->gui->xitk, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+  xitk_image_t *p = xitk_image_new (skd->gui->xitk, NULL, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
   xitk_image_fill_rectangle (p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT,
     xitk_color_db_get (skd->gui->xitk, (52 << 16) + (52 << 8) + 52));
   xitk_image_draw_image (skd->widget_list, p, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT, 15, 34, 0);
@@ -299,38 +298,6 @@ static void download_update_preview(xui_skdloader_t *skd) {
         0, 0, img_width, img_height,
         15 + ((PREVIEW_WIDTH - img_width) >> 1), 34 + ((PREVIEW_HEIGHT - img_height) >> 1), 0);
   }
-}
-
-static xitk_image_t *decode(gGui_t *gui, const void *buf, int size) {
-  int            preview_width, preview_height;
-  float          ratio;
-  xitk_image_t  *i;
-
-  i = xitk_image_decode_raw(gui->xitk, buf, size);
-  if (!i)
-    return NULL;
-
-  preview_width  = xitk_image_width(i);
-  preview_height = xitk_image_height(i);
-  ratio = ((float)preview_width / (float)preview_height);
-
-  if (ratio > PREVIEW_RATIO) {
-    if (preview_width > PREVIEW_WIDTH) {
-      preview_width = PREVIEW_WIDTH;
-      preview_height = (float)preview_width / ratio;
-    }
-  } else {
-    if (preview_height > PREVIEW_HEIGHT) {
-      preview_height = PREVIEW_HEIGHT;
-      preview_width = (float)preview_height * ratio;
-    }
-  }
-
-  /* Rescale preview */
-  if (xitk_image_render(i, preview_width, preview_height) < 0)
-    xitk_image_free_image(&i);
-
-  return i;
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected, int modifier) {
@@ -353,7 +320,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
   if((network_download(skd->slxs[selected]->skin.preview, &download))) {
     xitk_image_t *ximg;
 
-    ximg = decode(gui, download.buf, download.size);
+    ximg = xitk_image_new (gui->xitk, download.buf, download.size, PREVIEW_WIDTH, PREVIEW_HEIGHT);
     if (ximg) {
       xitk_image_t *oimg = skd->preview_image;
       skd->preview_image = ximg;
@@ -519,7 +486,7 @@ void skin_download_end (xui_skdloader_t *skd) {
 
 void skin_download (gGui_t *gui, char *url) {
   slx_entry_t         **slxs;
-  xitk_pixmap_t        *bg;
+  xitk_image_t         *bg;
   xitk_widget_t        *widget;
   xui_skdloader_t      *skd;
   xitk_register_key_t   downloading_key;
@@ -580,7 +547,7 @@ void skin_download (gGui_t *gui, char *url) {
                                                   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     set_window_states_start(gui, skd->xwin);
-    bg = xitk_window_get_background_pixmap (skd->xwin);
+    bg = xitk_window_get_background_image (skd->xwin);
     skd->widget_list = xitk_window_widget_list(skd->xwin);
 
     x = 15;
@@ -608,9 +575,9 @@ void skin_download (gGui_t *gui, char *url) {
 
     xitk_enable_and_show_widget(skd->browser);
 
-    draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
+    xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
 
-    xitk_window_set_background (skd->xwin, bg);
+    xitk_window_set_background_image (skd->xwin, bg);
 
     y = WINDOW_HEIGHT - (23 + 15);
     x = 15;
@@ -653,4 +620,3 @@ void skin_download (gGui_t *gui, char *url) {
     gui->skdloader = skd;
   }
 }
-
