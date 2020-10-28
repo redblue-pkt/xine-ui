@@ -989,6 +989,7 @@ void xitk_image_copy_rect (xitk_image_t *from, xitk_image_t *to, int x1, int y1,
 int xitk_image_width(xitk_image_t *);
 int xitk_image_height(xitk_image_t *);
 uintptr_t xitk_image_get_pixmap (xitk_image_t *img);
+uintptr_t xitk_image_get_mask (xitk_image_t *img);
 
 /**
  * Create an image widget type.

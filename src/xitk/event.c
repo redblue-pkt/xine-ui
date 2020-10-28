@@ -1730,9 +1730,8 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
   /*
    * create an icon pixmap
    */
-
-  gui->icon = xitk_image_new (gui->xitk, (const char *)icon_datas, -1, 40, 40);
-
+  if (!(gui->icon = xitk_image_new (gui->xitk, XINE_SKINDIR "/xine_64.png", 0, 0, 0)))
+    gui->icon = xitk_image_new (gui->xitk, (const char *)icon_datas, -1, 40, 40);
 
   skin_preinit (gui);
 

@@ -249,6 +249,10 @@ uintptr_t xitk_image_get_pixmap (xitk_image_t *img) {
   return img && img->beimg ? img->beimg->id1 : 0;
 }
 
+uintptr_t xitk_image_get_mask (xitk_image_t *img) {
+  return img && img->beimg ? img->beimg->id2 : 0;
+}
+
 static void _xitk_image_add_beimg (xitk_image_t *img, const char *data, int dsize) {
   xitk_tagitem_t tags[7] = {
     {XITK_TAG_FILENAME, (uintptr_t)NULL},

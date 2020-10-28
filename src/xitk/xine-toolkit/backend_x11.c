@@ -1501,13 +1501,14 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       XSetTransientForHint (d->display, win->w.id, tw->w.id);
     }
 
-    {
+    if (win->props[XITK_X11_WT_WRAP].value == None) {
       xitk_x11_image_t *icon = (xitk_x11_image_t *)win->props[XITK_X11_WT_ICON].value;
       if ((wm_hint = XAllocWMHints ()) != NULL) {
         wm_hint->input         = True;
         wm_hint->initial_state = NormalState;
         wm_hint->icon_pixmap   = icon ? icon->img.id1 : None;
-        wm_hint->flags         = InputHint | StateHint | (icon ? IconPixmapHint : 0);
+        wm_hint->icon_mask     = icon ? icon->img.id2 : None;
+        wm_hint->flags         = InputHint | StateHint | (icon ? (IconPixmapHint | IconMaskHint) : 0);
         XSetWMHints (d->display, win->w.id, wm_hint);
         XFree (wm_hint);
       }
