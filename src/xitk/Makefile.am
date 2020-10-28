@@ -167,7 +167,7 @@ noinst_HEADERS = \
 	viewlog.h
 
 skinsdir = $(datadir)/xine/skins
-skins_DATA = skins/missing.png
+skins_DATA = skins/missing.png skins/xine_64.png
 
 skin1dir = $(datadir)/xine/skins/xinetic
 xinetic_dir = skins/xinetic

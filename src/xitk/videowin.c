@@ -1014,7 +1014,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->icon_pixmap = xitk_image_get_pixmap (vwin->gui->icon);
-    wm_hint->flags = InputHint | StateHint | IconPixmapHint;
+    wm_hint->icon_mask = xitk_image_get_mask (vwin->gui->icon);
+    wm_hint->flags = InputHint | StateHint | IconPixmapHint | IconMaskHint;
     XSetWMHints (vwin->video_display, vwin->video_window, wm_hint);
     XFree(wm_hint);
   }

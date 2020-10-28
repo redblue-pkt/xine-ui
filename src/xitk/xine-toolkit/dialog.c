@@ -108,12 +108,10 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
 
   /* Draw text area */
   {
-    xitk_pixmap_t  *bg;
-
-    bg = xitk_window_get_background_pixmap (wd->xwin);
+    xitk_image_t *bg = xitk_window_get_background_image (wd->xwin);
     if (bg) {
-      xitk_pixmap_copy_area(image->image, bg, 0, 0, image->width, image->height, 20, TITLE_BAR_HEIGHT + 20);
-      xitk_window_set_background (wd->xwin, bg);
+      xitk_image_copy_rect (image, bg, 0, 0, image->width, image->height, 20, TITLE_BAR_HEIGHT + 20);
+      xitk_window_set_background_image (wd->xwin, bg);
     }
   }
   xitk_image_free_image (&image);
@@ -342,5 +340,3 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   xitk_widget_list_defferred_destroy (widget_list);
   return wd->key;
 }
-
-
