@@ -1731,7 +1731,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
    * create an icon pixmap
    */
 
-  gui->icon = xitk_pixmap_create_from_data(gui->xitk, 40, 40, (const char *)icon_datas);
+  gui->icon = xitk_image_new (gui->xitk, (const char *)icon_datas, -1, 40, 40);
 
 
   skin_preinit (gui);

@@ -3100,26 +3100,26 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
 
 
   {
-    xitk_pixmap_t *bg = xitk_window_get_background_pixmap (mmkedit->xwin);
+    xitk_image_t *bg = xitk_window_get_background_image (mmkedit->xwin);
 
     x = 15;
     y = 34 - 6;
     w = WINDOW_WIDTH - 30;
-    draw_outter_frame (bg, _("Identifier"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("Identifier"), btnfontname, x, y, w, 45);
     y += 45 + 3;
-    draw_outter_frame (bg, _("Mrl"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("Mrl"), btnfontname, x, y, w, 45);
     y += 45 + 3;
-    draw_outter_frame (bg, _("Subtitle"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("Subtitle"), btnfontname, x, y, w, 45);
     y += 45 + 3;
     w = 120;
-    draw_outter_frame (bg, _("Start at"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("Start at"), btnfontname, x, y, w, 45);
     x += w + 5;
-    draw_outter_frame (bg, _("End at"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("End at"), btnfontname, x, y, w, 45);
     x += w + 5;
-    draw_outter_frame (bg, _("A/V offset"), btnfontname, x, y, w, 45);
+    xitk_image_draw_outter_frame (bg, _("A/V offset"), btnfontname, x, y, w, 45);
     x += w + 5;
-    draw_outter_frame (bg, _("SPU offset"), btnfontname, x, y, w, 45);
-    xitk_window_set_background (mmkedit->xwin, bg);
+    xitk_image_draw_outter_frame (bg, _("SPU offset"), btnfontname, x, y, w, 45);
+    xitk_window_set_background_image (mmkedit->xwin, bg);
   }
 
   {

@@ -233,7 +233,6 @@ static void panel_exit (xitk_widget_t *w, void *data) {
  */
 void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_image_t *bg_image;
-  int           new_width, new_height;
 
   (void)synthetic;
 
@@ -250,11 +249,8 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
     xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
-  new_width = xitk_image_width(bg_image);
-  new_height = xitk_image_height(bg_image);
 
-  xitk_window_resize_window (panel->xwin, new_width, new_height);
-  xitk_window_change_background_with_image(panel->xwin, bg_image, new_width, new_height);
+  xitk_window_set_background_image (panel->xwin, bg_image);
 
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
@@ -268,7 +264,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
   enable_playback_controls (panel, panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
 
-  event_sender_move (panel->gui, panel->x + new_width, panel->y);
+  event_sender_move (panel->gui, panel->x + xitk_image_width (bg_image), panel->y);
 }
 
 /*
@@ -1183,8 +1179,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
   panel->y = 100;
   gui_load_window_pos (panel->gui, "panel", &panel->x, &panel->y);
 
-  panel->xwin = xitk_window_create_simple_window_ext(gui->xitk, panel->x, panel->y, width, height, title,
-    title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon);
+  panel->xwin = xitk_window_create_window_ext (gui->xitk, panel->x, panel->y, width, height, title,
+    title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon, bg_image);
   /*
    * The following is more or less a hack to keep the panel window visible
    * with and without focus in windowed and fullscreen mode.
@@ -1196,12 +1192,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
     : !(xitk_get_wm_type (panel->gui->xitk) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR
     : WINDOW_TYPE_NONE);
   video_window_set_transient_for (panel->gui->vwin, panel->xwin);
-
-  /*
-   * set background image
-   */
-
-  xitk_window_change_background_with_image(panel->xwin, bg_image, width, height);
 
   /*
    * Widget-list

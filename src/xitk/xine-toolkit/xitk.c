@@ -90,6 +90,91 @@ static int ml = 0;
 #define MUTUNLOCK() pthread_mutex_unlock (&xitk->mutex)
 #endif
 
+int xitk_tags_get (const xitk_tagitem_t *from, xitk_tagitem_t *to) {
+  const xitk_tagitem_t *stack1[32];
+  xitk_tagitem_t *stack2[32];
+  size_t bufsize = 0;
+  uint32_t sp1, sp2;
+  int res = 0;
+
+  if (!from || !to)
+    return 0;
+  sp1 = 0;
+  while (1) {
+    if (from->type <= XITK_TAG_BUFSIZE) {
+      if (from->type == XITK_TAG_END) {
+        if (sp1 == 0)
+          break;
+        from = stack1[--sp1];
+      } else if (from->type == XITK_TAG_SKIP) {
+        from += from->value + 1;
+      } else if (from->type == XITK_TAG_INSERT) {
+        if (from->value && (sp1 < sizeof (stack1) / sizeof (stack1[0]) - 1)) {
+          stack1[sp1++] = from + 1;
+          from = (const xitk_tagitem_t *)from->value;
+        } else {
+          from += 1;
+        }
+      } else if (from->type == XITK_TAG_JUMP) {
+        if (from->value)
+          from = (const xitk_tagitem_t *)from->value;
+        else
+          break;
+      } else /* from->type == XITK_TAG_BUFSIZE */ {
+        from += 1;
+      }
+    } else {
+      xitk_tagitem_t *q = to;
+
+      sp2 = 0;
+      while (1) {
+        if (q->type <= XITK_TAG_BUFSIZE) {
+          if (q->type == XITK_TAG_END) {
+            if (sp2 == 0)
+              break;
+            q = stack2[--sp2];
+          } else if (q->type == XITK_TAG_SKIP) {
+            q += q->value + 1;
+          } else if (q->type == XITK_TAG_INSERT) {
+            if (q->value && (sp2 < sizeof (stack2) / sizeof (stack2[0]) - 1)) {
+              stack2[sp2++] = q + 1;
+              q = (xitk_tagitem_t *)q->value;
+            } else {
+              q += 1;
+            }
+          } else if (q->type == XITK_TAG_JUMP) {
+            if (q->value)
+              q = (xitk_tagitem_t *)q->value;
+            else
+              break;
+          } else /* q->type == XITK_TAG_BUFSIZE */ {
+            bufsize = q->value;
+            q += 1;
+          }
+        } else if (from->type == q->type) {
+          if ((from->type >= XITK_TAG_NAME) && bufsize && q->value) {
+            if (from->value) {
+              strlcpy ((char *)q->value, (const char *)from->value, bufsize);
+            } else {
+              char *s = (char *)q->value;
+              s[0] = 0;
+            }
+          } else {
+            q->value = from->value;
+          }
+          q += 1;
+          res += 1;
+          /* XXX: does anyone really want multiple copies?? break; */
+        } else {
+          q += 1;
+        }
+      }
+      from += 1;
+    }
+  }
+  return res;
+}
+
 typedef struct {
   int                               enabled;
   int                               offset_x;
@@ -428,7 +513,7 @@ void xitk_color_db_flush (xitk_t *_xitk) {
 
   xitk_container (xitk, _xitk, x);
   for (u = xitk->color_db.used; u > 0; u--)
-    xitk_color_free_value (&xitk->x, xitk->color_db.a[u - 1].value);
+    xitk->x.d->color._delete (xitk->x.d, xitk->color_db.a[u - 1].value);
   xitk->color_db.used = 0;
   xitk->color_query.used = 0;
 }
@@ -480,7 +565,7 @@ uint32_t xitk_color_db_get (xitk_t *_xitk, uint32_t rgb) {
   xitk->color_db.used += 1;
   xitk->color_db.a[b].rgb = rgb;
   info.want = rgb;
-  xitk_color_want_alloc (&xitk->x, &info);
+  xitk->x.d->color._new (xitk->x.d, &info);
   xitk->color_db.a[b].value = info.value;
 
   b = 0;
@@ -1615,9 +1700,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   xitk_dlist_init (&fx->wl.list);
   fx->wl.xitk               = &xitk->x;
   fx->wl.win                = None;
-  fx->wl.gc                 = NULL;
-  fx->wl.origin_gc          = NULL;
-  fx->wl.temp_gc            = NULL;
   fx->wl.shared_images      = NULL;
   fx->wl.widget_focused     = NULL;
   fx->wl.widget_under_mouse = NULL;
@@ -1892,16 +1974,7 @@ static void __fx_delete (__gfx_t *fx) {
   fx->destructor = NULL;
   fx->destr_data = NULL;
 
-  if (fx->wl.temp_gc || fx->wl.gc) {
-    xitk_lock_display (&xitk->x);
-    if (fx->wl.temp_gc)
-      XFreeGC (xitk->x.display, fx->wl.temp_gc);
-    if (fx->wl.gc)
-      XFreeGC (xitk->x.display, fx->wl.gc);
-    xitk_unlock_display (&xitk->x);
-    fx->wl.gc = NULL;
-    fx->wl.temp_gc = NULL;
-  }
+  xitk_destroy_widgets (&fx->wl);
   xitk_shared_image_list_delete (&fx->wl);
   xitk_dlist_clear (&fx->wl.list);
 
@@ -1955,6 +2028,7 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl) {
   __fx_unref (fx);
   MUTUNLOCK ();
 }
+
 
 /*
  * Copy window information matching with key in passed window_info_t struct.
@@ -2493,15 +2567,12 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   __xitk_t *xitk;
   char buffer[256];
   pthread_mutexattr_t attr;
-  Display *display;
 
   if (use_x_lock_display) {
     /* Nasty (temporary) kludge. */
     xitk_x_lock_display = XLockDisplay;
     xitk_x_unlock_display = XUnlockDisplay;
   }
-
-  display = xitk_x11_open_display(use_x_lock_display, use_synchronized_x, verbosity);
 
 #ifdef ENABLE_NLS
   bindtextdomain("xitk", XITK_LOCALE);
@@ -2511,6 +2582,19 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   gXitk = &xitk->x;
   if (!xitk)
     return NULL;
+
+  xitk->x.be = xitk_backend_new (&xitk->x, verbosity);
+  if (!xitk->x.be) {
+    free (xitk);
+    return NULL;
+  }
+  xitk->x.d = xitk->x.be->open_display (xitk->x.be, NULL, use_x_lock_display, use_synchronized_x);
+  if (!xitk->x.d) {
+    xitk->x.be->_delete (&xitk->x.be);
+    free (xitk);
+    return NULL;
+  }
+  xitk->x.display = (Display *)xitk->x.d->id;
 
   xitk->xitk_pid = getppid ();
 
@@ -2534,21 +2618,23 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk_color_db_init (xitk);
 
-  xitk->display_width   = DisplayWidth(display, DefaultScreen(display));
-  xitk->display_height  = DisplayHeight(display, DefaultScreen(display));
+  {
+    int s = DefaultScreen (xitk->x.display);
+    xitk->display_width   = DisplayWidth (xitk->x.display, s);
+    xitk->display_height  = DisplayHeight (xitk->x.display, s);
+  }
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
-  xitk->x.display       = display;
   xitk->key             = 0;
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (display) : 0;
+  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (xitk->x.display) : 0;
   xitk_x_error           = 0;
   xitk->x_error_handler = NULL;
   //xitk->modalw          = None;
-  xitk->ignore_keys[0]  = XKeysymToKeycode(display, XK_Shift_L);
-  xitk->ignore_keys[1]  = XKeysymToKeycode(display, XK_Control_L);
+  xitk->ignore_keys[0]  = XKeysymToKeycode (xitk->x.display, XK_Shift_L);
+  xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->x.display, XK_Control_L);
   xitk->tips_timeout    = TIPS_TIMEOUT;
 #if 0
   XGetInputFocus(display, &(xitk->parent.window), &(xitk->parent.focus));
@@ -2629,7 +2715,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   if (verbosity >= 1)
     printf("%s", buffer);
 
-  xitk->wm_type = xitk_check_wm (xitk, display);
+  xitk->wm_type = xitk_check_wm (xitk, xitk->x.display);
 
   /* imit imlib */
   _init_imlib(xitk, prefered_visual, install_colormap);
@@ -2637,8 +2723,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
 
-  xitk_cursors_init(display);
-  xitk->x.tips = xitk_tips_new (display);
+  xitk_cursors_init (xitk->x.display);
+  xitk->x.tips = xitk_tips_new (xitk->x.display);
 
   return &xitk->x;
 }
@@ -2808,8 +2894,9 @@ void xitk_free(xitk_t **p) {
 
   Imlib_destroy(&xitk->x.imlibdata);
 
-  XCloseDisplay(xitk->x.display);
+  xitk->x.d->close (&xitk->x.d);
   xitk->x.display = NULL;
+  xitk->x.be->_delete (&xitk->x.be);
 
 #ifdef DEBUG_LOCKDISPLAY
   pthread_mutex_destroy (&xitk->x.debug_mutex);
@@ -3237,4 +3324,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-

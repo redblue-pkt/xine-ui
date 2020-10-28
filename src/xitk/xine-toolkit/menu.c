@@ -318,7 +318,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   static xitk_window_t       *xwin;
   _menu_window_t             *mw;
   xitk_widget_t              *btn;
-  xitk_pixmap_t              *bg = NULL;
+  xitk_image_t               *bg = NULL;
   int                         yy = 0, got_title = 0;
 
   if (wp->num_open >= _MENU_MAX_OPEN)
@@ -356,8 +356,9 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   else
     fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_12);
 
-  xitk_font_set_font (fs, wp->w.wl->gc);
+  xitk_image_set_font (bg, fs);
   maxlen = xitk_font_get_string_length (fs, maxnode->menu_entry.menu);
+  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   shortcutlen = 0;
@@ -427,7 +428,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
                                               NULL, NULL, NULL, 1, 1, NULL);
 
   if(bsep || btitle) {
-    bg = xitk_window_get_background_pixmap(xwin);
+    bg = xitk_window_get_background_image (xwin);
   }
 
   mw = wp->open_windows + wp->num_open;
@@ -444,32 +445,32 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   mw->bevel_checked = NULL;
 
   if (node->type & (_MENU_NODE_PLAIN << _MENU_NODE_HAS)) {
-    mw->bevel_plain = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    mw->bevel_plain = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_plain)
-      draw_flat_three_state (mw->bevel_plain);
+      xitk_image_draw_flat_three_state (mw->bevel_plain);
   }
 
   if (node->type & (_MENU_NODE_BRANCH << _MENU_NODE_HAS)) {
-    mw->bevel_arrow = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    mw->bevel_arrow = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_arrow) {
-      draw_flat_three_state (mw->bevel_arrow);
-      menu_draw_arrow_branch (mw->bevel_arrow);
+      xitk_image_draw_flat_three_state (mw->bevel_arrow);
+      xitk_image_draw_menu_arrow_branch (mw->bevel_arrow);
     }
   }
 
   if (node->type & (_MENU_NODE_CHECK << _MENU_NODE_HAS)) {
-    mw->bevel_unchecked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    mw->bevel_unchecked = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_unchecked) {
-      draw_flat_three_state (mw->bevel_unchecked);
-      menu_draw_check (mw->bevel_unchecked, 0);
+      xitk_image_draw_flat_three_state (mw->bevel_unchecked);
+      xitk_image_draw_menu_check (mw->bevel_unchecked, 0);
     }
   }
 
   if (node->type & (_MENU_NODE_CHECKED << _MENU_NODE_HAS)) {
-    mw->bevel_checked = xitk_image_create_image (wp->w.wl->xitk, wwidth * 3, 20);
+    mw->bevel_checked = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_checked) {
-      draw_flat_three_state (mw->bevel_checked);
-      menu_draw_check (mw->bevel_checked, 1);
+      xitk_image_draw_flat_three_state (mw->bevel_checked);
+      xitk_image_draw_menu_check (mw->bevel_checked, 1);
     }
   }
 
@@ -500,18 +501,19 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 	unsigned int  cfg, cbg;
 
         fs = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
-	xitk_font_set_font(fs, wp->w.wl->gc);
+        xitk_image_set_font (bg, fs);
 
 	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
         cbg = xitk_color_db_get (wp->w.wl->xitk, (140 << 16) + (140 << 8) + 140);
         cfg = xitk_color_db_get (wp->w.wl->xitk, (255 << 16) + (255 << 8) + 255);
 
-        pixmap_fill_rectangle(bg, 1, 1, wwidth, 20, cbg);
+        xitk_image_fill_rectangle (bg, 1, 1, wwidth, 20, cbg);
 
-        xitk_pixmap_draw_string (bg, fs, 5, 1 + ((20 + asc + des) >> 1) - des,
+        xitk_image_draw_string (bg, 5, 1 + ((20 + asc + des) >> 1) - des,
           me->menu_entry.menu, strlen (me->menu_entry.menu), cfg);
 
+        xitk_image_set_font (bg, NULL);
 	xitk_font_unload_font(fs);
 
 	yy += 20;
@@ -523,7 +525,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     else if (me->type & _MENU_NODE_SEP) {
     __sep:
       if(bg)
-        draw_rectangular_box (bg, 3, yy, wwidth - 5, 2, DRAW_INNER | DRAW_LIGHT);
+        xitk_image_draw_rectangular_box (bg, 3, yy, wwidth - 5, 2, DRAW_INNER | DRAW_LIGHT);
       yy += 2;
     }
     else {
@@ -559,8 +561,8 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     }
   }
 
-  if(bg) {
-    xitk_window_set_background(xwin, bg);
+  if (bg) {
+    xitk_window_set_background_image (xwin, bg);
   }
 
   /* Set transient-for-hint to the immediate predecessor,     */
@@ -753,4 +755,3 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
 
   return &wp->w;
 }
-

@@ -147,8 +147,9 @@ struct xitk_widget_list_s {
   xitk_widget_t              *widget_pressed;
 
   xine_sarray_t              *shared_images;
+
+  xitk_window_t              *xwin;
   Window                      win;
-  GC                          gc, origin_gc, temp_gc;
 };
 
 xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size);

@@ -289,7 +289,7 @@ static void setup_clear_tab (xui_setup_t *setup) {
   int width = (WINDOW_WIDTH - 30);
   int height = (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30);
 
-  im = xitk_image_create_image (setup->gui->xitk, width, height);
+  im = xitk_image_new (setup->gui->xitk, NULL, 0, width, height);
 
   xitk_image_draw_outter (im, width, height);
   xitk_image_draw_image (setup->widget_list, im, 0, 0, width, height, 15, (24 + setup->th), 0);
@@ -573,7 +573,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
       {
         xitk_image_widget_t  im;
-        xitk_image_t        *image = xitk_image_create_image (setup->gui->xitk, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
+        xitk_image_t        *image = xitk_image_new (setup->gui->xitk, NULL, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 
         if (image) {
           xitk_image_fill_rectangle (image, 0, 0, FRAME_WIDTH + 1, FRAME_HEIGHT + 1,
@@ -827,7 +827,7 @@ static int _section_cmp (void *a, void *b) {
 #endif
 
 static void setup_sections (xui_setup_t *setup) {
-  xitk_pixmap_t      *bg;
+  xitk_image_t *bg;
   xine_cfg_entry_t    entry;
   int                 cfg_err_result;
   xitk_tabs_widget_t  tab;
@@ -918,10 +918,10 @@ static void setup_sections (xui_setup_t *setup) {
 
   xitk_enable_and_show_widget (setup->tabs);
 
-  bg = xitk_window_get_background_pixmap (setup->xwin);
-  draw_rectangular_box (bg, 15, (24 + setup->th),
+  bg = xitk_window_get_background_image (setup->xwin);
+  xitk_image_draw_rectangular_box (bg, 15, (24 + setup->th),
     WINDOW_WIDTH - 30, MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30, DRAW_OUTTER);
-  xitk_window_set_background (setup->xwin, bg);
+  xitk_window_set_background_image (setup->xwin, bg);
 
   setup->num_wg = 0;
   setup->first_displayed = 0;
@@ -958,6 +958,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   xui_setup_t   *setup;
   xitk_widget_t *w;
   xitk_font_t   *fs;
+  xitk_image_t  *bg;
 
   if (!gui)
     return NULL;
@@ -978,8 +979,9 @@ xui_setup_t *setup_panel (gGui_t *gui) {
 
     setup->widget_list = xitk_window_widget_list(setup->xwin);
 
+    bg = xitk_window_get_background_image (setup->xwin);
     fs = xitk_font_load_font (setup->gui->xitk, fontname);
-    xitk_widget_list_set_font (setup->widget_list, fs);
+    xitk_image_set_font (bg, fs);
     setup->fh = xitk_font_get_string_height (fs, " ");
   }
 
@@ -1024,6 +1026,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   xitk_add_widget (setup->widget_list, w);
   xitk_enable_and_show_widget(w);
 
+  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   {

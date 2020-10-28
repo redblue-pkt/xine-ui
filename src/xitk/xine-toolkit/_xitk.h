@@ -55,24 +55,34 @@
 #include "libcommon.h"
 #include "xitk.h"
 
+typedef struct {
+  uint32_t want, value;
+  uint16_t r, g, b, a;
+} xitk_color_info_t;
+
+int xitk_color_db_query_value (xitk_t *xitk, xitk_color_info_t *info);
+
+#include "backend.h"
+
 typedef struct xitk_font_cache_s xitk_font_cache_t;
 struct xitk_tips_s;
 
 struct xitk_s {
+  xitk_backend_t *be;
+  xitk_be_display_t *d, *d2;
+  /* TODO: remove this kludge. */
   Display  *display;
   void    (*x_lock_display) (Display *display);
   void    (*x_unlock_display) (Display *display);
   void    (*lock_display) (xitk_t *);
   void    (*unlock_display) (xitk_t *);
+  ImlibData *imlibdata;
+  /* /TODO: remove this kludge. */
 #ifdef DEBUG_LOCKDISPLAY
   pthread_mutex_t debug_mutex;
   int debug_level;
 #endif
-
-  ImlibData         *imlibdata;
-
   xitk_font_cache_t *font_cache;
-
   struct xitk_tips_s *tips;
 };
 
@@ -105,15 +115,6 @@ extern xitk_t *gXitk;
 
 extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
-
-typedef struct {
-  uint32_t want, value;
-  uint16_t r, g, b, a;
-} xitk_color_info_t;
-
-void xitk_color_want_alloc (xitk_t *xitk, xitk_color_info_t *info);
-int xitk_color_db_query_value (xitk_t *xitk, xitk_color_info_t *info);
-void xitk_color_free_value (xitk_t *xitk, uint32_t value);
 
 typedef struct {
   xitk_widget_t    *itemlist;
@@ -239,34 +240,30 @@ void menu_auto_pop(xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
 
-struct xitk_pixmap_s {
-  xitk_t                           *xitk;
-  ImlibData                        *imlibdata;
-  XImage                           *xim;
-  Pixmap                            pixmap;
-  GC                                gc;
-  int                               width;
-  int                               height;
-  int                               shm;
-#ifdef HAVE_SHM
-  XShmSegmentInfo                  *shminfo;
-#endif
-  xitk_pixmap_destroyer_t           destroy;
+struct xitk_image_s {
+  xitk_be_image_t *beimg;
+  xitk_pix_font_t *pix_font;
+  int width, height;
+  /* image private */
+  xitk_t *xitk;
+  xitk_widget_list_t *wl;
+  xitk_font_t *xtfs;
+  GC gc;
+  int refs, max_refs;
+  char key[32];
 };
 
-struct xitk_image_s {
-  xitk_pixmap_t                    *image;
-  xitk_pixmap_t                    *mask;
-  xitk_pix_font_t                  *pix_font;
-  int                               width;
-  int                               height;
+void xitk_image_ref (xitk_image_t *img);
 
-  /* image private */
-  xitk_t                           *xitk;
-  ImlibImage                       *raw;
-  xitk_widget_list_t               *wl;
-  int                               refs, max_refs;
-  char                              key[32];
+struct xitk_window_s {
+  xitk_t                   *xitk;
+  xitk_be_window_t         *bewin;
+  xitk_image_t             *bg_image;
+  Window                    window;
+  xitk_window_t            *win_parent;
+  int                       width;
+  int                       height;
+  xitk_widget_list_t       *widget_list;
 };
 
 xitk_t *xitk_window_get_xitk (xitk_window_t *w);

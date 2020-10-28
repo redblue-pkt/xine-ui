@@ -51,6 +51,13 @@ static inline void xitk_dnode_remove (xitk_dnode_t *node) {
   }
 }
 
+static inline void xitk_dlist_add_head (xitk_dlist_t *list, xitk_dnode_t *node) {
+  node->next = list->head.next;
+  list->head.next->prev = node;
+  list->head.next = node;
+  node->prev = &list->head;
+}
+
 static inline void xitk_dlist_add_tail (xitk_dlist_t *list, xitk_dnode_t *node) {
 #ifdef XITK_DEBUG
   if (node->next)
@@ -123,13 +130,6 @@ static inline xitk_dnode_t *xitk_dlist_remove_tail (xitk_dlist_t *list) {
   node->next->prev = node->prev;
   node->next = node->prev = NULL;
   return node;
-}
-
-static inline void xitk_dlist_add_head (xitk_dlist_t *list, xitk_dnode_t *node) {
-  node->next = list->head.next;
-  list->head.next->prev = node;
-  list->head.next = node;
-  node->prev = &list->head;
 }
 
 #endif

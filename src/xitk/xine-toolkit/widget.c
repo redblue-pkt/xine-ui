@@ -801,7 +801,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   event.skonfig = skonfig;
 
   mywidget = (xitk_widget_t *)wl->list.head.next;
-  while (mywidget->node.next && wl->win && wl->gc && skonfig) {
+  while (mywidget->node.next && wl->win && skonfig) {
 
     (void) mywidget->event(mywidget, &event, NULL);
 
@@ -859,7 +859,7 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
 
   if (!wl || !hull)
     return 0;
-  if (!wl->win || !wl->gc)
+  if (!wl->win)
     return 0;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
@@ -907,7 +907,7 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
 
   if (!wl)
     return 1;
-  if (!wl->win || !wl->gc)
+  if (!wl->win)
     return 1;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
@@ -921,28 +921,6 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
     (void)w->event (w, &event, NULL);
     w->state.visible = w->visible;
   }
-  return 1;
-}
-
-/*
- * Return 1 if the mouse poiter is in the visible area of widget.
- */
-int xitk_is_cursor_out_mask(xitk_widget_t *w, xitk_pixmap_t *mask, int x, int y) {
-
-  if(!w || !w->wl) {
-    XITK_WARNING("widget list was NULL.\n");
-    return 0;
-  }
-
-  if(mask) {
-    int xx, yy;
-
-    if((xx = (x - w->x)) == w->width) xx--;
-    if((yy = (y - w->y)) == w->height) yy--;
-
-    return xitk_pixmap_get_pixel(mask, xx, yy);
-  }
-
   return 1;
 }
 
@@ -1351,7 +1329,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
 
   if (!wl)
     return;
-  if (!wl->win || !wl->gc)
+  if (!wl->win)
     return;
 
   w = xitk_find_nextprev_focus (wl, backward);
@@ -1451,7 +1429,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     XITK_WARNING("widget list is NULL.\n");
     return;
   }
-  if (!wl->win || !wl->gc)
+  if (!wl->win)
     return;
 
   /* paranois: w (still) in list? */
@@ -2241,10 +2219,6 @@ int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *
   }
 
   return retval;
-}
-
-void xitk_widget_list_set_font(xitk_widget_list_t *wl, xitk_font_t *xtfs) {
-  xitk_font_set_font(xtfs, wl->gc);
 }
 
 int xitk_widget_mode (xitk_widget_t *w, int mask, int mode) {

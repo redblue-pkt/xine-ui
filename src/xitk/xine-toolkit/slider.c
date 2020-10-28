@@ -310,11 +310,9 @@ static int _notify_inside (_slider_private_t *wp, int x, int y) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (wp->w.visible == 1) {
       if (wp->paddle_cover_bg == 1) {
-        if (wp->paddle_skin.image->mask)
-          return xitk_is_cursor_out_mask (&wp->w, wp->paddle_skin.image->mask, wp->paddle_skin.x + x, wp->paddle_skin.y + y);
+        return xitk_image_inside (wp->paddle_skin.image, wp->paddle_skin.x + x - wp->w.x, wp->paddle_skin.y + y - wp->w.y);
       } else {
-        if (wp->bg_skin.image->mask)
-          return xitk_is_cursor_out_mask (&wp->w, wp->bg_skin.image->mask, wp->bg_skin.x + x, wp->bg_skin.y + y);
+        return xitk_image_inside (wp->bg_skin.image, wp->bg_skin.x + x - wp->w.x, wp->bg_skin.y + y - wp->w.y);
       }
     } else
       return 0;
@@ -1006,7 +1004,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
         }
       }
       if ((hv_w != wp->hv_w) || (hv_h != wp->hv_h)) {
-        draw_paddle_three_state (wp->paddle_skin.image, hv_w, hv_h);
+        xitk_image_draw_paddle_three_state (wp->paddle_skin.image, hv_w, hv_h);
         wp->hv_w = hv_w;
         wp->hv_h = hv_h;
         wp->paddle_skin.width = hv_w;
@@ -1133,23 +1131,19 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   wp->skin_element_name.s = NULL;
 
   if (type == XITK_VSLIDER) {
-    wp->paddle_skin.image = xitk_image_create_image (wl->xitk, width * 3, height / 5);
-    xitk_image_add_mask (wp->paddle_skin.image);
-    draw_paddle_three_state_vertical (wp->paddle_skin.image);
+    wp->paddle_skin.image = xitk_image_new (wl->xitk, NULL, 0, width * 3, height / 5);
+    xitk_image_draw_paddle_three_state_vertical (wp->paddle_skin.image);
   } else if (type == XITK_HSLIDER) {
-    wp->paddle_skin.image = xitk_image_create_image (wl->xitk, (width / 5) * 3, height);
-    xitk_image_add_mask (wp->paddle_skin.image);
-    draw_paddle_three_state_horizontal (wp->paddle_skin.image);
+    wp->paddle_skin.image = xitk_image_new (wl->xitk, NULL, 0, (width / 5) * 3, height);
+    xitk_image_draw_paddle_three_state_horizontal (wp->paddle_skin.image);
   } else if (type == XITK_RSLIDER) {
     int w;
 
     w = ((((width + height) >> 1) >> 1) / 10) * 3;
-    wp->paddle_skin.image = xitk_image_create_image (wl->xitk, (w * 3), w);
-    xitk_image_add_mask (wp->paddle_skin.image);
-    draw_paddle_rotate (wp->paddle_skin.image);
+    wp->paddle_skin.image = xitk_image_new (wl->xitk, NULL, 0, (w * 3), w);
+    xitk_image_draw_paddle_rotate (wp->paddle_skin.image);
   } else if (type == XITK_HVSLIDER) {
-    wp->paddle_skin.image = xitk_image_create_image (wl->xitk, width * 3, height);
-    xitk_image_add_mask (wp->paddle_skin.image);
+    wp->paddle_skin.image = xitk_image_new (wl->xitk, NULL, 0, width * 3, height);
     /* defer init to xitk_slider_hv_sync (). */
   } else {
     XITK_DIE ("Slider type unhandled.\n");
@@ -1159,12 +1153,11 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   wp->paddle_skin.width = wp->paddle_skin.image->width;
   wp->paddle_skin.height = wp->paddle_skin.image->height;
 
-  wp->bg_skin.image = xitk_image_create_image (wl->xitk, width, height);
-  xitk_image_add_mask (wp->bg_skin.image);
+  wp->bg_skin.image = xitk_image_new (wl->xitk, NULL, 0, width, height);
   if ((type == XITK_HSLIDER) || (type == XITK_VSLIDER) || (type == XITK_HVSLIDER))
-    draw_inner (wp->bg_skin.image->image, width, height);
+    xitk_image_draw_inner (wp->bg_skin.image, width, height);
   else if (type == XITK_RSLIDER) {
-    draw_rotate_button (wp->bg_skin.image);
+    xitk_image_draw_rotate_button (wp->bg_skin.image);
   }
   wp->bg_skin.x = 0;
   wp->bg_skin.y = 0;

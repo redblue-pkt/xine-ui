@@ -124,7 +124,6 @@ static void *_tips_loop_thread (void *data) {
         if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && tips->widget->tips_string[0]) {
           int x, y, w, h;
           xitk_image_t *image;
-          xitk_font_t *fs;
           unsigned int cfore, cback;
           int disp_w, disp_h;
           int x_margin = 12, y_margin = 6;
@@ -138,11 +137,6 @@ static void *_tips_loop_thread (void *data) {
 
           x += tips->widget->x;
           y += tips->widget->y;
-
-          fs = xitk_font_load_font (xitk, DEFAULT_FONT_10);
-          xitk_font_set_font (fs, tips->widget->wl->gc);
-
-          xitk_font_unload_font (fs);
 
           cfore = xitk_get_cfg_num (xitk, XITK_BLACK_COLOR);
           cback = xitk_get_cfg_num (xitk, XITK_FOCUS_COLOR);
@@ -169,19 +163,19 @@ static void *_tips_loop_thread (void *data) {
           /* No further alternative to y-position the tips (just either below or above widget) */
           xwin = xitk_window_create_simple_window_ext (xitk, x, y, w, h, NULL, NULL, NULL, 1, 0, NULL);
           {
-            xitk_pixmap_t *bg;
+            xitk_image_t *bg;
             int bg_width, bg_height;
 
-            bg = xitk_window_get_background_pixmap (xwin);
-            bg_width = xitk_pixmap_width (bg);
-            bg_height = xitk_pixmap_height (bg);
+            bg = xitk_window_get_background_image (xwin);
+            bg_width = xitk_image_width (bg);
+            bg_height = xitk_image_height (bg);
 
-            pixmap_draw_rectangle (bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
-            pixmap_fill_rectangle (bg, 1, 1, bg_width - 2, bg_height - 2, cback);
-            xitk_pixmap_copy_area (image->image, bg, 0, 0, image->width, image->height,
+            xitk_image_draw_rectangle (bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
+            xitk_image_fill_rectangle (bg, 1, 1, bg_width - 2, bg_height - 2, cback);
+            xitk_image_copy_rect (image, bg, 0, 0, image->width, image->height,
               (bg_width - image->width) >> 1, (bg_height - image->height) >> 1);
 
-            xitk_window_set_background (xwin, bg);
+            xitk_window_set_background_image (xwin, bg);
 
             xitk_image_free_image (&image);
           }

@@ -738,9 +738,7 @@ void xitk_mrlbrowser_change_skins (xitk_widget_t *w, xitk_skin_config_t *skonfig
   if (!bg_image)
     XITK_DIE ("%s(): couldn't find image for background\n", __FUNCTION__);
 
-  xitk_window_resize_window (wp->xwin, bg_image->width, bg_image->height);
-
-  xitk_window_change_background_with_image (wp->xwin, bg_image, bg_image->width, bg_image->height);
+  xitk_window_set_background_image (wp->xwin, bg_image);
   xitk_skin_unlock (skonfig);
 
   xitk_change_skins_widget_list (wp->widget_list, skonfig);
@@ -979,9 +977,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->last_mrl_source = NULL;
 
   wp->xwin = xitk_window_create_window_ext (xitk, mb->x, mb->y, bg_image->width, bg_image->height,
-    title, "xitk mrl browser", "xitk", 0, 0, mb->icon);
-
-  xitk_window_change_background_with_image (wp->xwin, bg_image, bg_image->width, bg_image->height);
+    title, "xitk mrl browser", "xitk", 0, 0, mb->icon, bg_image);
 
   wp->widget_list = xitk_window_widget_list (wp->xwin);
 

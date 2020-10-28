@@ -395,10 +395,14 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_button_widget_t       b;
     int                        xx = x;
 
-    fs = xitk_font_load_font(wl->xitk, fontname);
+    xitk_image_t *dummy;
 
-    xitk_font_set_font(fs, wl->gc);
+    fs = xitk_font_load_font(wl->xitk, fontname);
+    dummy = xitk_image_new (wl->xitk, NULL, 0, 32, 32);
+    xitk_image_set_font (dummy, fs);
     fheight = xitk_font_get_string_height(fs, " ");
+    xitk_image_free_image (&dummy);
+
     wp->w.height = wp->bheight = fheight + 18;
 
     XITK_WIDGET_INIT(&lb);

@@ -224,7 +224,7 @@ struct gGui_st {
   xitk_t                   *xitk;
 
   /* basic X11 stuff */
-  xitk_pixmap_t            *icon;
+  xitk_image_t             *icon;
 
   xitk_skin_config_t       *skin_config;
   char                     *skin_server_url;
