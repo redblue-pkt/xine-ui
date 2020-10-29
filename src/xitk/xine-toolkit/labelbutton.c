@@ -215,6 +215,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
       short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font.s);
     if (!short_font)
       short_font = fs;
+    xitk_image_set_font (pix, short_font);
     if (shortcut_pos == 0) {
       xitk_font_text_extent (short_font, wp->shortcut_label.s, slen, &lbear, &rbear, &width, &asc, &des);
       shortcut_pos = xsize - 5 - width;

@@ -1727,6 +1727,11 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
                          use_x_lock_display, use_synchronized_x11,
                          gui->verbosity);
 
+  if (!gui->xitk) {
+    printf ("gui.init: ERROR: xiTK engine unavailable.\n");
+    exit (1);
+  }
+
   /*
    * create an icon pixmap
    */
@@ -1973,3 +1978,4 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
+
