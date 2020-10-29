@@ -890,6 +890,7 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
     XITK_FREE (xwin);
     return NULL;
   }
+  xwin->bewin->data = xwin;
   xwin->xitk = xitk;
   xwin->widget_list = NULL;
   xwin->bg_image = NULL;

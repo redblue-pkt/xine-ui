@@ -55,6 +55,7 @@
 #include <X11/keysym.h>
 
 #include "utils.h"
+#include "dump.h"
 #include "_xitk.h"
 #include "xitk_x11.h"
 #include "tips.h"
@@ -383,6 +384,50 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
 }
 
 
+static void __fx_ref (__gfx_t *fx) {
+  fx->refs++;
+}
+
+static void __fx_delete (__gfx_t *fx) {
+  __xitk_t *xitk = fx->xitk;
+
+  if (xitk->verbosity >= 2)
+    printf ("xitk_gfx_delete (%d) = \"%s\".\n", fx->key, fx->name);
+
+  xitk_dnode_remove (&fx->wl.node);
+
+  if (fx->xdnd) {
+    xitk_unset_dnd_callback (fx->xdnd);
+    free (fx->xdnd);
+    fx->xdnd = NULL;
+  }
+
+  fx->cbs       = NULL;
+  fx->user_data = NULL;
+
+  /* dialog.c uses this to clean out by either widget callback
+   * or xitk_unregister_event_handler () from outside.
+   * that includes another xitk_widget_list_defferred_destroy (),
+   * which does not harm here because
+   * a) widget list is still there, and
+   * b) fx->refs == -1 prevents recursion. */
+  if (fx->destructor)
+    fx->destructor (fx->destr_data);
+  fx->destructor = NULL;
+  fx->destr_data = NULL;
+
+  xitk_destroy_widgets (&fx->wl);
+  xitk_shared_image_list_delete (&fx->wl);
+  xitk_dlist_clear (&fx->wl.list);
+
+  free (fx);
+}
+
+static void __fx_unref (__gfx_t *fx) {
+  if (--fx->refs == 0)
+    __fx_delete (fx);
+}
+
 static void _xitk_reset_hull (xitk_hull_t *hull) {
   hull->x1 = 0x7fffffff;
   hull->x2 = 0;
@@ -390,79 +435,54 @@ static void _xitk_reset_hull (xitk_hull_t *hull) {
   hull->y2 = 0;
 }
 
-
 static void *xitk_event_bridge_thread (void *data) {
   __xitk_t *xitk = data;
-  int xconnection;
+    xitk_be_window_t *bewin = NULL;
 
-  xitk_lock_display (&xitk->x);
-  xconnection = ConnectionNumber (xitk->x.display);
-  xitk_unlock_display (&xitk->x);
+  if (xitk->verbosity >= 2)
+    printf ("xitk.event_bridge.start.\n");
 
-  while (1) {
-    XEvent event;
+  MUTLOCK ();
+  while (xitk->event_bridge.running) {
+    xitk_be_event_t event;
     __gfx_t  *fx;
 
-    xitk_lock_display (&xitk->x);
-    if (XCheckTypedEvent (xitk->x.display, Expose, &event) == False) {
-      fd_set fdset;
-      struct timeval tv;
-
-      xitk_unlock_display (&xitk->x);
-      MUTLOCK ();
-      if (!xitk->event_bridge.running) {
-        MUTUNLOCK ();
-        break;
-      }
-      MUTUNLOCK ();
-      FD_ZERO (&fdset);
-      FD_SET (xconnection, &fdset);
-      tv.tv_sec  = 0;
-      tv.tv_usec = 33000;
-      select (xconnection + 1, &fdset, 0, 0, &tv);
-      continue;
-    }
-
-    xitk_unlock_display (&xitk->x);
-    if (event.xany.type != Expose)
-      continue;
-    if (event.xexpose.window == None)
-      continue;
-
-    MUTLOCK ();
-    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
-      if (event.xexpose.window == fx->window) {
-        int r;
-
-        do {
-          if (event.xexpose.x < fx->expose.x1)
-            fx->expose.x1 = event.xexpose.x;
-          if (event.xexpose.x + event.xexpose.width > fx->expose.x2)
-            fx->expose.x2 = event.xexpose.x + event.xexpose.width;
-          if (event.xexpose.y < fx->expose.y1)
-            fx->expose.y1 = event.xexpose.y;
-          if (event.xexpose.y + event.xexpose.height > fx->expose.y2)
-            fx->expose.y2 = event.xexpose.y + event.xexpose.height;
-          xitk_lock_display (&xitk->x);
-          r = XCheckTypedWindowEvent (xitk->x.display, fx->window, Expose, &event);
-          xitk_unlock_display (&xitk->x);
-        } while (r == True);
-        if (event.xexpose.count == 0) {
-#ifdef XITK_PAINT_DEBUG
-          printf ("xitk.expose: x %d-%d, y %d-%d.\n", fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
-#endif
-          xitk_partial_paint_widget_list (&fx->wl, &fx->expose);
-          _xitk_reset_hull (&fx->expose);
-        }
-        break;
-      }
-    }
-    if (!xitk->event_bridge.running) {
-      MUTUNLOCK ();
-      break;
-    }
     MUTUNLOCK ();
+    if (xitk->x.d->next_event (xitk->x.d, &event, bewin, XITK_EV_EXPOSE, 33)) {
+      xitk_window_t *xwin;
+
+      bewin = event.window;
+      xwin = bewin ? bewin->data : NULL;
+      fx = xwin ? (__gfx_t *)xwin->widget_list : NULL;
+      MUTLOCK ();
+      if (!fx) {
+        bewin = NULL;
+        continue;
+      }
+      if (event.x < fx->expose.x1)
+        fx->expose.x1 = event.x;
+      if (event.x + event.w > fx->expose.x2)
+        fx->expose.x2 = event.x + event.w;
+      if (event.y < fx->expose.y1)
+        fx->expose.y1 = event.y;
+      if (event.y + event.h > fx->expose.y2)
+        fx->expose.y2 = event.y + event.h;
+      if (event.more > 0)
+        continue;
+      if (xitk->verbosity >= 2)
+        printf ("xitk.event_bridge.expose (%s): x %d-%d, y %d-%d.\n",
+          fx->name, fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
+      xitk_partial_paint_widget_list (&fx->wl, &fx->expose);
+      _xitk_reset_hull (&fx->expose);
+    } else {
+      MUTLOCK ();
+    }
+    bewin = NULL;
   }
+  MUTUNLOCK ();
+
+  if (xitk->verbosity >= 2)
+    printf ("xitk.event_bridge.stop.\n");
 
   return NULL;
 }
@@ -1942,50 +1962,6 @@ void xitk_register_eh_destructor (xitk_t *_xitk, xitk_register_key_t key,
   MUTUNLOCK ();
 }
 
-static void __fx_ref (__gfx_t *fx) {
-  fx->refs++;
-}
-
-static void __fx_delete (__gfx_t *fx) {
-  __xitk_t *xitk = fx->xitk;
-
-  if (xitk->verbosity >= 2)
-    printf ("xitk_gfx_delete (%d) = \"%s\".\n", fx->key, fx->name);
-
-  xitk_dnode_remove (&fx->wl.node);
-
-  if (fx->xdnd) {
-    xitk_unset_dnd_callback (fx->xdnd);
-    free (fx->xdnd);
-    fx->xdnd = NULL;
-  }
-
-  fx->cbs       = NULL;
-  fx->user_data = NULL;
-
-  /* dialog.c uses this to clean out by either widget callback
-   * or xitk_unregister_event_handler () from outside.
-   * that includes another xitk_widget_list_defferred_destroy (),
-   * which does not harm here because
-   * a) widget list is still there, and
-   * b) fx->refs == -1 prevents recursion. */
-  if (fx->destructor)
-    fx->destructor (fx->destr_data);
-  fx->destructor = NULL;
-  fx->destr_data = NULL;
-
-  xitk_destroy_widgets (&fx->wl);
-  xitk_shared_image_list_delete (&fx->wl);
-  xitk_dlist_clear (&fx->wl.list);
-
-  free (fx);
-}
-
-static void __fx_unref (__gfx_t *fx) {
-  if (--fx->refs == 0)
-    __fx_delete (fx);
-}
-
 /*
  * Remove from the list the window/event_handler
  * specified by the key.
@@ -2577,6 +2553,11 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 #ifdef ENABLE_NLS
   bindtextdomain("xitk", XITK_LOCALE);
 #endif
+
+  if (verbosity > 1) {
+    dump_host_info ();
+    dump_cpu_infos ();
+  }
 
   xitk = xitk_xmalloc (sizeof (*xitk));
   gXitk = &xitk->x;

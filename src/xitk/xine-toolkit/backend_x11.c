@@ -55,6 +55,7 @@ typedef struct _mwmhints {
 #include "_xitk.h"
 #include "xitkintl.h"
 #include "backend.h"
+#include "dump_x11.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
@@ -1983,13 +1984,6 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   d->default_screen = DefaultScreen (display);
   d->gc1 = d->gc2 = NULL;
-#if 0
-  if (d->be->be.verbosity > 1) {
-    dump_host_info ();
-    dump_cpu_infos ();
-    dump_xfree_info (display, d->default_screen, d->be->be.verbosity);
-  }
-#endif
   xitk_dnode_init (&d->d.node);
   xitk_dlist_init (&d->d.images);
   xitk_dlist_init (&d->d.windows);
@@ -2057,8 +2051,11 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   xitk_dlist_add_tail (&be->be.displays, &d->d.node);
   pthread_mutex_unlock (&be->mutex);
 
+  if (d->be->be.verbosity > 1)
+    dump_xfree_info (d->display, d->default_screen, d->be->be.verbosity);
+
   if (d->be->be.verbosity >= 2)
-    printf ("xitk.x11.display.new () = %p.\n", (void *)d);
+    printf ("xitk.x11.display.new (%p) = %p.\n", (void *)be, (void *)d);
 
   return &d->d;
 }
@@ -2072,7 +2069,7 @@ static void xitk_x11_backend_delete (xitk_backend_t **_be) {
   if (!be)
     return;
   if (be->be.verbosity >= 2)
-    printf ("xitk.be.delete (%p).\n", (void *)be);
+    printf ("xitk.x11.delete (%p).\n", (void *)be);
   pthread_mutex_lock (&be->mutex);
   if (_xitk_x11_backend_unref (be))
     pthread_mutex_unlock (&be->mutex);
@@ -2110,7 +2107,7 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
   be->be.open_display = xitk_x11_open_display;
 
   if (be->be.verbosity >= 2)
-    printf ("xitk.x11.be.new () = %p.\n", (void *)be);
+    printf ("xitk.x11.new () = %p.\n", (void *)be);
 
   return &be->be;
 }
