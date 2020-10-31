@@ -934,7 +934,8 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state) {
     set_window_states_start(gui, xwin);
   }
 
-  xitk_window_show_window(xwin, 1);
+  xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (xwin);
   xitk_window_try_to_set_input_focus(xwin);
 
   {

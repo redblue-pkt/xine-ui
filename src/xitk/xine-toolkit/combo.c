@@ -205,7 +205,8 @@ static void _combo_open (_combo_private_t *wp) {
   if (!wp->xwin)
     return;
 
-  xitk_window_set_transient_for(wp->xwin, wp->parent_wlist->win);
+  xitk_window_flags (wp->xwin, XITK_WINF_FIXED_POS, XITK_WINF_FIXED_POS);
+  xitk_window_set_transient_for_win (wp->xwin, wp->parent_wlist->xwin);
 
   wp->widget_list        = xitk_window_widget_list(wp->xwin);
 
@@ -426,7 +427,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       wp->win_y += yy;
 
       xitk_window_move_window(wp->xwin, wp->win_x, wp->win_y);
-      xitk_window_show_window(wp->xwin, 1);
+      xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+      xitk_window_raise_window (wp->xwin);
 
       xitk_window_try_to_set_input_focus(wp->xwin);
 

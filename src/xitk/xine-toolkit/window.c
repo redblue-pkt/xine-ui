@@ -398,38 +398,6 @@ void xitk_window_raise_window (xitk_window_t *xwin) {
     xwin->bewin->raise (xwin->bewin);
 }
 
-void xitk_window_show_window (xitk_window_t *xwin, int raise) {
-  if (xwin && xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_STATE, XITK_WS_NORMAL},
-      {XITK_TAG_END, 0}
-    };
-    xwin->bewin->set_props (xwin->bewin, tags);
-    if (raise)
-      xwin->bewin->raise (xwin->bewin);
-  }
-}
-
-void xitk_window_iconify_window (xitk_window_t *xwin) {
-  if (xwin && xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_STATE, XITK_WS_ICONIFIED},
-      {XITK_TAG_END, 0}
-    };
-    xwin->bewin->set_props (xwin->bewin, tags);
-  }
-}
-
-void xitk_window_hide_window (xitk_window_t *xwin) {
-  if (xwin && xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_STATE, XITK_WS_HIDDEN},
-      {XITK_TAG_END, 0}
-    };
-    xwin->bewin->set_props (xwin->bewin, tags);
-  }
-}
-
 void xitk_window_clear_window(xitk_window_t *w)
 {
   xitk_lock_display (w->xitk);
@@ -580,12 +548,13 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
       {XITK_TAG_IMAGE, xwin->bg_image ? (uintptr_t)xwin->bg_image->beimg : 0},
       {XITK_TAG_TITLE, (uintptr_t)title},
       {XITK_TAG_ICON, (uintptr_t)icon},
-      {XITK_TAG_OVERRIDE_REDIRECT, override_redirect},
+      {XITK_TAG_WIN_FLAGS, (XITK_WINF_OVERRIDE_REDIRECT << 16) | (override_redirect ? XITK_WINF_OVERRIDE_REDIRECT : 0)},
       {XITK_TAG_LAYER_ABOVE, layer_above},
       {XITK_TAG_RES_NAME, (uintptr_t)res_name},
       {XITK_TAG_RES_CLASS, (uintptr_t)res_class},
       {XITK_TAG_WIDTH, width},
       {XITK_TAG_HEIGHT, height},
+      {XITK_TAG_WIN_FLAGS, 0},
       {XITK_TAG_END, 0}
     };
     xwin->bewin = xitk->d->window_new (xitk->d, tags);
@@ -593,6 +562,7 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
       xwin->bewin->get_props (xwin->bewin, tags + 9);
       xwin->width = tags[9].value;
       xwin->height = tags[10].value;
+      xwin->flags = tags[11].value;
       xwin->bewin->data = xwin;
       xwin->window = xwin->bewin->id;
       xitk_image_ref (xwin->bg_image);
@@ -896,15 +866,35 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
   xwin->bg_image = NULL;
   xwin->window = window;
   {
-    xitk_tagitem_t tags[3] = {
+    xitk_tagitem_t tags[] = {
       {XITK_TAG_WIDTH, 0},
       {XITK_TAG_HEIGHT, 0},
+      {XITK_TAG_WIN_FLAGS, 0},
       {XITK_TAG_END, 0}
     };
     xwin->bewin->get_props (xwin->bewin, tags);
     xwin->width = tags[0].value;
     xwin->height = tags[1].value;
+    xwin->flags = tags[2].value;
   }
   return xwin;
 }
 
+uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value) {
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_WIN_FLAGS, 0},
+    {XITK_TAG_END, 0}
+  };
+
+  if (!xwin)
+    return 0;
+  if (!xwin->bewin)
+    return 0;
+
+  tags[0].value = (mask << 16) | (value & 0xffff);
+  xwin->bewin->set_props (xwin->bewin, tags);
+  xwin->bewin->get_props (xwin->bewin, tags);
+  xwin->flags = tags[0].value;
+
+  return tags[0].value & 0xffff;
+}

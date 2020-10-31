@@ -610,7 +610,8 @@ void skin_download (gGui_t *gui, char *url) {
 
     skd->widget_key = xitk_window_register_event_handler("skdloader", skd->xwin, &download_skin_event_cbs, skd);
 
-    xitk_window_show_window(skd->xwin, 1);
+    xitk_window_flags (skd->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_raise_window (skd->xwin);
     video_window_set_transient_for (gui->vwin, skd->xwin);
     layer_above_video (skd->gui, skd->xwin);
 

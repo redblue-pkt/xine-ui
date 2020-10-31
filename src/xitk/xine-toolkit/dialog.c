@@ -314,7 +314,8 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
       wd->default_button = wd->w2;
   }
 
-  xitk_window_show_window(wd->xwin, 1);
+  xitk_window_flags (wd->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (wd->xwin);
 
   if (wd->w1)
     xitk_enable_and_show_widget (wd->w1);

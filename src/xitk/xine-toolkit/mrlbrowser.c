@@ -673,7 +673,7 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
   if (wp->visible) {
     wp->visible = 0;
     xitk_hide_widgets (wp->widget_list);
-    xitk_window_hide_window (wp->xwin);
+    xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
   }
 }
 
@@ -691,7 +691,8 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
 
   wp->visible = 1;
   xitk_show_widgets (wp->widget_list);
-  xitk_window_show_window (wp->xwin, 1);
+  xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (wp->xwin);
 }
 
 /*
@@ -1134,7 +1135,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   if (mb->reparent_window)
     mb->reparent_window (mb->rw_data, wp->xwin);
   else
-    xitk_window_show_window (wp->xwin, 1);
+    xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_raise_window (wp->xwin);
 
   xitk_window_try_to_set_input_focus (wp->xwin);
 

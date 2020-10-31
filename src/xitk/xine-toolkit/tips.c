@@ -179,7 +179,8 @@ static void *_tips_loop_thread (void *data) {
 
             xitk_image_free_image (&image);
           }
-          xitk_window_show_window (xwin, 1);
+          xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+          xitk_window_raise_window (xwin);
           state = TIPS_WAIT;
         } else {
           state = TIPS_IDLE;

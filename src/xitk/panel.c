@@ -595,11 +595,11 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
     if ((vv > 0) && !panel->gui->use_root_window) {
       panel->visible = 0;
-      xitk_window_hide_window (panel->xwin);
+      xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
       xitk_hide_widgets (panel->widget_list);
     } else {
       panel->visible = 1;
-      xitk_window_iconify_window (panel->xwin);
+      xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
     }
     video_window_grab_input_focus(panel->gui->vwin);
 
@@ -609,7 +609,8 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
     panel->gui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
 
-    xitk_window_show_window(panel->xwin, 1);
+    xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_raise_window (panel->xwin);
     video_window_set_transient_for (panel->gui->vwin, panel->xwin);
 
     wait_for_window_visible (panel->xwin);
@@ -1035,15 +1036,16 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
     panel->visible = 2;
     reparent_window (panel->gui, panel->xwin);
     /* already called by reparent_window ()
-    xitk_window_show_window (panel->xwin, 1);
+    xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_raise_window (panel->xwin);
     xitk_window_try_to_set_input_focus (panel->xwin);
     */
   } else {
     if ((video_window_is_visible (panel->gui->vwin) > 0) && !panel->gui->use_root_window) {
-      xitk_window_hide_window (panel->xwin);
+      xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
       xitk_hide_widgets (panel->widget_list);
     } else {
-      xitk_window_iconify_window (panel->xwin);
+      xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
     }
   }
   panel->gui->cursor_visible = 1;
@@ -1103,7 +1105,7 @@ void panel_deinit (xui_panel_t *panel) {
 
   if (panel_is_visible (panel) > 1) {
     panel->visible = 0;
-    xitk_window_hide_window (panel->xwin);
+    xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
     xitk_hide_widgets (panel->widget_list);
   }
   panel_exit (NULL, panel);
@@ -1432,8 +1434,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
   /* NOTE: panel and video window follow a complex visibility logic.
    * defer this to panel_add_autoplay_buttons () when video win is stable. */
   panel->visible = 0;
-  /* NOTE: do this _before_ xitk_window_show_window (), and make sure to get that initial expose event
+  /* NOTE: do this _before_ xitk_window_flags (, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE), and make sure to get that initial expose event
    * handled in xitk.c - otherwise some widgets may not show until focused. */
+  xitk_window_flags (panel->xwin, XITK_WINF_TASKBAR | XITK_WINF_PAGER, XITK_WINF_TASKBAR | XITK_WINF_PAGER);
   panel->widget_key = xitk_window_register_event_handler ("panel", panel->xwin, &panel_event_cbs, panel);
 
   {

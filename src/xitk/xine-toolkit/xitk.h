@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  *
- * Unique public header file for xitk µTK.
+ * Unique public header file for xitk ÂµTK.
  *
  */
 
@@ -1283,6 +1283,21 @@ void xitk_window_set_border_size (xitk_t *_xitk, xitk_register_key_t key, int le
  */
 void xitk_window_destroy_window(xitk_window_t *w);
 
+#define XITK_WINF_VISIBLE    0x0001 /** << contents is shown on screen */
+#define XITK_WINF_ICONIFIED  0x0002 /** << window shown as icon or taskbar entry */
+#define XITK_WINF_DECORATED  0x0004 /** << window manager frame around */
+#define XITK_WINF_TASKBAR    0x0008 /** << do appear in taskbar */
+#define XITK_WINF_PAGER      0x0010 /** << do appear in alt-tab */
+#define XITK_WINF_MAX_X      0x0020 /** << maximized width */
+#define XITK_WINF_MAX_Y      0x0040 /** << maximized height */
+#define XITK_WINF_FULLSCREEN 0x0080 /** << full screen size */
+#define XITK_WINF_FOCUS      0x0100 /** << input goes here */
+#define XITK_WINF_OVERRIDE_REDIRECT 0x0200
+#define XITK_WINF_FIXED_POS  0x0400 /** << user may _not_ click move */
+#define XITK_WINF_FENCED_IN  0x0800 /** << always stay on screen cmpletely */
+/** try to set the flags in mask to value, return new flags. */
+uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value);
+
 /**
  *
  */
@@ -1357,17 +1372,10 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
 /*
  *
  */
-void xitk_window_show_window(xitk_window_t *w, int raise);
 void xitk_window_raise_window(xitk_window_t *w);
-void xitk_window_hide_window(xitk_window_t *w);
 
 void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin);
-
-/*
- *
- */
-void xitk_window_iconify_window(xitk_window_t *w);
 
 /*
  *
