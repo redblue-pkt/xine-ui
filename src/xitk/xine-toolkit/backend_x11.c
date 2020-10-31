@@ -79,6 +79,29 @@ typedef enum {
   XITK_A__MOTIF_WM_HINTS,
   XITK_A_WM_STATE,
   XITK_A_DELETE_WINDOW,
+  XITK_A__NET_WM_NAME,
+  XITK_A__NET_WM_WINDOW_TYPE,
+  XITK_A__NET_WM_WINDOW_TYPE_DESKTOP,
+  XITK_A__NET_WM_WINDOW_TYPE_DOCK,
+  XITK_A__NET_WM_WINDOW_TYPE_TOOLBAR,
+  XITK_A__NET_WM_WINDOW_TYPE_MENU,
+  XITK_A__NET_WM_WINDOW_TYPE_UTILITY,
+  XITK_A__NET_WM_WINDOW_TYPE_SPLASH,
+  XITK_A__NET_WM_WINDOW_TYPE_DIALOG,
+  XITK_A__NET_WM_WINDOW_TYPE_NORMAL,
+  XITK_A__NET_WM_STATE,
+  XITK_A__NET_WM_STATE_MODAL,
+  XITK_A__NET_WM_STATE_STICKY,
+  XITK_A__NET_WM_STATE_MAXIMIZED_VERT,
+  XITK_A__NET_WM_STATE_MAXIMIZED_HORZ,
+  XITK_A__NET_WM_STATE_SHADED,
+  XITK_A__NET_WM_STATE_SKIP_TASKBAR,
+  XITK_A__NET_WM_STATE_SKIP_PAGER,
+  XITK_A__NET_WM_STATE_HIDDEN,
+  XITK_A__NET_WM_STATE_FULLSCREEN,
+  XITK_A__NET_WM_STATE_ABOVE,
+  XITK_A__NET_WM_STATE_BELOW,
+  XITK_A__NET_WM_STATE_DEMANDS_ATTENTION,
   XITK_A_LAST
 } xitk_x11_atoms_t;
 
@@ -98,6 +121,7 @@ typedef enum {
   XITK_A_length,
   XITK_A_targets,
   XITK_A_multiple,
+  XITK_A__NET_SUPPORTING_WM_CHECK,
   XITK_A_clip_end
 } xitk_x11_clip_atom_t;
 
@@ -112,9 +136,7 @@ typedef enum {
   XITK_X11_WT_TRANSIENT_FOR,
   XITK_X11_WT_WRAP,
   XITK_X11_WT_ICON,
-  XITK_X11_WT_STATE,
-  XITK_X11_WT_BORDER,
-  XITK_X11_WT_OVERRIDE_REDIRECT,
+  XITK_X11_WT_WIN_FLAGS,
   XITK_X11_WT_LAYER_ABOVE,
   XITK_X11_WT_TITLE,
   XITK_X11_WT_RES_NAME,
@@ -134,9 +156,7 @@ static const xitk_tagitem_t _xitk_x11_window_defaults[XITK_X11_WT_LAST] = {
   [XITK_X11_WT_TRANSIENT_FOR] = {XITK_TAG_TRANSIENT_FOR, (uintptr_t)NULL},
   [XITK_X11_WT_WRAP]          = {XITK_TAG_WRAP, None},
   [XITK_X11_WT_ICON]          = {XITK_TAG_ICON, (uintptr_t)NULL},
-  [XITK_X11_WT_STATE]         = {XITK_TAG_STATE, XITK_WS_HIDDEN},
-  [XITK_X11_WT_BORDER]        = {XITK_TAG_BORDER, 0},
-  [XITK_X11_WT_OVERRIDE_REDIRECT] = {XITK_TAG_OVERRIDE_REDIRECT, 0},
+  [XITK_X11_WT_WIN_FLAGS]     = {XITK_TAG_WIN_FLAGS, 0},
   [XITK_X11_WT_LAYER_ABOVE]   = {XITK_TAG_LAYER_ABOVE, 0},
   [XITK_X11_WT_TITLE]         = {XITK_TAG_TITLE, 0},
   [XITK_X11_WT_RES_NAME]      = {XITK_TAG_RES_NAME, (uintptr_t)NULL},
@@ -787,7 +807,8 @@ static void _xitk_x11_clipboard_init (xitk_x11_display_t *d) {
     [XITK_A_clipboard]   = "CLIPBOARD",
     [XITK_A_length]      = "LENGTH",
     [XITK_A_targets]     = "TARGETS",
-    [XITK_A_multiple]    = "MULTIPLE"
+    [XITK_A_multiple]    = "MULTIPLE",
+    [XITK_A__NET_SUPPORTING_WM_CHECK] = "_NET_SUPPORTING_WM_CHECK"
   };
 
   d->clipboard.text = NULL;
@@ -1114,6 +1135,229 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
   return len;
 }
 
+static void _xitk_x11_window_debug_flags (const char *s1, const char *s2, uint32_t flags) {
+  char buf[2000], *b = buf, *e = b + sizeof (buf);
+
+  b += strlcpy (b, "xitk.x11.window.flags.", e - b);
+  b += strlcpy (b, s1, e - b);
+  b += strlcpy (b, " (", e - b);
+  b += strlcpy (b, s2, e - b);
+  b += strlcpy (b, "): ", e - b);
+  if (flags & XITK_WINF_VISIBLE)
+    b += strlcpy (b, "visible ", e - b);
+  if (flags & XITK_WINF_ICONIFIED)
+    b += strlcpy (b, "iconified ", e - b);
+  if (flags & XITK_WINF_DECORATED)
+    b += strlcpy (b, "decorated ", e - b);
+  if (flags & XITK_WINF_TASKBAR)
+    b += strlcpy (b, "taskbar ", e - b);
+  if (flags & XITK_WINF_PAGER)
+    b += strlcpy (b, "pager ", e - b);
+  if (flags & XITK_WINF_MAX_X)
+    b += strlcpy (b, "max_x ", e - b);
+  if (flags & XITK_WINF_MAX_Y)
+    b += strlcpy (b, "max_y ", e - b);
+  if (flags & XITK_WINF_FULLSCREEN)
+    b += strlcpy (b, "fullscreen ", e - b);
+  if (flags & XITK_WINF_FOCUS)
+    b += strlcpy (b, "focus ", e - b);
+  if (flags & XITK_WINF_OVERRIDE_REDIRECT)
+    b += strlcpy (b, "override_redirect ", e - b);
+  if (flags & XITK_WINF_FIXED_POS)
+    b += strlcpy (b, "fixed_pos ", e - b);
+  if (flags & XITK_WINF_FENCED_IN)
+    b += strlcpy (b, "fenced_in ", e - b);
+  b += strlcpy (b, ".\n", e - b);
+  printf ("%s", buf);
+}
+
+static uint32_t _xitk_x11_window_merge_flags (uint32_t f1, uint32_t f2) {
+  uint32_t mask, res;
+
+  mask = f2 & 0xffff0000;
+  res = f1 | mask;
+  mask >>= 16;
+  res = (f1 & ~mask) | (f2 & mask);
+  return res;
+}
+
+static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_value) {
+  xitk_x11_display_t *d = win->d;
+  XWindowAttributes attr;
+  Atom type, buf[32];
+  int fmt;
+  unsigned long nitem, rest;
+  uint32_t oldflags, newflags, diff, mask, set, have;
+
+  mask = mask_and_value >> 16;
+  mask_and_value &= 0xffff;
+  have = 0;
+  oldflags = win->props[XITK_X11_WT_WIN_FLAGS].value;
+
+  attr.root = None;
+  if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
+    oldflags &= ~(XITK_WINF_VISIBLE | XITK_WINF_OVERRIDE_REDIRECT);
+    have |= XITK_WINF_VISIBLE | XITK_WINF_OVERRIDE_REDIRECT;
+    win->props[XITK_X11_WT_X].value = attr.x;
+    win->props[XITK_X11_WT_Y].value = attr.y;
+    win->props[XITK_X11_WT_W].value = attr.width;
+    win->props[XITK_X11_WT_H].value = attr.height;
+    oldflags |= attr.map_state == IsUnmapped ? 0 : XITK_WINF_VISIBLE;
+    oldflags |= attr.override_redirect == False ? 0 : XITK_WINF_OVERRIDE_REDIRECT;
+  }
+
+  if (XGetWindowProperty (d->display, win->w.id, d->atoms[XITK_A__NET_WM_STATE], 0, sizeof (buf),
+    False, d->atoms[XITK_A_atom], &type, &fmt, &nitem, &rest, (unsigned char **)buf)) {
+    uint32_t u;
+
+    oldflags &= ~(XITK_WINF_FULLSCREEN | XITK_WINF_MAX_X | XITK_WINF_MAX_Y);
+    oldflags |= XITK_WINF_TASKBAR | XITK_WINF_PAGER;
+    for (u = 0; u < nitem; u++) {
+      if (buf[u] == d->atoms[XITK_A__NET_WM_STATE_FULLSCREEN]) {
+        oldflags |= XITK_WINF_FULLSCREEN;
+      } else if (buf[u] == d->atoms[XITK_A__NET_WM_STATE_SKIP_TASKBAR]) {
+        oldflags &= ~XITK_WINF_TASKBAR;
+      } else if (buf[u] == d->atoms[XITK_A__NET_WM_STATE_SKIP_PAGER]) {
+        oldflags &= ~XITK_WINF_PAGER;
+      } else if (buf[u] == d->atoms[XITK_A__NET_WM_STATE_MAXIMIZED_HORZ]) {
+        oldflags |= XITK_WINF_MAX_X;
+      } else if (buf[u] == d->atoms[XITK_A__NET_WM_STATE_MAXIMIZED_VERT]) {
+        oldflags |= XITK_WINF_MAX_Y;
+      }
+    }
+    set = 0;
+  } else {
+    oldflags |= XITK_WINF_TASKBAR | XITK_WINF_PAGER;
+    set = 1;
+  }
+  have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
+
+  have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN;
+  if (d->be->be.verbosity >= 2)
+    _xitk_x11_window_debug_flags ("before", win->title, oldflags);
+
+  newflags = (oldflags & ~mask) | (mask_and_value & mask);
+  diff = newflags ^ oldflags;
+  if (set || diff) {
+    d->d.lock (&d->d);
+    if (diff & XITK_WINF_VISIBLE) {
+      if (newflags & XITK_WINF_VISIBLE)
+        XMapWindow (d->display, win->w.id);
+      else
+        XUnmapWindow (d->display, win->w.id);
+    }
+    if (diff & XITK_WINF_ICONIFIED) {
+      if (newflags & XITK_WINF_ICONIFIED)
+        XIconifyWindow (d->display, win->w.id, d->be->be.xitk->imlibdata->x.screen);
+      else
+        XMapWindow (d->display, win->w.id);
+    }
+    if (diff & XITK_WINF_DECORATED) {
+        MWMHints mwmhints;
+
+      memset (&mwmhints, 0, sizeof (mwmhints));
+      mwmhints.flags = MWM_HINTS_DECORATIONS;
+      mwmhints.decorations = (newflags & XITK_WINF_DECORATED) ? 1 : 0;
+      XChangeProperty (d->display, win->w.id, d->atoms[XITK_A__MOTIF_WM_HINTS], d->atoms[XITK_A__MOTIF_WM_HINTS], 32,
+        PropModeReplace, (unsigned char *) &mwmhints, PROP_MWM_HINTS_ELEMENTS);
+    }
+    if (diff & XITK_WINF_FULLSCREEN) {
+        XEvent msg;
+
+        msg.xclient.type = ClientMessage;
+        msg.xclient.serial = 0;
+        msg.xclient.send_event = 1;
+        msg.xclient.window = win->w.id;
+        msg.xclient.message_type = d->atoms[XITK_A__NET_WM_STATE];
+        msg.xclient.format = 32;
+        msg.xclient.data.l[0] = (newflags & XITK_WINF_FULLSCREEN) ? 1 : 0;
+        msg.xclient.data.l[1] = d->atoms[XITK_A__NET_WM_STATE_FULLSCREEN];
+        msg.xclient.data.l[2] = None;
+        msg.xclient.data.l[3] = 1; /* from plain spplication */
+        msg.xclient.data.l[4] = 0;
+        XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
+    }
+    if (diff & XITK_WINF_TASKBAR) {
+        XEvent msg;
+
+        msg.xclient.type = ClientMessage;
+        msg.xclient.serial = 0;
+        msg.xclient.send_event = 1;
+        msg.xclient.window = win->w.id;
+        msg.xclient.message_type = d->atoms[XITK_A__NET_WM_STATE];
+        msg.xclient.format = 32;
+        msg.xclient.data.l[0] = (newflags & XITK_WINF_TASKBAR) ? 0 : 1;
+        msg.xclient.data.l[1] = d->atoms[XITK_A__NET_WM_STATE_SKIP_TASKBAR];
+        msg.xclient.data.l[2] = None;
+        msg.xclient.data.l[3] = 1; /* from plain spplication */
+        msg.xclient.data.l[4] = 0;
+        XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
+    }
+    if (diff & XITK_WINF_PAGER) {
+        XEvent msg;
+
+        msg.xclient.type = ClientMessage;
+        msg.xclient.serial = 0;
+        msg.xclient.send_event = 1;
+        msg.xclient.window = win->w.id;
+        msg.xclient.message_type = d->atoms[XITK_A__NET_WM_STATE];
+        msg.xclient.format = 32;
+        msg.xclient.data.l[0] = (newflags & XITK_WINF_PAGER) ? 0 : 1;
+        msg.xclient.data.l[1] = d->atoms[XITK_A__NET_WM_STATE_SKIP_PAGER];
+        msg.xclient.data.l[2] = None;
+        msg.xclient.data.l[3] = 1; /* from plain spplication */
+        msg.xclient.data.l[4] = 0;
+        XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
+    }
+    if (diff & XITK_WINF_MAX_X) {
+        XEvent msg;
+
+        msg.xclient.type = ClientMessage;
+        msg.xclient.serial = 0;
+        msg.xclient.send_event = 1;
+        msg.xclient.window = win->w.id;
+        msg.xclient.message_type = d->atoms[XITK_A__NET_WM_STATE];
+        msg.xclient.format = 32;
+        msg.xclient.data.l[0] = (newflags & XITK_WINF_MAX_X) ? 1 : 0;
+        msg.xclient.data.l[1] = d->atoms[XITK_A__NET_WM_STATE_MAXIMIZED_HORZ];
+        msg.xclient.data.l[2] = None;
+        if ((diff & XITK_WINF_MAX_Y) && !(((newflags << 1) ^ newflags) & XITK_WINF_MAX_Y)) {
+          diff &= ~XITK_WINF_MAX_Y;
+          msg.xclient.data.l[2] = d->atoms[XITK_A__NET_WM_STATE_MAXIMIZED_VERT];
+        }
+        msg.xclient.data.l[3] = 1; /* from plain spplication */
+        msg.xclient.data.l[4] = 0;
+        XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
+    }
+    if (diff & XITK_WINF_MAX_Y) {
+        XEvent msg;
+
+        msg.xclient.type = ClientMessage;
+        msg.xclient.serial = 0;
+        msg.xclient.send_event = 1;
+        msg.xclient.window = win->w.id;
+        msg.xclient.message_type = d->atoms[XITK_A__NET_WM_STATE];
+        msg.xclient.format = 32;
+        msg.xclient.data.l[0] = (newflags & XITK_WINF_MAX_Y) ? 1 : 0;
+        msg.xclient.data.l[1] = d->atoms[XITK_A__NET_WM_STATE_MAXIMIZED_VERT];
+        msg.xclient.data.l[2] = None;
+        msg.xclient.data.l[3] = 1; /* from plain spplication */
+        msg.xclient.data.l[4] = 0;
+        XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
+    }
+    if (diff & XITK_WINF_FOCUS) {
+      if (newflags & XITK_WINF_FOCUS)
+        XSetInputFocus (d->display, win->w.id, RevertToParent, CurrentTime);
+    }
+    XSync (d->display, False);
+    d->d.unlock (&d->d);
+  }
+
+  if (d->be->be.verbosity >= 2)
+    _xitk_x11_window_debug_flags ("after", win->title, newflags);
+  win->props[XITK_X11_WT_WIN_FLAGS].value = newflags | (have << 16);
+}
+
 static int xitk_x11_window_get_props (xitk_be_window_t *_win, xitk_tagitem_t *taglist) {
   xitk_x11_window_t *win;
 
@@ -1204,26 +1448,9 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     win->props[XITK_X11_WT_TRANSIENT_FOR].value = props[XITK_X11_WT_TRANSIENT_FOR].value;
   }
 
-  if (props[XITK_X11_WT_STATE].value != win->props[XITK_X11_WT_STATE].value) {
-    d->d.lock (&d->d);
-    switch (props[XITK_X11_WT_STATE].value) {
-      case XITK_WS_HIDDEN:
-        XUnmapWindow (d->display, win->w.id);
-        break;
-      case XITK_WS_NORMAL:
-        XMapWindow (d->display, win->w.id);
-        XClearWindow (d->display, win->w.id);
-        break;
-      case XITK_WS_MAXIMIZED:
-        XMapWindow (d->display, win->w.id);
-        break;
-      case XITK_WS_ICONIFIED:
-        XIconifyWindow (d->display, win->w.id, d->be->be.xitk->imlibdata->x.screen);
-        break;
-    }
-    win->props[XITK_X11_WT_STATE].value = props[XITK_X11_WT_STATE].value;
-    d->d.unlock (&d->d);
-  }
+  if ((props[XITK_X11_WT_WIN_FLAGS].value ^ win->props[XITK_X11_WT_WIN_FLAGS].value)
+    & (props[XITK_X11_WT_WIN_FLAGS].value >> 16))
+    _xitk_x11_window_flags (win, props[XITK_X11_WT_WIN_FLAGS].value);
 
   return res;
 }
@@ -1364,16 +1591,23 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
   xitk_dnode_remove (&win->w.node);
   pthread_mutex_unlock (&d->mutex);
 
+  win->w.display = &d->d;
+  win->d = d;
+
   memcpy (win->props, _xitk_x11_window_defaults, sizeof (win->props));
   win->props[XITK_X11_WT_TITLE].value = (uintptr_t)win->title;
   strcpy (win->title, "xiTK Window");
   xitk_tags_get (taglist, win->props);
+  win->props[XITK_X11_WT_WIN_FLAGS].value = _xitk_x11_window_merge_flags (
+    win->props[XITK_X11_WT_WRAP].value != None ?
+    ((XITK_WINF_DECORATED << 16) | XITK_WINF_DECORATED) :
+    (0xffff0000 | XITK_WINF_OVERRIDE_REDIRECT),
+    win->props[XITK_X11_WT_WIN_FLAGS].value);
 
   do {
     long        data[1];
     XClassHint *xclasshint;
     XWMHints   *wm_hint;
-    MWMHints   mwmhints;
 
     if (win->props[XITK_X11_WT_WRAP].value != None) {
       Window        rootwin;
@@ -1448,7 +1682,8 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       hint.win_gravity     = NorthWestGravity;
       hint.flags           = PWinGravity | PBaseSize | PMinSize | PMaxSize | USSize | USPosition;
 
-      attr.override_redirect = win->props[XITK_X11_WT_OVERRIDE_REDIRECT].value ? True : False;
+      attr.override_redirect = (win->props[XITK_X11_WT_WIN_FLAGS].value & XITK_WINF_OVERRIDE_REDIRECT) ? True : False;
+      win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_OVERRIDE_REDIRECT << 16);
       attr.background_pixel  =
       attr.border_pixel      = xitk_get_cfg_num (d->be->be.xitk, XITK_BLACK_COLOR);
       attr.colormap          = Imlib_get_colormap (d->be->be.xitk->imlibdata);
@@ -1465,16 +1700,10 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       }
       XmbSetWMProperties (d->display, win->w.id, win->title, win->title, NULL, 0, &hint, NULL, NULL);
     
-      memset (&mwmhints, 0, sizeof (mwmhints));
-      mwmhints.flags = MWM_HINTS_DECORATIONS;
-      mwmhints.decorations = 0;
-      XChangeProperty (d->display, win->w.id, d->atoms[XITK_A__MOTIF_WM_HINTS], d->atoms[XITK_A__MOTIF_WM_HINTS], 32,
-        PropModeReplace, (unsigned char *) &mwmhints, PROP_MWM_HINTS_ELEMENTS);
-
       data[0] = 10;
       XChangeProperty (d->display, win->w.id, d->atoms[XITK_A_WIN_LAYER], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
     }
-    
+
     XSelectInput (d->display, win->w.id, INPUT_MOTION | KeymapStateMask);
 
     XSetWMProtocols (d->display, win->w.id, &d->atoms[XITK_A_DELETE_WINDOW], 1);
@@ -1514,6 +1743,9 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
         XFree (wm_hint);
       }
     }
+
+    _xitk_x11_window_flags (win, win->props[XITK_X11_WT_WIN_FLAGS].value);
+
     win->gc = XCreateGC (d->display, win->w.id, 0, NULL);
     d->d.unlock (&d->d);
 #if 0
@@ -1522,7 +1754,6 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
 #endif
     win->w.magic = _XITK_X11_WINDOW_MAGIC;
     win->w.type = XITK_BE_TYPE_X11;
-    win->w.display = &d->d;
     win->w.data = NULL;
     win->w._delete = xitk_x11_window_delete;
     win->w.get_props = xitk_x11_window_get_props;
@@ -1531,7 +1762,6 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
     win->w.set_clip_utf8 = xitk_x11_window_set_utf8;
     win->w.copy_rect = xitk_x11_window_copy_rect;
     win->w.raise = xitk_x11_window_raise;
-    win->d = d;
 
     pthread_mutex_lock (&d->mutex);
     d->refs += 1;
@@ -1680,6 +1910,8 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       break;
 
     case FocusIn:
+      if (win)
+        win->props[XITK_X11_WT_WIN_FLAGS].value |= XITK_WINF_FOCUS;
       event->type = XITK_EV_FOCUS;
       event->qual = 0;
       event->x = 0;
@@ -1689,6 +1921,8 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       break;
 
     case FocusOut:
+      if (win)
+        win->props[XITK_X11_WT_WIN_FLAGS].value &= ~XITK_WINF_FOCUS;
       event->type = XITK_EV_UNFOCUS;
       event->qual = 0;
       event->x = 0;
@@ -2031,7 +2265,32 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
       [XITK_A_WIN_LAYER]       = "_WIN_LAYER",
       [XITK_A__MOTIF_WM_HINTS] = "_MOTIF_WM_HINTS",
       [XITK_A_WM_STATE]        = "WM_STATE",
-      [XITK_A_DELETE_WINDOW]   = "WM_DELETE_WINDOW"
+      [XITK_A_DELETE_WINDOW]   = "WM_DELETE_WINDOW",
+      [XITK_A__NET_WM_NAME]    = "_NET_WM_NAME",
+
+      [XITK_A__NET_WM_WINDOW_TYPE]         = "_NET_WM_WINDOW_TYPE",
+      [XITK_A__NET_WM_WINDOW_TYPE_DESKTOP] = "_NET_WM_WINDOW_TYPE_DESKTOP",
+      [XITK_A__NET_WM_WINDOW_TYPE_DOCK]    = "_NET_WM_WINDOW_TYPE_DOCK",
+      [XITK_A__NET_WM_WINDOW_TYPE_TOOLBAR] = "_NET_WM_WINDOW_TYPE_TOOLBAR",
+      [XITK_A__NET_WM_WINDOW_TYPE_MENU]    = "_NET_WM_WINDOW_TYPE_MENU",
+      [XITK_A__NET_WM_WINDOW_TYPE_UTILITY] = "_NET_WM_WINDOW_TYPE_UTILITY",
+      [XITK_A__NET_WM_WINDOW_TYPE_SPLASH]  = "_NET_WM_WINDOW_TYPE_SPLASH",
+      [XITK_A__NET_WM_WINDOW_TYPE_DIALOG]  = "_NET_WM_WINDOW_TYPE_DIALOG",
+      [XITK_A__NET_WM_WINDOW_TYPE_NORMAL]  = "_NET_WM_WINDOW_TYPE_NORMAL",
+
+      [XITK_A__NET_WM_STATE]               = "_NET_WM_STATE",
+      [XITK_A__NET_WM_STATE_MODAL]         = "_NET_WM_STATE_MODAL",
+      [XITK_A__NET_WM_STATE_STICKY]        = "_NET_WM_STATE_STICKY",
+      [XITK_A__NET_WM_STATE_MAXIMIZED_VERT]= "_NET_WM_STATE_MAXIMIZED_VERT",
+      [XITK_A__NET_WM_STATE_MAXIMIZED_HORZ]= "_NET_WM_STATE_MAXIMIZED_HORZ",
+      [XITK_A__NET_WM_STATE_SHADED]        = "_NET_WM_STATE_SHADED",
+      [XITK_A__NET_WM_STATE_SKIP_TASKBAR]  = "_NET_WM_STATE_SKIP_TASKBAR",
+      [XITK_A__NET_WM_STATE_SKIP_PAGER]    = "_NET_WM_STATE_SKIP_PAGER",
+      [XITK_A__NET_WM_STATE_HIDDEN]        = "_NET_WM_STATE_HIDDEN",
+      [XITK_A__NET_WM_STATE_FULLSCREEN]    = "_NET_WM_STATE_FULLSCREEN",
+      [XITK_A__NET_WM_STATE_ABOVE]         = "_NET_WM_STATE_ABOVE",
+      [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
+      [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION"
     };
     d->d.lock (&d->d);
     XInternAtoms (d->display, (char **)names, XITK_A_LAST, False, d->atoms);
@@ -2111,4 +2370,3 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
 
   return &be->be;
 }
-

@@ -60,8 +60,7 @@ typedef enum {
   XITK_TAG_PARENT,  /* xitk_be_window_t * */
   XITK_TAG_TRANSIENT_FOR,  /* xitk_be_window_t * */
   XITK_TAG_STATE,   /* xitk_be_window_state_t * */
-  XITK_TAG_BORDER,  /* bool */
-  XITK_TAG_OVERRIDE_REDIRECT,  /* bool */
+  XITK_TAG_WIN_FLAGS, /* XITK_WINF_* */
   XITK_TAG_MASK,    /* xitk_be_mask_t */
   XITK_TAG_FILEBUF, /* const char * */
   XITK_TAG_FILESIZE,/* size_t */
@@ -224,3 +223,4 @@ struct xitk_backend_s {
   xitk_be_display_t *(*open_display) (xitk_backend_t *be, const char *name, int use_lock, int use_sync);
 };
 #endif
+

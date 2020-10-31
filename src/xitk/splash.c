@@ -74,7 +74,8 @@ void splash_create(void) {
         _("xine Splash"), NULL, "xine", 0, 1, gGui->icon, xim);
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
 
-    xitk_window_show_window (xwin, 1);
+    xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_raise_window (xwin);
 
     xitk_image_free_image(&xim);
   }
@@ -85,7 +86,7 @@ void splash_create(void) {
 void splash_destroy(void) {
 
   if(xwin) {
-    xitk_window_hide_window(xwin);
+    xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
     xitk_window_destroy_window(xwin);
     xwin = NULL;
   }

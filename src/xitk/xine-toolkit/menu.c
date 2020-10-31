@@ -573,7 +573,8 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
   mw->key = xitk_window_register_event_handler("xitk menu", mw->xwin, NULL, mw);
 
-  xitk_window_show_window(xwin, 1);
+  xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (xwin);
   xitk_window_try_to_set_input_focus(xwin);
 
   if (!(xitk_get_wm_type (wp->w.wl->xitk) & WM_TYPE_KWIN))

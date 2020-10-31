@@ -267,6 +267,7 @@ struct __xitk_s {
   int                         display_height;
   int                         verbosity;
   xitk_dlist_t                gfxs;
+  __gfx_t                    *backdrop;
   int                         use_xshm;
   int                         install_colormap;
 
@@ -1705,6 +1706,56 @@ void xitk_ungrab_pointer(void) {
   xitk_unlock_display (&xitk->x);
 }
 
+static void _xitk_window_apply_backdrop (__xitk_t *xitk, __gfx_t *fx) {
+  if (fx->wl.xwin && fx->wl.xwin->bewin) {
+    xitk_tagitem_t tags[] = {
+      {XITK_TAG_TRANSIENT_FOR, (uintptr_t)(xitk->backdrop ? xitk->backdrop->wl.xwin->bewin : NULL)},
+      {XITK_TAG_END, 0}
+    };
+
+    fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
+  }
+}
+
+void xitk_window_set_as_backdrop (xitk_window_t *xwin) {
+  __xitk_t *xitk;
+  __gfx_t *fx, *bd;
+
+  if (!xwin)
+    return;
+  xitk_container (xitk, xwin->xitk, x);
+  if (!xitk)
+    return;
+
+  {
+    xitk_widget_list_t *wl = xitk_window_widget_list (xwin);
+
+    if (!wl)
+      return;
+    xitk_container (bd, wl, wl);
+  }
+  if (!xwin->bewin)
+    bd = NULL;
+
+  MUTLOCK ();
+  if (xitk->backdrop != bd) {
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+      xitk_be_window_t *bwin = (fx == bd) ? NULL : xwin->bewin;
+
+      if (fx->wl.xwin && fx->wl.xwin->bewin) {
+        xitk_tagitem_t tags[] = {
+          {XITK_TAG_TRANSIENT_FOR, (uintptr_t)bwin},
+          {XITK_TAG_END, 0}
+        };
+
+        fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
+      }
+    }
+    xitk->backdrop = bd;
+  }
+  MUTUNLOCK ();
+}
+
 /*
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.
@@ -1909,6 +1960,7 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   }
 
   MUTLOCK ();
+  _xitk_window_apply_backdrop (xitk, fx);
   fx->key = ++xitk->key;
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
   MUTUNLOCK ();
@@ -2316,6 +2368,8 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
             event->xbutton.x, event->xbutton.y, event->xbutton.button, 0, modifier);
           if (event->xbutton.button != Button1)
             fx->move.enabled = 0;
+          if (fx->wl.xwin && (fx->wl.xwin->flags & XITK_WINF_FIXED_POS))
+            fx->move.enabled = 0;
 
           if ((event->xbutton.button == Button4) || (event->xbutton.button == Button5)) {
             if (fx->wl.widget_focused) {
@@ -2606,6 +2660,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   }
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
+  xitk->backdrop        = NULL;
   xitk->key             = 0;
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;

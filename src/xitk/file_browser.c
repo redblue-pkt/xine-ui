@@ -384,7 +384,8 @@ static void fb_create_input_window(char *title, char *text,
     fne->widget_key = xitk_window_register_event_handler(buffer, fne->xwin, &fne_event_cbs, fne);
   }
 
-  xitk_window_show_window(fne->xwin, 1);
+  xitk_window_flags (fne->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (fne->xwin);
 
   video_window_set_transient_for (fb->gui->vwin, fne->xwin);
   layer_above_video (fb->gui, fne->xwin);
