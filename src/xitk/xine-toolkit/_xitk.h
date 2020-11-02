@@ -258,11 +258,12 @@ struct xitk_window_s {
   xitk_window_t            *win_parent;
   int                       width;
   int                       height;
+  xitk_window_role_t        role;
   uint32_t                  flags;
   xitk_widget_list_t       *widget_list;
 };
 
-xitk_t *xitk_window_get_xitk (xitk_window_t *w);
+void xitk_window_update_tree (xitk_window_t *xwin);
 
 Pixmap xitk_window_get_background(xitk_window_t *w);
 #ifdef YET_UNUSED

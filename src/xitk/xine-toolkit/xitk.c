@@ -267,7 +267,6 @@ struct __xitk_s {
   int                         display_height;
   int                         verbosity;
   xitk_dlist_t                gfxs;
-  __gfx_t                    *backdrop;
   int                         use_xshm;
   int                         install_colormap;
 
@@ -1706,20 +1705,14 @@ void xitk_ungrab_pointer(void) {
   xitk_unlock_display (&xitk->x);
 }
 
-static void _xitk_window_apply_backdrop (__xitk_t *xitk, __gfx_t *fx) {
-  if (fx->wl.xwin && fx->wl.xwin->bewin) {
-    xitk_tagitem_t tags[] = {
-      {XITK_TAG_TRANSIENT_FOR, (uintptr_t)(xitk->backdrop ? xitk->backdrop->wl.xwin->bewin : NULL)},
-      {XITK_TAG_END, 0}
-    };
-
-    fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
-  }
-}
-
-void xitk_window_set_as_backdrop (xitk_window_t *xwin) {
+void xitk_window_update_tree (xitk_window_t *xwin) {
   __xitk_t *xitk;
-  __gfx_t *fx, *bd;
+  __gfx_t *fx, *_main = NULL, *vice = NULL, *trans;
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_TRANSIENT_FOR, (uintptr_t)NULL},
+    {XITK_TAG_WIN_FLAGS, 0},
+    {XITK_TAG_END, 0}
+  };
 
   if (!xwin)
     return;
@@ -1727,32 +1720,64 @@ void xitk_window_set_as_backdrop (xitk_window_t *xwin) {
   if (!xitk)
     return;
 
-  {
-    xitk_widget_list_t *wl = xitk_window_widget_list (xwin);
-
-    if (!wl)
-      return;
-    xitk_container (bd, wl, wl);
-  }
-  if (!xwin->bewin)
-    bd = NULL;
-
   MUTLOCK ();
-  if (xitk->backdrop != bd) {
-    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
-      xitk_be_window_t *bwin = (fx == bd) ? NULL : xwin->bewin;
 
-      if (fx->wl.xwin && fx->wl.xwin->bewin) {
-        xitk_tagitem_t tags[] = {
-          {XITK_TAG_TRANSIENT_FOR, (uintptr_t)bwin},
-          {XITK_TAG_END, 0}
-        };
-
-        fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
+  if (xitk->verbosity >= 2) {
+    xitk_container (fx, xwin->widget_list, wl);
+    if (fx)
+        printf ("xitk.window.update_tree (%s).\n", fx->name);
+  }
+  /* find latest main and vice. */
+  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+    if (fx->wl.xwin && fx->wl.xwin->bewin) {
+      if (fx->wl.xwin->role == XITK_WR_MAIN) {
+        _main = fx;
+      } else if (fx->wl.xwin->role == XITK_WR_VICE) {
+        vice = fx;
       }
     }
-    xitk->backdrop = bd;
   }
+  /* find new transient for win (NULL = root). */
+  trans = (_main && ((_main->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE))
+        ? _main : NULL;
+  /* take action. */
+  if ((_main && (_main->wl.xwin == xwin)) || (vice && (vice->wl.xwin == xwin))) {
+    /* main or vice changed, adjust all. */
+    if (vice) {
+      xitk_dnode_remove (&vice->wl.node);
+      xitk_dlist_add_head (&xitk->gfxs, &vice->wl.node);
+    }
+    if (_main) {
+      xitk_dnode_remove (&_main->wl.node);
+      xitk_dlist_add_head (&xitk->gfxs, &_main->wl.node);
+    }
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+      if (!fx->wl.xwin)
+        continue;
+      if (!fx->wl.xwin->bewin)
+        continue;
+      tags[0].value = (uintptr_t)(((fx == _main) || !trans) ? NULL : trans->wl.xwin->bewin);
+      tags[1].value = ((fx == _main) || !vice) ? 0
+                    : ((vice->wl.xwin->flags & 0xffff) | ((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16));
+      fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
+      fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
+      fx->wl.xwin->flags = tags[1].value;
+      if ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE)
+        fx->wl.xwin->bewin->raise (fx->wl.xwin->bewin);
+      if ((fx != _main) && (fx != vice))
+        fx->wl.xwin->role = XITK_WR_HELPER;
+    }
+  } else {
+    /* do just this 1. */
+    if (xwin->bewin) {
+      tags[0].value = (uintptr_t)(trans ? trans->wl.xwin->bewin : NULL);
+      tags[1].value = 0;
+      xwin->bewin->set_props (xwin->bewin, tags);
+      xwin->bewin->get_props (xwin->bewin, tags);
+      xwin->flags = tags[1].value;
+    }
+  }
+
   MUTUNLOCK ();
 }
 
@@ -1891,7 +1916,7 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   //  printf("%s()\n", __FUNCTION__);
 
   ABORT_IF_NULL (w);
-  _xitk = xitk_window_get_xitk (w);
+  _xitk = w ? w->xitk : NULL;
   if (!_xitk && wl)
     _xitk = wl->xitk;
   if (!_xitk)
@@ -1960,7 +1985,6 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   }
 
   MUTLOCK ();
-  _xitk_window_apply_backdrop (xitk, fx);
   fx->key = ++xitk->key;
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
   MUTUNLOCK ();
@@ -2154,6 +2178,16 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
     case SelectionRequest:
       _xitk_clipboard_event (xitk, event);
       handled = 1;
+      break;
+
+    case MapNotify:
+      if (fx && fx->wl.xwin && ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) != XITK_WINF_VISIBLE))
+        xitk_window_update_tree (fx->wl.xwin);
+      break;
+
+    case UnmapNotify:
+      if (fx && fx->wl.xwin && ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE))
+        xitk_window_update_tree (fx->wl.xwin);
       break;
 
     case MappingNotify:
@@ -2660,7 +2694,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   }
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
-  xitk->backdrop        = NULL;
   xitk->key             = 0;
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
@@ -3360,3 +3393,4 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
+

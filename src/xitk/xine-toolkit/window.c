@@ -38,10 +38,6 @@
 
 #define TITLE_BAR_HEIGHT 20
 
-xitk_t *xitk_window_get_xitk (xitk_window_t *w) {
-  return w ? w->xitk : NULL;
-}
-
 static Window _xitk_window_get_window (xitk_window_t *w) {
   return w->window;
 }
@@ -540,6 +536,7 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
   xwin->bewin           = NULL;
   xwin->bg_image        = bg_image;
   xwin->win_parent      = NULL;
+  xwin->role            = XITK_WR_HELPER;
 
   {
     xitk_tagitem_t tags[] = {
@@ -862,9 +859,12 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
   }
   xwin->bewin->data = xwin;
   xwin->xitk = xitk;
-  xwin->widget_list = NULL;
-  xwin->bg_image = NULL;
   xwin->window = window;
+  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin->window);
+  if (xwin->widget_list)
+    xwin->widget_list->xwin = xwin;
+  xwin->bg_image = NULL;
+  xwin->role = XITK_WR_HELPER;
   {
     xitk_tagitem_t tags[] = {
       {XITK_TAG_WIDTH, 0},
@@ -896,5 +896,17 @@ uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value) 
   xwin->bewin->get_props (xwin->bewin, tags);
   xwin->flags = tags[0].value;
 
+  if (mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED))
+    xitk_window_update_tree (xwin);
+
   return tags[0].value & 0xffff;
+}
+
+void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role) {
+  if (!xwin)
+    return;
+  if (xwin->role == role)
+    return;
+  xwin->role = role;
+  xitk_window_update_tree (xwin);
 }

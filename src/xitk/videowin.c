@@ -2437,9 +2437,9 @@ static void register_event_handler(xui_vwin_t *vwin)
   xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
   vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
   xitk_window_flags (vwin->wrapped_window, XITK_WINF_TASKBAR | XITK_WINF_PAGER, XITK_WINF_TASKBAR | XITK_WINF_PAGER);
-
-  vwin->widget_key = xitk_window_register_event_handler ("video_window", vwin->wrapped_window,
-                                                         &vwin_event_cbs, vwin);
+  vwin->widget_key = xitk_window_register_event_handler ("video_window", vwin->wrapped_window, &vwin_event_cbs, vwin);
+  if (!vwin->separate_display)
+    xitk_window_set_role (vwin->wrapped_window, XITK_WR_MAIN);
 }
 
 /*
