@@ -671,8 +671,6 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
     }
 
   }
-
-  gui_hide_show_all (panel->gui, ~1, panel->visible > 1 ? ~0 : 0);
 }
 
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
@@ -954,14 +952,6 @@ static void panel_handle_destroy_notify(void *data) {
   gui_exit (NULL, panel->gui);
 }
 
-static void panel_handle_map_notify(void *data) {
-  xui_panel_t *panel = data;
-
-  /* When panel becomes visible by any means,               */
-  /* all other hidden GUI windows shall also become visible */
-  gui_hide_show_all (panel->gui, ~1, ~0);
-}
-
 static void panel_handle_button_event(void *data, const xitk_button_event_t *be) {
   xui_panel_t *panel = data;
 
@@ -983,7 +973,7 @@ static void panel_handle_key_event(void *data, const xitk_key_event_t *ke) {
 static const xitk_event_cbs_t panel_event_cbs = {
   .key_cb            = panel_handle_key_event,
   .btn_cb            = panel_handle_button_event,
-  .map_notify_cb     = panel_handle_map_notify,
+  .map_notify_cb     = NULL,
   .destroy_notify_cb = panel_handle_destroy_notify,
 
   .pos_cb            = panel_store_new_position,
@@ -1193,7 +1183,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     video_window_is_visible (panel->gui->vwin) < 2 ? WINDOW_TYPE_NORMAL
     : !(xitk_get_wm_type (panel->gui->xitk) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR
     : WINDOW_TYPE_NONE);
-  video_window_set_transient_for (panel->gui->vwin, panel->xwin);
+  xitk_window_set_role (panel->xwin, XITK_WR_VICE);
 
   /*
    * Widget-list
@@ -1466,4 +1456,3 @@ void panel_set_title (xui_panel_t *panel, char *title) {
   if(panel && panel->title_label)
     xitk_label_change_label(panel->title_label, title);
 }
-

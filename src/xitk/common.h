@@ -399,8 +399,6 @@ void set_window_states_start(gGui_t *gui, xitk_window_t *xwin);
 
 void reparent_window(gGui_t *gui, xitk_window_t *xwin);
 
-/* panel has bit 0. return the windows that were visible before. */
-int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible);
 
 void gui_load_window_pos (gGui_t *gui, const char *name, int *x, int *y);
 void gui_save_window_pos (gGui_t *gui, const char *name, xitk_register_key_t key);

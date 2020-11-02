@@ -1121,78 +1121,16 @@ void gui_toggle_border (xitk_widget_t *w, void *data) {
   video_window_toggle_border (gui->vwin);
 }
 
-int gui_hide_show_all (gGui_t *gui, int flags_mask, int flags_visible) {
-  int v, s;
-
-  if (!gui)
-    return 0;
-
-  v = (panel_is_visible (gui->panel) > 1) << 0;
-  s = (v ^ flags_visible) & flags_mask;
-  if (s & (1 << 0)) {
-    /* this will call us again on the remaining windows, ... */
-    panel_toggle_visibility (NULL, gui->panel);
-    /* ... so stop right here. */
-    return v;
-  }
-
-  v |= (mrl_browser_is_visible (gui->mrlb) != 0) << 1;
-  v |= (playlist_is_visible (gui) != 0) << 2;
-  v |= (control_status (gui->vctrl) == 3) << 3;
-  v |= (setup_is_visible (gui->setup) != 0) << 4;
-  v |= (viewlog_is_visible (gui->viewlog) != 0) << 5;
-  v |= (kbedit_is_visible (gui->keyedit) != 0) << 6;
-  v |= (event_sender_is_visible (gui) != 0) << 7;
-  v |= (stream_infos_is_visible (gui->streaminfo) != 0) << 8;
-  v |= (tvset_is_visible () != 0) << 9;
-  v |= (pplugin_is_visible (&gui->post_video) != 0) << 10;
-  v |= (pplugin_is_visible (&gui->post_audio) != 0) << 11;
-  v |= (help_is_visible (gui->help) != 0) << 12;
-
-  s = (v ^ flags_visible) & flags_mask;
-  if (s & (1 << 1))
-    mrl_browser_toggle_visibility (NULL, gui->mrlb);
-  if (s & (1 << 2))
-    playlist_toggle_visibility (gui);
-  if (s & (1 << 3))
-    control_toggle_visibility (gui->vctrl);
-  if (s & (1 << 4))
-    setup_toggle_visibility (gui->setup);
-  if (s & (1 << 5))
-    viewlog_toggle_visibility (gui->viewlog);
-  if (s & (1 << 6))
-    kbedit_toggle_visibility (NULL, gui->keyedit);
-  if (s & (1 << 7))
-    event_sender_toggle_visibility (gui);
-  if (s & (1 << 8))
-    stream_infos_toggle_visibility (NULL, gui->streaminfo);
-  if (s & (1 << 9))
-    tvset_toggle_visibility (NULL, NULL);
-  if (s & (1 << 10))
-    pplugin_toggle_visibility (NULL, &gui->post_video);
-  if (s & (1 << 11))
-    pplugin_toggle_visibility (NULL, &gui->post_audio);
-  if (s & (1 << 12))
-    help_toggle_visibility (gui->help);
-
-  return v;
-}
-
 static void set_fullscreen_mode(int fullscreen_mode) {
   gGui_t *gui = gGui;
-  int flags;
 
   if ((video_window_is_visible (gui->vwin) < 2) || gui->use_root_window)
     return;
-
-  flags = gui_hide_show_all (gui, ~0, 0);
 
   video_window_set_fullscreen_mode (gui->vwin, fullscreen_mode);
   /* Drawable has changed, update cursor visiblity */
   if(!gui->cursor_visible)
     video_window_set_cursor_visibility (gui->vwin, gui->cursor_visible);
-
-  gui_hide_show_all (gui, flags, ~0);
 }
 
 void gui_set_fullscreen_mode (xitk_widget_t *w, void *data) {
@@ -2463,4 +2401,3 @@ void visual_anim_stop(void) {
     gui->visual_anim.running = 0;
   }
 }
-

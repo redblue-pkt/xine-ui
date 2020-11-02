@@ -1187,7 +1187,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   Atom type, buf[32];
   int fmt;
   unsigned long nitem, rest;
-  uint32_t oldflags, newflags, diff, mask, set, have;
+  uint32_t oldflags, newflags, diff, mask, have;
 
   mask = mask_and_value >> 16;
   mask_and_value &= 0xffff;
@@ -1225,10 +1225,8 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
         oldflags |= XITK_WINF_MAX_Y;
       }
     }
-    set = 0;
   } else {
     oldflags |= XITK_WINF_TASKBAR | XITK_WINF_PAGER;
-    set = 1;
   }
   have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
 
@@ -1238,7 +1236,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
 
   newflags = (oldflags & ~mask) | (mask_and_value & mask);
   diff = newflags ^ oldflags;
-  if (set || diff) {
+  if (diff) {
     d->d.lock (&d->d);
     if (diff & XITK_WINF_VISIBLE) {
       if (newflags & XITK_WINF_VISIBLE)
@@ -1577,6 +1575,7 @@ static void xitk_x11_window_delete (xitk_be_window_t **_win) {
 static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_tagitem_t *taglist) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
+  uint32_t want_flags;
 
   xitk_container (d, _d, d);
   if (!d)
@@ -1598,11 +1597,11 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
   win->props[XITK_X11_WT_TITLE].value = (uintptr_t)win->title;
   strcpy (win->title, "xiTK Window");
   xitk_tags_get (taglist, win->props);
-  win->props[XITK_X11_WT_WIN_FLAGS].value = _xitk_x11_window_merge_flags (
-    win->props[XITK_X11_WT_WRAP].value != None ?
-    ((XITK_WINF_DECORATED << 16) | XITK_WINF_DECORATED) :
-    (0xffff0000 | XITK_WINF_OVERRIDE_REDIRECT),
+
+  want_flags = _xitk_x11_window_merge_flags (
+    win->props[XITK_X11_WT_WRAP].value != None ? 0 : 0xffff0000,
     win->props[XITK_X11_WT_WIN_FLAGS].value);
+  win->props[XITK_X11_WT_WIN_FLAGS].value = XITK_WINF_DECORATED;
 
   do {
     long        data[1];
@@ -1682,8 +1681,15 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       hint.win_gravity     = NorthWestGravity;
       hint.flags           = PWinGravity | PBaseSize | PMinSize | PMaxSize | USSize | USPosition;
 
-      attr.override_redirect = (win->props[XITK_X11_WT_WIN_FLAGS].value & XITK_WINF_OVERRIDE_REDIRECT) ? True : False;
-      win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_OVERRIDE_REDIRECT << 16);
+      /* applied this here already.
+       * BTW. this is not very useful with kwin4 because
+       * 1. window is always on top of the world,
+       * 2. window may be moved over the screen border, and
+       * 3. while window has focus, alt-tab reports "no windows available". */
+      attr.override_redirect = (want_flags & XITK_WINF_OVERRIDE_REDIRECT) ? True : False;
+      win->props[XITK_X11_WT_WIN_FLAGS].value |= want_flags & XITK_WINF_OVERRIDE_REDIRECT;
+      want_flags &= ~(XITK_WINF_OVERRIDE_REDIRECT << 16);
+
       attr.background_pixel  =
       attr.border_pixel      = xitk_get_cfg_num (d->be->be.xitk, XITK_BLACK_COLOR);
       attr.colormap          = Imlib_get_colormap (d->be->be.xitk->imlibdata);
@@ -1744,7 +1750,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       }
     }
 
-    _xitk_x11_window_flags (win, win->props[XITK_X11_WT_WIN_FLAGS].value);
+    _xitk_x11_window_flags (win, want_flags);
 
     win->gc = XCreateGC (d->display, win->w.id, 0, NULL);
     d->d.unlock (&d->d);

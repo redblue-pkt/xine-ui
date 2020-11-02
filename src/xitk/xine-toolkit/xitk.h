@@ -1298,6 +1298,13 @@ void xitk_window_destroy_window(xitk_window_t *w);
 /** try to set the flags in mask to value, return new flags. */
 uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value);
 
+typedef enum {
+  XITK_WR_HELPER = 0, /** << stay in front of main, show/hide with vice, default. */
+  XITK_WR_MAIN,       /** << represent the application. */
+  XITK_WR_VICE        /** << stay in front of main, be main while main is invisible. */
+} xitk_window_role_t;
+void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role);
+
 /**
  *
  */
