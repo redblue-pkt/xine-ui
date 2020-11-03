@@ -945,11 +945,6 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
   setup_paint_widgets (setup, rpos);
 }
 
-void setup_reparent (xui_setup_t *setup) {
-  if (!setup)
-    return;
-  reparent_window (setup->gui, setup->xwin);
-}
 
 /*
  * Create setup panel window

@@ -69,6 +69,5 @@ void panel_update_mixer_display (xui_panel_t *panel);
 
 void panel_set_title (xui_panel_t *panel, char*);
 
-void panel_reparent (xui_panel_t *panel);
 
 #endif

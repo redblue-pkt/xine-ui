@@ -77,6 +77,7 @@ struct xitk_x11_backend_s {
 typedef enum {
   XITK_A_WIN_LAYER = 0,
   XITK_A__MOTIF_WM_HINTS,
+  XITK_A_WM_CHANGE_STATE,
   XITK_A_WM_STATE,
   XITK_A_DELETE_WINDOW,
   XITK_A__NET_WM_NAME,
@@ -1238,17 +1239,14 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   diff = newflags ^ oldflags;
   if (diff) {
     d->d.lock (&d->d);
-    if (diff & XITK_WINF_VISIBLE) {
-      if (newflags & XITK_WINF_VISIBLE)
+    if (diff & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) {
+      if (diff & newflags & XITK_WINF_VISIBLE)
         XMapWindow (d->display, win->w.id);
-      else
-        XUnmapWindow (d->display, win->w.id);
-    }
-    if (diff & XITK_WINF_ICONIFIED) {
-      if (newflags & XITK_WINF_ICONIFIED)
+      else if ((newflags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_ICONIFIED)
         XIconifyWindow (d->display, win->w.id, d->be->be.xitk->imlibdata->x.screen);
       else
-        XMapWindow (d->display, win->w.id);
+        XUnmapWindow (d->display, win->w.id);
+      XSync (d->display, False);
     }
     if (diff & XITK_WINF_DECORATED) {
         MWMHints mwmhints;
@@ -1377,11 +1375,24 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
   if (!win)
     return 0;
   d = win->d;
+
+  if (win->props[XITK_X11_WT_WRAP].value != None) {
+    XWindowAttributes attr;
+    attr.root = None;
+    if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
+      win->props[XITK_X11_WT_X].value = attr.x;
+      win->props[XITK_X11_WT_Y].value = attr.y;
+      win->props[XITK_X11_WT_W].value = attr.width;
+      win->props[XITK_X11_WT_H].value = attr.height;
+    }
+  }
   memcpy (props, win->props, sizeof (props));
   props[XITK_X11_WT_IMAGE].value = (uintptr_t)NULL;
+  props[XITK_X11_WT_PARENT].value = ~(uintptr_t)NULL;
   res = xitk_tags_get (taglist, props);
 
-  if (props[XITK_X11_WT_PARENT].value != win->props[XITK_X11_WT_PARENT].value) {
+  /* always do this on request. */
+  if (props[XITK_X11_WT_PARENT].value != ~(uintptr_t)NULL) {
     xitk_x11_window_t *pw = (xitk_x11_window_t *)props[XITK_X11_WT_PARENT].value;
 
     win->props[XITK_X11_WT_X].value = props[XITK_X11_WT_X].value;
@@ -1404,6 +1415,16 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
   }
   if  ((props[XITK_X11_WT_X].value != win->props[XITK_X11_WT_X].value)
     || (props[XITK_X11_WT_Y].value != win->props[XITK_X11_WT_Y].value)) {
+    if (win->props[XITK_X11_WT_WRAP].value != None) {
+      XWindowAttributes attr;
+      attr.root = None;
+      if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
+        win->props[XITK_X11_WT_X].value = attr.x;
+        win->props[XITK_X11_WT_Y].value = attr.y;
+        win->props[XITK_X11_WT_W].value = attr.width;
+        win->props[XITK_X11_WT_H].value = attr.height;
+      }
+    }
     hint.x = win->props[XITK_X11_WT_X].value = props[XITK_X11_WT_X].value;
     hint.y = win->props[XITK_X11_WT_Y].value = props[XITK_X11_WT_Y].value;
     hint.flags |= PPosition;
@@ -2270,6 +2291,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
     static const char * const names[XITK_A_LAST] = {
       [XITK_A_WIN_LAYER]       = "_WIN_LAYER",
       [XITK_A__MOTIF_WM_HINTS] = "_MOTIF_WM_HINTS",
+      [XITK_A_WM_CHANGE_STATE] = "WM_CHANGE_STATE",
       [XITK_A_WM_STATE]        = "WM_STATE",
       [XITK_A_DELETE_WINDOW]   = "WM_DELETE_WINDOW",
       [XITK_A__NET_WM_NAME]    = "_NET_WM_NAME",

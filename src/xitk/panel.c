@@ -607,24 +607,10 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
 
     panel->visible = 2;
     panel->gui->nongui_error_msg = NULL;
-    xitk_show_widgets(panel->widget_list);
-
+    xitk_show_widgets (panel->widget_list);
     xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
-    xitk_window_raise_window (panel->xwin);
-    video_window_set_transient_for (panel->gui->vwin, panel->xwin);
-
-    wait_for_window_visible (panel->xwin);
-    layer_above_video (panel->gui, panel->xwin);
-    /* FIXME: when switching to fullscreen with old kwin, compositor off,
-     * panel stays hidden  50% of cases. It reappears after a mouse click
-     * anywhere. Other open xine windows seem not to have this issue.
-     * And no, video window _does_ report viewable. Waiting half a second
-     * after switch does help, and so does this HACK. */
-    xitk_window_raise_window (panel->xwin);
-
-    if (panel->gui->cursor_grabbed) {
+    if (panel->gui->cursor_grabbed)
       xitk_ungrab_pointer();
-    }
 
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
     if(
@@ -683,12 +669,9 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   config_update_num ("gui.panel_visible", panel->visible > 1);
 }
 
-void panel_raise_window(xui_panel_t *panel)
-{
-  if (panel_is_visible (panel) > 1)  {
-    xitk_window_raise_window(panel->xwin);
-    video_window_set_transient_for (panel->gui->vwin, panel->xwin);
-  }
+void panel_raise_window (xui_panel_t *panel) {
+  if (panel_is_visible (panel) > 1)
+    xitk_window_raise_window (panel->xwin);
 }
 
 void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, int *ph)
@@ -1106,23 +1089,6 @@ void panel_paint (xui_panel_t *panel) {
     xitk_paint_widget_list (panel->widget_list);
 }
 
-void panel_reparent (xui_panel_t *panel) {
-  if (panel) {
-
-    if (video_window_is_visible (panel->gui->vwin) < 2) { /* Show the panel in taskbar */
-      int x = 0, y = 0;
-
-      panel_get_window_position(panel, &x, &y, NULL, NULL);
-      xitk_window_reparent_window(panel->xwin, NULL, x, y);
-    }
-
-    reparent_window (panel->gui, panel->xwin);
-
-    if (video_window_is_visible (panel->gui->vwin) > 1) {
-      layer_above_video (panel->gui, panel->xwin);
-    }
-  }
-}
 
 /*
  * Create the panel window, and fit all widgets in.
@@ -1173,16 +1139,6 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   panel->xwin = xitk_window_create_window_ext (gui->xitk, panel->x, panel->y, width, height, title,
     title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon, bg_image);
-  /*
-   * The following is more or less a hack to keep the panel window visible
-   * with and without focus in windowed and fullscreen mode.
-   * Different WMs and even different versions behave different.
-   * There is no guarantee that it works with all WMs/versions.
-   */
-  xitk_window_set_wm_window_type (panel->xwin,
-    video_window_is_visible (panel->gui->vwin) < 2 ? WINDOW_TYPE_NORMAL
-    : !(xitk_get_wm_type (panel->gui->xitk) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR
-    : WINDOW_TYPE_NONE);
   xitk_window_set_role (panel->xwin, XITK_WR_VICE);
 
   /*

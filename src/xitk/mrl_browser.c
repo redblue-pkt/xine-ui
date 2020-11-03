@@ -462,10 +462,6 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   }
 }
 
-void mrl_browser_reparent (xui_mrlb_t *mrlb) {
-  if (mrlb && mrlb->w)
-    reparent_window (mrlb->gui, xitk_mrlbrowser_get_window (mrlb->w));
-}
 
 /*
  * Create a new mrl browser.

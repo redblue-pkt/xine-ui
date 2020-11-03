@@ -262,6 +262,5 @@ void kbedit_end (xui_keyedit_t *kbedit);
 int kbedit_is_visible (xui_keyedit_t *kbedit);
 void kbedit_toggle_visibility (xitk_widget_t *w, void *kbedit);
 void kbedit_raise_window (xui_keyedit_t *kbedit);
-void kbedit_reparent (xui_keyedit_t *kbedit);
 
 #endif

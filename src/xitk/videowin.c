@@ -1430,13 +1430,23 @@ void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y) {
  * hide/show video window
  */
 void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
-
+#if defined (WEIRD_DEBUG)
+  sleep (2);
+  XIconifyWindow (vwin->video_display, vwin->video_window, XDefaultScreen (vwin->video_display));
+  XSync (vwin->video_display, False);
+  printf ("video_window: unmap.\n");
+  sleep (3);
+  XMapWindow (vwin->video_display, vwin->video_window);
+  XSync (vwin->video_display, False);
+  printf ("video_window: map.\n");
+#endif
   if (!vwin)
     return;
   if (vwin->gui->use_root_window)
     return;
 
-  xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)(intptr_t)show_window);
+  if (vwin->gui->vo_port)
+    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)(intptr_t)show_window);
 
   pthread_mutex_lock (&vwin->mutex);
 
@@ -1461,8 +1471,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
       xitk_set_layer_above (vwin->video_window);
     }
 
-    XRaiseWindow (vwin->video_display, vwin->video_window);
-    XMapWindow (vwin->video_display, vwin->video_window);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
 
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
@@ -1477,9 +1486,9 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
      && _vwin_is_ewmh (vwin))
       xitk_set_ewmh_fullscreen (vwin->video_window);
   } else if (vwin->show == 1) {
-    XIconifyWindow (vwin->video_display, vwin->video_window, vwin->video_screen);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
   } else {
-    XUnmapWindow (vwin->video_display, vwin->video_window);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
   }
 
   vwin->x_unlock_display (vwin->video_display);
@@ -2438,8 +2447,9 @@ static void register_event_handler(xui_vwin_t *vwin)
   vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
   xitk_window_flags (vwin->wrapped_window, XITK_WINF_TASKBAR | XITK_WINF_PAGER, XITK_WINF_TASKBAR | XITK_WINF_PAGER);
   vwin->widget_key = xitk_window_register_event_handler ("video_window", vwin->wrapped_window, &vwin_event_cbs, vwin);
+
   if (!vwin->separate_display)
-    xitk_window_set_role (vwin->wrapped_window, XITK_WR_MAIN);
+    xitk_window_set_role (vwin->wrapped_window, vwin->gui->use_root_window ? XITK_WR_ROOT : XITK_WR_MAIN);
 }
 
 /*

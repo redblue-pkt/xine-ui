@@ -371,10 +371,6 @@ void event_sender_end (gGui_t *gui) {
     event_sender_exit (NULL, gui->eventer, 0);
 }
 
-void event_sender_reparent (gGui_t *gui) {
-  if (gui && gui->eventer)
-    reparent_window (gui, gui->eventer->xwin);
-}
 
 void event_sender_panel (gGui_t *gui) {
   int                        x, y, i;

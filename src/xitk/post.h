@@ -74,7 +74,6 @@ void pplugin_parse_and_store_post (post_info_t *info, const char *post);
 void pplugin_rewire_from_posts_window (post_info_t *info);
 void pplugin_rewire_posts (post_info_t *info);
 int pplugin_is_post_selected (post_info_t *info);
-void pplugin_reparent (post_info_t *info);
 
 void post_deinterlace_init (gGui_t *gui, const char *deinterlace_post);
 void post_deinterlace (gGui_t *gui);

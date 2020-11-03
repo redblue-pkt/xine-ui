@@ -26,7 +26,6 @@
 
 void playlist_editor (gGui_t *gui);
 void playlist_change_skins (gGui_t *gui, int synth);
-void playlist_reparent (gGui_t *gui);
 void playlist_get_input_focus (gGui_t *gui);
 void playlist_raise_window (gGui_t *gui);
 int playlist_is_visible (gGui_t *gui);

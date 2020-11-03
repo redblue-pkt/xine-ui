@@ -1038,10 +1038,6 @@ void playlist_deinit (gGui_t *gui) {
   }
 }
 
-void playlist_reparent (gGui_t *gui) {
-  if (gui && gui->plwin && gui->plwin->xwin)
-    reparent_window (gui, gui->plwin->xwin);
-}
 
 static void _open_mrlbrowser_from_playlist (xitk_widget_t *w, void *data, int state) {
   (void)state;

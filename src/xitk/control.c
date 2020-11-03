@@ -681,9 +681,3 @@ void control_deinit (xui_vctrl_t *vctrl) {
     free (vctrl);
   }
 }
-
-void control_reparent (xui_vctrl_t *vctrl) {
-  if (vctrl && vctrl->xwin)
-    reparent_window(vctrl->gui, vctrl->xwin);
-}
-

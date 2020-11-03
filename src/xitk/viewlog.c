@@ -326,10 +326,6 @@ static const xitk_event_cbs_t viewlog_event_cbs = {
   .key_cb = viewlog_handle_key_event,
 };
 
-void viewlog_reparent (xui_viewlog_t *vl) {
-  if (vl)
-    reparent_window (vl->gui, vl->xwin);
-}
 
 /*
  * Create viewlog window

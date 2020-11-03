@@ -524,10 +524,6 @@ void stream_infos_update_infos (xui_sinfo_t *sinfo) {
   }
 }
 
-void stream_infos_reparent (xui_sinfo_t *sinfo) {
-  if (sinfo)
-    reparent_window (sinfo->gui, sinfo->xwin);
-}
 
 void stream_infos_panel (gGui_t *gui) {
   int         x, y;

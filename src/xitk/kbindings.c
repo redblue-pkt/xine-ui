@@ -1036,10 +1036,6 @@ static const xitk_event_cbs_t kbedit_event_cbs = {
   .btn_cb            = kbedit_handle_button_event,
 };
 
-void kbedit_reparent (xui_keyedit_t *kbedit) {
-  if (kbedit)
-    reparent_window (kbedit->gui, kbedit->xwin);
-}
 
 /*
  *
