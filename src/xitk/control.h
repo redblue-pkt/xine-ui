@@ -40,7 +40,6 @@ void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout);
 //void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout);
 void control_inc_image_prop (xui_vctrl_t *vctrl, int prop);
 void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);
-void control_reparent (xui_vctrl_t *vctrl);
 
 #endif
 

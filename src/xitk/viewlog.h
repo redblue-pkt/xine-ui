@@ -28,7 +28,6 @@ void viewlog_panel (gGui_t *gui);
 int viewlog_is_visible (xui_viewlog_t *vl);
 void viewlog_toggle_visibility (xui_viewlog_t *vl);
 void viewlog_raise_window (xui_viewlog_t *vl);
-void viewlog_reparent (xui_viewlog_t *vl);
 void viewlog_end (xui_viewlog_t *vl);
 
 #endif

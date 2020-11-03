@@ -32,13 +32,11 @@
 #define GUI_RESET(gui) ((gui)->nextprev + 1)
 
 /* windows */
-void gui_reparent_all_windows (gGui_t *gui);
 void raise_window (gGui_t *gui, xitk_window_t *xwin, int visible, int running);
 void toggle_window (gGui_t *gui, xitk_window_t *xwin, xitk_widget_list_t *widget_list, int *visible, int running);
 void layer_above_video (gGui_t *gui, xitk_window_t *xwin);
 int get_layer_above_video (gGui_t *gui);
 int is_layer_above (gGui_t *gui);
-void wait_for_window_visible(xitk_window_t *xwin);
 void gui_playlist_show (xitk_widget_t *w, void *gui);
 void gui_mrlbrowser_show (xitk_widget_t *w, void *gui);
 void gui_control_show (xitk_widget_t *w, void *gui);

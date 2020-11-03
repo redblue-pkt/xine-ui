@@ -374,9 +374,11 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
   xitk_set_window_class(w->xitk->display, w->window, res_name, res_class);
 }
 
-void xitk_window_set_wm_window_type (xitk_window_t *w, xitk_wm_window_type_t type) {
-  if (w)
-    xitk_set_wm_window_type (w->xitk, w->window, type);
+void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t type) {
+  if (xwin) {
+    xitk_set_wm_window_type (xwin->xitk, xwin->window, type);
+    xwin->type = type;
+  }
 }
 
 void xitk_window_set_transient_for(xitk_window_t *w, Window win) {
@@ -536,6 +538,8 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
   xwin->bewin           = NULL;
   xwin->bg_image        = bg_image;
   xwin->win_parent      = NULL;
+  /* will be set by xitk_window_update_tree (). */
+  xwin->type            = WINDOW_TYPE_END;
   xwin->role            = XITK_WR_HELPER;
 
   {
@@ -857,14 +861,21 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
     XITK_FREE (xwin);
     return NULL;
   }
-  xwin->bewin->data = xwin;
+
   xwin->xitk = xitk;
+  xwin->bewin->data = xwin;
+  xwin->bg_image = NULL;
+  xwin->win_parent = NULL;
+
+  /* will be set by xitk_window_update_tree (). */
+  xwin->type = WINDOW_TYPE_END;
+  xwin->role = XITK_WR_HELPER;
+
   xwin->window = window;
   xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin->window);
   if (xwin->widget_list)
     xwin->widget_list->xwin = xwin;
-  xwin->bg_image = NULL;
-  xwin->role = XITK_WR_HELPER;
+
   {
     xitk_tagitem_t tags[] = {
       {XITK_TAG_WIDTH, 0},
@@ -892,12 +903,14 @@ uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value) 
     return 0;
 
   tags[0].value = (mask << 16) | (value & 0xffff);
-  xwin->bewin->set_props (xwin->bewin, tags);
+  if (mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) {
+    xitk_window_update_tree (xwin, tags[0].value);
+  } else {
+    xwin->bewin->set_props (xwin->bewin, tags);
+  }
   xwin->bewin->get_props (xwin->bewin, tags);
   xwin->flags = tags[0].value;
 
-  if (mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED))
-    xitk_window_update_tree (xwin);
 
   return tags[0].value & 0xffff;
 }
@@ -908,5 +921,6 @@ void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role) {
   if (xwin->role == role)
     return;
   xwin->role = role;
-  xitk_window_update_tree (xwin);
+  xitk_window_update_tree (xwin, 0);
 }
+

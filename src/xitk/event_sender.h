@@ -30,7 +30,6 @@ int event_sender_is_visible (gGui_t *gui);
 void event_sender_toggle_visibility (gGui_t *gui);
 void event_sender_update_menu_buttons (gGui_t *gui);
 void event_sender_send (gGui_t *gui, int event);
-void event_sender_reparent (gGui_t *gui);
 void event_sender_show_tips (gGui_t *gui, unsigned long timeout);
 //void event_sender_update_tips_timeout (gGui_t *gui, unsigned long timeout);
 

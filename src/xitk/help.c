@@ -306,10 +306,6 @@ void help_toggle_visibility (xui_help_t *help) {
     toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, 1);
 }
 
-void help_reparent (xui_help_t *help) {
-  if (help)
-    reparent_window (help->gui, help->xwin);
-}
 
 static const xitk_event_cbs_t  help_event_cbs = {
   .key_cb = help_handle_key_event,

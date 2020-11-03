@@ -28,7 +28,6 @@ xui_setup_t *setup_panel (gGui_t *gui);
 int setup_is_visible (xui_setup_t *setup);
 void setup_toggle_visibility (xui_setup_t *setup);
 void setup_raise_window (xui_setup_t *setup);
-void setup_reparent (xui_setup_t *setup);
 void setup_end (xui_setup_t *setup);
 void setup_show_tips (xui_setup_t *setup, int enabled, unsigned long timeout);
 //void setup_update_tips_timeout (xui_setup_t *setup, unsigned long timeout);

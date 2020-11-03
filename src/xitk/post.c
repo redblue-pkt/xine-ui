@@ -1823,10 +1823,6 @@ void pplugin_update_enable_button (post_info_t *info) {
   }
 }
 
-void pplugin_reparent (post_info_t *info) {
-  if (info && info->win)
-    reparent_window (info->gui, info->win->xwin);
-}
 
 void pplugin_panel (post_info_t *info) {
   gGui_t *gui;

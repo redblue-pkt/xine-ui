@@ -38,6 +38,5 @@ void stream_infos_toggle_visibility (xitk_widget_t *w, void *sinfo);
 void stream_infos_raise_window (xui_sinfo_t *sinfo);
 void stream_infos_update_infos (xui_sinfo_t *sinfo);
 void stream_infos_toggle_auto_update (xui_sinfo_t *sinfo);
-void stream_infos_reparent (xui_sinfo_t *sinfo);
 
 #endif

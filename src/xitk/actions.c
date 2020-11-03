@@ -84,54 +84,6 @@ static void gui_messages_on (gGui_t *gui) {
   pthread_mutex_unlock (&gui->no_messages.mutex);
 }
 
-void gui_reparent_all_windows (gGui_t *gui) {
-  int                    i;
-  static const struct {
-    int                 (*visible)(void);
-    void                (*reparent)(void);
-  } _reparent[] = {
-    { tvset_is_visible,         tvset_reparent },
-    { NULL,                     NULL}
-  };
-
-  if (playlist_is_visible (gui))
-    playlist_reparent (gui);
-  if (panel_is_visible (gui->panel) > 1)
-    panel_reparent (gui->panel);
-  if (setup_is_visible (gui->setup))
-    setup_reparent (gui->setup);
-  if (mrl_browser_is_visible (gui->mrlb))
-    mrl_browser_reparent (gui->mrlb);
-  if (event_sender_is_visible (gui))
-    event_sender_reparent (gui);
-  if (help_is_visible (gui->help))
-    help_reparent (gui->help);
-  if (viewlog_is_visible (gui->viewlog))
-    viewlog_reparent (gui->viewlog);
-  if (kbedit_is_visible (gui->keyedit))
-    kbedit_reparent (gui->keyedit);
-  if (pplugin_is_visible (&gui->post_audio))
-    pplugin_reparent (&gui->post_audio);
-  if (pplugin_is_visible (&gui->post_video))
-    pplugin_reparent (&gui->post_video);
-  if (stream_infos_is_visible (gui->streaminfo))
-    stream_infos_reparent (gui->streaminfo);
-  control_reparent (gui->vctrl);
-
-  for(i = 0; _reparent[i].visible; i++) {
-    if(_reparent[i].visible())
-      _reparent[i].reparent();
-  }
-
-}
-
-void wait_for_window_visible(xitk_window_t *xwin) {
-  int t = 0;
-
-  while ((!xitk_window_is_window_visible(xwin)) && (++t < 3))
-    xine_usec_sleep(5000);
-}
-
 void reparent_window (gGui_t *gui, xitk_window_t *xwin) {
   if (!gui || !xwin)
     return;
@@ -185,10 +137,7 @@ void toggle_window (gGui_t *gui, xitk_window_t *xwin, xitk_widget_list_t *widget
       xitk_show_widgets(widget_list);
 
       xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
-      xitk_window_raise_window (xwin);
-      video_window_set_transient_for (gui->vwin, xwin);
 
-      wait_for_window_visible(xwin);
       layer_above_video (gui, xwin);
     }
   }
@@ -1096,9 +1045,6 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
     int visible = video_window_is_visible (gui->vwin) < 2;
 
     video_window_set_visibility (gui->vwin, visible);
-
-    /* We need to reparent all visible windows because of redirect tweaking */
-    gui_reparent_all_windows (gui);
 
     /* (re)start/stop visual animation */
     if (video_window_is_visible (gui->vwin) > 1) {

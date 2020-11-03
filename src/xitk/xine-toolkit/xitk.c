@@ -1705,9 +1705,9 @@ void xitk_ungrab_pointer(void) {
   xitk_unlock_display (&xitk->x);
 }
 
-void xitk_window_update_tree (xitk_window_t *xwin) {
+void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {
   __xitk_t *xitk;
-  __gfx_t *fx, *_main = NULL, *vice = NULL, *trans;
+  __gfx_t *fx, *_main, *vice, *trans;
   xitk_tagitem_t tags[] = {
     {XITK_TAG_TRANSIENT_FOR, (uintptr_t)NULL},
     {XITK_TAG_WIN_FLAGS, 0},
@@ -1725,12 +1725,13 @@ void xitk_window_update_tree (xitk_window_t *xwin) {
   if (xitk->verbosity >= 2) {
     xitk_container (fx, xwin->widget_list, wl);
     if (fx)
-        printf ("xitk.window.update_tree (%s).\n", fx->name);
+        printf ("xitk.window.update_tree (%s, 0x%x).\n", fx->name, (unsigned int)mask_and_flags);
   }
   /* find latest main and vice. */
+  _main = vice = NULL;
   for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
     if (fx->wl.xwin && fx->wl.xwin->bewin) {
-      if (fx->wl.xwin->role == XITK_WR_MAIN) {
+      if ((fx->wl.xwin->role == XITK_WR_ROOT) || (fx->wl.xwin->role == XITK_WR_MAIN)) {
         _main = fx;
       } else if (fx->wl.xwin->role == XITK_WR_VICE) {
         vice = fx;
@@ -1738,11 +1739,15 @@ void xitk_window_update_tree (xitk_window_t *xwin) {
     }
   }
   /* find new transient for win (NULL = root). */
-  trans = (_main && ((_main->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE))
-        ? _main : NULL;
+  trans = (_main && (_main->wl.xwin->flags & XITK_WINF_VISIBLE)) ? _main : NULL;
   /* take action. */
-  if ((_main && (_main->wl.xwin == xwin)) || (vice && (vice->wl.xwin == xwin))) {
-    /* main or vice changed, adjust all. */
+  fx = (_main && (_main->wl.xwin == xwin)) ? _main
+     : (vice && (vice->wl.xwin == xwin)) ? vice
+     : NULL;
+  if (fx) {
+    __gfx_t *helper;
+    /* main or vice changed, adjust all.
+     * move main/vice to front of list, and find first helper. */
     if (vice) {
       xitk_dnode_remove (&vice->wl.node);
       xitk_dlist_add_head (&xitk->gfxs, &vice->wl.node);
@@ -1751,27 +1756,113 @@ void xitk_window_update_tree (xitk_window_t *xwin) {
       xitk_dnode_remove (&_main->wl.node);
       xitk_dlist_add_head (&xitk->gfxs, &_main->wl.node);
     }
-    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+    helper = vice ? vice : _main;
+    helper = (__gfx_t *)(helper->wl.node.next);
+    /* do not touch root visibility. */
+    if ((fx == _main) && (xwin->role == XITK_WR_ROOT))
+      mask_and_flags &= ~((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16);
+    /* do not hide them both, it would make us nearly unreachable for the user. */
+    if ((mask_and_flags ^ xwin->flags) & (mask_and_flags >> 16) & XITK_WINF_VISIBLE) {
+      if (fx == _main) {
+        trans = (mask_and_flags & XITK_WINF_VISIBLE) ? _main : NULL;
+        if (vice) {
+          if (vice->wl.xwin->flags & XITK_WINF_VISIBLE) {
+            /* do main */
+            tags[0].value = (uintptr_t)NULL;
+            tags[1].value = mask_and_flags;
+            xwin->bewin->set_props (xwin->bewin, tags);
+            xwin->bewin->get_props (xwin->bewin, tags);
+            xwin->flags = tags[1].value;
+            /* toggle vice mode, remap vice to tell task bar about the new type. */
+            tags[1].value = (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16;
+            vice->wl.xwin->bewin->set_props (vice->wl.xwin->bewin, tags + 1);
+            xitk_window_set_wm_window_type (vice->wl.xwin,
+              !(mask_and_flags & XITK_WINF_VISIBLE) ? WINDOW_TYPE_NORMAL
+              : !(xitk_get_wm_type (&xitk->x) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR : WINDOW_TYPE_NONE);
+            tags[0].value = (uintptr_t)(trans ? trans->wl.xwin->bewin : NULL);
+            tags[1].value = ((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16) | XITK_WINF_VISIBLE;
+            vice->wl.xwin->bewin->set_props (vice->wl.xwin->bewin, tags);
+            vice->wl.xwin->bewin->get_props (vice->wl.xwin->bewin, tags);
+            vice->wl.xwin->bewin->raise (vice->wl.xwin->bewin);
+            vice->wl.xwin->flags = tags[1].value;
+          } else {
+            /* do main */
+            mask_and_flags &= ~XITK_WINF_ICONIFIED;
+            mask_and_flags |= (mask_and_flags & XITK_WINF_VISIBLE) ? 0 : XITK_WINF_ICONIFIED;
+            mask_and_flags |= (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16;
+            tags[0].value = (uintptr_t)NULL;
+            tags[1].value = mask_and_flags;
+            xwin->bewin->set_props (xwin->bewin, tags);
+            xwin->bewin->get_props (xwin->bewin, tags);
+            xwin->flags = tags[1].value;
+            /* toggle vice mode */
+            xitk_window_set_wm_window_type (vice->wl.xwin,
+              !(mask_and_flags & XITK_WINF_VISIBLE) ? WINDOW_TYPE_NORMAL
+              : !(xitk_get_wm_type (&xitk->x) & WM_TYPE_KWIN) ? WINDOW_TYPE_TOOLBAR : WINDOW_TYPE_NONE);
+            /* retrans vice */
+            tags[0].value = (uintptr_t)(((fx == _main) || !trans) ? NULL : trans->wl.xwin->bewin);
+            tags[1].value = 0;
+            vice->wl.xwin->bewin->set_props (vice->wl.xwin->bewin, tags);
+          }
+        } else {
+          /* do main. */
+#if 0
+          /* HACK: on shutdown (hide main with no vice), dont iconify instead of unmap.
+           * avoid kwin 4 losing focus completely when destroying an iconified window. */
+          mask_and_flags &= ~XITK_WINF_ICONIFIED;
+          mask_and_flags |= (mask_and_flags & XITK_WINF_VISIBLE) ? 0 : XITK_WINF_ICONIFIED;
+          mask_and_flags |= (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16;
+#endif
+          tags[0].value = (uintptr_t)NULL;
+          tags[1].value = mask_and_flags;
+          xwin->bewin->set_props (xwin->bewin, tags);
+          xwin->bewin->get_props (xwin->bewin, tags);
+          xwin->flags = tags[1].value;
+        }
+      } else { /* fx == vice */
+        mask_and_flags &= ~XITK_WINF_ICONIFIED;
+        mask_and_flags |= (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16;
+        if (!(_main && (_main->wl.xwin->flags & XITK_WINF_VISIBLE)))
+          mask_and_flags |= (mask_and_flags & XITK_WINF_VISIBLE) ? 0 : XITK_WINF_ICONIFIED;
+        tags[0].value = (uintptr_t)(trans ? trans->wl.xwin->bewin : NULL);
+        tags[1].value = mask_and_flags;
+        xwin->bewin->set_props (xwin->bewin, tags);
+        xwin->bewin->get_props (xwin->bewin, tags);
+        xwin->flags = tags[1].value;
+        if (xwin->flags & XITK_WINF_VISIBLE)
+          xwin->bewin->raise (xwin->bewin);
+      }
+    } else { /* no visibility change */
+      helper = (__gfx_t *)(fx->wl.node.next);
+      mask_and_flags &= ~((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16);
+      tags[0].value = (uintptr_t)(((fx == _main) || !trans) ? NULL : trans->wl.xwin->bewin);
+      tags[1].value = mask_and_flags;
+      xwin->bewin->set_props (xwin->bewin, tags);
+      xwin->bewin->get_props (xwin->bewin, tags);
+      xwin->flags = tags[1].value;
+      if (xwin->flags & XITK_WINF_VISIBLE)
+        xwin->bewin->raise (xwin->bewin);
+    }
+    /* finally, the helpers. */
+    mask_and_flags = vice ? ((vice->wl.xwin->flags & 0xffff) | ((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16)) : 0;
+    for (fx = helper; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
       if (!fx->wl.xwin)
         continue;
       if (!fx->wl.xwin->bewin)
         continue;
       tags[0].value = (uintptr_t)(((fx == _main) || !trans) ? NULL : trans->wl.xwin->bewin);
-      tags[1].value = ((fx == _main) || !vice) ? 0
-                    : ((vice->wl.xwin->flags & 0xffff) | ((XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED) << 16));
+      tags[1].value = mask_and_flags;
       fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
       fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
       fx->wl.xwin->flags = tags[1].value;
-      if ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE)
+      if (fx->wl.xwin->flags & XITK_WINF_VISIBLE)
         fx->wl.xwin->bewin->raise (fx->wl.xwin->bewin);
-      if ((fx != _main) && (fx != vice))
-        fx->wl.xwin->role = XITK_WR_HELPER;
     }
   } else {
     /* do just this 1. */
     if (xwin->bewin) {
       tags[0].value = (uintptr_t)(trans ? trans->wl.xwin->bewin : NULL);
-      tags[1].value = 0;
+      tags[1].value = mask_and_flags;
       xwin->bewin->set_props (xwin->bewin, tags);
       xwin->bewin->get_props (xwin->bewin, tags);
       xwin->flags = tags[1].value;
@@ -2174,6 +2265,12 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
       break;
 
     case PropertyNotify:
+      if ((xitk->verbosity >= 2) && fx) {
+        char *name = XGetAtomName (xitk->x.display, event->xproperty.atom);
+        printf ("xitk.window.property.change (%s, %s).\n", fx->name, name ? name : "<unknown>");
+        XFree (name);
+      }
+      /* fall through */
     case SelectionClear:
     case SelectionRequest:
       _xitk_clipboard_event (xitk, event);
@@ -2182,12 +2279,12 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
 
     case MapNotify:
       if (fx && fx->wl.xwin && ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) != XITK_WINF_VISIBLE))
-        xitk_window_update_tree (fx->wl.xwin);
+        xitk_window_update_tree (fx->wl.xwin, 0);
       break;
 
     case UnmapNotify:
       if (fx && fx->wl.xwin && ((fx->wl.xwin->flags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_VISIBLE))
-        xitk_window_update_tree (fx->wl.xwin);
+        xitk_window_update_tree (fx->wl.xwin, 0);
       break;
 
     case MappingNotify:
@@ -2328,6 +2425,9 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           break;
 
         if (fx->move.enabled) {
+          xitk_tagitem_t tags[] = {
+            {XITK_TAG_X, 0}, {XITK_TAG_Y, 0}, {XITK_TAG_END, 0}
+          };
 
           if (fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU)) {
             xitk_widget_t *menu = xitk_menu_get_menu(fx->wl.widget_focused);
@@ -2338,11 +2438,10 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
           fx->new_pos.x = fx->old_pos.x + event->xmotion.x_root - fx->move.offset_x;
           fx->new_pos.y = fx->old_pos.y + event->xmotion.y_root - fx->move.offset_y;
 
-          xitk_lock_display (&xitk->x);
-          XMoveWindow (xitk->x.display, fx->window, fx->new_pos.x - fx->border_size.x,
-            fx->new_pos.y - fx->border_size.y);
-          XSync (xitk->x.display, False);
-          xitk_unlock_display (&xitk->x);
+          tags[0].value = fx->new_pos.x - fx->border_size.x;
+          tags[1].value = fx->new_pos.y - fx->border_size.y;
+          if (fx->wl.xwin && fx->wl.xwin->bewin)
+            fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
 
         } else {
           xitk_motion_notify_widget_list (&fx->wl,
@@ -3393,4 +3492,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-

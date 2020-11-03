@@ -267,11 +267,6 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
 }
 
 
-void tvset_reparent(void) {
-  gGui_t *gui = gGui;
-
-  reparent_window(gui, tvset.xwin);
-}
 
 void tvset_panel(void) {
   xitk_labelbutton_widget_t   lb;

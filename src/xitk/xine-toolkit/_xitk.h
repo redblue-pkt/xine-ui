@@ -254,16 +254,18 @@ struct xitk_window_s {
   xitk_t                   *xitk;
   xitk_be_window_t         *bewin;
   xitk_image_t             *bg_image;
-  Window                    window;
   xitk_window_t            *win_parent;
   int                       width;
   int                       height;
+  xitk_wm_window_type_t     type;
   xitk_window_role_t        role;
   uint32_t                  flags;
   xitk_widget_list_t       *widget_list;
+  /* to be removed */
+  Window                    window;
 };
 
-void xitk_window_update_tree (xitk_window_t *xwin);
+void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags);
 
 Pixmap xitk_window_get_background(xitk_window_t *w);
 #ifdef YET_UNUSED

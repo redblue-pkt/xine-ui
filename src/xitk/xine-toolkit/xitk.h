@@ -1300,6 +1300,7 @@ uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value);
 
 typedef enum {
   XITK_WR_HELPER = 0, /** << stay in front of main, show/hide with vice, default. */
+  XITK_WR_ROOT,       /** << main using root window */
   XITK_WR_MAIN,       /** << represent the application. */
   XITK_WR_VICE        /** << stay in front of main, be main while main is invisible. */
 } xitk_window_role_t;
@@ -1423,3 +1424,4 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+

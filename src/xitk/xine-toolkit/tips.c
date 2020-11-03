@@ -179,8 +179,9 @@ static void *_tips_loop_thread (void *data) {
 
             xitk_image_free_image (&image);
           }
+          pthread_mutex_unlock (&tips->mutex);
           xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
-          xitk_window_raise_window (xwin);
+          pthread_mutex_lock (&tips->mutex);
           state = TIPS_WAIT;
         } else {
           state = TIPS_IDLE;
