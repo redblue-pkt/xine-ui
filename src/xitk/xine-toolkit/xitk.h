@@ -154,53 +154,6 @@ typedef void (*xitk_signal_callback_t)(int, void *);
  */
 typedef int xitk_register_key_t;
 
-#define XITK_CTRL_KEY_PREFIX 1
-typedef enum {
-  XITK_KEY_ESCAPE = 1,
-  XITK_KEY_RETURN,
-  XITK_KEY_NUMPAD_ENTER,
-  XITK_KEY_ISO_ENTER,
-  XITK_KEY_LEFT,
-  XITK_KEY_RIGHT,
-  XITK_KEY_UP,
-  XITK_KEY_DOWN,
-  XITK_KEY_HOME,
-  XITK_KEY_END,
-  XITK_KEY_PAGE_UP,
-  XITK_KEY_PAGE_DOWN,
-  XITK_KEY_TAB,
-  XITK_KEY_KP_TAB,
-  XITK_KEY_ISO_LEFT_TAB,
-  XITK_KEY_INSERT,
-  XITK_KEY_DELETE,
-  XITK_KEY_BACKSPACE,
-  XITK_KEY_PRINT,
-  XITK_KEY_ROLL,
-  XITK_KEY_PAUSE,
-  XITK_KEY_F1,
-  XITK_KEY_F2,
-  XITK_KEY_F3,
-  XITK_KEY_F4,
-  XITK_KEY_F5,
-  XITK_KEY_F6,
-  XITK_KEY_F7,
-  XITK_KEY_F8,
-  XITK_KEY_F9,
-  XITK_KEY_F10,
-  XITK_KEY_F11,
-  XITK_KEY_F12,
-  XITK_KEY_PREV,
-  XITK_KEY_NEXT,
-  XITK_KEY_ABORT,
-  XITK_KEY_MENU,
-  XITK_KEY_HELP,
-
-  XITK_MOUSE_WHEEL_UP,
-  XITK_MOUSE_WHEEL_DOWN,
-
-  XITK_KEY_LASTCODE
-} xitk_ctrl_key_t;
-
 int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier);
 
 /*
@@ -1295,6 +1248,7 @@ void xitk_window_destroy_window(xitk_window_t *w);
 #define XITK_WINF_OVERRIDE_REDIRECT 0x0200
 #define XITK_WINF_FIXED_POS  0x0400 /** << user may _not_ click move */
 #define XITK_WINF_FENCED_IN  0x0800 /** << always stay on screen cmpletely */
+#define XITK_WINF_DND        0x1000 /** << do receive drag and drop events */
 /** try to set the flags in mask to value, return new flags. */
 uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value);
 

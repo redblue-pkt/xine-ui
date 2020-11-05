@@ -56,6 +56,7 @@ typedef struct _mwmhints {
 #include "xitkintl.h"
 #include "backend.h"
 #include "dump_x11.h"
+#include "dnd.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
@@ -169,6 +170,7 @@ struct xitk_x11_window_s {
   xitk_be_window_t w;
 
   xitk_x11_display_t *d;
+  xitk_dnd_t *dnd;
   GC gc;
   xitk_tagitem_t props[XITK_X11_WT_LAST];
   char title[256];
@@ -217,6 +219,8 @@ struct xitk_x11_display_s {
 
   int fd;
   Display *display;
+
+  xitk_x11_window_t *dnd_win;
 
   xitk_dlist_t free_windows;
   xitk_x11_window_t windows[32];
@@ -1347,6 +1351,19 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
     }
     XSync (d->display, False);
     d->d.unlock (&d->d);
+    if (diff & XITK_WINF_DND) {
+      if (newflags & XITK_WINF_DND) {
+        win->dnd = xitk_dnd_new (d->display, d->d.lock == xitk_x11_display_lock, d->be->be.verbosity);
+        xitk_dnd_make_window_aware (win->dnd, win->w.id);
+      } else {
+        pthread_mutex_lock (&d->mutex);
+        if (d->dnd_win == win)
+          d->dnd_win = NULL;
+        pthread_mutex_unlock (&d->mutex);
+        xitk_dnd_delete (win->dnd);
+        win->dnd = NULL;
+      }
+    }
   }
 
   if (d->be->be.verbosity >= 2)
@@ -1587,6 +1604,9 @@ static void xitk_x11_window_delete (xitk_be_window_t **_win) {
 
   pthread_mutex_lock (&d->mutex);
   xitk_dnode_remove (&win->w.node);
+  d->dnd_win = NULL;
+  xitk_dnd_delete (win->dnd);
+  win->dnd = NULL;
   _xitk_x11_clipboard_unregister_window (d, win->w.id);
   xitk_dlist_add_tail (&d->free_windows, &win->w.node);
   if (_xitk_x11_display_unref (d))
@@ -1823,6 +1843,34 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
   if (!d || !event)
     return 0;
 
+  if (d->dnd_win) {
+    pthread_mutex_lock (&d->mutex);
+    if (d->dnd_win && (!win || (win == d->dnd_win)) && ((type == XITK_EV_ANY) || (type == XITK_EV_DND))) {
+      int r;
+      win = d->dnd_win;
+      r = xitk_dnd_client_message (win->dnd, &xevent, d->utf8, sizeof (d->utf8));
+      if (r >= 2) {
+        event->type = XITK_EV_DND;
+        event->window = &win->w;
+        event->parent = NULL;
+        event->code = 0;
+        event->qual = 0;
+        event->id = 0;
+        event->x = 0;
+        event->y = 0;
+        event->w = 0;
+        event->h = 0;
+        event->time = 0;
+        event->more = strlen (d->utf8);
+        event->utf8 = d->utf8;
+        pthread_mutex_unlock (&d->mutex);
+        return 1;
+      }
+      d->dnd_win = NULL;
+    }
+    pthread_mutex_unlock (&d->mutex);
+  }
+
   while (1) {
     Status res;
 
@@ -2045,6 +2093,35 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       break;
 
     case PropertyNotify:
+      if (d->be->be.verbosity >= 2) {
+        char *name;
+        d->d.lock (&d->d);
+        name = XGetAtomName (d->display, xevent.xproperty.atom);
+        d->d.unlock (&d->d);
+        printf ("xitk.x11.window.property.change (%s, %s).\n",
+          win && win->props[XITK_X11_WT_TITLE].value ? (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>",
+        name ? name : "<unknown>");
+        XFree (name);
+      }
+      if (win && (xevent.xproperty.atom == d->atoms[XITK_A_WM_STATE])) {
+        Atom actual_type;
+        int actual_format = 0, res;
+        unsigned long nitems, bytes_after;
+        int *prop = NULL;
+
+        d->d.lock (&d->d);
+        res = XGetWindowProperty (d->display, win->w.id, xevent.xproperty.atom, 0, 4, False,
+          d->clipboard.atoms[XITK_A_integer], &actual_type, &actual_format, &nitems, &bytes_after,
+          (unsigned char **)&prop);
+        d->d.unlock (&d->d);
+        if ((res != False) && (nitems >= 1)) {
+          win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED);
+          win->props[XITK_X11_WT_WIN_FLAGS].value |=
+            *prop == NormalState ? XITK_WINF_VISIBLE : *prop == IconicState ? XITK_WINF_ICONIFIED : 0;
+        }
+        XFree (prop);
+      }
+      /* fall through */
     case SelectionClear:
     case SelectionRequest:
       _xitk_x11_clipboard_event (d, &xevent);
@@ -2067,8 +2144,25 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       }
       /* fall through */
     case ClientMessage:
-        event->type = XITK_EV_DND;
-        break;
+      if (win && win->dnd) {
+        int r = xitk_dnd_client_message (win->dnd, &xevent, d->utf8, sizeof (d->utf8));
+        if (r >= 2) {
+          pthread_mutex_lock (&d->mutex);
+          d->dnd_win = win;
+          pthread_mutex_unlock (&d->mutex);
+          event->type = XITK_EV_DND;
+          event->more = strlen (d->utf8);
+          event->utf8 = d->utf8;
+          event->qual = 0;
+          event->id = 0;
+          event->x = 0;
+          event->y = 0;
+          event->w = 0;
+          event->h = 0;
+          break;
+        }
+      }
+      return 0;
 
     case MappingNotify:
       d->d.lock (&d->d);
@@ -2092,7 +2186,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
   return 1;
 }
 
-static const char *xitk_x11_event_name (xitk_be_display_t *_d, xitk_be_event_t *event) {
+static const char *xitk_x11_event_name (xitk_be_display_t *_d, const xitk_be_event_t *event) {
   xitk_x11_display_t *d;
   const char *s = NULL;
 
@@ -2259,6 +2353,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
       xitk_dlist_add_tail (&d->free_windows, &win->w.node);
     }
   }
+  d->dnd_win = NULL;
   d->d.magic = _XITK_X11_DISPLAY_MAGIC;
   d->d.type = XITK_BE_TYPE_X11;
   d->d.id = (uintptr_t)d->display;
@@ -2318,7 +2413,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
       [XITK_A__NET_WM_STATE_FULLSCREEN]    = "_NET_WM_STATE_FULLSCREEN",
       [XITK_A__NET_WM_STATE_ABOVE]         = "_NET_WM_STATE_ABOVE",
       [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
-      [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION"
+      [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION",
     };
     d->d.lock (&d->d);
     XInternAtoms (d->display, (char **)names, XITK_A_LAST, False, d->atoms);
@@ -2398,3 +2493,4 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
 
   return &be->be;
 }
+

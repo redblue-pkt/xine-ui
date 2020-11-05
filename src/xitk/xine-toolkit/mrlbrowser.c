@@ -1132,11 +1132,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   wp->widget_key = xitk_window_register_event_handler ("mrl browser", wp->xwin, &wp->mrlbrowser_event_cbs, wp);
 
-  if (mb->reparent_window)
+  if (mb->reparent_window) {
     mb->reparent_window (mb->rw_data, wp->xwin);
-  else
+  } else {
     xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
     xitk_window_raise_window (wp->xwin);
+  }
 
   xitk_window_try_to_set_input_focus (wp->xwin);
 

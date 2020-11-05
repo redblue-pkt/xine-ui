@@ -20,78 +20,63 @@
  * Public part of xiTK backend.
  */
 
+#ifndef _XITK_H_
+#  error include xitk.h before backend.h!
+#endif
+
 #ifndef XITK_BACKEND_H
 #define XITK_BACKEND_H
 
 #include <stdint.h>
-#include "dlist.h"
 
-typedef struct xitk_backend_s xitk_backend_t;
-typedef struct xitk_be_display_s xitk_be_display_t;
-typedef struct xitk_be_image_s xitk_be_image_t;
+#define XITK_CTRL_KEY_PREFIX 1
+typedef enum {
+  XITK_KEY_ESCAPE = 1,
+  XITK_KEY_RETURN,
+  XITK_KEY_NUMPAD_ENTER,
+  XITK_KEY_ISO_ENTER,
+  XITK_KEY_LEFT,
+  XITK_KEY_RIGHT,
+  XITK_KEY_UP,
+  XITK_KEY_DOWN,
+  XITK_KEY_HOME,
+  XITK_KEY_END,
+  XITK_KEY_PAGE_UP,
+  XITK_KEY_PAGE_DOWN,
+  XITK_KEY_TAB,
+  XITK_KEY_KP_TAB,
+  XITK_KEY_ISO_LEFT_TAB,
+  XITK_KEY_INSERT,
+  XITK_KEY_DELETE,
+  XITK_KEY_BACKSPACE,
+  XITK_KEY_PRINT,
+  XITK_KEY_ROLL,
+  XITK_KEY_PAUSE,
+  XITK_KEY_F1,
+  XITK_KEY_F2,
+  XITK_KEY_F3,
+  XITK_KEY_F4,
+  XITK_KEY_F5,
+  XITK_KEY_F6,
+  XITK_KEY_F7,
+  XITK_KEY_F8,
+  XITK_KEY_F9,
+  XITK_KEY_F10,
+  XITK_KEY_F11,
+  XITK_KEY_F12,
+  XITK_KEY_PREV,
+  XITK_KEY_NEXT,
+  XITK_KEY_ABORT,
+  XITK_KEY_MENU,
+  XITK_KEY_HELP,
+
+  XITK_MOUSE_WHEEL_UP,
+  XITK_MOUSE_WHEEL_DOWN,
+
+  XITK_KEY_LASTCODE
+} xitk_ctrl_key_t;
+
 typedef struct xitk_be_window_s xitk_be_window_t;
-
-typedef enum {
-  XITK_BE_MASK_NO = 0, /* default */
-  XITK_BE_MASK_YES,    /* implicit when copying from masked image */
-  XITK_BE_MASK_SHARED  /* if supported by backend, otherwise same as YES */
-} xitk_be_mask_t;
-
-typedef enum {
-  XITK_TAG_END = 0, /* 0 */
-  XITK_TAG_SKIP,    /* num_items */
-  XITK_TAG_INSERT,  /* xitk_tagitem_t * */
-  XITK_TAG_JUMP,    /* xitk_tagitem_t * */
-  XITK_TAG_BUFSIZE, /* size_t. > 0 enables string copying. */
-#define XITK_XY_CENTER 0x7fffffff
-  XITK_TAG_X,       /* int */
-  XITK_TAG_Y,       /* int */
-  XITK_TAG_WIDTH,   /* int */
-  XITK_TAG_HEIGHT,  /* int */
-  XITK_TAG_MODE,    /* int */
-  XITK_TAG_LAYER_ABOVE,  /* int */
-  XITK_TAG_FG,      /* uint32_t */
-  XITK_TAG_BG,      /* uint32_t */
-  XITK_TAG_IMAGE,   /* xitk_be_image_t * */
-  XITK_TAG_WINDOW,  /* xitk_be_window_t * */
-  XITK_TAG_ICON,    /* xitk_be_image_t * */
-  XITK_TAG_WRAP,    /* existing window id */
-  XITK_TAG_RAW,     /* const char * */
-  XITK_TAG_PARENT,  /* xitk_be_window_t * */
-  XITK_TAG_TRANSIENT_FOR,  /* xitk_be_window_t * */
-  XITK_TAG_STATE,   /* xitk_be_window_state_t * */
-  XITK_TAG_WIN_FLAGS, /* XITK_WINF_* */
-  XITK_TAG_MASK,    /* xitk_be_mask_t */
-  XITK_TAG_FILEBUF, /* const char * */
-  XITK_TAG_FILESIZE,/* size_t */
-  XITK_TAG_NAME,    /* (const) char * */
-  XITK_TAG_FILENAME,/* (const) char * */
-  XITK_TAG_FONTNAME,/* (const) char * */
-  XITK_TAG_TITLE,   /* (const) char * */
-  XITK_TAG_RES_NAME,/* (const) char * */
-  XITK_TAG_RES_CLASS,/* (const) char * */
-  XITK_TAG_LAST
-} xitk_tag_type_t;
-
-typedef struct {
-  xitk_tag_type_t type;
-  uintptr_t value;
-} xitk_tagitem_t;
-
-/* generic helper, not to be implemented by backend. */
-int xitk_tags_get (const xitk_tagitem_t *from, xitk_tagitem_t *to);
-
-typedef struct {
-  uint16_t x1, y1, x2, y2;
-} xitk_be_line_t;
-typedef struct {
-  uint16_t x, y, w, h;
-} xitk_be_rect_t;
-
-typedef enum {
-  XITK_BE_TYPE_X11 = 1,
-  XITK_BE_TYPE_WAYLAND = 2
-} xitk_be_type_t;
 
 typedef enum {
   XITK_EV_ANY = 0,
@@ -118,109 +103,27 @@ typedef enum {
 
 typedef struct {
   xitk_be_event_type_t type;
-  uint32_t code, qual, from_peer;
-  uintptr_t id;
+  uint32_t code; /** << backend internal key code or button # */
+  uint32_t qual; /** << shift, ctrl, ... */
+  uint32_t from_peer;
+  uintptr_t id;  /** << backend internal value */
   xitk_be_window_t *window, *parent;
-  int x, y, w, h, more, time;
-  const char *utf8;
+  int x, y;
+  int w, h; /** << alias root window relative x, y with XITK_EV_[MOVE,BUTTON_*,KEY_*]. */
+  int more; /** << utf8 byte length, or count of remaining XITK_EV_EXPOSE */
+  int time; /** << milliseconds */
+  const char *utf8; /** << may be XITK_CTRL_KEY_PREFIX, xitk_ctrl_key_t, 0 */
 } xitk_be_event_t;
 
-struct xitk_be_image_s {
-  xitk_dnode_t node;
-  uint32_t magic;
-  xitk_be_type_t type;
-  xitk_be_display_t *display;
-  uintptr_t id1, id2;
-  /* for appliction use */
-  void *data;
+/** for use in event handler */
+const char *xitk_be_event_name (const xitk_be_event_t *event);
 
-  void (*_delete) (xitk_be_image_t **image);
+/** return 1 if event was handled finally. */
+typedef int (xitk_be_event_handler_t) (void *data, const xitk_be_event_t *event);
 
-  int  (*get_props) (xitk_be_image_t *image, xitk_tagitem_t *taglist);
-  int  (*pixel_is_visible) (xitk_be_image_t *image, int x, int y);
+xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_window_t *xwin,
+  xitk_widget_list_t *wl,
+  xitk_be_event_handler_t *event_handler, void *eh_data,
+  void (*destructor) (void *data), void *destr_data);
 
-  int  (*set_props) (xitk_be_image_t *image, const xitk_tagitem_t *taglist);
-  void (*draw_lines) (xitk_be_image_t *image, const xitk_be_line_t *lines, int num_lines, uint32_t color, int mask);
-  void (*fill_rects) (xitk_be_image_t *image, const xitk_be_rect_t *rects, int num_rects, uint32_t color, int mask);
-  void (*copy_rect)  (xitk_be_image_t *image, xitk_be_image_t *from, int x1, int y1, int w, int h, int x2, int y2);
-  void (*draw_arc)   (xitk_be_image_t *image, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
-    uint16_t a1, uint16_t a2, uint32_t color, int mask);
-  void (*fill_arc)   (xitk_be_image_t *image, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
-    uint16_t a1, uint16_t a2, uint32_t color, int mask);
-  void (*fill_polygon) (xitk_be_image_t *image, const xitk_point_t *points, int num_points, uint32_t color, int mask);
-  void (*draw_text)  (xitk_be_image_t *image, const char *text, size_t bytes, int x, int y);
-};
-
-typedef enum {
-  XITK_WS_NONE = 0,
-  XITK_WS_HIDDEN,
-  XITK_WS_NORMAL,
-  XITK_WS_MAXIMIZED,
-  XITK_WS_ICONIFIED
-} xitk_be_window_state_t;
-
-struct xitk_be_window_s {
-  xitk_dnode_t node;
-  uint32_t magic;
-  xitk_be_type_t type;
-  xitk_be_display_t *display;
-  uintptr_t id;
-  /* for appliction use */
-  void *data;
-
-  void (*_delete)  (xitk_be_window_t **win);
-
-  int  (*get_props)     (xitk_be_window_t *win, xitk_tagitem_t *taglist);
-  int  (*get_clip_utf8) (xitk_be_window_t *win, char **buf, int max_len);
-
-  int  (*set_props)     (xitk_be_window_t *win, const xitk_tagitem_t *taglist);
-  void (*raise)         (xitk_be_window_t *win);
-  int  (*set_clip_utf8) (xitk_be_window_t *win, const char *buf, int len);
-  void (*copy_rect)     (xitk_be_window_t *win, xitk_be_image_t *from, int x1, int y1, int w, int h, int x2, int y2, int sync);
-};
-
-struct xitk_be_display_s {
-  xitk_dnode_t node;
-  uint32_t magic;
-  xitk_be_type_t type;
-  xitk_backend_t *be;
-  uintptr_t id;
-  /* for appliction use */
-  void *data;
-
-  xitk_dlist_t images, windows;
-
-  void (*close)  (xitk_be_display_t **d);
-  void (*lock)   (xitk_be_display_t *d);
-  void (*unlock) (xitk_be_display_t *d);
-
-  /* win may be NULL, type may be XITK_EV_ANY.
-   * the pointers in event stay valid until next next_event () or close (). */
-  int (*next_event) (xitk_be_display_t *d, xitk_be_event_t *event, xitk_be_window_t *win, xitk_be_event_type_t type, int timeout);
-  const char *(*event_name) (xitk_be_display_t *d, xitk_be_event_t *event);
-
-  struct {
-    int  (*_new)    (xitk_be_display_t *d, xitk_color_info_t *info);
-    void (*_delete) (xitk_be_display_t *d, uint32_t value);
-  } color;
-
-  xitk_be_image_t  *(*image_new)  (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
-  xitk_be_window_t *(*window_new) (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
-};
-
-xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity);
-
-struct xitk_backend_s {
-  xitk_dnode_t node;
-  uint32_t magic;
-  xitk_be_type_t type;
-  xitk_t *xitk;
-  int verbosity;
-
-  xitk_dlist_t displays;
-
-  void (*_delete) (xitk_backend_t **be);
-  xitk_be_display_t *(*open_display) (xitk_backend_t *be, const char *name, int use_lock, int use_sync);
-};
 #endif
-
