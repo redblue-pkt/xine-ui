@@ -62,7 +62,7 @@ typedef struct {
 
 int xitk_color_db_query_value (xitk_t *xitk, xitk_color_info_t *info);
 
-#include "backend.h"
+#include "_backend.h"
 
 typedef struct xitk_font_cache_s xitk_font_cache_t;
 struct xitk_tips_s;

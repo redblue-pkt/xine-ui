@@ -210,6 +210,7 @@ typedef struct {
   xitk_dnd_t                 *xdnd;
   void                       *user_data;
 
+  xitk_be_event_handler_t    *event_handler;
   void                      (*destructor)(void *userdata);
   void                       *destr_data;
 } __gfx_t;
@@ -397,8 +398,7 @@ static void __fx_delete (__gfx_t *fx) {
   xitk_dnode_remove (&fx->wl.node);
 
   if (fx->xdnd) {
-    xitk_unset_dnd_callback (fx->xdnd);
-    free (fx->xdnd);
+    xitk_dnd_delete (fx->xdnd);
     fx->xdnd = NULL;
   }
 
@@ -1992,14 +1992,25 @@ void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data)
   }
 }
 
+const char *xitk_be_event_name (const xitk_be_event_t *event) {
+  if (!event)
+    return NULL;
+  if (!event->window)
+    return NULL;
+  if (!event->window->display)
+    return NULL;
+  return event->window->display->event_name (event->window->display, event);
+}
+
 /*
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
  */
 
-xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
-                                                    const xitk_event_cbs_t *cbs, void *user_data,
-                                                    xitk_widget_list_t *wl) {
+static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_window_t *w,
+  xitk_widget_list_t *wl,
+  xitk_be_event_handler_t *event_handler, const xitk_event_cbs_t *cbs, void *user_data,
+  void (*destructor) (void *data), void *destr_data) {
   xitk_t *_xitk;
   __xitk_t *xitk;
   __gfx_t   *fx;
@@ -2031,7 +2042,6 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     strlcpy (fx->name, name, sizeof (fx->name));
   else
     strcpy (fx->name, "NO_SET");
-  fx->user_data = user_data;
   fx->w         = w;
   fx->window    = xitk_window_get_window (w);
 
@@ -2060,13 +2070,17 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
     }
   }
 
+  fx->user_data = user_data;
   fx->cbs = cbs;
 
   if (cbs && cbs->dnd_cb && (fx->window != None)) {
-    fx->xdnd = xitk_dnd_new (&xitk->x);
-    if (fx->xdnd && xitk_make_window_dnd_aware(fx->xdnd, fx->window))
-      xitk_set_dnd_callback(fx->xdnd, cbs->dnd_cb);
+    fx->xdnd = xitk_dnd_new (xitk->x.display, xitk->x.lock_display == _xitk_lock_display, xitk->verbosity);
+    xitk_dnd_make_window_aware (fx->xdnd, fx->window);
   }
+
+  fx->event_handler = event_handler;
+  fx->destructor = destructor;
+  fx->destr_data = destr_data;
 
   if(fx->window) {
     xitk_lock_display (&xitk->x);
@@ -2083,6 +2097,18 @@ xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_windo
   if (xitk->verbosity >= 2)
     printf ("xitk_gfx_new (\"%s\") = %d.\n", fx->name, fx->key);
   return fx->key;
+}
+
+xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_window_t *xwin,
+  xitk_widget_list_t *wl,
+  xitk_be_event_handler_t *event_handler, void *eh_data,
+  void (*destructor) (void *data), void *destr_data) {
+  return _xitk_register_event_handler (name, xwin, wl, event_handler, NULL, eh_data, destructor, destr_data);
+}
+
+xitk_register_key_t xitk_register_event_handler_ext (const char *name, xitk_window_t *xwin,
+  const xitk_event_cbs_t *cbs, void *user_data, xitk_widget_list_t *wl) {
+  return _xitk_register_event_handler (name, xwin, wl, NULL, cbs, user_data, NULL, NULL);
 }
 
 static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
@@ -2260,8 +2286,14 @@ static void xitk_xevent_notify_impl (__xitk_t *xitk, XEvent *event) {
         break;
       /* fall through */
     case ClientMessage:
-      if (fx->xdnd)
-        xitk_process_client_dnd_message (fx->xdnd, event);
+      if (fx->xdnd) {
+        char buf[2048];
+        while (xitk_dnd_client_message (fx->xdnd, event, buf, sizeof (buf)) > 1) {
+          if (xitk->verbosity >= 2)
+            printf ("xitk.dnd.add (%s).\n", buf);
+          fx->cbs->dnd_cb (buf);
+        }
+      }
       break;
 
     case PropertyNotify:

@@ -19,7 +19,6 @@ noinst_LIBRARIES = $(xitk_lib)
 
 libxitk_a_CFLAGS = $(AM_CFLAGS)
 libxitk_a_SOURCES = \
-	backend.h \
 	backend_x11.c \
 	browser.c \
 	button.c \
@@ -40,7 +39,6 @@ libxitk_a_SOURCES = \
 	labelbutton.c \
 	menu.c \
 	mrlbrowser.c \
-	recode.h \
 	skin.c \
 	slider.c \
 	tabs.c \
@@ -57,8 +55,10 @@ libxitk_a_SOURCES += recode.c
 endif
 
 noinst_HEADERS = \
+	_backend.h \
 	_config.h \
 	_xitk.h \
+	backend.h \
 	browser.h \
 	button.h \
 	button_list.h \
@@ -77,6 +77,7 @@ noinst_HEADERS = \
 	labelbutton.h \
 	menu.h \
 	mrlbrowser.h \
+	recode.h \
 	skin.h \
 	slider.h \
 	tabs.h \
