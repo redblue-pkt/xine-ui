@@ -33,6 +33,7 @@
 #include "videowin.h"
 #include "actions.h"
 #include "event.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/tabs.h"
@@ -417,65 +418,50 @@ static void setup_list_step (xui_setup_t *setup, int step) {
  * Handle X events here.
  */
 
-static void _setup_handle_button_event(void *data, const xitk_button_event_t *be) {
+static int setup_event (void *data, const xitk_be_event_t *e) {
   xui_setup_t *setup = data;
+  int step = 0;
 
-  if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button4)
-      setup_list_step (setup, -1);
-    else if (be->button == Button5)
-      setup_list_step (setup, 1);
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
+      setup_exit (NULL, setup, 0);
+      return 1;
+    case XITK_EV_BUTTON_DOWN:
+      if (e->code == 4)
+        step = -1;
+      else if (e->code == 5)
+        step = 1;
+      break;
+    case XITK_EV_KEY_DOWN:
+      if (e->utf8[0] == XITK_CTRL_KEY_PREFIX) {
+        switch (e->utf8[1]) {
+          case XITK_MOUSE_WHEEL_UP:
+          case XITK_KEY_UP:
+            step = -1;
+            break;
+          case XITK_MOUSE_WHEEL_DOWN:
+          case XITK_KEY_DOWN:
+            step = 1;
+            break;
+          case XITK_KEY_NEXT:
+            step = MAX_DISPLAY_WIDGETS;
+            break;
+          case XITK_KEY_PREV:
+            step = -MAX_DISPLAY_WIDGETS;
+            break;
+          case XITK_KEY_ESCAPE:
+            setup_exit (NULL, setup, 0);
+            return 1;
+        }
+      }
+    default: ;
   }
-}
-
-static void _setup_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  xui_setup_t *setup = data;
-
-  if (ke->event == XITK_KEY_PRESS) {
-    switch (ke->key_pressed) {
-      case XK_Up:
-        if (xitk_is_widget_enabled (setup->slider_wg) &&
-            (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-          setup_list_step (setup, -1);
-          return;
-        }
-        break;
-
-      case XK_Down:
-        if (xitk_is_widget_enabled (setup->slider_wg) &&
-            (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-          setup_list_step (setup, 1);
-          return;
-        }
-        break;
-
-      case XK_Next:
-        if (xitk_is_widget_enabled(setup->slider_wg)) {
-          setup_list_step (setup, MAX_DISPLAY_WIDGETS);
-          return;
-        }
-        break;
-
-      case XK_Prior:
-        if (xitk_is_widget_enabled(setup->slider_wg)) {
-          setup_list_step (setup, -MAX_DISPLAY_WIDGETS);
-          return;
-        }
-        break;
-
-      case XK_Escape:
-        setup_exit (NULL, setup, 0);
-        return;
-    }
-
-    gui_handle_key_event (setup->gui, ke);
+  if (step && xitk_is_widget_enabled (setup->slider_wg) && (!(e->qual & (MODIFIER_SHIFT | MODIFIER_CTRL)))) {
+    setup_list_step (setup, step);
+    return 1;
   }
+  return gui_handle_be_event (setup->gui, e);
 }
-
-static const xitk_event_cbs_t setup_event_cbs = {
-  .key_cb            = _setup_handle_key_event,
-  .btn_cb            = _setup_handle_button_event,
-};
 
 /*
  *
@@ -1057,7 +1043,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   }
   setup_show_tips (setup, panel_get_tips_enable (setup->gui->panel), panel_get_tips_timeout (setup->gui->panel));
 
-  setup->kreg = xitk_window_register_event_handler("setup", setup->xwin, &setup_event_cbs, setup);
+  setup->kreg = xitk_be_register_event_handler ("setup", setup->xwin, NULL, setup_event, setup, NULL, NULL);
 
   setup->visible = 1;
   setup_raise_window (setup);
@@ -1067,3 +1053,4 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
+

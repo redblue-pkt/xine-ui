@@ -354,6 +354,11 @@ typedef struct {
 #define MODIFIER_MOD3               0x00000020
 #define MODIFIER_MOD4               0x00000040
 #define MODIFIER_MOD5               0x00000080
+#define MODIFIER_BUTTON1            0x00000100
+#define MODIFIER_BUTTON2            0x00000200
+#define MODIFIER_BUTTON3            0x00000400
+#define MODIFIER_BUTTON4            0x00000800
+#define MODIFIER_BUTTON5            0x00001000
 
 /*
  * See

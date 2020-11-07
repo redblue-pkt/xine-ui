@@ -34,6 +34,7 @@
 #include "videowin.h"
 #include "actions.h"
 #include "event.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
 #include "recode.h"
@@ -445,20 +446,16 @@ static void stream_infos_exit (xitk_widget_t *w, void *data, int state) {
   free (sinfo);
 }
 
-static void stream_infos_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static int stream_infos_event (void *data, const xitk_be_event_t *e) {
   xui_sinfo_t *sinfo = (xui_sinfo_t *)data;
 
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      stream_infos_exit (NULL, sinfo, 0);
-    else
-      gui_handle_key_event (sinfo->gui, ke);
+  if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    stream_infos_exit (NULL, sinfo, 0);
+    return 1;
   }
+  return gui_handle_be_event (sinfo->gui, e);
 }
-
-static const xitk_event_cbs_t stream_infos_event_cbs = {
-  .key_cb            = stream_infos_handle_key_event,
-};
 
 int stream_infos_is_visible (xui_sinfo_t *sinfo) {
   if (sinfo) {
@@ -653,7 +650,7 @@ void stream_infos_panel (gGui_t *gui) {
     xitk_enable_and_show_widget (sinfo->close);
   }
 
-  sinfo->widget_key = xitk_window_register_event_handler ("sinfos", sinfo->xwin, &stream_infos_event_cbs, sinfo);
+  sinfo->widget_key = xitk_be_register_event_handler ("sinfos", sinfo->xwin, NULL, stream_infos_event, sinfo, NULL, NULL);
   sinfo->visible = 1;
   stream_infos_raise_window (sinfo);
   xitk_window_try_to_set_input_focus (sinfo->xwin);

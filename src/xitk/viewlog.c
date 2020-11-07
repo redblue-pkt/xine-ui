@@ -32,6 +32,7 @@
 #include "videowin.h"
 #include "actions.h"
 #include "event.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/tabs.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/browser.h"
@@ -311,21 +312,16 @@ void viewlog_end (xui_viewlog_t *vl) {
   viewlog_exit (NULL, vl, 0);
 }
 
-static void viewlog_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static int viewlog_event (void *data, const xitk_be_event_t *e) {
   xui_viewlog_t *vl = data;
 
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      viewlog_exit (NULL, vl, 0);
-    else
-      gui_handle_key_event (vl->gui, ke);
+  if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    viewlog_exit (NULL, vl, 0);
+    return 1;
   }
+  return gui_handle_be_event (vl->gui, e);
 }
-
-static const xitk_event_cbs_t viewlog_event_cbs = {
-  .key_cb = viewlog_handle_key_event,
-};
-
 
 /*
  * Create viewlog window
@@ -429,7 +425,7 @@ void viewlog_panel (gGui_t *gui) {
     }
   }
 
-  vl->kreg = xitk_window_register_event_handler ("viewlog", vl->xwin, &viewlog_event_cbs, vl);
+  vl->kreg = xitk_be_register_event_handler ("viewlog", vl->xwin, NULL, viewlog_event, vl, NULL, NULL);
 
   vl->visible = 1;
   viewlog_raise_window (vl);

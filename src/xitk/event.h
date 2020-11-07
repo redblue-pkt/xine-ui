@@ -25,6 +25,7 @@
 #include "common.h"
 
 #include "xitk.h"
+#include "backend.h"
 
 typedef struct {
   int    num_files;
@@ -48,7 +49,9 @@ int gui_playlist_play (gGui_t *gui, int idx);
 void gui_playlist_start_next (gGui_t *gui);
 void gui_execute_action_id (gGui_t *gui, action_id_t id);
 
+int gui_handle_be_event (void *gui, const xitk_be_event_t *e);
 void gui_handle_key_event (void *data, const xitk_key_event_t *ke);
 void gui_handle_button_event (void *data, const xitk_button_event_t *be);
 
 #endif
+

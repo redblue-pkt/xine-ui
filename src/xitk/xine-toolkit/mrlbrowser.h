@@ -25,6 +25,7 @@
 #include <xine.h>
 
 #include "browser.h"
+#include "backend.h"
 
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 
@@ -52,8 +53,8 @@ typedef struct {
     const char                     *skin_element_name;
   } origin;
 
-  xitk_key_event_callback_t         key_cb;
-  void                             *key_cb_data;
+  xitk_be_event_handler_t          *input_cb;
+  void                             *input_cb_data;
   xitk_dnd_callback_t               dndcallback;
 
   struct {

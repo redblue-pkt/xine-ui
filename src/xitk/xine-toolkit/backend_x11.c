@@ -80,7 +80,8 @@ typedef enum {
   XITK_A__MOTIF_WM_HINTS,
   XITK_A_WM_CHANGE_STATE,
   XITK_A_WM_STATE,
-  XITK_A_DELETE_WINDOW,
+  XITK_A_WM_DELETE_WINDOW,
+  XITK_A_WM_PROTOCOLS,
   XITK_A__NET_WM_NAME,
   XITK_A__NET_WM_WINDOW_TYPE,
   XITK_A__NET_WM_WINDOW_TYPE_DESKTOP,
@@ -794,6 +795,8 @@ static void xitk_x11_display_nolock (xitk_be_display_t *_d) {
 static void _xitk_x11_clipboard_unregister_window (xitk_x11_display_t *d, Window win) {
   if (d->clipboard.window_out == win)
     d->clipboard.window_out = None;
+  if (d->clipboard.window_in == win)
+    d->clipboard.window_in = None;
 }
 
 static void _xitk_x11_clipboard_init (xitk_x11_display_t *d) {
@@ -849,6 +852,8 @@ static void _xitk_x11_clipboard_init (xitk_x11_display_t *d) {
 }
 
 static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
+  if (event->xproperty.window == None)
+    return 0;
   if (event->type == PropertyNotify) {
     if (event->xproperty.atom == d->clipboard.dummy) {
       if (event->xproperty.window == d->clipboard.window_out) {
@@ -894,7 +899,6 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
           } while (0);
           d->d.unlock (&d->d);
           if (d->clipboard.text_len > 0) {
-            d->clipboard.window_in = None;
             return 2;
           }
         }
@@ -1047,6 +1051,7 @@ static int xitk_x11_window_get_utf8 (xitk_be_window_t *_win, char **text, int ma
     if (d->be->be.verbosity >= 2)
       printf ("xitk.x11.clipboard: get #1 from self: %d bytes.\n", d->clipboard.text_len);
   } else {
+    d->clipboard.window_in = None;
     if (d->be->be.verbosity >= 2)
       printf ("xitk.x11.clipboard: get #3: %d bytes.\n", d->clipboard.text_len);
   }
@@ -1087,27 +1092,29 @@ static const int _xitk_x11_event_type[XITK_EV_LAST] = {
   [XITK_EV_CLIP_READY] = 0
 };
 
-static int _xitk_x11_get_modifier (unsigned int state) {
-  int res = MODIFIER_NOMOD;
+static uint32_t _xitk_x11_get_modifier (uint32_t state) {
+  static const uint32_t tab[] = {
+    ShiftMask,    MODIFIER_SHIFT,
+    LockMask,     MODIFIER_LOCK,
+    ControlMask,  MODIFIER_CTRL,
+    Mod1Mask,     MODIFIER_META,
+    Mod2Mask,     MODIFIER_NUML,
+    Mod3Mask,     MODIFIER_MOD3,
+    Mod4Mask,     MODIFIER_MOD4,
+    Mod5Mask,     MODIFIER_MOD5,
+    Button1Mask,  MODIFIER_BUTTON1,
+    Button2Mask,  MODIFIER_BUTTON2,
+    Button3Mask,  MODIFIER_BUTTON3,
+    Button4Mask,  MODIFIER_BUTTON4,
+    Button5Mask,  MODIFIER_BUTTON5
+  };
+  uint32_t res = MODIFIER_NOMOD, i;
 
   if (state & XK_Multi_key)
     state = (state | XK_Multi_key) & 0xFF;
-  if (state & ShiftMask)
-    res |= MODIFIER_SHIFT;
-  if (state & LockMask)
-    res |= MODIFIER_LOCK;
-  if (state & ControlMask)
-    res |= MODIFIER_CTRL;
-  if (state & Mod1Mask)
-    res |= MODIFIER_META;
-  if (state & Mod2Mask)
-    res |= MODIFIER_NUML;
-  if (state & Mod3Mask)
-    res |= MODIFIER_MOD3;
-  if (state & Mod4Mask)
-    res |= MODIFIER_MOD4;
-  if (state & Mod5Mask)
-    res |= MODIFIER_MOD5;
+  for (i = 0; i < sizeof (tab) / sizeof (tab[0]); i += 2)
+    if (state & tab[i])
+      res |= tab[i + 1];
   return res;
 }
 
@@ -1203,8 +1210,8 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
     oldflags &= ~(XITK_WINF_VISIBLE | XITK_WINF_OVERRIDE_REDIRECT);
     have |= XITK_WINF_VISIBLE | XITK_WINF_OVERRIDE_REDIRECT;
-    win->props[XITK_X11_WT_X].value = attr.x;
-    win->props[XITK_X11_WT_Y].value = attr.y;
+/*  win->props[XITK_X11_WT_X].value = attr.x;
+    win->props[XITK_X11_WT_Y].value = attr.y; */
     win->props[XITK_X11_WT_W].value = attr.width;
     win->props[XITK_X11_WT_H].value = attr.height;
     oldflags |= attr.map_state == IsUnmapped ? 0 : XITK_WINF_VISIBLE;
@@ -1397,8 +1404,8 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     XWindowAttributes attr;
     attr.root = None;
     if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
-      win->props[XITK_X11_WT_X].value = attr.x;
-      win->props[XITK_X11_WT_Y].value = attr.y;
+/*    win->props[XITK_X11_WT_X].value = attr.x;
+      win->props[XITK_X11_WT_Y].value = attr.y; */
       win->props[XITK_X11_WT_W].value = attr.width;
       win->props[XITK_X11_WT_H].value = attr.height;
     }
@@ -1436,8 +1443,8 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
       XWindowAttributes attr;
       attr.root = None;
       if (XGetWindowAttributes (d->display, win->w.id, &attr)) {
-        win->props[XITK_X11_WT_X].value = attr.x;
-        win->props[XITK_X11_WT_Y].value = attr.y;
+/*      win->props[XITK_X11_WT_X].value = attr.x;
+        win->props[XITK_X11_WT_Y].value = attr.y; */
         win->props[XITK_X11_WT_W].value = attr.width;
         win->props[XITK_X11_WT_H].value = attr.height;
       }
@@ -1736,11 +1743,17 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       attr.colormap          = Imlib_get_colormap (d->be->be.xitk->imlibdata);
       attr.win_gravity       = NorthWestGravity;
 
+      attr.event_mask =
+        KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
+        EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask |
+        KeymapStateMask | ExposureMask | VisibilityChangeMask | StructureNotifyMask |
+        SubstructureNotifyMask | FocusChangeMask | PropertyChangeMask | ColormapChangeMask;
+
       d->d.lock (&d->d);
       win->w.id = XCreateWindow (d->display, d->be->be.xitk->imlibdata->x.root,
         hint.x, hint.y, hint.width, hint.height, 0, d->be->be.xitk->imlibdata->x.depth,
         InputOutput, d->be->be.xitk->imlibdata->x.visual,
-        CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect | CWWinGravity, &attr);
+        CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect | CWWinGravity | CWEventMask, &attr);
       if (win->w.id == None) {
         d->d.unlock (&d->d);
         break;
@@ -1753,7 +1766,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
 
     XSelectInput (d->display, win->w.id, INPUT_MOTION | KeymapStateMask);
 
-    XSetWMProtocols (d->display, win->w.id, &d->atoms[XITK_A_DELETE_WINDOW], 1);
+    XSetWMProtocols (d->display, win->w.id, &d->atoms[XITK_A_WM_DELETE_WINDOW], 1);
 
     if ((xclasshint = XAllocClassHint ()) != NULL) {
       xclasshint->res_name  = ((char *)win->props[XITK_X11_WT_RES_NAME].value
@@ -1835,8 +1848,10 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
   xitk_be_window_t *_win, xitk_be_event_type_t type, int timeout) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
+
   XEvent xevent;
   KeySym ksym;
+  Window w11;
 
   xitk_container (d, _d, d);
   xitk_container (win, _win, w);
@@ -1854,6 +1869,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
         event->window = &win->w;
         event->parent = NULL;
         event->code = 0;
+        event->sym = 0;
         event->qual = 0;
         event->id = 0;
         event->x = 0;
@@ -1885,7 +1901,11 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       if ((type > XITK_EV_ANY) && (type < XITK_EV_CLIP_READY)) {
         res = XCheckTypedEvent (d->display, _xitk_x11_event_type[type], &xevent);
       } else {
-        res = XCheckMaskEvent (d->display, ~0, &xevent);
+        /* NOTE: res = XCheckMaskEvent (d->display, ~0, &xevent); would be the natural choice here.
+         * however, that seems to filter out some interesting stuff. */
+        res = XPending (d->display);
+        if (res != False)
+          XNextEvent (d->display, &xevent);
       }
     }
     d->d.unlock (&d->d);
@@ -1907,17 +1927,25 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
     }
   }
 
+  w11 = xevent.xany.type == CreateNotify ? xevent.xcreatewindow.window
+      : xevent.xany.type == DestroyNotify ? xevent.xdestroywindow.window
+      : xevent.xany.type == MapNotify ? xevent.xmap.window
+      : xevent.xany.type == UnmapNotify ? xevent.xunmap.window
+      : xevent.xany.type == ConfigureNotify ? xevent.xconfigure.window
+      : xevent.xany.window;
   if (!win) {
     pthread_mutex_lock (&d->mutex);
     for (win = (xitk_x11_window_t *)d->d.windows.head.next; win->w.node.next; win = (xitk_x11_window_t *)win->w.node.next)
-      if (win->w.id == xevent.xany.window)
+      if (win->w.id == w11)
         break;
     pthread_mutex_unlock (&d->mutex);
     if (!win->w.node.next)
       win = NULL;
   }
-  event->id = xevent.xany.window;
+  event->id = w11;
   event->from_peer = (xevent.xany.send_event != False);
+  event->code = 0;
+  event->sym = 0;
   event->more = 0;
   event->time = 0;
   event->window = &win->w;
@@ -1940,6 +1968,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       event->h = xevent.xkey.y_root;
       event->time = xevent.xkey.time;
       event->more = _xitk_x11_keyevent_2_string (d, &xevent, &ksym, d->utf8, sizeof (d->utf8));
+      event->sym = ksym;
       event->utf8 = d->utf8;
       break;
 
@@ -1961,7 +1990,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
 
     case MotionNotify:
       event->type = XITK_EV_MOVE;
-      event->qual = xevent.xmotion.state;
+      event->qual = _xitk_x11_get_modifier (xevent.xmotion.state);
       event->x = xevent.xmotion.x;
       event->y = xevent.xmotion.y;
       event->w = xevent.xmotion.x_root;
@@ -1981,6 +2010,8 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       event->y = xevent.xcrossing.y;
       event->w = xevent.xcrossing.x_root;
       event->h = xevent.xcrossing.y_root;
+      event->code = xevent.xcrossing.mode == NotifyNormal ? 0
+                  : xevent.xcrossing.mode == NotifyGrab ? 1 : 2;
       event->time = xevent.xcrossing.time;
       break;
 
@@ -2036,6 +2067,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
 
     case DestroyNotify:
       event->type = XITK_EV_DEL_WIN;
+      event->code = 1;
       if (win) {
         _xitk_x11_clipboard_unregister_window (d, win->w.id);
         win->w.id = None;
@@ -2124,11 +2156,8 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       /* fall through */
     case SelectionClear:
     case SelectionRequest:
-      _xitk_x11_clipboard_event (d, &xevent);
-      return 0;
-
     case SelectionNotify:
-      {
+      if (win) {
         int r = _xitk_x11_clipboard_event (d, &xevent);
         if (r > 0) {
           if (r == 1)
@@ -2161,6 +2190,17 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
           event->h = 0;
           break;
         }
+        if (r == 1)
+        return 0;
+      }
+      if (win && (xevent.xclient.message_type == d->atoms[XITK_A_WM_PROTOCOLS])
+        && ((Atom)xevent.xclient.data.l[0] == d->atoms[XITK_A_WM_DELETE_WINDOW])) {
+        if (d->be->be.verbosity >= 2)
+          printf ("xitk.x11.window.close_request (%s).\n", win->props[XITK_X11_WT_TITLE].value ?
+            (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>");
+        event->type = XITK_EV_DEL_WIN;
+        event->code = 0;
+        goto _ev_zero;
       }
       return 0;
 
@@ -2194,22 +2234,18 @@ static const char *xitk_x11_event_name (xitk_be_display_t *_d, const xitk_be_eve
   if (!d || !event)
     return NULL;
   if ((event->type == XITK_EV_KEY_DOWN) || (event->type == XITK_EV_KEY_UP)) {
-    s = XKeysymToString (event->code);
-  } else if ((event->type == XITK_EV_BUTTON_DOWN) || (event->type == XITK_EV_BUTTON_UP)) {
-    static const char * const names[5] = {
-      "MouseLeft",
-      "MouseRight",
-      "MouseMiddle",
-      "MouseWheelUp",
-      "MouseWheelDown"
-    };
-    if ((event->code >= 1) && (event->code <= 5))
-      s = names[event->code - 1];
+    s = XKeysymToString (event->sym);
+    if (s)
+      strlcpy (d->name, s, sizeof (d->name));
+    else
+      sprintf (d->name, "XKey_%u", (unsigned int)event->code);
+    return d->name;
   }
-  if (!s)
-    return NULL;
-  strlcpy (d->name, s, sizeof (d->name));
-  return d->name;
+  if ((event->type == XITK_EV_BUTTON_DOWN) || (event->type == XITK_EV_BUTTON_UP)) {
+    sprintf (d->name, "XButton_%d", (unsigned int)event->code);
+    return d->name;
+  }
+  return NULL;
 }
 
 static int xitk_x11_color_new (xitk_be_display_t *_d, xitk_color_info_t *info) {
@@ -2388,7 +2424,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
       [XITK_A__MOTIF_WM_HINTS] = "_MOTIF_WM_HINTS",
       [XITK_A_WM_CHANGE_STATE] = "WM_CHANGE_STATE",
       [XITK_A_WM_STATE]        = "WM_STATE",
-      [XITK_A_DELETE_WINDOW]   = "WM_DELETE_WINDOW",
+      [XITK_A_WM_DELETE_WINDOW]= "WM_DELETE_WINDOW",
+      [XITK_A_WM_PROTOCOLS]    = "WM_PROTOCOLS",
       [XITK_A__NET_WM_NAME]    = "_NET_WM_NAME",
 
       [XITK_A__NET_WM_WINDOW_TYPE]         = "_NET_WM_WINDOW_TYPE",
@@ -2493,4 +2530,3 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
 
   return &be->be;
 }
-

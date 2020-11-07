@@ -35,6 +35,7 @@
 #include "actions.h"
 #include "event.h"
 #include "errors.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/browser.h"
 
@@ -455,29 +456,19 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
   download_skin_exit (w, skd, 0);
 }
 
-static void download_skin_handle_expose_event(void *data, const xitk_expose_event_t *ee) {
+static int download_skin_event (void *data, const xitk_be_event_t *e) {
   xui_skdloader_t *skd = data;
 
-  if (ee->expose_count == 0)
-    download_update_preview(skd);
-}
-
-static void download_skin_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  xui_skdloader_t *skd = data;
-
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      download_skin_exit (NULL, skd, 0);
-    else
-      gui_handle_key_event (skd->gui, ke);
+  if (e->type == XITK_EV_EXPOSE) {
+    download_update_preview (skd);
+    return 1;
+  } else if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    download_skin_exit (NULL, skd, 0);
+    return 1;
   }
+  return gui_handle_be_event (skd->gui, e);
 }
-
-static const xitk_event_cbs_t download_skin_event_cbs = {
-  .key_cb            = download_skin_handle_key_event,
-  .expose_notify_cb  = download_skin_handle_expose_event,
-};
-
 
 void skin_download_end (xui_skdloader_t *skd) {
   if (skd)
@@ -608,7 +599,7 @@ void skin_download (gGui_t *gui, char *url) {
     xitk_add_widget (skd->widget_list, widget);
     xitk_enable_and_show_widget(widget);
 
-    skd->widget_key = xitk_window_register_event_handler("skdloader", skd->xwin, &download_skin_event_cbs, skd);
+    skd->widget_key = xitk_be_register_event_handler ("skdloader", skd->xwin, NULL, download_skin_event, skd, NULL, NULL);
 
     xitk_window_flags (skd->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
     xitk_window_raise_window (skd->xwin);

@@ -101,10 +101,9 @@ typedef struct {
   void                      *kill_userdata;
   xitk_simple_callback_t     ip_callback;
   void                      *ip_userdata;
-  xitk_key_event_callback_t  key_cb;
-  void                      *key_cb_data;
+  xitk_be_event_handler_t   *input_cb;
+  void                      *input_cb_data;
 
-  xitk_event_cbs_t           mrlbrowser_event_cbs;
 } _mrlbrowser_private_t;
 
 
@@ -880,46 +879,47 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
 /*
  * Handle here mrlbrowser events.
  */
-static void mrlbrowser_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  _mrlbrowser_private_t *wp= (_mrlbrowser_private_t *)data;
+static int mrlbrowser_event (void *data, const xitk_be_event_t *e) {
+  _mrlbrowser_private_t *wp = (_mrlbrowser_private_t *)data;
 
-  if (ke->event != XITK_KEY_PRESS)
-    return;
-
-  switch (ke->key_pressed) {
-
-    case XK_d:
-    case XK_D:
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
+      xitk_mrlbrowser_exit (NULL, wp, 0);
+      return 1;
+    case XITK_EV_KEY_DOWN:
+      switch (e->utf8[0]) {
 #ifdef DEBUG_MRLB
-      /* This is for debugging purpose */
-      if (ke->modifiers & MODIFIER_CTRL)
-        mrlbrowser_dumpmrl (NULL, (void *)wp);
+        case 'd' & 0x1f:
+          /* This is for debugging purpose */
+          mrlbrowser_dumpmrl (NULL, (void *)wp);
+          return 1;
 #endif
-      break;
-
-    case XK_s:
-    case XK_S:
-      if (ke->modifiers & MODIFIER_CTRL)
-        mrlbrowser_select (NULL, (void *)wp, 0);
-      break;
-
-    case XK_Return: {
-      int selected;
-
-      if ((selected = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
-        _mrlbrowser_select_mrl (wp, selected, 0, 1);
-    }
-    break;
-
-    case XK_Escape:
-      xitk_mrlbrowser_exit (NULL, (void *)wp, 0);
-      break;
-
-    default:
-      if (wp->key_cb)
-        wp->key_cb (wp->key_cb_data, ke);
-      break;
+        case 's' & 0x1f:
+          mrlbrowser_select (NULL, (void *)wp, 0);
+          return 1;
+        case XITK_CTRL_KEY_PREFIX:
+          switch (e->utf8[1]) {
+            case XITK_KEY_RETURN:
+            case XITK_KEY_NUMPAD_ENTER:
+            case XITK_KEY_ISO_ENTER:
+              {
+                int selected;
+                if ((selected = xitk_browser_get_current_selected (wp->mrlb_list)) >= 0)
+                  _mrlbrowser_select_mrl (wp, selected, 0, 1);
+                return 1;
+              }
+            case XITK_KEY_ESCAPE:
+              xitk_mrlbrowser_exit (NULL, (void *)wp, 0);
+              return 1;
+            default: ;
+          }
+        default: ;
+      }
+    default: ;
   }
+  if (wp->input_cb)
+    return wp->input_cb (wp->input_cb_data, e);
+  return 0;
 }
 
 /*
@@ -956,8 +956,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->running           = 1;
   wp->skin_element_name = mb->skin_element_name ? strdup (mb->skin_element_name) : NULL;
   wp->xine              = mb->xine;
-  wp->key_cb            = mb->key_cb;
-  wp->key_cb_data       = mb->key_cb_data;
+  wp->input_cb          = mb->input_cb;
+  wp->input_cb_data     = mb->input_cb_data;
 
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
@@ -1127,10 +1127,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 
-  wp->mrlbrowser_event_cbs.dnd_cb = mb->dndcallback;
-  wp->mrlbrowser_event_cbs.key_cb  = mrlbrowser_handle_key_event;
-
-  wp->widget_key = xitk_window_register_event_handler ("mrl browser", wp->xwin, &wp->mrlbrowser_event_cbs, wp);
+  wp->widget_key = xitk_be_register_event_handler ("mrl browser", wp->xwin, NULL, mrlbrowser_event, wp, NULL, NULL);
 
   if (mb->reparent_window) {
     mb->reparent_window (mb->rw_data, wp->xwin);

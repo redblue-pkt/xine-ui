@@ -571,7 +571,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     xitk_window_set_transient_for (xwin, wp->w.wl->win);
   else
     xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
-  mw->key = xitk_window_register_event_handler("xitk menu", mw->xwin, NULL, mw);
+  mw->key = xitk_be_register_event_handler ("xitk menu", mw->xwin, NULL, NULL, mw, NULL, NULL);
 
   xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (xwin);
