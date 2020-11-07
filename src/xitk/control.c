@@ -38,6 +38,7 @@
 #include "videowin.h"
 #include "panel.h"
 #include "errors.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
@@ -274,34 +275,29 @@ xui_vctrl_t *control_init (gGui_t *gui) {
  * Handle X events here.
  */
 
-static void control_handle_button_event(void *data, const xitk_button_event_t *be) {
+static int control_event (void *data, const xitk_be_event_t *e) {
   xui_vctrl_t *vctrl = data;
 
-  if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button3) {
-      int wx, wy;
-      xitk_window_get_window_position (vctrl->xwin, &wx, &wy, NULL, NULL);
-      control_menu (vctrl->gui, vctrl->widget_list, be->x + wx, be->y + wy);
-    }
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
+      control_deinit (vctrl);
+      return 1;
+    case XITK_EV_BUTTON_DOWN:
+      if (e->code == 3) {
+        control_menu (vctrl->gui, vctrl->widget_list, e->w, e->h);
+        return 1;
+      }
+      break;
+    case XITK_EV_KEY_DOWN:
+      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE)) {
+        control_toggle_window (NULL, vctrl);
+        return 1;
+      }
+      break;
+    default: ;
   }
+  return gui_handle_be_event (vctrl->gui, e);
 }
-static void control_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  xui_vctrl_t *vctrl = data;
-
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      control_toggle_window (NULL, vctrl);
-    else
-      gui_handle_key_event (gGui, ke);
-  }
-}
-
-static const xitk_event_cbs_t control_event_cbs = {
-  .key_cb            = control_handle_key_event,
-  .btn_cb            = control_handle_button_event,
-
-  .dnd_cb            = gui_dndcallback,
-};
 
 static void _control_toggle_window (xitk_widget_t *w, void *data, int state) {
   (void)state;
@@ -437,7 +433,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   control_show_tips (vctrl, panel_get_tips_enable (vctrl->gui->panel), panel_get_tips_timeout (vctrl->gui->panel));
 
-  vctrl->widget_key = xitk_window_register_event_handler ("control", vctrl->xwin, &control_event_cbs, vctrl);
+  vctrl->widget_key = xitk_be_register_event_handler ("control", vctrl->xwin, NULL, control_event, vctrl, NULL, NULL);
 
   vctrl->status = 3;
   control_raise_window (vctrl);

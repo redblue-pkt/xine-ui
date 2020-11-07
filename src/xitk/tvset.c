@@ -34,6 +34,7 @@
 #include "videowin.h"
 #include "actions.h"
 #include "event.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"
@@ -200,19 +201,14 @@ static void tvset_exit (xitk_widget_t *w, void *data, int state) {
     video_window_set_input_focus(gGui->vwin);
 }
 
-static void tvset_handle_key_event(void *data, const xitk_key_event_t *ke) {
-
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      tvset_exit (NULL, NULL, 0);
-    else
-      gui_handle_key_event (gGui, ke);
+static int tvset_event (void *data, const xitk_be_event_t *e) {
+  if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    tvset_exit (NULL, NULL, 0);
+    return 1;
   }
+  return gui_handle_be_event (gGui, e);
 }
-
-static const xitk_event_cbs_t tvset_event_cbs = {
-  .key_cb            = tvset_handle_key_event,
-};
 
 int tvset_is_visible(void) {
 
@@ -482,7 +478,7 @@ void tvset_panel(void) {
 
   xitk_window_set_background_image (tvset.xwin, bg);
 
-  tvset.widget_key = xitk_window_register_event_handler("tvset", tvset.xwin, &tvset_event_cbs, &tvset);
+  tvset.widget_key = xitk_be_register_event_handler ("tvset", tvset.xwin, NULL, tvset_event, &tvset, NULL, NULL);
 
   tvset.visible = 1;
   tvset.running = 1;

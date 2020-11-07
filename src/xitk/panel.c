@@ -187,9 +187,9 @@ static void panel_store_new_position (void *data, int x, int y, int w, int h) {
 
     panel->x = x;
     panel->y = y;
-
+    /*
     config_update_num ("gui.panel_x", x);
-    config_update_num ("gui.panel_y", y);
+    config_update_num ("gui.panel_y", y); */
 
     event_sender_move (panel->gui, x + w, y);
   }
@@ -929,39 +929,26 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 /*
  * Handle X events here.
  */
-static void panel_handle_destroy_notify(void *data) {
+static int panel_event (void *data, const xitk_be_event_t *e) {
   xui_panel_t *panel = data;
 
-  gui_exit (NULL, panel->gui);
-}
-
-static void panel_handle_button_event(void *data, const xitk_button_event_t *be) {
-  xui_panel_t *panel = data;
-
-  if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button3) {
-      video_window_menu (panel->gui, panel->widget_list);
-    }
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
+      gui_exit (NULL, panel->gui);
+      return 1;
+    case XITK_EV_BUTTON_DOWN:
+      if (e->code == 3) {
+        video_window_menu (panel->gui, panel->widget_list);
+        return 1;
+      }
+      break;
+    case XITK_EV_POS_SIZE:
+      event_sender_move (panel->gui, e->x + e->w, e->y);
+      return 1;
+    default: ;
   }
-  if (be->event == XITK_BUTTON_RELEASE) {
-    gui_handle_button_event (panel->gui, be);
-  }
+  return gui_handle_be_event (panel->gui, e);
 }
-
-static void panel_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  xui_panel_t *panel = data;
-  gui_handle_key_event (panel->gui, ke);
-}
-
-static const xitk_event_cbs_t panel_event_cbs = {
-  .key_cb            = panel_handle_key_event,
-  .btn_cb            = panel_handle_button_event,
-  .map_notify_cb     = NULL,
-  .destroy_notify_cb = panel_handle_destroy_notify,
-
-  .pos_cb            = panel_store_new_position,
-  .dnd_cb            = gui_dndcallback,
-};
 
 /*
  * Create buttons from information if input plugins autoplay featured.
@@ -1382,8 +1369,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
   panel->visible = 0;
   /* NOTE: do this _before_ xitk_window_flags (, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE), and make sure to get that initial expose event
    * handled in xitk.c - otherwise some widgets may not show until focused. */
-  xitk_window_flags (panel->xwin, XITK_WINF_TASKBAR | XITK_WINF_PAGER, XITK_WINF_TASKBAR | XITK_WINF_PAGER);
-  panel->widget_key = xitk_window_register_event_handler ("panel", panel->xwin, &panel_event_cbs, panel);
+  xitk_window_flags (panel->xwin,
+    XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
+  panel->widget_key = xitk_be_register_event_handler ("panel", panel->xwin, NULL, panel_event, panel, NULL, NULL);
 
   {
     pthread_attr_t       pth_attrs;

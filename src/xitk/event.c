@@ -1280,6 +1280,31 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 /*
  * top-level event handler
  */
+int gui_handle_be_event (void *data, const xitk_be_event_t *e) {
+  gGui_t *gui = data;
+
+  if (!gui || !e)
+    return 0;
+  switch (e->type) {
+    case XITK_EV_KEY_DOWN:
+    case XITK_EV_BUTTON_UP:
+      {
+        action_id_t a;
+        if (gui->stdctl_enable)
+          stdctl_keypress (gui, e->utf8);
+        a = kbinding_aid_from_be_event (gui->kbindings, e, gui->no_gui);
+        if (!a)
+          return 0;
+        gui_execute_action_id (gui, a);
+      }
+      break;
+    case XITK_EV_DND:
+      gui_dndcallback (e->utf8);
+      break;
+    default: return 0;
+  }
+  return 1;
+}
 
 void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
   gGui_t *gui = data;

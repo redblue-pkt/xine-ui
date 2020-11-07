@@ -541,90 +541,61 @@ static void _playlist_add_input(xitk_widget_t *w, void *data, const char *filena
  * Handle X events here.
  */
 
-static void _playlist_handle_button_event (void *data, const xitk_button_event_t *be) {
+static int playlist_event (void *data, const xitk_be_event_t *e) {
   xui_playlist_t *pl = data;
 
-  if (!pl)
-    return;
-  if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button3) {
-      xitk_widget_t *w = xitk_get_focused_widget (pl->widget_list);
-
-      if (w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
-        int wx, wy;
-
-        xitk_window_get_window_position (pl->xwin, &wx, &wy, NULL, NULL);
-
-        playlist_menu (pl->gui, pl->widget_list,
-                       be->x + wx, be->y + wy,
-                       (xitk_browser_get_current_selected (pl->playlist) >= 0));
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
+      playlist_deinit (pl->gui);
+      return 1;
+    case XITK_EV_BUTTON_UP:
+      if (pl->playlist) {
+        if (xitk_browser_get_current_selected (pl->playlist) < 0) {
+          mmk_editor_end (pl->gui);
+          return 1;
+        }
       }
-    } else if (be->button == Button4 || be->button == Button5) {
-      mmk_editor_end (pl->gui);
-    }
-  }
+      break;
+    case XITK_EV_BUTTON_DOWN:
+      if (e->code == 3) {
+        xitk_widget_t *w = xitk_get_focused_widget (pl->widget_list);
 
-  if (be->event == XITK_BUTTON_RELEASE) {
-    if (pl && pl->playlist) {
-      if (xitk_browser_get_current_selected (pl->playlist) < 0)
+        if (w && ((xitk_get_widget_type (w)) & WIDGET_GROUP_BROWSER)) {
+          playlist_menu (pl->gui, pl->widget_list, e->w, e->h,
+            (xitk_browser_get_current_selected (pl->playlist) >= 0));
+          return 1;
+        }
+      } else if ((e->code == 4) || (e->code == 5)) {
         mmk_editor_end (pl->gui);
-    }
+        return 1;
+      }
+      break;
+    case XITK_EV_KEY_DOWN:
+      if (e->utf8[0] == XITK_CTRL_KEY_PREFIX) {
+        xitk_widget_t *w;
 
-    gui_handle_button_event (pl->gui, be);
+        switch (e->utf8[1]) {
+          case XITK_MOUSE_WHEEL_UP:
+          case XITK_KEY_UP:
+          case XITK_MOUSE_WHEEL_DOWN:
+          case XITK_KEY_DOWN:
+          case XITK_KEY_NEXT:
+          case XITK_KEY_PREV:
+            mmk_editor_end (pl->gui);
+            w = xitk_get_focused_widget (pl->widget_list);
+            if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER))))
+              xitk_widget_key_event (pl->playlist, e->utf8, e->qual);
+            return 1;
+          case XITK_KEY_ESCAPE:
+            playlist_exit (pl->gui);
+            return 1;
+          default: ;
+        }
+      }
+    default: ;
   }
+  return gui_handle_be_event (pl->gui, e);
 }
-
-static void _playlist_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  static const char t[4][3] = {
-    {XITK_CTRL_KEY_PREFIX, XITK_KEY_UP, 0},
-    {XITK_CTRL_KEY_PREFIX, XITK_KEY_DOWN, 0},
-    {XITK_CTRL_KEY_PREFIX, XITK_KEY_PREV, 0},
-    {XITK_CTRL_KEY_PREFIX, XITK_KEY_NEXT, 0}
-  };
-  const char *s;
-  xui_playlist_t *pl = data;
-
-  if (!pl)
-    return;
-
-  if (ke->event == XITK_KEY_PRESS) {
-    xitk_widget_t *w;
-
-    switch (ke->key_pressed) {
-      case XK_Up:
-        s = t[0];
-        goto _move_browser;
-      case XK_Down:
-        s = t[1];
-        goto _move_browser;
-      case XK_Prior:
-        s = t[2];
-        goto _move_browser;
-      case XK_Next:
-        s = t[3];
-      _move_browser:
-        mmk_editor_end (pl->gui);
-        w = xitk_get_focused_widget (pl->widget_list);
-        if ((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER))))
-          xitk_widget_key_event (pl->playlist, s, ke->modifiers);
-        break;
-
-      case XK_Escape:
-        playlist_exit (pl->gui);
-        break;
-
-      default:
-        gui_handle_key_event (pl->gui, ke);
-        break;
-    }
-  }
-}
-
-static const xitk_event_cbs_t playlist_event_cbs = {
-  .key_cb            = _playlist_handle_key_event,
-  .btn_cb            = _playlist_handle_button_event,
-  .dnd_cb            = gui_dndcallback,
-};
 
 static void _playlist_apply_cb(void *data) {
   gGui_t *gui = data;
@@ -1271,7 +1242,7 @@ void playlist_editor (gGui_t *gui) {
 
   playlist_show_tips (pl->gui, panel_get_tips_enable (pl->gui->panel), panel_get_tips_timeout (pl->gui->panel));
 
-  pl->widget_key = xitk_window_register_event_handler ("playlist", pl->xwin, &playlist_event_cbs, pl);
+  pl->widget_key = xitk_be_register_event_handler ("playlist", pl->xwin, NULL, playlist_event, pl, NULL, NULL);
 
   pl->visible = 1;
 

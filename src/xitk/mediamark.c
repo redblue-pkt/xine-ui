@@ -46,6 +46,7 @@
 #include "actions.h"
 #include "event.h"
 #include "errors.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/label.h"
@@ -2901,20 +2902,22 @@ static void _mmkedit_exit (xitk_widget_t *w, void *data, int state) {
   free (mmkedit);
 }
 
-static void _mmkedit_handle_key_event (void *data, const xitk_key_event_t *ke) {
-  xui_mmkedit_t *mmkedit = (xui_mmkedit_t *)data;
+static int mmkedit_event (void *data, const xitk_be_event_t *e) {
+  xui_mmkedit_t *mmkedit = data;
 
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
       _mmkedit_exit (NULL, mmkedit, 0);
-    else
-      gui_handle_key_event (mmkedit->gui, ke);
+      return 1;
+    case XITK_EV_KEY_DOWN:
+      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE)) {
+        _mmkedit_exit (NULL, mmkedit, 0);
+        return 1;
+      }
+    default: ;
   }
+  return gui_handle_be_event (mmkedit->gui, e);
 }
-
-static const xitk_event_cbs_t mmkedit_event_cbs = {
-  .key_cb = _mmkedit_handle_key_event
-};
 
 void mmk_editor_show_tips (gGui_t *gui, int enabled, unsigned long timeout) {
   if (gui && gui->mmkedit) {
@@ -3248,8 +3251,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
 
   mmk_editor_show_tips (mmkedit->gui, panel_get_tips_enable (mmkedit->gui->panel), panel_get_tips_timeout (mmkedit->gui->panel));
 
-  mmkedit->widget_key = xitk_window_register_event_handler ("gui->mmkedit", mmkedit->xwin,
-    &mmkedit_event_cbs, mmkedit);
+  mmkedit->widget_key = xitk_be_register_event_handler ("gui->mmkedit", mmkedit->xwin, NULL, mmkedit_event, mmkedit, NULL, NULL);
 
   mmkedit->visible = 1;
 

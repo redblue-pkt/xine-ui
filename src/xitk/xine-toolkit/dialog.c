@@ -152,48 +152,21 @@ static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state)
 /*
  * Local XEvent handling.
  */
-static void _dialog_window_handle_expose_event (void *data, const xitk_expose_event_t *ee) {
+static int dialog_event (void *data, const xitk_be_event_t *e) {
   xitk_dialog_t *wd = data;
 
   if (wd->default_button) {
-    xitk_widget_list_t *widget_list = xitk_window_widget_list(wd->xwin);
-    widget_list->widget_focused = wd->default_button;
-    if ((widget_list->widget_focused->type & WIDGET_FOCUSABLE) &&
-        (widget_list->widget_focused->enable == WIDGET_ENABLE)) {
-      xitk_widget_t *w = widget_list->widget_focused;
-      widget_event_t event;
-      event.type = WIDGET_EVENT_FOCUS;
-      event.focus = FOCUS_RECEIVED;
-      w->event (w, &event, NULL);
-      w->have_focus = FOCUS_RECEIVED;
-      event.type = WIDGET_EVENT_PAINT;
-      w->event (w, &event, NULL);
+    if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+      || (e->type == XITK_EV_DEL_WIN)) {
+      _xitk_window_dialog_3_done (wd->default_button, wd, 0);
+      return 1;
+    } else if (e->type == XITK_EV_EXPOSE) {
+      xitk_set_focus_to_widget (wd->default_button);
+      return 1;
     }
   }
+  return 0;
 }
-
-static void _dialog_window_handle_key_event (void *data, const xitk_key_event_t *ke) {
-  xitk_dialog_t *wd = data;
-
-  if (ke->event == XITK_KEY_PRESS) {
-    switch (ke->key_pressed) {
-      case XK_Return:
-        if (wd->default_button)
-          _xitk_window_dialog_3_done (wd->default_button, wd, 0);
-        break;
-
-      case XK_Escape:
-        if (wd->default_button)
-          _xitk_window_dialog_3_done (wd->default_button, wd, 0);
-        break;
-    }
-  }
-}
-
-static const xitk_event_cbs_t _dialog_event_cbs = {
-  .key_cb           = _dialog_window_handle_key_event,
-  .expose_notify_cb = _dialog_window_handle_expose_event,
-};
 
 static const char *_xitk_window_dialog_label (const char *label) {
   switch ((uintptr_t)label) {
@@ -336,8 +309,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     xitk_window_set_window_layer (wd->xwin, layer_above);
   xitk_window_try_to_set_input_focus (wd->xwin);
 
-  wd->key = xitk_window_register_event_handler ("xitk_dialog_3", wd->xwin, &_dialog_event_cbs, wd);
-  xitk_register_eh_destructor (wd->xitk, wd->key, _xitk_window_dialog_3_destr, wd);
+  wd->key = xitk_be_register_event_handler ("xitk_dialog_3", wd->xwin, NULL, dialog_event, wd, _xitk_window_dialog_3_destr, wd);
   xitk_widget_list_defferred_destroy (widget_list);
   return wd->key;
 }

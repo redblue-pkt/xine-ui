@@ -1011,7 +1011,7 @@ static void xitk_widget_apply_focus_redirect (xitk_widget_t **w) {
  * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state),
  * function in right widget (the one who get, and the one who lose focus).
  */
-void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsigned int state) {
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsigned int state) {
   xitk_widget_t *w;
   widget_event_t event;
 
@@ -1028,13 +1028,13 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
 
     //    printf("slider already clicked -> send event\n");
 
-    if(state & Button1Mask) {
+    if (state & MODIFIER_BUTTON1) {
       event.type           = WIDGET_EVENT_CLICK;
       event.x              = x;
       event.y              = y;
       event.button_pressed = LBUTTON_DOWN;
-      event.button         = Button1;
-      event.modifier       = 0;
+      event.button         = 1;
+      event.modifier       = state;
       (void) wl->widget_focused->event(wl->widget_focused, &event, &result);
     }
     return;

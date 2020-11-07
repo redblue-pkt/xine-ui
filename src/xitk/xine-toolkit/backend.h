@@ -81,7 +81,7 @@ typedef struct xitk_be_window_s xitk_be_window_t;
 typedef enum {
   XITK_EV_ANY = 0,
   XITK_EV_NEW_WIN,
-  XITK_EV_DEL_WIN,
+  XITK_EV_DEL_WIN, /** << code == 0 (user request), 1 (actual close). */
   XITK_EV_SHOW,
   XITK_EV_HIDE,
   XITK_EV_REPARENT,
@@ -104,8 +104,9 @@ typedef enum {
 typedef struct {
   xitk_be_event_type_t type;
   uint32_t code; /** << backend internal key code or button # */
+  uint32_t sym; /** << backend internal key symbol */
   uint32_t qual; /** << shift, ctrl, ... */
-  uint32_t from_peer;
+  uint32_t from_peer; /** sent by another client */
   uintptr_t id;  /** << backend internal value */
   xitk_be_window_t *window, *parent;
   int x, y;

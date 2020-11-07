@@ -287,8 +287,8 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   mb.origin.cur_origin        = NULL;
 
   mb.dndcallback              = dnd_cb;
-  mb.key_cb                   = gui_handle_key_event;
-  mb.key_cb_data              = gui;
+  mb.input_cb                 = gui_handle_be_event;
+  mb.input_cb_data            = gui;
 
   mb.select.skin_element_name = "MrlSelect";
   mb.select.caption           = _("Add");

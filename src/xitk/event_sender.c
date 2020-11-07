@@ -40,6 +40,7 @@
 #include "videowin.h"
 #include "actions.h"
 #include "event.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/labelbutton.h"
 
 #define WINDOW_WIDTH    250
@@ -111,20 +112,6 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   }
 }
 
-static void event_sender_store_new_position (void *data, int x, int y, int w, int h) {
-  xui_event_sender_t *es = data;
-  (void)w;
-  (void)h;
-  if (!es)
-    return;
-  if (!es->gui->eventer_sticky) {
-    es->gui->eventer->x = x;
-    es->gui->eventer->y = y;
-    config_update_num ("gui.eventer_x", x);
-    config_update_num ("gui.eventer_y", y);
-  }
-}
-
 void event_sender_show_tips (gGui_t *gui, unsigned long timeout) {
   if (gui && gui->eventer) {
     if (timeout)
@@ -173,108 +160,69 @@ static void event_sender_send2 (xitk_widget_t *w, void *data, int state) {
 
 static void event_sender_exit (xitk_widget_t *w, void *data, int state);
 
-static void event_sender_handle_button_event(void *data, const xitk_button_event_t *be) {
+static int event_sender_event (void *data, const xitk_be_event_t *e) {
   xui_event_sender_t *es = data;
-  if (be->event == XITK_BUTTON_RELEASE) {
-    /*
-     * If we tried to move sticky window, move it back to stored position.
-     */
-    if (es->gui->eventer_sticky) {
-      if (panel_is_visible (es->gui->panel) > 1) {
-        int  x, y;
-        xitk_window_get_window_position (es->xwin, &x, &y, NULL, NULL);
-        if ((x != es->x) || (y != es->y))
-          xitk_window_move_window (es->xwin, es->x, es->y);
-      }
-    }
-  }
-}
+  xine_event_t xine_event;
 
-static void event_sender_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  xui_event_sender_t *es = data;
-  xine_event_t  xine_event;
+  xine_event.type = -1;
 
-  if (ke->event != XITK_KEY_PRESS)
-    return;
-
-  switch (ke->key_pressed) {
-    case XK_Up:
-      xine_event.type = XINE_EVENT_INPUT_UP;
-      break;
-    case XK_Down:
-      xine_event.type = XINE_EVENT_INPUT_DOWN;
-      break;
-    case XK_Left:
-      xine_event.type = XINE_EVENT_INPUT_LEFT;
-      break;
-    case XK_Right:
-      xine_event.type = XINE_EVENT_INPUT_RIGHT;
-      break;
-
-    case XK_Return:
-    case XK_KP_Enter:
-    case XK_ISO_Enter:
-      xine_event.type = XINE_EVENT_INPUT_SELECT;
-      break;
-
-    case XK_0:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_0;
-      break;
-    case XK_1:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_1;
-      break;
-    case XK_2:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_2;
-      break;
-    case XK_3:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_3;
-      break;
-    case XK_4:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_4;
-      break;
-    case XK_5:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_5;
-      break;
-    case XK_6:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_6;
-      break;
-    case XK_7:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_7;
-      break;
-    case XK_8:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_8;
-      break;
-    case XK_9:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_9;
-      break;
-
-    case XK_plus:
-    case XK_KP_Add:
-      xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD;
-      break;
-
-    case XK_Escape:
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
       event_sender_exit (NULL, es, 0);
-      return;
+      return 1;
+    case XITK_EV_BUTTON_UP:
+      /* If we tried to move sticky window, move it back to stored position. */
+      if (es->gui->eventer_sticky) {
+        if (panel_is_visible (es->gui->panel) > 1) {
+          int  x, y;
 
-    default:
-      gui_handle_key_event (es->gui, ke);
-      return;
+          xitk_window_get_window_position (es->xwin, &x, &y, NULL, NULL);
+          if ((x != es->x) || (y != es->y))
+            xitk_window_move_window (es->xwin, es->x, es->y);
+        }
+      }
+      return 1;
+    case XITK_EV_KEY_DOWN:
+      switch (e->utf8[0]) {
+        case XITK_CTRL_KEY_PREFIX:
+          switch (e->utf8[1]) {
+            case XITK_KEY_UP:    xine_event.type = XINE_EVENT_INPUT_UP; break;
+            case XITK_KEY_DOWN:  xine_event.type = XINE_EVENT_INPUT_DOWN; break;
+            case XITK_KEY_LEFT:  xine_event.type = XINE_EVENT_INPUT_LEFT; break;
+            case XITK_KEY_RIGHT: xine_event.type = XINE_EVENT_INPUT_RIGHT; break;
+            case XITK_KEY_RETURN:
+            case XITK_KEY_NUMPAD_ENTER:
+            case XITK_KEY_ISO_ENTER: xine_event.type = XINE_EVENT_INPUT_SELECT; break;
+            case XITK_KEY_ESCAPE:
+              event_sender_exit (NULL, es, 0);
+              return 1;
+            default: ;
+          }
+          break;
+        case '+': xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD; break;
+        case '0': xine_event.type = XINE_EVENT_INPUT_NUMBER_0; break;
+        case '1': xine_event.type = XINE_EVENT_INPUT_NUMBER_1; break;
+        case '2': xine_event.type = XINE_EVENT_INPUT_NUMBER_2; break;
+        case '3': xine_event.type = XINE_EVENT_INPUT_NUMBER_3; break;
+        case '4': xine_event.type = XINE_EVENT_INPUT_NUMBER_4; break;
+        case '5': xine_event.type = XINE_EVENT_INPUT_NUMBER_5; break;
+        case '6': xine_event.type = XINE_EVENT_INPUT_NUMBER_6; break;
+        case '7': xine_event.type = XINE_EVENT_INPUT_NUMBER_7; break;
+        case '8': xine_event.type = XINE_EVENT_INPUT_NUMBER_8; break;
+        case '9': xine_event.type = XINE_EVENT_INPUT_NUMBER_9; break;
+      }
+    default: ;
   }
-
-  xine_event.data_length = 0;
-  xine_event.data        = NULL;
-  xine_event.stream      = es->gui->stream;
-  gettimeofday (&xine_event.tv, NULL);
-  xine_event_send (es->gui->stream, &xine_event);
+  if (xine_event.type >= 0) {
+    xine_event.data_length = 0;
+    xine_event.data        = NULL;
+    xine_event.stream      = es->gui->stream;
+    gettimeofday (&xine_event.tv, NULL);
+    xine_event_send (es->gui->stream, &xine_event);
+    return 1;
+  }
+  return gui_handle_be_event (es->gui, e);
 }
-
-static const xitk_event_cbs_t event_sender_event_cbs = {
-  .key_cb            = event_sender_handle_key_event,
-  .btn_cb            = event_sender_handle_button_event,
-
-  .pos_cb            = event_sender_store_new_position,
-};
 
 void event_sender_update_menu_buttons (gGui_t *gui) {
   if (gui && gui->eventer) {
@@ -465,7 +413,7 @@ void event_sender_panel (gGui_t *gui) {
   }
 
   event_sender_show_tips (es->gui, panel_get_tips_enable (es->gui->panel) ? panel_get_tips_timeout (es->gui->panel) : 0);
-  es->widget_key = xitk_window_register_event_handler ("eventer", es->xwin, &event_sender_event_cbs, es);
+  es->widget_key = xitk_be_register_event_handler ("eventer", es->xwin, NULL, event_sender_event, es, NULL, NULL);
 
   es->visible = 1;
   _event_sender_raise_window (es->gui);

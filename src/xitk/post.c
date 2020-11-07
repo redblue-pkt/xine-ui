@@ -1148,20 +1148,16 @@ static void _pplugin_destroy_only_obj(post_info_t *info, post_object_t *pobj) {
   }
 }
 
-static void _pplugin_help_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static int pplugin_help_event (void *data, const xitk_be_event_t *e) {
   post_info_t *info = data;
 
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      _pplugin_close_help (NULL, info, 0);
-    else
-      gui_handle_key_event (info->gui, ke);
+  if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    _pplugin_close_help (NULL, info, 0);
+    return 1;
   }
+  return gui_handle_be_event (info->gui, e);
 }
-
-static const xitk_event_cbs_t pplugin_help_event_cbs = {
-  .key_cb            = _pplugin_help_handle_key_event,
-};
 
 static int __line_wrap(char *s, int pos, int line_size)
 {
@@ -1311,9 +1307,9 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
     xitk_window_set_background_image (info->win->helpwin, bg);
 
-    info->win->help_widget_key = xitk_window_register_event_handler (
+    info->win->help_widget_key = xitk_be_register_event_handler (
       info->type == POST_VIDEO ? "vpplugin_help" : "applugin_help",
-      info->win->helpwin, &pplugin_help_event_cbs, info);
+      info->win->helpwin, NULL, pplugin_help_event, info, NULL, NULL);
 
     info->win->help_running = 1;
   }
@@ -1677,66 +1673,51 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
   }
 }
 
-static void _pplugin_handle_button_event(void *data, const xitk_button_event_t *be) {
+static int pplugin_event (void *data, const xitk_be_event_t *e) {
   post_info_t *info = data;
+  int step;
 
-  if (be->event == XITK_BUTTON_PRESS) {
-    if (be->button == Button4)
-      _pplugin_list_step (info, -1);
-    else if (be->button == Button5)
-      _pplugin_list_step (info, 1);
-  }
-}
-
-static void _pplugin_handle_key_event(void *data, const xitk_key_event_t *ke) {
-  post_info_t *info = data;
-
-  if (ke->event != XITK_KEY_PRESS)
-    return;
-
-  switch (ke->key_pressed) {
-    case XK_Up:
-      if (xitk_is_widget_enabled(info->win->slider) &&
-          (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-        _pplugin_list_step (info, -1);
-        return;
-      }
-      break;
-
-    case XK_Down:
-      if (xitk_is_widget_enabled(info->win->slider) &&
-          (ke->modifiers & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-        _pplugin_list_step (info, 1);
-        return;
-      }
-      break;
-
-    case XK_Next:
-      if (xitk_is_widget_enabled(info->win->slider)) {
-        _pplugin_list_step (info, MAX_DISPLAY_FILTERS);
-        return;
-      }
-      break;
-
-    case XK_Prior:
-      if (xitk_is_widget_enabled(info->win->slider)) {
-        _pplugin_list_step (info, -MAX_DISPLAY_FILTERS);
-        return;
-      }
-      break;
-
-    case XK_Escape:
+  switch (e->type) {
+    case XITK_EV_DEL_WIN:
       _pplugin_exit (NULL, info, 0);
-      return;
+      return 1;
+    case XITK_EV_BUTTON_DOWN:
+      if (e->code == 4)
+        step = -1;
+      else if (e->code == 5)
+        step = 1;
+      break;
+    case XITK_EV_KEY_DOWN:
+      if (e->utf8[0] == XITK_CTRL_KEY_PREFIX) {
+        switch (e->utf8[1]) {
+          case XITK_MOUSE_WHEEL_UP:
+          case XITK_KEY_UP:
+            step = -1;
+            break;
+          case XITK_MOUSE_WHEEL_DOWN:
+          case XITK_KEY_DOWN:
+            step = 1;
+            break;
+          case XITK_KEY_NEXT:
+            step = MAX_DISPLAY_FILTERS;
+            break;
+          case XITK_KEY_PREV:
+            step = -MAX_DISPLAY_FILTERS;
+            break;
+          case XITK_KEY_ESCAPE:
+            _pplugin_exit (NULL, info, 0);
+            return 1;
+        }
+      }
+    default: ;
   }
-
-  gui_handle_key_event (info->gui, ke);
+  if (step && !(e->qual & (MODIFIER_SHIFT | MODIFIER_CTRL))) {
+    _pplugin_list_step (info, step);
+    return 1;
+  }
+  return gui_handle_be_event (info->gui, e);
 }
 
-static const xitk_event_cbs_t pplugin_event_cbs = {
-  .key_cb            = _pplugin_handle_key_event,
-  .btn_cb            = _pplugin_handle_button_event,
-};
 
 static void _pplugin_enability (xitk_widget_t *w, void *data, int state, int modifier) {
   post_info_t *info = data;
@@ -1930,8 +1911,8 @@ void pplugin_panel (post_info_t *info) {
 
   xitk_window_set_background_image (info->win->xwin, bg);
 
-  info->win->widget_key = xitk_window_register_event_handler (
-    info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->xwin, &pplugin_event_cbs, info);
+  info->win->widget_key = xitk_be_register_event_handler (
+    info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->xwin, NULL, pplugin_event, info, NULL, NULL);
 
   info->win->visible = 1;
   info->win->running = 1;

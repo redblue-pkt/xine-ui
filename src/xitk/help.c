@@ -41,6 +41,7 @@
 #include "actions.h"
 #include "event.h"
 #include "errors.h"
+#include "xine-toolkit/backend.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/tabs.h"
 #include "xine-toolkit/browser.h"
@@ -274,15 +275,15 @@ static void help_exit (xitk_widget_t *w, void *data, int state) {
   }
 }
 
-static void help_handle_key_event(void *data, const xitk_key_event_t *ke) {
+static int help_event (void *data, const xitk_be_event_t *e) {
   xui_help_t *help = data;
 
-  if (ke->event == XITK_KEY_PRESS) {
-    if (ke->key_pressed == XK_Escape)
-      help_exit (NULL, help, 0);
-    else
-      gui_handle_key_event (help->gui, ke);
+  if (((e->type == XITK_EV_KEY_DOWN) && (e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE))
+    || (e->type == XITK_EV_DEL_WIN)) {
+    help_exit (NULL, help, 0);
+    return 1;
   }
+  return gui_handle_be_event (help->gui, e);
 }
 
 void help_raise_window (xui_help_t *help) {
@@ -306,10 +307,6 @@ void help_toggle_visibility (xui_help_t *help) {
     toggle_window (help->gui, help->xwin, help->widget_list, &help->visible, 1);
 }
 
-
-static const xitk_event_cbs_t  help_event_cbs = {
-  .key_cb = help_handle_key_event,
-};
 
 void help_panel (gGui_t *gui) {
   xui_help_t *help;
@@ -415,7 +412,7 @@ void help_panel (gGui_t *gui) {
     }
   }
 
-  help->kreg = xitk_window_register_event_handler ("help", help->xwin, &help_event_cbs, help);
+  help->kreg = xitk_be_register_event_handler ("help", help->xwin, NULL, help_event, help, NULL, NULL);
 
   help->visible = 1;
   help_raise_window (help);
@@ -423,3 +420,4 @@ void help_panel (gGui_t *gui) {
   xitk_window_try_to_set_input_focus (help->xwin);
   help->gui->help = help;
 }
+
