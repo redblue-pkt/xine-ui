@@ -46,16 +46,6 @@ typedef enum {
 #define FOREGROUND_SKIN 1
 #define BACKGROUND_SKIN 2
 
-typedef struct {
-  XColor                      red;
-  XColor                      blue;
-  XColor                      green;
-  XColor                      white;
-  XColor                      black;
-  XColor                      tmp;
-} xitk_color_t;
-
-
 #define WIDGET_EVENT_PAINT           1
 #define WIDGET_EVENT_CLICK           2
 #define WIDGET_EVENT_FOCUS           3
