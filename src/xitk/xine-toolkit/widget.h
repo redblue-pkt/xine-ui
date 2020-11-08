@@ -72,8 +72,6 @@ typedef struct {
 
   const char           *string;
 
-  XEvent               *xevent;
-
   xitk_skin_config_t   *skonfig;
   int                   skin_layer;
 } widget_event_t;
