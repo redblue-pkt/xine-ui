@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <X11/keysym.h>
+
 
 #include "common.h"
 #include "stream_infos.h"

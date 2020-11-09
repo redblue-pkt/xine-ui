@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "setup.h"
 #include "panel.h"

@@ -171,7 +171,6 @@ static session_commands_t  **session_commands = NULL;
 #else  /* NETWORK_CLIENT */
 
 # include <pwd.h>
-# include <X11/Xlib.h>
 # include <xine.h>
 # include <xine/xineutils.h>
 

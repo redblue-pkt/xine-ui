@@ -31,8 +31,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <X11/keysym.h>
-
 #include "xine-toolkit/recode.h"
 
 #include "common.h"
