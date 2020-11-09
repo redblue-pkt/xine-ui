@@ -24,8 +24,6 @@
 
 #include <stdio.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "kbindings.h"
 #include "videowin.h"
@@ -449,7 +447,7 @@ kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, in
 }
 
 /* Convert X(Button|Key)(Press|Release) events into string identifier. */
-static void event2id(KeySym keysym, unsigned int keycode, int button, char *buf, size_t size) {
+static void event2id(unsigned long keysym, unsigned int keycode, int button, char *buf, size_t size) {
   if (button >= 0) {
     snprintf(buf, size, "XButton_%d", button);
     return;
@@ -460,9 +458,7 @@ static void event2id(KeySym keysym, unsigned int keycode, int button, char *buf,
         break;
       /* fall through */
     case 0: /* Key without assigned KeySymbol */
-    case XK_VoidSymbol:
-      /* For keys without assigned KeySyms. */
-      snprintf(buf, size, "XKey_%d", keycode);
+      snprintf(buf, size, "XKey_%u", keycode);
       break;
   }
 }
@@ -493,7 +489,7 @@ action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *
   return 0;
 }
 
-void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int modifier, int button) {
+void kbindings_handle_kbinding(kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button) {
   gGui_t *gui = gGui;
   char              buf[256];
   kbinding_entry_t *k;

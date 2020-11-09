@@ -251,7 +251,7 @@ void kbindings_display_default_bindings(void);
 action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *event, int no_gui);
 kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, int modifier);
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
-void kbindings_handle_kbinding(kbinding_t *kbt, KeySym keysym, int keycode, int modifier, int button);
+void kbindings_handle_kbinding(kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button);
 action_id_t kbindings_get_action_id(kbinding_entry_t *);
 
 /* return bytes written (without terminating nul).
