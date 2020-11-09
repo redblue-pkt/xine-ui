@@ -35,8 +35,6 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include <X11/keysym.h>
-
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
 
@@ -1321,7 +1319,7 @@ void gui_handle_button_event (void *data, const xitk_button_event_t *be) {
   gGui_t *gui = data;
 
   if (be->event == XITK_BUTTON_RELEASE) {
-    kbindings_handle_kbinding(gui->kbindings, XK_VoidSymbol, 0, be->modifiers, be->button);
+    kbindings_handle_kbinding(gui->kbindings, 0, 0, be->modifiers, be->button);
   }
 }
 
