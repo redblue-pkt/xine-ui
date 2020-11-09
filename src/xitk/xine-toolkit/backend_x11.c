@@ -1399,6 +1399,12 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
   if (!win)
     return 0;
   d = win->d;
+  if (win->w.id == None) {
+    if (d->be->be.verbosity >= 1)
+      printf ("xitk.x11.window.set_props (%s): ERROR: window closed already.\n",
+        (const char *)win->props[XITK_X11_WT_TITLE].value);
+    return 0;
+  }
 
   if (win->props[XITK_X11_WT_WRAP].value != None) {
     XWindowAttributes attr;
@@ -1509,6 +1515,12 @@ static void xitk_x11_window_copy_rect (xitk_be_window_t *_win, xitk_be_image_t *
   if (!win || !from)
     return;
   d = win->d;
+  if (win->w.id == None) {
+    if (d->be->be.verbosity >= 1)
+      printf ("xitk.x11.window.copy_rect (%s): ERROR: window closed already.\n",
+        (const char *)win->props[XITK_X11_WT_TITLE].value);
+    return;
+  }
 
   {
     int v;
@@ -1607,7 +1619,8 @@ static void xitk_x11_window_delete (xitk_be_window_t **_win) {
   }
 
   if (d->be->be.verbosity >= 2)
-    printf ("xitk.x11.window.delete (%p).\n", (void *)win);
+    printf ("xitk.x11.window.delete (%s, %p).\n", win && win->props[XITK_X11_WT_TITLE].value
+      ? (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>", (void *)win);
 
   pthread_mutex_lock (&d->mutex);
   xitk_dnode_remove (&win->w.node);
@@ -2067,10 +2080,18 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
 
     case DestroyNotify:
       event->type = XITK_EV_DEL_WIN;
-      event->code = 1;
-      if (win) {
+      if (!win)
+        goto _ev_zero;
+      if (!event->from_peer) {
+        event->code = 1;
         _xitk_x11_clipboard_unregister_window (d, win->w.id);
         win->w.id = None;
+      } else {
+        if (d->be->be.verbosity >= 2)
+          printf ("xitk.x11.window.close_request (%s).\n", win->props[XITK_X11_WT_TITLE].value ?
+            (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>");
+        event->type = XITK_EV_DEL_WIN;
+        event->code = 0;
       }
       goto _ev_zero;
 
