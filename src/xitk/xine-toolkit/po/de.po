@@ -6,14 +6,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.23\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2019-11-25 19:47+0100\n"
+"POT-Creation-Date: 2020-11-08 14:56+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+
+#, c-format
+msgid "Cannot open display\n"
+msgstr "Kann Anzeigegerät nicht öffnen\n"
+
+#, c-format
+msgid "Warning! Synchronized X activated - this is very slow...\n"
+msgstr "Warnung: Synchrones X Protokoll aktiviert - dies ist sehr langsam...\n"
+
+#, c-format
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
+"\n"
+"XInitThreads fehlgeschlagen - xlib ist anscheinend nicht Thread-sicher.\n"
 
 msgid "..."
 msgstr "..."
@@ -21,32 +37,49 @@ msgstr "..."
 msgid "More sources..."
 msgstr "Weitere Quellen..."
 
-msgid "Select current entry"
-msgstr "Wähle momentanen Eintrag"
-
-msgid "Play selected entry"
-msgstr "Spiele momentanen Eintrag"
-
-msgid "Close MRL browser window"
-msgstr "MRL-Browser-Fenster schließen"
-
 msgid "OK"
 msgstr "OK"
-
-msgid "Question?"
-msgstr "Frage?"
-
-msgid "Yes"
-msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
 
+msgid "Yes"
+msgstr "Ja"
+
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "Question?"
+msgstr "Frage?"
+
+msgid "Select current entry"
+msgstr "Wähle momentanen Eintrag"
+
+msgid "Close MRL browser window"
+msgstr "MRL-Auswahlfenster schließen"
+
+msgid "Play selected entry"
+msgstr "Spiele momentanen Eintrag"
+
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr "Kann Imlib nicht starten\n"
+
+msgid "Information"
+msgstr "Information"
+
+msgid "Warning"
+msgstr "Warnung"
 
 msgid "Error"
 msgstr "Fehler"
 
-msgid "Information"
-msgstr "Information"
+#, c-format
+msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
+msgstr ""
+"gui_main: gewünschtes Ausgabeformat %#lx nicht vorhanden, versuche "
+"Standardformat\n"
+
+#, c-format
+msgid "gui_main: couldn't find true color visual.\n"
+msgstr "gui_main: kein Echtfarben-Ausgabeformat vorhanden.\n"

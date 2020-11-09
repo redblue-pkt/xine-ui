@@ -1,7 +1,11 @@
 # For updating this file, look at the result of:
-#  head -n 3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] --exclude '*/session_ctrl.c' | sed -e 's:^\./::' >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
+#  head -n 3 src/xitk/xine-toolkit/po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/xine-toolkit/*.[chy] --exclude '*/session_ctrl.c' | sed -e 's:^\./::' >> /tmp/POTFILES.in && cp /tmp/POTFILES.in src/xitk/xine-toolkit/po/
 
+src/xitk/xine-toolkit/backend_x11.c
 src/xitk/xine-toolkit/button_list.c
+src/xitk/xine-toolkit/dialog.c
 src/xitk/xine-toolkit/mrlbrowser.c
-src/xitk/xine-toolkit/window.c
+src/xitk/xine-toolkit/xitk.c
 src/xitk/xine-toolkit/xitk.h
+src/xitk/xine-toolkit/xitkintl.h
+src/xitk/xine-toolkit/xitk_x11.c

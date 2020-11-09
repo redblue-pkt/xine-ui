@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-09-14 00:49+0200\n"
+"POT-Creation-Date: 2020-11-08 16:01+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -142,17 +142,17 @@ msgstr "%s(): Kann keinen neuen Thread erzeugen (%s)\n"
 
 #, c-format
 msgid "Video post plugins: %s."
-msgstr "Video Nach-Plugin: %s."
+msgstr "Video Nachbearbeitungs-Plugin: %s."
 
 msgid "Amplification Level"
-msgstr "Verstärkungslevel"
+msgstr "Verstärkungspegel"
 
 msgid "Audio Volume"
 msgstr "Lautstärke"
 
 #, c-format
 msgid "Audio post plugins: %s."
-msgstr "Audio Nach-Plugin: %s."
+msgstr "Audio Nachbearbeitungs-Plugin: %s."
 
 #, c-format
 msgid "TV Mode: %d"
@@ -311,13 +311,13 @@ msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
 msgid "Download in progress"
-msgstr "Download läuft"
+msgstr "Wird heruntergeladen"
 
 #. TRANSLATORS: only ASCII characters (skin)
 #, c-format
 msgctxt "skin"
 msgid "Download progress: %d%%."
-msgstr "Downloadfortschritt: %d%%."
+msgstr "Ueruntergeladen: %d%%."
 
 msgid "Done"
 msgstr "Fertig"
@@ -415,32 +415,32 @@ msgid "Disable this warning."
 msgstr "Deaktiviere diese Warnung."
 
 msgid "Zoom: 1:1"
-msgstr "Zoom: 1:1"
+msgstr "Bildgröße: 1:1"
 
 #, c-format
 msgid "Zoom: 200%%"
-msgstr "Zoom: 200%%"
+msgstr "Bildgröße: 200%%"
 
 #, c-format
 msgid "Zoom: 50%%"
-msgstr "Zoom: 50%%"
+msgstr "Bildgröße: 50%%"
 
 #, c-format
 msgid "A/V offset: %s"
-msgstr "A/V Versatz: %s"
+msgstr "Bild/Ton-Versatz: %s"
 
 msgid "A/V Offset: reset."
-msgstr "A/V Versatz: Zurücksetzen"
+msgstr "Bild/Ton-Versatz: Zurücksetzen"
 
 #, c-format
 msgid "SPU Offset: %s"
-msgstr "SPU Versatz: %s"
+msgstr "Untertitel-Versatz: %s"
 
 msgid "SPU Offset: reset."
-msgstr "SPU Versatz: Zurücksetzen"
+msgstr "Untertitel-Versatz: Zurücksetzen"
 
 msgid "Playlist: no loop."
-msgstr "Playliste: Keine Wiederholung."
+msgstr "Playliste: Nicht wiederholen."
 
 msgid "Playlist: loop."
 msgstr "Playliste: Wiederholen."
@@ -449,10 +449,10 @@ msgid "Playlist: entry repeat."
 msgstr "Playliste: Eintrag wiederholen."
 
 msgid "Playlist: shuffle."
-msgstr "Playliste: Mischen"
+msgstr "Playliste: Zufällige Reihenfolge"
 
 msgid "Playlist: shuffle forever."
-msgstr "Playliste: Immer mischen."
+msgstr "Playliste: In zufälliger Reihenfolge wiederholen"
 
 msgid "No text to display!"
 msgstr "Kein Text zum Anzeigen!"
@@ -548,10 +548,10 @@ msgstr ""
 "anzeigen/verstecken"
 
 msgid "Event sender behavior"
-msgstr "Verhalten von Ereignissender"
+msgstr "Verhalten des Navigationsfensters"
 
 msgid "Event sender window stick to main panel"
-msgstr "Ereignissendefester klebt am Hauptbedienfeld"
+msgstr "Navigationsfenster klebt am Bedienfeld"
 
 msgid "Visual animation style"
 msgstr "Stil der Videoanimation"
@@ -559,7 +559,7 @@ msgstr "Stil der Videoanimation"
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
-"Videoanimation anzeigen, wenn der aktuelle Stream nur Audio hat (z.B.: mp3)."
+"Videoanimation anzeigen, wenn der aktuelle Stream nur Ton hat (z.B.: mp3)."
 
 msgid "Stream information"
 msgstr "Datenstrominformationen"
@@ -623,7 +623,7 @@ msgstr ""
 "anzeigt."
 
 msgid "Amplification level"
-msgstr "Verstärkungslevel"
+msgstr "Verstärkungspegel"
 
 msgid "Display splash screen"
 msgstr "Startbildschirm anzeigen"
@@ -635,7 +635,7 @@ msgid "Audio mixer control method"
 msgstr "Tonmischpultmethode"
 
 msgid "Which method used to control audio volume."
-msgstr "Methode, zum Steuern der Lautstärke."
+msgstr "Methode zum Steuern der Lautstärke."
 
 msgid "Menu shortcut style"
 msgstr "Menu Tastenkürzelstil"
@@ -790,16 +790,16 @@ msgid "Create a directory"
 msgstr "Verzeichnis anlegen"
 
 msgid "Undefined"
-msgstr "Undefiniert"
+msgstr "Nicht angegeben"
 
 msgid "Help"
 msgstr "Hilfe"
 
 msgid "No Help Section Available"
-msgstr "Keine Hilfe für Abschnitt verfügbar"
+msgstr "Keine Hilfe für diesen Abschnitt"
 
 msgid "OOCH: key binding table is NULL.\n"
-msgstr "Autsch! Tastenbelegungstabelle ist NULL.\n"
+msgstr "Autsch! Tastenbelegungstabelle fehlt.\n"
 
 msgid "Ctrl"
 msgstr "Strg"
@@ -813,28 +813,14 @@ msgstr "Nichts ausgewählt"
 msgid "None"
 msgstr "Nichts"
 
+msgid "Grab"
+msgstr "Aufzeichnen"
+
 msgid "You can only delete alias entries."
 msgstr "Nur Alias-Einträge können entfernt werden."
 
 msgid "No more space for additional entries!"
 msgstr "Kein Platz für weitere Einträge!"
-
-msgid "Press Keyboard Keys..."
-msgstr "Drücke Taste auf Tastatur..."
-
-msgid "Event Receiver Window:  Press keyboard keys to bind..."
-msgstr "Ereignisempfangsfenster: Drücke Taste auf Tastatur zum zuweisen..."
-
-msgid "Accept?"
-msgstr "Akzeptieren?"
-
-#, c-format
-msgid ""
-"Store %s as\n"
-"'%s' key binding ?"
-msgstr ""
-"%s als\n"
-"'%s' Tastenbelegung sichern?"
 
 #, c-format
 msgid ""
@@ -844,8 +830,14 @@ msgstr ""
 "Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
 "\"%s\".\n"
 
+msgid "Store new key binding"
+msgstr "Neue Tastenbelegung übernehmen"
+
+msgid "Press keyboard keys to bind..."
+msgstr "Drücke Taste(n) zum Zuweisen..."
+
 msgid "Key Binding Editor"
-msgstr "Tastenbelegungseditor"
+msgstr "Tastenbelegungen bearbeiten"
 
 msgid "Binding Action"
 msgstr "Aktion zuordnen"
@@ -866,7 +858,7 @@ msgid "Save"
 msgstr "Speichern"
 
 msgid "Reset"
-msgstr "Reset"
+msgstr "Zurücksetzen"
 
 msgid "ctrl"
 msgstr "Strg"
@@ -882,9 +874,6 @@ msgstr "Mod4"
 
 msgid "mod5"
 msgstr "Mod5"
-
-msgid "Grab"
-msgstr "Aufzeichnen"
 
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
@@ -957,10 +946,10 @@ msgid "   -Post processing:\n"
 msgstr "   -Nachbearbeitung:\n"
 
 msgid "   -Audio decoder:\n"
-msgstr "   -Audiodecoder:\n"
+msgstr "   -Tondecoder:\n"
 
 msgid "   -Video decoder:\n"
-msgstr "   -Videodecoder:\n"
+msgstr "   -Bilddecoder:\n"
 
 #, c-format
 msgid ""
@@ -1614,17 +1603,29 @@ msgstr "Mediamarkeditor"
 msgid "Identifier"
 msgstr "Bezeichner"
 
-msgid "Mediamark Identifier"
-msgstr "Mediamarkbezeichner"
-
 msgid "Mrl"
 msgstr "MRL"
 
-msgid "Mediamark Mrl"
-msgstr "Mediamark-MRL"
-
 msgid "Subtitle"
 msgstr "Untertitel"
+
+msgid "Start at"
+msgstr "Start bei"
+
+msgid "End at"
+msgstr "Ende bei"
+
+msgid "A/V offset"
+msgstr "A/V Versatz"
+
+msgid "SPU offset"
+msgstr "SPU Versatz"
+
+msgid "Mediamark Identifier"
+msgstr "Mediamarkbezeichner"
+
+msgid "Mediamark Mrl"
+msgstr "Mediamark-MRL"
 
 msgid "Subtitle File"
 msgstr "Untertiteldatei"
@@ -1637,26 +1638,14 @@ msgstr ""
 "Wähle eine Untertiteldatei, welche zusammen mit dieser MRL benutzt werden "
 "soll."
 
-msgid "Start at"
-msgstr "Start bei"
-
 msgid "Mediamark start time (secs)."
 msgstr "Mediamark Startzeit (sek)."
-
-msgid "End at"
-msgstr "Ende bei"
 
 msgid "Mediamark end time (secs)."
 msgstr "Mediamark Endzeit (sek)."
 
-msgid "A/V offset"
-msgstr "A/V Versatz"
-
 msgid "Offset of Audio and Video."
-msgstr "Versatz von Audio und Video."
-
-msgid "SPU offset"
-msgstr "SPU Versatz"
+msgstr "Bild/Ton-Versatz."
 
 msgid "Subpicture offset."
 msgstr "Untertitelversatz."
@@ -1731,7 +1720,7 @@ msgid "Playlist/Load..."
 msgstr "Playliste/Laden..."
 
 msgid "Playlist/Editor..."
-msgstr "Playliste/Editor..."
+msgstr "Playliste/Bearbeiten..."
 
 msgid "Playlist/SEP"
 msgstr "Playliste/SEP"
@@ -1749,10 +1738,10 @@ msgid "Playlist/Loop modes/Repeat Selection"
 msgstr "Playliste/Wiederholen/Auswahl wiederholen"
 
 msgid "Playlist/Loop modes/Shuffle"
-msgstr "Playliste/Wiederholen/Mischen"
+msgstr "Playliste/Wiederholen/Zufällige Reihenfolge"
 
 msgid "Playlist/Loop modes/Non-stop Shuffle"
-msgstr "Playliste/Wiederholmodus/Ununterbrochen mischen"
+msgstr "Playliste/Wiederholmodus/Zufällig wiederholen"
 
 msgid "Playlist/Continue Playback"
 msgstr "Playliste/Wiedergabe fortsetzen"
@@ -1818,7 +1807,7 @@ msgid "Video/Postprocess/Chain Reaction..."
 msgstr "Video/Nachbearbeitung/Kettenreaktion..."
 
 msgid "Video/Postprocess/Enable Postprocessing"
-msgstr "Video/Nachbearbeitung/Nachbearbeitung aktivieren"
+msgstr "Video/Nachbearbeitung/Aktivieren"
 
 msgid "Audio/Volume"
 msgstr "Audio/Lautstärke"
@@ -1848,7 +1837,7 @@ msgid "Audio/Postprocess/Chain Reaction..."
 msgstr "Audio/Nachbearbeitung/Kettenreaktion..."
 
 msgid "Audio/Postprocess/Enable Postprocessing"
-msgstr "Audio/Nachbearbeitung/Nachbearbeitung aktivieren"
+msgstr "Audio/Nachbearbeitung/Aktivieren"
 
 msgid "Subtitle/Channel"
 msgstr "Untertitel/Kanal"
@@ -1999,6 +1988,9 @@ msgstr "N.Stumm"
 msgid "Audio: %s"
 msgstr "Audio: %s"
 
+msgid "gui panel visibility"
+msgstr "gui Fenster sichtbar"
+
 msgid "Volume control"
 msgstr "Lautstärke-Regler"
 
@@ -2081,9 +2073,6 @@ msgstr "Hinweiszeit (ms)"
 msgid "Persistence time of tooltips, in milliseconds."
 msgstr "Anzeigezeit von Hinweisen in Millisekunden."
 
-msgid "gui panel visibility"
-msgstr "gui Fenster sichtbar"
-
 msgid "Load"
 msgstr "Laden"
 
@@ -2129,7 +2118,7 @@ msgstr "Playlisten-Fenster schließen"
 #. TRANSLATORS: only ASCII characters (skin)
 msgctxt "skin"
 msgid "Scan for:"
-msgstr "Suche nach:"
+msgstr "Von Quelle:"
 
 msgid "Direct MRL entry"
 msgstr "Direkte MRL-Eingabe"
@@ -2388,7 +2377,7 @@ msgid "Has Chapters: "
 msgstr "Hat Kapitel: "
 
 msgid "Ignore Spu: "
-msgstr "Ignoriert SPU: "
+msgstr "Ignoriert Untertitel: "
 
 msgid "Has Still: "
 msgstr "Hat Standbild: "
@@ -2609,6 +2598,12 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
+#~ msgstr "Ereignisempfangsfenster: Drücke Taste auf Tastatur zum zuweisen..."
+
+#~ msgid "Accept?"
+#~ msgstr "Akzeptieren?"
 
 #~ msgid "XSendEvent(display, 0x%x ...) failed.\n"
 #~ msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
