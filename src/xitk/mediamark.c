@@ -34,8 +34,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "mediamark.h"
 #include "download.h"

@@ -24,8 +24,6 @@
 
 #include <stdio.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "post.h"
 #include "videowin.h"

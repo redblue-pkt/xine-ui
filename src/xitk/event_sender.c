@@ -29,8 +29,6 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-#include <X11/keysym.h>
-
 #include <xine.h>
 #include <xine/xineutils.h>
 

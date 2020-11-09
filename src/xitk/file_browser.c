@@ -32,8 +32,6 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "file_browser.h"
 #include "videowin.h"

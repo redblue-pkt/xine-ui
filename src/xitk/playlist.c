@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "playlist.h"
 #include "file_browser.h"

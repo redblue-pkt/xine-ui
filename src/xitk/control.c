@@ -27,8 +27,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "actions.h"
 #include "event.h"

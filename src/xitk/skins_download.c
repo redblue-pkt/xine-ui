@@ -26,8 +26,6 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <X11/keysym.h>
-
 #include "common.h"
 #include "skins.h"
 #include "download.h"

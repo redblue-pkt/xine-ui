@@ -25,7 +25,6 @@
 #endif
 
 #include <stdio.h>
-#include <X11/Xlib.h>
 
 #include "common.h"
 #include "splash.h"
