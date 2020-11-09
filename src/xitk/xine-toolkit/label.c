@@ -35,7 +35,6 @@
 typedef struct {
   xitk_widget_t           w;
 
-  ImlibData              *imlibdata;
   xitk_short_string_t     skin_element_name, fontname, label;
 
   xitk_image_t           *labelpix;
@@ -576,7 +575,6 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
   _label_private_t *wp;
 
   ABORT_IF_NULL (wl);
-  ABORT_IF_NULL (wl->imlibdata);
   XITK_CHECK_CONSTITENCY (l);
 
   info = xitk_skin_get_info (skonfig, l->skin_element_name);
@@ -591,7 +589,6 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
   if (!wp)
     return NULL;
 
-  wp->imlibdata = wl->imlibdata;
   xitk_short_string_init (&wp->skin_element_name);
   xitk_short_string_set (&wp->skin_element_name, l->skin_element_name);
   xitk_short_string_init (&wp->fontname);
@@ -631,14 +628,12 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
   _label_private_t *wp;
 
   ABORT_IF_NULL (wl);
-  ABORT_IF_NULL (wl->imlibdata);
   XITK_CHECK_CONSTITENCY (l);
 
   wp = (_label_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
     return NULL;
 
-  wp->imlibdata = wl->imlibdata;
   wp->skin_element_name.s = NULL;
   wp->w.enable  = 0;
   wp->w.visible = 0;
