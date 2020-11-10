@@ -215,6 +215,10 @@ static void _menu_close_1 (_menu_private_t *wp) {
     return;
   wp->num_open -= 1;
   mw = wp->open_windows + wp->num_open;
+  /* revert focus first and prevent annoying window manager flashing. */
+  if ((wp->num_open > 0) && xitk_window_is_window_visible (mw[-1].xwin))
+    xitk_window_try_to_set_input_focus (mw[-1].xwin);
+  /* now, close the window. */
   xitk_unregister_event_handler (mw->wp->w.wl->xitk, &mw->key);
   xitk_image_free_image (&mw->bevel_plain);
   xitk_image_free_image (&mw->bevel_arrow);
@@ -223,8 +227,6 @@ static void _menu_close_1 (_menu_private_t *wp) {
   xitk_window_destroy_window (mw->xwin);
   mw->xwin = NULL;
   mw->node->menu_window = NULL;
-  if ((wp->num_open > 0) && xitk_window_is_window_visible (mw[-1].xwin))
-    xitk_window_try_to_set_input_focus (mw[-1].xwin);
 }
 
 static void _menu_close_subs_in (_menu_private_t *wp, _menu_node_t *node) {
@@ -565,18 +567,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     xitk_window_set_background_image (xwin, bg);
   }
 
-  /* Set transient-for-hint to the immediate predecessor,     */
-  /* so window stacking of submenus is kept upon raise/lower. */
-  if (!node->parent)
-    xitk_window_set_transient_for (xwin, wp->w.wl->win);
-  else
-    xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
-  mw->key = xitk_be_register_event_handler ("xitk menu", mw->xwin, NULL, NULL, mw, NULL, NULL);
-
-  xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
-  xitk_window_raise_window (xwin);
-  xitk_window_try_to_set_input_focus(xwin);
-
+  /* set up wndow type before showing it to minimize window manager action. */
   if (!(xitk_get_wm_type (wp->w.wl->xitk) & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
     xitk_window_set_wm_window_type (xwin, WINDOW_TYPE_MENU);
@@ -588,6 +579,21 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     /* This causes menus not to be shown under many several conditions.  */
     /* WINDOW_TYPE_DOCK is definitely the right choice for KWin.         */
     xitk_window_set_wm_window_type (xwin, WINDOW_TYPE_DOCK);
+
+  /* Set transient-for-hint to the immediate predecessor,     */
+  /* so window stacking of submenus is kept upon raise/lower. */
+  if (!node->parent) {
+    xitk_window_set_transient_for (xwin, wp->w.wl->win);
+  } else {
+    xitk_window_set_role (xwin, XITK_WR_SUBMENU);
+    xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
+  }
+  mw->key = xitk_be_register_event_handler ("xitk menu", mw->xwin, NULL, NULL, mw, NULL, NULL);
+
+  xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+  xitk_window_raise_window (xwin);
+  xitk_window_try_to_set_input_focus(xwin);
+
   btn = (xitk_widget_t *) xitk_window_widget_list(xwin)->list.head.next;
   if (btn) {
     xitk_set_focus_to_widget(btn);

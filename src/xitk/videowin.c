@@ -2306,7 +2306,7 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
         }
 
         if ((e->code == 3) && !vwin->separate_display)
-          video_window_menu (vwin->gui, xitk_window_widget_list (vwin->wrapped_window));
+          video_window_menu (vwin->gui, xitk_window_widget_list (vwin->wrapped_window), e->w, e->h);
         else if (e->code == 2)
           panel_toggle_visibility (NULL, vwin->gui->panel);
         else if (e->code == 1) {
@@ -2405,6 +2405,12 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
         pthread_mutex_unlock (&vwin->mutex);
       }
       break;
+    case XITK_EV_KEY_DOWN:
+      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_MENU) && !vwin->separate_display) {
+        video_window_menu (vwin->gui, xitk_window_widget_list (vwin->wrapped_window), e->w, e->h);
+        return 1;
+      }
+      /* fall through */
     default:
       return gui_handle_be_event (vwin->gui, e);
   }

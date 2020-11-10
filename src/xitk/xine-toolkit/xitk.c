@@ -1591,8 +1591,8 @@ void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {
         continue;
       tags[0].value = (uintptr_t)(((fx == _main) || !trans) ? NULL : trans->wl.xwin->bewin);
       tags[1].value = mask_and_flags;
-      fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
-      fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
+      fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags + (fx->wl.xwin->role == XITK_WR_SUBMENU ? 1 : 0));
+      fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags + 1);
       fx->wl.xwin->flags = tags[1].value;
       if (fx->wl.xwin->flags & XITK_WINF_VISIBLE)
         fx->wl.xwin->bewin->raise (fx->wl.xwin->bewin);
@@ -1602,8 +1602,8 @@ void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {
     if (xwin->bewin) {
       tags[0].value = (uintptr_t)(trans ? trans->wl.xwin->bewin : NULL);
       tags[1].value = mask_and_flags;
-      xwin->bewin->set_props (xwin->bewin, tags);
-      xwin->bewin->get_props (xwin->bewin, tags);
+      xwin->bewin->set_props (xwin->bewin, tags + (xwin->role == XITK_WR_SUBMENU ? 1 : 0));
+      xwin->bewin->get_props (xwin->bewin, tags + 1);
       xwin->flags = tags[1].value;
     }
   }
@@ -2095,6 +2095,21 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         xitk_tips_hide_tips (xitk->x.tips);
 
         w = fx->wl.widget_focused ? fx->wl.widget_focused : NULL;
+
+        /* hint possible menu location */
+        if ((event->utf8[0] == XITK_CTRL_KEY_PREFIX) && (event->utf8[1] == XITK_KEY_MENU) && fx->wl.xwin->bewin) {
+          xitk_tagitem_t tags[] = {{XITK_TAG_X, 0}, {XITK_TAG_Y, 0}, {XITK_TAG_END, 0}};
+          fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
+          event->w = tags[0].value;
+          event->h = tags[1].value;
+          if (w) {
+            event->w += w->x + 10;
+            event->h += w->y + 10;
+          } else {
+            event->w += 20;
+            event->h += 20;
+          }
+        }
 
         handled = xitk_widget_key_event (w, event->utf8, event->qual);
 

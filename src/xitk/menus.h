@@ -23,7 +23,7 @@
 
 #include "xitk.h"
 
-void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl);
+void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y);
 void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y);
 void spu_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y);
 void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selected);

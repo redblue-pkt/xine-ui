@@ -938,13 +938,19 @@ static int panel_event (void *data, const xitk_be_event_t *e) {
       return 1;
     case XITK_EV_BUTTON_DOWN:
       if (e->code == 3) {
-        video_window_menu (panel->gui, panel->widget_list);
+        video_window_menu (panel->gui, panel->widget_list, e->w, e->h);
         return 1;
       }
       break;
     case XITK_EV_POS_SIZE:
       event_sender_move (panel->gui, e->x + e->w, e->y);
       return 1;
+    case XITK_EV_KEY_DOWN:
+      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_MENU)) {
+        video_window_menu (panel->gui, panel->widget_list, e->w, e->h);
+        return 1;
+      }
+      break;
     default: ;
   }
   return gui_handle_be_event (panel->gui, e);

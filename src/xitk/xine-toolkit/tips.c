@@ -180,6 +180,7 @@ static void *_tips_loop_thread (void *data) {
             xitk_image_free_image (&image);
           }
           pthread_mutex_unlock (&tips->mutex);
+          xitk_window_set_role (xwin, XITK_WR_SUBMENU);
           xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
           pthread_mutex_lock (&tips->mutex);
           state = TIPS_WAIT;

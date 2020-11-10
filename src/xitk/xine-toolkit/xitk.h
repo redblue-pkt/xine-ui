@@ -1261,7 +1261,8 @@ typedef enum {
   XITK_WR_HELPER = 0, /** << stay in front of main, show/hide with vice, default. */
   XITK_WR_ROOT,       /** << main using root window */
   XITK_WR_MAIN,       /** << represent the application. */
-  XITK_WR_VICE        /** << stay in front of main, be main while main is invisible. */
+  XITK_WR_VICE,       /** << stay in front of main, be main while main is invisible. */
+  XITK_WR_SUBMENU     /** << stay in front, keep transient_for parent. */
 } xitk_window_role_t;
 void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role);
 
