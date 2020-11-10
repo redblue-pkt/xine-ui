@@ -903,7 +903,7 @@ uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value) 
     return 0;
 
   tags[0].value = (mask << 16) | (value & 0xffff);
-  if (mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) {
+  if ((mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) && (xwin->role != XITK_WR_SUBMENU)) {
     xitk_window_update_tree (xwin, tags[0].value);
   } else {
     xwin->bewin->set_props (xwin->bewin, tags);

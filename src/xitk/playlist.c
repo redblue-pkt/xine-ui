@@ -587,6 +587,17 @@ static int playlist_event (void *data, const xitk_be_event_t *e) {
           case XITK_KEY_ESCAPE:
             playlist_exit (pl->gui);
             return 1;
+          case XITK_KEY_MENU:
+            {
+              xitk_widget_t *w = xitk_get_focused_widget (pl->widget_list);
+
+              if (w && ((xitk_get_widget_type (w)) & WIDGET_GROUP_BROWSER)) {
+                playlist_menu (pl->gui, pl->widget_list, e->w, e->h,
+                  (xitk_browser_get_current_selected (pl->playlist) >= 0));
+                return 1;
+              }
+            }
+            break;
           default: ;
         }
       }
@@ -1250,3 +1261,4 @@ void playlist_editor (gGui_t *gui) {
   xitk_window_try_to_set_input_focus (pl->xwin);
   xitk_set_focus_to_widget (pl->winput);
 }
+

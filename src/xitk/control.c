@@ -287,9 +287,15 @@ static int control_event (void *data, const xitk_be_event_t *e) {
       }
       break;
     case XITK_EV_KEY_DOWN:
-      if ((e->utf8[0] == XITK_CTRL_KEY_PREFIX) && (e->utf8[1] == XITK_KEY_ESCAPE)) {
-        control_toggle_window (NULL, vctrl);
-        return 1;
+      if (e->utf8[0] == XITK_CTRL_KEY_PREFIX) {
+        if (e->utf8[1] == XITK_KEY_ESCAPE) {
+          control_toggle_window (NULL, vctrl);
+          return 1;
+        }
+        if (e->utf8[1] == XITK_KEY_MENU) {
+          control_menu (vctrl->gui, vctrl->widget_list, e->w, e->h);
+          return 1;
+        }
       }
       break;
     default: ;
@@ -675,3 +681,4 @@ void control_deinit (xui_vctrl_t *vctrl) {
     free (vctrl);
   }
 }
+

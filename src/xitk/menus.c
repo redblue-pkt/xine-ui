@@ -320,9 +320,8 @@ static void menu_aspect (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_toggle_aspect (gui, aspect);
 }
 
-void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
+void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   int                  aspect = xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO);
-  int                  x, y;
   xitk_menu_widget_t   menu;
   char                 buffer[2048];
   xitk_widget_t       *w;
@@ -674,8 +673,6 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl) {
   menu_entries[0].menu = buffer;
 
   XITK_WIDGET_INIT(&menu);
-
-  video_window_get_mouse_coords(gui->vwin, &x, &y);
 
   menu.menu_tree         = &menu_entries[0];
   menu.skin_element_name = NULL;
