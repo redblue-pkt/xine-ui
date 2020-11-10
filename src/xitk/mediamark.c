@@ -2667,7 +2667,7 @@ int mediamark_concat_mediamarks(const char *filename) {
 
   if(mmk) {
 #ifdef DEBUG
-    printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
+    printf("Playlist file (%s) is valid (%s).\n", filename, lf->type);
 #endif
   }
   else {
@@ -2716,7 +2716,7 @@ void mediamark_load_mediamarks(const char *filename) {
 
   if(mmk) {
 #ifdef DEBUG
-    printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
+    printf("Playlist file (%s) is valid (%s).\n", filename, lf->type);
 #endif
   }
   else {
