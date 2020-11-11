@@ -117,7 +117,6 @@ extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 
 #include "_config.h"
-#include "cursors.h"
 #include "dnd.h"
 #include "font.h"
 #include "image.h"
