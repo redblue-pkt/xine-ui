@@ -934,7 +934,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   xitk_image_t               *bg_image;
 
   ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->imlibdata);
 
   XITK_CHECK_CONSTITENCY(mb);
 
