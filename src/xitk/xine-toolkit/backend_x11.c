@@ -249,6 +249,7 @@ struct xitk_x11_display_s {
 };
 
 static void _xitk_x11_backend_delete (xitk_x11_backend_t *be) {
+  pthread_mutex_unlock (&be->mutex);
   pthread_mutex_destroy (&be->mutex);
   free (be);
 }
@@ -317,6 +318,7 @@ static int _xitk_x11_display_unref (xitk_x11_display_t *d) {
   if (--d->refs != 0) {
     return 1;
   }
+  pthread_mutex_unlock (&d->mutex);
   _xitk_x11_display_delete (d);
   return 0;
 }
@@ -1580,8 +1582,6 @@ static void xitk_x11_window_raise (xitk_be_window_t *_win) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
 
-  if (!_win)
-    return;
   xitk_container (win, _win, w);
   if (!win)
     return;
