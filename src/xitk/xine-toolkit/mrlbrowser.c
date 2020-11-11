@@ -358,12 +358,13 @@ static void _mrlbrowser_duplicate_mrls (_mrlb_items_t *items, xine_mrl_t **mtmp,
   slen = 0;
   for (i = 0; i < num_mrls; i++) {
     xine_mrl_t *m = mtmp[i];
-    size_t olen = (m->origin ? strlen (m->origin) : 0) + 1;
+    const char *orig = m->origin ? m->origin : "";
+    size_t olen = strlen (orig) + 1;
     size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
     size_t llen = (m->link ? strlen (m->link) : 0) + 1;
     size_t dlen = (mlen > olen ? mlen - olen + 1 : mlen) + ((m->type & XINE_MRL_TYPE_file_symlink) ? llen + 5 : 1);
     slen += olen + mlen + llen + dlen;
-    if ((olen == g_olen) && !memcmp (m->origin, g_orig, g_olen))
+    if ((olen == g_olen) && !memcmp (orig, g_orig, g_olen))
       g_onum += 1;
   }
   if (g_onum != num_mrls)
@@ -396,7 +397,8 @@ static void _mrlbrowser_duplicate_mrls (_mrlb_items_t *items, xine_mrl_t **mtmp,
     size_t olen;
     size_t mlen = (m->mrl ? strlen (m->mrl) : 0) + 1;
     size_t llen = (m->link ? strlen (m->link) : 0) + 1;
-    char *p, *q, *r;
+    const char *p, *q;
+    char *r;
 
     if (g_orig) {
       olen = g_olen;
@@ -446,7 +448,7 @@ static void _mrlbrowser_duplicate_mrls (_mrlb_items_t *items, xine_mrl_t **mtmp,
     } else {
       *mem++ = 0;
     }
-    p = mlen > olen ? m->mrl + mlen - olen : m->mrl;
+    p = m->mrl ? (mlen > olen ? m->mrl + mlen - olen : m->mrl) : "";
     q = NULL;
     while (p[0] && (p[0] != '?') && (p[0] != '#')) {
       if (p[0] == '.') {

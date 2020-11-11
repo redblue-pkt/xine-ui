@@ -305,7 +305,7 @@ static int _skin_alter (gGui_t *gui, int index) {
   /* Check skin version */
   if (xitk_skin_check_version (nskin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config (nskin_config);
-    xine_error (gui, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), sks->fullname, osks->name);
+    xine_error (gui, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), sks->fullname, old_skin);
     return old_index;
   }
   gui->skins.current_skin = sks;

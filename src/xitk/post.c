@@ -1673,7 +1673,7 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
 
 static int pplugin_event (void *data, const xitk_be_event_t *e) {
   post_info_t *info = data;
-  int step;
+  int step = 0;
 
   switch (e->type) {
     case XITK_EV_DEL_WIN:

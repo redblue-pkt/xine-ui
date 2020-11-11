@@ -89,8 +89,10 @@ size_t xitk_short_string_set (xitk_short_string_t *s, const char *v) {
     free (s->s);
     s->s = s->buf;
   }
-  n = strlen (v) + 1;
-  if (n > sizeof (s->buf)) {
+  /* TJ. trying to avoid a Coverity Scan false positive with v == "PlInputText":
+   * >>> Overrunning buffer pointed to by "inp.skin_element_name" of 12 bytes
+   * by passing it to a function which accesses it at byte offset 62. */
+  if ((n = strlen (v) + 1) > sizeof (s->buf)) {
     char *d = malloc (n);
     if (d) {
       s->s = d;

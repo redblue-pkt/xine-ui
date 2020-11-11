@@ -282,9 +282,10 @@ void playlist_delete_current (gGui_t *gui) {
 
   if (!gui)
     return;
-  pl = gui->plwin;
 
-  mmk_editor_end (pl->gui);
+  mmk_editor_end (gui);
+
+  pl = gui->plwin;
   if (!pl)
     return;
   j = xitk_browser_get_current_selected (pl->playlist);
@@ -304,9 +305,13 @@ void playlist_delete_all (gGui_t *gui) {
 
   if (!gui)
     return;
-  pl = gui->plwin;
 
-  mmk_editor_end (pl->gui);
+  mmk_editor_end (gui);
+
+  pl = gui->plwin;
+  if (!pl)
+    return;
+
   mediamark_free_mediamarks ();
   playlist_update_playlist (gui);
   if (xine_get_status (gui->stream) != XINE_STATUS_STOP)
@@ -331,10 +336,11 @@ static void _playlist_delete_all (xitk_widget_t *w, void *data) {
 static void _playlist_move_current_updown (xui_playlist_t *pl, int dir) {
   int j;
 
-  mmk_editor_end (pl->gui);
-
   if (!pl)
     return;
+
+  mmk_editor_end (pl->gui);
+
   if ((j = xitk_browser_get_current_selected (pl->playlist)) >= 0) {
     mediamark_t *mmk;
     int          start = xitk_browser_get_current_start (pl->playlist);
@@ -739,6 +745,7 @@ void playlist_mrlident_toggle (gGui_t *gui) {
  */
 void playlist_update_playlist (gGui_t *gui) {
   xui_playlist_t *pl;
+
   if (!gui)
     return;
   pl = gui->plwin;
