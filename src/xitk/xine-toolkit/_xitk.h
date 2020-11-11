@@ -203,8 +203,8 @@ int xitk_system(int dont_run_as_root, const char *command);
 int xitk_is_use_xshm (xitk_t *xitk);
 
 char *xitk_filter_filename(const char *name);
-void xitk_modal_window(Window w);
-void xitk_unmodal_window(Window w);
+//void xitk_modal_window(Window w);
+//void xitk_unmodal_window(Window w);
 void xitk_set_current_menu(xitk_widget_t *menu);
 void xitk_unset_current_menu(void);
 void xitk_set_tips_timeout(unsigned long timeout);
