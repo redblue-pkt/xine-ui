@@ -35,7 +35,6 @@
 #include <inttypes.h>
 
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #ifdef HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
@@ -44,10 +43,6 @@
 #endif
 #ifdef HAVE_X11_EXTENSIONS_XSHM_H
 #include <X11/extensions/XShm.h>
-#endif
-#ifdef WITH_XFT
-#include <ft2build.h>
-#include <X11/Xft/Xft.h>
 #endif
 
 #include "xitk/Imlib-light/Imlib.h"

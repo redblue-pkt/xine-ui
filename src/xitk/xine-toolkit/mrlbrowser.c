@@ -29,8 +29,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <X11/keysym.h>
-
 #include <xine.h>
 
 #include "_xitk.h"
