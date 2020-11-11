@@ -306,12 +306,12 @@ static void _inputtext_sbuf_unset (_inputtext_private_t *wp) {
 /*
  *
  */
-static void _cursor_focus (_inputtext_private_t *wp, Window win, int focus) {
+static void _cursor_focus (_inputtext_private_t *wp, int focus) {
   wp->cursor_focus = focus;
   if (focus)
-    xitk_cursors_define_window_cursor (wp->imlibdata->x.disp, win, xitk_cursor_xterm);
+    xitk_cursors_define_window_cursor (wp->imlibdata->x.disp, wp->w.wl->win, xitk_cursor_xterm);
   else
-    xitk_cursors_restore_window_cursor (wp->imlibdata->x.disp, win);
+    xitk_cursors_restore_window_cursor (wp->imlibdata->x.disp, wp->w.wl->win);
 }
 
 /*
@@ -416,7 +416,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   if (wp->w.visible != 1) {
     if (wp->cursor_focus)
-      _cursor_focus (wp, wp->w.wl->win, 0);
+      _cursor_focus (wp, 0);
     return;
   }
 
@@ -425,7 +425,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 #endif
   if (wp->w.enable && (!wp->cursor_focus)
     && (xitk_is_mouse_over_widget (&wp->w)))
-      _cursor_focus (wp, wp->w.wl->win, 1);
+      _cursor_focus (wp, 1);
 
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
@@ -629,7 +629,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
 
     if (wp->w.enable && (!wp->cursor_focus)
        && (xitk_is_mouse_over_widget (&wp->w)))
-      _cursor_focus (wp, wp->w.wl->win, 1);
+      _cursor_focus (wp, 1);
 
     {
       _inputtext_pos_t pos;
@@ -656,9 +656,9 @@ static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
       wp->text.cursor_pos = -1;
 
     if ((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
-      _cursor_focus (wp, wp->w.wl->win, 0);
+      _cursor_focus (wp, 0);
     else if (wp->w.enable && (focus == FOCUS_MOUSE_IN))
-      _cursor_focus (wp, wp->w.wl->win, 1);
+      _cursor_focus (wp, 1);
   }
   return 1;
 }
@@ -890,7 +890,7 @@ static void _inputtext_exec_return (_inputtext_private_t *wp) {
   wp->text.cursor_pos   = -1;
   wp->w.have_focus = wp->have_focus = FOCUS_LOST;
   //  wl->widget_focused = NULL;
-  _cursor_focus (wp, wp->w.wl->win, 0);
+  _cursor_focus (wp, 0);
   _paint_inputtext (wp);
 
   if (wp->text.buf && wp->text.buf[0]) {
@@ -906,7 +906,7 @@ static void _inputtext_exec_escape (_inputtext_private_t *wp) {
   wp->text.cursor_pos = -1;
   wp->w.have_focus = wp->have_focus = FOCUS_LOST;
   wp->w.wl->widget_focused = NULL;
-  _cursor_focus (wp, wp->w.wl->win, 0);
+  _cursor_focus (wp, 0);
   _paint_inputtext (wp);
 }
 
