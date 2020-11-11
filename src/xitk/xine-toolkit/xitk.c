@@ -50,9 +50,19 @@
 #include <execinfo.h>
 #endif
 
+#ifdef HAVE_SYS_IPC_H
+#include <sys/ipc.h>
+#endif
+#ifdef HAVE_SYS_SHM_H
+#include <sys/shm.h>
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+#ifdef HAVE_X11_EXTENSIONS_XSHM_H
+#include <X11/extensions/XShm.h>
+#endif
 
 #include "utils.h"
 #include "dump.h"
