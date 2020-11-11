@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#include <X11/keysym.h>
-
 #include "font.h"
 
 #include "_xitk.h"
