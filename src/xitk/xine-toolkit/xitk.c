@@ -63,6 +63,7 @@
 #include "menu.h"
 #include "combo.h"
 #include "cursors.h"
+#include "dnd.h"
 
 extern char **environ;
 #undef TRACE_LOCKS
