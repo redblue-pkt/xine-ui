@@ -918,11 +918,6 @@ void xitk_enable_widgets_tips(xitk_widget_list_t *wl);
  */
 void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
 
-/**
- * Pass events to UI
- */
-void xitk_xevent_notify(XEvent *event);
-
 /*
  * *** Image
  */
