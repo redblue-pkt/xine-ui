@@ -31,9 +31,12 @@
 
 #include "_xitk.h"
 #include "inputtext.h"
-#include "xitk_x11.h"
 
 #define NEW_CLIPBOARD
+
+#ifndef NEW_CLIPBOARD
+#include "xitk_x11.h"
+#endif
 
 #define DIRTY_BEFORE     1
 #define DIRTY_AFTER      2
@@ -52,7 +55,6 @@ typedef enum {
 typedef struct {
   xitk_widget_t           w;
 
-  ImlibData              *imlibdata;
   xitk_short_string_t     skin_element_name, fontname;
   char                    color[_IT_END][32];
 
@@ -308,9 +310,9 @@ static void _inputtext_sbuf_unset (_inputtext_private_t *wp) {
 static void _cursor_focus (_inputtext_private_t *wp, int focus) {
   wp->cursor_focus = focus;
   if (focus)
-    xitk_cursors_define_window_cursor (wp->imlibdata->x.disp, wp->w.wl->win, xitk_cursor_xterm);
+    xitk_window_define_window_cursor (wp->w.wl->xwin, xitk_cursor_xterm);
   else
-    xitk_cursors_restore_window_cursor (wp->imlibdata->x.disp, wp->w.wl->win);
+    xitk_window_restore_window_cursor (wp->w.wl->xwin);
 }
 
 /*
@@ -546,9 +548,9 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xs[0].x1 = width - 1; xs[0].x2 = width + 1; xs[0].y1 = xs[0].y2 = 2;
     xs[1].x1 = width - 1; xs[1].x2 = width + 1; xs[1].y1 = xs[1].y2 = ysize - 3;
     xs[2].x1 = xs[2].x2 = width; xs[2].y1 = 3; xs[2].y2 = ysize - 4;
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
+    xitk_lock_display(wp->w.wl->xitk);
     wp->text.temp_img.image->beimg->draw_lines (wp->text.temp_img.image->beimg, xs, 3, fg, 0);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    xitk_unlock_display(wp->w.wl->xitk);
   }
 
   if (fs) {
@@ -741,9 +743,9 @@ static void _inputtext_kill_line (_inputtext_private_t *wp) {
 static void _inputtext_copy (_inputtext_private_t *wp) {
   if (wp->text.buf && (wp->text.used > 0)) {
 #ifndef NEW_CLIPBOARD
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    xitk_lock_display(wp->w.wl->xitk);
+    XStoreBytes (xitk_x11_get_display(wp->w.wl->xitk), wp->text.buf, wp->text.used);
+    xitk_unlock_display(wp->w.wl->xitk);
 #else
     xitk_clipboard_set_text (&wp->w, wp->text.buf, wp->text.used);
 #endif
@@ -753,9 +755,9 @@ static void _inputtext_copy (_inputtext_private_t *wp) {
 static void _inputtext_cut (_inputtext_private_t *wp) {
   if (wp->text.buf && (wp->text.used > 0)) {
 #ifndef NEW_CLIPBOARD
-    XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-    XStoreBytes (wp->imlibdata->x.disp, wp->text.buf, wp->text.used);
-    XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+    xitk_lock_display(wp->w.wl->xitk);
+    XStoreBytes (xitk_x11_get_display(wp->w.wl->xitk), wp->text.buf, wp->text.used);
+    xitk_unlock_display(wp->w.wl->xitk);
 #else
     xitk_clipboard_set_text (&wp->w, wp->text.buf, wp->text.used);
 #endif
@@ -781,9 +783,9 @@ static void _inputtext_paste (_inputtext_private_t *wp) {
   olen -= pos;
 
 #ifndef NEW_CLIPBOARD
-  XLOCK (wp->imlibdata->x.x_lock_display, wp->imlibdata->x.disp);
-  insert = XFetchBytes (wp->imlibdata->x.disp, &ilen);
-  XUNLOCK (wp->imlibdata->x.x_unlock_display, wp->imlibdata->x.disp);
+  xitk_lock_display(wp->w.wl->xitk);
+  insert = XFetchBytes (xitk_x11_get_display(wp->w.wl->xitk), &ilen);
+  xitk_unlock_display(wp->w.wl->xitk);
 #else
   insert = NULL;
   ilen = xitk_clipboard_get_text (&wp->w, &insert, wp->text.size - wp->text.used);
@@ -1112,9 +1114,7 @@ void xitk_inputtext_change_text (xitk_widget_t *w, const char *text) {
  */
 static xitk_widget_t *_xitk_inputtext_create (_inputtext_private_t *wp, xitk_inputtext_widget_t *it) {
   ABORT_IF_NULL (wp->w.wl);
-  ABORT_IF_NULL (wp->w.wl->imlibdata);
-
-  wp->imlibdata         = wp->w.wl->imlibdata;
+  ABORT_IF_NULL (wp->w.wl->xitk);
 
   wp->w.width           = wp->skin.width / 2;
   wp->w.height          = wp->skin.height;
@@ -1154,7 +1154,6 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 
   XITK_CHECK_CONSTITENCY(it);
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   wp = (_inputtext_private_t *)xitk_widget_new (wl, sizeof (*wp));
   if (!wp)
@@ -1179,7 +1178,6 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   _inputtext_private_t *wp;
 
   ABORT_IF_NULL(wl);
-  ABORT_IF_NULL(wl->imlibdata);
 
   XITK_CHECK_CONSTITENCY(it);
 
