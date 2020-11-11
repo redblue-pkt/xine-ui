@@ -34,8 +34,6 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-#include <X11/Xlib.h>
-
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (11)
 #define XITK_SUB_VERSION            (0)
@@ -598,20 +596,12 @@ uint32_t xitk_get_wm_type (xitk_t *xitk);
 /*
  *
  */
-void xitk_set_layer_above(Window window);
 void xitk_window_set_layer_above(xitk_window_t *window);
 
 /*
  *
  */
-void xitk_set_window_layer(Window window, int layer);
 void xitk_window_set_window_layer(xitk_window_t *w, int layer);
-
-/*
- *
- */
-void xitk_set_ewmh_fullscreen(Window window);
-void xitk_unset_ewmh_fullscreen(Window window);
 
 /*
  * This function start the widget live. It's a block function,
@@ -962,31 +952,8 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
  */
 void xitk_image_copy (xitk_image_t *from, xitk_image_t *to);
 
-/*
- * return len of keystring (stored in kbuf)
- * define ksym
- * kbuf should be large enought (256 usually)
- */
-int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen);
-
-/**
- * return keypressed
- */
-KeySym xitk_get_key_pressed(XEvent *event);
-
-KeySym xitk_keycode_to_keysym(XEvent *event);
-
 /* Return size of output string (>=buf_size if truncated). -1 on error. */
-int xitk_keysym_to_string(KeySym keysym, char *buf, size_t buf_size);
-
-/**
- * All states of modifiers (see xitk_get_key_modifier() bellow).
- */
-/**
- * return 1 if a modifier key has been pressed (extracted from XEvent *)
- * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
- */
-int xitk_get_key_modifier(XEvent *xev, int *modifier);
+int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size);
 
 /*
  *  *** skin
@@ -1101,11 +1068,6 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
  */
 void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 			    int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
-
-/*
- *
- */
-void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 
 /**
  *
@@ -1264,11 +1226,6 @@ void xitk_window_resize_window(xitk_window_t *w, int width, int height);
  */
 void xitk_window_center_window(xitk_window_t *w);
 
-/**
- *
- */
-Window xitk_window_get_window(xitk_window_t *w);
-
 /*
  *
  */
@@ -1329,7 +1286,6 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
  */
 void xitk_window_raise_window(xitk_window_t *w);
 
-void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin);
 
 /*
