@@ -22,8 +22,6 @@
 #ifndef HAVE_XITK_CURSORS_H
 #define HAVE_XITK_CURSORS_H
 
-#include "_xitk.h"
-
 #include <X11/Xlib.h>
 
 void xitk_cursors_init(Display *display);
