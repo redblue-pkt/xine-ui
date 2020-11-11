@@ -326,6 +326,55 @@ Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, i
  *
  */
 
+static int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen) {
+  int len = 0;
+  if(event) {
+    XKeyEvent  pkeyev = event->xkey;
+
+    XLOCK (xitk_x_lock_display, pkeyev.display);
+    len = XLookupString(&pkeyev, kbuf, kblen, ksym, NULL);
+    XUNLOCK (xitk_x_unlock_display, pkeyev.display);
+  }
+  return len;
+}
+
+/*
+ * Return key pressed (XK_VoidSymbol on failure)
+ */
+KeySym xitk_get_key_pressed(XEvent *event) {
+  KeySym   pkey = XK_VoidSymbol;
+
+  if(event) {
+    char  buf[256];
+    (void) xitk_get_keysym_and_buf(event, &pkey, buf, sizeof(buf));
+  }
+
+  return pkey;
+}
+
+int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
+  const char *s = XKeysymToString(keysym);
+  if (!s)
+    return -1;
+  return strlcpy(buf, s, buf_size);
+}
+
+static KeySym xitk_keycode_to_keysym(XEvent *event) {
+  KeySym pkey = XK_VoidSymbol;
+
+  if (event) {
+    XLOCK (xitk_x_lock_display, event->xany.display);
+    pkey = XLookupKeysym (&event->xkey, 0);
+    XUNLOCK (xitk_x_unlock_display, event->xany.display);
+  }
+  return pkey;
+}
+
+
+/*
+ *
+ */
+
 void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void *user_data) {
 
   switch (event->type) {

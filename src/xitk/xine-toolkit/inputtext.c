@@ -355,50 +355,6 @@ static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
   return 1;
 }
 
-int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen) {
-  int len = 0;
-  if(event) {
-    XKeyEvent  pkeyev = event->xkey;
-
-    XLOCK (xitk_x_lock_display, pkeyev.display);
-    len = XLookupString(&pkeyev, kbuf, kblen, ksym, NULL);
-    XUNLOCK (xitk_x_unlock_display, pkeyev.display);
-  }
-  return len;
-}
-
-/*
- * Return key pressed (XK_VoidSymbol on failure)
- */
-KeySym xitk_get_key_pressed(XEvent *event) {
-  KeySym   pkey = XK_VoidSymbol;
-
-  if(event) {
-    char  buf[256];
-    (void) xitk_get_keysym_and_buf(event, &pkey, buf, sizeof(buf));
-  }
-
-  return pkey;
-}
-
-int xitk_keysym_to_string(KeySym keysym, char *buf, size_t buf_size) {
-  const char *s = XKeysymToString(keysym);
-  if (!s)
-    return -1;
-  return strlcpy(buf, s, buf_size);
-}
-
-KeySym xitk_keycode_to_keysym(XEvent *event) {
-  KeySym pkey = XK_VoidSymbol;
-
-  if (event) {
-    XLOCK (xitk_x_lock_display, event->xany.display);
-    pkey = XLookupKeysym (&event->xkey, 0);
-    XUNLOCK (xitk_x_unlock_display, event->xany.display);
-  }
-  return pkey;
-}
-
 /*
  * Paint the input text box.
  */

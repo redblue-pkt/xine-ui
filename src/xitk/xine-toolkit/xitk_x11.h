@@ -37,6 +37,20 @@ void xitk_x11_delete (xitk_x11_t *xitk_x11);
 
 int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksym, int *modifier, char *buf, int bsize);
 
+/**
+ * return keypressed
+ */
+KeySym xitk_get_key_pressed(XEvent *event);
+
+/**
+ * All states of modifiers (see xitk_get_key_modifier() bellow).
+ */
+/**
+ * return 1 if a modifier key has been pressed (extracted from XEvent *)
+ * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
+ */
+int xitk_get_key_modifier(XEvent *xev, int *modifier);
+
 /*
  *
  */
@@ -65,6 +79,15 @@ void xitk_x11_xrm_parse(const char *xrm_class_name,
 int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h);
 
 Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity);
+
+/*
+ *
+ */
+
+void xitk_set_layer_above(Window window);
+void xitk_set_window_layer(Window window, int layer);
+void xitk_set_ewmh_fullscreen(Window window);
+void xitk_unset_ewmh_fullscreen(Window window);
 
 /*
  *
@@ -101,6 +124,9 @@ xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 
 void xitk_x11_translate_xevent(XEvent *xev, const xitk_event_cbs_t *cbs, void *user_data);
+
+Window xitk_window_get_window(xitk_window_t *w);
+void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
 
 #endif /* _XITK_X11_H_ */
 
