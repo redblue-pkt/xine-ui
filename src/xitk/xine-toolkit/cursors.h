@@ -22,9 +22,9 @@
 #ifndef HAVE_XITK_CURSORS_H
 #define HAVE_XITK_CURSORS_H
 
-#include <X11/Xlib.h>
+#include "_xitk.h"
 
-void xitk_cursors_init(Display *display);
-void xitk_cursors_deinit(Display *display);
+void xitk_cursors_init(xitk_t *xitk);
+void xitk_cursors_deinit(xitk_t *xitk);
 
 #endif

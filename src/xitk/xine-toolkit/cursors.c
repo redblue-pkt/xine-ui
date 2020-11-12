@@ -868,9 +868,10 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
   XUNLOCK (xitk_x_unlock_display, display);
 }
 
-void xitk_cursors_init(Display *display) {
+void xitk_cursors_init(xitk_t *xitk) {
   int   i;
-  int   xitk_cursors = xitk_get_cfg_num (gXitk, XITK_CURSORS_FEATURE);
+  int   xitk_cursors = xitk_get_cfg_num (xitk, XITK_CURSORS_FEATURE);
+  Display *display = xitk_x11_get_display(xitk);
 
   /* Transparent cursor isn't a valid X cursor */
   _cursors_create_cursor(display, &cursors[0]);
@@ -879,25 +880,26 @@ void xitk_cursors_init(Display *display) {
 
     if(xitk_cursors) {
       if(cursors[i].embedded == X_CURSOR) {
-        XLOCK (xitk_x_lock_display, display);
+        xitk_lock_display (xitk);
 	cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
-        XUNLOCK (xitk_x_unlock_display, display);
+        xitk_unlock_display (xitk);
       }
       else
 	_cursors_create_cursor(display, &cursors[i]);
     }
     else {
-      XLOCK (xitk_x_lock_display, display);
+      xitk_lock_display (xitk);
       cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
-      XUNLOCK (xitk_x_unlock_display, display);
+      xitk_unlock_display (xitk);
     }
   }
 }
 
-void xitk_cursors_deinit(Display *display) {
+void xitk_cursors_deinit(xitk_t *xitk) {
+  Display *display = xitk_x11_get_display(xitk);
   int i;
 
-  XLOCK (xitk_x_lock_display, display);
+  xitk_lock_display (xitk);
   for(i = 0; i < MAX_CURSORS; i++) {
     XFreeCursor(display, cursors[i].cursor);
 
@@ -909,13 +911,13 @@ void xitk_cursors_deinit(Display *display) {
     }
 
   }
-  XUNLOCK (xitk_x_unlock_display, display);
+  xitk_unlock_display (xitk);
 }
 
 /* Public */
 void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor) {
   if(window != None) {
-    XLOCK (xitk_x_lock_display, display);
+    XLOCK (xitk_x_unlock_display, display);
     XDefineCursor(display, window, cursors[cursor].cursor);
     XSync(display, False);
     XUNLOCK (xitk_x_unlock_display, display);

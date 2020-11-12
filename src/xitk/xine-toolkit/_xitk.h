@@ -97,8 +97,6 @@ struct xitk_s {
 #  define xitk_unlock_display(_xitk_) (_xitk_)->unlock_display (_xitk_)
 #endif
 
-extern xitk_t *gXitk;
-
 extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 
