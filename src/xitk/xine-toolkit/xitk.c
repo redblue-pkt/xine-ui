@@ -1639,7 +1639,7 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   xitk_dnode_init (&fx->wl.node);
   xitk_dlist_init (&fx->wl.list);
   fx->wl.xitk               = &xitk->x;
-  fx->wl.win                = None;
+  fx->wl.xwin               = NULL;
   fx->wl.shared_images      = NULL;
   fx->wl.widget_focused     = NULL;
   fx->wl.widget_under_mouse = NULL;
@@ -1674,9 +1674,10 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
 }
 
 /* nasty xitk_window_widget_list () helper. */
-xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, Window win) {
+xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
   __xitk_t *xitk;
   __gfx_t *fx;
+  Window win = xitk_window_get_window(xwin);
 
   xitk_container (xitk, _xitk, x);
   ABORT_IF_NULL(xitk);
@@ -1689,7 +1690,7 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, Window win) {
         break;
     if (fx->wl.node.next) {
       fx->refs += 1;
-      fx->wl.win = win;
+      fx->wl.xwin = xwin;
       MUTUNLOCK ();
       return &fx->wl;
     }
@@ -1699,7 +1700,7 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, Window win) {
   fx = _xitk_gfx_new (xitk);
   if (!fx)
     return NULL;
-  fx->wl.win = win;
+  fx->wl.xwin = xwin;
   fx->window = win;
   strcpy (fx->name, "XITK_WIN_WL");
   MUTLOCK();

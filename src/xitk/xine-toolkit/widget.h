@@ -24,8 +24,6 @@
 
 #include "dlist.h"
 
-#include <X11/Xlib.h>
-
 #include <xine/sorted_array.h>
 
 typedef enum {
@@ -134,7 +132,6 @@ struct xitk_widget_list_s {
   xine_sarray_t              *shared_images;
 
   xitk_window_t              *xwin;
-  Window                      win;
 };
 
 xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size);
