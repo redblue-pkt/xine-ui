@@ -551,11 +551,8 @@ xitk_widget_list_t *xitk_window_widget_list (xitk_window_t *xwin) {
   if (xwin->widget_list)
     return xwin->widget_list;
 
-  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin->window);
-  if (!xwin->widget_list)
-    return NULL;
+  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin);
 
-  xwin->widget_list->xwin = xwin;
   return xwin->widget_list;
 }
 
@@ -814,9 +811,7 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
   xwin->role = XITK_WR_HELPER;
 
   xwin->window = window;
-  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin->window);
-  if (xwin->widget_list)
-    xwin->widget_list->xwin = xwin;
+  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin);
 
   {
     xitk_tagitem_t tags[] = {

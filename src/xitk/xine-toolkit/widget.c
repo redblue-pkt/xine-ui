@@ -801,7 +801,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   event.skonfig = skonfig;
 
   mywidget = (xitk_widget_t *)wl->list.head.next;
-  while (mywidget->node.next && wl->win && skonfig) {
+  while (mywidget->node.next && wl->xwin && skonfig) {
 
     (void) mywidget->event(mywidget, &event, NULL);
 
@@ -859,7 +859,7 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
 
   if (!wl || !hull)
     return 0;
-  if (!wl->win)
+  if (!wl->xwin)
     return 0;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
@@ -907,7 +907,7 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
 
   if (!wl)
     return 1;
-  if (!wl->win)
+  if (!wl->xwin)
     return 1;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
@@ -1329,7 +1329,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
 
   if (!wl)
     return;
-  if (!wl->win)
+  if (!wl->xwin)
     return;
 
   w = xitk_find_nextprev_focus (wl, backward);
@@ -1429,7 +1429,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     XITK_WARNING("widget list is NULL.\n");
     return;
   }
-  if (!wl->win)
+  if (!wl->xwin)
     return;
 
   /* paranois: w (still) in list? */
@@ -2166,7 +2166,7 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
 int xitk_is_mouse_over_widget(xitk_widget_t *w) {
   int             win_x, win_y;
   Display        *display = xitk_x11_get_display(w->wl->xitk);
-  Window          window = w->wl->win;
+  Window          window = xitk_window_get_window(w->wl->xwin);
 
   if(!w) {
     XITK_WARNING("widget is NULL\n");
