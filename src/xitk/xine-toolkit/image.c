@@ -30,6 +30,8 @@
 
 #include <xine/sorted_array.h>
 
+#include "xitk/Imlib-light/Imlib.h"
+
 #include "_xitk.h"
 
 #include "utils.h"

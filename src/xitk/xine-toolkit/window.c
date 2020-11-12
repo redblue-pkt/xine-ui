@@ -30,6 +30,8 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
 
+#include "xitk/Imlib-light/Imlib_types.h"
+
 #include "_xitk.h"
 #include "xitk.h"
 
