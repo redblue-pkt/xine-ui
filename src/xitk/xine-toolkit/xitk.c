@@ -2475,13 +2475,11 @@ static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install
   free(xrm_prefered_visual);
 }
 
-#ifdef YET_UNUSED
 void xitk_sync(xitk_t *_xitk) {
   xitk_lock_display (_xitk);
   XSync (_xitk->display, False);
   xitk_unlock_display (_xitk);
 }
-#endif
 
 /*
  * Initiatization of widget internals.
@@ -2663,7 +2661,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->x.font_cache = xitk_font_cache_init();
 
   xitk_cursors_init (xitk->x.display);
-  xitk->x.tips = xitk_tips_new (xitk->x.display);
+  xitk->x.tips = xitk_tips_new ();
 
   return &xitk->x;
 }
