@@ -52,6 +52,8 @@ typedef struct _mwmhints {
 
 #include <xine/sorted_array.h>
 
+#include "xitk/Imlib-light/Imlib.h"
+
 #include "_xitk.h"
 #include "xitkintl.h"
 #include "backend.h"

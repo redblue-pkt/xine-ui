@@ -36,7 +36,7 @@
 
 #include <X11/Xlib.h>
 
-#include "xitk/Imlib-light/Imlib.h"
+struct _ImlibData;
 
 #include "libcommon.h"
 #include "xitk.h"
@@ -62,7 +62,7 @@ struct xitk_s {
   void    (*x_unlock_display) (Display *display);
   void    (*lock_display) (xitk_t *);
   void    (*unlock_display) (xitk_t *);
-  ImlibData *imlibdata;
+  struct _ImlibData *imlibdata;
   /* /TODO: remove this kludge. */
 #ifdef DEBUG_LOCKDISPLAY
   pthread_mutex_t debug_mutex;

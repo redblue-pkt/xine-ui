@@ -64,6 +64,8 @@
 #include <X11/extensions/XShm.h>
 #endif
 
+#include "xitk/Imlib-light/Imlib.h"
+
 #include "utils.h"
 #include "dump.h"
 #include "_xitk.h"
