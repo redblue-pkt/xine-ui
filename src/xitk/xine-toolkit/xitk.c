@@ -1671,27 +1671,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   return fx;
 }
 
-xitk_widget_list_t *xitk_widget_list_new (xitk_t *_xitk) {
-  __xitk_t *xitk;
-  __gfx_t *fx;
-
-  xitk_container (xitk, _xitk, x);
-  ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->x.imlibdata);
-
-  fx = _xitk_gfx_new (xitk);
-  if (!fx)
-    return NULL;
-  strcpy (fx->name, "XITK_WL_ONLY");
-  MUTLOCK();
-  xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
-  MUTUNLOCK ();
-
-  if (xitk->verbosity >= 2)
-    printf ("xitk_gfx_new (\"%s\") = %d.\n", fx->name, fx->key);
-  return &fx->wl;
-}
-
 /* nasty xitk_window_widget_list () helper. */
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, Window win) {
   __xitk_t *xitk;

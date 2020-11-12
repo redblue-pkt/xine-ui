@@ -516,11 +516,6 @@ typedef struct {
 /* *******
  * INIT: widget lib initialization and friends
  */
-/*
- * Create a new widget list, store it internaly,
- * then return the pointer to app.
- */
-xitk_widget_list_t *xitk_widget_list_new (xitk_t *xitk);
 
 /*
  * Register a callback function called when a signal heppen.
