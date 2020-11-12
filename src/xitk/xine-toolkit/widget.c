@@ -2165,7 +2165,7 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
 
 int xitk_is_mouse_over_widget(xitk_widget_t *w) {
   int             win_x, win_y;
-  Display        *display = w->wl->imlibdata->x.disp;
+  Display        *display = xitk_x11_get_display(w->wl->xitk);
   Window          window = w->wl->win;
 
   if(!w) {
