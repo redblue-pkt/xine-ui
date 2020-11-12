@@ -352,7 +352,7 @@ int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int h
     *image = NULL;
     return 0;
   }
-  if (!wl->imlibdata) {
+  if (!wl->xitk->imlibdata) {
     *image = NULL;
     return 0;
   }

@@ -28,8 +28,6 @@
 
 #include <xine/sorted_array.h>
 
-#include "xitk/Imlib-light/Imlib.h"
-
 typedef enum {
   FOCUS_LOST = 0,
   FOCUS_RECEIVED,
@@ -126,7 +124,6 @@ struct xitk_widget_list_s {
   xitk_dnode_t                node;
 
   xitk_t                     *xitk;
-  ImlibData                  *imlibdata;
 
   xitk_dlist_t                list;
 

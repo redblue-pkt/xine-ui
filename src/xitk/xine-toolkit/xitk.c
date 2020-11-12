@@ -1642,7 +1642,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->wl.widget_focused     = NULL;
   fx->wl.widget_under_mouse = NULL;
   fx->wl.widget_pressed     = NULL;
-  fx->wl.imlibdata          = xitk->x.imlibdata;
 
   fx->xitk                  = xitk;
   fx->refs                  = 1;
