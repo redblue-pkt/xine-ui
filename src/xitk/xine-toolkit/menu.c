@@ -29,8 +29,6 @@
 #include "menu.h"
 #include "labelbutton.h"
 
-#include "xitk_x11.h"
-
 #include "utils.h"
 
 #undef DEBUG_MENU
@@ -583,7 +581,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   /* Set transient-for-hint to the immediate predecessor,     */
   /* so window stacking of submenus is kept upon raise/lower. */
   if (!node->parent) {
-    xitk_window_set_transient_for (xwin, wp->w.wl->win);
+    xitk_window_set_transient_for_win (xwin, wp->w.wl->xwin);
   } else {
     xitk_window_set_role (xwin, XITK_WR_SUBMENU);
     xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
