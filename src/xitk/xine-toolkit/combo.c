@@ -25,16 +25,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-
 #include "_xitk.h"
 #include "combo.h"
 #include "button.h"
 #include "label.h"
 #include "checkbox.h"
 #include "browser.h"
-#include "xitk_x11.h"
 
 
 typedef struct {
