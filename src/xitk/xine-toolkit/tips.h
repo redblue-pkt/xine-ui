@@ -26,7 +26,7 @@
 
 typedef struct xitk_tips_s xitk_tips_t;
 
-xitk_tips_t *xitk_tips_new (Display *display);
+xitk_tips_t *xitk_tips_new (void);
 void xitk_tips_delete (xitk_tips_t **ptips);
 
 #define xitk_tips_hide_tips(_tips) xitk_tips_show_widget_tips (_tips, NULL)

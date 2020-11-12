@@ -29,13 +29,10 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <errno.h>
-#include <X11/Xlib.h>
 
 #include "_xitk.h"
-#include "xitk_x11.h"
 
 #include "tips.h"
-#include "combo.h"
 
 typedef enum {
   TIPS_IDLE = 0,
@@ -66,8 +63,6 @@ static const int _tips_wait[TIPS_LAST] = {
 };
 
 struct xitk_tips_s {
-  Display             *display;
-
   xitk_widget_t       *widget, *new_widget;
   _tips_state_t        state;
   int                  num_waiters;
@@ -133,7 +128,7 @@ static void *_tips_loop_thread (void *data) {
           xitk_get_display_size (xitk, &disp_w, &disp_h);
 
           /* Get parent window position */
-          xitk_get_window_position (tips->display, tips->widget->wl->win, &x, &y, NULL, NULL);
+          xitk_window_get_window_position (tips->widget->wl->xwin, &x, &y, NULL, NULL);
 
           x += tips->widget->x;
           y += tips->widget->y;
@@ -191,12 +186,13 @@ static void *_tips_loop_thread (void *data) {
         break;
 
       case TIPS_HIDE:
-        xitk_window_destroy_window (xwin);
-        /* We are flushing here, otherwise tips window will stay displayed */
-        XLOCK (xitk_x_lock_display, tips->display);
-        XSync (tips->display, False);
-        XUNLOCK (xitk_x_unlock_display, tips->display);
-        xwin = NULL;
+        if (xwin) {
+          xitk = xwin->xitk;
+          xitk_window_destroy_window (xwin);
+          /* We are flushing here, otherwise tips window will stay displayed */
+          xitk_sync(xitk);
+          xwin = NULL;
+        }
         state = TIPS_IDLE;
         /* fall through */
       case TIPS_IDLE:
@@ -227,14 +223,13 @@ static void *_tips_loop_thread (void *data) {
 /*
  *
  */
-xitk_tips_t *xitk_tips_new (Display *disp) {
+xitk_tips_t *xitk_tips_new (void) {
   xitk_tips_t *tips;
 
   tips = xitk_xmalloc (sizeof (*tips));
   if (!tips)
     return NULL;
 
-  tips->display    = disp;
   tips->state      = TIPS_IDLE;
   tips->num_waiters = 0;
   tips->widget     = NULL;
