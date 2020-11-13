@@ -69,6 +69,16 @@ typedef struct _mwmhints {
 } MWMHints;
 
 /*
+ *
+ */
+
+#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
+                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
+                      StructureNotifyMask | PropertyChangeMask |              \
+                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
+
+
+/*
  * X11 helpers
  */
 

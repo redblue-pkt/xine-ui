@@ -61,11 +61,6 @@
 #define XITK_PATH_MAX               PATH_MAX
 #endif
 
-#define INPUT_MOTION                (ExposureMask | ButtonPressMask | ButtonReleaseMask | \
-                                     KeyPressMask | KeyReleaseMask | ButtonMotionMask |   \
-                                     StructureNotifyMask | PropertyChangeMask |           \
-                                     LeaveWindowMask | EnterWindowMask | PointerMotionMask)
-
 /* paranoia #1: error if *cont_ptr does not have an element elem_name.
  * paranoia #2: warn if it has wrong type. */
 #define xitk_container(cont_ptr,elem_ptr,elem_name) do { \
