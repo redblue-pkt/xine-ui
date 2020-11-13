@@ -58,8 +58,6 @@ struct xitk_s {
   xitk_be_display_t *d, *d2;
   /* TODO: remove this kludge. */
   Display  *display;
-  void    (*x_lock_display) (Display *display);
-  void    (*x_unlock_display) (Display *display);
   void    (*lock_display) (xitk_t *);
   void    (*unlock_display) (xitk_t *);
   struct _ImlibData *imlibdata;
@@ -96,9 +94,6 @@ struct xitk_s {
 #  define xitk_lock_display(_xitk_) (_xitk_)->lock_display (_xitk_)
 #  define xitk_unlock_display(_xitk_) (_xitk_)->unlock_display (_xitk_)
 #endif
-
-extern void (*xitk_x_lock_display) (Display *display);
-extern void (*xitk_x_unlock_display) (Display *display);
 
 #include "_config.h"
 #include "image.h"

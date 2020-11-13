@@ -993,7 +993,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
   uint32_t  type = WM_TYPE_UNKNOWN;
   unsigned char *wm_name = NULL;
 
-  xitk->x.x_lock_display (display);
+  xitk->x.lock_display (&xitk->x);
 
   xitk->XA_XITK = XInternAtom (xitk->x.display, "_XITK_EVENT", False);
   
@@ -1171,7 +1171,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
     break;
   }
 
-  xitk->x.x_unlock_display (display);
+  xitk->x.unlock_display (&xitk->x);
 
   if (xitk->verbosity >= 2) {
     static const char * const names[] = {
@@ -1254,11 +1254,11 @@ void xitk_set_layer_above(Window window) {
 
     propvalue[0] = xitk_get_layer_level();
 
-    xitk->x.x_lock_display (xitk->x.display);
+    xitk->x.lock_display (&xitk->x);
     XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		    1);
-    xitk->x.x_unlock_display (xitk->x.display);
+    xitk->x.unlock_display (&xitk->x);
     return;
   }
 
@@ -1267,7 +1267,7 @@ void xitk_set_layer_above(Window window) {
     XEvent xev;
 
     memset(&xev, 0, sizeof xev);
-    xitk->x.x_lock_display (xitk->x.display);
+    xitk->x.lock_display (&xitk->x);
     if(xitk->wm_type & WM_TYPE_KWIN) {
       xev.xclient.type         = ClientMessage;
       xev.xclient.display      = xitk->x.display;
@@ -1298,7 +1298,7 @@ void xitk_set_layer_above(Window window) {
 		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
 
     }
-    xitk->x.x_unlock_display (xitk->x.display);
+    xitk->x.unlock_display (&xitk->x);
 
     return;
   }
@@ -1309,10 +1309,10 @@ void xitk_set_layer_above(Window window) {
     break;
 
   case WM_TYPE_KWIN:
-    xitk->x.x_lock_display (xitk->x.display);
+    xitk->x.lock_display (&xitk->x);
     XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
-    xitk->x.x_unlock_display (xitk->x.display);
+    xitk->x.unlock_display (&xitk->x);
     break;
 
   case WM_TYPE_UNKNOWN:
@@ -1330,11 +1330,11 @@ void xitk_set_layer_above(Window window) {
 
       propvalue[0] = xitk_get_layer_level();
 
-      xitk->x.x_lock_display (xitk->x.display);
+      xitk->x.lock_display (&xitk->x);
       XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		      1);
-      xitk->x.x_unlock_display (xitk->x.display);
+      xitk->x.unlock_display (&xitk->x);
     }
     break;
   }
@@ -1361,10 +1361,10 @@ void xitk_set_window_layer(Window window, int layer) {
   xev.xclient.data.l[2]    = (long) 0;
   xev.xclient.data.l[3]    = (long) 0;
 
-  xitk->x.x_lock_display (xitk->x.display);
+  xitk->x.lock_display (&xitk->x);
   XSendEvent (xitk->x.display, RootWindow (xitk->x.display, (XDefaultScreen (xitk->x.display))),
 	     False, SubstructureNotifyMask, (XEvent*) &xev);
-  xitk->x.x_unlock_display (xitk->x.display);
+  xitk->x.unlock_display (&xitk->x);
 }
 
 static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enable) {
@@ -1385,9 +1385,9 @@ static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enabl
   xev.xclient.data.l[3]    = 0l;
   xev.xclient.data.l[4]    = 0l;
 
-  xitk->x.x_lock_display (xitk->x.display);
+  xitk->x.lock_display (&xitk->x);
   XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display), True, SubstructureRedirectMask, &xev);
-  xitk->x.x_unlock_display (xitk->x.display);
+  xitk->x.unlock_display (&xitk->x);
 }
 
 void xitk_set_ewmh_fullscreen(Window window) {
@@ -2378,6 +2378,13 @@ Display *xitk_x11_get_display(xitk_t *xitk) {
   return xitk->display;
 }
 
+static void xitk_dummy_un_lock_display (Display *display) {
+  (void)display;
+}
+
+void (*xitk_x_lock_display) (Display *display) = xitk_dummy_un_lock_display;
+void (*xitk_x_unlock_display) (Display *display) = xitk_dummy_un_lock_display;
+
 /*
  * Imlib
  */
@@ -2436,8 +2443,8 @@ void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
     exit(1);
   }
 
-  xitk->imlibdata->x.x_lock_display = xitk->x_lock_display;
-  xitk->imlibdata->x.x_unlock_display = xitk->x_unlock_display;
+  xitk->imlibdata->x.x_lock_display = xitk_x_lock_display;
+  xitk->imlibdata->x.x_unlock_display = xitk_x_unlock_display;
 }
 
 static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install_colormap)
@@ -2467,13 +2474,6 @@ void xitk_sync(xitk_t *_xitk) {
 /*
  * Initiatization of widget internals.
  */
-
-static void xitk_dummy_un_lock_display (Display *display) {
-  (void)display;
-}
-
-void (*xitk_x_lock_display) (Display *display) = xitk_dummy_un_lock_display;
-void (*xitk_x_unlock_display) (Display *display) = xitk_dummy_un_lock_display;
 
 xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
                    int use_x_lock_display, int use_synchronized_x, int verbosity) {
@@ -2517,8 +2517,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk->xitk_pid = getppid ();
 
-  xitk->x.x_lock_display   = xitk_x_lock_display;
-  xitk->x.x_unlock_display = xitk_x_unlock_display;
   if (use_x_lock_display) {
     xitk->x.lock_display   = _xitk_lock_display;
     xitk->x.unlock_display = _xitk_unlock_display;
