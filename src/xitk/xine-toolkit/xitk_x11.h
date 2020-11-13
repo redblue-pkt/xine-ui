@@ -130,6 +130,7 @@ void xitk_x11_translate_xevent(XEvent *xev, const xitk_event_cbs_t *cbs, void *u
 
 Window xitk_window_get_window(xitk_window_t *w);
 void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
+void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 #endif /* _XITK_X11_H_ */
 

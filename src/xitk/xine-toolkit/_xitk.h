@@ -247,7 +247,6 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
 
-void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 /* text == NULL: just tell length.
