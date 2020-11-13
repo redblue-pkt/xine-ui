@@ -37,6 +37,9 @@ void xitk_x11_delete (xitk_x11_t *xitk_x11);
 
 int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksym, int *modifier, char *buf, int bsize);
 
+extern void (*xitk_x_lock_display) (Display *display);
+extern void (*xitk_x_unlock_display) (Display *display);
+
 /**
  * return keypressed
  */
