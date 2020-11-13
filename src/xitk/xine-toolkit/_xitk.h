@@ -57,7 +57,6 @@ struct xitk_s {
   xitk_backend_t *be;
   xitk_be_display_t *d, *d2;
   /* TODO: remove this kludge. */
-  Display  *display;
   void    (*lock_display) (xitk_t *);
   void    (*unlock_display) (xitk_t *);
   struct _ImlibData *imlibdata;

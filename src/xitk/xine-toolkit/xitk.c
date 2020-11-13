@@ -259,6 +259,7 @@ struct __xitk_s {
   xitk_t                      x;
 
   xitk_x11_t                 *xitk_x11;
+  Display                    *display;
 
   int                         display_width;
   int                         display_height;
@@ -323,13 +324,13 @@ static void _xitk_lock_display (xitk_t *_xitk) {
   __xitk_t *xitk;
 
   xitk_container (xitk, _xitk, x);
-  XLockDisplay (xitk->x.display);
+  XLockDisplay (xitk->display);
 }
 static void _xitk_unlock_display (xitk_t *_xitk) {
   __xitk_t *xitk;
 
   xitk_container (xitk, _xitk, x);
-  XUnlockDisplay (xitk->x.display);
+  XUnlockDisplay (xitk->display);
 }
 
 static void _xitk_dummy_lock_display (xitk_t *_xitk) {
@@ -355,7 +356,7 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
     if (&fx->wl == wl) {
       xitk_lock_display (&xitk->x);
-      XSetInputFocus (xitk->x.display, fx->window, RevertToParent, CurrentTime);
+      XSetInputFocus (xitk->display, fx->window, RevertToParent, CurrentTime);
       xitk_unlock_display (&xitk->x);
       break;
     }
@@ -781,7 +782,7 @@ int xitk_install_x_error_handler (xitk_t *_xitk) {
   xitk_container (xitk, _xitk, x);
   if (xitk->x_error_handler == NULL) {
     xitk->x_error_handler = XSetErrorHandler (_x_error_handler);
-    XSync (xitk->x.display, False);
+    XSync (xitk->display, False);
     return 1;
   }
   return 0;
@@ -794,7 +795,7 @@ int xitk_uninstall_x_error_handler (xitk_t *_xitk) {
   if (xitk->x_error_handler != NULL) {
     XSetErrorHandler (xitk->x_error_handler);
     xitk->x_error_handler = NULL;
-    XSync (xitk->x.display, False);
+    XSync (xitk->display, False);
     return 1;
   }
   return 0;
@@ -968,7 +969,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
 
   xitk->x.lock_display (&xitk->x);
 
-  xitk->XA_XITK = XInternAtom (xitk->x.display, "_XITK_EVENT", False);
+  xitk->XA_XITK = XInternAtom (xitk->display, "_XITK_EVENT", False);
   
   XInternAtoms (display, (char **)wm_det_names, _WMEND_, True, wm_det_atoms);
   if (wm_det_atoms[_XFWM_F] != None)
@@ -1115,7 +1116,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
         [XITK_A_WM_WINDOW_TYPE_DND]           = "_NET_WM_WINDOW_TYPE_DND",
         [XITK_A_WM_WINDOW_TYPE_NORMAL]        = "_NET_WM_WINDOW_TYPE_NORMAL"
     };
-    XInternAtoms (xitk->x.display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
+    XInternAtoms (xitk->display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
   }
 
   switch(type & WM_TYPE_COMP_MASK) {
@@ -1228,7 +1229,7 @@ void xitk_set_layer_above(Window window) {
     propvalue[0] = xitk_get_layer_level();
 
     xitk->x.lock_display (&xitk->x);
-    XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
+    XChangeProperty (xitk->display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		    1);
     xitk->x.unlock_display (&xitk->x);
@@ -1243,7 +1244,7 @@ void xitk_set_layer_above(Window window) {
     xitk->x.lock_display (&xitk->x);
     if(xitk->wm_type & WM_TYPE_KWIN) {
       xev.xclient.type         = ClientMessage;
-      xev.xclient.display      = xitk->x.display;
+      xev.xclient.display      = xitk->display;
       xev.xclient.window       = window;
       xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
       xev.xclient.format       = 32;
@@ -1253,13 +1254,13 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.data.l[3]    = 0l;
       xev.xclient.data.l[4]    = 0l;
 
-      XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display), True, SubstructureRedirectMask, &xev);
+      XSendEvent (xitk->display, DefaultRootWindow (xitk->display), True, SubstructureRedirectMask, &xev);
     }
     else {
       xev.xclient.type         = ClientMessage;
       xev.xclient.serial       = 0;
       xev.xclient.send_event   = True;
-      xev.xclient.display      = xitk->x.display;
+      xev.xclient.display      = xitk->display;
       xev.xclient.window       = window;
       xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
       xev.xclient.format       = 32;
@@ -1267,7 +1268,7 @@ void xitk_set_layer_above(Window window) {
       xev.xclient.data.l[1]    = (long) xitk->atoms[XITK_A_NET_WM_STATE_ABOVE];
       xev.xclient.data.l[2]    = (long) None;
 
-      XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display),
+      XSendEvent (xitk->display, DefaultRootWindow (xitk->display),
 		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
 
     }
@@ -1283,7 +1284,7 @@ void xitk_set_layer_above(Window window) {
 
   case WM_TYPE_KWIN:
     xitk->x.lock_display (&xitk->x);
-    XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
+    XChangeProperty (xitk->display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
     xitk->x.unlock_display (&xitk->x);
     break;
@@ -1304,7 +1305,7 @@ void xitk_set_layer_above(Window window) {
       propvalue[0] = xitk_get_layer_level();
 
       xitk->x.lock_display (&xitk->x);
-      XChangeProperty (xitk->x.display, window, xitk->atoms[XITK_A_WIN_LAYER],
+      XChangeProperty (xitk->display, window, xitk->atoms[XITK_A_WIN_LAYER],
 		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
 		      1);
       xitk->x.unlock_display (&xitk->x);
@@ -1335,7 +1336,7 @@ void xitk_set_window_layer(Window window, int layer) {
   xev.xclient.data.l[3]    = (long) 0;
 
   xitk->x.lock_display (&xitk->x);
-  XSendEvent (xitk->x.display, RootWindow (xitk->x.display, (XDefaultScreen (xitk->x.display))),
+  XSendEvent (xitk->display, RootWindow (xitk->display, (XDefaultScreen (xitk->display))),
 	     False, SubstructureNotifyMask, (XEvent*) &xev);
   xitk->x.unlock_display (&xitk->x);
 }
@@ -1349,7 +1350,7 @@ static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enabl
   memset(&xev, 0, sizeof(xev));
   xev.xclient.type         = ClientMessage;
   xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
-  xev.xclient.display      = xitk->x.display;
+  xev.xclient.display      = xitk->display;
   xev.xclient.window       = window;
   xev.xclient.format       = 32;
   xev.xclient.data.l[0]    = (enable == 1) ? 1 : 0;
@@ -1359,7 +1360,7 @@ static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enabl
   xev.xclient.data.l[4]    = 0l;
 
   xitk->x.lock_display (&xitk->x);
-  XSendEvent (xitk->x.display, DefaultRootWindow (xitk->x.display), True, SubstructureRedirectMask, &xev);
+  XSendEvent (xitk->display, DefaultRootWindow (xitk->display), True, SubstructureRedirectMask, &xev);
   xitk->x.unlock_display (&xitk->x);
 }
 
@@ -1394,7 +1395,7 @@ void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t
   if (_xitk->wm_type & WM_TYPE_EWMH_COMP) {
     if (type == WINDOW_TYPE_NONE) {
       xitk_lock_display (&_xitk->x);
-      XDeleteProperty (_xitk->x.display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE]);
+      XDeleteProperty (_xitk->display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE]);
       xitk_unlock_display (&_xitk->x);
     } else if ((type >= 1) && (type < WINDOW_TYPE_END)) {
       static const xitk_atom_t ai[WINDOW_TYPE_END] = {
@@ -1415,9 +1416,9 @@ void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t
       };
 
       xitk_lock_display (&_xitk->x);
-      XChangeProperty (_xitk->x.display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE],
+      XChangeProperty (_xitk->display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE],
         XA_ATOM, 32, PropModeReplace, (unsigned char *)&_xitk->atoms[ai[type]], 1);
-      XRaiseWindow (_xitk->x.display, window);
+      XRaiseWindow (_xitk->display, window);
       xitk_unlock_display (&_xitk->x);
     }
   }
@@ -1765,7 +1766,7 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
   fx->cbs = cbs;
 
   if (cbs && cbs->dnd_cb && (fx->window != None)) {
-    fx->xdnd = xitk_dnd_new (xitk->x.display, xitk->x.lock_display == _xitk_lock_display, xitk->verbosity);
+    fx->xdnd = xitk_dnd_new (xitk->display, xitk->x.lock_display == _xitk_lock_display, xitk->verbosity);
     xitk_dnd_make_window_aware (fx->xdnd, fx->window);
   }
 
@@ -1775,7 +1776,7 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
 
   if(fx->window) {
     xitk_lock_display (&xitk->x);
-    XChangeProperty (xitk->x.display, fx->window, xitk->XA_XITK, XA_ATOM,
+    XChangeProperty (xitk->display, fx->window, xitk->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
     xitk_unlock_display (&xitk->x);
   }
@@ -2291,7 +2292,9 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
 }
 
 Display *xitk_x11_get_display(xitk_t *xitk) {
-  return xitk->display;
+  __xitk_t *_xitk;
+  xitk_container (_xitk, xitk, x);
+  return _xitk->display;
 }
 
 static void xitk_dummy_un_lock_display (Display *display) {
@@ -2345,15 +2348,15 @@ void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
        * Imlib and Xine.
        */
       Colormap cm;
-      cm = XCreateColormap(xitk->display,
-                           RootWindow(xitk->display, DefaultScreen(xitk->display)),
+      cm = XCreateColormap(_xitk->display,
+                           RootWindow(_xitk->display, DefaultScreen(_xitk->display)),
                            gui_visual, AllocNone);
 
       imlib_init.cmap = cm;
       imlib_init.flags |= PARAMS_COLORMAP;
   }
 
-  xitk->imlibdata = Imlib_init_with_params (xitk->display, &imlib_init);
+  xitk->imlibdata = Imlib_init_with_params (_xitk->display, &imlib_init);
   xitk_unlock_display (xitk);
   if (xitk->imlibdata == NULL) {
     fprintf(stderr, _("Unable to initialize Imlib\n"));
@@ -2375,17 +2378,19 @@ static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install
                        install_colormap  ? NULL : &install_colormap);
   xitk->install_colormap = install_colormap;
 
-  xitk_x11_find_visual(xitk->x.display, DefaultScreen(xitk->x.display),
+  xitk_x11_find_visual(xitk->display, DefaultScreen(xitk->display),
                        prefered_visual ? prefered_visual : xrm_prefered_visual,
                        &visual, NULL);
   xitk_x11_select_visual(&xitk->x, visual);
   free(xrm_prefered_visual);
 }
 
-void xitk_sync(xitk_t *_xitk) {
-  xitk_lock_display (_xitk);
+void xitk_sync(xitk_t *xitk) {
+  __xitk_t *_xitk;
+  xitk_container (_xitk, xitk, x);
+  xitk_lock_display (xitk);
   XSync (_xitk->display, False);
-  xitk_unlock_display (_xitk);
+  xitk_unlock_display (xitk);
 }
 
 /*
@@ -2430,7 +2435,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     free (xitk);
     return NULL;
   }
-  xitk->x.display = (Display *)xitk->x.d->id;
+  xitk->display = (Display *)xitk->x.d->id;
 
   xitk->xitk_pid = getppid ();
 
@@ -2453,9 +2458,9 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk_color_db_init (xitk);
 
   {
-    int s = DefaultScreen (xitk->x.display);
-    xitk->display_width   = DisplayWidth (xitk->x.display, s);
-    xitk->display_height  = DisplayHeight (xitk->x.display, s);
+    int s = DefaultScreen (xitk->display);
+    xitk->display_width   = DisplayWidth (xitk->display, s);
+    xitk->display_height  = DisplayHeight (xitk->display, s);
   }
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
@@ -2463,12 +2468,12 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (xitk->x.display) : 0;
+  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (xitk->display) : 0;
   xitk_x_error           = 0;
   xitk->x_error_handler = NULL;
   //xitk->modalw          = None;
-  xitk->ignore_keys[0]  = XKeysymToKeycode (xitk->x.display, XK_Shift_L);
-  xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->x.display, XK_Control_L);
+  xitk->ignore_keys[0]  = XKeysymToKeycode (xitk->display, XK_Shift_L);
+  xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->display, XK_Control_L);
   xitk->qual            = 0;
   xitk->tips_timeout    = TIPS_TIMEOUT;
 #if 0
@@ -2550,7 +2555,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   if (verbosity >= 1)
     printf("%s", buffer);
 
-  xitk->wm_type = xitk_check_wm (xitk, xitk->x.display);
+  xitk->wm_type = xitk_check_wm (xitk, xitk->display);
 
   /* imit imlib */
   _init_imlib(xitk, prefered_visual, install_colormap);
@@ -2704,7 +2709,7 @@ void xitk_free(xitk_t **p) {
   Imlib_destroy(&xitk->x.imlibdata);
 
   xitk->x.d->close (&xitk->x.d);
-  xitk->x.display = NULL;
+  xitk->display = NULL;
   xitk->x.be->_delete (&xitk->x.be);
 
 #ifdef DEBUG_LOCKDISPLAY
@@ -2735,11 +2740,11 @@ void xitk_stop (xitk_t *_xitk) {
 #if 0
   if (xitk->parent.window != None) {
     int (*previous_error_handler)(Display *, XErrorEvent *);
-    XSync (xitk->x.display, False);
+    XSync (xitk->display, False);
     /* don't care about BadWindow when the focussed window is gone already */
     previous_error_handler = XSetErrorHandler(_x_ignoring_error_handler);
-    XSetInputFocus (xitk->x.display, xitk->parent.window, xitk->parent.focus, CurrentTime);
-    XSync (xitk->x.display, False);
+    XSetInputFocus (xitk->display, xitk->parent.window, xitk->parent.focus, CurrentTime);
+    XSync (xitk->display, False);
     XSetErrorHandler(previous_error_handler);
   }
 #endif
