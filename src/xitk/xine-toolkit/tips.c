@@ -33,6 +33,7 @@
 #include "_xitk.h"
 
 #include "tips.h"
+#include "default_font.h"
 
 typedef enum {
   TIPS_IDLE = 0,

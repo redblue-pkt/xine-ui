@@ -23,12 +23,11 @@
 #include "config.h"
 #endif
 
-#include "font.h"
-
 #include "_xitk.h"
 #include "label.h"
 #include "labelbutton.h"
 #include "checkbox.h"
+#include "default_font.h"
 
 #define TITLE_BAR_HEIGHT 20
 

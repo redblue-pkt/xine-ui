@@ -28,6 +28,7 @@
 #include "_xitk.h"
 #include "menu.h"
 #include "labelbutton.h"
+#include "default_font.h"
 
 #include "utils.h"
 

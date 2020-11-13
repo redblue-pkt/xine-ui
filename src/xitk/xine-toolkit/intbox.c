@@ -30,6 +30,7 @@
 #include "inputtext.h"
 #include "button.h"
 #include "slider.h"
+#include "default_font.h"
 
 typedef struct {
   xitk_widget_t        w;
