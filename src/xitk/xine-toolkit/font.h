@@ -31,7 +31,6 @@
 #define DEFAULT_BOLD_FONT_10 "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*"
 #define DEFAULT_BOLD_FONT_12 "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
 #define DEFAULT_BOLD_FONT_14 "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*"
-#define FONT_HEIGHT_MODEL    "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
 
 /*
  * init font cache subsystem
