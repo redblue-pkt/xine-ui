@@ -568,7 +568,7 @@ static int _notify_click_slider (_slider_private_t *wp, int button, int bUp, int
   int                    ret = 0;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if(button == Button1) {
+    if (button == 1) {
       if (wp->focus == FOCUS_RECEIVED) {
         if (wp->sType == XITK_HVSLIDER) {
           /* if this thing really moves x and y, use xitk_slider_hv_sync (). */

@@ -478,7 +478,7 @@ static int _label_click (_label_private_t *wp, int button, int bUp, int x, int y
   (void)x;
   (void)y;
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    if (button == Button1) {
+    if (button == 1) {
       if (wp->callback) {
         if (bUp)
           wp->callback (&wp->w, wp->userdata);

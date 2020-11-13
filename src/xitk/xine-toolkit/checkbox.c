@@ -97,7 +97,7 @@ static int _checkbox_click (_checkbox_private_t *wp, int button, int cUp, int x,
 
   (void)x;
   (void)y;
-  if (button == Button1) {
+  if (button == 1) {
     wp->cClicked = !cUp;
     if (cUp && (wp->focus == FOCUS_RECEIVED)) {
       wp->cState = !wp->cState;

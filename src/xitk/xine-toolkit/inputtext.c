@@ -26,15 +26,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-
 #include "_xitk.h"
 #include "inputtext.h"
 
 #define NEW_CLIPBOARD
 
 #ifndef NEW_CLIPBOARD
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "xitk_x11.h"
 #endif
 
@@ -577,7 +576,7 @@ static void _paint_inputtext (_inputtext_private_t *wp) {
  */
 static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bUp, int x, int y) {
   (void)y;
-  if ((button != Button1) || bUp)
+  if ((button != 1) || bUp)
     return 0;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
