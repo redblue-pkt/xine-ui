@@ -33,6 +33,7 @@
 #include "xitk/Imlib-light/Imlib.h"
 
 #include "_xitk.h"
+#include "xitk_x11.h"
 
 #include "utils.h"
 #include "font.h"
@@ -208,7 +209,7 @@ void xitk_image_free_image (xitk_image_t **src) {
   if (image->beimg) {
     if (image->gc) {
       image->beimg->display->lock (image->beimg->display);
-      XFreeGC (image->xitk->display, image->gc);
+      XFreeGC (xitk_x11_get_display(image->xitk), image->gc);
       image->beimg->display->unlock (image->beimg->display);
       image->gc = NULL;
     }
@@ -227,7 +228,7 @@ static void _xitk_image_gc (xitk_image_t *img) {
 
     gcv.graphics_exposures = False;
     img->beimg->display->lock (img->beimg->display);
-    img->gc = XCreateGC (img->xitk->display, img->beimg->id1, GCGraphicsExposures, &gcv);
+    img->gc = XCreateGC (xitk_x11_get_display(img->xitk), img->beimg->id1, GCGraphicsExposures, &gcv);
     img->beimg->display->unlock (img->beimg->display);
   }
 }
@@ -462,7 +463,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   im = xitk->imlibdata;
 
   xitk_lock_display (xitk);
-  gc = XCreateGC (xitk->display, im->x.base_window, None, None);
+  gc = XCreateGC (xitk_x11_get_display(xitk), im->x.base_window, None, None);
   xitk_unlock_display (xitk);
 
   /* Creating an image from an empty string would cause an abort with failed */
@@ -597,7 +598,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
     int i, y, x = 0;
 
     xitk_lock_display (xitk);
-    XSetForeground (xitk->display, gc, foreground);
+    XSetForeground (xitk_x11_get_display(xitk), gc, foreground);
     xitk_unlock_display (xitk);
 
     for(y = ascent, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
@@ -619,7 +620,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   xitk_font_unload_font(fs);
 
   xitk_lock_display (xitk);
-  XFreeGC (xitk->display, gc);
+  XFreeGC (xitk_x11_get_display(xitk), gc);
   xitk_unlock_display (xitk);
 
   return image;
@@ -1458,7 +1459,7 @@ void xitk_image_set_font (xitk_image_t *img, xitk_font_t *xtfs) {
 #  endif
   {
     img->beimg->display->lock (img->beimg->display);
-    XSetFont (xitk->display, img->gc, xtfs ? xitk_font_get_font_id (xtfs) : None);
+    XSetFont (xitk_x11_get_display(xitk), img->gc, xtfs ? xitk_font_get_font_id (xtfs) : None);
     img->beimg->display->unlock (img->beimg->display);
   }
 #endif
@@ -1471,7 +1472,7 @@ void xitk_image_draw_string (xitk_image_t *img, int x, int y, const char *text, 
     return;
 
   img->beimg->display->lock (img->beimg->display);
-  XSetForeground (img->xitk->display, img->gc, color);
+  XSetForeground (xitk_x11_get_display(img->xitk), img->gc, color);
   xitk_font_draw_string (img->xtfs, img, img->gc, x, y, text, nbytes);
   img->beimg->display->unlock (img->beimg->display);
 }

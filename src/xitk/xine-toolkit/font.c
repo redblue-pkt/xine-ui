@@ -204,6 +204,7 @@ static char *xitk_font_right_name(const char *name) {
  */
 static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
   int    ok;
+  Display *display = xitk_x11_get_display(xtfs->xitk);
 #ifdef WITH_XFT
 #else
 # ifdef WITH_XMB
@@ -215,7 +216,7 @@ static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
   if(xitk_get_xmb_enability()) {
     right_name = xitk_font_right_name(font);
     xitk_lock_display (xtfs->xitk);
-    xtfs->fontset = XCreateFontSet (xtfs->xitk->display, right_name, &missing, &count, &def);
+    xtfs->fontset = XCreateFontSet (display, right_name, &missing, &count, &def);
     ok = !xitk_font_guess_error(xtfs->fontset, right_name, missing, count);
     xitk_unlock_display (xtfs->xitk);
     free(right_name);
@@ -227,17 +228,17 @@ static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
     char new_name[255];
     xitk_lock_display (xtfs->xitk);
 #ifdef WITH_XFT
-    xtfs->font = XftFontOpenName (xtfs->xitk->display, DefaultScreen (xtfs->xitk->display),
+    xtfs->font = XftFontOpenName (display, DefaultScreen (display),
                                   xitk_font_core_string_to_xft(new_name, sizeof(new_name), font));
 #else
-    xtfs->font = XLoadQueryFont (xtfs->xitk->display, font);
+    xtfs->font = XLoadQueryFont (display, font);
 #endif
     xitk_unlock_display (xtfs->xitk);
     ok = (xtfs->font != NULL);
   }
 
   if(ok)
-    xtfs->display = xtfs->xitk->display;
+    xtfs->display = display;
 
   return ok;
 }
@@ -527,7 +528,7 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(font);
 
-  display = xitk->display;
+  display = xitk_x11_get_display(xitk);
   ABORT_IF_NULL(display);
 
   font_cache = xitk->font_cache;

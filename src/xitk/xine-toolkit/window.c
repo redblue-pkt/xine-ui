@@ -50,7 +50,7 @@ int xitk_window_get_mouse_coords(xitk_window_t *w, int *x, int *y, int *rx, int 
 
 void xitk_window_set_input_focus (xitk_window_t *w) {
   xitk_lock_display (w->xitk);
-  XSetInputFocus(w->xitk->display, w->window, RevertToParent, CurrentTime);
+  XSetInputFocus(xitk_x11_get_display(w->xitk), w->window, RevertToParent, CurrentTime);
   xitk_unlock_display (w->xitk);
 }
 
@@ -111,7 +111,7 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
   if (w == NULL)
     return;
 
-  return xitk_try_to_set_input_focus(w->xitk->display, w->window);
+  return xitk_try_to_set_input_focus(xitk_x11_get_display(w->xitk), w->window);
 }
 
 void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
@@ -125,11 +125,11 @@ void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
  */
 
 void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor) {
-  xitk_cursors_define_window_cursor (w->xitk->display, w->window, cursor);
+  xitk_cursors_define_window_cursor (xitk_x11_get_display(w->xitk), w->window, cursor);
 }
 
 void xitk_window_restore_window_cursor(xitk_window_t *w) {
-  xitk_cursors_restore_window_cursor (w->xitk->display, w->window);
+  xitk_cursors_restore_window_cursor (xitk_x11_get_display(w->xitk), w->window);
 }
 
 /*
@@ -192,7 +192,7 @@ int xitk_window_is_window_visible(xitk_window_t *w) {
   if (w == NULL)
     return 0;
 
-  return xitk_is_window_visible(w->xitk->display, w->window);
+  return xitk_is_window_visible(xitk_x11_get_display(w->xitk), w->window);
 }
 
 /*
@@ -239,7 +239,7 @@ void xitk_window_set_window_title(xitk_window_t *w, const char *title) {
   if ((w == NULL) || (title == NULL))
     return;
 
-  xitk_set_window_title(w->xitk->display, w->window, title);
+  xitk_set_window_title(xitk_x11_get_display(w->xitk), w->window, title);
 }
 
 /*
@@ -270,7 +270,7 @@ void xitk_window_set_window_icon (xitk_window_t *w, xitk_image_t *icon) {
   if (w == NULL)
     return;
 
-  xitk_set_window_icon (w->xitk->display, w->window, icon->beimg->id1);
+  xitk_set_window_icon (xitk_x11_get_display(w->xitk), w->window, icon->beimg->id1);
 }
 
 void xitk_window_set_layer_above(xitk_window_t *w) {
@@ -318,7 +318,7 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
   if (w == NULL)
     return;
 
-  xitk_set_window_class(w->xitk->display, w->window, res_name, res_class);
+  xitk_set_window_class(xitk_x11_get_display(w->xitk), w->window, res_name, res_class);
 }
 
 void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t type) {
@@ -330,7 +330,7 @@ void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t 
 
 void xitk_window_set_transient_for(xitk_window_t *w, Window win) {
   xitk_lock_display (w->xitk);
-  XSetTransientForHint(w->xitk->display, w->window, win);
+  XSetTransientForHint(xitk_x11_get_display(w->xitk), w->window, win);
   xitk_unlock_display (w->xitk);
 }
 
@@ -346,7 +346,7 @@ void xitk_window_raise_window (xitk_window_t *xwin) {
 void xitk_window_clear_window(xitk_window_t *w)
 {
   xitk_lock_display (w->xitk);
-  XClearWindow(w->xitk->display, w->window);
+  XClearWindow(xitk_x11_get_display(w->xitk), w->window);
   xitk_unlock_display (w->xitk);
 }
 
@@ -451,7 +451,7 @@ void xitk_window_center_window (xitk_window_t *xwin) {
     return;
 
   xitk_lock_display (xwin->xitk);
-  if (XGetGeometry (xwin->xitk->display, xwin->xitk->imlibdata->x.root, &rootwin,
+  if (XGetGeometry (xitk_x11_get_display(xwin->xitk), xwin->xitk->imlibdata->x.root, &rootwin,
     &x, &y, &w, &h, &b, &d) != BadDrawable) {
     int xx, yy;
 
@@ -696,13 +696,13 @@ void xitk_window_resize_window(xitk_window_t *w, int width, int height) {
   hint.width  = width;
   hint.height = height;
   hint.flags  = PPosition | PSize;
-  XSetWMNormalHints (w->xitk->display, w->window, &hint);
-  XResizeWindow (w->xitk->display, w->window, width, height);
-  XSync(w->xitk->display, False);
+  XSetWMNormalHints (xitk_x11_get_display(w->xitk), w->window, &hint);
+  XResizeWindow (xitk_x11_get_display(w->xitk), w->window, width, height);
+  XSync(xitk_x11_get_display(w->xitk), False);
 
   xitk_unlock_display (w->xitk);
 
-  while (t < 10 && !xitk_is_window_size(w->xitk->display, w->window, w->width, w->height)) {
+  while (t < 10 && !xitk_is_window_size(xitk_x11_get_display(w->xitk), w->window, w->width, w->height)) {
     xitk_usec_sleep(10000);
   }
 }
