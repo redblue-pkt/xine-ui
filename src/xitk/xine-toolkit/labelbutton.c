@@ -300,7 +300,7 @@ static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int 
 
   (void)x;
   (void)y;
-  if (button == Button1) {
+  if (button == 1) {
     wp->bClicked = !bUp;
     wp->bOldState = wp->bState;
 

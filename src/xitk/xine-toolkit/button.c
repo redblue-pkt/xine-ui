@@ -123,7 +123,7 @@ static int _button_click (_button_private_t *wp, int button, int bUp, int x, int
 
   (void)x;
   (void)y;
-  if (button == Button1) {
+  if (button == 1) {
     widget_event_t event;
 
     wp->bClicked = !bUp;
