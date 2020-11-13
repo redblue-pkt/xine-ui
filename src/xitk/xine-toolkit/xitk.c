@@ -76,6 +76,7 @@
 #include "combo.h"
 #include "cursors.h"
 #include "dnd.h"
+#include "font.h"
 
 extern char **environ;
 #undef TRACE_LOCKS

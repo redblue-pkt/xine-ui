@@ -34,6 +34,7 @@
 
 #include "_xitk.h"
 #include "xitk.h"
+#include "default_font.h"
 
 #include "xitk_x11.h"
 

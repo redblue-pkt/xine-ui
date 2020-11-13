@@ -25,12 +25,7 @@
 
 #include <X11/Xlib.h>
 
-#define DEFAULT_FONT_10      "-*-helvetica-medium-r-*-*-11-*-*-*-*-*-*-*"
-#define DEFAULT_FONT_12      "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*"
-#define DEFAULT_FONT_14      "-*-helvetica-medium-r-*-*-14-*-*-*-*-*-*-*"
-#define DEFAULT_BOLD_FONT_10 "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*"
-#define DEFAULT_BOLD_FONT_12 "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-#define DEFAULT_BOLD_FONT_14 "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*"
+#include "default_font.h"
 
 /*
  * init font cache subsystem

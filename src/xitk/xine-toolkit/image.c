@@ -35,6 +35,7 @@
 #include "_xitk.h"
 
 #include "utils.h"
+#include "font.h"
 
 typedef struct {
   xitk_widget_t  w;

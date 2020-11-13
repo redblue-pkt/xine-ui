@@ -29,6 +29,7 @@
 #include "doublebox.h"
 #include "inputtext.h"
 #include "button.h"
+#include "default_font.h"
 
 typedef struct {
   xitk_widget_t                   w;

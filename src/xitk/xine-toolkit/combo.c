@@ -31,6 +31,7 @@
 #include "label.h"
 #include "checkbox.h"
 #include "browser.h"
+#include "default_font.h"
 
 
 typedef struct {
