@@ -341,7 +341,7 @@ static int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int
 /*
  * Return key pressed (XK_VoidSymbol on failure)
  */
-KeySym xitk_get_key_pressed(XEvent *event) {
+static KeySym _get_key_pressed(XEvent *event) {
   KeySym   pkey = XK_VoidSymbol;
 
   if(event) {
@@ -359,7 +359,7 @@ int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
   return strlcpy(buf, s, buf_size);
 }
 
-static KeySym xitk_keycode_to_keysym(XEvent *event) {
+static KeySym _keycode_to_keysym(XEvent *event) {
   KeySym pkey = XK_VoidSymbol;
 
   if (event) {
@@ -374,6 +374,7 @@ static KeySym xitk_keycode_to_keysym(XEvent *event) {
 /*
  *
  */
+static int _get_key_modifier(XEvent *xev, int *modifier);
 
 void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void *user_data) {
 
@@ -404,18 +405,18 @@ void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void 
       char keycode_str[256] = "", keysym_str[256] = "";
       xitk_key_event_t ke = {
         .event       = event->type == KeyPress ? XITK_KEY_PRESS : XITK_KEY_RELEASE,
-        .key_pressed = xitk_get_key_pressed(event),
+        .key_pressed = _get_key_pressed(event),
         .modifiers   = 0,
         .keycode     = event->xkey.keycode,
         .keysym_str  = keysym_str,
         .keycode_str = keycode_str,
       };
       // ???????
-      xitk_get_key_modifier(event, &ke.modifiers);
+      _get_key_modifier(event, &ke.modifiers);
       // ????????
       if (xitk_keysym_to_string(ke.key_pressed, keysym_str, sizeof(keysym_str)) <= 0)
         ke.keysym_str = NULL;
-      if (xitk_keysym_to_string(xitk_keycode_to_keysym(event), keycode_str, sizeof(keycode_str)) <= 0)
+      if (xitk_keysym_to_string(_keycode_to_keysym(event), keycode_str, sizeof(keycode_str)) <= 0)
         ke.keycode_str = NULL;
       cbs->key_cb(user_data, &ke);
     }
@@ -431,7 +432,7 @@ void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void 
         .y         = event->xbutton.y,
         .modifiers = 0,
       };
-      xitk_get_key_modifier(event, &be.modifiers);
+      _get_key_modifier(event, &be.modifiers);
       cbs->btn_cb(user_data, &be);
     }
     break;
@@ -467,7 +468,7 @@ void xitk_x11_translate_xevent(XEvent *event, const xitk_event_cbs_t *cbs, void 
 /*
  * Extract modifier keys.
  */
-int xitk_get_key_modifier(XEvent *xev, int *modifier) {
+static int _get_key_modifier(XEvent *xev, int *modifier) {
   unsigned int state = 0;
 
   *modifier = MODIFIER_NOMOD;
@@ -599,7 +600,7 @@ int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksy
     ksym = &_ksym;
 
   if (modifier)
-    xitk_get_key_modifier (event, modifier);
+    _get_key_modifier (event, modifier);
 
   *ksym = XK_VoidSymbol;
   xitk_lock_display (xitk_x11->xitk);

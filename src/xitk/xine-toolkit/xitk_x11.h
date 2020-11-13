@@ -40,20 +40,6 @@ int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksy
 extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 
-/**
- * return keypressed
- */
-KeySym xitk_get_key_pressed(XEvent *event);
-
-/**
- * All states of modifiers (see xitk_get_key_modifier() bellow).
- */
-/**
- * return 1 if a modifier key has been pressed (extracted from XEvent *)
- * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
- */
-int xitk_get_key_modifier(XEvent *xev, int *modifier);
-
 /*
  *
  */
