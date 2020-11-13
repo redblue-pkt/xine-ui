@@ -243,12 +243,6 @@ struct xitk_window_s {
 
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags);
 
-Pixmap xitk_window_get_background(xitk_window_t *w);
-#ifdef YET_UNUSED
-Pixmap xitk_window_get_background_mask(xitk_window_t *w);
-#endif
-
-
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
@@ -256,7 +250,6 @@ void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
 void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
-void xitk_clipboard_unregister_window (Window win);
 /* text == NULL: just tell length.
  * *text == NULL: return live buf.
  * *text != NULL: copy there.

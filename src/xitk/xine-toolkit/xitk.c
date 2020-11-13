@@ -643,10 +643,6 @@ void xitk_clipboard_unregister_widget (xitk_widget_t *w) {
   }
 }
 
-void xitk_clipboard_unregister_window (Window win) {
-  (void)win;
-}
-
 static void _xitk_clipboard_init (__xitk_t *xitk) {
   xitk->clipboard.widget_in = NULL;
 }
