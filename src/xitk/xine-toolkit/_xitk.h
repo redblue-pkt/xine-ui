@@ -166,11 +166,6 @@ struct xitk_s {
       XITK_DIE("%s(%d): widget consistency failed.!\n", __FUNCTION__, __LINE__); \
   } while(0)
 
-#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
-                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
-                      StructureNotifyMask | PropertyChangeMask |              \
-                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
-
 #define DIRECTION_UP     1
 #define DIRECTION_DOWN   2
 #define DIRECTION_LEFT   3
