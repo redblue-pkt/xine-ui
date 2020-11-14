@@ -1448,15 +1448,6 @@ void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t
   }
 }
 
-void xitk_ungrab_pointer(void) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  xitk_lock_display (&xitk->x);
-  XUngrabPointer(xitk->x.display, CurrentTime);
-  xitk_unlock_display (&xitk->x);
-}
-
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {
   __xitk_t *xitk;
   __gfx_t *fx, *_main, *vice, *trans;
