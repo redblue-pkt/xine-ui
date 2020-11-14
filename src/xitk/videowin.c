@@ -56,6 +56,10 @@
 #include "event.h"
 #include "errors.h"
 #include "xine-toolkit/xitk_x11.h"
+
+typedef struct xitk_color_info_s xitk_color_info_t;
+#include "xine-toolkit/_backend.h"
+
 #include "oxine/oxine.h"
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */
@@ -83,6 +87,9 @@ struct xui_vwin_st {
 
   int                    separate_display; /* gui and video window use different displays */
   int                    wid; /* use this window */
+  xitk_backend_t        *video_backend;
+  xitk_be_display_t     *video_be_display;
+  xitk_be_window_t      *video_be_window;
   Display               *video_display;
   Window                 video_window;
   int                    gui_depth;
@@ -313,9 +320,16 @@ static Bool have_xtestextention (xui_vwin_t *vwin) {
 }
 
 static void _set_window_title (xui_vwin_t *vwin) {
-  XmbSetWMProperties (vwin->video_display, vwin->video_window,
-    vwin->window_title, vwin->window_title, NULL, 0, NULL, NULL, NULL);
-  XSync (vwin->video_display, False);
+  if (vwin->separate_display) {
+    xitk_tagitem_t tags[] = {
+      {XITK_TAG_TITLE, (uintptr_t)vwin->window_title},
+      {XITK_TAG_END, 0}
+    };
+    if (vwin->video_be_window)
+      vwin->video_be_window->set_props (vwin->video_be_window, tags);
+  } else {
+    xitk_window_set_window_title (vwin->wrapped_window, vwin->window_title);
+  }
 }
 
 static void video_window_find_visual (xui_vwin_t *vwin) {
@@ -451,8 +465,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         XSelectInput (vwin->video_display, vwin->video_window,
           ExposureMask & (~(ButtonPressMask | ButtonReleaseMask)));
 
-      _set_window_title (vwin);
-
       hint.flags  = USSize | USPosition | PPosition | PSize;
       hint.x      = 0;
       hint.y      = 0;
@@ -470,8 +482,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       vwin->x_unlock_display (vwin->video_display);
 
-      if (!vwin->separate_display)
-        register_event_handler(vwin);
+      register_event_handler (vwin);
       return;
     }
 
@@ -733,8 +744,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
 
-    _set_window_title (vwin);
-
     XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
 
     XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
@@ -837,8 +846,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #endif
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
-
-    _set_window_title (vwin);
 
     XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
 
@@ -993,8 +1000,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint);
     }
 
-    _set_window_title (vwin);
-
     XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
 
     XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
@@ -1094,8 +1099,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   vwin->x_unlock_display (vwin->video_display);
 
-  if (!vwin->separate_display)
-    register_event_handler(vwin);
+  register_event_handler (vwin);
 
   /* take care about window decoration/pos */
   {
@@ -1434,6 +1438,21 @@ void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y) {
   xitk_x11_get_mouse_coords (vwin->video_display, vwin->video_window, NULL, NULL, x, y);
 }
 
+static uint32_t _vwin_flags (xui_vwin_t *vwin, uint32_t mask, uint32_t value) {
+  if (vwin->separate_display) {
+    if (vwin->video_be_window) {
+      xitk_tagitem_t tags[] = {{XITK_TAG_WIN_FLAGS, 0}, {XITK_TAG_END, 0}};
+      tags[0].value = (mask << 16) | (value & 0xffff);
+      vwin->video_be_window->set_props (vwin->video_be_window, tags);
+      vwin->video_be_window->get_props (vwin->video_be_window, tags);
+      return tags[0].value & 0xffff;
+    }
+    return 0;
+  } else {
+    return xitk_window_flags (vwin->wrapped_window, mask, value);
+  }
+}
+
 /*
  * hide/show video window
  */
@@ -1479,7 +1498,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
       xitk_set_layer_above (vwin->video_window);
     }
 
-    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    _vwin_flags (vwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
 
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
@@ -1494,9 +1513,9 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
      && _vwin_is_ewmh (vwin))
       xitk_set_ewmh_fullscreen (vwin->video_window);
   } else if (vwin->show == 1) {
-    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
+    _vwin_flags (vwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
   } else {
-    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
+    _vwin_flags (vwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
   }
 
   vwin->x_unlock_display (vwin->video_display);
@@ -1579,17 +1598,25 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->gui = gui;
   pthread_mutex_init (&vwin->mutex, NULL);
 
+  vwin->video_display = NULL;
   if (video_display_name && video_display_name[0]) {
-    if ((vwin->video_display = XOpenDisplay(video_display_name)) == NULL )
-      fprintf(stderr, _("Cannot open display '%s' for video. Falling back to primary display.\n"),
-              video_display_name);
-    else
-      vwin->separate_display = 1;
+    do {
+      vwin->video_backend = xitk_backend_new (vwin->gui->xitk, vwin->gui->verbosity);
+      if (vwin->video_backend) {
+        vwin->video_be_display = vwin->video_backend->open_display (vwin->video_backend,
+          video_display_name, use_x_lock_display, 0);
+        if (vwin->video_be_display) {
+          vwin->video_display = (Display *)vwin->video_be_display->id;
+          vwin->separate_display = 1;
+          break;
+        }
+        vwin->video_backend->_delete (&vwin->video_backend);
+      }
+      fprintf (stderr, _("Cannot open display '%s' for video. Falling back to primary display.\n"), video_display_name);
+    } while (0);
   }
-
-  if (vwin->video_display == NULL) {
-    vwin->video_display = xitk_x11_get_display(gui->xitk);
-  }
+  if (vwin->video_display == NULL)
+    vwin->video_display = xitk_x11_get_display (gui->xitk);
 
   {
     char *xrm_geometry = NULL;
@@ -2054,11 +2081,14 @@ void video_window_exit (xui_vwin_t *vwin) {
     vwin->x_unlock_display (vwin->video_display);
   }
 
-  if (!vwin->separate_display) {
-    xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
-    xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
-  } else
+  if (vwin->separate_display) {
     pthread_join (vwin->second_display_thread, NULL);
+    if (vwin->video_be_window)
+      vwin->video_be_window->_delete (&vwin->video_be_window);
+  } else {
+    xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
+    xitk_x11_destroy_window_wrapper (&vwin->wrapped_window);
+  }
 
   if (!vwin->wid) {
     vwin->x_lock_display (vwin->video_display);
@@ -2068,6 +2098,11 @@ void video_window_exit (xui_vwin_t *vwin) {
     vwin->x_unlock_display (vwin->video_display);
   }
   vwin->video_window = None;
+
+  if (vwin->separate_display) {
+    vwin->video_be_display->close (&vwin->video_be_display);
+    vwin->video_backend->_delete (&vwin->video_backend);
+  }
 
   pthread_mutex_destroy (&vwin->mutex);
 
@@ -2087,7 +2122,12 @@ void video_window_exit (xui_vwin_t *vwin) {
   if (vwin->separate_display) {
     vwin->x_lock_display (vwin->video_display);
     vwin->x_unlock_display (vwin->video_display);
-    XCloseDisplay(vwin->video_display);
+    if (vwin->video_be_display) {
+      vwin->video_be_display->close (&vwin->video_be_display);
+      vwin->video_display = NULL;
+    }
+    if (vwin->video_backend)
+      vwin->video_backend->_delete (&vwin->video_backend);
   }
 
   free(vwin->prefered_visual);
@@ -2375,7 +2415,7 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
       gui_exit (NULL, vwin->gui);
       break;
     case XITK_EV_EXPOSE:
-      if (e->more == 0) {
+      if ((e->more == 0) && vwin->gui->vo_port) {
         xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_EXPOSE_EVENT, (void *)e->id);
       }
       break;
@@ -2431,68 +2471,45 @@ static void register_event_handler(xui_vwin_t *vwin)
 {
   xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
 
-  xitk_x11_destroy_window_wrapper(&vwin->wrapped_window);
-  vwin->wrapped_window = xitk_x11_wrap_window(vwin->gui->xitk, vwin->video_window);
-  xitk_window_flags (vwin->wrapped_window,
-    XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
-  vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
-    _vwin_handle_be_event, vwin, NULL, NULL);
-
-  if (!vwin->separate_display)
+  if (vwin->separate_display) {
+    xitk_tagitem_t tags[] = {
+        {XITK_TAG_WRAP, (uintptr_t)vwin->video_window},
+        {XITK_TAG_NAME, (uintptr_t)"video_window_2"},
+        {XITK_TAG_WIN_FLAGS, (XITK_WINF_DND << 16) | XITK_WINF_DND},
+        {XITK_TAG_END, 0}
+    };
+    if (vwin->video_be_window)
+      vwin->video_be_window->_delete (&vwin->video_be_window);
+    vwin->video_be_window = vwin->video_be_display->window_new (vwin->video_be_display, tags);
+  } else {
+    xitk_x11_destroy_window_wrapper (&vwin->wrapped_window);
+    vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, vwin->video_window);
+    xitk_window_flags (vwin->wrapped_window,
+      XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
+    vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
+      _vwin_handle_be_event, vwin, NULL, NULL);
     xitk_window_set_role (vwin->wrapped_window, vwin->gui->use_root_window ? XITK_WR_ROOT : XITK_WR_MAIN);
-}
-
-/*
- *
- */
-
-static void video_window_handle_event (xui_vwin_t *vwin, XEvent *event) {
-
-  switch(event->type) {
-    case KeyPress:
-    case ButtonRelease:
-    case ButtonPress:
-    case MotionNotify:
-/*      xitk_x11_translate_xevent(event, &vwin_event_cbs, vwin); */
-      break;
-
-    case DestroyNotify:
-    case ConfigureNotify:
-    case Expose:
-      if (event->xany.window == vwin->video_window) {
-/*        xitk_x11_translate_xevent(event, &vwin_event_cbs, vwin); */
-      }
-      break;
   }
+
+  _set_window_title (vwin);
 }
 
 /*
  * very small X event loop for the second display
  */
-static __attribute__((noreturn)) void *second_display_loop (void *data) {
+static void *second_display_loop (void *data) {
   xui_vwin_t *vwin = data;
 
   while (vwin->second_display_running) {
-    XEvent   xevent;
-    int      got_event;
+    xitk_be_event_t event;
 
-    xine_usec_sleep(20000);
-
-    do {
-        vwin->x_lock_display (vwin->video_display);
-        got_event = XPending (vwin->video_display);
-        if( got_event )
-          XNextEvent (vwin->video_display, &xevent);
-        vwin->x_unlock_display (vwin->video_display);
-
-        if (got_event && vwin->gui->stream) {
-          video_window_handle_event (vwin, &xevent);
-        }
-    } while (got_event);
-
+    if (vwin->video_be_display->next_event (vwin->video_be_display, &event, vwin->video_be_window, XITK_EV_ANY, 20)) {
+      if (event.window)
+        _vwin_handle_be_event (vwin, &event);
+    }
   }
 
-  pthread_exit(NULL);
+  return NULL;
 }
 
 /*
@@ -2660,9 +2677,7 @@ void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
     return;
   memcpy (vwin->window_title, "xine: ", 6);
   strlcpy (vwin->window_title + 6, mrl, sizeof (vwin->window_title) - 6);
-  vwin->x_lock_display (vwin->video_display);
   _set_window_title (vwin);
-  vwin->x_unlock_display (vwin->video_display);
 }
 
 void video_window_toggle_border (xui_vwin_t *vwin) {

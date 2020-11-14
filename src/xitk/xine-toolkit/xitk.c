@@ -1750,7 +1750,7 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
       {XITK_TAG_END, 0}
     };
     xitk_tagitem_t tags2[] = {
-      {XITK_TAG_TITLE, (uintptr_t)fx->name},
+      {XITK_TAG_NAME, (uintptr_t)fx->name},
       {XITK_TAG_END, 0}
     };
     fx->w->bewin->get_props (fx->w->bewin, tags1);
