@@ -205,8 +205,6 @@ typedef struct {
   __xitk_t                   *xitk;
   int                         refs;
 
-  Window                      window;
-
   xitk_move_t                 move;
 
   struct {
@@ -352,9 +350,7 @@ void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   MUTLOCK ();
   for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
     if (&fx->wl == wl) {
-      xitk_lock_display (&xitk->x);
-      XSetInputFocus (xitk->display, fx->window, RevertToParent, CurrentTime);
-      xitk_unlock_display (&xitk->x);
+      xitk_window_set_input_focus (fx->wl.xwin);
       break;
     }
   }
@@ -1614,7 +1610,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->xitk                  = xitk;
   fx->refs                  = 1;
   fx->name[0]               = 0;
-  fx->window                = None;
   fx->move.enabled          = 0;
   fx->move.offset_x         = 0;
   fx->move.offset_y         = 0;
@@ -1642,16 +1637,15 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
   __xitk_t *xitk;
   __gfx_t *fx;
-  Window win = xitk_window_get_window(xwin);
 
   xitk_container (xitk, _xitk, x);
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(xitk->x.imlibdata);
 
-  if (win != None) {
+  if (xwin) {
     MUTLOCK ();
     for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next)
-      if (win == fx->window)
+      if (xwin == fx->wl.xwin)
         break;
     if (fx->wl.node.next) {
       fx->refs += 1;
@@ -1666,7 +1660,6 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
   if (!fx)
     return NULL;
   fx->wl.xwin = xwin;
-  fx->window = win;
   strcpy (fx->name, "XITK_WIN_WL");
   MUTLOCK();
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
@@ -1734,7 +1727,6 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
     MUTUNLOCK ();
   }
   fx->wl.xwin = xwin;
-  fx->window = xitk_window_get_window (xwin);
 
   if (name)
     strlcpy (fx->name, name, sizeof (fx->name));
@@ -1764,18 +1756,18 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
   fx->user_data = user_data;
   fx->cbs = cbs;
 
-  if (cbs && cbs->dnd_cb && (fx->window != None)) {
+  if (cbs && cbs->dnd_cb && fx->wl.xwin) {
     fx->xdnd = xitk_dnd_new (xitk->display, xitk->x.lock_display == _xitk_lock_display, xitk->verbosity);
-    xitk_dnd_make_window_aware (fx->xdnd, fx->window);
+    xitk_dnd_make_window_aware (fx->xdnd, xitk_window_get_window(fx->wl.xwin));
   }
 
   fx->event_handler = event_handler;
   fx->destructor = destructor;
   fx->destr_data = destr_data;
 
-  if(fx->window) {
+  if(fx->wl.xwin) {
     xitk_lock_display (&xitk->x);
-    XChangeProperty (xitk->display, fx->window, xitk->XA_XITK, XA_ATOM,
+    XChangeProperty (xitk->display, xitk_window_get_window(fx->wl.xwin), xitk->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
     xitk_unlock_display (&xitk->x);
   }
@@ -1904,7 +1896,7 @@ int xitk_get_window_info (xitk_t *_xitk, xitk_register_key_t key, window_info_t 
     xitk_container (xitk, _xitk, x);
     MUTLOCK ();
     fx = __fx_from_key (xitk, key);
-    if (fx && (fx->window != None)) {
+    if (fx && fx->wl.xwin) {
       xitk_tagitem_t tags[] = {
         {XITK_TAG_X, 0},
         {XITK_TAG_Y, 0},
