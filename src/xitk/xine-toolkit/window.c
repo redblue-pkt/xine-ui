@@ -44,6 +44,10 @@ static Window _xitk_window_get_window (xitk_window_t *w) {
   return w->window;
 }
 
+int xitk_window_get_mouse_coords(xitk_window_t *w, int *x, int *y, int *rx, int *ry) {
+  return xitk_x11_get_mouse_coords(xitk_x11_get_display(w->xitk), w->window, x, y, rx, ry);
+}
+
 void xitk_window_set_input_focus (xitk_window_t *w) {
   xitk_lock_display (w->xitk);
   XSetInputFocus(w->xitk->display, w->window, RevertToParent, CurrentTime);
