@@ -30,8 +30,6 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-#include <X11/Xlib.h>
-
 #include <xine/sorted_array.h>
 
 #include "_xitk.h"
@@ -39,7 +37,6 @@
 #include "menu.h"
 #include "combo.h"
 #include "checkbox.h"
-#include "xitk_x11.h"
 
 static const xitk_color_names_t xitk_sorted_color_names[] = {
   { 240,  248,  255,  "aliceblue" },
@@ -1372,7 +1369,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
       event.x              = wl->widget_focused->x + 1;
       event.y              = wl->widget_focused->y + 1;
       event.button_pressed = LBUTTON_DOWN;
-      event.button         = AnyButton;
+      event.button         = 0;
       event.modifier       = modifier;
       (void)wl->widget_focused->event (wl->widget_focused, &event, &result);
       event.type = WIDGET_EVENT_PAINT;
@@ -1479,7 +1476,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 	event.x              = wl->widget_focused->x + 1;
 	event.y              = wl->widget_focused->y + 1;
 	event.button_pressed = LBUTTON_DOWN;
-	event.button         = AnyButton;
+	event.button         = 0;
         event.modifier       = 0;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, &result);
 
@@ -2166,15 +2163,13 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
 
 int xitk_is_mouse_over_widget(xitk_widget_t *w) {
   int             win_x, win_y;
-  Display        *display = xitk_x11_get_display(w->wl->xitk);
-  Window          window = xitk_window_get_window(w->wl->xwin);
 
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return 0;
   }
 
-  if (xitk_x11_get_mouse_coords(display, window, &win_x, &win_y, NULL, NULL)) {
+  if (xitk_window_get_mouse_coords(w->wl->xwin, &win_x, &win_y, NULL, NULL)) {
     if(((win_x >= w->x) && (win_x < (w->x + w->width))) &&
        ((win_y >= w->y) && (win_y < (w->y + w->height)))) {
       return 1;
