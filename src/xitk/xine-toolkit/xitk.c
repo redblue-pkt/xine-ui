@@ -295,7 +295,6 @@ struct __xitk_s {
   xitk_signal_callback_t      sig_callback;
   void                       *sig_data;
 
-  //Window                      modalw;
   xitk_widget_t              *menu;
 
   struct timeval              keypress;
@@ -305,14 +304,6 @@ struct __xitk_s {
   unsigned long               tips_timeout;
 
   uint32_t                    qual;
-
-#if 0
-  /* not used  ? */
-  struct {
-    Window                    window;
-    int                       focus;
-  } parent;
-#endif
 
   pid_t                       xitk_pid;
 
@@ -685,22 +676,6 @@ int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len) {
   xitk->clipboard.widget_in = l < 0 ? w : NULL;
   return l;
 }
-
-/*
-void xitk_modal_window(Window w) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  xitk->modalw = w;
-}
-void xitk_unmodal_window(Window w) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  if (w == xitk->modalw)
-    xitk->modalw = None;
-}
-*/
 
 /*
  * Execute a shell command.
@@ -2314,54 +2289,6 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
   if (fx)
     __fx_unref (fx);
 }
-
-#if 0
-  /*
-  if (xitk->modalw != None) {
-    while (fx->wl.node.next && (fx->window != xitk->modalw)) {
-
-      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
-	fx->xevent_callback(event, fx->user_data);
-
-      fx = (__gfx_t *)fx->wl.node.next;
-    }
-  }
-  */
-
-#warning FIXME
-    if (xitk->modalw != None) {
-
-      /* Flush remain fxs */
-      while (fx->wl.node.next && (fx->window != xitk->modalw)) {
-	FXLOCK(fx);
-
-        if (fx->cbs && fx->window != None && event->type != KeyRelease)
-          xitk_x11_translate_xevent(event, fx->cbs, fx->user_data);
-
-	fxd = fx;
-	fx = (__gfx_t *)fx->wl.node.next;
-
-	if(fxd->destroy)
-	  __fx_destroy(fxd, 0);
-	else
-	  FXUNLOCK(fxd);
-      }
-      return;
-    }
-#endif
-
-
-#if 0
-void xitk_xevent_notify (XEvent *event) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  /* protect walking through gfx list */
-  MUTLOCK ();
-  xitk_xevent_notify_impl (xitk, event);
-  MUTUNLOCK ();
-}
-#endif
 
 Display *xitk_x11_get_display(xitk_t *xitk) {
   return xitk->display;
