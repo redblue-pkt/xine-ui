@@ -36,7 +36,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #ifdef WITH_XFT
-#include <ft2build.h>
 #include <X11/Xft/Xft.h>
 #endif
 
@@ -213,7 +212,7 @@ static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
   char  *right_name;
   int    count;
 
-  if(xitk_get_xmb_enability()) {
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     right_name = xitk_font_right_name(font);
     xitk_lock_display (xtfs->xitk);
     xtfs->fontset = XCreateFontSet (display, right_name, &missing, &count, &def);
@@ -250,7 +249,7 @@ static void xitk_font_unload_one(xitk_font_t *xtfs) {
   xitk_lock_display (xtfs->xitk);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
     XFreeFontSet (xtfs->display, xtfs->fontset);
   else
 #endif
@@ -611,7 +610,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
   ABORT_IF_NULL(xtfs->font_cache);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
     ABORT_IF_NULL(xtfs->fontset);
   else
 #endif
@@ -651,7 +650,7 @@ void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
 #ifndef WITH_XFT
 # ifdef WITH_XMB
   XSetForeground (xtfs->display, gc, color);
-  if (xitk_get_xmb_enability ())
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
     XmbDrawString (xtfs->display, (Pixmap)img->beimg->id1, xtfs->fontset, gc, x, y, text, nbytes);
   else
 # endif
@@ -760,7 +759,7 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
   xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
 # else
 # ifdef WITH_XMB
-  if(xitk_get_xmb_enability()) {
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     ABORT_IF_NULL(xtfs->fontset);
 
     xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
@@ -804,7 +803,7 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, in
   mbstate_t state;
   size_t    n;
 
-  if(xitk_get_xmb_enability()) {
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     ABORT_IF_NULL(xtfs);
     ABORT_IF_NULL(xtfs->fontset);
     ABORT_IF_NULL(c);
@@ -887,7 +886,7 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, i
   mbstate_t state;
   size_t    n;
 
-  if(xitk_get_xmb_enability()) {
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     memset(&state, '\0', sizeof(mbstate_t));
     n = mbrtowc(NULL, c, maxnbytes, &state);
 
@@ -979,7 +978,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   if (rbearing) *rbearing = -xft_extents.x + xft_extents.width;
 #else
 #ifdef WITH_XMB
-  if(xitk_get_xmb_enability()) {
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     ABORT_IF_NULL(xtfs);
     ABORT_IF_NULL(xtfs->fontset);
     ABORT_IF_NULL(c);
@@ -1085,7 +1084,7 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
   ABORT_IF_NULL(c);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
     ABORT_IF_NULL(xtfs->fontset);
   else
 #endif
@@ -1110,7 +1109,7 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
   ABORT_IF_NULL(c);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
     ABORT_IF_NULL(xtfs->fontset);
   else
 #endif
@@ -1126,20 +1125,19 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
-void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
+void xitk_font_set_font(xitk_t *xitk, xitk_font_t *xtfs, GC gc) {
 
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(xitk);
 #ifndef WITH_XFT
 # ifdef WITH_XMB
-  if(xitk_get_xmb_enability())
+  if (xitk_get_cfg_num (xitk, XITK_XMB_ENABLE))
     ;
   else
 # endif
     {
-      xitk_lock_display (xtfs->xitk);
-      XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
-      xitk_unlock_display (xtfs->xitk);
+      xitk_lock_display (xitk);
+      XSetFont(xitk_x11_get_display(xitk), gc, xtfs ? xitk_font_get_font_id(xtfs) : None);
+      xitk_unlock_display (xitk);
     }
 #else
   (void)gc;

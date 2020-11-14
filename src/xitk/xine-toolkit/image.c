@@ -473,7 +473,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
     str = "   ";
 
   fs = xitk_font_load_font(xitk, fontname);
-  xitk_font_set_font(fs, gc);
+  xitk_font_set_font(xitk, fs, gc);
   xitk_font_string_extent(fs, str, NULL, NULL, NULL, &ascent, &descent);
   height = ascent + descent;
 
@@ -1446,19 +1446,7 @@ void xitk_image_set_font (xitk_image_t *img, xitk_font_t *xtfs) {
     return;
   img->xtfs = xtfs;
   _xitk_image_gc (img);
-
-#ifndef WITH_XFT
-#  ifdef WITH_XMB
-  if (xitk_cfg_get_num (img->xitk, XITK_XMB_ENABLE)) {
-    ;
-  } else
-#  endif
-  {
-    img->beimg->display->lock (img->beimg->display);
-    XSetFont (xitk_x11_get_display(xitk), img->gc, xtfs ? xitk_font_get_font_id (xtfs) : None);
-    img->beimg->display->unlock (img->beimg->display);
-  }
-#endif
+  xitk_font_set_font(img->xitk, xtfs, img->gc);
 }
 
 void xitk_image_draw_string (xitk_image_t *img, int x, int y, const char *text, size_t nbytes, int color) {
