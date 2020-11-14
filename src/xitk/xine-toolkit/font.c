@@ -93,21 +93,23 @@ struct xitk_font_s {
 static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int count) {
   int i;
 
-  if(fs == NULL)
+  if (fs == NULL) {
+    if (missing)
+      XFreeStringList(missing);
     return 1;
-
-  if(count) {
-    /* some uncovered codepages */
-    for(i = 0; i < count; i++) {
-      if(strcasecmp("ISO10646-1", missing[i]) == 0) {
-        XITK_WARNING("font \"%s\" doesn't contain charset %s\n", name, missing[i]);
-        XFreeStringList(missing);
-        return 1;
-      }
-    }
-
-    XFreeStringList(missing);
   }
+
+  /* some uncovered codepages */
+  for (i = 0; i < count; i++) {
+    if (strcasecmp("ISO10646-1", missing[i]) == 0) {
+      XITK_WARNING("font \"%s\" doesn't contain charset %s\n", name, missing[i]);
+      XFreeStringList(missing);
+      return 1;
+    }
+  }
+
+  if (missing)
+    XFreeStringList(missing);
 
   return 0;
 }
@@ -207,8 +209,8 @@ static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
 #ifdef WITH_XFT
 #else
 # ifdef WITH_XMB
-  char **missing;
-  char  *def;
+  char **missing = NULL;
+  char  *def = NULL;
   char  *right_name;
   int    count;
 

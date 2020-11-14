@@ -340,15 +340,19 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
   return ret;
 }
 
-static void set_mmk(mediamark_t *mmk) {
-  gGui_t *gui = gGui;
-
-  pthread_mutex_lock (&gui->mmk_mutex);
+static void free_mmk(gGui_t *gui) {
   free(gui->mmk.mrl);
   free(gui->mmk.ident);
   free(gui->mmk.sub);
   if(mediamark_have_alternates(&(gui->mmk)))
     mediamark_free_alternates(&(gui->mmk));
+}
+
+static void set_mmk(mediamark_t *mmk) {
+  gGui_t *gui = gGui;
+
+  pthread_mutex_lock (&gui->mmk_mutex);
+  free_mmk(gui);
 
   if(mmk) {
     gui->mmk.mrl           = strdup(mmk->mrl);
@@ -790,6 +794,7 @@ void gui_exit_2 (gGui_t *gui) {
   xitk_skin_unload_config(gui->skin_config);
 
   mediamark_free_mediamarks();
+  free_mmk(gui);
 
   if (gui->icon)
     xitk_image_free_image (&gui->icon);
