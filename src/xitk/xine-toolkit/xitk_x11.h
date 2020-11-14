@@ -92,7 +92,7 @@ void xitk_unset_ewmh_fullscreen(Window window);
  *
  */
 
-int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
+int xitk_x11_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
 void xitk_try_to_set_input_focus(Display *display, Window window);
 void xitk_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
 int xitk_is_window_iconified(Display *display, Window window);
