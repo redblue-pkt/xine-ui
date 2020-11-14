@@ -224,7 +224,9 @@ static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
 # endif
 #endif
   {
+#ifdef WITH_XFT
     char new_name[255];
+#endif
     xitk_lock_display (xtfs->xitk);
 #ifdef WITH_XFT
     xtfs->font = XftFontOpenName (display, DefaultScreen (display),
