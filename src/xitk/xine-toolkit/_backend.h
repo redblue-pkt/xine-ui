@@ -115,7 +115,7 @@ struct xitk_be_image_s {
   void (*fill_arc)   (xitk_be_image_t *image, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
     uint16_t a1, uint16_t a2, uint32_t color, int mask);
   void (*fill_polygon) (xitk_be_image_t *image, const xitk_point_t *points, int num_points, uint32_t color, int mask);
-  void (*draw_text)  (xitk_be_image_t *image, const char *text, size_t bytes, int x, int y);
+  void (*draw_text)  (xitk_be_image_t *image, const char *text, size_t bytes, int x, int y, uint32_t color);
 };
 
 typedef enum {
