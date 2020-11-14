@@ -274,6 +274,14 @@ void video_window_grab_pointer(xui_vwin_t *vwin) {
   vwin->x_unlock_display (vwin->video_display);
 }
 
+void video_window_ungrab_pointer(xui_vwin_t *vwin) {
+  if (!vwin)
+    return;
+  vwin->x_lock_display (vwin->video_display);
+  XUngrabPointer(vwin->video_display, CurrentTime);
+  vwin->x_unlock_display (vwin->video_display);
+}
+
 static void video_window_adapt_size (xui_vwin_t *vwin);
 static int  video_window_check_mag (xui_vwin_t *vwin);
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag);

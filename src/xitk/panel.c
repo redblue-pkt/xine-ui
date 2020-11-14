@@ -610,7 +610,7 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
     xitk_show_widgets (panel->widget_list);
     xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
     if (panel->gui->cursor_grabbed)
-      xitk_ungrab_pointer();
+      video_window_ungrab_pointer(panel->gui->vwin);
 
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
     if(

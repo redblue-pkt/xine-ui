@@ -565,8 +565,6 @@ const char *xitk_set_locale(void);
  */
 long int xitk_get_last_keypressed_time (xitk_t *xitk);
 
-void xitk_ungrab_pointer(void);
-
 void xitk_get_display_size (xitk_t *xitk, int *w, int *h);
 
 /*

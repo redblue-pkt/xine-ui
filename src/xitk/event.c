@@ -905,7 +905,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       gui->cursor_grabbed = 1;
     }
     else {
-      xitk_ungrab_pointer();
+      video_window_ungrab_pointer(gui->vwin);
       gui->cursor_grabbed = 0;
     }
     break;
