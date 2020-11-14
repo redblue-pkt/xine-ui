@@ -567,7 +567,7 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
           if (xitk_get_cfg_num (xitk, XITK_XMB_ENABLE)) {
 	    xitk_font_t *xtfs_fallback;
 
-	    xitk_set_xmb_enability(0);
+            xitk_set_xmb_enability(xitk, 0);
 	    if((xtfs_fallback = xitk_font_load_font(xitk, font)))
 	      XITK_WARNING("XMB support seems broken on your system, add \"font.xmb = 0\" in your ~/.xitkrc\n");
 

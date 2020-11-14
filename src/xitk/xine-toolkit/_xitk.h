@@ -188,12 +188,12 @@ void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, const char *command);
 int xitk_is_use_xshm (xitk_t *xitk);
 
+void xitk_set_xmb_enability(xitk_t *, int value);
+
 char *xitk_filter_filename(const char *name);
-//void xitk_modal_window(Window w);
-//void xitk_unmodal_window(Window w);
-void xitk_set_current_menu(xitk_widget_t *menu);
-void xitk_unset_current_menu(void);
-void xitk_set_tips_timeout(unsigned long timeout);
+void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
+void xitk_unset_current_menu(xitk_t *);
+void xitk_set_tips_timeout(xitk_t *, unsigned long timeout);
 
 const char *xitk_skin_get_logo(xitk_skin_config_t *);
 const char *xitk_skin_get_animation(xitk_skin_config_t *);

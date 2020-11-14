@@ -341,8 +341,6 @@ static void _xitk_dummy_lock_display (xitk_t *_xitk) {
  *
  */
 
-xitk_t *gXitk;
-
 void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   __xitk_t *xitk;
   __gfx_t *fx;
@@ -760,19 +758,19 @@ static int _x_error_handler(Display *display, XErrorEvent *xevent) {
 
 }
 
-void xitk_set_current_menu(xitk_widget_t *menu) {
+void xitk_set_current_menu(xitk_t *_xitk, xitk_widget_t *menu) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   if (xitk->menu)
     xitk_destroy_widget (xitk->menu);
   xitk->menu = menu;
 }
 
-void xitk_unset_current_menu(void) {
+void xitk_unset_current_menu(xitk_t *_xitk) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   xitk->menu = NULL;
 }
 
@@ -804,6 +802,9 @@ int xitk_uninstall_x_error_handler (xitk_t *_xitk) {
 /*
  *
  */
+
+xitk_t *gXitk;
+
 static void xitk_signal_handler(int sig) {
   __xitk_t *xitk;
   pid_t cur_pid = getppid();
@@ -2100,7 +2101,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         if (!handled) {
           if (xitk->menu) {
             if (!(fx->wl.widget_focused && (fx->wl.widget_focused->type & WIDGET_GROUP_MENU)))
-              xitk_set_current_menu (NULL);
+              xitk_set_current_menu (&xitk->x, NULL);
           }
         }
       }
@@ -2191,7 +2192,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
       if (!xwin) {
         /* A click anywhere outside an open menu shall close it with no further action. */
         if (xitk->menu)
-          xitk_set_current_menu (NULL);
+          xitk_set_current_menu (&xitk->x, NULL);
       } else {
         xitk_tagitem_t tags[] = {{XITK_TAG_WIN_FLAGS, 0}, {XITK_TAG_END, 0}};
 
@@ -2211,7 +2212,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
          * FIXME: this currently works only if the click goes into one of our windows. */
         if (xitk->menu) {
           if (!(fx->wl.widget_under_mouse && (fx->wl.widget_under_mouse->type & WIDGET_GROUP_MENU))) {
-            xitk_set_current_menu (NULL);
+            xitk_set_current_menu (&xitk->x, NULL);
             break;
           }
         }
@@ -2659,7 +2660,7 @@ void xitk_run (xitk_t *_xitk, void (* start_cb)(void *data), void *start_data,
   if (stop_cb)
     stop_cb (stop_data);
 
-  xitk_set_current_menu(NULL);
+  xitk_set_current_menu(_xitk, NULL);
 
   xitk_tips_delete (&xitk->x.tips);
   _xitk_clipboard_deinit (xitk);
@@ -2750,10 +2751,10 @@ void xitk_stop (xitk_t *_xitk) {
 #endif
 }
 
-void xitk_set_xmb_enability(int value) {
+void xitk_set_xmb_enability(xitk_t *_xitk, int value) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   xitk_config_set_xmb_enability (xitk->config, value);
 }
 
@@ -2800,10 +2801,10 @@ void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
     *h = _xitk->display_height;
 }
 
-void xitk_set_tips_timeout(unsigned long timeout) {
+void xitk_set_tips_timeout(xitk_t *_xitk, unsigned long timeout) {
   __xitk_t *xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   xitk->tips_timeout = timeout;
 }
 

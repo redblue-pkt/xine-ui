@@ -2135,7 +2135,7 @@ void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout
     return;
   }
 
-  xitk_set_tips_timeout(timeout);
+  xitk_set_tips_timeout(wl->xitk, timeout);
 
   mywidget = (xitk_widget_t *)wl->list.head.next;
 
