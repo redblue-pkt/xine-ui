@@ -295,8 +295,8 @@ void help_end (xui_help_t *help) {
 
 int help_is_visible (xui_help_t *help) {
   return help ? (help->gui->use_root_window ?
-                 xitk_window_is_window_visible (help->xwin) :
-                 (help->visible && xitk_window_is_window_visible (help->xwin)))
+                 (xitk_window_flags (help->xwin, 0, 0) & XITK_WINF_VISIBLE) :
+                 (help->visible && (xitk_window_flags (help->xwin, 0, 0) & XITK_WINF_VISIBLE)))
               : 0;
 }
 

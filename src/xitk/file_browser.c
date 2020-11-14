@@ -1563,3 +1563,4 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   return fb;
 }
+

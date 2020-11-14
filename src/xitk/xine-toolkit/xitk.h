@@ -1203,7 +1203,6 @@ void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role);
  *
  */
 void xitk_window_move_window(xitk_window_t *w, int x, int y);
-void xitk_window_resize_window(xitk_window_t *w, int width, int height);
 
 /**
  *
@@ -1272,11 +1271,6 @@ void xitk_window_raise_window(xitk_window_t *w);
 
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin);
 
-/*
- *
- */
-int xitk_window_is_window_visible(xitk_window_t *w);
-
 /* done_cb status */
 #define XITK_WINDOW_DIALOG_BUTTONS_MASK 0x7fff
 #define XITK_WINDOW_DIALOG_CHECKED 0x8000
@@ -1311,4 +1305,3 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
-

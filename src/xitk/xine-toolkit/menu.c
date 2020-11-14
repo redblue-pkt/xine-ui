@@ -215,7 +215,7 @@ static void _menu_close_1 (_menu_private_t *wp) {
   wp->num_open -= 1;
   mw = wp->open_windows + wp->num_open;
   /* revert focus first and prevent annoying window manager flashing. */
-  if ((wp->num_open > 0) && xitk_window_is_window_visible (mw[-1].xwin))
+  if ((wp->num_open > 0) && (xitk_window_flags (mw[-1].xwin, 0, 0) & XITK_WINF_VISIBLE))
     xitk_window_try_to_set_input_focus (mw[-1].xwin);
   /* now, close the window. */
   xitk_unregister_event_handler (mw->wp->w.wl->xitk, &mw->key);

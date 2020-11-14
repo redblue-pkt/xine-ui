@@ -158,9 +158,9 @@ int setup_is_visible (xui_setup_t *setup) {
   if (!setup)
     return 0;
   if (setup->gui->use_root_window)
-    return xitk_window_is_window_visible (setup->xwin);
+    return (xitk_window_flags (setup->xwin, 0, 0) & XITK_WINF_VISIBLE);
   else
-    return setup->visible && xitk_window_is_window_visible (setup->xwin);
+    return setup->visible && (xitk_window_flags (setup->xwin, 0, 0) & XITK_WINF_VISIBLE);
 }
 
 /*

@@ -83,10 +83,12 @@ struct xitk_x11_backend_s {
 };
 
 typedef enum {
-  XITK_A_WIN_LAYER = 0,
+  XITK_A_UTF8 = 0,
+  XITK_A_WIN_LAYER,
   XITK_A__MOTIF_WM_HINTS,
   XITK_A_WM_CHANGE_STATE,
   XITK_A_WM_STATE,
+  XITK_A_WM_NAME,
   XITK_A_WM_DELETE_WINDOW,
   XITK_A_WM_PROTOCOLS,
   XITK_A__NET_WM_NAME,
@@ -148,6 +150,7 @@ typedef enum {
   XITK_X11_WT_ICON,
   XITK_X11_WT_WIN_FLAGS,
   XITK_X11_WT_LAYER_ABOVE,
+  XITK_X11_WT_NAME,
   XITK_X11_WT_TITLE,
   XITK_X11_WT_RES_NAME,
   XITK_X11_WT_RES_CLASS,
@@ -168,6 +171,7 @@ static const xitk_tagitem_t _xitk_x11_window_defaults[XITK_X11_WT_LAST] = {
   [XITK_X11_WT_ICON]          = {XITK_TAG_ICON, (uintptr_t)NULL},
   [XITK_X11_WT_WIN_FLAGS]     = {XITK_TAG_WIN_FLAGS, 0},
   [XITK_X11_WT_LAYER_ABOVE]   = {XITK_TAG_LAYER_ABOVE, 0},
+  [XITK_X11_WT_NAME]          = {XITK_TAG_NAME, (uintptr_t)NULL},
   [XITK_X11_WT_TITLE]         = {XITK_TAG_TITLE, 0},
   [XITK_X11_WT_RES_NAME]      = {XITK_TAG_RES_NAME, (uintptr_t)NULL},
   [XITK_X11_WT_RES_CLASS]     = {XITK_TAG_RES_CLASS, (uintptr_t)NULL},
@@ -181,7 +185,7 @@ struct xitk_x11_window_s {
   xitk_dnd_t *dnd;
   GC gc;
   xitk_tagitem_t props[XITK_X11_WT_LAST];
-  char title[256];
+  char name[80], title[256];
 };
 
 typedef enum {
@@ -1411,7 +1415,7 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
   if (win->w.id == None) {
     if (d->be->be.verbosity >= 1)
       printf ("xitk.x11.window.set_props (%s): ERROR: window closed already.\n",
-        (const char *)win->props[XITK_X11_WT_TITLE].value);
+        (const char *)win->props[XITK_X11_WT_NAME].value);
     return 0;
   }
 
@@ -1426,6 +1430,8 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     }
   }
   memcpy (props, win->props, sizeof (props));
+  props[XITK_X11_WT_NAME].value = (uintptr_t)NULL;
+  props[XITK_X11_WT_TITLE].value = (uintptr_t)NULL;
   props[XITK_X11_WT_IMAGE].value = (uintptr_t)NULL;
   props[XITK_X11_WT_PARENT].value = ~(uintptr_t)NULL;
   res = xitk_tags_get (taglist, props);
@@ -1440,6 +1446,16 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     d->d.lock (&d->d);
     XReparentWindow (d->display, win->w.id, pw ? pw->w.id : d->be->be.xitk->imlibdata->x.root,
       win->props[XITK_X11_WT_X].value, win->props[XITK_X11_WT_Y].value);
+    d->d.unlock (&d->d);
+  }
+
+  if (props[XITK_X11_WT_NAME].value != (uintptr_t)NULL)
+    strlcpy (win->name, (const char *)props[XITK_X11_WT_NAME].value, sizeof (win->name));
+
+  if (props[XITK_X11_WT_TITLE].value != (uintptr_t)NULL) {
+    strlcpy (win->title, (const char *)props[XITK_X11_WT_TITLE].value, sizeof (win->title));
+    d->d.lock (&d->d);
+    XmbSetWMProperties (d->display, win->w.id, win->title, NULL, NULL, 0, NULL, NULL, NULL);
     d->d.unlock (&d->d);
   }
 
@@ -1527,7 +1543,7 @@ static void xitk_x11_window_copy_rect (xitk_be_window_t *_win, xitk_be_image_t *
   if (win->w.id == None) {
     if (d->be->be.verbosity >= 1)
       printf ("xitk.x11.window.copy_rect (%s): ERROR: window closed already.\n",
-        (const char *)win->props[XITK_X11_WT_TITLE].value);
+        (const char *)win->props[XITK_X11_WT_NAME].value);
     return;
   }
 
@@ -1626,8 +1642,8 @@ static void xitk_x11_window_delete (xitk_be_window_t **_win) {
   }
 
   if (d->be->be.verbosity >= 2)
-    printf ("xitk.x11.window.delete (%s, %p).\n", win && win->props[XITK_X11_WT_TITLE].value
-      ? (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>", (void *)win);
+    printf ("xitk.x11.window.delete (%s, %p).\n",
+      win ? (const char *)win->props[XITK_X11_WT_NAME].value : "<unknown>", (void *)win);
 
   pthread_mutex_lock (&d->mutex);
   xitk_dnode_remove (&win->w.node);
@@ -1662,9 +1678,15 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
   win->d = d;
 
   memcpy (win->props, _xitk_x11_window_defaults, sizeof (win->props));
+  win->props[XITK_X11_WT_NAME].value = (uintptr_t)win->name;
   win->props[XITK_X11_WT_TITLE].value = (uintptr_t)win->title;
-  strcpy (win->title, "xiTK Window");
+  win->name[0] = 0;
+  win->title[0] = 0;
   xitk_tags_get (taglist, win->props);
+  if (!win->title[0])
+    strcpy (win->title, "xiTK Window");
+  if (!win->name[0])
+    strlcpy (win->name, win->title, sizeof (win->name));
 
   want_flags = _xitk_x11_window_merge_flags (
     win->props[XITK_X11_WT_WRAP].value != None ? 0 : 0xffff0000,
@@ -2095,8 +2117,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
         win->w.id = None;
       } else {
         if (d->be->be.verbosity >= 2)
-          printf ("xitk.x11.window.close_request (%s).\n", win->props[XITK_X11_WT_TITLE].value ?
-            (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>");
+          printf ("xitk.x11.window.close_request (%s).\n", (const char *)win->props[XITK_X11_WT_NAME].value);
         event->type = XITK_EV_DEL_WIN;
         event->code = 0;
       }
@@ -2159,7 +2180,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
         name = XGetAtomName (d->display, xevent.xproperty.atom);
         d->d.unlock (&d->d);
         printf ("xitk.x11.window.property.change (%s, %s).\n",
-          win && win->props[XITK_X11_WT_TITLE].value ? (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>",
+          win ? (const char *)win->props[XITK_X11_WT_NAME].value : "<unknown>",
         name ? name : "<unknown>");
         XFree (name);
       }
@@ -2224,8 +2245,7 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       if (win && (xevent.xclient.message_type == d->atoms[XITK_A_WM_PROTOCOLS])
         && ((Atom)xevent.xclient.data.l[0] == d->atoms[XITK_A_WM_DELETE_WINDOW])) {
         if (d->be->be.verbosity >= 2)
-          printf ("xitk.x11.window.close_request (%s).\n", win->props[XITK_X11_WT_TITLE].value ?
-            (const char *)win->props[XITK_X11_WT_TITLE].value : "<unknown>");
+          printf ("xitk.x11.window.close_request (%s).\n", (const char *)win->props[XITK_X11_WT_NAME].value);
         event->type = XITK_EV_DEL_WIN;
         event->code = 0;
         goto _ev_zero;
@@ -2448,10 +2468,12 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   {
     static const char * const names[XITK_A_LAST] = {
+      [XITK_A_UTF8]            = "UTF8_STRING",
       [XITK_A_WIN_LAYER]       = "_WIN_LAYER",
       [XITK_A__MOTIF_WM_HINTS] = "_MOTIF_WM_HINTS",
       [XITK_A_WM_CHANGE_STATE] = "WM_CHANGE_STATE",
       [XITK_A_WM_STATE]        = "WM_STATE",
+      [XITK_A_WM_NAME]         = "WM_NAME",
       [XITK_A_WM_DELETE_WINDOW]= "WM_DELETE_WINDOW",
       [XITK_A_WM_PROTOCOLS]    = "WM_PROTOCOLS",
       [XITK_A__NET_WM_NAME]    = "_NET_WM_NAME",

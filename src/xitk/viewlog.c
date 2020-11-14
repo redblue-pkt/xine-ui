@@ -98,8 +98,8 @@ static void viewlog_exit (xitk_widget_t *w, void *data, int state) {
  * Return 1 if viewlog window is visible
  */
 int viewlog_is_visible (xui_viewlog_t *vl) {
-  return vl ? (vl->gui->use_root_window ? xitk_window_is_window_visible (vl->xwin)
-               : (vl->visible && xitk_window_is_window_visible (vl->xwin))) : 0;
+  return vl ? (vl->gui->use_root_window ? (xitk_window_flags (vl->xwin, 0, 0) & XITK_WINF_VISIBLE)
+               : (vl->visible && (xitk_window_flags (vl->xwin, 0, 0) & XITK_WINF_VISIBLE))) : 0;
 }
 
 /*
