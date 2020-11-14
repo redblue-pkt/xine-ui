@@ -94,7 +94,7 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, i
 /*
  * Get text extents of string length length.
  */
-void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int length,
+void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, size_t length,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
 
 /*
