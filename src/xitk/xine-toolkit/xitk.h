@@ -1043,12 +1043,6 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
-void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
-			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
-
-/*
- *
- */
 void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 			    int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
 
