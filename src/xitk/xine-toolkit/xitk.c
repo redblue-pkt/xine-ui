@@ -205,7 +205,6 @@ typedef struct {
   __xitk_t                   *xitk;
   int                         refs;
 
-  xitk_window_t              *w;
   Window                      window;
 
   xitk_move_t                 move;
@@ -1615,7 +1614,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->xitk                  = xitk;
   fx->refs                  = 1;
   fx->name[0]               = 0;
-  fx->w                     = NULL;
   fx->window                = None;
   fx->move.enabled          = 0;
   fx->move.offset_x         = 0;
@@ -1735,7 +1733,7 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
     fx->refs += 1;
     MUTUNLOCK ();
   }
-  fx->wl.xwin = fx->w = xwin;
+  fx->wl.xwin = xwin;
   fx->window = xitk_window_get_window (xwin);
 
   if (name)
@@ -1743,7 +1741,7 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
   else if (!fx->name[0])
     strcpy (fx->name, "NO_SET");
 
-  if (fx->w && fx->w->bewin) {
+  if (fx->wl.xwin && fx->wl.xwin->bewin) {
     xitk_tagitem_t tags1[] = {
       {XITK_TAG_X, 0},
       {XITK_TAG_Y, 0},
@@ -1755,12 +1753,12 @@ static xitk_register_key_t _xitk_register_event_handler (const char *name, xitk_
       {XITK_TAG_NAME, (uintptr_t)fx->name},
       {XITK_TAG_END, 0}
     };
-    fx->w->bewin->get_props (fx->w->bewin, tags1);
+    fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags1);
     fx->new_pos.x = tags1[0].value;
     fx->new_pos.y = tags1[1].value;
-    fx->w->width = fx->width = tags1[2].value;
-    fx->w->height = fx->height = tags1[3].value;
-    fx->w->bewin->set_props (fx->w->bewin, tags2);
+    fx->wl.xwin->width = fx->width = tags1[2].value;
+    fx->wl.xwin->height = fx->height = tags1[3].value;
+    fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags2);
   }
 
   fx->user_data = user_data;
@@ -1915,12 +1913,12 @@ int xitk_get_window_info (xitk_t *_xitk, xitk_register_key_t key, window_info_t 
         {XITK_TAG_END, 0}
       };
 
-      fx->w->bewin->get_props (fx->w->bewin, tags);
+      fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
       winf->x      = fx->new_pos.x = tags[0].value;
       winf->y      = fx->new_pos.y = tags[1].value;
-      winf->width  = fx->w->width = fx->width = tags[2].value;
-      winf->height = fx->w->height = fx->height = tags[3].value;
-      winf->xwin   = fx->w;
+      winf->width  = fx->wl.xwin->width = fx->width = tags[2].value;
+      winf->height = fx->wl.xwin->height = fx->height = tags[3].value;
+      winf->xwin   = fx->wl.xwin;
       strcpy (winf->name, fx->name);
       MUTUNLOCK ();
       return 1;
@@ -1947,7 +1945,7 @@ xitk_window_t *xitk_get_window (xitk_t *_xitk, xitk_register_key_t key) {
     MUTLOCK ();
     fx = __fx_from_key (xitk, key);
     if (fx)
-      w = fx->w;
+      w = fx->wl.xwin;
     MUTUNLOCK ();
   }
   return w;
