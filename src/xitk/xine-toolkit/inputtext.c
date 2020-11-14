@@ -308,10 +308,12 @@ static void _inputtext_sbuf_unset (_inputtext_private_t *wp) {
  */
 static void _cursor_focus (_inputtext_private_t *wp, int focus) {
   wp->cursor_focus = focus;
-  if (focus)
-    xitk_window_define_window_cursor (wp->w.wl->xwin, xitk_cursor_xterm);
-  else
-    xitk_window_restore_window_cursor (wp->w.wl->xwin);
+  if (wp->w.wl->xwin) {
+    if (focus)
+      xitk_window_define_window_cursor (wp->w.wl->xwin, xitk_cursor_xterm);
+    else
+      xitk_window_restore_window_cursor (wp->w.wl->xwin);
+  }
 }
 
 /*
