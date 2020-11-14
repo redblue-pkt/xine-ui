@@ -629,7 +629,6 @@ typedef enum {
 const char *xitk_get_cfg_string (xitk_t *xitk, xitk_cfg_item_t item);
 int xitk_get_cfg_num (xitk_t *xitk, xitk_cfg_item_t item);
 
-void xitk_set_xmb_enability(int value);
 char *xitk_filter_filename(const char *name);
 int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct timeval *t2);
 

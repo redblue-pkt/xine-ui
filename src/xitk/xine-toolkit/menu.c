@@ -261,7 +261,8 @@ static int _menu_show_subs (_menu_private_t *wp, _menu_node_t *node) {
 static void _menu_exit (_menu_private_t *wp) {
   /* 핵: this runs inside xitk_destroy_widget ().
    * dont destroy again through xitk_set_current_menu (NULL). */
-  xitk_unset_current_menu ();
+  if (wp->w.wl)
+    xitk_unset_current_menu (wp->w.wl->xitk);
   _menu_close_subs_in (wp, NULL);
   _menu_tree_free (&wp->root);
 }
@@ -301,6 +302,7 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
     /* 핵: detach from parent window. it may go away in user callback,
      * eg when switching fullscreen mode. */
     xitk_dnode_remove (&wp->w.node);
+    xitk_unset_current_menu (wp->w.wl->xitk);
     wp->w.wl = NULL;
     if (me->menu_entry.cb)
       me->menu_entry.cb (&wp->w, &me->menu_entry, me->menu_entry.user_data);
@@ -715,7 +717,7 @@ void xitk_menu_show_menu (xitk_widget_t *w) {
 
   wp->w.visible = 1;
   _menu_open (&wp->root, wp->x, wp->y);
-  xitk_set_current_menu (&wp->w);
+  xitk_set_current_menu (wp->w.wl->xitk, &wp->w);
 }
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
