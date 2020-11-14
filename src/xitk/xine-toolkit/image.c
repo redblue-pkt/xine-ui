@@ -597,10 +597,6 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   { /* Draw string in image */
     int i, y, x = 0;
 
-    xitk_lock_display (xitk);
-    XSetForeground (xitk_x11_get_display(xitk), gc, foreground);
-    xitk_unlock_display (xitk);
-
     for(y = ascent, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
       xitk_font_string_extent(fs, lines[i], &lbearing, &rbearing, NULL, NULL, NULL);
       length = rbearing - lbearing;
@@ -612,7 +608,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
       else if(align == ALIGN_RIGHT)
         x = (width - length);
 
-      xitk_font_draw_string (fs, image, gc, (x - lbearing), y, lines[i], strlen(lines[i]));
+      xitk_font_draw_string (fs, image, gc, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
                                             /*   ^^^^^^^^ Adjust to start of ink */
     }
   }
@@ -1471,10 +1467,7 @@ void xitk_image_draw_string (xitk_image_t *img, int x, int y, const char *text, 
   if (!img->beimg || !img->xitk || !img->xtfs)
     return;
 
-  img->beimg->display->lock (img->beimg->display);
-  XSetForeground (xitk_x11_get_display(img->xitk), img->gc, color);
-  xitk_font_draw_string (img->xtfs, img, img->gc, x, y, text, nbytes);
-  img->beimg->display->unlock (img->beimg->display);
+  xitk_font_draw_string (img->xtfs, img, img->gc, x, y, text, nbytes, color);
 }
 
 /*
