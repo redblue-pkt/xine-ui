@@ -2204,8 +2204,10 @@ int video_window_set_mag (xui_vwin_t *vwin, float xmag, float ymag) {
 }
 
 void video_window_get_mag (xui_vwin_t *vwin, float *xmag, float *ymag) {
-  if (!vwin)
+  if (!vwin) {
+    *xmag = *ymag = 1.0;
     return;
+  }
 
   /* compute current mag */
   pthread_mutex_lock (&vwin->mutex);

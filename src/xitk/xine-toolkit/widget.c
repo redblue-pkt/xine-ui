@@ -1566,6 +1566,7 @@ int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y) {
 
   if(!w) {
     XITK_WARNING("widget is NULL\n");
+    *x = *y = 0;
     return 0;
   }
   *x = w->x;
