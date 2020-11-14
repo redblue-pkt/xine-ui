@@ -28,6 +28,7 @@
 
 #include "_xitk.h"
 #include "labelbutton.h"
+#include "font.h"
 
 typedef enum {
   _LB_NORMAL = 0,
