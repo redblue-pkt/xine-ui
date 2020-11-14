@@ -629,6 +629,8 @@ int xitk_color_db_query_value (xitk_t *_xitk, xitk_color_info_t *info) {
         b = m + 1;
     } while (b != e);
   }
+
+  memset(info, 0, sizeof(*info));
   return 0;
 }
 
@@ -2410,6 +2412,7 @@ void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
    * However, we have to reinitialize Imlib if we have to change the visual.
    * This will be a (small) memory leak.
    */
+  memset(&imlib_init, 0, sizeof(imlib_init));
   imlib_init.flags = PARAMS_VISUALID;
   imlib_init.visualid = gui_visual->visualid;
 
@@ -2868,12 +2871,10 @@ void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
   __xitk_t *_xitk;
 
   xitk_container (_xitk, xitk, x);
-  if (_xitk) {
-    if (w)
-      *w = _xitk->display_width;
-    if (h)
-      *h = _xitk->display_height;
-  }
+  if (w)
+    *w = _xitk->display_width;
+  if (h)
+    *h = _xitk->display_height;
 }
 
 void xitk_set_tips_timeout(unsigned long timeout) {

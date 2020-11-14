@@ -1896,7 +1896,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   init_session();
 
   if(gui->tvout) {
-    int w, h;
+    int w = 0, h = 0;
 
     video_window_get_visible_size (gui->vwin, &w, &h);
     tvout_set_fullscreen_mode (gui->tvout,
