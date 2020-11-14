@@ -1423,7 +1423,7 @@ void video_window_set_cursor_timer (xui_vwin_t *vwin, int timer) {
 void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y) {
   if (!vwin)
     return;
-  xitk_get_mouse_coords (vwin->video_display, vwin->video_window, NULL, NULL, x, y);
+  xitk_x11_get_mouse_coords (vwin->video_display, vwin->video_window, NULL, NULL, x, y);
 }
 
 /*
