@@ -2197,6 +2197,8 @@ int main(int argc, char *argv[]) {
   free (gui->cfg_file);
   __xineui_global_config_file = NULL;
 
+  free(gui->keymap_file);
+
   free (gui);
   return retval;
 }
