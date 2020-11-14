@@ -1367,7 +1367,7 @@ static void _xitk_image_draw_frame (xitk_image_t *img,
   xitk_font_t   *fs = NULL;
   int            yoff = 0, xstart = 0, xstop = 0;
   int            ascent = 0, descent = 0, lbearing = 0, rbearing = 0;
-  int            titlelen = 0;
+  size_t         titlelen = 0;
   const char    *titlebuf = NULL;
   char           buf[BUFSIZ];
 
@@ -1391,7 +1391,7 @@ static void _xitk_image_draw_frame (xitk_image_t *img,
     /* Limit title to frame width */
     if((rbearing - lbearing) > maxinkwidth) {
       char  dots[]  = "...";
-      int   dotslen = strlen(dots);
+      size_t dotslen = strlen(dots);
       int   dotsrbearing;
       int   titlewidth;
 
