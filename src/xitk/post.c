@@ -1769,9 +1769,9 @@ void pplugin_end (post_info_t *info) {
 int pplugin_is_visible (post_info_t *info) {
   if (info && info->win) {
     if (info->gui->use_root_window)
-      return xitk_window_is_window_visible (info->win->xwin);
+      return (xitk_window_flags (info->win->xwin, 0, 0) & XITK_WINF_VISIBLE);
     else
-      return info->win->visible && xitk_window_is_window_visible (info->win->xwin);
+      return info->win->visible && (xitk_window_flags (info->win->xwin, 0, 0) & XITK_WINF_VISIBLE);
   }
   return 0;
 }

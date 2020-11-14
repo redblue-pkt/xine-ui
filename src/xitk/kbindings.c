@@ -518,9 +518,9 @@ void kbindings_handle_kbinding(kbinding_t *kbt, unsigned long keysym, int keycod
 int kbedit_is_visible (xui_keyedit_t *kbedit) {
   if (kbedit) {
     if (kbedit->gui->use_root_window)
-      return xitk_window_is_window_visible (kbedit->xwin);
+      return (xitk_window_flags (kbedit->xwin, 0, 0) & XITK_WINF_VISIBLE);
     else
-      return kbedit->visible && xitk_window_is_window_visible (kbedit->xwin);
+      return kbedit->visible && (xitk_window_flags (kbedit->xwin, 0, 0) & XITK_WINF_VISIBLE);
   }
   return 0;
 }

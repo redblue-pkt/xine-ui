@@ -815,9 +815,9 @@ int playlist_is_visible (gGui_t *gui) {
 
   if (pl) {
     if (gui->use_root_window)
-      return xitk_window_is_window_visible (pl->xwin);
+      return (xitk_window_flags (pl->xwin, 0, 0) & XITK_WINF_VISIBLE);
     else
-      return pl->visible && xitk_window_is_window_visible (pl->xwin);
+      return pl->visible && (xitk_window_flags (pl->xwin, 0, 0) & XITK_WINF_VISIBLE);
   }
   return 0;
 }

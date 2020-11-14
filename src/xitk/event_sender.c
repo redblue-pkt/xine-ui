@@ -286,8 +286,8 @@ int event_sender_is_visible (gGui_t *gui) {
     return 0;
   if (!gui->eventer)
     return 0;
-  return gui->use_root_window ? xitk_window_is_window_visible (gui->eventer->xwin)
-                              : (gui->eventer->visible && xitk_window_is_window_visible (gui->eventer->xwin));
+  return gui->use_root_window ? (xitk_window_flags (gui->eventer->xwin, 0, 0) & XITK_WINF_VISIBLE)
+                              : (gui->eventer->visible && (xitk_window_flags (gui->eventer->xwin, 0, 0) & XITK_WINF_VISIBLE));
 }
 
 static void _event_sender_raise_window (gGui_t *gui) {

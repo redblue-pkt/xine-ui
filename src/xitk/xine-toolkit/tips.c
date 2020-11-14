@@ -294,7 +294,7 @@ int xitk_tips_show_widget_tips (xitk_tips_t *tips, xitk_widget_t *w) {
   if (!tips)
     return 1;
   /* Don't show when window invisible. This call may occur directly after iconifying window. */
-  if (w && !xitk_window_is_window_visible (w->wl->xwin))
+  if (w && !(xitk_window_flags (w->wl->xwin, 0, 0) & XITK_WINF_VISIBLE))
     return 0;
 
   do {

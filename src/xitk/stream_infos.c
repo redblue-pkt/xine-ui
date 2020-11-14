@@ -460,9 +460,9 @@ static int stream_infos_event (void *data, const xitk_be_event_t *e) {
 int stream_infos_is_visible (xui_sinfo_t *sinfo) {
   if (sinfo) {
     if (sinfo->gui->use_root_window)
-      return xitk_window_is_window_visible (sinfo->xwin);
+      return (xitk_window_flags (sinfo->xwin, 0, 0) & XITK_WINF_VISIBLE);
     else
-      return sinfo->visible && xitk_window_is_window_visible (sinfo->xwin);
+      return sinfo->visible && (xitk_window_flags (sinfo->xwin, 0, 0) & XITK_WINF_VISIBLE);
   }
   return 0;
 }

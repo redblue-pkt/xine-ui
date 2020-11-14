@@ -117,12 +117,12 @@ void toggle_window (gGui_t *gui, xitk_window_t *xwin, xitk_widget_list_t *widget
   if((*visible) && running) {
 
     if(gui->use_root_window) {
-      if (xitk_window_is_window_visible(xwin))
+      if ((xitk_window_flags (xwin, 0, 0) & XITK_WINF_VISIBLE))
         xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
       else
         xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
     }
-    else if (!xitk_window_is_window_visible(xwin)) {
+    else if (!(xitk_window_flags (xwin, 0, 0) & XITK_WINF_VISIBLE)) {
       /* Obviously user has iconified the window, let it be */
     }
     else {

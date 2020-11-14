@@ -124,12 +124,14 @@ void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
  *
  */
 
-void xitk_window_define_window_cursor(xitk_window_t *w, xitk_cursors_t cursor) {
-  xitk_cursors_define_window_cursor (xitk_x11_get_display(w->xitk), w->window, cursor);
+void xitk_window_define_window_cursor (xitk_window_t *xwin, xitk_cursors_t cursor) {
+  if (xwin)
+    xitk_cursors_define_window_cursor (xitk_x11_get_display (xwin->xitk), xwin->window, cursor);
 }
 
-void xitk_window_restore_window_cursor(xitk_window_t *w) {
-  xitk_cursors_restore_window_cursor (xitk_x11_get_display(w->xitk), w->window);
+void xitk_window_restore_window_cursor (xitk_window_t *xwin) {
+  if (xwin)
+    xitk_cursors_restore_window_cursor (xitk_x11_get_display (xwin->xitk), xwin->window);
 }
 
 /*
@@ -187,61 +189,27 @@ int xitk_is_window_visible(Display *display, Window window) {
   return 0;
 }
 
-int xitk_window_is_window_visible(xitk_window_t *w) {
-
-  if (w == NULL)
-    return 0;
-
-  return xitk_is_window_visible(xitk_x11_get_display(w->xitk), w->window);
-}
-
-/*
- * Is window is size match with given args
- */
-static int xitk_is_window_size(Display *display, Window window, int width, int height) {
-  XWindowAttributes  wattr;
-
-  if((display == NULL) || (window == None))
-    return -1;
-
-  xitk_x_lock_display (display);
-  if(!XGetWindowAttributes(display, window, &wattr)) {
-    XITK_WARNING("XGetWindowAttributes() failed.n");
-    xitk_x_unlock_display (display);
-    return -1;
-  }
-  xitk_x_unlock_display (display);
-
-  if((wattr.width == width) && (wattr.height == height))
-    return 1;
-
-  return 0;
-}
-
-/*
- * Set/Change window title.
- */
-static void xitk_set_window_title(Display *display, Window window, const char *title) {
-
-  if((display == NULL) || (window == None) || (title == NULL))
+void xitk_window_set_window_title (xitk_window_t *xwin, const char *title) {
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_TITLE, (uintptr_t)NULL},
+    {XITK_TAG_END, 0}
+  };
+  const char *t;
+ 
+  if (!xwin || !title)
     return;
-
-  xitk_x_lock_display (display);
-  XmbSetWMProperties(display, window, title, title, NULL, 0, NULL, NULL, NULL);
-  xitk_x_unlock_display (display);
-}
-
-/*
- * Set/Change window title.
- */
-void xitk_window_set_window_title(xitk_window_t *w, const char *title) {
-
-  if ((w == NULL) || (title == NULL))
+  if (!xwin->bewin)
     return;
-
-  xitk_set_window_title(xitk_x11_get_display(w->xitk), w->window, title);
+ 
+  xwin->bewin->get_props (xwin->bewin, tags);
+  t = (const char *)tags[0].value;
+  if (t && !strcmp (t, title))
+    return;
+ 
+  tags[0].value = (uintptr_t)title;
+  xwin->bewin->set_props (xwin->bewin, tags);
 }
-
+ 
 /*
  *
  */
@@ -679,32 +647,6 @@ void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height) {
 
   *width = w->width;
   *height = w->height;
-}
-
-void xitk_window_resize_window(xitk_window_t *w, int width, int height) {
-  XSizeHints   hint;
-  int          t = 0;
-
-  if (w == NULL)
-    return;
-
-  w->width = width;
-  w->height = height;
-
-  xitk_lock_display (w->xitk);
-
-  hint.width  = width;
-  hint.height = height;
-  hint.flags  = PPosition | PSize;
-  XSetWMNormalHints (xitk_x11_get_display(w->xitk), w->window, &hint);
-  XResizeWindow (xitk_x11_get_display(w->xitk), w->window, width, height);
-  XSync(xitk_x11_get_display(w->xitk), False);
-
-  xitk_unlock_display (w->xitk);
-
-  while (t < 10 && !xitk_is_window_size(xitk_x11_get_display(w->xitk), w->window, w->width, w->height)) {
-    xitk_usec_sleep(10000);
-  }
 }
 
 /*

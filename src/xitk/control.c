@@ -566,7 +566,7 @@ int control_status (xui_vctrl_t *vctrl) {
     return 1;
   if (!vctrl->gui->use_root_window && (vctrl->status == 2))
     return 2;
-  return (!!xitk_window_is_window_visible (vctrl->xwin)) + 2;
+  return (!!(xitk_window_flags (vctrl->xwin, 0, 0) & XITK_WINF_VISIBLE)) + 2;
 }
 
 /*

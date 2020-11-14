@@ -569,9 +569,9 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
 }
 
 static int _panel_get_visibility (xui_panel_t *panel) {
-  static const uint8_t map[6] = {0, 1, 0, 2, 2, 2};
+  uint32_t flags = xitk_window_flags (panel->xwin, 0, 0);
 
-  panel->visible = map[(xitk_window_is_window_visible (panel->xwin) ? 3 : 0) + panel->visible];
+  panel->visible = (flags & XITK_WINF_VISIBLE) ? 2 : (flags & XITK_WINF_ICONIFIED) ? 1 : 0;
   return panel->visible;
 }
 
@@ -1069,7 +1069,9 @@ void panel_deinit (xui_panel_t *panel) {
   if (!panel)
     return;
 
-  if (panel_is_visible (panel) > 1) {
+  _panel_get_visibility (panel);
+  config_update_num ("gui.panel_visible", panel->visible > 1);
+  if (panel->visible > 1) {
     panel->visible = 0;
     xitk_window_flags (panel->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
     xitk_hide_widgets (panel->widget_list);
