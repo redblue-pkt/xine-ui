@@ -2188,19 +2188,20 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
         Atom actual_type;
         int actual_format = 0, res;
         unsigned long nitems, bytes_after;
-        int *prop = NULL;
+        unsigned char *prop_return = NULL;
 
         d->d.lock (&d->d);
         res = XGetWindowProperty (d->display, win->w.id, xevent.xproperty.atom, 0, 4, False,
           d->clipboard.atoms[XITK_A_integer], &actual_type, &actual_format, &nitems, &bytes_after,
-          (unsigned char **)&prop);
+          &prop_return);
         d->d.unlock (&d->d);
         if ((res != False) && (nitems >= 1)) {
+          int *prop = (int *)prop_return;
           win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED);
           win->props[XITK_X11_WT_WIN_FLAGS].value |=
             *prop == NormalState ? XITK_WINF_VISIBLE : *prop == IconicState ? XITK_WINF_ICONIFIED : 0;
         }
-        XFree (prop);
+        XFree (prop_return);
       }
       /* fall through */
     case SelectionClear:
