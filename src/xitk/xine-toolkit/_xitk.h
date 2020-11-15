@@ -174,8 +174,6 @@ struct xitk_s {
 #define CHECK_STYLE_CHECK 2
 #define CHECK_STYLE_ROUND 3
 
-extern int xitk_x_error;
-
 xitk_register_key_t xitk_register_event_handler_ext(const char *name, xitk_window_t *w,
                                                     const xitk_event_cbs_t *cbs, void *user_data,
                                                     xitk_widget_list_t *wl);
