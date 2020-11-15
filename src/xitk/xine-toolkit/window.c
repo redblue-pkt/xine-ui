@@ -30,8 +30,6 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
 
-#include "xitk/Imlib-light/Imlib_types.h"
-
 #include "_xitk.h"
 #include "xitk.h"
 #include "default_font.h"
@@ -401,6 +399,7 @@ void xitk_window_move_window (xitk_window_t *xwin, int x, int y) {
  */
 void xitk_window_center_window (xitk_window_t *xwin) {
   Window rootwin;
+  Display *display;
   int x, y;
   unsigned int w, h, b, d;
 
@@ -410,7 +409,8 @@ void xitk_window_center_window (xitk_window_t *xwin) {
     return;
 
   xitk_lock_display (xwin->xitk);
-  if (XGetGeometry (xitk_x11_get_display(xwin->xitk), xwin->xitk->imlibdata->x.root, &rootwin,
+  display = xitk_x11_get_display(xwin->xitk);
+  if (XGetGeometry (display, DefaultRootWindow(display), &rootwin,
     &x, &y, &w, &h, &b, &d) != BadDrawable) {
     int xx, yy;
 
@@ -431,7 +431,7 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
     int override_redirect, int layer_above, xitk_image_t *icon, xitk_image_t *bg_image) {
   xitk_window_t         *xwin;
 
-  if ((xitk == NULL) || (xitk->imlibdata == NULL))
+  if (xitk == NULL)
     return NULL;
   if (!bg_image && ((width <= 0 || height <= 0)))
     return NULL;
