@@ -23,8 +23,6 @@
 
 #include "_xitk.h"
 
-#include <X11/Xlib.h>
-
 #include "default_font.h"
 
 /*
@@ -45,7 +43,7 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font);
 /*
  * Draw the string with given font.
  */
-void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
+void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img,
     int x, int y, const char *text, size_t nbytes, uint32_t color);
 
 /*

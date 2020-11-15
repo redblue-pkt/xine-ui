@@ -640,8 +640,15 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 /*
  *
  */
-void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
+void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img,
     int x, int y, const char *text, size_t nbytes, uint32_t color) {
+
+#ifndef WITH_XFT
+  XGCValues gcv;
+  GC gc;
+
+  gcv.graphics_exposures = False;
+#endif
 
 #ifdef DEBUG
   if (nbytes > strlen(text) + 1) {
@@ -652,8 +659,9 @@ void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
   xitk_lock_display (xtfs->xitk);
 
 #ifndef WITH_XFT
-# ifdef WITH_XMB
+  gc = XCreateGC (xtfs->display, img->beimg->id1, GCGraphicsExposures, &gcv);
   XSetForeground (xtfs->display, gc, color);
+# ifdef WITH_XMB
   if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     XmbDrawString (xtfs->display, (Pixmap)img->beimg->id1, xtfs->fontset, gc, x, y, text, nbytes);
   }
@@ -663,6 +671,7 @@ void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
     XSetFont(xtfs->display, gc, xtfs->font->fid);
     XDrawString (xtfs->display, (Pixmap)img->beimg->id1, gc, x, y, text, nbytes);
   }
+  XFreeGC (xtfs->display, gc);
 #else
   {
     int           screen   = DefaultScreen( xtfs->display );
