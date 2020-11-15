@@ -937,7 +937,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   xui_setup_t   *setup;
   xitk_widget_t *w;
   xitk_font_t   *fs;
-  xitk_image_t  *bg;
 
   if (!gui)
     return NULL;
@@ -958,9 +957,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
 
     setup->widget_list = xitk_window_widget_list(setup->xwin);
 
-    bg = xitk_window_get_background_image (setup->xwin);
     fs = xitk_font_load_font (setup->gui->xitk, fontname);
-    xitk_image_set_font (bg, fs);
     setup->fh = xitk_font_get_string_height (fs, " ");
   }
 
@@ -1005,7 +1002,6 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   xitk_add_widget (setup->widget_list, w);
   xitk_enable_and_show_widget(w);
 
-  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   {

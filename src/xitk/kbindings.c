@@ -1217,9 +1217,7 @@ void kbedit_window (gGui_t *gui) {
   XITK_WIDGET_INIT(&l);
 
   fs = xitk_font_load_font(gui->xitk, hboldfontname);
-  xitk_image_set_font (bg, fs);
   fontheight = xitk_font_get_string_height(fs, " ");
-  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   y = y1 + (45 / 2);                /* Checkbox                     */
