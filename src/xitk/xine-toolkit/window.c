@@ -48,64 +48,12 @@ void xitk_window_set_input_focus (xitk_window_t *w) {
   xitk_unlock_display (w->xitk);
 }
 
-static int _xitk_window_set_focus (Display *display, Window window) {
-  int t = 0;
-
-  while ((!xitk_is_window_visible (display, window)) && (++t < 3))
-    xitk_usec_sleep (5000);
-
-  if (xitk_is_window_visible (display, window)) {
-    xitk_x_lock_display (display);
-    XSetInputFocus (display, window, RevertToParent, CurrentTime);
-    xitk_x_unlock_display (display);
-    return 0;
-  }
-
-  return -1;
-}
-
-static int _xitk_window_has_focus(Display *display, Window window) {
-  Window focused_win;
-  int revert;
-
-  xitk_x_lock_display (display);
-  XGetInputFocus(display, &focused_win, &revert);
-  xitk_x_unlock_display (display);
-
-  return (focused_win == window);
-}
-
-void xitk_try_to_set_input_focus(Display *display, Window window) {
-  int retry = 0;
-
-  if (_xitk_window_set_focus(display, window) < 0)
-    return;
-
-  do {
-
-    /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
-
-    xitk_x_lock_display (display);
-    XSync(display, False);
-    xitk_x_unlock_display (display);
-
-    if (_xitk_window_has_focus(display, window))
-      break;
-
-    xitk_usec_sleep(5000);
-
-    if (_xitk_window_set_focus(display, window) < 0)
-      break;
-
-  } while (retry++ < 30);
-}
-
 void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
 
   if (w == NULL)
     return;
 
-  return xitk_try_to_set_input_focus(xitk_x11_get_display(w->xitk), w->window);
+  return xitk_x11_try_to_set_input_focus(xitk_x11_get_display(w->xitk), w->window);
 }
 
 void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
@@ -129,50 +77,8 @@ void xitk_window_restore_window_cursor (xitk_window_t *xwin) {
 }
 
 /*
- *
- */
-int xitk_is_window_iconified(Display *display, Window window) {
-  unsigned char *prop_return = NULL;
-  unsigned long  nitems_return;
-  unsigned long  bytes_after_return;
-  int            format_return;
-  Atom           type_return, atom;
-  int            retval = 0;
-
-  xitk_x_lock_display (display);
-  atom = XInternAtom(display, "WM_STATE", False);
-  XGetWindowProperty (display, window, atom, 0, 0x7fffffff, False,
-		      atom, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return);
-
-  if(prop_return) {
-    if (prop_return[0] == IconicState)
-      retval = 1;
-    XFree(prop_return);
-  }
-  xitk_x_unlock_display (display);
-
-  return retval;
-}
-
-/*
  * Is window is size match with given args
  */
-int xitk_is_window_visible(Display *display, Window window) {
-  XWindowAttributes  wattr;
-  Status             status;
-
-  if((display == NULL) || (window == None))
-    return -1;
-
-  xitk_x_lock_display (display);
-  status = XGetWindowAttributes(display, window, &wattr);
-  xitk_x_unlock_display (display);
-
-  if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
-    return 1;
-
-  return 0;
-}
 
 void xitk_window_set_window_title (xitk_window_t *xwin, const char *title) {
   xitk_tagitem_t tags[] = {
@@ -281,14 +187,10 @@ void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t 
   }
 }
 
-void xitk_window_set_transient_for(xitk_window_t *w, Window win) {
-  xitk_lock_display (w->xitk);
-  XSetTransientForHint(xitk_x11_get_display(w->xitk), w->window, win);
-  xitk_unlock_display (w->xitk);
-}
-
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin) {
-  xitk_window_set_transient_for(w, xwin->window);
+  xitk_lock_display (w->xitk);
+  XSetTransientForHint(xitk_x11_get_display(w->xitk), w->window, xwin->window);
+  xitk_unlock_display (w->xitk);
 }
 
 void xitk_window_raise_window (xitk_window_t *xwin) {
@@ -313,43 +215,6 @@ void xitk_window_reparent_window (xitk_window_t *xwin, xitk_window_t *parent, in
     };
     xwin->bewin->set_props (xwin->bewin, tags);
   }
-}
-
-/*
- * Get (safely) window pos.
- */
-void xitk_get_window_position(Display *display, Window window,
-			      int *x, int *y, int *width, int *height) {
-  XWindowAttributes  wattr;
-  Window             wdummy;
-  int                xx = 0, yy = 0;
-
-  if((display == NULL) || (window == None))
-    return;
-
-  xitk_x_lock_display (display);
-  if(!XGetWindowAttributes(display, window, &wattr)) {
-    XITK_WARNING("XGetWindowAttributes() failed.n");
-    wattr.width = wattr.height = 0;
-    goto __failure;
-  }
-
-  (void) XTranslateCoordinates (display, window, wattr.root,
-				-wattr.border_width, -wattr.border_width,
-                                &xx, &yy, &wdummy);
-
- __failure:
-
-  xitk_x_unlock_display (display);
-
-  if(x)
-    *x = xx;
-  if(y)
-    *y = yy;
-  if(width)
-    *width = wattr.width;
-  if(height)
-    *height = wattr.height;
 }
 
 /*

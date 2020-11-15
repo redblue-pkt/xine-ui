@@ -203,16 +203,14 @@ void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
   if (vwin->gui->use_root_window || vwin->separate_display)
     return;
   pthread_mutex_lock (&vwin->mutex);
-  vwin->x_lock_display (vwin->video_display);
-  XSetTransientForHint (vwin->video_display, xitk_window_get_window(xwin), vwin->video_window);
-  vwin->x_unlock_display (vwin->video_display);
+  xitk_window_set_transient_for_win(xwin, vwin->wrapped_window);
   pthread_mutex_unlock (&vwin->mutex);
 }
 
 void video_window_set_input_focus(xui_vwin_t *vwin) {
   if (!vwin)
     return;
-  xitk_try_to_set_input_focus (vwin->video_display, vwin->video_window);
+  xitk_x11_try_to_set_input_focus (vwin->video_display, vwin->video_window);
 }
 
 /*
@@ -222,7 +220,7 @@ static int _video_window_is_visible (xui_vwin_t *vwin) {
   static const uint8_t map[6] = {0, 1, 0, 2, 2, 2};
 
   /* user may have changed this via task bar. */
-  vwin->show = map[vwin->show + (xitk_is_window_visible (vwin->video_display, vwin->video_window) ? 3 : 0)];
+  vwin->show = map[vwin->show + (xitk_x11_is_window_visible (vwin->video_display, vwin->video_window) ? 3 : 0)];
   return vwin->show;
 }
 
@@ -698,7 +696,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         return;
       }
 
-      xitk_get_window_position (vwin->video_display, vwin->video_window,
+      xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
         &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
 
       old_video_window = vwin->video_window;
@@ -792,7 +790,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	return;
       }
 
-      xitk_get_window_position (vwin->video_display, vwin->video_window,
+      xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
         &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
 
       old_video_window = vwin->video_window;
@@ -1051,7 +1049,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XRaiseWindow (vwin->video_display, vwin->video_window);
     XMapWindow (vwin->video_display, vwin->video_window);
 
-    while (!xitk_is_window_visible (vwin->video_display, vwin->video_window))
+    while (!xitk_x11_is_window_visible (vwin->video_display, vwin->video_window))
       xine_usec_sleep(5000);
 
     if ((vwin->gui->always_layer_above ||
@@ -1073,7 +1071,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))) {
     /* Waiting for visibility, avoid X error on some cases */
 
-    xitk_try_to_set_input_focus (vwin->video_display, vwin->video_window);
+    xitk_x11_try_to_set_input_focus (vwin->video_display, vwin->video_window);
 
 #ifdef HAVE_XINERAMA
     if (vwin->xinerama)
@@ -1327,7 +1325,7 @@ void video_window_set_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen) {
 
   video_window_adapt_size (vwin);
 
-  xitk_try_to_set_input_focus (vwin->video_display, vwin->video_window);
+  xitk_x11_try_to_set_input_focus (vwin->video_display, vwin->video_window);
   osd_update_osd();
 
   pthread_mutex_unlock (&vwin->mutex);
@@ -2217,7 +2215,7 @@ static int video_window_check_mag (xui_vwin_t *vwin) {
     return 0;
 
   /* Allow mag only if video win is visible, so don't do something we can't see. */
-  return (xitk_is_window_visible (vwin->video_display, vwin->video_window));
+  return (xitk_x11_is_window_visible (vwin->video_display, vwin->video_window));
 }
 
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag) {
@@ -2661,7 +2659,7 @@ void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *win
     if (window_height)
       *window_height = 0;
   }
-  xitk_get_window_position (vwin->video_display, vwin->video_window, NULL, NULL, window_width, window_height);
+  xitk_x11_get_window_position (vwin->video_display, vwin->video_window, NULL, NULL, window_width, window_height);
 }
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {

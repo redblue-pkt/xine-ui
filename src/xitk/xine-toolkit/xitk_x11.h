@@ -90,10 +90,10 @@ void xitk_unset_ewmh_fullscreen(Window window);
  *
  */
 
-void xitk_try_to_set_input_focus(Display *display, Window window);
-void xitk_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
-int xitk_is_window_iconified(Display *display, Window window);
-int xitk_is_window_visible(Display *display, Window window);
+void xitk_x11_try_to_set_input_focus(Display *display, Window window);
+void xitk_x11_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
+int  xitk_x11_is_window_iconified(Display *display, Window window);
+int  xitk_x11_is_window_visible(Display *display, Window window);
 Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
 
 /*
@@ -120,7 +120,6 @@ xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 
 Window xitk_window_get_window(xitk_window_t *w);
-void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
 void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 /* ****************************************************************** */
