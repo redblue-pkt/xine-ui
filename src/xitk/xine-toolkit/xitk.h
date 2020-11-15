@@ -518,18 +518,6 @@ typedef struct {
 void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data);
 
 /*
- * Register function:
- * name:   temporary name about debug stuff, can be NULL.
- * w:      desired window for event callback calls.
- *         window widget list is handled internally for event reactions.
- * cbs:    callback functions for events, can be NULL.
- * user_data: passed to each callback.
- */
-
-xitk_register_key_t xitk_window_register_event_handler(const char *name, xitk_window_t *w,
-                                                       const xitk_event_cbs_t *cbs, void *user_data);
-
-/*
  * Remove widgetkey_t entry in internal table.
  */
 void xitk_unregister_event_handler (xitk_t *xitk, xitk_register_key_t *key);

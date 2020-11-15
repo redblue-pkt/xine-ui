@@ -1791,11 +1791,6 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   return _xitk_register_event_handler (name, xwin, wl, event_handler, NULL, eh_data, destructor, destr_data);
 }
 
-xitk_register_key_t xitk_register_event_handler_ext (const char *name, xitk_window_t *xwin,
-  const xitk_event_cbs_t *cbs, void *user_data, xitk_widget_list_t *wl) {
-  return _xitk_register_event_handler (name, xwin, wl, NULL, cbs, user_data, NULL, NULL);
-}
-
 static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
   /* fx->key is set uniquely in xitk_register_event_handler, then never changed.
    * MUTLOCK () is enough. */
