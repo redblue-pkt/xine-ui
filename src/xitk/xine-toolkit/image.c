@@ -205,30 +205,12 @@ void xitk_image_free_image (xitk_image_t **src) {
   }
 #endif
   if (image->beimg) {
-    if (image->gc) {
-      image->beimg->display->lock (image->beimg->display);
-      XFreeGC (xitk_x11_get_display(image->xitk), image->gc);
-      image->beimg->display->unlock (image->beimg->display);
-      image->gc = NULL;
-    }
     image->beimg->_delete (&image->beimg);
   }
   _xitk_image_destroy_pix_font (&image->pix_font);
 
   XITK_FREE (image);
   *src = NULL;
-}
-
-
-static void _xitk_image_gc (xitk_image_t *img) {
-  if (img && !img->gc) {
-    XGCValues gcv;
-
-    gcv.graphics_exposures = False;
-    img->beimg->display->lock (img->beimg->display);
-    img->gc = XCreateGC (xitk_x11_get_display(img->xitk), img->beimg->id1, GCGraphicsExposures, &gcv);
-    img->beimg->display->unlock (img->beimg->display);
-  }
 }
 
 void xitk_image_copy (xitk_image_t *from, xitk_image_t *to) {
@@ -437,10 +419,8 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
                                                               int width, int align, const char *str,
                                                               unsigned int foreground,
                                                               unsigned int background) {
-  ImlibData      *im;
   xitk_image_t   *image;
   xitk_font_t    *fs;
-  GC              gc;
   int             length, height, lbearing, rbearing, ascent, descent, linel, linew, wlinew, lastws;
   int             maxw = 0;
   const char     *p;
@@ -452,16 +432,9 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   int             add_line_spc = 2;
 
   ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->imlibdata);
   ABORT_IF_NULL(fontname);
   ABORT_IF_NULL(str);
   ABORT_IF_NOT_COND(width > 0);
-
-  im = xitk->imlibdata;
-
-  xitk_lock_display (xitk);
-  gc = XCreateGC (xitk_x11_get_display(xitk), im->x.base_window, None, None);
-  xitk_unlock_display (xitk);
 
   /* Creating an image from an empty string would cause an abort with failed */
   /* condition "width > 0". So we substitute some spaces (one single space   */
@@ -604,17 +577,12 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
       else if(align == ALIGN_RIGHT)
         x = (width - length);
 
-      xitk_font_draw_string (fs, image, gc, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
-                                            /*   ^^^^^^^^ Adjust to start of ink */
+      xitk_font_draw_string (fs, image, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
+                                        /*   ^^^^^^^^ Adjust to start of ink */
     }
   }
 
   xitk_font_unload_font(fs);
-
-  xitk_lock_display (xitk);
-  XFreeGC (xitk_x11_get_display(xitk), gc);
-  xitk_unlock_display (xitk);
-
   return image;
 }
 
@@ -1436,8 +1404,7 @@ void xitk_image_draw_string (xitk_image_t *img, xitk_font_t *xtfs, int x, int y,
   if (!img->beimg || !img->xitk)
     return;
 
-  _xitk_image_gc (img);
-  xitk_font_draw_string (xtfs, img, img->gc, x, y, text, nbytes, color);
+  xitk_font_draw_string (xtfs, img, x, y, text, nbytes, color);
 }
 
 /*
