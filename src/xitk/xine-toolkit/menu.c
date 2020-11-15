@@ -358,10 +358,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
   else
     fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_12);
-
-  xitk_image_set_font (bg, fs);
   maxlen = xitk_font_get_string_length (fs, maxnode->menu_entry.menu);
-  xitk_image_set_font (bg, NULL);
   xitk_font_unload_font(fs);
 
   shortcutlen = 0;

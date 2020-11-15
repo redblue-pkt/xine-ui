@@ -132,7 +132,6 @@ static int _inputtext_find_text_pos (_inputtext_private_t *wp,
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       return 0;
-    xitk_image_set_font (wp->text.temp_img.image, fs);
   }
 
   tries = 12;
@@ -399,7 +398,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
       fs = xitk_font_load_font (wp->w.wl->xitk, xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
     if (!fs)
       XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-    xitk_image_set_font (wp->text.temp_img.image, fs);
     xitk_font_string_extent (fs, wp->text.buf, &lbear, &rbear, &width, &asc, &des);
   }
 

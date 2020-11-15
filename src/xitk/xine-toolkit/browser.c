@@ -77,7 +77,6 @@ typedef struct _browser_private_s {
 } _browser_private_t;
 
 static void _browser_set_items (_browser_private_t *wp, const char * const *names, const char * const *shortcuts, int num) {
-  xitk_image_t *dummy;
 
   wp->items.last_over = -1;
 
@@ -87,8 +86,6 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
     wp->items.num = 0;
     return;
   }
-
-  dummy = xitk_image_new (wp->w.wl->xitk, NULL, 0, 32, 32);
 
   do {
     xitk_font_t *fs;
@@ -127,14 +124,11 @@ static void _browser_set_items (_browser_private_t *wp, const char * const *name
     fs = xitk_font_load_font (wp->w.wl->xitk, wp->visible.fontname.s);
     if (!fs)
       break;
-    xitk_image_set_font (dummy, fs);
     wp->items.width = xitk_font_get_string_length (fs, wp->items.names[max_index]);
     if (shortcuts && (max_index < wp->items.snum))
       wp->items.width += 10 + xitk_font_get_string_length (fs, wp->items.shortcuts[max_index]);
     xitk_font_unload_font (fs);
   } while (0);
-
-  xitk_image_free_image (&dummy);
 }
 
 static void _browser_set_hslider (_browser_private_t *wp, int reset) {
