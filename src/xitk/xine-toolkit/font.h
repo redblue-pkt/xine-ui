@@ -120,6 +120,6 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
 /*
  * Set font to GC.
  */
-void xitk_font_set_font(xitk_t *xitk, xitk_font_t *xtfs, GC gc);
+void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 
 #endif
