@@ -137,15 +137,6 @@ void xitk_window_restore_window_cursor (xitk_window_t *xwin) {
 /*
  *
  */
-
-xitk_register_key_t xitk_window_register_event_handler(const char *name, xitk_window_t *w,
-                                                       const xitk_event_cbs_t *cbs, void *user_data) {
-  return xitk_register_event_handler_ext(name, w, cbs, user_data, w->widget_list);
-}
-
-/*
- *
- */
 int xitk_is_window_iconified(Display *display, Window window) {
   unsigned char *prop_return = NULL;
   unsigned long  nitems_return;
