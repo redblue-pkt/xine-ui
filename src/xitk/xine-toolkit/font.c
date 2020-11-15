@@ -1125,9 +1125,10 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
 /*
  *
  */
-void xitk_font_set_font(xitk_t *xitk, xitk_font_t *xtfs, GC gc) {
+void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
 
-  ABORT_IF_NULL(xitk);
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
 #ifndef WITH_XFT
 # ifdef WITH_XMB
   if (xitk_get_cfg_num (xitk, XITK_XMB_ENABLE))
@@ -1135,9 +1136,9 @@ void xitk_font_set_font(xitk_t *xitk, xitk_font_t *xtfs, GC gc) {
   else
 # endif
     {
-      xitk_lock_display (xitk);
-      XSetFont(xitk_x11_get_display(xitk), gc, xtfs ? xitk_font_get_font_id(xtfs) : None);
-      xitk_unlock_display (xitk);
+      xitk_lock_display (xtfs->xitk);
+      XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
+      xitk_unlock_display (xtfs->xitk);
     }
 #else
   (void)gc;
