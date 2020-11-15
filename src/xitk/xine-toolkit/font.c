@@ -654,11 +654,15 @@ void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
 #ifndef WITH_XFT
 # ifdef WITH_XMB
   XSetForeground (xtfs->display, gc, color);
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
+  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
     XmbDrawString (xtfs->display, (Pixmap)img->beimg->id1, xtfs->fontset, gc, x, y, text, nbytes);
+  }
   else
 # endif
+  {
+    XSetFont(xtfs->display, gc, xtfs->font->fid);
     XDrawString (xtfs->display, (Pixmap)img->beimg->id1, gc, x, y, text, nbytes);
+  }
 #else
   {
     int           screen   = DefaultScreen( xtfs->display );
@@ -713,17 +717,6 @@ void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img, GC gc,
 }
 
 #ifndef WITH_XFT
-/*
- *
- */
-static Font xitk_font_get_font_id(xitk_font_t *xtfs) {
-
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font);
-
-  return xtfs->font->fid;
-}
-
 /*
  *
  */
@@ -1121,26 +1114,3 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
   return descent;
 }
 #endif
-
-/*
- *
- */
-void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
-
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->display);
-#ifndef WITH_XFT
-# ifdef WITH_XMB
-  if (xitk_get_cfg_num (xitk, XITK_XMB_ENABLE))
-    ;
-  else
-# endif
-    {
-      xitk_lock_display (xtfs->xitk);
-      XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
-      xitk_unlock_display (xtfs->xitk);
-    }
-#else
-  (void)gc;
-#endif
-}
