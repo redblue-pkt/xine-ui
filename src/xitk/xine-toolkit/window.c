@@ -554,7 +554,6 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   pix_bg = xitk_image_new (xitk, NULL, 0, width, height);
 
   fs = xitk_font_load_font(xitk, DEFAULT_BOLD_FONT_12);
-  xitk_image_set_font (bar, fs);
   xitk_font_string_extent(fs, (title && strlen(title)) ? title : "Window", &lbear, &rbear, &wid, &asc, &des);
 
   xitk_image_copy (xwin->bg_image, pix_bg);
@@ -618,10 +617,9 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 
   xitk_unlock_display (xitk);
 
-  xitk_image_draw_string (bar, (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT + asc + des) >> 1) - des,
+  xitk_image_draw_string (bar, fs, (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT + asc + des) >> 1) - des,
     title, strlen (title), bar_style ? colorwhite : xitk_color_db_get (xitk, (85 << 16) + (12 << 8) + 135));
 
-  xitk_image_set_font (bar, NULL);
   xitk_font_unload_font(fs);
 
   xitk_image_copy_rect (bar, pix_bg, 0, 0, width, TITLE_BAR_HEIGHT, 0, 0);

@@ -195,8 +195,6 @@ void xitk_image_free_image (xitk_image_t **src) {
   if (image->refs > 0)
     return;
 
-  xitk_image_set_font (image, NULL);
-
 #ifdef XINE_SARRAY_MODE_UNIQUE
   if (image->wl && image->wl->shared_images) {
     xine_sarray_remove_ptr (image->wl->shared_images, image);
@@ -308,7 +306,6 @@ xitk_image_t *xitk_image_new (xitk_t *xitk, const char *data, int dsize, int w, 
     XITK_FREE (img);
     return NULL;
   }
-  img->xtfs = NULL;
   img->wl = NULL;
   img->max_refs =
   img->refs     = 1;
@@ -1384,7 +1381,6 @@ static void _xitk_image_draw_frame (xitk_image_t *img,
     titlebuf = title;
 
     fs = xitk_font_load_font (xitk, (fontname ? fontname : DEFAULT_FONT_12));
-    xitk_image_set_font (img, fs);
     xitk_font_text_extent (fs, title, titlelen, &lbearing, &rbearing, NULL, &ascent, &descent);
 
     /* Limit title to frame width */
@@ -1427,35 +1423,21 @@ static void _xitk_image_draw_frame (xitk_image_t *img,
   _xitk_image_draw_rectangular_box (img, x, y + yoff, xstart, xstop, w, h - yoff, style | DRAW_DOUBLE | DRAW_LIGHT);
 
   if (title) {
-    xitk_image_draw_string (img, (x - lbearing + 6), (y + ascent), titlebuf, titlelen,
+    xitk_image_draw_string (img, fs, (x - lbearing + 6), (y + ascent), titlebuf, titlelen,
         xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR));
-    xitk_image_set_font (img, NULL);
     xitk_font_unload_font (fs);
   }
 
 }
 
-void xitk_image_set_font (xitk_image_t *img, xitk_font_t *xtfs) {
+void xitk_image_draw_string (xitk_image_t *img, xitk_font_t *xtfs, int x, int y, const char *text, size_t nbytes, int color) {
   if (!img)
     return;
   if (!img->beimg || !img->xitk)
     return;
 
-  if (img->xtfs == xtfs)
-    return;
-  img->xtfs = xtfs;
-  if (xtfs) {
-    _xitk_image_gc (img);
-  }
-}
-
-void xitk_image_draw_string (xitk_image_t *img, int x, int y, const char *text, size_t nbytes, int color) {
-  if (!img)
-    return;
-  if (!img->beimg || !img->xitk || !img->xtfs)
-    return;
-
-  xitk_font_draw_string (img->xtfs, img, img->gc, x, y, text, nbytes, color);
+  _xitk_image_gc (img);
+  xitk_font_draw_string (xtfs, img, img->gc, x, y, text, nbytes, color);
 }
 
 /*

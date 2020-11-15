@@ -501,7 +501,6 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 	unsigned int  cfg, cbg;
 
         fs = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
-        xitk_image_set_font (bg, fs);
 
 	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
@@ -510,10 +509,9 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
         xitk_image_fill_rectangle (bg, 1, 1, wwidth, 20, cbg);
 
-        xitk_image_draw_string (bg, 5, 1 + ((20 + asc + des) >> 1) - des,
+        xitk_image_draw_string (bg, fs, 5, 1 + ((20 + asc + des) >> 1) - des,
           me->menu_entry.menu, strlen (me->menu_entry.menu), cfg);
 
-        xitk_image_set_font (bg, NULL);
 	xitk_font_unload_font(fs);
 
 	yy += 20;

@@ -1011,8 +1011,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs);
 /*
  *
  */
-void xitk_image_set_font (xitk_image_t *img, xitk_font_t *xtfs);
-void xitk_image_draw_string (xitk_image_t *img, int x, int y, const char *text, size_t nbytes, int color);
+void xitk_image_draw_string (xitk_image_t *img, xitk_font_t *xtfs, int x, int y, const char *text, size_t nbytes, int color);
 
 /*
  *
