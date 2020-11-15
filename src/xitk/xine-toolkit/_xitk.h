@@ -212,7 +212,6 @@ struct xitk_image_s {
   /* image private */
   xitk_t *xitk;
   xitk_widget_list_t *wl;
-  xitk_font_t *xtfs;
   GC gc;
   int refs, max_refs;
   char key[32];

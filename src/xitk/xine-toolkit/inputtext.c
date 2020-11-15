@@ -513,8 +513,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->text.temp_img,
       src_x, 0, xsize, ysize, 0, 0);
     if (fs) {
-      xitk_image_set_font (wp->text.temp_img.image, fs);
-      xitk_image_draw_string (wp->text.temp_img.image,
+      xitk_image_draw_string (wp->text.temp_img.image, fs,
         ysize + wp->text.box_start + wp->text.shift,
         ((ysize + asc + des + yoff) >> 1) - des,
         wp->text.buf + wp->text.draw_start,
@@ -553,7 +552,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   }
 
   if (fs) {
-    xitk_image_set_font (wp->text.temp_img.image, NULL);
     xitk_font_unload_font (fs);
   }
 

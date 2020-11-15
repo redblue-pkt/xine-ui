@@ -280,16 +280,13 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
       if (fs && bg) {
         int lbear, rbear, wid, asc, des;
 
-        xitk_image_set_font (bg, fs);
         xitk_font_string_extent (fs, wp->label.s, &lbear, &rbear, &wid, &asc, &des);
 
         xitk_image_copy_rect (font, bg, 0, 0, wp->font->width, wp->font->height, 0, 0);
-        xitk_image_draw_string (bg, 2, ((wp->font->height + asc + des) >> 1) - des,
+        xitk_image_draw_string (bg, fs, 2, ((wp->font->height + asc + des) >> 1) - des,
           wp->label.s, wp->label_len, xitk_get_cfg_num (wp->w.wl->xitk, XITK_BLACK_COLOR));
         xitk_image_draw_image (wp->w.wl, bg,
           event->x - wp->w.x, event->y - wp->w.y, event->width, event->height, event->x, event->y, 0);
-
-        xitk_image_set_font (bg, NULL);
       }
       xitk_image_free_image (&bg);
       xitk_font_unload_font (fs);

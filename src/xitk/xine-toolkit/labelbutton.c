@@ -164,7 +164,6 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
   fs = xitk_font_load_font (wp->w.wl->xitk, wp->font.s[0] ? wp->font.s : xitk_get_cfg_string (wp->w.wl->xitk, XITK_SYSTEM_FONT));
   if (!fs)
     XITK_DIE ("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-  xitk_image_set_font (pix, fs);
 
   slen = strlen (wp->label.s);
   xitk_font_text_extent (fs, wp->label.s[0] ? wp->label.s : "Button", wp->label.s[0] ? slen : 6,
@@ -208,7 +207,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
     int xx = wp->align == ALIGN_CENTER ? ((xsize - width - xoff) >> 1)
            : wp->align == ALIGN_RIGHT  ? (xsize - width - (state != _LB_CLICK ? 5 : 1))
            : /* wp->align == ALIGN_LEFT */ (state != _LB_CLICK ? 1 : 5);
-    xitk_image_draw_string (pix, xx + wp->label_offset, origin, wp->label.s, slen, fg);
+    xitk_image_draw_string (pix, fs, xx + wp->label_offset, origin, wp->label.s, slen, fg);
   }
 
   short_font = fs;
@@ -218,15 +217,13 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
       short_font = xitk_font_load_font (wp->w.wl->xitk, wp->shortcut_font.s);
     if (!short_font)
       short_font = fs;
-    xitk_image_set_font (pix, short_font);
     if (shortcut_pos == 0) {
       xitk_font_text_extent (short_font, wp->shortcut_label.s, slen, &lbear, &rbear, &width, &asc, &des);
       shortcut_pos = xsize - 5 - width;
     }
-    xitk_image_draw_string (pix, (((state != _LB_CLICK) ? 1 : 5)) + shortcut_pos, origin, wp->shortcut_label.s, slen, fg);
+    xitk_image_draw_string (pix, short_font, (((state != _LB_CLICK) ? 1 : 5)) + shortcut_pos, origin, wp->shortcut_label.s, slen, fg);
   }
 
-  xitk_image_set_font (pix, NULL);
   if (short_font != fs)
     xitk_font_unload_font (short_font);
   xitk_font_unload_font (fs);
