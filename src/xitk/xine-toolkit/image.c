@@ -24,16 +24,11 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <X11/Xlib.h>
-#include <X11/Intrinsic.h>
-#include <errno.h>
+#include <string.h>
 
 #include <xine/sorted_array.h>
 
-#include "xitk/Imlib-light/Imlib.h"
-
 #include "_xitk.h"
-#include "xitk_x11.h"
 
 #include "utils.h"
 #include "font.h"
@@ -44,15 +39,6 @@ typedef struct {
   char          *skin_element_name;
   xitk_image_t  *skin;
 } _image_private_t;
-
-#define CHECK_IMAGE(p)                          \
-  do {                                          \
-    ABORT_IF_NULL((p));                         \
-    ABORT_IF_NULL((p)->image);                  \
-    ABORT_IF_NULL((p)->image->imlibdata);       \
-  } while (0)
-
-int xitk_x_error = 0;
 
 static int _xitk_pix_font_find_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
   int range, n = 0;
@@ -1820,8 +1806,4 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
   XITK_CHECK_CONSTITENCY(im);
 
   return _xitk_image_create (wl, im, x, y, NULL, image);
-}
-
-int xitk_image_quality (xitk_t *xitk, int qual) {
-  return Imlib_gfx_quality (xitk->imlibdata, qual);
 }

@@ -741,6 +741,8 @@ static int _x_ignoring_error_handler(Display *display, XErrorEvent *xevent) {
 }
 #endif
 
+int xitk_x_error;
+
 static int _x_error_handler(Display *display, XErrorEvent *xevent) {
   char buffer[2048];
 
@@ -2311,6 +2313,9 @@ Colormap xitk_x11_get_colormap(xitk_t *xitk) {
   return Imlib_get_colormap(xitk->imlibdata);
 }
 
+int xitk_image_quality (xitk_t *xitk, int qual) {
+  return Imlib_gfx_quality (xitk->imlibdata, qual);
+}
 void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
   __xitk_t *_xitk;
   int install_colormap;
