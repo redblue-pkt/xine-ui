@@ -584,7 +584,11 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     xitk_window_set_role (xwin, XITK_WR_SUBMENU);
     xitk_window_set_transient_for_win (xwin, node->parent->menu_window->xwin);
   }
-  mw->key = xitk_be_register_event_handler ("xitk menu", mw->xwin, NULL, NULL, mw, NULL, NULL);
+  {
+    char name[32] = "xitk_menu_0";
+    name[10] += wp->num_open;
+    mw->key = xitk_be_register_event_handler (name, mw->xwin, NULL, NULL, mw, NULL, NULL);
+  }
 
   xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (xwin);

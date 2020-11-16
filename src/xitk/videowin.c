@@ -2050,6 +2050,8 @@ void video_window_exit (xui_vwin_t *vwin) {
   xine_config_unregister_callbacks (vwin->gui->xine, NULL, NULL, vwin, sizeof (*vwin));
 #endif
 
+  pthread_mutex_lock (&vwin->mutex);
+  vwin->second_display_running = 0;
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
   if (vwin->gui->XF86VidMode_fullscreen) {
@@ -2059,25 +2061,22 @@ void video_window_exit (xui_vwin_t *vwin) {
     vwin->x_unlock_display (vwin->video_display);
   }
 #endif
+  pthread_mutex_unlock (&vwin->mutex);
 
-  vwin->second_display_running = 0;
   {
-    union {
-      XExposeEvent expose;
-      XEvent event;
-    } event;
+    XEvent event;
 
     vwin->x_lock_display (vwin->video_display);
     XClearWindow (vwin->video_display, vwin->video_window);
-    event.expose.type       = Expose;
-    event.expose.send_event = True;
-    event.expose.display    = vwin->video_display;
-    event.expose.window     = vwin->video_window;
-    event.expose.x          = 0;
-    event.expose.y          = 0;
-    event.expose.width      = vwin->video_width;
-    event.expose.height     = vwin->video_height;
-    XSendEvent (vwin->video_display, vwin->video_window, False, Expose, &event.event);
+    event.xexpose.type       = Expose;
+    event.xexpose.send_event = True;
+    event.xexpose.display    = vwin->video_display;
+    event.xexpose.window     = vwin->video_window;
+    event.xexpose.x          = 0;
+    event.xexpose.y          = 0;
+    event.xexpose.width      = vwin->video_width;
+    event.xexpose.height     = vwin->video_height;
+    XSendEvent (vwin->video_display, vwin->video_window, False, Expose, &event);
     vwin->x_unlock_display (vwin->video_display);
   }
 
@@ -2500,14 +2499,18 @@ static void register_event_handler(xui_vwin_t *vwin)
 static void *second_display_loop (void *data) {
   xui_vwin_t *vwin = data;
 
+  pthread_mutex_lock (&vwin->mutex);
   while (vwin->second_display_running) {
     xitk_be_event_t event;
 
-    if (vwin->video_be_display->next_event (vwin->video_be_display, &event, vwin->video_be_window, XITK_EV_ANY, 20)) {
-      if (event.window)
+    pthread_mutex_unlock (&vwin->mutex);
+    if (vwin->video_be_display->next_event (vwin->video_be_display, &event, NULL, XITK_EV_ANY, 33)) {
+      if (event.window && (vwin->video_be_window == event.window))
         _vwin_handle_be_event (vwin, &event);
     }
+    pthread_mutex_lock (&vwin->mutex);
   }
+  pthread_mutex_unlock (&vwin->mutex);
 
   return NULL;
 }

@@ -139,12 +139,18 @@ static void *_tips_loop_thread (void *data) {
 
           /* Note: disp_w/3 is max. width, returned image with ALIGN_LEFT will be as small as possible */
           image = xitk_image_create_image_with_colors_from_string (xitk,
-            DEFAULT_FONT_10, disp_w / 3, ALIGN_LEFT, tips->widget->tips_string, cfore, cback);
+            DEFAULT_FONT_10, disp_w / 3, x_margin >> 1, y_margin >> 1, ALIGN_LEFT, tips->widget->tips_string, cfore, cback);
+          if (!image) {
+            state = TIPS_IDLE;
+            tips->widget = tips->new_widget = NULL;
+            break;
+          }
 
           /* Create the tips window, horizontally centered from parent widget */
           /* If necessary, adjust position to display it fully on screen      */
-          w = image->width + x_margin;
-          h = image->height + y_margin;
+          w = image->width;
+          h = image->height;
+          xitk_image_draw_rectangle (image, 0, 0, w, h, cfore);
           x -= (w - tips->widget->width) >> 1;
           y += tips->widget->height + bottom_gap;
           if (x > disp_w - w)
@@ -157,23 +163,12 @@ static void *_tips_loop_thread (void *data) {
             /*                                           v                      */
             y -= tips->widget->height + h + bottom_gap + 1;
           /* No further alternative to y-position the tips (just either below or above widget) */
-          xwin = xitk_window_create_simple_window_ext (xitk, x, y, w, h, NULL, NULL, NULL, 1, 0, NULL);
-          {
-            xitk_image_t *bg;
-            int bg_width, bg_height;
-
-            bg = xitk_window_get_background_image (xwin);
-            bg_width = xitk_image_width (bg);
-            bg_height = xitk_image_height (bg);
-
-            xitk_image_draw_rectangle (bg, 0, 0, bg_width - 1, bg_height - 1, cfore);
-            xitk_image_fill_rectangle (bg, 1, 1, bg_width - 2, bg_height - 2, cback);
-            xitk_image_copy_rect (image, bg, 0, 0, image->width, image->height,
-              (bg_width - image->width) >> 1, (bg_height - image->height) >> 1);
-
-            xitk_window_set_background_image (xwin, bg);
-
+          xwin = xitk_window_create_window_ext (xitk, x, y, w, h, "tips", NULL, NULL, 1, 0, NULL, image);
+          if (!xwin) {
             xitk_image_free_image (&image);
+            state = TIPS_IDLE;
+            tips->widget = tips->new_widget = NULL;
+            break;
           }
           pthread_mutex_unlock (&tips->mutex);
           xitk_window_set_role (xwin, XITK_WR_SUBMENU);
