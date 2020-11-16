@@ -1202,7 +1202,7 @@ static uint32_t _xitk_x11_window_merge_flags (uint32_t f1, uint32_t f2) {
   mask = f2 & 0xffff0000;
   res = f1 | mask;
   mask >>= 16;
-  res = (f1 & ~mask) | (f2 & mask);
+  res = (res & ~mask) | (f2 & mask);
   return res;
 }
 
@@ -1257,7 +1257,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
 
   have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN;
   if (d->be->be.verbosity >= 2)
-    _xitk_x11_window_debug_flags ("before", win->title, oldflags);
+    _xitk_x11_window_debug_flags ("before", win->name, oldflags);
 
   newflags = (oldflags & ~mask) | (mask_and_value & mask);
   diff = newflags ^ oldflags;
@@ -1387,7 +1387,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   }
 
   if (d->be->be.verbosity >= 2)
-    _xitk_x11_window_debug_flags ("after", win->title, newflags);
+    _xitk_x11_window_debug_flags ("after", win->name, newflags);
   win->props[XITK_X11_WT_WIN_FLAGS].value = newflags | (have << 16);
 }
 
@@ -1642,8 +1642,7 @@ static void xitk_x11_window_delete (xitk_be_window_t **_win) {
   }
 
   if (d->be->be.verbosity >= 2)
-    printf ("xitk.x11.window.delete (%s, %p).\n",
-      win ? (const char *)win->props[XITK_X11_WT_NAME].value : "<unknown>", (void *)win);
+    printf ("xitk.x11.window.delete (%s, %p).\n", (const char *)win->props[XITK_X11_WT_NAME].value, (void *)win);
 
   pthread_mutex_lock (&d->mutex);
   xitk_dnode_remove (&win->w.node);
@@ -1775,7 +1774,8 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
        * BTW. this is not very useful with kwin4 because
        * 1. window is always on top of the world,
        * 2. window may be moved over the screen border, and
-       * 3. while window has focus, alt-tab reports "no windows available". */
+       * 3. while window has focus, alt-tab reports "no windows available".
+       * we use this for tips only, which are never focused or moved. */
       attr.override_redirect = (want_flags & XITK_WINF_OVERRIDE_REDIRECT) ? True : False;
       win->props[XITK_X11_WT_WIN_FLAGS].value |= want_flags & XITK_WINF_OVERRIDE_REDIRECT;
       want_flags &= ~(XITK_WINF_OVERRIDE_REDIRECT << 16);

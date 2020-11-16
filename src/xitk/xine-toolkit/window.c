@@ -470,7 +470,6 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
       {XITK_TAG_RES_CLASS, (uintptr_t)res_class},
       {XITK_TAG_WIDTH, width},
       {XITK_TAG_HEIGHT, height},
-      {XITK_TAG_WIN_FLAGS, 0},
       {XITK_TAG_END, 0}
     };
     xwin->bewin = xitk->d->window_new (xitk->d, tags);

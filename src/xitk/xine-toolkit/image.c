@@ -400,11 +400,9 @@ void xitk_image_fill_rectangle (xitk_image_t *img, int x, int y, int w, int h, u
 /*
  *
  */
-xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
-                                                              const char *fontname,
-                                                              int width, int align, const char *str,
-                                                              unsigned int foreground,
-                                                              unsigned int background) {
+xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
+  const char *fontname, int width, int pad_x, int pad_y, int align, const char *str,
+  unsigned int foreground, unsigned int background) {
   xitk_image_t   *image;
   xitk_font_t    *fs;
   int             length, height, lbearing, rbearing, ascent, descent, linel, linew, wlinew, lastws;
@@ -420,6 +418,8 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(fontname);
   ABORT_IF_NULL(str);
+
+  width -= 2 * pad_x;
   ABORT_IF_NOT_COND(width > 0);
 
   /* Creating an image from an empty string would cause an abort with failed */
@@ -546,22 +546,22 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
   if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
     width = MIN(maxw, width);
 
-  image = xitk_image_new (xitk, NULL, 0, width, (height + add_line_spc) * numlines - add_line_spc);
+  image = xitk_image_new (xitk, NULL, 0, width + 2 * pad_x, (height + add_line_spc) * numlines - add_line_spc + 2 * pad_y);
   xitk_image_fill_rectangle (image, 0, 0, image->width, image->height, background);
 
   { /* Draw string in image */
-    int i, y, x = 0;
+    int i, y;
 
-    for(y = ascent, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
+    for (y = ascent + pad_y, i = 0; i < numlines; i++, y += (height + add_line_spc)) {
+      int x;
+
       xitk_font_string_extent(fs, lines[i], &lbearing, &rbearing, NULL, NULL, NULL);
       length = rbearing - lbearing;
 
-      if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
-        x = 0;
-      else if(align == ALIGN_CENTER)
-        x = (width - length) >> 1;
-      else if(align == ALIGN_RIGHT)
-        x = (width - length);
+      x = align == ALIGN_CENTER ? (width - length) >> 1
+        : align == ALIGN_RIGHT ? width - length
+        : 0;
+      x += pad_x;
 
       xitk_font_draw_string (fs, image, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
                                         /*   ^^^^^^^^ Adjust to start of ink */
@@ -575,7 +575,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
 xitk_image_t *xitk_image_create_image_from_string (xitk_t *xitk, const char *fontname,
     int width, int align, const char *str) {
 
-  return xitk_image_create_image_with_colors_from_string (xitk, fontname, width, align, str,
+  return xitk_image_create_image_with_colors_from_string (xitk, fontname, width, 0, 0, align, str,
     xitk_get_cfg_num (xitk, XITK_BLACK_COLOR), xitk_get_cfg_num (xitk, XITK_BG_COLOR));
 }
 

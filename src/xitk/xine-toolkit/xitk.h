@@ -1054,11 +1054,9 @@ void xitk_color_db_flush (xitk_t *_xitk);
 /**
  * xitk image
  */
-xitk_image_t *xitk_image_create_image_with_colors_from_string(xitk_t *xitk,
-                                                              const char *fontname,
-                                                              int width, int align, const char *str,
-							      unsigned int foreground,
-							      unsigned int background);
+xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
+  const char *fontname, int width, int pad_x, int pad_y, int align, const char *str,
+  unsigned int foreground, unsigned int background);
 xitk_image_t *xitk_image_create_image_from_string(xitk_t *xitk,
                                                   const char *fontname,
                                                   int width, int align, const char *str);
