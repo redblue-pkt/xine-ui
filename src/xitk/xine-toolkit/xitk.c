@@ -74,7 +74,6 @@
 #include "widget.h"
 #include "menu.h"
 #include "combo.h"
-#include "cursors.h"
 #include "dnd.h"
 #include "font.h"
 
@@ -2534,7 +2533,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
 
-  xitk->x.cursors = xitk_x11_cursors_init (&xitk->x);
   xitk->x.tips = xitk_tips_new ();
 
   return &xitk->x;
@@ -2676,8 +2674,6 @@ void xitk_free(xitk_t **p) {
    */
   xitk_lock_display (&xitk->x);
   xitk_unlock_display (&xitk->x);
-
-  xitk_x11_cursors_deinit (&xitk->x.cursors);
 
   Imlib_destroy(&xitk->x.imlibdata);
 

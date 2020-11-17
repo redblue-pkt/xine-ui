@@ -1368,23 +1368,23 @@ void video_window_set_cursor (xui_vwin_t *vwin, int cursor) {
   if (vwin && cursor) {
     vwin->current_cursor = cursor;
 
-# if 0
-    if (vwin->cursor_visible) {
+    if (vwin->video_be_window && vwin->cursor_visible) {
+      xitk_tagitem_t tags[] = { {XITK_TAG_CURSOR, ~(uintptr_t)0}, {XITK_TAG_END, 0} };
       vwin->cursor_timer = 0;
       switch (vwin->current_cursor) {
       case 0:
-        xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_invisible);
+        tags[0].value = xitk_cursor_invisible;
 	break;
       case CURSOR_ARROW:
-        xitk_cursors_restore_window_cursor (vwin->video_display, vwin->video_window);
 	break;
       case CURSOR_HAND:
-        xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_hand2);
+        tags[0].value = xitk_cursor_hand2;
 	break;
       }
+      vwin->video_be_window->set_props (vwin->video_be_window, tags);
+      return;
     }
-# endif
-    /* XXX XXX does not work with multiple displays ! */
+
     if (vwin->cursor_visible) {
       vwin->cursor_timer = 0;
       switch (vwin->current_cursor) {
@@ -1418,25 +1418,23 @@ void video_window_set_cursor_visibility (xui_vwin_t *vwin, int show_cursor) {
   if (show_cursor)
     vwin->cursor_timer = 0;
 
-# if 0
-  if (show_cursor) {
-    if (vwin->current_cursor == CURSOR_ARROW)
-      xitk_cursors_restore_window_cursor (vwin->video_display, vwin->video_window);
+  if (vwin->video_be_window) {
+    xitk_tagitem_t tags[] = { {XITK_TAG_CURSOR, ~(uintptr_t)0}, {XITK_TAG_END, 0} };
+    if (!show_cursor)
+      tags[0].value = xitk_cursor_invisible;
+    else if (vwin->current_cursor != CURSOR_ARROW)
+      tags[0].value = xitk_cursor_hand1;
+    vwin->video_be_window->set_props (vwin->video_be_window, tags);
+  } else {
+    if (show_cursor) {
+      if (vwin->current_cursor == CURSOR_ARROW)
+        xitk_window_restore_window_cursor (vwin->wrapped_window);
+      else
+        xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_hand1);
+    }
     else
-      xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_hand1);
+      xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_invisible);
   }
-  else
-    xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_invisible);
-# endif
-  /* XXX XXX does not work with multiple displays ! */
-  if (show_cursor) {
-    if (vwin->current_cursor == CURSOR_ARROW)
-      xitk_window_restore_window_cursor (vwin->wrapped_window);
-    else
-      xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_hand1);
-  }
-  else
-    xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_invisible);
 }
 
 /*

@@ -28,7 +28,7 @@
 #include "cursors.h"
 
 #include "_xitk.h"
-#include "xitk_x11.h"
+#include "_backend.h"
 
 #define MAX_CURSORS  xitk_cursor_num_glyphs
 
@@ -677,8 +677,17 @@ struct cursors_s {
   Pixmap          mask;
 };
 
-static void _cursors_create_cursor(Display *display, struct cursors_s *cursor, const struct cursors_init_s *cursor_init) {
+struct xitk_x11_cursors_s {
+  Display *display;
+  xitk_be_display_t *d;
+  struct cursors_s cursors[sizeof(cursors_init)/sizeof(cursors_init[0])];
+};
+
+static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
   XColor  bg, fg;
+  Display *display = c->display;
+  struct cursors_s *cursor = &c->cursors[idx];
+  const struct cursors_init_s *cursor_init = &cursors_init[idx];
 
   bg.red   = 255 << 8;
   bg.green = 255 << 8;
@@ -687,7 +696,8 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor, c
   fg.green = 0;
   fg.blue  = 0;
 
-  XLOCK (xitk_x_lock_display, display);
+  c->d->lock(c->d);
+
   switch (cursor_init->xitk_shape) {
 
   case xitk_cursor_invisible:
@@ -866,16 +876,11 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor, c
     cursor->cursor = XCreateFontCursor(display, cursor_init->x_shape);
     break;
   }
-  XUNLOCK (xitk_x_unlock_display, display);
+
+  c->d->unlock(c->d);
 }
 
-struct xitk_x11_cursors_s {
-  Display *display;
-
-  struct cursors_s cursors[sizeof(cursors_init)/sizeof(cursors_init[0])];
-};
-
-xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk) {
+xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk, xitk_be_display_t *d, Display *display) {
   int   i;
   int   xitk_cursors = xitk_get_cfg_num (xitk, XITK_CURSORS_FEATURE);
   xitk_x11_cursors_t *c;
@@ -884,10 +889,11 @@ xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk) {
   if (!c)
     return NULL;
 
-  c->display = xitk_x11_get_display(xitk);
+  c->display = display;
+  c->d       = d;
 
   /* Transparent cursor isn't a valid X cursor */
-  _cursors_create_cursor(c->display, &c->cursors[0], &cursors_init[0]);
+  _cursors_create_cursor(c, 0);
 
   /* XXX create cursor on demand ? */
 
@@ -895,17 +901,17 @@ xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk) {
 
     if(xitk_cursors) {
       if (cursors_init[i].embedded == X_CURSOR) {
-        xitk_lock_display (xitk);
+        c->d->lock(c->d);
         c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
-        xitk_unlock_display (xitk);
+        c->d->unlock(c->d);
       }
       else
-        _cursors_create_cursor(c->display, &c->cursors[i], &cursors_init[i]);
+        _cursors_create_cursor(c, i);
     }
     else {
-      xitk_lock_display (xitk);
+      c->d->lock(c->d);
       c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
-      xitk_unlock_display (xitk);
+      c->d->unlock(c->d);
     }
   }
 
@@ -920,7 +926,7 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
     return;
   *p = NULL;
 
-  XLOCK (xitk_x_unlock_display, c->display);
+  c->d->lock(c->d);
 
   for(i = 0; i < MAX_CURSORS; i++) {
     if (c->cursors[i].cursor != None)
@@ -931,7 +937,7 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
       XFreePixmap(c->display, c->cursors[i].mask);
   }
 
-  XUNLOCK (xitk_x_unlock_display, c->display);
+  c->d->unlock(c->d);
 
   free(c);
 }
@@ -939,18 +945,18 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
 /* Public */
 void xitk_x11_cursors_define_window_cursor(xitk_x11_cursors_t *c, Window window, xitk_cursors_t cursor) {
   if (/*c &&*/ window != None && cursor >= 0 && cursor < sizeof(c->cursors)/sizeof(c->cursors[0])) {
-    XLOCK (xitk_x_unlock_display, c->display);
+    c->d->lock(c->d);
     XDefineCursor(c->display, window, c->cursors[cursor].cursor);
     XSync(c->display, False);
-    XUNLOCK (xitk_x_unlock_display, c->display);
+    c->d->unlock(c->d);
   }
 }
 
 void xitk_x11_cursors_restore_window_cursor(xitk_x11_cursors_t *c, Window window) {
   if (/*c && */window != None) {
-    XLOCK (xitk_x_lock_display, c->display);
+    c->d->lock(c->d);
     XUndefineCursor(c->display, window);
     XSync(c->display, False);
-    XUNLOCK (xitk_x_unlock_display, c->display);
+    c->d->unlock(c->d);
   }
 }
