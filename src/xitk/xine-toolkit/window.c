@@ -559,12 +559,10 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     unsigned int colorblue;
 
     colorblue = xitk_color_db_get (xitk, bl);
-    xitk_lock_display (xitk);
     for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
       xitk_image_draw_line (bar, 0, s, width, s, colorblue);
       colorblue = xitk_color_db_get (xitk, bl);
     }
-    xitk_unlock_display (xitk);
   }
   else {
     int s;
@@ -576,7 +574,6 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
     xitk_image_fill_rectangle (bar, 0, 0, width, TITLE_BAR_HEIGHT, colorgray);
     xitk_image_draw_rectangular_box (bar, 2, 2, width - 5, TITLE_BAR_HEIGHT - 4, DRAW_INNER);
 
-    xitk_lock_display (xitk);
     for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {
       xitk_image_draw_line (bar, 5, s, (width - 8), s, c);
       xitk_image_draw_line (bar, 5, s+1, (width - 8), s + 1, cd);
@@ -584,15 +581,11 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
 
     xitk_image_fill_rectangle (bar, ((width - wid) - TITLE_BAR_HEIGHT) - 10, 6,
       wid + 20, TITLE_BAR_HEIGHT - 1 - 8, colorgray);
-    xitk_unlock_display (xitk);
   }
 
-  xitk_lock_display (xitk);
   xitk_image_draw_line (bar, 0, 0, width, 0, colorwhite);
   xitk_image_draw_line (bar, 0, 0, 0, TITLE_BAR_HEIGHT - 1, colorwhite);
-  xitk_unlock_display (xitk);
 
-  xitk_lock_display (xitk);
 
   xitk_image_draw_line (bar, width - 1, 0, width - 1, TITLE_BAR_HEIGHT - 1, colorblack);
   xitk_image_draw_line (bar, 2, TITLE_BAR_HEIGHT - 1, width - 2, TITLE_BAR_HEIGHT - 1, colorblack);
@@ -605,7 +598,6 @@ xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title,
   xitk_image_draw_line (pix_bg, width - 2, 0, width - 2, height - 2, colordgray);
   xitk_image_draw_line (pix_bg, 2, height - 2, width - 2, height - 2, colordgray);
 
-  xitk_unlock_display (xitk);
 
   xitk_image_draw_string (bar, fs, (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT + asc + des) >> 1) - des,
     title, strlen (title), bar_style ? colorwhite : xitk_color_db_get (xitk, (85 << 16) + (12 << 8) + 135));
