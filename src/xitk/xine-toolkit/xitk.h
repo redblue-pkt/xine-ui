@@ -196,21 +196,6 @@ typedef void (*xitk_map_notify_callback_t)(void *data);
 typedef void (*xitk_expose_notify_callback_t)(void *data, const xitk_expose_event_t *);
 typedef void (*xitk_destroy_notify_callback_t)(void *);
 
-typedef struct {
-  xitk_key_event_callback_t    key_cb;
-  xitk_button_event_callback_t btn_cb;
-  xitk_motion_event_callback_t motion_cb;
-
-  widget_newpos_callback_t     pos_cb;
-  xitk_dnd_callback_t          dnd_cb;
-
-  xitk_configure_notify_callback_t configure_notify_cb;
-  xitk_map_notify_callback_t       map_notify_cb;
-  xitk_expose_notify_callback_t    expose_notify_cb;
-  xitk_destroy_notify_callback_t   destroy_notify_cb;
-
-} xitk_event_cbs_t;
-
 /*
  *
  */
@@ -844,11 +829,6 @@ unsigned long xitk_get_widget_tips_timeout(xitk_widget_t *w);
  *
  */
 void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout);
-
-/**
- *
- */
-int xitk_is_mouse_over_widget(xitk_widget_t *w);
 
 /**
  *

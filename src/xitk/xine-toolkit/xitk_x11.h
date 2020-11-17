@@ -35,8 +35,6 @@ typedef struct xitk_x11_s xitk_x11_t;
 xitk_x11_t *xitk_x11_new (xitk_t *xitk);
 void xitk_x11_delete (xitk_x11_t *xitk_x11);
 
-int xitk_x11_keyevent_2_string (xitk_x11_t *xitk_x11, XEvent *event, KeySym *ksym, int *modifier, char *buf, int bsize);
-
 extern void (*xitk_x_lock_display) (Display *display);
 extern void (*xitk_x_unlock_display) (Display *display);
 
@@ -92,7 +90,6 @@ void xitk_unset_ewmh_fullscreen(Window window);
  *
  */
 
-int xitk_x11_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
 void xitk_try_to_set_input_focus(Display *display, Window window);
 void xitk_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
 int xitk_is_window_iconified(Display *display, Window window);
@@ -121,8 +118,6 @@ Colormap    xitk_x11_get_colormap(xitk_t *);
 
 xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
-
-void xitk_x11_translate_xevent(XEvent *xev, const xitk_event_cbs_t *cbs, void *user_data);
 
 Window xitk_window_get_window(xitk_window_t *w);
 void xitk_window_set_transient_for(xitk_window_t *xwin, Window win);
@@ -195,4 +190,3 @@ static int displ;
 #endif
 
 #endif /* _XITK_X11_H_ */
-

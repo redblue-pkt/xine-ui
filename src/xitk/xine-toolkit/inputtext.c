@@ -380,9 +380,6 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.inputtext.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (wp->w.enable && (!wp->cursor_focus)
-    && (xitk_is_mouse_over_widget (&wp->w)))
-      _cursor_focus (wp, 1);
 
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
@@ -581,8 +578,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
     if (wp->w.have_focus == FOCUS_LOST)
       wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;
 
-    if (wp->w.enable && (!wp->cursor_focus)
-       && (xitk_is_mouse_over_widget (&wp->w)))
+    if (wp->w.enable && !wp->cursor_focus)
       _cursor_focus (wp, 1);
 
     {
