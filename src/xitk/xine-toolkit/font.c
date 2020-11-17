@@ -449,9 +449,9 @@ static xitk_font_t *xitk_cache_remove_item(xitk_font_cache_t *font_cache, size_t
 /*
  * search the font of given display in the cache, remove it from the cache
  */
-static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, Display *display, const char *name) {
+static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, const char *name) {
   int     left, right;
-  size_t  i, j;
+  size_t  i;
   int     cmp;
 
   if (!font_cache->n)
@@ -470,35 +470,8 @@ static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, Display 
     else if (cmp > 0)
       left = i + 1;
     else {
-      /* found right name, search right display */
-      /* forward */
-      j = i;
-      while(1) {
-        if (font_cache->items[j].font->display == display)
-          return xitk_cache_remove_item(font_cache, j);
-
-	if(!j)
-	  break;
-
-        cmp = strcmp(name, font_cache->items[--j].font->name);
-      }
-      /* backward */
-      j = i + 1;
-
-      while (j < font_cache->n) {
-        cmp = strcmp(name, font_cache->items[j].font->name);
-
-	if(cmp != 0)
-	  return NULL;
-
-        if (font_cache->items[j].font->display == display)
-          return xitk_cache_remove_item(font_cache, j);
-
-	j++;
-      }
-
-      /* not in given display */
-      return NULL;
+      /* found right name */
+      return xitk_cache_remove_item(font_cache, i);
     }
   }
 
@@ -509,10 +482,10 @@ static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, Display 
 /*
  * search the font in the list of loaded fonts
  */
-static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache, Display *display, const char *name) {
+static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache, const char *name) {
   xitk_font_list_item_t *item = (xitk_font_list_item_t *)font_cache->loaded.head.next;
   while (item->node.next) {
-    if ((strcmp(name, item->font->name) == 0) && (display == item->font->display))
+    if (strcmp(name, item->font->name) == 0)
       return item;
     item = (xitk_font_list_item_t *)item->node.next;
   }
@@ -539,9 +512,9 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   pthread_mutex_lock(&font_cache->mutex);
 
   /* quick search in the cache of unloaded fonts */
-  if ((xtfs = xitk_cache_take_item(font_cache, display, font)) == NULL) {
+  if ((xtfs = xitk_cache_take_item(font_cache, font)) == NULL) {
     /* search in the list of loaded fonts */
-    if((list_item = cache_get_from_list(font_cache, display, font)) != NULL) {
+    if((list_item = cache_get_from_list(font_cache, font)) != NULL) {
       list_item->number++;
       pthread_mutex_unlock(&font_cache->mutex);
       return list_item->font;
@@ -610,7 +583,6 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
   xitk_font_list_item_t *item;
 
   ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->display);
   ABORT_IF_NULL(xtfs->font_cache);
 #ifndef WITH_XFT
 #ifdef WITH_XMB
@@ -623,7 +595,7 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
 
   pthread_mutex_lock(&xtfs->font_cache->mutex);
   /* search the font in the list */
-  item = cache_get_from_list(xtfs->font_cache, xtfs->display, xtfs->name);
+  item = cache_get_from_list(xtfs->font_cache, xtfs->name);
   /* it must be there */
   ABORT_IF_NULL(item);
 
