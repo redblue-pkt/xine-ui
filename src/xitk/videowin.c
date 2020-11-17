@@ -32,7 +32,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
@@ -1369,6 +1368,7 @@ void video_window_set_cursor (xui_vwin_t *vwin, int cursor) {
   if (vwin && cursor) {
     vwin->current_cursor = cursor;
 
+# if 0
     if (vwin->cursor_visible) {
       vwin->cursor_timer = 0;
       switch (vwin->current_cursor) {
@@ -1381,6 +1381,22 @@ void video_window_set_cursor (xui_vwin_t *vwin, int cursor) {
       case CURSOR_HAND:
         xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_hand2);
 	break;
+      }
+    }
+# endif
+    /* XXX XXX does not work with multiple displays ! */
+    if (vwin->cursor_visible) {
+      vwin->cursor_timer = 0;
+      switch (vwin->current_cursor) {
+      case 0:
+        xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_invisible);
+        break;
+      case CURSOR_ARROW:
+        xitk_window_restore_window_cursor (vwin->wrapped_window);
+        break;
+      case CURSOR_HAND:
+        xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_hand2);
+        break;
       }
     }
   }
@@ -1402,6 +1418,7 @@ void video_window_set_cursor_visibility (xui_vwin_t *vwin, int show_cursor) {
   if (show_cursor)
     vwin->cursor_timer = 0;
 
+# if 0
   if (show_cursor) {
     if (vwin->current_cursor == CURSOR_ARROW)
       xitk_cursors_restore_window_cursor (vwin->video_display, vwin->video_window);
@@ -1410,7 +1427,16 @@ void video_window_set_cursor_visibility (xui_vwin_t *vwin, int show_cursor) {
   }
   else
     xitk_cursors_define_window_cursor (vwin->video_display, vwin->video_window, xitk_cursor_invisible);
-
+# endif
+  /* XXX XXX does not work with multiple displays ! */
+  if (show_cursor) {
+    if (vwin->current_cursor == CURSOR_ARROW)
+      xitk_window_restore_window_cursor (vwin->wrapped_window);
+    else
+      xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_hand1);
+  }
+  else
+    xitk_window_define_window_cursor (vwin->wrapped_window, xitk_cursor_invisible);
 }
 
 /*
