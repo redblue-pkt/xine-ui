@@ -2534,7 +2534,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
 
-  xitk_cursors_init (&xitk->x);
+  xitk->x.cursors = xitk_x11_cursors_init (&xitk->x);
   xitk->x.tips = xitk_tips_new ();
 
   return &xitk->x;
@@ -2677,6 +2677,8 @@ void xitk_free(xitk_t **p) {
   xitk_lock_display (&xitk->x);
   xitk_unlock_display (&xitk->x);
 
+  xitk_x11_cursors_deinit (&xitk->x.cursors);
+
   Imlib_destroy(&xitk->x.imlibdata);
 
   xitk->x.d->close (&xitk->x.d);
@@ -2706,7 +2708,6 @@ void xitk_stop (xitk_t *_xitk) {
     return;
   xitk_container (xitk, _xitk, x);
   xitk_tips_delete (&xitk->x.tips);
-  xitk_cursors_deinit (_xitk);
   xitk->running = 0;
 #if 0
   if (xitk->parent.window != None) {

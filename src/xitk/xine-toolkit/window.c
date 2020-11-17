@@ -68,12 +68,12 @@ void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
 
 void xitk_window_define_window_cursor (xitk_window_t *xwin, xitk_cursors_t cursor) {
   if (xwin)
-    xitk_cursors_define_window_cursor (xitk_x11_get_display (xwin->xitk), xwin->window, cursor);
+    xitk_x11_cursors_define_window_cursor (xwin->xitk->cursors, xwin->window, cursor);
 }
 
 void xitk_window_restore_window_cursor (xitk_window_t *xwin) {
   if (xwin)
-    xitk_cursors_restore_window_cursor (xitk_x11_get_display (xwin->xitk), xwin->window);
+    xitk_x11_cursors_restore_window_cursor (xwin->xitk->cursors, xwin->window);
 }
 
 /*

@@ -67,6 +67,7 @@ struct xitk_s {
 #endif
   xitk_font_cache_t *font_cache;
   struct xitk_tips_s *tips;
+  struct xitk_x11_cursors_s *cursors;
 };
 
 #ifdef DEBUG_LOCKDISPLAY

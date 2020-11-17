@@ -35,95 +35,91 @@
 #define X_CURSOR     0
 #define XITK_CURSOR  1
 
-static struct cursors_s {
+static const struct cursors_init_s {
   xitk_cursors_t  xitk_shape;
   unsigned int    x_shape;
   unsigned int    embedded;
-  Cursor          cursor;
-  Pixmap          p;
-  Pixmap          mask;
-} cursors[] = {
-  { xitk_cursor_invisible,              0,                      XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_X_cursor,               XC_X_cursor,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_arrow,                  XC_arrow,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_based_arrow_down,       XC_based_arrow_down,    X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_based_arrow_up,         XC_based_arrow_up,      X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_boat,                   XC_boat,                X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_bogosity,               XC_bogosity,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_bottom_left_corner,     XC_bottom_left_corner,  XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_bottom_right_corner,    XC_bottom_right_corner, XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_bottom_side,            XC_bottom_side,         XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_bottom_tee,             XC_bottom_tee,          X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_box_spiral,             XC_box_spiral,          X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_center_ptr,             XC_center_ptr,          XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_circle,                 XC_circle,              XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_clock,                  XC_clock,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_coffee_mug,             XC_coffee_mug,          X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_cross,                  XC_cross,               XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_cross_reverse,          XC_cross_reverse,       X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_crosshair,              XC_crosshair,           X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_diamond_cross,          XC_diamond_cross,       X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_dot,                    XC_dot,                 X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_dotbox,                 XC_dotbox,              XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_double_arrow,           XC_double_arrow,        XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_draft_large,            XC_draft_large,         X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_draft_small,            XC_draft_small,         X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_draped_box,             XC_draped_box,          XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_exchange,               XC_exchange,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_fleur,                  XC_fleur,               XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_gobbler,                XC_gobbler,             X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_gumby,                  XC_gumby,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_hand1,                  XC_hand1,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_hand2,                  XC_hand2,               XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_heart,                  XC_heart,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_icon,                   XC_icon,                X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_iron_cross,             XC_iron_cross,          X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_left_ptr,               XC_left_ptr,            XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_left_side,              XC_left_side,           XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_left_tee,               XC_left_tee,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_leftbutton,             XC_leftbutton,          X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_ll_angle,               XC_ll_angle,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_lr_angle,               XC_lr_angle,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_man,                    XC_man,                 X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_middlebutton,           XC_middlebutton,        X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_mouse,                  XC_mouse,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_pencil,                 XC_pencil,              XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_pirate,                 XC_pirate,              X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_plus,                   XC_plus,                X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_question_arrow,         XC_question_arrow,      XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_right_ptr,              XC_right_ptr,           XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_right_side,             XC_right_side,          XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_right_tee,              XC_right_tee,           X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_rightbutton,            XC_rightbutton,         X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_rtl_logo,               XC_rtl_logo,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_sailboat,               XC_sailboat,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_sb_down_arrow,          XC_sb_down_arrow,       XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_sb_h_double_arrow,      XC_sb_h_double_arrow,   XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_sb_left_arrow,          XC_sb_left_arrow,       XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_sb_right_arrow,         XC_sb_right_arrow,      XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_sb_up_arrow,            XC_sb_up_arrow,         XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_sb_v_double_arrow,      XC_sb_v_double_arrow,   XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_shuttle,                XC_shuttle,             X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_sizing,                 XC_sizing,              X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_spider,                 XC_spider,              X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_spraycan,               XC_spraycan,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_star,                   XC_star,                X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_target,                 XC_target,              X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_tcross,                 XC_tcross,              X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_top_left_arrow,         XC_top_left_arrow,      X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_top_left_corner,        XC_top_left_corner,     XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_top_right_corner,       XC_top_right_corner,    XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_top_side,               XC_top_side,            XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_top_tee,                XC_top_tee,             X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_trek,                   XC_trek,                X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_ul_angle,               XC_ul_angle,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_umbrella,               XC_umbrella,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_ur_angle,               XC_ur_angle,            X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_watch,                  XC_watch,               X_CURSOR,      None,  None,  None  },
-  { xitk_cursor_xterm,                  XC_xterm,               XITK_CURSOR,   None,  None,  None  },
-  { xitk_cursor_num_glyphs,             XC_num_glyphs,          X_CURSOR,      None,  None,  None  }
+} cursors_init[] = {
+  { xitk_cursor_invisible,              0,                      XITK_CURSOR,   },
+  { xitk_cursor_X_cursor,               XC_X_cursor,            X_CURSOR,      },
+  { xitk_cursor_arrow,                  XC_arrow,               X_CURSOR,      },
+  { xitk_cursor_based_arrow_down,       XC_based_arrow_down,    X_CURSOR,      },
+  { xitk_cursor_based_arrow_up,         XC_based_arrow_up,      X_CURSOR,      },
+  { xitk_cursor_boat,                   XC_boat,                X_CURSOR,      },
+  { xitk_cursor_bogosity,               XC_bogosity,            X_CURSOR,      },
+  { xitk_cursor_bottom_left_corner,     XC_bottom_left_corner,  XITK_CURSOR,   },
+  { xitk_cursor_bottom_right_corner,    XC_bottom_right_corner, XITK_CURSOR,   },
+  { xitk_cursor_bottom_side,            XC_bottom_side,         XITK_CURSOR,   },
+  { xitk_cursor_bottom_tee,             XC_bottom_tee,          X_CURSOR,      },
+  { xitk_cursor_box_spiral,             XC_box_spiral,          X_CURSOR,      },
+  { xitk_cursor_center_ptr,             XC_center_ptr,          XITK_CURSOR,   },
+  { xitk_cursor_circle,                 XC_circle,              XITK_CURSOR,   },
+  { xitk_cursor_clock,                  XC_clock,               X_CURSOR,      },
+  { xitk_cursor_coffee_mug,             XC_coffee_mug,          X_CURSOR,      },
+  { xitk_cursor_cross,                  XC_cross,               XITK_CURSOR,   },
+  { xitk_cursor_cross_reverse,          XC_cross_reverse,       X_CURSOR,      },
+  { xitk_cursor_crosshair,              XC_crosshair,           X_CURSOR,      },
+  { xitk_cursor_diamond_cross,          XC_diamond_cross,       X_CURSOR,      },
+  { xitk_cursor_dot,                    XC_dot,                 X_CURSOR,      },
+  { xitk_cursor_dotbox,                 XC_dotbox,              XITK_CURSOR,   },
+  { xitk_cursor_double_arrow,           XC_double_arrow,        XITK_CURSOR,   },
+  { xitk_cursor_draft_large,            XC_draft_large,         X_CURSOR,      },
+  { xitk_cursor_draft_small,            XC_draft_small,         X_CURSOR,      },
+  { xitk_cursor_draped_box,             XC_draped_box,          XITK_CURSOR,   },
+  { xitk_cursor_exchange,               XC_exchange,            X_CURSOR,      },
+  { xitk_cursor_fleur,                  XC_fleur,               XITK_CURSOR,   },
+  { xitk_cursor_gobbler,                XC_gobbler,             X_CURSOR,      },
+  { xitk_cursor_gumby,                  XC_gumby,               X_CURSOR,      },
+  { xitk_cursor_hand1,                  XC_hand1,               X_CURSOR,      },
+  { xitk_cursor_hand2,                  XC_hand2,               XITK_CURSOR,   },
+  { xitk_cursor_heart,                  XC_heart,               X_CURSOR,      },
+  { xitk_cursor_icon,                   XC_icon,                X_CURSOR,      },
+  { xitk_cursor_iron_cross,             XC_iron_cross,          X_CURSOR,      },
+  { xitk_cursor_left_ptr,               XC_left_ptr,            XITK_CURSOR,   },
+  { xitk_cursor_left_side,              XC_left_side,           XITK_CURSOR,   },
+  { xitk_cursor_left_tee,               XC_left_tee,            X_CURSOR,      },
+  { xitk_cursor_leftbutton,             XC_leftbutton,          X_CURSOR,      },
+  { xitk_cursor_ll_angle,               XC_ll_angle,            X_CURSOR,      },
+  { xitk_cursor_lr_angle,               XC_lr_angle,            X_CURSOR,      },
+  { xitk_cursor_man,                    XC_man,                 X_CURSOR,      },
+  { xitk_cursor_middlebutton,           XC_middlebutton,        X_CURSOR,      },
+  { xitk_cursor_mouse,                  XC_mouse,               X_CURSOR,      },
+  { xitk_cursor_pencil,                 XC_pencil,              XITK_CURSOR,   },
+  { xitk_cursor_pirate,                 XC_pirate,              X_CURSOR,      },
+  { xitk_cursor_plus,                   XC_plus,                X_CURSOR,      },
+  { xitk_cursor_question_arrow,         XC_question_arrow,      XITK_CURSOR,   },
+  { xitk_cursor_right_ptr,              XC_right_ptr,           XITK_CURSOR,   },
+  { xitk_cursor_right_side,             XC_right_side,          XITK_CURSOR,   },
+  { xitk_cursor_right_tee,              XC_right_tee,           X_CURSOR,      },
+  { xitk_cursor_rightbutton,            XC_rightbutton,         X_CURSOR,      },
+  { xitk_cursor_rtl_logo,               XC_rtl_logo,            X_CURSOR,      },
+  { xitk_cursor_sailboat,               XC_sailboat,            X_CURSOR,      },
+  { xitk_cursor_sb_down_arrow,          XC_sb_down_arrow,       XITK_CURSOR,   },
+  { xitk_cursor_sb_h_double_arrow,      XC_sb_h_double_arrow,   XITK_CURSOR,   },
+  { xitk_cursor_sb_left_arrow,          XC_sb_left_arrow,       XITK_CURSOR,   },
+  { xitk_cursor_sb_right_arrow,         XC_sb_right_arrow,      XITK_CURSOR,   },
+  { xitk_cursor_sb_up_arrow,            XC_sb_up_arrow,         XITK_CURSOR,   },
+  { xitk_cursor_sb_v_double_arrow,      XC_sb_v_double_arrow,   XITK_CURSOR,   },
+  { xitk_cursor_shuttle,                XC_shuttle,             X_CURSOR,      },
+  { xitk_cursor_sizing,                 XC_sizing,              X_CURSOR,      },
+  { xitk_cursor_spider,                 XC_spider,              X_CURSOR,      },
+  { xitk_cursor_spraycan,               XC_spraycan,            X_CURSOR,      },
+  { xitk_cursor_star,                   XC_star,                X_CURSOR,      },
+  { xitk_cursor_target,                 XC_target,              X_CURSOR,      },
+  { xitk_cursor_tcross,                 XC_tcross,              X_CURSOR,      },
+  { xitk_cursor_top_left_arrow,         XC_top_left_arrow,      X_CURSOR,      },
+  { xitk_cursor_top_left_corner,        XC_top_left_corner,     XITK_CURSOR,   },
+  { xitk_cursor_top_right_corner,       XC_top_right_corner,    XITK_CURSOR,   },
+  { xitk_cursor_top_side,               XC_top_side,            XITK_CURSOR,   },
+  { xitk_cursor_top_tee,                XC_top_tee,             X_CURSOR,      },
+  { xitk_cursor_trek,                   XC_trek,                X_CURSOR,      },
+  { xitk_cursor_ul_angle,               XC_ul_angle,            X_CURSOR,      },
+  { xitk_cursor_umbrella,               XC_umbrella,            X_CURSOR,      },
+  { xitk_cursor_ur_angle,               XC_ur_angle,            X_CURSOR,      },
+  { xitk_cursor_watch,                  XC_watch,               X_CURSOR,      },
+  { xitk_cursor_xterm,                  XC_xterm,               XITK_CURSOR,   },
+  { xitk_cursor_num_glyphs,             XC_num_glyphs,          X_CURSOR,      },
 };
-
 static const unsigned char no_data[] = {
   0,0,0,0, 0,0,0,0
 };
@@ -675,8 +671,13 @@ static const unsigned char xterm_bits[] = {
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00 };
 
+struct cursors_s {
+  Cursor          cursor;
+  Pixmap          p;
+  Pixmap          mask;
+};
 
-static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
+static void _cursors_create_cursor(Display *display, struct cursors_s *cursor, const struct cursors_init_s *cursor_init) {
   XColor  bg, fg;
 
   bg.red   = 255 << 8;
@@ -687,7 +688,7 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
   fg.blue  = 0;
 
   XLOCK (xitk_x_lock_display, display);
-  switch(cursor->xitk_shape) {
+  switch (cursor_init->xitk_shape) {
 
   case xitk_cursor_invisible:
     {
@@ -861,74 +862,95 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
     break;
 
   default:
-    XITK_WARNING("cursor unhandled: %d. Fallback to X one.\n", cursor->xitk_shape);
-    cursors->cursor = XCreateFontCursor(display, cursor->x_shape);
+    XITK_WARNING("cursor unhandled: %d. Fallback to X one.\n", cursor_init->xitk_shape);
+    cursor->cursor = XCreateFontCursor(display, cursor_init->x_shape);
     break;
   }
   XUNLOCK (xitk_x_unlock_display, display);
 }
 
-void xitk_cursors_init(xitk_t *xitk) {
+struct xitk_x11_cursors_s {
+  Display *display;
+
+  struct cursors_s cursors[sizeof(cursors_init)/sizeof(cursors_init[0])];
+};
+
+xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk) {
   int   i;
   int   xitk_cursors = xitk_get_cfg_num (xitk, XITK_CURSORS_FEATURE);
-  Display *display = xitk_x11_get_display(xitk);
+  xitk_x11_cursors_t *c;
+
+  c = calloc(1, sizeof(*c));
+  if (!c)
+    return NULL;
+
+  c->display = xitk_x11_get_display(xitk);
 
   /* Transparent cursor isn't a valid X cursor */
-  _cursors_create_cursor(display, &cursors[0]);
+  _cursors_create_cursor(c->display, &c->cursors[0], &cursors_init[0]);
+
+  /* XXX create cursor on demand ? */
 
   for(i = 1; i < MAX_CURSORS; i++) {
 
     if(xitk_cursors) {
-      if(cursors[i].embedded == X_CURSOR) {
+      if (cursors_init[i].embedded == X_CURSOR) {
         xitk_lock_display (xitk);
-	cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
+        c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
         xitk_unlock_display (xitk);
       }
       else
-	_cursors_create_cursor(display, &cursors[i]);
+        _cursors_create_cursor(c->display, &c->cursors[i], &cursors_init[i]);
     }
     else {
       xitk_lock_display (xitk);
-      cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
+      c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
       xitk_unlock_display (xitk);
     }
   }
+
+  return c;
 }
 
-void xitk_cursors_deinit(xitk_t *xitk) {
-  Display *display = xitk_x11_get_display(xitk);
+void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
+  xitk_x11_cursors_t *c = *p;
   int i;
 
-  xitk_lock_display (xitk);
+  if (!c)
+    return;
+  *p = NULL;
+
+  XLOCK (xitk_x_unlock_display, c->display);
+
   for(i = 0; i < MAX_CURSORS; i++) {
-    XFreeCursor(display, cursors[i].cursor);
-
-    if(cursors[i].embedded == XITK_CURSOR) {
-      if(cursors[i].p != None)
-	XFreePixmap(display, cursors[i].p);
-      if(cursors[i].mask != None)
-	XFreePixmap(display, cursors[i].mask);
-    }
-
+    if (c->cursors[i].cursor != None)
+      XFreeCursor(c->display, c->cursors[i].cursor);
+    if (c->cursors[i].p != None)
+      XFreePixmap(c->display, c->cursors[i].p);
+    if (c->cursors[i].mask != None)
+      XFreePixmap(c->display, c->cursors[i].mask);
   }
-  xitk_unlock_display (xitk);
+
+  XUNLOCK (xitk_x_unlock_display, c->display);
+
+  free(c);
 }
 
 /* Public */
-void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor) {
-  if(window != None) {
-    XLOCK (xitk_x_unlock_display, display);
-    XDefineCursor(display, window, cursors[cursor].cursor);
-    XSync(display, False);
-    XUNLOCK (xitk_x_unlock_display, display);
+void xitk_x11_cursors_define_window_cursor(xitk_x11_cursors_t *c, Window window, xitk_cursors_t cursor) {
+  if (/*c &&*/ window != None && cursor >= 0 && cursor < sizeof(c->cursors)/sizeof(c->cursors[0])) {
+    XLOCK (xitk_x_unlock_display, c->display);
+    XDefineCursor(c->display, window, c->cursors[cursor].cursor);
+    XSync(c->display, False);
+    XUNLOCK (xitk_x_unlock_display, c->display);
   }
 }
 
-void xitk_cursors_restore_window_cursor(Display *display, Window window) {
-  if(window != None) {
-    XLOCK (xitk_x_lock_display, display);
-    XUndefineCursor(display, window);
-    XSync(display, False);
-    XUNLOCK (xitk_x_unlock_display, display);
+void xitk_x11_cursors_restore_window_cursor(xitk_x11_cursors_t *c, Window window) {
+  if (/*c && */window != None) {
+    XLOCK (xitk_x_lock_display, c->display);
+    XUndefineCursor(c->display, window);
+    XSync(c->display, False);
+    XUNLOCK (xitk_x_unlock_display, c->display);
   }
 }
