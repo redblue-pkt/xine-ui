@@ -64,7 +64,7 @@ typedef struct _mwmhints {
 #include "backend.h"
 #include "dump_x11.h"
 #include "dnd.h"
-#include "cursors.h"
+#include "cursors_x11.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')

@@ -25,7 +25,7 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 
-#include "cursors.h"
+#include "cursors_x11.h"
 
 #include "_xitk.h"
 #include "_backend.h"

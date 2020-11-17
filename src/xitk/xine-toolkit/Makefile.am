@@ -26,7 +26,7 @@ libxitk_a_SOURCES = \
 	checkbox.c \
 	combo.c \
 	config.c \
-	cursors.c \
+	cursors_x11.c \
 	dialog.c \
 	dnd.c \
 	doublebox.c \
@@ -65,7 +65,7 @@ noinst_HEADERS = \
 	checkbox.c \
 	checkbox.h \
 	combo.h \
-	cursors.h \
+	cursors_x11.h \
 	default_font.h \
 	dlist.h \
 	dnd.h \
