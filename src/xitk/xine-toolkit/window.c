@@ -67,13 +67,27 @@ void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
  */
 
 void xitk_window_define_window_cursor (xitk_window_t *xwin, xitk_cursors_t cursor) {
-  if (xwin)
-    xitk_x11_cursors_define_window_cursor (xwin->xitk->cursors, xwin->window, cursor);
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_CURSOR, (uintptr_t)cursor},
+    {XITK_TAG_END, 0}
+  };
+
+  if (!xwin)
+    return;
+
+  xwin->bewin->set_props (xwin->bewin, tags);
 }
 
 void xitk_window_restore_window_cursor (xitk_window_t *xwin) {
-  if (xwin)
-    xitk_x11_cursors_restore_window_cursor (xwin->xitk->cursors, xwin->window);
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_CURSOR, ~(uintptr_t)0},
+    {XITK_TAG_END, 0}
+  };
+
+  if (!xwin)
+    return;
+
+  xwin->bewin->set_props (xwin->bewin, tags);
 }
 
 /*

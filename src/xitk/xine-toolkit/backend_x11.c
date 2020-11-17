@@ -64,6 +64,7 @@ typedef struct _mwmhints {
 #include "backend.h"
 #include "dump_x11.h"
 #include "dnd.h"
+#include "cursors.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
@@ -150,6 +151,7 @@ typedef enum {
   XITK_X11_WT_ICON,
   XITK_X11_WT_WIN_FLAGS,
   XITK_X11_WT_LAYER_ABOVE,
+  XITK_X11_WT_CURSOR,
   XITK_X11_WT_NAME,
   XITK_X11_WT_TITLE,
   XITK_X11_WT_RES_NAME,
@@ -171,6 +173,7 @@ static const xitk_tagitem_t _xitk_x11_window_defaults[XITK_X11_WT_LAST] = {
   [XITK_X11_WT_ICON]          = {XITK_TAG_ICON, (uintptr_t)NULL},
   [XITK_X11_WT_WIN_FLAGS]     = {XITK_TAG_WIN_FLAGS, 0},
   [XITK_X11_WT_LAYER_ABOVE]   = {XITK_TAG_LAYER_ABOVE, 0},
+  [XITK_X11_WT_CURSOR]        = {XITK_TAG_CURSOR, ~(uintptr_t)0},
   [XITK_X11_WT_NAME]          = {XITK_TAG_NAME, (uintptr_t)NULL},
   [XITK_X11_WT_TITLE]         = {XITK_TAG_TITLE, 0},
   [XITK_X11_WT_RES_NAME]      = {XITK_TAG_RES_NAME, (uintptr_t)NULL},
@@ -249,6 +252,8 @@ struct xitk_x11_display_s {
     Atom    atoms[XITK_A_clip_end];
   } clipboard;
 
+  xitk_x11_cursors_t *cursors;
+
   GC gc1, gc2;
 
   xine_sarray_t *ctrl_keysyms1;
@@ -307,6 +312,8 @@ static void _xitk_x11_display_delete (xitk_x11_display_t *d) {
     }
     d->d.unlock (&d->d);
   }
+
+  xitk_x11_cursors_deinit(&d->cursors);
 
   XCloseDisplay (d->display);
   d->display = NULL;
@@ -1522,6 +1529,14 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     win->props[XITK_X11_WT_TRANSIENT_FOR].value = props[XITK_X11_WT_TRANSIENT_FOR].value;
   }
 
+  if (props[XITK_X11_WT_CURSOR].value != win->props[XITK_X11_WT_CURSOR].value) {
+    if (props[XITK_X11_WT_CURSOR].value == ~(uintptr_t)0)
+      xitk_x11_cursors_restore_window_cursor (d->cursors, win->w.id);
+    else
+      xitk_x11_cursors_define_window_cursor (d->cursors, win->w.id, props[XITK_X11_WT_CURSOR].value);
+    win->props[XITK_X11_WT_CURSOR].value = props[XITK_X11_WT_CURSOR].value;
+  }
+
   if ((props[XITK_X11_WT_WIN_FLAGS].value ^ win->props[XITK_X11_WT_WIN_FLAGS].value)
     & (props[XITK_X11_WT_WIN_FLAGS].value >> 16))
     _xitk_x11_window_flags (win, props[XITK_X11_WT_WIN_FLAGS].value);
@@ -2526,6 +2541,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   if (d->be->be.verbosity >= 2)
     printf ("xitk.x11.display.new (%p) = %p.\n", (void *)be, (void *)d);
+
+  d->cursors = xitk_x11_cursors_init(_be->xitk, &d->d, d->display);
 
   return &d->d;
 }

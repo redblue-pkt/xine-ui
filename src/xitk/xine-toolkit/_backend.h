@@ -58,6 +58,7 @@ typedef enum {
   XITK_TAG_RAW,     /* const char * */
   XITK_TAG_PARENT,  /* xitk_be_window_t * */
   XITK_TAG_TRANSIENT_FOR,  /* xitk_be_window_t * */
+  XITK_TAG_CURSOR,   /* xitk_cursors_t */
   XITK_TAG_STATE,   /* xitk_be_window_state_t * */
   XITK_TAG_WIN_FLAGS, /* XITK_WINF_* */
   XITK_TAG_MASK,    /* xitk_be_mask_t */

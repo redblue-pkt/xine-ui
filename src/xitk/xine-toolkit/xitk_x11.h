@@ -97,17 +97,10 @@ int  xitk_x11_is_window_visible(Display *display, Window window);
 Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
 
 /*
- *
+ * access to xitk X11
  */
 
 #include "xitk.h"
-
-void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
-void xitk_cursors_restore_window_cursor(Display *display, Window window);
-
-/*
- * access to xitk X11
- */
 
 void        xitk_x11_select_visual(xitk_t *, Visual *gui_visual);
 
