@@ -1017,6 +1017,9 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
     return;
   }
 
+  wl->mouse.x = x;
+  wl->mouse.y = y;
+
   /* Convenience: while holding the slider, user need not stay within its
    * graphical bounds. Just move to closest possible. */
   if (wl->widget_pressed && (wl->widget_pressed == wl->widget_focused) &&
@@ -1144,6 +1147,9 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
+
+  wl->mouse.x = x;
+  wl->mouse.y = y;
 
   w = xitk_get_widget_at (wl, x, y);
   xitk_widget_apply_focus_redirect (&w);
@@ -1622,8 +1628,8 @@ static void xitk_widget_able (xitk_widget_t *w, int enable) {
   w->enable = enable;
   if (w->state.enable != enable) {
     w->state.enable = enable;
-    if (!enable) {
-      if (w->wl) {
+    if (w->wl) {
+      if (!enable) {
         if (w == w->wl->widget_under_mouse)
           xitk_tips_hide_tips (w->wl->xitk->tips);
         if ((w->type & WIDGET_FOCUSABLE) && (w->have_focus != FOCUS_LOST)) {
@@ -1638,6 +1644,12 @@ static void xitk_widget_able (xitk_widget_t *w, int enable) {
         }
         if (w == w->wl->widget_focused)
           w->wl->widget_focused = NULL;
+      } else {
+        int dx = w->wl->mouse.x - w->x, dy = w->wl->mouse.y - w->y;
+        if ((dx >= 0) && (dx < w->width) && (dy >= 0) && (dy < w->height)) {
+          /* enabling the widget under mouse. how often does this happen ?? */
+          xitk_motion_notify_widget_list (w->wl, w->wl->mouse.x, w->wl->mouse.y, 0);
+        }
       }
     }
     w->enable = enable;
@@ -2159,24 +2171,6 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
   }
 
   xitk_tips_set_timeout(w, timeout);
-}
-
-int xitk_is_mouse_over_widget(xitk_widget_t *w) {
-  int             win_x, win_y;
-
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return 0;
-  }
-
-  if (xitk_window_get_mouse_coords(w->wl->xwin, &win_x, &win_y, NULL, NULL)) {
-    if(((win_x >= w->x) && (win_x < (w->x + w->width))) &&
-       ((win_y >= w->y) && (win_y < (w->y + w->height)))) {
-      return 1;
-    }
-  }
-
-  return 0;
 }
 
 int xitk_widget_mode (xitk_widget_t *w, int mask, int mode) {

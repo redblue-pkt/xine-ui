@@ -228,7 +228,6 @@ struct xitk_window_s {
 };
 
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags);
-int xitk_window_get_mouse_coords(xitk_window_t *xwin, int *x, int *y, int *rx, int *ry);
 
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,

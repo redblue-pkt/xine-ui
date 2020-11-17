@@ -1431,13 +1431,6 @@ void video_window_set_cursor_timer (xui_vwin_t *vwin, int timer) {
     vwin->cursor_timer = timer;
 }
 
-
-void video_window_get_mouse_coords(xui_vwin_t *vwin, int *x, int *y) {
-  if (!vwin)
-    return;
-  xitk_x11_get_mouse_coords (vwin->video_display, vwin->video_window, NULL, NULL, x, y);
-}
-
 static uint32_t _vwin_flags (xui_vwin_t *vwin, uint32_t mask, uint32_t value) {
   if (vwin->separate_display) {
     if (vwin->video_be_window) {
