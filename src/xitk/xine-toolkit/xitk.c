@@ -74,7 +74,6 @@
 #include "widget.h"
 #include "menu.h"
 #include "combo.h"
-#include "dnd.h"
 #include "font.h"
 
 extern char **environ;
@@ -217,7 +216,6 @@ typedef struct {
 
   char                        name[64];
   xitk_register_key_t         key;
-  xitk_dnd_t                 *xdnd;
   void                       *user_data;
 
   xitk_be_event_handler_t    *event_handler;
@@ -367,11 +365,6 @@ static void __fx_delete (__gfx_t *fx) {
     printf ("xitk_gfx_delete (%d) = \"%s\".\n", fx->key, fx->name);
 
   xitk_dnode_remove (&fx->wl.node);
-
-  if (fx->xdnd) {
-    xitk_dnd_delete (fx->xdnd);
-    fx->xdnd = NULL;
-  }
 
   fx->event_handler = NULL;
   fx->user_data = NULL;
@@ -1625,7 +1618,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->event_handler         = NULL;
   fx->destructor            = NULL;
   fx->destr_data            = NULL;
-  fx->xdnd                  = NULL;
   fx->key                   = 0;
 
   return fx;
@@ -2446,9 +2438,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->display, XK_Control_L);
   xitk->qual            = 0;
   xitk->tips_timeout    = TIPS_TIMEOUT;
-#if 0
-  XGetInputFocus(display, &(xitk->parent.window), &(xitk->parent.focus));
-#endif
   {
     unsigned int u;
     for (u = 0; u < XITK_A_END; u++)
@@ -2705,17 +2694,6 @@ void xitk_stop (xitk_t *_xitk) {
   xitk_container (xitk, _xitk, x);
   xitk_tips_delete (&xitk->x.tips);
   xitk->running = 0;
-#if 0
-  if (xitk->parent.window != None) {
-    int (*previous_error_handler)(Display *, XErrorEvent *);
-    XSync (xitk->display, False);
-    /* don't care about BadWindow when the focussed window is gone already */
-    previous_error_handler = XSetErrorHandler(_x_ignoring_error_handler);
-    XSetInputFocus (xitk->display, xitk->parent.window, xitk->parent.focus, CurrentTime);
-    XSync (xitk->display, False);
-    XSetErrorHandler(previous_error_handler);
-  }
-#endif
 }
 
 void xitk_set_xmb_enability(xitk_t *_xitk, int value) {
