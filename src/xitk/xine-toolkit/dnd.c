@@ -33,7 +33,6 @@
 #include <signal.h>
 
 #include "_xitk.h"
-#include "xitk_x11.h"  // xitk_x11_get_display
 
 #define XDND_VERSION 3
 #define MAX_SUPPORTED_TYPE 2

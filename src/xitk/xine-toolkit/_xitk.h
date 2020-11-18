@@ -98,7 +98,6 @@ struct xitk_s {
 #include "image.h"
 #include "skin.h"
 #include "widget.h"
-#include "window.h"
 #include "xitkintl.h"
 
 #if !defined(__GNUC__) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
