@@ -62,57 +62,20 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int length);
 int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c);
 
 /*
- * Return the char width (in pixel),
- * if nbytes != NULL returns there size of multibyte character in bytes.
- */
-#ifdef YET_UNUSED
-int xitk_font_get_char_width(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
-#endif
-
-/*
- * Return the height (in pixel) of string, with length length.
- * if nbytes != NULL returns there size of multibyte character in bytes.
- */
-#ifdef YET_UNUSED
-int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes);
-#endif
-
-/*
  * Return string height (in pixel) of string.
  */
 int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
 
 /*
- * Return char height (in pixel).
- */
-#ifdef YET_UNUSED
-int xitk_font_get_char_height(xitk_font_t *xtfs, const char *c, int maxnbytes, int *nbytes);
-#endif
-
-/*
  * Get text extents of string length length.
  */
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, size_t length,
-			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
+                           int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
 
 /*
  * Get string extents.
  */
 void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
-			    int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
-
-/*
- * Get ascent height (in pixel) of string.
- */
-#ifdef YET_UNUSED
-int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c);
-#endif
-
-/*
- * Get descent height (in pixel) of string.
- */
-#ifdef YET_UNUSED
-int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
-#endif
+                             int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
 
 #endif
