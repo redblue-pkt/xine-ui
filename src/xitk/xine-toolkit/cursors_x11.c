@@ -22,13 +22,12 @@
 #include "config.h"
 #endif
 
+#include "cursors_x11.h"
+
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 
-#include "cursors_x11.h"
-
 #include "_xitk.h"
-#include "_backend.h"
 
 #define MAX_CURSORS  xitk_cursor_num_glyphs
 
@@ -678,8 +677,9 @@ struct cursors_s {
 };
 
 struct xitk_x11_cursors_s {
-  Display *display;
-  xitk_be_display_t *d;
+  Display  *display;
+  void    (*lock) (Display *display);
+  void    (*unlock) (Display *display);
   struct cursors_s cursors[sizeof(cursors_init)/sizeof(cursors_init[0])];
 };
 
@@ -696,7 +696,7 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
   fg.green = 0;
   fg.blue  = 0;
 
-  c->d->lock(c->d);
+  c->lock(c->display);
 
   switch (cursor_init->xitk_shape) {
 
@@ -877,12 +877,15 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
     break;
   }
 
-  c->d->unlock(c->d);
+  c->unlock(c->display);
 }
 
-xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk, xitk_be_display_t *d, Display *display) {
+static void _no_lock (Display *display) {
+  (void)display;
+}
+
+xitk_x11_cursors_t *xitk_x11_cursors_init(Display *display, int xitk_cursors, int lock) {
   int   i;
-  int   xitk_cursors = xitk_get_cfg_num (xitk, XITK_CURSORS_FEATURE);
   xitk_x11_cursors_t *c;
 
   c = calloc(1, sizeof(*c));
@@ -890,7 +893,13 @@ xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk, xitk_be_display_t *d, Di
     return NULL;
 
   c->display = display;
-  c->d       = d;
+  if (lock) {
+    c->lock = XLockDisplay;
+    c->unlock = XUnlockDisplay;
+  } else {
+    c->lock =
+    c->unlock = _no_lock;
+  }
 
   /* Transparent cursor isn't a valid X cursor */
   _cursors_create_cursor(c, 0);
@@ -901,17 +910,17 @@ xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk, xitk_be_display_t *d, Di
 
     if(xitk_cursors) {
       if (cursors_init[i].embedded == X_CURSOR) {
-        c->d->lock(c->d);
+        c->lock(c->display);
         c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
-        c->d->unlock(c->d);
+        c->unlock(c->display);
       }
       else
         _cursors_create_cursor(c, i);
     }
     else {
-      c->d->lock(c->d);
+      c->lock(c->display);
       c->cursors[i].cursor = XCreateFontCursor(c->display, cursors_init[i].x_shape);
-      c->d->unlock(c->d);
+      c->unlock(c->display);
     }
   }
 
@@ -926,7 +935,7 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
     return;
   *p = NULL;
 
-  c->d->lock(c->d);
+  c->lock(c->display);
 
   for(i = 0; i < MAX_CURSORS; i++) {
     if (c->cursors[i].cursor != None)
@@ -937,7 +946,7 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
       XFreePixmap(c->display, c->cursors[i].mask);
   }
 
-  c->d->unlock(c->d);
+  c->unlock(c->display);
 
   free(c);
 }
@@ -945,18 +954,18 @@ void xitk_x11_cursors_deinit(xitk_x11_cursors_t **p) {
 /* Public */
 void xitk_x11_cursors_define_window_cursor(xitk_x11_cursors_t *c, Window window, xitk_cursors_t cursor) {
   if (/*c &&*/ window != None && cursor >= 0 && cursor < sizeof(c->cursors)/sizeof(c->cursors[0])) {
-    c->d->lock(c->d);
+    c->lock(c->display);
     XDefineCursor(c->display, window, c->cursors[cursor].cursor);
     XSync(c->display, False);
-    c->d->unlock(c->d);
+    c->unlock(c->display);
   }
 }
 
 void xitk_x11_cursors_restore_window_cursor(xitk_x11_cursors_t *c, Window window) {
   if (/*c && */window != None) {
-    c->d->lock(c->d);
+    c->lock(c->display);
     XUndefineCursor(c->display, window);
     XSync(c->display, False);
-    c->d->unlock(c->d);
+    c->unlock(c->display);
   }
 }
