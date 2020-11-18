@@ -119,31 +119,17 @@ void xitk_window_set_window_title (xitk_window_t *xwin, const char *title) {
  *
  */
 
-static void xitk_set_window_icon(Display *display, Window window, Pixmap icon) {
-
-  XWMHints *wmhints;
-
-  if ((display == NULL) || (window == None)) /* icon == None is valid */
-    return;
-
-  xitk_x_lock_display (display);
-
-  wmhints = XAllocWMHints();
-  if (wmhints) {
-    wmhints->icon_pixmap   = icon;
-    wmhints->flags         = IconPixmapHint;
-    XSetWMHints(display, (window), wmhints);
-    XFree(wmhints);
-  }
-  xitk_x_unlock_display (display);
-}
-
 void xitk_window_set_window_icon (xitk_window_t *w, xitk_image_t *icon) {
+
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_ICON, (uintptr_t)icon},
+    {XITK_TAG_END, 0}
+  };
 
   if (w == NULL)
     return;
 
-  xitk_set_window_icon (xitk_x11_get_display(w->xitk), w->window, icon->beimg->id1);
+  w->bewin->set_props (w->bewin, tags);
 }
 
 void xitk_window_set_layer_above(xitk_window_t *w) {
@@ -166,32 +152,17 @@ void xitk_window_set_window_layer(xitk_window_t *w, int layer) {
  *
  */
 
-static void xitk_set_window_class(Display *display, Window window, const char *res_name, const char *res_class) {
-
-  XClassHint xclasshint, new_xclasshint;
-
-  if ((display == NULL) || (window == None))
-    return;
-
-  xitk_x_lock_display (display);
-
-  if ((XGetClassHint(display, (window), &xclasshint)) != 0) {
-    new_xclasshint.res_name  = res_name  ? (char*)res_name  : xclasshint.res_name;
-    new_xclasshint.res_class = res_class ? (char*)res_class : xclasshint.res_class;
-    XSetClassHint(display, window, &new_xclasshint);
-    XFree(xclasshint.res_name);
-    XFree(xclasshint.res_class);
-  }
-
-  xitk_x_unlock_display (display);
-}
-
 void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const char *res_class) {
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_RES_NAME, (uintptr_t)res_name},
+    {XITK_TAG_RES_CLASS, (uintptr_t)res_class},
+    {XITK_TAG_END, 0}
+  };
 
   if (w == NULL)
     return;
 
-  xitk_set_window_class(xitk_x11_get_display(w->xitk), w->window, res_name, res_class);
+  w->bewin->set_props (w->bewin, tags);
 }
 
 void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t type) {

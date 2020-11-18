@@ -2503,6 +2503,8 @@ static void register_event_handler(xui_vwin_t *vwin)
     vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
       _vwin_handle_be_event, vwin, NULL, NULL);
     xitk_window_set_role (vwin->wrapped_window, vwin->gui->use_root_window ? XITK_WR_ROOT : XITK_WR_MAIN);
+    xitk_window_set_window_icon (vwin->wrapped_window, vwin->gui->icon);
+    xitk_window_set_window_class(vwin->wrapped_window, vwin->xclasshint->res_name, vwin->xclasshint->res_class);
   }
 
   _set_window_title (vwin);
