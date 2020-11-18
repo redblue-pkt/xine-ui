@@ -28,7 +28,7 @@ libxitk_a_SOURCES = \
 	config.c \
 	cursors_x11.c \
 	dialog.c \
-	dnd.c \
+	dnd_x11.c \
 	doublebox.c \
 	font.c \
 	getdeskroot.c \
@@ -68,7 +68,7 @@ noinst_HEADERS = \
 	cursors_x11.h \
 	default_font.h \
 	dlist.h \
-	dnd.h \
+	dnd_x11.h \
 	doublebox.h \
 	font.h \
 	image.h \
