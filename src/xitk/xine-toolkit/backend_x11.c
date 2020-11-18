@@ -2574,7 +2574,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   if (d->be->be.verbosity >= 2)
     printf ("xitk.x11.display.new (%p) = %p.\n", (void *)be, (void *)d);
 
-  d->cursors = xitk_x11_cursors_init(_be->xitk, &d->d, d->display);
+  d->cursors = xitk_x11_cursors_init(d->display, xitk_get_cfg_num (_be->xitk, XITK_CURSORS_FEATURE), d->d.lock == xitk_x11_display_lock);
 
   return &d->d;
 }

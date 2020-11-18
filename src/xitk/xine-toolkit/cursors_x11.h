@@ -22,11 +22,13 @@
 #ifndef HAVE_XITK_CURSORS_H
 #define HAVE_XITK_CURSORS_H
 
-#include "_xitk.h"
+#include <X11/Xlib.h>
+
+#include "xitk.h"
 
 typedef struct xitk_x11_cursors_s xitk_x11_cursors_t;
 
-xitk_x11_cursors_t *xitk_x11_cursors_init(xitk_t *xitk, xitk_be_display_t *d, Display *display);
+xitk_x11_cursors_t *xitk_x11_cursors_init(Display *display, int xitk_cursors, int lock);
 void xitk_x11_cursors_deinit(xitk_x11_cursors_t **);
 
 void xitk_x11_cursors_define_window_cursor(xitk_x11_cursors_t *, Window window, xitk_cursors_t cursor);
