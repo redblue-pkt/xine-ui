@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#include "dnd.h"
+#include "dnd_x11.h"
 
 #include <stdio.h>
 #include <sys/types.h>
