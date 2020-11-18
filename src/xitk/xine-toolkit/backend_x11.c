@@ -1216,7 +1216,8 @@ static uint32_t _xitk_x11_window_merge_flags (uint32_t f1, uint32_t f2) {
 static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_value) {
   xitk_x11_display_t *d = win->d;
   XWindowAttributes attr;
-  Atom type, buf[32];
+  unsigned char *prop_return = NULL;
+  Atom type;
   int fmt;
   unsigned long nitem, rest;
   uint32_t oldflags, newflags, diff, mask, have;
@@ -1238,8 +1239,9 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
     oldflags |= attr.override_redirect == False ? 0 : XITK_WINF_OVERRIDE_REDIRECT;
   }
 
-  if (XGetWindowProperty (d->display, win->w.id, d->atoms[XITK_A__NET_WM_STATE], 0, sizeof (buf),
-    False, d->atoms[XITK_A_atom], &type, &fmt, &nitem, &rest, (unsigned char **)buf)) {
+  if (XGetWindowProperty (d->display, win->w.id, d->atoms[XITK_A__NET_WM_STATE], 0, 4*32,
+          False, d->atoms[XITK_A_atom], &type, &fmt, &nitem, &rest, &prop_return)) {
+    Atom *buf = (Atom *)prop_return;
     uint32_t u;
 
     oldflags &= ~(XITK_WINF_FULLSCREEN | XITK_WINF_MAX_X | XITK_WINF_MAX_Y);
@@ -1260,6 +1262,8 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   } else {
     oldflags |= XITK_WINF_TASKBAR | XITK_WINF_PAGER;
   }
+  if (prop_return)
+    XFree(prop_return);
   have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
 
   have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN;
