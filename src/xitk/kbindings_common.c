@@ -23,6 +23,8 @@
 #include "config.h"
 #endif
 
+#include <strings.h>
+
 #include "dump.h"
 
 #include "common.h"

@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <strings.h>
 
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>

@@ -26,6 +26,7 @@
 #include "lang.h"
 
 #include <string.h>
+#include <strings.h>
 
 #include "i18n.h"
 
