@@ -387,6 +387,14 @@ static void _config_load(xine_t *xine)
   }
 }
 
+/* FreeBSD: Taking protected visibility symbol address to struct causes link time error:
+ *   ld: error: cannot preempt symbol: xine_list_spu_plugins
+ * Fix by creating wrapper functions.
+ */
+#define LIST_WRAPPER(TYPE) \
+static const char * const * _list_ ## TYPE ## _plugins (xine_t *xine) { return xine_list_ ## TYPE ## _plugins (xine); }
+LIST_WRAPPER(audio_output) LIST_WRAPPER(video_output) LIST_WRAPPER(demuxer) LIST_WRAPPER(input) LIST_WRAPPER(spu) LIST_WRAPPER(post) LIST_WRAPPER(audio_decoder) LIST_WRAPPER(video_decoder)
+#undef LIST_WRAPPER
 static void list_plugins(char *type) {
   const char   *const  *plugins;
   xine_t               *xine;
@@ -396,17 +404,16 @@ static void list_plugins(char *type) {
     char                name[24];
     char                type[16];
   } list_functions[] = {
-    { xine_list_audio_output_plugins,  N_("   -Audio output:\n"),    "audio_out"     },
-    { xine_list_video_output_plugins,  N_("   -Video output:\n"),    "video_out"     },
-    { xine_list_demuxer_plugins,       N_("   -Demuxer:\n"),         "demux"         },
-    { xine_list_input_plugins,         N_("   -Input:\n"),           "input"         },
-    { xine_list_spu_plugins,           N_("   -Subpicture:\n"),      "sub"           },
-    { xine_list_post_plugins,          N_("   -Post processing:\n"), "post"          },
-    { xine_list_audio_decoder_plugins, N_("   -Audio decoder:\n"),   "audio_decoder" },
-    { xine_list_video_decoder_plugins, N_("   -Video decoder:\n"),   "video_decoder" },
+    { _list_audio_output_plugins,  N_("   -Audio output:\n"),    "audio_out"     },
+    { _list_video_output_plugins,  N_("   -Video output:\n"),    "video_out"     },
+    { _list_demuxer_plugins,       N_("   -Demuxer:\n"),         "demux"         },
+    { _list_input_plugins,         N_("   -Input:\n"),           "input"         },
+    { _list_spu_plugins,           N_("   -Subpicture:\n"),      "sub"           },
+    { _list_post_plugins,          N_("   -Post processing:\n"), "post"          },
+    { _list_audio_decoder_plugins, N_("   -Audio decoder:\n"),   "audio_decoder" },
+    { _list_video_decoder_plugins, N_("   -Video decoder:\n"),   "video_decoder" },
     { NULL,                            "",                           ""              }
   };
-
 
   xine = xine_new();
   _config_load(xine);
