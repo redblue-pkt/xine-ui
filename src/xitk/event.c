@@ -34,6 +34,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 /* input_pvr functionality needs this */
 #define XINE_ENABLE_EXPERIMENTAL_FEATURES
