@@ -492,7 +492,7 @@ int init_session(void) {
     for(i = 0;; i++)	{
       saddr.un.sun_family = AF_UNIX;
 
-      snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", i);
+      snprintf(saddr.un.sun_path, sizeof(saddr.un.sun_path), "%s%s%d", (xine_get_homedir()), "/.xine/session.", i);
       if(!is_remote_running(i)) {
 	if((unlink(saddr.un.sun_path) == -1) && errno != ENOENT) {
 	  fprintf(stderr, "setup_ctrlsocket(): Failed to unlink %s (Error: %s)",

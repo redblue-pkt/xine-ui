@@ -64,10 +64,9 @@ int connect_to_session(int session) {
     if (setuid(euid) == -1)
       perror("setuid() failed");
 
-    snprintf(saddr.un.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
+    snprintf(saddr.un.sun_path, sizeof(saddr.un.sun_path), "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
     if (setreuid(stored_uid, euid) == -1)
       perror("setreuid() failed");
-
     if((connect(fd,&saddr.sa, sizeof(saddr.un))) != -1) {
       return fd;
     }
