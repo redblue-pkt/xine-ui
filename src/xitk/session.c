@@ -502,8 +502,12 @@ int init_session(void) {
       else
 	continue;
 
-      if((bind(ctrl_fd, &saddr.sa, sizeof (saddr.un))) != -1) {
-
+#ifdef SUN_LEN
+      if((bind(ctrl_fd, &saddr.sa, SUN_LEN(&saddr.un))) != -1)
+#else
+      if((bind(ctrl_fd, &saddr.sa, sizeof (saddr.un))) != -1)
+#endif
+      {
 	session_id = i;
 	listen(ctrl_fd, 100);
 	going = 1;
