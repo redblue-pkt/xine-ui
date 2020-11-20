@@ -191,13 +191,6 @@ void xitk_window_raise_window (xitk_window_t *xwin) {
     xwin->bewin->raise (xwin->bewin);
 }
 
-void xitk_window_clear_window(xitk_window_t *w)
-{
-  xitk_lock_display (w->xitk);
-  XClearWindow(xitk_x11_get_display(w->xitk), w->window);
-  xitk_unlock_display (w->xitk);
-}
-
 void xitk_window_reparent_window (xitk_window_t *xwin, xitk_window_t *parent, int x, int y) {
   if (xwin && xwin->bewin) {
     xitk_tagitem_t tags[] = {

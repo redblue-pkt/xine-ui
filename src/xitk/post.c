@@ -1404,7 +1404,7 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
       }
       xitk_hide_widget (info->win->enable);
       xitk_hide_widget (info->win->exit);
-      xitk_window_clear_window (info->win->xwin);
+      xitk_window_apply_background (info->win->xwin);
       xitk_show_widget (info->win->enable);
       xitk_show_widget (info->win->exit);
     }
