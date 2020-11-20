@@ -511,16 +511,6 @@ int xitk_window_set_background_image (xitk_window_t *xwin, xitk_image_t *bg) {
   }
 }
 
-#ifdef YET_UNUSED
-void xitk_window_set_modal(xitk_window_t *w) {
-  xitk_modal_window(w->window);
-}
-void xitk_window_dialog_set_modal(xitk_window_t *w) {
-  xitk_dialog_t *wd = w->dialog;
-  xitk_window_set_modal(wd->xwin);
-}
-#endif
-
 void xitk_window_destroy_window (xitk_window_t *xwin) {
   if (!xwin)
     return;

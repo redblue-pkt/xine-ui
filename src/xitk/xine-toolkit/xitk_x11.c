@@ -291,35 +291,6 @@ void xitk_x11_find_visual(Display *display, int screen, const char *prefered_vis
     *visual_out = visual;
 }
 
-Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity)
-{
-  Display *display;
-
-  if (!XInitThreads ()) {
-    printf (_("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n"));
-    exit(1);
-  }
-
-  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
-    fprintf(stderr, _("Cannot open display\n"));
-    exit(1);
-  }
-
-  if (use_synchronized_x) {
-    XSynchronize (display, True);
-    fprintf (stderr, _("Warning! Synchronized X activated - this is very slow...\n"));
-  }
-
-  /* Some infos */
-  if(verbosity) {
-    dump_host_info();
-    dump_cpu_infos();
-    dump_xfree_info(display, DefaultScreen(display), verbosity);
-  }
-
-  return display;
-}
-
 int xitk_x11_is_window_iconified(Display *display, Window window) {
   unsigned char *prop_return = NULL;
   unsigned long  nitems_return;
