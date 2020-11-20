@@ -75,8 +75,6 @@ void xitk_x11_xrm_parse(const char *xrm_class_name,
 
 int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h);
 
-Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, int verbosity);
-
 /*
  *
  */
