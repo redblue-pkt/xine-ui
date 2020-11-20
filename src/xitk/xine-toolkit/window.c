@@ -43,9 +43,7 @@ static Window _xitk_window_get_window (xitk_window_t *w) {
 }
 
 void xitk_window_set_input_focus (xitk_window_t *w) {
-  xitk_lock_display (w->xitk);
-  XSetInputFocus(xitk_x11_get_display(w->xitk), w->window, RevertToParent, CurrentTime);
-  xitk_unlock_display (w->xitk);
+  xitk_window_flags (w, XITK_WINF_FOCUS, XITK_WINF_FOCUS);
 }
 
 void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
