@@ -94,7 +94,7 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
   }
 
   *height += image->height;
-  wd->xwin = xitk_window_create_dialog_window (xitk, title, 0, 0, *width, *height);
+  wd->xwin = xitk_window_create_dialog_window (xitk, title, XITK_XY_CENTER, XITK_XY_CENTER, *width, *height);
   if (!wd->xwin) {
     xitk_image_free_image (&image);
     free (wd);
@@ -112,8 +112,6 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
     }
   }
   xitk_image_free_image (&image);
-
-  xitk_window_center_window (wd->xwin);
 
   return wd;
 }
