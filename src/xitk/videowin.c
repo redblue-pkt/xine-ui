@@ -383,6 +383,18 @@ static void video_window_lock_opacity (xui_vwin_t *vwin) {
 		  (unsigned char *)vwin->gui, 1);
 }
 
+static void _set_layer_above (xui_vwin_t *vwin) {
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_LAYER_ABOVE, (uintptr_t)1},
+    {XITK_TAG_END, 0}
+  };
+
+  if (vwin->video_be_window)
+    vwin->video_be_window->set_props (vwin->video_be_window, tags);
+  else
+    xitk_window_set_layer_above(vwin->wrapped_window);
+}
+
 /*
  * will modify/create video output window based on
  *
@@ -1042,7 +1054,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if ((vwin->gui->always_layer_above ||
       ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && !_vwin_is_ewmh (vwin)) {
-      xitk_set_layer_above (vwin->video_window);
+      _set_layer_above (vwin);
     }
 
     XRaiseWindow (vwin->video_display, vwin->video_window);
@@ -1053,7 +1065,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if ((vwin->gui->always_layer_above ||
       ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui))) && _vwin_is_ewmh (vwin)) {
-      xitk_set_layer_above (vwin->video_window);
+      _set_layer_above (vwin);
     }
 
     /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
@@ -1510,7 +1522,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
       (vwin->hide_on_start == 0))) && (!_vwin_is_ewmh (vwin))) {
-      xitk_set_layer_above (vwin->video_window);
+      _set_layer_above (vwin);
     }
 
     _vwin_flags (vwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
@@ -1518,7 +1530,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
     if ((vwin->gui->always_layer_above ||
       (((!(vwin->fullscreen_mode & WINDOWED_MODE)) && is_layer_above (vwin->gui)) &&
       (vwin->hide_on_start == 0))) && (_vwin_is_ewmh (vwin))) {
-      xitk_set_layer_above(vwin->video_window);
+      _set_layer_above(vwin);
     }
 
     /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
