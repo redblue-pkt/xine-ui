@@ -1073,8 +1073,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (!(vwin->fullscreen_mode & WINDOWED_MODE)
      && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
      && _vwin_is_ewmh (vwin))
-      xitk_set_ewmh_fullscreen (vwin->video_window);
-
+      xitk_x11_set_ewmh_fullscreen (vwin->video_display, vwin->video_window, 1);
   }
 
   XSync (vwin->video_display, False);
@@ -1538,7 +1537,7 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
     if (!(vwin->fullscreen_mode & WINDOWED_MODE)
      && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
      && _vwin_is_ewmh (vwin))
-      xitk_set_ewmh_fullscreen (vwin->video_window);
+      xitk_x11_set_ewmh_fullscreen (vwin->video_display, vwin->video_window, 1);
   } else if (vwin->show == 1) {
     _vwin_flags (vwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
   } else {

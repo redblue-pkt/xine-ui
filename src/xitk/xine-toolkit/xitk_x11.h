@@ -80,8 +80,10 @@ int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h)
  */
 
 void xitk_x11_set_window_layer(xitk_t *, Window window, int layer);
-void xitk_set_ewmh_fullscreen(Window window);
-void xitk_unset_ewmh_fullscreen(Window window);
+void xitk_x11_set_ewmh_fullscreen(Display *display, Window window, int enable);
+
+unsigned char *xitk_x11_get_wm_name (Display *display, Window win, Atom atom, Atom type_utf8);
+uint32_t xitk_x11_check_wm (Display *display, int verbose);
 
 /*
  *
