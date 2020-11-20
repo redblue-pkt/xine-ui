@@ -178,9 +178,12 @@ void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t 
 }
 
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin) {
-  xitk_lock_display (w->xitk);
-  XSetTransientForHint(xitk_x11_get_display(w->xitk), w->window, xwin->window);
-  xitk_unlock_display (w->xitk);
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_TRANSIENT_FOR, (uintptr_t)xwin->bewin},
+    {XITK_TAG_END, 0}
+  };
+
+  w->bewin->set_props (w->bewin, tags);
 }
 
 void xitk_window_raise_window (xitk_window_t *xwin) {
