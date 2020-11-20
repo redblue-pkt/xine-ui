@@ -45,8 +45,7 @@ static void _png_user_read(png_structp png, png_bytep data, png_size_t length)
   p->pos += length;
 }
 
-static unsigned char *_LoadPNG(ImlibData * id,
-                               FILE * f,
+static unsigned char *_LoadPNG(FILE * f,
                                struct _png_data *indata,
                                int *w, int *h, int *t) {
   png_structp         png_ptr;
@@ -166,8 +165,7 @@ static unsigned char *_LoadPNG(ImlibData * id,
   return data;
 }
 
-static unsigned char *_LoadJPEG(ImlibData * id,
-                                FILE * f,
+static unsigned char *_LoadJPEG(FILE * f,
                                 const unsigned char *inbuf, unsigned long insize,
                                 int *w, int *h) {
   struct jpeg_error_mgr jpeg_error;
@@ -294,9 +292,9 @@ ImlibImage * Imlib_decode_image(ImlibData * id, const void *p, size_t size) {
 
   if (ispng(p, size)) {
     struct _png_data d = {0, size, p };
-    data = _LoadPNG(id, NULL, &d, &w, &h, &trans);
+    data = _LoadPNG(NULL, &d, &w, &h, &trans);
   } else if (isjpeg(p, size))
-    data = _LoadJPEG(id, NULL, p, size, &w, &h);
+    data = _LoadJPEG(NULL, p, size, &w, &h);
 
   if (!data) {
     fprintf(stderr, "IMLIB ERROR: Cannot load image from memory\nAll fallbacks failed.\n");
@@ -398,10 +396,10 @@ ImlibImage * Imlib_load_image(ImlibData * id, const char *file) {
   switch (fmt)
   {
     case FORMAT_PNG:
-      data = _LoadPNG(id, p, NULL, &w, &h, &trans);
+      data = _LoadPNG(p, NULL, &w, &h, &trans);
         break;
     case FORMAT_JPEG:
-      data = _LoadJPEG(id, p, NULL, 0, &w, &h);
+      data = _LoadJPEG(p, NULL, 0, &w, &h);
         break;
     default:
         break;
