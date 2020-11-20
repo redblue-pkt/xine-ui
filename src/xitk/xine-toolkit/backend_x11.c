@@ -114,6 +114,7 @@ typedef enum {
   XITK_A__NET_WM_STATE_FULLSCREEN,
   XITK_A__NET_WM_STATE_ABOVE,
   XITK_A__NET_WM_STATE_BELOW,
+  XITK_A__NET_WM_STATE_STAYS_ON_TOP,
   XITK_A__NET_WM_STATE_DEMANDS_ATTENTION,
   XITK_A_LAST
 } xitk_x11_atoms_t;
@@ -1411,6 +1412,94 @@ static int xitk_x11_window_get_props (xitk_be_window_t *_win, xitk_tagitem_t *ta
   return xitk_tags_get (win->props, taglist);
 }
 
+static void _set_layer_above(xitk_x11_window_t *win) {
+  xitk_t  *xitk    = win->d->be->be.xitk;
+  Display *display = win->d->display;
+  Window   window  = win->w.id;
+  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+
+  if ((wm_type & WM_TYPE_GNOME_COMP) && !(wm_type & WM_TYPE_EWMH_COMP)) {
+    long propvalue[1];
+
+    propvalue[0] = xitk_get_layer_level(xitk);
+    XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+                     XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+                     1);
+    return;
+  }
+
+
+  if (wm_type & WM_TYPE_EWMH_COMP) {
+    XEvent xev;
+
+    memset(&xev, 0, sizeof xev);
+    if (wm_type & WM_TYPE_KWIN) {
+      xev.xclient.type         = ClientMessage;
+      xev.xclient.display      = display;
+      xev.xclient.window       = window;
+      xev.xclient.message_type = win->d->atoms[XITK_A__NET_WM_STATE];
+      xev.xclient.format       = 32;
+      xev.xclient.data.l[0]    = 1;
+      xev.xclient.data.l[1]    = win->d->atoms[XITK_A__NET_WM_STATE_STAYS_ON_TOP];
+      xev.xclient.data.l[2]    = 0l;
+      xev.xclient.data.l[3]    = 0l;
+      xev.xclient.data.l[4]    = 0l;
+
+      XSendEvent (display, DefaultRootWindow (display), True, SubstructureRedirectMask, &xev);
+    }
+    else {
+      xev.xclient.type         = ClientMessage;
+      xev.xclient.serial       = 0;
+      xev.xclient.send_event   = True;
+      xev.xclient.display      = display;
+      xev.xclient.window       = window;
+      xev.xclient.message_type = win->d->atoms[XITK_A__NET_WM_STATE];
+      xev.xclient.format       = 32;
+      xev.xclient.data.l[0]    = (long) 1;
+      xev.xclient.data.l[1]    = (long) win->d->atoms[XITK_A__NET_WM_STATE_ABOVE];
+      xev.xclient.data.l[2]    = (long) None;
+
+      XSendEvent (display, DefaultRootWindow (display),
+                  False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
+
+    }
+
+    return;
+  }
+
+  switch (wm_type & WM_TYPE_COMP_MASK) {
+  case WM_TYPE_MOTIF:
+  case WM_TYPE_LARSWM:
+    break;
+
+  case WM_TYPE_KWIN:
+    XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+                     XA_ATOM, 32, PropModeReplace, (unsigned char *)&win->d->atoms[XITK_A__NET_WM_STATE_STAYS_ON_TOP], 1);
+    break;
+
+  case WM_TYPE_UNKNOWN:
+  case WM_TYPE_WINDOWMAKER:
+  case WM_TYPE_ICE:
+  case WM_TYPE_E:
+  case WM_TYPE_XFCE:
+  case WM_TYPE_SAWFISH:
+  case WM_TYPE_METACITY: /* Untested */
+  case WM_TYPE_AFTERSTEP:
+  case WM_TYPE_BLACKBOX:
+  case WM_TYPE_DTWM:
+    {
+      long propvalue[1];
+
+      propvalue[0] = xitk_get_layer_level(xitk);
+
+      XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+                       XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+                       1);
+    }
+    break;
+  }
+}
+
 static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem_t *taglist) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
@@ -1531,6 +1620,15 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     XSetTransientForHint (d->display, win->w.id, tw ? tw->w.id : None);
     d->d.unlock (&d->d);
     win->props[XITK_X11_WT_TRANSIENT_FOR].value = props[XITK_X11_WT_TRANSIENT_FOR].value;
+  }
+
+  if (props[XITK_X11_WT_LAYER_ABOVE].value != win->props[XITK_X11_WT_LAYER_ABOVE].value) {
+    if (props[XITK_X11_WT_LAYER_ABOVE].value) {
+      d->d.lock (&d->d);
+      _set_layer_above(win);
+      d->d.unlock (&d->d);
+    }
+    win->props[XITK_X11_WT_LAYER_ABOVE].value = props[XITK_X11_WT_LAYER_ABOVE].value;
   }
 
   if (props[XITK_X11_WT_CURSOR].value != win->props[XITK_X11_WT_CURSOR].value) {
@@ -2548,6 +2646,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
       [XITK_A__NET_WM_STATE_FULLSCREEN]    = "_NET_WM_STATE_FULLSCREEN",
       [XITK_A__NET_WM_STATE_ABOVE]         = "_NET_WM_STATE_ABOVE",
       [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
+      [XITK_A__NET_WM_STATE_STAYS_ON_TOP]  = "_NET_WM_STATE_STAYS_ON_TOP",
       [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION",
     };
     d->d.lock (&d->d);

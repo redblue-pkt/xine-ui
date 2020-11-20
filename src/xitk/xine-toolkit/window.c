@@ -140,6 +140,19 @@ void xitk_window_set_window_layer(xitk_window_t *w, int layer) {
   xitk_x11_set_window_layer(w->xitk, w->window, layer);
 }
 
+void xitk_window_set_layer_above(xitk_window_t *w) {
+
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_LAYER_ABOVE, (uintptr_t)1},
+    {XITK_TAG_END, 0}
+  };
+
+  if (w == NULL)
+    return;
+
+  w->bewin->set_props (w->bewin, tags);
+}
+
 /*
  *
  */

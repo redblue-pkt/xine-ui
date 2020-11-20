@@ -79,7 +79,6 @@ int xitk_x11_parse_geometry(const char *geomstr, int *x, int *y, int *w, int *h)
  *
  */
 
-void xitk_set_layer_above(Window window);
 void xitk_x11_set_window_layer(xitk_t *, Window window, int layer);
 void xitk_set_ewmh_fullscreen(Window window);
 void xitk_unset_ewmh_fullscreen(Window window);

@@ -554,6 +554,7 @@ uint32_t xitk_get_wm_type (xitk_t *xitk);
  *
  */
 void xitk_window_set_window_layer(xitk_window_t *w, int layer);
+void xitk_window_set_layer_above(xitk_window_t *w);
 
 /*
  * This function start the widget live. It's a block function,
