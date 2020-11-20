@@ -1611,22 +1611,30 @@ int xitk_is_widget_focused(xitk_widget_t *w) {
   return(w->have_focus == FOCUS_RECEIVED);
 }
 
-static void xitk_widget_show_hide (xitk_widget_t *w, int visible) {
-  w->visible = visible;
-  if (w->state.visible != visible) {
-    widget_event_t  event;
+static void xitk_widget_paint (xitk_widget_t *w) {
+  widget_event_t  event;
 
-    w->state.visible = visible;
-    if (!visible && w->wl && (w->wl->widget_under_mouse == w))
-      xitk_tips_hide_tips (w->wl->xitk->tips);
-    event.type = WIDGET_EVENT_PAINT;
-    w->event (w, &event, NULL);
-  }
+  if (!w->visible && w->wl && (w->wl->widget_under_mouse == w))
+    xitk_tips_hide_tips (w->wl->xitk->tips);
+  event.type = WIDGET_EVENT_PAINT;
+  w->event (w, &event, NULL);
 }
 
-static void xitk_widget_able (xitk_widget_t *w, int enable) {
+static int xitk_widget_show_hide (xitk_widget_t *w, int visible) {
+  w->visible = visible;
+  if (w->state.visible != visible) {
+    w->state.visible = visible;
+    return 1;
+  }
+  return 0;
+}
+
+static int xitk_widget_able (xitk_widget_t *w, int enable) {
+  int res = 0;
+
   w->enable = enable;
   if (w->state.enable != enable) {
+    res = 1;
     w->state.enable = enable;
     if (w->wl) {
       if (!enable) {
@@ -1641,6 +1649,7 @@ static void xitk_widget_able (xitk_widget_t *w, int enable) {
           w->have_focus = FOCUS_LOST;
           event.type = WIDGET_EVENT_PAINT;
           w->event (w, &event, NULL);
+          res = 0;
         }
         if (w == w->wl->widget_focused)
           w->wl->widget_focused = NULL;
@@ -1660,6 +1669,7 @@ static void xitk_widget_able (xitk_widget_t *w, int enable) {
       w->event (w, &event, NULL);
     }
   }
+  return res;
 }
 
 static void xitk_widget_run (xitk_widget_t *w, int start) {
@@ -1676,7 +1686,8 @@ void xitk_enable_widget (xitk_widget_t *w) {
     XITK_WARNING ("widget is NULL\n");
     return;
   }
-  xitk_widget_able (w, 1);
+  if (xitk_widget_able (w, 1))
+    xitk_widget_paint (w);
 }
 
 /*
@@ -1685,7 +1696,8 @@ void xitk_enable_widget (xitk_widget_t *w) {
 void xitk_disable_widget (xitk_widget_t *w) {
   if (!w)
     return;
-  xitk_widget_able (w, 0);
+  if (xitk_widget_able (w, 0))
+    xitk_widget_paint (w);
 }
 
 /*
@@ -1693,14 +1705,17 @@ void xitk_disable_widget (xitk_widget_t *w) {
  */
 void xitk_destroy_widget(xitk_widget_t *w) {
   widget_event_t event;
+  int paint;
 
   if (!w)
     return;
 
   xitk_clipboard_unregister_widget (w);
-  xitk_widget_show_hide (w, 0);
+  paint = xitk_widget_show_hide (w, 0);
   xitk_widget_run (w, 0);
-  xitk_widget_able (w, 0);
+  paint |= xitk_widget_able (w, 0);
+  if (paint)
+    xitk_widget_paint (w);
 
   xitk_widget_rel_deinit (&w->parent);
   xitk_widget_rel_deinit (&w->focus_redirect);
@@ -1896,7 +1911,8 @@ void xitk_show_widget (xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
-  xitk_widget_show_hide (w, 1);
+  if (xitk_widget_show_hide (w, 1))
+    xitk_widget_paint (w);
 }
 
 /*
@@ -1913,18 +1929,23 @@ void xitk_show_widgets (xitk_widget_list_t *wl) {
     if (w->visible == -1) {
       w->visible = 0;
     } else {
-      xitk_widget_show_hide (w, 1);
+      if (xitk_widget_show_hide (w, 1))
+        xitk_widget_paint (w);
     }
   }
 }
 
 void xitk_enable_and_show_widget(xitk_widget_t *w) {
+  int paint;
+
   if(!w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
-  xitk_widget_able (w, 1);
-  xitk_widget_show_hide (w, 1);
+  paint = xitk_widget_able (w, 1);
+  paint |= xitk_widget_show_hide (w, 1);
+  if (paint)
+    xitk_widget_paint (w);
 }
 
 /*
@@ -1933,7 +1954,8 @@ void xitk_enable_and_show_widget(xitk_widget_t *w) {
 void xitk_hide_widget (xitk_widget_t *w) {
   if (!w)
     return;
-  xitk_widget_show_hide (w, 0);
+  if (xitk_widget_show_hide (w, 0))
+    xitk_widget_paint (w);
 }
 
 /*
@@ -1951,16 +1973,21 @@ void xitk_hide_widgets (xitk_widget_list_t *wl) {
     if (w->visible == 0) {
         w->visible = -1;
     } else {
-      xitk_widget_show_hide (w, 0);
+      if (xitk_widget_show_hide (w, 0))
+        xitk_widget_paint (w);
     }
   }
 }
 
 void xitk_disable_and_hide_widget (xitk_widget_t *w) {
+  int paint;
+
   if (!w)
     return;
-  xitk_widget_able (w, 0);
-  xitk_widget_show_hide (w, 0);
+  paint = xitk_widget_able (w, 0);
+  paint |= xitk_widget_show_hide (w, 0);
+  if (paint)
+    xitk_widget_paint (w);
 }
 
 /*
@@ -2256,3 +2283,4 @@ void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redi
   xitk_widget_rel_join (&w->focus_redirect,
     focus_redirect && (focus_redirect->wl == w->wl) ? &focus_redirect->focus_redirect : NULL);
 }
+

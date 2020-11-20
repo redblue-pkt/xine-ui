@@ -172,16 +172,23 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
   /*  Some colors configurations */
   {
     xitk_color_names_t color, *have_cn = NULL;
-    static const xitk_cfg_item_t idx[_LB_END] = {XITK_BLACK_COLOR, XITK_BLACK_COLOR, XITK_WHITE_COLOR};
+    static const xitk_cfg_item_t idx[2 * _LB_END] = {
+      XITK_BLACK_COLOR, XITK_BLACK_COLOR, XITK_WHITE_COLOR,
+      XITK_BG_COLOR, XITK_BG_COLOR, XITK_SELECT_COLOR
+    };
 
     if (state >= _LB_END)
       state = _LB_NORMAL;
     if (strcasecmp (wp->color[state], "Default"))
       have_cn = xitk_get_color_name (&color, wp->color[state]);
     if (have_cn) {
-      fg = xitk_color_db_get (wp->w.wl->xitk, (color.red << 16) + (color.green << 8) + color.blue);
+      uint32_t v = (color.red << 16) + (color.green << 8) + color.blue;
+      if (!wp->w.enable) {
+        v = ((v >> 2) & 0x3f3f3f) + 0x606060;
+      }
+      fg = xitk_color_db_get (wp->w.wl->xitk, v);
     } else {
-      fg = xitk_get_cfg_num (wp->w.wl->xitk, idx[state]);
+      fg = xitk_get_cfg_num (wp->w.wl->xitk, idx[(wp->w.enable ? 0 : 3) + state]);
     }
   }
 
