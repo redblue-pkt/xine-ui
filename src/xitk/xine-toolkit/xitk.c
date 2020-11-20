@@ -50,19 +50,9 @@
 #include <execinfo.h>
 #endif
 
-#ifdef HAVE_SYS_IPC_H
-#include <sys/ipc.h>
-#endif
-#ifdef HAVE_SYS_SHM_H
-#include <sys/shm.h>
-#endif
-
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
-#ifdef HAVE_X11_EXTENSIONS_XSHM_H
-#include <X11/extensions/XShm.h>
-#endif
 
 #include "xitk/Imlib-light/Imlib.h"
 
@@ -258,7 +248,6 @@ struct __xitk_s {
   int                         display_height;
   int                         verbosity;
   xitk_dlist_t                gfxs;
-  int                         use_xshm;
   int                         install_colormap;
 
   struct {
@@ -851,41 +840,6 @@ static void xitk_signal_handler(int sig) {
 
 
   }
-}
-
-/*
- * Desc: query the server for support for the MIT_SHM extension
- * Return:  0 = not available
- *          1 = shared XImage support available
- *          2 = shared Pixmap support available also
- * Shamelessly stolen from gdk, and slightly tuned for xitk.
- */
-static int xitk_check_xshm(Display *display) {
-#ifdef HAVE_SHM
-  if(XShmQueryExtension(display)) {
-    int major, minor, ignore;
-    Bool pixmaps;
-
-    if(XQueryExtension(display, "MIT-SHM", &ignore, &ignore, &ignore)) {
-      if(XShmQueryVersion(display, &major, &minor, &pixmaps ) == True) {
-	if((pixmaps == True) && ((XShmPixmapFormat(display)) == ZPixmap))
-	  return 2;
-	else if(pixmaps == True)
-	  return 1;
-      }
-    }
-  }
-#else
-  (void)display;
-#endif
-  return 0;
-}
-
-int xitk_is_use_xshm (xitk_t *_xitk) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, _xitk, x);
-  return xitk->use_xshm;
 }
 
 /* Extract WM Name */
@@ -2430,7 +2384,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk->use_xshm        = xitk_config_get_num (xitk->config, XITK_SHM_ENABLE) ? xitk_check_xshm (xitk->display) : 0;
   xitk_x_error           = 0;
   xitk->x_error_handler = NULL;
   //xitk->modalw          = None;
@@ -2451,57 +2404,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   pthread_mutex_init (&xitk->mutex, &attr);
 
   snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
-
-  /* Check if SHM is working */
-#ifdef HAVE_SHM
-  if(xitk->use_xshm) {
-    XImage             *xim;
-    XShmSegmentInfo     shminfo;
-
-    xim = XShmCreateImage(display,
-			  (DefaultVisual(display, (DefaultScreen(display)))),
-			  (DefaultDepth(display, (DefaultScreen(display)))),
-			  ZPixmap, NULL, &shminfo, 10, 10);
-    if(!xim)
-      xitk->use_xshm = 0;
-    else {
-      shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
-      if(shminfo.shmid < 0) {
-	XDestroyImage(xim);
-	xitk->use_xshm = 0;
-      }
-      else {
-	shminfo.shmaddr = xim->data =  shmat(shminfo.shmid, 0, 0);
-	if(shminfo.shmaddr == (char *) -1) {
-	  XDestroyImage(xim);
-	  xitk->use_xshm = 0;
-	}
-	else {
-	  shminfo.readOnly = False;
-
-	  xitk_x_error = 0;
-	  xitk_install_x_error_handler();
-
-	  XShmAttach(display, &shminfo);
-	  XSync(display, False);
-	  if(xitk_x_error)
-	    xitk->use_xshm = 0;
-	  else {
-	    XShmDetach(display, &shminfo);
-	    strlcat(buffer, "[XShm]", sizeof(buffer));
-	  }
-
-	  XDestroyImage(xim);
-	  shmdt(shminfo.shmaddr);
-
-	  xitk_uninstall_x_error_handler();
-	  xitk_x_error = 0;
-	}
-	shmctl(shminfo.shmid, IPC_RMID, 0);
-      }
-    }
-  }
-#endif
 
 #ifdef WITH_XFT
   strlcat(buffer, "[XFT]", sizeof(buffer));

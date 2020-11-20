@@ -179,7 +179,6 @@ int xitk_uninstall_x_error_handler (xitk_t *xitk);
 const char *xine_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, const char *command);
-int xitk_is_use_xshm (xitk_t *xitk);
 
 void xitk_set_xmb_enability(xitk_t *, int value);
 
