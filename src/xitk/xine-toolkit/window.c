@@ -132,20 +132,12 @@ void xitk_window_set_window_icon (xitk_window_t *w, xitk_image_t *icon) {
   w->bewin->set_props (w->bewin, tags);
 }
 
-void xitk_window_set_layer_above(xitk_window_t *w) {
-
-  if (w == NULL)
-    return;
-
-  xitk_set_layer_above(w->window);
-}
-
 void xitk_window_set_window_layer(xitk_window_t *w, int layer) {
 
   if (w == NULL)
     return;
 
-  xitk_set_window_layer(w->window, layer);
+  xitk_x11_set_window_layer(w->xitk, w->window, layer);
 }
 
 /*

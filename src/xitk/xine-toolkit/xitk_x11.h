@@ -82,7 +82,7 @@ Display *xitk_x11_open_display(int use_x_lock_display, int use_synchronized_x, i
  */
 
 void xitk_set_layer_above(Window window);
-void xitk_set_window_layer(Window window, int layer);
+void xitk_x11_set_window_layer(xitk_t *, Window window, int layer);
 void xitk_set_ewmh_fullscreen(Window window);
 void xitk_unset_ewmh_fullscreen(Window window);
 
