@@ -216,10 +216,6 @@ typedef struct {
 
 typedef enum {
   XITK_A_WIN_LAYER = 0,
-  XITK_A_STAYS_ON_TOP,
-  XITK_A_NET_WM_STATE,
-  XITK_A_NET_WM_STATE_ABOVE,
-  XITK_A_NET_WM_STATE_FULLSCREEN,
   XITK_A_WM_WINDOW_TYPE,
   XITK_A_WM_WINDOW_TYPE_DESKTOP,
   XITK_A_WM_WINDOW_TYPE_DOCK,
@@ -233,7 +229,6 @@ typedef enum {
   XITK_A_WM_WINDOW_TYPE_TOOLTIP,
   XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
   XITK_A_WM_WINDOW_TYPE_COMBO,
-  XITK_A_WM_WINDOW_TYPE_DND,
   XITK_A_WM_WINDOW_TYPE_NORMAL,
   XITK_A_END
 } xitk_atom_t;
@@ -793,220 +788,19 @@ static void xitk_signal_handler(int sig) {
   }
 }
 
-/* Extract WM Name */
-static unsigned char *get_wm_name (Display *display, Window win, Atom atom, Atom type_utf8) {
-  unsigned char   *prop_return = NULL;
-  unsigned long    nitems_return, bytes_after_return;
-  Atom             type_return;
-  int              format_return;
-
-  if (atom == None)
-    return NULL;
-
-  if ((XGetWindowProperty (display, win, atom, 0, 4, False, XA_STRING,
-    &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return)) != Success)
-    return NULL;
-
-  do {
-    if (type_return == None)
-      break;
-    if (type_return == XA_STRING)
-      return prop_return;
-    if (type_return == type_utf8) {
-      if (prop_return) {
-        XFree (prop_return);
-        prop_return = NULL;
-      }
-      if ((XGetWindowProperty (display, win, atom, 0, 4, False, type_utf8,
-        &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return)) != Success)
-        break;
-    }
-    if (format_return == 8)
-      return prop_return;
-  } while (0);
-  if (prop_return)
-    XFree (prop_return);
-  return NULL;
-}
-
-static int _x_error_handler(Display *display, XErrorEvent *xevent) {
-  char buffer[2048];
-
-  XGetErrorText(display, xevent->error_code, &buffer[0], 1023);
-
-  XITK_WARNING("X error received: '%s'\n", buffer);
-
-  return 0;
-}
-
-static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
-  enum {
-    _XFWM_F = 0,
-    __WINDO, __SAWMI, _ENLIGH, __METAC, __AS_ST,
-    __ICEWM, __BLACK, _LARSWM, _KWIN_R, __DT_SM,
-    _DTWM_I, __WIN_S, __NET_S, __NET_W, __NET_N,
-    __WIN_N, _UTF8_S, _WMEND_
-  };
-  static const char * const wm_det_names[_WMEND_] = {
-    [_XFWM_F] = "XFWM_FLAGS",
-    [__WINDO] = "_WINDOWMAKER_WM_PROTOCOLS",
-    [__SAWMI] = "_SAWMILL_TIMESTAMP",
-    [_ENLIGH] = "ENLIGHTENMENT_COMMS",
-    [__METAC] = "_METACITY_RESTART_MESSAGE",
-    [__AS_ST] = "_AS_STYLE",
-    [__ICEWM] = "_ICEWM_WINOPTHINT",
-    [__BLACK] = "_BLACKBOX_HINTS",
-    [_LARSWM] = "LARSWM_EXIT",
-    [_KWIN_R] = "KWIN_RUNNING",
-    [__DT_SM] = "_DT_SM_WINDOW_INFO",
-    [_DTWM_I] = "DTWM_IS_RUNNING",
-    [__WIN_S] = "_WIN_SUPPORTING_WM_CHECK",
-    [__NET_S] = "_NET_SUPPORTING_WM_CHECK",
-    [__NET_W] = "_NET_WORKAREA",
-    [__NET_N] = "_NET_WM_NAME",
-    [__WIN_N] = "_WIN_WM_NAME",
-    [_UTF8_S] = "UTF8_STRING"
-  };
-  Atom      wm_det_atoms[_WMEND_];
-  uint32_t  type = WM_TYPE_UNKNOWN;
-  unsigned char *wm_name = NULL;
-  int (*old_error_handler)(Display *, XErrorEvent *);
+static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
+{
+  uint32_t type;
 
   xitk->x.lock_display (&xitk->x);
 
-  xitk->XA_XITK = XInternAtom (xitk->display, "_XITK_EVENT", False);
-  
-  XInternAtoms (display, (char **)wm_det_names, _WMEND_, True, wm_det_atoms);
-  if (wm_det_atoms[_XFWM_F] != None)
-    type |= WM_TYPE_XFCE;
-  else if (wm_det_atoms[__WINDO] != None)
-    type |= WM_TYPE_WINDOWMAKER;
-  else if (wm_det_atoms[__SAWMI] != None)
-    type |= WM_TYPE_SAWFISH;
-  else if (wm_det_atoms[_ENLIGH] != None)
-    type |= WM_TYPE_E;
-  else if (wm_det_atoms[__METAC] != None)
-    type |= WM_TYPE_METACITY;
-  else if (wm_det_atoms[__AS_ST] != None)
-    type |= WM_TYPE_AFTERSTEP;
-  else if (wm_det_atoms[__ICEWM] != None)
-    type |= WM_TYPE_ICE;
-  else if (wm_det_atoms[__BLACK] != None)
-    type |= WM_TYPE_BLACKBOX;
-  else if (wm_det_atoms[_LARSWM] != None)
-    type |= WM_TYPE_LARSWM;
-  else if ((wm_det_atoms[_KWIN_R] != None) && (wm_det_atoms[__DT_SM] != None))
-    type |= WM_TYPE_KWIN;
-  else if (wm_det_atoms[_DTWM_I] != None)
-    type |= WM_TYPE_DTWM;
+  type = xitk_x11_check_wm(display, xitk->verbosity >= 2);
 
-  old_error_handler = XSetErrorHandler (_x_error_handler);
-  XSync (xitk->display, False);
-
-  if (wm_det_atoms[__WIN_S] != None) {
-    unsigned char   *prop_return = NULL;
-    unsigned long    nitems_return;
-    unsigned long    bytes_after_return;
-    Atom             type_return;
-    int              format_return;
-    Status           status;
-
-    /* Check for Gnome Compliant WM */
-    if ((XGetWindowProperty (display, (XDefaultRootWindow (display)), wm_det_atoms[__WIN_S], 0,
-			   1, False, XA_CARDINAL,
-			   &type_return, &format_return, &nitems_return,
-			   &bytes_after_return, &prop_return)) == Success) {
-
-      if((type_return != None) && (type_return == XA_CARDINAL) &&
-	 ((format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0))) {
-	unsigned char   *prop_return2 = NULL;
-	Window           win_id;
-
-	win_id = *(unsigned long *)prop_return;
-
-        status = XGetWindowProperty (display, win_id, wm_det_atoms[__WIN_S], 0,
-				    1, False, XA_CARDINAL,
-				    &type_return, &format_return, &nitems_return,
-				    &bytes_after_return, &prop_return2);
-
-	if((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
-
-	  if((format_return == 32) && (nitems_return == 1)
-	     && (bytes_after_return == 0) && (win_id == *(unsigned long *)prop_return2)) {
-	    type |= WM_TYPE_GNOME_COMP;
-	  }
-	}
-
-	if(prop_return2)
-	  XFree(prop_return2);
-
-        if (!(wm_name = get_wm_name (display, win_id, wm_det_atoms[__NET_N], wm_det_atoms[_UTF8_S]))) {
-	  /*
-	   * Enlightenment is Gnome compliant, but don't set
-	   * the _NET_WM_NAME atom property
-	   */
-            wm_name = get_wm_name (display, (XDefaultRootWindow (display)), wm_det_atoms[__WIN_N], wm_det_atoms[_UTF8_S]);
-	}
-      }
-
-      if(prop_return)
-	XFree(prop_return);
-    }
-  }
-
-  /* Check for Extended Window Manager Hints (EWMH) Compliant */
-  if ((wm_det_atoms[__NET_S] != None) && (wm_det_atoms[__NET_W] != None)) {
-    unsigned char   *prop_return = NULL;
-    unsigned long    nitems_return;
-    unsigned long    bytes_after_return;
-    Atom             type_return;
-    int              format_return;
-    Status           status;
-
-    if ((XGetWindowProperty (display, (XDefaultRootWindow (display)), wm_det_atoms[__NET_S], 0, 1, False, XA_WINDOW,
-			   &type_return, &format_return, &nitems_return,
-			   &bytes_after_return, &prop_return)) == Success) {
-
-      if((type_return != None) && (type_return == XA_WINDOW) &&
-	 (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
-	unsigned char   *prop_return2 = NULL;
-	Window           win_id;
-
-	win_id = *(unsigned long *)prop_return;
-
-        status = XGetWindowProperty (display, win_id, wm_det_atoms[__NET_S], 0,
-				    1, False, XA_WINDOW,
-				    &type_return, &format_return, &nitems_return,
-				    &bytes_after_return, &prop_return2);
-
-	if((status == Success) && (type_return != None) && (type_return == XA_WINDOW) &&
-	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
-
-	  if(win_id == *(unsigned long *)prop_return) {
-            if (wm_name)
-              XFree (wm_name);
-            wm_name = get_wm_name (display, win_id, wm_det_atoms[__NET_N], wm_det_atoms[_UTF8_S]);
-	    type |= WM_TYPE_EWMH_COMP;
-	  }
-	}
-	if(prop_return2)
-	  XFree(prop_return2);
-      }
-      if(prop_return)
-	XFree(prop_return);
-    }
-  }
-
-  XSetErrorHandler (old_error_handler);
-  XSync (xitk->display, False);
+  xitk->XA_XITK = XInternAtom (display, "_XITK_EVENT", False);
 
   if (type & WM_TYPE_EWMH_COMP) {
     static const char * const atom_names[XITK_A_END] = {
         [XITK_A_WIN_LAYER]                    = "_NET_WM_STATE",
-        [XITK_A_STAYS_ON_TOP]                 = "_NET_WM_STATE_STAYS_ON_TOP",
-        [XITK_A_NET_WM_STATE]                 = "_NET_WM_STATE",
-        [XITK_A_NET_WM_STATE_ABOVE]           = "_NET_WM_STATE_ABOVE",
-        [XITK_A_NET_WM_STATE_FULLSCREEN]      = "_NET_WM_STATE_FULLSCREEN",
         [XITK_A_WM_WINDOW_TYPE]               = "_NET_WM_WINDOW_TYPE",
         [XITK_A_WM_WINDOW_TYPE_DESKTOP]       = "_NET_WM_WINDOW_TYPE_DESKTOP",
         [XITK_A_WM_WINDOW_TYPE_DOCK]          = "_NET_WM_WINDOW_TYPE_DOCK",
@@ -1020,18 +814,13 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
         [XITK_A_WM_WINDOW_TYPE_TOOLTIP]       = "_NET_WM_WINDOW_TYPE_TOOLTIP",
         [XITK_A_WM_WINDOW_TYPE_NOTIFICATION]  = "_NET_WM_WINDOW_TYPE_NOTIFICATION",
         [XITK_A_WM_WINDOW_TYPE_COMBO]         = "_NET_WM_WINDOW_TYPE_COMBO",
-        [XITK_A_WM_WINDOW_TYPE_DND]           = "_NET_WM_WINDOW_TYPE_DND",
         [XITK_A_WM_WINDOW_TYPE_NORMAL]        = "_NET_WM_WINDOW_TYPE_NORMAL"
     };
-    XInternAtoms (xitk->display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
+    XInternAtoms (display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
   }
 
   switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KWIN:
-    if (xitk->atoms[XITK_A_NET_WM_STATE] == None)
-      xitk->atoms[XITK_A_NET_WM_STATE] = XInternAtom(display, "_NET_WM_STATE", False);
-    if (xitk->atoms[XITK_A_STAYS_ON_TOP] == None)
-      xitk->atoms[XITK_A_STAYS_ON_TOP] = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
     break;
 
   case WM_TYPE_MOTIF:
@@ -1054,38 +843,9 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
 
   xitk->x.unlock_display (&xitk->x);
 
-  if (xitk->verbosity >= 2) {
-    static const char * const names[] = {
-        [WM_TYPE_UNKNOWN]     = "Unknown",
-        [WM_TYPE_KWIN]        = "KWIN",
-        [WM_TYPE_E]           = "Enlightenment",
-        [WM_TYPE_ICE]         = "Ice",
-        [WM_TYPE_WINDOWMAKER] = "WindowMaker",
-        [WM_TYPE_MOTIF]       = "Motif(like?)",
-        [WM_TYPE_XFCE]        = "XFce",
-        [WM_TYPE_SAWFISH]     = "Sawfish",
-        [WM_TYPE_METACITY]    = "Metacity",
-        [WM_TYPE_AFTERSTEP]   = "Afterstep",
-        [WM_TYPE_BLACKBOX]    = "Blackbox",
-        [WM_TYPE_LARSWM]      = "LarsWM",
-        [WM_TYPE_DTWM]        = "dtwm"
-    };
-    uint32_t t = type & WM_TYPE_COMP_MASK;
-    const char *name = (t < sizeof (names) / sizeof (names[0])) ? names[t] : NULL;
-
-    if (!name)
-      name = names[WM_TYPE_UNKNOWN];
-    printf ("[ WM type: %s%s%s {%s} ]-\n",
-      (type & WM_TYPE_GNOME_COMP) ? "(GnomeCompliant) " : "",
-      (type & WM_TYPE_EWMH_COMP) ? "(EWMH) " : "",
-      name, wm_name ? (char *)wm_name : "");
-  }
-
-  if (wm_name)
-    XFree (wm_name);
-
   return type;
 }
+
 uint32_t xitk_get_wm_type (xitk_t *xitk) {
   __xitk_t *_xitk;
 
@@ -1152,51 +912,6 @@ void xitk_x11_set_window_layer(xitk_t *_xitk, Window window, int layer) {
   xitk->x.unlock_display (&xitk->x);
 }
 
-static void _set_ewmh_state (__xitk_t *xitk, Window window, Atom atom, int enable) {
-  XEvent xev;
-
-  if((window == None) || (atom == None))
-    return;
-
-  memset(&xev, 0, sizeof(xev));
-  xev.xclient.type         = ClientMessage;
-  xev.xclient.message_type = xitk->atoms[XITK_A_NET_WM_STATE];
-  xev.xclient.display      = xitk->display;
-  xev.xclient.window       = window;
-  xev.xclient.format       = 32;
-  xev.xclient.data.l[0]    = (enable == 1) ? 1 : 0;
-  xev.xclient.data.l[1]    = atom;
-  xev.xclient.data.l[2]    = 0l;
-  xev.xclient.data.l[3]    = 0l;
-  xev.xclient.data.l[4]    = 0l;
-
-  xitk->x.lock_display (&xitk->x);
-  XSendEvent (xitk->display, DefaultRootWindow (xitk->display), True, SubstructureRedirectMask, &xev);
-  xitk->x.unlock_display (&xitk->x);
-}
-
-void xitk_set_ewmh_fullscreen(Window window) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
-    return;
-
-  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 1);
-  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_STAYS_ON_TOP], 1);
-}
-
-void xitk_unset_ewmh_fullscreen(Window window) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, gXitk, x);
-  if (!(xitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
-    return;
-
-  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_NET_WM_STATE_FULLSCREEN], 0);
-  _set_ewmh_state (xitk, window, xitk->atoms[XITK_A_STAYS_ON_TOP], 0);
-}
-
 void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type) {
   __xitk_t *_xitk;
 
@@ -1222,7 +937,6 @@ void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t
         [WINDOW_TYPE_TOOLTIP]       = XITK_A_WM_WINDOW_TYPE_TOOLTIP,
         [WINDOW_TYPE_NOTIFICATION]  = XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
         [WINDOW_TYPE_COMBO]         = XITK_A_WM_WINDOW_TYPE_COMBO,
-        [WINDOW_TYPE_DND]           = XITK_A_WM_WINDOW_TYPE_DND,
         [WINDOW_TYPE_NORMAL]        = XITK_A_WM_WINDOW_TYPE_NORMAL
       };
 
