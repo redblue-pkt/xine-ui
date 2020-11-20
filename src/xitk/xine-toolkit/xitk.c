@@ -263,8 +263,6 @@ struct __xitk_s {
 
   uint32_t                    wm_type;
 
-  int                        (*x_error_handler)(Display *, XErrorEvent *);
-
   pthread_mutex_t             mutex;
   int                         running;
   xitk_register_key_t         key;
@@ -712,28 +710,6 @@ void xitk_usec_sleep(unsigned long usec) {
 #endif
 }
 
-#if 0
-static int _x_ignoring_error_handler(Display *display, XErrorEvent *xevent) {
-  (void)display;
-  (void)xevent;
-  return 0;
-}
-#endif
-
-int xitk_x_error;
-
-static int _x_error_handler(Display *display, XErrorEvent *xevent) {
-  char buffer[2048];
-
-  XGetErrorText(display, xevent->error_code, &buffer[0], 1023);
-
-  XITK_WARNING("X error received: '%s'\n", buffer);
-
-  xitk_x_error = 1;
-  return 0;
-
-}
-
 void xitk_set_current_menu(xitk_t *_xitk, xitk_widget_t *menu) {
   __xitk_t *xitk;
 
@@ -748,31 +724,6 @@ void xitk_unset_current_menu(xitk_t *_xitk) {
 
   xitk_container (xitk, _xitk, x);
   xitk->menu = NULL;
-}
-
-int xitk_install_x_error_handler (xitk_t *_xitk) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, _xitk, x);
-  if (xitk->x_error_handler == NULL) {
-    xitk->x_error_handler = XSetErrorHandler (_x_error_handler);
-    XSync (xitk->display, False);
-    return 1;
-  }
-  return 0;
-}
-
-int xitk_uninstall_x_error_handler (xitk_t *_xitk) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, _xitk, x);
-  if (xitk->x_error_handler != NULL) {
-    XSetErrorHandler (xitk->x_error_handler);
-    xitk->x_error_handler = NULL;
-    XSync (xitk->display, False);
-    return 1;
-  }
-  return 0;
 }
 
 /*
@@ -877,6 +828,17 @@ static unsigned char *get_wm_name (Display *display, Window win, Atom atom, Atom
     XFree (prop_return);
   return NULL;
 }
+
+static int _x_error_handler(Display *display, XErrorEvent *xevent) {
+  char buffer[2048];
+
+  XGetErrorText(display, xevent->error_code, &buffer[0], 1023);
+
+  XITK_WARNING("X error received: '%s'\n", buffer);
+
+  return 0;
+}
+
 static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
   enum {
     _XFWM_F = 0,
@@ -908,6 +870,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
   Atom      wm_det_atoms[_WMEND_];
   uint32_t  type = WM_TYPE_UNKNOWN;
   unsigned char *wm_name = NULL;
+  int (*old_error_handler)(Display *, XErrorEvent *);
 
   xitk->x.lock_display (&xitk->x);
 
@@ -937,7 +900,8 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
   else if (wm_det_atoms[_DTWM_I] != None)
     type |= WM_TYPE_DTWM;
 
-  xitk_install_x_error_handler (&xitk->x);
+  old_error_handler = XSetErrorHandler (_x_error_handler);
+  XSync (xitk->display, False);
 
   if (wm_det_atoms[__WIN_S] != None) {
     unsigned char   *prop_return = NULL;
@@ -1033,7 +997,8 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display) {
     }
   }
 
-  xitk_uninstall_x_error_handler (&xitk->x);
+  XSetErrorHandler (old_error_handler);
+  XSync (xitk->display, False);
 
   if (type & WM_TYPE_EWMH_COMP) {
     static const char * const atom_names[XITK_A_END] = {
@@ -2383,9 +2348,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk_x_error           = 0;
-  xitk->x_error_handler = NULL;
-  //xitk->modalw          = None;
   xitk->ignore_keys[0]  = XKeysymToKeycode (xitk->display, XK_Shift_L);
   xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->display, XK_Control_L);
   xitk->qual            = 0;

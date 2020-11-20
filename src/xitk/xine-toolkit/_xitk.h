@@ -173,9 +173,6 @@ struct xitk_s {
 #define CHECK_STYLE_CHECK 2
 #define CHECK_STYLE_ROUND 3
 
-int xitk_install_x_error_handler (xitk_t *xitk);
-int xitk_uninstall_x_error_handler (xitk_t *xitk);
-
 const char *xine_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, const char *command);
