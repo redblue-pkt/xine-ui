@@ -1128,15 +1128,14 @@ uint32_t xitk_get_wm_type (xitk_t *xitk) {
   return _xitk->wm_type;
 }
 
-int xitk_get_layer_level(void) {
-  __xitk_t *xitk;
+int xitk_get_layer_level(xitk_t *xitk) {
+  uint32_t wm_type = xitk_get_wm_type(xitk);
   int level = 10;
 
-  xitk_container (xitk, gXitk, x);
-  if ((xitk->wm_type & WM_TYPE_GNOME_COMP) || (xitk->wm_type & WM_TYPE_EWMH_COMP))
+  if ((wm_type & WM_TYPE_GNOME_COMP) || (wm_type & WM_TYPE_EWMH_COMP))
     level = 10;
 
-  switch (xitk->wm_type & WM_TYPE_COMP_MASK) {
+  switch (wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_UNKNOWN:
   case WM_TYPE_KWIN:
   case WM_TYPE_SAWFISH:
@@ -1168,7 +1167,7 @@ void xitk_set_layer_above(Window window) {
   if ((xitk->wm_type & WM_TYPE_GNOME_COMP) && !(xitk->wm_type & WM_TYPE_EWMH_COMP)) {
     long propvalue[1];
 
-    propvalue[0] = xitk_get_layer_level();
+    propvalue[0] = xitk_get_layer_level(&xitk->x);
 
     xitk->x.lock_display (&xitk->x);
     XChangeProperty (xitk->display, window, xitk->atoms[XITK_A_WIN_LAYER],
@@ -1244,7 +1243,7 @@ void xitk_set_layer_above(Window window) {
     {
       long propvalue[1];
 
-      propvalue[0] = xitk_get_layer_level();
+      propvalue[0] = xitk_get_layer_level(&xitk->x);
 
       xitk->x.lock_display (&xitk->x);
       XChangeProperty (xitk->display, window, xitk->atoms[XITK_A_WIN_LAYER],
@@ -1256,11 +1255,11 @@ void xitk_set_layer_above(Window window) {
   }
 }
 
-void xitk_set_window_layer(Window window, int layer) {
+void xitk_x11_set_window_layer(xitk_t *_xitk, Window window, int layer) {
   __xitk_t *xitk;
   XEvent xev;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (xitk, _xitk, x);
   if (((xitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
       ((xitk->wm_type & WM_TYPE_EWMH_COMP) && !(xitk->wm_type & WM_TYPE_GNOME_COMP))) {
     return;
@@ -1617,13 +1616,13 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
 /*
  * Register a callback function called when a signal happen.
  */
-void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data) {
-  __xitk_t *xitk;
+void xitk_register_signal_handler(xitk_t *xitk, xitk_signal_callback_t sigcb, void *user_data) {
+  __xitk_t *_xitk;
 
-  xitk_container (xitk, gXitk, x);
+  xitk_container (_xitk, xitk, x);
   if (sigcb) {
-    xitk->sig_callback = sigcb;
-    xitk->sig_data     = user_data;
+    _xitk->sig_callback = sigcb;
+    _xitk->sig_data     = user_data;
   }
 }
 

@@ -500,7 +500,7 @@ typedef struct {
 /*
  * Register a callback function called when a signal heppen.
  */
-void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data);
+void xitk_register_signal_handler(xitk_t *, xitk_signal_callback_t sigcb, void *user_data);
 
 /*
  * Remove widgetkey_t entry in internal table.
@@ -543,17 +543,12 @@ void xitk_get_display_size (xitk_t *xitk, int *w, int *h);
 /*
  *
  */
-int xitk_get_layer_level(void);
+int xitk_get_layer_level(xitk_t *xitk);
 
 /*
  * Return WM_TYPE_*
  */
 uint32_t xitk_get_wm_type (xitk_t *xitk);
-
-/*
- *
- */
-void xitk_window_set_layer_above(xitk_window_t *window);
 
 /*
  *

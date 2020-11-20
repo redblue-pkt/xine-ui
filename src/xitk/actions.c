@@ -1875,11 +1875,11 @@ void layer_above_video (gGui_t *gui, xitk_window_t *xwin) {
     return;
 
   if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin) > 1) {
-    layer = xitk_get_layer_level();
+    layer = xitk_get_layer_level(gui->xitk);
   }
   else {
     if (is_layer_above (gui))
-      layer = xitk_get_layer_level();
+      layer = xitk_get_layer_level(gui->xitk);
     else
       /* FIXME: never happens? */ layer = 4;
   }
@@ -1891,9 +1891,9 @@ int get_layer_above_video (gGui_t *gui) {
   if (!(gui->always_layer_above || gui->layer_above))
     return 0;
   if ((!(video_window_get_fullscreen_mode (gui->vwin) & WINDOWED_MODE)) && video_window_is_visible (gui->vwin) > 1)
-    return xitk_get_layer_level ();
+    return xitk_get_layer_level (gui->xitk);
   if (gui->always_layer_above || gui->layer_above)
-    return xitk_get_layer_level ();
+    return xitk_get_layer_level (gui->xitk);
   return 4;
 }
 

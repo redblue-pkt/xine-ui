@@ -1877,7 +1877,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   /* We can't handle signals here, xitk handle this, so
    * give a function callback for this.
    */
-  xitk_register_signal_handler(gui_signal_handler, NULL);
+  xitk_register_signal_handler(gui->xitk, gui_signal_handler, NULL);
 
   /*
    * event loop
