@@ -462,7 +462,7 @@ void xitk_window_apply_background (xitk_window_t *xwin) {
     return;
   {
     xitk_tagitem_t tags[2] = {
-      {XITK_TAG_IMAGE, (uintptr_t)xwin->bg_image},
+      {XITK_TAG_IMAGE, (uintptr_t)xwin->bg_image->beimg},
       {XITK_TAG_END, 0}
     };
     xwin->bewin->set_props (xwin->bewin, tags);
