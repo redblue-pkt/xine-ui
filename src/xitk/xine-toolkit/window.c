@@ -246,35 +246,6 @@ void xitk_window_move_window (xitk_window_t *xwin, int x, int y) {
 }
 
 /*
- * Center a window in root window.
- */
-void xitk_window_center_window (xitk_window_t *xwin) {
-  Window rootwin;
-  Display *display;
-  int x, y;
-  unsigned int w, h, b, d;
-
-  if (!xwin)
-    return;
-  if (!xwin->xitk || !xwin->bewin)
-    return;
-
-  xitk_lock_display (xwin->xitk);
-  display = xitk_x11_get_display(xwin->xitk);
-  if (XGetGeometry (display, DefaultRootWindow(display), &rootwin,
-    &x, &y, &w, &h, &b, &d) != BadDrawable) {
-    int xx, yy;
-
-    xitk_unlock_display (xwin->xitk);
-    xx = (w / 2) - (xwin->width / 2);
-    yy = (h / 2) - (xwin->height / 2);
-    xitk_window_move_window (xwin, xx, yy);
-    return;
-  }
-  xitk_unlock_display (xwin->xitk);
-}
-
-/*
  * Create a simple (empty) window.
  */
 xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int width, int height,
