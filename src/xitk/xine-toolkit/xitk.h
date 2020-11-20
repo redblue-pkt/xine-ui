@@ -1181,11 +1181,6 @@ void xitk_window_apply_background(xitk_window_t *w);
  */
 int xitk_window_set_background_image (xitk_window_t *w, xitk_image_t *bg);
 
-/**
- *
- */
-void xitk_window_clear_window(xitk_window_t *);
-
 void xitk_window_reparent_window(xitk_window_t *w, xitk_window_t *parent, int x, int y);
 
 /**

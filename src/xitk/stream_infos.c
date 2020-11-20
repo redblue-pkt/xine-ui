@@ -471,7 +471,7 @@ void stream_infos_toggle_auto_update (xui_sinfo_t *sinfo) {
   if (sinfo) {
     if (sinfo->gui->stream_info_auto_update) {
       xitk_hide_widget (sinfo->update);
-      xitk_window_clear_window (sinfo->xwin);
+      xitk_window_apply_background (sinfo->xwin);
       xitk_paint_widget_list (sinfo->widget_list);
     } else {
       xitk_show_widget (sinfo->update);
