@@ -1884,7 +1884,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->wm_hint->input         = True;
   vwin->wm_hint->initial_state = NormalState;
   vwin->wm_hint->icon_pixmap   = xitk_image_get_pixmap (vwin->gui->icon);
-  vwin->wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
+  vwin->wm_hint->icon_mask     = xitk_image_get_mask (vwin->gui->icon);
+  vwin->wm_hint->flags         = InputHint | StateHint | IconPixmapHint | IconMaskHint;
 
   vwin->x_unlock_display (vwin->video_display);
 
@@ -2514,8 +2515,11 @@ static void register_event_handler(xui_vwin_t *vwin)
     vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
       _vwin_handle_be_event, vwin, NULL, NULL);
     xitk_window_set_role (vwin->wrapped_window, vwin->gui->use_root_window ? XITK_WR_ROOT : XITK_WR_MAIN);
+    /* NOTE: this makes kwin use a desktop file named <res_class>.desktop to set the icon.
+     * any subsequent attempt to set an icon has no effect then.
+     * setting an icon _before_ leads to random fallback to default x icon. */
+    xitk_window_set_window_class (vwin->wrapped_window, vwin->xclasshint->res_name, vwin->xclasshint->res_class);
     xitk_window_set_window_icon (vwin->wrapped_window, vwin->gui->icon);
-    xitk_window_set_window_class(vwin->wrapped_window, vwin->xclasshint->res_name, vwin->xclasshint->res_class);
   }
 
   _set_window_title (vwin);
