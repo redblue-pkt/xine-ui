@@ -1579,7 +1579,8 @@ static void vwin_dummy_un_lock_display (Display *display) {
  */
 xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
                                int borderless, const char *geometry, int hide_on_start,
-                               const char *prefered_visual, int use_x_lock_display) {
+                               const char *prefered_visual, int use_x_lock_display,
+                               int install_colormap) {
   xui_vwin_t           *vwin;
   int                   i;
   const char           *video_display_name;
@@ -1630,7 +1631,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
       vwin->video_backend = xitk_backend_new (vwin->gui->xitk, vwin->gui->verbosity);
       if (vwin->video_backend) {
         vwin->video_be_display = vwin->video_backend->open_display (vwin->video_backend,
-          video_display_name, use_x_lock_display, 0);
+                                                                    video_display_name, use_x_lock_display, 0,
+                                                                    prefered_visual, install_colormap);
         if (vwin->video_be_display) {
           vwin->video_display = (Display *)vwin->video_be_display->id;
           vwin->separate_display = 1;

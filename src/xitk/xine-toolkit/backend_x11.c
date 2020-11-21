@@ -40,21 +40,6 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
 
-#define MWM_HINTS_DECORATIONS       (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS     5
-typedef struct _mwmhints {
-  unsigned long flags;
-  unsigned long functions;
-  unsigned long decorations;
-  long          input_mode;
-  unsigned long status;
-} MWMHints;
-
-#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
-                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
-                      StructureNotifyMask | PropertyChangeMask |              \
-                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
-
 #include <xine/sorted_array.h>
 
 #include "xitk/Imlib-light/Imlib.h"
@@ -65,6 +50,8 @@ typedef struct _mwmhints {
 #include "dump_x11.h"
 #include "dnd_x11.h"
 #include "cursors_x11.h"
+
+#include "xitk_x11.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
@@ -236,6 +223,9 @@ struct xitk_x11_display_s {
   int fd;
   Display *display;
 
+  int        install_colormap;
+  ImlibData *imlibdata;
+
   xitk_x11_window_t *dnd_win;
 
   xitk_dlist_t free_windows;
@@ -315,6 +305,8 @@ static void _xitk_x11_display_delete (xitk_x11_display_t *d) {
   }
 
   xitk_x11_cursors_deinit(&d->cursors);
+
+  Imlib_destroy(&d->imlibdata);
 
   XCloseDisplay (d->display);
   d->display = NULL;
@@ -678,7 +670,7 @@ static xitk_be_image_t *xitk_x11_image_new (xitk_be_display_t *_d, const xitk_ta
   xitk_tags_get (taglist, img->props);
 
   do {
-    ImlibData *ild = d->be->be.xitk->imlibdata;
+    ImlibData *ild = d->imlibdata;
 
     if (!ild)
       break;
@@ -811,6 +803,10 @@ static void xitk_x11_display_unlock (xitk_be_display_t *_d) {
 
 static void xitk_x11_display_nolock (xitk_be_display_t *_d) {
   (void)_d;
+}
+
+static void _dummy_XLockDisplay(Display *d) {
+  (void)d;
 }
 
 static void _xitk_x11_clipboard_unregister_window (xitk_x11_display_t *d, Window win) {
@@ -1279,7 +1275,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
       if (diff & newflags & XITK_WINF_VISIBLE)
         XMapWindow (d->display, win->w.id);
       else if ((newflags & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) == XITK_WINF_ICONIFIED)
-        XIconifyWindow (d->display, win->w.id, d->be->be.xitk->imlibdata->x.screen);
+        XIconifyWindow (d->display, win->w.id, d->imlibdata->x.screen);
       else
         XUnmapWindow (d->display, win->w.id);
       XSync (d->display, False);
@@ -1544,7 +1540,7 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     win->props[XITK_X11_WT_Y].value = props[XITK_X11_WT_Y].value;
     win->props[XITK_X11_WT_PARENT].value = props[XITK_X11_WT_PARENT].value;
     d->d.lock (&d->d);
-    XReparentWindow (d->display, win->w.id, pw ? pw->w.id : d->be->be.xitk->imlibdata->x.root,
+    XReparentWindow (d->display, win->w.id, pw ? pw->w.id : d->imlibdata->x.root,
       win->props[XITK_X11_WT_X].value, win->props[XITK_X11_WT_Y].value);
     d->d.unlock (&d->d);
   }
@@ -1886,7 +1882,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
           unsigned int  wwin, hwin, bwin, dwin;
 
           d->d.lock (&d->d);
-          if (XGetGeometry (d->display, d->be->be.xitk->imlibdata->x.root, &rootwin,
+          if (XGetGeometry (d->display, d->imlibdata->x.root, &rootwin,
             &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
             x = wwin >> 1;
             y = hwin >> 1;
@@ -1927,7 +1923,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
 
       attr.background_pixel  =
       attr.border_pixel      = xitk_get_cfg_num (d->be->be.xitk, XITK_BLACK_COLOR);
-      attr.colormap          = Imlib_get_colormap (d->be->be.xitk->imlibdata);
+      attr.colormap          = Imlib_get_colormap (d->imlibdata);
       attr.win_gravity       = NorthWestGravity;
 
       attr.event_mask =
@@ -1937,9 +1933,9 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
         SubstructureNotifyMask | FocusChangeMask | PropertyChangeMask | ColormapChangeMask;
 
       d->d.lock (&d->d);
-      win->w.id = XCreateWindow (d->display, d->be->be.xitk->imlibdata->x.root,
-        hint.x, hint.y, hint.width, hint.height, 0, d->be->be.xitk->imlibdata->x.depth,
-        InputOutput, d->be->be.xitk->imlibdata->x.visual,
+      win->w.id = XCreateWindow (d->display, d->imlibdata->x.root,
+        hint.x, hint.y, hint.width, hint.height, 0, d->imlibdata->x.depth,
+        InputOutput, d->imlibdata->x.visual,
         CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect | CWWinGravity | CWEventMask, &attr);
       if (win->w.id == None) {
         d->d.unlock (&d->d);
@@ -2460,7 +2456,7 @@ static int xitk_x11_color_new (xitk_be_display_t *_d, xitk_color_info_t *info) {
   xcolor.blue  = (v << 8) + v;
 
   d->d.lock (&d->d);
-  XAllocColor (d->display, Imlib_get_colormap (d->be->be.xitk->imlibdata), &xcolor);
+  XAllocColor (d->display, Imlib_get_colormap (d->imlibdata), &xcolor);
   d->d.unlock (&d->d);
 
   info->value = xcolor.pixel;
@@ -2483,14 +2479,123 @@ static void xitk_x11_color_delete  (xitk_be_display_t *_d, uint32_t value) {
     return;
 
   d->d.lock (&d->d);
-  XFreeColors (d->display, Imlib_get_colormap (d->be->be.xitk->imlibdata), &v, 1, 0);
+  XFreeColors (d->display, Imlib_get_colormap (d->imlibdata), &v, 1, 0);
   d->d.unlock (&d->d);
 
   if (d->be->be.verbosity >= 2)
     printf ("xitk.x11.color.delete (0x%0x).\n", (unsigned int)value);
 }
 
-static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char *name, int use_lock, int use_sync) {
+/*
+ * Imlib
+ */
+
+static void _x11_select_visual(xitk_be_display_t *_d, Visual *gui_visual) {
+  xitk_x11_display_t *d;
+  ImlibInitParams  imlib_init;
+
+  xitk_container (d, _d, d);
+
+  /*
+   * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
+   * However, we have to reinitialize Imlib if we have to change the visual.
+   * This will be a (small) memory leak.
+   */
+  memset(&imlib_init, 0, sizeof(imlib_init));
+  imlib_init.flags = PARAMS_VISUALID;
+  imlib_init.visualid = gui_visual->visualid;
+
+  _d->lock(_d);
+
+  if (d->install_colormap && (gui_visual->class & 1)) {
+      /*
+       * We're using a visual with changable colors / colormaps
+       * (According to the comment in X11/X.h, an odd display class
+       * has changable colors), and the user requested to install a
+       * private colormap for xine.  Allocate a fresh colormap for
+       * Imlib and Xine.
+       */
+      Colormap cm;
+      cm = XCreateColormap(d->display, RootWindow(d->display, DefaultScreen(d->display)),
+                           gui_visual, AllocNone);
+
+      imlib_init.cmap = cm;
+      imlib_init.flags |= PARAMS_COLORMAP;
+  }
+
+  d->imlibdata = Imlib_init_with_params (d->display, &imlib_init);
+  _d->unlock(_d);
+
+  if (d->imlibdata == NULL) {
+    fprintf(stderr, _("Unable to initialize Imlib\n"));
+    exit(1);
+  }
+  if (d->d.lock == xitk_x11_display_lock) {
+    d->imlibdata->x.x_lock_display   = XLockDisplay;
+    d->imlibdata->x.x_unlock_display = XUnlockDisplay;
+  } else {
+    d->imlibdata->x.x_lock_display   =
+    d->imlibdata->x.x_unlock_display = _dummy_XLockDisplay;
+  }
+}
+
+static void _init_imlib(xitk_x11_display_t *d, const char *prefered_visual, int install_colormap)
+{
+  Visual *visual = NULL;
+  char *xrm_prefered_visual = NULL;
+
+  if (!prefered_visual || !install_colormap)
+    xitk_x11_xrm_parse("xine", NULL, NULL,
+                       prefered_visual ? NULL : &xrm_prefered_visual,
+                       install_colormap  ? NULL : &install_colormap);
+  d->install_colormap = install_colormap;
+
+  xitk_x11_find_visual(d->display, DefaultScreen(d->display),
+                       prefered_visual ? prefered_visual : xrm_prefered_visual,
+                       &visual, NULL);
+  fprintf(stderr, "select vis %p\n", visual);
+  _x11_select_visual(&d->d, visual);
+
+  free(xrm_prefered_visual);
+}
+
+/*
+ */
+
+static void _x11_select_visual_wrapper(xitk_be_display_t *_d, void *gui_visual) {
+  _x11_select_visual(_d, gui_visual);
+}
+
+static void *_x11_get_visual(xitk_be_display_t *_d) {
+  xitk_x11_display_t *d;
+  xitk_container (d, _d, d);
+  return Imlib_get_visual(d->imlibdata);
+}
+
+static int _x11_get_depth(xitk_be_display_t *_d) {
+  xitk_x11_display_t *d;
+  xitk_container (d, _d, d);
+  return d->imlibdata->x.depth;
+}
+
+static uintptr_t _x11_get_colormap(xitk_be_display_t *_d) {
+  xitk_x11_display_t *d;
+  xitk_container (d, _d, d);
+  return (uintptr_t)Imlib_get_colormap(d->imlibdata);
+}
+
+static int _xitk_image_quality (xitk_be_display_t *_d, int qual) {
+  xitk_x11_display_t *d;
+  xitk_container (d, _d, d);
+  return Imlib_gfx_quality (d->imlibdata, qual);
+}
+
+/*
+ *
+ */
+
+static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char *name, int use_lock, int use_sync,
+                                                 const char *prefered_visual, int install_colormap) {
   static const unsigned int ctrl_syms[XITK_KEY_LASTCODE] = {
     0,
     XK_Escape,
@@ -2610,6 +2715,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
     d->d.unlock = xitk_x11_display_nolock;
   }
 
+  _init_imlib(d, prefered_visual, install_colormap);
+
   _xitk_x11_clipboard_init (d);
 
   {
@@ -2661,6 +2768,12 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.window_new = xitk_x11_window_new;
   d->d.color._new = xitk_x11_color_new;
   d->d.color._delete = xitk_x11_color_delete;
+
+  d->d.set_visual    = _x11_select_visual_wrapper;
+  d->d.get_visual    = _x11_get_visual;
+  d->d.get_colormap  = _x11_get_colormap;
+  d->d.get_depth     = _x11_get_depth;
+  d->d.image_quality = _xitk_image_quality;
 
   pthread_mutex_lock (&be->mutex);
   be->refs += 1;

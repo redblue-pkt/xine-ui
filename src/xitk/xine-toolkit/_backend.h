@@ -174,6 +174,14 @@ struct xitk_be_display_s {
 
   xitk_be_image_t  *(*image_new)  (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
   xitk_be_window_t *(*window_new) (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
+
+
+  /* temporary, X11 specific */
+  void      (*set_visual)   (xitk_be_display_t *, void *visual);  /* does video window really need the same visual with gui ... ? */
+  void *    (*get_visual)   (xitk_be_display_t *);  /* does video window really need the same visual with gui ... ? */
+  uintptr_t (*get_colormap) (xitk_be_display_t *);  /* used in videowin, should be removed later */
+  int       (*get_depth)    (xitk_be_display_t *);  /* used in videowin, should be removed later */
+  int       (*image_quality)(xitk_be_display_t *, int); /* is this really needed ? */
 };
 
 xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity);
@@ -188,7 +196,8 @@ struct xitk_backend_s {
   xitk_dlist_t displays;
 
   void (*_delete) (xitk_backend_t **be);
-  xitk_be_display_t *(*open_display) (xitk_backend_t *be, const char *name, int use_lock, int use_sync);
+  xitk_be_display_t *(*open_display) (xitk_backend_t *be, const char *name, int use_lock, int use_sync,
+                                      const char *prefered_visual, int install_colormap);
 };
 #endif
 

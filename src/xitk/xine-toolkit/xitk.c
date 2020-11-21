@@ -54,8 +54,6 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
-#include "xitk/Imlib-light/Imlib.h"
-
 #include "utils.h"
 #include "dump.h"
 #include "_xitk.h"
@@ -243,7 +241,6 @@ struct __xitk_s {
   int                         display_height;
   int                         verbosity;
   xitk_dlist_t                gfxs;
-  int                         install_colormap;
 
   struct {
     struct {
@@ -1167,7 +1164,7 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
 
   xitk_container (xitk, _xitk, x);
   ABORT_IF_NULL(xitk);
-  ABORT_IF_NULL(xitk->x.imlibdata);
+  ABORT_IF_NULL(xitk->x.be);
 
   if (xwin) {
     MUTLOCK ();
@@ -1800,88 +1797,10 @@ static void xitk_dummy_un_lock_display (Display *display) {
 void (*xitk_x_lock_display) (Display *display) = xitk_dummy_un_lock_display;
 void (*xitk_x_unlock_display) (Display *display) = xitk_dummy_un_lock_display;
 
-/*
- * Imlib
- */
-
-Visual *xitk_x11_get_visual(xitk_t *xitk) {
-  return Imlib_get_visual(xitk->imlibdata);
-}
-
-int xitk_x11_get_depth(xitk_t *xitk) {
-  return xitk->imlibdata->x.depth;
-}
-
-Colormap xitk_x11_get_colormap(xitk_t *xitk) {
-  return Imlib_get_colormap(xitk->imlibdata);
-}
-
 int xitk_image_quality (xitk_t *xitk, int qual) {
-  return Imlib_gfx_quality (xitk->imlibdata, qual);
-}
-void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
-  __xitk_t *_xitk;
-  int install_colormap;
-  ImlibInitParams  imlib_init;
-
-  xitk_container (_xitk, xitk, x);
-  install_colormap = _xitk->install_colormap;
-
-  /*
-   * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
-   * However, we have to reinitialize Imlib if we have to change the visual.
-   * This will be a (small) memory leak.
-   */
-  memset(&imlib_init, 0, sizeof(imlib_init));
-  imlib_init.flags = PARAMS_VISUALID;
-  imlib_init.visualid = gui_visual->visualid;
-
-  xitk_lock_display (xitk);
-
-  if (install_colormap && (gui_visual->class & 1)) {
-      /*
-       * We're using a visual with changable colors / colormaps
-       * (According to the comment in X11/X.h, an odd display class
-       * has changable colors), and the user requested to install a
-       * private colormap for xine.  Allocate a fresh colormap for
-       * Imlib and Xine.
-       */
-      Colormap cm;
-      cm = XCreateColormap(_xitk->display,
-                           RootWindow(_xitk->display, DefaultScreen(_xitk->display)),
-                           gui_visual, AllocNone);
-
-      imlib_init.cmap = cm;
-      imlib_init.flags |= PARAMS_COLORMAP;
-  }
-
-  xitk->imlibdata = Imlib_init_with_params (_xitk->display, &imlib_init);
-  xitk_unlock_display (xitk);
-  if (xitk->imlibdata == NULL) {
-    fprintf(stderr, _("Unable to initialize Imlib\n"));
-    exit(1);
-  }
-
-  xitk->imlibdata->x.x_lock_display = xitk_x_lock_display;
-  xitk->imlibdata->x.x_unlock_display = xitk_x_unlock_display;
-}
-
-static void _init_imlib(__xitk_t *xitk, const char *prefered_visual, int install_colormap)
-{
-  Visual *visual = NULL;
-  char *xrm_prefered_visual = NULL;
-
-  if (!prefered_visual || !install_colormap)
-    xitk_x11_xrm_parse("xine", NULL, NULL,
-                       prefered_visual ? NULL : &xrm_prefered_visual,
-                       install_colormap  ? NULL : &install_colormap);
-  xitk->install_colormap = install_colormap;
-
-  xitk_x11_find_visual(xitk->display, DefaultScreen(xitk->display),
-                       prefered_visual ? prefered_visual : xrm_prefered_visual,
-                       &visual, NULL);
-  xitk_x11_select_visual(&xitk->x, visual);
-  free(xrm_prefered_visual);
+  if (xitk->d->image_quality)
+    return xitk->d->image_quality(xitk->d, qual);
+  return qual;
 }
 
 void xitk_sync(xitk_t *xitk) {
@@ -1928,7 +1847,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     free (xitk);
     return NULL;
   }
-  xitk->x.d = xitk->x.be->open_display (xitk->x.be, NULL, use_x_lock_display, use_synchronized_x);
+  xitk->x.d = xitk->x.be->open_display (xitk->x.be, NULL, use_x_lock_display, use_synchronized_x,
+                                        prefered_visual, install_colormap);
   if (!xitk->x.d) {
     xitk->x.be->_delete (&xitk->x.be);
     free (xitk);
@@ -1997,9 +1917,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     printf("%s", buffer);
 
   xitk->wm_type = xitk_check_wm (xitk, xitk->display);
-
-  /* imit imlib */
-  _init_imlib(xitk, prefered_visual, install_colormap);
 
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
@@ -2145,8 +2062,6 @@ void xitk_free(xitk_t **p) {
    */
   xitk_lock_display (&xitk->x);
   xitk_unlock_display (&xitk->x);
-
-  Imlib_destroy(&xitk->x.imlibdata);
 
   xitk->x.d->close (&xitk->x.d);
   xitk->display = NULL;
