@@ -694,6 +694,37 @@ void xitk_x11_set_ewmh_fullscreen(Display *display, Window window, int enable) {
  *
  */
 
+void xitk_x11_select_visual(xitk_t *xitk, Visual *gui_visual) {
+  xitk_be_display_t *d = xitk->d;
+  if (d->set_visual)
+    d->set_visual(d, gui_visual);
+}
+
+Visual *xitk_x11_get_visual(xitk_t *xitk) {
+  xitk_be_display_t *d = xitk->d;
+  if (d->get_visual)
+    return d->get_visual(d);
+  return NULL;
+}
+
+int xitk_x11_get_depth(xitk_t *xitk) {
+  xitk_be_display_t *d = xitk->d;
+  if (d->get_depth)
+    return d->get_depth(d);
+  return 0;
+}
+
+Colormap xitk_x11_get_colormap(xitk_t *xitk) {
+  xitk_be_display_t *d = xitk->d;
+  if (d->get_colormap)
+    return (Colormap)d->get_colormap(d);
+  return None;
+}
+
+/*
+ *
+ */
+
 int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
   const char *s = XKeysymToString(keysym);
   if (!s)

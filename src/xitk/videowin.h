@@ -39,7 +39,8 @@ typedef struct {
 #define CURSOR_HAND                2
 
 xui_vwin_t *video_window_init (gGui_t *gui, int window_id, int borderless, const char *geometry,
-                               int hide_on_start, const char *prefered_visual, int use_x_lock_display);
+                               int hide_on_start, const char *prefered_visual, int install_colormap,
+                               int use_x_lock_display);
 void video_window_exit (xui_vwin_t *vwin);
 
 void *video_window_get_xine_visual(xui_vwin_t *vwin);

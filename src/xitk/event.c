@@ -1774,7 +1774,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   video_window_init (gui, p->window_id, p->borderless, p->geometry,
                      ((actions_on_start(gui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0),
-                     p->prefered_visual, use_x_lock_display);
+                     p->prefered_visual, p->install_colormap, use_x_lock_display);
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
    * when done before the video_window_init(). */
