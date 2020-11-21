@@ -60,16 +60,12 @@ void splash_create(void) {
   free(skin_path);
 
   if ((xim = xitk_image_new (gGui->xitk, splash_image, 0, 0, 0))) {
-    int  x, y, width, height;
+    int width, height;
 
     width = xitk_image_width(xim);
     height = xitk_image_height(xim);
 
-    xitk_get_display_size (gui->xitk, &x, &y);
-    x = (x >> 1) - (width >> 1);
-    y = (y >> 1) - (height >> 1);
-
-    xwin = xitk_window_create_window_ext (gGui->xitk, x, y, width, height,
+    xwin = xitk_window_create_window_ext (gGui->xitk, -1, -1, width, height,
         _("xine Splash"), NULL, "xine", 0, 1, gGui->icon, xim);
     xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
 
