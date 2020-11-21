@@ -252,6 +252,11 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
   if (!bg_image && ((width <= 0 || height <= 0)))
     return NULL;
 
+  if (x < 0)
+    x = XITK_XY_CENTER;
+  if (y < 0)
+    y = XITK_XY_CENTER;
+
   if (!title)
     title = "xiTK Window";
 

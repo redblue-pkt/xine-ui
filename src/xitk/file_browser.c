@@ -307,16 +307,14 @@ static void fb_create_input_window(char *title, char *text,
   xitk_labelbutton_widget_t   lb;
   xitk_inputtext_widget_t     inp;
 
-  xitk_get_display_size (fb->gui->xitk, &x, &y);
-  x = (x >> 1) - (width >> 1);
-  y = (y >> 1) - (height >> 1);
-
   fne = (filename_editor_t *) calloc(1, sizeof(filename_editor_t));
+  if (!fne)
+    return;
 
   fne->callback = cb;
   fne->fb = fb;
 
-  fne->xwin = xitk_window_create_dialog_window (fb->gui->xitk, title, x, y, width, height);
+  fne->xwin = xitk_window_create_dialog_window_center (fb->gui->xitk, title, width, height);
 
   xitk_window_set_wm_window_type(fne->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fne->xwin, NULL, "xine");
@@ -1188,14 +1186,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
     fb->cbb[2].userdata = cbb_close->userdata;
   }
 
-  xitk_get_display_size (fb->gui->xitk, &x, &y);
-  x = (x >> 1) - (WINDOW_WIDTH >> 1);
-  y = (y >> 1) - (WINDOW_HEIGHT >> 1);
-
   /* Create window */
-  fb->xwin = xitk_window_create_dialog_window (fb->gui->xitk,
-					      (window_title) ? window_title : _("File Browser"),
-					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+  fb->xwin = xitk_window_create_dialog_window_center (fb->gui->xitk,
+                                                      (window_title) ? window_title : _("File Browser"),
+                                                      WINDOW_WIDTH, WINDOW_HEIGHT);
 
   xitk_window_set_wm_window_type(fb->xwin, WINDOW_TYPE_NORMAL);
   xitk_window_set_window_class(fb->xwin, NULL, "xine");

@@ -1114,6 +1114,10 @@ xitk_window_t *xitk_window_create_simple_window_ext(xitk_t *xitk, int x, int y, 
  */
 xitk_window_t *xitk_window_create_dialog_window(xitk_t *xitk, const char *title, int x, int y, int width, int height);
 
+#define xitk_window_create_dialog_window_center(xitk, title, width, height) \
+  xitk_window_create_dialog_window((xitk), (title), -1, -1, (width), (height))
+
+
 /*
  * Get widget list of window.
  *  - list is created during first call.
