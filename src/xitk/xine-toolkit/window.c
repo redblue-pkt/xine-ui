@@ -47,11 +47,20 @@ void xitk_window_set_input_focus (xitk_window_t *w) {
 }
 
 void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
+  int t;
 
   if (w == NULL)
     return;
 
-  return xitk_x11_try_to_set_input_focus(xitk_x11_get_display(w->xitk), w->window);
+  if (xitk_window_flags (w, 0, 0) & XITK_WINF_FOCUS)
+    return;
+
+  for (t = 0; t < 4; t++) {
+    /* this loops seems useless - if it fails first time, it fails every time ... */
+    if (xitk_window_flags (w, XITK_WINF_FOCUS, XITK_WINF_FOCUS) & XITK_WINF_FOCUS)
+      return;
+    xitk_usec_sleep(5000);
+  }
 }
 
 void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
