@@ -222,8 +222,6 @@ struct __xitk_s {
 
   Display                    *display;
 
-  int                         display_width;
-  int                         display_height;
   int                         verbosity;
   xitk_dlist_t                gfxs;
 
@@ -1772,11 +1770,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk_color_db_init (xitk);
 
-  {
-    int s = DefaultScreen (xitk->display);
-    xitk->display_width   = DisplayWidth (xitk->display, s);
-    xitk->display_height  = DisplayHeight (xitk->display, s);
-  }
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
   xitk->key             = 0;
@@ -2027,13 +2020,10 @@ int xitk_get_cfg_num (xitk_t *_xitk, xitk_cfg_item_t item) {
 }
 
 void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
-  __xitk_t *_xitk;
-
-  xitk_container (_xitk, xitk, x);
   if (w)
-    *w = _xitk->display_width;
+    *w = xitk->d->width;
   if (h)
-    *h = _xitk->display_height;
+    *h = xitk->d->height;
 }
 
 void xitk_set_tips_timeout(xitk_t *_xitk, unsigned long timeout) {
