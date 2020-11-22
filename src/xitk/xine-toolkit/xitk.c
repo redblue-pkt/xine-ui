@@ -882,33 +882,6 @@ int xitk_get_layer_level(xitk_t *xitk) {
   return level;
 }
 
-void xitk_x11_set_window_layer(xitk_t *_xitk, Window window, int layer) {
-  __xitk_t *xitk;
-  XEvent xev;
-
-  xitk_container (xitk, _xitk, x);
-  if (((xitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
-      ((xitk->wm_type & WM_TYPE_EWMH_COMP) && !(xitk->wm_type & WM_TYPE_GNOME_COMP))) {
-    return;
-  }
-
-  memset(&xev, 0, sizeof xev);
-  xev.type                 = ClientMessage;
-  xev.xclient.type         = ClientMessage;
-  xev.xclient.window       = window;
-  xev.xclient.message_type = xitk->atoms[XITK_A_WIN_LAYER];
-  xev.xclient.format       = 32;
-  xev.xclient.data.l[0]    = (long) layer;
-  xev.xclient.data.l[1]    = (long) 0;
-  xev.xclient.data.l[2]    = (long) 0;
-  xev.xclient.data.l[3]    = (long) 0;
-
-  xitk->x.lock_display (&xitk->x);
-  XSendEvent (xitk->display, RootWindow (xitk->display, (XDefaultScreen (xitk->display))),
-	     False, SubstructureNotifyMask, (XEvent*) &xev);
-  xitk->x.unlock_display (&xitk->x);
-}
-
 void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type) {
   __xitk_t *_xitk;
 

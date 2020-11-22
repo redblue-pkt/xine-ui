@@ -138,6 +138,7 @@ typedef enum {
   XITK_X11_WT_WRAP,
   XITK_X11_WT_ICON,
   XITK_X11_WT_WIN_FLAGS,
+  XITK_X11_WT_LAYER,
   XITK_X11_WT_LAYER_ABOVE,
   XITK_X11_WT_CURSOR,
   XITK_X11_WT_NAME,
@@ -160,6 +161,7 @@ static const xitk_tagitem_t _xitk_x11_window_defaults[XITK_X11_WT_LAST] = {
   [XITK_X11_WT_WRAP]          = {XITK_TAG_WRAP, None},
   [XITK_X11_WT_ICON]          = {XITK_TAG_ICON, (uintptr_t)NULL},
   [XITK_X11_WT_WIN_FLAGS]     = {XITK_TAG_WIN_FLAGS, 0},
+  [XITK_X11_WT_LAYER]         = {XITK_TAG_LAYER, 0},
   [XITK_X11_WT_LAYER_ABOVE]   = {XITK_TAG_LAYER_ABOVE, 0},
   [XITK_X11_WT_CURSOR]        = {XITK_TAG_CURSOR, ~(uintptr_t)0},
   [XITK_X11_WT_NAME]          = {XITK_TAG_NAME, (uintptr_t)NULL},
@@ -1496,6 +1498,33 @@ static void _set_layer_above(xitk_x11_window_t *win) {
   }
 }
 
+static void _set_layer(xitk_x11_window_t *win, int layer) {
+  xitk_t  *xitk    = win->d->be->be.xitk;
+  Display *display = win->d->display;
+  Window   window  = win->w.id;
+  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+  XEvent xev;
+
+  if (((wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
+      ((wm_type & WM_TYPE_EWMH_COMP) && !(wm_type & WM_TYPE_GNOME_COMP))) {
+    return;
+  }
+
+  memset(&xev, 0, sizeof xev);
+  xev.type                 = ClientMessage;
+  xev.xclient.type         = ClientMessage;
+  xev.xclient.window       = window;
+  xev.xclient.message_type = win->d->atoms[XITK_A_WIN_LAYER];
+  xev.xclient.format       = 32;
+  xev.xclient.data.l[0]    = (long) layer;
+  xev.xclient.data.l[1]    = (long) 0;
+  xev.xclient.data.l[2]    = (long) 0;
+  xev.xclient.data.l[3]    = (long) 0;
+
+  XSendEvent (display, RootWindow (display, XDefaultScreen (display)),
+              False, SubstructureNotifyMask, (XEvent*) &xev);
+}
+
 static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem_t *taglist) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
@@ -1625,6 +1654,15 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
       d->d.unlock (&d->d);
     }
     win->props[XITK_X11_WT_LAYER_ABOVE].value = props[XITK_X11_WT_LAYER_ABOVE].value;
+  }
+
+  if (props[XITK_X11_WT_LAYER].value != win->props[XITK_X11_WT_LAYER].value) {
+    if (props[XITK_X11_WT_LAYER].value) {
+      d->d.lock (&d->d);
+      _set_layer(win, props[XITK_X11_WT_LAYER].value);
+      d->d.unlock (&d->d);
+    }
+    win->props[XITK_X11_WT_LAYER].value = props[XITK_X11_WT_LAYER].value;
   }
 
   if (props[XITK_X11_WT_CURSOR].value != win->props[XITK_X11_WT_CURSOR].value) {
