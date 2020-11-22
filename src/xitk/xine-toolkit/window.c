@@ -173,11 +173,17 @@ void xitk_window_set_window_class(xitk_window_t *w, const char *res_name, const 
   w->bewin->set_props (w->bewin, tags);
 }
 
-void xitk_window_set_wm_window_type (xitk_window_t *xwin, xitk_wm_window_type_t type) {
-  if (xwin) {
-    xitk_set_wm_window_type (xwin->xitk, xwin->window, type);
-    xwin->type = type;
-  }
+void xitk_window_set_wm_window_type (xitk_window_t *w, xitk_wm_window_type_t type) {
+  xitk_tagitem_t tags[] = {
+    {XITK_TAG_WINDOW_TYPE, (uintptr_t)type},
+    {XITK_TAG_END, 0}
+  };
+
+  if (!w)
+    return;
+
+  w->bewin->set_props (w->bewin, tags);
+  w->type = type;
 }
 
 void xitk_window_set_transient_for_win(xitk_window_t *w, xitk_window_t *xwin) {
