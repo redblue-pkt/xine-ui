@@ -45,7 +45,6 @@
 #include "xitk_x11.h"
 
 #define XITK_CACHE_SIZE 10
-#define XITK_FONT_LENGTH_NAME 256
 
 typedef struct {
   unsigned int             lru;        /* old of item for LRU */
