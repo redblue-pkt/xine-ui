@@ -23,6 +23,8 @@
 #include "config.h"
 #endif
 
+#include <stdarg.h>
+
 #include "_xitk.h"
 #include "label.h"
 #include "labelbutton.h"

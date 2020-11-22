@@ -23,7 +23,6 @@
 #endif
 
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 
 #include <xine/sorted_array.h>
