@@ -34,8 +34,6 @@
 #include <limits.h>
 #include <inttypes.h>
 
-#include <X11/Xlib.h>
-
 #include "libcommon.h"
 #include "xitk.h"
 
@@ -215,11 +213,10 @@ struct xitk_window_s {
   xitk_window_role_t        role;
   uint32_t                  flags;
   xitk_widget_list_t       *widget_list;
-  /* to be removed */
-  Window                    window;
 };
 
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags);
+xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window);
 
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,

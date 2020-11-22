@@ -1186,7 +1186,7 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
 
   if(fx->wl.xwin) {
     xitk_lock_display (&xitk->x);
-    XChangeProperty (xitk->display, xitk_window_get_window(fx->wl.xwin), xitk->XA_XITK, XA_ATOM,
+    XChangeProperty (xitk->display, fx->wl.xwin->bewin->id, xitk->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
     xitk_unlock_display (&xitk->x);
   }

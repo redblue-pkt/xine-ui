@@ -110,6 +110,4 @@ Colormap    xitk_x11_get_colormap(xitk_t *);
 xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 
-Window xitk_window_get_window(xitk_window_t *w);
-
 #endif /* _XITK_X11_H_ */
