@@ -184,6 +184,8 @@ struct xitk_be_display_s {
   uintptr_t (*get_colormap) (xitk_be_display_t *);  /* used in videowin, should be removed later */
   int       (*get_depth)    (xitk_be_display_t *);  /* used in videowin, should be removed later */
   int       (*image_quality)(xitk_be_display_t *, int); /* is this really needed ? */
+
+  int width, height; /* size in pixels */
 };
 
 xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity);
