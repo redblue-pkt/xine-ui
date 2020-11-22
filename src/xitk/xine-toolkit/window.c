@@ -24,11 +24,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/extensions/shape.h>
 
 #include "_xitk.h"
 #include "xitk.h"
@@ -37,10 +32,6 @@
 #include "xitk_x11.h"
 
 #define TITLE_BAR_HEIGHT 20
-
-static Window _xitk_window_get_window (xitk_window_t *w) {
-  return w->window;
-}
 
 void xitk_window_set_input_focus (xitk_window_t *w) {
   xitk_window_flags (w, XITK_WINF_FOCUS, XITK_WINF_FOCUS);
@@ -311,7 +302,6 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
       xwin->height = tags[10].value;
       xwin->flags = tags[11].value;
       xwin->bewin->data = xwin;
-      xwin->window = xwin->bewin->id;
       xitk_image_ref (xwin->bg_image);
       return xwin;
     }
@@ -471,13 +461,6 @@ void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height) {
 }
 
 /*
- * Get window (X) id.
- */
-Window xitk_window_get_window(xitk_window_t *w) {
-  return w ? _xitk_window_get_window (w) : None;
-}
-
-/*
  * Apply (draw) window background.
  */
 void xitk_window_apply_background (xitk_window_t *xwin) {
@@ -535,10 +518,10 @@ void xitk_x11_destroy_window_wrapper (xitk_window_t **p) {
   *p = NULL;
 }
 
-xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
+xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
   xitk_window_t *xwin;
 
-  if (!xitk || (window == None))
+  if (!xitk)
     return NULL;
   if (!xitk->d)
     return NULL;
@@ -568,7 +551,6 @@ xitk_window_t *xitk_x11_wrap_window (xitk_t *xitk, Window window) {
   xwin->type = WINDOW_TYPE_END;
   xwin->role = XITK_WR_HELPER;
 
-  xwin->window = window;
   xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin);
 
   {
