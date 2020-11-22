@@ -140,6 +140,7 @@ typedef enum {
   XITK_X11_WT_WIN_FLAGS,
   XITK_X11_WT_LAYER,
   XITK_X11_WT_LAYER_ABOVE,
+  XITK_X11_WT_WINDOW_TYPE,
   XITK_X11_WT_CURSOR,
   XITK_X11_WT_NAME,
   XITK_X11_WT_TITLE,
@@ -163,6 +164,7 @@ static const xitk_tagitem_t _xitk_x11_window_defaults[XITK_X11_WT_LAST] = {
   [XITK_X11_WT_WIN_FLAGS]     = {XITK_TAG_WIN_FLAGS, 0},
   [XITK_X11_WT_LAYER]         = {XITK_TAG_LAYER, 0},
   [XITK_X11_WT_LAYER_ABOVE]   = {XITK_TAG_LAYER_ABOVE, 0},
+  [XITK_X11_WT_WINDOW_TYPE]   = {XITK_TAG_WINDOW_TYPE, WINDOW_TYPE_NONE},
   [XITK_X11_WT_CURSOR]        = {XITK_TAG_CURSOR, ~(uintptr_t)0},
   [XITK_X11_WT_NAME]          = {XITK_TAG_NAME, (uintptr_t)NULL},
   [XITK_X11_WT_TITLE]         = {XITK_TAG_TITLE, 0},
@@ -1525,6 +1527,44 @@ static void _set_layer(xitk_x11_window_t *win, int layer) {
               False, SubstructureNotifyMask, (XEvent*) &xev);
 }
 
+static void _set_wm_window_type(xitk_x11_window_t *win, xitk_wm_window_type_t type) {
+  xitk_t  *xitk    = win->d->be->be.xitk;
+  Display *display = win->d->display;
+  Window   window  = win->w.id;
+  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+
+  static const xitk_x11_atoms_t ai[WINDOW_TYPE_END] = {
+    [WINDOW_TYPE_DESKTOP]       = XITK_A__NET_WM_WINDOW_TYPE_DESKTOP,
+    [WINDOW_TYPE_DOCK]          = XITK_A__NET_WM_WINDOW_TYPE_DOCK,
+    [WINDOW_TYPE_TOOLBAR]       = XITK_A__NET_WM_WINDOW_TYPE_TOOLBAR,
+    [WINDOW_TYPE_MENU]          = XITK_A__NET_WM_WINDOW_TYPE_MENU,
+    [WINDOW_TYPE_UTILITY]       = XITK_A__NET_WM_WINDOW_TYPE_UTILITY,
+    [WINDOW_TYPE_SPLASH]        = XITK_A__NET_WM_WINDOW_TYPE_SPLASH,
+    [WINDOW_TYPE_DIALOG]        = XITK_A__NET_WM_WINDOW_TYPE_DIALOG,
+    //[WINDOW_TYPE_DROPDOWN_MENU] = XITK_A__NET_WM_WINDOW_TYPE_DROPDOWN_MENU,
+    //[WINDOW_TYPE_POPUP_MENU]    = XITK_A__NET_WM_WINDOW_TYPE_POPUP_MENU,
+    //[WINDOW_TYPE_TOOLTIP]       = XITK_A__NET_WM_WINDOW_TYPE_TOOLTIP,
+    //[WINDOW_TYPE_NOTIFICATION]  = XITK_A__NET_WM_WINDOW_TYPE_NOTIFICATION,
+    //[WINDOW_TYPE_COMBO]         = XITK_A__NET_WM_WINDOW_TYPE_COMBO,
+    [WINDOW_TYPE_NORMAL]        = XITK_A__NET_WM_WINDOW_TYPE_NORMAL
+  };
+
+  if (!(wm_type & WM_TYPE_EWMH_COMP))
+    return;
+
+  win->d->d.lock (&win->d->d);
+
+  if (type == WINDOW_TYPE_NONE) {
+    XDeleteProperty (display, window, win->d->atoms[XITK_A__NET_WM_WINDOW_TYPE]);
+  } else if ((type >= 1) && (type < WINDOW_TYPE_END)) {
+    XChangeProperty (display, window, win->d->atoms[XITK_A__NET_WM_WINDOW_TYPE],
+      XA_ATOM, 32, PropModeReplace, (unsigned char *)&win->d->atoms[ai[type]], 1);
+    XRaiseWindow (display, window);
+  }
+
+  win->d->d.unlock (&win->d->d);
+}
+
 static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem_t *taglist) {
   xitk_x11_display_t *d;
   xitk_x11_window_t *win;
@@ -1663,6 +1703,13 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
       d->d.unlock (&d->d);
     }
     win->props[XITK_X11_WT_LAYER].value = props[XITK_X11_WT_LAYER].value;
+  }
+
+  if (props[XITK_X11_WT_WINDOW_TYPE].value != win->props[XITK_X11_WT_WINDOW_TYPE].value) {
+    if (props[XITK_X11_WT_WINDOW_TYPE].value) {
+      _set_wm_window_type(win, props[XITK_X11_WT_WINDOW_TYPE].value);
+    }
+    win->props[XITK_X11_WT_WINDOW_TYPE].value = props[XITK_X11_WT_WINDOW_TYPE].value;
   }
 
   if (props[XITK_X11_WT_CURSOR].value != win->props[XITK_X11_WT_CURSOR].value) {

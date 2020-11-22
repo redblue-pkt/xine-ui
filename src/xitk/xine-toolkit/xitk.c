@@ -214,20 +214,6 @@ typedef struct {
 
 typedef enum {
   XITK_A_WIN_LAYER = 0,
-  XITK_A_WM_WINDOW_TYPE,
-  XITK_A_WM_WINDOW_TYPE_DESKTOP,
-  XITK_A_WM_WINDOW_TYPE_DOCK,
-  XITK_A_WM_WINDOW_TYPE_TOOLBAR,
-  XITK_A_WM_WINDOW_TYPE_MENU,
-  XITK_A_WM_WINDOW_TYPE_UTILITY,
-  XITK_A_WM_WINDOW_TYPE_SPLASH,
-  XITK_A_WM_WINDOW_TYPE_DIALOG,
-  XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU,
-  XITK_A_WM_WINDOW_TYPE_POPUP_MENU,
-  XITK_A_WM_WINDOW_TYPE_TOOLTIP,
-  XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
-  XITK_A_WM_WINDOW_TYPE_COMBO,
-  XITK_A_WM_WINDOW_TYPE_NORMAL,
   XITK_A_END
 } xitk_atom_t;
 
@@ -795,27 +781,6 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
 
   xitk->XA_XITK = XInternAtom (display, "_XITK_EVENT", False);
 
-  if (type & WM_TYPE_EWMH_COMP) {
-    static const char * const atom_names[XITK_A_END] = {
-        [XITK_A_WIN_LAYER]                    = "_NET_WM_STATE",
-        [XITK_A_WM_WINDOW_TYPE]               = "_NET_WM_WINDOW_TYPE",
-        [XITK_A_WM_WINDOW_TYPE_DESKTOP]       = "_NET_WM_WINDOW_TYPE_DESKTOP",
-        [XITK_A_WM_WINDOW_TYPE_DOCK]          = "_NET_WM_WINDOW_TYPE_DOCK",
-        [XITK_A_WM_WINDOW_TYPE_TOOLBAR]       = "_NET_WM_WINDOW_TYPE_TOOLBAR",
-        [XITK_A_WM_WINDOW_TYPE_MENU]          = "_NET_WM_WINDOW_TYPE_MENU",
-        [XITK_A_WM_WINDOW_TYPE_UTILITY]       = "_NET_WM_WINDOW_TYPE_UTILITY",
-        [XITK_A_WM_WINDOW_TYPE_SPLASH]        = "_NET_WM_WINDOW_TYPE_SPLASH",
-        [XITK_A_WM_WINDOW_TYPE_DIALOG]        = "_NET_WM_WINDOW_TYPE_DIALOG",
-        [XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU] = "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU",
-        [XITK_A_WM_WINDOW_TYPE_POPUP_MENU]    = "_NET_WM_WINDOW_TYPE_POPUP_MENU",
-        [XITK_A_WM_WINDOW_TYPE_TOOLTIP]       = "_NET_WM_WINDOW_TYPE_TOOLTIP",
-        [XITK_A_WM_WINDOW_TYPE_NOTIFICATION]  = "_NET_WM_WINDOW_TYPE_NOTIFICATION",
-        [XITK_A_WM_WINDOW_TYPE_COMBO]         = "_NET_WM_WINDOW_TYPE_COMBO",
-        [XITK_A_WM_WINDOW_TYPE_NORMAL]        = "_NET_WM_WINDOW_TYPE_NORMAL"
-    };
-    XInternAtoms (display, (char **)atom_names, XITK_A_END, False, xitk->atoms);
-  }
-
   switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KWIN:
     break;
@@ -880,43 +845,6 @@ int xitk_get_layer_level(xitk_t *xitk) {
     break;
   }
   return level;
-}
-
-void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type) {
-  __xitk_t *_xitk;
-
-  if (!xitk)
-    return;
-  xitk_container (_xitk, xitk, x);
-  if (_xitk->wm_type & WM_TYPE_EWMH_COMP) {
-    if (type == WINDOW_TYPE_NONE) {
-      xitk_lock_display (&_xitk->x);
-      XDeleteProperty (_xitk->display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE]);
-      xitk_unlock_display (&_xitk->x);
-    } else if ((type >= 1) && (type < WINDOW_TYPE_END)) {
-      static const xitk_atom_t ai[WINDOW_TYPE_END] = {
-        [WINDOW_TYPE_DESKTOP]       = XITK_A_WM_WINDOW_TYPE_DESKTOP,
-        [WINDOW_TYPE_DOCK]          = XITK_A_WM_WINDOW_TYPE_DOCK,
-        [WINDOW_TYPE_TOOLBAR]       = XITK_A_WM_WINDOW_TYPE_TOOLBAR,
-        [WINDOW_TYPE_MENU]          = XITK_A_WM_WINDOW_TYPE_MENU,
-        [WINDOW_TYPE_UTILITY]       = XITK_A_WM_WINDOW_TYPE_UTILITY,
-        [WINDOW_TYPE_SPLASH]        = XITK_A_WM_WINDOW_TYPE_SPLASH,
-        [WINDOW_TYPE_DIALOG]        = XITK_A_WM_WINDOW_TYPE_DIALOG,
-        [WINDOW_TYPE_DROPDOWN_MENU] = XITK_A_WM_WINDOW_TYPE_DROPDOWN_MENU,
-        [WINDOW_TYPE_POPUP_MENU]    = XITK_A_WM_WINDOW_TYPE_POPUP_MENU,
-        [WINDOW_TYPE_TOOLTIP]       = XITK_A_WM_WINDOW_TYPE_TOOLTIP,
-        [WINDOW_TYPE_NOTIFICATION]  = XITK_A_WM_WINDOW_TYPE_NOTIFICATION,
-        [WINDOW_TYPE_COMBO]         = XITK_A_WM_WINDOW_TYPE_COMBO,
-        [WINDOW_TYPE_NORMAL]        = XITK_A_WM_WINDOW_TYPE_NORMAL
-      };
-
-      xitk_lock_display (&_xitk->x);
-      XChangeProperty (_xitk->display, window, _xitk->atoms[XITK_A_WM_WINDOW_TYPE],
-        XA_ATOM, 32, PropModeReplace, (unsigned char *)&_xitk->atoms[ai[type]], 1);
-      XRaiseWindow (_xitk->display, window);
-      xitk_unlock_display (&_xitk->x);
-    }
-  }
 }
 
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {

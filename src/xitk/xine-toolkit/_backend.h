@@ -50,6 +50,7 @@ typedef enum {
   XITK_TAG_MODE,    /* int */
   XITK_TAG_LAYER,   /* int */
   XITK_TAG_LAYER_ABOVE,  /* int */
+  XITK_TAG_WINDOW_TYPE, /* xitk_wm_window_type_t */
   XITK_TAG_FG,      /* uint32_t */
   XITK_TAG_BG,      /* uint32_t */
   XITK_TAG_IMAGE,   /* xitk_be_image_t * */

@@ -111,6 +111,5 @@ xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
 void xitk_x11_destroy_window_wrapper(xitk_window_t **);
 
 Window xitk_window_get_window(xitk_window_t *w);
-void xitk_set_wm_window_type (xitk_t *xitk, Window window, xitk_wm_window_type_t type);
 
 #endif /* _XITK_X11_H_ */
