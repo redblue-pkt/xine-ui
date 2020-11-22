@@ -1176,7 +1176,6 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
   post_object_t *pobj = (post_object_t *) data;
   post_info_t *info = pobj->info;
   gGui_t *gui = info->gui;
-  xitk_image_t *bg = NULL;
   int                         x, y;
   xitk_labelbutton_widget_t   lb;
   xitk_browser_widget_t       br;
@@ -1202,8 +1201,6 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
     set_window_states_start(gui, info->win->helpwin);
 
     help_widget_list = xitk_window_widget_list(info->win->helpwin);
-
-    bg = xitk_window_get_background_image (info->win->helpwin);
 
     XITK_WIDGET_INIT(&lb);
     lb.button_type       = CLICK_BUTTON;
@@ -1302,8 +1299,6 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
     xitk_enable_and_show_widget(info->win->help_browser);
     xitk_browser_set_alignment(info->win->help_browser, ALIGN_LEFT);
-
-    xitk_window_set_background_image (info->win->helpwin, bg);
 
     info->win->help_widget_key = xitk_be_register_event_handler (
       info->type == POST_VIDEO ? "vpplugin_help" : "applugin_help",
@@ -1808,7 +1803,6 @@ void pplugin_panel (post_info_t *info) {
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
-  xitk_image_t               *bg;
   int                         x, y;
   xitk_slider_widget_t        sl;
 
@@ -1836,8 +1830,6 @@ void pplugin_panel (post_info_t *info) {
   XITK_WIDGET_INIT(&lb);
   XITK_WIDGET_INIT(&lbl);
   XITK_WIDGET_INIT(&cb);
-
-  bg = xitk_window_get_background_image (info->win->xwin);
 
   XITK_WIDGET_INIT(&sl);
 
@@ -1906,8 +1898,6 @@ void pplugin_panel (post_info_t *info) {
   info->win->y = 34 - (FRAME_HEIGHT + 4);
 
   _pplugin_rebuild_filters (info);
-
-  xitk_window_set_background_image (info->win->xwin, bg);
 
   info->win->widget_key = xitk_be_register_event_handler (
     info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->xwin, NULL, pplugin_event, info, NULL, NULL);
