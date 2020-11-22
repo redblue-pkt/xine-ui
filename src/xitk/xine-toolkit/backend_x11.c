@@ -1379,12 +1379,15 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
     }
     if (diff & XITK_WINF_FOCUS) {
       if (newflags & XITK_WINF_FOCUS) {
+        newflags = (newflags & ~XITK_WINF_FOCUS);
+        if (have & oldflags & XITK_WINF_VISIBLE) {
         Window focused_win;
         int revert;
         XSetInputFocus (d->display, win->w.id, RevertToParent, CurrentTime);
         XSync (d->display, False);
         XGetInputFocus(d->display, &focused_win, &revert);
-        newflags = (newflags & ~XITK_WINF_FOCUS) | (XITK_WINF_FOCUS * !!(focused_win == win->w.id));
+        newflags |= (XITK_WINF_FOCUS * !!(focused_win == win->w.id));
+        }
       }
     }
     XSync (d->display, False);
