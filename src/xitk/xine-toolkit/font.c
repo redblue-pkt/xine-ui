@@ -504,9 +504,6 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   ABORT_IF_NULL(xitk);
   ABORT_IF_NULL(font);
 
-  display = xitk_x11_get_display(xitk);
-  ABORT_IF_NULL(display);
-
   font_cache = xitk->font_cache;
 
   pthread_mutex_lock(&font_cache->mutex);
@@ -556,7 +553,6 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
     }
 
     xtfs->name = strdup(font);
-    xtfs->display = display;
     xtfs->font_cache = font_cache;
 
 #ifdef LOG
