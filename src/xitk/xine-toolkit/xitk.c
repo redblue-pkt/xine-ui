@@ -220,7 +220,6 @@ typedef enum {
 struct __xitk_s {
   xitk_t                      x;
 
-  xitk_x11_t                 *xitk_x11;
   Display                    *display;
 
   int                         display_width;
@@ -733,8 +732,6 @@ static void xitk_signal_handler(int sig) {
     if (xitk && (cur_pid == xitk->xitk_pid)) {
       xitk_dlist_clear (&xitk->gfxs);
       xitk_config_deinit (xitk->config);
-      xitk_x11_delete (xitk->xitk_x11);
-      xitk->xitk_x11 = NULL;
       XITK_FREE (xitk);
       gXitk = NULL;
       exit(1);
@@ -1771,8 +1768,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->x.debug_level = 0;
 #endif
 
-  xitk->xitk_x11 = xitk_x11_new (&xitk->x);
-
   xitk->event_bridge.running = 0;
 
   xitk_color_db_init (xitk);
@@ -1973,9 +1968,6 @@ void xitk_free(xitk_t **p) {
   printf ("%s:%d %s (): final display lock level: #%d.\n", __FILE__, __LINE__, __FUNCTION__, xitk->x.debug_level);
 #endif
   pthread_mutex_destroy (&xitk->mutex);
-
-  xitk_x11_delete (xitk->xitk_x11);
-  xitk->xitk_x11 = NULL;
 
   XITK_FREE (xitk);
   gXitk = NULL;
