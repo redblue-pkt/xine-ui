@@ -2115,7 +2115,8 @@ void video_window_exit (xui_vwin_t *vwin) {
       vwin->video_be_window->_delete (&vwin->video_be_window);
   } else {
     xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
-    xitk_x11_destroy_window_wrapper (&vwin->wrapped_window);
+    xitk_window_destroy_window (vwin->wrapped_window);
+    vwin->wrapped_window = NULL;
   }
 
   if (!vwin->wid) {
@@ -2510,7 +2511,7 @@ static void register_event_handler(xui_vwin_t *vwin)
       vwin->video_be_window->_delete (&vwin->video_be_window);
     vwin->video_be_window = vwin->video_be_display->window_new (vwin->video_be_display, tags);
   } else {
-    xitk_x11_destroy_window_wrapper (&vwin->wrapped_window);
+    xitk_window_destroy_window (vwin->wrapped_window);
     vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, vwin->video_window);
     xitk_window_flags (vwin->wrapped_window,
       XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);

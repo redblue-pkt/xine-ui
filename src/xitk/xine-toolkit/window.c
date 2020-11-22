@@ -511,13 +511,6 @@ void xitk_window_destroy_window (xitk_window_t *xwin) {
   XITK_FREE (xwin);
 }
 
-void xitk_x11_destroy_window_wrapper (xitk_window_t **p) {
-  if (!p)
-    return;
-  xitk_window_destroy_window (*p);
-  *p = NULL;
-}
-
 xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
   xitk_window_t *xwin;
 
