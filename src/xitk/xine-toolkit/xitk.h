@@ -31,7 +31,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <stdarg.h>
 #include <stdint.h>
 
 #define XITK_MAJOR_VERSION          (0)

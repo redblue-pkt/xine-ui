@@ -22,8 +22,6 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-#include <stdarg.h>
-
 void xine_error (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
 
 void xine_error_with_more (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));

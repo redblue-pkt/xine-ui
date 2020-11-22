@@ -22,8 +22,6 @@
 #ifndef __OSD_H__
 #define __OSD_H__
 
-#include <stdarg.h>
-
 typedef struct {
   xine_osd_t   *osd[2];
   int           visible;
