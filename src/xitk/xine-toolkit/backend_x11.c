@@ -1267,7 +1267,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
     XFree(prop_return);
   have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
 
-  have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN;
+  have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN | XITK_WINF_FOCUS;
   if (d->be->be.verbosity >= 2)
     _xitk_x11_window_debug_flags ("before", win->name, oldflags);
 
@@ -1378,8 +1378,14 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
         XSendEvent (d->display, attr.root, False, SubstructureNotifyMask | SubstructureRedirectMask, &msg);
     }
     if (diff & XITK_WINF_FOCUS) {
-      if (newflags & XITK_WINF_FOCUS)
+      if (newflags & XITK_WINF_FOCUS) {
+        Window focused_win;
+        int revert;
         XSetInputFocus (d->display, win->w.id, RevertToParent, CurrentTime);
+        XSync (d->display, False);
+        XGetInputFocus(d->display, &focused_win, &revert);
+        newflags = (newflags & ~XITK_WINF_FOCUS) | (XITK_WINF_FOCUS * !!(focused_win == win->w.id));
+      }
     }
     XSync (d->display, False);
     d->d.unlock (&d->d);
@@ -2032,7 +2038,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       XChangeProperty (d->display, win->w.id, d->atoms[XITK_A_WIN_LAYER], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
     }
 
-    XSelectInput (d->display, win->w.id, INPUT_MOTION | KeymapStateMask);
+    XSelectInput (d->display, win->w.id, INPUT_MOTION | KeymapStateMask | FocusChangeMask);
 
     XSetWMProtocols (d->display, win->w.id, &d->atoms[XITK_A_WM_DELETE_WINDOW], 1);
 
