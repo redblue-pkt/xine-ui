@@ -4,7 +4,7 @@ EXTRA_DIST = $(pixmap_DATA) xine.wmconfig \
 	$(icon16_DATA) \
 	$(icon22_DATA) \
 	$(icon32_DATA) \
-	$(icon48_DATA) 
+	$(icon64_DATA) 
 
 BUILT_SOURCES = xine.desktop
 CLEANFILES = $(BUILT_SOURCES)
@@ -13,14 +13,14 @@ pixmapdir = $(datadir)/pixmaps
 icon16dir = $(datadir)/icons/hicolor/16x16/apps
 icon22dir = $(datadir)/icons/hicolor/22x22/apps
 icon32dir = $(datadir)/icons/hicolor/32x32/apps
-icon48dir = $(datadir)/icons/hicolor/48x48/apps
+icon64dir = $(datadir)/icons/hicolor/64x64/apps
 
 icon16_DATA = icons/16/xine.png
 icon22_DATA = icons/22/xine.png
 icon32_DATA = icons/32/xine.png
-icon48_DATA = icons/48/xine.png
+icon64_DATA = icons/64/xine.png
 
-pixmap_DATA = xine.xpm
+pixmap_DATA = xine.xpm xine_32.xpm
 
 desktopdir = $(datadir)/applications
 desktop_DATA = xine.desktop
