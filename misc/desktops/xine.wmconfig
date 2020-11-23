@@ -1,6 +1,6 @@
 xine name "xine"
 xine description "xine video player"
 xine icon "xine.xpm"
-xine mini-icon "xine_32.xpm"
+xine mini-icon "xine.xpm"
 xine exec "xine &"
 xine group "Multimedia"
