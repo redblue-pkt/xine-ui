@@ -29,30 +29,19 @@
 #include <string.h>
 #include <pthread.h>
 
-#ifdef WITH_XMB
-#include <wchar.h>
-#endif
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#ifdef WITH_XFT
-#include <X11/Xft/Xft.h>
-#endif
-
 #include "_xitk.h"
-#include "recode.h"
-
-#include "xitk_x11.h"
 
 #define XITK_CACHE_SIZE 10
 
 typedef struct {
   unsigned int             lru;        /* old of item for LRU */
+  char                    *name;       /* this is the name of requested font (loaded font may be different) */
   xitk_font_t             *font;
 } xitk_font_cache_item_t;
 
 typedef struct {
   xitk_dnode_t             node;
+  const char              *name;       /* this is the name of requested font (loaded font may be different) */
   xitk_font_t             *font;       /* remembered loaded font */
   unsigned int             number;     /* number of instances of this font */
 } xitk_font_list_item_t;
@@ -65,204 +54,7 @@ struct xitk_font_cache_s {
   xitk_dlist_t             loaded;     /* list of loaded fonts */
   pthread_mutex_t          mutex;      /* protecting mutex */
   xitk_font_cache_item_t   items[XITK_CACHE_SIZE]; /* cache */
-
-  xitk_recode_t           *xr;         /* text recoding */
 };
-
-struct xitk_font_s {
-  xitk_font_cache_t *font_cache;
-  xitk_t        *xitk;
-  Display       *display;
-#ifdef WITH_XFT
-  XftFont       *font;
-#else
-# ifdef WITH_XMB
-  XFontSet       fontset;
-# endif
-  XFontStruct   *font;
-#endif
-  char          *name;
-};
-
-#if defined(WITH_XMB) && !defined(WITH_XFT)
-/*
- * Guess if error occured, release missing charsets list.
- * There is a problem with rendering when "ISO10646-1" charset is missing.
- */
-static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int count) {
-  int i;
-
-  if (fs == NULL) {
-    if (missing)
-      XFreeStringList(missing);
-    return 1;
-  }
-
-  /* some uncovered codepages */
-  for (i = 0; i < count; i++) {
-    if (strcasecmp("ISO10646-1", missing[i]) == 0) {
-      XITK_WARNING("font \"%s\" doesn't contain charset %s\n", name, missing[i]);
-      XFreeStringList(missing);
-      return 1;
-    }
-  }
-
-  if (missing)
-    XFreeStringList(missing);
-
-  return 0;
-}
-#endif
-
-#ifdef WITH_XFT
-/* convert a -*-* .. style font description into something Xft can digest */
-static const char * xitk_font_core_string_to_xft(char *new_name, size_t new_name_size, const char * old_name) {
-
-  if(old_name[0] == '-' || old_name[0] == '*') {
-    char  family[50], weight[15], slant[8], pxsize[5], ptsize[5];
-
-    if( old_name[0] == '-' )
-      old_name++;
-
-    /* Extract description elements */
-    family[0] = weight[0] = slant[0] = pxsize[0] = ptsize[0] = '\0';
-    sscanf(old_name, "%*[^-]-%49[^-]", family);
-    sscanf(old_name, "%*[^-]-%*[^-]-%14[^-]", weight);
-    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%7[^-]", slant);
-    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%4[^-]", pxsize);
-    sscanf(old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%4[^-]", ptsize);
-
-    /* Transform the elements */
-    if(!strcmp(weight, "*"))
-      weight[0] = '\0';
-    if(!strcmp(pxsize, "*"))
-      pxsize[0] = '\0';
-    if(!strcmp(ptsize, "*"))
-      ptsize[0] = '\0';
-    strcpy(slant,
-           (!strcmp(slant, "i")) ? "italic" :
-           (!strcmp(slant, "o")) ? "oblique" :
-           (!strcmp(slant, "r")) ? "roman" :
-                                   "");
-
-    /* Xft doesn't have lucida, which is a small font;
-     * thus we make whatever is chosen 2 sizes smaller */
-    if(!strcasecmp(family, "lucida")) {
-      if(pxsize[0]) {
-        int sz = strtol(pxsize, NULL, 10) - 2;
-        snprintf(pxsize, sizeof(pxsize), "%i", sz);
-      }
-      if(ptsize[0]) {
-        int sz = strtol(ptsize, NULL, 10) - 2;
-        snprintf(ptsize, sizeof(ptsize), "%i", sz);
-      }
-    }
-
-    /* Build Xft font description string from the elements */
-    snprintf(new_name, new_name_size, "%s%s%s%s%s%s%s%s%s",
-             family,
-             ((weight[0]) ? ":weight="    : ""), weight,
-             ((slant[0])  ? ":slant="     : ""), slant,
-             ((pxsize[0]) ? ":pixelsize=" : ""), pxsize,
-             ((ptsize[0]) ? ":size="      : ""), ptsize);
-
-    return new_name;
-  }
-
-  return old_name;
-}
-#endif
-
-#if defined(WITH_XMB) && !defined(WITH_XFT)
-/*
- * XCreateFontSet requires font name starting with '-'
- */
-static char *xitk_font_right_name(const char *name) {
-  char *right_name;
-
-  ABORT_IF_NULL(name);
-
-  right_name = strdup(name);
-
-  switch(right_name[0]) {
-  case '-':
-    break;
-  case '*':
-    right_name[0] = '-';
-    break;
-  default:
-    right_name[0] = '*';
-    break;
-  }
-
-  return right_name;
-}
-#endif
-
-/*
- * load the font and returns status
- */
-static int xitk_font_load_one (xitk_font_t *xtfs, const char *font) {
-  int    ok;
-  Display *display = xitk_x11_get_display(xtfs->xitk);
-#ifdef WITH_XFT
-#else
-# ifdef WITH_XMB
-  char **missing = NULL;
-  char  *def = NULL;
-  char  *right_name;
-  int    count;
-
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
-    right_name = xitk_font_right_name(font);
-    xitk_lock_display (xtfs->xitk);
-    xtfs->fontset = XCreateFontSet (display, right_name, &missing, &count, &def);
-    ok = !xitk_font_guess_error(xtfs->fontset, right_name, missing, count);
-    xitk_unlock_display (xtfs->xitk);
-    free(right_name);
-  }
-  else
-# endif
-#endif
-  {
-#ifdef WITH_XFT
-    char new_name[255];
-#endif
-    xitk_lock_display (xtfs->xitk);
-#ifdef WITH_XFT
-    xtfs->font = XftFontOpenName (display, DefaultScreen (display),
-                                  xitk_font_core_string_to_xft(new_name, sizeof(new_name), font));
-#else
-    xtfs->font = XLoadQueryFont (display, font);
-#endif
-    xitk_unlock_display (xtfs->xitk);
-    ok = (xtfs->font != NULL);
-  }
-
-  if(ok)
-    xtfs->display = display;
-
-  return ok;
-}
-
-/*
- * unload the font
- */
-static void xitk_font_unload_one(xitk_font_t *xtfs) {
-  xitk_lock_display (xtfs->xitk);
-#ifndef WITH_XFT
-#ifdef WITH_XMB
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
-    XFreeFontSet (xtfs->display, xtfs->fontset);
-  else
-#endif
-    XFreeFont (xtfs->display, xtfs->font);
-#else
-    XftFontClose (xtfs->display, xtfs->font);
-#endif
-  xitk_unlock_display (xtfs->xitk);
-  free(xtfs->name);
-}
 
 /*
  * init font cache subsystem
@@ -277,11 +69,6 @@ xitk_font_cache_t *xitk_font_cache_init (void) {
     font_cache->life = 0;
     xitk_dlist_init (&font_cache->loaded);
     pthread_mutex_init (&font_cache->mutex, NULL);
-#ifdef WITH_XFT
-    font_cache->xr = xitk_recode_init (NULL, "UTF-8", 1);
-#else
-    font_cache->xr = NULL;
-#endif
   }
 
   return font_cache;
@@ -293,18 +80,14 @@ xitk_font_cache_t *xitk_font_cache_init (void) {
 void xitk_font_cache_destroy(xitk_font_cache_t **p) {
   xitk_font_cache_t *font_cache = *p;
   size_t       i;
-  xitk_font_t *xtfs;
 
   if (!font_cache)
     return;
   *p = NULL;
 
   for (i = 0; i < font_cache->n; i++) {
-    xtfs = font_cache->items[i].font;
-
-    xitk_font_unload_one(xtfs);
-
-    free(xtfs);
+    font_cache->items[i].font->_delete(&font_cache->items[i].font);
+    free(font_cache->items[i].name);
   }
   font_cache->n = 0;
 
@@ -323,8 +106,6 @@ void xitk_font_cache_destroy(xitk_font_cache_t **p) {
 
   xitk_dlist_clear (&font_cache->loaded);
   pthread_mutex_destroy(&font_cache->mutex);
-
-  xitk_recode_done(font_cache->xr);
 
   free (font_cache);
 }
@@ -358,11 +139,12 @@ static size_t xitk_cache_get_oldest(xitk_font_cache_t *font_cache) {
 /*
  * place item into cache and adjust all counters for LRU
  */
-static void xitk_cache_insert_final(xitk_font_cache_t *font_cache, size_t pos, xitk_font_t *font) {
+static void xitk_cache_insert_final(xitk_font_cache_t *font_cache, size_t pos, xitk_font_t *font, const char *name) {
   size_t i;
 
   font_cache->items[pos].lru  = font_cache->life;
   font_cache->items[pos].font = font;
+  font_cache->items[pos].name = strdup(name);
 
   if (font_cache->life + 1 == 0) {
     font_cache->life >>= 1;
@@ -376,22 +158,22 @@ static void xitk_cache_insert_final(xitk_font_cache_t *font_cache, size_t pos, x
 /*
  * insert item into sorted cache, it shifts part of cache to move gap
  */
-static void xitk_cache_insert_into(xitk_font_cache_t *font_cache, size_t gap, int step, xitk_font_t *font) {
+static void xitk_cache_insert_into(xitk_font_cache_t *font_cache, size_t gap, int step, xitk_font_t *font, const char *name) {
   size_t i;
 
   i = gap;
   while (((step == -1 && i > 0) || (step == 1 && i < font_cache->n - 1))
-         && strcmp(font->name, font_cache->items[i + step].font->name) * step > 0) {
+         && strcmp(name, font_cache->items[i + step].name) * step > 0) {
     font_cache->items[i] = font_cache->items[i + step];
     i += step;
   }
-  xitk_cache_insert_final(font_cache, i, font);
+  xitk_cache_insert_final(font_cache, i, font, name);
 }
 
 /*
  * add new item into cache, if it's full the oldest item will be released
  */
-static void xitk_cache_add_item(xitk_font_cache_t *font_cache, xitk_font_t *font) {
+static void xitk_cache_add_item(xitk_font_cache_t *font_cache, xitk_font_t *font, const char *name) {
   size_t       oldest;
   int          cmp;
   xitk_font_t *xtfs;
@@ -399,33 +181,32 @@ static void xitk_cache_add_item(xitk_font_cache_t *font_cache, xitk_font_t *font
   if (font_cache->n < XITK_CACHE_SIZE) {
     /* cache is not full */
     font_cache->n++;
-    xitk_cache_insert_into(font_cache, font_cache->n - 1, -1, font);
+    xitk_cache_insert_into(font_cache, font_cache->n - 1, -1, font, name);
   }
   else {
     /* cache is full */
     /* free the oldest item */
     oldest = xitk_cache_get_oldest(font_cache);
-    cmp    = strcmp(font->name, font_cache->items[oldest].font->name);
+    cmp    = strcmp(name, font_cache->items[oldest].name);
     xtfs   = font_cache->items[oldest].font;
 
 #ifdef LOG
     printf("xiTK: dropped \"%s\", list: %zu, cache: %zu\n", xtfs->name, font_cache->nlist, font_cache->n);
 #endif
 
-    xitk_font_unload_one(xtfs);
-
-    free(xtfs);
+    xtfs->_delete(&font_cache->items[oldest].font);
+    free(font_cache->items[oldest].name);
 
     /* insert new item into sorted cache */
     if(cmp == 0)
-      xitk_cache_insert_final(font_cache, oldest, font);
+      xitk_cache_insert_final(font_cache, oldest, font, name);
     else {
       if(cmp < 0)
         cmp = -1;
       else
         cmp = 1;
 
-      xitk_cache_insert_into(font_cache, oldest, cmp, font);
+      xitk_cache_insert_into(font_cache, oldest, cmp, font, name);
     }
   }
 }
@@ -438,6 +219,8 @@ static xitk_font_t *xitk_cache_remove_item(xitk_font_cache_t *font_cache, size_t
   size_t       i;
 
   xtfs = font_cache->items[pos].font;
+  free(font_cache->items[pos].name);
+
   for (i = pos; i < font_cache->n - 1; i++)
     font_cache->items[i] = font_cache->items[i + 1];
   font_cache->n--;
@@ -462,7 +245,7 @@ static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, const ch
 
   while(right >= left) {
     i = (left + right) >> 1;
-    cmp = strcmp(name, font_cache->items[i].font->name);
+    cmp = strcmp(name, font_cache->items[i].name);
 
     if(cmp < 0)
       right = i - 1;
@@ -481,10 +264,19 @@ static xitk_font_t *xitk_cache_take_item(xitk_font_cache_t *font_cache, const ch
 /*
  * search the font in the list of loaded fonts
  */
-static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache, const char *name) {
+static xitk_font_list_item_t *cache_find_from_list(xitk_font_cache_t *font_cache, const char *name) {
   xitk_font_list_item_t *item = (xitk_font_list_item_t *)font_cache->loaded.head.next;
   while (item->node.next) {
-    if (strcmp(name, item->font->name) == 0)
+    if (strcmp(name, item->name) == 0)
+      return item;
+    item = (xitk_font_list_item_t *)item->node.next;
+  }
+  return NULL;
+}
+static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache, xitk_font_t *xtfs) {
+  xitk_font_list_item_t *item = (xitk_font_list_item_t *)font_cache->loaded.head.next;
+  while (item->node.next) {
+    if (xtfs == item->font)
       return item;
     item = (xitk_font_list_item_t *)item->node.next;
   }
@@ -497,7 +289,6 @@ static xitk_font_list_item_t *cache_get_from_list(xitk_font_cache_t *font_cache,
 xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   xitk_font_t           *xtfs;
   xitk_font_list_item_t *list_item;
-  Display               *display;
   xitk_font_cache_t     *font_cache;
 
   ABORT_IF_NULL(xitk);
@@ -510,7 +301,7 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
   /* quick search in the cache of unloaded fonts */
   if ((xtfs = xitk_cache_take_item(font_cache, font)) == NULL) {
     /* search in the list of loaded fonts */
-    if((list_item = cache_get_from_list(font_cache, font)) != NULL) {
+    if((list_item = cache_find_from_list(font_cache, font)) != NULL) {
       list_item->number++;
       pthread_mutex_unlock(&font_cache->mutex);
       return list_item->font;
@@ -519,20 +310,17 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
 
   if(!xtfs) {
     /* font not found, load it */
-    xtfs = (xitk_font_t *) xitk_xmalloc(sizeof(xitk_font_t));
-    if (!xtfs)
-      return NULL;
-    xtfs->xitk = xitk;
-
-    if (!xitk_font_load_one (xtfs, font)) {
+    xtfs = xitk->d->font_new(xitk->d, font);
+    if (!xtfs) {
       const char *fdname = xitk_get_cfg_string (xitk, XITK_DEFAULT_FONT);
 
-      if (!fdname || !xitk_font_load_one (xtfs, fdname)) {
+      xtfs = fdname ? xitk->d->font_new(xitk->d, fdname) : NULL;
+      if (!xtfs) {
         const char *fsname = xitk_get_cfg_string (xitk, XITK_SYSTEM_FONT);
 
-        if (!xitk_font_load_one (xtfs, fsname)) {
+        xtfs = xitk->d->font_new(xitk->d, fsname);
+        if (!xtfs) {
           XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
-          free(xtfs);
           pthread_mutex_unlock(&font_cache->mutex);
 
           /* Maybe broken XMB support */
@@ -545,23 +333,21 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
 
             return xtfs_fallback;
           }
-          else
-            return NULL;
+          return NULL;
         }
       }
     }
 
-    xtfs->name = strdup(font);
-    xtfs->font_cache = font_cache;
-
+    xtfs->data = font_cache;
 #ifdef LOG
-    printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", xtfs->name, font_cache->nlist, font_cache->n);
+    printf("xiTK: loaded new \"%s\", list: %zu, cache: %zu\n", font, font_cache->nlist, font_cache->n);
 #endif
   }
 
   /* add the font into list */
-  list_item         = xitk_xmalloc(sizeof(xitk_font_list_item_t));
+  list_item         = xitk_xmalloc(sizeof(xitk_font_list_item_t) + strlen(font) + 1);
   list_item->font   = xtfs;
+  list_item->name   = strcpy((char *)&list_item[1], font);
   list_item->number = 1;
   xitk_dlist_add_tail (&font_cache->loaded, &list_item->node);
   font_cache->nlist++;
@@ -576,134 +362,26 @@ xitk_font_t *xitk_font_load_font(xitk_t *xitk, const char *font) {
  */
 void xitk_font_unload_font(xitk_font_t *xtfs) {
   xitk_font_list_item_t *item;
+  xitk_font_cache_t *font_cache = xtfs->data;
 
   ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font_cache);
-#ifndef WITH_XFT
-#ifdef WITH_XMB
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE))
-    ABORT_IF_NULL(xtfs->fontset);
-  else
-#endif
-#endif
-    ABORT_IF_NULL(xtfs->font);
+  ABORT_IF_NULL(xtfs->data);
 
-  pthread_mutex_lock(&xtfs->font_cache->mutex);
+  pthread_mutex_lock(&font_cache->mutex);
   /* search the font in the list */
-  item = cache_get_from_list(xtfs->font_cache, xtfs->name);
+  item = cache_get_from_list(font_cache, xtfs);
   /* it must be there */
   ABORT_IF_NULL(item);
 
   if(--item->number == 0) {
     xitk_dnode_remove (&item->node);
-    xtfs->font_cache->nlist--;
-    xitk_cache_add_item(xtfs->font_cache, item->font);
+    font_cache->nlist--;
+    xitk_cache_add_item(font_cache, item->font, item->name);
     free(item);
   }
 
-  pthread_mutex_unlock(&xtfs->font_cache->mutex);
+  pthread_mutex_unlock(&font_cache->mutex);
 }
-
-/*
- *
- */
-void xitk_font_draw_string (xitk_font_t *xtfs, xitk_image_t *img,
-    int x, int y, const char *text, size_t nbytes, uint32_t color) {
-
-#ifndef WITH_XFT
-  XGCValues gcv;
-  GC gc;
-
-  gcv.graphics_exposures = False;
-#endif
-
-#ifdef DEBUG
-  if (nbytes > strlen(text) + 1) {
-    XITK_WARNING("draw: %zu > %zu\n", nbytes, strlen(text));
-  }
-#endif
-
-  xitk_lock_display (xtfs->xitk);
-
-#ifndef WITH_XFT
-  gc = XCreateGC (xtfs->display, img->beimg->id1, GCGraphicsExposures, &gcv);
-  XSetForeground (xtfs->display, gc, color);
-# ifdef WITH_XMB
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
-    XmbDrawString (xtfs->display, (Pixmap)img->beimg->id1, xtfs->fontset, gc, x, y, text, nbytes);
-  }
-  else
-# endif
-  {
-    XSetFont(xtfs->display, gc, xtfs->font->fid);
-    XDrawString (xtfs->display, (Pixmap)img->beimg->id1, gc, x, y, text, nbytes);
-  }
-  XFreeGC (xtfs->display, gc);
-#else
-  {
-    int           screen   = DefaultScreen( xtfs->display );
-    Visual       *visual   = DefaultVisual( xtfs->display, screen );
-    Colormap      colormap = DefaultColormap( xtfs->display, screen );
-    xitk_color_info_t info;
-    XftColor      xcolor;
-    XftDraw      *xft_draw;
-    char          buf[2048];
-    xitk_recode_string_t rs;
-
-    rs.src = text;
-    rs.ssize = strlen (text);
-    if ((size_t)nbytes < rs.ssize)
-      rs.ssize = nbytes;
-    rs.buf = buf;
-    rs.bsize = sizeof (buf);
-    xitk_recode2_do (xtfs->font_cache->xr, &rs);
-
-    info.value = color;
-    xitk_color_db_query_value (xtfs->xitk, &info);
-    xft_draw       = XftDrawCreate (xtfs->display, (Pixmap)img->beimg->id1, visual, colormap);
-#define XITK_FONT_TEMPTED
-#ifdef XITK_FONT_TEMPTED
-    /* we are tempted to fill in a XftColor directly here.
-     * however, xft will need a few more colors for smoothing internally ?? */
-    xcolor.pixel       = info.value;
-    xcolor.color.red   = info.r;
-    xcolor.color.green = info.g;
-    xcolor.color.blue  = info.b;
-    xcolor.color.alpha = info.a;
-    XftDrawStringUtf8 (xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
-#else
-    {
-      XRenderColor  xr_color;
-
-      xr_color.red   = info.r;
-      xr_color.green = info.g;
-      xr_color.blue  = info.b;
-      xr_color.alpha = info.a;
-      XftColorAllocValue (xtfs->display, visual, colormap, &xr_color, &xcolor);
-      XftDrawStringUtf8 (xft_draw, &xcolor, xtfs->font, x, y, (FcChar8 *)rs.res, rs.rsize);
-      XftColorFree (xtfs->display, visual, colormap, &xcolor);
-    }
-#endif
-    XftDrawDestroy(xft_draw);
-
-    xitk_recode2_done (xtfs->font_cache->xr, &rs);
-  }
-#endif
-  xitk_unlock_display (xtfs->xitk);
-}
-
-#ifndef WITH_XFT
-/*
- *
- */
-static int xitk_font_is_font_8(xitk_font_t *xtfs) {
-
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font);
-
-  return ((xtfs->font->min_byte1 == 0) && (xtfs->font->max_byte1 == 0));
-}
-#endif
 
 /*
  *
@@ -712,35 +390,9 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
   int width;
 
   ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->display);
   ABORT_IF_NULL(c);
-#ifdef WITH_XFT
-  ABORT_IF_NULL(xtfs->font);
 
   xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
-# else
-# ifdef WITH_XMB
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
-    ABORT_IF_NULL(xtfs->fontset);
-
-    xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
-  }
-  else
-# endif
-    {
-      ABORT_IF_NULL(xtfs->font);
-
-      xitk_lock_display (xtfs->xitk);
-
-      if(xitk_font_is_font_8(xtfs))
-        width = XTextWidth (xtfs->font, c, nbytes);
-      else
-        width = XTextWidth16 (xtfs->font, (XChar2b *)c, nbytes);
-
-      xitk_unlock_display (xtfs->xitk);
-    }
-#endif
-
   return width;
 }
 
@@ -775,16 +427,8 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c) {
  */
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, size_t nbytes,
                            int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
-#ifndef WITH_XFT
-  XCharStruct ov;
-  int         dir;
-  int         fascent, fdescent;
-#else
-  XGlyphInfo  xft_extents;
-#endif
-#if defined(WITH_XMB) && !defined(WITH_XFT)
-  XRectangle  ink, logic;
-#endif
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(c);
 
   if (nbytes <= 0) {
     if (width) *width     = 0;
@@ -801,122 +445,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, size_t nbytes,
   }
 #endif
 
-#ifdef WITH_XFT
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font);
-  ABORT_IF_NULL(c);
-
-  /* recode right part of string */
-  {
-    char buf[2048];
-    xitk_recode_string_t rs;
-
-    rs.src = c;
-    rs.ssize = strlen (c);
-    if (nbytes < rs.ssize)
-      rs.ssize = nbytes;
-    rs.buf = buf;
-    rs.bsize = sizeof (buf);
-    xitk_recode2_do (xtfs->font_cache->xr, &rs);
-
-    /* FIXME: XftTextExtentsUtf8 () seems to be non reentrant - at least when called
-     * with same font. We probably need to mutex it when XLockDisplay () is turned off. */
-    xitk_lock_display (xtfs->xitk);
-    XftTextExtentsUtf8 (xtfs->display, xtfs->font, (FcChar8 *)rs.res, rs.rsize, &xft_extents);
-    xitk_unlock_display (xtfs->xitk);
-
-    xitk_recode2_done (xtfs->font_cache->xr, &rs);
-  }
-
-  if (width) *width       = xft_extents.xOff;
-  /* Since Xft fonts have more top and bottom space rows than Xmb/Xcore fonts, */
-  /* we tweak ascent and descent to appear the same like Xmb/Xcore, so we get  */
-  /* unified vertical text positions. We must however be aware to eventually   */
-  /* reserve space for these rows when drawing the text.                       */
-  /* Following trick works for our font sizes 10...14.                         */
-  if (ascent) *ascent     = xtfs->font->ascent - (xtfs->font->ascent - 9) / 2;
-  if (descent) *descent   = xtfs->font->descent - (xtfs->font->descent - 0) / 2;
-  if (lbearing) *lbearing = -xft_extents.x;
-  if (rbearing) *rbearing = -xft_extents.x + xft_extents.width;
-#else
-#ifdef WITH_XMB
-  if (xitk_get_cfg_num (xtfs->xitk, XITK_XMB_ENABLE)) {
-    ABORT_IF_NULL(xtfs);
-    ABORT_IF_NULL(xtfs->fontset);
-    ABORT_IF_NULL(c);
-
-    xitk_lock_display (xtfs->xitk);
-    XmbTextExtents(xtfs->fontset, c, nbytes, &ink, &logic);
-    xitk_unlock_display (xtfs->xitk);
-    if (!logic.width || !logic.height) {
-      /* XmbTextExtents() has problems, try char-per-char counting */
-      mbstate_t state;
-      size_t    i = 0, n;
-      int       height = 0, width = 0, y = 0, lb = 0, rb;
-
-      memset(&state, '\0', sizeof(mbstate_t));
-
-      xitk_lock_display (xtfs->xitk);
-      while (i < nbytes) {
-        n = mbrtowc(NULL, c + i, nbytes - i, &state);
-        if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
-        XmbTextExtents(xtfs->fontset, c + i, n, &ink, &logic);
-        if (logic.height > height) height = logic.height;
-        if (logic.y < y) y = logic.y; /* y is negative! */
-        if (i == 0) lb = ink.x; /* left bearing of string */
-        width += logic.width;
-        i += n;
-      }
-      rb = width - logic.width + ink.x + ink.width; /* right bearing of string */
-      xitk_unlock_display (xtfs->xitk);
-
-      if (!height || !width) {
-        /* char-per-char counting fails too */
-        XITK_WARNING("extents of the font \"%s\" are %dx%d!\n", xtfs->name, width, height);
-        if (!height) height = 12, y = -10;
-        if (!width) lb = rb = 0;
-      }
-
-      logic.height = height;
-      logic.width = width;
-      logic.y = y;
-      ink.x = lb;
-      ink.width = rb - lb;
-    }
-
-    if (width) *width     = logic.width;
-    if (ascent) *ascent   = -logic.y;
-    if (descent) *descent = logic.height + logic.y;
-    if (lbearing) *lbearing = ink.x;
-    if (rbearing) *rbearing = ink.x + ink.width;
-  }
-  else
-#endif
-    {
-      ABORT_IF_NULL(xtfs);
-      ABORT_IF_NULL(xtfs->font);
-      ABORT_IF_NULL(xtfs->display);
-      ABORT_IF_NULL(c);
-
-      xitk_lock_display (xtfs->xitk);
-      if(xitk_font_is_font_8(xtfs))
-        XTextExtents(xtfs->font, c, nbytes, &dir, &fascent, &fdescent, &ov);
-      else
-        XTextExtents16(xtfs->font, (XChar2b *)c, (nbytes / 2), &dir, &fascent, &fdescent, &ov);
-      xitk_unlock_display (xtfs->xitk);
-
-      if(lbearing)
-        *lbearing = ov.lbearing;
-      if(rbearing)
-        *rbearing = ov.rbearing;
-      if(width)
-        *width    = ov.width;
-      if(ascent)
-        *ascent  = xtfs->font->ascent;
-      if(descent)
-        *descent = xtfs->font->descent;
-    }
-#endif
+  xtfs->text_extent(xtfs, c, nbytes, lbearing, rbearing, width, ascent, descent);
 }
 
 /*

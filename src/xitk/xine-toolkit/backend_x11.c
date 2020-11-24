@@ -50,10 +50,12 @@
 #include "dump_x11.h"
 #include "dnd_x11.h"
 #include "cursors_x11.h"
+#include "font_x11.h"
 
 #include "xitk_x11.h"
 
 #define _XITK_X11_BE_MAGIC      (('x' << 24) | ('1' << 16) | ('1' << 8) | 'b')
+#define _XITK_X11_FONT_MAGIC    (('x' << 24) | ('1' << 16) | ('1' << 8) | 'f')
 #define _XITK_X11_IMAGE_MAGIC   (('x' << 24) | ('1' << 16) | ('1' << 8) | 'i')
 #define _XITK_X11_WINDOW_MAGIC  (('x' << 24) | ('1' << 16) | ('1' << 8) | 'w')
 #define _XITK_X11_DISPLAY_MAGIC (('x' << 24) | ('1' << 16) | ('1' << 8) | 'd')
@@ -182,6 +184,12 @@ struct xitk_x11_window_s {
   xitk_tagitem_t props[XITK_X11_WT_LAST];
   char name[80], title[256];
 };
+
+typedef struct xitk_x11_be_font_t {
+  xitk_be_font_t      f;
+  xitk_x11_display_t *d;
+  xitk_x11_font_t    *font;
+} xitk_x11_be_font_t;
 
 typedef enum {
   XITK_X11_IT_W = 0,
@@ -661,6 +669,15 @@ static int xitk_x11_pixel_is_visible (xitk_be_image_t *_img, int x, int y) {
   return pixel;
 }
 
+static void xitk_x11_image_draw_text (xitk_be_image_t *_img, xitk_be_font_t *_font, const char *text, size_t bytes, int x, int y, uint32_t color) {
+
+  xitk_x11_be_font_t *font;
+  if (_font->magic != _XITK_X11_FONT_MAGIC)
+    return;
+  xitk_container (font, _font, f);
+  xitk_x11_font_draw_string(font->d->display, font->font, _img->id1, x, y, text, bytes, color);
+}
+
 static xitk_be_image_t *xitk_x11_image_new (xitk_be_display_t *_d, const xitk_tagitem_t *taglist) {
   xitk_x11_display_t *d;
   xitk_x11_image_t *img;
@@ -695,9 +712,7 @@ static xitk_be_image_t *xitk_x11_image_new (xitk_be_display_t *_d, const xitk_ta
     img->img.draw_arc   = xitk_x11_image_draw_arc;
     img->img.fill_arc   = xitk_x11_image_fill_arc;
     img->img.fill_polygon = xitk_x11_image_fill_polygon;
-#if 0
     img->img.draw_text  = xitk_x11_image_draw_text;
-#endif
     img->img.copy_rect  = xitk_x11_image_copy_rect;
     img->d              = d;
     img->shared_mask.id = None;
@@ -2581,6 +2596,70 @@ static void xitk_x11_color_delete  (xitk_be_display_t *_d, uint32_t value) {
 }
 
 /*
+ * Fonts
+ */
+
+static void _x11_font_text_extent(xitk_be_font_t *_font, const char *c, size_t nbytes,
+                                  int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
+  xitk_x11_be_font_t *font;
+  xitk_container (font, _font, f);
+  font->d->d.lock(&font->d->d);
+  xitk_x11_font_text_extent(font->d->display, font->font, c, nbytes, lbearing, rbearing, width, ascent, descent);
+  font->d->d.unlock(&font->d->d);
+}
+
+static void _x11_font_delete(xitk_be_font_t **_font) {
+  xitk_x11_be_font_t *font;
+  xitk_x11_display_t *d;
+
+  if (!_font || !*_font)
+    return;
+
+  xitk_container (font, *_font, f);
+  *_font = NULL;
+  d = font->d;
+
+  d->d.lock(&d->d);
+  xitk_x11_font_destroy(d->display, &font->font);
+  d->d.unlock(&d->d);
+
+  pthread_mutex_lock (&d->mutex);
+  if (_xitk_x11_display_unref (d))
+    pthread_mutex_unlock (&d->mutex);
+}
+
+static xitk_be_font_t *xitk_x11_font_new (xitk_be_display_t *_d, const char *name) {
+  xitk_x11_display_t *d;
+  xitk_x11_be_font_t *font;
+
+  xitk_container (d, _d, d);
+
+  font = calloc(1, sizeof(*font));
+  if (!font)
+    return NULL;
+
+  _d->lock(_d);
+  font->font = xitk_x11_font_create (_d->be->xitk, d->display, name);
+  _d->unlock(_d);
+  if (!font->font) {
+    free(font);
+    return NULL;
+  }
+
+  font->d = d;
+  font->f.magic   = _XITK_X11_FONT_MAGIC;
+  //font->f.name = strcpy((char *)(font + 1), name);
+  font->f._delete     = _x11_font_delete;
+  font->f.text_extent = _x11_font_text_extent;
+
+  pthread_mutex_lock (&d->mutex);
+  d->refs += 1;
+  pthread_mutex_unlock (&d->mutex);
+
+  return &font->f;
+}
+
+/*
  * Imlib
  */
 
@@ -2860,6 +2939,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.close = xitk_x11_display_close;
   d->d.next_event = xitk_x11_next_event;
   d->d.event_name = xitk_x11_event_name;
+  d->d.font_new   = xitk_x11_font_new;
   d->d.image_new  = xitk_x11_image_new;
   d->d.window_new = xitk_x11_window_new;
   d->d.color._new = xitk_x11_color_new;

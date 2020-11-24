@@ -105,7 +105,7 @@ typedef struct xitk_s xitk_t;
 typedef struct xitk_widget_s xitk_widget_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
 typedef struct xitk_skin_config_s xitk_skin_config_t;
-typedef struct xitk_font_s xitk_font_t;
+typedef struct xitk_be_font_s xitk_font_t;
 typedef struct xitk_image_s xitk_image_t;
 typedef struct xitk_window_s xitk_window_t;
 
