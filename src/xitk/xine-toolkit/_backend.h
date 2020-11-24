@@ -29,6 +29,7 @@
 typedef struct xitk_backend_s xitk_backend_t;
 typedef struct xitk_be_display_s xitk_be_display_t;
 typedef struct xitk_be_image_s xitk_be_image_t;
+typedef struct xitk_be_font_s xitk_be_font_t;
 
 typedef enum {
   XITK_BE_MASK_NO = 0, /* default */
@@ -95,6 +96,16 @@ typedef enum {
   XITK_BE_TYPE_WAYLAND = 2
 } xitk_be_type_t;
 
+struct xitk_be_font_s {
+  uint32_t magic;
+  /* for appliction use */
+  void *data;
+
+  void (*_delete) (xitk_be_font_t **);
+  void (*text_extent) (xitk_be_font_t *, const char *text, size_t nbytes,
+                       int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
+};
+
 struct xitk_be_image_s {
   xitk_dnode_t node;
   uint32_t magic;
@@ -118,7 +129,7 @@ struct xitk_be_image_s {
   void (*fill_arc)   (xitk_be_image_t *image, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
     uint16_t a1, uint16_t a2, uint32_t color, int mask);
   void (*fill_polygon) (xitk_be_image_t *image, const xitk_point_t *points, int num_points, uint32_t color, int mask);
-  void (*draw_text)  (xitk_be_image_t *image, const char *text, size_t bytes, int x, int y, uint32_t color);
+  void (*draw_text)  (xitk_be_image_t *image, xitk_be_font_t *font, const char *text, size_t bytes, int x, int y, uint32_t color);
 };
 
 typedef enum {
@@ -174,6 +185,7 @@ struct xitk_be_display_s {
     void (*_delete) (xitk_be_display_t *d, uint32_t value);
   } color;
 
+  xitk_be_font_t   *(*font_new)   (xitk_be_display_t *d, const char *font);
   xitk_be_image_t  *(*image_new)  (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
   xitk_be_window_t *(*window_new) (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
 

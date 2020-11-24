@@ -31,6 +31,7 @@ libxitk_a_SOURCES = \
 	dnd_x11.c \
 	doublebox.c \
 	font.c \
+	font_x11.c \
 	getdeskroot.c \
 	image.c \
 	inputtext.c \
@@ -71,6 +72,7 @@ noinst_HEADERS = \
 	dnd_x11.h \
 	doublebox.h \
 	font.h \
+	font_x11.h \
 	image.h \
 	inputtext.h \
 	intbox.h \

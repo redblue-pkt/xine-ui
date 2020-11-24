@@ -558,7 +558,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
         : 0;
       x += pad_x;
 
-      xitk_font_draw_string (fs, image, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
+      xitk_image_draw_string (image, fs, (x - lbearing), y, lines[i], strlen(lines[i]), foreground);
                                         /*   ^^^^^^^^ Adjust to start of ink */
     }
   }
@@ -1380,12 +1380,23 @@ static void _xitk_image_draw_frame (xitk_image_t *img,
 }
 
 void xitk_image_draw_string (xitk_image_t *img, xitk_font_t *xtfs, int x, int y, const char *text, size_t nbytes, int color) {
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(text);
+
   if (!img)
     return;
   if (!img->beimg || !img->xitk)
     return;
 
-  xitk_font_draw_string (xtfs, img, x, y, text, nbytes, color);
+#ifdef DEBUG
+  if (nbytes > strlen(text) + 1) {
+    XITK_WARNING("draw_string: %zu > %zu\n", nbytes, strlen(text));
+  }
+#endif
+
+  img->beimg->display->lock (img->beimg->display);
+  img->beimg->draw_text (img->beimg, xtfs, text, nbytes, x, y, color);
+  img->beimg->display->unlock (img->beimg->display);
 }
 
 /*
