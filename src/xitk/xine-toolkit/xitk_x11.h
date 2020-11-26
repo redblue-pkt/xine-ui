@@ -83,7 +83,7 @@ uint32_t xitk_x11_check_wm (Display *display, int verbose);
  *
  */
 
-void xitk_x11_try_to_set_input_focus(Display *display, Window window);
+int  xitk_x11_try_to_set_input_focus(Display *display, Window window);
 void xitk_x11_get_window_position(Display *display, Window window, int *x, int *y, int *width, int *height);
 int  xitk_x11_is_window_visible(Display *display, Window window);
 Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
