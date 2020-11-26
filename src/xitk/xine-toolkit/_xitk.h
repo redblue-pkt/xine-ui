@@ -171,7 +171,6 @@ struct xitk_window_s {
   xitk_t                   *xitk;
   xitk_be_window_t         *bewin;
   xitk_image_t             *bg_image;
-  xitk_window_t            *win_parent;
   int                       width;
   int                       height;
   xitk_wm_window_type_t     type;
