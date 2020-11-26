@@ -1680,13 +1680,6 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
     __fx_unref (fx);
 }
 
-static void xitk_dummy_un_lock_display (Display *display) {
-  (void)display;
-}
-
-void (*xitk_x_lock_display) (Display *display) = xitk_dummy_un_lock_display;
-void (*xitk_x_unlock_display) (Display *display) = xitk_dummy_un_lock_display;
-
 int xitk_image_quality (xitk_t *xitk, int qual) {
   if (xitk->d->image_quality)
     return xitk->d->image_quality(xitk->d, qual);
@@ -1711,12 +1704,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   __xitk_t *xitk;
   char buffer[256];
   pthread_mutexattr_t attr;
-
-  if (use_x_lock_display) {
-    /* Nasty (temporary) kludge. */
-    xitk_x_lock_display = XLockDisplay;
-    xitk_x_unlock_display = XUnlockDisplay;
-  }
 
 #ifdef ENABLE_NLS
   bindtextdomain("xitk", XITK_LOCALE);

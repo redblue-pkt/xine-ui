@@ -295,9 +295,7 @@ int xitk_x11_is_window_visible(Display *display, Window window) {
   if((display == NULL) || (window == None))
     return -1;
 
-  xitk_x_lock_display (display);
   status = XGetWindowAttributes(display, window, &wattr);
-  xitk_x_unlock_display (display);
 
   if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
     return 1;
@@ -331,7 +329,6 @@ void xitk_x11_get_window_position(Display *display, Window window,
   if((display == NULL) || (window == None))
     return;
 
-  xitk_x_lock_display (display);
   if(!XGetWindowAttributes(display, window, &wattr)) {
     XITK_WARNING("XGetWindowAttributes() failed.n");
     wattr.width = wattr.height = 0;
@@ -343,8 +340,6 @@ void xitk_x11_get_window_position(Display *display, Window window,
                                 &xx, &yy, &wdummy);
 
  __failure:
-
-  xitk_x_unlock_display (display);
 
   if(x)
     *x = xx;

@@ -229,7 +229,9 @@ static int _video_window_is_visible (xui_vwin_t *vwin) {
   static const uint8_t map[6] = {0, 1, 0, 2, 2, 2};
 
   /* user may have changed this via task bar. */
+  vwin->x_lock_display (vwin->video_display);
   vwin->show = map[vwin->show + (xitk_x11_is_window_visible (vwin->video_display, vwin->video_window) ? 3 : 0)];
+  vwin->x_unlock_display (vwin->video_display);
   return vwin->show;
 }
 
@@ -2251,6 +2253,7 @@ static int video_window_translate_point (xui_vwin_t *vwin,
  * Set/Get magnification.
  */
 static int video_window_check_mag (xui_vwin_t *vwin) {
+  int ret;
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))
 /*
  * Currently, no support for magnification in fullscreen mode.
@@ -2264,7 +2267,10 @@ static int video_window_check_mag (xui_vwin_t *vwin) {
     return 0;
 
   /* Allow mag only if video win is visible, so don't do something we can't see. */
-  return (xitk_x11_is_window_visible (vwin->video_display, vwin->video_window));
+  vwin->x_unlock_display (vwin->video_display);
+  ret = xitk_x11_is_window_visible (vwin->video_display, vwin->video_window);
+  vwin->x_unlock_display (vwin->video_display);
+  return ret;
 }
 
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag) {
@@ -2713,7 +2719,9 @@ void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *win
     if (window_height)
       *window_height = 0;
   }
+  vwin->x_lock_display (vwin->video_display);
   xitk_x11_get_window_position (vwin->video_display, vwin->video_window, NULL, NULL, window_width, window_height);
+  vwin->x_unlock_display (vwin->video_display);
 }
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
