@@ -1680,12 +1680,6 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
     __fx_unref (fx);
 }
 
-Display *xitk_x11_get_display(xitk_t *xitk) {
-  __xitk_t *_xitk;
-  xitk_container (_xitk, xitk, x);
-  return _xitk->display;
-}
-
 static void xitk_dummy_un_lock_display (Display *display) {
   (void)display;
 }

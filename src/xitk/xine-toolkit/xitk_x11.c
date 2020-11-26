@@ -698,6 +698,17 @@ Colormap xitk_x11_get_colormap(xitk_t *xitk) {
  *
  */
 
+Display *xitk_x11_get_display(xitk_t *xitk) {
+  if (xitk->d->type != XITK_BE_TYPE_X11)
+    return NULL;
+
+  return (Display *)xitk->d->id;
+}
+
+/*
+ *
+ */
+
 xitk_window_t *xitk_x11_wrap_window(xitk_t *xitk, Window window) {
   if (!xitk->be || xitk->be->type != XITK_BE_TYPE_X11) {
     XITK_WARNING("Trying to wrap X11 window to non-X11 backend %d\n", xitk->be->type);
