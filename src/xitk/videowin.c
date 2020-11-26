@@ -185,6 +185,8 @@ struct xui_vwin_st {
 };
 
 static int _vwin_is_ewmh (xui_vwin_t *vwin) {
+  if (vwin->video_be_display)
+    return (vwin->video_be_display->wm_type & WM_TYPE_EWMH_COMP) ? 1 : 0;
   return (xitk_get_wm_type (vwin->gui->xitk) & WM_TYPE_EWMH_COMP) ? 1 : 0;
 }
 

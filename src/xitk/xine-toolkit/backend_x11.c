@@ -244,6 +244,7 @@ struct xitk_x11_display_s {
   xitk_x11_window_t windows[32];
 
   int default_screen;
+  uint32_t wm_type;
   Atom atoms[XITK_A_LAST];
 
   struct {
@@ -1440,7 +1441,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
   xitk_t  *xitk    = win->d->be->be.xitk;
   Display *display = win->d->display;
   Window   window  = win->w.id;
-  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+  uint32_t wm_type = win->d->wm_type;
 
   if ((wm_type & WM_TYPE_GNOME_COMP) && !(wm_type & WM_TYPE_EWMH_COMP)) {
     long propvalue[1];
@@ -1525,10 +1526,9 @@ static void _set_layer_above(xitk_x11_window_t *win) {
 }
 
 static void _set_layer(xitk_x11_window_t *win, int layer) {
-  xitk_t  *xitk    = win->d->be->be.xitk;
   Display *display = win->d->display;
   Window   window  = win->w.id;
-  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+  uint32_t wm_type = win->d->wm_type;
   XEvent xev;
 
   if (((wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
@@ -1552,10 +1552,9 @@ static void _set_layer(xitk_x11_window_t *win, int layer) {
 }
 
 static void _set_wm_window_type(xitk_x11_window_t *win, xitk_wm_window_type_t type) {
-  xitk_t  *xitk    = win->d->be->be.xitk;
   Display *display = win->d->display;
   Window   window  = win->w.id;
-  uint32_t wm_type = xitk_get_wm_type(xitk); // XXX should be hidden to x11_display
+  uint32_t wm_type = win->d->wm_type;
 
   static const xitk_x11_atoms_t ai[WINDOW_TYPE_END] = {
     [WINDOW_TYPE_DESKTOP]       = XITK_A__NET_WM_WINDOW_TYPE_DESKTOP,
@@ -2932,6 +2931,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
     };
     d->d.lock (&d->d);
     XInternAtoms (d->display, (char **)names, XITK_A_LAST, False, d->atoms);
+    d->wm_type = xitk_x11_check_wm(d->display, d->be->be.verbosity >= 2);
+    d->d.wm_type = d->wm_type;
     d->d.unlock (&d->d);
   }
 
