@@ -529,6 +529,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
 
   /* Draw cursor pointer */
   if (wp->text.cursor_pos >= 0) {
+    xitk_be_image_t *beimg;
     xitk_be_line_t xs[3];
     width = cursor_x >= 0
           ? cursor_x
@@ -543,9 +544,10 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
     xs[0].x1 = width - 1; xs[0].x2 = width + 1; xs[0].y1 = xs[0].y2 = 2;
     xs[1].x1 = width - 1; xs[1].x2 = width + 1; xs[1].y1 = xs[1].y2 = ysize - 3;
     xs[2].x1 = xs[2].x2 = width; xs[2].y1 = 3; xs[2].y2 = ysize - 4;
-    xitk_lock_display(wp->w.wl->xitk);
-    wp->text.temp_img.image->beimg->draw_lines (wp->text.temp_img.image->beimg, xs, 3, fg, 0);
-    xitk_unlock_display(wp->w.wl->xitk);
+    beimg = wp->text.temp_img.image->beimg;
+    beimg->display->lock (beimg->display);
+    beimg->draw_lines (beimg, xs, 3, fg, 0);
+    beimg->display->unlock (beimg->display);
   }
 
   if (fs) {
