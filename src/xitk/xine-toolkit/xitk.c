@@ -212,11 +212,6 @@ typedef struct {
 } __gfx_t;
 
 
-typedef enum {
-  XITK_A_WIN_LAYER = 0,
-  XITK_A_END
-} xitk_atom_t;
-
 struct __xitk_s {
   xitk_t                      x;
 
@@ -263,7 +258,6 @@ struct __xitk_s {
 
   pid_t                       xitk_pid;
 
-  Atom                        atoms[XITK_A_END];
   Atom                        XA_XITK;
 
   struct {
@@ -754,28 +748,6 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
   type = xitk_x11_check_wm(display, xitk->verbosity >= 2);
 
   xitk->XA_XITK = XInternAtom (display, "_XITK_EVENT", False);
-
-  switch(type & WM_TYPE_COMP_MASK) {
-  case WM_TYPE_KWIN:
-    break;
-
-  case WM_TYPE_MOTIF:
-  case WM_TYPE_LARSWM:
-    break;
-
-  case WM_TYPE_UNKNOWN:
-  case WM_TYPE_E:
-  case WM_TYPE_ICE:
-  case WM_TYPE_WINDOWMAKER:
-  case WM_TYPE_XFCE:
-  case WM_TYPE_SAWFISH:
-  case WM_TYPE_METACITY: /* Untested */
-  case WM_TYPE_AFTERSTEP:
-  case WM_TYPE_BLACKBOX:
-  case WM_TYPE_DTWM:
-    xitk->atoms[XITK_A_WIN_LAYER] = XInternAtom(display, "_WIN_LAYER", False);
-    break;
-  }
 
   xitk->x.d->unlock(xitk->x.d);
 
@@ -1737,11 +1709,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->ignore_keys[1]  = 0;
   xitk->qual            = 0;
   xitk->tips_timeout    = TIPS_TIMEOUT;
-  {
-    unsigned int u;
-    for (u = 0; u < XITK_A_END; u++)
-      xitk->atoms[u] = None;
-  }
 
   memset(&xitk->keypress, 0, sizeof(xitk->keypress));
 
