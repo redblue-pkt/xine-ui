@@ -1132,7 +1132,7 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   else if (!fx->name[0])
     strcpy (fx->name, "NO_SET");
 
-  if (fx->wl.xwin && fx->wl.xwin->bewin) {
+  if (fx->wl.xwin->bewin) {
     xitk_tagitem_t tags1[] = {
       {XITK_TAG_X, 0},
       {XITK_TAG_Y, 0},
@@ -1158,12 +1158,10 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   fx->destructor = destructor;
   fx->destr_data = destr_data;
 
-  if(fx->wl.xwin) {
-    xitk->x.d->lock(xitk->x.d);
-    XChangeProperty (xitk->display, fx->wl.xwin->bewin->id, xitk->XA_XITK, XA_ATOM,
-		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
-    xitk->x.d->unlock(xitk->x.d);
-  }
+  xitk->x.d->lock(xitk->x.d);
+  XChangeProperty (xitk->display, fx->wl.xwin->bewin->id, xitk->XA_XITK, XA_ATOM,
+                   32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
+  xitk->x.d->unlock(xitk->x.d);
 
   MUTLOCK ();
   fx->key = ++xitk->key;
