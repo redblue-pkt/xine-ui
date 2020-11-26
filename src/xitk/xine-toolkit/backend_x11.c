@@ -2726,7 +2726,6 @@ static void _init_imlib(xitk_x11_display_t *d, const char *prefered_visual, int 
   xitk_x11_find_visual(d->display, DefaultScreen(d->display),
                        prefered_visual ? prefered_visual : xrm_prefered_visual,
                        &visual, NULL);
-  fprintf(stderr, "select vis %p\n", visual);
   _x11_select_visual(&d->d, visual);
 
   free(xrm_prefered_visual);
