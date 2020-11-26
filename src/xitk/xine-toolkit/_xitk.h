@@ -27,8 +27,6 @@
 #error config.h not included
 #endif
 
-/* #define DEBUG_LOCKDISPLAY */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -52,42 +50,9 @@ struct xitk_tips_s;
 struct xitk_s {
   xitk_backend_t *be;
   xitk_be_display_t *d, *d2;
-  /* TODO: remove this kludge. */
-  void    (*lock_display) (xitk_t *);
-  void    (*unlock_display) (xitk_t *);
-  /* /TODO: remove this kludge. */
-#ifdef DEBUG_LOCKDISPLAY
-  pthread_mutex_t debug_mutex;
-  int debug_level;
-#endif
   xitk_font_cache_t *font_cache;
   struct xitk_tips_s *tips;
 };
-
-#ifdef DEBUG_LOCKDISPLAY
-#  include <pthread.h>
-#  define xitk_lock_display(_xitk_) do { \
-     int _level_; \
-     pthread_mutex_lock (&(_xitk_)->debug_mutex); \
-     _level_ = ++(_xitk_)->debug_level; \
-     pthread_mutex_unlock (&(_xitk_)->debug_mutex); \
-     printf ("%s:%d %s (): getting display lock #%d...\n", __FILE__, __LINE__, __FUNCTION__, _level_); \
-     (_xitk_)->lock_display (_xitk_); \
-     printf ("%s:%d %s (): got display lock #%d.\n", __FILE__, __LINE__, __FUNCTION__, _level_); \
-   } while (0)
-#  define xitk_unlock_display(_xitk_) do { \
-     int _level_; \
-     pthread_mutex_lock (&(_xitk_)->debug_mutex); \
-     _level_ = (_xitk_)->debug_level--; \
-     pthread_mutex_unlock (&(_xitk_)->debug_mutex); \
-     printf ("%s:%d %s (): freeing display lock #%d...\n", __FILE__, __LINE__, __FUNCTION__, _level_); \
-     (_xitk_)->unlock_display (_xitk_); \
-     printf ("%s:%d %s (): freed display lock #%d.\n", __FILE__, __LINE__, __FUNCTION__, _level_); \
-   } while (0)
-#else
-#  define xitk_lock_display(_xitk_) (_xitk_)->lock_display (_xitk_)
-#  define xitk_unlock_display(_xitk_) (_xitk_)->unlock_display (_xitk_)
-#endif
 
 #include "_config.h"
 #include "image.h"

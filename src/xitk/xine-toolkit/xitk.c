@@ -275,27 +275,6 @@ struct __xitk_s {
  *
  */
 
-static void _xitk_lock_display (xitk_t *_xitk) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, _xitk, x);
-  XLockDisplay (xitk->display);
-}
-static void _xitk_unlock_display (xitk_t *_xitk) {
-  __xitk_t *xitk;
-
-  xitk_container (xitk, _xitk, x);
-  XUnlockDisplay (xitk->display);
-}
-
-static void _xitk_dummy_lock_display (xitk_t *_xitk) {
-  (void)_xitk;
-}
-
-/*
- *
- */
-
 void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
   __xitk_t *xitk;
   __gfx_t *fx;
@@ -770,7 +749,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
 {
   uint32_t type;
 
-  xitk->x.lock_display (&xitk->x);
+  xitk->x.d->lock(xitk->x.d);
 
   type = xitk_x11_check_wm(display, xitk->verbosity >= 2);
 
@@ -798,7 +777,7 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
     break;
   }
 
-  xitk->x.unlock_display (&xitk->x);
+  xitk->x.d->unlock(xitk->x.d);
 
   return type;
 }
@@ -1180,10 +1159,10 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   fx->destr_data = destr_data;
 
   if(fx->wl.xwin) {
-    xitk_lock_display (&xitk->x);
+    xitk->x.d->lock(xitk->x.d);
     XChangeProperty (xitk->display, fx->wl.xwin->bewin->id, xitk->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
-    xitk_unlock_display (&xitk->x);
+    xitk->x.d->unlock(xitk->x.d);
   }
 
   MUTLOCK ();
@@ -1689,9 +1668,9 @@ int xitk_image_quality (xitk_t *xitk, int qual) {
 void xitk_sync(xitk_t *xitk) {
   __xitk_t *_xitk;
   xitk_container (_xitk, xitk, x);
-  xitk_lock_display (xitk);
+  xitk->d->lock(xitk->d);
   XSync (_xitk->display, False);
-  xitk_unlock_display (xitk);
+  xitk->d->unlock(xitk->d);
 }
 
 /*
@@ -1734,18 +1713,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->display = (Display *)xitk->x.d->id;
 
   xitk->xitk_pid = getppid ();
-
-  if (use_x_lock_display) {
-    xitk->x.lock_display   = _xitk_lock_display;
-    xitk->x.unlock_display = _xitk_unlock_display;
-  } else {
-    xitk->x.lock_display   = _xitk_dummy_lock_display;
-    xitk->x.unlock_display = _xitk_dummy_lock_display;
-  }
-#ifdef DEBUG_LOCKDISPLAY
-  pthread_mutex_init (&xitk->x.debug_mutex, NULL);
-  xitk->x.debug_level = 0;
-#endif
 
   xitk->event_bridge.running = 0;
 
@@ -1930,17 +1897,11 @@ void xitk_free(xitk_t **p) {
    * callback functions are called. If libGL.so has already been unloaded
    * with dlclose() this will cause a segmentation fault.
    */
-  xitk_lock_display (&xitk->x);
-  xitk_unlock_display (&xitk->x);
 
   xitk->x.d->close (&xitk->x.d);
   xitk->display = NULL;
   xitk->x.be->_delete (&xitk->x.be);
 
-#ifdef DEBUG_LOCKDISPLAY
-  pthread_mutex_destroy (&xitk->x.debug_mutex);
-  printf ("%s:%d %s (): final display lock level: #%d.\n", __FILE__, __LINE__, __FUNCTION__, xitk->x.debug_level);
-#endif
   pthread_mutex_destroy (&xitk->mutex);
 
   XITK_FREE (xitk);
