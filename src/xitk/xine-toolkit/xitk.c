@@ -255,7 +255,7 @@ struct __xitk_s {
 
   struct timeval              keypress;
 
-  KeyCode                     ignore_keys[2];
+  uint32_t                    ignore_keys[2];
 
   unsigned long               tips_timeout;
 
@@ -1659,6 +1659,17 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
     __fx_unref (fx);
 }
 
+void xitk_set_ignore_keys(xitk_t *xitk, const uint32_t *keys, size_t count) {
+  __xitk_t *_xitk;
+  size_t i;
+
+  xitk_container (_xitk, xitk, x);
+
+  for (i = 0; i < sizeof (_xitk->ignore_keys) / sizeof (_xitk->ignore_keys[0]); i++) {
+    _xitk->ignore_keys[i] = (i < count) ? keys[i] : 0;
+  }
+}
+
 int xitk_image_quality (xitk_t *xitk, int qual) {
   if (xitk->d->image_quality)
     return xitk->d->image_quality(xitk->d, qual);
@@ -1724,8 +1735,8 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk->ignore_keys[0]  = XKeysymToKeycode (xitk->display, XK_Shift_L);
-  xitk->ignore_keys[1]  = XKeysymToKeycode (xitk->display, XK_Control_L);
+  xitk->ignore_keys[0]  = 0;
+  xitk->ignore_keys[1]  = 0;
   xitk->qual            = 0;
   xitk->tips_timeout    = TIPS_TIMEOUT;
   {
