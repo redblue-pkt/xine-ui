@@ -52,10 +52,6 @@
 #include "../../common/dump.h"
 #include "../../common/dump_x11.h"
 
-struct xitk_x11_s {
-  xitk_t        *xitk;
-};
-
 /*
 *
 */
@@ -290,29 +286,6 @@ void xitk_x11_find_visual(Display *display, int screen, const char *prefered_vis
     *depth_out = depth;
   if (visual_out)
     *visual_out = visual;
-}
-
-int xitk_x11_is_window_iconified(Display *display, Window window) {
-  unsigned char *prop_return = NULL;
-  unsigned long  nitems_return;
-  unsigned long  bytes_after_return;
-  int            format_return;
-  Atom           type_return, atom;
-  int            retval = 0;
-
-  xitk_x_lock_display (display);
-  atom = XInternAtom(display, "WM_STATE", False);
-  XGetWindowProperty (display, window, atom, 0, 0x7fffffff, False,
-                     atom, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return);
-
-  if(prop_return) {
-    if (prop_return[0] == IconicState)
-      retval = 1;
-    XFree(prop_return);
-  }
-  xitk_x_unlock_display (display);
-
-  return retval;
 }
 
 int xitk_x11_is_window_visible(Display *display, Window window) {
@@ -745,23 +718,3 @@ int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
     return -1;
   return strlcpy(buf, s, buf_size);
 }
-
-xitk_x11_t *xitk_x11_new (xitk_t *xitk) {
-  xitk_x11_t *xitk_x11;
-
-  if (!xitk)
-    return NULL;
-  xitk_x11 = malloc (sizeof (*xitk_x11));
-  if (!xitk_x11)
-    return NULL;
-
-  xitk_x11->xitk = xitk;
-  return xitk_x11;
-}
-
-void xitk_x11_delete (xitk_x11_t *xitk_x11) {
-  if (!xitk_x11)
-    return;
-  free (xitk_x11);
-}
-
