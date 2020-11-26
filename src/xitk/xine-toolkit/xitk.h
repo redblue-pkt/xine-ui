@@ -535,6 +535,8 @@ const char *xitk_set_locale(void);
 /*
  *
  */
+void xitk_set_ignore_keys(xitk_t *, const uint32_t *keys, size_t count);
+
 long int xitk_get_last_keypressed_time (xitk_t *xitk);
 
 void xitk_get_display_size (xitk_t *xitk, int *w, int *h);

@@ -156,7 +156,7 @@ struct xui_vwin_st {
   Bool                   have_xtest;
 #ifdef HAVE_XTESTEXTENSION
   int                    fake_key_cur;
-  KeyCode                fake_keys[2];    /* Fake key to send */
+  uint32_t               fake_keys[2];    /* Fake key to send */
 #endif
 
   XWMHints              *wm_hint;
@@ -1725,6 +1725,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->fake_keys[0] = XKeysymToKeycode (vwin->video_display, XK_Shift_L);
   vwin->fake_keys[1] = XKeysymToKeycode (vwin->video_display, XK_Control_L);
   vwin->fake_key_cur = 0;
+  xitk_set_ignore_keys(vwin->gui->xitk, vwin->fake_keys, 2);
 #endif
 
   memcpy (vwin->window_title, "xine", 5);
