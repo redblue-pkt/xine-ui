@@ -258,8 +258,6 @@ struct __xitk_s {
 
   pid_t                       xitk_pid;
 
-  Atom                        XA_XITK;
-
   struct {
     xitk_widget_t          *widget_in;
   }                         clipboard;
@@ -747,8 +745,6 @@ static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
 
   type = xitk_x11_check_wm(display, xitk->verbosity >= 2);
 
-  xitk->XA_XITK = XInternAtom (display, "_XITK_EVENT", False);
-
   xitk->x.d->unlock(xitk->x.d);
 
   return type;
@@ -1129,11 +1125,6 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   fx->event_handler = event_handler;
   fx->destructor = destructor;
   fx->destr_data = destr_data;
-
-  xitk->x.d->lock(xitk->x.d);
-  XChangeProperty (xitk->display, fx->wl.xwin->bewin->id, xitk->XA_XITK, XA_ATOM,
-                   32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
-  xitk->x.d->unlock(xitk->x.d);
 
   MUTLOCK ();
   fx->key = ++xitk->key;
