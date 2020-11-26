@@ -305,56 +305,18 @@ int xitk_x11_is_window_visible(Display *display, Window window) {
   return 0;
 }
 
-static int _xitk_window_set_focus (Display *display, Window window) {
-  int t = 0;
-
-  while ((!xitk_x11_is_window_visible (display, window)) && (++t < 3))
-    xitk_usec_sleep (5000);
-
-  if (xitk_x11_is_window_visible (display, window)) {
-    xitk_x_lock_display (display);
-    XSetInputFocus (display, window, RevertToParent, CurrentTime);
-    xitk_x_unlock_display (display);
-    return 0;
-  }
-
-  return -1;
-}
-
-static int _xitk_window_has_focus(Display *display, Window window) {
+int xitk_x11_try_to_set_input_focus(Display *display, Window window) {
   Window focused_win;
   int revert;
 
-  xitk_x_lock_display (display);
+  if (!xitk_x11_is_window_visible (display, window))
+    return 0;
+
+  XSetInputFocus (display, window, RevertToParent, CurrentTime);
+  XSync(display, False);
   XGetInputFocus(display, &focused_win, &revert);
-  xitk_x_unlock_display (display);
 
   return (focused_win == window);
-}
-
-void xitk_x11_try_to_set_input_focus(Display *display, Window window) {
-  int retry = 0;
-
-  if (_xitk_window_set_focus(display, window) < 0)
-    return;
-
-  do {
-
-    /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
-
-    xitk_x_lock_display (display);
-    XSync(display, False);
-    xitk_x_unlock_display (display);
-
-    if (_xitk_window_has_focus(display, window))
-      break;
-
-    xitk_usec_sleep(5000);
-
-    if (_xitk_window_set_focus(display, window) < 0)
-      break;
-
-  } while (retry++ < 30);
 }
 
 /*
