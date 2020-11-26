@@ -54,12 +54,6 @@ void xitk_window_try_to_set_input_focus(xitk_window_t *w) {
   }
 }
 
-void xitk_window_set_parent_window(xitk_window_t *xwin, xitk_window_t *parent) {
-
-  if(xwin)
-    xwin->win_parent = parent;
-}
-
 /*
  *
  */
@@ -275,7 +269,6 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
   xwin->xitk            = xitk;
   xwin->bewin           = NULL;
   xwin->bg_image        = bg_image;
-  xwin->win_parent      = NULL;
   /* will be set by xitk_window_update_tree (). */
   xwin->type            = WINDOW_TYPE_END;
   xwin->role            = XITK_WR_HELPER;
@@ -538,7 +531,6 @@ xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
   xwin->xitk = xitk;
   xwin->bewin->data = xwin;
   xwin->bg_image = NULL;
-  xwin->win_parent = NULL;
 
   /* will be set by xitk_window_update_tree (). */
   xwin->type = WINDOW_TYPE_END;

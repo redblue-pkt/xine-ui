@@ -299,7 +299,6 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   }
 
   if (transient_for) {
-    xitk_window_set_parent_window (wd->xwin, transient_for);
     xitk_window_set_transient_for_win(wd->xwin, transient_for);
   }
   if (layer_above)
