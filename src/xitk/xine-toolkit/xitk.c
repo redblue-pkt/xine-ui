@@ -57,7 +57,6 @@
 #include "utils.h"
 #include "dump.h"
 #include "_xitk.h"
-#include "xitk_x11.h"
 #include "tips.h"
 #include "widget.h"
 #include "menu.h"
@@ -230,8 +229,6 @@ struct __xitk_s {
     xitk_color_info_t        *a;
     uint32_t                  used, size;
   }                           color_query;
-
-  uint32_t                    wm_type;
 
   pthread_mutex_t             mutex;
   int                         running;
@@ -737,24 +734,8 @@ static void xitk_signal_handler(int sig) {
   }
 }
 
-static uint32_t xitk_check_wm (__xitk_t *xitk, Display *display)
-{
-  uint32_t type;
-
-  xitk->x.d->lock(xitk->x.d);
-
-  type = xitk_x11_check_wm(display, xitk->verbosity >= 2);
-
-  xitk->x.d->unlock(xitk->x.d);
-
-  return type;
-}
-
 uint32_t xitk_get_wm_type (xitk_t *xitk) {
-  __xitk_t *_xitk;
-
-  xitk_container (_xitk, xitk, x);
-  return _xitk->wm_type;
+  return xitk->d->wm_type;
 }
 
 int xitk_get_layer_level(xitk_t *xitk) {
@@ -1719,8 +1700,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   if (verbosity >= 1)
     printf("%s", buffer);
-
-  xitk->wm_type = xitk_check_wm (xitk, xitk->display);
 
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();

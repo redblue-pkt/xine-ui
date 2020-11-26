@@ -198,6 +198,7 @@ struct xitk_be_display_s {
   int       (*image_quality)(xitk_be_display_t *, int); /* is this really needed ? */
 
   int width, height; /* size in pixels */
+  uint32_t wm_type; /* XXX TODO remove when WM-specific hacks are all hidden to backend_x11. */
 };
 
 xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity);
