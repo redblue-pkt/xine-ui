@@ -283,7 +283,7 @@ static void _x11_font_text_extent(xitk_x11_font_t *font, const char *c, size_t n
   int         dir;
   int         fascent, fdescent;
 
-  ABORT_IF_NULL(font->fontset);
+  ABORT_IF_NULL(font->font);
 
   if (_font_is_font_8(font))
     XTextExtents(font->font, c, nbytes, &dir, &fascent, &fdescent, &ov);
