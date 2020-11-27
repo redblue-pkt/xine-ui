@@ -825,10 +825,6 @@ static void xitk_x11_display_nolock (xitk_be_display_t *_d) {
   (void)_d;
 }
 
-static void _dummy_XLockDisplay(Display *d) {
-  (void)d;
-}
-
 static void _xitk_x11_clipboard_unregister_window (xitk_x11_display_t *d, Window win) {
   if (d->clipboard.window_out == win)
     d->clipboard.window_out = None;
@@ -2701,13 +2697,6 @@ static void _x11_select_visual(xitk_be_display_t *_d, Visual *gui_visual) {
   if (d->imlibdata == NULL) {
     fprintf(stderr, _("Unable to initialize Imlib\n"));
     exit(1);
-  }
-  if (d->d.lock == xitk_x11_display_lock) {
-    d->imlibdata->x.x_lock_display   = XLockDisplay;
-    d->imlibdata->x.x_unlock_display = XUnlockDisplay;
-  } else {
-    d->imlibdata->x.x_lock_display   =
-    d->imlibdata->x.x_unlock_display = _dummy_XLockDisplay;
   }
 }
 
