@@ -2621,6 +2621,8 @@ static void _x11_font_delete(xitk_be_font_t **_font) {
   pthread_mutex_lock (&d->mutex);
   if (_xitk_x11_display_unref (d))
     pthread_mutex_unlock (&d->mutex);
+
+  free(font);
 }
 
 static xitk_be_font_t *xitk_x11_font_new (xitk_be_display_t *_d, const char *name) {
