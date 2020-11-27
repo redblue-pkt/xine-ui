@@ -323,10 +323,10 @@ xitk_window_t *xitk_window_create_simple_window_ext(xitk_t *xitk, int x, int y, 
   xitk_image_draw_outter (bg_image, width, height);
   xwin = xitk_window_create_window_ext (xitk, x, y, width, height, title,
     res_name, res_class, override_redirect, layer_above, icon, bg_image);
-  if (!xwin) {
-    xitk_image_free_image (&bg_image);
-    return NULL;
-  }
+
+  /* xitk_window_create_window_ext() calls xitk_image_ref() */
+  xitk_image_free_image (&bg_image);
+
   return xwin;
 }
 
