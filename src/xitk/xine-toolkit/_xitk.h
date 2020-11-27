@@ -186,6 +186,10 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
   void (*destructor)(void *userdata), void *destr_data);
 
+/*
+ * Helper function to free widget list inside callbacks.
+ */
+void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 /* text == NULL: just tell length.

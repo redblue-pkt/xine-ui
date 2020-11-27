@@ -477,8 +477,6 @@ typedef enum {
   xitk_cursor_num_glyphs
 } xitk_cursors_t;
 
-#define XITK_WIDGET_LIST_FREE(wl)   xitk_widget_list_defferred_destroy(wl)
-
 #define XITK_WIDGET_INIT(X)         do {                              \
                                       (X)->magic = XITK_WIDGET_MAGIC; \
                                     } while(0)
@@ -505,11 +503,6 @@ void xitk_register_signal_handler(xitk_t *, xitk_signal_callback_t sigcb, void *
  * Remove widgetkey_t entry in internal table.
  */
 void xitk_unregister_event_handler (xitk_t *xitk, xitk_register_key_t *key);
-
-/*
- * Helper function to free widget list inside callbacks.
- */
-void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
 
 /*
  * Copy window information matching with key in passed window_info_t struct.
