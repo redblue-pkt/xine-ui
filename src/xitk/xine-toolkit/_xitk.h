@@ -194,6 +194,4 @@ void xitk_clipboard_unregister_widget (xitk_widget_t *w);
  * return -1: wait for WIDGET_EVENT_CLIP_READY, then try again. */
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
-void xitk_sync(xitk_t *); /* XSync() wrapper */
-
 #endif

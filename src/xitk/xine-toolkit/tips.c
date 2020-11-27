@@ -183,10 +183,8 @@ static void *_tips_loop_thread (void *data) {
 
       case TIPS_HIDE:
         if (xwin) {
-          xitk = xwin->xitk;
+          xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
           xitk_window_destroy_window (xwin);
-          /* We are flushing here, otherwise tips window will stay displayed */
-          xitk_sync(xitk);
           xwin = NULL;
         }
         state = TIPS_IDLE;
