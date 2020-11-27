@@ -50,10 +50,6 @@
 #include <execinfo.h>
 #endif
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
-
 #include "utils.h"
 #include "dump.h"
 #include "_xitk.h"
@@ -213,8 +209,6 @@ typedef struct {
 
 struct __xitk_s {
   xitk_t                      x;
-
-  Display                    *display;
 
   int                         verbosity;
   xitk_dlist_t                gfxs;
@@ -1618,14 +1612,6 @@ int xitk_image_quality (xitk_t *xitk, int qual) {
   return qual;
 }
 
-void xitk_sync(xitk_t *xitk) {
-  __xitk_t *_xitk;
-  xitk_container (_xitk, xitk, x);
-  xitk->d->lock(xitk->d);
-  XSync (_xitk->display, False);
-  xitk->d->unlock(xitk->d);
-}
-
 /*
  * Initiatization of widget internals.
  */
@@ -1663,8 +1649,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
     free (xitk);
     return NULL;
   }
-  xitk->display = (Display *)xitk->x.d->id;
-
   xitk->xitk_pid = getppid ();
 
   xitk->event_bridge.running = 0;
@@ -1845,7 +1829,6 @@ void xitk_free(xitk_t **p) {
    */
 
   xitk->x.d->close (&xitk->x.d);
-  xitk->display = NULL;
   xitk->x.be->_delete (&xitk->x.be);
 
   pthread_mutex_destroy (&xitk->mutex);
