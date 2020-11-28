@@ -495,7 +495,7 @@ void xitk_window_destroy_window (xitk_window_t *xwin) {
     return;
   if (xwin->widget_list) {
     xwin->widget_list->xwin = NULL;
-    XITK_WIDGET_LIST_FREE (xwin->widget_list);
+    xitk_widget_list_defferred_destroy (xwin->widget_list);
     xwin->widget_list = NULL;
   }
   if (xwin->bewin)

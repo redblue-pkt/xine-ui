@@ -43,8 +43,6 @@
 #include "recode.h"
 #endif
 
-typedef struct xitk_x11_font_s xitk_x11_font_t;
-
 struct xitk_x11_font_s {
 #ifdef WITH_XFT
   xitk_t        *xitk;
