@@ -154,10 +154,24 @@ void menu_auto_pop(xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
 
+typedef enum {
+  /* states from left to right */
+  XITK_IMG_STATE_NORMAL = 0,
+  XITK_IMG_STATE_FOCUS,
+  XITK_IMG_STATE_SELECTED,
+  XITK_IMG_STATE_SEL_FOCUS,
+  XITK_IMG_STATE_DISABLED_NORMAL,
+  XITK_IMG_STATE_DISABLED_SELECTED,
+  XITK_IMG_STATE_LAST
+} xitk_img_state_t;
+
+xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int focus, int click, int selected);
+
 struct xitk_image_s {
   xitk_be_image_t *beimg;
   xitk_pix_font_t *pix_font;
   int width, height;
+  xitk_img_state_t last_state;
   /* image private */
   xitk_t *xitk;
   xitk_widget_list_t *wl;
@@ -199,3 +213,4 @@ void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
 #endif
+

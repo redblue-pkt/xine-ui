@@ -79,13 +79,12 @@ static int _checkbox_inside (_checkbox_private_t *wp, int x, int y) {
  */
 static void _checkbox_paint (_checkbox_private_t *wp) {
   if (wp->w.visible == 1) {
-    static const uint8_t i[] = {0, 2, 0, 2, 1, 2, 2, 2,  0, 1, 0, 1, 2, 3, 2, 3};
-    int checkbox_width = wp->skin.width / wp->num_gfx;
-    int mode = (wp->num_gfx == 4 ? 8 : 0)
-             + ((wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN) ? 4 : 0)
-             + (wp->cClicked ? 2 : 0) + (wp->cState ? 1 : 0);
-    xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
-      i[mode] * checkbox_width, 0, checkbox_width, wp->skin.height, wp->w.x, wp->w.y);
+    int w = wp->skin.width / wp->num_gfx;
+    xitk_img_state_t state = xitk_image_find_state ((xitk_img_state_t)(wp->num_gfx - 1),
+      wp->w.enable, (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), 
+      wp->cClicked, wp->cState);
+
+    xitk_part_image_draw (wp->w.wl, &wp->skin, NULL, (int)state * w, 0, w, wp->skin.height, wp->w.x, wp->w.y);
   }
 }
 
@@ -355,8 +354,9 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
     i = xitk_image_new (wl->xitk, NULL, 0, width * 3, height);
     xitk_image_draw_checkbox_check (i);
   } else {
-    wp->num_gfx = u == 6 ? 4 : 3;
+    wp->num_gfx = 6;
     if (xitk_shared_image (wl, noskin_names[u], width * wp->num_gfx, height, &i) == 1) {
+      i->last_state = XITK_IMG_STATE_DISABLED_SELECTED;
       switch (u) {
         case 0:
           xitk_image_draw_bevel_three_state (i);

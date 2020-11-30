@@ -268,6 +268,7 @@ xitk_image_t *xitk_image_new (xitk_t *xitk, const char *data, int dsize, int w, 
   img->xitk = xitk;
   img->width = w;
   img->height = h;
+  img->last_state = XITK_IMG_STATE_NORMAL;
   _xitk_image_add_beimg (img, data, dsize);
   if (!img->beimg) {
     XITK_FREE (img);
@@ -332,6 +333,7 @@ int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int h
   i->xitk  = wl->xitk;
   i->width = width;
   i->height = height;
+  i->last_state = XITK_IMG_STATE_NORMAL;
   memcpy (i->key, key, keylen);
   i->key[keylen] = 0;
 
@@ -624,7 +626,8 @@ void xitk_image_draw_menu_arrow_branch (xitk_image_t *img) {
  *
  */
 static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
-  int w, h, nsegments, i, s, x1, x2, dx, y1, y2, dy;
+  int n, w, h, nsegments,  s, x1, x2, dx, y1, y2, dy;
+  uint32_t color;
   xitk_be_line_t *segments;
 
   if (!img)
@@ -632,7 +635,8 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
   if (!img->beimg)
     return;
 
-  w = img->width / 3;
+  n = (int)img->last_state + 1;
+  w = img->width / n;
   h = img->height;
 
   /*
@@ -658,6 +662,8 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
 
     nsegments = dy;
     segments = calloc (nsegments, sizeof (*segments));
+    if (!segments)
+      return;
 
     if(direction == DIRECTION_DOWN) {
       y = y1; iy = 1;
@@ -690,6 +696,8 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
 
     nsegments = dx;
     segments = calloc (nsegments, sizeof (*segments));
+    if (!segments)
+      return;
 
     if(direction == DIRECTION_RIGHT) {
       x = x1; ix = 1;
@@ -723,19 +731,55 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
   }
 
   img->beimg->display->lock (img->beimg->display);
-  for (i = 0; i < 3; i++) {
-    if (i == 2) {
-      for (s = 0; s < nsegments; s++) {
-        segments[s].x1++; segments[s].y1++;
-        segments[s].x2++; segments[s].y2++;
-      }
-    }
-    img->beimg->draw_lines (img->beimg, segments, nsegments,xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+  do {
+    color = xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR);
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+    if (n < 2)
+        break;
     for (s = 0; s < nsegments; s++) {
       segments[s].x1 += w;
       segments[s].x2 += w;
     }
-  }
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+    if (n < 3)
+        break;
+    dx = w + 1;
+    for (s = 0; s < nsegments; s++) {
+      segments[s].x1 += dx;
+      segments[s].x2 += dx;
+      segments[s].y1 += 1;
+      segments[s].y2 += 1;
+    }
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+    if (n < 4)
+        break;
+    for (s = 0; s < nsegments; s++) {
+      segments[s].x1 += w;
+      segments[s].x2 += w;
+    }
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+    if (n < 5)
+        break;
+    color = xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR);
+    dx = w - 1;
+    for (s = 0; s < nsegments; s++) {
+      segments[s].x1 += dx;
+      segments[s].x2 += dx;
+      segments[s].y1 -= 1;
+      segments[s].y2 -= 1;
+    }
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+    if (n < 6)
+        break;
+    dx = w + 1;
+    for (s = 0; s < nsegments; s++) {
+      segments[s].x1 += dx;
+      segments[s].x2 += dx;
+      segments[s].y1 += 1;
+      segments[s].y2 += 1;
+    }
+    img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
+  } while (0);
   img->beimg->display->unlock (img->beimg->display);
 
   free(segments);
@@ -873,7 +917,92 @@ static void _xitk_image_draw_check_round (xitk_image_t *img, int x, int y, int d
   img->beimg->display->unlock (img->beimg->display);
 }
 
-static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d, int checked) {
+xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int focus, int click, int selected) {
+  static const uint8_t want[16] = {
+    XITK_IMG_STATE_DISABLED_NORMAL,
+    XITK_IMG_STATE_DISABLED_SELECTED,
+    XITK_IMG_STATE_DISABLED_NORMAL,
+    XITK_IMG_STATE_DISABLED_SELECTED,
+    XITK_IMG_STATE_DISABLED_NORMAL,
+    XITK_IMG_STATE_DISABLED_SELECTED,
+    XITK_IMG_STATE_DISABLED_NORMAL,
+    XITK_IMG_STATE_DISABLED_SELECTED,
+
+    XITK_IMG_STATE_NORMAL,
+    XITK_IMG_STATE_SELECTED,
+    XITK_IMG_STATE_NORMAL,
+    XITK_IMG_STATE_SELECTED,
+    XITK_IMG_STATE_FOCUS,
+    XITK_IMG_STATE_SEL_FOCUS,
+    XITK_IMG_STATE_SEL_FOCUS,
+    XITK_IMG_STATE_FOCUS
+  };
+  static const uint8_t have[XITK_IMG_STATE_LAST][XITK_IMG_STATE_LAST] = {
+    [XITK_IMG_STATE_NORMAL] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_NORMAL
+    },
+    [XITK_IMG_STATE_FOCUS] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_NORMAL
+    },
+    [XITK_IMG_STATE_SELECTED] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SELECTED,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+    },
+    [XITK_IMG_STATE_SEL_FOCUS] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+    },
+    [XITK_IMG_STATE_DISABLED_NORMAL] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+    },
+    [XITK_IMG_STATE_DISABLED_SELECTED] = {
+        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
+        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_DISABLED_SELECTED
+    }
+  };
+  uint32_t u = (enable ? 8 : 0) + (focus ? 4 : 0) + (click ? 2 : 0) + (selected ? 1 : 0);
+
+  if (max > XITK_IMG_STATE_LAST - 1)
+    max = XITK_IMG_STATE_LAST - 1;
+  return have[max][want[u]];
+}
+
+static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d, xitk_img_state_t state) {
+  static const uint8_t bg[XITK_IMG_STATE_LAST] = {
+    [XITK_IMG_STATE_NORMAL]            = XITK_FOCUS_COLOR,
+    [XITK_IMG_STATE_FOCUS]             = XITK_WHITE_COLOR,
+    [XITK_IMG_STATE_SELECTED]          = XITK_FOCUS_COLOR,
+    [XITK_IMG_STATE_SEL_FOCUS]         = XITK_WHITE_COLOR,
+    [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_BG_COLOR,
+    [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_BG_COLOR
+  };
   xitk_be_rect_t xr[1];
   xitk_be_line_t xs[4];
 
@@ -885,8 +1014,7 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   /* background */
   xr[0].x = x, xr[0].y = y, xr[0].w = xr[0].h = d;
   img->beimg->display->lock (img->beimg->display);
-  img->beimg->fill_rects (img->beimg, xr, 1, (checked & 2) ? xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR)
-    : xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
+  img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, bg[state]), 0);
   img->beimg->display->unlock (img->beimg->display);
   /* */
   xs[0].x1 = x, xs[0].y1 = y, xs[0].x2 = x + d, xs[0].y2 = y;
@@ -901,7 +1029,7 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   img->beimg->draw_lines (img->beimg, xs, 2, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  if (checked & 1) {
+  if ((uint32_t)state & 2) {
     xs[0].x1 = x + (d / 5),     xs[0].y1 = (y + ((d / 3) * 2)) - 2, xs[0].x2 = x + (d / 2),     xs[0].y2 = y + d - 2;
     xs[1].x1 = x + (d / 5) + 1, xs[1].y1 = (y + ((d / 3) * 2)) - 2, xs[1].x2 = x + (d / 2) + 1, xs[1].y2 = y + d - 2;
     xs[2].x1 = x + (d / 2),     xs[2].y1 =  y +   d            - 2, xs[2].x2 = x +  d      - 2, xs[2].y2 = y     + 1;
@@ -947,7 +1075,8 @@ void xitk_image_draw_menu_check (xitk_image_t *img, int checked) {
   style = xitk_get_cfg_num (img->xitk, XITK_CHECK_STYLE);
   switch (style) {
     case CHECK_STYLE_CHECK:
-      _xitk_image_draw_check_three_state_check (img, 4, 4, img->height - 8, img->width / 3, checked);
+      _xitk_image_draw_check_three_state_check (img, 4, 4, img->height - 8, img->width / 3,
+        checked ? XITK_IMG_STATE_SELECTED : XITK_IMG_STATE_NORMAL);
       break;
 
     case CHECK_STYLE_ROUND:
@@ -977,14 +1106,16 @@ void xitk_image_draw_menu_check (xitk_image_t *img, int checked) {
 static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   int w, h;
   xitk_be_rect_t xr[1];
-  xitk_be_line_t xs[8], *q;
+  xitk_be_line_t xs[10], *q;
 
   if (!img)
     return;
   if (!img->beimg)
     return;
 
-  w = img->width / 3;
+  if (img->last_state < XITK_IMG_STATE_SELECTED)
+    img->last_state = XITK_IMG_STATE_SELECTED;
+  w = img->width / ((int)img->last_state + 1);
   h = img->height;
 
   img->beimg->display->lock (img->beimg->display);
@@ -994,9 +1125,9 @@ static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  /* +----+----       *      +----       *
-   * |    |           *      |           *
-   * |    |           *      |           */
+  /* +----+----            *      +----            *
+   * |    |                *      |                *
+   * |    |                *      |                */
   q = xs;
   if (style == STYLE_BEVEL) {
     q->x1 = 0 * w; q->x2 = 1 * w; q->y1 = q->y2 = 0; q++;
@@ -1008,9 +1139,9 @@ static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  /*     |    |+----  *          |+----  *
-   *     |    ||      *          ||      *
-   * ----+----+|      *      ----+|      */
+  /*     |    |+----+----  *          |+----+----  *
+   *     |    ||    |      *          ||    |      *
+   * ----+----+|    |      *      ----+|    |      */
   q = xs;
   if (style == STYLE_BEVEL) {
     q->x1 = q->x2 = 1 * w - 2; q->y1 = 2; q->y2 = h - 3; q++;
@@ -1020,6 +1151,10 @@ static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   q->x1 = 1 * w + 2; q->x2 = 2 * w - 2; q->y1 = q->y2 = h - 2; q++;
   q->x1 = 2 * w + 0; q->x2 = 3 * w + 0; q->y1 = q->y2 = 0; q++;
   q->x1 = q->x2 = 2 * w + 0; q->y1 = 0; q->y2 = h - 1; q++;
+  if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
+    q->x1 = 3 * w + 0; q->x2 = 4 * w + 0; q->y1 = q->y2 = 0; q++;
+    q->x1 = q->x2 = 3 * w + 0; q->y1 = 0; q->y2 = h - 1; q++;
+  }
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
   xr[0].x = 2 * w, xr[0].y = 0, xr[0].w = w - 1, xr[0].h = h - 1;
@@ -1037,33 +1172,57 @@ static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   q->x1 = 1 * w + 0; q->x2 = 2 * w - 1; q->y1 = q->y2 = h - 1; q++;
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+  if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
+    xr[0].x = 3 * w + 1, xr[0].y = 1, xr[0].w = w - 2, xr[0].h = h - 2;
+    img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+  }
   img->beimg->display->unlock (img->beimg->display);
 
-  /*                | *
-   *                | *
-   *            ----+ */
+  /*                |    | *
+   *                |    | *
+   *            ----+----+ */
   q = xs;
   q->x1 = q->x2 = 3 * w - 1; q->y1 = 1; q->y2 = h - 1; q++;
-  q->x1 = 2 * w + 1; q->x2 = 3 * w + 0; q->y1 = q->y2 = h - 1; q++;
+  q->x1 = 2 * w + 1; q->x2 = 3 * w - 2; q->y1 = q->y2 = h - 1; q++;
+  if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
+    q->x1 = q->x2 = 4 * w - 1; q->y1 = 1; q->y2 = h - 1; q++;
+    q->x1 = 3 * w + 1; q->x2 = 4 * w - 2; q->y1 = q->y2 = h - 1; q++;
+  }
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  /* +   ++   ++   + *
-   *                 *
-   * +   ++   ++   + */
+  /* +   ++   ++   ++   + *
+   *                      *
+   * +   ++   ++   ++   + */
   q = xs;
   q->x1 = q->x2 = 0 * w;            q->y1 = q->y2 = 0; q++;
-  q->x1 = 1 * w - 1; q->x2 = 1 * w; q->y1 = q->y2 = 0; q++;
-  q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = 0; q++;
-  q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = 0; q++;
   q->x1 = q->x2 = 0 * w;            q->y1 = q->y2 = h - 1; q++;
+  q->x1 = 1 * w - 1; q->x2 = 1 * w; q->y1 = q->y2 = 0; q++;
   q->x1 = 1 * w - 1; q->x2 = 1 * w; q->y1 = q->y2 = h - 1; q++;
+  q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = 0; q++;
   q->x1 = 2 * w - 1; q->x2 = 2 * w; q->y1 = q->y2 = h - 1; q++;
-  q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = h - 1; q++;
+  if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
+    q->x1 = 3 * w - 1; q->x2 = 3 * w; q->y1 = q->y2 = 0; q++;
+    q->x1 = 3 * w - 1; q->x2 = 3 * w; q->y1 = q->y2 = h - 1; q++;
+    q->x1 = q->x2 = 4 * w - 1;        q->y1 = q->y2 = 0; q++;
+    q->x1 = q->x2 = 4 * w - 1;        q->y1 = q->y2 = h - 1; q++;
+  } else {
+    q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = 0; q++;
+    q->x1 = q->x2 = 3 * w - 1;        q->y1 = q->y2 = h - 1; q++;
+  }
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_BG_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
+
+  /* 0 1 2 3 -> 0 1 2 3 0 2 */
+  if (img->last_state >= XITK_IMG_STATE_DISABLED_NORMAL) {
+    img->beimg->display->lock (img->beimg->display);
+    img->beimg->copy_rect (img->beimg, img->beimg, 0, 0, w, h, 4 * w, 0);
+    if (img->last_state >= XITK_IMG_STATE_DISABLED_SELECTED)
+      img->beimg->copy_rect (img->beimg, img->beimg, 2 * w, 0, w, h, 5 * w, 0);
+    img->beimg->display->unlock (img->beimg->display);
+  }
 }
 
 /*
@@ -1134,24 +1293,23 @@ static void _xitk_image_draw_relief (xitk_image_t *img, int w, int h, int type) 
 }
 
 void xitk_image_draw_checkbox_check (xitk_image_t *img) {
-  int style = xitk_get_cfg_num (img->xitk, XITK_CHECK_STYLE);
+  int style, w;
+  xitk_img_state_t state;
+
+  if (!img)
+    return;
+  if (!img->xitk || !img->beimg)
+    return;
+
+  style = xitk_get_cfg_num (img->xitk, XITK_CHECK_STYLE);
 
   xitk_image_fill_rectangle (img, 0, 0, img->width, img->height, xitk_get_cfg_num (img->xitk, XITK_BG_COLOR));
 
+  w = img->width / ((int)img->last_state + 1);
   switch (style) {
     case CHECK_STYLE_CHECK:
-      if (img->width == img->height * 4) {
-        int w = img->width / 4;
-        _xitk_image_draw_check_check (img, w * 0, 0, img->height, 0);
-        _xitk_image_draw_check_check (img, w * 1, 0, img->height, 1);
-        _xitk_image_draw_check_check (img, w * 2, 0, img->height, 2);
-        _xitk_image_draw_check_check (img, w * 3, 0, img->height, 3);
-      } else {
-        int w = img->width / 3;
-        _xitk_image_draw_check_check (img, 0, 0, img->height, 0);
-        _xitk_image_draw_check_check (img, w, 0, img->height, 0);
-        _xitk_image_draw_check_check (img, w * 2, 0, img->height, 1);
-      }
+      for (state = XITK_IMG_STATE_NORMAL; state <= img->last_state; state += 1)
+        _xitk_image_draw_check_check (img, w * (int)state, 0, img->height, state);
       break;
 
     case CHECK_STYLE_ROUND:
@@ -1416,7 +1574,7 @@ void xitk_image_draw_outter_frame (xitk_image_t *img, const char *title, const c
  */
 void xitk_image_draw_tab (xitk_image_t *img) {
   int           w, h;
-  xitk_be_line_t xs[10];
+  xitk_be_line_t xs[13];
   xitk_be_rect_t xr[2];
 
   if (!img)
@@ -1424,7 +1582,9 @@ void xitk_image_draw_tab (xitk_image_t *img) {
   if (!img->beimg)
     return;
 
-  w = img->width / 3;
+  if (img->last_state < XITK_IMG_STATE_SELECTED)
+    img->last_state = XITK_IMG_STATE_SELECTED;
+  w = img->width / ((int)img->last_state + 1);
   h = img->height;
 
   xr[0].x = 0 * w; xr[0].w = 2 * w; xr[0].y = 0; xr[0].h = 5;
@@ -1439,10 +1599,17 @@ void xitk_image_draw_tab (xitk_image_t *img) {
   img->beimg->fill_rects (img->beimg, xr, 2, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  /*          *  /-----  *  /-----  *
-   *  /-----  * |        * |        *
-   * |        * |        * |        *
-   * +------- * +------- * |        */
+  if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
+    xr[0].x = 3 * w + 1; xr[0].w = w - 2; xr[0].y = 0; xr[0].h = h;
+    img->beimg->display->lock (img->beimg->display);
+    img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
+    img->beimg->display->unlock (img->beimg->display);
+  }
+
+  /*          *  /-----  *  /-----  *  /----  *
+   *  /-----  * |        * |        * |       *
+   * |        * |        * |        * |       *
+   * +------- * +------- * |        * |       */
   xs[0].x1 = 1 * w + 2; xs[0].x2 = 2 * w - 3; xs[0].y1 = xs[0].y2 = 0;
   xs[1].x1 = xs[1].x2 = 1 * w + 1;            xs[1].y1 = xs[1].y2 = 1;
   xs[2].x1 = 2 * w + 2; xs[2].x2 = 3 * w - 3; xs[2].y1 = xs[2].y2 = 0;
@@ -1452,20 +1619,26 @@ void xitk_image_draw_tab (xitk_image_t *img) {
   xs[6].x1 = xs[6].x2 = 0 * w;                xs[6].y1 = 5; xs[6].y2 = h - 1;
   xs[7].x1 = xs[7].x2 = 1 * w;                xs[7].y1 = 2; xs[7].y2 = h - 1;
   xs[8].x1 = xs[8].x2 = 2 * w;                xs[8].y1 = 2; xs[8].y2 = h - 1;
-  xs[9].x1 = 0 * w;     xs[9].x2 = 2 * w - 1; xs[9].y1 = xs[9].y2 = h - 1;
+  xs[9].x1 = 0 * w; xs[9].x2 = 2 * w - 1;     xs[9].y1 = xs[9].y2 = h - 1;
+  xs[10].x1 = 3 * w + 2; xs[10].x2 = 4 * w - 3; xs[10].y1 = xs[10].y2 = 0;
+  xs[11].x1 = xs[11].x2 = 3 * w + 1;            xs[11].y1 = xs[11].y2 = 1;
+  xs[12].x1 = xs[12].x2 = 3 * w;                xs[12].y1 = 2; xs[12].y2 = h - 1;
   img->beimg->display->lock (img->beimg->display);
-  img->beimg->draw_lines (img->beimg, xs, 10, xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR), 0);
+  img->beimg->draw_lines (img->beimg, xs, (img->last_state >= XITK_IMG_STATE_SEL_FOCUS ? 13 : 10),
+    xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  /*          *          *          *
-   *          *        | *        | *
-   *        | *        | *        | *
-   *        | *        | *        | */
+  /*          *          *          *          *
+   *          *        | *        | *        | *
+   *        | *        | *        | *        | *
+   *        | *        | *        | *        | */
   xs[0].x1 = xs[0].x2 = 1 * w - 1;            xs[0].y1 = 5; xs[0].y2 = h - 1;
   xs[1].x1 = xs[1].x2 = 2 * w - 1;            xs[1].y1 = 2; xs[1].y2 = h - 1;
   xs[2].x1 = xs[2].x2 = 3 * w - 1;            xs[2].y1 = 2; xs[2].y2 = h - 1;
+  xs[3].x1 = xs[3].x2 = 4 * w - 1;            xs[3].y1 = 2; xs[3].y2 = h - 1;
   img->beimg->display->lock (img->beimg->display);
-  img->beimg->draw_lines (img->beimg, xs, 3, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+  img->beimg->draw_lines (img->beimg, xs, (img->last_state >= XITK_IMG_STATE_SEL_FOCUS ? 4 : 3),
+    xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 }
 
@@ -1547,21 +1720,33 @@ void xitk_image_draw_rotate_button (xitk_image_t *img) {
  */
 void xitk_image_draw_button_plus (xitk_image_t *img) {
   if (img && img->beimg) {
-    xitk_be_line_t lines[6];
-    int w, h;
+    xitk_be_line_t lines[8];
+    int w, h, n;
 
-    w = img->width / 3;
+    n = (int)img->last_state + 1;
+    w = img->width / n;
     h = img->height;
 
-    lines[0].x1 =           2, lines[0].y1 = (h >> 1) - 1, lines[0].x2 =  w      - 4, lines[0].y2 = (h >> 1) - 1;
-    lines[1].x1 =  w      + 2, lines[1].y1 = (h >> 1) - 1, lines[1].x2 = (w * 2) - 4, lines[1].y2 = (h >> 1) - 1;
-    lines[2].x1 = (w * 2) + 3, lines[2].y1 =  h >> 1,      lines[2].x2 = (w * 3) - 3, lines[2].y2 =  h >> 1;
-    lines[3].x1 = (w >> 1)           - 1, lines[3].y1 = 2, lines[3].x2 = (w >> 1)           - 1, lines[3].y2 = h - 4;
-    lines[4].x1 =  w      + (w >> 1) - 1, lines[4].y1 = 2, lines[4].x2 =  w      + (w >> 1) - 1, lines[4].y2 = h - 4;
-    lines[5].x1 = (w * 2) + (w >> 1),     lines[5].y1 = 3, lines[5].x2 = (w * 2) + (w >> 1),     lines[5].y2 = h - 3;
+    lines[0].x1 = w * 0 + 2, lines[0].x2 = w * 1 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
+    lines[1].x1 = lines[1].x2 = w * 0 + (w >> 1) - 1, lines[1].y1 = 2, lines[1].y2 = h - 4;
+    lines[2].x1 = w * 1 + 2, lines[2].x2 = w * 2 - 4, lines[2].y1 = lines[2].y2 = (h >> 1) - 1;
+    lines[3].x1 = lines[3].x2 = w * 1 + (w >> 1) - 1, lines[3].y1 = 2, lines[3].y2 = h - 4;
+    lines[4].x1 = w * 2 + 3, lines[4].x2 = w * 3 - 3, lines[4].y1 = lines[4].y2 =  h >> 1;
+    lines[5].x1 = lines[5].x2 = w * 2 + (w >> 1),     lines[5].y1 = 3, lines[5].y2 = h - 3;
+    lines[6].x1 = w * 3 + 3, lines[6].x2 = w * 4 - 3, lines[6].y1 = lines[6].y2 =  h >> 1;
+    lines[7].x1 = lines[7].x2 = w * 3 + (w >> 1),     lines[7].y1 = 3, lines[7].y2 = h - 3;
     img->beimg->display->lock (img->beimg->display);
-    img->beimg->draw_lines (img->beimg, lines, 6, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    img->beimg->draw_lines (img->beimg, lines, 2 * (n <= 4 ? n : 4), xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
     img->beimg->display->unlock (img->beimg->display);
+    if (n > 4) {
+      lines[0].x1 = w * 4 + 2, lines[0].x2 = w * 5 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
+      lines[1].x1 = w * 5 + 3, lines[1].x2 = w * 6 - 3, lines[1].y1 = lines[1].y2 =  h >> 1;
+      lines[2].x1 = lines[2].x2 = w * 4 + (w >> 1) - 1, lines[2].y1 = 2, lines[2].y2 = h - 4;
+      lines[3].x1 = lines[3].x2 = w * 5 + (w >> 1),     lines[3].y1 = 2, lines[3].y2 = h - 4;
+      img->beimg->display->lock (img->beimg->display);
+      img->beimg->draw_lines (img->beimg, lines, n < 6 ? 2 : 4, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
+      img->beimg->display->unlock (img->beimg->display);
+    }
   }
 }
 
@@ -1570,18 +1755,27 @@ void xitk_image_draw_button_plus (xitk_image_t *img) {
  */
 void xitk_image_draw_button_minus (xitk_image_t *img) {
   if (img && img->beimg) {
-    xitk_be_line_t lines[3];
-    int w, h;
+    xitk_be_line_t lines[4];
+    int w, h, n;
 
-    w = img->width / 3;
+    n = (int)img->last_state + 1;
+    w = img->width / n;
     h = img->height;
 
-    lines[0].x1 =           2, lines[0].y1 = (h >> 1) - 1, lines[0].x2 =  w      - 4, lines[0].y2 = (h >> 1) - 1;
-    lines[1].x1 =  w      + 2, lines[1].y1 = (h >> 1) - 1, lines[1].x2 = (w * 2) - 4, lines[1].y2 = (h >> 1) - 1;
-    lines[2].x1 = (w * 2) + 3, lines[2].y1 =  h >> 1,      lines[2].x2 = (w * 3) - 3, lines[2].y2 = h >> 1;
+    lines[0].x1 = w * 0 + 2, lines[0].x2 = w * 1 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
+    lines[1].x1 = w * 1 + 2, lines[1].x2 = w * 2 - 4, lines[1].y1 = lines[1].y2 = (h >> 1) - 1;
+    lines[2].x1 = w * 2 + 3, lines[2].x2 = w * 3 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
+    lines[2].x1 = w * 3 + 3, lines[2].x2 = w * 4 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
     img->beimg->display->lock (img->beimg->display);
-    img->beimg->draw_lines (img->beimg, lines, 3, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    img->beimg->draw_lines (img->beimg, lines, n < 4 ? n : 4, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
     img->beimg->display->unlock (img->beimg->display);
+    if (n > 4) {
+      lines[0].x1 = w * 4 + 2, lines[0].x2 = w * 5 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
+      lines[1].x1 = w * 5 + 3, lines[1].x2 = w * 6 - 3, lines[1].y1 = lines[1].y2 =  h >> 1;
+      img->beimg->display->lock (img->beimg->display);
+      img->beimg->draw_lines (img->beimg, lines, n < 6 ? 1 : 2, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
+      img->beimg->display->unlock (img->beimg->display);
+    }
   }
 }
 
