@@ -57,7 +57,8 @@ typedef struct {
   } browser;
 
   xitk_ext_state_callback_t         dbl_click_callback;
-
+  /** If the "selected" argument is >= 0: user has selected new item (selected).
+   *  Otherwise: user has explicitly _un_selected old item (1 - selected). */
   xitk_ext_state_callback_t         callback;
   void                             *userdata;
 

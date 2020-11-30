@@ -2353,3 +2353,4 @@ void visual_anim_stop(void) {
     gui->visual_anim.running = 0;
   }
 }
+

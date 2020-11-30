@@ -322,8 +322,8 @@ static void browser_select(xitk_widget_t *w, void *data, int state, int modifier
     }
     wp->click_time = tv;
     _browser_select (wp, state ? num : -1);
-    if (state && wp->callback)
-      wp->callback (&wp->w, wp->userdata, num, modifier);
+    if (wp->callback)
+      wp->callback (&wp->w, wp->userdata, state ? num : -num - 1, modifier);
   }
 }
 
@@ -898,6 +898,8 @@ void xitk_browser_set_select(xitk_widget_t *w, int item) {
 
   gettimeofday (&wp->click_time, NULL);
   _browser_select (wp, item);
+  _browser_move (wp, wp->items.selected - (wp->visible.max >> 1) - wp->visible.start);
+  _browser_set_vslider (wp);
 }
 
 /**

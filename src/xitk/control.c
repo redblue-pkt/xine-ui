@@ -92,7 +92,7 @@ static void control_select_new_skin (xitk_widget_t *w, void *data, int selected,
 
   (void)w;
   (void)modifier;
-  if (vctrl) {
+  if (vctrl && (selected >= 0)) {
     xitk_browser_release_all_buttons (vctrl->skinlist);
     skin_select (vctrl->gui, selected);
   }
