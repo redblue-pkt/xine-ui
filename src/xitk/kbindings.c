@@ -912,10 +912,21 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
     return 1;
   }
 
+  if (e->type == XITK_EV_KEY_DOWN) {
+    kbe->grabbing = 2;
+    return 1;
+  }
+
   if (e->type == XITK_EV_KEY_UP) {
     int redundant;
     const char *name = xitk_be_event_name (e);
 
+    /* 1. user hits grab button with ENTER/SPACE,
+     * 2. grab window opens,
+     * 3. we get the ENTER/SPACE key up here, and
+     * 4. ignore it :-)) */
+    if (kbe->grabbing < 2)
+      return 0;
     if (!name)
       return 0;
     if (!name[0])
