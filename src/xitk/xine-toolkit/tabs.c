@@ -111,13 +111,13 @@ static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
       wp->rgap = width;
     }
     if (wp->start <= 0)
-      xitk_stop_widget (wp->left);
+      xitk_disable_widget (wp->left);
     else
-      xitk_start_widget (wp->left);
+      xitk_enable_widget (wp->left);
     if (wp->stop < wp->num_entries)
-      xitk_start_widget (wp->right);
+      xitk_enable_widget (wp->right);
     else
-      xitk_stop_widget (wp->right);
+      xitk_disable_widget (wp->right);
   }
 
   {
@@ -207,8 +207,18 @@ static void _tabs_enability (_tabs_private_t *wp) {
   if (wp->w.enable == WIDGET_ENABLE) {
     widget_event_t ne;
     int i;
-    xitk_enable_and_show_widget (wp->left);
-    xitk_enable_and_show_widget (wp->right);
+    if (wp->start <= 0) {
+      xitk_disable_widget (wp->left);
+      xitk_show_widget (wp->left);
+    } else {
+      xitk_enable_and_show_widget (wp->left);
+    }
+    if (wp->stop < wp->num_entries) {
+      xitk_enable_and_show_widget (wp->right);
+    } else {
+      xitk_disable_widget (wp->right);
+      xitk_show_widget (wp->right);
+    }
     for (i = wp->start; i < wp->stop; i++)
       xitk_enable_and_show_widget (wp->tabs[i]);
     ne.x = wp->w.x;
@@ -268,9 +278,14 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     return 0;
 
   if (string[0] == XITK_CTRL_KEY_PREFIX) {
+    widget_event_t event;
+
     if (string[1] == XITK_KEY_LEFT) {
       if (wp->selected <= 0)
         return 1;
+      event.type = WIDGET_EVENT_FOCUS;
+      event.focus = FOCUS_LOST;
+      wp->tabs[wp->selected]->event (wp->tabs[wp->selected], &event, NULL);
       xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
       wp->selected -= 1;
       if (wp->selected < wp->start)
@@ -278,6 +293,9 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     } else if (string[1] == XITK_KEY_RIGHT) {
       if (wp->selected + 1 >= wp->num_entries)
         return 1;
+      event.type = WIDGET_EVENT_FOCUS;
+      event.focus = FOCUS_LOST;
+      wp->tabs[wp->selected]->event (wp->tabs[wp->selected], &event, NULL);
       xitk_labelbutton_set_state (wp->tabs[wp->selected], 0);
       wp->selected += 1;
       if (wp->selected >= wp->stop)
@@ -285,6 +303,9 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
     } else {
       return 0;
     }
+    event.type = WIDGET_EVENT_FOCUS;
+    event.focus = FOCUS_RECEIVED;
+    wp->tabs[wp->selected]->event (wp->tabs[wp->selected], &event, NULL);
     xitk_labelbutton_set_state (wp->tabs[wp->selected], 1);
     if (wp->callback)
       wp->callback (&wp->w, wp->userdata, wp->selected);
@@ -292,6 +313,22 @@ static int _tabs_key (_tabs_private_t *wp, const char *string, int modifier) {
   }
 
   return 0;
+}
+
+static void _tabs_focus (_tabs_private_t *wp, int focus) {
+  if (wp->w.enable && wp->w.visible && ((focus == FOCUS_LOST) || (focus == FOCUS_RECEIVED))) {
+    xitk_widget_t *sel = wp->selected >= 0 ? wp->tabs[wp->selected] : NULL;
+
+    if (sel) {
+      widget_event_t event;
+
+      event.type = WIDGET_EVENT_FOCUS;
+      event.focus = focus;
+      sel->event (sel, &event, NULL);
+      event.type = WIDGET_EVENT_PAINT;
+      sel->event (sel, &event, NULL);
+    }
+  }
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -321,6 +358,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       break;
     case WIDGET_EVENT_ENABLE:
       _tabs_enability (wp);
+      break;
+    case WIDGET_EVENT_FOCUS:
+      _tabs_focus (wp, event->focus);
       break;
     default: ;
   }
