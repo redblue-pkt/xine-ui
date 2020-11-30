@@ -172,6 +172,9 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 
   (void)w;
   (void)modifier;
+  if (selected < 0)
+    return;
+
   if (pl->playlist_mrls[selected] != NULL) {
     xitk_inputtext_change_text (pl->winput, pl->playlist_mrls[selected]);
     pthread_mutex_lock (&pl->gui->mmk_mutex);
@@ -1268,4 +1271,3 @@ void playlist_editor (gGui_t *gui) {
   xitk_window_try_to_set_input_focus (pl->xwin);
   xitk_set_focus_to_widget (pl->winput);
 }
-

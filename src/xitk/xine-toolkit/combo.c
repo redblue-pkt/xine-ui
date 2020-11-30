@@ -160,6 +160,8 @@ static void _combo_select (xitk_widget_t *w, void *data, int selected, int modif
     return;
 
   _combo_close (wp, 1);
+  if (selected < 0)
+    return;
   wp->selected = selected;
   xitk_label_change_label (wp->label_widget, wp->entries[selected]);
   if (wp->callback)

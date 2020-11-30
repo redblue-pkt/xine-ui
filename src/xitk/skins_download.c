@@ -306,6 +306,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
 
   (void)w;
   (void)modifier;
+  if (selected < 0)
+    return;
   if(skd->slxs[selected]->skin.preview == NULL)
     return;
 
