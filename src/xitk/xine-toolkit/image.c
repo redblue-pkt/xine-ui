@@ -544,6 +544,8 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
     width = MIN(maxw, width);
 
   image = xitk_image_new (xitk, NULL, 0, width + 2 * pad_x, (height + add_line_spc) * numlines - add_line_spc + 2 * pad_y);
+  if (!image)
+    goto fail;
   xitk_image_fill_rectangle (image, 0, 0, image->width, image->height, background);
 
   { /* Draw string in image */
@@ -565,6 +567,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
     }
   }
 
+ fail:
   xitk_font_unload_font(fs);
   return image;
 }
