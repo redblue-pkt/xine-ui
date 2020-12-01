@@ -14,12 +14,14 @@ if HAVE_X11
 xine_ui = xine $(remote)
 oxine_lib = liboxine.a
 imlib_lib = libImlib-light.a
+imlib_decode_lib = libImlib-light-decode.a
 endif
 
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl kbindings_man
 noinst_LIBRARIES = \
 	$(imlib_lib) \
+	$(imlib_decode_lib) \
 	$(oxine_lib)
 
 kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
@@ -31,7 +33,12 @@ EXTRA_DIST = \
 	$(skin1_DATA) \
 	$(oxine_DATA)
 
-libImlib_light_a_CFLAGS = $(X_CFLAGS) $(LIBPNG_CFLAGS) $(JPEG_CFLAGS)
+libImlib_light_decode_a_CFLAGS = $(LIBPNG_CFLAGS) $(JPEG_CFLAGS)
+libImlib_light_decode_a_SOURCES = \
+	Imlib-light/Imlib_decode.h \
+	Imlib-light/decode.c
+
+libImlib_light_a_CFLAGS = $(X_CFLAGS)
 libImlib_light_a_SOURCES = \
 	Imlib-light/Imlib.h \
 	Imlib-light/Imlib_private.h \
@@ -114,12 +121,12 @@ endif
 
 xine_LDADD = \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.a \
-	     $(imlib_lib) \
+	     $(imlib_lib) $(imlib_decode_lib) \
 	     $(oxine_lib) \
 	     $(LIBCOMMON) $(LIBCOMMONX) \
 	     $(XINE_LIBS) $(X_PRE_LIBS) $(LIRC_LIBS) $(XFT_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(XSSAVER_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
-	     -lX11 -lXext -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(JPEG_LIBS) \
+	     $(X11_LIBS) -lm $(DBG_LIBS) $(XV_LIB) $(LIBPNG_LIBS) $(JPEG_LIBS) \
 	     $(LTLIBINTL) $(THREAD_LIBS) $(RT_LIBS) $(LIBICONV)
 
 xine_remote_CFLAGS = $(AM_CFLAGS) -DNETWORK_CLIENT
