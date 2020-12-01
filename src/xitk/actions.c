@@ -783,6 +783,7 @@ void gui_exit_2 (gGui_t *gui) {
   gui->ao_port = gui->ao_none = NULL;
 
   video_window_exit (gui->vwin);
+  gui->vwin = NULL;
 
 #ifdef HAVE_LIRC
   if(__xineui_global_lirc_enable)
