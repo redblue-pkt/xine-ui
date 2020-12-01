@@ -169,8 +169,7 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
       XITK_BLACK_COLOR, XITK_BLACK_COLOR, XITK_WHITE_COLOR,
       XITK_BG_COLOR, XITK_BG_COLOR, XITK_SELECT_COLOR
     };
-
-    if (strcasecmp (wp->color[state], "Default"))
+    if (strcasecmp (wp->color[state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state], "Default"))
       have_cn = xitk_get_color_name (&color, wp->color[state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state]);
     if (have_cn) {
       uint32_t v = (color.red << 16) + (color.green << 8) + color.blue;
