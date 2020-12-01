@@ -1020,23 +1020,23 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, bg[state]), 0);
   img->beimg->display->unlock (img->beimg->display);
   /* */
-  xs[0].x1 = x, xs[0].y1 = y, xs[0].x2 = x + d, xs[0].y2 = y;
-  xs[1].x1 = x, xs[1].y1 = y, xs[1].x2 = x,     xs[1].y2 = y + d;
+  xs[0].x1 = x, xs[0].y1 = y, xs[0].x2 = x + d - 1, xs[0].y2 = y;
+  xs[1].x1 = x, xs[1].y1 = y, xs[1].x2 = x,         xs[1].y2 = y + d - 1;
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, 2, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  xs[0].x1 = x,     xs[0].y1 = y + d, xs[0].x2 = x + d, xs[0].y2 = y + d;
-  xs[1].x1 = x + d, xs[1].y1 = y,     xs[1].x2 = x + d, xs[1].y2 = y + d;
+  xs[0].x1 = x,         xs[0].y1 = y + d - 1, xs[0].x2 = x + d - 1, xs[0].y2 = y + d - 1;
+  xs[1].x1 = x + d - 1, xs[1].y1 = y,         xs[1].x2 = x + d - 1, xs[1].y2 = y + d - 1;
   img->beimg->display->lock (img->beimg->display);
   img->beimg->draw_lines (img->beimg, xs, 2, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
   if ((uint32_t)state & 2) {
-    xs[0].x1 = x + (d / 5),     xs[0].y1 = (y + ((d / 3) * 2)) - 2, xs[0].x2 = x + (d / 2),     xs[0].y2 = y + d - 2;
-    xs[1].x1 = x + (d / 5) + 1, xs[1].y1 = (y + ((d / 3) * 2)) - 2, xs[1].x2 = x + (d / 2) + 1, xs[1].y2 = y + d - 2;
-    xs[2].x1 = x + (d / 2),     xs[2].y1 =  y +   d            - 2, xs[2].x2 = x +  d      - 2, xs[2].y2 = y     + 1;
-    xs[3].x1 = x + (d / 2) + 1, xs[3].y1 =  y +   d            - 2, xs[3].x2 = x +  d      - 1, xs[3].y2 = y     + 1;
+    xs[0].x1 = x + (d / 5),     xs[0].y1 = (y + ((d / 3) * 2)) - 2, xs[0].x2 = x + (d / 2),     xs[0].y2 = y + d - 3;
+    xs[1].x1 = x + (d / 5) + 1, xs[1].y1 = (y + ((d / 3) * 2)) - 2, xs[1].x2 = x + (d / 2) + 1, xs[1].y2 = y + d - 3;
+    xs[2].x1 = x + (d / 2),     xs[2].y1 =  y +   d            - 3, xs[2].x2 = x +  d      - 3, xs[2].y2 = y     + 1;
+    xs[3].x1 = x + (d / 2) + 1, xs[3].y1 =  y +   d            - 3, xs[3].x2 = x +  d      - 2, xs[3].y2 = y     + 1;
     img->beimg->display->lock (img->beimg->display);
     img->beimg->draw_lines (img->beimg, xs, 4, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
     img->beimg->display->unlock (img->beimg->display);
