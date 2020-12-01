@@ -675,7 +675,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
     }
     else if (strcasecmp (video_driver_ids[driver_num], "auto")) {
       video_port = xine_open_video_driver (gui->xine, video_driver_ids[driver_num],
-        XINE_VISUAL_TYPE_X11, vis);
+        vis ? XINE_VISUAL_TYPE_X11 : XINE_VISUAL_TYPE_NONE, vis);
       if (video_port)
 	return video_port;
     }
@@ -693,7 +693,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
 
       video_port = xine_open_video_driver (gui->xine,
 					  driver_ids[i],
-					  XINE_VISUAL_TYPE_X11,
+                                           vis ? XINE_VISUAL_TYPE_X11 : XINE_VISUAL_TYPE_NONE,
                                            vis);
       if (video_port) {
 	return video_port;
@@ -2022,6 +2022,7 @@ int main(int argc, char *argv[]) {
 	}
       }
     }
+
     gui->vo_port = load_video_out_driver(driver_num, video_driver_ids);
 
     if(xine_config_lookup_entry (gui->xine, "video.driver", &cfg_vo_entry)) {

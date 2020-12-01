@@ -1778,7 +1778,6 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
                      p->prefered_visual, p->install_colormap, use_x_lock_display);
   if (!gui->vwin) {
     printf ("gui.init: ERROR: video window unavailable.\n");
-    exit (1);
   }
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
