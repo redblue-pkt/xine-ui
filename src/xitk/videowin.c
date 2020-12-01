@@ -1659,7 +1659,11 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   }
   if (vwin->video_display == NULL)
     vwin->video_display = xitk_x11_get_display (gui->xitk);
-
+  if (vwin->video_display == NULL) {
+    fprintf (stderr, _("Cannot open any X11 display for video.\n"));
+    free(vwin);
+    return NULL;
+  }
   {
     char *xrm_geometry = NULL;
     if (prefered_visual)
@@ -2078,7 +2082,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 #endif
   }
 
-  vwin->gui->vwin = vwin;
   return vwin;
 }
 
@@ -2176,7 +2179,6 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   free(vwin->prefered_visual);
 
-  vwin->gui->vwin = NULL;
   free (vwin);
 }
 
