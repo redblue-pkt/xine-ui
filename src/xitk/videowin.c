@@ -2193,7 +2193,7 @@ static int video_window_translate_point (xui_vwin_t *vwin,
   float           scale, width_scale, height_scale,aspect;
   Window          rootwin;
 
-  if (!vwin)
+  if (!vwin || !vwin->gui || !vwin->gui->vo_port)
     return 0;
 
   rect.x = gui_x;
