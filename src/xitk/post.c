@@ -38,7 +38,6 @@
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/doublebox.h"
 #include "xine-toolkit/intbox.h"
-#include "xine-toolkit/checkbox.h"
 #include "xine-toolkit/browser.h"
 
 #define VFREE(vfp) do {memset (vfp, 0x55, sizeof (*(vfp))); free (vfp); } while (0)
@@ -934,7 +933,7 @@ static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {
   v = (int *)(pobj->param_data + pobj->param->offset);
   *v = state;
   _pplugin_update_parameter (pobj);
-  xitk_checkbox_set_state (pobj->value, *v);
+  xitk_button_set_state (pobj->value, *v);
 }
 
 static void _pplugin_add_parameter_widget (post_object_t *pobj) {
@@ -1044,16 +1043,16 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
 
     case POST_PARAM_TYPE_BOOL:
       {
-	xitk_checkbox_widget_t    cb;
+        xitk_button_widget_t    b;
 
-        XITK_WIDGET_INIT(&cb);
-	cb.skin_element_name = NULL;
-	cb.callback          = _pplugin_set_param_bool;
-	cb.userdata          = pobj;
-        pobj->value =  xitk_noskin_checkbox_create (info->win->widget_list, &cb, 0, 0, 12, 12);
+        XITK_WIDGET_INIT (&b);
+        b.skin_element_name = "XITK_NOSKIN_CHECK";
+        b.callback          = NULL;
+        b.state_callback    = _pplugin_set_param_bool;
+        b.userdata          = pobj;
+        pobj->value =  xitk_noskin_button_create (info->win->widget_list, &b, 0, 0, 12, 12);
         xitk_add_widget (info->win->widget_list, pobj->value);
-	xitk_checkbox_set_state(pobj->value,
-				(*(int *)(pobj->param_data + pobj->param->offset)));
+        xitk_button_set_state (pobj->value, (*(int *)(pobj->param_data + pobj->param->offset)));
       }
       break;
     }
@@ -1528,16 +1527,17 @@ static post_object_t *_pplugin_create_filter_object (post_info_t *info) {
   xitk_combo_set_select(pobj->plugins, 0);
 
   XITK_WIDGET_INIT(&b);
+  b.state_callback    = NULL;
+  b.userdata          = pobj;
+
   b.skin_element_name = "XITK_NOSKIN_UP";
   b.callback          = _pplugin_move_up;
-  b.userdata          = pobj;
   pobj->up = xitk_noskin_button_create (info->win->widget_list, &b, 0, 0, 17, 17);
   xitk_add_widget (info->win->widget_list, pobj->up);
   DISABLE_ME(pobj->up);
 
   b.skin_element_name = "XITK_NOSKIN_DOWN";
   b.callback          = _pplugin_move_down;
-  b.userdata          = pobj;
   pobj->down = xitk_noskin_button_create (info->win->widget_list, &b, 0, 0, 17, 17);
   xitk_add_widget (info->win->widget_list, pobj->down);
   DISABLE_ME(pobj->down);
@@ -1801,8 +1801,6 @@ void pplugin_update_enable_button (post_info_t *info) {
 void pplugin_panel (post_info_t *info) {
   gGui_t *gui;
   xitk_labelbutton_widget_t   lb;
-  xitk_label_widget_t         lbl;
-  xitk_checkbox_widget_t      cb;
   int                         x, y;
   xitk_slider_widget_t        sl;
 
@@ -1828,8 +1826,6 @@ void pplugin_panel (post_info_t *info) {
   info->win->widget_list = xitk_window_widget_list (info->win->xwin);
 
   XITK_WIDGET_INIT(&lb);
-  XITK_WIDGET_INIT(&lbl);
-  XITK_WIDGET_INIT(&cb);
 
   XITK_WIDGET_INIT(&sl);
 

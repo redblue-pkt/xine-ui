@@ -33,7 +33,7 @@
 #include "xine-toolkit/backend.h"
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/labelbutton.h"
-#include "xine-toolkit/checkbox.h"
+#include "xine-toolkit/button.h"
 #include "xine-toolkit/browser.h"
 #include "kbindings_common.h"
 
@@ -586,11 +586,11 @@ static void kbedit_display_kbinding (xui_keyedit_t *kbedit, const char *action, 
     xitk_label_change_label(kbedit->comment, action);
     xitk_label_change_label(kbedit->key, kbe->key);
 
-    xitk_checkbox_set_state(kbedit->ctrl, (kbe->modifier & KEYMOD_CONTROL) ? 1 : 0);
-    xitk_checkbox_set_state(kbedit->meta, (kbe->modifier & KEYMOD_META) ? 1 : 0);
-    xitk_checkbox_set_state(kbedit->mod3, (kbe->modifier & KEYMOD_MOD3) ? 1 : 0);
-    xitk_checkbox_set_state(kbedit->mod4, (kbe->modifier & KEYMOD_MOD4) ? 1 : 0);
-    xitk_checkbox_set_state(kbedit->mod5, (kbe->modifier & KEYMOD_MOD5) ? 1 : 0);
+    xitk_button_set_state (kbedit->ctrl, (kbe->modifier & KEYMOD_CONTROL) ? 1 : 0);
+    xitk_button_set_state (kbedit->meta, (kbe->modifier & KEYMOD_META) ? 1 : 0);
+    xitk_button_set_state (kbedit->mod3, (kbe->modifier & KEYMOD_MOD3) ? 1 : 0);
+    xitk_button_set_state (kbedit->mod4, (kbe->modifier & KEYMOD_MOD4) ? 1 : 0);
+    xitk_button_set_state (kbedit->mod5, (kbe->modifier & KEYMOD_MOD5) ? 1 : 0);
   }
 }
 
@@ -629,11 +629,11 @@ static void kbedit_unset (xui_keyedit_t *kbedit) {
   xitk_label_change_label(kbedit->comment, _("Nothing selected"));
   xitk_label_change_label(kbedit->key, _("None"));
 
-  xitk_checkbox_set_state(kbedit->ctrl, 0);
-  xitk_checkbox_set_state(kbedit->meta, 0);
-  xitk_checkbox_set_state(kbedit->mod3, 0);
-  xitk_checkbox_set_state(kbedit->mod4, 0);
-  xitk_checkbox_set_state(kbedit->mod5, 0);
+  xitk_button_set_state (kbedit->ctrl, 0);
+  xitk_button_set_state (kbedit->meta, 0);
+  xitk_button_set_state (kbedit->mod3, 0);
+  xitk_button_set_state (kbedit->mod4, 0);
+  xitk_button_set_state (kbedit->mod5, 0);
 }
 
 /*
@@ -1044,6 +1044,13 @@ static int kbedit_event (void *data, const xitk_be_event_t *e) {
   return 0;
 }
 
+/* needed to turn button into checkbox */
+static void kbedit_dummy (xitk_widget_t *w, void *data, int state) {
+  (void)w;
+  (void)data;
+  (void)state;
+}
+
 /*
  *
  */
@@ -1053,7 +1060,7 @@ void kbedit_window (gGui_t *gui) {
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        l;
   xitk_browser_widget_t      br;
-  xitk_checkbox_widget_t     cb;
+  xitk_button_widget_t       b;
   int                        btnw = 80;
   int                        fontheight;
   xitk_font_t               *fs;
@@ -1253,14 +1260,15 @@ void kbedit_window (gGui_t *gui) {
   xitk_add_widget (kbedit->widget_list, kbedit->key);
   xitk_enable_and_show_widget(kbedit->key);
 
-  XITK_WIDGET_INIT(&cb);
-
   x += 130 + 10;
 
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
-  cb.skin_element_name = NULL;
-  kbedit->ctrl = xitk_noskin_checkbox_create (kbedit->widget_list, &cb, x, y, 10, 10);
+  XITK_WIDGET_INIT (&b);
+  b.callback          = NULL;
+  b.state_callback    = kbedit_dummy;
+  b.userdata          = NULL;
+  b.skin_element_name = "XITK_NOSKIN_CHECK";
+
+  kbedit->ctrl = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
   xitk_add_widget (kbedit->widget_list, kbedit->ctrl);
   xitk_show_widget(kbedit->ctrl);
   xitk_disable_widget(kbedit->ctrl);
@@ -1277,10 +1285,7 @@ void kbedit_window (gGui_t *gui) {
 
   x += 55;
 
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
-  cb.skin_element_name = NULL;
-  kbedit->meta = xitk_noskin_checkbox_create (kbedit->widget_list, &cb, x, y, 10, 10);
+  kbedit->meta = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
   xitk_add_widget (kbedit->widget_list, kbedit->meta);
   xitk_show_widget(kbedit->meta);
   xitk_disable_widget(kbedit->meta);
@@ -1297,10 +1302,7 @@ void kbedit_window (gGui_t *gui) {
 
   x += 55;
 
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
-  cb.skin_element_name = NULL;
-  kbedit->mod3 = xitk_noskin_checkbox_create (kbedit->widget_list, &cb, x, y, 10, 10);
+  kbedit->mod3 = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
   xitk_add_widget (kbedit->widget_list, kbedit->mod3);
   xitk_show_widget(kbedit->mod3);
   xitk_disable_widget(kbedit->mod3);
@@ -1317,10 +1319,7 @@ void kbedit_window (gGui_t *gui) {
 
   x += 55;
 
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
-  cb.skin_element_name = NULL;
-  kbedit->mod4 = xitk_noskin_checkbox_create (kbedit->widget_list, &cb, x, y, 10, 10);
+  kbedit->mod4 = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
   xitk_add_widget (kbedit->widget_list, kbedit->mod4);
   xitk_show_widget(kbedit->mod4);
   xitk_disable_widget(kbedit->mod4);
@@ -1337,10 +1336,7 @@ void kbedit_window (gGui_t *gui) {
 
   x += 55;
 
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
-  cb.skin_element_name = NULL;
-  kbedit->mod5 = xitk_noskin_checkbox_create (kbedit->widget_list, &cb, x, y, 10, 10);
+  kbedit->mod5 = xitk_noskin_button_create (kbedit->widget_list, &b, x, y, 10, 10);
   xitk_add_widget (kbedit->widget_list, kbedit->mod5);
   xitk_show_widget(kbedit->mod5);
   xitk_disable_widget(kbedit->mod5);
@@ -1387,3 +1383,4 @@ void kbedit_window (gGui_t *gui) {
 
   xitk_window_try_to_set_input_focus (kbedit->xwin);
 }
+

@@ -32,6 +32,7 @@
 #include "actions.h"
 #include "event.h"
 #include "xine-toolkit/backend.h"
+#include "xine-toolkit/button.h"
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/inputtext.h"
 #include "xine-toolkit/tabs.h"
@@ -39,7 +40,6 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/intbox.h"
-#include "xine-toolkit/checkbox.h"
 
 #include <xine/sorted_array.h>
 
@@ -212,7 +212,7 @@ static void setup_apply (xitk_widget_t *w, void *data, int state) {
 	    break;
 
 	  case WIDGET_TYPE_CHECKBOX:
-	    numval = xitk_checkbox_get_state(w);
+	    numval = xitk_button_get_state (w);
 	    break;
 
 	  case WIDGET_TYPE_INPUTTEXT:
@@ -666,16 +666,17 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
 
         case XINE_CONFIG_TYPE_BOOL:
           {
-            xitk_checkbox_widget_t cb;
+            xitk_button_widget_t b;
 
-            XITK_WIDGET_INIT (&cb);
-            cb.skin_element_name = "XITK_NOSKIN_CHECK";
-            cb.callback          = numtype_update;
-            cb.userdata          = wt;
-            wt->widget = xitk_noskin_checkbox_create (setup->widget_list, &cb, x, y, 13, 13);
+            XITK_WIDGET_INIT (&b);
+            b.skin_element_name = "XITK_NOSKIN_CHECK";
+            b.callback          = NULL;
+            b.state_callback    = numtype_update;
+            b.userdata          = wt;
+            wt->widget = xitk_noskin_button_create (setup->widget_list, &b, x, y, 13, 13);
             if (wt->widget) {
               xitk_add_widget (setup->widget_list, wt->widget);
-              xitk_checkbox_set_state (wt->widget, entry.num_value);
+              xitk_button_set_state (wt->widget, entry.num_value);
             }
           }
           break;
@@ -1047,4 +1048,3 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->gui->setup = setup;
   return setup;
 }
-

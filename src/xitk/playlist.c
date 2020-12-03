@@ -1084,11 +1084,13 @@ void playlist_editor (gGui_t *gui) {
 
   {
     xitk_button_widget_t b;
+
     XITK_WIDGET_INIT (&b);
+    b.state_callback    = NULL;
+    b.userdata          = pl->gui;
 
     b.skin_element_name = "PlMoveUp";
     b.callback          = _playlist_move_current_up;
-    b.userdata          = pl->gui;
     pl->move_up =  xitk_button_create (pl->widget_list, pl->gui->skin_config, &b);
     if (pl->move_up) {
       xitk_add_widget (pl->widget_list, pl->move_up);
@@ -1097,7 +1099,6 @@ void playlist_editor (gGui_t *gui) {
 
     b.skin_element_name = "PlMoveDn";
     b.callback          = _playlist_move_current_down;
-    b.userdata          = pl->gui;
     pl->move_down =  xitk_button_create (pl->widget_list, pl->gui->skin_config, &b);
     if (pl->move_down) {
       xitk_add_widget (pl->widget_list, pl->move_down);
@@ -1106,7 +1107,6 @@ void playlist_editor (gGui_t *gui) {
 
     b.skin_element_name = "PlPlay";
     b.callback          = _playlist_play_current;
-    b.userdata          = pl->gui;
     pl->play =  xitk_button_create (pl->widget_list, pl->gui->skin_config, &b);
     if (pl->play) {
       xitk_add_widget (pl->widget_list, pl->play);
@@ -1115,7 +1115,6 @@ void playlist_editor (gGui_t *gui) {
 
     b.skin_element_name = "PlDelete";
     b.callback          = _playlist_delete_current;
-    b.userdata          = pl->gui;
     pl->delete =  xitk_button_create (pl->widget_list, pl->gui->skin_config, &b);
     if (pl->delete) {
       xitk_add_widget (pl->widget_list, pl->delete);
@@ -1124,7 +1123,6 @@ void playlist_editor (gGui_t *gui) {
 
     b.skin_element_name = "PlDeleteAll";
     b.callback          = _playlist_delete_all;
-    b.userdata          = pl->gui;
     pl->delete_all = xitk_button_create (pl->widget_list, pl->gui->skin_config, &b);
     if (pl->delete_all) {
       xitk_add_widget (pl->widget_list, pl->delete_all);

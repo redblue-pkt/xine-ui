@@ -36,7 +36,6 @@
 #include "tips.h"
 #include "menu.h"
 #include "combo.h"
-#include "checkbox.h"
 
 static const xitk_color_names_t xitk_sorted_color_names[] = {
   { 240,  248,  255,  "aliceblue" },

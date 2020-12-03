@@ -308,9 +308,11 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
     wp->input_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   }
 
+  b.state_callback    = NULL;
+  b.userdata          = wp;
+
   b.skin_element_name = "XITK_NOSKIN_PLUS";
   b.callback          = doublebox_plus;
-  b.userdata          = (void *)wp;
   wp->more_widget = xitk_noskin_button_create (wl, &b,
     x + width - (height >> 1), y, height >> 1, height >> 1);
   if (wp->more_widget) {
@@ -320,7 +322,6 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
 
   b.skin_element_name = "XITK_NOSKIN_MINUS";
   b.callback          = doublebox_minus;
-  b.userdata          = (void *)wp;
   wp->less_widget = xitk_noskin_button_create (wl, &b,
     x + width - (height >> 1), y + (height >> 1), height >> 1, height >> 1);
   if (wp->less_widget) {

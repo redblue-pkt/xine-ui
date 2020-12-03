@@ -29,7 +29,6 @@
 #include "combo.h"
 #include "button.h"
 #include "label.h"
-#include "checkbox.h"
 #include "browser.h"
 #include "default_font.h"
 
@@ -108,7 +107,7 @@ static void _combo_close (_combo_private_t *wp, int focus) {
     wp->xwin = NULL;
     if (focus) {
       xitk_set_focus_to_widget (wp->button_widget);
-      xitk_checkbox_set_state (wp->button_widget, 0);
+      xitk_button_set_state (wp->button_widget, 0);
       xitk_set_focus_to_wl (wp->parent_wlist);
     }
     if (wp->button_widget)
@@ -234,6 +233,7 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
 
   if (wp && w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
     ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+    /* no typo, thats what it reports with state ^ */
     if (state && !wp->xwin) {
       _combo_open (wp);
       xitk_combo_update_pos (&wp->w);
@@ -252,7 +252,7 @@ static void _combo_enability (_combo_private_t *wp) {
     xitk_enable_widget (wp->button_widget);
   } else {
     if (wp->xwin) {
-      xitk_checkbox_set_state (wp->button_widget, 0);
+      xitk_button_set_state (wp->button_widget, 0);
       _combo_rollunroll (wp->button_widget, (void *)wp, 0);
     }
     xitk_disable_widget (wp->label_widget);
@@ -280,7 +280,7 @@ static void _combo_destroy (_combo_private_t *wp) {
  */
 static void _combo_paint (_combo_private_t *wp) {
   if (wp->xwin && (wp->w.visible < 1)) {
-    xitk_checkbox_set_state (wp->button_widget, 0);
+    xitk_button_set_state (wp->button_widget, 0);
     _combo_rollunroll (wp->button_widget, (void *)wp, 0);
   }
   if (wp->w.visible == 1) {
@@ -525,12 +525,12 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
 xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
   xitk_skin_config_t *skonfig, xitk_combo_widget_t *c) {
   _combo_private_t        *wp;
-  xitk_checkbox_widget_t   cb;
+  xitk_button_widget_t     b;
   xitk_label_widget_t      lbl;
 
   XITK_CHECK_CONSTITENCY(c);
 
-  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT (&b);
   XITK_WIDGET_INIT(&lbl);
 
   wp = (_combo_private_t *)xitk_widget_new (wl, sizeof (*wp));
@@ -548,10 +548,11 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
     xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
   }
 
-  cb.skin_element_name = c->skin_element_name;
-  cb.callback          = _combo_rollunroll;
-  cb.userdata          = (void *)wp;
-  if ((wp->button_widget = xitk_checkbox_create (wl, skonfig, &cb))) {
+  b.skin_element_name = c->skin_element_name;
+  b.callback          = NULL;
+  b.state_callback    = _combo_rollunroll;
+  b.userdata          = (void *)wp;
+  if ((wp->button_widget = xitk_button_create (wl, skonfig, &b))) {
     xitk_widget_set_parent (wp->button_widget, &wp->w);
     wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
     xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
@@ -581,9 +582,9 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
  */
 xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
   xitk_combo_widget_t *c, int x, int y, int width) {
-  _combo_private_t        *wp;
-  xitk_checkbox_widget_t   cb;
-  xitk_label_widget_t      lbl;
+  _combo_private_t     *wp;
+  xitk_button_widget_t  b;
+  xitk_label_widget_t   lbl;
 
   ABORT_IF_NULL(wl);
 
@@ -593,7 +594,7 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  XITK_WIDGET_INIT(&cb);
+  XITK_WIDGET_INIT (&b);
   XITK_WIDGET_INIT(&lbl);
 
 
@@ -617,11 +618,12 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
       xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
     }
 
-    cb.skin_element_name = "XITK_NOSKIN_DOWN";
-    cb.callback          = _combo_rollunroll;
-    cb.userdata          = (void *)wp;
+    b.skin_element_name = "XITK_NOSKIN_DOWN";
+    b.callback          = NULL;
+    b.state_callback    = _combo_rollunroll;
+    b.userdata          = (void *)wp;
 
-    if ((wp->button_widget = xitk_noskin_checkbox_create (wl, &cb,
+    if ((wp->button_widget = xitk_noskin_button_create (wl, &b,
       x + (width - height), y, height, height))) {
       xitk_widget_set_parent (wp->button_widget, &wp->w);
       wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;

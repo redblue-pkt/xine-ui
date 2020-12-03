@@ -23,7 +23,6 @@ libxitk_a_SOURCES = \
 	browser.c \
 	button.c \
 	button_list.c \
-	checkbox.c \
 	combo.c \
 	config.c \
 	cursors_x11.c \
@@ -63,8 +62,6 @@ noinst_HEADERS = \
 	browser.h \
 	button.h \
 	button_list.h \
-	checkbox.c \
-	checkbox.h \
 	combo.h \
 	cursors_x11.h \
 	default_font.h \
