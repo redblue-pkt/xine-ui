@@ -48,7 +48,6 @@
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/button_list.h"
-#include "xine-toolkit/checkbox.h"
 
 struct xui_panel_st {
   gGui_t               *gui;
@@ -680,7 +679,7 @@ void panel_get_window_position(xui_panel_t *panel, int *px, int *py, int *pw, in
 }
 
 void panel_check_mute (xui_panel_t *panel) {
-  xitk_checkbox_set_state (panel->mixer.mute, panel->gui->mixer.mute);
+  xitk_button_set_state (panel->mixer.mute, panel->gui->mixer.mute);
 }
 
 /*
@@ -688,7 +687,7 @@ void panel_check_mute (xui_panel_t *panel) {
  */
 void panel_check_pause (xui_panel_t *panel) {
 
-  xitk_checkbox_set_state(panel->playback_widgets.pause,
+  xitk_button_set_state (panel->playback_widgets.pause,
     (((xine_get_status (panel->gui->stream) == XINE_STATUS_PLAY) &&
       (xine_get_param (panel->gui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0));
 }
@@ -837,7 +836,7 @@ void panel_update_mixer_display (xui_panel_t *panel) {
 
     xitk_slider_set_max(panel->mixer.slider, max);
     xitk_slider_set_pos(panel->mixer.slider, vol);
-    xitk_checkbox_set_state(panel->mixer.mute, gui->mixer.mute);
+    xitk_button_set_state (panel->mixer.mute, gui->mixer.mute);
   }
 }
 
@@ -1049,7 +1048,7 @@ void panel_add_mixer_control (xui_panel_t *panel) {
   if (panel->gui->mixer.caps & MIXER_CAP_MUTE) {
     xitk_enable_widget(panel->mixer.mute);
     panel->gui->mixer.mute = xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_MUTE);
-    xitk_checkbox_set_state (panel->mixer.mute, panel->gui->mixer.mute);
+    xitk_button_set_state (panel->mixer.mute, panel->gui->mixer.mute);
   }
 
   /* Tips should be available only if widgets are enabled */
@@ -1145,7 +1144,9 @@ xui_panel_t *panel_init (gGui_t *gui) {
   {
     xitk_widget_t *w;
     xitk_button_widget_t b;
+
     XITK_WIDGET_INIT (&b);
+    b.state_callback    = NULL;
 
     b.userdata          = GUI_PREV (panel->gui);
 
@@ -1342,20 +1343,22 @@ xui_panel_t *panel_init (gGui_t *gui) {
   }
 
   {
-    xitk_checkbox_widget_t cb;
-    XITK_WIDGET_INIT (&cb);
+    xitk_button_widget_t b;
+    XITK_WIDGET_INIT (&b);
 
-    cb.skin_element_name = "Pause";
-    cb.callback          = gui_pause;
-    cb.userdata          = panel->gui;
-    panel->playback_widgets.pause = xitk_checkbox_create (panel->widget_list, panel->gui->skin_config, &cb);
+    b.callback          = NULL;
+
+    b.skin_element_name = "Pause";
+    b.state_callback    = gui_pause;
+    b.userdata          = panel->gui;
+    panel->playback_widgets.pause = xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
     xitk_add_widget (panel->widget_list, panel->playback_widgets.pause);
     xitk_set_widget_tips (panel->playback_widgets.pause, _("Pause/Resume playback"));
 
-    cb.skin_element_name = "Mute";
-    cb.callback          = panel_toggle_audio_mute;
-    cb.userdata          = panel;
-    panel->mixer.mute = xitk_checkbox_create (panel->widget_list, panel->gui->skin_config, &cb);
+    b.skin_element_name = "Mute";
+    b.state_callback    = panel_toggle_audio_mute;
+    b.userdata          = panel;
+    panel->mixer.mute = xitk_button_create (panel->widget_list, panel->gui->skin_config, &b);
     xitk_add_widget (panel->widget_list, panel->mixer.mute);
     xitk_disable_widget (panel->mixer.mute);
   }

@@ -487,9 +487,11 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
 
     XITK_WIDGET_INIT (&b);
 
+    b.state_callback    = NULL;
+    b.userdata          = wp;
+
     b.skin_element_name = "XITK_NOSKIN_PLUS";
     b.callback          = intbox_plus;
-    b.userdata          = (void *)wp;
     wp->more_widget = xitk_noskin_button_create (wl, &b,
       x + wp->input_width, y, wp->pm_width, wp->pm_width);
     if (wp->more_widget) {
@@ -499,7 +501,6 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
 
     b.skin_element_name = "XITK_NOSKIN_MINUS";
     b.callback          = intbox_minus;
-    b.userdata          = (void *)wp;
     wp->less_widget = xitk_noskin_button_create (wl, &b,
       x + wp->input_width, y + wp->w.height - wp->pm_width, wp->pm_width, wp->pm_width);
     if (wp->less_widget) {

@@ -466,7 +466,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_font_t               *fs;
     int                        fwidth, fheight, i;
     xitk_labelbutton_widget_t  lb;
-    xitk_button_widget_t       b;
     int                        xx = x;
 
     fs = xitk_font_load_font(wl->xitk, fontname);
@@ -475,7 +474,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     wp->w.height = wp->bheight = fheight + 18;
 
     XITK_WIDGET_INIT(&lb);
-    XITK_WIDGET_INIT(&b);
 
     for (i = 0; i < wp->num_entries; i++) {
 
@@ -505,9 +503,14 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
        Add left/rigth arrows
     */
     if (wp->all_width > wp->w.width) {
+      xitk_button_widget_t b;
+
+      XITK_WIDGET_INIT (&b);
+      b.state_callback    = NULL;
+      b.userdata          = wp;
+
       b.skin_element_name = "XITK_NOSKIN_LEFT";
       b.callback          = _tabs_shift_left;
-      b.userdata          = (void *)wp;
       if ((wp->left = xitk_noskin_button_create (wl, &b,
         wp->x + width - 40, y - 1 + wp->bheight - 20, 20, 20))) {
         wp->left->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
@@ -518,7 +521,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       xx += 20;
       b.skin_element_name = "XITK_NOSKIN_RIGHT";
       b.callback          = _tabs_shift_right;
-      b.userdata          = (void *)wp;
       if ((wp->right = xitk_noskin_button_create (wl, &b,
         wp->x + width - 20, y - 1 + wp->bheight - 20, 20, 20))) {
         wp->right->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;

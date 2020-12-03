@@ -44,7 +44,6 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/combo.h"
-#include "xine-toolkit/checkbox.h"
 #include "xine-toolkit/browser.h"
 
 
@@ -1145,7 +1144,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   filebrowser_t              *fb;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
-  xitk_checkbox_widget_t      cb;
   xitk_image_t               *bg;
   xitk_browser_widget_t       br;
   xitk_inputtext_widget_t     inp;
@@ -1228,7 +1226,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   XITK_WIDGET_INIT(&lb);
   XITK_WIDGET_INIT(&lbl);
-  XITK_WIDGET_INIT(&cb);
   XITK_WIDGET_INIT(&br);
   XITK_WIDGET_INIT(&inp);
   XITK_WIDGET_INIT(&cmb);
@@ -1275,8 +1272,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   y -= 15;
 
   b.skin_element_name = NULL;
-  b.callback          = fb_sort;
   b.userdata          = (void *)fb;
+
+  b.state_callback    = NULL;
+  b.callback          = fb_sort;
   fb->directories_sort = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
   xitk_add_widget (fb->widget_list, fb->directories_sort);
   xitk_enable_and_show_widget(fb->directories_sort);
@@ -1303,9 +1302,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   y -= 15;
 
-  b.skin_element_name = NULL;
   b.callback          = fb_sort;
-  b.userdata          = (void *)fb;
   fb->files_sort = xitk_noskin_button_create (fb->widget_list, &b, x, y, w, 15);
   xitk_add_widget (fb->widget_list, fb->files_sort);
   xitk_enable_and_show_widget(fb->files_sort);
@@ -1425,12 +1422,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   x = 15;
 
-  cb.skin_element_name = "XITK_NOSKIN_CHECK";
-  cb.callback          = fb_hidden_files;
-  cb.userdata          = (void *) fb;
-  fb->show_hidden = xitk_noskin_checkbox_create (fb->widget_list, &cb, x, y+5, 10, 10);
+  b.skin_element_name = "XITK_NOSKIN_CHECK";
+  b.callback          = NULL;
+  b.state_callback    = fb_hidden_files;
+  b.userdata          = (void *) fb;
+  fb->show_hidden = xitk_noskin_button_create (fb->widget_list, &b, x, y+5, 10, 10);
   xitk_add_widget (fb->widget_list, fb->show_hidden);
-  xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files);
+  xitk_button_set_state (fb->show_hidden, fb->show_hidden_files);
   xitk_enable_and_show_widget(fb->show_hidden);
 
   lbl.skin_element_name = NULL;
@@ -1559,4 +1557,3 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   return fb;
 }
-

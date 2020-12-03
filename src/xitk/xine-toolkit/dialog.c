@@ -28,7 +28,7 @@
 #include "_xitk.h"
 #include "label.h"
 #include "labelbutton.h"
-#include "checkbox.h"
+#include "button.h"
 #include "default_font.h"
 
 #define TITLE_BAR_HEIGHT 20
@@ -136,7 +136,7 @@ static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state)
               : w == wd->w1 ? 1
               : w == wd->w2 ? 2
               : /* w == wd->w3 */ 3;
-    if (wd->checkbox && xitk_checkbox_get_state (wd->checkbox))
+    if (wd->checkbox && xitk_button_get_state (wd->checkbox))
       state += XITK_WINDOW_DIALOG_CHECKED;
     wd->done3cb (wd->done3data, state);
   }
@@ -176,6 +176,13 @@ static const char *_xitk_window_dialog_label (const char *label) {
 }
 
 
+/* needed to turn button into checkbox */
+static void _dialog_dummy (xitk_widget_t *w, void *data, int state) {
+  (void)w;
+  (void)data;
+  (void)state;
+}
+
 xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient_for, int layer_above,
   int width, const char *title,
   void (*done_cb)(void *userdata, int state), void *userdata,
@@ -204,19 +211,20 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   if (check_label) {
     xitk_widget_list_t *widget_list = xitk_window_widget_list (wd->xwin);
     int x = 25, y = winh - (num_buttons ? 50 : 0) - 50;
-    xitk_checkbox_widget_t cb;
+    xitk_button_widget_t b;
     xitk_label_widget_t lbl;
 
-    XITK_WIDGET_INIT(&cb);
+    XITK_WIDGET_INIT (&b);
     XITK_WIDGET_INIT(&lbl);
 
-    cb.skin_element_name = "XITK_NOSKIN_CHECK";
-    cb.callback          = NULL;
-    cb.userdata          = NULL;
-    wd->checkbox = xitk_noskin_checkbox_create (widget_list, &cb, x, y + 5, 10, 10);
+    b.skin_element_name = "XITK_NOSKIN_CHECK";
+    b.callback          = NULL;
+    b.state_callback    = _dialog_dummy;
+    b.userdata          = NULL;
+    wd->checkbox = xitk_noskin_button_create (widget_list, &b, x, y + 5, 10, 10);
     if (wd->checkbox) {
       xitk_dlist_add_tail (&widget_list->list, &wd->checkbox->node);
-      xitk_checkbox_set_state (wd->checkbox, checked);
+      xitk_button_set_state (wd->checkbox, checked);
     }
 
     lbl.skin_element_name = NULL;

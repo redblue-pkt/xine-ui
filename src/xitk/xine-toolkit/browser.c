@@ -1080,9 +1080,11 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   wp->visible.max = 0;
   _browser_item_btns (wp, info);
 
+  b.state_callback    = NULL;
+  b.userdata          = wp;
+
   b.skin_element_name = br->arrow_up.skin_element_name;
   b.callback          = browser_up;
-  b.userdata          = wp;
   wp->visible.btns[WBUP] = xitk_button_create (wp->w.wl, skonfig, &b);
   if (wp->visible.btns[WBUP]) {
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBUP]->node);
@@ -1110,7 +1112,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
 
   b.skin_element_name = br->arrow_dn.skin_element_name;
   b.callback          = browser_down;
-  b.userdata          = wp;
   wp->visible.btns[WBDN] = xitk_button_create (wl, skonfig, &b);
   if (wp->visible.btns[WBDN]) {
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBDN]->node);
@@ -1121,7 +1122,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
 
   b.skin_element_name = br->arrow_left.skin_element_name;
   b.callback          = browser_left;
-  b.userdata          = wp;
   wp->visible.btns[WBLF] = xitk_button_create (wl, skonfig, &b);
   if (wp->visible.btns[WBLF]) {
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBLF]->node);
@@ -1149,7 +1149,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
 
   b.skin_element_name = br->arrow_right.skin_element_name;
   b.callback          = browser_right;
-  b.userdata          = wp;
   wp->visible.btns[WBRT] = xitk_button_create (wl, skonfig, &b);
   if (wp->visible.btns[WBRT]) {
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBRT]->node);
@@ -1229,9 +1228,11 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
     wp->visible.max = i;
   }
 
+  b.state_callback    = NULL;
+  b.userdata          = wp;
+
   b.skin_element_name = "XITK_NOSKIN_UP";
   b.callback          = browser_up;
-  b.userdata          = wp;
   wp->visible.btns[WBUP] = xitk_noskin_button_create (wl, &b, x + itemw, y + 0, slidw, btns);
   if (wp->visible.btns[WBUP]) {
     xitk_dlist_add_tail (&wl->list, &wp->visible.btns[WBUP]->node);
@@ -1260,7 +1261,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   b.skin_element_name = "XITK_NOSKIN_DOWN";
   b.callback          = browser_down;
-  b.userdata          = wp;
   wp->visible.btns[WBDN] = xitk_noskin_button_create (wl, &b,
     x + itemw, y + itemh * wp->visible.max - btns, slidw, btns);
   if (wp->visible.btns[WBDN]) {
@@ -1272,7 +1272,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   b.skin_element_name = "XITK_NOSKIN_LEFT";
   b.callback          = browser_left;
-  b.userdata          = wp;
   wp->visible.btns[WBLF] = xitk_noskin_button_create (wl, &b,
     x, y + itemh * wp->visible.max, btns, slidw);
   if (wp->visible.btns[WBLF]) {
@@ -1302,7 +1301,6 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
 
   b.skin_element_name = "XITK_NOSKIN_RIGHT";
   b.callback          = browser_right;
-  b.userdata          = wp;
   wp->visible.btns[WBRT] = xitk_noskin_button_create (wl, &b,
     x + itemw - btns, y + itemh * wp->visible.max, btns, slidw);
   if (wp->visible.btns[WBRT]) {

@@ -1015,6 +1015,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
     xitk_button_widget_t pb;
     XITK_WIDGET_INIT (&pb);
     pb.skin_element_name = mb->play.skin_element_name;
+    pb.state_callback    = NULL;
     pb.callback          = mrlbrowser_play;
     pb.userdata          = (void *)wp;
     w = xitk_button_create (wp->widget_list, skonfig, &pb);

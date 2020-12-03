@@ -32,11 +32,13 @@ typedef struct {
   xitk_widget_t       w;
 
   xitk_short_string_t skin_element_name;
-  int                 bClicked, focus, s5;
+  int                 bClicked, bState;
+  int                 focus, s5;
   xitk_part_image_t   skin;
 
   /* callback function (active_widget, user_data) */
   xitk_simple_callback_t  callback;
+  xitk_state_callback_t   state_callback;
   void                   *userdata;
 } _button_private_t;
 
@@ -79,7 +81,7 @@ static void _button_paint (_button_private_t *wp, widget_event_t *event) {
 #endif
   if (wp->w.visible) {
     xitk_img_state_t state = xitk_image_find_state (wp->s5 ? XITK_IMG_STATE_DISABLED_SELECTED : XITK_IMG_STATE_SELECTED,
-      wp->w.enable, (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), wp->bClicked, 0);
+      wp->w.enable, (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), wp->bClicked, wp->bState);
 
     xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
       (int)state * wp->w.width + event->x - wp->w.x, event->y - wp->w.y,
@@ -117,12 +119,13 @@ static void _button_new_skin (_button_private_t *wp, xitk_skin_config_t *skonfig
  *
  */
 static int _button_click (_button_private_t *wp, int button, int bUp, int x, int y) {
-  int ret = 0;
-
   (void)x;
   (void)y;
   if (button == 1) {
     widget_event_t event;
+
+    if (bUp && (wp->focus == FOCUS_RECEIVED) && wp->state_callback)
+      wp->bState = wp->bState ? 0 : 1;
 
     wp->bClicked = !bUp;
     event.x = wp->w.x;
@@ -132,12 +135,14 @@ static int _button_click (_button_private_t *wp, int button, int bUp, int x, int
     _button_paint (wp, &event);
 
     if (bUp && (wp->focus == FOCUS_RECEIVED)) {
-      if (wp->callback)
+      if (wp->state_callback)
+        wp->state_callback (&wp->w, wp->userdata, wp->bState);
+      else if (wp->callback)
         wp->callback (&wp->w, wp->userdata);
     }
-    ret = 1;
+    return 1;
   }
-  return ret;
+  return 0;
 }
 
 static int _button_key (_button_private_t *wp, const char *s, int modifier) {
@@ -167,6 +172,9 @@ static int _button_key (_button_private_t *wp, const char *s, int modifier) {
 
   wp->bClicked = 0;
 
+  if (wp->state_callback)
+    wp->bState = wp->bState ? 0 : 1;
+
   event.x = wp->w.x;
   event.y = wp->w.y;
   event.width = wp->w.width;
@@ -174,7 +182,9 @@ static int _button_key (_button_private_t *wp, const char *s, int modifier) {
   _button_paint (wp, &event);
 
   if (wp->focus == FOCUS_RECEIVED) {
-    if (wp->callback)
+    if (wp->state_callback)
+      wp->state_callback (&wp->w, wp->userdata, wp->bState);
+    else if (wp->callback)
       wp->callback (&wp->w, wp->userdata);
   }
   return 1;
@@ -185,6 +195,12 @@ static int _button_key (_button_private_t *wp, const char *s, int modifier) {
  */
 static int _button_focus (_button_private_t *wp, int focus) {
   wp->focus = focus;
+  if ((wp->w.type & WIDGET_GROUP_COMBO) && (focus == FOCUS_LOST)) {
+    wp->bClicked = 0;
+    wp->bState = 0;
+    if (wp->state_callback)
+      wp->state_callback (&wp->w, wp->userdata, wp->bState);
+  }
   return 1;
 }
 
@@ -194,7 +210,8 @@ static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
   xitk_container (wp, w, w);
   if (!wp || ! event)
     return 0;
-  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BUTTON)
+  if (((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_BUTTON)
+    && ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_CHECKBOX))
     return 0;
 
   switch (event->type) {
@@ -243,21 +260,61 @@ static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
   return 0;
 }
 
+int xitk_button_get_state (xitk_widget_t *w) {
+  _button_private_t *wp;
+
+  xitk_container (wp, w, w);
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_CHECKBOX)
+    return 0;
+  return wp->bState;
+}
+
+int xitk_button_set_state (xitk_widget_t *w, int state) {
+  _button_private_t *wp;
+  widget_event_t event;
+
+  xitk_container (wp, w, w);
+  if (!wp)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_CHECKBOX)
+    return 0;
+
+  if (!wp->state_callback)
+    return 0;
+
+  state = state ? 1 : 0;
+  if (state == wp->bState)
+    return state;
+
+  wp->bState = state;
+  event.x = wp->w.x;
+  event.y = wp->w.y;
+  event.width = wp->w.width;
+  event.height = wp->w.height;
+  _button_paint (wp, &event);
+  return state;
+}
+
 /*
  *
  */
-static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_widget_t *b) {
+static xitk_widget_t *_xitk_button_create (_button_private_t *wp, const xitk_button_widget_t *b) {
   ABORT_IF_NULL (wp->w.wl);
 
   wp->bClicked          = 0;
+  wp->bState            = 0;
   wp->focus             = FOCUS_LOST;
 
   wp->callback          = b->callback;
+  wp->state_callback    = b->state_callback;
   wp->userdata          = b->userdata;
 
   wp->w.width           = wp->skin.width / (wp->s5 ? 6 : 3);
   wp->w.height          = wp->skin.height;
-  wp->w.type            = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE
+  wp->w.type            = (wp->state_callback ? WIDGET_TYPE_CHECKBOX : WIDGET_TYPE_BUTTON)
+                        | WIDGET_CLICKABLE | WIDGET_FOCUSABLE | WIDGET_TABABLE
                         | WIDGET_KEYABLE | WIDGET_PARTIAL_PAINTABLE;
   wp->w.event           = button_event;
 
@@ -268,7 +325,7 @@ static xitk_widget_t *_xitk_button_create (_button_private_t *wp, xitk_button_wi
  *
  */
 xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
-				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b) {
+  xitk_skin_config_t *skonfig, const xitk_button_widget_t *b) {
   _button_private_t *wp;
 
   XITK_CHECK_CONSTITENCY(b);
@@ -288,17 +345,18 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
  *
  */
 xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
-					  xitk_button_widget_t *b,
-					  int x, int y, int width, int height) {
+  const xitk_button_widget_t *b, int x, int y, int width, int height) {
   static const char *noskin_names[] = {
     "XITK_NOSKIN_LEFT",
     "XITK_NOSKIN_RIGHT",
     "XITK_NOSKIN_UP",
     "XITK_NOSKIN_DOWN",
     "XITK_NOSKIN_PLUS",
-    "XITK_NOSKIN_MINUS"
+    "XITK_NOSKIN_MINUS",
+    "XITK_NOSKIN_CHECK"
   };
   _button_private_t *wp;
+  xitk_button_widget_t _b;
   unsigned int u = sizeof (noskin_names) / sizeof (noskin_names[0]);
   xitk_image_t *i;
 
@@ -307,12 +365,13 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
-  if (b->skin_element_name) {
+  _b = *b;
+  if (_b.skin_element_name) {
     for (u = 0; u < sizeof (noskin_names) / sizeof (noskin_names[0]); u++) {
-      if (!strcmp (b->skin_element_name, noskin_names[u]))
+      if (!strcmp (_b.skin_element_name, noskin_names[u]))
         break;
     }
-    b->skin_element_name = NULL;
+    _b.skin_element_name = NULL;
   }
   if (u == sizeof (noskin_names) / sizeof (noskin_names[0])) {
     i = xitk_image_new (wl->xitk, NULL, 0, width * 3, height);
@@ -322,7 +381,8 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
     wp->s5 = 1;
     if (xitk_shared_image (wl, noskin_names[u], width * 6, height, &i) == 1) {
       i->last_state = XITK_IMG_STATE_DISABLED_SELECTED;
-      xitk_image_draw_bevel_three_state (i);
+      if (u != 6)
+        xitk_image_draw_bevel_three_state (i);
       switch (u) {
         case 0:
           xitk_image_draw_arrow_left (i);
@@ -342,6 +402,9 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
         case 5:
           xitk_image_draw_button_minus (i);
           break;
+        case 6:
+          xitk_image_draw_checkbox_check (i);
+          break;
         default: ;
       }
     }
@@ -358,6 +421,6 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   wp->w.enable = 0;
   wp->w.visible = 0;
 
-  return _xitk_button_create (wp, b);
+  return _xitk_button_create (wp, &_b);
 }
 
