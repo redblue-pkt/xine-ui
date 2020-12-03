@@ -81,6 +81,8 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
       xtcf->colors.select = pixel;
     else if(!strncasecmp(p, "focus", 5))
       xtcf->colors.focus = pixel;
+    else if(!strncasecmp(p, "sel_focus", 9))
+      xtcf->colors.sel_focus = pixel;
     else if(!strncasecmp(p, "black", 5))
       xtcf->colors.black = pixel;
     else if(!strncasecmp(p, "white", 5))
@@ -324,12 +326,14 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.background      = XITK_RGB_INT (190, 190, 190);
   xtcf->colors.focus           = XITK_RGB_INT (224, 224, 224);
   xtcf->colors.select          = XITK_RGB_INT (128, 128, 128);
+  xtcf->colors.sel_focus       = XITK_RGB_INT (64, 64, 64);
   xtcf->colors.warn_foreground = XITK_RGB_INT (0, 0, 0);
   xtcf->colors.warn_background = XITK_RGB_INT (255, 255, 0);
   xtcf->color_vals.black       = -1;
   xtcf->color_vals.white       = -1;
   xtcf->color_vals.background  = -1;
   xtcf->color_vals.focus       = -1;
+  xtcf->color_vals.sel_focus   = -1;
   xtcf->color_vals.select      = -1;
   xtcf->color_vals.warn_foreground = -1;
   xtcf->color_vals.warn_background = -1;
@@ -377,6 +381,7 @@ int xitk_config_get_num (xitk_config_t *xtcf, xitk_cfg_item_t item) {
     case XITK_WHITE_COLOR:   XITK_COLOR_VAL (xtcf, white);
     case XITK_BG_COLOR:      XITK_COLOR_VAL (xtcf, background);
     case XITK_FOCUS_COLOR:   XITK_COLOR_VAL (xtcf, focus);
+    case XITK_SEL_FOCUS_COLOR: XITK_COLOR_VAL (xtcf, sel_focus);
     case XITK_SELECT_COLOR:  XITK_COLOR_VAL (xtcf, select);
     case XITK_WARN_BG_COLOR: XITK_COLOR_VAL (xtcf, warn_background);
     case XITK_WARN_FG_COLOR: XITK_COLOR_VAL (xtcf, warn_foreground);
@@ -448,3 +453,4 @@ void xitk_config_deinit(xitk_config_t *xtcf) {
   XITK_FREE(xtcf->fonts.system);
   XITK_FREE(xtcf);
 }
+

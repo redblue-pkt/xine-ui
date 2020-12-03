@@ -45,6 +45,7 @@ typedef struct {
     int             background;
     int             focus;
     int             select;
+    int             sel_focus;
     int             warn_foreground;
     int             warn_background;
   } colors;
@@ -55,6 +56,7 @@ typedef struct {
     int             background;
     int             focus;
     int             select;
+    int             sel_focus;
     int             warn_foreground;
     int             warn_background;
   } color_vals;

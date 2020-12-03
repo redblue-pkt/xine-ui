@@ -753,6 +753,7 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
       segments[s].y1 += 1;
       segments[s].y2 += 1;
     }
+    color = xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR);
     img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
     if (n < 4)
         break;
@@ -763,7 +764,6 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
     img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
     if (n < 5)
         break;
-    color = xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR);
     dx = w - 1;
     for (s = 0; s < nsegments; s++) {
       segments[s].x1 += dx;
@@ -1006,6 +1006,14 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
     [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_BG_COLOR,
     [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_BG_COLOR
   };
+  static const uint8_t sel[XITK_IMG_STATE_LAST] = {
+    [XITK_IMG_STATE_NORMAL]            = 0,
+    [XITK_IMG_STATE_FOCUS]             = 0,
+    [XITK_IMG_STATE_SELECTED]          = 1,
+    [XITK_IMG_STATE_SEL_FOCUS]         = 1,
+    [XITK_IMG_STATE_DISABLED_NORMAL]   = 0,
+    [XITK_IMG_STATE_DISABLED_SELECTED] = 1
+  };
   xitk_be_rect_t xr[1];
   xitk_be_line_t xs[4];
 
@@ -1032,7 +1040,7 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   img->beimg->draw_lines (img->beimg, xs, 2, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
   img->beimg->display->unlock (img->beimg->display);
 
-  if ((uint32_t)state & 2) {
+  if (sel[state]) {
     xs[0].x1 = x + (d / 5),     xs[0].y1 = (y + ((d / 3) * 2)) - 2, xs[0].x2 = x + (d / 2),     xs[0].y2 = y + d - 3;
     xs[1].x1 = x + (d / 5) + 1, xs[1].y1 = (y + ((d / 3) * 2)) - 2, xs[1].x2 = x + (d / 2) + 1, xs[1].y2 = y + d - 3;
     xs[2].x1 = x + (d / 2),     xs[2].y1 =  y +   d            - 3, xs[2].x2 = x +  d      - 3, xs[2].y2 = y     + 1;
@@ -1177,7 +1185,7 @@ static void _xitk_image_draw_three_state (xitk_image_t *img, int style) {
   img->beimg->draw_lines (img->beimg, xs, q - xs, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
   if (img->last_state >= XITK_IMG_STATE_SEL_FOCUS) {
     xr[0].x = 3 * w + 1, xr[0].y = 1, xr[0].w = w - 2, xr[0].h = h - 2;
-    img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    img->beimg->fill_rects (img->beimg, xr, 1, xitk_get_cfg_num (img->xitk, XITK_SEL_FOCUS_COLOR), 0);
   }
   img->beimg->display->unlock (img->beimg->display);
 
@@ -1739,7 +1747,9 @@ void xitk_image_draw_button_plus (xitk_image_t *img) {
     lines[6].x1 = w * 3 + 3, lines[6].x2 = w * 4 - 3, lines[6].y1 = lines[6].y2 =  h >> 1;
     lines[7].x1 = lines[7].x2 = w * 3 + (w >> 1),     lines[7].y1 = 3, lines[7].y2 = h - 3;
     img->beimg->display->lock (img->beimg->display);
-    img->beimg->draw_lines (img->beimg, lines, 2 * (n <= 4 ? n : 4), xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    img->beimg->draw_lines (img->beimg, lines, 2 * (n <= 2 ? n : 2), xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    if (n > 2)
+      img->beimg->draw_lines (img->beimg, lines + 4, 2 * ((n <= 4 ? n : 4) - 2), xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
     img->beimg->display->unlock (img->beimg->display);
     if (n > 4) {
       lines[0].x1 = w * 4 + 2, lines[0].x2 = w * 5 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
@@ -1770,7 +1780,9 @@ void xitk_image_draw_button_minus (xitk_image_t *img) {
     lines[2].x1 = w * 2 + 3, lines[2].x2 = w * 3 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
     lines[2].x1 = w * 3 + 3, lines[2].x2 = w * 4 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
     img->beimg->display->lock (img->beimg->display);
-    img->beimg->draw_lines (img->beimg, lines, n < 4 ? n : 4, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    img->beimg->draw_lines (img->beimg, lines, n < 2 ? n : 2, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
+    if (n > 2)
+      img->beimg->draw_lines (img->beimg, lines + 2, (n < 4 ? n : 4) - 2, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
     img->beimg->display->unlock (img->beimg->display);
     if (n > 4) {
       lines[0].x1 = w * 4 + 2, lines[0].x2 = w * 5 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
