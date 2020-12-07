@@ -8,7 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* NOTE: libpng 1.2 is very paranoid about getting the wrong version of setjmp.h,
+ * and refuses to build on Linux when it is already there.
+ * on the other hand, both 1.2 and 1.6 do include it themselves.
+ * thus, dont do it here for now.
 #include <setjmp.h>
+ */
 
 #include <png.h>
 #include <jpeglib.h>
