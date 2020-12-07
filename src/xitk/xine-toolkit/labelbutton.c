@@ -319,12 +319,14 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
 
   wp->bClicked = 0;
   if (wp->focus == FOCUS_RECEIVED) {
-    wp->bState = !wp->bState;
-    _labelbutton_paint (wp);
+    /* as always, do callback last -- it may modify or even delete us. */
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
+      wp->bState = !wp->bState;
+      _labelbutton_paint (wp);
       if (wp->state_callback)
         wp->state_callback (&wp->w, wp->userdata, wp->bState, modifier);
     } else if (wp->bType == CLICK_BUTTON) {
+      _labelbutton_paint (wp);
       if (wp->callback)
         wp->callback (&wp->w, wp->userdata, wp->bState);
     }
@@ -803,3 +805,4 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+
