@@ -78,8 +78,8 @@ void gui_seek_relative (int off_sec) ;
 int gui_xine_get_pos_length (gGui_t *gui, xine_stream_t *stream, int *pos, int *time, int *length);
 
 /* video */
-void gui_toggle_visibility (xitk_widget_t *w, void *gui);
-void gui_toggle_border (xitk_widget_t *w, void *gui);
+void gui_toggle_visibility (gGui_t *gui);
+void gui_toggle_border (gGui_t *gui);
 void gui_set_fullscreen_mode (xitk_widget_t *w, void *gui);
 #ifdef HAVE_XINERAMA
 void gui_set_xinerama_fullscreen_mode(void);

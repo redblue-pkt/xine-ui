@@ -1044,10 +1044,8 @@ void gui_eject (xitk_widget_t *w, void *data) {
 
 }
 
-void gui_toggle_visibility (xitk_widget_t *w, void *data) {
-  gGui_t *gui = data;
+void gui_toggle_visibility (gGui_t *gui) {
 
-  (void)w;
   if (!gui->use_root_window) {
     int visible = video_window_is_visible (gui->vwin) < 2;
 
@@ -1068,9 +1066,7 @@ void gui_toggle_visibility (xitk_widget_t *w, void *data) {
   }
 }
 
-void gui_toggle_border (xitk_widget_t *w, void *data) {
-  gGui_t *gui = data;
-  (void)w;
+void gui_toggle_border (gGui_t *gui) {
   video_window_toggle_border (gui->vwin);
 }
 
