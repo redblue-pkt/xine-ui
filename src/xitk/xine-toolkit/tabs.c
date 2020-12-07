@@ -454,7 +454,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   wp->callback    = t->callback;
   wp->userdata    = t->userdata;
 
-  wp->w.running   = 0;
   wp->w.visible   = 0;
   wp->w.x         = x;
   wp->w.y         = y;
@@ -544,3 +543,4 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
   return &wp->w;
 }
+
