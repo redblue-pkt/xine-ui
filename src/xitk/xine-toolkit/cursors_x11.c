@@ -121,10 +121,6 @@ static const struct cursors_init_s {
   { xitk_cursor_xterm,                  XC_xterm,               XITK_CURSOR,   },
   { xitk_cursor_num_glyphs,             XC_num_glyphs,          X_CURSOR,      },
 };
-static const unsigned char no_data[] = {
-  0,0,0,0, 0,0,0,0
-};
-
 
 /* (fg / bg / trans) normal: (* / . /  ) hotspot: (# / + / -) */
 
