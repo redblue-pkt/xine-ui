@@ -118,6 +118,9 @@ int is_playback_widgets_enabled (xui_panel_t *panel) {
 void enable_playback_controls (xui_panel_t *panel, int enable) {
   void (*enability)(xitk_widget_t *) = NULL;
 
+  if (!panel)
+    return;
+
   panel->playback_widgets.enabled = enable;
 
   if(enable)
@@ -138,6 +141,8 @@ void enable_playback_controls (xui_panel_t *panel, int enable) {
  */
 void panel_show_tips (xui_panel_t *panel) {
 
+  if (!panel)
+    return;
   if(panel->tips.enable)
     xitk_set_widgets_tips_timeout(panel->widget_list, panel->tips.timeout);
   else
@@ -687,6 +692,9 @@ void panel_check_mute (xui_panel_t *panel) {
  */
 void panel_check_pause (xui_panel_t *panel) {
 
+  if (!panel)
+    return;
+
   xitk_button_set_state (panel->playback_widgets.pause,
     (((xine_get_status (panel->gui->stream) == XINE_STATUS_PLAY) &&
       (xine_get_param (panel->gui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0));
@@ -703,6 +711,9 @@ static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
 
   (void)w;
+  if (!panel)
+    return;
+
   panel->gui->is_display_mrl = !panel->gui->is_display_mrl;
   panel_update_mrl_display (panel);
   playlist_mrlident_toggle (panel->gui);
@@ -712,6 +723,9 @@ static void _panel_change_time_label(xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
 
   (void)w;
+  if (!panel)
+    return;
+
   panel->runtime_mode = !panel->runtime_mode;
   panel_update_runtime_display (panel);
 }
@@ -720,11 +734,15 @@ static void _panel_change_time_label(xitk_widget_t *w, void *data) {
  * Reset the slider of panel window (set to 0).
  */
 void panel_reset_slider (xui_panel_t *panel) {
+  if (!panel)
+    return;
   xitk_slider_reset(panel->playback_widgets.slider_play);
   panel_reset_runtime_label (panel);
 }
 
 void panel_update_slider (xui_panel_t *panel, int pos) {
+  if (!panel)
+    return;
   xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 }
 
@@ -735,6 +753,9 @@ void panel_update_channel_display (xui_panel_t *panel) {
   int   channel;
   char  buffer[XINE_LANG_MAX];
   const char *lang = NULL;
+
+  if (!panel)
+    return;
 
   memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param (panel->gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
@@ -961,8 +982,12 @@ static int panel_event (void *data, const xitk_be_event_t *e) {
  * called before xine engine initialization.
  */
 void panel_add_autoplay_buttons (xui_panel_t *panel) {
-  const char * const *autoplay_plugins = xine_get_autoplay_input_plugin_ids (panel->gui->xine);
+  const char * const *autoplay_plugins;
 
+  if (!panel)
+    return;
+
+  autoplay_plugins = xine_get_autoplay_input_plugin_ids (panel->gui->xine);
   if (autoplay_plugins) {
     const char *tips[64];
     unsigned int i;
@@ -1022,6 +1047,8 @@ void panel_add_autoplay_buttons (xui_panel_t *panel) {
  */
 void panel_add_mixer_control (xui_panel_t *panel) {
 
+  if (!panel)
+    return;
   panel->gui->mixer.caps = MIXER_CAP_NOTHING;
 
   if (panel->gui->ao_port) {
@@ -1118,7 +1145,8 @@ xui_panel_t *panel_init (gGui_t *gui) {
   }
   if (!bg_image) {
     xine_error (panel->gui, _("panel: couldn't find image for background\n"));
-    exit(-1);
+    free(panel);
+    return NULL;
   }
   width = xitk_image_width(bg_image);
   height = xitk_image_height(bg_image);
@@ -1133,6 +1161,12 @@ xui_panel_t *panel_init (gGui_t *gui) {
 
   panel->xwin = xitk_window_create_window_ext (gui->xitk, panel->x, panel->y, width, height, title,
     title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon, bg_image);
+  if (!panel->xwin) {
+    xine_error (panel->gui, _("panel: couldn't create window\n"));
+    xitk_image_free_image(&bg_image);
+    free(panel);
+    return NULL;
+  }
   xitk_window_set_role (panel->xwin, XITK_WR_VICE);
 
   /*
