@@ -43,7 +43,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id, int borderless, const
                                int use_x_lock_display);
 void video_window_exit (xui_vwin_t *vwin);
 
-void *video_window_get_xine_visual(xui_vwin_t *vwin);
+void *video_window_get_xine_visual(xui_vwin_t *vwin, int *visual_type);
 
 void video_window_select_visual (xui_vwin_t *vwin);
 

@@ -1298,9 +1298,12 @@ static void _video_window_frame_output_cb (void *data,
   pthread_mutex_unlock (&vwin->mutex);
 }
 
-void *video_window_get_xine_visual(xui_vwin_t *vwin) {
+void *video_window_get_xine_visual(xui_vwin_t *vwin, int *visual_type) {
+
   if (vwin) {
     x11_visual_t *v = &vwin->xine_visual;
+
+    *visual_type = XINE_VISUAL_TYPE_X11;
 
     v->display           = vwin->video_display;
     v->screen            = vwin->video_screen;
