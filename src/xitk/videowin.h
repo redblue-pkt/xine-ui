@@ -56,7 +56,6 @@ void video_window_set_cursor (xui_vwin_t *vwin, int cursor);
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility (xui_vwin_t *vwin, int show_cursor);
 /* Get cursor visiblity (boolean) */
-int video_window_is_cursor_visible (xui_vwin_t *vwin);
 int video_window_get_cursor_timer (xui_vwin_t *vwin);
 void video_window_set_cursor_timer (xui_vwin_t *vwin, int timer);
 
