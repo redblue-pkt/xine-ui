@@ -409,6 +409,171 @@ static void _set_layer_above (xui_vwin_t *vwin) {
     xitk_window_set_layer_above(vwin->wrapped_window);
 }
 
+#ifdef HAVE_XF86VIDMODE
+static void _adjust_modeline(xui_vwin_t *vwin) {
+  /* XF86VidMode Extension
+   * In case a fullscreen request is received or if already in fullscreen, the
+   * appropriate modeline will be looked up and used.
+   */
+  if (((!(vwin->fullscreen_req & WINDOWED_MODE)) || (!(vwin->fullscreen_mode & WINDOWED_MODE)))
+     && (vwin->XF86_modelines_count > 1)) {
+    int search = 0;
+
+    /* skipping first entry because it is the current modeline */
+    for (search = 1; search < vwin->XF86_modelines_count; search++) {
+       if (vwin->XF86_modelines[search]->hdisplay >= vwin->video_width)
+         break;
+    }
+
+    /*
+     * in case we have a request for a resolution higher than any available
+     * ones we take the highest currently available.
+     */
+    if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search >= vwin->XF86_modelines_count))
+       search = 0;
+
+    /* just switching to a different modeline if necessary */
+    if (!(search >= vwin->XF86_modelines_count)) {
+       if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
+                                    vwin->XF86_modelines[search])) {
+         double res_h, res_v;
+#ifdef HAVE_XINERAMA
+         int dummy_event, dummy_error;
+#endif
+
+          vwin->gui->XF86VidMode_fullscreen = 1;
+          vwin->fullscreen_width  = vwin->XF86_modelines[search]->hdisplay;
+          vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
+
+          /* update pixel aspect */
+          res_h = (DisplayWidth (vwin->video_display, vwin->video_screen) * 1000
+            / DisplayWidthMM (vwin->video_display, vwin->video_screen));
+          res_v = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
+            / DisplayHeightMM (vwin->video_display, vwin->video_screen));
+
+          vwin->pixel_aspect    = res_v / res_h;
+#ifdef HAVE_XINERAMA
+          if (XineramaQueryExtension (vwin->video_display, &dummy_event, &dummy_error)) {
+            int count = 1;
+            XineramaScreenInfo *xsi;
+            xsi = XineramaQueryScreens (vwin->video_display, &count);
+            if (count > 1)
+              /* multihead -> assuming square pixels */
+              vwin->pixel_aspect = 1.0;
+            if (xsi)
+              XFree (xsi);
+          }
+#endif
+#ifdef DEBUG
+          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
+#endif
+
+          // TODO
+          /*
+           * just in case the mouse pointer is off the visible area, move it
+           * to the middle of the video window
+           */
+          XWarpPointer (vwin->video_display, None, vwin->video_window,
+            0, 0, 0, 0, vwin->fullscreen_width / 2, vwin->fullscreen_height / 2);
+
+          XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
+
+          /*
+           * if this is true, we are back at the original resolution, so there
+           * is no need to further worry about anything.
+           */
+          if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search == 0))
+            vwin->gui->XF86VidMode_fullscreen = 0;
+       } else {
+          xine_error (vwin->gui, _("XF86VidMode Extension: modeline switching failed.\n"));
+       }
+    }
+  }
+}
+#endif/* HAVE_XF86VIDMODE */
+
+#ifdef HAVE_XINERAMA
+static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
+  if (vwin->xinerama) {
+    int           i;
+    int           knowLocation = 0;
+    Window        root_win, dummy_win;
+    int           x_mouse,y_mouse;
+    int           dummy_x,dummy_y;
+    unsigned int  dummy_opts;
+
+    /* someday this could also use the centre of the window as the
+     * test point I guess.  Right now it's the upper-left.
+     */
+    if (vwin->video_window != None) {
+      if (vwin->xwin >= 0 && vwin->ywin >= 0 &&
+          vwin->xwin < vwin->desktopWidth && vwin->ywin < vwin->desktopHeight) {
+        knowLocation = 1;
+      }
+    }
+
+    if (vwin->fullscreen_req & FULLSCR_XI_MODE) {
+      hint->x = vwin->xinerama_fullscreen_x;
+      hint->y = vwin->xinerama_fullscreen_y;
+      hint->width  = vwin->xinerama_fullscreen_width;
+      hint->height = vwin->xinerama_fullscreen_height;
+      vwin->fullscreen_width = hint->width;
+      vwin->fullscreen_height = hint->height;
+    }
+    else {
+      /* Get mouse cursor position */
+      XQueryPointer (vwin->video_display, RootWindow (vwin->video_display, vwin->video_screen),
+                     &root_win, &dummy_win, &x_mouse, &y_mouse, &dummy_x, &dummy_y, &dummy_opts);
+
+      for (i = 0; i < vwin->xinerama_cnt; i++) {
+        if (
+            (knowLocation == 1 &&
+             vwin->xwin >= vwin->xinerama[i].x_org &&
+             vwin->ywin >= vwin->xinerama[i].y_org &&
+             vwin->xwin < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
+             vwin->ywin < vwin->xinerama[i].y_org + vwin->xinerama[i].height) ||
+            (knowLocation == 0 &&
+             x_mouse >= vwin->xinerama[i].x_org &&
+             y_mouse >= vwin->xinerama[i].y_org &&
+             x_mouse < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
+             y_mouse < vwin->xinerama[i].y_org + vwin->xinerama[i].height)) {
+          /*  vwin->xinerama[i].screen_number ==
+              XScreenNumberOfScreen (XDefaultScreenOfDisplay (vwin->video_display)))) {*/
+          hint->x = vwin->xinerama[i].x_org;
+          hint->y = vwin->xinerama[i].y_org;
+
+          if (knowLocation == 0) {
+            vwin->old_xwin = hint->x;
+            vwin->old_ywin = hint->y;
+          }
+
+          if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
+            hint->width  = vwin->xinerama[i].width;
+            hint->height = vwin->xinerama[i].height;
+            vwin->fullscreen_width = hint->width;
+            vwin->fullscreen_height = hint->height;
+          }
+          else {
+            hint->width  = vwin->video_width;
+            hint->height = vwin->video_height;
+          }
+          break;
+        }
+      }
+    }
+  }
+  else {
+    if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
+      hint->width  = vwin->fullscreen_width;
+      hint->height = vwin->fullscreen_height;
+    } else {
+      hint->width  = vwin->win_width;
+      hint->height = vwin->win_height;
+    }
+  }
+}
+#endif /* HAVE_XINERAMA */
+
 /*
  * will modify/create video output window based on
  *
@@ -511,172 +676,15 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     return;
   }
 
-
 #ifdef HAVE_XF86VIDMODE
-  /* XF86VidMode Extension
-   * In case a fullscreen request is received or if already in fullscreen, the
-   * appropriate modeline will be looked up and used.
-   */
-  if (((!(vwin->fullscreen_req & WINDOWED_MODE)) || (!(vwin->fullscreen_mode & WINDOWED_MODE)))
-     && (vwin->XF86_modelines_count > 1)) {
-    int search = 0;
-
-    /* skipping first entry because it is the current modeline */
-    for (search = 1; search < vwin->XF86_modelines_count; search++) {
-       if (vwin->XF86_modelines[search]->hdisplay >= vwin->video_width)
-	 break;
-    }
-
-    /*
-     * in case we have a request for a resolution higher than any available
-     * ones we take the highest currently available.
-     */
-    if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search >= vwin->XF86_modelines_count))
-       search = 0;
-
-    /* just switching to a different modeline if necessary */
-    if (!(search >= vwin->XF86_modelines_count)) {
-       if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
-        vwin->XF86_modelines[search])) {
-	  double res_h, res_v;
-#ifdef HAVE_XINERAMA
-	  int dummy_event, dummy_error;
+  _adjust_modeline(vwin);
 #endif
 
-          vwin->gui->XF86VidMode_fullscreen = 1;
-          vwin->fullscreen_width  = vwin->XF86_modelines[search]->hdisplay;
-          vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
-
-	  /* update pixel aspect */
-          res_h = (DisplayWidth (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayWidthMM (vwin->video_display, vwin->video_screen));
-          res_v = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayHeightMM (vwin->video_display, vwin->video_screen));
-
-          vwin->pixel_aspect    = res_v / res_h;
-#ifdef HAVE_XINERAMA
-          if (XineramaQueryExtension (vwin->video_display, &dummy_event, &dummy_error)) {
-	    int count = 1;
-            XineramaScreenInfo *xsi;
-            xsi = XineramaQueryScreens (vwin->video_display, &count);
-	    if (count > 1)
-	      /* multihead -> assuming square pixels */
-              vwin->pixel_aspect = 1.0;
-            if (xsi)
-              XFree (xsi);
-	  }
-#endif
-#ifdef DEBUG
-          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
-#endif
-
-	  // TODO
-	  /*
-	   * just in case the mouse pointer is off the visible area, move it
-	   * to the middle of the video window
-	   */
-          XWarpPointer (vwin->video_display, None, vwin->video_window,
-            0, 0, 0, 0, vwin->fullscreen_width / 2, vwin->fullscreen_height / 2);
-
-          XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-
-	  /*
-	   * if this is true, we are back at the original resolution, so there
-	   * is no need to further worry about anything.
-	   */
-          if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search == 0))
-            vwin->gui->XF86VidMode_fullscreen = 0;
-       } else {
-          xine_error (vwin->gui, _("XF86VidMode Extension: modeline switching failed.\n"));
-       }
-    }
-  }
-#endif/* HAVE_XF86VIDMODE */
-
-#ifdef HAVE_XINERAMA
-  if (vwin->xinerama) {
-    int           i;
-    int           knowLocation = 0;
-    Window        root_win, dummy_win;
-    int           x_mouse,y_mouse;
-    int           dummy_x,dummy_y;
-    unsigned int  dummy_opts;
-
-    /* someday this could also use the centre of the window as the
-     * test point I guess.  Right now it's the upper-left.
-     */
-    if (vwin->video_window != None) {
-      if (vwin->xwin >= 0 && vwin->ywin >= 0 &&
-        vwin->xwin < vwin->desktopWidth && vwin->ywin < vwin->desktopHeight) {
-	knowLocation = 1;
-      }
-    }
-
-    if (vwin->fullscreen_req & FULLSCR_XI_MODE) {
-      hint.x = vwin->xinerama_fullscreen_x;
-      hint.y = vwin->xinerama_fullscreen_y;
-      hint.width  = vwin->xinerama_fullscreen_width;
-      hint.height = vwin->xinerama_fullscreen_height;
-      vwin->fullscreen_width = hint.width;
-      vwin->fullscreen_height = hint.height;
-    }
-    else {
-      /* Get mouse cursor position */
-      XQueryPointer (vwin->video_display, RootWindow (vwin->video_display, vwin->video_screen),
-		    &root_win, &dummy_win, &x_mouse, &y_mouse, &dummy_x, &dummy_y, &dummy_opts);
-
-      for (i = 0; i < vwin->xinerama_cnt; i++) {
-	if (
-	    (knowLocation == 1 &&
-             vwin->xwin >= vwin->xinerama[i].x_org &&
-             vwin->ywin >= vwin->xinerama[i].y_org &&
-             vwin->xwin < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
-             vwin->ywin < vwin->xinerama[i].y_org + vwin->xinerama[i].height) ||
-	    (knowLocation == 0 &&
-             x_mouse >= vwin->xinerama[i].x_org &&
-             y_mouse >= vwin->xinerama[i].y_org &&
-             x_mouse < vwin->xinerama[i].x_org + vwin->xinerama[i].width &&
-             y_mouse < vwin->xinerama[i].y_org + vwin->xinerama[i].height)) {
-          /*  vwin->xinerama[i].screen_number ==
-              XScreenNumberOfScreen (XDefaultScreenOfDisplay (vwin->video_display)))) {*/
-          hint.x = vwin->xinerama[i].x_org;
-          hint.y = vwin->xinerama[i].y_org;
-
-	  if(knowLocation == 0) {
-            vwin->old_xwin = hint.x;
-            vwin->old_ywin = hint.y;
-	  }
-
-          if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
-            hint.width  = vwin->xinerama[i].width;
-            hint.height = vwin->xinerama[i].height;
-            vwin->fullscreen_width = hint.width;
-            vwin->fullscreen_height = hint.height;
-	  }
-	  else {
-            hint.width  = vwin->video_width;
-            hint.height = vwin->video_height;
-	  }
-	  break;
-	}
-      }
-    }
-  }
-  else {
-    hint.x = 0;
-    hint.y = 0;
-    if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
-      hint.width  = vwin->fullscreen_width;
-      hint.height = vwin->fullscreen_height;
-    } else {
-      hint.width  = vwin->win_width;
-      hint.height = vwin->win_height;
-    }
-  }
-#else /* HAVE_XINERAMA */
   hint.x = 0;
   hint.y = 0;   /* for now -- could change later */
-#endif /* HAVE_XINERAMA */
+#ifdef HAVE_XINERAMA
+  _detect_xinerama_pos_size(vwin, &hint);
+#endif
 
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
@@ -849,8 +857,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_fullscreen);
 
 #ifndef HAVE_XINERAMA
-    hint.x      = 0;
-    hint.y      = 0;
     hint.width  = vwin->visible_width;
     hint.height = vwin->visible_height;
 #endif
@@ -872,8 +878,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XColor black, dummy;
 
 #ifndef HAVE_XINERAMA
-    hint.x           = 0;
-    hint.y           = 0;
     hint.width       = vwin->win_width;
     hint.height      = vwin->win_height;
 #endif
