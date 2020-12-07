@@ -593,6 +593,23 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   vwin->x_lock_display (vwin->video_display);
 
+  {
+    XColor      dummy, black;
+    Colormap    colormap;
+    if (vwin->separate_display) {
+      video_window_find_visual (vwin);
+      colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
+    } else {
+      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
+    }
+    XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
+    attr.background_pixel  = black.pixel;
+    attr.border_pixel      = black.pixel;
+    attr.colormap          = colormap;
+  }
+  hint.x = 0;
+  hint.y = 0;   /* for now -- could change later */
+
   if (vwin->gui->use_root_window) { /* Using root window, but not really */
 
     vwin->xwin = vwin->ywin = 0;
@@ -605,21 +622,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->video_window == None) {
       Window      wparent;
       Window      rootwindow = None;
-      XColor      dummy, black;
-      Colormap    colormap;
 
       vwin->fullscreen_mode = FULLSCR_MODE;
       vwin->visual          = vwin->gui_visual;
       vwin->depth           = vwin->gui_depth;
-
-      if (vwin->separate_display) {
-        video_window_find_visual (vwin);
-        colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
-      } else {
-        colormap = xitk_x11_get_colormap (vwin->gui->xitk);
-      }
-
-      XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
 
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->video_display,
@@ -627,7 +633,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         rootwindow = DefaultRootWindow (vwin->video_display);
 
       attr.override_redirect = True;
-      attr.background_pixel  = black.pixel;
 
       border_width = 0;
 
@@ -651,8 +656,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           ExposureMask & (~(ButtonPressMask | ButtonReleaseMask)));
 
       hint.flags  = USSize | USPosition | PPosition | PSize;
-      hint.x      = 0;
-      hint.y      = 0;
       hint.width  = vwin->fullscreen_width;
       hint.height = vwin->fullscreen_height;
       XSetNormalHints (vwin->video_display, vwin->video_window, &hint);
@@ -679,9 +682,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #ifdef HAVE_XF86VIDMODE
   _adjust_modeline(vwin);
 #endif
-
-  hint.x = 0;
-  hint.y = 0;   /* for now -- could change later */
 #ifdef HAVE_XINERAMA
   _detect_xinerama_pos_size(vwin, &hint);
 #endif
@@ -703,8 +703,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #ifdef HAVE_XINERAMA
   /* ask for xinerama fullscreen mode */
   if (vwin->xinerama && (vwin->fullscreen_req & FULLSCR_XI_MODE)) {
-    Colormap colormap;
-    XColor black, dummy;
 
     if (vwin->video_window) {
       int dummy;
@@ -735,21 +733,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->fullscreen_mode = vwin->fullscreen_req;
     vwin->visual   = vwin->gui_visual;
     vwin->depth    = vwin->gui_depth;
-    if (vwin->separate_display) {
-      video_window_find_visual (vwin);
-      colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
-    } else {
-      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
-    }
-    XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
 
     /*
      * open fullscreen window
      */
-
-    attr.background_pixel  = black.pixel;
-    attr.border_pixel      = black.pixel;
-    attr.colormap          = colormap;
 
     border_width           = 0;
     if (vwin->wid)
@@ -760,23 +747,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         hint.x, hint.y, vwin->visible_width, vwin->visible_height,
         border_width, vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-    if (vwin->gui->vo_port) {
-      vwin->x_unlock_display (vwin->video_display);
-      xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->x_lock_display (vwin->video_display);
-    }
-
-    if (vwin->xclasshint_fullscreen != NULL)
-      XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_fullscreen);
-
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
-
-    XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
-
-    XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
-
-    video_window_lock_opacity (vwin);
 
     vwin->output_width    = hint.width;
     vwin->output_height   = hint.height;
@@ -784,8 +756,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   } else
 #endif /* HAVE_XINERAMA */
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
-    Colormap colormap;
-    XColor black, dummy;
 
     if (vwin->video_window) {
       int dummy;
@@ -820,21 +790,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->visual   = vwin->gui_visual;
     vwin->depth    = vwin->gui_depth;
 
-    if (vwin->separate_display) {
-      video_window_find_visual (vwin);
-      colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
-    } else {
-      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
-    }
-    XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
-
     /*
      * open fullscreen window
      */
-
-    attr.background_pixel  = black.pixel;
-    attr.border_pixel      = black.pixel;
-    attr.colormap          = colormap;
 
     border_width           = 0;
 
@@ -847,15 +805,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         border_width, vwin->depth, InputOutput, vwin->visual,
         CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-    if (vwin->gui->vo_port) {
-      vwin->x_unlock_display (vwin->video_display);
-      xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->x_lock_display (vwin->video_display);
-    }
-
-    if (vwin->xclasshint_fullscreen != NULL)
-      XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_fullscreen);
-
 #ifndef HAVE_XINERAMA
     hint.width  = vwin->visible_width;
     hint.height = vwin->visible_height;
@@ -863,20 +812,11 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
 
-    XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
-
-    XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
-
-    video_window_lock_opacity (vwin);
-
     vwin->output_width    = hint.width;
     vwin->output_height   = hint.height;
 
   }
   else {
-    Colormap colormap;
-    XColor black, dummy;
-
 #ifndef HAVE_XINERAMA
     hint.width       = vwin->win_width;
     hint.height      = vwin->win_height;
@@ -964,17 +904,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->visual            = vwin->gui_visual;
     vwin->depth             = vwin->gui_depth;
 
-    if (vwin->separate_display) {
-      video_window_find_visual (vwin);
-      colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
-    } else {
-      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
-    }
-    XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
-    attr.background_pixel  = black.pixel;
-    attr.border_pixel      = black.pixel;
-    attr.colormap          = colormap;
-
     if (vwin->borderless)
       border_width = 0;
     else
@@ -987,29 +916,32 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         DefaultRootWindow (vwin->video_display),
         hint.x, hint.y, hint.width, hint.height, border_width,
         vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
+  }
 
-    if (vwin->gui->vo_port) {
-      vwin->x_unlock_display (vwin->video_display);
-      xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-      vwin->x_lock_display (vwin->video_display);
-    }
+  if (vwin->gui->vo_port) {
+    vwin->x_unlock_display (vwin->video_display);
+    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
+    vwin->x_lock_display (vwin->video_display);
+  }
 
+  if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
+    if (vwin->xclasshint_fullscreen != NULL)
+      XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_fullscreen);
+  } else {
     if (vwin->borderless) {
       if (vwin->xclasshint_borderless != NULL)
         XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_borderless);
     }
     else {
-
       if (vwin->xclasshint != NULL)
         XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint);
     }
-
-    XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
-
-    XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
-
-    video_window_lock_opacity (vwin);
   }
+
+  XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
+  XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
+
+  video_window_lock_opacity (vwin);
 
   if (!(vwin->fullscreen_req & WINDOWED_MODE) || vwin->borderless) {
     /*
