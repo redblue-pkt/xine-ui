@@ -423,7 +423,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   XSizeHints            hint;
   XWMHints             *wm_hint;
   XSetWindowAttributes  attr;
-  Atom                  wm_delete_window;
   Window                old_video_window = None;
   int                   border_width;
 
@@ -1038,9 +1037,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XSetWMHints (vwin->video_display, vwin->video_window, wm_hint);
     XFree(wm_hint);
   }
-
-  wm_delete_window = XInternAtom (vwin->video_display, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (vwin->video_display, vwin->video_window, &wm_delete_window, 1);
 
   if (vwin->hide_on_start == 1) {
     vwin->hide_on_start = -1;
