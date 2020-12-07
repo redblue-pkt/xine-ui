@@ -604,13 +604,26 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
  */
 static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if ((wp->have_focus = focus) == FOCUS_LOST)
-      wp->text.cursor_pos = -1;
-
-    if ((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
-      _cursor_focus (wp, 0);
-    else if (wp->w.enable && (focus == FOCUS_MOUSE_IN))
-      _cursor_focus (wp, 1);
+    if (wp->have_focus == focus)
+      return 1;
+    wp->have_focus = focus;
+    switch (focus) {
+      case FOCUS_LOST:
+        wp->text.cursor_pos = -1;
+        /* fall through */
+      case FOCUS_MOUSE_OUT:
+        _cursor_focus (wp, 0);
+        break;
+      case FOCUS_MOUSE_IN:
+        if (wp->w.enable)
+          _cursor_focus (wp, 1);
+        break;
+      case FOCUS_RECEIVED:
+        if (wp->w.enable)
+          wp->text.cursor_pos = 0;
+        break;
+      default: ;
+    }
   }
   return 1;
 }
