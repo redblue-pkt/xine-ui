@@ -544,11 +544,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
-    gui_toggle_visibility (NULL, gui);
+    gui_toggle_visibility (gui);
     break;
 
   case ACTID_TOGGLE_WINOUT_BORDER:
-    gui_toggle_border (NULL, gui);
+    gui_toggle_border (gui);
     break;
 
   case ACTID_AUDIOCHAN_NEXT:

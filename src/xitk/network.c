@@ -2373,7 +2373,7 @@ static void do_gui(const commands_t *cmd, client_info_t *client_info) {
 	}
       }
       else if(is_arg_contain(client_info, 1, "output")) {
-        gui_toggle_visibility (NULL, gui);
+        gui_toggle_visibility (gui);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "panel")) {
