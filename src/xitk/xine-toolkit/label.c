@@ -320,7 +320,7 @@ static void *xitk_label_animation_loop (void *data) {
   while (1) {
     unsigned long t_anim;
 
-    if (!wp->w.running || (wp->anim_running != 1))
+    if (wp->anim_running != 1)
       break;
     if ((wp->w.visible == 1) && wp->pix_font) {
       widget_event_t event;

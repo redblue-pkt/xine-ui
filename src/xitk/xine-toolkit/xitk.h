@@ -738,23 +738,6 @@ void xitk_destroy_widget(xitk_widget_t *w);
 void xitk_destroy_widgets(xitk_widget_list_t *wl);
 
 /**
- *
- */
-void xitk_stop_widget(xitk_widget_t *w);
-
-/**
- * Stop each (if widget handle it) widgets of widget list.
- */
-#ifdef YET_UNUSED
-void xitk_stop_widgets(xitk_widget_list_t *wl);
-#endif
-
-/**
- * Start widget.
- */
-void xitk_start_widget(xitk_widget_t *w);
-
-/**
  * Set widgets of widget list visible.
  */
 void xitk_show_widgets(xitk_widget_list_t *);

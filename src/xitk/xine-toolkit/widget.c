@@ -1225,8 +1225,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 
       xitk_tips_hide_tips(wl->xitk->tips);
 
-      if((w->type & WIDGET_CLICKABLE) &&
-	 w->enable == WIDGET_ENABLE && w->running) {
+      if ((w->type & WIDGET_CLICKABLE) && (w->enable == WIDGET_ENABLE)) {
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = x;
 	event.y              = y;
@@ -1242,8 +1241,8 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   else {
 
     if(wl->widget_pressed) {
-      if((wl->widget_pressed->type & WIDGET_CLICKABLE) &&
-	 (wl->widget_pressed->enable == WIDGET_ENABLE) && wl->widget_pressed->running) {
+      if ((wl->widget_pressed->type & WIDGET_CLICKABLE) &&
+        (wl->widget_pressed->enable == WIDGET_ENABLE)) {
 	event.type           = WIDGET_EVENT_CLICK;
 	event.x              = x;
 	event.y              = y;
@@ -1366,22 +1365,6 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
     (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
   }
 
-  if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
-    if ((wl->widget_focused->type & WIDGET_CLICKABLE) &&
-        (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
-      widget_event_result_t  result;
-      event.type           = WIDGET_EVENT_CLICK;
-      event.x              = wl->widget_focused->x + 1;
-      event.y              = wl->widget_focused->y + 1;
-      event.button_pressed = LBUTTON_DOWN;
-      event.button         = 0;
-      event.modifier       = modifier;
-      (void)wl->widget_focused->event (wl->widget_focused, &event, &result);
-      event.type = WIDGET_EVENT_PAINT;
-        (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
-    }
-  }
-
 #if 0
     /* next widget will be focused */
     if((widget == wl->widget_focused) ||
@@ -1469,26 +1452,6 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-    }
-
-    if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
-
-      if((wl->widget_focused->type & WIDGET_CLICKABLE) &&
-	 (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
-	widget_event_result_t  result;
-
-	event.type           = WIDGET_EVENT_CLICK;
-	event.x              = wl->widget_focused->x + 1;
-	event.y              = wl->widget_focused->y + 1;
-	event.button_pressed = LBUTTON_DOWN;
-	event.button         = 0;
-        event.modifier       = 0;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, &result);
-
-	event.type = WIDGET_EVENT_PAINT;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-      }
-
     }
   }
   else
@@ -1671,12 +1634,6 @@ static int xitk_widget_able (xitk_widget_t *w, int enable) {
   return res;
 }
 
-static void xitk_widget_run (xitk_widget_t *w, int start) {
-  w->running = start;
-  w->state.running = start;
-}
-
-
 /*
  * Enable a widget.
  */
@@ -1711,7 +1668,6 @@ void xitk_destroy_widget(xitk_widget_t *w) {
 
   xitk_clipboard_unregister_widget (w);
   paint = xitk_widget_show_hide (w, 0);
-  xitk_widget_run (w, 0);
   paint |= xitk_widget_able (w, 0);
   if (paint)
     xitk_widget_paint (w);
@@ -1855,28 +1811,6 @@ void xitk_free_color_name(xitk_color_names_t *color) {
   }
 
   XITK_FREE(color);
-}
-
-/*
- * Stop a widget.
- */
-void xitk_stop_widget(xitk_widget_t *w) {
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return;
-  }
-  xitk_widget_run (w, 0);
-}
-
-/*
- * (Re)Start a widget.
- */
-void xitk_start_widget(xitk_widget_t *w) {
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return;
-  }
-  xitk_widget_run (w, 1);
 }
 
 /*
@@ -2255,7 +2189,7 @@ xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size) {
   w->x = w->y = w->width = w->height = 0;
 
   w->type = 0;
-  w->enable = w->running = w->visible = 1;
+  w->enable = w->visible = 1;
   w->have_focus = FOCUS_LOST;
 
   w->event = NULL;
@@ -2265,7 +2199,7 @@ xitk_widget_t *xitk_widget_new (xitk_widget_list_t *wl, size_t size) {
 
   w->private_data = size > sizeof (*w) ? w : NULL;
 
-  w->state.enable = w->state.visible = w->running = 0x7fffffff;
+  w->state.enable = w->state.visible = 0x7fffffff;
 
   return w;
 };
@@ -2282,4 +2216,3 @@ void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redi
   xitk_widget_rel_join (&w->focus_redirect,
     focus_redirect && (focus_redirect->wl == w->wl) ? &focus_redirect->focus_redirect : NULL);
 }
-

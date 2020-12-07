@@ -100,7 +100,6 @@ struct xitk_widget_s {
 
   uint32_t               type;
   int                    enable;
-  int                    running;
   int                    visible;
   widget_focus_t         have_focus;
 
@@ -114,7 +113,6 @@ struct xitk_widget_s {
   struct {
     int                  enable;
     int                  visible;
-    int                  running;
   }                      state;
 };
 
