@@ -74,6 +74,8 @@ struct _menu_node_s {
 
 struct _menu_private_s {
   xitk_widget_t        w;
+  xitk_t              *xitk;
+  xitk_register_key_t  parent, before_cb, after_cb;
   _menu_node_t         root;
   int                  x, y, num_open;
   _menu_window_t       open_windows[_MENU_MAX_OPEN];
@@ -218,7 +220,7 @@ static void _menu_close_1 (_menu_private_t *wp) {
   if ((wp->num_open > 0) && (xitk_window_flags (mw[-1].xwin, 0, 0) & XITK_WINF_VISIBLE))
     xitk_window_try_to_set_input_focus (mw[-1].xwin);
   /* now, close the window. */
-  xitk_unregister_event_handler (mw->wp->w.wl->xitk, &mw->key);
+  xitk_unregister_event_handler (mw->wp->xitk, &mw->key);
   xitk_image_free_image (&mw->bevel_plain);
   xitk_image_free_image (&mw->bevel_arrow);
   xitk_image_free_image (&mw->bevel_unchecked);
@@ -261,10 +263,12 @@ static int _menu_show_subs (_menu_private_t *wp, _menu_node_t *node) {
 static void _menu_exit (_menu_private_t *wp) {
   /* 핵: this runs inside xitk_destroy_widget ().
    * dont destroy again through xitk_set_current_menu (NULL). */
-  if (wp->w.wl)
-    xitk_unset_current_menu (wp->w.wl->xitk);
+  xitk_unset_current_menu (wp->xitk);
   _menu_close_subs_in (wp, NULL);
   _menu_tree_free (&wp->root);
+  /* revert focus if not a new window. */
+  if (wp->before_cb == wp->after_cb)
+    xitk_set_focus_key (wp->xitk, wp->parent, 1);
 }
 
 static void _menu_open (_menu_node_t *branch, int x, int y);
@@ -302,10 +306,15 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
     /* 핵: detach from parent window. it may go away in user callback,
      * eg when switching fullscreen mode. */
     xitk_dnode_remove (&wp->w.node);
-    xitk_unset_current_menu (wp->w.wl->xitk);
+    xitk_unset_current_menu (wp->xitk);
     wp->w.wl = NULL;
-    if (me->menu_entry.cb)
+    if (me->menu_entry.cb) {
+      /* if user callback did open a new window, let it keep its focus in
+       * xitk_destroy_widget () -> _menu_exit (). */
+      wp->before_cb = xitk_get_focus_key (wp->xitk);
       me->menu_entry.cb (&wp->w, &me->menu_entry, me->menu_entry.user_data);
+      wp->after_cb = xitk_get_focus_key (wp->xitk);
+    }
     xitk_destroy_widget (&wp->w);
   }
 }
@@ -355,14 +364,14 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   rentries = bentries - bsep;
 
   if (maxnode->type & _MENU_NODE_TITLE)
-    fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
+    fs = xitk_font_load_font (wp->xitk, DEFAULT_BOLD_FONT_14);
   else
-    fs = xitk_font_load_font (wp->w.wl->xitk, DEFAULT_BOLD_FONT_12);
+    fs = xitk_font_load_font (wp->xitk, DEFAULT_BOLD_FONT_12);
   maxlen = xitk_font_get_string_length (fs, maxnode->menu_entry.menu);
   xitk_font_unload_font(fs);
 
   shortcutlen = 0;
-  if (xitk_get_cfg_num (wp->w.wl->xitk, XITK_MENU_SHORTCUTS_ENABLE) && (node->type & (_MENU_NODE_SHORTCUT << _MENU_NODE_HAS))) {
+  if (xitk_get_cfg_num (wp->xitk, XITK_MENU_SHORTCUTS_ENABLE) && (node->type & (_MENU_NODE_SHORTCUT << _MENU_NODE_HAS))) {
     xitk_font_t *short_font;
     _menu_node_t *smaxnode;
     for (smaxnode = me = (_menu_node_t *)node->branches.head.next; me->node.next; me = (_menu_node_t *)me->node.next) {
@@ -375,7 +384,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
         }
       }
     }
-    short_font = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_FONT_12);
+    short_font = xitk_font_load_font(wp->xitk, DEFAULT_FONT_12);
     shortcutlen = xitk_font_get_string_length (short_font, smaxnode->menu_entry.shortcut);
     xitk_font_unload_font(short_font);
     maxlen += shortcutlen + 15;
@@ -389,7 +398,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
   shortcutpos = (wwidth - shortcutlen) - 15;
 
-  xitk_get_display_size (wp->w.wl->xitk, &swidth, &sheight);
+  xitk_get_display_size (wp->xitk, &swidth, &sheight);
 
   if (node->parent) {
     x -= 4; /* Overlap parent menu but leave text and symbols visible */
@@ -423,7 +432,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
     }
   }
 
-  xwin = xitk_window_create_simple_window_ext(wp->w.wl->xitk,
+  xwin = xitk_window_create_simple_window_ext(wp->xitk,
                                               x, y, wwidth + 2, wheight + 2,
                                               NULL, NULL, NULL, 1, 1, NULL);
 
@@ -445,13 +454,13 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   mw->bevel_checked = NULL;
 
   if (node->type & (_MENU_NODE_PLAIN << _MENU_NODE_HAS)) {
-    mw->bevel_plain = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
+    mw->bevel_plain = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_plain)
       xitk_image_draw_flat_three_state (mw->bevel_plain);
   }
 
   if (node->type & (_MENU_NODE_BRANCH << _MENU_NODE_HAS)) {
-    mw->bevel_arrow = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
+    mw->bevel_arrow = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_arrow) {
       xitk_image_draw_flat_three_state (mw->bevel_arrow);
       xitk_image_draw_menu_arrow_branch (mw->bevel_arrow);
@@ -459,7 +468,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   }
 
   if (node->type & (_MENU_NODE_CHECK << _MENU_NODE_HAS)) {
-    mw->bevel_unchecked = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
+    mw->bevel_unchecked = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_unchecked) {
       xitk_image_draw_flat_three_state (mw->bevel_unchecked);
       xitk_image_draw_menu_check (mw->bevel_unchecked, 0);
@@ -467,7 +476,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   }
 
   if (node->type & (_MENU_NODE_CHECKED << _MENU_NODE_HAS)) {
-    mw->bevel_checked = xitk_image_new (wp->w.wl->xitk, NULL, 0, wwidth * 3, 20);
+    mw->bevel_checked = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
     if (mw->bevel_checked) {
       xitk_image_draw_flat_three_state (mw->bevel_checked);
       xitk_image_draw_menu_check (mw->bevel_checked, 1);
@@ -500,12 +509,12 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 	int           lbear, rbear, width, asc, des;
 	unsigned int  cfg, cbg;
 
-        fs = xitk_font_load_font(wp->w.wl->xitk, DEFAULT_BOLD_FONT_14);
+        fs = xitk_font_load_font(wp->xitk, DEFAULT_BOLD_FONT_14);
 
 	xitk_font_string_extent (fs, me->menu_entry.menu, &lbear, &rbear, &width, &asc, &des);
 
-        cbg = xitk_color_db_get (wp->w.wl->xitk, (140 << 16) + (140 << 8) + 140);
-        cfg = xitk_color_db_get (wp->w.wl->xitk, (255 << 16) + (255 << 8) + 255);
+        cbg = xitk_color_db_get (wp->xitk, (140 << 16) + (140 << 8) + 140);
+        cfg = xitk_color_db_get (wp->xitk, (255 << 16) + (255 << 8) + 255);
 
         xitk_image_fill_rectangle (bg, 1, 1, wwidth, 20, cbg);
 
@@ -549,7 +558,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
       btn->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_MENU;
       me->button = btn;
 
-      if (xitk_get_cfg_num (wp->w.wl->xitk, XITK_MENU_SHORTCUTS_ENABLE) && me->menu_entry.shortcut)
+      if (xitk_get_cfg_num (wp->xitk, XITK_MENU_SHORTCUTS_ENABLE) && me->menu_entry.shortcut)
 	xitk_labelbutton_change_shortcut_label (btn, me->menu_entry.shortcut, shortcutpos, DEFAULT_FONT_12);
 
       xitk_labelbutton_set_label_offset(btn, 20);
@@ -564,7 +573,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   }
 
   /* set up wndow type before showing it to minimize window manager action. */
-  if (!(xitk_get_wm_type (wp->w.wl->xitk) & WM_TYPE_KWIN))
+  if (!(xitk_get_wm_type (wp->xitk) & WM_TYPE_KWIN))
     /* WINDOW_TYPE_MENU seems to be the natural choice. */
     xitk_window_set_wm_window_type (xwin, WINDOW_TYPE_MENU);
   else
@@ -608,7 +617,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 #endif
 #endif
 
-static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int menu_notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _menu_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -714,9 +723,10 @@ void xitk_menu_show_menu (xitk_widget_t *w) {
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MENU)
     return;
 
+  wp->parent = xitk_get_focus_key (wp->xitk);
   wp->w.visible = 1;
   _menu_open (&wp->root, wp->x, wp->y);
-  xitk_set_current_menu (wp->w.wl->xitk, &wp->w);
+  xitk_set_current_menu (wp->xitk, &wp->w);
 }
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
@@ -730,6 +740,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   if (!wp)
     return NULL;
 
+  wp->xitk           = wl->xitk;
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_MENU | WIDGET_FOCUSABLE;
 
   wp->x              = x;
@@ -745,6 +756,9 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   wp->root.menu_window = NULL;
   wp->root.wp          = wp;
   wp->root.button      = NULL;
+  wp->before_cb        =
+  wp->after_cb         =
+  wp->parent           = 0;
 
   if (!m->menu_tree) {
     printf ("Empty menu entries. You will not .\n");
@@ -758,7 +772,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   }
 
   wp->w.visible       = 0;
-  wp->w.event         = notify_event;
+  wp->w.event         = menu_notify_event;
 
   return &wp->w;
 }

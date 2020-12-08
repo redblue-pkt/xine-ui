@@ -272,6 +272,7 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
   /* will be set by xitk_window_update_tree (). */
   xwin->type            = WINDOW_TYPE_END;
   xwin->role            = XITK_WR_HELPER;
+  xwin->key             = 0;
 
   {
     xitk_tagitem_t tags[] = {
@@ -564,6 +565,8 @@ uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value) 
   if (!xwin->bewin)
     return 0;
 
+  if ((mask & value & XITK_WINF_FOCUS) && xwin->xitk)
+    xitk_set_focus_key (xwin->xitk, xwin->key, 0);
   tags[0].value = (mask << 16) | (value & 0xffff);
   if ((mask & (XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED)) && (xwin->role != XITK_WR_SUBMENU)) {
     xitk_window_update_tree (xwin, tags[0].value);
