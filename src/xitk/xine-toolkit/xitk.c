@@ -237,6 +237,8 @@ struct __xitk_s {
   xitk_signal_callback_t      sig_callback;
   void                       *sig_data;
 
+  xitk_register_key_t         focused;
+
   xitk_widget_t              *menu;
 
   struct timeval              keypress;
@@ -1081,6 +1083,7 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
       {XITK_TAG_Y, 0},
       {XITK_TAG_WIDTH, 0},
       {XITK_TAG_HEIGHT, 0},
+      {XITK_TAG_WIN_FLAGS, 0},
       {XITK_TAG_END, 0}
     };
     xitk_tagitem_t tags2[] = {
@@ -1092,6 +1095,7 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
     fx->new_pos.y = tags1[1].value;
     fx->wl.xwin->width = fx->width = tags1[2].value;
     fx->wl.xwin->height = fx->height = tags1[3].value;
+    fx->wl.xwin->flags = tags1[4].value;
     fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags2);
   }
 
@@ -1102,8 +1106,11 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
   fx->destr_data = destr_data;
 
   MUTLOCK ();
-  fx->key = ++xitk->key;
+  xwin->key = fx->key = ++xitk->key;
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
+  /* set new focus early, to hint menu not to revert it. */
+  if (fx->wl.xwin->flags & XITK_WINF_FOCUS)
+    xitk->focused = fx->key;
   MUTUNLOCK ();
 
   if (xitk->verbosity >= 2)
@@ -1257,6 +1264,52 @@ xitk_window_t *xitk_get_window (xitk_t *_xitk, xitk_register_key_t key) {
     MUTUNLOCK ();
   }
   return w;
+}
+
+xitk_register_key_t xitk_get_focus_key (xitk_t *_xitk) {
+  __xitk_t *xitk;
+  xitk_register_key_t key;
+
+  xitk_container (xitk, _xitk, x);
+  if (!xitk)
+    return 0;
+
+  MUTLOCK ();
+  key = xitk->focused;
+  MUTUNLOCK ();
+  return key;
+}
+
+xitk_register_key_t xitk_set_focus_key (xitk_t *_xitk, xitk_register_key_t key, int focus) {
+  __xitk_t *xitk;
+  __gfx_t  *fx;
+  xitk_register_key_t prev_key;
+
+  xitk_container (xitk, _xitk, x);
+  if (!xitk)
+    return 0;
+
+  MUTLOCK ();
+  prev_key = xitk->focused;
+  if (focus) {
+    for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
+      if (fx->key == key)
+        break;
+    }
+    if (fx->wl.node.next && fx->wl.xwin && fx->wl.xwin->bewin) {
+      xitk_tagitem_t tags[] = {
+        {XITK_TAG_WIN_FLAGS, (XITK_WINF_FOCUS << 16) + XITK_WINF_FOCUS},
+        {XITK_TAG_END, 0}
+      };
+      fx->wl.xwin->bewin->set_props (fx->wl.xwin->bewin, tags);
+      fx->wl.xwin->bewin->get_props (fx->wl.xwin->bewin, tags);
+      fx->wl.xwin->flags = tags[0].value;
+    }
+  } else {
+    xitk->focused = key;
+  }
+  MUTUNLOCK ();
+  return prev_key;
 }
 
 /*
@@ -1441,7 +1494,19 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
       break;
 
     case XITK_EV_FOCUS:
+      if (fx) {
+        xitk->focused = fx->key;
+        if (xitk->verbosity >= 2)
+          printf ("xitk.window.focus.received (%s).\n", fx->name);
+      }
+      goto _get_flags;
     case XITK_EV_UNFOCUS:
+      if (fx && (fx->key == xitk->focused)) {
+        xitk->focused = 0;
+        if (xitk->verbosity >= 2)
+          printf ("xitk.window.focus.lost (%s).\n", fx->name);
+      }
+    _get_flags:
       if (xwin && xwin->bewin) {
         xitk_tagitem_t tags[] = {{XITK_TAG_WIN_FLAGS, 0}, {XITK_TAG_END, 0}};
         xwin->bewin->get_props (xwin->bewin, tags);
@@ -1658,6 +1723,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->verbosity       = verbosity;
   xitk_dlist_init (&xitk->gfxs);
   xitk->key             = 0;
+  xitk->focused         = 0;
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
