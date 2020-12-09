@@ -485,7 +485,7 @@ void skin_download (gGui_t *gui, char *url) {
   if (gui->skdloader) {
     xitk_window_t *win = gui->skdloader->xwin;
     xitk_window_raise_window(win);
-    xitk_window_try_to_set_input_focus(win);
+    xitk_window_set_input_focus (win);
     return;
   }
 
@@ -602,7 +602,7 @@ void skin_download (gGui_t *gui, char *url) {
     video_window_set_transient_for (gui->vwin, skd->xwin);
     layer_above_video (skd->gui, skd->xwin);
 
-    xitk_window_try_to_set_input_focus(skd->xwin);
+    xitk_window_set_input_focus (skd->xwin);
     download_update_blank_preview(skd);
 
     gui->skdloader = skd;

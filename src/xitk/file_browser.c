@@ -382,7 +382,7 @@ static void fb_create_input_window(char *title, char *text,
   video_window_set_transient_for (fb->gui->vwin, fne->xwin);
   layer_above_video (fb->gui, fne->xwin);
 
-  xitk_window_try_to_set_input_focus(fne->xwin);
+  xitk_window_set_input_focus (fne->xwin);
 }
 /*
  * ************************** END OF filename editor **************************
@@ -1553,7 +1553,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb_getdir(fb);
 
   layer_above_video (fb->gui, fb->xwin);
-  xitk_window_try_to_set_input_focus(fb->xwin);
+  xitk_window_set_input_focus (fb->xwin);
 
   return fb;
 }

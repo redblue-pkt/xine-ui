@@ -1043,7 +1043,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
   setup->visible = 1;
   setup_raise_window (setup);
 
-  xitk_window_try_to_set_input_focus(setup->xwin);
+  xitk_window_set_input_focus (setup->xwin);
 
   setup->gui->setup = setup;
   return setup;

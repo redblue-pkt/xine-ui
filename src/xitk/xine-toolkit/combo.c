@@ -411,7 +411,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
       xitk_window_raise_window (wp->xwin);
 
-      xitk_window_try_to_set_input_focus(wp->xwin);
+      xitk_window_set_input_focus (wp->xwin);
 
       /* No widget focused, give focus to the first one */
       if (wp->widget_list->widget_focused == NULL)

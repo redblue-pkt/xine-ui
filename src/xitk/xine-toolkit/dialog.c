@@ -311,7 +311,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
   }
   if (layer_above)
     xitk_window_set_window_layer (wd->xwin, layer_above);
-  xitk_window_try_to_set_input_focus (wd->xwin);
+  xitk_window_set_input_focus (wd->xwin);
 
   wd->key = xitk_be_register_event_handler ("xitk_dialog_3", wd->xwin, NULL, dialog_event, wd, _xitk_window_dialog_3_destr, wd);
   xitk_widget_list_defferred_destroy (widget_list);

@@ -482,5 +482,5 @@ void tvset_panel(void) {
   tvset.running = 1;
   tvset_raise_window();
 
-  xitk_window_try_to_set_input_focus(tvset.xwin);
+  xitk_window_set_input_focus (tvset.xwin);
 }

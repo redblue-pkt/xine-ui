@@ -442,7 +442,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   vctrl->status = 3;
   control_raise_window (vctrl);
 
-  xitk_window_try_to_set_input_focus(vctrl->xwin);
+  xitk_window_set_input_focus (vctrl->xwin);
   return 1;
 }
 

@@ -415,5 +415,5 @@ void event_sender_panel (gGui_t *gui) {
 
   es->visible = 1;
   _event_sender_raise_window (es->gui);
-  xitk_window_try_to_set_input_focus (es->xwin);
+  xitk_window_set_input_focus (es->xwin);
 }

@@ -427,7 +427,7 @@ void viewlog_panel (gGui_t *gui) {
 
   vl->visible = 1;
   viewlog_raise_window (vl);
-  xitk_window_try_to_set_input_focus (vl->xwin);
+  xitk_window_set_input_focus (vl->xwin);
 
   vl->gui->viewlog = vl;
 }
