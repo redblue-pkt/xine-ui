@@ -415,7 +415,7 @@ void help_panel (gGui_t *gui) {
   help->visible = 1;
   help_raise_window (help);
 
-  xitk_window_try_to_set_input_focus (help->xwin);
+  xitk_window_set_input_focus (help->xwin);
   help->gui->help = help;
 }
 

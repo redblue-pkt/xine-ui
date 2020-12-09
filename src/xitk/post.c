@@ -1308,7 +1308,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
   raise_window (info->gui, info->win->helpwin, 1, info->win->help_running);
 
-  xitk_window_try_to_set_input_focus(info->win->helpwin);
+  xitk_window_set_input_focus (info->win->helpwin);
 }
 
 static void _pplugin_retrieve_parameters(post_info_t *info, post_object_t *pobj) {
@@ -1905,7 +1905,7 @@ void pplugin_panel (post_info_t *info) {
 
   pplugin_raise_window(info);
 
-  xitk_window_try_to_set_input_focus(info->win->xwin);
+  xitk_window_set_input_focus (info->win->xwin);
 }
 
 void pplugin_parse_and_store_post (post_info_t *info, const char *post_chain) {

@@ -1007,7 +1007,7 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state, int qual) {
   set_window_states_start (kbe->gui, kbe->kbr.xwin);
   xitk_window_flags (kbe->kbr.xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (kbe->kbr.xwin);
-  xitk_window_try_to_set_input_focus (kbe->kbr.xwin);
+  xitk_window_set_input_focus (kbe->kbr.xwin);
   kbe->kbr.key = xitk_be_register_event_handler ("keybinding recorder", kbe->kbr.xwin, NULL, kbr_event, kbe, kbr_delete, kbe);
 }
 
@@ -1381,6 +1381,6 @@ void kbedit_window (gGui_t *gui) {
   kbedit->visible      = 1;
   kbedit_raise_window (kbedit);
 
-  xitk_window_try_to_set_input_focus (kbedit->xwin);
+  xitk_window_set_input_focus (kbedit->xwin);
 }
 

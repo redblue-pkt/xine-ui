@@ -3255,5 +3255,5 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
 
   _mmkedit_set_mmk (mmkedit, mmk);
   raise_window (mmkedit->gui, mmkedit->xwin, 1, 1);
-  xitk_window_try_to_set_input_focus (mmkedit->xwin);
+  xitk_window_set_input_focus (mmkedit->xwin);
 }

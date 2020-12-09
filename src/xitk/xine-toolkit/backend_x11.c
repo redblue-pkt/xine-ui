@@ -74,13 +74,24 @@ struct xitk_x11_backend_s {
 
 typedef enum {
   XITK_A_UTF8 = 0,
-  XITK_A_WIN_LAYER,
+  XITK_A__WIN_LAYER,
+  XITK_A_WM_NORMAL_HINTS,
   XITK_A__MOTIF_WM_HINTS,
+  XITK_A_WM_ICON_NAME,
+  XITK_A_WM_LOCALE_NAME,
+  XITK_A_WM_CLIENT_MACHINE,
+  XITK_A_WM_CLASS,
+  XITK_A_WM_HINTS,
+  XITK_A_WM_TRANSIENT_FOR,
   XITK_A_WM_CHANGE_STATE,
   XITK_A_WM_STATE,
   XITK_A_WM_NAME,
   XITK_A_WM_DELETE_WINDOW,
   XITK_A_WM_PROTOCOLS,
+  XITK_A__NET_WM_DESKTOP,
+  XITK_A__NET_WM_ALLOWED_ACTIONS,
+  XITK_A__NET_WM_ICON_GEOMETRY,
+  XITK_A__KDE_NET_WM_USER_CREATION_TIME,
   XITK_A__NET_WM_NAME,
   XITK_A__NET_WM_WINDOW_TYPE,
   XITK_A__NET_WM_WINDOW_TYPE_DESKTOP,
@@ -107,6 +118,56 @@ typedef enum {
   XITK_A__NET_WM_STATE_DEMANDS_ATTENTION,
   XITK_A_LAST
 } xitk_x11_atoms_t;
+
+static const char * const _xitk_x11_atom_names[XITK_A_LAST] = {
+  [XITK_A_UTF8]             = "UTF8_STRING",
+  [XITK_A__WIN_LAYER]       = "_WIN_LAYER",
+  [XITK_A_WM_NORMAL_HINTS]  = "WM_NORMAL_HINTS",
+  [XITK_A__MOTIF_WM_HINTS]  = "_MOTIF_WM_HINTS",
+  [XITK_A_WM_ICON_NAME]     = "WM_ICON_NAME",
+  [XITK_A_WM_LOCALE_NAME]   = "WM_LOCALE_NAME",
+  [XITK_A_WM_CLIENT_MACHINE]= "WM_CLIENT_MACHINE",
+  [XITK_A_WM_CLASS]         = "WM_CLASS",
+  [XITK_A_WM_HINTS]         = "WM_HINTS",
+  [XITK_A_WM_TRANSIENT_FOR] = "WM_TRANSIENT_FOR",
+  [XITK_A_WM_CHANGE_STATE]  = "WM_CHANGE_STATE",
+  [XITK_A_WM_STATE]         = "WM_STATE",
+  [XITK_A_WM_NAME]          = "WM_NAME",
+  [XITK_A_WM_DELETE_WINDOW] = "WM_DELETE_WINDOW",
+  [XITK_A_WM_PROTOCOLS]     = "WM_PROTOCOLS",
+
+  [XITK_A__NET_WM_NAME]     = "_NET_WM_NAME",
+  [XITK_A__NET_WM_DESKTOP]  = "_NET_WM_DESKTOP",
+  [XITK_A__NET_WM_ICON_GEOMETRY] = "_NET_WM_ICON_GEOMETRY",
+  [XITK_A__NET_WM_ALLOWED_ACTIONS] = "_NET_WM_ALLOWED_ACTIONS",
+
+  [XITK_A__KDE_NET_WM_USER_CREATION_TIME] = "_KDE_NET_WM_USER_CREATION_TIME",
+
+  [XITK_A__NET_WM_WINDOW_TYPE]         = "_NET_WM_WINDOW_TYPE",
+  [XITK_A__NET_WM_WINDOW_TYPE_DESKTOP] = "_NET_WM_WINDOW_TYPE_DESKTOP",
+  [XITK_A__NET_WM_WINDOW_TYPE_DOCK]    = "_NET_WM_WINDOW_TYPE_DOCK",
+  [XITK_A__NET_WM_WINDOW_TYPE_TOOLBAR] = "_NET_WM_WINDOW_TYPE_TOOLBAR",
+  [XITK_A__NET_WM_WINDOW_TYPE_MENU]    = "_NET_WM_WINDOW_TYPE_MENU",
+  [XITK_A__NET_WM_WINDOW_TYPE_UTILITY] = "_NET_WM_WINDOW_TYPE_UTILITY",
+  [XITK_A__NET_WM_WINDOW_TYPE_SPLASH]  = "_NET_WM_WINDOW_TYPE_SPLASH",
+  [XITK_A__NET_WM_WINDOW_TYPE_DIALOG]  = "_NET_WM_WINDOW_TYPE_DIALOG",
+  [XITK_A__NET_WM_WINDOW_TYPE_NORMAL]  = "_NET_WM_WINDOW_TYPE_NORMAL",
+
+  [XITK_A__NET_WM_STATE]               = "_NET_WM_STATE",
+  [XITK_A__NET_WM_STATE_MODAL]         = "_NET_WM_STATE_MODAL",
+  [XITK_A__NET_WM_STATE_STICKY]        = "_NET_WM_STATE_STICKY",
+  [XITK_A__NET_WM_STATE_MAXIMIZED_VERT]= "_NET_WM_STATE_MAXIMIZED_VERT",
+  [XITK_A__NET_WM_STATE_MAXIMIZED_HORZ]= "_NET_WM_STATE_MAXIMIZED_HORZ",
+  [XITK_A__NET_WM_STATE_SHADED]        = "_NET_WM_STATE_SHADED",
+  [XITK_A__NET_WM_STATE_SKIP_TASKBAR]  = "_NET_WM_STATE_SKIP_TASKBAR",
+  [XITK_A__NET_WM_STATE_SKIP_PAGER]    = "_NET_WM_STATE_SKIP_PAGER",
+  [XITK_A__NET_WM_STATE_HIDDEN]        = "_NET_WM_STATE_HIDDEN",
+  [XITK_A__NET_WM_STATE_FULLSCREEN]    = "_NET_WM_STATE_FULLSCREEN",
+  [XITK_A__NET_WM_STATE_ABOVE]         = "_NET_WM_STATE_ABOVE",
+  [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
+  [XITK_A__NET_WM_STATE_STAYS_ON_TOP]  = "_NET_WM_STATE_STAYS_ON_TOP",
+  [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION",
+};
 
 typedef enum {
   XITK_A_null = 0,
@@ -267,6 +328,35 @@ struct xitk_x11_display_s {
 
   char utf8[2048], name[256];
 };
+
+static int _xitk_x11_get_atom_name (xitk_x11_display_t *d, char *buf, size_t bsize, Atom atom) {
+  char *r;
+  uint32_t u;
+
+  if (!d || !buf || !bsize)
+    return 0;
+  buf[0] = 0;
+
+  for (u = 0; u < XITK_A_LAST; u++) {
+    if (d->atoms[u] == atom)
+      break;
+  }
+  if (u < XITK_A_LAST) {
+    strlcpy (buf, _xitk_x11_atom_names[u], bsize);
+    return 1;
+  }
+
+  d->d.lock (&d->d);
+  r = XGetAtomName (d->display, atom);
+  d->d.unlock (&d->d);
+  if (!r) {
+    snprintf (buf, bsize, "%d", (int)atom);
+    return 0;
+  }
+  strlcpy (buf, r, bsize);
+  XFree (r);
+  return 1;
+}
 
 static void _xitk_x11_backend_delete (xitk_x11_backend_t *be) {
   pthread_mutex_unlock (&be->mutex);
@@ -952,17 +1042,13 @@ static int _xitk_x11_clipboard_event (xitk_x11_display_t *d, XEvent *event) {
     if ((event->xselectionrequest.owner == d->clipboard.window_out)
      && (event->xselectionrequest.selection == d->clipboard.atoms[XITK_A_clipboard])) {
       if (d->be->be.verbosity >= 2) {
-        char *tname, *pname;
-        d->d.lock (&d->d);
-        tname = XGetAtomName (d->display, event->xselectionrequest.target);
-        pname = XGetAtomName (d->display, event->xselectionrequest.property);
-        d->d.unlock (&d->d);
+        char tname[64], pname[64];
+        _xitk_x11_get_atom_name (d, tname, sizeof (tname), event->xselectionrequest.target);
+        _xitk_x11_get_atom_name (d, pname, sizeof (pname), event->xselectionrequest.property);
         printf ("xitk.x11.clipboard: serve #1 requestor=%d target=%d (%s) property=%d (%s).\n",
           (int)event->xselectionrequest.requestor,
           (int)event->xselectionrequest.target, tname,
           (int)event->xselectionrequest.property, pname);
-        XFree (pname);
-        XFree (tname);
       }
       d->clipboard.req    = event->xselectionrequest.requestor;
       d->clipboard.target = event->xselectionrequest.target;
@@ -1444,7 +1530,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
     long propvalue[1];
 
     propvalue[0] = xitk_get_layer_level(xitk);
-    XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+    XChangeProperty (display, window, win->d->atoms[XITK_A__WIN_LAYER],
                      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
                      1);
     return;
@@ -1495,7 +1581,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
     break;
 
   case WM_TYPE_KWIN:
-    XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+    XChangeProperty (display, window, win->d->atoms[XITK_A__WIN_LAYER],
                      XA_ATOM, 32, PropModeReplace, (unsigned char *)&win->d->atoms[XITK_A__NET_WM_STATE_STAYS_ON_TOP], 1);
     break;
 
@@ -1514,7 +1600,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
 
       propvalue[0] = xitk_get_layer_level(xitk);
 
-      XChangeProperty (display, window, win->d->atoms[XITK_A_WIN_LAYER],
+      XChangeProperty (display, window, win->d->atoms[XITK_A__WIN_LAYER],
                        XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
                        1);
     }
@@ -1537,7 +1623,7 @@ static void _set_layer(xitk_x11_window_t *win, int layer) {
   xev.type                 = ClientMessage;
   xev.xclient.type         = ClientMessage;
   xev.xclient.window       = window;
-  xev.xclient.message_type = win->d->atoms[XITK_A_WIN_LAYER];
+  xev.xclient.message_type = win->d->atoms[XITK_A__WIN_LAYER];
   xev.xclient.format       = 32;
   xev.xclient.data.l[0]    = (long) layer;
   xev.xclient.data.l[1]    = (long) 0;
@@ -2049,7 +2135,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
       XmbSetWMProperties (d->display, win->w.id, win->title, win->title, NULL, 0, &hint, NULL, NULL);
     
       data[0] = 10;
-      XChangeProperty (d->display, win->w.id, d->atoms[XITK_A_WIN_LAYER], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
+      XChangeProperty (d->display, win->w.id, d->atoms[XITK_A__WIN_LAYER], XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data, 1);
     }
 
     XSelectInput (d->display, win->w.id, INPUT_MOTION | KeymapStateMask | FocusChangeMask);
@@ -2304,8 +2390,11 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       break;
 
     case FocusIn:
-      if (win)
+      if (win) {
         win->props[XITK_X11_WT_WIN_FLAGS].value |= XITK_WINF_FOCUS;
+        if (d->be->be.verbosity >= 2)
+          _xitk_x11_window_debug_flags ("focus_in", win->name, win->props[XITK_X11_WT_WIN_FLAGS].value);
+      }
       event->type = XITK_EV_FOCUS;
       event->qual = 0;
       event->x = 0;
@@ -2315,8 +2404,11 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       break;
 
     case FocusOut:
-      if (win)
+      if (win) {
         win->props[XITK_X11_WT_WIN_FLAGS].value &= ~XITK_WINF_FOCUS;
+        if (d->be->be.verbosity >= 2)
+          _xitk_x11_window_debug_flags ("focus_out", win->name, win->props[XITK_X11_WT_WIN_FLAGS].value);
+      }
       event->type = XITK_EV_UNFOCUS;
       event->qual = 0;
       event->x = 0;
@@ -2374,6 +2466,12 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
       goto _ev_zero;
 
     case MapNotify:
+      if (win) {
+        win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED);
+        win->props[XITK_X11_WT_WIN_FLAGS].value |= XITK_WINF_VISIBLE;
+        if (d->be->be.verbosity >= 2)
+          _xitk_x11_window_debug_flags ("map_notify", win->name, win->props[XITK_X11_WT_WIN_FLAGS].value);
+      }
       event->type = XITK_EV_SHOW;
     _ev_zero:
       event->qual = 0;
@@ -2421,31 +2519,41 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
 
     case PropertyNotify:
       if (d->be->be.verbosity >= 2) {
-        char *name;
-        d->d.lock (&d->d);
-        name = XGetAtomName (d->display, xevent.xproperty.atom);
-        d->d.unlock (&d->d);
-        printf ("xitk.x11.window.property.change (%s, %s).\n",
-          win ? (const char *)win->props[XITK_X11_WT_NAME].value : "<unknown>",
-        name ? name : "<unknown>");
-        XFree (name);
+        char name[64];
+        _xitk_x11_get_atom_name (d, name, sizeof (name), xevent.xproperty.atom);
+        printf ("xitk.x11.window.property.%s (%s, %s).\n",
+          xevent.xproperty.state == PropertyNewValue ? "changed" : "deleted",
+          win ? (const char *)win->props[XITK_X11_WT_NAME].value : "<unknown>", name);
       }
       if (win && (xevent.xproperty.atom == d->atoms[XITK_A_WM_STATE])) {
-        Atom actual_type;
+        Atom actual_type = None;
         int actual_format = 0, res;
-        unsigned long nitems, bytes_after;
+        unsigned long nitems = 0, bytes_after = 0;
         unsigned char *prop_return = NULL;
 
         d->d.lock (&d->d);
         res = XGetWindowProperty (d->display, win->w.id, xevent.xproperty.atom, 0, 4, False,
-          d->clipboard.atoms[XITK_A_integer], &actual_type, &actual_format, &nitems, &bytes_after,
-          &prop_return);
+          AnyPropertyType, &actual_type, &actual_format, &nitems, &bytes_after, &prop_return);
         d->d.unlock (&d->d);
-        if ((res != False) && (nitems >= 1)) {
-          int *prop = (int *)prop_return;
-          win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED);
-          win->props[XITK_X11_WT_WIN_FLAGS].value |=
-            *prop == NormalState ? XITK_WINF_VISIBLE : *prop == IconicState ? XITK_WINF_ICONIFIED : 0;
+        if ((res == 0) && (nitems >= 1)) {
+          int v = -1;
+          if (actual_format == 32) {
+            long *prop = (long *)prop_return;
+            v = *prop;
+          } else if (actual_format == 16) {
+            short *prop = (short *)prop_return;
+            v = *prop;
+          } else if (actual_format == 8) {
+            char *prop = (char *)prop_return;
+            v = *prop;
+          }
+          if (v >= 0) {
+            win->props[XITK_X11_WT_WIN_FLAGS].value &= ~(XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED);
+            win->props[XITK_X11_WT_WIN_FLAGS].value |=
+              v == NormalState ? XITK_WINF_VISIBLE : v == IconicState ? XITK_WINF_ICONIFIED : 0;
+            if (d->be->be.verbosity >= 2)
+              _xitk_x11_window_debug_flags ("wm_state", win->name, win->props[XITK_X11_WT_WIN_FLAGS].value);
+          }
         }
         XFree (prop_return);
       }
@@ -2884,49 +2992,11 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   _xitk_x11_clipboard_init (d);
 
-  {
-    static const char * const names[XITK_A_LAST] = {
-      [XITK_A_UTF8]            = "UTF8_STRING",
-      [XITK_A_WIN_LAYER]       = "_WIN_LAYER",
-      [XITK_A__MOTIF_WM_HINTS] = "_MOTIF_WM_HINTS",
-      [XITK_A_WM_CHANGE_STATE] = "WM_CHANGE_STATE",
-      [XITK_A_WM_STATE]        = "WM_STATE",
-      [XITK_A_WM_NAME]         = "WM_NAME",
-      [XITK_A_WM_DELETE_WINDOW]= "WM_DELETE_WINDOW",
-      [XITK_A_WM_PROTOCOLS]    = "WM_PROTOCOLS",
-      [XITK_A__NET_WM_NAME]    = "_NET_WM_NAME",
-
-      [XITK_A__NET_WM_WINDOW_TYPE]         = "_NET_WM_WINDOW_TYPE",
-      [XITK_A__NET_WM_WINDOW_TYPE_DESKTOP] = "_NET_WM_WINDOW_TYPE_DESKTOP",
-      [XITK_A__NET_WM_WINDOW_TYPE_DOCK]    = "_NET_WM_WINDOW_TYPE_DOCK",
-      [XITK_A__NET_WM_WINDOW_TYPE_TOOLBAR] = "_NET_WM_WINDOW_TYPE_TOOLBAR",
-      [XITK_A__NET_WM_WINDOW_TYPE_MENU]    = "_NET_WM_WINDOW_TYPE_MENU",
-      [XITK_A__NET_WM_WINDOW_TYPE_UTILITY] = "_NET_WM_WINDOW_TYPE_UTILITY",
-      [XITK_A__NET_WM_WINDOW_TYPE_SPLASH]  = "_NET_WM_WINDOW_TYPE_SPLASH",
-      [XITK_A__NET_WM_WINDOW_TYPE_DIALOG]  = "_NET_WM_WINDOW_TYPE_DIALOG",
-      [XITK_A__NET_WM_WINDOW_TYPE_NORMAL]  = "_NET_WM_WINDOW_TYPE_NORMAL",
-
-      [XITK_A__NET_WM_STATE]               = "_NET_WM_STATE",
-      [XITK_A__NET_WM_STATE_MODAL]         = "_NET_WM_STATE_MODAL",
-      [XITK_A__NET_WM_STATE_STICKY]        = "_NET_WM_STATE_STICKY",
-      [XITK_A__NET_WM_STATE_MAXIMIZED_VERT]= "_NET_WM_STATE_MAXIMIZED_VERT",
-      [XITK_A__NET_WM_STATE_MAXIMIZED_HORZ]= "_NET_WM_STATE_MAXIMIZED_HORZ",
-      [XITK_A__NET_WM_STATE_SHADED]        = "_NET_WM_STATE_SHADED",
-      [XITK_A__NET_WM_STATE_SKIP_TASKBAR]  = "_NET_WM_STATE_SKIP_TASKBAR",
-      [XITK_A__NET_WM_STATE_SKIP_PAGER]    = "_NET_WM_STATE_SKIP_PAGER",
-      [XITK_A__NET_WM_STATE_HIDDEN]        = "_NET_WM_STATE_HIDDEN",
-      [XITK_A__NET_WM_STATE_FULLSCREEN]    = "_NET_WM_STATE_FULLSCREEN",
-      [XITK_A__NET_WM_STATE_ABOVE]         = "_NET_WM_STATE_ABOVE",
-      [XITK_A__NET_WM_STATE_BELOW]         = "_NET_WM_STATE_BELOW",
-      [XITK_A__NET_WM_STATE_STAYS_ON_TOP]  = "_NET_WM_STATE_STAYS_ON_TOP",
-      [XITK_A__NET_WM_STATE_DEMANDS_ATTENTION] = "_NET_WM_STATE_DEMANDS_ATTENTION",
-    };
-    d->d.lock (&d->d);
-    XInternAtoms (d->display, (char **)names, XITK_A_LAST, False, d->atoms);
-    d->wm_type = xitk_x11_check_wm(d->display, d->be->be.verbosity >= 2);
-    d->d.wm_type = d->wm_type;
-    d->d.unlock (&d->d);
-  }
+  d->d.lock (&d->d);
+  XInternAtoms (d->display, (char **)_xitk_x11_atom_names, XITK_A_LAST, False, d->atoms);
+  d->wm_type = xitk_x11_check_wm(d->display, d->be->be.verbosity >= 2);
+  d->d.wm_type = d->wm_type;
+  d->d.unlock (&d->d);
 
   d->d.close = xitk_x11_display_close;
   d->d.next_event = xitk_x11_next_event;

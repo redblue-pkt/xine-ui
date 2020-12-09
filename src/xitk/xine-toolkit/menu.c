@@ -218,7 +218,7 @@ static void _menu_close_1 (_menu_private_t *wp) {
   mw = wp->open_windows + wp->num_open;
   /* revert focus first and prevent annoying window manager flashing. */
   if ((wp->num_open > 0) && (xitk_window_flags (mw[-1].xwin, 0, 0) & XITK_WINF_VISIBLE))
-    xitk_window_try_to_set_input_focus (mw[-1].xwin);
+    xitk_window_set_input_focus (mw[-1].xwin);
   /* now, close the window. */
   xitk_unregister_event_handler (mw->wp->xitk, &mw->key);
   xitk_image_free_image (&mw->bevel_plain);
@@ -601,7 +601,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
   xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (xwin);
-  xitk_window_try_to_set_input_focus(xwin);
+  xitk_window_set_input_focus (xwin);
 
   btn = (xitk_widget_t *) xitk_window_widget_list(xwin)->list.head.next;
   if (btn) {

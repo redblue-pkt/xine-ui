@@ -623,7 +623,7 @@ static void _playlist_apply_cb(void *data) {
 
 void playlist_get_input_focus (gGui_t *gui) {
   if (gui && gui->plwin)
-    xitk_window_try_to_set_input_focus (gui->plwin->xwin);
+    xitk_window_set_input_focus (gui->plwin->xwin);
 }
 
 void playlist_mmk_editor (gGui_t *gui) {
@@ -1266,6 +1266,6 @@ void playlist_editor (gGui_t *gui) {
   playlist_update_focused_entry (pl->gui);
   playlist_raise_window (pl->gui);
 
-  xitk_window_try_to_set_input_focus (pl->xwin);
+  xitk_window_set_input_focus (pl->xwin);
   xitk_set_focus_to_widget (pl->winput);
 }
