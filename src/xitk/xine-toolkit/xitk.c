@@ -256,30 +256,6 @@ struct __xitk_s {
   }                         clipboard;
 };
 
-/*
- *
- */
-
-void xitk_set_focus_to_wl (xitk_widget_list_t *wl) {
-  __xitk_t *xitk;
-  __gfx_t *fx;
-
-  if (!wl)
-    return;
-  if (!wl->xitk)
-    return;
-  xitk_container (xitk, wl->xitk, x);
-  MUTLOCK ();
-  for (fx = (__gfx_t *)xitk->gfxs.head.next; fx->wl.node.next; fx = (__gfx_t *)fx->wl.node.next) {
-    if (&fx->wl == wl) {
-      xitk_window_set_input_focus (fx->wl.xwin);
-      break;
-    }
-  }
-  MUTUNLOCK ();
-}
-
-
 static void __fx_ref (__gfx_t *fx) {
   fx->refs++;
 }
