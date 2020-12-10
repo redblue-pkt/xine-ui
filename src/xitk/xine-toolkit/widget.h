@@ -136,6 +136,5 @@ void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent);
  *
  */
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
-void xitk_set_focus_to_wl (xitk_widget_list_t *wl);
 
 #endif

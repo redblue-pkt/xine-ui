@@ -101,6 +101,8 @@ static char **_combo_copy_string_list (const char * const *s, int *n) {
 
 static void _combo_close (_combo_private_t *wp, int focus) {
   if (wp->xwin) {
+    if (focus)
+      xitk_window_set_input_focus (wp->parent_wlist->xwin);
     wp->browser_widget = NULL;
     xitk_unregister_event_handler (wp->w.wl->xitk, &wp->widget_key);
     xitk_window_destroy_window (wp->xwin);
@@ -108,7 +110,6 @@ static void _combo_close (_combo_private_t *wp, int focus) {
     if (focus) {
       xitk_set_focus_to_widget (wp->button_widget);
       xitk_button_set_state (wp->button_widget, 0);
-      xitk_set_focus_to_wl (wp->parent_wlist);
     }
     if (wp->button_widget)
       wp->button_widget->type &= ~WIDGET_KEEP_FOCUS;
