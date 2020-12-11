@@ -98,6 +98,8 @@ Visual     *xitk_x11_get_visual(xitk_t *);
 int         xitk_x11_get_depth(xitk_t *);
 Colormap    xitk_x11_get_colormap(xitk_t *);
 
-xitk_window_t *xitk_x11_wrap_window(xitk_t *, Window window);
+struct xitk_be_display_s;
+/* xitk or be_display may be NULL */
+xitk_window_t *xitk_x11_wrap_window(xitk_t *, struct xitk_be_display_s *, Window window);
 
 #endif /* _XITK_X11_H_ */
