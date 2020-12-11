@@ -339,6 +339,11 @@ xitk_widget_list_t *xitk_window_widget_list (xitk_window_t *xwin) {
   if (xwin->widget_list)
     return xwin->widget_list;
 
+  if (!xwin->xitk) {
+    XITK_WARNING("xitk_window_widget_list() failed for non-xitk window %p\n", xwin);
+    return NULL;
+  }
+
   xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin);
 
   return xwin->widget_list;
@@ -505,12 +510,19 @@ void xitk_window_destroy_window (xitk_window_t *xwin) {
   XITK_FREE (xwin);
 }
 
-xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
+xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, xitk_be_display_t *be_display, uintptr_t window) {
   xitk_window_t *xwin;
 
-  if (!xitk)
-    return NULL;
-  if (!xitk->d)
+  if (be_display) {
+    /* display must match witk xitk display */
+    if (xitk && xitk->d != be_display) {
+      XITK_WARNING("Tried to wrap native window from display %p to xitk display %p\n", be_display, xitk->d);
+      return NULL;
+    }
+  } else if (xitk) {
+    be_display = xitk->d;
+  }
+  if (!be_display)
     return NULL;
 
   xwin = xitk_xmalloc (sizeof (*xwin));
@@ -522,7 +534,7 @@ xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
       {XITK_TAG_WRAP, window},
       {XITK_TAG_END, 0}
     };
-    xwin->bewin = xitk->d->window_new (xitk->d, tags);
+    xwin->bewin = be_display->window_new (be_display, tags);
   }
   if (!xwin->bewin) {
     XITK_FREE (xwin);
@@ -537,7 +549,8 @@ xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window) {
   xwin->type = WINDOW_TYPE_END;
   xwin->role = XITK_WR_HELPER;
 
-  xwin->widget_list = xitk_widget_list_get (xwin->xitk, xwin);
+  if (xitk)
+    xwin->widget_list = xitk_widget_list_get (xitk, xwin);
 
   {
     xitk_tagitem_t tags[] = {

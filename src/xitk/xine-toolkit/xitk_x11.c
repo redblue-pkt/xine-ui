@@ -666,14 +666,18 @@ Display *xitk_x11_get_display(xitk_t *xitk) {
  *
  */
 
-xitk_window_t *xitk_x11_wrap_window(xitk_t *xitk, Window window) {
-  if (!xitk->be || xitk->be->type != XITK_BE_TYPE_X11) {
+xitk_window_t *xitk_x11_wrap_window(xitk_t *xitk, xitk_be_display_t *be_display, Window window) {
+  if (xitk && (!xitk->be || xitk->be->type != XITK_BE_TYPE_X11)) {
     XITK_WARNING("Trying to wrap X11 window to non-X11 backend %d\n", xitk->be->type);
+    return NULL;
+  }
+  if (be_display && be_display->type != XITK_BE_TYPE_X11) {
+    XITK_WARNING("Tried to wrap X11 window to non-X11 backend %d\n", be_display->type);
     return NULL;
   }
   if (window == None)
     return NULL;
- return xitk_window_wrap_native_window (xitk, (uintptr_t)window);
+  return xitk_window_wrap_native_window (xitk, be_display, (uintptr_t)window);
 }
 
 /*

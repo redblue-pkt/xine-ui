@@ -195,7 +195,9 @@ struct xitk_window_s {
 };
 
 void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags);
-xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, uintptr_t window);
+xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk /* may be null if be_display given */,
+                                               xitk_be_display_t *be_display /* may be NULL */,
+                                               uintptr_t window);
 
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
 void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,

@@ -2448,7 +2448,7 @@ static void register_event_handler(xui_vwin_t *vwin)
     vwin->video_be_window = vwin->video_be_display->window_new (vwin->video_be_display, tags);
   } else {
     xitk_window_destroy_window (vwin->wrapped_window);
-    vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, vwin->video_window);
+    vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, NULL, vwin->video_window);
     xitk_window_flags (vwin->wrapped_window,
       XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
     vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
