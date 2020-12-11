@@ -1837,7 +1837,8 @@ static void on_stop (void *data) {
 void gui_run(gGui_t *gui, char **session_opts) {
   int         i, auto_start = 0;
 
-  video_window_change_skins (gui->vwin, 0);
+  gui->logo_has_changed++;
+
   panel_add_autoplay_buttons (gui->panel);
   panel_show_tips (gui->panel);
   panel_add_mixer_control (gui->panel);

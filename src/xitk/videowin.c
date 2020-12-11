@@ -177,8 +177,6 @@ struct xui_vwin_st {
   pthread_t              second_display_thread;
   int                    second_display_running;
 
-  int                    logo_synthetic;
-
   pthread_mutex_t        mutex;
 
   x11_visual_t            xine_visual;
@@ -2227,79 +2225,6 @@ void video_window_get_mag (xui_vwin_t *vwin, float *xmag, float *ymag) {
   *xmag = (float) vwin->output_width / (float) vwin->video_width;
   *ymag = (float) vwin->output_height / (float) vwin->video_height;
   pthread_mutex_unlock (&vwin->mutex);
-}
-
-/*
- * Change displayed logo, if selected skin want to customize it.
- */
-void video_window_update_logo (xui_vwin_t *vwin) {
-  xine_cfg_entry_t     cfg_entry;
-  const char          *skin_logo;
-  int                  cfg_err_result;
-
-  if (!vwin)
-    return;
-
-  cfg_err_result = xine_config_lookup_entry (vwin->gui->xine, "gui.logo_mrl", &cfg_entry);
-  skin_logo = xitk_skin_get_logo (vwin->gui->skin_config);
-
-  if(skin_logo) {
-
-    if((cfg_err_result) && cfg_entry.str_value) {
-      /* Old and new logo are same, don't reload */
-      if(!strcmp(cfg_entry.str_value, skin_logo))
-	goto __done;
-    }
-
-    config_update_string("gui.logo_mrl", skin_logo);
-    goto __play_logo_now;
-
-  }
-  else { /* Skin don't use logo feature, set to xine's default */
-
-    /*
-     * Back to default logo only on a skin
-     * change, not at the first skin loading.
-     **/
-#ifdef XINE_LOGO2_MRL
-#  define USE_XINE_LOGO_MRL XINE_LOGO2_MRL
-#else
-#  define USE_XINE_LOGO_MRL XINE_LOGO_MRL
-#endif
-    if (vwin->logo_synthetic && (cfg_err_result) && (strcmp (cfg_entry.str_value, USE_XINE_LOGO_MRL))) {
-        config_update_string ("gui.logo_mrl", USE_XINE_LOGO_MRL);
-
-    __play_logo_now:
-
-      sleep(1);
-
-      if (vwin->gui->logo_mode) {
-        if (xine_get_status (vwin->gui->stream) == XINE_STATUS_PLAY) {
-          vwin->gui->ignore_next = 1;
-          xine_stop (vwin->gui->stream);
-          vwin->gui->ignore_next = 0;
-	}
-        if (vwin->gui->display_logo) {
-          if ((!xine_open (vwin->gui->stream, vwin->gui->logo_mrl))
-            || (!xine_play (vwin->gui->stream, 0, 0))) {
-            gui_handle_xine_error (vwin->gui, vwin->gui->stream, vwin->gui->logo_mrl);
-	    goto __done;
-	  }
-	}
-        vwin->gui->logo_mode = 1;
-      }
-    }
-  }
-
- __done:
-  vwin->gui->logo_has_changed--;
-}
-
-void video_window_change_skins (xui_vwin_t *vwin, int synthetic) {
-  if (!vwin)
-    return;
-  vwin->logo_synthetic = (synthetic ? 1 : 0);
-  vwin->gui->logo_has_changed++;
 }
 
 /*

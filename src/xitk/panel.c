@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 #include "common.h"
@@ -97,6 +98,7 @@ struct xui_panel_st {
   unsigned int          shown_time;
   unsigned int          shown_length;
 
+  int                   logo_synthetic;
 };
 
 void panel_update_nextprev_tips (xui_panel_t *panel) {
@@ -233,12 +235,76 @@ static void panel_exit (xitk_widget_t *w, void *data) {
 }
 
 /*
+ * Change displayed logo, if selected skin want to customize it.
+ */
+static void _update_logo (xui_panel_t *panel) {
+  xine_cfg_entry_t     cfg_entry;
+  const char          *skin_logo;
+  int                  cfg_err_result;
+
+  cfg_err_result = xine_config_lookup_entry (panel->gui->xine, "gui.logo_mrl", &cfg_entry);
+  skin_logo = xitk_skin_get_logo (panel->gui->skin_config);
+
+  if(skin_logo) {
+
+    if((cfg_err_result) && cfg_entry.str_value) {
+      /* Old and new logo are same, don't reload */
+      if(!strcmp(cfg_entry.str_value, skin_logo))
+	goto __done;
+    }
+
+    config_update_string("gui.logo_mrl", skin_logo);
+    goto __play_logo_now;
+
+  }
+  else { /* Skin don't use logo feature, set to xine's default */
+
+    /*
+     * Back to default logo only on a skin
+     * change, not at the first skin loading.
+     **/
+#ifdef XINE_LOGO2_MRL
+#  define USE_XINE_LOGO_MRL XINE_LOGO2_MRL
+#else
+#  define USE_XINE_LOGO_MRL XINE_LOGO_MRL
+#endif
+    if (panel->logo_synthetic && (cfg_err_result) && (strcmp (cfg_entry.str_value, USE_XINE_LOGO_MRL))) {
+        config_update_string ("gui.logo_mrl", USE_XINE_LOGO_MRL);
+
+    __play_logo_now:
+
+      sleep(1);
+
+      if (panel->gui->logo_mode) {
+        if (xine_get_status (panel->gui->stream) == XINE_STATUS_PLAY) {
+          panel->gui->ignore_next = 1;
+          xine_stop (panel->gui->stream);
+          panel->gui->ignore_next = 0;
+	}
+        if (panel->gui->display_logo) {
+          if ((!xine_open (panel->gui->stream, panel->gui->logo_mrl))
+            || (!xine_play (panel->gui->stream, 0, 0))) {
+            gui_handle_xine_error (panel->gui, panel->gui->stream, panel->gui->logo_mrl);
+	    goto __done;
+	  }
+	}
+        panel->gui->logo_mode = 1;
+      }
+    }
+  }
+
+ __done:
+  panel->gui->logo_has_changed--;
+}
+
+/*
  * Change the current skin.
  */
 void panel_change_skins (xui_panel_t *panel, int synthetic) {
   xitk_image_t *bg_image;
 
-  (void)synthetic;
+  panel->logo_synthetic = !!synthetic;
+  panel->gui->logo_has_changed++;
 
   panel->skin_on_change++;
 
@@ -562,7 +628,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
     }
 
     if (panel->gui->logo_has_changed)
-      video_window_update_logo (panel->gui->vwin);
+      _update_logo (panel);
 
   __next_iteration:
     xine_usec_sleep (step * 1000);

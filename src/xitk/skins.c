@@ -322,7 +322,6 @@ static int _skin_alter (gGui_t *gui, int index) {
   gui->skin_config = nskin_config;
 
   /* Now, change skins for each window */
-  video_window_change_skins (gui->vwin, 1);
   panel_change_skins (gui->panel, 1);
   control_change_skins (gui->vctrl, 1);
   mrl_browser_change_skins (gui->mrlb, 1);
