@@ -899,17 +899,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   video_window_lock_opacity (vwin);
 
   if (!(vwin->fullscreen_req & WINDOWED_MODE) || vwin->borderless) {
-    /*
-     * wm, no borders please
-     */
-    Atom      prop;
-    MWMHints  mwmhints;
-    memset(&mwmhints, 0, sizeof(mwmhints));
-    prop = XInternAtom (vwin->video_display, "_MOTIF_WM_HINTS", False);
-    mwmhints.flags = MWM_HINTS_DECORATIONS;
-    mwmhints.decorations = 0;
-    XChangeProperty (vwin->video_display, vwin->video_window, prop, prop, 32,
-                     PropModeReplace, (unsigned char *) &mwmhints, PROP_MWM_HINTS_ELEMENTS);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_DECORATED, 0);
   }
 
   if (!(vwin->gui->no_mouse))
@@ -2441,21 +2431,9 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     return;
 
   if (!vwin->gui->use_root_window && (vwin->fullscreen_mode & WINDOWED_MODE)) {
-    Atom         prop;
-    MWMHints     mwmhints;
-
     vwin->borderless = !vwin->borderless;
 
-    memset (&mwmhints, 0, sizeof (mwmhints));
-    mwmhints.flags       = MWM_HINTS_DECORATIONS;
-    mwmhints.decorations = vwin->borderless ? 0 : 1;
-
-    vwin->x_lock_display (vwin->video_display);
-    prop = XInternAtom (vwin->video_display, "_MOTIF_WM_HINTS", False);
-    if (prop != None)
-      XChangeProperty (vwin->video_display, vwin->video_window, prop, prop, 32,
-        PropModeReplace, (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS);
-    vwin->x_unlock_display (vwin->video_display);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_DECORATED, vwin->borderless ? 0 : XITK_WINF_DECORATED);
 
     xitk_window_set_window_class (vwin->wrapped_window,
                                   vwin->borderless ? vwin->res_name.borderless : vwin->res_name.normal,
