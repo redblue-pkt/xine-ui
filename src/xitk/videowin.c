@@ -94,9 +94,9 @@ struct xui_vwin_st {
   Visual                *gui_visual;
   char                  *prefered_visual;
   Visual	        *visual;          /* Visual for video window               */
-  XClassHint            *xclasshint;
-  XClassHint            *xclasshint_fullscreen;
-  XClassHint            *xclasshint_borderless;
+  struct {
+    const char *normal, *fullscreen, *borderless;
+  } res_name;
   int                    video_screen;
 
   int                    video_width;     /* size of currently displayed video     */
@@ -878,25 +878,21 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
   }
 
+  vwin->x_unlock_display (vwin->video_display);
+
   if (vwin->gui->vo_port) {
-    vwin->x_unlock_display (vwin->video_display);
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-    vwin->x_lock_display (vwin->video_display);
   }
 
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
-    if (vwin->xclasshint_fullscreen != NULL)
-      XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_fullscreen);
+    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.fullscreen, "xine");
+  } else if (vwin->borderless) {
+    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.borderless, "xine");
   } else {
-    if (vwin->borderless) {
-      if (vwin->xclasshint_borderless != NULL)
-        XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint_borderless);
-    }
-    else {
-      if (vwin->xclasshint != NULL)
-        XSetClassHint (vwin->video_display, vwin->video_window, vwin->xclasshint);
-    }
+    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.normal, "xine");
   }
+
+  vwin->x_lock_display (vwin->video_display);
 
   XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
 
@@ -1700,20 +1696,10 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
 
-  /* create xclass hint for video window */
-
-  if ((vwin->xclasshint = XAllocClassHint()) != NULL) {
-    vwin->xclasshint->res_name  = _("xine Video Window");
-    vwin->xclasshint->res_class = "xine";
-  }
-  if ((vwin->xclasshint_fullscreen = XAllocClassHint()) != NULL) {
-    vwin->xclasshint_fullscreen->res_name  = _("xine Video Fullscreen Window");
-    vwin->xclasshint_fullscreen->res_class = "xine";
-  }
-  if ((vwin->xclasshint_borderless = XAllocClassHint()) != NULL) {
-    vwin->xclasshint_borderless->res_name  = _("xine Video Borderless Window");
-    vwin->xclasshint_borderless->res_class = "xine";
-  }
+  /* xclass hint for video window */
+  vwin->res_name.normal     = _("xine Video Window");
+  vwin->res_name.fullscreen = _("xine Video Fullscreen Window");
+  vwin->res_name.borderless = _("xine Video Borderless Window");
 
   vwin->current_cursor = CURSOR_ARROW;
   vwin->cursor_timer   = 0;
@@ -1950,12 +1936,6 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   pthread_mutex_destroy (&vwin->mutex);
 
-  if (vwin->xclasshint != NULL)
-    XFree (vwin->xclasshint);
-  if (vwin->xclasshint_fullscreen != NULL)
-    XFree (vwin->xclasshint_fullscreen);
-  if (vwin->xclasshint_borderless != NULL)
-    XFree (vwin->xclasshint_borderless);
 #ifdef HAVE_XINERAMA
   if (vwin->xinerama)
     XFree (vwin->xinerama);
@@ -2257,7 +2237,7 @@ static void register_event_handler(xui_vwin_t *vwin)
     /* NOTE: this makes kwin use a desktop file named <res_class>.desktop to set the icon.
      * any subsequent attempt to set an icon has no effect then.
      * setting an icon _before_ leads to random fallback to default x icon. */
-    xitk_window_set_window_class (vwin->wrapped_window, vwin->xclasshint->res_name, vwin->xclasshint->res_class);
+    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.normal, "xine");
     xitk_window_set_window_icon (vwin->wrapped_window, vwin->gui->icon);
   }
 
@@ -2463,23 +2443,23 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
   if (!vwin->gui->use_root_window && (vwin->fullscreen_mode & WINDOWED_MODE)) {
     Atom         prop;
     MWMHints     mwmhints;
-    XClassHint  *xclasshint;
 
     vwin->borderless = !vwin->borderless;
 
     memset (&mwmhints, 0, sizeof (mwmhints));
     mwmhints.flags       = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = vwin->borderless ? 0 : 1;
-    xclasshint           = vwin->borderless ? vwin->xclasshint_borderless : vwin->xclasshint;
 
     vwin->x_lock_display (vwin->video_display);
     prop = XInternAtom (vwin->video_display, "_MOTIF_WM_HINTS", False);
     if (prop != None)
       XChangeProperty (vwin->video_display, vwin->video_window, prop, prop, 32,
         PropModeReplace, (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS);
-    if (xclasshint)
-      XSetClassHint (vwin->video_display, vwin->video_window, xclasshint);
     vwin->x_unlock_display (vwin->video_display);
+
+    xitk_window_set_window_class (vwin->wrapped_window,
+                                  vwin->borderless ? vwin->res_name.borderless : vwin->res_name.normal,
+                                  "xine");
 
     xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
       vwin->borderless ? 0 : vwin->border_left,
