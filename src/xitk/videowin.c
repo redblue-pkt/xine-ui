@@ -159,8 +159,6 @@ struct xui_vwin_st {
   uint32_t               fake_keys[2];    /* Fake key to send */
 #endif
 
-  XWMHints              *wm_hint;
-
   xitk_register_key_t    widget_key;
 
 #ifdef HAVE_XF86VIDMODE
@@ -937,7 +935,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   }
 
   XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
-  XSetWMHints (vwin->video_display, vwin->video_window, vwin->wm_hint);
 
   video_window_lock_opacity (vwin);
 
@@ -1784,6 +1781,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     vwin->fullscreen_width  = DisplayWidth (vwin->video_display, vwin->video_screen);
     vwin->fullscreen_height = DisplayHeight (vwin->video_display, vwin->video_screen);
   }
+  vwin->x_unlock_display (vwin->video_display);
+
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
 
@@ -1804,24 +1803,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
   vwin->current_cursor = CURSOR_ARROW;
   vwin->cursor_timer   = 0;
-
-  /*
-   * wm hints
-   */
-
-  vwin->wm_hint = XAllocWMHints();
-  if (!vwin->wm_hint) {
-    printf (_("XAllocWMHints() failed\n"));
-    exit (1);
-  }
-
-  vwin->wm_hint->input         = True;
-  vwin->wm_hint->initial_state = NormalState;
-  vwin->wm_hint->icon_pixmap   = xitk_image_get_pixmap (vwin->gui->icon);
-  vwin->wm_hint->icon_mask     = xitk_image_get_mask (vwin->gui->icon);
-  vwin->wm_hint->flags         = InputHint | StateHint | IconPixmapHint | IconMaskHint;
-
-  vwin->x_unlock_display (vwin->video_display);
 
   vwin->stream_resize_window = xine_config_register_bool (vwin->gui->xine, "gui.stream_resize_window",
     1,
@@ -2072,8 +2053,6 @@ void video_window_exit (xui_vwin_t *vwin) {
     XFree (vwin->xclasshint_fullscreen);
   if (vwin->xclasshint_borderless != NULL)
     XFree (vwin->xclasshint_borderless);
-  if (vwin->wm_hint != NULL)
-    XFree (vwin->wm_hint);
 #ifdef HAVE_XINERAMA
   if (vwin->xinerama)
     XFree (vwin->xinerama);
