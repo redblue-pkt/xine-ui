@@ -326,7 +326,7 @@ struct xitk_x11_display_s {
 
   XImage *testpix;
 
-  char utf8[2048], name[256];
+  char utf8[2048];
 };
 
 static int _xitk_x11_get_atom_name (xitk_x11_display_t *d, char *buf, size_t bsize, Atom atom) {
@@ -2629,26 +2629,24 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
   return 1;
 }
 
-static const char *xitk_x11_event_name (xitk_be_display_t *_d, const xitk_be_event_t *event) {
+static size_t xitk_x11_event_name (xitk_be_display_t *_d, const xitk_be_event_t *event, char *buf, size_t buf_size) {
   xitk_x11_display_t *d;
-  const char *s = NULL;
+  const char *s;
+  int res = 0;
 
   xitk_container (d, _d, d);
   if (!d || !event)
-    return NULL;
+    return 0;
   if ((event->type == XITK_EV_KEY_DOWN) || (event->type == XITK_EV_KEY_UP)) {
     s = XKeysymToString (event->sym);
     if (s)
-      strlcpy (d->name, s, sizeof (d->name));
-    else
-      sprintf (d->name, "XKey_%u", (unsigned int)event->code);
-    return d->name;
+      return strlcpy(buf, s, buf_size);
+    res = snprintf (buf, buf_size, "XKey_%u", (unsigned int)event->code);
   }
   if ((event->type == XITK_EV_BUTTON_DOWN) || (event->type == XITK_EV_BUTTON_UP)) {
-    sprintf (d->name, "XButton_%d", (unsigned int)event->code);
-    return d->name;
+    res = snprintf (buf, buf_size, "XButton_%d", (unsigned int)event->code);
   }
-  return NULL;
+  return res >= 0 ? res : 0;
 }
 
 static int xitk_x11_color_new (xitk_be_display_t *_d, xitk_color_info_t *info) {
