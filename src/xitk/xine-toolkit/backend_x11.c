@@ -1553,7 +1553,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
       xev.xclient.data.l[3]    = 0l;
       xev.xclient.data.l[4]    = 0l;
 
-      XSendEvent (display, DefaultRootWindow (display), True, SubstructureRedirectMask, &xev);
+      XSendEvent (display, win->d->imlibdata->x.root, True, SubstructureRedirectMask, &xev);
     }
     else {
       xev.xclient.type         = ClientMessage;
@@ -1567,7 +1567,7 @@ static void _set_layer_above(xitk_x11_window_t *win) {
       xev.xclient.data.l[1]    = (long) win->d->atoms[XITK_A__NET_WM_STATE_ABOVE];
       xev.xclient.data.l[2]    = (long) None;
 
-      XSendEvent (display, DefaultRootWindow (display),
+      XSendEvent (display, win->d->imlibdata->x.root,
                   False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
 
     }
@@ -1630,8 +1630,7 @@ static void _set_layer(xitk_x11_window_t *win, int layer) {
   xev.xclient.data.l[2]    = (long) 0;
   xev.xclient.data.l[3]    = (long) 0;
 
-  XSendEvent (display, RootWindow (display, XDefaultScreen (display)),
-              False, SubstructureNotifyMask, (XEvent*) &xev);
+  XSendEvent (display, win->d->imlibdata->x.root, False, SubstructureNotifyMask, (XEvent*) &xev);
 }
 
 static void _set_wm_window_type(xitk_x11_window_t *win, xitk_wm_window_type_t type) {
@@ -2793,7 +2792,7 @@ static void _x11_select_visual(xitk_be_display_t *_d, Visual *gui_visual) {
        * Imlib and Xine.
        */
       Colormap cm;
-      cm = XCreateColormap(d->display, RootWindow(d->display, DefaultScreen(d->display)),
+      cm = XCreateColormap(d->display, RootWindow(d->display, d->default_screen),
                            gui_visual, AllocNone);
 
       imlib_init.cmap = cm;
@@ -2820,7 +2819,7 @@ static void _init_imlib(xitk_x11_display_t *d, const char *prefered_visual, int 
                        install_colormap  ? NULL : &install_colormap);
   d->install_colormap = install_colormap;
 
-  xitk_x11_find_visual(d->display, DefaultScreen(d->display),
+  xitk_x11_find_visual(d->display, d->default_screen,
                        prefered_visual ? prefered_visual : xrm_prefered_visual,
                        &visual, NULL);
   _x11_select_visual(&d->d, visual);
