@@ -467,18 +467,17 @@ static void event2id(unsigned long keysym, unsigned int keycode, int button, cha
  * Handle key event from an XEvent.
  */
 static kbinding_entry_t *_kbinding_entry_from_be_event (kbinding_t *kbt, const xitk_be_event_t *event) {
-  const char *s;
+  char buf[64];
   int qual;
 
   if (!kbt || !event)
     return NULL;
 
-  s = xitk_be_event_name (event);
-  if (!s)
+  if (xitk_be_event_name (event, buf, sizeof(buf)) < 1)
     return NULL;
   /* printf ("_kbinding_entry_from_be_event (%s, 0x%x).\n", s, (unsigned int)event->qual); */
   kbindings_convert_modifier (event->qual, &qual);
-  return kbindings_lookup_binding (kbt, s, qual);
+  return kbindings_lookup_binding (kbt, buf, qual);
 }
 
 action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *event, int no_gui) {
@@ -919,7 +918,7 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
 
   if (e->type == XITK_EV_KEY_UP) {
     int redundant;
-    const char *name = xitk_be_event_name (e);
+    char name[64];
 
     /* 1. user hits grab button with ENTER/SPACE,
      * 2. grab window opens,
@@ -927,9 +926,7 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
      * 4. ignore it :-)) */
     if (kbe->grabbing < 2)
       return 0;
-    if (!name)
-      return 0;
-    if (!name[0])
+    if (xitk_be_event_name (e, name, sizeof(name)) < 1)
       return 0;
 
     _kbr_close (kbe);
@@ -944,7 +941,7 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
     kbe->kbr.entry->action_id = kbe->ksel->action_id;
     kbe->kbr.entry->is_alias  = kbe->ksel->is_alias;
     kbe->kbr.entry->is_gui    = kbe->ksel->is_gui;
-    kbe->kbr.entry->key       = strdup (name);
+    kbe->kbr.entry->key       = strdup(name);
     kbindings_convert_modifier (e->qual, &kbe->kbr.entry->modifier);
 
     redundant = bkedit_check_redundancy (kbe->kbt, kbe->kbr.entry);

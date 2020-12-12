@@ -178,7 +178,7 @@ struct xitk_be_display_s {
   /* win may be NULL, type may be XITK_EV_ANY.
    * the pointers in event stay valid until next next_event () or close (). */
   int (*next_event) (xitk_be_display_t *d, xitk_be_event_t *event, xitk_be_window_t *win, xitk_be_event_type_t type, int timeout);
-  const char *(*event_name) (xitk_be_display_t *d, const xitk_be_event_t *event);
+  size_t (*event_name) (xitk_be_display_t *d, const xitk_be_event_t *event, char *buf, size_t buf_size);
 
   struct {
     int  (*_new)    (xitk_be_display_t *d, xitk_color_info_t *info);
@@ -202,6 +202,7 @@ struct xitk_be_display_s {
 };
 
 xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity);
+xitk_backend_t *xitk_backend_new_x11 (xitk_t *xitk, int verbosity);
 
 struct xitk_backend_s {
   xitk_dnode_t node;

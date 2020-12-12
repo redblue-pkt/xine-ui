@@ -1003,14 +1003,14 @@ void xitk_register_signal_handler(xitk_t *xitk, xitk_signal_callback_t sigcb, vo
   }
 }
 
-const char *xitk_be_event_name (const xitk_be_event_t *event) {
+size_t xitk_be_event_name (const xitk_be_event_t *event, char *buf, size_t buf_size) {
   if (!event)
-    return NULL;
+    return 0;
   if (!event->window)
-    return NULL;
+    return 0;
   if (!event->window->display)
-    return NULL;
-  return event->window->display->event_name (event->window->display, event);
+    return 0;
+  return event->window->display->event_name (event->window->display, event, buf, buf_size);
 }
 
 /*

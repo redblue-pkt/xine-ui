@@ -28,6 +28,7 @@
 #define XITK_BACKEND_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define XITK_CTRL_KEY_PREFIX 1
 typedef enum {
@@ -117,7 +118,7 @@ typedef struct {
 } xitk_be_event_t;
 
 /** for use in event handler */
-const char *xitk_be_event_name (const xitk_be_event_t *event);
+size_t xitk_be_event_name (const xitk_be_event_t *event, char *buf, size_t buf_size);
 
 /** return 1 if event was handled finally. */
 typedef int (xitk_be_event_handler_t) (void *data, const xitk_be_event_t *event);
