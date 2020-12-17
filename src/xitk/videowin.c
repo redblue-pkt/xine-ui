@@ -432,7 +432,6 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
     if (!(search >= vwin->XF86_modelines_count)) {
        if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
                                     vwin->XF86_modelines[search])) {
-         double res_h, res_v;
 #ifdef HAVE_XINERAMA
          int dummy_event, dummy_error;
 #endif
@@ -442,12 +441,8 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
           vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
 
           /* update pixel aspect */
-          res_h = (DisplayWidth (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayWidthMM (vwin->video_display, vwin->video_screen));
-          res_v = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayHeightMM (vwin->video_display, vwin->video_screen));
+          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
 
-          vwin->pixel_aspect    = res_v / res_h;
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->video_display, &dummy_event, &dummy_error)) {
             int count = 1;
@@ -842,7 +837,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	 * the original modeline
 	 */
         if (vwin->XF86_modelines_count > 1) {
-          double res_h, res_v;
 #ifdef HAVE_XINERAMA
           int dummy_event, dummy_error;
 #endif
@@ -856,12 +850,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
 
           /* update pixel aspect */
-          res_h = (DisplayWidth (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayWidthMM (vwin->video_display, vwin->video_screen));
-          res_v = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
-            / DisplayHeightMM (vwin->video_display, vwin->video_screen));
+          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
 
-          vwin->pixel_aspect = res_v / res_h;
 #ifdef HAVE_XINERAMA
           if (XineramaQueryExtension (vwin->video_display, &dummy_event, &dummy_error)) {
             int count = 1;
@@ -1940,20 +1930,11 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     pthread_create (&vwin->second_display_thread, NULL, second_display_loop, vwin);
   }
 
-  {
-#ifdef HAVE_XINERAMA
-    int    dummy_event, dummy_error;
-#endif
-    double res_h, res_v;
-    vwin->x_lock_display (vwin->video_display);
-    res_h                 = (DisplayWidth  (vwin->video_display, vwin->video_screen) * 1000
-                             / DisplayWidthMM (vwin->video_display, vwin->video_screen));
-    res_v                 = (DisplayHeight (vwin->video_display, vwin->video_screen) * 1000
-                             / DisplayHeightMM (vwin->video_display, vwin->video_screen));
-    vwin->x_unlock_display (vwin->video_display);
-    vwin->pixel_aspect    = res_v / res_h;
+  vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
 
 #ifdef HAVE_XINERAMA
+  {
+    int    dummy_event, dummy_error;
     if (XineramaQueryExtension(vwin->video_display, &dummy_event, &dummy_error)) {
       void *info;
       int count = 1;
@@ -1965,12 +1946,12 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
       if (info)
         XFree(info);
     }
+  }
 #endif
 
 #ifdef DEBUG
     printf("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
-  }
 
   return vwin;
 }

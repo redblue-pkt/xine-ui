@@ -2943,6 +2943,8 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->default_screen = DefaultScreen (display);
   d->d.width = DisplayWidth (display, d->default_screen);
   d->d.height = DisplayHeight (display, d->default_screen);
+  d->d.ratio = ((double)d->d.height * DisplayWidthMM  (display, d->default_screen)) /
+               ((double)d->d.width  * DisplayHeightMM (display, d->default_screen));
   d->gc1 = d->gc2 = NULL;
   xitk_dnode_init (&d->d.node);
   xitk_dlist_init (&d->d.images);

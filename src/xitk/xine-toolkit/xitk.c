@@ -1939,6 +1939,10 @@ void xitk_get_display_size (xitk_t *xitk, int *w, int *h) {
     *h = xitk->d->height;
 }
 
+double xitk_get_display_ratio (xitk_t *xitk) {
+  return xitk->d->ratio;
+}
+
 void xitk_set_tips_timeout(xitk_t *_xitk, unsigned long timeout) {
   __xitk_t *xitk;
 
