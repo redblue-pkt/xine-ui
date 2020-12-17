@@ -68,7 +68,6 @@ int video_window_is_separate_display(xui_vwin_t *vwin);
 int video_window_set_mag (xui_vwin_t *vwin, float xmag, float ymag);
 void video_window_get_mag (xui_vwin_t *vwin, float *xmag, float *ymag);
 
-long int video_window_get_ssaver_idle (xui_vwin_t *vwin);
 long int video_window_reset_ssaver (xui_vwin_t *vwin);
 
 void video_window_get_frame_size (xui_vwin_t *vwin, int *w, int *h);

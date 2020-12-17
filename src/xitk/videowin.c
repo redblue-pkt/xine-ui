@@ -2394,7 +2394,7 @@ static void *second_display_loop (void *data) {
  *
  */
 
-long int video_window_get_ssaver_idle (xui_vwin_t *vwin) {
+static long int video_window_get_ssaver_idle (xui_vwin_t *vwin) {
   if (!vwin)
     return 0;
 
