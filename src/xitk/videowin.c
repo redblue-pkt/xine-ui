@@ -1919,11 +1919,6 @@ void video_window_exit (xui_vwin_t *vwin) {
   }
   vwin->video_window = None;
 
-  if (vwin->separate_display) {
-    vwin->video_be_display->close (&vwin->video_be_display);
-    vwin->video_backend->_delete (&vwin->video_backend);
-  }
-
   pthread_mutex_destroy (&vwin->mutex);
 
 #ifdef HAVE_XINERAMA
@@ -1931,16 +1926,10 @@ void video_window_exit (xui_vwin_t *vwin) {
     XFree (vwin->xinerama);
 #endif
 
-  if (vwin->separate_display) {
-    vwin->x_lock_display (vwin->video_display);
-    vwin->x_unlock_display (vwin->video_display);
-    if (vwin->video_be_display) {
-      vwin->video_be_display->close (&vwin->video_be_display);
-      vwin->video_display = NULL;
-    }
-    if (vwin->video_backend)
-      vwin->video_backend->_delete (&vwin->video_backend);
-  }
+  if (vwin->video_be_display)
+    vwin->video_be_display->close (&vwin->video_be_display);
+  if (vwin->video_backend)
+    vwin->video_backend->_delete (&vwin->video_backend);
 
   free(vwin->prefered_visual);
 
