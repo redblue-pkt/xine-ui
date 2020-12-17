@@ -1636,6 +1636,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->x_lock_display (vwin->video_display);
   vwin->desktopWidth       = DisplayWidth(vwin->video_display, vwin->video_screen);
   vwin->desktopHeight      = DisplayHeight(vwin->video_display, vwin->video_screen);
+  vwin->fullscreen_width   = vwin->desktopWidth;
+  vwin->fullscreen_height  = vwin->desktopHeight;
 
 #ifdef HAVE_XTESTEXTENSION
   vwin->fake_keys[0] = XKeysymToKeycode (vwin->video_display, XK_Shift_L);
@@ -1762,8 +1764,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 #endif
     }
     else {
-      vwin->fullscreen_width           = DisplayWidth  (vwin->video_display, vwin->video_screen);
-      vwin->fullscreen_height          = DisplayHeight (vwin->video_display, vwin->video_screen);
       vwin->xinerama_fullscreen_x      = 0;
       vwin->xinerama_fullscreen_y      = 0;
       vwin->xinerama_fullscreen_width  = vwin->fullscreen_width;
@@ -1771,16 +1771,12 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
       XFree (screeninfo);
     }
-
-  } else
-#endif
-  {
+  } else {
     /* no Xinerama */
     if (vwin->gui->verbosity)
       printf ("Display is not using Xinerama.\n");
-    vwin->fullscreen_width  = DisplayWidth (vwin->video_display, vwin->video_screen);
-    vwin->fullscreen_height = DisplayHeight (vwin->video_display, vwin->video_screen);
   }
+#endif
   vwin->x_unlock_display (vwin->video_display);
 
   vwin->visible_width  = vwin->fullscreen_width;
