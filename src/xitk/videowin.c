@@ -243,20 +243,18 @@ int video_window_is_visible (xui_vwin_t *vwin) {
 }
 
 void video_window_grab_input_focus(xui_vwin_t *vwin) {
-  Window want;
   int t;
 
   if (!vwin)
     return;
   pthread_mutex_lock (&vwin->mutex);
-  want = vwin->video_window;
-  vwin->x_lock_display (vwin->video_display);
   if (vwin->gui->cursor_grabbed) {
-    XGrabPointer (vwin->video_display, want,
-                  1, None, GrabModeAsync, GrabModeAsync, want, None, CurrentTime);
+    video_window_grab_pointer(vwin);
   }
   if (_video_window_is_visible (vwin) > 1) {
     /* Give focus to video output window */
+    Window want = vwin->video_window;
+    vwin->x_lock_display (vwin->video_display);
     XSetInputFocus (vwin->video_display, want, RevertToParent, CurrentTime);
     XSync (vwin->video_display, False);
     vwin->x_unlock_display (vwin->video_display);
@@ -281,18 +279,15 @@ void video_window_grab_input_focus(xui_vwin_t *vwin) {
 void video_window_grab_pointer(xui_vwin_t *vwin) {
   if (!vwin)
     return;
-  vwin->x_lock_display (vwin->video_display);
-  XGrabPointer(vwin->video_display, vwin->video_window, 1, None,
-               GrabModeAsync, GrabModeAsync, vwin->video_window, None, CurrentTime);
-  vwin->x_unlock_display (vwin->video_display);
+
+  xitk_window_flags (vwin->wrapped_window, XITK_WINF_GRAB_POINTER, XITK_WINF_GRAB_POINTER);
 }
 
 void video_window_ungrab_pointer(xui_vwin_t *vwin) {
   if (!vwin)
     return;
-  vwin->x_lock_display (vwin->video_display);
-  XUngrabPointer(vwin->video_display, CurrentTime);
-  vwin->x_unlock_display (vwin->video_display);
+
+ xitk_window_flags (vwin->wrapped_window, XITK_WINF_GRAB_POINTER, 0);
 }
 
 static void video_window_adapt_size (xui_vwin_t *vwin);
@@ -975,11 +970,10 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if(old_video_window != None) {
     vwin->x_lock_display (vwin->video_display);
     XDestroyWindow (vwin->video_display, old_video_window);
+    vwin->x_unlock_display (vwin->video_display);
 
     if (vwin->gui->cursor_grabbed)
-      XGrabPointer (vwin->video_display, vwin->video_window, 1,
-        None, GrabModeAsync, GrabModeAsync, vwin->video_window, None, CurrentTime);
-    vwin->x_unlock_display (vwin->video_display);
+      video_window_grab_pointer(vwin);
   }
 
   /* take care about window decoration/pos */
