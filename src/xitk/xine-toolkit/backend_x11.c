@@ -1366,6 +1366,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
 
   have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN | XITK_WINF_FOCUS;
+  have |= XITK_WINF_GRAB_POINTER;
   if (d->be->be.verbosity >= 2)
     _xitk_x11_window_debug_flags ("before", win->name, oldflags);
 
@@ -1489,6 +1490,14 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
         }
       }
     }
+    if (diff & XITK_WINF_GRAB_POINTER) {
+      if (newflags & XITK_WINF_GRAB_POINTER)
+        XGrabPointer(d->display, win->w.id, 1, None,
+                     GrabModeAsync, GrabModeAsync, win->w.id, None, CurrentTime);
+      else
+        XUngrabPointer(d->display, CurrentTime);
+    }
+
     XSync (d->display, False);
     d->d.unlock (&d->d);
     if (diff & XITK_WINF_DND) {
