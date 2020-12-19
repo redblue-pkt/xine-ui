@@ -31,7 +31,6 @@
 #include <sys/wait.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -285,24 +284,6 @@ void video_window_select_visual (xui_vwin_t *vwin) {
       }
     }
   }
-}
-
-/*
- * Lock the video window against WM-initiated transparency changes.
- * At the time of writing (2006-06-29), only xfwm4 SVN understands this.
- * Ref. http://bugzilla.xfce.org/show_bug.cgi?id=1958
- */
-static void video_window_lock_opacity (xui_vwin_t *vwin) {
-  Atom opacity_lock = XInternAtom (vwin->video_display, "_NET_WM_WINDOW_OPACITY_LOCKED", False);
-
-  /* This shouldn't happen, but was reported in bug #1573056 */
-  if (opacity_lock == None)
-    return;
-
-  XChangeProperty (vwin->video_display, vwin->video_window,
-		  opacity_lock,
-		  XA_CARDINAL, 32, PropModeReplace,
-		  (unsigned char *)vwin->gui, 1);
 }
 
 #ifdef HAVE_XF86VIDMODE
@@ -781,7 +762,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       hint.height = vwin->fullscreen_height;
       XSetNormalHints (vwin->video_display, vwin->video_window, &hint);
 
-      video_window_lock_opacity (vwin);
+      xitk_window_flags (vwin->wrapped_window, XITK_WINF_LOCK_OPACITY, XITK_WINF_LOCK_OPACITY);
 
       XClearWindow (vwin->video_display, vwin->video_window);
 
@@ -972,7 +953,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
 
-  video_window_lock_opacity (vwin);
+  xitk_window_flags (vwin->wrapped_window, XITK_WINF_LOCK_OPACITY, XITK_WINF_LOCK_OPACITY);
 
   if (!(vwin->fullscreen_req & WINDOWED_MODE) || vwin->borderless) {
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_DECORATED, 0);
