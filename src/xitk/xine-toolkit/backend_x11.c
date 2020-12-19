@@ -1397,7 +1397,7 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
   have |= XITK_WINF_FULLSCREEN | XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_MAX_X | XITK_WINF_MAX_Y;
 
   have |= XITK_WINF_ICONIFIED | XITK_WINF_DECORATED | XITK_WINF_FIXED_POS | XITK_WINF_FENCED_IN | XITK_WINF_FOCUS;
-  have |= XITK_WINF_GRAB_POINTER;
+  have |= XITK_WINF_GRAB_POINTER | XITK_WINF_LOCK_OPACITY;
   if (d->be->be.verbosity >= 2)
     _xitk_x11_window_debug_flags ("before", win->name, oldflags);
 
@@ -1527,6 +1527,20 @@ static void _xitk_x11_window_flags (xitk_x11_window_t *win, uint32_t mask_and_va
                      GrabModeAsync, GrabModeAsync, win->w.id, None, CurrentTime);
       else
         XUngrabPointer(d->display, CurrentTime);
+    }
+    if (diff & XITK_WINF_LOCK_OPACITY) {
+      /*
+       * Lock the video window against WM-initiated transparency changes.
+       * At the time of writing (2006-06-29), only xfwm4 SVN understands this.
+       * Ref. http://bugzilla.xfce.org/show_bug.cgi?id=1958
+       */
+      Atom opacity_lock = XInternAtom (d->display, "_NET_WM_WINDOW_OPACITY_LOCKED", False);
+      unsigned int val = (newflags & XITK_WINF_LOCK_OPACITY) ? 0xffffffff : 0;
+
+      /* This shouldn't happen, but was reported in bug #1573056 */
+      if (opacity_lock != None)
+        XChangeProperty (d->display, win->w.id, opacity_lock, XA_CARDINAL, 32, PropModeReplace,
+                         (unsigned char *)&val, 1);
     }
 
     XSync (d->display, False);
