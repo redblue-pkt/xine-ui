@@ -32,7 +32,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-#include <X11/keysym.h>
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -74,7 +73,6 @@ struct xui_vwin_st {
   void                   (*x_lock_display) (Display *display);
   void                   (*x_unlock_display) (Display *display);
 
-  xitk_widget_list_t    *wl;
   xitk_window_t         *wrapped_window;
   int                    border_left;
   int                    border_top;
@@ -665,8 +663,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (vwin->xinerama && (vwin->fullscreen_req & FULLSCR_XI_MODE)) {
 
     if (vwin->video_window) {
-      int dummy;
-
       if ((vwin->fullscreen_mode & FULLSCR_XI_MODE) && vwin->gui_visual == vwin->visual) {
         if (vwin->visible_width != vwin->output_width || vwin->visible_height != vwin->output_height) {
           /*
@@ -685,7 +681,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       }
 
       xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
-        &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
+        &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
 
       old_video_window = vwin->video_window;
     }
@@ -718,7 +714,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
 
     if (vwin->video_window) {
-      int dummy;
 
       if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (vwin->gui_visual == vwin->visual)) {
 //#ifdef HAVE_XF86VIDMODE
@@ -741,7 +736,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       }
 
       xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
-        &vwin->old_xwin, &vwin->old_ywin, &dummy, &dummy);
+        &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
 
       old_video_window = vwin->video_window;
     }
