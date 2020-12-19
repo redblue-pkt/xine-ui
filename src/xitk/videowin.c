@@ -202,19 +202,11 @@ void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin) {
 }
 
 void video_window_set_input_focus(xui_vwin_t *vwin) {
-  int t, got;
-
   if (!vwin)
     return;
 
-  /* Retry until the WM was mercyful to give us the focus (but not indefinitely) */
-  for (t = 0; t < 3; t++) {
-    vwin->x_lock_display (vwin->video_display);
-    got = xitk_x11_try_to_set_input_focus (vwin->video_display, vwin->video_window);
-    vwin->x_unlock_display (vwin->video_display);
-    if (got)
-      break;
-  }
+  if (xitk_window_flags (vwin->wrapped_window, 0, 0) & XITK_WINF_VISIBLE)
+    xitk_window_try_to_set_input_focus(vwin->wrapped_window);
 }
 
 /*
@@ -222,11 +214,9 @@ void video_window_set_input_focus(xui_vwin_t *vwin) {
  */
 static int _video_window_is_visible (xui_vwin_t *vwin) {
   static const uint8_t map[6] = {0, 1, 0, 2, 2, 2};
-
+  int visible = xitk_window_flags (vwin->wrapped_window, 0, 0) & XITK_WINF_VISIBLE;
   /* user may have changed this via task bar. */
-  vwin->x_lock_display (vwin->video_display);
-  vwin->show = map[vwin->show + (xitk_x11_is_window_visible (vwin->video_display, vwin->video_window) ? 3 : 0)];
-  vwin->x_unlock_display (vwin->video_display);
+  vwin->show = map[vwin->show + (visible ? 3 : 0)];
   return vwin->show;
 }
 
@@ -241,37 +231,18 @@ int video_window_is_visible (xui_vwin_t *vwin) {
 }
 
 void video_window_grab_input_focus(xui_vwin_t *vwin) {
-  int t;
-
   if (!vwin)
     return;
+
   pthread_mutex_lock (&vwin->mutex);
   if (vwin->gui->cursor_grabbed) {
     video_window_grab_pointer(vwin);
   }
   if (_video_window_is_visible (vwin) > 1) {
     /* Give focus to video output window */
-    Window want = vwin->video_window;
-    vwin->x_lock_display (vwin->video_display);
-    XSetInputFocus (vwin->video_display, want, RevertToParent, CurrentTime);
-    XSync (vwin->video_display, False);
-    vwin->x_unlock_display (vwin->video_display);
-    pthread_mutex_unlock (&vwin->mutex);
-    /* check after 5/15/30/50/75/105/140 ms */
-    for (t = 5000; t < 40000; t += 5000) {
-      Window got;
-      int revert;
-      xine_usec_sleep (t);
-      vwin->x_lock_display (vwin->video_display);
-      XGetInputFocus (vwin->video_display, &got, &revert);
-      vwin->x_unlock_display (vwin->video_display);
-      if (got == want)
-        break;
-    }
-  } else {
-    vwin->x_unlock_display (vwin->video_display);
-    pthread_mutex_unlock (&vwin->mutex);
+    xitk_window_try_to_set_input_focus (vwin->wrapped_window);
   }
+  pthread_mutex_unlock (&vwin->mutex);
 }
 
 void video_window_grab_pointer(xui_vwin_t *vwin) {
@@ -909,6 +880,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XFree(wm_hint);
   }
 
+  register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
+
   if (vwin->hide_on_start == 1) {
     vwin->hide_on_start = -1;
     vwin->show = 0;
@@ -921,8 +894,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       xitk_window_set_layer_above(vwin->wrapped_window);
     }
 
-    XRaiseWindow (vwin->video_display, vwin->video_window);
-    XMapWindow (vwin->video_display, vwin->video_window);
+    xitk_window_raise_window(vwin->wrapped_window);
+    xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE, XITK_WINF_VISIBLE);
 
     while (!xitk_x11_is_window_visible (vwin->video_display, vwin->video_window))
       xine_usec_sleep(5000);
@@ -934,10 +907,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
        otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
-    if (!(vwin->fullscreen_mode & WINDOWED_MODE)
-     && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
-     && _vwin_is_ewmh (vwin))
-      xitk_x11_set_ewmh_fullscreen (vwin->video_display, vwin->video_window, 1);
+    if (!(vwin->fullscreen_mode & (WINDOWED_MODE | FULLSCR_XI_MODE))) {
+      xitk_window_flags (vwin->wrapped_window, XITK_WINF_FULLSCREEN, XITK_WINF_FULLSCREEN);
+    }
   }
 
   XSync (vwin->video_display, False);
@@ -958,8 +930,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   }
 
   vwin->x_unlock_display (vwin->video_display);
-
-  register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
 
   /* The old window should be destroyed now */
   if(old_video_window != None) {
@@ -1350,12 +1320,8 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
 
     /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
        otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
-    if (!(vwin->fullscreen_mode & WINDOWED_MODE)
-     && !(vwin->fullscreen_mode & FULLSCR_XI_MODE)
-     && _vwin_is_ewmh (vwin)) {
-      vwin->x_lock_display (vwin->video_display);
-      xitk_x11_set_ewmh_fullscreen (vwin->video_display, vwin->video_window, 1);
-      vwin->x_unlock_display (vwin->video_display);
+    if (!(vwin->fullscreen_mode & (WINDOWED_MODE | FULLSCR_XI_MODE))) {
+      xitk_window_flags (vwin->wrapped_window, XITK_WINF_FULLSCREEN, XITK_WINF_FULLSCREEN);
     }
   } else if (vwin->show == 1) {
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_ICONIFIED);
@@ -1932,11 +1898,9 @@ void video_window_exit (xui_vwin_t *vwin) {
 static int video_window_translate_point (xui_vwin_t *vwin,
   int gui_x, int gui_y, int *video_x, int *video_y) {
   x11_rectangle_t rect;
-  int             xwin, ywin;
-  unsigned int    wwin, hwin, bwin, dwin;
+  int             wwin, hwin;
   float           xf,yf;
   float           scale, width_scale, height_scale,aspect;
-  Window          rootwin;
 
   if (!vwin || !vwin->gui || !vwin->gui->vo_port)
     return 0;
@@ -1957,15 +1921,11 @@ static int video_window_translate_point (xui_vwin_t *vwin,
   /* Driver cannot convert vwin->gui->video space, fall back to old code... */
 
   pthread_mutex_lock (&vwin->mutex);
-
-  vwin->x_lock_display (vwin->video_display);
-  if (XGetGeometry (vwin->video_display, vwin->video_window, &rootwin,
-    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) == BadDrawable) {
-    vwin->x_unlock_display (vwin->video_display);
+  xitk_window_get_window_position (vwin->wrapped_window, NULL, NULL, &wwin, &hwin);
+  if (wwin < 1 || hwin < 1) {
     pthread_mutex_unlock (&vwin->mutex);
     return 0;
   }
-  vwin->x_unlock_display (vwin->video_display);
 
   /* Scale co-ordinate to image dimensions. */
   height_scale = (float)vwin->video_height / (float)hwin;
@@ -2001,7 +1961,6 @@ static int video_window_translate_point (xui_vwin_t *vwin,
  * Set/Get magnification.
  */
 static int video_window_check_mag (xui_vwin_t *vwin) {
-  int ret;
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))
 /*
  * Currently, no support for magnification in fullscreen mode.
@@ -2015,10 +1974,7 @@ static int video_window_check_mag (xui_vwin_t *vwin) {
     return 0;
 
   /* Allow mag only if video win is visible, so don't do something we can't see. */
-  vwin->x_unlock_display (vwin->video_display);
-  ret = xitk_x11_is_window_visible (vwin->video_display, vwin->video_window);
-  vwin->x_unlock_display (vwin->video_display);
-  return ret;
+  return !!(xitk_window_flags (vwin->wrapped_window, 0, 0) & XITK_WINF_VISIBLE);
 }
 
 static void video_window_calc_mag_win_size (xui_vwin_t *vwin, float xmag, float ymag) {
@@ -2386,10 +2342,9 @@ void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *win
       *window_width = 0;
     if (window_height)
       *window_height = 0;
+    return;
   }
-  vwin->x_lock_display (vwin->video_display);
-  xitk_x11_get_window_position (vwin->video_display, vwin->video_window, NULL, NULL, window_width, window_height);
-  vwin->x_unlock_display (vwin->video_display);
+  xitk_window_get_window_position (vwin->wrapped_window, NULL, NULL, window_width, window_height);
 }
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
