@@ -39,6 +39,12 @@
 
 #include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
+#ifdef HAVE_XTESTEXTENSION
+#include <X11/extensions/XTest.h>
+#endif
+#ifdef HAVE_XSSAVEREXTENSION
+#include <X11/extensions/scrnsaver.h>
+#endif
 
 #include <xine/sorted_array.h>
 
@@ -325,6 +331,12 @@ struct xitk_x11_display_s {
   uint8_t        ctrl_keysyms2[XITK_KEY_LASTCODE];
 
   XImage *testpix;
+
+#ifdef HAVE_XTESTEXTENSION
+  /* screen saver prevention keys */
+  int fake_key_cur;
+  uint32_t fake_keys[2];
+#endif
 
   char utf8[2048];
 };
@@ -2226,6 +2238,21 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
   return NULL;
 }
 
+static int _is_ignore_key(xitk_x11_display_t *d, unsigned code) {
+  (void)d; (void)code;
+#ifdef HAVE_XTESTEXTENSION
+  size_t i;
+  /* Filter keys that dont't need to be handled by xine
+   * and could be used by our screen saver reset "ping".
+   * So they will not kill tips and menus. */
+  if (d->fake_key_cur >= 0)
+    for (i = 0; i < sizeof (d->fake_keys) / sizeof (d->fake_keys[0]); ++i)
+      if (code == d->fake_keys[i])
+        return 1;
+#endif
+  return 0;
+}
+
 static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
   xitk_be_window_t *_win, xitk_be_event_type_t type, int timeout) {
   xitk_x11_display_t *d;
@@ -2342,6 +2369,8 @@ static int xitk_x11_next_event (xitk_be_display_t *_d, xitk_be_event_t *event,
     case KeyRelease:
       event->type = XITK_EV_KEY_UP;
     _key_rest:
+      if (_is_ignore_key(d, xevent.xkey.keycode))
+        return 0;
       event->qual = _xitk_x11_get_modifier (xevent.xkey.state);
       event->code = xevent.xkey.keycode;
       event->x = xevent.xkey.x;
@@ -2867,6 +2896,58 @@ static int _xitk_image_quality (xitk_be_display_t *_d, int qual) {
   return Imlib_gfx_quality (d->imlibdata, qual);
 }
 
+static long int xitk_x11_reset_screen_saver(xitk_be_display_t *_d, long int timeout) {
+  xitk_x11_display_t *d;
+  int dummy;
+  (void)timeout;
+
+  xitk_container (d, _d, d);
+
+  d->d.lock(&d->d);
+
+#ifdef HAVE_XSSAVEREXTENSION
+  if (XScreenSaverQueryExtension (d->display, &dummy, &dummy)) {
+    XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
+    long int ssaver_idle;
+    XScreenSaverQueryInfo (d->display, (DefaultRootWindow (d->display)), ssaverinfo);
+    ssaver_idle = ssaverinfo->idle / 1000;
+    XFree(ssaverinfo);
+    if (ssaver_idle < timeout) {
+      d->d.unlock(&d->d);
+      if (d->be->be.verbosity >= 2)
+        printf ("xitk.x11.reset_screensaver (%p): %ld/%ld s elapsed.\n", (void *)d, ssaver_idle, timeout);
+      return ssaver_idle;
+    }
+  }
+#endif
+
+  if (d->be->be.verbosity >= 2)
+    printf ("xitk.x11.reset_screen_saver (%p).\n", (void *)d);
+
+#ifdef HAVE_XTESTEXTENSION
+  if (XTestQueryExtension (d->display, &dummy, &dummy, &dummy, &dummy)) {
+
+    if (d->fake_key_cur < 0) {
+      d->fake_keys[0] = XKeysymToKeycode (d->display, XK_Shift_L);
+      d->fake_keys[1] = XKeysymToKeycode (d->display, XK_Control_L);
+      d->fake_key_cur = 0;
+    }
+
+    d->fake_key_cur = (d->fake_key_cur + 1) & 1;
+    XTestFakeKeyEvent (d->display, d->fake_keys[d->fake_key_cur], True, CurrentTime);
+    XTestFakeKeyEvent (d->display, d->fake_keys[d->fake_key_cur], False, CurrentTime);
+    XSync (d->display, False);
+  } else
+#endif
+  {
+    XResetScreenSaver (d->display);
+  }
+
+  d->d.unlock(&d->d);
+
+  return 0;
+}
+
 /*
  *
  */
@@ -2949,6 +3030,10 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
 
   d->testpix = NULL;
 
+#ifdef HAVE_XTESTEXTENSION
+  d->fake_key_cur = -1;
+#endif
+
   d->default_screen = DefaultScreen (display);
   d->d.width = DisplayWidth (display, d->default_screen);
   d->d.height = DisplayHeight (display, d->default_screen);
@@ -3014,6 +3099,7 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.window_new = xitk_x11_window_new;
   d->d.color._new = xitk_x11_color_new;
   d->d.color._delete = xitk_x11_color_delete;
+  d->d.reset_screen_saver = xitk_x11_reset_screen_saver;
 
   d->d.set_visual    = _x11_select_visual_wrapper;
   d->d.get_visual    = _x11_get_visual;
