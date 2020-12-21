@@ -38,12 +38,6 @@
 #ifdef HAVE_XF86VIDMODE
 #include <X11/extensions/xf86vmode.h>
 #endif
-#ifdef HAVE_XTESTEXTENSION
-#include <X11/extensions/XTest.h>
-#endif
-#ifdef HAVE_XSSAVEREXTENSION
-#include <X11/extensions/scrnsaver.h>
-#endif
 
 #include "common.h"
 #include "videowin.h"
@@ -149,12 +143,6 @@ struct xui_vwin_st {
   int                    depth;
   int                    show;
   int                    borderless;      /* borderless window (for windowed mode)? */
-
-  Bool                   have_xtest;
-#ifdef HAVE_XTESTEXTENSION
-  int                    fake_key_cur;
-  uint32_t               fake_keys[2];    /* Fake key to send */
-#endif
 
   xitk_register_key_t    widget_key;
 
@@ -273,20 +261,6 @@ static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
 static void _video_window_zoom_small_cb(void *data, xine_cfg_entry_t *cfg) {
   xui_vwin_t *vwin = data;
   vwin->zoom_small_stream = cfg->num_value;
-}
-
-static Bool have_xtestextention (xui_vwin_t *vwin) {
-  Bool xtestext = False;
-#ifdef HAVE_XTESTEXTENSION
-  int dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
-
-  vwin->x_lock_display (vwin->video_display);
-  xtestext = XTestQueryExtension (vwin->video_display, &dummy1, &dummy2, &dummy3, &dummy4);
-  vwin->x_unlock_display (vwin->video_display);
-#else
-  (void)vwin;
-#endif
-  return xtestext;
 }
 
 static void video_window_find_visual (xui_vwin_t *vwin) {
@@ -1475,7 +1449,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->borderless         = (borderless > 0);
   vwin->border_left        = 0;
   vwin->border_top         = 0;
-  vwin->have_xtest         = have_xtestextention (vwin);
   vwin->hide_on_start      = hide_on_start;
 
   vwin->depth              = vwin->gui_depth;
@@ -1497,13 +1470,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->desktopHeight      = DisplayHeight(vwin->video_display, vwin->video_screen);
   vwin->fullscreen_width   = vwin->desktopWidth;
   vwin->fullscreen_height  = vwin->desktopHeight;
-
-#ifdef HAVE_XTESTEXTENSION
-  vwin->fake_keys[0] = XKeysymToKeycode (vwin->video_display, XK_Shift_L);
-  vwin->fake_keys[1] = XKeysymToKeycode (vwin->video_display, XK_Control_L);
-  vwin->fake_key_cur = 0;
-  xitk_set_ignore_keys(vwin->gui->xitk, vwin->fake_keys, 2);
-#endif
 
   memcpy (vwin->window_title, "xine", 5);
 
@@ -2194,66 +2160,22 @@ static void *second_display_loop (void *data) {
  *
  */
 
-static long int video_window_get_ssaver_idle (xui_vwin_t *vwin) {
-  if (!vwin)
-    return 0;
-
-#ifdef HAVE_XSSAVEREXTENSION
-  {
-    long int ssaver_idle = -1;
-    int dummy = 0;
-    vwin->x_lock_display (vwin->video_display);
-    if (XScreenSaverQueryExtension (vwin->video_display, &dummy, &dummy)) {
-      XScreenSaverInfo *ssaverinfo = XScreenSaverAllocInfo();
-      XScreenSaverQueryInfo (vwin->video_display, (DefaultRootWindow (vwin->video_display)), ssaverinfo);
-      ssaver_idle = ssaverinfo->idle / 1000;
-      XFree(ssaverinfo);
-    }
-    vwin->x_unlock_display (vwin->video_display);
-    if (ssaver_idle != -1)
-      return ssaver_idle;
-  }
-#endif
-
-  return xitk_get_last_keypressed_time (vwin->gui->xitk);
-}
-
-
 long int video_window_reset_ssaver (xui_vwin_t *vwin) {
-
-  /* fprintf(stderr, "Idletime %d, timeout %d\n", video_window_get_ssaver_idle(), (long int) vwin->gui->ssaver_timeout); */
 
   long int idle = 0;
 
   if (!vwin)
     return 0;
+  if (!vwin->gui->ssaver_enabled)
+    return 0;
 
-  if (vwin->gui->ssaver_enabled && ((idle = video_window_get_ssaver_idle (vwin)) >= (long int) vwin->gui->ssaver_timeout)) {
-    idle = 0;
-    /* fprintf(stderr, "resetting ssaver\n"); */
-
-#ifdef HAVE_XTESTEXTENSION
-    if (vwin->have_xtest == True) {
-
-      vwin->fake_key_cur++;
-
-      if (vwin->fake_key_cur >= 2)
-        vwin->fake_key_cur = 0;
-
-      vwin->x_lock_display (vwin->video_display);
-      XTestFakeKeyEvent (vwin->video_display, vwin->fake_keys[vwin->fake_key_cur], True, CurrentTime);
-      XTestFakeKeyEvent (vwin->video_display, vwin->fake_keys[vwin->fake_key_cur], False, CurrentTime);
-      XSync (vwin->video_display, False);
-      vwin->x_unlock_display (vwin->video_display);
-    }
-    else
-#endif
-    {
-      vwin->x_lock_display (vwin->video_display);
-      XResetScreenSaver (vwin->video_display);
-      vwin->x_unlock_display (vwin->video_display);
-    }
+  if (vwin->video_be_display) {
+    if (vwin->video_be_display->reset_screen_saver)
+      idle = vwin->video_be_display->reset_screen_saver(vwin->video_be_display, vwin->gui->ssaver_timeout);
+  } else {
+    idle = xitk_reset_screen_saver(vwin->gui->xitk, vwin->gui->ssaver_timeout);
   }
+
   return idle;
 }
 

@@ -243,8 +243,6 @@ struct __xitk_s {
 
   struct timeval              keypress;
 
-  uint32_t                    ignore_keys[2];
-
   unsigned long               tips_timeout;
 
   uint32_t                    qual;
@@ -1338,36 +1336,10 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
       break;
 
     case XITK_EV_KEY_UP:
-      {
-        size_t i;
-        /* Filter keys that dont't need to be handled by xine
-         * and could be used by our screen saver reset "ping".
-         * So they will not kill tips and menus. */
-        for (i = 0; i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0]); ++i)
-          if (event->code == xitk->ignore_keys[i])
-            break;
-        if (i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0])) {
-          handled = 1;
-          break;
-        }
-      }
       gettimeofday (&xitk->keypress, 0);
       break;
 
     case XITK_EV_KEY_DOWN:
-      {
-        size_t i;
-        /* Filter keys that dont't need to be handled by xine
-         * and could be used by our screen saver reset "ping".
-         * So they will not kill tips and menus. */
-        for (i = 0; i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0]); ++i)
-          if (event->code == xitk->ignore_keys[i])
-            break;
-        if (i < sizeof (xitk->ignore_keys) / sizeof (xitk->ignore_keys[0])) {
-          handled = 1;
-          break;
-        }
-      }
       if (fx) {
         static const uint8_t t[XITK_KEY_LASTCODE + 1] = {
           [XITK_KEY_ESCAPE] = 32,
@@ -1636,15 +1608,20 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
     __fx_unref (fx);
 }
 
-void xitk_set_ignore_keys(xitk_t *xitk, const uint32_t *keys, size_t count) {
-  __xitk_t *_xitk;
-  size_t i;
+long int xitk_get_last_keypressed_time (xitk_t *xitk);
+long int xitk_reset_screen_saver(xitk_t *xitk, long int timeout)
+{
+  long int idle;
 
-  xitk_container (_xitk, xitk, x);
+  // XXX is this useful at all ... ???
+  idle = xitk_get_last_keypressed_time (xitk);
+  if (idle < timeout)
+    return idle;
 
-  for (i = 0; i < sizeof (_xitk->ignore_keys) / sizeof (_xitk->ignore_keys[0]); i++) {
-    _xitk->ignore_keys[i] = (i < count) ? keys[i] : 0;
-  }
+  if (xitk->d && xitk->d->reset_screen_saver)
+    return xitk->d->reset_screen_saver(xitk->d, timeout);
+
+  return 0;
 }
 
 int xitk_image_quality (xitk_t *xitk, int qual) {
@@ -1703,8 +1680,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_callback    = NULL;
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
-  xitk->ignore_keys[0]  = 0;
-  xitk->ignore_keys[1]  = 0;
   xitk->qual            = 0;
   xitk->tips_timeout    = TIPS_TIMEOUT;
 
