@@ -394,6 +394,48 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
 }
 #endif/* HAVE_XF86VIDMODE */
 
+#ifdef HAVE_XF86VIDMODE
+static void _reset_modeline(xui_vwin_t *vwin) {
+  /*
+   * toggling from fullscreen to window mode - time to switch back to
+   * the original modeline
+   */
+  if (vwin->XF86_modelines_count > 1) {
+#ifdef HAVE_XINERAMA
+    int dummy_event, dummy_error;
+#endif
+    vwin->x_lock_display (vwin->video_display);
+    XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display), vwin->XF86_modelines[0]);
+    XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
+    vwin->x_unlock_display (vwin->video_display);
+
+    vwin->gui->XF86VidMode_fullscreen = 0;
+
+    vwin->fullscreen_width  = vwin->XF86_modelines[0]->hdisplay;
+    vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
+
+    /* update pixel aspect */
+    vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
+#ifdef HAVE_XINERAMA
+    if (XineramaQueryExtension(vwin->video_display, &dummy_event, &dummy_error)) {
+      void *info;
+      int count = 1;
+
+      info = XineramaQueryScreens(vwin->video_display, &count);
+      if (count > 1)
+        /* multihead -> assuming square pixels */
+        vwin->pixel_aspect = 1.0;
+      if (info)
+        XFree(info);
+    }
+#endif
+#ifdef DEBUG
+    printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
+#endif
+  }
+}
+#endif
+
 #ifdef HAVE_XINERAMA
 static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
   if (vwin->xinerama) {
@@ -740,44 +782,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) || (vwin->visual != vwin->gui_visual)) {
 #ifdef HAVE_XF86VIDMODE
-	/*
-	 * toggling from fullscreen to window mode - time to switch back to
-	 * the original modeline
-	 */
-        if (vwin->XF86_modelines_count > 1) {
-#ifdef HAVE_XINERAMA
-          int dummy_event, dummy_error;
+        _reset_modeline(vwin);
 #endif
-
-          XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display), vwin->XF86_modelines[0]);
-          XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-
-          vwin->gui->XF86VidMode_fullscreen = 0;
-
-          vwin->fullscreen_width  = vwin->XF86_modelines[0]->hdisplay;
-          vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
-
-          /* update pixel aspect */
-          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
-
-#ifdef HAVE_XINERAMA
-          if (XineramaQueryExtension (vwin->video_display, &dummy_event, &dummy_error)) {
-            int count = 1;
-            XineramaScreenInfo *xsi;
-            xsi = XineramaQueryScreens (vwin->video_display, &count);
-            if (count > 1)
-              /* multihead -> assuming square pixels */
-              vwin->pixel_aspect = 1.0;
-            if (xsi)
-              XFree (xsi);
-          }
-#endif
-#ifdef DEBUG
-          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
-#endif
-	}
-#endif
-
         old_video_window = vwin->video_window;
       }
       else {
@@ -1795,10 +1801,7 @@ void video_window_exit (xui_vwin_t *vwin) {
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
   if (vwin->gui->XF86VidMode_fullscreen) {
-    vwin->x_lock_display (vwin->video_display);
-    XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display), vwin->XF86_modelines[0]);
-    XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-    vwin->x_unlock_display (vwin->video_display);
+    _reset_modeline(vwin);
   }
 #endif
   pthread_mutex_unlock (&vwin->mutex);
