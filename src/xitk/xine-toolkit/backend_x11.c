@@ -39,6 +39,9 @@
 
 #include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
 #ifdef HAVE_XTESTEXTENSION
 #include <X11/extensions/XTest.h>
 #endif
@@ -3039,6 +3042,20 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.height = DisplayHeight (display, d->default_screen);
   d->d.ratio = ((double)d->d.height * DisplayWidthMM  (display, d->default_screen)) /
                ((double)d->d.width  * DisplayHeightMM (display, d->default_screen));
+#ifdef HAVE_XINERAMA
+  {
+    int dummy;
+    if (XineramaQueryExtension(display, &dummy, &dummy)) {
+      int count = 1;
+      void *info = XineramaQueryScreens(display, &count);
+      if (count > 1)
+        /* multihead -> assuming square pixels */
+        d->d.ratio = 1.0;
+      if (info)
+        XFree(info);
+    }
+  }
+#endif
   d->gc1 = d->gc2 = NULL;
   xitk_dnode_init (&d->d.node);
   xitk_dlist_init (&d->d.images);
