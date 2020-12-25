@@ -317,6 +317,70 @@ static void video_window_lock_opacity (xui_vwin_t *vwin) {
 }
 
 #ifdef HAVE_XF86VIDMODE
+static void _get_modelines(xui_vwin_t *vwin) {
+  int dummy_query_event, dummy_query_error;
+
+  vwin->x_lock_display (vwin->video_display);
+
+  if (XF86VidModeQueryExtension (vwin->video_display, &dummy_query_event, &dummy_query_error)) {
+    XF86VidModeModeInfo* XF86_modelines_swap;
+    int                  mode, major, minor, sort_x, sort_y;
+
+    XF86VidModeQueryVersion (vwin->video_display, &major, &minor);
+    printf (_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
+
+    if (XF86VidModeGetAllModeLines (vwin->video_display, XDefaultScreen(vwin->video_display),
+                                    &(vwin->XF86_modelines_count), &(vwin->XF86_modelines))) {
+      printf (_("XF86VidMode Extension: %d modelines found.\n"), vwin->XF86_modelines_count);
+
+      /* first, kick off unsupported modes */
+      for (mode = 1; mode < vwin->XF86_modelines_count; mode++) {
+
+        if (!XF86VidModeValidateModeLine (vwin->video_display, vwin->video_screen,
+                                          vwin->XF86_modelines[mode])) {
+          int wrong_mode;
+
+          printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"),
+                 vwin->XF86_modelines[mode]->hdisplay,
+                 vwin->XF86_modelines[mode]->vdisplay);
+
+          for (wrong_mode = mode; wrong_mode < vwin->XF86_modelines_count; wrong_mode++)
+            vwin->XF86_modelines[wrong_mode] = vwin->XF86_modelines[wrong_mode + 1];
+
+          vwin->XF86_modelines[wrong_mode] = NULL;
+          vwin->XF86_modelines_count--;
+          mode--;
+        }
+      }
+
+      /*
+       * sorting modelines, skipping first entry because it is the current
+       * modeline in use - this is important so we know to which modeline
+       * we have to switch to when toggling fullscreen mode.
+       */
+      for (sort_x = 1; sort_x < vwin->XF86_modelines_count; sort_x++) {
+
+        for (sort_y = sort_x+1; sort_y < vwin->XF86_modelines_count; sort_y++) {
+
+          if (vwin->XF86_modelines[sort_x]->hdisplay > vwin->XF86_modelines[sort_y]->hdisplay) {
+            XF86_modelines_swap = vwin->XF86_modelines[sort_y];
+            vwin->XF86_modelines[sort_y] = vwin->XF86_modelines[sort_x];
+            vwin->XF86_modelines[sort_x] = XF86_modelines_swap;
+          }
+        }
+      }
+    } else {
+      vwin->XF86_modelines_count = 0;
+      printf(_("XF86VidMode Extension: could not get list of available modelines. Failed.\n"));
+    }
+  } else {
+    printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
+  }
+  vwin->x_unlock_display (vwin->video_display);
+}
+#endif /* HAVE_XF86VIDMODE */
+
+#ifdef HAVE_XF86VIDMODE
 static void _adjust_modeline(xui_vwin_t *vwin) {
   /* XF86VidMode Extension
    * In case a fullscreen request is received or if already in fullscreen, the
@@ -1319,9 +1383,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   XineramaScreenInfo   *screeninfo = NULL;
   const char           *screens_list;
 #endif
-#ifdef HAVE_XF86VIDMODE
-  int                   dummy_query_event, dummy_query_error;
-#endif
   int geometry_x = 0, geometry_y = 0, geometry_w = -8192, geometry_h = -8192;
 
   if (!gui)
@@ -1626,63 +1687,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
      */
     vwin->stream_resize_window = 1;
 
-    vwin->x_lock_display (vwin->video_display);
-
-    if (XF86VidModeQueryExtension (vwin->video_display, &dummy_query_event, &dummy_query_error)) {
-      XF86VidModeModeInfo* XF86_modelines_swap;
-      int                  mode, major, minor, sort_x, sort_y;
-
-      XF86VidModeQueryVersion (vwin->video_display, &major, &minor);
-      printf (_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
-
-      if (XF86VidModeGetAllModeLines (vwin->video_display, XDefaultScreen(vwin->video_display),
-        &(vwin->XF86_modelines_count), &(vwin->XF86_modelines))) {
-        printf (_("XF86VidMode Extension: %d modelines found.\n"), vwin->XF86_modelines_count);
-
-	/* first, kick off unsupported modes */
-        for (mode = 1; mode < vwin->XF86_modelines_count; mode++) {
-
-          if (!XF86VidModeValidateModeLine (vwin->video_display, vwin->video_screen,
-            vwin->XF86_modelines[mode])) {
-	    int wrong_mode;
-
-	    printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"),
-              vwin->XF86_modelines[mode]->hdisplay,
-              vwin->XF86_modelines[mode]->vdisplay);
-
-            for (wrong_mode = mode; wrong_mode < vwin->XF86_modelines_count; wrong_mode++)
-	      vwin->XF86_modelines[wrong_mode] = vwin->XF86_modelines[wrong_mode + 1];
-
-            vwin->XF86_modelines[wrong_mode] = NULL;
-            vwin->XF86_modelines_count--;
-	    mode--;
-	  }
-	}
-
-	/*
-	 * sorting modelines, skipping first entry because it is the current
-	 * modeline in use - this is important so we know to which modeline
-	 * we have to switch to when toggling fullscreen mode.
-	 */
-        for (sort_x = 1; sort_x < vwin->XF86_modelines_count; sort_x++) {
-
-          for (sort_y = sort_x+1; sort_y < vwin->XF86_modelines_count; sort_y++) {
-
-            if (vwin->XF86_modelines[sort_x]->hdisplay > vwin->XF86_modelines[sort_y]->hdisplay) {
-              XF86_modelines_swap = vwin->XF86_modelines[sort_y];
-              vwin->XF86_modelines[sort_y] = vwin->XF86_modelines[sort_x];
-              vwin->XF86_modelines[sort_x] = XF86_modelines_swap;
-	    }
-	  }
-	}
-      } else {
-        vwin->XF86_modelines_count = 0;
-	printf(_("XF86VidMode Extension: could not get list of available modelines. Failed.\n"));
-      }
-    } else {
-      printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
-    }
-    vwin->x_unlock_display (vwin->video_display);
+    _get_modelines(vwin);
   }
   else
     vwin->XF86_modelines_count = 0;
