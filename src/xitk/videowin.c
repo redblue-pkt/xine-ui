@@ -127,7 +127,6 @@ struct xui_vwin_st {
   int                    visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
   double                 visible_aspect;  /* Pixel ratio of currently visible screen */
 
-  int                    using_xinerama;
 #ifdef HAVE_XINERAMA
   XineramaScreenInfo    *xinerama;   /* pointer to xinerama struct, or NULL */
   int                    xinerama_cnt;    /* number of screens in Xinerama */
@@ -1475,7 +1474,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
   gettimeofday (&vwin->click_time, NULL);
 
-  vwin->using_xinerama = 0;
 #ifdef HAVE_XINERAMA
   vwin->xinerama       = NULL;
   vwin->xinerama_cnt   = 0;
@@ -1494,7 +1492,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 	     screeninfo[0].width, screeninfo[0].height);
 #endif
     if (XineramaIsActive(vwin->video_display)) {
-      vwin->using_xinerama = 1;
       vwin->fullscreen_width  = screeninfo[0].width;
       vwin->fullscreen_height = screeninfo[0].height;
       vwin->xinerama = screeninfo;
