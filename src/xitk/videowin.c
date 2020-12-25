@@ -82,8 +82,6 @@ struct xui_vwin_st {
   xitk_be_display_t     *video_be_display;
   Display               *video_display;
   Window                 video_window;
-  int                    gui_depth;
-  Visual                *gui_visual;
   char                  *prefered_visual;
   Visual	        *visual;          /* Visual for video window               */
   struct {
@@ -272,6 +270,7 @@ static void video_window_find_visual (xui_vwin_t *vwin) {
 void video_window_select_visual (xui_vwin_t *vwin) {
   XVisualInfo *vinfo = (XVisualInfo *) -1;
 
+  /* this is done before creating initial video window */
   if (!vwin)
     return;
   if (vwin->gui->vo_port && !vwin->separate_display) {
@@ -283,16 +282,12 @@ void video_window_select_visual (xui_vwin_t *vwin) {
         fprintf (stderr, _("videowin: output driver cannot select a working visual\n"));
         exit (1);
       }
-      vwin->gui_visual  = vinfo->visual;
-      vwin->gui_depth   = vinfo->depth;
-    }
-    if (vwin->gui_visual != vwin->visual) {
-      printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vwin->gui_visual->visualid);
-      xitk_x11_select_visual (vwin->gui->xitk, vwin->gui_visual);
-      vwin->gui_depth = xitk_x11_get_depth(vwin->gui->xitk);
-      pthread_mutex_lock (&vwin->mutex);
-      video_window_adapt_size (vwin);
-      pthread_mutex_unlock (&vwin->mutex);
+      if (vwin->visual != vinfo->visual) {
+        printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vinfo->visual->visualid);
+        xitk_x11_select_visual (vwin->gui->xitk, vinfo->visual);
+        vwin->visual = vinfo->visual;
+        vwin->depth = vinfo->depth;
+      }
     }
   }
 }
@@ -756,8 +751,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       Window      rootwindow = None;
 
       vwin->fullscreen_mode = FULLSCR_MODE;
-      vwin->visual          = vwin->gui_visual;
-      vwin->depth           = vwin->gui_depth;
 
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->video_display,
@@ -837,7 +830,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (vwin->xinerama && (vwin->fullscreen_req & FULLSCR_XI_MODE)) {
 
     if (vwin->video_window) {
-      if ((vwin->fullscreen_mode & FULLSCR_XI_MODE) && vwin->gui_visual == vwin->visual) {
+      if (vwin->fullscreen_mode & FULLSCR_XI_MODE) {
         if (vwin->visible_width != vwin->output_width || vwin->visible_height != vwin->output_height) {
           /*
            * resizing the video window may be necessary if the modeline or tv mode has
@@ -861,8 +854,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
-    vwin->visual   = vwin->gui_visual;
-    vwin->depth    = vwin->gui_depth;
 
     /*
      * open fullscreen window
@@ -889,7 +880,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if (vwin->video_window) {
 
-      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (vwin->gui_visual == vwin->visual)) {
+      if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
 //#ifdef HAVE_XF86VIDMODE
 //	if(vwin->XF86_modelines_count > 1) {
         if ((vwin->visible_width != vwin->output_width) || (vwin->visible_height != vwin->output_height)) {
@@ -916,8 +907,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
-    vwin->visual   = vwin->gui_visual;
-    vwin->depth    = vwin->gui_depth;
 
     /*
      * open fullscreen window
@@ -968,7 +957,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if (vwin->video_window) {
 
-      if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) || (vwin->visual != vwin->gui_visual)) {
+      if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
 #ifdef HAVE_XF86VIDMODE
         _reset_modeline(vwin);
 #endif
@@ -989,8 +978,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     }
 
     vwin->fullscreen_mode   = WINDOWED_MODE;
-    vwin->visual            = vwin->gui_visual;
-    vwin->depth             = vwin->gui_depth;
 
     if (vwin->borderless)
       border_width = 0;
@@ -1583,10 +1570,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
   vwin->video_window       = None;
   vwin->wid                = window_id;
-  vwin->gui_depth          = xitk_x11_get_depth(gui->xitk);
   vwin->fullscreen_req     = WINDOWED_MODE;
   vwin->fullscreen_mode    = WINDOWED_MODE;
-  vwin->video_window  = None;
   vwin->show               = 2;
   vwin->widget_key         = 0;
   vwin->borderless         = (borderless > 0);
@@ -1594,8 +1579,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->border_top         = 0;
   vwin->hide_on_start      = hide_on_start;
 
-  vwin->depth              = vwin->gui_depth;
-  vwin->gui_visual         =
+  vwin->depth              = xitk_x11_get_depth(gui->xitk);
   vwin->visual             = xitk_x11_get_visual(gui->xitk);
 
   /* Currently, there no plugin loaded so far, but that might change */
