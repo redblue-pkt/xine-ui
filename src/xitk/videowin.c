@@ -117,12 +117,6 @@ struct xui_vwin_st {
   int                    fullscreen_width;
   int                    fullscreen_height;
 
-  int                    xinerama_fullscreen_x; /* will contain paramaters for very
-						   fullscreen in xinerama mode */
-  int                    xinerama_fullscreen_y;
-  int                    xinerama_fullscreen_width;
-  int                    xinerama_fullscreen_height;
-
   int                    visible_width;   /* Size of currently visible portion of screen */
   int                    visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
   double                 visible_aspect;  /* Pixel ratio of currently visible screen */
@@ -130,6 +124,11 @@ struct xui_vwin_st {
 #ifdef HAVE_XINERAMA
   XineramaScreenInfo    *xinerama;   /* pointer to xinerama struct, or NULL */
   int                    xinerama_cnt;    /* number of screens in Xinerama */
+  int                    xinerama_fullscreen_x; /* will contain paramaters for very
+                                                   fullscreen in xinerama mode */
+  int                    xinerama_fullscreen_y;
+  int                    xinerama_fullscreen_width;
+  int                    xinerama_fullscreen_height;
 #endif
 
   int                    xwin;            /* current X location */
@@ -464,6 +463,164 @@ static void _reset_modeline(xui_vwin_t *vwin) {
     printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
   }
+}
+#endif
+
+/*
+ * check if screen_number is in the list
+ */
+#ifdef HAVE_XINERAMA
+static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_number) {
+  const char *buffer;
+  int         dummy;
+
+  buffer = list;
+
+  do {
+    if((sscanf(buffer,"%d", &dummy) == 1) && (screen_number == dummy))
+      return 1;
+  } while((buffer = strchr(buffer,' ')) && (++buffer < (list + strlen(list))));
+
+  return 0;
+}
+#endif
+
+#ifdef HAVE_XINERAMA
+static void _init_xinerama(xui_vwin_t *vwin) {
+
+  int                   screens, i;
+  int                   dummy_a, dummy_b;
+  XineramaScreenInfo   *screeninfo = NULL;
+  const char           *screens_list;
+
+  vwin->xinerama       = NULL;
+  vwin->xinerama_cnt   = 0;
+
+  vwin->x_lock_display (vwin->video_display);
+
+  /* Spark
+   * some Xinerama stuff
+   * I want to figure out what fullscreen means for this setup
+   */
+
+  if (!XineramaQueryExtension (vwin->video_display, &dummy_a, &dummy_b))
+    return;
+  screeninfo = XineramaQueryScreens (vwin->video_display, &screens);
+  if (!screeninfo)
+    return;
+
+  /* Xinerama Detected */
+#ifdef DEBUG
+  printf ("videowin: display is using xinerama with %d screens\n", screens);
+  printf ("videowin: going to assume we are using the first screen.\n");
+  printf ("videowin: size of the first screen is %dx%d.\n",
+          screeninfo[0].width, screeninfo[0].height);
+#endif
+  if (XineramaIsActive(vwin->video_display)) {
+    vwin->fullscreen_width  = screeninfo[0].width;
+    vwin->fullscreen_height = screeninfo[0].height;
+    vwin->xinerama = screeninfo;
+    vwin->xinerama_cnt = screens;
+
+    screens_list = xine_config_register_string (vwin->gui->xine, "gui.xinerama_use_screens",
+        "0 1",
+        _("Screens to use in order to do a very fullscreen in xinerama mode. (example 0 2 3)"),
+        _("Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"),
+        CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
+
+    if ((sscanf(screens_list,"%d",&dummy_a) == 1) && (dummy_a >= 0) && (dummy_a < screens)) {
+
+      /* try to calculate the best maximum size for xinerama fullscreen */
+      vwin->xinerama_fullscreen_x = screeninfo[dummy_a].x_org;
+      vwin->xinerama_fullscreen_y = screeninfo[dummy_a].y_org;
+      vwin->xinerama_fullscreen_width = screeninfo[dummy_a].width;
+      vwin->xinerama_fullscreen_height = screeninfo[dummy_a].height;
+
+      i = dummy_a;
+      while (i < screens) {
+
+        if (screen_is_in_xinerama_fullscreen_list(screens_list, i)) {
+          if (screeninfo[i].x_org < vwin->xinerama_fullscreen_x)
+            vwin->xinerama_fullscreen_x = screeninfo[i].x_org;
+          if (screeninfo[i].y_org < vwin->xinerama_fullscreen_y)
+            vwin->xinerama_fullscreen_y = screeninfo[i].y_org;
+        }
+
+        i++;
+      }
+
+      i = dummy_a;
+      while (i < screens) {
+
+        if (screen_is_in_xinerama_fullscreen_list(screens_list, i)) {
+          if ((screeninfo[i].width + screeninfo[i].x_org) >
+              (vwin->xinerama_fullscreen_x + vwin->xinerama_fullscreen_width)) {
+            vwin->xinerama_fullscreen_width =
+              screeninfo[i].width + screeninfo[i].x_org - vwin->xinerama_fullscreen_x;
+          }
+
+          if ((screeninfo[i].height + screeninfo[i].y_org) >
+              (vwin->xinerama_fullscreen_y + vwin->xinerama_fullscreen_height)) {
+            vwin->xinerama_fullscreen_height =
+              screeninfo[i].height + screeninfo[i].y_org - vwin->xinerama_fullscreen_y;
+          }
+        }
+
+        i++;
+      }
+    } else {
+      /* we can't find screens to use, so we use screen 0 */
+      vwin->xinerama_fullscreen_x      = screeninfo[0].x_org;
+      vwin->xinerama_fullscreen_y      = screeninfo[0].y_org;
+      vwin->xinerama_fullscreen_width  = screeninfo[0].width;
+      vwin->xinerama_fullscreen_height = screeninfo[0].height;
+    }
+
+    dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_x",
+        -8192,
+        _("x coordinate for xinerama fullscreen (-8192 = autodetect)"),
+        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
+    if (dummy_a > -8192)
+      vwin->xinerama_fullscreen_x = dummy_a;
+
+    dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_y",
+        -8192,
+        _("y coordinate for xinerama fullscreen (-8192 = autodetect)"),
+        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
+    if (dummy_a > -8192)
+      vwin->xinerama_fullscreen_y = dummy_a;
+
+    dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_width",
+        -8192,
+        _("width for xinerama fullscreen (-8192 = autodetect)"),
+        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
+    if (dummy_a > -8192)
+      vwin->xinerama_fullscreen_width = dummy_a;
+
+    dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_height",
+        -8192,
+        _("height for xinerama fullscreen (-8192 = autodetect)"),
+        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
+    if (dummy_a > -8192)
+      vwin->xinerama_fullscreen_height = dummy_a;
+
+#ifdef DEBUG
+    printf ("videowin: Xinerama fullscreen parameters: X_origin=%d Y_origin=%d Width=%d Height=%d\n",
+            vwin->xinerama_fullscreen_x, vwin->xinerama_fullscreen_y,
+            vwin->xinerama_fullscreen_width, vwin->xinerama_fullscreen_height);
+#endif
+  } else {
+    /* no Xinerama */
+    if (vwin->gui->verbosity)
+      printf ("Display is not using Xinerama.\n");
+    vwin->xinerama_fullscreen_x      = 0;
+    vwin->xinerama_fullscreen_y      = 0;
+    vwin->xinerama_fullscreen_width  = vwin->fullscreen_width;
+    vwin->xinerama_fullscreen_height = vwin->fullscreen_height;
+    XFree (screeninfo);
+  }
+
+  vwin->x_unlock_display (vwin->video_display);
 }
 #endif
 
@@ -1193,29 +1350,6 @@ int video_window_get_fullscreen_mode (xui_vwin_t *vwin) {
   return vwin ? vwin->fullscreen_mode : 0;
 }
 
-#if 0
-/*
- * set/reset xine in xinerama fullscreen
- * ie: try to expend display on further screens
- */
-void video_window_set_xinerama_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen) {
-  if (!vwin)
-    return;
-
-  pthread_mutex_lock (&vwin->mutex);
-  vwin->fullscreen_req = req_fullscreen;
-  video_window_adapt_size (vwin);
-  pthread_mutex_unlock (&vwin->mutex);
-}
-
-/*
- *
- */
-int video_window_get_xinerama_fullscreen_mode (xui_vwin_t *vwin) {
-  return vwin ? vwin->fullscreen_mode : 0;
-}
-#endif
-
 /*
  * Set cursor
  */
@@ -1346,23 +1480,6 @@ void video_window_set_visibility (xui_vwin_t *vwin, int show_window) {
   pthread_mutex_unlock (&vwin->mutex);
 }
 
-/*
- * check if screen_number is in the list
- */
-static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_number) {
-  const char *buffer;
-  int         dummy;
-
-  buffer = list;
-
-  do {
-    if((sscanf(buffer,"%d", &dummy) == 1) && (screen_number == dummy))
-      return 1;
-  } while((buffer = strchr(buffer,' ')) && (++buffer < (list + strlen(list))));
-
-  return 0;
-}
-
 static void vwin_dummy_un_lock_display (Display *display) {
   (void)display;
 }
@@ -1375,14 +1492,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
                                const char *prefered_visual, int use_x_lock_display,
                                int install_colormap) {
   xui_vwin_t           *vwin;
-  int                   i;
   const char           *video_display_name;
-#ifdef HAVE_XINERAMA
-  int                   screens;
-  int                   dummy_a, dummy_b;
-  XineramaScreenInfo   *screeninfo = NULL;
-  const char           *screens_list;
-#endif
   int geometry_x = 0, geometry_y = 0, geometry_w = -8192, geometry_h = -8192;
 
   if (!gui)
@@ -1509,131 +1619,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   gettimeofday (&vwin->click_time, NULL);
 
 #ifdef HAVE_XINERAMA
-  vwin->xinerama       = NULL;
-  vwin->xinerama_cnt   = 0;
-  /* Spark
-   * some Xinerama stuff
-   * I want to figure out what fullscreen means for this setup
-   */
-
-  if ((XineramaQueryExtension (vwin->video_display, &dummy_a, &dummy_b))
-      && (screeninfo = XineramaQueryScreens (vwin->video_display, &screens))) {
-    /* Xinerama Detected */
-#ifdef DEBUG
-    printf ("videowin: display is using xinerama with %d screens\n", screens);
-    printf ("videowin: going to assume we are using the first screen.\n");
-    printf ("videowin: size of the first screen is %dx%d.\n",
-	     screeninfo[0].width, screeninfo[0].height);
+  _init_xinerama(vwin);
 #endif
-    if (XineramaIsActive(vwin->video_display)) {
-      vwin->fullscreen_width  = screeninfo[0].width;
-      vwin->fullscreen_height = screeninfo[0].height;
-      vwin->xinerama = screeninfo;
-      vwin->xinerama_cnt = screens;
-
-      screens_list = xine_config_register_string (vwin->gui->xine, "gui.xinerama_use_screens",
-        "0 1",
-        _("Screens to use in order to do a very fullscreen in xinerama mode. (example 0 2 3)"),
-        _("Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"),
-        CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
-
-      if((sscanf(screens_list,"%d",&dummy_a) == 1) && (dummy_a >= 0) && (dummy_a < screens)) {
-
-        /* try to calculate the best maximum size for xinerama fullscreen */
-        vwin->xinerama_fullscreen_x = screeninfo[dummy_a].x_org;
-        vwin->xinerama_fullscreen_y = screeninfo[dummy_a].y_org;
-        vwin->xinerama_fullscreen_width = screeninfo[dummy_a].width;
-        vwin->xinerama_fullscreen_height = screeninfo[dummy_a].height;
-
-        i = dummy_a;
-        while(i < screens) {
-
-          if(screen_is_in_xinerama_fullscreen_list(screens_list, i)) {
-            if(screeninfo[i].x_org < vwin->xinerama_fullscreen_x)
-	      vwin->xinerama_fullscreen_x = screeninfo[i].x_org;
-            if(screeninfo[i].y_org < vwin->xinerama_fullscreen_y)
-	      vwin->xinerama_fullscreen_y = screeninfo[i].y_org;
-          }
-
-          i++;
-        }
-
-        i = dummy_a;
-        while(i < screens) {
-
-          if(screen_is_in_xinerama_fullscreen_list(screens_list, i)) {
-            if((screeninfo[i].width + screeninfo[i].x_org) >
-	       (vwin->xinerama_fullscreen_x + vwin->xinerama_fullscreen_width)) {
-	      vwin->xinerama_fullscreen_width =
-		screeninfo[i].width + screeninfo[i].x_org - vwin->xinerama_fullscreen_x;
-	    }
-
-            if((screeninfo[i].height + screeninfo[i].y_org) >
-	       (vwin->xinerama_fullscreen_y + vwin->xinerama_fullscreen_height)) {
-	      vwin->xinerama_fullscreen_height =
-		screeninfo[i].height + screeninfo[i].y_org - vwin->xinerama_fullscreen_y;
-	    }
-          }
-
-          i++;
-        }
-      } else {
-        /* we can't find screens to use, so we use screen 0 */
-        vwin->xinerama_fullscreen_x      = screeninfo[0].x_org;
-        vwin->xinerama_fullscreen_y      = screeninfo[0].y_org;
-        vwin->xinerama_fullscreen_width  = screeninfo[0].width;
-        vwin->xinerama_fullscreen_height = screeninfo[0].height;
-      }
-
-      dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_x",
-        -8192,
-        _("x coordinate for xinerama fullscreen (-8192 = autodetect)"),
-        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
-      if(dummy_a > -8192)
-        vwin->xinerama_fullscreen_x = dummy_a;
-
-      dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_y",
-        -8192,
-        _("y coordinate for xinerama fullscreen (-8192 = autodetect)"),
-        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
-      if(dummy_a > -8192)
-        vwin->xinerama_fullscreen_y = dummy_a;
-
-      dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_width",
-        -8192,
-        _("width for xinerama fullscreen (-8192 = autodetect)"),
-        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
-      if(dummy_a > -8192)
-        vwin->xinerama_fullscreen_width = dummy_a;
-
-      dummy_a = xine_config_register_num (vwin->gui->xine, "gui.xinerama_fullscreen_height",
-        -8192,
-        _("height for xinerama fullscreen (-8192 = autodetect)"),
-        CONFIG_NO_HELP, CONFIG_LEVEL_EXP, CONFIG_NO_CB, CONFIG_NO_DATA);
-      if(dummy_a > -8192)
-        vwin->xinerama_fullscreen_height = dummy_a;
-
-#ifdef DEBUG
-      printf ("videowin: Xinerama fullscreen parameters: X_origin=%d Y_origin=%d Width=%d Height=%d\n",
-        vwin->xinerama_fullscreen_x, vwin->xinerama_fullscreen_y,
-        vwin->xinerama_fullscreen_width, vwin->xinerama_fullscreen_height);
-#endif
-    }
-    else {
-      vwin->xinerama_fullscreen_x      = 0;
-      vwin->xinerama_fullscreen_y      = 0;
-      vwin->xinerama_fullscreen_width  = vwin->fullscreen_width;
-      vwin->xinerama_fullscreen_height = vwin->fullscreen_height;
-
-      XFree (screeninfo);
-    }
-  } else {
-    /* no Xinerama */
-    if (vwin->gui->verbosity)
-      printf ("Display is not using Xinerama.\n");
-  }
-#endif
-  vwin->x_unlock_display (vwin->video_display);
 
   vwin->visible_width  = vwin->fullscreen_width;
   vwin->visible_height = vwin->fullscreen_height;
