@@ -244,6 +244,19 @@ void xitk_window_move_window (xitk_window_t *xwin, int x, int y) {
   }
 }
 
+void xitk_window_resize_window (xitk_window_t *xwin, int x, int y, int w, int h) {
+  if (xwin && xwin->bewin) {
+    xitk_tagitem_t tags[] = {
+      {XITK_TAG_X,      x},
+      {XITK_TAG_Y,      y},
+      {XITK_TAG_WIDTH,  w},
+      {XITK_TAG_HEIGHT, h},
+      {XITK_TAG_END,    0}
+    };
+    xwin->bewin->set_props (xwin->bewin, (x>=0 && y>=0) ? tags : &tags[2]);
+  }
+}
+
 /*
  * Create a simple (empty) window.
  */
