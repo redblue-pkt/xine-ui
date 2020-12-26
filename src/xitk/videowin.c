@@ -259,11 +259,6 @@ static void _video_window_zoom_small_cb(void *data, xine_cfg_entry_t *cfg) {
   vwin->zoom_small_stream = cfg->num_value;
 }
 
-static void video_window_find_visual (xui_vwin_t *vwin) {
-  xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->prefered_visual,
-                       &vwin->visual, &vwin->depth);
-}
-
 /*
  * Let the video driver override the selected visual
  */
@@ -724,7 +719,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XColor      dummy, black;
     Colormap    colormap;
     if (vwin->separate_display) {
-      video_window_find_visual (vwin);
       colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
     } else {
       colormap = xitk_x11_get_colormap (vwin->gui->xitk);
@@ -1579,7 +1573,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   video_window_select_visual (vwin);
 
   if (vwin->separate_display) {
-    video_window_find_visual (vwin);
+    xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->prefered_visual,
+                         &vwin->visual, &vwin->depth);
   }
 
   vwin->xwin               = geometry_x;
