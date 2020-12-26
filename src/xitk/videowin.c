@@ -835,9 +835,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           /*
            * resizing the video window may be necessary if the modeline or tv mode has
            * just been switched
-           */
-          XMoveResizeWindow (vwin->video_display, vwin->video_window, hint.x, hint.y,
-            vwin->visible_width, vwin->visible_height);
+           */ 
+          xitk_window_resize_window (vwin->wrapped_window, hint.x, hint.y, vwin->visible_width, vwin->visible_height);
           vwin->output_width  = vwin->visible_width;
           vwin->output_height = vwin->visible_height;
         }
@@ -881,22 +880,17 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->video_window) {
 
       if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
-//#ifdef HAVE_XF86VIDMODE
-//	if(vwin->XF86_modelines_count > 1) {
         if ((vwin->visible_width != vwin->output_width) || (vwin->visible_height != vwin->output_height)) {
 	   /*
 	    * resizing the video window may be necessary if the modeline or tv mode has
 	    * just been switched
 	    */
-          XResizeWindow (vwin->video_display, vwin->video_window,
-            vwin->visible_width, vwin->visible_height);
+          xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->visible_width, vwin->visible_height);
           vwin->output_width    = vwin->visible_width;
           vwin->output_height   = vwin->visible_height;
 	}
-//#endif
         vwin->fullscreen_mode = vwin->fullscreen_req;
 	vwin->x_unlock_display (vwin->video_display);
-
 	return;
       }
 
@@ -968,10 +962,9 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	/* Update window size hints with the new size */
         XSetNormalHints (vwin->video_display, vwin->video_window, &hint);
 
-        XResizeWindow (vwin->video_display, vwin->video_window,
-          vwin->win_width, vwin->win_height);
-
         vwin->x_unlock_display (vwin->video_display);
+
+        xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->win_width, vwin->win_height);
 
 	return;
       }
@@ -998,6 +991,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (vwin->gui->vo_port) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
   }
+
+  register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
 
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
     xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.fullscreen, "xine");
@@ -1034,8 +1029,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XFree(wm_hint);
   }
 
-  register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
-
   if (vwin->hide_on_start == 1) {
     vwin->hide_on_start = -1;
     vwin->show = 0;
@@ -1068,6 +1061,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   XSync (vwin->video_display, False);
 
+  vwin->x_unlock_display (vwin->video_display);
+
   if ((!(vwin->fullscreen_mode & WINDOWED_MODE))) {
     /* Waiting for visibility, avoid X error on some cases */
 
@@ -1075,15 +1070,13 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
 #ifdef HAVE_XINERAMA
     if (vwin->xinerama)
-      XMoveWindow (vwin->video_display, vwin->video_window, hint.x, hint.y);
+      xitk_window_move_window (vwin->wrapped_window, hint.x, hint.y);
     else
-      XMoveWindow (vwin->video_display, vwin->video_window, 0, 0);
+      xitk_window_move_window (vwin->wrapped_window, 0, 0);
 #else
-    XMoveWindow (vwin->video_display, vwin->video_window, 0, 0);
+    xitk_window_move_window (vwin->wrapped_window, 0, 0);
 #endif
   }
-
-  vwin->x_unlock_display (vwin->video_display);
 
   /* The old window should be destroyed now */
   if(old_video_window != None) {
@@ -1683,9 +1676,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
       vwin->xwin = vwin->old_xwin = geometry_x;;
       vwin->ywin = vwin->old_ywin = geometry_y;
 
-      XMoveResizeWindow (vwin->video_display, vwin->video_window,
-        vwin->xwin, vwin->ywin, vwin->video_width, vwin->video_height);
-
+      xitk_window_resize_window(vwin->wrapped_window, vwin->xwin, vwin->ywin, vwin->video_width, vwin->video_height);
     }
     else {
 

@@ -1141,6 +1141,7 @@ void xitk_window_set_role (xitk_window_t *xwin, xitk_window_role_t role);
  *
  */
 void xitk_window_move_window(xitk_window_t *w, int x, int y);
+void xitk_window_resize_window (xitk_window_t *xwin, int x, int y, int w, int h);
 
 /*
  *
