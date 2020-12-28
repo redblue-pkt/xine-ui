@@ -988,14 +988,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
 
-  if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
-    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.fullscreen, "xine");
-  } else if (vwin->borderless) {
-    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.borderless, "xine");
-  } else {
-    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.normal, "xine");
-  }
-
   vwin->x_lock_display (vwin->video_display);
 
   XSetWMNormalHints (vwin->video_display, vwin->video_window, &hint);
@@ -1016,9 +1008,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->icon_pixmap = xitk_image_get_pixmap (vwin->gui->icon);
-    wm_hint->icon_mask = xitk_image_get_mask (vwin->gui->icon);
-    wm_hint->flags = InputHint | StateHint | IconPixmapHint | IconMaskHint;
+    wm_hint->flags = InputHint | StateHint;
     XSetWMHints (vwin->video_display, vwin->video_window, wm_hint);
     XFree(wm_hint);
   }
@@ -2022,10 +2012,14 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
 
 static void register_event_handler(xui_vwin_t *vwin)
 {
+  const char *res_name = !(vwin->fullscreen_req & WINDOWED_MODE) ? vwin->res_name.fullscreen
+                       : vwin->borderless ? vwin->res_name.borderless
+                       : vwin->res_name.normal;
   if (vwin->video_be_display) {
     xitk_window_destroy_window (vwin->wrapped_window);
     vwin->wrapped_window = xitk_x11_wrap_window (NULL, vwin->video_be_display, vwin->video_window);
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_DND, XITK_WINF_DND);
+    xitk_window_set_window_class (vwin->wrapped_window, res_name, "xine");
   } else {
     xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
     xitk_window_destroy_window (vwin->wrapped_window);
@@ -2038,7 +2032,7 @@ static void register_event_handler(xui_vwin_t *vwin)
     /* NOTE: this makes kwin use a desktop file named <res_class>.desktop to set the icon.
      * any subsequent attempt to set an icon has no effect then.
      * setting an icon _before_ leads to random fallback to default x icon. */
-    xitk_window_set_window_class (vwin->wrapped_window, vwin->res_name.normal, "xine");
+    xitk_window_set_window_class (vwin->wrapped_window, res_name, "xine");
     xitk_window_set_window_icon (vwin->wrapped_window, vwin->gui->icon);
   }
 
