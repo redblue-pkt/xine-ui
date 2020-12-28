@@ -114,7 +114,7 @@ void xitk_window_set_window_title (xitk_window_t *xwin, const char *title) {
 void xitk_window_set_window_icon (xitk_window_t *w, xitk_image_t *icon) {
 
   xitk_tagitem_t tags[] = {
-    {XITK_TAG_ICON, (uintptr_t)icon},
+    {XITK_TAG_ICON, (uintptr_t)(icon ? icon->beimg : NULL)},
     {XITK_TAG_END, 0}
   };
 
@@ -293,7 +293,7 @@ xitk_window_t *xitk_window_create_window_ext (xitk_t *xitk, int x, int y, int wi
       {XITK_TAG_Y, y},
       {XITK_TAG_IMAGE, xwin->bg_image ? (uintptr_t)xwin->bg_image->beimg : 0},
       {XITK_TAG_TITLE, (uintptr_t)title},
-      {XITK_TAG_ICON, (uintptr_t)icon},
+      {XITK_TAG_ICON, (uintptr_t)(icon ? icon->beimg : NULL)},
       {XITK_TAG_WIN_FLAGS, (XITK_WINF_OVERRIDE_REDIRECT << 16) | (override_redirect ? XITK_WINF_OVERRIDE_REDIRECT : 0)},
       {XITK_TAG_LAYER_ABOVE, layer_above},
       {XITK_TAG_RES_NAME, (uintptr_t)res_name},

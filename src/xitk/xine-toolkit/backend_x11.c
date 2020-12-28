@@ -252,7 +252,7 @@ struct xitk_x11_window_s {
   xitk_dnd_t *dnd;
   GC gc;
   xitk_tagitem_t props[XITK_X11_WT_LAST];
-  char name[80], title[256];
+  char res_class[128], res_name[128], name[128], title[256];
 };
 
 typedef struct xitk_x11_be_font_t {
@@ -1724,6 +1724,8 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     }
   }
   memcpy (props, win->props, sizeof (props));
+  props[XITK_X11_WT_RES_CLASS].value = (uintptr_t)NULL;
+  props[XITK_X11_WT_RES_NAME].value = (uintptr_t)NULL;
   props[XITK_X11_WT_NAME].value = (uintptr_t)NULL;
   props[XITK_X11_WT_TITLE].value = (uintptr_t)NULL;
   props[XITK_X11_WT_IMAGE].value = (uintptr_t)NULL;
@@ -1849,7 +1851,33 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
     win->props[XITK_X11_WT_CURSOR].value = props[XITK_X11_WT_CURSOR].value;
   }
 
-  if (props[XITK_X11_WT_ICON].value != win->props[XITK_X11_WT_ICON].value) {
+  {
+    const char *res_class = (const char *)props[XITK_X11_WT_RES_CLASS].value;
+    const char *res_name = (const char *)props[XITK_X11_WT_RES_NAME].value;
+
+    if (res_class && strcmp (res_class, win->res_class))
+      strlcpy (win->res_class, res_class, sizeof (win->res_class));
+    else
+      res_class = NULL;
+    if (res_name && strcmp (res_name, win->res_name))
+      strlcpy (win->res_name, res_name, sizeof (win->res_name));
+    else
+      res_name = NULL;
+    if (res_class || res_name) {
+      XClassHint *xclasshint;
+
+      if ((xclasshint = XAllocClassHint ()) != NULL) {
+        xclasshint->res_name  = win->res_name[0] ? win->res_name : (char *)"Xine Window";
+        xclasshint->res_class = win->res_class[0] ? win->res_class : (char *)"Xitk";
+        XSetClassHint (d->display, win->w.id, xclasshint);
+        XFree (xclasshint);
+      }
+    }
+  }
+
+  /* dont override nice wm icon scaling via res_database->class_name with a single one. */
+  if (!((d->wm_type & WM_TYPE_EWMH_COMP) && win->res_class[0]) &&
+    (props[XITK_X11_WT_ICON].value != win->props[XITK_X11_WT_ICON].value)) {
     xitk_x11_image_t *icon = (xitk_x11_image_t *)props[XITK_X11_WT_ICON].value;
     XWMHints   *wm_hint;
     if ((wm_hint = XAllocWMHints ()) != NULL) {
@@ -1860,21 +1888,6 @@ static int xitk_x11_window_set_props (xitk_be_window_t *_win, const xitk_tagitem
       XFree (wm_hint);
     }
     win->props[XITK_X11_WT_ICON].value = props[XITK_X11_WT_ICON].value;
-  }
-
-  if (props[XITK_X11_WT_RES_NAME].value != win->props[XITK_X11_WT_RES_NAME].value ||
-      props[XITK_X11_WT_RES_CLASS].value != win->props[XITK_X11_WT_RES_CLASS].value) {
-    XClassHint *xclasshint;
-    if ((xclasshint = XAllocClassHint ()) != NULL) {
-      xclasshint->res_name  =
-        (char *)props[XITK_X11_WT_RES_NAME].value ? (char *)props[XITK_X11_WT_RES_NAME].value :
-        (char *)win->props[XITK_X11_WT_RES_NAME].value ? (char *)win->props[XITK_X11_WT_RES_NAME].value : "Xine Window";
-      xclasshint->res_class =
-        (char *)props[XITK_X11_WT_RES_CLASS].value ? (char *)props[XITK_X11_WT_RES_CLASS].value :
-        (char *)win->props[XITK_X11_WT_RES_CLASS].value ? (char *)win->props[XITK_X11_WT_RES_CLASS].value : "Xitk";
-      XSetClassHint (d->display, win->w.id, xclasshint);
-      XFree (xclasshint);
-    }
   }
 
   if ((props[XITK_X11_WT_WIN_FLAGS].value ^ win->props[XITK_X11_WT_WIN_FLAGS].value)
@@ -2032,8 +2045,12 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
   win->d = d;
 
   memcpy (win->props, _xitk_x11_window_defaults, sizeof (win->props));
+  win->props[XITK_X11_WT_RES_CLASS].value = (uintptr_t)win->res_class;
+  win->props[XITK_X11_WT_RES_NAME].value = (uintptr_t)win->res_name;
   win->props[XITK_X11_WT_NAME].value = (uintptr_t)win->name;
   win->props[XITK_X11_WT_TITLE].value = (uintptr_t)win->title;
+  win->res_class[0] = 0;
+  win->res_name[0] = 0;
   win->name[0] = 0;
   win->title[0] = 0;
   xitk_tags_get (taglist, win->props);
@@ -2166,12 +2183,19 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
     XSetWMProtocols (d->display, win->w.id, &d->atoms[XITK_A_WM_DELETE_WINDOW], 1);
 
     if ((xclasshint = XAllocClassHint ()) != NULL) {
-      xclasshint->res_name  = ((char *)win->props[XITK_X11_WT_RES_NAME].value
-                            ? (char *)win->props[XITK_X11_WT_RES_NAME].value : "Xine Window");
-      xclasshint->res_class = ((char *)win->props[XITK_X11_WT_RES_CLASS].value
-                            ? (char *)win->props[XITK_X11_WT_RES_CLASS].value : "Xitk");
+      const char *res_class = (const char *)win->props[XITK_X11_WT_RES_CLASS].value;
+      const char *res_name = (const char *)win->props[XITK_X11_WT_RES_NAME].value;
+
+      if (res_class)
+        strlcpy (win->res_class, res_class, sizeof (win->res_class));
+      if (res_name)
+        strlcpy (win->res_name, res_name, sizeof (win->res_name));
+      xclasshint->res_name  = win->res_name[0] ? win->res_name : "Xine Window";
+      xclasshint->res_class = win->res_class[0] ? win->res_class : (char *)"Xitk";
       XSetClassHint (d->display, win->w.id, xclasshint);
       XFree (xclasshint);
+      win->props[XITK_X11_WT_RES_CLASS].value = (uintptr_t)win->res_class;
+      win->props[XITK_X11_WT_RES_NAME].value = (uintptr_t)win->res_name;
     }
 
     if (win->props[XITK_X11_WT_IMAGE].value) {
@@ -2190,6 +2214,10 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
 
     if (win->props[XITK_X11_WT_WRAP].value == None) {
       xitk_x11_image_t *icon = (xitk_x11_image_t *)win->props[XITK_X11_WT_ICON].value;
+
+      /* dont override nice wm icon scaling via res_database->class_name with a single one. */
+      if ((d->wm_type & WM_TYPE_EWMH_COMP) && win->res_class[0])
+        icon = NULL;
       if ((wm_hint = XAllocWMHints ()) != NULL) {
         wm_hint->input         = True;
         wm_hint->initial_state = NormalState;
@@ -3191,3 +3219,4 @@ xitk_backend_t *xitk_backend_new (xitk_t *xitk, int verbosity) {
 
   return &be->be;
 }
+
