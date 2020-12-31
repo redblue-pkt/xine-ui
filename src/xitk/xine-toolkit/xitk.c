@@ -1863,7 +1863,10 @@ void xitk_stop (xitk_t *_xitk) {
   if (!_xitk)
     return;
   xitk_container (xitk, _xitk, x);
+  /* defer this to xitk_run (), where it cannot freeze the tips thread waiting for xitk->mutex
+   * in _tips_loop_thread () -> xitk_window_set_role () -> xitk_window_update_tree ().
   xitk_tips_delete (&xitk->x.tips);
+   */
   xitk->running = 0;
 }
 
