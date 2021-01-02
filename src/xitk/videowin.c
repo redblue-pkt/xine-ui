@@ -146,6 +146,7 @@ struct xui_vwin_st {
   /* XF86VidMode Extension stuff */
   XF86VidModeModeInfo**  XF86_modelines;
   int                    XF86_modelines_count;
+  int                    XF86VidMode_fullscreen;
 #endif
 
   int                    hide_on_start; /* user use '-H' arg, don't map
@@ -396,7 +397,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
     if (!(search >= vwin->XF86_modelines_count)) {
        if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
                                     vwin->XF86_modelines[search])) {
-          vwin->gui->XF86VidMode_fullscreen = 1;
+          vwin->XF86VidMode_fullscreen = 1;
           vwin->fullscreen_width  = vwin->XF86_modelines[search]->hdisplay;
           vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
 
@@ -421,7 +422,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
            * is no need to further worry about anything.
            */
           if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search == 0))
-            vwin->gui->XF86VidMode_fullscreen = 0;
+            vwin->XF86VidMode_fullscreen = 0;
        } else {
           xine_error (vwin->gui, _("XF86VidMode Extension: modeline switching failed.\n"));
        }
@@ -442,7 +443,7 @@ static void _reset_modeline(xui_vwin_t *vwin) {
     XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
     vwin->x_unlock_display (vwin->video_display);
 
-    vwin->gui->XF86VidMode_fullscreen = 0;
+    vwin->XF86VidMode_fullscreen = 0;
 
     vwin->fullscreen_width  = vwin->XF86_modelines[0]->hdisplay;
     vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
@@ -1705,7 +1706,7 @@ void video_window_exit (xui_vwin_t *vwin) {
   vwin->second_display_running = 0;
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
-  if (vwin->gui->XF86VidMode_fullscreen) {
+  if (vwin->XF86VidMode_fullscreen) {
     _reset_modeline(vwin);
   }
 #endif

@@ -261,10 +261,6 @@ struct gGui_st {
 
   int                       stdctl_enable;
 
-#ifdef HAVE_XF86VIDMODE
-  int                       XF86VidMode_fullscreen;
-#endif
-
   struct {
     int                     caps; /* MIXER_CAP_x */
     int                     volume_level;
