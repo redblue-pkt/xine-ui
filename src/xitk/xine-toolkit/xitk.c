@@ -1119,23 +1119,6 @@ void xitk_window_set_border_size (xitk_t *_xitk, xitk_register_key_t key, int le
   MUTUNLOCK ();
 }
 
-void xitk_register_eh_destructor (xitk_t *_xitk, xitk_register_key_t key,
-  void (*destructor)(void *userdata), void *destr_data) {
-  __xitk_t *xitk;
-  __gfx_t *fx;
-
-  if (!key || !_xitk)
-    return;
-  xitk_container (xitk, _xitk, x);
-  MUTLOCK ();
-  fx = __fx_from_key (xitk, key);
-  if (fx) {
-    fx->destructor = destructor;
-    fx->destr_data = destr_data;
-  }
-  MUTUNLOCK ();
-}
-
 /*
  * Remove from the list the window/event_handler
  * specified by the key.
@@ -2257,4 +2240,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-

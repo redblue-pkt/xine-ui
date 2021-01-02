@@ -200,8 +200,6 @@ xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk /* may be null if be
                                                uintptr_t window);
 
 xitk_widget_list_t *xitk_widget_list_get (xitk_t *xitk, xitk_window_t *xwin);
-void xitk_register_eh_destructor (xitk_t *xitk, xitk_register_key_t key,
-  void (*destructor)(void *userdata), void *destr_data);
 
 xitk_register_key_t xitk_get_focus_key (xitk_t *xitk);
 xitk_register_key_t xitk_set_focus_key (xitk_t *xitk, xitk_register_key_t key, int focus);
