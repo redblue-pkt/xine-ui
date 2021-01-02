@@ -734,16 +734,6 @@ void gui_exit_2 (gGui_t *gui) {
 
   tvout_deinit(gui->tvout);
 
-#ifdef HAVE_XF86VIDMODE
-  /* just in case a different modeline than the original one is running,
-   * toggle back to window mode which automatically causes a switch back to
-   * the original modeline
-   */
-  if(gui->XF86VidMode_fullscreen)
-    video_window_set_fullscreen_mode (gui->vwin, WINDOWED_MODE);
-  //     gui_set_fullscreen_mode (NULL, gui);
-#endif
-
   osd_deinit();
 
   config_update_num("gui.amp_level", gui->mixer.amp_level);
