@@ -303,20 +303,6 @@ int xitk_x11_is_window_visible(Display *display, Window window) {
   return 0;
 }
 
-int xitk_x11_try_to_set_input_focus(Display *display, Window window) {
-  Window focused_win;
-  int revert;
-
-  if (!xitk_x11_is_window_visible (display, window))
-    return 0;
-
-  XSetInputFocus (display, window, RevertToParent, CurrentTime);
-  XSync(display, False);
-  XGetInputFocus(display, &focused_win, &revert);
-
-  return (focused_win == window);
-}
-
 /*
  * Get (safely) window pos.
  */

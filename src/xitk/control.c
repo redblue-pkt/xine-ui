@@ -559,6 +559,7 @@ void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout) {
 }
 */
 
+/*
 int control_status (xui_vctrl_t *vctrl) {
   if (!vctrl)
     return 0;
@@ -568,6 +569,7 @@ int control_status (xui_vctrl_t *vctrl) {
     return 2;
   return (!!(xitk_window_flags (vctrl->xwin, 0, 0) & XITK_WINF_VISIBLE)) + 2;
 }
+*/
 
 /*
  * Raise control->window

@@ -214,14 +214,6 @@ void xitk_image_copy_rect (xitk_image_t *from, xitk_image_t *to, int x1, int y1,
   to->beimg->copy_rect (to->beimg, from->beimg, x1, y1, w, h, x2, y2);
 }
 
-uintptr_t xitk_image_get_pixmap (xitk_image_t *img) {
-  return img && img->beimg ? img->beimg->id1 : 0;
-}
-
-uintptr_t xitk_image_get_mask (xitk_image_t *img) {
-  return img && img->beimg ? img->beimg->id2 : 0;
-}
-
 static void _xitk_image_add_beimg (xitk_image_t *img, const char *data, int dsize) {
   xitk_tagitem_t tags[7] = {
     {XITK_TAG_FILENAME, (uintptr_t)NULL},
