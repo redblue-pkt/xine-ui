@@ -682,19 +682,8 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
     if (panel->gui->cursor_grabbed)
       video_window_ungrab_pointer(panel->gui->vwin);
 
-#if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
-    if(
-#ifdef HAVE_XINERAMA
-       (((video_window_get_fullscreen_mode (panel->gui->vwin)) & (WINDOWED_MODE | FULLSCR_MODE)) &&
-	(!((video_window_get_fullscreen_mode (panel->gui->vwin)) & FULLSCR_XI_MODE)))
-#ifdef HAVE_XF86VIDMODE
-       ||
-#endif
-#endif
-#ifdef HAVE_XF86VIDMODE
-       (panel->gui->XF86VidMode_fullscreen)
-#endif
-       ) {
+    if ((video_window_get_fullscreen_mode (panel->gui->vwin) & (WINDOWED_MODE | FULLSCR_MODE))
+        && (!((video_window_get_fullscreen_mode (panel->gui->vwin)) & FULLSCR_XI_MODE))) {
       int x, y, w, h, desktopw, desktoph;
 
       xitk_window_get_window_position (panel->xwin, &x, &y, &w, &h);
@@ -712,7 +701,6 @@ static void _panel_toggle_visibility (xui_panel_t *panel) {
         panel_store_new_position (panel, newx, newy, w, h);
       }
     }
-#endif
 
     if (panel->gui->logo_mode == 0) {
       int pos;
