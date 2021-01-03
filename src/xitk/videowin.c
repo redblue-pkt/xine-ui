@@ -479,7 +479,7 @@ static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_n
 #ifdef HAVE_XINERAMA
 static void _init_xinerama(xui_vwin_t *vwin) {
 
-  int                   screens, i;
+  int                   screens, i, active;
   int                   dummy_a, dummy_b;
   XineramaScreenInfo   *screeninfo = NULL;
   const char           *screens_list;
@@ -487,16 +487,18 @@ static void _init_xinerama(xui_vwin_t *vwin) {
   vwin->xinerama       = NULL;
   vwin->xinerama_cnt   = 0;
 
-  vwin->x_lock_display (vwin->video_display);
-
   /* Spark
    * some Xinerama stuff
    * I want to figure out what fullscreen means for this setup
    */
 
-  if (!XineramaQueryExtension (vwin->video_display, &dummy_a, &dummy_b))
-    return;
-  screeninfo = XineramaQueryScreens (vwin->video_display, &screens);
+  vwin->x_lock_display (vwin->video_display);
+  if (XineramaQueryExtension (vwin->video_display, &dummy_a, &dummy_b)) {
+    screeninfo = XineramaQueryScreens (vwin->video_display, &screens);
+    active = XineramaIsActive(vwin->video_display);
+  }
+  vwin->x_unlock_display (vwin->video_display);
+
   if (!screeninfo)
     return;
 
@@ -507,7 +509,8 @@ static void _init_xinerama(xui_vwin_t *vwin) {
   printf ("videowin: size of the first screen is %dx%d.\n",
           screeninfo[0].width, screeninfo[0].height);
 #endif
-  if (XineramaIsActive(vwin->video_display)) {
+
+  if (active) {
     vwin->fullscreen_width  = screeninfo[0].width;
     vwin->fullscreen_height = screeninfo[0].height;
     vwin->xinerama = screeninfo;
@@ -610,8 +613,6 @@ static void _init_xinerama(xui_vwin_t *vwin) {
     vwin->xinerama_fullscreen_height = vwin->fullscreen_height;
     XFree (screeninfo);
   }
-
-  vwin->x_unlock_display (vwin->video_display);
 }
 #endif
 
