@@ -95,11 +95,13 @@ struct xui_vwin_st {
   int                    frame_width;     /* frame size, from xine-lib */
   int                    frame_height;
 
+#if 0
   double                 video_duration;  /* frame duratrion in seconds */
   double                 video_average;   /* average frame duration in seconds */
   double                 use_duration;    /* duration used for tv mode selection */
-  double                 pixel_aspect;
   int                    video_duration_valid; /* is use_duration trustable? */
+#endif
+  double                 pixel_aspect;
   int                    win_width;       /* size of non-fullscreen window         */
   int                    win_height;
   int                    old_win_width;
