@@ -48,6 +48,10 @@ typedef enum {
   XITK_TAG_Y,       /* int */
   XITK_TAG_WIDTH,   /* int */
   XITK_TAG_HEIGHT,  /* int */
+  XITK_TAG_FRAME_LEFT,   /* int */
+  XITK_TAG_FRAME_TOP,    /* int */
+  XITK_TAG_FRAME_RIGHT,  /* int */
+  XITK_TAG_FRAME_BOTTOM, /* int */
   XITK_TAG_MODE,    /* int */
   XITK_TAG_LAYER,   /* int */
   XITK_TAG_LAYER_ABOVE,  /* int */

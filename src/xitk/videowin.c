@@ -768,11 +768,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         vwin->x_lock_display (vwin->video_display);
       }
 
-      if (!(vwin->gui->no_mouse))
-        XSelectInput (vwin->video_display, vwin->video_window, ExposureMask);
-      else
-        XSelectInput (vwin->video_display, vwin->video_window,
-          ExposureMask & (~(ButtonPressMask | ButtonReleaseMask)));
+      {
+        long mask = INPUT_MOTION | ExposureMask | KeymapStateMask | FocusChangeMask;
+        if (vwin->gui->no_mouse)
+          mask &= ~(ButtonPressMask | ButtonReleaseMask);
+        XSelectInput (vwin->video_display, vwin->video_window, mask);
+      }
 
       hint.flags  = USSize | USPosition | PPosition | PSize;
       hint.width  = vwin->fullscreen_width;
@@ -953,7 +954,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       }
       else {
 
-	/* Update window size hints with the new size */
+        /* Update window size hints with the new size */
         XSetNormalHints (vwin->video_display, vwin->video_window, &hint);
 
         vwin->x_unlock_display (vwin->video_display);
@@ -998,11 +999,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_DECORATED, 0);
   }
 
-  if (!(vwin->gui->no_mouse))
-    XSelectInput (vwin->video_display, vwin->video_window, INPUT_MOTION | KeymapStateMask);
-  else
-    XSelectInput (vwin->video_display, vwin->video_window,
-      (INPUT_MOTION | KeymapStateMask) & (~(ButtonPressMask | ButtonReleaseMask)));
+  {
+    long mask = INPUT_MOTION | KeymapStateMask | ExposureMask | FocusChangeMask;
+    if (vwin->gui->no_mouse)
+      mask &= ~(ButtonPressMask | ButtonReleaseMask);
+    XSelectInput (vwin->video_display, vwin->video_window, mask);
+  }
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
@@ -1092,9 +1094,11 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->border_left = x;
     if (y > 0)
       vwin->border_top  = y;
+    /*
     xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
       vwin->borderless ? 0 : vwin->border_left,
       vwin->borderless ? 0 : vwin->border_top);
+    */
   }
 
   oxine_adapt();
@@ -2155,9 +2159,11 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
                                   vwin->borderless ? vwin->res_name.borderless : vwin->res_name.normal,
                                   "xine");
 
+    /*
     xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
       vwin->borderless ? 0 : vwin->border_left,
       vwin->borderless ? 0 : vwin->border_top);
+    */
 
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }
