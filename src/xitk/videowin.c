@@ -826,7 +826,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   /* ask for xinerama fullscreen mode */
   if (vwin->xinerama && (vwin->fullscreen_req & FULLSCR_XI_MODE)) {
 
-    if (vwin->video_window) {
+    if (vwin->wrapped_window) {
       if (vwin->fullscreen_mode & FULLSCR_XI_MODE) {
         if (vwin->visible_width != vwin->output_width || vwin->visible_height != vwin->output_height) {
           /*
@@ -844,7 +844,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       }
 
       xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
-      old_video_window = vwin->video_window;
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
@@ -854,13 +853,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
      */
 
     border_width           = 0;
-    if (vwin->wid)
-      vwin->video_window = vwin->wid;
-    else
-      vwin->video_window = XCreateWindow (vwin->video_display,
-        DefaultRootWindow (vwin->video_display),
-        hint.x, hint.y, vwin->visible_width, vwin->visible_height,
-        border_width, vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
@@ -872,7 +864,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #endif /* HAVE_XINERAMA */
   if (!(vwin->fullscreen_req & WINDOWED_MODE)) {
 
-    if (vwin->video_window) {
+    if (vwin->wrapped_window) {
 
       if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
         if ((vwin->visible_width != vwin->output_width) || (vwin->visible_height != vwin->output_height)) {
@@ -890,7 +882,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       }
 
       xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
-      old_video_window = vwin->video_window;
     }
 
     vwin->fullscreen_mode = vwin->fullscreen_req;
@@ -900,15 +891,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
      */
 
     border_width           = 0;
-
-    if (vwin->wid)
-      vwin->video_window = vwin->wid;
-    else
-      vwin->video_window = XCreateWindow (vwin->video_display,
-        DefaultRootWindow(vwin->video_display),
-        hint.x, hint.y, vwin->visible_width, vwin->visible_height,
-        border_width, vwin->depth, InputOutput, vwin->visual,
-        CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
 #ifndef HAVE_XINERAMA
     hint.width  = vwin->visible_width;
@@ -942,13 +924,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     vwin->output_width  = hint.width;
     vwin->output_height = hint.height;
 
-    if (vwin->video_window) {
+    if (vwin->wrapped_window) {
 
       if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
 #ifdef HAVE_XF86VIDMODE
         _reset_modeline(vwin);
 #endif
-        old_video_window = vwin->video_window;
       }
       else {
 
@@ -959,21 +940,22 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
         xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->win_width, vwin->win_height);
 
-	return;
+        return;
       }
     }
 
     vwin->fullscreen_mode   = WINDOWED_MODE;
-
     if (vwin->borderless)
       border_width = 0;
     else
       border_width = 4;
+  }
 
-    if (vwin->wid)
-      vwin->video_window = vwin->wid;
-    else
-      vwin->video_window = XCreateWindow (vwin->video_display,
+  if (vwin->wid) {
+    vwin->video_window = vwin->wid;
+  } else {
+    old_video_window = vwin->video_window;
+    vwin->video_window = XCreateWindow (vwin->video_display,
         DefaultRootWindow (vwin->video_display),
         hint.x, hint.y, hint.width, hint.height, border_width,
         vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
