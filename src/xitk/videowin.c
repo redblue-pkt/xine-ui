@@ -1033,15 +1033,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     /* Waiting for visibility, avoid X error on some cases */
 
     video_window_set_input_focus(vwin);
-
-#ifdef HAVE_XINERAMA
-    if (vwin->xinerama)
-      xitk_window_move_window (vwin->wrapped_window, hint.x, hint.y);
-    else
-      xitk_window_move_window (vwin->wrapped_window, 0, 0);
-#else
-    xitk_window_move_window (vwin->wrapped_window, 0, 0);
-#endif
+    xitk_window_move_window (vwin->wrapped_window, hint.x, hint.y);
   }
 
   /* The old window should be destroyed now */
