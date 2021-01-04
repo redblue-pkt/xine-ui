@@ -190,7 +190,7 @@ typedef struct {
 
   struct {
     int                       x, y;
-  }                           border_size, old_pos, new_pos;
+  }                           old_pos, new_pos;
 
   int                         width;
   int                         height;
@@ -933,8 +933,6 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->move.enabled          = 0;
   fx->move.offset_x         = 0;
   fx->move.offset_y         = 0;
-  fx->border_size.y         = 0;
-  fx->border_size.x         = 0;
   fx->old_pos.x             = 0;
   fx->old_pos.y             = 0;
   fx->new_pos.x             = 0;
@@ -1101,22 +1099,6 @@ static __gfx_t *__fx_from_key (__xitk_t *xitk, xitk_register_key_t key) {
       return fx;
   }
   return NULL;
-}
-
-void xitk_window_set_border_size (xitk_t *_xitk, xitk_register_key_t key, int left, int top) {
-  __xitk_t *xitk;
-  __gfx_t  *fx;
-
-  xitk_container (xitk, _xitk, x);
-  if (!xitk || !key)
-    return;
-  MUTLOCK ();
-  fx = __fx_from_key (xitk, key);
-  if (fx) {
-    fx->border_size.y = top;
-    fx->border_size.x = left;
-  }
-  MUTUNLOCK ();
 }
 
 /*
@@ -1466,8 +1448,8 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         fx->new_pos.x = fx->old_pos.x + event->w - fx->move.offset_x;
         fx->new_pos.y = fx->old_pos.y + event->h - fx->move.offset_y;
 
-        tags[0].value = fx->new_pos.x - fx->border_size.x;
-        tags[1].value = fx->new_pos.y - fx->border_size.y;
+        tags[0].value = fx->new_pos.x;
+        tags[1].value = fx->new_pos.y;
         if (xwin && xwin->bewin)
           xwin->bewin->set_props (xwin->bewin, tags);
       } else {
