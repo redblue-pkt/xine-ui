@@ -1292,37 +1292,43 @@ static int _xitk_x11_keyevent_2_string (xitk_x11_display_t *d, XEvent *event, Ke
 }
 
 static void _xitk_x11_window_debug_flags (const char *s1, const char *s2, uint32_t flags) {
+  static const struct {
+    uint32_t flag;
+    const char *s;
+  } winf[] = {
+    {XITK_WINF_VISIBLE,            " visible"},
+    {XITK_WINF_ICONIFIED,          " iconified"},
+    {XITK_WINF_DECORATED,          " decorated"},
+    {XITK_WINF_TASKBAR,            " taskbar"},
+    {XITK_WINF_PAGER,              " pager"},
+    {XITK_WINF_MAX_X,              " max_x"},
+    {XITK_WINF_MAX_Y,              " max_y"},
+    {XITK_WINF_FULLSCREEN,         " fullscreen"},
+    {XITK_WINF_FOCUS,              " focus"},
+    {XITK_WINF_OVERRIDE_REDIRECT,  " override_redirect"},
+    {XITK_WINF_FIXED_POS,          " fixed_pos"},
+    {XITK_WINF_FENCED_IN,          " fenced_in"},
+    {XITK_WINF_DND,                " dnd"},
+    {XITK_WINF_GRAB_POINTER,       " grab_pointer"}
+  };
   char buf[2000], *b = buf, *e = b + sizeof (buf);
 
   b += strlcpy (b, "xitk.x11.window.flags.", e - b);
   b += strlcpy (b, s1, e - b);
   b += strlcpy (b, " (", e - b);
   b += strlcpy (b, s2, e - b);
-  b += strlcpy (b, "): ", e - b);
-  if (flags & XITK_WINF_VISIBLE)
-    b += strlcpy (b, "visible ", e - b);
-  if (flags & XITK_WINF_ICONIFIED)
-    b += strlcpy (b, "iconified ", e - b);
-  if (flags & XITK_WINF_DECORATED)
-    b += strlcpy (b, "decorated ", e - b);
-  if (flags & XITK_WINF_TASKBAR)
-    b += strlcpy (b, "taskbar ", e - b);
-  if (flags & XITK_WINF_PAGER)
-    b += strlcpy (b, "pager ", e - b);
-  if (flags & XITK_WINF_MAX_X)
-    b += strlcpy (b, "max_x ", e - b);
-  if (flags & XITK_WINF_MAX_Y)
-    b += strlcpy (b, "max_y ", e - b);
-  if (flags & XITK_WINF_FULLSCREEN)
-    b += strlcpy (b, "fullscreen ", e - b);
-  if (flags & XITK_WINF_FOCUS)
-    b += strlcpy (b, "focus ", e - b);
-  if (flags & XITK_WINF_OVERRIDE_REDIRECT)
-    b += strlcpy (b, "override_redirect ", e - b);
-  if (flags & XITK_WINF_FIXED_POS)
-    b += strlcpy (b, "fixed_pos ", e - b);
-  if (flags & XITK_WINF_FENCED_IN)
-    b += strlcpy (b, "fenced_in ", e - b);
+  b += strlcpy (b, "):", e - b);
+
+  if (!flags) {
+    b += strlcpy (b, " <none>", e - b);
+  } else {
+    uint32_t u;
+
+    for (u = 0; u < sizeof (winf) / sizeof (winf[0]); u++) {
+      if (flags & winf[u].flag)
+        b += strlcpy (b, winf[u].s, e - b);
+    }
+  }
   b += strlcpy (b, ".\n", e - b);
   printf ("%s", buf);
 }

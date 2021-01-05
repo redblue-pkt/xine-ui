@@ -1115,11 +1115,11 @@ void xitk_window_destroy_window(xitk_window_t *w);
 #define XITK_WINF_MAX_Y      0x0040 /** << maximized height */
 #define XITK_WINF_FULLSCREEN 0x0080 /** << full screen size */
 #define XITK_WINF_FOCUS      0x0100 /** << input goes here */
-#define XITK_WINF_OVERRIDE_REDIRECT 0x0200
+#define XITK_WINF_OVERRIDE_REDIRECT 0x0200 /** << window manager please dont interfere */
 #define XITK_WINF_FIXED_POS  0x0400 /** << user may _not_ click move */
 #define XITK_WINF_FENCED_IN  0x0800 /** << always stay on screen cmpletely */
 #define XITK_WINF_DND        0x1000 /** << do receive drag and drop events */
-#define XITK_WINF_GRAB_POINTER 0x2000 /* << Grab mouse pointer */
+#define XITK_WINF_GRAB_POINTER 0x2000 /** << Grab mouse pointer */
 
 /** try to set the flags in mask to value, return new flags. */
 uint32_t xitk_window_flags (xitk_window_t *xwin, uint32_t mask, uint32_t value);
