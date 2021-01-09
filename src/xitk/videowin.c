@@ -843,9 +843,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         return;
       }
 
-      xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
-        &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
-
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
       old_video_window = vwin->video_window;
     }
 
@@ -891,9 +889,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 	return;
       }
 
-      xitk_x11_get_window_position (vwin->video_display, vwin->video_window,
-        &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
-
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->old_xwin, &vwin->old_ywin, NULL, NULL);
       old_video_window = vwin->video_window;
     }
 
@@ -1032,7 +1028,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     xitk_window_raise_window(vwin->wrapped_window);
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_VISIBLE, XITK_WINF_VISIBLE);
 
-    while (!xitk_x11_is_window_visible (vwin->video_display, vwin->video_window))
+    while (!(xitk_window_flags (vwin->wrapped_window, 0, 0) & XITK_WINF_VISIBLE))
       xine_usec_sleep(5000);
 
     if ((vwin->gui->always_layer_above ||
@@ -1078,15 +1074,11 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   /* take care about window decoration/pos */
   {
-    Window tmp_win;
     /*
     int x = vwin->xwin < 0 ? 0 : vwin->xwin;
     int y = vwin->ywin < 0 ? 0 : vwin->ywin;
     */
-    vwin->x_lock_display (vwin->video_display);
-    XTranslateCoordinates (vwin->video_display, vwin->video_window,
-      DefaultRootWindow (vwin->video_display), 0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
-    vwin->x_unlock_display (vwin->video_display);
+    xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
     /*
     x = vwin->xwin - x;
     y = vwin->ywin - y;
@@ -1658,23 +1650,16 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
    * vwin->xwin and vwin->ywin variables are set to *real* values, otherwise the
    * overlay will be displayed somewhere outside the window
    */
-  if (vwin->video_window) {
-    Window tmp_win;
-
-    vwin->x_lock_display (vwin->video_display);
+  if (vwin->wrapped_window) {
     if (geometry && (geometry_x > -8192) && (geometry_y > -8192)) {
-      vwin->xwin = vwin->old_xwin = geometry_x;;
+      vwin->xwin = vwin->old_xwin = geometry_x;
       vwin->ywin = vwin->old_ywin = geometry_y;
 
       xitk_window_resize_window(vwin->wrapped_window, vwin->xwin, vwin->ywin, vwin->video_width, vwin->video_height);
     }
     else {
-
-      XTranslateCoordinates (vwin->video_display, vwin->video_window,
-        DefaultRootWindow (vwin->video_display), 0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
+      xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
     }
-    vwin->x_unlock_display (vwin->video_display);
-
   }
 
   if (vwin->separate_display) {
@@ -1969,7 +1954,6 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
       break;
     case XITK_EV_POS_SIZE:
       {
-        Window tmp_win;
         int    h, w;
 
         pthread_mutex_lock (&vwin->mutex);
@@ -1978,12 +1962,8 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
         w = vwin->output_width;
         vwin->output_width  = e->w;
         vwin->output_height = e->h;
-
         if ((e->x == 0) && (e->y == 0)) {
-          vwin->x_lock_display (vwin->video_display);
-          XTranslateCoordinates (vwin->video_display, vwin->video_window, DefaultRootWindow(vwin->video_display),
-            0, 0, &vwin->xwin, &vwin->ywin, &tmp_win);
-          vwin->x_unlock_display (vwin->video_display);
+          xitk_window_get_window_position (vwin->wrapped_window, &vwin->xwin, &vwin->ywin, NULL, NULL);
         } else {
           vwin->xwin = e->x;
           vwin->ywin = e->y;
