@@ -382,6 +382,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
 
     /* just switching to a different modeline if necessary */
     if (!(search >= vwin->XF86_modelines_count)) {
+       vwin->x_lock_display (vwin->video_display);
        if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
                                     vwin->XF86_modelines[search])) {
           vwin->XF86VidMode_fullscreen = 1;
@@ -413,6 +414,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
        } else {
           gui_msg (vwin->gui, XUI_MSG_ERROR, _("XF86VidMode Extension: modeline switching failed.\n"));
        }
+       vwin->x_unlock_display (vwin->video_display);
     }
   }
 }
@@ -702,17 +704,17 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   Window                old_video_window = None;
   int                   border_width;
 
-  vwin->x_lock_display (vwin->video_display);
-
   {
     XColor      dummy, black;
     Colormap    colormap;
+    vwin->x_lock_display (vwin->video_display);
     if (vwin->separate_display) {
       colormap = DefaultColormap (vwin->video_display, DefaultScreen(vwin->video_display));
     } else {
       colormap = xitk_x11_get_colormap (vwin->gui->xitk);
     }
     XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
+    vwin->x_unlock_display (vwin->video_display);
     attr.background_pixel  = black.pixel;
     attr.border_pixel      = black.pixel;
     attr.colormap          = colormap;
@@ -734,6 +736,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       Window      rootwindow = None;
 
       vwin->fullscreen_mode = FULLSCR_MODE;
+
+      vwin->x_lock_display (vwin->video_display);
 
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->video_display,
@@ -779,11 +783,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
         xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED,
                                   (void*)xitk_window_get_native_id(vwin->wrapped_window));
       }
-      return;
     }
-
-    vwin->x_unlock_display (vwin->video_display);
-
     return;
   }
 
@@ -824,8 +824,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->output_height = vwin->visible_height;
         }
         vwin->fullscreen_mode = vwin->fullscreen_req;
-        vwin->x_unlock_display (vwin->video_display);
-
         return;
       }
 
@@ -863,7 +861,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           vwin->output_height   = vwin->visible_height;
 	}
         vwin->fullscreen_mode = vwin->fullscreen_req;
-	vwin->x_unlock_display (vwin->video_display);
 	return;
       }
 
@@ -918,14 +915,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 #endif
       }
       else {
-
-        /* Update window size hints with the new size */
-        XSetNormalHints (vwin->video_display, vwin->video_window, &hint);
-
-        vwin->x_unlock_display (vwin->video_display);
-
         xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->win_width, vwin->win_height);
-
         return;
       }
     }
@@ -940,14 +930,16 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   if (vwin->wid) {
     vwin->video_window = vwin->wid;
   } else {
+    vwin->x_lock_display (vwin->video_display);
+
     old_video_window = vwin->video_window;
     vwin->video_window = XCreateWindow (vwin->video_display,
         DefaultRootWindow (vwin->video_display),
         hint.x, hint.y, hint.width, hint.height, border_width,
         vwin->depth, InputOutput, vwin->visual, CWBackPixel | CWBorderPixel | CWColormap, &attr);
-  }
 
-  vwin->x_unlock_display (vwin->video_display);
+    vwin->x_unlock_display (vwin->video_display);
+  }
 
   register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
 
