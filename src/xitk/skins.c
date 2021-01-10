@@ -104,7 +104,7 @@ int skin_add_1 (gGui_t *gui, const char *fullname, const char *name, const char 
       skin_get_names (gui, names, sizeof (names) / sizeof (names[0]));
       xine_config_register_enum (gui->xine, "gui.skin",
         _skin_name_index (gui, DEFAULT_SKIN), (char **)names,
-        _("gui skin theme"), CONFIG_NO_HELP, CONFIG_LEVEL_BEG, NULL, NULL);
+        _("Skin theme"), CONFIG_NO_HELP, CONFIG_LEVEL_BEG, NULL, NULL);
     }
   }
   return index;
