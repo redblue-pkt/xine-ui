@@ -85,7 +85,6 @@ struct xui_vwin_st {
   struct {
     const char *normal, *fullscreen, *borderless;
   } res_name;
-  int                    video_screen;
 
   int                    video_width;     /* size of currently displayed video     */
   int                    video_height;
@@ -326,7 +325,7 @@ static void _get_modelines(xui_vwin_t *vwin) {
       /* first, kick off unsupported modes */
       for (mode = 1; mode < vwin->XF86_modelines_count; mode++) {
 
-        if (!XF86VidModeValidateModeLine (vwin->video_display, vwin->video_screen,
+        if (!XF86VidModeValidateModeLine (vwin->video_display, DefaultScreen(vwin->video_display),
                                           vwin->XF86_modelines[mode])) {
           int wrong_mode;
 
@@ -646,7 +645,7 @@ static void _detect_xinerama_pos_size(xui_vwin_t *vwin, XSizeHints *hint) {
     }
     else {
       /* Get mouse cursor position */
-      XQueryPointer (vwin->video_display, RootWindow (vwin->video_display, vwin->video_screen),
+      XQueryPointer (vwin->video_display, RootWindow (vwin->video_display, DefaultScreen(vwin->video_display)),
                      &root_win, &dummy_win, &x_mouse, &y_mouse, &dummy_x, &dummy_y, &dummy_opts);
 
       for (i = 0; i < vwin->xinerama_cnt; i++) {
@@ -721,7 +720,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     XColor      dummy, black;
     Colormap    colormap;
     if (vwin->separate_display) {
-      colormap = DefaultColormap (vwin->video_display, vwin->video_screen);
+      colormap = DefaultColormap (vwin->video_display, DefaultScreen(vwin->video_display));
     } else {
       colormap = xitk_x11_get_colormap (vwin->gui->xitk);
     }
@@ -750,7 +749,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
       /* This couldn't happen, but we're paranoid ;-) */
       if ((rootwindow = xitk_get_desktop_root_window (vwin->video_display,
-        vwin->video_screen, &wparent)) == None)
+        DefaultScreen(vwin->video_display), &wparent)) == None)
         rootwindow = DefaultRootWindow (vwin->video_display);
 
       attr.override_redirect = True;
@@ -1228,7 +1227,7 @@ void *video_window_get_xine_visual(xui_vwin_t *vwin, int *visual_type) {
     *visual_type = XINE_VISUAL_TYPE_X11;
 
     v->display           = vwin->video_display;
-    v->screen            = vwin->video_screen;
+    v->screen            = DefaultScreen(vwin->video_display);
     v->d                 = vwin->video_window;
     v->dest_size_cb      = _video_window_dest_size_cb;
     v->frame_output_cb   = _video_window_frame_output_cb;
@@ -1514,10 +1513,6 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     borderless = 0;
   }
 
-  vwin->x_lock_display (vwin->video_display);
-  vwin->video_screen = DefaultScreen(vwin->video_display);
-  vwin->x_unlock_display (vwin->video_display);
-
   vwin->video_window       = None;
   vwin->wid                = window_id;
   vwin->fullscreen_req     = WINDOWED_MODE;
@@ -1532,18 +1527,19 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
 
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual (vwin);
-
   if (vwin->separate_display) {
-    xitk_x11_find_visual(vwin->video_display, vwin->video_screen, vwin->prefered_visual,
+    vwin->x_lock_display (vwin->video_display);
+    xitk_x11_find_visual(vwin->video_display, DefaultScreen(vwin->video_display), vwin->prefered_visual,
                          &vwin->visual, &vwin->depth);
+    vwin->x_unlock_display (vwin->video_display);
   }
 
   vwin->xwin               = geometry_x;
   vwin->ywin               = geometry_y;
 
   vwin->x_lock_display (vwin->video_display);
-  vwin->desktopWidth       = DisplayWidth(vwin->video_display, vwin->video_screen);
-  vwin->desktopHeight      = DisplayHeight(vwin->video_display, vwin->video_screen);
+  vwin->desktopWidth       = DisplayWidth(vwin->video_display, DefaultScreen(vwin->video_display));
+  vwin->desktopHeight      = DisplayHeight(vwin->video_display, DefaultScreen(vwin->video_display));
   vwin->fullscreen_width   = vwin->desktopWidth;
   vwin->fullscreen_height  = vwin->desktopHeight;
 
