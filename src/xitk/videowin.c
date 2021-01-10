@@ -62,6 +62,7 @@ typedef struct xitk_color_info_s xitk_color_info_t;
 /* Video window private structure */
 struct xui_vwin_st {
   gGui_t                *gui;
+  xitk_t                *xitk;
 
   void                   (*x_lock_display) (Display *display);
   void                   (*x_unlock_display) (Display *display);
@@ -170,7 +171,7 @@ struct xui_vwin_st {
 static int _vwin_is_ewmh (xui_vwin_t *vwin) {
   if (vwin->video_be_display)
     return (vwin->video_be_display->wm_type & WM_TYPE_EWMH_COMP) ? 1 : 0;
-  return (xitk_get_wm_type (vwin->gui->xitk) & WM_TYPE_EWMH_COMP) ? 1 : 0;
+  return (xitk_get_wm_type (vwin->xitk) & WM_TYPE_EWMH_COMP) ? 1 : 0;
 }
 
 static void *second_display_loop (void *data);
@@ -285,7 +286,7 @@ void video_window_select_visual (xui_vwin_t *vwin) {
       }
       if (vwin->visual != vinfo->visual) {
         printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), vinfo->visual->visualid);
-        xitk_x11_select_visual (vwin->gui->xitk, vinfo->visual);
+        xitk_x11_select_visual (vwin->xitk, vinfo->visual);
         vwin->visual = vinfo->visual;
         vwin->depth = vinfo->depth;
       }
@@ -390,7 +391,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
           vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
 
           /* update pixel aspect */
-          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
+          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->xitk);
 #ifdef DEBUG
           printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
@@ -438,7 +439,7 @@ static void _reset_modeline(xui_vwin_t *vwin) {
     vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
 
     /* update pixel aspect */
-    vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
+    vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->xitk);
 #ifdef DEBUG
     printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
@@ -711,7 +712,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
     if (vwin->separate_display) {
       colormap = DefaultColormap (vwin->video_display, DefaultScreen(vwin->video_display));
     } else {
-      colormap = xitk_x11_get_colormap (vwin->gui->xitk);
+      colormap = xitk_x11_get_colormap (vwin->xitk);
     }
     XAllocNamedColor(vwin->video_display, colormap, "black", &black, &dummy);
     vwin->x_unlock_display (vwin->video_display);
@@ -1043,7 +1044,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->border_left = x;
     if (y > 0)
       vwin->border_top  = y;
-    xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
+    xitk_window_set_border_size (vwin->xitk, vwin->widget_key,
       vwin->borderless ? 0 : vwin->border_left,
       vwin->borderless ? 0 : vwin->border_top);
     */
@@ -1454,12 +1455,13 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   }
 
   vwin->gui = gui;
+  vwin->xitk = gui->xitk;
   pthread_mutex_init (&vwin->mutex, NULL);
 
   vwin->video_display = NULL;
   if (video_display_name && video_display_name[0]) {
     do {
-      vwin->video_backend = xitk_backend_new (vwin->gui->xitk, vwin->gui->verbosity);
+      vwin->video_backend = xitk_backend_new (vwin->xitk, vwin->gui->verbosity);
       if (vwin->video_backend) {
         vwin->video_be_display = vwin->video_backend->open_display (vwin->video_backend,
                                                                     video_display_name, use_x_lock_display, 0,
@@ -1475,7 +1477,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     } while (0);
   }
   if (vwin->video_display == NULL)
-    vwin->video_display = xitk_x11_get_display (gui->xitk);
+    vwin->video_display = xitk_x11_get_display (vwin->xitk);
   if (vwin->video_display == NULL) {
     fprintf (stderr, _("Cannot open any X11 display for video.\n"));
     free(vwin);
@@ -1517,8 +1519,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->borderless         = (borderless > 0);
   vwin->hide_on_start      = hide_on_start;
 
-  vwin->depth              = xitk_x11_get_depth(gui->xitk);
-  vwin->visual             = xitk_x11_get_visual(gui->xitk);
+  vwin->depth              = xitk_x11_get_depth(vwin->xitk);
+  vwin->visual             = xitk_x11_get_visual(vwin->xitk);
 
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual (vwin);
@@ -1536,7 +1538,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     vwin->desktopWidth  = vwin->video_be_display->width;
     vwin->desktopHeight = vwin->video_be_display->height;
   } else {
-    xitk_get_display_size(gui->xitk, &vwin->desktopWidth, &vwin->desktopHeight);
+    xitk_get_display_size(vwin->xitk, &vwin->desktopWidth, &vwin->desktopHeight);
   }
   vwin->fullscreen_width   = vwin->desktopWidth;
   vwin->fullscreen_height  = vwin->desktopHeight;
@@ -1635,7 +1637,7 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
     pthread_create (&vwin->second_display_thread, NULL, second_display_loop, vwin);
   }
 
-  vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->gui->xitk);
+  vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->xitk);
 #ifdef DEBUG
     printf("pixel_aspect: %f\n", vwin->pixel_aspect);
 #endif
@@ -1685,7 +1687,7 @@ void video_window_exit (xui_vwin_t *vwin) {
   if (vwin->separate_display) {
     pthread_join (vwin->second_display_thread, NULL);
   } else {
-    xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
+    xitk_unregister_event_handler (vwin->xitk, &vwin->widget_key);
   }
   xitk_window_destroy_window (vwin->wrapped_window);
   vwin->wrapped_window = NULL;
@@ -1864,7 +1866,7 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
           struct timeval old_click_time = vwin->click_time;
 
           gettimeofday (&vwin->click_time, NULL);
-          if (xitk_is_dbl_click (vwin->gui->xitk, &old_click_time, &vwin->click_time)) {
+          if (xitk_is_dbl_click (vwin->xitk, &old_click_time, &vwin->click_time)) {
             vwin->click_time = event.tv = old_click_time;
             gui_execute_action_id (vwin->gui, ACTID_TOGGLE_FULLSCREEN);
           } else {
@@ -1975,9 +1977,9 @@ static void register_event_handler(xui_vwin_t *vwin)
     xitk_window_flags (vwin->wrapped_window, XITK_WINF_DND, XITK_WINF_DND);
     xitk_window_set_window_class (vwin->wrapped_window, res_name, "xine");
   } else {
-    xitk_unregister_event_handler (vwin->gui->xitk, &vwin->widget_key);
+    xitk_unregister_event_handler (vwin->xitk, &vwin->widget_key);
     xitk_window_destroy_window (vwin->wrapped_window);
-    vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, NULL, vwin->video_window);
+    vwin->wrapped_window = xitk_x11_wrap_window (vwin->xitk, NULL, vwin->video_window);
     xitk_window_flags (vwin->wrapped_window,
       XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
     vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window,
@@ -2032,7 +2034,7 @@ long int video_window_reset_ssaver (xui_vwin_t *vwin) {
     if (vwin->video_be_display->reset_screen_saver)
       idle = vwin->video_be_display->reset_screen_saver(vwin->video_be_display, vwin->gui->ssaver_timeout);
   } else {
-    idle = xitk_reset_screen_saver(vwin->gui->xitk, vwin->gui->ssaver_timeout);
+    idle = xitk_reset_screen_saver(vwin->xitk, vwin->gui->ssaver_timeout);
   }
 
   return idle;
@@ -2118,7 +2120,7 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
                                   "xine");
 
     /*
-    xitk_window_set_border_size (vwin->gui->xitk, vwin->widget_key,
+    xitk_window_set_border_size (vwin->xitk, vwin->widget_key,
       vwin->borderless ? 0 : vwin->border_left,
       vwin->borderless ? 0 : vwin->border_top);
     */
