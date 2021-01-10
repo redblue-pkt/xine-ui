@@ -523,6 +523,18 @@ void xitk_window_destroy_window (xitk_window_t *xwin) {
   XITK_FREE (xwin);
 }
 
+int xitk_window_get_backend_type(xitk_window_t *xwin) {
+  return xwin->bewin->type;
+}
+
+uintptr_t xitk_window_get_native_display_id(xitk_window_t *xwin) {
+  return xwin->bewin->display->id;
+}
+
+uintptr_t xitk_window_get_native_id(xitk_window_t *xwin) {
+  return xwin->bewin->id;
+}
+
 xitk_window_t *xitk_window_wrap_native_window (xitk_t *xitk, xitk_be_display_t *be_display, uintptr_t window) {
   xitk_window_t *xwin;
 
