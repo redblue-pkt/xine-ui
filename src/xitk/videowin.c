@@ -157,7 +157,14 @@ struct xui_vwin_st {
 
   pthread_mutex_t        mutex;
 
-  x11_visual_t            xine_visual;
+  union {
+#if defined(HAVE_X11)
+    x11_visual_t          x11;
+#endif
+#if defined(HAVE_WAYLAND) && defined(XINE_VISUAL_TYPE_WAYLAND)
+    xine_wayland_visual_t wl;
+#endif
+  } xine_visual;
 };
 
 static int _vwin_is_ewmh (xui_vwin_t *vwin) {
@@ -744,12 +751,6 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
           0, 0, vwin->fullscreen_width, vwin->fullscreen_height, border_width,
           CopyFromParent, CopyFromParent, CopyFromParent, CWBackPixel | CWOverrideRedirect, &attr);
 
-      if (vwin->gui->vo_port) {
-        vwin->x_unlock_display (vwin->video_display);
-        xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-        vwin->x_lock_display (vwin->video_display);
-      }
-
       {
         long mask = INPUT_MOTION | ExposureMask | KeymapStateMask | FocusChangeMask;
         if (vwin->gui->no_mouse)
@@ -773,6 +774,11 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
       vwin->x_unlock_display (vwin->video_display);
 
       register_event_handler (vwin);
+
+      if (vwin->gui->vo_port) {
+        xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED,
+                                  (void*)xitk_window_get_native_id(vwin->wrapped_window));
+      }
       return;
     }
 
@@ -943,11 +949,12 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
   vwin->x_unlock_display (vwin->video_display);
 
-  if (vwin->gui->vo_port) {
-    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)vwin->video_window);
-  }
-
   register_event_handler (vwin); /* avoid destroy notify from old window (triggers exit) */
+
+  if (vwin->gui->vo_port) {
+    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED,
+                             (void*)xitk_window_get_native_id(vwin->wrapped_window));
+  }
 
   vwin->x_lock_display (vwin->video_display);
 
@@ -1202,20 +1209,35 @@ static void _video_window_frame_output_cb (void *data,
 
 void *video_window_get_xine_visual(xui_vwin_t *vwin, int *visual_type) {
 
-  if (vwin) {
-    x11_visual_t *v = &vwin->xine_visual;
+  if (!vwin || !vwin->wrapped_window)
+    return NULL;
 
-    *visual_type = XINE_VISUAL_TYPE_X11;
-
-    v->display           = vwin->video_display;
-    v->screen            = DefaultScreen(vwin->video_display);
-    v->d                 = vwin->video_window;
-    v->dest_size_cb      = _video_window_dest_size_cb;
-    v->frame_output_cb   = _video_window_frame_output_cb;
-    v->user_data         = vwin;
-    return v;
+  switch (xitk_window_get_backend_type(vwin->wrapped_window)) {
+#if defined(HAVE_WAYLAND) && defined(XINE_VISUAL_TYPE_WAYLAND)
+    case XITK_BE_TYPE_WAYLAND:
+      *visual_type = XINE_VISUAL_TYPE_WAYLAND;
+      vwin->xine_visual.wl.display           = (void *)xitk_window_get_native_display_id(vwin->wrapped_window);
+      vwin->xine_visual.wl.surface           = (void *)xitk_window_get_native_id(vwin->wrapped_window);
+      vwin->xine_visual.wl.frame_output_cb   = _video_window_frame_output_cb;
+      vwin->xine_visual.wl.user_data         = vwin;
+      break;
+#endif
+#if defined(HAVE_X11)
+    case XITK_BE_TYPE_X11:
+      *visual_type = XINE_VISUAL_TYPE_X11;
+      vwin->xine_visual.x11.display           = (void *)xitk_window_get_native_display_id(vwin->wrapped_window);
+      vwin->xine_visual.x11.screen            = DefaultScreen(vwin->xine_visual.x11.display);
+      vwin->xine_visual.x11.d                 = xitk_window_get_native_id(vwin->wrapped_window);
+      vwin->xine_visual.x11.dest_size_cb      = _video_window_dest_size_cb;
+      vwin->xine_visual.x11.frame_output_cb   = _video_window_frame_output_cb;
+      vwin->xine_visual.x11.user_data         = vwin;
+      break;
+#endif
+    default:
+      *visual_type = XINE_VISUAL_TYPE_NONE;
+      return NULL;
   }
-  return NULL;
+  return &vwin->xine_visual;
 }
 
 
@@ -2109,7 +2131,8 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
       vwin->borderless ? 0 : vwin->border_top);
     */
 
-    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
+    xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED,
+                             (void*)xitk_window_get_native_id(vwin->wrapped_window));
   }
 }
 

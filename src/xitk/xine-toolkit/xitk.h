@@ -512,6 +512,10 @@ int xitk_get_window_info (xitk_t *xitk, xitk_register_key_t key, window_info_t *
 
 xitk_window_t *xitk_get_window (xitk_t *xitk, xitk_register_key_t key);
 
+int       xitk_window_get_backend_type(xitk_window_t *xwin);
+uintptr_t xitk_window_get_native_id(xitk_window_t *xwin);
+uintptr_t xitk_window_get_native_display_id(xitk_window_t *xwin);
+
 /*
  * Initialization function, should be the first call to widget lib.
  */
