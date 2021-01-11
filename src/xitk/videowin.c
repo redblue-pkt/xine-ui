@@ -1985,7 +1985,7 @@ static void register_event_handler(xui_vwin_t *vwin)
     vwin->wrapped_window = xitk_x11_wrap_window (vwin->gui->xitk, NULL, vwin->video_window);
     xitk_window_flags (vwin->wrapped_window,
       XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
-    vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window, NULL,
+    vwin->widget_key = xitk_be_register_event_handler ("video_window", vwin->wrapped_window,
       _vwin_handle_be_event, vwin, NULL, NULL);
     xitk_window_set_role (vwin->wrapped_window, vwin->gui->use_root_window ? XITK_WR_ROOT : XITK_WR_MAIN);
     /* NOTE: this makes kwin use a desktop file named <res_class>.desktop to set the icon.

@@ -3249,7 +3249,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
 
   mmk_editor_show_tips (mmkedit->gui, panel_get_tips_enable (mmkedit->gui->panel), panel_get_tips_timeout (mmkedit->gui->panel));
 
-  mmkedit->widget_key = xitk_be_register_event_handler ("gui->mmkedit", mmkedit->xwin, NULL, mmkedit_event, mmkedit, NULL, NULL);
+  mmkedit->widget_key = xitk_be_register_event_handler ("gui->mmkedit", mmkedit->xwin, mmkedit_event, mmkedit, NULL, NULL);
 
   mmkedit->visible = 1;
 

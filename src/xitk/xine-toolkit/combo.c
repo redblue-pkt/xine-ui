@@ -217,7 +217,7 @@ static void _combo_open (_combo_private_t *wp) {
   wp->sel2 = wp->selected;
   xitk_browser_set_select (wp->browser_widget, wp->selected);
 
-  wp->widget_key = xitk_be_register_event_handler ("xitk combo", wp->xwin, NULL, combo_event, wp, NULL, NULL);
+  wp->widget_key = xitk_be_register_event_handler ("xitk combo", wp->xwin, combo_event, wp, NULL, NULL);
 
   if (wp->button_widget)
     wp->button_widget->type |= WIDGET_KEEP_FOCUS;

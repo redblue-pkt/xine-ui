@@ -1005,7 +1005,7 @@ static void kbedit_grab (xitk_widget_t *w, void *data, int state, int qual) {
   xitk_window_flags (kbe->kbr.xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (kbe->kbr.xwin);
   xitk_window_set_input_focus (kbe->kbr.xwin);
-  kbe->kbr.key = xitk_be_register_event_handler ("keybinding recorder", kbe->kbr.xwin, NULL, kbr_event, kbe, kbr_delete, kbe);
+  kbe->kbr.key = xitk_be_register_event_handler ("keybinding recorder", kbe->kbr.xwin, kbr_event, kbe, kbr_delete, kbe);
 }
 
 /*
@@ -1365,7 +1365,7 @@ void kbedit_window (gGui_t *gui) {
 
   kbedit_unset (kbedit);
 
-  kbedit->kreg = xitk_be_register_event_handler ("kbedit", kbedit->xwin, NULL, kbedit_event, kbedit, NULL, NULL);
+  kbedit->kreg = xitk_be_register_event_handler ("kbedit", kbedit->xwin, kbedit_event, kbedit, NULL, NULL);
 
   kbedit->kbr.key = 0;
   kbedit->kbr.entry = NULL;

@@ -410,7 +410,7 @@ void help_panel (gGui_t *gui) {
     }
   }
 
-  help->kreg = xitk_be_register_event_handler ("help", help->xwin, NULL, help_event, help, NULL, NULL);
+  help->kreg = xitk_be_register_event_handler ("help", help->xwin, help_event, help, NULL, NULL);
 
   help->visible = 1;
   help_raise_window (help);

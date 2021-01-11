@@ -437,7 +437,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
 
   control_show_tips (vctrl, panel_get_tips_enable (vctrl->gui->panel), panel_get_tips_timeout (vctrl->gui->panel));
 
-  vctrl->widget_key = xitk_be_register_event_handler ("control", vctrl->xwin, NULL, control_event, vctrl, NULL, NULL);
+  vctrl->widget_key = xitk_be_register_event_handler ("control", vctrl->xwin, control_event, vctrl, NULL, NULL);
 
   vctrl->status = 3;
   control_raise_window (vctrl);
