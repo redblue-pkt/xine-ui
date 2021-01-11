@@ -595,7 +595,7 @@ void skin_download (gGui_t *gui, char *url) {
     xitk_add_widget (skd->widget_list, widget);
     xitk_enable_and_show_widget(widget);
 
-    skd->widget_key = xitk_be_register_event_handler ("skdloader", skd->xwin, NULL, download_skin_event, skd, NULL, NULL);
+    skd->widget_key = xitk_be_register_event_handler ("skdloader", skd->xwin, download_skin_event, skd, NULL, NULL);
 
     xitk_window_flags (skd->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
     xitk_window_raise_window (skd->xwin);

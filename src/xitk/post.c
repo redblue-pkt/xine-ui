@@ -1301,7 +1301,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
     info->win->help_widget_key = xitk_be_register_event_handler (
       info->type == POST_VIDEO ? "vpplugin_help" : "applugin_help",
-      info->win->helpwin, NULL, pplugin_help_event, info, NULL, NULL);
+      info->win->helpwin, pplugin_help_event, info, NULL, NULL);
 
     info->win->help_running = 1;
   }
@@ -1896,7 +1896,7 @@ void pplugin_panel (post_info_t *info) {
   _pplugin_rebuild_filters (info);
 
   info->win->widget_key = xitk_be_register_event_handler (
-    info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->xwin, NULL, pplugin_event, info, NULL, NULL);
+    info->type == POST_VIDEO ? "vpplugin" : "applugin", info->win->xwin, pplugin_event, info, NULL, NULL);
 
   info->win->visible = 1;
   info->win->running = 1;

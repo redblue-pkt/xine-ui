@@ -124,7 +124,6 @@ size_t xitk_be_event_name (const xitk_be_event_t *event, char *buf, size_t buf_s
 typedef int (xitk_be_event_handler_t) (void *data, const xitk_be_event_t *event);
 
 xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_window_t *xwin,
-  xitk_widget_list_t *wl,
   xitk_be_event_handler_t *event_handler, void *eh_data,
   void (*destructor) (void *data), void *destr_data);
 

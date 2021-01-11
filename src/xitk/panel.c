@@ -1470,7 +1470,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
    * handled in xitk.c - otherwise some widgets may not show until focused. */
   xitk_window_flags (panel->xwin,
     XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND, XITK_WINF_TASKBAR | XITK_WINF_PAGER | XITK_WINF_DND);
-  panel->widget_key = xitk_be_register_event_handler ("panel", panel->xwin, NULL, panel_event, panel, NULL, NULL);
+  panel->widget_key = xitk_be_register_event_handler ("panel", panel->xwin, panel_event, panel, NULL, NULL);
 
   {
     pthread_attr_t       pth_attrs;

@@ -411,7 +411,7 @@ void event_sender_panel (gGui_t *gui) {
   }
 
   event_sender_show_tips (es->gui, panel_get_tips_enable (es->gui->panel) ? panel_get_tips_timeout (es->gui->panel) : 0);
-  es->widget_key = xitk_be_register_event_handler ("eventer", es->xwin, NULL, event_sender_event, es, NULL, NULL);
+  es->widget_key = xitk_be_register_event_handler ("eventer", es->xwin, event_sender_event, es, NULL, NULL);
 
   es->visible = 1;
   _event_sender_raise_window (es->gui);

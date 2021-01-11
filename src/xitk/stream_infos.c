@@ -650,7 +650,7 @@ void stream_infos_panel (gGui_t *gui) {
     xitk_enable_and_show_widget (sinfo->close);
   }
 
-  sinfo->widget_key = xitk_be_register_event_handler ("sinfos", sinfo->xwin, NULL, stream_infos_event, sinfo, NULL, NULL);
+  sinfo->widget_key = xitk_be_register_event_handler ("sinfos", sinfo->xwin, stream_infos_event, sinfo, NULL, NULL);
   sinfo->visible = 1;
   stream_infos_raise_window (sinfo);
   xitk_window_set_input_focus (sinfo->xwin);

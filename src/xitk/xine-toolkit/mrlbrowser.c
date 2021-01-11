@@ -1127,7 +1127,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   xitk_browser_update_list (wp->mrlb_list, (const char * const *)wp->items.f_list, NULL, wp->items.f_num, 0);
 
-  wp->widget_key = xitk_be_register_event_handler ("mrl browser", wp->xwin, NULL, mrlbrowser_event, wp, NULL, NULL);
+  wp->widget_key = xitk_be_register_event_handler ("mrl browser", wp->xwin, mrlbrowser_event, wp, NULL, NULL);
 
   if (mb->reparent_window) {
     mb->reparent_window (mb->rw_data, wp->xwin);

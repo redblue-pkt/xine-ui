@@ -423,7 +423,7 @@ void viewlog_panel (gGui_t *gui) {
     }
   }
 
-  vl->kreg = xitk_be_register_event_handler ("viewlog", vl->xwin, NULL, viewlog_event, vl, NULL, NULL);
+  vl->kreg = xitk_be_register_event_handler ("viewlog", vl->xwin, viewlog_event, vl, NULL, NULL);
 
   vl->visible = 1;
   viewlog_raise_window (vl);

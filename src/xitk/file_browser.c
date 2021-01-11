@@ -373,7 +373,7 @@ static void fb_create_input_window(char *title, char *text,
     char buffer[256];
     snprintf(buffer, sizeof(buffer), "filenameed%u", (unsigned int) time(NULL));
 
-    fne->widget_key = xitk_be_register_event_handler (buffer, fne->xwin, NULL, fne_event, fne, NULL, NULL);
+    fne->widget_key = xitk_be_register_event_handler (buffer, fne->xwin, fne_event, fne, NULL, NULL);
   }
 
   xitk_window_flags (fne->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
@@ -1542,7 +1542,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   {
     char buffer[256];
     snprintf(buffer, sizeof(buffer), "filebrowser%u", (unsigned int) time(NULL));
-    fb->widget_key = xitk_be_register_event_handler (buffer, fb->xwin, NULL, fb_event, fb, NULL, NULL);
+    fb->widget_key = xitk_be_register_event_handler (buffer, fb->xwin, fb_event, fb, NULL, NULL);
   }
   fb->dialog = 0;
 

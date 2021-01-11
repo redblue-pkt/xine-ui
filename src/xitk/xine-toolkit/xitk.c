@@ -1015,18 +1015,17 @@ size_t xitk_be_event_name (const xitk_be_event_t *event, char *buf, size_t buf_s
  */
 
 xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_window_t *xwin,
-  xitk_widget_list_t *wl,
   xitk_be_event_handler_t *event_handler, void *user_data,
   void (*destructor) (void *data), void *destr_data) {
   __xitk_t *xitk;
   __gfx_t   *fx;
+  xitk_widget_list_t *wl;
 
   //  printf("%s()\n", __FUNCTION__);
 
   ABORT_IF_NULL (xwin);
 
-  if (!wl)
-    wl = xwin->widget_list;
+  wl = xwin->widget_list;
   if (!wl) {
     xitk_t *_xitk = xwin->xitk;
     xitk_container (xitk, _xitk, x);
