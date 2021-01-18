@@ -235,7 +235,7 @@ static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (wp->w.visible == 1) {
+  if ((wp->w.visible == 1) && wp->skin.width) {
     xitk_img_state_t state = xitk_image_find_state (XITK_IMG_STATE_SEL_FOCUS, wp->w.enable,
       (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), wp->bClicked, wp->bState);
 
@@ -442,6 +442,31 @@ static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *s
       wp->temp_image.y = 0;
       wp->temp_image.width = wp->skin.width / 3;
       wp->temp_image.height = wp->skin.height;
+    } else {
+      wp->skin.x        = 0;
+      wp->skin.y        = 0;
+      wp->skin.width    = 0;
+      wp->skin.height   = 0;
+      wp->skin.image    = NULL;
+      wp->color[XITK_IMG_STATE_NORMAL][0]   = 0;
+      wp->color[XITK_IMG_STATE_FOCUS][0]    = 0;
+      wp->color[XITK_IMG_STATE_SELECTED][0] = 0;
+      xitk_short_string_set (&wp->font, "");
+      wp->label_visible = 0;
+      wp->label_static  = 0;
+      wp->align         = ALIGN_LEFT;
+      wp->w.x       = 0;
+      wp->w.y       = 0;
+      wp->w.width   = 0;
+      wp->w.height  = 0;
+      wp->label_dy  = 0;
+      wp->w.visible = -1;
+      wp->w.enable  = 0;
+      xitk_image_free_image (&wp->temp_image.image);
+      wp->temp_image.x      = 0;
+      wp->temp_image.y      = 0;
+      wp->temp_image.width  = 0;
+      wp->temp_image.height = 0;
     }
     xitk_skin_unlock (skonfig);
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
