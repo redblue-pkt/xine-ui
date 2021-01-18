@@ -98,6 +98,16 @@ static void _button_read_skin (_button_private_t *wp, xitk_skin_config_t *skonfi
     wp->w.y       = s->y;
     wp->w.enable  = s->enability;
     wp->w.visible = s->visibility ? 1 : -1;
+  } else {
+    wp->skin.x      = 0;
+    wp->skin.y      = 0;
+    wp->skin.width  = 0;
+    wp->skin.height = 0;
+    wp->skin.image  = NULL;
+    wp->w.x         = 0;
+    wp->w.y         = 0;
+    wp->w.enable    = 0;
+    wp->w.visible   = -1;
   }
 }
 

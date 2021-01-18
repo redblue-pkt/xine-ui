@@ -95,7 +95,7 @@ struct xitk_widget_s {
 
   int                    x;
   int                    y;
-  int                    width;
+  int                    width; /** << 0 if not used by current skin */
   int                    height;
 
   uint32_t               type;

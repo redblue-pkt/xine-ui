@@ -328,7 +328,7 @@ static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
   xitk_image_t           *bg;
   xitk_image_t           *paddle;
 
-  if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (wp->w.visible == 1))) {
+  if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (wp->w.visible == 1)) && wp->bg_skin.width) {
     int    x, y, srcx1, src_w, destx1, srcy1, src_h, desty1;
     int    xcenter, ycenter;
     int    paddle_width;
@@ -520,7 +520,8 @@ static void _paint_slider (_slider_private_t *wp, widget_event_t *event) {
 
 static void _xitk_slider_get_skin (_slider_private_t *wp, xitk_skin_config_t *skonfig) {
   const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
-  if (s) {
+  /* always be there for the application. if this skin does not use us, disable user side. */
+  if (s && s->pixmap_img.image && s->slider_pixmap_pad_img.image) {
     wp->w.x         = s->x;
     wp->w.y         = s->y;
     wp->w.enable    = s->enability;
@@ -529,6 +530,23 @@ static void _xitk_slider_get_skin (_slider_private_t *wp, xitk_skin_config_t *sk
     wp->radius      = s->slider_radius;
     wp->bg_skin     = s->pixmap_img;
     wp->paddle_skin = s->slider_pixmap_pad_img;
+  } else {
+    wp->w.x         = 0;
+    wp->w.y         = 0;
+    wp->w.enable    = 0;
+    wp->w.visible   = -1;
+    wp->sType       = XITK_VSLIDER;
+    wp->radius      = 8;
+    wp->bg_skin.x      = 0;
+    wp->bg_skin.y      = 0;
+    wp->bg_skin.width  = 0;
+    wp->bg_skin.height = 0;
+    wp->bg_skin.image  = NULL;
+    wp->paddle_skin.x      = 0;
+    wp->paddle_skin.y      = 0;
+    wp->paddle_skin.width  = 0;
+    wp->paddle_skin.height = 0;
+    wp->paddle_skin.image  = NULL;
   }
 }
 
@@ -1103,11 +1121,6 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
   xitk_short_string_init (&wp->skin_element_name);
   xitk_short_string_set (&wp->skin_element_name, s->skin_element_name);
   _xitk_slider_get_skin (wp, skonfig);
-  if (!wp->bg_skin.image || !wp->paddle_skin.image) {
-    xitk_short_string_deinit (&wp->skin_element_name);
-    free (wp);
-    return NULL;
-  }
 
   return _xitk_slider_create (wp, s);
 }
