@@ -278,7 +278,7 @@ static int control_event (void *data, const xitk_be_event_t *e) {
 
   switch (e->type) {
     case XITK_EV_DEL_WIN:
-      control_deinit (vctrl);
+      control_toggle_window (NULL, vctrl);
       return 1;
     case XITK_EV_BUTTON_DOWN:
       if (e->code == 3) {
