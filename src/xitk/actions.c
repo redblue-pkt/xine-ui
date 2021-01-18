@@ -1708,7 +1708,12 @@ void gui_set_current_mmk_by_index(int idx) {
 
 void gui_control_show(xitk_widget_t *w, void *data) {
   gGui_t *gui = data;
-  if (gui)
+
+  if (!gui)
+    return;
+  if (!gui->vctrl)
+    control_init (gui);
+  else
     control_toggle_window (w, gui->vctrl);
 }
 
