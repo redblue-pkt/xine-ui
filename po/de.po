@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-11-08 16:01+0100\n"
+"POT-Creation-Date: 2021-01-19 02:11+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -2003,6 +2003,9 @@ msgstr "xine Bedienfeld"
 msgid "panel: couldn't find image for background\n"
 msgstr "panel: Kann Hintergrundbild nicht finden\n"
 
+msgid "panel: couldn't create window\n"
+msgstr "panel: Kann Fenster nicht öffnen\n"
+
 msgid "Previous audio channel"
 msgstr "Vorherigen Audio-Kanal"
 
@@ -2204,8 +2207,8 @@ msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr ""
 "(*)  xine muß neu gestartet werden, damit diese EInstellung wirksam wird"
 
-msgid "gui skin theme"
-msgstr "gui skin Thema"
+msgid "Skin theme"
+msgstr "Skin Thema"
 
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
@@ -2222,6 +2225,9 @@ msgstr "Fehler beim Laden von %s, falsche Version. Lade sicheren Skin '%s'.\n"
 #, c-format
 msgid "No available skin found. Say goodbye.\n"
 msgstr "Keinen verfügbaren Skin gefunden. Tschüss.\n"
+
+msgid "gui skin theme"
+msgstr "gui skin Thema"
 
 msgid "Grapics quality"
 msgstr "Grafikqualität"
@@ -2488,78 +2494,6 @@ msgstr ""
 "videowin: Ausgabetreiber überschreibt ausgewähltes Visual mit Visual id 0x%"
 "lx\n"
 
-msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
-
-msgid "Name of video display"
-msgstr "Name des Video-Bildschirms"
-
-msgid ""
-"Use this setting to configure to which display xine will show videos. When "
-"left blank, the main display will be used. Setting this option to something "
-"like ':0.1' or ':1' makes possible to display video and control on different "
-"screens (very useful for TV presentations)."
-msgstr ""
-"Diese Einstellung gibt an, auf welchem Bildschirm xine Videos anzeigt. Wenn "
-"leer gelassen wird der Hauptbildschirm benutzt. Einstellungen wie ':0.1' "
-"oder ':1' machen es möglich, das Video auf einem anderen Bildschirm als das "
-"Steuerfeld anzuzeigen (sehr nützlich für TV-Presentationen)."
-
-#, c-format
-msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
-msgstr ""
-"Kann Bildschirm '%s' nicht für Video öffnen. Falle zurück auf "
-"Hauptbildschirm.\n"
-
-#, c-format
-msgid "Bad geometry '%s'\n"
-msgstr "Fehlerhafte Geometrie '%s'\n"
-
-msgid ""
-"Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
-"2 3)"
-msgstr "Zu nutzende Bildschirme im Xinerama Vollbildmodus (z.B. 0 2 3)"
-
-msgid ""
-"Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
-msgstr ""
-"Zum Beispiel, wenn die Anzeige auf den Schirmen 0, 2 und 3 sein soll, 0 2 3 "
-"eingeben"
-
-msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "X-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
-
-msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Y-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
-
-msgid "width for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Breite für Xinerama-Vollbildmodus (-8192 = automatisch)"
-
-msgid "height for xinerama fullscreen (-8192 = autodetect)"
-msgstr "Höhe für Xinerama-Vollbildmodus (-8192 = automatisch)"
-
-msgid "xine Video Window"
-msgstr "xine Video Fenster"
-
-msgid "xine Video Fullscreen Window"
-msgstr "xine Video Vollbildfenster"
-
-msgid "xine Video Borderless Window"
-msgstr "xine Video rahmenloses Fenster"
-
-#, c-format
-msgid "XAllocWMHints() failed\n"
-msgstr "XAllocWMHints() fehlgeschlagen\n"
-
-msgid "New stream sizes resize output window"
-msgstr "Neue Datemstromgröße verändert Ausgabefenstergröße "
-
-msgid "Double size for small streams (require stream_resize_window)"
-msgstr "Doppelte Größe für kleine Datemströme (Erfordert stream_resize_window)"
-
-msgid "use XVidModeExtension when switching to fullscreen"
-msgstr "Benutze XVidModeExtension beim Umschalten auf Vollbild"
-
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr "XF86VidMode Erweiterung (%d.%d) erkannt, versuche sie zu nutzen.\n"
@@ -2585,6 +2519,78 @@ msgstr ""
 "XF86VidMode Erweiterung: Initialisierung fehlgeschlagen, wird nicht "
 "benutzt.\n"
 
+msgid "XF86VidMode Extension: modeline switching failed.\n"
+msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
+
+msgid ""
+"Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
+"2 3)"
+msgstr "Zu nutzende Bildschirme im Xinerama Vollbildmodus (z.B. 0 2 3)"
+
+msgid ""
+"Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
+msgstr ""
+"Zum Beispiel, wenn die Anzeige auf den Schirmen 0, 2 und 3 sein soll, 0 2 3 "
+"eingeben"
+
+msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr "X-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
+
+msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr "Y-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
+
+msgid "width for xinerama fullscreen (-8192 = autodetect)"
+msgstr "Breite für Xinerama-Vollbildmodus (-8192 = automatisch)"
+
+msgid "height for xinerama fullscreen (-8192 = autodetect)"
+msgstr "Höhe für Xinerama-Vollbildmodus (-8192 = automatisch)"
+
+msgid "Name of video display"
+msgstr "Name des Video-Bildschirms"
+
+msgid ""
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
+msgstr ""
+"Diese Einstellung gibt an, auf welchem Bildschirm xine Videos anzeigt. Wenn "
+"leer gelassen wird der Hauptbildschirm benutzt. Einstellungen wie ':0.1' "
+"oder ':1' machen es möglich, das Video auf einem anderen Bildschirm als das "
+"Steuerfeld anzuzeigen (sehr nützlich für TV-Presentationen)."
+
+#, c-format
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr ""
+"Kann Bildschirm '%s' nicht für Video öffnen. Falle zurück auf "
+"Hauptbildschirm.\n"
+
+#, c-format
+msgid "Cannot open any X11 display for video.\n"
+msgstr "Kann kein X11-Videodisplay öffnen\n"
+
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "Fehlerhafte Geometrie '%s'\n"
+
+msgid "xine Video Window"
+msgstr "xine Video Fenster"
+
+msgid "xine Video Fullscreen Window"
+msgstr "xine Video Vollbildfenster"
+
+msgid "xine Video Borderless Window"
+msgstr "xine Video rahmenloses Fenster"
+
+msgid "New stream sizes resize output window"
+msgstr "Neue Datemstromgröße verändert Ausgabefenstergröße "
+
+msgid "Double size for small streams (require stream_resize_window)"
+msgstr "Doppelte Größe für kleine Datemströme (Erfordert stream_resize_window)"
+
+msgid "use XVidModeExtension when switching to fullscreen"
+msgstr "Benutze XVidModeExtension beim Umschalten auf Vollbild"
+
 msgid "log info"
 msgstr "Log Information"
 
@@ -2598,6 +2604,9 @@ msgstr "xine Log-Betrachter"
 
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "XAllocWMHints() failed\n"
+#~ msgstr "XAllocWMHints() fehlgeschlagen\n"
 
 #~ msgid "Event Receiver Window:  Press keyboard keys to bind..."
 #~ msgstr "Ereignisempfangsfenster: Drücke Taste auf Tastatur zum zuweisen..."
@@ -2626,9 +2635,6 @@ msgstr "Aktualisieren"
 #~ msgstr ""
 #~ "\n"
 #~ "XInitThreads Fehler - Ihre xlib ist anscheinend nicht threadsicher.\n"
-
-#~ msgid "Cannot open display\n"
-#~ msgstr "Kann Display nicht öffnen\n"
 
 #~ msgid "Warning! Synchronized X activated - this is very slow...\n"
 #~ msgstr "Warnung! Synchrones X aktiviert - das wird sehr langsam...\n"
