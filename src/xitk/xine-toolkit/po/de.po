@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.23\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2020-11-08 14:56+0100\n"
+"POT-Creation-Date: 2021-01-19 01:39+0100\n"
 "PO-Revision-Date: 2007-04-23 23:05+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,6 +14,10 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
+
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr "Kann Imlib nicht starten\n"
 
 #, c-format
 msgid "Cannot open display\n"
@@ -60,10 +64,6 @@ msgstr "MRL-Auswahlfenster schlieﬂen"
 
 msgid "Play selected entry"
 msgstr "Spiele momentanen Eintrag"
-
-#, c-format
-msgid "Unable to initialize Imlib\n"
-msgstr "Kann Imlib nicht starten\n"
 
 msgid "Information"
 msgstr "Information"
