@@ -52,6 +52,7 @@ struct xitk_s {
   xitk_be_display_t *d, *d2;
   xitk_font_cache_t *font_cache;
   struct xitk_tips_s *tips;
+  int verbosity; /** << 0 (quiet), 1 (base, errors), 2 (debug) */
 };
 
 #include "_config.h"
