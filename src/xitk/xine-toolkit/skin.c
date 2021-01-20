@@ -455,8 +455,11 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
     return NULL;
 
   r = xine_sarray_binary_search (skonfig->elements, (char *)str);
-  if (r < 0)
+  if (r < 0) {
+    if (skonfig->xitk->verbosity >= 1)
+      printf ("xitk.skin.section.missing (%s, %s).\n", skonfig->name, str);
     return NULL;
+  }
   s = xine_sarray_get (skonfig->elements, r);
 
   if (!s->info.pixmap_img.image && s->info.pixmap_name) {
@@ -872,6 +875,10 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const c
     xitk_system(0, skonfig->load_command);
 
   pthread_mutex_unlock (&skonfig->skin_mutex);
+
+  if (skonfig->xitk->verbosity >= 2)
+    printf ("xitk.skin.load (%s).\n", skonfig->name);
+
   return 1;
 }
 
@@ -880,6 +887,8 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const c
  */
 void xitk_skin_unload_config(xitk_skin_config_t *skonfig) {
   if(skonfig) {
+    if (skonfig->xitk->verbosity >= 2)
+      printf ("xitk.skin.unload (%s).\n", skonfig->name);
 
     if(skonfig->unload_command)
       xitk_system(0, skonfig->unload_command);
@@ -954,3 +963,4 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
+

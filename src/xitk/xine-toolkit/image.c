@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include <xine/sorted_array.h>
 
@@ -251,6 +252,7 @@ static void _xitk_image_add_beimg (xitk_image_t *img, const char *data, int dsiz
  * dsize == -1: use raw data as (w, h). */
 xitk_image_t *xitk_image_new (xitk_t *xitk, const char *data, int dsize, int w, int h) {
   xitk_image_t *img;
+  struct timeval t1 = {0, 0}, t2 = {0, 0};
 
   if (!xitk)
     return NULL;
@@ -261,10 +263,21 @@ xitk_image_t *xitk_image_new (xitk_t *xitk, const char *data, int dsize, int w, 
   img->width = w;
   img->height = h;
   img->last_state = XITK_IMG_STATE_NORMAL;
+  if ((dsize == 0) && data && (xitk->verbosity >= 2))
+    gettimeofday (&t1, NULL);
   _xitk_image_add_beimg (img, data, dsize);
   if (!img->beimg) {
+    if ((dsize == 0) && data && (xitk->verbosity >= 1))
+      printf ("xitk.image.load (%s) [failed].\n", (const char *)data);
     XITK_FREE (img);
     return NULL;
+  }
+  if ((dsize == 0) && data && (xitk->verbosity >= 2)) {
+    int d;
+    gettimeofday (&t2, NULL);
+    d = ((int)t2.tv_usec - (int)t1.tv_usec) / 100;
+    d += (t2.tv_sec - t1.tv_sec) * 10000;
+    printf ("xitk.image.load (%s) [%0d.%04ds].\n", (const char *)data, d / 10000, d % 10000);
   }
   img->wl = NULL;
   img->max_refs =

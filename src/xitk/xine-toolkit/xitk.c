@@ -210,7 +210,6 @@ typedef struct {
 struct __xitk_s {
   xitk_t                      x;
 
-  int                         verbosity;
   xitk_dlist_t                gfxs;
 
   struct {
@@ -261,7 +260,7 @@ static void __fx_ref (__gfx_t *fx) {
 static void __fx_delete (__gfx_t *fx) {
   __xitk_t *xitk = fx->xitk;
 
-  if (xitk->verbosity >= 2)
+  if (xitk->x.verbosity >= 2)
     printf ("xitk_gfx_delete (%d) = \"%s\".\n", fx->key, fx->name);
 
   xitk_dnode_remove (&fx->wl.node);
@@ -303,7 +302,7 @@ static void *xitk_event_bridge_thread (void *data) {
   __xitk_t *xitk = data;
     xitk_be_window_t *bewin = NULL;
 
-  if (xitk->verbosity >= 2)
+  if (xitk->x.verbosity >= 2)
     printf ("xitk.event_bridge.start.\n");
 
   MUTLOCK ();
@@ -333,7 +332,7 @@ static void *xitk_event_bridge_thread (void *data) {
         fx->expose.y2 = event.y + event.h;
       if (event.more > 0)
         continue;
-      if (xitk->verbosity >= 2)
+      if (xitk->x.verbosity >= 2)
         printf ("xitk.event_bridge.expose (%s): x %d-%d, y %d-%d.\n",
           fx->name, fx->expose.x1, fx->expose.x2, fx->expose.y1, fx->expose.y2);
       xitk_partial_paint_widget_list (&fx->wl, &fx->expose);
@@ -345,7 +344,7 @@ static void *xitk_event_bridge_thread (void *data) {
   }
   MUTUNLOCK ();
 
-  if (xitk->verbosity >= 2)
+  if (xitk->x.verbosity >= 2)
     printf ("xitk.event_bridge.stop.\n");
 
   return NULL;
@@ -757,7 +756,7 @@ void xitk_window_update_tree (xitk_window_t *xwin, uint32_t mask_and_flags) {
 
   MUTLOCK ();
 
-  if (xitk->verbosity >= 2) {
+  if (xitk->x.verbosity >= 2) {
     xitk_container (fx, xwin->widget_list, wl);
     if (fx)
         printf ("xitk.window.update_tree (%s, 0x%x).\n", fx->name, (unsigned int)mask_and_flags);
@@ -981,7 +980,7 @@ xitk_widget_list_t *xitk_widget_list_get (xitk_t *_xitk, xitk_window_t *xwin) {
   xitk_dlist_add_tail (&xitk->gfxs, &fx->wl.node);
   MUTUNLOCK ();
 
-  if (xitk->verbosity >= 2)
+  if (xitk->x.verbosity >= 2)
     printf ("xitk_gfx_new (\"%s\") = %d.\n", fx->name, fx->key);
   return &fx->wl;
 }
@@ -1084,7 +1083,7 @@ xitk_register_key_t xitk_be_register_event_handler (const char *name, xitk_windo
     xitk->focused = fx->key;
   MUTUNLOCK ();
 
-  if (xitk->verbosity >= 2)
+  if (xitk->x.verbosity >= 2)
     printf ("xitk_gfx_new (\"%s\") = %d.\n", fx->name, fx->key);
   return fx->key;
 }
@@ -1408,14 +1407,14 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
     case XITK_EV_FOCUS:
       if (fx) {
         xitk->focused = fx->key;
-        if (xitk->verbosity >= 2)
+        if (xitk->x.verbosity >= 2)
           printf ("xitk.window.focus.received (%s).\n", fx->name);
       }
       goto _get_flags;
     case XITK_EV_UNFOCUS:
       if (fx && (fx->key == xitk->focused)) {
         xitk->focused = 0;
-        if (xitk->verbosity >= 2)
+        if (xitk->x.verbosity >= 2)
           printf ("xitk.window.focus.lost (%s).\n", fx->name);
       }
     _get_flags:
@@ -1637,7 +1636,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
 
   xitk_color_db_init (xitk);
 
-  xitk->verbosity       = verbosity;
+  xitk->x.verbosity     = verbosity;
   xitk_dlist_init (&xitk->gfxs);
   xitk->key             = 0;
   xitk->focused         = 0;
