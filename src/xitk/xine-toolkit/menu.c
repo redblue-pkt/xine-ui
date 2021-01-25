@@ -78,6 +78,8 @@ struct _menu_private_s {
   xitk_register_key_t  parent, before_cb, after_cb;
   _menu_node_t         root;
   int                  x, y, num_open;
+  xitk_menu_callback_t cb;
+  void                *user_data;
   _menu_window_t       open_windows[_MENU_MAX_OPEN];
 };
 
@@ -92,14 +94,22 @@ static void _menu_tree_free (_menu_node_t *root) {
   }
 }
 
-static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me, const char *name, size_t lname) {
+static _menu_node_t *_menu_node_new (_menu_private_t *wp, const xitk_menu_entry_t *me, const char *name, size_t lname) {
+  static const uint32_t type[XITK_MENU_ENTRY_LAST] = {
+    [XITK_MENU_ENTRY_END]       = 0,
+    [XITK_MENU_ENTRY_PLAIN]     = _MENU_NODE_PLAIN,
+    [XITK_MENU_ENTRY_SEPARATOR] = _MENU_NODE_SEP,
+    [XITK_MENU_ENTRY_BRANCH]    = _MENU_NODE_BRANCH,
+    [XITK_MENU_ENTRY_CHECK]     = _MENU_NODE_CHECK,
+    [XITK_MENU_ENTRY_CHECKED]   = _MENU_NODE_CHECKED,
+    [XITK_MENU_ENTRY_TITLE]     = _MENU_NODE_TITLE
+  };
   _menu_node_t *node;
   size_t lshort = (me->shortcut ? strlen (me->shortcut) : 0) + 1;
-  size_t ltype = (me->type ? strlen (me->type) : 0) + 1;
   char *s;
 
   lname += 1;
-  s = (char *)xitk_xmalloc (sizeof (_menu_node_t) + lname + lshort + ltype);
+  s = (char *)xitk_xmalloc (sizeof (_menu_node_t) + lname + lshort);
   if (!s)
     return NULL;
   node = (_menu_node_t *)s;
@@ -109,24 +119,8 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
   memcpy (s, name, lname);
   s += lname;
 
-  node->type = _MENU_NODE_PLAIN;
-  node->menu_entry.type = NULL;
-  if (me->type) {
-    node->menu_entry.type = s;
-    memcpy (s, me->type, ltype);
-    if (!strcasecmp (s, "<separator>")) {
-      node->type = _MENU_NODE_SEP;
-    } else if (!strcasecmp (s, "<branch>")) {
-      node->type = _MENU_NODE_BRANCH;
-    } else if (!strcasecmp (s, "<check>")) {
-      node->type = _MENU_NODE_CHECK;
-    } else if (!strcasecmp (s, "<checked>")) {
-      node->type = _MENU_NODE_CHECKED;
-    } else if (!strcasecmp (s, "<title>")) {
-      node->type = _MENU_NODE_TITLE;
-    }
-    s += ltype;
-  }
+  node->menu_entry.type = me->type;
+  node->type = type[me->type >= XITK_MENU_ENTRY_LAST ? XITK_MENU_ENTRY_PLAIN : me->type];
 
   if (me->shortcut) {
     node->menu_entry.shortcut = s;
@@ -137,8 +131,6 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
     node->menu_entry.shortcut = NULL;
   }
 
-  node->menu_entry.cb        = me->cb;
-  node->menu_entry.user_data = me->user_data;
   node->menu_entry.user_id   = me->user_id;
 
   node->node.next = NULL;
@@ -152,7 +144,7 @@ static _menu_node_t *_menu_node_new (_menu_private_t *wp, xitk_menu_entry_t *me,
   return node;
 }
 
-void xitk_menu_add_entry (xitk_widget_t *w, xitk_menu_entry_t *me) {
+void xitk_menu_add_entry (xitk_widget_t *w, const xitk_menu_entry_t *me) {
   _menu_private_t *wp;
   _menu_node_t *here;
   char buf[400], *e = buf + sizeof (buf) - 1;
@@ -308,11 +300,11 @@ static void _menu_click_cb (xitk_widget_t *w, void *data, int state) {
     xitk_dnode_remove (&wp->w.node);
     xitk_unset_current_menu (wp->xitk);
     wp->w.wl = NULL;
-    if (me->menu_entry.cb) {
+    if (me->wp->cb) {
       /* if user callback did open a new window, let it keep its focus in
        * xitk_destroy_widget () -> _menu_exit (). */
       wp->before_cb = xitk_get_focus_key (wp->xitk);
-      me->menu_entry.cb (&wp->w, &me->menu_entry, me->menu_entry.user_data);
+      me->wp->cb (&wp->w, &me->menu_entry, me->wp->user_data);
       wp->after_cb = xitk_get_focus_key (wp->xitk);
     }
     xitk_destroy_widget (&wp->w);
@@ -759,6 +751,8 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   wp->before_cb        =
   wp->after_cb         =
   wp->parent           = 0;
+  wp->cb               = m->cb;
+  wp->user_data        = m->user_data;
 
   if (!m->menu_tree) {
     printf ("Empty menu entries. You will not .\n");
@@ -766,9 +760,10 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   }
 
   {
-    xitk_menu_entry_t *me;
-    for (me = m->menu_tree; me->menu; me++)
-      xitk_menu_add_entry (&wp->w, me);
+    const xitk_menu_entry_t *me;
+    for (me = m->menu_tree; me->type != XITK_MENU_ENTRY_END; me++)
+      if (me->menu)
+        xitk_menu_add_entry (&wp->w, me);
   }
 
   wp->w.visible       = 0;
