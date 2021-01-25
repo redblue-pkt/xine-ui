@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-01-19 02:11+0100\n"
+"POT-Creation-Date: 2021-01-24 17:48+0100\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -1670,6 +1670,9 @@ msgstr "Videofenster anzeigen"
 
 msgid "Fullscreen"
 msgstr "Vollbild"
+
+msgid "Window frame"
+msgstr "Fensterrahmen"
 
 msgid "Open"
 msgstr "Öffnen"
