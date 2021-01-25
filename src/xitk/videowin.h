@@ -77,6 +77,7 @@ void video_window_get_window_size (xui_vwin_t *vwin, int *window_width, int *win
 
 void video_window_set_mrl (xui_vwin_t *vwin, char *mrl);
 
+int video_window_get_border_mode (xui_vwin_t *vwin);
 void video_window_toggle_border (xui_vwin_t *vwin);
 
 void video_window_set_transient_for (xui_vwin_t *vwin, xitk_window_t *xwin);

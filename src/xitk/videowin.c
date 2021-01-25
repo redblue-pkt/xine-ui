@@ -2101,6 +2101,14 @@ void video_window_set_mrl (xui_vwin_t *vwin, char *mrl) {
   xitk_window_set_window_title (vwin->wrapped_window, vwin->window_title);
 }
 
+int video_window_get_border_mode (xui_vwin_t *vwin) {
+  if (!vwin)
+    return 1;
+  if (!vwin->gui->use_root_window && (vwin->fullscreen_mode & WINDOWED_MODE))
+    return !vwin->borderless;
+  return 0;
+}
+
 void video_window_toggle_border (xui_vwin_t *vwin) {
   if (!vwin)
     return;
@@ -2123,3 +2131,4 @@ void video_window_toggle_border (xui_vwin_t *vwin) {
     xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)vwin->video_window);
   }
 }
+
