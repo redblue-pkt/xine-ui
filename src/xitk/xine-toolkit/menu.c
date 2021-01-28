@@ -447,32 +447,25 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 
   if (node->type & (_MENU_NODE_PLAIN << _MENU_NODE_HAS)) {
     mw->bevel_plain = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
-    if (mw->bevel_plain)
-      xitk_image_draw_flat_three_state (mw->bevel_plain);
+    xitk_image_draw_flat_three_state (mw->bevel_plain);
   }
 
   if (node->type & (_MENU_NODE_BRANCH << _MENU_NODE_HAS)) {
     mw->bevel_arrow = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
-    if (mw->bevel_arrow) {
-      xitk_image_draw_flat_three_state (mw->bevel_arrow);
-      xitk_image_draw_menu_arrow_branch (mw->bevel_arrow);
-    }
+    xitk_image_draw_flat_three_state (mw->bevel_arrow);
+    xitk_image_draw_menu_arrow_branch (mw->bevel_arrow);
   }
 
   if (node->type & (_MENU_NODE_CHECK << _MENU_NODE_HAS)) {
     mw->bevel_unchecked = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
-    if (mw->bevel_unchecked) {
-      xitk_image_draw_flat_three_state (mw->bevel_unchecked);
-      xitk_image_draw_menu_check (mw->bevel_unchecked, 0);
-    }
+    xitk_image_draw_flat_three_state (mw->bevel_unchecked);
+    xitk_image_draw_menu_check (mw->bevel_unchecked, 0);
   }
 
   if (node->type & (_MENU_NODE_CHECKED << _MENU_NODE_HAS)) {
     mw->bevel_checked = xitk_image_new (wp->xitk, NULL, 0, wwidth * 3, 20);
-    if (mw->bevel_checked) {
-      xitk_image_draw_flat_three_state (mw->bevel_checked);
-      xitk_image_draw_menu_check (mw->bevel_checked, 1);
-    }
+    xitk_image_draw_flat_three_state (mw->bevel_checked);
+    xitk_image_draw_menu_check (mw->bevel_checked, 1);
   }
 
   memset (&info, 0, sizeof (info));
