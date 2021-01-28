@@ -855,11 +855,6 @@ static void _xitk_image_draw_rectangular_box (xitk_image_t *img,
   unsigned int color[2];
   xitk_be_line_t xs[5], *q;
 
-  if (!img)
-    return;
-  if (!img->beimg)
-    return;
-
   color[(type & DRAW_FLATTER) != DRAW_OUTTER] = xitk_get_cfg_num (img->xitk, XITK_WHITE_COLOR);
   color[(type & DRAW_FLATTER) == DRAW_OUTTER] = (type & DRAW_LIGHT)
                                               ? xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR)
@@ -908,6 +903,10 @@ static void _xitk_image_draw_rectangular_box (xitk_image_t *img,
  *
  */
 void xitk_image_draw_rectangular_box (xitk_image_t *img, int x, int y, int width, int height, int type) {
+  if (!img)
+    return;
+  if (!img->beimg || !img->xitk)
+    return;
   _xitk_image_draw_rectangular_box (img, x, y, 0, 0, width, height, type);
 }
 
@@ -1022,11 +1021,6 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   xitk_be_rect_t xr[1];
   xitk_be_line_t xs[4];
 
-  if (!img)
-    return;
-  if (!img->beimg)
-    return;
-
   /* background */
   xr[0].x = x, xr[0].y = y, xr[0].w = xr[0].h = d;
   img->beimg->display->lock (img->beimg->display);
@@ -1056,47 +1050,31 @@ static void _xitk_image_draw_check_check (xitk_image_t *img, int x, int y, int d
   }
 }
 
-static void _xitk_image_draw_check_three_state_round (xitk_image_t *img, int x, int y, int d, int w, int checked) {
-  int i;
-
-  for (i = 0; i < 3; i++) {
-    if (i == 2) {
-      x++;
-      y++;
-    }
-    _xitk_image_draw_check_round (img, x, y, d, checked);
-    x += w;
-  }
-}
-
-static void _xitk_image_draw_check_three_state_check (xitk_image_t *img, int x, int y, int d, int w, int checked) {
-  int i;
-
-  for (i = 0; i < 3; i++) {
-    if (i == 2) {
-      x++;
-      y++;
-    }
-    _xitk_image_draw_check_check (img, x, y, d, checked);
-    x += w;
-  }
-}
-
 void xitk_image_draw_menu_check (xitk_image_t *img, int checked) {
-  int  style;
+  int style, w, h;
 
   if (!img)
     return;
+  if (!img->beimg || !img->xitk)
+    return;
 
+  w = img->width / 3;
+  h = img->height;
   style = xitk_get_cfg_num (img->xitk, XITK_CHECK_STYLE);
+
   switch (style) {
     case CHECK_STYLE_CHECK:
-      _xitk_image_draw_check_three_state_check (img, 4, 4, img->height - 8, img->width / 3,
-        checked ? XITK_IMG_STATE_SELECTED : XITK_IMG_STATE_NORMAL);
+      h -= 8;
+      _xitk_image_draw_check_check (img, 4, 4, h, checked ? XITK_IMG_STATE_SELECTED : XITK_IMG_STATE_NORMAL);
+      _xitk_image_draw_check_check (img, 4 + w, 4, h, checked ? XITK_IMG_STATE_SEL_FOCUS : XITK_IMG_STATE_FOCUS);
+      _xitk_image_draw_check_check (img, 4 + 2 * w, 4, h, checked ? XITK_IMG_STATE_FOCUS : XITK_IMG_STATE_SEL_FOCUS);
       break;
 
     case CHECK_STYLE_ROUND:
-      _xitk_image_draw_check_three_state_round (img, 4, 4, img->height - 8, img->width / 3, checked);
+        h -= 8;
+      _xitk_image_draw_check_round (img, 4, 4, h, checked);
+      _xitk_image_draw_check_round (img, 4 + w, 4, h, checked);
+      _xitk_image_draw_check_round (img, 4 + 2 * w, 4, h, !checked);
       break;
 
     case CHECK_STYLE_OLD:
@@ -1104,10 +1082,8 @@ void xitk_image_draw_menu_check (xitk_image_t *img, int checked) {
       {
         int relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
         int nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
-        int w, h;
 
-        w = img->width / 3;
-        h = img->height - 12;
+        h -= 12;
         _xitk_image_draw_rectangular_box (img, 4,               6,     0, 0, 12, h, relief);
         _xitk_image_draw_rectangular_box (img, w + 4,           6,     0, 0, 12, h, relief);
         _xitk_image_draw_rectangular_box (img, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
@@ -1300,6 +1276,8 @@ static void _xitk_image_draw_two_state (xitk_image_t *img, int style) {
  */
 static void _xitk_image_draw_relief (xitk_image_t *img, int w, int h, int type) {
   if (!img)
+    return;
+  if (!img->beimg || !img->xitk)
     return;
 
   xitk_image_fill_rectangle (img, 0, 0, w, h, xitk_get_cfg_num (img->xitk, XITK_BG_COLOR));
