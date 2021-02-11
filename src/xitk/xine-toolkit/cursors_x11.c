@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2020 the xine project
+ * Copyright (C) 2004-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -661,7 +661,7 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
     char img[1536], mask[1536];
     const char *p;
     uint8_t m;
-    uint32_t wx = 0, w = 0, h = 0, hx = 0, hy = 0, x, y;
+    uint32_t wx = 0, w = 0, h = 0, hx = 0, hy = 0;
 
     for (p = map; *p; p++) {
       if (*p == '|') {
@@ -676,8 +676,12 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
         hx = wx;
       }
     }
+    if (hx > w)
+      w = hx;
 
     if (w && h) {
+      int32_t x, y;
+
       wx = (w + 7) >> 3;
       if (wx * h > sizeof (img))
         h = sizeof (img) / wx;
@@ -686,7 +690,8 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
       memset (mask, 0, wx * h);
 
       m = 0x01;
-      x = y = 0;
+      x = 0;
+      y = -1;
       for (p = map; *p; p++) {
         uint32_t u;
 
@@ -727,10 +732,10 @@ static void _cursors_create_cursor(struct xitk_x11_cursors_s *c, int idx) {
             m = (m << 1) | (m >> 7);
             break;
         }
-        cursor->p       = XCreateBitmapFromData (display, DefaultRootWindow (display), img, w, h);
-        cursor->mask    = XCreateBitmapFromData (display, DefaultRootWindow (display), mask, w, h);
-        cursor->cursor  = XCreatePixmapCursor (display, cursor->p, cursor->mask, &fg, &bg, hx, hy);
       }
+      cursor->p       = XCreateBitmapFromData (display, DefaultRootWindow (display), img, w, h);
+      cursor->mask    = XCreateBitmapFromData (display, DefaultRootWindow (display), mask, w, h);
+      cursor->cursor  = XCreatePixmapCursor (display, cursor->p, cursor->mask, &fg, &bg, hx, hy);
     }
 
     if (cursor->cursor == None) {
