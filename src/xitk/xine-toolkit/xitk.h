@@ -396,7 +396,7 @@ typedef enum {
 void xitk_window_set_wm_window_type (xitk_window_t *w, xitk_wm_window_type_t type);
 
 typedef enum {
-  xitk_cursor_invisible,
+  xitk_cursor_invisible = 0,
   xitk_cursor_X_cursor,
   xitk_cursor_arrow,
   xitk_cursor_based_arrow_down,
