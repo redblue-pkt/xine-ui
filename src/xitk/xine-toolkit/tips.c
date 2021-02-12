@@ -93,6 +93,7 @@ static void _compute_interval (struct timespec *ts, unsigned int millisecs) {
 static void *_tips_loop_thread (void *data) {
   xitk_tips_t *tips = data;
   xitk_t *xitk = NULL;
+  xitk_image_t *image = NULL;
   xitk_window_t *xwin = NULL;
   _tips_state_t state = TIPS_IDLE;
 
@@ -119,7 +120,6 @@ static void *_tips_loop_thread (void *data) {
       case TIPS_SHOW:
         if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && tips->widget->tips_string[0]) {
           int x, y, w, h;
-          xitk_image_t *image;
           unsigned int cfore, cback;
           int disp_w, disp_h;
           int x_margin = 12, y_margin = 6;
@@ -186,6 +186,7 @@ static void *_tips_loop_thread (void *data) {
           xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
           xitk_window_destroy_window (xwin);
           xwin = NULL;
+          xitk_image_free_image (&image);
         }
         state = TIPS_IDLE;
         /* fall through */
