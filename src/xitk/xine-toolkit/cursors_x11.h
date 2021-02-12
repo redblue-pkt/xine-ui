@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2020 the xine project
+ * Copyright (C) 2004-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -28,7 +28,7 @@
 
 typedef struct xitk_x11_cursors_s xitk_x11_cursors_t;
 
-xitk_x11_cursors_t *xitk_x11_cursors_init(Display *display, int xitk_cursors, int lock);
+xitk_x11_cursors_t *xitk_x11_cursors_init (Display *display, int xitk_cursors, int lock, int verbosity);
 void xitk_x11_cursors_deinit(xitk_x11_cursors_t **);
 
 void xitk_x11_cursors_define_window_cursor(xitk_x11_cursors_t *, Window window, xitk_cursors_t cursor);
