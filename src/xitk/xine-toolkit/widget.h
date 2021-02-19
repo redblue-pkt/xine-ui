@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -125,6 +125,7 @@ struct xitk_widget_list_s {
   struct {
     int           x, y;
   }               mouse;
+  unsigned int    qual;
   xine_sarray_t  *shared_images;
   xitk_window_t  *xwin;
 };

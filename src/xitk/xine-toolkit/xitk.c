@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -244,7 +244,7 @@ struct __xitk_s {
 
   unsigned long               tips_timeout;
 
-  uint32_t                    qual;
+  uint32_t                    qual; /** << track held mouse buttons */
 
   pid_t                       xitk_pid;
 
@@ -925,6 +925,9 @@ static __gfx_t *_xitk_gfx_new (__xitk_t *xitk) {
   fx->wl.widget_focused     = NULL;
   fx->wl.widget_under_mouse = NULL;
   fx->wl.widget_pressed     = NULL;
+  fx->wl.mouse.x            = 0;
+  fx->wl.mouse.y            = 0;
+  fx->wl.qual               = 0;
 
   fx->xitk                  = xitk;
   fx->refs                  = 1;
@@ -1426,11 +1429,11 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
       break;
 
     case XITK_EV_MOVE:
-      event->qual |= xitk->qual;
       if (!fx)
         break;
 
       while (xitk->x.d->next_event (xitk->x.d, event, NULL, XITK_EV_MOVE, 0)) ;
+      event->qual |= xitk->qual;
 
       if (fx->move.enabled) {
         xitk_tagitem_t tags[] = {
@@ -1462,6 +1465,7 @@ static void xitk_handle_event (__xitk_t *xitk, xitk_be_event_t *event) {
         /* but leave the actual coords for an active slider, otherwise the slider may jump */
       /* fall through */
     case XITK_EV_ENTER:
+      event->qual |= xitk->qual;
       if (fx)
         if (event->code == 0) /* Ptr. moved rel. to win., not (un)grab */
           xitk_motion_notify_widget_list (&fx->wl, event->x, event->y, event->qual);
