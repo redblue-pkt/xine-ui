@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -515,12 +515,6 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      event->x = wp->w.x;
-      event->y = wp->w.y;
-      event->width = wp->w.width;
-      event->height = wp->w.height;
-      /* fall through */
-    case WIDGET_EVENT_PARTIAL_PAINT:
       if (!pthread_mutex_trylock (&wp->change_mutex)) {
         _label_paint (wp, event);
         pthread_mutex_unlock (&wp->change_mutex);
@@ -530,12 +524,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       wp->w.have_focus = event->focus;
       return 1;
     case WIDGET_EVENT_CLICK:
-      {
-        int r = _label_click (wp, event->button, event->button_pressed, event->x, event->y);
-        if (result)
-          result->value = r;
-        return 1;
-      }
+      return _label_click (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_CHANGE_SKIN:
       _label_new_skin (wp, event->skonfig);
       break;
@@ -548,6 +537,7 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
         return 1;
       }
       break;
+    default: ;
   }
   return 0;
 }

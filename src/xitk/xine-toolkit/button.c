@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -226,33 +226,17 @@ static int button_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      event->x = wp->w.x;
-      event->y = wp->w.y;
-      event->width = wp->w.width;
-      event->height = wp->w.height;
-      /* fall through */
-    case WIDGET_EVENT_PARTIAL_PAINT:
       _button_paint (wp, event);
       break;
-    case WIDGET_EVENT_CLICK: {
-      int r = _button_click (wp, event->button, event->button_pressed, event->x, event->y);
-      if (result) {
-        result->value = r;
-        return 1;
-      }
-      break;
-    }
+    case WIDGET_EVENT_CLICK:
+      return _button_click (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_KEY:
       return _button_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_FOCUS:
       _button_focus (wp, event->focus);
       break;
     case WIDGET_EVENT_INSIDE:
-      if (result) {
-        result->value = _button_inside (wp, event->x, event->y);
-        return 1;
-      }
-      break;
+      return _button_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
       _button_new_skin (wp, event->skonfig);
       break;

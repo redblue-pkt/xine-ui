@@ -174,7 +174,7 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
     ne.y = y1;
     ne.width = x2 - x1;
     ne.height = y2 - y1;
-    ne.type = WIDGET_EVENT_PARTIAL_PAINT;
+    ne.type = WIDGET_EVENT_PAINT;
     wp->tabs[wp->start - 1]->visible = 1;
     wp->tabs[wp->start - 1]->event (wp->tabs[wp->start - 1], &ne, NULL);
     wp->tabs[wp->start - 1]->visible = 0;
@@ -193,7 +193,7 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
     ne.y = y1;
     ne.width = x2 - x1;
     ne.height = y2 - y1;
-    ne.type = WIDGET_EVENT_PARTIAL_PAINT;
+    ne.type = WIDGET_EVENT_PAINT;
     wp->tabs[wp->stop]->visible = 1;
     wp->tabs[wp->stop]->event (wp->tabs[wp->stop], &ne, NULL);
     wp->tabs[wp->stop]->visible = 0;
@@ -326,6 +326,10 @@ static void _tabs_focus (_tabs_private_t *wp, int focus) {
       event.focus = focus;
       sel->event (sel, &event, NULL);
       event.type = WIDGET_EVENT_PAINT;
+      event.x = sel->x;
+      event.y = sel->y;
+      event.width = sel->width;
+      event.height = sel->height;
       sel->event (sel, &event, NULL);
     }
   }
@@ -343,12 +347,6 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      event->x = wp->w.x;
-      event->y = wp->w.y;
-      event->width = wp->w.width;
-      event->height = wp->w.height;
-      /* fall through */
-    case WIDGET_EVENT_PARTIAL_PAINT:
       _tabs_paint (wp, event);
       break;
     case WIDGET_EVENT_KEY:
@@ -543,4 +541,3 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
   return &wp->w;
 }
-

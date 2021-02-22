@@ -729,6 +729,13 @@ void dump_widget_type(xitk_widget_t *w) {
 }
 #endif
 
+/* NOTE: at least for WIDGET_EVENT_{KEY|DESTROY|CLICK|CHANGE_SKIN}, xitk_widget_t.event ()
+ * may modify the widget list, including deleting widgets -- with or without the help of
+ * application callbacks.
+ * Practical example: unclick a skin browser button -> change to skin with less browser
+ * buttons -> delete that very button.
+ * Remember to re-examine widget pointers after such call. */
+
 static void xitk_widget_rel_init (xitk_widget_rel_t *r, xitk_widget_t *w) {
   xitk_dnode_init (&r->node);
   xitk_dlist_init (&r->list);
@@ -848,51 +855,63 @@ static void _xitk_and_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
     h2->y2 = h1->y2;
 }
 
+static int _xitk_widget_paint (xitk_widget_t *w, widget_event_t *e) {
+  e->type = WIDGET_EVENT_PAINT;
+  e->x = w->x;
+  e->y = w->y;
+  e->width = w->width;
+  e->height = w->height;
+  return w->event (w, e, NULL);
+}
+
+static void _xitk_widget_focus (xitk_widget_t *w, widget_event_t *e, widget_focus_t f) {
+  e->type = WIDGET_EVENT_FOCUS;
+  e->focus = f;
+  w->event (w, e, NULL);
+  w->have_focus = f;
+}
+  
 int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
-  xitk_widget_t   *w;
-  widget_event_t   event;
+  xitk_widget_t *w;
+  xitk_hull_t h;
   int n = 0;
 
   if (!wl || !hull)
     return 0;
   if (!wl->xwin)
     return 0;
+  h = *hull;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
     xitk_hull_t wh;
+    widget_event_t event;
 
     _xitk_widget_to_hull (w, &wh);
     if ((w->enable != WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST)) {
-      event.type = WIDGET_EVENT_FOCUS;
-      event.focus = FOCUS_LOST;
-      (void)w->event (w, &event, NULL);
-      event.type = WIDGET_EVENT_PAINT;
-      (void)w->event (w, &event, NULL);
-      w->have_focus = FOCUS_LOST;
+      _xitk_widget_focus (w, &event, FOCUS_LOST);
 #if 0
-      _xitk_or_hulls (&wh, hull);
+      _xitk_or_hulls (&wh, &h);
 #endif
-      w->state.visible = w->visible;
-      n += 1;
-    } else if (_xitk_is_hull_in_hull (&wh, hull)) {
+    } else if (_xitk_is_hull_in_hull (&wh, &h)) {
       if (w->type & WIDGET_PARTIAL_PAINTABLE) {
-        _xitk_and_hulls (hull, &wh);
-        event.type = WIDGET_EVENT_PARTIAL_PAINT;
-        event.x = wh.x1;
-        event.width = wh.x2 - wh.x1;
-        event.y = wh.y1;
-        event.height = wh.y2 - wh.y1;
-        (void)w->event (w, &event, NULL);
+        _xitk_and_hulls (&h, &wh);
       } else {
-        event.type = WIDGET_EVENT_PAINT;
-        (void)w->event (w, &event, NULL);
 #if 0
-        _xitk_or_hulls (&wh, hull);
+        _xitk_or_hulls (&wh, &h);
 #endif
+        ;
       }
-      w->state.visible = w->visible;
-      n += 1;
+    } else {
+      continue;
     }
+    event.type = WIDGET_EVENT_PAINT;
+    event.x = wh.x1;
+    event.width = wh.x2 - wh.x1;
+    event.y = wh.y1;
+    event.height = wh.y2 - wh.y1;
+    w->event (w, &event, NULL);
+    w->state.visible = w->visible;
+    n += 1;
   }
   return n;
 }
@@ -907,14 +926,9 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
     return 1;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
-    if ((w->enable != WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST)) {
-      event.type = WIDGET_EVENT_FOCUS;
-      event.focus = FOCUS_LOST;
-      (void)w->event (w, &event, NULL);
-      w->have_focus = FOCUS_LOST;
-    }
-    event.type = WIDGET_EVENT_PAINT;
-    (void)w->event (w, &event, NULL);
+    if ((w->enable != WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST))
+      _xitk_widget_focus (w, &event, FOCUS_LOST);
+    _xitk_widget_paint (w, &event);
     w->state.visible = w->visible;
   }
   return 1;
@@ -925,8 +939,6 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
  */
 #ifdef YET_UNUSED
 int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
-  int inside = 0;
-
   if(!widget) {
     XITK_WARNING("widget was NULL.\n");
     return 0;
@@ -935,18 +947,14 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
   if(((x >= widget->x) && (x < (widget->x + widget->width))) &&
      ((y >= widget->y) && (y < (widget->y + widget->height)))) {
     widget_event_t        event;
-    widget_event_result_t result;
-
-    inside = 1;
 
     event.type = WIDGET_EVENT_INSIDE;
     event.x    = x;
     event.y    = y;
-    if(widget->event(widget, &event, &result))
-      inside = result.value;
+    return widget->event (widget, &event, NULL) != 2;
   }
 
-  return inside;
+  return 0;
 }
 #endif
 
@@ -963,7 +971,6 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
     widget_event_t        event;
-    widget_event_result_t result;
     int d;
 
     if (w->enable != WIDGET_ENABLE)
@@ -982,10 +989,7 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
     event.type = WIDGET_EVENT_INSIDE;
     event.x    = x;
     event.y    = y;
-    result.value = 1;
-    if (!w->event (w, &event, &result))
-      return w;
-    if (result.value)
+    if (w->event (w, &event, NULL) != 2)
       return w;
   }
   return NULL;
@@ -1024,8 +1028,6 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
    * graphical bounds. Just move to closest possible. */
   if ((state & MODIFIER_BUTTON1) && wl->widget_pressed
     && ((wl->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    widget_event_result_t   result;
-
     wl->widget_focused = wl->widget_pressed;
     event.type           = WIDGET_EVENT_CLICK;
     event.x              = x;
@@ -1033,14 +1035,13 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
     event.button_pressed = LBUTTON_DOWN;
     event.button         = 1;
     event.modifier       = state;
-    wl->widget_pressed->event (wl->widget_pressed, &event, &result);
+    wl->widget_pressed->event (wl->widget_pressed, &event, NULL);
     return;
   }
 
   w = NULL;
   do {
     int d;
-    widget_event_result_t result;
     xitk_widget_t *lw = wl->widget_under_mouse;
     /* Still over same widget? */
     if (!lw)
@@ -1062,11 +1063,8 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
     event.type = WIDGET_EVENT_INSIDE;
     event.x    = x;
     event.y    = y;
-    result.value = 1;
     w = lw;
-    if (!lw->event (lw, &event, &result))
-      break;
-    if (result.value)
+    if (lw->event (lw, &event, NULL) != 2)
       break;
     w = NULL;
   } while (0);
@@ -1099,11 +1097,8 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
       if (!w)
         break;
     }
-    event.type  = WIDGET_EVENT_FOCUS;
-    event.focus = f ? FOCUS_LOST : FOCUS_MOUSE_OUT;
-    wl->widget_under_mouse->event (wl->widget_under_mouse, &event, NULL);
-    event.type = WIDGET_EVENT_PAINT;
-    wl->widget_under_mouse->event (wl->widget_under_mouse, &event, NULL);
+    _xitk_widget_focus (wl->widget_under_mouse, &event, f ? FOCUS_LOST : FOCUS_MOUSE_OUT);
+    _xitk_widget_paint (wl->widget_under_mouse, &event);
     if (f)
       wl->widget_focused = NULL;
   } while (0);
@@ -1119,12 +1114,9 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
 #if 0
     dump_widget_type(mywidget);
 #endif
-    event.type  = WIDGET_EVENT_FOCUS;
     /* If widget still marked pressed or focus received, it shall receive the focus again. */
-    event.focus = (w == wl->widget_pressed) || (w == wl->widget_focused) ? FOCUS_RECEIVED : FOCUS_MOUSE_IN;
-    w->event (w, &event, NULL);
-    event.type  = WIDGET_EVENT_PAINT;
-    w->event (w, &event, NULL);
+    _xitk_widget_focus (w, &event, (w == wl->widget_pressed) || (w == wl->widget_focused) ? FOCUS_RECEIVED : FOCUS_MOUSE_IN);
+    _xitk_widget_paint (w, &event);
     if (w->type & WIDGET_GROUP_MENU)
       menu_auto_pop (w);
   }
@@ -1138,7 +1130,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   int                    bRepaint = 0;
   xitk_widget_t         *w, *menu = NULL;
   widget_event_t         event;
-  widget_event_result_t  result;
 
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
@@ -1178,38 +1169,27 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
           (wl->widget_focused->enable == WIDGET_ENABLE)) {
           if (wl->widget_focused->type & WIDGET_GROUP_MENU)
             menu = xitk_menu_get_menu (wl->widget_focused);
-          event.type  = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_LOST;
-          wl->widget_focused->event (wl->widget_focused, &event, NULL);
-          wl->widget_focused->have_focus = FOCUS_LOST;
+          _xitk_widget_focus (wl->widget_focused, &event, FOCUS_LOST);
         }
-        event.type = WIDGET_EVENT_PAINT;
-        wl->widget_focused->event (wl->widget_focused, &event, NULL);
+        _xitk_widget_paint (wl->widget_focused, &event);
       }
 
       wl->widget_focused = w;
 
       if (w) {
         if ((w->type & WIDGET_FOCUSABLE) && w->enable == WIDGET_ENABLE) {
-          event.type = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_RECEIVED;
-          w->event (w, &event, NULL);
-          w->have_focus = FOCUS_RECEIVED;
+          _xitk_widget_focus (w, &event, FOCUS_RECEIVED);
         } else {
           wl->widget_focused = NULL;
         }
-        event.type = WIDGET_EVENT_PAINT;
-        w->event (w, &event, NULL);
+        _xitk_widget_paint (w, &event);
       }
 
     } else {
 
       if (wl->widget_under_mouse && w && (wl->widget_under_mouse == w)) {
         if ((w->type & WIDGET_FOCUSABLE) && (w->enable == WIDGET_ENABLE)) {
-          event.type  = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_RECEIVED;
-          w->event (w, &event, NULL);
-          w->have_focus = FOCUS_RECEIVED;
+          _xitk_widget_focus (w, &event, FOCUS_RECEIVED);
         }
       }
 
@@ -1218,8 +1198,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     wl->widget_pressed = w;
 
     if (w) {
-      widget_event_result_t result;
-
       xitk_tips_hide_tips(wl->xitk->tips);
 
       if ((w->type & WIDGET_CLICKABLE) && (w->enable == WIDGET_ENABLE)) {
@@ -1230,8 +1208,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.button         = button;
         event.modifier       = modifier;
 
-	if(w->event(w, &event, &result))
-	  bRepaint |= result.value;
+        bRepaint |= w->event (w, &event, NULL);
       }
     }
 
@@ -1247,20 +1224,15 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	event.button         = button;
         event.modifier       = modifier;
 
-	if(wl->widget_pressed->event(wl->widget_pressed, &event, &result))
-	  bRepaint |= result.value;
+        bRepaint |= wl->widget_pressed->event (wl->widget_pressed, &event, NULL);
 
         /* user may still hold a slider (see xitk_motion_notify_widget_list ()).
          * ungrab it here. */
-        if ((w != wl->widget_pressed) && (button == 1)) {
+        if (wl->widget_pressed && (w != wl->widget_pressed) && (button == 1)) {
           if (wl->widget_pressed->type & WIDGET_FOCUSABLE) {
-            event.type  = WIDGET_EVENT_FOCUS;
-            event.focus = FOCUS_LOST;
-            wl->widget_pressed->event (wl->widget_pressed, &event, NULL);
-            wl->widget_pressed->have_focus = FOCUS_LOST;
+            _xitk_widget_focus (wl->widget_pressed, &event, FOCUS_LOST);
             wl->widget_focused = NULL;
-            event.type = WIDGET_EVENT_PAINT;
-            wl->widget_pressed->event (wl->widget_pressed, &event, NULL);
+            _xitk_widget_paint (wl->widget_pressed, &event);
           }
         }
       }
@@ -1353,12 +1325,8 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
   if (wl->widget_focused) {
     if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
         (wl->widget_focused->enable == WIDGET_ENABLE)) {
-      event.type  = WIDGET_EVENT_FOCUS;
-      event.focus = FOCUS_LOST;
-      wl->widget_focused->have_focus = FOCUS_LOST;
-      (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
-      event.type = WIDGET_EVENT_PAINT;
-      (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
+      _xitk_widget_focus (wl->widget_focused, &event, FOCUS_LOST);
+      _xitk_widget_paint (wl->widget_focused, &event);
     }
   }
   wl->widget_focused = w;
@@ -1368,14 +1336,11 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
   if ((wl->widget_focused->type & (WIDGET_FOCUSABLE | WIDGET_TABABLE)) &&
       (wl->widget_focused->enable == WIDGET_ENABLE)) {
     /* NOTE: this may redirect focus to a group member. rereaad wl->widget_focused. */
-    event.type  = WIDGET_EVENT_FOCUS;
-    event.focus = FOCUS_RECEIVED;
-    (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
+    _xitk_widget_focus (wl->widget_focused, &event, FOCUS_RECEIVED);
     if (!wl->widget_focused)
       return;
     wl->widget_focused->have_focus = FOCUS_RECEIVED;
-    event.type = WIDGET_EVENT_PAINT;
-    (void)wl->widget_focused->event (wl->widget_focused, &event, NULL);
+    _xitk_widget_paint (wl->widget_focused, &event);
   }
 
 #if 0
@@ -1389,14 +1354,8 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int mod
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
 
-	event.type  = WIDGET_EVENT_FOCUS;
-	event.focus = FOCUS_LOST;
-
-	wl->widget_focused->have_focus = FOCUS_LOST;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-
-	event.type = WIDGET_EVENT_PAINT;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
+        _xitk_widget_focus (wl->widget_focused, &event, FOCUS_LOST);
+        _xitk_widget_paint (wl->widget_focused, &event);
 
       }
 
@@ -1444,13 +1403,8 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
-	event.type = WIDGET_EVENT_FOCUS;
-	event.focus = FOCUS_LOST;
-	wl->widget_focused->have_focus = FOCUS_LOST;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-
-	event.type = WIDGET_EVENT_PAINT;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
+        _xitk_widget_focus (wl->widget_focused, &event, FOCUS_LOST);
+        _xitk_widget_paint (wl->widget_focused, &event);
       }
     }
 
@@ -1458,13 +1412,8 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 
     if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	(wl->widget_focused->enable == WIDGET_ENABLE)) {
-      event.type = WIDGET_EVENT_FOCUS;
-      event.focus = FOCUS_RECEIVED;
-      (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-      wl->widget_focused->have_focus = FOCUS_RECEIVED;
-
-      event.type = WIDGET_EVENT_PAINT;
-      (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
+      _xitk_widget_focus (wl->widget_focused, &event, FOCUS_RECEIVED);
+      _xitk_widget_paint (wl->widget_focused, &event);
     }
   }
   else
@@ -1591,8 +1540,7 @@ static void xitk_widget_paint (xitk_widget_t *w) {
 
   if (!w->visible && w->wl && (w->wl->widget_under_mouse == w))
     xitk_tips_hide_tips (w->wl->xitk->tips);
-  event.type = WIDGET_EVENT_PAINT;
-  w->event (w, &event, NULL);
+  _xitk_widget_paint (w, &event);
 }
 
 static int xitk_widget_show_hide (xitk_widget_t *w, int visible) {
@@ -1618,12 +1566,8 @@ static int xitk_widget_able (xitk_widget_t *w, int enable) {
         if ((w->type & WIDGET_FOCUSABLE) && (w->have_focus != FOCUS_LOST)) {
           widget_event_t  event;
 
-          event.type  = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_LOST;
-          w->event (w, &event, NULL);
-          w->have_focus = FOCUS_LOST;
-          event.type = WIDGET_EVENT_PAINT;
-          w->event (w, &event, NULL);
+          _xitk_widget_focus (w, &event, FOCUS_LOST);
+          _xitk_widget_paint (w, &event);
           res = 0;
         }
         if (w == w->wl->widget_focused)

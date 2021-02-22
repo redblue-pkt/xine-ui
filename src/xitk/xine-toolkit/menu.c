@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -613,17 +613,14 @@ static int menu_notify_event(xitk_widget_t *w, widget_event_t *event, widget_eve
   (void)result;
 
   switch (event->type) {
-    case WIDGET_EVENT_PAINT:
-    case WIDGET_EVENT_FOCUS:
-    case WIDGET_EVENT_CHANGE_SKIN:
-    case WIDGET_EVENT_GET_SKIN:
-      return 0;
     case WIDGET_EVENT_CLICK:
     case WIDGET_EVENT_INSIDE:
       return 1;
     case WIDGET_EVENT_DESTROY:
       _menu_exit (wp);
       return 1;
+    default:
+      return 0;
   }
   return 0;
 }

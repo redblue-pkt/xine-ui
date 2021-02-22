@@ -441,6 +441,10 @@ static void _browser_set_focus (_browser_private_t *wp, int visible) {
         wp->w.wl->widget_focused->have_focus = FOCUS_LOST;
       }
       event.type = WIDGET_EVENT_PAINT;
+      event.x = wp->w.wl->widget_focused->x;
+      event.y = wp->w.wl->widget_focused->y;
+      event.width = wp->w.wl->widget_focused->width;
+      event.height = wp->w.wl->widget_focused->height;
       wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
     }
     if (visible < 0) {
@@ -456,6 +460,10 @@ static void _browser_set_focus (_browser_private_t *wp, int visible) {
           wp->w.wl->widget_focused->have_focus = FOCUS_RECEIVED;
         }
         event.type = WIDGET_EVENT_PAINT;
+        event.x = wp->w.wl->widget_focused->x;
+        event.y = wp->w.wl->widget_focused->y;
+        event.width = wp->w.wl->widget_focused->width;
+        event.height = wp->w.wl->widget_focused->height;
         wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
       }
     }
