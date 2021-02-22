@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -485,34 +485,17 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      event->x = wp->w.x;
-      event->y = wp->w.y;
-      event->width = wp->w.width;
-      event->height = wp->w.height;
-      /* fall through */
-    case WIDGET_EVENT_PARTIAL_PAINT:
       _labelbutton_partial_paint (wp, event);
       break;
-    case WIDGET_EVENT_CLICK: {
-      int r = _labelbutton_click (wp, event->button,
-        event->button_pressed, event->x, event->y, event->modifier);
-      if (result) {
-        result->value = r;
-        return 1;
-      }
-      break;
-    }
+    case WIDGET_EVENT_CLICK:
+      return _labelbutton_click (wp, event->button, event->button_pressed, event->x, event->y, event->modifier);
     case WIDGET_EVENT_KEY:
       return _labelbutton_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_FOCUS:
       _labelbutton_focus (wp, event->focus);
       break;
     case WIDGET_EVENT_INSIDE:
-      if (result) {
-        result->value = _labelbutton_inside (wp, event->x, event->y);
-        return 1;
-      }
-      break;
+      return _labelbutton_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
       _labelbutton_new_skin (wp, event->skonfig);
       break;

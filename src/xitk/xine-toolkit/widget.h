@@ -38,38 +38,42 @@ typedef enum {
 
 #define WIDGET_ENABLE  1
 
-
-#define FOREGROUND_SKIN 1
-#define BACKGROUND_SKIN 2
-
-#define WIDGET_EVENT_PAINT           1
-#define WIDGET_EVENT_CLICK           2
-#define WIDGET_EVENT_FOCUS           3
-#define WIDGET_EVENT_KEY             4
-#define WIDGET_EVENT_INSIDE          5
-#define WIDGET_EVENT_CHANGE_SKIN     6
-#define WIDGET_EVENT_ENABLE          7
-#define WIDGET_EVENT_GET_SKIN        8
-#define WIDGET_EVENT_DESTROY         9
-#define WIDGET_EVENT_TIPS_TIMEOUT   10
-#define WIDGET_EVENT_CLIP_READY     11
-#define WIDGET_EVENT_PARTIAL_PAINT  12
-
 typedef struct {
-  int                   type; /* See WIDGET_EVENT_x */
-  int                   x, y, width, height;
+  enum {
+    WIDGET_EVENT_NONE = 0,
+    WIDGET_EVENT_PAINT,        /** << paint specified portion, or whole widget if that is not supported */
+    WIDGET_EVENT_CLICK,        /** << return 0 (not hit), 1 (hit) */
+    WIDGET_EVENT_FOCUS,
+    WIDGET_EVENT_KEY,          /** << return 0 (pass again to further candidates), 1 (handled finally here) */
+    WIDGET_EVENT_INSIDE,       /** << return 0 (unsupported??), 1 (yes), 2 (no) */
+    WIDGET_EVENT_CHANGE_SKIN,
+    WIDGET_EVENT_ENABLE,
+    WIDGET_EVENT_GET_SKIN,     /** << return 0 (failed), 1 (result.image filled in) */
+    WIDGET_EVENT_DESTROY,
+    WIDGET_EVENT_TIPS_TIMEOUT,
+    WIDGET_EVENT_CLIP_READY
+  }                     type;
 
-  int                   button_pressed;
-  int                   button;
-  int                   modifier;   /* modifier key state (EVENT_CLICK, EVENT_KEY_EVENT) */
-  widget_focus_t        focus;
+  int                   x, y;            /** << PAINT, CLICK, INSIDE */
+  int                   width, height;   /** << PAINT */
 
-  unsigned long         tips_timeout;
+  int                   button_pressed;  /** << CLICK */
+  int                   button;          /** << CLICK */
 
-  const char           *string;
+  int                   modifier;        /** << CLICK, KEY */
 
-  xitk_skin_config_t   *skonfig;
-  int                   skin_layer;
+  widget_focus_t        focus;           /** << FOCUS */
+
+  unsigned long         tips_timeout;    /** << TIPS_TIMEOUT */
+
+  const char           *string;          /** << KEY */
+
+  xitk_skin_config_t   *skonfig;         /** << CHANGE_SKIN */
+
+  enum {
+    FOREGROUND_SKIN = 1,
+    BACKGROUND_SKIN
+  }                     skin_layer;      /** << GET_SKIN */
 } widget_event_t;
 
 typedef struct {
@@ -139,3 +143,4 @@ void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent);
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
 
 #endif
+

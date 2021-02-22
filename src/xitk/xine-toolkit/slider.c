@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -757,47 +757,36 @@ static int _slider_key (_slider_private_t *wp, const char *string, int modifier)
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _slider_private_t *wp;
-  int retval = 0;
 
   xitk_container (wp, w, w);
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      event->x = wp->w.x;
-      event->y = wp->w.y;
-      event->width = wp->w.width;
-      event->height = wp->w.height;
-      /* fall through */
-    case WIDGET_EVENT_PARTIAL_PAINT:
       _paint_slider (wp, event);
-      break;
+      return 0;
     case WIDGET_EVENT_KEY:
       return _slider_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_CLICK:
-      result->value = _notify_click_slider (wp, event->button, event->button_pressed, event->x, event->y);
-      retval = 1;
-      break;
+      return _notify_click_slider (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_FOCUS:
       _notify_focus_slider (wp, event->focus);
-      break;
+      return 0;
     case WIDGET_EVENT_INSIDE:
-      result->value = _notify_inside (wp, event->x, event->y);
-      retval = 1;
-      break;
+      return _notify_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
       _notify_change_skin (wp, event->skonfig);
-      break;
+      return 0;
     case WIDGET_EVENT_DESTROY:
       _notify_destroy (wp);
-      break;
+      return 0;
     case WIDGET_EVENT_GET_SKIN:
       if (result) {
         result->image = _get_skin (wp, event->skin_layer);
-        retval = 1;
+        return 1;
       }
-      break;
-    default: ;
+      return 0;
+    default:
+      return 0;
   }
-  return retval;
 }
 
 /*

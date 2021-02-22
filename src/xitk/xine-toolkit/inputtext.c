@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -1029,32 +1029,18 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
     return 0;
 
   switch (event->type) {
-    case WIDGET_EVENT_PARTIAL_PAINT:
+    case WIDGET_EVENT_PAINT:
       _paint_partial_inputtext (wp, event);
       return 0;
-    case WIDGET_EVENT_PAINT:
-      _paint_inputtext (wp);
-      return 0;
     case WIDGET_EVENT_CLICK:
-      {
-        int r = _notify_click_inputtext (wp, event->button,
-          event->button_pressed, event->x, event->y);
-        if (result)
-          result->value = r;
-        return 1;
-      }
+      return _notify_click_inputtext (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_FOCUS:
       _notify_focus_inputtext (wp, event->focus);
       return 1;
     case WIDGET_EVENT_KEY:
       return _inputtext_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_INSIDE:
-      {
-        int r = _notify_inside (wp, event->x, event->y);
-        if (result)
-          result->value = r;
-        return 1;
-      }
+      return _notify_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
       _notify_change_skin (wp, event->skonfig);
       return 0;
