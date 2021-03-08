@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -181,7 +181,7 @@ static void _combo_open (_combo_private_t *wp) {
   itemw -= 2; /* space for border */
 
   wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->xitk,
-    0, 0, itemw + 2, itemh * 5 + slidw + 2,
+    0, 0, itemw + 2, itemh * 5 + 2,
     NULL, "Xitk Combo", "Xitk", 1, 0, NULL);
   if (!wp->xwin)
     return;
@@ -198,17 +198,19 @@ static void _combo_open (_combo_private_t *wp) {
     browser.arrow_up.skin_element_name    = NULL;
     browser.slider.skin_element_name      = NULL;
     browser.arrow_dn.skin_element_name    = NULL;
+    browser.arrow_left.skin_element_name  = NULL;
+    browser.slider_h.skin_element_name    = NULL;
+    browser.arrow_right.skin_element_name = NULL;
     browser.browser.skin_element_name     = NULL;
-    browser.browser.max_displayed_entries = 5;
     browser.browser.num_entries           = wp->num_entries;
     browser.browser.entries               = (const char * const *)wp->entries;
-    browser.callback                      = _combo_select;
     browser.dbl_click_callback            = NULL;
+    browser.browser.max_displayed_entries = 5;
+    browser.callback                      = _combo_select;
     browser.userdata                      = (void *)wp;
     wp->browser_widget = xitk_noskin_browser_create (wp->widget_list, &browser,
-      1, 1, itemw - slidw, itemh, slidw, DEFAULT_FONT_10);
+      1, 1, itemw, itemh, -slidw, DEFAULT_FONT_10);
     xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
-    xitk_enable_and_show_widget (wp->browser_widget);
     wp->browser_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
   }
 
@@ -216,6 +218,7 @@ static void _combo_open (_combo_private_t *wp) {
     (const char * const *)wp->entries, NULL, wp->num_entries, 0);
   wp->sel2 = wp->selected;
   xitk_browser_set_select (wp->browser_widget, wp->selected);
+  xitk_enable_and_show_widget (wp->browser_widget);
 
   wp->widget_key = xitk_be_register_event_handler ("xitk combo", wp->xwin, combo_event, wp, NULL, NULL);
 

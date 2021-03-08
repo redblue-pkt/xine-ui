@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -68,6 +68,11 @@ typedef struct {
 /** Create the list browser */
 xitk_widget_t *xitk_browser_create (xitk_widget_list_t *wl,
   xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
+/** Create the list browser with generic skin.
+ *  If slider width is < 0, sliders and move buttons appear if needed only
+ *  within (itemw) x (itemh * br->browser.max_displayed_entries).
+ *  NOTE: this does not yet re-evaluate with xitk_browser_update_list ().
+ *  If slider width is 0, movement will be keyboard and mouse wheel only. */
 xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
   xitk_browser_widget_t *br,
   int x, int y, int itemw, int itemh, int slidw, const char *font_name);
