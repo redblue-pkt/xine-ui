@@ -33,13 +33,6 @@
 #include "utils.h"
 #include "font.h"
 
-typedef struct {
-  xitk_widget_t  w;
-
-  char          *skin_element_name;
-  xitk_image_t  *skin;
-} _image_private_t;
-
 static int _xitk_pix_font_find_char (xitk_pix_font_t *pf, xitk_point_t *found, int this_char) {
   int range, n = 0;
 
@@ -776,6 +769,7 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
       segments[s].y1 -= 1;
       segments[s].y2 -= 1;
     }
+    color = xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR);
     img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
     if (n < 6)
         break;
@@ -786,6 +780,7 @@ static void _xitk_image_draw_arrow (xitk_image_t *img, int direction) {
       segments[s].y1 += 1;
       segments[s].y2 += 1;
     }
+    color = xitk_get_cfg_num (img->xitk, XITK_BG_COLOR);
     img->beimg->draw_lines (img->beimg, segments, nsegments, color, 0);
   } while (0);
   img->beimg->display->unlock (img->beimg->display);
@@ -924,74 +919,98 @@ static void _xitk_image_draw_check_round (xitk_image_t *img, int x, int y, int d
   img->beimg->display->unlock (img->beimg->display);
 }
 
+typedef enum {
+  _XITK_IMG_STATE_NORMAL = 0,
+  _XITK_IMG_STATE_FOCUS,
+  _XITK_IMG_STATE_CLICK,
+  _XITK_IMG_STATE_SELECTED,
+  _XITK_IMG_STATE_SEL_FOCUS,
+  _XITK_IMG_STATE_SEL_CLICK,
+  _XITK_IMG_STATE_DISABLED_NORMAL,
+  _XITK_IMG_STATE_DISABLED_SELECTED,
+  _XITK_IMG_STATE_LAST
+} _xitk_img_state_t;
+
 xitk_img_state_t xitk_image_find_state (xitk_img_state_t max, int enable, int focus, int click, int selected) {
   static const uint8_t want[16] = {
-    XITK_IMG_STATE_DISABLED_NORMAL,
-    XITK_IMG_STATE_DISABLED_SELECTED,
-    XITK_IMG_STATE_DISABLED_NORMAL,
-    XITK_IMG_STATE_DISABLED_SELECTED,
-    XITK_IMG_STATE_DISABLED_NORMAL,
-    XITK_IMG_STATE_DISABLED_SELECTED,
-    XITK_IMG_STATE_DISABLED_NORMAL,
-    XITK_IMG_STATE_DISABLED_SELECTED,
+    _XITK_IMG_STATE_DISABLED_NORMAL,
+    _XITK_IMG_STATE_DISABLED_SELECTED,
+    _XITK_IMG_STATE_DISABLED_NORMAL,
+    _XITK_IMG_STATE_DISABLED_SELECTED,
+    _XITK_IMG_STATE_DISABLED_NORMAL,
+    _XITK_IMG_STATE_DISABLED_SELECTED,
+    _XITK_IMG_STATE_DISABLED_NORMAL,
+    _XITK_IMG_STATE_DISABLED_SELECTED,
 
-    XITK_IMG_STATE_NORMAL,
-    XITK_IMG_STATE_SELECTED,
-    XITK_IMG_STATE_NORMAL,
-    XITK_IMG_STATE_SELECTED,
-    XITK_IMG_STATE_FOCUS,
-    XITK_IMG_STATE_SEL_FOCUS,
-    XITK_IMG_STATE_SEL_FOCUS,
-    XITK_IMG_STATE_FOCUS
+    _XITK_IMG_STATE_NORMAL,
+    _XITK_IMG_STATE_SELECTED,
+    _XITK_IMG_STATE_NORMAL,
+    _XITK_IMG_STATE_SELECTED,
+    _XITK_IMG_STATE_FOCUS,
+    _XITK_IMG_STATE_SEL_FOCUS,
+    _XITK_IMG_STATE_CLICK,
+    _XITK_IMG_STATE_SEL_CLICK
   };
-  static const uint8_t have[XITK_IMG_STATE_LAST][XITK_IMG_STATE_LAST] = {
+  static const uint8_t have[XITK_IMG_STATE_LAST][_XITK_IMG_STATE_LAST] = {
     [XITK_IMG_STATE_NORMAL] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_NORMAL
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_NORMAL
     },
     [XITK_IMG_STATE_FOCUS] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_NORMAL
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_FOCUS
     },
     [XITK_IMG_STATE_SELECTED] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SELECTED,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_SELECTED,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
     },
     [XITK_IMG_STATE_SEL_FOCUS] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
     },
     [XITK_IMG_STATE_DISABLED_NORMAL] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_SELECTED
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_DISABLED_NORMAL
     },
     [XITK_IMG_STATE_DISABLED_SELECTED] = {
-        [XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
-        [XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
-        [XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
-        [XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
-        [XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
-        [XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_DISABLED_SELECTED
+        [_XITK_IMG_STATE_NORMAL]            = XITK_IMG_STATE_NORMAL,
+        [_XITK_IMG_STATE_FOCUS]             = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_CLICK]             = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SELECTED]          = XITK_IMG_STATE_SELECTED,
+        [_XITK_IMG_STATE_SEL_FOCUS]         = XITK_IMG_STATE_SEL_FOCUS,
+        [_XITK_IMG_STATE_SEL_CLICK]         = XITK_IMG_STATE_FOCUS,
+        [_XITK_IMG_STATE_DISABLED_NORMAL]   = XITK_IMG_STATE_DISABLED_NORMAL,
+        [_XITK_IMG_STATE_DISABLED_SELECTED] = XITK_IMG_STATE_DISABLED_SELECTED
     }
   };
   uint32_t u = (enable ? 8 : 0) + (focus ? 4 : 0) + (click ? 2 : 0) + (selected ? 1 : 0);
@@ -1740,7 +1759,9 @@ void xitk_image_draw_button_plus (xitk_image_t *img) {
       lines[2].x1 = lines[2].x2 = w * 4 + (w >> 1) - 1, lines[2].y1 = 2, lines[2].y2 = h - 4;
       lines[3].x1 = lines[3].x2 = w * 5 + (w >> 1),     lines[3].y1 = 2, lines[3].y2 = h - 4;
       img->beimg->display->lock (img->beimg->display);
-      img->beimg->draw_lines (img->beimg, lines, n < 6 ? 2 : 4, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
+      img->beimg->draw_lines (img->beimg, lines, 2, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
+      if (n > 5)
+        img->beimg->draw_lines (img->beimg, lines + 2, 2, xitk_get_cfg_num (img->xitk, XITK_BG_COLOR), 0);
       img->beimg->display->unlock (img->beimg->display);
     }
   }
@@ -1761,7 +1782,7 @@ void xitk_image_draw_button_minus (xitk_image_t *img) {
     lines[0].x1 = w * 0 + 2, lines[0].x2 = w * 1 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
     lines[1].x1 = w * 1 + 2, lines[1].x2 = w * 2 - 4, lines[1].y1 = lines[1].y2 = (h >> 1) - 1;
     lines[2].x1 = w * 2 + 3, lines[2].x2 = w * 3 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
-    lines[2].x1 = w * 3 + 3, lines[2].x2 = w * 4 - 3, lines[2].y1 = lines[2].y2 =  h >> 1;
+    lines[3].x1 = w * 3 + 3, lines[3].x2 = w * 4 - 3, lines[3].y1 = lines[3].y2 =  h >> 1;
     img->beimg->display->lock (img->beimg->display);
     img->beimg->draw_lines (img->beimg, lines, n < 2 ? n : 2, xitk_get_cfg_num (img->xitk, XITK_BLACK_COLOR), 0);
     if (n > 2)
@@ -1771,7 +1792,9 @@ void xitk_image_draw_button_minus (xitk_image_t *img) {
       lines[0].x1 = w * 4 + 2, lines[0].x2 = w * 5 - 4, lines[0].y1 = lines[0].y2 = (h >> 1) - 1;
       lines[1].x1 = w * 5 + 3, lines[1].x2 = w * 6 - 3, lines[1].y1 = lines[1].y2 =  h >> 1;
       img->beimg->display->lock (img->beimg->display);
-      img->beimg->draw_lines (img->beimg, lines, n < 6 ? 1 : 2, xitk_get_cfg_num (img->xitk, XITK_FOCUS_COLOR), 0);
+      img->beimg->draw_lines (img->beimg, lines, 1, xitk_get_cfg_num (img->xitk, XITK_SELECT_COLOR), 0);
+      if (n > 5)
+        img->beimg->draw_lines (img->beimg, lines + 1, 1, xitk_get_cfg_num (img->xitk, XITK_BG_COLOR), 0);
       img->beimg->display->unlock (img->beimg->display);
     }
   }
@@ -1844,96 +1867,68 @@ int xitk_image_height(xitk_image_t *i) {
  * ********************************************************************************
  */
 
-/*
- *
- */
-static void _notify_destroy (_image_private_t *wp) {
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
-    if (!wp->skin_element_name)
-      xitk_image_free_image (&(wp->skin));
-    XITK_FREE (wp->skin_element_name);
-  }
-}
+typedef struct {
+  xitk_widget_t w;
+  char *skin_element_name;
+  xitk_part_image_t skin;
+} _image_private_t;
 
-/*
- *
- */
-static int _notify_inside (_image_private_t *wp, int x, int y) {
-  (void)wp;
-  (void)x;
-  (void)y;
-  return 0;
-}
+static void _xitk_image_change_skin (_image_private_t *wp, xitk_skin_config_t *skonfig) {
+  if (wp->skin_element_name) {
+    const xitk_skin_element_info_t *info;
 
-/*
- *
- */
-static xitk_image_t *_get_skin (_image_private_t *wp, int sk) {
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
-    if ((sk == BACKGROUND_SKIN) && wp->skin)
-      return wp->skin;
-  }
-  return NULL;
-}
-
-/*
- *
- */
-static void _paint_image (_image_private_t *wp, widget_event_t *event) {
-#ifdef XITK_PAINT_DEBUG
-  printf ("xitk.image.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
-#endif
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (wp->w.visible == 1)) {
-    xitk_image_draw_image (wp->w.wl, wp->skin,
-        event->x - wp->w.x, event->y - wp->w.y,
-        event->width, event->height,
-        event->x, event->y, 0);
-  }
-}
-
-/*
- *
- */
-static void _notify_change_skin (_image_private_t *wp, xitk_skin_config_t *skonfig) {
-  if (wp && (((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (wp->w.visible == 1))) {
-    if (wp->skin_element_name) {
-      const xitk_skin_element_info_t *info;
-
-      xitk_skin_lock(skonfig);
-      info = xitk_skin_get_info (skonfig, wp->skin_element_name);
-      if (info) {
-        wp->skin = info->pixmap_img.image;
-        wp->w.x       = info->x;
-        wp->w.y       = info->y;
-        wp->w.width   = wp->skin->width;
-        wp->w.height  = wp->skin->height;
-      }
-      xitk_skin_unlock(skonfig);
-
-      xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
+    xitk_skin_lock (skonfig);
+    info = xitk_skin_get_info (skonfig, wp->skin_element_name);
+    if (info) {
+      wp->skin = info->pixmap_img;
+      wp->w.x = info->x;
+      wp->w.y = info->y;
+    } else {
+      wp->skin.image = NULL;
+      wp->skin.x = 0;
+      wp->skin.y = 0;
+      wp->skin.width = 0;
+      wp->skin.height = 0;
+      wp->w.x = 0;
+      wp->w.y = 0;
     }
+    xitk_skin_unlock (skonfig);
+    wp->w.width  = wp->skin.width;
+    wp->w.height = wp->skin.height;
+    xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
   }
 }
 
-static int _notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+static int _xitk_image_event (xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   _image_private_t *wp;
 
   xitk_container (wp, w, w);
+  if (!wp || !event)
+    return 0;
+  if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_IMAGE)
+    return 0;
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      _paint_image (wp, event);
+      if (wp->w.visible == 1)
+        xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
+          event->x - wp->w.x, event->y - wp->w.y, event->width, event->height,
+          event->x, event->y);
       return 0;
     case WIDGET_EVENT_INSIDE:
-      return _notify_inside (wp, event->x, event->y) ? 1 : 2;
+      /* NOTE: this is mainly used as background for other widgets.
+       * we also have no callbacks. for now, just pretend we are not really there ;-) */
+      return 2;
     case WIDGET_EVENT_CHANGE_SKIN:
-      _notify_change_skin (wp, event->skonfig);
+      _xitk_image_change_skin (wp, event->skonfig);
       return 0;
     case WIDGET_EVENT_DESTROY:
-      _notify_destroy (wp);
+      if (!wp->skin_element_name)
+        xitk_image_free_image (&(wp->skin.image));
+      XITK_FREE (wp->skin_element_name);
       return 0;
     case WIDGET_EVENT_GET_SKIN:
       if (result) {
-        result->image = _get_skin (wp, event->skin_layer);
+        result->image = (event->skin_layer == BACKGROUND_SKIN) ? wp->skin.image : NULL;
         return 1;
       }
       return 0;
@@ -1942,48 +1937,34 @@ static int _notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_
   }
 }
 
-/*
- *
- */
-static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
-					  xitk_image_widget_t *im,
-					  int x, int y,
-					  const char *skin_element_name,
-					  xitk_image_t *skin) {
-  _image_private_t *wp;
-
-  ABORT_IF_NULL(wl);
-
-  wp = (_image_private_t *)xitk_widget_new (wl, sizeof (*wp));
-  if (!wp)
-    return NULL;
-
-  wp->skin_element_name = (skin_element_name == NULL) ? NULL : strdup (im->skin_element_name);
-
-  wp->skin              = skin;
-
-  wp->w.enable          = 0;
-  wp->w.visible         = 0;
-  wp->w.x               = x;
-  wp->w.y               = y;
-  wp->w.width           = wp->skin->width;
-  wp->w.height          = wp->skin->height;
-  wp->w.type            = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
-  wp->w.event           = _notify_event;
-
-  return &wp->w;
-}
-
 xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
 				  xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+  _image_private_t *wp;
   const xitk_skin_element_info_t *info;
 
-  XITK_CHECK_CONSTITENCY(im);
+  XITK_CHECK_CONSTITENCY (im);
+  ABORT_IF_NULL (wl);
 
   info = xitk_skin_get_info (skonfig, im->skin_element_name);
   if (!info)
     return NULL;
-  return _xitk_image_create (wl, im, info->x, info->y, im->skin_element_name, info->pixmap_img.image);
+  wp = (_image_private_t *)xitk_widget_new (wl, sizeof (*wp));
+  if (!wp)
+    return NULL;
+
+  wp->skin_element_name = strdup (im->skin_element_name);
+
+  wp->skin       = info->pixmap_img;
+  wp->w.enable   = 0;
+  wp->w.visible  = 0;
+  wp->w.x        = info->x;
+  wp->w.y        = info->y;
+  wp->w.width    = wp->skin.width;
+  wp->w.height   = wp->skin.height;
+  wp->w.type     = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event    = _xitk_image_event;
+
+  return &wp->w;
 }
 
 /*
@@ -1992,7 +1973,30 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
 					 xitk_image_widget_t *im,
 					 xitk_image_t *image, int x, int y) {
-  XITK_CHECK_CONSTITENCY(im);
+  _image_private_t *wp;
 
-  return _xitk_image_create (wl, im, x, y, NULL, image);
+  XITK_CHECK_CONSTITENCY (im);
+  ABORT_IF_NULL (wl);
+
+  wp = (_image_private_t *)xitk_widget_new (wl, sizeof (*wp));
+  if (!wp)
+    return NULL;
+
+  wp->skin_element_name = NULL;
+
+  wp->skin.image  = image;
+  wp->skin.x      = 0;
+  wp->skin.y      = 0;
+  wp->skin.width  = image ? image->width : 0;
+  wp->skin.height = image ? image->height : 0;
+  wp->w.enable   = 0;
+  wp->w.visible  = 0;
+  wp->w.x        = x;
+  wp->w.y        = y;
+  wp->w.width    = wp->skin.width;
+  wp->w.height   = wp->skin.height;
+  wp->w.type     = WIDGET_TYPE_IMAGE | WIDGET_PARTIAL_PAINTABLE;
+  wp->w.event    = _xitk_image_event;
+
+  return &wp->w;
 }
