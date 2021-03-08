@@ -305,7 +305,7 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
         event->x, event->y);
     }
 
-    {
+    if (wp->w.enable == WIDGET_ENABLE) {
       int  srcx1, src_w, destx1, srcy1, src_h, desty1;
 
       wp->paddle_drawn_here.state = paddle_x;
@@ -415,6 +415,13 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
           srcx1, srcy1, src_w, src_h, destx1, desty1);
       }
     }
+  } else {
+    /* no paddle just background when disabled. */
+    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.x = 0;
+    wp->paddle_drawn_here.y = 0;
+    wp->paddle_drawn_here.w = 0;
+    wp->paddle_drawn_here.h = 0;
   }
 
 }
