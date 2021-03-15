@@ -39,7 +39,7 @@ typedef struct {
   int            install_colormap;
 } gui_init_params_t;
 
-int hidden_file_cb(int action, int value);
+int hidden_file_cb (void *gui, int action, int value);
 void dummy_config_cb(void *data, xine_cfg_entry_t *cfg);
 int actions_on_start(action_id_t actions[], action_id_t a);
 void gui_deinit (gGui_t *gui);

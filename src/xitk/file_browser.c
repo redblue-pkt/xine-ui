@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -184,6 +184,7 @@ struct filebrowser_s {
   xitk_widget_t                  *close;
 
   hidden_file_toggle_t            hidden_cb;
+  void                           *hidden_data;
 
   filebrowser_callback_button_t   cbb[3];
   xitk_widget_t                  *cb_buttons[2];
@@ -753,22 +754,19 @@ static void fb_select(xitk_widget_t *w, void *data, int selected, int modifier) 
 }
 
 static void fb_callback_button_cb (xitk_widget_t *w, void *data, int state) {
-  filebrowser_t *fb = (filebrowser_t *) data;
+  filebrowser_t *fb = (filebrowser_t *)data;
+  filebrowser_callback_button_t *b = (w == fb->cb_buttons[0]) ? fb->cbb : fb->cbb + 1;
 
-  (void)w;
   (void)state;
-  if(w == fb->cb_buttons[0]) {
-    if(fb->cbb[0].need_a_file && (!strlen(fb->filename)))
+  if (b->need_a_file) {
+    if (!fb->filename)
       return;
-    fb->cbb[0].callback (fb, fb->cbb[0].userdata);
-  }
-  else if(w == fb->cb_buttons[1]) {
-    if(fb->cbb[1].need_a_file && (!strlen(fb->filename)))
+    if (!fb->filename[0])
       return;
-    fb->cbb[1].callback (fb, fb->cbb[1].userdata);
   }
-
-  fb_exit(NULL, (void *)fb);
+  if (b->callback)
+    b->callback (fb, b->userdata);
+  fb_exit (NULL, (void *)fb);
 }
 
 
@@ -1062,7 +1060,8 @@ static void fb_hidden_files(xitk_widget_t *w, void *data, int state) {
 
   (void)w;
   fb->show_hidden_files = state;
-  fb->hidden_cb(1, state);
+  if (fb->hidden_cb)
+    fb->hidden_cb (fb->hidden_data, 1, state);
   fb_getdir(fb);
 }
 
@@ -1137,10 +1136,9 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
   return files;
 }
 
-filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden_file_toggle_t hidden_cb,
-				  filebrowser_callback_button_t *cbb1,
-				  filebrowser_callback_button_t *cbb2,
-				  filebrowser_callback_button_t *cbb_close) {
+filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const char *filepathname,
+  hidden_file_toggle_t hidden_cb, void *hidden_data, const filebrowser_callback_button_t *cbb1,
+  const filebrowser_callback_button_t *cbb2, const filebrowser_callback_button_t *cbb_close) {
   filebrowser_t              *fb;
   xitk_labelbutton_widget_t   lb;
   xitk_label_widget_t         lbl;
@@ -1152,39 +1150,46 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   xitk_widget_t              *widget;
   int                         i, x, y, w;
 
-  fb = (filebrowser_t *) calloc(1, sizeof(filebrowser_t));
+  if (!gui)
+    return NULL;
+
+  fb = (filebrowser_t *)calloc (1, sizeof (*fb));
   if (!fb)
     return NULL;
 
-  fb->gui = gGui;
+  fb->gui = gui;
 
-  if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
-    fb->cbb[0].label = strdup(cbb1->label);
+  if (cbb1) {
+    fb->cbb[0].label = (cbb1->label && cbb1->label[0]) ? strdup (cbb1->label) : NULL;
     fb->cbb[0].callback = cbb1->callback;
     fb->cbb[0].userdata = cbb1->userdata;
     fb->cbb[0].need_a_file = cbb1->need_a_file;
-    if(cbb2 && (strlen(cbb2->label) && cbb2->callback)) {
-      fb->cbb[1].label = strdup(cbb2->label);
-      fb->cbb[1].callback = cbb2->callback;
-      fb->cbb[1].userdata = cbb2->userdata;
-      fb->cbb[1].need_a_file = cbb2->need_a_file;
-  }
-    else {
-      fb->cbb[1].label = NULL;
-      fb->cbb[1].callback = NULL;
-    }
-  }
-  else {
+  } else {
     fb->cbb[0].label = NULL;
     fb->cbb[0].callback = NULL;
+    fb->cbb[0].userdata = NULL;
+    fb->cbb[0].need_a_file = 0;
+  }
+  if (cbb2) {
+    fb->cbb[1].label = (cbb2->label && cbb2->label[0]) ? strdup (cbb2->label) : NULL;
+    fb->cbb[1].callback = cbb2->callback;
+    fb->cbb[1].userdata = cbb2->userdata;
+    fb->cbb[1].need_a_file = cbb2->need_a_file;
+  } else {
     fb->cbb[1].label = NULL;
     fb->cbb[1].callback = NULL;
+    fb->cbb[1].userdata = NULL;
+    fb->cbb[1].need_a_file = 0;
   }
-
   if (cbb_close) {
     fb->cbb[2].callback = cbb_close->callback;
     fb->cbb[2].userdata = cbb_close->userdata;
+  } else {
+    fb->cbb[2].callback = NULL;
+    fb->cbb[2].userdata = NULL;
   }
+  fb->cbb[2].label = NULL;
+  fb->cbb[2].need_a_file = 0;
 
   /* Create window */
   fb->xwin = xitk_window_create_dialog_window_center (fb->gui->xitk,
@@ -1202,7 +1207,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   fb->directories_sort_direction = DEFAULT_SORT;
   fb->files_sort_direction       = DEFAULT_SORT;
   fb->hidden_cb                  = hidden_cb;
-  fb->show_hidden_files          = hidden_cb(0, 0);
+  fb->hidden_data                = hidden_data;
+  fb->show_hidden_files          = hidden_cb ? hidden_cb (hidden_data, 0, 0) : 1;
 
   strlcpy(fb->current_dir, xine_get_homedir(), sizeof(fb->current_dir));
   memset(&fb->filename, 0, sizeof(fb->filename));
@@ -1557,3 +1563,4 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
 
   return fb;
 }
+
