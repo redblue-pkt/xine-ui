@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -467,11 +467,13 @@ void playlist_load_playlist (gGui_t *gui) {
     cbb[0].callback = _playlist_load_callback;
     cbb[0].userdata = gui;
     cbb[0].need_a_file = 1;
+    cbb[1].label = NULL;
     cbb[1].callback = _playlist_exit_callback;
     cbb[1].userdata = gui;
+    cbb[1].need_a_file = 0;
 
     playlist_deactivate (gui->plwin);
-    gui->pl_load = create_filebrowser (_("Load a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+    gui->pl_load = create_filebrowser (gui, _("Load a playlist"), buffer, hidden_file_cb, gui, &cbb[0], NULL, &cbb[1]);
     free (buffer);
   }
 }
@@ -516,11 +518,13 @@ void playlist_save_playlist (gGui_t *gui) {
       cbb[0].callback = _playlist_save_callback;
       cbb[0].userdata = gui;
       cbb[0].need_a_file = 1;
+      cbb[1].label = NULL;
       cbb[1].callback = _playlist_exit_callback;
       cbb[1].userdata = gui;
+      cbb[1].need_a_file = 0;
 
       playlist_deactivate (gui->plwin);
-      gui->pl_save = create_filebrowser (_("Save a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+      gui->pl_save = create_filebrowser (gui, _("Save a playlist"), buffer, hidden_file_cb, gui, &cbb[0], NULL, &cbb[1]);
       free (buffer);
     }
   }
@@ -772,10 +776,14 @@ void playlist_exit (gGui_t *gui) {
     return;
   pl = gui->plwin;
 
-  if (gui->pl_load)
+  if (gui->pl_load) {
     filebrowser_end (gui->pl_load);
-  if (gui->pl_save)
+    gui->pl_load = NULL;
+  }
+  if (gui->pl_save) {
     filebrowser_end (gui->pl_save);
+    gui->pl_save = NULL;
+  }
 
   if (pl) {
     mmk_editor_end (gui);

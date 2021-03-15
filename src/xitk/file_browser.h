@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -23,20 +23,21 @@
 #define __FILE_BROWSER_H__
 
 typedef void (*filebrowser_callback_t) (filebrowser_t *fb, void *userdata);
-typedef int (*hidden_file_toggle_t)(int action, int value);
+typedef int (*hidden_file_toggle_t)(void *data, int action, int value);
 
 typedef struct {
-  char                     *label;
-  filebrowser_callback_t    callback;
-  void                     *userdata;
-  int                       need_a_file;
+  char                     *label;    /** << user visible text */
+  filebrowser_callback_t    callback; /** << fired when user clicks... */
+  void                     *userdata; /** << passed to callback */
+  int                       need_a_file; /** << ...and there is a file selected if this is set */
 } filebrowser_callback_button_t;
 
-
-filebrowser_t *create_filebrowser(char *, char *, hidden_file_toggle_t,
-				  filebrowser_callback_button_t *,
-				  filebrowser_callback_button_t *,
-				  filebrowser_callback_button_t *);
+/** NOTE: after return from cbb{1|2|_close}->callback, this filebrowser instance will delete itself.
+ *        make sure to NULL your pointers to it inside these callbacks. */
+filebrowser_t *create_filebrowser (gGui_t *gui, const char *window_title, const char *filepathname,
+  hidden_file_toggle_t hidden_callback, void *hidden_cb_data,
+  const filebrowser_callback_button_t *cbb1, const filebrowser_callback_button_t *cbb2,
+  const filebrowser_callback_button_t *cbb_close);
 
 void filebrowser_raise_window(filebrowser_t *);
 void filebrowser_end(filebrowser_t *);

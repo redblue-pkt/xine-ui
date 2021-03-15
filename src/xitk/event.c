@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -116,11 +116,14 @@ static const char *const shortcut_style[] = {
   NULL
 };
 
-int hidden_file_cb(int action, int value) {
+int hidden_file_cb (void *_gui, int action, int value) {
   xine_cfg_entry_t  cfg_entry;
   int               retval = 0;
+  gGui_t *gui = (gGui_t *)_gui;
 
-  if(xine_config_lookup_entry (gGui->xine, "media.files.show_hidden_files", &cfg_entry)) {
+  if (!gui)
+    return 0;
+  if (xine_config_lookup_entry (gui->xine, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
       config_update_bool("media.files.show_hidden_files", value);
     else

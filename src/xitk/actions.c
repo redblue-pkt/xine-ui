@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -2185,7 +2185,7 @@ void gui_file_selector(void) {
     cbb[2].callback = fileselector_cancel_callback;
     cbb[2].userdata = gui;
     cbb[2].need_a_file = 0;
-    gui->load_stream = create_filebrowser(_("Stream(s) Loading"), gui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
+    gui->load_stream = create_filebrowser (gui, _("Stream(s) Loading"), gui->curdir, hidden_file_cb, gui, &cbb[0], &cbb[1], &cbb[2]);
   }
 }
 
@@ -2272,7 +2272,7 @@ void gui_select_sub(void) {
 	else
 	  open_path = strdup(gui->curdir);
 
-        gui->load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
+        gui->load_sub = create_filebrowser (gui, _("Pick a subtitle file"), open_path, hidden_file_cb, gui, &cbb[0], NULL, &cbb[1]);
 	free(open_path);
       }
     }

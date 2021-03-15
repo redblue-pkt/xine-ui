@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -3057,7 +3057,7 @@ static void _mmkedit_select_sub (xitk_widget_t *w, void *data, int state) {
   else
     open_path = strdup (mmkedit->gui->curdir);
 
-  create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
+  create_filebrowser (mmkedit->gui, _("Pick a subtitle file"), open_path, hidden_file_cb, mmkedit->gui, &cbb, NULL, NULL);
 
   free(open_path);
 }
