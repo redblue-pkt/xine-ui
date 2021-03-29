@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -787,7 +787,7 @@ void audio_lang_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
 
       menu_entry.menu      = get_language_from_iso639_1 (langbuf);
       menu_entry.type      = channel == i ? XITK_MENU_ENTRY_CHECKED : XITK_MENU_ENTRY_CHECK;
-      menu_entry.user_id   = i;
+      menu_entry.user_id   = _MENU_AUDIO_CHAN_BASE + i;
       xitk_menu_add_entry(w, &menu_entry);
     }
 
