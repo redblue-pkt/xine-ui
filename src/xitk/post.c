@@ -1156,7 +1156,7 @@ static int pplugin_help_event (void *data, const xitk_be_event_t *e) {
   return gui_handle_be_event (info->gui, e);
 }
 
-static int __line_wrap(char *s, int pos, int line_size)
+static int __line_wrap(const char *s, int pos, int line_size)
 {
   int word_size = 0;
 
@@ -1234,13 +1234,15 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
   /* load text to the browser widget */
   {
-    char  *p, **hbuf = NULL;
+    const char *p;
+    char **hbuf = NULL;
     int    lines = 0, i;
 
     p = pobj->api->get_help();
 
     do {
-      char c, *old_p = p, *new_p;
+      const char *old_p = p, *new_p;
+      char c;
       int w;
 
       for(w = 0; !__line_wrap(p,w,BROWSER_LINE_WIDTH) && (c = *p++) != 0 && c != '\n'; w++)
