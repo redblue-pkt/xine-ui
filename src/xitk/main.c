@@ -1,4 +1,4 @@
-/** Copyright (C) 2000-2020 the xine project
+/** Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -920,179 +920,139 @@ static void event_listener (void *user_data, const xine_event_t *event) {
   case XINE_EVENT_UI_MESSAGE:
     if(event->stream == gui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
-      char                    buffer[8192];
-      void                    (*report)(gGui_t *gui, const char *message, ...)
-#if __GNUC__ >= 3
-				__attribute__ ((format (printf, 2, 3)))
-#endif
-      ;
+      char                    buffer[8192], *q = buffer, *e = buffer + sizeof (buffer) - 16;
+      const char             *s1, *s2 = NULL;
+#define _MSG_INFO      1
+#define _MSG_WITH_EXPL 2
+#define _MSG_WITH_ARGS 4
+      int                     flags;
 
-      report = xine_error_with_more;
+      *q = 0;
 
-      memset(&buffer, 0, sizeof(buffer));
-
-      switch(data->type) {
-
-	/* (messages to UI) */
-      case XINE_MSG_NO_ERROR:
-	{ /* copy strings, and replace '\0' separators by '\n' */
-	  char *s, *d;
-
-	  report = xine_info;
-
-	  s = data->messages;
-	  d = buffer;
-	  while(s && (*s != '\0') && ((*s + 1) != '\0')) {
-
-	    switch(*s) {
-
-	    case '\0':
-	      *d = '\n';
-	      break;
-
-	    default:
-	      *d = *s;
-	      break;
-	    }
-
-	    s++;
-	    d++;
-	  }
-
-	  *++d = '\0';
-	}
-	break;
-
-	/* (warning message) */
-      case XINE_MSG_GENERAL_WARNING:
-	report = xine_info;
-	snprintf(buffer, sizeof(buffer),
-		 "%s:", _("*drum roll*, xine lib wants to take your attention "
-			  "to deliver an important message to you ;-):"));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s %s", (char *) data + data->explanation, (char *) data + data->parameters);
-	else
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " %s", _("No information available."));
-
-	break;
-
-        /* (host name) */
-      case XINE_MSG_UNKNOWN_HOST:
-	strlcpy(buffer, _("The host you're trying to connect is unknown.\n"
-			  "Check the validity of the specified hostname."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (device name) */
-      case XINE_MSG_UNKNOWN_DEVICE:
-	strlcpy(buffer, _("The device name you specified seems invalid."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* none */
-      case XINE_MSG_NETWORK_UNREACHABLE:
-	strlcpy(buffer, _("The network looks unreachable.\nCheck your network "
-			  "setup and/or the server name."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (host name) */
-      case XINE_MSG_CONNECTION_REFUSED:
-	strlcpy(buffer, _("The connection was refused.\nCheck the host name."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (file name or mrl) */
-      case XINE_MSG_FILE_NOT_FOUND:
-	strlcpy(buffer, _("The specified file or MRL could not be found. Please check it twice."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (device/file/mrl) */
-      case XINE_MSG_READ_ERROR:
-	strlcpy(buffer, _("The source can't be read.\nMaybe you don't have enough "
-			  "rights for this, or source doesn't contain data "
-			  "(e.g: not disc in drive)."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (library/decoder) */
-      case XINE_MSG_LIBRARY_LOAD_ERROR:
-	strlcpy(buffer, _("A problem occurred while loading a library or a decoder"), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), ": %s", (char *) data + data->parameters);
-	break;
-
-	/* none */
-      case XINE_MSG_ENCRYPTED_SOURCE:
-	strlcpy(buffer, _("The source seems encrypted, and can't be read."), sizeof(buffer));
-        {
-          int i;
-          pthread_mutex_lock (&gui->mmk_mutex);
-          i = strncasecmp (gui->mmk.mrl, "dvd:/", 5);
-          pthread_mutex_unlock (&gui->mmk_mutex);
-          if (!i) {
-            strlcat (buffer,
-              _("\nYour DVD is probably crypted. According to your country laws, you can or can't "
-                "install/use libdvdcss to be able to read this disc, which you bought."), sizeof(buffer));
+      switch (data->type) {
+        case XINE_MSG_NO_ERROR: /* (messages to UI) */
+          s1 = NULL;
+          flags = _MSG_INFO;
+          { /* copy strings, and replace '\0' separators by '\n' */
+            const char *p = data->messages ? data->messages : "\0";
+            while (*p) {
+              size_t l = strlcpy (q, p, e - q);
+              q += l;
+              if (q + 1 >= e)
+                break;
+              *q++ = '\n';
+              p += l + 1;
+            }
           }
-        }
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s)", (char *) data + data->parameters);
-	break;
-
-	/* (warning message) */
-      case XINE_MSG_SECURITY:
-	report = xine_info;
-	if(data->explanation)
-	  snprintf(buffer, sizeof(buffer), "%s %s", (char *) data + data->explanation, (char *) data + data->parameters);
-	else
-	  strlcpy(buffer, _("No information available."), sizeof(buffer));
-	break;
-
-      case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
-        gui_stop (NULL, gui);
-	strlcpy(buffer, _("The audio device is unavailable. "
-			  "Please verify if another program already uses it."), sizeof(buffer));
-	break;
-
-	/* (file) */
-      case 13 /* UNCOMMENTME: XINE_MSG_FILE_EMPTY */:
-	snprintf(buffer, sizeof(buffer), "%s %s",
-		 data->explanation ? (char *) data + data->explanation : "File is empty",
-		 (char *) data + data->parameters);
-	break;
-
-#ifdef XINE_MSG_AUTHENTICATION_NEEDED
-	/* mrl */
-	/* FIXME: implement auth dialogue box */
-      case XINE_MSG_AUTHENTICATION_NEEDED:
-	strlcpy(buffer, _("Sorry, not implemented (authentication)"), sizeof(buffer));
-	if (data->num_parameters)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), ": %s", (char *) data + data->parameters);
-	break;
+          *q = 0;
+          break;
+        case XINE_MSG_GENERAL_WARNING: /* (warning message) */
+          s1 = _("*drum roll*, xine lib wants to take your attention "
+                 "to deliver an important message to you ;-):");
+          flags = _MSG_INFO | _MSG_WITH_EXPL | _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_UNKNOWN_HOST: /* (host name) */
+          s1 = _("The host you're trying to connect is unknown.\n"
+                 "Check the validity of the specified hostname.");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_UNKNOWN_DEVICE: /* (device name) */
+          s1 = _("The device name you specified seems invalid.");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_NETWORK_UNREACHABLE: /* none */
+          s1 = _("The network looks unreachable.\nCheck your network "
+                 "setup and/or the server name.");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_CONNECTION_REFUSED: /* (host name) */
+          s1 = _("The connection was refused.\nCheck the host name.");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_FILE_NOT_FOUND: /* (file name or mrl) */
+          s1 =  _("The specified file or MRL could not be found. Please check it twice.");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_READ_ERROR: /* (device/file/mrl) */
+          s1 = _("The source can't be read.\nMaybe you don't have enough rights for this, "
+                 "or source doesn't contain data (e.g: not disc in drive).");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_LIBRARY_LOAD_ERROR: /* (library/decoder) */
+          s1 = _("A problem occurred while loading a library or a decoder");
+          flags = _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_ENCRYPTED_SOURCE: /* none */
+          s1 = _("The source seems encrypted, and can't be read.");
+          flags = _MSG_WITH_ARGS;
+          {
+            int i;
+            pthread_mutex_lock (&gui->mmk_mutex);
+            i = strncasecmp (gui->mmk.mrl, "dvd:/", 5);
+            pthread_mutex_unlock (&gui->mmk_mutex);
+            if (!i)
+              s2 = _("\nYour DVD is probably crypted. According to your country laws, you can or can't "
+                     "install/use libdvdcss to be able to read this disc, which you bought.");
+          }
+          break;
+        case XINE_MSG_SECURITY: /* (warning message) */
+          s1 = "";
+          flags = _MSG_WITH_EXPL | _MSG_WITH_ARGS;
+          break;
+        case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
+          gui_stop (NULL, gui);
+          s1 = _("The audio device is unavailable. "
+                 "Please verify if another program already uses it.");
+          flags = 0;
+          break;
+#ifdef XINE_MSG_FILE_EMPTY
+        case XINE_MSG_FILE_EMPTY: /* (file) */
+          s1 = "";
+          flags = _MSG_WITH_ARGS;
+          break;
 #endif
-
-      default:
-	strlcpy(buffer, _("*sight*, unknown error."), sizeof(buffer));
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), " (%s %s)", (char *) data + data->explanation, (char *) data + data->parameters);
-	break;
+#ifdef XINE_MSG_AUTHENTICATION_NEEDED
+        case XINE_MSG_AUTHENTICATION_NEEDED: /* mrl */
+          /* FIXME: implement auth dialogue box */
+          s1 = _("Sorry, not implemented (authentication)");
+          flags = _MSG_WITH_ARGS;
+          break;
+#endif
+#ifdef XINE_MSG_RECORDING_DONE
+        case XINE_MSG_RECORDING_DONE: /* mrl, file */
+          s1 = _("The following stream has finished recording:");
+          flags = _MSG_INFO | _MSG_WITH_ARGS;
+          break;
+#endif
+        default:
+          s1 = _("*sight*, unknown error.");
+          flags = _MSG_WITH_EXPL | _MSG_WITH_ARGS;
       }
 
-      if (gui->verbosity >= XINE_VERBOSITY_DEBUG) {
-	strlcat(buffer, "\n\n[", sizeof(buffer));
+      if (gui->verbosity >= XINE_VERBOSITY_DEBUG)
+        flags |= _MSG_WITH_EXPL | _MSG_WITH_ARGS;
 
-	if(data->explanation)
-	  snprintf(buffer+strlen(buffer), sizeof(buffer)-strlen(buffer), "'%s' '%s'", (char *) data + data->explanation, (char *) data + data->parameters);
 
-	strlcat(buffer, "]", sizeof(buffer));
+      if (s1) {
+        q += strlcpy (q, s1, e - q);
+        if (s2 && (q < e)) {
+          *q++ = '\n';
+          q += strlcpy (q, s2, e - q);
+        }
+      }
+      if ((flags & _MSG_WITH_EXPL) && (q < e)) {
+        if (data->explanation) {
+          *q++ = '\n';
+          q += strlcpy (q, (const char *)data + data->explanation, e - q);
+        }
+      }
+      if ((flags & _MSG_WITH_ARGS) && (q < e)) {
+        *q++ = '\n';
+        if (data->parameters) {
+          q += strlcpy (q, (const char *)data + data->parameters, e - q);
+        } else {
+          q += strlcpy (q, _("No information available."), e - q);
+        }
       }
 
       if (buffer[0]) {
@@ -1105,7 +1065,10 @@ static void event_listener (void *user_data, const xine_event_t *event) {
           if (gui->verbosity >= XINE_VERBOSITY_DEBUG)
             printf ("xine-ui: suppressed message:\n%s\n", buffer);
         } else {
-          report (gui, "%s", buffer);
+          if (flags & _MSG_INFO)
+            xine_info (gui, "%s", buffer);
+          else
+            xine_error_with_more (gui, "%s", buffer);
         }
       }
 
