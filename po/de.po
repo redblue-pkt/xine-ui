@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-01-24 17:48+0100\n"
+"POT-Creation-Date: 2021-07-07 17:26+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -1506,6 +1506,9 @@ msgstr ""
 
 msgid "Sorry, not implemented (authentication)"
 msgstr "Benutzeranmeldung leider nicht unterstützt"
+
+msgid "The following stream has finished recording:"
+msgstr "Dieser Datenstrom wurde aufgezeichnet:"
 
 msgid "*sight*, unknown error."
 msgstr "*Seufz*, unbekannter Fehler."
