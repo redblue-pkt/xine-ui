@@ -76,7 +76,6 @@ struct xui_vwin_st {
 
   int                    separate_display; /* gui and video window use different displays */
   int                    wid; /* use this window */
-  xitk_backend_t        *video_backend;
   xitk_be_display_t     *video_be_display;
   Display               *video_display;
   Window                 video_window;
@@ -1461,17 +1460,18 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->video_display = NULL;
   if (video_display_name && video_display_name[0]) {
     do {
-      vwin->video_backend = xitk_backend_new (vwin->xitk, vwin->gui->verbosity);
-      if (vwin->video_backend) {
-        vwin->video_be_display = vwin->video_backend->open_display (vwin->video_backend,
+      xitk_backend_t *video_backend;
+      video_backend = xitk_backend_new (vwin->xitk, vwin->gui->verbosity);
+      if (video_backend) {
+        vwin->video_be_display = video_backend->open_display (video_backend,
                                                                     video_display_name, use_x_lock_display, 0,
                                                                     prefered_visual, install_colormap);
+        video_backend->_delete (&video_backend);
         if (vwin->video_be_display) {
           vwin->video_display = (Display *)vwin->video_be_display->id;
           vwin->separate_display = 1;
           break;
         }
-        vwin->video_backend->_delete (&vwin->video_backend);
       }
       fprintf (stderr, _("Cannot open display '%s' for video. Falling back to primary display.\n"), video_display_name);
     } while (0);
@@ -1710,8 +1710,6 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   if (vwin->video_be_display)
     vwin->video_be_display->close (&vwin->video_be_display);
-  if (vwin->video_backend)
-    vwin->video_backend->_delete (&vwin->video_backend);
 
   free(vwin->prefered_visual);
 
