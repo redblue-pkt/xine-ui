@@ -1518,9 +1518,12 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
   vwin->xwin               = geometry_x;
   vwin->ywin               = geometry_y;
 
-  vwin->x_lock_display (vwin->video_display);
-  vwin->desktopWidth       = DisplayWidth(vwin->video_display, DefaultScreen(vwin->video_display));
-  vwin->desktopHeight      = DisplayHeight(vwin->video_display, DefaultScreen(vwin->video_display));
+  if (vwin->video_be_display) {
+    vwin->desktopWidth  = vwin->video_be_display->width;
+    vwin->desktopHeight = vwin->video_be_display->height;
+  } else {
+    xitk_get_display_size(gui->xitk, &vwin->desktopWidth, &vwin->desktopHeight);
+  }
   vwin->fullscreen_width   = vwin->desktopWidth;
   vwin->fullscreen_height  = vwin->desktopHeight;
 
