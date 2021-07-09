@@ -1120,7 +1120,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
       snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
       gui->mrl_overrided = 3;
       panel_set_title (gui->panel, buffer);
-      osd_display_info("%s", buffer);
+      osd_display_info (gui, "%s", buffer);
     }
     break;
 
@@ -2061,7 +2061,7 @@ int main(int argc, char *argv[]) {
   gui->vo_none = xine_open_video_driver (gui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL);
   gui->ao_none = xine_open_audio_driver (gui->xine, "none", NULL);
 
-  osd_init();
+  osd_init (gui);
 
   /*
    * Setup logo.

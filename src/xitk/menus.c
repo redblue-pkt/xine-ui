@@ -138,7 +138,7 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
               gui->mixer.volume_level = 100;
             xine_set_param (gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
             panel_update_mixer_display (gui->panel);
-            osd_draw_bar (_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
+            osd_draw_bar (gui, _("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
           }
           break;
         case AUDIO_DECRE_VOL:
@@ -148,7 +148,7 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
               gui->mixer.volume_level = 0;
             xine_set_param (gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
             panel_update_mixer_display (gui->panel);
-            osd_draw_bar (_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
+            osd_draw_bar (gui, _("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
           }
           break;
         case AUDIO_PPROCESS:
@@ -188,23 +188,23 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
           break;
         case PLAYL_NO_LOOP:
           gui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
-          osd_display_info (_("Playlist: no loop."));
+          osd_display_info (gui, _("Playlist: no loop."));
           break;
         case PLAYL_LOOP:
           gui->playlist.loop = PLAYLIST_LOOP_LOOP;
-          osd_display_info (_("Playlist: loop."));
+          osd_display_info (gui, _("Playlist: loop."));
           break;
         case PLAYL_REPEAT:
           gui->playlist.loop = PLAYLIST_LOOP_REPEAT;
-          osd_display_info (_("Playlist: entry repeat."));
+          osd_display_info (gui, _("Playlist: entry repeat."));
           break;
         case PLAYL_SHUFFLE:
           gui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
-          osd_display_info (_("Playlist: shuffle."));
+          osd_display_info (gui, _("Playlist: shuffle."));
           break;
         case PLAYL_SHUF_PLUS:
           gui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
-          osd_display_info (_("Playlist: shuffle forever."));
+          osd_display_info (gui, _("Playlist: shuffle forever."));
           break;
         case PLAYL_CTRL_STOP:
           gui_execute_action_id (gui, ACTID_PLAYLIST_STOP);

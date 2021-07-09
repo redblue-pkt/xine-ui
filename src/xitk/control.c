@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -490,7 +490,7 @@ void control_dec_image_prop (xui_vctrl_t *vctrl, int prop) {
         v = xine_get_param (item->vctrl->gui->stream, item->prop);
         */
         item->value = v;
-        osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
+        osd_draw_bar (vctrl->gui, item->name, 0, 65535, v, OSD_BAR_STEPPER);
         if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
       }
@@ -515,7 +515,7 @@ void control_inc_image_prop (xui_vctrl_t *vctrl, int prop) {
       if (item->enable) {
         xine_set_param (item->vctrl->gui->stream, item->prop, v);
         item->value = v;
-        osd_draw_bar (item->name, 0, 65535, v, OSD_BAR_STEPPER);
+        osd_draw_bar (vctrl->gui, item->name, 0, 65535, v, OSD_BAR_STEPPER);
         if (item->w && xitk_is_widget_enabled (item->w))
           xitk_slider_set_pos (item->w, v);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -123,23 +123,21 @@ static const struct {
 
 static pthread_mutex_t osd_mutex;
 
-static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
-  gGui_t *gui = gGui;
+static void _xine_osd_show (gGui_t *gui, xine_osd_t *osd, int64_t vpts) {
   if (gui->osd.use_unscaled && gui->osd.unscaled_available)
     xine_osd_show_unscaled(osd, vpts);
   else
     xine_osd_show(osd, vpts);
 }
 
-static void _osd_get_output_size(int *w, int *h) {
-  gGui_t *gui = gGui;
+static void _osd_get_output_size (gGui_t *gui, int *w, int *h) {
   if (gui->osd.use_unscaled && gui->osd.unscaled_available)
     video_window_get_output_size (gui->vwin, w, h);
   else
     video_window_get_frame_size (gui->vwin, w, h);
 }
 
-static const char *_osd_get_speed_sym(int speed) {
+static const char *_osd_get_speed_sym (int speed) {
   size_t i;
 
   for(i = 0; i < sizeof(xine_speeds)/sizeof(xine_speeds[0]); i++) {
@@ -160,8 +158,7 @@ static const char *_osd_get_status_sym(int status) {
   return NULL;
 }
 
-void osd_init(void) {
-  gGui_t *gui = gGui;
+void osd_init (gGui_t *gui) {
   int fonth = FONT_SIZE;
 
   gui->osd.sinfo.osd[0] = xine_osd_new (gui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
@@ -193,9 +190,7 @@ void osd_init(void) {
   pthread_mutex_init(&osd_mutex, NULL);
 }
 
-void osd_hide_sinfo(void) {
-  gGui_t *gui = gGui;
-
+void osd_hide_sinfo (gGui_t *gui) {
   pthread_mutex_lock(&osd_mutex);
   if (gui->osd.sinfo.visible) {
     gui->osd.sinfo.visible = 0;
@@ -204,9 +199,7 @@ void osd_hide_sinfo(void) {
   pthread_mutex_unlock(&osd_mutex);
 }
 
-void osd_hide_bar(void) {
-  gGui_t *gui = gGui;
-
+void osd_hide_bar (gGui_t *gui) {
   pthread_mutex_lock(&osd_mutex);
   if (gui->osd.bar.visible) {
     gui->osd.bar.visible = 0;
@@ -216,9 +209,7 @@ void osd_hide_bar(void) {
   pthread_mutex_unlock(&osd_mutex);
 }
 
-void osd_hide_status(void) {
-  gGui_t *gui = gGui;
-
+void osd_hide_status (gGui_t *gui) {
   pthread_mutex_lock(&osd_mutex);
   if (gui->osd.status.visible) {
     gui->osd.status.visible = 0;
@@ -227,9 +218,7 @@ void osd_hide_status(void) {
   pthread_mutex_unlock(&osd_mutex);
 }
 
-void osd_hide_info(void) {
-  gGui_t *gui = gGui;
-
+void osd_hide_info (gGui_t *gui) {
   pthread_mutex_lock(&osd_mutex);
   if (gui->osd.info.visible) {
     gui->osd.info.visible = 0;
@@ -238,18 +227,16 @@ void osd_hide_info(void) {
   pthread_mutex_unlock(&osd_mutex);
 }
 
-void osd_hide(void) {
+void osd_hide (gGui_t *gui) {
 
-  osd_hide_sinfo();
-  osd_hide_bar();
-  osd_hide_status();
-  osd_hide_info();
+  osd_hide_sinfo (gui);
+  osd_hide_bar (gui);
+  osd_hide_status (gui);
+  osd_hide_info (gui);
 }
 
-void osd_deinit(void) {
-  gGui_t *gui = gGui;
-
-  osd_hide();
+void osd_deinit (gGui_t *gui) {
+  osd_hide (gui);
 
   xine_osd_free (gui->osd.sinfo.osd[0]);
   xine_osd_free (gui->osd.bar.osd[0]);
@@ -260,9 +247,7 @@ void osd_deinit(void) {
   pthread_mutex_destroy(&osd_mutex);
 }
 
-void osd_update(void) {
-  gGui_t *gui = gGui;
-
+void osd_update (gGui_t *gui) {
   pthread_mutex_lock(&osd_mutex);
 
   if (gui->osd.sinfo.visible) {
@@ -297,9 +282,7 @@ void osd_update(void) {
   pthread_mutex_unlock(&osd_mutex);
 }
 
-void osd_stream_infos(void) {
-  gGui_t *gui = gGui;
-
+void osd_stream_infos (gGui_t *gui) {
   if (gui->osd.enabled) {
     int         vwidth, vheight, asrate;
     int         wwidth, wheight;
@@ -345,7 +328,7 @@ void osd_stream_infos(void) {
       }
     }
 
-    _osd_get_output_size(&wwidth, &wheight);
+    _osd_get_output_size (gui, &wwidth, &wheight);
 
     y = x = 0;
 
@@ -446,7 +429,7 @@ void osd_stream_infos(void) {
     if(w > osdw)
       osdw = w;
 
-    osd_stream_position(pos);
+    osd_stream_position (gui, pos);
 
     x = (wwidth - osdw) - 40;
     xine_osd_set_position (gui->osd.sinfo.osd[0], (x >= 0) ? x : 0, 15);
@@ -455,15 +438,13 @@ void osd_stream_infos(void) {
     gui->osd.sinfo.w = osdw;
 
     pthread_mutex_lock(&osd_mutex);
-    _xine_osd_show (gui->osd.sinfo.osd[0], 0);
+    _xine_osd_show (gui, gui->osd.sinfo.osd[0], 0);
     gui->osd.sinfo.visible = gui->osd.timeout;
     pthread_mutex_unlock(&osd_mutex);
   }
 }
 
-void osd_draw_bar(const char *title, int min, int max, int val, int type) {
-  gGui_t *gui = gGui;
-
+void osd_draw_bar (gGui_t *gui, const char *title, int min, int max, int val, int type) {
   if (gui->osd.enabled) {
     int      wwidth, wheight;
     int      bar_color[40];
@@ -484,7 +465,7 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
 
     pos = (int) (_val + -_min) / ((_max + -_min) / 40);
 
-    _osd_get_output_size(&wwidth, &wheight);
+    _osd_get_output_size (gui, &wwidth, &wheight);
 
     xine_osd_clear (gui->osd.bar.osd[0]);
     xine_osd_clear (gui->osd.bar.osd[1]);
@@ -570,50 +551,61 @@ void osd_draw_bar(const char *title, int min, int max, int val, int type) {
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
       pthread_mutex_lock(&osd_mutex);
-      _xine_osd_show (gui->osd.bar.osd[0], 0);
+      _xine_osd_show (gui, gui->osd.bar.osd[0], 0);
       if(title)
-        _xine_osd_show (gui->osd.bar.osd[1], 0);
+        _xine_osd_show (gui, gui->osd.bar.osd[1], 0);
       gui->osd.bar.visible = gui->osd.timeout;
       pthread_mutex_unlock(&osd_mutex);
     }
   }
 }
 
-void osd_stream_position(int pos) {
-  osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_POS2);
+void osd_stream_position (gGui_t *gui, int pos) {
+  osd_draw_bar (gui, _("Position in Stream"), 0, 65535, pos, OSD_BAR_POS2);
 }
 
-void osd_display_info(const char *info, ...) {
-  gGui_t *gui = gGui;
+void osd_display_info (gGui_t *gui, const char *info, ...) {
+  char *buf;
+  const char *text;
 
-  if (gui->osd.enabled && !gui->on_quit) {
-    va_list   args;
-    char     *buf;
+  if (!gui->osd.enabled || gui->on_quit)
+    return;
 
-    va_start(args, info);
-    buf = xitk_vasprintf(info, args);
-    va_end(args);
-
-    if (!buf)
-      return;
-
-    xine_osd_clear (gui->osd.info.osd[0]);
-
-    xine_osd_draw_text (gui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
-    xine_osd_set_position (gui->osd.info.osd[0], 20, 10 + 30);
-
-    pthread_mutex_lock(&osd_mutex);
-    _xine_osd_show (gui->osd.info.osd[0], 0);
-    gui->osd.info.visible = gui->osd.timeout;
-    pthread_mutex_unlock(&osd_mutex);
-
-    free(buf);
+  if (info) {
+    if (!strchr (info, '%')) {
+      buf = NULL;
+      text = info;
+    } else {
+      va_list args;
+      va_start (args, info);
+      if (!strcmp (info, "%s")) {
+        buf = NULL;
+        text = va_arg (args, const char *);
+      } else {
+        text = buf = xitk_vasprintf (info, args);
+      }
+      va_end (args);
+    }
+  } else {
+    text = buf = NULL;
   }
+  if (!text)
+    return;
+
+  xine_osd_clear (gui->osd.info.osd[0]);
+
+  xine_osd_draw_text (gui->osd.info.osd[0], 0, 0, text, XINE_OSD_TEXT1);
+  xine_osd_set_position (gui->osd.info.osd[0], 20, 10 + 30);
+
+  pthread_mutex_lock (&osd_mutex);
+  _xine_osd_show (gui, gui->osd.info.osd[0], 0);
+  gui->osd.info.visible = gui->osd.timeout;
+  pthread_mutex_unlock (&osd_mutex);
+
+  free (buf);
 }
 
-void osd_update_status(void) {
-  gGui_t *gui = gGui;
-
+void osd_update_status (gGui_t *gui) {
   if (gui->osd.enabled) {
     int  status;
     char buffer[256];
@@ -678,22 +670,21 @@ void osd_update_status(void) {
     xine_osd_set_encoding (gui->osd.status.osd[0], "");
     xine_osd_set_position (gui->osd.status.osd[0], 20, 10);
 
-    _osd_get_output_size(&wwidth, &wheight);
+    _osd_get_output_size (gui, &wwidth, &wheight);
 
     /* don't even bother drawing osd over those small streams.
      * it would look pretty bad.
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
       pthread_mutex_lock(&osd_mutex);
-      _xine_osd_show (gui->osd.status.osd[0], 0);
+      _xine_osd_show (gui, gui->osd.status.osd[0], 0);
       gui->osd.status.visible = gui->osd.timeout;
       pthread_mutex_unlock(&osd_mutex);
     }
   }
 }
 
-void osd_display_spu_lang(void) {
-  gGui_t *gui = gGui;
+void osd_display_spu_lang (gGui_t *gui) {
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
   int    channel;
@@ -719,11 +710,10 @@ void osd_display_spu_lang(void) {
   }
 
   snprintf(buffer, sizeof(buffer), "%s%s", _("Subtitles: "), get_language_from_iso639_1(lang));
-  osd_display_info("%s", buffer);
+  osd_display_info (gui, "%s", buffer);
 }
 
-void osd_display_audio_lang(void) {
-  gGui_t *gui = gGui;
+void osd_display_audio_lang (gGui_t *gui) {
   char   buffer[XINE_LANG_MAX+128];
   char   lang_buffer[XINE_LANG_MAX];
   int    channel;
@@ -749,11 +739,10 @@ void osd_display_audio_lang(void) {
   }
 
   snprintf(buffer, sizeof(buffer), "%s%s", _("Audio Channel: "), get_language_from_iso639_1(lang));
-  osd_display_info("%s", buffer);
+  osd_display_info (gui, "%s", buffer);
 }
 
-void osd_update_osd(void) {
-  gGui_t *gui = gGui;
+void osd_update_osd (gGui_t *gui) {
   int vwidth, vheight, wwidth, wheight;
   int x;
 
@@ -775,7 +764,7 @@ void osd_update_osd(void) {
 
   }
 
-  _osd_get_output_size(&wwidth, &wheight);
+  _osd_get_output_size (gui, &wwidth, &wheight);
 
   pthread_mutex_lock(&osd_mutex);
 
@@ -784,7 +773,7 @@ void osd_update_osd(void) {
 
     x = (wwidth - gui->osd.sinfo.w) - 40;
     xine_osd_set_position (gui->osd.sinfo.osd[0], (x >= 0) ? x : 0,  gui->osd.sinfo.y);
-    _xine_osd_show (gui->osd.sinfo.osd[0], 0);
+    _xine_osd_show (gui, gui->osd.sinfo.osd[0], 0);
   }
 
   if (gui->osd.bar.visible) {
@@ -799,13 +788,14 @@ void osd_update_osd(void) {
      * it would look pretty bad.
      */
     if(wwidth > MINIMUM_WIN_WIDTH) {
-      _xine_osd_show (gui->osd.bar.osd[0], 0);
+      _xine_osd_show (gui, gui->osd.bar.osd[0], 0);
 
       if (gui->osd.bar.have_text)
-	_xine_osd_show (gui->osd.bar.osd[1], 0);
+        _xine_osd_show (gui, gui->osd.bar.osd[1], 0);
     }
 
   }
 
   pthread_mutex_unlock(&osd_mutex);
 }
+

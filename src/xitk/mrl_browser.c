@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -433,7 +433,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       }
     }
 
-    osd_hide();
+    osd_hide (mrlb->gui);
 
     if (!xine_open (mrlb->gui->stream, (const char *) _mrl)) {
       gui_handle_xine_error (mrlb->gui, mrlb->gui->stream, _mrl);

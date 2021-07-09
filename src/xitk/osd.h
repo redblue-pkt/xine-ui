@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -35,24 +35,24 @@ typedef struct {
 #define OSD_BAR_POS2     3
 #define OSD_BAR_STEPPER  4
 
-void osd_init(void);
-void osd_hide_sinfo(void);
-void osd_hide_bar(void);
-void osd_hide_status(void);
-void osd_hide_info(void);
-void osd_hide(void);
-void osd_deinit(void);
-void osd_update(void);
-void osd_display_spu_lang(void);
-void osd_display_audio_lang(void);
-void osd_stream_infos(void);
-void osd_update_status(void);
-void osd_stream_position(int pos);
-void osd_display_info(const char *info, ...) __attribute__ ((format (printf, 1, 2)));
+void osd_init (gGui_t *gui);
+void osd_hide_sinfo (gGui_t *gui);
+void osd_hide_bar (gGui_t *gui);
+void osd_hide_status (gGui_t *gui);
+void osd_hide_info (gGui_t *gui);
+void osd_hide (gGui_t *gui);
+void osd_deinit (gGui_t *gui);
+void osd_update (gGui_t *gui);
+void osd_display_spu_lang (gGui_t *gui);
+void osd_display_audio_lang (gGui_t *gui);
+void osd_stream_infos (gGui_t *gui);
+void osd_update_status (gGui_t *gui);
+void osd_stream_position (gGui_t *gui, int pos);
+void osd_display_info (gGui_t *gui, const char *info, ...) __attribute__ ((format (printf, 2, 3)));
 
 /* see OSD_BAR_* */
-void osd_draw_bar(const char *title, int min, int max, int val, int type);
+void osd_draw_bar (gGui_t *gui, const char *title, int min, int max, int val, int type);
 
-void osd_update_osd(void);
+void osd_update_osd (gGui_t *gui);
 
 #endif

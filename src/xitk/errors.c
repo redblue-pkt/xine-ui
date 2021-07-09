@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -53,53 +53,38 @@ static void _errors_display_log_3 (void *data, int state) {
 /*
  * Create the real window.
  */
-static void errors_create_window (gGui_t *gui, char *title, char *message) {
-
-  if((title == NULL) || (message == NULL))
-    return;
-
-  dump_error(message);
-
-  if (gui->nongui_error_msg) {
-    gui->nongui_error_msg (message);
-    return;
-  }
-  xitk_register_key_t key =
-  xitk_window_dialog_3 (gui->xitk,
-    NULL,
-    get_layer_above_video (gui), 400, title, _errors_display_log_3, gui,
-    _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", message);
-  video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
-}
-
 /*
  * Display an error window.
  */
 void xine_error (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
+  const char *text;
 
-  va_start(args, message);
-  buf = xitk_vasprintf(message, args);
+  va_start (args, message);
+  if (!strcmp (message, "%s")) {
+    buf = NULL;
+    text = va_arg (args, const char *);
+  } else {
+    text = buf = xitk_vasprintf (message, args);
+  }
   va_end(args);
 
-  if (!buf)
+  if (!text)
     return;
 
   if (gui->stdctl_enable || !gui->xitk) {
-    printf("%s\n", buf);
-  }
-  else {
-    dump_error(buf);
-
+    printf ("%s\n", text);
+  } else {
+    dump_error (text);
     if (gui->nongui_error_msg) {
-      gui->nongui_error_msg (buf);
+      gui->nongui_error_msg (text);
     } else {
       xitk_register_key_t key =
       xitk_window_dialog_3 (gui->xitk,
         NULL,
         get_layer_above_video (gui), 400, XITK_TITLE_ERROR, NULL, NULL,
-        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
+        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", text);
       video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
     }
   }
@@ -113,21 +98,33 @@ void xine_error (gGui_t *gui, const char *message, ...) {
 void xine_error_with_more (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
+  const char *text;
 
-  va_start(args, message);
-  buf = xitk_vasprintf(message, args);
+  va_start (args, message);
+  if (!strcmp (message, "%s")) {
+    buf = NULL;
+    text = va_arg (args, const char *);
+  } else {
+    text = buf = xitk_vasprintf (message, args);
+  }
   va_end(args);
 
-  if (!buf)
+  if (!text)
     return;
 
-  dump_error(buf);
-
-  if (gui->stdctl_enable) {
-    printf("%s\n", buf);
-  }
-  else {
-    errors_create_window (gui, _("Error"), buf);
+  if (gui->stdctl_enable || !gui->xitk) {
+    printf ("%s\n", text);
+  } else {
+    dump_error (text);
+    if (gui->nongui_error_msg) {
+      gui->nongui_error_msg (text);
+    } else {
+      xitk_register_key_t key =
+        xitk_window_dialog_3 (gui->xitk, NULL,
+          get_layer_above_video (gui), 400, _("Error"), _errors_display_log_3, gui,
+          _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", text);
+      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
+    }
   }
 
   free(buf);
@@ -139,33 +136,37 @@ void xine_error_with_more (gGui_t *gui, const char *message, ...) {
 void xine_info (gGui_t *gui, const char *message, ...) {
   va_list   args;
   char     *buf;
+  const char *text;
 
-  va_start(args, message);
-  buf = xitk_vasprintf(message, args);
+  va_start (args, message);
+  if (!strcmp (message, "%s")) {
+    buf = NULL;
+    text = va_arg (args, const char *);
+  } else {
+    text = buf = xitk_vasprintf (message, args);
+  }
   va_end(args);
 
-  if (!buf)
+  if (!text)
     return;
 
-  dump_info(buf);
-
-  if (gui->stdctl_enable) {
-    printf("%s\n", buf);
-  }
-  else {
+  if (gui->stdctl_enable || !gui->xitk) {
+    printf ("%s\n", text);
+  } else {
+    dump_info (text);
     if (gui->nongui_error_msg) {
-      gui->nongui_error_msg (buf);
+      gui->nongui_error_msg (text);
     } else {
       xitk_register_key_t key =
       xitk_window_dialog_3 (gui->xitk,
         NULL,
         get_layer_above_video (gui), 400, XITK_TITLE_INFO, NULL, NULL,
-        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", buf);
+        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", text);
       video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
     }
   }
 
-  free(buf);
+  free (buf);
 }
 
 /*
