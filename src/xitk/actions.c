@@ -334,7 +334,7 @@ static int _gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, in
 
       xine_usec_sleep(100);
       if(!already_playing)
-	osd_update_status();
+        osd_update_status (gui);
     }
   }
 
@@ -734,7 +734,7 @@ void gui_exit_2 (gGui_t *gui) {
 
   tvout_deinit(gui->tvout);
 
-  osd_deinit();
+  osd_deinit (gui);
 
   config_update_num("gui.amp_level", gui->mixer.amp_level);
   xine_config_save (gui->xine, __xineui_global_config_file);
@@ -836,7 +836,7 @@ void gui_play (xitk_widget_t *w, void *data) {
 
     xine_set_param(gui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
     if(oldspeed != XINE_SPEED_NORMAL)
-      osd_update_status();
+      osd_update_status (gui);
   }
 
   panel_check_pause (gui->panel);
@@ -862,10 +862,10 @@ void gui_stop (xitk_widget_t *w, void *data) {
       gui->visual_anim.running = 0;
   }
 
-  osd_hide_sinfo();
-  osd_hide_bar();
-  osd_hide_info();
-  osd_update_status();
+  osd_hide_sinfo (gui);
+  osd_hide_bar (gui);
+  osd_hide_info (gui);
+  osd_update_status (gui);
   panel_reset_slider (gui->panel);
   panel_check_pause (gui->panel);
   panel_update_runtime_display (gui->panel);
@@ -902,10 +902,10 @@ void gui_close (xitk_widget_t *w, void *data) {
       gui->visual_anim.running = 0;
   }
 
-  osd_hide_sinfo();
-  osd_hide_bar();
-  osd_hide_info();
-  osd_update_status();
+  osd_hide_sinfo (gui);
+  osd_hide_bar (gui);
+  osd_hide_info (gui);
+  osd_update_status (gui);
   panel_reset_slider (gui->panel);
   panel_check_pause (gui->panel);
   panel_update_runtime_display (gui->panel);
@@ -944,7 +944,7 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   /* Give xine engine some time before updating OSD, otherwise the */
   /* time disp may be empty when switching to XINE_SPEED_PAUSE.    */
   xine_usec_sleep(10000);
-  osd_update_status();
+  osd_update_status (gui);
 }
 
 void gui_eject (xitk_widget_t *w, void *data) {
@@ -1101,8 +1101,8 @@ void gui_toggle_aspect (gGui_t *gui, int aspect) {
 
   xine_set_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect);
 
-  osd_display_info(_("Aspect ratio: %s"),
-		   ratios[xine_get_param(gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
+  osd_display_info (gui, _("Aspect ratio: %s"),
+    ratios [xine_get_param (gui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
 
   panel_raise_window(gui->panel);
 }
@@ -1111,7 +1111,7 @@ void gui_toggle_interlaced (gGui_t *gui) {
   if (!gui)
     return;
   gui->deinterlace_enable = !gui->deinterlace_enable;
-  osd_display_info(_("Deinterlace: %s"), (gui->deinterlace_enable) ? _("enabled") : _("disabled"));
+  osd_display_info (gui, _("Deinterlace: %s"), (gui->deinterlace_enable) ? _("enabled") : _("disabled"));
   post_deinterlace (gui);
   panel_raise_window(gui->panel);
 }
@@ -1121,7 +1121,7 @@ void gui_direct_change_audio_channel (xitk_widget_t *w, void *data, int value) {
   (void)w;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
   panel_update_channel_display (gui->panel);
-  osd_display_audio_lang();
+  osd_display_audio_lang (gui);
 }
 
 void gui_nextprev_audio_channel (xitk_widget_t *w, void *data) {
@@ -1141,7 +1141,7 @@ void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
     return;
   xine_set_param(gui->stream, XINE_PARAM_SPU_CHANNEL, value);
   panel_update_channel_display (gui->panel);
-  osd_display_spu_lang();
+  osd_display_spu_lang (gui);
 }
 
 void gui_nextprev_spu_channel (xitk_widget_t *w, void *data) {
@@ -1209,7 +1209,7 @@ void gui_nextprev_speed (xitk_widget_t *w, void *data) {
   /* Give xine engine some time before updating OSD, otherwise the        */
   /* time disp may be empty when switching to speeds < XINE_SPEED_NORMAL. */
   xine_usec_sleep(10000);
-  osd_update_status();
+  osd_update_status (gui);
 }
 
 static void *gui_seek_thread (void *data) {
@@ -1276,7 +1276,7 @@ static void *gui_seek_thread (void *data) {
           pos = gui->seek_pos;
           pthread_mutex_unlock (&gui->seek_mutex);
           /* panel_update_slider (gui->panel, pos); */
-          osd_stream_position (pos);
+          osd_stream_position (gui, pos);
           _gui_xine_play (gui, gui->stream, pos, 0, update_mmk);
           xine_get_pos_length (gui->stream,
             &gui->stream_length.pos, &gui->stream_length.time, &gui->stream_length.length);
@@ -1299,7 +1299,7 @@ static void *gui_seek_thread (void *data) {
             if (xine_get_pos_length (gui->stream,
               &gui->stream_length.pos, &gui->stream_length.time, &gui->stream_length.length)) {
               panel_update_slider (gui->panel, gui->stream_length.pos);
-              osd_stream_position (gui->stream_length.pos);
+              osd_stream_position (gui, gui->stream_length.pos);
             }
             gui->ignore_next = 0;
           }
@@ -1309,7 +1309,7 @@ static void *gui_seek_thread (void *data) {
     }
 
     gui->ignore_next = 0;
-    osd_hide_status ();
+    osd_hide_status (gui);
     panel_check_pause (gui->panel);
 
     return NULL;
@@ -1520,7 +1520,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
 
   if (by > 0) { /* next */
 
-    osd_hide();
+    osd_hide (gui);
 
     if(by_chapter) {
 
@@ -1571,7 +1571,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
   }
   else if (by < 0) { /* prev */
 
-    osd_hide();
+    osd_hide (gui);
     by = -by;
     if(by_chapter) {
       for (i = 0; i < by; i++)
@@ -1796,7 +1796,7 @@ void gui_vpp_enable (gGui_t *gui) {
     return;
   if (pplugin_is_post_selected (&gui->post_video)) {
     gui->post_video_enable = !gui->post_video_enable;
-    osd_display_info(_("Video post plugins: %s."), (gui->post_video_enable) ? _("enabled") : _("disabled"));
+    osd_display_info (gui, _("Video post plugins: %s."), (gui->post_video_enable) ? _("enabled") : _("disabled"));
     pplugin_update_enable_button (&gui->post_video);
     if (pplugin_is_visible (&gui->post_video))
       pplugin_rewire_from_posts_window (&gui->post_video);
@@ -1898,7 +1898,7 @@ void change_amp_vol(int value) {
   gui->mixer.amp_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gui->mixer.amp_level);
   panel_update_mixer_display (gui->panel);
-  osd_draw_bar(_("Amplification Level"), 0, 200, gui->mixer.amp_level, OSD_BAR_STEPPER);
+  osd_draw_bar (gui, _("Amplification Level"), 0, 200, gui->mixer.amp_level, OSD_BAR_STEPPER);
 }
 void gui_increase_amp_level(void) {
   gGui_t *gui = gGui;
@@ -1921,7 +1921,7 @@ void change_audio_vol(int value) {
   gui->mixer.volume_level = value;
   xine_set_param(gui->stream, XINE_PARAM_AUDIO_VOLUME, gui->mixer.volume_level);
   panel_update_mixer_display (gui->panel);
-  osd_draw_bar(_("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
+  osd_draw_bar (gui, _("Audio Volume"), 0, 100, gui->mixer.volume_level, OSD_BAR_STEPPER);
 }
 void gui_increase_audio_volume(void) {
   gGui_t *gui = gGui;
@@ -1957,7 +1957,7 @@ void gui_app_enable (gGui_t *gui) {
     return;
   if (pplugin_is_post_selected (&gui->post_audio)) {
     gui->post_audio_enable = !gui->post_audio_enable;
-    osd_display_info (_("Audio post plugins: %s."), (gui->post_audio_enable) ? _("enabled") : _("disabled"));
+    osd_display_info (gui, _("Audio post plugins: %s."), (gui->post_audio_enable) ? _("enabled") : _("disabled"));
     pplugin_update_enable_button (&gui->post_audio);
     if (pplugin_is_visible (&gui->post_audio))
       pplugin_rewire_from_posts_window (&gui->post_audio);
@@ -1998,7 +1998,7 @@ void gui_toggle_tvmode(void) {
   xine_set_param(gui->stream, XINE_PARAM_VO_TVMODE,
 		 xine_get_param(gui->stream, XINE_PARAM_VO_TVMODE) + 1);
 
-  osd_display_info(_("TV Mode: %d"), xine_get_param(gui->stream, XINE_PARAM_VO_TVMODE));
+  osd_display_info (gui, _("TV Mode: %d"), xine_get_param(gui->stream, XINE_PARAM_VO_TVMODE));
 }
 
 void gui_add_mediamark(void) {

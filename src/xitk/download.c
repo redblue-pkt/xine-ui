@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -45,15 +45,16 @@
 
 static int progress_callback(void *userdata,
 			     double dltotal, double dlnow, double ultotal, double ulnow) {
+  gGui_t *gui = gGui;
   download_t  *download = (download_t *) userdata;
   char         buffer[1024];
   int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
 
-  osd_draw_bar(_("Download in progress"), 0, 100, percent, OSD_BAR_POS);
+  osd_draw_bar (gui, _("Download in progress"), 0, 100, percent, OSD_BAR_POS);
   /* TRANSLATORS: only ASCII characters (skin) */
   snprintf(buffer, sizeof(buffer), pgettext("skin", "Download progress: %d%%."), percent);
-  gGui->mrl_overrided = 3;
-  panel_set_title (gGui->panel, buffer);
+  gui->mrl_overrided = 3;
+  panel_set_title (gui->panel, buffer);
 
   /* return non 0 abort transfert */
   return download->status;

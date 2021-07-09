@@ -515,17 +515,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
   case ACTID_ZOOM_1_1:
   case ACTID_WINDOW100:
     if (video_window_set_mag (gui->vwin, 1.0f, 1.0f))
-      osd_display_info(_("Zoom: 1:1"));
+      osd_display_info (gui, _("Zoom: 1:1"));
     break;
 
   case ACTID_WINDOW200:
     if (video_window_set_mag (gui->vwin, 2.0f, 2.0f))
-      osd_display_info(_("Zoom: 200%%"));
+      osd_display_info (gui, _("Zoom: 200%%"));
     break;
 
   case ACTID_WINDOW50:
     if (video_window_set_mag (gui->vwin, 0.5f, 0.5f))
-      osd_display_info(_("Zoom: 50%%"));
+      osd_display_info (gui, _("Zoom: 50%%"));
     break;
 
   case ACTID_SPU_NEXT:
@@ -771,7 +771,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
       pthread_mutex_unlock (&gui->event_mutex);
       xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
+      osd_display_info (gui, _("A/V offset: %s"), pts2str (av_offset));
     }
     break;
 
@@ -787,7 +787,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 	  gui->playlist.mmk[gui->playlist.cur]->av_offset = av_offset;
       pthread_mutex_unlock (&gui->event_mutex);
       xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
+      osd_display_info (gui, _("A/V offset: %s"), pts2str (av_offset));
     }
     break;
 
@@ -800,7 +800,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 	gui->playlist.mmk[gui->playlist.cur]->av_offset = 0;
     pthread_mutex_unlock (&gui->event_mutex);
     xine_set_param(gui->stream, XINE_PARAM_AV_OFFSET, 0);
-    osd_display_info(_("A/V Offset: reset."));
+    osd_display_info (gui, _("A/V Offset: reset."));
     break;
 
   case ACTID_SV_SYNC_p:
@@ -809,7 +809,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
       xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
 
-      osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
+      osd_display_info (gui, _("SPU Offset: %s"), pts2str (spu_offset));
     }
     break;
 
@@ -819,13 +819,13 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
       xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
 
-      osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
+      osd_display_info (gui, _("SPU Offset: %s"), pts2str (spu_offset));
     }
     break;
 
   case ACTID_SV_SYNC_RESET:
     xine_set_param(gui->stream, XINE_PARAM_SPU_OFFSET, 0);
-    osd_display_info(_("SPU Offset: reset."));
+    osd_display_info (gui, _("SPU Offset: reset."));
     break;
 
   case ACTID_SPEED_FAST:
@@ -970,19 +970,19 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
     switch(gui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
-      osd_display_info(_("Playlist: no loop."));
+      osd_display_info (gui, _("Playlist: no loop."));
       break;
     case PLAYLIST_LOOP_LOOP:
-      osd_display_info(_("Playlist: loop."));
+      osd_display_info (gui, _("Playlist: loop."));
       break;
     case PLAYLIST_LOOP_REPEAT:
-      osd_display_info(_("Playlist: entry repeat."));
+      osd_display_info (gui, _("Playlist: entry repeat."));
       break;
     case PLAYLIST_LOOP_SHUFFLE:
-      osd_display_info(_("Playlist: shuffle."));
+      osd_display_info (gui, _("Playlist: shuffle."));
       break;
     case PLAYLIST_LOOP_SHUF_PLUS:
-      osd_display_info(_("Playlist: shuffle forever."));
+      osd_display_info (gui, _("Playlist: shuffle forever."));
       break;
     }
     break;
@@ -998,14 +998,14 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 #endif
 
   case ACTID_OSD_SINFOS:
-    osd_stream_infos();
+    osd_stream_infos (gui);
     break;
 
   case ACTID_OSD_WTEXT:
     if (sarg) {
-      osd_display_info ("%s", sarg);
+      osd_display_info (gui, "%s", sarg);
     } else {
-      osd_display_info(_("No text to display!"));
+      osd_display_info (gui, _("No text to display!"));
     }
     break;
 
@@ -1102,7 +1102,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 	gui->playlist.control |= PLAYLIST_CONTROL_STOP;
       gui->playlist.control |= PLAYLIST_CONTROL_STOP_PERSIST;
     }
-    osd_display_info(_("Playlist: %s"),
+    osd_display_info (gui, _("Playlist: %s"),
 		     (gui->playlist.control & PLAYLIST_CONTROL_STOP) ?
 		     (gui->playlist.control & PLAYLIST_CONTROL_STOP_PERSIST) ?
 		     _("Stop (persistent)") :
@@ -1333,7 +1333,7 @@ void gui_handle_button_event (void *data, const xitk_button_event_t *be) {
 int gui_playlist_play (gGui_t *gui, int idx) {
   int ret = 1;
 
-  osd_hide();
+  osd_hide (gui);
   panel_reset_slider (gui->panel);
 
   if(idx >= gui->playlist.num)
@@ -1359,7 +1359,7 @@ void gui_playlist_start_next (gGui_t *gui) {
   if (gui->ignore_next)
     return;
 
-  osd_hide();
+  osd_hide (gui);
   panel_reset_slider (gui->panel);
 
   if(gui->playlist.control & PLAYLIST_CONTROL_STOP) {

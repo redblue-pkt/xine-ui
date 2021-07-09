@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a free video player.
  *
@@ -1255,7 +1255,7 @@ void video_window_set_fullscreen_mode (xui_vwin_t *vwin, int req_fullscreen) {
   video_window_adapt_size (vwin);
 
   video_window_set_input_focus (vwin);
-  osd_update_osd();
+  osd_update_osd (vwin->gui);
 
   pthread_mutex_unlock (&vwin->mutex);
 }
@@ -1930,7 +1930,7 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
         }
 
         if ((h != vwin->output_height) || (w != vwin->output_width))
-          osd_update_osd ();
+          osd_update_osd (vwin->gui);
 
         oxine_adapt ();
 

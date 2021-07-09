@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -526,7 +526,7 @@ static __attribute__((noreturn)) void *slider_loop (void *data) {
       }
 
       if(!(i % 2)) {
-	osd_update();
+        osd_update (panel->gui);
 
         if (panel->gui->mrl_overrided) {
           panel->gui->mrl_overrided--;
@@ -925,12 +925,12 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
   if (panel->gui->mixer.method == SOFTWARE_MIXER) {
     panel->gui->mixer.mute = state;
     xine_set_param (panel->gui->stream, XINE_PARAM_AUDIO_AMP_MUTE, panel->gui->mixer.mute);
-    osd_display_info(_("Amp: %s"), panel->gui->mixer.mute ? _("Muted") : _("Unmuted"));
+    osd_display_info (panel->gui, _("Amp: %s"), panel->gui->mixer.mute ? _("Muted") : _("Unmuted"));
   }
   else if (panel->gui->mixer.caps & MIXER_CAP_MUTE) {
     panel->gui->mixer.mute = state;
     xine_set_param (panel->gui->stream, XINE_PARAM_AUDIO_MUTE, panel->gui->mixer.mute);
-    osd_display_info(_("Audio: %s"), panel->gui->mixer.mute ? _("Muted") : _("Unmuted"));
+    osd_display_info (panel->gui, _("Audio: %s"), panel->gui->mixer.mute ? _("Muted") : _("Unmuted"));
   }
   panel_check_mute (panel);
 }

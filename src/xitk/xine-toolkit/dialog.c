@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -24,6 +24,7 @@
 #endif
 
 #include <stdarg.h>
+#include <string.h>
 
 #include "_xitk.h"
 #include "label.h"
@@ -32,17 +33,6 @@
 #include "default_font.h"
 
 #define TITLE_BAR_HEIGHT 20
-
-#define _XITK_VASPRINTF(_target_ptr,_fmt) \
-  if (_fmt) { \
-    va_list args; \
-    va_start (args, _fmt); \
-    _target_ptr = xitk_vasprintf (_fmt, args); \
-    va_end (args); \
-  } else { \
-    _target_ptr = NULL; \
-  }
-
 
 /*
  * Dialog window
@@ -66,30 +56,24 @@ struct xitk_dialog_s {
   xitk_widget_t          *default_button;
 };
 
-/* NOTE: this will free (text). */
 static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
-  const char *title, char *text, int *width, int *height, int align) {
+  const char *title, const char *text, int *width, int *height, int align) {
   xitk_dialog_t *wd;
   xitk_image_t *image;
 
   if (!text)
     return NULL;
 
-  if (!xitk || !*width) {
-    free (text);
+  if (!xitk || !*width)
     return NULL;
-  }
 
   wd = xitk_xmalloc (sizeof (*wd));
-  if (!wd) {
-    free (text);
+  if (!wd)
     return NULL;
-  }
 
   wd->xitk = xitk;
 
   image = xitk_image_create_image_from_string (xitk, DEFAULT_FONT_12, *width - 40, align, text);
-  free (text);
   if (!image) {
     free (wd);
     return NULL;
@@ -200,9 +184,23 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     winh += 50;
   {
     const char *_title = title ? title : (num_buttons < 2) ? "Notice" : _("Question?");
-    char *text;
-    _XITK_VASPRINTF (text, text_fmt);
+    char *buf;
+    const char *text;
+    if (text_fmt) {
+      va_list args;
+      va_start (args, text_fmt);
+      if (!strcmp (text_fmt, "%s")) {
+        buf = NULL;
+        text = va_arg (args, const char *);
+      } else {
+        text = buf = xitk_vasprintf (text_fmt, args);
+      }
+      va_end (args);
+    } else {
+      text = buf = NULL;
+    }
     wd = _xitk_dialog_new (xitk, _title, text, &winw, &winh, text_align);
+    free (buf);
     if (!wd)
       return 0;
   }
