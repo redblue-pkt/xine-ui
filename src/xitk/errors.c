@@ -50,16 +50,12 @@ static void _errors_display_log_3 (void *data, int state) {
   }
 }
 
-/*
- * Create the real window.
- */
-/*
- * Display an error window.
- */
-void xine_error (gGui_t *gui, const char *message, ...) {
+#define XUI_MSG_TYPE_MASK 7
+void gui_msg (gGui_t *gui, unsigned int flags, const char *message, ...) {
   va_list   args;
   char     *buf;
   const char *text;
+  unsigned int type = flags & XUI_MSG_TYPE_MASK;
 
   va_start (args, message);
   if (!strcmp (message, "%s")) {
@@ -76,97 +72,25 @@ void xine_error (gGui_t *gui, const char *message, ...) {
   if (gui->stdctl_enable || !gui->xitk) {
     printf ("%s\n", text);
   } else {
-    dump_error (text);
+    if (type == XUI_MSG_ERROR)
+      dump_error (text);
+    else
+      dump_info (text);
     if (gui->nongui_error_msg) {
       gui->nongui_error_msg (text);
     } else {
-      xitk_register_key_t key =
-      xitk_window_dialog_3 (gui->xitk,
-        NULL,
-        get_layer_above_video (gui), 400, XITK_TITLE_ERROR, NULL, NULL,
-        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", text);
+      const char *title = (type == XUI_MSG_ERROR) ? XITK_TITLE_ERROR
+                        : (type == XUI_MSG_WARN)  ? XITK_TITLE_WARN
+                        : XITK_TITLE_INFO;
+      xitk_register_key_t key = xitk_window_dialog_3 (gui->xitk,
+        NULL, get_layer_above_video (gui), 400, title,
+        (flags & XUI_MSG_MORE) ? _errors_display_log_3 : NULL, gui,
+        (flags & XUI_MSG_MORE) ? _("Done") : XITK_LABEL_OK,
+        (flags & XUI_MSG_MORE) ? _("More...") : NULL,
+        NULL, NULL, 0, ALIGN_CENTER, "%s", text);
       video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
     }
   }
-
-  free(buf);
-}
-
-/*
- * Display an error window, with more button.
- */
-void xine_error_with_more (gGui_t *gui, const char *message, ...) {
-  va_list   args;
-  char     *buf;
-  const char *text;
-
-  va_start (args, message);
-  if (!strcmp (message, "%s")) {
-    buf = NULL;
-    text = va_arg (args, const char *);
-  } else {
-    text = buf = xitk_vasprintf (message, args);
-  }
-  va_end(args);
-
-  if (!text)
-    return;
-
-  if (gui->stdctl_enable || !gui->xitk) {
-    printf ("%s\n", text);
-  } else {
-    dump_error (text);
-    if (gui->nongui_error_msg) {
-      gui->nongui_error_msg (text);
-    } else {
-      xitk_register_key_t key =
-        xitk_window_dialog_3 (gui->xitk, NULL,
-          get_layer_above_video (gui), 400, _("Error"), _errors_display_log_3, gui,
-          _("Done"), _("More..."), NULL, NULL, 0, ALIGN_CENTER, "%s", text);
-      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
-    }
-  }
-
-  free(buf);
-}
-
-/*
- * Display an informative window.
- */
-void xine_info (gGui_t *gui, const char *message, ...) {
-  va_list   args;
-  char     *buf;
-  const char *text;
-
-  va_start (args, message);
-  if (!strcmp (message, "%s")) {
-    buf = NULL;
-    text = va_arg (args, const char *);
-  } else {
-    text = buf = xitk_vasprintf (message, args);
-  }
-  va_end(args);
-
-  if (!text)
-    return;
-
-  if (gui->stdctl_enable || !gui->xitk) {
-    printf ("%s\n", text);
-  } else {
-    dump_info (text);
-    if (gui->nongui_error_msg) {
-      gui->nongui_error_msg (text);
-    } else {
-      xitk_register_key_t key =
-      xitk_window_dialog_3 (gui->xitk,
-        NULL,
-        get_layer_above_video (gui), 400, XITK_TITLE_INFO, NULL, NULL,
-        XITK_LABEL_OK, NULL, NULL, NULL, 0, ALIGN_CENTER, "%s", text);
-      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
-    }
-  }
-
-  free (buf);
 }
 
 /*
@@ -190,7 +114,7 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
 
   case XINE_ERROR_NO_INPUT_PLUGIN:
     dump_error("got XINE_ERROR_NO_INPUT_PLUGIN.");
-    xine_error_with_more (gui,
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "There is no input plugin available to handle '%s'.\n"
         "Maybe MRL syntax is wrong or file/stream source doesn't exist."), _mrl);
@@ -198,7 +122,7 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
 
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     dump_error("got XINE_ERROR_NO_DEMUX_PLUGIN.");
-    xine_error_with_more (gui,
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "There is no demuxer plugin available to handle '%s'.\n"
         "Usually this means that the file format was not recognized."), _mrl);
@@ -206,28 +130,28 @@ void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl)
 
   case XINE_ERROR_DEMUX_FAILED:
     dump_error("got XINE_ERROR_DEMUX_FAILED.");
-    xine_error_with_more (gui,
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Demuxer failed. Maybe '%s' is a broken file?\n"), _mrl);
     break;
 
   case XINE_ERROR_MALFORMED_MRL:
     dump_error("got XINE_ERROR_MALFORMED_MRL.");
-    xine_error_with_more (gui,
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Malformed mrl. Mrl '%s' seems malformed/invalid.\n"), _mrl);
     break;
 
   case XINE_ERROR_INPUT_FAILED:
     dump_error("got XINE_ERROR_INPUT_FAILED.");
-    xine_error_with_more (gui,
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE,
       _("- xine engine error -\n\n"
         "Input plugin failed to open mrl '%s'\n"), _mrl);
     break;
 
   default:
     dump_error("got unhandle error.");
-    xine_error_with_more (gui, _("- xine engine error -\n\n!! Unhandled error !!\n"));
+    gui_msg (gui, XUI_MSG_ERROR | XUI_MSG_MORE, _("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }
 
@@ -243,7 +167,7 @@ static void _too_slow_done (void *data, int state) {
   if ((state & XITK_WINDOW_DIALOG_BUTTONS_MASK) == 2) {
     /* FIXME: how to properly open the system browser?
      * should we just make it configurable? */
-    xine_info (gui, _("Opening mozilla web browser, this might take a while..."));
+    gui_msg (gui, XUI_MSG_INFO, _("Opening mozilla web browser, this might take a while..."));
     xine_system (1, "mozilla http://www.xine-project.org/faq#SPEEDUP");
   }
 }
@@ -280,3 +204,4 @@ void too_slow_window (gGui_t *gui) {
     _("Done"), _("Learn More..."), NULL, _("Disable this warning."), 0, ALIGN_CENTER, "%s", message);
   video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
 }
+

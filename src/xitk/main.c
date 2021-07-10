@@ -1065,10 +1065,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
           if (gui->verbosity >= XINE_VERBOSITY_DEBUG)
             printf ("xine-ui: suppressed message:\n%s\n", buffer);
         } else {
-          if (flags & _MSG_INFO)
-            xine_info (gui, "%s", buffer);
-          else
-            xine_error_with_more (gui, "%s", buffer);
+          gui_msg (gui, (flags & _MSG_INFO) ? XUI_MSG_INFO : (XUI_MSG_ERROR | XUI_MSG_MORE), "%s", buffer);
         }
       }
 

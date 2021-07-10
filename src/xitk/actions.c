@@ -462,7 +462,7 @@ int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_
 
 
     if(v_unhandled && a_unhandled) {
-      xine_error (gui, "%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
+      gui_msg (gui, XUI_MSG_ERROR, "%s%s%s", buffer ? buffer : "", v_info ? v_info : "", a_info ? a_info : "");
       free(buffer); free(v_info); free(a_info);
       return 0;
     }
@@ -812,7 +812,7 @@ void gui_play (xitk_widget_t *w, void *data) {
   if(xine_get_status(gui->stream) != XINE_STATUS_PLAY) {
 
     if (!strncmp (gui->mmk.ident, "xine-ui version", 15)) {
-      xine_error (gui, _("No MRL (input stream) specified"));
+      gui_msg (gui, XUI_MSG_ERROR, _("No MRL (input stream) specified"));
       return;
     }
 

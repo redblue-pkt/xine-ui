@@ -404,7 +404,7 @@ static void _adjust_modeline(xui_vwin_t *vwin) {
           if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search == 0))
             vwin->XF86VidMode_fullscreen = 0;
        } else {
-          xine_error (vwin->gui, _("XF86VidMode Extension: modeline switching failed.\n"));
+          gui_msg (vwin->gui, XUI_MSG_ERROR, _("XF86VidMode Extension: modeline switching failed.\n"));
        }
     }
   }

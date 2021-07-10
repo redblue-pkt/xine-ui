@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -22,11 +22,11 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-void xine_error (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
-
-void xine_error_with_more (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
-
-void xine_info (gGui_t *gui, const char *message, ...) __attribute__ ((format (printf, 2, 3)));
+#define XUI_MSG_INFO  0 /** << just for user info */
+#define XUI_MSG_WARN  1 /** << warning */
+#define XUI_MSG_ERROR 2 /** << fail */
+#define XUI_MSG_MORE  8 /** << add "more..." button */
+void gui_msg (gGui_t *gui, unsigned int flags, const char *message, ...) __attribute__ ((format (printf, 3, 4)));
 
 void gui_handle_xine_error (gGui_t *gui, xine_stream_t *stream, const char *mrl);
 

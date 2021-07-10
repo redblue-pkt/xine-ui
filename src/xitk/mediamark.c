@@ -210,7 +210,7 @@ static _lf_t *_download_file (gGui_t *gui, const char *filename) {
   download.status = 0;
 
   if (!network_download (filename, &download)) {
-    xine_error (gui, "Unable to download '%s': %s", filename, download.error);
+    gui_msg (gui, XUI_MSG_ERROR, "Unable to download '%s': %s", filename, download.error);
     lf = NULL;
   } else {
     lf = _lf_new (download.size);

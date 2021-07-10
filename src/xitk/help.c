@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -163,7 +163,7 @@ static void help_sections (xui_help_t *help) {
   int                  i;
 
   if ((dir = opendir(XINE_DOCDIR)) == NULL) {
-    xine_error (help->gui, "Cannot open help files: %s", strerror(errno));
+    gui_msg (help->gui, XUI_MSG_ERROR, "Cannot open help files: %s", strerror(errno));
   }
   else {
     struct dirent       *dir_entry;
