@@ -693,6 +693,10 @@ void gui_exit_2 (gGui_t *gui) {
   if (gui->verbosity)
     printf ("xine_ui: gui_exit_2 ().\n");
 
+  /* paranoia: xitk internal error exit (eg. parent console close */
+  if (!gui->on_quit)
+    gui_exit (NULL, gui);
+
   /* shut down event queue threads */
   /* do it first, events access gui elements ... */
   xine_event_dispose_queue(gui->event_queue);
