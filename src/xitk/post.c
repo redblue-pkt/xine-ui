@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -853,7 +853,7 @@ static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
 
   if(pobj->param->range_min && pobj->param->range_max &&
      (value < (int)pobj->param->range_min || value > (int)pobj->param->range_max)) {
-    xine_error (pobj->info->gui, _("Entered value is out of bounds (%d>%d<%d)."),
+    gui_msg (pobj->info->gui, XUI_MSG_ERROR, _("Entered value is out of bounds (%d>%d<%d)."),
 	       (int)pobj->param->range_min, value, (int)pobj->param->range_max);
   }
   else {
@@ -877,7 +877,7 @@ static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value
 
   if(pobj->param->range_min && pobj->param->range_max &&
      (value < pobj->param->range_min || value > pobj->param->range_max)) {
-    xine_error (pobj->info->gui, _("Entered value is out of bounds (%e>%e<%e)."),
+    gui_msg (pobj->info->gui, XUI_MSG_ERROR, _("Entered value is out of bounds (%e>%e<%e)."),
 	       pobj->param->range_min, value, pobj->param->range_max);
   }
   else {
@@ -907,7 +907,7 @@ static void _pplugin_set_param_char(xitk_widget_t *w, void *data, const char *te
     xitk_inputtext_change_text (pobj->value, v);
   }
   else
-    xine_error (pobj->info->gui, _("parameter type POST_PARAM_TYPE_STRING not supported yet.\n"));
+    gui_msg (pobj->info->gui, XUI_MSG_ERROR, _("parameter type POST_PARAM_TYPE_STRING not supported yet.\n"));
 
 }
 
@@ -919,7 +919,7 @@ static void _pplugin_set_param_stringlist(xitk_widget_t *w, void *data, int valu
   if(pobj->readonly)
     return;
 
-  xine_error (pobj->info->gui, _("parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"));
+  gui_msg (pobj->info->gui, XUI_MSG_ERROR, _("parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"));
 }
 
 static void _pplugin_set_param_bool(xitk_widget_t *w, void *data, int state) {

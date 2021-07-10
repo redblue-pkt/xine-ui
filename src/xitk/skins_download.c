@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -217,7 +217,7 @@ static slx_entry_t **skins_get_slx_entries(gGui_t *gui, char *url) {
 
   }
   else
-    xine_error (gui, _("Unable to retrieve skin list from %s: %s"), url, download.error);
+    gui_msg (gui, XUI_MSG_ERROR, _("Unable to retrieve skin list from %s: %s"), url, download.error);
 
  __failure:
 
@@ -332,7 +332,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected, in
     download_update_preview(skd);
   }
   else {
-    xine_error (gui, _("Unable to download '%s': %s"),
+    gui_msg (gui, XUI_MSG_ERROR, _("Unable to download '%s': %s"),
       skd->slxs[selected]->skin.preview, download.error);
     download_update_blank_preview(skd);
   }
@@ -366,7 +366,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
     struct stat  st;
 
     if (!network_download (skd->slxs[selected]->skin.href, &download)) {
-      xine_error (gui, _("Unable to download '%s': %s"), skd->slxs[selected]->skin.href, download.error);
+      gui_msg (gui, XUI_MSG_ERROR, _("Unable to download '%s': %s"), skd->slxs[selected]->skin.href, download.error);
       break;
     }
 
@@ -390,7 +390,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
     if (stat (skindir, &st) < 0) {
       (void)mkdir_safe (skindir);
       if (stat (skindir, &st) < 0) {
-        xine_error (gui, _("Unable to create '%s' directory: %s."), skindir, strerror(errno));
+        gui_msg (gui, XUI_MSG_ERROR, _("Unable to create '%s' directory: %s."), skindir, strerror(errno));
         break;
       }
     }
@@ -400,7 +400,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
       FILE *fd;
       snprintf (tmpskin, sizeof (tmpskin), "%s%u%s", "/tmp/", (unsigned int)time (NULL), filename);
       if (!(fd = fopen (tmpskin, "w+b"))) {
-        xine_error (gui, _("Unable to create '%s'."), tmpskin);
+        gui_msg (gui, XUI_MSG_ERROR, _("Unable to create '%s'."), tmpskin);
         break;
       }
       fwrite (download.buf, download.size, 1, fd);
@@ -441,7 +441,7 @@ static void download_skin_select (xitk_widget_t *w, void *data, int state) {
     {
       int r = skin_add_1 (gui, skindir, skinname, skinend);
       if (r >= 0) {
-        xine_info (gui, _("Skin %s correctly installed"), skinname);
+        gui_msg (gui, XUI_MSG_INFO, _("Skin %s correctly installed"), skinname);
         /* Okay, load this skin */
         skin_select (gui, r);
       }

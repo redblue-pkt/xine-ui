@@ -1000,7 +1000,7 @@ void playlist_change_skins (gGui_t *gui, int synthetic) {
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
-    xine_error (pl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+    gui_msg (pl->gui, XUI_MSG_ERROR, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
   xitk_window_set_background_image (pl->xwin, bg_image);
@@ -1071,7 +1071,7 @@ void playlist_editor (gGui_t *gui) {
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
-    xine_error (pl->gui, _("playlist: couldn't find image for background\n"));
+    gui_msg (pl->gui, XUI_MSG_ERROR, _("playlist: couldn't find image for background\n"));
     exit(-1);
   }
   width = xitk_image_width(bg_image);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -288,7 +288,7 @@ static int _skin_alter (gGui_t *gui, int index) {
   if (!xitk_skin_load_config (nskin_config, sks->fullname, "skinconfig")) {
     xitk_skin_unload_config (nskin_config);
     if (!osks || !strcmp (osks->fullname, sks->fullname)) {
-      xine_error (gui, _("Failed to load %s/%s. Load fallback skin %s\n"), sks->fullname, "skinconfig", DEFAULT_SKIN);
+      gui_msg (gui, XUI_MSG_ERROR, _("Failed to load %s/%s. Load fallback skin %s\n"), sks->fullname, "skinconfig", DEFAULT_SKIN);
       sks = gui->skins.default_skin;
       nskin_config = xitk_skin_init_config (gui->xitk);
       if (!nskin_config)
@@ -298,14 +298,14 @@ static int _skin_alter (gGui_t *gui, int index) {
         return old_index;
       }
     } else {
-      xine_error (gui, _("Failed to load %s/%s. Reload old skin '%s'.\n"), sks->fullname, "skinconfig", old_skin);
+      gui_msg (gui, XUI_MSG_ERROR, _("Failed to load %s/%s. Reload old skin '%s'.\n"), sks->fullname, "skinconfig", old_skin);
       return old_index;
     }
   }
   /* Check skin version */
   if (xitk_skin_check_version (nskin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config (nskin_config);
-    xine_error (gui, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), sks->fullname, old_skin);
+    gui_msg (gui, XUI_MSG_ERROR, _("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), sks->fullname, old_skin);
     return old_index;
   }
   gui->skins.current_skin = sks;
@@ -358,7 +358,7 @@ void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
 /*
   sk = _skin_index_location (gui, index);
   if(!sk) {
-    xine_error (gui, _("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
+    gui_msg (gui, XUI_MSG_ERROR, _("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
     sk = gui->skins.default_skin;
     index = _skin_name_index (gui, DEFAULT_SKIN);
   }
@@ -451,7 +451,7 @@ void skin_init (gGui_t *gui) {
 
   sk = _skin_index_location (gui, skin_num);
   if (!sk) {
-    xine_error (gui, _("Ooch, skin '%s' not found, use fallback '%s'.\n"), "", DEFAULT_SKIN);
+    gui_msg (gui, XUI_MSG_ERROR, _("Ooch, skin '%s' not found, use fallback '%s'.\n"), "", DEFAULT_SKIN);
     config_update_num ("gui.skin", _skin_name_index (gui, DEFAULT_SKIN));
     sk = gui->skins.default_skin;
     if(!sk) {

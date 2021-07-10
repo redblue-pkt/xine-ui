@@ -666,7 +666,7 @@ static void fb_getdir(filebrowser_t *fb) {
   if((pdir = opendir(fb->current_dir)) == NULL) {
     char *p = strrchr(fb->current_dir, '/');
 
-    xine_error (fb->gui, _("Unable to open directory '%s': %s."),
+    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to open directory '%s': %s."),
 	       (p && *(p + 1)) ? p + 1 : fb->current_dir, strerror(errno));
 
     /* One step back if dir has a subdir component */
@@ -963,7 +963,7 @@ static void _fb_delete_file_done (void *data, int state) {
       fb->norm_files[sel].name);
 
     if ((unlink (buf)) == -1)
-      xine_error (fb->gui, _("Unable to delete file '%s': %s."), buf, strerror (errno));
+      gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to delete file '%s': %s."), buf, strerror (errno));
     else
       fb_getdir (fb);
   }
@@ -1002,7 +1002,7 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, const char *newname)
 	   fb->norm_files[sel].name);
 
   if((rename(buf, newname)) == -1)
-    xine_error (fb->gui, _("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
+    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
   else
     fb_getdir(fb);
 
@@ -1030,7 +1030,7 @@ static void fb_create_directory_cb(xitk_widget_t *w, void *data, const char *new
 
   (void)w;
   if(!mkdir_safe(newdir))
-    xine_error (fb->gui, _("Unable to create the directory '%s': %s."), newdir, strerror(errno));
+    gui_msg (fb->gui, XUI_MSG_ERROR, _("Unable to create the directory '%s': %s."), newdir, strerror(errno));
   else
     fb_getdir(fb);
 }

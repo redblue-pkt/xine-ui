@@ -330,7 +330,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
-    xine_error (vctrl->gui, _("control: couldn't find image for background\n"));
+    gui_msg (vctrl->gui, XUI_MSG_ERROR, _("control: couldn't find image for background\n"));
     exit(-1);
   }
 
@@ -640,7 +640,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
       bg_image = info ? info->pixmap_img.image : NULL;
     }
     if (!bg_image) {
-      xine_error (vctrl->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+      gui_msg (vctrl->gui, XUI_MSG_ERROR, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
 

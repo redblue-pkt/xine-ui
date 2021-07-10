@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -140,7 +140,7 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
   int          i;
 
   if(kbt == NULL) {
-    xine_error (gGui, _("OOCH: key binding table is NULL.\n"));
+    gui_msg (gGui, XUI_MSG_ERROR, _("OOCH: key binding table is NULL.\n"));
     return;
   }
 
@@ -816,7 +816,7 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
 			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
     }
     else
-      xine_error (gGui, _("You can only delete alias entries."));
+      gui_msg (gGui, XUI_MSG_ERROR, _("You can only delete alias entries."));
 
   }
 }
@@ -870,7 +870,7 @@ static void _kbedit_store_1 (xui_keyedit_t *kbe) {
   switch (kbe->action_wanted) {
     case KBEDIT_ALIASING:
       if (kbe->kbt->num_entries >= MAX_ENTRIES) {
-        xine_error (gGui, _("No more space for additional entries!"));
+        gui_msg (gGui, XUI_MSG_ERROR, _("No more space for additional entries!"));
         return;
       }
       kbe->kbr.entry->is_alias = 1;
@@ -947,7 +947,7 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
     redundant = bkedit_check_redundancy (kbe->kbt, kbe->kbr.entry);
     if (redundant >= 0) {
       /* error, redundant */
-      xine_error (kbe->gui, _("This key binding is redundant with action:\n\"%s\".\n"),
+      gui_msg (kbe->gui, XUI_MSG_ERROR, _("This key binding is redundant with action:\n\"%s\".\n"),
         kbe->kbt->entry[redundant]->comment);
       _kbedit_free_entry (&kbe->kbr.entry);
       return 1;

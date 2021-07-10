@@ -316,7 +316,7 @@ void panel_change_skins (xui_panel_t *panel, int synthetic) {
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
-    xine_error (panel->gui, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
+    gui_msg (panel->gui, XUI_MSG_ERROR, _("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
     exit(-1);
   }
 
@@ -941,11 +941,11 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  */
 static void panel_snapshot_error(void *data, char *message) {
   gGui_t *gui = data;
-  xine_error (gui, "%s", message);
+  gui_msg (gui, XUI_MSG_ERROR, "%s", message);
 }
 static void panel_snapshot_info(void *data, char *message) {
   gGui_t *gui = data;
-  xine_info (gui, "%s", message);
+  gui_msg (gui, XUI_MSG_INFO, "%s", message);
 }
 void panel_snapshot (xitk_widget_t *w, void *data) {
   xui_panel_t *panel = data;
@@ -1198,7 +1198,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
     bg_image = info ? info->pixmap_img.image : NULL;
   }
   if (!bg_image) {
-    xine_error (panel->gui, _("panel: couldn't find image for background\n"));
+    gui_msg (panel->gui, XUI_MSG_ERROR, _("panel: couldn't find image for background\n"));
     free(panel);
     return NULL;
   }
@@ -1216,7 +1216,7 @@ xui_panel_t *panel_init (gGui_t *gui) {
   panel->xwin = xitk_window_create_window_ext (gui->xitk, panel->x, panel->y, width, height, title,
     title, "xine", 0, is_layer_above (panel->gui), panel->gui->icon, bg_image);
   if (!panel->xwin) {
-    xine_error (panel->gui, _("panel: couldn't create window\n"));
+    gui_msg (panel->gui, XUI_MSG_ERROR, _("panel: couldn't create window\n"));
     xitk_image_free_image(&bg_image);
     free(panel);
     return NULL;
