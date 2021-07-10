@@ -1903,7 +1903,8 @@ static int _vwin_handle_be_event (void *data, const xitk_be_event_t *e) {
       break;
     case XITK_EV_EXPOSE:
       if ((e->more == 0) && vwin->gui->vo_port) {
-        xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_EXPOSE_EVENT, (void *)e->id);
+        XExposeEvent ev = { .type = Expose, .window = e->id, .count = 0, .x = e->x, .y = e->y, .width = e->w, .height = e->h };
+        xine_port_send_gui_data (vwin->gui->vo_port, XINE_GUI_SEND_EXPOSE_EVENT, (void *)&ev);
       }
       break;
     case XITK_EV_POS_SIZE:
