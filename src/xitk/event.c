@@ -163,7 +163,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
     return;
 
   if((gui->visual_anim.enabled) && (cfg->num_value == 0) && gui->visual_anim.running)
-    visual_anim_stop();
+    visual_anim_stop (gui);
 
   if(gui->visual_anim.enabled && gui->visual_anim.running) {
     if((gui->visual_anim.enabled == 1) && (cfg->num_value != 1)) {
@@ -171,7 +171,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
 	gui->visual_anim.running = 0;
     }
     if((gui->visual_anim.enabled == 2) && (cfg->num_value != 2)) {
-      visual_anim_stop();
+      visual_anim_stop (gui);
       gui->visual_anim.running = 0;
     }
   }
@@ -192,7 +192,7 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
 	}
       }
       else if(gui->visual_anim.enabled == 2) {
-	visual_anim_play();
+        visual_anim_play (gui);
 	gui->visual_anim.running = 1;
       }
     }
@@ -591,7 +591,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
 #ifdef HAVE_XINERAMA
   case ACTID_TOGGLE_XINERAMA_FULLSCREEN:
-    gui_set_xinerama_fullscreen_mode();
+    gui_set_xinerama_fullscreen_mode (gui);
     break;
 #endif
 
@@ -660,95 +660,95 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
       /* Number is a percentage, range [0..100] */
       if (narg > 100)
         narg = 100;
-      gui_set_current_position ((65535 * narg) / 100);
+      gui_set_current_position (gui, (65535 * narg) / 100);
     }
     break;
 
   case ACTID_SET_CURPOS_0:
-    gui_set_current_position (0);
+    gui_set_current_position (gui, 0);
     break;
 
   case ACTID_SET_CURPOS_10:
-    gui_set_current_position (6553);
+    gui_set_current_position (gui, 6553);
     break;
 
   case ACTID_SET_CURPOS_20:
-    gui_set_current_position (13107);
+    gui_set_current_position (gui, 13107);
     break;
 
   case ACTID_SET_CURPOS_30:
-    gui_set_current_position (19660);
+    gui_set_current_position (gui, 19660);
     break;
 
   case ACTID_SET_CURPOS_40:
-    gui_set_current_position (26214);
+    gui_set_current_position (gui, 26214);
     break;
 
   case ACTID_SET_CURPOS_50:
-    gui_set_current_position (32767);
+    gui_set_current_position (gui, 32767);
     break;
 
   case ACTID_SET_CURPOS_60:
-    gui_set_current_position (39321);
+    gui_set_current_position (gui, 39321);
     break;
 
   case ACTID_SET_CURPOS_70:
-    gui_set_current_position (45874);
+    gui_set_current_position (gui, 45874);
     break;
 
   case ACTID_SET_CURPOS_80:
-    gui_set_current_position (52428);
+    gui_set_current_position (gui, 52428);
     break;
 
   case ACTID_SET_CURPOS_90:
-    gui_set_current_position (58981);
+    gui_set_current_position (gui, 58981);
     break;
 
   case ACTID_SET_CURPOS_100:
-    gui_set_current_position (65535);
+    gui_set_current_position (gui, 65535);
     break;
 
   case ACTID_SEEK_REL_m:
     if (narg >= 0) {
-      gui_seek_relative (-narg);
+      gui_seek_relative (gui, -narg);
     }
     break;
 
   case ACTID_SEEK_REL_p:
     if (narg >= 0)
-      gui_seek_relative (narg);
+      gui_seek_relative (gui, narg);
     break;
 
   case ACTID_SEEK_REL_m60:
-    gui_seek_relative (-60);
+    gui_seek_relative (gui, -60);
     break;
 
   case ACTID_SEEK_REL_m15:
-    gui_seek_relative (-15);
+    gui_seek_relative (gui, -15);
     break;
 
   case ACTID_SEEK_REL_p60:
-    gui_seek_relative (60);
+    gui_seek_relative (gui, 60);
     break;
 
   case ACTID_SEEK_REL_p15:
-    gui_seek_relative (15);
+    gui_seek_relative (gui, 15);
     break;
 
   case ACTID_SEEK_REL_m30:
-    gui_seek_relative (-30);
+    gui_seek_relative (gui, -30);
     break;
 
   case ACTID_SEEK_REL_m7:
-    gui_seek_relative (-7);
+    gui_seek_relative (gui, -7);
     break;
 
   case ACTID_SEEK_REL_p30:
-    gui_seek_relative (30);
+    gui_seek_relative (gui, 30);
     break;
 
   case ACTID_SEEK_REL_p7:
-    gui_seek_relative (7);
+    gui_seek_relative (gui, 7);
     break;
 
   case ACTID_MRLBROWSER:
@@ -841,11 +841,11 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_pVOLUME:
-    gui_increase_audio_volume();
+    gui_increase_audio_volume (gui);
     break;
 
   case ACTID_mVOLUME:
-    gui_decrease_audio_volume();
+    gui_decrease_audio_volume (gui);
     break;
 
   case ACTID_APP:
@@ -857,15 +857,15 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_pAMP:
-    gui_increase_amp_level();
+    gui_increase_amp_level (gui);
     break;
 
   case ACTID_mAMP:
-    gui_decrease_amp_level();
+    gui_decrease_amp_level (gui);
     break;
 
   case ACTID_AMP_RESET:
-    gui_reset_amp_level();
+    gui_reset_amp_level (gui);
     break;
 
   case ACTID_SNAPSHOT:
@@ -873,31 +873,31 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_ZOOM_IN:
-    gui_change_zoom(1,1);
+    gui_change_zoom (gui, 1, 1);
     break;
 
   case ACTID_ZOOM_OUT:
-    gui_change_zoom(-1,-1);
+    gui_change_zoom (gui, -1, -1);
     break;
 
   case ACTID_ZOOM_X_IN:
-    gui_change_zoom(1,0);
+    gui_change_zoom (gui, 1, 0);
     break;
 
   case ACTID_ZOOM_X_OUT:
-    gui_change_zoom(-1,0);
+    gui_change_zoom (gui, -1, 0);
     break;
 
   case ACTID_ZOOM_Y_IN:
-    gui_change_zoom(0,1);
+    gui_change_zoom (gui, 0, 1);
     break;
 
   case ACTID_ZOOM_Y_OUT:
-    gui_change_zoom(0,-1);
+    gui_change_zoom (gui, 0, -1);
     break;
 
   case ACTID_ZOOM_RESET:
-    gui_reset_zoom();
+    gui_reset_zoom (gui);
     break;
 
   case ACTID_GRAB_POINTER:
@@ -915,7 +915,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_TOGGLE_TVMODE:
-    gui_toggle_tvmode();
+    gui_toggle_tvmode (gui);
     break;
 
   case ACTID_TVANALOG:
@@ -956,7 +956,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SUBSELECT:
-    gui_select_sub();
+    gui_select_sub (gui);
     break;
 
   case ACTID_LOOPMODE:
@@ -988,7 +988,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_ADDMEDIAMARK:
-    gui_add_mediamark();
+    gui_add_mediamark (gui);
     break;
 
 #ifdef HAVE_TAR
@@ -1014,7 +1014,7 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_FILESELECTOR:
-    gui_file_selector();
+    gui_file_selector (gui);
     break;
 
   case ACTID_HUECONTROLp:
@@ -1259,8 +1259,8 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
 
   case ACTID_PLAYLIST_OPEN:
     if (sarg) {
-        mediamark_load_mediamarks (sarg);
-        gui_set_current_mmk(mediamark_get_current_mmk());
+        mediamark_load_mediamarks (gui, sarg);
+        gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
         playlist_update_playlist (gui);
         if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
           enable_playback_controls (gui->panel, 1);
@@ -1301,7 +1301,7 @@ int gui_handle_be_event (void *data, const xitk_be_event_t *e) {
       }
       break;
     case XITK_EV_DND:
-      gui_dndcallback (e->utf8);
+      gui_dndcallback (gui, e->utf8);
       break;
     default: return 0;
   }
@@ -1338,14 +1338,14 @@ int gui_playlist_play (gGui_t *gui, int idx) {
 
   if(idx >= gui->playlist.num)
     return 0;
-  gui_set_current_mmk_by_index(idx);
+  gui_set_current_mmk_by_index (gui, idx);
 
   pthread_mutex_lock(&gui->mmk_mutex);
-  if(!gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
-			     gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset,
-			     !mediamark_have_alternates(&(gui->mmk))) &&
+  if (!gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
+    gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset,
+    !mediamark_have_alternates (&(gui->mmk))) &&
      (!mediamark_have_alternates(&(gui->mmk)) ||
-      !gui_open_and_play_alternates(&(gui->mmk), gui->mmk.sub)))
+        !gui_open_and_play_alternates (gui, &(gui->mmk), gui->mmk.sub)))
     ret = 0;
   pthread_mutex_unlock(&gui->mmk_mutex);
   return ret;
@@ -1370,7 +1370,7 @@ void gui_playlist_start_next (gGui_t *gui) {
   }
 
   if (is_playback_widgets_enabled (gui->panel) && (!gui->playlist.num)) {
-    gui_set_current_mmk(NULL);
+    gui_set_current_mmk (gui, NULL);
     enable_playback_controls (gui->panel, 0);
     gui_display_logo (gui);
     return;
@@ -1385,7 +1385,7 @@ void gui_playlist_start_next (gGui_t *gui) {
     if(gui->playlist.cur >= gui->playlist.num) {
       if(gui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) {
 	gui->playlist.cur--;
-	mediamark_reset_played_state();
+	mediamark_reset_played_state (gui);
 
 	if(gui->actions_on_start[0] == ACTID_QUIT)
           gui_exit (NULL, gui);
@@ -1404,13 +1404,13 @@ void gui_playlist_start_next (gGui_t *gui) {
 
   case PLAYLIST_LOOP_SHUFFLE:
   case PLAYLIST_LOOP_SHUF_PLUS:
-    if(!mediamark_all_played()) {
+    if (!mediamark_all_played (gui)) {
 
     __shuffle_restart:
-      gui->playlist.cur = mediamark_get_shuffle_next();
+      gui->playlist.cur = mediamark_get_shuffle_next (gui);
     }
     else {
-      mediamark_reset_played_state();
+      mediamark_reset_played_state (gui);
 
       if(gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS)
 	goto __shuffle_restart;
@@ -1429,7 +1429,7 @@ void gui_playlist_start_next (gGui_t *gui) {
   switch(gui->playlist.loop) {
 
   case PLAYLIST_LOOP_NO_LOOP:
-    if(mediamark_all_played() && (gui->actions_on_start[0] == ACTID_QUIT)) {
+    if (mediamark_all_played (gui) && (gui->actions_on_start[0] == ACTID_QUIT)) {
       gui_exit (NULL, gui);
       return;
     }
@@ -1441,7 +1441,7 @@ void gui_playlist_start_next (gGui_t *gui) {
 
   case PLAYLIST_LOOP_SHUFFLE:
   case PLAYLIST_LOOP_SHUF_PLUS:
-    if(!mediamark_all_played())
+    if (!mediamark_all_played (gui))
       goto __shuffle_restart;
     break;
   }
@@ -1491,12 +1491,12 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
       if(file[strlen(file) - 1] == '/')
 	file[strlen(file) - 1] = '\0';
 
-      mediamark_collect_from_directory(file);
+      mediamark_collect_from_directory (gui, file);
     }
     else {
 
       if(mrl_look_like_playlist(file))
-	(void) mediamark_concat_mediamarks(file);
+	(void) mediamark_concat_mediamarks (gui, file);
       else {
 	char *sub = NULL;
 
@@ -1509,7 +1509,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 	  }
 	}
 
-	mediamark_append_entry((const char *)file, (const char *)file, sub, 0, -1, 0, 0);
+        mediamark_append_entry (gui, (const char *)file, (const char *)file, sub, 0, -1, 0, 0);
       }
     }
   }
@@ -1518,7 +1518,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   if((gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) ||
      (gui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS))
-    gui->playlist.cur = mediamark_get_shuffle_next();
+    gui->playlist.cur = mediamark_get_shuffle_next (gui);
 
   gui->is_display_mrl = 0;
   gui->mrl_overrided  = 0;
@@ -1767,8 +1767,8 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   skin_preinit (gui);
 
-  if(gui->splash)
-    splash_create();
+  if (gui->splash)
+    splash_create (gui);
 
   skin_init (gui);
 
@@ -1787,7 +1787,7 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
    * when done before the video_window_init(). */
   gui->kbindings = kbindings_init_kbinding();
 
-  gui_set_current_mmk(mediamark_get_current_mmk());
+  gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 
   panel_init (gui);
   gui->event_reject = 0;
@@ -1806,7 +1806,7 @@ static void on_start(void *data) {
   _startup_t *startup = (_startup_t *) data;
   gGui_t *gui = startup->gui;
 
-  splash_destroy();
+  splash_destroy (gui);
 
   if(!startup->start) {
 
@@ -1869,11 +1869,11 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)
-	      mediamark_append_entry(autoplay_mrls[j],
+                mediamark_append_entry (gui, autoplay_mrls[j],
 				     autoplay_mrls[j], NULL, 0, -1, 0, 0);
 
 	    gui->playlist.cur = 0;
-	    gui_set_current_mmk(mediamark_get_current_mmk());
+            gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 	  }
 	}
       }
@@ -1947,7 +1947,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
     /* User load a playlist on startup */
     if(actions_on_start(gui->actions_on_start, ACTID_PLAYLIST)) {
-      gui_set_current_mmk(mediamark_get_current_mmk());
+      gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 
       if(gui->playlist.num) {
 	gui->playlist.cur = 0;
@@ -1961,7 +1961,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
 
     /*  The user request "play on start" */
     if(actions_on_start(gui->actions_on_start, ACTID_PLAY)) {
-      if((mediamark_get_current_mrl()) != NULL) {
+      if ((mediamark_get_current_mrl (gui)) != NULL) {
 	auto_start = 1;
       }
     }
@@ -1989,7 +1989,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
-    mediamark_save_mediamarks(buffer);
+    mediamark_save_mediamarks (gui, buffer);
   }
 
   gui->running = 0;

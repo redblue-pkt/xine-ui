@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -30,10 +30,7 @@
 #include "splash.h"
 #include "skins.h"
 
-static xitk_window_t     *xwin = NULL;
-
-void splash_create(void) {
-  gGui_t *gui = gGui;
+void splash_create (gGui_t *gui) {
   xitk_image_t *xim;
   const char   *splash_image = XINE_SPLASH;
   char         *skin_splash_image = NULL;
@@ -59,30 +56,29 @@ void splash_create(void) {
 
   free(skin_path);
 
-  if ((xim = xitk_image_new (gGui->xitk, splash_image, 0, 0, 0))) {
+  if ((xim = xitk_image_new (gui->xitk, splash_image, 0, 0, 0))) {
     int width, height;
 
     width = xitk_image_width(xim);
     height = xitk_image_height(xim);
 
-    xwin = xitk_window_create_window_ext (gGui->xitk, -1, -1, width, height,
-        _("xine Splash"), NULL, "xine", 0, 1, gGui->icon, xim);
-    xitk_window_set_wm_window_type(xwin, WINDOW_TYPE_SPLASH);
-
-    xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
-    xitk_window_raise_window (xwin);
-
+    gui->splash_win = xitk_window_create_window_ext (gui->xitk, -1, -1, width, height,
+        _("xine Splash"), NULL, "xine", 0, 1, gui->icon, xim);
+    if (gui->splash_win) {
+      xitk_window_set_wm_window_type (gui->splash_win, WINDOW_TYPE_SPLASH);
+      xitk_window_flags (gui->splash_win, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+      xitk_window_raise_window (gui->splash_win);
+    }
     xitk_image_free_image(&xim);
   }
 
   free(skin_splash_image);
 }
 
-void splash_destroy(void) {
-
-  if(xwin) {
-    xitk_window_flags (xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
-    xitk_window_destroy_window(xwin);
-    xwin = NULL;
+void splash_destroy (gGui_t *gui) {
+  if (gui->splash_win) {
+    xitk_window_flags (gui->splash_win, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, 0);
+    xitk_window_destroy_window (gui->splash_win);
+    gui->splash_win = NULL;
   }
 }

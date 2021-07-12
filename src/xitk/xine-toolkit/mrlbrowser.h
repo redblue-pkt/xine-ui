@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -56,6 +56,7 @@ typedef struct {
   xitk_be_event_handler_t          *input_cb;
   void                             *input_cb_data;
   xitk_dnd_callback_t               dndcallback;
+  void                             *dnd_cb_data;
 
   struct {
     char                           *caption;

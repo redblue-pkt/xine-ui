@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -22,7 +22,7 @@
 #ifndef SPLASH_H
 #define SPLASH_H
 
-void splash_create(void);
-void splash_destroy(void);
+void splash_create (gGui_t *gui);
+void splash_destroy (gGui_t *gui);
 
 #endif

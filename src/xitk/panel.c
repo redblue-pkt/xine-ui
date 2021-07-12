@@ -973,7 +973,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
     stime = tv.tv_usec / (1000000 / 20) + tv.tv_sec * 20;
     /* printf ("panel_slider_cb: timeslot #%u.\n", stime); */
     if (xitk_is_widget_enabled (panel->playback_widgets.slider_play)) {
-      gui_set_current_position (pos);
+      gui_set_current_position (panel->gui, pos);
       if (stime != panel->playback_widgets.slider_play_time) {
         panel->playback_widgets.slider_play_time = stime;
         if (xine_get_status (panel->gui->stream) != XINE_STATUS_PLAY) {
@@ -991,9 +991,9 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
   else if(w == panel->mixer.slider) {
 
     if (panel->gui->mixer.method == SOUND_CARD_MIXER)
-      change_audio_vol(pos);
+      change_audio_vol (panel->gui, pos);
     else if (panel->gui->mixer.method == SOFTWARE_MIXER)
-      change_amp_vol(pos);
+      change_amp_vol (panel->gui, pos);
 
   }
 

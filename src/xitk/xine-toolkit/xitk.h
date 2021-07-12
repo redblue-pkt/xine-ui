@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -117,7 +117,7 @@ typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_ext_state_callback_t)(xitk_widget_t *, void *, int, int modifiers);
 typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, const char *);
-typedef void (*xitk_dnd_callback_t) (const char *filename);
+typedef void (*xitk_dnd_callback_t) (void *data, const char *filename);
 
 typedef struct {
   int x, y, width, height;

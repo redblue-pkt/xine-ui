@@ -127,7 +127,7 @@ static void changelist (otk_widget_t *list) {
 }
 
 static void playlist_play_cb(void *data, void *entry) {
-
+  gGui_t *gui = gGui;
   pl_session_t *session = (pl_session_t*) data;
   oxine_t *oxine = session->oxine;
   int n = otk_list_get_entry_number(session->list) - 1;
@@ -135,11 +135,11 @@ static void playlist_play_cb(void *data, void *entry) {
   session->listpos = otk_list_get_pos(session->list);
 
   if (session->action == PL_ACTION_PLAY) {
-    gGui->playlist.cur = n;
-    gui_set_current_mmk(gGui->playlist.mmk[n]);
+    gui->playlist.cur = n;
+    gui_set_current_mmk (gui, gui->playlist.mmk[n]);
 
-    if( gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
-        gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0) ) {
+    if (gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
+        gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 0) ) {
 
       oxine->main_window = NULL;
       oxine->info_window = NULL;
@@ -149,7 +149,7 @@ static void playlist_play_cb(void *data, void *entry) {
     } /* else play_error(oxine); */
   }
   if (session->action == PL_ACTION_REMOVE) {
-    playlist_delete_entry (gGui, n);
+    playlist_delete_entry (gui, n);
     playlist_reentry_cb(session);
   }
 }

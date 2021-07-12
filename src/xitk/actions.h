@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -53,16 +53,16 @@ void gui_app_show (xitk_widget_t *w, void *gui);
 /* playlist */
 void gui_display_logo (gGui_t *gui);
 int gui_xine_play (gGui_t *gui, xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
-int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub);
-int gui_xine_open_and_play(char *mrl, char *sub, int start_pos,
-			   int start_time, int av_offset, int spu_offset, int report_error);
-void gui_dndcallback (const char *filename);
+int gui_open_and_play_alternates (gGui_t *gui, mediamark_t *mmk, const char *sub);
+int gui_xine_open_and_play (gGui_t *gui, char *mrl, char *sub, int start_pos,
+    int start_time, int av_offset, int spu_offset, int report_error);
+void gui_dndcallback (void *gui, const char *filename);
 void gui_step_mrl (gGui_t *gui, int by);
 void gui_nextprev_mrl (xitk_widget_t *w, void *gui_nextprev);
-void gui_set_current_mmk(mediamark_t *mmk);
-void gui_set_current_mmk_by_index(int idx);
-void gui_add_mediamark(void);
-void gui_file_selector(void);
+void gui_set_current_mmk (gGui_t *gui, mediamark_t *mmk);
+void gui_set_current_mmk_by_index (gGui_t *gui, int idx);
+void gui_add_mediamark (gGui_t *gui);
+void gui_file_selector (gGui_t *gui);
 
 /* main ctrl */
 void gui_exit (xitk_widget_t *w, void *gui);
@@ -73,8 +73,8 @@ void gui_close (xitk_widget_t *w, void *gui);
 void gui_pause (xitk_widget_t *w, void *gui, int state);
 void gui_eject (xitk_widget_t *w, void *gui);
 void gui_nextprev_speed (xitk_widget_t *w, void *gui_nextprev);
-void gui_set_current_position (int pos);
-void gui_seek_relative (int off_sec) ;
+void gui_set_current_position (gGui_t *gui, int pos);
+void gui_seek_relative (gGui_t *gui, int off_sec);
 int gui_xine_get_pos_length (gGui_t *gui, xine_stream_t *stream, int *pos, int *time, int *length);
 
 /* video */
@@ -82,38 +82,38 @@ void gui_toggle_visibility (gGui_t *gui);
 void gui_toggle_border (gGui_t *gui);
 void gui_set_fullscreen_mode (xitk_widget_t *w, void *gui);
 #ifdef HAVE_XINERAMA
-void gui_set_xinerama_fullscreen_mode(void);
+void gui_set_xinerama_fullscreen_mode (gGui_t *gui);
 #endif
 void gui_toggle_aspect (gGui_t *gui, int aspect);
 void gui_toggle_interlaced (gGui_t *gui);
 void gui_vpp_enable (gGui_t *gui);
-void gui_change_zoom(int zoom_dx, int zoom_dy);
-void gui_reset_zoom(void);
-void gui_toggle_tvmode(void);
+void gui_change_zoom (gGui_t *gui, int zoom_dx, int zoom_dy);
+void gui_reset_zoom (gGui_t *gui);
+void gui_toggle_tvmode (gGui_t *gui);
 
 /* audio */
 void gui_direct_change_audio_channel (xitk_widget_t *w, void *gui, int value);
 void gui_nextprev_audio_channel (xitk_widget_t *w, void *gui_nextprev);
-void change_audio_vol(int value);
-void gui_increase_audio_volume(void);
-void gui_decrease_audio_volume(void);
+void change_audio_vol (gGui_t *gui, int value);
+void gui_increase_audio_volume (gGui_t *gui);
+void gui_decrease_audio_volume (gGui_t *gui);
 void gui_app_enable (gGui_t *gui);
-void change_amp_vol(int value);
-void gui_increase_amp_level(void);
-void gui_decrease_amp_level(void);
-void gui_reset_amp_level(void);
+void change_amp_vol (gGui_t *gui, int value);
+void gui_increase_amp_level (gGui_t *gui);
+void gui_decrease_amp_level (gGui_t *gui);
+void gui_reset_amp_level (gGui_t *gui);
 
 /* subtitle */
 void gui_direct_change_spu_channel (xitk_widget_t *w, void *gui, int value);
 void gui_nextprev_spu_channel (xitk_widget_t *w, void *gui_nextprev);
-void gui_select_sub(void);
+void gui_select_sub (gGui_t *gui);
 
 /* anim */
-void visual_anim_init(void);
-void visual_anim_done(void);
-void visual_anim_add_animation(char *mrl);
-void visual_anim_play(void);
-void visual_anim_play_next(void);
-void visual_anim_stop(void);
+void visual_anim_init (gGui_t *gui);
+void visual_anim_done (gGui_t *gui);
+void visual_anim_add_animation (gGui_t *gui, char *mrl);
+void visual_anim_play (gGui_t *gui);
+void visual_anim_play_next (gGui_t *gui);
+void visual_anim_stop (gGui_t *gui);
 
 #endif

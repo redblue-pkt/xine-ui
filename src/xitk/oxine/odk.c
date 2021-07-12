@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2003 Stefan Holst
+ * Copyright (C) 2002-2021 Stefan Holst
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -466,11 +466,11 @@ void odk_free(odk_t *odk) {
 void odk_enqueue(odk_t *odk, const char *mrl)
 {
   if(mrl_look_like_playlist((char *)mrl)) {
-    if(!mediamark_concat_mediamarks(mrl))
-      mediamark_append_entry(mrl, mrl, NULL, 0, -1, 0, 0);
+    if (!mediamark_concat_mediamarks (odk->gui, mrl))
+      mediamark_append_entry (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
   }
   else
-    mediamark_append_entry(mrl, mrl, NULL, 0, -1, 0, 0);
+    mediamark_append_entry (odk->gui, mrl, mrl, NULL, 0, -1, 0, 0);
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {
@@ -486,9 +486,9 @@ int odk_open_and_play(odk_t *odk, const char *mrl) {
 
   if( odk->gui->playlist.num > entry_num ) {
     odk->gui->playlist.cur = entry_num;
-    gui_set_current_mmk(odk->gui->playlist.mmk[entry_num]);
+    gui_set_current_mmk (odk->gui, odk->gui->playlist.mmk[entry_num]);
 
-    return gui_xine_open_and_play(odk->gui->mmk.mrl, odk->gui->mmk.sub, 0,
+    return gui_xine_open_and_play (odk->gui, odk->gui->mmk.mrl, odk->gui->mmk.sub, 0,
            odk->gui->mmk.start, odk->gui->mmk.av_offset, odk->gui->mmk.spu_offset, 0);
   } else
     return 0;
@@ -562,7 +562,7 @@ int odk_get_seek(odk_t *odk) {
 
 void odk_seek(odk_t *odk, int how) {
 
-  gui_seek_relative(how);
+  gui_seek_relative (odk->gui, how);
 }
 
 void odk_set_speed(odk_t *odk, uint32_t speed) {
@@ -637,7 +637,7 @@ void odk_eject(odk_t *odk) {
 }
 
 const char *odk_get_mrl(odk_t *odk) {
-  return mediamark_get_current_mrl();
+  return mediamark_get_current_mrl (odk->gui);
 }
 
 char *odk_get_meta_info(odk_t *odk, int info) {

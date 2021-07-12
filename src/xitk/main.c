@@ -878,7 +878,7 @@ static void event_listener (void *user_data, const xine_event_t *event) {
     }
     else if(event->stream == gui->visual_anim.stream) {
       /* printf("xitk/main.c: restarting visual stream...\n"); */
-      visual_anim_play_next();
+      visual_anim_play_next (gui);
     }
     break;
 
@@ -1171,14 +1171,14 @@ typedef struct {
       if(ref->alternative == 0) {
         gui->playlist.ref_append++;
         /* FIXME: duration handled correctly? */
-        mediamark_insert_entry(gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL,
+        mediamark_insert_entry (gui, gui->playlist.ref_append, ref->mrl, *title ? title : ref->mrl, NULL,
                                ref->start_time,
                                ref->duration ? (int)(ref->start_time + ref->duration) : -1,
                                0, 0);
       } else {
         /* FIXME: title? start? duration? */
         pthread_mutex_lock (&gui->mmk_mutex);
-	mediamark_t *mmk = mediamark_get_mmk_by_index(gui->playlist.ref_append);
+        mediamark_t *mmk = mediamark_get_mmk_by_index (gui, gui->playlist.ref_append);
 
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
@@ -1311,6 +1311,7 @@ int main(int argc, char *argv[]) {
   gui->nongui_error_msg       = NULL;
   gui->orig_stdout            = stdout;
 
+  gui->splash_win             = NULL;
   gui->panel                  = NULL;
   gui->vwin                   = NULL;
   gui->setup                  = NULL;
@@ -1347,7 +1348,7 @@ int main(int argc, char *argv[]) {
     pthread_mutexattr_destroy (&attr);
   }
 
-  visual_anim_init();
+  visual_anim_init (gui);
 
   /*
    * parse command line
@@ -1552,7 +1553,7 @@ int main(int argc, char *argv[]) {
 
     case 'N':
       if (optarg) {
-        visual_anim_add_animation(optarg);
+        visual_anim_add_animation (gui, optarg);
       }
       break;
 
@@ -1563,9 +1564,9 @@ int main(int argc, char *argv[]) {
 
       pthread_mutex_lock (&gui->mmk_mutex);
       if(!gui->playlist.mmk)
-	mediamark_load_mediamarks(optarg);
+        mediamark_load_mediamarks (gui, optarg);
       else
-	mediamark_concat_mediamarks(optarg);
+        mediamark_concat_mediamarks (gui, optarg);
       pthread_mutex_unlock (&gui->mmk_mutex);
 
       /* don't load original playlist when loading this one */
@@ -1882,7 +1883,7 @@ int main(int argc, char *argv[]) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 2];
 
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
-    mediamark_load_mediamarks(buffer);
+    mediamark_load_mediamarks (gui, buffer);
   }
 
   gui->subtitle_autoload =
@@ -2130,7 +2131,7 @@ int main(int argc, char *argv[]) {
 
   xine_exit (gui->xine);
 
-  visual_anim_done();
+  visual_anim_done (gui);
   free(pplugins);
 
   if(session_argv_num) {
