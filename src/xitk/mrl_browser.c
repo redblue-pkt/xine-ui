@@ -287,6 +287,7 @@ static xui_mrlb_t *mrl_browser (gGui_t *gui,
   mb.origin.cur_origin        = NULL;
 
   mb.dndcallback              = dnd_cb;
+  mb.dnd_cb_data              = gui;
   mb.input_cb                 = gui_handle_be_event;
   mb.input_cb_data            = gui;
 
@@ -373,11 +374,11 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
         playlist_toggle_visibility (mrlb->gui);
     }
 
-    mediamark_append_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
+    mediamark_append_entry (mrlb->gui, (char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
 
     if ((!num) && ((xine_get_status (mrlb->gui->stream) == XINE_STATUS_STOP) || mrlb->gui->logo_mode)) {
       mrlb->gui->playlist.cur = mrlb->gui->playlist.num - 1;
-      gui_set_current_mmk(mediamark_get_current_mmk());
+      gui_set_current_mmk (mrlb->gui, mediamark_get_current_mmk (mrlb->gui));
     }
 
     playlist_update_playlist (mrlb->gui);
@@ -401,7 +402,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
         playlist_toggle_visibility (mrlb->gui);
     }
 
-    gui_dndcallback((char *)mrl->mrl);
+    gui_dndcallback (mrlb->gui, (const char *)mrl->mrl);
   }
 }
 
@@ -426,9 +427,9 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       enable_playback_controls (mrlb->gui->panel, 1);
 
     if(mrl_look_like_playlist(_mrl)) {
-      if(mediamark_concat_mediamarks(_mrl)) {
-	gui_set_current_mmk(mediamark_get_current_mmk());
-	_mrl = (char *) mediamark_get_current_mrl();
+      if (mediamark_concat_mediamarks (mrlb->gui, _mrl)) {
+        gui_set_current_mmk (mrlb->gui, mediamark_get_current_mmk (mrlb->gui));
+        _mrl = (char *) mediamark_get_current_mrl (mrlb->gui);
         playlist_update_playlist (mrlb->gui);
       }
     }
@@ -458,7 +459,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     mmk.got_alternate = 0;
     mmk.alternates    = NULL;
     mmk.cur_alt       = NULL;
-    gui_set_current_mmk(&mmk);
+    gui_set_current_mmk (mrlb->gui, &mmk);
   }
 }
 

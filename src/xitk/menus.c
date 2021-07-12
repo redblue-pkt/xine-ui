@@ -235,14 +235,14 @@ static void _menu_action (xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
               int j;
               /* Flush playlist in newbie mode */
               if (gui->smart_mode) {
-                mediamark_free_mediamarks ();
+                mediamark_free_mediamarks (gui);
                 playlist_update_playlist (gui);
               }
               for (j = 0; j < num_mrls; j++)
-                mediamark_append_entry (autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
+                mediamark_append_entry (gui, autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
               gui->playlist.cur = gui->playlist.num ? 0 : -1;
               if (gui->playlist.cur == 0)
-                gui_set_current_mmk (mediamark_get_current_mmk ());
+                gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
               /* If we're in newbie mode, start playback immediately
                * (even ignoring if we're currently playing something */
               if (gui->smart_mode) {

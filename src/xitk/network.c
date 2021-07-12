@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -1871,9 +1871,9 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	xine_stop (gui->stream);
 	gui->playlist.cur--;
 	if ((gui->playlist.cur >= 0) && (gui->playlist.cur < gui->playlist.num)) {
-	  gui_set_current_mmk(mediamark_get_current_mmk());
+          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
           pthread_mutex_lock (&gui->mmk_mutex);
-	  (void) gui_xine_open_and_play(gui->mmk.mrl, gui->mmk.sub, 0,
+          (void)gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
 					gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 1);
           pthread_mutex_unlock (&gui->mmk_mutex);
 
@@ -1891,12 +1891,12 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	int argc = 2;
 
 	while((get_arg(client_info, argc)) != NULL) {
-	  gui_dndcallback((char *)(get_arg(client_info, argc)));
+          gui_dndcallback (gui, (char *)(get_arg(client_info, argc)));
 	  argc++;
 	}
       }
       else if (is_arg_contain(client_info, 1, "play")) {
-	gui_dndcallback((char *)(get_arg(client_info, 2)));
+        gui_dndcallback (gui, (char *)(get_arg(client_info, 2)));
 
 	if((xine_get_status(gui->stream) != XINE_STATUS_STOP)) {
 	  gui->ignore_next = 1;
@@ -1904,7 +1904,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
 	  gui->ignore_next = 0;
 	}
         pthread_mutex_lock (&gui->mmk_mutex);
-	gui_set_current_mmk(gui->playlist.mmk[gui->playlist.num - 1]);
+        gui_set_current_mmk (gui, gui->playlist.mmk[gui->playlist.num - 1]);
 	if(!(xine_open(gui->stream, gui->mmk.mrl)
 	     && xine_play (gui->stream, 0, gui->mmk.start))) {
 	  handle_xine_error(client_info);
@@ -1965,7 +1965,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	    }
 
 	    gui->playlist.cur = entry;
-	    gui_set_current_mmk(mediamark_get_current_mmk());
+            gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
             gui_play (NULL, gui);
 	  }
 	}
@@ -1989,7 +1989,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 
 	if((j >= 0) && (j <= gui->playlist.num)) {
 	  gui->playlist.cur = j;
-	  gui_set_current_mmk(mediamark_get_current_mmk());
+          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP) {
 	    gui->ignore_next = 1;
@@ -2005,7 +2005,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	if((is_arg_contain(client_info, 2, "all")) ||
 	   (is_arg_contain(client_info, 2, "*"))) {
 
-	  mediamark_free_mediamarks();
+          mediamark_free_mediamarks (gui);
 
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
             gui_stop (NULL, gui);
@@ -2023,7 +2023,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
               gui_stop (NULL, gui);
 
             pthread_mutex_lock (&gui->mmk_mutex);
-            mediamark_delete_entry(j);
+            mediamark_delete_entry (gui, j);
 	    gui->playlist.cur = 0;
             pthread_mutex_unlock (&gui->mmk_mutex);
 	  }
@@ -2032,7 +2032,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
         playlist_update_playlist (gui);
 
 	if(gui->playlist.num)
-	  gui_set_current_mmk(mediamark_get_current_mmk());
+          gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 	else {
 
           if (is_playback_widgets_enabled (gui->panel))
@@ -2041,7 +2041,7 @@ static void do_playlist(const commands_t *cmd, client_info_t *client_info) {
 	  if(xine_get_status(gui->stream) != XINE_STATUS_STOP)
             gui_stop (NULL, gui);
 
-	  gui_set_current_mmk(NULL);
+          gui_set_current_mmk (gui, NULL);
 	}
       }
     }

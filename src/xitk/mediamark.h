@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -63,29 +63,31 @@ void mediamark_unset_got_alternate(mediamark_t *mmk);
 int mediamark_free_mmk(mediamark_t **mmk);
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
-void mediamark_insert_entry(int index, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_append_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_free_mediamarks(void);
+void mediamark_insert_entry (gGui_t *gui, int index, const char *mrl, const char *ident,
+  const char *sub, int start, int end, int av_offset, int spu_offset);
+void mediamark_append_entry (gGui_t *gui, const char *mrl, const char *ident,
+  const char *sub, int start, int end, int av_offset, int spu_offset);
+void mediamark_free_mediamarks (gGui_t *gui);
 void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
-void mediamark_delete_entry(int offset);
-void mediamark_reset_played_state(void);
-int mediamark_all_played(void);
-int mediamark_get_shuffle_next(void);
-int mediamark_get_entry_from_id(const char *ident);
+void mediamark_delete_entry (gGui_t *gui, int offset);
+void mediamark_reset_played_state (gGui_t *gui);
+int mediamark_all_played (gGui_t *gui);
+int mediamark_get_shuffle_next (gGui_t *gui);
+int mediamark_get_entry_from_id (gGui_t *gui, const char *ident);
 
-mediamark_t *mediamark_get_current_mmk(void);
-const char *mediamark_get_current_mrl(void);
-const char *mediamark_get_current_ident(void);
-const char *mediamark_get_current_sub(void);
-mediamark_t *mediamark_get_mmk_by_index(int index);
+mediamark_t *mediamark_get_current_mmk (gGui_t *gui);
+const char *mediamark_get_current_mrl (gGui_t *gui);
+const char *mediamark_get_current_ident (gGui_t *gui);
+const char *mediamark_get_current_sub (gGui_t *gui);
+mediamark_t *mediamark_get_mmk_by_index (gGui_t *gui, int index);
 
-int mediamark_concat_mediamarks(const char *filename);
-void mediamark_load_mediamarks(const char *filename);
-void mediamark_save_mediamarks(const char *filename);
+int mediamark_concat_mediamarks (gGui_t *gui, const char *filename);
+void mediamark_load_mediamarks (gGui_t *gui, const char *filename);
+void mediamark_save_mediamarks (gGui_t *gui, const char *filename);
 
 int mrl_look_like_playlist (const char *mrl);
 int mrl_look_like_file(char *mrl);
-void mediamark_collect_from_directory(char *filepathname);
+void mediamark_collect_from_directory (gGui_t *gui, char *filepathname);
 
 void mmk_editor_show_tips (gGui_t *gui, int enabled, unsigned long timeout);
 void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callback, void *data);

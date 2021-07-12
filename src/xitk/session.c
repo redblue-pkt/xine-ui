@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2019 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -286,7 +286,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
           gui_stop (NULL, gui);
 
         gui->playlist.cur = 0;
-	gui_set_current_mmk(mediamark_get_current_mmk());
+        gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
         gui_play (NULL, gui);
       }
       send_ack(shdr);
@@ -298,7 +298,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
           gui_stop (NULL, gui);
 
         gui->playlist.cur = gui->playlist.num - 1;
-	gui_set_current_mmk(mediamark_get_current_mmk());
+        gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
         gui_play (NULL, gui);
       }
       send_ack(shdr);
@@ -310,7 +310,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_ADD:
-      gui_dndcallback((char *)shdr->data);
+      gui_dndcallback (gui, (char *)shdr->data);
       send_ack(shdr);
       break;
 
@@ -325,8 +325,8 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_LOAD:
-      mediamark_load_mediamarks((const char *)shdr->data);
-      gui_set_current_mmk(mediamark_get_current_mmk());
+        mediamark_load_mediamarks (gui, (const char *)shdr->data);
+      gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
       playlist_update_playlist (gui);
       if ((!is_playback_widgets_enabled (gui->panel)) && gui->playlist.num)
         enable_playback_controls (gui->panel, 1);
@@ -351,9 +351,9 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 
         if ((gui->mixer.method == SOUND_CARD_MIXER) &&
           (gui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
-	  change_audio_vol(*vol);
+          change_audio_vol (gui, *vol);
         else if ((gui->mixer.method == SOFTWARE_MIXER) && ((*vol >= 0) && (*vol <= 200)))
-	  change_amp_vol(*vol);
+          change_amp_vol (gui, *vol);
 
 	send_ack(shdr);
       }
@@ -364,7 +364,7 @@ static __attribute__((noreturn)) void *ctrlsocket_func(void *data) {
 	int *amp = (int *)shdr->data;
 
 	if((*amp >= 0) && (*amp <= 200))
-	  change_amp_vol(*amp);
+          change_amp_vol (gui, *amp);
 
 	send_ack(shdr);
       }

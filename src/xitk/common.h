@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -335,6 +335,7 @@ struct gGui_st {
     int                      level;
   } no_messages;
 
+  xitk_window_t             *splash_win;
   xui_panel_t               *panel;
   xui_vwin_t                *vwin;
   xui_setup_t               *setup;

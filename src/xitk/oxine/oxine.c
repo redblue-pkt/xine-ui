@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002-2008 Stefan Holst
- * Copyright (C) 2005-2020 the xine project
+ * Copyright (C) 2005-2021 the xine project
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -313,7 +313,7 @@ static void autoplay_cb (void *data) {
     playlist_delete_all (gui);
 
     for (j = 0; j < num_mrls; j++)
-      mediamark_append_entry((const char *)autoplay_mrls[j],
+        mediamark_append_entry (gui, (const char *)autoplay_mrls[j],
                              (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
 
     oxine->pauseplay = NULL;
@@ -322,9 +322,9 @@ static void autoplay_cb (void *data) {
     oxine->mode = OXINE_MODE_NORMAL;
 
     gui->playlist.cur = 0;
-    gui_set_current_mmk(mediamark_get_current_mmk());
+    gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 
-    gui_xine_open_and_play (gui->mmk.mrl, gui->mmk.sub, 0,
+    gui_xine_open_and_play (gui, gui->mmk.mrl, gui->mmk.sub, 0,
                            gui->mmk.start, gui->mmk.av_offset, gui->mmk.spu_offset, 0);
   }
 

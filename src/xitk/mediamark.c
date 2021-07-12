@@ -2341,8 +2341,7 @@ static mediamark_t **guess_xml_based_playlist (_lf_t *lf) {
 /*
  * Public
  */
-int mediamark_get_entry_from_id(const char *ident) {
-  gGui_t *gui = gGui;
+int mediamark_get_entry_from_id (gGui_t *gui, const char *ident) {
   if(ident && gui->playlist.num) {
     int i;
 
@@ -2354,9 +2353,8 @@ int mediamark_get_entry_from_id(const char *ident) {
   return -1;
 }
 
-void mediamark_insert_entry(int index, const char *mrl, const char *ident,
+void mediamark_insert_entry (gGui_t *gui, int index, const char *mrl, const char *ident,
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
-  gGui_t *gui = gGui;
   char  autosub[2*XITK_PATH_MAX + XITK_NAME_MAX + 2];
   char  subpath[XITK_PATH_MAX + XITK_NAME_MAX + 2];
   DIR           *dir;
@@ -2447,16 +2445,12 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
     gui->playlist.num++;
 }
 
-void mediamark_append_entry(const char *mrl, const char *ident,
-			    const char *sub, int start, int end, int av_offset, int spu_offset) {
-  gGui_t *gui = gGui;
-
-  mediamark_insert_entry(gui->playlist.num, mrl, ident, sub, start, end, av_offset, spu_offset);
+void mediamark_append_entry (gGui_t *gui, const char *mrl, const char *ident,
+  const char *sub, int start, int end, int av_offset, int spu_offset) {
+  mediamark_insert_entry (gui, gui->playlist.num, mrl, ident, sub, start, end, av_offset, spu_offset);
 }
 
-void mediamark_free_mediamarks(void) {
-  gGui_t *gui = gGui;
-
+void mediamark_free_mediamarks (gGui_t *gui) {
   if(gui->playlist.num > 0) {
     int i;
 
@@ -2469,9 +2463,7 @@ void mediamark_free_mediamarks(void) {
   }
 }
 
-void mediamark_reset_played_state(void) {
-  gGui_t *gui = gGui;
-
+void mediamark_reset_played_state (gGui_t *gui) {
   if(gui->playlist.num) {
     int i;
 
@@ -2480,9 +2472,7 @@ void mediamark_reset_played_state(void) {
   }
 }
 
-int mediamark_all_played(void) {
-  gGui_t *gui = gGui;
-
+int mediamark_all_played (gGui_t *gui) {
   if(gui->playlist.num) {
     int i;
 
@@ -2495,8 +2485,7 @@ int mediamark_all_played(void) {
   return 1;
 }
 
-int mediamark_get_shuffle_next(void) {
-  gGui_t *gui = gGui;
+int mediamark_get_shuffle_next (gGui_t *gui) {
   int  next = 0;
 
   if(gui->playlist.num >= 3 && gui->playlist.cur >= 0) {
@@ -2556,9 +2545,7 @@ void mediamark_replace_entry(mediamark_t **mmk,
   (void) mediamark_store_mmk(mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
 }
 
-mediamark_t *mediamark_get_current_mmk(void) {
-  gGui_t *gui = gGui;
-
+mediamark_t *mediamark_get_current_mmk (gGui_t *gui) {
   if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[gui->playlist.cur])
     return gui->playlist.mmk[gui->playlist.cur];
@@ -2566,9 +2553,7 @@ mediamark_t *mediamark_get_current_mmk(void) {
   return (mediamark_t *) NULL;
 }
 
-mediamark_t *mediamark_get_mmk_by_index(int index) {
-  gGui_t *gui = gGui;
-
+mediamark_t *mediamark_get_mmk_by_index (gGui_t *gui, int index) {
   if(index < gui->playlist.num && index >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[index])
     return gui->playlist.mmk[index];
@@ -2576,9 +2561,7 @@ mediamark_t *mediamark_get_mmk_by_index(int index) {
   return (mediamark_t *) NULL;
 }
 
-const char *mediamark_get_current_mrl(void) {
-  gGui_t *gui = gGui;
-
+const char *mediamark_get_current_mrl (gGui_t *gui) {
   if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[gui->playlist.cur] &&
      gui->playlist.cur < gui->playlist.num)
@@ -2587,9 +2570,7 @@ const char *mediamark_get_current_mrl(void) {
   return NULL;
 }
 
-const char *mediamark_get_current_ident(void) {
-  gGui_t *gui = gGui;
-
+const char *mediamark_get_current_ident (gGui_t *gui) {
   if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[gui->playlist.cur])
     return gui->playlist.mmk[gui->playlist.cur]->ident;
@@ -2597,9 +2578,7 @@ const char *mediamark_get_current_ident(void) {
   return NULL;
 }
 
-const char *mediamark_get_current_sub(void) {
-  gGui_t *gui = gGui;
-
+const char *mediamark_get_current_sub (gGui_t *gui) {
   if(gui->playlist.num && gui->playlist.cur >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[gui->playlist.cur])
     return gui->playlist.mmk[gui->playlist.cur]->sub;
@@ -2607,9 +2586,7 @@ const char *mediamark_get_current_sub(void) {
   return NULL;
 }
 
-void mediamark_delete_entry(int offset) {
-  gGui_t *gui = gGui;
-
+void mediamark_delete_entry (gGui_t *gui, int offset) {
   if(offset < gui->playlist.num && offset >= 0 && gui->playlist.mmk &&
      gui->playlist.mmk[offset]) {
 
@@ -2641,8 +2618,7 @@ static _lf_t *_lf_get (gGui_t *gui, const char *_filename) {
   return lf;
 }
 
-int mediamark_concat_mediamarks(const char *filename) {
-  gGui_t *gui = gGui;
+int mediamark_concat_mediamarks (gGui_t *gui, const char *filename) {
   _lf_t *lf;
   size_t i;
   mediamark_t **mmk = NULL;
@@ -2679,7 +2655,7 @@ int mediamark_concat_mediamarks(const char *filename) {
   gui->playlist.cur = gui->playlist.num;
 
   for (i = 0; i < lf->num_entries; i++)
-    mediamark_append_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub,
+    mediamark_append_entry (gui, mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub,
 			   mmk[i]->start, mmk[i]->end, mmk[i]->av_offset, mmk[i]->spu_offset);
 
   for (i = 0; i < lf->num_entries; i++)
@@ -2690,8 +2666,7 @@ int mediamark_concat_mediamarks(const char *filename) {
   return 1;
 }
 
-void mediamark_load_mediamarks(const char *filename) {
-  gGui_t *gui = gGui;
+void mediamark_load_mediamarks (gGui_t *gui, const char *filename) {
   _lf_t *lf;
   int i, onum;
   mediamark_t **mmk = NULL, **ommk;
@@ -2732,7 +2707,7 @@ void mediamark_load_mediamarks(const char *filename) {
   gui->playlist.num = lf->num_entries;
 
   if(gui->playlist.loop == PLAYLIST_LOOP_SHUFFLE)
-    gui->playlist.cur = mediamark_get_shuffle_next();
+    gui->playlist.cur = mediamark_get_shuffle_next (gui);
   else
     gui->playlist.cur = 0;
 
@@ -2744,8 +2719,7 @@ void mediamark_load_mediamarks(const char *filename) {
   _lf_delete (lf);
 }
 
-void mediamark_save_mediamarks(const char *filename) {
-  gGui_t *gui = gGui;
+void mediamark_save_mediamarks (gGui_t *gui, const char *filename) {
   char *fullfn;
   char *pn;
   char *fn;
@@ -2830,7 +2804,7 @@ int mrl_look_like_file(char *mrl) {
   return 1;
 }
 
-void mediamark_collect_from_directory(char *filepathname) {
+void mediamark_collect_from_directory (gGui_t *gui, char *filepathname) {
   DIR           *dir;
   struct dirent *dentry;
 
@@ -2848,7 +2822,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	  if(!((strlen(dentry->d_name) == 1) && (dentry->d_name[0] == '.'))
 	     && !((strlen(dentry->d_name) == 2) &&
 		  ((dentry->d_name[0] == '.') && dentry->d_name[1] == '.'))) {
-	    mediamark_collect_from_directory(fullpathname);
+            mediamark_collect_from_directory (gui, fullpathname);
 	  }
 	}
 	else {
@@ -2871,7 +2845,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	      ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
 
             if (strstr(valid_endings, lo_ext)) {
-              mediamark_append_entry(fullpathname, fullpathname, NULL, 0, -1, 0, 0);
+              mediamark_append_entry (gui, fullpathname, fullpathname, NULL, 0, -1, 0, 0);
             }
 	  }
 	}
