@@ -624,8 +624,7 @@ static void show_usage (void) {
 /*
  * Try to load video output plugin, by stored name or probing
  */
-static xine_video_port_t *load_video_out_driver(int driver_number, char **video_driver_ids) {
-  gGui_t *gui = gGui;
+static xine_video_port_t *load_video_out_driver(gGui_t *gui, int driver_number, char **video_driver_ids) {
   xine_video_port_t      *video_port = NULL;
   void                   *vis;
   int                     driver_num;
@@ -741,8 +740,7 @@ static xine_video_port_t *load_video_out_driver(int driver_number, char **video_
 /*
  * Try to load audio output plugin, by stored name or probing
  */
-static xine_audio_port_t *load_audio_out_driver(int driver_number, char **audio_driver_ids) {
-  gGui_t                 *gui = gGui;
+static xine_audio_port_t *load_audio_out_driver(gGui_t *gui, int driver_number, char **audio_driver_ids) {
   xine_audio_port_t      *audio_port = NULL;
   int                     driver_num;
 
@@ -1981,7 +1979,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    gui->vo_port = load_video_out_driver(driver_num, video_driver_ids);
+    gui->vo_port = load_video_out_driver(gui, driver_num, video_driver_ids);
 
     if(xine_config_lookup_entry (gui->xine, "video.driver", &cfg_vo_entry)) {
 
@@ -2039,7 +2037,7 @@ int main(int argc, char *argv[]) {
 	}
       }
     }
-    gui->ao_port = load_audio_out_driver(driver_num, audio_driver_ids);
+    gui->ao_port = load_audio_out_driver(gui, driver_num, audio_driver_ids);
 
     for (i = 0; audio_driver_ids[i]; i++)
       free (audio_driver_ids[i]);

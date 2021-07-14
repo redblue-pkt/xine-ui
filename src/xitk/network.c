@@ -1609,8 +1609,7 @@ static void check_client_auth(client_info_t *client_info) {
   sock_write(client_info->socket, "user '%s' isn't known/authorized.\n", client_info->name);
 }
 
-static void handle_xine_error(client_info_t *client_info) {
-  gGui_t *gui = gGui;
+static void handle_xine_error(gGui_t *gui, client_info_t *client_info) {
   int err;
 
   err = xine_get_error(gui->stream);
@@ -1907,7 +1906,7 @@ static void do_mrl(const commands_t *cmd, client_info_t *client_info) {
         gui_set_current_mmk (gui, gui->playlist.mmk[gui->playlist.num - 1]);
 	if(!(xine_open(gui->stream, gui->mmk.mrl)
 	     && xine_play (gui->stream, 0, gui->mmk.start))) {
-	  handle_xine_error(client_info);
+          handle_xine_error(gui, client_info);
           gui_display_logo (gui);
 	}
 	else
@@ -2054,7 +2053,7 @@ static void do_play(const commands_t *cmd, client_info_t *client_info) {
   if (xine_get_status (gui->stream) != XINE_STATUS_PLAY) {
     pthread_mutex_lock (&gui->mmk_mutex);
     if(!(xine_open(gui->stream, gui->mmk.mrl) && xine_play (gui->stream, 0, gui->mmk.start))) {
-      handle_xine_error(client_info);
+      handle_xine_error(gui, client_info);
       gui_display_logo (gui);
     }
     else

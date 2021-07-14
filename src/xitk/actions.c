@@ -349,8 +349,7 @@ static void free_mmk(gGui_t *gui) {
     mediamark_free_alternates(&(gui->mmk));
 }
 
-static void set_mmk(mediamark_t *mmk) {
-  gGui_t *gui = gGui;
+static void set_mmk(gGui_t *gui, mediamark_t *mmk) {
 
   pthread_mutex_lock (&gui->mmk_mutex);
   free_mmk(gui);
@@ -381,8 +380,7 @@ static void set_mmk(mediamark_t *mmk) {
   pthread_mutex_unlock (&gui->mmk_mutex);
 }
 
-static void mmk_set_update(void) {
-  gGui_t *gui = gGui;
+static void mmk_set_update(gGui_t *gui) {
 
   video_window_set_mrl (gui->vwin, gui->mmk.ident);
   event_sender_update_menu_buttons (gui);
@@ -1484,8 +1482,8 @@ void gui_dndcallback (void *_gui, const char *filename) {
 	else
 	  gui->playlist.cur = gui->playlist.num - 1;
 
-        set_mmk (mediamark_get_current_mmk (gui));
-        mmk_set_update();
+        set_mmk (gui, mediamark_get_current_mmk (gui));
+        mmk_set_update(gui);
 	if(gui->smart_mode)
           gui_play (NULL, gui);
 
@@ -1683,19 +1681,19 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
 void gui_set_current_mmk (gGui_t *gui, mediamark_t *mmk) {
   pthread_mutex_lock(&gui->mmk_mutex);
-  set_mmk(mmk);
+  set_mmk(gui, mmk);
   pthread_mutex_unlock(&gui->mmk_mutex);
 
-  mmk_set_update();
+  mmk_set_update(gui);
 }
 
 void gui_set_current_mmk_by_index (gGui_t *gui, int idx) {
   pthread_mutex_lock(&gui->mmk_mutex);
-  set_mmk(mediamark_get_mmk_by_index (gui, idx));
+  set_mmk(gui, mediamark_get_mmk_by_index (gui, idx));
   gui->playlist.cur = idx;
   pthread_mutex_unlock(&gui->mmk_mutex);
 
-  mmk_set_update();
+  mmk_set_update(gui);
 }
 
 void gui_control_show(xitk_widget_t *w, void *data) {
