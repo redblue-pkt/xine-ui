@@ -1267,6 +1267,7 @@ void playlist_editor (gGui_t *gui) {
   playlist_show_tips (pl->gui, panel_get_tips_enable (pl->gui->panel), panel_get_tips_timeout (pl->gui->panel));
 
   pl->widget_key = xitk_be_register_event_handler ("playlist", pl->xwin, playlist_event, pl, NULL, NULL);
+  xitk_window_flags (pl->xwin, XITK_WINF_DND, XITK_WINF_DND);
 
   pl->visible = 1;
 
