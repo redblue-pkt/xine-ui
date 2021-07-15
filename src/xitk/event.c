@@ -665,47 +665,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SET_CURPOS_0:
-    gui_set_current_position (gui, 0);
-    break;
-
   case ACTID_SET_CURPOS_10:
-    gui_set_current_position (gui, 6553);
-    break;
-
   case ACTID_SET_CURPOS_20:
-    gui_set_current_position (gui, 13107);
-    break;
-
   case ACTID_SET_CURPOS_30:
-    gui_set_current_position (gui, 19660);
-    break;
-
   case ACTID_SET_CURPOS_40:
-    gui_set_current_position (gui, 26214);
-    break;
-
   case ACTID_SET_CURPOS_50:
-    gui_set_current_position (gui, 32767);
-    break;
-
   case ACTID_SET_CURPOS_60:
-    gui_set_current_position (gui, 39321);
-    break;
-
   case ACTID_SET_CURPOS_70:
-    gui_set_current_position (gui, 45874);
-    break;
-
   case ACTID_SET_CURPOS_80:
-    gui_set_current_position (gui, 52428);
-    break;
-
   case ACTID_SET_CURPOS_90:
-    gui_set_current_position (gui, 58981);
-    break;
-
   case ACTID_SET_CURPOS_100:
-    gui_set_current_position (gui, 65535);
+    gui_set_current_position (gui, (action - ACTID_SET_CURPOS_0) * 65535 / 10);
     break;
 
   case ACTID_SEEK_REL_m:
@@ -720,35 +690,17 @@ void gui_execute_action_id (gGui_t *gui, action_id_t action) {
     break;
 
   case ACTID_SEEK_REL_m60:
-    gui_seek_relative (gui, -60);
-    break;
-
-  case ACTID_SEEK_REL_m15:
-    gui_seek_relative (gui, -15);
-    break;
-
   case ACTID_SEEK_REL_p60:
-    gui_seek_relative (gui, 60);
-    break;
-
+  case ACTID_SEEK_REL_m15:
   case ACTID_SEEK_REL_p15:
-    gui_seek_relative (gui, 15);
-    break;
-
   case ACTID_SEEK_REL_m30:
-    gui_seek_relative (gui, -30);
-    break;
-
-  case ACTID_SEEK_REL_m7:
-    gui_seek_relative (gui, -7);
-    break;
-
   case ACTID_SEEK_REL_p30:
-    gui_seek_relative (gui, 30);
-    break;
-
+  case ACTID_SEEK_REL_m7:
   case ACTID_SEEK_REL_p7:
-    gui_seek_relative (gui, 7);
+    {
+      static const int8_t v[] = {-60, 60, -15, 15, -30, 30, -7, 7};
+      gui_seek_relative (gui, v[action - ACTID_SEEK_REL_m60]);
+    }
     break;
 
   case ACTID_MRLBROWSER:

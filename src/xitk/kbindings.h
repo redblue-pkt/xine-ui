@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -67,6 +67,7 @@ typedef enum {
   ACTID_MRL_SELECT,
   ACTID_EVENT_SENDER,
   ACTID_EJECT,
+  /* keep order, see event.c */
   ACTID_SET_CURPOS,
   ACTID_SET_CURPOS_0,
   ACTID_SET_CURPOS_10,
@@ -79,8 +80,10 @@ typedef enum {
   ACTID_SET_CURPOS_80,
   ACTID_SET_CURPOS_90,
   ACTID_SET_CURPOS_100,
+  /* /keep order */
   ACTID_SEEK_REL_m,
   ACTID_SEEK_REL_p,
+  /* keep order, see event.c */
   ACTID_SEEK_REL_m60,
   ACTID_SEEK_REL_p60,
   ACTID_SEEK_REL_m15,
@@ -89,6 +92,7 @@ typedef enum {
   ACTID_SEEK_REL_p30,
   ACTID_SEEK_REL_m7,
   ACTID_SEEK_REL_p7,
+  /* /keep order */
   ACTID_MRLBROWSER,
   ACTID_MUTE,
   ACTID_AV_SYNC_p3600,
