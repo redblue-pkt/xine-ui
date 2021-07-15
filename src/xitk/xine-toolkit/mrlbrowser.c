@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -101,6 +101,8 @@ typedef struct {
   void                      *ip_userdata;
   xitk_be_event_handler_t   *input_cb;
   void                      *input_cb_data;
+  xitk_dnd_callback_t        dnd_cb;
+  void                      *dnd_cb_data;
 
 } _mrlbrowser_private_t;
 
@@ -915,6 +917,11 @@ static int mrlbrowser_event (void *data, const xitk_be_event_t *e) {
           }
         default: ;
       }
+      break;
+    case XITK_EV_DND:
+      if (wp->dnd_cb)
+        wp->dnd_cb (wp->dnd_cb_data, e->utf8);
+      break;
     default: ;
   }
   if (wp->input_cb)
@@ -957,6 +964,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
   wp->xine              = mb->xine;
   wp->input_cb          = mb->input_cb;
   wp->input_cb_data     = mb->input_cb_data;
+  wp->dnd_cb            = mb->dndcallback;
+  wp->dnd_cb_data       = mb->dnd_cb_data;
 
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, wp->skin_element_name);
@@ -1131,8 +1140,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_t *xitk, xitk_skin_config_t *skonfig,
 
   if (mb->reparent_window) {
     mb->reparent_window (mb->rw_data, wp->xwin);
+    xitk_window_flags (wp->xwin, XITK_WINF_DND, wp->dnd_cb ? XITK_WINF_DND : 0);
   } else {
-    xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
+    xitk_window_flags (wp->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED | XITK_WINF_DND,
+      XITK_WINF_VISIBLE | (wp->dnd_cb ? XITK_WINF_DND : 0));
     xitk_window_raise_window (wp->xwin);
   }
 
