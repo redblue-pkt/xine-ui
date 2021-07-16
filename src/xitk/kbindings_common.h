@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -21,6 +21,7 @@
 #ifndef KBINDINGS_COMMON_H
 #define KBINDINGS_COMMON_H
 
+#include <xine/sorted_array.h>
 #include "kbindings.h"
 
 /*
@@ -49,7 +50,8 @@ struct kbinding_entry_s {
 #define MAX_ENTRIES 301          /* Including terminating null entry */
 struct kbinding_s {
   int               num_entries;
-  kbinding_entry_t *entry[MAX_ENTRIES];
+  kbinding_entry_t *entry[MAX_ENTRIES], *last;
+  xine_sarray_t    *action_index, *key_index;
 };
 
 /*
@@ -72,10 +74,17 @@ typedef struct {
   int               is_gui;
 } user_kbinding_t;
 
-void        _kbindings_free_bindings_no_kbt(kbinding_t *);
-void        _kbindings_free_bindings(kbinding_t *);
-void        _kbindings_init_to_default_no_kbt(kbinding_t *);
-kbinding_t *_kbindings_init_to_default(void);
+kbinding_t *_kbindings_init_to_default (void);
+kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt);
+
+void _kbindings_init_to_default_no_kbt (kbinding_t *kbt);
+
+void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry);
+void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry);
+
+kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier);
+
+void _kbindings_free_bindings_no_kbt (kbinding_t *kbt);
+void _kbindings_free_bindings (kbinding_t *kbt);
 
 #endif
-
