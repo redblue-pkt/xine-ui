@@ -247,41 +247,6 @@ void kbindings_save_kbinding(kbinding_t *kbt) {
 }
 
 /*
- * Return a duplicated table from kbt.
- */
-static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
-  int         i;
-  kbinding_t *k;
-
-  ABORT_IF_NULL(kbt);
-
-  k = (kbinding_t *) calloc(1, sizeof(kbinding_t));
-
-  for(i = 0; kbt->entry[i]->action != NULL; i++) {
-    k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
-    k->entry[i]->comment   = strdup(kbt->entry[i]->comment);
-    k->entry[i]->action    = strdup(kbt->entry[i]->action);
-    k->entry[i]->action_id = kbt->entry[i]->action_id;
-    k->entry[i]->key       = strdup(kbt->entry[i]->key);
-    k->entry[i]->modifier  = kbt->entry[i]->modifier;
-    k->entry[i]->is_alias  = kbt->entry[i]->is_alias;
-    k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
-  }
-
-  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
-  k->entry[i]->comment   = NULL;
-  k->entry[i]->action    = NULL;
-  k->entry[i]->action_id = 0;
-  k->entry[i]->key       = NULL;
-  k->entry[i]->modifier  = 0;
-  k->entry[i]->is_alias  = 0;
-  k->entry[i]->is_gui    = 0;
-  k->num_entries         = i + 1;
-
-  return k;
-}
-
-/*
  * Free key binding table kbt, then set it to default table.
  */
 void kbindings_reset_kbinding(kbinding_t *kbt) {
@@ -418,12 +383,9 @@ kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, in
 #endif
 
   /* Be case sensitive */
-  for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if(k && k->key && strlen(k->key) && ((!(strcmp(k->key, key))) && (modifier == k->modifier))) {
-      kret = k;
-      goto __found;
-    }
-  }
+  k = kbindings_find_key (kbt, key, modifier);
+  if (k)
+    return k;
 
   /* Not case sensitive */
   /*
@@ -439,8 +401,6 @@ kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, in
       break;
     }
   }
-
- __found:
 
   /* Keybinding unknown */
   return kret;
@@ -794,6 +754,7 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
     if(kbedit->kbt->entry[s]->is_alias) {
       xitk_browser_release_all_buttons(kbedit->browser);
 
+      kbindings_index_remove (kbedit->kbt, kbedit->kbt->entry[s]);
       free(kbedit->kbt->entry[s]->comment);
       free(kbedit->kbt->entry[s]->action);
       free(kbedit->kbt->entry[s]->key);
@@ -876,6 +837,7 @@ static void _kbedit_store_1 (xui_keyedit_t *kbe) {
       kbe->kbr.entry->is_alias = 1;
       kbe->kbt->entry[kbe->kbt->num_entries] = kbe->kbt->entry[kbe->kbt->num_entries - 1];
       kbe->kbt->entry[kbe->kbt->num_entries - 1] = kbe->kbr.entry;
+      kbindings_index_add (kbe->kbt, kbe->kbr.entry);
       kbe->kbr.entry = NULL;
       kbe->kbt->num_entries++;
       kbedit_create_browser_entries (kbe);
@@ -884,6 +846,8 @@ static void _kbedit_store_1 (xui_keyedit_t *kbe) {
       break;
     case KBEDIT_EDITING:
       kbe->kbr.entry->is_alias = kbe->ksel->is_alias;
+      kbindings_index_remove (kbe->kbt, kbe->ksel);
+      kbindings_index_add (kbe->kbt, kbe->kbr.entry);
       kbe->kbt->entry[kbe->nsel] = kbe->kbr.entry;
       _kbedit_free_entry (&kbe->ksel);
       kbe->ksel = kbe->kbr.entry;

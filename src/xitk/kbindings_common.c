@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -432,6 +432,43 @@ static const struct {
     0,                        0                              , "",         0              , 0 , 0}
 };
 
+static int _kbindings_action_cmp (void *a, void *b) {
+  kbinding_entry_t *d = (kbinding_entry_t *)a;
+  kbinding_entry_t *e = (kbinding_entry_t *)b;
+  return strcasecmp (d->action, e->action);
+}
+
+static int _kbindings_key_cmp (void *a, void *b) {
+  kbinding_entry_t *d = (kbinding_entry_t *)a;
+  kbinding_entry_t *e = (kbinding_entry_t *)b;
+  int f = strcmp (d->key, e->key); /* "A" != "a" */
+  if (f)
+    return f;
+  return d->modifier - e->modifier;
+}
+
+void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry) {
+  if (entry->action)
+    xine_sarray_add (kbt->action_index, entry);
+  if (entry->key && strcasecmp (entry->key, "void"))
+    xine_sarray_add (kbt->key_index, entry);
+}
+
+void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
+  kbt->last = NULL;
+#ifdef XINE_SARRAY_MODE_DEFAULT
+  xine_sarray_remove_ptr (kbt->action_index, entry);
+  xine_sarray_remove_ptr (kbt->key_index, entry);
+#else
+  int i;
+  i = xine_sarray_binary_search (kbt->action_index, entry);
+  if (i >= 0)
+    i = xine_sarray_remove (kbt->action_index, i);
+  i = xine_sarray_binary_search (kbt->key_index, entry);
+  if (i >= 0)
+    i = xine_sarray_remove (kbt->key_index, i);
+#endif
+}
 
 static int _kbinding_get_is_gui_from_default(const char *action) {
   int i;
@@ -464,6 +501,8 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
 
   for(i = 0; default_binding_table[i].action != NULL; i++) {
     kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
+    if (!kbt->entry[i])
+      break;
     kbt->entry[i]->comment = strdup(default_binding_table[i].comment);
     kbt->entry[i]->action = strdup(default_binding_table[i].action);
     kbt->entry[i]->action_id = default_binding_table[i].action_id;
@@ -471,6 +510,7 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
     kbt->entry[i]->modifier = default_binding_table[i].modifier;
     kbt->entry[i]->is_alias = default_binding_table[i].is_alias;
     kbt->entry[i]->is_gui = default_binding_table[i].is_gui;
+    kbindings_index_add (kbt, kbt->entry[i]);
   }
   kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
   kbt->entry[i]->comment = NULL;
@@ -487,9 +527,21 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
 kbinding_t *_kbindings_init_to_default(void) {
   kbinding_t  *kbt;
 
-  kbt = (kbinding_t *) malloc(sizeof(kbinding_t));
-  _kbindings_init_to_default_no_kbt(kbt);
+  kbt = (kbinding_t *)malloc (sizeof (*kbt));
+  if (!kbt)
+    return NULL;
 
+  kbt->last = NULL;
+  kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
+  kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
+  if (!kbt->action_index || !kbt->key_index) {
+    xine_sarray_delete (kbt->action_index);
+    xine_sarray_delete (kbt->key_index);
+    free (kbt);
+    return NULL;
+  }
+
+  _kbindings_init_to_default_no_kbt (kbt);
   return kbt;
 }
 
@@ -606,6 +658,35 @@ static void _kbindings_set_pos_to_value(char **p) {
   while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
 }
 
+static int _kbindings_modifier_from_string (char *s) {
+  int modifier = KEYMOD_NOMOD;
+  if (s) {
+    char *p, *t = s;
+    while ((p = xine_strsep (&t, ",")) != NULL) {
+      _kbindings_set_pos_to_next_char (&p);
+      if (p) {
+        if (!strcasecmp (p, "none"))
+          modifier = KEYMOD_NOMOD;
+        else if (!strcasecmp(p, "control"))
+          modifier |= KEYMOD_CONTROL;
+        else if (!strcasecmp(p, "ctrl"))
+          modifier |= KEYMOD_CONTROL;
+        else if (!strcasecmp(p, "meta"))
+          modifier |= KEYMOD_META;
+        else if (!strcasecmp(p, "alt"))
+          modifier |= KEYMOD_META;
+        else if (!strcasecmp(p, "mod3"))
+          modifier |= KEYMOD_MOD3;
+        else if (!strcasecmp(p, "mod4"))
+          modifier |= KEYMOD_MOD4;
+        else if (!strcasecmp(p, "mod5"))
+          modifier |= KEYMOD_MOD5;
+      }
+    }
+  }
+  return modifier;
+}
+
 /*
  * Add an entry in key binding table kbt. Called when an Alias entry
  * is found.
@@ -614,51 +695,15 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
   kbinding_entry_t  *k;
   int                modifier;
 
-  ABORT_IF_NULL(kbt);
-  ABORT_IF_NULL(ukb);
-
   /* This should only happen if the keymap file was edited manually. */
   if(kbt->num_entries >= MAX_ENTRIES) {
     fprintf(stderr, _("xine-ui: Too many Alias entries in keymap file, entry ignored.\n"));
     return;
   }
 
-  k = kbindings_lookup_action(kbt, ukb->alias);
+  k = kbindings_lookup_action (kbt, ukb->alias);
   if(k) {
-
-    modifier = k->modifier;
-
-    if(ukb->modifier) {
-      char *p, *ukb_modifier_ptr;
-
-      modifier = KEYMOD_NOMOD;
-
-      ukb_modifier_ptr = ukb->modifier;
-      while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
-
-	_kbindings_set_pos_to_next_char(&p);
-
-	if(p) {
-
-	  if(!strcasecmp(p, "none"))
-	    modifier = KEYMOD_NOMOD;
-	  else if(!strcasecmp(p, "control"))
-	    modifier |= KEYMOD_CONTROL;
-	  else if(!strcasecmp(p, "ctrl"))
-	    modifier |= KEYMOD_CONTROL;
-	  else if(!strcasecmp(p, "meta"))
-	    modifier |= KEYMOD_META;
-	  else if(!strcasecmp(p, "alt"))
-	    modifier |= KEYMOD_META;
-	  else if(!strcasecmp(p, "mod3"))
-	    modifier |= KEYMOD_MOD3;
-	  else if(!strcasecmp(p, "mod4"))
-	    modifier |= KEYMOD_MOD4;
-	  else if(!strcasecmp(p, "mod5"))
-	    modifier |= KEYMOD_MOD5;
-	}
-      }
-    }
+    modifier = ukb->modifier ? _kbindings_modifier_from_string (ukb->modifier) : k->modifier;
 
     /*
      * Add new entry (struct memory already allocated)
@@ -670,6 +715,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     kbt->entry[kbt->num_entries - 1]->action_id = k->action_id;
     kbt->entry[kbt->num_entries - 1]->key       = strdup(ukb->key);
     kbt->entry[kbt->num_entries - 1]->modifier  = modifier;
+    kbindings_index_add (kbt, kbt->entry[kbt->num_entries - 1]);
 
     /*
      * NULL terminate array.
@@ -691,51 +737,16 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
  * Change keystroke of modifier in entry.
  */
 static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
-  int i;
-
-  ABORT_IF_NULL(kbt);
-  ABORT_IF_NULL(ukb);
-
-  for(i = 0; kbt->entry[i]->action != NULL; i++) {
-
-    if(!strcmp(kbt->entry[i]->action, ukb->action)) {
-      SAFE_FREE(kbt->entry[i]->key);
-      kbt->entry[i]->key = strdup(ukb->key);
-
-      kbt->entry[i]->is_gui = _kbinding_get_is_gui_from_default(ukb->action);
-
-      if(ukb->modifier) {
-	char *p, *ukb_modifier_ptr;
-	int   modifier = KEYMOD_NOMOD;
-
-	ukb_modifier_ptr = ukb->modifier;
-	while((p = xine_strsep(&ukb_modifier_ptr, ",")) != NULL) {
-
-	  _kbindings_set_pos_to_next_char(&p);
-
-	  if(p) {
-
-	    if(!strcasecmp(p, "none"))
-	      modifier = KEYMOD_NOMOD;
-	    else if(!strcasecmp(p, "control"))
-	      modifier |= KEYMOD_CONTROL;
-	    else if(!strcasecmp(p, "ctrl"))
-	      modifier |= KEYMOD_CONTROL;
-	    else if(!strcasecmp(p, "meta"))
-	      modifier |= KEYMOD_META;
-	    else if(!strcasecmp(p, "alt"))
-	      modifier |= KEYMOD_META;
-	    else if(!strcasecmp(p, "mod3"))
-	      modifier |= KEYMOD_MOD3;
-	    else if(!strcasecmp(p, "mod4"))
-	      modifier |= KEYMOD_MOD4;
-	    else if(!strcasecmp(p, "mod5"))
-	      modifier |= KEYMOD_MOD5;
-	  }
-	}
-	kbt->entry[i]->modifier = modifier;
-      }
-      return;
+  kbinding_entry_t *e = kbindings_lookup_action (kbt, ukb->action);
+  if (e) {
+    int modifier = _kbindings_modifier_from_string (ukb->modifier);
+    if (strcmp (e->key, ukb->key) || (e->modifier != modifier)) {
+      kbindings_index_remove (kbt, e);
+      free (e->key);
+      e->key = strdup (ukb->key);
+      e->is_gui = _kbinding_get_is_gui_from_default (ukb->action);
+      e->modifier = modifier;
+      kbindings_index_add (kbt, e);
     }
   }
 }
@@ -747,9 +758,6 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
   int               brace_offset;
   user_kbinding_t   ukb;
   char              *p;
-
-  ABORT_IF_NULL(kbt);
-  ABORT_IF_NULL(kbdf);
 
   if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
     int found = 0;
@@ -851,38 +859,34 @@ static void _kbinding_done (void *data, int state) {
 
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
   gGui_t *gui = gGui;
-  int            i, j, found = 0;
-  char          *kmsg = NULL;
+  kbinding_entry_t *e1;
+  int n, i, found = 0;
+  char *kmsg = NULL, *dna = NULL;
 
   if(kbt == NULL)
     return;
 
-  for(i = 0; kbt->entry[i]->action != NULL; i++) {
-    for(j = 0; kbt->entry[j]->action != NULL; j++) {
-      if(i != j && j != found) {
-	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
-	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) &&
-	   (strcasecmp(kbt->entry[i]->key, "void"))) {
-	  char *action1, *action2;
-	  char *dna = _("and");
-
-	  found++;
-
-	  action1 = kbt->entry[i]->action;
-	  action2 = kbt->entry[j]->action;
-
-	  if(!kmsg) {
-            const char *header = _("The following key bindings pairs are identical:\n\n");
-            kmsg = xitk_asprintf("%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
-	  }
-	  else {
-            size_t len = strlen(action1) + 1 + strlen(dna) + 1 + strlen(action2) + 2;
-	    kmsg = (char *) realloc(kmsg, strlen(kmsg) + len + 1);
-	    sprintf(kmsg+strlen(kmsg), "%s%s%c%s%c%s", ", ", action1, ' ', dna, ' ', action2);
-	  }
-	}
+  n = xine_sarray_size (kbt->key_index);
+  e1 = xine_sarray_get (kbt->key_index, 0);
+  for (i = 1; i < n; i++) {
+    kbinding_entry_t *e2 = xine_sarray_get (kbt->key_index, i);
+    if (!_kbindings_key_cmp (e1, e2)) {
+      char *action1, *action2;
+      found++;
+      action1 = e1->action;
+      action2 = e2->action;
+      if (!kmsg) {
+        const char *header = _("The following key bindings pairs are identical:\n\n");
+        dna = _("and");
+        kmsg = xitk_asprintf ("%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
+      } else {
+        size_t len1 = strlen (kmsg);
+        size_t len2 = strlen (action1) + 1 + strlen (dna) + 1 + strlen (action2) + 2;
+        kmsg = (char *)realloc (kmsg, len1 + len2 + 1);
+        sprintf (kmsg + len1, "%s%s%c%s%c%s", ", ", action1, ' ', dna, ' ', action2);
       }
     }
+    e1 = e2;
   }
 
 #ifndef KBINDINGS_MAN
@@ -939,11 +943,15 @@ void _kbindings_free_bindings_no_kbt(kbinding_t *kbt) {
     int i = kbt->num_entries - 1;
 
     if(i && (i < MAX_ENTRIES)) {
+      kbt->last = NULL;
+      xine_sarray_clear (kbt->action_index);
+      xine_sarray_clear (kbt->key_index);
       for(; i >= 0; i--) {
 	SAFE_FREE(k[i]->comment);
 	SAFE_FREE(k[i]->action);
 	SAFE_FREE(k[i]->key);
 	free(k[i]);
+        k[i] = NULL;
       }
     }
   }
@@ -951,6 +959,8 @@ void _kbindings_free_bindings_no_kbt(kbinding_t *kbt) {
 
 void _kbindings_free_bindings(kbinding_t *kbt) {
   _kbindings_free_bindings_no_kbt(kbt);
+  xine_sarray_delete (kbt->key_index);
+  xine_sarray_delete (kbt->action_index);
   SAFE_FREE(kbt);
 }
 
@@ -969,20 +979,88 @@ void kbindings_free_kbinding(kbinding_t **kbt) {
  * Return a key binding entry (if available) matching with action string.
  */
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *kbt, const char *action) {
-  kbinding_entry_t  *kret = NULL, *k;
-  int                i;
-
   if((action == NULL) || (kbt == NULL))
     return NULL;
 
-  /* CHECKME: Not case sensitive */
-  for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if(!strcasecmp(k->action, action)) {
-      kret = k;
-      break;
-    }
+  {
+    kbinding_entry_t dummy = {
+      .action = (char *)action, /* will not be written to */
+      .is_alias = 0
+    };
+    int i = xine_sarray_binary_search (kbt->action_index, &dummy);
+    if (i < 0)
+      return NULL;
+    return (kbinding_entry_t *)xine_sarray_get (kbt->action_index, i);
+  }
+}
+
+/*
+ * Return a duplicated table from kbt.
+ */
+kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
+  int         i;
+  kbinding_t *k;
+
+  ABORT_IF_NULL(kbt);
+
+  k = (kbinding_t *)calloc (1, sizeof (*k));
+  if (!k)
+    return NULL;
+
+  k->last = NULL;
+  k->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
+  k->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
+  if (!k->action_index || !k->key_index) {
+    xine_sarray_delete (k->action_index);
+    xine_sarray_delete (k->key_index);
+    free (k);
+    return NULL;
   }
 
-  /* Unknown action */
-  return kret;
+  for (i = 0; kbt->entry[i]->action != NULL; i++) {
+    k->entry[i]            = (kbinding_entry_t *)calloc (1, sizeof (kbinding_entry_t));
+    if (!k->entry[i])
+      break;
+    k->entry[i]->comment   = strdup(kbt->entry[i]->comment);
+    k->entry[i]->action    = strdup(kbt->entry[i]->action);
+    k->entry[i]->action_id = kbt->entry[i]->action_id;
+    k->entry[i]->key       = strdup(kbt->entry[i]->key);
+    k->entry[i]->modifier  = kbt->entry[i]->modifier;
+    k->entry[i]->is_alias  = kbt->entry[i]->is_alias;
+    k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
+    kbindings_index_add (k, k->entry[i]);
+  }
+
+  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
+  k->entry[i]->comment   = NULL;
+  k->entry[i]->action    = NULL;
+  k->entry[i]->action_id = 0;
+  k->entry[i]->key       = NULL;
+  k->entry[i]->modifier  = 0;
+  k->entry[i]->is_alias  = 0;
+  k->entry[i]->is_gui    = 0;
+  k->num_entries         = i + 1;
+
+  return k;
+}
+
+kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier) {
+  kbinding_entry_t *e;
+  if (!kbt || !key)
+    return NULL;
+  e = kbt->last;
+  if (e && !strcmp (e->key, key) && (e->modifier == modifier))
+    return e;
+  {
+    kbinding_entry_t dummy = {
+      .key = (char *)key, /* will not be written to */
+      .modifier = modifier
+    };
+    int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+    if (i >= 0) {
+      kbt->last = e = xine_sarray_get (kbt->key_index, i);
+      return e;
+    }
+  }
+  return NULL;
 }
