@@ -39,7 +39,9 @@
  */
 struct kbinding_entry_s {
   char             *comment;     /* Comment automatically added in xbinding_display*() outputs */
-  char             *action;      /* Human readable action, used in config file too */
+  const char       *action;      /* Human readable action, used in config file too.
+                                  * We currently only use the known ones, and thus can stick
+                                  * to our default static const strings. */
   action_id_t       action_id;   /* The numerical action, handled in a case statement */
   char             *key;         /* key binding */
   int               modifier;    /* Modifier key of binding (can be OR'ed) */
@@ -54,33 +56,15 @@ struct kbinding_s {
   xine_sarray_t    *action_index, *key_index;
 };
 
-/*
- * keybinding file object.
- */
-typedef struct {
-  FILE             *fd;
-  char             *bindingfile;
-  char             *ln;
-  char              buf[256];
-} kbinding_file_t;
-
-/* Same as above, used on remapping */
-typedef struct {
-  char             *alias;
-  char             *action;
-  char             *key;
-  char             *modifier;
-  int               is_alias;
-  int               is_gui;
-} user_kbinding_t;
-
 kbinding_t *_kbindings_init_to_default (void);
 kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt);
 
 void _kbindings_init_to_default_no_kbt (kbinding_t *kbt);
 
-void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry);
-void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry);
+/* key == "void" means delete.
+ * return -1 (OK), -2 (unchanged), -3 (invalid), -4 (table full), >= 0 (index that already uses this key). */
+int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *key);
+int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *key);
 
 kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier);
 
