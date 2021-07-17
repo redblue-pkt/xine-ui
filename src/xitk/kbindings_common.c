@@ -33,6 +33,23 @@
 #include "videowin.h"
 #include "actions.h"
 
+/* used on remapping */
+typedef struct {
+  const char *alias, *action, *key;
+  char *modifier;
+  int is_alias, is_gui;
+} user_kbinding_t;
+
+/*
+ * keybinding file object.
+ */
+typedef struct {
+  FILE             *fd;
+  char             *bindingfile;
+  char             *ln;
+  char              buf[256];
+} kbinding_file_t;
+
 /*
  * Default key mapping table.
  */
@@ -435,7 +452,10 @@ static const struct {
 static int _kbindings_action_cmp (void *a, void *b) {
   kbinding_entry_t *d = (kbinding_entry_t *)a;
   kbinding_entry_t *e = (kbinding_entry_t *)b;
-  return strcasecmp (d->action, e->action);
+  int f = strcasecmp (d->action, e->action);
+  if (f)
+    return f;
+  return d->is_alias- e->is_alias;
 }
 
 static int _kbindings_key_cmp (void *a, void *b) {
@@ -447,14 +467,14 @@ static int _kbindings_key_cmp (void *a, void *b) {
   return d->modifier - e->modifier;
 }
 
-void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry) {
+static void kbindings_index_add (kbinding_t *kbt, kbinding_entry_t *entry) {
   if (entry->action)
     xine_sarray_add (kbt->action_index, entry);
   if (entry->key && strcasecmp (entry->key, "void"))
     xine_sarray_add (kbt->key_index, entry);
 }
 
-void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
+static void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
   kbt->last = NULL;
 #ifdef XINE_SARRAY_MODE_DEFAULT
   xine_sarray_remove_ptr (kbt->action_index, entry);
@@ -499,29 +519,21 @@ void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
     abort();
   }
 
-  for(i = 0; default_binding_table[i].action != NULL; i++) {
-    kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
-    if (!kbt->entry[i])
+  for (i = 0; default_binding_table[i].action; i++) {
+    kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
+    if (!n)
       break;
-    kbt->entry[i]->comment = strdup(default_binding_table[i].comment);
-    kbt->entry[i]->action = strdup(default_binding_table[i].action);
-    kbt->entry[i]->action_id = default_binding_table[i].action_id;
-    kbt->entry[i]->key = strdup(default_binding_table[i].key);
-    kbt->entry[i]->modifier = default_binding_table[i].modifier;
-    kbt->entry[i]->is_alias = default_binding_table[i].is_alias;
-    kbt->entry[i]->is_gui = default_binding_table[i].is_gui;
-    kbindings_index_add (kbt, kbt->entry[i]);
+    n->action = default_binding_table[i].action;
+    n->action_id = default_binding_table[i].action_id;
+    n->modifier = default_binding_table[i].modifier;
+    n->is_alias = default_binding_table[i].is_alias;
+    n->is_gui = default_binding_table[i].is_gui;
+    n->comment = strdup (default_binding_table[i].comment);
+    n->key = strdup (default_binding_table[i].key);
+    kbindings_index_add (kbt, n);
+    kbt->entry[i] = n;
   }
-  kbt->entry[i] = (kbinding_entry_t *) malloc(sizeof(kbinding_entry_t));
-  kbt->entry[i]->comment = NULL;
-  kbt->entry[i]->action = NULL;
-  kbt->entry[i]->action_id = 0;
-  kbt->entry[i]->key = NULL;
-  kbt->entry[i]->modifier = 0;
-  kbt->entry[i]->is_alias = 0;
-  kbt->entry[i]->is_gui = 0;
-
-  kbt->num_entries = i + 1; /* Count includes the terminating null entry! */
+  kbt->num_entries = i;
 }
 
 kbinding_t *_kbindings_init_to_default(void) {
@@ -702,34 +714,22 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
   }
 
   k = kbindings_lookup_action (kbt, ukb->alias);
-  if(k) {
-    modifier = ukb->modifier ? _kbindings_modifier_from_string (ukb->modifier) : k->modifier;
+  if (k) {
+    kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
+    if (n) {
+      modifier = ukb->modifier ? _kbindings_modifier_from_string (ukb->modifier) : k->modifier;
 
-    /*
-     * Add new entry (struct memory already allocated)
-     */
-    kbt->entry[kbt->num_entries - 1]->is_gui    = k->is_gui;
-    kbt->entry[kbt->num_entries - 1]->is_alias  = 1;
-    kbt->entry[kbt->num_entries - 1]->comment   = strdup(k->comment);
-    kbt->entry[kbt->num_entries - 1]->action    = strdup(k->action);
-    kbt->entry[kbt->num_entries - 1]->action_id = k->action_id;
-    kbt->entry[kbt->num_entries - 1]->key       = strdup(ukb->key);
-    kbt->entry[kbt->num_entries - 1]->modifier  = modifier;
-    kbindings_index_add (kbt, kbt->entry[kbt->num_entries - 1]);
-
-    /*
-     * NULL terminate array.
-     */
-    kbt->entry[kbt->num_entries] = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
-    kbt->entry[kbt->num_entries]->is_gui    = 0;
-    kbt->entry[kbt->num_entries]->is_alias  = 0;
-    kbt->entry[kbt->num_entries]->comment   = NULL;
-    kbt->entry[kbt->num_entries]->action    = NULL;
-    kbt->entry[kbt->num_entries]->action_id = 0;
-    kbt->entry[kbt->num_entries]->key       = NULL;
-    kbt->entry[kbt->num_entries]->modifier  = 0;
-
-    kbt->num_entries++;
+      /* Add new entry */
+      n->action    = k->action;
+      n->action_id = k->action_id;
+      n->modifier  = modifier;
+      n->is_alias  = 1;
+      n->is_gui    = k->is_gui;
+      n->comment   = strdup (k->comment);
+      n->key       = strdup (ukb->key);
+      kbindings_index_add (kbt, n);
+      kbt->entry[kbt->num_entries++] = n;
+    }
   }
 }
 
@@ -762,16 +762,19 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
   if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
     int found = 0;
 
-    memset(&ukb, 0, sizeof(ukb));
+    memset (&ukb, 0, sizeof (ukb));
     found = 1;
 
     p = kbdf->ln;
 
     if((brace_offset = _kbindings_begin_section(kbdf)) >= 0) {
+      char buf[2048], *b1 = buf, *be = buf + sizeof (buf);
       *(kbdf->ln + brace_offset) = '\0';
       _kbindings_clean_eol(kbdf);
-
-      ukb.action   = strdup(kbdf->ln);
+      ukb.action = b1;
+      b1 += strlcpy (b1, kbdf->ln, be - b1);
+      if (b1 > be)
+        b1 = be;
       ukb.is_alias = 0;
 
       while(_kbindings_end_section(kbdf) < 0) {
@@ -781,15 +784,24 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 	if(kbdf->ln != NULL) {
 	  if(!strncasecmp(kbdf->ln, "modifier", 8)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb.modifier = strdup(p);
+            ukb.modifier = b1;
+            b1 += strlcpy (b1, p, be - b1) + 1;
+            if (b1 > be)
+              b1 = be;
 	  }
 	  if(!strncasecmp(kbdf->ln, "entry", 5)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb.alias = strdup(p);
+            ukb.alias = b1;
+            b1 += strlcpy (b1, p, be - b1) + 1;
+            if (b1 > be)
+              b1 = be;
 	  }
 	  else if(!strncasecmp(kbdf->ln, "key", 3)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb.key = strdup(p);
+            ukb.key = b1;
+            b1 += strlcpy (b1, p, be - b1) + 1;
+            if (b1 > be)
+              b1 = be;
 	  }
 	}
 	else
@@ -804,11 +816,6 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
       }
 
     }
-
-    SAFE_FREE(ukb.alias);
-    SAFE_FREE(ukb.action);
-    SAFE_FREE(ukb.key);
-    SAFE_FREE(ukb.modifier);
   }
 }
 
@@ -871,7 +878,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
   for (i = 1; i < n; i++) {
     kbinding_entry_t *e2 = xine_sarray_get (kbt->key_index, i);
     if (!_kbindings_key_cmp (e1, e2)) {
-      char *action1, *action2;
+      const char *action1, *action2;
       found++;
       action1 = e1->action;
       action2 = e2->action;
@@ -934,25 +941,23 @@ kbinding_t *kbindings_init_kbinding(void) {
  * Free a keybindings object.
  */
 void _kbindings_free_bindings_no_kbt(kbinding_t *kbt) {
-  kbinding_entry_t **k;
+  int i;
 
-  if(kbt == NULL)
+  if (!kbt)
     return;
 
-  if((k = kbt->entry)) {
-    int i = kbt->num_entries - 1;
+  kbt->last = NULL;
+  xine_sarray_clear (kbt->action_index);
+  xine_sarray_clear (kbt->key_index);
 
-    if(i && (i < MAX_ENTRIES)) {
-      kbt->last = NULL;
-      xine_sarray_clear (kbt->action_index);
-      xine_sarray_clear (kbt->key_index);
-      for(; i >= 0; i--) {
-	SAFE_FREE(k[i]->comment);
-	SAFE_FREE(k[i]->action);
-	SAFE_FREE(k[i]->key);
-	free(k[i]);
-        k[i] = NULL;
-      }
+  for (i = kbt->num_entries - 1; i >= 0; i--) {
+    kbinding_entry_t *e = kbt->entry[i];
+    if (e) {
+      e->action = NULL;
+      SAFE_FREE (e->comment);
+      SAFE_FREE (e->key);
+      kbt->entry[i] = NULL;
+      free (e);
     }
   }
 }
@@ -1017,29 +1022,21 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
     return NULL;
   }
 
-  for (i = 0; kbt->entry[i]->action != NULL; i++) {
-    k->entry[i]            = (kbinding_entry_t *)calloc (1, sizeof (kbinding_entry_t));
-    if (!k->entry[i])
+  for (i = 0; i < kbt->num_entries; i++) {
+    kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
+    if (!n)
       break;
-    k->entry[i]->comment   = strdup(kbt->entry[i]->comment);
-    k->entry[i]->action    = strdup(kbt->entry[i]->action);
-    k->entry[i]->action_id = kbt->entry[i]->action_id;
-    k->entry[i]->key       = strdup(kbt->entry[i]->key);
-    k->entry[i]->modifier  = kbt->entry[i]->modifier;
-    k->entry[i]->is_alias  = kbt->entry[i]->is_alias;
-    k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
-    kbindings_index_add (k, k->entry[i]);
+    n->action    = kbt->entry[i]->action;
+    n->action_id = kbt->entry[i]->action_id;
+    n->modifier  = kbt->entry[i]->modifier;
+    n->is_alias  = kbt->entry[i]->is_alias;
+    n->is_gui    = kbt->entry[i]->is_gui;
+    n->comment   = strdup (kbt->entry[i]->comment);
+    n->key       = strdup (kbt->entry[i]->key);
+    kbindings_index_add (k, n);
+    k->entry[i] = n;
   }
-
-  k->entry[i]            = (kbinding_entry_t *) calloc(1, sizeof(kbinding_entry_t));
-  k->entry[i]->comment   = NULL;
-  k->entry[i]->action    = NULL;
-  k->entry[i]->action_id = 0;
-  k->entry[i]->key       = NULL;
-  k->entry[i]->modifier  = 0;
-  k->entry[i]->is_alias  = 0;
-  k->entry[i]->is_gui    = 0;
-  k->num_entries         = i + 1;
+  k->num_entries = i;
 
   return k;
 }
@@ -1063,4 +1060,139 @@ kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modi
     }
   }
   return NULL;
+}
+
+int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *key) {
+  kbinding_entry_t *e;
+
+  /* paranoia */
+  if ((index < 0) || (index >= kbt->num_entries))
+    return -3;
+  e = kbt->entry[index];
+  if (!e)
+    return -3;
+
+  if (!strcasecmp (key, "VOID")) {
+    /* delete */
+    if (!strcasecmp (e->key, "VOID"))
+      return -2;
+    if (e->is_alias) {
+      /* remove alias */
+      kbindings_index_remove (kbt, e);
+      e->action = NULL;
+      SAFE_FREE (e->key);
+      SAFE_FREE (e->comment);
+      free (e);
+      kbt->num_entries--;
+      for (; index < kbt->num_entries; index++)
+        kbt->entry[index] = kbt->entry[index + 1];
+      return -1;
+    } else {
+      kbinding_entry_t dummy = {
+        .action = e->action,
+        .is_alias = 1
+      };
+      int ai = xine_sarray_binary_search (kbt->action_index, &dummy);
+      if (ai >= 0) {
+        /* turn alias into new base entry */
+        kbinding_entry_t *a = xine_sarray_get (kbt->action_index, ai);
+        for (ai = 0; (ai < kbt->num_entries) && (a != kbt->entry[ai]); ai++) ;
+        if (ai < kbt->num_entries) {
+          kbindings_index_remove (kbt, e);
+          kbindings_index_remove (kbt, a);
+          e->modifier = a->modifier;
+          free (e->key);
+          e->key = a->key;
+          a->key = NULL;
+          free (e->comment);
+          e->comment = a->comment;
+          a->comment = NULL;
+          free (a);
+          kbt->num_entries--;
+          for (; ai < kbt->num_entries; ai++)
+            kbt->entry[ai] = kbt->entry[ai + 1];
+          kbindings_index_add (kbt, e);
+          return -1;
+        }
+      }
+      /* keep base entry, just reset */
+      kbindings_index_remove (kbt, e);
+      free (e->key);
+      e->key = strdup ("VOID");
+      e->modifier = 0;
+      kbindings_index_add (kbt, e);
+      return -1;
+    }
+  } else {
+    if (!strcmp (e->key, key) && (e->modifier == modifier)) {
+      /* no change */
+      return -2;
+    }
+    {
+      kbinding_entry_t dummy = {
+        .key = (char *)key, /* will not be written to */
+        .modifier = modifier
+      };
+      int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+      if (i >= 0) {
+        /* key already in use */
+        e = xine_sarray_get (kbt->key_index, i);
+        for (i = 0; (i < kbt->num_entries) && (e != kbt->entry[i]); i++) ;
+        return (i < kbt->num_entries) ? i : -3;
+      }
+    }
+    /* set new key */
+    kbindings_index_remove (kbt, e);
+    free (e->key);
+    e->key = strdup (key);
+    e->modifier = modifier;
+    kbindings_index_add (kbt, e);
+    return -1;
+  }
+}
+
+int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *key) {
+  kbinding_entry_t *e;
+
+  /* paranoia */
+  if ((index < 0) || (index >= kbt->num_entries))
+    return -3;
+  e = kbt->entry[index];
+  if (!e)
+    return -3;
+  if (kbt->num_entries >= MAX_ENTRIES)
+    return -4;
+
+  if (!strcasecmp (key, "VOID"))
+    return -2;
+  {
+    kbinding_entry_t dummy = {
+      .key = (char *)key, /* will not be written to */
+      .modifier = modifier
+    };
+    int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+    if (i >= 0) {
+      /* key already in use */
+      e = xine_sarray_get (kbt->key_index, i);
+      for (i = 0; (i < kbt->num_entries) && (e != kbt->entry[i]); i++) ;
+      return (i < kbt->num_entries) ? i : -3;
+    }
+  }
+  {
+    /* set new alias */
+    kbinding_entry_t *a = malloc (sizeof (*a));
+    if (!a)
+      return -3;
+    a->action = e->action;
+    a->action_id = e->action_id;
+    a->modifier = modifier;
+    a->is_alias = 1;
+    a->is_gui = e->is_gui;
+    a->key = strdup (key);
+    a->comment = strdup (e->comment);
+    kbt->entry[kbt->num_entries] = a;
+    kbt->num_entries++;
+    kbindings_index_add (kbt, a);
+    return -1;
+  }
 }
