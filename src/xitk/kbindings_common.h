@@ -38,28 +38,27 @@
  * Key binding entry struct.
  */
 struct kbinding_entry_s {
-  char             *comment;     /* Comment automatically added in xbinding_display*() outputs */
   const char       *action;      /* Human readable action, used in config file too.
                                   * We currently only use the known ones, and thus can stick
                                   * to our default static const strings. */
-  action_id_t       action_id;   /* The numerical action, handled in a case statement */
+  char             *comment;     /* Comment automatically added in xbinding_display*() outputs */
   char             *key;         /* key binding */
-  int               modifier;    /* Modifier key of binding (can be OR'ed) */
-  int               is_alias;    /* is made from an alias entry ? */
-  int               is_gui;
+  action_id_t       action_id;   /* The numerical action, handled in a case statement */
+  uint16_t          index;       /* into kbinding_t.entry */
+  uint8_t           modifier;    /* Modifier key of binding (can be OR'ed) */
+  uint8_t           is_alias:1;  /* is made from an alias entry ? */
+  uint8_t           is_gui:1;
 };
 
 #define MAX_ENTRIES 301          /* Including terminating null entry */
-struct kbinding_s {
-  int               num_entries;
-  kbinding_entry_t *entry[MAX_ENTRIES], *last;
-  xine_sarray_t    *action_index, *key_index;
-};
 
 kbinding_t *_kbindings_init_to_default (void);
 kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt);
 
 void _kbindings_init_to_default_no_kbt (kbinding_t *kbt);
+
+const kbinding_entry_t *_kbindings_get_entry (kbinding_t *kbt, int index);
+int _kbindings_get_num_entries (kbinding_t *kbt);
 
 /* key == "void" means delete.
  * return -1 (OK), -2 (unchanged), -3 (invalid), -4 (table full), >= 0 (index that already uses this key). */

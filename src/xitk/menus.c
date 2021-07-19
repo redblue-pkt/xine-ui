@@ -94,7 +94,7 @@ static void _menu_set_shortcuts (gGui_t *gui, menu_text_buf_t *tbuf, xitk_menu_e
     }
     if (!e->shortcut)
       continue;
-    sz = kbindings_get_shortcut (gui->kbindings, e->shortcut, tbuf->write, tbuf->end - tbuf->write);
+    sz = kbindings_get_shortcut (gui->kbindings, e->shortcut, tbuf->write, tbuf->end - tbuf->write, gui->shortcut_style);
     if (!sz) {
       if (gui->verbosity >= 2)
         printf ("gui.menu: action \"%s\" is invalid.\n", e->shortcut);

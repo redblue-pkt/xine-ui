@@ -911,7 +911,7 @@ void xitk_browser_release_all_buttons(xitk_widget_t *w) {
 /**
  * Select the item 'select' in list
  */
-void xitk_browser_set_select(xitk_widget_t *w, int item) {
+void xitk_browser_set_select (xitk_widget_t *w, int item) {
   _browser_private_t *wp;
 
   xitk_container (wp, w, w);
@@ -922,8 +922,10 @@ void xitk_browser_set_select(xitk_widget_t *w, int item) {
 
   gettimeofday (&wp->click_time, NULL);
   _browser_select (wp, item);
-  _browser_move (wp, wp->items.selected - (wp->visible.max >> 1) - wp->visible.start);
-  _browser_set_vslider (wp);
+  if (wp->items.selected >= 0) {
+    _browser_move (wp, wp->items.selected - (wp->visible.max >> 1) - wp->visible.start);
+    _browser_set_vslider (wp);
+  }
 }
 
 /**
@@ -958,8 +960,10 @@ void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, const c
   _browser_set_hslider (wp, 1);
   _browser_set_btns (wp);
   wp->visible.start = -MAX_VISIBLE;
-  _browser_move (wp, start);
+  _browser_move (wp, start - wp->visible.start);
   _browser_set_vslider (wp);
+  if (wp->items.selected >= wp->items.num)
+    _browser_select (wp, -1);
 }
 
 /**
