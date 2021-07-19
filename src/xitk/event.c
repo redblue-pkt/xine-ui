@@ -1962,4 +1962,3 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
-
