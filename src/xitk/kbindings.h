@@ -262,7 +262,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *);
  * if result >= buf_size, output was truncated. Does not return space required!
  * if result == 0, entry was not found.
  */
-size_t kbindings_get_shortcut(kbinding_t *, const char *, char *buf, size_t buf_size);
+size_t kbindings_get_shortcut (kbinding_t *kbt, const char *action, char *buf, size_t buf_size, int style);
 
 void kbedit_window (gGui_t *gui);
 void kbedit_end (xui_keyedit_t *kbedit);
