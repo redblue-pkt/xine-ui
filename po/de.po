@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.5\n"
 "Report-Msgid-Bugs-To: xine-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2021-07-07 17:26+0200\n"
+"POT-Creation-Date: 2021-07-18 02:38+0200\n"
 "PO-Revision-Date: 2007-04-25 00:55+0200\n"
 "Last-Translator: Torsten Jager <t.jager@gmx.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -324,9 +324,6 @@ msgstr "Fertig"
 
 msgid "More..."
 msgstr "Mehr..."
-
-msgid "Error"
-msgstr "Fehler"
 
 #, c-format
 msgid ""
@@ -816,9 +813,6 @@ msgstr "Nichts"
 msgid "Grab"
 msgstr "Aufzeichnen"
 
-msgid "You can only delete alias entries."
-msgstr "Nur Alias-Einträge können entfernt werden."
-
 msgid "No more space for additional entries!"
 msgstr "Kein Platz für weitere Einträge!"
 
@@ -875,12 +869,561 @@ msgstr "Mod4"
 msgid "mod5"
 msgstr "Mod5"
 
+msgid "start playback"
+msgstr "Wiedergabe starten"
+
+msgid "playback pause toggle"
+msgstr "Wiedergabe/Pause"
+
+msgid "stop playback"
+msgstr "Stopp (Abspielen Beenden)"
+
+msgid "close stream"
+msgstr "Datenstrom schliessen"
+
+msgid "take a snapshot"
+msgstr "Mache einen Schnappschuss"
+
+msgid "eject the current medium"
+msgstr "Momentanes Medium auswerfen"
+
+msgid "select and play next MRL in the playlist"
+msgstr "Nächste MRL wähöen und abspielen"
+
+msgid "select and play previous MRL in the playlist"
+msgstr "Vorige MRL wähöen und abspielen"
+
+msgid "select and play MRL in the playlist"
+msgstr "Diese MRL wähöen und abspielen"
+
+msgid "loop mode toggle"
+msgstr "Wiederholen ein/aus"
+
+msgid "stop playback after played stream"
+msgstr "Wiedergabe nach diesem Datenstrom beenden"
+
+msgid "scan playlist to grab stream infos"
+msgstr "Listeninfos erfassen"
+
+msgid "add a mediamark from current playback"
+msgstr "Laufende Wiedergabe zu Liste hinzufügen"
+
+msgid "edit selected mediamark"
+msgstr "Mediamark bearbeiten"
+
+msgid "set position to -60 seconds in current stream"
+msgstr "Springe 60 Sekunden zurück"
+
+msgid "set position to +60 seconds in current stream"
+msgstr "Springe 60 Sekunden vor"
+
+msgid "set position to -30 seconds in current stream"
+msgstr "Springe 30 Sekunden zurück"
+
+msgid "set position to +30 seconds in current stream"
+msgstr "Springe 30 Sekunden vor"
+
+msgid "set position to -15 seconds in current stream"
+msgstr "Springe 15 Sekunden zurück"
+
+msgid "set position to +15 seconds in current stream"
+msgstr "Springe 15 Sekunden vor"
+
+msgid "set position to -7 seconds in current stream"
+msgstr "Springe 7 Sekunden zurück"
+
+msgid "set position to +7 seconds in current stream"
+msgstr "Springe 7 Sekunden vor"
+
+msgid "set position to beginning of current stream"
+msgstr "Springe zum Anfang"
+
+msgid "set position to 1/10 of current stream"
+msgstr "Springe zu 1/10"
+
+msgid "set position to 2/10 of current stream"
+msgstr "Springe zu 2/10"
+
+msgid "set position to 3/10 of current stream"
+msgstr "Springe zu 3/10"
+
+msgid "set position to 4/10 of current stream"
+msgstr "Springe zu 4/10"
+
+msgid "set position to 5/10 of current stream"
+msgstr "Springe zu 5/10"
+
+msgid "set position to 6/10 of current stream"
+msgstr "Springe zu 6/10"
+
+msgid "set position to 7/10 of current stream"
+msgstr "Springe zu 7/10"
+
+msgid "set position to 8/10 of current stream"
+msgstr "Springe zu 8/10"
+
+msgid "set position to 9/10 of current stream"
+msgstr "Springe zu 9/10"
+
+msgid "set position to end of current stream"
+msgstr "Springe zum Ende"
+
+msgid "increment playback speed"
+msgstr "Schneller abspielen"
+
+msgid "decrement playback speed"
+msgstr "Langsamer abspielen"
+
+msgid "reset playback speed"
+msgstr "Normale Geschwindigkeit"
+
+msgid "increment audio volume"
+msgstr "Lauter"
+
+msgid "decrement audio volume"
+msgstr "Leiser"
+
+msgid "increment amplification level"
+msgstr "Verstärkungspegel auf"
+
+msgid "decrement amplification level"
+msgstr "Verstärkungspegel ab"
+
+msgid "reset amplification to default value"
+msgstr "Normaler Verstärkungspegel"
+
+msgid "audio muting toggle"
+msgstr "Lautlos ein/aus"
+
+msgid "select next audio channel"
+msgstr "Nächster Tonkanal"
+
+msgid "select previous audio channel"
+msgstr "Voriger Tonkanal"
+
+msgid "visibility toggle of audio post effect window"
+msgstr "Ton-Nachbearbeitung einstellen"
+
+msgid "toggle post effect usage"
+msgstr "Nachbearbeitung ein/aus"
+
+msgid "select next sub picture (subtitle) channel"
+msgstr "Nöchster Untertitel"
+
+msgid "select previous sub picture (subtitle) channel"
+msgstr "Voriger Untertitel"
+
+msgid "interlaced mode toggle"
+msgstr "Zeilensprungfilter ein/aus"
+
+msgid "cycle aspect ratio values"
+msgstr "Bildseitenverhältnis ändern"
+
+msgid "reduce the output window size by factor 1.2"
+msgstr "Bild kleiner"
+
+msgid "enlarge the output window size by factor 1.2"
+msgstr "Bild größer"
+
+msgid "set video output window to 50%"
+msgstr "Halbe Bildgröße"
+
+msgid "set video output window to 100%"
+msgstr "Normale Bildgröße"
+
+msgid "set video output window to 200%"
+msgstr "Doppelte Bildgröße"
+
+msgid "zoom in"
+msgstr "Bildausschnitt größer"
+
+msgid "zoom out"
+msgstr "Bildausschnitt kleiner"
+
+msgid "zoom in horizontally"
+msgstr "Bildausschnitt horizontal größer"
+
+msgid "zoom out horizontally"
+msgstr "Bildausschnitt horizontal kleiner"
+
+msgid "zoom in vertically"
+msgstr "Bildausschnitt vertikal größer"
+
+msgid "zoom out vertically"
+msgstr "Bildausschnitt vertikal kleiner"
+
+msgid "reset zooming"
+msgstr "ganzes Bild"
+
+msgid "resize output window to stream size"
+msgstr "Fenster an Bildgröße anpassen"
+
+msgid "fullscreen toggle"
+msgstr "Vollbild ein/aus"
+
+msgid "Xinerama fullscreen toggle"
+msgstr "Vollbild über mehrere Bildschirme ein/aus"
+
+msgid "jump to media Menu"
+msgstr "Zur Hauptauswahl"
+
+msgid "jump to Title Menu"
+msgstr "Zur Titelauswahl"
+
+msgid "jump to Root Menu"
+msgstr "Zur Startauswahl"
+
+msgid "jump to Subpicture Menu"
+msgstr "Zur Untertitelauswahl"
+
+msgid "jump to Audio Menu"
+msgstr "Zur Tonauswahl"
+
+msgid "jump to Angle Menu"
+msgstr "Zur Ansichtsauswahl"
+
+msgid "jump to Part Menu"
+msgstr "Zur Abschnittsauswahl"
+
+msgid "menu navigate up"
+msgstr "Auswahl auf"
+
+msgid "menu navigate down"
+msgstr "Auswahl ab"
+
+msgid "menu navigate left"
+msgstr "Auswahl links"
+
+msgid "menu navigate right"
+msgstr "Auswahl rechts"
+
+msgid "menu select"
+msgstr "Auswahl bestätigen"
+
+msgid "jump to next chapter"
+msgstr "Zum nächsten Kapitel"
+
+msgid "jump to previous chapter"
+msgstr "Zum vorigen Kapitel"
+
+msgid "select next angle"
+msgstr "Nächste Ansicht"
+
+msgid "select previous angle"
+msgstr "Vorige Ansicht"
+
+msgid "visibility toggle of help window"
+msgstr "Hilfe-Fenster"
+
+msgid "visibility toggle of video post effect window"
+msgstr "Bild-Nachbearbeitung einstellen"
+
+msgid "visibility toggle of output window"
+msgstr "Bild zeigen/verbergen"
+
+msgid "bordered window toggle of output window"
+msgstr "Fensterrahmen ein/aus"
+
+msgid "visibility toggle of UI windows"
+msgstr "Bedienteil zeigen/verbergen"
+
+msgid "visibility toggle of control window"
+msgstr "Bildeinstellungen zeigen/verbergen"
+
+msgid "visibility toggle of mrl browser window"
+msgstr "Medienauswahl zeigen/verbergen"
+
+msgid "visibility toggle of playlist editor window"
+msgstr "Abspielliste zeigen/verbergen"
+
+msgid "visibility toggle of the setup window"
+msgstr "Einstellungen zeigen/verbergen"
+
+msgid "visibility toggle of the event sender window"
+msgstr "Navigation zeigen/verbergen"
+
+msgid "visibility toggle of analog TV window"
+msgstr "Analog-TV-Einstellungen zeigen/verbergen"
+
+msgid "visibility toggle of log viewer"
+msgstr "Meldungen zeigen/verbergen"
+
+msgid "visibility toggle of stream info window"
+msgstr "Info zeigen/verbergen"
+
+msgid "display stream information using OSD"
+msgstr "Datenstnrom-Info einblenden"
+
+msgid "display information using OSD"
+msgstr "Info einblenden"
+
+msgid "show OSD menu"
+msgstr "Auswahl einblenden"
+
+msgid "enter key binding editor"
+msgstr "Tastenbelegungen bearbeiten"
+
+msgid "enable key bindings (not useful to bind a key to it!)"
+msgstr "Tastenbelegungen ein/aus (nicht sehr sinnvoll ;-)"
+
+msgid "open file selector"
+msgstr "Datei auswählen"
+
+msgid "select a subtitle file"
+msgstr "Untertiteldatei auswählen"
+
+msgid "download a skin from the skin server"
+msgstr "Thema herunterladen"
+
+msgid "display MRL/Ident toggle"
+msgstr "Medienadresse/Name zeigen"
+
+msgid "grab pointer toggle"
+msgstr "Mauszeiger ein/aus"
+
+msgid "enter the number 0"
+msgstr "Ziffer 0"
+
+msgid "enter the number 1"
+msgstr "Ziffer 1"
+
+msgid "enter the number 2"
+msgstr "Ziffer 2"
+
+msgid "enter the number 3"
+msgstr "Ziffer 3"
+
+msgid "enter the number 4"
+msgstr "Ziffer 4"
+
+msgid "enter the number 5"
+msgstr "Ziffer 5"
+
+msgid "enter the number 6"
+msgstr "Ziffer 6"
+
+msgid "enter the number 7"
+msgstr "Ziffer 7"
+
+msgid "enter the number 8"
+msgstr "Ziffer 8"
+
+msgid "enter the number 9"
+msgstr "Ziffer 9"
+
+msgid "add 10 to the next entered number"
+msgstr "Plus 10"
+
+msgid "set position in current stream to numeric percentage"
+msgstr "Springe zu xx%"
+
+msgid "set position forward by numeric argument in current stream"
+msgstr "Springe xx% vor"
+
+msgid "set position back by numeric argument in current stream"
+msgstr "Springe xx% zurück"
+
+msgid "change audio video syncing (delay video)"
+msgstr "Bild später"
+
+msgid "change audio video syncing (delay audio)"
+msgstr "Bild früher"
+
+msgid "reset audio video syncing offset"
+msgstr "Bild/Ton-Versatz zurücksetzen"
+
+msgid "change subtitle syncing (delay video)"
+msgstr "Untertitel früher"
+
+msgid "change subtitle syncing (delay subtitles)"
+msgstr "Untertitel später"
+
+msgid "reset subtitle syncing offset"
+msgstr "Untertitelversatz zurücksetzen"
+
+msgid "toggle TV modes (on the DXR3)"
+msgstr "DXR3 TV-Modus ändern"
+
+msgid "switch Monitor to DPMS standby mode"
+msgstr "Bildchirm ein/aus"
+
+msgid "increase hue by 10"
+msgstr "Farbton auf"
+
+msgid "decrease hue by 10"
+msgstr "Farbton ab"
+
+msgid "increase saturation by 10"
+msgstr "Farbsättigung auf"
+
+msgid "decrease saturation by 10"
+msgstr "Farbsättigung ab"
+
+msgid "increase brightness by 10"
+msgstr "Helligkeit auf"
+
+msgid "decrease brightness by 10"
+msgstr "Helligkeit ab"
+
+msgid "increase contrast by 10"
+msgstr "Kotrast auf"
+
+msgid "decrease contrast by 10"
+msgstr "Kotrast ab"
+
+msgid "increase gamma by 10"
+msgstr "Mittenhelligkeit auf"
+
+msgid "decrease gamma by 10"
+msgstr "Mittenhelligkeit ab"
+
+msgid "increase sharpness by 10"
+msgstr "Bildschärfe auf"
+
+msgid "decrease sharpness by 10"
+msgstr "Bildschärfe ab"
+
+msgid "increase noise reduction by 10"
+msgstr "Rauschfilter auf"
+
+msgid "decrease noise reduction by 10"
+msgstr "Rauschfilter ab"
+
+msgid "quit the program"
+msgstr "Beenden"
+
+msgid "input_pvr: set input"
+msgstr "PVR Eingabe wählen"
+
+msgid "input_pvr: set frequency"
+msgstr "PVR Frequenz einstellen"
+
+msgid "input_pvr: mark the start of a new stream section"
+msgstr "PVR Abchnitt beginnen"
+
+msgid "input_pvr: set the name for the current stream section"
+msgstr "PVR Abchnitt benennen"
+
+msgid "input_pvr: save the stream section"
+msgstr "PVR Abchnitt speichern"
+
+msgid "Open playlist"
+msgstr "Abspielliste öffnen"
+
+msgid "VDR Red button"
+msgstr "Taste ROT"
+
+msgid "VDR Green button"
+msgstr "Taste GRÜN"
+
+msgid "VDR Yellow button"
+msgstr "Taste GELB"
+
+msgid "VDR Blue button"
+msgstr "Taste BLAU"
+
+msgid "VDR Play"
+msgstr "VRR Wiedergabe"
+
+msgid "VDR Pause"
+msgstr "VDR Pause"
+
+msgid "VDR Stop"
+msgstr "VDR Stopp"
+
+msgid "VDR Record"
+msgstr "VDR Aufnahme"
+
+msgid "VDR Fast forward"
+msgstr "VDR schneller Vorlauf"
+
+msgid "VDR Fast rewind"
+msgstr "VDR schneller Rücklauf"
+
+msgid "VDR Power"
+msgstr "VDR ein/aus"
+
+msgid "VDR Channel +"
+msgstr "VDR Kanal auf"
+
+msgid "VDR Channel -"
+msgstr "VDR Kanal ab"
+
+msgid "VDR Schedule menu"
+msgstr "VDR Programmvorschau"
+
+msgid "VDR Channel menu"
+msgstr "VDR Kanalliste"
+
+msgid "VDR Timers menu"
+msgstr "VDR geplante Aufzeichnungen"
+
+msgid "VDR Recordings menu"
+msgstr "VDR Aufzeichnungen"
+
+msgid "VDR Setup menu"
+msgstr "VDR Einstellungen"
+
+msgid "VDR Command menu"
+msgstr "VDR Befehle"
+
+msgid "VDR Command back"
+msgstr "VDR Befehl: zurück"
+
+msgid "VDR User command 0"
+msgstr "VDR Befehl: 0"
+
+msgid "VDR User command 1"
+msgstr "VDR Befehl: 1"
+
+msgid "VDR User command 2"
+msgstr "VDR Befehl: 2"
+
+msgid "VDR User command 3"
+msgstr "VDR Befehl: 3"
+
+msgid "VDR User command 4"
+msgstr "VDR Befehl: 4"
+
+msgid "VDR User command 5"
+msgstr "VDR Befehl: 5"
+
+msgid "VDR User command 6"
+msgstr "VDR Befehl: 6"
+
+msgid "VDR User command 7"
+msgstr "VDR Befehl: 7"
+
+msgid "VDR User command 8"
+msgstr "VDR Befehl: 8"
+
+msgid "VDR User command 9"
+msgstr "VDR Befehl: 9"
+
+msgid "VDR Volume +"
+msgstr "VDR Laut"
+
+msgid "VDR Volume -"
+msgstr "VDR Leise"
+
+msgid "VDR Mute audio"
+msgstr "VDR Stumm"
+
+msgid "VDR Audio menu"
+msgstr "VDR Tonauswahl"
+
+msgid "VDR Command info"
+msgstr "VDR Befehl: Info"
+
+msgid "VDR Previous channel"
+msgstr "VDR voriger Kanal"
+
+msgid "VDR Subtiles menu"
+msgstr "VDR Untertitelauswahl"
+
 #, c-format
 msgid "xine-ui: Too many Alias entries in keymap file, entry ignored.\n"
 msgstr "xine-ui: Zu viele Alternativtasten belegt, Eintrag ignoriert.\n"
-
-msgid "and"
-msgstr "und"
 
 msgid ""
 "The following key bindings pairs are identical:\n"
@@ -888,6 +1431,9 @@ msgid ""
 msgstr ""
 "Die folgenden Paare von Tastenbelegung sind identisch::\n"
 "\n"
+
+msgid "and"
+msgstr "und"
 
 msgid ""
 ".\n"
@@ -1438,9 +1984,6 @@ msgid ""
 "message to you ;-):"
 msgstr "Flaschenpost fon der xine Library ;-):"
 
-msgid "No information available."
-msgstr "Keine Informationen verfügbar."
-
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
@@ -1512,6 +2055,9 @@ msgstr "Dieser Datenstrom wurde aufgezeichnet:"
 
 msgid "*sight*, unknown error."
 msgstr "*Seufz*, unbekannter Fehler."
+
+msgid "No information available."
+msgstr "Keine Informationen verfügbar."
 
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
@@ -2611,6 +3157,12 @@ msgstr "xine Log-Betrachter"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
+#~ msgid "Error"
+#~ msgstr "Fehler"
+
+#~ msgid "You can only delete alias entries."
+#~ msgstr "Nur Alias-Einträge können entfernt werden."
+
 #~ msgid "XAllocWMHints() failed\n"
 #~ msgstr "XAllocWMHints() fehlgeschlagen\n"
 
@@ -2755,17 +3307,11 @@ msgstr "Aktualisieren"
 #~ msgid "Post video plugin"
 #~ msgstr "Plugin für Video-Nachverarbeitung"
 
-#~ msgid "MRL Browser"
-#~ msgstr "MRL Browser"
-
 #~ msgid "Key Bindings"
 #~ msgstr "Tastenbelegungen"
 
 #~ msgid "Xine Control Panel"
 #~ msgstr "Xine Einstellungen"
-
-#~ msgid "stream informations"
-#~ msgstr "Datenstrominformationen"
 
 #~ msgid "No video plugin available to decode '%s'."
 #~ msgstr "Keines der Video-Plugin kann '%s' dekodieren."
