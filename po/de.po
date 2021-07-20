@@ -888,13 +888,13 @@ msgid "eject the current medium"
 msgstr "Momentanes Medium auswerfen"
 
 msgid "select and play next MRL in the playlist"
-msgstr "Nächste MRL wähöen und abspielen"
+msgstr "Nächste MRL wählen und abspielen"
 
 msgid "select and play previous MRL in the playlist"
-msgstr "Vorige MRL wähöen und abspielen"
+msgstr "Vorige MRL wählen und abspielen"
 
 msgid "select and play MRL in the playlist"
-msgstr "Diese MRL wähöen und abspielen"
+msgstr "Diese MRL wählen und abspielen"
 
 msgid "loop mode toggle"
 msgstr "Wiederholen ein/aus"
