@@ -1501,7 +1501,7 @@ int main(int argc, char *argv[]) {
 	else if(!strcasecmp(p, "lirc"))
 	  kbindings_display_default_lirc_bindings();
 	else if(!strcasecmp(p, "remapped"))
-	  kbindings_display_current_bindings((kbindings_init_kbinding()));
+	  kbindings_display_current_bindings ((kbindings_init_kbinding (gui->keymap_file)));
 	else if(!strncasecmp(p, "file:", 5)) {
 	  char  *keymap_file = p + 5;
 
