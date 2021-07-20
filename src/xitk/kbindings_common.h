@@ -21,7 +21,6 @@
 #ifndef KBINDINGS_COMMON_H
 #define KBINDINGS_COMMON_H
 
-#include <xine/sorted_array.h>
 #include "kbindings.h"
 
 /*
@@ -55,8 +54,6 @@ struct kbinding_entry_s {
 kbinding_t *_kbindings_init_to_default (void);
 kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt);
 
-void _kbindings_init_to_default_no_kbt (kbinding_t *kbt);
-
 const kbinding_entry_t *_kbindings_get_entry (kbinding_t *kbt, int index);
 int _kbindings_get_num_entries (kbinding_t *kbt);
 
@@ -64,10 +61,10 @@ int _kbindings_get_num_entries (kbinding_t *kbt);
  * return -1 (OK), -2 (unchanged), -3 (invalid), -4 (table full), >= 0 (index that already uses this key). */
 int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *key);
 int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *key);
+int kbindings_reset (kbinding_t *kbt, int index);
 
 kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier);
 
-void _kbindings_free_bindings_no_kbt (kbinding_t *kbt);
 void _kbindings_free_bindings (kbinding_t *kbt);
 
 #endif
