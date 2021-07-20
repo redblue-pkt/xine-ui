@@ -252,8 +252,7 @@ void kbindings_reset_kbinding(kbinding_t *kbt) {
 
   ABORT_IF_NULL(kbt);
 
-  _kbindings_free_bindings_no_kbt(kbt);
-  _kbindings_init_to_default_no_kbt(kbt);
+  kbindings_reset (kbt, -1);
 }
 
 /*
@@ -837,7 +836,7 @@ static void kbedit_reset (xitk_widget_t *w, void *data, int state) {
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
 
-  kbindings_reset_kbinding(kbedit->kbt);
+  kbindings_reset (kbedit->kbt, kbedit->nsel);
   kbedit_create_browser_entries (kbedit);
   xitk_browser_update_list (kbedit->browser, (const char * const *) kbedit->entries,
     (const char * const *)kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
