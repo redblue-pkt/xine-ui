@@ -1737,7 +1737,8 @@ void gui_init (gGui_t *gui, gui_init_params_t *p) {
 
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
    * when done before the video_window_init(). */
-  gui->kbindings = kbindings_init_kbinding();
+  gui->kbindings = kbindings_init_kbinding (gui->keymap_file);
+  gui->kbindings_enabled = !!gui->kbindings;
 
   gui_set_current_mmk (gui, mediamark_get_current_mmk (gui));
 
@@ -1962,3 +1963,4 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
+

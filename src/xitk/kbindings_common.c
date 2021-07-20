@@ -83,7 +83,7 @@ typedef struct {
   FILE             *fd;
   char             *bindingfile;
   char             *ln;
-  char              buf[256];
+  char              buf[2048];
 } kbinding_file_t;
 
 /*
@@ -581,117 +581,122 @@ kbinding_t *_kbindings_init_to_default(void) {
   return kbt;
 }
 
+static const uint8_t _tab_char[256] = {
+  /* end of string */
+  [0]    =   1,
+  /* end of line */
+  ['\r'] =   2,
+  ['\n'] =   2,
+  /* whitespace */
+  ['\t'] =   4,
+  [' ']  =   4,
+  /* comments */
+  ['/']  =   8,
+  ['#']  =   8,
+  /* separator */
+  [';']  =  16,
+  /* sections */
+  ['{']  =  32,
+  ['}']  =  64,
+  /* value assignment */
+  [':']  = 128,
+  ['=']  = 128
+};
+  
 /*
  * Cleanup end of line.
  */
-static void _kbindings_clean_eol(kbinding_file_t *kbdf) {
-  char *p;
+static void _kbindings_clean_eol (kbinding_file_t *kbdf) {
+  uint8_t *p = (uint8_t *)kbdf->ln, *spc;
 
-  ABORT_IF_NULL(kbdf);
-
-  p = kbdf->ln;
-
-  if(p) {
-    while(*p != '\0') {
-      if(*p == '\n' || *p == '\r') {
-	*p = '\0';
-	break;
-      }
+  while (1) {
+    while (!(_tab_char[*p] & (1 | 2 | 4))) /* ! \0 cr lf tab spc */
       p++;
-    }
-
-    while(p > kbdf->ln) {
-      --p;
-
-      if(*p == ' ' || *p == '\t')
-	*p = '\0';
-      else
-	break;
-    }
+    spc = p;
+    if (_tab_char[*p] & (1 | 2)) /* ! \0 cr lf */
+      break;
+    do
+      p++;
+    while (_tab_char[*p] & 4); /* tab spc */
+    if (_tab_char[*p] & (1 | 2)) /* ! \0 cr lf */
+      break;
   }
+  *spc = 0;
 }
 
 /*
  * Read the next line of the key binding file.
  */
 static void _kbindings_get_next_line(kbinding_file_t *kbdf) {
-
-  ABORT_IF_NULL(kbdf);
-  ABORT_IF_NULL(kbdf->fd);
-
- __get_next_line:
-
-  kbdf->ln = fgets(kbdf->buf, 255, kbdf->fd);
-
-  while(kbdf->ln && (*kbdf->ln == ' ' || *kbdf->ln == '\t')) ++kbdf->ln;
-
-  if(kbdf->ln) {
-    if((strncmp(kbdf->ln, "//", 2) == 0) ||
-       (strncmp(kbdf->ln, "/*", 2) == 0) || /**/
-       (strncmp(kbdf->ln, ";", 1) == 0) ||
-       (strncmp(kbdf->ln, "#", 1) == 0) ||
-       (*kbdf->ln == '\0')) {
-      goto __get_next_line;
+  while (1) {
+    uint8_t *p;
+    kbdf->ln = fgets (kbdf->buf, sizeof (kbdf->buf) - 1, kbdf->fd);
+    if (!kbdf->ln)
+      return;
+    p = (uint8_t *)kbdf->ln;
+    while (_tab_char[*p] & 4) /* tab spc */
+      p++;
+    kbdf->ln = (char *)p;
+    if (!(_tab_char[*p] & (1 | 8 | 16))) /* ! \0 / # ; */
+      break;
+    if (p[0] == '/') {
+      if ((p[1] != '/') && (p[1] != '*'))
+        break;
     }
-
   }
-
-  _kbindings_clean_eol(kbdf);
-}
-
-/*
- * Return position in str of char 'c'. -1 if not found
- */
-static int _is_there_char(const char *str, int c) {
-  char *p;
-
-  if(str)
-    if((p = strrchr(str, c)) != NULL) {
-      return (p - str);
-    }
-
-  return -1;
+  _kbindings_clean_eol (kbdf);
 }
 
 /*
  * Return >= 0 if it's begin of section, otherwise -1
  */
-static int _kbindings_begin_section(kbinding_file_t *kbdf) {
-
-  ABORT_IF_NULL(kbdf);
-
-  return _is_there_char(kbdf->ln, '{');
+static int _kbindings_begin_section (kbinding_file_t *kbdf) {
+  uint8_t *p = (uint8_t *)kbdf->ln, *brace = NULL;
+  while (1) {
+    while (!(_tab_char[*p] & (1 | 32))) /* ! \0 { */
+      p++;
+    if (!*p)
+      break;
+    brace = p++;
+  }
+  return brace ? brace - (uint8_t *)kbdf->ln : -1;
 }
 
 /*
  * Return >= 0 if it's end of section, otherwise -1
  */
 static int _kbindings_end_section(kbinding_file_t *kbdf) {
-
-  ABORT_IF_NULL(kbdf);
-
-  return _is_there_char(kbdf->ln, '}');
+  uint8_t *p = (uint8_t *)kbdf->ln, *brace = NULL;
+  while (1) {
+    while (!(_tab_char[*p] & (1 | 64))) /* ! \0 } */
+      p++;
+    if (!*p)
+      break;
+    brace = p++;
+  }
+  return brace ? brace - (uint8_t *)kbdf->ln : -1;
 }
 
 /*
  * move forward p pointer till non space or tab.
  */
 static void _kbindings_set_pos_to_next_char(char **p) {
-
-  ABORT_IF_NULL(*p);
-
-  while(*(*p) != '\0' && (*(*p) == ' ' || *(*p) == '\t')) ++(*p);
+  uint8_t *q = (uint8_t *)*p;
+  while (_tab_char[*q] & 4) /* tab spc */
+    q++;
+  *p = (char *)q;
 }
 
 /*
  * Position p pointer to value.
  */
 static void _kbindings_set_pos_to_value(char **p) {
-
-  ABORT_IF_NULL(*p);
-
-  while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
-  while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
+  uint8_t *q = (uint8_t *)*p;
+  while (!(_tab_char[*q] & (1 | 32 | 128))) /* ! \0 { : = */
+    q++;
+  while (_tab_char[*q] & (4 | 128)) /* tab spc : = */
+    q++;
+  *p = (char *)q;
 }
 
 static int _kbindings_modifier_from_string (char *s) {
@@ -781,8 +786,7 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 /*
  * Read key remap section (try to).
  */
-static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
-  int               brace_offset;
+static void _kbindings_parse_section (kbinding_t *kbt, kbinding_file_t *kbdf, int brace_offset) {
   user_kbinding_t   ukb;
   char              *p;
 
@@ -794,12 +798,12 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 
     p = kbdf->ln;
 
-    if((brace_offset = _kbindings_begin_section(kbdf)) >= 0) {
+    if (brace_offset >= 0) {
       char buf[2048], *b1 = buf, *be = buf + sizeof (buf);
       *(kbdf->ln + brace_offset) = '\0';
       _kbindings_clean_eol(kbdf);
       ukb.action = b1;
-      b1 += strlcpy (b1, kbdf->ln, be - b1);
+      b1 += strlcpy (b1, kbdf->ln, be - b1) + 1;
       if (b1 > be)
         b1 = be;
       ukb.is_alias = 0;
@@ -849,25 +853,22 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 /*
  * Read and parse remap key binding file, if available.
  */
-static void _kbinding_load_config(kbinding_t *kbt, char *file) {
+static void _kbinding_load_config(kbinding_t *kbt, const char *file) {
   kbinding_file_t *kbdf;
 
-  ABORT_IF_NULL(kbt);
-  ABORT_IF_NULL(file);
-
-  kbdf = (kbinding_file_t *) calloc(1, sizeof(kbinding_file_t));
-  kbdf->bindingfile = strdup(file);
+  kbdf = (kbinding_file_t *)calloc (1, sizeof (*kbdf));
+  if (!kbdf)
+    return;
+  kbdf->bindingfile = strdup (file);
 
   if((kbdf->fd = fopen(kbdf->bindingfile, "r")) != NULL) {
 
     _kbindings_get_next_line(kbdf);
 
-    while(kbdf->ln != NULL) {
-
-      if(_kbindings_begin_section(kbdf)) {
-	_kbindings_parse_section(kbt, kbdf);
-      }
-
+    while (kbdf->ln != NULL) {
+      int brace_offs = _kbindings_begin_section (kbdf);
+      if (brace_offs >= 0)
+        _kbindings_parse_section (kbt, kbdf, brace_offs);
       _kbindings_get_next_line(kbdf);
     }
     fclose(kbdf->fd);
@@ -948,18 +949,18 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
  * Initialize a key binding table from default, then try
  * to remap this one with (system/user) remap files.
  */
-kbinding_t *kbindings_init_kbinding(void) {
-  gGui_t *gui = gGui;
-  kbinding_t *kbt = NULL;
+kbinding_t *kbindings_init_kbinding (const char *keymap_file) {
+  kbinding_t *kbt;
 
-  kbt = _kbindings_init_to_default();
+  kbt = _kbindings_init_to_default ();
+  if (!kbt)
+    return NULL;
 
-  _kbinding_load_config(kbt, gui->keymap_file);
+  if (keymap_file)
+    _kbinding_load_config (kbt, keymap_file);
 
   /* Just to check is there redundant entries, and inform user */
   _kbindings_check_redundancy(kbt);
-
-  gui->kbindings_enabled = 1;
 
   return kbt;
 }
