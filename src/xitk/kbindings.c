@@ -628,6 +628,18 @@ static void kbedit_unset (xui_keyedit_t *kbedit) {
   xitk_button_set_state (kbedit->mod5, 0);
 }
 
+static void _kbedit_set (xui_keyedit_t *kbedit) {
+  xitk_enable_and_show_widget (kbedit->edit);
+  if (strcasecmp (kbedit->ksel->key, "VOID")) {
+    xitk_enable_and_show_widget (kbedit->delete);
+    xitk_enable_and_show_widget (kbedit->alias);
+  } else {
+    xitk_disable_widget (kbedit->delete);
+    xitk_disable_widget (kbedit->alias);
+  }
+  kbedit_display_kbinding (kbedit, kbedit->entries[kbedit->nsel], kbedit->ksel);
+}
+
 /*
  *
  */
@@ -639,17 +651,7 @@ static void kbedit_select (xui_keyedit_t *kbedit, int s) {
 
   kbedit->nsel = s;
   kbedit->ksel = _kbindings_get_entry (kbedit->kbt, s);
-
-  xitk_enable_and_show_widget(kbedit->edit);
-  if (strcasecmp (kbedit->ksel->key, "VOID")) {
-    xitk_enable_and_show_widget (kbedit->delete);
-    xitk_enable_and_show_widget (kbedit->alias);
-  } else {
-    xitk_disable_widget (kbedit->delete);
-    xitk_disable_widget (kbedit->alias);
-  }
-
-  kbedit_display_kbinding (kbedit, kbedit->entries[s], kbedit->ksel);
+  _kbedit_set (kbedit);
 }
 
 /*
@@ -807,15 +809,24 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
   xitk_disable_widget(kbedit->grab);
 
   if (s >= 0) {
-    int r = kbindings_entry_set (kbedit->kbt, s, 0, "VOID");
+    int r, is_alias;
+
+    kbedit->nsel = s;
+    kbedit->ksel = _kbindings_get_entry (kbedit->kbt, s);
+    is_alias = kbedit->ksel->is_alias;
+    r = kbindings_entry_set (kbedit->kbt, s, 0, "VOID");
 
     if (r == -1) {
       kbedit_create_browser_entries (kbedit);
       xitk_browser_update_list (kbedit->browser,
         (const char* const*) kbedit->entries,
         (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
-      xitk_browser_set_select (kbedit->browser, -1);
-      kbedit_unset (kbedit);
+      if (is_alias) {
+        xitk_browser_set_select (kbedit->browser, -1);
+        kbedit_unset (kbedit);
+      } else {
+        _kbedit_set (kbedit);
+      }
     }
     /* gone ;-)
     gui_msg (gGui, XUI_MSG_ERROR, _("You can only delete alias entries."));
@@ -828,18 +839,35 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
  */
 static void kbedit_reset (xitk_widget_t *w, void *data, int state) {
   xui_keyedit_t *kbedit = data;
+  int n1, n2, r;
 
   (void)w;
   (void)state;
   _kbr_close (kbedit);
-  xitk_labelbutton_set_state(kbedit->alias, 0);
-  xitk_labelbutton_set_state(kbedit->edit, 0);
-  xitk_disable_widget(kbedit->grab);
 
-  kbindings_reset (kbedit->kbt, kbedit->nsel);
+  n1 = _kbindings_get_num_entries (kbedit->kbt);
+  r = kbindings_reset (kbedit->kbt, kbedit->nsel);
+  n2 = _kbindings_get_num_entries (kbedit->kbt);
+
   kbedit_create_browser_entries (kbedit);
   xitk_browser_update_list (kbedit->browser, (const char * const *) kbedit->entries,
     (const char * const *)kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->browser));
+  xitk_labelbutton_set_state (kbedit->alias, 0);
+  xitk_labelbutton_set_state (kbedit->edit, 0);
+  xitk_disable_widget (kbedit->grab);
+
+  if (kbedit->nsel < 0) {
+    /* full list reset */
+    ;
+  } else if (n2 < n1) {
+    /* alias deleted */
+    xitk_browser_set_select (kbedit->browser, -1);
+    kbedit_unset (kbedit);
+  } else if (r == -1) {
+    /* base entry changed */
+    kbedit->ksel = _kbindings_get_entry (kbedit->kbt, kbedit->nsel);
+    _kbedit_set (kbedit);
+  }
 }
 
 /*
@@ -908,6 +936,7 @@ static void _kbedit_store_1 (xui_keyedit_t *kbe) {
         kbedit_create_browser_entries (kbe);
         xitk_browser_update_list (kbe->browser, (const char * const *) kbe->entries,
           (const char * const *) kbe->shortcuts, kbe->num_entries, xitk_browser_get_current_start (kbe->browser));
+        _kbedit_set (kbe);
       }
       break;
     default: ;
