@@ -572,7 +572,7 @@ kbinding_t *_kbindings_init_to_default(void) {
     n->index     = i;
     n->is_alias  = default_binding_table[i].is_alias;
     n->is_gui    = default_binding_table[i].is_gui;
-    n->comment   = refs_strdup (gettext (default_binding_table[i].comment));
+    n->comment   = gettext (default_binding_table[i].comment);
     n->key       = refs_strdup (default_binding_table[i].key);
     kbindings_index_add (kbt, n);
   }
@@ -755,7 +755,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
       n->modifier  = modifier;
       n->is_alias  = 1;
       n->is_gui    = k->is_gui;
-      n->comment   = refs_ref (k->comment);
+      n->comment   = k->comment;
       n->key       = refs_strdup (ukb->key);
       kbindings_index_add (kbt, n);
       kbt->alias[kbt->num_entries - KBT_NUM_BASE] = n;
@@ -982,7 +982,7 @@ void _kbindings_free_bindings(kbinding_t *kbt) {
     kbinding_entry_t *e = kbt->alias[i - KBT_NUM_BASE];
     if (e) {
       e->action = NULL;
-      refs_unref (&e->comment);
+      e->comment = NULL;
       refs_unref (&e->key);
       kbt->alias[i - KBT_NUM_BASE] = NULL;
       free (e);
@@ -992,7 +992,7 @@ void _kbindings_free_bindings(kbinding_t *kbt) {
     kbinding_entry_t *e = kbt->base + i;
     if (e) {
       e->action = NULL;
-      refs_unref (&e->comment);
+      e->comment = NULL;
       refs_unref (&e->key);
     }
   }
@@ -1062,7 +1062,7 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
     n->index     = i;
     n->is_alias  = o->is_alias;
     n->is_gui    = o->is_gui;
-    n->comment   = refs_ref (o->comment);
+    n->comment   = o->comment;
     n->key       = refs_ref (o->key);
     kbindings_index_add (k, n);
   }
@@ -1077,7 +1077,7 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
     n->index     = i;
     n->is_alias  = o->is_alias;
     n->is_gui    = o->is_gui;
-    n->comment   = refs_ref (o->comment);
+    n->comment   = o->comment;
     n->key       = refs_ref (o->key);
     kbindings_index_add (k, n);
     k->alias[i - KBT_NUM_BASE] = n;
@@ -1126,8 +1126,8 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
       /* remove alias */
       kbindings_index_remove (kbt, e);
       e->action = NULL;
+      e->comment = NULL;
       refs_unref (&e->key);
-      refs_unref (&e->comment);
       free (e);
       kbt->num_entries--;
       for (; index < kbt->num_entries; index++) {
@@ -1152,7 +1152,6 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
           refs_unref (&e->key);
           e->key = a->key;
           a->key = NULL;
-          refs_unref (&e->comment);
           e->comment = a->comment;
           a->comment = NULL;
           free (a);
@@ -1239,7 +1238,7 @@ int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *k
     a->is_alias = 1;
     a->is_gui = e->is_gui;
     a->key = refs_strdup (key);
-    a->comment = refs_ref (e->comment);
+    a->comment = e->comment;
     a->index = kbt->num_entries;
     kbt->alias[kbt->num_entries - KBT_NUM_BASE] = a;
     kbt->num_entries++;
@@ -1276,8 +1275,8 @@ int kbindings_reset (kbinding_t *kbt, int index) {
       kbinding_entry_t *entry = kbt->alias[index - KBT_NUM_BASE];
       kbt->alias[index - KBT_NUM_BASE] = NULL;
       entry->action = NULL;
+      entry->comment = NULL;
       refs_unref (&entry->key);
-      refs_unref (&entry->comment);
       free (entry);
     }
     kbt->num_entries = KBT_NUM_BASE;

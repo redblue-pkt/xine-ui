@@ -40,7 +40,7 @@ struct kbinding_entry_s {
   const char       *action;      /* Human readable action, used in config file too.
                                   * We currently only use the known ones, and thus can stick
                                   * to our default static const strings. */
-  char             *comment;     /* Comment automatically added in xbinding_display*() outputs */
+  const char       *comment;     /* Comment automatically added in xbinding_display*() outputs */
   char             *key;         /* key binding */
   action_id_t       action_id;   /* The numerical action, handled in a case statement */
   uint16_t          index;       /* into kbinding_t.entry */

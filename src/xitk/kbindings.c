@@ -682,7 +682,7 @@ static int bkedit_check_redundancy (kbinding_t *kbt, kbinding_entry_t *kbe) {
 static void _kbedit_free_entry (kbinding_entry_t **entry) {
   if (!*entry)
     return;
-  SAFE_FREE ((*entry)->comment);
+  (*entry)->comment = NULL;
   (*entry)->action = NULL;
   SAFE_FREE ((*entry)->key);
   SAFE_FREE (*entry);
@@ -956,7 +956,7 @@ static int kbr_event (void *data, const xitk_be_event_t *e) {
     kbe->kbr.entry = calloc (1, sizeof (*kbe->kbr.entry));
     if (!kbe->kbr.entry)
         return 1;
-    kbe->kbr.entry->comment   = strdup (kbe->ksel->comment);
+    kbe->kbr.entry->comment   = kbe->ksel->comment;
     kbe->kbr.entry->action    = kbe->ksel->action;
     kbe->kbr.entry->action_id = kbe->ksel->action_id;
     kbe->kbr.entry->is_alias  = kbe->ksel->is_alias;
