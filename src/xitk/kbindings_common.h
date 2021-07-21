@@ -46,7 +46,8 @@ struct kbinding_entry_s {
   uint16_t          index;       /* into kbinding_t.entry */
   uint8_t           modifier;    /* Modifier key of binding (can be OR'ed) */
   uint8_t           is_alias:1;  /* is made from an alias entry ? */
-  uint8_t           is_gui:1;
+  uint8_t           is_gui:1;    /* controls the gui (eg opening a dialogue) rather than the xine playback */
+  uint8_t           is_default:1;/* still or again the preset mapping */
 };
 
 #define MAX_ENTRIES 301          /* Including terminating null entry */

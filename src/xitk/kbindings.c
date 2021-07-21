@@ -57,6 +57,7 @@ struct xui_keyedit_s {
   xitk_widget_t        *edit;
   xitk_widget_t        *delete;
   xitk_widget_t        *save;
+  xitk_widget_t        *reset;
   xitk_widget_t        *done;
   xitk_widget_t        *grab;
 
@@ -611,6 +612,7 @@ static void kbedit_unset (xui_keyedit_t *kbedit) {
   if(xitk_labelbutton_get_state(kbedit->edit))
     xitk_labelbutton_set_state(kbedit->edit, 0);
 
+  xitk_enable_and_show_widget (kbedit->reset);
   xitk_disable_widget(kbedit->alias);
   xitk_disable_widget(kbedit->edit);
   xitk_disable_widget(kbedit->delete);
@@ -636,6 +638,11 @@ static void _kbedit_set (xui_keyedit_t *kbedit) {
   } else {
     xitk_disable_widget (kbedit->delete);
     xitk_disable_widget (kbedit->alias);
+  }
+  if (kbedit->ksel->is_default) {
+    xitk_disable_widget (kbedit->reset);
+  } else {
+    xitk_enable_and_show_widget (kbedit->reset);
   }
   kbedit_display_kbinding (kbedit, kbedit->entries[kbedit->nsel], kbedit->ksel);
 }
@@ -1243,10 +1250,10 @@ void kbedit_window (gGui_t *gui) {
   lb.state_callback    = NULL;
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
-  w =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
+  kbedit->reset =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
     "Black", "Black", "White", hboldfontname);
-  xitk_add_widget (kbedit->widget_list, w);
-  xitk_enable_and_show_widget(w);
+  xitk_add_widget (kbedit->widget_list, kbedit->reset);
+  xitk_enable_and_show_widget (kbedit->reset);
 
   x += btnw + 4;
 
