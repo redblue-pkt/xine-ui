@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -43,7 +43,7 @@ static __attribute__((noreturn)) void *xine_stdctl_loop (void *data) {
   gGui_t           *gui = data;
   char              buf[256], *c, *c1;
   int               len, selrt;
-  kbinding_entry_t *k;
+  const kbinding_entry_t *k;
   fd_set            set;
   struct timeval    tv;
   int               secs, last_secs;

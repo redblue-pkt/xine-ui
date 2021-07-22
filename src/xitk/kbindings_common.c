@@ -534,54 +534,6 @@ static void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
 #endif
 }
 
-kbinding_t *_kbindings_init_to_default(void) {
-  kbinding_t  *kbt;
-  int i;
-
-  kbt = (kbinding_t *)malloc (sizeof (*kbt));
-  if (!kbt)
-    return NULL;
-
-  kbt->last = NULL;
-  kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
-  kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
-  if (!kbt->action_index || !kbt->key_index) {
-    xine_sarray_delete (kbt->action_index);
-    xine_sarray_delete (kbt->key_index);
-    free (kbt);
-    return NULL;
-  }
-
-  /*
-   * FIXME: This should be a compile time check.
-   */
-  /* Check for space to hold the default table plus a number of user defined aliases. */
-  if (KBT_NUM_BASE > MAX_ENTRIES) {
-    fprintf(stderr, "%s(%d):\n"
-		    "  Too many entries in default_binding_table[].\n"
-		    "  Increase MAX_ENTRIES to at least %zd.\n",
-	    __XINE_FUNCTION__, __LINE__, KBT_NUM_BASE + 100);
-    abort();
-  }
-
-  for (i = 0; i < (int)KBT_NUM_BASE; i++) {
-    kbinding_entry_t *n = kbt->base + i;
-    n->action     = default_binding_table[i].action;
-    n->action_id  = default_binding_table[i].action_id;
-    n->modifier   = default_binding_table[i].modifier;
-    n->index      = i;
-    n->is_alias   = default_binding_table[i].is_alias;
-    n->is_gui     = default_binding_table[i].is_gui;
-    n->is_default = 1;
-    n->comment    = gettext (default_binding_table[i].comment);
-    n->key        = refs_strdup (default_binding_table[i].key);
-    kbindings_index_add (kbt, n);
-  }
-  kbt->num_entries = i;
-
-  return kbt;
-}
-
 static const uint8_t _tab_char[256] = {
   /* end of string */
   [0]    =   1,
@@ -730,6 +682,26 @@ static int _kbindings_modifier_from_string (char *s) {
 }
 
 /*
+ * Return a key binding entry (if available) matching with action string.
+ */
+static kbinding_entry_t *_kbindings_lookup_action (kbinding_t *kbt, const char *action) {
+  kbinding_entry_t dummy = {
+    .action = (char *)action, /* will not be written to */
+    .is_alias = 0
+  };
+  int i = xine_sarray_binary_search (kbt->action_index, &dummy);
+  if (i < 0)
+    return NULL;
+  return (kbinding_entry_t *)xine_sarray_get (kbt->action_index, i);
+}
+
+const kbinding_entry_t *kbindings_lookup_action (kbinding_t *kbt, const char *action) {
+  if((action == NULL) || (kbt == NULL))
+    return NULL;
+  return _kbindings_lookup_action (kbt, action);
+}
+
+/*
  * Add an entry in key binding table kbt. Called when an Alias entry
  * is found.
  */
@@ -743,7 +715,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     return;
   }
 
-  k = kbindings_lookup_action (kbt, ukb->alias);
+  k = _kbindings_lookup_action (kbt, ukb->alias);
   if (k) {
     kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
     if (n) {
@@ -770,7 +742,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
  * Change keystroke of modifier in entry.
  */
 static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
-  kbinding_entry_t *e = kbindings_lookup_action (kbt, ukb->action);
+  kbinding_entry_t *e = _kbindings_lookup_action (kbt, ukb->action);
   if (e) {
     int modifier = _kbindings_modifier_from_string (ukb->modifier);
     if (strcmp (e->key, ukb->key) || (e->modifier != modifier)) {
@@ -954,10 +926,48 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
  */
 kbinding_t *kbindings_init_kbinding (const char *keymap_file) {
   kbinding_t *kbt;
+  int i;
 
-  kbt = _kbindings_init_to_default ();
+  kbt = (kbinding_t *)malloc (sizeof (*kbt));
   if (!kbt)
     return NULL;
+
+  kbt->last = NULL;
+  kbt->action_index = xine_sarray_new (MAX_ENTRIES, _kbindings_action_cmp);
+  kbt->key_index = xine_sarray_new (MAX_ENTRIES, _kbindings_key_cmp);
+  if (!kbt->action_index || !kbt->key_index) {
+    xine_sarray_delete (kbt->action_index);
+    xine_sarray_delete (kbt->key_index);
+    free (kbt);
+    return NULL;
+  }
+
+  /*
+   * FIXME: This should be a compile time check.
+   */
+  /* Check for space to hold the default table plus a number of user defined aliases. */
+  if (KBT_NUM_BASE > MAX_ENTRIES) {
+    fprintf(stderr, "%s(%d):\n"
+		    "  Too many entries in default_binding_table[].\n"
+		    "  Increase MAX_ENTRIES to at least %zd.\n",
+	    __XINE_FUNCTION__, __LINE__, KBT_NUM_BASE + 100);
+    abort();
+  }
+
+  for (i = 0; i < (int)KBT_NUM_BASE; i++) {
+    kbinding_entry_t *n = kbt->base + i;
+    n->action     = default_binding_table[i].action;
+    n->action_id  = default_binding_table[i].action_id;
+    n->modifier   = default_binding_table[i].modifier;
+    n->index      = i;
+    n->is_alias   = default_binding_table[i].is_alias;
+    n->is_gui     = default_binding_table[i].is_gui;
+    n->is_default = 1;
+    n->comment    = gettext (default_binding_table[i].comment);
+    n->key        = refs_strdup (default_binding_table[i].key);
+    kbindings_index_add (kbt, n);
+  }
+  kbt->num_entries = i;
 
   if (keymap_file)
     _kbinding_load_config (kbt, keymap_file);
@@ -971,9 +981,13 @@ kbinding_t *kbindings_init_kbinding (const char *keymap_file) {
 /*
  * Free a keybindings object.
  */
-void _kbindings_free_bindings(kbinding_t *kbt) {
+void kbindings_free_kbinding (kbinding_t **_kbt) {
+  kbinding_t *kbt;
   int i;
 
+  if (!_kbt)
+    return;
+  kbt = *_kbt;
   if (!kbt)
     return;
 
@@ -1001,37 +1015,8 @@ void _kbindings_free_bindings(kbinding_t *kbt) {
   }
   xine_sarray_delete (kbt->key_index);
   xine_sarray_delete (kbt->action_index);
-  SAFE_FREE(kbt);
-}
-
-/*
- * Freeing key binding table, then NULLify it.
- */
-void kbindings_free_kbinding(kbinding_t **kbt) {
-
-  ABORT_IF_NULL(*kbt);
-
-  _kbindings_free_bindings(*kbt);
-  *kbt = NULL;
-}
-
-/*
- * Return a key binding entry (if available) matching with action string.
- */
-kbinding_entry_t *kbindings_lookup_action(kbinding_t *kbt, const char *action) {
-  if((action == NULL) || (kbt == NULL))
-    return NULL;
-
-  {
-    kbinding_entry_t dummy = {
-      .action = (char *)action, /* will not be written to */
-      .is_alias = 0
-    };
-    int i = xine_sarray_binary_search (kbt->action_index, &dummy);
-    if (i < 0)
-      return NULL;
-    return (kbinding_entry_t *)xine_sarray_get (kbt->action_index, i);
-  }
+  free (kbt);
+  *_kbt = NULL;
 }
 
 /*

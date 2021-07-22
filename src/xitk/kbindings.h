@@ -246,17 +246,26 @@ typedef enum {
 } action_id_t;
 
 kbinding_t *kbindings_init_kbinding (const char *keymap_file);
-void kbindings_save_kbinding(kbinding_t *);
-void kbindings_reset_kbinding(kbinding_t *);
-void kbindings_free_kbinding(kbinding_t **);
-void kbindings_display_current_bindings(kbinding_t *);
-void kbindings_display_default_lirc_bindings(void);
-void kbindings_display_default_bindings(void);
+
+void kbindings_reset_kbinding (kbinding_t *kbt);
+
+typedef enum {
+  KBT_DISPLAY_MODE_DEFAULT = 1,
+  KBT_DISPLAY_MODE_LIRC,
+  KBT_DISPLAY_MODE_CURRENT
+} kbedit_display_mode_t;
+
+void kbindings_display_bindings (gGui_t *gui, kbedit_display_mode_t mode);
+
 action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *event, int no_gui);
-kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, int modifier);
-kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
-void kbindings_handle_kbinding(kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button);
-action_id_t kbindings_get_action_id(kbinding_entry_t *);
+const kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, int modifier);
+const kbinding_entry_t *kbindings_lookup_action (kbinding_t *kbt, const char *action);
+action_id_t kbindings_get_action_id (const kbinding_entry_t *entry);
+void kbindings_handle_kbinding (gGui_t *gui, kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button);
+
+void kbindings_save_kbinding (gGui_t *gui, kbinding_t *kbt, const char *keymap_file);
+
+void kbindings_free_kbinding (kbinding_t **kbt);
 
 /* return bytes written (without terminating nul).
  * if result >= buf_size, output was truncated. Does not return space required!

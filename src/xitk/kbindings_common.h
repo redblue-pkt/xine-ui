@@ -52,7 +52,6 @@ struct kbinding_entry_s {
 
 #define MAX_ENTRIES 301          /* Including terminating null entry */
 
-kbinding_t *_kbindings_init_to_default (void);
 kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt);
 
 const kbinding_entry_t *_kbindings_get_entry (kbinding_t *kbt, int index);
@@ -65,7 +64,5 @@ int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *k
 int kbindings_reset (kbinding_t *kbt, int index);
 
 kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier);
-
-void _kbindings_free_bindings (kbinding_t *kbt);
 
 #endif
