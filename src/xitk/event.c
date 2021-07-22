@@ -1268,14 +1268,14 @@ void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
   if (gui->stdctl_enable) {
     stdctl_keypress (gui, ke->keycode_str);
   }
-  kbindings_handle_kbinding(gui->kbindings, ke->key_pressed, ke->keycode, ke->modifiers, -1);
+  kbindings_handle_kbinding (gui, gui->kbindings, ke->key_pressed, ke->keycode, ke->modifiers, -1);
 }
 
 void gui_handle_button_event (void *data, const xitk_button_event_t *be) {
   gGui_t *gui = data;
 
   if (be->event == XITK_BUTTON_RELEASE) {
-    kbindings_handle_kbinding(gui->kbindings, 0, 0, be->modifiers, be->button);
+    kbindings_handle_kbinding (gui, gui->kbindings, 0, 0, be->modifiers, be->button);
   }
 }
 
@@ -1948,7 +1948,7 @@ void gui_run(gGui_t *gui, char **session_opts) {
   gui->running = 0;
   deinit_session();
 
-  kbindings_save_kbinding(gui->kbindings);
+  kbindings_save_kbinding (gui, gui->kbindings, gui->keymap_file);
   kbindings_free_kbinding(&gui->kbindings);
 
   /*

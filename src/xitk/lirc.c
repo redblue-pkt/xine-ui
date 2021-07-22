@@ -87,7 +87,7 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
   gGui_t *gui = data;
   char             *code, *c;
   int               ret;
-  kbinding_entry_t *k;
+  const kbinding_entry_t *k;
   fd_set            set;
   struct timeval    tv;
 
@@ -112,10 +112,10 @@ static __attribute__((noreturn)) void *xine_lirc_loop (void *data) {
 	fprintf(stdout, "Command Received = '%s'\n", c);
 #endif
 
-	k = kbindings_lookup_action (gui->kbindings, c);
+        k = kbindings_lookup_action (gui->kbindings, c);
 
 	if(k) {
-          gui_execute_action_id (gui, (kbindings_get_action_id(k)));
+          gui_execute_action_id (gui, (kbindings_get_action_id (k)));
 	}
 	else {
 	  char from[256];

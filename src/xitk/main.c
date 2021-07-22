@@ -1497,11 +1497,11 @@ int main(int argc, char *argv[]) {
 	char *p = xine_chomp(optarg);
 
 	if(!strcasecmp(p, "default"))
-	  kbindings_display_default_bindings();
+          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
 	else if(!strcasecmp(p, "lirc"))
-	  kbindings_display_default_lirc_bindings();
+          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_LIRC);
 	else if(!strcasecmp(p, "remapped"))
-	  kbindings_display_current_bindings ((kbindings_init_kbinding (gui->keymap_file)));
+          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_CURRENT);
 	else if(!strncasecmp(p, "file:", 5)) {
 	  char  *keymap_file = p + 5;
 
@@ -1511,10 +1511,10 @@ int main(int argc, char *argv[]) {
 	  }
 	}
 	else
-	  kbindings_display_default_bindings();
+          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
       }
       else
-	kbindings_display_default_bindings();
+        kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
       exit(1);
       break;
 
