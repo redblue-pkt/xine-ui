@@ -24,10 +24,6 @@ noinst_LIBRARIES = \
 	$(imlib_decode_lib) \
 	$(oxine_lib)
 
-kbindings_man_CFLAGS = $(AM_CFLAGS) -DKBINDINGS_MAN
-kbindings_man_LDADD = $(THREAD_LIBS) $(LIBCOMMON) $(LTLIBINTL) $(XINE_LIBS)
-kbindings_man_SOURCES = kbindings_man.c kbindings_common.c
-
 EXTRA_DIST = \
 	$(skins_DATA) \
 	$(skin1_DATA) \

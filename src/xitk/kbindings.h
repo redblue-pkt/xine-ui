@@ -252,7 +252,8 @@ void kbindings_reset_kbinding (kbinding_t *kbt);
 typedef enum {
   KBT_DISPLAY_MODE_DEFAULT = 1,
   KBT_DISPLAY_MODE_LIRC,
-  KBT_DISPLAY_MODE_CURRENT
+  KBT_DISPLAY_MODE_CURRENT,
+  KBT_DISPLAY_MODE_MAN
 } kbedit_display_mode_t;
 
 void kbindings_display_bindings (gGui_t *gui, kbedit_display_mode_t mode);
