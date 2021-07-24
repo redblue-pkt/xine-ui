@@ -1429,7 +1429,7 @@ msgid ""
 "The following key bindings pairs are identical:\n"
 "\n"
 msgstr ""
-"Die folgenden Paare von Tastenbelegung sind identisch::\n"
+"Die folgenden Paare von Tastenbelegungen sind identisch:\n"
 "\n"
 
 msgid "and"
