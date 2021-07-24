@@ -1592,22 +1592,17 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	if(sprop && sprop->anchor)
 	  (*snode)->mmk->mrl = strdup(sprop->anchor);
 	else {
-	  char  buffer[((smil->base) ? (strlen(smil->base) + 1) : 0) + strlen(prop->value) + 1];
-	  char *p;
-
-	  memset(&buffer, 0, sizeof(buffer));
-	  p = buffer;
-
-	  if(smil->base && (!strstr(prop->value, "://"))) {
-	    strlcat(p, smil->base, sizeof(buffer));
-
-	    if(buffer[strlen(buffer) - 1] != '/')
-	      strlcat(p, "/", sizeof(buffer));
-	  }
-
-	  strlcat(p, prop->value, sizeof(buffer));
-
-	  (*snode)->mmk->mrl = strdup(buffer);
+          size_t l1 = smil->base ? strlen (smil->base) : 0, l2 = strlen (prop->value) + 1;
+          char *p = malloc (l1 + l2 + 1);
+          (*snode)->mmk->mrl = p;
+          if (p) {
+            if (l1 && !strstr (prop->value, "://")) {
+              memcpy (p, smil->base, l1); p += l1;
+              if (p[-1] != '/')
+                *p++ = '/';
+            }
+            memcpy (p, prop->value, l2);
+          }
 	}
       }
       else if(!strcasecmp(prop->name, "TITLE")) {
@@ -2241,15 +2236,14 @@ static mediamark_t **xml_freevo_playlist (_lf_t *lf, xml_node_t *xml_tree) {
 		else if(!strcasecmp(ssentry->name, "FILE")) {
 
 		  if(origin) {
-		    const size_t urlsize = strlen(origin) + strlen(ssentry->data) + 2;
-		    url = (char *) malloc(urlsize);
-		    strlcat(url, origin, urlsize);
-
-		    if((url[strlen(url) - 1] == '/') && (*ssentry->data == '/'))
-		      url[strlen(url) - 1] = '\0';
-
-		    strlcat(url, ssentry->data, urlsize);
-
+                    size_t l1 = strlen (origin), l2 = strlen (ssentry->data);
+                    url = (char *)malloc (l1 + l2 + 2);
+                    if (l1) {
+                      memcpy (url, origin, l1);
+                      if ((url[l1 - 1] == '/') && (ssentry->data[0] == '/'))
+                        l1 -= 1;
+                    }
+                    memcpy (url + l1, ssentry->data, l2 + 1);
 		  }
 		  else
 		    url = strdup(ssentry->data);
@@ -2746,11 +2740,12 @@ void mediamark_save_mediamarks (gGui_t *gui, const char *filename) {
     int   i;
     FILE *fd;
     const char *store_item;
-    char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX];
+    char buffer[_PATH_MAX + _NAME_MAX + 2], current_dir[_PATH_MAX + 1];
 
-    if (getcwd(current_dir, sizeof(current_dir))) {
-      if (current_dir[strlen(current_dir) - 1] != '/')
-        strlcat(current_dir, "/", sizeof(current_dir));
+    if (getcwd (current_dir, sizeof (current_dir))) {
+      size_t dl = strlen (current_dir);
+      if (dl && (current_dir[dl - 1] != '/'))
+        strcpy (current_dir + dl, "/");
     } else
       strcpy(current_dir, "");
 

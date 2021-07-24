@@ -1656,15 +1656,14 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
   pthread_mutex_init (&xitk->mutex, &attr);
 
-  snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
-
+  snprintf (buffer, sizeof (buffer),
+    "-[ xiTK version %d.%d.%d"
 #ifdef WITH_XFT
-  strlcat(buffer, "[XFT]", sizeof(buffer));
+    " [XFT]"
 #elif defined(WITH_XMB)
-  strlcat(buffer, "[XMB]", sizeof(buffer));
+    " [XMB]"
 #endif
-
-  strlcat(buffer, " ]-", sizeof(buffer));
+    " ]-", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
 
   if (verbosity >= 1)
     printf("%s", buffer);
@@ -2224,3 +2223,4 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
+
