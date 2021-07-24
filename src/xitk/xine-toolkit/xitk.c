@@ -1605,7 +1605,6 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
                    int use_x_lock_display, int use_synchronized_x, int verbosity) {
 
   __xitk_t *xitk;
-  char buffer[256];
   pthread_mutexattr_t attr;
 
 #ifdef ENABLE_NLS
@@ -1656,17 +1655,16 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
   pthread_mutex_init (&xitk->mutex, &attr);
 
-  snprintf (buffer, sizeof (buffer),
-    "-[ xiTK version %d.%d.%d"
+  if (verbosity >= 1) {
+    printf (
+      "-[ xiTK version %d.%d.%d"
 #ifdef WITH_XFT
-    " [XFT]"
+      " [XFT]"
 #elif defined(WITH_XMB)
-    " [XMB]"
+      " [XMB]"
 #endif
-    " ]-", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
-
-  if (verbosity >= 1)
-    printf("%s", buffer);
+      " ]-\n", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
+  }
 
   /* init font caching */
   xitk->x.font_cache = xitk_font_cache_init();
