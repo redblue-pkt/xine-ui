@@ -1493,29 +1493,33 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_DISPLAY_KEYMAP:
-      if(optarg != NULL) {
-	char *p = xine_chomp(optarg);
-
-	if(!strcasecmp(p, "default"))
-          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
-	else if(!strcasecmp(p, "lirc"))
-          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_LIRC);
-	else if(!strcasecmp(p, "remapped"))
-          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_CURRENT);
-	else if(!strncasecmp(p, "file:", 5)) {
-	  char  *keymap_file = p + 5;
-
-	  if((gui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
-	    gui->keymap_file = xitk_filter_filename (keymap_file);
-	    continue;
-	  }
-	}
-	else
-          kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
+      {
+        kbedit_display_mode_t mode = KBT_DISPLAY_MODE_DEFAULT;
+        if (optarg) {
+          char *p = xine_chomp (optarg);
+          /*
+          if (!strcasecmp (p, "default"))
+            mode = KBT_DISPLAY_MODE_DEFAULT;
+          */
+          if (!strcasecmp (p, "lirc")) {
+            mode = KBT_DISPLAY_MODE_LIRC;
+          } else if (!strcasecmp (p, "remapped")) {
+            gui->keymap_file = xitk_asprintf ("%s/" CONFIGDIR "/keymap", xine_get_homedir ());
+            mode = KBT_DISPLAY_MODE_CURRENT;
+          } else if (!strcasecmp (p, "man")) {
+            gui->keymap_file = xitk_asprintf ("%s/" CONFIGDIR "/keymap", xine_get_homedir ());
+            mode = KBT_DISPLAY_MODE_MAN;
+          } else if (!strncasecmp(p, "file:", 5)) {
+            if (!gui->keymap_file && p[5]) {
+              gui->keymap_file = xitk_filter_filename (p + 5);
+              continue;
+            }
+          }
+        }
+        kbindings_display_bindings (gui, mode);
+        SAFE_FREE (gui->keymap_file);
+        exit (1);
       }
-      else
-        kbindings_display_bindings (gui, KBT_DISPLAY_MODE_DEFAULT);
-      exit(1);
       break;
 
     case 'n': /* Enable remote control server */
@@ -1842,12 +1846,8 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize keymap
    */
-  if(gui->keymap_file == NULL) {
-    const char *cfgdir = CONFIGDIR;
-    const char *keymap = "keymap";
-
-    gui->keymap_file = xitk_asprintf("%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
-  }
+  if (!gui->keymap_file)
+    gui->keymap_file = xitk_asprintf ("%s/" CONFIGDIR "/keymap", xine_get_homedir ());
 
   pthread_mutex_init (&gui->seek_mutex, NULL);
   gui->seek_running = 0;

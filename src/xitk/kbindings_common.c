@@ -857,7 +857,6 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *file) {
 /*
  * Check if there some redundant entries in key binding table kbt.
  */
-#ifndef KBINDINGS_MAN
 static void _kbinding_done (void *data, int state) {
   kbinding_t *kbt = data;
   if (state == 1)
@@ -865,13 +864,14 @@ static void _kbinding_done (void *data, int state) {
   else if (state == 2)
     kbedit_window (gGui);
 }
-#endif
 
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
   gGui_t *gui = gGui;
   kbinding_entry_t *e1;
   int n, i, found = 0;
-  char *kmsg = NULL, *dna = NULL;
+  size_t msglen = 0, dnalen = 0;
+  char *kmsg = NULL;
+  const char *dna = NULL;
 
   if(kbt == NULL)
     return;
@@ -881,41 +881,58 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
   for (i = 1; i < n; i++) {
     kbinding_entry_t *e2 = xine_sarray_get (kbt->key_index, i);
     if (!_kbindings_key_cmp (e1, e2)) {
-      const char *action1, *action2;
+      char *p;
+      const char *action1 = e1->action, *action2 = e2->action;
+      size_t alen1 = strlen (action1), alen2 = strlen (action2);
       found++;
-      action1 = e1->action;
-      action2 = e2->action;
       if (!kmsg) {
         const char *header = _("The following key bindings pairs are identical:\n\n");
+        size_t hlen = strlen (header);
         dna = _("and");
-        kmsg = xitk_asprintf ("%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
+        dnalen = strlen (dna);
+        kmsg = malloc (hlen + alen1 + 1 + dnalen + 1 + alen2 + 2);
+        if (!kmsg)
+          break;
+        p = kmsg;
+        memcpy (p, header, hlen); p += hlen;
       } else {
-        size_t len1 = strlen (kmsg);
-        size_t len2 = strlen (action1) + 1 + strlen (dna) + 1 + strlen (action2) + 2;
-        kmsg = (char *)realloc (kmsg, len1 + len2 + 1);
-        sprintf (kmsg + len1, "%s%s%c%s%c%s", ", ", action1, ' ', dna, ' ', action2);
+        char *nmsg = realloc (kmsg, msglen + 2 + alen1 + 1 + dnalen + 1 + alen2 + 2);
+        if (!nmsg)
+          break;
+        kmsg = nmsg;
+        p = kmsg + msglen;
+        memcpy (p, ", ", 2); p += 2;
       }
+      memcpy (p, action1, alen1); p += alen1;
+      *p++ = ' ';
+      memcpy (p, dna, dnalen); p += dnalen;
+      *p++ = ' ';
+      memcpy (p, action2, alen2 + 1); p += alen2;
+      msglen = p - kmsg;
     }
     e1 = e2;
   }
 
-#ifndef KBINDINGS_MAN
-  if(found) {
-    char          *footer = _(".\n\nWhat do you want to do ?\n");
-
-    kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
-    strlcat(kmsg, footer, strlen(kmsg) + strlen(footer) + 1);
-
-    dump_error(kmsg);
-
-    xitk_register_key_t key =
-    xitk_window_dialog_3 (gui->xitk,
-      NULL,
-      get_layer_above_video (gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
-      _("Reset"), _("Editor"), _("Cancel"), NULL, 0, ALIGN_CENTER, "%s", kmsg);
-    video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
+  if (found) {
+    if (gui->xitk) {
+      xitk_register_key_t key;
+      const char *footer = _(".\n\nWhat do you want to do ?\n");
+      size_t flen = strlen (footer);
+      char *nmsg = realloc (kmsg, msglen + flen + 1);
+      if (nmsg) {
+        kmsg = nmsg;
+        memcpy (kmsg + msglen, footer, flen + 1);
+      }
+      dump_error (kmsg);
+      key = xitk_window_dialog_3 (gui->xitk, NULL,
+        get_layer_above_video (gui), 450, _("Keybindings error!"), _kbinding_done, kbt,
+        _("Reset"), _("Editor"), _("Cancel"), NULL, 0, ALIGN_CENTER, "%s", kmsg);
+      video_window_set_transient_for (gui->vwin, xitk_get_window (gui->xitk, key));
+    } else {
+      memcpy (kmsg + msglen, "\n", 2);
+      printf ("%s", kmsg);
+    }
   }
-#endif
 
   free(kmsg);
 }
