@@ -53,8 +53,10 @@ static skins_locations_t *_skin_add_1 (gGui_t *gui, int *index, const char *full
   skins_locations_t *s;
   int n, i;
   uint8_t *m = malloc (sizeof (*s) + (end - fullname) + 1);
-  if (!m)
+  if (!m) {
+    *index = -1;
     return NULL;
+  }
   s = (skins_locations_t *)m;
   m += sizeof (*s);
   memcpy (m, fullname, end - fullname + 1);
@@ -503,4 +505,3 @@ void skin_init (gGui_t *gui) {
     gui->visual_anim.mrls[gui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
 }
-
