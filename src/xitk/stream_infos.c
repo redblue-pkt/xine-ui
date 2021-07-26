@@ -335,86 +335,65 @@ static void stream_infos_update (xitk_widget_t *w, void *data, int state) {
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
-  char        *title   = NULL;
-  char        *atitle  = NULL;
-  char        *album   = NULL;
-  char        *aartist = NULL;
-  char        *artist  = NULL;
-  char        *aalbum  = NULL;
-  char        *ident   = NULL;
+  const char *artist1, *title1, *album1;
+  char       *artist2 = NULL, *title2 = NULL, *album2 = NULL, *ident = NULL;
   xitk_recode_t *xr;
 
   if(!stream)
     return NULL;
 
-  title = (char *)xine_get_meta_info(stream, XINE_META_INFO_TITLE);
-  artist = (char *)xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
-  album = (char *)xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
+  title1  = xine_get_meta_info (stream, XINE_META_INFO_TITLE);
+  artist1 = xine_get_meta_info (stream, XINE_META_INFO_ARTIST);
+  album1  = xine_get_meta_info (stream, XINE_META_INFO_ALBUM);
 
   xr = xitk_recode_init (METAINFO_CHARSET, NULL, 0);
-  if(title)
-    title = xitk_recode(xr, title);
-  if(artist)
-    artist = xitk_recode(xr, artist);
-  if(album)
-    album = xitk_recode(xr, album);
-  xitk_recode_done(xr);
+  if (title1)
+    title2 = xitk_recode (xr, title1);
+  if (artist1)
+    artist2 = xitk_recode (xr, artist1);
+  if (album1)
+    album2 = xitk_recode (xr, album1);
+  xitk_recode_done (xr);
 
   /*
    * Since meta info can be corrupted/wrong/ugly
    * we need to clean and check them before using.
    * Note: atoa() modify the string, so we work on a copy.
    */
-  if(title && strlen(title)) {
-    atitle = atoa(title);
-    if ( ! *atitle )
-      atitle = strdup(title);
-    else
-      atitle = strdup(atitle);
-  }
-  if(artist && strlen(artist)) {
-    aartist = atoa(artist);
-    if ( ! *aartist )
-      aartist = strdup(artist);
-    else
-      aartist = strdup(aartist);
-  }
-  if(album && strlen(album)) {
-    aalbum = atoa(album);
-    if ( ! *aalbum )
-      aalbum = strdup(album);
-    else
-      aalbum = strdup(aalbum);
-  }
-  free(title);
-  free(artist);
-  free(album);
+  artist1 = artist2 ? atoa (artist2) : "";
+  title1 = title2 ? atoa (title2) : "";
+  album1 = album2 ? atoa (album2) : "";
 
-  if(atitle) {
-    int len = strlen(atitle) + 1;
+  if (title1[0]) {
+    char *p;
+    size_t tlen = strlen (title1);
+    size_t alen = strlen (artist1);
+    size_t llen = strlen (album1);
 
-    if(aartist && strlen(aartist))
-      len += strlen(aartist) + 3;
-    if(aalbum && strlen(aalbum))
-      len += strlen(aalbum) + 3;
+    ident = (char *)malloc (tlen + 2 + alen + 3 + llen + 1 + 1);
+    if (!ident)
+      return NULL;
+    p = ident;
 
-    ident = (char *) malloc(len + 1);
-    strcpy(ident, atitle);
-
-    if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {
-      strlcat(ident, " (", len);
-      if(aartist && strlen(aartist))
-	strlcat(ident, aartist, len);
-      if((aartist && strlen(aartist)) && (aalbum && strlen(aalbum)))
-	strlcat(ident, " - ", len);
-      if(aalbum && strlen(aalbum))
-	strlcat(ident, aalbum, len);
-      strlcat(ident, ")", len);
+    memcpy (p, title1, tlen); p += tlen;
+    if (alen || llen) {
+      memcpy (p, " (", 2); p += 2;
+      if (alen) {
+        memcpy (p, artist1, alen); p += alen;
+      }
+      if (alen && llen) {
+        memcpy (p, " - ", 3); p += 3;
+      }
+      if (llen) {
+        memcpy (p, album1, llen); p += llen;
+      }
+      *p++ = ')';
     }
+    *p = 0;
   }
-  free(atitle);
-  free(aartist);
-  free(aalbum);
+  free (album2);
+  free (title2);
+  free (artist2);
 
   return ident;
 }
