@@ -49,6 +49,7 @@
 #include "xine-toolkit/slider.h"
 #include "xine-toolkit/button.h"
 #include "xine-toolkit/button_list.h"
+#include "xine-toolkit/skin.h"
 
 struct xui_panel_st {
   gGui_t               *gui;

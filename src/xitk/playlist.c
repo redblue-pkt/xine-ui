@@ -45,6 +45,7 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/button_list.h"
 #include "xine-toolkit/browser.h"
+#include "xine-toolkit/skin.h"
 
 
 struct xui_playlist_st {

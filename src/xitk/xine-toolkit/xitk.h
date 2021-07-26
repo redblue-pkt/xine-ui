@@ -105,6 +105,7 @@ typedef struct xitk_s xitk_t;
 typedef struct xitk_widget_s xitk_widget_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
 typedef struct xitk_skin_config_s xitk_skin_config_t;
+typedef struct xitk_skin_element_info_s xitk_skin_element_info_t;
 typedef struct xitk_be_font_s xitk_font_t;
 typedef struct xitk_image_s xitk_image_t;
 typedef struct xitk_window_s xitk_window_t;
@@ -241,30 +242,6 @@ typedef struct {
   xitk_image_t *image;
   int x, y, width, height;
 } xitk_part_image_t;
-
-typedef struct {
-  /* all */
-  int x, y;
-  int visibility, enability;
-  char *pixmap_name;
-  xitk_part_image_t pixmap_img;
-  /* button list */
-  int max_buttons, direction;
-  /* browser */
-  int browser_entries;
-  /* label */
-  int label_length, label_alignment, label_y, label_printable, label_staticity;
-  int label_animation, label_animation_step;
-  unsigned long int label_animation_timer;
-  char *label_color, *label_color_focus, *label_color_click, *label_fontname;
-  char *label_pixmap_font_name, *label_pixmap_highlight_font_name;
-  char *label_pixmap_font_format;
-  xitk_image_t *label_pixmap_font_img, *label_pixmap_highlight_font_img;
-  /* slider */
-  int slider_type, slider_radius;
-  char *slider_pixmap_pad_name;
-  xitk_part_image_t slider_pixmap_pad_img;
-} xitk_skin_element_info_t;
 
 /* Group of widgets widget */
 #define WIDGET_GROUP                0x00000800
@@ -883,63 +860,6 @@ void xitk_image_copy (xitk_image_t *from, xitk_image_t *to);
 /* Return size of output string (>=buf_size if truncated). -1 on error. */
 int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size);
 
-/*
- *  *** skin
- */
-
-/*
- * Alloc a xitk_skin_config_t* memory area, nullify pointers.
- */
-xitk_skin_config_t *xitk_skin_init_config(xitk_t *);
-
-/*
- * Release all allocated memory of a xitk_skin_config_t* variable (element chained struct too).
- */
-void xitk_skin_free_config(xitk_skin_config_t *);
-
-/*
- * Load the skin configfile.
- */
-int xitk_skin_load_config(xitk_skin_config_t *, const char *, const char *);
-
-/*
- * Check skin version.
- * return: 0 if version found < min_version
- *         1 if version found == min_version
- *         2 if version found > min_version
- *        -1 if no version found
- */
-int xitk_skin_check_version(xitk_skin_config_t *, int);
-
-/*
- * Unload (free) xitk_skin_config_t object.
- */
-void xitk_skin_unload_config(xitk_skin_config_t *);
-
-const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, const char *element_name);
-
-/*
- *
- */
-const char *xitk_skin_get_logo(xitk_skin_config_t *);
-
-/*
- *
- */
-const char *xitk_skin_get_animation(xitk_skin_config_t *);
-
-
-/*
- *
- */
-void xitk_skin_lock(xitk_skin_config_t *);
-
-/*
- *
- */
-void xitk_skin_unlock(xitk_skin_config_t *);
-
-
 /**
  * Font manipulations.
  */
@@ -1234,3 +1154,4 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+

@@ -36,6 +36,7 @@
 #include "playlist.h"
 #include "videowin.h"
 #include "errors.h"
+#include "xine-toolkit/skin.h"
 #include "skins_internal.h"
 
 struct skins_locations_s {

@@ -29,6 +29,8 @@
 #include <pthread.h>
 #include <errno.h>
 
+#include <xine/sorted_array.h>
+
 #include "utils.h"
 #include "_xitk.h"
 #include "slider.h"
@@ -38,6 +40,38 @@
 /************************************************************************************
  *                                     PRIVATES
  ************************************************************************************/
+
+typedef struct {
+  /* this needs to stay first. */
+  char                          section[64];
+
+  xitk_skin_element_info_t      info;
+} xitk_skin_element_t;
+
+struct xitk_skin_config_s {
+  xitk_t                       *xitk;
+  FILE                         *fd;
+  char                         *path;
+  char                         *skinfile;
+
+  char                         *name;
+  int                           version;
+  char                         *author;
+  char                         *date;
+  char                         *url;
+  char                         *logo;
+  char                         *animation;
+
+  char                         *load_command;
+  char                         *unload_command;
+
+  xine_sarray_t                *elements;
+  xitk_skin_element_t          *celement;
+
+  xine_sarray_t                *imgs;
+
+  pthread_mutex_t               skin_mutex;
+};
 
 typedef struct {
   const char *name, *format;
@@ -203,99 +237,126 @@ static void skin_free_imgs (xitk_skin_config_t *skonfig) {
   xine_sarray_clear (skonfig->imgs);
 }
 
+/* 1 = \0; 2 = 0-9; 4 = A-Z,a-z,_; 8 = $; 16 = (,{; 32 = ),}; */
+static const uint8_t _tab_char[256] = {
+   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 8, 0, 0, 0,16,32, 0, 0, 0, 0, 0, 0,
+   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
+   0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 4,
+   0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+   4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,16, 0,32, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
 /*
  *
  */
 //#warning FIXME
-static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
-  char *p;
-  char *buf2 = NULL;
-  char  buf[BUFSIZ], var[BUFSIZ];
+static char *_expanded (xitk_skin_config_t *skonfig, const char *cmd) {
+  const uint8_t *p = (const uint8_t *)cmd;
+  uint8_t buf[2048], *q = buf, *e = buf + sizeof (buf) - 1;
+  int num_vars = 0;
 
-  ABORT_IF_NULL(skonfig);
-
-  if( ! ( cmd && strchr(cmd, '$') ) ) return NULL;
-
-  buf2 = calloc(BUFSIZ, sizeof(char));
-
-  strlcpy(buf, cmd, sizeof(buf));
-
-  buf2[0] = 0;
-
-  p = buf;
-
-  while(*p != '\0') {
-    switch(*p) {
-
-      /*
-       * Prefix of variable names.
-       */
-    case '$':
-      memset(&var, 0, sizeof(var));
-      if(sscanf(p, "$\(%[A-Z-_])", &var[0])) {
-
-	p += (strlen(var) + 2);
-
-	/*
-	 * Now check variable validity
-	 */
-	if(!strncmp("SKIN_PARENT_PATH", var, strlen(var))) {
-	  if(skonfig->path) {
-	    char *ppath;
-	    char *z;
-
-	    ppath = strdup(skonfig->path);
-	    if((z = strrchr(ppath, '/')) != NULL) {
-	      *z = '\0';
-	      strlcat(buf2, ppath, BUFSIZ);
-	    }
-	    free(ppath);
-	  }
-	}
-	else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
-	  if(skonfig->version >= 0)
-	    snprintf(buf2+strlen(buf2), sizeof(buf2)-strlen(buf2), "%d", skonfig->version);
-	}
-	else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
-	  if(skonfig->author)
-	    strlcat(buf2, skonfig->author, BUFSIZ);
-	}
-	else if(!strncmp("SKIN_PATH", var, strlen(var))) {
-	  if(skonfig->path)
-	    strlcat(buf2, skonfig->path, BUFSIZ);
-	}
-	else if(!strncmp("SKIN_NAME", var, strlen(var))) {
-	  if(skonfig->name)
-	    strlcat(buf2, skonfig->name, BUFSIZ);
-	}
-	else if(!strncmp("SKIN_DATE", var, strlen(var))) {
-	  if(skonfig->date)
-	    strlcat(buf2, skonfig->date, BUFSIZ);
-	}
-	else if(!strncmp("SKIN_URL", var, strlen(var))) {
-	  if(skonfig->url)
-	    strlcat(buf2, skonfig->url, BUFSIZ);
-	}
-	else if(!strncmp("HOME", var, strlen(var))) {
-	  if(skonfig->url)
-	    strlcat(buf2, xine_get_homedir(), BUFSIZ);
-	}
-	/* else ignore */
-      }
-      break;
-
-    default:
-      {
-	const size_t buf2_len = strlen(buf2);
-	buf2[buf2_len + 1] = 0;
-	buf2[buf2_len] = *p;
-      }
-      break;
+  while (q < e) {
+    const uint8_t *start, *stop;
+    const char *val = NULL;
+    int l;
+    start = p;
+    while (!(_tab_char[*p] & (1 | 8))) /* \0, $ */
+      p++;
+    /* literal part */
+    l = p - start;
+    if (l > e - q)
+      l = e - q;
+    if (l > 0) {
+      memcpy (q, start, l);
+      q += l;
     }
-    p++;
+    /* eot */
+    if (!*p)
+      break;
+    /* $ */
+    if ((_tab_char[p[1]] & 16) && (_tab_char[p[2]] & 4)) {
+      /* ${VARNAME}, $(VARNAME) */
+      p += 2;
+      start = p;
+      while (_tab_char[*p] & (2 | 4)) /* 0-9, A-Z, a-z, _ */
+        p++;
+      stop = p;
+      while (!(_tab_char[*p] & (1 | 32))) /* \0, ), } */
+        p++;
+      if (*p)
+        p++;
+    } else if (_tab_char[p[1]] & 4) {
+      /* $VARNAME */
+      p += 1;
+      start = p;
+      while (_tab_char[*p] & (2 | 4)) /* 0-9, A-Z, a-z, _ */
+        p++;
+      stop = p;
+    } else {
+      if (q < e)
+        *q++ = *p;
+      p++;
+      continue;
+    }
+    num_vars += 1;
+    l = stop - start;
+    if ((l == 16) && !strncmp ((const char *)start, "SKIN_PARENT_PATH", 16)) {
+      if (skonfig->path) {
+        const char *z = strrchr (skonfig->path, '/');
+        l = z ? z - skonfig->path : (int)strlen (skonfig->path);
+        if (l > e - q)
+          l = e - q;
+        if (l > 0) {
+          memcpy (q, skonfig->path, l); q += l;
+        }
+      }
+    } else if ((l == 12) && !strncmp ((const char *)start, "SKIN_VERSION", 12)) {
+      if (skonfig->version >= 0) {
+        q += snprintf ((char *)q, e - q, "%d", skonfig->version);
+      }
+    } else if ((l == 11) && !strncmp ((const char *)start, "SKIN_AUTHOR", 11)) {
+      val = skonfig->author;
+    } else if ((l == 9) && !strncmp ((const char *)start, "SKIN_PATH", 9)) {
+      val = skonfig->path;
+    } else if ((l == 9) && !strncmp ((const char *)start, "SKIN_NAME", 9)) {
+      val = skonfig->name;
+    } else if ((l == 9) && !strncmp ((const char *)start, "SKIN_DATE", 9)) {
+      val = skonfig->date;
+    } else if ((l == 8) && !strncmp ((const char *)start, "SKIN_URL", 8)) {
+      val = skonfig->url;
+    } else if ((l == 4) && !strncmp ((const char *)start, "HOME", 4)) {
+      val = xine_get_homedir ();
+    }
+    if (val) {
+      l = strlen (val);
+      if (l > e - q)
+        l = e - q;
+      if (l > 0) {
+        memcpy (q, val, l); q += l;
+      }
+    }
   }
-
-  return buf2;
+  *q = 0;
+  if (num_vars > 0) {
+    int l = q - buf + 1;
+    char *ret = malloc (l);
+    if (ret) {
+      memcpy (ret, buf, l);
+      return ret;
+    }
+  }
+  return NULL;
 }
 
 /*
@@ -513,8 +574,6 @@ xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
                     = skonfig->animation
                     = NULL;
   skonfig->skinfile = skonfig->path = NULL;
-
-  skonfig->ln = skonfig->buf;
 
   return skonfig;
 }

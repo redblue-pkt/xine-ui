@@ -59,6 +59,7 @@
 #include "download.h"
 #include "errors.h"
 #include "oxine/oxine.h"
+#include "xine-toolkit/skin.h"
 
 static gGui_t *_gui_get_nextprev (void *data, int *value) {
   gGui_t **p = data, *gui;
