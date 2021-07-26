@@ -1713,6 +1713,11 @@ void video_window_exit (xui_vwin_t *vwin) {
 
   free(vwin->prefered_visual);
 
+#ifdef HAVE_XF86VIDMODE
+  if (vwin->XF86_modelines)
+    XFree(vwin->XF86_modelines);
+#endif
+
   free (vwin);
 }
 
