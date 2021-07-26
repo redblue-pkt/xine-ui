@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 the xine project
+ * Copyright (C) 2019-2021 the xine project
  *
  * This file is part of xine, a free video player.
  *
@@ -31,6 +31,7 @@
 #include "button_list.h"
 #include "widget.h"
 #include "labelbutton.h"
+#include "skin.h"
 
 /* mrlbrowser calls "show" on the entire widget list.
  * we should not add our hidden ones there, and keep "..." separate.

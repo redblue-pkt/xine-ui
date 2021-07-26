@@ -42,6 +42,7 @@
 #include "xine-toolkit/labelbutton.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/browser.h"
+#include "xine-toolkit/skin.h"
 #include <xine/video_out.h>
 
 #define CONTROL_MIN     0
@@ -683,4 +684,3 @@ void control_deinit (xui_vctrl_t *vctrl) {
     free (vctrl);
   }
 }
-

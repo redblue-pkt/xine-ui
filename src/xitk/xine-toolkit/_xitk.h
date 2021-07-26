@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -144,11 +144,6 @@ char *xitk_filter_filename(const char *name);
 void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
 void xitk_unset_current_menu(xitk_t *);
 void xitk_set_tips_timeout(xitk_t *, unsigned long timeout);
-
-const char *xitk_skin_get_logo(xitk_skin_config_t *);
-const char *xitk_skin_get_animation(xitk_skin_config_t *);
-void xitk_skin_lock(xitk_skin_config_t *);
-void xitk_skin_unlock(xitk_skin_config_t *);
 
 void *labelbutton_get_user_data(xitk_widget_t *w);
 void menu_auto_pop(xitk_widget_t *w);
