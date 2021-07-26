@@ -535,148 +535,86 @@ static void kbindings_index_remove (kbinding_t *kbt, kbinding_entry_t *entry) {
 }
 
 static const uint8_t _tab_char[256] = {
-  /* end of string */
-  [0]    =   1,
-  /* end of line */
-  ['\r'] =   2,
-  ['\n'] =   2,
-  /* whitespace */
-  ['\t'] =   4,
-  [' ']  =   4,
-  /* comments */
-  ['/']  =   8,
-  ['#']  =   8,
-  /* separator */
-  [';']  =  16,
-  /* sections */
-  ['{']  =  32,
-  ['}']  =  64,
-  /* value assignment */
-  [':']  = 128,
-  ['=']  = 128
+  [0]    = 1,
+  ['\t'] = 2,
+  [' ']  = 2,
+  [',']  = 4
 };
-  
-/*
- * Cleanup end of line.
- */
-static void _kbindings_clean_eol (kbinding_file_t *kbdf) {
-  uint8_t *p = (uint8_t *)kbdf->ln, *spc;
 
-  while (1) {
-    while (!(_tab_char[*p] & (1 | 2 | 4))) /* ! \0 cr lf tab spc */
-      p++;
-    spc = p;
-    if (_tab_char[*p] & (1 | 2)) /* ! \0 cr lf */
-      break;
-    do
-      p++;
-    while (_tab_char[*p] & 4); /* tab spc */
-    if (_tab_char[*p] & (1 | 2)) /* ! \0 cr lf */
-      break;
-  }
-  *spc = 0;
-}
+typedef union {
+  uint8_t b[4];
+  uint32_t w;
+} _v4_t;
 
-/*
- * Read the next line of the key binding file.
- */
-static void _kbindings_get_next_line(kbinding_file_t *kbdf) {
-  while (1) {
-    uint8_t *p;
-    kbdf->ln = fgets (kbdf->buf, sizeof (kbdf->buf) - 1, kbdf->fd);
-    if (!kbdf->ln)
-      return;
-    p = (uint8_t *)kbdf->ln;
-    while (_tab_char[*p] & 4) /* tab spc */
-      p++;
-    kbdf->ln = (char *)p;
-    if (!(_tab_char[*p] & (1 | 8 | 16))) /* ! \0 / # ; */
-      break;
-    if (p[0] == '/') {
-      if ((p[1] != '/') && (p[1] != '*'))
-        break;
-    }
-  }
-  _kbindings_clean_eol (kbdf);
-}
-
-/*
- * Return >= 0 if it's begin of section, otherwise -1
- */
-static int _kbindings_begin_section (kbinding_file_t *kbdf) {
-  uint8_t *p = (uint8_t *)kbdf->ln, *brace = NULL;
-  while (1) {
-    while (!(_tab_char[*p] & (1 | 32))) /* ! \0 { */
-      p++;
-    if (!*p)
-      break;
-    brace = p++;
-  }
-  return brace ? brace - (uint8_t *)kbdf->ln : -1;
-}
-
-/*
- * Return >= 0 if it's end of section, otherwise -1
- */
-static int _kbindings_end_section(kbinding_file_t *kbdf) {
-  uint8_t *p = (uint8_t *)kbdf->ln, *brace = NULL;
-  while (1) {
-    while (!(_tab_char[*p] & (1 | 64))) /* ! \0 } */
-      p++;
-    if (!*p)
-      break;
-    brace = p++;
-  }
-  return brace ? brace - (uint8_t *)kbdf->ln : -1;
-}
-
-/*
- * move forward p pointer till non space or tab.
- */
-static void _kbindings_set_pos_to_next_char(char **p) {
-  uint8_t *q = (uint8_t *)*p;
-  while (_tab_char[*q] & 4) /* tab spc */
-    q++;
-  *p = (char *)q;
-}
-
-/*
- * Position p pointer to value.
- */
-static void _kbindings_set_pos_to_value(char **p) {
-  uint8_t *q = (uint8_t *)*p;
-  while (!(_tab_char[*q] & (1 | 32 | 128))) /* ! \0 { : = */
-    q++;
-  while (_tab_char[*q] & (4 | 128)) /* tab spc : = */
-    q++;
-  *p = (char *)q;
-}
-
-static int _kbindings_modifier_from_string (char *s) {
+static int _kbindings_modifier_from_string (const char *s) {
+  /* NOTE: for [static] const, gcc references actual read only mem.
+   * however, this here optimizes to a plain immediate value.
+   * tested with gcc -S ;-) */
+  _v4_t _none = {{'n', 'o', 'n', 'e'}};
+  _v4_t _ctrl = {{'c', 't', 'r', 'l'}};
+  _v4_t _meta = {{'m', 'e', 't', 'a'}};
+  _v4_t _mod3 = {{'m', 'o', 'd', '3'}};
+  _v4_t _mod4 = {{'m', 'o', 'd', '4'}};
+  _v4_t _mod5 = {{'m', 'o', 'd', '5'}};
+  _v4_t _cont = {{'c', 'o', 'n', 't'}};
+  _v4_t _rol_ = {{'r', 'o', 'l', 0}};
+  _v4_t _alt_ = {{'a', 'l', 't', 0}};
   int modifier = KEYMOD_NOMOD;
-  if (s) {
-    char *p, *t = s;
-    while ((p = xine_strsep (&t, ",")) != NULL) {
-      _kbindings_set_pos_to_next_char (&p);
-      if (p) {
-        if (!strcasecmp (p, "none"))
-          modifier = KEYMOD_NOMOD;
-        else if (!strcasecmp(p, "control"))
-          modifier |= KEYMOD_CONTROL;
-        else if (!strcasecmp(p, "ctrl"))
-          modifier |= KEYMOD_CONTROL;
-        else if (!strcasecmp(p, "meta"))
-          modifier |= KEYMOD_META;
-        else if (!strcasecmp(p, "alt"))
-          modifier |= KEYMOD_META;
-        else if (!strcasecmp(p, "mod3"))
-          modifier |= KEYMOD_MOD3;
-        else if (!strcasecmp(p, "mod4"))
-          modifier |= KEYMOD_MOD4;
-        else if (!strcasecmp(p, "mod5"))
-          modifier |= KEYMOD_MOD5;
+  const uint8_t *p = (const uint8_t *)s, *b, *e;
+  while (1) {
+    size_t l;
+    while (_tab_char[*p] & 2) /* \t ' ' */
+      p++;
+    if (!*p)
+      break;
+    b = p;
+    do {
+      while (!(_tab_char[*p] & (1 | 2 | 4))) /* \0 \t ' ' , */
+        p++;
+      e = p;
+      while (_tab_char[*p] & 2) /* \t ' ' */
+        p++;
+    } while (!(_tab_char[*p] & (1 | 4))); /* \0 , */
+    l = e - b;
+    if (l == 4) {
+      uint32_t v;
+      memcpy (&v, b, 4);
+      v |= 0x20202020;
+      if (v == _none.w) {
+        modifier = KEYMOD_NOMOD;
+      } else if (v == _ctrl.w) {
+        modifier |= KEYMOD_CONTROL;
+      } else if (v == _meta.w) {
+        modifier |= KEYMOD_META;
+      } else if (v == _mod3.w) {
+        modifier |= KEYMOD_MOD3;
+      } else if (v == _mod4.w) {
+        modifier |= KEYMOD_MOD4;
+      } else if (v == _mod5.w) {
+        modifier |= KEYMOD_MOD5;
       }
+    } else if (l == 7) {
+      _v4_t v;
+      memcpy (&v.w, b, 4);
+      v.w |= 0x20202020;
+      if (v.w == _cont.w) {
+        memcpy (&v.w, b + 4, 4);
+        v.w |= 0x20202020;
+        v.b[3] = 0;
+        if (v.w == _rol_.w)
+          modifier |= KEYMOD_CONTROL;
+      }
+    } else if (l == 3) {
+      _v4_t v;
+      memcpy (&v.w, b, 4);
+      v.w |= 0x20202020;
+      v.b[3] = 0;
+      if (v.w == _alt_.w)
+        modifier |= KEYMOD_META;
     }
+    if (!*p)
+      break;
+    p++;
   }
   return modifier;
 }
@@ -702,158 +640,119 @@ const kbinding_entry_t *kbindings_lookup_action (kbinding_t *kbt, const char *ac
 }
 
 /*
- * Add an entry in key binding table kbt. Called when an Alias entry
- * is found.
- */
-static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
-  kbinding_entry_t  *k;
-  int                modifier;
-
-  /* This should only happen if the keymap file was edited manually. */
-  if(kbt->num_entries >= MAX_ENTRIES) {
-    fprintf(stderr, _("xine-ui: Too many Alias entries in keymap file, entry ignored.\n"));
-    return;
-  }
-
-  k = _kbindings_lookup_action (kbt, ukb->alias);
-  if (k) {
-    kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
-    if (n) {
-      modifier = ukb->modifier ? _kbindings_modifier_from_string (ukb->modifier) : k->modifier;
-
-      /* Add new entry */
-      n->action     = k->action;
-      n->action_id  = k->action_id;
-      n->index      = kbt->num_entries;
-      n->modifier   = modifier;
-      n->is_alias   = 1;
-      n->is_gui     = k->is_gui;
-      n->is_default = 0;
-      n->comment    = k->comment;
-      n->key        = refs_strdup (ukb->key);
-      kbindings_index_add (kbt, n);
-      kbt->alias[kbt->num_entries - KBT_NUM_BASE] = n;
-      kbt->num_entries++;
-    }
-  }
-}
-
-/*
- * Change keystroke of modifier in entry.
- */
-static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
-  kbinding_entry_t *e = _kbindings_lookup_action (kbt, ukb->action);
-  if (e) {
-    int modifier = _kbindings_modifier_from_string (ukb->modifier);
-    if (strcmp (e->key, ukb->key) || (e->modifier != modifier)) {
-      kbindings_index_remove (kbt, e);
-      refs_unref (&e->key);
-      e->key = refs_strdup (ukb->key);
-      e->modifier = modifier;
-      e->is_default = 0;
-      if (e->index < KBT_NUM_BASE)
-        e->is_gui = default_binding_table[e->index].is_gui;
-      kbindings_index_add (kbt, e);
-    }
-  }
-}
-
-/*
- * Read key remap section (try to).
- */
-static void _kbindings_parse_section (kbinding_t *kbt, kbinding_file_t *kbdf, int brace_offset) {
-  user_kbinding_t   ukb;
-  char              *p;
-
-  if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
-    int found = 0;
-
-    memset (&ukb, 0, sizeof (ukb));
-    found = 1;
-
-    p = kbdf->ln;
-
-    if (brace_offset >= 0) {
-      char buf[2048], *b1 = buf, *be = buf + sizeof (buf);
-      *(kbdf->ln + brace_offset) = '\0';
-      _kbindings_clean_eol(kbdf);
-      ukb.action = b1;
-      b1 += strlcpy (b1, kbdf->ln, be - b1) + 1;
-      if (b1 > be)
-        b1 = be;
-      ukb.is_alias = 0;
-
-      while(_kbindings_end_section(kbdf) < 0) {
-
-	_kbindings_get_next_line(kbdf);
-	p = kbdf->ln;
-	if(kbdf->ln != NULL) {
-	  if(!strncasecmp(kbdf->ln, "modifier", 8)) {
-	    _kbindings_set_pos_to_value(&p);
-            ukb.modifier = b1;
-            b1 += strlcpy (b1, p, be - b1) + 1;
-            if (b1 > be)
-              b1 = be;
-	  }
-	  if(!strncasecmp(kbdf->ln, "entry", 5)) {
-	    _kbindings_set_pos_to_value(&p);
-            ukb.alias = b1;
-            b1 += strlcpy (b1, p, be - b1) + 1;
-            if (b1 > be)
-              b1 = be;
-	  }
-	  else if(!strncasecmp(kbdf->ln, "key", 3)) {
-	    _kbindings_set_pos_to_value(&p);
-            ukb.key = b1;
-            b1 += strlcpy (b1, p, be - b1) + 1;
-            if (b1 > be)
-              b1 = be;
-	  }
-	}
-	else
-	  break;
-      }
-
-      if(found && ukb.alias && ukb.action && ukb.key) {
-	_kbindings_add_entry(kbt, &ukb);
-      }
-      else if(found && ukb.action && ukb.key) {
-	_kbindings_replace_entry(kbt, &ukb);
-      }
-
-    }
-  }
-}
-
-/*
  * Read and parse remap key binding file, if available.
  */
-static void _kbinding_load_config(kbinding_t *kbt, const char *file) {
-  kbinding_file_t *kbdf;
+static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
+  FILE *file;
+  size_t s;
+  char *fbuf;
+  xitk_cfg_parse_t *tree;
+  int i;
 
-  kbdf = (kbinding_file_t *)calloc (1, sizeof (*kbdf));
-  if (!kbdf)
+  if (!name)
     return;
-  kbdf->bindingfile = strdup (file);
+  file = fopen (name, "rb");
+  if (!file)
+    return;
+  fseek (file, 0, SEEK_END);
+  s = ftell (file);
+  fseek (file, 0, SEEK_SET);
+  if (s == 0) {
+    fclose (file);
+    return;
+  }
+  if (s > (1 << 20) - 1)
+    s = (1 << 20) - 1;
+  fbuf = malloc (s + 2);
+  if (!fbuf) {
+    fclose (file);
+    return;
+  }
+  fbuf[0] = 0;
+  s = fread (fbuf + 1, 1, s, file);
+  fbuf[s] = 0;
+  fclose (file);
 
-  if((kbdf->fd = fopen(kbdf->bindingfile, "r")) != NULL) {
-
-    _kbindings_get_next_line(kbdf);
-
-    while (kbdf->ln != NULL) {
-      int brace_offs = _kbindings_begin_section (kbdf);
-      if (brace_offs >= 0)
-        _kbindings_parse_section (kbt, kbdf, brace_offs);
-      _kbindings_get_next_line(kbdf);
-    }
-    fclose(kbdf->fd);
+  tree = xitk_cfg_parse (fbuf + 1, XITK_CFG_PARSE_CASE);
+  if (!tree) {
+    free (fbuf);
+    return;
   }
 
-  SAFE_FREE(kbdf->bindingfile);
-  SAFE_FREE(kbdf);
+  for (i = tree[0].first_child; i; i = tree[i].next) {
+    const char *sname = fbuf + 1 + tree[i].key, *entry = "", *key = "", *mod = "";
+    int j;
 
+    for (j = tree[i].first_child; j; j = tree[j].next) {
+      const char *ename = fbuf + 1 + tree[j].key, *eval = fbuf + 1 + tree[j].value;
+      int d;
+
+      d = strcmp (ename, "key");
+      if (d < 0) {
+        if (!strcmp (ename, "entry")) 
+          entry = eval;
+      } else if (d == 0) {
+        key = eval;
+      } else {
+        if (!strcmp (ename, "modifier"))
+          mod = eval;
+      }
+    }
+    if (!key[0])
+      continue;
+    if (!strcmp (sname, "Alias")) {
+      kbinding_entry_t *k;
+      int modifier;
+
+      if (!entry[0])
+        continue;
+      /* This should only happen if the keymap file was edited manually. */
+      if (kbt->num_entries >= MAX_ENTRIES) {
+        fprintf (stderr, _("xine-ui: Too many Alias entries in keymap file, entry ignored.\n"));
+        continue;
+      }
+      k = _kbindings_lookup_action (kbt, entry);
+      if (k) {
+        kbinding_entry_t *n = (kbinding_entry_t *)malloc (sizeof (*n));
+        if (n) {
+          modifier = mod[0] ? _kbindings_modifier_from_string (mod) : k->modifier;
+          /* Add new entry */
+          n->action     = k->action;
+          n->action_id  = k->action_id;
+          n->index      = kbt->num_entries;
+          n->modifier   = modifier;
+          n->is_alias   = 1;
+          n->is_gui     = k->is_gui;
+          n->is_default = 0;
+          n->comment    = k->comment;
+          n->key        = refs_strdup (key);
+          kbindings_index_add (kbt, n);
+          kbt->alias[kbt->num_entries - KBT_NUM_BASE] = n;
+          kbt->num_entries++;
+        }
+      }
+    } else {
+      kbinding_entry_t *e = _kbindings_lookup_action (kbt, sname);
+      if (e) {
+        int modifier = _kbindings_modifier_from_string (mod);
+        if (strcmp (e->key, key) || (e->modifier != modifier)) {
+          kbindings_index_remove (kbt, e);
+          refs_unref (&e->key);
+          e->key = refs_strdup (key);
+          e->modifier = modifier;
+          e->is_default = 0;
+          if (e->index < KBT_NUM_BASE)
+            e->is_gui = default_binding_table[e->index].is_gui;
+          kbindings_index_add (kbt, e);
+        }
+      }
+    }
+  }
+
+  xitk_cfg_unparse (tree);
+  free (fbuf);
 }
-
+  
 /*
  * Check if there some redundant entries in key binding table kbt.
  */
