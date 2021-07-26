@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -87,52 +87,75 @@ int xine_system(int dont_run_as_root, const char *command) {
 /*
  * cleanup the str string, take care about '
  */
-char *atoa(char *str) {
-  char *pbuf;
-  int   quote = 0, dblquote = 0;
+char *atoa (char *str) {
+  uint8_t *b1, *b2, *e, *q;
 
-  pbuf = str;
-
-  while(*pbuf == ' ')
-    pbuf++;
-
-  if(*pbuf == '\'')
-    quote = 1;
-  else if(*pbuf == '"')
-    dblquote = 1;
-
-  pbuf = str;
-
-  while(*pbuf != '\0')
-    pbuf++;
-
-  if(pbuf > str)
-    pbuf--;
-
-  while((pbuf > str) && (*pbuf == '\r' || *pbuf == '\n')) {
-    *pbuf = '\0';
-    pbuf--;
+  if (!str)
+    return NULL;
+  b1 = (uint8_t *)str;
+  /* skip leading whitespace */
+  while ((b1[0] > 0) && (b1[0] <= ' '))
+    b1++;
+  if (!b1[0])
+    return (char *)b1;
+  /* cut trailing whitespace */
+  e = b1 + strlen ((char *)b1);
+  while ((e[-1] > 0) && (e[-1] <= ' '))
+    e--;
+  e[0] = 0;
+  /* are we quoted? */
+  if (((b1[0] == '"') || (b1[0] == '\'')) && (b1[0] == e[-1])) {
+    /* yes we are */
+    if (b1 + 1 == e) {
+      /* just the quote sign, maybe intended, keep it */
+      return (char *)b1;
+    }
+    /* skip leading whitespace again */
+    b2 = b1 + 1;
+    while ((b2[0] > 0) && (b2[0] <= ' '))
+      b2++;
+    if (b2 + 1 == e) {
+      /* nothing serious in it, settle with a plain "" */
+      b1[1] = b1[0];
+      b1[2] = 0;
+      return (char *)b1;
+    }
+    /* removr thn quote */
+    b1 = b2;
+    e--;
+    /* cut trailing whitespace again */
+    while ((e[-1] > 0) && (e[-1] <= ' '))
+      e--;
+    e[0] = 0;
   }
-
-  while((pbuf > str) && (*pbuf == ' ')) {
-    *pbuf = '\0';
-    pbuf--;
+  /* test all embedded whitespace is single plain */
+  q = b2 = b1;
+  while (1) {
+    while (b2[0] > ' ')
+      b2++;
+    if (!b2[0])
+      break;
+    q = b2;
+    while ((b2[0] > 0) && (b2[0] <= ' '))
+      b2++;
+    if ((q[0] != ' ') || (q + 1 != b2))
+      break;
   }
-
-  if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"'))) {
-    *pbuf = '\0';
-    pbuf--;
+  /* well, make it that way */
+  if (b2[0]) {
+    while (1) {
+      *q++ = ' ';
+      while (b2[0] > ' ')
+        *q++ = *b2++;
+      if (!b2[0])
+        break;
+      while ((b2[0] > 0) && (b2[0] <= ' '))
+        b2++;
+    }
+    /* e = q; */
+    q[0] = 0;
   }
-
-  pbuf = str;
-
-  while(*pbuf == ' ' || *pbuf == '\t')
-    pbuf++;
-
-  if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"')))
-    pbuf++;
-
-  return pbuf;
+  return (char *)b1;
 }
 
 /*
