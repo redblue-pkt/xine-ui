@@ -566,9 +566,9 @@ fi
 
 dnl Flags not supported by all *cc* variants
 AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
+AC_TRY_CFLAGS("-fstrict-aliasing", falias="-fstrict-aliasing", falias="")
 
-CFLAGS="$wall -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
-AC_SUBST(CFLAGS)
+CFLAGS="$wall $falias -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 
 AC_ARG_ENABLE([debug],
    AS_HELP_STRING([--enable-debug], [Compile with debug information]))
@@ -578,6 +578,14 @@ if test "x$enable_debug" = "xyes"; then
 else
    CFLAGS="$CFLAGS -DNDEBUG"
 fi
+
+AC_ARG_ENABLE([optlevel], [AS_HELP_STRING([--enable-optlevel=0|1|2|3|s], [Optimize this much, default 3.])])
+test x"$enable_optlevel" = x"yes" && enable_optlevel=3
+test x"$enable_optlevel" = x"" && enable_optlevel=3
+test x"$enable_optlevel" = x"no" && enable_optlevel=0
+test x"$enable_optlevel" = x"0" || CFLAGS="$CFLAGS -O$enable_optlevel"
+
+AC_SUBST(CFLAGS)
 
 AC_ARG_ENABLE([asan],
    [AS_HELP_STRING([--enable-asan], [Compile with address sanitizer])])
