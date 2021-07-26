@@ -568,7 +568,7 @@ dnl Flags not supported by all *cc* variants
 AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
 AC_TRY_CFLAGS("-fstrict-aliasing", falias="-fstrict-aliasing", falias="")
 
-CFLAGS="$wall $falias -D_FILE_OFFSET_BITS=64 $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
+CFLAGS="$wall $falias -D_FILE_OFFSET_BITS=64 $CFLAGS"
 
 AC_ARG_ENABLE([debug],
    AS_HELP_STRING([--enable-debug], [Compile with debug information]))
