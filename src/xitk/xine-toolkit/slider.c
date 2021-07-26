@@ -33,11 +33,12 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-typedef struct {
+typedef struct _slider_private_s {
   xitk_widget_t           w;
 
   xitk_short_string_t     skin_element_name;
 
+  void                    (*paint) (struct _slider_private_s *wp, widget_event_t *event);
   int                     sType;
   int                     bClicked;
   int                     focus;
@@ -238,17 +239,16 @@ static int _xitk_slider_inside (_slider_private_t *wp, int x, int y) {
 /*
  * Draw widget
  */
-static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
-  if ((wp->w.visible == 1) && wp->bg_skin.width && wp->paddle_skin.image && wp->bg_skin.image) {
-    int    paddle_x, paddle_width, paddle_height;
+static void _xitk_slider_paint_n (_slider_private_t *wp, widget_event_t *event) {
+  (void)wp;
+  (void)event;
+}
 
-    if (wp->sType == XITK_HVSLIDER) {
-      paddle_width = wp->hv_w;
-      paddle_height = wp->hv_h;
-    } else {
-      paddle_width = wp->button_width;
-      paddle_height = wp->paddle_skin.height;
-    }
+static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event) {
+  if (wp->w.visible == 1) {
+    int    paddle_x, paddle_width;
+
+    paddle_width = wp->hv_w;
     paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
              ? (wp->bClicked ? 2 : 1)
              : 0;
@@ -257,42 +257,10 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
     if (!event) {
       if (wp->paddle_drawn_here.w > 0) {
         /* incremental */
-        if (wp->bar_mode && (wp->paddle_drawn_here.state == paddle_x)) {
-          /* nasty little shortcut ;-) */
-          if (wp->sType == XITK_HSLIDER) {
-            int oldpos = wp->paddle_drawn_here.w;
-            int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
-
-            if (newpos < oldpos) {
-              xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
-                newpos, 0, oldpos - newpos, wp->bg_skin.height, wp->w.x + newpos, wp->w.y);
-            } else if (newpos > oldpos) {
-              xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-                paddle_x + oldpos, 0, newpos - oldpos, paddle_height, wp->w.x + oldpos, wp->w.y);
-            }
-            wp->paddle_drawn_here.w = newpos;
-          } else if (wp->sType == XITK_VSLIDER) {
-            int oldpos = wp->paddle_drawn_here.y;
-            int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
-
-            newpos = wp->bg_skin.height - newpos;
-            if (newpos > oldpos) {
-              xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
-                0, oldpos, wp->bg_skin.width, newpos - oldpos, wp->w.x, wp->w.y + oldpos);
-            } else if (newpos < oldpos) {
-              xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-                paddle_x, newpos, paddle_width, oldpos - newpos, wp->w.x, wp->w.y + newpos);
-            }
-            wp->paddle_drawn_here.y = newpos;
-            wp->paddle_drawn_here.h = paddle_height - newpos;
-          }
-          return;
-        } else {
-          xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
-            wp->paddle_drawn_here.x, wp->paddle_drawn_here.y,
-            wp->paddle_drawn_here.w, wp->paddle_drawn_here.h,
-            wp->w.x + wp->paddle_drawn_here.x, wp->w.y + wp->paddle_drawn_here.y);
-        }
+        xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+          wp->paddle_drawn_here.x, wp->paddle_drawn_here.y,
+          wp->paddle_drawn_here.w, wp->paddle_drawn_here.h,
+          wp->w.x + wp->paddle_drawn_here.x, wp->w.y + wp->paddle_drawn_here.y);
       } else {
         /* full */
         xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL, 0, 0, wp->bg_skin.width, wp->bg_skin.height, wp->w.x, wp->w.y);
@@ -310,9 +278,8 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
 
       wp->paddle_drawn_here.state = paddle_x;
 
-      if (wp->sType == XITK_HVSLIDER) {
+      {
         int x, y;
-
         x = wp->hv_info.h.max - wp->hv_info.h.visible;
         if (x > 0) {
           x = wp->hv_info.h.pos * (wp->w.width - wp->hv_w) / x;
@@ -341,58 +308,6 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
         src_h = wp->hv_h;
         destx1 = wp->w.x + x;
         desty1 = wp->w.y + y;
-
-      } else if (wp->sType == XITK_RSLIDER) {
-
-        int xcenter = (wp->bg_skin.width >> 1) + wp->w.x;
-        int ycenter = (wp->bg_skin.height >> 1) + wp->w.y;
-        double angle = wp->angle;
-
-	if(angle < M_PI / -2)
-	  angle = angle + M_PI * 2;
-
-        destx1 = (int) (0.5 + xcenter + wp->radius * cos (angle)) - (paddle_width / 2);
-        desty1 = (int) (0.5 + ycenter - wp->radius * sin (angle)) - (paddle_height / 2);
-
-        srcx1 = paddle_x;
-	srcy1 = 0;
-	src_w = paddle_width;
-	src_h = paddle_height;
-
-      } else {
-
-        if (wp->bar_mode == 1) {
-          if (wp->sType == XITK_VSLIDER) {
-            int pixpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
-            pixpos = paddle_height - pixpos;
-            srcy1  = pixpos;
-            src_w  = paddle_width;
-            src_h  = paddle_height - pixpos;
-            destx1 = wp->w.x;
-            desty1 = wp->w.y + pixpos;
-          } else if (wp->sType == XITK_HSLIDER) {
-            int pixpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
-            srcy1  = 0;
-            src_w  = pixpos;
-            src_h  = paddle_height;
-            destx1 = wp->w.x;
-            desty1 = wp->w.y;
-	  }
-        } else {
-          if (wp->sType == XITK_HSLIDER) {
-            destx1 = wp->w.x + ((wp->w.width - paddle_width) * .01) * (wp->percentage * 100.0) + 0.5;
-            desty1 = wp->w.y;
-          } else if (wp->sType == XITK_VSLIDER) {
-            destx1 = wp->w.x;
-            desty1 = wp->w.y + wp->bg_skin.height - paddle_height
-                   - ((wp->w.height - paddle_height) * .01) * (wp->percentage * 100.0) + 0.5;
-          }
-	  srcy1  = 0;
-          src_w  = paddle_width;
-          src_h  = paddle_height;
-	}
-
-        srcx1 = paddle_x;
       }
 
       wp->paddle_drawn_here.x = destx1 - wp->w.x;
@@ -423,7 +338,290 @@ static void _xitk_slider_paint (_slider_private_t *wp, widget_event_t *event) {
     wp->paddle_drawn_here.w = 0;
     wp->paddle_drawn_here.h = 0;
   }
+}
 
+static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) {
+  if (wp->w.visible == 1) {
+    int    paddle_x, paddle_width, paddle_height;
+
+    paddle_width = wp->button_width;
+    paddle_height = wp->paddle_skin.height;
+    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
+             ? (wp->bClicked ? 2 : 1)
+             : 0;
+    paddle_x *= paddle_width;
+
+    if (!event) {
+      if (wp->paddle_drawn_here.w > 0) {
+        /* incremental */
+        xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+          wp->paddle_drawn_here.x, wp->paddle_drawn_here.y,
+          wp->paddle_drawn_here.w, wp->paddle_drawn_here.h,
+          wp->w.x + wp->paddle_drawn_here.x, wp->w.y + wp->paddle_drawn_here.y);
+      } else {
+        /* full */
+        xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL, 0, 0, wp->bg_skin.width, wp->bg_skin.height, wp->w.x, wp->w.y);
+      }
+    } else {
+      /* partial */
+      xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+        event->x - wp->w.x, event->y - wp->w.y,
+        event->width, event->height,
+        event->x, event->y);
+    }
+
+    if (wp->w.enable == WIDGET_ENABLE) {
+      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
+
+      wp->paddle_drawn_here.state = paddle_x;
+
+      {
+        int xcenter = (wp->bg_skin.width >> 1) + wp->w.x;
+        int ycenter = (wp->bg_skin.height >> 1) + wp->w.y;
+        double angle = wp->angle;
+        if (angle < M_PI / -2)
+          angle = angle + M_PI * 2;
+        destx1 = (int) (0.5 + xcenter + wp->radius * cos (angle)) - (paddle_width / 2);
+        desty1 = (int) (0.5 + ycenter - wp->radius * sin (angle)) - (paddle_height / 2);
+        srcx1 = paddle_x;
+        srcy1 = 0;
+        src_w = paddle_width;
+        src_h = paddle_height;
+      }
+
+      wp->paddle_drawn_here.x = destx1 - wp->w.x;
+      wp->paddle_drawn_here.y = desty1 - wp->w.y;
+      wp->paddle_drawn_here.w = src_w;
+      wp->paddle_drawn_here.h = src_h;
+      if (event) {
+        int x1, x2, y1, y2;
+
+        x1 = _tabs_max (destx1, event->x);
+        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
+        y1 = _tabs_max (desty1, event->y);
+        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
+        if ((x1 < x2) && (y1 < y2))
+          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
+            x2 - x1, y2 - y1, x1, y1);
+      } else {
+        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+          srcx1, srcy1, src_w, src_h, destx1, desty1);
+      }
+    }
+  } else {
+    /* no paddle just background when disabled. */
+    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.x = 0;
+    wp->paddle_drawn_here.y = 0;
+    wp->paddle_drawn_here.w = 0;
+    wp->paddle_drawn_here.h = 0;
+  }
+}
+
+static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) {
+  if (wp->w.visible == 1) {
+    int    paddle_x, paddle_width, paddle_height;
+
+    paddle_width = wp->button_width;
+    paddle_height = wp->paddle_skin.height;
+    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
+             ? (wp->bClicked ? 2 : 1)
+             : 0;
+    paddle_x *= paddle_width;
+
+    if (!event) {
+      if (wp->paddle_drawn_here.w > 0) {
+        /* incremental */
+        if (wp->bar_mode && (wp->paddle_drawn_here.state == paddle_x)) {
+          /* nasty little shortcut ;-) */
+          int oldpos = wp->paddle_drawn_here.w;
+          int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
+
+          if (newpos < oldpos) {
+            xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+              newpos, 0, oldpos - newpos, wp->bg_skin.height, wp->w.x + newpos, wp->w.y);
+          } else if (newpos > oldpos) {
+            xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+              paddle_x + oldpos, 0, newpos - oldpos, paddle_height, wp->w.x + oldpos, wp->w.y);
+          }
+          wp->paddle_drawn_here.w = newpos;
+          return;
+        } else {
+          xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+            wp->paddle_drawn_here.x, wp->paddle_drawn_here.y,
+            wp->paddle_drawn_here.w, wp->paddle_drawn_here.h,
+            wp->w.x + wp->paddle_drawn_here.x, wp->w.y + wp->paddle_drawn_here.y);
+        }
+      } else {
+        /* full */
+        xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL, 0, 0, wp->bg_skin.width, wp->bg_skin.height, wp->w.x, wp->w.y);
+      }
+    } else {
+      /* partial */
+      xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+        event->x - wp->w.x, event->y - wp->w.y,
+        event->width, event->height,
+        event->x, event->y);
+    }
+
+    if (wp->w.enable == WIDGET_ENABLE) {
+      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
+
+      wp->paddle_drawn_here.state = paddle_x;
+
+      if (wp->bar_mode == 1) {
+        src_w  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
+        destx1 = wp->w.x;
+      } else {
+        destx1 = wp->w.x + ((wp->w.width - paddle_width) * .01) * (wp->percentage * 100.0) + 0.5;
+        src_w  = paddle_width;
+      }
+      srcx1 = paddle_x;
+      srcy1 = 0;
+      src_h = paddle_height;
+      desty1 = wp->w.y;
+
+      wp->paddle_drawn_here.x = destx1 - wp->w.x;
+      wp->paddle_drawn_here.y = desty1 - wp->w.y;
+      wp->paddle_drawn_here.w = src_w;
+      wp->paddle_drawn_here.h = src_h;
+      if (event) {
+        int x1, x2, y1, y2;
+
+        x1 = _tabs_max (destx1, event->x);
+        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
+        y1 = _tabs_max (desty1, event->y);
+        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
+        if ((x1 < x2) && (y1 < y2))
+          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
+            x2 - x1, y2 - y1, x1, y1);
+      } else {
+        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+          srcx1, srcy1, src_w, src_h, destx1, desty1);
+      }
+    }
+  } else {
+    /* no paddle just background when disabled. */
+    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.x = 0;
+    wp->paddle_drawn_here.y = 0;
+    wp->paddle_drawn_here.w = 0;
+    wp->paddle_drawn_here.h = 0;
+  }
+}
+
+static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) {
+  if (wp->w.visible == 1) {
+    int    paddle_x, paddle_width, paddle_height;
+
+    paddle_width = wp->button_width;
+    paddle_height = wp->paddle_skin.height;
+    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
+             ? (wp->bClicked ? 2 : 1)
+             : 0;
+    paddle_x *= paddle_width;
+
+    if (!event) {
+      if (wp->paddle_drawn_here.w > 0) {
+        /* incremental */
+        if (wp->bar_mode && (wp->paddle_drawn_here.state == paddle_x)) {
+          /* nasty little shortcut ;-) */
+          int oldpos = wp->paddle_drawn_here.y;
+          int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
+
+          newpos = wp->bg_skin.height - newpos;
+          if (newpos > oldpos) {
+            xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+              0, oldpos, wp->bg_skin.width, newpos - oldpos, wp->w.x, wp->w.y + oldpos);
+          } else if (newpos < oldpos) {
+            xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+              paddle_x, newpos, paddle_width, oldpos - newpos, wp->w.x, wp->w.y + newpos);
+          }
+          wp->paddle_drawn_here.y = newpos;
+          wp->paddle_drawn_here.h = paddle_height - newpos;
+          return;
+        } else {
+          xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+            wp->paddle_drawn_here.x, wp->paddle_drawn_here.y,
+            wp->paddle_drawn_here.w, wp->paddle_drawn_here.h,
+            wp->w.x + wp->paddle_drawn_here.x, wp->w.y + wp->paddle_drawn_here.y);
+        }
+      } else {
+        /* full */
+        xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL, 0, 0, wp->bg_skin.width, wp->bg_skin.height, wp->w.x, wp->w.y);
+      }
+    } else {
+      /* partial */
+      xitk_part_image_draw (wp->w.wl, &wp->bg_skin, NULL,
+        event->x - wp->w.x, event->y - wp->w.y,
+        event->width, event->height,
+        event->x, event->y);
+    }
+
+    if (wp->w.enable == WIDGET_ENABLE) {
+      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
+
+      wp->paddle_drawn_here.state = paddle_x;
+
+      if (wp->bar_mode == 1) {
+        src_h  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
+        srcy1  = paddle_height - src_h;
+        desty1 = wp->w.y + srcy1;
+      } else {
+        desty1 = wp->w.y + wp->bg_skin.height - paddle_height
+               - ((wp->w.height - paddle_height) * .01) * (wp->percentage * 100.0) + 0.5;
+        srcy1  = 0;
+        src_h  = paddle_height;
+      }
+      srcx1 = paddle_x;
+      src_w = paddle_width;
+      destx1 = wp->w.x;
+
+      wp->paddle_drawn_here.x = destx1 - wp->w.x;
+      wp->paddle_drawn_here.y = desty1 - wp->w.y;
+      wp->paddle_drawn_here.w = src_w;
+      wp->paddle_drawn_here.h = src_h;
+      if (event) {
+        int x1, x2, y1, y2;
+
+        x1 = _tabs_max (destx1, event->x);
+        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
+        y1 = _tabs_max (desty1, event->y);
+        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
+        if ((x1 < x2) && (y1 < y2))
+          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
+            x2 - x1, y2 - y1, x1, y1);
+      } else {
+        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+          srcx1, srcy1, src_w, src_h, destx1, desty1);
+      }
+    }
+  } else {
+    /* no paddle just background when disabled. */
+    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.x = 0;
+    wp->paddle_drawn_here.y = 0;
+    wp->paddle_drawn_here.w = 0;
+    wp->paddle_drawn_here.h = 0;
+  }
+}
+
+static void _xitk_slider_set_paint (_slider_private_t *wp) {
+  if (!wp->bg_skin.width || !wp->paddle_skin.image || !wp->bg_skin.image)
+    wp->paint = _xitk_slider_paint_n;
+  else if (wp->sType == XITK_HVSLIDER)
+    wp->paint = _xitk_slider_paint_hv;
+  else if (wp->sType == XITK_RSLIDER)
+    wp->paint = _xitk_slider_paint_r;
+  else if (wp->sType == XITK_HSLIDER)
+    wp->paint = _xitk_slider_paint_h;
+  else if (wp->sType == XITK_VSLIDER)
+    wp->paint = _xitk_slider_paint_v;
+  else
+    wp->paint = _xitk_slider_paint_n;
 }
 
 static void _xitk_slider_set_skin (_slider_private_t *wp, xitk_skin_config_t *skonfig) {
@@ -457,6 +655,7 @@ static void _xitk_slider_set_skin (_slider_private_t *wp, xitk_skin_config_t *sk
     wp->paddle_skin.height = 0;
     wp->paddle_skin.image  = NULL;
   }
+  _xitk_slider_set_paint (wp);
 }
 
 /*
@@ -505,7 +704,7 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
       if (bUp == 0) {
         if (moved || !wp->bClicked) {
           wp->bClicked = 1;
-          _xitk_slider_paint (wp, NULL);
+          wp->paint (wp, NULL);
         }
         /* Exec motion callback function (if available) */
         if (moved && wp->motion_callback)
@@ -513,7 +712,7 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
       } else if (bUp == 1) {
         if (moved || wp->bClicked) {
           wp->bClicked = 0;
-          _xitk_slider_paint (wp, NULL);
+          wp->paint (wp, NULL);
         }
         if (wp->callback)
           wp->callback (&wp->w, wp->userdata, value);
@@ -657,7 +856,7 @@ static int xitk_slider_event (xitk_widget_t *w, widget_event_t *event, widget_ev
 
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      _xitk_slider_paint (wp, event);
+      wp->paint (wp, event);
       return 0;
     case WIDGET_EVENT_KEY:
       return _xitk_slider_key (wp, event->string, event->modifier);
@@ -787,7 +986,7 @@ void xitk_slider_reset (xitk_widget_t *w) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     _xitk_slider_update_value (wp, 0.0);
     wp->bClicked = 0;
-    _xitk_slider_paint (wp, NULL);
+    wp->paint (wp, NULL);
   }
 }
 
@@ -801,7 +1000,7 @@ void xitk_slider_set_to_max (xitk_widget_t *w) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     if (!wp->bClicked) {
       _xitk_slider_update_value (wp, wp->upper);
-      _xitk_slider_paint (wp, NULL);
+      wp->paint (wp, NULL);
     }
   }
 }
@@ -836,12 +1035,12 @@ void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
           pos = (int)wp->upper - pos;
           if (wp->hv_info.v.pos != pos) {
             wp->hv_info.v.pos = pos;
-            _xitk_slider_paint (wp, NULL);
+            wp->paint (wp, NULL);
           }
         } else {
           if (wp->hv_info.h.pos != pos) {
             wp->hv_info.h.pos = pos;
-            _xitk_slider_paint (wp, NULL);
+            wp->paint (wp, NULL);
           }
         }
         if ((pos >= (int)wp->lower) && (pos <= (int)wp->upper))
@@ -851,7 +1050,7 @@ void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
 
         if ((value >= wp->lower) && (value <= wp->upper)) {
           _xitk_slider_update_value (wp, value);
-          _xitk_slider_paint (wp, NULL);
+          wp->paint (wp, NULL);
         }
       }
     }
@@ -918,7 +1117,7 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
               : (wp->hv_info.h.visible >= wp->hv_info.h.max ? 0 : wp->hv_info.h.max - wp->hv_info.h.visible);
     wp->step = wp->hv_max_y > 0 ? wp->hv_info.v.step : wp->hv_info.h.step;
     if (mode == XITK_SLIDER_SYNC_SET_AND_PAINT)
-      _xitk_slider_paint (wp, NULL);
+      wp->paint (wp, NULL);
   }
 }
 
@@ -1061,6 +1260,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   wp->radius = (wp->bg_skin.height >> 1) - (wp->paddle_skin.height);
 
   wp->sType = type;
+  _xitk_slider_set_paint (wp);
   wp->w.enable = 0;
   wp->w.visible = 0;
   wp->w.x = x;
