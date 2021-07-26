@@ -72,7 +72,7 @@ typedef struct _slider_private_s {
   int                     hv_x, hv_y, hv_max_x, hv_max_y;
 
   struct {
-    int                   x, y, w, h, state;
+    int                   fx, fy, x, y, w, h;
   }                       paddle_drawn_here;
 } _slider_private_t;
 
@@ -244,6 +244,27 @@ static void _xitk_slider_paint_n (_slider_private_t *wp, widget_event_t *event) 
   (void)event;
 }
 
+static void _xitk_slider_paint_p (_slider_private_t *wp, widget_event_t *event) {
+  int destx = wp->w.x + wp->paddle_drawn_here.x;
+  int desty = wp->w.y + wp->paddle_drawn_here.y;
+
+  if (event) {
+    int x1 = _tabs_max (destx, event->x);
+    int x2 = _tabs_min (destx + wp->paddle_drawn_here.w, event->x + event->width);
+    int y1 = _tabs_max (desty, event->y);
+    int y2 = _tabs_min (desty + wp->paddle_drawn_here.h, event->y + event->height);
+
+    if ((x1 < x2) && (y1 < y2))
+      xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+        wp->paddle_drawn_here.fx + x1 - destx, wp->paddle_drawn_here.fy + y1 - desty,
+        x2 - x1, y2 - y1, x1, y1);
+  } else {
+    xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
+      wp->paddle_drawn_here.fx, wp->paddle_drawn_here.fy,
+      wp->paddle_drawn_here.w, wp->paddle_drawn_here.h, destx, desty);
+  }
+}
+
 static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event) {
   if (wp->w.visible == 1) {
     int    paddle_x, paddle_width;
@@ -274,10 +295,6 @@ static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event)
     }
 
     if (wp->w.enable == WIDGET_ENABLE) {
-      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
-
-      wp->paddle_drawn_here.state = paddle_x;
-
       {
         int x, y;
         x = wp->hv_info.h.max - wp->hv_info.h.visible;
@@ -302,37 +319,19 @@ static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event)
         }
         wp->hv_x = x;
         wp->hv_y = y;
-        srcx1 = paddle_x;
-        srcy1 = 0;
-        src_w = wp->hv_w;
-        src_h = wp->hv_h;
-        destx1 = wp->w.x + x;
-        desty1 = wp->w.y + y;
+        wp->paddle_drawn_here.fx = paddle_x;
+        wp->paddle_drawn_here.fy = 0;
+        wp->paddle_drawn_here.w = wp->hv_w;
+        wp->paddle_drawn_here.h = wp->hv_h;
+        wp->paddle_drawn_here.x = x;
+        wp->paddle_drawn_here.y = y;
       }
 
-      wp->paddle_drawn_here.x = destx1 - wp->w.x;
-      wp->paddle_drawn_here.y = desty1 - wp->w.y;
-      wp->paddle_drawn_here.w = src_w;
-      wp->paddle_drawn_here.h = src_h;
-      if (event) {
-        int x1, x2, y1, y2;
-
-        x1 = _tabs_max (destx1, event->x);
-        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
-        y1 = _tabs_max (desty1, event->y);
-        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
-        if ((x1 < x2) && (y1 < y2))
-          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
-            x2 - x1, y2 - y1, x1, y1);
-      } else {
-        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-          srcx1, srcy1, src_w, src_h, destx1, desty1);
-      }
+      _xitk_slider_paint_p (wp, event);
     }
   } else {
     /* no paddle just background when disabled. */
-    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.fx = -1;
     wp->paddle_drawn_here.x = 0;
     wp->paddle_drawn_here.y = 0;
     wp->paddle_drawn_here.w = 0;
@@ -371,47 +370,22 @@ static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) 
     }
 
     if (wp->w.enable == WIDGET_ENABLE) {
-      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
-
-      wp->paddle_drawn_here.state = paddle_x;
-
-      {
-        int xcenter = (wp->bg_skin.width >> 1) + wp->w.x;
-        int ycenter = (wp->bg_skin.height >> 1) + wp->w.y;
-        double angle = wp->angle;
-        if (angle < M_PI / -2)
-          angle = angle + M_PI * 2;
-        destx1 = (int) (0.5 + xcenter + wp->radius * cos (angle)) - (paddle_width / 2);
-        desty1 = (int) (0.5 + ycenter - wp->radius * sin (angle)) - (paddle_height / 2);
-        srcx1 = paddle_x;
-        srcy1 = 0;
-        src_w = paddle_width;
-        src_h = paddle_height;
-      }
-
-      wp->paddle_drawn_here.x = destx1 - wp->w.x;
-      wp->paddle_drawn_here.y = desty1 - wp->w.y;
-      wp->paddle_drawn_here.w = src_w;
-      wp->paddle_drawn_here.h = src_h;
-      if (event) {
-        int x1, x2, y1, y2;
-
-        x1 = _tabs_max (destx1, event->x);
-        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
-        y1 = _tabs_max (desty1, event->y);
-        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
-        if ((x1 < x2) && (y1 < y2))
-          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
-            x2 - x1, y2 - y1, x1, y1);
-      } else {
-        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-          srcx1, srcy1, src_w, src_h, destx1, desty1);
-      }
+      int xcenter = wp->bg_skin.width >> 1;
+      int ycenter = wp->bg_skin.height >> 1;
+      double angle = wp->angle;
+      if (angle < M_PI / -2)
+        angle = angle + M_PI * 2;
+      wp->paddle_drawn_here.x = (int) (0.5 + xcenter + wp->radius * cos (angle)) - (paddle_width / 2);
+      wp->paddle_drawn_here.y = (int) (0.5 + ycenter - wp->radius * sin (angle)) - (paddle_height / 2);
+      wp->paddle_drawn_here.fx = paddle_x;
+      wp->paddle_drawn_here.fy = 0;
+      wp->paddle_drawn_here.w = paddle_width;
+      wp->paddle_drawn_here.h = paddle_height;
+      _xitk_slider_paint_p (wp, event);
     }
   } else {
     /* no paddle just background when disabled. */
-    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.fx = -1;
     wp->paddle_drawn_here.x = 0;
     wp->paddle_drawn_here.y = 0;
     wp->paddle_drawn_here.w = 0;
@@ -433,7 +407,7 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) 
     if (!event) {
       if (wp->paddle_drawn_here.w > 0) {
         /* incremental */
-        if (wp->bar_mode && (wp->paddle_drawn_here.state == paddle_x)) {
+        if (wp->bar_mode && (wp->paddle_drawn_here.fx == paddle_x)) {
           /* nasty little shortcut ;-) */
           int oldpos = wp->paddle_drawn_here.w;
           int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
@@ -466,45 +440,22 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) 
     }
 
     if (wp->w.enable == WIDGET_ENABLE) {
-      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
-
-      wp->paddle_drawn_here.state = paddle_x;
-
       if (wp->bar_mode == 1) {
-        src_w  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
-        destx1 = wp->w.x;
+        wp->paddle_drawn_here.w  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
+        wp->paddle_drawn_here.x = 0;
       } else {
-        destx1 = wp->w.x + ((wp->w.width - paddle_width) * .01) * (wp->percentage * 100.0) + 0.5;
-        src_w  = paddle_width;
+        wp->paddle_drawn_here.x = ((wp->w.width - paddle_width) * .01) * (wp->percentage * 100.0) + 0.5;
+        wp->paddle_drawn_here.w  = paddle_width;
       }
-      srcx1 = paddle_x;
-      srcy1 = 0;
-      src_h = paddle_height;
-      desty1 = wp->w.y;
-
-      wp->paddle_drawn_here.x = destx1 - wp->w.x;
-      wp->paddle_drawn_here.y = desty1 - wp->w.y;
-      wp->paddle_drawn_here.w = src_w;
-      wp->paddle_drawn_here.h = src_h;
-      if (event) {
-        int x1, x2, y1, y2;
-
-        x1 = _tabs_max (destx1, event->x);
-        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
-        y1 = _tabs_max (desty1, event->y);
-        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
-        if ((x1 < x2) && (y1 < y2))
-          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
-            x2 - x1, y2 - y1, x1, y1);
-      } else {
-        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-          srcx1, srcy1, src_w, src_h, destx1, desty1);
-      }
+      wp->paddle_drawn_here.fx = paddle_x;
+      wp->paddle_drawn_here.fy = 0;
+      wp->paddle_drawn_here.h = paddle_height;
+      wp->paddle_drawn_here.y = 0;
+      _xitk_slider_paint_p (wp, event);
     }
   } else {
     /* no paddle just background when disabled. */
-    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.fx = -1;
     wp->paddle_drawn_here.x = 0;
     wp->paddle_drawn_here.y = 0;
     wp->paddle_drawn_here.w = 0;
@@ -526,7 +477,7 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) 
     if (!event) {
       if (wp->paddle_drawn_here.w > 0) {
         /* incremental */
-        if (wp->bar_mode && (wp->paddle_drawn_here.state == paddle_x)) {
+        if (wp->bar_mode && (wp->paddle_drawn_here.fx == paddle_x)) {
           /* nasty little shortcut ;-) */
           int oldpos = wp->paddle_drawn_here.y;
           int newpos = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
@@ -561,47 +512,24 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) 
     }
 
     if (wp->w.enable == WIDGET_ENABLE) {
-      int  srcx1, src_w, destx1, srcy1, src_h, desty1;
-
-      wp->paddle_drawn_here.state = paddle_x;
-
       if (wp->bar_mode == 1) {
-        src_h  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
-        srcy1  = paddle_height - src_h;
-        desty1 = wp->w.y + srcy1;
+        wp->paddle_drawn_here.h  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
+        wp->paddle_drawn_here.y =
+        wp->paddle_drawn_here.fy = paddle_height - wp->paddle_drawn_here.h;
       } else {
-        desty1 = wp->w.y + wp->bg_skin.height - paddle_height
-               - ((wp->w.height - paddle_height) * .01) * (wp->percentage * 100.0) + 0.5;
-        srcy1  = 0;
-        src_h  = paddle_height;
+        wp->paddle_drawn_here.y = wp->bg_skin.height - paddle_height
+          - ((wp->w.height - paddle_height) * .01) * (wp->percentage * 100.0) + 0.5;
+        wp->paddle_drawn_here.fy = 0;
+        wp->paddle_drawn_here.h = paddle_height;
       }
-      srcx1 = paddle_x;
-      src_w = paddle_width;
-      destx1 = wp->w.x;
-
-      wp->paddle_drawn_here.x = destx1 - wp->w.x;
-      wp->paddle_drawn_here.y = desty1 - wp->w.y;
-      wp->paddle_drawn_here.w = src_w;
-      wp->paddle_drawn_here.h = src_h;
-      if (event) {
-        int x1, x2, y1, y2;
-
-        x1 = _tabs_max (destx1, event->x);
-        x2 = _tabs_min (destx1 + src_w, event->x + event->width);
-        y1 = _tabs_max (desty1, event->y);
-        y2 = _tabs_min (desty1 + src_h, event->y + event->height);
-        if ((x1 < x2) && (y1 < y2))
-          xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-            srcx1 + x1 - destx1, srcy1 + y1 - desty1,
-            x2 - x1, y2 - y1, x1, y1);
-      } else {
-        xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,
-          srcx1, srcy1, src_w, src_h, destx1, desty1);
-      }
+      wp->paddle_drawn_here.fx = paddle_x;
+      wp->paddle_drawn_here.w = paddle_width;
+      wp->paddle_drawn_here.x = 0;
+      _xitk_slider_paint_p (wp, event);
     }
   } else {
     /* no paddle just background when disabled. */
-    wp->paddle_drawn_here.state = -1;
+    wp->paddle_drawn_here.fx = -1;
     wp->paddle_drawn_here.x = 0;
     wp->paddle_drawn_here.y = 0;
     wp->paddle_drawn_here.w = 0;
@@ -627,7 +555,7 @@ static void _xitk_slider_set_paint (_slider_private_t *wp) {
 static void _xitk_slider_set_skin (_slider_private_t *wp, xitk_skin_config_t *skonfig) {
   const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
   /* always be there for the application. if this skin does not use us, disable user side. */
-  wp->paddle_drawn_here.state = -1;
+  wp->paddle_drawn_here.fx = -1;
   if (s && s->pixmap_img.image && s->slider_pixmap_pad_img.image) {
     wp->w.x         = s->x;
     wp->w.y         = s->y;
@@ -1168,7 +1096,7 @@ static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_wi
   wp->paddle_drawn_here.y = 0;
   wp->paddle_drawn_here.w = 0;
   wp->paddle_drawn_here.h = 0;
-  wp->paddle_drawn_here.state = -1;
+  wp->paddle_drawn_here.fx = -1;
 
   wp->motion_callback    = s->motion_callback;
   wp->motion_userdata    = s->motion_userdata;
