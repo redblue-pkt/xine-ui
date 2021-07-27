@@ -643,48 +643,27 @@ const kbinding_entry_t *kbindings_lookup_action (kbinding_t *kbt, const char *ac
  * Read and parse remap key binding file, if available.
  */
 static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
-  FILE *file;
-  size_t s;
+  size_t fsize = 1 << 20;
   char *fbuf;
   xitk_cfg_parse_t *tree;
   int i;
 
-  if (!name)
+  fbuf = xitk_cfg_load (name, &fsize);
+  if (!fbuf)
     return;
-  file = fopen (name, "rb");
-  if (!file)
-    return;
-  fseek (file, 0, SEEK_END);
-  s = ftell (file);
-  fseek (file, 0, SEEK_SET);
-  if (s == 0) {
-    fclose (file);
-    return;
-  }
-  if (s > (1 << 20) - 1)
-    s = (1 << 20) - 1;
-  fbuf = malloc (s + 2);
-  if (!fbuf) {
-    fclose (file);
-    return;
-  }
-  fbuf[0] = 0;
-  s = fread (fbuf + 1, 1, s, file);
-  fbuf[s] = 0;
-  fclose (file);
 
-  tree = xitk_cfg_parse (fbuf + 1, XITK_CFG_PARSE_CASE);
+  tree = xitk_cfg_parse (fbuf, XITK_CFG_PARSE_CASE);
   if (!tree) {
-    free (fbuf);
+    xitk_cfg_unload (fbuf);
     return;
   }
 
   for (i = tree[0].first_child; i; i = tree[i].next) {
-    const char *sname = fbuf + 1 + tree[i].key, *entry = "", *key = "", *mod = "";
+    const char *sname = fbuf + tree[i].key, *entry = "", *key = "", *mod = "";
     int j;
 
     for (j = tree[i].first_child; j; j = tree[j].next) {
-      const char *ename = fbuf + 1 + tree[j].key, *eval = fbuf + 1 + tree[j].value;
+      const char *ename = fbuf + tree[j].key, *eval = fbuf + tree[j].value;
       int d;
 
       d = strcmp (ename, "key");
@@ -750,7 +729,7 @@ static void _kbinding_load_config(kbinding_t *kbt, const char *name) {
   }
 
   xitk_cfg_unparse (tree);
-  free (fbuf);
+  xitk_cfg_unload (fbuf);
 }
   
 /*

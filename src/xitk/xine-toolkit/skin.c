@@ -50,7 +50,6 @@ typedef struct {
 
 struct xitk_skin_config_s {
   xitk_t                       *xitk;
-  FILE                         *fd;
   char                         *path;
   char                         *skinfile;
 
@@ -640,8 +639,8 @@ static int _skin_string_index (const char * const *list, size_t size, const char
 }
 
 static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *sub) {
-  char dummy[8] = {[0] = 0}, *key = sub->key >= 0 ? text + sub->key : dummy;
-  char *val = sub->value >= 0 ? text + sub->value : dummy;
+  char *key = text + sub->key;
+  char *val = text + sub->value;
   xitk_skin_element_t *s = skonfig->celement;
   static const char * const list1[] = {
     "browser",
@@ -661,7 +660,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         xitk_cfg_parse_t *sub2;
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+          char *key2 = text + sub2->key, *val2 = text + sub2->value;
 
           if (!strcmp (key2, "entries"))
             s->info.browser_entries = strtol (val2, &val2, 10);
@@ -672,7 +671,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         xitk_cfg_parse_t *sub2;
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+          char *key2 = text + sub2->key, *val2 = text + sub2->value;
 
           if (!strcmp (key2, "x"))
             s->info.x = strtol (val2, &val2, 10);
@@ -714,7 +713,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         s->info.label_alignment = ALIGN_CENTER;
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+          char *key2 = text + sub2->key, *val2 = text + sub2->value;
 
           n = _skin_string_index (list2, sizeof (list2) / sizeof (list2[0]), key2);
           switch (n) {
@@ -782,7 +781,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
         xitk_cfg_parse_t *sub2;
 
         for (sub2 = sub->first_child ? tree + sub->first_child : NULL; sub2; sub2 = sub2->next ? tree + sub2->next : NULL) {
-          char *key2 = sub2->key >= 0 ? text + sub2->key : dummy, *val2 = sub2->value >= 0 ? text + sub2->value : dummy;
+          char *key2 = text + sub2->key, *val2 = text + sub2->value;
 
           if (!strcmp (key2, "pixmap")) {
             _skin_make_filename (skonfig, val2, &skonfig->celement->info.slider_pixmap_pad_name);
@@ -809,7 +808,7 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
 }
 
 static void _skin_parse_1 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_parse_t *tree, xitk_cfg_parse_t *entry) {
-  char dummy[8] = {[0] = 0}, *key = text + entry->key, *val = entry->value >= 0 ? text + entry->value : dummy;
+  char *key = text + entry->key, *val = text + entry->value;
 
   if (entry->first_child) {
     xitk_skin_element_t *s = xitk_xmalloc (sizeof (*s));
@@ -855,7 +854,7 @@ static void _skin_parse_0 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
 
   for (entry = tree->first_child ? tree + tree->first_child : NULL; entry;
     entry = entry->next ? tree + entry->next : NULL) {
-    char buf[1] = {0}, *key = entry->key >= 0 ? text + entry->key : buf;
+    char *key = text + entry->key;
 
     if (!strncmp (key, "skin.", 5)) {
       entry->key += 5;
@@ -868,7 +867,9 @@ static void _skin_parse_0 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
  * Load the skin configfile.
  */
 int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const char *filename) {
-  char buf[2048];
+  char buf[2048], *text;
+  size_t fsize = 2 << 20;
+  xitk_cfg_parse_t *tree;
 
   ABORT_IF_NULL(skonfig);
   ABORT_IF_NULL(path);
@@ -880,41 +881,26 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, const char *path, const c
   skonfig->skinfile = strdup(filename);
 
   snprintf(buf, sizeof(buf), "%s/%s", skonfig->path, skonfig->skinfile);
-
-  if((skonfig->fd = fopen(buf, "r")) != NULL) {
-    {
-      size_t size;
-      char *text;
-      xitk_cfg_parse_t *tree;
-
-      fseek (skonfig->fd, 0, SEEK_END);
-      size = ftell (skonfig->fd);
-      fseek (skonfig->fd, 0, SEEK_SET);
-      if (size > (1 << 20) - 1)
-        size = (1 << 20) - 1;
-      text = malloc (size + 1);
-      if (text) {
-        int r = fread (text, 1, size, skonfig->fd);
-
-        if (r > 0) {
-          size = r;
-          text[size] = 0;
-          tree = xitk_cfg_parse (text, /* XITK_CFG_PARSE_DEBUG */ 0);
-          _skin_parse_0 (skonfig, text, tree);
-          xitk_cfg_unparse (tree);
-        }
-        free (text);
-      }
-      fseek (skonfig->fd, 0, SEEK_SET);
-    }
-    fclose(skonfig->fd);
-  }
-  else {
-    XITK_WARNING("%s(): Unable to open '%s' file.\n", __FUNCTION__, skonfig->skinfile);
+  text = xitk_cfg_load (buf, &fsize);
+  if (!text) {
+    XITK_WARNING ("%s(): Unable to open '%s' file.\n", __FUNCTION__, skonfig->skinfile);
     XITK_FREE(skonfig->skinfile);
     pthread_mutex_unlock (&skonfig->skin_mutex);
     return 0;
   }
+
+  tree = xitk_cfg_parse (text, /* XITK_CFG_PARSE_DEBUG */ 0);
+  if (!tree) {
+    xitk_cfg_unload (text);
+    XITK_FREE (skonfig->skinfile);
+    pthread_mutex_unlock (&skonfig->skin_mutex);
+    return 0;
+  }
+
+  _skin_parse_0 (skonfig, text, tree);
+
+  xitk_cfg_unparse (tree);
+  xitk_cfg_unload (text);
 
   if (!skonfig->celement) {
     XITK_WARNING("%s(): no valid skin element found in '%s/%s'.\n",
@@ -1022,4 +1008,3 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
-
