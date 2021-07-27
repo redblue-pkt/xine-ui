@@ -1979,6 +1979,51 @@ long int xitk_get_last_keypressed_time (xitk_t *xitk) {
   return tm.tv_usec < 0 ? tm.tv_sec - 1 : tm.tv_sec;
 }
 
+char *xitk_cfg_load (const char *filename, size_t *filesize) {
+  char *buf;
+  size_t fsize;
+  FILE *f;
+
+  if (!filename)
+    return NULL;
+  if (!filename[0])
+    return NULL;
+
+  f = fopen (filename, "rb");
+  if (!f)
+    return NULL;
+  if (fseek (f, 0, SEEK_END))
+    return NULL;
+  fsize = ftell (f);
+  if (fseek (f, 0, SEEK_SET))
+    return NULL;
+
+  if (filesize) {
+    if (fsize > *filesize)
+      fsize = *filesize;
+  }
+  buf = malloc (fsize + 16);
+  if (!buf) {
+    fclose (f);
+    return NULL;
+  }
+
+  memset (buf, 0, 8);
+  fsize = fread (buf + 8, 1, fsize, f);
+  memset (buf + 8 + fsize, 0, 8);
+  fclose (f);
+
+  if (filesize)
+    *filesize = fsize;
+  return buf + 8;
+}
+
+void xitk_cfg_unload (char *buf) {
+  if (!buf)
+    return;
+  free (buf - 8);
+}
+
 /*
  * Return 0/1 from char value (valids are 1/0, true/false,
  * yes/no, on/off. Case isn't checked.

@@ -85,6 +85,11 @@ static inline void xitk_short_string_deinit (xitk_short_string_t *s) {
 
 size_t xitk_strlcpy (char *d, const char *s, size_t len);
 
+/* this will pad the return with 8 zero bytes both before and after.
+ * filesize, if set, is the size limit before and the actual size after the call. */
+char *xitk_cfg_load (const char *filename, size_t *filesize);
+void xitk_cfg_unload (char *buf);
+
 typedef struct {
   int level;
   /* array index. */
