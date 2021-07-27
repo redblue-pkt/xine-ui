@@ -1984,19 +1984,33 @@ char *xitk_cfg_load (const char *filename, size_t *filesize) {
   size_t fsize;
   FILE *f;
 
-  if (!filename)
+  if (!filename) {
+    errno = EINVAL;
     return NULL;
-  if (!filename[0])
+  }
+  if (!filename[0]) {
+    errno = EINVAL;
     return NULL;
+  }
 
+  errno = 0;
   f = fopen (filename, "rb");
   if (!f)
     return NULL;
-  if (fseek (f, 0, SEEK_END))
+
+  if (fseek (f, 0, SEEK_END)) {
+    int e = errno;
+    fclose (f);
+    errno = e;
     return NULL;
+  }
   fsize = ftell (f);
-  if (fseek (f, 0, SEEK_SET))
+  if (fseek (f, 0, SEEK_SET)) {
+    int e = errno;
+    fclose (f);
+    errno = e;
     return NULL;
+  }
 
   if (filesize) {
     if (fsize > *filesize)
@@ -2005,6 +2019,7 @@ char *xitk_cfg_load (const char *filename, size_t *filesize) {
   buf = malloc (fsize + 16);
   if (!buf) {
     fclose (f);
+    errno = ENOMEM;
     return NULL;
   }
 
@@ -2012,7 +2027,6 @@ char *xitk_cfg_load (const char *filename, size_t *filesize) {
   fsize = fread (buf + 8, 1, fsize, f);
   memset (buf + 8 + fsize, 0, 8);
   fclose (f);
-
   if (filesize)
     *filesize = fsize;
   return buf + 8;
@@ -2266,4 +2280,3 @@ xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags) {
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree) {
   free (tree);
 }
-
