@@ -194,6 +194,7 @@ struct xitk_be_display_s {
   xitk_be_window_t *(*window_new) (xitk_be_display_t *d, const xitk_tagitem_t *taglist);
 
   long int (*reset_screen_saver)(xitk_be_display_t *d, long int timeout); /* return number of seconds since last reset */
+  int      (*change_vmode)      (xitk_be_display_t *d, xitk_be_window_t *w, int min_width, int min_height); /* set width, height to -1 to reset */
 
   /* temporary, X11 specific */
   void      (*set_visual)   (xitk_be_display_t *, void *visual);  /* does video window really need the same visual with gui ... ? */

@@ -1591,6 +1591,18 @@ long int xitk_reset_screen_saver(xitk_t *xitk, long int timeout)
   return 0;
 }
 
+int xitk_change_video_mode(xitk_t *xitk, xitk_window_t *w, int min_width, int min_height)
+{
+  if (w) {
+    if (w->bewin->display->change_vmode)
+      return w->bewin->display->change_vmode(w->bewin->display, w->bewin, min_width, min_height);
+  } else if (xitk->d && xitk->d->change_vmode) {
+    return xitk->d->change_vmode(xitk->d, NULL, min_width, min_height);
+  }
+
+  return -1;
+}
+
 int xitk_image_quality (xitk_t *xitk, int qual) {
   if (xitk->d->image_quality)
     return xitk->d->image_quality(xitk->d, qual);

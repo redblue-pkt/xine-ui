@@ -48,6 +48,9 @@
 #ifdef HAVE_XSSAVEREXTENSION
 #include <X11/extensions/scrnsaver.h>
 #endif
+#ifdef HAVE_XF86VIDMODE
+#include <X11/extensions/xf86vmode.h>
+#endif
 
 #include <xine/sorted_array.h>
 
@@ -351,6 +354,10 @@ struct xitk_x11_display_s {
   uint32_t fake_keys[2];
 #endif
 
+#ifdef HAVE_XF86VIDMODE
+  xitk_x11_modelines_t modelines;
+#endif
+
   char utf8[2048];
 };
 
@@ -431,6 +438,14 @@ static void _xitk_x11_display_delete (xitk_x11_display_t *d) {
     }
     d->d.unlock (&d->d);
   }
+
+#ifdef HAVE_XF86VIDMODE
+  if (d->modelines.info) {
+    d->d.lock(&d->d);
+    xitk_x11_modelines_shutdown(d->display, &d->modelines);
+    d->d.unlock(&d->d);
+  }
+#endif
 
   xitk_x11_cursors_deinit(&d->cursors);
 
@@ -3105,6 +3120,63 @@ static long int xitk_x11_reset_screen_saver(xitk_be_display_t *_d, long int time
   return 0;
 }
 
+#ifdef HAVE_XF86VIDMODE
+static int xitk_x11_change_vmode(xitk_be_display_t *_d, xitk_be_window_t *_w, int min_width, int min_height)
+{
+  xitk_x11_display_t *d;
+  xitk_x11_window_t  *w;
+
+  xitk_container (d, _d, d);
+  xitk_container (w, _w, w);
+
+  /* wrong display / window ? */
+  if (w && w->w.display != _d)
+    return -1;
+
+  /* not supported by server ? */
+  if (d->modelines.count < 0)
+    return -1;
+
+  if (d->modelines.count == 0) {
+    /* initialize */
+    d->d.lock(&d->d);
+    xitk_x11_modelines_init(d->display, &d->modelines);
+    d->d.unlock(&d->d);
+    if (!d->modelines.info || d->modelines.count < 1) {
+      printf ("xitk.x11.display.change_vmode: no modelines found\n");
+      d->modelines.count = -1;
+      return -1;
+    }
+  }
+
+  if (d->be->be.verbosity >= 2)
+    printf ("xitk.x11.display.change_vmode %dx%d -> %dx%d\n", d->d.width, d->d.height, min_width, min_height);
+
+  d->d.lock(&d->d);
+
+  if (min_width < 0 || min_width < 0) {
+    xitk_x11_modelines_reset(d->display, &d->modelines);
+  } else {
+    xitk_x11_modelines_adjust(d->display, w ? w->w.id : None, &d->modelines, min_width, min_height);
+  }
+
+  XSync (d->display, False);
+
+  d->d.width = DisplayWidth (d->display, d->default_screen);
+  d->d.height = DisplayHeight (d->display, d->default_screen);
+  d->d.ratio = ((double)d->d.height * DisplayWidthMM  (d->display, d->default_screen)) /
+               ((double)d->d.width  * DisplayHeightMM (d->display, d->default_screen));
+
+  d->d.unlock(&d->d);
+
+  if (d->be->be.verbosity >= 2)
+    printf ("xitk.x11.display.change_vmode: new mode %dx%d\n", d->d.width, d->d.height);
+
+  return 0;
+}
+#endif
+
+
 /*
  *
  */
@@ -3271,6 +3343,9 @@ static xitk_be_display_t *xitk_x11_open_display (xitk_backend_t *_be, const char
   d->d.color._new = xitk_x11_color_new;
   d->d.color._delete = xitk_x11_color_delete;
   d->d.reset_screen_saver = xitk_x11_reset_screen_saver;
+#ifdef HAVE_XF86VIDMODE
+  d->d.change_vmode = xitk_x11_change_vmode;
+#endif
 
   d->d.set_visual    = _x11_select_visual_wrapper;
   d->d.get_visual    = _x11_get_visual;

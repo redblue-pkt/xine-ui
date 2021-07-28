@@ -41,6 +41,9 @@
 #include <X11/Xresource.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#ifdef HAVE_XF86VIDMODE
+#include <X11/extensions/xf86vmode.h>
+#endif
 
 #include <xine/xineutils.h> /* xine_get_homedir() */
 #include <xine/sorted_array.h>
@@ -676,3 +679,136 @@ int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
     return -1;
   return strlcpy(buf, s, buf_size);
 }
+
+/*
+ *
+ */
+
+#ifdef HAVE_XF86VIDMODE
+void xitk_x11_modelines_init(Display *display, xitk_x11_modelines_t *m) {
+
+  int dummy_query_event, dummy_query_error;
+  if (XF86VidModeQueryExtension (display, &dummy_query_event, &dummy_query_error)) {
+    XF86VidModeModeInfo* XF86_modelines_swap;
+    int                  mode, major, minor, sort_x, sort_y;
+    int                  screen = XDefaultScreen(display);
+
+    XF86VidModeQueryVersion (display, &major, &minor);
+    printf (_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
+
+    if (XF86VidModeGetAllModeLines (display, screen, &m->count, &m->info)) {
+      printf (_("XF86VidMode Extension: %d modelines found.\n"), m->count);
+
+      /* first, kick off unsupported modes */
+      for (mode = 1; mode < m->count; mode++) {
+
+        if (!XF86VidModeValidateModeLine (display, screen, m->info[mode])) {
+          int wrong_mode;
+
+          printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"),
+                 m->info[mode]->hdisplay,
+                 m->info[mode]->vdisplay);
+
+          for (wrong_mode = mode; wrong_mode < m->count; wrong_mode++)
+            m->info[wrong_mode] = m->info[wrong_mode + 1];
+
+          m->info[wrong_mode] = NULL;
+          m->count--;
+          mode--;
+        }
+      }
+
+      /*
+       * sorting modelines, skipping first entry because it is the current
+       * modeline in use - this is important so we know to which modeline
+       * we have to switch to when toggling fullscreen mode.
+       */
+      for (sort_x = 1; sort_x < m->count; sort_x++) {
+
+        for (sort_y = sort_x+1; sort_y < m->count; sort_y++) {
+
+          if (m->info[sort_x]->hdisplay > m->info[sort_y]->hdisplay) {
+            XF86_modelines_swap = m->info[sort_y];
+            m->info[sort_y] = m->info[sort_x];
+            m->info[sort_x] = XF86_modelines_swap;
+          }
+        }
+      }
+    } else {
+      m->count = 0;
+      printf(_("XF86VidMode Extension: could not get list of available modelines. Failed.\n"));
+    }
+  } else {
+    printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
+  }
+}
+#endif /* HAVE_XF86VIDMODE */
+
+#ifdef HAVE_XF86VIDMODE
+void xitk_x11_modelines_adjust(Display *display, Window window, xitk_x11_modelines_t *m, int width, int height) {
+  int search = 0;
+
+  if (m->count < 1)
+    return;
+
+  if (width > 0 && height > 0) {
+    /* skipping first entry because it is the current modeline */
+    for (search = 1; search < m->count; search++) {
+      if (m->info[search]->hdisplay >= width)
+        break;
+    }
+  }
+
+  /*
+   * in case we have a request for a resolution higher than any available
+   * ones we take the highest currently available.
+   */
+  if (search >= m->count)
+    search = 0;
+
+  /* just switching to a different modeline if necessary */
+  if (m->current != search) {
+    if (XF86VidModeSwitchToMode (display, XDefaultScreen (display), m->info[search])) {
+      m->current = search;
+
+      // TODO
+      /*
+       * just in case the mouse pointer is off the visible area, move it
+       * to the middle of the video window
+       */
+      XWarpPointer (display, None, window,
+                    0, 0, 0, 0, m->info[search]->hdisplay / 2, m->info[search]->vdisplay / 2);
+
+      XF86VidModeSetViewPort (display, XDefaultScreen (display), 0, 0);
+
+    } else {
+      //gui_msg (vwin->gui, XUI_MSG_ERROR, _("XF86VidMode Extension: modeline switching failed.\n"));
+    }
+  }
+}
+#endif /* HAVE_XF86VIDMODE */
+
+#ifdef HAVE_XF86VIDMODE
+void xitk_x11_modelines_reset(Display *display, xitk_x11_modelines_t *m) {
+  /*
+   * toggling from fullscreen to window mode - time to switch back to
+   * the original modeline
+   */
+
+  if (m->count > 1 && m->current) {
+    XF86VidModeSwitchToMode (display, XDefaultScreen (display), m->info[0]);
+    XF86VidModeSetViewPort (display, XDefaultScreen (display), 0, 0);
+    m->current = 0;
+  }
+}
+#endif /* HAVE_XF86VIDMODE */
+
+#ifdef HAVE_XF86VIDMODE
+void xitk_x11_modelines_shutdown(Display *display, xitk_x11_modelines_t *m) {
+  if (m->info) {
+    xitk_x11_modelines_reset(display, m);
+    XFree(m->info);
+    m->info = NULL;
+  }
+}
+#endif /* HAVE_XF86VIDMODE */

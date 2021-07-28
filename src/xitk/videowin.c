@@ -34,9 +34,6 @@
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
-#ifdef HAVE_XF86VIDMODE
-#include <X11/extensions/xf86vmode.h>
-#endif
 
 #include "common.h"
 #include "videowin.h"
@@ -141,10 +138,7 @@ struct xui_vwin_st {
   xitk_register_key_t    widget_key;
 
 #ifdef HAVE_XF86VIDMODE
-  /* XF86VidMode Extension stuff */
-  XF86VidModeModeInfo**  XF86_modelines;
-  int                    XF86_modelines_count;
-  int                    XF86VidMode_fullscreen;
+  int                    XF86VidMode;
 #endif
 
   int                    hide_on_start; /* user use '-H' arg, don't map
@@ -294,157 +288,28 @@ void video_window_select_visual (xui_vwin_t *vwin) {
 }
 
 #ifdef HAVE_XF86VIDMODE
-static void _get_modelines(xui_vwin_t *vwin) {
-  int dummy_query_event, dummy_query_error;
-
-  vwin->x_lock_display (vwin->video_display);
-
-  if (XF86VidModeQueryExtension (vwin->video_display, &dummy_query_event, &dummy_query_error)) {
-    XF86VidModeModeInfo* XF86_modelines_swap;
-    int                  mode, major, minor, sort_x, sort_y;
-
-    XF86VidModeQueryVersion (vwin->video_display, &major, &minor);
-    printf (_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
-
-    if (XF86VidModeGetAllModeLines (vwin->video_display, XDefaultScreen(vwin->video_display),
-                                    &(vwin->XF86_modelines_count), &(vwin->XF86_modelines))) {
-      printf (_("XF86VidMode Extension: %d modelines found.\n"), vwin->XF86_modelines_count);
-
-      /* first, kick off unsupported modes */
-      for (mode = 1; mode < vwin->XF86_modelines_count; mode++) {
-
-        if (!XF86VidModeValidateModeLine (vwin->video_display, DefaultScreen(vwin->video_display),
-                                          vwin->XF86_modelines[mode])) {
-          int wrong_mode;
-
-          printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"),
-                 vwin->XF86_modelines[mode]->hdisplay,
-                 vwin->XF86_modelines[mode]->vdisplay);
-
-          for (wrong_mode = mode; wrong_mode < vwin->XF86_modelines_count; wrong_mode++)
-            vwin->XF86_modelines[wrong_mode] = vwin->XF86_modelines[wrong_mode + 1];
-
-          vwin->XF86_modelines[wrong_mode] = NULL;
-          vwin->XF86_modelines_count--;
-          mode--;
-        }
-      }
-
-      /*
-       * sorting modelines, skipping first entry because it is the current
-       * modeline in use - this is important so we know to which modeline
-       * we have to switch to when toggling fullscreen mode.
-       */
-      for (sort_x = 1; sort_x < vwin->XF86_modelines_count; sort_x++) {
-
-        for (sort_y = sort_x+1; sort_y < vwin->XF86_modelines_count; sort_y++) {
-
-          if (vwin->XF86_modelines[sort_x]->hdisplay > vwin->XF86_modelines[sort_y]->hdisplay) {
-            XF86_modelines_swap = vwin->XF86_modelines[sort_y];
-            vwin->XF86_modelines[sort_y] = vwin->XF86_modelines[sort_x];
-            vwin->XF86_modelines[sort_x] = XF86_modelines_swap;
-          }
-        }
-      }
-    } else {
-      vwin->XF86_modelines_count = 0;
-      printf(_("XF86VidMode Extension: could not get list of available modelines. Failed.\n"));
-    }
-  } else {
-    printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
-  }
-  vwin->x_unlock_display (vwin->video_display);
-}
-#endif /* HAVE_XF86VIDMODE */
-
-#ifdef HAVE_XF86VIDMODE
 static void _adjust_modeline(xui_vwin_t *vwin) {
-  /* XF86VidMode Extension
-   * In case a fullscreen request is received or if already in fullscreen, the
-   * appropriate modeline will be looked up and used.
-   */
-  if (((!(vwin->fullscreen_req & WINDOWED_MODE)) || (!(vwin->fullscreen_mode & WINDOWED_MODE)))
-     && (vwin->XF86_modelines_count > 1)) {
-    int search = 0;
 
-    /* skipping first entry because it is the current modeline */
-    for (search = 1; search < vwin->XF86_modelines_count; search++) {
-       if (vwin->XF86_modelines[search]->hdisplay >= vwin->video_width)
-         break;
-    }
-
-    /*
-     * in case we have a request for a resolution higher than any available
-     * ones we take the highest currently available.
-     */
-    if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search >= vwin->XF86_modelines_count))
-       search = 0;
-
-    /* just switching to a different modeline if necessary */
-    if (!(search >= vwin->XF86_modelines_count)) {
-       vwin->x_lock_display (vwin->video_display);
-       if (XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display),
-                                    vwin->XF86_modelines[search])) {
-          vwin->XF86VidMode_fullscreen = 1;
-          vwin->fullscreen_width  = vwin->XF86_modelines[search]->hdisplay;
-          vwin->fullscreen_height = vwin->XF86_modelines[search]->vdisplay;
-
-          /* update pixel aspect */
-          vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->xitk);
-#ifdef DEBUG
-          printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
-#endif
-
-          // TODO
-          /*
-           * just in case the mouse pointer is off the visible area, move it
-           * to the middle of the video window
-           */
-          XWarpPointer (vwin->video_display, None, vwin->video_window,
-            0, 0, 0, 0, vwin->fullscreen_width / 2, vwin->fullscreen_height / 2);
-
-          XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-
-          /*
-           * if this is true, we are back at the original resolution, so there
-           * is no need to further worry about anything.
-           */
-          if ((!(vwin->fullscreen_mode & WINDOWED_MODE)) && (search == 0))
-            vwin->XF86VidMode_fullscreen = 0;
-       } else {
-          gui_msg (vwin->gui, XUI_MSG_ERROR, _("XF86VidMode Extension: modeline switching failed.\n"));
-       }
-       vwin->x_unlock_display (vwin->video_display);
-    }
+  if (vwin->fullscreen_req & WINDOWED_MODE) {
+    xitk_change_video_mode(vwin->xitk, vwin->wrapped_window, -1, -1);
+  } else if ((!(vwin->fullscreen_req & WINDOWED_MODE)) || (!(vwin->fullscreen_mode & WINDOWED_MODE))) {
+    xitk_change_video_mode(vwin->xitk, vwin->wrapped_window, vwin->video_width, vwin->video_height);
   }
+
+  if (vwin->video_be_display) {
+    vwin->fullscreen_width  = vwin->video_be_display->width;
+    vwin->fullscreen_height = vwin->video_be_display->height;
+    vwin->pixel_aspect = vwin->video_be_display->ratio;
+  } else {
+    xitk_get_display_size(vwin->xitk, &vwin->fullscreen_width, &vwin->fullscreen_height);
+    vwin->pixel_aspect = xitk_get_display_ratio(vwin->xitk);
+  }
+
+#ifdef DEBUG
+  printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
+#endif
 }
 #endif/* HAVE_XF86VIDMODE */
-
-#ifdef HAVE_XF86VIDMODE
-static void _reset_modeline(xui_vwin_t *vwin) {
-  /*
-   * toggling from fullscreen to window mode - time to switch back to
-   * the original modeline
-   */
-  if (vwin->XF86_modelines_count > 1) {
-    vwin->x_lock_display (vwin->video_display);
-    XF86VidModeSwitchToMode (vwin->video_display, XDefaultScreen (vwin->video_display), vwin->XF86_modelines[0]);
-    XF86VidModeSetViewPort (vwin->video_display, XDefaultScreen (vwin->video_display), 0, 0);
-    vwin->x_unlock_display (vwin->video_display);
-
-    vwin->XF86VidMode_fullscreen = 0;
-
-    vwin->fullscreen_width  = vwin->XF86_modelines[0]->hdisplay;
-    vwin->fullscreen_height = vwin->XF86_modelines[0]->vdisplay;
-
-    /* update pixel aspect */
-    vwin->pixel_aspect = vwin->video_be_display ? vwin->video_be_display->ratio : xitk_get_display_ratio(vwin->xitk);
-#ifdef DEBUG
-    printf ("pixel_aspect: %f\n", vwin->pixel_aspect);
-#endif
-  }
-}
-#endif
 
 /*
  * check if screen_number is in the list
@@ -788,7 +653,8 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
   }
 
 #ifdef HAVE_XF86VIDMODE
-  _adjust_modeline(vwin);
+  if (vwin->XF86VidMode)
+    _adjust_modeline(vwin);
 #endif
 #ifdef HAVE_XINERAMA
   _detect_xinerama_pos_size(vwin, &hint);
@@ -909,12 +775,7 @@ static void video_window_adapt_size (xui_vwin_t *vwin) {
 
     if (vwin->wrapped_window) {
 
-      if (!(vwin->fullscreen_mode & WINDOWED_MODE)) {
-#ifdef HAVE_XF86VIDMODE
-        _reset_modeline(vwin);
-#endif
-      }
-      else {
+      if (vwin->fullscreen_mode & WINDOWED_MODE) {
         xitk_window_resize_window (vwin->wrapped_window, -1, -1, vwin->win_width, vwin->win_height);
         return;
       }
@@ -1602,12 +1463,8 @@ xui_vwin_t *video_window_init (gGui_t *gui, int window_id,
      * FIXME: maybe display a warning message or so?!
      */
     vwin->stream_resize_window = 1;
-
-    _get_modelines(vwin);
+    vwin->XF86VidMode = 1;
   }
-  else
-    vwin->XF86_modelines_count = 0;
-
 #endif
 
   /*
@@ -1661,9 +1518,8 @@ void video_window_exit (xui_vwin_t *vwin) {
   vwin->second_display_running = 0;
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
-  if (vwin->XF86VidMode_fullscreen) {
-    _reset_modeline(vwin);
-  }
+  if (vwin->XF86VidMode)
+    xitk_change_video_mode(vwin->xitk, vwin->wrapped_window, -1, -1);
 #endif
   pthread_mutex_unlock (&vwin->mutex);
 
@@ -1712,11 +1568,6 @@ void video_window_exit (xui_vwin_t *vwin) {
     vwin->video_be_display->close (&vwin->video_be_display);
 
   free(vwin->prefered_visual);
-
-#ifdef HAVE_XF86VIDMODE
-  if (vwin->XF86_modelines)
-    XFree(vwin->XF86_modelines);
-#endif
 
   free (vwin);
 }
