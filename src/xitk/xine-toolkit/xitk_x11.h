@@ -101,4 +101,22 @@ struct xitk_be_display_s;
 /* xitk or be_display may be NULL */
 xitk_window_t *xitk_x11_wrap_window(xitk_t *, struct xitk_be_display_s *, Window window);
 
+#ifdef HAVE_XF86VIDMODE
+
+#include <X11/extensions/xf86vmode.h>
+
+typedef struct {
+  /* XF86VidMode Extension stuff */
+  int                    count;
+  int                    current;
+  XF86VidModeModeInfo**  info;
+} xitk_x11_modelines_t;
+
+void xitk_x11_modelines_init(Display *display, xitk_x11_modelines_t *);
+void xitk_x11_modelines_adjust(Display *display, Window window, xitk_x11_modelines_t *m, int width, int height);
+void xitk_x11_modelines_reset(Display *display, xitk_x11_modelines_t *);
+void xitk_x11_modelines_shutdown(Display *display, xitk_x11_modelines_t *);
+
+#endif /* HAVE_XF86VIDMODE */
+
 #endif /* _XITK_X11_H_ */

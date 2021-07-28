@@ -516,6 +516,7 @@ const char *xitk_set_locale(void);
  */
 
 long int xitk_reset_screen_saver(xitk_t *xitk, long int timeout);
+int xitk_change_video_mode(xitk_t *xitk, xitk_window_t *w, int min_width, int min_height);
 
 void xitk_get_display_size (xitk_t *xitk, int *w, int *h);
 double xitk_get_display_ratio (xitk_t *xitk);
