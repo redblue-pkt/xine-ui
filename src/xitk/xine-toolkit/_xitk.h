@@ -56,7 +56,6 @@ struct xitk_s {
 };
 
 #include "_config.h"
-#include "image.h"
 #include "skin.h"
 #include "widget.h"
 #include "xitkintl.h"
@@ -64,8 +63,6 @@ struct xitk_s {
 #if !defined(__GNUC__) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 #define	__FUNCTION__	__func__
 #endif
-
-#define XITK_WIDGET_MAGIC 0x7869746b
 
 #ifndef BUFSIZ
 #define BUFSIZ 8192
@@ -140,7 +137,6 @@ int xitk_system(int dont_run_as_root, const char *command);
 
 void xitk_set_xmb_enability(xitk_t *, int value);
 
-char *xitk_filter_filename(const char *name);
 void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
 void xitk_unset_current_menu(xitk_t *);
 void xitk_set_tips_timeout(xitk_t *, unsigned long timeout);
@@ -149,6 +145,29 @@ void *labelbutton_get_user_data(xitk_widget_t *w);
 void menu_auto_pop(xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
+
+typedef struct {
+  int                               red;
+  int                               green;
+  int                               blue;
+  char                              colorname[20];
+} xitk_color_names_t;
+
+xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *color);
+
+typedef struct {
+  int                               width;
+  int                               height;
+  int                               chars_per_row;
+  int                               chars_total;
+  int                               char_width;
+  int                               char_height;
+  xitk_point_t                      space;
+  xitk_point_t                      asterisk;
+  xitk_point_t                      unknown;
+#define XITK_MAX_UNICODE_RANGES 16
+  xitk_range_t                      unicode_ranges[XITK_MAX_UNICODE_RANGES + 1];
+} xitk_pix_font_t;
 
 typedef enum {
   /* states from left to right */
@@ -176,6 +195,19 @@ struct xitk_image_s {
 };
 
 void xitk_image_ref (xitk_image_t *img);
+
+#define STYLE_FLAT     1
+#define STYLE_BEVEL    2
+
+#define ALIGN_LEFT    1
+#define ALIGN_CENTER  2
+#define ALIGN_RIGHT   3
+#define ALIGN_DEFAULT (ALIGN_LEFT)
+
+#define TABULATION_SIZE 6 /* number of chars inserted in place of a tabulation */
+
+int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int height, xitk_image_t **image);
+void xitk_shared_image_list_delete (xitk_widget_list_t *wl);
 
 struct xitk_window_s {
   xitk_t                   *xitk;
@@ -213,4 +245,3 @@ void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 int xitk_clipboard_get_text (xitk_widget_t *w, char **text, int max_len);
 
 #endif
-

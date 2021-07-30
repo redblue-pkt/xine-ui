@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -74,7 +74,7 @@ size_t strlcat(char *dst, const char *src, size_t size);
 #endif
 
 #ifndef HAVE_STRLCPY
-size_t strlcpy(char *dst, const char *src, size_t size);
+size_t strlcpy (char *dst, const char *src, size_t size) ATTR_INLINE_ALL_STRINGOPS;
 #endif
 
 char *xitk_vasprintf(const char *fmt, va_list ap)  __attribute__ ((format (printf, 1, 0)));

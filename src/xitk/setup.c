@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -40,6 +40,7 @@
 #include "xine-toolkit/label.h"
 #include "xine-toolkit/combo.h"
 #include "xine-toolkit/intbox.h"
+#include "xine-toolkit/image.h"
 
 #include <xine/sorted_array.h>
 

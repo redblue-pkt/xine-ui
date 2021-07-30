@@ -639,8 +639,8 @@ static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_conf
     wp->w.enable = s->enability;
     wp->w.visible = s->visibility ? 1 : -1;
     xitk_short_string_set (&wp->fontname, s->label_fontname);
-    xitk_strlcpy (wp->color[_IT_NORMAL], s->label_color, sizeof (wp->color[_IT_NORMAL]));
-    xitk_strlcpy (wp->color[_IT_FOCUS], s->label_color_focus, sizeof (wp->color[_IT_FOCUS]));
+    strlcpy (wp->color[_IT_NORMAL], s->label_color, sizeof (wp->color[_IT_NORMAL]));
+    strlcpy (wp->color[_IT_FOCUS], s->label_color_focus, sizeof (wp->color[_IT_FOCUS]));
     wp->skin = s->pixmap_img;
   }
 }
@@ -1188,8 +1188,8 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   xitk_short_string_init (&wp->fontname);
   xitk_short_string_set (&wp->fontname, fontname);
 
-  xitk_strlcpy (wp->color[_IT_NORMAL], ncolor, sizeof (wp->color[_IT_NORMAL]));
-  xitk_strlcpy (wp->color[_IT_FOCUS], fcolor, sizeof (wp->color[_IT_FOCUS]));
+  strlcpy (wp->color[_IT_NORMAL], ncolor, sizeof (wp->color[_IT_NORMAL]));
+  strlcpy (wp->color[_IT_FOCUS], fcolor, sizeof (wp->color[_IT_FOCUS]));
 
   wp->skin_element_name.s = NULL;
   if (xitk_shared_image (wl, "xitk_inputtext", width * 2, height, &wp->skin.image) == 1)
