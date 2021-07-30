@@ -83,8 +83,6 @@ static inline void xitk_short_string_deinit (xitk_short_string_t *s) {
   }
 }
 
-size_t xitk_strlcpy (char *d, const char *s, size_t len);
-
 /* this will pad the return with 8 zero bytes both before and after.
  * filesize, if set, is the size limit before and the actual size after the call. */
 char *xitk_cfg_load (const char *filename, size_t *filesize);
@@ -155,53 +153,6 @@ typedef int xitk_register_key_t;
 int xitk_widget_key_event (xitk_widget_t *w, const char *string, int modifier);
 
 /*
- * event callbacks
- */
-
-typedef struct {
-#define XITK_KEY_PRESS      1
-#define XITK_KEY_RELEASE    2
-  int           event;
-  unsigned long key_pressed;     /* KeySym */
-  int           modifiers;       /* modifier flags XITK_MODIFIER_* */
-  int           keycode;         /* hardware keycode if known */
-  const char   *keysym_str;      /* ASCII key name */
-  const char   *keycode_str;     /* ASCII key name */
-} xitk_key_event_t;
-
-typedef struct {
-#define XITK_BUTTON_PRESS   3
-#define XITK_BUTTON_RELEASE 4
-  int event;
-  int button;
-  int x, y;
-  int modifiers;
-} xitk_button_event_t;
-
-typedef struct {
-  int   expose_count;
-  void *orig_event;
-} xitk_expose_event_t;
-
-typedef struct {
-  int x, y;
-} xitk_motion_event_t;
-
-typedef struct {
-  int x, y;
-  int width, height;
-} xitk_configure_event_t;
-
-typedef void (*xitk_key_event_callback_t)(void *data, const xitk_key_event_t *);
-typedef void (*xitk_button_event_callback_t)(void *data, const xitk_button_event_t *);
-typedef void (*xitk_motion_event_callback_t)(void *data, const xitk_motion_event_t *);
-
-typedef void (*xitk_configure_notify_callback_t)(void *data, const xitk_configure_event_t *);
-typedef void (*xitk_map_notify_callback_t)(void *data);
-typedef void (*xitk_expose_notify_callback_t)(void *data, const xitk_expose_event_t *);
-typedef void (*xitk_destroy_notify_callback_t)(void *);
-
-/*
  *
  */
 
@@ -212,27 +163,6 @@ typedef struct {
 typedef struct {
   int first, last;
 } xitk_range_t;
-
-typedef struct {
-  int                               width;
-  int                               height;
-  int                               chars_per_row;
-  int                               chars_total;
-  int                               char_width;
-  int                               char_height;
-  xitk_point_t                      space;
-  xitk_point_t                      asterisk;
-  xitk_point_t                      unknown;
-#define XITK_MAX_UNICODE_RANGES 16
-  xitk_range_t                      unicode_ranges[XITK_MAX_UNICODE_RANGES + 1];
-} xitk_pix_font_t;
-
-typedef struct {
-  int                               red;
-  int                               green;
-  int                               blue;
-  char                              colorname[20];
-} xitk_color_names_t;
 
 typedef struct {
   xitk_window_t                    *xwin;
@@ -463,15 +393,6 @@ typedef enum {
                                       (X)->magic = XITK_WIDGET_MAGIC; \
                                     } while(0)
 
-/**
- *  Widget struct
- */
-
-typedef struct {
-  int                               magic;
-  const char                       *skin_element_name;
-} xitk_image_widget_t;
-
 /* *******
  * INIT: widget lib initialization and friends
  */
@@ -594,23 +515,6 @@ int xitk_is_dbl_click (xitk_t *xitk, const struct timeval *t1, const struct time
  */
 void *xitk_xmalloc(size_t);
 
-
-/**
- *
- */
-xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *color);
-
-/**
- * return pointer to the xitk_color_names struct.
- */
-#ifdef YET_UNUSED
-xitk_color_names_t *xitk_get_color_names(void);
-#endif
-
-/**
- * Free color object.
- */
-void xitk_free_color_name(xitk_color_names_t *color);
 
 /**
  * (re)Paint a widget list.
@@ -844,19 +748,6 @@ void xitk_image_copy_rect (xitk_image_t *from, xitk_image_t *to, int x1, int y1,
 
 int xitk_image_width(xitk_image_t *);
 int xitk_image_height(xitk_image_t *);
-
-/**
- * Create an image widget type.
- */
-xitk_widget_t *xitk_image_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
-
-/**
- * Same as above, without skin.
- */
-xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
-					 xitk_image_widget_t *im,
-					 xitk_image_t *image, int x, int y);
 
 /**
  *
@@ -1160,4 +1051,3 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
-

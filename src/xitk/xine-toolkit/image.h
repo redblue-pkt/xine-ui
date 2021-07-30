@@ -22,19 +22,17 @@
 #ifndef HAVE_XITK_IMAGE_H
 #define HAVE_XITK_IMAGE_H
 
-#include "_xitk.h"
+typedef struct {
+  int                               magic;
+  const char                       *skin_element_name;
+} xitk_image_widget_t;
 
-#define STYLE_FLAT     1
-#define STYLE_BEVEL    2
+/** Create an image widget type. */
+xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
+  xitk_skin_config_t *skonfig, const xitk_image_widget_t *im);
 
-#define ALIGN_LEFT    1
-#define ALIGN_CENTER  2
-#define ALIGN_RIGHT   3
-#define ALIGN_DEFAULT (ALIGN_LEFT)
-
-#define TABULATION_SIZE 6 /* number of chars inserted in place of a tabulation */
-
-int xitk_shared_image (xitk_widget_list_t *wl, const char *key, int width, int height, xitk_image_t **image);
-void xitk_shared_image_list_delete (xitk_widget_list_t *wl);
+/** Same as above, without skin. */
+xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
+  const xitk_image_widget_t *im, xitk_image_t *image, int x, int y);
 
 #endif

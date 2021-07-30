@@ -1260,25 +1260,6 @@ int gui_handle_be_event (void *data, const xitk_be_event_t *e) {
   return 1;
 }
 
-void gui_handle_key_event (void *data, const xitk_key_event_t *ke) {
-  gGui_t *gui = data;
-
-  if (ke->event != XITK_KEY_PRESS)
-    return;
-  if (gui->stdctl_enable) {
-    stdctl_keypress (gui, ke->keycode_str);
-  }
-  kbindings_handle_kbinding (gui, gui->kbindings, ke->key_pressed, ke->keycode, ke->modifiers, -1);
-}
-
-void gui_handle_button_event (void *data, const xitk_button_event_t *be) {
-  gGui_t *gui = data;
-
-  if (be->event == XITK_BUTTON_RELEASE) {
-    kbindings_handle_kbinding (gui, gui->kbindings, 0, 0, be->modifiers, be->button);
-  }
-}
-
 /*
  * Start playback of an entry in playlist
  */
@@ -1963,4 +1944,3 @@ void gui_run(gGui_t *gui, char **session_opts) {
    */
   xitk_free(&gui->xitk);
 }
-

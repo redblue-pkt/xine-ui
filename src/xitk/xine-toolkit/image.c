@@ -30,6 +30,7 @@
 
 #include "_xitk.h"
 
+#include "image.h"
 #include "utils.h"
 #include "font.h"
 
@@ -1938,7 +1939,7 @@ static int _xitk_image_event (xitk_widget_t *w, widget_event_t *event, widget_ev
 }
 
 xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
-				  xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+  xitk_skin_config_t *skonfig, const xitk_image_widget_t *im) {
   _image_private_t *wp;
   const xitk_skin_element_info_t *info;
 
@@ -1971,8 +1972,7 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
  *
  */
 xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
-					 xitk_image_widget_t *im,
-					 xitk_image_t *image, int x, int y) {
+  const xitk_image_widget_t *im, xitk_image_t *image, int x, int y) {
   _image_private_t *wp;
 
   XITK_CHECK_CONSTITENCY (im);

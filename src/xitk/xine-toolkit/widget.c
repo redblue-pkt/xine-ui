@@ -1758,19 +1758,6 @@ xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *col
 
 
 /*
- * Free color object.
- */
-void xitk_free_color_name(xitk_color_names_t *color) {
-
-  if(!color) {
-    XITK_WARNING("color is NULL\n");
-    return;
-  }
-
-  XITK_FREE(color);
-}
-
-/*
  * Stop widgets from widget list.
  */
 #ifdef YET_UNUSED

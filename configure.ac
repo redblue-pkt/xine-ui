@@ -587,6 +587,24 @@ test x"$enable_optlevel" = x"0" || CFLAGS="$CFLAGS -O$enable_optlevel"
 
 AC_SUBST(CFLAGS)
 
+AC_MSG_CHECKING([whether gcc supports __attribute ((target ("inline-all-stringops")))])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#include <string.h>
+#include <sys/types.h>
+size_t my_strlen (const char *s) __attribute__ ((__target__ ("inline-all-stringops")));
+size_t my_strlen (const char *s) {
+  return strlen (s);
+}
+], [
+int n = my_strlen ("what");
+])], [have_attr_iaso=yes], [have_attr_iaso=no])
+AC_MSG_RESULT([$have_attr_iaso])
+if test x"$have_attr_iaso" = x"yes" ; then
+    AC_DEFINE([ATTR_INLINE_ALL_STRINGOPS],
+        [__attribute__ ((__target__ ("inline-all-stringops")))],
+        [Define this to a function attribute that inlines string handling code])
+fi
+
 AC_ARG_ENABLE([asan],
    [AS_HELP_STRING([--enable-asan], [Compile with address sanitizer])])
 AC_ARG_ENABLE([lto],
