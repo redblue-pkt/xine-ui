@@ -262,7 +262,6 @@ action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *
 const kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *key, int modifier);
 const kbinding_entry_t *kbindings_lookup_action (kbinding_t *kbt, const char *action);
 action_id_t kbindings_get_action_id (const kbinding_entry_t *entry);
-void kbindings_handle_kbinding (gGui_t *gui, kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button);
 
 void kbindings_save_kbinding (gGui_t *gui, kbinding_t *kbt, const char *keymap_file);
 

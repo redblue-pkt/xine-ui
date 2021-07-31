@@ -754,9 +754,6 @@ int xitk_image_height(xitk_image_t *);
  */
 void xitk_image_copy (xitk_image_t *from, xitk_image_t *to);
 
-/* Return size of output string (>=buf_size if truncated). -1 on error. */
-int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size);
-
 /**
  * Font manipulations.
  */
