@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -291,61 +291,8 @@ void xitk_x11_find_visual(Display *display, int screen, const char *prefered_vis
     *visual_out = visual;
 }
 
-int xitk_x11_is_window_visible(Display *display, Window window) {
-  XWindowAttributes  wattr;
-  Status             status;
-
-  if((display == NULL) || (window == None))
-    return -1;
-
-  status = XGetWindowAttributes(display, window, &wattr);
-
-  if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
-    return 1;
-
-  return 0;
-}
-
-/*
- * Get (safely) window pos.
- */
-void xitk_x11_get_window_position(Display *display, Window window,
-                                  int *x, int *y, int *width, int *height) {
-  XWindowAttributes  wattr;
-  Window             wdummy;
-  int                xx = 0, yy = 0;
-
-  if((display == NULL) || (window == None))
-    return;
-
-  if(!XGetWindowAttributes(display, window, &wattr)) {
-    XITK_WARNING("XGetWindowAttributes() failed.n");
-    wattr.width = wattr.height = 0;
-    goto __failure;
-  }
-
-  (void) XTranslateCoordinates (display, window, wattr.root,
-                                -wattr.border_width, -wattr.border_width,
-                                &xx, &yy, &wdummy);
-
- __failure:
-
-  if(x)
-    *x = xx;
-  if(y)
-    *y = yy;
-  if(width)
-    *width = wattr.width;
-  if(height)
-    *height = wattr.height;
-}
-
-/*
- *
- */
-
 /* Extract WM Name */
-unsigned char *xitk_x11_get_wm_name (Display *display, Window win, Atom atom, Atom type_utf8) {
+static unsigned char *xitk_x11_get_wm_name (Display *display, Window win, Atom atom, Atom type_utf8) {
   unsigned char   *prop_return = NULL;
   unsigned long    nitems_return, bytes_after_return;
   Atom             type_return;
@@ -667,17 +614,6 @@ xitk_window_t *xitk_x11_wrap_window(xitk_t *xitk, xitk_be_display_t *be_display,
   if (window == None)
     return NULL;
   return xitk_window_wrap_native_window (xitk, be_display, (uintptr_t)window);
-}
-
-/*
- *
- */
-
-int xitk_keysym_to_string(unsigned long keysym, char *buf, size_t buf_size) {
-  const char *s = XKeysymToString(keysym);
-  if (!s)
-    return -1;
-  return strlcpy(buf, s, buf_size);
 }
 
 /*

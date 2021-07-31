@@ -574,23 +574,6 @@ const kbinding_entry_t *kbindings_lookup_binding (kbinding_t *kbt, const char *k
   return kret;
 }
 
-/* Convert X(Button|Key)(Press|Release) events into string identifier. */
-static void event2id(unsigned long keysym, unsigned int keycode, int button, char *buf, size_t size) {
-  if (button >= 0) {
-    snprintf(buf, size, "XButton_%d", button);
-    return;
-  }
-  switch (keysym) {
-    default:
-      if (xitk_keysym_to_string(keysym, buf, size) > 0)
-        break;
-      /* fall through */
-    case 0: /* Key without assigned KeySymbol */
-      snprintf(buf, size, "XKey_%u", keycode);
-      break;
-  }
-}
-
 /*
  * Handle key event from an XEvent.
  */
@@ -611,25 +594,6 @@ action_id_t kbinding_aid_from_be_event (kbinding_t *kbt, const xitk_be_event_t *
   if (entry && (!entry->is_gui || !no_gui))
     return entry->action_id;
   return 0;
-}
-
-void kbindings_handle_kbinding (gGui_t *gui, kbinding_t *kbt, unsigned long keysym, int keycode, int modifier, int button) {
-  char              buf[256];
-  const kbinding_entry_t *k;
-
-  if (!gui->kbindings_enabled || (kbt == NULL))
-    return;
-
-  modifier = kbindings_convert_modifier (modifier);
-  event2id(keysym, keycode, button, buf, sizeof(buf));
-
-  k = kbindings_lookup_binding(kbt, buf, modifier);
-  if(k && !(gui->no_gui && k->is_gui))
-    gui_execute_action_id (gui, k->action_id);
-#if 0  /* DEBUG */
-  else
-    printf("%s unhandled\n", kbuf);
-#endif
 }
 
 /*
