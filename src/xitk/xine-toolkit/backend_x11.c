@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -2163,7 +2163,7 @@ static xitk_be_window_t *xitk_x11_window_new (xitk_be_display_t *_d, const xitk_
 
       if  ((win->props[XITK_X11_WT_X].value == XITK_XY_CENTER)
         || (win->props[XITK_X11_WT_Y].value == XITK_XY_CENTER)) {
-        int x = -1, y;
+        int x = -1, y = 0;
 
         if (win->props[XITK_X11_WT_TRANSIENT_FOR].value) {
           xitk_x11_window_t *tw = (xitk_x11_window_t *)win->props[XITK_X11_WT_TRANSIENT_FOR].value;

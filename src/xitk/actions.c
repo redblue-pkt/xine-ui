@@ -1632,7 +1632,7 @@ void gui_step_mrl (gGui_t *gui, int by) {
 }
 
 void gui_nextprev_mrl (xitk_widget_t *w, void *data) {
-  int by;
+  int by = 0;
   gGui_t *gui = _gui_get_nextprev (data, &by);
 
   (void)w;
