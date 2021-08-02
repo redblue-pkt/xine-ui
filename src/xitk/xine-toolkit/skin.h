@@ -66,7 +66,5 @@ const xitk_skin_element_info_t *xitk_skin_get_info (xitk_skin_config_t *skin, co
 void xitk_skin_unlock (xitk_skin_config_t *skonfig);
 /* Unload (free) xitk_skin_config_t object. */
 void xitk_skin_unload_config (xitk_skin_config_t *skonfig);
-/* Release all allocated memory of a xitk_skin_config_t* variable (element chained struct too). */
-void xitk_skin_free_config (xitk_skin_config_t *skonfig);
 
 #endif

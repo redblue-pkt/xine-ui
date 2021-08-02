@@ -592,10 +592,7 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_MRLBROWSER)
     return;
 
-  if (enabled)
-    xitk_set_widgets_tips_timeout (wp->widget_list, timeout);
-  else
-    xitk_disable_widgets_tips (wp->widget_list);
+  xitk_set_widgets_tips_timeout (wp->widget_list, enabled ? timeout : XITK_TIPS_TIMEOUT_OFF);
 }
 
 /*

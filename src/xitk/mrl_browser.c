@@ -47,23 +47,6 @@ struct xui_mrlb_st {
 /*
  *
  */
-void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout) {
-  if (mrlb && mrlb->w)
-    xitk_mrlbrowser_set_tips_timeout (mrlb->w, enabled, timeout);
-}
-
-/*
-void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout) {
-  if (mrlb && mrlb->w) {
-    if (xitk_get_widget_tips_timeout (mrlb->w) > 0)
-      xitk_mrlbrowser_set_tips_timeout (mrlb->w, 1, timeout);
-  }
-}
-*/
-
-/*
- *
- */
 void mrl_browser_change_skins (xui_mrlb_t *mrlb, int synthetic) {
   (void)synthetic;
   if (mrlb && mrlb->w) {
@@ -473,7 +456,8 @@ void open_mrlbrowser(xitk_widget_t *w, void *data) {
   (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add, mrl_play, NULL, gui_dndcallback);
-    mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
+    if (gui->mrlb)
+      xitk_mrlbrowser_set_tips_timeout (gui->mrlb->w, 1, XITK_TIPS_TIMEOUT_AUTO);
   }
 }
 
@@ -483,6 +467,8 @@ void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
   (void)w;
   if (gui) {
     mrl_browser (gui, mrl_add_noautoplay, mrl_play, NULL, gui_dndcallback);
-    mrl_browser_show_tips (gui->mrlb, panel_get_tips_enable (gui->panel), panel_get_tips_timeout (gui->panel));
+    if (gui->mrlb)
+      xitk_mrlbrowser_set_tips_timeout (gui->mrlb->w, 1, XITK_TIPS_TIMEOUT_AUTO);
   }
 }
+

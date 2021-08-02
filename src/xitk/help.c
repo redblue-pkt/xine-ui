@@ -351,9 +351,8 @@ void help_panel (gGui_t *gui) {
     help->tabs = xitk_noskin_tabs_create (help->widget_list, &tab,
       15, 24, WINDOW_WIDTH - 30, tabsfontname);
     if (help->tabs) {
-      xitk_add_widget (help->widget_list, help->tabs);
+      xitk_add_widget (help->widget_list, help->tabs, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
       help->tabs_height = xitk_get_widget_height (help->tabs) - 1;
-      xitk_enable_and_show_widget (help->tabs);
     }
   }
 
@@ -382,10 +381,7 @@ void help_panel (gGui_t *gui) {
     br.userdata                      = NULL;
     help->browser = xitk_noskin_browser_create (help->widget_list, &br,
       15 + 5, 24 + help->tabs_height + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
-    if (help->browser) {
-      xitk_add_widget (help->widget_list, help->browser);
-      xitk_enable_and_show_widget (help->browser);
-    }
+    xitk_add_widget (help->widget_list, help->browser, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
   xitk_browser_set_alignment (help->browser, ALIGN_LEFT);
   help_change_section (NULL, help, 0);
@@ -404,10 +400,7 @@ void help_panel (gGui_t *gui) {
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (help->widget_list, &lb,
       WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
-    if (w) {
-      xitk_add_widget (help->widget_list, w);
-      xitk_enable_and_show_widget (w);
-    }
+      xitk_add_widget (help->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
   help->kreg = xitk_be_register_event_handler ("help", help->xwin, help_event, help, NULL, NULL);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -291,9 +291,8 @@ static void viewlog_create_tabs (xui_viewlog_t *vl) {
   tab.userdata          = vl;
   vl->tabs = xitk_noskin_tabs_create (vl->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
   if (vl->tabs) {
-    xitk_add_widget (vl->widget_list, vl->tabs);
+    xitk_add_widget (vl->widget_list, vl->tabs, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     vl->tabs_height = xitk_get_widget_height (vl->tabs) - 1;
-    xitk_enable_and_show_widget (vl->tabs);
     bg = xitk_window_get_background_image (vl->xwin);
     xitk_image_draw_rectangular_box (bg, 15, 24 + vl->tabs_height,
       WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_OUTTER);
@@ -376,8 +375,7 @@ void viewlog_panel (gGui_t *gui) {
     vl->browser_widget = xitk_noskin_browser_create (vl->widget_list, &br,
       15 + 5, (24 + vl->tabs_height) + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
     if (vl->browser_widget) {
-      xitk_add_widget (vl->widget_list, vl->browser_widget);
-      xitk_enable_and_show_widget (vl->browser_widget);
+      xitk_add_widget (vl->widget_list, vl->browser_widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
       xitk_browser_set_alignment (vl->browser_widget, ALIGN_LEFT);
       xitk_browser_update_list (vl->browser_widget, vl->log, NULL, vl->real_num_entries, 0);
     }
@@ -401,10 +399,7 @@ void viewlog_panel (gGui_t *gui) {
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
       x, y, 100, 23, "Black", "Black", "White", tabsfontname);
-    if (w) {
-      xitk_add_widget (vl->widget_list, w);
-      xitk_enable_and_show_widget (w);
-    }
+    xitk_add_widget (vl->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     x = WINDOW_WIDTH - (100 + 15);
 
@@ -417,10 +412,7 @@ void viewlog_panel (gGui_t *gui) {
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
       x, y, 100, 23, "Black", "Black", "White", tabsfontname);
-    if (w) {
-      xitk_add_widget (vl->widget_list, w);
-      xitk_enable_and_show_widget (w);
-    }
+    xitk_add_widget (vl->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
   vl->kreg = xitk_be_register_event_handler ("viewlog", vl->xwin, viewlog_event, vl, NULL, NULL);
@@ -431,3 +423,4 @@ void viewlog_panel (gGui_t *gui) {
 
   vl->gui->viewlog = vl;
 }
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -36,7 +36,6 @@ void control_reset (xui_vctrl_t *vctrl);
 void control_toggle_visibility (xui_vctrl_t *vctrl);
 void control_change_skins (xui_vctrl_t *vctrl, int);
 void control_raise_window (xui_vctrl_t *vctrl);
-void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout);
 /* void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout); */
 void control_inc_image_prop (xui_vctrl_t *vctrl, int prop);
 void control_dec_image_prop (xui_vctrl_t *vctrl, int prop);

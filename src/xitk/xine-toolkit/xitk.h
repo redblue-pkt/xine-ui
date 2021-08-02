@@ -113,8 +113,6 @@ typedef struct xitk_be_font_s xitk_font_t;
 typedef struct xitk_image_s xitk_image_t;
 typedef struct xitk_window_s xitk_window_t;
 
-void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi);
-
 typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
@@ -620,11 +618,6 @@ void xitk_enable_widget(xitk_widget_t *);
 void xitk_disable_widget(xitk_widget_t *);
 
 /**
- * Destroy and free widget.
- */
-void xitk_destroy_widget(xitk_widget_t *w);
-
-/**
  * Destroy widgets from widget list.
  */
 void xitk_destroy_widgets(xitk_widget_list_t *wl);
@@ -671,59 +664,26 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
 xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 #endif
 
-/**
- *
- */
-void xitk_set_widget_tips(xitk_widget_t *w, const char *str);
+#define XITK_WIDGET_STATE_KEEP (~0u)
+#define XITK_WIDGET_STATE_ENABLE 1
+#define XITK_WIDGET_STATE_VISIBLE 2
+void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int flags);
+void xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state);
+void xitk_widgets_delete (xitk_widget_t **w, unsigned int n);
+#define xitk_destroy_widget(w) do {xitk_widget_t *__w = w; xitk_widgets_delete (&(__w), 1); } while (0)
 
-/**
- *
- */
-void xitk_set_widget_tips_default(xitk_widget_t *w, const char *str);
-
-/**
- *
- */
-void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, const char *str, unsigned long timeout);
-
-/**
- *
- */
-unsigned long xitk_get_widget_tips_timeout(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout);
-
-/**
- *
- */
-#ifdef YET_UNUSED
-void xitk_enable_widget_tips(xitk_widget_t *w);
-#endif
-
-/**
- *
- */
-void xitk_disable_widget_tips(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_disable_widgets_tips(xitk_widget_list_t *wl);
-
-/**
- *
- */
-#ifdef YET_UNUSED
-void xitk_enable_widgets_tips(xitk_widget_list_t *wl);
-#endif
-
-/**
- *
- */
-void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
+#define XITK_TIPS_STRING_KEEP ((const char *)1)
+#define XITK_TIPS_TIMEOUT_OFF 0
+#define XITK_TIPS_TIMEOUT_AUTO 1
+/* other values are milliseconds. */
+void xitk_set_tips_timeout (xitk_t *xitk, unsigned int timeout);
+void xitk_set_widgets_tips_timeout (xitk_widget_list_t *wl, unsigned int timeout);
+void xitk_set_widget_tips_and_timeout (xitk_widget_t *w, const char *str, unsigned int timeout);
+unsigned int xitk_get_widget_tips_timeout (xitk_widget_t *w);
+#define xitk_disable_widgets_tips(wl) xitk_set_widgets_tips_timeout (wl, XITK_TIPS_TIMEOUT_OFF)
+#define xitk_disable_widget_tips(w) xitk_set_widget_tips_and_timeout (w, XITK_TIPS_STRING_KEEP, XITK_TIPS_TIMEOUT_OFF)
+#define xitk_enable_widget_tips(w) xitk_set_widget_tips_and_timeout (w, XITK_TIPS_STRING_KEEP, XITK_TIPS_TIMEOUT_AUTO)
+#define xitk_set_widget_tips(w,s) xitk_set_widget_tips_and_timeout (w, s, XITK_TIPS_TIMEOUT_AUTO)
 
 /*
  * *** Image

@@ -387,17 +387,14 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
       sl.motion_userdata = item;
       item->w = xitk_slider_create (vctrl->widget_list, vctrl->gui->skin_config, &sl);
       if (item->w) {
-        xitk_add_widget (vctrl->widget_list, item->w);
+        xitk_add_widget (vctrl->widget_list, item->w, (item->enable ? XITK_WIDGET_STATE_ENABLE : 0) | XITK_WIDGET_STATE_VISIBLE);
         xitk_slider_set_pos (item->w, item->value);
         xitk_set_widget_tips (item->w, item->hint);
-        if (item->enable)
-          xitk_enable_widget (item->w);
-        else
-          xitk_disable_widget (item->w);
       }
       lbl.skin_element_name = lbl_skins[u];
       lbl.label             = item->label;
-      xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl));
+      xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl),
+        XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
   }
 
@@ -406,7 +403,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   lbl.skin_element_name = "CtlSkLbl";
   /* TRANSLATORS: only ASCII characters (skin) */
   lbl.label             = pgettext("skin", "Choose a Skin");
-  xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl));
+  xitk_add_widget (vctrl->widget_list, xitk_label_create (vctrl->widget_list, vctrl->gui->skin_config, &lbl),
+    XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   br.arrow_up.skin_element_name    = "CtlSkUp";
   br.slider.skin_element_name      = "SliderCtlSk";
@@ -421,7 +419,7 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   br.dbl_click_callback            = control_select_new_skin;
   br.userdata                      = vctrl;
   vctrl->skinlist = xitk_browser_create (vctrl->widget_list, vctrl->gui->skin_config, &br);
-  xitk_add_widget (vctrl->widget_list, vctrl->skinlist);
+  xitk_add_widget (vctrl->widget_list, vctrl->skinlist, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_browser_update_list (vctrl->skinlist, vctrl->skins, NULL, vctrl->skins_num, 0);
 
@@ -433,10 +431,8 @@ static int vctrl_open_window (xui_vctrl_t *vctrl) {
   lb.state_callback    = NULL;
   lb.userdata          = vctrl;
   w = xitk_labelbutton_create (vctrl->widget_list, vctrl->gui->skin_config, &lb);
-  xitk_add_widget (vctrl->widget_list, w);
+  xitk_add_widget (vctrl->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_set_widget_tips(w, _("Close control window"));
-
-  control_show_tips (vctrl, panel_get_tips_enable (vctrl->gui->panel), panel_get_tips_timeout (vctrl->gui->panel));
 
   vctrl->widget_key = xitk_be_register_event_handler ("control", vctrl->xwin, control_event, vctrl, NULL, NULL);
 
@@ -540,25 +536,6 @@ void control_reset (xui_vctrl_t *vctrl) {
     }
   }
 }
-
-/*
- *
- */
-void control_show_tips (xui_vctrl_t *vctrl, int enabled, unsigned long timeout) {
-  if (vctrl) {
-    if (enabled)
-      xitk_set_widgets_tips_timeout (vctrl->widget_list, timeout);
-    else
-      xitk_disable_widgets_tips (vctrl->widget_list);
-  }
-}
-
-/*
-void control_update_tips_timeout (xui_vctrl_t *vctrl, unsigned long timeout) {
-  if (vctrl)
-    xitk_set_widgets_tips_timeout (vctrl->widget_list, timeout);
-}
-*/
 
 /*
 int control_status (xui_vctrl_t *vctrl) {

@@ -242,8 +242,6 @@ struct __xitk_s {
 
   struct timeval              keypress;
 
-  unsigned long               tips_timeout;
-
   uint32_t                    qual; /** << track held mouse buttons */
 
   pid_t                       xitk_pid;
@@ -1659,7 +1657,7 @@ xitk_t *xitk_init (const char *prefered_visual, int install_colormap,
   xitk->sig_data        = NULL;
   xitk->config          = xitk_config_init (&xitk->x);
   xitk->qual            = 0;
-  xitk->tips_timeout    = TIPS_TIMEOUT;
+  xitk->x.tips_timeout  = TIPS_TIMEOUT;
 
   memset(&xitk->keypress, 0, sizeof(xitk->keypress));
 
@@ -1881,7 +1879,7 @@ int xitk_get_cfg_num (xitk_t *_xitk, xitk_cfg_item_t item) {
     return 0;
   xitk_container (xitk, _xitk, x);
   switch (item) {
-    case XITK_TIPS_TIMEOUT: return xitk->tips_timeout;
+    case XITK_TIPS_TIMEOUT: return xitk->x.tips_timeout;
     default: return xitk_config_get_num (xitk->config, item);
   }
 }
@@ -1897,11 +1895,11 @@ double xitk_get_display_ratio (xitk_t *xitk) {
   return xitk->d->ratio;
 }
 
-void xitk_set_tips_timeout(xitk_t *_xitk, unsigned long timeout) {
+void xitk_set_tips_timeout (xitk_t *_xitk, unsigned int timeout) {
   __xitk_t *xitk;
 
   xitk_container (xitk, _xitk, x);
-  xitk->tips_timeout = timeout;
+  xitk->x.tips_timeout = timeout == XITK_TIPS_TIMEOUT_AUTO ? TIPS_TIMEOUT : timeout;
 }
 
 char *xitk_filter_filename(const char *name) {

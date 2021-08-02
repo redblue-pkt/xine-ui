@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -109,22 +109,6 @@ void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
     }
   }
 }
-
-void event_sender_show_tips (gGui_t *gui, unsigned long timeout) {
-  if (gui && gui->eventer) {
-    if (timeout)
-      xitk_set_widgets_tips_timeout (gui->eventer->widget_list, timeout);
-    else
-      xitk_disable_widgets_tips (gui->eventer->widget_list);
-  }
-}
-
-/*
-void event_sender_update_tips_timeout (gGui_t *gui, unsigned long timeout) {
-  if (gui && gui->eventer)
-    xitk_set_widgets_tips_timeout (gui->eventer->widget_list, timeout);
-}
-*/
 
 /* Send given event to xine engine */
 void event_sender_send (gGui_t *gui, int event) {
@@ -376,10 +360,7 @@ void event_sender_panel (gGui_t *gui) {
         _es_event_types[i].x, _es_event_types[i].y,
         _es_event_types[i].w, _es_event_types[i].h,
         "Black", "Black", "White", hboldfontname);
-      if (es->wdgts[i]) {
-        xitk_add_widget (es->widget_list, es->wdgts[i]);
-        xitk_enable_and_show_widget (es->wdgts[i]);
-      }
+      xitk_add_widget (es->widget_list, es->wdgts[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < (int)(sizeof (_es_event_types) / sizeof (_es_event_types[0])); i++) {
@@ -389,10 +370,7 @@ void event_sender_panel (gGui_t *gui) {
         _es_event_types[i].x, _es_event_types[i].y,
         _es_event_types[i].w, _es_event_types[i].h,
         "Black", "Black", "White", hboldfontname);
-      if (es->wdgts[i]) {
-        xitk_add_widget (es->widget_list, es->wdgts[i]);
-        xitk_enable_and_show_widget (es->wdgts[i]);
-      }
+      xitk_add_widget (es->widget_list, es->wdgts[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     event_sender_update_menu_buttons (es->gui);
@@ -404,13 +382,9 @@ void event_sender_panel (gGui_t *gui) {
     lb.userdata = es;
     w = xitk_noskin_labelbutton_create (es->widget_list,
       &lb, x, y, 70, 23, "Black", "Black", "White", hboldfontname);
-    if (w) {
-      xitk_add_widget (es->widget_list, w);
-      xitk_enable_and_show_widget (w);
-    }
+    xitk_add_widget (es->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
-  event_sender_show_tips (es->gui, panel_get_tips_enable (es->gui->panel) ? panel_get_tips_timeout (es->gui->panel) : 0);
   es->widget_key = xitk_be_register_event_handler ("eventer", es->xwin, event_sender_event, es, NULL, NULL);
 
   es->visible = 1;

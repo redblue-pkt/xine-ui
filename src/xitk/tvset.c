@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -326,8 +326,7 @@ void tvset_panel(void) {
   ib.userdata          = NULL;
   tvset.input = xitk_noskin_intbox_create (tvset.widget_list, &ib,
     x + 10, y + 15, w - 20 + 1, 20);
-  xitk_add_widget (tvset.widget_list, tvset.input);
-  xitk_enable_and_show_widget(tvset.input);
+  xitk_add_widget (tvset.widget_list, tvset.input, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   {
     static const size_t chanlists_count = sizeof(chanlists)/sizeof(chanlists[0]);
@@ -352,9 +351,8 @@ void tvset_panel(void) {
   cmb.userdata          = NULL;
   tvset.system = xitk_noskin_combo_create (tvset.widget_list, &cmb,
     x + 10, y + 15, w - 20 + 1);
-  xitk_add_widget (tvset.widget_list, tvset.system);
+  xitk_add_widget (tvset.widget_list, tvset.system, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_set_widget_pos(tvset.system, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.system)) / 2);
-  xitk_enable_and_show_widget(tvset.system);
 
   xitk_combo_set_select(tvset.system, 0);
   update_chann_entries(0);
@@ -373,9 +371,8 @@ void tvset_panel(void) {
   cmb.userdata          = NULL;
   tvset.chann = xitk_noskin_combo_create (tvset.widget_list, &cmb,
     x + 10, y + 15, w - 20 + 1);
-  xitk_add_widget (tvset.widget_list, tvset.chann);
+  xitk_add_widget (tvset.widget_list, tvset.chann, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   xitk_set_widget_pos(tvset.chann, x + 10, y + 15 + (20 - xitk_get_widget_height(tvset.chann)) / 2);
-  xitk_enable_and_show_widget(tvset.chann);
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
@@ -397,8 +394,7 @@ void tvset_panel(void) {
   inp.userdata          = NULL;
   tvset.framerate = xitk_noskin_inputtext_create (tvset.widget_list, &inp,
     x + 10, y + 15, w - 20 + 1, 20, "Black", "Black", fontname);
-  xitk_add_widget (tvset.widget_list, tvset.framerate);
-  xitk_enable_and_show_widget(tvset.framerate);
+  xitk_add_widget (tvset.widget_list, tvset.framerate, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   tvset.vidstd_entries = (const char **) malloc(sizeof(const char *) *
                           (sizeof(std_list)/sizeof(std_list[0])+1));
@@ -421,8 +417,7 @@ void tvset_panel(void) {
   cmb.userdata          = NULL;
   tvset.vidstd = xitk_noskin_combo_create (tvset.widget_list, &cmb,
     x + 10, y + 15, w - 20 + 1);
-  xitk_add_widget (tvset.widget_list, tvset.vidstd);
-  xitk_enable_and_show_widget(tvset.vidstd);
+  xitk_add_widget (tvset.widget_list, tvset.vidstd, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = 15;
   y += ((20 + 22) + 5 + 2) + 3;
@@ -457,8 +452,7 @@ void tvset_panel(void) {
   lb.skin_element_name = NULL;
   tvset.update = xitk_noskin_labelbutton_create (tvset.widget_list,
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (tvset.widget_list, tvset.update);
-  xitk_enable_and_show_widget(tvset.update);
+  xitk_add_widget (tvset.widget_list, tvset.update, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = WINDOW_WIDTH - (100 + 15);
 
@@ -471,8 +465,7 @@ void tvset_panel(void) {
   lb.skin_element_name = NULL;
   widget =  xitk_noskin_labelbutton_create (tvset.widget_list,
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (tvset.widget_list, widget);
-  xitk_enable_and_show_widget(widget);
+  xitk_add_widget (tvset.widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_window_set_background_image (tvset.xwin, bg);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -36,7 +36,5 @@ int mrl_browser_is_visible (xui_mrlb_t *mrlb);
 void mrl_browser_change_skins (xui_mrlb_t *mrlb, int);
 void hide_mrl_browser (xui_mrlb_t *mrlb);
 void show_mrl_browser (xui_mrlb_t *mrlb);
-void mrl_browser_show_tips (xui_mrlb_t *mrlb, int enabled, unsigned long timeout);
-//void mrl_browser_update_tips_timeout (xui_mrlb_t *mrlb, unsigned long timeout);
 
 #endif

@@ -555,12 +555,10 @@ void skin_download (gGui_t *gui, char *url) {
     br.userdata                      = skd;
     skd->browser = xitk_noskin_browser_create (skd->widget_list, &br,
       x + 5, y + 5, WINDOW_WIDTH - (30 + 10 + 16), 20, 16, br_fontname);
-    xitk_add_widget (skd->widget_list, skd->browser);
+    xitk_add_widget (skd->widget_list, skd->browser, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     xitk_browser_update_list(skd->browser,
                              (const char *const *)skd->entries, NULL, skd->num, 0);
-
-    xitk_enable_and_show_widget(skd->browser);
 
     xitk_image_draw_rectangular_box (bg, x, y, WINDOW_WIDTH - 30, MAX_DISP_ENTRIES * 20 + 16 + 10, DRAW_INNER);
 
@@ -578,8 +576,7 @@ void skin_download (gGui_t *gui, char *url) {
     lb.skin_element_name = NULL;
     widget =  xitk_noskin_labelbutton_create (skd->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (skd->widget_list, widget);
-    xitk_enable_and_show_widget(widget);
+    xitk_add_widget (skd->widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     x = WINDOW_WIDTH - (100 + 15);
 
@@ -592,8 +589,7 @@ void skin_download (gGui_t *gui, char *url) {
     lb.skin_element_name = NULL;
     widget =  xitk_noskin_labelbutton_create (skd->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (skd->widget_list, widget);
-    xitk_enable_and_show_widget(widget);
+    xitk_add_widget (skd->widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     skd->widget_key = xitk_be_register_event_handler ("skdloader", skd->xwin, download_skin_event, skd, NULL, NULL);
 

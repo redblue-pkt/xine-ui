@@ -580,9 +580,7 @@ xitk_skin_config_t *xitk_skin_init_config(xitk_t *xitk) {
 /*
  * Release all allocated memory of a xitk_skin_config_t* variable (element chained struct too).
  */
-void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
-
-  ABORT_IF_NULL(skonfig);
+static void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   pthread_mutex_lock (&skonfig->skin_mutex);
   {
     int n = xine_sarray_size (skonfig->elements);

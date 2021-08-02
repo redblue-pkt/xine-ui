@@ -52,6 +52,7 @@ struct xitk_s {
   xitk_be_display_t *d, *d2;
   xitk_font_cache_t *font_cache;
   struct xitk_tips_s *tips;
+  unsigned int tips_timeout;
   int verbosity; /** << 0 (quiet), 1 (base, errors), 2 (debug) */
 };
 
@@ -139,7 +140,6 @@ void xitk_set_xmb_enability(xitk_t *, int value);
 
 void xitk_set_current_menu(xitk_t *, xitk_widget_t *menu);
 void xitk_unset_current_menu(xitk_t *);
-void xitk_set_tips_timeout(xitk_t *, unsigned long timeout);
 
 void *labelbutton_get_user_data(xitk_widget_t *w);
 void menu_auto_pop(xitk_widget_t *w);

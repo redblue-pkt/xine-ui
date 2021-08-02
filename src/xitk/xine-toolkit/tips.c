@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -96,6 +96,7 @@ static void *_tips_loop_thread (void *data) {
   xitk_image_t *image = NULL;
   xitk_window_t *xwin = NULL;
   _tips_state_t state = TIPS_IDLE;
+  unsigned int timeout = 0;
 
   pthread_mutex_lock (&tips->mutex);
 
@@ -105,7 +106,7 @@ static void *_tips_loop_thread (void *data) {
     tips->state = state;
     wait = _tips_wait[state];
     if (wait < 0)
-      wait = tips->widget ? tips->widget->tips_timeout : 0;
+      wait = tips->widget ? timeout : 0;
     if (wait > 0) {
       struct timespec ts;
       _compute_interval (&ts, wait);
@@ -118,7 +119,7 @@ static void *_tips_loop_thread (void *data) {
 
     switch (state) {
       case TIPS_SHOW:
-        if (tips->widget && (tips->widget->tips_timeout > 0) && tips->widget->tips_string && tips->widget->tips_string[0]) {
+        if (tips->widget && tips->widget->tips_timeout && tips->widget->tips_string && tips->widget->tips_string[0]) {
           int x, y, w, h;
           unsigned int cfore, cback;
           int disp_w, disp_h;
@@ -145,11 +146,28 @@ static void *_tips_loop_thread (void *data) {
             tips->widget = tips->new_widget = NULL;
             break;
           }
+          w = image->width;
+          h = image->height;
+
+          /* Tips may be extensive help texts that user wants more time to read.
+           * We used to implement this by per widget timeout values, but this
+           * was never really used like that (only as an enable flag).
+           * Instead, take the xitk value as basis for small texts, and hold
+           * larger area tips up to 8 times longer. This also saves us the need
+           * to broadcast config changes to all widgets. This should be fine since
+           * tips are killed when the widget goes away or loses focus. */
+          if (tips->widget->tips_timeout == XITK_TIPS_TIMEOUT_AUTO) {
+            timeout = xitk->tips_timeout * (h - 8) / 11;
+            if (timeout < xitk->tips_timeout)
+              timeout = xitk->tips_timeout;
+            else if (timeout > xitk->tips_timeout * 8)
+              timeout = xitk->tips_timeout * 8;
+          } else {
+            timeout = tips->widget->tips_timeout;
+          }
 
           /* Create the tips window, horizontally centered from parent widget */
           /* If necessary, adjust position to display it fully on screen      */
-          w = image->width;
-          h = image->height;
           xitk_image_draw_rectangle (image, 0, 0, w, h, cfore);
           x -= (w - tips->widget->width) >> 1;
           y += tips->widget->height + bottom_gap;
@@ -294,7 +312,7 @@ int xitk_tips_show_widget_tips (xitk_tips_t *tips, xitk_widget_t *w) {
   do {
     if (!w)
       break;
-    if ((w->tips_timeout <= 0) || !w->tips_string)
+    if (!w->tips_timeout || !w->tips_string)
       break;
     if (!w->tips_string[0])
       break;
@@ -315,29 +333,3 @@ int xitk_tips_show_widget_tips (xitk_tips_t *tips, xitk_widget_t *w) {
   return 1;
 }
 
-void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
-  if (!w)
-    return;
-  w->tips_timeout = timeout;
-  if (w->type & (WIDGET_GROUP | WIDGET_GROUP_MEMBER)) {
-    widget_event_t  event;
-
-    event.type         = WIDGET_EVENT_TIPS_TIMEOUT;
-    event.tips_timeout = timeout;
-    w->event (w, &event, NULL);
-  }
-}
-
-void xitk_tips_set_tips(xitk_widget_t *w, const char *str) {
-  if (!w)
-    return;
-  XITK_FREE (w->tips_string);
-  if (!str)
-    return;
-  if (!str[0])
-    return;
-  w->tips_string = strdup (str);
-  /* No timeout, set it to default */
-  if (!w->tips_timeout)
-    xitk_tips_set_timeout (w, xitk_get_cfg_num (w->wl->xitk, XITK_TIPS_TIMEOUT));
-}

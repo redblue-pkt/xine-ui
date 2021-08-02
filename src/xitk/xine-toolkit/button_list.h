@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 the xine project
+ * Copyright (C) 2019-2021 the xine project
  *
  * This file is part of xine, a free video player.
  *
@@ -32,6 +32,5 @@ xitk_widget_t *xitk_button_list_new (
   const char * const *names,
   const char * const *tips, int tips_timeout, uint32_t widget_type_flags);
 xitk_widget_t *xitk_button_list_find (xitk_widget_t *w, const char *name);
-void xitk_button_list_able (xitk_widget_t *w, int enable);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -47,8 +47,6 @@ void playlist_delete_entry (gGui_t *gui, int j);
 void playlist_mmk_editor (gGui_t *gui);
 void playlist_scan_for_infos_selected (gGui_t *gui);
 void playlist_scan_for_infos (gGui_t *gui);
-void playlist_show_tips (gGui_t *gui, int enabled, unsigned long timeout);
-//void playlist_update_tips_timeout (gGui_t *gui, unsigned long timeout);
 void playlist_mrlident_toggle (gGui_t *gui);
 
 void playlist_scan_input (xitk_widget_t *w, void *gui, int state);
