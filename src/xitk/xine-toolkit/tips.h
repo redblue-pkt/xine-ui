@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -32,7 +32,5 @@ void xitk_tips_delete (xitk_tips_t **ptips);
 #define xitk_tips_hide_tips(_tips) xitk_tips_show_widget_tips (_tips, NULL)
 int xitk_tips_show_widget_tips(xitk_tips_t *tips, xitk_widget_t *w);
 
-void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout);
-void xitk_tips_set_tips(xitk_widget_t *w, const char *str);
 
 #endif

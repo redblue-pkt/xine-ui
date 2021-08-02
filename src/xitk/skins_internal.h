@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2009 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -26,7 +26,5 @@
 #define SKIN_IFACE_VERSION  5
 
 #undef SKIN_DEBUG
-
-void skin_change_cb(void *data, xine_cfg_entry_t *cfg);
 
 #endif

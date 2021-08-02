@@ -61,10 +61,15 @@ typedef struct {
   int   num_entries;
 } _setup_section_t;
 
+typedef enum {
+  _T_frame = 0,
+  _T_label,
+  _T_widget,
+  _T_LAST
+} _T_t;
+
 typedef struct {
-  xitk_widget_t    *frame;
-  xitk_widget_t    *label;
-  xitk_widget_t    *widget;
+  xitk_widget_t    *w[_T_LAST];
   int               changed;
   xine_cfg_entry_t  cfg;
 } _widget_triplet_t;
@@ -135,23 +140,6 @@ static void setup_exit (xitk_widget_t *w, void *data, int state) {
   free (setup);
 }
 
-void setup_show_tips (xui_setup_t *setup, int enabled, unsigned long timeout) {
-  if (!setup)
-    return;
-  if (enabled)
-    xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
-  else
-    xitk_disable_widgets_tips (setup->widget_list);
-}
-
-/*
-void setup_update_tips_timeout (xui_setup_t *setup, unsigned long timeout) {
-  if (!setup)
-    return;
-  xitk_set_widgets_tips_timeout (setup->widget_list, timeout);
-}
-*/
-
 /*
  * Return 1 if setup panel is visible
  */
@@ -191,12 +179,12 @@ static void setup_apply (xitk_widget_t *w, void *data, int state) {
 
     for (i = 0; i < setup->num_wg; i++) {
 
-      if (setup->wg[i].widget) {
-        int type = xitk_get_widget_type (setup->wg[i].widget);
+      if (setup->wg[i].w[_T_widget]) {
+        int type = xitk_get_widget_type (setup->wg[i].w[_T_widget]);
 
         if (setup->wg[i].changed ||
           ((type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) || (type & WIDGET_GROUP_INTBOX)) {
-          xitk_widget_t *w = setup->wg[i].widget;
+          xitk_widget_t *w = setup->wg[i].w[_T_widget];
           int            numval = 0;
           const char    *strval = NULL;
 
@@ -296,28 +284,13 @@ static void setup_clear_tab (xui_setup_t *setup) {
   xitk_image_free_image (&im);
 }
 
-static void setup_triplets_enable_and_show (xui_setup_t *setup, int start, int stop, int tips_timeout) {
+static void setup_triplets_enable_and_show (xui_setup_t *setup, int start, int stop) {
   int i;
 
   for (i = start; i < stop; i++) {
     _widget_triplet_t *t = setup->wg + i;
 
-    if (t->frame)
-      xitk_enable_and_show_widget (t->frame);
-    if (t->label) {
-      xitk_enable_and_show_widget (t->label);
-      if (tips_timeout)
-        xitk_set_widget_tips_timeout (t->label, tips_timeout);
-      else
-        xitk_disable_widget_tips (t->label);
-    }
-    if (t->widget) {
-      xitk_enable_and_show_widget (t->widget);
-      if (tips_timeout)
-        xitk_set_widget_tips_timeout (t->widget, tips_timeout);
-      else
-        xitk_disable_widget_tips (t->widget);
-    }
+    xitk_widgets_state (t->w, _T_LAST, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
   }
 }
 
@@ -327,16 +300,7 @@ static void setup_triplets_disable_and_hide (xui_setup_t *setup, int start, int 
   for (i = start; i < stop; i++) {
     _widget_triplet_t *t = setup->wg + i;
 
-    if (t->frame)
-      xitk_disable_and_hide_widget (t->frame);
-    if (t->label) {
-      xitk_disable_and_hide_widget (t->label);
-      xitk_disable_widget_tips (t->label);
-    }
-    if (t->widget) {
-      xitk_disable_and_hide_widget (t->widget);
-      xitk_disable_widget_tips (t->widget);
-    }
+    xitk_widgets_state (t->w, _T_LAST, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
   }
 }
 
@@ -346,8 +310,6 @@ static void setup_triplets_disable_and_hide (xui_setup_t *setup, int start, int 
 static void setup_paint_widgets (xui_setup_t *setup, int first) {
   int i, last;
   int wx, wy, y = (24 + setup->th + 13);
-  int tips_timeout = !panel_get_tips_enable (setup->gui->panel) ? 0
-                   : panel_get_tips_timeout (setup->gui->panel);
 
   last = setup->num_wg - setup->first_displayed;
   if (last > MAX_DISPLAY_WIDGETS)
@@ -372,18 +334,18 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
   for (i = setup->first_displayed; i < last; i++) {
     _widget_triplet_t *t = setup->wg + i;
 
-    if (t->frame) {
-      xitk_get_widget_pos (t->frame, &wx, &wy);
-      xitk_set_widget_pos (t->frame, wx, y);
+    if (t->w[_T_frame]) {
+      xitk_get_widget_pos (t->w[_T_frame], &wx, &wy);
+      xitk_set_widget_pos (t->w[_T_frame], wx, y);
     }
     y += FRAME_HEIGHT >> 1;
-    if (t->label) {
-      xitk_get_widget_pos (t->label, &wx, &wy);
-      xitk_set_widget_pos (t->label, wx, y + 4 - xitk_get_widget_height (t->label) / 2);
+    if (t->w[_T_label]) {
+      xitk_get_widget_pos (t->w[_T_label], &wx, &wy);
+      xitk_set_widget_pos (t->w[_T_label], wx, y + 4 - xitk_get_widget_height (t->w[_T_label]) / 2);
     }
-    if (t->widget) {
-      xitk_get_widget_pos (t->widget, &wx, &wy);
-      xitk_set_widget_pos (t->widget, wx, y + 4 - xitk_get_widget_height (t->widget) / 2);
+    if (t->w[_T_widget]) {
+      xitk_get_widget_pos (t->w[_T_widget], &wx, &wy);
+      xitk_set_widget_pos (t->w[_T_widget], wx, y + 4 - xitk_get_widget_height (t->w[_T_widget]) / 2);
     }
     y += (FRAME_HEIGHT >> 1) + 3;
   }
@@ -392,7 +354,7 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
 
   if (setup->num_wg > MAX_DISPLAY_WIDGETS)
     xitk_enable_and_show_widget (setup->slider_wg);
-  setup_triplets_enable_and_show (setup, setup->first_displayed, last, tips_timeout);
+  setup_triplets_enable_and_show (setup, setup->first_displayed, last);
   setup_set_cursor (setup, NORMAL_CURS);
 }
 
@@ -495,12 +457,11 @@ static void setup_add_nothing_available (xui_setup_t *setup, const char *title, 
 
   XITK_WIDGET_INIT (&im);
   im.skin_element_name = NULL;
-  wt->frame =  xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
-  if (wt->frame)
-    xitk_add_widget (setup->widget_list, frame);
+  wt->w[_T_frame] =  xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
+  xitk_add_widget (setup->widget_list, frame, XITK_WIDGET_STATE_KEEP);
 
-  wt->label = NULL;
-  wt->widget = NULL;
+  wt->w[_T_label] = NULL;
+  wt->w[_T_widget] = NULL;
   wt->changed = 0;
 
   setup->num_wg = 1;
@@ -568,9 +529,8 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         }
         XITK_WIDGET_INIT (&im);
         im.skin_element_name = NULL;
-        wt->frame = xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
-        if (wt->frame)
-          xitk_add_widget (setup->widget_list, wt->frame);
+        wt->w[_T_frame] = xitk_noskin_image_create (setup->widget_list, &im, image, x, y);
+        xitk_add_widget (setup->widget_list, wt->w[_T_frame], 0);
       }
       x += 10;
       y += FRAME_HEIGHT >> 1;
@@ -604,9 +564,8 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             ib.step              = 1;
             ib.callback          = numtype_update;
             ib.userdata          = wt;
-            wt->widget = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, ib_width, 20);
-            if (wt->widget)
-              xitk_add_widget (setup->widget_list, wt->widget);
+            wt->w[_T_widget] = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, ib_width, 20);
+            xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
           };
           break;
 
@@ -620,10 +579,9 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             inp.max_length        = 256;
             inp.callback          = stringtype_update;
             inp.userdata          = wt;
-            wt->widget = xitk_noskin_inputtext_create (setup->widget_list, &inp,
+            wt->w[_T_widget] = xitk_noskin_inputtext_create (setup->widget_list, &inp,
               x, y, 260, 20, "Black", "Black", fontname);
-            if (wt->widget)
-              xitk_add_widget (setup->widget_list, wt->widget);
+            xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
           }
           break;
 
@@ -638,11 +596,9 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             cmb.parent_wkey       = &setup->kreg;
             cmb.callback          = numtype_update;
             cmb.userdata          = wt;
-            wt->widget = xitk_noskin_combo_create (setup->widget_list, &cmb, x, y, 260);
-            if (wt->widget) {
-              xitk_add_widget (setup->widget_list, wt->widget);
-              xitk_combo_set_select (wt->widget, entry.num_value);
-            }
+            wt->w[_T_widget] = xitk_noskin_combo_create (setup->widget_list, &cmb, x, y, 260);
+            xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
+            xitk_combo_set_select (wt->w[_T_widget], entry.num_value);
           }
           break;
 
@@ -659,9 +615,8 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             ib.step              = 1;
             ib.callback          = numtype_update;
             ib.userdata          = wt;
-            wt->widget = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, 60, 20);
-            if (wt->widget)
-              xitk_add_widget (setup->widget_list, wt->widget);
+            wt->w[_T_widget] = xitk_noskin_intbox_create (setup->widget_list, &ib, x, y, 60, 20);
+            xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
           }
           break;
 
@@ -674,11 +629,9 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             b.callback          = NULL;
             b.state_callback    = numtype_update;
             b.userdata          = wt;
-            wt->widget = xitk_noskin_button_create (setup->widget_list, &b, x, y, 13, 13);
-            if (wt->widget) {
-              xitk_add_widget (setup->widget_list, wt->widget);
-              xitk_button_set_state (wt->widget, entry.num_value);
-            }
+            wt->w[_T_widget] = xitk_noskin_button_create (setup->widget_list, &b, x, y, 13, 13);
+            xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
+            xitk_button_set_state (wt->w[_T_widget], entry.num_value);
           }
           break;
       }
@@ -694,27 +647,16 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
         } else {
           lb.label = labelkey;
         }
-        lx = x + 20 + xitk_get_widget_width (wt->widget);
-        wt->label = xitk_noskin_label_create (setup->widget_list, &lb, lx, y, FRAME_WIDTH - lx - 15, setup->fh, fontname);
-        xitk_widget_set_focus_redirect (wt->label, wt->widget);
-        if (wt->label)
-          xitk_add_widget (setup->widget_list, wt->label);
+        lx = x + 20 + xitk_get_widget_width (wt->w[_T_widget]);
+        wt->w[_T_label] = xitk_noskin_label_create (setup->widget_list, &lb, lx, y, FRAME_WIDTH - lx - 15, setup->fh, fontname);
+        xitk_widget_set_focus_redirect (wt->w[_T_label], wt->w[_T_widget]);
+        xitk_add_widget (setup->widget_list, wt->w[_T_label], 0);
       }
 
-      if (wt->frame)
-        xitk_disable_and_hide_widget (wt->frame);
       {
         const char *help = entry.help ? entry.help : (const char *)_("No help available");
-        if (wt->label) {
-          xitk_set_widget_tips (wt->label, help);
-          xitk_disable_widget_tips (wt->label);
-          xitk_disable_and_hide_widget (wt->label);
-        }
-        if (wt->widget) {
-          xitk_set_widget_tips (wt->widget, help);
-          xitk_disable_widget_tips (wt->widget);
-          xitk_disable_and_hide_widget (wt->widget);
-        }
+        xitk_set_widget_tips (wt->w[_T_label], help);
+        xitk_set_widget_tips (wt->w[_T_widget], help);
       }
     }
 
@@ -765,20 +707,8 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   /* remove old widgets */
   {
     _widget_triplet_t *wt;
-    for (wt = setup->wg + setup->num_wg - 1; wt >= setup->wg; wt--) {
-      if (wt->label) {
-        xitk_destroy_widget (wt->label);
-        wt->label = NULL;
-      }
-      if (wt->widget) {
-        xitk_destroy_widget (wt->widget);
-        wt->widget = NULL;
-      }
-      if (wt->frame) {
-        xitk_destroy_widget (wt->frame);
-        wt->frame = NULL;
-      }
-    }
+    for (wt = setup->wg + setup->num_wg - 1; wt >= setup->wg; wt--)
+      xitk_widgets_delete (wt->w, _T_LAST);
   }
   setup->num_wg = 0;
   setup->first_displayed = 0;
@@ -898,11 +828,8 @@ static void setup_sections (xui_setup_t *setup) {
   tab.callback          = setup_change_section;
   tab.userdata          = setup;
   setup->tabs = xitk_noskin_tabs_create (setup->widget_list, &tab, 15, 24, WINDOW_WIDTH - 30, tabsfontname);
-  xitk_add_widget (setup->widget_list, setup->tabs);
-
+  xitk_add_widget (setup->widget_list, setup->tabs, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   setup->th = xitk_get_widget_height (setup->tabs) - 1;
-
-  xitk_enable_and_show_widget (setup->tabs);
 
   bg = xitk_window_get_background_image (setup->xwin);
   xitk_image_draw_rectangular_box (bg, 15, (24 + setup->th),
@@ -981,7 +908,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
       (WINDOW_WIDTH - 15 - 16 - 4 - 1), (24 + setup->th + 15),
       16, (MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3), XITK_HVSLIDER);
   }
-  xitk_add_widget (setup->widget_list, setup->slider_wg);
+  xitk_add_widget (setup->widget_list, setup->slider_wg, XITK_WIDGET_STATE_KEEP);
 
   setup_section_widgets (setup, 0);
   setup_paint_widgets (setup, 0);
@@ -1001,8 +928,7 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     w =  xitk_noskin_label_create (setup->widget_list, &lbl,
       (WINDOW_WIDTH - len) >> 1, (24 + setup->th + MAX_DISPLAY_WIDGETS * (FRAME_HEIGHT + 3) - 3 + 3 + 30), len + 3, 18, fontname);
   }
-  xitk_add_widget (setup->widget_list, w);
-  xitk_enable_and_show_widget(w);
+  xitk_add_widget (setup->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_font_unload_font(fs);
 
@@ -1020,25 +946,20 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     lb.callback          = setup_ok;
     setup->ok = xitk_noskin_labelbutton_create (setup->widget_list, &lb,
       15, WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
-    xitk_add_widget (setup->widget_list, setup->ok);
-    xitk_enable_and_show_widget(setup->ok);
+    xitk_add_widget (setup->widget_list, setup->ok, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     lb.label             = _("Apply");
     lb.callback          = setup_apply;
     w = xitk_noskin_labelbutton_create (setup->widget_list, &lb,
       (WINDOW_WIDTH - 100) >> 1, WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
-    xitk_add_widget (setup->widget_list, w);
-    xitk_enable_and_show_widget(w);
+    xitk_add_widget (setup->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     lb.label             = _("Close");
     lb.callback          = setup_exit;
     w =  xitk_noskin_labelbutton_create (setup->widget_list, &lb,
       WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
-    xitk_add_widget (setup->widget_list, w);
-    xitk_enable_and_show_widget(w);
+    xitk_add_widget (setup->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
-  setup_show_tips (setup, panel_get_tips_enable (setup->gui->panel), panel_get_tips_timeout (setup->gui->panel));
-
   setup->kreg = xitk_be_register_event_handler ("setup", setup->xwin, setup_event, setup, NULL, NULL);
 
   setup->visible = 1;

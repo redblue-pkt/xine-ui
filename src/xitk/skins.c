@@ -348,7 +348,7 @@ static void gfx_quality_cb (void *data, xine_cfg_entry_t *cfg) {
 /*
  *
  */
-void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
+static void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui_t *gui = data;
   int index, retval;
 

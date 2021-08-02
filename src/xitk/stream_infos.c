@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -560,39 +560,34 @@ void stream_infos_panel (gGui_t *gui) {
       lbl.label = sinf_get_string (sinfo, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
-      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
-      xitk_enable_and_show_widget (sinfo->w[i]);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_INT; i++) {
       lbl.label = sinf_get_bool (sinfo, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
-      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
-      xitk_enable_and_show_widget (sinfo->w[i]);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_FOURCC; i++) {
       lbl.label = sinf_get_int (sinfo, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
-      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
-      xitk_enable_and_show_widget (sinfo->w[i]);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     for (; i < SINF_END; i++) {
       lbl.label = sinf_get_4cc (sinfo, i);
       sinfo->w[i] = xitk_noskin_label_create (sinfo->widget_list, &lbl,
         sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
-      xitk_add_widget (sinfo->widget_list, sinfo->w[i]);
-      xitk_enable_and_show_widget (sinfo->w[i]);
+      xitk_add_widget (sinfo->widget_list, sinfo->w[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
     lbl.label = sinf_get_res (sinfo);
     sinfo->video_resolution = xitk_noskin_label_create (sinfo->widget_list, &lbl,
       sinf_w_defs[i].x, sinf_w_defs[i].y, sinf_w_defs[i].w, sinf_w_defs[i].h, fontname);
-    xitk_add_widget (sinfo->widget_list, sinfo->video_resolution);
-    xitk_enable_and_show_widget (sinfo->video_resolution);
+    xitk_add_widget (sinfo->widget_list, sinfo->video_resolution, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
   free (sinfo->temp);
@@ -614,8 +609,7 @@ void stream_infos_panel (gGui_t *gui) {
     lb.callback = stream_infos_update;
     sinfo->update = xitk_noskin_labelbutton_create (sinfo->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (sinfo->widget_list, sinfo->update);
-    xitk_enable_and_show_widget (sinfo->update);
+    xitk_add_widget (sinfo->widget_list, sinfo->update, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     if (gui->stream_info_auto_update)
       xitk_hide_widget (sinfo->update);
@@ -625,8 +619,7 @@ void stream_infos_panel (gGui_t *gui) {
     lb.callback = stream_infos_exit;
     sinfo->close = xitk_noskin_labelbutton_create (sinfo->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (sinfo->widget_list, sinfo->close);
-    xitk_enable_and_show_widget (sinfo->close);
+    xitk_add_widget (sinfo->widget_list, sinfo->close, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
   sinfo->widget_key = xitk_be_register_event_handler ("sinfos", sinfo->xwin, stream_infos_event, sinfo, NULL, NULL);

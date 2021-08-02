@@ -2886,15 +2886,6 @@ static int mmkedit_event (void *data, const xitk_be_event_t *e) {
   return gui_handle_be_event (mmkedit->gui, e);
 }
 
-void mmk_editor_show_tips (gGui_t *gui, int enabled, unsigned long timeout) {
-  if (gui && gui->mmkedit) {
-    if (enabled)
-      xitk_set_widgets_tips_timeout (gui->mmkedit->widget_list, timeout);
-    else
-      xitk_disable_widgets_tips (gui->mmkedit->widget_list);
-  }
-}
-
 void mmk_editor_raise_window (gGui_t *gui) {
   if (gui && gui->mmkedit)
     raise_window (gui, gui->mmkedit->xwin, gui->mmkedit->visible, 1);
@@ -3107,24 +3098,20 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     w = WINDOW_WIDTH - 30;
     mmkedit->ident = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
       x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->ident);
-    xitk_set_widget_tips_default (mmkedit->ident, _("Mediamark Identifier"));
-    xitk_enable_and_show_widget (mmkedit->ident);
-
+    xitk_add_widget (mmkedit->widget_list, mmkedit->ident, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->ident, _("Mediamark Identifier"));
 
     y += 45 + 3;
     mmkedit->mrl = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
       x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->mrl);
-    xitk_set_widget_tips_default (mmkedit->mrl, _("Mediamark Mrl"));
-    xitk_enable_and_show_widget (mmkedit->mrl);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->mrl, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->mrl, _("Mediamark Mrl"));
 
     y += 45 + 3;
     mmkedit->sub = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
       x + 10, y + 16, w - 20 - 100 - 10, 20, "Black", "Black", fontname);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->sub);
-    xitk_set_widget_tips_default (mmkedit->sub, _("Subtitle File"));
-    xitk_enable_and_show_widget (mmkedit->sub);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->sub, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->sub, _("Subtitle File"));
   }
 
   {
@@ -3148,9 +3135,8 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.callback          = _mmkedit_select_sub;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list, &lb,
       x + 10 + w - 20 - 100, y + 16, 100, 20, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (mmkedit->widget_list, b);
-    xitk_set_widget_tips_default (b, _("Select a subtitle file to use together with the mrl."));
-    xitk_enable_and_show_widget (b);
+    xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (b, _("Select a subtitle file to use together with the mrl."));
 
     y += 45 + 3;
     w = 120;
@@ -3159,33 +3145,29 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     ib.value             = 0;
     mmkedit->start = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
       x + 30, y + 16, w - 60, 20);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->start);
-    xitk_set_widget_tips_default (mmkedit->start, _("Mediamark start time (secs)."));
-    xitk_enable_and_show_widget (mmkedit->start);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->start, _("Mediamark start time (secs)."));
 
     x += w + 5;
     ib.value             = -1;
     mmkedit->end = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
       x + 30, y + 16, w - 60, 20);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->end);
-    xitk_set_widget_tips_default (mmkedit->end, _("Mediamark end time (secs)."));
-    xitk_enable_and_show_widget (mmkedit->end);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->end, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->end, _("Mediamark end time (secs)."));
 
     x += w + 5;
     ib.value             = 0;
     mmkedit->av_offset = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
       x + 30, y + 16, w - 60, 20);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->av_offset);
-    xitk_set_widget_tips_default (mmkedit->av_offset, _("Offset of Audio and Video."));
-    xitk_enable_and_show_widget (mmkedit->av_offset);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->av_offset, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->av_offset, _("Offset of Audio and Video."));
 
     x += w + 5;
     ib.value             = 0;
     mmkedit->spu_offset = xitk_noskin_intbox_create (mmkedit->widget_list, &ib,
       x + 30, y + 16, w - 60, 20);
-    xitk_add_widget (mmkedit->widget_list, mmkedit->spu_offset);
-    xitk_set_widget_tips_default (mmkedit->spu_offset, _("Subpicture offset."));
-    xitk_enable_and_show_widget (mmkedit->spu_offset);
+    xitk_add_widget (mmkedit->widget_list, mmkedit->spu_offset, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (mmkedit->spu_offset, _("Subpicture offset."));
 
     y = WINDOW_HEIGHT - (23 + 15);
     x = 15;
@@ -3193,33 +3175,27 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.callback          = _mmkedit_ok;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (mmkedit->widget_list, b);
-    xitk_set_widget_tips_default (b, _("Apply the changes and close the window."));
-    xitk_enable_and_show_widget (b);
+    xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (b, _("Apply the changes and close the window."));
 
     x = (WINDOW_WIDTH - 100) / 2;
     lb.label             = _("Apply");
     lb.callback          = _mmkedit_apply;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (mmkedit->widget_list, b);
-    xitk_set_widget_tips_default (b, _("Apply the changes to the playlist."));
-    xitk_enable_and_show_widget (b);
+    xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (b, _("Apply the changes to the playlist."));
 
     x = WINDOW_WIDTH - (100 + 15);
     lb.label             = _("Close");
     lb.callback          = _mmkedit_exit;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
       &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-    xitk_add_widget (mmkedit->widget_list, b);
-    xitk_set_widget_tips_default (b, _("Discard changes and dismiss the window."));
-    xitk_enable_and_show_widget (b);
+    xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+    xitk_set_widget_tips (b, _("Discard changes and dismiss the window."));
   }
 
-  mmk_editor_show_tips (mmkedit->gui, panel_get_tips_enable (mmkedit->gui->panel), panel_get_tips_timeout (mmkedit->gui->panel));
-
   mmkedit->widget_key = xitk_be_register_event_handler ("gui->mmkedit", mmkedit->xwin, mmkedit_event, mmkedit, NULL, NULL);
-
   mmkedit->visible = 1;
 
   _mmkedit_set_mmk (mmkedit, mmk);
