@@ -65,8 +65,8 @@
 
 typedef enum {
   /* keep order */
-  _W_plugins = 0,
-  _W_frame,
+  _W_frame = 0,
+  _W_plugins,
   _W_up,
   _W_down,
   /* /keep order */
@@ -762,7 +762,8 @@ static void _pplugin_show_obj(post_info_t *info, post_object_t *pobj) {
     xitk_set_widget_pos (pobj->w[_W_up], pobj->x + 5, pobj->y + 5);
     xitk_set_widget_pos (pobj->w[_W_down], pobj->x + 5, pobj->y + (FRAME_HEIGHT - 16 - 5));
 
-    xitk_widgets_state (pobj->w, _W_help + 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
+    xitk_widgets_state (pobj->w, _W_up, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
+    xitk_widgets_state (pobj->w + _W_down + 1, _W_help - _W_down, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
     if ((!_pplugin_is_first_filter (info, pobj)) && (xitk_combo_get_current_selected (pobj->w[_W_plugins])))
       xitk_widgets_state (pobj->w + _W_up, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
@@ -1360,8 +1361,8 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
           xine_post_dispose (gui->xine, p[n]->post);
           p[n]->post = NULL;
         }
-        /* plugins, frame, up, down */
-        xitk_widgets_delete (p[n]->w + _W_plugins, 4);
+        /* frame, plugins, up, down */
+        xitk_widgets_delete (p[n]->w + _W_frame, 4);
         VFREE (p[n]);
         p[n] = NULL;
         n++;
@@ -1602,8 +1603,8 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
       post_object_t **p = info->win->post_objects;
       while (*p) {
         _pplugin_destroy_only_obj (info, *p);
-        /* plugins, frame, up, down */
-        xitk_widgets_delete ((*p)->w + _W_plugins, 4);
+        /* frame, plugins, up, down */
+        xitk_widgets_delete ((*p)->w + _W_frame, 4);
         VFREE (*p);
         *p = NULL;
         p++;
