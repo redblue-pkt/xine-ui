@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -31,14 +31,21 @@
 #include "button.h"
 #include "default_font.h"
 
+typedef enum {
+  /* keep order */
+  _W_input = 0,
+  _W_more,
+  _W_less,
+  /* /keep order */
+  _W_LAST
+} _W_t;
+
 typedef struct {
   xitk_widget_t                   w;
 
   char                           *skin_element_name;
 
-  xitk_widget_t                  *input_widget;
-  xitk_widget_t                  *more_widget;
-  xitk_widget_t                  *less_widget;
+  xitk_widget_t                  *iw[_W_LAST];
 
   double                          step;
   double                          value;
@@ -48,33 +55,14 @@ typedef struct {
 } _doublebox_private_t;
 
 static void _db_enability (_doublebox_private_t *wp) {
-  if (wp->w.enable == WIDGET_ENABLE) {
-    xitk_enable_widget (wp->input_widget);
-    xitk_enable_widget (wp->more_widget);
-    xitk_enable_widget (wp->less_widget);
-  } else {
-    xitk_disable_widget (wp->input_widget);
-    xitk_disable_widget (wp->more_widget);
-    xitk_disable_widget (wp->less_widget);
-  }
+  xitk_widgets_state (wp->iw + _W_input, 3, XITK_WIDGET_STATE_ENABLE, (wp->w.enable == WIDGET_ENABLE) ? ~0u : 0);
 }
 
 /*
  *
  */
 static void _db_destroy (_doublebox_private_t *wp) {
-  if (wp->input_widget) {
-    xitk_destroy_widget (wp->input_widget);
-    wp->input_widget = NULL;
-  }
-  if (wp->more_widget) {
-    xitk_destroy_widget (wp->more_widget);
-    wp->more_widget = NULL;
-  }
-  if (wp->less_widget) {
-    xitk_destroy_widget (wp->less_widget);
-    wp->less_widget = NULL;
-  }
+  xitk_widgets_delete (wp->iw + _W_input, 3);
   XITK_FREE (wp->skin_element_name);
 }
 
@@ -82,22 +70,18 @@ static void _db_destroy (_doublebox_private_t *wp) {
  *
  */
 static void _db_paint (_doublebox_private_t *wp) {
+  unsigned int show = 0;
   if (wp->w.visible == 1) {
     int bx, ih, iw;
-    iw = xitk_get_widget_width (wp->input_widget);
-    ih = xitk_get_widget_height (wp->input_widget);
-    xitk_set_widget_pos (wp->input_widget, wp->w.x, wp->w.y);
+    iw = xitk_get_widget_width (wp->iw[_W_input]);
+    ih = xitk_get_widget_height (wp->iw[_W_input]);
+    xitk_set_widget_pos (wp->iw[_W_input], wp->w.x, wp->w.y);
     bx = wp->w.x + iw;
-    xitk_set_widget_pos (wp->more_widget, bx, wp->w.y);
-    xitk_set_widget_pos (wp->less_widget, bx, wp->w.y + (ih >> 1));
-    xitk_show_widget (wp->input_widget);
-    xitk_show_widget (wp->more_widget);
-    xitk_show_widget (wp->less_widget);
-  } else {
-    xitk_hide_widget (wp->input_widget);
-    xitk_hide_widget (wp->more_widget);
-    xitk_hide_widget (wp->less_widget);
+    xitk_set_widget_pos (wp->iw[_W_more], bx, wp->w.y);
+    xitk_set_widget_pos (wp->iw[_W_less], bx, wp->w.y + (ih >> 1));
+    show = ~0u;
   }
+  xitk_widgets_state (wp->iw + _W_input, 3, XITK_WIDGET_STATE_VISIBLE, show);
 }
 
 /*
@@ -122,8 +106,8 @@ static void _db_new_skin (_doublebox_private_t *wp, xitk_skin_config_t *skonfig)
 }
 
 static void _db_tips_timeout (_doublebox_private_t *wp, unsigned long timeout) {
-  if (wp->input_widget)
-    xitk_set_widget_tips_and_timeout (wp->input_widget, wp->w.tips_string, timeout);
+  if (wp->iw[_W_input])
+    xitk_set_widget_tips_and_timeout (wp->iw[_W_input], wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -173,7 +157,7 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, const char *str
   wp->value = strtod (string, NULL);
   memset (&buf, 0, sizeof (buf));
   snprintf (buf, sizeof (buf), "%lf", wp->value);
-  xitk_inputtext_change_text (wp->input_widget, buf);
+  xitk_inputtext_change_text (wp->iw[_W_input], buf);
   if (wp->callback)
     wp->callback (&wp->w, wp->userdata, wp->value);
 }
@@ -194,7 +178,7 @@ void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
   wp->value = value;
   memset (&buf, 0, sizeof (buf));
   snprintf (buf, sizeof (buf), "%lf", wp->value);
-  xitk_inputtext_change_text (wp->input_widget, buf);
+  xitk_inputtext_change_text (wp->iw[_W_input], buf);
 }
 
 /*
@@ -210,7 +194,7 @@ double xitk_doublebox_get_value(xitk_widget_t *w) {
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_DOUBLEBOX)
     return 0;
 
-  strval = xitk_inputtext_get_text (wp->input_widget);
+  strval = xitk_inputtext_get_text (wp->iw[_W_input]);
   wp->value = strtod (strval, NULL);
   return wp->value;
 }
@@ -231,7 +215,7 @@ static void doublebox_minus(xitk_widget_t *x, void *data) {
   wp->value -= wp->step;
   memset (&buf, 0, sizeof (buf));
   snprintf (buf, sizeof (buf), "%lf", wp->value);
-  xitk_inputtext_change_text (wp->input_widget, buf);
+  xitk_inputtext_change_text (wp->iw[_W_input], buf);
   if (wp->callback)
     wp->callback (&wp->w, wp->userdata, wp->value);
 }
@@ -252,7 +236,7 @@ static void doublebox_plus(xitk_widget_t *x, void *data) {
   wp->value += wp->step;
   memset (&buf, 0, sizeof (buf));
   snprintf (buf, sizeof (buf), "%lf", wp->value);
-  xitk_inputtext_change_text (wp->input_widget, buf);
+  xitk_inputtext_change_text (wp->iw[_W_input], buf);
   if (wp->callback)
     wp->callback (&wp->w, wp->userdata, wp->value);
 }
@@ -301,11 +285,11 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
   inp.max_length        = 16;
   inp.callback          = doublebox_change_value;
   inp.userdata          = (void *)wp;
-  wp->input_widget = xitk_noskin_inputtext_create (wl, &inp,
+  wp->iw[_W_input] = xitk_noskin_inputtext_create (wl, &inp,
     x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
-  if (wp->input_widget) {
-    xitk_dlist_add_tail (&wl->list, &wp->input_widget->node);
-    wp->input_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
+  if (wp->iw[_W_input]) {
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_input]->node);
+    wp->iw[_W_input]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   }
 
   b.state_callback    = NULL;
@@ -313,20 +297,20 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
 
   b.skin_element_name = "XITK_NOSKIN_PLUS";
   b.callback          = doublebox_plus;
-  wp->more_widget = xitk_noskin_button_create (wl, &b,
+  wp->iw[_W_more] = xitk_noskin_button_create (wl, &b,
     x + width - (height >> 1), y, height >> 1, height >> 1);
-  if (wp->more_widget) {
-    xitk_dlist_add_tail (&wl->list, &wp->more_widget->node);
-    wp->more_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
+  if (wp->iw[_W_more]) {
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_more]->node);
+    wp->iw[_W_more]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   }
 
   b.skin_element_name = "XITK_NOSKIN_MINUS";
   b.callback          = doublebox_minus;
-  wp->less_widget = xitk_noskin_button_create (wl, &b,
+  wp->iw[_W_less] = xitk_noskin_button_create (wl, &b,
     x + width - (height >> 1), y + (height >> 1), height >> 1, height >> 1);
-  if (wp->less_widget) {
-    xitk_dlist_add_tail (&wl->list, &wp->less_widget->node);
-    wp->less_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
+  if (wp->iw[_W_less]) {
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_less]->node);
+    wp->iw[_W_less]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;
   }
 
   return &wp->w;

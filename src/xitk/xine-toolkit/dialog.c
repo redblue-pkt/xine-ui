@@ -40,18 +40,25 @@
 
 typedef struct xitk_dialog_s xitk_dialog_t;
 
+typedef enum {
+  _W_w1 = 0,
+  _W_w2,
+  _W_w3,
+  _W_checkbox,
+  _W_checkbox_label,
+  _W_LAST
+} _W_t;
+  
 struct xitk_dialog_s {
   xitk_t                 *xitk;
   xitk_window_t          *xwin;
   xitk_register_key_t     key;
   int                     type;
 
-  xitk_widget_t          *w1, *w2, *w3;
+  xitk_widget_t          *w[_W_LAST];
+
   void                  (*done3cb)(void *userdata, int state);
   void                   *done3data;
-
-  xitk_widget_t          *checkbox;
-  xitk_widget_t          *checkbox_label;
 
   xitk_widget_t          *default_button;
 };
@@ -86,7 +93,8 @@ static xitk_dialog_t *_xitk_dialog_new (xitk_t *xitk,
     free (wd);
     return NULL;
   }
-  wd->w1 = wd->w2 = wd->w3 = NULL;
+
+  wd->w[_W_w1] = wd->w[_W_w2] = wd->w[_W_w3] = NULL;
   wd->default_button = NULL;
 
   /* Draw text area */
@@ -117,10 +125,10 @@ static void _xitk_window_dialog_3_done (xitk_widget_t *w, void *data, int state)
 
   if (wd->done3cb) {
     int state = !w ? 0
-              : w == wd->w1 ? 1
-              : w == wd->w2 ? 2
-              : /* w == wd->w3 */ 3;
-    if (wd->checkbox && xitk_button_get_state (wd->checkbox))
+              : w == wd->w[_W_w1] ? 1
+              : w == wd->w[_W_w2] ? 2
+              : /* w == wd->w[_W_w3] */ 3;
+    if (wd->w[_W_checkbox] && xitk_button_get_state (wd->w[_W_checkbox]))
       state += XITK_WINDOW_DIALOG_CHECKED;
     wd->done3cb (wd->done3data, state);
   }
@@ -219,20 +227,20 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     b.callback          = NULL;
     b.state_callback    = _dialog_dummy;
     b.userdata          = NULL;
-    wd->checkbox = xitk_noskin_button_create (widget_list, &b, x, y + 5, 10, 10);
-    if (wd->checkbox) {
-      xitk_dlist_add_tail (&widget_list->list, &wd->checkbox->node);
-      xitk_button_set_state (wd->checkbox, checked);
+    wd->w[_W_checkbox] = xitk_noskin_button_create (widget_list, &b, x, y + 5, 10, 10);
+    if (wd->w[_W_checkbox]) {
+      xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_checkbox]->node);
+      xitk_button_set_state (wd->w[_W_checkbox], checked);
     }
 
     lbl.skin_element_name = NULL;
     lbl.label             = check_label;
     lbl.callback          = NULL;
     lbl.userdata          = NULL;
-    wd->checkbox_label = xitk_noskin_label_create (widget_list, &lbl, x + 15, y, winw - x - 40, 20, DEFAULT_FONT_12);
-    if (wd->checkbox_label)
-      xitk_dlist_add_tail (&widget_list->list, &wd->checkbox_label->node);
-    xitk_widget_set_focus_redirect (wd->checkbox_label, wd->checkbox);
+    wd->w[_W_checkbox_label] = xitk_noskin_label_create (widget_list, &lbl, x + 15, y, winw - x - 40, 20, DEFAULT_FONT_12);
+    if (wd->w[_W_checkbox_label])
+      xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_checkbox_label]->node);
+    xitk_widget_set_focus_redirect (wd->w[_W_checkbox_label], wd->w[_W_checkbox]);
   }
 
   wd->done3cb = done_cb;
@@ -259,50 +267,41 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
 
     if (button1_label) {
       lb.label = _xitk_window_dialog_label (button1_label);
-      wd->w1 = xitk_noskin_labelbutton_create (widget_list, &lb,
+      wd->w[_W_w1] = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
-      if (wd->w1)
-        xitk_dlist_add_tail (&widget_list->list, &wd->w1->node);
+      if (wd->w[_W_w1])
+        xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w1]->node);
       bx += bdx;
     }
 
     if (button2_label) {
       lb.label = _xitk_window_dialog_label (button2_label);
-      wd->w2 = xitk_noskin_labelbutton_create (widget_list, &lb,
+      wd->w[_W_w2] = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
-      if (wd->w2)
-        xitk_dlist_add_tail (&widget_list->list, &wd->w2->node);
+      if (wd->w[_W_w2])
+        xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w2]->node);
       bx += bdx;
     }
 
     if (button3_label) {
       lb.label = _xitk_window_dialog_label (button3_label);
-      wd->w3 = xitk_noskin_labelbutton_create (widget_list, &lb,
+      wd->w[_W_w3] = xitk_noskin_labelbutton_create (widget_list, &lb,
         bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
-      if (wd->w3)
-        xitk_dlist_add_tail (&widget_list->list, &wd->w3->node);
+      if (wd->w[_W_w3])
+        xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w3]->node);
     }
   }
-  wd->default_button = wd->w3;
+  wd->default_button = wd->w[_W_w3];
   if (!wd->default_button) {
-    wd->default_button = wd->w1;
+    wd->default_button = wd->w[_W_w1];
     if (!wd->default_button)
-      wd->default_button = wd->w2;
+      wd->default_button = wd->w[_W_w2];
   }
 
   xitk_window_flags (wd->xwin, XITK_WINF_VISIBLE | XITK_WINF_ICONIFIED, XITK_WINF_VISIBLE);
   xitk_window_raise_window (wd->xwin);
 
-  if (wd->w1)
-    xitk_enable_and_show_widget (wd->w1);
-  if (wd->w2)
-    xitk_enable_and_show_widget (wd->w2);
-  if (wd->w3)
-    xitk_enable_and_show_widget (wd->w3);
-  if (check_label) {
-    xitk_enable_and_show_widget (wd->checkbox);
-    xitk_enable_and_show_widget (wd->checkbox_label);
-  }
+  xitk_widgets_state (wd->w, _W_LAST, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
   if (transient_for) {
     xitk_window_set_transient_for_win(wd->xwin, transient_for);

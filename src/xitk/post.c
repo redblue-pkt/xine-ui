@@ -64,14 +64,18 @@
 #define BROWSER_LINE_WIDTH  55
 
 typedef enum {
-  _W_frame = 0,
-  _W_plugins,
-  _W_properties,
-  _W_value,
-  _W_comment,
-  _W_help,
+  /* keep order */
+  _W_plugins = 0,
+  _W_frame,
   _W_up,
   _W_down,
+  /* /keep order */
+  _W_properties,
+  /* keep order */
+  _W_value,
+  _W_comment,
+  /* /keep order */
+  _W_help,
   _W_LAST
 } _W_t;
 
@@ -94,6 +98,15 @@ typedef struct {
   char                       **properties_names;
 } post_object_t;
 
+typedef enum {
+  _V_slider = 0,
+  /* keep order */
+  _V_enable,
+  _V_exit,
+  /* /keep order */
+  _V_LAST
+} _V_t;
+
 struct post_win_s {
   xitk_window_t              *xwin;
 
@@ -104,7 +117,7 @@ struct post_win_s {
   post_object_t              *post_objects[MAX_USED_FILTERS];
   int                         first_displayed, object_num;
 
-  xitk_widget_t              *slider, *enable, *exit;
+  xitk_widget_t              *w[_V_LAST];
 
   int                         x, y;
 
@@ -752,13 +765,13 @@ static void _pplugin_show_obj(post_info_t *info, post_object_t *pobj) {
     xitk_widgets_state (pobj->w, _W_help + 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
     if ((!_pplugin_is_first_filter (info, pobj)) && (xitk_combo_get_current_selected (pobj->w[_W_plugins])))
-      xitk_enable_and_show_widget (pobj->w[_W_up]);
+      xitk_widgets_state (pobj->w + _W_up, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
     if ((!_pplugin_is_last_filter (info, pobj) && (xitk_combo_get_current_selected (pobj->w[_W_plugins]))) &&
       (_pplugin_is_last_filter(info, pobj) || (!_pplugin_is_last_filter(info, pobj)
       && info->win->post_objects[_pplugin_get_object_offset(info, pobj) + 1]
       && xitk_combo_get_current_selected (info->win->post_objects[_pplugin_get_object_offset(info, pobj) + 1]->w[_W_plugins]))))
-      xitk_enable_and_show_widget (pobj->w[_W_down]);
+      xitk_widgets_state (pobj->w + _W_down, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
   }
 }
 
@@ -787,24 +800,19 @@ static void _pplugin_paint_widgets(post_info_t *info) {
     if(info->win->object_num > MAX_DISPLAY_FILTERS) {
       slidmax = info->win->object_num - MAX_DISPLAY_FILTERS;
       slidpos = slidmax - info->win->first_displayed;
-      xitk_enable_and_show_widget(info->win->slider);
+      xitk_widgets_state (info->win->w + _V_slider, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
     }
     else {
       slidmax = 1;
       slidpos = slidmax;
 
       if(!info->win->first_displayed)
-	xitk_disable_and_hide_widget(info->win->slider);
+        xitk_widgets_state (info->win->w + _V_slider, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
     }
 
-    xitk_slider_set_max(info->win->slider, slidmax);
-    xitk_slider_set_pos(info->win->slider, slidpos);
+    xitk_slider_set_max(info->win->w[_V_slider], slidmax);
+    xitk_slider_set_pos(info->win->w[_V_slider], slidpos);
   }
-}
-
-static void _pplugin_destroy_widget (xitk_widget_t **w) {
-  xitk_destroy_widget (*w);
-  *w = NULL;
 }
 
 static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
@@ -1028,8 +1036,8 @@ static void _pplugin_change_parameter (xitk_widget_t *w, void *data, int select)
   (void)w;
   if(pobj) {
 
-    _pplugin_destroy_widget (&pobj->w[_W_value]);
-    _pplugin_destroy_widget (&pobj->w[_W_comment]);
+    /* value, comment */
+    xitk_widgets_delete (pobj->w + _W_value, 2);
 
     if(pobj->descr) {
       pobj->param    = pobj->descr->parameter;
@@ -1078,7 +1086,7 @@ static void _pplugin_destroy_only_obj(post_info_t *info, post_object_t *pobj) {
 
     if (pobj->w[_W_properties]) {
 
-      _pplugin_destroy_widget (&pobj->w[_W_properties]);
+      xitk_widgets_delete (pobj->w + _W_properties, 1);
 
       VFREE(pobj->param_data);
       pobj->param_data = NULL;
@@ -1096,13 +1104,13 @@ static void _pplugin_destroy_only_obj(post_info_t *info, post_object_t *pobj) {
       }
     }
 
-    _pplugin_destroy_widget (&pobj->w[_W_comment]);
-    _pplugin_destroy_widget (&pobj->w[_W_value]);
+    /* value, comment */
+    xitk_widgets_delete (pobj->w + _W_value, 2);
 
     if (pobj->api && pobj->w[_W_help]) {
       if(info->win->help_running)
         _pplugin_close_help (NULL, info, 0);
-      _pplugin_destroy_widget (&pobj->w[_W_help]);
+      xitk_widgets_delete (pobj->w + _W_help, 1);
     }
 
   }
@@ -1260,7 +1268,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
 
   if( !info->win->help_running ) {
 
-    xitk_enable_and_show_widget(info->win->help_browser);
+    xitk_widgets_state (&info->win->help_browser, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
     xitk_browser_set_alignment(info->win->help_browser, ALIGN_LEFT);
 
     info->win->help_widget_key = xitk_be_register_event_handler (
@@ -1352,19 +1360,16 @@ static void _pplugin_select_filter (xitk_widget_t *w, void *data, int select) {
           xine_post_dispose (gui->xine, p[n]->post);
           p[n]->post = NULL;
         }
-        _pplugin_destroy_widget (&p[n]->w[_W_plugins]);
-        _pplugin_destroy_widget (&p[n]->w[_W_frame]);
-        _pplugin_destroy_widget (&p[n]->w[_W_up]);
-        _pplugin_destroy_widget (&p[n]->w[_W_down]);
+        /* plugins, frame, up, down */
+        xitk_widgets_delete (p[n]->w + _W_plugins, 4);
         VFREE (p[n]);
         p[n] = NULL;
         n++;
       }
-      xitk_hide_widget (info->win->enable);
-      xitk_hide_widget (info->win->exit);
+      /* enable, exit */
+      xitk_widgets_state (info->win->w + _V_enable, 2, XITK_WIDGET_STATE_VISIBLE, 0);
       xitk_window_apply_background (info->win->xwin);
-      xitk_show_widget (info->win->enable);
-      xitk_show_widget (info->win->exit);
+      xitk_widgets_state (info->win->w + _V_enable, 2, XITK_WIDGET_STATE_VISIBLE, ~0u);
     }
     if(info->win->object_num <= MAX_DISPLAY_FILTERS)
       info->win->first_displayed = 0;
@@ -1558,7 +1563,7 @@ static void _pplugin_list_step (post_info_t *info, int step) {
 
 static void _pplugin_nextprev (xitk_widget_t *w, void *data, int pos) {
   post_info_t *info = data;
-  int rpos = (xitk_slider_get_max(info->win->slider)) - pos;
+  int rpos = (xitk_slider_get_max(info->win->w[_V_slider])) - pos;
 
   (void)w;
   if(rpos != info->win->first_displayed) {
@@ -1597,10 +1602,8 @@ static void _pplugin_exit (xitk_widget_t *w, void *data, int state) {
       post_object_t **p = info->win->post_objects;
       while (*p) {
         _pplugin_destroy_only_obj (info, *p);
-        _pplugin_destroy_widget (&(*p)->w[_W_plugins]);
-        _pplugin_destroy_widget (&(*p)->w[_W_frame]);
-        _pplugin_destroy_widget (&(*p)->w[_W_up]);
-        _pplugin_destroy_widget (&(*p)->w[_W_down]);
+        /* plugins, frame, up, down */
+        xitk_widgets_delete ((*p)->w + _W_plugins, 4);
         VFREE (*p);
         *p = NULL;
         p++;
@@ -1752,7 +1755,7 @@ void pplugin_toggle_visibility (xitk_widget_t *w, void *data) {
 void pplugin_update_enable_button (post_info_t *info) {
   if (info && info->win) {
     gGui_t *gui = info->gui;
-    xitk_labelbutton_set_state (info->win->enable, info->type == POST_VIDEO ? gui->post_video_enable : gui->post_audio_enable);
+    xitk_labelbutton_set_state (info->win->w[_V_enable], info->type == POST_VIDEO ? gui->post_video_enable : gui->post_audio_enable);
   }
 }
 
@@ -1796,9 +1799,9 @@ void pplugin_panel (post_info_t *info) {
   sl.userdata                 = NULL;
   sl.motion_callback          = _pplugin_nextprev;
   sl.motion_userdata          = info;
-  info->win->slider =  xitk_noskin_slider_create (info->win->widget_list, &sl,
+  info->win->w[_V_slider] =  xitk_noskin_slider_create (info->win->widget_list, &sl,
     (WINDOW_WIDTH - (16 + 15)), 34, 16, (MAX_DISPLAY_FILTERS * (FRAME_HEIGHT + 4) - 4), XITK_VSLIDER);
-  xitk_add_widget (info->win->widget_list, info->win->slider, XITK_WIDGET_STATE_KEEP);
+  xitk_add_widget (info->win->widget_list, info->win->w[_V_slider], XITK_WIDGET_STATE_KEEP);
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
@@ -1810,11 +1813,11 @@ void pplugin_panel (post_info_t *info) {
   lb.state_callback    = _pplugin_enability;
   lb.userdata          = info;
   lb.skin_element_name = NULL;
-  info->win->enable =  xitk_noskin_labelbutton_create (info->win->widget_list,
+  info->win->w[_V_enable] =  xitk_noskin_labelbutton_create (info->win->widget_list,
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (info->win->widget_list, info->win->enable, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  xitk_add_widget (info->win->widget_list, info->win->w[_V_enable], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
-  xitk_labelbutton_set_state (info->win->enable, info->type == POST_VIDEO ? gui->post_video_enable : gui->post_audio_enable);
+  xitk_labelbutton_set_state (info->win->w[_V_enable], info->type == POST_VIDEO ? gui->post_video_enable : gui->post_audio_enable);
 
   /* IMPLEMENT ME
   x += (100 + 15);
@@ -1840,9 +1843,9 @@ void pplugin_panel (post_info_t *info) {
   lb.state_callback    = NULL;
   lb.userdata          = info;
   lb.skin_element_name = NULL;
-  info->win->exit =  xitk_noskin_labelbutton_create (info->win->widget_list,
+  info->win->w[_V_exit] =  xitk_noskin_labelbutton_create (info->win->widget_list,
     &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
-  xitk_add_widget (info->win->widget_list, info->win->exit, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  xitk_add_widget (info->win->widget_list, info->win->w[_V_exit], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   _pplugin_get_plugins(info);
 

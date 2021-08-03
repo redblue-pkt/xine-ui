@@ -340,7 +340,7 @@ static void _browser_hide_set_pos (_browser_private_t *wp) {
   int i, y = wp->visible.y;
   for (i = 0; i < wp->visible.max; i++) {
     int v = wp->visible.i2v[i];
-    xitk_hide_widget (wp->visible.btns[v + _W_items]);
+    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, 0);
     xitk_set_widget_pos (wp->visible.btns[v + _W_items], wp->visible.x, y);
     y += h;
   }
@@ -352,12 +352,12 @@ static void _browser_show (_browser_private_t *wp) {
     int v = wp->visible.i2v[i];
     if (wp->visible.xmax)
       xitk_labelbutton_set_label_offset (wp->visible.btns[v + _W_items], -wp->visible.dx);
-    xitk_show_widget (wp->visible.btns[v + _W_items]);
+    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
     xitk_labelbutton_set_state (wp->visible.btns[v + _W_items], i == wp->items.selected - wp->visible.start);
   }
   for (; i < wp->visible.max; i++) {
     int v = wp->visible.i2v[i];
-    xitk_show_widget (wp->visible.btns[v + _W_items]);
+    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
   }
 }
 
@@ -582,7 +582,7 @@ static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_
       w->type &= ~WIDGET_TABABLE;
       xitk_widget_set_parent (w, &wp->w);
       if (i >= wp->visible.num)
-        xitk_disable_widget (w);
+        xitk_widgets_state (&w, 1, XITK_WIDGET_STATE_ENABLE, 0);
       xitk_set_widget_pos (w, x, y);
       if (h <= 0)
         h = xitk_get_widget_height (w) + 1;
@@ -1273,7 +1273,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
       w->type &= ~WIDGET_TABABLE;
       xitk_widget_set_parent (w, &wp->w);
       if (i >= wp->visible.num)
-        xitk_disable_widget (w);
+        xitk_widgets_state (&w, 1, XITK_WIDGET_STATE_ENABLE, 0);
       xitk_set_widget_pos (w, ix, iy);
       if (wp->items.shortcuts)
         xitk_labelbutton_change_shortcut_label (w,

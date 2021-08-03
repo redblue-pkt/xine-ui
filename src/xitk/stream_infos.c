@@ -449,11 +449,11 @@ int stream_infos_is_visible (xui_sinfo_t *sinfo) {
 void stream_infos_toggle_auto_update (xui_sinfo_t *sinfo) {
   if (sinfo) {
     if (sinfo->gui->stream_info_auto_update) {
-      xitk_hide_widget (sinfo->update);
+      xitk_widgets_state (&sinfo->update, 1, XITK_WIDGET_STATE_VISIBLE, 0);
       xitk_window_apply_background (sinfo->xwin);
       xitk_paint_widget_list (sinfo->widget_list);
     } else {
-      xitk_show_widget (sinfo->update);
+      xitk_widgets_state (&sinfo->update, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
     }
   }
 }
@@ -612,7 +612,7 @@ void stream_infos_panel (gGui_t *gui) {
     xitk_add_widget (sinfo->widget_list, sinfo->update, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     if (gui->stream_info_auto_update)
-      xitk_hide_widget (sinfo->update);
+      xitk_widgets_state (&sinfo->update, 1, XITK_WIDGET_STATE_VISIBLE, 0);
 
     x = WINDOW_WIDTH - (100 + 15);
     lb.label    = _("Close");

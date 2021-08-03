@@ -1592,28 +1592,6 @@ static int xitk_widget_able (xitk_widget_t *w, int enable) {
 }
 
 /*
- * Enable a widget.
- */
-void xitk_enable_widget (xitk_widget_t *w) {
-  if (!w) {
-    XITK_WARNING ("widget is NULL\n");
-    return;
-  }
-  if (xitk_widget_able (w, 1))
-    xitk_widget_paint (w);
-}
-
-/*
- * Disable a widget.
- */
-void xitk_disable_widget (xitk_widget_t *w) {
-  if (!w)
-    return;
-  if (xitk_widget_able (w, 0))
-    xitk_widget_paint (w);
-}
-
-/*
  * Destroy widgets.
  */
 void xitk_widgets_delete (xitk_widget_t **w, unsigned int n) {
@@ -1790,18 +1768,6 @@ void xitk_stop_widgets(xitk_widget_list_t *wl) {
 #endif
 
 /*
- * Show a widget.
- */
-void xitk_show_widget (xitk_widget_t *w) {
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return;
-  }
-  if (xitk_widget_show_hide (w, 1))
-    xitk_widget_paint (w);
-}
-
-/*
  * Show widgets from widget list.
  */
 void xitk_show_widgets (xitk_widget_list_t *wl) {
@@ -1819,29 +1785,6 @@ void xitk_show_widgets (xitk_widget_list_t *wl) {
         xitk_widget_paint (w);
     }
   }
-}
-
-void xitk_enable_and_show_widget(xitk_widget_t *w) {
-  int paint;
-
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return;
-  }
-  paint = xitk_widget_able (w, 1);
-  paint |= xitk_widget_show_hide (w, 1);
-  if (paint)
-    xitk_widget_paint (w);
-}
-
-/*
- * Hide a widget.
- */
-void xitk_hide_widget (xitk_widget_t *w) {
-  if (!w)
-    return;
-  if (xitk_widget_show_hide (w, 0))
-    xitk_widget_paint (w);
 }
 
 /*
@@ -1863,17 +1806,6 @@ void xitk_hide_widgets (xitk_widget_list_t *wl) {
         xitk_widget_paint (w);
     }
   }
-}
-
-void xitk_disable_and_hide_widget (xitk_widget_t *w) {
-  int paint;
-
-  if (!w)
-    return;
-  paint = xitk_widget_able (w, 0);
-  paint |= xitk_widget_show_hide (w, 0);
-  if (paint)
-    xitk_widget_paint (w);
 }
 
 void xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state) {

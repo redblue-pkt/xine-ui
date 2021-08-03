@@ -353,7 +353,7 @@ static void setup_paint_widgets (xui_setup_t *setup, int first) {
 /* Repaint our new ones just 1 time. */
 
   if (setup->num_wg > MAX_DISPLAY_WIDGETS)
-    xitk_enable_and_show_widget (setup->slider_wg);
+    xitk_widgets_state (&setup->slider_wg, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
   setup_triplets_enable_and_show (setup, setup->first_displayed, last);
   setup_set_cursor (setup, NORMAL_CURS);
 }
@@ -484,8 +484,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
               | (1 << XINE_CONFIG_TYPE_NUM)
               | (1 << XINE_CONFIG_TYPE_BOOL);
 
-  xitk_disable_widget (setup->slider_wg);
-  xitk_hide_widget (setup->slider_wg);
+  xitk_widgets_state (&setup->slider_wg, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
 
   section = setup->sections + s;
   memset (&entry, 0, sizeof (entry));

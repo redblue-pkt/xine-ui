@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -32,6 +32,14 @@
 #include "slider.h"
 #include "default_font.h"
 
+typedef enum {
+  _W_input = 0,
+  _W_more,
+  _W_less,
+  _W_slider,
+  _W_LAST
+} _W_t;
+
 typedef struct {
   xitk_widget_t        w;
 
@@ -41,10 +49,7 @@ typedef struct {
   int                  input_width, slider_width, pm_width;
   xitk_slider_hv_t     hv;
 
-  xitk_widget_t       *input_widget;
-  xitk_widget_t       *more_widget;
-  xitk_widget_t       *less_widget;
-  xitk_widget_t       *slider_widget;
+  xitk_widget_t       *iw[_W_LAST];
 } _intbox_private_t;
 
 static const uint8_t _ib_unhex[256] = {
@@ -102,7 +107,7 @@ static int _ib_from_string (const char *s) {
 
 static void _ib_set_text (_intbox_private_t *wp) {
   uint8_t b[32], *q = b + sizeof (b);
-  if (!wp->input_widget)
+  if (!wp->iw[_W_input])
     return;
   *--q = 0;
   if (wp->info.fmt == INTBOX_FMT_DECIMAL) {
@@ -126,12 +131,12 @@ static void _ib_set_text (_intbox_private_t *wp) {
       *--q = '#';
     }
   }
-  if (strcmp ((const char *)q, xitk_inputtext_get_text (wp->input_widget)))
-    xitk_inputtext_change_text (wp->input_widget, (const char *)q);
+  if (strcmp ((const char *)q, xitk_inputtext_get_text (wp->iw[_W_input])))
+    xitk_inputtext_change_text (wp->iw[_W_input], (const char *)q);
 }
 
 static void _ib_set_slider (_intbox_private_t *wp) {
-  if (!wp->slider_widget)
+  if (!wp->iw[_W_slider])
     return;
   wp->hv.h.pos = wp->info.value - wp->info.min;
   wp->hv.h.step = 1;
@@ -141,50 +146,19 @@ static void _ib_set_slider (_intbox_private_t *wp) {
   wp->hv.v.step = 1;
   wp->hv.v.visible = 0;
   wp->hv.v.max = 0;
-  xitk_slider_hv_sync (wp->slider_widget, &wp->hv,
+  xitk_slider_hv_sync (wp->iw[_W_slider], &wp->hv,
     wp->w.visible ? XITK_SLIDER_SYNC_SET_AND_PAINT : XITK_SLIDER_SYNC_SET);
 }
 
 static void _ib_enability (_intbox_private_t *wp) {
-  if (wp->w.enable == WIDGET_ENABLE) {
-    xitk_enable_widget (wp->input_widget);
-    if (wp->more_widget)
-      xitk_enable_widget (wp->more_widget);
-    if (wp->less_widget)
-      xitk_enable_widget (wp->less_widget);
-    if (wp->slider_widget)
-      xitk_enable_widget (wp->slider_widget);
-  } else {
-    xitk_disable_widget (wp->input_widget);
-    if (wp->more_widget)
-      xitk_disable_widget (wp->more_widget);
-    if (wp->less_widget)
-      xitk_disable_widget (wp->less_widget);
-    if (wp->slider_widget)
-      xitk_disable_widget (wp->slider_widget);
-  }
+  xitk_widgets_state (wp->iw + _W_input, 4, XITK_WIDGET_STATE_ENABLE, (wp->w.enable == WIDGET_ENABLE) ? ~0u : 0);
 }
 
 /*
  *
  */
 static void _ib_destroy (_intbox_private_t *wp) {
-  if (wp->input_widget) {
-    xitk_destroy_widget (wp->input_widget);
-    wp->input_widget = NULL;
-  }
-  if (wp->more_widget) {
-    xitk_destroy_widget (wp->more_widget);
-    wp->more_widget = NULL;
-  }
-  if (wp->less_widget) {
-    xitk_destroy_widget (wp->less_widget);
-    wp->less_widget = NULL;
-  }
-  if (wp->slider_widget) {
-    xitk_destroy_widget (wp->slider_widget);
-    wp->slider_widget = NULL;
-  }
+  xitk_widgets_delete (wp->iw + _W_input, 4);
   xitk_short_string_deinit (&wp->skin_element_name);
 }
 
@@ -192,33 +166,15 @@ static void _ib_destroy (_intbox_private_t *wp) {
  *
  */
 static void _ib_paint (_intbox_private_t *wp) {
+  unsigned int show = 0;
   if (wp->w.visible == 1) {
-    if (wp->input_widget) {
-      xitk_set_widget_pos (wp->input_widget, wp->w.x, wp->w.y);
-      xitk_show_widget (wp->input_widget);
-    }
-    if (wp->more_widget) {
-      xitk_set_widget_pos (wp->more_widget, wp->w.x + wp->input_width, wp->w.y);
-      xitk_show_widget (wp->more_widget);
-    }
-    if (wp->less_widget) {
-      xitk_set_widget_pos (wp->less_widget, wp->w.x + wp->input_width, wp->w.y + wp->w.height - wp->pm_width);
-      xitk_show_widget (wp->less_widget);
-    }
-    if (wp->slider_widget) {
-      xitk_set_widget_pos (wp->slider_widget, wp->w.x + wp->input_width + 2, wp->w.y);
-      xitk_show_widget (wp->slider_widget);
-    }
-  } else {
-    if (wp->input_widget)
-      xitk_hide_widget (wp->input_widget);
-    if (wp->more_widget)
-      xitk_hide_widget (wp->more_widget);
-    if (wp->less_widget)
-      xitk_hide_widget (wp->less_widget);
-    if (wp->slider_widget)
-      xitk_hide_widget (wp->slider_widget);
+    xitk_set_widget_pos (wp->iw[_W_input], wp->w.x, wp->w.y);
+    xitk_set_widget_pos (wp->iw[_W_more], wp->w.x + wp->input_width, wp->w.y);
+    xitk_set_widget_pos (wp->iw[_W_less], wp->w.x + wp->input_width, wp->w.y + wp->w.height - wp->pm_width);
+    xitk_set_widget_pos (wp->iw[_W_slider], wp->w.x + wp->input_width + 2, wp->w.y);
+    show = ~0u;
   }
+  xitk_widgets_state (wp->iw + _W_input, 4, XITK_WIDGET_STATE_VISIBLE, show);
 }
 
 /*
@@ -243,10 +199,10 @@ static void _ib_new_skin (_intbox_private_t *wp, xitk_skin_config_t *skonfig) {
 }
 
 static void _ib_tips_timeout (_intbox_private_t *wp, unsigned long timeout) {
-  if (wp->input_widget)
-    xitk_set_widget_tips_and_timeout (wp->input_widget, wp->w.tips_string, timeout);
-  if (wp->slider_widget)
-    xitk_set_widget_tips_and_timeout (wp->slider_widget, wp->w.tips_string, timeout);
+  if (wp->iw[_W_input])
+    xitk_set_widget_tips_and_timeout (wp->iw[_W_input], wp->w.tips_string, timeout);
+  if (wp->iw[_W_slider])
+    xitk_set_widget_tips_and_timeout (wp->iw[_W_slider], wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -408,7 +364,7 @@ static void intbox_sl (xitk_widget_t *x, void *data, int pos) {
 
   (void)x;
   (void)pos;
-  xitk_slider_hv_sync (wp->slider_widget, &wp->hv, XITK_SLIDER_SYNC_GET);
+  xitk_slider_hv_sync (wp->iw[_W_slider], &wp->hv, XITK_SLIDER_SYNC_GET);
   v = wp->info.min + wp->hv.h.pos;
   if (v != wp->info.value) {
     wp->info.value = v;
@@ -474,11 +430,11 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
   inp.max_length        = 32;
   inp.callback          = intbox_it;
   inp.userdata          = (void *)wp;
-  wp->input_widget = xitk_noskin_inputtext_create (wl, &inp,
+  wp->iw[_W_input] = xitk_noskin_inputtext_create (wl, &inp,
     x, y, wp->input_width, wp->w.height, "Black", "Black", DEFAULT_FONT_10);
-  if (wp->input_widget) {
-    xitk_dlist_add_tail (&wl->list, &wp->input_widget->node);
-    wp->input_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
+  if (wp->iw[_W_input]) {
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_input]->node);
+    wp->iw[_W_input]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
   }
   _ib_set_text (wp);
 
@@ -492,20 +448,20 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
 
     b.skin_element_name = "XITK_NOSKIN_PLUS";
     b.callback          = intbox_plus;
-    wp->more_widget = xitk_noskin_button_create (wl, &b,
+    wp->iw[_W_more] = xitk_noskin_button_create (wl, &b,
       x + wp->input_width, y, wp->pm_width, wp->pm_width);
-    if (wp->more_widget) {
-      xitk_dlist_add_tail (&wl->list, &wp->more_widget->node);
-      wp->more_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
+    if (wp->iw[_W_more]) {
+      xitk_dlist_add_tail (&wl->list, &wp->iw[_W_more]->node);
+      wp->iw[_W_more]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
     }
 
     b.skin_element_name = "XITK_NOSKIN_MINUS";
     b.callback          = intbox_minus;
-    wp->less_widget = xitk_noskin_button_create (wl, &b,
+    wp->iw[_W_less] = xitk_noskin_button_create (wl, &b,
       x + wp->input_width, y + wp->w.height - wp->pm_width, wp->pm_width, wp->pm_width);
-    if (wp->less_widget) {
-      xitk_dlist_add_tail (&wl->list, &wp->less_widget->node);
-      wp->less_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
+    if (wp->iw[_W_less]) {
+      xitk_dlist_add_tail (&wl->list, &wp->iw[_W_less]->node);
+      wp->iw[_W_less]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
     }
   }
 
@@ -520,16 +476,16 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
     sl.userdata          = (void *)wp;
     sl.motion_callback   = intbox_sl;
     sl.motion_userdata   = (void *)wp;
-    wp->slider_widget = xitk_noskin_slider_create (wl, &sl,
+    wp->iw[_W_slider] = xitk_noskin_slider_create (wl, &sl,
         x + wp->input_width + 2, y, wp->slider_width, wp->w.height, XITK_HVSLIDER);
-    if (wp->slider_widget) {
-      xitk_dlist_add_tail (&wl->list, &wp->slider_widget->node);
-      wp->slider_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
+    if (wp->iw[_W_slider]) {
+      xitk_dlist_add_tail (&wl->list, &wp->iw[_W_slider]->node);
+      wp->iw[_W_slider]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_INTBOX;
     }
     _ib_set_slider (wp);
   }
 
-  xitk_widget_set_focus_redirect (&wp->w, wp->input_widget);
+  xitk_widget_set_focus_redirect (&wp->w, wp->iw[_W_input]);
 
   return &wp->w;
 }
