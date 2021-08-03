@@ -608,16 +608,6 @@ int xitk_is_widget_focused(xitk_widget_t *);
 int xitk_is_widget_enabled(xitk_widget_t *);
 
 /**
- * Enable widget.
- */
-void xitk_enable_widget(xitk_widget_t *);
-
-/**
- * Disable widget.
- */
-void xitk_disable_widget(xitk_widget_t *);
-
-/**
  * Destroy widgets from widget list.
  */
 void xitk_destroy_widgets(xitk_widget_list_t *wl);
@@ -628,29 +618,9 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl);
 void xitk_show_widgets(xitk_widget_list_t *);
 
 /**
- * Set widget visible
- */
-void xitk_show_widget(xitk_widget_t *);
-
-/**
- *
- */
-void xitk_enable_and_show_widget(xitk_widget_t *w);
-
-/**
  * Set widgets of widget list not visible.
  */
 void xitk_hide_widgets(xitk_widget_list_t *);
-
-/**
- * Hide a widget.
- */
-void xitk_hide_widget(xitk_widget_t *);
-
-/**
- *
- */
-void xitk_disable_and_hide_widget(xitk_widget_t *w);
 
 /**
  *

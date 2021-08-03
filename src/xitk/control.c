@@ -639,10 +639,7 @@ void control_change_skins (xui_vctrl_t *vctrl, int synthetic) {
       for (u = 0; u < NUM_SLIDERS; u++) {
         vctrl_item_t *item = &vctrl->items[u];
 
-        if (item->enable)
-          xitk_enable_widget (item->w);
-        else
-          xitk_disable_widget (item->w);
+        xitk_widgets_state (&item->w, 1, XITK_WIDGET_STATE_ENABLE, item->enable ? ~0u : 0);
       }
     }
   }

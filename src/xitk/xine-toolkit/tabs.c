@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -77,11 +77,8 @@ static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
 
   if (wp->start < 0)
     wp->start = 0;
-  {
-    int i;
-    for (i = wp->start; i < wp->stop; i++)
-      xitk_disable_and_hide_widget (wp->tabs[i]);
-  }
+
+  xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
 
   wp->start = start;
   wp->stop = wp->num_entries;
@@ -110,14 +107,8 @@ static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
     } else { /* left */
       wp->rgap = width;
     }
-    if (wp->start <= 0)
-      xitk_disable_widget (wp->left);
-    else
-      xitk_enable_widget (wp->left);
-    if (wp->stop < wp->num_entries)
-      xitk_enable_widget (wp->right);
-    else
-      xitk_disable_widget (wp->right);
+    xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, wp->start <= 0 ? 0 : ~0u);
+    xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, wp->stop < wp->num_entries ? ~0u : 0);
   }
 
   {
@@ -130,11 +121,9 @@ static void _tabs_arrange (_tabs_private_t *wp, int start, int paint) {
       int w = xitk_get_widget_width (wp->tabs[i]);
       xitk_set_widget_pos (wp->tabs[i], x, wp->y);
       x += w;
-      if (paint)
-        xitk_enable_and_show_widget (wp->tabs[i]);
-      else
-        xitk_enable_widget (wp->tabs[i]);
     }
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
+        XITK_WIDGET_STATE_ENABLE | (paint ? XITK_WIDGET_STATE_VISIBLE : 0), ~0u);
     if (wp->stop < wp->num_entries)
       xitk_set_widget_pos (wp->tabs[wp->stop], x, wp->y);
   }
@@ -206,32 +195,23 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
 static void _tabs_enability (_tabs_private_t *wp) {
   if (wp->w.enable == WIDGET_ENABLE) {
     widget_event_t ne;
-    int i;
-    if (wp->start <= 0) {
-      xitk_disable_widget (wp->left);
-      xitk_show_widget (wp->left);
-    } else {
-      xitk_enable_and_show_widget (wp->left);
-    }
-    if (wp->stop < wp->num_entries) {
-      xitk_enable_and_show_widget (wp->right);
-    } else {
-      xitk_disable_widget (wp->right);
-      xitk_show_widget (wp->right);
-    }
-    for (i = wp->start; i < wp->stop; i++)
-      xitk_enable_and_show_widget (wp->tabs[i]);
+    xitk_widgets_state (&wp->left, 1,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE,
+      (wp->start <= 0 ? 0 : XITK_WIDGET_STATE_ENABLE) | XITK_WIDGET_STATE_VISIBLE);
+    xitk_widgets_state (&wp->right, 1,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE,
+      (wp->stop < wp->num_entries ? XITK_WIDGET_STATE_ENABLE : 0) | XITK_WIDGET_STATE_VISIBLE);
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
     ne.x = wp->w.x;
     ne.y = wp->w.y;
     ne.width = wp->w.width;
     ne.height = wp->w.height;
     _tabs_paint (wp, &ne);
   } else {
-    int i;
-    xitk_disable_widget (wp->left);
-    xitk_disable_widget (wp->right);
-    for (i = wp->start; i < wp->stop; i++)
-      xitk_disable_widget (wp->tabs[i]);
+    xitk_widgets_state (&wp->left, 1, XITK_WIDGET_STATE_ENABLE, 0);
+    xitk_widgets_state (&wp->right, 1, XITK_WIDGET_STATE_ENABLE, 0);
+    xitk_widgets_state (wp->tabs + wp->start, wp->stop - wp->start, XITK_WIDGET_STATE_ENABLE, 0);
   }
 }
 
@@ -490,7 +470,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
         wp->tabs[i]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
         wp->tabs[i]->type &= ~WIDGET_TABABLE;
         xitk_dlist_add_tail (&wl->list, &wp->tabs[i]->node);
-        xitk_disable_and_hide_widget (wp->tabs[i]);
+        xitk_widgets_state (wp->tabs + i, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, 0);
       }
       xx += fwidth + 20;
     }

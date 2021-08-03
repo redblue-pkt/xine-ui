@@ -697,9 +697,9 @@ static void kbedit_unset (xui_keyedit_t *kbedit) {
   if (xitk_labelbutton_get_state (kbedit->w[_W_edit]))
     xitk_labelbutton_set_state (kbedit->w[_W_edit], 0);
 
-  xitk_enable_and_show_widget (kbedit->w[_W_reset]);
+  xitk_widgets_state (kbedit->w + _W_reset, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
   /* edit, alias, delete, grab */
-  xitk_widgets_state (&kbedit->w[_W_edit], 4, XITK_WIDGET_STATE_ENABLE, 0);
+  xitk_widgets_state (kbedit->w + _W_edit, 4, XITK_WIDGET_STATE_ENABLE, 0);
   kbedit->ksel = NULL;
   kbedit->nsel = -1;
 
@@ -714,7 +714,7 @@ static void kbedit_unset (xui_keyedit_t *kbedit) {
 }
 
 static void _kbedit_set (xui_keyedit_t *kbedit) {
-  xitk_enable_and_show_widget (kbedit->w[_W_edit]);
+  xitk_widgets_state (kbedit->w + _W_edit, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
   /* alias, delete */
   xitk_widgets_state (&kbedit->w[_W_alias], 2, XITK_WIDGET_STATE_ENABLE,
     strcasecmp (kbedit->ksel->key, "VOID") ? XITK_WIDGET_STATE_ENABLE : 0);
@@ -801,14 +801,8 @@ static void kbedit_alias(xitk_widget_t *w, void *data, int state, int modifier) 
   _kbr_close (kbedit);
   xitk_labelbutton_set_state(kbedit->w[_W_edit], 0);
 
-  if(state) {
-    xitk_enable_widget(kbedit->w[_W_grab]);
-    kbedit->action_wanted = KBEDIT_ALIASING;
-  }
-  else {
-    xitk_disable_widget(kbedit->w[_W_grab]);
-    kbedit->action_wanted = KBEDIT_NOOP;
-  }
+  xitk_widgets_state (kbedit->w + _W_grab, 1, XITK_WIDGET_STATE_ENABLE, state ? ~0u : 0);
+  kbedit->action_wanted = state ? KBEDIT_ALIASING : KBEDIT_NOOP;
 }
 
 /*
@@ -822,15 +816,8 @@ static void kbedit_edit(xitk_widget_t *w, void *data, int state, int modifier) {
   _kbr_close (kbedit);
   xitk_labelbutton_set_state(kbedit->w[_W_alias], 0);
 
-  if(state) {
-    xitk_enable_widget(kbedit->w[_W_grab]);
-    kbedit->action_wanted = KBEDIT_EDITING;
-  }
-  else {
-    xitk_disable_widget(kbedit->w[_W_grab]);
-    kbedit->action_wanted = KBEDIT_NOOP;
-  }
-
+  xitk_widgets_state (kbedit->w + _W_grab, 1, XITK_WIDGET_STATE_ENABLE, state ? ~0u : 0);
+  kbedit->action_wanted = state ? KBEDIT_EDITING : KBEDIT_NOOP;
 }
 
 /*
@@ -845,7 +832,7 @@ static void kbedit_delete (xitk_widget_t *w, void *data, int state) {
   _kbr_close (kbedit);
   xitk_labelbutton_set_state(kbedit->w[_W_alias], 0);
   xitk_labelbutton_set_state(kbedit->w[_W_edit], 0);
-  xitk_disable_widget(kbedit->w[_W_grab]);
+  xitk_widgets_state (kbedit->w + _W_grab, 1, XITK_WIDGET_STATE_ENABLE, 0);
 
   if (s >= 0) {
     int r, is_alias;
@@ -893,7 +880,7 @@ static void kbedit_reset (xitk_widget_t *w, void *data, int state) {
     (const char * const *)kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start (kbedit->w[_W_browser]));
   xitk_labelbutton_set_state (kbedit->w[_W_alias], 0);
   xitk_labelbutton_set_state (kbedit->w[_W_edit], 0);
-  xitk_disable_widget (kbedit->w[_W_grab]);
+  xitk_widgets_state (kbedit->w + _W_grab, 1, XITK_WIDGET_STATE_ENABLE, 0);
 
   if (kbedit->nsel < 0) {
     /* full list reset */
@@ -920,7 +907,7 @@ static void kbedit_save (xitk_widget_t *w, void *data, int state) {
   _kbr_close (kbedit);
   xitk_labelbutton_set_state(kbedit->w[_W_alias], 0);
   xitk_labelbutton_set_state(kbedit->w[_W_edit], 0);
-  xitk_disable_widget(kbedit->w[_W_grab]);
+  xitk_widgets_state (kbedit->w + _W_grab, 1, XITK_WIDGET_STATE_ENABLE, 0);
 
   kbindings_free_kbinding (&kbedit->gui->kbindings);
   kbedit->gui->kbindings = _kbindings_duplicate_kbindings (kbedit->kbt);

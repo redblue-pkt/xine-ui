@@ -32,6 +32,15 @@
 #include "browser.h"
 #include "default_font.h"
 
+typedef enum {
+  _W_combo = 0,
+  /* keep order */
+  _W_label,
+  _W_button,
+  /* /keep order */
+  _W_browser,
+  _W_LAST
+} _W_t;
 
 typedef struct {
   xitk_widget_t           w;
@@ -45,10 +54,7 @@ typedef struct {
 
   xitk_register_key_t    *parent_wkey;
 
-  xitk_widget_t          *combo_widget;
-  xitk_widget_t          *label_widget;
-  xitk_widget_t          *button_widget;
-  xitk_widget_t          *browser_widget;
+  xitk_widget_t          *iw[_W_LAST];
 
   char                  **entries;
   int                     num_entries;
@@ -103,16 +109,16 @@ static void _combo_close (_combo_private_t *wp, int focus) {
   if (wp->xwin) {
     if (focus)
       xitk_window_set_input_focus (wp->parent_wlist->xwin);
-    wp->browser_widget = NULL;
+    wp->iw[_W_browser] = NULL;
     xitk_unregister_event_handler (wp->w.wl->xitk, &wp->widget_key);
     xitk_window_destroy_window (wp->xwin);
     wp->xwin = NULL;
     if (focus) {
-      xitk_set_focus_to_widget (wp->button_widget);
-      xitk_button_set_state (wp->button_widget, 0);
+      xitk_set_focus_to_widget (wp->iw[_W_button]);
+      xitk_button_set_state (wp->iw[_W_button], 0);
     }
-    if (wp->button_widget)
-      wp->button_widget->type &= ~WIDGET_KEEP_FOCUS;
+    if (wp->iw[_W_button])
+      wp->iw[_W_button]->type &= ~WIDGET_KEEP_FOCUS;
   }
 }
 
@@ -139,7 +145,7 @@ static int combo_event (void *data, const xitk_be_event_t *e) {
         int  x, y;
         xitk_window_get_window_position (wp->xwin, &x, &y, NULL, NULL);
         if ((x != wp->win_x) || (y != wp->win_y))
-          xitk_combo_update_pos (wp->combo_widget);
+          xitk_combo_update_pos (wp->iw[_W_combo]);
       }
       return 1;
     default: ;
@@ -163,9 +169,9 @@ static void _combo_select (xitk_widget_t *w, void *data, int selected, int modif
   if (selected < 0)
     return;
   wp->selected = selected;
-  xitk_label_change_label (wp->label_widget, wp->entries[selected]);
+  xitk_label_change_label (wp->iw[_W_label], wp->entries[selected]);
   if (wp->callback)
-    wp->callback (wp->combo_widget, wp->userdata, selected);
+    wp->callback (wp->iw[_W_combo], wp->userdata, selected);
 }
 
 static void _combo_open (_combo_private_t *wp) {
@@ -176,8 +182,8 @@ static void _combo_open (_combo_private_t *wp) {
 
   itemh = 20;
   slidw = 12;
-  itemw = xitk_get_widget_width (wp->label_widget);
-  itemw += xitk_get_widget_width (wp->button_widget);
+  itemw = xitk_get_widget_width (wp->iw[_W_label]);
+  itemw += xitk_get_widget_width (wp->iw[_W_button]);
   itemw -= 2; /* space for border */
 
   wp->xwin = xitk_window_create_simple_window_ext (wp->w.wl->xitk,
@@ -208,22 +214,22 @@ static void _combo_open (_combo_private_t *wp) {
     browser.browser.max_displayed_entries = 5;
     browser.callback                      = _combo_select;
     browser.userdata                      = (void *)wp;
-    wp->browser_widget = xitk_noskin_browser_create (wp->widget_list, &browser,
+    wp->iw[_W_browser] = xitk_noskin_browser_create (wp->widget_list, &browser,
       1, 1, itemw, itemh, -slidw, DEFAULT_FONT_10);
-    xitk_dlist_add_tail (&wp->widget_list->list, &wp->browser_widget->node);
-    wp->browser_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
+    xitk_dlist_add_tail (&wp->widget_list->list, &wp->iw[_W_browser]->node);
+    wp->iw[_W_browser]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
   }
 
-  xitk_browser_update_list (wp->browser_widget,
+  xitk_browser_update_list (wp->iw[_W_browser],
     (const char * const *)wp->entries, NULL, wp->num_entries, 0);
   wp->sel2 = wp->selected;
-  xitk_browser_set_select (wp->browser_widget, wp->selected);
-  xitk_enable_and_show_widget (wp->browser_widget);
+  xitk_browser_set_select (wp->iw[_W_browser], wp->selected);
+  xitk_widgets_state (wp->iw + _W_browser, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
   wp->widget_key = xitk_be_register_event_handler ("xitk combo", wp->xwin, combo_event, wp, NULL, NULL);
 
-  if (wp->button_widget)
-    wp->button_widget->type |= WIDGET_KEEP_FOCUS;
+  if (wp->iw[_W_button])
+    wp->iw[_W_button]->type |= WIDGET_KEEP_FOCUS;
 }
 
 /*
@@ -252,29 +258,22 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
  */
 static void _combo_enability (_combo_private_t *wp) {
   if (wp->w.enable == WIDGET_ENABLE) {
-    xitk_enable_widget (wp->label_widget);
-    xitk_enable_widget (wp->button_widget);
+    /* label, button */
+    xitk_widgets_state (wp->iw + _W_label, 2, XITK_WIDGET_STATE_ENABLE, ~0u);
   } else {
     if (wp->xwin) {
-      xitk_button_set_state (wp->button_widget, 0);
-      _combo_rollunroll (wp->button_widget, (void *)wp, 0);
+      xitk_button_set_state (wp->iw[_W_button], 0);
+      _combo_rollunroll (wp->iw[_W_button], (void *)wp, 0);
     }
-    xitk_disable_widget (wp->label_widget);
-    xitk_disable_widget (wp->button_widget);
+    /* label, button */
+    xitk_widgets_state (wp->iw + _W_label, 2, XITK_WIDGET_STATE_ENABLE, 0);
   }
 }
 
 static void _combo_destroy (_combo_private_t *wp) {
   if (wp->xwin)
-    _combo_rollunroll (wp->button_widget, (void *)wp, 0);
-  if (wp->label_widget) {
-    xitk_destroy_widget (wp->label_widget);
-    wp->label_widget = NULL;
-  }
-  if (wp->button_widget) {
-    xitk_destroy_widget (wp->button_widget);
-    wp->button_widget = NULL;
-  }
+    _combo_rollunroll (wp->iw[_W_button], (void *)wp, 0);
+  xitk_widgets_delete (wp->iw + _W_label, 2);
   XITK_FREE (wp->entries);
   xitk_short_string_deinit (&wp->skin_element_name);
 }
@@ -283,23 +282,22 @@ static void _combo_destroy (_combo_private_t *wp) {
  *
  */
 static void _combo_paint (_combo_private_t *wp) {
+  unsigned int show = 0;
   if (wp->xwin && (wp->w.visible < 1)) {
-    xitk_button_set_state (wp->button_widget, 0);
-    _combo_rollunroll (wp->button_widget, (void *)wp, 0);
+    xitk_button_set_state (wp->iw[_W_button], 0);
+    _combo_rollunroll (wp->iw[_W_button], (void *)wp, 0);
   }
   if (wp->w.visible == 1) {
     int bx, lw;
 
-    lw = xitk_get_widget_width (wp->label_widget);
-    xitk_set_widget_pos (wp->label_widget, wp->w.x, wp->w.y);
+    lw = xitk_get_widget_width (wp->iw[_W_label]);
+    xitk_set_widget_pos (wp->iw[_W_label], wp->w.x, wp->w.y);
     bx = wp->w.x + lw;
-    xitk_set_widget_pos (wp->button_widget, bx, wp->w.y);
-    xitk_show_widget (wp->label_widget);
-    xitk_show_widget (wp->button_widget);
-  } else {
-    xitk_hide_widget (wp->label_widget);
-    xitk_hide_widget (wp->button_widget);
+    xitk_set_widget_pos (wp->iw[_W_button], bx, wp->w.y);
+    show = ~0u;
   }
+  /* label, button */
+  xitk_widgets_state (wp->iw + _W_label, 2, XITK_WIDGET_STATE_VISIBLE, show);
 }
 
 /*
@@ -316,22 +314,22 @@ static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) 
     wp->w.enable  = info ? info->enability : 0;
 
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
-    xitk_get_widget_pos (wp->label_widget, &x, &y);
+    xitk_get_widget_pos (wp->iw[_W_label], &x, &y);
 
     wp->w.x = x;
     wp->w.y = y;
 
-    x += xitk_get_widget_width (wp->label_widget);
+    x += xitk_get_widget_width (wp->iw[_W_label]);
 
-    (void)xitk_set_widget_pos (wp->button_widget, x, y);
+    (void)xitk_set_widget_pos (wp->iw[_W_button], x, y);
 
     xitk_skin_unlock (skonfig);
   }
 }
 
 static void _combo_tips_timeout (_combo_private_t *wp, unsigned long timeout) {
-  if (wp->label_widget)
-    xitk_set_widget_tips_and_timeout (wp->button_widget, wp->w.tips_string, timeout);
+  if (wp->iw[_W_label])
+    xitk_set_widget_tips_and_timeout (wp->iw[_W_button], wp->w.tips_string, timeout);
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -380,7 +378,7 @@ void xitk_combo_set_select(xitk_widget_t *w, int select) {
   if ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_COMBO) {
     if (wp->entries && wp->entries[select]) {
       wp->selected = select;
-      xitk_label_change_label (wp->label_widget, wp->entries[select]);
+      xitk_label_change_label (wp->iw[_W_label], wp->entries[select]);
     }
   }
 }
@@ -405,9 +403,9 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
 	wp->win_y = wi.y;
       }
 
-      xitk_get_widget_pos(wp->label_widget, &xx, &yy);
+      xitk_get_widget_pos(wp->iw[_W_label], &xx, &yy);
 
-      yy += xitk_get_widget_height(wp->label_widget);
+      yy += xitk_get_widget_height(wp->iw[_W_label]);
       wp->win_x += xx;
       wp->win_y += yy;
 
@@ -474,7 +472,7 @@ void xitk_combo_update_list(xitk_widget_t *w, const char *const *const list, int
     wp->selected    = -1;
 
     if (wp->xwin)
-      xitk_browser_update_list (wp->browser_widget,
+      xitk_browser_update_list (wp->iw[_W_browser],
         (const char* const*)wp->entries, NULL, wp->num_entries, 0);
   }
 }
@@ -496,7 +494,7 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   } else {
     wp->skin_element_name.s = NULL;
   }
-  wp->combo_widget      = &wp->w;
+  wp->iw[_W_combo]      = &wp->w;
   wp->parent_wlist      = wl;
   wp->parent_wkey       = c->parent_wkey;
   wp->callback          = c->callback;
@@ -506,7 +504,7 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->selected          = -1;
 
   if (wp->num_entries) {
-    xitk_label_change_label (wp->label_widget, entries[0]);
+    xitk_label_change_label (wp->iw[_W_label], entries[0]);
     wp->selected = 0;
   }
 
@@ -517,8 +515,8 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_COMBO;
   wp->w.event        = notify_event;
 
-  xitk_widget_set_focus_redirect (wp->label_widget, wp->button_widget);
-  xitk_widget_set_focus_redirect (&wp->w, wp->button_widget);
+  xitk_widget_set_focus_redirect (wp->iw[_W_label], wp->iw[_W_button]);
+  xitk_widget_set_focus_redirect (&wp->w, wp->iw[_W_button]);
 
   return &wp->w;
 }
@@ -546,33 +544,33 @@ xitk_widget_t *xitk_combo_create (xitk_widget_list_t *wl,
   lbl.skin_element_name = c->skin_element_name;
   lbl.callback          = NULL;
   lbl.userdata          = NULL;
-  if ((wp->label_widget = xitk_label_create (wl, skonfig, &lbl))) {
-    xitk_widget_set_parent (wp->label_widget, &wp->w);
-    wp->label_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
-    xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
+  if ((wp->iw[_W_label] = xitk_label_create (wl, skonfig, &lbl))) {
+    xitk_widget_set_parent (wp->iw[_W_label], &wp->w);
+    wp->iw[_W_label]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_label]->node);
   }
 
   b.skin_element_name = c->skin_element_name;
   b.callback          = NULL;
   b.state_callback    = _combo_rollunroll;
   b.userdata          = (void *)wp;
-  if ((wp->button_widget = xitk_button_create (wl, skonfig, &b))) {
-    xitk_widget_set_parent (wp->button_widget, &wp->w);
-    wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
-    xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
+  if ((wp->iw[_W_button] = xitk_button_create (wl, skonfig, &b))) {
+    xitk_widget_set_parent (wp->iw[_W_button], &wp->w);
+    wp->iw[_W_button]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
+    xitk_dlist_add_tail (&wl->list, &wp->iw[_W_button]->node);
   }
 
   {
     int x, y;
 
-    xitk_get_widget_pos(wp->label_widget, &x, &y);
+    xitk_get_widget_pos(wp->iw[_W_label], &x, &y);
 
     wp->w.x = x;
     wp->w.y = y;
 
-    x += xitk_get_widget_width(wp->label_widget);
+    x += xitk_get_widget_width(wp->iw[_W_label]);
 
-    (void) xitk_set_widget_pos(wp->button_widget, x, y);
+    (void) xitk_set_widget_pos(wp->iw[_W_button], x, y);
   }
   {
     const xitk_skin_element_info_t *info = xitk_skin_get_info (skonfig, c->skin_element_name);
@@ -615,11 +613,11 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
     lbl.label             = "";
     lbl.callback          = NULL;
     lbl.userdata          = NULL;
-    if ((wp->label_widget = xitk_noskin_label_create (wl, &lbl,
+    if ((wp->iw[_W_label] = xitk_noskin_label_create (wl, &lbl,
       x, y, (width - height), height, DEFAULT_FONT_10))) {
-      xitk_widget_set_parent (wp->label_widget, &wp->w);
-      wp->label_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
-      xitk_dlist_add_tail (&wl->list, &wp->label_widget->node);
+      xitk_widget_set_parent (wp->iw[_W_label], &wp->w);
+      wp->iw[_W_label]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
+      xitk_dlist_add_tail (&wl->list, &wp->iw[_W_label]->node);
     }
 
     b.skin_element_name = "XITK_NOSKIN_DOWN";
@@ -627,11 +625,11 @@ xitk_widget_t *xitk_noskin_combo_create (xitk_widget_list_t *wl,
     b.state_callback    = _combo_rollunroll;
     b.userdata          = (void *)wp;
 
-    if ((wp->button_widget = xitk_noskin_button_create (wl, &b,
+    if ((wp->iw[_W_button] = xitk_noskin_button_create (wl, &b,
       x + (width - height), y, height, height))) {
-      xitk_widget_set_parent (wp->button_widget, &wp->w);
-      wp->button_widget->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
-      xitk_dlist_add_tail (&wl->list, &wp->button_widget->node);
+      xitk_widget_set_parent (wp->iw[_W_button], &wp->w);
+      wp->iw[_W_button]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_COMBO;
+      xitk_dlist_add_tail (&wl->list, &wp->iw[_W_button]->node);
     }
 
     wp->w.x = x;
