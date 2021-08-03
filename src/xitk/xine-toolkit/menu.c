@@ -547,7 +547,7 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
 	xitk_labelbutton_change_shortcut_label (btn, me->menu_entry.shortcut, shortcutpos, DEFAULT_FONT_12);
 
       xitk_labelbutton_set_label_offset(btn, 20);
-      xitk_widgets_state (&btn, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_ENABLE, ~0u);
+      xitk_widgets_state (&btn, 1, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE, ~0u);
 
       yy += 20;
     }
