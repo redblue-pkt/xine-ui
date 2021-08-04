@@ -76,16 +76,6 @@ typedef struct _slider_private_s {
   }                       paddle_drawn_here;
 } _slider_private_t;
 
-static int _tabs_min (int a, int b) {
-  int d = b - a;
-  return a + (d & (d >> (8 * sizeof (d) - 1)));
-}
-
-static int _tabs_max (int a, int b) {
-  int d = a - b;
-  return a - (d & (d >> (8 * sizeof (d) - 1)));
-}
-
 static void _xitk_slider_update_skin (_slider_private_t *wp) {
   wp->hv_max_x = wp->w.width - wp->hv_w;
   if (wp->hv_max_x < 0)
@@ -249,10 +239,10 @@ static void _xitk_slider_paint_p (_slider_private_t *wp, widget_event_t *event) 
   int desty = wp->w.y + wp->paddle_drawn_here.y;
 
   if (event) {
-    int x1 = _tabs_max (destx, event->x);
-    int x2 = _tabs_min (destx + wp->paddle_drawn_here.w, event->x + event->width);
-    int y1 = _tabs_max (desty, event->y);
-    int y2 = _tabs_min (desty + wp->paddle_drawn_here.h, event->y + event->height);
+    int x1 = xitk_max (destx, event->x);
+    int x2 = xitk_min (destx + wp->paddle_drawn_here.w, event->x + event->width);
+    int y1 = xitk_max (desty, event->y);
+    int y2 = xitk_min (desty + wp->paddle_drawn_here.h, event->y + event->height);
 
     if ((x1 < x2) && (y1 < y2))
       xitk_part_image_draw (wp->w.wl, &wp->paddle_skin, NULL,

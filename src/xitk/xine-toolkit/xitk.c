@@ -320,14 +320,10 @@ static void *xitk_event_bridge_thread (void *data) {
         bewin = NULL;
         continue;
       }
-      if (event.x < fx->expose.x1)
-        fx->expose.x1 = event.x;
-      if (event.x + event.w > fx->expose.x2)
-        fx->expose.x2 = event.x + event.w;
-      if (event.y < fx->expose.y1)
-        fx->expose.y1 = event.y;
-      if (event.y + event.h > fx->expose.y2)
-        fx->expose.y2 = event.y + event.h;
+      fx->expose.x1 = xitk_min (fx->expose.x1, event.x);
+      fx->expose.x2 = xitk_max (fx->expose.x2, event.x + event.w);
+      fx->expose.y1 = xitk_min (fx->expose.y1, event.y);
+      fx->expose.y2 = xitk_max (fx->expose.y2, event.y + event.h);
       if (event.more > 0)
         continue;
       if (xitk->x.verbosity >= 2)

@@ -490,14 +490,10 @@ static void _browser_hull (_browser_private_t *wp) {
     xitk_widget_t *w = wp->visible.btns[i];
     if (!w)
       continue;
-    if (x1 > w->x)
-      x1 = w->x;
-    if (x2 < w->x + w->width)
-      x2 = w->x + w->width;
-    if (y1 > w->y)
-      y1 = w->y;
-    if (y2 < w->y + w->height)
-      y2 = w->y + w->height;
+    x1 = xitk_min (x1, w->x);
+    x2 = xitk_max (x2, w->x + w->width);
+    y1 = xitk_min (y1, w->y);
+    y2 = xitk_max (y2, w->y + w->height);
   }
   wp->w.x = x1;
   wp->w.width = x2 - x1;

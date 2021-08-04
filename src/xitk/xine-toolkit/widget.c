@@ -22,6 +22,8 @@
 #include "config.h"
 #endif
 
+#define XITK_WIDGET_C
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -815,45 +817,6 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
 /*
  * (re)paint the specified widget list.
  */
-static void _xitk_widget_to_hull (xitk_widget_t *w, xitk_hull_t *hull) {
-  hull->x1 = w->x;
-  hull->x2 = w->x + w->width;
-  hull->y1 = w->y;
-  hull->y2 = w->y + w->height;
-}
-static int _xitk_is_hull_in_hull (xitk_hull_t *h1, xitk_hull_t *h2) {
-  if (h1->x1 >= h2->x2)
-    return 0;
-  if (h1->x2 <= h2->x1)
-    return 0;
-  if (h1->y1 >= h2->y2)
-    return 0;
-  if (h1->y2 <= h2->y1)
-    return 0;
-  return 1;
-}
-#if 0
-static void _xitk_or_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
-  if (h1->x1 < h2->x1)
-    h2->x1 = h1->x1;
-  if (h1->x2 > h2->x2)
-    h2->x2 = h1->x2;
-  if (h1->y1 < h2->y1)
-    h2->y1 = h1->y1;
-  if (h1->y2 > h2->y2)
-    h2->y2 = h1->y2;
-}
-#endif
-static void _xitk_and_hulls (xitk_hull_t *h1, xitk_hull_t *h2) {
-  if (h1->x1 > h2->x1)
-    h2->x1 = h1->x1;
-  if (h1->x2 < h2->x2)
-    h2->x2 = h1->x2;
-  if (h1->y1 > h2->y1)
-    h2->y1 = h1->y1;
-  if (h1->y2 < h2->y2)
-    h2->y2 = h1->y2;
-}
 
 static int _xitk_widget_paint (xitk_widget_t *w, widget_event_t *e) {
   e->type = WIDGET_EVENT_PAINT;
@@ -883,35 +846,37 @@ int xitk_partial_paint_widget_list (xitk_widget_list_t *wl, xitk_hull_t *hull) {
   h = *hull;
 
   for (w = (xitk_widget_t *)wl->list.head.next; w->node.next; w = (xitk_widget_t *)w->node.next) {
-    xitk_hull_t wh;
     widget_event_t event;
 
-    _xitk_widget_to_hull (w, &wh);
     if ((w->enable != WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST)) {
       _xitk_widget_focus (w, &event, FOCUS_LOST);
-#if 0
-      _xitk_or_hulls (&wh, &h);
-#endif
-    } else if (_xitk_is_hull_in_hull (&wh, &h)) {
-      if (w->type & WIDGET_PARTIAL_PAINTABLE) {
-        _xitk_and_hulls (&h, &wh);
-      } else {
-#if 0
-        _xitk_or_hulls (&wh, &h);
-#endif
-        ;
-      }
     } else {
-      continue;
+      xitk_hull_t wh;
+
+      wh.x1 = xitk_max (w->x, h.x1);
+      wh.x2 = xitk_min (w->x + w->width, h.x2);
+      if (wh.x1 >= wh.x2)
+        continue;
+      wh.y1 = xitk_max (w->y, h.y1);
+      wh.y2 = xitk_min (w->y + w->height, h.y2);
+      if (wh.y1 >= wh.y2)
+        continue;
+      if (w->type & WIDGET_PARTIAL_PAINTABLE) {
+        event.x = wh.x1;
+        event.width = wh.x2 - wh.x1;
+        event.y = wh.y1;
+        event.height = wh.y2 - wh.y1;
+      } else {
+        event.x = w->x;
+        event.width = w->width;
+        event.y = w->y;
+        event.height = w->height;
+      }
+      event.type = WIDGET_EVENT_PAINT;
+      w->event (w, &event, NULL);
+      w->state.visible = w->visible;
+      n += 1;
     }
-    event.type = WIDGET_EVENT_PAINT;
-    event.x = wh.x1;
-    event.width = wh.x2 - wh.x1;
-    event.y = wh.y1;
-    event.height = wh.y2 - wh.y1;
-    w->event (w, &event, NULL);
-    w->state.visible = w->visible;
-    n += 1;
   }
   return n;
 }
@@ -1473,10 +1438,10 @@ int xitk_get_widget_height(xitk_widget_t *w) {
  * Set position of a widget.
  */
 int xitk_set_widget_pos(xitk_widget_t *w, int x, int y) {
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
+  /* do not warn here as this may be NULL intentionally,
+   * eg with optional sub widgets in an intbox. */
+  if (!w)
     return 0;
-  }
   if ((w->x == x) && (w->y == y))
     return 1;
   w->x = x;
@@ -2008,3 +1973,4 @@ void xitk_widget_set_focus_redirect (xitk_widget_t *w, xitk_widget_t *focus_redi
   xitk_widget_rel_join (&w->focus_redirect,
     focus_redirect && (focus_redirect->wl == w->wl) ? &focus_redirect->focus_redirect : NULL);
 }
+
