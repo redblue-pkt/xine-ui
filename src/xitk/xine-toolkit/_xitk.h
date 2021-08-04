@@ -35,6 +35,16 @@
 #include "libcommon.h"
 #include "xitk.h"
 
+static inline int xitk_min (int a, int b) {
+  int d = b - a;
+  return a + (d & (d >> (8 * sizeof (d) - 1)));
+}
+
+static inline int xitk_max (int a, int b) {
+  int d = a - b;
+  return a - (d & (d >> (8 * sizeof (d) - 1)));
+}
+
 typedef struct {
   uint32_t want, value;
   uint16_t r, g, b, a;
@@ -236,6 +246,13 @@ xitk_register_key_t xitk_set_focus_key (xitk_t *xitk, xitk_register_key_t key, i
  * Helper function to free widget list inside callbacks.
  */
 void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
+
+/* A few shortcuts for internal use. */
+#ifndef XITK_WIDGET_C
+#  define xitk_get_widget_width(w) ((w) ? (w)->width : 0)
+#  define xitk_get_widget_height(w) ((w) ? (w)->height : 0)
+#  define xitk_get_widget_pos(w,px,py) if (w) { *px = (w)->x; *py = (w)->y; } else { *px = 0; *py = 0; }
+#endif
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 /* text == NULL: just tell length.

@@ -55,16 +55,6 @@ typedef struct _tabs_private_s {
 
 } _tabs_private_t;
 
-static int _tabs_min (int a, int b) {
-  int d = b - a;
-  return a + (d & (d >> (8 * sizeof (d) - 1)));
-}
-
-static int _tabs_max (int a, int b) {
-  int d = a - b;
-  return a - (d & (d >> (8 * sizeof (d) - 1)));
-}
-
 static void _notify_destroy (_tabs_private_t *wp) {
   (void)wp;
 }
@@ -150,13 +140,18 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
   widget_event_t ne;
   int x1, x2, y1, y2;
 
+  /* We have up to 2 partly visible tabs here. They are marked invisible
+   * to stop engine from painting too much of them. Instead, switch them
+   * visible temporarily and relay the clipped group paint event to them
+   * manually here. */
+
   if (wp->lgap > 0) do {
-    x1 = _tabs_max (event->x, wp->w.x);
-    x2 = _tabs_min (event->x + event->width, wp->w.x + wp->lgap);
+    x1 = xitk_max (event->x, wp->w.x);
+    x2 = xitk_min (event->x + event->width, wp->w.x + wp->lgap);
     if (x1 >= x2)
       break;
-    y1 = _tabs_max (event->y, wp->w.y);
-    y2 = _tabs_min (event->y + event->height, wp->w.y + wp->w.height);
+    y1 = xitk_max (event->y, wp->w.y);
+    y2 = xitk_min (event->y + event->height, wp->w.y + wp->w.height);
     if (y1 >= y2)
       break;
     ne.x = x1;
@@ -170,12 +165,12 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
   } while (0);
 
   if (wp->rgap > 0) do {
-    x1 = _tabs_max (event->x, wp->w.x + wp->w.width - 40 - wp->rgap);
-    x2 = _tabs_min (event->x + event->width, wp->w.x + wp->w.width - 40);
+    x1 = xitk_max (event->x, wp->w.x + wp->w.width - 40 - wp->rgap);
+    x2 = xitk_min (event->x + event->width, wp->w.x + wp->w.width - 40);
     if (x1 >= x2)
       break;
-    y1 = _tabs_max (event->y, wp->w.y);
-    y2 = _tabs_min (event->y + event->height, wp->w.y + wp->w.height);
+    y1 = xitk_max (event->y, wp->w.y);
+    y2 = xitk_min (event->y + event->height, wp->w.y + wp->w.height);
     if (y1 >= y2)
       break;
     ne.x = x1;
