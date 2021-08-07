@@ -67,17 +67,15 @@ typedef struct {
 
 /** Create the list browser */
 xitk_widget_t *xitk_browser_create (xitk_widget_list_t *wl,
-  xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
+  xitk_skin_config_t *skonfig, const xitk_browser_widget_t *b);
 /** Create the list browser with generic skin.
  *  If slider width is < 0, sliders and move buttons appear if needed only
  *  within (itemw) x (itemh * br->browser.max_displayed_entries).
  *  NOTE: this does not yet re-evaluate with xitk_browser_update_list ().
  *  If slider width is 0, movement will be keyboard and mouse wheel only. */
 xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl,
-  xitk_browser_widget_t *br,
+  const xitk_browser_widget_t *br,
   int x, int y, int itemw, int itemh, int slidw, const char *font_name);
-/** Redraw buttons/slider */
-void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
 /** Update the list, and rebuild button list */
 void xitk_browser_update_list (xitk_widget_t *w, const char *const *list, const char *const *shortcut, int len, int start);
 /** Return the current selected button (if not, return -1) */

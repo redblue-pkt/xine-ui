@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "_xitk.h"
 #include "xitkintl.h"
 #include "button_list.h"
 #include "widget.h"
@@ -258,7 +259,7 @@ static void xitk_button_list_new_skin (xitk_button_list_t *bl, xitk_skin_config_
 
 static void xitk_button_list_able (xitk_button_list_t *bl) {
   int e, m;
-  m = bl->w.enable == WIDGET_ENABLE ? 1 : 0;
+  m = (bl->w.state & XITK_WIDGET_STATE_ENABLE) ? 1 : 0;
   if ((bl->flags & 1) == m)
     return;
   bl->flags ^= 1;
@@ -343,8 +344,7 @@ xitk_widget_t *xitk_button_list_new (
   bl->w.x = bl->x = info ? info->x : 0;
   bl->w.y = bl->y = info ? info->y : 0;
   bl->w.type = WIDGET_GROUP | WIDGET_TYPE_BUTTON_LIST;
-  bl->w.enable = info ? info->enability : 1;
-  bl->w.visible = info ? info->visibility : 1;
+  xitk_widget_state_from_info (&bl->w, info);
   bl->w.event = xitk_button_list_event;
 
   bl->add_here = (xitk_widget_t *)widget_list->list.tail.prev;

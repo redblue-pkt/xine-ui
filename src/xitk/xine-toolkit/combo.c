@@ -257,7 +257,7 @@ static void _combo_rollunroll (xitk_widget_t *w, void *data, int state) {
  *
  */
 static void _combo_enability (_combo_private_t *wp) {
-  if (wp->w.enable == WIDGET_ENABLE) {
+  if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
     /* label, button */
     xitk_widgets_state (wp->iw + _W_label, 2, XITK_WIDGET_STATE_ENABLE, ~0u);
   } else {
@@ -283,11 +283,11 @@ static void _combo_destroy (_combo_private_t *wp) {
  */
 static void _combo_paint (_combo_private_t *wp) {
   unsigned int show = 0;
-  if (wp->xwin && (wp->w.visible < 1)) {
+  if (wp->xwin && !(wp->w.state & XITK_WIDGET_STATE_VISIBLE)) {
     xitk_button_set_state (wp->iw[_W_button], 0);
     _combo_rollunroll (wp->iw[_W_button], (void *)wp, 0);
   }
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int bx, lw;
 
     lw = xitk_get_widget_width (wp->iw[_W_label]);
@@ -310,8 +310,7 @@ static void _combo_new_skin (_combo_private_t *wp, xitk_skin_config_t *skonfig) 
 
     xitk_skin_lock (skonfig);
 
-    wp->w.visible = info ? (info->visibility ? 1 : -1) : 0;
-    wp->w.enable  = info ? info->enability : 0;
+    xitk_widget_state_from_info (&wp->w, info);
 
     xitk_set_widget_pos (&wp->w, wp->w.x, wp->w.y);
     xitk_get_widget_pos (wp->iw[_W_label], &x, &y);
@@ -508,8 +507,9 @@ static xitk_widget_t *_combo_create (xitk_widget_list_t *wl, xitk_combo_widget_t
     wp->selected = 0;
   }
 
-  wp->w.enable         = enable;
-  wp->w.visible        = visible;
+  wp->w.state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  wp->w.state |= visible ? XITK_WIDGET_STATE_VISIBLE : 0;
+  wp->w.state |= enable ? XITK_WIDGET_STATE_ENABLE : 0;
 
   //  wp->w.x = wp->w.y = wp->w.width = wp->w.height = 0;
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_COMBO;

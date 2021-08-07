@@ -266,7 +266,7 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
     printf ("xitk.label.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (wp->w.visible && wp->w.width && wp->label_visible) {
+  if ((wp->w.state & XITK_WIDGET_STATE_VISIBLE) && wp->w.width && wp->label_visible) {
     xitk_image_t *font = (xitk_image_t *) wp->font;
 
     /* non skinable widget */
@@ -319,7 +319,7 @@ static void *xitk_label_animation_loop (void *data) {
 
     if (wp->anim_running != 1)
       break;
-    if ((wp->w.visible == 1) && wp->pix_font) {
+    if ((wp->w.state & XITK_WIDGET_STATE_VISIBLE) && wp->pix_font) {
       widget_event_t event;
 
       event.x = wp->w.x;
@@ -433,16 +433,14 @@ static void _label_new_skin (_label_private_t *wp, xitk_skin_config_t *skonfig) 
           wp->w.width     = wp->pix_font->char_width * wp->length;
           wp->w.height    = wp->pix_font->char_height;
         }
-        wp->w.visible     = info->visibility ? 1 : -1;
-        wp->w.enable      = info->enability;
+        xitk_widget_state_from_info (&wp->w, info);
         _label_setup_label (wp, 1);
       } else {
         wp->w.x           = 0;
         wp->w.y           = 0;
         wp->w.width       = 0;
         wp->w.height      = 0;
-        wp->w.visible     = -1;
-        wp->w.enable      = 0;
+        wp->w.state      &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
         wp->label_visible = 0;
         wp->length        = 0;
         wp->animation     = 0;
@@ -595,8 +593,7 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
     wp->w.y           = 0;
     wp->w.width       = 0;
     wp->w.height      = 0;
-    wp->w.visible     = -1;
-    wp->w.enable      = 0;
+    wp->w.state      &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     wp->label_visible = 0;
     wp->length        = 0;
     wp->animation     = 0;
@@ -628,8 +625,7 @@ xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl, xitk_skin_config_t *sk
     wp->w.height = wp->pix_font->char_height;
   }
 
-  wp->w.enable  = info->enability;
-  wp->w.visible = info->visibility ? info->visibility : -1;
+  xitk_widget_state_from_info (&wp->w, info);
   wp->w.x       = info->x;
   wp->w.y       = info->y;
 
@@ -651,8 +647,7 @@ xitk_widget_t *xitk_noskin_label_create (xitk_widget_list_t *wl,
     return NULL;
 
   wp->skin_element_name.s = NULL;
-  wp->w.enable  = 0;
-  wp->w.visible = 0;
+  wp->w.state    &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.x       = x;
   wp->w.y       = y;
   wp->w.height  = height;

@@ -706,7 +706,7 @@ void xitk_menu_show_menu (xitk_widget_t *w) {
     return;
 
   wp->parent = xitk_get_focus_key (wp->xitk);
-  wp->w.visible = 1;
+  wp->w.state |= XITK_WIDGET_STATE_VISIBLE;
   _menu_open (&wp->root, wp->x, wp->y);
   xitk_set_current_menu (wp->xitk, &wp->w);
 }
@@ -756,7 +756,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
         xitk_menu_add_entry (&wp->w, me);
   }
 
-  wp->w.visible       = 0;
+  wp->w.state &= ~XITK_WIDGET_STATE_VISIBLE;
   wp->w.event         = menu_notify_event;
 
   return &wp->w;

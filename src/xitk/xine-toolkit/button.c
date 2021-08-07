@@ -64,7 +64,7 @@ static xitk_image_t *_button_get_skin (_button_private_t *wp, int sk) {
  *
  */
 static int _button_inside (_button_private_t *wp, int x, int y) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     xitk_image_t *skin = wp->skin.image;
 
     return xitk_image_inside (skin, x + wp->skin.x - wp->w.x, y + wp->skin.y - wp->w.y);
@@ -79,9 +79,10 @@ static void _button_paint (_button_private_t *wp, widget_event_t *event) {
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.button.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
-  if (wp->w.visible) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     xitk_img_state_t state = xitk_image_find_state (wp->s5 ? XITK_IMG_STATE_DISABLED_SELECTED : XITK_IMG_STATE_SELECTED,
-      wp->w.enable, (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), wp->bClicked, wp->bState);
+      (wp->w.state & XITK_WIDGET_STATE_ENABLE), (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN),
+      wp->bClicked, wp->bState);
 
     xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
       (int)state * wp->w.width + event->x - wp->w.x, event->y - wp->w.y,
@@ -92,12 +93,12 @@ static void _button_paint (_button_private_t *wp, widget_event_t *event) {
 
 static void _button_read_skin (_button_private_t *wp, xitk_skin_config_t *skonfig) {
   const xitk_skin_element_info_t *s = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
+
+  xitk_widget_state_from_info (&wp->w, s);
   if (s) {
     wp->skin      = s->pixmap_img;
     wp->w.x       = s->x;
     wp->w.y       = s->y;
-    wp->w.enable  = s->enability;
-    wp->w.visible = s->visibility ? 1 : -1;
   } else {
     wp->skin.x      = 0;
     wp->skin.y      = 0;
@@ -106,8 +107,6 @@ static void _button_read_skin (_button_private_t *wp, xitk_skin_config_t *skonfi
     wp->skin.image  = NULL;
     wp->w.x         = 0;
     wp->w.y         = 0;
-    wp->w.enable    = 0;
-    wp->w.visible   = -1;
   }
 }
 
@@ -412,9 +411,7 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   wp->skin.y        = 0;
   wp->skin.width    = i->width;
   wp->skin.height   = i->height;
-  wp->w.enable = 0;
-  wp->w.visible = 0;
+  wp->w.state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   return _xitk_button_create (wp, &_b);
 }
-

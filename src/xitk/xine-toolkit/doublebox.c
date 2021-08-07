@@ -55,7 +55,7 @@ typedef struct {
 } _doublebox_private_t;
 
 static void _db_enability (_doublebox_private_t *wp) {
-  xitk_widgets_state (wp->iw + _W_input, 3, XITK_WIDGET_STATE_ENABLE, (wp->w.enable == WIDGET_ENABLE) ? ~0u : 0);
+  xitk_widgets_state (wp->iw + _W_input, 3, XITK_WIDGET_STATE_ENABLE, (wp->w.state & XITK_WIDGET_STATE_ENABLE));
 }
 
 /*
@@ -71,7 +71,7 @@ static void _db_destroy (_doublebox_private_t *wp) {
  */
 static void _db_paint (_doublebox_private_t *wp) {
   unsigned int show = 0;
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int bx, ih, iw;
     iw = xitk_get_widget_width (wp->iw[_W_input]);
     ih = xitk_get_widget_height (wp->iw[_W_input]);
@@ -265,8 +265,7 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
   wp->w.y          = y;
   wp->w.width      = width;
   wp->w.height     = height;
-  wp->w.enable     = 0;
-  wp->w.visible    = 0;
+  wp->w.state     &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.type         = WIDGET_GROUP | WIDGET_TYPE_DOUBLEBOX;
   wp->w.event        = notify_event;
 

@@ -147,11 +147,11 @@ static void _ib_set_slider (_intbox_private_t *wp) {
   wp->hv.v.visible = 0;
   wp->hv.v.max = 0;
   xitk_slider_hv_sync (wp->iw[_W_slider], &wp->hv,
-    wp->w.visible ? XITK_SLIDER_SYNC_SET_AND_PAINT : XITK_SLIDER_SYNC_SET);
+    (wp->w.state & XITK_WIDGET_STATE_VISIBLE) ? XITK_SLIDER_SYNC_SET_AND_PAINT : XITK_SLIDER_SYNC_SET);
 }
 
 static void _ib_enability (_intbox_private_t *wp) {
-  xitk_widgets_state (wp->iw + _W_input, 4, XITK_WIDGET_STATE_ENABLE, (wp->w.enable == WIDGET_ENABLE) ? ~0u : 0);
+  xitk_widgets_state (wp->iw + _W_input, 4, XITK_WIDGET_STATE_ENABLE, (wp->w.state & XITK_WIDGET_STATE_ENABLE));
 }
 
 /*
@@ -167,7 +167,7 @@ static void _ib_destroy (_intbox_private_t *wp) {
  */
 static void _ib_paint (_intbox_private_t *wp) {
   unsigned int show = 0;
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     xitk_set_widget_pos (wp->iw[_W_input], wp->w.x, wp->w.y);
     xitk_set_widget_pos (wp->iw[_W_more], wp->w.x + wp->input_width, wp->w.y);
     xitk_set_widget_pos (wp->iw[_W_less], wp->w.x + wp->input_width, wp->w.y + wp->w.height - wp->pm_width);
@@ -396,8 +396,7 @@ xitk_widget_t *xitk_noskin_intbox_create (xitk_widget_list_t *wl,
   wp->w.y        = y;
   wp->w.width    = width;
   wp->w.height   = height;
-  wp->w.enable   = 0;
-  wp->w.visible  = 0;
+  wp->w.state   &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.type     = WIDGET_GROUP | WIDGET_TYPE_INTBOX;
   wp->w.event    = notify_event;
 

@@ -103,8 +103,15 @@ struct xitk_widget_s {
   int                    height;
 
   uint32_t               type;
-  int                    enable;
-  int                    visible;
+
+  /* XITK_WIDGET_STATE_* */
+  uint32_t               state;
+  /* xitk_show_widgets () restores the state before xitk_hide_widgets (). */
+  uint32_t               saved_state;
+  /* internal use, to avoid double paint. */
+#define XITK_WIDGET_STATE_UNSET 0x80000000
+  uint32_t               shown_state;
+
   widget_focus_t         have_focus;
 
   widget_event_notify_t  event;
@@ -113,11 +120,6 @@ struct xitk_widget_s {
   char                  *tips_string;
 
   void                  *private_data;
-
-  struct {
-    int                  enable;
-    int                  visible;
-  }                      state;
 };
 
 struct xitk_widget_list_s {
