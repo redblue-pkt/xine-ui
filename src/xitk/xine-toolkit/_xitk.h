@@ -79,12 +79,6 @@ struct xitk_s {
 #define BUFSIZ 8192
 #endif
 
-#undef  MAX
-#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
-
-#undef  MIN
-#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
-
 #if defined(__GNUC__) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
 #define XITK_DIE(FMT, ARGS...)                                        \
   do {                                                                \
@@ -253,6 +247,21 @@ void xitk_widget_list_defferred_destroy(xitk_widget_list_t *wl);
 #  define xitk_get_widget_height(w) ((w) ? (w)->height : 0)
 #  define xitk_get_widget_pos(w,px,py) if (w) { *px = (w)->x; *py = (w)->y; } else { *px = 0; *py = 0; }
 #endif
+#ifndef XITK_WINDOW_C
+#  define xitk_window_get_background_image(_w) ((_w) ? (_w)->bg_image : NULL)
+#  define xitk_window_set_input_focus(_w) xitk_window_flags (_w, XITK_WINF_FOCUS, XITK_WINF_FOCUS)
+#endif
+#ifndef _XITK_C_
+#  define xitk_get_display_size(xitk,pw,ph) *(pw) = (xitk)->d->width, *(ph) = (xitk)->d->height
+#  define xitk_get_wm_type(xitk) ((xitk)->d->wm_type)
+#endif
+
+#define xitk_widget_state_from_info(_w,info) do { \
+  (_w)->state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE); \
+  (_w)->state |= (info) && (info)->visibility ? XITK_WIDGET_STATE_VISIBLE : 0; \
+  (_w)->state |= (info) && (info)->enability ? XITK_WIDGET_STATE_ENABLE : 0; \
+  (_w)->saved_state = (_w)->state; \
+} while (0)
 
 void xitk_clipboard_unregister_widget (xitk_widget_t *w);
 /* text == NULL: just tell length.

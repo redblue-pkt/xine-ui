@@ -540,7 +540,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string (xitk_t *xitk,
 
   /* If default resp. left aligned, we may shrink the image */
   if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
-    width = MIN(maxw, width);
+    width = xitk_min (width, maxw);
 
   image = xitk_image_new (xitk, NULL, 0, width + 2 * pad_x, (height + add_line_spc) * numlines - add_line_spc + 2 * pad_y);
   if (!image)
@@ -1910,7 +1910,7 @@ static int _xitk_image_event (xitk_widget_t *w, widget_event_t *event, widget_ev
     return 0;
   switch (event->type) {
     case WIDGET_EVENT_PAINT:
-      if (wp->w.visible == 1)
+      if (wp->w.state & XITK_WIDGET_STATE_VISIBLE)
         xitk_part_image_draw (wp->w.wl, &wp->skin, NULL,
           event->x - wp->w.x, event->y - wp->w.y, event->width, event->height,
           event->x, event->y);
@@ -1956,8 +1956,7 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
   wp->skin_element_name = strdup (im->skin_element_name);
 
   wp->skin       = info->pixmap_img;
-  wp->w.enable   = 0;
-  wp->w.visible  = 0;
+  wp->w.state   &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.x        = info->x;
   wp->w.y        = info->y;
   wp->w.width    = wp->skin.width;
@@ -1989,8 +1988,7 @@ xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
   wp->skin.y      = 0;
   wp->skin.width  = image ? image->width : 0;
   wp->skin.height = image ? image->height : 0;
-  wp->w.enable   = 0;
-  wp->w.visible  = 0;
+  wp->w.state   &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.x        = x;
   wp->w.y        = y;
   wp->w.width    = wp->skin.width;

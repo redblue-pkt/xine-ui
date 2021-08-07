@@ -346,7 +346,7 @@ static xitk_image_t *_get_skin (_inputtext_private_t *wp, int sk) {
  */
 static int _notify_inside (_inputtext_private_t *wp, int x, int y) {
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
       xitk_image_t *skin = wp->skin.image;
 
       return xitk_image_inside (skin, wp->skin.x + x - wp->w.x, wp->skin.y + y - wp->w.y);
@@ -371,7 +371,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INPUTTEXT)
     return;
 
-  if (wp->w.visible != 1) {
+  if (!(wp->w.state & XITK_WIDGET_STATE_VISIBLE)) {
     if (wp->cursor_focus)
       _cursor_focus (wp, 0);
     return;
@@ -580,7 +580,7 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
     if (wp->w.have_focus == FOCUS_LOST)
       wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;
 
-    if (wp->w.enable && !wp->cursor_focus)
+  if ((wp->w.state & XITK_WIDGET_STATE_ENABLE) && !wp->cursor_focus)
       _cursor_focus (wp, 1);
 
     {
@@ -615,11 +615,11 @@ static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
         _cursor_focus (wp, 0);
         break;
       case FOCUS_MOUSE_IN:
-        if (wp->w.enable)
+        if (wp->w.state & XITK_WIDGET_STATE_ENABLE)
           _cursor_focus (wp, 1);
         break;
       case FOCUS_RECEIVED:
-        if (wp->w.enable)
+        if (wp->w.state & XITK_WIDGET_STATE_ENABLE)
           wp->text.cursor_pos = 0;
         break;
       default: ;
@@ -636,8 +636,7 @@ static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_conf
   if (s) {
     wp->w.x = s->x;
     wp->w.y = s->y;
-    wp->w.enable = s->enability;
-    wp->w.visible = s->visibility ? 1 : -1;
+    xitk_widget_state_from_info (&wp->w, s);
     xitk_short_string_set (&wp->fontname, s->label_fontname);
     strlcpy (wp->color[_IT_NORMAL], s->label_color, sizeof (wp->color[_IT_NORMAL]));
     strlcpy (wp->color[_IT_FOCUS], s->label_color_focus, sizeof (wp->color[_IT_FOCUS]));
@@ -1182,8 +1181,7 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   wp->w.x = x;
   wp->w.y = y;
 
-  wp->w.enable   = 0;
-  wp->w.visible  = 0;
+  wp->w.state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_short_string_init (&wp->fontname);
   xitk_short_string_set (&wp->fontname, fontname);

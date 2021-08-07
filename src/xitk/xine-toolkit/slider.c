@@ -216,7 +216,7 @@ static xitk_image_t *_xitk_slider_get_skin (_slider_private_t *wp, int sk) {
  *
  */
 static int _xitk_slider_inside (_slider_private_t *wp, int x, int y) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     if (wp->bar_mode == 1) {
       return xitk_image_inside (wp->paddle_skin.image, wp->paddle_skin.x + x - wp->w.x, wp->paddle_skin.y + y - wp->w.y);
     } else {
@@ -256,7 +256,7 @@ static void _xitk_slider_paint_p (_slider_private_t *wp, widget_event_t *event) 
 }
 
 static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int    paddle_x, paddle_width;
 
     paddle_width = wp->hv_w;
@@ -284,7 +284,7 @@ static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event)
         event->x, event->y);
     }
 
-    if (wp->w.enable == WIDGET_ENABLE) {
+    if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       {
         int x, y;
         x = wp->hv_info.h.max - wp->hv_info.h.visible;
@@ -330,7 +330,7 @@ static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event)
 }
 
 static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int    paddle_x, paddle_width, paddle_height;
 
     paddle_width = wp->button_width;
@@ -359,7 +359,7 @@ static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) 
         event->x, event->y);
     }
 
-    if (wp->w.enable == WIDGET_ENABLE) {
+    if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       int xcenter = wp->bg_skin.width >> 1;
       int ycenter = wp->bg_skin.height >> 1;
       double angle = wp->angle;
@@ -384,7 +384,7 @@ static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) 
 }
 
 static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int    paddle_x, paddle_width, paddle_height;
 
     paddle_width = wp->button_width;
@@ -429,7 +429,7 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) 
         event->x, event->y);
     }
 
-    if (wp->w.enable == WIDGET_ENABLE) {
+    if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       if (wp->bar_mode == 1) {
         wp->paddle_drawn_here.w  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.width);
         wp->paddle_drawn_here.x = 0;
@@ -454,7 +454,7 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) 
 }
 
 static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) {
-  if (wp->w.visible == 1) {
+  if (wp->w.state & XITK_WIDGET_STATE_VISIBLE) {
     int    paddle_x, paddle_width, paddle_height;
 
     paddle_width = wp->button_width;
@@ -501,7 +501,7 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) 
         event->x, event->y);
     }
 
-    if (wp->w.enable == WIDGET_ENABLE) {
+    if (wp->w.state & XITK_WIDGET_STATE_ENABLE) {
       if (wp->bar_mode == 1) {
         wp->paddle_drawn_here.h  = (int)wp->value / ((wp->upper - wp->lower) / wp->bg_skin.height);
         wp->paddle_drawn_here.y =
@@ -549,8 +549,7 @@ static void _xitk_slider_set_skin (_slider_private_t *wp, xitk_skin_config_t *sk
   if (s && s->pixmap_img.image && s->slider_pixmap_pad_img.image) {
     wp->w.x         = s->x;
     wp->w.y         = s->y;
-    wp->w.enable    = s->enability;
-    wp->w.visible   = s->visibility ? 1 : -1;
+    xitk_widget_state_from_info (&wp->w, s);
     wp->sType       = s->slider_type;
     wp->radius      = s->slider_radius;
     wp->bg_skin     = s->pixmap_img;
@@ -558,8 +557,7 @@ static void _xitk_slider_set_skin (_slider_private_t *wp, xitk_skin_config_t *sk
   } else {
     wp->w.x         = 0;
     wp->w.y         = 0;
-    wp->w.enable    = 0;
-    wp->w.visible   = -1;
+    wp->w.state    &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     wp->sType       = XITK_VSLIDER;
     wp->radius      = 8;
     wp->bg_skin.x      = 0;
@@ -653,7 +651,7 @@ static int _xitk_slider_focus (_slider_private_t *wp, int focus) {
 static int _xitk_slider_key (_slider_private_t *wp, const char *string, int modifier) {
   int v, dx, dy;
 
-  if ((wp->w.enable != WIDGET_ENABLE) || !string)
+  if (!(wp->w.state & XITK_WIDGET_STATE_ENABLE) || !string)
     return 0;
 
   if (string[0] != XITK_CTRL_KEY_PREFIX)
@@ -1179,10 +1177,10 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
 
   wp->sType = type;
   _xitk_slider_set_paint (wp);
-  wp->w.enable = 0;
-  wp->w.visible = 0;
+  wp->w.state &= ~(XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   wp->w.x = x;
   wp->w.y = y;
 
   return _xitk_slider_create (wp, s);
 }
+
