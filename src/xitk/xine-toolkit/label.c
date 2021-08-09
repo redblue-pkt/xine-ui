@@ -41,8 +41,6 @@ typedef struct {
 
   xitk_pix_font_t        *pix_font;
 
-  widget_focus_t          have_focus;
-
   int                     length;      /* length in char */
   xitk_image_t           *font, *highlight_font;
   size_t                  label_len;
@@ -82,10 +80,6 @@ static int _find_pix_font_char (xitk_pix_font_t *pf, xitk_point_t *found, int th
   return 1;
 }
 
-static int _label_is_hili (int have_focus) {
-  return (have_focus == FOCUS_MOUSE_IN) | (have_focus == FOCUS_RECEIVED);
-}
-
 static void _create_label_pixmap (_label_private_t *wp) {
   xitk_image_t          *font;
   xitk_pix_font_t       *pix_font;
@@ -94,7 +88,7 @@ static void _create_label_pixmap (_label_private_t *wp) {
   int                    len, anim_add = 0;
   uint16_t               buf[2048];
 
-  font = _label_is_hili (wp->have_focus) && wp->highlight_font ? wp->highlight_font : wp->font;
+  font = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)) && wp->highlight_font ? wp->highlight_font : wp->font;
   wp->anim_offset = 0;
 
   if (!font->pix_font) {
@@ -290,18 +284,15 @@ static void _label_paint (_label_private_t *wp, widget_event_t *event) {
       return;
     }
     else if (wp->pix_font) {
-      if (wp->w.have_focus != wp->have_focus) {
-        if ((_label_is_hili (wp->w.have_focus) ^ _label_is_hili (wp->have_focus)) && wp->highlight_font) {
-          wp->have_focus = wp->w.have_focus;
+      if (((wp->w.state ^ wp->w.shown_state) & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS))) {
+        if (wp->highlight_font)
           _create_label_pixmap (wp);
-        } else {
-          wp->have_focus = wp->w.have_focus;
-        }
       }
       xitk_image_draw_image (wp->w.wl, wp->labelpix,
         wp->anim_offset + event->x - wp->w.x, event->y - wp->w.y,
         event->width, event->height,
         event->x, event->y, wp->anim_running);
+      wp->w.shown_state = wp->w.state;
     }
   }
 }
@@ -330,6 +321,7 @@ static void *xitk_label_animation_loop (void *data) {
       if (wp->anim_offset >= (wp->pix_font->char_width * ((int)wp->label_len + 5)))
         wp->anim_offset = 0;
       _label_paint (wp, &event);
+      wp->w.shown_state = wp->w.state;
     }
     t_anim = wp->anim_timer;
     pthread_mutex_unlock (&wp->change_mutex);
@@ -397,6 +389,7 @@ static void _label_setup_label (_label_private_t *wp, int paint) {
     event.width = wp->w.width;
     event.height = wp->w.height;
     _label_paint (wp, &event);
+    wp->w.shown_state = wp->w.state;
   }
   pthread_mutex_unlock (&wp->change_mutex);
 }
@@ -518,9 +511,6 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
         pthread_mutex_unlock (&wp->change_mutex);
       }
       break;
-    case WIDGET_EVENT_FOCUS:
-      wp->w.have_focus = event->focus;
-      return 1;
     case WIDGET_EVENT_CLICK:
       return _label_click (wp, event->button, event->button_pressed, event->x, event->y);
     case WIDGET_EVENT_CHANGE_SKIN:
@@ -548,7 +538,6 @@ static xitk_widget_t *_label_create (_label_private_t *wp, const xitk_label_widg
   wp->userdata = l->userdata;
 
   wp->anim_running = 0;
-  wp->have_focus   = FOCUS_LOST;
 
   pthread_mutex_init (&wp->change_mutex, NULL);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -35,7 +35,7 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl, xitk_skin_config_t *s
 xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl, const xitk_button_widget_t *b,
   int x, int y, int width, int height);
 /** get/set on/off state */
-int xitk_button_get_state (xitk_widget_t *w);
-int xitk_button_set_state (xitk_widget_t *w, int state);
+#define xitk_button_get_state(w) (!!(xitk_widgets_state (&(w), 1, 0, 0) & XITK_WIDGET_STATE_ON))
+#define xitk_button_set_state(w,on) xitk_widgets_state (&(w), 1, XITK_WIDGET_STATE_ON, (on) ? ~0u : 0)
 
 #endif

@@ -634,11 +634,19 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
 xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 #endif
 
+/* xitk_add_widget (): keep state as is */
 #define XITK_WIDGET_STATE_KEEP (~0u)
+/* widget responds to user input */
 #define XITK_WIDGET_STATE_ENABLE 1
+/* widget is shown */
 #define XITK_WIDGET_STATE_VISIBLE 2
+/* left mouse button held on this */
+#define XITK_WIDGET_STATE_CLICK 4
+/* widget is "on" (radio button etc.) */
+#define XITK_WIDGET_STATE_ON 8
 void xitk_add_widget (xitk_widget_list_t *wl, xitk_widget_t *wi, unsigned int flags);
-void xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state);
+/* returns the new state of last done widget. */
+unsigned int xitk_widgets_state (xitk_widget_t * const *w, unsigned int n, unsigned int mask, unsigned int state);
 void xitk_widgets_delete (xitk_widget_t **w, unsigned int n);
 #define xitk_destroy_widget(w) do {xitk_widget_t *__w = w; xitk_widgets_delete (&(__w), 1); } while (0)
 
@@ -978,3 +986,4 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
+

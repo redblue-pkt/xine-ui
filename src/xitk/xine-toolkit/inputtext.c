@@ -64,8 +64,6 @@ typedef struct {
   xitk_string_callback_t  callback;
   void                   *userdata;
 
-  int                     have_focus;
-
   struct {
     char                 *buf;
     xitk_part_image_t     temp_img;
@@ -371,6 +369,12 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   if ((wp->w.type & WIDGET_TYPE_MASK) != WIDGET_TYPE_INPUTTEXT)
     return;
 
+  if ((wp->w.state ^ wp->w.shown_state) & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)) {
+    _cursor_focus (wp, !!(wp->w.state & XITK_WIDGET_STATE_MOUSE));
+    if ((wp->w.state ^ wp->w.shown_state) & XITK_WIDGET_STATE_FOCUS)
+      wp->text.cursor_pos = (wp->w.state & XITK_WIDGET_STATE_FOCUS) ? 0 : -1;
+  }
+
   if (!(wp->w.state & XITK_WIDGET_STATE_VISIBLE)) {
     if (wp->cursor_focus)
       _cursor_focus (wp, 0);
@@ -384,7 +388,7 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   xsize = wp->skin.width / 2;
   ysize = wp->skin.height;
 
-  state = (wp->w.have_focus == FOCUS_RECEIVED) || (wp->have_focus == FOCUS_MOUSE_IN) ? _IT_FOCUS : _IT_NORMAL;
+  state = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)) ? _IT_FOCUS : _IT_NORMAL;
 
   /* Try to load font */
 
@@ -566,6 +570,7 @@ static void _paint_inputtext (_inputtext_private_t *wp) {
   event.width = wp->w.width;
   event.height = wp->w.height;
   _paint_partial_inputtext (wp, &event);
+  wp->w.shown_state = wp->w.state;
 }
 
 /*
@@ -577,10 +582,10 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
     return 0;
 
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->w.have_focus == FOCUS_LOST)
-      wp->w.have_focus = wp->have_focus = FOCUS_RECEIVED;
+    if (!(wp->w.state & XITK_WIDGET_STATE_FOCUS))
+      wp->w.state |= XITK_WIDGET_STATE_FOCUS;
 
-  if ((wp->w.state & XITK_WIDGET_STATE_ENABLE) && !wp->cursor_focus)
+    if ((wp->w.state & XITK_WIDGET_STATE_ENABLE) && !wp->cursor_focus)
       _cursor_focus (wp, 1);
 
     {
@@ -596,35 +601,6 @@ static int _notify_click_inputtext (_inputtext_private_t *wp, int button, int bU
     _paint_inputtext (wp);
   }
 
-  return 1;
-}
-
-/*
- * Handle motion on input text box.
- */
-static int _notify_focus_inputtext (_inputtext_private_t *wp, int focus) {
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    if (wp->have_focus == focus)
-      return 1;
-    wp->have_focus = focus;
-    switch (focus) {
-      case FOCUS_LOST:
-        wp->text.cursor_pos = -1;
-        /* fall through */
-      case FOCUS_MOUSE_OUT:
-        _cursor_focus (wp, 0);
-        break;
-      case FOCUS_MOUSE_IN:
-        if (wp->w.state & XITK_WIDGET_STATE_ENABLE)
-          _cursor_focus (wp, 1);
-        break;
-      case FOCUS_RECEIVED:
-        if (wp->w.state & XITK_WIDGET_STATE_ENABLE)
-          wp->text.cursor_pos = 0;
-        break;
-      default: ;
-    }
-  }
   return 1;
 }
 
@@ -851,11 +827,10 @@ static void _inputtext_move_right (_inputtext_private_t *wp) {
  * Remove focus of widget, then call callback function.
  */
 static void _inputtext_exec_return (_inputtext_private_t *wp) {
-  wp->text.cursor_pos   = -1;
-  wp->w.have_focus = wp->have_focus = FOCUS_LOST;
-  //  wl->widget_focused = NULL;
-  _cursor_focus (wp, 0);
+  wp->text.cursor_pos = -1;
+  wp->w.state &= ~(XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS);
   _paint_inputtext (wp);
+  wp->w.shown_state = wp->w.state;
 
   if (wp->text.buf && wp->text.buf[0]) {
     if (wp->callback)
@@ -868,10 +843,9 @@ static void _inputtext_exec_return (_inputtext_private_t *wp) {
  */
 static void _inputtext_exec_escape (_inputtext_private_t *wp) {
   wp->text.cursor_pos = -1;
-  wp->w.have_focus = wp->have_focus = FOCUS_LOST;
-  wp->w.wl->widget_focused = NULL;
-  _cursor_focus (wp, 0);
+  wp->w.state &= ~(XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS);
   _paint_inputtext (wp);
+  wp->w.shown_state = wp->w.state;
 }
 
 /*
@@ -922,8 +896,6 @@ static void _inputtext_transpose_chars (_inputtext_private_t *wp) {
  * Handle keyboard event in input text box.
  */
 static int _inputtext_key (_inputtext_private_t *wp, const char *s, int modifier) {
-  wp->have_focus = FOCUS_RECEIVED;
-
   if (!s)
     return 0;
   if (!s[0])
@@ -1033,9 +1005,6 @@ static int notify_event (xitk_widget_t *w, widget_event_t *event, widget_event_r
       return 0;
     case WIDGET_EVENT_CLICK:
       return _notify_click_inputtext (wp, event->button, event->button_pressed, event->x, event->y);
-    case WIDGET_EVENT_FOCUS:
-      _notify_focus_inputtext (wp, event->focus);
-      return 1;
     case WIDGET_EVENT_KEY:
       return _inputtext_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_INSIDE:
