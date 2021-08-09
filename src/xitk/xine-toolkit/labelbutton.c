@@ -35,11 +35,7 @@ typedef struct {
 
   int                     num_gfx;
   int                     bType;
-  int                     bClicked;
 
-  int                     focus;
-
-  int                     bState;
   xitk_part_image_t       skin;
   xitk_part_image_t       temp_image;
 
@@ -223,9 +219,13 @@ static void _labelbutton_partial_paint (_lbutton_private_t *wp, widget_event_t *
 #ifdef XITK_PAINT_DEBUG
   printf ("xitk.labelbutton.paint (%d, %d, %d, %d).\n", event->x, event->y, event->width, event->height);
 #endif
+  if ((wp->bType != RADIO_BUTTON) && (wp->bType != TAB_BUTTON))
+    wp->w.state &= ~XITK_WIDGET_STATE_ON;
   if ((wp->w.state & XITK_WIDGET_STATE_VISIBLE) && wp->skin.width) {
-    xitk_img_state_t state = xitk_image_find_state (XITK_IMG_STATE_SEL_FOCUS, (wp->w.state & XITK_WIDGET_STATE_ENABLE),
-      (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN), wp->bClicked, wp->bState);
+    xitk_img_state_t state = xitk_image_find_state (XITK_IMG_STATE_SEL_FOCUS,
+      (wp->w.state & XITK_WIDGET_STATE_ENABLE),
+      (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS)),
+      (wp->w.state & XITK_WIDGET_STATE_CLICK), (wp->w.state & XITK_WIDGET_STATE_ON));
 
     xitk_part_image_copy (wp->w.wl, &wp->skin, &wp->temp_image,
       ((int)state >= wp->num_gfx ? wp->num_gfx - 1 : (int)state) * wp->skin.width / wp->num_gfx,
@@ -250,6 +250,7 @@ static void _labelbutton_paint (_lbutton_private_t *wp) {
   event.width = wp->w.width;
   event.height = wp->w.height;
   _labelbutton_partial_paint (wp, &event);
+  wp->w.shown_state = wp->w.state;
 }
 
 /*
@@ -260,19 +261,20 @@ static int _labelbutton_click (_lbutton_private_t *wp, int button, int bUp, int 
   (void)y;
   if (button != 1)
     return 0;
-  wp->bClicked = !bUp;
-  if (bUp && (wp->focus == FOCUS_RECEIVED)) {
+  wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
+  wp->w.state |= bUp ? 0 : XITK_WIDGET_STATE_CLICK;
+  if (bUp && (wp->w.state & XITK_WIDGET_STATE_FOCUS)) {
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      wp->bState = !wp->bState;
+      wp->w.state ^= XITK_WIDGET_STATE_ON;
       _labelbutton_paint (wp);
       if (wp->state_callback)
-        wp->state_callback (&wp->w, wp->userdata, wp->bState, modifier);
+        wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), modifier);
       return 1;
     }
     if (wp->bType == CLICK_BUTTON) {
       _labelbutton_paint (wp);
       if (wp->callback)
-        wp->callback (&wp->w, wp->userdata, wp->bState);
+        wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
       return 1;
     }
   }
@@ -290,7 +292,7 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
   };
   int i, n = sizeof (k) / sizeof (k[0]);
 
-  if (wp->focus != FOCUS_RECEIVED)
+  if (!(wp->w.state & XITK_WIDGET_STATE_FOCUS))
     return 0;
   if (!s)
     return 0;
@@ -305,21 +307,19 @@ static int _labelbutton_key (_lbutton_private_t *wp, const char *s, int modifier
   if (i >= n)
     return 0;
 
-  wp->bClicked = 0;
-  if (wp->focus == FOCUS_RECEIVED) {
+  wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
+  {
     /* as always, do callback last -- it may modify or even delete us. */
     if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      wp->bState = !wp->bState;
+      wp->w.state ^= XITK_WIDGET_STATE_ON;
       _labelbutton_paint (wp);
       if (wp->state_callback)
-        wp->state_callback (&wp->w, wp->userdata, wp->bState, modifier);
+        wp->state_callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON), modifier);
     } else if (wp->bType == CLICK_BUTTON) {
       _labelbutton_paint (wp);
       if (wp->callback)
-        wp->callback (&wp->w, wp->userdata, wp->bState);
+        wp->callback (&wp->w, wp->userdata, !!(wp->w.state & XITK_WIDGET_STATE_ON));
     }
-  } else {
-    _labelbutton_paint (wp);
   }
   return 1;
 }
@@ -388,14 +388,6 @@ const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w) {
     && (wp->w.type & (WIDGET_GROUP_MENU | WIDGET_GROUP_BROWSER)))
     return wp->shortcut_label.s;
   return NULL;
-}
-
-/*
- * Handle focus on button
- */
-static int _labelbutton_focus (_lbutton_private_t *wp, int focus) {
-  wp->focus = focus;
-  return 1;
 }
 
 /*
@@ -477,9 +469,6 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       return _labelbutton_click (wp, event->button, event->button_pressed, event->x, event->y, event->modifier);
     case WIDGET_EVENT_KEY:
       return _labelbutton_key (wp, event->string, event->modifier);
-    case WIDGET_EVENT_FOCUS:
-      _labelbutton_focus (wp, event->focus);
-      break;
     case WIDGET_EVENT_INSIDE:
       return _labelbutton_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
@@ -497,20 +486,6 @@ static int labelbutton_event (xitk_widget_t *w, widget_event_t *event, widget_ev
     default: ;
   }
   return 0;
-}
-
-/*
- * Return state (ON/OFF) if button is radio button, otherwise -1
- */
-int xitk_labelbutton_get_state (xitk_widget_t *w) {
-  _lbutton_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON))
-      return wp->bState;
-  }
-  return -1;
 }
 
 /*
@@ -568,36 +543,6 @@ int xitk_labelbutton_get_label_offset (xitk_widget_t *w) {
   return 0;
 }
 
-/*
- * Set radio button to state 'state'
- */
-void xitk_labelbutton_set_state (xitk_widget_t *w, int state) {
-  _lbutton_private_t *wp;
-
-  xitk_container (wp, w, w);
-  if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    if ((wp->bType == RADIO_BUTTON) || (wp->bType == TAB_BUTTON)) {
-      if (xitk_labelbutton_get_state (&wp->w) != state) {
-#if 0 /* FIXME: user will hardly ever see this flash?? */
-        int focus = wp->focus, clk = wp->bClicked;
-
-        wp->focus = FOCUS_RECEIVED;
-        wp->bClicked = 1;
-        wp->bState = state;
-        _labelbutton_paint (wp);
-
-        wp->focus = focus;
-        wp->bClicked = clk;
-        _labelbutton_paint (wp);
-#else
-        wp->bState = state;
-        _labelbutton_paint (wp);
-#endif
-      }
-    }
-  }
-}
-
 void *labelbutton_get_user_data (xitk_widget_t *w) {
   _lbutton_private_t *wp;
 
@@ -624,9 +569,6 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
 
   wp->num_gfx           = 3;
   wp->bType             = b->button_type;
-  wp->bClicked          = 0;
-  wp->focus             = FOCUS_LOST;
-  wp->bState            = 0;
 
   wp->callback          = b->callback;
   wp->state_callback    = b->state_callback;
@@ -723,9 +665,6 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
     return NULL;
 
   wp->bType             = b->button_type;
-  wp->bClicked          = 0;
-  wp->focus             = FOCUS_LOST;
-  wp->bState            = 0;
 
   wp->callback          = b->callback;
   wp->state_callback    = b->state_callback;

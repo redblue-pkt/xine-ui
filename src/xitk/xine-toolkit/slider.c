@@ -40,8 +40,6 @@ typedef struct _slider_private_s {
 
   void                    (*paint) (struct _slider_private_s *wp, widget_event_t *event);
   int                     sType;
-  int                     bClicked;
-  int                     focus;
 
   float                   angle;
   float                   percentage;
@@ -260,8 +258,8 @@ static void _xitk_slider_paint_hv (_slider_private_t *wp, widget_event_t *event)
     int    paddle_x, paddle_width;
 
     paddle_width = wp->hv_w;
-    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
-             ? (wp->bClicked ? 2 : 1)
+    paddle_x = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS))
+             ? ((wp->w.state & XITK_WIDGET_STATE_CLICK) ? 2 : 1)
              : 0;
     paddle_x *= paddle_width;
 
@@ -335,8 +333,8 @@ static void _xitk_slider_paint_r (_slider_private_t *wp, widget_event_t *event) 
 
     paddle_width = wp->button_width;
     paddle_height = wp->paddle_skin.height;
-    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
-             ? (wp->bClicked ? 2 : 1)
+    paddle_x = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS))
+             ? ((wp->w.state & XITK_WIDGET_STATE_CLICK) ? 2 : 1)
              : 0;
     paddle_x *= paddle_width;
 
@@ -389,8 +387,8 @@ static void _xitk_slider_paint_h (_slider_private_t *wp, widget_event_t *event) 
 
     paddle_width = wp->button_width;
     paddle_height = wp->paddle_skin.height;
-    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
-             ? (wp->bClicked ? 2 : 1)
+    paddle_x = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS))
+             ? ((wp->w.state & XITK_WIDGET_STATE_CLICK) ? 2 : 1)
              : 0;
     paddle_x *= paddle_width;
 
@@ -459,8 +457,8 @@ static void _xitk_slider_paint_v (_slider_private_t *wp, widget_event_t *event) 
 
     paddle_width = wp->button_width;
     paddle_height = wp->paddle_skin.height;
-    paddle_x = (wp->focus == FOCUS_RECEIVED) || (wp->focus == FOCUS_MOUSE_IN)
-             ? (wp->bClicked ? 2 : 1)
+    paddle_x = (wp->w.state & (XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS))
+             ? ((wp->w.state & XITK_WIDGET_STATE_CLICK) ? 2 : 1)
              : 0;
     paddle_x *= paddle_width;
 
@@ -605,7 +603,7 @@ static void _xitk_slider_new_skin (_slider_private_t *wp, xitk_skin_config_t *sk
  */
 static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x, int y) {
   if (button == 1) {
-    if (wp->focus == FOCUS_RECEIVED) {
+    if (wp->w.state & XITK_WIDGET_STATE_FOCUS) {
       int moved, value;
 
       if (wp->sType == XITK_HVSLIDER) {
@@ -617,18 +615,20 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
         value = wp->value;
       }
 
-      if (bUp == 0) {
-        if (moved || !wp->bClicked) {
-          wp->bClicked = 1;
+      if (!bUp) {
+        if (moved || !(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
+          wp->w.state |= XITK_WIDGET_STATE_CLICK;
           wp->paint (wp, NULL);
+          wp->w.shown_state = wp->w.state;
         }
         /* Exec motion callback function (if available) */
         if (moved && wp->motion_callback)
           wp->motion_callback (&wp->w, wp->motion_userdata, value);
-      } else if (bUp == 1) {
-        if (moved || wp->bClicked) {
-          wp->bClicked = 0;
+      } else {
+        if (moved || (wp->w.state & XITK_WIDGET_STATE_CLICK)) {
+          wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
           wp->paint (wp, NULL);
+          wp->w.shown_state = wp->w.state;
         }
         if (wp->callback)
           wp->callback (&wp->w, wp->userdata, value);
@@ -637,15 +637,6 @@ static int _xitk_slider_click (_slider_private_t *wp, int button, int bUp, int x
     return 1;
   }
   return 0;
-}
-
-/*
- * Got focus
- */
-static int _xitk_slider_focus (_slider_private_t *wp, int focus) {
-  if (!wp->bClicked)
-    wp->focus = focus;
-  return 1;
 }
 
 static int _xitk_slider_key (_slider_private_t *wp, const char *string, int modifier) {
@@ -778,9 +769,6 @@ static int xitk_slider_event (xitk_widget_t *w, widget_event_t *event, widget_ev
       return _xitk_slider_key (wp, event->string, event->modifier);
     case WIDGET_EVENT_CLICK:
       return _xitk_slider_click (wp, event->button, event->button_pressed, event->x, event->y);
-    case WIDGET_EVENT_FOCUS:
-      _xitk_slider_focus (wp, event->focus);
-      return 0;
     case WIDGET_EVENT_INSIDE:
       return _xitk_slider_inside (wp, event->x, event->y) ? 1 : 2;
     case WIDGET_EVENT_CHANGE_SKIN:
@@ -810,7 +798,7 @@ int xitk_slider_make_step(xitk_widget_t *w) {
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     v = xitk_slider_get_pos (&wp->w);
-    if (!wp->bClicked) {
+    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
       int m = xitk_slider_get_max (&wp->w);
       if (v < m) {
         v += wp->step;
@@ -833,7 +821,7 @@ int xitk_slider_make_backstep(xitk_widget_t *w) {
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     v = xitk_slider_get_pos (&wp->w);
-    if (!wp->bClicked) {
+    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
       int m = xitk_slider_get_min (&wp->w);
       if (v > m) {
         v -= wp->step;
@@ -901,7 +889,7 @@ void xitk_slider_reset (xitk_widget_t *w) {
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     _xitk_slider_update_value (wp, 0.0);
-    wp->bClicked = 0;
+    wp->w.state &= ~XITK_WIDGET_STATE_CLICK;
     wp->paint (wp, NULL);
   }
 }
@@ -914,7 +902,7 @@ void xitk_slider_set_to_max (xitk_widget_t *w) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if (!wp->bClicked) {
+    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
       _xitk_slider_update_value (wp, wp->upper);
       wp->paint (wp, NULL);
     }
@@ -945,7 +933,7 @@ void xitk_slider_set_pos (xitk_widget_t *w, int pos) {
 
   xitk_container (wp, w, w);
   if (wp && ((wp->w.type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    if (!wp->bClicked) {
+    if (!(wp->w.state & XITK_WIDGET_STATE_CLICK)) {
       if (wp->sType == XITK_HVSLIDER) {
         if (wp->hv_max_y > 0) {
           pos = (int)wp->upper - pos;
@@ -1041,9 +1029,6 @@ void xitk_slider_hv_sync (xitk_widget_t *w, xitk_slider_hv_t *info, xitk_slider_
  * Create the widget
  */
 static xitk_widget_t *_xitk_slider_create (_slider_private_t *wp, xitk_slider_widget_t *s) {
-  wp->bClicked           = 0;
-  wp->focus              = FOCUS_LOST;
-
   wp->angle              = 0.0;
 
   wp->upper              = (float)((s->min == s->max) ? s->max + 1 : s->max);
@@ -1183,4 +1168,3 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
 
   return _xitk_slider_create (wp, s);
 }
-

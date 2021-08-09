@@ -56,9 +56,9 @@ int xitk_labelbutton_change_shortcut_label (xitk_widget_t *w, const char *string
 const char *xitk_labelbutton_get_label (xitk_widget_t *w);
 const char *xitk_labelbutton_get_shortcut_label (xitk_widget_t *w);
 /** * Get state of button 'widget'. */
-int xitk_labelbutton_get_state (xitk_widget_t *w);
+#define xitk_labelbutton_get_state(w) (!!(xitk_widgets_state (&(w), 1, 0, 0) & XITK_WIDGET_STATE_ON))
 /** Set state of button 'widget'. */
-void xitk_labelbutton_set_state (xitk_widget_t *, int selected);
+#define xitk_labelbutton_set_state(w,on) xitk_widgets_state (&(w), 1, XITK_WIDGET_STATE_ON, (on) ? ~0u : 0)
 /** Return used font name */
 char *xitk_labelbutton_get_fontname (xitk_widget_t *w);
 /** Set label button alignment */

@@ -347,18 +347,30 @@ static void _browser_hide_set_pos (_browser_private_t *wp) {
 }
 
 static void _browser_show (_browser_private_t *wp) {
+  uint32_t state[MAX_VISIBLE], t;
   int i;
+
+  t = wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   for (i = 0; i < wp->visible.num; i++) {
     int v = wp->visible.i2v[i];
     if (wp->visible.xmax)
       xitk_labelbutton_set_label_offset (wp->visible.btns[v + _W_items], -wp->visible.dx);
-    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
-    xitk_labelbutton_set_state (wp->visible.btns[v + _W_items], i == wp->items.selected - wp->visible.start);
+    state[v] = t;
   }
+  t &= ~XITK_WIDGET_STATE_ENABLE;
   for (; i < wp->visible.max; i++) {
     int v = wp->visible.i2v[i];
-    xitk_widgets_state (wp->visible.btns + _W_items + v, 1, XITK_WIDGET_STATE_VISIBLE, ~0u);
+    state[v] = t;
   }
+  if ((wp->items.selected >= wp->visible.start) && (wp->items.selected < wp->visible.start + wp->visible.num))
+    state[wp->visible.i2v[wp->items.selected - wp->visible.start]] |= XITK_WIDGET_STATE_ON;
+  if ((wp->items.last_over >= wp->visible.start) && (wp->items.last_over < wp->visible.start + wp->visible.num))
+    state[wp->visible.i2v[wp->items.last_over - wp->visible.start]] |= wp->w.state & XITK_WIDGET_STATE_FOCUS;
+
+  for (i = 0; i < wp->visible.max; i++)
+    xitk_widgets_state (wp->visible.btns + _W_items + i, 1,
+      XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_MOUSE | XITK_WIDGET_STATE_FOCUS,
+      state[i]);
 }
 
 static void _browser_set_label (_browser_private_t *wp, int start, int num) {
@@ -405,15 +417,10 @@ static void _browser_move (_browser_private_t *wp, int by) {
   _browser_show (wp);
 }
 
-static void _browser_paint (_browser_private_t *wp) {
-  unsigned int show = (wp->w.state & XITK_WIDGET_STATE_VISIBLE) ? ~0u : 0;
-  xitk_widgets_state (wp->visible.btns, _W_items + wp->visible.max, XITK_WIDGET_STATE_VISIBLE, show);
-}
-
 static int _browser_get_focus (_browser_private_t *wp) {
   int i;
   for (i = 0; i < wp->visible.num; i++) {
-    if (wp->visible.btns[i + _W_items] == wp->w.wl->widget_focused)
+    if (wp->visible.btns[_W_items + i] && (wp->visible.btns[_W_items + i]->state & XITK_WIDGET_STATE_FOCUS))
       return i;
   }
   return -1;
@@ -430,58 +437,30 @@ static int _browser_get_current_item (_browser_private_t *wp, int *have_focus) {
   }
 }
 
-static void _browser_set_focus (_browser_private_t *wp, int visible) {
-  if (wp->w.wl->widget_focused != wp->visible.btns[visible + _W_items]) {
-    widget_event_t event;
-    if (wp->w.wl->widget_focused) {
-      if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
-        (wp->w.wl->widget_focused->state & XITK_WIDGET_STATE_ENABLE)) {
-        event.type = WIDGET_EVENT_FOCUS;
-        event.focus = FOCUS_LOST;
-        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-        wp->w.wl->widget_focused->have_focus = FOCUS_LOST;
-      }
-      event.type = WIDGET_EVENT_PAINT;
-      event.x = wp->w.wl->widget_focused->x;
-      event.y = wp->w.wl->widget_focused->y;
-      event.width = wp->w.wl->widget_focused->width;
-      event.height = wp->w.wl->widget_focused->height;
-      wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-    }
-    if (visible < 0) {
-      wp->w.wl->widget_focused = NULL;
-    } else {
-      wp->w.wl->widget_focused = wp->visible.btns[visible + _W_items];
-      if (wp->w.wl->widget_focused) {
-        if ((wp->w.wl->widget_focused->type & WIDGET_FOCUSABLE) &&
-          (wp->w.wl->widget_focused->state & XITK_WIDGET_STATE_ENABLE)) {
-          event.type = WIDGET_EVENT_FOCUS;
-          event.focus = FOCUS_RECEIVED;
-          wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-          wp->w.wl->widget_focused->have_focus = FOCUS_RECEIVED;
-        }
-        event.type = WIDGET_EVENT_PAINT;
-        event.x = wp->w.wl->widget_focused->x;
-        event.y = wp->w.wl->widget_focused->y;
-        event.width = wp->w.wl->widget_focused->width;
-        event.height = wp->w.wl->widget_focused->height;
-        wp->w.wl->widget_focused->event (wp->w.wl->widget_focused, &event, NULL);
-      }
-    }
-  }
-}
+static void _browser_paint (_browser_private_t *wp) {
+  unsigned int d = wp->w.state ^ wp->w.shown_state, t;
 
-static void _browser_focus (_browser_private_t *wp, int type) {
-  if (type == FOCUS_LOST) {
-    wp->w.have_focus = FOCUS_LOST;
-    wp->items.last_over = _browser_visible_2_item (wp, _browser_get_focus (wp));
-    _browser_set_focus (wp, -1);
-  } else if (type == FOCUS_RECEIVED) {
-    int item = wp->items.last_over >= 0 ? wp->items.last_over
-             : wp->items.selected >= 0 ? wp->items.selected : 0;
-    wp->w.have_focus = FOCUS_RECEIVED;
-    _browser_set_focus (wp, _browser_item_2_visible (wp, item));
+  if (!d)
+    return;
+
+  if (d & XITK_WIDGET_STATE_FOCUS) {
+    if (wp->w.state & XITK_WIDGET_STATE_FOCUS) {
+      int i = wp->items.last_over >= 0 ? wp->items.last_over
+            : wp->items.selected >= 0 ? wp->items.selected : 0;
+
+      if ((i < wp->visible.start) || (i >= wp->visible.start + wp->visible.num))
+        i = wp->visible.start + (wp->visible.num >> 1);
+      wp->items.last_over = i;
+    } else {
+      wp->items.last_over = _browser_visible_2_item (wp, _browser_get_focus (wp));
+    }
   }
+
+  t = wp->w.state & (XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
+  xitk_widgets_state (wp->visible.btns, _W_items,
+    XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE | XITK_WIDGET_STATE_FOCUS, t);
+  _browser_show (wp);
+  wp->w.shown_state = wp->w.state;
 }
 
 static void _browser_item_btns (_browser_private_t *wp, const xitk_skin_element_info_t *info) {
@@ -675,11 +654,9 @@ static int _browser_warp_jump (_browser_private_t *wp, const char *key, int modi
     return 0;
   }
 
+  wp->items.last_over = i;
   _browser_move (wp, i - (wp->visible.max >> 1) - wp->visible.start);
   _browser_set_vslider (wp);
-  wp->items.last_over = i;
-  v = _browser_item_2_visible (wp, i);
-  _browser_set_focus (wp, v);
 
   return 1;
 }
@@ -757,12 +734,9 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
           v = 0;
       }
     _key_move:
+      wp->items.last_over = v;
       _browser_move (wp, v - (wp->visible.max >> 1) - wp->visible.start);
       _browser_set_vslider (wp);
-      wp->items.last_over = v;
-      v = _browser_item_2_visible (wp, v);
-      if (f)
-        _browser_set_focus (wp, v);
       return 1;
 
     case XITK_MOUSE_WHEEL_UP:
@@ -771,9 +745,9 @@ static int _browser_key (_browser_private_t *wp, const char *string, int modifie
     case XITK_MOUSE_WHEEL_DOWN:
       v = 1;
     _mouse_move:
+      wp->items.last_over = -1;
       _browser_move (wp, v);
       _browser_set_vslider (wp);
-      wp->items.last_over = -1;
       return 1;
 
     default: ;
@@ -796,9 +770,6 @@ static int browser_notify_event (xitk_widget_t *w, widget_event_t *event, widget
       break;
     case WIDGET_EVENT_KEY:
       return _browser_key (wp, event->string, event->modifier);
-    case WIDGET_EVENT_FOCUS:
-      _browser_focus (wp, event->focus);
-      break;
     case WIDGET_EVENT_DESTROY:
       _browser_notify_destroy (wp);
       break;
@@ -1293,4 +1264,3 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl, const xitk_br
   wp->skonfig = NULL;
   return _xitk_browser_create (wp, br);
 }
-

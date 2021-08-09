@@ -26,13 +26,6 @@
 
 #include <xine/sorted_array.h>
 
-typedef enum {
-  FOCUS_LOST = 0,
-  FOCUS_RECEIVED,
-  FOCUS_MOUSE_IN,
-  FOCUS_MOUSE_OUT
-} widget_focus_t;
-
 #define LBUTTON_DOWN   0
 #define LBUTTON_UP     1
 
@@ -41,9 +34,8 @@ typedef enum {
 typedef struct {
   enum {
     WIDGET_EVENT_NONE = 0,
-    WIDGET_EVENT_PAINT,        /** << paint specified portion, or whole widget if that is not supported */
+    WIDGET_EVENT_PAINT,        /** << check for state change, paint specified portion, or whole widget if that is not supported */
     WIDGET_EVENT_CLICK,        /** << return 0 (not hit), 1 (hit) */
-    WIDGET_EVENT_FOCUS,
     WIDGET_EVENT_KEY,          /** << return 0 (pass again to further candidates), 1 (handled finally here) */
     WIDGET_EVENT_INSIDE,       /** << return 0 (unsupported??), 1 (yes), 2 (no) */
     WIDGET_EVENT_CHANGE_SKIN,
@@ -61,8 +53,6 @@ typedef struct {
   int                   button;          /** << CLICK */
 
   int                   modifier;        /** << CLICK, KEY */
-
-  widget_focus_t        focus;           /** << FOCUS */
 
   unsigned long         tips_timeout;    /** << TIPS_TIMEOUT */
 
@@ -105,14 +95,14 @@ struct xitk_widget_s {
   uint32_t               type;
 
   /* XITK_WIDGET_STATE_* */
+#define XITK_WIDGET_STATE_MOUSE 0x10000
+#define XITK_WIDGET_STATE_FOCUS 0x20000
   uint32_t               state;
   /* xitk_show_widgets () restores the state before xitk_hide_widgets (). */
   uint32_t               saved_state;
-  /* internal use, to avoid double paint. */
+  /* detect state changes, and avoid double paint. */
 #define XITK_WIDGET_STATE_UNSET 0x80000000
   uint32_t               shown_state;
-
-  widget_focus_t         have_focus;
 
   widget_event_notify_t  event;
 
@@ -145,4 +135,3 @@ void xitk_widget_set_parent (xitk_widget_t *w, xitk_widget_t *parent);
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward, int modifier);
 
 #endif
-
