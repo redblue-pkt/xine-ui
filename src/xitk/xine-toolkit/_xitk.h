@@ -151,15 +151,6 @@ void menu_auto_pop(xitk_widget_t *w);
 int xitk_get_bool_value(const char *val);
 
 typedef struct {
-  int                               red;
-  int                               green;
-  int                               blue;
-  char                              colorname[20];
-} xitk_color_names_t;
-
-xitk_color_names_t *xitk_get_color_name (xitk_color_names_t *cn, const char *color);
-
-typedef struct {
   int                               width;
   int                               height;
   int                               chars_per_row;

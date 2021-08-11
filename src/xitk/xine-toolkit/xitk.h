@@ -103,6 +103,16 @@ typedef struct {
 xitk_cfg_parse_t *xitk_cfg_parse (char *contents, int flags);
 void xitk_cfg_unparse (xitk_cfg_parse_t *tree);
 
+uint32_t xitk_str2uint32 (const char **str);
+
+/* supports some real names, "#rrggbb", "0xrrggbb".
+ * returns (red << 16) | (green << 8) | blue, or ~0u. */
+uint32_t xitk_get_color_name (const char *color);
+/* special color values for xitk_*_noskin_create () */
+#define XITK_NOSKIN_DEFAULT   0x80000000
+#define XITK_NOSKIN_TEXT_NORM 0x80000001
+#define XITK_NOSKIN_TEXT_INV  0x80000002
+
 typedef struct xitk_s xitk_t;
 
 typedef struct xitk_widget_s xitk_widget_t;
@@ -480,7 +490,9 @@ typedef enum {
   XITK_SHM_ENABLE,
   XITK_MENU_SHORTCUTS_ENABLE,
   XITK_BLACK_COLOR,
+  XITK_DISABLED_BLACK_COLOR,
   XITK_WHITE_COLOR,
+  XITK_DISABLED_WHITE_COLOR,
   XITK_BG_COLOR,
   XITK_FOCUS_COLOR,
   XITK_SELECT_COLOR,
@@ -986,4 +998,3 @@ void xitk_window_restore_window_cursor(xitk_window_t *w);
 int xitk_clipboard_set_text (xitk_widget_t *w, const char *text, int text_len);
 
 #endif
-

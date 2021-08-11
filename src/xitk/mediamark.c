@@ -3097,19 +3097,19 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     y = 34 - 6;
     w = WINDOW_WIDTH - 30;
     mmkedit->ident = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
-      x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+      x + 10, y + 16, w - 20, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
     xitk_add_widget (mmkedit->widget_list, mmkedit->ident, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (mmkedit->ident, _("Mediamark Identifier"));
 
     y += 45 + 3;
     mmkedit->mrl = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
-      x + 10, y + 16, w - 20, 20, "Black", "Black", fontname);
+      x + 10, y + 16, w - 20, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
     xitk_add_widget (mmkedit->widget_list, mmkedit->mrl, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (mmkedit->mrl, _("Mediamark Mrl"));
 
     y += 45 + 3;
     mmkedit->sub = xitk_noskin_inputtext_create (mmkedit->widget_list, &inp,
-      x + 10, y + 16, w - 20 - 100 - 10, 20, "Black", "Black", fontname);
+      x + 10, y + 16, w - 20 - 100 - 10, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
     xitk_add_widget (mmkedit->widget_list, mmkedit->sub, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (mmkedit->sub, _("Subtitle File"));
   }
@@ -3134,7 +3134,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.label             = _("Sub File");
     lb.callback          = _mmkedit_select_sub;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list, &lb,
-      x + 10 + w - 20 - 100, y + 16, 100, 20, "Black", "Black", "White", btnfontname);
+      x + 10 + w - 20 - 100, y + 16, 100, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (b, _("Select a subtitle file to use together with the mrl."));
 
@@ -3174,7 +3174,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.label             = _("OK");
     lb.callback          = _mmkedit_ok;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (b, _("Apply the changes and close the window."));
 
@@ -3182,7 +3182,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.label             = _("Apply");
     lb.callback          = _mmkedit_apply;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (b, _("Apply the changes to the playlist."));
 
@@ -3190,7 +3190,7 @@ void mmk_edit_mediamark (gGui_t *gui, mediamark_t **mmk, apply_callback_t callba
     lb.label             = _("Close");
     lb.callback          = _mmkedit_exit;
     b =  xitk_noskin_labelbutton_create (mmkedit->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (mmkedit->widget_list, b, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     xitk_set_widget_tips (b, _("Discard changes and dismiss the window."));
   }

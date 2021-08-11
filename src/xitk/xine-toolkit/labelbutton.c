@@ -52,7 +52,7 @@ typedef struct {
   int                     shortcut_pos;
 
   xitk_short_string_t     label, shortcut_label, font, shortcut_font, skin_element_name;
-  char                    color[XITK_IMG_STATE_SELECTED + 1][32];
+  uint32_t                color[XITK_IMG_STATE_SELECTED + 1];
 } _lbutton_private_t;
 
 size_t xitk_short_string_set (xitk_short_string_t *s, const char *v) {
@@ -147,24 +147,15 @@ static void _create_labelofbutton (_lbutton_private_t *wp,
     &lbear, &rbear, &width, &asc, &des);
 
   /*  Some colors configurations */
-  {
-    xitk_color_names_t color, *have_cn = NULL;
-    static const xitk_cfg_item_t idx[2 * (XITK_IMG_STATE_SELECTED + 1)] = {
-      XITK_BLACK_COLOR, XITK_BLACK_COLOR, XITK_WHITE_COLOR,
-      XITK_BG_COLOR, XITK_BG_COLOR, XITK_SELECT_COLOR
-    };
-    if (strcasecmp (wp->color[state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state], "Default"))
-      have_cn = xitk_get_color_name (&color, wp->color[state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state]);
-    if (have_cn) {
-      uint32_t v = (color.red << 16) + (color.green << 8) + color.blue;
-      if (!(wp->w.state & XITK_WIDGET_STATE_ENABLE)) {
-        v = ((v >> 2) & 0x3f3f3f) + 0x606060;
-      }
-      fg = xitk_color_db_get (wp->w.wl->xitk, v);
-    } else {
-      fg = xitk_get_cfg_num (wp->w.wl->xitk,
-      idx[((wp->w.state & XITK_WIDGET_STATE_ENABLE) ? 0 : 3) + (state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state)]);
-    }
+  fg = wp->color[state > XITK_IMG_STATE_SELECTED ? XITK_IMG_STATE_SELECTED : state];
+  if (fg & 0x80000000) {
+    fg = xitk_get_cfg_num (wp->w.wl->xitk, (fg == XITK_NOSKIN_TEXT_INV)
+        ? ((wp->w.state & XITK_WIDGET_STATE_ENABLE) ? XITK_WHITE_COLOR : XITK_DISABLED_WHITE_COLOR)
+        : ((wp->w.state & XITK_WIDGET_STATE_ENABLE) ? XITK_BLACK_COLOR : XITK_DISABLED_BLACK_COLOR));
+  } else {
+    if (!(wp->w.state & XITK_WIDGET_STATE_ENABLE))
+      fg = xitk_disabled_color (fg);
+    fg = xitk_color_db_get (wp->w.wl->xitk, fg);
   }
 
   roff = (state == XITK_IMG_STATE_SELECTED) || (state == XITK_IMG_STATE_SEL_FOCUS) ? 5 : 1;
@@ -401,9 +392,9 @@ static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *s
     info = xitk_skin_get_info (skonfig, wp->skin_element_name.s);
     if (info) {
       wp->skin = info->pixmap_img;
-      strlcpy (wp->color[XITK_IMG_STATE_NORMAL],   info->label_color, sizeof (wp->color[XITK_IMG_STATE_NORMAL]));
-      strlcpy (wp->color[XITK_IMG_STATE_FOCUS],    info->label_color_focus, sizeof (wp->color[XITK_IMG_STATE_FOCUS]));
-      strlcpy (wp->color[XITK_IMG_STATE_SELECTED], info->label_color_click, sizeof (wp->color[XITK_IMG_STATE_SELECTED]));
+      wp->color[XITK_IMG_STATE_NORMAL] = info->label_color;
+      wp->color[XITK_IMG_STATE_FOCUS] = info->label_color_focus;
+      wp->color[XITK_IMG_STATE_SELECTED] = info->label_color_click;
       xitk_short_string_set (&wp->font, info->label_fontname);
       wp->label_visible = info->label_printable;
       wp->label_static  = info->label_staticity;
@@ -427,9 +418,9 @@ static void _labelbutton_new_skin (_lbutton_private_t *wp, xitk_skin_config_t *s
       wp->skin.width    = 0;
       wp->skin.height   = 0;
       wp->skin.image    = NULL;
-      wp->color[XITK_IMG_STATE_NORMAL][0]   = 0;
-      wp->color[XITK_IMG_STATE_FOCUS][0]    = 0;
-      wp->color[XITK_IMG_STATE_SELECTED][0] = 0;
+      wp->color[XITK_IMG_STATE_NORMAL]   = 0;
+      wp->color[XITK_IMG_STATE_FOCUS]    = 0;
+      wp->color[XITK_IMG_STATE_SELECTED] = 0;
       xitk_short_string_set (&wp->font, "");
       wp->label_visible = 0;
       wp->label_static  = 0;
@@ -602,9 +593,9 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
   xitk_short_string_init (&wp->skin_element_name);
   xitk_short_string_set (&wp->skin_element_name, b->skin_element_name);
 
-  strlcpy (wp->color[XITK_IMG_STATE_NORMAL],   info->label_color, sizeof (wp->color[XITK_IMG_STATE_NORMAL]));
-  strlcpy (wp->color[XITK_IMG_STATE_FOCUS],    info->label_color_focus, sizeof (wp->color[XITK_IMG_STATE_FOCUS]));
-  strlcpy (wp->color[XITK_IMG_STATE_SELECTED], info->label_color_click, sizeof (wp->color[XITK_IMG_STATE_SELECTED]));
+  wp->color[XITK_IMG_STATE_NORMAL] = info->label_color;
+  wp->color[XITK_IMG_STATE_FOCUS] = info->label_color_focus;
+  wp->color[XITK_IMG_STATE_SELECTED] = info->label_color_click;
 
   wp->label_offset      = 0;
   wp->align             = info->label_alignment;
@@ -654,7 +645,7 @@ xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
  */
 xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b, int x, int y, int width, int height,
-  const char *ncolor, const char *fcolor, const char *ccolor, const char *fname) {
+  uint32_t ncolor, uint32_t fcolor, uint32_t ccolor, const char *fname) {
   _lbutton_private_t *wp;
 
   ABORT_IF_NULL (wl);
@@ -717,9 +708,9 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   wp->temp_image.height = wp->skin.height;
 
   wp->skin_element_name.s = NULL;
-  strlcpy (wp->color[XITK_IMG_STATE_NORMAL],   ncolor, sizeof (wp->color[XITK_IMG_STATE_NORMAL]));
-  strlcpy (wp->color[XITK_IMG_STATE_FOCUS],    fcolor, sizeof (wp->color[XITK_IMG_STATE_FOCUS]));
-  strlcpy (wp->color[XITK_IMG_STATE_SELECTED], ccolor, sizeof (wp->color[XITK_IMG_STATE_SELECTED]));
+  wp->color[XITK_IMG_STATE_NORMAL] = ncolor;
+  wp->color[XITK_IMG_STATE_FOCUS] = fcolor;
+  wp->color[XITK_IMG_STATE_SELECTED] = ccolor;
 
   wp->label_offset      = 0;
   wp->align             = b->align;

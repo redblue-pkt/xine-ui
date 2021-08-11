@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -52,7 +52,9 @@ typedef struct {
 
   struct {
     int             black;
+    int             disabled_black;
     int             white;
+    int             disabled_white;
     int             background;
     int             focus;
     int             select;

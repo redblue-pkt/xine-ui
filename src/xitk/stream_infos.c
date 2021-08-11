@@ -608,7 +608,7 @@ void stream_infos_panel (gGui_t *gui) {
     lb.label    = _("Update");
     lb.callback = stream_infos_update;
     sinfo->update = xitk_noskin_labelbutton_create (sinfo->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (sinfo->widget_list, sinfo->update, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     if (gui->stream_info_auto_update)
@@ -618,7 +618,7 @@ void stream_infos_panel (gGui_t *gui) {
     lb.label    = _("Close");
     lb.callback = stream_infos_exit;
     sinfo->close = xitk_noskin_labelbutton_create (sinfo->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (sinfo->widget_list, sinfo->close, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 

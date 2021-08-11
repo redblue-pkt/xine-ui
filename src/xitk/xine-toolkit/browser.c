@@ -1190,7 +1190,7 @@ xitk_widget_t *xitk_noskin_browser_create (xitk_widget_list_t *wl, const xitk_br
       lb.label             = i < wp->items.num ? wp->items.names[i] : "";
       lb.userdata          = wp->visible.blist + i;
       wp->visible.btns[i + _W_items] = w = xitk_noskin_labelbutton_create (wl, &lb,
-        ix, iy, iw, itemh, "Black", "Black", "White", fontname);
+        ix, iy, iw, itemh, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, fontname);
       if (!w)
         break;
       xitk_dlist_add_tail (&wl->list, &w->node);

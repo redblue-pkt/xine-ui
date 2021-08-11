@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -371,9 +371,9 @@ static void _nullify_me(xitk_skin_element_t *s) {
   s->info.label_pixmap_font_img  = NULL;
   s->info.label_pixmap_highlight_font_name = NULL;
   s->info.label_pixmap_highlight_font_img = NULL;
-  s->info.label_color            = NULL;
-  s->info.label_color_focus      = NULL;
-  s->info.label_color_click      = NULL;
+  s->info.label_color            = 0;
+  s->info.label_color_focus      = 0;
+  s->info.label_color_click      = 0;
   s->info.label_fontname         = NULL;
   s->info.browser_entries        = -2;
   s->info.direction              = DIRECTION_LEFT; /* Compatibility */
@@ -493,9 +493,9 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  print       = %d\n", s->info.label_printable);
       printf("  static      = %d\n", s->info.label_staticity);
       printf("  length      = %d\n", s->info.label_length);
-      printf("  color       = '%s'\n", s->info.label_color);
-      printf("  color focus = '%s'\n", s->info.label_color_focus);
-      printf("  color click = '%s'\n", s->info.label_color_click);
+      printf("  color       = '#%06x'\n", (unsigned int)s->info.label_color);
+      printf("  color focus = '#%06x'\n", (unsigned int)s->info.label_color_focus);
+      printf("  color click = '#%06x'\n", (unsigned int)s->info.label_color_click);
       printf("  pixmap font = '%s'\n", s->info.label_pixmap_font_name);
       printf("  pixmap highlight_font = '%s'\n", s->info.label_pixmap_highlight_font_name);
       printf("  pixmap fmt  = '%s'\n", s->info.label_pixmap_font_format);
@@ -590,9 +590,6 @@ static void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
       XITK_FREE(s->info.slider_pixmap_pad_name);
       XITK_FREE(s->info.label_pixmap_font_name);
       XITK_FREE(s->info.label_pixmap_font_format);
-      XITK_FREE(s->info.label_color);
-      XITK_FREE(s->info.label_color_focus);
-      XITK_FREE(s->info.label_color_click);
       XITK_FREE(s->info.label_fontname);
       XITK_FREE(s);
     }
@@ -722,13 +719,13 @@ static void _skin_parse_2 (xitk_skin_config_t *skonfig, char *text, xitk_cfg_par
               s->info.label_animation = xitk_get_bool_value (val2);
               break;
             case 2: /* color */
-              s->info.label_color = strdup (val2);
+              s->info.label_color = xitk_get_color_name (val2);
               break;
             case 3: /* color_click */
-              s->info.label_color_click = strdup (val2);
+              s->info.label_color_click = xitk_get_color_name (val2);
               break;
             case 4: /* color_focus */
-              s->info.label_color_focus = strdup (val2);
+              s->info.label_color_focus = xitk_get_color_name (val2);
               break;
             case 5: /* font */
               s->info.label_fontname = strdup (val2);
@@ -1006,3 +1003,4 @@ void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
   if (skonfig)
     pthread_mutex_unlock (&skonfig->skin_mutex);
 }
+

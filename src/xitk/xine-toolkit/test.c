@@ -523,7 +523,7 @@ static void create_inputtext(void) {
 	   (test->input =
 	    xitk_noskin_inputtext_create(test->widget_list, &inp,
 					 150, 150, 150, 20,
-					 "Black", "Black", fontname)));
+					 XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname)));
   xitk_enable_and_show_widget(test->input);
 
   xitk_set_widget_tips_default(test->input, "This is an input text.");
@@ -984,7 +984,7 @@ int main(int argc, char **argv) {
 	   (w = xitk_noskin_labelbutton_create(test->widget_list, &lb,
 					       (windoww / 2) - 50, windowh - 50,
 					       100, 30,
-					       "Black", "Black", "White", fontname)));
+					       XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, fontname)));
   xitk_enable_and_show_widget(w);
   xitk_set_widget_tips_default(w, "Do you really want to leave me?");
 

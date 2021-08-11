@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -37,7 +37,7 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 /** */
 xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   xitk_inputtext_widget_t *it, int x, int y, int width, int height,
-  const char *ncolor, const char *fcolor, const char *font_name);
+  uint32_t ncolor, uint32_t fcolor, const char *font_name);
 /** Return the text of widget. */
 char *xitk_inputtext_get_text (xitk_widget_t *w);
 /** Change and redisplay the text of widget. */

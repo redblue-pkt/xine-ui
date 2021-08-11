@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2017 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -53,23 +53,11 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
 
     while(*c == ' ' || *c == '\t') c++;
 
-    if((strchr(c, '#')) || (isalpha(*c))) {
-      xitk_color_names_t color;
-
-      if (xitk_get_color_name (&color, c)) {
-	/*
-	 * We can't use xitk_get_pixel_from_rgb() here,
-	 * 'cause we didn't have any ImlibData object.
-	 */
-        pixel = XITK_RGB_INT (color.red, color.green, color.blue);
-      }
-      else {
-	XITK_WARNING("%s@%d: wrong color name: '%s'\n", __FUNCTION__, __LINE__, c);
-	pixel = 0;
-      }
+    pixel = xitk_get_color_name (c);
+    if (pixel == ~0) {
+      XITK_WARNING ("%s@%d: wrong color name: '%s'\n", __FUNCTION__, __LINE__, c);
+      pixel = 0;
     }
-    else
-      sscanf(c, "%d", &pixel);
 
     if(!strncasecmp(p, "warning_foreground", 15))
       xtcf->colors.warn_foreground = pixel;
@@ -330,7 +318,9 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.warn_foreground = XITK_RGB_INT (0, 0, 0);
   xtcf->colors.warn_background = XITK_RGB_INT (255, 255, 0);
   xtcf->color_vals.black       = -1;
+  xtcf->color_vals.disabled_black = -1;
   xtcf->color_vals.white       = -1;
+  xtcf->color_vals.disabled_white = -1;
   xtcf->color_vals.background  = -1;
   xtcf->color_vals.focus       = -1;
   xtcf->color_vals.sel_focus   = -1;
@@ -370,6 +360,12 @@ const char *xitk_config_get_string (xitk_config_t *xtcf, xitk_cfg_item_t item) {
   return _xtcf->color_vals._name; \
 } while (0)
 
+#define XITK_DISABLED_COLOR_VAL(_xtcf,_name) do { \
+  if (_xtcf->color_vals.disabled_##_name < 0) \
+    _xtcf->color_vals.disabled_##_name = xitk_color_db_get (_xtcf->xitk, xitk_disabled_color (_xtcf->colors._name)); \
+  return _xtcf->color_vals.disabled_##_name; \
+} while (0)
+
 int xitk_config_get_num (xitk_config_t *xtcf, xitk_cfg_item_t item) {
   if (!xtcf)
     return -1;
@@ -378,7 +374,9 @@ int xitk_config_get_num (xitk_config_t *xtcf, xitk_cfg_item_t item) {
     case XITK_SHM_ENABLE:    return (xtcf->features.shm > 0) ? 1 : 0;
     case XITK_MENU_SHORTCUTS_ENABLE: return xtcf->menus.shortcuts;
     case XITK_BLACK_COLOR:   XITK_COLOR_VAL (xtcf, black);
+    case XITK_DISABLED_BLACK_COLOR: XITK_DISABLED_COLOR_VAL (xtcf, black);
     case XITK_WHITE_COLOR:   XITK_COLOR_VAL (xtcf, white);
+    case XITK_DISABLED_WHITE_COLOR: XITK_DISABLED_COLOR_VAL (xtcf, white);
     case XITK_BG_COLOR:      XITK_COLOR_VAL (xtcf, background);
     case XITK_FOCUS_COLOR:   XITK_COLOR_VAL (xtcf, focus);
     case XITK_SEL_FOCUS_COLOR: XITK_COLOR_VAL (xtcf, sel_focus);

@@ -1212,7 +1212,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_alias] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_alias], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x += btnw + 4;
@@ -1225,7 +1225,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_edit] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_edit], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x += btnw + 4;
@@ -1238,7 +1238,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_delete] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_delete], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x += btnw + 4;
@@ -1251,7 +1251,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_save] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_save], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x += btnw + 4;
@@ -1264,7 +1264,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_reset] =  xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_reset], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x += btnw + 4;
@@ -1277,7 +1277,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_done] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, btnw, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_done], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = 15;
@@ -1390,7 +1390,7 @@ void kbedit_window (gGui_t *gui) {
   lb.userdata          = kbedit;
   lb.skin_element_name = NULL;
   kbedit->w[_W_grab] = xitk_noskin_labelbutton_create (kbedit->widget_list, &lb, x, y, WINDOW_WIDTH - 30, 23,
-    "Black", "Black", "White", hboldfontname);
+    XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
   xitk_add_widget (kbedit->widget_list, kbedit->w[_W_grab], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   kbedit_unset (kbedit);

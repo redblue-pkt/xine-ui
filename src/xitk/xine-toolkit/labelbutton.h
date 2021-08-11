@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2020 the xine project
+ * Copyright (C) 2000-2021 the xine project
  *
  * This file is part of xine, a unix video player.
  *
@@ -47,7 +47,7 @@ xitk_widget_t *xitk_info_labelbutton_create (xitk_widget_list_t *wl,
 xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   const xitk_labelbutton_widget_t *b,
   int x, int y, int width, int height,
-  const char *ncolor, const char *fcolor, const char *ccolor,
+  uint32_t ncolor, uint32_t fcolor, uint32_t ccolor,
   const char *fname);
 /** Change label of button 'widget'. */
 int xitk_labelbutton_change_label (xitk_widget_t *w, const char *new_label);
