@@ -359,7 +359,7 @@ void event_sender_panel (gGui_t *gui) {
       es->wdgts[i] = xitk_noskin_labelbutton_create (es->widget_list, &lb,
         _es_event_types[i].x, _es_event_types[i].y,
         _es_event_types[i].w, _es_event_types[i].h,
-        "Black", "Black", "White", hboldfontname);
+        XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
       xitk_add_widget (es->widget_list, es->wdgts[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
@@ -369,7 +369,7 @@ void event_sender_panel (gGui_t *gui) {
       es->wdgts[i] = xitk_noskin_labelbutton_create (es->widget_list, &lb,
         _es_event_types[i].x, _es_event_types[i].y,
         _es_event_types[i].w, _es_event_types[i].h,
-        "Black", "Black", "White", hboldfontname);
+        XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
       xitk_add_widget (es->widget_list, es->wdgts[i], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
     }
 
@@ -381,7 +381,7 @@ void event_sender_panel (gGui_t *gui) {
     lb.callback = event_sender_exit;
     lb.userdata = es;
     w = xitk_noskin_labelbutton_create (es->widget_list,
-      &lb, x, y, 70, 23, "Black", "Black", "White", hboldfontname);
+      &lb, x, y, 70, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, hboldfontname);
     xitk_add_widget (es->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 

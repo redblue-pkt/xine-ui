@@ -55,7 +55,7 @@ typedef struct {
   xitk_widget_t           w;
 
   xitk_short_string_t     skin_element_name, fontname;
-  char                    color[_IT_END][32];
+  uint32_t                color[_IT_END];
 
   xitk_part_image_t       skin;
 
@@ -403,16 +403,15 @@ static void _paint_partial_inputtext (_inputtext_private_t *wp, widget_event_t *
   }
 
   /*  Some colors configurations */
-  {
-    xitk_color_names_t color, *have_cn = NULL;
-
-    if (strcasecmp (wp->color[state], "Default"))
-      have_cn = xitk_get_color_name (&color, wp->color[state]);
-    if (have_cn) {
-      fg = xitk_color_db_get (wp->w.wl->xitk, (color.red << 16) + (color.green << 8) +  color.blue);
-    } else {
-      fg = xitk_get_cfg_num (wp->w.wl->xitk, XITK_BLACK_COLOR);
-    }
+  fg = wp->color[state];
+  if (fg & 0x80000000) {
+    fg = xitk_get_cfg_num (wp->w.wl->xitk, (fg == XITK_NOSKIN_TEXT_INV)
+        ? ((wp->w.state & XITK_WIDGET_STATE_ENABLE) ? XITK_WHITE_COLOR : XITK_DISABLED_WHITE_COLOR)
+        : ((wp->w.state & XITK_WIDGET_STATE_ENABLE) ? XITK_BLACK_COLOR : XITK_DISABLED_BLACK_COLOR));
+  } else {
+    if (!(wp->w.state & XITK_WIDGET_STATE_ENABLE))
+      fg = xitk_disabled_color (fg);
+    fg = xitk_color_db_get (wp->w.wl->xitk, fg);
   }
 
   cursor_x = 0;
@@ -614,8 +613,8 @@ static void _xitk_inputtext_apply_skin (_inputtext_private_t *wp, xitk_skin_conf
     wp->w.y = s->y;
     xitk_widget_state_from_info (&wp->w, s);
     xitk_short_string_set (&wp->fontname, s->label_fontname);
-    strlcpy (wp->color[_IT_NORMAL], s->label_color, sizeof (wp->color[_IT_NORMAL]));
-    strlcpy (wp->color[_IT_FOCUS], s->label_color_focus, sizeof (wp->color[_IT_FOCUS]));
+    wp->color[_IT_NORMAL] = s->label_color;
+    wp->color[_IT_FOCUS] = s->label_color_focus;
     wp->skin = s->pixmap_img;
   }
 }
@@ -1134,9 +1133,8 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
  *
  */
 xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
-					     xitk_inputtext_widget_t *it,
-					     int x, int y, int width, int height,
-                                             const char *ncolor, const char *fcolor, const char *fontname) {
+  xitk_inputtext_widget_t *it, int x, int y, int width, int height,
+  uint32_t ncolor, uint32_t fcolor, const char *fontname) {
   _inputtext_private_t *wp;
 
   ABORT_IF_NULL(wl);
@@ -1155,8 +1153,8 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   xitk_short_string_init (&wp->fontname);
   xitk_short_string_set (&wp->fontname, fontname);
 
-  strlcpy (wp->color[_IT_NORMAL], ncolor, sizeof (wp->color[_IT_NORMAL]));
-  strlcpy (wp->color[_IT_FOCUS], fcolor, sizeof (wp->color[_IT_FOCUS]));
+  wp->color[_IT_NORMAL] = ncolor;
+  wp->color[_IT_FOCUS] = fcolor;
 
   wp->skin_element_name.s = NULL;
   if (xitk_shared_image (wl, "xitk_inputtext", width * 2, height, &wp->skin.image) == 1)

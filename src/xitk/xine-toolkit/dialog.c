@@ -268,7 +268,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     if (button1_label) {
       lb.label = _xitk_window_dialog_label (button1_label);
       wd->w[_W_w1] = xitk_noskin_labelbutton_create (widget_list, &lb,
-        bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+        bx, by, bwidth, 30, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, DEFAULT_BOLD_FONT_12);
       if (wd->w[_W_w1])
         xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w1]->node);
       bx += bdx;
@@ -277,7 +277,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     if (button2_label) {
       lb.label = _xitk_window_dialog_label (button2_label);
       wd->w[_W_w2] = xitk_noskin_labelbutton_create (widget_list, &lb,
-        bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+        bx, by, bwidth, 30, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, DEFAULT_BOLD_FONT_12);
       if (wd->w[_W_w2])
         xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w2]->node);
       bx += bdx;
@@ -286,7 +286,7 @@ xitk_register_key_t xitk_window_dialog_3 (xitk_t *xitk, xitk_window_t *transient
     if (button3_label) {
       lb.label = _xitk_window_dialog_label (button3_label);
       wd->w[_W_w3] = xitk_noskin_labelbutton_create (widget_list, &lb,
-        bx, by, bwidth, 30, "Black", "Black", "White", DEFAULT_BOLD_FONT_12);
+        bx, by, bwidth, 30, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, DEFAULT_BOLD_FONT_12);
       if (wd->w[_W_w3])
         xitk_dlist_add_tail (&widget_list->list, &wd->w[_W_w3]->node);
     }

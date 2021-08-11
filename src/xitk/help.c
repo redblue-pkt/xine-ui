@@ -399,7 +399,8 @@ void help_panel (gGui_t *gui) {
     lb.userdata          = help;
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (help->widget_list, &lb,
-      WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+      WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
       xitk_add_widget (help->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 

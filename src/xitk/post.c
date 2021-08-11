@@ -991,7 +991,7 @@ static void _pplugin_add_parameter_widget (post_object_t *pobj) {
 	inp.callback          = _pplugin_set_param_char;
 	inp.userdata          = pobj;
         pobj->w[_W_value] = xitk_noskin_inputtext_create (info->win->widget_list, &inp,
-          0, 0, 365, 20, "Black", "Black", fontname);
+          0, 0, 365, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
         xitk_add_widget (info->win->widget_list, pobj->w[_W_value], XITK_WIDGET_STATE_KEEP);
       }
       break;
@@ -1183,7 +1183,7 @@ static void _pplugin_show_help (xitk_widget_t *w, void *data, int state) {
     lb.skin_element_name = NULL;
     w =  xitk_noskin_labelbutton_create (help_widget_list,
       &lb, HELP_WINDOW_WIDTH - (100 + 15), HELP_WINDOW_HEIGHT - (23 + 15), 100, 23,
-      "Black", "Black", "White", btnfontname);
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (help_widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
 
@@ -1313,7 +1313,7 @@ static void _pplugin_retrieve_parameters(post_info_t *info, post_object_t *pobj)
       lb.userdata          = pobj;
       lb.skin_element_name = NULL;
       pobj->w[_W_help] =  xitk_noskin_labelbutton_create (info->win->widget_list,
-        &lb, 0, 0, 63, 20, "Black", "Black", "White", btnfontname);
+        &lb, 0, 0, 63, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
       xitk_add_widget (info->win->widget_list, pobj->w[_W_help], XITK_WIDGET_STATE_KEEP);
     }
   }
@@ -1815,7 +1815,7 @@ void pplugin_panel (post_info_t *info) {
   lb.userdata          = info;
   lb.skin_element_name = NULL;
   info->win->w[_V_enable] =  xitk_noskin_labelbutton_create (info->win->widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (info->win->widget_list, info->win->w[_V_enable], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_labelbutton_set_state (info->win->w[_V_enable], info->type == POST_VIDEO ? gui->post_video_enable : gui->post_audio_enable);
@@ -1831,7 +1831,7 @@ void pplugin_panel (post_info_t *info) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   w =  xitk_noskin_labelbutton_create (info->win->widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (info->win->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   */
 
@@ -1845,7 +1845,7 @@ void pplugin_panel (post_info_t *info) {
   lb.userdata          = info;
   lb.skin_element_name = NULL;
   info->win->w[_V_exit] =  xitk_noskin_labelbutton_create (info->win->widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (info->win->widget_list, info->win->w[_V_exit], XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   _pplugin_get_plugins(info);

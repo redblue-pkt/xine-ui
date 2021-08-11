@@ -579,7 +579,7 @@ static void setup_section_widgets (xui_setup_t *setup, int s) {
             inp.callback          = stringtype_update;
             inp.userdata          = wt;
             wt->w[_T_widget] = xitk_noskin_inputtext_create (setup->widget_list, &inp,
-              x, y, 260, 20, "Black", "Black", fontname);
+              x, y, 260, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
             xitk_add_widget (setup->widget_list, wt->w[_T_widget], 0);
           }
           break;
@@ -944,19 +944,22 @@ xui_setup_t *setup_panel (gGui_t *gui) {
     lb.label             = _("OK");
     lb.callback          = setup_ok;
     setup->ok = xitk_noskin_labelbutton_create (setup->widget_list, &lb,
-      15, WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+      15, WINDOW_HEIGHT - (23 + 15), 100, 23,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
     xitk_add_widget (setup->widget_list, setup->ok, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     lb.label             = _("Apply");
     lb.callback          = setup_apply;
     w = xitk_noskin_labelbutton_create (setup->widget_list, &lb,
-      (WINDOW_WIDTH - 100) >> 1, WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+      (WINDOW_WIDTH - 100) >> 1, WINDOW_HEIGHT - (23 + 15), 100, 23,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
     xitk_add_widget (setup->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     lb.label             = _("Close");
     lb.callback          = setup_exit;
     w =  xitk_noskin_labelbutton_create (setup->widget_list, &lb,
-      WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23, "Black", "Black", "White", tabsfontname);
+      WINDOW_WIDTH - (100 + 15), WINDOW_HEIGHT - (23 + 15), 100, 23,
+      XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
     xitk_add_widget (setup->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
   setup->kreg = xitk_be_register_event_handler ("setup", setup->xwin, setup_event, setup, NULL, NULL);

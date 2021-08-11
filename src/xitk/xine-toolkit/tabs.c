@@ -147,7 +147,7 @@ static void _tabs_paint (_tabs_private_t *wp, widget_event_t *event) {
       xitk_widget_t *sel = wp->selected >= 0 ? wp->tabs[wp->selected] : NULL;
 
       if (sel)
-        xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_ON | XITK_WIDGET_STATE_FOCUS,
+        xitk_widgets_state (wp->tabs + wp->selected, 1, XITK_WIDGET_STATE_FOCUS,
           (wp->w.state & XITK_WIDGET_STATE_FOCUS) ? ~0u : 0);
     }
   }
@@ -440,7 +440,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       lb.state_callback    = tabs_select;
       lb.userdata          = (void *)&wp->ref[i];
       if ((wp->tabs[i] = xitk_noskin_labelbutton_create (wl, &lb,
-        xx, y, fwidth + 20, wp->bheight, "Black", "Black", "Black", fontname))) {
+        xx, y, fwidth + 20, wp->bheight, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname))) {
         wp->tabs[i]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_TABS;
         wp->tabs[i]->type &= ~WIDGET_TABABLE;
         xitk_dlist_add_tail (&wl->list, &wp->tabs[i]->node);

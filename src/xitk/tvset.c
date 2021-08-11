@@ -393,7 +393,7 @@ void tvset_panel(void) {
   inp.callback          = NULL;
   inp.userdata          = NULL;
   tvset.framerate = xitk_noskin_inputtext_create (tvset.widget_list, &inp,
-    x + 10, y + 15, w - 20 + 1, 20, "Black", "Black", fontname);
+    x + 10, y + 15, w - 20 + 1, 20, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, fontname);
   xitk_add_widget (tvset.widget_list, tvset.framerate, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   tvset.vidstd_entries = (const char **) malloc(sizeof(const char *) *
@@ -451,7 +451,7 @@ void tvset_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   tvset.update = xitk_noskin_labelbutton_create (tvset.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (tvset.widget_list, tvset.update, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   x = WINDOW_WIDTH - (100 + 15);
@@ -464,7 +464,7 @@ void tvset_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   widget =  xitk_noskin_labelbutton_create (tvset.widget_list,
-    &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+    &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
   xitk_add_widget (tvset.widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
   xitk_window_set_background_image (tvset.xwin, bg);

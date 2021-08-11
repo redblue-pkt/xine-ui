@@ -35,7 +35,8 @@ struct xitk_skin_element_info_s {
   int label_length, label_alignment, label_y, label_printable, label_staticity;
   int label_animation, label_animation_step;
   unsigned long int label_animation_timer;
-  char *label_color, *label_color_focus, *label_color_click, *label_fontname;
+  uint32_t label_color, label_color_focus, label_color_click;
+  char *label_fontname;
   char *label_pixmap_font_name, *label_pixmap_highlight_font_name;
   char *label_pixmap_font_format;
   xitk_image_t *label_pixmap_font_img, *label_pixmap_highlight_font_img;
@@ -44,6 +45,9 @@ struct xitk_skin_element_info_s {
   char *slider_pixmap_pad_name;
   xitk_part_image_t slider_pixmap_pad_img;
 };
+
+/* generic disabled color: shift half way towards gray. */
+#define xitk_disabled_color(_rgb) ((((uint32_t)_rgb >> 2) & 0x3f3f3f) + 0x606060)
 
 /* Alloc a xitk_skin_config_t* memory area, nullify pointers. */
 xitk_skin_config_t *xitk_skin_init_config (xitk_t *xitk);

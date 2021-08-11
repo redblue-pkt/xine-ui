@@ -285,7 +285,7 @@ xitk_widget_t *xitk_noskin_doublebox_create (xitk_widget_list_t *wl,
   inp.callback          = doublebox_change_value;
   inp.userdata          = (void *)wp;
   wp->iw[_W_input] = xitk_noskin_inputtext_create (wl, &inp,
-    x, y, (width - 10), height, "Black", "Black", DEFAULT_FONT_10);
+    x, y, (width - 10), height, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, DEFAULT_FONT_10);
   if (wp->iw[_W_input]) {
     xitk_dlist_add_tail (&wl->list, &wp->iw[_W_input]->node);
     wp->iw[_W_input]->type |= WIDGET_GROUP_MEMBER | WIDGET_GROUP_DOUBLEBOX;

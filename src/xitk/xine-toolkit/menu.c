@@ -478,8 +478,8 @@ static void _menu_open (_menu_node_t *node, int x, int y) {
   info.label_printable   = 1;
   info.label_staticity   = 0;
   info.label_color       =
-  info.label_color_focus = (char *)"Black";
-  info.label_color_click = (char *)"White";
+  info.label_color_focus = XITK_NOSKIN_TEXT_NORM;
+  info.label_color_click = XITK_NOSKIN_TEXT_INV;
   info.label_fontname    = (char *)DEFAULT_BOLD_FONT_12;
 
   yy = 1;

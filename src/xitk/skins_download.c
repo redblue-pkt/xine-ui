@@ -575,7 +575,7 @@ void skin_download (gGui_t *gui, char *url) {
     lb.userdata          = skd;
     lb.skin_element_name = NULL;
     widget =  xitk_noskin_labelbutton_create (skd->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (skd->widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     x = WINDOW_WIDTH - (100 + 15);
@@ -588,7 +588,7 @@ void skin_download (gGui_t *gui, char *url) {
     lb.userdata          = skd;
     lb.skin_element_name = NULL;
     widget =  xitk_noskin_labelbutton_create (skd->widget_list,
-      &lb, x, y, 100, 23, "Black", "Black", "White", btnfontname);
+      &lb, x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, btnfontname);
     xitk_add_widget (skd->widget_list, widget, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     skd->widget_key = xitk_be_register_event_handler ("skdloader", skd->xwin, download_skin_event, skd, NULL, NULL);

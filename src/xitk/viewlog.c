@@ -398,7 +398,7 @@ void viewlog_panel (gGui_t *gui) {
     lb.userdata          = vl;
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
-      x, y, 100, 23, "Black", "Black", "White", tabsfontname);
+      x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
     xitk_add_widget (vl->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
 
     x = WINDOW_WIDTH - (100 + 15);
@@ -411,7 +411,7 @@ void viewlog_panel (gGui_t *gui) {
     lb.userdata          = vl;
     lb.skin_element_name = NULL;
     w = xitk_noskin_labelbutton_create (vl->widget_list, &lb,
-      x, y, 100, 23, "Black", "Black", "White", tabsfontname);
+      x, y, 100, 23, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_NORM, XITK_NOSKIN_TEXT_INV, tabsfontname);
     xitk_add_widget (vl->widget_list, w, XITK_WIDGET_STATE_ENABLE | XITK_WIDGET_STATE_VISIBLE);
   }
 
