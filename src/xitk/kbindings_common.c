@@ -34,17 +34,40 @@
 #include "videowin.h"
 #include "actions.h"
 
-static char *refs_strdup (const char *text) {
-  size_t l;
+/* refs string layout: [int32_t] (char)
+ * [(-)(-)(count)(refs)] [(t)(e)(x)(t)] [( )(h)(e)(r)] [(e)(\0)(\0)(\0)] [0]
+ *           ((char *)ptr)-^                     ((int32_t *)ptr + count)-^ */
+
+typedef union {
+  int32_t i[32];
+  char s[4 * 32];
+} refs_dummy_t;
+
+static ATTR_INLINE_ALL_STRINGOPS char *refs_set_dummy (refs_dummy_t *dummy, const char *text) {
+  size_t l = strlen (text) + 1;
+  if (l > sizeof (*dummy) - 8)
+    l = sizeof (*dummy) - 8;
+  dummy->i[(4 + l - 1) >> 2] = 0;
+  dummy->i[(4 + l - 1 + 4) >> 2] = 0;
+  memcpy (dummy->s + 4, text, l);
+  dummy->s[2] = (l + 3) >> 2;
+  return dummy->s + 4;
+}
+
+static ATTR_INLINE_ALL_STRINGOPS char *refs_strdup (const char *text) {
+  size_t l, s;
   char *m;
 
   if (!text)
     return NULL;
   l = strlen (text) + 1;
-  m = malloc (4 + l);
+  s = (4 + l + 4 + 3) & ~3u;
+  m = malloc (s);
   if (!m)
     return NULL;
+  memset (m + s - 8, 0, 8);
   m += 4;
+  m[-2] = (s - 8) >> 2;
   m[-1] = 1;
   memcpy (m, text, l);
   return m;
@@ -91,395 +114,394 @@ typedef struct {
  */
 static const struct {
   const char       *comment;     /* Comment automatically added in xbinding_display*() outputs */
-  const char       *action;      /* Human readable action, used in config file too */
   action_id_t       action_id;   /* The numerical action, handled in a case statement */
-  const char        key[9];      /* key binding */
+  const char        action[24];  /* Human readable action, used in config file too */
+  const char        key[10];      /* key binding */
   uint8_t           modifier;    /* Modifier key of binding (can be OR'ed) */
   uint8_t           is_alias : 1;/* is made from an alias entry ? */
   uint8_t           is_gui : 1;
 }  default_binding_table[] = {
   { N_("start playback"),
-    "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PLAY,                      "Play",                   "Return",   KEYMOD_NOMOD,    0, 0},
   { N_("playback pause toggle"),
-    "Pause",                  ACTID_PAUSE                   , "space",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PAUSE,                     "Pause",                  "space",    KEYMOD_NOMOD,    0, 0},
   { N_("stop playback"),
-    "Stop",                   ACTID_STOP                    , "S",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_STOP,                      "Stop",                   "S",        KEYMOD_NOMOD,    0, 0},
   { N_("close stream"),
-    "Close",                  ACTID_CLOSE                   , "C",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_CLOSE,                     "Close",                  "C",        KEYMOD_NOMOD,    0, 0},
   { N_("take a snapshot"),
-    "Snapshot",               ACTID_SNAPSHOT                , "t",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SNAPSHOT,                  "Snapshot",               "t",        KEYMOD_NOMOD,    0, 0},
   { N_("eject the current medium"),
-    "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EJECT,                     "Eject",                  "e",        KEYMOD_NOMOD,    0, 0},
   { N_("select and play next MRL in the playlist"),
-    "NextMrl",                ACTID_MRL_NEXT                , "Next",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_MRL_NEXT,                  "NextMrl",                "Next",     KEYMOD_NOMOD,    0, 0},
   { N_("select and play previous MRL in the playlist"),
-    "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_MRL_PRIOR,                 "PriorMrl",               "Prior",    KEYMOD_NOMOD,    0, 0},
   { N_("select and play MRL in the playlist"),
-    "SelectMrl",              ACTID_MRL_SELECT              , "Select",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_MRL_SELECT,                "SelectMrl",              "Select",   KEYMOD_NOMOD,    0, 0},
   { N_("loop mode toggle"),
-    "ToggleLoopMode",         ACTID_LOOPMODE	            , "l",	  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_LOOPMODE,                  "ToggleLoopMode",         "l",        KEYMOD_NOMOD,    0, 0},
   { N_("stop playback after played stream"),
-    "PlaylistStop",           ACTID_PLAYLIST_STOP           , "l",	  KEYMOD_CONTROL , 0 , 0},
+    ACTID_PLAYLIST_STOP,             "PlaylistStop",           "l",        KEYMOD_CONTROL,  0, 0},
   { N_("scan playlist to grab stream infos"),
-    "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SCANPLAYLIST,              "ScanPlaylistInfo",       "s",        KEYMOD_CONTROL,  0, 0},
   { N_("add a mediamark from current playback"),
-    "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_ADDMEDIAMARK,              "AddMediamark",           "a",        KEYMOD_CONTROL,  0, 0},
   { N_("edit selected mediamark"),
-    "MediamarkEditor",        ACTID_MMKEDITOR               , "e",        KEYMOD_CONTROL , 0 , 1},
+    ACTID_MMKEDITOR,                 "MediamarkEditor",        "e",        KEYMOD_CONTROL,  0, 1},
   { N_("set position to -60 seconds in current stream"),
-    "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SEEK_REL_m60,              "SeekRelative-60",        "Left",     KEYMOD_NOMOD,    0, 0},
   { N_("set position to +60 seconds in current stream"),
-    "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SEEK_REL_p60,              "SeekRelative+60",        "Right",    KEYMOD_NOMOD,    0, 0},
   { N_("set position to -30 seconds in current stream"),
-    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 , 0},
+    ACTID_SEEK_REL_m30,              "SeekRelative-30",        "Left",     KEYMOD_META,     0, 0},
   { N_("set position to +30 seconds in current stream"),
-    "SeekRelative+30",        ACTID_SEEK_REL_p30            , "Right",    KEYMOD_META    , 0 , 0},
+    ACTID_SEEK_REL_p30,              "SeekRelative+30",        "Right",    KEYMOD_META,     0, 0},
   { N_("set position to -15 seconds in current stream"),
-    "SeekRelative-15",        ACTID_SEEK_REL_m15            , "Left",     KEYMOD_CONTROL , 0 , 0},
+    ACTID_SEEK_REL_m15,              "SeekRelative-15",        "Left",     KEYMOD_CONTROL,  0, 0},
   { N_("set position to +15 seconds in current stream"),
-    "SeekRelative+15",        ACTID_SEEK_REL_p15            , "Right",    KEYMOD_CONTROL , 0 , 0},
+    ACTID_SEEK_REL_p15,              "SeekRelative+15",        "Right",    KEYMOD_CONTROL,  0, 0},
   { N_("set position to -7 seconds in current stream"),
-    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 , 0},
+    ACTID_SEEK_REL_m7,               "SeekRelative-7",         "Left",     KEYMOD_MOD3,     0, 0},
   { N_("set position to +7 seconds in current stream"),
-    "SeekRelative+7",         ACTID_SEEK_REL_p7             , "Right",    KEYMOD_MOD3    , 0 , 0},
+    ACTID_SEEK_REL_p7,               "SeekRelative+7",         "Right",    KEYMOD_MOD3,     0, 0},
   { N_("set position to beginning of current stream"),
-    "SetPosition0%",          ACTID_SET_CURPOS_0            , "0",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_0,              "SetPosition0%",          "0",        KEYMOD_CONTROL,  0, 0},
   /* NOTE: these used to be "... to 10% of ..." etc. but msgmerge seems not to like such "c-format". */
   { N_("set position to 1/10 of current stream"),
-    "SetPosition10%",         ACTID_SET_CURPOS_10           , "1",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_10,             "SetPosition10%",         "1",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 2/10 of current stream"),
-    "SetPosition20%",         ACTID_SET_CURPOS_20           , "2",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_20,             "SetPosition20%",         "2",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 3/10 of current stream"),
-    "SetPosition30%",         ACTID_SET_CURPOS_30           , "3",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_30,             "SetPosition30%",         "3",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 4/10 of current stream"),
-    "SetPosition40%",         ACTID_SET_CURPOS_40           , "4",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_40,             "SetPosition40%",         "4",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 5/10 of current stream"),
-    "SetPosition50%",         ACTID_SET_CURPOS_50           , "5",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_50,             "SetPosition50%",         "5",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 6/10 of current stream"),
-    "SetPosition60%",         ACTID_SET_CURPOS_60           , "6",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_60,             "SetPosition60%",         "6",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 7/10 of current stream"),
-    "SetPosition70%",         ACTID_SET_CURPOS_70           , "7",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_70,             "SetPosition70%",         "7",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 8/10 of current stream"),
-    "SetPosition80%",         ACTID_SET_CURPOS_80           , "8",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_80,             "SetPosition80%",         "8",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to 9/10 of current stream"),
-    "SetPosition90%",         ACTID_SET_CURPOS_90           , "9",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_90,             "SetPosition90%",         "9",        KEYMOD_CONTROL,  0, 0},
   { N_("set position to end of current stream"),
-    "SetPosition100%",        ACTID_SET_CURPOS_100          , "End",      KEYMOD_CONTROL , 0 , 0},
+    ACTID_SET_CURPOS_100,            "SetPosition100%",        "End",      KEYMOD_CONTROL,  0, 0},
   { N_("increment playback speed"),
-    "SpeedFaster",            ACTID_SPEED_FAST              , "Up",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SPEED_FAST,                "SpeedFaster",            "Up",       KEYMOD_NOMOD,    0, 0},
   { N_("decrement playback speed"),
-    "SpeedSlower",            ACTID_SPEED_SLOW              , "Down",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SPEED_SLOW,                "SpeedSlower",            "Down",     KEYMOD_NOMOD,    0, 0},
   { N_("reset playback speed"),
-    "SpeedReset",             ACTID_SPEED_RESET             , "Down",     KEYMOD_META    , 0 , 0},
+    ACTID_SPEED_RESET,               "SpeedReset",             "Down",     KEYMOD_META,     0, 0},
   { N_("increment audio volume"),
-    "Volume+",                ACTID_pVOLUME                 , "V",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_pVOLUME,                   "Volume+",                "V",        KEYMOD_NOMOD,    0, 0},
   { N_("decrement audio volume"),
-    "Volume-",                ACTID_mVOLUME                 , "v",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_mVOLUME,                   "Volume-",                "v",        KEYMOD_NOMOD,    0, 0},
   { N_("increment amplification level"),
-    "Amp+",                   ACTID_pAMP                    , "V",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_pAMP,                      "Amp+",                   "V",        KEYMOD_CONTROL,  0, 0},
   { N_("decrement amplification level"),
-    "Amp-",                   ACTID_mAMP                    , "v",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_mAMP,                      "Amp-",                   "v",        KEYMOD_CONTROL,  0, 0},
   { N_("reset amplification to default value"),
-    "ResetAmp",               ACTID_AMP_RESET               , "A",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_AMP_RESET,                 "ResetAmp",               "A",        KEYMOD_CONTROL,  0, 0},
   { N_("audio muting toggle"),
-    "Mute",                   ACTID_MUTE                    , "m",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_MUTE,                      "Mute",                   "m",        KEYMOD_CONTROL,  0, 0},
   { N_("select next audio channel"),
-    "AudioChannelNext",       ACTID_AUDIOCHAN_NEXT          , "plus",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_AUDIOCHAN_NEXT,            "AudioChannelNext",       "plus",     KEYMOD_NOMOD,    0, 0},
   { N_("select previous audio channel"),
-    "AudioChannelPrior",      ACTID_AUDIOCHAN_PRIOR         , "minus",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_AUDIOCHAN_PRIOR,           "AudioChannelPrior",      "minus",    KEYMOD_NOMOD,    0, 0},
   { N_("visibility toggle of audio post effect window"),
-    "APProcessShow",          ACTID_APP                     , "VOID",     KEYMOD_NOMOD   , 0 , 1},
+    ACTID_APP,                       "APProcessShow",          "VOID",     KEYMOD_NOMOD,    0, 1},
   { N_("toggle post effect usage"),
-    "APProcessEnable",        ACTID_APP_ENABLE              , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_APP_ENABLE,                "APProcessEnable",        "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("select next sub picture (subtitle) channel"),
-    "SpuNext",                ACTID_SPU_NEXT                , "period",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SPU_NEXT,                  "SpuNext",                "period",   KEYMOD_NOMOD,    0, 0},
   { N_("select previous sub picture (subtitle) channel"),
-    "SpuPrior",               ACTID_SPU_PRIOR               , "comma",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SPU_PRIOR,                 "SpuPrior",               "comma",    KEYMOD_NOMOD,    0, 0},
   { N_("interlaced mode toggle"),
-    "ToggleInterleave",       ACTID_TOGGLE_INTERLEAVE       , "i",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_TOGGLE_INTERLEAVE,         "ToggleInterleave",       "i",        KEYMOD_NOMOD,    0, 0},
   { N_("cycle aspect ratio values"),
-    "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_TOGGLE_ASPECT_RATIO,       "ToggleAspectRatio",      "a",        KEYMOD_NOMOD,    0, 0},
   { N_("reduce the output window size by factor 1.2"),
-    "WindowReduce",           ACTID_WINDOWREDUCE            , "less",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_WINDOWREDUCE,              "WindowReduce",           "less",     KEYMOD_NOMOD,    0, 0},
   { N_("enlarge the output window size by factor 1.2"),
-    "WindowEnlarge",          ACTID_WINDOWENLARGE           , "greater",  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_WINDOWENLARGE,             "WindowEnlarge",          "greater",  KEYMOD_NOMOD,    0, 0},
   { N_("set video output window to 50%"),
-    "Window50",               ACTID_WINDOW50                , "1",        KEYMOD_META    , 0 , 0},
+    ACTID_WINDOW50,                  "Window50",               "1",        KEYMOD_META,     0, 0},
   { N_("set video output window to 100%"),
-    "Window100",              ACTID_WINDOW100               , "2",        KEYMOD_META    , 0 , 0},
+    ACTID_WINDOW100,                 "Window100",              "2",        KEYMOD_META,     0, 0},
   { N_("set video output window to 200%"),
-    "Window200",              ACTID_WINDOW200               , "3",        KEYMOD_META    , 0 , 0},
+    ACTID_WINDOW200,                 "Window200",              "3",        KEYMOD_META,     0, 0},
   { N_("zoom in"),
-    "ZoomIn",                 ACTID_ZOOM_IN                 , "z",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_ZOOM_IN,                   "ZoomIn",                 "z",        KEYMOD_NOMOD,    0, 0},
   { N_("zoom out"),
-    "ZoomOut",                ACTID_ZOOM_OUT                , "Z",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_ZOOM_OUT,                  "ZoomOut",                "Z",        KEYMOD_NOMOD,    0, 0},
   { N_("zoom in horizontally"),
-    "ZoomInX",                ACTID_ZOOM_X_IN               , "z",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_ZOOM_X_IN,                 "ZoomInX",                "z",        KEYMOD_CONTROL,  0, 0},
   { N_("zoom out horizontally"),
-    "ZoomOutX",               ACTID_ZOOM_X_OUT              , "Z",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_ZOOM_X_OUT,                "ZoomOutX",               "Z",        KEYMOD_CONTROL,  0, 0},
   { N_("zoom in vertically"),
-    "ZoomInY",                ACTID_ZOOM_Y_IN               , "z",        KEYMOD_META    , 0 , 0},
+    ACTID_ZOOM_Y_IN,                 "ZoomInY",                "z",        KEYMOD_META,     0, 0},
   { N_("zoom out vertically"),
-    "ZoomOutY",               ACTID_ZOOM_Y_OUT              , "Z",        KEYMOD_META    , 0 , 0},
+    ACTID_ZOOM_Y_OUT,                "ZoomOutY",               "Z",        KEYMOD_META,     0, 0},
   { N_("reset zooming"),
-    "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
+    ACTID_ZOOM_RESET,                "ZoomReset",              "z",        KEYMOD_CONTROL | KEYMOD_META, 0, 0},
   { N_("resize output window to stream size"),
-    "Zoom1:1",                ACTID_ZOOM_1_1                , "s",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_ZOOM_1_1,                  "Zoom1:1",                "s",        KEYMOD_NOMOD,    0, 0},
   { N_("fullscreen toggle"),
-    "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_TOGGLE_FULLSCREEN,         "ToggleFullscreen",       "f",        KEYMOD_NOMOD,    0, 0},
 #ifdef HAVE_XINERAMA
   { N_("Xinerama fullscreen toggle"),
-    "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCREEN
-                                                            , "F",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_TOGGLE_XINERAMA_FULLSCREEN,"ToggleXineramaFullscr",  "F",        KEYMOD_NOMOD,    0, 0},
 #endif
   { N_("jump to media Menu"),
-    "Menu",                   ACTID_EVENT_MENU1             , "Escape",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU1,               "Menu",                   "Escape",   KEYMOD_NOMOD,    0, 0},
   { N_("jump to Title Menu"),
-    "TitleMenu",              ACTID_EVENT_MENU2             , "F1",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU2,               "TitleMenu",              "F1",       KEYMOD_NOMOD,    0, 0},
   { N_("jump to Root Menu"),
-    "RootMenu",               ACTID_EVENT_MENU3             , "F2",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU3,               "RootMenu",               "F2",       KEYMOD_NOMOD,    0, 0},
   { N_("jump to Subpicture Menu"),
-    "SubpictureMenu",         ACTID_EVENT_MENU4             , "F3",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU4,               "SubpictureMenu",         "F3",       KEYMOD_NOMOD,    0, 0},
   { N_("jump to Audio Menu"),
-    "AudioMenu",              ACTID_EVENT_MENU5             , "F4",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU5,               "AudioMenu",              "F4",       KEYMOD_NOMOD,    0, 0},
   { N_("jump to Angle Menu"),
-    "AngleMenu",              ACTID_EVENT_MENU6             , "F5",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU6,               "AngleMenu",              "F5",       KEYMOD_NOMOD,    0, 0},
   { N_("jump to Part Menu"),
-    "PartMenu",               ACTID_EVENT_MENU7             , "F6",       KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_MENU7,               "PartMenu",               "F6",       KEYMOD_NOMOD,    0, 0},
   { N_("menu navigate up"),
-    "EventUp",                ACTID_EVENT_UP                , "KP_Up",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_UP,                  "EventUp",                "KP_Up",    KEYMOD_NOMOD,    0, 0},
   { N_("menu navigate down"),
-    "EventDown",              ACTID_EVENT_DOWN              , "KP_Down",  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_DOWN,                "EventDown",              "KP_Down",  KEYMOD_NOMOD,    0, 0},
   { N_("menu navigate left"),
-    "EventLeft",              ACTID_EVENT_LEFT              , "KP_Left",  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_LEFT,                "EventLeft",              "KP_Left",  KEYMOD_NOMOD,    0, 0},
   { N_("menu navigate right"),
-    "EventRight",             ACTID_EVENT_RIGHT             , "KP_Right", KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_RIGHT,               "EventRight",             "KP_Right", KEYMOD_NOMOD,    0, 0},
   { N_("menu select"),
-    "EventSelect",            ACTID_EVENT_SELECT            , "KP_Enter", KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_SELECT,              "EventSelect",            "KP_Enter", KEYMOD_NOMOD,    0, 0},
   { N_("jump to next chapter"),
-    "EventNext",              ACTID_EVENT_NEXT              , "KP_Next",  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NEXT,                "EventNext",              "KP_Next",  KEYMOD_NOMOD,    0, 0},
   { N_("jump to previous chapter"),
-    "EventPrior",             ACTID_EVENT_PRIOR             , "KP_Prior", KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_PRIOR,               "EventPrior",             "KP_Prior", KEYMOD_NOMOD,    0, 0},
   { N_("select next angle"),
-    "EventAngleNext",         ACTID_EVENT_ANGLE_NEXT        , "KP_Home",  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_ANGLE_NEXT,          "EventAngleNext",         "KP_Home",  KEYMOD_NOMOD,    0, 0},
   { N_("select previous angle"),
-    "EventAnglePrior",        ACTID_EVENT_ANGLE_PRIOR       , "KP_End",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_ANGLE_PRIOR,         "EventAnglePrior",        "KP_End",   KEYMOD_NOMOD,    0, 0},
   { N_("visibility toggle of help window"),
-    "HelpShow",               ACTID_HELP_SHOW               , "h",        KEYMOD_META    , 0 , 1},
+    ACTID_HELP_SHOW,                 "HelpShow",               "h",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of video post effect window"),
-    "VPProcessShow",          ACTID_VPP                     , "P",        KEYMOD_META    , 0 , 1},
+    ACTID_VPP,                       "VPProcessShow",          "P",        KEYMOD_META,     0, 1},
   { N_("toggle post effect usage"),
-    "VPProcessEnable",        ACTID_VPP_ENABLE              , "P",        KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
+    ACTID_VPP_ENABLE,                "VPProcessEnable",        "P",        KEYMOD_CONTROL | KEYMOD_META, 0, 0},
   { N_("visibility toggle of output window"),
-    "ToggleWindowVisibility", ACTID_TOGGLE_WINOUT_VISIBLITY , "h",        KEYMOD_NOMOD   , 0 , 1},
+    ACTID_TOGGLE_WINOUT_VISIBLITY,   "ToggleWindowVisibility", "h",        KEYMOD_NOMOD,    0, 1},
   { N_("bordered window toggle of output window"),
-    "ToggleWindowBorder",     ACTID_TOGGLE_WINOUT_BORDER    , "b",        KEYMOD_NOMOD   , 0 , 1},
+    ACTID_TOGGLE_WINOUT_BORDER,      "ToggleWindowBorder",     "b",        KEYMOD_NOMOD,    0, 1},
   { N_("visibility toggle of UI windows"),
-    "ToggleVisibility",       ACTID_TOGGLE_VISIBLITY        , "g",        KEYMOD_NOMOD   , 0 , 1},
+    ACTID_TOGGLE_VISIBLITY,          "ToggleVisibility",       "g",        KEYMOD_NOMOD,    0, 1},
   { N_("visibility toggle of control window"),
-    "ControlShow",            ACTID_CONTROLSHOW             , "c",        KEYMOD_META    , 0 , 1},
+    ACTID_CONTROLSHOW,               "ControlShow",            "c",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of mrl browser window"),
-    "MrlBrowser",             ACTID_MRLBROWSER              , "m",        KEYMOD_META    , 0 , 1},
+    ACTID_MRLBROWSER,                "MrlBrowser",             "m",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of playlist editor window"),
-    "PlaylistEditor",         ACTID_PLAYLIST                , "p",        KEYMOD_META    , 0 , 1},
+    ACTID_PLAYLIST,                  "PlaylistEditor",         "p",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of the setup window"),
-    "SetupShow",              ACTID_SETUP                   , "s",        KEYMOD_META    , 0 , 1},
+    ACTID_SETUP,                     "SetupShow",              "s",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of the event sender window"),
-    "EventSenderShow",        ACTID_EVENT_SENDER            , "e",        KEYMOD_META    , 0 , 1},
+    ACTID_EVENT_SENDER,              "EventSenderShow",        "e",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of analog TV window"),
-    "TVAnalogShow",           ACTID_TVANALOG                , "t",        KEYMOD_META    , 0 , 1},
+    ACTID_TVANALOG,                  "TVAnalogShow",           "t",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of log viewer"),
-    "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 , 1},
+    ACTID_VIEWLOG,                   "ViewlogShow",            "l",        KEYMOD_META,     0, 1},
   { N_("visibility toggle of stream info window"),
-    "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 , 1},
+    ACTID_STREAM_INFOS,              "StreamInfosShow",        "i",        KEYMOD_META,     0, 1},
   { N_("display stream information using OSD"),
-    "OSDStreamInfos",         ACTID_OSD_SINFOS              , "i",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_OSD_SINFOS,                "OSDStreamInfos",         "i",        KEYMOD_CONTROL,  0, 0},
   { N_("display information using OSD"),
-    "OSDWriteText",           ACTID_OSD_WTEXT               , "VOID",     KEYMOD_CONTROL , 0 , 0},
+    ACTID_OSD_WTEXT,                 "OSDWriteText",           "VOID",     KEYMOD_CONTROL,  0, 0},
   { N_("show OSD menu"),
-    "OSDMenu",                ACTID_OSD_MENU                , "O",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_OSD_MENU,                  "OSDMenu",                "O",        KEYMOD_NOMOD,    0, 0},
   { N_("enter key binding editor"),
-    "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 , 1},
+    ACTID_KBEDIT,                    "KeyBindingEditor",       "k",        KEYMOD_META,     0, 1},
   { N_("enable key bindings (not useful to bind a key to it!)"),
-    "KeyBindingsEnable",      ACTID_KBENABLE	            , "VOID",	  KEYMOD_NOMOD   , 0 , 0},
+    ACTID_KBENABLE,                  "KeyBindingsEnable",      "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("open file selector"),
-    "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 , 1},
+    ACTID_FILESELECTOR,              "FileSelector",           "o",        KEYMOD_CONTROL,  0, 1},
   { N_("select a subtitle file"),
-    "SubSelector",            ACTID_SUBSELECT               , "S",        KEYMOD_CONTROL , 0 , 1},
+    ACTID_SUBSELECT,                 "SubSelector",            "S",        KEYMOD_CONTROL,  0, 1},
 #ifdef HAVE_CURL
   { N_("download a skin from the skin server"),
-    "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 , 1},
+    ACTID_SKINDOWNLOAD,              "SkinDownload",           "d",        KEYMOD_CONTROL,  0, 1},
 #endif
   { N_("display MRL/Ident toggle"),
-    "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 , 0},
+    ACTID_MRLIDENTTOGGLE,            "MrlIdentToggle",         "t",        KEYMOD_CONTROL,  0, 0},
   { N_("grab pointer toggle"),
-    "GrabPointer",            ACTID_GRAB_POINTER            , "Insert",   KEYMOD_NOMOD   , 0 , 0},
+    ACTID_GRAB_POINTER,              "GrabPointer",            "Insert",   KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 0"),
-    "Number0",                ACTID_EVENT_NUMBER_0          , "0",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_0,            "Number0",                "0",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 1"),
-    "Number1",                ACTID_EVENT_NUMBER_1          , "1",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_1,            "Number1",                "1",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 2"),
-    "Number2",                ACTID_EVENT_NUMBER_2          , "2",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_2,            "Number2",                "2",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 3"),
-    "Number3",                ACTID_EVENT_NUMBER_3          , "3",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_3,            "Number3",                "3",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 4"),
-    "Number4",                ACTID_EVENT_NUMBER_4          , "4",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_4,            "Number4",                "4",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 5"),
-    "Number5",                ACTID_EVENT_NUMBER_5          , "5",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_5,            "Number5",                "5",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 6"),
-    "Number6",                ACTID_EVENT_NUMBER_6          , "6",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_6,            "Number6",                "6",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 7"),
-    "Number7",                ACTID_EVENT_NUMBER_7          , "7",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_7,            "Number7",                "7",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 8"),
-    "Number8",                ACTID_EVENT_NUMBER_8          , "8",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_8,            "Number8",                "8",        KEYMOD_NOMOD,    0, 0},
   { N_("enter the number 9"),
-    "Number9",                ACTID_EVENT_NUMBER_9          , "9",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_NUMBER_9,            "Number9",                "9",        KEYMOD_NOMOD,    0, 0},
   { N_("add 10 to the next entered number"),
-    "Number10add",            ACTID_EVENT_NUMBER_10_ADD     , "plus",     KEYMOD_MOD3    , 0 , 0},
+    ACTID_EVENT_NUMBER_10_ADD,       "Number10add",            "plus",     KEYMOD_MOD3,     0, 0},
   { N_("set position in current stream to numeric percentage"),
-    "SetPosition%",           ACTID_SET_CURPOS              , "slash",    KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SET_CURPOS,                "SetPosition%",           "slash",    KEYMOD_NOMOD,    0, 0},
   { N_("set position forward by numeric argument in current stream"),
-    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 , 0},
+    ACTID_SEEK_REL_p,                "SeekRelative+",          "Up",       KEYMOD_META,     0, 0},
   { N_("set position back by numeric argument in current stream"),
-    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 , 0},
+    ACTID_SEEK_REL_m,                "SeekRelative-",          "Up",       KEYMOD_MOD3,     0, 0},
   { N_("change audio video syncing (delay video)"),
-    "AudioVideoDecay+",       ACTID_AV_SYNC_p3600           , "m",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_AV_SYNC_p3600,             "AudioVideoDecay+",       "m",        KEYMOD_NOMOD,    0, 0},
   { N_("change audio video syncing (delay audio)"),
-    "AudioVideoDecay-",       ACTID_AV_SYNC_m3600           , "n",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_AV_SYNC_m3600,             "AudioVideoDecay-",       "n",        KEYMOD_NOMOD,    0, 0},
   { N_("reset audio video syncing offset"),
-    "AudioVideoDecayReset",   ACTID_AV_SYNC_RESET           , "Home",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_AV_SYNC_RESET,             "AudioVideoDecayReset",   "Home",     KEYMOD_NOMOD,    0, 0},
   { N_("change subtitle syncing (delay video)"),
-    "SpuVideoDecay+",         ACTID_SV_SYNC_p               , "M",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SV_SYNC_p,                 "SpuVideoDecay+",         "M",        KEYMOD_NOMOD,    0, 0},
   { N_("change subtitle syncing (delay subtitles)"),
-    "SpuVideoDecay-",         ACTID_SV_SYNC_m               , "N",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SV_SYNC_m,                 "SpuVideoDecay-",         "N",        KEYMOD_NOMOD,    0, 0},
   { N_("reset subtitle syncing offset"),
-    "SpuVideoDecayReset",     ACTID_SV_SYNC_RESET           , "End",      KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SV_SYNC_RESET,             "SpuVideoDecayReset",     "End",      KEYMOD_NOMOD,    0, 0},
   { N_("toggle TV modes (on the DXR3)"),
-    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
+    ACTID_TOGGLE_TVMODE,             "ToggleTVmode",           "o",        KEYMOD_CONTROL | KEYMOD_META, 0, 0},
   { N_("switch Monitor to DPMS standby mode"),
-    "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_DPMSSTANDBY,               "DPMSStandby",            "d",        KEYMOD_NOMOD,    0, 0},
   { N_("increase hue by 10"),
-    "HueControl+",            ACTID_HUECONTROLp             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_HUECONTROLp,               "HueControl+",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease hue by 10"),
-    "HueControl-",            ACTID_HUECONTROLm             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_HUECONTROLm,               "HueControl-",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase saturation by 10"),
-    "SaturationControl+",     ACTID_SATURATIONCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SATURATIONCONTROLp,        "SaturationControl+",     "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease saturation by 10"),
-    "SaturationControl-",     ACTID_SATURATIONCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SATURATIONCONTROLm,        "SaturationControl-",     "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase brightness by 10"),
-    "BrightnessControl+",     ACTID_BRIGHTNESSCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_BRIGHTNESSCONTROLp,        "BrightnessControl+",     "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease brightness by 10"),
-    "BrightnessControl-",     ACTID_BRIGHTNESSCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_BRIGHTNESSCONTROLm,        "BrightnessControl-",     "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase contrast by 10"),
-    "ContrastControl+",       ACTID_CONTRASTCONTROLp        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_CONTRASTCONTROLp,          "ContrastControl+",       "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease contrast by 10"),
-    "ContrastControl-",       ACTID_CONTRASTCONTROLm        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_CONTRASTCONTROLm,          "ContrastControl-",       "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase gamma by 10"),
-    "GammaControl+",          ACTID_GAMMACONTROLp           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_GAMMACONTROLp,             "GammaControl+",          "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease gamma by 10"),
-    "GammaControl-",          ACTID_GAMMACONTROLm           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_GAMMACONTROLm,             "GammaControl-",          "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase sharpness by 10"),
-    "SharpnessControl+",      ACTID_SHARPNESSCONTROLp       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SHARPNESSCONTROLp,         "SharpnessControl+",      "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease sharpness by 10"),
-    "SharpnessControl-",      ACTID_SHARPNESSCONTROLm       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_SHARPNESSCONTROLm,         "SharpnessControl-",      "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("increase noise reduction by 10"),
-    "NoiseReductionControl+", ACTID_NOISEREDUCTIONCONTROLp  , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_NOISEREDUCTIONCONTROLp,    "NoiseReductionControl+", "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("decrease noise reduction by 10"),
-    "NoiseReductionControl-", ACTID_NOISEREDUCTIONCONTROLm  , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_NOISEREDUCTIONCONTROLm,    "NoiseReductionControl-", "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("quit the program"),
-    "Quit",                   ACTID_QUIT                    , "q",        KEYMOD_NOMOD   , 0 , 0},
+    ACTID_QUIT,                      "Quit",                   "q",        KEYMOD_NOMOD,    0, 0},
   { N_("input_pvr: set input"),
-    "PVRSetInput",            ACTID_PVR_SETINPUT            , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PVR_SETINPUT,              "PVRSetInput",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("input_pvr: set frequency"),
-    "PVRSetFrequency",        ACTID_PVR_SETFREQUENCY        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PVR_SETFREQUENCY,          "PVRSetFrequency",        "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("input_pvr: mark the start of a new stream section"),
-    "PVRSetMark",             ACTID_PVR_SETMARK             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PVR_SETMARK,               "PVRSetMark",             "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("input_pvr: set the name for the current stream section"),
-    "PVRSetName",             ACTID_PVR_SETNAME             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PVR_SETNAME,               "PVRSetName",             "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("input_pvr: save the stream section"),
-    "PVRSave",                ACTID_PVR_SAVE                , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PVR_SAVE,                  "PVRSave",                "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("Open playlist"),
-    "PlaylistOpen",           ACTID_PLAYLIST_OPEN           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_PLAYLIST_OPEN,             "PlaylistOpen",           "VOID",     KEYMOD_NOMOD,    0, 0},
 #ifdef ENABLE_VDR_KEYS
   { N_("VDR Red button"),
-    "VDRButtonRed",           ACTID_EVENT_VDR_RED            , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_RED,             "VDRButtonRed",           "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Green button"),
-    "VDRButtonGreen",         ACTID_EVENT_VDR_GREEN          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_GREEN,           "VDRButtonGreen",         "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Yellow button"),
-    "VDRButtonYellow",        ACTID_EVENT_VDR_YELLOW         , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_YELLOW,          "VDRButtonYellow",        "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Blue button"),
-    "VDRButtonBlue",          ACTID_EVENT_VDR_BLUE           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_BLUE,            "VDRButtonBlue",          "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Play"),
-    "VDRPlay",                ACTID_EVENT_VDR_PLAY           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_PLAY,            "VDRPlay",                "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Pause"),
-    "VDRPause",               ACTID_EVENT_VDR_PAUSE          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_PAUSE,           "VDRPause",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Stop"),
-    "VDRStop",                ACTID_EVENT_VDR_STOP           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_STOP,            "VDRStop",                "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Record"),
-    "VDRRecord",              ACTID_EVENT_VDR_RECORD         , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_RECORD,          "VDRRecord",              "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Fast forward"),
-    "VDRFastFwd",             ACTID_EVENT_VDR_FASTFWD        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_FASTFWD,         "VDRFastFwd",             "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Fast rewind"),
-    "VDRFastRew",             ACTID_EVENT_VDR_FASTREW        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_FASTREW,         "VDRFastRew",             "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Power"),
-    "VDRPower",               ACTID_EVENT_VDR_POWER          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_POWER,           "VDRPower",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Channel +"),
-    "VDRChannelPlus",         ACTID_EVENT_VDR_CHANNELPLUS    , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_CHANNELPLUS,     "VDRChannelPlus",         "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Channel -"),
-    "VDRChannelMinus",        ACTID_EVENT_VDR_CHANNELMINUS   , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_CHANNELMINUS,    "VDRChannelMinus",        "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Schedule menu"),
-    "VDRSchedule",            ACTID_EVENT_VDR_SCHEDULE       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_SCHEDULE,        "VDRSchedule",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Channel menu"),
-    "VDRChannels",            ACTID_EVENT_VDR_CHANNELS       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_CHANNELS,        "VDRChannels",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Timers menu"),
-    "VDRTimers",              ACTID_EVENT_VDR_TIMERS         , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_TIMERS,          "VDRTimers",              "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Recordings menu"),
-    "VDRRecordings",          ACTID_EVENT_VDR_RECORDINGS     , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_RECORDINGS,      "VDRRecordings",          "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Setup menu"),
-    "VDRSetup",               ACTID_EVENT_VDR_SETUP          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_SETUP,           "VDRSetup",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Command menu"),
-    "VDRCommands",            ACTID_EVENT_VDR_COMMANDS       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_COMMANDS,        "VDRCommands",            "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Command back"),
-    "VDRBack",                ACTID_EVENT_VDR_BACK           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_BACK,            "VDRBack",                "VOID",     KEYMOD_NOMOD,    0, 0},
 #ifdef XINE_EVENT_VDR_USER0 /* #ifdef is precaution for backward compatibility at the moment */
   { N_("VDR User command 0"),
-    "VDRUser0",               ACTID_EVENT_VDR_USER0          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER0,           "VDRUser0",               "VOID",     KEYMOD_NOMOD,    0, 0},
 #endif
   { N_("VDR User command 1"),
-    "VDRUser1",               ACTID_EVENT_VDR_USER1          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER1,           "VDRUser1",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 2"),
-    "VDRUser2",               ACTID_EVENT_VDR_USER2          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER2,           "VDRUser2",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 3"),
-    "VDRUser3",               ACTID_EVENT_VDR_USER3          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER3,           "VDRUser3",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 4"),
-    "VDRUser4",               ACTID_EVENT_VDR_USER4          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER4,           "VDRUser4",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 5"),
-    "VDRUser5",               ACTID_EVENT_VDR_USER5          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER5,           "VDRUser5",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 6"),
-    "VDRUser6",               ACTID_EVENT_VDR_USER6          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER6,           "VDRUser6",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 7"),
-    "VDRUser7",               ACTID_EVENT_VDR_USER7          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER7,           "VDRUser7",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 8"),
-    "VDRUser8",               ACTID_EVENT_VDR_USER8          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER8,           "VDRUser8",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR User command 9"),
-    "VDRUser9",               ACTID_EVENT_VDR_USER9          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_USER9,           "VDRUser9",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Volume +"),
-    "VDRVolumePlus",          ACTID_EVENT_VDR_VOLPLUS        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_VOLPLUS,         "VDRVolumePlus",          "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Volume -"),
-    "VDRVolumeMinus",         ACTID_EVENT_VDR_VOLMINUS       , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_VOLMINUS,        "VDRVolumeMinus",         "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Mute audio"),
-    "VDRMute",                ACTID_EVENT_VDR_MUTE           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_MUTE,            "VDRMute",                "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Audio menu"),
-    "VDRAudio",               ACTID_EVENT_VDR_AUDIO          , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_AUDIO,           "VDRAudio",               "VOID",     KEYMOD_NOMOD,    0, 0},
   { N_("VDR Command info"),
-    "VDRInfo",                ACTID_EVENT_VDR_INFO           , "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_INFO,            "VDRInfo",                "VOID",     KEYMOD_NOMOD,    0, 0},
 #ifdef XINE_EVENT_VDR_CHANNELPREVIOUS /* #ifdef is precaution for backward compatibility at the moment */
   { N_("VDR Previous channel"),
-    "VDRChannelPrevious",     ACTID_EVENT_VDR_CHANNELPREVIOUS, "VOID",     KEYMOD_NOMOD   , 0 , 0},
+    ACTID_EVENT_VDR_CHANNELPREVIOUS, "VDRChannelPrevious",     "VOID",     KEYMOD_NOMOD,    0, 0},
 #endif
 #ifdef XINE_EVENT_VDR_SUBTITLES /* #ifdef is precaution for backward compatibility at the moment */
   { N_("VDR Subtiles menu"),
-    "VDRSubtitles",           ACTID_EVENT_VDR_SUBTITLES      , "VOID",     KEYMOD_NOMOD   , 0 , 0}
+    ACTID_EVENT_VDR_SUBTITLES,       "VDRSubtitles",           "VOID",     KEYMOD_NOMOD,    0, 0}
 #endif
 #endif
 };
@@ -503,9 +525,21 @@ static int _kbindings_action_cmp (void *a, void *b) {
 }
 
 static int _kbindings_key_cmp (void *a, void *b) {
+  /* yes this depends on string length and mmachine endian,
+   * but it is still a atable sort. */
   kbinding_entry_t *d = (kbinding_entry_t *)a;
   kbinding_entry_t *e = (kbinding_entry_t *)b;
-  int f = strcmp (d->key, e->key); /* "A" != "a" */
+  /* "A" != "a" */
+  const int32_t *v1 = (const int32_t *)(const void *)d->key;
+  const int32_t *v2 = (const int32_t *)(const void *)e->key;
+  int32_t *s = (int32_t *)(void *)d->key + d->key[-2];
+  int f;
+  /* a layout violation that safely stops our fast single test loop. */
+  *s = 0x00ffff00;
+  while (*v1 == *v2)
+    v1++, v2++;
+  *s = 0;
+  f = *v1 - *v2;
   if (f)
     return f;
   return (int)d->modifier - (int)e->modifier;
@@ -974,17 +1008,21 @@ kbinding_t *_kbindings_duplicate_kbindings (kbinding_t *kbt) {
 
 kbinding_entry_t *kbindings_find_key (kbinding_t *kbt, const char *key, int modifier) {
   kbinding_entry_t *e;
+
   if (!kbt || !key)
     return NULL;
+
   e = kbt->last;
   if (e && !strcmp (e->key, key) && (e->modifier == modifier))
     return e;
+
   {
-    kbinding_entry_t dummy = {
-      .key = (char *)key, /* will not be written to */
+    refs_dummy_t dummy;
+    kbinding_entry_t e2 = {
+      .key = refs_set_dummy (&dummy, key),
       .modifier = modifier
     };
-    int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+    int i = xine_sarray_binary_search (kbt->key_index, &e2);
     if (i >= 0) {
       kbt->last = e = xine_sarray_get (kbt->key_index, i);
       return e;
@@ -1067,11 +1105,12 @@ int kbindings_entry_set (kbinding_t *kbt, int index, int modifier, const char *k
       return -2;
     }
     {
-      kbinding_entry_t dummy = {
-        .key = (char *)key, /* will not be written to */
+      refs_dummy_t dummy;
+      kbinding_entry_t e2 = {
+        .key = refs_set_dummy (&dummy, key),
         .modifier = modifier
       };
-      int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+      int i = xine_sarray_binary_search (kbt->key_index, &e2);
       if (i >= 0) {
         /* key already in use */
         e = xine_sarray_get (kbt->key_index, i);
@@ -1107,11 +1146,12 @@ int kbindings_alias_add (kbinding_t *kbt, int index, int modifier, const char *k
   if (!strcasecmp (key, "VOID"))
     return -2;
   {
-    kbinding_entry_t dummy = {
-      .key = (char *)key, /* will not be written to */
+    refs_dummy_t dummy;
+    kbinding_entry_t e2 = {
+      .key = refs_set_dummy (&dummy, key),
       .modifier = modifier
     };
-    int i = xine_sarray_binary_search (kbt->key_index, &dummy);
+    int i = xine_sarray_binary_search (kbt->key_index, &e2);
     if (i >= 0) {
       /* key already in use */
       e = xine_sarray_get (kbt->key_index, i);
