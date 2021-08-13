@@ -96,8 +96,7 @@ static void _menu_set_shortcuts (gGui_t *gui, menu_text_buf_t *tbuf, xitk_menu_e
       continue;
     sz = kbindings_get_shortcut (gui->kbindings, e->shortcut, tbuf->write, tbuf->end - tbuf->write, gui->shortcut_style);
     if (!sz) {
-      if (gui->verbosity >= 2)
-        printf ("gui.menu: action \"%s\" is invalid.\n", e->shortcut);
+      /* no shortcut set (VOID) */
       e->shortcut = NULL;
     } else if (tbuf->write + sz == tbuf->end) {
       if (gui->verbosity >= 2)
@@ -353,7 +352,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     { XITK_MENU_ENTRY_SEPARATOR, 0,
       _("Playlist/SEP"), NULL},
     { XITK_MENU_ENTRY_BRANCH, 0,
-      _("Playlist/Loop modes"), NULL},
+      _("Playlist/Loop modes"), "ToggleLoopMode"},
     { (gui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) ? XITK_MENU_ENTRY_CHECKED : XITK_MENU_ENTRY_CHECK,
       _MENU_PLAYL_CMD_BASE + PLAYL_NO_LOOP,
       _("Playlist/Loop modes/Disabled"), NULL},
@@ -396,7 +395,7 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     { XITK_MENU_ENTRY_SEPARATOR, 0,
       _("Video/SEP"), NULL},
     { XITK_MENU_ENTRY_BRANCH, 0,
-      _("Video/Aspect ratio"), NULL},
+      _("Video/Aspect ratio"), "ToggleAspectRatio"},
     { (aspect == XINE_VO_ASPECT_AUTO) ? XITK_MENU_ENTRY_CHECKED : XITK_MENU_ENTRY_CHECK,
       _MENU_ASPECT_BASE + XINE_VO_ASPECT_AUTO,
       _("Video/Aspect ratio/Automatic"), NULL},
@@ -441,9 +440,9 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
       _MENU_AUDIO_CMD_BASE + AUDIO_MUTE,
       _("Audio/Volume/Mute"), "Mute"},
     { XITK_MENU_ENTRY_PLAIN, _MENU_AUDIO_CMD_BASE + AUDIO_INCRE_VOL,
-      _("Audio/Volume/Increase 10%"), NULL},
+      _("Audio/Volume/Increase 10%"), "Volume+"},
     { XITK_MENU_ENTRY_PLAIN, _MENU_AUDIO_CMD_BASE + AUDIO_DECRE_VOL,
-      _("Audio/Volume/Decrease 10%"), NULL},
+      _("Audio/Volume/Decrease 10%"), "Volume-"},
     { XITK_MENU_ENTRY_BRANCH, 0,
       _("Audio/Channel"), NULL},
     { XITK_MENU_ENTRY_BRANCH, 0,
@@ -453,10 +452,10 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
     { XITK_MENU_ENTRY_BRANCH, 0,
       _("Audio/Postprocess"), NULL},
     { XITK_MENU_ENTRY_PLAIN, _MENU_AUDIO_CMD_BASE + AUDIO_PPROCESS,
-      _("Audio/Postprocess/Chain Reaction..."), NULL /* "APProcessShow" */},
+      _("Audio/Postprocess/Chain Reaction..."), "APProcessShow"},
     { gui->post_audio_enable ? XITK_MENU_ENTRY_CHECKED : XITK_MENU_ENTRY_CHECK,
       _MENU_AUDIO_CMD_BASE + AUDIO_PPROCESS_ENABLE,
-      _("Audio/Postprocess/Enable Postprocessing"), NULL /* "APProcessEnable" */},
+      _("Audio/Postprocess/Enable Postprocessing"), "APProcessEnable"},
     { XITK_MENU_ENTRY_BRANCH, 0,
       _("Subtitle"), NULL},
     { XITK_MENU_ENTRY_BRANCH, 0,
@@ -667,6 +666,9 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
   }
 
   { /* Menus access */
+    static const char menu_shortcuts[7][16] = {
+      "Menu", "TitleMenu", "RootMenu", "SubpictureMenu", "AudioMenu", "AngleMenu", "PartMenu"
+    };
     static const char menu_entries[21][16] = {
       /* Default menu */
       N_("Menu 1"), N_("Menu 2"), N_("Menu 3"), N_("Menu 4"),
@@ -704,6 +706,8 @@ void video_window_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y) {
       snprintf (buf, sizeof (buf), "%s/%s", menus_str, gettext (menu_entries [first_entry + i]));
       menu_entry.menu = buf;
       menu_entry.user_id = _MENU_NAV_BASE + XINE_EVENT_INPUT_MENU1 + i;
+      menu_entry.shortcut = menu_shortcuts[i];
+      _menu_set_shortcuts (gui, &tbuf, &menu_entry, 1);
       xitk_menu_add_entry (w, &menu_entry);
     }
   }
@@ -876,7 +880,7 @@ void playlist_menu (gGui_t *gui, xitk_widget_list_t *wl, int x, int y, int selec
     { XITK_MENU_ENTRY_TITLE,     0,                                     NULL,            NULL              },
     { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_PLAY_CUR, _("Play"),       NULL              },
     { XITK_MENU_ENTRY_SEPARATOR, 0,                                     "SEP",           NULL              },
-    { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_SCAN_SEL, _("Scan"),       NULL              },
+    { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_SCAN_SEL, _("Scan"),       "ScanPlaylistInfo"},
     { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_OPEN_MRLB,_("Add"),        NULL              },
     { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_MMK_EDIT, _("Edit"),       "MediamarkEditor" },
     { XITK_MENU_ENTRY_PLAIN,     _MENU_PLAYL_CMD_BASE + PLAYL_DEL_1,    _("Delete"),     NULL,             },
