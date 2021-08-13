@@ -115,7 +115,7 @@ typedef struct {
 static const struct {
   const char       *comment;     /* Comment automatically added in xbinding_display*() outputs */
   action_id_t       action_id;   /* The numerical action, handled in a case statement */
-  const char        action[24];  /* Human readable action, used in config file too */
+  const char        action[24];  /* Human readable action, used in config file too. 4 aligned. */
   const char        key[10];      /* key binding */
   uint8_t           modifier;    /* Modifier key of binding (can be OR'ed) */
   uint8_t           is_alias : 1;/* is made from an alias entry ? */
@@ -518,7 +518,26 @@ struct kbinding_s {
 static int _kbindings_action_cmp (void *a, void *b) {
   kbinding_entry_t *d = (kbinding_entry_t *)a;
   kbinding_entry_t *e = (kbinding_entry_t *)b;
-  int f = strcasecmp (d->action, e->action);
+  const int32_t *v1 = (const int32_t *)(const void *)d->action;
+  const int32_t *v2 = (const int32_t *)(const void *)e->action;
+  int f;
+  /* 'A' == 'a, sizeof (default_binding_table[0].action) == 6 * 4 */
+  f = (v1[0] | 0x20202020) - (v2[0] | 0x20202020);
+  if (f)
+    return f;
+  f = (v1[1] | 0x20202020) - (v2[1] | 0x20202020);
+  if (f)
+    return f;
+  f = (v1[2] | 0x20202020) - (v2[2] | 0x20202020);
+  if (f)
+    return f;
+  f = (v1[3] | 0x20202020) - (v2[3] | 0x20202020);
+  if (f)
+    return f;
+  f = (v1[4] | 0x20202020) - (v2[4] | 0x20202020);
+  if (f)
+    return f;
+  f = (v1[5] | 0x20202020) - (v2[5] | 0x20202020);
   if (f)
     return f;
   return (int)d->is_alias - (int)e->is_alias;
@@ -657,11 +676,22 @@ static int _kbindings_modifier_from_string (const char *s) {
  * Return a key binding entry (if available) matching with action string.
  */
 static kbinding_entry_t *_kbindings_lookup_action (kbinding_t *kbt, const char *action) {
-  kbinding_entry_t dummy = {
-    .action = (char *)action, /* will not be written to */
-    .is_alias = 0
-  };
-  int i = xine_sarray_binary_search (kbt->action_index, &dummy);
+  union {
+    int32_t i[6];
+    char s[6 * 4];
+  } buf;
+  kbinding_entry_t dummy;
+  size_t s = strlen (action) + 1;
+  int i;
+
+  if (s > sizeof (buf))
+    s = sizeof (buf);
+  for (i = s >> 2; i < (int)sizeof (buf) / 4; i++)
+    buf.i[i] = 0;
+  memcpy (buf.s, action, s);
+  dummy.action = buf.s;
+  dummy.is_alias = 0;
+  i = xine_sarray_binary_search (kbt->action_index, &dummy);
   if (i < 0)
     return NULL;
   return (kbinding_entry_t *)xine_sarray_get (kbt->action_index, i);
